@@ -153,6 +153,10 @@ trace (Kakoulis-Tollis 2006, Been et al.) before any novelty claim. Task 741: th
 - `dev/tom-review-queue.md` still lists R-366/R-367/R-075 and the round-2 placer items as open;
   all were answered in conversation 2026-09-28/29. Clear them against this file.
 
+- Unverified: a second File > Open in one browser session showed the picker but never opened the
+  file (seen by the fix/time-series-open agent in headless Chrome). Reproduce before believing it.
+- Time Series fixed twice on 09-29 (switch: ff488a8d; open + waiting message: 2c1814df).
+
 ### Traps met 2026-09-28/29
 
 - **A broad `pkill -f check_all.sh` kills every session's run** (an agent did it; master's run died

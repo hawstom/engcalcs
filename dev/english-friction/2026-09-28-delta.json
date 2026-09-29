@@ -131,8 +131,10 @@
         "the middle of each bar is where step 1 (Place approximately) left the size and rotation, so 1 and 0 mean no change",
         "a garbled fragment with some other meaning"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "Proposed English: 'The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change.' Waits for Tom's ruling; the five translations follow the first reading."
+      "disposition": "english",
+      "resolution": "English rewritten on Tom's approval of the proposal (2026-09-29). The 26 translations are now stale; they resync in the next sprint (detect_english_drift.php lists them).",
+      "human_answer": "TGH 2026-09-29: approved",
+      "human_answered": "2026-09-29"
     },
     {
       "key": "lpn_lock_requested",
@@ -143,8 +145,9 @@
         "File, Close (the real menu row)",
         "a 'Close project' control that does not exist"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "Proposed English: '...save your work and use File, Close to hand it over.' Waits for Tom's ruling."
+      "disposition": "english",
+      "resolution": "English rewritten on Tom's approval of the proposal (2026-09-29). The 26 translations are now stale; they resync in the next sprint (detect_english_drift.php lists them).",
+      "human_answer": "TGH 2026-09-29: approved"
     },
     {
       "key": "lpn_settings_symbol_cap_mid",

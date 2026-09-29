@@ -977,6 +977,11 @@
             "on": "Every other junction and every pipe",
             "ruled": "2026-09-01"
         },
+        "lpn_ff_design_no_selection": {
+            "on": "The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.",
+            "ruled": "2026-09-29",
+            "answer": "Edited."
+        },
         "lpn_ff_design_none": {
             "on": "Nothing in the chosen set was drawn down by any junction tested.",
             "ruled": "2026-09-01"
@@ -988,6 +993,11 @@
         "lpn_ff_design_off_note": {
             "on": "The effect on the rest of the system was not checked in this run.",
             "ruled": "2026-09-01"
+        },
+        "lpn_ff_design_selected": {
+            "on": "The selected junctions and their pipes",
+            "ruled": "2026-09-29",
+            "answer": "OK."
         },
         "lpn_ff_design_tip": {
             "on": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or run too fast? Choosing to check it costs no extra calculation.",
@@ -1400,6 +1410,11 @@
             "ruled": "2026-09-23",
             "answer": "Default needs to be off. I see that you turned it on by default, and that already has caused me grief. Only a few texts would be privileged to have this on. Otherwise ok."
         },
+        "lpn_field_text_anchor": {
+            "on": "Attached to",
+            "ruled": "2026-09-29",
+            "answer": "OK."
+        },
         "lpn_field_text_attached": {
             "on": "Attached to",
             "ruled": "2026-08-29"
@@ -1588,6 +1603,11 @@
         "lpn_find_query_tip": {
             "on": "The same search, written as one line. Change the controls and it rewrites itself, or type in it and the controls follow.",
             "ruled": "2026-08-29"
+        },
+        "lpn_find_shift_hint": {
+            "on": "Shift+click to add/remove toggle.",
+            "ruled": "2026-09-29",
+            "answer": "Edited."
         },
         "lpn_fitting_add": {
             "on": "Add a fitting",
@@ -1791,6 +1811,11 @@
         "lpn_georef_twopt_tip": {
             "on": "Place the model exactly, when you already know where two points on your drawing really are. Click one of them, type its latitude and longitude, then do the same for a second point. The place, the size and the turn all follow from those two. Press this button again to stop picking.",
             "ruled": "2026-08-29"
+        },
+        "lpn_goto_on_map": {
+            "on": "Go to on map",
+            "ruled": "2026-09-29",
+            "answer": "OK."
         },
         "lpn_gpv_curve_source": {
             "on": "Valve head loss curve",
@@ -2766,6 +2791,16 @@
             "ruled": "2026-09-28",
             "answer": "OK."
         },
+        "lpn_pane_paste_customer_no_position": {
+            "on": "Row {row}: a new Customer needs both {first} and {second}.",
+            "ruled": "2026-09-29",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_customer_node_no_pipe": {
+            "on": "Row {row}: node {id} has no pipe for a Customer to attach to.",
+            "ruled": "2026-09-29",
+            "answer": "OK."
+        },
         "lpn_pane_paste_here": {
             "on": "Click here and paste rows from a spreadsheet to add them.",
             "ruled": "2026-09-28",
@@ -2791,6 +2826,21 @@
             "ruled": "2026-09-28",
             "answer": "OK."
         },
+        "lpn_pane_paste_no_anchor": {
+            "on": "Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.",
+            "ruled": "2026-09-29",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_no_customer_node": {
+            "on": "Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.",
+            "ruled": "2026-09-29",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_no_customer_ref": {
+            "on": "Row {row}: a new Customer needs a connected pipe or node.",
+            "ruled": "2026-09-29",
+            "answer": "OK."
+        },
         "lpn_pane_paste_no_ends": {
             "on": "Row {row}: a new link needs a From node and a To node.",
             "ruled": "2026-09-28",
@@ -2804,6 +2854,11 @@
         "lpn_pane_paste_no_node": {
             "on": "Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.",
             "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_paste_no_pipe": {
+            "on": "Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.",
+            "ruled": "2026-09-29",
             "answer": "OK."
         },
         "lpn_pane_paste_no_position": {
@@ -2846,6 +2901,11 @@
             "ruled": "2026-09-28",
             "answer": "OK."
         },
+        "lpn_pane_paste_text_no_position": {
+            "on": "Row {row}: a new Text needs both {first} and {second}.",
+            "ruled": "2026-09-29",
+            "answer": "OK."
+        },
         "lpn_pane_pasted": {
             "on": "Pasted {n} cells. {skipped} were not changed.",
             "ruled": "2026-09-09",
@@ -2859,6 +2919,11 @@
         "lpn_pane_pasted_rows_skipped": {
             "on": "Pasted {n} rows and added {created} of them to the network. {skipped} cells were not changed.",
             "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_pane_select_on_map": {
+            "on": "Select on map",
+            "ruled": "2026-09-29",
             "answer": "OK."
         },
         "lpn_pane_show_all_cols": {
@@ -2890,6 +2955,11 @@
             "on": "Attached",
             "ruled": "2026-09-09",
             "answer": "OK"
+        },
+        "lpn_pane_unselect_on_map": {
+            "on": "Unselect on map",
+            "ruled": "2026-09-29",
+            "answer": "OK."
         },
         "lpn_pipetype_detach": {
             "on": "Detach from pipe type",
