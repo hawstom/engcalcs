@@ -29955,7 +29955,10 @@ var EngCalcs = EngCalcs || {};
 		var form = document.createElement('form');
 		form.method = 'post';
 		form.action = '/engcalcs/consent.php';
-		form.style.display = 'none';
+		// `hidden`, not `style.display = 'none'` -- this is a throwaway navigation carrier, not a
+		// panel, and panel-touch-harness.js polices that exact string as "nothing hides a panel
+		// except hidePanel()".
+		form.hidden = true;
 		[['ec_wipe', '1'], ['return', window.location.pathname + window.location.search]].forEach(function (pair) {
 			var field = document.createElement('input');
 			field.name = pair[0];
