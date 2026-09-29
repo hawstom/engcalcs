@@ -109,6 +109,19 @@ views, 642 of 949 lie along, and 38 of the rest had room (was 93). To keep the b
 short I lowered the repair pass's work cap from 25 000 to 18 000 label tests, about an eighth off
 the layout time for under one percent of values.
 
+On blank time: Tom put the ceiling at about a second in Chrome on the heavy Novato view and
+suggested placing roughly first, then tidying. I measured it. A rough layout (seating and growth
+only, no repair and no polish) takes 0.60 of the full layout's time, but shows 4.5 percent fewer
+values (52 against 54 percent) and fewer labels (76 against 79 percent). Tidying in the next pause
+would win those back, but the page draws only what `place()` returns; nothing a pause computes
+reaches the screen. So rough-then-tidy cannot be shown without a change to the seam: a way for the
+placer to hand over a better layout for the same view after a pause. The tidy would also move
+labels the user has just seen, which R15 warns against. Until the seam allows it I kept the full
+layout. It measured 80 to 290 ms in quiet runs and up to about a second only under heavy machine
+load. If the seam gains that path, the rough layout already exists (the same code with the repair
+pass turned off), and the tidy could keep every label that was already placed and only add rows
+and labels.
+
 Strategy names: **Along by default** now reads **Along unless it costs a value**: a pipe label
 lies along its pipe wherever its rows fit that way, and is level only when turning it would cost a
 value or there is no room. New: **Clean slate on a setting change**: when the user changes how
