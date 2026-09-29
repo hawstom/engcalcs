@@ -2360,3 +2360,70 @@ from search-engine summaries, not from opening the PDFs myself — re-fetch and 
 goes in front of a journal editor.
 
 — Mary
+
+## 2026-09-28 — Fire flow design-check selector: None/All/Selected? (Tom's question)
+
+**OBSERVED**, `js/looped-network.js:53976-53980,53998-54008`: today's box has two separate
+three-way-shaped controls. "Junctions to test" (`boxes.scope`) is already All/Selected
+(`lpn_ff_scope_all` / `lpn_ff_scope_selected`) — which junctions get a fire flow drawn on them.
+"Design check (effect on system)" (`boxes.design`) is Off/Nodes/All
+(`lpn_ff_design_off` / `lpn_ff_design_nodes` / `lpn_ff_design_all`) — whether the rest of the
+network is watched for collateral pressure/velocity damage while a fire flow is drawn, and if so,
+whether pipes are watched too. There is no way today to name a SUBSET of junctions/pipes for the
+design check the way there already is for which junctions get tested. Tom's proposed None/All/
+Selected would give the design check the same scope-picking shape the demand side already has,
+replacing the nodes-vs-nodes+pipes split with a user-chosen element set.
+
+**Outward look, verified.**
+
+**CITED**, Bentley WaterGEMS/WaterCAD "Fire Flow Analysis" docs (search-engine cache of
+docs.bentley.com/.../GUID-C6BF82B2-253F-4845-B60F-718A63FB1F8F.html; direct fetch blocked by
+network policy in this session, so treat as a snippet, not a full read): fire flow can be run for
+"a single node, a group of selected nodes, or all nodes." Collateral-effect pressure has THREE
+separate named constraints, not one collapsed switch: Residual Lower Limit (the hydrant itself),
+Zone Lower Limit (all junctions in a named zone), and System Lower Limit (any junction in the
+entire system) — each is its own field, left blank to not apply it. Velocity gets an explicit
+boolean, "Use Velocity Constraint" (true/false), separate from the numeric limit itself.
+
+**CITED**, Innovyze/Autodesk InfoWater Pro "Fireflow" help (help.innovyze.com/display/infowaterpro/
+Fireflow; help.autodesk.com/cloudhelp/ENU/INFWP-UserGuide GUID-7019401E; same network-block caveat,
+search-cache only): the velocity constraint carries a scope dropdown with exactly three values —
+**"No Pipes," "Connecting Pipes" (adjacent to each hydrant), "Entire Network" (all pipes)** — this
+is structurally the None/All/(narrower-set) shape Tom is proposing, already shipping in a
+competitor, though "Connecting Pipes" is automatic-by-adjacency, not a user-picked selection set the
+way our "Selected junctions" is.
+
+**CITED**, IFC Appendix B (up.codes mirror, multiple jurisdictions/years) and AWWA M31 (summarized
+via FRWA whitepaper and GlobalSpec listing, not the manual itself — flag before quoting AWWA's exact
+words): both anchor the CODE-REQUIRED check on the hydrant's OWN residual pressure at 20 psi. Neither
+source surfaced a code-mandated check of pressure at *other* junctions or of pipe velocity anywhere
+in the system — those are WaterGEMS/InfoWater's own added engineering checks (system-impact /
+zone-impact analysis), not something IFC or AWWA M31 requires be run at all. So "design check" in
+this suite's sense is already past what code requires; the fire code alone gives no opinion on
+whether None/All/Selected is the right shape for it.
+
+**Did not find**: any vendor doc, forum thread, or paper describing a user deliberately setting an
+extreme pressure/velocity threshold to neutralize a check without turning it off — Tom's "easy A"
+observation is his own inference, not something corroborated outside this repo. What I did find cuts
+the other way: both competitors give an EXPLICIT off state per constraint (a blank field, a
+false boolean) that does not depend on the threshold's own value, which is exactly the shape that
+makes threshold-gaming unnecessary — it's a "why give a user a reason to reach for a workaround"
+argument, not "here is proof they do."
+
+**Verdict for the message to Tom (≤200 words, sent as-is):**
+
+"None/All/Selected is the right shape, and the deciding reason is that both WaterGEMS/WaterCAD and
+InfoWater Pro already separate two questions your design check collapses into one field: 'is this
+constraint checked at all' (an explicit off — WaterGEMS leaves the limit blank, InfoWater's velocity
+toggle is a boolean) and 'which elements is it checked against' (WaterGEMS: zone vs. system vs. a
+selected junction; InfoWater's velocity scope literally offers No Pipes / Connecting Pipes / Entire
+Network — the same three-tier shape you're proposing). Neither vendor relies on a user typing an
+absurd threshold to disable a check; they give a real off switch instead. So 'set pressure to 0 or
+velocity to 999' is a workaround our current off/nodes/all scheme invites because it can't name a
+subset — not something I found users of the competing tools doing, because their tools don't force
+the choice. Recommend: keep an honest 'None,' keep 'All' as today's broadest option, and add
+'Selected' meaning a user-chosen set of junctions and pipes, matching the shape 'Junctions to test'
+already has. Neither IFC Appendix B nor AWWA M31 requires this collateral check at all — it's
+already beyond code, so the fire code gives no argument against reshaping it."
+
+— Mary

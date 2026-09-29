@@ -525,3 +525,21 @@ nothing" (what I have) and "there is nothing" (what a paper needs). Ranked here 
 directly requested by Tom, and the paper's strongest selling point (audacity that pays off) is exactly
 the claim most likely to be wrong if skipped.
 </content>
+
+## Fire flow design check: add "Selected" scope, matching InfoWater's own precedent
+
+2026-09-28, answering Tom's question about `boxes.design` (off/nodes/all,
+`js/looped-network.js:54002-54006`). **CITED**, Innovyze/Autodesk InfoWater Pro Fireflow help
+(help.innovyze.com/display/infowaterpro/Fireflow; help.autodesk.com/cloudhelp/ENU/INFWP-UserGuide
+GUID-7019401E — search-cache only, direct fetch blocked by network policy this session, re-verify
+before quoting to Tom as final): its velocity constraint already ships a three-way scope selector,
+"No Pipes / Connecting Pipes / Entire Network." That is the same None/All/(narrower-set) shape Tom
+is proposing for our design check, already live in a named competitor — so this is not a novel UI
+idea, it is catching up to a shape the market already validated. **CITED**, Bentley WaterGEMS/
+WaterCAD Fire Flow Analysis docs (same caveat): pressure constraints separate "is it checked" (a
+blank field = off) from "which elements" (Residual/Zone/System, three distinct named scopes) —
+further evidence that collapsing on/off and scope into one field, as our current off/nodes/all
+does, is the odd one out. Ranked below the label-placement and epanet-plus-plus items because it is
+a single control's option set, not a structural gap — but it is a real, cheap fix with two
+citations already in hand, not a guess.
+</content>

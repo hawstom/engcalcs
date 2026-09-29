@@ -11,6 +11,11 @@ flat list, highest priority first, lowest ID first inside a band. `- 75|739| **S
   Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
+- 75|742| **Fire-flow design check: None, All, or Selected junctions.**
+  Tom, 2026-09-28: *"What would Mary and Sue think about changing the Fire flow analysis design check
+  selector to offer None, All, and Selected?"* Both said yes (journals, same day): the middle option is
+  redundant with a blank criterion box, and a named subset is how appendices and InfoWater/WaterGEMS
+  scope it. Mary's vendor quotes are from search snippets; verify before citing.
 # Reference` at the foot holds the
 standing prose that is not a task.
 

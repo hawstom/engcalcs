@@ -947,3 +947,19 @@ or CIP decision would ever turn on; I would not push it ahead of anything alread
 this file.
 
 — Sue
+
+### 2026-09-28 — Fire flow design-check scope: Selected locations, not just off/nodes/all
+
+Rank: low-medium, offered because Tom asked directly, not because I went looking for it. Change
+the `design` selector (`js/looped-network.js:54002-54008`) from off/nodes/all to None/All/Selected,
+where Selected names a specific junction/pipe set for the downstream pressure-and-velocity impact
+check — the same "named set, chosen before the run" shape `scope` already uses for the fire-flow
+test points themselves (`js/looped-network.js:53976-53980`). Costs nothing computationally
+(`lpn_ff_design_tip`, `lib/lang.ec.en.php:3903`: "costs no extra calculation" — the solve already
+produces every value, `design` only controls what's reported). The `nodes` option it replaces is
+already redundant: `minPressure`/`maxVelocity` default to 0/Infinity when left blank
+(`js/looped-network.js:54540-54541`), so a user can already silence velocity under `all` without
+`nodes` existing. Full reasoning and the one WaterGEMS citation I could find (selection-set-scoped
+TEST points, globally-applied thresholds, no documented narrower IMPACT scope) in journal
+2026-09-28. Does not duplicate Task 724 (every-junction sweep) or 725 (merged table) — this is a
+third axis, which locations the impact check reports on.

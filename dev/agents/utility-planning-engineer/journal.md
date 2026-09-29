@@ -2703,3 +2703,61 @@ Wishlist: added as a new row, ranked low-to-medium — a real, cheap, and well-e
 gradient comment is the suite's own proof), but a decimals-display polish, not a capability.
 
 — Sue
+
+## 2026-09-28 — Fire flow design-check selector: None/All/Selected, answered
+
+Tom asked what Mary and I think of changing the fire flow "design check" selector from
+off/nodes/all to None/All/Selected, given that "a creative user can 'turn off' pressure or
+velocity by making them an easy 'A.'" I read the control and its consumer before answering.
+
+- **OBSERVED, `js/looped-network.js:53976-54016`: there are TWO independent selectors already,
+  and they answer different questions.** `boxes.scope` (all/selected, `lpn_ff_scope`) picks WHICH
+  junctions get tested as fire-suppression demand points. `boxes.design` (off/nodes/all,
+  `lpn_ff_design`) picks whether, for each such test, the REST of the system gets checked against
+  a pressure floor and a velocity ceiling: off = no ripple check, nodes = pressure at every other
+  junction, all = pressure at every other junction AND velocity in every pipe. Tom's proposal
+  changes the SECOND selector's vocabulary, not the first.
+- **OBSERVED, `js/looped-network.js:54540-54541`: the "easy A" is already fully available and
+  already independent of the design selector.** `minPressure: minPressure > 0 ? minPressure : 0`
+  and `maxVelocity: maxVelocity > 0 ? maxVelocity : Infinity` — leaving either box blank (or typing
+  0 / an absurdly large number) already neuters that criterion completely, regardless of whether
+  `design` is `nodes` or `all`. This means the 'nodes' option's one real job today — let a user
+  check pressure without also being bothered by velocity — is already redundant: the same result
+  (velocity never fails) is reachable under 'all' by leaving `maxVelocity` blank. 'nodes' does not
+  protect anything a blank box doesn't already give away.
+- **OBSERVED, `lib/lang.ec.en.php:3903`, `lpn_ff_design_tip`: "Choosing to check it costs no extra
+  calculation."** The three-way split was never a performance concession — pressure and velocity
+  at every node/pipe are already computed by the one solve; `design` only controls what gets
+  REPORTED. That matters for the Selected option: adding it costs nothing computationally either;
+  it is purely a reporting-scope choice, same as `scope` already is.
+- **CITED, Bentley WaterGEMS/HAMMER "EPS Fire Flow Analysis Tool"
+  (https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/GUID-C6BF82B2-253F-4845-B60F-718A63FB1F8F.html):
+  fire-flow TEST points are scoped by "a selection set" of nodes ("Fire flow nodes selection
+  set"), with a single "Zone Pressure Lower Limit" applied globally once run. I found no
+  documentation in this search of WaterGEMS scoping the downstream IMPACT check (pressure/velocity
+  elsewhere) to a narrower set than the whole model — if that is right, a Selected design-check
+  scope would be ahead of what I can show WaterGEMS documents, not parity with it. Flagging this as
+  an absence-of-evidence finding from a limited search, not a confirmed gap in their product.
+- **My reading, from the seat that reviews developer submittals: the threshold-gaming and the
+  scope question are different problems, and only one of them is this suite's to solve.** A
+  reviewer reads a submitted report's typed criteria (0 psi minimum, 1000 fps ceiling) and can
+  challenge an absurd number on sight, same as on any paper calc — that is exactly my job, and no
+  UI restriction removes the need for it or does it better than a reviewer's own judgment. What a
+  UI restriction CAN'T do anything about (an honest typed number) it should not pretend to police.
+  A location-scoped, NAMED "Selected" design check, by contrast, is auditable in a way "nodes vs
+  all" is not: a report that says "checked at: Junctions J-14, J-22, J-40 (hospital service, low-
+  pressure zone boundary)" tells a reviewer exactly what was and was not evaluated, which is the
+  same shape a master-plan appendix already uses — check impact at known critical/sensitive points,
+  not exhaustively at every node in a two-thousand-node model, because a report with one row per
+  node per fire test is unreadable at that scale even though the solve itself is free.
+- **My recommendation: adopt None/All/Selected.** The reason it decides on: it removes an option
+  ('nodes') that was already redundant with leaving a threshold blank, and replaces it with a
+  capability (Selected) that is new, real, and matches how a utility engineer already scopes an
+  impact check in practice — not a defense against gaming, which nothing here can be, but a genuine
+  reporting improvement independent of that question.
+- Relates to open Task 724 (system-wide available fire flow, every junction) and Task 725 (one wide
+  fire-flow table) — Selected design-check scope is a third, distinct idea (which locations get
+  the IMPACT check, not which get tested or how the two reports merge) and does not duplicate
+  either.
+
+— Sue
