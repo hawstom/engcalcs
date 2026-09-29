@@ -334,7 +334,10 @@
 		// appears (Task 450). A run somebody pressed Run for owes them a sign that it started; an
 		// automatic run after a quiet moment owes them silence, or the page grows a box that pops
 		// up every time the mouse stops moving.
-		lastRunMs: null, lastBusyMs: null, wanted: false, wantedByUser: false, busy: false, idle: null, runSig: null
+		lastRunMs: null, lastBusyMs: null, wanted: false, wantedByUser: false, busy: false, idle: null, runSig: null,
+		// `failed` is how the last run ended when it left no frames: 'engine' (no EPANET here),
+		// 'run' (EPANET failed or refused), or null. Read only by EC.lpnTimeWaiting().
+		failed: null
 	};
 
 	/**
@@ -822,6 +825,7 @@
 			shown = state.wantedByUser;
 		cancelIdleRun();
 		state.busy = true;
+		state.failed = null;
 		state.wantedByUser = false;
 		host.status(strings().running);
 		if (shown) { boxStart(token); }
@@ -847,6 +851,7 @@
 			}
 			if (!run.ok) {
 				state.run = null;
+				state.failed = 'run';
 				// **A REFUSAL IS NOT A FAILURE TO CONVERGE AND NOT AN ABSENT ENGINE** (Task 471).
 				// EPANET read our network and would not take it; handing this result to host.apply()
 				// would print "Did not converge", which sends the user looking for a zero diameter
@@ -987,8 +992,34 @@
 		state.runSig = null;
 		state.t = 0;
 		state.wanted = true;
+		state.failed = null;
 		renderPanel();
 		return false;
+	};
+
+	/**
+	 * **WHAT A VIEW WITH NO FRAMES SHOULD SAY WHILE IT WAITS** (Tom, 2026-09-29, on a Time series
+	 * tab telling him to press a Calculate button that Recalculate automatically hides: "I know.
+	 * That should be fixed."). One of:
+	 *   'manual'  -- the switch is off, so the Calculate button is on screen and is the answer;
+	 *   'running' -- a run is in flight, queued, or waiting out the quiet moment;
+	 *   'failed'  -- the last run failed or was refused, and the status bar says why;
+	 *   'engine'  -- EPANET is not here, so there is one instant and never a period.
+	 * With the switch on and none of those, a run is OWED and nothing will start it, so this starts
+	 * one -- silently, as an automatic run is -- and answers 'running'. Starting it here rather
+	 * than answering "press Calculate" is the only way that sentence can be true with no button.
+	 * Only when there are no frames and the project has a period; otherwise null.
+	 */
+	EC.lpnTimeWaiting = function () {
+		if (!host || state.run || !EC.lpnTimeIsExtended(docTimes())) { return null; }
+		if (state.busy) { return 'running'; }
+		// Off before `wanted`: an arrival with the switch off sets the flag and runs nothing.
+		if (!autoRunAllowed()) { return 'manual'; }
+		if (state.wanted || state.idle) { return 'running'; }
+		if (state.failed === 'engine' || !EC.lpnEpanetRun) { return 'engine'; }
+		if (state.failed) { return 'failed'; }
+		requestRun(false);
+		return 'running';
 	};
 
 	/**
@@ -1063,6 +1094,7 @@
 	 */
 	function noEngine(model) {
 		state.run = null;
+		state.failed = 'engine';
 		host.apply(host.native(model));
 		host.status(strings().noEngine.replace('{time}', EC.lpnTimeElapsedText(state.t)));
 		renderPanel();
@@ -1082,6 +1114,7 @@
 	function engineRefused(model, run) {
 		var S = strings();
 		state.run = null;
+		state.failed = 'run';
 		host.apply(host.native(model));
 		host.status([
 			refusedText(run),
