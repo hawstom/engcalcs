@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 2142,
-        "delta_key_count": 315,
+        "expected_key_count": 2157,
+        "delta_key_count": 331,
         "exempt_key_count": 33,
         "exempt_keys": [
             "calc_units_us",
@@ -586,6 +586,13 @@
         "lpn_pane_paste_no_node": "Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.",
         "lpn_pane_paste_same_ends": "Row {row}: From and To are the same node.",
         "lpn_pane_paste_bad_cell": "Row {row}: {text} is not a valid {col}.",
+        "lpn_pane_paste_text_no_position": "Row {row}: a new Text needs both {first} and {second}.",
+        "lpn_pane_paste_no_anchor": "Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.",
+        "lpn_pane_paste_customer_no_position": "Row {row}: a new Customer needs both {first} and {second}.",
+        "lpn_pane_paste_no_customer_ref": "Row {row}: a new Customer needs a connected pipe or node.",
+        "lpn_pane_paste_no_pipe": "Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.",
+        "lpn_pane_paste_no_customer_node": "Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.",
+        "lpn_pane_paste_customer_node_no_pipe": "Row {row}: node {id} has no pipe for a Customer to attach to.",
         "lpn_pane_filled": "Filled down {n} cells. {skipped} were not changed.",
         "lpn_pane_filldown": "Fill down",
         "lpn_pane_fill_none": "Nothing in this selection can be filled down.",
@@ -606,6 +613,7 @@
         "lpn_tool_zoom_window": "Zoom Window",
         "lpn_zoom_in": "Zoom in",
         "lpn_zoom_out": "Zoom out",
+        "lpn_field_text_anchor": "Attached to",
         "lpn_offscreen_intact": "Your network is intact.",
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
@@ -641,9 +649,13 @@
         "lpn_zoom_out_tip": "Zoom out. Shortcut: -",
         "lpn_pane_not_used": "Not used",
         "lpn_pane_goto_tip": "Zoom & select",
+        "lpn_goto_on_map": "Go to on map",
+        "lpn_pane_select_on_map": "Select on map",
+        "lpn_pane_unselect_on_map": "Unselect on map",
         "lpn_find_filter_row": "{table}: {n} of {all}",
         "lpn_find_filter_summary": "Filtered by {q}. {rows}.",
         "lpn_find_filter_none": "This query doesn't apply to any table.",
+        "lpn_find_shift_hint": "Shift+click one to add it to the map selection or take it out.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -698,6 +710,8 @@
         "lpn_mode_zoom_window": "Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.",
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E",
+        "lpn_field_lat_abbr": "Lat",
+        "lpn_field_lon_abbr": "Lon",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
         "lpn_field_text_all_zoom": "Show at all zoom levels",
@@ -809,6 +823,8 @@
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
         "lpn_ff_skipped": "{n} selected elements are not junctions, so they were not tested.",
+        "lpn_ff_design_selected": "The selected junctions and their pipes",
+        "lpn_ff_design_no_selection": "The design check is set to the selected junctions, and none is selected. Select some on the map, or check all of them.",
         "lpn_ff_clear": "Clear rings",
         "lpn_file_import_survey": "Import surveyed points…",
         "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
@@ -903,6 +919,13 @@
         "lpn_pane_paste_no_node": "Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.",
         "lpn_pane_paste_same_ends": "Row {row}: From and To are the same node.",
         "lpn_pane_paste_bad_cell": "Row {row}: {text} is not a valid {col}.",
+        "lpn_pane_paste_text_no_position": "Row {row}: a new Text needs both {first} and {second}.",
+        "lpn_pane_paste_no_anchor": "Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.",
+        "lpn_pane_paste_customer_no_position": "Row {row}: a new Customer needs both {first} and {second}.",
+        "lpn_pane_paste_no_customer_ref": "Row {row}: a new Customer needs a connected pipe or node.",
+        "lpn_pane_paste_no_pipe": "Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.",
+        "lpn_pane_paste_no_customer_node": "Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.",
+        "lpn_pane_paste_customer_node_no_pipe": "Row {row}: node {id} has no pipe for a Customer to attach to.",
         "lpn_pane_filled": "Filled down {n} cells. {skipped} were not changed.",
         "lpn_pane_filldown": "Fill down",
         "lpn_pane_fill_none": "Nothing in this selection can be filled down.",
@@ -923,6 +946,7 @@
         "lpn_tool_zoom_window": "Zoom Window",
         "lpn_zoom_in": "Zoom in",
         "lpn_zoom_out": "Zoom out",
+        "lpn_field_text_anchor": "Attached to",
         "lpn_offscreen_intact": "Your network is intact.",
         "lpn_units_mapcoords": "Map coordinates",
         "lpn_units_mapcoords_deg": "degrees",
@@ -958,9 +982,13 @@
         "lpn_zoom_out_tip": "Zoom out. Shortcut: -",
         "lpn_pane_not_used": "Not used",
         "lpn_pane_goto_tip": "Zoom & select",
+        "lpn_goto_on_map": "Go to on map",
+        "lpn_pane_select_on_map": "Select on map",
+        "lpn_pane_unselect_on_map": "Unselect on map",
         "lpn_find_filter_row": "{table}: {n} of {all}",
         "lpn_find_filter_summary": "Filtered by {q}. {rows}.",
         "lpn_find_filter_none": "This query doesn't apply to any table.",
+        "lpn_find_shift_hint": "Shift+click one to add it to the map selection or take it out.",
         "lpn_ts_menu": "Time series",
         "lpn_ts_tip": "Graph one or more assets against time across an extended period simulation.",
         "lpn_ts_title": "Values versus time",
@@ -1015,6 +1043,8 @@
         "lpn_mode_zoom_window": "Mode: Zoom window. Click two opposite corners of a box, or drag one, on the map to zoom in on it.",
         "lpn_field_northing_abbr": "N",
         "lpn_field_easting_abbr": "E",
+        "lpn_field_lat_abbr": "Lat",
+        "lpn_field_lon_abbr": "Lon",
         "lpn_field_coord_tip": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere.",
         "lpn_coord_off_world": "That is off the map. Pseudo Mercator latitude ranges from -85.05 to 85.05 and longitude ranges from -180 to 180.",
         "lpn_field_text_all_zoom": "Show at all zoom levels",
@@ -1126,6 +1156,8 @@
         "lpn_terrain_http": "The terrain service answered with an error ({status}), so no elevation was changed. Nothing is wrong with your network.",
         "lpn_terrain_no_place": "None of those nodes has a position on the Earth, so nothing was sent and no elevation was changed. Reading the land surface needs a project in latitude and longitude, or one on a projection this page can place.",
         "lpn_ff_skipped": "{n} selected elements are not junctions, so they were not tested.",
+        "lpn_ff_design_selected": "The selected junctions and their pipes",
+        "lpn_ff_design_no_selection": "The design check is set to the selected junctions, and none is selected. Select some on the map, or check all of them.",
         "lpn_ff_clear": "Clear rings",
         "lpn_file_import_survey": "Import surveyed points…",
         "lpn_file_import_survey_tip": "Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.",
@@ -2045,6 +2077,118 @@
                 }
             }
         },
+        "lpn_pane_paste_text_no_position": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_no_anchor": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_customer_no_position": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_no_customer_ref": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_no_pipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_no_customer_node": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
+        "lpn_pane_paste_customer_node_no_pipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_pasted",
+                    "value": "Vloženo {n} buněk. {skipped} nebylo změněno.",
+                    "english": "Pasted {n} cells. {skipped} were not changed."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_window",
+                    "value": "Vybrat okno",
+                    "english": "Select a window"
+                }
+            }
+        },
         "lpn_pane_filled": {
             "reason": "missing",
             "current_value": null,
@@ -2362,6 +2506,22 @@
                     "key": "lpn_field_text_bold",
                     "value": "Tučný text",
                     "english": "Bold text"
+                }
+            }
+        },
+        "lpn_field_text_anchor": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_bold",
+                    "value": "Tučný text",
+                    "english": "Bold text"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_align",
+                    "value": "Vodorovné zarovnání",
+                    "english": "Horizontal alignment"
                 }
             }
         },
@@ -2925,6 +3085,54 @@
                 }
             }
         },
+        "lpn_goto_on_map": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Ničemu v této tabulce filtr neodpovídá.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "Vytisknout tabulku",
+                    "english": "Print table"
+                }
+            }
+        },
+        "lpn_pane_select_on_map": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Ničemu v této tabulce filtr neodpovídá.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "Vytisknout tabulku",
+                    "english": "Print table"
+                }
+            }
+        },
+        "lpn_pane_unselect_on_map": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Ničemu v této tabulce filtr neodpovídá.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_print",
+                    "value": "Vytisknout tabulku",
+                    "english": "Print table"
+                }
+            }
+        },
         "lpn_find_filter_row": {
             "reason": "missing",
             "current_value": null,
@@ -2970,6 +3178,22 @@
                     "key": "lpn_find_op_contains",
                     "value": "obsahuje",
                     "english": "contains"
+                }
+            }
+        },
+        "lpn_find_shift_hint": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_count",
+                    "value": "Nalezeno: {n}. Kliknutím na jeden z nich na něj přejdete.",
+                    "english": "{n} found. Click one to go to it."
+                },
+                "next_translated": {
+                    "key": "lpn_find_none",
+                    "value": "Nic nevyhovuje.",
+                    "english": "Nothing matched."
                 }
             }
         },
@@ -3824,6 +4048,38 @@
         "lpn_field_easting_abbr": {
             "reason": "equal_to_english",
             "current_value": "E",
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_easting",
+                    "value": "Východní souřadnice",
+                    "english": "Easting"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Násobitel velikosti",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_field_lat_abbr": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_easting",
+                    "value": "Východní souřadnice",
+                    "english": "Easting"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Násobitel velikosti",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_field_lon_abbr": {
+            "reason": "missing",
+            "current_value": null,
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_field_easting",
@@ -5610,6 +5866,38 @@
                     "key": "lpn_ff_required",
                     "value": "Požadovaný požární průtok",
                     "english": "Required fire flow"
+                }
+            }
+        },
+        "lpn_ff_design_selected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_design_all",
+                    "value": "Všechny ostatní uzly a všechna potrubí",
+                    "english": "All other junctions and all pipes"
+                },
+                "next_translated": {
+                    "key": "lpn_ff_minpressure",
+                    "value": "Nejnižší povolený tlak jinde",
+                    "english": "Lowest pressure allowed elsewhere"
+                }
+            }
+        },
+        "lpn_ff_design_no_selection": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_design_all",
+                    "value": "Všechny ostatní uzly a všechna potrubí",
+                    "english": "All other junctions and all pipes"
+                },
+                "next_translated": {
+                    "key": "lpn_ff_minpressure",
+                    "value": "Nejnižší povolený tlak jinde",
+                    "english": "Lowest pressure allowed elsewhere"
                 }
             }
         },
