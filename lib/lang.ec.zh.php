@@ -1358,7 +1358,6 @@ $ec_lang['lpn_ff_residual_tip']='节点在提供消防流量的同时必须维�
 $ec_lang['lpn_ff_design']='设计校核（对系统的影响）';
 $ec_lang['lpn_ff_design_tip']='这是一个独立的问题：抽取该流量后，是否有其他部位的压力低于其下限，或流速超过其限值？勾选此项不会增加额外的计算量。';
 $ec_lang['lpn_ff_design_off']='不检查';
-$ec_lang['lpn_ff_design_nodes']='所有其他节点';
 $ec_lang['lpn_ff_design_all']='所有其他节点和所有管道';
 $ec_lang['lpn_ff_minpressure']='其他部位允许的最低压力';
 $ec_lang['lpn_ff_minpressure_tip']='当某个节点正在抽取其消防流量时，若其他节点的压力低于此值，则报告为设计问题。';

@@ -1442,7 +1442,6 @@ $ec_lang['lpn_ff_residual_tip']='Der Druck, den der Entnahmeknoten noch halten m
 $ec_lang['lpn_ff_design']='Systemprüfung (Auswirkung auf das Netz)';
 $ec_lang['lpn_ff_design_tip']='Eine eigene Frage, unabhängig davon, ob der Entnahmeknoten den Durchfluss liefern kann: Fällt, während dort dieser Durchfluss entnommen wird, irgendetwas anderes unter seinen Mindestdruck oder über seinen Geschwindigkeitsgrenzwert? Diese Prüfung zu wählen kostet keine zusätzliche Berechnung.';
 $ec_lang['lpn_ff_design_off']='Nicht prüfen';
-$ec_lang['lpn_ff_design_nodes']='Alle anderen Entnahmeknoten';
 $ec_lang['lpn_ff_design_all']='Alle anderen Entnahmeknoten und alle Rohre';
 $ec_lang['lpn_ff_minpressure']='Niedrigster zulässiger Druck andernorts';
 $ec_lang['lpn_ff_minpressure_tip']='Ein Entnahmeknoten, der unter diesen Wert fällt, während ein anderer seine Löschwassermenge liefert, wird als Systemproblem gemeldet.';

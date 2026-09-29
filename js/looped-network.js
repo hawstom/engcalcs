@@ -54199,15 +54199,19 @@ var EngCalcs = EngCalcs || {};
 		ffRow(host, pc.lpn_ff_residual || 'Residual pressure to hold', pc.lpn_ff_residual_tip,
 			boxes.residual, unitLabel('lpn_u_pressure'));
 
-		// **THE SCOPE OF THE DESIGN SEARCH IS A NAMED SET, CHOSEN BEFORE THE RUN.** Three values,
-		// in this page's own vocabulary rather than EPANET's or Innovyze's, and the middle one
-		// exists because a system with thousands of pipes may want the pressures without the
-		// velocities.
+		// **THE SCOPE OF THE DESIGN SEARCH IS A NAMED SET, CHOSEN BEFORE THE RUN: NONE, ALL, OR
+		// SELECTED** (Task 742; Tom, 2026-09-28, *"Selection set build: Yes."*). The old middle
+		// value, every other junction without the pipes, went: a blank velocity box already turns
+		// the velocity half off under All (runFireFlowSweep() reads blank as no limit), so it gave
+		// nothing a blank box did not. Selected is the new one -- the impact is checked only at the
+		// junctions selected on the map and the pipes that meet them, which is how a master-plan
+		// appendix scopes it (Sue's and Mary's journals, same day). ffDesignScope() maps the retired
+		// value, should anything still carry it, to All.
 		boxes.design = ffSelect([
 			['off', pc.lpn_ff_design_off || 'Do not check'],
-			['nodes', pc.lpn_ff_design_nodes || 'All other junctions'],
-			['all', pc.lpn_ff_design_all || 'All other junctions and all pipes']
-		], ask.design);
+			['all', pc.lpn_ff_design_all || 'All other junctions and all pipes'],
+			['selected', pc.lpn_ff_design_selected || 'The selected junctions and their pipes']
+		], ffDesignScope(ask.design));
 		ffRow(host, pc.lpn_ff_design || 'Design check (effect on system)', pc.lpn_ff_design_tip,
 			boxes.design, '');
 
@@ -54710,6 +54714,33 @@ var EngCalcs = EngCalcs || {};
 		ffRunUi = null;
 	}
 
+	// The design check's scope, with the retired 'nodes' (every other junction, no pipes) read as
+	// 'all' (Task 742). Nothing stores this value -- `fireFlowAsk` lives for one page load -- so the
+	// mapping is a guard, not a migration: an unknown value is never allowed to mean "do not check".
+	function ffDesignScope(v) {
+		return (v === 'off' || v === 'selected') ? v : 'all';
+	}
+	// **SELECTED: THE JUNCTIONS SELECTED ON THE MAP AND THE PIPES THAT MEET THEM** (Task 742). A
+	// pipe selected on its own counts too, since selecting it says as plainly as anything can that
+	// its velocity is wanted. Read from the model the run solves, so an inactive element, which is
+	// not in the model, is not checked. Whatever else is selected (a tank, a Text) is not a place
+	// the check can be applied and is left out.
+	function ffDesignSelectedSet(model) {
+		var nodeIn = {}, linkIn = {}, nodes = [], links = [], junctionIds = {}, linkIds = {};
+		model.nodes.forEach(function (n) { if (n.type === 'junction') { junctionIds[n.id] = true; } });
+		model.links.forEach(function (l) { linkIds[l.id] = true; });
+		selections.forEach(function (s) {
+			if (s.kind === 'node' && junctionIds[s.id] && !nodeIn[s.id]) {
+				nodeIn[s.id] = true; nodes.push(s.id);
+				(incidentLinks[s.id] || []).forEach(function (lid) {
+					if (linkIds[lid] && !linkIn[lid]) { linkIn[lid] = true; links.push(lid); }
+				});
+			} else if (s.kind === 'link' && linkIds[s.id] && !linkIn[s.id]) {
+				linkIn[s.id] = true; links.push(s.id);
+			}
+		});
+		return { nodes: nodes, links: links };
+	}
 	// ---- the run --------------------------------------------------------------------------------
 	function runFireFlowSweep() {
 		var pc = EngCalcs.pageConfig || {},
@@ -54764,11 +54795,20 @@ var EngCalcs = EngCalcs || {};
 		model = assembleModel();
 		fireFlowAtFrame(model);
 		engine = engineFor(model);
-		if (ask.design !== 'off') {
+		if (ffDesignScope(ask.design) === 'selected') {
+			design = ffDesignSelectedSet(model);
+			if (!design.nodes.length && !design.links.length) {
+				setNotice(pc.lpn_ff_design_no_selection ||
+					'The design check is set to the selected junctions, and none is selected. Select some on the map, or check all of them.');
+				return;
+			}
+			design.minPressure = minPressure > 0 ? minPressure : 0;
+			design.maxVelocity = maxVelocity > 0 ? maxVelocity : Infinity;
+		} else if (ffDesignScope(ask.design) !== 'off') {
 			design = {
 				nodes: model.nodes.filter(function (n) { return n.type === 'junction'; })
 					.map(function (n) { return n.id; }),
-				links: ask.design === 'all' ? model.links.map(function (l) { return l.id; }) : [],
+				links: model.links.map(function (l) { return l.id; }),
 				minPressure: minPressure > 0 ? minPressure : 0,
 				maxVelocity: maxVelocity > 0 ? maxVelocity : Infinity
 			};

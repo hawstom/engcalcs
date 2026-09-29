@@ -977,10 +977,6 @@
             "on": "Every other junction and every pipe",
             "ruled": "2026-09-01"
         },
-        "lpn_ff_design_nodes": {
-            "on": "Every other junction",
-            "ruled": "2026-09-01"
-        },
         "lpn_ff_design_none": {
             "on": "Nothing in the chosen set was drawn down by any junction tested.",
             "ruled": "2026-09-01"

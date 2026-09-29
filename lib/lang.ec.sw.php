@@ -1450,7 +1450,6 @@ $ec_lang['lpn_ff_residual_tip']='Shinikizo ambalo muunganiko lazima liendelee ku
 $ec_lang['lpn_ff_design']='Ukaguzi wa kubuni (athari kwenye mfumo)';
 $ec_lang['lpn_ff_design_tip']='Swali tofauti na kama muunganiko unaweza kutoa mtiririko: mtiririko huo ukichotwa hapo, je, kuna kitu kingine kinachoshuka chini ya shinikizo lake la chini kabisa au kuzidi kikomo chake cha kasi? Kuchagua kukagua hakugharimu ukokotoaji wa ziada.';
 $ec_lang['lpn_ff_design_off']='Usikague';
-$ec_lang['lpn_ff_design_nodes']='Miunganiko mingine yote';
 $ec_lang['lpn_ff_design_all']='Miunganiko mingine yote na mabomba yote';
 $ec_lang['lpn_ff_minpressure']='Shinikizo la chini kabisa linaloruhusiwa mahali pengine';
 $ec_lang['lpn_ff_minpressure_tip']='Muunganiko unaoshuka chini ya hili wakati mwingine unachota mtiririko wake wa moto huripotiwa kama tatizo la kubuni.';

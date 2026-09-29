@@ -1444,7 +1444,6 @@ $ec_lang['lpn_ff_residual_tip']='A pressão que a junção precisa manter enquan
 $ec_lang['lpn_ff_design']='Verificação de projeto (efeito no sistema)';
 $ec_lang['lpn_ff_design_tip']='Uma pergunta separada de saber se a junção consegue fornecer a vazão: com essa vazão sendo fornecida ali, algo mais cai abaixo de sua pressão mínima ou ultrapassa seu limite de velocidade? Escolher verificar isso não custa cálculo extra.';
 $ec_lang['lpn_ff_design_off']='Não verificar';
-$ec_lang['lpn_ff_design_nodes']='Todas as outras junções';
 $ec_lang['lpn_ff_design_all']='Todas as outras junções e todos os trechos';
 $ec_lang['lpn_ff_minpressure']='Menor pressão permitida em outros pontos';
 $ec_lang['lpn_ff_minpressure_tip']='Uma junção que cai abaixo deste valor enquanto outra fornece sua vazão de incêndio é reportada como um problema de projeto.';

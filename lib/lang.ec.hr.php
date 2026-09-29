@@ -1443,7 +1443,6 @@ $ec_lang['lpn_ff_residual_tip']='Tlak koji čvor mora i dalje održavati dok isp
 $ec_lang['lpn_ff_design']='Provjera projektnih uvjeta (učinak na sustav)';
 $ec_lang['lpn_ff_design_tip']='Zasebno pitanje od toga može li čvor isporučiti protok: dok se taj protok ondje povlači, pada li nešto drugo ispod svog minimalnog tlaka ili prelazi svoju graničnu brzinu? Odabir provjere ne zahtijeva dodatni izračun.';
 $ec_lang['lpn_ff_design_off']='Ne provjeravaj';
-$ec_lang['lpn_ff_design_nodes']='Svi drugi čvorovi';
 $ec_lang['lpn_ff_design_all']='Svi drugi čvorovi i sve cijevi';
 $ec_lang['lpn_ff_minpressure']='Najniži dopušteni tlak drugdje';
 $ec_lang['lpn_ff_minpressure_tip']='Čvor koji padne ispod ovoga dok drugi povlači svoj protupožarni protok prijavljuje se kao problem projektiranja.';

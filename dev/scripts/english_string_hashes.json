@@ -2353,7 +2353,6 @@
         "lpn_ff_cost": "66a71c4168e7cc8bbefcd582a492c268d145138e",
         "lpn_ff_design": "b6e5eaf486df1f225d39b98a74607ed7845a97da",
         "lpn_ff_design_all": "b56ada991fcc364c0667a651346c32485f75e251",
-        "lpn_ff_design_nodes": "3b17acc857107d43c4cb4645f5577dca01127961",
         "lpn_ff_design_none": "e02543961d3e9ecbfaabd72204ab25316e517374",
         "lpn_ff_design_off": "bc10277c1e27efbb998067028b1be8d770b95de8",
         "lpn_ff_design_off_note": "77e938d422b07aca04c053b13772f9ff93f901e8",
@@ -5764,10 +5763,6 @@
         },
         "lpn_ff_design_all": {
             "words": 6,
-            "ends_sentence": false
-        },
-        "lpn_ff_design_nodes": {
-            "words": 3,
             "ends_sentence": false
         },
         "lpn_ff_design_none": {

@@ -1542,7 +1542,6 @@ $ec_lang['lpn_ff_residual_tip']='La presión que el nudo debe seguir manteniendo
 $ec_lang['lpn_ff_design']='Verificación de diseño (efecto en el sistema)';
 $ec_lang['lpn_ff_design_tip']='Una pregunta aparte de si el nudo puede entregar el caudal: con ese caudal extraído allí, ¿algo más cae por debajo de su presión mínima o supera su límite de velocidad? Elegir verificarlo no cuesta cálculo adicional.';
 $ec_lang['lpn_ff_design_off']='No verificar';
-$ec_lang['lpn_ff_design_nodes']='Todos los demás nudos';
 $ec_lang['lpn_ff_design_all']='Todos los demás nudos y todas las tuberías';
 $ec_lang['lpn_ff_minpressure']='Presión mínima permitida en el resto';
 $ec_lang['lpn_ff_minpressure_tip']='Un nudo que cae por debajo de esto mientras otro extrae su caudal contra incendios se reporta como un problema de diseño.';
