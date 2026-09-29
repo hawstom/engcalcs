@@ -780,12 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='Rândul {row}: De la și Către sunt acela
 $ec_lang['lpn_pane_paste_bad_cell']='Rândul {row}: {text} nu este un {col} valid.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='Rândul {row}: un Text nou are nevoie atât de {first} cât și de {second}.';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='Rândul {row}: {id} nu este încă un nod sau o conductă în această rețea. Lipiți-l mai întâi, apoi acest Text.';
+$ec_lang['lpn_pane_paste_customer_no_position']='Rândul {row}: un Abonat nou are nevoie atât de {first} cât și de {second}.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='Rândul {row}: un Abonat nou are nevoie de o conductă sau un nod conectat.';
+$ec_lang['lpn_pane_paste_no_pipe']='Rândul {row}: conducta {id} nu există încă. Lipiți mai întâi conductele, apoi abonații.';
+$ec_lang['lpn_pane_paste_no_customer_node']='Rândul {row}: nodul {id} nu există încă. Lipiți mai întâi joncțiunile, apoi abonații.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='Rândul {row}: nodul {id} nu are nicio conductă de care să se atașeze un Abonat.';
 
 
 $ec_lang['lpn_pane_filled']='S-au completat în jos {n} celule. {skipped} nu au fost modificate.';
@@ -825,7 +827,7 @@ $ec_lang['lpn_field_text_bold']='Text îngroșat';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
-
+$ec_lang['lpn_field_text_anchor']='Atașat la';
 $ec_lang['lpn_field_text_align']='Aliniere orizontală';
 $ec_lang['lpn_field_text_align_left']='Stânga';
 $ec_lang['lpn_field_text_align_center']='Centru';
@@ -1331,9 +1333,9 @@ $ec_lang['lpn_pane_filter_none']='Nimic din acest tabel nu corespunde filtrului.
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='Mărește și selectează';
-
-
-
+$ec_lang['lpn_goto_on_map']='Mergi la pe hartă';
+$ec_lang['lpn_pane_select_on_map']='Selectează pe hartă';
+$ec_lang['lpn_pane_unselect_on_map']='Deselectează pe hartă';
 $ec_lang['lpn_pane_print']='Tipărește tabelul';
 $ec_lang['lpn_pane_print_tip']='Tipărește tabelul pe care îl vedeți, cu numele proiectului, numele tabelului și unitățile de măsură în antete. Rândurile se tipăresc în ordinea în care le-ați sortat.';
 
@@ -1470,7 +1472,7 @@ $ec_lang['lpn_find_op_lt']='mai mic decât';
 $ec_lang['lpn_find_op_empty']='gol';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} găsite. Faceți clic pe unul pentru a merge la el.';
-
+$ec_lang['lpn_find_shift_hint']='Shift+clic pentru a comuta adăugarea/eliminarea.';
 $ec_lang['lpn_find_none']='Nimic nu s-a potrivit.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1970,7 @@ $ec_lang['lpn_lock_open_choices_ask']='„Întreabă” anunță pe oricine are 
 $ec_lang['lpn_lock_ask']='Întreabă';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='Cine să spunem că întreabă? Inițialele dvs. sunt ideale. Sunt trimise oricui are fișierul deschis și sunt stocate doar în acest browser.';
+$ec_lang['lpn_lock_ask_prompt']='Cine să spunem că întreabă? Inițialele dvs. sunt ideale. Sunt păstrate împreună cu blocarea acestui fișier pe serverul nostru, pentru oricine îl are deschis, și sunt șterse în cel mult 30 de zile.';
 $ec_lang['lpn_lock_ask_sent']='Am cerut oricui are acest fișier deschis să îl închidă. Va vedea cererea în decurs de un minut, dacă pagina lui este încă deschisă. Nimic altceva nu s-a schimbat, iar fișierul este încă al lui până când îl închide.';
 $ec_lang['lpn_lock_ask_failed']='Mesajul dvs. nu a putut fi livrat. Fie nimeni nu are acest fișier deschis acum, fie serverul nu a putut fi contactat.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,8 +2380,8 @@ $ec_lang['lpn_field_easting_abbr']='E';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
-
+$ec_lang['lpn_field_lat_abbr']='Lat';
+$ec_lang['lpn_field_lon_abbr']='Lon';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -3713,8 +3715,8 @@ $ec_lang['lpn_ff_design']='Verificare de proiectare (efect asupra sistemului)';
 $ec_lang['lpn_ff_design_tip']='O întrebare separată de dacă joncțiunea poate livra debitul: cu acel debit preluat acolo, scade altceva sub presiunea sa minimă sau depășește limita sa de viteză? Alegerea de a verifica aceasta nu costă niciun calcul suplimentar.';
 $ec_lang['lpn_ff_design_off']='Nu verifica';
 $ec_lang['lpn_ff_design_all']='Toate celelalte joncțiuni și toate conductele';
-
-
+$ec_lang['lpn_ff_design_selected']='Joncțiunile selectate și conductele lor';
+$ec_lang['lpn_ff_design_no_selection']='Verificarea de proiectare este setată pe joncțiunile selectate, iar niciuna nu este selectată. Selectați unele pe hartă sau setați Toate.';
 $ec_lang['lpn_ff_minpressure']='Cea mai mică presiune permisă în altă parte';
 $ec_lang['lpn_ff_minpressure_tip']='O joncțiune care scade sub aceasta în timp ce alta își preia debitul de incendiu este raportată ca o problemă de proiectare.';
 $ec_lang['lpn_ff_maxvelocity']='Cea mai mare viteză permisă';
