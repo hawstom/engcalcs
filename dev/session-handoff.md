@@ -123,8 +123,8 @@ Ask prompt in 26 languages). Roadmap: Tasks 739-742 unspliced from the header; 7
   on a phone (the toolbar hides it at phone width; pre-existing).
 - Both ports need his Apache reload (commands at the foot).
 - Label placement: pipe 185 is SETTLED -- no room aligned (needs 94.8 px, 57 px free), so level is
-  correct under R14 in C and D; Perry's probe was wrong. Fixed probe committed on feat/label-placer
-  (5508e0a1, `dev/lpn-spike/label-bench/probe-r14.js`). Next: his side-by-side of C (8132) and D
+  correct under R14 in C and D; Perry's probe was wrong. Fixed probe exists only on branch feat/label-placer
+  (commit 5508e0a1, probe-r14.js in its label bench), not on master. Next: his side-by-side of C (8132) and D
   (8133), C first.
 
 ### Awaiting his words
