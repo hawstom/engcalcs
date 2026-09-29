@@ -1461,6 +1461,9 @@ $ec_lang['lpn_pane_filter_none']='Nothing in this table matches the filter.';
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='Zoom & select';
+$ec_lang['lpn_goto_on_map']='Go to on map';
+$ec_lang['lpn_pane_select_on_map']='Select on map';
+$ec_lang['lpn_pane_unselect_on_map']='Unselect on map';
 $ec_lang['lpn_pane_print']='Print table';
 $ec_lang['lpn_pane_print_tip']='Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.';
 
@@ -1599,6 +1602,7 @@ $ec_lang['lpn_find_op_lt']='below';
 $ec_lang['lpn_find_op_empty']='empty';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} found. Click one to go to it.';
+$ec_lang['lpn_find_shift_hint']='Shift+click one to add it to the map selection or take it out.';
 $ec_lang['lpn_find_none']='Nothing matched.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the

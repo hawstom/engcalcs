@@ -55,7 +55,7 @@ const L = loadLoopedNetwork(
 	"\t\t\tel = doc.nodes.filter(function (x) { return x.id === elId; })[0];\n" +
 	"\t\t\treturn paneCellText(paneColByKey(s, key), el); },\n" +
 	"\t\tundoDepth: function () { return undoStack.length; }, undo: undo,\n" +
-	"\t\tselectedRefs: selectedRefs,\n" +
+	"\t\tselectedRefs: selectedRefs, clearSel: clearSelection,\n" +
 	"\t\topenPopup: openPopup, popupRef: function () { return currentPopup; }, closePopup: closePopup,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -367,13 +367,16 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 	report(!!menu, 'a right press on a cell opens a menu');
 	const labels = (menu.children || []).map((b) => labelText(b));
 	// Paste as new rows at end of table (Task 610) sits after Paste on a table that can create rows.
-	report(labels.length === 5, 'exactly five rows', labels.join(' | '));
+	// Tom, 2026-09-28: Select on map / Unselect on map join it, each offered only when it would do
+	// something. Nothing is selected yet, so this cell's menu has Select on map and not Unselect.
+	report(labels.length === 6, 'exactly six rows', labels.join(' | '));
 	report(labels[0] === (PC.points_data_copy || 'Copy'), 'Copy is the row-table grid’s own word', labels[0]);
 	report(labels[1] === (PC.points_data_paste || 'Paste'), 'Paste is the row-table grid’s own word', labels[1]);
 	report(labels[2] === PC.lpn_pane_paste_append, 'Paste as new rows at end of table follows Paste', labels[2]);
-	report(labels[3] === PC.lpn_pane_goto_tip,
-		'Select in map reuses the pin’s own tip, not a new string', labels[3]);
-	report(labels[4] === (PC.lpn_tool_delete || 'Delete'), 'Delete reuses the Delete tool’s word', labels[4]);
+	report(labels[3] === PC.lpn_pane_select_on_map, 'Select on map follows the paste rows', labels[3]);
+	report(labels[4] === PC.lpn_pane_goto_tip,
+		'Zoom & select keeps its ruled words (R-115)', labels[4]);
+	report(labels[5] === (PC.lpn_tool_delete || 'Delete'), 'Delete reuses the Delete tool’s word', labels[5]);
 
 	// Copy: writes the cell to the clipboard, the same as Ctrl+C.
 	clipboard = null;
@@ -384,10 +387,11 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 	// Select in map: the same door the pin uses -- setSelection() through findGoTo().
 	openMenuOn(ids[2], 'elev');
 	menu = menuEl();
-	fire(menu.children[3], 'click', {});
+	fire(menu.children[4], 'click', {});
 	const refs = L.selectedRefs();
 	report(refs.length === 1 && refs[0].kind === 'node' && refs[0].id === ids[2],
-		'Select in map selects the element the row is about', JSON.stringify(refs));
+		'Zoom & select selects the element the row is about', JSON.stringify(refs));
+	L.clearSel && L.clearSel();
 
 	// Delete: clears the value, takes one undo, and never removes the row. A text field ('tag')
 	// so the assertion is not tangled up with a required numeric field's own blank-means-zero rule
@@ -399,7 +403,7 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 	const d0 = L.undoDepth();
 	openMenuOn(ids[3], 'tag');
 	menu = menuEl();
-	fire(menu.children[4], 'click', {});
+	fire(menu.children[menu.children.length - 1], 'click', {});
 	report(L.cellText('junctions', ids[3], 'tag') === '', 'Delete clears the cell’s value',
 		L.cellText('junctions', ids[3], 'tag'));
 	report(L.undoDepth() === d0 + 1, '...as one undoable edit', d0 + ' -> ' + L.undoDepth());
@@ -414,7 +418,7 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 	const d1 = L.undoDepth();
 	openMenuOn(ids[0], 'tag');
 	menu = menuEl();
-	if (menu) { fire(menu.children[3], 'click', {}); }
+	if (menu) { fire(menu.children[menu.children.length - 1], 'click', {}); }
 	report(L.undoDepth() === d1, 'Delete on an already-blank cell takes no snapshot', d1 + ' -> ' + L.undoDepth());
 }
 
