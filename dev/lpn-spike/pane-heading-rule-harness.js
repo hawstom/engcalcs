@@ -73,12 +73,12 @@ if (process.env[LOCK_ENV] !== '1') {
 	let hasFlock = false;
 	try { execFileSync('which', ['flock'], { stdio: 'ignore' }); hasFlock = true; } catch (e) { /* none */ }
 	if (hasFlock) {
-		const r = spawnSync('flock', ['-E', '75', '-w', '400', LOCK_FILE, process.execPath, __filename], {
+		const r = spawnSync('flock', ['-E', '75', '-w', '180', LOCK_FILE, process.execPath, __filename], {
 			stdio: 'inherit', env: Object.assign({}, process.env, { [LOCK_ENV]: '1' })
 		});
 		if (r.error) { console.error('pane-heading-rule-harness: flock re-exec failed: ' + r.error.message); process.exit(1); }
 		if (r.status === 75) {
-			console.error('pane-heading-rule-harness: NOT RUN -- another session held ' + LOCK_FILE + ' for 400 s. Lock contention, not a width failure; re-run it alone.');
+			console.error('pane-heading-rule-harness: NOT RUN -- another session held ' + LOCK_FILE + ' for 180 s. Lock contention, not a width failure; re-run it alone.');
 			process.exit(1);
 		}
 		process.exit(r.status === null ? 1 : r.status);
