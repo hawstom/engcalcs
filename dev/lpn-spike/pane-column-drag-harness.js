@@ -37,10 +37,11 @@ const L = loadLoopedNetwork(
 	"\t\trenderTable: function (id) { renderPaneTable(paneTableById(id)); },\n" +
 	"\t\tcolKeys: function (id) { return paneCols(paneTableById(id)).map(function (c) { return c.key; }); },\n" +
 	"\t\twidthEm: function (id, key) { var s = paneTableById(id);\n" +
-	"\t\t\treturn paneColWidthEm(s.id, paneColByKey(s, key)); },\n" +
+	"\t\t\treturn paneColWidthEm(s, paneColByKey(s, key)); },\n" +
 	"\t\tuserWidth: function (id, key) { var s = paneTableById(id);\n" +
 	"\t\t\treturn paneColUserWidth(s.id, paneColByKey(s, key)); },\n" +
 	"\t\tfloorEm: function (id, key) { return paneColFloorEm(paneColByKey(paneTableById(id), key)); },\n" +
+	"\t\tdeclaredEm: function (id, key) { return paneColByKey(paneTableById(id), key).em || 0; },\n" +
 	"\t\tresetWidth: function (id, key) { paneResetColOnDouble(paneTableById(id), key, null); },\n" +
 	"\t\tcolGroup: function (id) { return paneTableById(id).colGroup; },\n" +
 	"\t\tcells: function (id) { return paneTableById(id).cells; },\n" +
@@ -179,11 +180,16 @@ console.log('\n--- A PRESS THAT NEVER TRAVELS IS NOT A DRAG ---');
 	report(declared > 1, '...and is drawn at the width its spec declares', declared);
 	report(String(thFor('elev').className).indexOf('lpn-pane-tight') < 0,
 		'...so its heading may NOT break mid-word', thFor('elev').className);
-	// HIS OWN INSTANCE, BY NAME. Description is the column he found at a character, and it is the
-	// one to assert because it declares the widest box in the pane (8em, a street-corner sentence):
-	// a rule that narrowed it would narrow anything.
+	// HIS OWN INSTANCE, BY NAME. Description is the column he found at a character. Under the
+	// initial-width rule (2026-09-27) an empty junctions table has no description TEXT to measure,
+	// so rule (a) contributes nothing and rule (b) alone decides: "Description" is 11 characters,
+	// >= 8, so it is split in half (Math.ceil(11/2) = 6 and 5 characters, "Descri"/"ption") and
+	// only the longer half's width counts, plus the 0.3em pad. The first half is measured with the
+	// hyphen the browser draws at a soft-hyphen break ("Descri-", 7 characters at the stub's 0.62em),
+	// since the heading's own width is now exactly this number (R-356, 2026-09-28).
 	report(L.userWidth('junctions', 'desc') === 0, 'a freshly opened table has no width stored for Description');
-	report(L.widthEm('junctions', 'desc') === 8, '...so Description opens at its declared 8em',
+	report(Math.abs(L.widthEm('junctions', 'desc') - 4.64) < 0.01,
+		'...so Description opens at half its longest heading word, not the old flat 8em',
 		L.widthEm('junctions', 'desc'));
 	report(String(thFor('desc').className).indexOf('lpn-pane-tight') < 0,
 		'...and its heading is held open by its own longest word', thFor('desc').className);
@@ -229,10 +235,16 @@ console.log('\n--- double-clicking the divider gives the column its default back
 
 // **THE BLIND SPOT, AND IT WAS THE COLUMNS HE NAMED** (Tom, 2026-09-21, R-110: *"Pumps.Date
 // installed, width = 1em; Pumps.Pump head curve, width = 2 em (due to selector?); Pump.Price
-// pattern, width = 3em (due to selector?)"*). A pull-down and a custom property declare no width,
+// pattern, width = 3em (due to selector?)"*). A pull-down and a custom property declare no `em`,
 // so the drag assumed 7em; a column whose heading has outgrown its declared em was assumed to be
 // the declared em. Either way the first pixel of travel snapped the column to a width the reader
 // had never seen. It must start from what is drawn.
+// **THE FLAT 7em GUESS ITSELF IS GONE** (Tom's initial-width rule, 2026-09-27): a column that
+// declares no static `em` now gets a rule-computed one instead (paneColInitialEm()), so the case
+// below is narrowed to "declares no static em" rather than "measures zero" -- every column
+// measures something now. The mechanism under test (start the drag from the width ON SCREEN, not
+// from any declared or computed number) still needs it: `drawn` stands in for whatever the real
+// heading rendered at, on purpose disagreeing with both.
 console.log('\n--- R-110: a drag starts from the width on screen ---');
 {
 	L.resetWidth('junctions', 'elev');
@@ -248,17 +260,18 @@ console.log('\n--- R-110: a drag starts from the width on screen ---');
 	delete drawn.elev;
 	L.resetWidth('junctions', 'elev');
 	L.renderTable('junctions');
-	// A column declaring NO width -- the pull-down and custom-property case -- was assumed to be
-	// 7em. Drawn at 5.9em (a pattern pull-down, measured in Chromium), a one-em narrowing is 4.9.
-	const noEm = L.colKeys('junctions').filter((k) => !L.widthEm('junctions', k))[0];
-	report(!!noEm, 'the junction table has a column that declares no width to test with', noEm);
+	// A column declaring no static `em` -- the pull-down and custom-property case -- used to be
+	// assumed 7em. Drawn at 5.9em (a pattern pull-down, measured in Chromium), a one-em narrowing
+	// is 4.9, regardless of whatever paneColInitialEm() would compute for it.
+	const noEm = L.colKeys('junctions').filter((k) => !L.declaredEm('junctions', k))[0];
+	report(!!noEm, 'the junction table has a column that declares no static em to test with', noEm);
 	if (noEm) {
 		drawn[noEm] = 5.9;
 		fire(gripOf(noEm), 'mousedown', { clientX: 100, stopPropagation: function () {}, preventDefault: function () {} });
 		docFire('mousemove', { clientX: 84 });
 		docFire('mouseup', { clientX: 84 });
 		report(Math.abs(L.widthEm('junctions', noEm) - 4.9) < 0.01,
-			'a column that declares no width narrows from its drawn 5.9 em, not from a 7 em guess',
+			'a column that declares no static em narrows from its drawn 5.9 em, not from a 7 em guess',
 			'-1 em -> ' + L.widthEm('junctions', noEm));
 		delete drawn[noEm];
 		L.resetWidth('junctions', noEm);

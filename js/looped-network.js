@@ -21534,18 +21534,26 @@ var EngCalcs = EngCalcs || {};
 	/**
 	 * **A LINK'S VERTICES AS ONE CELL** (ROADMAP Task 610), in the format the data-entry clerk
 	 * specified before anything was built (dev/agents/data-entry-clerk/task-610-vertex-cell-spec.md):
-	 * `n1/n2/n3/n4/...`, read two at a time from the From end toward the To end, in the SAME slot
-	 * order the two coordinate columns of the node tables use (latitude first on a geographic
-	 * project, northing first on a projected one, x first on a grid). An empty cell is a straight
-	 * link.
+	 * read two at a time from the From end toward the To end, in the SAME slot order the two
+	 * coordinate columns of the node tables use (latitude first on a geographic project, northing
+	 * first on a projected one, x first on a grid). An empty cell is a straight link.
 	 *
-	 * **`/` AND NOTHING ELSE**, because libPasteCells() splits a line with no tab on whitespace,
-	 * commas and semicolons: a vertices-only paste arrives with no tab at all, and any of those
-	 * separators would shred it into false columns. A hyphen is out because it is a minus sign.
+	 * **DISPLAY (Tom, 2026-09-27, on the old flat `n1/n2/n3/n4/...`: *"That is not very
+	 * readable."*): `n1/n2|n3/n4|...` -- a pair stays `/`-joined exactly as before, one vertex
+	 * from the next now reads `|` rather than the same slash, so a reader can see where a vertex
+	 * ends without counting fields. **NO SPACE AROUND THE `|`, EVER**: libPasteCells() splits a
+	 * line with no tab on whitespace (`/[\s,;]+/`), which is exactly the shape a vertices-only
+	 * single-cell paste arrives in -- `A | B` splits into three tokens ("A", "|", "B") the moment
+	 * either space is there, `A|B` does not split at all. A hyphen stays out for the same reason
+	 * it always was: it is a minus sign.
 	 *
-	 * **THE WHOLE CELL OR NOTHING.** An odd count, or one token that is not a number or is off the
-	 * map, refuses the cell and leaves the link's vertices as they were: a polyline half-read still
-	 * draws and solves, wrong, quietly.
+	 * **THE PARSER TAKES EITHER FORM.** `|`-separated is tried first (unambiguous: '|' is never a
+	 * coordinate); its absence falls back to the original flat, all-`/` reading, so a table
+	 * someone copied before this change still pastes back exactly as it did.
+	 *
+	 * **THE WHOLE CELL OR NOTHING.** A malformed group, or one token that is not a number or is
+	 * off the map, refuses the cell and leaves the link's vertices as they were: a polyline
+	 * half-read still draws and solves, wrong, quietly.
 	 *
 	 * **A TYPED LATITUDE KEEPS ITS OWN CHARACTERS** through the same `_xsrc`/`_ysrc` channel a
 	 * typed node coordinate and an `.inp` vertex use, so 40.7128 is saved as 40.7128 and not as a
@@ -21558,21 +21566,39 @@ var EngCalcs = EngCalcs || {};
 				(isY ? inwardY(src) === v.y : inwardX(src) === v.x)) { return String(src); }
 		return paneNumText(isY ? outwardY(v.y) : outwardX(v.x));
 	}
+	// One N/E pair -> a point, or null if the pair is not a legal coordinate.
+	function paneParseVertPair(a, b) {
+		var xv, yv, pt;
+		if (a === '' || b === '' || !isFinite(+a) || !isFinite(+b)) { return null; }
+		a = +a; b = +b;
+		if (!coordValueOk(coordSlotIsY(1), a) || !coordValueOk(coordSlotIsY(2), b)) { return null; }
+		yv = coordSlotIsY(1) ? a : b;
+		xv = coordSlotIsY(1) ? b : a;
+		pt = { x: inwardX(xv), y: inwardY(yv) };
+		if (isLatLonProject()) { pt[LPN_GEO_XSRC] = xv; pt[LPN_GEO_YSRC] = yv; }
+		return pt;
+	}
 	function paneParseVerts(t) {
-		var parts, i, pts = [], a, b, xv, yv, pt;
+		var groups, parts, i, pts = [], pt;
 		if (t === '') { return { ok: true, v: [] }; }
+		// NEW FORMAT: one vertex per `|`-separated group, each group an N/E pair.
+		if (t.indexOf('|') !== -1) {
+			groups = t.split('|');
+			for (i = 0; i < groups.length; i++) {
+				parts = groups[i].trim().split('/').map(function (x) { return x.trim(); });
+				if (parts.length !== 2) { return { ok: false }; }
+				pt = paneParseVertPair(parts[0], parts[1]);
+				if (!pt) { return { ok: false }; }
+				pts.push(pt);
+			}
+			return { ok: true, v: pts };
+		}
+		// OLD FORMAT: every value flat and `/`-joined, read two at a time.
 		parts = t.split('/').map(function (x) { return x.trim(); });
 		if (parts.length % 2) { return { ok: false }; }
 		for (i = 0; i < parts.length; i += 2) {
-			if (parts[i] === '' || parts[i + 1] === '' || !isFinite(+parts[i]) || !isFinite(+parts[i + 1])) {
-				return { ok: false };
-			}
-			a = +parts[i]; b = +parts[i + 1];
-			if (!coordValueOk(coordSlotIsY(1), a) || !coordValueOk(coordSlotIsY(2), b)) { return { ok: false }; }
-			yv = coordSlotIsY(1) ? a : b;
-			xv = coordSlotIsY(1) ? b : a;
-			pt = { x: inwardX(xv), y: inwardY(yv) };
-			if (isLatLonProject()) { pt[LPN_GEO_XSRC] = xv; pt[LPN_GEO_YSRC] = yv; }
+			pt = paneParseVertPair(parts[i], parts[i + 1]);
+			if (!pt) { return { ok: false }; }
 			pts.push(pt);
 		}
 		return { ok: true, v: pts };
@@ -21582,12 +21608,20 @@ var EngCalcs = EngCalcs || {};
 			label: function () { return (EngCalcs.pageConfig || {}).lpn_tool_vertices || 'Vertices'; },
 			// The heading says which number comes first, as the clerk's spec requires: a reader
 			// should never have to open a popup to learn the order of a cell.
+			// **TWO PAIRS, THEN THE ELLIPSIS, IN SHORT NAMES** (Tom, 2026-09-28: *"Vertices column
+			// heading: Change to 'Vertices (Lat/Lon|Lat/Lon|...)'"*): the second pair shows that
+			// `|` separates one vertex from the next, and the short names keep the heading narrow.
+			// Lat/Lon has its own short pair here rather than in axisNames(), whose short pair the
+			// status strip also reads and which on a lat/lon project stays the full words.
 			unitText: function () {
-				var n = axisNames();
-				return (n.firstShort || n.first) + '/' + (n.secondShort || n.second) + '/…';
+				var n = axisNames(), pc = EngCalcs.pageConfig || {}, pair;
+				pair = isLatLonProject()
+					? (pc.lpn_field_lat_abbr || 'Lat') + '/' + (pc.lpn_field_lon_abbr || 'Lon')
+					: (n.firstShort || n.first) + '/' + (n.secondShort || n.second);
+				return pair + '|' + pair + '|…';
 			},
 			get: function (l) {
-				return (l.verts || []).map(function (v) { return paneVertText(v, 1) + '/' + paneVertText(v, 2); }).join('/');
+				return (l.verts || []).map(function (v) { return paneVertText(v, 1) + '/' + paneVertText(v, 2); }).join('|');
 			},
 			set: function (l, pts) {
 				l.verts = (pts || []).map(function (p) {
@@ -22635,20 +22669,18 @@ var EngCalcs = EngCalcs || {};
 	function savePaneColPrefs() {
 		try { localStorage.setItem(LPN_PANECOLS_KEY, JSON.stringify(paneColPrefs)); } catch (e) {}
 	}
-	// The width a column is drawn at: what the reader dragged it to, else what the spec declares,
-	// else the stylesheet's own 7em fallback. In `em`, like every declared width, so it still
-	// follows the reader's text size.
-	function paneColWidthEm(specId, c) {
-		var w = paneColUserWidth(specId, c);
-		return w || (c.em || 0);
+	// The width a column is drawn at: what the reader dragged it to, else the rule-based initial
+	// width (paneColInitialEm(), Tom 2026-09-27), else the stylesheet's own 7em fallback. In `em`,
+	// like every declared width, so it still follows the reader's text size. Takes the whole spec,
+	// not just its id, because the initial width has to see the table's own current rows.
+	function paneColWidthEm(spec, c) {
+		var w = paneColUserWidth(spec.id, c);
+		return w || paneColInitialEm(spec, c) || (c.em || 0);
 	}
-	// **HAS THE READER DRAGGED THIS COLUMN?** -- which is a different question from how wide it is,
-	// and the one that decides whether the heading is allowed to break mid-word (Task 690, Tom
-	// 2026-09-19). A column nobody has touched keeps the layout he has already approved: the
-	// heading holds the column open at its longest word, exactly as it always did. A column he has
-	// dragged is HIS width, and the heading wraps to the character to fit inside it, which is what
-	// *"Let selectors and inputs be truncated and headings be wrapped to the character level"*
-	// asks for -- relaxed for the gesture, not for everybody's first look at the table.
+	// **HAS THE READER DRAGGED THIS COLUMN?** (Task 690, Tom 2026-09-19). A column nobody has
+	// touched keeps the rule-based initial width; a column he has dragged is HIS width, and the
+	// heading wraps to the character to fit inside it, which is what *"Let selectors and inputs be
+	// truncated and headings be wrapped to the character level"* asks for.
 	function paneColUserWidth(specId, c) {
 		var w = paneColPrefs[specId] && paneColPrefs[specId].w && paneColPrefs[specId].w[c.key];
 		return (typeof w === 'number' && isFinite(w) && w > 0) ? Math.max(w, paneColFloorEm(c)) : 0;
@@ -22684,6 +22716,352 @@ var EngCalcs = EngCalcs || {};
 	}
 	function paneColFloorEm(c) {
 		return Math.max(1, Math.ceil((paneLongestWordEm(paneHeadingText(c)) / 3 + 0.55) * 100) / 100);
+	}
+	// ---- INITIAL COLUMN WIDTH (Tom, 2026-09-27) -------------------------------------------------
+	// **THE RULE, VERBATIM:** *"Set initial table column width to hold the greater (max) of (a) the
+	// known, present, current contents of the column not counting 'No....' selectors or (b) the
+	// heading's longest word not counting units, with any word 8 characters or longer split into
+	// two parts for the purposes of this calculation."* This governs the width a column opens at
+	// UNDRAGGED, in the current network -- it is not the drag floor above (paneColFloorEm(), a
+	// fraction of the heading word, meant only to stop a dragged column from shrinking to one
+	// letter per line). One canvas-measured `em` cache serves both halves of the rule.
+	//
+	// **A DETACHED PROBE ANSWERS FOR THE HEADING'S REAL FONT** (Perry's real-Chrome pass, reported
+	// by Tom, 2026-09-27: headings broke mid-word on plain short words -- "Tag", "Closed" -- nowhere
+	// near the 8-character split threshold, because the ESTIMATE that set the column's width was
+	// too narrow to hold them on one line). The first build guessed the heading's font as the pane
+	// body's own font at a flat 0.9 -- a number with no source, and wrong on both counts: the
+	// heading (`.lpn-pane-sort`) is BOLD, and its size already comes from `.lpn-pane-table`'s own
+	// `font-size: .9em` rule cascading through the real stylesheet, so re-applying 0.9 in JS shrank
+	// it twice. A `<table class="lpn-pane-table"><thead><tr><th><button class="lpn-pane-sort">`
+	// kept in the DOM (so the cascade actually reaches it) but never shown answers
+	// `getComputedStyle` with the true font AND the `<th>`'s own padding, in one place, built once.
+	var panePaneProbe = null;
+	function panePaneProbeEls() {
+		var table, thead, tr, th, btn;
+		if (panePaneProbe) { return panePaneProbe; }
+		try {
+			table = document.createElement('table'); table.className = 'lpn-pane-table';
+			thead = document.createElement('thead'); tr = document.createElement('tr');
+			th = document.createElement('th'); btn = document.createElement('button');
+			btn.type = 'button'; btn.className = 'lpn-pane-sort';
+			th.appendChild(btn); tr.appendChild(th); thead.appendChild(tr); table.appendChild(thead);
+			table.style.cssText = 'position:absolute;visibility:hidden;left:-9999px;top:-9999px;' +
+				'pointer-events:none;';
+			(document.getElementById('lpn_pane_body') || document.body || document.documentElement)
+				.appendChild(table);
+			panePaneProbe = { th: th, btn: btn };
+		} catch (e) { panePaneProbe = null; }
+		return panePaneProbe;
+	}
+	// **A PULL-DOWN'S OWN BOX, MEASURED** (R-356, Tom's browser pass 2026-09-28: *"Pipe type,
+	// Fittings list, ... Speed pattern, Pump efficiency curve, Price pattern"* all stood on one line
+	// because every pull-down held its column open to its WIDEST OPTION -- the "No ..." choice
+	// included, which the rule says not to count). A chosen value's box is its text plus a drop
+	// arrow and the control's own padding, and the browser rounds it to a whole pixel, so neither a
+	// canvas measurement nor a fixed chrome allowance matches it (measured: "Complete mixing" drew
+	// 132px against a 129.3px estimate). A `<select>` holding just that one option, in a detached
+	// `.lpn-pane-table` cell attached to <body> (a closed pane is `display: none`, and nothing inside
+	// it has a width), is measured instead, once per label, in the table font's em. With no real
+	// DOM, or nothing laid out, the text plus 1.7em stands in and is not cached.
+	var paneSelBoxEmCache = {};
+	function paneSelBoxEm(text) {
+		var table, tbody, tr, td, sel, opt, px, w = 0;
+		if (Object.prototype.hasOwnProperty.call(paneSelBoxEmCache, text)) { return paneSelBoxEmCache[text]; }
+		try {
+			table = document.createElement('table'); table.className = 'lpn-pane-table';
+			tr = document.createElement('tr'); td = document.createElement('td');
+			sel = document.createElement('select'); opt = document.createElement('option');
+			opt.textContent = text; sel.appendChild(opt); td.appendChild(sel); tr.appendChild(td);
+			tbody = document.createElement('tbody'); tbody.appendChild(tr); table.appendChild(tbody);
+			table.style.cssText = 'position:absolute;visibility:hidden;left:-9999px;top:-9999px;';
+			document.body.appendChild(table);
+			w = sel.getBoundingClientRect().width;
+			px = parseFloat(window.getComputedStyle(sel).fontSize);
+			document.body.removeChild(table);
+		} catch (e) { w = 0; }
+		if (w > 0 && px > 0) {
+			paneSelBoxEmCache[text] = Math.round((w / px + 0.06) * 1000) / 1000;
+			return paneSelBoxEmCache[text];
+		}
+		return paneMeasureEm(text, false) + 1.7;
+	}
+	// The heading's real font (bold, its actual cascaded size, its actual family) -- null where
+	// there is no real DOM to ask, which is the Node harnesses' signal to fall back to the
+	// per-character estimate below exactly as before.
+	function paneHeadFont() {
+		var probe = panePaneProbeEls(), cs;
+		if (!probe) { return null; }
+		try {
+			cs = window.getComputedStyle(probe.btn);
+			return (parseFloat(cs.fontSize) > 0)
+				? { px: parseFloat(cs.fontSize), family: cs.fontFamily, weight: cs.fontWeight, style: cs.fontStyle }
+				: null;
+		} catch (e) { return null; }
+	}
+	// **THE PAD IS THE `<th>`'s OWN, READ FROM THE SAME PROBE** -- `th, td { padding: 1px 6px 1px
+	// 0 }` in css/engcalcs.css, converted to em against whichever font is in play so it still
+	// follows the reader's own text size. NEVER the sort arrow or the "..." menu: both are
+	// `position: absolute` (see that rule's own comment) and reserve no layout width of their own.
+	// 0.3 remains the answer with no real DOM to measure against, matching every harness written
+	// before this fix.
+	function panePadEm(px) {
+		var probe = panePaneProbeEls(), cs, pad;
+		if (!probe || !(px > 0)) { return 0.3; }
+		try {
+			cs = window.getComputedStyle(probe.th);
+			pad = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+			return pad > 0 ? Math.round((pad / px) * 1000) / 1000 + 0.06 : 0.3;
+		} catch (e) { return 0.3; }
+	}
+	var paneMeasureEmCache = {};
+	function paneMeasureEm(text, heading) {
+		var key = (heading ? 'h:' : 'c:') + text, ctx, host, px, family, cs, w = 0, hf;
+		if (Object.prototype.hasOwnProperty.call(paneMeasureEmCache, key)) { return paneMeasureEmCache[key]; }
+		try {
+			ctx = document.createElement('canvas').getContext('2d');
+			if (ctx) {
+				if (heading) { hf = paneHeadFont(); }
+				if (hf) {
+					px = hf.px; family = hf.family;
+					ctx.font = hf.style + ' ' + hf.weight + ' ' + px + 'px ' + family;
+				} else {
+					host = document.getElementById('lpn_pane_body') || document.body;
+					cs = window.getComputedStyle(host);
+					px = parseFloat(cs.fontSize);
+					ctx.font = (heading ? 'bold ' : '') + px + 'px ' + cs.fontFamily;
+				}
+				if (px > 0) { w = ctx.measureText(text).width / px; }
+			}
+		} catch (e) { w = 0; }
+		if (!(w > 0)) { w = String(text || '').length * 0.62; }
+		paneMeasureEmCache[key] = w;
+		return w;
+	}
+	// The label alone, with no unit appended -- rule (b) reads "not counting units", and
+	// paneHeadingText() is the function that appends one.
+	function paneHeadingLabelOnly(c) {
+		var pc = EngCalcs.pageConfig || {};
+		return (typeof c.label === 'function') ? c.label() : (pc[c.label] || c.key);
+	}
+	// **THE TWO HEADING KNOBS, EACH ONE NAMED CONSTANT, EACH ONE A URL OVERRIDE FOR AN A/B LOOK**
+	// (Tom, 2026-09-28: *"What's our longest word rule? 7 max. It may be too short. We could A/B
+	// test 7 and 9 as max."* and *"We need a max lines ratio rule. Don't wrap to cause n lines to
+	// be more than KLmax times n characters on longest line. Let's try KLmax=1 with a possible
+	// future A/B test of KLmax=0.8."*).
+	//   PANE_WORD_MAX -- the longest word a heading keeps whole; a longer one may break at its
+	//     middle (below). 7 is R-356's "8 characters or longer split". `?colword=9` overrides it.
+	//   PANE_LINES_MAX -- KLmax: a heading may wrap to no more lines than ceil(this times the
+	//     number of characters on its longest line) (paneLineRatioEm()). 0.8 (Tom, 2026-09-28:
+	//     *"I think that KLmax=1 is working ok. But let's change to KLmax=0.8."*); `?collines=1`
+	//     overrides it for an A/B look.
+	// Read once, from this page's own address, and only a sane number is taken.
+	function paneUrlNum(name, lo, hi) {
+		var m, v;
+		try { m = new RegExp('[?&]' + name + '=([0-9.]+)(&|$)').exec(window.location.search || ''); } catch (e) { m = null; }
+		v = m ? parseFloat(m[1]) : NaN;
+		return (isFinite(v) && v >= lo && v <= hi) ? v : null;
+	}
+	var PANE_WORD_MAX = Math.round(paneUrlNum('colword', 3, 30) || 7);
+	var PANE_LINES_MAX = paneUrlNum('collines', 0.1, 10) || 0.8;
+	// **"SPLIT INTO TWO PARTS", TAKEN LITERALLY:** a word longer than PANE_WORD_MAX is cut in half
+	// (the longer half first, for an odd length); nothing shorter is split at all. Returns the
+	// split INDEX (or -1 for "do not split"), the one number both the width calculation below and
+	// paneHeadingDisplayText()'s soft hyphen read, so the rendered break can never land anywhere
+	// but where the width was measured to allow it.
+	function paneWordSplitIndex(word) {
+		return word.length > PANE_WORD_MAX ? Math.ceil(word.length / 2) : -1;
+	}
+	// This is what lets the heading actually narrow past its longest whole word: the browser's own
+	// min-content floor is the longest UNBROKEN run in the heading, and paneHeadingDisplayText()'s
+	// soft hyphen is what makes that run the HALF this measures, not the whole word.
+	function paneWordSplitEm(word, heading) {
+		var mid = paneWordSplitIndex(word), a, b;
+		if (mid < 0) { return paneMeasureEm(word, heading); }
+		// The first half is measured WITH the hyphen the browser draws when it breaks at the soft
+		// hyphen, because that is the line the reader sees (R-356 follow-up, 2026-09-28).
+		a = word.slice(0, mid) + '-'; b = word.slice(mid);
+		return Math.max(paneMeasureEm(a, heading), paneMeasureEm(b, heading));
+	}
+	function paneHeadingInitEm(c) {
+		var words = paneHeadingLabelOnly(c).replace(/[▲▼]/g, '').split(/\s+/).filter(Boolean),
+			best = 0;
+		words.forEach(function (w) { best = Math.max(best, paneWordSplitEm(w, true)); });
+		return best;
+	}
+	// **Rule (a): "the known, present, current contents of the column"** -- so a table with no
+	// pumps yet cannot know a pump's own price and this is 0 for it, leaving the heading (b) to
+	// decide alone. A `str` field's actual text, a number's own rounded/typed display text
+	// (paneCellText() is the one function both the screen and the printed sheet already use, so
+	// this never disagrees with either) -- and for a pull-down, the OPTION'S OWN LABEL, since that
+	// is what is on screen, not the stored id.
+	// **"NOT COUNTING 'No....' SELECTORS":** a pull-down with nothing chosen reads back a falsy
+	// value from `get()` by construction (every "No pattern"/"No curve"/etc. choice is stored as
+	// `''`), so skipping an unset selector is the same test paneCellText() and paneTableSorted()
+	// already use for "this cell has nothing in it" -- no string-matching on "No " needed, and
+	// nothing to break in a language where that word is not "No".
+	// A checkbox has no text at all to measure; rule (b) alone decides its width.
+	function paneColContentEm(c, rows) {
+		var best = 0, choiceMap = null, i, el, v, text, plain;
+		if (c.bool) { return 0; }
+		if (c.choices) {
+			choiceMap = {};
+			c.choices().forEach(function (o) { choiceMap[o[0]] = o[1]; });
+		}
+		// **EACH VALUE IS MEASURED AS THE BOX IT IS DRAWN IN** (R-356 follow-up, 2026-09-28): a
+		// plain cell (a result, an identity the drawing owns, a stated word) is text inside the
+		// `<td>`'s own padding; a typed value is text inside an `<input>` whose padding is inside
+		// the column; a CHOSEN pull-down is its text plus its arrow and padding. An unset one is
+		// skipped whole -- rule (b) alone decides a column of nothing but "No ..." choices.
+		for (i = 0; i < rows.length; i++) {
+			el = rows[i];
+			plain = paneCellIsPlain(c, el);
+			if (c.choices && !plain) {
+				v = c.get(el);
+				if (!panePresent(v) || v === '') { continue; }
+				text = Object.prototype.hasOwnProperty.call(choiceMap, v) ? choiceMap[v] : String(v);
+			} else {
+				text = paneCellText(c, el);
+			}
+			if (!text) { continue; }
+			best = Math.max(best, (c.choices && !plain) ? paneSelBoxEm(text)
+				: paneMeasureEm(text, false) + (plain ? paneCellPadEm().td : paneCellPadEm().input));
+		}
+		return best;
+	}
+	// **THE INITIAL WIDTH ITSELF, CACHED PER RENDER** -- scanning every row for every column on
+	// every cell built would be O(columns x rows^2); renderPaneTable() clears this cache (alongside
+	// `spec.cells`) whenever it rebuilds the table, and a live refill (typing, a solve) never calls
+	// this at all, because the rule is about the INITIAL width, not a width that chases every
+	// keystroke. The pad is the CELL'S OWN padding (panePadEm()), read against whichever side of
+	// the max() actually won -- the heading's bold, `.9em`-scaled font if rule (b) did, the plain
+	// content font if rule (a) did -- so the number added is never a guess about either.
+	//
+	// **EACH SIDE CARRIES ITS OWN BOX** (R-356 follow-up, 2026-09-28). The heading's text sits in
+	// the `<th>`'s content box, inside the `<th>`'s own padding; a value's box (paneColContentEm())
+	// already carries its own padding or pull-down chrome. So the column is the wider of the two.
+	function paneColInitialEm(spec, c) {
+		var v = 0, contentEm, headingEm, hf, headPad;
+		if (!spec.initEmCache) { spec.initEmCache = {}; }
+		if (Object.prototype.hasOwnProperty.call(spec.initEmCache, c.key)) { return spec.initEmCache[c.key]; }
+		contentEm = paneColContentEm(c, paneTableRowsInOrder(spec));
+		headingEm = paneHeadingInitEm(c);
+		hf = paneHeadFont();
+		headPad = panePadEm(hf ? hf.px : 0);
+		if (headingEm > 0 || contentEm > 0) {
+			v = Math.max(contentEm, headingEm + headPad);
+			// The line-ratio rule may widen it further, never narrow it.
+			v = Math.max(v, paneLineRatioEm(c, v - headPad) + headPad);
+			v = Math.round(v * 100) / 100;
+		}
+		spec.initEmCache[c.key] = v;
+		return v;
+	}
+	// **THE LINE-RATIO RULE** (Tom, 2026-09-28, KLmax above): *"Don't wrap to cause n lines to be
+	// more than KLmax times n characters on longest line."* A heading drawn at width `em` is laid
+	// out for real in a hidden probe (the same `<th><button class="lpn-pane-sort">` the table uses,
+	// filled by paneHeadingFill(), so soft hyphens, the unit's own box and its `<wbr>`s all break
+	// exactly as they will on screen); its lines are counted, and the characters on its longest
+	// line. While lines > ceil(KLmax x characters) the width grows (Tom, 2026-09-28: *"nlines <=
+	// ceil(KLmax * max line characters)"* -- the ceil is what lets a one-letter "X" meet 0.8) by
+	// PANE_LINES_STEP_EM and is tried again. This is the one way a UNIT can widen a column: the old
+	// "(Latitude/Longitude|…)" in a column sized for "Vert-" ran to nine lines of four or five
+	// letters each. It stops at the heading's
+	// own one-line width, where the rule cannot fail (one line, at least one character).
+	// Returns the heading width that complies (>= `em`), or `em` itself with no DOM to measure.
+	var PANE_LINES_STEP_EM = 0.2;
+	var paneLineRatioCache = {};
+	var paneLineProbe = null;
+	function paneLineProbeEls() {
+		var table, thead, tr, th, btn;
+		if (paneLineProbe) { return paneLineProbe; }
+		table = document.createElement('table'); table.className = 'lpn-pane-table';
+		thead = document.createElement('thead'); tr = document.createElement('tr');
+		th = document.createElement('th'); btn = document.createElement('button');
+		btn.type = 'button'; btn.className = 'lpn-pane-sort';
+		th.appendChild(btn); tr.appendChild(th); thead.appendChild(tr); table.appendChild(thead);
+		table.style.cssText = 'position:absolute;visibility:hidden;left:-9999px;top:-9999px;pointer-events:none;';
+		document.body.appendChild(table);
+		paneLineProbe = { btn: btn };
+		return paneLineProbe;
+	}
+	// { lines, chars } for the probe button as it is laid out now.
+	function paneLineCount(btn) {
+		var tops = [], per = {}, walker, node, i, r, rs, t, k, j, chars = 0;
+		walker = document.createTreeWalker(btn, 4, null);
+		while ((node = walker.nextNode())) {
+			for (i = 0; i < node.nodeValue.length; i++) {
+				if (/\s|\u00ad/.test(node.nodeValue.charAt(i))) { continue; }
+				r = document.createRange(); r.setStart(node, i); r.setEnd(node, i + 1);
+				rs = r.getClientRects();
+				if (!rs.length || !(rs[0].width > 0)) { continue; }
+				t = rs[0].top + rs[0].height / 2; k = -1;
+				for (j = 0; j < tops.length; j++) { if (Math.abs(tops[j] - t) < 3) { k = j; break; } }
+				if (k < 0) { tops.push(t); k = tops.length - 1; }
+				per[k] = (per[k] || 0) + 1;
+			}
+		}
+		for (k in per) { if (per[k] > chars) { chars = per[k]; } }
+		return { lines: tops.length, chars: chars };
+	}
+	function paneLineRatioEm(c, em) {
+		var key, probe, btn, w, n, full, guard = 0;
+		if (!(em > 0)) { return em; }
+		key = paneHeadingDisplayText(c) + '\u0001' + em + '\u0001' + PANE_LINES_MAX;
+		if (Object.prototype.hasOwnProperty.call(paneLineRatioCache, key)) { return paneLineRatioCache[key]; }
+		try {
+			if (typeof document.createTreeWalker !== 'function' || typeof document.createRange !== 'function') { return em; }
+			probe = paneLineProbeEls(); btn = probe.btn;
+			btn.textContent = '';
+			paneHeadingFill(btn, c);
+			btn.style.width = 'max-content';
+			full = btn.getBoundingClientRect().width / (parseFloat(window.getComputedStyle(btn).fontSize) || 16);
+			if (!(full > 0)) { return em; }
+			w = em;
+			while (w < full && guard++ < 200) {
+				btn.style.width = w + 'em';
+				n = paneLineCount(btn);
+				if (n.lines <= Math.ceil(PANE_LINES_MAX * n.chars)) { break; }
+				w = Math.round((w + PANE_LINES_STEP_EM) * 100) / 100;
+			}
+			w = Math.min(Math.max(w, em), Math.max(full, em));
+		} catch (e) { w = em; }
+		paneLineRatioCache[key] = w;
+		return w;
+	}
+	// A value's own box padding, in em of the table font: `input` for a typed value (`padding: 1px
+	// 4px` on the control, which fills its cell), `td` for a plain cell (`padding: 1px 6px` on the
+	// cell). Read off real ones where there is a DOM, in a detached `.lpn-pane-table` on <body> so a
+	// closed pane cannot hide them -- WITH a `<tbody>`, which every rule for these cells names and
+	// which the DOM, unlike the HTML parser, never inserts by itself -- so a
+	// 0.6em and 0.9em otherwise. A 0.06em hair is added to each, as
+	// panePadEm() does, for sub-pixel rounding between canvas and layout.
+	var paneCellPadEmCache = null;
+	function paneCellPadEm() {
+		var table, tbody, tr, td, td2, inp, px, hor;
+		if (paneCellPadEmCache) { return paneCellPadEmCache; }
+		hor = function (cs) {
+			return (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0) +
+				(parseFloat(cs.borderLeftWidth) || 0) + (parseFloat(cs.borderRightWidth) || 0);
+		};
+		try {
+			table = document.createElement('table'); table.className = 'lpn-pane-table';
+			tr = document.createElement('tr'); td = document.createElement('td'); td2 = document.createElement('td');
+			inp = document.createElement('input'); td.appendChild(inp); td2.textContent = 'M';
+			tr.appendChild(td); tr.appendChild(td2);
+			tbody = document.createElement('tbody'); tbody.appendChild(tr); table.appendChild(tbody);
+			table.style.cssText = 'position:absolute;visibility:hidden;left:-9999px;top:-9999px;';
+			document.body.appendChild(table);
+			px = parseFloat(window.getComputedStyle(td2).fontSize);
+			if (px > 0) {
+				paneCellPadEmCache = {
+					input: Math.round(hor(window.getComputedStyle(inp)) / px * 1000) / 1000 + 0.06,
+					td: Math.round(hor(window.getComputedStyle(td2)) / px * 1000) / 1000 + 0.06
+				};
+			}
+			document.body.removeChild(table);
+		} catch (e) { /* no real DOM */ }
+		return paneCellPadEmCache || { input: 0.6, td: 0.9 };
 	}
 	// **THE FLOOR IS ONE CHARACTER AND THERE IS NO CEILING.** Tom's own rule about a narrow box
 	// (2026-08-23): *"inputs are flexible. You can enter more than their width."* A column dragged
@@ -22968,6 +23346,16 @@ var EngCalcs = EngCalcs || {};
 	// A result rounds to 2 decimals; a typed number reads back exactly as it is stored; an
 	// identity reads verbatim. Two of these written separately is how a sheet in somebody's hand
 	// comes to round differently from the screen it was taken off.
+	//
+	// **THE ONE EXCEPTION: A CHOICE COLUMN.** This deliberately returns the RAW STORED WORD
+	// (`MIXED`, `2COMP`, `FIFO`, `LIFO`...) rather than its label, because every caller that reads a
+	// choice column feeds it straight to `input.value =` on a live `<select>` -- and a `<select>`
+	// matches by its `<option>`'s `value`, not by the words printed on it. That is correct for the
+	// SCREEN, where the matched option's own text is what the reader actually sees. The printed
+	// sheet has no `<option>` to do that matching (paneBuildPrintable() writes a plain `<td>`), so it
+	// must NOT call this function for a choice column -- see paneCellDisplayText() below, which is
+	// the one that reads as the screen reads (R-367, Tom, 2026-09-27: *"Mixing model prints a
+	// different value than appears on-screen"*).
 	// **WHICH OVERRIDABLE PROPERTY A COLUMN WRITES.** A literal for every column but the two
 	// coordinates, whose axis follows the kind of project and is therefore a function (paneColCoord).
 	// One reader, so a cell edit, a paste and a multi-properties row cannot disagree about it.
@@ -22986,6 +23374,23 @@ var EngCalcs = EngCalcs || {};
 		if (c.result) { return c.str ? String(v) : String(plainRound(v, 2)); }
 		if (!c.set || c.choices || c.str) { return String(v); }
 		return paneNumText(v);
+	}
+	// **WHAT THE READER ACTUALLY SEES, FOR A CELL WITH NO `<select>` UNDER IT TO SHOW IT FOR THEM**
+	// (R-367). paneCellText() is right for every caller that assigns to a live control's `.value`;
+	// this is for the one caller that is not one -- paneBuildPrintable()'s plain `<td>`. A choice
+	// column's label is read from the SAME `choices()` list the on-screen `<select>` was built from
+	// (paneColContentEm() already reads it this way to size the column), so the printed word can
+	// never disagree with the option the reader picked -- in whatever language is on screen, since
+	// `choices()` returns the translated label, not the stored EPANET token. Every other column
+	// reads exactly as paneCellText() already does.
+	function paneCellDisplayText(c, el) {
+		var v, choices, i;
+		if (!c.choices) { return paneCellText(c, el); }
+		v = c.get(el);
+		if (!panePresent(v)) { return ''; }
+		choices = c.choices(el);
+		for (i = 0; i < choices.length; i++) { if (choices[i][0] === v) { return choices[i][1]; } }
+		return String(v);
 	}
 	// **ONE PARSER FOR A TYPED CELL, A PASTED CELL AND A MULTI-PROPERTIES ROW.** Returns {ok, v}:
 	// the value c.set() should receive, or a refusal the caller can count. A number column keeps
@@ -23113,7 +23518,7 @@ var EngCalcs = EngCalcs || {};
 		var th = spec.headCells && spec.headCells[c.key], w = 0;
 		try { w = (th && th.getBoundingClientRect) ? th.getBoundingClientRect().width : 0; } catch (e) { w = 0; }
 		if (w > 0 && unit > 0) { return Math.round((w / unit) * 100) / 100; }
-		return paneColWidthEm(spec.id, c) || 7;
+		return paneColWidthEm(spec, c) || 7;
 	}
 	function paneStartColResize(spec, key, ev) {
 		var cols = paneCols(spec), i = paneColIndex(spec, key), table, unit,
@@ -23285,7 +23690,7 @@ var EngCalcs = EngCalcs || {};
 		return { move: move, up: up, begin: begin, plan: function () { return plan; } };
 	}
 	function paneApplyColWidth(input, c, spec) {
-		var em = spec ? paneColWidthEm(spec.id, c) : c.em;
+		var em = spec ? paneColWidthEm(spec, c) : c.em;
 		if (em) { input.style.setProperty('--lpn-pane-col-w', em + 'em'); }
 		// A pull-down gives up its natural width only in a column the reader has dragged (R-110;
 		// the rule and its reason are in css/engcalcs.css beside `select.lpn-pane-dragged`).
@@ -23314,6 +23719,62 @@ var EngCalcs = EngCalcs || {};
 			// the heading and the property popup's own row cannot disagree.
 			t = c.unitText ? c.unitText() : (u ? unitLabel(u) : '');
 		return t ? text + ' (' + t + ')' : text;
+	}
+	// **THE ONE PLACE A SOFT HYPHEN IS EVER WRITTEN**, and it is never written into
+	// paneHeadingText() itself: that string is compared against elsewhere (Find and replace's own
+	// heading match, the pane's "..." menu, aria-label, every harness that pins a heading's exact
+	// wording), and an invisible U+00AD in the middle of it would make every one of those a
+	// silent near-miss. This is DISPLAY ONLY -- the text a heading's own `<button>` (screen) or
+	// `<th>` (print) actually shows -- and it hyphenates the label at the SAME index
+	// paneWordSplitIndex() used to size the column, on the SAME words (never the unit in
+	// parens): the browser's own line breaker treats U+00AD as a legal, and the ONLY, place to
+	// break that word, with a visible hyphen if it does (Perry's real-Chrome pass, 2026-09-27: a
+	// column that could not hold a heading on one line was breaking it anywhere the glyphs
+	// happened to run out of room, not at the calculation's own split).
+	// U+00AD (soft hyphen), spelled as a code point rather than typed literally: an invisible
+	// character sitting in the source as a raw byte is one a future edit could delete without
+	// anyone seeing it happen.
+	var PANE_SHY = String.fromCharCode(173);
+	function paneHeadingDisplayLabel(c) {
+		return paneHeadingLabelOnly(c).split(/(\s+)/).map(function (tok) {
+			var mid = /\s/.test(tok) ? -1 : paneWordSplitIndex(tok);
+			return mid < 0 ? tok : tok.slice(0, mid) + PANE_SHY + tok.slice(mid);
+		}).join('');
+	}
+	function paneHeadingUnitText(c) {
+		var u = c.unit ? c.unit() : '';
+		return c.unitText ? c.unitText() : (u ? unitLabel(u) : '');
+	}
+	function paneHeadingDisplayText(c) {
+		var t = paneHeadingUnitText(c), text = paneHeadingDisplayLabel(c);
+		return t ? text + ' (' + t + ')' : text;
+	}
+	// **THE UNIT IS ITS OWN BOX, AND IT NEVER WIDENS THE COLUMN** (R-356, Tom's browser pass
+	// 2026-09-28: *"Vertices (Lat....) is wrapped to two lines, but its units are not wrapped in
+	// violation of the rule to ignore units in the wrapping calculation"*). The label goes in as a
+	// text node, exactly the string paneHeadingDisplayText() starts with; the unit goes in as a
+	// `.lpn-pane-hunit` span, which css/engcalcs.css makes an inline-block that may break
+	// anywhere. Inline-block, so the unit stays beside the label only when the WHOLE unit fits
+	// there and otherwise starts its own line; break-anywhere, so a unit wider than the column
+	// ("(Lat/Lon|…)", "(% rise/run)") wraps inside the column instead of holding it open. The
+	// element's textContent is still paneHeadingDisplayText(c), character for character.
+	function paneHeadingFill(node, c) {
+		var t = paneHeadingUnitText(c), span;
+		node.appendChild(document.createTextNode(paneHeadingDisplayLabel(c) + (t ? ' ' : '')));
+		if (t) {
+			span = document.createElement('span');
+			span.className = 'lpn-pane-hunit';
+			// A `<wbr>` after every `/` and `|`, so a unit that has to break breaks at its own
+			// seams first -- "(ft/" over "sec)", never "(ft/se" over "c)" -- and anywhere only
+			// when one piece is still wider than the column. `<wbr>` has no text, so the span's
+			// textContent is the unit exactly.
+			('(' + t + ')').split(/([\/|])/).forEach(function (piece) {
+				if (!piece) { return; }
+				span.appendChild(document.createTextNode(piece));
+				if (piece === '/' || piece === '|') { span.appendChild(document.createElement('wbr')); }
+			});
+			node.appendChild(span);
+		}
 	}
 	// What the table would have to be REBUILT for, as opposed to merely refilled: which rows are
 	// present, the order they are in, and the headings (which carry the units). A solve changes none
@@ -23387,6 +23848,7 @@ var EngCalcs = EngCalcs || {};
 		spec.sig = sig;
 		spec.cells = {};
 		spec.tds = {};
+		spec.initEmCache = {};   // the rule's inputs (the rows) are about to change under it
 		spec.painted = null;   // fresh <td>s carry no class: see paneSelPaint()
 		host.innerHTML = '';
 		// **A FILTERED TABLE SAYS SO BEFORE IT SAYS ANYTHING ELSE**, empty or not (Task 597). Hidden
@@ -23439,7 +23901,7 @@ var EngCalcs = EngCalcs || {};
 		// `--lpn-pane-col-w` because that is what sizes the BOX inside the cell.
 		cg = document.createElement('colgroup');
 		paneCols(spec).forEach(function (c) {
-			var col = document.createElement('col'), em = paneColWidthEm(spec.id, c);
+			var col = document.createElement('col'), em = paneColWidthEm(spec, c);
 			if (em) { col.style.width = em + 'em'; }
 			cg.appendChild(col);
 		});
@@ -23466,7 +23928,7 @@ var EngCalcs = EngCalcs || {};
 			// `<th>`'s own uniform pointer. Every glyph that used to compete with this text for
 			// room -- the "..." menu and the sort arrow -- now overlays it, at zero layout cost; see
 			// their own comments below for why no space is reserved for either any more.
-			b.appendChild(document.createTextNode(paneHeadingText(c)));
+			paneHeadingFill(b, c);
 			// **THE CLICK, DRAG-START AND SELECT LOGIC IS WIRED ON THE `<th>`, NOT THIS BUTTON** --
 			// see the listeners attached after `grip`/`menuBtn`/`arrow` exist, below. (Percentage
 			// heights on a table cell's children resolve to `auto`, not the cell's own drawn height,
@@ -26004,7 +26466,9 @@ var EngCalcs = EngCalcs || {};
 	// to go stale. It reads the spec, so it prints whatever the spec says -- the headings through
 	// paneHeadingText(), so the units on the paper are the units on the screen; the rows through
 	// paneTableRowsInOrder(), so the sort the reader chose is the order that prints; the cells
-	// through paneCellText(), which is also what fills them on screen.
+	// through paneCellDisplayText() (R-367), the one caller of paneCellText() that does not feed a
+	// live `<select>`'s own value matching -- so a choice column prints the label the screen shows,
+	// not the stored EPANET word underneath it.
 	//
 	// **A STATIC COPY, NOT THE LIVE TABLE.** Print rules that beat the live pane into a sheet of
 	// paper would be a second layout of the same table, maintained in CSS: it is a 260 px
@@ -26049,7 +26513,7 @@ var EngCalcs = EngCalcs || {};
 		paneCols(spec).forEach(function (c, i) {
 			var th = document.createElement('th');
 			th.className = paneCellClass(c, i);
-			th.textContent = paneHeadingText(c);
+			paneHeadingFill(th, c);
 			tr.appendChild(th);
 		});
 		thead.appendChild(tr);
@@ -26060,7 +26524,9 @@ var EngCalcs = EngCalcs || {};
 			paneCols(spec).forEach(function (c, i) {
 				var td = document.createElement('td');
 				td.className = paneCellClass(c, i);
-				td.textContent = paneCellText(c, el);
+				// paneCellDisplayText(), not paneCellText(): this <td> has no <select> under it to
+				// turn a choice column's stored word back into the label the screen shows (R-367).
+				td.textContent = paneCellDisplayText(c, el);
 				row.appendChild(td);
 			});
 			tbody.appendChild(row);
@@ -26088,11 +26554,59 @@ var EngCalcs = EngCalcs || {};
 	 * dev/browser-pass/specs/print.js.
 	 * Returns the em widths it applied, or null when the table has no columns to measure.
 	 */
+	// **MEASURED HEADROOM FOR A VALUE WITH NOWHERE TO WRAP** (R-366 follow-up, Perry's pre-review,
+	// 2026-09-28). `overflow-wrap: normal` on a print `td` (below) stops a mid-character break, but
+	// it does nothing about a value that is genuinely too wide for its column: forcing one to
+	// roughly twice its column's width showed it painting 133px into the NEXT column, unbroken --
+	// an overlap, which reads worse than the wrap it replaced. Two defenses, not one: this headroom
+	// so an ordinary, honestly-sized value never gets close to that edge, and `overflow-wrap:
+	// anywhere` restored below as the last resort for the value that still does not fit.
+	//
+	// **THE NUMBER, MEASURED WITH A REAL PRINT PASS, NOT ASSUMED.** Built the fixture's Longitude
+	// column, read the print table's OWN computed font-size, canvas-`measureText()`'d
+	// "-122.419415917969" at that exact size (the same technique paneColContentEm() already uses to
+	// size a column) as a PREDICTION, then read the ACTUAL painted glyph width back out of a real
+	// `page.pdf()` PDF with pdfjs-dist (`transform`/`width` per text run, points converted to CSS px
+	// at 96/72). Predicted vs. actual: Letter 57.92px vs 64.07px (10.6% short); A4 56.10px vs
+	// 62.40px (11.2% short). Consistent across both papers, so a real property of Chromium's PRINT
+	// rendering pass -- plausibly a different font instance behind the generic `sans-serif` family
+	// in the print/PDF export path than on screen -- not measurement noise. 1.12 gives that a small
+	// margin. The exact percentage is this machine's; a different platform's font substitution could
+	// need more or less, which is the other reason the wrap fallback still has to exist.
+	var PANE_PRINT_HEADROOM = 1.12;
+	// **A MEASURED MARGIN, NOT A COLUMN TYPE.** The first draft of this gave headroom only to `str`/
+	// `choices` columns (custom properties, Mixing model...) on the theory that a plain number is
+	// short and rounded and therefore safe. That theory is WRONG: `paneColCoord()`'s own X/Y columns
+	// are plain numbers and print through `paneNumText()` (`+v.toFixed(6)`), which keeps up to six
+	// decimal places -- as long an unbreakable token as a custom property, and as unprotected by a
+	// space to wrap at. Numbers are not exempt.
+	// **THE PRINTED WIDTH EACH VALUE NEEDS, NOT A GUESS AT A MARGIN** (R-356 follow-up, 2026-09-28).
+	// The second draft asked whether the SCREEN column's cushion was smaller than the shortfall and,
+	// if so, multiplied the whole column by 1.12 -- which silently depended on the screen cushion
+	// being the heading cell's 6px: when the initial-width rule began counting an input's own 8px
+	// padding, a Latitude cushion grew past the test, no headroom was given, and "37.123456"
+	// wrapped on paper again. Stated directly instead: an unbreakable value needs its own measured
+	// width times the print shortfall, plus the PRINT cell's own padding (`padding: .07em .42em` on
+	// `#lpn_print_area .lpn-print-table tbody td` in css/engcalcs.css), and a column is printed at
+	// least that wide. A value with a space in it can wrap and needs nothing.
+	var PANE_PRINT_TD_PAD_EM = 0.84;
+	function paneColPrintNeedEm(spec, c) {
+		var rows = paneTableRowsInOrder(spec), i, text, need = 0;
+		for (i = 0; i < rows.length; i++) {
+			text = paneCellDisplayText(c, rows[i]);
+			if (!text || /\s/.test(text)) { continue; }   // a space is always a place left to wrap
+			need = Math.max(need, paneMeasureEm(text, false) * PANE_PRINT_HEADROOM + PANE_PRINT_TD_PAD_EM);
+		}
+		return need;
+	}
 	function panePrintWidths(spec, table) {
 		var cols = paneCols(spec), unit, ems, sum = 0, cg;
 		if (!cols.length) { return null; }
 		unit = paneEmPx(spec.colGroup && spec.colGroup.parentNode);
 		ems = cols.map(function (c) { return paneColDrawnEm(spec, c, unit); });
+		ems = ems.map(function (e, i) {
+			return Math.round(Math.max(e, paneColPrintNeedEm(spec, cols[i])) * 100) / 100;
+		});
 		ems.forEach(function (e) { sum += e; });
 		if (!(sum > 0)) { return null; }
 		// **EACH COLUMN ALSO CARRIES ITS 1px RULE, OUTSIDE THE SCALE.** On screen the grid is inset

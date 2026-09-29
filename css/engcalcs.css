@@ -2294,7 +2294,10 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-pane-table tbody td.lpn-pane-first { padding: 1px 6px 1px 4px; box-shadow: inset -1px 0 0 #ddd, inset 0 -1px 0 #ddd, inset 1px 0 0 #ddd; }
 html[dir="rtl"] .lpn-pane-table tbody td { box-shadow: inset 1px 0 0 #ddd, inset 0 -1px 0 #ddd; }
 html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 0 0 #ddd, inset 0 -1px 0 #ddd, inset -1px 0 0 #ddd; }
-.lpn-pane-table tbody td:not(.lpn-pane-first):not(:has(input)) { padding: 1px 6px; }
+/* A pull-down, like an input, IS its cell and brings its own padding (R-356: the column's rule
+   width counts the pull-down's own box, so a cell padding around it pushed the column 12px past
+   the rule). */
+.lpn-pane-table tbody td:not(.lpn-pane-first):not(:has(input)):not(:has(select)) { padding: 1px 6px; }
 /* The control IS the cell: no border of its own, no background of its own, and the cell's own
    padding rather than the browser's. Its width is still the column's, so nothing Tom approved
    about column widths moves. */
@@ -2360,6 +2363,12 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
 /* start, not left: the first column is the leading one, and in an RTL language that is the
    right-hand edge. Same rule the Labels panel's affix headings follow (Task 435). */
 .lpn-pane-table th.lpn-pane-first, .lpn-pane-table td.lpn-pane-first { text-align: start; }
+/* **THE ID COLUMN IS CENTRED EVEN THOUGH IT LEADS** (Tom, 2026-09-27: *"Let's try making the ID
+   column of every table centered horizontally; it's not printing beautifully yet."*). It carries
+   `.lpn-pane-first` for its border and padding (it is still the leading column), but the general
+   "first column reads start" rule above is for a customer's tag or a text object's words, not an
+   id -- so this rule, keyed on the column and not the position, comes after it and wins the tie. */
+.lpn-pane-table th.lpn-pane-col-id, .lpn-pane-table td.lpn-pane-col-id { text-align: center; }
 /* padding-top, because the panel's own is gone; and every rule around a heading is an INSET SHADOW
    rather than a border -- under `border-collapse: collapse` the border belongs to the table, not to
    the cell, so it scrolls away from the heading that owns it.
@@ -2489,7 +2498,17 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
      * `min-width: 0` on both, so the declared width is the floor rather than the content.
    Truncation is then the browser's own: an over-long option or value is clipped by its control.
    THIS IS A TRIAL AND HE SAID SO. If it reads badly in public, the thing to change is these three
-   lines, not the drag. */
+   lines, not the drag.
+   **BACK TO ONLY `.lpn-pane-tight` (a dragged column)** (Perry's real-Chrome pass on Tom's
+   initial-width rule, 2026-09-27: widened to every heading for one build, which let the browser
+   break EVERY word wherever it liked to fit a too-narrow estimate -- "Tag", "Closed", short words
+   nowhere near the 8-character split threshold, broke too). Two separate fixes replace that one
+   line: the width estimate itself is now measured against the heading's REAL font (see
+   paneHeadFont() in js/looped-network.js), so an undragged column should no longer need to break
+   at all; and where an 8+ letter word IS split, paneHeadingDisplayText() writes a soft hyphen
+   (U+00AD) at the exact split point, which the browser treats as a legal break point on its own,
+   with no `anywhere`/`break-word` needed. A DRAGGED column still gets both, because the reader
+   chose that width and a heading that cannot shrink to fit it is the worse failure. */
 .lpn-pane-table thead th.lpn-pane-tight,
 .lpn-pane-table thead th.lpn-pane-tight .lpn-pane-sort { overflow-wrap: anywhere; word-break: break-word; }
 .lpn-pane-table tbody td select {
@@ -2497,20 +2516,20 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	   computes to `auto`, so a column that declares no width leaves its pull-down exactly the
 	   width it has always been. Only a column that names an em -- or that the reader has
 	   dragged -- pulls its pull-down in with it. */
-	width: var(--lpn-pane-col-w); max-width: 100%; min-width: max-content;
+	width: var(--lpn-pane-col-w); max-width: 100%; min-width: 0;
 	border: 0; background: transparent; padding: 1px 2px; margin: 0; font: inherit;
 	text-align: inherit;
 }
-/* **AND A PULL-DOWN NOBODY HAS DRAGGED HOLDS ITS COLUMN OPEN TO ITS OWN WIDEST CHOICE** (Tom,
-   2026-09-21, R-110: *"Pumps.Pump head curve, width = 2 em (due to selector?); Pump.Price
-   pattern, width = 3em (due to selector?)"*). He was right that it was the selector. The trial
-   above made `min-width: 0` unconditional, and a control with a percentage `max-width` and no
-   minimum contributes NOTHING to an automatic table column's width -- so an untouched pull-down
-   column was as wide as its heading's longest word and no wider, and clipped "No fittings list
-   selected" to "No fittings" on first sight, before anybody had asked for a narrow column at all.
-   Measured on Net3: four pull-down columns clipped their own shown choice. `max-content` gives
-   it back its natural width; the truncation his trial asked for is kept for exactly the case he
-   described -- a column he has DRAGGED, which js/looped-network.js marks on the control. */
+/* **A PULL-DOWN NO LONGER HOLDS ITS COLUMN OPEN TO ITS WIDEST CHOICE** (R-356, Tom 2026-09-27:
+   the initial width counts present content *"not counting 'No....' selectors"*; his browser pass
+   2026-09-28 found Pipe type, Fittings list, Speed pattern, Pump efficiency curve and Price
+   pattern still one line wide because `min-width: max-content` here, from R-110, let every
+   pull-down lay its column out at its widest option). The column's rule width already holds a
+   CHOSEN value's own text plus the pull-down's arrow and padding (paneColContentEm() and
+   paneSelBoxEm() in js/looped-network.js), so `min-width: 0` costs a chosen value nothing; an
+   unset "No ..." pull-down is clipped to the column, which is what the rule asks. The rejected
+   alternative, re-proposed easily: `max-content` for unset pull-downs only -- it would hold the
+   column open to "No fittings list selected" and put the heading back on one line. */
 .lpn-pane-table tbody td select.lpn-pane-dragged { min-width: 0; }
 .lpn-pane-table tbody td input { min-width: 0; max-width: 100%; }
 .lpn-pane-table tbody td { overflow: hidden; }
@@ -2572,6 +2591,14 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    live here (percentage heights on a table cell's child do not resolve to the cell's real
    height). */
 .lpn-pane-sort { font-weight: bold; display: block; width: 100%; cursor: inherit; }
+/* **THE UNIT IS IGNORED BY THE WIDTH AND WRAPS INSIDE IT** (R-356: *"not counting units"*; Tom,
+   2026-09-28, on "Vertices": *"its units are not wrapped in violation of the rule to ignore units
+   in the wrapping calculation"*). An inline-block, so it stays on the label's last line only when
+   the WHOLE unit fits there and otherwise starts a line of its own; `overflow-wrap: anywhere`, so
+   a unit wider than the column ("(Lat/Lon|…)", "(% rise/run)") breaks inside the column instead
+   of holding it open -- `anywhere`, unlike `break-word`, is counted by the browser when it sizes
+   the column, which is the whole point. */
+.lpn-pane-hunit { display: inline-block; overflow-wrap: anywhere; }
 /* The browser's OWN default focus ring on a focused `<button>` is not "unstyled", it is a second
    ring drawn tight around the text -- exactly the thing point (1) objects to, just undoing the fix
    a different way. The `<th>`'s own `:has(:focus-visible)` rule is the only ring this table draws. */
@@ -2901,11 +2928,36 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	   all of them shrink by the one factor and the wrapping is the screen's wrapping. */
 	body.lpn-printing-table #lpn_print_area { container-type: inline-size; }
 	.lpn-print-table.lpn-print-fixed { table-layout: fixed; }
+	/* **TWO DEFENSES, NOT ONE** (R-366, Tom, 2026-09-27: *"Printing seems to always take a little
+	   more room than on-screen... this happened to Latitude, Longitude, and Date installed"*; the
+	   pre-reviewer's follow-up, 2026-09-28, on the first attempt at this comment, which removed
+	   `anywhere` from `td` outright: forcing a value to roughly twice its column's width showed it
+	   painting 133px into the NEXT column, unbroken -- trading a wrap for a silent overlap, which
+	   reads worse). An honestly-sized value -- a coordinate, a date, sized on screen to its own
+	   exact drawn width with no space to wrap at -- is now given MEASURED HEADROOM in
+	   panePrintWidths() (js/looped-network.js, PANE_PRINT_HEADROOM) so it should never come
+	   anywhere near this rule at all. `overflow-wrap: anywhere` stays here as the LAST RESORT for
+	   the value that still does not fit -- a column dragged narrow and then pasted or typed into
+	   with something longer than it was ever sized for -- so THAT failure is a wrap, which is
+	   legible, rather than an overlap, which is not. A heading's own `anywhere` is doing a second,
+	   older job too: paneHeadingDisplayText()'s soft hyphen is the only point it is normally allowed
+	   to land on. */
 	.lpn-print-table.lpn-print-fixed th, .lpn-print-table.lpn-print-fixed td { overflow-wrap: anywhere; }
 	/* The letters are 3% smaller than the columns they sit in. A glyph's advance does not scale
 	   exactly linearly at 5-8px, and a heading that exactly fills its column on screen (every one
-	   does: the table is `max-content`) then wraps on paper for want of a fraction of a pixel. The
-	   column widths are in the TABLE's em, so this moves no column. */
+	   does: the table is `max-content`) then wraps on paper for want of a fraction of a pixel.
+	   **THIS IS NOT A CSS ROUNDING ERROR TO FIX ONCE; IT IS HOW PRINTING WORKS.** A real print job
+	   (Ctrl+P, Save as PDF) is generated by Chromium in a SEPARATE rendering pass from the page the
+	   reader is looking at -- lockedownseo.com's write-up on Chrome print preview divergence puts it
+	   plainly: "the print preview generates" as its own event, not a snapshot of the live DOM's own
+	   layout. This repo's own tooling already knew it could not promise byte-identical text metrics
+	   between the two: dev/browser-pass/specs/print.js's header notes it verifies against
+	   `emulateMedia('print')` because that is what Playwright offers, and the pre-reviewer's journal
+	   (2026-09-23, confirming print widths) records the same tool's own limit in so many words --
+	   `emulateMedia('print')` "does not paginate to a real sheet size the way page.pdf() or an
+	   actual print dialog would." A build-and-verify pipeline that cannot promise its own harness
+	   matches the real print pass has no business promising the pixel it measured on SCREEN survives
+	   into that pass unchanged. The column widths are in the TABLE's em, so this moves no column. */
 	#lpn_print_area .lpn-print-table.lpn-print-fixed th, #lpn_print_area .lpn-print-table.lpn-print-fixed td { font-size: .97em; }
 }
 

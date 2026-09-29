@@ -68,6 +68,7 @@ const L = loadLoopedNetwork(
 	// draw and fails on a table that is perfectly correct.
 	"\t\tpaneCols: paneCols,\n" +
 	"\t\ttableCols: function (id) { return paneCols(paneTableById(id)); },\n" +
+	"\t\twidthEm: paneColWidthEm,\n" +
 	"\t\ttableHeadings: function (id) { return paneCols(paneTableById(id)).map(paneHeadingText); },\n" +
 	// The scenario machinery through its own doors -- createScenario()/switchScenario(), never a
 	// hand-built scenario object, or the seam under test would be tested against a shape the page
@@ -759,13 +760,16 @@ console.log('\n--- heading and cells share one alignment ---');
 		report(firstTh.length === 1 && firstTh[0] === 0 && firstTd.length === 1 && firstTd[0] === 0,
 			spec.id + ': one column is marked first, and it is the leftmost',
 			firstTh.join(',') + ' / ' + firstTd.join(','));
-		// **THE BOX WIDTH REACHES THE BOX**, as the custom property the stylesheet reads. A column
-		// that names no width says nothing at all, so CSS's own 7em fallback stands -- assert the
-		// silence too, or a stray default would be invisible here.
+		// **THE BOX WIDTH REACHES THE BOX**, as the custom property the stylesheet reads. Compared
+		// against `paneColWidthEm()` itself (Tom's initial-width rule, 2026-09-27) rather than the
+		// column's own static `em`: an undragged column's initial width is now RULE-computed, the
+		// greater of its present content and its heading's own (word-split) floor, and only falls
+		// back to the static `em` (or CSS's 7em) when that rule has nothing to measure at all.
 		cols.forEach((c, i) => {
 			const target = spec.cells[Object.keys(spec.cells)[0]][c.key];
 			if (!target || target._tag !== 'input') { return; }
-			report(target.style.getPropertyValue('--lpn-pane-col-w') === (c.em ? c.em + 'em' : ''),
+			const wantEm = L.widthEm(spec, c);
+			report(target.style.getPropertyValue('--lpn-pane-col-w') === (wantEm ? wantEm + 'em' : ''),
 				spec.id + '/' + c.key + ': the box carries its column’s width',
 				target.style.getPropertyValue('--lpn-pane-col-w') || '(none)');
 		});
@@ -834,7 +838,7 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 	// **THE READER'S OWN SELF-TEST.** Two answers it must get right before any answer it gives is
 	// worth reading, and a selector it cannot parse is collected and reported at the end rather
 	// than silently answering "no rule".
-	report(align(cell('td', 'id', false, true), WIDE) === 'start', 'reader self-test: the first cell reads start');
+	report(align(cell('td', 'id', false, true), WIDE) === 'center', 'reader self-test: the ID cell reads centred (2026-09-27)');
 	report(width(inputIn('length'), WIDE) === 'var(--lpn-pane-col-w, 7em)' &&
 		width(inputIn('length'), SMALL) === '3.5em',
 		'reader self-test: the desktop box takes its column’s width and the phone box is 3.5em',
@@ -845,12 +849,16 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 	// be back to where we started, focusing on the inputs as we should."* So the question is asked
 	// of POSITION, at both widths, of the heading and of the cell -- and of the box inside the cell.
 	[WIDE, SMALL].forEach((w) => {
-		// `start`, not `left`: the first column is the LEADING one, which in an RTL language is
-		// the right-hand edge. The print rules below still say `left` and are asserted separately —
-		// they are a different question and did not move.
-		report(align(cell('th', 'id', false, true), w) === 'start' &&
-			align(cell('td', 'id', false, true), w) === 'start',
-			'the first column leads at ' + w + 'px, heading and cell alike');
+		// **THE ID COLUMN IS CENTRED EVEN THOUGH IT LEADS** (Tom, 2026-09-27: *"Let's try making
+		// the ID column of every table centered horizontally."*). It still carries
+		// `.lpn-pane-first` for its border and padding, but the column-keyed `.lpn-pane-col-id`
+		// rule comes after the position-keyed `.lpn-pane-first` one in the stylesheet and wins
+		// the tie. `start`, not `left`, is still the rule for a first column that is not the id
+		// (a table that led with something else would read that way in an RTL language too), but
+		// every table's first column is its id column, so there is no such column to test here.
+		report(align(cell('th', 'id', false, true), w) === 'center' &&
+			align(cell('td', 'id', false, true), w) === 'center',
+			'the ID column is centred at ' + w + 'px, heading and cell alike');
 		report(align(cell('th', 'flow', true, false), w) === 'center' &&
 			align(cell('td', 'flow', true, false), w) === 'center',
 			'...a figures column is centred at ' + w + 'px, heading and cell alike');
@@ -880,9 +888,12 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 		report(pAlign(pCell('td', 'flow', true, false)) === 'center' &&
 			pAlign(pCell('th', 'flow', true, false)) === 'center',
 			'on paper a figures column is centred, as on screen', pAlign(pCell('td', 'flow', true, false)));
+		// **AND NOW EVERY COLUMN, ID INCLUDED** (Tom, 2026-09-27, superseding R-215's "all centred
+		// except ID"): the ID column centres on paper because it centres on screen, through the
+		// same shared class and the same rule.
 		report(pAlign(pCell('td', 'from', false, false)) === 'center' &&
-			pAlign(pCell('td', 'id', false, true)) === 'start',
-			'...a name column too, and the first column leads, as on screen');
+			pAlign(pCell('td', 'id', false, true)) === 'center',
+			'...a name column too, and the ID column centres, as on screen');
 	}
 
 	// 3. THE STICKY HEADING, and the 6px band the rows were scrolling through above it.

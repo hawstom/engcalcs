@@ -35,6 +35,9 @@ const PC = global.EngCalcs.pageConfig;
 // the harness's own text, not the page's -- it happens to read like lpn_ex_elm_street_title, which
 // is why dev/scripts/harness_wording_check.php declares this one line an exception.
 const PROJECT_NAME = 'Elm Street Center';
+// U+00AD (soft hyphen), spelled rather than typed literally -- an invisible character sitting in
+// the source as a raw byte is one a future edit could delete without anyone seeing it happen.
+const SHY_RE = new RegExp(String.fromCharCode(173), 'g');
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
@@ -95,7 +98,11 @@ const L = loadLoopedNetwork(
 	"\t\ttableOrder: function (id) { return paneTableRowsInOrder(paneTableById(id)).map(function (e) { return e.id; }); },\n" +
 	"\t\ttableCells: function (id) { return paneTableById(id).cells; },\n" +
 	// paneCols(), never `spec.cols` -- a column may stand down; see pane-harness.js.
-	"\t\ttableHeadings: function (id) { return paneCols(paneTableById(id)).map(paneHeadingText); },\n" +
+	// paneHeadingDisplayText(), not paneHeadingText(): this section's whole claim is that the sheet
+	// and the screen show the IDENTICAL heading, soft hyphen (Tom's initial-width rule, 2026-09-27)
+	// included, and paneHeadingText() is the hyphen-free string kept for exact-match lookups
+	// elsewhere (Find, the "..." menu, this same harness's own `at()` below).
+	"\t\ttableHeadings: function (id) { return paneCols(paneTableById(id)).map(paneHeadingDisplayText); },\n" +
 	"\t\tpaneCols: paneCols,\n" +
 	"\t\theadCells: function (id) { return paneTableById(id).headCells; },\n" +
 	"\t\tsetUserWidth: function (id, key, em) { paneSetColWidth(paneTableById(id), key, em); },\n" +
@@ -238,7 +245,10 @@ console.log('\n--- nothing on the sheet is a control ---');
 	// The values themselves, stated. j2 was given a demand of 50 and an elevation of 10; both are
 	// number INPUTS on screen, and both have to be readable on paper.
 	const s = sheetOf('junctions');
-	const head = s.headings, order = L.tableOrder('junctions');
+	// A soft hyphen (Tom's initial-width rule, 2026-09-27) may sit inside a long heading word now,
+	// so this lookup-by-English-prefix strips it first -- it is finding a COLUMN, not asserting
+	// the heading's exact text, which section 3 above already does.
+	const head = s.headings.map((h) => h.replace(SHY_RE, '')), order = L.tableOrder('junctions');
 	const rowFor = (id) => s.rows[order.indexOf(id)];
 	const at = (id, h) => rowFor(id)[head.findIndex((x) => x.indexOf(h) === 0)].text;
 	report(at(j2.id, 'Demand') === '50', 'a typed demand prints as its number', at(j2.id, 'Demand'));
@@ -248,7 +258,7 @@ console.log('\n--- nothing on the sheet is a control ---');
 	// A RESULT rounds the way the screen rounds it. 3.14159 is on the document; 3.14 is what both
 	// the cell and the sheet must say.
 	L.renderTable('pipes');
-	const ps = sheetOf('pipes'), pHead = ps.headings;
+	const ps = sheetOf('pipes'), pHead = ps.headings.map((h) => h.replace(SHY_RE, ''));
 	const pRow = ps.rows[L.tableOrder('pipes').indexOf(p1.id)];
 	const vAt = pHead.findIndex((x) => x.indexOf('Velocity') === 0);
 	// 1 m/s solved is 3.28084 ft/s displayed, and 3.28 printed. Stated as a number rather than as
@@ -268,9 +278,23 @@ console.log('\n--- nothing on the sheet is a control ---');
 			// The ID column is a go-to-the-map button on screen and plain text on paper; its TEXT
 			// is the same either way, which is the claim being made.
 			// A checkbox cell (Active, Bold) holds its answer in `checked`; the sheet prints it as 1 or 0.
+			// A SELECT cell's `.value` is the STORED word ("MIXED") -- that is what the DOM's own
+			// option-matching needs, not what the reader sees. What the reader sees, and what the
+			// printed sheet must equal (R-367), is the matching OPTION'S OWN TEXT ("Complete
+			// mixing") -- paneCellDisplayText()'s whole point. This stub does not simulate a real
+			// <select>'s value-to-selectedIndex resolution (only its purpose-built unit selects do),
+			// so the match is made by hand, against the same `<option>` children the real DOM would
+			// search.
+			// An UNSELECTED choice ('' -- "No pattern", "No curve selected"...) has always printed
+			// blank, on both sides of R-367: paneCellText() and paneCellDisplayText() both refuse it
+			// before ever reaching the choice list (`!panePresent(v)`), the same test every other
+			// empty cell on the sheet is held to. Only a REAL selection is looked up by label.
+			const selectedOption = (cell._tag === 'select' && cell.value !== '')
+				? (cell.children || []).filter((o) => o._tag === 'option').find((o) => o.value === cell.value)
+				: null;
 			const want = c.key === 'id' ? elId
 				: (cell._tag === 'input' ? (cell.type === 'checkbox' ? (cell.checked ? '1' : '0') : cell.value)
-					: (cell._tag === 'select' ? cell.value : cell.textContent));
+					: (cell._tag === 'select' ? (cell.value === '' ? '' : (selectedOption || {}).textContent) : cell.textContent));
 			const got = sheet.rows[r][i].text;
 			if (String(want) !== String(got)) { mismatch.push(`${elId}.${c.key}: ${want} != ${got}`); }
 		}));
@@ -468,11 +492,14 @@ console.log('\n--- the sheet is the screen table at one scale ---');
 	L.forgetWidths('junctions');
 	L.setUserWidth('junctions', keys[1], 20);
 	L.renderTable('junctions');
-	// The stub's em is 16px. Column 1 is drawn at 80px (5em) and every other at 32px (2em) -- the
+	// The stub's em is 16px. Column 1 is drawn at 128px (8em) and every other at 112px (7em) -- the
 	// DRAWN width wins over the stored 20em, because the drawn one is what the reader is looking at.
+	// (Wide enough that no value here needs more on paper: paneColPrintNeedEm() prints a column
+	// wider than drawn only for an unbreakable value that would otherwise wrap, and that has its
+	// own harness, pane-print-cell-wrap-harness.js.)
 	const heads = L.headCells('junctions');
 	Object.keys(heads).forEach((k, i) => {
-		const w = k === keys[1] ? 80 : 32;
+		const w = k === keys[1] ? 128 : 112;
 		heads[k].getBoundingClientRect = () => ({ left: 0, top: 0, right: w, bottom: 20, width: w, height: 20 });
 	});
 	const got = cg(L.buildPrintable('junctions'));
@@ -481,7 +508,7 @@ console.log('\n--- the sheet is the screen table at one scale ---');
 		'every printed column is given a width, fixed layout', got.cols.length + ' / ' + keys.length);
 	report(parsed.every(Boolean), '...each one its drawn em plus its 1px rule', got.cols.map((c) => c.style.width).slice(0, 3).join(' '));
 	const ems = parsed.map((m) => m ? parseFloat(m[1]) : NaN);
-	report(ems[1] === 5 && ems.every((e, i) => i === 1 || e === 2), '...at the width it is DRAWN, dragged or not', ems.join(','));
+	report(ems[1] === 8 && ems.every((e, i) => i === 1 || e === 7), '...at the width it is DRAWN, dragged or not', ems.join(','));
 	const sum = ems.reduce((x, y) => x + y, 0), n = keys.length + 1;
 	report(got.t.style.width === 'calc(' + sum + 'em + ' + n + 'px)', 'the table is the sum of those widths', got.t.style.width);
 	report(got.t.style.fontSize === 'min(16px, calc((100cqw - ' + n + 'px) / ' + sum + '))',

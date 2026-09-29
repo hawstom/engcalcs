@@ -2526,6 +2526,11 @@ $ec_lang['lpn_field_northing_abbr']='N';
 $ec_lang_syn['lpn_field_northing_abbr']='Northing | abbreviation of Northing, as short as the language has a short form for; the full word where it has none.';
 $ec_lang['lpn_field_easting_abbr']='E';
 $ec_lang_syn['lpn_field_easting_abbr']='Easting | abbreviation of Easting, as short as the language has a short form for; the full word where it has none.';
+// layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
+// The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
+// own customary abbreviation.
+$ec_lang['lpn_field_lat_abbr']='Lat';
+$ec_lang['lpn_field_lon_abbr']='Lon';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
