@@ -896,6 +896,18 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			</div>
 			<div id="lpn_ts_chart"></div>
 		</div>
+		<?php // ---- Tab: Frequency (ROADMAP Task 600) ----
+		      // EPANET's frequency plot: one value over every junction or every pipe, at the moment
+		      // the map shows, against the percent of them less than it. The profile's classes again,
+		      // for the reason the time-series panel gives above. ?>
+		<div id="lpn_pane_frequency" class="lpn-pane-panel lpn-profile-panel lpn-ts-panel" role="tabpanel" aria-labelledby="lpn_pane_tab_frequency">
+			<div class="lpn-profile-controls">
+				<div class="lpn-profile-heading"><?=$ec_lang['lpn_freq_title']?></div>
+				<div id="lpn_freq_form"></div>
+				<div id="lpn_freq_note" class="lpn-profile-say"></div>
+			</div>
+			<div id="lpn_freq_chart"></div>
+		</div>
 		<?php // ---- Tabs: one ASSET TABLE per type (Task 434, all six since Task 455) ----
 		      // The document as a spreadsheet, built entirely in JS: the rows are the network and
 		      // the headings carry the current units. Every write goes through the same seam the
@@ -2078,6 +2090,14 @@ EngCalcs.pageConfig = {
 	lpn_ts_no_frames: <?=json_encode($ec_lang['lpn_ts_no_frames'])?>,
 	lpn_ts_summary: <?=json_encode($ec_lang['lpn_ts_summary'])?>,
 	lpn_ts_axis_time: <?=json_encode($ec_lang['lpn_ts_axis_time'])?>,
+	lpn_freq_menu: <?=json_encode($ec_lang['lpn_freq_menu'])?>,
+	lpn_freq_tip: <?=json_encode($ec_lang['lpn_freq_tip'])?>,
+	lpn_freq_group_tip: <?=json_encode($ec_lang['lpn_freq_group_tip'])?>,
+	lpn_freq_quantity_tip: <?=json_encode($ec_lang['lpn_freq_quantity_tip'])?>,
+	lpn_freq_none: <?=json_encode($ec_lang['lpn_freq_none'])?>,
+	lpn_freq_summary: <?=json_encode($ec_lang['lpn_freq_summary'])?>,
+	lpn_freq_summary_time: <?=json_encode($ec_lang['lpn_freq_summary_time'])?>,
+	lpn_freq_axis_percent: <?=json_encode($ec_lang['lpn_freq_axis_percent'])?>,
 	lpn_pane_toggle: <?=json_encode($ec_lang['lpn_pane_toggle'])?>,
 	lpn_pane_toggle_tip: <?=json_encode($ec_lang['lpn_pane_toggle_tip'])?>,
 	lpn_pane_tab_junctions: <?=json_encode($ec_lang['lpn_pane_tab_junctions'])?>,
