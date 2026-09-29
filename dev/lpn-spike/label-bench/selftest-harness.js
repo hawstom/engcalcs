@@ -211,6 +211,24 @@ notAsked.labels[notAsked.labels.length - 1].along = false;
 const r14Off = scoreView(notAsked, withLabel('l:AC', { shown: true, rows: [0], layout: 'line', x: 160, y: 190, leader: null }));
 report(r14Off.r14.asked === 0, 'R14: a pipe label the setting does not ask (off, or dragged) is not counted', JSON.stringify(r14Off.r14));
 
+// R13 on a settings change: switching "Draw link labels along the link line" off at the same view
+// must level every pipe label. A placer that hands back its previous layout keeps them turned.
+const { settingsToggle } = require('./run.js');
+const net1 = loadSets(path.join(__dirname, 'scenes'), ['net1']);
+function turnedPlacer(sticky) {
+	return { create: function () { return { name: sticky ? 'sticky' : 'fresh', place: function (sc, o) {
+		if (sticky && o && o.prev) { return o.prev.layout; }
+		const out = {};
+		sc.labels.forEach(function (r, i) {
+			out[r.id] = { shown: true, rows: [0], layout: 'line', x: 10 + 40 * i, y: 10, angle: r.along ? 30 : 0, leader: null };
+		});
+		return { labels: out };
+	} }; } };
+}
+const togFresh = settingsToggle(turnedPlacer(false), net1), togSticky = settingsToggle(turnedPlacer(true), net1);
+report(togFresh.checked > 0 && togFresh.stillTurned === 0, 'R13 toggle: a placer that reads the setting levels every pipe label once it is off', JSON.stringify({ checked: togFresh.checked, still: togFresh.stillTurned }));
+report(togSticky.stillTurned > 0, 'R13 toggle: a placer that keeps its previous layout is reported with labels still turned', JSON.stringify({ checked: togSticky.checked, still: togSticky.stillTurned }));
+
 // ---- 3. the committed Net1 scene ----------------------------------------------------------------
 const sets = loadSets(path.join(__dirname, 'scenes'), ['net1']);
 report(sets.length === 1 && sets[0].steps[0].labels.length === 24, 'the Net1 scene is committed and has its 24 labels',

@@ -34,6 +34,12 @@ const CROSSING_ORDER = ['leader on leader', 'label on leader', 'label on pipe', 
 // canvas (1400x900), so this is one number for every scene -- filled in at load time rather than by
 // re-running extract.js's headless browser pass, which regenerating the committed scenes only for a
 // derived, constant field would not be worth.
+// R14 AT CLOSE ZOOM (Tom, 2026-09-28: "The problem was that at any close zoom whatsoever, pipe
+// labels stayed horizontal [...] If they are still horizontal when there's no good reason to ignore
+// the user setting, that's bad."): the views zoomed this far in or further (novato-zoom@4x and 8x,
+// novato-seq@4x), where there is plenty of room.
+const CLOSE_ZOOM = 4;
+
 function withRepeatSpacing(scene) {
 	scene.text.repeatSpacingPx = 0.75 * Math.min(scene.viewport.w, scene.viewport.h);
 	return scene;
@@ -84,6 +90,41 @@ function runBench(placerPath, sets, opts) {
 	return out;
 }
 
+// **R13 ON A SETTINGS CHANGE: THE ALIGNMENT SETTING SWITCHED OFF AT THE SAME VIEW.** The scene
+// sets are all views of an unchanging project, so nothing above ever changes a setting under a
+// placer. The page does: a user unticks "Draw link labels along the link line" and the very next
+// place() gets the same view with `alignPipeLabels: false`, `along: false` on every pipe label, and
+// `prev` = the layout it just made with the setting on. R13 says the layout reflects the settings,
+// so no pipe label may stay turned. For the first view of every set that asks for any pipe label
+// along its pipe: place it with the setting on, then again with it off and `prev` set, and count
+// the pipe labels still turned (angle not a multiple of 180). A placer that cannot place a scene
+// it has not seen (master's replay) is reported as such. Reported, never failing.
+function settingsToggle(placerPath, sets) {
+	const make = loadPlacer(placerPath), out = { checked: 0, stillTurned: 0, ids: [], skipped: false };
+	sets.forEach(function (set) {
+		const on = set.steps[0];
+		if (!on.labels.some(function (r) { return r.along; })) { return; }
+		const off = JSON.parse(JSON.stringify(on));
+		off.id = on.id + '#align-off';
+		off.settings = Object.assign({}, off.settings, { alignPipeLabels: false });
+		off.labels.forEach(function (r) { if (r.kind === 'link') { r.along = false; } });
+		const placer = make();
+		let a, b;
+		try {
+			a = placer.place(on, { prev: null });
+			b = placer.place(off, { prev: { scene: on, layout: a } });
+		} catch (e) { out.skipped = true; return; }
+		const L = (b && b.labels) || {};
+		Object.keys(L).forEach(function (id) {
+			const p = L[id];
+			if (id.charAt(0) !== 'l' || !p || !p.shown) { return; }
+			out.checked++;
+			if (Math.abs(((+p.angle || 0) % 180)) > 0.5) { out.stillTurned++; out.ids.push(off.id + ' ' + id); }
+		});
+	});
+	return out;
+}
+
 function pct(a, b) { return b ? (100 * a / b).toFixed(0) + '%' : '-'; }
 function quant(arr, q) {
 	if (!arr.length) { return null; }
@@ -107,7 +148,7 @@ function printTable(results, log) {
 	log(cols.map(function (c) { return pad(c[0], c[1], c[2]); }).join(' '));
 	const T = { N1: 0, N3: 0, N4: 0, N5: 0, invalid: 0, cost: 0, rowsR: 0, rowsS: 0, labR: 0, labS: 0,
 		ldr: [], moved: 0, churn: 0, compared: 0, ms: [],
-		r5c: 0, r5m: 0, r7c: 0, r7o: 0, r9s: 0, r9h: 0, r14a: 0, r14y: 0, r14m: 0, zoomRegained: 0, zoomLost: 0 };
+		r5c: 0, r5m: 0, r7c: 0, r7o: 0, r9s: 0, r9h: 0, r14a: 0, r14y: 0, r14m: 0, r14ca: 0, r14cy: 0, r14cm: 0, zoomRegained: 0, zoomLost: 0 };
 	results.forEach(function (set) {
 		set.steps.forEach(function (st) {
 			const s = st.score, b = s.breaks;
@@ -117,6 +158,7 @@ function printTable(results, log) {
 			T.r5c += s.r5.checked; T.r5m += s.r5.mismatch; T.r7c += s.r7.checked; T.r7o += s.r7.onOwnPipe;
 			T.r9s += s.r9.should; T.r9h += s.r9.has;
 			T.r14a += s.r14.asked; T.r14y += s.r14.along; T.r14m += s.r14.missedWithRoom;
+			if (s.r14.zoom >= CLOSE_ZOOM) { T.r14ca += s.r14.asked; T.r14cy += s.r14.along; T.r14cm += s.r14.missedWithRoom; }
 			const stab = st.stability;
 			if (stab) { T.moved += stab.moved; T.churn += stab.churn; T.compared += stab.compared; }
 			if (st.zoomIn) { T.zoomRegained += st.zoomIn.regained; T.zoomLost += st.zoomIn.lost; }
@@ -143,7 +185,9 @@ function printTable(results, log) {
 		+ ' their own pipe; R9 repeats: ' + T.r9h + '/' + T.r9s + ' pipes longer than the repeat spacing carry repeats;'
 		+ ' R11 zoom-in row change: ' + T.zoomRegained + ' regained, ' + T.zoomLost + ' lost, across zoom-in steps;'
 		+ ' R14 along the pipe: ' + T.r14y + '/' + T.r14a + ' shown pipe labels the setting asks to lie along their pipe do,'
-		+ ' and ' + T.r14m + ' of the rest had room beside their pipe to');
+		+ ' and ' + T.r14m + ' of the rest had room beside their pipe to; R14 at close zoom (' + CLOSE_ZOOM + 'x and closer): of '
+		+ (T.r14ca - T.r14cy) + ' pipe labels still level, ' + T.r14cm + ' had room to lie along their pipe with the same rows'
+		+ ' (' + pct(T.r14cm, T.r14ca - T.r14cy) + '; should be near zero)');
 	return T;
 }
 
@@ -159,7 +203,12 @@ function main() {
 		idleStep: opt('--idle-step') !== undefined ? +opt('--idle-step') : undefined });
 	console.log('placer: ' + (res[0] && res[0].name) + ' (' + placer + ')');
 	const T = printTable(res);
+	const tog = settingsToggle(placer, sets);
+	console.log('REPORTED, never failing -- R13 alignment setting switched off at the same view: '
+		+ (tog.skipped && !tog.checked ? 'not measurable (this placer cannot place a scene it has not seen)'
+			: tog.stillTurned + '/' + tog.checked + ' shown pipe labels still turned (should be 0)'));
 	if (a.indexOf('--verbose') >= 0) {
+		tog.ids.forEach(function (m) { console.log('  R13 still turned after the setting went off: ' + m); });
 		res.forEach(function (set) {
 			set.steps.forEach(function (st) {
 				const b = st.score.breaks;
@@ -185,4 +234,4 @@ function main() {
 }
 
 if (require.main === module) { main(); }
-module.exports = { runBench, printTable, loadSets, machine };
+module.exports = { runBench, printTable, loadSets, machine, settingsToggle, CLOSE_ZOOM };
