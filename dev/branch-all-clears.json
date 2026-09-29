@@ -251,6 +251,30 @@
             "date": "2026-09-28",
             "words": "your all-clear to merge Ctrl+Enter: Approved.",
             "context": "His answer to the request for his merge word on port 8123, which had sat unchanged at d6558eb4 since 2026-09-27 with Mary's and Ida's endorsement and Perry's pre-review. Pinned to the head he saw; master is merged in on the merge commit itself."
+        },
+        "feat/table-width": {
+            "head": "7fc48a12",
+            "date": "2026-09-29",
+            "words": "Done. Close, merge, and delete branch",
+            "context": "His message of 2026-09-29, one line per branch: 8134 fix/tables-legend, 8135 feat/selection-set, 8124 feat/table-width, 8131 feat/fill-handle, each 'Done. Close, merge, and delete branch', then 'Let me know when master is ready with all these so I can make a table-editing video.' He tested 8124 through round 3 (KLmax 0.8 with ceil, Vertices (Lat/Lon|Lat/Lon|...))."
+        },
+        "feat/fill-handle": {
+            "head": "76716393",
+            "date": "2026-09-29",
+            "words": "Done. Close, merge, and delete branch",
+            "context": "His message of 2026-09-29, one line per branch: 8134 fix/tables-legend, 8135 feat/selection-set, 8124 feat/table-width, 8131 feat/fill-handle, each 'Done. Close, merge, and delete branch', then 'Let me know when master is ready with all these so I can make a table-editing video.' Earlier, 2026-09-28: 'Pretty amazing. Everything seems to work.'"
+        },
+        "feat/selection-set": {
+            "head": "5fe5c2a7",
+            "date": "2026-09-29",
+            "words": "Done. Close, merge, and delete branch",
+            "context": "His message of 2026-09-29, one line per branch: 8134 fix/tables-legend, 8135 feat/selection-set, 8124 feat/table-width, 8131 feat/fill-handle, each 'Done. Close, merge, and delete branch', then 'Let me know when master is ready with all these so I can make a table-editing video.' He tested it: 'Select from Table is wonderful now.' 'Zoom from Fire flow is good now.'"
+        },
+        "fix/tables-legend": {
+            "head": "001893a9",
+            "date": "2026-09-29",
+            "words": "Done. Close, merge, and delete branch",
+            "context": "His message of 2026-09-29, one line per branch: 8134 fix/tables-legend, 8135 feat/selection-set, 8124 feat/table-width, 8131 feat/fill-handle, each 'Done. Close, merge, and delete branch', then 'Let me know when master is ready with all these so I can make a table-editing video.' Pinned to 001893a9, the branch after fix/table-paste's final commits were merged in (Text/Customer paste he confirmed: 'Text paste works now.')."
         }
     }
 }
