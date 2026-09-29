@@ -29954,7 +29954,8 @@ var EngCalcs = EngCalcs || {};
 		// is no separate window.location.reload() to race it.
 		var form = document.createElement('form');
 		form.method = 'post';
-		form.action = '/engcalcs/consent.php';
+		// Through suiteUrl(), the one door every suite page addressed from JS goes through.
+		form.action = suiteUrl('consent.php');
 		// `hidden`, not `style.display = 'none'` -- this is a throwaway navigation carrier, not a
 		// panel, and panel-touch-harness.js polices that exact string as "nothing hides a panel
 		// except hidePanel()".
