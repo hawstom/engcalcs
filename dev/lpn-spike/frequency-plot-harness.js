@@ -45,6 +45,11 @@ const L = loadLoopedNetwork(
 	"\t\tfreqField: freqField, renderFrequency: renderFrequency, rebuildFreqForm: rebuildFreqForm,\n" +
 	"\t\tcolorFieldUnitText: colorFieldUnitText, colorFieldLabel: colorFieldLabel,\n" +
 	"\t\tunitLabel: unitLabel, unitFactor: unitFactor, serialize: serializeProject,\n" +
+	// The edit, scenario and project doors, for sections 8 to 11.
+	"\t\tsetProp: setProp, scheduleSolve: scheduleSolve, createScenario: createScenario,\n" +
+	"\t\tswitchScenario: switchScenario, baseScenarioId: function () { return baseScenario().id; },\n" +
+	"\t\tgetLibrary: function () { return library; }, saveToStorage: saveToStorage,\n" +
+	"\t\topenProject: openProject, nodeById: nodeById, linkById: linkById, effective: effective,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -77,6 +82,29 @@ function control(id) {
 }
 function fire(el, type) {
 	((el && el._listeners && el._listeners[type]) || []).forEach((f) => f({ type: type, target: el }));
+}
+// WHAT THE CHART DREW, read back off its dots' hover text ("id   value   percent %"), as
+// {id: value}. Everything from section 8 on asserts on THIS rather than on a fresh computation, so a
+// tab that was never redrawn is caught: the page's accessors would give the new answer on demand
+// while the screen still showed the old one.
+function drawn() {
+	const out = {};
+	chartEls('lpn-ts-dot').forEach((c) => {
+		const t = (c.children || []).filter((k) => k.tagName === 'title' || k.nodeName === 'title' ||
+			String(k.tagName || '').toLowerCase() === 'title')[0];
+		const txt = [];
+		(function walk(e) { if (!e) { return; } if (e.nodeType === 3) { txt.push(String(e.textContent)); } (e.children || []).forEach(walk); }(t));
+		const parts = txt.join('').split(/\s{3}/);
+		if (parts.length >= 2) { out[parts[0]] = +parts[1]; }
+	});
+	return out;
+}
+const close = (a, b) => Math.abs(a - b) <= 1e-3 * Math.max(1, Math.abs(b));
+function drawnMatches(want) {
+	const got = drawn(), ids = Object.keys(want);
+	if (Object.keys(got).length !== ids.length) { return `drew ${Object.keys(got).length}, want ${ids.length}`; }
+	for (const id of ids) { if (!(id in got) || !close(got[id], want[id])) { return `${id}: drew ${got[id]}, want ${want[id]}`; } }
+	return '';
 }
 // THE INDEPENDENT ANSWER. For each distinct value x in the list: the percent of the list strictly
 // less than x, counted by brute force. EPANET's curve puts the FIRST point at x at exactly this y.
@@ -231,7 +259,113 @@ function curve(group, field) {
 	check(byId.lpn_freq_note._text.indexOf(EngCalcs.lpnFormatTime(later.t)) >= 0,
 		`the tab was refreshed by the step itself, and says so: "${byId.lpn_freq_note._text}"`);
 
-	head('7. NOTHING STORED');
+	// ---- 8. Recalculate OFF: the kept snapshot, and an edit still shows ------------------------
+	head('8. RECALCULATE OFF: AN EDIT SHOWS, THE SNAPSHOT STAYS');
+	d.settings.autoRun = false;
+	const J = L.nodeById('10');
+	const kept = L.lastResult();
+	const pWant = {};
+	junctions.forEach((n) => { pWant[n.id] = kept.pressures[n.id] * L.unitFactor('lpn_u_pressure'); });
+	S.group = 'node'; S.fields.node = 'elev';
+	L.rebuildFreqForm(); L.renderFrequency();
+	const elevBefore = J.elev;
+	// The edit a person makes: the number changes and scheduleSolve() is told (an elevation is not
+	// scenario-overridable and is stored bare, so it is written directly, as manual-recalc-harness.js
+	// writes a roughness). With the switch off that solves nothing and refreshes the pane.
+	J.elev = elevBefore + 50;
+	L.scheduleSolve();
+	check(drawn()['10'] !== undefined && close(drawn()['10'], elevBefore + 50),
+		`the edited elevation is on the curve at once, with nothing solved: ${drawn()['10']}`);
+	check(L.lastResult() === kept, 'and the kept solve is still the one on screen, not cleared');
+	const qOff = control('lpn_freq_quantity');
+	qOff.value = 'pressure';
+	fire(qOff, 'change');
+	check(!drawnMatches(pWant) && chartEls('lpn-freq-line').length === 1,
+		`pressure still draws the kept snapshot, never hidden: ${drawnMatches(pWant) || 'matches'}`);
+	J.elev = elevBefore + 60;
+	L.scheduleSolve();
+	check(!drawnMatches(pWant) && byId.lpn_freq_note._text !== PC.lpn_freq_none,
+		`and a second edit, with pressure on show, leaves the snapshot drawn: ${drawnMatches(pWant) || 'matches'}`);
+	J.elev = elevBefore;
+	L.scheduleSolve();
+
+	// ---- 9. scenario switch -----------------------------------------------------------------
+	head('9. A SCENARIO SWITCH REDRAWS THE CURVE');
+	const pSel9 = control('lpn_freq_group');
+	pSel9.value = 'link';
+	fire(pSel9, 'change');
+	const q9 = control('lpn_freq_quantity');
+	q9.value = 'diameter';
+	fire(q9, 'change');
+	const P = L.linkById('10');
+	const baseDia = {};
+	pipes.forEach((l) => { baseDia[l.id] = L.effective(l, 'diameter'); });
+	const scn = L.createScenario('Frequency test');
+	L.setProp(P, 'diameter', 99);
+	L.scheduleSolve();
+	const scnDia = Object.assign({}, baseDia, { '10': 99 });
+	check(!drawnMatches(scnDia), `in the new scenario the overridden diameter is drawn: ${drawnMatches(scnDia) || 'matches'}`);
+	L.switchScenario(L.baseScenarioId());
+	check(!drawnMatches(baseDia), `switched to Base, Base's diameters are drawn: ${drawnMatches(baseDia) || 'matches'}`);
+	L.switchScenario(scn.id);
+	check(!drawnMatches(scnDia), `and back, the override is drawn again: ${drawnMatches(scnDia) || 'matches'}`);
+	L.switchScenario(L.baseScenarioId());
+
+	// ---- 10. Recalculate ON: an edit redraws --------------------------------------------------
+	head('10. RECALCULATE ON: AN EDIT RE-SOLVES AND REDRAWS');
+	const g10 = control('lpn_freq_group');
+	g10.value = 'node';
+	fire(g10, 'change');
+	const q10 = control('lpn_freq_quantity');
+	q10.value = 'pressure';
+	fire(q10, 'change');
+	d.settings.autoRun = true;
+	const oldP10 = drawn()['10'];
+	J.elev = elevBefore + 50;
+	L.scheduleSolve();
+	const t10 = Date.now();
+	while (Date.now() - t10 < LIMIT_MS && (L.lastResult() === kept || close(drawn()['10'], oldP10))) { await wait(50); }
+	const R10 = L.lastResult(), want10 = {};
+	junctions.forEach((n) => { want10[n.id] = R10.pressures[n.id] * L.unitFactor('lpn_u_pressure'); });
+	check(R10 !== kept && !drawnMatches(want10),
+		`the new solve is drawn: ${drawnMatches(want10) || 'matches'}`);
+	check(oldP10 - drawn()['10'] > 15,
+		`junction 10, raised 50 ft (about 21.7 psi of static head), drops by more than 15 psi on the curve: ${oldP10.toFixed(2)} -> ${drawn()['10'].toFixed(2)}`);
+
+	// ---- 11. project switch and back --------------------------------------------------------
+	head('11. SWITCHING PROJECT TAB AND BACK');
+	d.settings.autoRun = false;
+	J.elev = elevBefore;
+	const lib = L.getLibrary();
+	const d2 = L.docFromInp(EngCalcs.lpnInpParse(fs.readFileSync(ROOT + 'dev/lpn-spike/reference/Net2.inp', 'utf8')), 'net2');
+	d2.settings.autoRun = false;
+	lib.projects = [{ id: 'freq-net1', name: 'net1', updated: 0 }, { id: 'freq-net2', name: 'net2', updated: 0 }];
+	// Net2 is written to its own slot through the page's own save, then Net1 is put back as the
+	// open project, so openProject() below is a real switch between two stored documents.
+	lib.openId = 'freq-net2';
+	L.setDoc(d2); L.setSettings(d2.settings);
+	L.saveToStorage();
+	lib.openId = 'freq-net1';
+	L.setDoc(d); L.setSettings(d.settings);
+	L.saveToStorage();
+	const g11 = control('lpn_freq_group');
+	g11.value = 'node';
+	fire(g11, 'change');
+	const q11 = control('lpn_freq_quantity');
+	q11.value = 'elev';
+	fire(q11, 'change');
+	const net1Elev = {};
+	junctions.forEach((n) => { net1Elev[n.id] = n.elev; });
+	check(!drawnMatches(net1Elev), `Net1's elevations before the switch: ${drawnMatches(net1Elev) || 'matches'}`);
+	check(L.openProject('freq-net2') === true, 'switched to the Net2 tab');
+	const net2Elev = {};
+	L.getDoc().nodes.filter((n) => n.type === 'junction').forEach((n) => { net2Elev[n.id] = n.elev; });
+	check(Object.keys(net2Elev).length > 20 && !drawnMatches(net2Elev),
+		`the curve is Net2's ${Object.keys(net2Elev).length} junctions: ${drawnMatches(net2Elev) || 'matches'}`);
+	check(L.openProject('freq-net1') === true, 'and back to Net1');
+	check(!drawnMatches(net1Elev), `the curve is Net1's again: ${drawnMatches(net1Elev) || 'matches'}`);
+
+	head('12. NOTHING STORED');
 	const saved = JSON.stringify(L.serialize());
 	check(saved.indexOf('freq') < 0, 'nothing about the graph enters serializeProject()');
 

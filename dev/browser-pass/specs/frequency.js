@@ -46,6 +46,7 @@ exports.run = async function ({ browser, report }) {
 		const later = await read();
 		report.ok(later.points !== first.points && later.note.indexOf(at) >= 0,
 			`at ${at} the curve is redrawn and the summary names the time`, later.note);
+		report.ok(a.errors.length === 0, 'no uncaught page errors', a.errors.join('\n'));
 	} finally {
 		await a.close();
 	}
