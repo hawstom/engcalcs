@@ -1,0 +1,5 @@
+{
+  "sprint": "2026-09-29-delta",
+  "description": "16 missing lpn_ keys (the 2026-09-29 merges: paste messages, select/unselect on map, Shift hint, Lat/Lon abbreviations, fire-flow Selected design check) plus one REPLACE-IN-PLACE resync, lpn_lock_ask_prompt, whose English was corrected 2026-09-29 (the initials are kept on the server, not in the browser). x 26 languages. Wave 0 reviewed nothing: all 17 keys carry Tom's ruling on their exact English (dev/english-key-rulings.json), and wave0_keyset.php excludes ruled keys.",
+  "entries": []
+}
