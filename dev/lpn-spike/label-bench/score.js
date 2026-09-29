@@ -225,6 +225,12 @@ function scoreView(scene, layout, opts) {
 	// many are, and of the rest, how many had an aligned spot beside their own pipe free in this
 	// very layout (alignedRoom()) -- the misses the rule is about. A hidden one is not counted here;
 	// dropping is R1's business.
+	// Under page furniture (scene.furniture: legends, zoom buttons, status chips the page draws over
+	// the map). Only the page's scenes carry any. Reported.
+	const furn = (scene.furniture || []).map(C.rectToOBox), underFurniture = [];
+	if (furn.length) {
+		items.forEach(function (it) { if (it.boxes.some(function (b) { return furn.some(function (f) { return C.boxesOverlap(b, f); }); })) { underFurniture.push(it.id); } });
+	}
 	let r14Asked = 0, r14Along = 0, r14MissedWithRoom = 0;
 	const r14Missed = [];
 	items.forEach(function (it) {
@@ -238,7 +244,8 @@ function scoreView(scene, layout, opts) {
 		labelsShown: items.length, rowsReq: rowsReq, rowsShown: rowsShown, leaderLH: leaderLH,
 		r5: { checked: r5Checked, mismatch: r5Mismatch }, r7: { checked: r7Checked, onOwnPipe: r7OnOwnPipe },
 		r9: { should: r9Should, has: r9Has },
-		r14: { asked: r14Asked, along: r14Along, missedWithRoom: r14MissedWithRoom, missedIds: r14Missed, zoom: scene.zoom || null } };
+		r14: { asked: r14Asked, along: r14Along, missedWithRoom: r14MissedWithRoom, missedIds: r14Missed, zoom: scene.zoom || null },
+		underFurniture: underFurniture };
 }
 
 // ---- R14: along the pipe -------------------------------------------------------------------------
@@ -309,6 +316,7 @@ function alignedRoom(scene, items, req, rows, link) {
 	scene.nodes.forEach(function (n) { others.push(C.rectToOBox(n.symbol)); });
 	scene.links.forEach(function (l) { (l.symbols || []).forEach(function (b) { others.push(b); }); });
 	scene.texts.forEach(function (t) { others.push(t.box); });
+	(scene.furniture || []).forEach(function (f) { others.push(C.rectToOBox(f)); });
 	const pipes = [];
 	scene.links.forEach(function (l) {
 		if (l.id === link.id) { return; }
