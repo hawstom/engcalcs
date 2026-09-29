@@ -136,4 +136,43 @@ properties wins, because Tom put properties ahead of everything but nearness. If
 see the alignment kept and one property dropped, that one sentence would change my ranking, and
 probably the look of a crowded map, more than any other.
 
+## Round 4
+
+Tom answered question 8: values outrank alignment, but alignment is required wherever the same
+rows fit aligned, and pipe labels that stayed level at close zoom for no good reason were the
+real complaint. Round 4 changed four things.
+
+**A settings change is a fresh start (R13).** When the user switched "Draw link labels along the
+link line" off, my Keep Your Seat pass carried every turned label into the next view, because
+last view's spot always gets the first try. Now last view's spot counts only if the label is
+asked the same way it was then, and a view whose settings differ from the last one is never
+treated as a quiet pan. Switching the setting off now leaves no label turned (0 of 243 on the
+bench, was 106 of 240).
+
+**A new last pass, named Last Look Along.** After every other pass has settled (showing, growing,
+mending, nudging), each pipe label still level where the user asked for aligned looks once more
+for an aligned spot that holds the same rows. Earlier passes run while neighbours are still
+moving, so room often opens only at the end; this pass is what catches it. It never drops a
+value to align, so Tom's ranking holds.
+
+**A pixel of leading is not ink.** I had been refusing any spot that touched a node symbol at
+all, while a label box has a little empty leading at its edges. Allowing just over a pixel of box
+overlap on a node symbol (still under the bench's tolerance) opened many aligned spots on the
+short pipes at close zoom, where the only way beside a pipe is to pass close to the symbols at its
+ends.
+
+**Finer stations along the pipe.** Aligned spots are now tried every half step along the pipe,
+not every step.
+
+Results: at 4x and closer, level pipe labels with an aligned spot for the same rows went from 21
+of 101 to 6 of 74; novato-seq at 4x has 31 of 62 along (was 15 of 61); over the whole bench 531
+labels lie along their pipe (was 462) and coverage held (50% of values, 80% of labels, zero
+breaks, speed about the same as round 3 measured side by side on the same loaded machine). The
+six remaining close-zoom misses are mostly spots where the aligned label would lie over another
+label's leader; Tom's cost order ranks a label on a leader as high cost, so I leave those level.
+
+Strategies: **Along Before Level** stays, now with its companion **Last Look Along** above.
+**Keep Your Seat** gains one condition: a seat is kept only if the user has not changed what the
+label is asked to be.
+
 Copyright 2009 Thomas Gail Haws. Licensed under GNU GPL v3.0 or later.

@@ -92,6 +92,10 @@ page errors, 4 to 34 ms per layout. One thing to watch: on Net2 the share of pip
 their pipe falls as you zoom in (35 of 39 at open, about 21 later), because labels that gain a
 second property often find room for it only level. See `dev/label-placer-interview-c.md` §8.
 
+Round 4 (2026-09-28): R13 alignment toggle 0/243 turned (was 106/240); at 4x and closer 6 of 74
+level pipe labels had aligned room (was 21 of 101); R14 531/1007 along, 37 missed with room;
+rows 50%, labels 80%, no breaks. See the "Round 4" section of `dev/label-placer-interview-c.md`.
+
 The first view of each set costs about 1 ms because `idle()` thought it out when the project
 opened. It shows nearly twice the labels and twice the rows master does, with no breaks. Its
 crossing cost is higher in total because it draws twice as much; every crossing is a label or
