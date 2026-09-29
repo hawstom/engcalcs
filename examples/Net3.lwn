@@ -2483,15 +2483,6 @@
 			"y": 30.8,
 			"anchorNode": null,
 			"sizeMult": 2
-		},
-		{
-			"id": "X3",
-			"text": "Zoom in to see labels",
-			"x": 35.440246952096,
-			"y": 15.397639717135469,
-			"anchorNode": null,
-			"sizeMult": 4,
-			"allZoom": true
 		}
 	],
 	"nextId": {
