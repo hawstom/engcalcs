@@ -669,8 +669,11 @@ console.log('\n--- the Text table ---');
 	// **R-308, Tom: "Text table needs its location coordinates."** axis1/axis2 ride right after
 	// id, the same slot the Junctions and Customers tables give a position. `allZoom` ("Show at
 	// all zoom levels", R-174) still rides in right after Bold.
-	report(keys.join(',') === 'id,axis1,axis2,active,text,sizeMult,align,valign,bold,allZoom,rot',
-		'with the id, the location, Active, the words, size, the two alignments, Bold, all-zoom and the angle',
+	// **AND ANCHOR RIGHT AFTER THAT** (Tom, 2026-09-28: paste creates a Text row exactly as it
+	// creates a node, and an anchored one names what it is attached to the way a Pipe names its
+	// From/To -- which the plain X/Y cells cannot say once they go plain themselves).
+	report(keys.join(',') === 'id,axis1,axis2,anchor,active,text,sizeMult,align,valign,bold,allZoom,rot',
+		'with the id, the location, the anchor, Active, the words, size, the two alignments, Bold, all-zoom and the angle',
 		keys.join(','));
 	L.renderPaneTable(spec);
 	const host = byId.lpn_pane_text;
@@ -682,9 +685,10 @@ console.log('\n--- the Text table ---');
 	const cellTags = firstRow.children.map((td) => (td.children[0] ? td.children[0]._tag + (td.children[0].type ? ':' + td.children[0].type : '') : 'plain'));
 	report(cellTags[1] === 'input:text' && cellTags[2] === 'input:text',
 		'the location cells are ordinary editable text cells for a free-floating Text', cellTags.join(','));
-	report(cellTags[3] === 'input:checkbox', 'the Active cell is a checkbox', cellTags.join(','));
-	report(cellTags[6] === 'select' || cellTags[6] === 'plain', 'the alignment cell is a select (or plain on a Text with a leader)', cellTags.join(','));
-	report(cellTags[8] === 'input:checkbox', 'the Bold cell is a checkbox', cellTags.join(','));
+	report(cellTags[3] === 'plain', 'the anchor cell is plain -- read-only, a map gesture sets it', cellTags.join(','));
+	report(cellTags[4] === 'input:checkbox', 'the Active cell is a checkbox', cellTags.join(','));
+	report(cellTags[7] === 'select' || cellTags[7] === 'plain', 'the alignment cell is a select (or plain on a Text with a leader)', cellTags.join(','));
+	report(cellTags[9] === 'input:checkbox', 'the Bold cell is a checkbox', cellTags.join(','));
 	// The parser the table, the paste and the multi box share.
 	const boldCol = spec.cols.filter((c) => c.key === 'bold')[0], lb0 = doc.labels[0];
 	report(L.paneWriteCellText(spec, boldCol, lb0, 'yes') === true && lb0.bold === true, 'a pasted "yes" is a tick');
