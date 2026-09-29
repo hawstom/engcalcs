@@ -958,8 +958,29 @@
 	 * The strip does not exist yet on the boot path; renderTransport() returns at its first line
 	 * there and wireToolbar()'s own render, a few lines later, draws the arrived document.
 	 */
-	EC.lpnTimeArrived = function () {
+	EC.lpnTimeArrived = function (kept) {
 		cancelIdleRun();
+		// **A RUN IN FLIGHT IS ANSWERING THE PROJECT JUST LEFT** (2026-09-29), so it is superseded
+		// here exactly as an edit supersedes it; landing, it would put that project's frames under
+		// this one's map. runFinished() still fires, so nothing queued behind it is lost.
+		if (state.busy) { state.token++; }
+		if (state.playing) { pause(); }
+		// **THE RUN SURVIVES A SWITCH WITH THE SOLVE** (Task 680, 2026-09-29). Tom: "Switching to
+		// the 1-step and back blanks the Time Series graph." The host keeps lastSolveResult per tab
+		// and, holding it, schedules no solve -- so a run dropped here was never asked for again,
+		// and the chart waited for a Calculate the switch had hidden. Put back only whole; the
+		// host's signature has already vouched that the document is the one it came from.
+		if (kept && kept.run) {
+			state.run = kept.run;
+			state.runSig = kept.runSig;
+			state.t = kept.t;
+			state.lastRunMs = kept.lastRunMs;
+			state.lastBusyMs = kept.lastBusyMs;
+			state.wanted = false;
+			state.wantedByUser = false;
+			renderPanel();
+			return true;
+		}
 		state.lastRunMs = null;
 		state.lastBusyMs = null;
 		state.run = null;
@@ -967,6 +988,17 @@
 		state.t = 0;
 		state.wanted = true;
 		renderPanel();
+		return false;
+	};
+
+	/**
+	 * What a switch keeps of the run for EC.lpnTimeArrived(): the frames and the moment on show,
+	 * or null when there is no finished run to keep (none yet, or one still in flight).
+	 */
+	EC.lpnTimeKeep = function () {
+		if (!state.run || state.busy) { return null; }
+		return { run: state.run, runSig: state.runSig, t: state.t,
+			lastRunMs: state.lastRunMs, lastBusyMs: state.lastBusyMs };
 	};
 
 	/**
