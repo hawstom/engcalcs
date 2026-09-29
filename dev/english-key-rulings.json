@@ -2263,9 +2263,9 @@
             "answer": "Edited."
         },
         "lpn_lock_ask_prompt": {
-            "on": "Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.",
-            "ruled": "2026-09-17",
-            "answer": "Edited. Please review."
+            "on": "Who should we say is asking? Your initials are ideal. They are kept with this file's lock on our server, for whoever has it open, and deleted within 30 days.",
+            "ruled": "2026-09-29",
+            "answer": "Go ahead and make those disclosure fixes."
         },
         "lpn_lock_ask_sent": {
             "on": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
