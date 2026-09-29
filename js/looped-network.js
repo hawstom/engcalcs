@@ -54200,7 +54200,7 @@ var EngCalcs = EngCalcs || {};
 			boxes.residual, unitLabel('lpn_u_pressure'));
 
 		// **THE SCOPE OF THE DESIGN SEARCH IS A NAMED SET, CHOSEN BEFORE THE RUN: NONE, ALL, OR
-		// SELECTED** (Task 742; Tom, 2026-09-28, *"Selection set build: Yes."*). The old middle
+		// SELECTED** (Tom, 2026-09-28, *"Selection set build: Yes."*). The old middle
 		// value, every other junction without the pipes, went: a blank velocity box already turns
 		// the velocity half off under All (runFireFlowSweep() reads blank as no limit), so it gave
 		// nothing a blank box did not. Selected is the new one -- the impact is checked only at the
@@ -54715,12 +54715,12 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// The design check's scope, with the retired 'nodes' (every other junction, no pipes) read as
-	// 'all' (Task 742). Nothing stores this value -- `fireFlowAsk` lives for one page load -- so the
+	// 'all' (Tom, 2026-09-28). Nothing stores this value -- `fireFlowAsk` lives for one page load -- so the
 	// mapping is a guard, not a migration: an unknown value is never allowed to mean "do not check".
 	function ffDesignScope(v) {
 		return (v === 'off' || v === 'selected') ? v : 'all';
 	}
-	// **SELECTED: THE JUNCTIONS SELECTED ON THE MAP AND THE PIPES THAT MEET THEM** (Task 742). A
+	// **SELECTED: THE JUNCTIONS SELECTED ON THE MAP AND THE PIPES THAT MEET THEM**. A
 	// pipe selected on its own counts too, since selecting it says as plainly as anything can that
 	// its velocity is wanted. Read from the model the run solves, so an inactive element, which is
 	// not in the model, is not checked. Whatever else is selected (a tank, a Text) is not a place
