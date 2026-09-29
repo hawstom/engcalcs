@@ -56,6 +56,7 @@ EngCalcs.lpnPlacerC = (function () {
 	var HOOK = 8;              // the one standard short hook (clamped to text.hookMaxPx)
 	var GAP = 2.5;               // clear space between a label and its own symbol or pipe
 	var SYM_PAD = 0.5;           // clear space kept round every symbol and Text object
+	var LEAD_TOL = 1.4;        // a label box may overlap a node symbol this much (the row's leading)
 	var LBL_TOL = 0.5;         // two labels may share this much up and down (the row pitch carries leading)
 	var HGAP = 4;              // and keep this much apart side by side, or they read as one
 	var EDGE = 160;            // px from the view's edge where a pan can change what fits
@@ -568,6 +569,16 @@ EngCalcs.lpnPlacerC = (function () {
 			// other convenient space, if that gives it room for its next property.
 			nudge(st, order, touched);
 			grow(st, touched);
+			// 4c. ALIGN (R14): alignment is required wherever the same rows fit aligned. Once
+			// everything has settled, a pipe label still level where the user asked for it along
+			// its pipe takes any aligned spot now free for the same rows.
+			order.forEach(function (L) {
+				var c0 = L.cur;
+				if (!c0 || !L.along || c0.angle || L.panKept || alignedNow(L, c0)) { return; }
+				var own = (c0.cost || 0) - pen(L, c0.spec) - (c0.spec ? 0 : Math.min(0, c0.base));
+				uncommit(st, L);
+				commit(st, L, bestFor(st, L, c0.rs, Math.max(own + LEVEL / 2, SHOW_MAX), 60, 'along') || c0);
+			});
 			// 5. Repeats along long pipes (R9), in whatever room is left.
 			for (i = 0; i < labels.length; i++) { if (labels[i].cur && labels[i].owner.t === 'link') { repeats(st, labels[i]); } }
 
@@ -1037,7 +1048,8 @@ EngCalcs.lpnPlacerC = (function () {
 			arr = st.hg.collect(u, st.buf);
 			for (k = 0; k < arr.length; k++) {
 				it = arr[k];
-				if (inkOn(c, it.ob, 0)) { return Infinity; }
+				// A node symbol by its own box: an overlap of a pixel is the row's leading, not ink.
+				if (it.k === SYM ? inkOn(c, it.raw, LEAD_TOL) : inkOn(c, it.ob, 0)) { return Infinity; }
 				for (j = 0; j < c.ns; j++) {
 					s = c.segs[j];
 					if (!bbHit(s.bb, it.ob)) { continue; }
