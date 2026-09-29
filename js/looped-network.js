@@ -27224,8 +27224,12 @@ var EngCalcs = EngCalcs || {};
 	// document ARRIVES (the boot path and refreshAllFromDocument()), never on an edit. Every table's
 	// remembered row order belongs to the outgoing document, so all seven forget it.
 	function paneDocumentArrived() {
+		var t = activePaneTab();
 		paneTables().forEach(paneTableReset);
 		if (paneIsOpen() && activePaneTableSpec()) { renderPaneTable(activePaneTableSpec()); }
+		// The Time series tab draws from the run, not the table specs, and a switch that re-solves
+		// nothing never reached it: it went on showing the project just left (2026-09-29).
+		else if (paneIsOpen() && t && t.id === 'timeseries' && t.refresh) { t.refresh(); }
 	}
 	function refreshPaneIfOpen() {
 		var t = activePaneTab();
@@ -30169,6 +30173,7 @@ var EngCalcs = EngCalcs || {};
 		if (!id) { return; }
 		if (!switchKeep[id]) { switchKeepOrder.push(id); }
 		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult,
+			time: EngCalcs.lpnTimeKeep ? EngCalcs.lpnTimeKeep() : null,
 			layout: captureLabelLayout() };
 		while (switchKeepOrder.length > SWITCH_KEEP_MAX) {
 			delete switchKeep[switchKeepOrder.shift()];
@@ -31415,14 +31420,22 @@ var EngCalcs = EngCalcs || {};
 		// 2026-08-19). On a slow network an EDIT shows the first reporting time first, but arriving is
 		// not an edit: opening a file that states a 24-hour run is asking to see the 24 hours. Marked
 		// here rather than run here, so the one solve scheduled below does it.
-		if (EngCalcs.lpnTimeArrived) { EngCalcs.lpnTimeArrived(); }
+		// The kept run goes back with the kept solve; `timeKept` says whether it did.
+		var timeKept = EngCalcs.lpnTimeArrived ?
+			EngCalcs.lpnTimeArrived(lastSolveResult && kept ? kept.time : null) : false;
 		// **AND NOTHING IS RE-SOLVED WHEN THE ANSWER IS ALREADY ON SCREEN.** The fire-flow run is
 		// still dropped, which is the one thing scheduleSolve() does besides the arithmetic: its
 		// rings describe the network they were run on, and this is a different project.
+		//
+		// **"ALREADY ON SCREEN" INCLUDES THE RUN** (2026-09-29). A project with a duration whose
+		// steady answer was kept but whose run was not (it was still in flight when we left) is
+		// owed the run, or the Time series tab waits for one nothing will start.
 		perfDebugTime('scheduleSolve', function () {
+			var owed = !lastSolveResult || (!timeKept && EngCalcs.lpnTimeIsExtended &&
+				EngCalcs.lpnTimeIsExtended(doc.times));
 			// scheduleArrivalSolve(), not scheduleSolve(): see the note at its definition. With the
 			// switch off it runs nothing at all, which is Tom's ruling and not an inference.
-			if (lastSolveResult) { clearFireFlowRun(false); } else { scheduleArrivalSolve(); }
+			if (owed) { scheduleArrivalSolve(); } else { clearFireFlowRun(false); }
 		});
 		paneDocumentArrived();   // R-109: see its definition
 		perfDebugTime('tabs', function () { renderTabs(); });
