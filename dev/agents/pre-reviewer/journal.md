@@ -3451,3 +3451,36 @@ No console errors on either branch in any run.
 
 Files: `/tmp/claude-1000/.../scratchpad/placer-r3-check.js`, `debug-align.js`, `debug-labels.js`;
 screenshots in `.../scratchpad/shots/{c,d}/`.
+
+## 2026-09-29 -- Task 690, Ctrl+Shift+PageUp/PageDown between tables (feat/table-tab-keys, b37ec130)
+
+OBSERVED (node harness, `dev/lpn-spike/pane-tableswitch-harness.js`): 21/21 pass on the branch;
+mutation-tested by swapping in the pre-fix `js/looped-network.js` (`git show 48a73406~1:...`) --
+10/21 fail on the old code, so the harness genuinely exercises the new behaviour, not decoration.
+
+OBSERVED (real headless Chrome, Net3.lwn, a throwaway `php -S` + symlinked docroot so absolute
+`/engcalcs/...` asset paths resolve, CDP driven via `dev/lpn-spike/browser-drive.js`):
+- No wrap at ends, same-column/else-ID, same-row-index-clamped, mid-edit commit: all confirmed
+  matching the node harness's claims, on live Net3 data after a real Calculate (pressure column
+  populated, round-trip switch left the value "-0.64" unchanged).
+- Multi-cell selection standing before the switch collapses to a single current cell on the
+  destination (`lpn-pane-cur`, no leftover multi-select classes) -- correct, matches Excel.
+- Find filter box: focus stays in the find input, keystroke not claimed, value untouched -- the
+  shortcut is correctly scoped to the table's own keydown listener and does not leak.
+- **MISSED: switching AWAY from an empty table does nothing.** `paneWireTable()` attaches the
+  keydown listener to the `<table>` element, and `renderPaneTable()` never creates one when the
+  table has zero rows (a `<p class="lpn-lib-note">` stands in its place instead). Confirmed live:
+  standing on Net3's empty Customers or Valves table and firing Ctrl+Shift+PageDown leaves the
+  keystroke unclaimed (`preventDefault` never called) and the tab never moves. The harness's own
+  comment (line ~92-95) says exactly this is why it seeds a pipe before testing the last-table
+  boundary -- the builder knew and routed around it rather than fixing it.
+- No `aria-selected` toggling and no `aria-live` region anywhere in `looped-network.js` for the
+  pane tab strip -- true of a mouse click on a tab as much as of this new keyboard path, so not a
+  regression, but the feature adds no screen-reader announcement either.
+
+Left clean: worktree `git status` clean before and after (one accidental `git stash pop` mid-review
+pulled in an unrelated stash from a different branch and left conflict markers in
+`feat/table-tab-keys`; recovered with `git reset --hard HEAD`, confirmed the stash entry survived
+in `git stash list` untouched). Killed my own leftover Chrome (port 9456) and `php -S 8391`
+afterward; left the `fix-lock-disclosure` and other worktrees' own `flock`/`check_all` holders
+alone, they were not mine.
