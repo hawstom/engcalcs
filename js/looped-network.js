@@ -22836,13 +22836,31 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return (typeof c.label === 'function') ? c.label() : (pc[c.label] || c.key);
 	}
-	// **"SPLIT INTO TWO PARTS", TAKEN LITERALLY:** a word of 8 or more characters is cut in half
+	// **THE TWO HEADING KNOBS, EACH ONE NAMED CONSTANT, EACH ONE A URL OVERRIDE FOR AN A/B LOOK**
+	// (Tom, 2026-09-28: *"What's our longest word rule? 7 max. It may be too short. We could A/B
+	// test 7 and 9 as max."* and *"We need a max lines ratio rule. Don't wrap to cause n lines to
+	// be more than KLmax times n characters on longest line. Let's try KLmax=1 with a possible
+	// future A/B test of KLmax=0.8."*).
+	//   PANE_WORD_MAX -- the longest word a heading keeps whole; a longer one may break at its
+	//     middle (below). 7 is R-356's "8 characters or longer split". `?colword=9` overrides it.
+	//   PANE_LINES_MAX -- KLmax: a heading may wrap to no more lines than this times the number of
+	//     characters on its longest line (paneLineRatioEm()). `?collines=0.8` overrides it.
+	// Read once, from this page's own address, and only a sane number is taken.
+	function paneUrlNum(name, lo, hi) {
+		var m, v;
+		try { m = new RegExp('[?&]' + name + '=([0-9.]+)(&|$)').exec(window.location.search || ''); } catch (e) { m = null; }
+		v = m ? parseFloat(m[1]) : NaN;
+		return (isFinite(v) && v >= lo && v <= hi) ? v : null;
+	}
+	var PANE_WORD_MAX = Math.round(paneUrlNum('colword', 3, 30) || 7);
+	var PANE_LINES_MAX = paneUrlNum('collines', 0.1, 10) || 1;
+	// **"SPLIT INTO TWO PARTS", TAKEN LITERALLY:** a word longer than PANE_WORD_MAX is cut in half
 	// (the longer half first, for an odd length); nothing shorter is split at all. Returns the
 	// split INDEX (or -1 for "do not split"), the one number both the width calculation below and
 	// paneHeadingDisplayText()'s soft hyphen read, so the rendered break can never land anywhere
 	// but where the width was measured to allow it.
 	function paneWordSplitIndex(word) {
-		return word.length >= 8 ? Math.ceil(word.length / 2) : -1;
+		return word.length > PANE_WORD_MAX ? Math.ceil(word.length / 2) : -1;
 	}
 	// This is what lets the heading actually narrow past its longest whole word: the browser's own
 	// min-content floor is the longest UNBROKEN run in the heading, and paneHeadingDisplayText()'s
@@ -22921,10 +22939,85 @@ var EngCalcs = EngCalcs || {};
 		hf = paneHeadFont();
 		headPad = panePadEm(hf ? hf.px : 0);
 		if (headingEm > 0 || contentEm > 0) {
-			v = Math.round(Math.max(contentEm, headingEm + headPad) * 100) / 100;
+			v = Math.max(contentEm, headingEm + headPad);
+			// The line-ratio rule may widen it further, never narrow it.
+			v = Math.max(v, paneLineRatioEm(c, v - headPad) + headPad);
+			v = Math.round(v * 100) / 100;
 		}
 		spec.initEmCache[c.key] = v;
 		return v;
+	}
+	// **THE LINE-RATIO RULE** (Tom, 2026-09-28, KLmax above): *"Don't wrap to cause n lines to be
+	// more than KLmax times n characters on longest line."* A heading drawn at width `em` is laid
+	// out for real in a hidden probe (the same `<th><button class="lpn-pane-sort">` the table uses,
+	// filled by paneHeadingFill(), so soft hyphens, the unit's own box and its `<wbr>`s all break
+	// exactly as they will on screen); its lines are counted, and the characters on its longest
+	// line. While there is more than one line and lines > KLmax x characters the width grows by PANE_LINES_STEP_EM and is tried
+	// again. This is the one way a UNIT can widen a column: "(Latitude/Longitude|…)" in a column
+	// sized for "Vert-" ran to nine lines of four or five letters each. It stops at the heading's
+	// own one-line width, where the rule cannot fail (one line, at least one character).
+	// Returns the heading width that complies (>= `em`), or `em` itself with no DOM to measure.
+	var PANE_LINES_STEP_EM = 0.2;
+	var paneLineRatioCache = {};
+	var paneLineProbe = null;
+	function paneLineProbeEls() {
+		var table, thead, tr, th, btn;
+		if (paneLineProbe) { return paneLineProbe; }
+		table = document.createElement('table'); table.className = 'lpn-pane-table';
+		thead = document.createElement('thead'); tr = document.createElement('tr');
+		th = document.createElement('th'); btn = document.createElement('button');
+		btn.type = 'button'; btn.className = 'lpn-pane-sort';
+		th.appendChild(btn); tr.appendChild(th); thead.appendChild(tr); table.appendChild(thead);
+		table.style.cssText = 'position:absolute;visibility:hidden;left:-9999px;top:-9999px;pointer-events:none;';
+		document.body.appendChild(table);
+		paneLineProbe = { btn: btn };
+		return paneLineProbe;
+	}
+	// { lines, chars } for the probe button as it is laid out now.
+	function paneLineCount(btn) {
+		var tops = [], per = {}, walker, node, i, r, rs, t, k, j, chars = 0;
+		walker = document.createTreeWalker(btn, 4, null);
+		while ((node = walker.nextNode())) {
+			for (i = 0; i < node.nodeValue.length; i++) {
+				if (/\s|\u00ad/.test(node.nodeValue.charAt(i))) { continue; }
+				r = document.createRange(); r.setStart(node, i); r.setEnd(node, i + 1);
+				rs = r.getClientRects();
+				if (!rs.length || !(rs[0].width > 0)) { continue; }
+				t = rs[0].top + rs[0].height / 2; k = -1;
+				for (j = 0; j < tops.length; j++) { if (Math.abs(tops[j] - t) < 3) { k = j; break; } }
+				if (k < 0) { tops.push(t); k = tops.length - 1; }
+				per[k] = (per[k] || 0) + 1;
+			}
+		}
+		for (k in per) { if (per[k] > chars) { chars = per[k]; } }
+		return { lines: tops.length, chars: chars };
+	}
+	function paneLineRatioEm(c, em) {
+		var key, probe, btn, w, n, full, guard = 0;
+		if (!(em > 0)) { return em; }
+		key = paneHeadingDisplayText(c) + '\u0001' + em + '\u0001' + PANE_LINES_MAX;
+		if (Object.prototype.hasOwnProperty.call(paneLineRatioCache, key)) { return paneLineRatioCache[key]; }
+		try {
+			if (typeof document.createTreeWalker !== 'function' || typeof document.createRange !== 'function') { return em; }
+			probe = paneLineProbeEls(); btn = probe.btn;
+			btn.textContent = '';
+			paneHeadingFill(btn, c);
+			btn.style.width = 'max-content';
+			full = btn.getBoundingClientRect().width / (parseFloat(window.getComputedStyle(btn).fontSize) || 16);
+			if (!(full > 0)) { return em; }
+			w = em;
+			while (w < full && guard++ < 200) {
+				btn.style.width = w + 'em';
+				n = paneLineCount(btn);
+				// One line is not a wrap: the rule is about what wrapping does (KLmax < 1 would
+				// otherwise fail every one-letter heading, "X", at any width).
+				if (n.lines <= 1 || n.lines <= PANE_LINES_MAX * n.chars) { break; }
+				w = Math.round((w + PANE_LINES_STEP_EM) * 100) / 100;
+			}
+			w = Math.min(Math.max(w, em), Math.max(full, em));
+		} catch (e) { w = em; }
+		paneLineRatioCache[key] = w;
+		return w;
 	}
 	// A value's own box padding, in em of the table font: `input` for a typed value (`padding: 1px
 	// 4px` on the control, which fills its cell), `td` for a plain cell (`padding: 1px 6px` on the

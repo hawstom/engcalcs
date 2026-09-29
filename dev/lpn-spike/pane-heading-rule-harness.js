@@ -18,7 +18,11 @@
 //       fraction's "Not used" blanked, and the two pumps with their curve references blanked,
 //       because the new project has no curves to point at);
 //   (b) every example on the wall, solved as it opens, so every result column has content;
-//   (c) Net3 in German, for the long words.
+//   (c) Net3 in German, for the long words;
+//   (d) Net3 at `?colword=9` and at `?collines=0.8`, the two A/B overrides.
+// It runs in three parts, one per harness file, because run_harnesses.sh gives each file 300 s:
+// this file is (a); pane-heading-rule-examples-harness.js is (b); pane-heading-rule-ab-harness.js
+// is (c) and (d). Each of those sets PANE_RULE_PART and requires this one.
 // What it asserts, from the DOM as drawn and a canvas measurement of its own (never the page's own
 // width arithmetic, which is the thing under test):
 //   1. RULE WIDTH: H = max(the heading's longest label word -- an 8+ letter word as its wider
@@ -32,6 +36,19 @@
 //      column (likewise).
 //   4. No present value is clipped: every input's text fits its box, and every CHOSEN pull-down
 //      shows its whole choice.
+//   5. THE WORD CAP (Tom, 2026-09-28: *"What's our longest word rule? 7 max ... We could A/B test
+//      7 and 9 as max."*): a label word longer than WORD_MAX (7, or the page's `?colword=`) carries
+//      exactly one soft hyphen, at its middle; a word of WORD_MAX letters or fewer carries none.
+//      Rule 1's heading-word width is computed from that cap here, not read off the page.
+//   6. THE LINE-RATIO RULE (Tom, 2026-09-28: *"Don't wrap to cause n lines to be more than KLmax
+//      times n characters on longest line. Let's try KLmax=1"*): every WRAPPED heading's line count
+//      is at most KLmax (1, or `?collines=`) times the characters on its longest line (one line is
+//      not a wrap, or KLmax 0.8 would fail "X"). A column is
+//      allowed past rule 1's width only for this, and only minimally: 4px narrower, its heading
+//      would break the ratio.
+//   7. AN UNSET PULL-DOWN NEVER WIDENS ITS COLUMN (Tom, 2026-09-28, on "No ▾": *"This is
+//      accepted."*): every unset "No ..." pull-down is drawn no wider than its cell, and a column
+//      of nothing but unset pull-downs is no wider than its heading's rules make it.
 // Screenshots of the lat/lon paste case and German Net3 go to $PANE_RULE_SHOTS (default: a folder
 // under the system temp dir); PANE_RULE_ALLSHOTS=1 takes every table (slower: check_all runs this
 // under run_harnesses.sh's 300 s limit).
@@ -69,6 +86,7 @@ if (process.env[LOCK_ENV] !== '1') {
 	console.error('pane-heading-rule-harness: no `flock` binary found -- running WITHOUT the browser lock.');
 }
 
+const PART = process.env.PANE_RULE_PART || 'paste';
 const SHOTS = process.env.PANE_RULE_SHOTS || path.join(os.tmpdir(), 'pane-rule-shots');
 const TABS = ['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves'];
 const PASTE_TABS = ['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps'];
@@ -85,7 +103,7 @@ function ok(name, cond, extra) {
 }
 
 // Runs INSIDE the page, on one table. Returns one record per column.
-const MEASURE = ([panelId, slack]) => {
+const MEASURE = ([panelId, slack, wordMax, kl]) => {
 	const host = document.getElementById(panelId);
 	const table = host && host.querySelector('table.lpn-pane-table');
 	if (!table) { return { none: true }; }
@@ -115,17 +133,19 @@ const MEASURE = ([panelId, slack]) => {
 		const labelNode = [...btn.childNodes].find((n) => n.nodeType === 3);
 		const unit = btn.querySelector('.lpn-pane-hunit');
 		const label = (labelNode ? labelNode.nodeValue : btn.textContent).trim();
-		// (b) the heading's longest word, units not counted, 8+ letters as the wider half.
-		let headW = 0;
+		// (b) the heading's longest word, units not counted; a word over the cap as its wider half,
+		// split where the harness says (the middle), and the soft hyphen checked to be there.
+		let headW = 0; const shyWrong = [];
 		label.split(/\s+/).filter(Boolean).forEach((w) => {
-			const i = w.indexOf(SHY);
-			if (i < 0) { headW = Math.max(headW, textW(w, btn)); return; }
-			headW = Math.max(headW, textW(w.slice(0, i) + '-', btn), textW(w.slice(i + 1), btn));
+			const bare = w.split(SHY).join(''), i = w.indexOf(SHY), mid = Math.ceil(bare.length / 2);
+			if (bare.length > wordMax ? (i !== mid || w.lastIndexOf(SHY) !== i) : i >= 0) { shyWrong.push(bare); }
+			if (bare.length <= wordMax) { headW = Math.max(headW, textW(bare, btn)); return; }
+			headW = Math.max(headW, textW(bare.slice(0, mid) + '-', btn), textW(bare.slice(mid), btn));
 		});
 		// (a) the widest present content BOX: an input's text plus its own padding and border; a
 		// CHOSEN pull-down's natural width with only its chosen option in it. An unset pull-down
 		// (value '') is the rule's "No ..." and is not counted.
-		let contentW = 0, clipped = [], isBool = false;
+		let contentW = 0, clipped = [], isBool = false, unsetWide = [], unsetN = 0;
 		rows.forEach((tr) => {
 			const td = tr.children[ci];
 			if (!td) { return; }
@@ -144,6 +164,9 @@ const MEASURE = ([panelId, slack]) => {
 				const box = rg.getBoundingClientRect().width + px(cs.paddingLeft) + px(cs.paddingRight);
 				contentW = Math.max(contentW, box);
 				if (td.scrollWidth > td.clientWidth + 1) { clipped.push(td.textContent.trim()); }
+			} else if (sel && sel.value === '') {
+				unsetN++;
+				if (sel.getBoundingClientRect().width > td.getBoundingClientRect().width + slack) { unsetWide.push(tr.dataset.id || '?'); }
 			} else if (sel && sel.value !== '' && sel.selectedIndex >= 0) {
 				const c = sel.cloneNode(false);
 				c.appendChild(sel.options[sel.selectedIndex].cloneNode(true));
@@ -176,7 +199,41 @@ const MEASURE = ([panelId, slack]) => {
 				unitOk = false; unitNote = 'unit ' + unit.textContent + ' (' + unitW.toFixed(1) + 'px) broken in a column with ' + room.toFixed(1) + 'px of room';
 			}
 		}
+		// Line ratio: lines and the characters on the longest line, as drawn; and, if the column is
+		// wider than rule 1, whether 4px narrower would break the ratio (a clone, same cell).
+		const ratio = (node) => {
+			const tops = [], per = [];
+			const walker = document.createTreeWalker(node, 4, null); let tn;
+			while ((tn = walker.nextNode())) {
+				for (let i = 0; i < tn.nodeValue.length; i++) {
+					const ch = tn.nodeValue.charAt(i);
+					if (/\s/.test(ch) || ch === SHY) { continue; }
+					const r = document.createRange(); r.setStart(tn, i); r.setEnd(tn, i + 1);
+					const rc = r.getClientRects()[0];
+					if (!rc || !(rc.width > 0)) { continue; }
+					const t = rc.top + rc.height / 2;
+					let k = tops.findIndex((x) => Math.abs(x - t) < 3);
+					if (k < 0) { tops.push(t); per.push(0); k = tops.length - 1; }
+					per[k]++;
+				}
+			}
+			return { lines: tops.length, chars: per.length ? Math.max.apply(null, per) : 0 };
+		};
+		const now = ratio(btn);
+		let narrowerBreaks = null;
+		const basicMax = H + thPad + slack + 1;
+		const widestNow = Math.max.apply(null, lineWs.concat([0]));
+		if (th.getBoundingClientRect().width > basicMax || widestNow > H + slack) {
+			const cl = btn.cloneNode(true);
+			cl.style.cssText = 'position:absolute;visibility:hidden;left:0;top:0;width:' + (btn.getBoundingClientRect().width - 4) + 'px;';
+			th.appendChild(cl);
+			const n2 = ratio(cl);
+			th.removeChild(cl);
+			narrowerBreaks = n2.lines > 1 && n2.lines > kl * n2.chars;
+		}
 		res.push({
+			lines: now.lines, lineChars: now.chars, btnW: btn.getBoundingClientRect().width, narrowerBreaks: narrowerBreaks, shyWrong: shyWrong,
+			unsetN: unsetN, unsetWide: unsetWide, basicMax: basicMax,
 			key: key, text: btn.textContent.replace(new RegExp(SHY, 'g'), ''), H: H, headW: headW, contentW: contentW,
 			lineWs: lineWs, widest: lineWs.length ? Math.max.apply(null, lineWs) : 0,
 			thW: th.getBoundingClientRect().width, thPad: thPad, unitOk: unitOk, unitNote: unitNote,
@@ -190,19 +247,35 @@ function assertTable(label, report) {
 	if (report.none) { return 0; }
 	report.cols.forEach((c) => {
 		const name = label + ' "' + c.text + '"';
-		ok(name + ': no heading line wider than the rule width', c.widest <= c.H + SLACK,
+		// Widened for the line ratio (and minimally, check below): the rule width is then the width
+		// that ratio needed, which is the button's own.
+		const ruleW = c.narrowerBreaks === true ? Math.max(c.H, c.btnW) : c.H;
+		ok(name + ': no heading line wider than the rule width', c.widest <= ruleW + SLACK,
 			'widest line ' + c.widest.toFixed(1) + 'px > rule ' + c.H.toFixed(1) + 'px (heading word ' + c.headW.toFixed(1) +
 			', content box ' + c.contentW.toFixed(1) + ')');
 		ok(name + ': units whole on the label\'s line or on a line of their own, and unbroken where they fit', c.unitOk, c.unitNote);
+		ok(name + ': a word over the cap splits once, at its middle; none at or under it splits', c.shyWrong.length === 0,
+			c.shyWrong.join(', '));
+		ok(name + ': a wrapped heading has lines <= KLmax x characters on its longest line', c.lines <= 1 || c.lines <= KL * c.lineChars,
+			c.lines + ' lines, longest ' + c.lineChars + ' characters, KLmax ' + KL);
 		if (c.key !== 'id' && !c.isBool) {
-			ok(name + ': the column is not held open past the rule', c.thW <= c.H + c.thPad + SLACK + 1,
-				'heading cell ' + c.thW.toFixed(1) + 'px > rule ' + (c.H + c.thPad).toFixed(1) + 'px');
+			ok(name + ': the column is not held open past the rule (past rule 1 only for the line ratio, and minimally)',
+				c.thW <= c.basicMax || c.narrowerBreaks === true,
+				'heading cell ' + c.thW.toFixed(1) + 'px > rule ' + (c.basicMax - SLACK - 1).toFixed(1) + 'px' +
+				(c.narrowerBreaks === false ? ', and 4px narrower still keeps the line ratio' : ''));
+		}
+		if (c.unsetN) {
+			ok(name + ': an unset "No ..." pull-down never widens its column', c.unsetWide.length === 0 &&
+				(c.contentW > 0 || c.thW <= c.basicMax || c.narrowerBreaks === true), c.unsetWide.join(', '));
 		}
 		ok(name + ': no present value is clipped', c.clipped.length === 0, c.clipped.join(', '));
 	});
 	return report.cols.length;
 }
 
+// The cap and the ratio the page under test is running at: the defaults, or what the run's URL
+// says. Set per run in main().
+let WORD_MAX = 7, KL = 1;
 async function measureAll(a, label, shots) {
 	let n = 0;
 	for (const t of TABS) {
@@ -210,7 +283,7 @@ async function measureAll(a, label, shots) {
 		if (!has) { continue; }
 		await a.page.evaluate((t) => document.getElementById('lpn_pane_tab_' + t).click(), t);
 		await a.settle(250);
-		const rep = await a.page.evaluate(MEASURE, ['lpn_pane_' + t, SLACK]);
+		const rep = await a.page.evaluate(MEASURE, ['lpn_pane_' + t, SLACK, WORD_MAX, KL]);
 		const cols = assertTable(label + ' ' + t, rep);
 		n += cols;
 		if (cols && (shots || process.env.PANE_RULE_ALLSHOTS)) {
@@ -285,7 +358,7 @@ async function main() {
 	const errors = [];
 	try {
 		// (a) new projects, local and lat/lon, with Net3 pasted in.
-		for (const geo of [false, true]) {
+		for (const geo of (PART === 'paste' ? [false, true] : [])) {
 			const label = geo ? 'new-latlon+Net3' : 'new-local+Net3';
 			const a = await Session.open(browser, label);
 			await a.context.grantPermissions(['clipboard-read', 'clipboard-write']);
@@ -312,23 +385,47 @@ async function main() {
 			errors.push.apply(errors, a.errors);
 			await a.context.close();
 		}
-		// (b) every example on the wall, in English; (c) Net3 in German.
-		const probe = await Session.open(browser, 'wall');
-		await probe.goto('Looped-Network.php');
-		const titles = await probe.page.$$eval('#lpn_examples_pane .lpn-example-card .lpn-example-title',
-			(els) => els.map((e) => (e.textContent || '').trim()));
-		await probe.context.close();
-		const runs = titles.map((t) => ({ lang: null, title: t })).concat([{ lang: 'de', key: 'lpn_ex_net3_title' }]);
+		// (b) every example on the wall, in English; (c) Net3 in German; (d) the A/B overrides.
+		let runs = [];
+		if (PART === 'examples') {
+			const probe = await Session.open(browser, 'wall');
+			await probe.goto('Looped-Network.php');
+			const titles = await probe.page.$$eval('#lpn_examples_pane .lpn-example-card .lpn-example-title',
+				(els) => els.map((e) => (e.textContent || '').trim()));
+			await probe.context.close();
+			runs = titles.map((t) => ({ lang: null, title: t }));
+		} else if (PART === 'ab') {
+			runs = [{ lang: 'de', key: 'lpn_ex_net3_title' },
+				{ lang: null, key: 'lpn_ex_net3_title', q: 'colword=9', word: 9 },
+				{ lang: null, key: 'lpn_ex_net3_title', q: 'collines=0.8', kl: 0.8 }];
+		}
 		for (const run of runs) {
 			const a = await Session.open(browser, run.lang || 'en');
-			await a.goto('Looped-Network.php' + (run.lang ? '?lang=' + run.lang : ''));
+			WORD_MAX = run.word || 7; KL = run.kl || 1;
+			const qs = [run.lang ? 'lang=' + run.lang : '', run.q || ''].filter(Boolean).join('&');
+			await a.goto('Looped-Network.php' + (qs ? '?' + qs : ''));
 			await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 			const title = run.title || await a.lang(run.key);
 			await a.openExampleCard(title);
 			await a.settle(800);
 			await openPane(a);
-			const n = await measureAll(a, (run.lang || 'en') + ' ' + title, run.key === 'lpn_ex_net3_title');
-			console.log('  ' + (run.lang || 'en') + ' ' + title + ': ' + n + ' columns measured');
+			const tag = (run.lang || 'en') + ' ' + title + (run.q ? ' ?' + run.q : '');
+			const n = await measureAll(a, tag, PART === 'ab');
+			console.log('  ' + tag + ': ' + n + ' columns measured');
+			if (run.word) {
+				// The override really reached the page: "Diameter" and "Velocity" (8) whole,
+				// "Description" (11) still split.
+				const shy = await a.page.evaluate(() => {
+					const SHY = String.fromCharCode(173), out = {};
+					document.querySelectorAll('#lpn_pane_pipes thead .lpn-pane-sort').forEach((b) => {
+						const t = b.firstChild && b.firstChild.nodeType === 3 ? b.firstChild.nodeValue : '';
+						out[t.split(SHY).join('').trim().split(/\s+/)[0]] = t.indexOf(SHY) >= 0;
+					});
+					return out;
+				});
+				ok(tag + ': Diameter and Velocity are kept whole, Description still splits',
+					shy.Diameter === false && shy.Velocity === false && shy.Description === true, JSON.stringify(shy));
+			}
 			errors.push.apply(errors, a.errors);
 			await a.context.close();
 		}
