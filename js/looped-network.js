@@ -54476,6 +54476,56 @@ var EngCalcs = EngCalcs || {};
 		var td = ffEl('td', cls || null, text, row);
 		return td;
 	}
+	// **EVERY COLUMN SORTS FROM ITS HEADING** (Tom, 2026-09-28: *"Sort Fire flow analysis
+	// columns."*). The Tables pane's own arrow and rule (sortPaneTable(): the same column flips, a
+	// new one starts ascending), on this table's records rather than its cells, so a number sorts
+	// as a number and not as the text it is printed as. A cell with no value -- a dash, an answer
+	// that could not be found -- goes LAST in both directions, because a blank is not the smallest
+	// or the largest of anything. `null` is the reading order ffSorted() gives, until a heading is
+	// clicked. Kept for the page load, like the criteria in the boxes above it.
+	var ffSortState = { col: null, dir: 1 };
+	function ffSortKey(rec, col) {
+		switch (col) {
+		case 0: return rec.id;
+		case 1: return rec.staticPressure;
+		case 2: return rec.required;
+		case 3: return rec.pressureAtRequired;
+		case 4: return rec.available;
+		case 5: return rec.residualAt;
+		case 6: return rec.effects ? ffCriticalText(rec) : undefined;
+		case 7: return rec.effects ? ffLimitText(rec) : undefined;
+		case 8: return rec.solves;
+		case 9: return ffModesText(rec);
+		}
+		return undefined;
+	}
+	function ffBlank(v) {
+		return v === undefined || v === null || v === '' || v === FF_DASH || (typeof v === 'number' && !isFinite(v));
+	}
+	function ffSortResults(results) {
+		var base = ffSorted(results), col = ffSortState.col, dir = ffSortState.dir;
+		if (col === null) { return base; }
+		return base.map(function (r, i) { return { r: r, i: i, k: ffSortKey(r, col) }; }).sort(function (a, b) {
+			var ab = ffBlank(a.k), bb = ffBlank(b.k), c;
+			if (ab || bb) { return ab === bb ? a.i - b.i : (ab ? 1 : -1); }
+			c = (typeof a.k === 'number' && typeof b.k === 'number') ? a.k - b.k
+				: String(a.k).localeCompare(String(b.k), undefined, { numeric: true });
+			return c ? dir * c : a.i - b.i;
+		}).map(function (x) { return x.r; });
+	}
+	function ffSortBy(col) {
+		ffSortState = { col: col, dir: ffSortState.col === col ? -ffSortState.dir : 1 };
+		rebuildFireFlowReport();
+		// The report is rebuilt, so the arrow the keyboard was on is a new element: put the focus
+		// back on this column's arrow rather than dropping it to the page.
+		var host = document.getElementById('lpn_ff_report'), btn = null;
+		(function walk(n) {
+			Array.prototype.slice.call((n && n.children) || []).forEach(function (c) {
+				if (c._lpnFfSortCol === col) { btn = c; } else if (!btn) { walk(c); }
+			});
+		}(host));
+		if (btn && btn.focus) { try { btn.focus({ preventScroll: true }); } catch (e) { btn.focus(); } }
+	}
 	function ffTable(parent, headings) {
 		// **THE WIDE TABLE SCROLLS SIDEWAYS INSIDE ITS OWN BOX**, so ten columns can never push the
 		// dialog's own edges off the screen (CLAUDE.md: wide content scrolls in its own container).
@@ -54489,11 +54539,27 @@ var EngCalcs = EngCalcs || {};
 		// *"I'd like to check against the literature and disclose the meaning of Static Pressure.
 		// Zero flow from this hydrant? Zero flow in the system?"* The answer is the first, and a
 		// column heading that does not say so leaves the reader to pick.
-		headings.forEach(function (h) {
-			var text = h, tip = null, th;
+		headings.forEach(function (h, i) {
+			var text = h, tip = null, th, arrow, pc = EngCalcs.pageConfig || {}, on = ffSortState.col === i;
 			if (h && h.length === 2 && typeof h !== 'string') { text = h[0]; tip = h[1]; }
-			th = ffEl('th', null, text, hr);
+			th = ffEl('th', 'lpn-ff-sortable', text, hr);
 			if (tip) { th.title = tip; }
+			// The pane's arrow, in the pane's words: shown on the sorted column, and on any other
+			// under the pointer or the keyboard. A click anywhere on the heading sorts too.
+			arrow = document.createElement('button');
+			arrow.type = 'button';
+			arrow.className = 'lpn-pane-sortarrow lpn-ff-sortarrow' + (on ? ' lpn-pane-sortarrow-active' : '') +
+				(on && ffSortState.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
+			arrow.title = on ? (pc.lpn_pane_sortarrow_tip || 'Reverse the sort') : (pc.lpn_pane_sort_asc || 'Sort ascending');
+			arrow.setAttribute('aria-label', arrow.title + ': ' + text);
+			arrow._lpnFfSortCol = i;
+			arrow.addEventListener('click', function (ev) {
+				if (ev && ev.stopPropagation) { ev.stopPropagation(); }
+				ffSortBy(i);
+			});
+			th.appendChild(arrow);
+			th.setAttribute('aria-sort', on ? (ffSortState.dir < 0 ? 'descending' : 'ascending') : 'none');
+			th.addEventListener('click', function () { ffSortBy(i); });
 		});
 		return ffEl('tbody', null, null, table);
 	}
@@ -54565,7 +54631,7 @@ var EngCalcs = EngCalcs || {};
 		}
 
 		ffEl('div', 'lpn-ff-head', pc.lpn_ff_report_all || 'Every junction tested', host);
-		sorted = ffSorted(set.results);
+		sorted = ffSortResults(set.results);
 		shown = sorted.slice(0, FF_MAX_ROWS);
 		// **THE ORDER IS THE ORDER A PERSON READS THE ANSWER IN** (Tom, 2026-09-02, once the
 		// terminology stopped fighting him: *"Now that the terminology is recognizable, more of my
