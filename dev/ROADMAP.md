@@ -215,8 +215,9 @@ the block.
 - 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
   **FIRST BRANCH MERGED 2026-09-23 on his all-clear** (`feat/tables-spreadsheet`: modes, copy/paste,
   undo, widths, print). Since shipped: paste that creates rows (610), column hide, fill-down,
-  multi-cell selection, Ctrl+Enter fill (2026-09-28). Still open: drag-to-fill (parked by Tom as
-  its own build), Ctrl+Shift+PageUp/PageDn between tables, and whatever Declan ranks next.
+  multi-cell selection, Ctrl+Enter fill (2026-09-28), Ctrl+Shift+PageUp/PageDn between tables
+  (`feat/table-tab-keys`, awaiting Tom's browser pass). Still open: drag-to-fill (parked by Tom as
+  its own build), and whatever Declan ranks next.
   **RAISED TO 100 BY TOM, 2026-09-18: *"Raise to 100 and open a branch. This is important."***
   Tom, 2026-09-17: *"I wonder why I don't see a spreadsheet editing branch. That's a major long term
   project we should be working on in the roadmap if not on a branch."* He is right that it is not

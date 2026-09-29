@@ -25901,6 +25901,47 @@ var EngCalcs = EngCalcs || {};
 		});
 		return handle;
 	}
+	/**
+	 * Ctrl+Shift+PageDown/PageUp between the DATA TABLES only (Task 690). `paneTables()`, never
+	 * `paneTabs` -- the latter also holds Time series and Profile, which carry no cell grid to land
+	 * a caret in, and this must not reach for either of them.
+	 *
+	 * **EXCEL DOES NOT WRAP AT THE ENDS, SO NEITHER DOES THIS.** Past the last table or before the
+	 * first, the keystroke is still claimed (so the browser never sees it) but nothing moves --
+	 * Excel's own Ctrl+PageDown on its last sheet does exactly that, silently.
+	 *
+	 * **FOCUS LANDS ON THE SAME COLUMN KEY IF THE NEW TABLE HAS ONE, ELSE THE FIRST COLUMN, AND THE
+	 * SAME ROW INDEX, CLAMPED TO THE NEW TABLE'S ROW COUNT.** Two tables rarely share a row space --
+	 * Pipes and Junctions have no row in common -- but they often share a COLUMN, and Excel's own
+	 * sheet switch keeps the reader in the same column and row position it left, falling back to A1
+	 * only where that stops meaning anything.
+	 *
+	 * **A DESTINATION TABLE WITH NO ROWS STILL BECOMES THE SHOWN TAB** -- no table is ever hidden
+	 * from the strip for being empty, so none is skipped here either -- it simply has no cell to
+	 * focus, exactly as clicking that tab by hand would leave it.
+	 */
+	function paneSwitchTableTab(spec, dir) {
+		var tables = paneTables(), idx = -1, i, newSpec, newIdx,
+			rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
+			box = paneSelBox(spec, rows, cols), colKey = null, rowIdx = 0,
+			newRows, newCols, newColIdx, newRowIdx;
+		for (i = 0; i < tables.length; i++) { if (tables[i].id === spec.id) { idx = i; break; } }
+		if (idx < 0) { return false; }
+		newIdx = idx + dir;
+		if (newIdx < 0 || newIdx >= tables.length) { return true; }
+		newSpec = tables[newIdx];
+		if (box) { colKey = cols[box.ac].key; rowIdx = box.ar; }
+		setPaneTab(newSpec.id);
+		newRows = paneTableRowsInOrder(newSpec); newCols = paneCols(newSpec);
+		if (!newRows.length || !newCols.length) { return true; }
+		newColIdx = colKey !== null ? paneIndexOfKey(newCols, colKey) : -1;
+		if (newColIdx < 0) { newColIdx = paneHomeCol(newCols); }
+		newRowIdx = Math.min(rowIdx, newRows.length - 1);
+		paneSelSet(newSpec, newRows, newCols, newRowIdx, newColIdx, false);
+		paneSelPaint(newSpec, newRows, newCols);
+		paneFocusCell(newSpec, newRows[newRowIdx].id, newCols[newColIdx].key);
+		return true;
+	}
 	// Every key Tom named, in one place, against the table as it is rendered. Returns true where it
 	// handled the key, which is also what decides whether the browser still gets it -- an unhandled
 	// key is ordinary typing and must stay that way.
@@ -25982,6 +26023,19 @@ var EngCalcs = EngCalcs || {};
 				setNotice(pc.lpn_pane_fill_none || 'Nothing in this selection can be filled down.');
 			}
 			return true;
+		}
+		// **CTRL+SHIFT+PAGEDOWN/PAGEUP SWITCHES TABLES** (Task 690, the spreadsheet convention --
+		// Excel's own Ctrl+PageDown/PageUp moves between SHEETS). Shift is added because plain
+		// Ctrl+PageDown/PageUp is the BROWSER'S OWN shortcut for switching ITS tabs, and taking it
+		// back would fight every other tab the visitor has open; Shift is free. Checked before the
+		// `!box` early return below so it works with nothing selected yet in this table.
+		//
+		// **MID-EDIT, THE TYPED VALUE IS COMMITTED FIRST** -- the same choice Enter and the arrow
+		// keys make when they leave a cell, never Tab's choice of leaving it to the browser's own
+		// blur -- so switching tables can never cost the person the character they just typed.
+		if (jump && ext && (key === 'PageDown' || key === 'PageUp')) {
+			if (editing && active) { paneCommitCell(active); }
+			return paneSwitchTableTab(spec, key === 'PageDown' ? 1 : -1);
 		}
 		if (!box) {
 			// Nothing selected yet and a navigation key pressed: start at the top left, which is

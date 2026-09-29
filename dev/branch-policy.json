@@ -83,7 +83,8 @@
         "feat/selection-preview",
         "feat/ctrl-enter",
         "feat/fill-handle",
-        "feat/selection-set"
+        "feat/selection-set",
+        "feat/table-tab-keys"
     ],
     "feature_freeze": {
         "active": false,
