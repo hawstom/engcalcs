@@ -16149,7 +16149,7 @@ var EngCalcs = EngCalcs || {};
 		mapgeoBarEl('lpn_mapgeo_hint_gestures').textContent = world1 ? '' :
 			(pc.lpn_mapgeo_gestures || 'Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.');
 		mapgeoBarEl('lpn_mapgeo_hint_dial').textContent = world1 ? '' :
-			(pc.lpn_mapgeo_dial_help || 'Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar is the fit step 1 left, so 1 and 0 mean leave it alone. Arrow keys work on both.');
+			(pc.lpn_mapgeo_dial_help || 'Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change. Arrow keys work on both.');
 		mapgeoShow('lpn_mapgeo_search', world1);
 		mapgeoShow('lpn_mapgeo_goto', world1);
 		mapgeoShow('lpn_mapgeo_place', world1);
@@ -19326,7 +19326,7 @@ var EngCalcs = EngCalcs || {};
 		// Its own line rather than a second sentence in the count, which is a ruled string.
 		head = document.createElement('div');
 		head.className = 'lpn-find-hint';
-		head.textContent = pc.lpn_find_shift_hint || 'Shift+click one to add it to the map selection or take it out.';
+		head.textContent = pc.lpn_find_shift_hint || 'Shift+click to add/remove toggle.';
 		box.appendChild(head);
 		var list = document.createElement('div');
 		// Bounded because the panel is a pull-down, not a report: a 4,000-pipe answer is a scroll
@@ -35405,7 +35405,7 @@ var EngCalcs = EngCalcs || {};
 		if (!r || !r.held || !r.requestedAt) { return; }
 		if (lockRequestSeen.get(id) === r.requestedAt) { return; }
 		lockRequestSeen.set(id, r.requestedAt);
-		var msg = (pc.lpn_lock_requested || '{name} would like to edit this file. When you are ready, save your work and use File, Close project to hand it over.')
+		var msg = (pc.lpn_lock_requested || '{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over.')
 			.replace('{name}', r.requestedBy || (pc.lpn_lock_somebody || 'Somebody else'));
 		if (id === library.openId) {
 			bannerWarn = { kind: 'request', message: msg, action: null, dismissable: true };
@@ -55907,7 +55907,7 @@ var EngCalcs = EngCalcs || {};
 			design = ffDesignSelectedSet(model);
 			if (!design.nodes.length && !design.links.length) {
 				setNotice(pc.lpn_ff_design_no_selection ||
-					'The design check is set to the selected junctions, and none is selected. Select some on the map, or check all of them.');
+					'The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.');
 				return;
 			}
 			design.minPressure = minPressure > 0 ? minPressure : 0;
