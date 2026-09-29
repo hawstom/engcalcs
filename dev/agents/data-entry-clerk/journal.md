@@ -1673,3 +1673,134 @@ wrap-at-column-end semantics against a primary source — flagged SPECULATION ab
 CITED.
 
 — Declan
+
+## Invocation, 2026-09-28 — Tom's Task 738: standing vs snapshot filter, after fill-handle/Ctrl+Enter shipped
+
+Tom, verbatim, quoted in full in the task: *"If I filter on a value and then edit that value to be
+non-compliant with the filter, the row disappears. The question is whether the filter should be
+standing or transient... Suppose it's standing while the Find box is open, and we state next to the
+Filter in table button something like Filter actively, maybe with a toggle instead of sleeping on
+close. Then if I want the Filter to be just a snapshot, I can untick that toggle. Any other ideas?"*
+
+### What the code actually does today — it is STANDING, by deliberate design, and survives Find-box close
+
+**OBSERVED** `js/looped-network.js:22540-22554`, the comment block above `paneFilters`, states the
+rule Tom is now questioning, in the file's own words: *"IT IS RE-ASKED ON EVERY DRAW, so the filter
+follows the drawing -- widen a pipe past the threshold and it arrives, delete one and it leaves. A
+snapshot of ids would be a report about a network that has moved on."* This was argued and shipped
+as Task 597 (his own 2026-09-06 words, same block: beat EPANET's click count, nothing fancier).
+
+**OBSERVED** `paneFilters` (`:22555`) is a plain module-level object, not scoped to the Find box's
+open/closed state. Grepped for any `paneFilters = {}` reset or Find-box-close handler that touches
+it — found none (`closeFindPopup()` at `:20073` does not reference `paneFilters` at all). So today
+the filter is already standing in BOTH senses Tom's message raises: it re-evaluates live on every
+edit, AND it keeps running after the Find box is closed. His "sleeping on close" proposal describes
+a THIRD state the code does not currently have.
+
+**OBSERVED, the actual removal mechanism.** `renderPaneTable()` (`:23381`) computes `rows =
+paneTableRowsInOrder(spec)` (which calls `paneTableElements()` → `paneFilterKeys()`, freshly, every
+call) and folds the resulting row-ID list into `paneTableSignature()` (`:23344`, first term). A
+committed edit that changes an element's filter-relevant property changes that ID list, which
+changes the signature, which fails the `sig === spec.sig` fast path (`:23386`) and forces a full
+rebuild — the row's `<td>`s are destroyed, not hidden. There is no CSS-hide path here at all; it is
+structurally identical to how a filter admits or excludes a row on first render, run again.
+
+### The volume-workflow cost, in gestures, against the two shapes this actually happens in
+
+**OBSERVED, gesture trace 1 — the fill-handle/Ctrl+Enter case that just shipped.** `paneCtrlEnterFill()`
+(`:24921-24957`) writes every selected cell via `paneWriteCellText()` in a tight loop, THEN calls
+`completeEdit(null)` and `renderPaneTable(spec)` ONCE (`:24954-24956`) — one rebuild for the whole
+broadcast, not one per cell. So "filter all pipes with no roughness, select the column, Ctrl+Enter
+100" is: select filtered rows (already on screen), type a value, Ctrl+Enter — three gestures — and
+then the ENTIRE selection vanishes from the table in the same instant the fill completes, because
+every row that was missing roughness now has one. **The one visual confirmation a clerk gets that a
+100-row fill worked (100 populated cells, still visible, to eyeball against the plan set) is
+withheld** — what they see instead is an empty or near-empty table and a `{n} filled, {skipped}
+skipped` notice (`lpn_pane_filled`, `:24887-24889`) they have to read instead of see. This does not
+cost extra GESTURES — the fill itself is not slower — but it removes the cheapest verification step
+there is (look at what you just typed) and replaces it with a step that must be deliberately taken
+(click "Show all" to check). At volume this is a confidence tax, not a keystroke tax, but it is real:
+a clerk who has just done the single highest-leverage batch action on this page gets an emptied
+table as the reward.
+
+**OBSERVED, gesture trace 2 — row-by-row typing down a filtered column, my seat's more typical
+case (a plan set with a unique value per row, not one broadcast value).** Each committed cell fires
+`afterPropertyEdit()` → `refreshPaneIfOpen()` → `renderPaneTable()` (`:47169`, `:23634` and
+similar), i.e. the SAME full-rebuild-on-signature-change path, once per row, not once per batch.
+Filtering "no roughness" and then typing a real, distinct roughness into each visible row in turn:
+committing row 3's value removes row 3 from the table NOW, and every row below it shifts up one
+position. **If the clerk's own next move is Down-arrow (relative position) rather than re-reading
+the ID column, they land on what was row 4, now sitting in row 3's old screen position, having just
+watched row 3 vanish** — this is disorientation with a real error mode (typing the next intended
+value into the wrong element, or re-typing over a row already done, if attention lapses even once
+in 100+ repetitions). **This is the closer match to Tom's own sentence** ("I edit that value... the
+row disappears") and it is the one place the standing filter genuinely fights the arithmetic my seat
+exists to name: not more keystrokes, but a shifting target under a keystroke that assumed a stable
+one.
+
+### External patterns, both verified this session, both already implicitly cited in Tom's own message
+
+**CITED** Excel's own AutoFilter, per Microsoft's own support documentation and independently
+confirmed by contextures.com and ablebits.com (all retrieved 2026-09-28): *"When you edit or delete
+data in filtered cells, Excel AutoFilter does not update automatically to reflect the changes... To
+re-apply the filter, click any cell within your dataset, and then click Reapply."* This is SNAPSHOT
+behavior by default: the row SET is fixed at the moment the filter runs (or was last reapplied), an
+edit that would now fail the filter leaves the row exactly where it is, and shrinking the view to
+the current truth is a SEPARATE, deliberate, named action ("Reapply") — never automatic, never tied
+to the filter dialog's open/closed state.
+(https://support.microsoft.com/en-us/excel/get-started/filter-data-in-a-range-or-table-in-excel,
+https://www.contextures.com/xlautofilter01.html)
+
+**CITED** QGIS's attribute-table "Feature Filter" control (per opensourceoptions.com's own
+walkthrough of the feature, retrieved 2026-09-28, matching the shape Tom's own message names): one
+of its modes is explicitly **"Show Edited and New Features"** — *"will show any features you have
+changed or added during an editing session... especially useful to double check your changes."*
+This is neither pure standing nor pure snapshot: it is a UNION of "still matches the filter" and
+"you touched this row since the filter was set," so an edited row never disappears mid-session no
+matter which way the edit pushed it, and the reader can deliberately ask to see exactly the rows
+they have been touching, as its own separate filter MODE alongside "show all," "show selected," and
+an advanced SQL filter.
+
+### My answer to "any other ideas": the union mode, not a toggle, and no new control
+
+Tom's proposed remedy is a toggle next to "Filter in table," defaulted on (standing), unticked for
+snapshot. **I recommend against a toggle as the primary fix and recommend the QGIS union shape
+instead, folded into the EXISTING "Filter in table" / "Show all" pair with no new control added.**
+Reasoning, from this seat specifically:
+
+1. **A toggle is a decision every filter now asks the clerk to make, and getting it wrong just
+   relocates today's surprise rather than removing it.** A first-time user of "Filter in table"
+   does not yet know the row-vanishing behavior exists, so they cannot yet know to flip a toggle to
+   avoid it — they hit the surprise once, THEN learn the toggle exists, which is the identical
+   discovery cost my second-invocation entry on the snap-on-create gap already named for a
+   different feature. A default that never needs the toggle touched removes the decision instead of
+   asking for it every time.
+2. **The union rule (row shown if it currently matches OR was edited since the filter was last
+   applied) fixes BOTH gesture traces above with no per-row and no per-session extra gesture.**
+   Trace 1 (Ctrl+Enter bulk fill): every filled row stays visible after the fill, showing exactly
+   the 100 populated cells the clerk just typed, which is the confirmation the current behavior
+   withholds. Trace 2 (row-by-row typing): a committed row stays in its screen position while the
+   clerk continues down the column, so Down-arrow keeps meaning "the next row I meant," and nothing
+   shifts under a keystroke already in flight.
+3. **The two existing buttons already say the two things a toggle would say, without a third
+   control.** "Filter in table" — clicked again, which a clerk finishing a batch already has reason
+   to do to check the count — is the Excel-style deliberate "Reapply," collapsing the view back to
+   only the rows that currently match (the now-compliant edited rows drop out on THIS click, which
+   is the moment the clerk is asking "how many are left"). "Show all" (`:23372-23377`, already
+   shipped) is the full escape hatch, unchanged. No standing-vs-snapshot STATE has to be named,
+   taught, or remembered per filter, because the behavior is uniformly "you never lose sight of a
+   row you just touched, and a deliberate reapply is always one click away, using a button already
+   on screen."
+4. **Cost of building this, honestly, is not mine to size** — it needs a small per-filter set of
+   "touched since filter" ids (`spec` already carries per-table state at `:22504-22518`, e.g.
+   `spec.sel`; an `spec.editedSinceFilter` object of the same shape is a small, precedented
+   addition) and a one-line OR in `paneTableElements()` (`:22590-22593`). I have not written or
+   tested this change; sizing it is implementation work outside my seat.
+
+**Where Tom's toggle idea is still right and I would keep it:** as a SEPARATE, opt-in escape for the
+rarer case where a clerk explicitly wants a frozen point-in-time report regardless of edits (e.g.,
+"show me what matched at 2pm, no matter what I do after") — that is a real, different job from
+volume data entry and deserves its own control if anyone asks for it, but it should not be the
+DEFAULT gate a first-time filter user has to discover before their first bulk fill is safe.
+
+— Declan

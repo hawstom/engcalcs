@@ -11,8 +11,10 @@
         "a legend/index explaining what each toolbar icon means (the intended reading, per the code comment)",
         "a keyboard shortcut for the toolbar (the reading suggested by every other 'key' string on this page)"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_help_icons']='Toolbar legend, Key to the toolbar icons, What each toolbar icon means | avoid: a keyboard key or shortcut';"
+      "disposition": "intent",
+      "resolution": "Written to $ec_lang_syn on Tom's 2026-09-28 answer (human_answer), in his edited wording.",
+      "human_answer": "@@ NEEDS RULING Approved: 'Toolbar legend, Key to the toolbar icons, What each toolbar icon means, Toolbar help, Toolbar | avoid: a keyboard key or shortcut'",
+      "human_answered": "2026-09-28"
     },
     {
       "key": "lpn_georef_rotation",
@@ -35,8 +37,10 @@
         "a sub-heading meaning 'settings that apply to both nodes and links' (the intended meaning)",
         "a 'select all' or 'show all' action/filter control, as elsewhere in list/filter UIs"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_settings_sym_all']='All labels, Both node and link labels | layout: sub-heading; avoid: select all, show all (a command)';"
+      "disposition": "intent",
+      "resolution": "Written to $ec_lang_syn on Tom's 2026-09-28 answer (human_answer), in his edited wording.",
+      "human_answer": "@@ NEEDS RULING Edited: 'For all labels | layout: sub-heading; avoid: select all, show all (a command)'",
+      "human_answered": "2026-09-28"
     },
     {
       "key": "lpn_scenario_push_tip",
@@ -47,8 +51,10 @@
         "the properties currently turned on as map labels in the Labels panel (correct, per the code)",
         "the properties whose form-field captions happen to be visible in whatever panel is open right now"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_scenario_push_tip']='labels here = the map labels (Settings, Symbology, Labels) | avoid: the captions of form fields';"
+      "disposition": "intent",
+      "resolution": "Written to $ec_lang_syn on Tom's 2026-09-28 answer (human_answer), in his edited wording.",
+      "human_answer": "@@ NEEDS RULING Edited: 'labels here = the map labels (Settings, Symbology, Labels) | avoid: the captions of form fields'. Maybe the word \"for\" is what you needed. Your avoid is pretty much impossible. A label is a label. The key here is for every language to invent unique words for each interface element and to use them consistently.",
+      "human_answered": "2026-09-28"
     },
     {
       "key": "lpn_labels_priority_node_tip",
@@ -59,8 +65,10 @@
         "the node whose elevation or head value is numerically closest to (least different from) its neighboring nodes' values",
         "the node that most resembles its neighboring nodes in kind or role"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_labels_priority_node_tip']='more like neighboring nodes = numerically closer to the neighbors' values | avoid: similar in kind';"
+      "disposition": "intent",
+      "resolution": "Written to $ec_lang_syn on Tom's 2026-09-28 answer (human_answer), in his edited wording.",
+      "human_answer": "@@ NEEDS RULING Again, I have my doubts about the veracity and utility of these avoids. But I trust your judgement. Approved.",
+      "human_answered": "2026-09-28"
     },
     {
       "key": "lpn_settings_sec_symbology",
@@ -83,8 +91,10 @@
         "the comparison operator 'greater than' (correct, matches lpn_find_op_lt's counterpart 'below'/'less than')",
         "a spatial/directional word meaning physically above, especially plausible for a property like elevation"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_find_op_gt']='greater than, more than, over, exceeding | avoid: spatially above, higher on the map';"
+      "disposition": "intent",
+      "resolution": "Written to $ec_lang_syn on Tom's 2026-09-28 answer (human_answer), in his edited wording.",
+      "human_answer": "@@ NEEDS RULING Edited: 'greater than, more than, exceeding | avoid: spatially above, higher on the map'",
+      "human_answered": "2026-09-28"
     },
     {
       "key": "lpn_find_op_lt",
@@ -95,8 +105,10 @@
         "the comparison operator 'less than' (correct, pairs with lpn_find_op_gt's 'greater than')",
         "a spatial/directional word meaning physically below"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_find_op_lt']='less than, under | avoid: spatially below, lower on the map';"
+      "disposition": "intent",
+      "resolution": "Written to $ec_lang_syn on Tom's 2026-09-28 answer (human_answer), in his edited wording.",
+      "human_answer": "@@ NEEDS RULING Edited: 'less than | avoid: spatially below, lower on the map'",
+      "human_answered": "2026-09-28"
     },
     {
       "key": "lpn_reaction_pipe_tip",

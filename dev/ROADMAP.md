@@ -1,7 +1,22 @@
 # Roadmap
 
 Open tasks for the EngCalcs hydraulic calculator suite. **Format: `Priority|ID| Description`.** One
-flat list, highest priority first, lowest ID first inside a band. `# Reference` at the foot holds the
+flat list, highest priority first, lowest ID first inside a band. `- 75|739| **Say where each setting is saved: the project or this browser.**
+  Tom, 2026-09-28, on learning dragged column widths live in the browser: *"Systematically disclose to users where things are stored. Autodesk does this so well that I, a user can cite by memory that variables are stored in the drawing (project), session, or user profile. Every sysvar listing includes 'Where it's stored.'"* Also *"Maybe include Width in the manage columns box with a tip glyph as a secondary discovery path"*, and a delayed tip on the column dragger (never on a phone). The inventory is `dev/cookie-storage-inventory.md`; CLAUDE.md already splits project vs browser settings.
+- 50|740| **One sentence for the node-size cap, not three fragments.**
+  Sprint 2026-09-28-delta: five languages (it, he, ur, my, am) could not assemble
+  lpn_settings_symbol_cap + _mid + _post around two number inputs in their word order. One key with
+  {n} and {p} placeholders, split into inputs at render time.
+- 75|741| **The infinite map: generated networks for the label bench.**
+  Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
+  networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
+  utility-scale networks. Notes: dev/paper-notes-label-placement.md.
+- 75|742| **Fire-flow design check: None, All, or Selected junctions.**
+  Tom, 2026-09-28: *"What would Mary and Sue think about changing the Fire flow analysis design check
+  selector to offer None, All, and Selected?"* Both said yes (journals, same day): the middle option is
+  redundant with a blank criterion box, and a named subset is how appendices and InfoWater/WaterGEMS
+  scope it. Mary's vendor quotes are from search snippets; verify before citing.
+# Reference` at the foot holds the
 standing prose that is not a task.
 
 | Priority | Means |
@@ -1667,6 +1682,19 @@ the block.
   *"Do we have a way of knowing whether people are installing?"* No: `appinstalled` only hides the
   button (`js/Calculators.lib.js:195`). One install event plus an app/tab field on view rows would
   answer it; it is a new logged fact about visitors, so it goes past `consent_body` and him first.
+- 75|737| **Coined names for interface elements, so every language names each one once.**
+  Tom, 2026-09-28: *"The key here is for every language to invent unique words for each interface
+  element and to use them consistently... it might be handy to literally make up unique, but memorable
+  keys"*, e.g. a Sally (symbology annotation label). Later the same day: *"a keywords table where
+  we are less concerned about what key you assign to each row as that they be unique and canonical"*
+  (dynamic asset annotation = Label, asset management key = Tag, asset notes = Description, user map
+  annotation = Text, z = Elevation, y = depth, p = pressure, total potential = Head/HGL, energy = EGL).
+  Plan: re-key glossary.json by concept (id + definition), English one rendering among 27; keys cite
+  it with the existing `gloss:` tag.
+- 75|738| **A Find filter that stays standing, or a snapshot, by the visitor's choice.**
+  Tom, 2026-09-28: editing a filtered value out of the filter makes its row vanish. His proposal: a
+  standing filter while the Find box is open, with a toggle next to Filter in table to make it a
+  snapshot. Declan's and Ida's readings go in their journals first.
 # Reference
 
 Standing prose that is not a task. It was the body of the old category sections.

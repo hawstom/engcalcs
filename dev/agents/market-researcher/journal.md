@@ -2259,3 +2259,171 @@ session — that is a housekeeping note, not a defect in anything published.
 
 — Mary
 </content>
+
+## 2026-09-28 — is "show all the labels" audacious, done, or impossible? (Task from Tom's paper-notes question)
+
+Tom's question, via `dev/paper-notes-label-placement.md`: is trying to place every requested
+label, with as many of its values as fit, on a live pannable/zoomable network map "foolishly
+audacious," already done well somewhere, or known-impossible. Verdict first: **it is genuinely
+unusual as a stated goal and not achieved as a shipped default anywhere I found, but "impossible"
+is the wrong word for what is actually a proven-hard optimization problem that the whole field
+responds to by giving up on completeness, not by proving completeness itself is unreachable** —
+Tom is a fool only in the sense that most of the field agreed decades ago to stop trying what he
+is trying, not in the sense that it can't be tried.
+
+**CITED, Formann & Wagner, "A packing problem with applications to lettering of maps," Proc. 7th
+ACM Symposium on Computational Geometry, pp. 281-288 (1991)**, and **CITED, Marks & Shieber (1991)
+/ Christensen, Marks & Shieber, "An empirical study of algorithms for point-feature label
+placement," ACM Transactions on Graphics 14(3), 1995** (https://dl.acm.org/doi/10.1145/212332.212334,
+PDF at https://www.eecs.harvard.edu/~shieber/Biblio/Papers/tog-final.pdf): both independently prove
+point-feature label placement (deciding whether N labels can ALL be placed without overlap) is
+NP-hard, and both papers' whole contribution is heuristics (simulated annealing, greedy, gradient
+descent) that accept dropping labels rather than solving the decision problem exactly. This is the
+field's founding move: "show every label" was posed and then abandoned as a target within the same
+papers that proved it hard, in 1991-1995, for STATIC maps. This is the strongest evidence for
+"audacious" — the standard response to the problem Tom is attacking was set 30+ years ago and it
+was retreat, not victory.
+
+**CITED, Kakoulis & Tollis, "Algorithms for the multiple label placement problem," Computational
+Geometry 35(3), pp. 143-161 (2006)**, https://www.sciencedirect.com/science/article/pii/S0925772106000344,
+PDF at https://core.ac.uk/download/pdf/82103495.pdf: explicitly notes that most labeling literature
+places one label per feature, and that "very little work has been directed towards positioning
+multiple labels per graphical feature" — i.e. our multi-row-per-node problem (ID, elevation,
+demand, pressure stacked at one node) is even less studied than the single-label problem the 1991
+papers attacked. This narrows "audacious" further: not just "show all labels" but "show all labels
+AND as many of their several fields as fit" sits in a corner of the literature nobody has worked
+hard.
+
+**CITED, Been, Daiches & Yap, "Dynamic map labeling," IEEE TVCG 12(5), 2006 (the "consistent
+dynamic map labeling" desiderata paper)**, and its 2014 sequel **Gemsa, Nöllenburg, Rutter,
+"Approximation Algorithms on Consistent Dynamic Map Labeling," https://link.springer.com/chapter/10.1007/978-3-319-08016-1_16**,
+plus **Gemsa, Nöllenburg, Rutter, "Sliding labels for dynamic point labeling," CCCG'11, pp. 205-210**
+(found via search, not yet PDF-verified — re-check before quoting in a paper): this is the branch
+closest to our zoom/pan problem (labels appearing/disappearing consistently across a continuous
+zoom range, "active ranges"), but its own framing is which labels are SHOWN or HIDDEN at each zoom,
+never all of them with degraded content — it optimizes selection and stability, not completeness.
+No paper found that treats "show 100% of labels, drop only ROWS within a label" as the frame our
+bench scores; the row-dropping design (drop properties before the label itself) appears to be ours
+alone in what I found. **This is a gap-in-the-literature finding (I looked and found nothing), not
+proof no one has done it.**
+
+**CITED, ArcGIS Pro documentation, "Force the placement of all labels in a label class"**
+(https://pro.arcgis.com/en/pro-app/latest/help/mapping/text/force-the-placement-of-all-labels-in-a-label-class.htm):
+Maplex has a literal "Never remove (place overlapping)" option that places every label even in
+conflict — this is the closest a shipping product comes to "show all labels," and it is presented
+as a caveated escape hatch ("use with caution... no guarantee the labels won't overlap"), not a
+default and not a values-fit-or-drop scheme. It does not restore/adapt on zoom (Pro isn't
+continuously zoom-driven the way a web map is) and it does not selectively drop VALUES within a
+label — it is whole-label-or-nothing, with the "or nothing" turned off. **CITED, QGIS PAL engine,
+"Show all labels (including colliding labels)"** (per Google Groups thread and QGIS docs,
+https://groups.google.com/g/australian-qgis-user-group/c/6VeOBLKs_7g,
+https://docs.qgis.org/3.10/en/docs/user_manual/style_library/label_settings.html): same shape —
+an opt-in override that accepts overlap rather than an algorithm that finds room. Neither product
+tries the "use available space, then drop by priority order, then restore on zoom" strategy our
+rules describe; both offer only "hide the loser" (default) or "show and let it collide" (opt-in).
+
+**Water-network tools, no finding either way, CITED as absence-of-evidence**: searched EPANET's
+own docs (https://usepa.github.io/EPANET2.2/7_map.html — its Notation/Map Options pages describe
+WHAT can be labeled, not HOW conflicts are resolved) and Bentley WaterGEMS/WaterCAD docs
+(https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/GUID-0E9E41B41B6E47B28DD6058E80B1C66A.html)
+and found no documented collision-resolution behavior at all for either — practitioner habit,
+per the docs and forum threads (Bentley Communities symbology threads),
+is apparently to turn multi-attribute annotation ON only at high zoom or for a filtered subset,
+and to read multi-value data from a FlexTable/attribute table instead of the map. I could not find
+a single water-hydraulics-specific source describing an automatic multi-label placement engine
+for a pipe network map; InfoWater, Synergi and KYPipe searches returned nothing on label placement
+at all (their docs are paywalled/behind product logins, not indexed). This is the strongest support
+for Tom's instinct in the domain that matters to him: the tools he competes with, as far as public
+documentation shows, do not attempt this and instead push the user toward the table.
+
+**Verdict, restated for the paper**: not impossible in the sense Tom should fear (NP-hardness is
+about EXACT optimality of the decision problem — "can all N labels be placed with zero overlap" —
+which is a different question from "can a good heuristic show almost all labels with priority-
+ordered value dropping," which is exactly what 1991-2020s heuristic literature exists to attempt
+and what ArcGIS/QGIS's opt-in overlap modes gesture at without really solving). It is audacious
+in that: (a) the founding papers of the field chose retreat (drop labels) over this fight three
+decades ago and the mainstream never revisited that choice for STATIC maps, (b) the dynamic/zoom
+branch of the field optimizes label SELECTION across zoom, not row-level degradation within a
+still-fully-present label, and (c) no domain-specific water-network tool's public documentation
+describes trying it at all. Where our result would sit: not a rediscovery (nobody file-and-forget
+solved this the same way), most plausibly INCREMENTAL on the label-placement literature generally
+(new heuristic in a hard-but-well-trodden problem family) but potentially NOVEL specifically on the
+row-level-value-dropping-with-restore-on-zoom-in mechanic, which I could not find precedent for
+anywhere, academic or commercial. That novelty claim needs a real literature search pass (a
+university-library database search, not web search snippets) before it goes in a paper — what I
+have here is "I looked on the open web and did not find it," which is real but weaker than a
+systematic review.
+
+**Not yet verified, flag before quoting**: the exact venue/page details for Gemsa/Nöllenburg/
+Rutter's CCCG'11 sliding-labels paper and the Been/Daiches/Yap original TVCG citation year came
+from search-engine summaries, not from opening the PDFs myself — re-fetch and confirm before either
+goes in front of a journal editor.
+
+— Mary
+
+## 2026-09-28 — Fire flow design-check selector: None/All/Selected? (Tom's question)
+
+**OBSERVED**, `js/looped-network.js:53976-53980,53998-54008`: today's box has two separate
+three-way-shaped controls. "Junctions to test" (`boxes.scope`) is already All/Selected
+(`lpn_ff_scope_all` / `lpn_ff_scope_selected`) — which junctions get a fire flow drawn on them.
+"Design check (effect on system)" (`boxes.design`) is Off/Nodes/All
+(`lpn_ff_design_off` / `lpn_ff_design_nodes` / `lpn_ff_design_all`) — whether the rest of the
+network is watched for collateral pressure/velocity damage while a fire flow is drawn, and if so,
+whether pipes are watched too. There is no way today to name a SUBSET of junctions/pipes for the
+design check the way there already is for which junctions get tested. Tom's proposed None/All/
+Selected would give the design check the same scope-picking shape the demand side already has,
+replacing the nodes-vs-nodes+pipes split with a user-chosen element set.
+
+**Outward look, verified.**
+
+**CITED**, Bentley WaterGEMS/WaterCAD "Fire Flow Analysis" docs (search-engine cache of
+docs.bentley.com/.../GUID-C6BF82B2-253F-4845-B60F-718A63FB1F8F.html; direct fetch blocked by
+network policy in this session, so treat as a snippet, not a full read): fire flow can be run for
+"a single node, a group of selected nodes, or all nodes." Collateral-effect pressure has THREE
+separate named constraints, not one collapsed switch: Residual Lower Limit (the hydrant itself),
+Zone Lower Limit (all junctions in a named zone), and System Lower Limit (any junction in the
+entire system) — each is its own field, left blank to not apply it. Velocity gets an explicit
+boolean, "Use Velocity Constraint" (true/false), separate from the numeric limit itself.
+
+**CITED**, Innovyze/Autodesk InfoWater Pro "Fireflow" help (help.innovyze.com/display/infowaterpro/
+Fireflow; help.autodesk.com/cloudhelp/ENU/INFWP-UserGuide GUID-7019401E; same network-block caveat,
+search-cache only): the velocity constraint carries a scope dropdown with exactly three values —
+**"No Pipes," "Connecting Pipes" (adjacent to each hydrant), "Entire Network" (all pipes)** — this
+is structurally the None/All/(narrower-set) shape Tom is proposing, already shipping in a
+competitor, though "Connecting Pipes" is automatic-by-adjacency, not a user-picked selection set the
+way our "Selected junctions" is.
+
+**CITED**, IFC Appendix B (up.codes mirror, multiple jurisdictions/years) and AWWA M31 (summarized
+via FRWA whitepaper and GlobalSpec listing, not the manual itself — flag before quoting AWWA's exact
+words): both anchor the CODE-REQUIRED check on the hydrant's OWN residual pressure at 20 psi. Neither
+source surfaced a code-mandated check of pressure at *other* junctions or of pipe velocity anywhere
+in the system — those are WaterGEMS/InfoWater's own added engineering checks (system-impact /
+zone-impact analysis), not something IFC or AWWA M31 requires be run at all. So "design check" in
+this suite's sense is already past what code requires; the fire code alone gives no opinion on
+whether None/All/Selected is the right shape for it.
+
+**Did not find**: any vendor doc, forum thread, or paper describing a user deliberately setting an
+extreme pressure/velocity threshold to neutralize a check without turning it off — Tom's "easy A"
+observation is his own inference, not something corroborated outside this repo. What I did find cuts
+the other way: both competitors give an EXPLICIT off state per constraint (a blank field, a
+false boolean) that does not depend on the threshold's own value, which is exactly the shape that
+makes threshold-gaming unnecessary — it's a "why give a user a reason to reach for a workaround"
+argument, not "here is proof they do."
+
+**Verdict for the message to Tom (≤200 words, sent as-is):**
+
+"None/All/Selected is the right shape, and the deciding reason is that both WaterGEMS/WaterCAD and
+InfoWater Pro already separate two questions your design check collapses into one field: 'is this
+constraint checked at all' (an explicit off — WaterGEMS leaves the limit blank, InfoWater's velocity
+toggle is a boolean) and 'which elements is it checked against' (WaterGEMS: zone vs. system vs. a
+selected junction; InfoWater's velocity scope literally offers No Pipes / Connecting Pipes / Entire
+Network — the same three-tier shape you're proposing). Neither vendor relies on a user typing an
+absurd threshold to disable a check; they give a real off switch instead. So 'set pressure to 0 or
+velocity to 999' is a workaround our current off/nodes/all scheme invites because it can't name a
+subset — not something I found users of the competing tools doing, because their tools don't force
+the choice. Recommend: keep an honest 'None,' keep 'All' as today's broadest option, and add
+'Selected' meaning a user-chosen set of junctions and pipes, matching the shape 'Junctions to test'
+already has. Neither IFC Appendix B nor AWWA M31 requires this collateral check at all — it's
+already beyond code, so the fire code gives no argument against reshaping it."
+
+— Mary

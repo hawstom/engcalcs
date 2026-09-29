@@ -506,4 +506,40 @@ reasoning and citations: journal entry 2026-09-26 (night), Q2.
   a stray newline character can't slip into the committed value first. Low effort, cheap to check
   with the existing `dev/lpn-spike/` harness style, worth doing before Tom's browser pass rather
   than after a report comes in from a LibreOffice-habituated tester.
+
+## 12. Before the label-placement paper claims novelty, do a real database search — web search is not enough
+
+2026-09-28, answering Tom's "how bad a fool am I" question (full sourcing in the journal entry this
+date). The open-web search I could run is enough to establish the SHAPE of the field (NP-hard since
+1991, dynamic-labeling branch optimizes selection-across-zoom not row-level degradation, multi-label-
+per-feature is itself under-studied per Kakoulis & Tollis 2006, no commercial GIS or water-network
+tool's public docs describe trying "show all, drop rows, restore on zoom in") — but it is not enough
+to certify "nobody has done the row-dropping mechanic," because web search under-indexes exactly the
+venues (GIS Science conference proceedings, cartography journals, Esri/Bentley internal engineering
+blogs) most likely to contain a prior attempt. **Recommendation: before "novel" appears in a paper
+draft, run one real pass through a citation database** (Google Scholar cited-by chains from Formann &
+Wagner 1991 and Christensen/Marks/Shieber 1995 forward, and ACM Digital Library / IEEE Xplore full-text
+search for "label" + "drop" + "restore" or "degrade") **rather than relying on this session's web
+search snippets.** Cost: a few hours, and it is the single thing standing between "I looked and found
+nothing" (what I have) and "there is nothing" (what a paper needs). Ranked here because it is cheap,
+directly requested by Tom, and the paper's strongest selling point (audacity that pays off) is exactly
+the claim most likely to be wrong if skipped.
+</content>
+
+## Fire flow design check: add "Selected" scope, matching InfoWater's own precedent
+
+2026-09-28, answering Tom's question about `boxes.design` (off/nodes/all,
+`js/looped-network.js:54002-54006`). **CITED**, Innovyze/Autodesk InfoWater Pro Fireflow help
+(help.innovyze.com/display/infowaterpro/Fireflow; help.autodesk.com/cloudhelp/ENU/INFWP-UserGuide
+GUID-7019401E — search-cache only, direct fetch blocked by network policy this session, re-verify
+before quoting to Tom as final): its velocity constraint already ships a three-way scope selector,
+"No Pipes / Connecting Pipes / Entire Network." That is the same None/All/(narrower-set) shape Tom
+is proposing for our design check, already live in a named competitor — so this is not a novel UI
+idea, it is catching up to a shape the market already validated. **CITED**, Bentley WaterGEMS/
+WaterCAD Fire Flow Analysis docs (same caveat): pressure constraints separate "is it checked" (a
+blank field = off) from "which elements" (Residual/Zone/System, three distinct named scopes) —
+further evidence that collapsing on/off and scope into one field, as our current off/nodes/all
+does, is the odd one out. Ranked below the label-placement and epanet-plus-plus items because it is
+a single control's option set, not a structural gap — but it is a real, cheap fix with two
+citations already in hand, not a guess.
 </content>
