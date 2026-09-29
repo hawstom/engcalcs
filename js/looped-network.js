@@ -21608,9 +21608,17 @@ var EngCalcs = EngCalcs || {};
 			label: function () { return (EngCalcs.pageConfig || {}).lpn_tool_vertices || 'Vertices'; },
 			// The heading says which number comes first, as the clerk's spec requires: a reader
 			// should never have to open a popup to learn the order of a cell.
+			// **TWO PAIRS, THEN THE ELLIPSIS, IN SHORT NAMES** (Tom, 2026-09-28: *"Vertices column
+			// heading: Change to 'Vertices (Lat/Lon|Lat/Lon|...)'"*): the second pair shows that
+			// `|` separates one vertex from the next, and the short names keep the heading narrow.
+			// Lat/Lon has its own short pair here rather than in axisNames(), whose short pair the
+			// status strip also reads and which on a lat/lon project stays the full words.
 			unitText: function () {
-				var n = axisNames();
-				return (n.firstShort || n.first) + '/' + (n.secondShort || n.second) + '|…';
+				var n = axisNames(), pc = EngCalcs.pageConfig || {}, pair;
+				pair = isLatLonProject()
+					? (pc.lpn_field_lat_abbr || 'Lat') + '/' + (pc.lpn_field_lon_abbr || 'Lon')
+					: (n.firstShort || n.first) + '/' + (n.secondShort || n.second);
+				return pair + '|' + pair + '|…';
 			},
 			get: function (l) {
 				return (l.verts || []).map(function (v) { return paneVertText(v, 1) + '/' + paneVertText(v, 2); }).join('|');
@@ -22843,8 +22851,10 @@ var EngCalcs = EngCalcs || {};
 	// future A/B test of KLmax=0.8."*).
 	//   PANE_WORD_MAX -- the longest word a heading keeps whole; a longer one may break at its
 	//     middle (below). 7 is R-356's "8 characters or longer split". `?colword=9` overrides it.
-	//   PANE_LINES_MAX -- KLmax: a heading may wrap to no more lines than this times the number of
-	//     characters on its longest line (paneLineRatioEm()). `?collines=0.8` overrides it.
+	//   PANE_LINES_MAX -- KLmax: a heading may wrap to no more lines than ceil(this times the
+	//     number of characters on its longest line) (paneLineRatioEm()). 0.8 (Tom, 2026-09-28:
+	//     *"I think that KLmax=1 is working ok. But let's change to KLmax=0.8."*); `?collines=1`
+	//     overrides it for an A/B look.
 	// Read once, from this page's own address, and only a sane number is taken.
 	function paneUrlNum(name, lo, hi) {
 		var m, v;
@@ -22853,7 +22863,7 @@ var EngCalcs = EngCalcs || {};
 		return (isFinite(v) && v >= lo && v <= hi) ? v : null;
 	}
 	var PANE_WORD_MAX = Math.round(paneUrlNum('colword', 3, 30) || 7);
-	var PANE_LINES_MAX = paneUrlNum('collines', 0.1, 10) || 1;
+	var PANE_LINES_MAX = paneUrlNum('collines', 0.1, 10) || 0.8;
 	// **"SPLIT INTO TWO PARTS", TAKEN LITERALLY:** a word longer than PANE_WORD_MAX is cut in half
 	// (the longer half first, for an odd length); nothing shorter is split at all. Returns the
 	// split INDEX (or -1 for "do not split"), the one number both the width calculation below and
@@ -22952,9 +22962,11 @@ var EngCalcs = EngCalcs || {};
 	// out for real in a hidden probe (the same `<th><button class="lpn-pane-sort">` the table uses,
 	// filled by paneHeadingFill(), so soft hyphens, the unit's own box and its `<wbr>`s all break
 	// exactly as they will on screen); its lines are counted, and the characters on its longest
-	// line. While there is more than one line and lines > KLmax x characters the width grows by PANE_LINES_STEP_EM and is tried
-	// again. This is the one way a UNIT can widen a column: "(Latitude/Longitude|…)" in a column
-	// sized for "Vert-" ran to nine lines of four or five letters each. It stops at the heading's
+	// line. While lines > ceil(KLmax x characters) the width grows (Tom, 2026-09-28: *"nlines <=
+	// ceil(KLmax * max line characters)"* -- the ceil is what lets a one-letter "X" meet 0.8) by
+	// PANE_LINES_STEP_EM and is tried again. This is the one way a UNIT can widen a column: the old
+	// "(Latitude/Longitude|…)" in a column sized for "Vert-" ran to nine lines of four or five
+	// letters each. It stops at the heading's
 	// own one-line width, where the rule cannot fail (one line, at least one character).
 	// Returns the heading width that complies (>= `em`), or `em` itself with no DOM to measure.
 	var PANE_LINES_STEP_EM = 0.2;
@@ -23009,9 +23021,7 @@ var EngCalcs = EngCalcs || {};
 			while (w < full && guard++ < 200) {
 				btn.style.width = w + 'em';
 				n = paneLineCount(btn);
-				// One line is not a wrap: the rule is about what wrapping does (KLmax < 1 would
-				// otherwise fail every one-letter heading, "X", at any width).
-				if (n.lines <= 1 || n.lines <= PANE_LINES_MAX * n.chars) { break; }
+				if (n.lines <= Math.ceil(PANE_LINES_MAX * n.chars)) { break; }
 				w = Math.round((w + PANE_LINES_STEP_EM) * 100) / 100;
 			}
 			w = Math.min(Math.max(w, em), Math.max(full, em));

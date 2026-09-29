@@ -254,7 +254,7 @@ console.log('\n--- 5. the Vertices cell, per the clerk\'s vertex spec ---');
 {
 	const cols = L.headings('pipes');
 	const vh = cols.filter((c) => c.key === 'verts')[0];
-	report(!!vh && vh.h === 'Vertices (X/Y|…)', 'the Pipes table has a Vertices column whose heading states the order', vh && vh.h);
+	report(!!vh && vh.h === 'Vertices (X/Y|X/Y|…)', 'the Pipes table has a Vertices column whose heading states the order', vh && vh.h);
 	const keys = cols.map((c) => c.key);
 	function pipeRow(o) { return keys.map((k) => (o[k] === undefined ? '' : String(o[k]))).join('\t'); }
 	let r = L.pasteAppend('pipes', pipeRow({ id: 'P4', from: 'N1', to: 'N3', verts: '0/100/50/120' }));
@@ -290,7 +290,7 @@ console.log('\n--- 5. the Vertices cell, per the clerk\'s vertex spec ---');
 	const gh = L.headings('junctions');
 	report(gh[1].h === 'Latitude' && gh[2].h === 'Longitude', 'a geographic project reads Latitude, Longitude', gh[1].h + ', ' + gh[2].h);
 	const vcol = L.headings('pipes').filter((c) => c.key === 'verts')[0];
-	report(vcol && vcol.h === 'Vertices (Latitude/Longitude|…)', '...and so does the Vertices heading', vcol && vcol.h);
+	report(vcol && vcol.h === 'Vertices (Lat/Lon|Lat/Lon|…)', '...and so does the Vertices heading', vcol && vcol.h);
 	const gkeys = L.headings('pipes').map((c) => c.key);
 	pasteIntoEmpty('pipes', gkeys.map((k) => ({ id: 'GP', from: 'G1', to: 'G2', verts: '40.7135/-74.0071/40.72/-73.99' })[k] || '').join('\t'));
 	report(L.cellText('pipes', 'GP', 'verts') === '40.7135/-74.0071|40.72/-73.99', 'the vertex cell reads back the typed latitude and longitude',

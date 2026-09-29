@@ -19,7 +19,7 @@
 //       because the new project has no curves to point at);
 //   (b) every example on the wall, solved as it opens, so every result column has content;
 //   (c) Net3 in German, for the long words;
-//   (d) Net3 at `?colword=9` and at `?collines=0.8`, the two A/B overrides.
+//   (d) Net3 at `?colword=9` and at `?collines=1`, the two A/B overrides.
 // It runs in three parts, one per harness file, because run_harnesses.sh gives each file 300 s:
 // this file is (a); pane-heading-rule-examples-harness.js is (b); pane-heading-rule-ab-harness.js
 // is (c) and (d). Each of those sets PANE_RULE_PART and requires this one.
@@ -41,9 +41,9 @@
 //      exactly one soft hyphen, at its middle; a word of WORD_MAX letters or fewer carries none.
 //      Rule 1's heading-word width is computed from that cap here, not read off the page.
 //   6. THE LINE-RATIO RULE (Tom, 2026-09-28: *"Don't wrap to cause n lines to be more than KLmax
-//      times n characters on longest line. Let's try KLmax=1"*): every WRAPPED heading's line count
-//      is at most KLmax (1, or `?collines=`) times the characters on its longest line (one line is
-//      not a wrap, or KLmax 0.8 would fail "X"). A column is
+//      times n characters on longest line."*, and later that day: *"nlines <= ceil(KLmax * max
+//      line characters) ... let's change to KLmax=0.8."*): every heading's line count is at most
+//      ceil(KLmax x the characters on its longest line), KLmax 0.8 or the page's `?collines=`. A column is
 //      allowed past rule 1's width only for this, and only minimally: 4px narrower, its heading
 //      would break the ratio.
 //   7. AN UNSET PULL-DOWN NEVER WIDENS ITS COLUMN (Tom, 2026-09-28, on "No ▾": *"This is
@@ -229,7 +229,7 @@ const MEASURE = ([panelId, slack, wordMax, kl]) => {
 			th.appendChild(cl);
 			const n2 = ratio(cl);
 			th.removeChild(cl);
-			narrowerBreaks = n2.lines > 1 && n2.lines > kl * n2.chars;
+			narrowerBreaks = n2.lines > Math.ceil(kl * n2.chars);
 		}
 		res.push({
 			lines: now.lines, lineChars: now.chars, btnW: btn.getBoundingClientRect().width, narrowerBreaks: narrowerBreaks, shyWrong: shyWrong,
@@ -256,7 +256,7 @@ function assertTable(label, report) {
 		ok(name + ': units whole on the label\'s line or on a line of their own, and unbroken where they fit', c.unitOk, c.unitNote);
 		ok(name + ': a word over the cap splits once, at its middle; none at or under it splits', c.shyWrong.length === 0,
 			c.shyWrong.join(', '));
-		ok(name + ': a wrapped heading has lines <= KLmax x characters on its longest line', c.lines <= 1 || c.lines <= KL * c.lineChars,
+		ok(name + ': lines <= ceil(KLmax x characters on its longest line)', c.lines <= Math.ceil(KL * c.lineChars),
 			c.lines + ' lines, longest ' + c.lineChars + ' characters, KLmax ' + KL);
 		if (c.key !== 'id' && !c.isBool) {
 			ok(name + ': the column is not held open past the rule (past rule 1 only for the line ratio, and minimally)',
@@ -275,7 +275,7 @@ function assertTable(label, report) {
 
 // The cap and the ratio the page under test is running at: the defaults, or what the run's URL
 // says. Set per run in main().
-let WORD_MAX = 7, KL = 1;
+let WORD_MAX = 7, KL = 0.8;
 async function measureAll(a, label, shots) {
 	let n = 0;
 	for (const t of TABS) {
@@ -397,11 +397,11 @@ async function main() {
 		} else if (PART === 'ab') {
 			runs = [{ lang: 'de', key: 'lpn_ex_net3_title' },
 				{ lang: null, key: 'lpn_ex_net3_title', q: 'colword=9', word: 9 },
-				{ lang: null, key: 'lpn_ex_net3_title', q: 'collines=0.8', kl: 0.8 }];
+				{ lang: null, key: 'lpn_ex_net3_title', q: 'collines=1', kl: 1 }];
 		}
 		for (const run of runs) {
 			const a = await Session.open(browser, run.lang || 'en');
-			WORD_MAX = run.word || 7; KL = run.kl || 1;
+			WORD_MAX = run.word || 7; KL = run.kl || 0.8;
 			const qs = [run.lang ? 'lang=' + run.lang : '', run.q || ''].filter(Boolean).join('&');
 			await a.goto('Looped-Network.php' + (qs ? '?' + qs : ''));
 			await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });

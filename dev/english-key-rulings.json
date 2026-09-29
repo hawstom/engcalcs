@@ -1265,6 +1265,16 @@
             "ruled": "2026-09-09",
             "answer": "OK"
         },
+        "lpn_field_lat_abbr": {
+            "on": "Lat",
+            "ruled": "2026-09-28",
+            "answer": "Tom, 2026-09-28: \"Vertices column heading: Change to 'Vertices (Lat/Lon|Lat/Lon|...)'\""
+        },
+        "lpn_field_lon_abbr": {
+            "on": "Lon",
+            "ruled": "2026-09-28",
+            "answer": "Tom, 2026-09-28: \"Vertices column heading: Change to 'Vertices (Lat/Lon|Lat/Lon|...)'\""
+        },
         "lpn_field_meter_count": {
             "on": "Number of services",
             "ruled": "2026-09-23",
