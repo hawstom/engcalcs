@@ -246,12 +246,14 @@ console.log('\n--- the boot path reopens exactly the three boxes, and nothing el
 	// it" -- the stub does not read the page's inline styles, so a box it has never touched reports
 	// an empty display, and asserting on the literal 'none' would have been asserting about the stub.
 	// **The four report boxes LEFT this list on 2026-09-08**, on Tom's word, and have a harness of
-	// their own: dev/lpn-spike/report-box-memory-harness.js.
+	// their own: dev/lpn-spike/report-box-memory-harness.js. **The Notes box LEFT it too, on
+	// 2026-09-28** ("Draggable non-hog box for Help, Notes. I need it open for my spreadsheet
+	// editing video.") -- it is now a standing reference box, restored open like the four reports,
+	// and has its own harness: dev/lpn-spike/notes-box-harness.js.
 	[['lpn_popup', 'the property popup -- an answer to a selection that is not restored'],
 	 ['lpn_new_panel', 'the New-project box -- a modal'],
 	 ['lpn_crsbox', 'the Coordinate system box -- a chooser off that modal'],
 	 ['lpn_ff_run_box', 'the fire-flow run dialog -- a modal'],
-	 ['lpn_notes_popup', 'the notes popover -- transient'],
 	 ['lpn_dialog', 'the confirm dialog -- a modal'],
 	 ['lpn_backdrop_target_panel', 'the backdrop target panel -- a transient chooser'],
 	 ['lpn_menu_popup', 'a pull-down']

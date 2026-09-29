@@ -126,6 +126,9 @@ const EC_LPN_FURNITURE = [
     'lpn_reportbox'   => 'position, size and openness of the EPANET run report box',
     'lpn_statusbox'   => 'position, size and openness of the Status report box (Task 716)',
     'lpn_fullbox'     => 'position, size and openness of the Full report box (Task 715)',
+    // The Notes box joined the standing-box shell on Tom's word (2026-09-28: *"Draggable non-hog
+    // box for Help, Notes."*) after being a centred, click-away-dismissed popover until then.
+    'lpn_notesbox'    => 'position, size and openness of the Notes box',
     // NOT a box POSITION like its neighbours, and it is furniture for the same reason they are:
     // whether somebody wants a progress dialog in front of them while a run goes is a fact about
     // the person at the screen. A colleague opening the file would otherwise inherit the answer.

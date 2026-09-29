@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**8 still to read on master**, of 321 untranslated keys, of 2149 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**16 still to read on master**, of 329 untranslated keys, of 2157 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -79,7 +79,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* Needs a $ec_lang_syn entry, which AI may not write without Tom's permission. Proposed: $ec_lang_syn['lpn_settings_sym_all']='All labels, Both node and link labels | layout: sub-heading; avoid: select all, show all (a command)';
   @@ NEEDS RULING
 
-## lpn_  (321, 8 to read @@ NEEDS RULING)
+## lpn_  (329, 16 to read @@ NEEDS RULING)
 
 - **`lpn_convas_cancelled`**
   > Nothing was converted. The copy is closed, and the original project is unchanged.
@@ -273,6 +273,9 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_field_text_all_zoom_tip`**
   > Keep this text on the drawing however far out you zoom. Untick it and the text hides with the other labels once the view is wider than the labeling threshold set under Map and page.
   _Ruled 2026-09-23: Default needs to be off. I see that you turned it on by default, and that already has caused me grief. Only a few texts would be privileged to have this on. Otherwise ok._
+- **`lpn_field_text_anchor`**
+  > Attached to
+  @@ NEEDS RULING
 - **`lpn_file_convert_as`**
   > Convert as…
   _Ruled OK 2026-09-25._
@@ -663,6 +666,12 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_pane_paste_bad_id`**
   > Row {row}: the ID {id} has a space or a quotation mark in it.
   _Ruled OK 2026-09-28._
+- **`lpn_pane_paste_customer_no_position`**
+  > Row {row}: a new Customer needs both {first} and {second}.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_customer_node_no_pipe`**
+  > Row {row}: node {id} has no pipe for a Customer to attach to.
+  @@ NEEDS RULING
 - **`lpn_pane_paste_here`**
   > Click here and paste rows from a spreadsheet to add them.
   _Ruled OK 2026-09-28._
@@ -678,6 +687,15 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_pane_paste_more`**
   > Rows with problems not shown here: {n}.
   _Ruled OK 2026-09-28._
+- **`lpn_pane_paste_no_anchor`**
+  > Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_customer_node`**
+  > Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.
+  @@ NEEDS RULING
+- **`lpn_pane_paste_no_customer_ref`**
+  > Row {row}: a new Customer needs a connected pipe or node.
+  @@ NEEDS RULING
 - **`lpn_pane_paste_no_ends`**
   > Row {row}: a new link needs a From node and a To node.
   _Ruled OK 2026-09-28._
@@ -687,6 +705,9 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_pane_paste_no_node`**
   > Row {row}: node {id} does not exist yet. Paste your nodes first, then your links.
   _Ruled OK 2026-09-28._
+- **`lpn_pane_paste_no_pipe`**
+  > Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.
+  @@ NEEDS RULING
 - **`lpn_pane_paste_no_position`**
   > Row {row}: a new node needs both {first} and {second}.
   _Ruled OK 2026-09-28._
@@ -708,6 +729,9 @@ is the one you meant. "The first one" is a complete answer.
 - **`lpn_pane_paste_same_ends`**
   > Row {row}: From and To are the same node.
   _Ruled OK 2026-09-28._
+- **`lpn_pane_paste_text_no_position`**
+  > Row {row}: a new Text needs both {first} and {second}.
+  @@ NEEDS RULING
 - **`lpn_pane_pasted_rows`**
   > Pasted {n} rows and added {created} of them to the network.
   _Ruled OK 2026-09-28._
@@ -1049,7 +1073,7 @@ is the one you meant. "The first one" is a complete answer.
 
 # Strings waiting on a branch
 
-**16 still to read**, of 19 new keys across 12 unmerged branch(es).
+**0 still to read**, of 3 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -1086,60 +1110,8 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/selection-set (`5fe5c2a7`) — adds no English strings
-
 ### fix/example-guard-harness (`b0cdf8d3`) — adds no English strings
 
-### fix/table-paste (`da7e63bc`) — 8 new, 8 to read @@ NEEDS RULING
+### fix/table-paste (`da7e63bc`) — adds no English strings
 
-- **`lpn_field_text_anchor`**
-  > Attached to
-  @@ NEEDS RULING
-- **`lpn_pane_paste_customer_no_position`**
-  > Row {row}: a new Customer needs both {first} and {second}.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_customer_node_no_pipe`**
-  > Row {row}: node {id} has no pipe for a Customer to attach to.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_no_anchor`**
-  > Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_no_customer_node`**
-  > Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_no_customer_ref`**
-  > Row {row}: a new Customer needs a connected pipe or node.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_no_pipe`**
-  > Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_text_no_position`**
-  > Row {row}: a new Text needs both {first} and {second}.
-  @@ NEEDS RULING
-
-### fix/tables-legend (`001893a9`) — 8 new, 8 to read @@ NEEDS RULING
-
-- **`lpn_field_text_anchor`**
-  > Attached to
-  @@ NEEDS RULING
-- **`lpn_pane_paste_customer_no_position`**
-  > Row {row}: a new Customer needs both {first} and {second}.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_customer_node_no_pipe`**
-  > Row {row}: node {id} has no pipe for a Customer to attach to.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_no_anchor`**
-  > Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_no_customer_node`**
-  > Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_no_customer_ref`**
-  > Row {row}: a new Customer needs a connected pipe or node.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_no_pipe`**
-  > Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.
-  @@ NEEDS RULING
-- **`lpn_pane_paste_text_no_position`**
-  > Row {row}: a new Text needs both {first} and {second}.
-  @@ NEEDS RULING
+### fix/tables-legend (`001893a9`) — adds no English strings

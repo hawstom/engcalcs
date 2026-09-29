@@ -481,8 +481,12 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE MORE EACH FOR THE WORLD-VIEW FIT AT STEP 1** (R-306). `mapgeoWorldFit()` centres the
 	// camera on the anchor -- 0 N 0 E -- and that anchor is a DOC point, so it comes through this
 	// door exactly as `zoomExtent()`'s own centring would have.
-	ok('inwardX has one definition and 38 call sites', count(/inwardX\(/g) === 39, count(/inwardX\(/g));
-	ok('inwardY has one definition and 39 call sites', count(/inwardY\(/g) === 40, count(/inwardY\(/g));
+	// **AND THREE MORE EACH FOR TEXT AND CUSTOMERS CREATING ROWS BY PASTE** (Tom, 2026-09-28):
+	// paneCreateFromPlan()'s label and customer branches convert a pasted row's typed position
+	// through this door exactly as a node's own does, and the customer branch's node-attachment
+	// lookup (customerAttachAtNode()) needs the same inward point to find the nearest pipe.
+	ok('inwardX has one definition and 41 call sites', count(/inwardX\(/g) === 42, count(/inwardX\(/g));
+	ok('inwardY has one definition and 42 call sites', count(/inwardY\(/g) === 43, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

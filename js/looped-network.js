@@ -4621,9 +4621,23 @@ var EngCalcs = EngCalcs || {};
 	// dashed, which elements are greyed out, which carry a halo, and what an open popup shows.
 	// A full rebuild rather than a targeted refresh, because a scenario switch can change every
 	// element on the map and the cost is one buildDom on a network of a few hundred elements.
+	//
+	// **THE POPUP STAYS OPEN, ON THE SAME ELEMENT, SHOWING THE NEW SCENARIO'S VALUES** (Tom,
+	// 2026-09-28: "Switching scenarios closes Properties" -- reported against R-369). It used to
+	// call closePopup() unconditionally, which this very comment's own second sentence ("what an
+	// open popup shows") already claimed a scenario switch would handle rather than discard. A
+	// scenario never deletes the element a popup is open on -- it only changes which overrides
+	// `effective()` resolves -- so there is nothing here an undo-style closePopup() needs to guard
+	// against (contrast restoreUndoSnapshot(), which really can make the popup's subject vanish).
+	// buildDom() throws every DOM element away and rebuilds fresh ones by id; refreshSelection()
+	// re-applies the selection highlight to the new elements exactly as it does after any other
+	// buildDom() (its own comment: "a selection naming something the rebuild no longer contains...
+	// has to go", which is a no-op here since nothing was removed), and refreshPopupIfOpen() then
+	// re-renders the popup's fields by the same id, reading whichever scenario is now active.
 	function applyScenarioChange() {
-		closePopup();
 		buildDom();
+		refreshSelection();
+		refreshPopupIfOpen();
 		refreshSymbolSizes();
 		refreshValueColors();
 		refreshScenarioStatus();
@@ -5679,11 +5693,14 @@ var EngCalcs = EngCalcs || {};
 			// its next label drag pulled somewhere the user did not put it. 0 is Off; 15, 30 and 45
 			// are the increments he named. See EngCalcs.lpnGeom.snapLeaderOffset() for the magnet.
 			leaderSnapDeg: 0,
-			// One of LEGEND_POSITIONS' keys below. On a pointer the corner is the original hardcoded
-			// CSS's, top right; **ON A PHONE THE TWO LEGENDS SWAP INTO THE TOP CORNERS** -- Tom,
-			// 2026-08-25: "527 on phone, color legend upper right and label legend upper left."
-			// See the colour key's own key below for why this is a DEFAULT and not an override.
-			legendPosition: smallScreen() ? 'top-left' : 'top-right',
+			// One of LEGEND_POSITIONS' keys below. **TOP LEFT ON EVERY SCREEN** (Tom, 2026-09-28:
+			// "New project: Put Node labels legend at top left"), which also matches what a phone
+			// already opened to -- Tom, 2026-08-25: "527 on phone, color legend upper right and
+			// label legend upper left." See the colour key's own key below for why this is a
+			// DEFAULT and not an override, and legendInsetFor()/overlayOccupants() for why this
+			// corner already dodges the message-log column and the zoom chip that also live here
+			// rather than colliding with them.
+			legendPosition: 'top-left',
 			// ---- colour by value (Task 384) ----
 			// FLAT KEYS, not one nested `colors` object: applySaved() merges with a TOP-LEVEL
 			// Object.assign and hand-lists the three nested objects it merges a level deeper, so a
@@ -5769,14 +5786,17 @@ var EngCalcs = EngCalcs || {};
 		fill('diameter', niceDefault('lpn_u_diameter', 'in', 4, 0.1));
 		fill('roughness', 100);
 		fill('k', 2);
-		// A TANK'S FOUR NUMBERS ARE ALL VERTICAL DISTANCES IN THE ELEVATION/HEAD UNIT, the vessel
-		// diameter included -- EPANET's own convention, and the one that catches people out, since
-		// a PIPE diameter two rows up is in inches or millimetres. The numbers describe an ordinary
-		// municipal storage tank, roughly 15 m across and 9 m tall, about two-thirds full.
+		// A TANK'S THREE LEVELS ARE VERTICAL DISTANCES IN THE ELEVATION/HEAD UNIT, EPANET's own
+		// convention. **THE VESSEL DIAMETER IS NOT ONE OF THEM** (CLAUDE.md: "Tank diameter is in
+		// the LENGTH unit, pipe diameter in millimetres") -- it is a horizontal distance across the
+		// tank, not a head, and printing it with a head suffix ("ft H2O") is the defect a pre-review
+		// pass caught. Nor is it the PIPE diameter unit two rows up (inches/millimetres). The
+		// numbers describe an ordinary municipal storage tank, roughly 15 m across and 9 m tall,
+		// about two-thirds full.
 		fill('tankLevel', niceDefault('lpn_u_elevhead', 'fth2o', 20, 6));
 		fill('tankMinLevel', 0);
 		fill('tankMaxLevel', niceDefault('lpn_u_elevhead', 'fth2o', 30, 9));
-		fill('tankDiameter', niceDefault('lpn_u_elevhead', 'fth2o', 50, 15));
+		fill('tankDiameter', niceDefault('lpn_u_length', 'ft', 50, 15));
 	}
 
 	// User-supplied backdrop image. Deliberately NOT part of `doc`/the undo-snapshotted document:
@@ -10119,8 +10139,8 @@ var EngCalcs = EngCalcs || {};
 	 * wants a field of its own name makes a custom property. Nothing here is born holding either:
 	 * an absent description and an absent tag are what every other element is born with.
 	 */
-	function addCustomer(x, y, attach) {
-		var id = mintId(LPN_ID_KEY.meter), c, l = (attach && linkById(attach.link)) || null, t;
+	function addCustomer(x, y, attach, wantId) {
+		var id = wantId || mintId(LPN_ID_KEY.meter), c, l = (attach && linkById(attach.link)) || null, t;
 		// **`x`/`y` IS WHERE THE METER GOES, AND THE STATION IS DERIVED FROM IT WHEN THE CALLER
 		// DOES NOT STATE ONE.** That is the placement gesture's ordinary case: the second press
 		// names the PIPE, and where along the pipe the service lands is the nearest point on it to
@@ -21813,6 +21833,14 @@ var EngCalcs = EngCalcs || {};
 			set: function (n, v) { setProp(n, 'initQuality', v); } };
 	}
 	function paneUnitElevHead() { return 'lpn_u_elevhead'; }
+	// **THE TANK DIAMETER'S OWN FAMILY** (CLAUDE.md: "Tank diameter is in the LENGTH unit, pipe
+	// diameter in millimetres"). It used to share paneUnitElevHead() with the four tank inputs
+	// beside it -- a plausible reading (all five are drawn against the same vertical staff) that a
+	// pre-review pass caught printing "Tank diameter (ft H2O)", and "(ft WS)" in German, on a
+	// number that is a horizontal distance across the vessel, not a head. A diameter is still the
+	// wrong family too (millimetres/inches, the PIPE convention -- a 15 m tank would read 15000),
+	// so this is its own function rather than a reuse of either neighbour.
+	function paneUnitLength() { return 'lpn_u_length'; }
 	// **A REACTION COEFFICIENT AS A COLUMN** (Task 566), for the pipe pair and for the tank's own.
 	// It is the popup row's twin and is deliberately built from the same three parts: the same
 	// gate, the same `effective()` read, and the same setProp() write. Two editors of one property
@@ -22309,7 +22337,16 @@ var EngCalcs = EngCalcs || {};
 	function paneTextCols() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			paneColId(), paneColTextCoord(1), paneColTextCoord(2), paneColActive(),
+			paneColId(), paneColTextCoord(1), paneColTextCoord(2),
+			// **WHAT THE POSITION CELLS CANNOT SAY WHEN THEY ARE PLAIN** (Tom, 2026-09-28): an anchored
+			// Text's X/Y read "Attached" rather than a number, so a copy of that row carries nothing
+			// naming WHAT it is attached to -- the one thing a paste needs to create it attached again.
+			// Read-only here (attaching and detaching are map gestures, not a typed rename), but its own
+			// value is a node or link ID exactly as From/To name one on a Pipe, so panePlanCreates()
+			// reads it the same way.
+			{ key: 'anchor', label: 'lpn_field_text_anchor', str: true, em: 5,
+				get: function (lb) { return lb.anchorNode || lb.anchorLink || ''; } },
+			paneColActive(),
 			// The words and the presence are the label's two OVERRIDABLE properties (Task 407) and
 			// go through setProp(); everything below is Base-owned, as the popup's own rows say.
 			{ key: 'text', label: 'lpn_tool_add_text', str: true, em: 9, prop: 'text',
@@ -22473,10 +22510,12 @@ var EngCalcs = EngCalcs || {};
 					{ key: 'maxLevel', em: 3.5, label: 'lpn_field_tank_maxlevel', unit: paneUnitElevHead,
 						get: function (n) { return n.maxLevel; },
 						set: function (n, v) { n.maxLevel = v; updateNode(n.id, true); } },
-					// The Elevation/Head unit, not the pipe-diameter unit: a tank diameter is a
-					// distance across the ground, and inches would put a 15 m tank on screen as
-					// 15000. The popup says the same thing in its tip.
-					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitElevHead,
+					// **THE LENGTH UNIT, NOT ELEVATION/HEAD AND NOT THE PIPE-DIAMETER UNIT** (CLAUDE.md;
+					// a pre-review pass caught this heading printing "Tank diameter (ft H2O)", "(ft
+					// WS)" in German -- a head suffix on a horizontal distance). Not the pipe unit
+					// either: inches or millimetres would put a 15 m tank on screen as 15000. The
+					// popup says the same thing in its tip.
+					{ key: 'tankDiameter', em: 3.5, label: 'lpn_field_tank_diameter', unit: paneUnitLength,
 						get: function (n) { return n.tankDiameter; },
 						set: function (n, v) { n.tankDiameter = v; updateNode(n.id, true); } },
 					// **THE TANK'S OWN REACTION COEFFICIENT** (Task 566), the twin of the pipe pair:
@@ -23491,6 +23530,14 @@ var EngCalcs = EngCalcs || {};
 		// A column whose cell is a small language of its own (the Vertices list, Task 610) brings
 		// its own reader, so a typed cell, a pasted one and a created row all refuse it alike.
 		if (c.parse) { return c.parse(t); }
+		// **A CELL'S OWN PLAIN WORD ROUND-TRIPS** (Tom, 2026-09-28: pasting Net3's Tanks into a new
+		// project refused on "Not used is not a valid Mixing fraction"). paneCellText() prints the
+		// plain word -- "Not used", "Attached" -- wherever plainFor(el) is true, and a copy writes
+		// exactly what the cell shows; a paste has to accept that back rather than trying to read it
+		// as a number or a choice. The word carries no information of its own -- plainFor is asked
+		// again, per row, at write time (paneWriteCellText(), paneCreateFromPlan()) -- so it reads as
+		// blank here, same as an empty cell would.
+		if (c.plainWord && t !== '' && t === String(c.plainWord()).trim()) { return { ok: true, v: undefined }; }
 		if (c.bool) {
 			if (/^(1|true|yes|on|y|x|✓)$/i.test(t)) { return { ok: true, v: true }; }
 			if (t === '' || /^(0|false|no|off|n)$/i.test(t)) { return { ok: true, v: false }; }
@@ -24979,6 +25026,11 @@ var EngCalcs = EngCalcs || {};
 	// a number, so the caller can COUNT what it refused instead of discarding it in silence.
 	function paneWriteCellText(spec, c, el, text) {
 		var p;
+		// A cell that is plain FOR THIS ROW shows its plain word, and a paste that lands on it
+		// carrying that exact word back is the round trip a copy of this very cell produces -- not a
+		// stray write to refuse, a no-op to accept. See paneParseCellText()'s own comment.
+		if (c.plainWord && c.plainFor && c.plainFor(el) &&
+			String(text === null || text === undefined ? '' : text).trim() === String(c.plainWord()).trim()) { return true; }
 		if (paneCellIsPlain(c, el) || !c.set) { return false; }
 		p = paneParseCellText(c, text);
 		if (!p.ok) { return false; }
@@ -25023,7 +25075,13 @@ var EngCalcs = EngCalcs || {};
 	 * Text and Customer rows are not created this way (a Text is placed and a customer is served
 	 * from a pipe, neither by typing an ID), so those two tables offer no such action.
 	 */
-	function paneCanCreate(spec) { return spec.group === 'node' || spec.group === 'link'; }
+	// **EVERY TABLE CREATES ROWS BY PASTE, NOT JUST NODES AND LINKS** (Tom, 2026-09-28: *"Nothing
+	// about text is harder to put in a table than a junction is. Same with Customer... Refusing to
+	// paste Customers makes no more sense than refusing to paste Pipes."*). A Text names its anchor
+	// (a node or a link) by ID in its own `anchor` column, exactly as a Pipe names its two nodes; a
+	// Customer names its serving pipe or node exactly the same way. Each refuses a row only when
+	// what it needs is not there yet, never because the TABLE cannot make the kind of thing at all.
+	function paneCanCreate(spec) { return spec.group === 'node' || spec.group === 'link' || spec.group === 'label' || spec.group === 'customer'; }
 	// **A HEADING ROW IS NOT A ROW.** Copying a whole table puts its headings on the clipboard
 	// (paneCopyTsv()), and a spreadsheet kept for this purpose has them too -- so a first line
 	// whose every filled cell is the heading of the column it lands on, with or without its unit,
@@ -25098,6 +25156,86 @@ var EngCalcs = EngCalcs || {};
 				}
 				plan.from = f; plan.to = to;
 			}
+			// **A TEXT NAMES ITS ANCHOR THE WAY A PIPE NAMES ITS NODES** (Tom, 2026-09-28: *"Nothing
+			// about text is harder to put in a table than a junction is."*). The Attached to cell
+			// names an existing node or link, exactly as From/To do; a blank one means the row is a
+			// free-floating Text and X/Y (a node's own requirement) state where. An anchored row's
+			// offset is not stated anywhere a copy can read (the position cells go plain there), so it
+			// is born at zero offset -- attached, at the anchor's own point, same as spec §2 leaves a
+			// blank cell at the default a drawn element is born with.
+			if (!err && spec.group === 'label') {
+				var anchorTxt = txt('anchor'), anchorNodeEl, anchorLinkEl;
+				if (anchorTxt) {
+					anchorNodeEl = nodeById(anchorTxt);
+					anchorLinkEl = !anchorNodeEl && linkById(anchorTxt);
+					if (!anchorNodeEl && !anchorLinkEl) {
+						err = panePasteSay('lpn_pane_paste_no_anchor',
+							'Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.', row, { id: anchorTxt });
+					} else {
+						plan.anchorNode = anchorNodeEl ? anchorTxt : null;
+						plan.anchorLink = anchorLinkEl ? anchorTxt : null;
+					}
+				} else {
+					a = txt('axis1'); b = txt('axis2');
+					if (a === '' || b === '') {
+						err = panePasteSay('lpn_pane_paste_text_no_position', 'Row {row}: a new Text needs both {first} and {second}.', row,
+							{ first: axisNames().first, second: axisNames().second });
+					} else if (!isFinite(+a) || !coordValueOk(coordSlotIsY(1), +a)) { err = bad('axis1'); }
+					else if (!isFinite(+b) || !coordValueOk(coordSlotIsY(2), +b)) { err = bad('axis2'); }
+					else {
+						plan.yv = coordSlotIsY(1) ? +a : +b;
+						plan.xv = coordSlotIsY(1) ? +b : +a;
+					}
+				}
+			}
+			// **A CUSTOMER NAMES ITS SERVING PIPE OR NODE THE WAY A PIPE NAMES ITS NODES** (Tom,
+			// 2026-09-28: *"Customers can refuse to paste only if the pipe they need is not present.
+			// Refusing to paste Customers makes no more sense than refusing to paste Pipes."*). The
+			// Connected asset cell (a pipe) or the read-only Added to node cell (a node, when the
+			// source copy shows a connection lumped exactly at one) each name what it needs; a row
+			// naming neither is refused rather than guessed at, the same way a blank From/To is.
+			// Position is required as it is for a node, and Station (if stated) fixes exactly where
+			// along the named pipe, ahead of a manual snap from X/Y; Offset, like every other cell,
+			// is applied afterward through its own setter.
+			if (!err && spec.group === 'customer') {
+				a = txt('axis1'); b = txt('axis2');
+				if (a === '' || b === '') {
+					err = panePasteSay('lpn_pane_paste_customer_no_position', 'Row {row}: a new Customer needs both {first} and {second}.', row,
+						{ first: axisNames().first, second: axisNames().second });
+				} else if (!isFinite(+a) || !coordValueOk(coordSlotIsY(1), +a)) { err = bad('axis1'); }
+				else if (!isFinite(+b) || !coordValueOk(coordSlotIsY(2), +b)) { err = bad('axis2'); }
+				else {
+					plan.yv = coordSlotIsY(1) ? +a : +b;
+					plan.xv = coordSlotIsY(1) ? +b : +a;
+				}
+				if (!err) {
+					var linkTxt = txt('link'), nodeTxt = txt('atNode'), stTxt = txt('station'), pipeEl, nodeEl, atPick;
+					if (linkTxt) {
+						pipeEl = linkById(linkTxt);
+						if (!pipeEl) {
+							err = panePasteSay('lpn_pane_paste_no_pipe', 'Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.', row, { id: linkTxt });
+						} else {
+							plan.customerLink = pipeEl.id;
+							if (stTxt !== '') {
+								if (!isFinite(+stTxt)) { err = bad('station'); }
+								else { plan.customerT = Math.max(0, Math.min(100, +stTxt)) / 100; }
+							}
+						}
+					} else if (nodeTxt) {
+						nodeEl = nodeById(nodeTxt);
+						if (!nodeEl) {
+							err = panePasteSay('lpn_pane_paste_no_customer_node', 'Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.', row, { id: nodeTxt });
+						} else {
+							atPick = customerAttachAtNode(nodeEl, { x: inwardX(plan.xv), y: inwardY(plan.yv) });
+							if (!atPick) {
+								err = panePasteSay('lpn_pane_paste_customer_node_no_pipe', 'Row {row}: node {id} has no pipe for a Customer to attach to.', row, { id: nodeTxt });
+							} else { plan.customerLink = atPick.link.id; plan.customerT = atPick.t; }
+						}
+					} else {
+						err = panePasteSay('lpn_pane_paste_no_customer_ref', 'Row {row}: a new Customer needs a connected pipe or node.', row);
+					}
+				}
+			}
 			// Every other cell: blank keeps the default a drawn element is born with (spec §2), a
 			// result or identity cell is left to the solve and counted, and anything else must read
 			// as its column reads a typed value.
@@ -25105,7 +25243,8 @@ var EngCalcs = EngCalcs || {};
 				Object.keys(cells).forEach(function (key) {
 					var c = cells[key].c, t = cells[key].t, p;
 					if (err || key === 'id' || key === 'axis1' || key === 'axis2' ||
-						key === 'from' || key === 'to' || key === 'verts' || t === '') { return; }
+						key === 'from' || key === 'to' || key === 'verts' ||
+						key === 'anchor' || key === 'link' || key === 'atNode' || key === 'station' || t === '') { return; }
 					if (c.result || !c.set) { plan.ignored++; return; }
 					p = paneParseCellText(c, t);
 					if (!p.ok) { err = bad(key); return; }
@@ -25129,7 +25268,7 @@ var EngCalcs = EngCalcs || {};
 				el[LPN_GEO_XSRC] = plan.xv;   // the typed characters, exactly as setNodeCoordAxis() keeps them
 				el[LPN_GEO_YSRC] = plan.yv;
 			}
-		} else {
+		} else if (spec.group === 'link') {
 			el = addLink(spec.type, plan.from, plan.to, plan.verts || [], plan.id);
 			(plan.verts || []).forEach(function (p, i) {
 				if (typeof p[LPN_GEO_XSRC] === 'number') {
@@ -25137,6 +25276,20 @@ var EngCalcs = EngCalcs || {};
 					el.verts[i][LPN_GEO_YSRC] = p[LPN_GEO_YSRC];
 				}
 			});
+		} else if (spec.group === 'label') {
+			// **BORN AT ZERO OFFSET WHEN ANCHORED** -- see panePlanCreates()'s own comment: the source
+			// copy's position cells go plain the moment a Text is anchored, so there is no pasted
+			// offset to honour. addText() computes an offset from the (x, y) it is handed and the
+			// anchor point it resolves internally; forcing both back to exactly the anchor's own point
+			// afterward is simpler and no less correct than trying to hand it the right x/y up front
+			// for a link anchor, whose point it would otherwise have to duplicate finding.
+			el = addText(plan.anchorNode || plan.anchorLink ? 0 : inwardX(plan.xv),
+				plan.anchorNode || plan.anchorLink ? 0 : inwardY(plan.yv),
+				plan.anchorNode || null, plan.anchorLink ? { link: plan.anchorLink, t: 0.5 } : null, plan.id);
+			if (el.anchorNode || el.anchorLink) { el.x = 0; el.y = 0; updateLabelGeometry(el.id); }
+		} else {
+			el = addCustomer(inwardX(plan.xv), inwardY(plan.yv),
+				plan.customerLink ? { link: plan.customerLink, t: plan.customerT } : null, plan.id);
 		}
 		plan.writes.forEach(function (w) {
 			// Asked at write time, per element, as a typed cell asks it: a pipe type written by an
@@ -28862,8 +29015,8 @@ var EngCalcs = EngCalcs || {};
 	// `attach` is the LINK form of the same argument (Task 502): {link: id, t: fraction}, and the
 	// offset is taken from the point that fraction names. A Text has ONE anchor -- a node wins if
 	// both are somehow supplied, because a node is the more specific thing to have tapped.
-	function addText(x, y, anchorNode, attach) {
-		var id = mintId('X'), an = anchorNode ? nodeById(anchorNode) : null, lb, onLink = null;
+	function addText(x, y, anchorNode, attach, wantId) {
+		var id = wantId || mintId('X'), an = anchorNode ? nodeById(anchorNode) : null, lb, onLink = null;
 		if (!an && attach && linkById(attach.link)) {
 			onLink = attach;
 			an = textAnchorPoint({ anchorLink: attach.link, anchorT: attach.t });
@@ -31990,10 +32143,12 @@ var EngCalcs = EngCalcs || {};
 				return withInpNotes(carryInpTokens(n, rz, LPN_INP_TOK_RESERVOIR), inpNodeNotes[n.id]);
 			}
 			if (n.type === 'tank') {
-				// A tank's four levels and its diameter are ALL in the Elevation/Head unit -- all
-				// vertical distances on the same staff, the diameter included, which is the one that
-				// surprises people. Nothing here is blank-means-follow the way a reservoir's head is:
-				// EPANET states every one, so every one is written.
+				// EVERY LENGTH HERE PASSES THROUGH UNCHANGED (Task 390's pass-through rule): the
+				// units strip is set to the FILE's own system before this runs, so the digit the
+				// file states is the digit the document stores, whichever family (Elevation/Head for
+				// the four vertical distances, LENGTH for the diameter -- CLAUDE.md) later reads it
+				// in. Nothing here is blank-means-follow the way a reservoir's head is: EPANET states
+				// every one, so every one is written.
 				var tk = carryInpTokens(n, {
 					id: n.id, type: 'tank', x: n.x, y: n.y,
 					elev: n.elev,
@@ -35713,8 +35868,11 @@ var EngCalcs = EngCalcs || {};
 	// read and work WHILE you work the map -- clicking a pipe to look at it must not throw either
 	// away, and that is exactly what membership here would do. Both get the property popup's
 	// chrome instead: a drag surface and an X. Settings LEFT this list with Task 441, when it
-	// stopped being a pull-down.
-	var VIEW_POPOVERS = ['lpn_notes_popup', 'lpn_about_popup'];
+	// stopped being a pull-down. **NOTES LEFT TOO** (Tom, 2026-09-28: *"Draggable non-hog box for
+	// Help, Notes. I need it open for my spreadsheet editing video."*) -- it is wired through
+	// wireBoxMemory() like the report boxes below, and a click on the map or a table while it is
+	// open must not dismiss it, which is exactly what membership here would do.
+	var VIEW_POPOVERS = ['lpn_about_popup'];
 	// The control that opened the popover now showing -- the toolbar button, or the menu-bar item.
 	// Same job openMenuAnchor does for the menus, and needed for the same reason: the click that
 	// OPENED a popover must not also be read as a click away from it (Task 372). Exempting the whole
@@ -37383,39 +37541,63 @@ var EngCalcs = EngCalcs || {};
 		openMenu(anchor, rows);
 	}
 
-	// The Notes, revealed. Centred rather than hung off the menu button, because this is a column of
-	// prose to be read, not a control panel to be operated next to the thing it controls -- and it
-	// is the only popover here that can be taller than the map it covers, so it takes its own
-	// scrollbar via .lpn-popover-body.
-	function toggleNotesPopup() {
-		var popup = document.getElementById('lpn_notes_popup');
-		if (!popup) { return; }
-		if (popup.style.display === 'block') { closeNotesPopup(); return; }
+	// **THE NOTES BOX** (Tom, 2026-09-28: *"Draggable non-hog box for Help, Notes. I need it open
+	// for my spreadsheet editing video."*). Until now this was a centred popover in VIEW_POPOVERS --
+	// a click anywhere away from it, or a bare Escape, closed it, which is exactly what "non-hog"
+	// rules out. It is now the same shell and the same memory as Settings, Find and the four report
+	// boxes: draggable by its title bar, resizable, remembered per browser as window furniture
+	// (`lpn_notesbox`), and dismissed only by its own × or an Escape pressed while focus is inside
+	// it -- see wireNotesBox().
+	function notesBoxEl() { return document.getElementById('lpn_notes_popup'); }
+	function notesBoxIsOpen() {
+		var b = notesBoxEl();
+		return !!b && b.style.display === 'flex';
+	}
+	var LPN_NOTESBOX_KEY = 'lpn_notesbox';
+	var notesboxLayout = newBoxLayout();
+	function saveNotesboxLayout() {
+		try { localStorage.setItem(LPN_NOTESBOX_KEY, JSON.stringify(notesboxLayout)); } catch (e) {}
+	}
+	// **OPENS AT THE MAP'S TOP-RIGHT, NOT CENTRED, THE FIRST TIME** (setboxHomeCorner() -- the same
+	// corner Settings opens at). Centring is what the old popover did, and centring a box tall
+	// enough to hold every term in this list lands squarely on top of the Tables pane docked under
+	// the map, which is the one thing this box must not do on a first open.
+	function openNotesBox() {
+		var box = notesBoxEl(), r, at, home, floor;
+		if (!box) { return; }
 		closeMenu();
 		closeViewPopovers();
-		popup.style.display = 'block';
-		raisePanel(popup);   // centred, not dragged, so it is raised where it becomes visible
-		// **CAPPED TO THE ROOM BELOW WHERE IT LANDS, NOT TO THE WHOLE VIEWPORT** (Tom, 2026-09-11:
-		// *"Notes is too large for my laptop and my phone. It scrolls, but its bottom is off the
-		// map."*). fitPanelToViewport() caps to `innerHeight - 2 * POPUP_EDGE`, which is right only
-		// for a box free to sit anywhere; this one is then floored at chromeFloor(), so a box taller
-		// than the room UNDER the chrome fits the viewport, gets pushed down past the menu bar, and
-		// hangs off the bottom by exactly the height of the chrome -- with the end of the prose
-		// below the fold rather than below a scrollbar, which is why scrolling did not reach it.
-		//
-		// The note above capPanelToRoomBelow() describes this defect in general terms and the Find
-		// box was fixed for it; the Notes popup was simply never brought along. Choose the top from
-		// the natural height, then cap to what is genuinely left below that top.
-		var natural = fitPanelToViewport(popup);
-		var top = Math.max(chromeFloor(), (window.innerHeight - natural) / 2);
-		capPanelToRoomBelow(popup, top);
-		var pr = popup.getBoundingClientRect();
-		popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - pr.width) / 2) + 'px';
-		popup.style.top = top + 'px';
+		hideOpenTips();
+		box.style.display = 'flex';
+		placePanelForScreen(box, function () {
+			applyBoxSize(box, notesboxLayout);
+			floor = chromeFloor();
+			capPanelToRoomBelow(box, floor);
+			r = box.getBoundingClientRect();
+			if (notesboxLayout.left === null || notesboxLayout.top === null) {
+				home = setboxHomeCorner(r.width, r.height);
+				at = clampPanel(home.left, home.top, r.width, r.height,
+					window.innerWidth, window.innerHeight, floor);
+			} else {
+				at = restoreBounds(notesboxLayout.left, notesboxLayout.top, r.width, r.height,
+					window.innerWidth, window.innerHeight);
+			}
+			box.style.left = at.left + 'px';
+			box.style.top = at.top + 'px';
+		});
+		if (!notesboxLayout.open) { notesboxLayout.open = true; saveNotesboxLayout(); }
 	}
-	function closeNotesPopup() { hidePanel(document.getElementById('lpn_notes_popup')); }
-	// The About box. Same shape as the Notes popup on purpose -- centred, capped to the room below
-	// the chrome, one close button -- because this page should have one kind of box and not two.
+	function closeNotesBox() {
+		hidePanel(notesBoxEl());
+		if (notesboxLayout.open) { notesboxLayout.open = false; saveNotesboxLayout(); }
+	}
+	function toggleNotesPopup() {
+		if (notesBoxIsOpen()) { closeNotesBox(); return; }
+		openNotesBox();
+	}
+	function closeNotesPopup() { closeNotesBox(); }
+	// The About box. Still a centred, click-away-dismissed popover -- unlike Notes since Tom's
+	// 2026-09-28 ruling, this is read once and closed, not a reference kept open beside the work.
 	function toggleAboutPopup() {
 		var popup = document.getElementById('lpn_about_popup');
 		if (!popup) { return; }
@@ -37435,8 +37617,18 @@ var EngCalcs = EngCalcs || {};
 	function wireNotesPopup() {
 		var ax = document.getElementById('lpn_about_close');
 		if (ax) { ax.addEventListener('click', closeAboutPopup); }
-		var x = document.getElementById('lpn_notes_close');
-		if (x) { x.addEventListener('click', closeNotesPopup); }
+		var box = notesBoxEl(), x = document.getElementById('lpn_notes_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeNotesBox); }
+		// **ESCAPE CLOSES IT ONLY WHEN FOCUS IS INSIDE IT** -- bound on the box itself rather than on
+		// `document`, exactly like the CRS convert-as box (closeConvasBox()). The page-wide Escape
+		// handler no longer knows about this box at all (VIEW_POPOVERS above), which is the point:
+		// pressing Escape to back out of an edit elsewhere on the page must not also sweep this box
+		// away, and a table cell or the map must keep taking Escape for its own undo.
+		box.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape') { e.preventDefault(); closeNotesBox(); }
+		});
+		wireBoxMemory(box, LPN_NOTESBOX_KEY, notesboxLayout, saveNotesboxLayout, notesBoxIsOpen);
 	}
 	// **THE MAP MENU** -- View until 2026-08-27, renamed on Tom's word. It holds the drawing's frame,
 	// the pictures behind it, where on Earth it is, and the elevations read off that ground. Only
@@ -40292,12 +40484,19 @@ var EngCalcs = EngCalcs || {};
 	// the question names them to the user -- and because this list IS the conversion's scope.
 	function unitServes(name) {
 		var pc = EngCalcs.pageConfig || {};
-		if (name === 'lpn_u_length') { return [pc.lpn_field_length || 'Length']; }
+		// **TANK DIAMETER MOVED HERE FROM Elevation/Head** (CLAUDE.md: "Tank diameter is in the
+		// LENGTH unit"). It is a horizontal distance across the vessel, not a vertical one, and this
+		// list is read by the user as "what is about to be rescaled" -- so it has to name the unit
+		// that actually now owns the number, or a Length change would rescale a field this dialog
+		// never mentioned.
+		if (name === 'lpn_u_length') {
+			return [pc.lpn_field_length || 'Length', pc.lpn_field_tank_diameter || 'Tank diameter'];
+		}
 		if (name === 'lpn_u_diameter') { return [pc.lpn_field_diameter || 'Diameter']; }
 		if (name === 'lpn_u_roughness') { return [roughnessLabel()]; }
 		if (name === 'lpn_u_elevhead') {
 			return [pc.lpn_field_elev || 'Elevation', pc.lpn_field_head || 'Head',
-				pc.lpn_field_tank_level || 'Water depth', pc.lpn_field_tank_diameter || 'Tank diameter',
+				pc.lpn_field_tank_level || 'Water depth',
 				(pc.lpn_result_head || 'Head') + ' (pump curve)'];
 		}
 		if (name === 'lpn_u_pressure') { return [pc.lpn_field_valve_setting_pressure || 'Pressure setting']; }
@@ -40360,6 +40559,10 @@ var EngCalcs = EngCalcs || {};
 		if (name === 'lpn_u_length') {
 			doc.links.forEach(function (l) { conv(l, '_length'); });
 			convOverrides('length');
+			// **THE TANK'S VESSEL DIAMETER, MOVED HERE FROM Elevation/Head** (CLAUDE.md). It is a
+			// horizontal distance and this is the horizontal-distance family; a Length change must
+			// rescale it and an Elevation/Head change must leave it alone, both now true below.
+			doc.nodes.forEach(function (nd) { conv(nd, 'tankDiameter'); });
 		} else if (name === 'lpn_u_diameter') {
 			doc.links.forEach(function (l) { conv(l, '_diameter'); });
 			convOverrides('diameter');
@@ -40374,9 +40577,11 @@ var EngCalcs = EngCalcs || {};
 				syncRoughnessLabelDecimals();
 			}
 		} else if (name === 'lpn_u_elevhead') {
+			// tankDiameter is NOT one of these any more (CLAUDE.md: it is a LENGTH, handled in the
+			// lpn_u_length branch above) -- these four are all vertical distances on the same staff.
 			doc.nodes.forEach(function (nd) {
 				conv(nd, 'elev'); conv(nd, '_level'); conv(nd, 'minLevel');
-				conv(nd, 'maxLevel'); conv(nd, 'tankDiameter'); conv(nd, '_head');
+				conv(nd, 'maxLevel'); conv(nd, '_head');
 			});
 			convOverrides('level'); convOverrides('head');
 			// A curve point is [flow, value]; this unit owns the second, for the two kinds whose
@@ -44290,6 +44495,10 @@ var EngCalcs = EngCalcs || {};
 	//   panel, which have done this since Tasks 434 and 441. All five are standing boxes and all
 	//   five remember their geometry, which is the same sentence Tom's question is about.
 	//
+	//   **THE NOTES BOX JOINED THEM ON 2026-09-28**, the same day it stopped being a modal-feeling
+	//   popover: Tom wants it left open across a whole recording session, which is exactly the
+	//   "standing reference" case this section already draws the line on.
+	//
 	//   **THE LIBRARY BOX JOINED THEM ON HIS WORD AND IT BROUGHT ITS GEOMETRY WITH IT** (Tom,
 	//   2026-09-04: *"The bottom pane has long remembered its openness. If it should get both, add
 	//   its height or whatever size setting you can save."*). It had been left out here for a
@@ -44308,7 +44517,7 @@ var EngCalcs = EngCalcs || {};
 	//   DELIBERATELY LEFT ALONE, and each for a reason, not by omission:
 	//
 	//   * **The property popup.** It is an answer to a selection, and a selection is not restored.
-	//   * **The New-project box, the confirm dialog, the fire-flow run dialog, the notes popover,
+	//   * **The New-project box, the confirm dialog, the fire-flow run dialog, the About box,
 	//     the backdrop target panel and the two menu popovers.** Modals, transient choosers and
 	//     pull-downs. A modal that survives a reload is a question the reader has already answered.
 	//
@@ -44335,6 +44544,9 @@ var EngCalcs = EngCalcs || {};
 		if (energyboxLayout.open) { openEnergyBox(); }
 		if (cmpboxLayout.open) { openScenarioCompareBox(); }
 		if (rptboxLayout.open) { openRunReportBox(true); }
+		// The Notes box (Tom, 2026-09-28), after the reports and before Find for the same stacking
+		// reason: Find is the smallest and ends up on top.
+		if (notesboxLayout.open) { openNotesBox(); }
 		if (findUserOpen) { toggleFindPopup(null, true); }
 	}
 	// ---- THE DIVIDER BETWEEN THE TWO PANES (ROADMAP Task 576) ------------------------------------
@@ -45096,18 +45308,53 @@ var EngCalcs = EngCalcs || {};
 	// own name, so the chooser and the receipt call it what the box behind them calls it. `units`
 	// names the unit selections these numbers depend on; a fittings list names none, because a minor
 	// loss coefficient is dimensionless.
+	// A control names nothing (there is no id a second one could collide with), so its identity for
+	// this wizard is the sentence itself -- the same `raw` text `libControlText()` shows. Two
+	// controls with the same words are the duplicate this wizard exists to catch; two with
+	// different words are simply both taken, whatever elements they name.
+	function libImportControlKey(rec) {
+		return String((rec && (rec.raw || libControlText(rec))) || '').trim();
+	}
+	function libImportControlUsable(rec) {
+		return !!rec && typeof rec === 'object' && !!libImportControlKey(rec);
+	}
+	// A RULE, unlike a control, IS named -- `RULE <name>` is the first line of every chunk
+	// lpnRuleSplit() cuts `[RULES]` into -- so it collides on that name the same way a curve
+	// collides on its id. The synthetic `{id, lines}` record below is never written to `doc.rules`
+	// itself; libImportRulesWrite()'s `push` reads only `.lines` back out of it.
+	function libImportRuleChunks(lines) {
+		return (EngCalcs.lpnRuleSplit ? EngCalcs.lpnRuleSplit(lines || []) : [])
+			.filter(function (c) { return c.name; })
+			.map(function (c) { return { id: c.name, lines: c.lines.slice() }; });
+	}
+	function libImportRulesSource(saved) {
+		return libImportRuleChunks(Array.isArray(saved.rules) ? saved.rules : []);
+	}
+	function libImportRulesExisting() { return libImportRuleChunks(libRulesRead()); }
+	function libImportRulesWrite() {
+		return { push: function (clone) { doc.rules = libRules().concat(clone.lines || []); } };
+	}
 	var LIB_IMPORTABLE = {
+		// Dimensionless, and shared with no other page, so patterns carry no unit of their own
+		// (js/lpn-patterns.js's own rule) -- there is nothing here for libImportUnitDiffs() to say.
+		patterns: { from: 'patterns', label: 'lpn_library_patterns',
+			read: libPatternsRead, write: libPatterns, units: [] },
 		curves: { from: 'curves', label: 'lpn_library_curves',
 			read: libCurvesRead, write: libCurves, units: ['lpn_u_flow', 'lpn_u_elevhead'] },
 		pipetypes: { from: 'pipeTypes', label: 'lpn_library_pipetypes',
 			read: libPipeTypesRead, write: libPipeTypes, units: ['lpn_u_diameter'] },
 		fittings: { from: 'fittingSets', label: 'lpn_library_fittings',
-			read: libFittingSetsRead, write: libFittingSets, units: [] }
+			read: libFittingSetsRead, write: libFittingSets, units: [] },
+		controls: { from: 'controls', label: 'lpn_library_controls',
+			read: libControlsRead, write: libControls, units: [],
+			keyOf: libImportControlKey, usable: libImportControlUsable },
+		rules: { label: 'lpn_library_rules', units: [],
+			source: libImportRulesSource, read: libImportRulesExisting, write: libImportRulesWrite }
 	};
 	// The order the chooser and the receipt list them in: the Libraries box's OWN section order, so
 	// the dialog reads down in the same order as the index behind it. Not the object's key order,
 	// which is nobody's decision.
-	var LIB_IMPORT_ORDER = ['curves', 'pipetypes', 'fittings'];
+	var LIB_IMPORT_ORDER = ['patterns', 'curves', 'pipetypes', 'fittings', 'controls', 'rules'];
 	// A record with no id is not a definition: nothing could ever have referred to it, so it is
 	// neither offered, counted, copied nor reported. The one place that judgement is made, because
 	// the count in the chooser has to be the number of things the import will actually consider.
@@ -45115,6 +45362,15 @@ var EngCalcs = EngCalcs || {};
 		return !!rec && typeof rec === 'object' && rec.id !== undefined && rec.id !== null
 			&& String(rec.id) !== '';
 	}
+	// **THE SEAM BETWEEN THE ORDINARY id-KEYED LIBRARIES AND THE TWO THAT ARE NOT.** A spec states
+	// `source`/`keyOf`/`usable` only when the default (a named field, keyed on `.id`) does not fit
+	// it; every other kind falls straight through to what it always did.
+	function libImportSourceOf(spec, saved) {
+		if (spec.source) { return spec.source(saved); }
+		return Array.isArray(saved[spec.from]) ? saved[spec.from] : [];
+	}
+	function libImportKeyOf(spec, rec) { return spec.keyOf ? spec.keyOf(rec) : rec.id; }
+	function libImportIsUsable(spec, rec) { return (spec.usable || libImportUsable)(rec); }
 	function libImportPick() {
 		var input = document.getElementById('lpn_library_file');
 		if (!input) { return; }
@@ -45146,8 +45402,10 @@ var EngCalcs = EngCalcs || {};
 	function libImportOffer(saved) {
 		return LIB_IMPORT_ORDER.map(function (kind) {
 			var spec = LIB_IMPORTABLE[kind],
-				source = Array.isArray(saved[spec.from]) ? saved[spec.from] : [];
-			return { kind: kind, count: source.filter(libImportUsable).length };
+				source = libImportSourceOf(spec, saved);
+			return { kind: kind, count: source.filter(function (rec) {
+				return libImportIsUsable(spec, rec);
+			}).length };
 		}).filter(function (o) { return o.count > 0; });
 	}
 	/**
@@ -45343,14 +45601,14 @@ var EngCalcs = EngCalcs || {};
 		(kinds || []).forEach(function (kind) {
 			var spec = LIB_IMPORTABLE[kind];
 			if (!spec) { return; }
-			var source = Array.isArray(saved[spec.from]) ? saved[spec.from] : [],
+			var source = libImportSourceOf(spec, saved),
 				taken = {}, clones = [], added = [], clashed = [];
 			spec.read().forEach(function (rec) {
-				if (libImportUsable(rec)) { taken[String(rec.id)] = true; }
+				if (libImportIsUsable(spec, rec)) { taken[String(libImportKeyOf(spec, rec))] = true; }
 			});
 			source.forEach(function (rec) {
-				if (!libImportUsable(rec)) { return; }
-				var id = String(rec.id), clone;
+				if (!libImportIsUsable(spec, rec)) { return; }
+				var id = String(libImportKeyOf(spec, rec)), clone;
 				if (taken[id]) { clashed.push(id); return; }
 				try { clone = JSON.parse(JSON.stringify(rec)); } catch (err) { return; }
 				taken[id] = true;
@@ -49641,10 +49899,11 @@ var EngCalcs = EngCalcs || {};
 				function () { return n.maxLevel; },
 				function (v) { n.maxLevel = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_maxlevel_tip);
-			// The Elevation/Head unit, NOT the pipe-diameter unit, and the tip says so. A tank
-			// diameter is a distance across the ground, of the same order as the elevations beside
-			// it; reading it in inches or millimetres would put a 15 m tank on screen as 15000.
-			unitNumberField(fields, pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_elevhead',
+			// **THE LENGTH UNIT** (CLAUDE.md), NOT the Elevation/Head unit this box used to read it
+			// in -- a fix caught in review printing "ft H2O" beside a distance across the vessel --
+			// and NOT the pipe-diameter unit either, or inches/millimetres would put a 15 m tank on
+			// screen as 15000. The tip says so.
+			unitNumberField(fields, pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_length',
 				function () { return n.tankDiameter; },
 				function (v) { n.tankDiameter = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_diameter_tip);
@@ -52411,9 +52670,10 @@ var EngCalcs = EngCalcs || {};
 			if (n.type === 'tank') {
 				// A tank passes BOTH its resolved surface head (what the steady-state solve reads,
 				// see EngCalcs.lpnIsFixedHead) AND its vessel geometry, which the native solver
-				// ignores and js/lpn-epanet.js writes into [TANKS]. All five are lengths in the
-				// Elevation/Head unit, the vessel diameter included -- it is a vertical distance's
-				// unit because it is measured on the same staff, not a pipe diameter.
+				// ignores and js/lpn-epanet.js writes into [TANKS]. The four vertical distances are
+				// in the Elevation/Head unit, measured on the same staff as the ground; the vessel
+				// DIAMETER is a horizontal one and is in the LENGTH unit instead (CLAUDE.md) -- not
+				// a pipe diameter either, which would read a 15 m tank as 15000.
 				return {
 					id: n.id, type: n.type,
 					elev: toSI(n.elev || 0, 'lpn_u_elevhead'),
@@ -52421,7 +52681,7 @@ var EngCalcs = EngCalcs || {};
 					level: toSI(effective(n, 'level') || 0, 'lpn_u_elevhead'),
 					minLevel: toSI(n.minLevel || 0, 'lpn_u_elevhead'),
 					maxLevel: toSI(n.maxLevel || 0, 'lpn_u_elevhead'),
-					diameter: toSI(n.tankDiameter || 0, 'lpn_u_elevhead')
+					diameter: toSI(n.tankDiameter || 0, 'lpn_u_length')
 				};
 			}
 			return n.type === 'reservoir'

@@ -111,6 +111,12 @@ const CURATED_SETTING = {
 	colorNodeField: 'what the map is coloured by', colorLinkField: 'what the map is coloured by',
 	colorBreaks: 'the legend limits that colouring was drawn on',
 	colorModes: 'how those limits were chosen', colorLegendPosition: 'where the legend sits',
+	// **THE LABELS LEGEND'S OWN CORNER, EXEMPT ON THE SAME TERMS AS colorLegendPosition ABOVE IT**
+	// (missed when that one was declared, surfaced when Tom moved the default corner, 2026-09-28).
+	// A gallery example is a stored project, so it keeps whatever corner it was saved with rather
+	// than silently picking up a later default -- that is R-342 working as designed, not a source
+	// this .inp states or fails to.
+	legendPosition: 'where the labels legend sits',
 	linkWidth: 'line weight',
 	textSize: 'label size', symbolSize: 'symbol size', mapHeight: 'pane height',
 	backdropOpacity: 'how strongly the site plan shows through',

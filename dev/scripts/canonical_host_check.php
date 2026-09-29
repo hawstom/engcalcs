@@ -85,6 +85,27 @@ foreach ($cases as $host => $want) {
     // The other brand must not leak onto this host's page as a visible name.
     $other = $brand === 'EPANET++' ? '>LibreWaterNet.org<' : '>EPANET++<';
     hc_ok(strpos($html, $other) === false, "$tag: never shows the other front door's name '$other'");
+
+    // **THE ABOUT BOX'S CREDITS LINK FOLLOWS THE BRAND TOO** (pre-review, Task 697 follow-up: the
+    // site-name link two lines above already used ecAppSiteUrl(), but Credits still hard-wired
+    // EC_LWN_SITE_URL, so on epanet-plus-plus.org clicking the software's own name and clicking
+    // Credits sent a reader to two different sites). Every credits.html anchor on the page, which
+    // is exactly the About box's one row -- so a stray second one cannot make this pass by luck.
+    preg_match_all('/<a href="([^"]*credits\.html)"/', $html, $call);
+    hc_ok(count($call[1]) === 1, "$tag: exactly one credits.html link", json_encode($call[1]));
+    if ($call[1]) {
+        hc_ok($call[1][0] === $origin . '/credits.html', "$tag: Credits follows THIS brand's own site",
+            "got '{$call[1][0]}'");
+    }
+    // AND THE GENERAL RULE, stated as broadly as Tom asked for it: on the EPANET++ front door, no
+    // visitor-facing link anywhere in the page points at librewaternet.org at all -- not just the
+    // one row this defect was found on. (`EngCalcs.lwnSiteUrl`'s own JS variable NAME is exempt: it
+    // is source code, not a link a visitor can click, and it is asserted by value two lines above.)
+    if ($brand === 'EPANET++') {
+        $withoutVarName = str_replace('EngCalcs.lwnSiteUrl', '', $html);
+        hc_ok(strpos($withoutVarName, 'librewaternet.org') === false,
+            "$tag: no visitor-facing link anywhere on the page names librewaternet.org");
+    }
 }
 
 // 3b. THE DEV-ONLY *.localhost ALIAS (Task 697 follow-up, Tom: "How/where do I look at it?").

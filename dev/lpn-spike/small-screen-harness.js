@@ -1003,17 +1003,22 @@ console.log('\n--- a box on a short screen, and the pane tables (Tom\'s items 5 
 }
 
 // ============================================================================================
-// 10. THE TWO LEGENDS' DEFAULT CORNERS DIFFER ON A PHONE (ROADMAP Task 527)
+// 10. THE TWO LEGENDS' DEFAULT CORNERS (ROADMAP Task 527; updated Task 527 follow-up, Tom,
+//     2026-09-28: "New project: Put Node labels legend at top left")
 // ============================================================================================
-// Tom, 2026-08-25: "527 on phone, color legend upper right and label legend upper left." Task 516
-// is the same collision on the desktop and he was explicitly not worried about it there, so the
-// desktop corners are asserted UNCHANGED beside every phone assertion -- a default that leaked
-// upward would move two boxes on every existing user's map.
+// Tom, 2026-08-25: "527 on phone, color legend upper right and label legend upper left." The
+// colour key still differs by screen (top-right on a phone, bottom-right on a desktop) and is
+// asserted unchanged. **THE LABELS LEGEND NO LONGER DIFFERS BY SCREEN** -- Tom's later ruling put
+// it at top-left on EVERY screen, phone included, which is simply the phone's own corner widened
+// to the desktop rather than a new value.
 //
 // **THIS IS A DEFAULT, AND THE EXPENSIVE FAILURE IS FOR IT TO ACT LIKE AN OVERRIDE.** A placement
 // is stored in the project (settings is serialized whole), so a project saved on a desktop and
 // opened on a phone must open in the corner it was saved in. That is the last assertion here, and
-// it goes through the real applySaved() rather than through a modelled merge.
+// it goes through the real applySaved() rather than through a modelled merge. Because the DEFAULT
+// is now the same on both screens, that fixture sets a NON-default corner explicitly (setLegendPos)
+// rather than relying on the desktop default happening to differ from the phone's -- otherwise the
+// assertion would pass by coincidence and prove nothing about storage surviving a screen change.
 //
 // Unlike everything above, this cannot be answered from the stylesheet: the corner is a settings
 // value, not a rule. So the module is LOADED AGAIN at each width and asked what it decided. This is
@@ -1080,14 +1085,20 @@ console.log('\n--- the corners a first-time visitor gets, and the corner a saved
 	const desk = atWidth(WIDE, (M) => M.defaultSettings());
 	ok('the desktop colour key is untouched, still bottom right',
 		desk.colorLegendPosition === 'bottom-right', 'got ' + desk.colorLegendPosition);
-	ok('...and the desktop labels legend is untouched, still top right',
-		desk.legendPosition === 'top-right', 'got ' + desk.legendPosition);
+	ok('...and the desktop labels legend now opens top-left too, the same as a phone',
+		desk.legendPosition === 'top-left', 'got ' + desk.legendPosition);
 
 	// **A STORED CHOICE SURVIVES.** A project serialized on a desktop, opened at 360px: both corners
 	// must come back as they were saved, not as the phone's defaults. Serializing on the desktop
 	// instance is what makes the fixture the page's own writing rather than two retyped strings.
+	//
+	// **THE LABELS-LEGEND CORNER IS SET EXPLICITLY, TO A NON-DEFAULT VALUE.** Its default no longer
+	// differs by screen (both are top-left now), so leaving it at the default here would make the
+	// "keeps its corner" assertion below pass whether storage worked or not. top-right is a corner
+	// nobody's default ever hands out, so getting it back only happens if applySaved() truly kept it.
 	const savedOnPc = atWidth(WIDE, (M) => {
 		M.buildLayers();
+		M.setLegendPos('top-right', 'bottom-right');
 		return JSON.parse(JSON.stringify(M.serializeProject()));
 	});
 	ok('a project records the placement at all -- otherwise the case below is vacuous',

@@ -85,15 +85,31 @@ console.log('\n-- the Notes are still CONTENT, not a JS string --');
 	report(!/lpn_notes_\w+ *:/.test(src), 'no note text was smuggled into pageConfig as a JS string');
 }
 
-console.log('\n-- the popover behaves like the others --');
+console.log('\n-- the Notes box is a non-hog reference box, not a pull-down (Tom, 2026-09-28) --');
 {
-	report(/VIEW_POPOVERS = \[[^\]]*'lpn_notes_popup'/.test(src),
-		'it is in VIEW_POPOVERS, so another menu or a click away closes it');
+	// **NOT IN VIEW_POPOVERS ANY MORE.** Tom, 2026-09-28: "Draggable non-hog box for Help, Notes.
+	// I need it open for my spreadsheet editing video." A box he leaves open through an editing
+	// session must not vanish because a click landed on the map or a table.
+	report(!/VIEW_POPOVERS = \[[^\]]*'lpn_notes_popup'/.test(src),
+		'it is NOT in VIEW_POPOVERS -- a click on the map or a table must not close it');
 	report(/function toggleNotesPopup/.test(src), 'it toggles rather than only opening');
-	report(/wireNotesPopup\(\);/.test(src), 'its close button is wired at init');
+	report(/wireNotesPopup\(\);/.test(src), 'its close button and drag/resize memory are wired at init');
 	report(page.indexOf('id="lpn_notes_close"') > 0, 'and it has a close button');
 	report(/lpn-popover-body/.test(page.slice(page.indexOf('id="lpn_notes_popup"'), page.indexOf('id="lpn_notes_popup"') + 1500)),
 		'its body scrolls, since prose can be taller than the map it covers');
+	// Draggable, resizable and remembered per browser, the same shell as Settings and the report
+	// boxes -- see dev/lpn-spike/box-open-memory-harness.js for the drag/reopen/keystroke proof.
+	{
+		const notesAt = page.indexOf('id="lpn_notes_popup"');
+		const tagStart = page.lastIndexOf('<div', notesAt);
+		const tagEnd = page.indexOf('>', notesAt);
+		report(page.slice(tagStart, tagEnd).indexOf('lpn-setbox') > 0,
+			'it wears the standing-box shell (lpn-setbox)');
+	}
+	report(/id="lpn_notes_title"/.test(page), 'it has a title bar to drag by');
+	report(/LPN_NOTESBOX_KEY *= *'lpn_notesbox'/.test(src), 'its layout is remembered under lpn_notesbox');
+	report(/box\.addEventListener\('keydown', function \(e\) \{\s*if \(e\.key === 'Escape'\) \{ e\.preventDefault\(\); closeNotesBox\(\); \}/.test(src),
+		'Escape closes it only when bound to the box itself, i.e. only when focus is inside it');
 }
 
 console.log('\n-- the invitation landed somewhere real before the page dropped it --');

@@ -438,9 +438,13 @@ console.log('\n--- 9. Paste as new rows at end of table: the menu arms it, Ctrl+
 	L.selectCell('junctions', 'K7', 'elev');
 	paste('70');
 	report(nodes().length === 7 && L.nodeById('K7').elev === 70, 'the next plain Ctrl+V is ordinary again');
-	// Tables that cannot create rows offer nothing.
+	// Text and Customers create rows by paste too (Tom, 2026-09-28: "Nothing about text is harder
+	// to put in a table than a junction is"), so the action is offered there as well.
+	pasteIntoEmpty('text', 'X1\t\t\tK1');
 	L.openPane('text'); L.renderTable('text');
-	report(!L.spec('text').appendArmed, 'the Text table has no such action');
+	L.ctxMenu('text', 'X1', 'sizeMult');
+	const itText = item(menuEl());
+	report(!!itText, 'the Text table\'s cell menu offers Paste as new rows at end of table too', itText && itText.textContent);
 }
 
 console.log('\n--- 10. 100 rows pasted on the first of 50: the paste asks ---');
