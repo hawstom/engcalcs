@@ -64,8 +64,12 @@ report(walled.hidden.length === 1 && !walled.hiddenRoom.length, 'a label hidden 
 const bench = path.join(__dirname, '..');
 const sets = loadSets(path.join(bench, 'scenes'));
 function r14Total(res) {
-	const t = { asked: 0, along: 0, missed: 0 };
-	res.forEach(function (s) { s.steps.forEach(function (st) { t.asked += st.score.r14.asked; t.along += st.score.r14.along; t.missed += st.score.r14.missedWithRoom; }); });
+	const t = { asked: 0, along: 0, missed: 0, closeLevel: 0, closeRoom: 0 };
+	res.forEach(function (s) { s.steps.forEach(function (st) {
+		const r = st.score.r14;
+		t.asked += r.asked; t.along += r.along; t.missed += r.missedWithRoom;
+		if (r.zoom >= 4) { t.closeLevel += r.asked - r.along; t.closeRoom += r.missedWithRoom; }
+	}); });
 	return t;
 }
 const mast = r14Total(runBench(path.join(bench, 'placers/master-replay.js'), sets));
@@ -87,6 +91,8 @@ const level = {
 };
 const lev = r14Total(runBench(level, sets));
 report(lev.missed > R14_MAX_MISSED * lev.asked, 'the same layouts with every pipe label turned level fail R14', JSON.stringify(lev));
+report(lev.closeLevel > 0 && lev.closeRoom > 0.05 * lev.closeLevel, 'and fail R14 at close zoom (level labels with room to lie along their pipe)',
+	lev.closeRoom + '/' + lev.closeLevel);
 
 // ---- 3. Tom's numbers are the judges' alone ------------------------------------------------------
 report(TOM.leaderOnLeader === 0.9 && TOM.labelOnLeader === 0.7 && TOM.labelOnLink === 0.3 && TOM.leaderOnLink === 0.2,

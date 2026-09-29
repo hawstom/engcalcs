@@ -197,6 +197,59 @@ const EVERY_SHAPE_SRC = `function (scene) {
 	return { labels: out };
 }`;
 
+// **THE INK THE PAGE DREW, ROW BY ROW, AS TURNED BOXES IN CANVAS PX** -- the same shape contract.js's
+// placementBoxes() states. A whole <text>'s getBoundingClientRect() is the axis-aligned hull: for a
+// turned label or a stepped stack it covers ground the ink does not, so two labels that do not
+// touch "overlap" by it (round 3's pre-review counted 16-35 such pairs where the ink overlapped
+// nowhere). Each row is a run of tspans starting at one that carries its own `x`.
+const DRAWN_INK = `(() => {
+	const cv = document.getElementById('lpn_canvas'), r = cv.getBoundingClientRect();
+	const ox = r.left + (cv.clientLeft || 0), oy = r.top + (cv.clientTop || 0), out = {};
+	document.querySelectorAll('#lpn_canvas text[data-nodelbl], #lpn_canvas text.lpn-lbl[data-linklbl]:not([data-repeat])').forEach((t) => {
+		if (getComputedStyle(t).visibility === 'hidden' || !t.textContent) { return; }
+		const id = t.getAttribute('data-nodelbl') !== null ? 'n:' + t.getAttribute('data-nodelbl') : 'l:' + t.getAttribute('data-linklbl');
+		const M = t.getScreenCTM(), P = (x, y) => { const p = new DOMPoint(x, y).matrixTransform(M); return [p.x - ox, p.y - oy]; };
+		const groups = [];
+		Array.from(t.children).filter((k) => k.tagName === 'tspan').forEach((k) => {
+			if (k.getAttribute('x') !== null || !groups.length) { groups.push([]); }
+			groups[groups.length - 1].push(k);
+		});
+		out[id] = groups.map((g) => {
+			let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+			g.forEach((k) => { const b = k.getBBox(); if (!b.width && !b.height) { return; } x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y); x1 = Math.max(x1, b.x + b.width); y1 = Math.max(y1, b.y + b.height); });
+			if (!(x1 > x0)) { return null; }
+			const q = [P(x0, y0), P(x1, y0), P(x1, y1), P(x0, y1)];
+			return { cx: (q[0][0] + q[2][0]) / 2, cy: (q[0][1] + q[2][1]) / 2, w: Math.hypot(q[1][0] - q[0][0], q[1][1] - q[0][1]),
+				h: Math.hypot(q[3][0] - q[0][0], q[3][1] - q[0][1]), angle: Math.atan2(q[1][1] - q[0][1], q[1][0] - q[0][0]) * 180 / Math.PI };
+		}).filter(Boolean);
+	});
+	return out;
+})()`;
+// Worst distance by which a drawn row's ink leaves the row box the placer stated (its centre off
+// by more than the pitch's slack, or wider), and the rows whose turn differs by more than 1 degree.
+function inkAgainstStated(scene, layout, drawn) {
+	const C = require(path.join(REPO, 'dev/lpn-spike/label-bench/contract.js'));
+	const req = {};
+	scene.labels.forEach((r) => { req[r.id] = r; });
+	let worst = 0, at = '', turned = [], rows = [];
+	Object.keys(layout).forEach((id) => {
+		const p = layout[id];
+		if (!p || !p.shown || !drawn[id]) { return; }
+		const want = C.placementBoxes(req[id], Object.assign({}, p, { repeats: [] }), scene.text), got = drawn[id];
+		if (got.length !== want.length) { rows.push(id + ' ' + got.length + '/' + want.length); return; }
+		got.forEach((g, i) => {
+			const w = want[i];
+			const rad = -(w.angle || 0) * Math.PI / 180, dx = g.cx - w.cx, dy = g.cy - w.cy;
+			const u = dx * Math.cos(rad) - dy * Math.sin(rad), v = dx * Math.sin(rad) + dy * Math.cos(rad);
+			const e = Math.max(Math.abs(u) - Math.max(0, (w.w - g.w) / 2), Math.abs(v) - Math.max(0, (w.h - g.h) / 2), g.w - w.w);
+			if (e > worst) { worst = e; at = id + ' row ' + i; }
+			let da = Math.abs(((g.angle - (w.angle || 0)) % 360 + 540) % 360 - 180);
+			if (da > 1) { turned.push(id + ' ' + g.angle.toFixed(1) + '/' + (w.angle || 0)); }
+		});
+	});
+	return { worst: worst, at: at, turned: turned, rows: rows };
+}
+
 async function sectionEveryShape(a, scene0) {
 	const page = a.page;
 	await page.evaluate((src) => { EngCalcs.lpnPlacers.trivial.place = new Function('return ' + src)(); }, EVERY_SHAPE_SRC);
@@ -252,6 +305,60 @@ async function sectionEveryShape(a, scene0) {
 	ok('a turned label is turned, and only it', !bad.angle.length, bad.angle.slice(0, 3).join(', '));
 	ok('dropped rows are not drawn; a node label can be one line', !bad.rows.length, bad.rows.slice(0, 4).join(', '));
 	ok('a label stated hidden is hidden, and no other is', !bad.hidden.length, bad.hidden.slice(0, 4).join(', ') || n((w) => !w.shown) + ' hidden');
+	const ink = inkAgainstStated(scene, want, await page.evaluate(DRAWN_INK));
+	ok('every row\'s ink, turned stacks and lines included, lies in the row box the placer stated, within 1.5 px',
+		ink.worst <= 1.5 && !ink.turned.length && !ink.rows.length,
+		'worst ' + ink.worst.toFixed(2) + ' px ' + ink.at + (ink.turned.length ? '; turned differently: ' + ink.turned.slice(0, 3).join(', ') : '') + (ink.rows.length ? '; rows: ' + ink.rows.slice(0, 3).join(', ') : ''));
+}
+
+// **R13 THROUGH THE REAL CHECKBOX** (round 3's pre-review, 2026-09-28: a click on "Draw link labels
+// along the link line" re-ran the placer and changed no angle on the page). A placer that turns
+// exactly the pipe labels the scene marks `along` is installed; the checkbox is clicked off and on
+// again, and after each click the scene must say so and the page must draw what came back.
+const ALONG_SRC = `function (scene) {
+	var out = {};
+	scene.labels.forEach(function (req, i) {
+		out[req.id] = { shown: true, rows: [0], layout: 'line', align: 'center', angle: req.along ? 30 : 0,
+			x: req.anchor.x + 6, y: req.anchor.y + 6, leader: null };
+	});
+	return { labels: out };
+}`;
+async function sectionToggle(a) {
+	const page = a.page;
+	await page.evaluate((src) => { EngCalcs.lpnPlacers.trivial.place = new Function('return ' + src)(); }, ALONG_SRC);
+	const name = await a.lang('lpn_settings_align_labels');
+	async function click() {
+		return page.evaluate((nm) => {
+			const l = Array.from(document.querySelectorAll('label')).find((e) => (e.textContent || '').indexOf(nm) >= 0);
+			const cb = l && l.querySelector('input[type=checkbox]');
+			if (!cb) { return null; }
+			cb.click();
+			return cb.checked;
+		}, name);
+	}
+	async function drawnTurns() {
+		return page.evaluate(() => Array.from(document.querySelectorAll('#lpn_canvas text.lpn-lbl[data-linklbl]:not([data-repeat])'))
+			.filter((t) => getComputedStyle(t).visibility !== 'hidden' && t.textContent && /rotate\(30 /.test(t.getAttribute('transform') || '')).length);
+	}
+	let state = await click();
+	if (state === null) {
+		// The Settings box is not open: open it through the toolbar's own button and try again.
+		const tool = await a.lang('lpn_tool_settings');
+		await page.evaluate((nm) => { const b = Array.from(document.querySelectorAll('button')).find((e) => (e.getAttribute('aria-label') || e.title || '') === nm); if (b) { b.click(); } }, tool);
+		await a.settle(400);
+		state = await click();
+	}
+	ok('the Settings box offers the alignment checkbox', state !== null);
+	if (state === null) { return; }
+	for (let k = 0; k < 2; k++) {
+		if (k) { state = await click(); }
+		await a.settle(700);
+		const last = await page.evaluate(() => { const L = EngCalcs.lpnPlacerLast; return { settings: L.scene.settings, along: L.scene.labels.filter((r) => r.along).length, links: L.scene.labels.filter((r) => r.kind === 'link' && !r.hand).length }; });
+		const turned = await drawnTurns();
+		ok('alignment ' + (state ? 'on' : 'off') + ' by a click: the next scene says so and the page draws what came back',
+			last.settings && last.settings.alignPipeLabels === state && last.along === (state ? last.links : 0) && turned === last.along,
+			JSON.stringify(last) + '; drawn turned ' + turned);
+	}
 }
 
 // ---- 1. the trivial placer drives the real page -------------------------------------------------
@@ -333,6 +440,7 @@ async function sectionPlacer(Session, browser, env) {
 		ok('hand-placed labels are passed in', scene.labels.some((r) => r.hand), scene.labels.filter((r) => r.hand).map((r) => r.id).join(', '));
 
 		await sectionEveryShape(a, scene);
+		await sectionToggle(a);
 
 		// T1: a pan held in the hand places nothing; its release is followed by a layout.
 		const c = await page.evaluate(() => { const r = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height }; });
