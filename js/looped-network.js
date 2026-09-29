@@ -24013,7 +24013,6 @@ var EngCalcs = EngCalcs || {};
 			// hidden the moment they were made.
 			if (!filterNote && paneCanCreate(spec)) {
 				note.textContent += ' ' + (pc.lpn_pane_paste_here || 'Click here and paste rows from a spreadsheet to add them.');
-				note.tabIndex = 0;
 				note.className += ' lpn-pane-paste-target';
 				note.addEventListener('paste', function (e) {
 					var text, cells;
@@ -24026,6 +24025,21 @@ var EngCalcs = EngCalcs || {};
 					panePasteAt(spec, cells, { append: true });
 				});
 			}
+			// **FOCUSABLE EVEN WITH NOTHING TO PASTE INTO, AND EVEN UNDER A FILTER** (Task 690,
+			// Perry's pre-review on b37ec130: Ctrl+Shift+PageDown/PageUp went dead on Valves or
+			// Customers on Net3, which have no rows). `tabIndex` used to be set only inside the
+			// paste-target branch above, so a table with no create door -- or one hidden behind a
+			// filter -- left NOTHING in the panel the keyboard could reach, and this shortcut had
+			// no element to fire on. This note is the one thing left standing in an empty panel, so
+			// it carries the same keydown a real table's own <table> does (paneWireTable), scoped to
+			// itself exactly as that one is -- never a document- or pane-wide listener that could
+			// steal the key from the Find box or any other control outside the tables.
+			note.tabIndex = 0;
+			note.addEventListener('keydown', function (e) {
+				var key = e && e.key, jump = !!(e && (e.ctrlKey || e.metaKey)), ext = !!(e && e.shiftKey);
+				if (!jump || !ext || (key !== 'PageDown' && key !== 'PageUp')) { return; }
+				if (paneSwitchTableTab(spec, key === 'PageDown' ? 1 : -1) && e.preventDefault) { e.preventDefault(); }
+			});
 			host.appendChild(note);
 			return;
 		}
@@ -24718,10 +24732,29 @@ var EngCalcs = EngCalcs || {};
 	// border (see paneSelPaint()), so a Shift-extended range survives the trip untouched. A table
 	// nobody has touched yet gets its first cell, as a spreadsheet opens on A1.
 	function paneFocusActiveCell(spec) {
-		var rows, cols, box;
+		var rows, cols, box, host, note;
 		if (!spec || !spec.tds) { return false; }
 		rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
-		if (!rows.length || !cols.length) { return false; }
+		if (!rows.length || !cols.length) {
+			// **AN EMPTY TABLE HAS NO CELL, BUT SOMETHING STILL HAS TO HOLD THE CARET** (Task 690,
+			// Perry's pre-review on b37ec130): every caller of this function -- setPaneTab(),
+			// openPane(), and paneSwitchTableTab() switching onto a table with no rows -- needs
+			// Ctrl+Shift+PageDown/PageUp to keep working from here, and that shortcut is wired
+			// (renderPaneTable()) onto the "none of these yet" note that stands in for the missing
+			// <table>. Landing there is what lets the NEXT press find a keydown listener to answer.
+			// Positional, not a class-selector query: renderPaneTable() clears the panel and
+			// appends the note LAST (after an optional filter banner), so it is always the panel's
+			// last child in the empty case -- true in a real browser and in the headless DOM stub
+			// alike, where querySelector() only ever matches a bare tag name.
+			host = spec.panel ? document.getElementById(spec.panel) : null;
+			note = host && host.children && host.children.length ? host.children[host.children.length - 1] : null;
+			if (note && note.className && note.className.indexOf('lpn-lib-note') < 0) { note = null; }
+			if (note && note.focus) {
+				try { note.focus({ preventScroll: true }); } catch (e) { note.focus(); }
+				return true;
+			}
+			return false;
+		}
 		box = paneSelBox(spec, rows, cols);
 		if (!box) {
 			paneSelSet(spec, rows, cols, 0, 0, false);

@@ -17,6 +17,12 @@
 //      Time series or Profile, which sit on the same tab strip but hold no cell grid.
 //   6. Mid-edit, the typed-but-not-yet-committed value is committed before the switch, so no
 //      text is lost -- the same choice Enter and the arrow keys make.
+//   7. **AN EMPTY TABLE STILL ANSWERS THE SHORTCUT** (Perry's pre-review finding on b37ec130):
+//      Pumps, Valves, Text and Customers are left with no rows at all in this harness -- a real
+//      network commonly has empty asset tables (Net3 has no valves) -- and the shortcut must
+//      still work FROM one of them, in both directions, including walking straight through
+//      several empty tables in a row, and the "none of these yet" note is where the caret lands
+//      so the NEXT press still has something to answer it.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -70,16 +76,34 @@ const L = loadLoopedNetwork(
 );
 L.buildLayers();
 
-function tableEl(id) { return byId['lpn_pane_' + id].children.filter((c) => c._tag === 'table')[0]; }
+function fire(el, type, ev) {
+	((el && el._listeners && el._listeners[type]) || []).slice().forEach((f) => f(ev || {}));
+}
+// **THE ELEMENT THE LISTENER LIVES ON, NOT A FIXED TAG** -- a table with rows carries the key
+// handler on its <table> (paneWireTable); an EMPTY table has no <table> at all (renderPaneTable()
+// draws its "none of these yet" note instead) and carries it on THAT. The stub's fire() does not
+// simulate bubbling (nor does any other harness here rely on that), so the target has to be
+// whichever one is really standing in the panel right now.
+function keyOwnerEl(id) {
+	const host = byId['lpn_pane_' + id];
+	if (!host || !host.children) { return null; }
+	const table = host.children.filter((c) => c._tag === 'table')[0];
+	if (table) { return table; }
+	return host.children.filter((c) => c._tag === 'p')[0];
+}
 function pressPageKey(id, key, opts) {
 	let prevented = false;
 	const o = opts || {};
-	fire(tableEl(id), 'keydown', { key: key, shiftKey: !!o.shift, ctrlKey: o.ctrl !== false,
+	fire(keyOwnerEl(id), 'keydown', { key: key, shiftKey: !!o.shift, ctrlKey: o.ctrl !== false,
 		metaKey: false, altKey: false, preventDefault: function () { prevented = true; } });
 	return prevented;
 }
-function fire(el, type, ev) {
-	((el && el._listeners && el._listeners[type]) || []).slice().forEach((f) => f(ev || {}));
+// Is the caret standing on TABLE id's own empty-state note (renderPaneTable's ".lpn-lib-note"),
+// as opposed to nothing, or a leftover element from some other panel?
+function focusedIsEmptyNoteOf(id) {
+	const host = byId['lpn_pane_' + id], el = document.activeElement;
+	return !!(host && el && host.children && host.children.indexOf(el) !== -1 &&
+		el.className && el.className.indexOf('lpn-lib-note') !== -1);
 }
 
 const jIds = [L.addNode('junction', 0, 0), L.addNode('junction', 10, 0), L.addNode('junction', 20, 0),
@@ -89,37 +113,39 @@ const rIds = [L.addNode('reservoir', 0, 100)].map((n) => n.id);
 L.setCell('reservoirs', rIds[0], 'elev', 500);
 const tIds = [L.addNode('tank', 0, 200), L.addNode('tank', 10, 200)].map((n) => n.id);
 tIds.forEach((id, i) => { L.setCell('tanks', id, 'elev', 300 + i); });
-// A pipe to carry a customer -- Customers is the LAST data table in paneTables() order, and it
-// needs at least one row for test 4 below: an empty CURRENT table's keydown bails out before
-// this shortcut is ever reached (`paneHandleKey`'s own `!rows.length` guard), which would make
-// the boundary this test names untestable rather than passing.
-const pipe = L.addLink('pipe', jIds[0], jIds[1]);
+L.addLink('pipe', jIds[0], jIds[1]);
 L.addLink('pipe', jIds[2], jIds[3]);
-L.addCustomer(5, 0, { link: pipe.id });
+// **PUMPS, VALVES, TEXT AND CUSTOMERS ARE LEFT EMPTY, DELIBERATELY.** A real network commonly
+// has empty asset tables -- EPANET's own Net3 has no valves -- and that is precisely the case
+// Perry's pre-review caught going dead on b37ec130: an empty CURRENT table left nothing in its
+// panel the keyboard could reach, so the shortcut was never claimed and the tab never moved.
+// Four of them in a row, at the END of the strip, also exercises "walk through several empty
+// tables" and "the no-wrap boundary is now a genuinely EMPTY last table", not a stand-in for one.
 
 L.openPane('junctions');
-L.renderTable('junctions');
-L.renderTable('reservoirs');
-L.renderTable('tanks');
-L.renderTable('customers');
+['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'text', 'customers']
+	.forEach((id) => L.renderTable(id));
 
 const order = L.tableIds();
-report(order[0] === 'junctions' && order[1] === 'reservoirs' && order[2] === 'tanks',
+report(order.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers',
 	'the table order this harness assumes is the real one', JSON.stringify(order));
 
 console.log('\n--- 1. Ctrl+Shift+PageDown moves to the NEXT table; plain Ctrl+PageDown does not ---');
 {
-	const undone = pressPageKey('junctions', 'PageDown', { shift: false });
+	L.setPaneTab('junctions');
+	L.selectBox('junctions', 'elev', 'elev', 0, 0);
+	L.focusable('junctions', jIds[0], 'elev').focus();
+	const undone = pressPageKey(L.activeTab(), 'PageDown', { shift: false });
 	report(!undone, 'plain Ctrl+PageDown (no Shift) is left for the browser -- not claimed');
 	report(L.activeTab() === 'junctions', 'and the tab did not move', L.activeTab());
-	const claimed = pressPageKey('junctions', 'PageDown', { shift: true });
+	const claimed = pressPageKey(L.activeTab(), 'PageDown', { shift: true });
 	report(claimed, 'Ctrl+Shift+PageDown is claimed');
 	report(L.activeTab() === 'reservoirs', 'the tab moved to the next table, Reservoirs', L.activeTab());
 }
 
 console.log('\n--- 2. Ctrl+Shift+PageUp moves back to the PREVIOUS table ---');
 {
-	const claimed = pressPageKey('reservoirs', 'PageUp', { shift: true });
+	const claimed = pressPageKey(L.activeTab(), 'PageUp', { shift: true });
 	report(claimed, 'Ctrl+Shift+PageUp is claimed');
 	report(L.activeTab() === 'junctions', 'the tab moved back to Junctions', L.activeTab());
 }
@@ -127,27 +153,17 @@ console.log('\n--- 2. Ctrl+Shift+PageUp moves back to the PREVIOUS table ---');
 console.log('\n--- 3. Excel does not wrap: PageUp on the first table is a no-op ---');
 {
 	report(L.activeTab() === 'junctions', 'starting on the first table, Junctions');
-	const claimed = pressPageKey('junctions', 'PageUp', { shift: true });
+	const claimed = pressPageKey(L.activeTab(), 'PageUp', { shift: true });
 	report(claimed, 'the keystroke is still claimed (never reaches the browser)');
 	report(L.activeTab() === 'junctions', 'but the tab did not wrap to the last table', L.activeTab());
 }
 
-console.log('\n--- 4. Excel does not wrap: PageDown on the last table is a no-op ---');
-{
-	L.setPaneTab(order[order.length - 1]);
-	report(L.activeTab() === order[order.length - 1], 'starting on the last table', L.activeTab());
-	const claimed = pressPageKey(order[order.length - 1], 'PageDown', { shift: true });
-	report(claimed, 'the keystroke is still claimed');
-	report(L.activeTab() === order[order.length - 1], 'but the tab did not wrap to the first table', L.activeTab());
-	L.setPaneTab('junctions');
-}
-
-console.log('\n--- 5. focus lands on the SAME COLUMN if it exists, else the FIRST column ---');
+console.log('\n--- 4. focus lands on the SAME COLUMN if it exists, else the FIRST column ---');
 {
 	// "elev" exists in both Junctions and Reservoirs -- the switch keeps it.
 	L.selectBox('junctions', 'elev', 'elev', 0, 0);
 	L.focusable('junctions', jIds[0], 'elev').focus();
-	pressPageKey('junctions', 'PageDown', { shift: true });
+	pressPageKey(L.activeTab(), 'PageDown', { shift: true });
 	const at1 = L.focused('reservoirs');
 	report(!!at1 && at1.key === 'elev', 'landed on "elev" in Reservoirs, the shared column', JSON.stringify(at1));
 	L.setPaneTab('junctions');
@@ -156,19 +172,19 @@ console.log('\n--- 5. focus lands on the SAME COLUMN if it exists, else the FIRS
 	// back to the first column, "id".
 	L.selectBox('junctions', 'demand', 'demand', 0, 0);
 	L.focusable('junctions', jIds[0], 'demand').focus();
-	pressPageKey('junctions', 'PageDown', { shift: true });
+	pressPageKey(L.activeTab(), 'PageDown', { shift: true });
 	const at2 = L.focused('reservoirs');
 	report(!!at2 && at2.key === 'id', 'no "demand" column in Reservoirs -- landed on the first column, "id"', JSON.stringify(at2));
 	L.setPaneTab('junctions');
 }
 
-console.log('\n--- 6. focus lands on the SAME ROW INDEX, clamped to the destination row count ---');
+console.log('\n--- 5. focus lands on the SAME ROW INDEX, clamped to the destination row count ---');
 {
 	// Row index 3 (the 4th of Junctions' 5 rows) -- Reservoirs has only 1 row, so the row index
 	// clamps to 0, the last (and only) row it has, never to an index that does not exist.
 	L.selectBox('junctions', 'elev', 'elev', 3, 3);
 	L.focusable('junctions', jIds[3], 'elev').focus();
-	pressPageKey('junctions', 'PageDown', { shift: true });
+	pressPageKey(L.activeTab(), 'PageDown', { shift: true });
 	const resOrder = L.tableOrder('reservoirs');
 	const at = L.focused('reservoirs');
 	report(!!at && at.id === resOrder[0], 'row index 3 clamped down to Reservoirs\' only row', JSON.stringify(at));
@@ -181,7 +197,7 @@ console.log('\n--- 6. focus lands on the SAME ROW INDEX, clamped to the destinat
 	const tankOrder = L.tableOrder('tanks');
 	L.selectBox('tanks', 'tag', 'tag', 1, 1);
 	L.focusable('tanks', tankOrder[1], 'tag').focus();
-	pressPageKey('tanks', 'PageDown', { shift: true });
+	pressPageKey(L.activeTab(), 'PageDown', { shift: true });
 	const pipeOrder = L.tableOrder('pipes');
 	const at2 = L.focused('pipes');
 	report(!!at2 && at2.id === pipeOrder[1] && at2.key === 'tag',
@@ -189,30 +205,76 @@ console.log('\n--- 6. focus lands on the SAME ROW INDEX, clamped to the destinat
 	L.setPaneTab('junctions');
 }
 
-console.log('\n--- 7. scoped to the data tables only -- never Time series or Profile ---');
+console.log('\n--- 6. scoped to the data tables only -- never Time series or Profile ---');
 {
 	const tabs = L.tabIds();
 	report(tabs.indexOf('timeseries') > order.length - 1 && tabs.indexOf('profile') > order.length - 1,
 		'Time series and Profile sit after the data tables on the strip', JSON.stringify(tabs));
-	// From the LAST data table, PageDown must stay there, never step onto Time series.
-	L.setPaneTab(order[order.length - 1]);
-	pressPageKey(order[order.length - 1], 'PageDown', { shift: true });
-	report(L.activeTab() === order[order.length - 1],
-		'PageDown from the last data table does not advance onto Time series', L.activeTab());
-	L.setPaneTab('junctions');
 }
 
-console.log('\n--- 8. mid-edit, the typed value is committed before the switch, never lost ---');
+console.log('\n--- 7. mid-edit, the typed value is committed before the switch, never lost ---');
 {
 	L.selectBox('junctions', 'elev', 'elev', 0, 0);
 	const box = L.focusable('junctions', jIds[0], 'elev');
 	box.focus();
 	L.enterEdit(box, true);
 	box.value = '777';
-	pressPageKey('junctions', 'PageDown', { shift: true });
+	pressPageKey(L.activeTab(), 'PageDown', { shift: true });
 	report(L.cellText('junctions', jIds[0], 'elev') === '777',
 		'the typed-but-uncommitted "777" landed in the model, not lost', L.cellText('junctions', jIds[0], 'elev'));
 	report(L.activeTab() === 'reservoirs', 'and the switch still happened');
+	L.setPaneTab('junctions');
+}
+
+console.log('\n--- 8. an EMPTY table still answers the shortcut, in both directions ---');
+{
+	// Pipes (2 real rows) -> Pumps (empty): the switch still fires from a non-empty table INTO
+	// an empty one, and something in the empty panel has to catch the caret.
+	L.setPaneTab('pipes');
+	const pipeOrder = L.tableOrder('pipes');
+	L.selectBox('pipes', 'tag', 'tag', 0, 0);
+	L.focusable('pipes', pipeOrder[0], 'tag').focus();
+	const claimed1 = pressPageKey(L.activeTab(), 'PageDown', { shift: true });
+	report(claimed1, 'Ctrl+Shift+PageDown out of a full table is claimed');
+	report(L.activeTab() === 'pumps', 'the tab moved to Pumps, which has no rows', L.activeTab());
+	report(focusedIsEmptyNoteOf('pumps'),
+		'the caret landed on Pumps\' "none of these yet" note -- somewhere sensible to keep going');
+
+	// FROM that empty table, PageDown keeps going: Pumps -> Valves, both empty.
+	const claimed2 = pressPageKey(L.activeTab(), 'PageDown', { shift: true });
+	report(claimed2, 'Ctrl+Shift+PageDown FROM an empty table (Pumps) is claimed');
+	report(L.activeTab() === 'valves', 'the tab moved on to Valves, also empty', L.activeTab());
+	report(focusedIsEmptyNoteOf('valves'), 'and the caret landed on Valves\' own empty-state note');
+
+	// Walk the rest of the strip: Valves -> Text -> Customers, all empty, one keystroke apiece --
+	// several empty tables in a row, not just one.
+	pressPageKey(L.activeTab(), 'PageDown', { shift: true });
+	report(L.activeTab() === 'text', 'Valves -> Text', L.activeTab());
+	report(focusedIsEmptyNoteOf('text'), 'landed on Text\'s own empty-state note');
+	pressPageKey(L.activeTab(), 'PageDown', { shift: true });
+	report(L.activeTab() === 'customers', 'Text -> Customers, the LAST table', L.activeTab());
+	report(focusedIsEmptyNoteOf('customers'), 'landed on Customers\' own empty-state note');
+
+	// The no-wrap boundary, now against a table that is GENUINELY empty (not a stand-in): one
+	// more PageDown from the last table, empty, is still claimed and still does not wrap.
+	const claimed3 = pressPageKey(L.activeTab(), 'PageDown', { shift: true });
+	report(claimed3, 'PageDown on the last table (empty) is still claimed');
+	report(L.activeTab() === 'customers', 'and it does not wrap to Junctions', L.activeTab());
+
+	// FROM an empty table, PageUp works too, walking back into a table that has real rows.
+	const claimed4 = pressPageKey(L.activeTab(), 'PageUp', { shift: true });
+	report(claimed4, 'Ctrl+Shift+PageUp FROM an empty table (Customers) is claimed');
+	report(L.activeTab() === 'text', 'Customers -> Text', L.activeTab());
+	pressPageKey(L.activeTab(), 'PageUp', { shift: true });
+	pressPageKey(L.activeTab(), 'PageUp', { shift: true });   // text -> valves -> pumps
+	report(L.activeTab() === 'pumps', 'walked back through Valves to Pumps', L.activeTab());
+	const claimed5 = pressPageKey(L.activeTab(), 'PageUp', { shift: true });
+	report(claimed5, 'Ctrl+Shift+PageUp from Pumps (empty) back into Pipes (real rows) is claimed');
+	report(L.activeTab() === 'pipes', 'landed back on Pipes', L.activeTab());
+	const at = L.focused('pipes');
+	report(!!at && at.id === pipeOrder[0] && at.key === 'id',
+		'with nothing to carry from an empty source, focus falls back to the first cell, row 0 / "id"',
+		JSON.stringify(at));
 	L.setPaneTab('junctions');
 }
 
