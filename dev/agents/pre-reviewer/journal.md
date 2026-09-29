@@ -3235,3 +3235,49 @@ byte-for-byte layout stability between two identical views.
   branches.
 - No repo file edited on either worktree; `git status --porcelain` empty on both,
   re-checked after this pass.
+
+## 2026-09-28 — feat/fill-handle (Task 690's drag half), HEAD 9893ce3a
+
+OBSERVED (this session, real Chromium via Playwright against the worktree's own `php -S`,
+under `flock /tmp/engcalcs-browser.lock`, using dev/browser-pass's Session/env infra by absolute
+path — worktree never edited):
+
+- Real `page.mouse` down/move/up on the handle's own on-screen coordinates: drag down 3 rows
+  correctly tiled the source cell's value into rows 1-3, left row 0 and row 4 untouched, showed
+  the "Filled 3 cells. 0 were not changed." notice. PASS.
+- Dashed preview (`.lpn-pane-fillrange`) painted mid-drag (3 cells) and removed after release/Escape.
+- Escape mid-drag: no values changed, no preview left, matches the pure-DOM harness's own claim.
+- Ctrl+Z after a 3-row drag restored the pre-drag values in one step.
+- No handle on an id-only selection (paneFillBoxHasSettable gate holds under real click-selection).
+- A box selected from a settable column to a READ-ONLY corner column (e.g. demand -> quality)
+  still shows the handle — confirms the box-wide (not corner-only) settable check the code claims.
+- Ordinary drag-select (press well inside a cell, away from the corner) still builds a multi-cell
+  selection; column-resize grip still resizes. Neither regressed.
+- RTL (`?lang=ar`): handle sits at the cell's LEFT edge (the logical trailing corner), confirmed
+  numerically against the cell's own rect, not just by class name.
+- Touch: raw DOM `TouchEvent` dispatch does NOT reach the handle (Chromium only synthesizes
+  PointerEvents from touch for CDP-driven or real touch input, not from scripted TouchEvents) —
+  had to drive it through `Input.dispatchTouchEvent` (CDP) directly. Once driven that way, a touch
+  drag filled cells correctly. Worth remembering for any future lpn_ touch harness: a DOM
+  `dispatchEvent(new TouchEvent(...))` in a headless check proves nothing about a pointer-event-based
+  handler; only CDP touch input does.
+- MEASURED, minor: `document.elementFromPoint` sampled at 1px steps across the handle's own
+  6x6px declared box shows only a 5x5 area actually hit-tests as the handle; the right-most and
+  bottom-most 1px columns/rows resolve to something else. Cause: the handle is `position:absolute`
+  with `inset-inline-end:-1px; inset-block-end:-1px` inside a `td` that itself carries
+  `overflow:hidden` (`.lpn-pane-table tbody td { overflow:hidden }`, pre-existing rule) — the 1px
+  that pokes outside the cell's own box on two sides gets clipped by the cell's own overflow.
+  Visually a screenshot at 4x DPR still shows a solid small blue square in the corner (not obviously
+  broken to the eye), and it did not prevent any drag in this session's real-mouse or real-touch
+  tests, whose start point was the reported (unclipped) rect center. Reported as a small, measured
+  defect rather than blocking.
+- Ran the pure-DOM harness (`dev/lpn-spike/pane-fillhandle-harness.js`): 67/67, including left/up
+  drag direction and ABABA pattern tiling for a multi-row source and the filter-hides-rows case —
+  none of which this session drove with real pointer events (only down-drag was driven for real);
+  those three claims rest on the harness's own index-level simulation, not a real drag, and are
+  UNVERIFIABLE FROM HERE as real-pointer behaviour.
+- The existing `dev/browser-pass` `tables` suite threw once mid-section on an unrelated step
+  ("EPANET Net3 was clicked and nothing was drawn") while 7 separate `node run.js` processes were
+  running concurrently on this machine (heavy lock contention) — not attributed to this branch: my
+  own probe loaded that same example successfully 7/7 times outside that contention window, and the
+  diff touches nothing on the example-loading path.
