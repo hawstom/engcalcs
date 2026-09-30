@@ -144,10 +144,14 @@ const OPKEYS = ['lpn_find_op_conn_unlinked', 'lpn_find_op_conn_noopen', 'lpn_fin
 ok('the pull-down offers the four op keys, lowercase as written',
 	JSON.stringify(L.connOpLabels()) === JSON.stringify(OPKEYS.map(function (k) { return PC[k]; })),
 	JSON.stringify(L.connOpLabels()));
-// The exact English each result row printed before the redesign, from its own retired key.
-const BEFORE = ['No links at node', 'No open links at node', 'No link path to a source', 'No open path to a source'];
+// What each result row printed before the redesign was the op key's words with a capital first
+// letter (the retired keys were exactly that in English). Asserted against the page's own strings,
+// never an English literal, so a rewording keeps the test.
 STATES.forEach(function (st, i) {
-	ok('a ' + st + ' result row reads "' + BEFORE[i] + '", as it did', L.connLabel(st) === BEFORE[i], L.connLabel(st));
+	const want = PC[OPKEYS[i]].charAt(0).toUpperCase() + PC[OPKEYS[i]].slice(1);
+	ok('a ' + st + ' result row reads the op key with its first letter raised', L.connLabel(st) === want,
+		L.connLabel(st));
+	ok('...which is not the lowercase pull-down form', L.connLabel(st) !== PC[OPKEYS[i]]);
 });
 ok('a node that is fine prints nothing', L.connLabel('ok') === '');
 // Raising, never lowering: a translation that already opens with a capital keeps it, and one that
