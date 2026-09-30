@@ -4093,7 +4093,6 @@ html:has(#lpn_canvas) { overflow: hidden; }
 .lpn-ff-row { display: flex; align-items: baseline; gap: .5em; margin: .25em 0; }
 .lpn-ff-row > span:first-child { flex: 1 1 auto; }
 .lpn-ff-row > input, .lpn-ff-row > select { flex: 0 0 8rem; min-width: 0; }
-.lpn-ff-row > input[type="checkbox"] { flex: 0 0 auto; }
 .lpn-ff-unit { flex: 0 0 4rem; color: #555; font-size: .9em; }
 .lpn-ff-head { font-weight: bold; margin: .8em 0 .3em; }
 .lpn-ff-note { margin: .3em 0; font-size: .9em; color: #444; }

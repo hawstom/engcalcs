@@ -55219,12 +55219,6 @@ var EngCalcs = EngCalcs || {};
 		i.value = value === undefined || value === null ? '' : String(value);
 		return i;
 	}
-	function ffCheckbox(checked) {
-		var i = document.createElement('input');
-		i.type = 'checkbox';
-		i.checked = !!checked;
-		return i;
-	}
 	function ffSelect(options, value) {
 		var sel = document.createElement('select');
 		options.forEach(function (o) {
@@ -55279,29 +55273,22 @@ var EngCalcs = EngCalcs || {};
 		ffRow(host, pc.lpn_ff_residual || 'Residual pressure to hold', pc.lpn_ff_residual_tip,
 			boxes.residual, unitLabel('lpn_u_pressure'));
 
-		// **THE DESIGN CHECK IS A SWITCH, AND ITS SCOPE IS A NAMED SET CHOSEN BEFORE THE RUN: ALL OR
-		// SELECTED** (Tom, 2026-09-29, simplifying the three-way selector to a checkbox plus a scope:
-		// "(b) Design check (effect on system); (specify) pipes and other junctions to check:
-		// All/Selected"). `ask.design` still carries the combined 'off'/'all'/'selected' string that
-		// runFireFlowSweep() and ffDesignScope() already understood, built from the two boxes below
-		// rather than typed directly. ffDesignScope() maps any retired or unknown value, should
-		// anything still carry one, to All.
-		boxes.designOn = ffCheckbox(ffDesignScope(ask.design) !== 'off');
-		ffRow(host, pc.lpn_ff_design || 'Design check (effect on system)', pc.lpn_ff_design_tip,
-			boxes.designOn, '');
-		boxes.designScope = ffSelect([
+		// **THE DESIGN CHECK'S SCOPE IS A NAMED SET, CHOSEN BEFORE THE RUN: NONE, ALL, OR SELECTED**
+		// (Tom, 2026-09-30: "Replace Design check toggle with a third option 'None All Selected'."),
+		// reverting the 2026-09-29 checkbox-plus-scope split (Task 746) back to the single selector
+		// Task 742 shipped, now in Tom's own shorter words rather than "Do not check" / "All other
+		// junctions and all pipes" / "The selected junctions and their pipes". One row, one control;
+		// the row label keeps naming the concept ("Design check (effect on system)") now that no
+		// checkbox carries it. `ask.design` already carried the 'off'/'all'/'selected' string
+		// underneath the checkbox, and runFireFlowSweep()/ffDesignScope() never changed, so only the
+		// control built here changes back.
+		boxes.design = ffSelect([
+			['off', pc.lpn_source_type_none || 'None'],
 			['all', pc.lpn_ff_all || 'All'],
 			['selected', pc.lpn_ff_selected || 'Selected']
-		], ffDesignScope(ask.design) === 'selected' ? 'selected' : 'all');
-		boxes.designScope.disabled = !boxes.designOn.checked;
-		ffRow(host, pc.lpn_ff_design_scope || 'Pipes and other junctions to check',
-			pc.lpn_ff_design_scope_tip, boxes.designScope, '');
-		function ffSyncDesignAsk() {
-			boxes.designScope.disabled = !boxes.designOn.checked;
-			ask.design = boxes.designOn.checked ? boxes.designScope.value : 'off';
-		}
-		boxes.designOn.addEventListener('change', ffSyncDesignAsk);
-		boxes.designScope.addEventListener('change', ffSyncDesignAsk);
+		], ffDesignScope(ask.design));
+		ffRow(host, pc.lpn_ff_design || 'Design check (effect on system)', pc.lpn_ff_design_tip,
+			boxes.design, '');
 
 		boxes.minPressure = ffInput(ask.minPressure);
 		ffRow(host, pc.lpn_ff_minpressure || 'Lowest pressure allowed elsewhere',
@@ -55332,11 +55319,7 @@ var EngCalcs = EngCalcs || {};
 		run.type = 'button';
 		run.disabled = fireFlowBusy;
 		run.addEventListener('click', function () {
-			Object.keys(boxes).forEach(function (k) {
-				if (k === 'designOn' || k === 'designScope') { return; }
-				ask[k] = boxes[k].value;
-			});
-			ffSyncDesignAsk();
+			Object.keys(boxes).forEach(function (k) { ask[k] = boxes[k].value; });
 			runFireFlowSweep();
 		});
 		stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', buttons);
@@ -55355,7 +55338,6 @@ var EngCalcs = EngCalcs || {};
 		// Remembered as it is typed, so closing the box and reopening it does not throw the
 		// criteria away.
 		Object.keys(boxes).forEach(function (k) {
-			if (k === 'designOn' || k === 'designScope') { return; }
 			boxes[k].addEventListener('change', function () { ask[k] = boxes[k].value; });
 		});
 		initTipsIn(host);

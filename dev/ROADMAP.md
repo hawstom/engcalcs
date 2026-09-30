@@ -304,12 +304,13 @@ the block.
   and all keyboard shortcuts divided by context), Toolbars. (2) Helpers: Fix something, Install, and
   Cookies. (3) True about: Notes on this page, Welcome page, Screenshot, Privacy, Terms, About."*
   Seam: the menu definitions, shared with Task 718 (File menu); one track builds both.
-- 100|746| **Fire flow dialog: one All/Selected choice for each of its two scopes.**
+- 100|746| **Fire flow dialog: Design check is one None/All/Selected selector.**
   **BUILT 2026-09-30 on `feat/fireflow-scope`, port 8139** (Perry: ready), awaiting his browser pass.
   Tom, 2026-09-29, ruling `lpn_ff_design_no_selection`: *"Our interface needs simplification as
   follows: (a) (Specify) Junctions to test: All/Selected (b) Design check (effect on system);
-  (specify) pipes and other junctions to check: All/Selected"*, and the message: *"The design check
-  scope is set to Selected, but no assets are selected. Select assets or select All"*.
+  (specify) pipes and other junctions to check: All/Selected"*, then 2026-09-30: *"Replace Design
+  check toggle with a third option 'None All Selected'."* -- the checkbox-plus-scope built for (b)
+  reverted to one selector (None/All/Selected), (a) unchanged.
 
 - 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
