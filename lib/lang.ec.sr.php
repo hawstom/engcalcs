@@ -1655,6 +1655,15 @@ $ec_lang['lpn_ts_none']='Још ништа за приказ на графико
 $ec_lang['lpn_ts_no_frames']='Још нема резултата продуженог периода. Притисните Израчунај да покренете симулацију.';
 $ec_lang['lpn_ts_summary']='Елемената: {n}, извештајних тренутака: {steps}';
 $ec_lang['lpn_ts_axis_time']='Протекло време';
+$ec_lang['lpn_freq_menu']='Учесталост';
+$ec_lang['lpn_freq_tip']='Прикажите графикон расподеле учесталости једне особине за све чворове или све цеви у тренутном временском кораку.';
+$ec_lang['lpn_freq_title']='Расподела вредности';
+$ec_lang['lpn_freq_group_tip']='Да ли графикон приказује чворове или цеви.';
+$ec_lang['lpn_freq_quantity_tip']='Која вредност се приказује на графикону.';
+$ec_lang['lpn_freq_none']='Још нема резултата за ову вредност, па нема шта да се прикаже на графикону.';
+$ec_lang['lpn_freq_summary']='Приказано: {n} од {total}';
+$ec_lang['lpn_freq_summary_time']='Приказано: {n} од {total}, у {time}';
+$ec_lang['lpn_freq_axis_percent']='Проценат мањи од';
 $ec_lang['lpn_view_units']='Јединице';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Сачувај све';
@@ -2122,7 +2131,7 @@ $ec_lang['lpn_notes_6_term']='Помоћ за колоне табеле';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Изабери колону</td><td>Кликните заглавље</td></tr><tr><td>Додај или прошири избор колона</td><td>Ctrl+клик или Shift+клик на друго заглавље</td></tr><tr><td>Помери (промени редослед) изабране колоне</td><td>Превуците или користите Управљај колонама… у менију десног клика или ⋮</td></tr><tr><td>Мени ⋮ и стрелица за сортирање.</td><td>Лебдите изнад горњег угла заглавља, или изаберите или уђите у заглавље тастером Tab</td></tr><tr><td>Сакриј, Прикажи све, или управљај видљивошћу и редоследом</td><td>Десни клик на заглавље или мени ⋮ у горњем десном углу заглавља</td></tr><tr><td>Сортирај по колони</td><td>Иконица стрелице у горњем десном углу заглавља</td></tr><tr><td>Налепи као нове редове на крају табеле</td><td>Десни клик, мени ⋮ у горњем десном углу заглавља, или Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Пречице на тастатури за табелу';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Тастери стрелица</td><td>Кретање.</td></tr><tr><td>Tab, Enter</td><td>Заврши унос и пређи једну ћелију удесно / надоле.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Кретање уназад.</td></tr><tr><td>Shift+тастери стрелица</td><td>Прошири избор.</td></tr><tr><td>Ctrl+C</td><td>Копирај избор.</td></tr><tr><td>Ctrl+D</td><td>Попуни избор надоле од његовог горњег реда.</td></tr><tr><td>Ctrl+Enter</td><td>Попуни избор вредношћу активне ћелије.</td></tr><tr><td>Ctrl+A</td><td>Изабери целу табелу.</td></tr><tr><td>Ctrl+Shift+V</td><td>Налепи као нове редове на крају табеле.</td></tr><tr><td>Delete</td><td>Обриши ћелију.</td></tr><tr><td>F2</td><td>Отвори ћелију за уређивање.</td></tr><tr><td>Esc</td><td>Откажи уређивање.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Тастери стрелица</td><td>Кретање.</td></tr><tr><td>Tab, Enter</td><td>Заврши унос и пређи једну ћелију удесно / надоле.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Кретање уназад.</td></tr><tr><td>Shift+тастери стрелица</td><td>Прошири избор.</td></tr><tr><td>Ctrl+C</td><td>Копирај избор.</td></tr><tr><td>Ctrl+D</td><td>Попуни избор надоле од његовог горњег реда.</td></tr><tr><td>Ctrl+Enter</td><td>Попуни избор вредношћу активне ћелије.</td></tr><tr><td>Ctrl+A</td><td>Изабери целу табелу.</td></tr><tr><td>Ctrl+Shift+V</td><td>Налепи као нове редове на крају табеле.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Пређи на следећу или претходну табелу.</td></tr><tr><td>Delete</td><td>Обриши ћелију.</td></tr><tr><td>F2</td><td>Отвори ћелију за уређивање.</td></tr><tr><td>Esc</td><td>Откажи уређивање.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
