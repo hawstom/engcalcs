@@ -472,8 +472,13 @@ a one-line hint that appears the FIRST time a person opens a multi-cell selectio
 that is a new instrument, and Tom's own finding on the Hide-titles highlight is a reason to be
 skeptical it would work. Not proposing it now; no evidence it's needed.)
 
-48. **Make the Tables-pane filter a snapshot-by-default, like Recalculate, instead of adding a
-    toggle beside the Filter in table button.** An edited row that no longer matches should stay
+48. **SUPERSEDED 2026-09-29 — Tom chose the toggle this item argued against** (task brief for
+    Task 738, 2026-09-29: *"a STANDING filter while the Find box is open, with a toggle next to
+    'Filter in table' to make it a SNAPSHOT instead"*). Kept for the record; item 4 below answers
+    within his chosen direction rather than re-arguing default-snapshot. Original text follows.
+
+    Make the Tables-pane filter a snapshot-by-default, like Recalculate, instead of adding a
+    toggle beside the Filter in table button. An edited row that no longer matches should stay
     visible, marked, until the filter is re-applied or cleared — not vanish silently, and not gain
     a second always-live/snapshot control off in the Find box that sleeps on close. The existing
     per-table banner (`paneFilterBanner()`, `js/looped-network.js:23363-23380`) is already the
@@ -482,3 +487,9 @@ skeptical it would work. Not proposing it now; no evidence it's needed.)
     change in `paneFilterKeys()`/`paneTableElements()` to retain rather than recompute the match
     set on every redraw, plus a "no longer matches" row mark (visual language TBD, no precedent
     found in this codebase). See journal, 2026-09-28 (Task 738).
+
+4. **Task 738 — Snapshot filter mode: checkbox in the filter row, `.7`-opacity row dim + leading ⚠,
+   count folded into the existing receipt banner.** See journal, 2026-09-29, for the full reading
+   and citations. Ranked first of its three parts: the toggle + dim class alone already makes a
+   frozen row visibly different from a live one; the ⚠ glyph and the banner count are the next
+   increments and can trail the demo without leaving the first change silently wrong.

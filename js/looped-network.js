@@ -19326,7 +19326,7 @@ var EngCalcs = EngCalcs || {};
 		// Its own line rather than a second sentence in the count, which is a ruled string.
 		head = document.createElement('div');
 		head.className = 'lpn-find-hint';
-		head.textContent = pc.lpn_find_shift_hint || 'Shift+click to add/remove toggle.';
+		head.textContent = pc.lpn_find_shift_hint || 'Shift+click to toggle, adding if not in the selection set or removing if already in the selection set.';
 		box.appendChild(head);
 		var list = document.createElement('div');
 		// Bounded because the panel is a pull-down, not a report: a 4,000-pipe answer is a scroll
@@ -31687,14 +31687,24 @@ var EngCalcs = EngCalcs || {};
 			{ label: pc.lpn_v2_restore_no || 'Close so that I can check the current units first', fn: function () { saveToStorage(); } }
 		]);
 	}
-	function openProject(id) {
-		if (id === library.openId) { return true; }
+	// **Every path that moves `library.openId` away from a live open project calls this first**
+	// (Task 711). It is openProject()'s own outgoing sequence, pulled out so newProject(),
+	// saveProjectAs() and importProject() cannot each forget a piece of it the way newProject() and
+	// importProject() forgot rememberCurrentView() -- the tab being left kept solving and saving
+	// correctly, but its pan and zoom were never captured, so switching back refit it from scratch.
+	// Order is load-bearing: rememberCurrentView() before the switch reads `library.openId` as the
+	// OUTGOING id, and rememberSwitchState() runs AFTER saveToStorage() deliberately, so what it
+	// keeps is pinned to the bytes just written -- the only thing both sides of the switch can agree
+	// on.
+	function rememberOutgoingProject() {
 		rememberCurrentView();   // ...and where we were looking in it
 		saveToStorage(); // flush the outgoing project before switching away from it
-		// AFTER the flush, deliberately: what is kept is pinned to the bytes that were just
-		// written, which is the only thing both sides of the switch can agree on.
 		rememberSwitchState();   // ...and what we worked out about it (Task 680)
 		flushOutgoingFile();
+	}
+	function openProject(id) {
+		if (id === library.openId) { return true; }
+		rememberOutgoingProject();
 		var doc2 = readDocument(projectKey(id));
 		if (!doc2) { return false; }
 		library.openId = id;
@@ -31711,8 +31721,7 @@ var EngCalcs = EngCalcs || {};
 		// Making a project opens it, which is a project switch with an extra step -- and the
 		// wizard's state belongs to the document it started on. Same refusal, same reason.
 		if (georefBlocksProjectSwitch()) { return; }
-		saveToStorage();
-		flushOutgoingFile();
+		rememberOutgoingProject();
 		var inheritedSettings = JSON.parse(JSON.stringify(settings));
 		// **THE FRICTION METHOD IS NOT INHERITED, AND IT IS THE ONE SETTING THAT IS NOT** (Tom,
 		// 2026-09-04: *"The default Friction method for a new project is Darcy-Weisbach. It should
@@ -31787,8 +31796,7 @@ var EngCalcs = EngCalcs || {};
 	// untouched. Copy is at the PROJECT level because that is where a self-contained duplicate is
 	// what the user means.
 	function saveProjectAs(name) {
-		saveToStorage();
-		flushOutgoingFile();
+		rememberOutgoingProject();
 		var id = newProjectId(), copy = serializeProject();
 		// A new docId, deliberately: a copy is a different document, and inheriting the original's
 		// id would make the two fight over one lock -- and let a copy's autosave abort because
@@ -32042,8 +32050,7 @@ var EngCalcs = EngCalcs || {};
 
 	function importProject(saved) {
 		var pc = EngCalcs.pageConfig || {};
-		saveToStorage(); // flush the outgoing project before switching away from it
-		flushOutgoingFile();
+		rememberOutgoingProject();
 		var id = newProjectId();
 		if (!writeJSON(projectKey(id), saved)) {
 			alert(pc.lpn_import_no_room || 'There is not enough browser storage left to add this project. Delete a project you no longer need and try again.');

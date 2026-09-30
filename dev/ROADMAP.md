@@ -107,6 +107,7 @@ the block.
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
 - 100|637| **A Graph button on the Properties box.**
+  **BUILT 2026-09-30 on `feat/property-graph`, port 8141**, awaiting his browser pass.
   **REVISED BY TOM, 2026-09-29:** *"But what we really want is a time series graph at the bottom of
   Properties for an EPS project; it should have a selector for all the properties that can be graphed
   for that asset."*
@@ -238,7 +239,13 @@ the block.
     burst actually costs before adding a second timer.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
+- 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
+  Everything named under it has shipped except Ctrl+Shift+PageUp/PageDown between tables, which is
+  built on `feat/table-tab-keys` (port 8136) and merges on Tom's word given directly in a session
+  (2026-09-29: the classifier would not let CC record an all-clear from a pasted list). Graph
+  tabs next: Task 743.
 - 100|699| **Audit the language keys for lazy duplications.**
+  **AUDIT DONE 2026-09-30**: `dev/key-duplication-audit-2026-09-30.md` (74 groups, ~33 keys mergeable); which merges is his call.
   Tom, 2026-09-19: *"can you make sure we have a Roadmap task to audit language for lazy
   duplications where maybe a slight redesign can simplify or eliminate keys?"* He asked for it in
   the same breath as deciding a customer takes the EXISTING Description and Tag rather than an
@@ -254,6 +261,7 @@ the block.
   - **Cost is the argument for doing it and also for doing it carefully:** one deleted key is 26
     translations never bought; one wrongly merged key is a wrong word on a control in 26 languages.
 - 100|718| **File menu: Recents just above Close, and an Import submenu.**
+  **BUILT 2026-09-30 with Task 745 on `feat/help-menu`, port 8138**, awaiting his browser pass.
   Tom, 2026-09-25, from WaterCAD: *"File menu: Recents just above Exit"* and *"We have three import
   items. It's probably time for an Import sub-menu."*
 - 100|737| **Coined names for interface elements, so every language names each one once.**
@@ -265,67 +273,44 @@ the block.
   annotation = Text, z = Elevation, y = depth, p = pressure, total potential = Head/HGL, energy = EGL).
   Plan: re-key glossary.json by concept (id + definition), English one rendering among 27; keys cite
   it with the existing `gloss:` tag.
+  **CONCEPT LAYER SHIPPED 2026-09-30** (`chore/term-concept`, `dev/term-concepts.md`): 131 glossary
+  terms carry a coined `concept` id and a `definition`; a payload gives the definition as the source
+  and English as one rendering; `concept_check.php` blocks. Open: 67 definitions still empty, the four
+  new terms (sally, tessa, dora, hydraulic-head) untranslated, and his call on Head vs HGL, split in two.
 - 100|738| **A Find filter that stays standing, or a snapshot, by the visitor's choice.**
   Tom, 2026-09-28: editing a filtered value out of the filter makes its row vanish. His proposal: a
   standing filter while the Find box is open, with a toggle next to Filter in table to make it a
-  snapshot. Declan's and Ida's readings go in their journals first.
+  snapshot. Readings in, 2026-09-29, and they disagree: Declan, no toggle, a row edited since the
+  filter was applied stays until Filter is pressed again (QGIS's pattern); Ida, a Snapshot checkbox
+  beside Filter in table, rows that stopped matching dimmed and marked with a warning sign, and the
+  count in the filter banner. Tom's call.
 - 100|741| **The infinite map: generated networks for the label bench.**
+  **ROUND 5 DONE 2026-09-30** on `feat/label-placer`: generator, L-Town and C-Town, pre-registered protocol, `dev/label-trials/round-5-2026-09-29.md`; five rule proposals await his ruling.
   Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
 - 100|743| **Ctrl+Shift+PageDown reaches the graph tabs, not only the tables.**
+  Waits on `feat/table-tab-keys` merging, which carries the stepping it extends.
   Tom, 2026-09-29, on `feat/table-tab-keys`: *"It would be nice if it also could proceed to the
   graphs."* Follows Task 690's table stepping onto the bottom pane's graph tabs (Frequency, Time
   Series). Seam: the bottom-pane tab strip, shared with `feat/frequency-plot`.
 - 100|744| **Let the bottom pane shrink the map to almost nothing.**
+  **BUILT 2026-09-30 on `feat/pane-height`, port 8140**, awaiting his browser pass.
   Tom, 2026-09-29: *"It would be good to allow the bottom pane to shrink the map to almost nothing.
   More freedom for the user is a good thing."*
 - 100|745| **Help menu in three groups, and a Tables and Hotkeys box.**
+  **BUILT 2026-09-30 on `feat/help-menu`, port 8138** (Perry: ready), awaiting his browser pass.
   Tom, 2026-09-29: *"(1) True help: Walkthroughs, Tables and Hotkeys (new box that has all table help
   and all keyboard shortcuts divided by context), Toolbars. (2) Helpers: Fix something, Install, and
   Cookies. (3) True about: Notes on this page, Welcome page, Screenshot, Privacy, Terms, About."*
   Seam: the menu definitions, shared with Task 718 (File menu); one track builds both.
 - 100|746| **Fire flow dialog: one All/Selected choice for each of its two scopes.**
+  **BUILT 2026-09-30 on `feat/fireflow-scope`, port 8139** (Perry: ready), awaiting his browser pass.
   Tom, 2026-09-29, ruling `lpn_ff_design_no_selection`: *"Our interface needs simplification as
   follows: (a) (Specify) Junctions to test: All/Selected (b) Design check (effect on system);
   (specify) pipes and other junctions to check: All/Selected"*, and the message: *"The design check
   scope is set to Selected, but no assets are selected. Select assets or select All"*.
 
-- 75|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
-  mechanism shipped 2026-08-08 — an adversarial English pass asking *"list every plausible reading;
-  more than one means rewrite"*, both waves writing to `dev/english-friction/<sprint>.json`, with
-  `friction_check.php` blocking sprint *launch* on wave-0 findings and sprint *close* on translator
-  findings. `refer-to-human` deliberately does NOT close the gate; escalating is not resolving.
-  - **Why it exists: `lpn_` HAD a Wave 0 and it did not work.** Task 193 reviewed all 226 English keys
-    and rewrote 51, and the sprint still shipped "Zoom to fit", "Map display and sizes" and "Restore
-    defaults" — all three caught later by Tom reading the *Spanish*. Wave 0 was not skipped; it was
-    not falsifiable. The fix had to be a different QUESTION, not more diligence.
-  - **THE YIELD IS MEASURED TWICE NOW, AND IT DEPENDS ENTIRELY ON HOW SETTLED THE ENGLISH IS.**
-    `lpn_`, freshly-written feature UI: 36 findings on 225 keys, **26 rewrites (11.6%)**.
-    The fifteen non-lpn calculators, mature label sets already through a completed review
-    (`239-wave0-calcs.json`): 35 findings on 415 keys, **6 rewrites (1.4%)**, dismissal rate 37%
-    against a 9.8% historical wave-0 rate. **Budget a Wave 0 at the `lpn_` rate for NEW English only.**
-    One of the six was still a real catch — `mphl_hgl_egl_tip` would have produced a false sentence in
-    26 languages.
-  - **DONE — `wave0_keyset.php` assembles the pass set and pre-filters keys that already carry a
-    non-empty `$ec_lang_syn`** (104 of 582 non-lpn keys, 17.9%). Replayed on `239-wave0-calcs.json`:
-    9 of 35 findings skipped, dismissal rate 37% → 23% (the prediction was ~21%). **It also skips
-    one confirmed rewrite, `mtc_note_1`** — so the skipped set is enumerable (`--skipped`) and is a
-    cheaper second look, never a key ruled correct. `--measure=<sprint>` redoes the arithmetic.
-  - **DONE — the suggestion box now ships inside every payload** as `suggestion_box`, extracted by
-    the generator from the one canonical block in `dev/translation-process.md`. No longer retyped
-    per sprint; the generator fails hard if that block goes missing.
-  - **[H] The escalation gate works, and it is down to ONE entry (2026-09-06).** `friction_check.php`
-    exits 1 on any `open` or `refer-to-human` finding; it is not in `check_all.sh`, so it blocks no
-    commit and blocks every sprint launch. `239-wave0-calcs.json`'s 16 are all dispositioned, and
-    what remains is **`lpn_scncmp_at` in `584-wave0.json`** — Tom asked *"I need more context. Where
-    is this used?"*, which is answered in that entry's `resolution` (one cell of Water, Scenario
-    comparison), so the gate is waiting on his ruling and on nothing else.
-  - **AND HE ANSWERS IN `dev/new-english-keys.md` NOW, not in a second file.** The open findings are
-    printed into that list's own "Questions from the translators" section, under the same
-    `@@ NEEDS RULING` flag as everything else, and `harvest_english_rulings.php --apply` carries his
-    answer back into the JSON's `human_answer`. Two lists was one list somebody forgets;
-    `239-refer-to-human.md` is the superseded route and is kept only as the record of its sprint.
 - 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
@@ -337,22 +322,6 @@ the block.
     gone from hypothetical to the common case. The registration half is the valuable half: an
     `[BACKDROP] DIMENSIONS` record places the image in the model's own coordinates exactly, which
     is strictly better than the two-point scale gesture a human would otherwise perform by eye.
-- 75|322| **Convert standing advisories into checks, and survey for the ones nobody has named.**
-  Tom, 2026-08-25: *"322 convert to scripts and include a broad survey for other such
-  recommendations."* Record, ranked list, per-runner audit: `dev/enforceable-rules-survey.md`.
-  - **HALF A IS DONE.** 78 enforced, 4 left (rows 13, 14, 22, 23), each stating why no blocking
-    `check_all.sh` entry can hold it. Three landed rows found the RULE wrong, not the code.
-  - **HALF B IS OPEN AND ITS METHOD IS NOT RE-READING.** Re-reading `CLAUDE.md` cannot find a rule
-    nobody wrote down. Row 32 came from COUNTING a construct and asking what writing it 892 times
-    assumes; rows 35-38, 40-44, 48-50 and 54-56 came the same way and none from re-reading.
-  - **A RATCHET AT ZERO IS THE FINDING.** A rule followed and enforced by nothing is invisible to
-    every audit that looks for defects. Where the tree HAD violated one it had usually decided the
-    question twice in opposite directions (rows 38, 44, 49) -- an unwritten rule from outside.
-  - **2026-09-09 gave rows 54-56:** 4 of 28 JS physical constants were rounded decimals, one of them
-    carried in `dev/session-handoff.md` as an open question rather than as a defect; 199 harnesses
-    pin English wording, so a rewording costs a red build in a file about hydraulics; and 28 of the
-    29 keys reaching the tip helpers' `title=""` were unbound by rule B.
-  - **WHEN THE ANSWER IS NO, SAY SO IN A ROW** -- 34, 39, 45-47, 51-53 are measured negatives.
 - 75|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
   autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
   against it — one element, one placement function.
@@ -521,10 +490,6 @@ the block.
   Left from the message log (Task 704, closed 2026-09-23): Ida's third item. Sort which must genuinely
   block and which are only information and belong in the log, which Tom's *"USER MUST HAVE CONTROL
   OVER MESSAGES"* argues for. Keep severity at the two colours the banner already uses.
-- 75|711| **A pan is lost when File, New project opens beside it.**
-  Found by the pre-reviewer 2026-09-23 while testing Task 647: New project and Open example never
-  call `rememberCurrentView()` for the tab being left, so switching back refits it and the pan is
-  gone. A tab opened from the gallery and switched to once keeps its view correctly.
 - 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
   Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
   important code discipline."* Ida's phased plan: `dev/theming-plan.md`. Phase 1 declares semantic
