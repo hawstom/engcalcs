@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**7 still to read on master**, of 7 untranslated keys, of 2164 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**9 still to read on master**, of 9 untranslated keys, of 2166 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (7, 7 to read @@ NEEDS RULING)
+## lpn_  (9, 9 to read @@ NEEDS RULING)
 
 - **`lpn_copy_body`**
   > This file was originally created on {date}, but this browser doesn't remember it. Is this the Original file (keep same lock) or a Copy (make new lock)?
@@ -33,8 +33,14 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_copy_body_nodate`**
   > This browser doesn't remember this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
   @@ NEEDS RULING
+- **`lpn_copy_body_tab`**
+  > This file has the same lock as {name}, which is already open here, so it may be a copy of that file made outside this page. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  @@ NEEDS RULING
 - **`lpn_copy_copy`**
   > A copy; make new lock
+  @@ NEEDS RULING
+- **`lpn_copy_kept_link`**
+  > Switched to {name}. It stays connected to the file it was opened from, {file}, and Save writes there, not to the file you just chose.
   @@ NEEDS RULING
 - **`lpn_copy_opened`**
   > Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.
@@ -53,7 +59,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**11 still to read**, of 14 new keys across 12 unmerged branch(es).
+**47 still to read**, of 104 new keys across 18 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -64,17 +70,143 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`be4dbfb8`) — adds no English strings
+### chore/key-merge (`c4482083`) — 9 new, all ruled
 
-### feat/copy-lock (`5ed3e3b6`) — adds no English strings
+- **`lpn_freq_axis_percent`**
+  > Percent less than
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_group_tip`**
+  > Whether the graph shows junctions or pipes.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_menu`**
+  > Frequency
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_none`**
+  > No results for this value yet, so there is nothing to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_quantity_tip`**
+  > Which value to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary`**
+  > Plotted: {n} of {total}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary_time`**
+  > Plotted: {n} of {total}, at {time}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_tip`**
+  > Graph the frequency distribution of one property over all junctions or all pipes at the current time step.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_title`**
+  > Distribution of values
+  _Ruled OK 2026-09-30._
 
-### feat/find-filter (`92b573b5`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/bentley-interop (`8c5cc3a9`) — adds no English strings
+
+### feat/copy-lock (`1d99970f`) — adds no English strings
+
+### feat/criticality (`31e545ca`) — 31 new, 22 to read @@ NEEDS RULING
+
+- **`lpn_crit_baseline_below`**
+  > Junctions already below it with nothing broken: {n}. They are not counted.
+  @@ NEEDS RULING
+- **`lpn_crit_col_asset`**
+  > Asset
+  @@ NEEDS RULING
+- **`lpn_crit_col_below`**
+  > Junctions below minimum
+  @@ NEEDS RULING
+- **`lpn_crit_col_cutoff`**
+  > Junctions cut off
+  @@ NEEDS RULING
+- **`lpn_crit_col_unserved`**
+  > Demand not served
+  @@ NEEDS RULING
+- **`lpn_crit_intro`**
+  > Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in your project is changed; the whole run is made on a copy.
+  @@ NEEDS RULING
+- **`lpn_crit_menu`**
+  > Criticality analysis…
+  @@ NEEDS RULING
+- **`lpn_crit_menu_tip`**
+  > Take each pipe out of the network in turn and see what the system loses.
+  @@ NEEDS RULING
+- **`lpn_crit_minpressure`**
+  > Lowest pressure allowed
+  @@ NEEDS RULING
+- **`lpn_crit_minpressure_tip`**
+  > This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.
+  @@ NEEDS RULING
+- **`lpn_crit_no_pipes`**
+  > This project has no pipes yet, so there is nothing to break.
+  @@ NEEDS RULING
+- **`lpn_crit_no_selection`**
+  > No pipe, pump or valve is selected. Choose one on the map, or break all pipes.
+  @@ NEEDS RULING
+- **`lpn_crit_scope`**
+  > Assets to break
+  @@ NEEDS RULING
+- **`lpn_crit_scope_all`**
+  > All pipes
+  @@ NEEDS RULING
+- **`lpn_crit_scope_selected`**
+  > Selected
+  @@ NEEDS RULING
+- **`lpn_crit_scope_tip`**
+  > All pipes, or only the pipes, pumps and valves selected on the map.
+  @@ NEEDS RULING
+- **`lpn_crit_skipped`**
+  > {n} selected elements are not links, so they were not broken.
+  @@ NEEDS RULING
+- **`lpn_crit_stale`**
+  > The drawing changed, so the criticality results were cleared. Run it again.
+  @@ NEEDS RULING
+- **`lpn_crit_stopped`**
+  > Stopped after {done} of {total} assets. The results below are the ones already finished.
+  @@ NEEDS RULING
+- **`lpn_crit_summary`**
+  > {n} of {total} assets cut off demand or drop a junction below {pressure}.
+  @@ NEEDS RULING
+- **`lpn_crit_title`**
+  > Criticality analysis
+  @@ NEEDS RULING
+- **`lpn_crit_working`**
+  > Working: {done} of {total} assets.
+  @@ NEEDS RULING
+- **`lpn_freq_axis_percent`**
+  > Percent less than
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_group_tip`**
+  > Whether the graph shows junctions or pipes.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_menu`**
+  > Frequency
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_none`**
+  > No results for this value yet, so there is nothing to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_quantity_tip`**
+  > Which value to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary`**
+  > Plotted: {n} of {total}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary_time`**
+  > Plotted: {n} of {total}, at {time}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_tip`**
+  > Graph the frequency distribution of one property over all junctions or all pipes at the current time step.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_title`**
+  > Distribution of values
+  _Ruled OK 2026-09-30._
+
+### feat/find-filter (`6e0bbf8d`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_pane_filter_stale`**
   > Rows that no longer match: {n}.
   @@ NEEDS RULING
 
-### feat/fireflow-scope (`86f4e2b2`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/fireflow-scope (`34872754`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_ff_all`**
   > All
@@ -82,6 +214,36 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_ff_selected`**
   > Selected
   @@ NEEDS RULING
+
+### feat/graph-tab-keys (`ee61d048`) — 9 new, all ruled
+
+- **`lpn_freq_axis_percent`**
+  > Percent less than
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_group_tip`**
+  > Whether the graph shows junctions or pipes.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_menu`**
+  > Frequency
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_none`**
+  > No results for this value yet, so there is nothing to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_quantity_tip`**
+  > Which value to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary`**
+  > Plotted: {n} of {total}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary_time`**
+  > Plotted: {n} of {total}, at {time}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_tip`**
+  > Graph the frequency distribution of one property over all junctions or all pipes at the current time step.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_title`**
+  > Distribution of values
+  _Ruled OK 2026-09-30._
 
 ### feat/help-menu (`d34b00e6`) — 6 new, 6 to read @@ NEEDS RULING
 
@@ -134,3 +296,135 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pgraph_source_share_from`**
   > Source share from {node}
   @@ NEEDS RULING
+
+### feat/scenario-preset (`0f7792ec`) — 23 new, 14 to read @@ NEEDS RULING
+
+- **`lpn_freq_axis_percent`**
+  > Percent less than
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_group_tip`**
+  > Whether the graph shows junctions or pipes.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_menu`**
+  > Frequency
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_none`**
+  > No results for this value yet, so there is nothing to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_quantity_tip`**
+  > Which value to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary`**
+  > Plotted: {n} of {total}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary_time`**
+  > Plotted: {n} of {total}, at {time}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_tip`**
+  > Graph the frequency distribution of one property over all junctions or all pipes at the current time step.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_title`**
+  > Distribution of values
+  _Ruled OK 2026-09-30._
+- **`lpn_scenario_preset_average_day`**
+  > 4. Average Day
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_average_day_tip`**
+  > Demand multiplier 1: every demand as entered, which is taken to be average day demand.
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_fire_max_day`**
+  > 7. Fire plus max day
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_fire_max_day_tip`**
+  > Max day demand (multiplier 2.0). Run Fire flow analysis in this scenario: it adds the fire flow at each junction on top of this demand.
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_flow_max`**
+  > 3. Flow test: Max
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_flow_max_tip`**
+  > A hydrant flow test at the highest residual reading. In this scenario, add the flow measured at the flowing hydrant to the demand of its junction, then compare the pressures with 1. Flow test: Static. Nothing flows until you do.
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_flow_mid`**
+  > 2. Flow test: Mid
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_flow_mid_tip`**
+  > A hydrant flow test at the first residual reading. In this scenario, add the flow measured at the flowing hydrant to the demand of its junction, then compare the pressures with 1. Flow test: Static. Nothing flows until you do.
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_flow_static`**
+  > 1. Flow test: Static
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_flow_static_tip`**
+  > A hydrant flow test with no hydrant flowing. Its pressures are the static readings to compare with 2. Flow test: Mid and 3. Flow test: Max.
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_max_day`**
+  > 5. Max Day
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_max_day_tip`**
+  > Demand multiplier 2.0 times average day, a starting value. Most systems fall between 1.2 and 3.0 (National Research Council, 2006). Set your own system's in Settings, Calculation, Hydraulics, Demand multiplier.
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_peak_hour`**
+  > 6. Peak hour
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_peak_hour_tip`**
+  > Demand multiplier 3.0 times average day, a starting value. Most systems fall between 3.0 and 6.0 (National Research Council, 2006). Set your own system's in Settings, Calculation, Hydraulics, Demand multiplier.
+  @@ NEEDS RULING
+
+### fix/category-desc (`f4bcaf94`) — 9 new, all ruled
+
+- **`lpn_freq_axis_percent`**
+  > Percent less than
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_group_tip`**
+  > Whether the graph shows junctions or pipes.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_menu`**
+  > Frequency
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_none`**
+  > No results for this value yet, so there is nothing to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_quantity_tip`**
+  > Which value to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary`**
+  > Plotted: {n} of {total}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary_time`**
+  > Plotted: {n} of {total}, at {time}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_tip`**
+  > Graph the frequency distribution of one property over all junctions or all pipes at the current time step.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_title`**
+  > Distribution of values
+  _Ruled OK 2026-09-30._
+
+### fix/points-data-heading (`75707bd6`) — 9 new, all ruled
+
+- **`lpn_freq_axis_percent`**
+  > Percent less than
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_group_tip`**
+  > Whether the graph shows junctions or pipes.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_menu`**
+  > Frequency
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_none`**
+  > No results for this value yet, so there is nothing to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_quantity_tip`**
+  > Which value to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary`**
+  > Plotted: {n} of {total}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary_time`**
+  > Plotted: {n} of {total}, at {time}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_tip`**
+  > Graph the frequency distribution of one property over all junctions or all pipes at the current time step.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_title`**
+  > Distribution of values
+  _Ruled OK 2026-09-30._

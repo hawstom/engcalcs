@@ -2136,6 +2136,10 @@ $ec_lang['lpn_copy_body_nodate']='This browser doesn\'t remember this file. Is t
 $ec_lang['lpn_copy_why']='Another browser has a file with this same lock open right now. A file copied outside this page keeps its original\'s lock.';
 $ec_lang['lpn_copy_original']='Original; keep same lock';
 $ec_lang['lpn_copy_copy']='A copy; make new lock';
+// The same question when the id belongs to a tab already open HERE, whose file the browser cannot
+// confirm is this one; and what "Original" then does: switch, without changing the tab's file.
+$ec_lang['lpn_copy_body_tab']='This file has the same lock as {name}, which is already open here, so it may be a copy of that file made outside this page. Is this the Original file (keep same lock) or a Copy (make new lock)?';
+$ec_lang['lpn_copy_kept_link']='Switched to {name}. It stays connected to the file it was opened from, {file}, and Save writes there, not to the file you just chose.';
 $ec_lang['lpn_copy_opened']='Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.';
 // The other end of the back channel, shown to the holder.
 $ec_lang['lpn_lock_requested']='{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over.';

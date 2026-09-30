@@ -34806,7 +34806,16 @@ var EngCalcs = EngCalcs || {};
 		// Identity is the `docId` INSIDE the file, never the name -- a copy saved under a new name is
 		// a different document and legitimately opens as its own tab.
 		var already = docId ? projectWithDocId(docId) : null;
-		if (already) { adoptAlreadyOpen(already, handle); return; }
+		if (already) {
+			// **SAME ID IS NOT SAME FILE** (Task 747, reproduced by the pre-review 2026-09-30). An
+			// Explorer copy of an open file carries its id, and switching to the tab used to REBIND
+			// the tab to the copy's handle -- so the next Save overwrote the copy and the original
+			// silently stopped receiving saves. Only the browser can say two handles are one file.
+			var tabHandle = handleFor(already);
+			if (tabHandle && await sameFileEntry(tabHandle, handle)) { adoptAlreadyOpen(already, handle); return; }
+			presentCopyQuestion(saved, handle, null, already);
+			return;
+		}
 		var r = docId ? await postLock('check', docId) : null;
 		if (r && r.ok && r.locked && !r.mine) {
 			// **A COPY MADE OUTSIDE THIS PAGE KEEPS ITS ORIGINAL'S docId, AND SO ITS LOCK** (Task
@@ -35057,10 +35066,13 @@ var EngCalcs = EngCalcs || {};
 	// Tom's dialog, his words (2026-09-30). ORIGINAL LEADS, and so takes the keyboard focus: it
 	// changes nothing and hands on to the ordinary lock question, where every answer is still
 	// available. No Cancel of its own: that question, one click on, has one.
-	function presentCopyQuestion(saved, handle, info) {
+	// `tabId` is set when the id belongs to a tab open HERE whose file is not provably this one: the
+	// same question, with the sentence that is true of that case instead of "doesn't remember it".
+	function presentCopyQuestion(saved, handle, info, tabId) {
 		var pc = EngCalcs.pageConfig || {};
 		var docId = saved.project && saved.project.docId;
 		var at = docIdCreatedAt(docId);
+		var tabName = tabId ? projectDisplayName(indexEntry(tabId) || { name: '' }) : '';
 		openDialog(function (body) {
 			var h = document.createElement('p');
 			h.style.margin = '0 0 8px';
@@ -35069,10 +35081,13 @@ var EngCalcs = EngCalcs || {};
 			body.appendChild(h);
 			var p = document.createElement('p');
 			p.style.margin = '0 0 8px';
-			p.textContent = at
+			p.textContent = tabId
+				? (pc.lpn_copy_body_tab || 'This file has the same lock as {name}, which is already open here, so it may be a copy of that file made outside this page. Is this the Original file (keep same lock) or a Copy (make new lock)?').replace('{name}', tabName)
+				: at
 				? (pc.lpn_copy_body || 'This file was originally created on {date}, but this browser doesn\'t remember it. Is this the Original file (keep same lock) or a Copy (make new lock)?').replace('{date}', regionalDateTime(at))
 				: (pc.lpn_copy_body_nodate || 'This browser doesn\'t remember this file. Is this the Original file (keep same lock) or a Copy (make new lock)?');
 			body.appendChild(p);
+			if (tabId) { return; }   // the "another browser" sentence is not true of this case
 			var w = document.createElement('p');
 			w.style.margin = '0';
 			w.textContent = pc.lpn_copy_why || 'Another browser has a file with this same lock open right now. A file copied outside this page keeps its original\'s lock.';
@@ -35080,10 +35095,35 @@ var EngCalcs = EngCalcs || {};
 		}, [
 			{ label: pc.lpn_copy_original || 'Original; keep same lock', fn: function () {
 				rememberDocId(docId);
+				if (tabId) { originalOfOpenTab(tabId, handle); return; }
 				presentOpenChoice(saved, handle, lockHolderName(info), info);
 			} },
 			{ label: pc.lpn_copy_copy || 'A copy; make new lock', fn: function () { openAsNewCopy(saved, handle); } }
 		]);
+	}
+	// True only when the browser itself says the two handles are one file. A handle without
+	// isSameEntry(), or one that throws, is "not provably the same", which is the safe answer.
+	async function sameFileEntry(a, b) {
+		if (!a || !b) { return false; }
+		if (a === b) { return true; }
+		try { return typeof a.isSameEntry === 'function' ? !!(await a.isSameEntry(b)) : false; }
+		catch (err) { return false; }
+	}
+	// "Original" said of a file whose id is already open in a tab here. Today's switch to the tab --
+	// but the tab's file connection is NEVER swapped for a file that is not provably the same one:
+	// it stays connected to the file it was opened from, and the notice says so. The one exception is
+	// a tab with NO connection at all (lost, or never restored): there is nothing to swap, and
+	// re-opening the file is the documented way to reconnect it, so the user's answer is taken.
+	function originalOfOpenTab(tabId, handle) {
+		var pc = EngCalcs.pageConfig || {};
+		var tabHandle = handleFor(tabId);
+		if (!tabHandle) { adoptAlreadyOpen(tabId, handle); return; }
+		openProject(tabId);
+		syncReadOnlyToOpenProject();
+		renderTabs();
+		setNotice((pc.lpn_copy_kept_link || 'Switched to {name}. It stays connected to the file it was opened from, {file}, and Save writes there, not to the file you just chose.')
+			.replace('{name}', projectDisplayName(indexEntry(tabId) || project))
+			.replace('{file}', tabHandle.name || ''));
 	}
 	// "A copy; make new lock". The copy gets a NEW docId BEFORE it lands, so the lock it takes is its
 	// own and the original's lock is never touched -- not released, not stolen, not even acquired.

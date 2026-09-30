@@ -63,6 +63,8 @@ const L = loadLoopedNetwork(
 	"\t\tprojectCount: function () { return library.projects.length; },\n" +
 	"\t\tknownKey: LPN_KNOWN_DOCS_KEY,\n" +
 	"\t\twipe: wipeAllStorage,\n" +
+	"\t\thandleOf: function (id) { return handleFor(id); },\n" +
+	"\t\tdropHandle: function (id) { fileHandles.delete(id); },\n" +
 	// The drawing layers init() would build, so importProject() can land a project headless
 	// (the same arrangement as example-view-harness.js).
 	"\t\tsetSized: function () { mapSized = true; },\n" +
@@ -218,6 +220,67 @@ console.log('\n--- 2. the gate is silent when this browser knows the ID ---');
 	await settle();
 	ok('an unknown ID that nobody holds opens without a question', L.projectCount() === before + 1 && !dialogOpen());
 	ok('...and is remembered, having been opened here', known().indexOf(free) >= 0);
+}
+
+console.log('\n--- 6. an ID already open in a tab HERE, arriving in a different file ---');
+// The pre-review's reproduction (2026-09-30): Main open in a tab, an Explorer copy of it opened.
+// It used to switch to Main's tab AND rebind that tab to the copy's file, so Save overwrote the copy
+// and Main stopped receiving saves.
+{
+	const SHARED = idAt(T0 + 180000, 'ShAr0001');
+	const main = fileWith(SHARED, 'Main');
+	await L.openHandle(main);
+	await settle();
+	const mainTab = L.openId();
+	ok('Main lands as a tab connected to its own file', L.handleOf(mainTab) === main && !dialogOpen());
+
+	// (a) The very same file again: the browser says it is the same entry, so today's switch stands.
+	const tabs0 = L.projectCount();
+	await L.openHandle(main);
+	await settle();
+	ok('the same file again switches to its tab with no question', !dialogOpen() && L.projectCount() === tabs0 && L.openId() === mainTab);
+
+	// (b) A copy with the same ID, answered Copy.
+	const backup = fileWith(SHARED, 'Backup');
+	await L.openHandle(backup);
+	await settle();
+	ok('a different file with the same ID gets the question', dialogOpen() && dialogText()[0] === TITLE, JSON.stringify(dialogText()));
+	ok('...with the open tab\'s wording, not "doesn\'t remember it"',
+		dialogText()[1] === PC.lpn_copy_body_tab.replace('{name}', 'Main'), dialogText()[1]);
+	ok('...and nothing about another browser', dialogText().indexOf(PC.lpn_copy_why) < 0);
+	ok('Main\'s tab is still connected to Main while the question is open', L.handleOf(mainTab) === main);
+	posted.length = 0;
+	press(COPY_BTN);
+	await settle();
+	ok('"A copy" opens a NEW tab', L.projectCount() === tabs0 + 1 && L.openId() !== mainTab);
+	ok('...under a new ID', L.docId() !== SHARED);
+	ok('...connected to the copy\'s file', L.handleOf(L.openId()) === backup);
+	ok('Main\'s tab is still connected to Main', L.handleOf(mainTab) === main);
+	ok('the shared ID got no lock traffic from the copy', !posted.some(p => p.id === SHARED),
+		JSON.stringify(posted.map(p => p.action + ':' + p.id)));
+
+	// (c) Another copy, answered Original: switch, never rebind.
+	const sameName = fileWith(SHARED, 'Main');   // a same-name file in another folder
+	const tabs1 = L.projectCount();
+	await L.openHandle(sameName);
+	await settle();
+	ok('a same-name file elsewhere gets the question too', dialogOpen() && dialogText()[0] === TITLE);
+	press(ORIGINAL_BTN);
+	await settle();
+	ok('"Original" switches to Main\'s tab and opens nothing new', L.openId() === mainTab && L.projectCount() === tabs1);
+	ok('...and does NOT swap the tab\'s file connection', L.handleOf(mainTab) === main);
+	ok('...and nothing was written to either file', main.writes === 0 && sameName.writes === 0);
+
+	// (d) A tab with no connection to compare: asked, and "Original" reconnects it (the documented
+	// way to reconnect a tab is to open its file again).
+	L.dropHandle(mainTab);
+	const again = fileWith(SHARED, 'Main');
+	await L.openHandle(again);
+	await settle();
+	ok('a tab with no file connection cannot be compared, so the question is asked', dialogOpen() && dialogText()[0] === TITLE);
+	press(ORIGINAL_BTN);
+	await settle();
+	ok('..."Original" then reconnects that tab to the chosen file', L.openId() === mainTab && L.handleOf(mainTab) === again);
 }
 
 console.log('\n--- 5. Erase everything forgets the list ---');
