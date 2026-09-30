@@ -4421,7 +4421,7 @@
         "label (map annotation)": {
             "term": "label (map annotation)",
             "concept": "sally",
-            "definition": "Text the page itself writes on the map beside an asset, built from that asset's current properties or results (its ID, diameter, pressure and so on) by the rules set in the Labels box, and redrawn whenever those values change. The user chooses what a Label shows, never what it says. EPANET calls this Notation. Distinct from Text (tessa), which the user types and places; from Tag (gus), an identifier stored on the asset; and from Description (dora), a note stored on the asset.",
+            "definition": "Text the page itself writes on the map beside an asset, built from that asset's current properties or results (its ID, diameter, pressure and so on) by the rules set in the Labels box, and redrawn whenever those values change. The user chooses which values a Label shows and how they are formatted; the values themselves always come from the data. EPANET calls this Notation. Distinct from Text (tessa), which the user types and places; from Tag (gus), an identifier stored on the asset; and from Description (dora), a note stored on the asset.",
             "symbol": "",
             "avoid": [
                 "this page's Text, the note a user types onto the map (tessa)",
