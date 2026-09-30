@@ -649,3 +649,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|648| CLOSED 2026-09-28 with feat/water-tower (see 645): the About rendering, option 3.
 - 0|679| CLOSED 2026-09-28 with feat/water-tower (see 645): narrower strokes and more detail at About's size.
 - 0|742| CLOSED 2026-09-29 with feat/selection-set (merged on Tom's "Done. Close, merge, and delete branch"): the fire-flow design check offers None, All, or Selected junctions.
+- 0|744| CLOSED 2026-09-30 with feat/pane-height (merged on Tom's word): the bottom pane can shrink the map to a 32 px strip.

@@ -2427,3 +2427,134 @@ already has. Neither IFC Appendix B nor AWWA M31 requires this collateral check 
 already beyond code, so the fire code gives no argument against reshaping it."
 
 — Mary
+
+
+## 2026-09-30 -- a connected Google Sheet for scenarios (Task 721)
+
+**OBSERVED**, `js/looped-network.js:3184-3195, 3940-3943, 3998-4042`: our scenario model is already
+built — Base holds full data, every other scenario is a row of per-element overrides keyed by a
+stable id, parent-pointer only ("a scenario-of-a-scenario is UNREPRESENTABLE rather than
+discouraged"), switching scenarios rebuilds the drawing in place. The comments are explicit that this
+was a deliberate, argued design (`dev/scenario-seam-repair.md` referenced inline), not a placeholder
+waiting on a UI. Task 721 (`dev/ROADMAP.md:1056-1060`) is about the PRESENTATION of this model
+(pre-configured scenarios, "ironclad rule you only edit the layer mapped to the Active Scenario") —
+it does not ask for a new storage/editing substrate. Tom's Sheets idea is a bigger swap than the task
+that prompted it: replacing not just the picker UI but the whole in-browser edit path with a
+round-trip through an external spreadsheet.
+
+**CITED**, Bentley WaterGEMS/WaterCAD, "Understanding Scenarios and Alternatives"
+(https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/GUID-CFD87BDB32304AB8AAE6EF45AB53E3F0.html)
+and Virtuosity's summary (https://blog.virtuosity.com/hydraulics-hydrology/saving-time-and-money-with-watergems-scenario-management):
+scenarios are parent/child, a child inherits from its parent and the user picks what it inherits, and
+editing the parent propagates to children — the same shape we already have, editable entirely inside
+the desktop app's own dialogs. Neither doc mentions a spreadsheet as the editing surface; "alternatives"
+are edited in Bentley's own property grids.
+
+**CITED**, HEC-RAS Scenario Manager, USACE CWMS docs
+(https://www.hec.usace.army.mil/confluence/cwmsdocs/cwmsum/latest/model-alternatives-and-forecast-runs/creating-an-hec-ras-alternative,
+https://www.hec.usace.army.mil/confluence/rasdocs/ras1dtechref/6.3/overview-of-optional-capabilities/multiple-plan-analysis)
+and CivilGEO's explainer (https://knowledge.civilgeo.com/understanding-hec-ras-scenarios): a "plan"
+pairs a geometry file with a flow file; "Duplicate Current Scenario" copies geometry/flow to start a
+variant. This is Tom's own cited precedent (he told Mary/Sue 2026-09-25 he's comfortable with it from
+HEC-RAS). It is file-pair based, not spreadsheet-based — HEC-RAS's flow/geometry files are its own
+binary/text formats, not an Excel workbook a user edits directly. No finding of HEC-RAS using a
+spreadsheet as the live alternative store.
+
+**CITED**, epanet-js, "epanet-js January 2026 Progress Report" (https://epanetjs.com/blog/2026/02/10/epanet-js-january-2026-progress-report/)
+and product page (https://epanetjs.com/): epanet-js shipped Scenario Management in its Pro plan
+($950/yr) with almost exactly our shape — a locked "Main" scenario, child scenarios for what-if
+testing, edits made by drawing/editing directly in the same map UI, with a quick-graph diff and a
+keyboard shortcut ('Y') to flip between scenario and Main. This is the closest living competitor, built
+the same year, and it did NOT reach for a spreadsheet as the editing surface — it built the in-app
+UI. That is one data point against "a spreadsheet interface could save us the UI," from the tool
+closest to ours in architecture and release date.
+
+**Did not find** any hydraulic, GIS, or engineering-design tool (WaterGEMS, WaterCAD, InfoWater Pro,
+InfoWorks WS Pro, HEC-RAS, QGIS, epanet-js, or generic BIM/CAD scenario tooling) that uses Google
+Sheets or Excel as the live, synced scenario/alternative data store or editing surface. **CITED**,
+InfoWater Pro alternatives search (G2, SourceForge, Slashdot listings, 2026-09-30) surfaced only other
+desktop/cloud hydraulic packages (InfoWorks WS Pro, IWLive Pro, OpenFlows Water) as InfoWater's
+competitors, none spreadsheet-based. I did not reach QGIS/QWater plugin documentation directly (search
+returned no QWater-specific scenario-management page); this is an absence-of-search-result, not a
+verified absence, and should be re-checked before being relied on as a negative finding.
+
+**CITED**, Al-Zahrani & Muhammed (and related), "Modeling and Design Optimization of Looped Water
+Distribution Networks using MS Excel: Developing the Open-Source X-WHAT Model," arXiv:2405.09044
+(https://arxiv.org/pdf/2405.09044) and the NSF-hosted copy (https://par.nsf.gov/servlets/purl/10538693):
+this is the closest thing found to "a spreadsheet as the hydraulic tool," and it confirms the famous
+fact Tom's question alludes to — engineers already do real looped-network hydraulics in Excel, no
+special tool needed. But X-WHAT is Excel AS the calculator (formulas solve the network), not a Sheet
+synced to a separate web app's scenario store; it is evidence that engineers trust and reach for
+spreadsheets generally, not evidence for the specific "sync in/out" architecture Tom is asking about.
+**CITED**, Pandit, *Water Engineering with the Spreadsheet* (ASCE Press, ISBN 9780784414040,
+https://www.amazon.com/Water-Engineering-Spreadsheet-Asce-Press/dp/0784414041): a whole published book
+premised on exactly this — water engineers doing real design work in spreadsheets — which is real
+support for "spreadsheets are the engineers' true home turf," a fact in Tom's favor for SOME
+spreadsheet-facing feature, just not evidence for THIS architecture.
+
+**On cost and access — the part of the question that should decide it regardless of UI taste:**
+
+**CITED**, Google, "Configure the OAuth consent screen and choose scopes"
+(https://developers.google.com/workspace/guides/configure-oauth-consent) and "Submitting your app for
+verification" (https://support.google.com/cloud/answer/13461325): the full-spreadsheet scope
+(`.../auth/spreadsheets`) is classified **sensitive**, and using it requires OAuth verification —
+demonstration video, verified domain, privacy policy, Google security review — before the "unverified
+app" warning goes away.
+
+**CITED**, "Manage App Audience" / "Unverified apps," Google Cloud Platform Console Help
+(https://support.google.com/cloud/answer/15549945, https://support.google.com/cloud/answer/7454865):
+an unverified app requesting a sensitive/restricted scope is capped at **100 users, for the lifetime of
+the project, and the cap cannot be reset** — only completing verification lifts it. For a suite that
+already measures tens of thousands of visits, 100 lifetime OAuth grants is not a meaningful feature,
+it is a beta gate.
+
+**CITED**, same sources plus a GitHub issue thread on `drive.file` adoption
+(https://github.com/Jose-cd/React-google-drive-picker/issues/79): the narrower **`drive.file`** scope
+("see, edit, create, and delete only files the app created or the user explicitly picked") is
+classified **non-sensitive** and does not trigger the verification burden or the 100-user cap. A
+"connected Google Sheet, Sync In/Sync Out" feature COULD be built on `drive.file` plus the Sheets API
+scoped to files opened through Google's own file picker, avoiding sensitive-scope review — this is the
+one finding that argues the idea is technically buildable without Google's heaviest gate, IF the
+implementation is disciplined about never requesting the broad `spreadsheets` or `drive` scopes.
+
+**CITED**, Wikipedia, "Censorship of Google" (https://en.wikipedia.org/wiki/Censorship_of_Google):
+countries "representing over 1.5 billion people" operate under state firewalls, national intranets, or
+near-total blocks that cut off Google services, China's "Great Firewall" being the largest single case,
+with Iran, North Korea, Turkmenistan, Russia and others also blocking Google services at times for
+political or security reasons. This is squarely relevant to `dev/positioning.md`'s and the market
+researcher's prior finding (journal, various entries) that our users are consulting engineers serving
+small utilities, disproportionately outside the US, sometimes in exactly these jurisdictions. **I did
+not find a source narrowly confirming "government work computers in developing countries specifically
+block Google Drive/Sheets"** (as distinct from the country-level blocks above) — the prior utility-
+planning-engineer and field-operator findings in Task 537 (`dev/ROADMAP.md:1512-1526`) made a related,
+better-sourced point about legal exposure rather than access: a complete network topology is a document
+type several US states legislate as sensitive infrastructure information, and "cloud behind a login"
+is something a small agency's counsel cannot approve. A Google Sheet holding the same alternatives data
+is the identical legal question in a different vendor's name — Task 537 is about MSA/DPA/SOC2 posture,
+which does not become easier because the cloud in question is Google's rather than ours.
+
+**SPECULATION**: even scoped to `drive.file`, a Sync In/Sync Out design reopens exactly the question
+Task 537 closed — "nothing you draw is uploaded" stops being true the moment any element of the model
+leaves the browser, regardless of whose server receives it. The field operator's and planning
+engineer's arguments in Task 537 were not really about WHICH cloud; they were about the browser-only
+posture itself being the thing that never needs a lawyer's sign-off. This needs re-derivation, not
+citation, before it goes in a report to Tom — flagging it because it is the throughline connecting this
+question to the one already decided twice.
+
+**Verdict, for the reply to Tom**: no hydraulic, GIS or engineering-scenario tool found — not
+WaterGEMS/WaterCAD, not InfoWater Pro, not HEC-RAS, not epanet-js, our nearest and newest competitor —
+uses a spreadsheet as the live scenario/alternative store; all of them, including the ones Tom likes
+(HEC-RAS) and the one built in 2026 by people solving our exact problem (epanet-js), built in-app UI
+instead. Spreadsheets ARE where engineers do real hydraulic work (X-WHAT, Pandit's ASCE book) — that
+argues for spreadsheet EXPORT/IMPORT as a respected workflow, not for spreadsheet-as-source-of-truth.
+The Google-specific costs are real but not prohibitive if scoped narrowly (`drive.file`, not
+`spreadsheets`/`drive`) — verification and the 100-user cap are avoidable by design, not a hard wall.
+The harder problem is not Google's API terms, it is the same one Task 537 already closed twice: any
+sync step, to any vendor, turns "nothing you draw is uploaded" into "nothing you draw is uploaded,
+except when you use this feature," and a fraction of the exact population this suite is built for
+(state-firewalled countries, legally cautious small-utility counsel) cannot or should not click through
+a Google OAuth screen at work at all.
+
+— Mary
+
+---
