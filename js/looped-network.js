@@ -29893,7 +29893,9 @@ var EngCalcs = EngCalcs || {};
 			// page-title toggle went with the titles; a browser that used it before still carries
 			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
 			// Erasing a key we no longer write is the one direction that is always safe.
-			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY];
+			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY,
+			// Task 747's memory of which documents this browser knows.
+			LPN_KNOWN_DOCS_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -34807,6 +34809,11 @@ var EngCalcs = EngCalcs || {};
 		if (already) { adoptAlreadyOpen(already, handle); return; }
 		var r = docId ? await postLock('check', docId) : null;
 		if (r && r.ok && r.locked && !r.mine) {
+			// **A COPY MADE OUTSIDE THIS PAGE KEEPS ITS ORIGINAL'S docId, AND SO ITS LOCK** (Task
+			// 747). Held elsewhere AND never seen by this browser is the one moment we can tell a copy
+			// from the original only by asking, so ask before the lock question. A browser that made
+			// or opened this document before goes straight on: to it, this IS the file.
+			if (!docIdKnown(docId)) { presentCopyQuestion(saved, handle, r); return; }
 			presentOpenChoice(saved, handle, lockHolderName(r), r);
 			return;
 		}
@@ -34995,6 +35002,104 @@ var EngCalcs = EngCalcs || {};
 		}
 		return null;
 	}
+	// ---- Is this a copy? (ROADMAP Task 747) ----
+	//
+	// A file copied in Explorer carries its original's docId, so the two share one lock. Nothing in
+	// the file can tell them apart -- same bytes, and possibly the same name in another folder -- so
+	// the page asks, and asks only when it has reason to (Tom, 2026-09-30): the ID is locked by
+	// another browser right now AND this browser has no memory of it.
+	//
+	// THE MEMORY is `lpn_known_docs`: every docId this browser minted, opened from a file, or was
+	// told is the original. An open tab's docId counts too (projectWithDocId). Nothing else here
+	// remembers a CLOSED document's id -- the recent list keeps handles and names, not ids -- which is
+	// why the list exists. Ids only, most recent first, capped; no names, no paths, no times.
+	var LPN_KNOWN_DOCS_KEY = 'lpn_known_docs';
+	var LPN_KNOWN_DOCS_MAX = 500;
+	function knownDocIds() {
+		var a = readJSON(LPN_KNOWN_DOCS_KEY);
+		return Array.isArray(a) ? a : [];
+	}
+	function docIdKnown(docId) {
+		if (!docId) { return false; }
+		return !!projectWithDocId(docId) || knownDocIds().indexOf(docId) >= 0;
+	}
+	// Not writeJSON(): that seam clears the storage-full banner on success, and a list this small
+	// succeeding says nothing about whether the last PROJECT write did.
+	function rememberDocId(docId) {
+		if (!docId) { return; }
+		var a = knownDocIds().filter(function (x) { return x !== docId; });
+		a.unshift(docId);
+		if (a.length > LPN_KNOWN_DOCS_MAX) { a.length = LPN_KNOWN_DOCS_MAX; }
+		try { localStorage.setItem(LPN_KNOWN_DOCS_KEY, JSON.stringify(a)); }
+		catch (err) { /* private mode or full: the question may simply be asked again */ }
+	}
+	// **THE CREATION TIME IS IN THE ID ITSELF**: newDocId() is 'd' + Date.now() in base 36 + eight
+	// random characters, so the moment a document got its identity (its first save to a file, or a
+	// Save as) needs no server field. The broker's record cannot answer it anyway: it exists only
+	// while somebody holds the lock, and its `acquiredAt` restarts whenever the lock changes hands.
+	// Anything that does not read as a plausible time gives null, and the sentence without a date.
+	function docIdCreatedAt(docId) {
+		if (typeof docId !== 'string' || docId.length < 10 || docId.charAt(0) !== 'd') { return null; }
+		var t36 = docId.slice(1, -8);
+		if (!/^[0-9a-z]+$/.test(t36)) { return null; }
+		var ms = parseInt(t36, 36);
+		if (!(ms >= Date.UTC(2020, 0, 1)) || ms > Date.now() + 86400000) { return null; }
+		return ms;
+	}
+	// The visitor's own regional date and time (Intl with no locale named is the browser's locale).
+	function regionalDateTime(ms) {
+		try {
+			return new Intl.DateTimeFormat(undefined, { dateStyle: 'long', timeStyle: 'short' }).format(new Date(ms));
+		} catch (err) {
+			return new Date(ms).toLocaleString();
+		}
+	}
+	// Tom's dialog, his words (2026-09-30). ORIGINAL LEADS, and so takes the keyboard focus: it
+	// changes nothing and hands on to the ordinary lock question, where every answer is still
+	// available. No Cancel of its own: that question, one click on, has one.
+	function presentCopyQuestion(saved, handle, info) {
+		var pc = EngCalcs.pageConfig || {};
+		var docId = saved.project && saved.project.docId;
+		var at = docIdCreatedAt(docId);
+		openDialog(function (body) {
+			var h = document.createElement('p');
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = pc.lpn_copy_title || 'Mark file as new copy?';
+			body.appendChild(h);
+			var p = document.createElement('p');
+			p.style.margin = '0 0 8px';
+			p.textContent = at
+				? (pc.lpn_copy_body || 'This file was originally created on {date}, but this browser doesn\'t remember it. Is this the Original file (keep same lock) or a Copy (make new lock)?').replace('{date}', regionalDateTime(at))
+				: (pc.lpn_copy_body_nodate || 'This browser doesn\'t remember this file. Is this the Original file (keep same lock) or a Copy (make new lock)?');
+			body.appendChild(p);
+			var w = document.createElement('p');
+			w.style.margin = '0';
+			w.textContent = pc.lpn_copy_why || 'Another browser has a file with this same lock open right now. A file copied outside this page keeps its original\'s lock.';
+			body.appendChild(w);
+		}, [
+			{ label: pc.lpn_copy_original || 'Original; keep same lock', fn: function () {
+				rememberDocId(docId);
+				presentOpenChoice(saved, handle, lockHolderName(info), info);
+			} },
+			{ label: pc.lpn_copy_copy || 'A copy; make new lock', fn: function () { openAsNewCopy(saved, handle); } }
+		]);
+	}
+	// "A copy; make new lock". The copy gets a NEW docId BEFORE it lands, so the lock it takes is its
+	// own and the original's lock is never touched -- not released, not stolen, not even acquired.
+	// **The file on disk is not written**: the tab is marked unsaved instead, because its identity
+	// now differs from the file's, and the next Save writes the new id into it.
+	function openAsNewCopy(saved, handle) {
+		var pc = EngCalcs.pageConfig || {};
+		var fresh = newDocId();
+		saved.project = Object.assign({}, saved.project, { docId: fresh });
+		landOpenedFile(saved, handle, false);
+		if (!(project && project.docId === fresh)) { return; }   // it did not land (storage full)
+		var entry = indexEntry(library.openId);
+		if (entry) { entry.savedSig = ''; entry.dirty = true; saveIndex(); renderTabs(); }
+		setNotice((pc.lpn_copy_opened || 'Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.')
+			.replace('{file}', (handle && handle.name) || projectDisplayName(project)));
+	}
 	// Opening a file this browser already has open: come forward, and take the connection with you.
 	// **Re-opening the file is a legitimate way to reconnect** -- the fallback the needs-reopen banner
 	// names -- so the fresh handle is adopted even though the tab already existed.
@@ -35031,6 +35136,8 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		var id = importProject(saved); // lands as a NEW project, exactly as the Phase 1 path does
 		if (!id) { return; }
+		// Opened here, so this browser now knows the document (Task 747).
+		rememberDocId(saved.project && saved.project.docId);
 		var entry = indexEntry(id);
 		if (handle) {
 			fileHandles.set(id, handle);
@@ -35093,7 +35200,12 @@ var EngCalcs = EngCalcs || {};
 	// The document id is baked into the FILE, not into our per-browser project id: two people
 	// opening the same file off a share have different local project ids and must still compute the
 	// same lock key. Matches lpn-lock.php's /^d[A-Za-z0-9]{8,48}$/.
-	function newDocId() { return 'd' + Date.now().toString(36) + randomToken(8); }
+	// Every id minted here is one this browser made, so it is remembered as known (Task 747).
+	function newDocId() {
+		var id = 'd' + Date.now().toString(36) + randomToken(8);
+		rememberDocId(id);
+		return id;
+	}
 	function randomToken(n) {
 		var chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', out = '';
 		for (var i = 0; i < n; i++) { out += chars.charAt(Math.floor(Math.random() * chars.length)); }

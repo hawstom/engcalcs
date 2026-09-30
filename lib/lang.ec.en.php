@@ -2127,6 +2127,16 @@ $ec_lang['lpn_lock_ask_failed']='Your message could not be delivered. Either nob
 // out of the locked-file dialog used to say nothing at all, so a reader who pressed Cancel by
 // reflex had no way to learn what had just been offered. It says what did not happen, and why.
 $ec_lang['lpn_lock_open_cancelled']='That file was not opened, and nothing here changed. Somebody else still has it open.';
+// Task 747: a file copied outside this page keeps its original's document ID, and so its lock. Asked
+// only when that lock is held elsewhere AND this browser has never seen the ID. {date} is when the ID
+// was minted, in the visitor's own regional date-time format.
+$ec_lang['lpn_copy_title']='Mark file as new copy?';
+$ec_lang['lpn_copy_body']='This file was originally created on {date}, but this browser doesn\'t remember it. Is this the Original file (keep same lock) or a Copy (make new lock)?';
+$ec_lang['lpn_copy_body_nodate']='This browser doesn\'t remember this file. Is this the Original file (keep same lock) or a Copy (make new lock)?';
+$ec_lang['lpn_copy_why']='Another browser has a file with this same lock open right now. A file copied outside this page keeps its original\'s lock.';
+$ec_lang['lpn_copy_original']='Original; keep same lock';
+$ec_lang['lpn_copy_copy']='A copy; make new lock';
+$ec_lang['lpn_copy_opened']='Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.';
 // The other end of the back channel, shown to the holder.
 $ec_lang['lpn_lock_requested']='{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over.';
 $ec_lang['lpn_ago_seconds']='{n} seconds';
