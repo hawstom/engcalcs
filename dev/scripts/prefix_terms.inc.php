@@ -118,7 +118,12 @@ function prefixToTermNames(): array
             // cartographic rule turning a longitude into an easting, and three agents reached
             // for the psychological, the optical and the sorting sense instead -- the false
             // friend a term exists to prevent, measured rather than predicted.
-            'emitter', 'projection (map)'],
+            'emitter', 'projection (map)',
+            // Added 2026-09-29 (Task 737). Concept records for Tom's interface keywords: Label
+            // (sally), Text (tessa) and Description (dora) sit beside Tag (gus) above, and the
+            // node value Head is split from the root 'head' family. Each must get its own word.
+            'label (map annotation)', 'text (map annotation)', 'description (asset notes)',
+            'hydraulic head (node value)'],
         'bpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
             'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
             'supply curve', 'branched network', 'branch', 'pipe line', 'pressure rating',
