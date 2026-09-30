@@ -21,32 +21,17 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (9 to read @@ NEEDS RULING)
+## Questions from the translators  (0, all answered)
 
-**These are SHIPPED strings, already translated into 26 languages.** A wave-0
-reading or a translator found each one readable two ways, and no sprint launches while one is
-unanswered. You are not being asked to approve wording here; you are being asked which reading
-is the one you meant. "The first one" is a complete answer.
+Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-### from sprint 2026-09-29-delta
-
-- **`lpn_ff_design_no_selection`**
-  > "The design check scope is set to Selected, but no assets are selected. Select assets or select All"
-  1. Edited
-  2. Our interface needs simplification as follows:
-  (a) (Specify) Junctions to test: All/Selected
-  (b) Design check (effect on system); (specify) pipes and other junctions to check: All/Selected
-- **`lpn_find_shift_hint`**
-  > Shift+click to toggle, adding if not in the selection set or removing if already in the selection set.
-   **`lpn_goto_on_map`**
-  > Go to on map
-  Add a canonical or _syn entry "Bring this into view on the map, Zoom to this on the map, Show this on the map"
+None on master. Every English key here is present in at least one other language.
 
 ---
 
 # Strings waiting on a branch
 
-**9 still to read**, of 12 new keys across 11 unmerged branch(es).
+**6 still to read**, of 18 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -57,37 +42,60 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-0929 (`0d83b01d`) — adds no English strings
+### chore/sprint-0929-echo (`1189bd0f`) — adds no English strings
 
-### feat/frequency-plot (`c74382c6`) — 9 new, 9 to read @@ NEEDS RULING
+### chore/term-concept (`bc078eca`) — adds no English strings
+
+### feat/frequency-plot (`8272fc8e`) — 9 new, all ruled
 
 - **`lpn_freq_axis_percent`**
   > Percent less than
-  OK.
+  _Ruled OK 2026-09-30._
 - **`lpn_freq_group_tip`**
   > Whether the graph shows junctions or pipes.
-  OK.
+  _Ruled OK 2026-09-30._
 - **`lpn_freq_menu`**
   > Frequency
-  OK.
+  _Ruled OK 2026-09-30._
 - **`lpn_freq_none`**
   > No results for this value yet, so there is nothing to graph.
-  OK.
+  _Ruled OK 2026-09-30._
 - **`lpn_freq_quantity_tip`**
   > Which value to graph.
-  OK.
+  _Ruled OK 2026-09-30._
 - **`lpn_freq_summary`**
   > Plotted: {n} of {total}
-  OK.
+  _Ruled OK 2026-09-30._
 - **`lpn_freq_summary_time`**
   > Plotted: {n} of {total}, at {time}
-  OK.
+  _Ruled OK 2026-09-30._
 - **`lpn_freq_tip`**
   > Graph the frequency distribution of one property over all junctions or all pipes at the current time step.
-  Edited
+  _Ruled OK 2026-09-30._
 - **`lpn_freq_title`**
   > Distribution of values
-  OK.
+  _Ruled OK 2026-09-30._
+
+### feat/help-menu (`e6c05a1b`) — 6 new, 6 to read @@ NEEDS RULING
+
+- **`lpn_file_import_menu`**
+  > Import…
+  @@ NEEDS RULING
+- **`lpn_help_hotkeys`**
+  > Tables and Hotkeys
+  @@ NEEDS RULING
+- **`lpn_hotkeys_map_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_hotkeys_map_heading`**
+  > Map
+  @@ NEEDS RULING
+- **`lpn_hotkeys_map_term`**
+  > Map keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_hotkeys_tables_heading`**
+  > Tables
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -101,7 +109,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/label-placer (`5508e0a1`) — adds no English strings
+### feat/label-placer (`2279a57e`) — adds no English strings
 
 ### feat/label-placer-a (`3483bfd6`) — adds no English strings
 
@@ -111,8 +119,6 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/table-tab-keys (`065d7e81`) — adds no English strings
+### feat/table-tab-keys (`08b8e73d`) — adds no English strings
 
-### fix/lock-disclosure (`8effc7cb`) — adds no English strings
-
-### fix/start-fresh-consent (`ef5a4c78`) — adds no English strings
+### fix/new-project-view (`cf9d9c53`) — adds no English strings
