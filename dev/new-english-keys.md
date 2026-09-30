@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 2157 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**6 still to read on master**, of 6 untranslated keys, of 2163 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,13 +25,32 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-None on master. Every English key here is present in at least one other language.
+## lpn_  (6, 6 to read @@ NEEDS RULING)
+
+- **`lpn_file_import_menu`**
+  > Import…
+  @@ NEEDS RULING
+- **`lpn_help_hotkeys`**
+  > Tables and Hotkeys
+  @@ NEEDS RULING
+- **`lpn_hotkeys_map_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_hotkeys_map_heading`**
+  > Map
+  @@ NEEDS RULING
+- **`lpn_hotkeys_map_term`**
+  > Map keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_hotkeys_tables_heading`**
+  > Tables
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**6 still to read**, of 18 new keys across 12 unmerged branch(es).
+**4 still to read**, of 16 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -42,11 +61,24 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/sprint-0929-echo (`1189bd0f`) — adds no English strings
+### chore/term-concept (`04543592`) — adds no English strings
 
-### chore/term-concept (`bc078eca`) — adds no English strings
+### feat/fireflow-scope (`8bee6721`) — 4 new, 4 to read @@ NEEDS RULING
 
-### feat/frequency-plot (`8272fc8e`) — 9 new, all ruled
+- **`lpn_ff_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_ff_design_scope`**
+  > Pipes and other junctions to check
+  @@ NEEDS RULING
+- **`lpn_ff_design_scope_tip`**
+  > All pipes and other junctions, or only the ones selected on the map.
+  @@ NEEDS RULING
+- **`lpn_ff_selected`**
+  > Selected
+  @@ NEEDS RULING
+
+### feat/frequency-plot (`be7f9aa1`) — 9 new, all ruled
 
 - **`lpn_freq_axis_percent`**
   > Percent less than
@@ -76,26 +108,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Distribution of values
   _Ruled OK 2026-09-30._
 
-### feat/help-menu (`e6c05a1b`) — 6 new, 6 to read @@ NEEDS RULING
-
-- **`lpn_file_import_menu`**
-  > Import…
-  @@ NEEDS RULING
-- **`lpn_help_hotkeys`**
-  > Tables and Hotkeys
-  @@ NEEDS RULING
-- **`lpn_hotkeys_map_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>
-  @@ NEEDS RULING
-- **`lpn_hotkeys_map_heading`**
-  > Map
-  @@ NEEDS RULING
-- **`lpn_hotkeys_map_term`**
-  > Map keyboard shortcuts
-  @@ NEEDS RULING
-- **`lpn_hotkeys_tables_heading`**
-  > Tables
-  @@ NEEDS RULING
+### feat/help-menu (`d098a3e1`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -109,7 +122,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/label-placer (`2279a57e`) — adds no English strings
+### feat/label-placer (`8254d3c9`) — adds no English strings
 
 ### feat/label-placer-a (`3483bfd6`) — adds no English strings
 
@@ -118,6 +131,8 @@ build for that would be a gate nobody keeps. Refresh it with
 ### feat/label-placer-c (`9a790a3e`) — adds no English strings
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
+
+### feat/pane-height (`0598413d`) — adds no English strings
 
 ### feat/table-tab-keys (`08b8e73d`) — adds no English strings
 
