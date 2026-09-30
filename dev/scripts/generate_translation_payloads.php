@@ -38,6 +38,9 @@ const GLOSSARY_PATH = __DIR__ . '/glossary.json';
 // it cannot file the complaint friction_check.php is waiting for.
 const SUGGESTION_BOX_SOURCE = __DIR__ . '/../translation-process.md';
 const SUGGESTION_BOX_HEADING = '## The suggestion box';
+// ROADMAP Task 737. The sibling block: what a translator does with a concept's definition. Extracted
+// the same way and for the same reason as the suggestion box.
+const CONCEPT_SOURCE_HEADING = '## Concepts are the source';
 const EN_FILE = DEFAULT_LANG_DIR . '/lang.ec.en.php';
 const TARGET_LANGS = [
     'am', 'ar', 'bg', 'bn', 'cs', 'de', 'es', 'fa', 'fr', 'he', 'hi', 'hr', 'id', 'it', 'km', 'my',
@@ -47,6 +50,7 @@ const TARGET_LANGS = [
 require_once __DIR__ . '/exempt_keys.inc.php';
 require_once __DIR__ . '/prefix_terms.inc.php';
 require_once __DIR__ . '/coverage.inc.php';
+require_once __DIR__ . '/concepts.inc.php';
 
 main($argv);
 
@@ -107,11 +111,14 @@ function buildPayloads(array $opts, bool $quiet = false): array
         fail('Invalid glossary JSON structure in: ' . GLOSSARY_PATH);
     }
 
-    $suggestionBox = loadSuggestionBox();
+    $suggestionBox = loadFencedBlock(SUGGESTION_BOX_HEADING);
+    $conceptSource = loadFencedBlock(CONCEPT_SOURCE_HEADING);
     $exemptMap = ecLoadExemptMap();
     $coverage = ecLoadCoverage();
     $termIndex = termIndexByName($glossaryData['terms']);
     $prefixMap = prefixToTermNames();
+    $conceptIndex = ecConceptIndex($glossaryData['terms']);
+    $keyConcepts = ecLoadKeyConcepts();
 
     $detectedPrefixes = detectPrefixes($enKeys);
     $activePrefixes = $detectedPrefixes;
@@ -150,6 +157,7 @@ function buildPayloads(array $opts, bool $quiet = false): array
         [$deltaKeys, $keyContext, $exemptKeys, $outOfScopeKeys] =
             collectDeltaAndContext($enKeys, $current, $activePrefixes, $lang, $exemptMap, $coverage);
         $keySyn = collectKeySyn($deltaKeys, $enKeys, $enIntent);
+        $keyConceptMap = collectKeyConcepts($deltaKeys, $keyConcepts, $enIntent, $termIndex, $conceptIndex, $lang);
         $exemptTotal += count($exemptKeys);
         $outOfScopeTotal += count($outOfScopeKeys);
 
@@ -163,6 +171,8 @@ function buildPayloads(array $opts, bool $quiet = false): array
             $termsByPrefix[$prefix] = array_map(static function ($term) use ($lang) {
                 return [
                     'term' => $term['term'] ?? '',
+                    'concept' => $term['concept'] ?? '',
+                    'definition' => $term['definition'] ?? '',
                     'symbol' => $term['symbol'] ?? '',
                     'context' => $term['context'] ?? '',
                     'translation_notes' => $term['translation_notes'] ?? '',
@@ -201,10 +211,13 @@ function buildPayloads(array $opts, bool $quiet = false): array
                 'context_notes' => 'Use key_context.neighbors to keep register consistent with nearby translated strings.',
                 'syn_notes' => 'Use key_syn when present; these entries provide terse disambiguation comments only where translation risk exists.',
                 'suggestion_box_notes' => 'Read suggestion_box and follow it. It is part of your instructions, not a footnote: a sprint does not close while a translator complaint is unanswered.',
+                'concept_notes' => 'Read concept_source and follow it. key_concepts lists, for a key that names a defined concept, the definition you translate from; English is one rendering of it.',
             ],
             // ROADMAP Task 239. Extracted verbatim from dev/translation-process.md so it reaches
             // every agent, every language, every batch size, without being retyped per sprint.
             'suggestion_box' => $suggestionBox,
+            // ROADMAP Task 737. Extracted verbatim from dev/translation-process.md, like the box above.
+            'concept_source' => $conceptSource,
             'prompt_context_by_prefix' => $promptByPrefix,
             'glossary_terms_by_prefix' => $termsByPrefix,
             'keys_to_translate' => $deltaKeys,
@@ -212,6 +225,7 @@ function buildPayloads(array $opts, bool $quiet = false): array
             'keys' => $deltaKeys,
             'key_context' => $keyContext,
             'key_syn' => $keySyn,
+            'key_concepts' => $keyConceptMap,
         ];
 
         $files["payload_{$lang}.json"] = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
@@ -395,33 +409,72 @@ function loadLangArray(string $file): array
 }
 
 /**
- * Pulls the suggestion-box block out of dev/translation-process.md -- the first fenced code block
- * under the "## The suggestion box" heading. One source of truth: the SOP shows the human what to
- * paste, and this hands the identical text to the agent through its own payload, so the two cannot
- * drift and a sprint that forgets to paste it still delivers it.
+ * Pulls a translator-instruction block out of dev/translation-process.md -- the first fenced code
+ * block under the given heading. Two headings use it: "## The suggestion box" (ROADMAP Task 239)
+ * and "## Concepts are the source" (Task 737). One source of truth: the SOP shows the human what
+ * the agent is told, and this hands the identical text to the agent through its own payload, so
+ * the two cannot drift and a sprint that forgets to paste it still delivers it.
  *
  * A failure here is fatal on purpose. A payload that quietly shipped without the suggestion box
  * would take a whole sprint's findings with it, and nothing downstream would notice.
  */
-function loadSuggestionBox(): string
+function loadFencedBlock(string $heading): string
 {
     if (!file_exists(SUGGESTION_BOX_SOURCE)) {
-        fail('Suggestion-box source not found: ' . SUGGESTION_BOX_SOURCE);
+        fail('Translator-instruction source not found: ' . SUGGESTION_BOX_SOURCE);
     }
     $md = (string)file_get_contents(SUGGESTION_BOX_SOURCE);
-    $at = strpos($md, SUGGESTION_BOX_HEADING);
+    $at = strpos($md, $heading);
     if ($at === false) {
-        fail('No "' . SUGGESTION_BOX_HEADING . '" heading in ' . basename(SUGGESTION_BOX_SOURCE)
+        fail('No "' . $heading . '" heading in ' . basename(SUGGESTION_BOX_SOURCE)
             . ' -- every payload carries that block, so it cannot be renamed without updating this script.');
     }
     if (!preg_match('/^```\n(.*?)^```/ms', substr($md, $at), $m)) {
-        fail('No fenced block under "' . SUGGESTION_BOX_HEADING . '" in ' . basename(SUGGESTION_BOX_SOURCE) . '.');
+        fail('No fenced block under "' . $heading . '" in ' . basename(SUGGESTION_BOX_SOURCE) . '.');
     }
     $block = trim($m[1]);
     if ($block === '') {
-        fail('The suggestion-box block in ' . basename(SUGGESTION_BOX_SOURCE) . ' is empty.');
+        fail('The block under "' . $heading . '" in ' . basename(SUGGESTION_BOX_SOURCE) . ' is empty.');
     }
     return $block;
+}
+
+/**
+ * ROADMAP Task 737. For each delta key that cites a concept with a NON-EMPTY definition, the
+ * concept record the translator translates from. A key citing only concepts whose definition is
+ * empty gets no entry at all, so its payload is exactly what it was before the concept layer:
+ * English stays the source. Citations come from key_concepts.json and from `gloss:` pointers.
+ */
+function collectKeyConcepts(array $deltaKeys, array $keyConcepts, array $synMap, array $termIndex, array $conceptIndex, string $lang): array
+{
+    $out = [];
+    foreach ($deltaKeys as $key => $english) {
+        $entries = [];
+        foreach (ecConceptsCitedByKey($key, $keyConcepts, $synMap, $termIndex) as $id) {
+            $term = $conceptIndex[$id] ?? null;
+            if ($term === null || trim((string)($term['definition'] ?? '')) === '') {
+                continue;
+            }
+            $entry = [
+                'concept' => $id,
+                'source' => 'definition',
+                'definition' => (string)$term['definition'],
+                'english_rendering' => ecConceptEnglish($term),
+                'preferred_translation' => (string)($term['translations'][$lang] ?? ''),
+            ];
+            if (($term['symbol'] ?? '') !== '') {
+                $entry['symbol'] = (string)$term['symbol'];
+            }
+            if (!empty($term['avoid']) && is_array($term['avoid'])) {
+                $entry['avoid'] = array_values($term['avoid']);
+            }
+            $entries[] = $entry;
+        }
+        if ($entries) {
+            $out[$key] = $entries;
+        }
+    }
+    return $out;
 }
 
 function loadEnglishIntentMap(string $file): array
@@ -641,6 +694,12 @@ function buildPromptContext(array $terms, string $language): string
             $line .= ' (' . $symbol . ')';
         }
         $line .= ': ' . $translationDisplay;
+
+        // Task 737: a non-empty definition is the source; English (the name above) renders it.
+        $definition = trim((string)($term['definition'] ?? ''));
+        if ($definition !== '') {
+            $line .= "\n    MEANS: " . $definition;
+        }
 
         $avoid = $term['avoid'] ?? [];
         if (is_array($avoid) && count($avoid) > 0) {

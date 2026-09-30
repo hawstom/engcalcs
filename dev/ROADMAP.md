@@ -107,6 +107,7 @@ the block.
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
 - 100|637| **A Graph button on the Properties box.**
+  **BUILT 2026-09-30 on `feat/property-graph`, port 8141**, awaiting his browser pass.
   **REVISED BY TOM, 2026-09-29:** *"But what we really want is a time series graph at the bottom of
   Properties for an EPS project; it should have a selector for all the properties that can be graphed
   for that asset."*
@@ -244,6 +245,7 @@ the block.
   (2026-09-29: the classifier would not let CC record an all-clear from a pasted list). Graph
   tabs next: Task 743.
 - 100|699| **Audit the language keys for lazy duplications.**
+  **AUDIT DONE 2026-09-30**: `dev/key-duplication-audit-2026-09-30.md` (74 groups, ~33 keys mergeable); which merges is his call.
   Tom, 2026-09-19: *"can you make sure we have a Roadmap task to audit language for lazy
   duplications where maybe a slight redesign can simplify or eliminate keys?"* He asked for it in
   the same breath as deciding a customer takes the EXISTING Description and Tag rather than an
@@ -259,6 +261,7 @@ the block.
   - **Cost is the argument for doing it and also for doing it carefully:** one deleted key is 26
     translations never bought; one wrongly merged key is a wrong word on a control in 26 languages.
 - 100|718| **File menu: Recents just above Close, and an Import submenu.**
+  **BUILT 2026-09-30 with Task 745 on `feat/help-menu`, port 8138**, awaiting his browser pass.
   Tom, 2026-09-25, from WaterCAD: *"File menu: Recents just above Exit"* and *"We have three import
   items. It's probably time for an Import sub-menu."*
 - 100|737| **Coined names for interface elements, so every language names each one once.**
@@ -270,6 +273,10 @@ the block.
   annotation = Text, z = Elevation, y = depth, p = pressure, total potential = Head/HGL, energy = EGL).
   Plan: re-key glossary.json by concept (id + definition), English one rendering among 27; keys cite
   it with the existing `gloss:` tag.
+  **CONCEPT LAYER SHIPPED 2026-09-30** (`chore/term-concept`, `dev/term-concepts.md`): 131 glossary
+  terms carry a coined `concept` id and a `definition`; a payload gives the definition as the source
+  and English as one rendering; `concept_check.php` blocks. Open: 67 definitions still empty, the four
+  new terms (sally, tessa, dora, hydraulic-head) untranslated, and his call on Head vs HGL, split in two.
 - 100|738| **A Find filter that stays standing, or a snapshot, by the visitor's choice.**
   Tom, 2026-09-28: editing a filtered value out of the filter makes its row vanish. His proposal: a
   standing filter while the Find box is open, with a toggle next to Filter in table to make it a
@@ -278,22 +285,27 @@ the block.
   beside Filter in table, rows that stopped matching dimmed and marked with a warning sign, and the
   count in the filter banner. Tom's call.
 - 100|741| **The infinite map: generated networks for the label bench.**
+  **ROUND 5 DONE 2026-09-30** on `feat/label-placer`: generator, L-Town and C-Town, pre-registered protocol, `dev/label-trials/round-5-2026-09-29.md`; five rule proposals await his ruling.
   Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
 - 100|743| **Ctrl+Shift+PageDown reaches the graph tabs, not only the tables.**
+  Waits on `feat/table-tab-keys` merging, which carries the stepping it extends.
   Tom, 2026-09-29, on `feat/table-tab-keys`: *"It would be nice if it also could proceed to the
   graphs."* Follows Task 690's table stepping onto the bottom pane's graph tabs (Frequency, Time
   Series). Seam: the bottom-pane tab strip, shared with `feat/frequency-plot`.
 - 100|744| **Let the bottom pane shrink the map to almost nothing.**
+  **BUILT 2026-09-30 on `feat/pane-height`, port 8140**, awaiting his browser pass.
   Tom, 2026-09-29: *"It would be good to allow the bottom pane to shrink the map to almost nothing.
   More freedom for the user is a good thing."*
 - 100|745| **Help menu in three groups, and a Tables and Hotkeys box.**
+  **BUILT 2026-09-30 on `feat/help-menu`, port 8138** (Perry: ready), awaiting his browser pass.
   Tom, 2026-09-29: *"(1) True help: Walkthroughs, Tables and Hotkeys (new box that has all table help
   and all keyboard shortcuts divided by context), Toolbars. (2) Helpers: Fix something, Install, and
   Cookies. (3) True about: Notes on this page, Welcome page, Screenshot, Privacy, Terms, About."*
   Seam: the menu definitions, shared with Task 718 (File menu); one track builds both.
 - 100|746| **Fire flow dialog: one All/Selected choice for each of its two scopes.**
+  **BUILT 2026-09-30 on `feat/fireflow-scope`, port 8139** (Perry: ready), awaiting his browser pass.
   Tom, 2026-09-29, ruling `lpn_ff_design_no_selection`: *"Our interface needs simplification as
   follows: (a) (Specify) Junctions to test: All/Selected (b) Design check (effect on system);
   (specify) pipes and other junctions to check: All/Selected"*, and the message: *"The design check
@@ -478,10 +490,6 @@ the block.
   Left from the message log (Task 704, closed 2026-09-23): Ida's third item. Sort which must genuinely
   block and which are only information and belong in the log, which Tom's *"USER MUST HAVE CONTROL
   OVER MESSAGES"* argues for. Keep severity at the two colours the banner already uses.
-- 75|711| **A pan is lost when File, New project opens beside it.**
-  Found by the pre-reviewer 2026-09-23 while testing Task 647: New project and Open example never
-  call `rememberCurrentView()` for the tab being left, so switching back refits it and the pan is
-  gone. A tab opened from the gallery and switched to once keeps its view correctly.
 - 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
   Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
   important code discipline."* Ida's phased plan: `dev/theming-plan.md`. Phase 1 declares semantic
