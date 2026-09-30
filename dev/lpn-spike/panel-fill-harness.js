@@ -151,7 +151,10 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		['openFullReportBox', 'the per-step node/link table box'],
 		// The Notes box (Tom, 2026-09-28): it left VIEW_POPOVERS for the standing-box shell and is
 		// now draggable and resizeable like the boxes above it, so a phone wants the same fill.
-		['openNotesBox', 'the Notes box']];
+		['openNotesBox', 'the Notes box'],
+		// The Alternatives table (dev/scenario-alternatives.md): one row per scenario and nine
+		// category columns, the widest case of all, so a phone wants the whole window for it.
+		['openAlternativesBox', 'the Alternatives table']];
 	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
 	});

@@ -57362,7 +57362,7 @@ var EngCalcs = EngCalcs || {};
 				ffCell(tr, a.isBase ? baseWord : scenarioDisplayName(s) + ' (' + a.count + ')');
 			});
 		});
-		ffEl('p', 'lpn-ff-note', pc.lpn_alt_note || 'Read only.', host);
+		ffEl('p', 'lpn-ff-note', pc.lpn_alt_note, host);
 	}
 	// Position and size for the life of the page only: remembering them would be a new key in the
 	// browser for a view Tom has not yet decided to keep.
