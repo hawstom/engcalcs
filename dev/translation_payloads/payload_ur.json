@@ -50,13 +50,16 @@
         "glossary_injection_notes": "Use prompt_context_by_prefix and glossary_terms_by_prefix.preferred_translation when available.",
         "context_notes": "Use key_context.neighbors to keep register consistent with nearby translated strings.",
         "syn_notes": "Use key_syn when present; these entries provide terse disambiguation comments only where translation risk exists.",
-        "suggestion_box_notes": "Read suggestion_box and follow it. It is part of your instructions, not a footnote: a sprint does not close while a translator complaint is unanswered."
+        "suggestion_box_notes": "Read suggestion_box and follow it. It is part of your instructions, not a footnote: a sprint does not close while a translator complaint is unanswered.",
+        "concept_notes": "Read concept_source and follow it. key_concepts lists, for a key that names a defined concept, the definition you translate from; English is one rendering of it."
     },
     "suggestion_box": "## Suggestion box — file a grievance about the English\n\nIf any English string made you guess, file it. You are the only person who will ever\nnotice, and a string that made you guess will make the next 25 translators guess too.\n\nFile an entry when: the English has more than one plausible reading; a verb or adjective\nhas no stated object; a word's intended sense is not its most common sense; a term maps\nonto a dangerous second sense in your language; a claim in the text looks false or stale;\nor the tooling handed you a preferred_translation that is wrong for the context.\n\nReport them in your final message as a JSON array, separate from your prose:\n\nFRICTION: [\n  {\"key\": \"<lang key>\", \"complaint\": \"<what made you guess, in one sentence>\",\n   \"readings\": [\"<reading you chose>\", \"<reading you rejected>\"]}\n]\n\nAn empty array is a fine and useful answer. Do NOT invent entries -- a false one costs a\nhuman's attention. But do not stay quiet to be agreeable either: this channel exists\nbecause real complaints were previously buried in prose and never acted on.\n\nWhere it goes and what happens next: the orchestrator copies each entry into\ndev\/english-friction\/<sprint>.json, adds \"source\": \"translator\" and \"lang\": \"<your\nlanguage code>\", and answers it with a \"disposition\" plus a written \"resolution\" --\nenglish (the English was rewritten), intent, glossary, dismissed (with the reason), or\nrefer-to-human. refer-to-human is a real answer and does NOT close the entry: escalating\nis not resolving, and it stays visible until Tom rules on it. friction_check.php blocks\nthe sprint from CLOSING while any entry of yours is unanswered, so filing one is expected\nwork that the sprint waits on -- not a complaint about the sprint.",
+    "concept_source": "## Concepts are the source\n\nWhere key_concepts lists a concept for a key, its definition is the authoritative source\nand the English string is one rendering of it: translate the thing the definition\ndescribes, and give that concept the same word in every key that cites it, a word no\nneighbouring concept in the definition shares. Where a key has no key_concepts entry,\nthe English is the source, as before.",
     "prompt_context_by_prefix": [],
     "glossary_terms_by_prefix": [],
     "keys_to_translate": [],
     "keys": [],
     "key_context": [],
-    "key_syn": []
+    "key_syn": [],
+    "key_concepts": []
 }

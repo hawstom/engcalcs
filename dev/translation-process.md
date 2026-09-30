@@ -340,6 +340,25 @@ English/intent/glossary rule, and `php dev/scripts/friction_check.php --sprint=<
 before the sprint closes. **Nothing is dismissed silently** — an entry closes with a written reason
 or escalates as `refer-to-human` and stays open. See `dev/english-friction/README.md`.
 
+## Concepts are the source — the sibling block, extracted the same way
+
+Tom, 2026-09-29: *"We need to have a source that is more primary and more authoritative than the
+English, and the English can be a translation of it."* Each `glossary.json` term carries a `concept`
+id and a `definition`; a key cites a concept through `dev/scripts/key_concepts.json` or a `gloss:`
+pointer, and its payload then carries `key_concepts`. The fenced block below reaches every agent as
+`concept_source`, exactly as the suggestion box does, and editing it makes every payload stale.
+Design: `dev/term-concepts.md`.
+
+```
+## Concepts are the source
+
+Where key_concepts lists a concept for a key, its definition is the authoritative source
+and the English string is one rendering of it: translate the thing the definition
+describes, and give that concept the same word in every key that cites it, a word no
+neighbouring concept in the definition shares. Where a key has no key_concepts entry,
+the English is the source, as before.
+```
+
 ## English-drift tripwire (staleness detection)
 
 **The gap it closes:** the payload-delta only sees *missing* keys, so a key whose English was
@@ -421,7 +440,7 @@ question about paths.
    9 of 35 findings skipped, dismissal rate 37% → 23%. **It also skipped one confirmed rewrite**
    (`mtc_note_1`), so a skipped key is a cheaper second look, not a key ruled correct — `--skipped`
    lists every one with its syn entry, and `--measure=<sprint>` re-runs the arithmetic on any log.
-1. **`php dev/scripts/gloss_ref_check.php` must exit 0.**
+1. **`php dev/scripts/gloss_ref_check.php` and `php dev/scripts/concept_check.php` must exit 0.**
 2. **Regenerate payloads** so the delta reflects current lang files:
    `php dev/scripts/generate_translation_payloads.php`. **This is the orchestrating AI's job, never
    the user's.** The launcher must then run `--check` immediately before spawning; it prints
