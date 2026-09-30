@@ -1714,6 +1714,51 @@
             "ruled": "2026-09-09",
             "answer": "OK"
         },
+        "lpn_freq_axis_percent": {
+            "on": "Percent less than",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
+        "lpn_freq_group_tip": {
+            "on": "Whether the graph shows junctions or pipes.",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
+        "lpn_freq_menu": {
+            "on": "Frequency",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
+        "lpn_freq_none": {
+            "on": "No results for this value yet, so there is nothing to graph.",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
+        "lpn_freq_quantity_tip": {
+            "on": "Which value to graph.",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
+        "lpn_freq_summary": {
+            "on": "Plotted: {n} of {total}",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
+        "lpn_freq_summary_time": {
+            "on": "Plotted: {n} of {total}, at {time}",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
+        "lpn_freq_tip": {
+            "on": "Graph the frequency distribution of one property over all junctions or all pipes at the current time step.",
+            "ruled": "2026-09-30",
+            "answer": "Edited"
+        },
+        "lpn_freq_title": {
+            "on": "Distribution of values",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
         "lpn_full_col_id": {
             "on": "ID",
             "ruled": "2026-09-26",
