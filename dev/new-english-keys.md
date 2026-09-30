@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**1 still to read on master**, of 1 untranslated keys, of 2158 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read on master**, of 2 untranslated keys, of 2159 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,17 +25,20 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (1, 1 to read @@ NEEDS RULING)
+## lpn_  (2, 2 to read @@ NEEDS RULING)
 
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.
+  @@ NEEDS RULING
+- **`lpn_pgraph_source_share_from`**
+  > Source share from {node}
   @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**10 still to read**, of 22 new keys across 12 unmerged branch(es).
+**16 still to read**, of 19 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -46,52 +49,48 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/fireflow-scope (`8bee6721`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/bentley-interop (`be4dbfb8`) — adds no English strings
+
+### feat/copy-lock (`5ed3e3b6`) — 7 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_copy_body`**
+  > This file was originally created on {date}, but this browser doesn't remember it. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  @@ NEEDS RULING
+- **`lpn_copy_body_nodate`**
+  > This browser doesn't remember this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  @@ NEEDS RULING
+- **`lpn_copy_copy`**
+  > A copy; make new lock
+  @@ NEEDS RULING
+- **`lpn_copy_opened`**
+  > Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.
+  @@ NEEDS RULING
+- **`lpn_copy_original`**
+  > Original; keep same lock
+  @@ NEEDS RULING
+- **`lpn_copy_title`**
+  > Mark file as new copy?
+  @@ NEEDS RULING
+- **`lpn_copy_why`**
+  > Another browser has a file with this same lock open right now. A file copied outside this page keeps its original's lock.
+  @@ NEEDS RULING
+
+### feat/find-filter (`92b573b5`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_pane_filter_stale`**
+  > Rows that no longer match: {n}.
+  @@ NEEDS RULING
+
+### feat/fireflow-scope (`86f4e2b2`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_ff_all`**
   > All
-  @@ NEEDS RULING
-- **`lpn_ff_design_scope`**
-  > Pipes and other junctions to check
-  @@ NEEDS RULING
-- **`lpn_ff_design_scope_tip`**
-  > All pipes and other junctions, or only the ones selected on the map.
   @@ NEEDS RULING
 - **`lpn_ff_selected`**
   > Selected
   @@ NEEDS RULING
 
-### feat/frequency-plot (`be7f9aa1`) — 9 new, all ruled
-
-- **`lpn_freq_axis_percent`**
-  > Percent less than
-  _Ruled OK 2026-09-30._
-- **`lpn_freq_group_tip`**
-  > Whether the graph shows junctions or pipes.
-  _Ruled OK 2026-09-30._
-- **`lpn_freq_menu`**
-  > Frequency
-  _Ruled OK 2026-09-30._
-- **`lpn_freq_none`**
-  > No results for this value yet, so there is nothing to graph.
-  _Ruled OK 2026-09-30._
-- **`lpn_freq_quantity_tip`**
-  > Which value to graph.
-  _Ruled OK 2026-09-30._
-- **`lpn_freq_summary`**
-  > Plotted: {n} of {total}
-  _Ruled OK 2026-09-30._
-- **`lpn_freq_summary_time`**
-  > Plotted: {n} of {total}, at {time}
-  _Ruled OK 2026-09-30._
-- **`lpn_freq_tip`**
-  > Graph the frequency distribution of one property over all junctions or all pipes at the current time step.
-  _Ruled OK 2026-09-30._
-- **`lpn_freq_title`**
-  > Distribution of values
-  _Ruled OK 2026-09-30._
-
-### feat/help-menu (`e9ebc9a2`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/help-menu (`d34b00e6`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_file_import_menu`**
   > Import…
@@ -134,8 +133,6 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/pane-height (`0598413d`) — adds no English strings
+### feat/property-graph (`b9e8f9ef`) — adds no English strings
 
-### feat/property-graph (`5c1f238a`) — adds no English strings
-
-### feat/table-tab-keys (`08b8e73d`) — adds no English strings
+### fix/scenario-sort (`ad494b66`) — adds no English strings

@@ -2082,6 +2082,7 @@ EngCalcs.pageConfig = {
 	lpn_ts_summary: <?=json_encode($ec_lang['lpn_ts_summary'])?>,
 	lpn_ts_axis_time: <?=json_encode($ec_lang['lpn_ts_axis_time'])?>,
 	lpn_pgraph_none: <?=json_encode($ec_lang['lpn_pgraph_none'])?>,
+	lpn_pgraph_source_share_from: <?=json_encode($ec_lang['lpn_pgraph_source_share_from'])?>,
 	lpn_pane_toggle: <?=json_encode($ec_lang['lpn_pane_toggle'])?>,
 	lpn_pane_toggle_tip: <?=json_encode($ec_lang['lpn_pane_toggle_tip'])?>,
 	lpn_pane_tab_junctions: <?=json_encode($ec_lang['lpn_pane_tab_junctions'])?>,
