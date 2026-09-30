@@ -157,7 +157,12 @@ console.log('\n--- a drag can never eat the map ---');
 {
 	const vh = 900;   // the stub's window
 	const max = L.paneMaxHeight();
-	report(max <= Math.floor(vh * 0.8), 'the pane can never take the whole window', max + ' of ' + vh);
+	// The fraction itself is read from source (Task 744 raised it from 0.8 -- a sanity net against
+	// literally the whole window, not the reserve that decides how little map is left; see section
+	// 12 for that): a harness that hard-codes 0.8 stops testing the constant the moment it changes.
+	const frac = Number((src.match(/Math\.floor\(vh \* (0\.\d+)\)/) || [])[1]);
+	report(frac > 0 && frac < 1, 'the fraction cap is a real fraction, not a typo', String(frac));
+	report(max <= Math.floor(vh * frac), 'the pane can never take the whole window', max + ' of ' + vh);
 	report(L.clampPaneHeight(100000) === max, 'an absurd drag stops at the ceiling', String(max));
 	report(L.clampPaneHeight(1) === 110, 'and a drag to nothing stops at the pane floor');
 	report(L.clampPaneHeight(0) === 260, 'a missing height falls back to the default, not to zero');
@@ -680,7 +685,7 @@ console.log('\n--- the strip may be two lines ---');
 		'the strip never scrolls sideways — the page may not scroll at all (Task 432)');
 	// THE CEILING KNOWS ABOUT THE CHROME. The body's height is the only number JS writes, so if the
 	// cap ignored the grip and a two-line strip the whole pane would sit past 80% of the window.
-	report(/Math\.floor\(vh \* 0\.8\) - paneChromeHeight\(\)/.test(fnBody('paneMaxHeight')),
+	report(/Math\.floor\(vh \* 0\.\d+\) - paneChromeHeight\(\)/.test(fnBody('paneMaxHeight')),
 		'the pane ceiling subtracts the measured chrome, so a second line of tabs is accounted for');
 	report(/pane\.getBoundingClientRect\(\)\.height/.test(fnBody('paneChromeHeight')) &&
 		/body\.getBoundingClientRect\(\)\.height/.test(fnBody('paneChromeHeight')),
@@ -1052,6 +1057,113 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 		/lpn-pane/.test(sel) && !/[:[]/.test(sel.replace('html:has(#lpn_canvas)', '')));
 	report(mine.length === 0, 'every pane-table selector this section met was one the reader understands',
 		mine.join(' | '));
+}
+
+// ---- 12. the grip can shrink the map to almost nothing ----------------------------------------
+// Task 744, Tom, 2026-09-29: *"It would be good to allow the bottom pane to shrink the map to
+// almost nothing. More freedom for the user is a good thing."* Section 4 above already holds that
+// a drag can never EAT the map; this section holds the other half Tom asked for -- that a drag CAN
+// take the map down to a sliver, rather than stalling a fifth of the way there.
+//
+// **A REALISTIC GEOMETRY, NOT THE STUB'S DEFAULT.** Sections 1-11 never need the canvas and the
+// pane to agree on where they sit, because nothing in them asks the map for its OWN height. This
+// section does, so the map, the pane body and the pane's chrome are wired to the one relationship
+// that matters: the pane sits in flow immediately below the map, and the map's own height is
+// whatever effectiveMapHeight() says it is (through the real `svg.setAttribute('height', ...)`
+// call, not a style property). Without this, `canvas` would answer a constant height forever and
+// this section would be asserting that a resize does nothing -- passing for the wrong reason.
+console.log('\n--- the grip can shrink the map to almost nothing (Task 744) ---');
+{
+	const MAP_MIN = Number((src.match(/var LPN_MAP_MIN = (\d+);/) || [])[1]);
+	const PANE_MAP_MIN = Number((src.match(/LPN_PANE_MIN = \d+, LPN_PANE_MAP_MIN = (\d+)/) || [])[1]);
+	report(MAP_MIN > 0 && PANE_MAP_MIN > 0, 'both floors are readable from source, not re-typed here',
+		MAP_MIN + ' / ' + PANE_MAP_MIN);
+
+	// Above the canvas: the menubar, the toolbar and the tab strip, none of which this harness
+	// loads, so it is supplied as a plain number of pixels of "above" the way a real window varies
+	// it -- wide enough for one line of toolbar, or wrapped onto several.
+	function withRealisticGeometry(above, fn) {
+		const canvas = byId.lpn_canvas, paneBody = byId.lpn_pane_body, pane = byId.lpn_pane;
+		const savedCanvasRect = canvas.getBoundingClientRect, savedCanvasSetAttr = canvas.setAttribute,
+			savedBodyRect = paneBody.getBoundingClientRect, savedPaneRect = pane.getBoundingClientRect,
+			savedDocBodyRect = document.body.getBoundingClientRect;
+		canvas.getBoundingClientRect = function () {
+			const h = parseFloat(this.height) || (900 - above);
+			return { left: 0, top: above, right: 1400, bottom: above + h, width: 1400, height: h };
+		};
+		// A real <svg> takes its height through setAttribute(), never through .style -- the default
+		// stub rect only reacts to .style, which is why this override exists at all.
+		canvas.setAttribute = function (k, v) { if (k === 'height') { this.height = v; } };
+		paneBody.getBoundingClientRect = function () {
+			const h = parseFloat(this.style.height) || 0, top = canvas.getBoundingClientRect().bottom;
+			return { left: 0, top: top, right: 1000, bottom: top + h, width: 1000, height: h };
+		};
+		// 44px of grip and tab strip beyond the body, the one thing paneChromeHeight() measures.
+		pane.getBoundingClientRect = function () {
+			const b = paneBody.getBoundingClientRect();
+			return { left: 0, top: b.top, right: 1000, bottom: b.bottom + 44, width: 1000, height: b.height + 44 };
+		};
+		document.body.getBoundingClientRect = function () { return { bottom: pane.getBoundingClientRect().bottom }; };
+		try { return fn(); } finally {
+			canvas.getBoundingClientRect = savedCanvasRect; canvas.setAttribute = savedCanvasSetAttr;
+			paneBody.getBoundingClientRect = savedBodyRect; pane.getBoundingClientRect = savedPaneRect;
+			document.body.getBoundingClientRect = savedDocBodyRect;
+		}
+	}
+
+	[60, 120, 300].forEach(function (above) {
+		withRealisticGeometry(above, function () {
+			global.document.readyState = 'complete';
+			L.openPane('junctions');
+			const grip = byId.lpn_pane_grip;
+			const down = grip._listeners.pointerdown[0], move = grip._listeners.pointermove[0],
+				up = grip._listeners.pointerup[0];
+
+			// **THE OLD CLAMP, COMPUTED FROM THE SAME MEASUREMENT, WOULD HAVE FAILED THIS.** Before
+			// dragging, read what today's ceiling would have been under the retired 160px reserve
+			// and the retired 80% fraction, and show that neither leaves enough pane height to push
+			// the map down anywhere near its floor -- which is exactly the "stalls a fifth of the
+			// way there" symptom Task 744 was opened for.
+			const vh = 900, map0 = byId.lpn_canvas.getBoundingClientRect().height,
+				mine0 = document.getElementById('lpn_pane_body').getBoundingClientRect().height;
+			const oldRoom = map0 + mine0 - 160;
+			const oldCap = Math.floor(vh * 0.8) - (byId.lpn_pane.getBoundingClientRect().height -
+				document.getElementById('lpn_pane_body').getBoundingClientRect().height);
+			const oldCeiling = Math.max(110, Math.min(oldRoom, oldCap));
+			const neededForFloor = vh - above - MAP_MIN - 44;   // pane height that would push the map to its floor
+			report(oldCeiling < neededForFloor,
+				'the old 160px reserve and 80% fraction could not have reached the floor at above=' + above,
+				'old ceiling ' + oldCeiling + ' < ' + neededForFloor + ' needed');
+
+			down({ clientY: 600, pointerId: 1, preventDefault: function () {} });
+			move({ clientY: -1000000, pointerId: 1 });   // an absurd drag straight to the top
+			up({ pointerId: 1 });
+
+			const finalMap = byId.lpn_canvas.getBoundingClientRect().height,
+				finalPane = byId.lpn_pane_body.getBoundingClientRect().height;
+			report(finalMap === MAP_MIN, 'at above=' + above + ', the map lands on its real floor, not the old clamp',
+				finalMap + ' (floor is ' + MAP_MIN + ')');
+			// **A FIXED POINT, NOT A FRESH RECOMPUTE.** paneMaxHeight() reads the CURRENT map and pane
+			// rects, and the map just shrank to its floor -- so calling it again now answers a
+			// different, larger ceiling than the one the settle loop actually converged on partway
+			// through. What holds is that the applied height is stable against its own ceiling: a
+			// further clamp of it changes nothing.
+			report(L.clampPaneHeight(finalPane) === finalPane,
+				'...and the pane settles at a height that is its own ceiling, not one still climbing',
+				finalPane + ' -> reclamped ' + L.clampPaneHeight(finalPane));
+
+			// Dragging back down still works: the grip is still there to grab, and the map grows
+			// back as the pane gives the height up.
+			down({ clientY: -1000000, pointerId: 1, preventDefault: function () {} });
+			move({ clientY: -1000000 + 400, pointerId: 1 });
+			up({ pointerId: 1 });
+			const backMap = byId.lpn_canvas.getBoundingClientRect().height, backPane = byId.lpn_pane_body.getBoundingClientRect().height;
+			report(backPane === finalPane - 400, 'dragging back down shrinks the pane again',
+				finalPane + ' -> ' + backPane);
+			report(backMap > finalMap, '...and the map grows back as the pane gives up the height',
+				finalMap + ' -> ' + backMap);
+		});
+	});
 }
 
 console.log(`\n${checks - failures}/${checks} checks passed`);
