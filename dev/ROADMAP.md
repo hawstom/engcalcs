@@ -270,6 +270,10 @@ the block.
   annotation = Text, z = Elevation, y = depth, p = pressure, total potential = Head/HGL, energy = EGL).
   Plan: re-key glossary.json by concept (id + definition), English one rendering among 27; keys cite
   it with the existing `gloss:` tag.
+  **CONCEPT LAYER SHIPPED 2026-09-30** (`chore/term-concept`, `dev/term-concepts.md`): 131 glossary
+  terms carry a coined `concept` id and a `definition`; a payload gives the definition as the source
+  and English as one rendering; `concept_check.php` blocks. Open: 67 definitions still empty, the four
+  new terms (sally, tessa, dora, hydraulic-head) untranslated, and his call on Head vs HGL, split in two.
 - 100|738| **A Find filter that stays standing, or a snapshot, by the visitor's choice.**
   Tom, 2026-09-28: editing a filtered value out of the filter makes its row vanish. His proposal: a
   standing filter while the Find box is open, with a toggle next to Filter in table to make it a
