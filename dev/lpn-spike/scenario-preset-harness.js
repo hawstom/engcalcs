@@ -61,8 +61,8 @@ const L = loadLoopedNetwork(
 	"\t\tindexEntry: indexEntry, getLibrary: function () { return library; }\n"
 );
 
-const TOM = ['1. Flow test: Static', '2. Flow test: Mid', '3. Flow test: Max', '4. Average Day',
-	'5. Max Day', '6. Peak hour', '7. Fire plus max day'];
+// Tom's order is the key order; the words themselves come from the language file.
+const TOM = KEYS.map((k) => strings[k]);
 const WANT_DM = { average_day: 1, max_day: 2, peak_hour: 3, fire_max_day: 2 };
 
 function menuNames() {
