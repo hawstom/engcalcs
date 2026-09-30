@@ -19326,7 +19326,7 @@ var EngCalcs = EngCalcs || {};
 		// Its own line rather than a second sentence in the count, which is a ruled string.
 		head = document.createElement('div');
 		head.className = 'lpn-find-hint';
-		head.textContent = pc.lpn_find_shift_hint || 'Shift+click to add/remove toggle.';
+		head.textContent = pc.lpn_find_shift_hint || 'Shift+click to toggle, adding if not in the selection set or removing if already in the selection set.';
 		box.appendChild(head);
 		var list = document.createElement('div');
 		// Bounded because the panel is a pull-down, not a report: a 4,000-pipe answer is a scroll
