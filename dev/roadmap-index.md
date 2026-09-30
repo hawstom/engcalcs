@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**109 open tasks.** Next (100): 15 · Soon (75): 15 · Someday (50): 45 · Maybe (25): 15 · Parked (5): 19
+**108 open tasks.** Next (100): 15 · Soon (75): 14 · Someday (50): 45 · Maybe (25): 15 · Parked (5): 19
 
 ## 100 — Next (15)
 
@@ -27,7 +27,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 745 — Help menu in three groups, and a Tables and Hotkeys box.
 - Task 746 — Fire flow dialog: one All/Selected choice for each of its two scopes.
 
-## 75 — Soon (15)
+## 75 — Soon (14)
 
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
@@ -41,7 +41,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 640 — Graphs: the umbrella, a submenu under Water holding five plots.
 - ! Task 701 — The panel guard is blind to forty sites, and the bottom panel is one.
 - Task 710 — Audit the 57 raw alert and confirm dialogs.
-- Task 711 — A pan is lost when File, New project opens beside it.
 - Task 714 — Theming: colour tokens first, then a Light/Dark choice in Settings.
 - Task 739 — Say where each setting is saved: the project or this browser.
 
@@ -137,5 +136,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-100 of 109 titles are within 4–12 words. `!` marks the rest;
+99 of 108 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

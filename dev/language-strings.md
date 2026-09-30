@@ -311,6 +311,8 @@ drift), though a label may legitimately carry both a `gloss:` pointer and its ow
 - **`glossary.json` — per concept.** One entry, referenced by every label that uses the term. Single
   source of truth for plain meaning, English synonyms, each language's dominant standard translation,
   `avoid` lists, and sourcing.
+  Each term's `concept` id and `definition` are the translator's primary source, English one
+  rendering of it; a key cites a concept in `dev/scripts/key_concepts.json` (`dev/term-concepts.md`).
 - **`$ec_lang_syn` — per label.** Alternate wordings of *this* label.
 - **Visible `.ec-help`/`.ec-tip` tips — user-facing definition.** Translated with the label, so a
   plain-language definition here helps the user *and* anchors the concept for translators. A tip
