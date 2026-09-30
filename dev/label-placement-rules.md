@@ -59,7 +59,8 @@ pipe is medium-low cost; leader on pipe is very low cost. A label on a customer 
 
 #### Time and change
 
-- **R10. Placement never slows a pan or zoom while it's under way.**
+- **R10. Placement never slows a pan or zoom while it's under way. A layout's cost depends on what is
+  on the screen, not on how big the network is.** (Second sentence added 2026-09-30 from round 5.)
 - **R11. When zooming in frees room, dropped properties and hidden labels come back.**
 - **R13. The layout always reflects the current network, text and settings.**
 - **R15. Avoid showing the user drastic shifts.** For example, when jumping into an untested
