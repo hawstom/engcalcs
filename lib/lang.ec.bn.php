@@ -778,6 +778,13 @@ $ec_lang['lpn_pane_paste_no_node']='সারি {row}: নোড {id} এখন
 $ec_lang['lpn_pane_paste_same_ends']='সারি {row}: From ও To একই নোড।';
 // {text} is what was pasted and {col} is the column heading, with its unit, such as Diameter (in).
 $ec_lang['lpn_pane_paste_bad_cell']='সারি {row}: {text} একটি বৈধ {col} নয়।';
+$ec_lang['lpn_pane_paste_text_no_position']='সারি {row}: একটি নতুন টেক্সটের {first} ও {second} উভয়ই প্রয়োজন।';
+$ec_lang['lpn_pane_paste_no_anchor']='সারি {row}: {id} এই নেটওয়ার্কে এখনও কোনো নোড বা পাইপ নয়। প্রথমে এটি পেস্ট করুন, তারপর এই টেক্সট।';
+$ec_lang['lpn_pane_paste_customer_no_position']='সারি {row}: একটি নতুন গ্রাহকের {first} ও {second} উভয়ই প্রয়োজন।';
+$ec_lang['lpn_pane_paste_no_customer_ref']='সারি {row}: একটি নতুন গ্রাহকের একটি সংযুক্ত পাইপ বা নোড প্রয়োজন।';
+$ec_lang['lpn_pane_paste_no_pipe']='সারি {row}: পাইপ {id} এখনও নেই। প্রথমে আপনার পাইপ পেস্ট করুন, তারপর আপনার গ্রাহক।';
+$ec_lang['lpn_pane_paste_no_customer_node']='সারি {row}: নোড {id} এখনও নেই। প্রথমে আপনার সংযোগস্থল পেস্ট করুন, তারপর আপনার গ্রাহক।';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='সারি {row}: নোড {id}-তে গ্রাহক সংযুক্ত করার মতো কোনো পাইপ নেই।';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
 
@@ -814,6 +821,7 @@ $ec_lang['lpn_tool_zoom_window']='জুম উইন্ডো';
 $ec_lang['lpn_zoom_in']='জুম ইন';
 $ec_lang['lpn_zoom_out']='জুম আউট';
 $ec_lang['lpn_new_text']='টেক্সট';
+$ec_lang['lpn_field_text_anchor']='সংযুক্ত';
 $ec_lang['lpn_field_text_bold']='বোল্ড টেক্সট';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -1331,7 +1339,9 @@ $ec_lang['lpn_pane_filter_none']='এই সারণিতে ফিল্ট�
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='জুম ও নির্বাচন করুন';
-
+$ec_lang['lpn_goto_on_map']='মানচিত্রে যান';
+$ec_lang['lpn_pane_select_on_map']='মানচিত্রে নির্বাচন করুন';
+$ec_lang['lpn_pane_unselect_on_map']='মানচিত্রে নির্বাচন বাতিল করুন';
 
 
 $ec_lang['lpn_pane_print']='টেবিল প্রিন্ট করুন';
@@ -1470,6 +1480,7 @@ $ec_lang['lpn_find_op_lt']='কম';
 $ec_lang['lpn_find_op_empty']='খালি';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n}টি পাওয়া গেছে। একটিতে যেতে সেটিতে ক্লিক করুন।';
+$ec_lang['lpn_find_shift_hint']='যোগ/অপসারণ টগল করতে Shift+ক্লিক করুন।';
 
 $ec_lang['lpn_find_none']='কিছুই মেলেনি।';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
@@ -1968,7 +1979,7 @@ $ec_lang['lpn_lock_open_choices_ask']='"জিজ্ঞাসা করুন" �
 $ec_lang['lpn_lock_ask']='জিজ্ঞাসা করুন';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='কে জিজ্ঞাসা করছে বলে জানাব? আপনার আদ্যক্ষরগুলো আদর্শ। এগুলো যার কাছে ফাইলটি খোলা আছে তার কাছে পাঠানো হয়, এবং শুধু এই ব্রাউজারে সংরক্ষিত থাকে।';
+$ec_lang['lpn_lock_ask_prompt']='কে জিজ্ঞাসা করছে বলে জানাব? আপনার আদ্যক্ষরগুলো আদর্শ। যার কাছে এই ফাইলটি খোলা আছে তার জন্য, এগুলো আমাদের সার্ভারে ফাইলটির লকের সাথে সংরক্ষিত থাকে, এবং ৩০ দিনের মধ্যে মুছে ফেলা হয়।';
 $ec_lang['lpn_lock_ask_sent']='যার কাছে এই ফাইলটি খোলা আছে তাকে এটি বন্ধ করতে আমরা অনুরোধ করেছি। তাদের পৃষ্ঠা এখনও খোলা থাকলে তারা এক মিনিটের মধ্যে এটি দেখবে। আর কিছু পরিবর্তিত হয়নি, এবং তারা এটি বন্ধ না করা পর্যন্ত ফাইলটি এখনও তাদেরই।';
 $ec_lang['lpn_lock_ask_failed']='আপনার বার্তাটি পৌঁছানো যায়নি। হয় এখন কারও কাছে এই ফাইলটি খোলা নেই, অথবা সার্ভারে পৌঁছানো যায়নি।';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,7 +2389,8 @@ $ec_lang['lpn_field_easting_abbr']='E';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
+$ec_lang['lpn_field_lat_abbr']='অক্ষা.';
+$ec_lang['lpn_field_lon_abbr']='দ্রাঘি.';
 
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
@@ -3713,7 +3725,8 @@ $ec_lang['lpn_ff_design']='ডিজাইন যাচাই (সিস্ট�
 $ec_lang['lpn_ff_design_tip']='সংযোগস্থলটি প্রবাহ সরবরাহ করতে পারে কিনা তার থেকে ভিন্ন একটি প্রশ্ন: সেখানে সেই প্রবাহ টানলে, অন্য কিছু কি তার সর্বনিম্ন চাপের নিচে নেমে যায় বা তার বেগ সীমা ছাড়িয়ে যায়? এটি পরীক্ষা করতে বেছে নিলে কোনো অতিরিক্ত হিসাব লাগে না।';
 $ec_lang['lpn_ff_design_off']='যাচাই করবেন না';
 $ec_lang['lpn_ff_design_all']='অন্য সব সংযোগস্থল ও সব পাইপ';
-
+$ec_lang['lpn_ff_design_selected']='নির্বাচিত সংযোগস্থল ও তাদের পাইপ';
+$ec_lang['lpn_ff_design_no_selection']='ডিজাইন যাচাই নির্বাচিত সংযোগস্থলে সেট করা আছে, এবং কিছুই নির্বাচিত নেই। মানচিত্রে কয়েকটি নির্বাচন করুন, অথবা সব সেট করুন।';
 
 $ec_lang['lpn_ff_minpressure']='অন্যত্র অনুমোদিত সর্বনিম্ন চাপ';
 $ec_lang['lpn_ff_minpressure_tip']='অন্য একটি সংযোগস্থল তার অগ্নিনির্বাপণ প্রবাহ টানার সময় যে সংযোগস্থল এর নিচে নেমে যায় তা একটি ডিজাইন সমস্যা হিসেবে প্রতিবেদন করা হয়।';

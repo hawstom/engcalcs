@@ -1210,7 +1210,7 @@
         "lpn_lock_age_unknown": "There is no record of how long it has been in use, or when it was last saved or edited.",
         "lpn_lock_open_choices_ask": "\"Ask\" tells whoever has this file open that you would like it, and changes nothing else. \"Open read-only\" lets you look at it and change anything you like, without being able to save here. \"Break lock\" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.",
         "lpn_lock_ask": "Ask",
-        "lpn_lock_ask_prompt": "Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.",
+        "lpn_lock_ask_prompt": "Who should we say is asking? Your initials are ideal. They are kept with this file's lock on our server, for whoever has it open, and deleted within 30 days.",
         "lpn_lock_ask_sent": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
         "lpn_lock_ask_failed": "Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.",
         "lpn_lock_open_cancelled": "That file was not opened, and nothing here changed. Somebody else still has it open.",

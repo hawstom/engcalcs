@@ -780,14 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='Baris {row}: Dari dan Ke adalah simpul yan
 $ec_lang['lpn_pane_paste_bad_cell']='Baris {row}: {text} bukan {col} yang valid.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='Baris {row}: Teks baru memerlukan {first} dan {second}.';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='Baris {row}: {id} bukan simpul atau pipa dalam jaringan ini. Tempel itu terlebih dahulu, lalu Teks ini.';
+$ec_lang['lpn_pane_paste_customer_no_position']='Baris {row}: Pelanggan baru memerlukan {first} dan {second}.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='Baris {row}: Pelanggan baru memerlukan pipa atau simpul yang terhubung.';
+$ec_lang['lpn_pane_paste_no_pipe']='Baris {row}: pipa {id} belum ada. Tempel pipa Anda terlebih dahulu, lalu pelanggan Anda.';
+$ec_lang['lpn_pane_paste_no_customer_node']='Baris {row}: simpul {id} belum ada. Tempel simpul Anda terlebih dahulu, lalu pelanggan Anda.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='Baris {row}: simpul {id} tidak memiliki pipa untuk tempat Pelanggan terhubung.';
 $ec_lang['lpn_pane_filled']='Mengisi ke bawah {n} sel. {skipped} tidak diubah.';
 $ec_lang['lpn_pane_filldown']='Isi ke bawah';
 $ec_lang['lpn_pane_fill_none']='Tidak ada yang dapat diisi ke bawah dalam pilihan ini.';
@@ -825,6 +825,7 @@ $ec_lang['lpn_field_text_bold']='Teks tebal';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
+$ec_lang['lpn_field_text_anchor']='Terlampir pada';
 
 $ec_lang['lpn_field_text_align']='Perataan horizontal';
 $ec_lang['lpn_field_text_align_left']='Kiri';
@@ -1331,8 +1332,9 @@ $ec_lang['lpn_pane_filter_none']='Tidak ada yang cocok dengan filter di tabel in
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='Perbesar & pilih';
-
-
+$ec_lang['lpn_goto_on_map']='Menuju di peta';
+$ec_lang['lpn_pane_select_on_map']='Pilih di peta';
+$ec_lang['lpn_pane_unselect_on_map']='Batalkan pilihan di peta';
 
 $ec_lang['lpn_pane_print']='Cetak tabel';
 $ec_lang['lpn_pane_print_tip']='Cetak tabel yang sedang Anda lihat, dengan nama proyek, nama tabel, dan satuan pada judul kolom. Baris dicetak sesuai urutan pengurutan yang Anda pilih.';
@@ -1470,6 +1472,7 @@ $ec_lang['lpn_find_op_lt']='lebih kecil dari';
 $ec_lang['lpn_find_op_empty']='kosong';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} ditemukan. Klik salah satu untuk menuju ke sana.';
+$ec_lang['lpn_find_shift_hint']='Shift+klik untuk mengalihkan tambah/hapus.';
 
 $ec_lang['lpn_find_none']='Tidak ada yang cocok.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
@@ -1968,7 +1971,7 @@ $ec_lang['lpn_lock_open_choices_ask']='"Tanya" memberi tahu siapa pun yang sedan
 $ec_lang['lpn_lock_ask']='Tanya';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='Siapa yang harus kami katakan sedang bertanya? Inisial Anda adalah pilihan yang ideal. Ini dikirim kepada siapa pun yang sedang membuka berkas ini, dan hanya disimpan di peramban ini.';
+$ec_lang['lpn_lock_ask_prompt']='Siapa yang harus kami katakan sedang bertanya? Inisial Anda adalah pilihan yang ideal. Ini disimpan bersama kunci berkas ini di server kami, untuk siapa pun yang sedang membukanya, dan dihapus dalam waktu 30 hari.';
 $ec_lang['lpn_lock_ask_sent']='Kami telah meminta siapa pun yang sedang membuka berkas ini untuk menutupnya. Mereka akan melihatnya dalam waktu satu menit, jika halaman mereka masih terbuka. Tidak ada hal lain yang berubah, dan berkas ini masih milik mereka sampai mereka menutupnya.';
 $ec_lang['lpn_lock_ask_failed']='Pesan Anda tidak dapat dikirim. Entah tidak ada yang sedang membuka berkas ini sekarang, atau server tidak dapat dihubungi.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2375,6 +2378,8 @@ $ec_lang['lpn_field_easting']='Timur';
 // spend most of the line. A surveyor reads these off a single letter; use your language's own.
 $ec_lang['lpn_field_northing_abbr']='U';
 $ec_lang['lpn_field_easting_abbr']='T';
+$ec_lang['lpn_field_lat_abbr']='Lint';
+$ec_lang['lpn_field_lon_abbr']='Buj';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
@@ -3713,7 +3718,8 @@ $ec_lang['lpn_ff_design']='Pemeriksaan desain (dampak pada sistem)';
 $ec_lang['lpn_ff_design_tip']='Pertanyaan terpisah dari apakah simpul dapat menyalurkan debit tersebut: dengan debit itu diambil di sana, apakah ada hal lain yang turun di bawah tekanan minimumnya atau melampaui batas kecepatannya? Memilih untuk memeriksanya tidak memerlukan perhitungan tambahan.';
 $ec_lang['lpn_ff_design_off']='Jangan periksa';
 $ec_lang['lpn_ff_design_all']='Semua simpul lainnya dan semua pipa';
-
+$ec_lang['lpn_ff_design_selected']='Simpul yang dipilih dan pipa-pipanya';
+$ec_lang['lpn_ff_design_no_selection']='Pemeriksaan desain diatur ke simpul yang dipilih, dan tidak ada yang dipilih. Pilih beberapa di peta, atau atur ke Semua.';
 
 $ec_lang['lpn_ff_minpressure']='Tekanan terendah yang diizinkan di tempat lain';
 $ec_lang['lpn_ff_minpressure_tip']='Simpul yang turun di bawah nilai ini saat simpul lain sedang mengambil debit kebakarannya akan dilaporkan sebagai masalah desain.';

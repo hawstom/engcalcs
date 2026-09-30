@@ -780,12 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='Рядок {row}: «Від» і «До» �
 $ec_lang['lpn_pane_paste_bad_cell']='Рядок {row}: {text} — недійсне значення для {col}.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='Рядок {row}: новому Тексту потрібні і {first}, і {second}.';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='Рядок {row}: {id} — це ще не вузол і не труба в цій мережі. Спершу вставте його, а потім цей Текст.';
+$ec_lang['lpn_pane_paste_customer_no_position']='Рядок {row}: новому Абоненту потрібні і {first}, і {second}.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='Рядок {row}: новому Абоненту потрібна під’єднана труба або вузол.';
+$ec_lang['lpn_pane_paste_no_pipe']='Рядок {row}: труби {id} ще не існує. Спершу вставте свої труби, потім абонентів.';
+$ec_lang['lpn_pane_paste_no_customer_node']='Рядок {row}: вузла {id} ще не існує. Спершу вставте свої вузли, потім абонентів.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='Рядок {row}: у вузла {id} немає труби, до якої міг би приєднатися Абонент.';
 
 
 $ec_lang['lpn_pane_filled']='Заповнено вниз {n} клітинок. {skipped} не змінено.';
@@ -825,7 +827,7 @@ $ec_lang['lpn_field_text_bold']='Жирний текст';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
-
+$ec_lang['lpn_field_text_anchor']='Приєднано до';
 $ec_lang['lpn_field_text_align']='Горизонтальне вирівнювання';
 $ec_lang['lpn_field_text_align_left']='Ліворуч';
 $ec_lang['lpn_field_text_align_center']='По центру';
@@ -1331,9 +1333,9 @@ $ec_lang['lpn_pane_filter_none']='Жоден рядок цієї таблиці 
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='Наблизити й вибрати';
-
-
-
+$ec_lang['lpn_goto_on_map']='Перейти на карті';
+$ec_lang['lpn_pane_select_on_map']='Вибрати на карті';
+$ec_lang['lpn_pane_unselect_on_map']='Скасувати вибір на карті';
 $ec_lang['lpn_pane_print']='Надрукувати таблицю';
 $ec_lang['lpn_pane_print_tip']='Друкує таблицю, яку ви зараз переглядаєте, із назвою проєкту, назвою таблиці та одиницями в заголовках. Рядки друкуються в тому порядку, в якому ви їх відсортували.';
 
@@ -1470,7 +1472,7 @@ $ec_lang['lpn_find_op_lt']='менше за';
 $ec_lang['lpn_find_op_empty']='порожньо';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='Знайдено: {n}. Клацніть, щоб перейти.';
-
+$ec_lang['lpn_find_shift_hint']='Shift+клацання додає або знімає позначку.';
 $ec_lang['lpn_find_none']='Нічого не знайдено.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1970,7 @@ $ec_lang['lpn_lock_open_choices_ask']='«Запитати» повідомляє
 $ec_lang['lpn_lock_ask']='Запитати';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='Кого нам вказати як того, хто питає? Ваші ініціали — ідеальний варіант. Вони надсилаються тому, хто відкрив файл, і зберігаються лише в цьому браузері.';
+$ec_lang['lpn_lock_ask_prompt']='Кого нам вказати як того, хто питає? Ваші ініціали — ідеальний варіант. Вони зберігаються разом із блокуванням цього файлу на нашому сервері, для того, хто його відкрив, і видаляються протягом 30 днів.';
 $ec_lang['lpn_lock_ask_sent']='Ми попросили того, хто відкрив цей файл, закрити його. Він побачить це протягом хвилини, якщо його сторінка все ще відкрита. Більше нічого не змінилося, і файл усе ще належить йому, доки він його не закриє.';
 $ec_lang['lpn_lock_ask_failed']='Ваше повідомлення не вдалося доставити. Або зараз ніхто не має цього файлу відкритим, або не вдалося з’єднатися із сервером.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,8 +2380,8 @@ $ec_lang['lpn_field_easting_abbr']='Сх';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
-
+$ec_lang['lpn_field_lat_abbr']='Шир';
+$ec_lang['lpn_field_lon_abbr']='Довг';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -3713,8 +3715,8 @@ $ec_lang['lpn_ff_design']='Перевірка проєкту (вплив на с
 $ec_lang['lpn_ff_design_tip']='Окреме питання від того, чи може вузол подати витрату: коли там відбирають цю витрату, чи не падає щось інше нижче свого мінімального тиску, чи не перевищує межу швидкості? Вибір перевірити це не коштує додаткового розрахунку.';
 $ec_lang['lpn_ff_design_off']='Не перевіряти';
 $ec_lang['lpn_ff_design_all']='Усі інші вузли й усі труби';
-
-
+$ec_lang['lpn_ff_design_selected']='Вибрані вузли та їхні труби';
+$ec_lang['lpn_ff_design_no_selection']='Перевірку проєкту налаштовано на вибрані вузли, а жодного не вибрано. Виберіть кілька на карті або встановіть «Усі».';
 $ec_lang['lpn_ff_minpressure']='Найнижчий допустимий тиск деінде';
 $ec_lang['lpn_ff_minpressure_tip']='Вузол, тиск у якому падає нижче цього, поки інший вузол відбирає свою витрату на пожежогасіння, повідомляється як проблема проєкту.';
 $ec_lang['lpn_ff_maxvelocity']='Найвища допустима швидкість';

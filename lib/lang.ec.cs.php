@@ -780,13 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='Řádek {row}: Od a Do jsou stejný uzel.'
 $ec_lang['lpn_pane_paste_bad_cell']='Řádek {row}: {text} není platná hodnota pole {col}.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='Řádek {row}: nový Text potřebuje {first} i {second}.';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='Řádek {row}: {id} zatím není v této síti uzlem ani potrubím. Nejprve vložte jej, a poté tento Text.';
+$ec_lang['lpn_pane_paste_customer_no_position']='Řádek {row}: nový Odběratel potřebuje {first} i {second}.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='Řádek {row}: nový Odběratel potřebuje připojené potrubí nebo uzel.';
+$ec_lang['lpn_pane_paste_no_pipe']='Řádek {row}: potrubí {id} ještě neexistuje. Nejprve vložte svá potrubí, a poté odběratele.';
+$ec_lang['lpn_pane_paste_no_customer_node']='Řádek {row}: uzel {id} ještě neexistuje. Nejprve vložte své uzly, a poté odběratele.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='Řádek {row}: uzel {id} nemá potrubí, ke kterému by se Odběratel mohl připojit.';
 
 $ec_lang['lpn_pane_filled']='Vyplněno dolů {n} buněk. {skipped} nebylo změněno.';
 $ec_lang['lpn_pane_filldown']='Vyplnit dolů';
@@ -825,6 +826,7 @@ $ec_lang['lpn_field_text_bold']='Tučný text';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
+$ec_lang['lpn_field_text_anchor']='Připojeno k';
 
 $ec_lang['lpn_field_text_align']='Vodorovné zarovnání';
 $ec_lang['lpn_field_text_align_left']='Vlevo';
@@ -1331,9 +1333,9 @@ $ec_lang['lpn_pane_filter_none']='Ničemu v této tabulce filtr neodpovídá.';
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='Přiblížit a vybrat';
-
-
-
+$ec_lang['lpn_goto_on_map']='Přejít na mapě';
+$ec_lang['lpn_pane_select_on_map']='Vybrat na mapě';
+$ec_lang['lpn_pane_unselect_on_map']='Zrušit výběr na mapě';
 $ec_lang['lpn_pane_print']='Vytisknout tabulku';
 $ec_lang['lpn_pane_print_tip']='Vytiskne tabulku, na kterou se právě díváte, s názvem projektu, názvem tabulky a jednotkami v záhlavích. Řádky se vytisknou v pořadí, do kterého jste je seřadili.';
 
@@ -1470,7 +1472,7 @@ $ec_lang['lpn_find_op_lt']='menší než';
 $ec_lang['lpn_find_op_empty']='prázdné';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='Nalezeno: {n}. Kliknutím na jeden z nich na něj přejdete.';
-
+$ec_lang['lpn_find_shift_hint']='Shift+klik pro přepnutí přidání nebo odebrání.';
 $ec_lang['lpn_find_none']='Nic nevyhovuje.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1970,7 @@ $ec_lang['lpn_lock_open_choices_ask']='„Zeptat se“ dá tomu, kdo má tento s
 $ec_lang['lpn_lock_ask']='Zeptat se';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='Koho máme uvést jako toho, kdo se ptá? Vaše iniciály jsou ideální. Odešlou se tomu, kdo má soubor otevřený, a ukládají se pouze v tomto prohlížeči.';
+$ec_lang['lpn_lock_ask_prompt']='Koho máme uvést jako toho, kdo se ptá? Vaše iniciály jsou ideální. Ukládají se spolu se zámkem tohoto souboru na našem serveru, pro toho, kdo jej má otevřený, a do 30 dnů se smažou.';
 $ec_lang['lpn_lock_ask_sent']='Požádali jsme toho, kdo má tento soubor otevřený, aby jej zavřel. Uvidí to do minuty, pokud má stránku stále otevřenou. Nic jiného se nezměnilo a soubor je stále jeho, dokud jej nezavře.';
 $ec_lang['lpn_lock_ask_failed']='Vaši zprávu se nepodařilo doručit. Buď tento soubor nemá nikdo otevřený, nebo se nepodařilo spojit se serverem.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,7 +2380,8 @@ $ec_lang['lpn_field_easting_abbr']='E';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
+$ec_lang['lpn_field_lat_abbr']='Š';
+$ec_lang['lpn_field_lon_abbr']='D';
 
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
@@ -3713,8 +3716,8 @@ $ec_lang['lpn_ff_design']='Návrhová kontrola (vliv na síť)';
 $ec_lang['lpn_ff_design_tip']='Samostatná otázka od toho, zda uzel dokáže dodat průtok: klesne při odběru tohoto průtoku tam něco jiného pod svůj minimální tlak, nebo přesáhne limit rychlosti? Volba tuto kontrolu provést nestojí žádný další výpočet navíc.';
 $ec_lang['lpn_ff_design_off']='Nekontrolovat';
 $ec_lang['lpn_ff_design_all']='Všechny ostatní uzly a všechna potrubí';
-
-
+$ec_lang['lpn_ff_design_selected']='Vybrané uzly a jejich potrubí';
+$ec_lang['lpn_ff_design_no_selection']='Návrhová kontrola je nastavena na vybrané uzly a žádný není vybrán. Vyberte nějaké na mapě, nebo nastavte Vše.';
 $ec_lang['lpn_ff_minpressure']='Nejnižší povolený tlak jinde';
 $ec_lang['lpn_ff_minpressure_tip']='Uzel, který klesne pod tuto hodnotu, zatímco jiný odebírá svůj požární průtok, je nahlášen jako návrhový problém.';
 $ec_lang['lpn_ff_maxvelocity']='Nejvyšší povolená rychlost';

@@ -780,13 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='Ред {row}: Од и До су исти �
 $ec_lang['lpn_pane_paste_bad_cell']='Ред {row}: {text} није важећи {col}.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='Ред {row}: новом Тексту су потребна оба поља, {first} и {second}.';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='Ред {row}: {id} још није ни чвор ни цев у овој мрежи. Прво налепите то, а затим овај текст.';
+$ec_lang['lpn_pane_paste_customer_no_position']='Ред {row}: новом Потрошачу су потребна оба поља, {first} и {second}.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='Ред {row}: новом Потрошачу је потребна повезана цев или чвор.';
+$ec_lang['lpn_pane_paste_no_pipe']='Ред {row}: цев {id} још не постоји. Прво налепите своје цеви, а затим своје потрошаче.';
+$ec_lang['lpn_pane_paste_no_customer_node']='Ред {row}: чвор {id} још не постоји. Прво налепите своје чворове, а затим своје потрошаче.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='Ред {row}: чвор {id} нема цев на коју би се потрошач прикачио.';
 
 $ec_lang['lpn_pane_filled']='Попуњено надоле {n} ћелија. {skipped} није промењено.';
 $ec_lang['lpn_pane_filldown']='Попуни надоле';
@@ -825,7 +826,7 @@ $ec_lang['lpn_field_text_bold']='Подебљан текст';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
-
+$ec_lang['lpn_field_text_anchor']='Прикачено на';
 $ec_lang['lpn_field_text_align']='Хоризонтално поравнање';
 $ec_lang['lpn_field_text_align_left']='Лево';
 $ec_lang['lpn_field_text_align_center']='Средина';
@@ -1331,9 +1332,9 @@ $ec_lang['lpn_pane_filter_none']='Ништа у овој табели не од�
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='Зумирај и изабери';
-
-
-
+$ec_lang['lpn_goto_on_map']='Иди на мапи';
+$ec_lang['lpn_pane_select_on_map']='Изабери на мапи';
+$ec_lang['lpn_pane_unselect_on_map']='Поништи избор на мапи';
 $ec_lang['lpn_pane_print']='Штампај табелу';
 $ec_lang['lpn_pane_print_tip']='Штампа табелу коју гледате, са називом пројекта, називом табеле и јединицама у заглављима. Редови се штампају редоследом по коме сте их сортирали.';
 
@@ -1470,7 +1471,7 @@ $ec_lang['lpn_find_op_lt']='мање од';
 $ec_lang['lpn_find_op_empty']='празно';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='Пронађено: {n}. Кликните на један да одете до њега.';
-
+$ec_lang['lpn_find_shift_hint']='Shift+клик за додавање/уклањање из избора.';
 $ec_lang['lpn_find_none']='Ништа се не поклапа.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1969,7 @@ $ec_lang['lpn_lock_open_choices_ask']='„Питај” јавља ономе к
 $ec_lang['lpn_lock_ask']='Питај';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='Кога да наведемо као онога ко пита? Ваши иницијали су идеални. Шаљу се ономе ко има датотеку отворену, и чувају се само у овом прегледачу.';
+$ec_lang['lpn_lock_ask_prompt']='Кога да наведемо као онога ко пита? Ваши иницијали су идеални. Чувају се уз закључавање ове датотеке на нашем серверу, за онога ко је има отворену, и бришу се у року од 30 дана.';
 $ec_lang['lpn_lock_ask_sent']='Питали смо онога ко има ову датотеку отворену да је затвори. Видеће то за мање од минута, ако му је страница још отворена. Ништа друго се није променило, а датотека је и даље његова док је не затвори.';
 $ec_lang['lpn_lock_ask_failed']='Ваша порука није могла да буде испоручена. Или нико тренутно нема ову датотеку отворену, или сервер није могао да буде достигнут.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,8 +2379,8 @@ $ec_lang['lpn_field_easting_abbr']='И';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
-
+$ec_lang['lpn_field_lat_abbr']='Гш';
+$ec_lang['lpn_field_lon_abbr']='Гд';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -3713,8 +3714,8 @@ $ec_lang['lpn_ff_design']='Провера пројекта (утицај на с
 $ec_lang['lpn_ff_design_tip']='Ово је одвојено питање од тога да ли чвор може да испоручи проток: када се тамо повуче тај проток, да ли нешто друго падне испод свог минималног притиска или пређе своју граничну брзину? Укључивање ове провере не кошта додатно израчунавање.';
 $ec_lang['lpn_ff_design_off']='Не проверавај';
 $ec_lang['lpn_ff_design_all']='Сви остали чворови и све цеви';
-
-
+$ec_lang['lpn_ff_design_selected']='Изабрани чворови и њихове цеви';
+$ec_lang['lpn_ff_design_no_selection']='Провера пројекта је постављена на изабране чворове, а ниједан није изабран. Изаберите неке на мапи, или подесите на Све.';
 $ec_lang['lpn_ff_minpressure']='Најнижи дозвољени притисак на другим местима';
 $ec_lang['lpn_ff_minpressure_tip']='Чвор који падне испод овога док други чвор повлачи свој противпожарни проток пријављује се као проблем у пројекту.';
 $ec_lang['lpn_ff_maxvelocity']='Највећа дозвољена брзина';

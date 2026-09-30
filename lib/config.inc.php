@@ -654,6 +654,26 @@ function ecForgetAnalyticsStorage() {
 }
 
 /**
+ * Erases the consent record ITSELF, not just what it gated. Called only by "Start fresh"
+ * (Looped-Network.php's wipeEverything(), via consent.php's `ec_wipe`), whose confirm promises the
+ * page reloads exactly as a brand-new visitor would see it -- and a brand-new visitor has never
+ * answered the banner at all, which ecConsentSet('0') does not achieve: refusing still records a
+ * "no" that has to be honoured, so the banner stays hidden. This is the one place ec_consent is
+ * ever deleted rather than written.
+ *
+ * Reuses ecForgetAnalyticsStorage() rather than re-listing ec_blang/ec_seen: one list of
+ * consent-gated cookies, not two doors disagreeing about what consent covers.
+ */
+function ecConsentForget() {
+    if (headers_sent()) return;
+    ecForgetAnalyticsStorage();
+    if (isset($_COOKIE[EC_CONSENT_COOKIE])) {
+        setcookie(EC_CONSENT_COOKIE, '', ['expires' => time() - 86400, 'path' => '/']);
+        unset($_COOKIE[EC_CONSENT_COOKIE]);
+    }
+}
+
+/**
  * Parses ec_seen into page => digit. Anything malformed is simply dropped: it is a cache, not a
  * record, and a visitor who hand-edits it only affects whether they are counted twice.
  *

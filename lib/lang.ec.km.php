@@ -780,12 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='ជួរដេក {row}៖ ថ្នា�
 $ec_lang['lpn_pane_paste_bad_cell']='ជួរដេក {row}៖ {text} មិនមែនជា {col} ត្រឹមត្រូវទេ។';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='ជួរដេក {row}៖ អត្ថបទថ្មីមួយត្រូវការទាំង {first} និង {second}។';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='ជួរដេក {row}៖ {id} មិនមែនជាថ្នាំង ឬបំពង់នៅក្នុងបណ្ដាញនេះនៅឡើយទេ។ សូមបិទភ្ជាប់វាមុនសិន រួចទើបអត្ថបទនេះ។';
+$ec_lang['lpn_pane_paste_customer_no_position']='ជួរដេក {row}៖ អតិថិជនថ្មីម្នាក់ត្រូវការទាំង {first} និង {second}។';
+$ec_lang['lpn_pane_paste_no_customer_ref']='ជួរដេក {row}៖ អតិថិជនថ្មីម្នាក់ត្រូវការបំពង់ ឬថ្នាំងដែលបានភ្ជាប់មួយ។';
+$ec_lang['lpn_pane_paste_no_pipe']='ជួរដេក {row}៖ បំពង់ {id} មិនទាន់មាននៅឡើយទេ។ សូមបិទភ្ជាប់បំពង់របស់អ្នកមុនសិន រួចទើបអតិថិជនរបស់អ្នក។';
+$ec_lang['lpn_pane_paste_no_customer_node']='ជួរដេក {row}៖ ថ្នាំង {id} មិនទាន់មាននៅឡើយទេ។ សូមបិទភ្ជាប់ថ្នាំងរបស់អ្នកមុនសិន រួចទើបអតិថិជនរបស់អ្នក។';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='ជួរដេក {row}៖ ថ្នាំង {id} គ្មានបំពង់ណាមួយសម្រាប់អតិថិជនម្នាក់ភ្ជាប់ចូលទេ។';
 
 
 $ec_lang['lpn_pane_filled']='បានបំពេញចុះក្រោមក្រឡា {n}។ {skipped} មិនត្រូវបានផ្លាស់ប្ដូរទេ។';
@@ -825,7 +827,7 @@ $ec_lang['lpn_field_text_bold']='អក្សរដិត';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
-
+$ec_lang['lpn_field_text_anchor']='ភ្ជាប់ទៅ';
 $ec_lang['lpn_field_text_align']='ការតម្រឹមផ្ដេក';
 $ec_lang['lpn_field_text_align_left']='ខាងឆ្វេង';
 $ec_lang['lpn_field_text_align_center']='កណ្ដាល';
@@ -1331,6 +1333,9 @@ $ec_lang['lpn_pane_filter_none']='គ្មានអ្វីនៅក្នុ�
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='ពង្រីក និងជ្រើសរើស';
+$ec_lang['lpn_goto_on_map']='ទៅកាន់លើផែនទី';
+$ec_lang['lpn_pane_select_on_map']='ជ្រើសរើសលើផែនទី';
+$ec_lang['lpn_pane_unselect_on_map']='ដកជ្រើសរើសលើផែនទី';
 
 
 
@@ -1470,6 +1475,7 @@ $ec_lang['lpn_find_op_lt']='តូចជាង';
 $ec_lang['lpn_find_op_empty']='ទទេ';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} ត្រូវបានរកឃើញ។ ចុចមួយដើម្បីទៅកាន់វា។';
+$ec_lang['lpn_find_shift_hint']='ចុច Shift+ចុច ដើម្បីបន្ថែម ឬដក (ត្រឡប់)។';
 
 $ec_lang['lpn_find_none']='គ្មានអ្វីត្រូវគ្នាទេ។';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
@@ -1968,7 +1974,7 @@ $ec_lang['lpn_lock_open_choices_ask']='"សួរ" ប្រាប់អ្ន�
 $ec_lang['lpn_lock_ask']='សួរ';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='តើគួរប្រាប់ថាអ្នកណាកំពុងសួរ? អក្សរកាត់ឈ្មោះរបស់អ្នកល្អបំផុត។ វាត្រូវបានផ្ញើទៅអ្នកណាដែលកំពុងបើកឯកសារនេះ ហើយត្រូវបានផ្ទុកតែក្នុងកម្មវិធីរុករកនេះប៉ុណ្ណោះ។';
+$ec_lang['lpn_lock_ask_prompt']='តើគួរប្រាប់ថាអ្នកណាកំពុងសួរ? អក្សរកាត់ឈ្មោះរបស់អ្នកល្អបំផុត។ វាត្រូវបានរក្សាទុកជាមួយការចាក់សោនៃឯកសារនេះនៅលើម៉ាស៊ីនមេរបស់យើង សម្រាប់អ្នកណាដែលកំពុងបើកវា ហើយត្រូវបានលុបក្នុងរយៈពេល ៣០ ថ្ងៃ។';
 $ec_lang['lpn_lock_ask_sent']='យើងបានសួរអ្នកណាដែលកំពុងបើកឯកសារនេះឲ្យបិទវា។ ពួកគេនឹងឃើញវាក្នុងរយៈពេលមិនដល់មួយនាទី ប្រសិនបើទំព័ររបស់ពួកគេនៅតែបើក។ គ្មានអ្វីផ្សេងទៀតបានផ្លាស់ប្ដូរទេ ហើយឯកសារនេះនៅតែជារបស់ពួកគេរហូតដល់ពួកគេបិទវា។';
 $ec_lang['lpn_lock_ask_failed']='សារបស់អ្នកមិនអាចផ្ញើបានទេ។ ប្រហែលជាគ្មាននរណាម្នាក់កំពុងបើកឯកសារនេះឥឡូវនេះទេ ឬម៉ាស៊ីនមេមិនអាចទាក់ទងបានទេ។';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,7 +2384,8 @@ $ec_lang['lpn_field_easting_abbr']='ក';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
+$ec_lang['lpn_field_lat_abbr']='ទ';
+$ec_lang['lpn_field_lon_abbr']='ប';
 
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
@@ -3713,8 +3720,8 @@ $ec_lang['lpn_ff_design']='ត្រួតពិនិត្យការរច�
 $ec_lang['lpn_ff_design_tip']='ជាសំណួរដាច់ដោយឡែកពីថាតើថ្នាំងអាចផ្ដល់លំហូរបានឬអត់៖ ជាមួយលំហូរនោះត្រូវបានទាញនៅទីនោះ តើមានធាតុផ្សេងទៀតធ្លាក់ក្រោមសម្ពាធអប្បបរមារបស់វា ឬលើសដែនកំណត់ល្បឿនរបស់វាដែរឬទេ? ការជ្រើសរើសត្រួតពិនិត្យវាមិនចំណាយការគណនាបន្ថែមទេ។';
 $ec_lang['lpn_ff_design_off']='កុំត្រួតពិនិត្យ';
 $ec_lang['lpn_ff_design_all']='ថ្នាំងផ្សេងទៀតទាំងអស់ និងបំពង់ទាំងអស់';
-
-
+$ec_lang['lpn_ff_design_selected']='ថ្នាំងដែលបានជ្រើសរើស និងបំពង់របស់ពួកវា';
+$ec_lang['lpn_ff_design_no_selection']='ការត្រួតពិនិត្យការរចនាត្រូវបានកំណត់ទៅថ្នាំងដែលបានជ្រើសរើស ប៉ុន្តែគ្មានថ្នាំងណាមួយត្រូវបានជ្រើសរើសទេ។ សូមជ្រើសរើសខ្លះនៅលើផែនទី ឬកំណត់ជា ទាំងអស់។';
 $ec_lang['lpn_ff_minpressure']='សម្ពាធទាបបំផុតដែលអនុញ្ញាតនៅកន្លែងផ្សេង';
 $ec_lang['lpn_ff_minpressure_tip']='ថ្នាំងមួយដែលធ្លាក់ក្រោមកម្រិតនេះ ខណៈមួយទៀតកំពុងទាញលំហូរពន្លត់អគ្គីភ័យរបស់វា ត្រូវបានរាយការណ៍ជាបញ្ហារចនា។';
 $ec_lang['lpn_ff_maxvelocity']='ល្បឿនខ្ពស់បំផុតដែលអនុញ្ញាត';

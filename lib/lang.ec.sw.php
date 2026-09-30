@@ -780,14 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='Safu mlalo {row}: Kutoka na Kwenda ni kifu
 $ec_lang['lpn_pane_paste_bad_cell']='Safu mlalo {row}: {text} si {col} sahihi.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='Safu mlalo {row}: Maandishi mapya yanahitaji {first} na {second} zote mbili.';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='Safu mlalo {row}: {id} si kifundo wala bomba katika mtandao huu bado. Bandika hicho kwanza, kisha Maandishi haya.';
+$ec_lang['lpn_pane_paste_customer_no_position']='Safu mlalo {row}: Mteja mpya anahitaji {first} na {second} zote mbili.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='Safu mlalo {row}: Mteja mpya anahitaji bomba au kifundo kilichounganishwa.';
+$ec_lang['lpn_pane_paste_no_pipe']='Safu mlalo {row}: bomba {id} bado halipo. Bandika mabomba yako kwanza, kisha wateja wako.';
+$ec_lang['lpn_pane_paste_no_customer_node']='Safu mlalo {row}: kifundo {id} bado hakipo. Bandika miunganiko yako kwanza, kisha wateja wako.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='Safu mlalo {row}: kifundo {id} hakina bomba ambalo Mteja anaweza kuambatanishwa nalo.';
 $ec_lang['lpn_pane_filled']='Zimejazwa chini seli {n}. {skipped} hazikubadilishwa.';
 $ec_lang['lpn_pane_filldown']='Jaza chini';
 $ec_lang['lpn_pane_fill_none']='Hakuna kitu katika uteuzi huu kinachoweza kujazwa chini.';
@@ -825,7 +825,7 @@ $ec_lang['lpn_field_text_bold']='Maandishi mazito';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
-
+$ec_lang['lpn_field_text_anchor']='Imeambatanishwa na';
 $ec_lang['lpn_field_text_align']='Mpangilio mlalo';
 $ec_lang['lpn_field_text_align_left']='Kushoto';
 $ec_lang['lpn_field_text_align_center']='Katikati';
@@ -1331,8 +1331,9 @@ $ec_lang['lpn_pane_filter_none']='Hakuna kitu kwenye jedwali hili kinacholingana
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='Kuza na chagua';
-
-
+$ec_lang['lpn_goto_on_map']='Nenda kwenye ramani';
+$ec_lang['lpn_pane_select_on_map']='Chagua kwenye ramani';
+$ec_lang['lpn_pane_unselect_on_map']='Ondoa uteuzi kwenye ramani';
 
 $ec_lang['lpn_pane_print']='Chapisha jedwali';
 $ec_lang['lpn_pane_print_tip']='Chapisha jedwali unaloliangalia, likiwa na jina la mradi, jina la jedwali, na vitengo kwenye vichwa vya safu. Safu mlalo zinachapishwa kwa mpangilio ulioupanga.';
@@ -1470,7 +1471,7 @@ $ec_lang['lpn_find_op_lt']='ndogo kuliko';
 $ec_lang['lpn_find_op_empty']='tupu';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} zimepatikana. Bofya moja ili kuiendea.';
-
+$ec_lang['lpn_find_shift_hint']='Shift+bofya ili kuongeza au kuondoa (kubadilisha hali).';
 $ec_lang['lpn_find_none']='Hakuna kilicholingana.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1969,7 @@ $ec_lang['lpn_lock_open_choices_ask']='"Uliza" humwambia yeyote aliye na faili h
 $ec_lang['lpn_lock_ask']='Uliza';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='Tumwambie nani anayeuliza? Herufi za mwanzo za majina yako ni bora zaidi. Zinatumwa kwa yeyote aliye na faili hili wazi, na zinahifadhiwa kwenye kivinjari hiki pekee.';
+$ec_lang['lpn_lock_ask_prompt']='Tumwambie nani anayeuliza? Herufi za mwanzo za majina yako ni bora zaidi. Zinahifadhiwa pamoja na mfungo wa faili hili kwenye seva yetu, kwa ajili ya yeyote aliye nalo wazi, na hufutwa ndani ya siku 30.';
 $ec_lang['lpn_lock_ask_sent']='Tumemwomba yeyote aliye na faili hili wazi kulifunga. Ataliona ndani ya dakika moja, ikiwa ukurasa wake bado uko wazi. Hakuna kingine kilichobadilika, na faili bado ni lake hadi atakapolifunga.';
 $ec_lang['lpn_lock_ask_failed']='Ujumbe wako haukuweza kufikishwa. Ima hakuna aliye na faili hili wazi sasa, au seva haikuweza kufikiwa.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,8 +2379,8 @@ $ec_lang['lpn_field_easting_abbr']='M';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
-
+$ec_lang['lpn_field_lat_abbr']='Lat';
+$ec_lang['lpn_field_lon_abbr']='Lon';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -3713,8 +3714,8 @@ $ec_lang['lpn_ff_design']='Ukaguzi wa kubuni (athari kwenye mfumo)';
 $ec_lang['lpn_ff_design_tip']='Swali tofauti na kama muunganiko unaweza kutoa mtiririko: mtiririko huo ukichotwa hapo, je, kuna kitu kingine kinachoshuka chini ya shinikizo lake la chini kabisa au kuzidi kikomo chake cha kasi? Kuchagua kukagua hakugharimu ukokotoaji wa ziada.';
 $ec_lang['lpn_ff_design_off']='Usikague';
 $ec_lang['lpn_ff_design_all']='Miunganiko mingine yote na mabomba yote';
-
-
+$ec_lang['lpn_ff_design_selected']='Miunganiko iliyochaguliwa na mabomba yao';
+$ec_lang['lpn_ff_design_no_selection']='Ukaguzi wa kubuni umewekwa kwenye miunganiko iliyochaguliwa, na hakuna kilichochaguliwa. Chagua baadhi kwenye ramani, au weka Miunganiko mingine yote na mabomba yote.';
 $ec_lang['lpn_ff_minpressure']='Shinikizo la chini kabisa linaloruhusiwa mahali pengine';
 $ec_lang['lpn_ff_minpressure_tip']='Muunganiko unaoshuka chini ya hili wakati mwingine unachota mtiririko wake wa moto huripotiwa kama tatizo la kubuni.';
 $ec_lang['lpn_ff_maxvelocity']='Kasi ya juu kabisa inayoruhusiwa';

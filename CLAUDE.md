@@ -379,7 +379,7 @@ Full record: `dev/deploying.md`.
 - **A correction replaces the superseded reasoning in every doc, not just this one.** Keep the
   conclusion and the one rejected alternative that would otherwise be re-proposed.
 - **Don't attribute repo prose to Tom.** Quote only the transcript or a dated first-person quote.
-- **ROADMAP priority is 100 and 99 Next, 75 Soon, 50 Someday, 25 Maybe, 5 Parked, or 0 closed**
+- **ROADMAP priority is 100 Next, 75 Soon, 50 Someday, 25 Maybe, 5 Parked, or 0 closed**
   (`roadmap_id_check.php`). Entries run 1–3 lines, hard cap ~15; past that, a `dev/*.md` and a
   pointer. Closing a task is one line in `dev/roadmap-closed-ids.md` plus deleting the block.
 - **Suite-wide UX/convention issues go to `dev/ROADMAP.md`**, not inline fixes during

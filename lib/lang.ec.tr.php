@@ -780,14 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='Satır {row}: Başlangıç ve Bitiş aynı
 $ec_lang['lpn_pane_paste_bad_cell']='Satır {row}: {text}, geçerli bir {col} değil.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='Satır {row}: yeni bir Metnin hem {first} hem de {second} değerine ihtiyacı var.';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='Satır {row}: {id} bu ağda henüz bir düğüm veya boru değil. Önce onu, sonra bu Metni yapıştırın.';
+$ec_lang['lpn_pane_paste_customer_no_position']='Satır {row}: yeni bir Müşterinin hem {first} hem de {second} değerine ihtiyacı var.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='Satır {row}: yeni bir Müşterinin bağlı bir boru veya düğüme ihtiyacı var.';
+$ec_lang['lpn_pane_paste_no_pipe']='Satır {row}: {id} borusu henüz yok. Önce borularınızı, sonra müşterilerinizi yapıştırın.';
+$ec_lang['lpn_pane_paste_no_customer_node']='Satır {row}: {id} düğümü henüz yok. Önce düğümlerinizi, sonra müşterilerinizi yapıştırın.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='Satır {row}: {id} düğümünün bir Müşterinin bağlanabileceği borusu yok.';
 $ec_lang['lpn_pane_filled']='{n} hücre aşağı dolduruldu. {skipped} tanesi değiştirilmedi.';
 $ec_lang['lpn_pane_filldown']='Aşağı doldur';
 $ec_lang['lpn_pane_fill_none']='Bu seçimde aşağı doldurulabilecek hiçbir şey yok.';
@@ -825,7 +825,7 @@ $ec_lang['lpn_field_text_bold']='Kalın metin';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
-
+$ec_lang['lpn_field_text_anchor']='Bağlı olduğu';
 $ec_lang['lpn_field_text_align']='Yatay hizalama';
 $ec_lang['lpn_field_text_align_left']='Sol';
 $ec_lang['lpn_field_text_align_center']='Orta';
@@ -1331,9 +1331,9 @@ $ec_lang['lpn_pane_filter_none']='Bu tabloda filtreyle eşleşen hiçbir şey yo
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='Yakınlaştır ve seç';
-
-
-
+$ec_lang['lpn_goto_on_map']='Haritada göster';
+$ec_lang['lpn_pane_select_on_map']='Haritada seç';
+$ec_lang['lpn_pane_unselect_on_map']='Haritada seçimi kaldır';
 $ec_lang['lpn_pane_print']='Tabloyu yazdır';
 $ec_lang['lpn_pane_print_tip']='Şu anda baktığınız tabloyu, proje adı, tablo adı ve başlıklardaki birimlerle birlikte yazdırır. Satırlar, sıraladığınız düzende yazdırılır.';
 
@@ -1470,7 +1470,7 @@ $ec_lang['lpn_find_op_lt']='şundan küçük';
 $ec_lang['lpn_find_op_empty']='boş';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} bulundu. Birine gitmek için tıklayın.';
-
+$ec_lang['lpn_find_shift_hint']='Eklemek/kaldırmak için Shift+tıklayın.';
 $ec_lang['lpn_find_none']='Hiçbir şey eşleşmedi.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1968,7 @@ $ec_lang['lpn_lock_open_choices_ask']='"Sor", bu dosyayı açık tutan kişiye o
 $ec_lang['lpn_lock_ask']='Sor';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='Sorduğumuzu kime söyleyelim? Baş harfleriniz ideal olur. Bu dosyayı açık tutan kişiye gönderilir ve yalnızca bu tarayıcıda saklanır.';
+$ec_lang['lpn_lock_ask_prompt']='Soran kişi olarak kimin adını verelim? Baş harfleriniz ideal olur. Bu dosyanın kilidiyle birlikte sunucumuzda, dosyayı o anda açık tutan herkes için saklanır ve 30 gün içinde silinir.';
 $ec_lang['lpn_lock_ask_sent']='Bu dosyayı açık tutan kişiden onu kapatmasını istedik. Sayfası hâlâ açıksa bir dakika içinde görecek. Başka hiçbir şey değişmedi ve dosya, o kapatana kadar hâlâ onun.';
 $ec_lang['lpn_lock_ask_failed']='Mesajınız iletilemedi. Ya şu anda bu dosyayı açık tutan kimse yok, ya da sunucuya ulaşılamadı.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,8 +2378,8 @@ $ec_lang['lpn_field_easting_abbr']='D';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
-
+$ec_lang['lpn_field_lat_abbr']='Enl.';
+$ec_lang['lpn_field_lon_abbr']='Boy.';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -3713,8 +3713,8 @@ $ec_lang['lpn_ff_design']='Tasarım kontrolü (sistem üzerindeki etki)';
 $ec_lang['lpn_ff_design_tip']='Düğümün debiyi sağlayıp sağlayamayacağından ayrı bir soru: orada o debi çekilirken başka bir şey asgari basıncının altına düşer mi veya hız sınırını aşar mı? Bunu kontrol etmeyi seçmek ek bir hesaplamaya mal olmaz.';
 $ec_lang['lpn_ff_design_off']='Kontrol etme';
 $ec_lang['lpn_ff_design_all']='Diğer tüm düğümler ve tüm borular';
-
-
+$ec_lang['lpn_ff_design_selected']='Seçili düğümler ve boruları';
+$ec_lang['lpn_ff_design_no_selection']='Tasarım kontrolü seçili düğümlere ayarlı, ama hiçbiri seçili değil. Haritada birkaçını seçin veya Diğer tüm düğümler ve tüm borular seçeneğini kullanın.';
 $ec_lang['lpn_ff_minpressure']='Başka yerde izin verilen en düşük basınç';
 $ec_lang['lpn_ff_minpressure_tip']='Başka bir düğüm yangın debisini çekerken bunun altına düşen bir düğüm, tasarım sorunu olarak bildirilir.';
 $ec_lang['lpn_ff_maxvelocity']='İzin verilen en yüksek hız';
