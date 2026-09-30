@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-09-30",
-    "count": 2157,
+    "count": 2166,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -2361,6 +2361,28 @@
                 "mtc_d50_mra"
             ],
             "reason": "[--force] Sprint 2026-09-29-echo resynced the 125 held-back keys in every language the 2026-09-29 audit found stale; the other 59 flags were audited fresh or false positive (dev/drift-audit-2026-09-29/)."
+        },
+        {
+            "date": "2026-09-30",
+            "keys": [
+                "lpn_freq_axis_percent",
+                "lpn_freq_group_tip",
+                "lpn_freq_menu",
+                "lpn_freq_none",
+                "lpn_freq_quantity_tip",
+                "lpn_freq_summary",
+                "lpn_freq_summary_time",
+                "lpn_freq_tip",
+                "lpn_freq_title"
+            ],
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
+        },
+        {
+            "date": "2026-09-30",
+            "keys": [
+                "lpn_notes_7_def"
+            ],
+            "reason": "Sprint 2026-09-30-fox: all 26 languages inserted the new Ctrl+Shift+PageDown/PageUp row; tag parity checked against English"
         }
     ],
     "hashes": {
@@ -3187,6 +3209,15 @@
         "lpn_fitting_tee_run": "8f87a3ae1107517ca5abeb0bb217b04edf288cd7",
         "lpn_fitting_total": "27c2822089b223d29d6b92410ab784e0f1db5d5b",
         "lpn_fittings_none": "b615dcfdcf8645f7f5c7054fb0e9e6f21d8d9e21",
+        "lpn_freq_axis_percent": "825f972465f35b56c1f66781f7582e17ab71e22d",
+        "lpn_freq_group_tip": "0ca2a99913fed8753cc6880faba73261049851ac",
+        "lpn_freq_menu": "89836a870e44fb467d13116254b39e2482f5cdf1",
+        "lpn_freq_none": "76213bc7a420a8066d8a06a82d38823867b713c2",
+        "lpn_freq_quantity_tip": "5febd33bc677049cfe202f18ce83149b50e6c307",
+        "lpn_freq_summary": "9f71e8d82777e2df113f4eebd3532daa774669c3",
+        "lpn_freq_summary_time": "ad7ed5948d625a23034d52c62357183d88b5bb16",
+        "lpn_freq_tip": "b0085c75f088beeb75f5ea15da1a6f5dd32a0157",
+        "lpn_freq_title": "cc3d9c4ff826f329cf2a639db20aaf5af474e4f2",
         "lpn_full_col_id": "89f89c02cf47e091e726a4e07b88af0966806897",
         "lpn_full_col_time": "6c82e6dd86807ee3db07e3c82bec1ae1ce00b08b",
         "lpn_full_col_type": "3deb7456519697ecf4eefc455516c969a3681bae",
@@ -3523,7 +3554,7 @@
         "lpn_notes_5_term": "04433f7fe8fbf41ae2e5d2354f718f4330e9c5ac",
         "lpn_notes_6_def": "7a690fe4507dd6a8016cbb6d1ee1ca3f620f396c",
         "lpn_notes_6_term": "81d3fc18f58b1f062d929392cf56424cce60fa14",
-        "lpn_notes_7_def": "eea0255ab909617c1257b09097d8f77003e60ba0",
+        "lpn_notes_7_def": "c98208934143918caec8f7e3bcece0e46aafe13d",
         "lpn_notes_7_term": "f85f833914da7710e7a7fe82a00dc7b784dea9b5",
         "lpn_notes_color_def": "4a8aab914b966262f3a655b4025db3c236facf18",
         "lpn_notes_color_term": "67c44c744f65a9a0f9f43f6a39ab3e4d11d382c7",
@@ -7813,6 +7844,42 @@
         },
         "lpn_fittings_none": {
             "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_freq_axis_percent": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_freq_group_tip": {
+            "words": 7,
+            "ends_sentence": true
+        },
+        "lpn_freq_menu": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_freq_none": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_freq_quantity_tip": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "lpn_freq_summary": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_freq_summary_time": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_freq_tip": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "lpn_freq_title": {
+            "words": 3,
             "ends_sentence": false
         },
         "lpn_full_col_id": {

@@ -1656,6 +1656,15 @@ $ec_lang['lpn_ts_none']='Zatím není co vykreslit. Zvolte prvky na mapě a stis
 $ec_lang['lpn_ts_no_frames']='Zatím žádné výsledky s časovým průběhem. Stiskněte Vypočítat pro spuštění simulace.';
 $ec_lang['lpn_ts_summary']='Prvky: {n}, časy hlášení: {steps}';
 $ec_lang['lpn_ts_axis_time']='Uplynulý čas';
+$ec_lang['lpn_freq_menu']='Četnost';
+$ec_lang['lpn_freq_tip']='Vykreslí rozdělení četností jedné vlastnosti pro všechny uzly nebo všechny spoje v aktuálním časovém kroku.';
+$ec_lang['lpn_freq_title']='Rozdělení hodnot';
+$ec_lang['lpn_freq_group_tip']='Zda graf zobrazuje uzly, nebo spoje.';
+$ec_lang['lpn_freq_quantity_tip']='Kterou hodnotu vykreslit.';
+$ec_lang['lpn_freq_none']='Pro tuto hodnotu zatím nejsou žádné výsledky, takže není co vykreslit.';
+$ec_lang['lpn_freq_summary']='Vykresleno: {n} z {total}';
+$ec_lang['lpn_freq_summary_time']='Vykresleno: {n} z {total}, v čase {time}';
+$ec_lang['lpn_freq_axis_percent']='Procento nižších hodnot';
 $ec_lang['lpn_view_units']='Jednotky';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Uložit vše';
@@ -2123,7 +2132,7 @@ $ec_lang['lpn_notes_6_term']='Nápověda ke sloupcům tabulky';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Vybrat sloupec</td><td>Klikněte na záhlaví</td></tr><tr><td>Přidat do výběru sloupců nebo jej rozšířit</td><td>Ctrl+klik nebo Shift+klik na jiné záhlaví</td></tr><tr><td>Přesunout (změnit pořadí) vybraných sloupců</td><td>Přetáhněte, nebo v nabídce po kliknutí pravým tlačítkem či v nabídce ⋮ použijte Spravovat sloupce…</td></tr><tr><td>Nabídka ⋮ a šipka řazení.</td><td>Najeďte na horní roh záhlaví, nebo jej vyberte či na něj přejděte klávesou Tab</td></tr><tr><td>Skrýt, Zobrazit vše nebo Spravovat viditelnost a pořadí</td><td>Klikněte pravým tlačítkem na záhlaví, nebo použijte nabídku ⋮ v pravém horním rohu záhlaví</td></tr><tr><td>Seřadit podle sloupce</td><td>Ikona šipky v pravém horním rohu záhlaví</td></tr><tr><td>Vložit jako nové řádky na konec tabulky</td><td>Klikněte pravým tlačítkem, použijte nabídku ⋮ v pravém horním rohu záhlaví, nebo Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Klávesové zkratky tabulky';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Šipky</td><td>Pohyb po tabulce.</td></tr><tr><td>Tab, Enter</td><td>Dokončí zadání a přesune o jednu buňku napříč / dolů.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Přesun zpět.</td></tr><tr><td>Shift+šipky</td><td>Rozšíří výběr.</td></tr><tr><td>Ctrl+C</td><td>Zkopíruje výběr.</td></tr><tr><td>Ctrl+D</td><td>Vyplní výběr dolů z jeho horního řádku.</td></tr><tr><td>Ctrl+Enter</td><td>Vyplní výběr hodnotou aktivní buňky.</td></tr><tr><td>Ctrl+A</td><td>Vybere celou tabulku.</td></tr><tr><td>Ctrl+Shift+V</td><td>Vloží jako nové řádky na konec tabulky.</td></tr><tr><td>Delete</td><td>Vymaže buňku.</td></tr><tr><td>F2</td><td>Otevře buňku k úpravě.</td></tr><tr><td>Esc</td><td>Zruší úpravu.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Šipky</td><td>Pohyb po tabulce.</td></tr><tr><td>Tab, Enter</td><td>Dokončí zadání a přesune o jednu buňku napříč / dolů.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Přesun zpět.</td></tr><tr><td>Shift+šipky</td><td>Rozšíří výběr.</td></tr><tr><td>Ctrl+C</td><td>Zkopíruje výběr.</td></tr><tr><td>Ctrl+D</td><td>Vyplní výběr dolů z jeho horního řádku.</td></tr><tr><td>Ctrl+Enter</td><td>Vyplní výběr hodnotou aktivní buňky.</td></tr><tr><td>Ctrl+A</td><td>Vybere celou tabulku.</td></tr><tr><td>Ctrl+Shift+V</td><td>Vloží jako nové řádky na konec tabulky.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Přepne na další nebo předchozí tabulku.</td></tr><tr><td>Delete</td><td>Vymaže buňku.</td></tr><tr><td>F2</td><td>Otevře buňku k úpravě.</td></tr><tr><td>Esc</td><td>Zruší úpravu.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

@@ -1654,6 +1654,15 @@ $ec_lang['lpn_ts_none']='ابھی گراف کرنے کو کچھ نہیں۔ نق�
 $ec_lang['lpn_ts_no_frames']='ابھی تک کوئی توسیعی دورانیے کے نتائج نہیں۔ سمولیشن چلانے کے لیے حل کریں دبائیں۔';
 $ec_lang['lpn_ts_summary']='اثاثے: {n}، رپورٹنگ اوقات: {steps}';
 $ec_lang['lpn_ts_axis_time']='گزرا ہوا وقت';
+$ec_lang['lpn_freq_menu']='تعدد';
+$ec_lang['lpn_freq_tip']='موجودہ ٹائم اسٹیپ پر تمام جنکشنز یا تمام پائپس میں کسی ایک خاصیت کی تعدد تقسیم گراف کریں۔';
+$ec_lang['lpn_freq_title']='قدروں کی تقسیم';
+$ec_lang['lpn_freq_group_tip']='آیا گراف جنکشنز دکھاتا ہے یا پائپس۔';
+$ec_lang['lpn_freq_quantity_tip']='کون سی قدر گراف کی جائے۔';
+$ec_lang['lpn_freq_none']='ابھی اس قدر کے کوئی نتائج نہیں، اس لیے گراف کرنے کو کچھ نہیں۔';
+$ec_lang['lpn_freq_summary']='پلاٹ کردہ: {total} میں سے {n}';
+$ec_lang['lpn_freq_summary_time']='پلاٹ کردہ: {total} میں سے {n}، بوقت {time}';
+$ec_lang['lpn_freq_axis_percent']='اس سے کم فیصد';
 $ec_lang['lpn_view_units']='یونٹس';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='سب محفوظ کریں';
@@ -2121,7 +2130,7 @@ $ec_lang['lpn_notes_6_term']='جدول کے کالمز کی مدد';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>کالم منتخب کریں</td><td>عنوان پر کلک کریں</td></tr><tr><td>کالم کا انتخاب شامل یا بڑھائیں</td><td>کسی دوسرے عنوان پر Ctrl+کلک یا Shift+کلک کریں</td></tr><tr><td>منتخب کالم(ز) منتقل کریں (ترتیب بدلیں)</td><td>گھسیٹیں یا رائٹ کلک یا ⋮ مینو میں کالمز کا انتظام کریں… استعمال کریں</td></tr><tr><td>مینو ⋮ اور ترتیب کا تیر۔</td><td>عنوان کے اوپری کونے پر ہوور کریں، یا کسی عنوان کو منتخب کریں یا Tab سے اس میں جائیں</td></tr><tr><td>چھپائیں، سب دکھائیں، یا نمائش اور ترتیب کا انتظام کریں</td><td>عنوان پر رائٹ کلک کریں یا عنوان کے اوپری دائیں کونے میں ⋮ مینو</td></tr><tr><td>کالم کے مطابق ترتیب دیں</td><td>عنوان کے اوپری دائیں کونے میں تیر کی علامت</td></tr><tr><td>جدول کے آخر میں نئی قطاروں کے طور پر پیسٹ کریں</td><td>رائٹ کلک، عنوان کے اوپری دائیں کونے میں ⋮ مینو، یا Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='جدول کیبورڈ شارٹ کٹس';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>نیویگیٹ کریں۔</td></tr><tr><td>Tab, Enter</td><td>اندراج مکمل کریں اور ایک سیل آر پار / نیچے جائیں۔</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>پیچھے کی طرف نیویگیٹ کریں۔</td></tr><tr><td>Shift+arrow keys</td><td>انتخاب کو بڑھائیں۔</td></tr><tr><td>Ctrl+C</td><td>انتخاب کاپی کریں۔</td></tr><tr><td>Ctrl+D</td><td>انتخاب کو اس کی سب سے اوپر والی قطار سے نیچے بھریں۔</td></tr><tr><td>Ctrl+Enter</td><td>انتخاب کو فعال سیل کی قدر سے بھریں۔</td></tr><tr><td>Ctrl+A</td><td>پورا جدول منتخب کریں۔</td></tr><tr><td>Ctrl+Shift+V</td><td>جدول کے آخر میں نئی قطاروں کے طور پر پیسٹ کریں۔</td></tr><tr><td>Delete</td><td>ایک سیل صاف کریں۔</td></tr><tr><td>F2</td><td>ترمیم کے لیے سیل کھولیں۔</td></tr><tr><td>Esc</td><td>ترمیم منسوخ کریں۔</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>نیویگیٹ کریں۔</td></tr><tr><td>Tab, Enter</td><td>اندراج مکمل کریں اور ایک سیل آر پار / نیچے جائیں۔</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>پیچھے کی طرف نیویگیٹ کریں۔</td></tr><tr><td>Shift+arrow keys</td><td>انتخاب کو بڑھائیں۔</td></tr><tr><td>Ctrl+C</td><td>انتخاب کاپی کریں۔</td></tr><tr><td>Ctrl+D</td><td>انتخاب کو اس کی سب سے اوپر والی قطار سے نیچے بھریں۔</td></tr><tr><td>Ctrl+Enter</td><td>انتخاب کو فعال سیل کی قدر سے بھریں۔</td></tr><tr><td>Ctrl+A</td><td>پورا جدول منتخب کریں۔</td></tr><tr><td>Ctrl+Shift+V</td><td>جدول کے آخر میں نئی قطاروں کے طور پر پیسٹ کریں۔</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>اگلے یا پچھلے جدول پر جائیں۔</td></tr><tr><td>Delete</td><td>ایک سیل صاف کریں۔</td></tr><tr><td>F2</td><td>ترمیم کے لیے سیل کھولیں۔</td></tr><tr><td>Esc</td><td>ترمیم منسوخ کریں۔</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

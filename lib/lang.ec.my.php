@@ -1654,6 +1654,15 @@ $ec_lang['lpn_ts_none']='ဂရပ်ဆွဲရန် မည်သည့်အ
 $ec_lang['lpn_ts_no_frames']='အချိန်ကာလ အတုယူတွက်ချက်မှု အဖြေများ မရှိသေးပါ။ ပုံဖော်တွက်ချက်မှုကို လည်ပတ်ရန် တွက်ချက်ရန် ကို နှိပ်ပါ။';
 $ec_lang['lpn_ts_summary']='အစိတ်အပိုင်းများ - {n}၊ အစီရင်ခံ အချိန်များ - {steps}';
 $ec_lang['lpn_ts_axis_time']='ကုန်ဆုံးအချိန်';
+$ec_lang['lpn_freq_menu']='ကြိမ်နှုန်း';
+$ec_lang['lpn_freq_tip']='ဆက်စပ်နေရာအားလုံး (သို့) ပိုက်လိုင်းအားလုံး၏ ဂုဏ်သတ္တိတစ်ခု၏ ကြိမ်နှုန်းဖြန့်ဝေမှုကို လက်ရှိအချိန်အဆင့်တွင် ဂရပ်ဆွဲရန်။';
+$ec_lang['lpn_freq_title']='တန်ဖိုးများ ဖြန့်ဝေမှု';
+$ec_lang['lpn_freq_group_tip']='ဂရပ်သည် ဆက်စပ်နေရာများကို ပြမည်လား (သို့) ပိုက်လိုင်းများကို ပြမည်လား။';
+$ec_lang['lpn_freq_quantity_tip']='မည်သည့်တန်ဖိုးကို ဂရပ်ဆွဲမည်နည်း။';
+$ec_lang['lpn_freq_none']='ဤတန်ဖိုးအတွက် အဖြေများ မရှိသေးသောကြောင့်၊ ဂရပ်ဆွဲစရာ မရှိပါ။';
+$ec_lang['lpn_freq_summary']='ဂရပ်ဆွဲထားသည် - {total} အနက် {n}';
+$ec_lang['lpn_freq_summary_time']='ဂရပ်ဆွဲထားသည် - {total} အနက် {n}၊ {time} တွင်';
+$ec_lang['lpn_freq_axis_percent']='ထက်နည်းသော ရာခိုင်နှုန်း';
 $ec_lang['lpn_view_units']='ယူနစ်များ';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='အားလုံးကို သိမ်းရန်';
@@ -2121,7 +2130,7 @@ $ec_lang['lpn_notes_6_term']='ဇယား ကော်လံများ အက
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>ကော်လံကို ရွေးချယ်ရန်</td><td>ခေါင်းစီးကို နှိပ်ပါ</td></tr><tr><td>ကော်လံ ရွေးချယ်မှုကို ထပ်ထည့်ရန် (သို့) ချဲ့ရန်</td><td>အခြားခေါင်းစီးကို Ctrl+click (သို့) Shift+click နှိပ်ပါ</td></tr><tr><td>ရွေးထားသော ကော်လံ(များ)ကို ရွှေ့ရန် (စီစဉ်ပြန်ရန်)</td><td>ဖိဆွဲပါ (သို့) right-click (သို့) ⋮ မီနူးရှိ ကော်လံများ စီမံရန်… ကို သုံးပါ</td></tr><tr><td>မီနူး ⋮ နှင့် စီမြှားညွှန်။</td><td>ခေါင်းစီး၏ ထောင့်အပေါ်ကို ကာဆာထားပါ၊ (သို့) ခေါင်းစီးထဲသို့ ရွေးချယ် (သို့) Tab ဖြင့် ဝင်ပါ</td></tr><tr><td>ဖျောက်ရန်၊ အားလုံးပြရန်၊ (သို့) မြင်နိုင်မှုနှင့် အစီအစဉ်ကို စီမံရန်</td><td>ခေါင်းစီးကို right-click နှိပ်ပါ (သို့) ခေါင်းစီး၏ ညာဘက်အပေါ်ထောင့်ရှိ ⋮ မီနူး</td></tr><tr><td>ကော်လံအလိုက် စီရန်</td><td>ခေါင်းစီး၏ ညာဘက်အပေါ်ထောင့်ရှိ မြှားသင်္ကေတ</td></tr><tr><td>ဇယားအဆုံးတွင် အတန်းအသစ်များအဖြစ် ကူးထည့်ရန်</td><td>Right-click၊ ခေါင်းစီး၏ ညာဘက်အပေါ်ထောင့်ရှိ ⋮ မီနူး၊ (သို့) Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='ဇယား ကီးဘုတ် ဖြတ်လမ်းများ';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>မြှားခလုတ်များ</td><td>ရွှေ့ရန်။</td></tr><tr><td>Tab, Enter</td><td>ရိုက်ထည့်မှု ပြီးဆုံးပြီး ဆဲလ်တစ်ခု အလျားလိုက် / အောက်သို့ ရွှေ့ရန်။</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>နောက်ပြန် ရွှေ့ရန်။</td></tr><tr><td>Shift+မြှားခလုတ်များ</td><td>ရွေးချယ်မှုကို ချဲ့ရန်။</td></tr><tr><td>Ctrl+C</td><td>ရွေးချယ်ထားသည်ကို ကူးယူရန်။</td></tr><tr><td>Ctrl+D</td><td>ရွေးချယ်ထားသည်ကို ၎င်း၏ထိပ်ဆုံးအတန်းမှ အောက်သို့ ဖြည့်ရန်။</td></tr><tr><td>Ctrl+Enter</td><td>ရွေးချယ်ထားသည်ကို လက်ရှိဆဲလ်\'၏ တန်ဖိုးဖြင့် ဖြည့်ရန်။</td></tr><tr><td>Ctrl+A</td><td>ဇယားတစ်ခုလုံးကို ရွေးချယ်ရန်။</td></tr><tr><td>Ctrl+Shift+V</td><td>ဇယားအဆုံးတွင် အတန်းအသစ်များအဖြစ် ကူးထည့်ရန်။</td></tr><tr><td>Delete</td><td>ဆဲလ်တစ်ခုကို ရှင်းလင်းရန်။</td></tr><tr><td>F2</td><td>ဆဲလ်တစ်ခုကို တည်းဖြတ်ရန် ဖွင့်ရန်။</td></tr><tr><td>Esc</td><td>တည်းဖြတ်မှုကို ပယ်ဖျက်ရန်။</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>မြှားခလုတ်များ</td><td>ရွှေ့ရန်။</td></tr><tr><td>Tab, Enter</td><td>ရိုက်ထည့်မှု ပြီးဆုံးပြီး ဆဲလ်တစ်ခု အလျားလိုက် / အောက်သို့ ရွှေ့ရန်။</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>နောက်ပြန် ရွှေ့ရန်။</td></tr><tr><td>Shift+မြှားခလုတ်များ</td><td>ရွေးချယ်မှုကို ချဲ့ရန်။</td></tr><tr><td>Ctrl+C</td><td>ရွေးချယ်ထားသည်ကို ကူးယူရန်။</td></tr><tr><td>Ctrl+D</td><td>ရွေးချယ်ထားသည်ကို ၎င်း၏ထိပ်ဆုံးအတန်းမှ အောက်သို့ ဖြည့်ရန်။</td></tr><tr><td>Ctrl+Enter</td><td>ရွေးချယ်ထားသည်ကို လက်ရှိဆဲလ်\'၏ တန်ဖိုးဖြင့် ဖြည့်ရန်။</td></tr><tr><td>Ctrl+A</td><td>ဇယားတစ်ခုလုံးကို ရွေးချယ်ရန်။</td></tr><tr><td>Ctrl+Shift+V</td><td>ဇယားအဆုံးတွင် အတန်းအသစ်များအဖြစ် ကူးထည့်ရန်။</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>နောက် (သို့) ယခင် ဇယားသို့ ပြောင်းရန်။</td></tr><tr><td>Delete</td><td>ဆဲလ်တစ်ခုကို ရှင်းလင်းရန်။</td></tr><tr><td>F2</td><td>ဆဲလ်တစ်ခုကို တည်းဖြတ်ရန် ဖွင့်ရန်။</td></tr><tr><td>Esc</td><td>တည်းဖြတ်မှုကို ပယ်ဖျက်ရန်။</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

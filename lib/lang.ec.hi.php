@@ -1656,6 +1656,15 @@ $ec_lang['lpn_ts_none']='अभी आलेखित करने के लि
 $ec_lang['lpn_ts_no_frames']='अभी तक कोई विस्तारित अवधि परिणाम नहीं है। सिमुलेशन चलाने के लिए Calculate दबाएँ।';
 $ec_lang['lpn_ts_summary']='तत्व: {n}, रिपोर्टिंग समय: {steps}';
 $ec_lang['lpn_ts_axis_time']='व्यतीत समय';
+$ec_lang['lpn_freq_menu']='आवृत्ति';
+$ec_lang['lpn_freq_tip']='वर्तमान समय चरण पर सभी जंक्शनों या सभी पाइपों में किसी एक गुण के आवृत्ति वितरण को आलेखित करें।';
+$ec_lang['lpn_freq_title']='मानों का वितरण';
+$ec_lang['lpn_freq_group_tip']='क्या ग्राफ जंक्शन दिखाता है या पाइप।';
+$ec_lang['lpn_freq_quantity_tip']='कौन-सा मान आलेखित करना है।';
+$ec_lang['lpn_freq_none']='इस मान के लिए अभी तक कोई परिणाम नहीं है, इसलिए आलेखित करने के लिए कुछ नहीं है।';
+$ec_lang['lpn_freq_summary']='आलेखित: {total} में से {n}';
+$ec_lang['lpn_freq_summary_time']='आलेखित: {total} में से {n}, {time} पर';
+$ec_lang['lpn_freq_axis_percent']='इससे कम प्रतिशत';
 $ec_lang['lpn_view_units']='इकाइयाँ';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='सभी सहेजें';
@@ -2123,7 +2132,7 @@ $ec_lang['lpn_notes_6_term']='तालिका कॉलम सहायता
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>कॉलम चुनें</td><td>शीर्षक पर क्लिक करें</td></tr><tr><td>कॉलम चयन जोड़ें या बढ़ाएँ</td><td>किसी अन्य शीर्षक पर Ctrl+click या Shift+click करें</td></tr><tr><td>चयनित कॉलम को स्थानांतरित करें (क्रम बदलें)</td><td>खींचें या राइट-क्लिक या ⋮ मेनू में Manage columns… का उपयोग करें</td></tr><tr><td>मेनू ⋮ और क्रमबद्ध तीर।</td><td>शीर्षक के ऊपरी कोने पर होवर करें, या किसी शीर्षक को चुनें या उसमें Tab करें</td></tr><tr><td>छिपाएँ, सभी दिखाएँ, या दृश्यता और क्रम प्रबंधित करें</td><td>शीर्षक पर राइट-क्लिक करें या शीर्षक के ऊपरी दाएँ कोने में ⋮ मेनू</td></tr><tr><td>कॉलम के अनुसार क्रमबद्ध करें</td><td>शीर्षक के ऊपरी दाएँ कोने में तीर आइकन</td></tr><tr><td>तालिका के अंत में नई पंक्तियों के रूप में पेस्ट करें</td><td>राइट-क्लिक करें, शीर्षक के ऊपरी दाएँ कोने में ⋮ मेनू, या Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='तालिका कीबोर्ड शॉर्टकट';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>नेविगेट करें।</td></tr><tr><td>Tab, Enter</td><td>प्रविष्टि पूर्ण करें और एक सेल आगे/नीचे नेविगेट करें।</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>पीछे की ओर नेविगेट करें।</td></tr><tr><td>Shift+arrow keys</td><td>चयन बढ़ाएँ।</td></tr><tr><td>Ctrl+C</td><td>चयन कॉपी करें।</td></tr><tr><td>Ctrl+D</td><td>चयन को उसकी शीर्ष पंक्ति से नीचे भरें।</td></tr><tr><td>Ctrl+Enter</td><td>चयन को सक्रिय सेल के मान से भरें।</td></tr><tr><td>Ctrl+A</td><td>पूरी तालिका चुनें।</td></tr><tr><td>Ctrl+Shift+V</td><td>तालिका के अंत में नई पंक्तियों के रूप में पेस्ट करें।</td></tr><tr><td>Delete</td><td>एक सेल साफ़ करें।</td></tr><tr><td>F2</td><td>किसी सेल को संपादित करने के लिए खोलें।</td></tr><tr><td>Esc</td><td>एक संपादन रद्द करें।</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>नेविगेट करें।</td></tr><tr><td>Tab, Enter</td><td>प्रविष्टि पूर्ण करें और एक सेल आगे/नीचे नेविगेट करें।</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>पीछे की ओर नेविगेट करें।</td></tr><tr><td>Shift+arrow keys</td><td>चयन बढ़ाएँ।</td></tr><tr><td>Ctrl+C</td><td>चयन कॉपी करें।</td></tr><tr><td>Ctrl+D</td><td>चयन को उसकी शीर्ष पंक्ति से नीचे भरें।</td></tr><tr><td>Ctrl+Enter</td><td>चयन को सक्रिय सेल के मान से भरें।</td></tr><tr><td>Ctrl+A</td><td>पूरी तालिका चुनें।</td></tr><tr><td>Ctrl+Shift+V</td><td>तालिका के अंत में नई पंक्तियों के रूप में पेस्ट करें।</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>अगली या पिछली तालिका पर जाएँ।</td></tr><tr><td>Delete</td><td>एक सेल साफ़ करें।</td></tr><tr><td>F2</td><td>किसी सेल को संपादित करने के लिए खोलें।</td></tr><tr><td>Esc</td><td>एक संपादन रद्द करें।</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

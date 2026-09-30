@@ -1656,6 +1656,15 @@ $ec_lang['lpn_ts_none']='Поки нічого показувати на гра�
 $ec_lang['lpn_ts_no_frames']='Ще немає результатів розширеного періоду. Натисніть «Розрахувати», щоб виконати розрахунок.';
 $ec_lang['lpn_ts_summary']='Елементів: {n}, моментів звітування: {steps}';
 $ec_lang['lpn_ts_axis_time']='Час, що минув';
+$ec_lang['lpn_freq_menu']='Частота';
+$ec_lang['lpn_freq_tip']='Графік частотного розподілу однієї властивості за всіма вузлами або всіма трубами на поточному часовому кроці.';
+$ec_lang['lpn_freq_title']='Розподіл значень';
+$ec_lang['lpn_freq_group_tip']='Чи показує графік вузли, чи труби.';
+$ec_lang['lpn_freq_quantity_tip']='Яке значення показати на графіку.';
+$ec_lang['lpn_freq_none']='Поки немає результатів для цього значення, тому нічого показувати на графіку.';
+$ec_lang['lpn_freq_summary']='Показано: {n} із {total}';
+$ec_lang['lpn_freq_summary_time']='Показано: {n} із {total}, на {time}';
+$ec_lang['lpn_freq_axis_percent']='Відсоток менших';
 $ec_lang['lpn_view_units']='Одиниці';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Зберегти все';
@@ -2123,7 +2132,7 @@ $ec_lang['lpn_notes_6_term']='Довідка про стовпці таблиц�
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Вибрати стовпець</td><td>Клацнути заголовок</td></tr><tr><td>Додати до вибору стовпців або розширити його</td><td>Ctrl+клацання або Shift+клацання по іншому заголовку</td></tr><tr><td>Перемістити (змінити порядок) вибраних стовпців</td><td>Перетягнути або скористатися «Керувати стовпцями…» в меню правої кнопки миші чи ⋮</td></tr><tr><td>Меню ⋮ і стрілка сортування.</td><td>Навести вказівник на верхній кут заголовка або вибрати заголовок чи перейти в нього клавішею Tab</td></tr><tr><td>Сховати, «Показати всі» або керувати видимістю й порядком</td><td>Клацнути заголовок правою кнопкою миші або меню ⋮ у верхньому правому куті заголовка</td></tr><tr><td>Сортувати за стовпцем</td><td>Піктограма стрілки у верхньому правому куті заголовка</td></tr><tr><td>Вставити як нові рядки в кінець таблиці</td><td>Клацання правою кнопкою миші, меню ⋮ у верхньому правому куті заголовка або Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Комбінації клавіш таблиці';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Клавіші зі стрілками</td><td>Навігація.</td></tr><tr><td>Tab, Enter</td><td>Завершити введення й перейти на одну клітинку вправо / вниз.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Перейти назад.</td></tr><tr><td>Shift+клавіші зі стрілками</td><td>Розширити виділення.</td></tr><tr><td>Ctrl+C</td><td>Скопіювати виділене.</td></tr><tr><td>Ctrl+D</td><td>Заповнити виділене вниз від верхнього рядка.</td></tr><tr><td>Ctrl+Enter</td><td>Заповнити виділене значенням активної клітинки.</td></tr><tr><td>Ctrl+A</td><td>Вибрати всю таблицю.</td></tr><tr><td>Ctrl+Shift+V</td><td>Вставити як нові рядки в кінець таблиці.</td></tr><tr><td>Delete</td><td>Очистити клітинку.</td></tr><tr><td>F2</td><td>Відкрити клітинку для редагування.</td></tr><tr><td>Esc</td><td>Скасувати редагування.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Клавіші зі стрілками</td><td>Навігація.</td></tr><tr><td>Tab, Enter</td><td>Завершити введення й перейти на одну клітинку вправо / вниз.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Перейти назад.</td></tr><tr><td>Shift+клавіші зі стрілками</td><td>Розширити виділення.</td></tr><tr><td>Ctrl+C</td><td>Скопіювати виділене.</td></tr><tr><td>Ctrl+D</td><td>Заповнити виділене вниз від верхнього рядка.</td></tr><tr><td>Ctrl+Enter</td><td>Заповнити виділене значенням активної клітинки.</td></tr><tr><td>Ctrl+A</td><td>Вибрати всю таблицю.</td></tr><tr><td>Ctrl+Shift+V</td><td>Вставити як нові рядки в кінець таблиці.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Перейти до наступної або попередньої таблиці.</td></tr><tr><td>Delete</td><td>Очистити клітинку.</td></tr><tr><td>F2</td><td>Відкрити клітинку для редагування.</td></tr><tr><td>Esc</td><td>Скасувати редагування.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

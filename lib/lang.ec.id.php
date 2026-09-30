@@ -1657,6 +1657,15 @@ $ec_lang['lpn_ts_none']='Belum ada yang digrafikkan. Pilih elemen pada peta lalu
 $ec_lang['lpn_ts_no_frames']='Belum ada hasil periode waktu. Tekan Hitung untuk menjalankan simulasi.';
 $ec_lang['lpn_ts_summary']='Elemen: {n}, waktu pelaporan: {steps}';
 $ec_lang['lpn_ts_axis_time']='Waktu berlalu';
+$ec_lang['lpn_freq_menu']='Frekuensi';
+$ec_lang['lpn_freq_tip']='Membuat grafik distribusi frekuensi satu properti pada semua simpul atau semua pipa pada langkah waktu saat ini.';
+$ec_lang['lpn_freq_title']='Distribusi nilai';
+$ec_lang['lpn_freq_group_tip']='Apakah grafik menampilkan simpul atau pipa.';
+$ec_lang['lpn_freq_quantity_tip']='Nilai mana yang digrafikkan.';
+$ec_lang['lpn_freq_none']='Belum ada hasil untuk nilai ini, sehingga tidak ada yang dapat digrafikkan.';
+$ec_lang['lpn_freq_summary']='Digambarkan: {n} dari {total}';
+$ec_lang['lpn_freq_summary_time']='Digambarkan: {n} dari {total}, pada {time}';
+$ec_lang['lpn_freq_axis_percent']='Persen kurang dari';
 $ec_lang['lpn_view_units']='Satuan';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Simpan semua';
@@ -2124,7 +2133,7 @@ $ec_lang['lpn_notes_6_term']='Bantuan kolom tabel';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Pilih kolom</td><td>Klik judul kolom</td></tr><tr><td>Tambah atau perluas pilihan kolom</td><td>Ctrl+klik atau Shift+klik judul kolom lain</td></tr><tr><td>Pindahkan (urutkan ulang) kolom yang dipilih</td><td>Seret, atau gunakan Kelola kolom… pada menu klik-kanan atau menu ⋮</td></tr><tr><td>Menu ⋮ dan panah urutan.</td><td>Arahkan kursor ke sudut atas judul kolom, atau pilih atau Tab ke judul kolom</td></tr><tr><td>Sembunyikan, Tampilkan semua, atau Kelola visibilitas dan urutan</td><td>Klik-kanan judul kolom atau menu ⋮ di sudut kanan atas judul kolom</td></tr><tr><td>Urutkan berdasarkan kolom</td><td>Ikon panah di sudut kanan atas judul kolom</td></tr><tr><td>Tempel sebagai baris baru di akhir tabel</td><td>Klik-kanan, menu ⋮ di sudut kanan atas judul kolom, atau Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Pintasan keyboard tabel';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tombol panah</td><td>Navigasi.</td></tr><tr><td>Tab, Enter</td><td>Selesaikan entri dan berpindah satu sel ke samping / ke bawah.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigasi mundur.</td></tr><tr><td>Shift+tombol panah</td><td>Perluas pilihan.</td></tr><tr><td>Ctrl+C</td><td>Salin pilihan.</td></tr><tr><td>Ctrl+D</td><td>Isi pilihan ke bawah mulai dari baris paling atas.</td></tr><tr><td>Ctrl+Enter</td><td>Isi pilihan dengan nilai sel aktif.</td></tr><tr><td>Ctrl+A</td><td>Pilih seluruh tabel.</td></tr><tr><td>Ctrl+Shift+V</td><td>Tempel sebagai baris baru di akhir tabel.</td></tr><tr><td>Delete</td><td>Kosongkan sel.</td></tr><tr><td>F2</td><td>Buka sel untuk menyuntingnya.</td></tr><tr><td>Esc</td><td>Batalkan penyuntingan.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tombol panah</td><td>Navigasi.</td></tr><tr><td>Tab, Enter</td><td>Selesaikan entri dan berpindah satu sel ke samping / ke bawah.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigasi mundur.</td></tr><tr><td>Shift+tombol panah</td><td>Perluas pilihan.</td></tr><tr><td>Ctrl+C</td><td>Salin pilihan.</td></tr><tr><td>Ctrl+D</td><td>Isi pilihan ke bawah mulai dari baris paling atas.</td></tr><tr><td>Ctrl+Enter</td><td>Isi pilihan dengan nilai sel aktif.</td></tr><tr><td>Ctrl+A</td><td>Pilih seluruh tabel.</td></tr><tr><td>Ctrl+Shift+V</td><td>Tempel sebagai baris baru di akhir tabel.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Beralih ke tabel berikutnya atau sebelumnya.</td></tr><tr><td>Delete</td><td>Kosongkan sel.</td></tr><tr><td>F2</td><td>Buka sel untuk menyuntingnya.</td></tr><tr><td>Esc</td><td>Batalkan penyuntingan.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
