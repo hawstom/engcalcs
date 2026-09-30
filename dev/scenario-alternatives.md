@@ -163,3 +163,9 @@ group)`, `alternativesOf(scenario)`, `alternativeFor(scenario, category)`, `reso
 `effective()` is NOT rewired through it: it runs per property per element per render and per solve,
 and in Basic mode its one override lookup already IS the one-hop chain. The harness holds the two
 equal instead.
+
+Basic mode and the table: same file, section "SCENARIOS > BASIC MODE" (`setScenarioBasicMode()`,
+`rebuildAlternativesTable()`); the box is `#lpn_alt_box` in `Looped-Network.php`. The box's
+position and size are not remembered, so the only new thing a browser stores is `lpn_scnbasic`
+(registered in `lpn_furniture_check.php`, `dev/cookie-storage-inventory.md` and Erase everything).
+Harness: `dev/lpn-spike/scenario-alternatives-harness.js`.

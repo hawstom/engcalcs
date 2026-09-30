@@ -4747,6 +4747,8 @@ var EngCalcs = EngCalcs || {};
 			(pc.lpn_scenario_label || 'Scenario') + ': ' + scenarioDisplayName(scn)
 			+ ' | ' + (pc.lpn_scenario_overrides || 'No. of custom values') + ': ' + overrideCount(scn));
 		refreshScenarioTip(btn);
+		// Every override written or cleared lands here, so the Alternatives table follows it.
+		refreshAlternativesBoxIfOpen();
 		// The scenario name is user-typed and can be long, so the bottom band's width is not knowable
 		// in advance -- a bottom legend re-dodges around whatever it now measures.
 		placeLegends();
@@ -4983,6 +4985,21 @@ var EngCalcs = EngCalcs || {};
 			// push into a push against whatever it happened to hand over.
 			fn: function () { pushBaseToScenarios(); }
 		});
+		// **BASIC MODE** (Tom, 2026-09-30), ticked by default. Unticked reveals the one thing the
+		// Advanced scenarios view has so far: the read-only Alternatives table. See
+		// setScenarioBasicMode() for why the answer lives in the browser.
+		rows.push({ separator: true });
+		rows.push({
+			label: (scenarioBasicMode ? '✓ ' : '  ') + (pc.lpn_scenario_basic || 'Basic mode'),
+			tip: pc.lpn_scenario_basic_tip,
+			fn: function () { setScenarioBasicMode(!scenarioBasicMode); }
+		});
+		if (!scenarioBasicMode) {
+			rows.push({
+				icon: 'scenarios', label: pc.lpn_alt_title || 'Alternatives',
+				fn: function () { openAlternativesBox(); }
+			});
+		}
 		return rows;
 	}
 	function openScenarioMenu(anchor) { openMenu(anchor, scenarioMenuRows()); }
@@ -30370,7 +30387,7 @@ var EngCalcs = EngCalcs || {};
 			// page-title toggle went with the titles; a browser that used it before still carries
 			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
 			// Erasing a key we no longer write is the one direction that is always safe.
-			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY];
+			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY, LPN_SCNBASIC_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -39105,6 +39122,7 @@ var EngCalcs = EngCalcs || {};
 		wireScenarioCompareBox();
 		wireRunReportBox();
 		wireStatusReportBox();
+		wireAlternativesBox();
 		wireFullReportBox();
 		buildMenuBar();
 		wireScenarioButton();
@@ -57282,6 +57300,93 @@ var EngCalcs = EngCalcs || {};
 	}
 	function refreshStatusReportBoxIfOpen() {
 		if (statusBoxIsOpen()) { rebuildStatusReport(); }
+	}
+
+	// ---- SCENARIOS > BASIC MODE, AND THE ALTERNATIVES TABLE (dev/scenario-alternatives.md) -----
+	//
+	// Tom, 2026-09-30: *"In our Scenarios menu, we have an 'Basic mode' command/row that is checked
+	// by default. If they uncheck it, our full Advanced (Bentley) Scenarios UX (to be designed later)
+	// is revealed."* The Advanced UX is NOT designed, so unticking reveals one thing only: a
+	// read-only table of which alternative each scenario uses in each category. Tom may strike it.
+	//
+	// **A BROWSER SETTING, NOT A PROJECT ONE.** The alternatives are derived from the overrides, so
+	// the mode changes no value, no solve and no stored byte -- only how much machinery the person at
+	// this screen wants shown, which a colleague opening the file must not inherit. Written only
+	// when OFF, like lpn_runbox, so a browser that never touched it holds nothing.
+	var LPN_SCNBASIC_KEY = 'lpn_scnbasic';
+	var scenarioBasicMode = true;
+	function loadScenarioBasicPref() {
+		try { scenarioBasicMode = localStorage.getItem(LPN_SCNBASIC_KEY) !== 'off'; } catch (e) {}
+	}
+	function setScenarioBasicMode(on) {
+		scenarioBasicMode = !!on;
+		try {
+			if (scenarioBasicMode) { localStorage.removeItem(LPN_SCNBASIC_KEY); }
+			else { localStorage.setItem(LPN_SCNBASIC_KEY, 'off'); }
+		} catch (e) {}
+		if (scenarioBasicMode) { closeAlternativesBox(); }
+	}
+	loadScenarioBasicPref();
+	function altCategoryLabel(cat) {
+		var pc = EngCalcs.pageConfig || {};
+		return {
+			physical: pc.lpn_alt_cat_physical || 'Physical',
+			demand: pc.lpn_alt_cat_demand || 'Demand',
+			topology: pc.lpn_alt_cat_topology || 'Active topology',
+			initial: pc.lpn_alt_cat_initial || 'Initial settings',
+			constituent: pc.lpn_alt_cat_constituent || 'Constituent',
+			fireflow: pc.lpn_alt_cat_fireflow || 'Fire flow',
+			energy: pc.lpn_alt_cat_energy || 'Energy cost',
+			userdata: pc.lpn_alt_cat_userdata || 'Custom properties',
+			text: pc.lpn_alt_cat_text || 'Text'
+		}[cat] || cat;
+	}
+	function altBoxEl() { return document.getElementById('lpn_alt_box'); }
+	function altBoxIsOpen() {
+		var box = altBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	// One row per scenario, one column per category. A cell names the alternative: Base's own word
+	// for a Base alternative, the scenario's name and its count of local values for its own.
+	function rebuildAlternativesTable() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_alt_report'), body,
+			baseWord = pc.lpn_scenario_base || 'Base';
+		if (!host) { return; }
+		host.innerHTML = '';
+		body = ffTable(host, [pc.lpn_scenario_label || 'Scenario'].concat(LPN_ALT_CATEGORIES.map(altCategoryLabel)));
+		scenariosForDisplay().forEach(function (s) {
+			var tr = ffEl('tr', null, null, body), alts = alternativesOf(s);
+			ffCell(tr, scenarioDisplayName(s));
+			LPN_ALT_CATEGORIES.forEach(function (cat) {
+				var a = alts[cat];
+				ffCell(tr, a.isBase ? baseWord : scenarioDisplayName(s) + ' (' + a.count + ')');
+			});
+		});
+		ffEl('p', 'lpn-ff-note', pc.lpn_alt_note || 'Read only.', host);
+	}
+	// Position and size for the life of the page only: remembering them would be a new key in the
+	// browser for a view Tom has not yet decided to keep.
+	var altboxLayout = newBoxLayout();
+	function openAlternativesBox() {
+		var box = altBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		rebuildAlternativesTable();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, altboxLayout); });
+		initTipsIn(box);
+	}
+	function closeAlternativesBox() { if (altBoxIsOpen()) { hidePanel(altBoxEl()); } }
+	function wireAlternativesBox() {
+		var box = altBoxEl(), x = document.getElementById('lpn_alt_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeAlternativesBox); }
+		makePanelDraggable(box);
+		addPanelResizeGrip(box);
+	}
+	function refreshAlternativesBoxIfOpen() {
+		if (altBoxIsOpen()) { rebuildAlternativesTable(); }
 	}
 
 	// ---- THE FULL REPORT: every node and every link, at every reporting time step -----------------

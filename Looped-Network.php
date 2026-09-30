@@ -1381,6 +1381,17 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<div id="lpn_status_report" class="lpn-ff-report"></div>
 	</div>
 </div>
+<?php // THE ALTERNATIVES TABLE (dev/scenario-alternatives.md). Offered only with Scenarios > Basic
+      // mode unticked: for each scenario, which alternative it uses in each category, read-only.
+      // The minimum honest view of a model that otherwise has no screen; the Advanced UX is not
+      // designed. Its position is NOT remembered, so it adds nothing to what a browser stores. ?>
+<div id="lpn_alt_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_altbox_title">
+	<div id="lpn_altbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_alt_title']?></div>
+	<button type="button" id="lpn_alt_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_alt_report" class="lpn-ff-report"></div>
+	</div>
+</div>
 <?php // THE FULL REPORT (ROADMAP Task 715). EPANET's Report > Full: every node and every link at
       // every reporting time step of the last run. Built in JS (rebuildFullReport) from the same
       // frames the Status report and the Tables pane read, so the three cannot disagree. Download
@@ -3191,6 +3202,19 @@ EngCalcs.pageConfig = {
 	lpn_scenario_deactivated: <?=json_encode($ec_lang['lpn_scenario_deactivated'])?>,
 	lpn_scenario_push_btn: <?=json_encode($ec_lang['lpn_scenario_push_btn'])?>,
 	lpn_scenario_push_tip: <?=json_encode($ec_lang['lpn_scenario_push_tip'])?>,
+	lpn_scenario_basic: <?=json_encode($ec_lang['lpn_scenario_basic'])?>,
+	lpn_scenario_basic_tip: <?=json_encode($ec_lang['lpn_scenario_basic_tip'])?>,
+	lpn_alt_title: <?=json_encode($ec_lang['lpn_alt_title'])?>,
+	lpn_alt_note: <?=json_encode($ec_lang['lpn_alt_note'])?>,
+	lpn_alt_cat_physical: <?=json_encode($ec_lang['lpn_alt_cat_physical'])?>,
+	lpn_alt_cat_demand: <?=json_encode($ec_lang['lpn_alt_cat_demand'])?>,
+	lpn_alt_cat_topology: <?=json_encode($ec_lang['lpn_alt_cat_topology'])?>,
+	lpn_alt_cat_initial: <?=json_encode($ec_lang['lpn_alt_cat_initial'])?>,
+	lpn_alt_cat_constituent: <?=json_encode($ec_lang['lpn_alt_cat_constituent'])?>,
+	lpn_alt_cat_fireflow: <?=json_encode($ec_lang['lpn_alt_cat_fireflow'])?>,
+	lpn_alt_cat_energy: <?=json_encode($ec_lang['lpn_alt_cat_energy'])?>,
+	lpn_alt_cat_userdata: <?=json_encode($ec_lang['lpn_alt_cat_userdata'])?>,
+	lpn_alt_cat_text: <?=json_encode($ec_lang['lpn_alt_cat_text'])?>,
 	lpn_scenario_push_confirm: <?=json_encode($ec_lang['lpn_scenario_push_confirm'])?>,
 	lpn_scenario_push_scenarios: <?=json_encode($ec_lang['lpn_scenario_push_scenarios'])?>,
 	lpn_scenario_push_values: <?=json_encode($ec_lang['lpn_scenario_push_values'])?>,

@@ -14,7 +14,9 @@
 //   3. the API mutating the overrides it reads, or a new key reaching the saved file.
 // Each section below asks one of those, on the real page code (the lpn-dom-stub.js technique).
 
-const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const { ROOT, setUnitSet, loadLoopedNetwork, ensure } = require('./lpn-dom-stub.js');
+// Read from the real lib/lang.ec.en.php the stub loads (dev/scripts/harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
 const fs = require('fs');
 
 let promptAnswer = 'Peak Hour';
@@ -34,6 +36,9 @@ const L = loadLoopedNetwork(
 	"\t\tcategoryOf: categoryOf, alternativesOf: alternativesOf, alternativeFor: alternativeFor,\n" +
 	"\t\tallAlternatives: allAlternatives, resolveThroughAlternatives: resolveThroughAlternatives,\n" +
 	"\t\talternativeOverrides: alternativeOverrides,\n" +
+	"\t\tscenarioMenuRows: scenarioMenuRows, openAlternativesBox: openAlternativesBox,\n" +
+	"\t\taltBoxIsOpen: altBoxIsOpen, wireAlternativesBox: wireAlternativesBox,\n" +
+	"\t\tbasicMode: function () { return scenarioBasicMode; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -230,6 +235,43 @@ console.log('\n--- no file changes ---');
 		ok(f + ': reading its alternatives changes no byte, and it round-trips unchanged',
 			once === again && L.projectFileText() === once);
 	});
+}
+
+// ---------------------------------------------------------------------------
+// 6. Scenarios > Basic mode: ticked by default, a browser setting, and unticked shows the table
+// ---------------------------------------------------------------------------
+console.log('\n--- Basic mode ---');
+{
+	const s = L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8'));
+	L.applySaved(s);
+	L.buildDom();
+	const pk = L.createScenario('Peak Hour');
+	L.setProp(L.getDoc().nodes.filter(function (n) { return n.type === 'junction'; })[0], 'demand', 999);
+	// The page's markup, which the stub builds only on request (Looped-Network.php holds the real one).
+	ensure('lpn_alt_box'); ensure('lpn_alt_report'); ensure('lpn_alt_close');
+	L.wireAlternativesBox();
+	function rows() { return L.scenarioMenuRows().filter(function (r) { return !r.separator; }); }
+	function basicRow() { return rows().filter(function (r) { return r.label.indexOf(PC.lpn_scenario_basic) >= 0; })[0]; }
+	function altRow() { return rows().filter(function (r) { return r.label === PC.lpn_alt_title; })[0]; }
+	let store = null;
+	try { store = global.localStorage.getItem('lpn_scnbasic'); } catch (e) {}
+	ok('Basic mode is on for a browser that never touched it, and nothing is stored', L.basicMode() && store === null);
+	ok('the Scenarios menu carries the row, ticked', basicRow() && basicRow().label.indexOf('✓') === 0);
+	ok('...and no Alternatives row while it is ticked', !altRow());
+	const fileBefore = L.projectFileText();
+	basicRow().fn();
+	ok('unticking it turns Basic mode off', !L.basicMode() && basicRow().label.indexOf('✓') !== 0);
+	ok('...stored in the browser as off', global.localStorage.getItem('lpn_scnbasic') === 'off');
+	ok('...and not in the project: the saved file is byte-identical', L.projectFileText() === fileBefore);
+	ok('the Alternatives row appears', !!altRow());
+	altRow().fn();
+	ok('it opens the Alternatives box', L.altBoxIsOpen());
+	const text = (function walk(el) { return (el.textContent || '') + (el.children || []).map(walk).join('|'); })(ensure('lpn_alt_report'));
+	ok('the table names every category', L.CATS.every(function (c) { return text.indexOf(PC['lpn_alt_cat_' + c]) >= 0; }));
+	ok('...and shows Peak Hour with its own Demand alternative of one value', text.indexOf(pk.name + ' (1)') >= 0);
+	basicRow().fn();
+	ok('ticking it again removes the stored key and closes the box',
+		L.basicMode() && global.localStorage.getItem('lpn_scnbasic') === null && !L.altBoxIsOpen());
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'ALL PASS'));

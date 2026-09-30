@@ -133,6 +133,10 @@ const EC_LPN_FURNITURE = [
     // whether somebody wants a progress dialog in front of them while a run goes is a fact about
     // the person at the screen. A colleague opening the file would otherwise inherit the answer.
     'lpn_runbox'      => 'whether the run progress box is shown at all, for this browser',
+    // Scenarios > Basic mode (dev/scenario-alternatives.md). The alternatives are derived from the
+    // overrides, so the mode changes no stored byte: it is how much scenario machinery the person
+    // at this screen wants shown, and a colleague opening the file must not inherit the answer.
+    'lpn_scnbasic'    => 'whether Scenarios > Basic mode is unticked, for this browser',
     'lpn_show_titles' => 'whether the page titles above the map are shown -- a reading preference '
                        . 'on this screen, and the four small-screen items of Task 486 turn it off',
     // The selection bubble's own "Show this" checkbox (Tom, 2026-09-08). Same side of the line as
