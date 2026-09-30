@@ -84,7 +84,8 @@
         "feat/ctrl-enter",
         "feat/fill-handle",
         "feat/selection-set",
-        "feat/pane-height"
+        "feat/pane-height",
+        "feat/table-tab-keys"
     ],
     "feature_freeze": {
         "active": false,
