@@ -356,6 +356,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_labels_customer_fields',
   'lpn_area_hint', 'lpn_labels_options', 'lpn_labels_popup', 'lpn_labels_popup_close', 'lpn_mode_hint', 'lpn_map_notice', 'lpn_map_overlay_tl',
   'lpn_popup', 'lpn_popup_close', 'lpn_popup_fields', 'lpn_popup_title', 'lpn_projects_btn',
+  // The graph at the foot of the Properties box (Task 637, revised).
+  'lpn_popup_graph',
   'lpn_projects_list', 'lpn_projects_popup', 'lpn_projects_popup_close',
   'lpn_settings_popup', 'lpn_settings_popup_close', 'lpn_status', 'lpn_toolbar',
   'lpn_project_file', 'lpn_inp_file', 'lpn_menubar', 'lpn_menu_popup', 'lpn_menu_list', 'lpn_dialog',

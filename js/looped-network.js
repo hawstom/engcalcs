@@ -28656,7 +28656,7 @@ var EngCalcs = EngCalcs || {};
 	function renderTimeSeries() {
 		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_ts_chart'),
 			note = document.getElementById('lpn_ts_note'),
-			frames, series, values = [], lay, xB, yB, box, svg, group, field, unit, now, dots;
+			frames, series, lay, group, field;
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (note) { note.textContent = ''; }
@@ -28684,9 +28684,6 @@ var EngCalcs = EngCalcs || {};
 			}
 			return;
 		}
-		series.forEach(function (s) {
-			s.points.forEach(function (p) { if (p.y !== undefined) { values.push(p.y); } });
-		});
 		// **SAID BEFORE THE CHART IS MEASURED**, which is load-bearing and is Task 527's lesson
 		// restated: this line shares the panel with the chart and wraps on a narrow one, so writing
 		// it afterwards would take height off the host the chart had just been laid out for, and the
@@ -28698,6 +28695,19 @@ var EngCalcs = EngCalcs || {};
 		}
 		lay = tsLayout(host);
 		tsLastSize = { w: lay.w, h: lay.h };
+		tsDraw(host, lay, frames, series, group, field);
+	}
+	// **THE ONE TIME-SERIES RENDERER** (Task 637, revised by Tom 2026-09-29). The bottom pane's
+	// tab and the graph at the foot of the Properties box both draw through this, so a second
+	// plotting idiom never enters the page: the axes, the `now` line, the breaks at a missing
+	// value and the hover numbers are one piece of code whichever box the chart sits in. Everything
+	// a caller decides -- which frames, which assets, which field, how big -- arrives as arguments;
+	// nothing here reads tsState.
+	function tsDraw(host, lay, frames, series, group, field) {
+		var pc = EngCalcs.pageConfig || {}, values = [], xB, yB, box, svg, unit, now, dots;
+		series.forEach(function (s) {
+			s.points.forEach(function (p) { if (p.y !== undefined) { values.push(p.y); } });
+		});
 		box = lay.box;
 		// The horizontal axis is TRUNCATED for the same reason the profile's vertical one is: a run
 		// may report only its later part (js/lpn-time.js's reportStart), and an axis anchored at
@@ -28796,6 +28806,145 @@ var EngCalcs = EngCalcs || {};
 				pc.lpn_ts_axis_time || 'Elapsed time',
 				{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
 		}
+	}
+
+	// ---- THE GRAPH AT THE FOOT OF THE PROPERTIES BOX (Task 637, revised) ------------------------
+	//
+	// Tom, 2026-09-29: *"But what we really want is a time series graph at the bottom of Properties
+	// for an EPS project; it should have a selector for all the properties that can be graphed for
+	// that asset."* One element, one line, drawn by tsDraw() -- the Time series tab's own renderer,
+	// so the two charts cannot come to disagree about an axis, a unit or the `now` line.
+	//
+	// **ONLY WHEN THERE IS A RUN, AND OTHERWISE NOTHING AT ALL.** The frames are
+	// EngCalcs.lpnTimeRunFrames(), the same list the tab reads, so a steady-state project, or an
+	// extended one not yet calculated, leaves the Properties box exactly as it always was: no
+	// heading, no empty frame, no sentence. And because the list is the run's, Recalculate OFF is
+	// honoured for free: the run is kept until a Calculate replaces it, so the graph is the same
+	// snapshot the map is showing.
+	//
+	// **ONE ELEMENT ONLY.** The multi-element Properties box carries no graph, although the Time
+	// series tab does draw one line per asset: that tab already takes the map selection through
+	// its Add selected button, and a selection of mixed kinds has no one property list to offer.
+	//
+	// **WHAT IS OFFERED IS WHAT THE RUN HAS FOR THIS ELEMENT, AND NOTHING ELSE.** The candidates
+	// are the fields that are RESULTS (a value per reporting step), in the map's own order; the
+	// typed inputs -- elevation, base demand, diameter, roughness, initial quality -- are not,
+	// because across a run they are a flat line that says nothing a reader did not type. Each
+	// candidate is then kept only if the run has at least one number for it on THIS element: a
+	// pump has no velocity, a reservoir no demand, and quality exists only when the analysis ran.
+	//
+	// A TANK'S PRESSURE IS LEFT OFF by name: colorNodeValue() deliberately reads it from the stored
+	// starting level (see its `pressure` branch), so over a run it is a flat line while the head
+	// above it moves. The head is the tank's moving reading, and it is offered.
+	var PG_FIELDS = {
+		node: ['pressure', 'head', 'demandActual', 'quality'],
+		link: ['velocity', 'flow', 'headloss', 'gradient', 'friction', 'status', 'quality', 'rate']
+	};
+	var PG_SKIP_BY_TYPE = { tank: { pressure: 1 } };
+	// **THE CHOSEN PROPERTY, PER ELEMENT TYPE, FOR THIS SESSION ONLY** -- tsState's standing: a
+	// reader's question, not a project setting and not a preference, so nothing is stored.
+	var pgFieldByType = {};
+	var pgLastWidth = null, pgWatching = false;
+	function pgSubject() {
+		var e;
+		if (!currentPopup) { return null; }
+		if (currentPopup.kind === 'node') {
+			e = nodeById(currentPopup.id);
+			return e ? { group: 'node', e: e } : null;
+		}
+		if (currentPopup.kind === 'link') {
+			e = linkById(currentPopup.id);
+			return e ? { group: 'link', e: e } : null;
+		}
+		return null;
+	}
+	// Every candidate field with its points over the run, keeping only those with a number in them.
+	function pgAvailable(group, e, frames) {
+		var skip = PG_SKIP_BY_TYPE[e.type] || {}, out = [];
+		(PG_FIELDS[group] || []).forEach(function (f) {
+			var any = false, pts;
+			if (skip[f]) { return; }
+			pts = frames.map(function (fr) {
+				var v = tsAsOfFrame(fr, function () { return colorValueOf(group, e, f); });
+				var ok = typeof v === 'number' && isFinite(v);
+				if (ok) { any = true; }
+				return { t: fr.t, y: ok ? v : undefined };
+			});
+			if (any) { out.push({ field: f, points: pts }); }
+		});
+		return out;
+	}
+	// The box redraws on a width change only: the chart host's height is fixed in CSS, and an
+	// observer firing on its own output is a loop (tsResizeWatch()'s guard, for the same reason).
+	function pgWatch(box) {
+		if (pgWatching || !window.ResizeObserver) { return; }
+		pgWatching = true;
+		new window.ResizeObserver(function () {
+			var w = box.getBoundingClientRect().width;
+			if (!(w > 0) || (pgLastWidth !== null && Math.abs(pgLastWidth - w) < 1)) { return; }
+			propGraphSync();
+		}).observe(box);
+	}
+	function propGraphSync() {
+		var box = document.getElementById('lpn_popup_graph'), pc = EngCalcs.pageConfig || {},
+			subj, frames, avail, field, pick, row, lab, sel, host, note, lay, i;
+		if (!box) { return; }
+		pgWatch(box);
+		clearFields(box);
+		subj = pgSubject();
+		frames = subj && EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
+		if (!subj || !frames.length) { box.style.display = 'none'; pgLastWidth = null; return; }
+		box.style.display = '';
+		avail = pgAvailable(subj.group, subj.e, frames);
+
+		row = document.createElement('div');
+		row.className = 'lpn-pgraph-row';
+		lab = document.createElement('label');
+		lab.htmlFor = 'lpn_pgraph_field';
+		// "Time series", the tab's own name: this is that graph, for one asset.
+		lab.textContent = pc.lpn_ts_menu || 'Time series';
+		row.appendChild(lab);
+		box.appendChild(row);
+		if (!avail.length) {
+			// A run exists and holds nothing for this element -- one added or renamed since the run,
+			// with Recalculate off. Said, never drawn as empty axes (renderTimeSeries()'s rule).
+			note = document.createElement('div');
+			note.className = 'lpn-profile-say';
+			note.id = 'lpn_pgraph_note';
+			note.textContent = pc.lpn_pgraph_none || 'This asset has no results in the current run.';
+			box.appendChild(note);
+			pgLastWidth = box.getBoundingClientRect().width;
+			return;
+		}
+		field = pgFieldByType[subj.e.type];
+		pick = avail[0];
+		for (i = 0; i < avail.length; i++) { if (avail[i].field === field) { pick = avail[i]; } }
+
+		sel = document.createElement('select');
+		sel.id = 'lpn_pgraph_field';
+		sel.className = 'lpn-ts-pick ec-help';
+		sel.title = pc.lpn_ts_quantity_tip || 'Which value to graph against time.';
+		avail.forEach(function (a) {
+			var op = document.createElement('option');
+			op.value = a.field; op.textContent = colorFieldLabel(subj.group, a.field);
+			sel.appendChild(op);
+		});
+		sel.value = pick.field;
+		sel.addEventListener('change', function () {
+			pgFieldByType[subj.e.type] = sel.value;
+			propGraphSync();
+		});
+		row.appendChild(sel);
+
+		host = document.createElement('div');
+		host.id = 'lpn_pgraph_chart';
+		host.className = 'lpn-pgraph-chart';
+		box.appendChild(host);
+		lay = tsLayout(host);
+		pgLastWidth = box.getBoundingClientRect().width;
+		tsDraw(host, lay, frames, [{ id: subj.e.id, color: LPN_TS_COLORS[0], points: pick.points }],
+			subj.group, pick.field);
+		initTipsIn(box);
 	}
 
 	// Maps a tool mode to its pageConfig mode-hint key -- see the lang keys' own comment for why
@@ -49463,6 +49612,9 @@ var EngCalcs = EngCalcs || {};
 			popup.style.width = popupUserSize.w + 'px';
 			popup.style.height = popupUserSize.h + 'px';
 		}
+		// The graph at the foot (Task 637) is built once the box has a width to lay it out in, and
+		// before the fit below measures the box's height with it inside.
+		propGraphSync();
 		// **RAISED HERE, WHERE IT BECOMES VISIBLE** (Tom, 2026-09-05: *"When an asset is clicked and
 		// its properties box opens, it is hidden under Libraries... It needs to win at the moment the
 		// asset is clicked."*). The property popup is the one panel that does NOT go through
@@ -49643,6 +49795,7 @@ var EngCalcs = EngCalcs || {};
 	function renameNode(oldId, newId) {
 		applyNodeRename(oldId, newId);   // currentPopup is kept in step inside it -- see above
 		renderNodeFields(newId);
+		propGraphSync();
 		// lastSolveResult's pressures are keyed by the OLD id -- without a fresh solve, the
 		// pressure label would silently vanish for this node until the next unrelated edit.
 		scheduleSolve();
@@ -49690,6 +49843,7 @@ var EngCalcs = EngCalcs || {};
 	function renameLink(oldId, newId) {
 		applyLinkRename(oldId, newId);   // currentPopup is kept in step inside it -- see above
 		renderLinkFields(newId);
+		propGraphSync();
 		scheduleSolve();
 	}
 	// ---- "Apply to all": re-prefix every element of one kind ----
@@ -52063,6 +52217,9 @@ var EngCalcs = EngCalcs || {};
 		else if (currentPopup.kind === 'multi') { if (selectionCount()) { openMultiProperties(); } else { closePopup(); } }
 		else if (currentPopup.kind === 'customer') { renderCustomerFields(currentPopup.id); }
 		else { renderLabelFields(currentPopup.id); }
+		// Every refresh, which includes every step of the transport: that is what moves the `now`
+		// line on the Properties graph (Task 637), exactly as the Time series tab's refresh does.
+		propGraphSync();
 	}
 
 	// Multi-step undo, in memory only (not localStorage) -- ROADMAP Task 146 Phase 1's own listed

@@ -4720,6 +4720,15 @@ tr.lpn-ff-error { background: #f2f2f2; }
 	display: inline-block; width: 1.1em; height: 0; margin-right: .35em;
 	border-top: 2px solid currentColor; vertical-align: middle;
 }
+/* ---- The graph at the foot of the Properties box (Task 637, revised) -------------------------
+   Drawn by the same renderer as the Time series tab, so every mark above applies unchanged. The
+   host has a FIXED, modest height and a fluid width: the box is narrow and on a phone it is most of
+   the screen, so the chart takes the box's width and never more than about a third of a tall
+   phone's height. The row above it is one label and one pull-down that may wrap. */
+.lpn-pgraph { margin-top: .5em; padding-top: .4em; border-top: 1px solid #ddd; }
+.lpn-pgraph-row { display: flex; flex-wrap: wrap; align-items: center; gap: .25em .5em; }
+.lpn-pgraph-row .lpn-ts-pick { max-width: 100%; }
+.lpn-pgraph-chart { width: 100%; height: 150px; }
 /* ---- The saved-path menu on the Profile tab (Task 510) ---------------------------------------
    An arrow ON the tab, not a second tab and not a toolbar button: Tom's placement, 2026-08-24, and
    it puts the list of names where the thing they name already lives.
