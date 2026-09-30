@@ -28893,7 +28893,7 @@ var EngCalcs = EngCalcs || {};
 		clearFields(box);
 		subj = pgSubject();
 		frames = subj && EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
-		if (!subj || !frames.length) { box.style.display = 'none'; pgLastWidth = null; return; }
+		if (!subj || !frames.length) { hidePanel(box); pgLastWidth = null; return; }
 		appearing = box.style.display === 'none';
 		box.style.display = '';
 		avail = pgAvailable(subj.group, subj.e, frames);
