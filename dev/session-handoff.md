@@ -127,7 +127,7 @@ in 16 languages that had "Go to map"); Task 711 (`fix/new-project-view`); Task 7
 
 ### Awaiting his words -- https://claude.ai/artifact/J5Vb4829NzQYnwFWuHBkRm (answers in its db, `answers/*`)
 
-Label rules from round 5 (`dev/label-trials/round-5-2026-09-29.md` on `feat/label-placer`), Task 738
+Label rules from round 5 (the round-5 record lives only on branch `feat/label-placer`, in its label-trials folder), Task 738
 (Declan vs Ida), Task 699 merges (`dev/key-duplication-audit-2026-09-30.md`), Head vs HGL (737), Help
 menu labels and where Notes goes, the copied-file lock (747), keyboard menus. Read the answers with
 ArtifactData `list` on collection `answers` before anything else. Review queue R-338/R-351 still `[?]`.
