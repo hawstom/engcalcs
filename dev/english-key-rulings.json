@@ -1605,9 +1605,9 @@
             "ruled": "2026-08-29"
         },
         "lpn_find_shift_hint": {
-            "on": "Shift+click to add/remove toggle.",
+            "on": "Shift+click to toggle, adding if not in the selection set or removing if already in the selection set.",
             "ruled": "2026-09-29",
-            "answer": "Edited."
+            "answer": "His own wording, written into dev/new-english-keys.md in place of the old string."
         },
         "lpn_fitting_add": {
             "on": "Add a fitting",
@@ -1815,7 +1815,7 @@
         "lpn_goto_on_map": {
             "on": "Go to on map",
             "ruled": "2026-09-29",
-            "answer": "OK."
+            "answer": "Add a canonical or _syn entry \"Bring this into view on the map, Zoom to this on the map, Show this on the map\""
         },
         "lpn_gpv_curve_source": {
             "on": "Valve head loss curve",
