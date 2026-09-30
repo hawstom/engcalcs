@@ -86,7 +86,18 @@
         "feat/selection-set",
         "feat/pane-height",
         "feat/table-tab-keys",
-        "feat/frequency-plot"
+        "feat/frequency-plot",
+        "feat/help-menu",
+        "feat/fireflow-scope",
+        "feat/property-graph",
+        "feat/label-placer",
+        "feat/label-placer-a",
+        "feat/label-placer-b",
+        "feat/label-placer-c",
+        "feat/label-placer-d",
+        "feat/find-filter",
+        "feat/copy-lock",
+        "feat/bentley-interop"
     ],
     "feature_freeze": {
         "active": false,
