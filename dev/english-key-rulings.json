@@ -4400,6 +4400,11 @@
             "on": "P as annual energy",
             "ruled": "2026-09-06"
         },
+        "points_data_heading": {
+            "on": "Calculator data<br />(use Copy to see format)",
+            "ruled": "2026-09-30",
+            "answer": "For mi and wi calculators, reword Points Data to \"Calculator data (use Copy to see format)\""
+        },
         "u_day": {
             "on": "day",
             "ruled": "2026-09-01"
