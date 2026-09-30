@@ -1806,7 +1806,7 @@ $ec_lang['lpn_ts_axis_time']='Elapsed time';
 // title. {n} and {total} are counts, {time} an elapsed time; all substituted, never concatenated.
 // The Junctions/Pipes choice reuses lpn_pane_tab_junctions and lpn_pane_tab_pipes.
 $ec_lang['lpn_freq_menu']='Frequency';
-$ec_lang['lpn_freq_tip']='Graph how one value is spread over all junctions or all pipes, at the time the map is showing.';
+$ec_lang['lpn_freq_tip']='Graph the frequency distribution of one property over all junctions or all pipes at the current time step.';
 $ec_lang['lpn_freq_title']='Distribution of values';
 $ec_lang['lpn_freq_group_tip']='Whether the graph shows junctions or pipes.';
 $ec_lang['lpn_freq_quantity_tip']='Which value to graph.';
