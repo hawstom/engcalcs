@@ -327,6 +327,14 @@ the block.
   to pay the privacy line if we get value."* His prompt instead: on open, when the server holds a lock
   this browser does not remember, ask *"Is this the Original file (keep same lock) or a Copy (make
   new lock)?"* Building on `feat/copy-lock`.
+- 100|750| **Ready-made scenarios in every new project.**
+  Tom, 2026-09-30: *"could we provide some pre-packaged Scenarios in all new projects? ... '1. Flow
+  test: Static, 2. Flow test: Mid, 3. Flow test: Max, 4. Average Day, 5. Max Day, 6. Peak hour,
+  7. Fire plus max day'"*. Building on `feat/scenario-preset`; flows for the flow tests are not guessed.
+- 100|751| **Criticality analysis: break each asset in turn and report.**
+  Tom, 2026-09-30, on WaterGEMS's Criticality tool: *"This sounds like a fun report to build. Break
+  each asset and report."* Fire flow's sibling: scope All/Selected, each pipe out of the network on
+  a copy, report cut-off junctions, low pressures and demand not served. Building on `feat/criticality`.
 - 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
@@ -525,6 +533,16 @@ the block.
   Phase 1 (`feat/bentley-interop`, `dev/bentley-interop.md`): the `.wtg.sqlite` schema is unpublished,
   no public sample exists, the EULA's reverse-engineering clause is his to read; writing is a no-go.
   Next: he exports one of his own WaterCAD models to `.inp` and we report what the round trip loses.
+- 75|752| **A scenario workbook: the scenario list and its data as spreadsheet tabs.**
+  Tom, 2026-09-30, on Gemini's master-spreadsheet layout (a Scenarios tab naming each scenario's
+  alternatives, then one tab per data kind keyed by element ID): *"Spreadsheet structure: I love
+  this."* and *"Sync in/out: Could we do this with GSheets?"* Export/import as a file first (no
+  account, no upload); a Google Sheets sync is a fifth third-party service, so a `privacy.php`
+  paragraph and his call. Mary, Sue and Declan's readings are under Task 721.
+- 75|753| **[H] · "Activation" as our word for EPANET's active status.**
+  Tom, 2026-09-30, on Bentley's "Active Topology": *"I like the alias 'Activation' or 'Asset
+  activation'."* We already have it: the Properties checkbox `lpn_field_active`, "Part of this
+  network", scenario-overridable. His call: which strings change, and to what.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted

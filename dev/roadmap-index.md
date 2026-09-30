@@ -7,9 +7,9 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**109 open tasks.** Next (100): 15 · Soon (75): 16 · Someday (50): 44 · Maybe (25): 15 · Parked (5): 19
+**113 open tasks.** Next (100): 17 · Soon (75): 18 · Someday (50): 44 · Maybe (25): 15 · Parked (5): 19
 
-## 100 — Next (15)
+## 100 — Next (17)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 637 — A Graph button on the Properties box.
@@ -26,8 +26,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 745 — Help menu in three groups, and a Tables and Hotkeys box.
 - Task 746 — Fire flow dialog: one All/Selected choice for each of its two scopes.
 - Task 747 — A copied project file shares its original's lock.
+- Task 750 — Ready-made scenarios in every new project.
+- Task 751 — Criticality analysis: break each asset in turn and report.
 
-## 75 — Soon (16)
+## 75 — Soon (18)
 
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
@@ -45,6 +47,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 739 — Say where each setting is saved: the project or this browser.
 - Task 748 — Keyboard menus: arrow keys, Enter, Escape and the fly-outs.
 - Task 749 — Read Bentley WaterCAD/WaterGEMS models.
+- Task 752 — A scenario workbook: the scenario list and its data as spreadsheet tabs.
+- Task 753 — [H] · · "Activation" as our word for EPANET's active status.
 
 ## 50 — Someday (44)
 
@@ -137,5 +141,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-100 of 109 titles are within 4–12 words. `!` marks the rest;
+104 of 113 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
