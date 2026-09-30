@@ -7,15 +7,16 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**110 open tasks.** Next (100): 14 · Soon (75): 17 · Someday (50): 45 · Maybe (25): 15 · Parked (5): 19
+**109 open tasks.** Next (100): 15 · Soon (75): 15 · Someday (50): 45 · Maybe (25): 15 · Parked (5): 19
 
-## 100 — Next (14)
+## 100 — Next (15)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 637 — A Graph button on the Properties box.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
+- Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
 - Task 699 — Audit the language keys for lazy duplications.
 - Task 718 — File menu: Recents just above Close, and an Import submenu.
 - Task 737 — Coined names for interface elements, so every language names each one once.
@@ -26,11 +27,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 745 — Help menu in three groups, and a Tables and Hotkeys box.
 - Task 746 — Fire flow dialog: one All/Selected choice for each of its two scopes.
 
-## 75 — Soon (17)
+## 75 — Soon (15)
 
-- Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
-- ! Task 322 — Convert standing advisories into checks, and survey for the ones nobody has named.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - Task 600 — The three EPANET plots we do not have: contour, frequency, flow balance.
@@ -138,5 +137,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-100 of 110 titles are within 4–12 words. `!` marks the rest;
+100 of 109 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

@@ -408,7 +408,7 @@ question about paths.
 
 ### Pre-sprint checklist (complete before proposing)
 
-0. **Wave 0, mechanized: the adversarial English pass.** One agent, English only, over the new and
+0. **Wave 0, mechanized: the adversarial English pass.** **It pays for NEW English only**: measured at 11.6% rewrites on freshly written `lpn_` UI (26 of 225) against 1.4% on mature calculator labels (6 of 415), ROADMAP Task 239. One agent, English only, over the new and
    changed strings. It does **not** ask "is this string good?" — a fluent English reader answers yes
    to almost everything, which is why one Wave 0 that reviewed 226 keys and rewrote 51 still shipped
    "Zoom to fit" and "Restore defaults". It asks **"list every plausible reading of this string; if

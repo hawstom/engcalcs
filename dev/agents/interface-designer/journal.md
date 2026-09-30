@@ -3494,3 +3494,75 @@ not speak for individually.
 Provenance: OBSERVED for all code citations above. SPECULATION for the "reuse Verdict-style marker
 language" suggestion — no existing dimmed/no-longer-matches row style was found in this codebase to
 point to; this is my own inference from the suite's marker-string convention, not a found precedent.
+
+---
+
+## 2026-09-29 — Task 738: standing vs. snapshot filter, a hierarchy reading
+
+The prior entry (2026-09-28) recommended snapshot-BY-DEFAULT with no new toggle. Tom's own
+follow-up brief (quoted in the 2026-09-29 task) chose the opposite shape — standing stays default,
+a toggle adds snapshot as an opt-in — so this entry works inside HIS decision rather than
+re-arguing default-snapshot; wishlist item 48 is marked superseded rather than deleted.
+
+OBSERVED `js/looped-network.js:22702-22716`: the filter is architecturally a single stored QUERY
+STRING per table (`paneFilters`), re-asked against `findSelectByQuery()` on every draw — deliberately,
+per the comment's own rationale (*"a snapshot of ids would be a report about a network that has moved
+on"*). Tom's ask does not overturn that default; it asks for an opt-in second mode that pins the row
+SET (not the query) at click time. The two modes need different storage: standing keeps the string
+live; snapshot needs to capture and hold `keys` (the `group:id` map `paneFilterKeys()` already builds)
+at the moment "Filter in table" is pressed, then union it with the live match set (row still shown if
+either the frozen key list OR the live query still admits it — a row that newly starts matching after
+snapshot should still be a defect to think through, but is not this task's question).
+
+**Naming — reuse over invention.** OBSERVED CLAUDE.md: *"Recalculate OFF means a snapshot, never hide
+or delete. Stale results stay on screen..."* — this suite already teaches the visitor the word
+**Snapshot** for exactly this shape of behavior (something stays visible after it stops being current).
+Tom's own proposal used the word. There is no EPANET precedent for a filtered-table freeze (its Map
+Browser has no live-updating table at all), so "EPANET-first" has nothing to defer to here — the
+correct instruction is "house-first": don't invent a second word for a concept this app already named
+once. Recommend the toggle be labeled **Snapshot**, not "Freeze", "Pin", "Hold" or "Lock" (all
+plausible, none already load-bearing here).
+
+**Where it sits.** `buildFilterRow()` (`js/looped-network.js:19160-19177`) builds one row:
+`[Find] [Filter in table]`. Recommend the Snapshot control lands in that same row, immediately after
+"Filter in table", as a checkbox with the single-word label "Snapshot" and an `.ec-help` tip (per
+CLAUDE.md's `ecTipLabel()` rule — one `?`, the tip carries the explanation, never the title
+attribute). Same row = read as a modifier of the button before it, not a new feature; a checkbox
+below or in a separate popup section would read as an independent setting and cost more attention
+than the feature is worth. Left it unchecked-by-default so the shipped, argued-for standing behavior
+is unchanged for everyone who never touches the toggle — the cheapest possible move, cost-wise, is
+"add one checkbox," not "change default behavior."
+
+**Marking a row that stopped matching.** Two existing opacity conventions in this repo, not proposals:
+OBSERVED `css/engcalcs.css:962` `.lpn-inactive { opacity: 0.3 }` (map symbols for OFF elements) and
+`css/engcalcs.css:3133` `.lpn-dim { opacity: .7 }` / `:3434` `.lpn-set-row` at `.8` (settings-pane
+secondary text). `.lpn-inactive`'s 0.3 is calibrated for a symbol glanced at on a map, not for a data
+row a reader may still want to read the numbers off of — recommend a NEW row-level class at `.7`
+(matching `.lpn-dim`, the closer precedent since both are "still present, still readable, now
+secondary") rather than reusing `.lpn-inactive` at 0.3, which would make the very numbers Tom wants to
+compare hard to read. Opacity alone fails print and fails anyone relying on the row's numbers rather
+than its color, so pair it with a leading glyph. OBSERVED CLAUDE.md: *"Verdict strings lead with ✓ or
+⚠, never a marker word."* Recommend the row's own ID cell (already carrying `findRowId()`-style text)
+gets a leading `⚠` on a no-longer-matching row, with the tip carrying the sentence — reusing a mark
+this repo has already taught means "something changed, look here," not inventing a new glyph
+vocabulary for one feature.
+
+**The count.** OBSERVED CLAUDE.md: *"a filtered table SAYS what it is filtered by, in the query's own
+words, above the rows"* — `findFilterRowText()` (`js/looped-network.js:19112-19119`) already renders
+that receipt banner, `{table}: {n} of {all}`. Recommend the "no longer match" count rides in THAT same
+banner as a third clause when Snapshot is on and the count is nonzero (e.g. a new key
+`lpn_find_filter_snapshot_note` = `'{n} no longer match.'`, appended), rather than a second banner or a
+badge floating near the checkbox. One receipt, one place a reader already checks after filtering, is
+cheaper in both translation cost (one key, not a UI region) and reading cost (no new place to look)
+than a standalone counter.
+
+**Crowding.** The find popover is narrow (`padding:40px 8px 8px`, `.lpn-findbox`). A second full-width
+control below the filter row would compete with the query builder above it for the box's limited
+height; a checkbox appended to the existing one-line filter row costs no new vertical space at typical
+widths and only wraps at the box's narrowest, which the row's two buttons already risk doing in
+long-word RTL languages — not a new failure mode, an existing one inherited.
+
+**Ranked, if only one thing ships before demo:** ship the Snapshot toggle + row dimming class first
+(the visible defect Tom named); the ⚠ glyph and the banner count are the second and third increments
+and can trail without leaving the first change silently wrong — a dimmed-but-unmarked row is at least
+visibly DIFFERENT from a live row, which is most of the fix.

@@ -88,7 +88,7 @@ $ec_lang['template_printable_subtitle']='אזור כותרת משנה להדפס
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='האם נוכל לשמור ספרה אחת בלבד לכל עמוד באחסון של פרופיל דפדפן זה, כדי למנוע רישום חוזר של ביקוריו?';
+$ec_lang['consent_body']='האם נוכל לשמור עוגיית ספרה אחת בדפדפן זה כדי לזכור שכבר ספרנו עמוד זה? היא אינה רושמת דבר עליכם ולא דבר שאתם מקלידים. בלעדיה, לא נוכל להבחין בין הביקור השני שלכם לביקור הראשון של מישהו אחר.';
 $ec_lang['consent_accept']='אשר בקשה זו';
 $ec_lang['consent_accept_all']='אשר תמיד';
 $ec_lang['consent_decline']='דחה תמיד';
@@ -441,7 +441,7 @@ $ec_lang['install_desktop_heading']='מחשב שולחני (Chrome / Edge)';
 // Edited by TGH 2026-09-07
 $ec_lang['install_desktop_steps_html']='<li>פתחו כל דף מחשבון.</li><li>לחצו על <strong>סמל ההתקנה</strong> (⊕ או סמל מחשב) בשורת הכתובת של הדפדפן, או פתחו את תפריט הדפדפן ובחרו <strong>התקן את EngCalcs…</strong></li><li>לחצו על <strong>התקנה</strong>. ‏EngCalcs ייפתח כחלון אפליקציה עצמאי.</li>';
 $ec_lang['install_firefox_heading']='Firefox / דפדפנים אחרים';
-$ec_lang['install_firefox_body']='‏Firefox אינו תומך בהתקנת אפליקציות PWA במחשב שולחני. עדיין ניתן להשתמש בכל המחשבונים כרגיל בדפדפן — לאחר הביקור הראשון, הדפים נשמרים במטמון באופן אוטומטי לשימוש ללא אינטרנט.';
+$ec_lang['install_firefox_body']='אם בדפדפן שלכם אין אפשרות התקנה, שום דבר לא הולך לאיבוד: השתמשו במחשבונים כרגיל בדפדפן, ולאחר הביקור הראשון הדפים נשמרים במטמון באופן אוטומטי לשימוש ללא אינטרנט. Firefox במחשב שולחני הוא המקרה הנפוץ.';
 $ec_lang['install_cached_heading']='מה נשמר במטמון';
 $ec_lang['install_cached_body']='בפעם הראשונה שבה אתם מתקינים את EngCalcs, כל דפי המחשבונים והקבצים התומכים בהם (סקריפטים, עיצוב) נשמרים במכשיר שלכם באופן אוטומטי. לאחר מכן, הכול פועל ללא חיבור לאינטרנט. בחירת השפה שלכם נשמרת מהביקור המקוון האחרון שלכם.';
 $ec_lang['contact_main_menu']='צור קשר';
@@ -599,7 +599,7 @@ $ec_lang['bpn_upstream_tip']='מזהה הקו המזין קו זה. השאירו
 $ec_lang['bpn_roughness_tip']='חספוס הצנרת עבור שיטת החיכוך שנבחרה: n של Manning, C של Hazen-Williams, או גובה חספוס e של Darcy-Weisbach (אורך). צינור פלסטיק חלק אופייני: n כ-0.009, C כ-150, e כ-0.0015 מ״מ.';
 $ec_lang['bpn_demand']='דרישה';
 // Edited by TGH 2026-09-07
-$ec_lang['bpn_demand_tip']='ספיקה קבועה המסופקת בקצה מורד הזרם של קו זה. השאירו ריק עבור קו שרק מעביר ספיקה הלאה.';
+$ec_lang['bpn_demand_tip']='ספיקה קבועה המסופקת בקצה מורד הזרם של קו זה.';
 $ec_lang['bpn_demand_mult']='מכפיל דרישה';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_demand_mult_tip']='מכפיל את דרישת כל הקווים בבת אחת, להרצת שעת שיא או צמיחה עתידית. השתמשו ב-1 עבור הדרישות כפי שהוזנו.';
@@ -640,7 +640,7 @@ $ec_lang['bpn_h_supply_tip']='גובה המקור בספיקת התכנון, נ�
 $ec_lang['bpn_show_elevation']='רום';
 $ec_lang['bpn_supply1_h']='גובה אספקה סטטי';
 $ec_lang['lpn_main_menu']='רשת אספקת מים';
-$ec_lang['lpn_main_title']='מחשבון חינמי מקוון לרשת חלוקת מים עם פותר EPANET';
+$ec_lang['lpn_main_title']='מידול חינמי מקוון לרשת חלוקת מים עם פותר EPANET';
 $ec_lang['lpn_main_desc']='ניתוח רשת אספקת מים: ציירו רשת צנרת טבעתית או ייבאו קובצי EPANET';
 $ec_lang['lpn_title_units']='יחידות {units}';
 $ec_lang['lpn_tool_select']='בחירה';
@@ -918,11 +918,11 @@ $ec_lang['lpn_offscreen_intact']='הרשת שלכם שלמה.';
 // lpn_main_title still names EPANET, which is where a search engine reads it, and that claim is
 // true and stays.
 $ec_lang['lpn_examples_welcome']='ברוכים הבאים למידול רשתות אספקת מים, עם פותר EPANET';
-$ec_lang['lpn_examples_heading']='פתיחת דוגמה';
+$ec_lang['lpn_examples_heading']='פתחו עותק משלכם של דוגמה';
 $ec_lang['lpn_examples_sub']='כל דוגמה נפתחת כעותק משלכם. שנו אותה, שמרו אותה, או פתחו עותק חדש והתחילו מחדש.';
 $ec_lang['lpn_examples_open']='פתח';
 $ec_lang['lpn_examples_menu']='פתיחת דוגמה…';
-$ec_lang['lpn_examples_blank']='או התחילו במפה ריקה';
+$ec_lang['lpn_examples_blank']='או התחילו כאן';
 // The SAME exit, worded for the other way in. Opened from File the user already has work on
 // screen, so "start with a blank map" reads as "discard it" and they do not dare press the
 // only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
@@ -967,7 +967,7 @@ $ec_lang['lpn_ex_basic_us_desc']='אותה רשת פתיחה בגלונים לד
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
-$ec_lang['lpn_ex_net1_title']='EPANET Net1';
+$ec_lang['lpn_ex_net1_title']='EPANET Net1 בתוספת בקרות מבוססות-חוקים';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net1_desc']='הקטנה מבין שלוש רשתות הדוגמה של EPANET עצמו: מאגר אחד, משאבה וטבעת יחידה.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2';
@@ -977,7 +977,7 @@ $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='הדוגמה הגדולה של EPANET: 92 צמתים, 3 מכלים ו-2 מאגרים, אחד מהם נהר. כדאי לפתוח כדי לראות איך נראה על המפה מודל בגודל אמיתי.';
 $ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='אותה רשת כמו EPANET Net3, ממוקמת במקום שרירותי על כדור הארץ: הקואורדינטות שלה הן קו רוחב וקו אורך, ומפת רחובות מצוירת מאחוריה.';
+$ec_lang['lpn_ex_net3_world_desc']='רשת EPANET Net3 הומרה לקו רוחב/קו אורך באזור נובאטו, קליפורניה, עם מפת העולם מוצגת מאחוריה.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='אתר מסחרי שנפתר עבור ספיקת כיבוי אש בנוסף לדרישת יום השיא, ברגע זמן אחד, משורטט מעל תוכנית האתר.';
 $ec_lang['lpn_tool_undo']='בטל';
@@ -1012,7 +1012,7 @@ $ec_lang['lpn_status_converted']='{n} ערכים נכתבו מחדש ל-{unit}.'
 $ec_lang['lpn_tool_color_tip']='צביעת הרשת לפי גודל אחד, כך שמפה גדולה ניתנת לקריאה במבט אחד. לחץ ומהירות הם השניים החשובים בדרך כלל.';
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
-$ec_lang['lpn_units_length']='אורך וקואורדינטות מפה';
+$ec_lang['lpn_units_length']='אורך';
 // The derived line: degrees for lat/lon, the coordinate system's own unit for an EPSG plane, and
 // the length unit for a local grid. A display of what the coordinate system says, never an input.
 $ec_lang['lpn_units_mapcoords']='קואורדינטות מפה';
@@ -1056,7 +1056,7 @@ $ec_lang['lpn_result_status_open']='פתוח';
 $ec_lang['lpn_result_status_closed']='סגור';
 $ec_lang['lpn_result_head']='גובה';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_result_head_tip']='האנרגיה של המים בצומת זה, רשומה כגובה טור מים. זהו גובה, לא לחץ.';
+$ec_lang['lpn_result_head_tip']='אנרגיית המים בצומת זה (העומד), רשומה כגובה טור מים. זהו גובה מוחלט, ואילו הלחץ הוא מדידת מד.';
 $ec_lang['lpn_result_pressure']='לחץ';
 $ec_lang['lpn_result_flow']='ספיקה';
 $ec_lang['lpn_result_velocity']='מהירות';
@@ -1333,7 +1333,7 @@ $ec_lang['lpn_pane_filter_none']='שום דבר בטבלה זו אינו תוא�
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='התקרבות ובחירה';
-$ec_lang['lpn_goto_on_map']='מעבר במפה';
+$ec_lang['lpn_goto_on_map']='הצגה במפה';
 $ec_lang['lpn_pane_select_on_map']='בחירה במפה';
 $ec_lang['lpn_pane_unselect_on_map']='ביטול בחירה במפה';
 $ec_lang['lpn_pane_print']='הדפסת טבלה';
@@ -1472,7 +1472,7 @@ $ec_lang['lpn_find_op_lt']='קטן מ';
 $ec_lang['lpn_find_op_empty']='ריק';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} נמצאו. לחצו על אחד כדי לעבור אליו.';
-$ec_lang['lpn_find_shift_hint']='Shift+לחיצה כדי להוסיף/להסיר (החלפה).';
+$ec_lang['lpn_find_shift_hint']='Shift+לחיצה כדי להחליף: הוספה אם אינו בבחירה, הסרה אם כבר נמצא בבחירה.';
 $ec_lang['lpn_find_none']='שום דבר לא תאם.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1940,7 +1940,7 @@ $ec_lang['lpn_lock_open_readonly']='פתח לקריאה בלבד';
 // "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
 // "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
 // trying not to encourage. "Create a copy" says what happens and claims nothing.
-$ec_lang['lpn_lock_break']='שבור את הנעילה שלו';
+$ec_lang['lpn_lock_break']='שבור נעילה';
 // **TASK 667(b): NOBODY IS ASKED FOR A NAME UNTIL A COLLEAGUE ACTUALLY WANTS THE FILE** (Tom,
 // 2026-09-17). The page used to ask the FIRST user for initials the first time they saved, for a
 // name nobody would ever read unless a colleague happened to collide with them -- and on a site
@@ -2006,7 +2006,7 @@ $ec_lang['lpn_lock_readonly_banner']='קריאה בלבד: {name} פתח קוב�
 $ec_lang['lpn_lock_unavailable']='שימו לב: לא ניתן היה להגיע לשרת כדי לבדוק או ליצור נעילה על פרויקט זה, כך ששום דבר אינו מונע מעמית לערוך את אותו קובץ באותו זמן. תקבלו הודעה אם הנעילה תתחיל לפעול שוב.';
 $ec_lang['lpn_lock_storage_error']='שימו לב: אתר זה אינו יכול לשמור רשומות נעילה, כך ששום דבר אינו מונע מעמית לערוך את אותו קובץ באותו זמן. זהו כשל בהגדרות השרת, לא משהו שתוכלו לתקן כאן — תיקיית הנעילה אינה ניתנת לכתיבה על ידי שרת האינטרנט.';
 $ec_lang['lpn_lock_full_error']='שימו לב: לאתר זה נגמר המקום לתעד מי פתח איזה פרויקט, כך ששום דבר אינו מונע מעמית לערוך את אותו קובץ באותו זמן. זהו כשל בהגדרות השרת, לא משהו שתוכלו לתקן כאן.';
-$ec_lang['lpn_lock_not_asked']='הנעילה אינה פועלת עבור פרויקט זה, כך ששום דבר אינו מונע מעמית לערוך את אותו קובץ באותו זמן. לדפדפן זה אין עדיין שם רשום עבורכם, או שלפרויקט אין מזהה — שמירת הפרויקט לקובץ קובעת את שניהם.';
+$ec_lang['lpn_lock_not_asked']='הנעילה אינה פועלת עבור פרויקט זה, כך ששום דבר אינו מונע מעמית לערוך את אותו קובץ באותו זמן. לפרויקט זה אין עדיין מזהה, ושמירתו לקובץ מקנה לו אחד.';
 $ec_lang['lpn_lock_restored']='הנעילה חזרה לפעול, וקובץ זה כעת שלכם לשמירה אליו.';
 $ec_lang['lpn_lock_dismiss']='הסתר הודעה זו';
 // Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
@@ -2084,8 +2084,8 @@ $ec_lang['lpn_notes_1_term']='כיצד זה נפתר';
 // lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
-$ec_lang['lpn_notes_1_def']='כל רגע נפתר באמצעות אותו אלגוריתם שיפוע גלובלי ש-EPANET משתמש בו. הגדירו משך ריצה כולל ופותר EPANET מחשב כל צעד דיווח בתורו: מכלים מתמלאים ומתרוקנים, דרישות עוקבות אחר התבניות שלהן, וסרגל הכלים מנגן את ההרצה בחזרה. הפותר המובנה מחשב רגע אחד בכל פעם ומחזיק כל מכל במפלס ההתחלה שלו.';
-$ec_lang['lpn_notes_2_term']='לא מדוגם';
+$ec_lang['lpn_notes_1_def']='פותר EPANET פותר רשת זו. הגדירו משך ריצה כולל, וכל צעד דיווח מחושב בתורו: מכלים מתמלאים ומתרוקנים, דרישות עוקבות אחר התבניות שלהן, וסרגל הכלים מנגן את ההרצה בחזרה.';
+$ec_lang['lpn_notes_2_term']='מה אינו נעשה';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
 // concentration all ship -- see lpn_quality_chemical and the lpn_reaction_* keys below. The note
@@ -2096,7 +2096,7 @@ $ec_lang['lpn_notes_2_term']='לא מדוגם';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='כימיית איכות המים אינה מדוגמת; גיל המים ומעקב המקור כן. שסתומים: שסתום חנק פועל בכל אחד משני הפותרים, ואילו השסתומים הקובעים את מיקומם בעצמם (PRV,‏ PSV,‏ FCV) נפתרים באמצעות פותר EPANET, שעמוד זה מפעיל בעצמו כאשר הרשת שלכם כוללת שסתום כזה.';
+$ec_lang['lpn_notes_2_def']='איכות המים מדוגמת: גיל המים, מעקב מקור, וחומר כימי המגיב בדפנות הצינור ובגוף המים. גל לחץ והלם מים אינם מדוגמים: כל תוצאה כאן היא עבור מים הזורמים כבר בזרימה יציבה, לא עבור גל הלחץ הנוצר כשסתום נסגר בחבטה.';
 $ec_lang['lpn_notes_3_term']='שמירת פרויקטים';
 $ec_lang['lpn_notes_3_def']='כל פרויקט הוא כרטיסייה, וכל כרטיסייה נשמרת בדפדפן זה תוך כדי עבודה. ניקוי נתוני הדפדפן שלכם מוחק את כולם, לכן שמרו את עבודתכם בקובץ: קובץ, שמור בשם. כוכבית על כרטיסייה משמעה שהיא מכילה שינויים שאינם בקובץ. שום דבר לעולם לא נכתב לקובץ אלא אם ביקשתם זאת. בדפדפנים מסוימים פרויקט מתחבר לקובץ שאליו שמרתם אותו, וקובץ, שמור כותב בחזרה לאותו קובץ מכאן ואילך; באחרים אין אפשרות חיבור, כך ששמור מושבת וזמין רק שמור בשם. כאשר קובץ פרויקט נשמר בכונן משותף, עמוד זה מודיע לכם אם עמית כבר פתח אותו, כדי ששני אנשים לא יכתבו זה מעל זה.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -2108,7 +2108,7 @@ $ec_lang['lpn_notes_3_def']='כל פרויקט הוא כרטיסייה, וכל �
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='עקומת משאבה';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_notes_5_def']='משאבה עוקבת אחר H = H₀ − aQ^b, כאשר H הוא הגובה שהמשאבה מוסיפה ו-Q הוא הספיקה דרכה. הזינו נקודה אחת, שתיים, או שלוש מעקומת היצרן. שלוש נקודות — הגובה בספיקה אפס, נקודת העבודה הרגילה, ונקודת הספיקה הגבוהה ביותר — קובעות ישירות את H₀‏, a ו-b, ועוקבות בצורה הקרובה ביותר אחר עקומה מפורסמת. שתי נקודות מתאימות פרבולה (b = 2) עם שיאה בספיקה אפס. נקודה אחת משתמשת בכלל נפוץ: הגובה בספיקה אפס הוא 1.33 × הגובה שהזנתם, והספיקה הגבוהה ביותר היא 2 × הספיקה שהזנתם, מה שנותן שוב b = 2. משאבה שלא הוזנו לה נקודות אינה מוסיפה גובה כלל. העקומה אינה נחתכת במקום שבו הגובה מגיע לאפס, כך שבקשה ממשאבה יותר ספיקה משהעקומה שלה יכולה לספק נותנת גובה שלילי. הפתרון הוא משאבה גדולה יותר או דרישה קטנה יותר, לא התאמת עקומה שונה. עקומה יכולה להכיל יותר משלוש נקודות. הפותר המובנה קורא שלוש מהן — הראשונה, האמצעית והאחרונה — כדי להתאים למשוואה שלעיל; מנוע EPANET קורא כל נקודה שהזנתם.';
+$ec_lang['lpn_notes_5_def']='משאבה עוקבת אחר H = H₀ − aQ^b, כאשר H הוא הגובה שהמשאבה מוסיפה ו-Q הוא הספיקה דרכה. הזינו נקודה אחת, שתיים, או שלוש מעקומת היצרן. שלוש נקודות — הגובה בספיקה אפס, נקודת העבודה הרגילה, ונקודת הספיקה הגבוהה ביותר — קובעות ישירות את H₀‏, a ו-b, ועוקבות בצורה הקרובה ביותר אחר עקומה מפורסמת. שתי נקודות מתאימות פרבולה (b = 2) עם שיאה בספיקה אפס. נקודה אחת משתמשת בכלל נפוץ: הגובה בספיקה אפס הוא 1.33 × הגובה שהזנתם, והספיקה הגבוהה ביותר היא 2 × הספיקה שהזנתם, מה שנותן שוב b = 2. משאבה שלא הוזנו לה נקודות אינה מוסיפה גובה כלל. העקומה אינה נחתכת במקום שבו הגובה מגיע לאפס, כך שבקשה ממשאבה יותר ספיקה משהעקומה שלה יכולה לספק נותנת גובה שלילי. הפתרון הוא משאבה גדולה יותר או דרישה קטנה יותר, לא התאמת עקומה שונה. עקומה יכולה להכיל יותר משלוש נקודות, וכל נקודה שהזנתם נקראת.';
 // WAS "Planned additions", NAMING THREE THINGS THAT NOW SHIP (scenarios, result tables, .inp
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
@@ -2432,11 +2432,11 @@ $ec_lang['lpn_labels_priority_link_tip']='הסדר שבו ערכים מוסרי�
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_node_tip']='הסדר שבו מוותרים על מאפיינים כאשר שתי תוויות צמתים חופפות. המאפיין שמספרו 1 מוותרים עליו ראשון, בשתי התוויות. כאשר נותר מאפיין אחד ושתי התוויות עדיין חופפות, תווית שלמה מוסתרת: זו שהערך שנותר בה הוא הפחות שווה הצגה, כלומר הדרישה הנמוכה ביותר, הלחץ הקרוב ביותר לאמצע הטווח, או הרום או העומד הקרובים ביותר לאלה של הצמתים השכנים.';
+$ec_lang['lpn_labels_priority_node_tip']='הסדר שבו מוותרים על ערכים כאשר שתי תוויות צמתים חופפות. הערך שמספרו 1 מוותרים עליו ראשון. כאשר נותר ערך אחד בלבד והתוויות עדיין חופפות, תווית שלמה מוסתרת: זו שבה הדרישה נמוכה יותר, הלחץ קרוב יותר לאמצע הטווח, או הרום או העומד קרובים יותר מספרית לאלה של הצמתים השכנים.';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
-$ec_lang['lpn_labels_col_before']='לפני';
-$ec_lang['lpn_labels_col_after']='אחרי';
+$ec_lang['lpn_labels_col_before']='קידומת';
+$ec_lang['lpn_labels_col_after']='סיומת';
 $ec_lang['lpn_labels_col_decimals']='ספרות עשרוניות';
 // ---- R-326..R-334 (2026-09-26): Show order, Use units, the customer Drop column, the new rows ----
 // "Show" heads the Show order column beside Drop (Tom, R-329: "I don't like that ID needs to
@@ -2573,7 +2573,7 @@ $ec_lang['lpn_backdrop_continue']='המשך';
 $ec_lang['lpn_tool_settings']='הגדרות';
 $ec_lang['lpn_settings_show_titles']='הצג כותרות עמוד';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_show_titles_tip']='מסתיר את כותרת העמוד ואת שורת הברוכים הבאים מעל השרטוט, כך שלמפה יש יותר מקום. ההדפסה אינה משתנה.';
+$ec_lang['lpn_settings_show_titles_tip']='מסתיר את כותרת העמוד ואת שורת הברוכים הבאים מעל השרטוט, כך שלמפה יש יותר מקום לעבודה. ההדפסה תמיד מציגה רק מפה נקייה.';
 // The link that rides on the headings themselves (Tom's 2026-09-08 worklist). It throws the switch AND opens the
 // box at the row that holds it, so the way back is learned in the same gesture.
 $ec_lang['lpn_hide_titles']='הסתר כותרות אלה';
@@ -2810,7 +2810,7 @@ $ec_lang['lpn_settings_engine_native']='פתור עם פותר EPANET';
 // EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
 // connection actually pays.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='מריץ את פותר EPANET של ה-US EPA, כאן בדפדפן שלכם. ברשת בגודל זה לא תראו הבדל במהירות. שני הפותרים מסכימים ביניהם מקרוב, אך לא בדיוק מוחלט: EPANET מעגל את הערך שהוא משתמש בו עבור כובד המשיכה, כך שהאובדנים המקומיים (הקטנים) שלו יוצאים נמוכים בכ-0.08% מהפותר המובנה, ועם חספוס Manning אובדן הגובה שלו יוצא נמוך בכ-0.6%. בפעם הראשונה שתסמנו תיבה זו, כ-650 KB מורדים ואז נשמרים במכשיר זה.';
+$ec_lang['lpn_settings_engine_native_tip']='הפעילו כדי להשתמש בפותר המובנה במידת האפשר. אחרת, נעשה תמיד שימוש בפותר EPANET של ה-US EPA. הפותר המובנה אינו משמש להרצות תקופתיות מורחבות או לרשת הכוללת PRV,‏ PSV או FCV פעילים. בפעם הראשונה שבה נעשה שימוש בפותר EPANET, כ-650 KB מורדים ואז נשמרים במכשיר זה. כאשר צינור נושא אובדן לחץ מקומי (קטן), שני הפותרים חלוקים בספרות האחרונות: EPANET מעגל את הערך שהוא משתמש בו עבור כובד המשיכה, כך שהאובדנים המקומיים שלו יוצאים נמוכים במעט מהצורה המדויקת.';
 $ec_lang['lpn_engine_loading']='טוען את פותר EPANET…';
 $ec_lang['lpn_engine_failed']='לא ניתן היה לטעון את פותר EPANET. מציג את הפותר המובנה במקום.';
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
@@ -2818,7 +2818,7 @@ $ec_lang['lpn_engine_failed']='לא ניתן היה לטעון את פותר EPA
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
 $ec_lang['lpn_engine_valve_route']='נפתר באמצעות פותר EPANET, משום ששסתומים אלה נפתחים ונסגרים מעצמם:';
 $ec_lang['lpn_unit_unknown']='שרטוט זה קובע יחידה שעמוד זה אינו מציע: {unit}. הכול נשמר ומוצג בדיוק כפי שהגיע, ושום דבר לא שונה. לא ניתן לתת תשובות עד שעמוד זה יכיר את היחידה הזו, משום שאין דרך לדעת מה גודלה.';
-$ec_lang['lpn_engine_manning_note']='הערה: עם חספוס Manning,‏ EPANET מחשב אובדן גובה נמוך בכ-0.6% מהפותר המובנה.';
+$ec_lang['lpn_engine_manning_note']='הערה: עם חספוס Manning,‏ EPANET מעגל את הקבוע במשוואת Manning, כך שאובדן הלחץ יוצא נמוך בכ-0.6% מהצורה המדויקת.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
 // Three sentences for three different facts, on the model of lpn_unit_unknown: what would not
 // happen, what the solver itself objected to, and where the numbers on screen actually came from.
@@ -2846,7 +2846,7 @@ $ec_lang['lpn_settings_text_size']='גודל טקסט (פיקסלים)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='גודל סמל (פיקסלים)';
-$ec_lang['lpn_settings_link_width']='עובי קו הצינור (פיקסלים)';
+$ec_lang['lpn_settings_link_width']='רוחב קו הצינור (פיקסלים)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
@@ -2898,7 +2898,7 @@ $ec_lang['lpn_settings_symbol_opacity']='אטימות סמל (0 עד 1)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='אטימות תמונת רקע (0 עד 1)';
-$ec_lang['lpn_settings_map_display']='מראה המפה';
+$ec_lang['lpn_settings_map_display']='מראה';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
 // LPN_MAP_MIN in js/looped-network.js). Nothing renders these two keys now, so key_hygiene_check
@@ -2954,8 +2954,8 @@ $ec_lang['lpn_confirm_restore_defaults']='לאפס את כל ההגדרות (ק�
 // the same direction: a restart is something you recover FROM, not something that takes your files.
 // The name is short because lpn_confirm_wipe below does the explaining, which is also why it does
 // not have to say "on this page".
-$ec_lang['lpn_settings_wipe_btn']='מחק הכול בעמוד זה';
-$ec_lang['lpn_confirm_wipe']='למחוק הכול ששמור עבור עמוד זה — כל פרויקט, כל תמונת רקע, כל ההגדרות, ובחירות היחידות שלכם — ולטעון מחדש את העמוד כפי שמבקר חדש לגמרי היה רואה אותו? לא ניתן לבטל פעולה זו.';
+$ec_lang['lpn_settings_wipe_btn']='התחילו מחדש';
+$ec_lang['lpn_confirm_wipe']='להתחיל מחדש, ולמחוק הכול ששמור עבור עמוד זה: כל פרויקט, כל תמונת רקע, כל ההגדרות, ובחירות היחידות שלכם? העמוד ייטען מחדש בדיוק כפי שמבקר חדש לגמרי היה רואה אותו. לא ניתן לבטל פעולה זו.';
 
 // Share this calculation (ROADMAP Task 228). template_share_link and template_share_copied were
 // RETIRED in Task 438 Wave 0: the duplicate control under the Printable Title is gone, the
@@ -2984,7 +2984,7 @@ $ec_lang['lpn_time_clock_day']='יום {day},‏ {clock}';
 $ec_lang['lpn_time_format_tip']='כתבו זמן כשעות ודקות, כמו 2:30. מספר פשוט פירושו שעות, כך ש-8 הוא שמונה שעות. חצי שעה הוא 0:30.';
 $ec_lang['lpn_time_running']='מחשב את הסימולציה על פני תקופת הזמן עם פותר EPANET.';
 $ec_lang['lpn_time_no_engine']='הפותר המובנה מחשב רגע אחד בכל פעם, כך שזוהי הרשת ב-{time} בלבד: כל תבנית נקראת באותו רגע, וכל מכל עדיין נמצא במפלס ההתחלה שלו במקום להתמלא ולהתרוקן. התחברו לאינטרנט פעם אחת כדי להביא את פותר EPANET, המריץ סימולציה על פני תקופת זמן.';
-$ec_lang['lpn_time_slider']='זמן';
+$ec_lang['lpn_time_slider']='זמן סימולציה שחלף';
 $ec_lang['lpn_time_no_period']='לפרויקט זה אין סימולציה על פני תקופת זמן מוגדרת, כך שיש רגע אחד בלבד להצגה. הגדירו זמן ריצה כולל בהגדרות, חישוב, זמן כדי להריץ סימולציה על פני תקופת זמן.';
 $ec_lang['lpn_time_first']='עבור להתחלה';
 $ec_lang['lpn_time_prev']='צעד אחורה';
@@ -2998,7 +2998,7 @@ $ec_lang['lpn_time_tank']='מכל';
 $ec_lang['lpn_time_level']='מפלס מים';
 $ec_lang['lpn_time_run']='חשב';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='פתרו רשת זו בכל צעד זמן הידראולי, מתחילת ההרצה ועד סופה.';
+$ec_lang['lpn_time_run_tip']='פתרו רשת זו בכל צעד זמן הידראולי.';
 // **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
 // `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
 // LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
@@ -3022,7 +3022,7 @@ $ec_lang['lpn_time_run_report_copied']='הועתק';
 $ec_lang['lpn_time_run_report_tip']='מה שפותר ה-EPANET עצמו הדפיס על ההרצה האחרונה: האם היא התכנסה, וכל דבר שעליו הוא הזהיר. זהו הטקסט של הפותר עצמו, לא שלנו.';
 
 $ec_lang['lpn_time_speed']='מהירות';
-$ec_lang['lpn_time_speed_tip']='באיזו מהירות הריצה מתנגנת.';
+$ec_lang['lpn_time_speed_tip']='מהירות ניגון';
 
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,
@@ -3036,7 +3036,7 @@ $ec_lang['lpn_settings_search']='חיפוש הגדרות';
 // word somewhere in a row's own searchable text (setboxUnitText()'s name+tip+aria-label+placeholder
 // join), so "zoom label" finds a row without either word next to the other. His own sentence is the
 // tip, verbatim.
-$ec_lang['lpn_settings_search_tip']='הקלידו מילה כדי לראות רק הגדרות המזכירות אותה. גם ההסברים נסרקים, לא רק השמות.';
+$ec_lang['lpn_settings_search_tip']='הקלידו מילה אחת או כמה מילים כדי לראות הגדרות המזכירות את כולן.';
 $ec_lang['lpn_settings_no_match']='אין הגדרה המזכירה מילה זו.';
 // The grab strip between the two panes (ROADMAP Task 576). An aria-label, so it is a NAME rather
 // than an instruction: what the control adjusts, not how to operate it.
@@ -3055,7 +3055,7 @@ $ec_lang['lpn_time_settings_open']='הגדרות זמן';
 // leaves room for its siblings (Quality, Reactions) as they arrive.
 $ec_lang['lpn_settings_sec_symbology']='הדמיה';
 $ec_lang['lpn_settings_sec_map']='מפה ועמוד';
-$ec_lang['lpn_settings_sec_assets']='ברירות מחדל לאלמנטים חדשים';
+$ec_lang['lpn_settings_sec_assets']='אלמנטים';
 $ec_lang['lpn_settings_sec_calculation']='חישוב';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels
 // would follow Node styles"), so this section has one control and no checkboxes: how close the
@@ -3098,7 +3098,7 @@ $ec_lang['lpn_quality_needs_run']='איכות המים נישאת לאורך ה�
 // key) and a Mass units dropdown (lpn_quality_mass_units) below, matching EPANET's own Parameter
 // and Mass Units fields; the name is optional, exactly as EPANET's own is.
 $ec_lang['lpn_quality_chemical_name']='חומר כימי ויחידות';
-$ec_lang['lpn_quality_chemical_name_tip']='שם החומר הכימי והיחידות שבהן נכתבים ריכוזיו: לדוגמה, כתבו כלור mg/L כרשומה אחת. זהו תווית. EPANET אינו ממיר ריכוז, כך שכל ריכוז וכל מקדם בפרויקט חייבים להיכתב כבר ביחידות אלה.';
+$ec_lang['lpn_quality_chemical_name_tip']='החומר הכימי שאתה עוקב אחריו, לדוגמה כלור. השאירו ריק כדי להשתמש בתווית ברירת המחדל של EPANET עצמו, Chemical. מוצג בדוחות שלכם, אך אינו משמש בחישובים.';
 $ec_lang['lpn_quality_mass_units']='יחידות מסה';
 $ec_lang['lpn_quality_mass_units_tip']='מחצית היחידות של רשומת האיכות, שתי הבחירות של EPANET עצמו.';
 $ec_lang['lpn_quality_unit_ug']='µg/L';
@@ -3376,7 +3376,7 @@ $ec_lang['lpn_library_curves_tip']='עקומה היא רשימת נקודות ה
 // document objects of their own, and the note said so; it now says what the box does and where a
 // curve is pointed at an element from.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_curves_note']='עקומה שייכת לפרויקט, ומשאבה או שסתום מציינים במאפיינים שלהם באיזו הם משתמשים. כמה אלמנטים יכולים להשתמש באותה עקומה, ועריכתה כאן משנה את כולם. עבור עקומת גובה משאבה ההרצה משתמשת בעקומה המותאמת דרך הנקודות כפי שמוצג; עבור כל סוג אחר היא מחברת את הנקודות בקווים ישרים כפי שמוצג.';
+$ec_lang['lpn_library_curves_note']='עקומות מצורפות למשאבות ולשסתומים. עבור עקומת עומד של משאבה ההרצה משתמשת בעקומה המותאמת דרך הנקודות כפי שמוצג; עבור כל סוג אחר היא מחברת את הנקודות בקווים ישרים כפי שמוצג.';
 $ec_lang['lpn_library_curve_add']='הוסיפו עקומה';
 $ec_lang['lpn_library_curve_type_tip']='מה עקומה זו מתארת';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
@@ -3553,7 +3553,7 @@ $ec_lang['lpn_library_control_add']='הוספת בקרה';
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
 // box, and the page reads back only those words. Translate the sentence around them.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_control_tip']='משפט אחד, במילים ש-EPANET משתמש בהן. ארבע צורות: LINK 9 OPEN IF NODE 2 BELOW 110, LINK 9 CLOSED IF NODE 2 ABOVE 140, LINK 10 OPEN AT TIME 1, ו-LINK 12 CLOSED AT CLOCKTIME 3 AM. במקום OPEN או CLOSED ניתן לכתוב מספר, שהוא הגדרת שסתום או מהירות משאבה. השאירו את מילות המפתח באנגלית; הן מה שהעמוד קורא.';
+$ec_lang['lpn_library_control_tip']='חוק בן שורה אחת בתחביר EPANET. השתמשו ביחידות הפרויקט באופן עקבי. מילות המפתח חייבות להיות באנגלית. דוגמאות: LINK 12 CLOSED IF NODE 23 ABOVE 20 (הקו 12 ייסגר כאשר המפלס במכל 23 יעלה על 20 רגל); LINK 12 OPEN IF NODE 130 BELOW 30 (הקו 12 ייפתח אם הלחץ בצומת 130 יירד מתחת ל-30 psi); LINK PUMP02 1.5 AT TIME 16 (מהירותה היחסית של המשאבה PUMP02 נקבעת ל-1.5 בשעה 16 מתחילת הריצה); LINK 12 CLOSED AT CLOCKTIME 10 AM LINK 12 OPEN AT CLOCKTIME 8 PM (שני חוקים: הקו 12 נסגר שוב ושוב בשעה 10 בבוקר ונפתח בשעה 8 בערב לאורך כל הריצה)';
 $ec_lang['lpn_library_control_ok']='✓ מובן';
 $ec_lang['lpn_library_control_bad']='⚠ לא מובן';
 $ec_lang['lpn_library_control_missing']='⚠ ברשת זו אין דבר בשם {id}';
@@ -3614,7 +3614,7 @@ $ec_lang['lpn_field_speed_pattern_tip']='כיצד מהירות משאבה זו �
 // one wall, and the order of the paragraphs stays ours rather than the translation's.
 $ec_lang['lpn_search_menu']='חיפוש מקום לפי שם…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_search_tip']='מצאו עיר, רחוב או ציון דרך לפי שם, והזיזו את המפה אליו. השימוש הראשון מבקש את רשותכם, כי המילים שאתם מקלידים נשלחות לשירות שמות המקומות של OpenStreetMap.';
+$ec_lang['lpn_search_tip']='מצאו עיר, כתובת או ציון דרך לפי שם, והזיזו את המפה אליו. השימוש הראשון מבקש את רשותכם, כי המילים שאתם מקלידים נשלחות לשירות שמות המקומות של OpenStreetMap.';
 $ec_lang['lpn_search_bar']='חיפוש לפי שם…';
 // The four paragraphs of the ask: what is sent and to whom; why this is a separate question from
 // the map pictures; the question itself; and what a no costs (nothing).
@@ -3701,7 +3701,7 @@ $ec_lang['lpn_ff_intro']='מכל צומת בתורו מתבקש לשאוב ספ�
 $ec_lang['lpn_ff_scope']='צמתים לבדיקה';
 $ec_lang['lpn_ff_scope_tip']='בחרו את הקבוצה לפני ההרצה. בדיקת כל צומת במערכת גדולה יכולה לקחת דקות.';
 $ec_lang['lpn_ff_scope_all']='כל צומת';
-$ec_lang['lpn_ff_scope_selected']='רק הצומת הנבחר';
+$ec_lang['lpn_ff_scope_selected']='הצמתים הנבחרים';
 $ec_lang['lpn_ff_no_junctions']='לפרויקט זה אין עדיין צמתים, כך שאין מה לבדוק.';
 $ec_lang['lpn_ff_no_selection']='אין צומת נבחר. בחרו אחד על המפה, או בדקו כל צומת.';
 $ec_lang['lpn_ff_skipped']='{n} האלמנטים הנבחרים אינם צמתים, כך שהם לא נבדקו.';
@@ -3728,11 +3728,11 @@ $ec_lang['lpn_ff_maxvelocity_tip']='צינור הפועל מעל זה בעוד �
 // rather than the deliberate and standard choice it actually is.
 $ec_lang['lpn_ff_accounting']='ספיקת כיבוי האש נשאבת בצומת עצמו. זו השיטה המשמשת כאן, וזו הנפוצה. ברז השריפה, צינור ההסתעפות שלו והזרבובית שלו אינם ממודלים, כך שברז שריפה אמיתי מספק פחות מהספיקה המוצגת כאן.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_native']='זה מחושב עם הפותר המובנה.';
+$ec_lang['lpn_ff_engine_native']='נעשה שימוש בפותר המובנה.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_epanet']='זה מחושב עם מנוע EPANET.';
+$ec_lang['lpn_ff_engine_epanet']='נעשה שימוש במנוע EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='ספיקת כיבוי אש זמינה היא חיפוש, כך שכל הרשת נפתרת כשש עשרה פעמים עבור כל צומת נבדק. מערכת גדולה לוקחת דקות. ניתן לעצור אותה בכל עת ולשמור את מה שכבר חושב.';
+$ec_lang['lpn_ff_engine_cost']='ספיקת כיבוי אש זמינה היא חיפוש, כך שכל הרשת נפתרת כשש עשרה פעמים עבור כל צומת נבדק. מערכת גדולה לוקחת דקות. ניתן לעצור אותה בכל עת ולשמור את מה שכבר בוצע.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
