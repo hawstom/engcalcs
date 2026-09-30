@@ -25,7 +25,7 @@ exports.title = '3. The File menu';
 const EXPECTED_KEYS = ['lpn_file_new', 'lpn_file_open', 'lpn_examples_menu', 'lpn_file_import_survey',
 	'lpn_file_import_inp', 'lpn_file_export_inp', 'lpn_library_import',
 	'lpn_file_save', 'lpn_file_saveas', 'lpn_file_convert_as', 'lpn_file_saveall', 'lpn_file_revert',
-	'lpn_file_close'];
+	'lpn_close'];
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
@@ -45,7 +45,7 @@ exports.run = async function ({ browser, report }) {
 		report.ok(by('lpn_file_revert').disabled, 'Revert is greyed with no file to revert to');
 		report.ok(!by('lpn_file_save').disabled, 'Save is live — this browser can connect to a file');
 		report.ok(!by('lpn_file_saveas').disabled, 'Save as is always live');
-		report.ok(!by('lpn_file_new').disabled && !by('lpn_file_open').disabled && !by('lpn_file_close').disabled,
+		report.ok(!by('lpn_file_new').disabled && !by('lpn_file_open').disabled && !by('lpn_close').disabled,
 			'New, Open and Close are always live');
 		// **Task 447: this row is never greyed either.** Its predecessor converted the OPEN project
 		// and had to be greyed on a project already on the map; this one opens a FILE into a new tab,

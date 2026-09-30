@@ -543,7 +543,6 @@ $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Nadmořská výška dolního konce úseku. Volitelná v interních řadách (pokud ponecháno prázdné, defaultuje na vodorovně / stejně jako uzel výše). Povinná v poslední řadě: tato hodnota je nadmořská výška posledního emitoru, která přímo určuje požadovaný vstupní tlak.">DS Nadm. výška <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='Nadmořská výška posledního emitoru (poslední řada) byla ponechána prázdná a defaultovala na vodorovně — zadejte ji pro přesný výsledek';
-$ec_lang['ip_flow']='Průtok';
 $ec_lang['ip_press']='Tlak';
 $ec_lang['ip_hf']='h<sub>f</sub>';
 $ec_lang['ip_hm']='h<sub>m</sub>';
@@ -610,10 +609,6 @@ $ec_lang['bpn_p_down']='DS tlak';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_p_down_tip']='Manometrický tlak (tlaková výška) v dolním uzlu této řady. Záporná hodnota (označena) znamená podatmosférický tlak; zkontrolujte návrh.';
 $ec_lang['bpn_sketch_heading']='Schéma sítě';
-$ec_lang['bpn_show_length']='Délka';
-$ec_lang['bpn_show_diameter']='Průměr';
-$ec_lang['bpn_show_q']='Průtok';
-$ec_lang['bpn_show_p']='Tlak';
 $ec_lang['bpn_source_label']='Zdroj';
 $ec_lang['bpn_line_problem']='Tato řada není připojena ke zdroji: odkazuje na neznámé horní ID, odkazuje sama na sebe, opakuje ID, které už používá jiná řada, nebo tvoří okruh. Nepřipojené řady zůstávají nevyřešeny.';
 $ec_lang['bpn_bad_id_short']='Chybné ID';
@@ -637,7 +632,6 @@ $ec_lang['bpn_supply3_h']='Dodávková výška 3';
 $ec_lang['bpn_supply_pt_tip']='Volitelné body dodávkové křivky 2 a 3. Zadejte průtok a výšku pro každý bod pro modelování čerpadla nebo jakéhokoli zdroje, jehož výška klesá s rostoucí dodávkou; nástroj čte výšku při návrhovém průtoku. Bod 1 výše je statická výška při nulovém průtoku. Body 2 a 3 ponechte prázdné pro konstantní výšku nádrže.';
 $ec_lang['bpn_h_supply']='Dodávková výška';
 $ec_lang['bpn_h_supply_tip']='Výška zdroje při návrhovém průtoku, čtená z dodávkové křivky. Rovná se zadané výšce zdroje, pokud je křivka plochá (nádrž).';
-$ec_lang['bpn_show_elevation']='Nadmořská výška';
 $ec_lang['bpn_supply1_h']='Statická dodávková výška';
 $ec_lang['lpn_main_menu']='Vodovodní síť';
 $ec_lang['lpn_main_title']='Bezplatné online modelování vodovodní sítě s řešičem EPANET';
@@ -927,7 +921,6 @@ $ec_lang['lpn_examples_blank']='Nebo začněte zde';
 // screen, so "start with a blank map" reads as "discard it" and they do not dare press the
 // only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
 // open an example"). Closing never touches a project either way.
-$ec_lang['lpn_examples_close']='Zavřít';
 $ec_lang['lpn_examples_size']='{nodes} uzlů, {links} potrubí';
 $ec_lang['lpn_examples_failed']='Příklady se nepodařilo načíst. Použijte Soubor, Nový projekt pro zahájení kreslení.';
 $ec_lang['lpn_examples_loading']='Načítání příkladů…';
@@ -1019,9 +1012,6 @@ $ec_lang['lpn_units_mapcoords']='Souřadnice mapy';
 $ec_lang['lpn_units_mapcoords_deg']='stupně';
 $ec_lang['lpn_units_usft']='US survey ft';
 $ec_lang['lpn_units_elevhead']='Nadmořská výška a tlaková výška';
-$ec_lang['lpn_units_pressure']='Tlak';
-$ec_lang['lpn_units_flow']='Průtok';
-$ec_lang['lpn_units_velocity']='Rychlost';
 // Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
 // mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
 // alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
@@ -1241,13 +1231,11 @@ $ec_lang['lpn_color_break_count']='Hranic musí být o jednu méně, než je po�
 $ec_lang['lpn_color_ramp_qualitative']='Kvalitativní';
 $ec_lang['lpn_color_ramp_rainbow']='Duha';
 $ec_lang['lpn_color_ramp_rainbow_eg']='shodné s EPANET';
-$ec_lang['lpn_color_example_status']='Stav';
 $ec_lang['lpn_color_example_material']='Materiál';
 $ec_lang['lpn_color_ramp_ylgnbu']='Žlutá až modrá';
 $ec_lang['lpn_color_ramp_rdylbu']='Červená až modrá, přes žlutou';
 $ec_lang['lpn_georef_drop']='Umístit model sem';
 $ec_lang['lpn_georef_finish']='Ponechat toto umístění';
-$ec_lang['lpn_georef_cancel']='Zrušit';
 $ec_lang['lpn_georef_scale']='Vzdálenost na zemi na jednu jednotku výkresu';
 // Edited by TGH 2026-09-07
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
@@ -1344,7 +1332,7 @@ $ec_lang['lpn_pane_print_tip']='Vytiskne tabulku, na kterou se právě díváte,
 // lpn_clean_map_tip were deleted with the row; nothing else read them.
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
-// lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
+// lpn_tool_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
 // it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
 // alternative and Tom kept Project.
 // ROADMAP Task 523, Tom 2026-08-24. **The KEY is still lpn_menu_project and that is deliberate** --
@@ -1395,7 +1383,6 @@ $ec_lang['lpn_time_run_slow']='Výpočet této sítě trval {secs} s a síť je 
 $ec_lang['lpn_time_no_report']='Zatím není žádná zpráva o výpočtu. Zpráva je vlastní text EPANETu, takže se objeví, jakmile je tato síť spočítána řešičem EPANET.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
-$ec_lang['lpn_menu_settings']='Nastavení';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -1512,10 +1499,6 @@ $ec_lang['lpn_find_op_conn_noopensource']='k uzlu nevede žádná otevřená ces
 // What a result row prints beside the node id: the fault it has, in three words.
 // What a result row prints beside the id: the NARROWEST condition true of that node, because "no
 // links" says more than "no open path to a source" and both are true of the same node.
-$ec_lang['lpn_find_conn_unlinked']='U uzlu nejsou žádná potrubí';
-$ec_lang['lpn_find_conn_noopen']='U uzlu nejsou žádná otevřená potrubí';
-$ec_lang['lpn_find_conn_nolinksource']='K uzlu nevede žádná cesta ke zdroji';
-$ec_lang['lpn_find_conn_noopensource']='K uzlu nevede žádná otevřená cesta ke zdroji';
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='Každý uzel je propojen.';
@@ -1704,10 +1687,8 @@ $ec_lang['lpn_new_coordsys_local_tip']='Bez georeferencování. Připojte vlastn
 // system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
 // the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
 // as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
-$ec_lang['lpn_new_crs']='Mapová projekce';
 // **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
 // it names the box's own subject rather than either caller's radio label.
-$ec_lang['lpn_crsbox_title']='Souřadnicový systém';
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
@@ -1718,7 +1699,6 @@ $ec_lang['lpn_crs_place_tip']='Napište město, adresu nebo významné místo a 
 $ec_lang['lpn_crs_search']='Hledat';
 $ec_lang['lpn_crs_name']='Filtr podle názvu projekce';
 $ec_lang['lpn_crs_name_tip']='Zobrazí jen projekce, jejichž název nebo kód EPSG obsahuje to, co zadáte. Zkuste číslo pásma, nebo UTM, nebo Mercator.';
-$ec_lang['lpn_crs_list']='Projekce';
 $ec_lang['lpn_crs_list_tip']='Projekce, které zbyly po použití obou filtrů výše. Vyberte jednu a stiskněte Vybrat.';
 $ec_lang['lpn_crs_choose']='Vybrat';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
@@ -1763,7 +1743,6 @@ $ec_lang['lpn_file_open']='Otevřít…';
 $ec_lang['lpn_file_save']='Uložit';
 $ec_lang['lpn_file_saveas']='Uložit jako…';
 $ec_lang['lpn_file_revert']='Vrátit k uloženému';
-$ec_lang['lpn_file_close']='Zavřít';
 // Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Nedávné soubory';
@@ -2622,7 +2601,6 @@ $ec_lang['lpn_cp_design']='Návrh';
 $ec_lang['lpn_cp_design_tip']='Jeden řádek na vlastní vlastnost; po otevření zobrazí: Klíč, Popisek, Platí pro, Ověřovat jako, Povolit nebo omezit, pole znaků pojmenované podle této volby, Dolní limit délky, Horní limit délky, Dolní limit, Horní limit.';
 $ec_lang['lpn_cp_add']='Přidat vlastní vlastnost';
 $ec_lang['lpn_cp_add_tip']='Přidá řádek do návrhové tabulky a otevře jej k úpravě.';
-$ec_lang['lpn_cp_remove']='Odebrat';
 $ec_lang['lpn_cp_remove_tip']='Odebere tuto vlastnost z návrhové tabulky. Hodnoty, které už jsou zadané u vašich prvků, zůstávají v souboru a vrátí se, pokud znovu navrhnete stejný klíč.';
 $ec_lang['lpn_cp_none']='Zatím není navržena žádná vlastní vlastnost.';
 $ec_lang['lpn_cp_unnamed']='Zatím nepojmenováno';
@@ -2642,7 +2620,6 @@ $ec_lang['lpn_cp_restrict_tip']='Omezit tyto znaky: Hodnota smí použít jen zn
 $ec_lang['lpn_cp_restrict_mode']='Povolit nebo omezit';
 $ec_lang['lpn_cp_restrict_mode_tip']='Povolit nebo omezit: Zadané znaky jsou buď jediné, které hodnota smí použít, nebo naopak ty, které použít nesmí.';
 $ec_lang['lpn_cp_restrict_allow']='Povolit pouze tyto znaky';
-$ec_lang['lpn_cp_restrict_deny']='Omezit tyto znaky';
 $ec_lang['lpn_cp_minlength']='Dolní limit délky';
 $ec_lang['lpn_cp_minlength_tip']='Dolní limit délky: Každý kratší záznam je označen, čímž najdete prázdné a napůl vyplněné záznamy.';
 $ec_lang['lpn_cp_length']='Horní limit délky';
@@ -2804,7 +2781,6 @@ $ec_lang['lpn_settings_flow_change_tip']='Další zkouška, kterou musí řeši�
 $ec_lang['lpn_settings_damp_limit']='Tlumení začíná na';
 $ec_lang['lpn_settings_damp_limit_tip']='Přesnost, při které řešič začne dělat menší kroky, což může pomoci síti, která osciluje, dosáhnout konvergence. Nula znamená, že řešič nikdy netlumí. Toto pole čte pouze řešič EPANET.';
 $ec_lang['lpn_settings_option_unset']='Neuvedeno';
-$ec_lang['lpn_settings_demand_multiplier']='Násobitel odběru';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_demand_multiplier_tip']='Jeden součinitel použitý najednou na každý odběr v síti. Použijte jej k dotazu, jak se síť chová při vyšším nebo nižším než dnešním odběru. Nemění čísla, která jste zadali. Scénář může mít vlastní, takže průměrný den, maximální den a špičková hodina jsou každý jedno číslo; ponechte prázdné ve scénáři, chcete-li použít hodnotu projektu.';
 $ec_lang['lpn_settings_engine_native']='Řešit pomocí řešiče EPANET';
@@ -3037,7 +3013,7 @@ $ec_lang['lpn_time_speed_tip']='Rychlost přehrávání';
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,
 // with an index down the left and a search across the top. The section titles are not new keys --
-// each borrows the name it already had (lpn_tool_labels, lpn_menu_settings, lpn_time_menu,
+// each borrows the name it already had (lpn_tool_labels, lpn_tool_settings, lpn_time_menu,
 // lpn_settings_colors), so the box cannot drift from the doors that open it.
 $ec_lang['lpn_settings_search']='Hledat v nastavení';
 // **AND-OF-WORDS, STATED AS SUCH** (Tom, 2026-09-23 (g): "can Settings filter work as an AND word
@@ -3094,7 +3070,6 @@ $ec_lang['lpn_settings_quality_track_tip']='Zvolte, co má výpočet sledovat v 
 $ec_lang['lpn_settings_quality_source']='Sledovaný uzel';
 $ec_lang['lpn_settings_quality_source_tip']='Uzel, jehož voda se sleduje. Každý ostatní uzel pak ukazuje podíl své vody, který pochází z tohoto uzlu.';
 $ec_lang['lpn_quality_none']='Nic';
-$ec_lang['lpn_quality_age']='Stáří vody';
 $ec_lang['lpn_quality_trace']='Sledování zdroje';
 $ec_lang['lpn_quality_chemical']='Chemická látka, která reaguje';
 $ec_lang['lpn_quality_needs_run']='Kvalita vody se přenáší podél potrubí v čase, takže potřebuje řešič EPANET a celkovou dobu běhu. Nastavte Celkovou dobu běhu v části Čas, poté stiskněte tlačítko Vypočítat.';
@@ -3268,7 +3243,6 @@ $ec_lang['lpn_scncmp_title']='Porovnání scénářů';
 $ec_lang['lpn_scncmp_menu_tip']='Vypočítá každý scénář v tomto projektu a zobrazí je vedle sebe: nejnižší tlak a nejvyšší rychlost v každém z nich.';
 $ec_lang['lpn_scncmp_running']='Počítají se všechny scénáře…';
 $ec_lang['lpn_scncmp_empty']='Zatím nic nebylo nakresleno, takže není co počítat.';
-$ec_lang['lpn_scncmp_col_minpressure']='Nejnižší tlak';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Nejvyšší rychlost';
 $ec_lang['lpn_scncmp_at']='{value} u {id}';
 $ec_lang['lpn_scncmp_current']='(právě otevřený)';
@@ -3301,7 +3275,6 @@ $ec_lang['lpn_reports_status_tip']='Co se změnilo v průběhu poslední simulac
 $ec_lang['lpn_status_title']='Sestava o stavu';
 $ec_lang['lpn_status_needs_run']='Sestava o stavu uvádí, co se změnilo během simulace s časovým průběhem. Nastavte Celkovou dobu běhu v Nastavení, Výpočet, Čas, stiskněte Vypočítat, a poté otevřete Voda, Sestavy, Sestava o stavu.';
 $ec_lang['lpn_status_empty']='Během tohoto běhu se stav ničeho nezměnil.';
-$ec_lang['lpn_status_col_time']='Čas';
 $ec_lang['lpn_status_col_event']='Událost';
 $ec_lang['lpn_status_opened']='{type} {id}: otevřeno';
 $ec_lang['lpn_status_closed']='{type} {id}: zavřeno';
@@ -3360,7 +3333,6 @@ $ec_lang['lpn_color_mode_jenks']='Přirozené hranice (Jenks)';
 $ec_lang['lpn_color_mode_stddev']='Směrodatná odchylka';
 $ec_lang['lpn_color_mode_pretty']='Zaokrouhlené';
 $ec_lang['lpn_color_mode_log']='Logaritmické';
-$ec_lang['lpn_color_mode_pressure']='Tlak';
 $ec_lang['lpn_color_mode_manual']='Ruční';
 
 // ---- LIBRARIES (ROADMAP Tasks 462 and 460) ---------------------------------------------------
@@ -3370,7 +3342,7 @@ $ec_lang['lpn_color_mode_manual']='Ruční';
 // Simulate, Transport, Time selectors."
 //
 // ONE NAME, THREE DOORS: the toolbar button, the Edit menu row and the box's own title all read
-// this key, exactly as lpn_menu_settings serves the Settings box's three.
+// this key, exactly as lpn_tool_settings serves the Settings box's three.
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='Knihovny';
@@ -3575,7 +3547,6 @@ $ec_lang['lpn_library_rule_add']='Přidat pravidlo';
 $ec_lang['lpn_library_rule_tip']='Jedno pravidlo, ve slovech, která používá EPANET, jedna klauzule na řádek. První řádek jej pojmenuje: RULE 1. Pak podmínka: IF TANK 2 LEVEL BELOW 17.1. Pak co s tím udělat: THEN PUMP 9 STATUS IS OPEN. Poslední řádek mu může dát prioritu: PRIORITY 1. Přidejte řádky AND nebo OR pro testování více věcí najednou a řádky ELSE pro určení, co se má stát, když test neuspěje. Podmínka může číst LEVEL, HEAD, GRADE, PRESSURE nebo DEMAND u uzlu, FLOW, STATUS nebo SETTING u spoje, nebo TIME a CLOCKTIME u SYSTEM. Čísla pište v jednotkách, které tento projekt zobrazuje; jsou pro vás převedena. Klíčová slova ponechte v angličtině; jsou to slova, která čte stránka i EPANET.';
 $ec_lang['lpn_library_rule_ok']='✓ Toto pravidlo bylo přečteno';
 $ec_lang['lpn_library_rule_bad']='⚠ Toto pravidlo nešlo přečíst';
-$ec_lang['lpn_library_rule_missing']='⚠ Tato síť nemá nic nazvaného {id}';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
 // for the entire project it is in Settings") drawn on its other side. Without it a pattern you
 // author can only be used by making it the default one, which is not what a library is for.
@@ -3815,8 +3786,6 @@ $ec_lang['lpn_ff_mode_none']='Žádný';
 $ec_lang['lpn_ff_col_solves']='Výpočty';
 // Which criterion the junction broke while drawing the required flow. A junction that broke nothing
 // shows a dash, never one of these words.
-$ec_lang['lpn_ff_limit_pressure']='Tlak';
-$ec_lang['lpn_ff_limit_velocity']='Rychlost';
 $ec_lang['lpn_ff_limit_both']='Tlak a rychlost';
 $ec_lang['lpn_ff_atleast']='více než {flow}';
 $ec_lang['lpn_ff_affect_node']='{id} klesá na {pressure}';

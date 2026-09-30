@@ -86,16 +86,16 @@ function echoCalculatorFormAppend() {
 					<?php echoUnitSelect($name = 'elevu', $units = 'distance_site', $indent_string, $ec_lang['ip_elev_ds']); ?>
 				</th>
 				<th>
-					<?=$ec_lang['ip_flow']?><br />
-					<?php echoUnitSelect($name = 'q_usu', $units = 'flow_emitter', $indent_string, $ec_lang['ip_flow']); ?>
+					<?=$ec_lang['lpn_result_flow']?><br />
+					<?php echoUnitSelect($name = 'q_usu', $units = 'flow_emitter', $indent_string, $ec_lang['lpn_result_flow']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_press']?><br />
 					<?php echoUnitSelect($name = 'h_usu', $units = 'partial_head', $indent_string, $ec_lang['ip_press']); ?>
 				</th>
 				<th>
-					<?=$ec_lang['ip_flow']?><br />
-					<?php echoUnitSelect($name = 'q_dsu', $units = 'flow_emitter', $indent_string, $ec_lang['ip_flow']); ?>
+					<?=$ec_lang['lpn_result_flow']?><br />
+					<?php echoUnitSelect($name = 'q_dsu', $units = 'flow_emitter', $indent_string, $ec_lang['lpn_result_flow']); ?>
 				</th>
 				<th>
 					<?=$ec_lang['ip_press']?><br />
