@@ -780,12 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='שורה {row}: מ- ואל הם אותו �
 $ec_lang['lpn_pane_paste_bad_cell']='שורה {row}: {text} אינו {col} תקין.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='שורה {row}: טקסט חדש זקוק גם ל-{first} וגם ל-{second}.';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='שורה {row}: {id} אינו צומת או צינור ברשת זו עדיין. הדביקו אותו קודם, ולאחר מכן את הטקסט הזה.';
+$ec_lang['lpn_pane_paste_customer_no_position']='שורה {row}: לקוח חדש זקוק גם ל-{first} וגם ל-{second}.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='שורה {row}: לקוח חדש זקוק לצינור או צומת מחובר.';
+$ec_lang['lpn_pane_paste_no_pipe']='שורה {row}: הצינור {id} עדיין אינו קיים. הדביקו קודם את הצינורות שלכם, ולאחר מכן את הלקוחות.';
+$ec_lang['lpn_pane_paste_no_customer_node']='שורה {row}: הצומת {id} עדיין אינו קיים. הדביקו קודם את הצמתים שלכם, ולאחר מכן את הלקוחות.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='שורה {row}: לצומת {id} אין צינור שאליו לקוח יכול להתחבר.';
 
 
 $ec_lang['lpn_pane_filled']='מולאו למטה {n} תאים. {skipped} לא שונו.';
@@ -825,7 +827,7 @@ $ec_lang['lpn_field_text_bold']='טקסט מודגש';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
-
+$ec_lang['lpn_field_text_anchor']='מחובר אל';
 $ec_lang['lpn_field_text_align']='יישור אופקי';
 $ec_lang['lpn_field_text_align_left']='שמאל';
 $ec_lang['lpn_field_text_align_center']='מרכז';
@@ -1331,9 +1333,9 @@ $ec_lang['lpn_pane_filter_none']='שום דבר בטבלה זו אינו תוא�
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='התקרבות ובחירה';
-
-
-
+$ec_lang['lpn_goto_on_map']='מעבר במפה';
+$ec_lang['lpn_pane_select_on_map']='בחירה במפה';
+$ec_lang['lpn_pane_unselect_on_map']='ביטול בחירה במפה';
 $ec_lang['lpn_pane_print']='הדפסת טבלה';
 $ec_lang['lpn_pane_print_tip']='הדפיסו את הטבלה שאתם רואים כעת, עם שם הפרויקט, שם הטבלה, והיחידות בכותרות. השורות מודפסות בסדר שמיינתם אותן אליו.';
 
@@ -1470,7 +1472,7 @@ $ec_lang['lpn_find_op_lt']='קטן מ';
 $ec_lang['lpn_find_op_empty']='ריק';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} נמצאו. לחצו על אחד כדי לעבור אליו.';
-
+$ec_lang['lpn_find_shift_hint']='Shift+לחיצה כדי להוסיף/להסיר (החלפה).';
 $ec_lang['lpn_find_none']='שום דבר לא תאם.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1970,7 @@ $ec_lang['lpn_lock_open_choices_ask']='"בקש" אומר למי שפתח קוב�
 $ec_lang['lpn_lock_ask']='בקש';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='את מי לומר שמבקש? ראשי התיבות שלכם אידיאליים. הם נשלחים למי שפתח את הקובץ, ונשמרים רק בדפדפן זה.';
+$ec_lang['lpn_lock_ask_prompt']='את מי לומר שמבקש? ראשי התיבות שלכם אידיאליים. הם נשמרים יחד עם הנעילה של קובץ זה בשרת שלנו, עבור מי שפתח אותו, ונמחקים תוך 30 יום.';
 $ec_lang['lpn_lock_ask_sent']='ביקשנו ממי שפתח קובץ זה לסגור אותו. הם יראו זאת תוך דקה, אם הדף שלהם עדיין פתוח. שום דבר אחר לא השתנה, והקובץ עדיין שלהם עד שיסגרו אותו.';
 $ec_lang['lpn_lock_ask_failed']='לא ניתן היה למסור את ההודעה שלכם. או ששום אחד אינו פותח כעת קובץ זה, או שלא ניתן היה להגיע לשרת.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,8 +2380,8 @@ $ec_lang['lpn_field_easting_abbr']='מ';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
-
+$ec_lang['lpn_field_lat_abbr']='רוחב';
+$ec_lang['lpn_field_lon_abbr']='אורך';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -3713,8 +3715,8 @@ $ec_lang['lpn_ff_design']='בדיקת תכן (השפעה על המערכת)';
 $ec_lang['lpn_ff_design_tip']='שאלה נפרדת מהאם הצומת יכול לספק את הספיקה: עם ספיקה זו נשאבת שם, האם משהו אחר יורד מתחת ללחץ המזערי שלו או חורג ממגבלת המהירות שלו? בחירה לבדוק זאת אינה עולה חישוב נוסף.';
 $ec_lang['lpn_ff_design_off']='אין לבדוק';
 $ec_lang['lpn_ff_design_all']='כל שאר הצמתים וכל הצינורות';
-
-
+$ec_lang['lpn_ff_design_selected']='הצמתים הנבחרים וצינוריהם';
+$ec_lang['lpn_ff_design_no_selection']='בדיקת התכן מוגדרת לצמתים הנבחרים, ואף אחד אינו נבחר. בחרו כמה במפה, או קבעו להכול.';
 $ec_lang['lpn_ff_minpressure']='הלחץ הנמוך ביותר המותר במקום אחר';
 $ec_lang['lpn_ff_minpressure_tip']='צומת שיורד מתחת לזה בעוד צומת אחר שואב את ספיקת כיבוי האש שלו מדווח כבעיית תכן.';
 $ec_lang['lpn_ff_maxvelocity']='המהירות הגבוהה ביותר המותרת';

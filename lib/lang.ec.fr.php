@@ -778,6 +778,13 @@ $ec_lang['lpn_pane_paste_no_node']='Ligne {row} : le nœud {id} n\'existe pas en
 $ec_lang['lpn_pane_paste_same_ends']='Ligne {row} : De et À désignent le même nœud.';
 // {text} is what was pasted and {col} is the column heading, with its unit, such as Diameter (in).
 $ec_lang['lpn_pane_paste_bad_cell']='Ligne {row} : {text} n\'est pas une valeur valide pour {col}.';
+$ec_lang['lpn_pane_paste_text_no_position']='Ligne {row} : un nouveau texte a besoin à la fois de {first} et de {second}.';
+$ec_lang['lpn_pane_paste_no_anchor']='Ligne {row} : {id} n\'est encore ni un nœud ni une conduite de ce réseau. Collez-le d\'abord, puis ce texte.';
+$ec_lang['lpn_pane_paste_customer_no_position']='Ligne {row} : un nouveau client a besoin à la fois de {first} et de {second}.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='Ligne {row} : un nouveau client a besoin d\'une conduite ou d\'un nœud connecté.';
+$ec_lang['lpn_pane_paste_no_pipe']='Ligne {row} : la conduite {id} n\'existe pas encore. Collez d\'abord vos conduites, puis vos clients.';
+$ec_lang['lpn_pane_paste_no_customer_node']='Ligne {row} : le nœud {id} n\'existe pas encore. Collez d\'abord vos jonctions, puis vos clients.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='Ligne {row} : le nœud {id} n\'a aucune conduite à laquelle un client puisse se rattacher.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
 
@@ -814,6 +821,7 @@ $ec_lang['lpn_tool_zoom_window']='Fenêtre de zoom';
 $ec_lang['lpn_zoom_in']='Zoom avant';
 $ec_lang['lpn_zoom_out']='Zoom arrière';
 $ec_lang['lpn_new_text']='Texte';
+$ec_lang['lpn_field_text_anchor']='Associé à';
 $ec_lang['lpn_field_text_bold']='Texte en gras';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
@@ -1331,7 +1339,9 @@ $ec_lang['lpn_pane_filter_none']='Rien dans ce tableau ne correspond au filtre.'
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='Zoomer et sélectionner';
-
+$ec_lang['lpn_goto_on_map']='Aller sur la carte';
+$ec_lang['lpn_pane_select_on_map']='Sélectionner sur la carte';
+$ec_lang['lpn_pane_unselect_on_map']='Désélectionner sur la carte';
 
 
 $ec_lang['lpn_pane_print']='Imprimer le tableau';
@@ -1471,6 +1481,7 @@ $ec_lang['lpn_find_op_empty']='vide';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} trouvé(s). Cliquez sur l\'un d\'eux pour y aller.';
 
+$ec_lang['lpn_find_shift_hint']='Maj+clic pour ajouter ou retirer (bascule).';
 $ec_lang['lpn_find_none']='Aucune correspondance.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1979,7 @@ $ec_lang['lpn_lock_open_choices_ask']='« Demander » indique à la personne qui
 $ec_lang['lpn_lock_ask']='Demander';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='Qui devons-nous dire que c\'est ? Vos initiales sont idéales. Elles sont envoyées à la personne qui a le fichier ouvert, et ne sont stockées que dans ce navigateur.';
+$ec_lang['lpn_lock_ask_prompt']='Qui devons-nous dire que c\'est ? Vos initiales sont idéales. Elles sont conservées avec le verrou de ce fichier sur notre serveur, pour quiconque l\'a ouvert, et supprimées sous 30 jours.';
 $ec_lang['lpn_lock_ask_sent']='Nous avons demandé à la personne qui a ce fichier ouvert de le fermer. Elle le verra dans la minute, si sa page est toujours ouverte. Rien d\'autre n\'a changé, et le fichier lui appartient toujours jusqu\'à ce qu\'elle le ferme.';
 $ec_lang['lpn_lock_ask_failed']='Votre message n\'a pas pu être délivré. Soit personne n\'a ce fichier ouvert actuellement, soit le serveur n\'a pas pu être joint.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2375,6 +2386,8 @@ $ec_lang['lpn_field_easting']='Est';
 // spend most of the line. A surveyor reads these off a single letter; use your language's own.
 $ec_lang['lpn_field_northing_abbr']='N';
 $ec_lang['lpn_field_easting_abbr']='E';
+$ec_lang['lpn_field_lat_abbr']='Lat';
+$ec_lang['lpn_field_lon_abbr']='Long';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
@@ -3713,7 +3726,8 @@ $ec_lang['lpn_ff_design']='Vérification de conception (effet sur le réseau)';
 $ec_lang['lpn_ff_design_tip']='Une question distincte de la capacité de la jonction à fournir le débit : avec ce débit prélevé là, est-ce qu\'autre chose descend sous sa pression minimale ou dépasse sa limite de vitesse ? Choisir de le vérifier ne coûte aucun calcul supplémentaire.';
 $ec_lang['lpn_ff_design_off']='Ne pas vérifier';
 $ec_lang['lpn_ff_design_all']='Toutes les autres jonctions et toutes les conduites';
-
+$ec_lang['lpn_ff_design_selected']='Les jonctions sélectionnées et leurs conduites';
+$ec_lang['lpn_ff_design_no_selection']='La vérification de conception est réglée sur les jonctions sélectionnées, et aucune n\'est sélectionnée. Sélectionnez-en sur la carte, ou choisissez Toutes.';
 
 $ec_lang['lpn_ff_minpressure']='Pression minimale admise ailleurs';
 $ec_lang['lpn_ff_minpressure_tip']='Une jonction qui descend sous cette valeur pendant qu\'une autre prélève son débit d\'incendie est signalée comme un problème de conception.';

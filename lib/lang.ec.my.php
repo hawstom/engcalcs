@@ -780,14 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='အတန်း {row}: မှ နှင့
 $ec_lang['lpn_pane_paste_bad_cell']='အတန်း {row}: {text} သည် မှန်ကန်သော {col} မဟုတ်ပါ။';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='အတန်း {row}: စာသားအသစ်တစ်ခုသည် {first} နှင့် {second} နှစ်ခုစလုံး လိုအပ်သည်။';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='အတန်း {row}: {id} သည် ဤကွန်ရက်တွင် ဆက်စပ်နေရာ (သို့) ပိုက်လိုင်း မဟုတ်သေးပါ။ ၎င်းကို ဦးစွာ ကူးထည့်ပြီးမှ ဤစာသားကို ကူးထည့်ပါ။';
+$ec_lang['lpn_pane_paste_customer_no_position']='အတန်း {row}: ဖောက်သည်အသစ်တစ်ခုသည် {first} နှင့် {second} နှစ်ခုစလုံး လိုအပ်သည်။';
+$ec_lang['lpn_pane_paste_no_customer_ref']='အတန်း {row}: ဖောက်သည်အသစ်တစ်ခုသည် ချိတ်ဆက်ထားသော ပိုက်လိုင်း (သို့) ဆက်စပ်နေရာ လိုအပ်သည်။';
+$ec_lang['lpn_pane_paste_no_pipe']='အတန်း {row}: ပိုက်လိုင်း {id} မရှိသေးပါ။ ပိုက်လိုင်းများကို ဦးစွာ ကူးထည့်ပြီးမှ ဖောက်သည်များကို ကူးထည့်ပါ။';
+$ec_lang['lpn_pane_paste_no_customer_node']='အတန်း {row}: ဆက်စပ်နေရာ {id} မရှိသေးပါ။ ဆက်စပ်နေရာများကို ဦးစွာ ကူးထည့်ပြီးမှ ဖောက်သည်များကို ကူးထည့်ပါ။';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='အတန်း {row}: ဆက်စပ်နေရာ {id} တွင် ဖောက်သည်တစ်ဦး ချိတ်ဆက်ရန် ပိုက်လိုင်း မရှိပါ။';
 $ec_lang['lpn_pane_filled']='ဆဲလ် {n} ကို အောက်သို့ဖြည့်ခဲ့သည်။ {skipped} ခုကို မပြောင်းလဲခဲ့ပါ။';
 $ec_lang['lpn_pane_filldown']='အောက်သို့ဖြည့်ရန်';
 $ec_lang['lpn_pane_fill_none']='ဤရွေးချယ်မှုတွင် အောက်သို့ ဖြည့်နိုင်သည့် မည်သည့်အရာမျှ မရှိပါ။';
@@ -825,7 +825,7 @@ $ec_lang['lpn_field_text_bold']='စာလုံးထူ';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
-
+$ec_lang['lpn_field_text_anchor']='ချိတ်ဆက်ထားသည့်နေရာ';
 $ec_lang['lpn_field_text_align']='အလျားလိုက် ချိန်ညှိမှု';
 $ec_lang['lpn_field_text_align_left']='ဘယ်';
 $ec_lang['lpn_field_text_align_center']='အလယ်';
@@ -1331,9 +1331,9 @@ $ec_lang['lpn_pane_filter_none']='ဤဇယားတွင် စစ်ထုတ
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='ဇူးမ်ပြီး ရွေးချယ်ရန်';
-
-
-
+$ec_lang['lpn_goto_on_map']='မြေပုံပေါ်သို့ သွားရန်';
+$ec_lang['lpn_pane_select_on_map']='မြေပုံပေါ်တွင် ရွေးချယ်ရန်';
+$ec_lang['lpn_pane_unselect_on_map']='မြေပုံပေါ်တွင် ရွေးချယ်မှု ပယ်ဖျက်ရန်';
 $ec_lang['lpn_pane_print']='ဇယားကို ပုံနှိပ်ရန်';
 $ec_lang['lpn_pane_print_tip']='သင်ကြည့်နေသော ဇယားကို ပရောဂျက်အမည်၊ ဇယားအမည်နှင့် ခေါင်းစီးများထဲရှိ ယူနစ်များဖြင့် ပုံနှိပ်သည်။ အတန်းများသည် သင်စီထားသည့် အစီအစဉ်အတိုင်း ပုံနှိပ်ပါလိမ့်မည်။';
 
@@ -1470,7 +1470,7 @@ $ec_lang['lpn_find_op_lt']='ထက်နည်းသည်';
 $ec_lang['lpn_find_op_empty']='ဗလာဖြစ်သည်';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} ခု တွေ့ရှိသည်။ တစ်ခုသို့ သွားရန် နှိပ်ပါ။';
-
+$ec_lang['lpn_find_shift_hint']='ထည့်ရန် (သို့) ဖယ်ရှားရန် အသွင်ပြောင်းရန် Shift+click နှိပ်ပါ။';
 $ec_lang['lpn_find_none']='မည်သည့်အရာမျှ မကိုက်ညီပါ။';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1968,7 @@ $ec_lang['lpn_lock_open_choices_ask']='“မေးမြန်းရန်” �
 $ec_lang['lpn_lock_ask']='မေးမြန်းရန်';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='မေးမြန်းသူအဖြစ် မည်သူ့အမည်ကို ပြောပြရမည်နည်း။ သင့်နာမည်အတိုကောက် အကောင်းဆုံးဖြစ်သည်။ ၎င်းတို့ကို ဖိုင်ကို ဖွင့်ထားသူထံသို့ ပေးပို့ပြီး၊ ဤဘရောက်ဇာတွင်သာ သိမ်းဆည်းထားသည်။';
+$ec_lang['lpn_lock_ask_prompt']='မေးမြန်းသူအဖြစ် မည်သူ့အမည်ကို ပြောပြရမည်နည်း။ သင့်နာမည်အတိုကောက် အကောင်းဆုံးဖြစ်သည်။ ၎င်းတို့ကို ဤဖိုင်၏ လော့ခ်နှင့်အတူ ကျွန်ုပ်တို့၏ ဆာဗာပေါ်တွင် ဖိုင်ကို ဖွင့်ထားသူ မည်သူ့အတွက်မဆို သိမ်းဆည်းထားပြီး၊ ရက် ၃၀ အတွင်း ဖျက်ပစ်မည်ဖြစ်သည်။';
 $ec_lang['lpn_lock_ask_sent']='ဤဖိုင်ကို ဖွင့်ထားသူအား ပိတ်ပေးရန် မေးမြန်းလိုက်ပါပြီ။ ၎င်းတို့၏ စာမျက်နှာ ဖွင့်ထားဆဲဖြစ်ပါက၊ တစ်မိနစ်အတွင်း တွေ့ရပါလိမ့်မည်။ အခြားမည်သည့်အရာမျှ ပြောင်းလဲခြင်း မရှိပါ၊ ၎င်းတို့ မပိတ်မချင်း ဖိုင်သည် ၎င်းတို့ပိုင်ဆိုင်ဆဲ ဖြစ်သည်။';
 $ec_lang['lpn_lock_ask_failed']='သင့်စာကို ပေးပို့၍ မရပါ။ ယခု ဤဖိုင်ကို ဖွင့်ထားသူ တစ်ဦးမျှ မရှိခြင်း (သို့) ဆာဗာသို့ မရောက်ရှိနိုင်ခြင်း ဖြစ်နိုင်သည်။';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,8 +2378,8 @@ $ec_lang['lpn_field_easting_abbr']='E';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
-
+$ec_lang['lpn_field_lat_abbr']='Lat';
+$ec_lang['lpn_field_lon_abbr']='Lon';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -3713,8 +3713,8 @@ $ec_lang['lpn_ff_design']='ဒီဇိုင်း စစ်ဆေးမှု 
 $ec_lang['lpn_ff_design_tip']='ဆက်စပ်နေရာက ရေစီးနှုန်းကို ပေးနိုင်သလားဟူသော မေးခွန်းနှင့် ခွဲထားသော မေးခွန်းတစ်ခု - ထိုနေရာတွင် ထိုရေစီးနှုန်းကို ဆွဲယူထားစဉ်၊ အခြားအရာတစ်ခုခုသည် ၎င်း၏ အနည်းဆုံးဖိအားအောက် ကျဆင်းသည် (သို့) ၎င်း၏ အလျင်ကန့်သတ်ချက်ကို ကျော်လွန်သလား။ ၎င်းကို စစ်ဆေးရန် ရွေးချယ်ခြင်းသည် နောက်ထပ် တွက်ချက်မှု ကုန်ကျစရိတ် မရှိပါ။';
 $ec_lang['lpn_ff_design_off']='မစစ်ဆေးပါ';
 $ec_lang['lpn_ff_design_all']='အခြား ဆက်စပ်နေရာ အားလုံးနှင့် ပိုက်လိုင်း အားလုံး';
-
-
+$ec_lang['lpn_ff_design_selected']='ရွေးချယ်ထားသော ဆက်စပ်နေရာများနှင့် ၎င်းတို့၏ ပိုက်လိုင်းများ';
+$ec_lang['lpn_ff_design_no_selection']='ဒီဇိုင်း စစ်ဆေးမှုကို ရွေးချယ်ထားသော ဆက်စပ်နေရာများအဖြစ် သတ်မှတ်ထားသော်လည်း၊ မည်သည့်ဆက်စပ်နေရာကိုမျှ မရွေးချယ်ထားပါ။ မြေပုံပေါ်တွင် အချို့ကို ရွေးပါ၊ (သို့) အားလုံး ကို သတ်မှတ်ပါ။';
 $ec_lang['lpn_ff_minpressure']='အခြားနေရာများတွင် ခွင့်ပြုထားသော အနိမ့်ဆုံးဖိအား';
 $ec_lang['lpn_ff_minpressure_tip']='အခြားဆက်စပ်နေရာတစ်ခုက ၎င်း၏ မီးငြိမ်းသတ်ရေးစီးနှုန်းကို ဆွဲယူနေစဉ်၊ ဤဖိအားအောက် ကျဆင်းသွားသော ဆက်စပ်နေရာကို ဒီဇိုင်းပြဿနာတစ်ခုအဖြစ် အစီရင်ခံမည်။';
 $ec_lang['lpn_ff_maxvelocity']='ခွင့်ပြုထားသော အမြင့်ဆုံးအလျင်';

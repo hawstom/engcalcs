@@ -780,13 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='पंक्ति {row}: से और �
 $ec_lang['lpn_pane_paste_bad_cell']='पंक्ति {row}: {text} एक मान्य {col} नहीं है।';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='पंक्ति {row}: एक नए टेक्स्ट को {first} और {second} दोनों चाहिए।';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='पंक्ति {row}: {id} अभी इस नेटवर्क में कोई नोड या पाइप नहीं है। पहले इसे पेस्ट करें, फिर यह टेक्स्ट।';
+$ec_lang['lpn_pane_paste_customer_no_position']='पंक्ति {row}: एक नए ग्राहक को {first} और {second} दोनों चाहिए।';
+$ec_lang['lpn_pane_paste_no_customer_ref']='पंक्ति {row}: एक नए ग्राहक को जुड़ा हुआ पाइप या नोड चाहिए।';
+$ec_lang['lpn_pane_paste_no_pipe']='पंक्ति {row}: पाइप {id} अभी मौजूद नहीं है। पहले अपने पाइप पेस्ट करें, फिर अपने ग्राहक।';
+$ec_lang['lpn_pane_paste_no_customer_node']='पंक्ति {row}: नोड {id} अभी मौजूद नहीं है। पहले अपने जंक्शन पेस्ट करें, फिर अपने ग्राहक।';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='पंक्ति {row}: नोड {id} के पास ग्राहक को जोड़ने के लिए कोई पाइप नहीं है।';
 
 $ec_lang['lpn_pane_filled']='{n} सेल नीचे भरे गए। {skipped} नहीं बदले गए।';
 $ec_lang['lpn_pane_filldown']='नीचे भरें';
@@ -825,6 +826,7 @@ $ec_lang['lpn_field_text_bold']='मोटा (बोल्ड) टेक्स�
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
+$ec_lang['lpn_field_text_anchor']='किससे जुड़ा';
 
 $ec_lang['lpn_field_text_align']='क्षैतिज संरेखण';
 $ec_lang['lpn_field_text_align_left']='बाएँ';
@@ -1331,9 +1333,9 @@ $ec_lang['lpn_pane_filter_none']='इस तालिका में कुछ 
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='ज़ूम करें और चुनें';
-
-
-
+$ec_lang['lpn_goto_on_map']='मानचित्र पर जाएँ';
+$ec_lang['lpn_pane_select_on_map']='मानचित्र पर चुनें';
+$ec_lang['lpn_pane_unselect_on_map']='मानचित्र पर चयन हटाएँ';
 $ec_lang['lpn_pane_print']='तालिका छापें';
 $ec_lang['lpn_pane_print_tip']='जो तालिका आप देख रहे हैं उसे प्रोजेक्ट का नाम, तालिका का नाम और शीर्षकों में इकाइयों के साथ छापें। पंक्तियाँ उसी क्रम में छपती हैं जिस क्रम में आपने उन्हें क्रमबद्ध किया था।';
 
@@ -1470,7 +1472,7 @@ $ec_lang['lpn_find_op_lt']='से कम';
 $ec_lang['lpn_find_op_empty']='खाली';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} मिले। किसी एक पर जाने के लिए क्लिक करें।';
-
+$ec_lang['lpn_find_shift_hint']='जोड़ने/हटाने के लिए Shift दबाकर क्लिक करें।';
 $ec_lang['lpn_find_none']='कुछ भी मेल नहीं खाया।';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1970,7 @@ $ec_lang['lpn_lock_open_choices_ask']='"पूछें" जिसके पा�
 $ec_lang['lpn_lock_ask']='पूछें';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='हम किसे पूछने वाला बताएँ? आपके आद्याक्षर आदर्श हैं। ये उसे भेजे जाते हैं जिसके पास फ़ाइल खुली है, और केवल इस ब्राउज़र में संग्रहीत होते हैं।';
+$ec_lang['lpn_lock_ask_prompt']='हम किसे पूछने वाला बताएँ? आपके आद्याक्षर आदर्श हैं। ये जिसके पास भी यह फ़ाइल खुली है उसके लिए हमारे सर्वर पर इस फ़ाइल के लॉक के साथ रखे जाते हैं, और 30 दिनों के भीतर मिटा दिए जाते हैं।';
 $ec_lang['lpn_lock_ask_sent']='हमने जिसके पास भी यह फ़ाइल खुली है उससे इसे बंद करने के लिए कहा है। यदि उनका पृष्ठ अभी भी खुला है, तो वे इसे एक मिनट के भीतर देख लेंगे। बाकी कुछ नहीं बदला है, और जब तक वे इसे बंद नहीं करते, फ़ाइल अभी भी उन्हीं की है।';
 $ec_lang['lpn_lock_ask_failed']='आपका संदेश भेजा नहीं जा सका। या तो अभी किसी के पास यह फ़ाइल खुली नहीं है, या सर्वर तक नहीं पहुँचा जा सका।';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,7 +2380,8 @@ $ec_lang['lpn_field_easting_abbr']='E';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
+$ec_lang['lpn_field_lat_abbr']='अक्षां';
+$ec_lang['lpn_field_lon_abbr']='देशां';
 
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
@@ -3713,7 +3716,8 @@ $ec_lang['lpn_ff_design']='डिज़ाइन जाँच (सिस्ट�
 $ec_lang['lpn_ff_design_tip']='यह सवाल इससे अलग है कि जंक्शन प्रवाह दे सकता है या नहीं: वहाँ वह प्रवाह खींचे जाने पर, क्या कुछ और अपने न्यूनतम दाब से नीचे जाता है या अपनी वेग सीमा से आगे निकलता है? इसे जाँचने का चुनाव कोई अतिरिक्त गणना नहीं माँगता।';
 $ec_lang['lpn_ff_design_off']='जाँच न करें';
 $ec_lang['lpn_ff_design_all']='सभी अन्य जंक्शन और सभी पाइप';
-
+$ec_lang['lpn_ff_design_selected']='चयनित जंक्शन और उनके पाइप';
+$ec_lang['lpn_ff_design_no_selection']='डिज़ाइन जाँच चयनित जंक्शनों पर सेट है, और कोई चयनित नहीं है। मानचित्र पर कुछ चुनें, या इसके बजाय "सभी" सेट करें।';
 
 $ec_lang['lpn_ff_minpressure']='अन्यत्र अनुमत न्यूनतम दाब';
 $ec_lang['lpn_ff_minpressure_tip']='एक जंक्शन जो इससे नीचे चला जाता है जबकि कोई दूसरा अपना फायर फ्लो खींच रहा है, उसे डिज़ाइन समस्या के रूप में रिपोर्ट किया जाता है।';

@@ -780,13 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='ردیف {row}: «از» و «به» یک 
 $ec_lang['lpn_pane_paste_bad_cell']='ردیف {row}: {text} یک {col} معتبر نیست.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='ردیف {row}: یک متن تازه به هر دوی {first} و {second} نیاز دارد.';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='ردیف {row}: {id} هنوز یک گره یا لوله در این شبکه نیست. نخست آن را بچسبانید، سپس این متن را.';
+$ec_lang['lpn_pane_paste_customer_no_position']='ردیف {row}: یک مشترک تازه به هر دوی {first} و {second} نیاز دارد.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='ردیف {row}: یک مشترک تازه به یک لوله یا گرهٔ متصل نیاز دارد.';
+$ec_lang['lpn_pane_paste_no_pipe']='ردیف {row}: لولهٔ {id} هنوز وجود ندارد. نخست لوله‌هایتان را بچسبانید، سپس مشترکانتان را.';
+$ec_lang['lpn_pane_paste_no_customer_node']='ردیف {row}: گرهٔ {id} هنوز وجود ندارد. نخست گره‌هایتان را بچسبانید، سپس مشترکانتان را.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='ردیف {row}: گرهٔ {id} لوله‌ای برای اتصال یک مشترک ندارد.';
 
 $ec_lang['lpn_pane_filled']='{n} سلول رو به پایین پر شد. {skipped} تغییر نکرد.';
 $ec_lang['lpn_pane_filldown']='پر کردن رو به پایین';
@@ -825,7 +826,7 @@ $ec_lang['lpn_field_text_bold']='متن پررنگ';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
-
+$ec_lang['lpn_field_text_anchor']='متصل به';
 $ec_lang['lpn_field_text_align']='ترازبندی افقی';
 $ec_lang['lpn_field_text_align_left']='چپ';
 $ec_lang['lpn_field_text_align_center']='وسط';
@@ -1331,9 +1332,9 @@ $ec_lang['lpn_pane_filter_none']='هیچ‌چیز در این جدول با پا
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='بزرگ‌نمایی و انتخاب';
-
-
-
+$ec_lang['lpn_goto_on_map']='نمایش روی نقشه';
+$ec_lang['lpn_pane_select_on_map']='انتخاب روی نقشه';
+$ec_lang['lpn_pane_unselect_on_map']='لغو انتخاب روی نقشه';
 $ec_lang['lpn_pane_print']='چاپ جدول';
 $ec_lang['lpn_pane_print_tip']='جدولی را که در حال دیدن آن هستید چاپ کنید، همراه با نام پروژه، نام جدول، و واحدها در سرستون‌ها. سطرها به همان ترتیبی که مرتب کرده‌اید چاپ می‌شوند.';
 
@@ -1470,7 +1471,7 @@ $ec_lang['lpn_find_op_lt']='کوچک‌تر از';
 $ec_lang['lpn_find_op_empty']='خالی';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} یافت شد. برای رفتن به آن، کلیک کنید.';
-
+$ec_lang['lpn_find_shift_hint']='Shift+کلیک برای افزودن یا حذف (تغییر وضعیت).';
 $ec_lang['lpn_find_none']='چیزی مطابقت نداشت.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1969,7 @@ $ec_lang['lpn_lock_open_choices_ask']='«پرسیدن» به هر کسی که ا
 $ec_lang['lpn_lock_ask']='پرسیدن';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='بگوییم چه کسی می‌پرسد؟ حروف اول نام شما ایده‌آل است. این به هر کسی که فایل را باز دارد فرستاده می‌شود، و فقط در همین مرورگر ذخیره می‌شود.';
+$ec_lang['lpn_lock_ask_prompt']='بگوییم چه کسی می‌پرسد؟ حروف اول نام شما ایده‌آل است. این با قفل این فایل روی سرور ما نگه‌داری می‌شود، برای هر کسی که آن را باز دارد، و ظرف 30 روز حذف می‌شود.';
 $ec_lang['lpn_lock_ask_sent']='از هر کسی که این فایل را باز دارد خواسته‌ایم آن را ببندد. اگر صفحه‌شان هنوز باز باشد، ظرف یک دقیقه آن را می‌بینند. چیز دیگری تغییر نکرده، و فایل تا وقتی که آن را نبندند همچنان مال آن‌هاست.';
 $ec_lang['lpn_lock_ask_failed']='پیام شما نتوانست ارسال شود. یا اکنون هیچ‌کس این فایل را باز ندارد، یا سرور در دسترس نبود.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,8 +2379,8 @@ $ec_lang['lpn_field_easting_abbr']='ع';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
-
+$ec_lang['lpn_field_lat_abbr']='عرض';
+$ec_lang['lpn_field_lon_abbr']='طول';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -3713,8 +3714,8 @@ $ec_lang['lpn_ff_design']='بررسی طراحی (اثر بر سیستم)';
 $ec_lang['lpn_ff_design_tip']='پرسشی جدا از این‌که آیا گره می‌تواند آن دبی را تحویل دهد: با برداشت آن دبی در آن‌جا، آیا چیز دیگری زیر حداقل فشار خود می‌افتد یا از حد سرعت خود فراتر می‌رود؟ انتخاب بررسی آن هیچ محاسبهٔ اضافه‌ای هزینه ندارد.';
 $ec_lang['lpn_ff_design_off']='بررسی نشود';
 $ec_lang['lpn_ff_design_all']='همهٔ گره‌های دیگر و همهٔ لوله‌ها';
-
-
+$ec_lang['lpn_ff_design_selected']='گره‌های انتخاب‌شده و لوله‌های آن‌ها';
+$ec_lang['lpn_ff_design_no_selection']='بررسی طراحی روی گره‌های انتخاب‌شده تنظیم شده، و هیچ‌کدام انتخاب نشده. چند مورد را روی نقشه انتخاب کنید، یا «همه» را تنظیم کنید.';
 $ec_lang['lpn_ff_minpressure']='کمترین فشار مجاز در جای دیگر';
 $ec_lang['lpn_ff_minpressure_tip']='گره‌ای که درحالی‌که گرهٔ دیگری جریان آتش‌نشانی خود را برمی‌دارد زیر این فشار بیفتد، به‌عنوان یک مشکل طراحی گزارش می‌شود.';
 $ec_lang['lpn_ff_maxvelocity']='بیشترین سرعت مجاز';

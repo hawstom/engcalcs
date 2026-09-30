@@ -780,13 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='第 {row} 行：“起点”和“终点�
 $ec_lang['lpn_pane_paste_bad_cell']='第 {row} 行：{text} 不是有效的 {col}。';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='第 {row} 行：新的文字需要同时给出 {first} 和 {second}。';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='第 {row} 行：{id} 尚不是此管网中的节点或管道。请先粘贴它，再粘贴此文字。';
+$ec_lang['lpn_pane_paste_customer_no_position']='第 {row} 行：新的用户需要同时给出 {first} 和 {second}。';
+$ec_lang['lpn_pane_paste_no_customer_ref']='第 {row} 行：新的用户需要连接到一条管道或一个节点。';
+$ec_lang['lpn_pane_paste_no_pipe']='第 {row} 行：管道 {id} 尚不存在。请先粘贴您的管道，再粘贴您的用户。';
+$ec_lang['lpn_pane_paste_no_customer_node']='第 {row} 行：节点 {id} 尚不存在。请先粘贴您的节点，再粘贴您的用户。';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='第 {row} 行：节点 {id} 没有可供用户连接的管道。';
 
 $ec_lang['lpn_pane_filled']='已向下填充 {n} 个单元格。{skipped} 个未被更改。';
 $ec_lang['lpn_pane_filldown']='向下填充';
@@ -825,7 +826,7 @@ $ec_lang['lpn_field_text_bold']='粗体文字';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
-
+$ec_lang['lpn_field_text_anchor']='附加于';
 $ec_lang['lpn_field_text_align']='水平对齐方式';
 $ec_lang['lpn_field_text_align_left']='左对齐';
 $ec_lang['lpn_field_text_align_center']='居中';
@@ -1331,9 +1332,9 @@ $ec_lang['lpn_pane_filter_none']='此表中没有与过滤条件匹配的内容�
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='缩放并选中';
-
-
-
+$ec_lang['lpn_goto_on_map']='在地图上定位';
+$ec_lang['lpn_pane_select_on_map']='在地图上选中';
+$ec_lang['lpn_pane_unselect_on_map']='在地图上取消选中';
 $ec_lang['lpn_pane_print']='打印表格';
 $ec_lang['lpn_pane_print_tip']='打印您正在查看的表格，标题中包含项目名称、表格名称和单位。行按您排序的顺序打印。';
 
@@ -1470,7 +1471,7 @@ $ec_lang['lpn_find_op_lt']='小于';
 $ec_lang['lpn_find_op_empty']='为空';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='找到 {n} 个。点击其中之一即可跳转到该处。';
-
+$ec_lang['lpn_find_shift_hint']='按住 Shift 点击可切换添加/移除。';
 $ec_lang['lpn_find_none']='未找到匹配项。';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1969,7 @@ $ec_lang['lpn_lock_open_choices_ask']='“询问”会告诉正在打开此文�
 $ec_lang['lpn_lock_ask']='询问';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='应该说是谁在询问？使用您的姓名缩写最为合适。这会发送给正在打开此文件的人，并且只保存在本浏览器中。';
+$ec_lang['lpn_lock_ask_prompt']='应该说是谁在询问？使用您的姓名缩写最为合适。它会随此文件的锁一起保存在我们的服务器上，供正在打开此文件的人查看，并在 30 天内删除。';
 $ec_lang['lpn_lock_ask_sent']='我们已请求正在打开此文件的人将其关闭。如果对方的页面仍处于打开状态，他们会在一分钟内看到请求。其他一切均未改变，在对方关闭之前，此文件仍归他们使用。';
 $ec_lang['lpn_lock_ask_failed']='您的消息未能送达。可能目前没有人打开此文件，也可能是无法连接到服务器。';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,8 +2379,8 @@ $ec_lang['lpn_field_easting_abbr']='东';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
-
+$ec_lang['lpn_field_lat_abbr']='纬';
+$ec_lang['lpn_field_lon_abbr']='经';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -3713,8 +3714,8 @@ $ec_lang['lpn_ff_design']='设计校核（对系统的影响）';
 $ec_lang['lpn_ff_design_tip']='这是一个独立的问题：抽取该流量后，是否有其他部位的压力低于其下限，或流速超过其限值？勾选此项不会增加额外的计算量。';
 $ec_lang['lpn_ff_design_off']='不检查';
 $ec_lang['lpn_ff_design_all']='所有其他节点和所有管道';
-
-
+$ec_lang['lpn_ff_design_selected']='所选节点及其管道';
+$ec_lang['lpn_ff_design_no_selection']='设计校核范围已设置为所选节点，但目前未选中任何节点。请在地图上选择一些节点，或将其设置为“所有其他节点和所有管道”。';
 $ec_lang['lpn_ff_minpressure']='其他部位允许的最低压力';
 $ec_lang['lpn_ff_minpressure_tip']='当某个节点正在抽取其消防流量时，若其他节点的压力低于此值，则报告为设计问题。';
 $ec_lang['lpn_ff_maxvelocity']='允许的最高流速';

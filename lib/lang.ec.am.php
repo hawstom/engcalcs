@@ -780,14 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='ረድፍ {row}፦ ከ-ነጥብና ወደ
 $ec_lang['lpn_pane_paste_bad_cell']='ረድፍ {row}፦ {text} ትክክለኛ {col} አይደለም።';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='ረድፍ {row}፦ አዲስ ጽሑፍ ሁለቱንም {first} እና {second} ይፈልጋል።';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='ረድፍ {row}፦ {id} በዚህ መረብ ውስጥ እስካሁን ነጥብ ወይም ቧንቧ አይደለም። መጀመሪያ እሱን ይለጥፉ፣ ከዚያም ይህን ጽሑፍ ይለጥፉ።';
+$ec_lang['lpn_pane_paste_customer_no_position']='ረድፍ {row}፦ አዲስ ደንበኛ ሁለቱንም {first} እና {second} ይፈልጋል።';
+$ec_lang['lpn_pane_paste_no_customer_ref']='ረድፍ {row}፦ አዲስ ደንበኛ የተገናኘ ቧንቧ ወይም ነጥብ ይፈልጋል።';
+$ec_lang['lpn_pane_paste_no_pipe']='ረድፍ {row}፦ ቧንቧ {id} ገና የለም። መጀመሪያ ቧንቧዎችዎን ይለጥፉ፣ ከዚያም ደንበኞችዎን።';
+$ec_lang['lpn_pane_paste_no_customer_node']='ረድፍ {row}፦ ነጥብ {id} ገና የለም። መጀመሪያ መገናኛዎችዎን ይለጥፉ፣ ከዚያም ደንበኞችዎን።';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='ረድፍ {row}፦ ነጥብ {id} ደንበኛ የሚያያዝበት ቧንቧ የለውም።';
 $ec_lang['lpn_pane_filled']='{n} ክፍሎች ወደታች ተሞልተዋል። {skipped} አልተቀየሩም።';
 $ec_lang['lpn_pane_filldown']='ወደታች ሙላ';
 $ec_lang['lpn_pane_fill_none']='በዚህ ምርጫ ውስጥ ወደታች ሊሞላ የሚችል ምንም ነገር የለም።';
@@ -825,7 +825,7 @@ $ec_lang['lpn_field_text_bold']='ደማቅ ጽሑፍ';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
-
+$ec_lang['lpn_field_text_anchor']='የተያያዘበት';
 $ec_lang['lpn_field_text_align']='አግድም አሰላለፍ';
 $ec_lang['lpn_field_text_align_left']='ግራ';
 $ec_lang['lpn_field_text_align_center']='መሃል';
@@ -1331,9 +1331,9 @@ $ec_lang['lpn_pane_filter_none']='በዚህ ሠንጠረዥ ውስጥ ከማጣ�
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='አጉላና ምረጥ';
-
-
-
+$ec_lang['lpn_goto_on_map']='ካርታ ላይ ሂድ';
+$ec_lang['lpn_pane_select_on_map']='ካርታ ላይ ምረጥ';
+$ec_lang['lpn_pane_unselect_on_map']='ካርታ ላይ ምርጫ አጥፋ';
 $ec_lang['lpn_pane_print']='ሠንጠረዥ አትም';
 $ec_lang['lpn_pane_print_tip']='እየተመለከቱት ያለውን ሠንጠረዥ ያትማል፣ ከፕሮጀክቱ ስም፣ ከሠንጠረዡ ስምና ከመለኪያ ክፍሎቹ ጋር በራስጌዎቹ ውስጥ። ረድፎች የደረደሩበትን ቅደም ተከተል ይዘው ይታተማሉ።';
 
@@ -1470,7 +1470,7 @@ $ec_lang['lpn_find_op_lt']='ያንሳል';
 $ec_lang['lpn_find_op_empty']='ባዶ';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} ተገኝቷል። ወደ እሱ ለመሄድ አንዱን ይጫኑ።';
-
+$ec_lang['lpn_find_shift_hint']='ለመጨመር ወይም ለማስወገድ ለመቀያየር Shift+click ያድርጉ።';
 $ec_lang['lpn_find_none']='ምንም አልተገኘም።';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1968,7 @@ $ec_lang['lpn_lock_open_choices_ask']='«ጠይቅ» ይህን ፋይል የከ�
 $ec_lang['lpn_lock_ask']='ጠይቅ';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='ማን እየጠየቀ እንደሆነ ምን እንበል? የመጀመሪያ ፊደሎችዎ ተመራጭ ናቸው። ይህን ፋይል ለከፈተው ሰው ይላካሉ፣ የሚቀመጡትም በዚህ አሳሽ ውስጥ ብቻ ነው።';
+$ec_lang['lpn_lock_ask_prompt']='ማን እየጠየቀ እንደሆነ ምን እንበል? የመጀመሪያ ፊደሎችዎ ተመራጭ ናቸው። ፋይሉን ክፍት ላደረገው ሰው ሁሉ በአገልጋያችን ላይ ካለው የዚህ ፋይል ቁልፍ ጋር ይቀመጣሉ፣ በ30 ቀናት ውስጥም ይሰረዛሉ።';
 $ec_lang['lpn_lock_ask_sent']='ይህን ፋይል የከፈተውን ሰው እንዲዘጋው ጠይቀናል። ገጹ ገና ክፍት ከሆነ በአንድ ደቂቃ ውስጥ ያያሉ። ሌላ ምንም አልተለወጠም፣ ፋይሉም እስከሚዘጉት ድረስ የእነሱ ሆኖ ይቀራል።';
 $ec_lang['lpn_lock_ask_failed']='መልእክትዎ ሊደርስ አልቻለም። አሁን ማንም ይህን ፋይል ከፍቶ የለም ወይም አገልጋዩ ሊደረስበት አልተቻለም።';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,8 +2378,8 @@ $ec_lang['lpn_field_easting_abbr']='E';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
-
+$ec_lang['lpn_field_lat_abbr']='Lat';
+$ec_lang['lpn_field_lon_abbr']='Lon';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -3713,8 +3713,8 @@ $ec_lang['lpn_ff_design']='የንድፍ ምርመራ (በስርዓቱ ላይ ያ
 $ec_lang['lpn_ff_design_tip']='መገናኛው ፍሰቱን ማድረስ ይችል እንደሆነ ከሚለው የተለየ ጥያቄ፦ ያ ፍሰት እዚያ ሲሳብ፣ ሌላ ማንኛውም ነገር ከዝቅተኛ ግፊቱ በታች ይወርዳል ወይስ የፍጥነት ገደቡን ያልፋል? መፈተኑን መምረጥ ምንም ተጨማሪ ስሌት አያስወጣም።';
 $ec_lang['lpn_ff_design_off']='አትፈትሽ';
 $ec_lang['lpn_ff_design_all']='ሌሎቹ መገናኛዎችና ቧንቧዎች ሁሉ';
-
-
+$ec_lang['lpn_ff_design_selected']='የተመረጡት መገናኛዎችና ቧንቧዎቻቸው';
+$ec_lang['lpn_ff_design_no_selection']='የንድፍ ምርመራው የተመረጡ መገናኛዎች ላይ ተቀናብሯል፣ ምንም ግን አልተመረጠም። በካርታው ላይ አንዳንዶቹን ይምረጡ፣ ወይም ሁሉንም ያዘጋጁ።';
 $ec_lang['lpn_ff_minpressure']='በሌላ ቦታ የሚፈቀድ ዝቅተኛ ግፊት';
 $ec_lang['lpn_ff_minpressure_tip']='ሌላ መገናኛ የእሳት ፍሰቱን እየሳበ ሳለ ከዚህ በታች የሚወርድ መገናኛ እንደ ንድፍ ችግር ይነገራል።';
 $ec_lang['lpn_ff_maxvelocity']='የሚፈቀድ ከፍተኛ ፍጥነት';

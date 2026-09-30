@@ -780,12 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='الصف {row}: العقدتان من وإ
 $ec_lang['lpn_pane_paste_bad_cell']='الصف {row}: {text} ليست {col} صالحة.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='الصف {row}: يحتاج نص جديد إلى كل من {first} و{second}.';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='الصف {row}: {id} ليس عقدة ولا أنبوباً في هذه الشبكة بعد. الصق ذلك أولاً، ثم هذا النص.';
+$ec_lang['lpn_pane_paste_customer_no_position']='الصف {row}: يحتاج مشترك جديد إلى كل من {first} و{second}.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='الصف {row}: يحتاج مشترك جديد إلى أنبوب أو عقدة متصلة.';
+$ec_lang['lpn_pane_paste_no_pipe']='الصف {row}: الأنبوب {id} غير موجود بعد. الصق أنابيبك أولاً، ثم مشتركيك.';
+$ec_lang['lpn_pane_paste_no_customer_node']='الصف {row}: العقدة {id} غير موجودة بعد. الصق ملتقياتك أولاً، ثم مشتركيك.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='الصف {row}: لا يوجد للعقدة {id} أنبوب يتصل به مشترك.';
 
 
 $ec_lang['lpn_pane_filled']='عُبّئت إلى الأسفل {n} خلية. لم تتغيّر {skipped}.';
@@ -825,7 +827,7 @@ $ec_lang['lpn_field_text_bold']='نص عريض';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
-
+$ec_lang['lpn_field_text_anchor']='متصل بـ';
 $ec_lang['lpn_field_text_align']='المحاذاة الأفقية';
 $ec_lang['lpn_field_text_align_left']='يسار';
 $ec_lang['lpn_field_text_align_center']='وسط';
@@ -1331,9 +1333,9 @@ $ec_lang['lpn_pane_filter_none']='لا شيء في هذا الجدول يطاب�
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='تكبير وتحديد';
-
-
-
+$ec_lang['lpn_goto_on_map']='الانتقال على الخريطة';
+$ec_lang['lpn_pane_select_on_map']='تحديد على الخريطة';
+$ec_lang['lpn_pane_unselect_on_map']='إلغاء التحديد على الخريطة';
 $ec_lang['lpn_pane_print']='طباعة الجدول';
 $ec_lang['lpn_pane_print_tip']='يطبع الجدول الذي تنظر إليه، مع اسم المشروع واسم الجدول والوحدات في العناوين. تُطبع الصفوف بالترتيب الذي فرزتها إليه.';
 
@@ -1470,7 +1472,7 @@ $ec_lang['lpn_find_op_lt']='أصغر من';
 $ec_lang['lpn_find_op_empty']='فارغ';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='تم العثور على {n}. انقر على واحد للانتقال إليه.';
-
+$ec_lang['lpn_find_shift_hint']='Shift+click للإضافة أو الإزالة (تبديل).';
 $ec_lang['lpn_find_none']='لم يُطابق شيء.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1970,7 @@ $ec_lang['lpn_lock_open_choices_ask']='"اسأل" يُخبر من فتح هذا 
 $ec_lang['lpn_lock_ask']='اسأل';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='من نقول إنه يسأل؟ الأحرف الأولى من اسمك مثالية. تُرسَل إلى من فتح الملف، وتُخزَّن فقط في هذا المتصفح.';
+$ec_lang['lpn_lock_ask_prompt']='من نقول إنه يسأل؟ الأحرف الأولى من اسمك مثالية. تُحفَظ مع قفل هذا الملف على خادمنا، لمن يكون قد فتحه، وتُحذَف خلال 30 يوماً.';
 $ec_lang['lpn_lock_ask_sent']='طلبنا ممن فتح هذا الملف إغلاقه. سيرونه خلال دقيقة، إذا كانت صفحتهم لا تزال مفتوحة. لم يتغيّر شيء آخر، والملف لا يزال لهم حتى يغلقوه.';
 $ec_lang['lpn_lock_ask_failed']='تعذّر تسليم رسالتك. إما أنه لا أحد يفتح هذا الملف الآن، أو تعذّر الوصول إلى الخادم.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,8 +2380,8 @@ $ec_lang['lpn_field_easting_abbr']='E';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
-
+$ec_lang['lpn_field_lat_abbr']='ع';
+$ec_lang['lpn_field_lon_abbr']='ط';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -3713,8 +3715,8 @@ $ec_lang['lpn_ff_design']='فحص التصميم (الأثر على النظام
 $ec_lang['lpn_ff_design_tip']='سؤال منفصل عن قدرة الملتقى على توصيل التدفق: مع سحب ذلك التدفق هناك، هل ينخفض أي شيء آخر دون حده الأدنى للضغط أو يتجاوز حد سرعته؟ اختيار فحص هذا لا يكلّف حساباً إضافياً.';
 $ec_lang['lpn_ff_design_off']='عدم الفحص';
 $ec_lang['lpn_ff_design_all']='كل الملتقيات الأخرى وكل الأنابيب';
-
-
+$ec_lang['lpn_ff_design_selected']='الملتقيات المحددة وأنابيبها';
+$ec_lang['lpn_ff_design_no_selection']='فحص التصميم مضبوط على الملتقيات المحددة، ولا يوجد ملتقى محدد. حدد بعضها على الخريطة، أو اضبطه على الكل.';
 $ec_lang['lpn_ff_minpressure']='أدنى ضغط مسموح به في أي مكان آخر';
 $ec_lang['lpn_ff_minpressure_tip']='يُبلَّغ عن أي ملتقى ينخفض دون هذا الحد بينما يسحب ملتقى آخر تدفق حريقه على أنه مشكلة تصميم.';
 $ec_lang['lpn_ff_maxvelocity']='أقصى سرعة مسموح بها';

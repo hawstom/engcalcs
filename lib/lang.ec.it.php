@@ -780,14 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='Riga {row}: Da e A sono lo stesso nodo.';
 $ec_lang['lpn_pane_paste_bad_cell']='Riga {row}: {text} non è un valore valido per {col}.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='Riga {row}: un nuovo Testo richiede sia {first} sia {second}.';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='Riga {row}: {id} non è ancora un nodo o una tubazione in questa rete. Incollalo prima, poi questo Testo.';
+$ec_lang['lpn_pane_paste_customer_no_position']='Riga {row}: un nuovo Cliente richiede sia {first} sia {second}.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='Riga {row}: un nuovo Cliente richiede una tubazione o un nodo collegato.';
+$ec_lang['lpn_pane_paste_no_pipe']='Riga {row}: la tubazione {id} non esiste ancora. Incolla prima le tue tubazioni, poi i tuoi clienti.';
+$ec_lang['lpn_pane_paste_no_customer_node']='Riga {row}: il nodo {id} non esiste ancora. Incolla prima i tuoi nodi, poi i tuoi clienti.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='Riga {row}: il nodo {id} non ha una tubazione a cui un Cliente possa collegarsi.';
 $ec_lang['lpn_pane_filled']='Riempite verso il basso {n} celle. {skipped} non sono state modificate.';
 $ec_lang['lpn_pane_filldown']='Riempi verso il basso';
 $ec_lang['lpn_pane_fill_none']='Niente in questa selezione può essere riempito verso il basso.';
@@ -815,6 +815,7 @@ $ec_lang['lpn_zoom_in']='Aumenta zoom';
 $ec_lang['lpn_zoom_out']='Riduci zoom';
 $ec_lang['lpn_new_text']='Testo';
 $ec_lang['lpn_field_text_bold']='Testo in grassetto';
+$ec_lang['lpn_field_text_anchor']='Collegato a';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
 // justification; you don't even have to mention the anchor point").
@@ -1331,9 +1332,9 @@ $ec_lang['lpn_pane_filter_none']='Nulla in questa tabella corrisponde al filtro.
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='Zoom e seleziona';
-
-
-
+$ec_lang['lpn_goto_on_map']='Vai sulla mappa';
+$ec_lang['lpn_pane_select_on_map']='Seleziona sulla mappa';
+$ec_lang['lpn_pane_unselect_on_map']='Deseleziona sulla mappa';
 $ec_lang['lpn_pane_print']='Stampa tabella';
 $ec_lang['lpn_pane_print_tip']='Stampa la tabella che stai guardando, con il nome del progetto, il nome della tabella e le unità nelle intestazioni. Le righe vengono stampate nell\'ordine in cui le hai ordinate.';
 
@@ -1470,7 +1471,7 @@ $ec_lang['lpn_find_op_lt']='minore di';
 $ec_lang['lpn_find_op_empty']='vuoto';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} trovati. Fai clic su uno per andarci.';
-
+$ec_lang['lpn_find_shift_hint']='Maiusc+clic per attivare o disattivare aggiunta/rimozione.';
 $ec_lang['lpn_find_none']='Nessuna corrispondenza.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1969,7 @@ $ec_lang['lpn_lock_open_choices_ask']='"Chiedi" dice a chi ha questo file aperto
 $ec_lang['lpn_lock_ask']='Chiedi';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='Chi dobbiamo dire che sta chiedendo? Le tue iniziali sono l\'ideale. Vengono inviate a chi ha il file aperto, e sono memorizzate solo in questo browser.';
+$ec_lang['lpn_lock_ask_prompt']='Chi dobbiamo dire che sta chiedendo? Le tue iniziali sono l\'ideale. Vengono conservate con il blocco di questo file sul nostro server, per chiunque lo abbia aperto, ed eliminate entro 30 giorni.';
 $ec_lang['lpn_lock_ask_sent']='Abbiamo chiesto a chi ha questo file aperto di chiuderlo. Lo vedrà entro un minuto, se la sua pagina è ancora aperta. Nient\'altro è cambiato, e il file resta suo finché non lo chiude.';
 $ec_lang['lpn_lock_ask_failed']='Il tuo messaggio non è stato consegnato. O nessuno ha questo file aperto ora, oppure non è stato possibile raggiungere il server.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,8 +2379,8 @@ $ec_lang['lpn_field_easting_abbr']='E';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
-
+$ec_lang['lpn_field_lat_abbr']='Lat';
+$ec_lang['lpn_field_lon_abbr']='Lon';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -3713,8 +3714,8 @@ $ec_lang['lpn_ff_design']='Verifica di progetto (effetto sul sistema)';
 $ec_lang['lpn_ff_design_tip']='Una domanda separata da se il nodo può erogare la portata: con quella portata prelevata lì, qualcos\'altro scende sotto la sua pressione minima o supera il suo limite di velocità? Scegliere di verificarlo non costa alcun calcolo aggiuntivo.';
 $ec_lang['lpn_ff_design_off']='Non verificare';
 $ec_lang['lpn_ff_design_all']='Tutti gli altri nodi e tutte le tubazioni';
-
-
+$ec_lang['lpn_ff_design_selected']='I nodi selezionati e le loro tubazioni';
+$ec_lang['lpn_ff_design_no_selection']='La verifica di progetto è impostata sui nodi selezionati, e nessuno è selezionato. Selezionane alcuni sulla mappa, oppure imposta Tutti.';
 $ec_lang['lpn_ff_minpressure']='Pressione minima consentita altrove';
 $ec_lang['lpn_ff_minpressure_tip']='Un nodo che scende sotto questo valore mentre un altro sta prelevando la propria portata antincendio è segnalato come un problema di progetto.';
 $ec_lang['lpn_ff_maxvelocity']='Velocità massima consentita';

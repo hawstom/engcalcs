@@ -780,13 +780,14 @@ $ec_lang['lpn_pane_paste_same_ends']='Zeile {row}: Von und Nach sind derselbe Kn
 $ec_lang['lpn_pane_paste_bad_cell']='Zeile {row}: {text} ist kein gültiger Wert für {col}.';
 // A new Text's position, the same rule paste-creates-rows gives a new node ({first}/{second} are
 // the project's two coordinate names).
-
+$ec_lang['lpn_pane_paste_text_no_position']='Zeile {row}: Ein neuer Text braucht sowohl {first} als auch {second}.';
 // {id} is what the Text table's own Attached to cell named.
-
-
-
-
-
+$ec_lang['lpn_pane_paste_no_anchor']='Zeile {row}: {id} ist noch kein Knoten oder Rohr in diesem Netz. Fügen Sie es zuerst ein, dann diesen Text.';
+$ec_lang['lpn_pane_paste_customer_no_position']='Zeile {row}: Ein neuer Kunde braucht sowohl {first} als auch {second}.';
+$ec_lang['lpn_pane_paste_no_customer_ref']='Zeile {row}: Ein neuer Kunde braucht ein verbundenes Rohr oder einen verbundenen Knoten.';
+$ec_lang['lpn_pane_paste_no_pipe']='Zeile {row}: Das Rohr {id} existiert noch nicht. Fügen Sie zuerst Ihre Rohre ein, dann Ihre Kunden.';
+$ec_lang['lpn_pane_paste_no_customer_node']='Zeile {row}: Der Knoten {id} existiert noch nicht. Fügen Sie zuerst Ihre Entnahmeknoten ein, dann Ihre Kunden.';
+$ec_lang['lpn_pane_paste_customer_node_no_pipe']='Zeile {row}: Der Knoten {id} hat kein Rohr, an das ein Kunde angeschlossen werden kann.';
 
 $ec_lang['lpn_pane_filled']='{n} Zellen nach unten ausgefüllt. {skipped} wurden nicht geändert.';
 $ec_lang['lpn_pane_filldown']='Nach unten ausfüllen';
@@ -825,6 +826,7 @@ $ec_lang['lpn_field_text_bold']='Fetter Text';
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 // The Text table's own column naming what a Text is attached to (a node or a link ID), read-only:
 // attaching and detaching are map gestures, never a typed rename.
+$ec_lang['lpn_field_text_anchor']='Angeschlossen an';
 
 $ec_lang['lpn_field_text_align']='Horizontale Ausrichtung';
 $ec_lang['lpn_field_text_align_left']='Links';
@@ -1331,9 +1333,9 @@ $ec_lang['lpn_pane_filter_none']='Nichts in dieser Tabelle entspricht dem Filter
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='Zoomen & auswählen';
-
-
-
+$ec_lang['lpn_goto_on_map']='Auf der Karte anzeigen';
+$ec_lang['lpn_pane_select_on_map']='Auf der Karte auswählen';
+$ec_lang['lpn_pane_unselect_on_map']='Auswahl auf der Karte aufheben';
 $ec_lang['lpn_pane_print']='Tabelle drucken';
 $ec_lang['lpn_pane_print_tip']='Druckt die Tabelle, die Sie gerade ansehen, mit Projektname, Tabellenname und den Einheiten in den Spaltenüberschriften. Die Zeilen werden in der Reihenfolge gedruckt, in die Sie sie sortiert haben.';
 
@@ -1470,7 +1472,7 @@ $ec_lang['lpn_find_op_lt']='kleiner als';
 $ec_lang['lpn_find_op_empty']='leer';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} gefunden. Klicken Sie eines an, um dorthin zu springen.';
-
+$ec_lang['lpn_find_shift_hint']='Shift+click zum Hinzufügen/Entfernen (umschalten).';
 $ec_lang['lpn_find_none']='Keine Übereinstimmung.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1968,7 +1970,7 @@ $ec_lang['lpn_lock_open_choices_ask']='„Fragen“ teilt demjenigen, der diese 
 $ec_lang['lpn_lock_ask']='Fragen';
 // Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
 // this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='Als wen sollen wir die Anfrage kennzeichnen? Ihre Initialen sind ideal. Sie werden an denjenigen gesendet, der die Datei geöffnet hat, und nur in diesem Browser gespeichert.';
+$ec_lang['lpn_lock_ask_prompt']='Wen sollen wir als Anfragenden nennen? Ihre Initialen sind ideal. Sie werden zusammen mit der Sperre dieser Datei auf unserem Server gespeichert, für wen auch immer sie geöffnet hat, und innerhalb von 30 Tagen gelöscht.';
 $ec_lang['lpn_lock_ask_sent']='Wir haben denjenigen, der diese Datei geöffnet hat, gebeten, sie zu schließen. Er sieht dies innerhalb einer Minute, sofern seine Seite noch geöffnet ist. Sonst hat sich nichts geändert, und die Datei gehört ihm weiterhin, bis er sie schließt.';
 $ec_lang['lpn_lock_ask_failed']='Ihre Nachricht konnte nicht zugestellt werden. Entweder hat gerade niemand diese Datei geöffnet, oder der Server war nicht erreichbar.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
@@ -2378,7 +2380,8 @@ $ec_lang['lpn_field_easting_abbr']='R';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-
+$ec_lang['lpn_field_lat_abbr']='Br';
+$ec_lang['lpn_field_lon_abbr']='Lä';
 
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
@@ -3713,8 +3716,8 @@ $ec_lang['lpn_ff_design']='Systemprüfung (Auswirkung auf das Netz)';
 $ec_lang['lpn_ff_design_tip']='Eine eigene Frage, unabhängig davon, ob der Entnahmeknoten den Durchfluss liefern kann: Fällt, während dort dieser Durchfluss entnommen wird, irgendetwas anderes unter seinen Mindestdruck oder über seinen Geschwindigkeitsgrenzwert? Diese Prüfung zu wählen kostet keine zusätzliche Berechnung.';
 $ec_lang['lpn_ff_design_off']='Nicht prüfen';
 $ec_lang['lpn_ff_design_all']='Alle anderen Entnahmeknoten und alle Rohre';
-
-
+$ec_lang['lpn_ff_design_selected']='Die ausgewählten Entnahmeknoten und ihre Rohre';
+$ec_lang['lpn_ff_design_no_selection']='Die Systemprüfung ist auf die ausgewählten Entnahmeknoten eingestellt, aber keiner ist ausgewählt. Wählen Sie welche auf der Karte aus, oder stellen Sie auf Alle.';
 $ec_lang['lpn_ff_minpressure']='Niedrigster zulässiger Druck andernorts';
 $ec_lang['lpn_ff_minpressure_tip']='Ein Entnahmeknoten, der unter diesen Wert fällt, während ein anderer seine Löschwassermenge liefert, wird als Systemproblem gemeldet.';
 $ec_lang['lpn_ff_maxvelocity']='Höchste zulässige Geschwindigkeit';

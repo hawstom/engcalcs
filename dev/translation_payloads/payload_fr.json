@@ -2,7 +2,7 @@
     "meta": {
         "language": "fr",
         "expected_key_count": 2157,
-        "delta_key_count": 16,
+        "delta_key_count": 1,
         "exempt_key_count": 57,
         "exempt_keys": [
             "u_depthFrac",
@@ -562,237 +562,15 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_pane_paste_text_no_position": "Row {row}: a new Text needs both {first} and {second}.",
-        "lpn_pane_paste_no_anchor": "Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.",
-        "lpn_pane_paste_customer_no_position": "Row {row}: a new Customer needs both {first} and {second}.",
-        "lpn_pane_paste_no_customer_ref": "Row {row}: a new Customer needs a connected pipe or node.",
-        "lpn_pane_paste_no_pipe": "Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.",
-        "lpn_pane_paste_no_customer_node": "Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.",
-        "lpn_pane_paste_customer_node_no_pipe": "Row {row}: node {id} has no pipe for a Customer to attach to.",
-        "lpn_field_text_anchor": "Attached to",
-        "lpn_goto_on_map": "Go to on map",
-        "lpn_pane_select_on_map": "Select on map",
-        "lpn_pane_unselect_on_map": "Unselect on map",
-        "lpn_find_shift_hint": "Shift+click to add\/remove toggle.",
-        "lpn_field_lat_abbr": "Lat",
-        "lpn_field_lon_abbr": "Lon",
-        "lpn_ff_design_selected": "The selected junctions and their pipes",
-        "lpn_ff_design_no_selection": "The design check is set to the selected junctions, and none is selected. Select some on the map, or set All."
+        "lpn_field_lat_abbr": "Lat"
     },
     "keys": {
-        "lpn_pane_paste_text_no_position": "Row {row}: a new Text needs both {first} and {second}.",
-        "lpn_pane_paste_no_anchor": "Row {row}: {id} is not a node or a pipe in this network yet. Paste it first, then this Text.",
-        "lpn_pane_paste_customer_no_position": "Row {row}: a new Customer needs both {first} and {second}.",
-        "lpn_pane_paste_no_customer_ref": "Row {row}: a new Customer needs a connected pipe or node.",
-        "lpn_pane_paste_no_pipe": "Row {row}: pipe {id} does not exist yet. Paste your pipes first, then your customers.",
-        "lpn_pane_paste_no_customer_node": "Row {row}: node {id} does not exist yet. Paste your junctions first, then your customers.",
-        "lpn_pane_paste_customer_node_no_pipe": "Row {row}: node {id} has no pipe for a Customer to attach to.",
-        "lpn_field_text_anchor": "Attached to",
-        "lpn_goto_on_map": "Go to on map",
-        "lpn_pane_select_on_map": "Select on map",
-        "lpn_pane_unselect_on_map": "Unselect on map",
-        "lpn_find_shift_hint": "Shift+click to add\/remove toggle.",
-        "lpn_field_lat_abbr": "Lat",
-        "lpn_field_lon_abbr": "Lon",
-        "lpn_ff_design_selected": "The selected junctions and their pipes",
-        "lpn_ff_design_no_selection": "The design check is set to the selected junctions, and none is selected. Select some on the map, or set All."
+        "lpn_field_lat_abbr": "Lat"
     },
     "key_context": {
-        "lpn_pane_paste_text_no_position": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_paste_bad_cell",
-                    "value": "Ligne {row} : {text} n'est pas une valeur valide pour {col}.",
-                    "english": "Row {row}: {text} is not a valid {col}."
-                },
-                "next_translated": {
-                    "key": "lpn_pane_filled",
-                    "value": "Rempli {n} cellules vers le bas. {skipped} n'ont pas été modifiées.",
-                    "english": "Filled down {n} cells. {skipped} were not changed."
-                }
-            }
-        },
-        "lpn_pane_paste_no_anchor": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_paste_bad_cell",
-                    "value": "Ligne {row} : {text} n'est pas une valeur valide pour {col}.",
-                    "english": "Row {row}: {text} is not a valid {col}."
-                },
-                "next_translated": {
-                    "key": "lpn_pane_filled",
-                    "value": "Rempli {n} cellules vers le bas. {skipped} n'ont pas été modifiées.",
-                    "english": "Filled down {n} cells. {skipped} were not changed."
-                }
-            }
-        },
-        "lpn_pane_paste_customer_no_position": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_paste_bad_cell",
-                    "value": "Ligne {row} : {text} n'est pas une valeur valide pour {col}.",
-                    "english": "Row {row}: {text} is not a valid {col}."
-                },
-                "next_translated": {
-                    "key": "lpn_pane_filled",
-                    "value": "Rempli {n} cellules vers le bas. {skipped} n'ont pas été modifiées.",
-                    "english": "Filled down {n} cells. {skipped} were not changed."
-                }
-            }
-        },
-        "lpn_pane_paste_no_customer_ref": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_paste_bad_cell",
-                    "value": "Ligne {row} : {text} n'est pas une valeur valide pour {col}.",
-                    "english": "Row {row}: {text} is not a valid {col}."
-                },
-                "next_translated": {
-                    "key": "lpn_pane_filled",
-                    "value": "Rempli {n} cellules vers le bas. {skipped} n'ont pas été modifiées.",
-                    "english": "Filled down {n} cells. {skipped} were not changed."
-                }
-            }
-        },
-        "lpn_pane_paste_no_pipe": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_paste_bad_cell",
-                    "value": "Ligne {row} : {text} n'est pas une valeur valide pour {col}.",
-                    "english": "Row {row}: {text} is not a valid {col}."
-                },
-                "next_translated": {
-                    "key": "lpn_pane_filled",
-                    "value": "Rempli {n} cellules vers le bas. {skipped} n'ont pas été modifiées.",
-                    "english": "Filled down {n} cells. {skipped} were not changed."
-                }
-            }
-        },
-        "lpn_pane_paste_no_customer_node": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_paste_bad_cell",
-                    "value": "Ligne {row} : {text} n'est pas une valeur valide pour {col}.",
-                    "english": "Row {row}: {text} is not a valid {col}."
-                },
-                "next_translated": {
-                    "key": "lpn_pane_filled",
-                    "value": "Rempli {n} cellules vers le bas. {skipped} n'ont pas été modifiées.",
-                    "english": "Filled down {n} cells. {skipped} were not changed."
-                }
-            }
-        },
-        "lpn_pane_paste_customer_node_no_pipe": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_paste_bad_cell",
-                    "value": "Ligne {row} : {text} n'est pas une valeur valide pour {col}.",
-                    "english": "Row {row}: {text} is not a valid {col}."
-                },
-                "next_translated": {
-                    "key": "lpn_pane_filled",
-                    "value": "Rempli {n} cellules vers le bas. {skipped} n'ont pas été modifiées.",
-                    "english": "Filled down {n} cells. {skipped} were not changed."
-                }
-            }
-        },
-        "lpn_field_text_anchor": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_text_bold",
-                    "value": "Texte en gras",
-                    "english": "Bold text"
-                },
-                "next_translated": {
-                    "key": "lpn_field_text_align",
-                    "value": "Alignement horizontal",
-                    "english": "Horizontal alignment"
-                }
-            }
-        },
-        "lpn_goto_on_map": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_goto_tip",
-                    "value": "Zoomer et sélectionner",
-                    "english": "Zoom & select"
-                },
-                "next_translated": {
-                    "key": "lpn_pane_print",
-                    "value": "Imprimer le tableau",
-                    "english": "Print table"
-                }
-            }
-        },
-        "lpn_pane_select_on_map": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_goto_tip",
-                    "value": "Zoomer et sélectionner",
-                    "english": "Zoom & select"
-                },
-                "next_translated": {
-                    "key": "lpn_pane_print",
-                    "value": "Imprimer le tableau",
-                    "english": "Print table"
-                }
-            }
-        },
-        "lpn_pane_unselect_on_map": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_pane_goto_tip",
-                    "value": "Zoomer et sélectionner",
-                    "english": "Zoom & select"
-                },
-                "next_translated": {
-                    "key": "lpn_pane_print",
-                    "value": "Imprimer le tableau",
-                    "english": "Print table"
-                }
-            }
-        },
-        "lpn_find_shift_hint": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_find_count",
-                    "value": "{n} trouvé(s). Cliquez sur l'un d'eux pour y aller.",
-                    "english": "{n} found. Click one to go to it."
-                },
-                "next_translated": {
-                    "key": "lpn_find_none",
-                    "value": "Aucune correspondance.",
-                    "english": "Nothing matched."
-                }
-            }
-        },
         "lpn_field_lat_abbr": {
-            "reason": "missing",
-            "current_value": null,
+            "reason": "equal_to_english",
+            "current_value": "Lat",
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_field_easting",
@@ -800,57 +578,9 @@
                     "english": "Easting"
                 },
                 "next_translated": {
-                    "key": "lpn_field_coord_tip",
-                    "value": "Saisissez une position en coordonnées pour placer ce nœud exactement. Dans un scénario, cette position ne s'applique qu'à ce scénario, tout comme le fait de le faire glisser ; dans Base, elle place le nœud partout.",
-                    "english": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere."
-                }
-            }
-        },
-        "lpn_field_lon_abbr": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_easting",
-                    "value": "Est",
-                    "english": "Easting"
-                },
-                "next_translated": {
-                    "key": "lpn_field_coord_tip",
-                    "value": "Saisissez une position en coordonnées pour placer ce nœud exactement. Dans un scénario, cette position ne s'applique qu'à ce scénario, tout comme le fait de le faire glisser ; dans Base, elle place le nœud partout.",
-                    "english": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere."
-                }
-            }
-        },
-        "lpn_ff_design_selected": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_design_all",
-                    "value": "Toutes les autres jonctions et toutes les conduites",
-                    "english": "All other junctions and all pipes"
-                },
-                "next_translated": {
-                    "key": "lpn_ff_minpressure",
-                    "value": "Pression minimale admise ailleurs",
-                    "english": "Lowest pressure allowed elsewhere"
-                }
-            }
-        },
-        "lpn_ff_design_no_selection": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_design_all",
-                    "value": "Toutes les autres jonctions et toutes les conduites",
-                    "english": "All other junctions and all pipes"
-                },
-                "next_translated": {
-                    "key": "lpn_ff_minpressure",
-                    "value": "Pression minimale admise ailleurs",
-                    "english": "Lowest pressure allowed elsewhere"
+                    "key": "lpn_field_lon_abbr",
+                    "value": "Long",
+                    "english": "Lon"
                 }
             }
         }

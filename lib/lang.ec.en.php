@@ -2129,9 +2129,10 @@ $ec_lang['lpn_lock_age_unknown']='There is no record of how long it has been in 
 // Cancel that needed a sentence would not be a Cancel.
 $ec_lang['lpn_lock_open_choices_ask']='"Ask" tells whoever has this file open that you would like it, and changes nothing else. "Open read-only" lets you look at it and change anything you like, without being able to save here. "Break lock" lets you save over the file; their unsaved work is not lost, but they will no longer be able to save it here, and somebody may have to merge the two by hand.';
 $ec_lang['lpn_lock_ask']='Ask';
-// Asked at the one moment the name is useful, and SENT rather than stored: nothing new is written to
-// this computer for it, which is the whole point of moving the question here.
-$ec_lang['lpn_lock_ask_prompt']='Who should we say is asking? Your initials are ideal. They are sent to whoever has the file open, and are stored only in this browser.';
+// Asked at the one moment the name is useful. Nothing is written to this computer for it; the lock
+// broker keeps it in that file's lock record for the holder to read (Tom, 2026-09-29, correcting a
+// prompt that said "stored only in this browser").
+$ec_lang['lpn_lock_ask_prompt']='Who should we say is asking? Your initials are ideal. They are kept with this file\'s lock on our server, for whoever has it open, and deleted within 30 days.';
 $ec_lang['lpn_lock_ask_sent']='We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.';
 $ec_lang['lpn_lock_ask_failed']='Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.';
 // **A CANCEL THAT LEAVES NO RESIDUE IS THE DEFECT** (ROADMAP Task 704, Ida's diagnosis). Backing
