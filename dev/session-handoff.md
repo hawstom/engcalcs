@@ -108,7 +108,6 @@ keys resynced in every stale language, incl. `consent_body` in 26 -- no consent 
 only -- plus his Shift-hint English and his `$ec_lang_syn` for `lpn_goto_on_map`, and "Show on map"
 in 16 languages that had "Go to map"); Task 711 (`fix/new-project-view`); Task 737's concept layer
 (`chore/term-concept`, `dev/term-concepts.md`). Drift baseline re-set 2026-09-30: CHANGED none.
-**Remind him to try drag-to-fill on a phone after he pulls** (his ask, still open).
 
 ### Awaiting his browser pass (protected; merge on his all-clear, typed by him in a session)
 
