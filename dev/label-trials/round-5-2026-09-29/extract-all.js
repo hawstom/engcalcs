@@ -1,6 +1,6 @@
 // ROUND 5: EXTRACT EVERY SCENE SET IN THE DESIGN (matrix.js), a few child processes at a time.
 //
-//   node dev/label-trials/round-5-2026-09-29/extract-all.js <work dir> [--workers 3] [--only E1]
+//   node dev/label-trials/round-5-2026-09-29/extract-all.js <work dir> [--workers 3] [--only E1] [--min-n N] [--max-n N]
 //
 // Scenes (12 MB for a 5000-node set) go to <work dir>/scenes and master's layouts to
 // <work dir>/master; neither is committed, since both reproduce exactly from the spec. A set whose
@@ -33,12 +33,17 @@ function main() {
 	if (!work) { console.error('usage: extract-all.js <work dir> [--workers N] [--only E1,E2]'); process.exit(2); }
 	const W = a.indexOf('--workers') >= 0 ? +a[a.indexOf('--workers') + 1] : 3;
 	const only = a.indexOf('--only') >= 0 ? a[a.indexOf('--only') + 1].split(',') : null;
+	// --min-n / --max-n: split the big networks (one at a time: three 5000-node pages at once
+	// exhausted 12 GB and every job hit the time limit) from the rest.
+	const minN = a.indexOf('--min-n') >= 0 ? +a[a.indexOf('--min-n') + 1] : 0;
+	const maxN = a.indexOf('--max-n') >= 0 ? +a[a.indexOf('--max-n') + 1] : Infinity;
 	const sceneDir = path.join(work, 'scenes'), masterDir = path.join(work, 'master');
 	fs.mkdirSync(sceneDir, { recursive: true });
 	fs.mkdirSync(masterDir, { recursive: true });
 	const log = fs.createWriteStream(path.join(work, 'extract.log'), { flags: 'a' });
 	const todo = M.jobs().filter(function (j) {
 		if (only && only.indexOf(j.exp) < 0) { return false; }
+		if ((j.spec.n || 800) < minN || (j.spec.n || 800) > maxN) { return false; }
 		return setIds(j.spec).some(function (id) { return !fs.existsSync(path.join(sceneDir, id + '.json')); });
 	});
 	// Largest first, so the long jobs do not all land at the end.
