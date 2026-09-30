@@ -20411,6 +20411,10 @@ var EngCalcs = EngCalcs || {};
 	// the strip.
 	paneTabs.push({
 		id: 'timeseries', panel: 'lpn_pane_timeseries', label: 'lpn_ts_menu', tip: 'lpn_ts_tip',
+		// **WHERE THE TAB'S OWN CONTROLS LIVE, FOR paneFocusTabFirstControl() (Task 743)** --
+		// narrower than `panel`, which also holds the chart: rebuildTsForm() builds the group and
+		// quantity pickers into exactly this div.
+		formId: 'lpn_ts_form',
 		show: function () { tsTabShow(); },
 		// Every solve and every document change while this is the tab on show -- and that includes
 		// every step of the transport, which is what keeps the `now` line under the scrubber.
@@ -20423,6 +20427,7 @@ var EngCalcs = EngCalcs || {};
 	// placed Time series: a new drawing joins the drawings, inside their stretch of the strip.
 	paneTabs.push({
 		id: 'frequency', panel: 'lpn_pane_frequency', label: 'lpn_freq_menu', tip: 'lpn_freq_tip',
+		formId: 'lpn_freq_form',
 		show: function () { freqTabShow(); },
 		// Every solve, every edit and every step of the transport, so the curve is always the
 		// map's own moment.
@@ -20435,6 +20440,7 @@ var EngCalcs = EngCalcs || {};
 	// print acts on a TABLE, and the tabs it applies to are now the ones next to it.
 	paneTabs.push({
 		id: 'profile', panel: 'lpn_pane_profile', label: 'lpn_profile_menu', tip: 'lpn_profile_tip',
+		formId: 'lpn_profile_form',
 		// **PRESSING PROFILE AGAIN IS THE COMMAND THAT CHOOSES A PATH** (Task 506). Tom,
 		// 2026-08-24: *"Our button to create a new path can be the Profile button. That removes all
 		// our left-side controls."* So this tab has ONE meaning stated once -- show me the profile
@@ -20470,6 +20476,28 @@ var EngCalcs = EngCalcs || {};
 		if (!panel) { return; }
 		panel.addEventListener('pointerenter', function () { profileHoverSet(true); });
 		panel.addEventListener('pointerleave', function () { profileHoverSet(false); });
+	}());
+	// **CTRL+SHIFT+PAGEDOWN/PAGEUP STILL REACHES paneStepTab() FROM INSIDE A GRAPH OR PROFILE TAB'S
+	// OWN CONTROLS** (Task 743). Wired here, once per panel, at module load -- the same moment and
+	// the same reasoning as wireProfileHover() just above: these three panels are static markup,
+	// never rebuilt, so one listener apiece for the life of the page is enough, and wiring it here
+	// (rather than in wirePane(), which only the real page's own bootstrap ever calls) means a
+	// harness that drives setPaneTab()/openPane() directly, with no DOMContentLoaded and no
+	// wirePane(), still has it. Attached to the PANEL, not to each control inside it: a `<select>`
+	// has its own idea of what PageDown does (paging its option list), and only an ancestor's
+	// bubble-phase `preventDefault()` stops that default action once this claims the key.
+	(function wireGraphTabKeys() {
+		paneTabs.forEach(function (t) {
+			var panel;
+			if (paneTableById(t.id)) { return; }   // a table wires its own <table> (paneWireTable)
+			panel = document.getElementById(t.panel);
+			if (!panel) { return; }
+			panel.addEventListener('keydown', function (e) {
+				var key = e && e.key, jump = !!(e && (e.ctrlKey || e.metaKey)), ext = !!(e && e.shiftKey);
+				if (!jump || !ext || (key !== 'PageDown' && key !== 'PageUp')) { return; }
+				if (paneStepTab(t.id, key === 'PageDown' ? 1 : -1) && e.preventDefault) { e.preventDefault(); }
+			});
+		});
 	}());
 	// **THE PANE OPENS ON THE FIRST TABLE, WHICH IS THE CHANGE THIS REORDER MAKES.** paneTabs[0] is
 	// no longer the profile, and that is right: a reader who opens the pane without naming a tab
@@ -24067,7 +24095,7 @@ var EngCalcs = EngCalcs || {};
 			note.addEventListener('keydown', function (e) {
 				var key = e && e.key, jump = !!(e && (e.ctrlKey || e.metaKey)), ext = !!(e && e.shiftKey);
 				if (!jump || !ext || (key !== 'PageDown' && key !== 'PageUp')) { return; }
-				if (paneSwitchTableTab(spec, key === 'PageDown' ? 1 : -1) && e.preventDefault) { e.preventDefault(); }
+				if (paneStepTab(spec.id, key === 'PageDown' ? 1 : -1) && e.preventDefault) { e.preventDefault(); }
 			});
 			host.appendChild(note);
 			return;
@@ -24767,7 +24795,7 @@ var EngCalcs = EngCalcs || {};
 		if (!rows.length || !cols.length) {
 			// **AN EMPTY TABLE HAS NO CELL, BUT SOMETHING STILL HAS TO HOLD THE CARET** (Task 690,
 			// Perry's pre-review on b37ec130): every caller of this function -- setPaneTab(),
-			// openPane(), and paneSwitchTableTab() switching onto a table with no rows -- needs
+			// openPane(), and paneStepTab() switching onto a table with no rows -- needs
 			// Ctrl+Shift+PageDown/PageUp to keep working from here, and that shortcut is wired
 			// (renderPaneTable()) onto the "none of these yet" note that stands in for the missing
 			// <table>. Landing there is what lets the NEXT press find a keydown listener to answer.
@@ -25963,37 +25991,90 @@ var EngCalcs = EngCalcs || {};
 		});
 		return handle;
 	}
+	// **A TAB BUTTON THE STRIP ITSELF HAS HIDDEN IS SKIPPED; A VISIBLE ONE NEVER IS** (Task 743).
+	// Nothing in this suite hides a tab button today -- every one of the eight always shows -- but
+	// the strip's own convention for hiding a control is `btn.style.display = 'none'` (see the
+	// Print button, a few lines above this one), so a future "no results yet" graph tab hidden that
+	// way is a future case this already answers, without a second door for "unavailable."
+	function paneTabIsHidden(tab) {
+		var btn = document.getElementById('lpn_pane_tab_' + tab.id);
+		return !!(btn && btn.style && btn.style.display === 'none');
+	}
+	function paneTabIndex(id) {
+		var i;
+		for (i = 0; i < paneTabs.length; i++) { if (paneTabs[i].id === id) { return i; } }
+		return -1;
+	}
+	// **THE GRAPH'S (OR PROFILE'S) FIRST CONTROL CATCHES THE CARET** (Task 743), so the NEXT
+	// Ctrl+Shift+PageDown/PageUp has somewhere to read from, exactly as a table's first cell does.
+	// Found generically -- `select`, else `input`, else `textarea`, else `button`, whichever kind
+	// of control the tab's own panel builds first (Time series' and Frequency's own group picker
+	// is a `select` and is always built first; Profile's only control is its Edit `button`) --
+	// rather than naming each graph's quantity picker by id, so a future graph tab needs no new
+	// case here. One selector shape per call, a bare tag name, same as every other querySelector()
+	// in this file. A panel with no control at all (nothing plotted, nothing to choose) still
+	// needs a landing spot, so the panel itself becomes focusable.
+	function paneFocusTabFirstControl(tab) {
+		// **SEARCHED FROM `formId` WHEN THE TAB DECLARES ONE** -- the form div rebuildTsForm() /
+		// rebuildFreqForm() / rebuildProfileForm() actually build their controls into, narrower
+		// than `panel`, which also holds the chart. A future graph tab with no `formId` is
+		// searched from its whole panel instead, so declaring one is an optimization, not a
+		// requirement.
+		var root = document.getElementById(tab.formId || tab.panel), panel, el;
+		if (!root) { return false; }
+		el = root.querySelector('select') || root.querySelector('input') ||
+			root.querySelector('textarea') || root.querySelector('button');
+		if (!el) {
+			panel = document.getElementById(tab.panel) || root;
+			if (panel.tabIndex < 0) { panel.tabIndex = 0; }
+			el = panel;
+		}
+		if (!el.focus) { return false; }
+		try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+		return true;
+	}
 	/**
-	 * Ctrl+Shift+PageDown/PageUp between the DATA TABLES only (Task 690). `paneTables()`, never
-	 * `paneTabs` -- the latter also holds Time series and Profile, which carry no cell grid to land
-	 * a caret in, and this must not reach for either of them.
+	 * Ctrl+Shift+PageDown/PageUp across the WHOLE bottom-pane tab strip, tables and graph tabs
+	 * alike -- `paneTabs`, never only `paneTables()` (Task 743, Tom: *"It would be nice if it also
+	 * could proceed to the graphs."*, extending Task 690's table-only stepping).
 	 *
-	 * **EXCEL DOES NOT WRAP AT THE ENDS, SO NEITHER DOES THIS.** Past the last table or before the
+	 * **EXCEL DOES NOT WRAP AT THE ENDS, SO NEITHER DOES THIS.** Past the last tab or before the
 	 * first, the keystroke is still claimed (so the browser never sees it) but nothing moves --
-	 * Excel's own Ctrl+PageDown on its last sheet does exactly that, silently.
+	 * Excel's own Ctrl+PageDown on its last sheet does exactly that, silently. A hidden tab (see
+	 * `paneTabIsHidden()`) is stepped over on the way, never landed on and never counted as the end.
 	 *
-	 * **FOCUS LANDS ON THE SAME COLUMN KEY IF THE NEW TABLE HAS ONE, ELSE THE FIRST COLUMN, AND THE
-	 * SAME ROW INDEX, CLAMPED TO THE NEW TABLE'S ROW COUNT.** Two tables rarely share a row space --
-	 * Pipes and Junctions have no row in common -- but they often share a COLUMN, and Excel's own
-	 * sheet switch keeps the reader in the same column and row position it left, falling back to A1
-	 * only where that stops meaning anything.
+	 * **BETWEEN TWO TABLES, FOCUS LANDS ON THE SAME COLUMN KEY IF THE NEW TABLE HAS ONE, ELSE THE
+	 * FIRST COLUMN, AND THE SAME ROW INDEX, CLAMPED TO THE NEW TABLE'S ROW COUNT** -- unchanged from
+	 * Task 690. Two tables rarely share a row space -- Pipes and Junctions have no row in common --
+	 * but they often share a COLUMN, and Excel's own sheet switch keeps the reader in the same
+	 * column and row position it left, falling back to A1 only where that stops meaning anything.
+	 * Stepping FROM a graph/profile tab, or ONTO one, carries nothing across -- there is no column
+	 * or row on either side -- so a table landed on from a graph opens at its home cell, and a graph
+	 * landed on from anywhere opens on its own first control (`paneFocusTabFirstControl()`).
 	 *
 	 * **A DESTINATION TABLE WITH NO ROWS STILL BECOMES THE SHOWN TAB** -- no table is ever hidden
 	 * from the strip for being empty, so none is skipped here either -- it simply has no cell to
 	 * focus, exactly as clicking that tab by hand would leave it.
 	 */
-	function paneSwitchTableTab(spec, dir) {
-		var tables = paneTables(), idx = -1, i, newSpec, newIdx,
-			rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
-			box = paneSelBox(spec, rows, cols), colKey = null, rowIdx = 0,
-			newRows, newCols, newColIdx, newRowIdx;
-		for (i = 0; i < tables.length; i++) { if (tables[i].id === spec.id) { idx = i; break; } }
+	function paneStepTab(fromId, dir) {
+		var idx = paneTabIndex(fromId), newIdx, newTab, fromSpec = paneTableById(fromId),
+			rows, cols, box, colKey = null, rowIdx = 0,
+			newSpec, newRows, newCols, newColIdx, newRowIdx;
 		if (idx < 0) { return false; }
+		if (fromSpec) {
+			rows = paneTableRowsInOrder(fromSpec); cols = paneCols(fromSpec);
+			box = paneSelBox(fromSpec, rows, cols);
+			if (box) { colKey = cols[box.ac].key; rowIdx = box.ar; }
+		}
 		newIdx = idx + dir;
-		if (newIdx < 0 || newIdx >= tables.length) { return true; }
-		newSpec = tables[newIdx];
-		if (box) { colKey = cols[box.ac].key; rowIdx = box.ar; }
-		setPaneTab(newSpec.id);
+		while (newIdx >= 0 && newIdx < paneTabs.length && paneTabIsHidden(paneTabs[newIdx])) {
+			newIdx += dir;
+		}
+		if (newIdx < 0 || newIdx >= paneTabs.length) { return true; }
+		newTab = paneTabs[newIdx];
+		setPaneTab(newTab.id);
+		newSpec = paneTableById(newTab.id);
+		if (!newSpec) { paneFocusTabFirstControl(newTab); return true; }
 		newRows = paneTableRowsInOrder(newSpec); newCols = paneCols(newSpec);
 		if (!newRows.length || !newCols.length) { return true; }
 		newColIdx = colKey !== null ? paneIndexOfKey(newCols, colKey) : -1;
@@ -26097,7 +26178,7 @@ var EngCalcs = EngCalcs || {};
 		// blur -- so switching tables can never cost the person the character they just typed.
 		if (jump && ext && (key === 'PageDown' || key === 'PageUp')) {
 			if (editing && active) { paneCommitCell(active); }
-			return paneSwitchTableTab(spec, key === 'PageDown' ? 1 : -1);
+			return paneStepTab(spec.id, key === 'PageDown' ? 1 : -1);
 		}
 		if (!box) {
 			// Nothing selected yet and a navigation key pressed: start at the top left, which is
