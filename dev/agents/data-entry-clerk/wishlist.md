@@ -519,3 +519,49 @@ smaller, single-behavior fix, not a structural gap in how volume entry reaches t
 above small conveniences like the digit-key toolbar reorder, because it touches a feature (filtering)
 that is now a direct precondition of the highest-leverage batch action on the page (Ctrl+Enter fill),
 which just shipped.
+
+
+<!-- 2026-09-30, Task 721, filed by the orchestrator from the seat's own text -->
+## New wishlist row — 2026-09-30, Task 721: "Apply scenario X to scenario Y", not a Sheet, is the one gap this seat would actually ask to close
+
+**Source:** Tom's Task 721 question this session and the journal entry above.
+
+**The ask:** a `scenarioMenuRows()` row — "Apply [scenario] values to this scenario…" — offering
+any non-active scenario as source, writing its overrides onto the active scenario the same way
+`pushBaseToScenarios()` already writes Base outward (same confirm-with-count pattern at
+`:4812-4816`). This closes the one real gesture gap my own trace found in "copying one scenario's
+values to another": today it is a manual switch/copy/switch/paste workaround through the Tables
+pane; a dedicated command removes three of those four steps.
+
+**Why not the Google Sheet:** a connected Sheet does not remove any UI this page needs — scenario
+create/rename/delete/switch/push still have to exist for someone not using a Sheet, so it is a
+SECOND alternatives-management surface, not a replacement for the first. Its stated draw (avoid
+building alternatives-management UI) does not hold once `pushBaseToScenarios()`'s existing pattern
+is the template — the remaining gap is one menu row, not a subsystem. Its real cost is in IDs,
+renames, deletions and units re-introducing, in an external tool the app cannot validate, exactly
+the hazards the app's own element-ID-keyed override model and declared-unit-family fields already
+eliminated (see journal entry). The Tables pane's existing clipboard TSV round trip
+(`paneCopyTsv()`, `js/looped-network.js:24823`) already gives the “move data through a spreadsheet”
+value with none of that risk, no account, and no network wait, for anyone who genuinely wants to
+stage an alternative in Sheets before pasting it in.
+
+**Ranking:** below Task 610/paste-creates-rows confirmation (still item 1, pending my own
+re-verification) and the Task 738 union-filter row — this is a small, single-command build, real
+but not high-volume on its own; above general polish items like the scenario-menu sort, because it
+removes actual round-trip gestures rather than reading gestures.
+
+## New wishlist row — 2026-09-30, scenario menu: keep alphabetical for named scenarios, but check `openMenu()` for type-ahead before assuming it exists
+
+**Source:** Tom's same-session question on sorting the scenario menu and giving it type-to-jump.
+
+**The ask:** no objection to sorting scenario rows (after Base) by name — the list stays small
+enough that alphabetizing costs nothing measurable and matches how Tom's own worked example
+(Alternative A/B) already reads. **Before building type-to-jump, confirm whether `openMenu()`
+already gives its rows native browser type-ahead or needs it hand-built** — I did not verify this
+in the code this session (SPECULATION, unverified); if `openMenu()` renders a plain custom `<div>`
+list rather than a native `<select>`, first-letter-jump does not come free and is worth its own
+small spec before Tom is told it's covered.
+
+**Ranking:** low — a small, low-volume convenience (a handful of scenarios, not hundreds of rows),
+worth a one-line confirmation before being called done, not worth a dedicated build session on its
+own merits.

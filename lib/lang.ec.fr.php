@@ -1665,6 +1665,15 @@ $ec_lang['lpn_ts_none']='Rien à tracer pour l\'instant. Sélectionnez des élé
 $ec_lang['lpn_ts_no_frames']='Pas encore de résultats en période prolongée. Appuyez sur Calculer pour lancer la simulation.';
 $ec_lang['lpn_ts_summary']='Éléments : {n}, pas de temps de rapport : {steps}';
 $ec_lang['lpn_ts_axis_time']='Temps écoulé';
+$ec_lang['lpn_freq_menu']='Fréquence';
+$ec_lang['lpn_freq_tip']='Graphique de la distribution de fréquence d\'une propriété sur toutes les jonctions ou toutes les conduites au pas de temps actuel.';
+$ec_lang['lpn_freq_title']='Distribution des valeurs';
+$ec_lang['lpn_freq_group_tip']='Si le graphique affiche des jonctions ou des conduites.';
+$ec_lang['lpn_freq_quantity_tip']='La valeur à tracer.';
+$ec_lang['lpn_freq_none']='Aucun résultat pour cette valeur pour l\'instant, donc rien à tracer.';
+$ec_lang['lpn_freq_summary']='Tracé : {n} sur {total}';
+$ec_lang['lpn_freq_summary_time']='Tracé : {n} sur {total}, à {time}';
+$ec_lang['lpn_freq_axis_percent']='Pourcentage inférieur à';
 $ec_lang['lpn_view_units']='Unités';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Tout enregistrer';
@@ -2132,7 +2141,7 @@ $ec_lang['lpn_notes_6_term']='Aide sur les colonnes du tableau';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Sélectionner une colonne</td><td>Cliquez sur l\'en-tête</td></tr><tr><td>Ajouter ou étendre la sélection de colonnes</td><td>Ctrl+clic ou Shift+clic sur un autre en-tête</td></tr><tr><td>Déplacer (réordonner) la ou les colonnes sélectionnées</td><td>Faites glisser, ou utilisez Gérer les colonnes… dans le clic droit ou le menu ⋮</td></tr><tr><td>Menu ⋮ et flèche de tri.</td><td>Survolez le coin supérieur d\'un en-tête, ou sélectionnez-le ou tabulez jusqu\'à lui</td></tr><tr><td>Masquer, Afficher tout, ou Gérer la visibilité et l\'ordre</td><td>Clic droit sur l\'en-tête, ou menu ⋮ dans le coin supérieur droit de l\'en-tête</td></tr><tr><td>Trier par colonne</td><td>Icône flèche dans le coin supérieur droit de l\'en-tête</td></tr><tr><td>Coller comme nouvelles lignes à la fin du tableau</td><td>Clic droit, menu ⋮ dans le coin supérieur droit de l\'en-tête, ou Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Raccourcis clavier du tableau';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Touches fléchées</td><td>Naviguer.</td></tr><tr><td>Tab, Enter</td><td>Termine la saisie et se déplace d\'une cellule vers la droite ou vers le bas.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Se déplace en arrière.</td></tr><tr><td>Shift+touches fléchées</td><td>Étend la sélection.</td></tr><tr><td>Ctrl+C</td><td>Copie la sélection.</td></tr><tr><td>Ctrl+D</td><td>Remplit la sélection vers le bas depuis sa première ligne.</td></tr><tr><td>Ctrl+Enter</td><td>Remplit la sélection avec la valeur de la cellule active.</td></tr><tr><td>Ctrl+A</td><td>Sélectionne tout le tableau.</td></tr><tr><td>Ctrl+Shift+V</td><td>Colle comme nouvelles lignes à la fin du tableau.</td></tr><tr><td>Delete</td><td>Efface une cellule.</td></tr><tr><td>F2</td><td>Ouvre une cellule pour la modifier.</td></tr><tr><td>Esc</td><td>Annule une modification.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Touches fléchées</td><td>Naviguer.</td></tr><tr><td>Tab, Enter</td><td>Termine la saisie et se déplace d\'une cellule vers la droite ou vers le bas.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Se déplace en arrière.</td></tr><tr><td>Shift+touches fléchées</td><td>Étend la sélection.</td></tr><tr><td>Ctrl+C</td><td>Copie la sélection.</td></tr><tr><td>Ctrl+D</td><td>Remplit la sélection vers le bas depuis sa première ligne.</td></tr><tr><td>Ctrl+Enter</td><td>Remplit la sélection avec la valeur de la cellule active.</td></tr><tr><td>Ctrl+A</td><td>Sélectionne tout le tableau.</td></tr><tr><td>Ctrl+Shift+V</td><td>Colle comme nouvelles lignes à la fin du tableau.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Passe à la table suivante ou précédente.</td></tr><tr><td>Delete</td><td>Efface une cellule.</td></tr><tr><td>F2</td><td>Ouvre une cellule pour la modifier.</td></tr><tr><td>Esc</td><td>Annule une modification.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

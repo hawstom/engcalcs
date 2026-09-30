@@ -1656,6 +1656,15 @@ $ec_lang['lpn_ts_none']='Todavía no hay nada que graficar. Elija elementos en e
 $ec_lang['lpn_ts_no_frames']='Todavía no hay resultados de período extendido. Presione Calcular para ejecutar la simulación.';
 $ec_lang['lpn_ts_summary']='Elementos: {n}, tiempos de informe: {steps}';
 $ec_lang['lpn_ts_axis_time']='Tiempo transcurrido';
+$ec_lang['lpn_freq_menu']='Frecuencia';
+$ec_lang['lpn_freq_tip']='Graficar la distribución de frecuencia de una propiedad en todos los nudos o todas las tuberías, en el paso de tiempo actual.';
+$ec_lang['lpn_freq_title']='Distribución de valores';
+$ec_lang['lpn_freq_group_tip']='Si el gráfico muestra nudos o tuberías.';
+$ec_lang['lpn_freq_quantity_tip']='Qué valor graficar.';
+$ec_lang['lpn_freq_none']='Todavía no hay resultados para este valor, así que no hay nada que graficar.';
+$ec_lang['lpn_freq_summary']='Graficados: {n} de {total}';
+$ec_lang['lpn_freq_summary_time']='Graficados: {n} de {total}, en {time}';
+$ec_lang['lpn_freq_axis_percent']='Porcentaje menor que';
 $ec_lang['lpn_view_units']='Unidades';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Guardar todo';
@@ -2123,7 +2132,7 @@ $ec_lang['lpn_notes_6_term']='Ayuda de columnas de tabla';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Seleccionar columna</td><td>Haga clic en el encabezado</td></tr><tr><td>Agregar o extender la selección de columnas</td><td>Ctrl+clic o Shift+clic en otro encabezado</td></tr><tr><td>Mover (reordenar) las columnas seleccionadas</td><td>Arrastre o use Administrar columnas… en el menú de clic derecho o ⋮</td></tr><tr><td>Menú ⋮ y flecha de orden.</td><td>Pase el puntero por la esquina superior de un encabezado, o selecciónelo o llegue a él con Tab</td></tr><tr><td>Ocultar, Mostrar todas, o Administrar visibilidad y orden</td><td>Clic derecho en el encabezado o menú ⋮ en la esquina superior derecha del encabezado</td></tr><tr><td>Ordenar por columna</td><td>Icono de flecha en la esquina superior derecha del encabezado</td></tr><tr><td>Pegar como filas nuevas al final de la tabla</td><td>Clic derecho, menú ⋮ en la esquina superior derecha del encabezado, o Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Atajos de teclado de la tabla';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Recorrer.</td></tr><tr><td>Tab, Enter</td><td>Termina la entrada y avanza una celda a la derecha / hacia abajo.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Retrocede.</td></tr><tr><td>Shift+arrow keys</td><td>Extiende la selección.</td></tr><tr><td>Ctrl+C</td><td>Copia la selección.</td></tr><tr><td>Ctrl+D</td><td>Rellena la selección hacia abajo desde su fila superior.</td></tr><tr><td>Ctrl+Enter</td><td>Rellena la selección con el valor de la celda activa.</td></tr><tr><td>Ctrl+A</td><td>Selecciona toda la tabla.</td></tr><tr><td>Ctrl+Shift+V</td><td>Pega como filas nuevas al final de la tabla.</td></tr><tr><td>Delete</td><td>Borra una celda.</td></tr><tr><td>F2</td><td>Abre una celda para editarla.</td></tr><tr><td>Esc</td><td>Cancela una edición.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Recorrer.</td></tr><tr><td>Tab, Enter</td><td>Termina la entrada y avanza una celda a la derecha / hacia abajo.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Retrocede.</td></tr><tr><td>Shift+arrow keys</td><td>Extiende la selección.</td></tr><tr><td>Ctrl+C</td><td>Copia la selección.</td></tr><tr><td>Ctrl+D</td><td>Rellena la selección hacia abajo desde su fila superior.</td></tr><tr><td>Ctrl+Enter</td><td>Rellena la selección con el valor de la celda activa.</td></tr><tr><td>Ctrl+A</td><td>Selecciona toda la tabla.</td></tr><tr><td>Ctrl+Shift+V</td><td>Pega como filas nuevas al final de la tabla.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Cambia a la siguiente o anterior tabla.</td></tr><tr><td>Delete</td><td>Borra una celda.</td></tr><tr><td>F2</td><td>Abre una celda para editarla.</td></tr><tr><td>Esc</td><td>Cancela una edición.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

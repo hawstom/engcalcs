@@ -1654,6 +1654,15 @@ $ec_lang['lpn_ts_none']='Nada para traçar ainda. Escolha elementos no mapa e pr
 $ec_lang['lpn_ts_no_frames']='Ainda não há resultados de período estendido. Pressione Calcular para executar a simulação.';
 $ec_lang['lpn_ts_summary']='Elementos: {n}, horários de relatório: {steps}';
 $ec_lang['lpn_ts_axis_time']='Tempo decorrido';
+$ec_lang['lpn_freq_menu']='Frequência';
+$ec_lang['lpn_freq_tip']='Trace o gráfico da distribuição de frequência de uma propriedade em todas as junções ou todos os tubos no passo de tempo atual.';
+$ec_lang['lpn_freq_title']='Distribuição de valores';
+$ec_lang['lpn_freq_group_tip']='Se o gráfico mostra junções ou tubos.';
+$ec_lang['lpn_freq_quantity_tip']='Qual valor traçar.';
+$ec_lang['lpn_freq_none']='Ainda não há resultados para este valor, portanto não há nada para traçar.';
+$ec_lang['lpn_freq_summary']='Traçados: {n} de {total}';
+$ec_lang['lpn_freq_summary_time']='Traçados: {n} de {total}, em {time}';
+$ec_lang['lpn_freq_axis_percent']='Porcentagem menor que';
 $ec_lang['lpn_view_units']='Unidades';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Salvar tudo';
@@ -2121,7 +2130,7 @@ $ec_lang['lpn_notes_6_term']='Ajuda das colunas da tabela';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Selecionar coluna</td><td>Clique no cabeçalho</td></tr><tr><td>Adicionar ou estender a seleção de colunas</td><td>Ctrl+clique ou Shift+clique em outro cabeçalho</td></tr><tr><td>Mover (reordenar) coluna(s) selecionada(s)</td><td>Arraste ou use Gerenciar colunas… no menu de clique direito ou ⋮</td></tr><tr><td>Menu ⋮ e seta de ordenação.</td><td>Passe o mouse no canto superior de um cabeçalho, ou selecione ou use Tab até um cabeçalho</td></tr><tr><td>Ocultar, Mostrar tudo, ou Gerenciar visibilidade e ordem</td><td>Clique direito no cabeçalho ou menu ⋮ no canto superior direito do cabeçalho</td></tr><tr><td>Ordenar por coluna</td><td>Ícone de seta no canto superior direito do cabeçalho</td></tr><tr><td>Colar como novas linhas no fim da tabela</td><td>Clique direito, menu ⋮ no canto superior direito do cabeçalho, ou Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Atalhos de teclado da tabela';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Teclas de seta</td><td>Navegar.</td></tr><tr><td>Tab, Enter</td><td>Concluir a entrada e navegar uma célula ao lado / abaixo.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navegar para trás.</td></tr><tr><td>Shift+teclas de seta</td><td>Estender a seleção.</td></tr><tr><td>Ctrl+C</td><td>Copiar a seleção.</td></tr><tr><td>Ctrl+D</td><td>Preencher a seleção para baixo a partir da sua linha superior.</td></tr><tr><td>Ctrl+Enter</td><td>Preencher a seleção com o valor da célula ativa.</td></tr><tr><td>Ctrl+A</td><td>Selecionar a tabela inteira.</td></tr><tr><td>Ctrl+Shift+V</td><td>Colar como novas linhas no fim da tabela.</td></tr><tr><td>Delete</td><td>Limpar uma célula.</td></tr><tr><td>F2</td><td>Abrir uma célula para editá-la.</td></tr><tr><td>Esc</td><td>Cancelar uma edição.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Teclas de seta</td><td>Navegar.</td></tr><tr><td>Tab, Enter</td><td>Concluir a entrada e navegar uma célula ao lado / abaixo.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navegar para trás.</td></tr><tr><td>Shift+teclas de seta</td><td>Estender a seleção.</td></tr><tr><td>Ctrl+C</td><td>Copiar a seleção.</td></tr><tr><td>Ctrl+D</td><td>Preencher a seleção para baixo a partir da sua linha superior.</td></tr><tr><td>Ctrl+Enter</td><td>Preencher a seleção com o valor da célula ativa.</td></tr><tr><td>Ctrl+A</td><td>Selecionar a tabela inteira.</td></tr><tr><td>Ctrl+Shift+V</td><td>Colar como novas linhas no fim da tabela.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Alternar para a próxima ou a tabela anterior.</td></tr><tr><td>Delete</td><td>Limpar uma célula.</td></tr><tr><td>F2</td><td>Abrir uma célula para editá-la.</td></tr><tr><td>Esc</td><td>Cancelar uma edição.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2379,7 +2388,7 @@ $ec_lang['lpn_field_easting_abbr']='E';
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
 $ec_lang['lpn_field_lat_abbr']='Lat';
-$ec_lang['lpn_field_lon_abbr']='Lon';
+$ec_lang['lpn_field_lon_abbr']='Long';
 
 
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an

@@ -1655,6 +1655,15 @@ $ec_lang['lpn_ts_none']='هنوز چیزی برای نمودار نیست. ال�
 $ec_lang['lpn_ts_no_frames']='هنوز نتیجه‌ای از شبیه‌سازی بازهٔ زمانی نیست. برای اجرای شبیه‌سازی، محاسبه را بزنید.';
 $ec_lang['lpn_ts_summary']='المان‌ها: {n}، زمان‌های گزارش‌دهی: {steps}';
 $ec_lang['lpn_ts_axis_time']='زمان سپری‌شده';
+$ec_lang['lpn_freq_menu']='فراوانی';
+$ec_lang['lpn_freq_tip']='توزیع فراوانی یک ویژگی را در همهٔ گره‌ها یا همهٔ لوله‌ها، در گام زمانی کنونی، نمودار می‌کند.';
+$ec_lang['lpn_freq_title']='توزیع مقادیر';
+$ec_lang['lpn_freq_group_tip']='نمودار گره‌ها را نشان دهد یا لوله‌ها را.';
+$ec_lang['lpn_freq_quantity_tip']='کدام مقدار نمودار شود.';
+$ec_lang['lpn_freq_none']='هنوز نتیجه‌ای برای این مقدار نیست، پس چیزی برای نمودار کردن وجود ندارد.';
+$ec_lang['lpn_freq_summary']='رسم‌شده: {n} از {total}';
+$ec_lang['lpn_freq_summary_time']='رسم‌شده: {n} از {total}، در {time}';
+$ec_lang['lpn_freq_axis_percent']='درصد کمتر از';
 $ec_lang['lpn_view_units']='واحدها';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='ذخیره همه';
@@ -2122,7 +2131,7 @@ $ec_lang['lpn_notes_6_term']='راهنمای ستون‌های جدول';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>گزینش ستون</td><td>کلیک روی سرستون</td></tr><tr><td>افزودن یا گسترش گزینش ستون</td><td>Ctrl+click یا Shift+click روی سرستون دیگر</td></tr><tr><td>جابه‌جایی (تغییر ترتیب) ستون(های) گزینش‌شده</td><td>کشیدن، یا استفاده از مدیریت ستون‌ها… در منوی راست‌کلیک یا ⋮</td></tr><tr><td>منوی ⋮ و پیکان مرتب‌سازی.</td><td>نگه‌داشتن اشاره‌گر روی گوشهٔ بالای سرستون، یا گزینش یا Tab به سرستون</td></tr><tr><td>پنهان کردن، نمایش همه، یا مدیریت نمایانی و ترتیب</td><td>راست‌کلیک روی سرستون یا منوی ⋮ در گوشهٔ بالا-راستِ سرستون</td></tr><tr><td>مرتب‌سازی بر پایهٔ ستون</td><td>نماد پیکان در گوشهٔ بالا-راستِ سرستون</td></tr><tr><td>چسباندن به‌صورت ردیف‌های تازه در انتهای جدول</td><td>راست‌کلیک، منوی ⋮ در گوشهٔ بالا-راستِ سرستون، یا Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='میان‌برهای صفحه‌کلید جدول';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>کلیدهای جهت</td><td>پیمایش.</td></tr><tr><td>Tab، Enter</td><td>پایان دادن به ورودی و پیمایش یک سلول به کنار / پایین.</td></tr><tr><td>Shift+Tab، Shift+Enter</td><td>پیمایش به عقب.</td></tr><tr><td>Shift+کلیدهای جهت</td><td>گسترش گزینش.</td></tr><tr><td>Ctrl+C</td><td>کپی گزینش.</td></tr><tr><td>Ctrl+D</td><td>پر کردن گزینش رو به پایین از ردیف بالای آن.</td></tr><tr><td>Ctrl+Enter</td><td>پر کردن گزینش با مقدار سلول فعال.</td></tr><tr><td>Ctrl+A</td><td>گزینش کل جدول.</td></tr><tr><td>Ctrl+Shift+V</td><td>چسباندن به‌صورت ردیف‌های تازه در انتهای جدول.</td></tr><tr><td>Delete</td><td>پاک کردن یک سلول.</td></tr><tr><td>F2</td><td>باز کردن یک سلول برای ویرایش آن.</td></tr><tr><td>Esc</td><td>لغو یک ویرایش.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>کلیدهای جهت</td><td>پیمایش.</td></tr><tr><td>Tab، Enter</td><td>پایان دادن به ورودی و پیمایش یک سلول به کنار / پایین.</td></tr><tr><td>Shift+Tab، Shift+Enter</td><td>پیمایش به عقب.</td></tr><tr><td>Shift+کلیدهای جهت</td><td>گسترش گزینش.</td></tr><tr><td>Ctrl+C</td><td>کپی گزینش.</td></tr><tr><td>Ctrl+D</td><td>پر کردن گزینش رو به پایین از ردیف بالای آن.</td></tr><tr><td>Ctrl+Enter</td><td>پر کردن گزینش با مقدار سلول فعال.</td></tr><tr><td>Ctrl+A</td><td>گزینش کل جدول.</td></tr><tr><td>Ctrl+Shift+V</td><td>چسباندن به‌صورت ردیف‌های تازه در انتهای جدول.</td></tr><tr><td>Ctrl+Shift+PageDown، Ctrl+Shift+PageUp</td><td>رفتن به جدول بعدی یا پیشین.</td></tr><tr><td>Delete</td><td>پاک کردن یک سلول.</td></tr><tr><td>F2</td><td>باز کردن یک سلول برای ویرایش آن.</td></tr><tr><td>Esc</td><td>لغو یک ویرایش.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

@@ -1655,6 +1655,15 @@ $ec_lang['lpn_ts_none']='Hakuna cha kuchora bado. Chagua vipengele kwenye ramani
 $ec_lang['lpn_ts_no_frames']='Bado hakuna matokeo ya kipindi kirefu cha muda. Bonyeza Kokotoa ili kuendesha uigaji.';
 $ec_lang['lpn_ts_summary']='Vipengele: {n}, nyakati za taarifa: {steps}';
 $ec_lang['lpn_ts_axis_time']='Muda uliopita';
+$ec_lang['lpn_freq_menu']='Marudio';
+$ec_lang['lpn_freq_tip']='Chora grafu ya usambazaji wa marudio wa kipengele kimoja katika miunganiko yote au mabomba yote wakati wa hatua ya sasa ya muda.';
+$ec_lang['lpn_freq_title']='Usambazaji wa thamani';
+$ec_lang['lpn_freq_group_tip']='Kama grafu inaonyesha miunganiko au mabomba.';
+$ec_lang['lpn_freq_quantity_tip']='Thamani gani ya kuchora.';
+$ec_lang['lpn_freq_none']='Hakuna matokeo ya thamani hii bado, hivyo hakuna cha kuchora.';
+$ec_lang['lpn_freq_summary']='Vilivyochorwa: {n} kati ya {total}';
+$ec_lang['lpn_freq_summary_time']='Vilivyochorwa: {n} kati ya {total}, katika {time}';
+$ec_lang['lpn_freq_axis_percent']='Asilimia iliyo chini ya';
 $ec_lang['lpn_view_units']='Vitengo';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Hifadhi vyote';
@@ -2122,7 +2131,7 @@ $ec_lang['lpn_notes_6_term']='Msaada wa safu za jedwali';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Chagua safu</td><td>Bofya kichwa</td></tr><tr><td>Ongeza au panua uteuzi wa safu</td><td>Ctrl+click au Shift+click kichwa kingine</td></tr><tr><td>Hamisha (panga upya) safu zilizoteuliwa</td><td>Buruta au tumia Simamia safu… kwenye menyu ya kubofya kulia au ⋮</td></tr><tr><td>Menyu ⋮ na mshale wa kupanga.</td><td>Elea juu ya kona ya juu ya kichwa, au chagua au Tab hadi kwenye kichwa</td></tr><tr><td>Ficha, Onyesha zote, au Simamia mwonekano na mpangilio</td><td>Bofya kulia kichwa au menyu ⋮ kwenye kona ya juu kulia ya kichwa</td></tr><tr><td>Panga kwa safu</td><td>Ikoni ya mshale kwenye kona ya juu kulia ya kichwa</td></tr><tr><td>Bandika kama safu mlalo mpya mwishoni mwa jedwali</td><td>Bofya kulia, menyu ⋮ kwenye kona ya juu kulia ya kichwa, au Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Njia za mkato za kibodi za jedwali';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Vitufe vya mshale</td><td>Songa.</td></tr><tr><td>Tab, Enter</td><td>Maliza uandishi kisha songa seli moja kando / chini.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Songa nyuma.</td></tr><tr><td>Shift+vitufe vya mshale</td><td>Panua uteuzi.</td></tr><tr><td>Ctrl+C</td><td>Nakili uteuzi.</td></tr><tr><td>Ctrl+D</td><td>Jaza uteuzi chini kutoka safu mlalo yake ya juu.</td></tr><tr><td>Ctrl+Enter</td><td>Jaza uteuzi kwa thamani ya seli inayotumika.</td></tr><tr><td>Ctrl+A</td><td>Chagua jedwali zima.</td></tr><tr><td>Ctrl+Shift+V</td><td>Bandika kama safu mlalo mpya mwishoni mwa jedwali.</td></tr><tr><td>Delete</td><td>Futa seli.</td></tr><tr><td>F2</td><td>Fungua seli kuihariri.</td></tr><tr><td>Esc</td><td>Ghairi uhariri.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Vitufe vya mshale</td><td>Songa.</td></tr><tr><td>Tab, Enter</td><td>Maliza uandishi kisha songa seli moja kando / chini.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Songa nyuma.</td></tr><tr><td>Shift+vitufe vya mshale</td><td>Panua uteuzi.</td></tr><tr><td>Ctrl+C</td><td>Nakili uteuzi.</td></tr><tr><td>Ctrl+D</td><td>Jaza uteuzi chini kutoka safu mlalo yake ya juu.</td></tr><tr><td>Ctrl+Enter</td><td>Jaza uteuzi kwa thamani ya seli inayotumika.</td></tr><tr><td>Ctrl+A</td><td>Chagua jedwali zima.</td></tr><tr><td>Ctrl+Shift+V</td><td>Bandika kama safu mlalo mpya mwishoni mwa jedwali.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Badilisha kwenda jedwali linalofuata au lililotangulia.</td></tr><tr><td>Delete</td><td>Futa seli.</td></tr><tr><td>F2</td><td>Fungua seli kuihariri.</td></tr><tr><td>Esc</td><td>Ghairi uhariri.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

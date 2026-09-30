@@ -1654,6 +1654,15 @@ $ec_lang['lpn_ts_none']='ገና የሚሳል ምንም ነገር የለም። �
 $ec_lang['lpn_ts_no_frames']='ገና የተራዘመ ጊዜ ውጤቶች የሉም። ማስመሰያውን ለማስኬድ ስላ ይጫኑ።';
 $ec_lang['lpn_ts_summary']='አካሎች፦ {n}፣ የሪፖርት ጊዜዎች፦ {steps}';
 $ec_lang['lpn_ts_axis_time']='ያለፈ ጊዜ';
+$ec_lang['lpn_freq_menu']='ድግግሞሽ';
+$ec_lang['lpn_freq_tip']='በአሁኑ የጊዜ ደረጃ የአንድ ንብረት ድግግሞሽ ስርጭትን በሁሉም መገናኛዎች ወይም በሁሉም ቧንቧዎች ላይ ግራፍ አድርጎ ያሳያል።';
+$ec_lang['lpn_freq_title']='የዋጋዎች ስርጭት';
+$ec_lang['lpn_freq_group_tip']='ግራፉ መገናኛዎችን ወይም ቧንቧዎችን ያሳያል ወይ።';
+$ec_lang['lpn_freq_quantity_tip']='የትኛው ዋጋ እንደሚሳል።';
+$ec_lang['lpn_freq_none']='ለዚህ ዋጋ ገና ውጤት የለም፣ ስለዚህ የሚሳል ነገር የለም።';
+$ec_lang['lpn_freq_summary']='የተሳሉት፦ {n} ከ{total}';
+$ec_lang['lpn_freq_summary_time']='የተሳሉት፦ {n} ከ{total}፣ በ{time}';
+$ec_lang['lpn_freq_axis_percent']='ከዚህ ያነሰ መቶኛ';
 $ec_lang['lpn_view_units']='መለኪያ ክፍሎች';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='ሁሉንም አስቀምጥ';
@@ -2121,7 +2130,7 @@ $ec_lang['lpn_notes_6_term']='የሠንጠረዥ አምዶች እርዳታ';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>አምድ ምረጥ</td><td>ራስጌ ይጫኑ</td></tr><tr><td>የአምድ ምርጫ ጨምር ወይም ዘርጋ</td><td>Ctrl+click ወይም Shift+click ሌላ ራስጌ</td></tr><tr><td>የተመረጡ አምድ(ዎችን) አንቀሳቅስ (ደርድር)</td><td>ይጎትቱ ወይም በቀኝ-ጠቅ ወይም ⋮ ምናሌ ውስጥ አምዶችን አስተዳድር… ይጠቀሙ</td></tr><tr><td>ምናሌ ⋮ እና የደርድር ቀስት።</td><td>የራስጌ የላይኛውን ጠርዝ ያንዣብቡ፣ ወይም ወደ ራስጌ ይምረጡ ወይም Tab ያድርጉ</td></tr><tr><td>ደብቅ፣ ሁሉንም አሳይ ወይም ታይነትና ቅደም ተከተል አስተዳድር</td><td>ራስጌ በቀኝ-ጠቅ ያድርጉ ወይም በራስጌ የላይኛው ቀኝ ጠርዝ ላይ ያለው ⋮ ምናሌ</td></tr><tr><td>በአምድ ደርድር</td><td>በራስጌ የላይኛው ቀኝ ጠርዝ ላይ ያለው የቀስት ምልክት</td></tr><tr><td>እንደ አዲስ ረድፎች በሠንጠረዡ መጨረሻ ለጥፍ</td><td>በቀኝ-ጠቅ፣ በራስጌ የላይኛው ቀኝ ጠርዝ ላይ ያለው ⋮ ምናሌ፣ ወይም Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='የሠንጠረዥ የቁልፍ ሰሌዳ አቋራጮች';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>የቀስት ቁልፎች</td><td>ዙር።</td></tr><tr><td>Tab, Enter</td><td>ግቤትን ጨርስና በአንድ ክፍል ላይ ተሻገር / ውረድ።</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>ወደ ኋላ ዙር።</td></tr><tr><td>Shift+የቀስት ቁልፎች</td><td>ምርጫውን ዘርጋ።</td></tr><tr><td>Ctrl+C</td><td>ምርጫውን ገልብጥ።</td></tr><tr><td>Ctrl+D</td><td>ምርጫውን ከላይኛው ረድፉ ወደታች ሙላ።</td></tr><tr><td>Ctrl+Enter</td><td>ምርጫውን በንቁ ክፍሉ ዋጋ ሙላ።</td></tr><tr><td>Ctrl+A</td><td>ጠቅላላውን ሠንጠረዥ ምረጥ።</td></tr><tr><td>Ctrl+Shift+V</td><td>እንደ አዲስ ረድፎች በሠንጠረዡ መጨረሻ ለጥፍ።</td></tr><tr><td>Delete</td><td>ክፍል አጽዳ።</td></tr><tr><td>F2</td><td>ክፍል ለማስተካከል ክፈት።</td></tr><tr><td>Esc</td><td>ማስተካከል ተወው።</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>የቀስት ቁልፎች</td><td>ዙር።</td></tr><tr><td>Tab, Enter</td><td>ግቤትን ጨርስና በአንድ ክፍል ላይ ተሻገር / ውረድ።</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>ወደ ኋላ ዙር።</td></tr><tr><td>Shift+የቀስት ቁልፎች</td><td>ምርጫውን ዘርጋ።</td></tr><tr><td>Ctrl+C</td><td>ምርጫውን ገልብጥ።</td></tr><tr><td>Ctrl+D</td><td>ምርጫውን ከላይኛው ረድፉ ወደታች ሙላ።</td></tr><tr><td>Ctrl+Enter</td><td>ምርጫውን በንቁ ክፍሉ ዋጋ ሙላ።</td></tr><tr><td>Ctrl+A</td><td>ጠቅላላውን ሠንጠረዥ ምረጥ።</td></tr><tr><td>Ctrl+Shift+V</td><td>እንደ አዲስ ረድፎች በሠንጠረዡ መጨረሻ ለጥፍ።</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>ወደ ቀጣዩ ወይም ቀዳሚው ሠንጠረዥ ቀይር።</td></tr><tr><td>Delete</td><td>ክፍል አጽዳ።</td></tr><tr><td>F2</td><td>ክፍል ለማስተካከል ክፈት።</td></tr><tr><td>Esc</td><td>ማስተካከል ተወው።</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

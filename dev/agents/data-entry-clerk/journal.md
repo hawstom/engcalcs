@@ -1816,3 +1816,109 @@ the recommendation. Reporting the prior entry's conclusion back to the orchestra
 than re-deriving it.
 
 — Declan
+
+
+## 2026-09-30 -- a connected Google Sheet for scenarios (Task 721)
+
+## Invocation, 2026-09-30 — Tom's question on Task 721: a connected Google Sheet for scenarios, vs the Tables pane's own alternatives management
+
+Tom, verbatim, quoted in the brief: *"What if all the alternatives definitions and data lived in a
+'connected' Google Sheet, and user can Sync In and Sync Out at any time? Could that save us the UI
+of alternatives and scenarios management? What advice do Mary, Sue, and Declan have?"* Also asked:
+should the scenarios menu sort by name (a change he wants now), and should it get type-to-jump.
+
+### The scenario model already exists, and it is keyed on stable element IDs, not names
+
+**OBSERVED** `js/looped-network.js:3184-4126` — a scenario is `{id, name, isBase, overrides}`
+(`:3193`); `overrides` is keyed by `ovKey(el)` (`:4156-4159`), which is `'n:'+el.id` /
+`'l:'+el.id` / `'t:'+el.id` — the element's own stable `.id`, never its display Label or Text.
+**OBSERVED** I grepped for any rename-the-id mechanism (`renameElement`, `idRename`, `changeId`)
+and found none — an element's `.id` is assigned once and is not a field the Tables pane or
+Properties box lets a clerk retype (consistent with CLAUDE.md's "un-typeable identity" framing I
+already flagged for Task 610 in this journal, 2026-09-17 entry). So inside the app, a scenario's
+override survives a clerk renaming a junction's Label freely — the row that already exists for
+this is safe.
+
+### What a connected Sheet has to solve that the app already has solved for free
+
+**SPECULATION**, reasoning from the shape above and from how every "connected Sheet" integration
+I have seen (Airtable, Smartsheet, Notion's two-way Google Sheets sync) actually works: a Sheet has
+no concept of `.id` unless the export itself puts one in a column and the Sheet owner is disciplined
+enough never to sort that column away from its row, never to let a collaborator insert a row without
+copying the ID cell, and never to let a fill-handle drag overwrite it. None of the three failure
+modes Tom's question names (IDs, renamed elements, deleted rows) are solved BY the Sheet — they are
+problems the Sheet re-introduces, ones the app's own element-ID keying had already eliminated:
+
+- **IDs**: Sync In has to match an incoming row to an existing element somehow. If it matches on
+  the ID column, that column must never be hand-edited, sorted independent of its row, or left
+  blank on a new row — exactly the kind of "the row disappeared/moved" hazard Task 738 already
+  documents INSIDE this page's own Tables pane (my 2026-09-28 entry above), now happening in a tool
+  this app cannot see and cannot warn about.
+- **Renamed elements**: harmless if Sync matches on ID (name is cosmetic, as it already is in the
+  overrides model above) — but only if whoever built the Sheet integration resisted the obvious,
+  wrong shortcut of matching on the Label column instead, which is the column a spreadsheet user
+  actually looks at and is far more likely to key off by habit.
+- **Deleted rows**: a row deleted in the Sheet is not distinguishable from a row a collaborator
+  hasn't gotten to yet, without a second signal (a "deleted" flag column, or a full diff against
+  the last-synced snapshot) that itself has to be designed, explained, and gotten right by every
+  user filling out the sheet by hand.
+- **Unit columns**: CLAUDE.md's own unit rule — "a stored unit is its NAME... only the user touches
+  a file's numbers... conversion happens at the solver and on results, nowhere else" — has no
+  enforcement mechanism once the numbers leave the app into a Sheet's plain cells. A Sheet column
+  headed "Diameter (mm)" gets silently re-typed in inches by a second editor with no unit picker to
+  stop them, and Sync In has no way to know the number changed meaning rather than value. Inside
+  the app this exact hazard is why every unit-bearing field is a declared family, never free text.
+
+### The gesture cost: Sync In/Out round trip vs. what the Tables pane's own clipboard TSV already does today
+
+**OBSERVED** the Tables pane already reads and writes plain clipboard TSV — `paneCopyTsv()`
+(`js/looped-network.js:24823`), a `copy` listener building TSV (`:24453`, `:26248-26272`), and a
+paste-as-new-rows path that reads `navigator.clipboard.readText()` on demand (`:26537-26543`,
+`:25303-25304`). This is Ctrl+C in the table, Ctrl+V into Sheets (or the reverse) — **zero network
+round trip, zero account, zero consent surface, and it already works with Google Sheets, Excel, or
+LibreOffice equally, because it is the operating system clipboard, not an API.** A "connected"
+Sheet's Sync In/Sync Out, by contrast, is at minimum: open the Sheets picker or paste a Sheet URL,
+wait for an OAuth consent screen (first time), click Sync, wait for the fetch, read a diff/conflict
+report, click through it, and repeat outward. That is five-plus gestures and a network wait PER
+ROUND TRIP, against a plan set workflow where the actual volume operation — four hundred demand
+overrides for a pipe-replacement alternative — is typed directly into the Tables pane's already-
+filtered, already-selected column with Ctrl+Enter or fill-down (my Task 738 and Task 690 entries
+above), needing no round trip to any external tool at all. **The Sheet's real advantage is
+collaboration — two people editing the same alternative at once — not volume entry**, which this
+seat's arithmetic says the Tables pane already wins on its own terms.
+
+### Copying one scenario's values to another
+
+**OBSERVED** the scenario model's own `pushBaseToScenarios()` (`:5072` area, menu row at `:4824`)
+already answers the one instance of this Tom names that the current UI supports (push Base outward
+to every scenario, confirmed with a specific "N values discarded" count per `:4812-4816`'s pattern).
+**SPECULATION**: copying scenario A's overrides onto scenario B (not Base) has no dedicated command
+today (I did not find a second scenario as source in `scenarioMenuRows()`, `:4772-4838`); the plain-
+copy-in-Tables-pane route for THIS job is worse than a dedicated command would be, because a clerk
+would have to switch to scenario A, copy the relevant columns out, switch to scenario B, and paste
+them in — a workaround, not a feature, and the workaround this seat would ask for first is a
+same-shape "Apply scenario A's values to scenario B" menu row, not a spreadsheet detour.
+
+### Scenario menu sort order and type-to-jump
+
+**OBSERVED** `scenarioMenuRows()` (`:4772-4785`) lists `scenarios` in array order — Base first
+(guaranteed by `defaultScenarios()` at `:3193` and `activeScenario()`'s Base-first fallback at
+`:3923`), every other scenario in creation order, never resorted. Tom's ask (sort by name) changes
+this to alphabetical for every row after Base.
+
+**SPECULATION, from this seat's own angle**: alphabetical is the right default for a NAMED list a
+keyboard user has to scan repeatedly, but only if the names are the thing a clerk actually
+remembers — for Tom's own example ("pre-configured scenarios... Alternative A, Alternative B"),
+alphabetical by name and by creation order coincide, so there is no real conflict there. Where it
+would hurt: a clerk running the same three scenarios all day (Base, Existing, Proposed) benefits
+more from a FIXED, memorized position (always row 2, always row 3) than from alphabetical order,
+because position-memory is faster than reading — the same reason this page already prefers spatial/
+positional consistency elsewhere. **I would not block Tom's ask on this** — it is a small list
+(handful of scenarios, not hundreds), so re-reading three to six alphabetized names costs
+negligible time next to the questions above. **Type-to-jump is worth adding only if the menu
+doesn't already have it** — I did not find first-letter cycling in `openMenu()`'s generic handling
+this session (not exhaustively checked, flagging as unverified); if `openMenu()` is a plain custom
+list with no native `<select>` under it, type-ahead does not come for free the way it would in a
+native control, and is worth asking for explicitly rather than assuming the browser supplies it.
+
+— Declan

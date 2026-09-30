@@ -58,13 +58,14 @@ console.log('\n-- the Notes are still CONTENT, not a JS string --');
 	// **R-311/R-312: Paste as new rows at end of table joined both tables.** Ctrl+Shift+V in the
 	// shortcuts table (R-311) and the same command paired with its menu gestures in the columns
 	// table (R-312, Tom's verbatim row) -- one row apiece, seven and eleven, before Task 690 added a
-	// twelfth shortcuts row (Ctrl+Enter). The wording itself is read out of `en`, never spelled out
-	// here (harness_wording_check.php), so a reword of either row is not a red build in this file.
+	// twelfth shortcuts row (Ctrl+Enter) and then a thirteenth (Ctrl+Shift+PageUp/PageDown, the
+	// table-switch shortcut, also Task 690). The wording itself is read out of `en`, never spelled
+	// out here (harness_wording_check.php), so a reword of either row is not a red build in this file.
 	const pasteAppendMatch = en.match(/\$ec_lang\['lpn_pane_paste_append'\]='([^\n]*)';/);
 	report(!!colsDefMatch && (colsDefMatch[1].match(/<tr>/g) || []).length === 7,
 		'the columns table has all seven rows, Paste as new rows at end of table included');
-	report(!!keysDefMatch && (keysDefMatch[1].match(/<tr>/g) || []).length === 12,
-		'the keyboard-shortcuts table has all twelve rows, Ctrl+Enter included (Task 690)');
+	report(!!keysDefMatch && (keysDefMatch[1].match(/<tr>/g) || []).length === 13,
+		'the keyboard-shortcuts table has all thirteen rows, table-switch included (Task 690)');
 	report(!!colsDefMatch && !!pasteAppendMatch &&
 		colsDefMatch[1].indexOf(pasteAppendMatch[1]) > 0 &&
 		colsDefMatch[1].indexOf('Ctrl+Shift+V') > 0,

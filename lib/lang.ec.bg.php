@@ -1656,6 +1656,15 @@ $ec_lang['lpn_ts_none']='Все още няма какво да се начер�
 $ec_lang['lpn_ts_no_frames']='Все още няма резултати от период от време. Натиснете Изчисли, за да изпълните изчислението.';
 $ec_lang['lpn_ts_summary']='Обекти: {n}, моменти на отчитане: {steps}';
 $ec_lang['lpn_ts_axis_time']='Изминало време';
+$ec_lang['lpn_freq_menu']='Честота';
+$ec_lang['lpn_freq_tip']='Начертава честотното разпределение на едно свойство за всички възли или всички тръби в текущия момент от времето.';
+$ec_lang['lpn_freq_title']='Разпределение на стойностите';
+$ec_lang['lpn_freq_group_tip']='Дали графиката показва възли или тръби.';
+$ec_lang['lpn_freq_quantity_tip']='Коя стойност да се начертае.';
+$ec_lang['lpn_freq_none']='Все още няма резултати за тази стойност, затова няма какво да се начертае.';
+$ec_lang['lpn_freq_summary']='Начертани: {n} от {total}';
+$ec_lang['lpn_freq_summary_time']='Начертани: {n} от {total}, в {time}';
+$ec_lang['lpn_freq_axis_percent']='Процент по-малко от';
 $ec_lang['lpn_view_units']='Единици';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Запиши всички';
@@ -2123,7 +2132,7 @@ $ec_lang['lpn_notes_6_term']='Помощ за колоните на таблиц
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Избор на колона</td><td>Щракнете върху заглавието</td></tr><tr><td>Добавяне или разширяване на избора на колони</td><td>Ctrl+щракване или Shift+щракване върху друго заглавие</td></tr><tr><td>Преместване (пренареждане) на избраната(ите) колона(и)</td><td>Плъзнете или използвайте Управление на колони… в менюто при десен клик или ⋮</td></tr><tr><td>Меню ⋮ и стрелка за сортиране.</td><td>Задръжте показалеца върху горния ъгъл на заглавие, или го изберете, или преминете с Tab в него</td></tr><tr><td>Скриване, Покажи всички, или управление на видимостта и реда</td><td>Десен клик върху заглавие или менюто ⋮ в горния десен ъгъл на заглавието</td></tr><tr><td>Сортиране по колона</td><td>Иконата стрелка в горния десен ъгъл на заглавието</td></tr><tr><td>Постави като нови редове в края на таблицата</td><td>Десен клик, менюто ⋮ в горния десен ъгъл на заглавието, или Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Клавишни комбинации за таблицата';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Стрелки</td><td>Придвижване.</td></tr><tr><td>Tab, Enter</td><td>Завършва въвеждането и премества с една клетка встрани / надолу.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Придвижване назад.</td></tr><tr><td>Shift+стрелки</td><td>Разширява селекцията.</td></tr><tr><td>Ctrl+C</td><td>Копира селекцията.</td></tr><tr><td>Ctrl+D</td><td>Запълва селекцията надолу от горния ѝ ред.</td></tr><tr><td>Ctrl+Enter</td><td>Запълва селекцията със стойността на активната клетка.</td></tr><tr><td>Ctrl+A</td><td>Избира цялата таблица.</td></tr><tr><td>Ctrl+Shift+V</td><td>Постави като нови редове в края на таблицата.</td></tr><tr><td>Delete</td><td>Изчиства клетка.</td></tr><tr><td>F2</td><td>Отваря клетка за редактиране.</td></tr><tr><td>Esc</td><td>Отменя редактиране.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Стрелки</td><td>Придвижване.</td></tr><tr><td>Tab, Enter</td><td>Завършва въвеждането и премества с една клетка встрани / надолу.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Придвижване назад.</td></tr><tr><td>Shift+стрелки</td><td>Разширява селекцията.</td></tr><tr><td>Ctrl+C</td><td>Копира селекцията.</td></tr><tr><td>Ctrl+D</td><td>Запълва селекцията надолу от горния ѝ ред.</td></tr><tr><td>Ctrl+Enter</td><td>Запълва селекцията със стойността на активната клетка.</td></tr><tr><td>Ctrl+A</td><td>Избира цялата таблица.</td></tr><tr><td>Ctrl+Shift+V</td><td>Постави като нови редове в края на таблицата.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Превключва към следващата или предишната таблица.</td></tr><tr><td>Delete</td><td>Изчиства клетка.</td></tr><tr><td>F2</td><td>Отваря клетка за редактиране.</td></tr><tr><td>Esc</td><td>Отменя редактиране.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

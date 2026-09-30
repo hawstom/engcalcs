@@ -1656,6 +1656,15 @@ $ec_lang['lpn_ts_none']='Încă nimic de reprezentat grafic. Alegeți elemente p
 $ec_lang['lpn_ts_no_frames']='Încă niciun rezultat pe perioadă extinsă. Apăsați Calculează pentru a rula simularea.';
 $ec_lang['lpn_ts_summary']='Elemente: {n}, momente de raportare: {steps}';
 $ec_lang['lpn_ts_axis_time']='Timp scurs';
+$ec_lang['lpn_freq_menu']='Frecvență';
+$ec_lang['lpn_freq_tip']='Reprezintă grafic distribuția de frecvență a unei proprietăți pentru toate joncțiunile sau toate conductele, la pasul de timp curent.';
+$ec_lang['lpn_freq_title']='Distribuția valorilor';
+$ec_lang['lpn_freq_group_tip']='Dacă graficul arată joncțiuni sau conducte.';
+$ec_lang['lpn_freq_quantity_tip']='Ce valoare să fie reprezentată grafic.';
+$ec_lang['lpn_freq_none']='Încă niciun rezultat pentru această valoare, așa că nu este nimic de reprezentat grafic.';
+$ec_lang['lpn_freq_summary']='Reprezentate: {n} din {total}';
+$ec_lang['lpn_freq_summary_time']='Reprezentate: {n} din {total}, la {time}';
+$ec_lang['lpn_freq_axis_percent']='Procent mai mic decât';
 $ec_lang['lpn_view_units']='Unități';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Salvează tot';
@@ -2123,7 +2132,7 @@ $ec_lang['lpn_notes_6_term']='Ajutor pentru coloanele tabelului';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Selectare coloană</td><td>Clic pe antet</td></tr><tr><td>Adaugă sau extinde selecția de coloane</td><td>Ctrl+clic sau Shift+clic pe alt antet</td></tr><tr><td>Mută (reordonează) coloana (coloanele) selectată(e)</td><td>Trageți sau folosiți Gestionare coloane… din meniul clic-dreapta sau ⋮</td></tr><tr><td>Meniul ⋮ și săgeata de sortare.</td><td>Treceți cu indicatorul peste colțul de sus al unui antet, sau selectați ori navigați cu Tab într-un antet</td></tr><tr><td>Ascunde, Arată toate, sau Gestionează vizibilitatea și ordinea</td><td>Clic-dreapta pe antet sau meniul ⋮ din colțul din dreapta sus al antetului</td></tr><tr><td>Sortare după coloană</td><td>Pictograma săgeată din colțul din dreapta sus al antetului</td></tr><tr><td>Lipește ca rânduri noi la sfârșitul tabelului</td><td>Clic-dreapta, meniul ⋮ din colțul din dreapta sus al antetului, sau Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Comenzi rapide de la tastatură pentru tabel';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tastele săgeți</td><td>Navigare.</td></tr><tr><td>Tab, Enter</td><td>Finalizează introducerea și navighează o celulă la dreapta / în jos.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navighează înapoi.</td></tr><tr><td>Shift+tastele săgeți</td><td>Extinde selecția.</td></tr><tr><td>Ctrl+C</td><td>Copiază selecția.</td></tr><tr><td>Ctrl+D</td><td>Completează selecția în jos, de la rândul de sus.</td></tr><tr><td>Ctrl+Enter</td><td>Completează selecția cu valoarea celulei active.</td></tr><tr><td>Ctrl+A</td><td>Selectează întregul tabel.</td></tr><tr><td>Ctrl+Shift+V</td><td>Lipește ca rânduri noi la sfârșitul tabelului.</td></tr><tr><td>Delete</td><td>Golește o celulă.</td></tr><tr><td>F2</td><td>Deschide o celulă pentru editare.</td></tr><tr><td>Esc</td><td>Anulează o editare.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tastele săgeți</td><td>Navigare.</td></tr><tr><td>Tab, Enter</td><td>Finalizează introducerea și navighează o celulă la dreapta / în jos.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navighează înapoi.</td></tr><tr><td>Shift+tastele săgeți</td><td>Extinde selecția.</td></tr><tr><td>Ctrl+C</td><td>Copiază selecția.</td></tr><tr><td>Ctrl+D</td><td>Completează selecția în jos, de la rândul de sus.</td></tr><tr><td>Ctrl+Enter</td><td>Completează selecția cu valoarea celulei active.</td></tr><tr><td>Ctrl+A</td><td>Selectează întregul tabel.</td></tr><tr><td>Ctrl+Shift+V</td><td>Lipește ca rânduri noi la sfârșitul tabelului.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Comută la tabelul următor sau la cel precedent.</td></tr><tr><td>Delete</td><td>Golește o celulă.</td></tr><tr><td>F2</td><td>Deschide o celulă pentru editare.</td></tr><tr><td>Esc</td><td>Anulează o editare.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
