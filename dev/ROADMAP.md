@@ -532,7 +532,10 @@ the block.
   Tom, 2026-09-30: *"We can see how far we get reading and writing the Bentley .sqlite file also."*
   Phase 1 (`feat/bentley-interop`, `dev/bentley-interop.md`): the `.wtg.sqlite` schema is unpublished,
   no public sample exists, the EULA's reverse-engineering clause is his to read; writing is a no-go.
-  Steel man against (2026-09-30, same doc): the hard part is inside the `.sqlite`, not the `.wtg`.
+  **THE REAL DIFFICULTY IS THE MODEL, NOT THE FILE** (Tom, 2026-09-30): *"The difficulty is in
+  providing/forcing inheritance and alternatives on the user. ... it's a huge burden on the user unless
+  we succeed in hiding it from 'basic mode' users."* A faithful reader needs a scenario tree and an
+  alternatives layer we do not have; flattening one loses what makes it Bentley's (Task 721).
   **Tom has no WaterCAD** (last used 1997; a friend might help), so the deciding test -- a small
   model with a child scenario saved as `.sqlite` and as `.inp` -- waits on finding one.
 - 75|752| **A scenario workbook: the scenario list and its data as spreadsheet tabs.**
@@ -1118,6 +1121,8 @@ the block.
   scenario X to this one" command. Scenario lists sort by name since `fix/scenario-sort`.
   **Ours is flat; Bentley's is a tree with alternatives beneath** (Tom, 2026-09-30): every scenario,
   not just Base, can have children, and each scenario picks one alternative per category.
+  Adopting that model is the price of Bentley interop (Task 749), and a burden unless a basic mode
+  hides it.
 - 50|722| **Change and revision tracking.**
   Tom, 2026-09-25, from WaterCAD: *"I like change/revision tracking very cool."*
 - 50|725| **One wide fire-flow table instead of two reports.**
