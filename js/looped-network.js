@@ -22715,6 +22715,44 @@ var EngCalcs = EngCalcs || {};
 	// hides rows silently is the whole risk here, a filtered table SAYS what it is filtered by, in
 	// the query's own words, above the rows, with the way out beside it.
 	var paneFilters = {};
+	// **AN EDITED ROW STAYS UNTIL THE FILTER IS PRESSED AGAIN** (ROADMAP Task 738; Tom, 2026-09-30,
+	// ruling for Declan's rule with Ida's marking). Tom, 2026-09-28: editing a filtered value so the
+	// row no longer matched made it vanish from under him, and a Ctrl+Enter fill into a filtered
+	// selection made the whole selection vanish. So a row is in the table if it MATCHES, or if it
+	// has been EDITED since Filter in table was pressed -- QGIS's attribute-table rule. The filter is
+	// still re-asked on every draw (a row that newly matches still arrives); only the leaving is held.
+	//
+	// **"EDITED" IS DETECTED, NOT REPORTED.** Typing in a cell, Properties, Find and replace, both
+	// fills, a drag and Ctrl+Z all change an element by different doors, and a flag set at each door
+	// is a list somebody forgets to extend. Instead `paneFilterSeen` holds, per table, the
+	// fingerprint each row had the first time the filter admitted it, and a row whose fingerprint
+	// has moved since is edited -- whatever moved it. Results are not in the fingerprint (they live
+	// in lastSolveResult, not on the element), so a solve never counts as an edit. Once edited, a row
+	// is in `paneFilterKept` until the filter is set again: an undo that makes it match again simply
+	// un-marks it, and it never vanishes on its own.
+	var paneFilterSeen = {}, paneFilterKept = {};
+	function paneFilterForgetEdits(id) {
+		if (id) { delete paneFilterSeen[id]; delete paneFilterKept[id]; return; }
+		paneFilterSeen = {}; paneFilterKept = {};
+	}
+	// The element and every scenario's overrides on it -- ALL scenarios rather than the active one,
+	// so switching scenario (which is not an edit) does not change it.
+	function paneFilterFingerprint(el) {
+		var key = ovKey(el);
+		return JSON.stringify(el) + '|' + scenarios.map(function (s) {
+			return JSON.stringify((s.overrides && s.overrides[key]) || null);
+		}).join(',');
+	}
+	// A rename changes the key a row is known by, so both keys are held: the new one so the row does
+	// not vanish under an ID filter, the old one so an undo of the rename does not either.
+	function paneFilterRenamed(group, oldId, newId) {
+		Object.keys(paneFilterSeen).forEach(function (id) {
+			var seen = paneFilterSeen[id], kept = paneFilterKept[id] || (paneFilterKept[id] = {});
+			if (seen[group + ':' + oldId] === undefined) { return; }
+			kept[group + ':' + oldId] = true;
+			kept[group + ':' + newId] = true;
+		});
+	}
 	function paneFilterQuery(spec) {
 		return (spec && paneFilters[spec.id]) ? paneFilters[spec.id] : '';
 	}
@@ -22722,6 +22760,8 @@ var EngCalcs = EngCalcs || {};
 		var spec = paneTableById(id);
 		if (!spec) { return false; }
 		if (query) { paneFilters[id] = String(query); } else { delete paneFilters[id]; }
+		// Pressing Filter in table again is the re-apply: rows kept for having been edited go now.
+		paneFilterForgetEdits(id);
 		// The rows and the banner both change, so the table is rebuilt rather than refilled -- and
 		// the remembered ORDER goes with it, because a filtered table is a different list.
 		paneTableReset(spec);
@@ -22749,10 +22789,24 @@ var EngCalcs = EngCalcs || {};
 		if (spec.group === 'customer') { return (doc.customers || []).slice(); }
 		return pool.filter(function (x) { return x.type === spec.type; });
 	}
+	// **THE ONE PLACE A ROW'S MEMBERSHIP IS DECIDED**, and so the one place an edit is noticed.
+	// `spec.filterStale` is the rows kept only for having been edited -- what the table dims and
+	// marks and the banner counts.
 	function paneTableElements(spec) {
-		var rows = paneTableAllElements(spec), keys = paneFilterKeys(spec);
-		if (!keys) { return rows; }
-		return rows.filter(function (x) { return keys[spec.group + ':' + x.id] === true; });
+		var rows = paneTableAllElements(spec), keys = paneFilterKeys(spec), seen, kept, stale = {}, n = 0;
+		if (!keys) { spec.filterStale = null; spec.filterStaleCount = 0; return rows; }
+		seen = paneFilterSeen[spec.id] || (paneFilterSeen[spec.id] = {});
+		kept = paneFilterKept[spec.id] || (paneFilterKept[spec.id] = {});
+		rows = rows.filter(function (x) {
+			var k = spec.group + ':' + x.id, match = keys[k] === true;
+			if (!kept[k] && seen[k] !== undefined && seen[k] !== paneFilterFingerprint(x)) { kept[k] = true; }
+			if (match && seen[k] === undefined) { seen[k] = paneFilterFingerprint(x); }
+			if (!match && kept[k]) { stale[x.id] = true; n++; }
+			return match || kept[k] === true;
+		});
+		spec.filterStale = stale;
+		spec.filterStaleCount = n;
+		return rows;
 	}
 	// **A COLUMN MAY DECLARE WHEN IT EXISTS, and every reader of the list goes through here**
 	// (Task 566). The two reaction coefficients are inputs to an analysis the document may not be
@@ -23951,11 +24005,51 @@ var EngCalcs = EngCalcs || {};
 	// The line above a filtered table: what it is filtered by, how much of the table is showing,
 	// and the way out. Null where there is no filter, so an unfiltered table gains nothing.
 	function paneFilterNoteText(spec, rows) {
-		var pc = EngCalcs.pageConfig || {};
-		return String(pc.lpn_pane_filter_note || 'Filtered by {q}. Showing {n} of {all}.')
+		var pc = EngCalcs.pageConfig || {}, text;
+		text = String(pc.lpn_pane_filter_note || 'Filtered by {q}. Showing {n} of {all}.')
 			.split('{q}').join(paneFilterQuery(spec))
 			.split('{n}').join(String(rows.length))
 			.split('{all}').join(String(paneTableAllElements(spec).length));
+		// Task 738: the rows the table is holding only because they were edited, counted.
+		if (spec.filterStaleCount) {
+			text += ' ' + String(pc.lpn_pane_filter_stale || 'Rows that no longer match: {n}.')
+				.split('{n}').join(String(spec.filterStaleCount));
+		}
+		return text;
+	}
+	// **IDA'S MARKING** (Task 738): a row kept only for having been edited is dimmed and its ID cell
+	// carries a warning sign, so a row that no longer answers the query cannot pass for one that
+	// does. Run after every build AND every refill, because a row can stop (or start again) matching
+	// without the set of rows changing -- which is the refill path -- and the banner count with it.
+	function paneFilterMarkRows(spec, rows) {
+		var stale = spec.filterStale || {};
+		rows.forEach(function (el) {
+			var tds = spec.tds && spec.tds[el.id], idTd = tds && tds.id, anyTd, tr,
+				on = stale[el.id] === true, mark, i;
+			if (!tds) { return; }
+			// The row is dimmed even with the ID column hidden; only the sign needs that column.
+			anyTd = idTd || tds[Object.keys(tds)[0]];
+			tr = anyTd && anyTd.parentNode;
+			if (tr) {
+				tr.className = String(tr.className || '').replace(/(^|\s)lpn-pane-stale(?=\s|$)/g, '').trim() +
+					(on ? ' lpn-pane-stale' : '');
+			}
+			if (!idTd) { return; }
+			mark = null;
+			for (i = 0; i < (idTd.children || []).length; i++) {
+				if (/(^|\s)lpn-pane-stale-mark(\s|$)/.test(idTd.children[i].className || '')) { mark = idTd.children[i]; }
+			}
+			if (on && !mark) {
+				mark = document.createElement('span');
+				mark.className = 'lpn-pane-stale-mark';
+				mark.setAttribute('aria-hidden', 'true');
+				mark.textContent = '\u26A0';
+				if (idTd.firstChild) { idTd.insertBefore(mark, idTd.firstChild); } else { idTd.appendChild(mark); }
+			} else if (!on && mark) {
+				idTd.removeChild(mark);
+			}
+		});
+		if (spec.filterNoteText) { spec.filterNoteText.textContent = paneFilterNoteText(spec, rows); }
 	}
 	function paneFilterBanner(spec, rows, withClear) {
 		var pc = EngCalcs.pageConfig || {}, q = paneFilterQuery(spec), wrap, text, btn;
@@ -23965,6 +24059,9 @@ var EngCalcs = EngCalcs || {};
 		text = document.createElement('span');
 		text.textContent = paneFilterNoteText(spec, rows);
 		wrap.appendChild(text);
+		// The table's own banner is refreshed in place by paneFilterMarkRows(); the Find panel's copy
+		// (withClear false) is not this table's to hold.
+		if (withClear) { spec.filterNoteText = text; }
 		if (withClear) {
 			btn = document.createElement('button');
 			btn.type = 'button';
@@ -23986,6 +24083,7 @@ var EngCalcs = EngCalcs || {};
 		spec.tds = {};
 		spec.initEmCache = {};   // the rule's inputs (the rows) are about to change under it
 		spec.painted = null;   // fresh <td>s carry no class: see paneSelPaint()
+		spec.filterNoteText = null;
 		host.innerHTML = '';
 		// **A FILTERED TABLE SAYS SO BEFORE IT SAYS ANYTHING ELSE**, empty or not (Task 597). Hidden
 		// rows with no visible cause is the one way this feature can mislead somebody.
@@ -24433,6 +24531,8 @@ var EngCalcs = EngCalcs || {};
 				}
 			});
 		});
+		// Task 738's marks and count, which a refill changes as surely as it changes a value.
+		paneFilterMarkRows(spec, rows);
 	}
 	function activeElementSafe() {
 		try { return document.activeElement; } catch (e) { return null; }
@@ -49612,6 +49712,7 @@ var EngCalcs = EngCalcs || {};
 			currentPopup = { kind: 'node', id: newId };
 		}
 		renameOverrides('node', oldId, newId);
+		paneFilterRenamed('node', oldId, newId);
 		nodeEls[newId] = nodeEls[oldId]; delete nodeEls[oldId];
 		incidentLinks[newId] = incidentLinks[oldId]; delete incidentLinks[oldId];
 		labelsByAnchor[newId] = labelsByAnchor[oldId]; delete labelsByAnchor[oldId];
@@ -49658,6 +49759,7 @@ var EngCalcs = EngCalcs || {};
 			currentPopup = { kind: 'link', id: newId };
 		}
 		renameOverrides('link', oldId, newId);
+		paneFilterRenamed('link', oldId, newId);
 		// **NOTHING FOLLOWS A LINK RENAME ANY MORE** (Task 586). It used to: `curveRef` named ANOTHER
 		// PUMP to copy points from, so renaming that pump silently emptied the borrower's curve. A
 		// curve is a document object now and both pumps name IT, so a link's name is nobody else's
@@ -52120,7 +52222,9 @@ var EngCalcs = EngCalcs || {};
 	// Switching projects drops the undo history (Task 146.08). The stack holds snapshots of the
 	// OUTGOING project's doc; leaving them in place would let one Undo in the newly-opened project
 	// paste the previous project's network over it -- silently, and with no way back.
-	function clearUndo() { undoStack.length = 0; }
+	// And the Tables' record of which filtered rows were edited (Task 738): it is keyed by id, and
+	// the next project's J1 is not this one's.
+	function clearUndo() { undoStack.length = 0; paneFilterForgetEdits(); }
 	function undo() {
 		if (undoStack.length === 0) { return; }
 		var snap = undoStack.pop();

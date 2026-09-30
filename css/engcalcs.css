@@ -2274,6 +2274,11 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	overflow-wrap: anywhere;
 }
 .lpn-pane-filter-clear { font-size: 1em; }
+/* **A ROW KEPT ONLY FOR HAVING BEEN EDITED** (Task 738): it no longer matches the filter and stays
+   until Filter in table is pressed again, so it must not pass for a row that does match. Dimmed by
+   opacity, which reads the same in both themes; the sign on its ID cell says why. */
+.lpn-pane-table tr.lpn-pane-stale td { opacity: .5; }
+.lpn-pane-stale-mark { margin-inline-end: .2em; white-space: nowrap; }
 /* **THE FIRST COLUMN IS LEFT AND EVERY OTHER COLUMN IS CENTRED, HEADING AND CELL ALIKE** (Tom,
    2026-08-23: "Right is great justification for numbers. But in tables, center is safest for
    everything but the first column... Make the headings center and we will be back to where we
