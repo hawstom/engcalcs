@@ -332,7 +332,13 @@ function makeIds(n, style, rng, prefix, used) {
 
 // ---- the document --------------------------------------------------------------------------------
 function generate(specIn) {
-	const s = normSpec(specIn), key = specKey(s), rng = makeRng(key);
+	// **THREE INDEPENDENT STREAMS, SO FACTORS PAIR.** The network (geometry, values) comes from
+	// (family, n, jitter, seed) alone, the IDs from (ids, seed) and the node count, and spacingPx and
+	// fields do not touch the document's network at all. So one seed at three densities, or with
+	// three ID styles, is the SAME network: a paired comparison by construction.
+	const s = normSpec(specIn), key = specKey(s);
+	const rng = makeRng(['net', s.family, s.n, s.jitter, s.seed].join('|'));
+	const rngId = makeRng(['ids', s.ids, s.n, s.seed].join('|'));
 	const g = s.family === 'grid' ? famGrid(s, rng) : s.family === 'tree' ? famTree(s, rng)
 		: s.family === 'suburban' ? famSuburban(s, rng) : famDowntown(s, rng);
 	const pts = g.pts, n = pts.length;
@@ -343,7 +349,7 @@ function generate(specIn) {
 	// The source: the grid's corner, the tree's root, the point nearest the others' lower-left.
 	let src = 0;
 	if (!g.tree) { pts.forEach(function (p, i) { if (p.x + p.y < pts[src].x + pts[src].y) { src = i; } }); }
-	const used = new Set(), nodeIds = makeIds(n, s.ids, rng, 'J', used);
+	const used = new Set(), nodeIds = makeIds(n, s.ids, rngId, 'J', used);
 	// Tanks: one per 1000 nodes, at nodes far from the source; the rest junctions.
 	const nTanks = Math.floor(n / 1000), isTank = {};
 	for (let t = 0; t < nTanks; t++) { isTank[rng.int(0, n - 1)] = true; }
@@ -381,7 +387,7 @@ function generate(specIn) {
 			}
 		});
 	}
-	const linkIds = makeIds(g.edges.length + 1, s.ids, rng, 'P', new Set());   // links name apart from nodes, as EPANET's do
+	const linkIds = makeIds(g.edges.length + 1, s.ids, rngId, 'P', new Set());   // links name apart from nodes, as EPANET's do
 	const links = [{ id: linkIds[g.edges.length], type: 'pipe', from: resId, to: nodeIds[src], verts: [],
 		_diameter: 24, _roughness: 130, _length: r1(0.8 * D * Math.SQRT2), lenAuto: false, _status: 'open', _k: 0 }];
 	g.edges.forEach(function (e, k) {
@@ -446,7 +452,10 @@ function medianNN(doc) {
 	return dd[Math.floor(dd.length / 2)];
 }
 
-module.exports = { generate, normSpec, specKey, medianNN, FAMILIES, ID_STYLES, FIELD_SETS, D };
+// A seeded index in [0, n): the extractor's view centre on a benchmark network (seed > 1).
+function pickIndex(n, key) { return Math.floor(makeRng(key).u() * n); }
+
+module.exports = { generate, normSpec, specKey, medianNN, pickIndex, FAMILIES, ID_STYLES, FIELD_SETS, D };
 
 if (require.main === module) {
 	const a = process.argv.slice(2);
