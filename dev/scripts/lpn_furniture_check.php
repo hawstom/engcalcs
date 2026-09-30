@@ -147,11 +147,6 @@ const EC_LPN_FURNITURE = [
     // A colleague opening the project must not inherit it: their own files come out of their own
     // instrument, in their own order.
     'lpn_survey_format' => 'the column order last chosen when importing a surveyed point list',
-    // **NOT FURNITURE, BUT ON THE BROWSER SIDE OF THE LINE ALL THE SAME** (Task 747). Which
-    // document IDs THIS browser has met is a fact about the browser by definition: carried in the
-    // file, every copy would arrive already "known" and the copy question could never be asked.
-    'lpn_known_docs'  => 'the document IDs this browser has minted, opened, or been told are the '
-                       . 'original, so an Explorer copy that shares a locked ID can be asked about',
 ];
 
 if (defined('LPN_FURNITURE_LIB_ONLY')) {

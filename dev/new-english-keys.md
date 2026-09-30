@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**9 still to read on master**, of 9 untranslated keys, of 2166 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**7 still to read on master**, of 7 untranslated keys, of 2164 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,16 +25,13 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (9, 9 to read @@ NEEDS RULING)
+## lpn_  (7, 7 to read @@ NEEDS RULING)
 
 - **`lpn_copy_body`**
   > This file was originally created on {date}, but this browser doesn't remember it. Is this the Original file (keep same lock) or a Copy (make new lock)?
   @@ NEEDS RULING
 - **`lpn_copy_body_nodate`**
   > This browser doesn't remember this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  @@ NEEDS RULING
-- **`lpn_copy_body_tab`**
-  > This file has the same lock as {name}, which is already open here, so it may be a copy of that file made outside this page. Is this the Original file (keep same lock) or a Copy (make new lock)?
   @@ NEEDS RULING
 - **`lpn_copy_copy`**
   > A copy; make new lock
@@ -51,15 +48,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_copy_title`**
   > Mark file as new copy?
   @@ NEEDS RULING
-- **`lpn_copy_why`**
-  > Another browser has a file with this same lock open right now. A file copied outside this page keeps its original's lock.
-  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**47 still to read**, of 104 new keys across 18 unmerged branch(es).
+**47 still to read**, of 113 new keys across 18 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -70,7 +64,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/key-merge (`c4482083`) — 9 new, all ruled
+### chore/key-merge (`70e18d02`) — 9 new, all ruled
 
 - **`lpn_freq_axis_percent`**
   > Percent less than
@@ -100,11 +94,39 @@ build for that would be a gate nobody keeps. Refresh it with
   > Distribution of values
   _Ruled OK 2026-09-30._
 
-### feat/bentley-interop (`8c5cc3a9`) — adds no English strings
+### feat/bentley-interop (`07996c49`) — 9 new, all ruled
 
-### feat/copy-lock (`1d99970f`) — adds no English strings
+- **`lpn_freq_axis_percent`**
+  > Percent less than
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_group_tip`**
+  > Whether the graph shows junctions or pipes.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_menu`**
+  > Frequency
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_none`**
+  > No results for this value yet, so there is nothing to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_quantity_tip`**
+  > Which value to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary`**
+  > Plotted: {n} of {total}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary_time`**
+  > Plotted: {n} of {total}, at {time}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_tip`**
+  > Graph the frequency distribution of one property over all junctions or all pipes at the current time step.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_title`**
+  > Distribution of values
+  _Ruled OK 2026-09-30._
 
-### feat/criticality (`31e545ca`) — 31 new, 22 to read @@ NEEDS RULING
+### feat/copy-lock (`561e86e4`) — adds no English strings
+
+### feat/criticality (`315bf427`) — 31 new, 22 to read @@ NEEDS RULING
 
 - **`lpn_crit_baseline_below`**
   > Junctions already below it with nothing broken: {n}. They are not counted.
@@ -215,7 +237,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selected
   @@ NEEDS RULING
 
-### feat/graph-tab-keys (`ee61d048`) — 9 new, all ruled
+### feat/graph-tab-keys (`6e7b95fa`) — 9 new, all ruled
 
 - **`lpn_freq_axis_percent`**
   > Percent less than
