@@ -976,7 +976,7 @@
         "lpn_find_op_lt": "below",
         "lpn_find_op_empty": "empty",
         "lpn_find_count": "{n} found. Click one to go to it.",
-        "lpn_find_shift_hint": "Shift+click to add\/remove toggle.",
+        "lpn_find_shift_hint": "Shift+click to toggle, adding if not in the selection set or removing if already in the selection set.",
         "lpn_find_none": "Nothing matched.",
         "lpn_find_op_top": "{n} highest",
         "lpn_find_op_bottom": "{n} lowest",

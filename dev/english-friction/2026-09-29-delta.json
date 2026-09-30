@@ -36,8 +36,9 @@
         "bare verbal noun parallel to Select/Unselect on map (chosen)",
         "add an implied pronoun object, whose gender may not fit every row"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "\"Go to on map\" has no object for \"to\". Three agents flagged it (ar, ps, ru), and the shipped values split: de, hr, fa, ru, tr wrote \"Show on map\", while ro (\"Mergi la pe hartă\"), pt (\"Ir para no mapa\") and id (\"Menuju di peta\") calqued it word for word into something ungrammatical. It is the title on the row button that zooms to the element and selects it, beside lpn_pane_goto_tip \"Zoom & select\". Proposed English, for Tom: \"Show on map\". Once ruled, retranslate this one key in all 26."
+      "disposition": "intent",
+      "resolution": "\"Go to on map\" has no object for \"to\". Three agents flagged it (ar, ps, ru), and the shipped values split: de, hr, fa, ru, tr wrote \"Show on map\", while ro (\"Mergi la pe hartă\"), pt (\"Ir para no mapa\") and id (\"Menuju di peta\") calqued it word for word into something ungrammatical. It is the title on the row button that zooms to the element and selects it, beside lpn_pane_goto_tip \"Zoom & select\". Proposed English, for Tom: \"Show on map\". Once ruled, retranslate this one key in all 26. RULED by Tom 2026-09-29: English kept; his $ec_lang_syn entry added; retranslated in sprint 2026-09-29-echo.",
+      "human_answer": "Add a canonical or _syn entry \"Bring this into view on the map, Zoom to this on the map, Show this on the map\""
     },
     {
       "key": "lpn_find_shift_hint",
@@ -48,8 +49,9 @@
         "Shift+click toggles whether a click adds or removes",
         "Shift+click adds, and some other gesture removes"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "\"Shift+click to add/remove toggle.\" leaves \"toggle\" dangling after the infinitive (it). Most languages rendered \"Shift+click to add or remove\", which is what the gesture does. Proposed English, for Tom: \"Shift+click to add or remove one.\""
+      "disposition": "english",
+      "resolution": "\"Shift+click to add/remove toggle.\" leaves \"toggle\" dangling after the infinitive (it). Most languages rendered \"Shift+click to add or remove\", which is what the gesture does. Proposed English, for Tom: \"Shift+click to add or remove one.\" RULED by Tom 2026-09-29: his own English, applied and retranslated in sprint 2026-09-29-echo.",
+      "human_answer": "Shift+click to toggle, adding if not in the selection set or removing if already in the selection set."
     },
     {
       "key": "lpn_field_lat_abbr",
@@ -72,8 +74,9 @@
         "quoted short 'All' (chosen)",
         "spell out the full option label"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26."
+      "disposition": "english",
+      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26. RULED by Tom 2026-09-29: new English and a dialog simplification, built together as Task 746 (the key is retranslated on that branch).",
+      "human_answer": "\"The design check scope is set to Selected, but no assets are selected. Select assets or select All\" ... Our interface needs simplification as follows: (a) (Specify) Junctions to test: All/Selected (b) Design check (effect on system); (specify) pipes and other junctions to check: All/Selected"
     },
     {
       "key": "lpn_field_lat_abbr",
@@ -96,8 +99,9 @@
         "go to it on the map (chosen)",
         "a literal Go, on map, with no object"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "\"Go to on map\" has no object for \"to\". Three agents flagged it (ar, ps, ru), and the shipped values split: de, hr, fa, ru, tr wrote \"Show on map\", while ro (\"Mergi la pe hartă\"), pt (\"Ir para no mapa\") and id (\"Menuju di peta\") calqued it word for word into something ungrammatical. It is the title on the row button that zooms to the element and selects it, beside lpn_pane_goto_tip \"Zoom & select\". Proposed English, for Tom: \"Show on map\". Once ruled, retranslate this one key in all 26."
+      "disposition": "intent",
+      "resolution": "\"Go to on map\" has no object for \"to\". Three agents flagged it (ar, ps, ru), and the shipped values split: de, hr, fa, ru, tr wrote \"Show on map\", while ro (\"Mergi la pe hartă\"), pt (\"Ir para no mapa\") and id (\"Menuju di peta\") calqued it word for word into something ungrammatical. It is the title on the row button that zooms to the element and selects it, beside lpn_pane_goto_tip \"Zoom & select\". Proposed English, for Tom: \"Show on map\". Once ruled, retranslate this one key in all 26. RULED by Tom 2026-09-29: English kept; his $ec_lang_syn entry added; retranslated in sprint 2026-09-29-echo.",
+      "human_answer": "Add a canonical or _syn entry \"Bring this into view on the map, Zoom to this on the map, Show this on the map\""
     },
     {
       "key": "lpn_field_lat_abbr",
@@ -120,8 +124,9 @@
         "generic 'set to all' (chosen)",
         "quote the full option label"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26."
+      "disposition": "english",
+      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26. RULED by Tom 2026-09-29: new English and a dialog simplification, built together as Task 746 (the key is retranslated on that branch).",
+      "human_answer": "\"The design check scope is set to Selected, but no assets are selected. Select assets or select All\" ... Our interface needs simplification as follows: (a) (Specify) Junctions to test: All/Selected (b) Design check (effect on system); (specify) pipes and other junctions to check: All/Selected"
     },
     {
       "key": "lpn_field_lat_abbr",
@@ -156,8 +161,9 @@
         "show this row's element on the map (chosen)",
         "a duplicate of 'Zoom & select'"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "\"Go to on map\" has no object for \"to\". Three agents flagged it (ar, ps, ru), and the shipped values split: de, hr, fa, ru, tr wrote \"Show on map\", while ro (\"Mergi la pe hartă\"), pt (\"Ir para no mapa\") and id (\"Menuju di peta\") calqued it word for word into something ungrammatical. It is the title on the row button that zooms to the element and selects it, beside lpn_pane_goto_tip \"Zoom & select\". Proposed English, for Tom: \"Show on map\". Once ruled, retranslate this one key in all 26."
+      "disposition": "intent",
+      "resolution": "\"Go to on map\" has no object for \"to\". Three agents flagged it (ar, ps, ru), and the shipped values split: de, hr, fa, ru, tr wrote \"Show on map\", while ro (\"Mergi la pe hartă\"), pt (\"Ir para no mapa\") and id (\"Menuju di peta\") calqued it word for word into something ungrammatical. It is the title on the row button that zooms to the element and selects it, beside lpn_pane_goto_tip \"Zoom & select\". Proposed English, for Tom: \"Show on map\". Once ruled, retranslate this one key in all 26. RULED by Tom 2026-09-29: English kept; his $ec_lang_syn entry added; retranslated in sprint 2026-09-29-echo.",
+      "human_answer": "Add a canonical or _syn entry \"Bring this into view on the map, Zoom to this on the map, Show this on the map\""
     },
     {
       "key": "lpn_ff_design_no_selection",
@@ -168,8 +174,9 @@
         "short 'All'",
         "spell out the full option label"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26."
+      "disposition": "english",
+      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26. RULED by Tom 2026-09-29: new English and a dialog simplification, built together as Task 746 (the key is retranslated on that branch).",
+      "human_answer": "\"The design check scope is set to Selected, but no assets are selected. Select assets or select All\" ... Our interface needs simplification as follows: (a) (Specify) Junctions to test: All/Selected (b) Design check (effect on system); (specify) pipes and other junctions to check: All/Selected"
     },
     {
       "key": "lpn_ff_design_no_selection",
@@ -180,8 +187,9 @@
         "quote the full option label (chosen)",
         "coin a short 全部 that may not match the dropdown"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26."
+      "disposition": "english",
+      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26. RULED by Tom 2026-09-29: new English and a dialog simplification, built together as Task 746 (the key is retranslated on that branch).",
+      "human_answer": "\"The design check scope is set to Selected, but no assets are selected. Select assets or select All\" ... Our interface needs simplification as follows: (a) (Specify) Junctions to test: All/Selected (b) Design check (effect on system); (specify) pipes and other junctions to check: All/Selected"
     },
     {
       "key": "lpn_ff_design_no_selection",
@@ -192,8 +200,9 @@
         "spell out the full option label (chosen, as pt)",
         "short word for All"
       ],
-      "disposition": "refer-to-human",
-      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26."
+      "disposition": "english",
+      "resolution": "\"or set All\" names no control: the option reads \"All other junctions and all pipes\" (lpn_ff_design_all). Seven agents flagged it (hi, he, ru, zh, sw, ur, and pt by choice), and the languages split between a bare \"All\" and the full option label. Proposed English, for Tom: \"The design check is set to the selected junctions, and none is selected. Select some on the map, or choose All other junctions and all pipes.\" Once ruled, retranslate this key in all 26. RULED by Tom 2026-09-29: new English and a dialog simplification, built together as Task 746 (the key is retranslated on that branch).",
+      "human_answer": "\"The design check scope is set to Selected, but no assets are selected. Select assets or select All\" ... Our interface needs simplification as follows: (a) (Specify) Junctions to test: All/Selected (b) Design check (effect on system); (specify) pipes and other junctions to check: All/Selected"
     }
   ]
 }

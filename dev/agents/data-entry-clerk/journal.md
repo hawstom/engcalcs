@@ -1804,3 +1804,15 @@ volume data entry and deserves its own control if anyone asks for it, but it sho
 DEFAULT gate a first-time filter user has to discover before their first bulk fill is safe.
 
 — Declan
+
+## Invocation, 2026-09-29 — Task 738 re-check before build
+
+Re-read the 2026-09-28 entry above; it already answers this task in full. **OBSERVED** re-verified
+against current code: `js/looped-network.js:22707` still carries the "IT IS RE-ASKED ON EVERY DRAW"
+comment (line number shifted from :22540 cited before, same text), `paneFilters` still a bare
+module-level object at `:22717`, `lpn_find_filter_btn`/`lpn_pane_filled` keys unchanged in
+`lib/lang.ec.en.php`. No new findings this pass — nothing in the repo has moved that would change
+the recommendation. Reporting the prior entry's conclusion back to the orchestrator verbatim rather
+than re-deriving it.
+
+— Declan
