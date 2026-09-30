@@ -28841,6 +28841,24 @@ var EngCalcs = EngCalcs || {};
 		link: ['velocity', 'flow', 'headloss', 'gradient', 'friction', 'status', 'quality', 'rate']
 	};
 	var PG_SKIP_BY_TYPE = { tank: { pressure: 1 } };
+	// **THE SELECTOR'S OWN WORDING FOR A SOURCE SHARE** (Tom, 2026-09-30: "In selector, use
+	// 'Source share from {trace node}'"). Everywhere else a source share is named -- the Tables
+	// column, Find's property list, the Labels popover, the colour legend -- it stays the bare
+	// lpn_result_source_share, because those headings repeat on every row and column and naming
+	// the trace node in each would be clutter; the selector says it once, so it can afford to.
+	// Falls back to colorFieldLabel()'s own "Source share" if somehow no trace node is set, which
+	// should not happen: pgAvailable() only offers 'quality' where the run already has numbers for
+	// it, and a trace run has none without a trace node chosen.
+	function pgFieldLabel(group, field) {
+		var pc = EngCalcs.pageConfig || {}, node;
+		if (field === 'quality' && qualityMode() === 'trace') {
+			node = (settings.quality || {}).traceNode;
+			if (node) {
+				return (pc.lpn_pgraph_source_share_from || 'Source share from {node}').replace('{node}', node);
+			}
+		}
+		return colorFieldLabel(group, field);
+	}
 	// **THE CHOSEN PROPERTY, PER ELEMENT TYPE, FOR THIS SESSION ONLY** -- tsState's standing: a
 	// reader's question, not a project setting and not a preference, so nothing is stored.
 	var pgFieldByType = {};
@@ -28927,7 +28945,7 @@ var EngCalcs = EngCalcs || {};
 		sel.title = pc.lpn_ts_quantity_tip || 'Which value to graph against time.';
 		avail.forEach(function (a) {
 			var op = document.createElement('option');
-			op.value = a.field; op.textContent = colorFieldLabel(subj.group, a.field);
+			op.value = a.field; op.textContent = pgFieldLabel(subj.group, a.field);
 			sel.appendChild(op);
 		});
 		sel.value = pick.field;

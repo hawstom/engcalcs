@@ -19,6 +19,9 @@
 //   7. The multi-element box carries no graph.
 //   8. Recalculate off keeps the snapshot: an edit does not take the graph away.
 //   9. A steady-state project (no run time) has no graph.
+//  10. A source-trace run: the selector's own wording, "Source share from {node}" (Tom, 2026-09-30),
+//      distinct from the shared lpn_result_source_share used everywhere else; and with no trace node
+//      set, the entry does not appear at all (no results to offer it from).
 
 const fs = require('fs');
 const { ROOT, byId, setUnitSet, loadLoopedNetwork, warmEpanet } = require('./lpn-dom-stub.js');
@@ -48,6 +51,7 @@ const L = loadLoopedNetwork(
 	"\t\topenMultiProperties: openMultiProperties, refreshPopupIfOpen: refreshPopupIfOpen,\n" +
 	"\t\tsetSelectionList: setSelectionList, setProp: setProp, serialize: serializeProject,\n" +
 	"\t\tcolorFieldLabel: colorFieldLabel, colorFieldUnitText: colorFieldUnitText,\n" +
+	"\t\tpgFieldLabel: pgFieldLabel,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -211,6 +215,42 @@ async function until(pred, ms) {
 	const gone = await until(() => EngCalcs.lpnTimeRunFrames().length === 0, 20000);
 	L.refreshPopupIfOpen();
 	check(gone && !shown(), 'with no run time set, the Properties box has no graph');
+
+	// ---- 10 -----------------------------------------------------------------------------------
+	head('10. SOURCE TRACE: THE SELECTOR\'S OWN WORDING');
+	L.closePopup();
+	d.times.duration = 86400;
+	d.settings.quality = { mode: 'trace', traceNode: 'River' };
+	d.settings.autoRun = false;
+	L.runSolve();
+	EngCalcs.lpnTimeRunNow();
+	const traceOk = await until(() => EngCalcs.lpnTimeRunState().frames > 0, 90000);
+	check(traceOk, `the trace run completed: ${EngCalcs.lpnTimeRunState().frames} frames`);
+	L.openPopup(J1, 100, 100);
+	const trOpts = options();
+	const trTexts = optionTexts();
+	const qIdx = trOpts.indexOf('quality');
+	check(qIdx >= 0, `a source-trace run offers quality on a junction: ${trOpts.join(', ')}`);
+	check(qIdx >= 0 && trTexts[qIdx] === 'Source share from River',
+		`the selector names the trace node, not the bare label: "${trTexts[qIdx]}"`);
+	check(qIdx >= 0 && L.pgFieldLabel('node', 'quality') === 'Source share from River',
+		'pgFieldLabel() itself returns the same wording');
+	check(L.colorFieldLabel('node', 'quality') === 'Source share',
+		'while the shared label colorFieldLabel() still returns unchanged, for Tables, Find and the legend');
+	L.closePopup();
+
+	// No trace node at all: the trace has nothing to report, so the run carries no quality numbers
+	// and the entry never reaches the selector -- the same "no results, no candidate" rule that
+	// keeps a pump's velocity and a reservoir's demand off their own lists (pgAvailable()'s rule).
+	d.settings.quality = { mode: 'trace', traceNode: '' };
+	L.runSolve();
+	EngCalcs.lpnTimeRunNow();
+	const noNodeOk = await until(() => EngCalcs.lpnTimeRunState().frames > 0, 90000);
+	check(noNodeOk, `the run without a trace node still completed: ${EngCalcs.lpnTimeRunState().frames} frames`);
+	L.openPopup(J1, 100, 100);
+	check(options().indexOf('quality') < 0,
+		'with no trace node set, quality (source share) does not appear in the selector at all');
+	L.closePopup();
 
 	console.log(failures ? `\n${failures} FAILED` : '\nall checks passed');
 	process.exit(failures ? 1 : 0);

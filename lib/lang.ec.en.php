@@ -1790,6 +1790,11 @@ $ec_lang['lpn_ts_group_nodes']='Nodes';
 $ec_lang['lpn_ts_group_links']='Links';
 $ec_lang['lpn_ts_quantity_tip']='Which value to graph against time.';
 $ec_lang['lpn_pgraph_none']='This asset has no results in the current run.';
+// The Properties graph's own selector entry for a source share (Tom, 2026-09-30: "In selector, use
+// 'Source share from {trace node}'"). Distinct from the shared lpn_result_source_share, which still
+// labels the bare quantity everywhere else -- the Tables column, Find's property list, the Labels
+// popover and the colour legend -- where naming the trace node in every heading would be clutter.
+$ec_lang['lpn_pgraph_source_share_from']='Source share from {node}';
 $ec_lang['lpn_ts_add']='Add selected';
 $ec_lang['lpn_ts_add_tip']='Put everything now chosen on the map onto the graph.';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
