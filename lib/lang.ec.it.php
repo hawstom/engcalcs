@@ -1655,6 +1655,15 @@ $ec_lang['lpn_ts_none']='Ancora nulla da tracciare. Scegli elementi sulla mappa 
 $ec_lang['lpn_ts_no_frames']='Ancora nessun risultato del calcolo esteso nel tempo. Premi Calcola per eseguire il calcolo.';
 $ec_lang['lpn_ts_summary']='Elementi: {n}, intervalli di reporting: {steps}';
 $ec_lang['lpn_ts_axis_time']='Tempo trascorso';
+$ec_lang['lpn_freq_menu']='Frequenza';
+$ec_lang['lpn_freq_tip']='Traccia il grafico della distribuzione di frequenza di una proprietà su tutti i nodi o tutte le tubazioni al passo temporale attuale.';
+$ec_lang['lpn_freq_title']='Distribuzione dei valori';
+$ec_lang['lpn_freq_group_tip']='Se il grafico mostra i nodi o le tubazioni.';
+$ec_lang['lpn_freq_quantity_tip']='Quale valore tracciare.';
+$ec_lang['lpn_freq_none']='Ancora nessun risultato per questo valore, quindi non c\'è nulla da tracciare.';
+$ec_lang['lpn_freq_summary']='Tracciati: {n} di {total}';
+$ec_lang['lpn_freq_summary_time']='Tracciati: {n} di {total}, a {time}';
+$ec_lang['lpn_freq_axis_percent']='Percentuale inferiore a';
 $ec_lang['lpn_view_units']='Unità';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Salva tutto';
@@ -2122,7 +2131,7 @@ $ec_lang['lpn_notes_6_term']='Guida alle colonne della tabella';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Seleziona colonna</td><td>Fai clic sull\'intestazione</td></tr><tr><td>Aggiungi o estendi la selezione delle colonne</td><td>Ctrl+clic o Shift+clic su un\'altra intestazione</td></tr><tr><td>Sposta (riordina) le colonne selezionate</td><td>Trascina oppure usa Gestisci colonne… nel menu del clic destro o ⋮</td></tr><tr><td>Menu ⋮ e freccia di ordinamento.</td><td>Passa il puntatore sull\'angolo superiore di un\'intestazione, oppure selezionala o raggiungila con Tab</td></tr><tr><td>Nascondi, Mostra tutte, o Gestisci visibilità e ordine</td><td>Clic destro sull\'intestazione o menu ⋮ nell\'angolo superiore destro dell\'intestazione</td></tr><tr><td>Ordina per colonna</td><td>Icona a freccia nell\'angolo superiore destro dell\'intestazione</td></tr><tr><td>Incolla come nuove righe in fondo alla tabella</td><td>Clic destro, menu ⋮ nell\'angolo superiore destro dell\'intestazione, oppure Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Scorciatoie da tastiera della tabella';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tasti freccia</td><td>Naviga.</td></tr><tr><td>Tab, Enter</td><td>Completa l\'inserimento e sposta di una cella in orizzontale/verso il basso.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Naviga all\'indietro.</td></tr><tr><td>Shift+tasti freccia</td><td>Estende la selezione.</td></tr><tr><td>Ctrl+C</td><td>Copia la selezione.</td></tr><tr><td>Ctrl+D</td><td>Riempi la selezione verso il basso a partire dalla riga superiore.</td></tr><tr><td>Ctrl+Enter</td><td>Riempi la selezione con il valore della cella attiva.</td></tr><tr><td>Ctrl+A</td><td>Seleziona l\'intera tabella.</td></tr><tr><td>Ctrl+Shift+V</td><td>Incolla come nuove righe in fondo alla tabella.</td></tr><tr><td>Delete</td><td>Cancella una cella.</td></tr><tr><td>F2</td><td>Apre una cella per modificarla.</td></tr><tr><td>Esc</td><td>Annulla una modifica.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tasti freccia</td><td>Naviga.</td></tr><tr><td>Tab, Enter</td><td>Completa l\'inserimento e sposta di una cella in orizzontale/verso il basso.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Naviga all\'indietro.</td></tr><tr><td>Shift+tasti freccia</td><td>Estende la selezione.</td></tr><tr><td>Ctrl+C</td><td>Copia la selezione.</td></tr><tr><td>Ctrl+D</td><td>Riempi la selezione verso il basso a partire dalla riga superiore.</td></tr><tr><td>Ctrl+Enter</td><td>Riempi la selezione con il valore della cella attiva.</td></tr><tr><td>Ctrl+A</td><td>Seleziona l\'intera tabella.</td></tr><tr><td>Ctrl+Shift+V</td><td>Incolla come nuove righe in fondo alla tabella.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Passa alla tabella successiva o precedente.</td></tr><tr><td>Delete</td><td>Cancella una cella.</td></tr><tr><td>F2</td><td>Apre una cella per modificarla.</td></tr><tr><td>Esc</td><td>Annulla una modifica.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2380,7 +2389,7 @@ $ec_lang['lpn_field_easting_abbr']='E';
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
 $ec_lang['lpn_field_lat_abbr']='Lat';
-$ec_lang['lpn_field_lon_abbr']='Lon';
+$ec_lang['lpn_field_lon_abbr']='Long';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is

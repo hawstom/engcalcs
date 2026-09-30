@@ -1655,6 +1655,15 @@ $ec_lang['lpn_ts_none']='目前没有可绘制的内容。请在地图上选择�
 $ec_lang['lpn_ts_no_frames']='尚无延时模拟结果。请按“计算”运行模拟。';
 $ec_lang['lpn_ts_summary']='元件数：{n}，报告时刻数：{steps}';
 $ec_lang['lpn_ts_axis_time']='经过时间';
+$ec_lang['lpn_freq_menu']='频率';
+$ec_lang['lpn_freq_tip']='绘制某一属性在当前时间步下，所有节点或所有管道上的频率分布图。';
+$ec_lang['lpn_freq_title']='数值分布';
+$ec_lang['lpn_freq_group_tip']='图中显示的是节点还是管道。';
+$ec_lang['lpn_freq_quantity_tip']='要绘制哪个数值的图形。';
+$ec_lang['lpn_freq_none']='该数值尚无结果，因此无内容可绘制。';
+$ec_lang['lpn_freq_summary']='已绘制：{n}（共 {total}）';
+$ec_lang['lpn_freq_summary_time']='已绘制：{n}（共 {total}），时刻：{time}';
+$ec_lang['lpn_freq_axis_percent']='低于该值的百分比';
 $ec_lang['lpn_view_units']='单位';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='全部保存';
@@ -2122,7 +2131,7 @@ $ec_lang['lpn_notes_6_term']='表格列帮助';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>选择列</td><td>点击表头</td></tr><tr><td>添加或扩展列选择</td><td>Ctrl+click 或 Shift+click 另一个表头</td></tr><tr><td>移动（重新排列）所选的列</td><td>拖动，或在右键菜单或 ⋮ 菜单中使用“管理列…”</td></tr><tr><td>⋮ 菜单和排序箭头。</td><td>将指针悬停在表头的右上角，或选中表头或按 Tab 键移入表头</td></tr><tr><td>隐藏、显示全部或管理可见性与顺序</td><td>右键点击表头，或点击表头右上角的 ⋮ 菜单</td></tr><tr><td>按列排序</td><td>表头右上角的箭头图标</td></tr><tr><td>粘贴为表格末尾的新行</td><td>右键点击、表头右上角的 ⋮ 菜单，或 Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='表格键盘快捷键';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>方向键</td><td>移动。</td></tr><tr><td>Tab、Enter</td><td>完成输入并向右/向下移动一个单元格。</td></tr><tr><td>Shift+Tab、Shift+Enter</td><td>向反方向移动。</td></tr><tr><td>Shift+方向键</td><td>扩展选区。</td></tr><tr><td>Ctrl+C</td><td>复制所选内容。</td></tr><tr><td>Ctrl+D</td><td>用选区顶行的内容向下填充选区。</td></tr><tr><td>Ctrl+Enter</td><td>用活动单元格的数值填充选区。</td></tr><tr><td>Ctrl+A</td><td>选中整个表格。</td></tr><tr><td>Ctrl+Shift+V</td><td>粘贴为表格末尾的新行。</td></tr><tr><td>Delete</td><td>清空单元格。</td></tr><tr><td>F2</td><td>打开单元格进行编辑。</td></tr><tr><td>Esc</td><td>取消编辑。</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>方向键</td><td>移动。</td></tr><tr><td>Tab、Enter</td><td>完成输入并向右/向下移动一个单元格。</td></tr><tr><td>Shift+Tab、Shift+Enter</td><td>向反方向移动。</td></tr><tr><td>Shift+方向键</td><td>扩展选区。</td></tr><tr><td>Ctrl+C</td><td>复制所选内容。</td></tr><tr><td>Ctrl+D</td><td>用选区顶行的内容向下填充选区。</td></tr><tr><td>Ctrl+Enter</td><td>用活动单元格的数值填充选区。</td></tr><tr><td>Ctrl+A</td><td>选中整个表格。</td></tr><tr><td>Ctrl+Shift+V</td><td>粘贴为表格末尾的新行。</td></tr><tr><td>Ctrl+Shift+PageDown、Ctrl+Shift+PageUp</td><td>切换到下一个或上一个表格。</td></tr><tr><td>Delete</td><td>清空单元格。</td></tr><tr><td>F2</td><td>打开单元格进行编辑。</td></tr><tr><td>Esc</td><td>取消编辑。</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

@@ -1656,6 +1656,15 @@ $ec_lang['lpn_ts_none']='Za sada nema ničega za prikaz. Odaberite elemente na k
 $ec_lang['lpn_ts_no_frames']='Još nema rezultata proširenog razdoblja. Pritisnite Izračunaj da pokrenete simulaciju.';
 $ec_lang['lpn_ts_summary']='Elementi: {n}, vremena izvještavanja: {steps}';
 $ec_lang['lpn_ts_axis_time']='Proteklo vrijeme';
+$ec_lang['lpn_freq_menu']='Učestalost';
+$ec_lang['lpn_freq_tip']='Prikažite grafikon razdiobe učestalosti jednog svojstva za sve čvorove ili sve cijevi u trenutačnom vremenskom koraku.';
+$ec_lang['lpn_freq_title']='Raspodjela vrijednosti';
+$ec_lang['lpn_freq_group_tip']='Prikazuje li grafikon čvorove ili cijevi.';
+$ec_lang['lpn_freq_quantity_tip']='Koju vrijednost prikazati na grafikonu.';
+$ec_lang['lpn_freq_none']='Za ovu vrijednost još nema rezultata, pa nema ništa za prikaz.';
+$ec_lang['lpn_freq_summary']='Prikazano: {n} od {total}';
+$ec_lang['lpn_freq_summary_time']='Prikazano: {n} od {total}, u {time}';
+$ec_lang['lpn_freq_axis_percent']='Postotak manje od';
 $ec_lang['lpn_view_units']='Jedinice';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Spremi sve';
@@ -2123,7 +2132,7 @@ $ec_lang['lpn_notes_6_term']='Pomoć za stupce tablice';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Odaberi stupac</td><td>Klik na zaglavlje</td></tr><tr><td>Dodaj ili proširi odabir stupaca</td><td>Ctrl+klik ili Shift+klik na drugo zaglavlje</td></tr><tr><td>Pomakni (promijeni redoslijed) odabranih stupaca</td><td>Povucite ili koristite Upravljaj stupcima… u izborniku desnog klika ili ⋮</td></tr><tr><td>Izbornik ⋮ i strelica za razvrstavanje.</td><td>Pređite mišem preko gornjeg kuta zaglavlja, ili odaberite ili se Tabom prebacite u zaglavlje</td></tr><tr><td>Sakrij, Prikaži sve, ili Upravljaj vidljivošću i redoslijedom</td><td>Desni klik na zaglavlje ili izbornik ⋮ u gornjem desnom kutu zaglavlja</td></tr><tr><td>Razvrstaj prema stupcu</td><td>Ikona strelice u gornjem desnom kutu zaglavlja</td></tr><tr><td>Zalijepi kao nove retke na kraju tablice</td><td>Desni klik, izbornik ⋮ u gornjem desnom kutu zaglavlja, ili Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Tipkovnički prečaci tablice';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tipke sa strelicama</td><td>Kretanje.</td></tr><tr><td>Tab, Enter</td><td>Završi unos i prijeđi jednu ćeliju udesno / dolje.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Kretanje unatrag.</td></tr><tr><td>Shift+tipke sa strelicama</td><td>Proširi odabir.</td></tr><tr><td>Ctrl+C</td><td>Kopiraj odabir.</td></tr><tr><td>Ctrl+D</td><td>Popuni odabir prema dolje od njegovog gornjeg retka.</td></tr><tr><td>Ctrl+Enter</td><td>Popuni odabir vrijednošću aktivne ćelije.</td></tr><tr><td>Ctrl+A</td><td>Odaberi cijelu tablicu.</td></tr><tr><td>Ctrl+Shift+V</td><td>Zalijepi kao nove retke na kraju tablice.</td></tr><tr><td>Delete</td><td>Isprazni ćeliju.</td></tr><tr><td>F2</td><td>Otvori ćeliju za uređivanje.</td></tr><tr><td>Esc</td><td>Prekini uređivanje.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tipke sa strelicama</td><td>Kretanje.</td></tr><tr><td>Tab, Enter</td><td>Završi unos i prijeđi jednu ćeliju udesno / dolje.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Kretanje unatrag.</td></tr><tr><td>Shift+tipke sa strelicama</td><td>Proširi odabir.</td></tr><tr><td>Ctrl+C</td><td>Kopiraj odabir.</td></tr><tr><td>Ctrl+D</td><td>Popuni odabir prema dolje od njegovog gornjeg retka.</td></tr><tr><td>Ctrl+Enter</td><td>Popuni odabir vrijednošću aktivne ćelije.</td></tr><tr><td>Ctrl+A</td><td>Odaberi cijelu tablicu.</td></tr><tr><td>Ctrl+Shift+V</td><td>Zalijepi kao nove retke na kraju tablice.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Prijeđi na sljedeću ili prethodnu tablicu.</td></tr><tr><td>Delete</td><td>Isprazni ćeliju.</td></tr><tr><td>F2</td><td>Otvori ćeliju za uređivanje.</td></tr><tr><td>Esc</td><td>Prekini uređivanje.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

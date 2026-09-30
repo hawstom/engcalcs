@@ -1656,6 +1656,15 @@ $ec_lang['lpn_ts_none']='אין עדיין מה להציג בגרף. בחרו נ
 $ec_lang['lpn_ts_no_frames']='אין עדיין תוצאות על פני תקופת זמן. לחצו על חשב כדי להריץ את הסימולציה.';
 $ec_lang['lpn_ts_summary']='נכסים: {n}, זמני דיווח: {steps}';
 $ec_lang['lpn_ts_axis_time']='זמן שחלף';
+$ec_lang['lpn_freq_menu']='תדירות';
+$ec_lang['lpn_freq_tip']='הצגה בגרף של התפלגות התדירות של תכונה אחת על פני כל הצמתים או כל הצינורות בצעד הזמן הנוכחי.';
+$ec_lang['lpn_freq_title']='התפלגות ערכים';
+$ec_lang['lpn_freq_group_tip']='האם הגרף מציג צמתים או צינורות.';
+$ec_lang['lpn_freq_quantity_tip']='איזה ערך להציג בגרף.';
+$ec_lang['lpn_freq_none']='אין עדיין תוצאות עבור ערך זה, ולכן אין מה להציג בגרף.';
+$ec_lang['lpn_freq_summary']='מוצגים בגרף: {n} מתוך {total}';
+$ec_lang['lpn_freq_summary_time']='מוצגים בגרף: {n} מתוך {total}, בזמן {time}';
+$ec_lang['lpn_freq_axis_percent']='אחוז נמוך מ';
 $ec_lang['lpn_view_units']='יחידות';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='שמור הכול';
@@ -2123,7 +2132,7 @@ $ec_lang['lpn_notes_6_term']='עזרה בעמודות הטבלה';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>בחירת עמודה</td><td>לחיצה על הכותרת</td></tr><tr><td>הוספה או הרחבה של בחירת העמודות</td><td>Ctrl+לחיצה או Shift+לחיצה על כותרת אחרת</td></tr><tr><td>הזזה (שינוי סדר) של העמודות הנבחרות</td><td>גררו או השתמשו בניהול עמודות… בתפריט לחיצה ימנית או ⋮</td></tr><tr><td>תפריט ⋮ וחץ המיון.</td><td>רחפו מעל הפינה העליונה של כותרת, או בחרו או עברו בטאב אל כותרת</td></tr><tr><td>הסתרה, הצגת הכול, או ניהול הנראות והסדר</td><td>לחיצה ימנית על הכותרת או תפריט ⋮ בפינה הימנית העליונה של הכותרת</td></tr><tr><td>מיון לפי עמודה</td><td>סמל חץ בפינה הימנית העליונה של הכותרת</td></tr><tr><td>הדבקה כשורות חדשות בסוף הטבלה</td><td>לחיצה ימנית, תפריט ⋮ בפינה הימנית העליונה של הכותרת, או Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='קיצורי מקלדת לטבלה';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>מקשי חצים</td><td>ניווט.</td></tr><tr><td>Tab,‏ Enter</td><td>סיום הזנה וניווט תא אחד הצידה / למטה.</td></tr><tr><td>Shift+Tab,‏ Shift+Enter</td><td>ניווט אחורה.</td></tr><tr><td>Shift+מקשי חצים</td><td>הרחבת הבחירה.</td></tr><tr><td>Ctrl+C</td><td>העתקת הבחירה.</td></tr><tr><td>Ctrl+D</td><td>מילוי הבחירה למטה משורתה העליונה.</td></tr><tr><td>Ctrl+Enter</td><td>מילוי הבחירה בערך התא הפעיל.</td></tr><tr><td>Ctrl+A</td><td>בחירת הטבלה כולה.</td></tr><tr><td>Ctrl+Shift+V</td><td>הדבקה כשורות חדשות בסוף הטבלה.</td></tr><tr><td>Delete</td><td>ניקוי תא.</td></tr><tr><td>F2</td><td>פתיחת תא לעריכה.</td></tr><tr><td>Esc</td><td>ביטול עריכה.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>מקשי חצים</td><td>ניווט.</td></tr><tr><td>Tab,‏ Enter</td><td>סיום הזנה וניווט תא אחד הצידה / למטה.</td></tr><tr><td>Shift+Tab,‏ Shift+Enter</td><td>ניווט אחורה.</td></tr><tr><td>Shift+מקשי חצים</td><td>הרחבת הבחירה.</td></tr><tr><td>Ctrl+C</td><td>העתקת הבחירה.</td></tr><tr><td>Ctrl+D</td><td>מילוי הבחירה למטה משורתה העליונה.</td></tr><tr><td>Ctrl+Enter</td><td>מילוי הבחירה בערך התא הפעיל.</td></tr><tr><td>Ctrl+A</td><td>בחירת הטבלה כולה.</td></tr><tr><td>Ctrl+Shift+V</td><td>הדבקה כשורות חדשות בסוף הטבלה.</td></tr><tr><td>Ctrl+Shift+PageDown,‏ Ctrl+Shift+PageUp</td><td>מעבר לטבלה הבאה או הקודמת.</td></tr><tr><td>Delete</td><td>ניקוי תא.</td></tr><tr><td>F2</td><td>פתיחת תא לעריכה.</td></tr><tr><td>Esc</td><td>ביטול עריכה.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
