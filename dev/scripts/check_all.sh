@@ -386,6 +386,11 @@ run_check "lang markup matches English"  blocking php dev/scripts/lang_tag_parit
 run_check "language placeholders"        blocking php dev/scripts/lang_placeholder_check.php
 run_check "placeholder selftest"         blocking php dev/scripts/lang_placeholder_selftest.php
 run_check "gloss pointers resolve"       blocking php dev/scripts/gloss_ref_check.php
+# Task 737. Concept records are the translator's source; a duplicate id, an id that reads as
+# another concept's English, or a key citing a missing id ships a wrong or inconsistent term in 26
+# languages while payloads still generate and --check still says FRESH.
+run_check "concept table"                blocking php dev/scripts/concept_check.php
+run_check "concept selftest"             blocking php dev/scripts/concept_selftest.php
 # Task 322 rows 16 and 19. The anchor languages are glossary.json's meta.anchor_languages and the
 # prose restating them agrees; and a new JS module is on a page and in the harness DOM stub, or
 # declared. No script reads meta.anchor_languages at all today, so that rule was entirely prose.

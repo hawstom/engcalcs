@@ -88,7 +88,7 @@ $ec_lang['template_printable_subtitle']='د چاپ فرعي سرلیک';
 // NO EC_CONSENT_VERSION BUMP. Nothing about what is stored, who reads it or how long it lives has
 // moved; the sentence became more accurate, not different. Bumping would re-ask every visitor who
 // has already answered, for no change they could act on.
-$ec_lang['consent_body']='ایا موږ کولی شو په دې براوزر پروفایل کې د هرې پاڼې یو رقم وساتو ترڅو مخنیوی وکړو چې ستاسو کتنې په بیا بیا ډول ثبت نشي؟';
+$ec_lang['consent_body']='ایا موږ کولی شو په دې براوزر کې د یو-رقمي کوکي وساتو ترڅو مو په یاد وي چې دا پاڼه مو دمخه شمېرلې ده؟ دا هیڅ شی ستاسو په اړه او هیڅ هغه شی چې تاسو یې لیکئ نه ثبتوي. پرته له دې موږ نشو کولی ستاسو دویمه کتنه د بل چا لومړۍ کتنې نه توپیر کړو.';
 $ec_lang['consent_accept']='دا ومنئ';
 $ec_lang['consent_accept_all']='تل يې ومنئ';
 $ec_lang['consent_decline']='تل يې رد کړئ';
@@ -441,7 +441,7 @@ $ec_lang['install_desktop_heading']='ډیسکټاپ (Chrome / Edge)';
 // Edited by TGH 2026-09-07
 $ec_lang['install_desktop_steps_html']='<li>د هر محاسبه‌کوونکي پاڼه پرانیزئ.</li><li>د براوزر د پتې پټې کې پر <strong>د نصب کولو نښه</strong> (⊕ یا کمپیوټر نښه) کېکاږئ، یا د براوزر مینو پرانیزئ او <strong>EngCalcs نصب کول…</strong> غوره کړئ.</li><li><strong>نصب کول</strong> کېکاږئ. EngCalcs به د یوې خپلواکې ایپ کړکۍ په توګه پرانیستل شي.</li>';
 $ec_lang['install_firefox_heading']='Firefox / نور براوزرونه';
-$ec_lang['install_firefox_body']='Firefox په ډیسکټاپ کې د PWA ایپونو نصبولو ملاتړ نه کوي. تاسو کولی شئ بیا هم ټول محاسبه‌کوونکي په عادي ډول په براوزر کې وکاروئ — ستاسو له لومړنۍ لیدنې وروسته، پاڼې د آفلاین کارونې لپاره په خپلکاره ډول خوندي (کش) کیږي.';
+$ec_lang['install_firefox_body']='که ستاسو براوزر د نصبولو کومه اختیار نه وړاندې کوي، هیڅ شی له لاسه نه ورکول کیږي: محاسبه‌کوونکي په عادي ډول په براوزر کې وکاروئ، او ستاسو له لومړۍ کتنې وروسته پاڼې د آفلاین کارونې لپاره په خپلکاره توګه خوندي (کش) کیږي. Firefox په ډیسکټاپ کې عام حالت دی.';
 $ec_lang['install_cached_heading']='څه شی خوندي (کش) کیږي';
 $ec_lang['install_cached_body']='کله چې تاسو EngCalcs لومړی ځل نصب کړئ، ټول د محاسبه‌کوونکو پاڼې او د هغوی مرستندویه فایلونه (سکریپټونه، سټایلونه) په خپلواک ډول ستاسو په وسیله کې خوندي کیږي. له هغه وروسته، هر څه پرته له انټرنېټ اړیکې کار کوي. ستاسو د ژبې انتخاب ستاسو له وروستي آنلاین لیدنې څخه په یاد وي.';
 $ec_lang['contact_main_menu']='اړیکه';
@@ -599,7 +599,7 @@ $ec_lang['bpn_upstream_tip']='د هغې کرښې ID چې دې ته اوبه ور
 $ec_lang['bpn_roughness_tip']='د غوره شوې اصطکاک طریقې لپاره د پایپ خشونت: Manning n، Hazen-Williams C، یا Darcy-Weisbach د خشونت لوړوالی e (یوه اوږدوالی). عادي هوار پلاستیکي پایپ: n نږدې 0.009، C نږدې 150، e نږدې 0.0015 mm.';
 $ec_lang['bpn_demand']='غوښتنه';
 // Edited by TGH 2026-09-07
-$ec_lang['bpn_demand_tip']='هغه ثابت بهاو چې د دې کرښې په ښکتني پای کې رسول کیږي. که کرښه یوازې بهاو مخته وړي، خالي پریږدئ.';
+$ec_lang['bpn_demand_tip']='هغه ثابت بهاو چې د دې کرښې په ښکتني پای کې رسول کیږي.';
 $ec_lang['bpn_demand_mult']='د غوښتنې ضربوونکی';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_demand_mult_tip']='د ټولو کرښو غوښتنه په یوځل کې مقیاس کوي، د اوج ساعت یا راتلونکې ودې د چلولو لپاره. لکه چې ننوتل شوي دي هغسې غوښتنو لپاره 1 وکاروئ.';
@@ -640,7 +640,7 @@ $ec_lang['bpn_h_supply_tip']='د ډیزاین بهاو کې د سرچینې سر
 $ec_lang['bpn_show_elevation']='لوړوالی';
 $ec_lang['bpn_supply1_h']='د تامین ثابت سر';
 $ec_lang['lpn_main_menu']='د اوبو رسونې شبکه';
-$ec_lang['lpn_main_title']='د EPANET حل کوونکي سره وړیا آنلاین د اوبو ویش شبکې محاسبګر';
+$ec_lang['lpn_main_title']='د EPANET حل کوونکي سره وړیا آنلاین د اوبو ویش شبکې ماډلینګ';
 $ec_lang['lpn_main_desc']='د اوبو رسونې شبکې تحلیل: د پایپونو حلقوي شبکه رسم کړئ یا د EPANET فایلونه دننه کړئ';
 $ec_lang['lpn_title_units']='{units} واحدونه';
 $ec_lang['lpn_tool_select']='ټاکل';
@@ -918,11 +918,11 @@ $ec_lang['lpn_offscreen_intact']='ستاسو شبکه بشپړه ده.';
 // lpn_main_title still names EPANET, which is where a search engine reads it, and that claim is
 // true and stays.
 $ec_lang['lpn_examples_welcome']='د اوبو د تامین شبکې ماډل جوړونې ته ښه راغلاست، د EPANET حل کوونکي سره';
-$ec_lang['lpn_examples_heading']='یوه بېلګه پرانیزئ';
+$ec_lang['lpn_examples_heading']='د یوې بېلګې خپله کاپي پرانیزئ';
 $ec_lang['lpn_examples_sub']='هره یوه ستاسو خپله کاپي په توګه پرانیځي. بدله یې کړئ، وساتئ یې، یا یوه نوې کاپي پرانیزئ او بیا پیل وکړئ.';
 $ec_lang['lpn_examples_open']='پرانیستل';
 $ec_lang['lpn_examples_menu']='بېلګه پرانیستل…';
-$ec_lang['lpn_examples_blank']='یا په یوه خالي نقشه پیل وکړئ';
+$ec_lang['lpn_examples_blank']='یا دلته پیل وکړئ';
 // The SAME exit, worded for the other way in. Opened from File the user already has work on
 // screen, so "start with a blank map" reads as "discard it" and they do not dare press the
 // only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
@@ -967,7 +967,7 @@ $ec_lang['lpn_ex_basic_us_desc']='هماغه پیل کوونکې شبکه په �
 // **NOT PLAIN EPA Net1 ANY MORE, AND THE TITLE SAYS SO** (Tom, 2026-09-08: *"Net1 plus rule-based
 // controls: OK"*). Two `[RULES]` were added to the shipped file so the rule editor can be exercised
 // from the gallery; the rules stay, and the name stops claiming to be the sample as EPA ships it.
-$ec_lang['lpn_ex_net1_title']='EPANET Net1';
+$ec_lang['lpn_ex_net1_title']='EPANET Net1 د قاعدې پر بنسټ کنترولونو سره';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net1_desc']='د EPANET د خپلو درې بېلګه شبکو نه تر ټولو کوچنۍ: یوه ذخیره، یو پمپ، او یوه یوازینۍ حلقه.';
 $ec_lang['lpn_ex_net2_title']='EPANET Net2';
@@ -977,7 +977,7 @@ $ec_lang['lpn_ex_net3_title']='EPANET Net3';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ex_net3_desc']='د EPANET لویه بېلګه: 92 جنکشنونه، 3 ټانکونه، او 2 ذخیرې، چې یوه یې سیندي ده. د پرانیستلو وړ ده ترڅو وګورئ چې یوه حقیقي اندازې ماډل په نقشه کې څنګه ښکاري.';
 $ec_lang['lpn_ex_net3_world_title']='EPANET Net3, lat/lon';
-$ec_lang['lpn_ex_net3_world_desc']='هماغه شبکه لکه د EPANET Net3، چې پر ځمکنۍ نړۍ یوه سوچه ځای کیښودل شوې: د دې همغږي عرض او طول البلد دي، او یو سرک نقشه یې شاليد کې راکاږل شوی دی.';
+$ec_lang['lpn_ex_net3_world_desc']='د EPANET Net3 شبکه چې د Novato, CA ښار عرض او طول البلد ته بدله شوې، او د نړۍ نقشه یې شاليد کې ده.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='یو سوداګریز ځای چې د اعظمي ورځنۍ غوښتنې له پاسه د اور د وژلو بهاو لپاره، په یوه شیبه کې، د ساحې د نقشې له پاسه رسم شوی حل شوی دی.';
 $ec_lang['lpn_tool_undo']='بېرته';
@@ -1012,7 +1012,7 @@ $ec_lang['lpn_status_converted']='{n} ارزښتونه {unit} ته بدل شول
 $ec_lang['lpn_tool_color_tip']='شبکه د یوې کمیت له مخې رنګه کړئ، ترڅو یوه لویه نقشه په یوه نظر ولوستل شي. فشار او سرعت هغه دوه دي چې معمولا اهمیت لري.';
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
-$ec_lang['lpn_units_length']='اوږدوالی او د نقشې همغږي';
+$ec_lang['lpn_units_length']='اوږدوالی';
 // The derived line: degrees for lat/lon, the coordinate system's own unit for an EPSG plane, and
 // the length unit for a local grid. A display of what the coordinate system says, never an input.
 $ec_lang['lpn_units_mapcoords']='د نقشې همغږۍ';
@@ -1056,7 +1056,7 @@ $ec_lang['lpn_result_status_open']='خلاص';
 $ec_lang['lpn_result_status_closed']='تړلی';
 $ec_lang['lpn_result_head']='هیډ';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_result_head_tip']='د دې نقطې د اوبو انرژي، د اوبو ستن د لوړوالي په توګه لیکل شوې. دا یو لوړوالی دی، نه فشار.';
+$ec_lang['lpn_result_head_tip']='د دې نقطې د اوبو انرژي، د اوبو ستن د لوړوالي په توګه لیکل شوې. دا یو بشپړ (مطلق) لوړوالی دی، پداسې حال کې چې فشار د ګیج اندازه ده.';
 $ec_lang['lpn_result_pressure']='فشار';
 $ec_lang['lpn_result_flow']='بهاو';
 $ec_lang['lpn_result_velocity']='سرعت';
@@ -1333,7 +1333,7 @@ $ec_lang['lpn_pane_filter_none']='په دې جدول کې هیڅ شی له فل�
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
 // and what a screen reader says, with the ID read after it.
 $ec_lang['lpn_pane_goto_tip']='زوم او ټاکل';
-$ec_lang['lpn_goto_on_map']='پر نقشه ورتلل';
+$ec_lang['lpn_goto_on_map']='پر نقشه ښودل';
 $ec_lang['lpn_pane_select_on_map']='پر نقشه ټاکل';
 $ec_lang['lpn_pane_unselect_on_map']='پر نقشه له ټاکنې ایستل';
 $ec_lang['lpn_pane_print']='جدول چاپ کړئ';
@@ -1472,7 +1472,7 @@ $ec_lang['lpn_find_op_lt']='کم له';
 $ec_lang['lpn_find_op_empty']='خالي';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} وموندل شول. یو یې کلیک کړئ ترڅو ورته لاړ شئ.';
-$ec_lang['lpn_find_shift_hint']='د اضافه کولو/لرې کولو د بدلولو لپاره Shift+کلیک وکړئ.';
+$ec_lang['lpn_find_shift_hint']='Shift+کلیک د بدلون لپاره: که یو شی د ټاکل شوو په ډله کې نه وي، اضافه کیږي؛ او که دمخه د ټاکل شوو په ډله کې وي، لرې کیږي.';
 $ec_lang['lpn_find_none']='هیڅ شی سره سمون ونه خوړ.';
 // The two extremes, as conditions on the same footing as "above" -- the Value box holds how
 // many. "Top"/"Bottom" were changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the
@@ -1940,7 +1940,7 @@ $ec_lang['lpn_lock_open_readonly']='یوازې لوستلو لپاره پران�
 // "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
 // "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
 // trying not to encourage. "Create a copy" says what happens and claims nothing.
-$ec_lang['lpn_lock_break']='د هغوی بندیز مات کول';
+$ec_lang['lpn_lock_break']='بندیز مات کول';
 // **TASK 667(b): NOBODY IS ASKED FOR A NAME UNTIL A COLLEAGUE ACTUALLY WANTS THE FILE** (Tom,
 // 2026-09-17). The page used to ask the FIRST user for initials the first time they saved, for a
 // name nobody would ever read unless a colleague happened to collide with them -- and on a site
@@ -2006,7 +2006,7 @@ $ec_lang['lpn_lock_readonly_banner']='یوازې لوستل: {name} دا فای�
 $ec_lang['lpn_lock_unavailable']='خبرداری: د دې پروژې د بندیز چک یا جوړولو لپاره سرور ته رسیدنه ونشوه، نو هیڅ شی یو همکار د ورته فایل په ورته وخت کې سمون نه ساتي. تاسو ته به وویل شي که بندیز بیا کار پیل کړي.';
 $ec_lang['lpn_lock_storage_error']='خبرداری: دا سایټ د بندیز ریکارډونه نشي ساتلی، نو هیڅ شی یو همکار د ورته فایل په ورته وخت کې سمون نه ساتي. دا د سرور د تنظیم عیب دی، نه داسې شی چې تاسو یې دلته سم کولی شئ — د بندیز فولډر د ویب سرور لخوا لیکل کیدونکی نه دی.';
 $ec_lang['lpn_lock_full_error']='خبرداری: دا سایټ د دې ثبتولو ځای بشپړ کړی چې څوک کومه پروژه پرانیستې لري، نو هیڅ شی یو همکار د ورته فایل په ورته وخت کې سمون نه ساتي. دا د سرور د تنظیم عیب دی، نه داسې شی چې تاسو یې دلته سم کولی شئ.';
-$ec_lang['lpn_lock_not_asked']='د دې پروژې لپاره بندیز نه چلیږي، نو هیڅ شی یو همکار د ورته فایل په ورته وخت کې سمون نه ساتي. دې براوزر لا تر اوسه ستاسو لپاره کوم نوم نه دی ثبت کړی، یا پروژه کوم پیژندونکی نلري — پروژه فایل ته ساتل دواړه تنظیموي.';
+$ec_lang['lpn_lock_not_asked']='د دې پروژې لپاره بندیز نه چلیږي، نو هیڅ شی یو همکار د ورته فایل په ورته وخت کې سمون کولو نه نه ساتي. دې پروژې لا تر اوسه کوم پیژندونکی نلري، او دې فایل ته ساتل یې ورته یو پیژندونکی ورکوي.';
 $ec_lang['lpn_lock_restored']='بندیز بیا کار کوي، او دا فایل اوس ستاسو لپاره د ساتلو دی.';
 $ec_lang['lpn_lock_dismiss']='دا پیغام پټول';
 // Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
@@ -2084,8 +2084,8 @@ $ec_lang['lpn_notes_1_term']='دا څنګه حل کیږي';
 // lpn_time_no_engine and lpn_engine_unavailable.** A note everybody reads should not carry a
 // failure explanation that the failure itself delivers. Task 605's rule is untouched -- every
 // sentence a reader meets only when something has gone wrong SURVIVES, and those two are it.
-$ec_lang['lpn_notes_1_def']='هره شیبه د هماغه نړیوال تګلور الګوریتم سره حل کیږي چې EPANET یې کاروي. یو ټول چلولو وخت ټاکئ او د EPANET حل کوونکی هره راپور شیبه یو په بل پسې محاسبوي: ټانکونه ډکیږي او خالیږي، غوښتنې خپلو نمونو تعقیبوي، او اوزارپټه چلول بیا ښیي. جوړ شوی حل کوونکی یوه شیبه پرله‌پسې محاسبوي او هر ټانک په خپل پیل کچه ساتي.';
-$ec_lang['lpn_notes_2_term']='نه دي ماډل شوي';
+$ec_lang['lpn_notes_1_def']='د EPANET حل کوونکی دا شبکه محاسبوي. یو ټول چلولو وخت ټاکئ او هر راپور شیبه یو په بل پسې محاسبیږي: ټانکونه ډکیږي او خالیږي، غوښتنې خپلو نمونو تعقیبوي، او اوزارپټه چلول بیا ښیي.';
+$ec_lang['lpn_notes_2_term']='هغه څه چې دا نه کوي';
 // **"Water quality chemistry is not modeled" WAS FLATLY FALSE** (Tom, 2026-09-10: *"Wrong
 // facts."*). A reacting chemical, bulk and wall reaction coefficients and a limiting
 // concentration all ship -- see lpn_quality_chemical and the lpn_reaction_* keys below. The note
@@ -2096,7 +2096,7 @@ $ec_lang['lpn_notes_2_term']='نه دي ماډل شوي';
 // omission is a public claim about scope, and this file's history says those go wrong in the
 // confident direction; the one omission stated here is the one nothing in this tree implements
 // or claims to. Do not lengthen the list without him.
-$ec_lang['lpn_notes_2_def']='د اوبو کیفیت کیمیا ماډل شوې نه ده؛ د اوبو عمر او سرچینې تعقیب ماډل شوي دي. والوونه: تنګوونکی والو په دواړو حل کوونکو کې کار کوي، او هغه والوونه چې پخپله خپل حالت ټاکي (PRV، PSV، FCV) د EPANET حل کوونکي سره حل کیږي، کوم چې دا پاڼه پخپله فعالوي کله چې ستاسو شبکه له دې والوونو نه یو ولري.';
+$ec_lang['lpn_notes_2_def']='د اوبو کیفیت ماډل شوی دی: د اوبو عمر، سرچینې تعقیب، او هغه کیمیاوي ماده چې د پایپ دیوالونو او د اوبو په بدن کې غبرګون ښیي. تلاطم (surge) او د اوبو هتوکی (water hammer) ماډل شوي نه دي: دلته هر ځواب د هغو اوبو لپاره دی چې دمخه په ثابته توګه بهیږي، نه د هغه فشار څپې لپاره چې کله والو ناڅاپه تړل کیږي.';
 $ec_lang['lpn_notes_3_term']='د پروژو ساتل';
 $ec_lang['lpn_notes_3_def']='هره پروژه یوه ټب ده، او هره ټب د کار پر مهال دې براوزر کې ساتل کیږي. ستاسو د براوزر معلوماتو پاکول ټول دوی ړنګوي، نو خپل کار یوه فایل کې وساتئ: فایل، داسې ساتل. په یوه ټب کې ستوري نښه دا معنی لري چې دا داسې بدلونونه لري چې په فایل کې نه دي. هیڅکله هیڅ شی فایل ته نه لیکل کیږي پرته له دې چې تاسو یې وغواړئ. په ځینو براوزرونو کې یوه پروژه هغه فایل سره وصلیږي چې تاسو یې ورته ساتئ، او فایل، ساتل له هغې وروسته همدې فایل ته لیکي؛ په نورو کې هیڅ وصلوالی ممکن نه دی، نو ساتل غیرفعال دي او یوازې داسې ساتل شته دي. کله چې د پروژې فایل یوه شریکه ډرایو کې ساتل کیږي، دا پاڼه تاسو ته وایي که یو همکار یې دمخه پرانیستی وي، ترڅو دوه کسان یو بل باندې ونه لیکي.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -2108,7 +2108,7 @@ $ec_lang['lpn_notes_3_def']='هره پروژه یوه ټب ده، او هره ټ
 // H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='د پمپ منحني';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_notes_5_def']='یو پمپ H = H₀ − aQ^b تعقیبوي، چیرې چې H هغه هیډ دی چې پمپ یې اضافه کوي او Q هغه بهاو دی چې د هغه نه تیریږي. د جوړونکي منحني نه یو، دوه، یا درې ټکي ولیکئ. درې ټکي — د صفر بهاو کې هیډ، عادي کار ټکی، او د لوړ ترین بهاو ټکی — H₀، a او b مستقیم برابروي، او یوه خپره شوې منحني ترټولو نږدې تعقیبوي. دوه ټکي یو پارابولا (b = 2) برابروي چې د هغه اوچت یې د صفر بهاو کې دی. یو ټکی یو عام قاعده کاروي: د صفر بهاو کې هیډ ستاسو ننوتلي هیډ نه 1.33 چنده دی، او لوړ ترین بهاو ستاسو ننوتلي بهاو نه 2 چنده دی، چې بیا b = 2 ورکوي. یو پمپ چې هیڅ ټکی پکې نه دی ننوتل شوی هیڅ هیډ نه اضافه کوي. منحني د صفر هیډ رسیدو ځای کې نه پرې کیږي، نو د پمپ نه د هغه د منحني نه زیات بهاو غوښتل منفي هیډ ورکوي. حل یو غټ پمپ یا کوچنۍ غوښتنه دی، نه یوه بله منحني برابرونه. یوه منحنۍ کولی شي له درې نه زیات ټکي ولري. جوړ شوی حل کوونکی له دوی نه درې — لومړی، منځنی، او وروستی — لولي ترڅو پورتنۍ معادله برابر کړي؛ خو د EPANET انجن هر هغه ټکی لولي چې تاسو ورکړی دی.';
+$ec_lang['lpn_notes_5_def']='یو پمپ H = H₀ − aQ^b تعقیبوي، چیرې چې H هغه هیډ دی چې پمپ یې اضافه کوي او Q هغه بهاو دی چې د هغه نه تیریږي. د جوړونکي منحني نه یو، دوه، یا درې ټکي ولیکئ. درې ټکي — د صفر بهاو کې هیډ، عادي کار ټکی، او د لوړ ترین بهاو ټکی — H₀، a او b مستقیم برابروي، او یوه خپره شوې منحني ترټولو نږدې تعقیبوي. دوه ټکي یو پارابولا (b = 2) برابروي چې د هغه اوچت یې د صفر بهاو کې دی. یو ټکی یو عام قاعده کاروي: د صفر بهاو کې هیډ ستاسو ننوتلي هیډ نه 1.33 چنده دی، او لوړ ترین بهاو ستاسو ننوتلي بهاو نه 2 چنده دی، چې بیا b = 2 ورکوي. یو پمپ چې هیڅ ټکی پکې نه دی ننوتل شوی هیڅ هیډ نه اضافه کوي. منحني د صفر هیډ رسیدو ځای کې نه پرې کیږي، نو د پمپ نه د هغه د منحني نه زیات بهاو غوښتل منفي هیډ ورکوي. حل یو غټ پمپ یا کوچنۍ غوښتنه دی، نه یوه بله منحني برابرونه. یوه منحنۍ کولی شي له درې نه زیات ټکي ولري، او هر هغه ټکی چې تاسو ورکړی دی لوستل کیږي.';
 // WAS "Planned additions", NAMING THREE THINGS THAT NOW SHIP (scenarios, result tables, .inp
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
@@ -2345,9 +2345,9 @@ $ec_lang['lpn_mode_add_text']='حالت: متن اضافه کول. نقشه کل
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
 // whole-label-wrap convention -- the button itself is already the click target (no separate "?"
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
-$ec_lang['lpn_tip_select']='دا حالت وکاروئ ترڅو په نقشه کې شیان بدل کړئ، ولیږدوئ، او کش کړئ. دا هغه حالت دی چې پاڼه پخپله بېرته ورته راګرځي: له ځینو کړنو وروسته، لکه د یوې پروژې پرانیستل، پخپله بېرته دې ته راځي، او [Esc] تاسو د هر بل حالت نه بېرته دې ته راولي.';
+$ec_lang['lpn_tip_select']='دا حالت وکاروئ ترڅو په نقشه کې شیان بدل کړئ، ولیږدوئ، او کش کړئ. دا هغه حالت دی چې پاڼه پخپله بېرته ورته راګرځي: له ځینو کړنو وروسته، لکه د یوې پروژې پرانیستل، پخپله بېرته دې ته راځي. د Esc دوهم ځل فشار هرڅه چې ټاکل شوي وي بې ټاکنه کوي.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tip_labels_draggable']='تاسو کولی شئ یو لیبل کش کړئ ترڅو یې ولیږدوئ. یو لیبل ته دوه ځلي کلیک وکړئ ترڅو یې خپل اوتوماتیک ځای ته بېرته ولیږئ.';
+$ec_lang['lpn_tip_labels_draggable']='تاسو کولی شئ یو لیبل کش کړئ ترڅو یې ولیږدوئ. لیبل لنډ مهاله روښانه کیږي ترڅو تاسو خبر کړي چې لیږدول شوی دی. یو لیبل ته دوه ځلي کلیک وکړئ ترڅو یې خپل اوتوماتیک ځای ته بېرته ولیږئ.';
 $ec_lang['lpn_field_auto']='اوتو';
 $ec_lang['lpn_method_switch_confirm']='د اصطکاک میتود بدلول ستاسو په پایپونو لیکل شوي د خشونت شمېرې نه بدلوي، او د یو میتود لپاره خشونت د بل میتود لپاره بې مانا دی. له دې وروسته هر پایپ وګورئ. بیا هم یې بدلوم؟';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
@@ -2407,7 +2407,7 @@ $ec_lang['lpn_labels_mark_extrema']='لوړ ترین او ټیټ ترین ارز
 // word not on the page is a word the search cannot reach -- and $ec_lang_syn, the other place the
 // terms could have gone, is invisible to it. Plain English leads and the term is the gloss, which is
 // the same shape as "Minor (local) loss".
-$ec_lang['lpn_labels_mark_extrema_tip']='پر نقشه د هرې لیبل شوې ملکیت د لوړ ترین ارزښت پورته یوه کرښه راکاږي (پاسنۍ کرښه)، او د هغې ملکیت د ټیټ ترین ارزښت لاندې یوه کرښه راکاږي (لاندنۍ کرښه)، ترڅو تاسو لوړ ترین او ټیټ ترین پرته له شمېرو لوستلو وپیژنئ.';
+$ec_lang['lpn_labels_mark_extrema_tip']='پر نقشه د هرې لیبل شوې ملکیت د لوړ ترین ارزښت پورته یوه کرښه راکاږي (پاسنۍ کرښه)، او د ټیټ ترین ارزښت لاندې یوه کرښه راکاږي (لاندنۍ کرښه).';
 // "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the assets
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.
@@ -2432,7 +2432,7 @@ $ec_lang['lpn_labels_priority_link_tip']='هغه ترتیب چې پکې ارزښ
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_node_tip']='هغه ترتیب چې پکې ملکیتونه پرېښودل کیږي کله چې د دوو نقطو لیبلونه سره یو له بل سره یوځای شي. ملکیت شمېره 1 لومړی پرېښودل کیږي، پر دواړو لیبلونو. کله چې یوازې یو ملکیت پاتې وي او دواړه لا هم یو له بل سره یوځای وي، بشپړ لیبل پټیږي: هغه لیبل چې پاتې ارزښت یې د ښودو لپاره تر ټولو کم ارزښت لري، چې معنی یې دا ده ټیټه غوښتنه، هغه فشار چې د لړۍ منځ ته نږدې وي، یا هغه لوړوالی یا هیډ چې ګاونډیو نقطو ته تر ټولو نږدې وي.';
+$ec_lang['lpn_labels_priority_node_tip']='هغه ترتیب چې پکې ارزښتونه پرېښودل کیږي کله چې د دوو نقطو لیبلونه سره یوځای شي. ارزښت شمېره 1 لومړی پرېښودل کیږي. کله چې یوازې یو ارزښت پاتې وي او لیبلونه لا هم سره یوځای وي، یو بشپړ لیبل پټیږي: هغه یو چې ټیټه غوښتنه لري، هغه فشار چې د لړۍ منځ ته نږدې وي، یا هغه لوړوالی یا هیډ چې ګاونډیو نقطو ته نږدې وي.';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
 $ec_lang['lpn_labels_col_before']='مخکې';
@@ -2573,7 +2573,7 @@ $ec_lang['lpn_backdrop_continue']='دوام ورکړئ';
 $ec_lang['lpn_tool_settings']='تنظیمات';
 $ec_lang['lpn_settings_show_titles']='د پاڼې سرلیکونه ښودل';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_show_titles_tip']='د پاڼې سرلیک او د رسم پورته ښه راغلاست کرښه پټوي، ترڅو نقشه ډیر ځای ولري. چاپول نه بدلیږي.';
+$ec_lang['lpn_settings_show_titles_tip']='د پاڼې سرلیک او د رسم پورته ښه راغلاست کرښه پټوي، ترڅو نقشه د کار لپاره ډیر ځای ولري. چاپول تل یوازې یوه پاکه نقشه ښیي.';
 // The link that rides on the headings themselves (Tom's 2026-09-08 worklist). It throws the switch AND opens the
 // box at the row that holds it, so the way back is learned in the same gesture.
 $ec_lang['lpn_hide_titles']='دا سرلیکونه پټ کړئ';
@@ -2810,7 +2810,7 @@ $ec_lang['lpn_settings_engine_native']='د EPANET حل کوونکي سره حل 
 // EPANET whatever the box says, and the one-time download, which is the cost a visitor on a slow
 // connection actually pays.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_engine_native_tip']='د متحده ایالاتو د EPA د EPANET حل کوونکی چلوي، دلته ستاسو براوزر کې. پدې اندازې شبکه کې به تاسو د چټکتیا توپیر ونه ویني. دواړه حل کوونکي نږدې ورته پایلې ورکوي، خو نه په بشپړه توګه: EPANET د جاذبې لپاره کارول شوی ارزښت مقرري کوي، نو د هغه ځایی (لوکل) ضیاع د جوړ شوي حل کوونکي په پرتله شاوخوا 0.08% ټیټه راځي، او د مانینګ خشونت سره یې د سر ضیاع شاوخوا 0.6% ټیټه راځي. کله چې تاسو دا بکس لومړی ځل نښه کړئ، شاوخوا 650 KB ډاونلوډ کیږي او بیا پدې وسیله کې ساتل کیږي.';
+$ec_lang['lpn_settings_engine_native_tip']='دا فعاله کړئ ترڅو د امکان په صورت کې جوړ شوی حل کوونکی وکاروئ. که نه نو، تل د متحده ایالاتو د EPA د EPANET حل کوونکی کارول کیږي. جوړ شوی حل کوونکی د اوږد موده سناریوګانو یا فعالو PRV، PSV، یا FCV لپاره نه کارول کیږي. کله چې تاسو د EPANET حل کوونکی لومړی ځل وکاروئ، شاوخوا 650 KB ډاونلوډ کیږي او بیا پدې وسیله کې ساتل کیږي. چیرې چې یو پایپ کوچنی (لوکل) ضیاع لري، دواړه حل کوونکي په وروستیو شمېرو کې سره توپیر لري: EPANET د جاذبې لپاره کارول شوی ارزښت مقرري کوي، نو د هغه لوکل ضیاع د جوړ شوي حل کوونکي په پرتله ډیره لږ ټیټه راځي.';
 $ec_lang['lpn_engine_loading']='د EPANET حل کوونکی پورته کیږي…';
 $ec_lang['lpn_engine_failed']='د EPANET حل کوونکی نشو پورته کیدی. د اندروني حل کوونکي ښودل کیږي.';
 // Said out loud, never silently: the user picked the built-in solver and this network was sent to
@@ -2818,7 +2818,7 @@ $ec_lang['lpn_engine_failed']='د EPANET حل کوونکی نشو پورته ک�
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
 $ec_lang['lpn_engine_valve_route']='د EPANET حل کوونکي سره حل شوی، ځکه چې دا والوونه پخپله خلاصیږي او بندیږي:';
 $ec_lang['lpn_unit_unknown']='دا رسم یو واحد بیانوي چې دا پاڼه یې نه وړاندې کوي: {unit}. هرڅه لکه څنګه چې راغلي ساتل او ښودل کیږي، او هیڅ شی نه دی بدل شوی. تر هغه پورې چې دا پاڼه هغه واحد نه پیژني هیڅ ځواب نشي ورکړل کیدی، ځکه چې د هغه د اندازې پوهیدو لاره نشته.';
-$ec_lang['lpn_engine_manning_note']='یادونه: د مانینګ خشونت سره، EPANET د سر ضیاع نږدې 0.6٪ د اندروني حل کوونکي نه ټیټ محاسبه کوي.';
+$ec_lang['lpn_engine_manning_note']='یادونه: د مانینګ خشونت سره، EPANET د مانینګ معادلې ثابت مقدار مقرروي، نو د سر ضیاع د دقیق شکل په پرتله شاوخوا 0.6٪ ټیټه راځي.';
 // ---- EPANET said no (ROADMAP Task 471) -------------------------------------------------------
 // Three sentences for three different facts, on the model of lpn_unit_unknown: what would not
 // happen, what the solver itself objected to, and where the numbers on screen actually came from.
@@ -2846,7 +2846,7 @@ $ec_lang['lpn_settings_text_size']='د متن اندازه (پیکسلونه)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='د نښې اندازه (پیکسلونه)';
-$ec_lang['lpn_settings_link_width']='د پایپ کرښې پنډوالی (پیکسلونه)';
+$ec_lang['lpn_settings_link_width']='د پایپ کرښې پلنوالی (پیکسلونه)';
 // Task 549: turning the flow arrows off. "Flow direction" is the profession's own phrase and
 // EPANET's own display option, so it is named rather than explained; the tip carries the two things
 // the label cannot say, which are that the arrows only appear once there are results and that the
@@ -2898,7 +2898,7 @@ $ec_lang['lpn_settings_symbol_opacity']='د نښې روڼوالی (0 نه 1)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='د شاليد انځور روڼوالی (0 نه 1)';
-$ec_lang['lpn_settings_map_display']='د نقشې بڼه';
+$ec_lang['lpn_settings_map_display']='بڼه';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
 // to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
 // LPN_MAP_MIN in js/looped-network.js). Nothing renders these two keys now, so key_hygiene_check
@@ -2954,8 +2954,8 @@ $ec_lang['lpn_confirm_restore_defaults']='ټول تنظیمات (د ID مختص�
 // the same direction: a restart is something you recover FROM, not something that takes your files.
 // The name is short because lpn_confirm_wipe below does the explaining, which is also why it does
 // not have to say "on this page".
-$ec_lang['lpn_settings_wipe_btn']='په دې پاڼه کې هرڅه ړنګول';
-$ec_lang['lpn_confirm_wipe']='د دې پاڼې لپاره هر ساتل شوی شی ړنګ کړئ — هره پروژه، هر شاليد انځور، ټول تنظیمات، او ستاسو د واحدونو انتخابونه — او پاڼه لکه یو نوی لیدونکی یې چې ویني بېرته پورته کړئ؟ دا نشي بېرته کیدی.';
+$ec_lang['lpn_settings_wipe_btn']='له سره پیل وکړئ';
+$ec_lang['lpn_confirm_wipe']='له سره پیل وکړئ، او د دې پاڼې لپاره هر ساتل شوی شی ړنګ کړئ: هره پروژه، هر شاليد انځور، ټول تنظیمات، او ستاسو د واحدونو انتخابونه؟ پاڼه به بیخي لکه یو نوی لیدونکی یې چې ویني بیا پورته شي. دا نشي بېرته کیدی.';
 
 // Share this calculation (ROADMAP Task 228). template_share_link and template_share_copied were
 // RETIRED in Task 438 Wave 0: the duplicate control under the Printable Title is gone, the
@@ -2984,7 +2984,7 @@ $ec_lang['lpn_time_clock_day']='ورځ {day}، {clock}';
 $ec_lang['lpn_time_format_tip']='وخت د ساعتونو او دقیقو په بڼه ولیکئ، لکه 2:30. یوازې یوه شمېره ساعتونه معنی لري، نو 8 یعنې اته ساعته دي. نیم ساعت 0:30 دی.';
 $ec_lang['lpn_time_running']='اوږدې مودې سمولېشن د EPANET حل کوونکي سره محاسبه کیږي.';
 $ec_lang['lpn_time_no_engine']='جوړ شوی حل کوونکی یوه شیبه په یو وخت کې محاسبه کوي، نو دا یوازې د {time} لپاره شبکه ده: هره نمونه پدې شیبه لوستل کیږي، او هر ټانک لا هم په خپله پیل کچه ولاړ دی، پرته له دې چې ډک یا خالی شي. یو ځل انترنېټ سره وصل شئ ترڅو د EPANET حل کوونکی راولئ، چې اوږدې مودې سمولېشن چلوي.';
-$ec_lang['lpn_time_slider']='وخت';
+$ec_lang['lpn_time_slider']='د سناریو تیر شوی وخت';
 $ec_lang['lpn_time_no_period']='دا پروژه هیڅ اوږدې مودې سمولېشن نه لري ټاکل شوی، نو یوازې یوه شیبه د ښودلو لپاره شته. د تنظیمات، محاسبه، وخت لاندې یو ټول چلولو وخت وټاکئ ترڅو اوږدې مودې سمولېشن وچلوئ.';
 $ec_lang['lpn_time_first']='پیل ته لاړ شه';
 $ec_lang['lpn_time_prev']='شاته ګام';
@@ -2998,7 +2998,7 @@ $ec_lang['lpn_time_tank']='ټانک';
 $ec_lang['lpn_time_level']='د اوبو کچه';
 $ec_lang['lpn_time_run']='محاسبه کول';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='دا شبکه پر هر هایدرولیکي وخت پړاو حل کړئ، د چلولو له پیل نه تر پایه پورې.';
+$ec_lang['lpn_time_run_tip']='دا شبکه پر هر هایدرولیکي وخت پړاو حل کړئ.';
 // **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
 // `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
 // LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
@@ -3022,7 +3022,7 @@ $ec_lang['lpn_time_run_report_copied']='کاپي شو';
 $ec_lang['lpn_time_run_report_tip']='هغه څه چې د EPANET حل کوونکي پخپله د وروستي چلولو په اړه چاپ کړل: آیا یووالي ته ورسیده، او هر هغه شی چې یې خبرداری ورکړ. دا د حل کوونکي خپل متن دی، نه زموږ.';
 
 $ec_lang['lpn_time_speed']='چټکتیا';
-$ec_lang['lpn_time_speed_tip']='چلول څومره چټک ښکاره کیږي.';
+$ec_lang['lpn_time_speed_tip']='د چلولو چټکتیا';
 
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,
@@ -3036,7 +3036,7 @@ $ec_lang['lpn_settings_search']='تنظیمات لټول';
 // word somewhere in a row's own searchable text (setboxUnitText()'s name+tip+aria-label+placeholder
 // join), so "zoom label" finds a row without either word next to the other. His own sentence is the
 // tip, verbatim.
-$ec_lang['lpn_settings_search_tip']='یوه کلمه ولیکئ ترڅو یوازې هغه تنظیمات ووینئ چې دا کلمه لري. توضیحات هم لټول کیږي، نه یوازې نومونه.';
+$ec_lang['lpn_settings_search_tip']='یوه کلمه یا څو کلمې ولیکئ ترڅو هغه تنظیمات ووینئ چې دا ټولې کلمې لري.';
 $ec_lang['lpn_settings_no_match']='هیڅ تنظیم دا کلمه نلري.';
 // The grab strip between the two panes (ROADMAP Task 576). An aria-label, so it is a NAME rather
 // than an instruction: what the control adjusts, not how to operate it.
@@ -3055,7 +3055,7 @@ $ec_lang['lpn_time_settings_open']='د وخت تنظیمات';
 // leaves room for its siblings (Quality, Reactions) as they arrive.
 $ec_lang['lpn_settings_sec_symbology']='انځورول';
 $ec_lang['lpn_settings_sec_map']='نقشه او پاڼه';
-$ec_lang['lpn_settings_sec_assets']='د نوو عناصرو تلواله ارزښتونه';
+$ec_lang['lpn_settings_sec_assets']='عناصر';
 $ec_lang['lpn_settings_sec_calculation']='محاسبه';
 // ROADMAP Task 247. A customer label's CONTENT is the node rows above it (Tom: "Customer labels
 // would follow Node styles"), so this section has one control and no checkboxes: how close the
@@ -3098,7 +3098,7 @@ $ec_lang['lpn_quality_needs_run']='د اوبو کیفیت د پایپونو له
 // key) and a Mass units dropdown (lpn_quality_mass_units) below, matching EPANET's own Parameter
 // and Mass Units fields; the name is optional, exactly as EPANET's own is.
 $ec_lang['lpn_quality_chemical_name']='کیمیاوي ماده او یوونې';
-$ec_lang['lpn_quality_chemical_name_tip']='د کیمیاوي مادې نوم او هغه یوونې چې د هغې غلظتونه پکې لیکل کیږي: د بیلګې په توګه، Chlorine mg/L یوه ننوتنه په توګه ولیکئ. دا یوه لیبل ده. EPANET یو غلظت نه بدلوي، نو هر غلظت او هره کچه پدې پروژه کې باید مخکې له مخکې پدې یوونو ولیکل شي.';
+$ec_lang['lpn_quality_chemical_name_tip']='هغه کیمیاوي ماده چې تاسو یې تعقیبوئ، د بیلګې په توګه کلورین. د EPANET خپل تلواله لیبل Chemical لپاره یې خالي پریږدئ. ستاسو په راپورونو کې ښکاره کیږي، خو په محاسبو کې نه کارول کیږي.';
 $ec_lang['lpn_quality_mass_units']='د کتلې واحدونه';
 $ec_lang['lpn_quality_mass_units_tip']='د کیفیت ننوتنې د واحد برخه، د EPANET خپل دوه انتخابونه.';
 $ec_lang['lpn_quality_unit_ug']='µg/L';
@@ -3376,7 +3376,7 @@ $ec_lang['lpn_library_curves_tip']='یوه منحنۍ د ټکو لړلیک دی 
 // document objects of their own, and the note said so; it now says what the box does and where a
 // curve is pointed at an element from.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_curves_note']='یوه منحنۍ یوې پروژې پورې اړه لري، او یو پمپ یا والو په خپلو ځانګړتیاوو کې هغه یوه بیانوي چې کاروي یې. څو عناصر کولی شي ورته منحنۍ وکاروي، او دلته د هغې سمون ټول هغه بدلوي. د پمپ هیډ منحنۍ لپاره، چلن هغه منحنۍ کاروي چې د ټکو له لارې برابره شوې لکه ښودل شوې؛ د هرې بلې ډول لپاره دا ټکي سیدو کرښو سره نښلوي لکه ښودل شوې.';
+$ec_lang['lpn_library_curves_note']='منحنۍ له پمپونو او والوونو سره نښلول کیږي. د پمپ هیډ منحنۍ لپاره، چلن هغه منحنۍ کاروي چې د ټکو له لارې برابره شوې لکه ښودل شوې؛ د هرې بلې ډول لپاره دا ټکي سیدو کرښو سره نښلوي لکه ښودل شوې.';
 $ec_lang['lpn_library_curve_add']='یوه منحنۍ اضافه کړئ';
 $ec_lang['lpn_library_curve_type_tip']='دا منحنۍ څه شی تشریح کوي';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
@@ -3553,7 +3553,7 @@ $ec_lang['lpn_library_control_add']='یو کنترول اضافه کړئ';
 // OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
 // box, and the page reads back only those words. Translate the sentence around them.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_library_control_tip']='یوه جمله، په هغو کلمو کې چې EPANET کاروي. څلور بڼې: LINK 9 OPEN IF NODE 2 BELOW 110، LINK 9 CLOSED IF NODE 2 ABOVE 140، LINK 10 OPEN AT TIME 1، او LINK 12 CLOSED AT CLOCKTIME 3 AM. د OPEN یا CLOSED پرځای تاسو کولی شئ یوه شمېره ولیکئ، چې د والو تنظیم یا د پمپ چټکتیا ده. کلیدي کلمې په انګلیسي کې پرېږدئ؛ دا هغه دي چې پاڼه یې لولي.';
+$ec_lang['lpn_library_control_tip']='یوه یو-کرښیزه قاعده چې د EPANET نحو کاروي. د پروژې همغږي واحدونه وکاروئ. کلیدي کلمې باید په انګلیسي کې وي. بېلګې: LINK 12 CLOSED IF NODE 23 ABOVE 20 (کله چې د ټانک 23 کچه له 20 فوټه ډیره شي، لینک 12 به وتړل شي)؛ LINK 12 OPEN IF NODE 130 BELOW 30 (که د نقطې 130 فشار له 30 psi نه ښکته شي، لینک 12 به خلاص شي)؛ LINK PUMP02 1.5 AT TIME 16 (د پمپ PUMP02 نسبي چټکتیا د سناریو له 16 ساعتونو وروسته 1.5 ته ټاکل کیږي)؛ LINK 12 CLOSED AT CLOCKTIME 10 AM LINK 12 OPEN AT CLOCKTIME 8 PM (دوه قواعد: لینک 12 په سناریو کې بیا بیا سهار 10 بجې تړل کیږي او ماښام 8 بجې خلاصیږي).';
 $ec_lang['lpn_library_control_ok']='✓ پوه شوی';
 $ec_lang['lpn_library_control_bad']='⚠ نه دی پوهېدل شوی';
 $ec_lang['lpn_library_control_missing']='⚠ دې شبکې کې هیڅ شی {id} نومیدونکی نشته';
@@ -3614,7 +3614,7 @@ $ec_lang['lpn_field_speed_pattern_tip']='دا چې د دې پمپ چټکتیا �
 // one wall, and the order of the paragraphs stays ours rather than the translation's.
 $ec_lang['lpn_search_menu']='د یو ځای په نوم لټون…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_search_tip']='یو ښار، سړک، یا نښه یې د نوم له مخې ومومئ او نقشه ورته یوسئ. لومړی کارونه ستاسو اجازه غواړي، ځکه چې هغه کلمې چې تاسو یې لیکئ د OpenStreetMap د ځای-نوم خدمت ته لاړ شي.';
+$ec_lang['lpn_search_tip']='یو ښار، پته، یا نښه یې د نوم له مخې ومومئ او نقشه ورته یوسئ. لومړی کارونه ستاسو اجازه غواړي، ځکه چې هغه کلمې چې تاسو یې لیکئ د OpenStreetMap د ځای-نوم خدمت ته لاړ شي.';
 $ec_lang['lpn_search_bar']='د نوم له مخې لټون…';
 // The four paragraphs of the ask: what is sent and to whom; why this is a separate question from
 // the map pictures; the question itself; and what a no costs (nothing).
@@ -3701,7 +3701,7 @@ $ec_lang['lpn_ff_intro']='هر جنکشن یو په یو غوښتل کیږي چ�
 $ec_lang['lpn_ff_scope']='هغه جنکشنونه چې ازمویل شي';
 $ec_lang['lpn_ff_scope_tip']='مخکې لدې چې محاسبه وکړئ ټاکنه وکړئ. په یوه لویه سیسټم کې د هر جنکشن ازموینه کیدای شي دقیقې ونیسي.';
 $ec_lang['lpn_ff_scope_all']='هر جنکشن';
-$ec_lang['lpn_ff_scope_selected']='یوازې ټاکل شوی جنکشن';
+$ec_lang['lpn_ff_scope_selected']='ټاکل شوي جنکشنونه';
 $ec_lang['lpn_ff_no_junctions']='دا پروژه لا هیڅ جنکشن نلري، نو د ازموینې لپاره هیڅ شی نشته.';
 $ec_lang['lpn_ff_no_selection']='هیڅ جنکشن ټاکل شوی نه دی. پر نقشه یو وټاکئ، یا هر جنکشن ازموئ.';
 $ec_lang['lpn_ff_skipped']='{n} ټاکل شوي عناصر جنکشنونه نه دي، نو ازمویل شوي نه دي.';
@@ -3728,11 +3728,11 @@ $ec_lang['lpn_ff_maxvelocity_tip']='یو پایپ چې له دې نه پورته
 // rather than the deliberate and standard choice it actually is.
 $ec_lang['lpn_ff_accounting']='اور بهاو پخپله جنکشن کې راایستل کیږي. دلته دا طریقه کارول کیږي، او دا معمول یو دی. اور-خونده، خپله لاتیرال پایپ او خپل نازل ماډل شوي نه دي، نو یو حقیقي اور-خونده لدې نه چې دلته ښودل کیږي کم وړاندې کوي.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_native']='دا د جوړ شوي حل کوونکي سره محاسبه کیږي.';
+$ec_lang['lpn_ff_engine_native']='جوړ شوی حل کوونکی کارول کیږي.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_epanet']='دا د EPANET انجن سره محاسبه کیږي.';
+$ec_lang['lpn_ff_engine_epanet']='د EPANET انجن کارول کیږي.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='شتون لرونکې اور بهاو یوه لټون ده، نو ټوله شبکه د هر ازمویل شوي جنکشن لپاره شاوخوا شپاړس ځله حل کیږي. یوه لویه سیسټم دقیقې نیسي. تاسو یې کوم وخت ودرولی شئ او هغه څه وساتلی شئ چې دمخه یې حساب شوي.';
+$ec_lang['lpn_ff_engine_cost']='شتون لرونکې اور بهاو یوه لټون ده، نو ټوله شبکه د هر ازمویل شوي جنکشن لپاره شاوخوا شپاړس ځله حل کیږي. یوه لویه سیسټم دقیقې نیسي. تاسو یې کوم وخت ودرولی شئ او هغه څه وساتلی شئ چې دمخه یې ترسره کړي دي.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //

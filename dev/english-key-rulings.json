@@ -978,9 +978,9 @@
             "ruled": "2026-09-01"
         },
         "lpn_ff_design_no_selection": {
-            "on": "The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.",
-            "ruled": "2026-09-29",
-            "answer": "Edited."
+            "on": "The design check scope is set to Selected, but no assets are selected. Select assets or select All.",
+            "ruled": "2026-09-30",
+            "answer": "His own English (quoted, without a final period, which is added), and: (a) (Specify) Junctions to test: All/Selected\n(b) Design check (effect on system); (specify) pipes and other junctions to check: All/Selected"
         },
         "lpn_ff_design_none": {
             "on": "Nothing in the chosen set was drawn down by any junction tested.",
@@ -1605,9 +1605,9 @@
             "ruled": "2026-08-29"
         },
         "lpn_find_shift_hint": {
-            "on": "Shift+click to add/remove toggle.",
+            "on": "Shift+click to toggle, adding if not in the selection set or removing if already in the selection set.",
             "ruled": "2026-09-29",
-            "answer": "Edited."
+            "answer": "His own wording, written into dev/new-english-keys.md in place of the old string."
         },
         "lpn_fitting_add": {
             "on": "Add a fitting",
@@ -1860,7 +1860,7 @@
         "lpn_goto_on_map": {
             "on": "Go to on map",
             "ruled": "2026-09-29",
-            "answer": "OK."
+            "answer": "Add a canonical or _syn entry \"Bring this into view on the map, Zoom to this on the map, Show this on the map\""
         },
         "lpn_gpv_curve_source": {
             "on": "Valve head loss curve",

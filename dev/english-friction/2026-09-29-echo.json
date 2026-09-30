@@ -1,0 +1,66 @@
+{
+  "sprint": "2026-09-29-echo",
+  "description": "Drift resync: the 125 keys held back by the 2026-09-29 drift audit (dev/drift-audit-2026-09-29/holdback.txt), each only in the languages the audit found stale (36-84 per language, 1,298 in all), plus lpn_find_shift_hint (Tom's new English) and lpn_goto_on_map (Tom's $ec_lang_syn ruling) in all 26. REPLACE IN PLACE; nothing is appended. Wave 0 reviewed nothing: every key is shipped English, audited key by key in dev/drift-audit-2026-09-29/, and the two new ones carry Tom's ruling on their exact text.",
+  "entries": [
+    {
+      "key": "lpn_quality_chemical_name_tip",
+      "lang": "es",
+      "source": "translator",
+      "complaint": "\"EPANET's own default label, Chemical\" could mean the literal string EPANET prints (kept in English as a UI/product term) or a generic description meaning 'a chemical'; I kept the English word Chemical untranslated as the literal default label text.",
+      "readings": [
+        "Chemical is EPANET's literal default label string, left untranslated (chosen)",
+        "Chemical is a generic description of the default and should be translated as 'un producto químico'"
+      ],
+      "disposition": "intent",
+      "resolution": "The literal reading is right: a blank field stores the EPANET token Chemical (js/looped-network.js:46242). 24 languages had translated the label name; all corrected to keep the token Chemical in this sprint. No English change."
+    },
+    {
+      "key": "lpn_goto_bad",
+      "lang": "fr",
+      "source": "translator",
+      "complaint": "The example '38.122' in the error message looks like a typo (missing comma/space before the longitude) rather than a genuine third valid format, but it is kept verbatim per instructions to preserve examples exactly.",
+      "readings": [
+        "kept the example characters exactly as given (chosen)",
+        "the example is a typo for '38.-122' or '38,122' and should be fixed"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Not a typo: Tom ruled 2026-09-08 that the parser accepts 38.122 as a pair, and the three examples show the three accepted shapes (comment above lpn_goto_tip in lang.ec.en.php)."
+    },
+    {
+      "key": "lpn_result_head_tip",
+      "lang": "fr",
+      "source": "translator",
+      "complaint": "\"gauge measurement\" for pressure could mean either a literal pressure gauge reading or the technical term 'gauge pressure' (vs. absolute pressure); I translated it as the technical term (pression manométrique/grandeur manométrique) since that is the more precise engineering contrast with 'absolute height'.",
+      "readings": [
+        "gauge pressure, the technical term contrasted with absolute (chosen)",
+        "a literal instrument reading"
+      ],
+      "disposition": "dismissed",
+      "resolution": "The chosen reading (gauge pressure, as against absolute) is the one meant. No English change."
+    },
+    {
+      "key": "lpn_ex_net1_title",
+      "lang": "hr",
+      "source": "translator",
+      "complaint": "\"EPANET Net1 plus rule-based controls\" is a title/menu label with no verb, and it is unclear whether \"rule-based controls\" names the EPANET [RULES] feature specifically or is a generic descriptive phrase, so the Croatian could read as either a fixed technical term or a plain description.",
+      "readings": [
+        "EPANET Net1 uz upravljanje pravilima (chosen, treats it as the general EPANET RULES feature)",
+        "EPANET Net1 s dodanim automatskim upravljačkim pravilima (a looser paraphrase of the same idea)"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Either reading names the same thing (the example carries EPANET [RULES]); the chosen rendering is right. No English change."
+    },
+    {
+      "key": "lpn_settings_engine_native_tip",
+      "lang": "hr",
+      "source": "translator",
+      "complaint": "\"Where a pipe carries a minor (local) loss, the two solvers disagree in the last digits\" could mean either that this disagreement is limited to pipes with a minor loss coefficient set, or a general statement about all pipes that happens to be introduced by that clause; I translated it literally as scoped to pipes carrying a minor loss.",
+      "readings": [
+        "Scoped: only pipes with a nonzero minor/local loss show the tiny discrepancy (chosen)",
+        "General: all results differ slightly and minor losses are just the named cause"
+      ],
+      "disposition": "dismissed",
+      "resolution": "The scoped reading is the one meant and is what the English says: the disagreement arises where a pipe carries a minor loss. No English change."
+    }
+  ]
+}

@@ -117,7 +117,11 @@ foreach ($syn as $key => $value) {
         // is a pointer to a promise. It resolves today and delivers on the day the glossary is
         // filled in, which for a new concept is the sprint that is about to run.
         $entry = $termsByName[$termName];
-        $carriesSomething = !empty($entry['avoid']) || !empty($entry['translations']);
+        // translations.en is the English rendering (Task 737), not a translation, so it does not
+        // count as the entry carrying something a translator could not already read.
+        $targetTranslations = is_array($entry['translations'] ?? null) ? $entry['translations'] : [];
+        unset($targetTranslations['en']);
+        $carriesSomething = !empty($entry['avoid']) || !empty($targetTranslations);
         if ($payload === '' && !$carriesSomething) {
             $warnings[] = "$key -> gloss: $termName — pointer only, to a glossary entry that has no "
                 . "avoid list and no translations yet. It resolves, but there is nothing there to "
