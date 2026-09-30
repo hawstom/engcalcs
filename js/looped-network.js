@@ -38263,6 +38263,13 @@ var EngCalcs = EngCalcs || {};
 				tip: pc.lpn_ff_menu_tip,
 				fn: function () { closeMenu(); openFireFlowBox(); }
 			},
+			// **CRITICALITY SITS BESIDE FIRE FLOW** (Tom, 2026-09-30): the same kind of run -- criteria
+			// first, then the network solved many times over on a copy.
+			{
+				icon: 'pipe', label: pc.lpn_crit_menu || 'Criticality analysis…',
+				tip: pc.lpn_crit_menu_tip,
+				fn: function () { closeMenu(); openCriticalityBox(); }
+			},
 			// **A DIVIDER, AND ONE ROW UNDER IT THAT IS THE REPORTS** (Tom, 2026-09-04: *"We can
 			// put a divider before the reports"*, and then, having seen them: *"It's strange and
 			// non-parallel now, however, for 2/3 to have the word 'report'. Do we dare dive in and
@@ -38967,6 +38974,7 @@ var EngCalcs = EngCalcs || {};
 		wireAreaHint();
 		wireWizardBars();
 		wireFireFlowBox();
+		wireCriticalityBox();
 		wireEnergyBox();
 		wireScenarioCompareBox();
 		wireRunReportBox();
@@ -55523,6 +55531,7 @@ var EngCalcs = EngCalcs || {};
 	// no longer exists, so an edit clears it rather than leaving a picture that is quietly wrong.
 	// Called from scheduleSolve(), which is the one thing every edit on this page goes through.
 	function clearFireFlowRun(quiet) {
+		clearCriticalityRun(quiet);
 		if (!fireFlowRun) { return; }
 		fireFlowRun = null;
 		refreshFireFlowMarks();
@@ -55944,7 +55953,10 @@ var EngCalcs = EngCalcs || {};
 		}(host));
 		if (btn && btn.focus) { try { btn.focus({ preventScroll: true }); } catch (e) { btn.focus(); } }
 	}
-	function ffTable(parent, headings) {
+	// `sorter` is { state: {col, dir}, by: function (col) } for a table that is not fire flow's own
+	// (the criticality report); omitted, the headings sort the fire flow table as they always did.
+	function ffTable(parent, headings, sorter) {
+		var sortState = sorter ? sorter.state : ffSortState, sortBy = sorter ? sorter.by : ffSortBy;
 		// **THE WIDE TABLE SCROLLS SIDEWAYS INSIDE ITS OWN BOX**, so ten columns can never push the
 		// dialog's own edges off the screen (CLAUDE.md: wide content scrolls in its own container).
 		var wrap = ffEl('div', 'lpn-ff-tablewrap', null, parent),
@@ -55958,7 +55970,7 @@ var EngCalcs = EngCalcs || {};
 		// Zero flow from this hydrant? Zero flow in the system?"* The answer is the first, and a
 		// column heading that does not say so leaves the reader to pick.
 		headings.forEach(function (h, i) {
-			var text = h, tip = null, th, arrow, pc = EngCalcs.pageConfig || {}, on = ffSortState.col === i;
+			var text = h, tip = null, th, arrow, pc = EngCalcs.pageConfig || {}, on = sortState.col === i;
 			if (h && h.length === 2 && typeof h !== 'string') { text = h[0]; tip = h[1]; }
 			th = ffEl('th', 'lpn-ff-sortable', text, hr);
 			if (tip) { th.title = tip; }
@@ -55967,17 +55979,17 @@ var EngCalcs = EngCalcs || {};
 			arrow = document.createElement('button');
 			arrow.type = 'button';
 			arrow.className = 'lpn-pane-sortarrow lpn-ff-sortarrow' + (on ? ' lpn-pane-sortarrow-active' : '') +
-				(on && ffSortState.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
+				(on && sortState.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
 			arrow.title = on ? (pc.lpn_pane_sortarrow_tip || 'Reverse the sort') : (pc.lpn_pane_sort_asc || 'Sort ascending');
 			arrow.setAttribute('aria-label', arrow.title + ': ' + text);
 			arrow._lpnFfSortCol = i;
 			arrow.addEventListener('click', function (ev) {
 				if (ev && ev.stopPropagation) { ev.stopPropagation(); }
-				ffSortBy(i);
+				sortBy(i);
 			});
 			th.appendChild(arrow);
-			th.setAttribute('aria-sort', on ? (ffSortState.dir < 0 ? 'descending' : 'ascending') : 'none');
-			th.addEventListener('click', function () { ffSortBy(i); });
+			th.setAttribute('aria-sort', on ? (sortState.dir < 0 ? 'descending' : 'ascending') : 'none');
+			th.addEventListener('click', function () { sortBy(i); });
 		});
 		return ffEl('tbody', null, null, table);
 	}
@@ -56124,18 +56136,25 @@ var EngCalcs = EngCalcs || {};
 	// it is.
 	var ffRunUi = null;
 	function ffRunBoxEl() { return document.getElementById('lpn_ff_run_box'); }
-	function openFireFlowRunBox(total) {
+	// **SHARED WITH THE CRITICALITY RUN** (Tom, 2026-09-30), which is the same kind of act: a known
+	// number of cases, solved one at a time, stoppable. `opts` names the title, what Stop sets and
+	// the first paint; omitted, it is the fire flow run exactly as it always was.
+	function openFireFlowRunBox(total, opts) {
 		var pc = EngCalcs.pageConfig || {},
+			o = opts || {},
+			title = o.title || pc.lpn_ff_run_title || 'Fire flow run',
+			titleEl = document.getElementById('lpn_ffrun_title'),
 			box = ffRunBoxEl(), host, track, buttons, h, r, top;
 		if (!box) { return; }
 		host = document.getElementById('lpn_ff_run_body');
 		if (!host) { return; }
 		host.innerHTML = '';
+		if (titleEl) { titleEl.textContent = title; }
 		track = ffEl('div', 'lpn-ff-bar', null, host);
 		track.setAttribute('role', 'progressbar');
 		track.setAttribute('aria-valuemin', '0');
 		track.setAttribute('aria-valuemax', String(total));
-		track.setAttribute('aria-label', pc.lpn_ff_run_title || 'Fire flow run');
+		track.setAttribute('aria-label', title);
 		ffRunUi = {
 			total: total,
 			track: track,
@@ -56147,8 +56166,9 @@ var EngCalcs = EngCalcs || {};
 		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
 		ffRunUi.stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', buttons);
 		ffRunUi.stop.type = 'button';
-		ffRunUi.stop.addEventListener('click', function () { fireFlowStop = true; });
-		updateFireFlowRunBox(0, { pass: 0, fail: 0, design: 0, error: 0 }, { fire: 0, design: 0, clean: 0 });
+		ffRunUi.stop.addEventListener('click', o.onStop || function () { fireFlowStop = true; });
+		if (o.update) { o.update(0); }
+		else { updateFireFlowRunBox(0, { pass: 0, fail: 0, design: 0, error: 0 }, { fire: 0, design: 0, clean: 0 }); }
 		box.style.display = 'block';
 		// **RAISED HERE, AT OPEN, AND NOT WHERE IT IS WIRED** (Tom, 2026-09-02: *"Run box: still
 		// invisible"*, twice). The first attempt raised it inside wireFireFlowBox(), which runs once
@@ -56401,6 +56421,277 @@ var EngCalcs = EngCalcs || {};
 		// aside is one they cannot see the map through.
 		run = document.getElementById('lpn_ff_run_box');
 		if (run) { makePanelDraggable(run, null); }
+	}
+
+	// ================================================================================================
+	// CRITICALITY ANALYSIS -- break each asset in turn and report what the system loses
+	// ================================================================================================
+	//
+	// Tom, 2026-09-30, reading about WaterGEMS: *"Criticality analysis: This sounds like a fun report
+	// to build. Break each asset and report."* The arithmetic is js/lpn-criticality.js. What is here
+	// is fire flow's sibling, on fire flow's own parts: the same box shell, the same scope idiom (All
+	// or Selected, picked before the run), the same run dialog with its bar and Stop, the same table
+	// with its go-to links, the same engine choice, and the same time step -- assembleModel() plus
+	// fireFlowAtFrame(), so what is broken is the network on screen.
+	//
+	// **THE MINIMUM PRESSURE IS FIRE FLOW'S "LOWEST PRESSURE ALLOWED ELSEWHERE", NOT A SECOND ONE.**
+	// Two boxes holding one fact about the utility would disagree the first time somebody edited one
+	// (the scenario comparison declined a threshold of its own for the same reason). The box here
+	// edits `fireFlowAsk.minPressure` itself, and its tip says so.
+	//
+	// **NO BOX MEMORY ACROSS PAGE LOADS YET.** The report boxes remember where they were left in
+	// localStorage; this one remembers only until the page is reloaded, so this feature stores
+	// nothing on a visitor's device. Adding the memory is a new `lpn_critbox` key and a line in
+	// dev/cookie-storage-inventory.md.
+	var critAsk = { scope: 'all' };
+	var critRun = null;
+	var critBusy = false;
+	var critStop = false;
+	var critSortState = { col: null, dir: 1 };
+	function critBoxEl() { return document.getElementById('lpn_crit_box'); }
+	function critBoxIsOpen() {
+		var box = critBoxEl();
+		return !!box && box.style.display !== 'none';
+	}
+	// The shared criterion, created on first use exactly as opening the fire flow box creates it.
+	function critFireFlowAsk() {
+		if (!fireFlowAsk && EngCalcs.lpnFireFlowDefaults) { fireFlowAsk = fireFlowDefaults(); }
+		return fireFlowAsk || { minPressure: '' };
+	}
+	function buildCriticalityControls() {
+		var pc = EngCalcs.pageConfig || {},
+			host = document.getElementById('lpn_crit_controls'),
+			scope, minP, buttons, run, stop, engine;
+		if (!host) { return; }
+		host.innerHTML = '';
+		ffEl('p', 'lpn-ff-note', pc.lpn_crit_intro, host);
+		scope = ffSelect([
+			['all', pc.lpn_crit_scope_all || 'All pipes'],
+			['selected', pc.lpn_crit_scope_selected || 'Selected']
+		], critAsk.scope);
+		scope.addEventListener('change', function () { critAsk.scope = scope.value; });
+		ffRow(host, pc.lpn_crit_scope || 'Assets to break', pc.lpn_crit_scope_tip, scope, '');
+		minP = ffInput(critFireFlowAsk().minPressure);
+		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
+		ffRow(host, pc.lpn_crit_minpressure || 'Lowest pressure allowed', pc.lpn_crit_minpressure_tip,
+			minP, unitLabel('lpn_u_pressure'));
+		engine = engineFor(assembleModel());
+		ffEl('p', 'lpn-ff-note', engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native, host);
+		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
+		run = ffEl('button', 'lpn-ff-run', pc.lpn_ff_calculate || 'Run', buttons);
+		run.type = 'button';
+		run.disabled = critBusy;
+		run.addEventListener('click', function () {
+			critAsk.scope = scope.value;
+			critFireFlowAsk().minPressure = minP.value;
+			runCriticality();
+		});
+		stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', buttons);
+		stop.type = 'button';
+		stop.disabled = !critBusy;
+		stop.addEventListener('click', function () { critStop = true; });
+		initTipsIn(host);
+	}
+	// A list of junction ids as go-to links: the first few, then how many more. The count is the
+	// cell's number; the links are where the reader goes next.
+	var CRIT_MAX_IDS = 5;
+	function critIdsCell(tr, ids) {
+		var pc = EngCalcs.pageConfig || {}, td = ffCell(tr, String(ids.length) + (ids.length ? ': ' : ''));
+		ids.slice(0, CRIT_MAX_IDS).forEach(function (id, i) {
+			if (i) { td.appendChild(document.createTextNode(', ')); }
+			ffGotoLink(td, 'node', id, labelPrefixFor('node', 'id') + id);
+		});
+		if (ids.length > CRIT_MAX_IDS) {
+			td.appendChild(document.createTextNode(' ' + (pc.lpn_ff_more || 'and {n} more affected')
+				.replace('{n}', String(ids.length - CRIT_MAX_IDS))));
+		}
+		return td;
+	}
+	function critSortKey(rec, col) {
+		switch (col) {
+		case 0: return rec.id;
+		case 1: return rec.unserved;
+		case 2: return rec.cutOff ? rec.cutOff.length : undefined;
+		case 3: return rec.below ? rec.below.length : undefined;
+		}
+		return undefined;
+	}
+	function critSorted(results) {
+		var base = EngCalcs.lpnCriticalityOrder(results), col = critSortState.col, dir = critSortState.dir;
+		if (col === null) { return base; }
+		return base.map(function (r, i) { return { r: r, i: i, k: critSortKey(r, col) }; }).sort(function (a, b) {
+			var ab = ffBlank(a.k), bb = ffBlank(b.k), c;
+			if (ab || bb) { return ab === bb ? a.i - b.i : (ab ? 1 : -1); }
+			c = (typeof a.k === 'number' && typeof b.k === 'number') ? a.k - b.k
+				: String(a.k).localeCompare(String(b.k), undefined, { numeric: true });
+			return c ? dir * c : a.i - b.i;
+		}).map(function (x) { return x.r; });
+	}
+	function critSortBy(col) {
+		critSortState = { col: col, dir: critSortState.col === col ? -critSortState.dir : 1 };
+		rebuildCriticalityReport();
+	}
+	function rebuildCriticalityReport() {
+		var pc = EngCalcs.pageConfig || {},
+			host = document.getElementById('lpn_crit_report'),
+			set = critRun, body, sorted, shown, hit;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (!set) { return; }
+		if (set.stopped) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_stopped || 'Stopped after {done} of {total} assets. The results below are the ones already finished.')
+				.replace('{done}', String(set.results.length)).replace('{total}', String(set.requested)), host);
+		}
+		hit = set.results.filter(function (r) { return r.state === EngCalcs.lpnCriticalityStates.IMPACT; }).length;
+		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || '{n} of {total} assets cut off demand or drop a junction below {pressure}.')
+			.replace('{n}', String(hit)).replace('{total}', String(set.results.length))
+			.replace('{pressure}', ffQty(set.minPressure, 'lpn_u_pressure')), host);
+		if (set.baselineBelow) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_baseline_below || 'Junctions already below it with nothing broken: {n}. They are not counted.')
+				.replace('{n}', String(set.baselineBelow)), host);
+		}
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
+			.replace('{solves}', String(set.solves)), host);
+		sorted = critSorted(set.results);
+		shown = sorted.slice(0, FF_MAX_ROWS);
+		body = ffTable(host, [
+			pc.lpn_crit_col_asset || 'Asset',
+			pc.lpn_crit_col_unserved || 'Demand not served',
+			pc.lpn_crit_col_cutoff || 'Junctions cut off',
+			pc.lpn_crit_col_below || 'Junctions below minimum'
+		], { state: critSortState, by: critSortBy });
+		shown.forEach(function (rec) {
+			var tr = ffEl('tr', 'lpn-crit-' + rec.state, null, body);
+			ffGotoLink(ffCell(tr, ''), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
+			ffCell(tr, typeof rec.unserved === 'number' ? ffQty(rec.unserved, 'lpn_u_flow') : FF_DASH);
+			if (rec.cutOff) { critIdsCell(tr, rec.cutOff); } else { ffCell(tr, FF_DASH); }
+			// **A CASE THAT DID NOT SOLVE IS A ROW SAYING SO, NEVER AN ABORT.** What was cut off is
+			// known without a solve and is still printed; only the pressures are missing, so the
+			// reason stands in the pressure column.
+			if (rec.below) { critIdsCell(tr, rec.below.map(function (b) { return b.id; })); }
+			else { ffCell(tr, ffReasonText(rec)); }
+		});
+		ffMoreLine(host, sorted.length - shown.length);
+	}
+	function updateCriticalityRunBox(done) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!ffRunUi) { return; }
+		ffRunUi.fill.style.width = (ffRunUi.total > 0 ? Math.round(1000 * done / ffRunUi.total) / 10 : 0) + '%';
+		ffRunUi.track.setAttribute('aria-valuenow', String(done));
+		ffRunUi.count.textContent = (pc.lpn_crit_working || 'Working: {done} of {total} assets.')
+			.replace('{done}', String(done)).replace('{total}', String(ffRunUi.total));
+	}
+	// The links to break. All: every pipe in the model this run solves, so an inactive one (which is
+	// already out) is not broken twice. Selected: every selected link -- a pump or a valve can be
+	// critical too -- and whatever else is selected is counted and said, not swallowed.
+	function criticalityLinks(model) {
+		var inModel = {}, ids = [], skipped = 0;
+		model.links.forEach(function (l) { inModel[l.id] = l; });
+		if (critAsk.scope !== 'selected') {
+			return { ids: model.links.filter(function (l) { return l.type === 'pipe'; }).map(function (l) { return l.id; }), skipped: 0 };
+		}
+		selections.forEach(function (s) {
+			if (s.kind === 'link' && inModel[s.id] && ids.indexOf(s.id) < 0) { ids.push(s.id); } else { skipped++; }
+		});
+		return { ids: ids, skipped: skipped };
+	}
+	function runCriticality() {
+		var pc = EngCalcs.pageConfig || {}, model, engine, pick, minPressure, before;
+		if (critBusy || !EngCalcs.lpnCriticalitySweep) { return Promise.resolve(null); }
+		model = assembleModel();
+		fireFlowAtFrame(model);
+		pick = criticalityLinks(model);
+		if (!pick.ids.length) {
+			setNotice(critAsk.scope === 'selected'
+				? (pc.lpn_crit_no_selection || 'No pipe, pump or valve is selected. Choose one on the map, or break all pipes.')
+				: (pc.lpn_crit_no_pipes || 'This project has no pipes yet, so there is nothing to break.'));
+			return Promise.resolve(null);
+		}
+		minPressure = ffValue(critFireFlowAsk().minPressure, 'lpn_u_pressure');
+		engine = engineFor(model);
+		before = JSON.stringify(doc);
+		critBusy = true;
+		critStop = false;
+		critRun = null;
+		rebuildCriticalityReport();
+		buildCriticalityControls();
+		openFireFlowRunBox(pick.ids.length, {
+			title: pc.lpn_crit_title || 'Criticality analysis',
+			onStop: function () { critStop = true; },
+			update: updateCriticalityRunBox
+		});
+		if (pick.skipped) {
+			setNotice((pc.lpn_crit_skipped || '{n} selected elements are not links, so they were not broken.')
+				.replace('{n}', String(pick.skipped)));
+		}
+		return EngCalcs.lpnCriticalitySweep(model, {
+			solve: engine.solve,
+			links: pick.ids,
+			minPressure: minPressure > 0 ? minPressure : 0,
+			onProgress: function (p) { updateCriticalityRunBox(p.done); },
+			shouldStop: function () { return critStop; }
+		}).then(function (set) {
+			critBusy = false;
+			closeFireFlowRunBox();
+			critDocGuard = (JSON.stringify(doc) === before);
+			if (!set.ok) {
+				critRun = null;
+				setNotice(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
+			} else {
+				critRun = set;
+			}
+			rebuildCriticalityReport();
+			buildCriticalityControls();
+			return set;
+		}, function (err) {
+			critBusy = false;
+			closeFireFlowRunBox();
+			buildCriticalityControls();
+			setNotice(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
+			if (window.console && console.warn) { console.warn('criticality run failed:', err); }
+			return null;
+		});
+	}
+	// Read by the harness. Set by the run, never by a user action.
+	var critDocGuard = true;
+	// **A RESULT SET DESCRIBES THE NETWORK IT WAS RUN ON**, so it is cleared through the same door
+	// fire flow's results are, at the same moments (clearFireFlowRun() calls this first).
+	function clearCriticalityRun(quiet) {
+		if (!critRun) { return; }
+		critRun = null;
+		if (critBoxIsOpen()) { rebuildCriticalityReport(); }
+		if (!quiet) {
+			setNotice((EngCalcs.pageConfig || {}).lpn_crit_stale ||
+				'The drawing changed, so the criticality results were cleared. Run it again.');
+		}
+	}
+	var critLayout = newBoxLayout();
+	function openCriticalityBox() {
+		var box = critBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		buildCriticalityControls();
+		rebuildCriticalityReport();
+		// Centred the first time, then where it was left -- for this page load only (see above).
+		placePanelForScreen(box, function () { placeBoxRemembered(box, critLayout); });
+		initTipsIn(box);
+	}
+	function closeCriticalityBox() {
+		hidePanel(critBoxEl());
+		if (critBusy) { critStop = true; }
+	}
+	function wireCriticalityBox() {
+		var box = critBoxEl(), x = document.getElementById('lpn_crit_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeCriticalityBox); }
+		makePanelDraggable(box, function (pos) {
+			if (smallScreen()) { return; }
+			critLayout.left = pos.left;
+			critLayout.top = pos.top;
+		});
+		addPanelResizeGrip(box);
 	}
 
 	// ================================================================================================

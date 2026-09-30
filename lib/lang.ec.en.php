@@ -4067,6 +4067,36 @@ $ec_lang['lpn_ff_err_solve']='The solver reported an error and gave no answer.';
 $ec_lang['lpn_ff_err_not_junction']='Not a junction';
 $ec_lang['lpn_ff_err_unknown']='No answer. The code reported was {code}.';
 
+// ---- Water > Criticality analysis (Tom, 2026-09-30) -------------------------------------------
+//
+// Break each asset in turn, on a copy, and report what the system loses. "Criticality analysis" is
+// the industry's term (WaterGEMS, InfoWater); EPANET has no such tool and no word for it. The run
+// dialog, Run, Stop, the engine sentence and the cost line are fire flow's own keys.
+//
+// {n}, {done} and {total} are whole numbers; {pressure} is a pressure with its unit.
+$ec_lang['lpn_crit_menu']='Criticality analysis…';
+$ec_lang['lpn_crit_menu_tip']='Take each pipe out of the network in turn and see what the system loses.';
+$ec_lang['lpn_crit_title']='Criticality analysis';
+$ec_lang['lpn_crit_intro']='Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in your project is changed; the whole run is made on a copy.';
+$ec_lang['lpn_crit_scope']='Assets to break';
+$ec_lang['lpn_crit_scope_tip']='All pipes, or only the pipes, pumps and valves selected on the map.';
+$ec_lang['lpn_crit_scope_all']='All pipes';
+$ec_lang['lpn_crit_scope_selected']='Selected';
+$ec_lang['lpn_crit_minpressure']='Lowest pressure allowed';
+$ec_lang['lpn_crit_minpressure_tip']='This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.';
+$ec_lang['lpn_crit_col_asset']='Asset';
+$ec_lang['lpn_crit_col_unserved']='Demand not served';
+$ec_lang['lpn_crit_col_cutoff']='Junctions cut off';
+$ec_lang['lpn_crit_col_below']='Junctions below minimum';
+$ec_lang['lpn_crit_summary']='{n} of {total} assets cut off demand or drop a junction below {pressure}.';
+$ec_lang['lpn_crit_baseline_below']='Junctions already below it with nothing broken: {n}. They are not counted.';
+$ec_lang['lpn_crit_working']='Working: {done} of {total} assets.';
+$ec_lang['lpn_crit_stopped']='Stopped after {done} of {total} assets. The results below are the ones already finished.';
+$ec_lang['lpn_crit_no_selection']='No pipe, pump or valve is selected. Choose one on the map, or break all pipes.';
+$ec_lang['lpn_crit_no_pipes']='This project has no pipes yet, so there is nothing to break.';
+$ec_lang['lpn_crit_skipped']='{n} selected elements are not links, so they were not broken.';
+$ec_lang['lpn_crit_stale']='The drawing changed, so the criticality results were cleared. Run it again.';
+
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //
 // A field survey produces a flat list of a name, a latitude and a longitude -- never an EPANET

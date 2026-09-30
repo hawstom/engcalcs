@@ -1325,6 +1325,18 @@ echoHeader("EngCalcsApp", $html_title, "", false);
    what the Stop button already says in words, and two controls for one act is how a user learns to
    distrust both. It sits above the fire flow box (z-index 23 against 22) because it is the modal
    half of the same act, and its body is built by openFireFlowRunBox(). */ ?>
+<?php // CRITICALITY ANALYSIS (Tom, 2026-09-30): break each asset in turn and report what the system
+      // loses. Fire flow's sibling, on the same box shell; the controls and the report are built in
+      // JS (buildCriticalityControls, rebuildCriticalityReport). Its progress uses fire flow's run
+      // dialog below, retitled for the run. ?>
+<div id="lpn_crit_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_critbox_title">
+	<div id="lpn_critbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_crit_title']?></div>
+	<button type="button" id="lpn_crit_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_crit_controls" class="lpn-ff-controls"></div>
+		<div id="lpn_crit_report" class="lpn-ff-report"></div>
+	</div>
+</div>
 <?php // THE PUMP ENERGY REPORT (ROADMAP Task 566). What each pump ran, what it drew and what it
       // cost: the one answer on this page that is money. It borrows the fire flow box's whole
       // shell -- the drag band, the resize grip, the scrolling body -- so this page has one set of
@@ -2849,6 +2861,29 @@ EngCalcs.pageConfig = {
 	lpn_ff_stopped: <?=json_encode($ec_lang['lpn_ff_stopped'])?>,
 	lpn_ff_cost: <?=json_encode($ec_lang['lpn_ff_cost'])?>,
 	lpn_ff_stale: <?=json_encode($ec_lang['lpn_ff_stale'])?>,
+	<?php // Criticality analysis (Tom, 2026-09-30). ?>
+	lpn_crit_menu: <?=json_encode($ec_lang['lpn_crit_menu'])?>,
+	lpn_crit_menu_tip: <?=json_encode($ec_lang['lpn_crit_menu_tip'])?>,
+	lpn_crit_title: <?=json_encode($ec_lang['lpn_crit_title'])?>,
+	lpn_crit_intro: <?=json_encode($ec_lang['lpn_crit_intro'])?>,
+	lpn_crit_scope: <?=json_encode($ec_lang['lpn_crit_scope'])?>,
+	lpn_crit_scope_tip: <?=json_encode($ec_lang['lpn_crit_scope_tip'])?>,
+	lpn_crit_scope_all: <?=json_encode($ec_lang['lpn_crit_scope_all'])?>,
+	lpn_crit_scope_selected: <?=json_encode($ec_lang['lpn_crit_scope_selected'])?>,
+	lpn_crit_minpressure: <?=json_encode($ec_lang['lpn_crit_minpressure'])?>,
+	lpn_crit_minpressure_tip: <?=json_encode($ec_lang['lpn_crit_minpressure_tip'])?>,
+	lpn_crit_col_asset: <?=json_encode($ec_lang['lpn_crit_col_asset'])?>,
+	lpn_crit_col_unserved: <?=json_encode($ec_lang['lpn_crit_col_unserved'])?>,
+	lpn_crit_col_cutoff: <?=json_encode($ec_lang['lpn_crit_col_cutoff'])?>,
+	lpn_crit_col_below: <?=json_encode($ec_lang['lpn_crit_col_below'])?>,
+	lpn_crit_summary: <?=json_encode($ec_lang['lpn_crit_summary'])?>,
+	lpn_crit_baseline_below: <?=json_encode($ec_lang['lpn_crit_baseline_below'])?>,
+	lpn_crit_working: <?=json_encode($ec_lang['lpn_crit_working'])?>,
+	lpn_crit_stopped: <?=json_encode($ec_lang['lpn_crit_stopped'])?>,
+	lpn_crit_no_selection: <?=json_encode($ec_lang['lpn_crit_no_selection'])?>,
+	lpn_crit_no_pipes: <?=json_encode($ec_lang['lpn_crit_no_pipes'])?>,
+	lpn_crit_skipped: <?=json_encode($ec_lang['lpn_crit_skipped'])?>,
+	lpn_crit_stale: <?=json_encode($ec_lang['lpn_crit_stale'])?>,
 	lpn_ff_summary: <?=json_encode($ec_lang['lpn_ff_summary'])?>,
 	lpn_ff_summary_error: <?=json_encode($ec_lang['lpn_ff_summary_error'])?>,
 	lpn_ff_report_all: <?=json_encode($ec_lang['lpn_ff_report_all'])?>,
@@ -3477,6 +3512,9 @@ EngCalcs.pageConfig = {
       // tag, and BEFORE looped-network.js, which reads EngCalcs.lpnFireFlowDefaults when the box
       // is opened. ?>
 <script src="/engcalcs/js/lpn-fireflow.js?v=<?=filemtime(__DIR__.'/js/lpn-fireflow.js')?>"></script>
+<?php // Criticality analysis (Tom, 2026-09-30). Pure arithmetic like the fire flow sweep, and BEFORE
+      // looped-network.js for the same reason; absent, the Run button does nothing. ?>
+<script src="/engcalcs/js/lpn-criticality.js?v=<?=filemtime(__DIR__.'/js/lpn-criticality.js')?>"></script>
 <?php // Reading a surveyed point list from a text file (ROADMAP Task 592). Pure parsing and column
       // mapping, no DOM, and no request of any kind. BEFORE looped-network.js, which calls
       // EngCalcs.lpnSurveyParse() when somebody picks a file; absent, the button reports that the
