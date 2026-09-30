@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 2135 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 0 untranslated keys, of 2166 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -31,7 +31,7 @@ None on master. Every English key here is present in at least one other language
 
 # Strings waiting on a branch
 
-**56 still to read**, of 59 new keys across 18 unmerged branch(es).
+**54 still to read**, of 57 new keys across 19 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -42,11 +42,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### chore/gemini-0930 (`13ca7fae`) — adds no English strings
+
 ### chore/key-merge (`c4482083`) — adds no English strings
 
 ### feat/bentley-interop (`8c5cc3a9`) — adds no English strings
 
-### feat/copy-lock (`561e86e4`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/copy-lock (`1d99970f`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_copy_body`**
   > This file was originally created on {date}, but this browser doesn't remember it. Is this the Original file (keep same lock) or a Copy (make new lock)?
@@ -54,14 +56,8 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_copy_body_nodate`**
   > This browser doesn't remember this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
   @@ NEEDS RULING
-- **`lpn_copy_body_tab`**
-  > This file has the same lock as {name}, which is already open here, so it may be a copy of that file made outside this page. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  @@ NEEDS RULING
 - **`lpn_copy_copy`**
   > A copy; make new lock
-  @@ NEEDS RULING
-- **`lpn_copy_kept_link`**
-  > Switched to {name}. It stays connected to the file it was opened from, {file}, and Save writes there, not to the file you just chose.
   @@ NEEDS RULING
 - **`lpn_copy_opened`**
   > Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.
@@ -76,7 +72,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Another browser has a file with this same lock open right now. A file copied outside this page keeps its original's lock.
   @@ NEEDS RULING
 
-### feat/criticality (`315bf427`) — 22 new, 22 to read @@ NEEDS RULING
+### feat/criticality (`31e545ca`) — 22 new, 22 to read @@ NEEDS RULING
 
 - **`lpn_crit_baseline_below`**
   > Junctions already below it with nothing broken: {n}. They are not counted.

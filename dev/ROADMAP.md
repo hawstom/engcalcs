@@ -327,6 +327,14 @@ the block.
   to pay the privacy line if we get value."* His prompt instead: on open, when the server holds a lock
   this browser does not remember, ask *"Is this the Original file (keep same lock) or a Copy (make
   new lock)?"* Building on `feat/copy-lock`.
+- 100|750| **Ready-made scenarios in every new project.**
+  Tom, 2026-09-30: *"could we provide some pre-packaged Scenarios in all new projects? ... '1. Flow
+  test: Static, 2. Flow test: Mid, 3. Flow test: Max, 4. Average Day, 5. Max Day, 6. Peak hour,
+  7. Fire plus max day'"*. Building on `feat/scenario-preset`; flows for the flow tests are not guessed.
+- 100|751| **Criticality analysis: break each asset in turn and report.**
+  Tom, 2026-09-30, on WaterGEMS's Criticality tool: *"This sounds like a fun report to build. Break
+  each asset and report."* Fire flow's sibling: scope All/Selected, each pipe out of the network on
+  a copy, report cut-off junctions, low pressures and demand not served. Building on `feat/criticality`.
 - 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
@@ -524,7 +532,31 @@ the block.
   Tom, 2026-09-30: *"We can see how far we get reading and writing the Bentley .sqlite file also."*
   Phase 1 (`feat/bentley-interop`, `dev/bentley-interop.md`): the `.wtg.sqlite` schema is unpublished,
   no public sample exists, the EULA's reverse-engineering clause is his to read; writing is a no-go.
-  Next: he exports one of his own WaterCAD models to `.inp` and we report what the round trip loses.
+  **THE REAL DIFFICULTY IS THE MODEL, NOT THE FILE** (Tom, 2026-09-30): *"The difficulty is in
+  providing/forcing inheritance and alternatives on the user. ... it's a huge burden on the user unless
+  we succeed in hiding it from 'basic mode' users."* A faithful reader needs a scenario tree and an
+  alternatives layer we do not have; flattening one loses what makes it Bentley's (Task 721).
+  **Tom has no WaterCAD** (last used 1997; a friend might help), so the deciding test -- a small
+  model with a child scenario saved as `.sqlite` and as `.inp` -- waits on finding one.
+- 75|752| **A scenario workbook: the scenario list and its data as spreadsheet tabs.**
+  Tom, 2026-09-30, on Gemini's master-spreadsheet layout (a Scenarios tab naming each scenario's
+  alternatives, then one tab per data kind keyed by element ID): *"Spreadsheet structure: I love
+  this."* and *"Sync in/out: Could we do this with GSheets?"* Export/import as a file first (no
+  account, no upload); a Google Sheets sync is a fifth third-party service, so a `privacy.php`
+  paragraph and his call. Mary, Sue and Declan's readings are under Task 721. The layout assumes
+  Bentley's model (a scenario tree, alternatives beneath); ours is flat, so the tabs need rethinking.
+- 75|753| **[H] · "Activation" as our word for EPANET's active status.**
+  Tom, 2026-09-30, on Bentley's "Active Topology": *"I like the alias 'Activation' or 'Asset
+  activation'."* We already have it: the Properties checkbox `lpn_field_active`, "Part of this
+  network", scenario-overridable. **But not the same thing** (Tom, 2026-09-30): ours is a flat
+  per-scenario override; Bentley's Active Topology is an alternative in a scenario TREE, with
+  alternatives as a layer beneath scenarios. His call: which strings change, and to what.
+- 75|754| **On-the-fly demand adjustment: an analysis that scales demands on a copy.**
+  Tom, 2026-09-30, on WaterGEMS's Active Demand Adjustments: *"This also sounds fun and easy to
+  provide."* Then: *"Their Criticality and 'On-the-fly' are like our 'Fire flow' analysis; they do not
+  touch the network. As such, our demand factors are similar and equivalent, but not the same UX or
+  data state."* Our per-scenario multiplier changes the data; this runs on a copy, like Fire flow.
+  Open: what it reports (a map of the adjusted run, or a table like Fire flow's).
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -1087,6 +1119,10 @@ the block.
   they found keeps scenarios in a live spreadsheet; a sync breaks "nothing you draw is uploaded";
   topology does not fit rows. Cheaper: CSV/xlsx import-export of override tables, and an "Apply
   scenario X to this one" command. Scenario lists sort by name since `fix/scenario-sort`.
+  **Ours is flat; Bentley's is a tree with alternatives beneath** (Tom, 2026-09-30): every scenario,
+  not just Base, can have children, and each scenario picks one alternative per category.
+  Adopting that model is the price of Bentley interop (Task 749), and a burden unless a basic mode
+  hides it.
 - 50|722| **Change and revision tracking.**
   Tom, 2026-09-25, from WaterCAD: *"I like change/revision tracking very cool."*
 - 50|725| **One wide fire-flow table instead of two reports.**

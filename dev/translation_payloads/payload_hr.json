@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "hr",
-        "expected_key_count": 2166,
+        "expected_key_count": 2135,
         "delta_key_count": 0,
-        "exempt_key_count": 36,
+        "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
             "calc_units_us",
@@ -25,7 +25,6 @@
             "lpn_ex_net3_world_title",
             "lpn_ex_elm_street_title",
             "lpn_result_status",
-            "lpn_color_example_status",
             "lpn_field_x",
             "lpn_field_y",
             "lpn_field_id",

@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 2166,
+        "expected_key_count": 2135,
         "delta_key_count": 0,
-        "exempt_key_count": 48,
+        "exempt_key_count": 47,
         "exempt_keys": [
             "u_imgd",
             "calc_units_us",
@@ -30,7 +30,6 @@
             "lpn_field_diameter",
             "lpn_result_status",
             "lpn_menu_edit",
-            "lpn_color_example_status",
             "lpn_color_example_material",
             "lpn_dialog_ok",
             "lpn_valve_type_tcv",
@@ -54,7 +53,7 @@
             "lpn_library_curve_y",
             "lpn_library_import_count"
         ],
-        "out_of_scope_key_count": 14,
+        "out_of_scope_key_count": 13,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [],
         "requested_prefix": null,

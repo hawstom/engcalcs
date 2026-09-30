@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 2166,
+        "expected_key_count": 2135,
         "delta_key_count": 1,
-        "exempt_key_count": 51,
+        "exempt_key_count": 50,
         "exempt_keys": [
             "u_imgd",
             "calc_units_us",
@@ -32,7 +32,6 @@
             "lpn_result_status",
             "lpn_xymap",
             "lpn_tip_join",
-            "lpn_color_example_status",
             "lpn_color_example_material",
             "lpn_dialog_ok",
             "lpn_field_x",
