@@ -4435,7 +4435,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return [
 			['allow', pc.lpn_cp_restrict_allow || 'Allow only these characters'],
-			['deny', pc.lpn_cp_restrict_deny || 'Restrict these characters']
+			['deny', pc.lpn_cp_restrict || 'Restrict these characters']
 		];
 	}
 	function customPropOptionLabel(opts, value, fallback) {
@@ -8058,7 +8058,7 @@ var EngCalcs = EngCalcs || {};
 			stddev: pc.lpn_color_mode_stddev,
 			pretty: pc.lpn_color_mode_pretty,
 			log: pc.lpn_color_mode_log,
-			pressure: pc.lpn_color_mode_pressure,
+			pressure: pc.lpn_result_pressure,
 			manual: pc.lpn_color_mode_manual
 		};
 		return names[m.key] || m.name;
@@ -17630,13 +17630,27 @@ var EngCalcs = EngCalcs || {};
 		}
 		return 'ok';
 	}
+	// **ONE KEY PER CONDITION, CAPITALIZED HERE** (Task 699, Tom 2026-09-30: "do the Find
+	// redesign"). A result row used to read a second key per condition that differed from the
+	// pull-down's only in its first letter, so every language translated each phrase twice and the
+	// two could drift. The row now prints the pull-down's own words with the first letter raised.
+	// Raising is the safe direction: lowering would be wrong in a language that capitalizes nouns.
+	// The locale is the page's own `<html lang>`, as the Find collator reads it, so a Turkish i
+	// becomes a dotted capital.
+	function findConnCapitalize(s) {
+		var lang = (document.documentElement && document.documentElement.lang) || undefined, first;
+		s = String(s || '');
+		if (!s) { return s; }
+		first = s.charAt(0);
+		try { first = first.toLocaleUpperCase(lang); } catch (e) { first = first.toUpperCase(); }
+		return first + s.slice(1);
+	}
 	function findConnLabel(st) {
-		var pc = EngCalcs.pageConfig || {};
-		if (st === 'conn-unlinked') { return pc.lpn_find_conn_unlinked || 'No links at node'; }
-		if (st === 'conn-noopen') { return pc.lpn_find_conn_noopen || 'No open links at node'; }
-		if (st === 'conn-nolinksource') { return pc.lpn_find_conn_nolinksource || 'No link path to a source'; }
-		if (st === 'conn-noopensource') {
-			return pc.lpn_find_conn_noopensource || 'No open path to a source';
+		var i, defs;
+		if (st === 'ok' || FIND_CONN_OPS.indexOf(st) < 0) { return ''; }
+		defs = findConnOpDefs();
+		for (i = 0; i < defs.length; i++) {
+			if (defs[i][0] === st) { return findConnCapitalize(defs[i][1]); }
 		}
 		return '';
 	}
@@ -20960,7 +20974,7 @@ var EngCalcs = EngCalcs || {};
 	function familyExampleWord(pc, key) {
 		var f = FAMILY_EXAMPLE_FIELDS[key];
 		if (f) { return colorFieldLabel(f[0], f[1]); }
-		if (key === 'status') { return pc.lpn_color_example_status || 'Status'; }
+		if (key === 'status') { return pc.lpn_result_status || 'Status'; }
 		if (key === 'material') { return pc.lpn_color_example_material || 'Material'; }
 		return key;
 	}
@@ -29584,7 +29598,7 @@ var EngCalcs = EngCalcs || {};
 		// drawing, so that wording reads as "throw it away" and they will not press the only control
 		// that leaves. Closing never touches a project either way.
 		var blank = elh('button', { type: 'button', 'class': 'lpn-examples-blank' },
-			(galleryForced ? pc.lpn_examples_close : pc.lpn_examples_blank) || '');
+			(galleryForced ? pc.lpn_close : pc.lpn_examples_blank) || '');
 		blank.addEventListener('click', function () { hideExamplesGallery(); });
 		pane.appendChild(blank);
 		var grid = elh('div', { 'class': 'lpn-examples-grid' });
@@ -36165,7 +36179,7 @@ var EngCalcs = EngCalcs || {};
 		x.type = 'button';
 		x.className = 'lpn-tab-x';
 		x.textContent = '×';
-		x.title = pc.lpn_file_close || 'Close';
+		x.title = pc.lpn_close || 'Close';
 		x.addEventListener('click', function (e) { e.stopPropagation(); closeTab(p.id); });
 		tab.appendChild(x);
 		return tab;
@@ -37649,7 +37663,7 @@ var EngCalcs = EngCalcs || {};
 			// forking. It writes nothing, so it is safe in every state.
 			{ icon: 'revert', label: pc.lpn_file_revert || 'Revert', fn: revertCurrent, disabled: !(linked && entry && entry.dirty) },
 			{ separator: true },
-			{ icon: 'close', label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
+			{ icon: 'close', label: pc.lpn_close || 'Close', fn: function () { closeTab(id); } }
 		], recentRows));
 	}
 	// ---- The menu bar (ROADMAP Task 211) ----
@@ -38174,7 +38188,7 @@ var EngCalcs = EngCalcs || {};
 			},
 			{ separator: true },
 			{
-				icon: 'settings', label: pc.lpn_menu_settings || 'Settings',
+				icon: 'settings', label: pc.lpn_tool_settings || 'Settings',
 				tip: pc.lpn_tool_settings_tip,
 				fn: function () { toggleSettingsBox(); }
 			},
@@ -38451,7 +38465,7 @@ var EngCalcs = EngCalcs || {};
 			{ label: pc.lpn_tab_move_left || 'Move left', disabled: idx <= 0, fn: function () { moveTab(id, -1); } },
 			{ label: pc.lpn_tab_move_right || 'Move right', disabled: idx < 0 || idx >= library.projects.length - 1, fn: function () { moveTab(id, 1); } },
 			{ separator: true },
-			{ icon: 'close', label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
+			{ icon: 'close', label: pc.lpn_close || 'Close', fn: function () { closeTab(id); } }
 		]);
 	}
 	function openTabListMenu(anchor) {
@@ -41444,8 +41458,8 @@ var EngCalcs = EngCalcs || {};
 		// the run takes -- the three pairs reorder in Arabic or Hebrew and the dividers stay between
 		// them. That caution IS right for a DIRECTIONAL glyph (an arrow, a guillemet, U+25B8).
 		el.textContent = [
-			(pc.lpn_units_flow || 'Flow') + ': ' + unitLabel('lpn_u_flow'),
-			(pc.lpn_units_pressure || 'Pressure') + ': ' + unitLabel('lpn_u_pressure'),
+			(pc.lpn_result_flow || 'Flow') + ': ' + unitLabel('lpn_u_flow'),
+			(pc.lpn_result_pressure || 'Pressure') + ': ' + unitLabel('lpn_u_pressure'),
 			(pc.bpn_method || 'Friction method') + ': ' + frictionMethodLabel()
 		].join(' | ');
 		refreshCoordsReadout();
@@ -43210,7 +43224,7 @@ var EngCalcs = EngCalcs || {};
 				var rm = document.createElement('button');
 				rm.type = 'button';
 				rm.className = 'lpn-cp-remove';
-				rm.textContent = pc.lpn_cp_remove || 'Remove';
+				rm.textContent = pc.lpn_fitting_remove || 'Remove';
 				helpTip(rm, pc.lpn_cp_remove_tip);
 				rm.addEventListener('click', function (e) {
 					if (e && e.preventDefault) { e.preventDefault(); }
@@ -44128,7 +44142,7 @@ var EngCalcs = EngCalcs || {};
 		// default quoted in the tip is what BLANK would inherit -- inside a scenario that is the
 		// document's own number, not the bare 1, or the tip would state a default the row does not
 		// have.
-		hydNumberRow('demandMultiplier', 'lpn_settings_demand_multiplier', 'Demand multiplier',
+		hydNumberRow('demandMultiplier', 'bpn_demand_mult', 'Demand multiplier',
 			'lpn_settings_demand_multiplier_tip',
 			inBaseScenario() ? 1 : ((settings.hydraulics || {}).demandMultiplier === undefined
 				? 1 : settings.hydraulics.demandMultiplier),
@@ -45949,7 +45963,7 @@ var EngCalcs = EngCalcs || {};
 	// is a sentence about diameters and does not say so.
 	var LIB_IMPORT_UNIT_NAMES = {
 		lpn_u_diameter: 'lpn_field_diameter',
-		lpn_u_flow: 'lpn_units_flow',
+		lpn_u_flow: 'lpn_result_flow',
 		lpn_u_elevhead: 'lpn_units_elevhead'
 	};
 	/**
@@ -46471,7 +46485,7 @@ var EngCalcs = EngCalcs || {};
 				['none', pc.lpn_quality_none || 'Nothing'],
 				['chemical', pc.lpn_quality_chemical || 'A reactive chemical'],
 				['trace', pc.lpn_quality_trace || 'Source trace'],
-				['age', pc.lpn_quality_age || 'Water age']
+				['age', pc.lpn_result_water_age || 'Water age']
 			];
 		opts.forEach(function (o) {
 			var opt = document.createElement('option');
@@ -48273,7 +48287,7 @@ var EngCalcs = EngCalcs || {};
 				verdict.textContent = read.ok
 					? (pc.lpn_library_rule_ok || '✓ This rule was read')
 					: read.missing
-						? (pc.lpn_library_rule_missing || '⚠ This network has nothing called {id}').replace('{id}', read.missing)
+						? (pc.lpn_library_control_missing || '⚠ This network has nothing called {id}').replace('{id}', read.missing)
 						: (pc.lpn_library_rule_bad || '⚠ This rule could not be read');
 			}
 			showVerdict(libReadRule(box.value));
@@ -55886,8 +55900,8 @@ var EngCalcs = EngCalcs || {};
 		if (!rec.effects) { return pc.lpn_ff_not_checked || 'Not checked'; }
 		n = rec.effects.nodes.length; l = rec.effects.links.length;
 		if (n && l) { return pc.lpn_ff_limit_both || 'Pressure and velocity'; }
-		if (n) { return pc.lpn_ff_limit_pressure || 'Pressure'; }
-		if (l) { return pc.lpn_ff_limit_velocity || 'Velocity'; }
+		if (n) { return pc.lpn_result_pressure || 'Pressure'; }
+		if (l) { return pc.lpn_result_velocity || 'Velocity'; }
 		return FF_DASH;
 	}
 	function ffCell(row, text, cls) {
@@ -56742,7 +56756,7 @@ var EngCalcs = EngCalcs || {};
 		body = ffTable(host, [
 			pc.lpn_scenario_label || 'Scenario',
 			pc.lpn_scenario_overrides || 'No. of custom values',
-			pc.lpn_scncmp_col_minpressure || 'Lowest pressure',
+			pc.bpn_p_min || 'Lowest pressure',
 			pc.lpn_scncmp_col_maxvelocity || 'Highest velocity'
 		]);
 		scenarioCompareRun.forEach(function (r) {
@@ -57112,7 +57126,7 @@ var EngCalcs = EngCalcs || {};
 			ffEl('p', 'lpn-ff-note', pc.lpn_status_empty || 'Nothing changed status during this run.', host);
 			return;
 		}
-		body = ffTable(host, [pc.lpn_status_col_time || 'Time', pc.lpn_status_col_event || 'Event']);
+		body = ffTable(host, [pc.lpn_full_col_time || 'Time', pc.lpn_status_col_event || 'Event']);
 		events.forEach(function (e) {
 			var tr = ffEl('tr', null, null, body);
 			ffCell(tr, EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(e.t) : String(e.t));

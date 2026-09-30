@@ -917,7 +917,7 @@ console.log('\n--- Settings panel stays in sync ---');
   ok('...divided by a pipe, not run together by whitespace',
     usText.split(' | ').length === 3, usText);
   ok('...each behind a translated label, not a bare token',
-    usText.indexOf(PC.lpn_units_flow) >= 0 && usText.indexOf(PC.lpn_units_pressure) >= 0 &&
+    usText.indexOf(PC.lpn_result_flow) >= 0 && usText.indexOf(PC.lpn_result_pressure) >= 0 &&
     usText.indexOf(PC.bpn_method) >= 0, usText);
 
   // It has to FOLLOW the units, or it is worse than nothing -- a stale readout is a confident lie.
