@@ -289,6 +289,10 @@ EngCalcs.dataStringToCookieValue = function () {
 	this.columnCounter = 1;
 	if (this.cookieValue) {
 		cookieVars = this.cookieValue.split(',');
+		// Strip a leading "v<N>" format-version token before re-reading it below: this describes
+		// the SINGLETON layout, not the row data being replaced, so it is stamped fresh afterwards
+		// rather than counted as (or left out of) a singleton slot.
+		if (/^v\d+$/.test(cookieVars[0])) { cookieVars.shift(); }
 		this.cookieVarsLength = cookieVars.length;
 		for (i = 0; i < this.cookieVarsLength; i = i + 1) {
 			cookieVarSplit = cookieVars[i].split(':');
@@ -304,7 +308,14 @@ EngCalcs.dataStringToCookieValue = function () {
 				cookieValueTemp.push(cookieVars[i]);
 			}
 		}
-		this.cookieValue = cookieValueTemp.concat(dataTemp).join(',');
+		// Restamp the current format version. WITHOUT THIS, a page whose row layout has its own
+		// migrateCookie() (Manning-Irregular, v2) writes a cookie with no version token here, so
+		// the very next readCookie() finds none, treats it as legacy v1, and silently re-runs
+		// migrateCookie() on a cookie that was never in the old layout -- swapping "is_bank" and
+		// "n" on every row. Tom, 2026-09-30: a single Copy->Paste on the defaults blanked every
+		// "n" value; two Copy->Paste round trips in a row "survived" because the false migration
+		// ran twice and swapped the pair back.
+		this.cookieValue = 'v' + (this.cookieFormatVersion || 1) + ',' + cookieValueTemp.concat(dataTemp).join(',');
 	}
 };
 
