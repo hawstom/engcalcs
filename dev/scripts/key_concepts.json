@@ -1,0 +1,31 @@
+{
+    "meta": {
+        "description": "Which language keys NAME which glossary concept. A key listed here cites the concept id (glossary.json terms[].concept); generate_translation_payloads.php hands the translator that concept's definition as the source for the key, with English as one rendering of it. A key may cite more than one concept. A key also cites a concept through an existing `gloss: <term>` pointer in $ec_lang_syn, so it is not repeated here. Checked by concept_check.php: every key must exist in lib/lang.ec.en.php and every id must exist in glossary.json. Design: dev/term-concepts.md (ROADMAP Task 737)."
+    },
+    "keys": {
+        "lpn_tool_labels": ["sally"],
+        "lpn_labels_heading_node": ["sally"],
+        "lpn_labels_heading_link": ["sally"],
+        "lpn_tool_add_text": ["tessa"],
+        "lpn_new_text": ["tessa"],
+        "lpn_field_tag": ["gus"],
+        "lpn_field_desc": ["dora"],
+        "lpn_field_elev": ["elevation"],
+        "hw_elev_up": ["elevation"],
+        "hw_elev_down": ["elevation"],
+        "mtc_flow_depth": ["depth"],
+        "lpn_field_tank_level": ["depth"],
+        "lpn_result_pressure": ["pressure"],
+        "lpn_units_pressure": ["pressure"],
+        "lpn_color_mode_pressure": ["pressure"],
+        "lpn_result_head": ["hydraulic-head"],
+        "lpn_field_head": ["hydraulic-head"],
+        "lpn_profile_hgl": ["hgl"],
+        "hw_hgl_1": ["hgl"],
+        "hw_hgl_2": ["hgl"],
+        "lpn_units_elevhead": ["elevation", "hydraulic-head"],
+        "lpn_profile_axis_elev": ["elevation", "hydraulic-head"],
+        "mphl_egl_1": ["egl"],
+        "mphl_egl_2": ["egl"]
+    }
+}
