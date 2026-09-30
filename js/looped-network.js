@@ -4581,6 +4581,22 @@ var EngCalcs = EngCalcs || {};
 		// screen comes from the lang file, so a user's data never carries an English word.
 		return s.isBase ? (pc.lpn_scenario_base || 'Base') : (s.name || '');
 	}
+	// **THE ONE SORT, FOR EVERY PLACE THAT LISTS SCENARIOS TO A USER** (Tom, 2026-09-30: "For now,
+	// let's sort it by name."). Base is not a peer of the others and always leads; the rest sort by
+	// display name, natural and case-insensitive so "Scenario 2" precedes "Scenario 10", with the id
+	// as a tiebreaker so two scenarios that render the same name still hold a stable order.
+	//
+	// **A COPY, NEVER THE STORED ARRAY.** `scenarios` is serializeProject()'s own order and a file
+	// round-trips byte-identical; only the reading of it for display is sorted.
+	function scenariosForDisplay() {
+		var base = [], rest = [];
+		scenarios.forEach(function (s) { (s.isBase ? base : rest).push(s); });
+		rest.sort(function (a, b) {
+			var byName = scenarioDisplayName(a).localeCompare(scenarioDisplayName(b), undefined, { numeric: true, sensitivity: 'base' });
+			return byName !== 0 ? byName : (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0));
+		});
+		return base.concat(rest);
+	}
 	function refreshScenarioStatus() {
 		var btn = document.getElementById('lpn_scenario_btn'), pc = EngCalcs.pageConfig || {};
 		if (!btn) { return; }
@@ -4771,7 +4787,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function scenarioMenuRows() {
 		var pc = EngCalcs.pageConfig || {}, rows = [], scn = activeScenario();
-		scenarios.forEach(function (s) {
+		scenariosForDisplay().forEach(function (s) {
 			rows.push({
 				// A tick on the row you are already in, the way every view menu in this file's
 				// neighbourhood marks a current choice. No icon column entry, so the marker cannot
@@ -56270,7 +56286,7 @@ var EngCalcs = EngCalcs || {};
 	function scenarioCompareModels() {
 		var was = project.activeScenario, out = [];
 		try {
-			scenarios.forEach(function (s) {
+			scenariosForDisplay().forEach(function (s) {
 				project.activeScenario = s.id;
 				out.push({ scn: s, model: assembleModel() });
 			});
