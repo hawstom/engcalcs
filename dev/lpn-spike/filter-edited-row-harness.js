@@ -53,6 +53,8 @@ const L = loadLoopedNetwork(
 	"\t\t\tc = d.cols.map(function (x) { return x.key; }).indexOf(key);\n" +
 	"\t\t\tpaneFillHandleMoveToIndex(s, r, c); },\n" +
 	"\t\tdragEnd: function (id, commit) { return paneFillHandleEnd(paneTableById(id), commit); },\n" +
+	"\t\tstaleText: function (n) { return String(EngCalcs.pageConfig.lpn_pane_filter_stale).split('{n}').join(String(n)); },\n" +
+	"\t\tstaleHead: function () { return String(EngCalcs.pageConfig.lpn_pane_filter_stale).split('{n}')[0]; },\n" +
 	"\t\tundo: undo, saveUndoSnapshot: saveUndoSnapshot,\n" +
 	"\t\tdemandText: function (elId) { var s = paneTableById('junctions');\n" +
 	"\t\t\treturn paneCellText(paneColByKey(s, 'demand'), doc.nodes.filter(function (x) { return x.id === elId; })[0]); },\n" +
@@ -124,7 +126,7 @@ report(L.filterQuery('junctions') !== '', 'the Junctions table is filtered', L.f
 report(JSON.stringify(L.tableOrder('junctions')) === JSON.stringify([J4, J5]),
 	'...to the two junctions whose demand is above 2', JSON.stringify(L.tableOrder('junctions')));
 report(!isDimmed(J4) && !hasSign(J4) && !isDimmed(J5), '...and neither is marked');
-report(!/no longer match/.test(L.bannerText('junctions')), '...and the line has no count', L.bannerText('junctions'));
+report(L.bannerText('junctions').indexOf(L.staleHead()) < 0, '...and the line has no count', L.bannerText('junctions'));
 
 console.log('\n--- 1. edit a matching row so it no longer matches ---');
 typeInCell(J4, 'demand', 1);
@@ -133,7 +135,7 @@ report(L.tableOrder('junctions').indexOf(J4) >= 0, 'the row STAYS in the table',
 report(isDimmed(J4), '...dimmed');
 report(hasSign(J4), '...with the warning sign on its ID cell');
 report(!isDimmed(J5) && !hasSign(J5), '...and the row that still matches is not marked');
-report(/Rows that no longer match: 1\./.test(L.bannerText('junctions')), 'the filter line counts 1', L.bannerText('junctions'));
+report(L.bannerText('junctions').indexOf(L.staleText(1)) >= 0, 'the filter line counts 1', L.bannerText('junctions'));
 // A solve refreshes the table without changing any row: nothing moves and the marks hold.
 L.renderTable('junctions');
 report(isDimmed(J4) && hasSign(J4) && L.tableOrder('junctions').length === 2, 'a redraw keeps the row and its marks');
@@ -147,7 +149,7 @@ report(demandOf(J5) === 1, 'Ctrl+Enter filled the selection', String(demandOf(J5
 report(JSON.stringify(L.tableOrder('junctions')) === JSON.stringify([J4, J5]),
 	'...and NONE of the selection vanished', JSON.stringify(L.tableOrder('junctions')));
 report(isDimmed(J5) && hasSign(J5), '...the newly unmatched row is marked');
-report(/Rows that no longer match: 2\./.test(L.bannerText('junctions')), '...and the count is 2', L.bannerText('junctions'));
+report(L.bannerText('junctions').indexOf(L.staleText(2)) >= 0, '...and the count is 2', L.bannerText('junctions'));
 // Undo the fill: J5 is back at 4 and matches again. It stays (it always stays until re-filter) and
 // is simply un-marked.
 L.undo();
@@ -155,7 +157,7 @@ L.renderTable('junctions');
 report(demandOf(J5) === 4, 'undo put J5 back at 4', String(demandOf(J5)));
 report(L.tableOrder('junctions').indexOf(J5) >= 0 && !isDimmed(J5) && !hasSign(J5),
 	'...an undo that makes a row match again un-marks it');
-report(/Rows that no longer match: 1\./.test(L.bannerText('junctions')), '...and the count falls to 1', L.bannerText('junctions'));
+report(L.bannerText('junctions').indexOf(L.staleText(1)) >= 0, '...and the count falls to 1', L.bannerText('junctions'));
 // Drag-to-fill from J4 down onto J5 -- the other fill.
 L.selectBox('junctions', 'demand', 'demand', 0, 0);
 L.dragBegin('junctions');
@@ -165,7 +167,7 @@ L.renderTable('junctions');
 report(demandOf(J5) === 1, 'drag-to-fill filled J5', String(demandOf(J5)));
 report(JSON.stringify(L.tableOrder('junctions')) === JSON.stringify([J4, J5]),
 	'...and none vanished', JSON.stringify(L.tableOrder('junctions')));
-report(/Rows that no longer match: 2\./.test(L.bannerText('junctions')), '...count 2 again', L.bannerText('junctions'));
+report(L.bannerText('junctions').indexOf(L.staleText(2)) >= 0, '...count 2 again', L.bannerText('junctions'));
 
 console.log('\n--- 3. an undo is an edit too ---');
 {
@@ -217,13 +219,13 @@ console.log('\n--- 5. Filter in table again re-applies from scratch ---');
 {
 	const j4 = L.getDoc().nodes.filter((n) => n.id === J4)[0];
 	typeInCell(J4, 'demand', 0);
-	report(L.tableOrder('junctions').indexOf(J4) >= 0 && /: 1\./.test(L.bannerText('junctions')),
+	report(L.tableOrder('junctions').indexOf(J4) >= 0 && L.bannerText('junctions').indexOf(L.staleText(1)) >= 0,
 		'an edited row is held with a count of 1', L.bannerText('junctions'));
 	L.pressFilter();
 	L.renderTable('junctions');
 	report(L.tableOrder('junctions').indexOf(J4) < 0, 'pressed again, the row that no longer matches goes',
 		JSON.stringify(L.tableOrder('junctions')));
-	report(!/no longer match/.test(L.bannerText('junctions')), '...and the count clears', L.bannerText('junctions'));
+	report(L.bannerText('junctions').indexOf(L.staleHead()) < 0, '...and the count clears', L.bannerText('junctions'));
 	// And the kept set is truly gone: making it match brings it back unmarked.
 	L.setProp(j4, 'demand', 5);
 	L.renderTable('junctions');
