@@ -4572,6 +4572,140 @@ var EngCalcs = EngCalcs || {};
 		scenarios.forEach(function (s) { delete s.overrides[key]; });
 	}
 
+	// ---- SCENARIO ALTERNATIVES: BENTLEY'S LAYER, DERIVED (dev/scenario-alternatives.md) --------
+	//
+	// Tom, 2026-09-30: *"I think we can implement Bentley scenarios and hide it from users until we
+	// have a UX design."* In Bentley's model a scenario names one ALTERNATIVE per CATEGORY, and an
+	// alternative inherits from a parent alternative. Tom's Basic-mode rules make that tree a pure
+	// function of what this page already stores: Base uses the Base alternative of every category,
+	// and a scenario gets its own child of that Base alternative in a category exactly when it holds
+	// a local value of a property in it. So each scenario's `overrides`, grouped by category, ARE
+	// its child alternatives, and **NOTHING HERE IS STORED** -- no file changes, no migration, and
+	// removing a scenario's last local value in a category makes that child alternative vanish.
+	//
+	// **effective() IS DELIBERATELY NOT ROUTED THROUGH THIS.** It runs per property per element per
+	// render and per solve, and in Basic mode its one override lookup already IS the one-hop chain.
+	// dev/lpn-spike/scenario-alternatives-harness.js holds the two equal: alternativeOverrides()
+	// rebuilt from the chain must be the scenario's own override map, element by element.
+	//
+	// **EVERY OVERRIDABLE PROPERTY IS IN EXACTLY ONE CATEGORY**, and the harness fails a property in
+	// LPN_OVERRIDABLE that is missing here. A custom property (Task 636), and any stray name an old
+	// file carries, is User data -- so "exactly one" holds for every key a file can contain.
+	// The demand multiplier is NOT here: it is a scenario's calculation option, as in Bentley.
+	var LPN_ALT_CATEGORIES = ['physical', 'demand', 'topology', 'initial', 'constituent', 'fireflow', 'energy', 'userdata', 'text'];
+	var LPN_ALT_CATEGORY_OF = {
+		node: { x: 'physical', y: 'physical', emitter: 'physical', head: 'physical',
+			demand: 'demand', demands: 'demand',
+			active: 'topology',
+			level: 'initial',
+			initQuality: 'constituent', tankCoeff: 'constituent', sourceType: 'constituent',
+			sourceQuality: 'constituent', sourcePattern: 'constituent',
+			fireFlow: 'fireflow' },
+		link: { diameter: 'physical', roughness: 'physical', k: 'physical', length: 'physical',
+			typeId: 'physical', fittingsId: 'physical', curveId: 'physical', efficCurveId: 'physical',
+			active: 'topology',
+			status: 'initial', setting: 'initial',
+			bulkCoeff: 'constituent', wallCoeff: 'constituent',
+			energyPrice: 'energy', energyPattern: 'energy' },
+		// A Text's `active` is not topology: it takes nothing out of the solve, and Bentley keeps
+		// annotation outside the model altogether.
+		label: { text: 'text', active: 'text' }
+	};
+	function categoryOf(prop, group) {
+		var g = LPN_ALT_CATEGORY_OF[group || 'node'] || {};
+		return Object.prototype.hasOwnProperty.call(g, prop) ? g[prop] : 'userdata';
+	}
+	// The group an override KEY belongs to, asked of ovKeyFor() itself so the key format is still
+	// spelled in one place (dev/scripts/scenario_seam_check.php).
+	function ovKeyGroup(key) {
+		var groups = ['link', 'label', 'node'], i;
+		for (i = 0; i < groups.length; i++) {
+			if (String(key).indexOf(ovKeyFor(groups[i], '')) === 0) { return groups[i]; }
+		}
+		return 'node';
+	}
+	function altCopy(v) { return (v && typeof v === 'object') ? JSON.parse(JSON.stringify(v)) : v; }
+	function altBase(cat) {
+		var b = baseScenario();
+		return { id: b.id + ':' + cat, category: cat, parent: null, scenario: b.id, isBase: true, values: {}, count: 0 };
+	}
+	/**
+	 * **ONE ALTERNATIVE PER CATEGORY, FOR ONE SCENARIO**, as {category: alternative}. An alternative
+	 * is {id, category, parent, scenario, isBase, values, count}: `values` is {ovKey: {prop: value}}
+	 * holding only its LOCAL values (copies, so no reader can edit an override by holding them),
+	 * and a Base alternative's are empty because its values are the elements' own.
+	 */
+	function alternativesOf(scn) {
+		var out = {}, own = {};
+		LPN_ALT_CATEGORIES.forEach(function (cat) { out[cat] = altBase(cat); });
+		if (!scn || scn.isBase) { return out; }
+		Object.keys(scn.overrides || {}).forEach(function (key) {
+			var group = ovKeyGroup(key), ov = scn.overrides[key];
+			Object.keys(ov || {}).forEach(function (prop) {
+				var cat = categoryOf(prop, group), a = own[cat];
+				if (!a) {
+					a = own[cat] = { id: scn.id + ':' + cat, category: cat, parent: baseScenario().id + ':' + cat,
+						scenario: scn.id, isBase: false, values: {}, count: 0 };
+				}
+				if (!a.values[key]) { a.values[key] = {}; }
+				a.values[key][prop] = altCopy(ov[prop]);
+				a.count++;
+			});
+		});
+		Object.keys(own).forEach(function (cat) { out[cat] = own[cat]; });
+		return out;
+	}
+	function alternativeFor(scn, cat) { return alternativesOf(scn)[cat] || null; }
+	// Every alternative the project has: the Base one of each category, then each scenario's
+	// children, in stored scenario order.
+	function allAlternatives() {
+		var list = LPN_ALT_CATEGORIES.map(altBase);
+		scenarios.forEach(function (s) {
+			if (s.isBase) { return; }
+			var alts = alternativesOf(s);
+			LPN_ALT_CATEGORIES.forEach(function (cat) { if (!alts[cat].isBase) { list.push(alts[cat]); } });
+		});
+		return list;
+	}
+	function alternativeById(id) {
+		var all = allAlternatives(), i;
+		for (i = 0; i < all.length; i++) { if (all[i].id === id) { return all[i]; } }
+		return null;
+	}
+	/**
+	 * **THE RESOLVE CHAIN**: scenario -> its alternative for the property's category -> that
+	 * alternative's local value, else its parent's, up to the category's Base alternative, whose
+	 * value is the element's own. Returns {found, value, alternative}; found=false means "the
+	 * element's own", which effective() then reads through the pipe type, the auto length and the
+	 * rest of its layers exactly as it always has.
+	 */
+	function resolveThroughAlternatives(scn, el, prop) {
+		var key = ovKey(el), alt = alternativeFor(scn, categoryOf(prop, elGroup(el))), vals;
+		while (alt) {
+			vals = alt.values[key];
+			// Row 0's base IS the breakdown's first row once an alternative holds the whole list
+			// (R-369), the same rule effective() applies; both are in the Demand category.
+			if (prop === 'demand' && vals && Array.isArray(vals.demands) && vals.demands.length) {
+				return { found: true, value: vals.demands[0].base, alternative: alt };
+			}
+			if (vals && Object.prototype.hasOwnProperty.call(vals, prop)) {
+				return { found: true, value: vals[prop], alternative: alt };
+			}
+			alt = alt.parent ? alternativeById(alt.parent) : null;
+		}
+		return { found: false, value: undefined, alternative: alternativeFor(baseScenario(), categoryOf(prop, elGroup(el))) };
+	}
+	// The override map one element would have if it were REBUILT from the alternatives, category by
+	// category -- the object effective() reads. Equal to the stored one is the whole claim of "A".
+	function alternativeOverrides(scn, el) {
+		var key = ovKey(el), out = {}, alts = alternativesOf(scn);
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			var v = alts[cat].values[key];
+			if (v) { Object.keys(v).forEach(function (p) { out[p] = v[p]; }); }
+		});
+		return Object.keys(out).length ? out : undefined;
+	}
+
 	// ---- the scenario selector, and its "what am I working on right now" readout ----
 	// The count is only cheap to compute because a scenario IS its overrides -- there is no second
 	// document to diff against.
