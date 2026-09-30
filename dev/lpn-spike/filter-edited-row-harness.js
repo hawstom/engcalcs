@@ -58,7 +58,8 @@ const L = loadLoopedNetwork(
 	"\t\tundo: undo, saveUndoSnapshot: saveUndoSnapshot,\n" +
 	"\t\tdemandText: function (elId) { var s = paneTableById('junctions');\n" +
 	"\t\t\treturn paneCellText(paneColByKey(s, 'demand'), doc.nodes.filter(function (x) { return x.id === elId; })[0]); },\n" +
-	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
+	"\t\tcreateScenario: createScenario, switchScenario: switchScenario, deleteScenario: deleteScenario,\n" +
+	"\t\tscenarioList: function () { return scenarios; },\n" +
 	"\t\tqueryFor: function (scope, prop, op, value) {\n" +
 	"\t\t\tfindState.scope = scope; findState.prop = prop; findState.op = op; findState.value = value;\n" +
 	"\t\t\treturn findQueryString(); },\n" +
@@ -213,6 +214,58 @@ console.log('\n--- 4. the Properties door, and a scenario switch ---');
 	L.renderTable('junctions');
 	report(L.tableOrder('junctions').indexOf(J4) >= 0 && !isDimmed(J4) && !hasSign(J4),
 		'...and switching back leaves it unmarked');
+}
+
+console.log('\n--- 4b. adding or deleting a scenario is not an edit (Perry, 2026-09-30) ---');
+{
+	const j4 = L.getDoc().nodes.filter((n) => n.id === J4)[0];
+	const base = L.scenarioList()[0].id;
+	L.switchScenario(base);
+	L.setProp(j4, 'demand', 9);
+	const B = L.createScenario('B');
+	L.switchScenario(B.id);
+	L.setProp(j4, 'demand', 0);   // an override in B: J4 does not match there
+	L.switchScenario(base);
+	L.pressFilter();
+	L.renderTable('junctions');
+	report(L.tableOrder('junctions').indexOf(J4) >= 0 && !isDimmed(J4), 'filtered in Base, J4 matches unmarked');
+	const C = L.createScenario('C');
+	L.switchScenario(B.id);
+	L.renderTable('junctions');
+	report(L.tableOrder('junctions').indexOf(J4) < 0,
+		'after ADDING a scenario, a switch to B still lets J4 go (nobody edited it)', JSON.stringify(L.tableOrder('junctions')));
+	L.switchScenario(base);
+	L.pressFilter();
+	L.deleteScenario(C.id);
+	L.switchScenario(B.id);
+	L.renderTable('junctions');
+	report(L.tableOrder('junctions').indexOf(J4) < 0,
+		'after DELETING a scenario, the same', JSON.stringify(L.tableOrder('junctions')));
+	// An override written into a scenario the snapshot never met IS an edit.
+	L.switchScenario(base);
+	L.pressFilter();
+	L.renderTable('junctions');
+	const D = L.createScenario('D');
+	L.switchScenario(D.id);
+	L.setProp(j4, 'demand', 0);
+	L.renderTable('junctions');
+	report(L.tableOrder('junctions').indexOf(J4) >= 0 && isDimmed(J4) && hasSign(J4),
+		'an override written into a NEW scenario is an edit: the row stays, marked', JSON.stringify(L.tableOrder('junctions')));
+	L.deleteScenario(D.id);
+	L.deleteScenario(B.id);
+	L.switchScenario(base);
+	L.pressFilter();
+}
+
+console.log('\n--- 4c. the ID column keeps room for the sign while filtered ---');
+{
+	const tbl = byId.lpn_pane_junctions.children.filter((c) => c._tag === 'table')[0];
+	report(/(^| )lpn-pane-filtered( |$)/.test(tbl.className || ''), 'a filtered table carries the class that reserves the gutter',
+		tbl.className);
+	const css = require('fs').readFileSync(require('path').join(__dirname, '../../css/engcalcs.css'), 'utf8');
+	report(/\.lpn-pane-table\.lpn-pane-filtered tbody td\.lpn-pane-col-id \{[^}]*padding-inline-start/.test(css) &&
+		/\.lpn-pane-stale-mark \{[^}]*position: absolute/.test(css),
+		'...and the stylesheet reserves it and lays the sign over it, so the first sign moves nothing');
 }
 
 console.log('\n--- 5. Filter in table again re-applies from scratch ---');

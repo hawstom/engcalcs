@@ -22735,13 +22735,29 @@ var EngCalcs = EngCalcs || {};
 		if (id) { delete paneFilterSeen[id]; delete paneFilterKept[id]; return; }
 		paneFilterSeen = {}; paneFilterKept = {};
 	}
-	// The element and every scenario's overrides on it -- ALL scenarios rather than the active one,
-	// so switching scenario (which is not an edit) does not change it.
+	// **ONLY WHAT AN EDIT CAN CHANGE**: the element's own values, and its override in each scenario,
+	// held PER SCENARIO ID. Switching scenario changes neither. Adding or deleting a scenario is not
+	// an edit of the row either (Perry's pre-review, 2026-09-30: one list of every scenario's entry
+	// changed length, so creating a scenario marked every filtered row). A scenario the snapshot has
+	// not met is compared against "no override", so an override written into a new scenario IS an
+	// edit; a scenario that has gone is simply not asked about.
+	function paneFilterOverride(s, key) {
+		return JSON.stringify((s.overrides && s.overrides[key]) || null);
+	}
 	function paneFilterFingerprint(el) {
-		var key = ovKey(el);
-		return JSON.stringify(el) + '|' + scenarios.map(function (s) {
-			return JSON.stringify((s.overrides && s.overrides[key]) || null);
-		}).join(',');
+		var key = ovKey(el), ov = {};
+		scenarios.forEach(function (s) { ov[s.id] = paneFilterOverride(s, key); });
+		return { el: JSON.stringify(el), ov: ov };
+	}
+	function paneFilterEdited(fp, el) {
+		var key = ovKey(el), i, s, was;
+		if (fp.el !== JSON.stringify(el)) { return true; }
+		for (i = 0; i < scenarios.length; i++) {
+			s = scenarios[i];
+			was = Object.prototype.hasOwnProperty.call(fp.ov, s.id) ? fp.ov[s.id] : 'null';
+			if (was !== paneFilterOverride(s, key)) { return true; }
+		}
+		return false;
 	}
 	// A rename changes the key a row is known by, so both keys are held: the new one so the row does
 	// not vanish under an ID filter, the old one so an undo of the rename does not either.
@@ -22799,7 +22815,7 @@ var EngCalcs = EngCalcs || {};
 		kept = paneFilterKept[spec.id] || (paneFilterKept[spec.id] = {});
 		rows = rows.filter(function (x) {
 			var k = spec.group + ':' + x.id, match = keys[k] === true;
-			if (!kept[k] && seen[k] !== undefined && seen[k] !== paneFilterFingerprint(x)) { kept[k] = true; }
+			if (!kept[k] && seen[k] !== undefined && paneFilterEdited(seen[k], x)) { kept[k] = true; }
 			if (match && seen[k] === undefined) { seen[k] = paneFilterFingerprint(x); }
 			if (!match && kept[k]) { stale[x.id] = true; n++; }
 			return match || kept[k] === true;
@@ -24128,7 +24144,9 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		table = document.createElement('table');
-		table.className = 'lpn-pane-table';
+		// Under a filter the ID column keeps room for Task 738's warning sign from the start, so the
+		// first sign to appear does not widen the column and shift the whole table sideways.
+		table.className = 'lpn-pane-table' + (filterNote ? ' lpn-pane-filtered' : '');
 		// **A <colgroup> IS HOW A TABLE COLUMN IS GIVEN A WIDTH**, rather than a width on each cell:
 		// one element per column, so a drag rewrites one style instead of four hundred, and the
 		// heading and its cells cannot end up at two different widths. The inputs keep their own
