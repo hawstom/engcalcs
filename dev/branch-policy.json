@@ -85,7 +85,8 @@
         "feat/fill-handle",
         "feat/selection-set",
         "feat/pane-height",
-        "feat/table-tab-keys"
+        "feat/table-tab-keys",
+        "feat/frequency-plot"
     ],
     "feature_freeze": {
         "active": false,

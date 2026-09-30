@@ -1802,6 +1802,19 @@ $ec_lang['lpn_ts_none']='Nothing to graph yet. Choose assets on the map and pres
 $ec_lang['lpn_ts_no_frames']='No extended period results yet. Press Calculate to run the simulation.';
 $ec_lang['lpn_ts_summary']='Assets: {n}, reporting times: {steps}';
 $ec_lang['lpn_ts_axis_time']='Elapsed time';
+// EPANET's Frequency Plot (Task 600): one value over every junction or every pipe, at the time the
+// map shows, against the percent of them less than it. "Percent less than" is EPANET's own axis
+// title. {n} and {total} are counts, {time} an elapsed time; all substituted, never concatenated.
+// The Junctions/Pipes choice reuses lpn_pane_tab_junctions and lpn_pane_tab_pipes.
+$ec_lang['lpn_freq_menu']='Frequency';
+$ec_lang['lpn_freq_tip']='Graph the frequency distribution of one property over all junctions or all pipes at the current time step.';
+$ec_lang['lpn_freq_title']='Distribution of values';
+$ec_lang['lpn_freq_group_tip']='Whether the graph shows junctions or pipes.';
+$ec_lang['lpn_freq_quantity_tip']='Which value to graph.';
+$ec_lang['lpn_freq_none']='No results for this value yet, so there is nothing to graph.';
+$ec_lang['lpn_freq_summary']='Plotted: {n} of {total}';
+$ec_lang['lpn_freq_summary_time']='Plotted: {n} of {total}, at {time}';
+$ec_lang['lpn_freq_axis_percent']='Percent less than';
 $ec_lang['lpn_view_units']='Units';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Save all';

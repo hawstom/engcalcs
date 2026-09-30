@@ -20419,6 +20419,15 @@ var EngCalcs = EngCalcs || {};
 		// (The profile's hide() exists because its route highlight would otherwise outlive the
 		// panel that explains it.)
 	});
+	// **FREQUENCY BESIDE TIME SERIES, AND PROFILE STILL LAST** (Task 600) -- the same argument that
+	// placed Time series: a new drawing joins the drawings, inside their stretch of the strip.
+	paneTabs.push({
+		id: 'frequency', panel: 'lpn_pane_frequency', label: 'lpn_freq_menu', tip: 'lpn_freq_tip',
+		show: function () { freqTabShow(); },
+		// Every solve, every edit and every step of the transport, so the curve is always the
+		// map's own moment.
+		refresh: function () { freqTabShow(); }
+	});
 	// **PROFILE IS LAST** (Tom, 2026-08-21: "making Profile the last tab"). It is still the odd one
 	// out -- a drawing where the other six are tables -- and the end of the strip is where an odd
 	// one out belongs, rather than the front, where it stood between the reader and the six things
@@ -27343,6 +27352,8 @@ var EngCalcs = EngCalcs || {};
 		// left on Time series was shown over the EMPTY startup document, chose nothing, and every
 		// run that landed afterwards redrew that nothing -- on a reload, the gallery and File > Open.
 		else if (paneIsOpen() && t && t.id === 'timeseries' && t.show) { t.show(); }
+		// The Frequency tab draws from the map's values, which a document can bring with no solve.
+		else if (paneIsOpen() && t && t.id === 'frequency' && t.show) { t.show(); }
 	}
 	function refreshPaneIfOpen() {
 		var t = activePaneTab();
@@ -28903,6 +28914,215 @@ var EngCalcs = EngCalcs || {};
 				pc.lpn_ts_axis_time || 'Elapsed time',
 				{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
 		}
+	}
+
+	// ---- FREQUENCY PLOT (ROADMAP Task 600, first slice) --------------------------------------------
+	//
+	// EPANET's Frequency Plot: one value over every junction or every pipe, at one time, drawn as
+	// the value against the percent of elements less than it. The EPANET 2.2 manual, Table 9.1:
+	// *"Plots value versus fraction of objects at or below the value ... All nodes or links at a
+	// specific time."* Its Graph window (Fgraph.pas) titles the vertical axis "Percent Less Than"
+	// and takes its values from GetJuncValues()/GetPipeValues() -- JUNCTIONS and PIPES only, never
+	// a tank, a reservoir, a pump or a valve -- which is the population used here too.
+	// EngCalcs.lpnProfile.frequencySeries() holds the curve itself.
+	//
+	// **IT READS WHAT THE MAP IS SHOWING, AND NOTHING ELSE.** Every value comes through
+	// colorValueOf(), the page's one value-and-unit seam, so the curve is the map's own numbers at
+	// the map's own moment: the transport's frame in a run, the single solve otherwise, and the
+	// kept snapshot when Recalculate is off -- the snapshot is never hidden here either. Nothing is
+	// solved, stored or re-read from the run.
+	//
+	// **THE SAME DRAWING AS TIME SERIES**, whose layout, text helper and line classes are called and
+	// not copied (tsLayout, tsText, .lpn-ts-line). No print and no export, because Profile has
+	// neither; the Graphs menu and the export row are Task 640's.
+	//
+	// **ABSOLUTE VALUES FOR THE THREE SIGNED LINK QUANTITIES, AND ONLY THOSE.** EPANET takes Abs()
+	// of everything it plots here. A flow's sign is only the direction the pipe was drawn in, so
+	// its absolute value is the honest distribution; the same holds for a head loss. A negative
+	// PRESSURE is a design fault, and folding it into a positive one would hide it, so a node value
+	// keeps its sign.
+	var FREQ_ABS = { link: { flow: 1, headloss: 1, gradient: 1 }, node: {} };
+	// A link's status is not a quantity, so it has no distribution. Everything else the map can be
+	// coloured by is offered, from the map's own list.
+	var FREQ_FIELD_SKIP = { node: {}, link: { status: 1 } };
+	// Above this many elements the per-point dots and their hover text are left off, for the reason
+	// LPN_TS_DOT_MAX gives. Higher than that one: here each dot names an element, which is the
+	// question a reader of this curve asks next ("which junction is the low one?").
+	var LPN_FREQ_DOT_MAX = 400;
+	var freqState = { group: 'node', fields: { node: '', link: '' } };
+	function freqGroup() { return freqState.group === 'link' ? 'link' : 'node'; }
+	function freqFieldOptions(group) {
+		var skip = FREQ_FIELD_SKIP[group] || {};
+		return colorFieldOptions(group).filter(function (o) { return !skip[o[0]]; });
+	}
+	function freqField() {
+		var group = freqGroup(), opts = freqFieldOptions(group), f = freqState.fields[group], i;
+		for (i = 0; i < opts.length; i++) { if (opts[i][0] === f) { return f; } }
+		return opts.length ? opts[0][0] : '';
+	}
+	// EPANET's population: junctions, or pipes. An inactive element is not in the network (Task 184).
+	function freqElements(group) {
+		return group === 'link'
+			? doc.links.filter(function (l) { return l.type === 'pipe' && isActive(l); })
+			: doc.nodes.filter(function (n) { return n.type === 'junction' && isActive(n); });
+	}
+	// One entry per element that HAS the value: {id, v}. The curve is built from these values.
+	function freqValues(group, field) {
+		var abs = (FREQ_ABS[group] || {})[field], out = [];
+		freqElements(group).forEach(function (e) {
+			var v = colorValueOf(group, e, field);
+			if (typeof v !== 'number' || !isFinite(v)) { return; }
+			out.push({ id: e.id, v: abs ? Math.abs(v) : v });
+		});
+		return out;
+	}
+	var freqLastSize = null;
+	function freqResizeWatch() {
+		var host = document.getElementById('lpn_freq_chart');
+		if (!host || !window.ResizeObserver) { return; }
+		new window.ResizeObserver(function () {
+			var r = host.getBoundingClientRect();
+			if (!(r.width > 0) || !(r.height > 0)) { return; }
+			if (freqLastSize && Math.abs(freqLastSize.w - r.width) < 1 &&
+				Math.abs(freqLastSize.h - r.height) < 1) { return; }
+			freqLastSize = { w: r.width, h: r.height };
+			renderFrequency();
+		}).observe(host);
+	}
+	function freqTabShow() { rebuildFreqForm(); renderFrequency(); }
+	// Two pull-downs, each in its own variable (see rebuildTsForm() for the defect that rule closes).
+	function rebuildFreqForm() {
+		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_freq_form'),
+			group = freqGroup(), field = freqField(), groupSel, fieldSel;
+		if (!box) { return; }
+		box.innerHTML = '';
+		groupSel = document.createElement('select');
+		groupSel.id = 'lpn_freq_group';
+		groupSel.className = 'lpn-ts-pick ec-help';
+		groupSel.title = pc.lpn_freq_group_tip || 'Whether the graph shows junctions or pipes.';
+		[['node', pc.lpn_pane_tab_junctions || 'Junctions'], ['link', pc.lpn_pane_tab_pipes || 'Pipes']]
+			.forEach(function (o) {
+				var op = document.createElement('option');
+				op.value = o[0]; op.textContent = o[1];
+				groupSel.appendChild(op);
+			});
+		groupSel.value = group;
+		groupSel.addEventListener('change', function () {
+			freqState.group = groupSel.value === 'link' ? 'link' : 'node';
+			rebuildFreqForm(); renderFrequency();
+		});
+		box.appendChild(groupSel);
+
+		fieldSel = document.createElement('select');
+		fieldSel.id = 'lpn_freq_quantity';
+		fieldSel.className = 'lpn-ts-pick ec-help';
+		fieldSel.title = pc.lpn_freq_quantity_tip || 'Which value to graph.';
+		freqFieldOptions(group).forEach(function (o) {
+			var op = document.createElement('option');
+			op.value = o[0]; op.textContent = o[1];
+			fieldSel.appendChild(op);
+		});
+		fieldSel.value = field;
+		fieldSel.addEventListener('change', function () {
+			freqState.fields[freqGroup()] = fieldSel.value;
+			renderFrequency();
+		});
+		box.appendChild(fieldSel);
+		initTipsIn(box);
+	}
+	function renderFrequency() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_freq_chart'),
+			note = document.getElementById('lpn_freq_note'),
+			group, field, vals, pts, lay, xB, yB, box, svg, unit, total, t, byVal, dots;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (note) { note.textContent = ''; }
+		group = freqGroup();
+		field = freqField();
+		total = freqElements(group).length;
+		vals = freqValues(group, field);
+		// **NOTHING TO GRAPH IS SAID IN WORDS, NEVER AS EMPTY AXES** -- Time series' rule. One
+		// sentence for every way of having no values (no solve yet, no quality run, a network with
+		// no pipes), and it names no button, so it is true in both states of Recalculate.
+		if (!vals.length) {
+			if (note) { note.textContent = pc.lpn_freq_none || 'No results for this value yet, so there is nothing to graph.'; }
+			return;
+		}
+		pts = EngCalcs.lpnProfile.frequencySeries(vals.map(function (o) { return o.v; }));
+		// The time is the one the VALUES are as of: a run's frame carries `t`, a single solve does not
+		// (the same test colorNodeValue() makes for a tank's head), and then there is no time to name.
+		t = (lastSolveResult && typeof lastSolveResult.t === 'number') ? lastSolveResult.t : null;
+		// Said before the chart is measured (Task 527; see renderTimeSeries()).
+		if (note) {
+			note.textContent = (t === null
+				? String(pc.lpn_freq_summary || 'Plotted: {n} of {total}')
+				: String(pc.lpn_freq_summary_time || 'Plotted: {n} of {total}, at {time}')
+					.replace('{time}', EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(t) : String(t)))
+				.replace('{n}', String(vals.length))
+				.replace('{total}', String(total));
+		}
+		lay = tsLayout(host);
+		freqLastSize = { w: lay.w, h: lay.h };
+		box = lay.box;
+		// The value axis is truncated like every axis here; the percent axis is 0 to 100 always, so
+		// two plots of the same network read against the same scale.
+		// A network whose pipes are all one diameter is a real answer: its curve is one vertical run,
+		// centred in a window a fiftieth of its own size rather than an axis of zero width.
+		xB = EngCalcs.lpnProfile.axisBounds(pts.map(function (p) { return p.x; }), {
+			ticks: 5, maxTicks: 8,
+			minSpan: Math.max(Math.abs(pts[0].x), Math.abs(pts[pts.length - 1].x)) / 50 || 1
+		});
+		yB = EngCalcs.lpnProfile.axisBounds([0, 100], lay.y);
+		svg = el('svg', { viewBox: '0 0 ' + lay.w + ' ' + lay.h, class: 'lpn-profile-svg' }, host);
+		function X(v) { return EngCalcs.lpnProfile.plotX(v, xB, box); }
+		function Y(v) { return EngCalcs.lpnProfile.plotY(v, yB, box); }
+		EngCalcs.lpnProfile.ticks(yB).forEach(function (v) {
+			el('line', { x1: box.left, y1: Y(v), x2: box.left + box.width, y2: Y(v),
+				class: 'lpn-profile-grid' }, svg);
+			tsText(svg, box.left - 5, Y(v) + 3, String(plainRound(v, 2)),
+				{ class: 'lpn-profile-tick', 'text-anchor': 'end' });
+		});
+		var xTicks = EngCalcs.lpnProfile.ticks(xB), xKeep = {};
+		EngCalcs.lpnProfile.labelStride(xTicks.map(X), LPN_TS_X_LABEL_PX)
+			.forEach(function (k) { xKeep[k] = true; });
+		xTicks.forEach(function (v, k) {
+			el('line', { x1: X(v), y1: box.top + box.height, x2: X(v), y2: box.top + box.height + 4,
+				class: 'lpn-profile-axis' }, svg);
+			if (!xKeep[k]) { return; }
+			tsText(svg, X(v), box.top + box.height + 14, String(plainRound(v, 4)),
+				{ class: 'lpn-profile-tick', 'text-anchor': 'middle' });
+		});
+		el('rect', { x: box.left, y: box.top, width: box.width, height: box.height,
+			class: 'lpn-profile-frame' }, svg);
+		if (pts.length > 1) {
+			el('polyline', {
+				points: pts.map(function (p) { return X(p.x) + ',' + Y(p.y); }).join(' '),
+				class: 'lpn-ts-line lpn-freq-line', stroke: LPN_TS_COLORS[0]
+			}, svg);
+		}
+		dots = pts.length <= LPN_FREQ_DOT_MAX || pts.length === 1;
+		if (dots) {
+			// Which element each dot is: the sorted values, matched back in the same order. Two
+			// elements with one value share a dot position, and each keeps its own name in turn.
+			byVal = vals.slice().sort(function (a, b) { return a.v - b.v; });
+			pts.forEach(function (p, k) {
+				var c = el('circle', { cx: X(p.x), cy: Y(p.y), r: 2, class: 'lpn-ts-dot', fill: LPN_TS_COLORS[0] }, svg),
+					ttl = el('title', {}, c);
+				ttl.appendChild(document.createTextNode(byVal[k].id + '   ' + plainRound(p.x, 4) +
+					'   ' + plainRound(p.y, 1) + ' %'));
+			});
+		}
+		// Axis titles: the value's whole label and unit, built as Time series and the map key build
+		// it; and EPANET's own "Percent less than" up the side.
+		unit = colorFieldUnitText(group, field);
+		if (lay.axisTitle) {
+			tsText(svg, box.left + box.width / 2, lay.titleY,
+				colorFieldLabel(group, field) + (unit ? ' (' + unit + ')' : ''),
+				{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
+		}
+		tsText(svg, 0, 0, pc.lpn_freq_axis_percent || 'Percent less than',
+			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
+			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
 	}
 
 	// Maps a tool mode to its pageConfig mode-hint key -- see the lang keys' own comment for why
@@ -38615,6 +38835,7 @@ var EngCalcs = EngCalcs || {};
 		// the pane before it starts reporting sizes.
 		profileResizeWatch();
 		tsResizeWatch();
+		freqResizeWatch();
 		wireUnitSelects();
 		var opening = initLibrary(), bornClean = false;
 		// **THREE STATES, NOT TWO** (Task 627): a document that opened, a document that is there and
