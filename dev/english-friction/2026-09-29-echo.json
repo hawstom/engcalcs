@@ -1,0 +1,5 @@
+{
+  "sprint": "2026-09-29-echo",
+  "description": "Drift resync: the 125 keys held back by the 2026-09-29 drift audit (dev/drift-audit-2026-09-29/holdback.txt), each only in the languages the audit found stale (36-84 per language, 1,298 in all), plus lpn_find_shift_hint (Tom's new English) and lpn_goto_on_map (Tom's $ec_lang_syn ruling) in all 26. REPLACE IN PLACE; nothing is appended. Wave 0 reviewed nothing: every key is shipped English, audited key by key in dev/drift-audit-2026-09-29/, and the two new ones carry Tom's ruling on their exact text.",
+  "entries": []
+}
