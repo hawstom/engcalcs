@@ -2916,6 +2916,22 @@ $ec_lang['lpn_scenario_push_values']='Values thrown away:';
 // A COUNT follows this label, not a list. Alternates are Tom's own (2026-08-14).
 $ec_lang_syn['lpn_scenario_push_values']='Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values';
 $ec_lang['lpn_scenario_push_none']='No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.';
+// Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
+// by name, and the numbers hold Tom's order in every language.
+$ec_lang['lpn_scenario_preset_flow_static']='1. Flow test: Static';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='A hydrant flow test with no hydrant flowing. Its pressures are the static readings to compare with 2. Flow test: Mid and 3. Flow test: Max.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. Flow test: Mid';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='A hydrant flow test at the first residual reading. In this scenario, add the flow measured at the flowing hydrant to the demand of its junction, then compare the pressures with 1. Flow test: Static. Nothing flows until you do.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. Flow test: Max';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='A hydrant flow test at the highest residual reading. In this scenario, add the flow measured at the flowing hydrant to the demand of its junction, then compare the pressures with 1. Flow test: Static. Nothing flows until you do.';
+$ec_lang['lpn_scenario_preset_average_day']='4. Average Day';
+$ec_lang['lpn_scenario_preset_average_day_tip']='Demand multiplier 1: every demand as entered, which is taken to be average day demand.';
+$ec_lang['lpn_scenario_preset_max_day']='5. Max Day';
+$ec_lang['lpn_scenario_preset_max_day_tip']='Demand multiplier 2.0 times average day, a starting value. Most systems fall between 1.2 and 3.0 (National Research Council, 2006). Set your own system\'s in Settings, Calculation, Hydraulics, Demand multiplier.';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. Peak hour';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='Demand multiplier 3.0 times average day, a starting value. Most systems fall between 3.0 and 6.0 (National Research Council, 2006). Set your own system\'s in Settings, Calculation, Hydraulics, Demand multiplier.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. Fire plus max day';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='Max day demand (multiplier 2.0). Run Fire flow analysis in this scenario: it adds the fire flow at each junction on top of this demand.';
 $ec_lang['lpn_delete_drops_overrides']='Deleting this asset also throws away {n} values that your scenarios hold for it. Continue?';
 $ec_lang['lpn_push_base_only']='This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.';
 $ec_lang['lpn_field_active']='Part of this network';

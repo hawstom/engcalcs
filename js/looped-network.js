@@ -3192,6 +3192,68 @@ var EngCalcs = EngCalcs || {};
 		// its own localized word, never echo this string, so the stored data stays language-free.
 		return [{ id: 'base', name: 'Base', isBase: true, overrides: {} }];
 	}
+	// **THE READY-MADE SCENARIOS A NEW PROJECT IS BORN WITH** (ROADMAP Task 721; Tom, 2026-09-30:
+	// *"could we provide some pre-packaged Scenarios in all new projects? ... '1. Flow test: Static,
+	// 2. Flow test: Mid, 3. Flow test: Max, 4. Average Day, 5. Max Day, 6. Peak hour, 7. Fire plus
+	// max day'"*). His numbers are part of the names: scenariosForDisplay() sorts by name, and they
+	// are what keeps the list in his order.
+	//
+	// **ORDINARY SCENARIOS, AND ONLY WHAT THE MODEL ALREADY EXPRESSES.** Each is a row exactly like
+	// one createScenario() makes -- renamable, deletable, editable -- holding at most a demand
+	// multiplier. The name is written in the visitor's language at birth because it is the user's
+	// data from then on, like a name typed at the New scenario prompt. The id is language-free and
+	// descriptive rather than s1..s7, so it keys the menu tip (lpn_scenario_preset_<id>_tip) and a
+	// scenario the user adds next is still s1.
+	//
+	// **THE MULTIPLIERS: 2.0 FOR MAXIMUM DAY, 3.0 FOR PEAK HOUR**, times average day. National
+	// Research Council, *Drinking Water Distribution Systems: Assessing and Reducing Risks* (2006),
+	// ch. 5, pp. 192-193, citing Walski et al., *Advanced Water Distribution Modeling and
+	// Management* (2003): "For most water systems the ratio of the maximum day water demand to the
+	// average day water demand ranges from 1.2 to 3.0, and the ratio of the peak hour to the average
+	// day is typically between 3.0 and 6.0." They are starting points inside those ranges, stated in
+	// the tip, and the user sets their own system's in Settings > Hydraulics > Demand multiplier.
+	//
+	// **THE FLOW TESTS HOLD NO FLOW, BECAUSE WE CANNOT KNOW WHICH HYDRANT.** Static is the test with
+	// nothing flowing; Mid and Max are where the user gives the flowing hydrant's junction its test
+	// flow, which their tip says. A guessed flow at a guessed junction would be a number nobody
+	// typed. They seed the document's multiplier the way createScenario() does: a test is read at
+	// whatever demand the system has that day.
+	//
+	// **FIRE PLUS MAX DAY IS THE MAX DAY MULTIPLIER AND NOTHING ELSE**: Fire flow analysis already
+	// draws each junction's fire flow on top of the demand of the scenario it is run in, so this is
+	// the scenario to run it in, which its tip says.
+	//
+	// **ONLY A NEW PROJECT.** newProject() and the first visit call this; an opened file, an imported
+	// .inp and Delete network keep defaultScenarios(), so no file ever written changes shape. A new
+	// project made from an open one gets these, not the open one's list: a scenario is overrides
+	// keyed to that network's elements, which the new empty network does not have.
+	var LPN_PRESET_SCENARIOS = [
+		{ id: 'flow_static', key: 'lpn_scenario_preset_flow_static', en: '1. Flow test: Static' },
+		{ id: 'flow_mid', key: 'lpn_scenario_preset_flow_mid', en: '2. Flow test: Mid' },
+		{ id: 'flow_max', key: 'lpn_scenario_preset_flow_max', en: '3. Flow test: Max' },
+		{ id: 'average_day', key: 'lpn_scenario_preset_average_day', en: '4. Average Day', dm: 1 },
+		{ id: 'max_day', key: 'lpn_scenario_preset_max_day', en: '5. Max Day', dm: 2 },
+		{ id: 'peak_hour', key: 'lpn_scenario_preset_peak_hour', en: '6. Peak hour', dm: 3 },
+		{ id: 'fire_max_day', key: 'lpn_scenario_preset_fire_max_day', en: '7. Fire plus max day', dm: 2 }
+	];
+	function presetScenarios() {
+		var pc = EngCalcs.pageConfig || {}, docDm = (settings.hydraulics || {}).demandMultiplier;
+		return defaultScenarios().concat(LPN_PRESET_SCENARIOS.map(function (p) {
+			var s = { id: p.id, name: pc[p.key] || p.en, overrides: {} };
+			if (p.dm !== undefined) { s.demandMultiplier = p.dm; }
+			else if (typeof docDm === 'number' && isFinite(docDm)) { s.demandMultiplier = docDm; }
+			return s;
+		}));
+	}
+	// The tip a ready-made scenario's menu row carries, found by its id. It stays after a rename:
+	// the row is still the scenario that was made for that job.
+	function presetScenarioTip(s) {
+		var pc = EngCalcs.pageConfig || {}, i;
+		for (i = 0; i < LPN_PRESET_SCENARIOS.length; i++) {
+			if (LPN_PRESET_SCENARIOS[i].id === s.id) { return pc[LPN_PRESET_SCENARIOS[i].key + '_tip']; }
+		}
+		return undefined;
+	}
 	var scenarios = defaultScenarios();
 	// A blank name means "not named yet"; the UI renders its own localized "Untitled" for that case
 	// rather than storing an English word in the user's data.
@@ -4551,8 +4613,14 @@ var EngCalcs = EngCalcs || {};
 		// the project's multiplier, counting the mere presence of the field would badge every
 		// freshly created scenario (1) before anybody had changed anything -- the opposite of the
 		// misreading the count exists to prevent.
+		//
+		// **A DOCUMENT THAT STATES NONE MEANS 1** (Task 721), which is what docDemandMultiplier()
+		// solves with. So a scenario stating 1 on such a document changes nothing and counts nothing:
+		// the ready-made 4. Average Day would otherwise read (1) beside a value equal to Base's.
+		var docDm = (settings.hydraulics || {}).demandMultiplier;
+		if (!(typeof docDm === 'number' && isFinite(docDm))) { docDm = 1; }
 		if (typeof scn.demandMultiplier === 'number' && isFinite(scn.demandMultiplier)
-			&& scn.demandMultiplier !== (settings.hydraulics || {}).demandMultiplier) { total += 1; }
+			&& scn.demandMultiplier !== docDm) { total += 1; }
 		return total;
 	}
 	// Every scenario's overrides on one element -- what a Base-side deletion is about to destroy,
@@ -4794,6 +4862,7 @@ var EngCalcs = EngCalcs || {};
 				// be mistaken for a command's glyph.
 				label: (s.id === scn.id ? '✓ ' : '  ') + scenarioDisplayName(s)
 					+ (s.isBase ? '' : ' (' + overrideCount(s) + ')'),
+				tip: presetScenarioTip(s),
 				fn: function () { switchScenario(s.id); }
 			});
 		});
@@ -32000,7 +32069,6 @@ var EngCalcs = EngCalcs || {};
 		var name = nextProjectName();
 		doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
 		nextId = newNextId();
-		scenarios = defaultScenarios();
 		project = { name: name, activeScenario: 'base' };
 		// Only when geographic: an absent key is the grid default, and writing 'grid' explicitly
 		// would put a word in every file that has always meant itself by saying nothing.
@@ -32019,6 +32087,9 @@ var EngCalcs = EngCalcs || {};
 		if (coords !== LPN_COORDS_GEO && crs) { assignProjectCrs(crs); }
 		settings = inheritedSettings;
 		labelSettings = inheritedLabels;
+		// AFTER `settings`, because the flow tests seed the new project's own demand multiplier.
+		// The ready-made list, never the outgoing project's: see LPN_PRESET_SCENARIOS (Task 721).
+		scenarios = presetScenarios();
 		backdrop = null;
 		// A project created now is written by the current code, so its numbers are declarative and
 		// its version is current. Without this it inherits openDocVersion from whatever project was
@@ -38883,6 +38954,9 @@ var EngCalcs = EngCalcs || {};
 			var firstId = newProjectId(), firstName = nextProjectName();
 			library.openId = firstId;
 			project.name = firstName; // the tab and the document have to agree from the first frame
+			// The first project is a new project, so it starts with the ready-made scenarios too
+			// (Task 721, "in all new projects").
+			scenarios = presetScenarios();
 			// **R-208: PROJECT1 OPENS GEOGRAPHIC, AT DOWNTOWN NOVATO CENTER, NOT ON AN UNPLACED
 			// GRID.** The reported defect was specific: attaching the world map to the default tab
 			// errored, because a schematic project has no coordinate system to place tiles with.
