@@ -978,9 +978,9 @@
             "ruled": "2026-09-01"
         },
         "lpn_ff_design_no_selection": {
-            "on": "The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.",
-            "ruled": "2026-09-29",
-            "answer": "Edited."
+            "on": "The design check scope is set to Selected, but no assets are selected. Select assets or select All.",
+            "ruled": "2026-09-30",
+            "answer": "His own English (quoted, without a final period, which is added), and: (a) (Specify) Junctions to test: All/Selected\n(b) Design check (effect on system); (specify) pipes and other junctions to check: All/Selected"
         },
         "lpn_ff_design_none": {
             "on": "Nothing in the chosen set was drawn down by any junction tested.",
@@ -1713,6 +1713,51 @@
             "on": "No fittings list selected",
             "ruled": "2026-09-09",
             "answer": "OK"
+        },
+        "lpn_freq_axis_percent": {
+            "on": "Percent less than",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
+        "lpn_freq_group_tip": {
+            "on": "Whether the graph shows junctions or pipes.",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
+        "lpn_freq_menu": {
+            "on": "Frequency",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
+        "lpn_freq_none": {
+            "on": "No results for this value yet, so there is nothing to graph.",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
+        "lpn_freq_quantity_tip": {
+            "on": "Which value to graph.",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
+        "lpn_freq_summary": {
+            "on": "Plotted: {n} of {total}",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
+        "lpn_freq_summary_time": {
+            "on": "Plotted: {n} of {total}, at {time}",
+            "ruled": "2026-09-30",
+            "answer": "OK."
+        },
+        "lpn_freq_tip": {
+            "on": "Graph the frequency distribution of one property over all junctions or all pipes at the current time step.",
+            "ruled": "2026-09-30",
+            "answer": "Edited"
+        },
+        "lpn_freq_title": {
+            "on": "Distribution of values",
+            "ruled": "2026-09-30",
+            "answer": "OK."
         },
         "lpn_full_col_id": {
             "on": "ID",
