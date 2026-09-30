@@ -115,8 +115,14 @@ function fileWith(docId, name) {
 // An ID minted at a known moment, in newDocId()'s own shape.
 const T0 = Date.UTC(2026, 8, 14, 15, 30);
 const idAt = (ms, tail) => 'd' + ms.toString(36) + (tail || 'AbCd1234');
-const ORIGINAL_BTN = 'Original; keep same lock';
-const COPY_BTN = 'A copy; make new lock';
+// Every visitor-facing string is read from the page's own config, never retyped here, so a
+// rewording is free (harness_wording_check.php).
+const PC = global.EngCalcs.pageConfig;
+const ORIGINAL_BTN = PC.lpn_copy_original;
+const COPY_BTN = PC.lpn_copy_copy;
+const TITLE = PC.lpn_copy_title;
+const READ_ONLY_BTN = PC.lpn_lock_open_readonly;
+const CANCEL_BTN = PC.lpn_cancel;
 
 (async function () {
 
@@ -141,17 +147,18 @@ let copyHandle, landedBefore;
 	await settle();
 	const text = dialogText();
 	ok('a dialog is open', dialogOpen());
-	ok('its title is Tom\'s question', text[0] === 'Mark file as new copy?', JSON.stringify(text));
+	ok('its title is Tom\'s question', text[0] === TITLE, JSON.stringify(text));
 	ok('its body carries the ID\'s creation time in the regional format',
 		text[1].indexOf(L.regionalDateTime(T0)) >= 0 && text[1].indexOf('{date}') < 0, text[1]);
-	ok('...in Tom\'s words', text[1].indexOf('but this browser doesn\'t remember it') >= 0, text[1]);
+	ok('...and is exactly the page\'s body string with the date filled in',
+		text[1] === PC.lpn_copy_body.replace('{date}', L.regionalDateTime(T0)), text[1]);
 	ok('the two answers, Original first so it takes the focus',
 		JSON.stringify(dialogButtons()) === JSON.stringify([ORIGINAL_BTN, COPY_BTN]), JSON.stringify(dialogButtons()));
 	ok('nothing has landed yet', L.projectCount() === landedBefore);
 	ok('...and no em dash reaches the visitor', text.every(t => t.indexOf('—') < 0));
 }
 
-console.log('\n--- 3. "A copy; make new lock" ---');
+console.log('\n--- 3. the Copy answer ---');
 {
 	posted.length = 0;
 	press(COPY_BTN);
@@ -169,21 +176,21 @@ console.log('\n--- 3. "A copy; make new lock" ---');
 	ok('the old ID is NOT remembered: this browser only ever met it as a copy', known().indexOf(COPIED) < 0);
 }
 
-console.log('\n--- 4. "Original; keep same lock" ---');
+console.log('\n--- 4. the Original answer ---');
 const ORIG = idAt(T0 + 60000, 'OrIg0001');
 {
 	lockedIds.add(ORIG);
 	await L.openHandle(fileWith(ORIG, 'Elm Street'));
 	await settle();
-	ok('the question is asked', dialogText()[0] === 'Mark file as new copy?');
+	ok('the question is asked', dialogText()[0] === TITLE);
 	posted.length = 0;
 	press(ORIGINAL_BTN);
 	await settle();
 	ok('the ID is remembered', known().indexOf(ORIG) >= 0);
-	ok('the ordinary lock question follows', dialogOpen() && dialogButtons().indexOf('Open read-only') >= 0,
+	ok('the ordinary lock question follows', dialogOpen() && dialogButtons().indexOf(READ_ONLY_BTN) >= 0,
 		JSON.stringify(dialogButtons()));
 	ok('...and nothing was sent about the lock in between', posted.length === 0);
-	press('Cancel');
+	press(CANCEL_BTN);
 	await settle();
 }
 
@@ -192,17 +199,17 @@ console.log('\n--- 2. the gate is silent when this browser knows the ID ---');
 	await L.openHandle(fileWith(ORIG, 'Elm Street'));
 	await settle();
 	ok('the same original, opened again, goes straight to the lock question',
-		dialogOpen() && dialogText()[0] !== 'Mark file as new copy?' && dialogButtons().indexOf('Open read-only') >= 0,
+		dialogOpen() && dialogText()[0] !== TITLE && dialogButtons().indexOf(READ_ONLY_BTN) >= 0,
 		JSON.stringify(dialogText()[0]));
-	press('Cancel');
+	press(CANCEL_BTN);
 	await settle();
 	// An ID this browser MINTED is known without anybody answering anything.
 	const mine = L.newDocId();
 	lockedIds.add(mine);
 	await L.openHandle(fileWith(mine, 'Made here'));
 	await settle();
-	ok('an ID minted in this browser is never asked about', dialogOpen() && dialogText()[0] !== 'Mark file as new copy?');
-	press('Cancel');
+	ok('an ID minted in this browser is never asked about', dialogOpen() && dialogText()[0] !== TITLE);
+	press(CANCEL_BTN);
 	await settle();
 	// Nobody holds it: nothing to ask, whatever this browser remembers.
 	const free = idAt(T0 + 120000, 'FrEe0001');
