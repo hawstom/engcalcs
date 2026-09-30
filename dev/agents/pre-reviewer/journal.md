@@ -3523,3 +3523,114 @@ and I ran out of budget chasing the toolbar-visibility rabbit hole to test it by
 architecture (freqTabShow reads colorValueOf(), the same seam Time series and the map colouring
 already use, and refresh is wired through the pane framework's existing refreshPaneIfOpen(), called
 from 40+ sites) makes an independent leak unlikely, but this is inference, not a measurement.
+
+## 2026-09-30 -- feat/help-menu (Task 745, Task 718), READY with one suite-wide caveat
+
+OBSERVED (static): `dev/lpn-spike/help-file-menu-745-718-harness.js` run clean in the worktree,
+49/49. Read its assertions rather than trusting the count: it checks Help's two-separator/three-group
+shape and order against Tom's own words, the Hotkeys box's Map table against `LPN_TOOL_KEYS` (all
+nine digits + Esc alt + Delete + Ctrl+Z + zoom keys) read out of the live source rather than a
+hand-copied list, File's Recent-files-above-Close, and the three import rows folded into one
+`Import…` submenu. `php dev/scripts/lang_syntax_validate.php` and
+`php dev/scripts/lpn_furniture_check.php` both pass clean on the worktree head; `lpn_hotkeysbox` is
+declared browser-scoped furniture and `dev/cookie-storage-inventory.md` was updated for it (Tom's
+storage rule).
+
+OBSERVED (real headless Chrome, `dev/browser-pass/lib/env.js` + `lib/session.js` driven from a
+standalone script outside the repo, `flock /tmp/engcalcs-browser.lock`, one throwaway `php -S` +
+Chromium per section, all killed clean afterward):
+- Tables and Hotkeys box: opens from Help, drags by its title bar (measured delta matched the drag
+  exactly), closes by its X, Escape with focus elsewhere on the page leaves it open, Escape with
+  focus genuinely inside it closes it -- all four match the Notes box's own spec
+  (`dev/browser-pass/specs/notesbox.js`), which this box shares a shell with.
+- Phone width (390x844): opens, stays fully within the viewport, its close X lands on-screen and
+  reachable.
+- Native `resize:both` corner-drag was NOT exercised -- two synthetic-drag attempts on the
+  bottom-right corner produced no size change, and I could not tell in the time available whether
+  that is a real defect or a Playwright/headless-Chrome native-resize-handle flakiness (the sibling
+  Notes box's own spec does not test resize either, so there is no working pattern in this repo to
+  imitate). **UNVERIFIABLE FROM HERE: whether the Tables and Hotkeys box actually resizes by
+  dragging its corner** -- a person should try it once with a real mouse.
+- **Map hotkeys content is genuinely complete against the live keydown handlers**, not just against
+  the harness's own claims: grepped every `keydown` listener in `js/looped-network.js`,
+  `js/lpn-time.js`, `js/Calculators.lib.js` by hand. Every map-level shortcut that exists
+  (`LPN_TOOL_KEYS` 1-9, Ctrl+Z, `+`/`=`/`-`) is in the box's Map table (13 rows, counted). No
+  redo binding exists to omit. The Tables context (moved `lpn_notes_6`/`lpn_notes_7` verbatim,
+  confirmed byte-identical keys, not duplicated) also covers Ctrl+Shift+V, Ctrl+D, Ctrl+Enter,
+  Ctrl+A, F2, Esc -- the table-pane shortcuts I found in the keydown grep at
+  `js/looped-network.js:26081`/`26292`. I found no Ctrl+Shift+PageUp/Down binding anywhere in the
+  tree (that was a hypothetical in my own brief, not a real gap).
+- **Keyboard navigation of the Help menu and its fly-out (Toolbar key), and of File's Import
+  fly-out, does not work with the keyboard at all -- measured, not inferred.** Opening a menu with a
+  real click and pressing Tab moves focus to the NEXT focusable element on the whole page (the
+  language switcher), never into the popup; ArrowDown/ArrowUp/ArrowRight/ArrowLeft do nothing inside
+  an open menu. Confirmed by reading `openMenu()` in `js/looped-network.js` (~line 36099): rows are
+  real `<button>` elements, but the function binds `click` and `mouseenter` only -- no `keydown`
+  listener anywhere on `#lpn_menu_list` or `#lpn_menu_popup`, and no focus is moved onto the popup or
+  its first row when it opens. **This is suite-wide, not new to this branch** -- `openMenu()` is the
+  one function every menu bar item uses (File, Edit, Map, Project, Help, all of them), so Edit >
+  Find's fly-out and every other submenu in the app has the identical gap. Worth a ROADMAP entry of
+  its own; not a regression this branch introduced, and not fair to hold against Task 745/718
+  specifically.
+
+Left clean: worktree `git status` clean throughout (I never edited or committed to it). No leftover
+`php -S` or headless Chrome processes (checked with `pgrep` after each run). Removed my own
+`chime.busy` touch at the end.
+
+Files: probe script `/tmp/claude-1000/.../scratchpad/perry-hotkeys-probe.js` (not committed,
+standalone, imports the worktree's own `dev/browser-pass/lib/{env,session}.js` and
+`playwright-core` rather than editing `dev/browser-pass/run.js`'s `SPECS` list, since I may not edit
+branch code).
+
+# Pre-review: feat/fireflow-scope (2026-09-30)
+
+OBSERVED (measured this session, will decay): feat/fireflow-scope worktree at
+/home/haws/webdev/worktrees/feat-fireflow-scope/engcalcs, commit 8bee6721.
+
+- Ran dev/lpn-spike/fireflow-design-scope-harness.js and fireflow-box-harness.js: all pass.
+  Confirmed by cross-check that master's own copy of the design-scope harness (pre-Task-746)
+  also passes on master's code with numerically identical minPressure/maxVelocity
+  (14.061391592783185 / 3.0480000000000005) -- computation genuinely untouched, only the UI
+  changed.
+- grep across js/php/harnesses for the five deleted keys (lpn_ff_scope_all, lpn_ff_scope_selected,
+  lpn_ff_design_off, lpn_ff_design_all, lpn_ff_design_selected): zero references anywhere. A
+  sixth similarly-named key, lpn_ff_design_off_note, is untouched by this branch and still used
+  (js/looped-network.js:55707) -- correctly left alone, not a leak.
+- Drove a real headless Chrome (dev/lpn-spike/browser-drive.js) against the worktree served by
+  `php -S` with the worktree's PARENT as docroot (docroot must be the parent so /engcalcs/... paths
+  resolve -- the app's chrome is absolute-from-origin). Opened Net1, Water > Fire flow analysis,
+  and read the real DOM:
+  - Checkbox row ("Design check (effect on system)") renders as a genuine <input type=checkbox>,
+    13x13px, checked by default (ask.design defaults to 'all').
+  - The scope <select> ("Pipes and other junctions to check") sits directly beneath it in both
+    reading order and pixel y (checkbox y=453/449, scope y=477/478 in two runs) -- reads as
+    Tom's "(b) ...; (specify) ... All/Selected" structure, heading-then-detail.
+    UNVERIFIABLE FROM HERE: whether the visual indent/grouping communicates "belongs to
+    checkbox" strongly enough -- that is a look-at-it judgment a browser pass should make.
+  - Unchecking the checkbox disables the scope select (select.disabled true); rechecking
+    re-enables it. Confirmed via direct DOM property AND via a simulated change event.
+  - Tab order through the dialog is natural top-to-bottom: ...Residual pressure, Design check
+    checkbox, Pipes-and-other-junctions select, Lowest pressure... -- no keyboard trap, disabled
+    control correctly excluded from the offsetParent/!disabled focusable list.
+  - Both no-selection messages fire and match Tom's words character-for-character:
+    - (b) "The design check scope is set to Selected, but no assets are selected. Select assets
+      or select All." -- matches his 2026-09-29 quote exactly.
+    - (a) "No junction is selected. Choose one on the map, or select All." -- matches
+      lib/lang.ec.en.php.
+  - Phone width: emulated 390x844 (iPhone-class) via CDP Emulation.setDeviceMetricsOverride.
+    All seven dialog rows fit inside the viewport (rowRight 377 < 390, no overflow); the .lpn-ff-row
+    CSS rule the branch added (`input[type="checkbox"] { flex: 0 0 auto }`) does what it says --
+    the checkbox does not stretch to the 8rem control column.
+- css/engcalcs.css diff is a single added rule, correctly scoped to `.lpn-ff-row > input[type="checkbox"]`;
+  no leak into other checkboxes elsewhere in the suite (selector is scoped to the fire-flow form).
+
+Verdict: READY. No blockers found. One UNVERIFIABLE FROM HERE item above (visual grouping
+strength of checkbox+scope) is the only thing left for an actual browser pass to judge; everything
+else -- wiring, wording, disabling, tab order, phone width, key hygiene, computation parity --
+was measured, not argued.
+
+Trap for next time: php -S's docroot must be the WORKTREE'S PARENT, not the worktree itself, or
+every /engcalcs/... asset 404s as HTML and the app never boots (silent "Unexpected token '<'"
+exceptions, page falls back to rendering something that looks like the homepage). Also: two
+php -S invocations on the same port fail silently (older one keeps serving) unless you check the
+log for "Address already in use".
