@@ -1,0 +1,134 @@
+[
+ {
+  "n": 150,
+  "set": "gen-grid-n150-s70-epanet-novato-j0.2-seed1",
+  "wallMs": 5866,
+  "exit": 0,
+  "views": [
+   {
+    "view": "gen-grid-n150-s70-epanet-novato-j0.2-seed1@1x",
+    "labelsReq": 401,
+    "masterMs": 743.38
+   },
+   {
+    "view": "gen-grid-n150-s70-epanet-novato-j0.2-seed1@1.5x",
+    "labelsReq": 225,
+    "masterMs": 539.92
+   },
+   {
+    "view": "gen-grid-n150-s70-epanet-novato-j0.2-seed1@2x",
+    "labelsReq": 126,
+    "masterMs": 214.51
+   },
+   {
+    "view": "gen-grid-n150-s70-epanet-novato-j0.2-seed1@3x",
+    "labelsReq": 52,
+    "masterMs": 216.9
+   },
+   {
+    "view": "gen-grid-n150-s70-epanet-novato-j0.2-seed1@4x",
+    "labelsReq": 32,
+    "masterMs": 200.94
+   }
+  ]
+ },
+ {
+  "n": 500,
+  "set": "gen-grid-n500-s70-epanet-novato-j0.2-seed1",
+  "wallMs": 15802,
+  "exit": 0,
+  "views": [
+   {
+    "view": "gen-grid-n500-s70-epanet-novato-j0.2-seed1@1x",
+    "labelsReq": 505,
+    "masterMs": 2393.26
+   },
+   {
+    "view": "gen-grid-n500-s70-epanet-novato-j0.2-seed1@1.5x",
+    "labelsReq": 229,
+    "masterMs": 1980.9
+   },
+   {
+    "view": "gen-grid-n500-s70-epanet-novato-j0.2-seed1@2x",
+    "labelsReq": 130,
+    "masterMs": 912.37
+   },
+   {
+    "view": "gen-grid-n500-s70-epanet-novato-j0.2-seed1@3x",
+    "labelsReq": 52,
+    "masterMs": 791.63
+   },
+   {
+    "view": "gen-grid-n500-s70-epanet-novato-j0.2-seed1@4x",
+    "labelsReq": 35,
+    "masterMs": 678.3
+   }
+  ]
+ },
+ {
+  "n": 1000,
+  "set": "gen-grid-n1000-s70-epanet-novato-j0.2-seed1",
+  "wallMs": 33035,
+  "exit": 0,
+  "views": [
+   {
+    "view": "gen-grid-n1000-s70-epanet-novato-j0.2-seed1@1x",
+    "labelsReq": 523,
+    "masterMs": 4866.54
+   },
+   {
+    "view": "gen-grid-n1000-s70-epanet-novato-j0.2-seed1@1.5x",
+    "labelsReq": 219,
+    "masterMs": 6838.55
+   },
+   {
+    "view": "gen-grid-n1000-s70-epanet-novato-j0.2-seed1@2x",
+    "labelsReq": 124,
+    "masterMs": 2050.65
+   },
+   {
+    "view": "gen-grid-n1000-s70-epanet-novato-j0.2-seed1@3x",
+    "labelsReq": 56,
+    "masterMs": 2558.34
+   },
+   {
+    "view": "gen-grid-n1000-s70-epanet-novato-j0.2-seed1@4x",
+    "labelsReq": 35,
+    "masterMs": 2051.36
+   }
+  ]
+ },
+ {
+  "n": 2000,
+  "set": "gen-grid-n2000-s70-epanet-novato-j0.2-seed1",
+  "wallMs": 194677,
+  "exit": 0,
+  "views": [
+   {
+    "view": "gen-grid-n2000-s70-epanet-novato-j0.2-seed1@1x",
+    "labelsReq": 518,
+    "masterMs": 51605.9
+   },
+   {
+    "view": "gen-grid-n2000-s70-epanet-novato-j0.2-seed1@1.5x",
+    "labelsReq": 223,
+    "masterMs": 33721.49
+   },
+   {
+    "view": "gen-grid-n2000-s70-epanet-novato-j0.2-seed1@2x",
+    "labelsReq": 122,
+    "masterMs": 9682.36
+   },
+   {
+    "view": "gen-grid-n2000-s70-epanet-novato-j0.2-seed1@3x",
+    "labelsReq": 47,
+    "masterMs": 5421.82
+   },
+   {
+    "view": "gen-grid-n2000-s70-epanet-novato-j0.2-seed1@4x",
+    "labelsReq": 33,
+    "masterMs": 6592.97
+   }
+  ]
+ }
+]

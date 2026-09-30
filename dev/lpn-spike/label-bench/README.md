@@ -6,8 +6,9 @@ builds no placer.
 **If you are building a placer: read `dev/label-placement-rules.md` Part A only — §1 through §5
 (the goal, Never, what the result looks like, the hints, and the job). Do not read Part B (§5-§6
 held back, and §6) of that file, this repo's `judges/` directory, this branch's or this bench's git
-history, or the app's existing label placement code (`js/lpn-collide.js` and friends) — those hold
-secret tests and prior answers you are meant to solve independently.**
+history, the trial records in `dev/label-trials/`, or the app's existing label placement code
+(`js/lpn-collide.js` and friends) — those hold secret tests and prior answers you are meant to solve
+independently.**
 
 ```sh
 node dev/lpn-spike/label-bench/run.js --placer <your-placer.js>            # one table, exit 1 on any N1, N3, N4 or N5 break
@@ -144,6 +145,19 @@ the scene's own viewport (`0.75 * min(viewport width, viewport height)`, master'
 `labelRepeatSpacing()` in `js/looped-network.js`) rather than by re-running `extract.js`'s headless
 browser pass for a field that is entirely derived from a viewport already in every committed scene.
 Every scene here shares one fixed 1400x900 canvas, so this is one number (675) for all of them.
+
+## Generated and published networks (round 5 on)
+
+- `generator.js` makes a network of any size and shape on demand (families grid, tree, suburban,
+  downtown; 50 to 5,000+ nodes; ID styles short, epanet, long, mixed; field sets id, novato, full),
+  exactly reproducible from (family, parameters, seed). `node generator.js --family grid --n 500
+  --seed 1 --stats` describes one.
+- `networks/` holds published utility-scale networks with open licences (L-Town, C-Town; licences
+  and what was not added, and why, in its README).
+- `extract.js --gen '<spec>' <scene dir> <master dir>` turns either into a scene set, zoomed so
+  the median nearest-neighbour distance is `spacingPx` screen px at the first view, then 1.5x, 2x,
+  3x and 4x about the same node. `noMaster: true` skips master's recording (its collision pass
+  grows with the whole network) and accepts a list of spacings from one load.
 
 ## The two reference placers (`placers/`)
 
