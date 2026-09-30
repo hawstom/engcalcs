@@ -4,6 +4,8 @@
 //   node dev/lpn-spike/label-bench/extract.js            (every public scene set)
 //   node dev/lpn-spike/label-bench/extract.js --judges   (the judges' prefixed sets as well)
 //   node dev/lpn-spike/label-bench/extract.js --only novato-zoom
+//   node dev/lpn-spike/label-bench/extract.js --gen '{"family":"grid","n":500,"seed":1}' <scene dir> <master dir>
+//                                                        (one generated set, generator.js)
 //
 // The page is js/looped-network.js evaluated against dev/lpn-spike/lpn-dom-stub.js, exactly as
 // label-crossing-measure.js loads it: the example is opened, solved through the vendored EPANET
@@ -28,6 +30,8 @@ const NOVATO = 'Net3-Novato-CA-World.lwn';
 const NOVATO_NODE_FIELDS = ['id', 'pressure', 'demand', 'elev'];   // P, Qb, Z (and the ID)
 const SEQ_CENTER = '179';
 const SEQ_MULTS = [1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4];
+const GEN_MULTS = [1, 1.5, 2, 3, 4];
+const Gen = require('./generator.js');
 
 // Every scene set the bench ships. `views` is 'saved' (the view the file opens on), 'zooms'
 // (fit then 2x, 4x, 8x about the node centroid) or 'seq' (a zoom sequence about one node).
@@ -89,7 +93,9 @@ async function extractSet(set) {
 	);
 	L.buildLayers();
 	L.setCanvas(CANVAS.w, CANVAS.h);
-	const saved = JSON.parse(fs.readFileSync(path.join(EXAMPLES, set.file), 'utf8'));
+	// A generated set (generator.js, round 5 on: "the infinite map") carries its document; the rest
+	// are the example files.
+	const saved = set.doc ? JSON.parse(JSON.stringify(set.doc)) : JSON.parse(fs.readFileSync(path.join(EXAMPLES, set.file), 'utf8'));
 	// **THE FILE'S LABELING THRESHOLD IS CLEARED.** Net3 (30) and Novato (65000) carry one that
 	// hides every label at the views measured here; a bench of empty views measures nothing.
 	if (saved.settings) { saved.settings.labelMaxWidth = null; }
@@ -130,6 +136,23 @@ async function extractSet(set) {
 			cx /= doc.nodes.length; cy /= doc.nodes.length;
 			return [1, 2, 4, 8].map(function (m) {
 				return { tag: m === 1 ? 'fit' : m + 'x', mult: m, v: { cx: cx, cy: cy, s: sFit * m } };
+			});
+		}
+		if (set.views === 'gen') {
+			// **A GENERATED SET IS ZOOMED BY ITS DENSITY, NOT ITS EXTENT.** The first view puts the
+			// median nearest-neighbour distance at `spacingPx` screen px, centred on the node nearest
+			// the centroid, so a large network runs off the screen on every side ("the infinite map");
+			// then GEN_MULTS about the same node.
+			const pts = doc.nodes.filter(function (n) { return n.type !== 'reservoir'; }).map(function (n) { return L.nodeAt(n); });
+			let gx = 0, gy = 0;
+			pts.forEach(function (p) { gx += p.x; gy += p.y; });
+			gx /= pts.length; gy /= pts.length;
+			let cen = pts[0];
+			pts.forEach(function (p) { if (Math.hypot(p.x - gx, p.y - gy) < Math.hypot(cen.x - gx, cen.y - gy)) { cen = p; } });
+			const nnDraw = Gen.medianNN({ nodes: pts.map(function (p) { return { x: p.x, y: p.y, type: 'junction' }; }) });
+			const s1 = set.spacingPx / nnDraw;
+			return GEN_MULTS.map(function (m) {
+				return { tag: m + 'x', mult: m, v: { cx: cen.x, cy: cen.y, s: s1 * m } };
 			});
 		}
 		const c = L.nodeAt(L.nodeById(SEQ_CENTER));
@@ -242,6 +265,22 @@ function writeJson(file, obj) {
 
 async function main() {
 	const args = process.argv.slice(2);
+	if (args[0] === '--gen') {
+		// A GENERATED SET: node extract.js --gen '<spec json>' <scene dir> <master dir>. The document is
+		// made here from the spec (generator.js), so the same spec always extracts the same scene.
+		const spec = JSON.parse(args[1]), doc = Gen.generate(spec), sp = Gen.normSpec(spec);
+		const set = { id: Gen.specKey(spec), file: Gen.specKey(spec) + '.lwn', doc: doc, views: 'gen', spacingPx: sp.spacingPx };
+		const t0 = Date.now();
+		const res = await extractSet(set);
+		res.set.generator = doc.generator;
+		fs.mkdirSync(args[2], { recursive: true });
+		fs.mkdirSync(args[3], { recursive: true });
+		writeJson(path.join(args[2], set.id + '.json'), res.set);
+		writeJson(path.join(args[3], set.id + '.json'), res.master);
+		const n = res.set.steps.map(function (s) { return s.labels.length; }).join('/');
+		process.stdout.write(set.id + ': ' + res.set.steps.length + ' step(s), labels ' + n + ', ' + (Date.now() - t0) + ' ms\n', function () { process.exit(0); });
+		return;
+	}
 	if (args[0] === '--child') {
 		const set = SETS.concat(JUDGE_SETS).find(function (x) { return x.id === args[1]; });
 		const res = await extractSet(set);
