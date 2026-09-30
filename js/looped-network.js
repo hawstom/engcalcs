@@ -55923,7 +55923,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			if (!ids.length) {
 				setNotice(pc.lpn_ff_no_selection ||
-					'No junction is selected. Choose one on the map, or test every junction.');
+					'No junction is selected. Choose one on the map, or select All.');
 				return;
 			}
 		} else {
@@ -55940,7 +55940,7 @@ var EngCalcs = EngCalcs || {};
 			design = ffDesignSelectedSet(model);
 			if (!design.nodes.length && !design.links.length) {
 				setNotice(pc.lpn_ff_design_no_selection ||
-					'The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.');
+					'The design check scope is set to Selected, but no assets are selected. Select assets or select All.');
 				return;
 			}
 			design.minPressure = minPressure > 0 ? minPressure : 0;

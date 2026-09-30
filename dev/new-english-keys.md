@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 2157 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read on master**, of 2 untranslated keys, of 2154 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,13 +25,20 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-None on master. Every English key here is present in at least one other language.
+## lpn_  (2, 2 to read @@ NEEDS RULING)
+
+- **`lpn_ff_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_ff_selected`**
+  > Selected
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**6 still to read**, of 18 new keys across 12 unmerged branch(es).
+**16 still to read**, of 37 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -42,11 +49,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/sprint-0929-echo (`1189bd0f`) — adds no English strings
-
-### chore/term-concept (`bc078eca`) — adds no English strings
-
-### feat/frequency-plot (`8272fc8e`) — 9 new, all ruled
+### chore/key-merge (`c4482083`) — 9 new, all ruled
 
 - **`lpn_freq_axis_percent`**
   > Percent less than
@@ -76,7 +79,71 @@ build for that would be a gate nobody keeps. Refresh it with
   > Distribution of values
   _Ruled OK 2026-09-30._
 
-### feat/help-menu (`e6c05a1b`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/bentley-interop (`be4dbfb8`) — adds no English strings
+
+### feat/copy-lock (`1d99970f`) — 7 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_copy_body`**
+  > This file was originally created on {date}, but this browser doesn't remember it. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  @@ NEEDS RULING
+- **`lpn_copy_body_nodate`**
+  > This browser doesn't remember this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  @@ NEEDS RULING
+- **`lpn_copy_copy`**
+  > A copy; make new lock
+  @@ NEEDS RULING
+- **`lpn_copy_opened`**
+  > Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.
+  @@ NEEDS RULING
+- **`lpn_copy_original`**
+  > Original; keep same lock
+  @@ NEEDS RULING
+- **`lpn_copy_title`**
+  > Mark file as new copy?
+  @@ NEEDS RULING
+- **`lpn_copy_why`**
+  > Another browser has a file with this same lock open right now. A file copied outside this page keeps its original's lock.
+  @@ NEEDS RULING
+
+### feat/find-filter (`92b573b5`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_pane_filter_stale`**
+  > Rows that no longer match: {n}.
+  @@ NEEDS RULING
+
+### feat/fireflow-scope (`86f4e2b2`) — adds no English strings
+
+### feat/graph-tab-keys (`ee61d048`) — 9 new, all ruled
+
+- **`lpn_freq_axis_percent`**
+  > Percent less than
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_group_tip`**
+  > Whether the graph shows junctions or pipes.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_menu`**
+  > Frequency
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_none`**
+  > No results for this value yet, so there is nothing to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_quantity_tip`**
+  > Which value to graph.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary`**
+  > Plotted: {n} of {total}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_summary_time`**
+  > Plotted: {n} of {total}, at {time}
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_tip`**
+  > Graph the frequency distribution of one property over all junctions or all pipes at the current time step.
+  _Ruled OK 2026-09-30._
+- **`lpn_freq_title`**
+  > Distribution of values
+  _Ruled OK 2026-09-30._
+
+### feat/help-menu (`d34b00e6`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_file_import_menu`**
   > Import…
@@ -109,7 +176,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/label-placer (`2279a57e`) — adds no English strings
+### feat/label-placer (`4c2d1634`) — adds no English strings
 
 ### feat/label-placer-a (`3483bfd6`) — adds no English strings
 
@@ -119,6 +186,11 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/table-tab-keys (`08b8e73d`) — adds no English strings
+### feat/property-graph (`f22d31af`) — 2 new, 2 to read @@ NEEDS RULING
 
-### fix/new-project-view (`cf9d9c53`) — adds no English strings
+- **`lpn_pgraph_none`**
+  > This asset has no results in the current run.
+  @@ NEEDS RULING
+- **`lpn_pgraph_source_share_from`**
+  > Source share from {node}
+  @@ NEEDS RULING

@@ -25,7 +25,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 743 — Ctrl+Shift+PageDown reaches the graph tabs, not only the tables.
 - Task 744 — Let the bottom pane shrink the map to almost nothing.
 - Task 745 — Help menu in three groups, and a Tables and Hotkeys box.
-- Task 746 — Fire flow dialog: one All/Selected choice for each of its two scopes.
+- Task 746 — Fire flow dialog: Design check is one None/All/Selected selector.
 
 ## 75 — Soon (14)
 
