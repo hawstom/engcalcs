@@ -55212,6 +55212,12 @@ var EngCalcs = EngCalcs || {};
 		i.value = value === undefined || value === null ? '' : String(value);
 		return i;
 	}
+	function ffCheckbox(checked) {
+		var i = document.createElement('input');
+		i.type = 'checkbox';
+		i.checked = !!checked;
+		return i;
+	}
 	function ffSelect(options, value) {
 		var sel = document.createElement('select');
 		options.forEach(function (o) {
@@ -55245,8 +55251,8 @@ var EngCalcs = EngCalcs || {};
 		ffEl('p', 'lpn-ff-note', pc.lpn_ff_intro, host);
 
 		boxes.scope = ffSelect([
-			['all', pc.lpn_ff_scope_all || 'Every junction'],
-			['selected', pc.lpn_ff_scope_selected || 'The selected junctions']
+			['all', pc.lpn_ff_all || 'All'],
+			['selected', pc.lpn_ff_selected || 'Selected']
 		], ask.scope);
 		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', pc.lpn_ff_scope_tip, boxes.scope, '');
 
@@ -55266,21 +55272,29 @@ var EngCalcs = EngCalcs || {};
 		ffRow(host, pc.lpn_ff_residual || 'Residual pressure to hold', pc.lpn_ff_residual_tip,
 			boxes.residual, unitLabel('lpn_u_pressure'));
 
-		// **THE SCOPE OF THE DESIGN SEARCH IS A NAMED SET, CHOSEN BEFORE THE RUN: NONE, ALL, OR
-		// SELECTED** (Tom, 2026-09-28, *"Selection set build: Yes."*). The old middle
-		// value, every other junction without the pipes, went: a blank velocity box already turns
-		// the velocity half off under All (runFireFlowSweep() reads blank as no limit), so it gave
-		// nothing a blank box did not. Selected is the new one -- the impact is checked only at the
-		// junctions selected on the map and the pipes that meet them, which is how a master-plan
-		// appendix scopes it (Sue's and Mary's journals, same day). ffDesignScope() maps the retired
-		// value, should anything still carry it, to All.
-		boxes.design = ffSelect([
-			['off', pc.lpn_ff_design_off || 'Do not check'],
-			['all', pc.lpn_ff_design_all || 'All other junctions and all pipes'],
-			['selected', pc.lpn_ff_design_selected || 'The selected junctions and their pipes']
-		], ffDesignScope(ask.design));
+		// **THE DESIGN CHECK IS A SWITCH, AND ITS SCOPE IS A NAMED SET CHOSEN BEFORE THE RUN: ALL OR
+		// SELECTED** (Tom, 2026-09-29, simplifying the three-way selector to a checkbox plus a scope:
+		// "(b) Design check (effect on system); (specify) pipes and other junctions to check:
+		// All/Selected"). `ask.design` still carries the combined 'off'/'all'/'selected' string that
+		// runFireFlowSweep() and ffDesignScope() already understood, built from the two boxes below
+		// rather than typed directly. ffDesignScope() maps any retired or unknown value, should
+		// anything still carry one, to All.
+		boxes.designOn = ffCheckbox(ffDesignScope(ask.design) !== 'off');
 		ffRow(host, pc.lpn_ff_design || 'Design check (effect on system)', pc.lpn_ff_design_tip,
-			boxes.design, '');
+			boxes.designOn, '');
+		boxes.designScope = ffSelect([
+			['all', pc.lpn_ff_all || 'All'],
+			['selected', pc.lpn_ff_selected || 'Selected']
+		], ffDesignScope(ask.design) === 'selected' ? 'selected' : 'all');
+		boxes.designScope.disabled = !boxes.designOn.checked;
+		ffRow(host, pc.lpn_ff_design_scope || 'Pipes and other junctions to check',
+			pc.lpn_ff_design_scope_tip, boxes.designScope, '');
+		function ffSyncDesignAsk() {
+			boxes.designScope.disabled = !boxes.designOn.checked;
+			ask.design = boxes.designOn.checked ? boxes.designScope.value : 'off';
+		}
+		boxes.designOn.addEventListener('change', ffSyncDesignAsk);
+		boxes.designScope.addEventListener('change', ffSyncDesignAsk);
 
 		boxes.minPressure = ffInput(ask.minPressure);
 		ffRow(host, pc.lpn_ff_minpressure || 'Lowest pressure allowed elsewhere',
@@ -55311,7 +55325,11 @@ var EngCalcs = EngCalcs || {};
 		run.type = 'button';
 		run.disabled = fireFlowBusy;
 		run.addEventListener('click', function () {
-			Object.keys(boxes).forEach(function (k) { ask[k] = boxes[k].value; });
+			Object.keys(boxes).forEach(function (k) {
+				if (k === 'designOn' || k === 'designScope') { return; }
+				ask[k] = boxes[k].value;
+			});
+			ffSyncDesignAsk();
 			runFireFlowSweep();
 		});
 		stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', buttons);
@@ -55330,6 +55348,7 @@ var EngCalcs = EngCalcs || {};
 		// Remembered as it is typed, so closing the box and reopening it does not throw the
 		// criteria away.
 		Object.keys(boxes).forEach(function (k) {
+			if (k === 'designOn' || k === 'designScope') { return; }
 			boxes[k].addEventListener('change', function () { ask[k] = boxes[k].value; });
 		});
 		initTipsIn(host);
