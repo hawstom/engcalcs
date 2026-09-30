@@ -276,11 +276,14 @@ the block.
   **CONCEPT LAYER SHIPPED 2026-09-30** (`chore/term-concept`, `dev/term-concepts.md`): 131 glossary
   terms carry a coined `concept` id and a `definition`; a payload gives the definition as the source
   and English as one rendering; `concept_check.php` blocks. Open: 67 definitions still empty, the four
-  new terms (sally, tessa, dora, hydraulic-head) untranslated.
+  new terms (label-sym-sally, label-user-tessa, label-long-dora, hydraulic-head) untranslated.
   **RULED 2026-09-30: Head and HGL stay split.** And on the coined ids: *"we should say something like
   label-sym-sally, label-user-tessa, label-word-gus, and label-long-dora (assuming those are
   'correct'); or we no longer need the anthro names ... This way the languages know that they all are
   merely labels, and they can inter-compare."* Re-key those four concept ids with the family prefix.
+  **RE-KEYED 2026-09-30**: sally/tessa/gus/dora are now label-sym-sally/label-user-tessa/
+  label-word-gus/label-long-dora everywhere (glossary.json, key_concepts.json, concept_selftest.php,
+  dev/term-concepts.md); definitions unchanged.
 - 100|738| **A Find filter that stays standing, or a snapshot, by the visitor's choice.**
   Tom, 2026-09-28: editing a filtered value out of the filter makes its row vanish. His proposal: a
   standing filter while the Find box is open, with a toggle next to Filter in table to make it a
