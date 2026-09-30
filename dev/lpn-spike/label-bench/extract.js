@@ -90,10 +90,16 @@ async function extractSet(set) {
 		"\t\tlabelSeparator: labelSeparator, linkLabelAligned: linkLabelAligned,\n" +
 		"\t\tlabelRank: labelRank, linkLabelStations: linkLabelStations,\n" +
 		"\t\tlabelFlipLeftOfVertical: labelFlipLeftOfVertical,\n" +
-		"\t\tdocFromInp: docFromInp, inpUnitSelections: inpUnitSelections, applyUnitSelections: applyUnitSelections"
+		"\t\tdocFromInp: docFromInp, inpUnitSelections: inpUnitSelections, applyUnitSelections: applyUnitSelections,\n" +
+		"\t\tcontentOnly: function () { runLabelCollisionAvoidance = function () {}; }"
 	);
 	L.buildLayers();
 	L.setCanvas(CANVAS.w, CANVAS.h);
+	// **SCENES WITHOUT MASTER** (set.noMaster): master's collision pass grows with the WHOLE network,
+	// not the view (round 5 measured 11 minutes at 2,500 nodes with 515 labels on screen), so on a
+	// large generated network the page composes the label text and the pass is switched off. The
+	// scene is the same; master's layout is not recorded.
+	if (set.noMaster) { L.contentOnly(); }
 	// A generated set (generator.js, round 5 on: "the infinite map") carries its document; the rest
 	// are the example files.
 	// A published benchmark network (networks/, its .inp) is read by the app's own importer.
@@ -169,10 +175,16 @@ async function extractSet(set) {
 			// nearest the centroid, any other seed a node drawn from the seed.
 			if (set.inp && set.seed > 1) { cen = pts[Gen.pickIndex(pts.length, 'view|' + set.id)]; }
 			const nnDraw = Gen.medianNN({ nodes: pts.map(function (p) { return { x: p.x, y: p.y, type: 'junction' }; }) });
-			const s1 = set.spacingPx / nnDraw;
-			return GEN_MULTS.map(function (m) {
-				return { tag: m + 'x', mult: m, v: { cx: cen.x, cy: cen.y, s: s1 * m } };
+			// Several densities of ONE loaded network (set.spacings, a large network without master):
+			// each is its own scene set, `<id>` with its spacing, from one load and one solve.
+			const out = [];
+			(set.spacings || [set.spacingPx]).forEach(function (sp) {
+				const s1 = sp / nnDraw, sid = set.spacings ? set.idFor(sp) : set.id;
+				GEN_MULTS.forEach(function (m, k) {
+					out.push({ tag: m + 'x', mult: m, setId: sid, step: k, v: { cx: cen.x, cy: cen.y, s: s1 * m } });
+				});
 			});
+			return out;
 		}
 		const c = L.nodeAt(L.nodeById(SEQ_CENTER));
 		return SEQ_MULTS.map(function (m) {
@@ -206,7 +218,7 @@ async function extractSet(set) {
 		// bench and the browser cannot come to different ideas of what a scene is. Only the text
 		// measurement and the obstacle set are this file's own.
 		const built = Scene.buildScene(L, {
-			id: set.id + '@' + vw.tag, set: set.id, step: steps.length, source: set.file,
+			id: (vw.setId || set.id) + '@' + vw.tag, set: vw.setId || set.id, step: vw.step === undefined ? steps.length : vw.step, source: set.file,
 			canvas: CANVAS, measure: textW, obs: lastObs, zoom: vw.mult
 		});
 		const scene = built.scene, V = built.V;
@@ -312,13 +324,34 @@ async function main() {
 			doc = Gen.generate(spec);
 			set = { id: Gen.specKey(spec), file: Gen.specKey(spec) + '.lwn', doc: doc, views: 'gen', spacingPx: Gen.normSpec(spec).spacingPx };
 		}
+		if (spec.noMaster) {
+			set.noMaster = true;
+		}
 		const t0 = Date.now();
+		if (Array.isArray(spec.spacingPx)) {
+			// One network, several densities: requires noMaster (master's layouts would carry state
+			// from one density to the next; its sets are extracted one per process).
+			if (!set.noMaster) { throw new Error('a list of spacings needs noMaster'); }
+			const base = Object.assign({}, spec);
+			set.spacings = spec.spacingPx;
+			set.idFor = function (sp) { return spec.bench ? set.id.replace(/-s[^-]+-/, '-s' + sp + '-') : Gen.specKey(Object.assign({}, base, { spacingPx: sp })); };
+		}
 		const res = await extractSet(set);
-		res.set.generator = doc.generator;
 		fs.mkdirSync(args[2], { recursive: true });
+		if (set.spacings) {
+			const bySet = {};
+			res.set.steps.forEach(function (st) { (bySet[st.set] = bySet[st.set] || []).push(st); });
+			Object.keys(bySet).forEach(function (sid) {
+				const gsp = Object.assign({}, doc.generator, { key: sid });
+				writeJson(path.join(args[2], sid + '.json'), { id: sid, source: res.set.source, canvas: res.set.canvas, steps: bySet[sid], generator: gsp });
+			});
+			process.stdout.write(Object.keys(bySet).join(', ') + ': ' + res.set.steps.length + ' views, ' + (Date.now() - t0) + ' ms\n', function () { process.exit(0); });
+			return;
+		}
+		res.set.generator = doc.generator;
 		fs.mkdirSync(args[3], { recursive: true });
 		writeJson(path.join(args[2], set.id + '.json'), res.set);
-		writeJson(path.join(args[3], set.id + '.json'), res.master);
+		if (!set.noMaster) { writeJson(path.join(args[3], set.id + '.json'), res.master); }
 		const n = res.set.steps.map(function (s) { return s.labels.length; }).join('/');
 		process.stdout.write(set.id + ': ' + res.set.steps.length + ' step(s), labels ' + n + ', ' + (Date.now() - t0) + ' ms\n', function () { process.exit(0); });
 		return;
