@@ -108,7 +108,6 @@ keys resynced in every stale language, incl. `consent_body` in 26 -- no consent 
 only -- plus his Shift-hint English and his `$ec_lang_syn` for `lpn_goto_on_map`, and "Show on map"
 in 16 languages that had "Go to map"); Task 711 (`fix/new-project-view`); Task 737's concept layer
 (`chore/term-concept`, `dev/term-concepts.md`). Drift baseline re-set 2026-09-30: CHANGED none.
-**Remind him to try drag-to-fill on a phone after he pulls** (his ask, still open).
 
 ### Awaiting his browser pass (protected; merge on his all-clear, typed by him in a session)
 
@@ -136,7 +135,8 @@ ArtifactData `list` on collection `answers` before anything else. Review queue R
 
 New English waiting on branches (translate on each merge): help-menu 6 keys, fireflow-scope 4 new +
 2 changed, frequency-plot 9, property-graph 1, table-tab-keys `lpn_notes_7_def`. The concept layer's
-four new terms (sally, tessa, dora, hydraulic-head) have empty translations. Glossary write-back owed
+four new terms (label-sym-sally, label-user-tessa, label-long-dora, hydraulic-head) have empty
+translations. Glossary write-back owed
 from echo: "Chemical" is a literal EPANET token in `lpn_quality_chemical_name_tip`; Bef./Aft. read as
 prefix/suffix; `lpn_goto_on_map` = show on map.
 

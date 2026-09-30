@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**108 open tasks.** Next (100): 15 · Soon (75): 14 · Someday (50): 45 · Maybe (25): 15 · Parked (5): 19
+**109 open tasks.** Next (100): 15 · Soon (75): 16 · Someday (50): 44 · Maybe (25): 15 · Parked (5): 19
 
 ## 100 — Next (15)
 
@@ -23,11 +23,11 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - ! Task 738 — A Find filter that stays standing, or a snapshot, by the visitor's choice.
 - Task 741 — The infinite map: generated networks for the label bench.
 - Task 743 — Ctrl+Shift+PageDown reaches the graph tabs, not only the tables.
-- Task 744 — Let the bottom pane shrink the map to almost nothing.
 - Task 745 — Help menu in three groups, and a Tables and Hotkeys box.
 - Task 746 — Fire flow dialog: one All/Selected choice for each of its two scopes.
+- Task 747 — A copied project file shares its original's lock.
 
-## 75 — Soon (14)
+## 75 — Soon (16)
 
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
@@ -43,8 +43,10 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 710 — Audit the 57 raw alert and confirm dialogs.
 - Task 714 — Theming: colour tokens first, then a Light/Dark choice in Settings.
 - Task 739 — Say where each setting is saved: the project or this browser.
+- Task 748 — Keyboard menus: arrow keys, Enter, Escape and the fly-outs.
+- Task 749 — Read Bentley WaterCAD/WaterGEMS models.
 
-## 50 — Someday (45)
+## 50 — Someday (44)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -90,7 +92,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 735 — Honour `[TIMES] Statistic` instead of discarding it.
 - Task 736 — [H] · Count installs and app launches, if the consent text allows it.
 - Task 740 — One sentence for the node-size cap, not three fragments.
-- Task 747 — A copied project file shares its original's lock.
 
 ## 25 — Maybe (15)
 
@@ -136,5 +137,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-99 of 108 titles are within 4–12 words. `!` marks the rest;
+100 of 109 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

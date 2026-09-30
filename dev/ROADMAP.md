@@ -240,12 +240,12 @@ the block.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
 - 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
-  Everything named under it has shipped except Ctrl+Shift+PageUp/PageDown between tables, which is
-  built on `feat/table-tab-keys` (port 8136) and merges on Tom's word given directly in a session
-  (2026-09-29: the classifier would not let CC record an all-clear from a pasted list). Graph
-  tabs next: Task 743.
+  Everything named under it has shipped, the table stepping last (`feat/table-tab-keys`, merged
+  2026-09-30 on his word). Graph tabs next: Task 743.
 - 100|699| **Audit the language keys for lazy duplications.**
-  **AUDIT DONE 2026-09-30**: `dev/key-duplication-audit-2026-09-30.md` (74 groups, ~33 keys mergeable); which merges is his call.
+  **AUDIT DONE 2026-09-30**: `dev/key-duplication-audit-2026-09-30.md` (74 groups, ~33 keys mergeable).
+  **RULED 2026-09-30: merge the listed groups and do the Find redesign** (the 4 case-only pairs
+  capitalized in code). Merge with `rename_lang_key.php`-style tooling, never by hand.
   Tom, 2026-09-19: *"can you make sure we have a Roadmap task to audit language for lazy
   duplications where maybe a slight redesign can simplify or eliminate keys?"* He asked for it in
   the same breath as deciding a customer takes the EXISTING Description and Tag rather than an
@@ -276,34 +276,43 @@ the block.
   **CONCEPT LAYER SHIPPED 2026-09-30** (`chore/term-concept`, `dev/term-concepts.md`): 131 glossary
   terms carry a coined `concept` id and a `definition`; a payload gives the definition as the source
   and English as one rendering; `concept_check.php` blocks. Open: 67 definitions still empty, the four
-  new terms (sally, tessa, dora, hydraulic-head) untranslated, and his call on Head vs HGL, split in two.
+  new terms (label-sym-sally, label-user-tessa, label-long-dora, hydraulic-head) untranslated.
+  **RULED 2026-09-30: Head and HGL stay split.** And on the coined ids: *"we should say something like
+  label-sym-sally, label-user-tessa, label-word-gus, and label-long-dora (assuming those are
+  'correct'); or we no longer need the anthro names ... This way the languages know that they all are
+  merely labels, and they can inter-compare."* Re-key those four concept ids with the family prefix.
+  **RE-KEYED 2026-09-30**: sally/tessa/gus/dora are now label-sym-sally/label-user-tessa/
+  label-word-gus/label-long-dora everywhere (glossary.json, key_concepts.json, concept_selftest.php,
+  dev/term-concepts.md); definitions unchanged.
 - 100|738| **A Find filter that stays standing, or a snapshot, by the visitor's choice.**
   Tom, 2026-09-28: editing a filtered value out of the filter makes its row vanish. His proposal: a
   standing filter while the Find box is open, with a toggle next to Filter in table to make it a
   snapshot. Readings in, 2026-09-29, and they disagree: Declan, no toggle, a row edited since the
   filter was applied stays until Filter is pressed again (QGIS's pattern); Ida, a Snapshot checkbox
   beside Filter in table, rows that stopped matching dimmed and marked with a warning sign, and the
-  count in the filter banner. Tom's call.
+  count in the filter banner. **RULED 2026-09-30: the synthesis** -- Declan's rule, no toggle, with
+  Ida's dimming, warning sign and count on the rows that stay but no longer match. Building on
+  `feat/find-filter`.
 - 100|741| **The infinite map: generated networks for the label bench.**
   **ROUND 5 DONE 2026-09-30** on `feat/label-placer`: generator, L-Town and C-Town, pre-registered protocol, `dev/label-trials/round-5-2026-09-29.md`; five rule proposals await his ruling.
   Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
 - 100|743| **Ctrl+Shift+PageDown reaches the graph tabs, not only the tables.**
-  Waits on `feat/table-tab-keys` merging, which carries the stepping it extends.
+  Unblocked 2026-09-30: `feat/table-tab-keys` merged.
   Tom, 2026-09-29, on `feat/table-tab-keys`: *"It would be nice if it also could proceed to the
   graphs."* Follows Task 690's table stepping onto the bottom pane's graph tabs (Frequency, Time
   Series). Seam: the bottom-pane tab strip, shared with `feat/frequency-plot`.
-- 100|744| **Let the bottom pane shrink the map to almost nothing.**
-  **BUILT 2026-09-30 on `feat/pane-height`, port 8140**, awaiting his browser pass.
-  Tom, 2026-09-29: *"It would be good to allow the bottom pane to shrink the map to almost nothing.
-  More freedom for the user is a good thing."*
+
 - 100|745| **Help menu in three groups, and a Tables and Hotkeys box.**
   **BUILT 2026-09-30 on `feat/help-menu`, port 8138** (Perry: ready), awaiting his browser pass.
   Tom, 2026-09-29: *"(1) True help: Walkthroughs, Tables and Hotkeys (new box that has all table help
   and all keyboard shortcuts divided by context), Toolbars. (2) Helpers: Fix something, Install, and
   Cookies. (3) True about: Notes on this page, Welcome page, Screenshot, Privacy, Terms, About."*
   Seam: the menu definitions, shared with Task 718 (File menu); one track builds both.
+  **2026-09-30:** labels kept, Notes stays in group 3, except *"Change 'Toolbar key' to 'Toolbar'"*
+  (done on the branch). On Notes: *"Notes reads like a white paper, as much disclaimer as help. If it
+  needs to exist, it needs a clear job and identity ... For now, Notes is on probation."*
 - 100|746| **Fire flow dialog: one All/Selected choice for each of its two scopes.**
   **BUILT 2026-09-30 on `feat/fireflow-scope`, port 8139** (Perry: ready), awaiting his browser pass.
   Tom, 2026-09-29, ruling `lpn_ff_design_no_selection`: *"Our interface needs simplification as
@@ -311,6 +320,13 @@ the block.
   (specify) pipes and other junctions to check: All/Selected"*, and the message: *"The design check
   scope is set to Selected, but no assets are selected. Select assets or select All"*.
 
+- 100|747| **A copied project file shares its original's lock.**
+  An Explorer copy keeps the document ID, so opening both gives a false "somebody has this open";
+  never lost work. Tom, 2026-09-29: *"If you have a magic fix, go for it. I can't think of one."*
+  2026-09-30, rejecting the file-name idea: *"The fix doesn't help copies with same name. I am willing
+  to pay the privacy line if we get value."* His prompt instead: on open, when the server holds a lock
+  this browser does not remember, ask *"Is this the Original file (keep same lock) or a Copy (make
+  new lock)?"* Building on `feat/copy-lock`.
 - 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
@@ -341,8 +357,8 @@ the block.
   - **CONTOUR is the one he starred and is also the one with a real unknown**: it interpolates a
     nodal value over the plane between nodes, so it needs a decision about what happens where there
     are no nodes -- a pressure contour across a river a main crosses is drawn over nothing.
-  - **FREQUENCY DISTRIBUTION is nearly free** and would be the first slice: a histogram of one
-    property over one element type is a sort and a bucket count, no interpolation and no geometry.
+  - **FREQUENCY SHIPPED 2026-09-30** (`feat/frequency-plot`, merged on his word). Contour and flow
+    balance remain.
   - **SYSTEM FLOW BALANCE -- AND HIS READING OF IT IS RIGHT, but confirm it against EPANET's own
     help before writing a word of interface.** He guessed *"produced comes from reservoirs and
     negative demands and consumed is positive demands"*; that matches how the engine accounts for
@@ -500,6 +516,15 @@ the block.
 - 75|739| **Say where each setting is saved: the project or this browser.**
   Tom, 2026-09-28, on learning dragged column widths live in the browser: *"Systematically disclose to users where things are stored. Autodesk does this so well that I, a user can cite by memory that variables are stored in the drawing (project), session, or user profile. Every sysvar listing includes 'Where it's stored.'"* Also *"Maybe include Width in the manage columns box with a tip glyph as a secondary discovery path"*, and a delayed tip on the column dragger (never on a phone). The inventory is `dev/cookie-storage-inventory.md`; CLAUDE.md already splits project vs browser settings.
 
+- 75|748| **Keyboard menus: arrow keys, Enter, Escape and the fly-outs.**
+  Found by Perry on `feat/help-menu`: Tab leaves an open menu for the next thing on the page and the
+  arrows do nothing, in every menu, because the one function that opens them wires only clicks.
+  Predates that branch. Tom set 75 on 2026-09-30.
+- 75|749| **Read Bentley WaterCAD/WaterGEMS models.**
+  Tom, 2026-09-30: *"We can see how far we get reading and writing the Bentley .sqlite file also."*
+  Phase 1 (`feat/bentley-interop`, `dev/bentley-interop.md`): the `.wtg.sqlite` schema is unpublished,
+  no public sample exists, the EULA's reverse-engineering clause is his to read; writing is a no-go.
+  Next: he exports one of his own WaterCAD models to `.inp` and we report what the round trip loses.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -1058,6 +1083,10 @@ the block.
   HEC-RAS, but it could be threatening to new users. What seems very welcoming is the set of
   pre-configured scenarios and the ironclad rule that you are always editing only the specific data
   layers (Alternatives) mapped to that Active Scenario."* Read against our scenario model first.
+  **Sheets as the scenario store, asked 2026-09-30; Mary, Sue and Declan all advise against.** No tool
+  they found keeps scenarios in a live spreadsheet; a sync breaks "nothing you draw is uploaded";
+  topology does not fit rows. Cheaper: CSV/xlsx import-export of override tables, and an "Apply
+  scenario X to this one" command. Scenario lists sort by name since `fix/scenario-sort`.
 - 50|722| **Change and revision tracking.**
   Tom, 2026-09-25, from WaterCAD: *"I like change/revision tracking very cool."*
 - 50|725| **One wide fire-flow table instead of two reports.**
@@ -1094,9 +1123,6 @@ the block.
   Sprint 2026-09-28-delta: five languages (it, he, ur, my, am) could not assemble
   lpn_settings_symbol_cap + _mid + _post around two number inputs in their word order. One key with
   {n} and {p} placeholders, split into inputs at render time.
-- 50|747| **A copied project file shares its original's lock.**
-  An Explorer copy keeps the document ID, so opening both gives a false "somebody has this open";
-  never lost work. Tom, 2026-09-29: *"If you have a magic fix, go for it. I can't think of one."*
 
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,

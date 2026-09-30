@@ -21,26 +21,26 @@ $t = static function (string $term, string $id, string $def = '', ?string $en = 
     return $row;
 };
 $sound = [
-    $t('label (map annotation)', 'sally', 'Text the page writes from data.', 'Label'),
-    $t('text (map annotation)', 'tessa', 'Text the user types.', 'Text'),
+    $t('label (map annotation)', 'label-sym-sally', 'Text the page writes from data.', 'Label'),
+    $t('text (map annotation)', 'label-user-tessa', 'Text the user types.', 'Text'),
     $t('head', 'head-family', 'Energy per unit weight as a length.'),
     $t('hydraulic head (node value)', 'hydraulic-head', 'z + p/gamma at a point.', 'Head'),
     $t('flow', 'flow'),
 ];
 $en = ['lpn_tool_labels' => 'Labels', 'lpn_result_head' => 'Head'];
-$cites = ['lpn_tool_labels' => ['sally'], 'lpn_result_head' => ['hydraulic-head']];
+$cites = ['lpn_tool_labels' => ['label-sym-sally'], 'lpn_result_head' => ['hydraulic-head']];
 
 $withTerms = static function (array $rows) use ($sound): array { return array_merge($sound, $rows); };
 
 $cases = [
     ['a sound table with two concepts sharing the English word Head', $sound, $cites, false],
-    ['THE DEFECT: two terms share one concept id', $withTerms([$t('tag (EPANET)', 'sally')]), $cites, true],
+    ['THE DEFECT: two terms share one concept id', $withTerms([$t('tag (EPANET)', 'label-sym-sally')]), $cites, true],
     ['an id that is another term\'s English rendering (head vs Head, the root family)',
         $withTerms([$t('pressure head', 'head')]), $cites, true],
     ['an id that folds to another term\'s name through case and punctuation',
         $withTerms([$t('something else', 'text-map-annotation')]), $cites, true],
-    ['a key citing an id no term carries', $sound, $cites + ['lpn_field_tag' => ['gus']], true],
-    ['a key that is not in the English file', $sound, ['lpn_gone' => ['sally']] + $cites, true],
+    ['a key citing an id no term carries', $sound, $cites + ['lpn_field_tag' => ['label-word-gus']], true],
+    ['a key that is not in the English file', $sound, ['lpn_gone' => ['label-sym-sally']] + $cites, true],
     ['a term with no concept id at all', $withTerms([['term' => 'orphan', 'definition' => '']]), $cites, true],
     ['an id that cannot be cited without quoting', $withTerms([$t('odd', 'Odd Id')]), $cites, true],
     ['a term with no definition field (empty is fine, absent is not)',
