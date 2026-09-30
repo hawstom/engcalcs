@@ -1654,6 +1654,15 @@ $ec_lang['lpn_ts_none']='Henüz çizilecek bir şey yok. Haritada varlıklar se�
 $ec_lang['lpn_ts_no_frames']='Henüz uzatılmış dönem sonucu yok. Simülasyonu çalıştırmak için Hesapla\'ya basın.';
 $ec_lang['lpn_ts_summary']='Varlıklar: {n}, raporlama zamanları: {steps}';
 $ec_lang['lpn_ts_axis_time']='Geçen süre';
+$ec_lang['lpn_freq_menu']='Frekans';
+$ec_lang['lpn_freq_tip']='Geçerli zaman adımındaki tüm düğümler veya tüm borular üzerinde bir özelliğin frekans dağılımını çizin.';
+$ec_lang['lpn_freq_title']='Değerlerin dağılımı';
+$ec_lang['lpn_freq_group_tip']='Grafiğin düğümleri mi yoksa boruları mı gösterdiği.';
+$ec_lang['lpn_freq_quantity_tip']='Hangi değerin çizileceği.';
+$ec_lang['lpn_freq_none']='Bu değer için henüz sonuç yok, bu yüzden çizilecek bir şey yok.';
+$ec_lang['lpn_freq_summary']='Çizilen: {n} / {total}';
+$ec_lang['lpn_freq_summary_time']='Çizilen: {n} / {total}, {time} zamanında';
+$ec_lang['lpn_freq_axis_percent']='Altında kalan yüzde';
 $ec_lang['lpn_view_units']='Birimler';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Tümünü kaydet';
@@ -2121,7 +2130,7 @@ $ec_lang['lpn_notes_6_term']='Tablo sütunları yardımı';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Sütun seç</td><td>Başlığa tıklayın</td></tr><tr><td>Sütun seçimini ekle veya genişlet</td><td>Başka bir başlığa Ctrl+tıklama veya Shift+tıklama yapın</td></tr><tr><td>Seçili sütun(lar)ı taşı (yeniden sırala)</td><td>Sürükleyin ya da sağ tık veya ⋮ menüsünde Sütunları yönet…\'i kullanın</td></tr><tr><td>⋮ menüsü ve sıralama oku.</td><td>Bir başlığın üst köşesinin üzerine gelin, ya da bir başlığı seçin veya Tab ile içine girin</td></tr><tr><td>Gizle, Tümünü göster, ya da görünürlüğü ve sırayı yönet</td><td>Başlığa sağ tıklayın ya da başlığın sağ üst köşesindeki ⋮ menüsü</td></tr><tr><td>Sütuna göre sırala</td><td>Başlığın sağ üst köşesindeki ok simgesi</td></tr><tr><td>Tablonun sonuna yeni satır olarak yapıştır</td><td>Sağ tık, başlığın sağ üst köşesindeki ⋮ menüsü, ya da Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Tablo klavye kısayolları';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Ok tuşları</td><td>Gezinin.</td></tr><tr><td>Tab, Enter</td><td>Girişi tamamlayın ve bir hücre yatayda / aşağıda gezinin.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Geriye doğru gezinin.</td></tr><tr><td>Shift+ok tuşları</td><td>Seçimi genişletin.</td></tr><tr><td>Ctrl+C</td><td>Seçimi kopyalayın.</td></tr><tr><td>Ctrl+D</td><td>Seçimi en üst satırından aşağı doldurun.</td></tr><tr><td>Ctrl+Enter</td><td>Seçimi etkin hücrenin değeriyle doldurun.</td></tr><tr><td>Ctrl+A</td><td>Tüm tabloyu seçin.</td></tr><tr><td>Ctrl+Shift+V</td><td>Tablonun sonuna yeni satır olarak yapıştırın.</td></tr><tr><td>Delete</td><td>Bir hücreyi temizleyin.</td></tr><tr><td>F2</td><td>Bir hücreyi düzenlemek için açın.</td></tr><tr><td>Esc</td><td>Bir düzenlemeyi iptal edin.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Ok tuşları</td><td>Gezinin.</td></tr><tr><td>Tab, Enter</td><td>Girişi tamamlayın ve bir hücre yatayda / aşağıda gezinin.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Geriye doğru gezinin.</td></tr><tr><td>Shift+ok tuşları</td><td>Seçimi genişletin.</td></tr><tr><td>Ctrl+C</td><td>Seçimi kopyalayın.</td></tr><tr><td>Ctrl+D</td><td>Seçimi en üst satırından aşağı doldurun.</td></tr><tr><td>Ctrl+Enter</td><td>Seçimi etkin hücrenin değeriyle doldurun.</td></tr><tr><td>Ctrl+A</td><td>Tüm tabloyu seçin.</td></tr><tr><td>Ctrl+Shift+V</td><td>Tablonun sonuna yeni satır olarak yapıştırın.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Sonraki veya önceki tabloya geçin.</td></tr><tr><td>Delete</td><td>Bir hücreyi temizleyin.</td></tr><tr><td>F2</td><td>Bir hücreyi düzenlemek için açın.</td></tr><tr><td>Esc</td><td>Bir düzenlemeyi iptal edin.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

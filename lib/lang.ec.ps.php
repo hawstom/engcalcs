@@ -1656,6 +1656,15 @@ $ec_lang['lpn_ts_none']='تر اوسه د ګراف کولو لپاره هیڅ ش
 $ec_lang['lpn_ts_no_frames']='تر اوسه د اوږدې مودې پایلې نشته. سمولېشن چلولو لپاره محاسبه فشار کړئ.';
 $ec_lang['lpn_ts_summary']='شتمنۍ: {n}، د راپور وختونه: {steps}';
 $ec_lang['lpn_ts_axis_time']='تیر شوی وخت';
+$ec_lang['lpn_freq_menu']='تعدد';
+$ec_lang['lpn_freq_tip']='د یوې ځانګړتیا د تعدد ویش، د ټولو جنکشنونو یا ټولو پایپونو لپاره، په اوسني وخت پړاو کې ګراف کړئ.';
+$ec_lang['lpn_freq_title']='د ارزښتونو ویش';
+$ec_lang['lpn_freq_group_tip']='چې ایا ګراف جنکشنونه ښیي که پایپونه.';
+$ec_lang['lpn_freq_quantity_tip']='کوم ارزښت دې ګراف شي.';
+$ec_lang['lpn_freq_none']='تر اوسه د دې ارزښت لپاره هیڅ پایله نشته، نو د ګراف کولو لپاره هیڅ شی نشته.';
+$ec_lang['lpn_freq_summary']='ګراف شوي: {n} د {total} څخه';
+$ec_lang['lpn_freq_summary_time']='ګراف شوي: {n} د {total} څخه، په {time} کې';
+$ec_lang['lpn_freq_axis_percent']='تر دې ټیټه سلنه';
 $ec_lang['lpn_view_units']='واحدونه';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='ټول ساتل';
@@ -2123,7 +2132,7 @@ $ec_lang['lpn_notes_6_term']='د جدول کالمونو مرسته';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>کالم ټاکل</td><td>سرلیک کلیک کړئ</td></tr><tr><td>د کالم ټاکنه اضافه یا غزول</td><td>بل سرلیک Ctrl+click یا Shift+click کړئ</td></tr><tr><td>ټاکل شوي کالم(ونه) لیږدول (بیا ترتیبول)</td><td>راکاږئ یا ښي کلیک یا ⋮ مینو کې کالمونه اداره کول… وکاروئ</td></tr><tr><td>مینو ⋮ او د ترتیب غشی.</td><td>د سرلیک پورتنی کونج ونیسئ، یا سرلیک ته Tab یا یې وټاکئ</td></tr><tr><td>پټول، ټول ښودل، یا د ښکاره والي او ترتیب اداره کول</td><td>سرلیک ښي کلیک کړئ یا د سرلیک پورتنی ښی کونج کې ⋮ مینو</td></tr><tr><td>د کالم له مخې ترتیب کول</td><td>د سرلیک پورتنی ښی کونج کې د غشي نښه</td></tr><tr><td>د جدول په پای کې د نویو قطارونو په توګه پیسټ کول</td><td>ښي کلیک، د سرلیک پورتنی ښی کونج کې ⋮ مینو، یا Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='د جدول کیبورډ لنډلارې';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>د غشي تڼۍ</td><td>حرکت کول.</td></tr><tr><td>Tab, Enter</td><td>ننوتنه بشپړول او یوه حجره پر خوا / ښکته حرکت کول.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>شاته حرکت کول.</td></tr><tr><td>Shift+د غشي تڼۍ</td><td>ټاکنه غزول.</td></tr><tr><td>Ctrl+C</td><td>ټاکنه کاپي کول.</td></tr><tr><td>Ctrl+D</td><td>ټاکنه د خپل پورتني قطار نه ښکته ډکول.</td></tr><tr><td>Ctrl+Enter</td><td>ټاکنه د فعالې حجرې ارزښت سره ډکول.</td></tr><tr><td>Ctrl+A</td><td>ټول جدول ټاکل.</td></tr><tr><td>Ctrl+Shift+V</td><td>د جدول په پای کې د نویو قطارونو په توګه پیسټ کول.</td></tr><tr><td>Delete</td><td>یوه حجره پاکول.</td></tr><tr><td>F2</td><td>د سمون لپاره یوه حجره پرانیستل.</td></tr><tr><td>Esc</td><td>یو سمون لغوه کول.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>د غشي تڼۍ</td><td>حرکت کول.</td></tr><tr><td>Tab, Enter</td><td>ننوتنه بشپړول او یوه حجره پر خوا / ښکته حرکت کول.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>شاته حرکت کول.</td></tr><tr><td>Shift+د غشي تڼۍ</td><td>ټاکنه غزول.</td></tr><tr><td>Ctrl+C</td><td>ټاکنه کاپي کول.</td></tr><tr><td>Ctrl+D</td><td>ټاکنه د خپل پورتني قطار نه ښکته ډکول.</td></tr><tr><td>Ctrl+Enter</td><td>ټاکنه د فعالې حجرې ارزښت سره ډکول.</td></tr><tr><td>Ctrl+A</td><td>ټول جدول ټاکل.</td></tr><tr><td>Ctrl+Shift+V</td><td>د جدول په پای کې د نویو قطارونو په توګه پیسټ کول.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>بل یا پخواني جدول ته لېږدول.</td></tr><tr><td>Delete</td><td>یوه حجره پاکول.</td></tr><tr><td>F2</td><td>د سمون لپاره یوه حجره پرانیستل.</td></tr><tr><td>Esc</td><td>یو سمون لغوه کول.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

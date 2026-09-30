@@ -1656,6 +1656,15 @@ $ec_lang['lpn_ts_none']='لا شيء لرسمه بعد. اختر عناصر عل
 $ec_lang['lpn_ts_no_frames']='لا توجد نتائج ممتدة الفترة بعد. اضغط احسب لتشغيل المحاكاة.';
 $ec_lang['lpn_ts_summary']='العناصر: {n}، أوقات التقرير: {steps}';
 $ec_lang['lpn_ts_axis_time']='الزمن المنقضي';
+$ec_lang['lpn_freq_menu']='التكرار';
+$ec_lang['lpn_freq_tip']='ارسم التوزيع التكراري لخاصية واحدة عبر جميع الملتقيات أو جميع الأنابيب عند الخطوة الزمنية الحالية.';
+$ec_lang['lpn_freq_title']='توزيع القيم';
+$ec_lang['lpn_freq_group_tip']='ما إذا كان الرسم يعرض الملتقيات أو الأنابيب.';
+$ec_lang['lpn_freq_quantity_tip']='أي قيمة تُرسم.';
+$ec_lang['lpn_freq_none']='لا توجد نتائج لهذه القيمة بعد، فلا شيء لرسمه.';
+$ec_lang['lpn_freq_summary']='المرسوم: {n} من {total}';
+$ec_lang['lpn_freq_summary_time']='المرسوم: {n} من {total}، عند {time}';
+$ec_lang['lpn_freq_axis_percent']='النسبة المئوية الأقل من';
 $ec_lang['lpn_view_units']='الوحدات';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='حفظ الكل';
@@ -2123,7 +2132,7 @@ $ec_lang['lpn_notes_6_term']='مساعدة أعمدة الجدول';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>تحديد عمود</td><td>انقر العنوان</td></tr><tr><td>إضافة عمود إلى التحديد أو توسيعه</td><td>Ctrl+click أو Shift+click على عنوان آخر</td></tr><tr><td>نقل (إعادة ترتيب) العمود أو الأعمدة المحدَّدة</td><td>اسحب أو استخدم إدارة الأعمدة… في قائمة النقر بالزر الأيمن أو قائمة ⋮</td></tr><tr><td>قائمة ⋮ وسهم الفرز.</td><td>مرّر فوق الزاوية العلوية لعنوان، أو حدده أو انتقل إليه بمفتاح Tab</td></tr><tr><td>إخفاء، أو إظهار الكل، أو إدارة الظهور والترتيب</td><td>انقر العنوان بالزر الأيمن أو قائمة ⋮ في الزاوية العلوية اليمنى للعنوان</td></tr><tr><td>الفرز حسب العمود</td><td>أيقونة السهم في الزاوية العلوية اليمنى للعنوان</td></tr><tr><td>لصق كصفوف جديدة في نهاية الجدول</td><td>النقر بالزر الأيمن، قائمة ⋮ في الزاوية العلوية اليمنى للعنوان، أو Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='اختصارات لوحة المفاتيح للجدول';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>مفاتيح الأسهم</td><td>التنقل.</td></tr><tr><td>Tab، Enter</td><td>إنهاء الإدخال والتنقل عبر / أسفل خلية واحدة.</td></tr><tr><td>Shift+Tab، Shift+Enter</td><td>التنقل للخلف.</td></tr><tr><td>Shift+مفاتيح الأسهم</td><td>توسيع التحديد.</td></tr><tr><td>Ctrl+C</td><td>نسخ التحديد.</td></tr><tr><td>Ctrl+D</td><td>تعبئة التحديد إلى الأسفل من صفه العلوي.</td></tr><tr><td>Ctrl+Enter</td><td>تعبئة التحديد بقيمة الخلية النشطة.</td></tr><tr><td>Ctrl+A</td><td>تحديد الجدول كله.</td></tr><tr><td>Ctrl+Shift+V</td><td>لصق كصفوف جديدة في نهاية الجدول.</td></tr><tr><td>Delete</td><td>مسح خلية.</td></tr><tr><td>F2</td><td>فتح خلية لتحريرها.</td></tr><tr><td>Esc</td><td>إلغاء تحرير.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>مفاتيح الأسهم</td><td>التنقل.</td></tr><tr><td>Tab، Enter</td><td>إنهاء الإدخال والتنقل عبر / أسفل خلية واحدة.</td></tr><tr><td>Shift+Tab، Shift+Enter</td><td>التنقل للخلف.</td></tr><tr><td>Shift+مفاتيح الأسهم</td><td>توسيع التحديد.</td></tr><tr><td>Ctrl+C</td><td>نسخ التحديد.</td></tr><tr><td>Ctrl+D</td><td>تعبئة التحديد إلى الأسفل من صفه العلوي.</td></tr><tr><td>Ctrl+Enter</td><td>تعبئة التحديد بقيمة الخلية النشطة.</td></tr><tr><td>Ctrl+A</td><td>تحديد الجدول كله.</td></tr><tr><td>Ctrl+Shift+V</td><td>لصق كصفوف جديدة في نهاية الجدول.</td></tr><tr><td>Ctrl+Shift+PageDown، Ctrl+Shift+PageUp</td><td>التبديل إلى الجدول التالي أو السابق.</td></tr><tr><td>Delete</td><td>مسح خلية.</td></tr><tr><td>F2</td><td>فتح خلية لتحريرها.</td></tr><tr><td>Esc</td><td>إلغاء تحرير.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

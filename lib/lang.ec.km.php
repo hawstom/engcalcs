@@ -1660,6 +1660,15 @@ $ec_lang['lpn_ts_none']='មិនទាន់មានអ្វីត្រូ�
 $ec_lang['lpn_ts_no_frames']='មិនទាន់មានលទ្ធផលការក្លែងធ្វើលើរយៈពេលមួយនៅឡើយទេ។ ចុច ដំណើរការ ដើម្បីធ្វើការក្លែងធ្វើនេះ។';
 $ec_lang['lpn_ts_summary']='ធាតុ៖ {n} ពេលវេលារាយការណ៍៖ {steps}';
 $ec_lang['lpn_ts_axis_time']='ពេលវេលាកន្លងផុត';
+$ec_lang['lpn_freq_menu']='ប្រេកង់';
+$ec_lang['lpn_freq_tip']='គូរក្រាបការចែកចាយប្រេកង់នៃលក្ខណៈមួយ លើថ្នាំងទាំងអស់ ឬបំពង់ទាំងអស់ នៅជំហានពេលវេលាបច្ចុប្បន្ន។';
+$ec_lang['lpn_freq_title']='ការចែកចាយតម្លៃ';
+$ec_lang['lpn_freq_group_tip']='តើក្រាបបង្ហាញថ្នាំង ឬបំពង់។';
+$ec_lang['lpn_freq_quantity_tip']='តម្លៃមួយណាត្រូវគូរ។';
+$ec_lang['lpn_freq_none']='មិនទាន់មានលទ្ធផលសម្រាប់តម្លៃនេះនៅឡើយទេ ដូច្នេះគ្មានអ្វីត្រូវគូរទេ។';
+$ec_lang['lpn_freq_summary']='បានគូរ៖ {n} នៃ {total}';
+$ec_lang['lpn_freq_summary_time']='បានគូរ៖ {n} នៃ {total} នៅ {time}';
+$ec_lang['lpn_freq_axis_percent']='ភាគរយតិចជាង';
 $ec_lang['lpn_view_units']='ខ្នាតវាស់';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='រក្សាទុកទាំងអស់';
@@ -2127,7 +2136,7 @@ $ec_lang['lpn_notes_6_term']='ជំនួយជួរឈរតារាង';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>ជ្រើសរើសជួរឈរ</td><td>ចុចលើក្បាល</td></tr><tr><td>បន្ថែម ឬពង្រីកជម្រើសជួរឈរ</td><td>Ctrl+ចុច ឬ Shift+ចុចលើក្បាលមួយទៀត</td></tr><tr><td>ផ្លាស់ទី (តម្រៀបលំដាប់ឡើងវិញ) ជួរឈរដែលបានជ្រើសរើស</td><td>អូស ឬប្រើ គ្រប់គ្រងជួរឈរ… នៅក្នុងម៉ឺនុយចុចខាងស្ដាំ ឬ ⋮</td></tr><tr><td>ម៉ឺនុយ ⋮ និងព្រួញតម្រៀប។</td><td>ដាក់ទ្រនិចលើជ្រុងខាងលើនៃក្បាលមួយ ឬជ្រើសរើស ឬចុច Tab ចូលក្បាលមួយ</td></tr><tr><td>លាក់ បង្ហាញទាំងអស់ ឬគ្រប់គ្រងភាពមើលឃើញ និងលំដាប់</td><td>ចុចស្ដាំលើក្បាល ឬម៉ឺនុយ ⋮ នៅជ្រុងខាងលើស្ដាំនៃក្បាល</td></tr><tr><td>តម្រៀបតាមជួរឈរ</td><td>រូបតំណាងព្រួញនៅជ្រុងខាងលើស្ដាំនៃក្បាល</td></tr><tr><td>បិទភ្ជាប់ជាជួរដេកថ្មីនៅចុងតារាង</td><td>ចុចស្ដាំ ម៉ឺនុយ ⋮ នៅជ្រុងខាងលើស្ដាំនៃក្បាល ឬ Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='ផ្លូវកាត់ក្តារចុចតារាង';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>រុករក។</td></tr><tr><td>Tab, Enter</td><td>បញ្ចប់ការវាយបញ្ចូល ហើយរុករកឆ្លង / ចុះក្រឡាមួយ។</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>រុករកថយក្រោយ។</td></tr><tr><td>Shift+arrow keys</td><td>ពង្រីកជម្រើស។</td></tr><tr><td>Ctrl+C</td><td>ចម្លងជម្រើស។</td></tr><tr><td>Ctrl+D</td><td>បំពេញជម្រើសចុះពីជួរដេកខាងលើរបស់វា។</td></tr><tr><td>Ctrl+Enter</td><td>បំពេញជម្រើសដោយតម្លៃក្រឡាសកម្ម។</td></tr><tr><td>Ctrl+A</td><td>ជ្រើសរើសតារាងទាំងមូល។</td></tr><tr><td>Ctrl+Shift+V</td><td>បិទភ្ជាប់ជាជួរដេកថ្មីនៅចុងតារាង។</td></tr><tr><td>Delete</td><td>សម្អាតក្រឡាមួយ។</td></tr><tr><td>F2</td><td>បើកក្រឡាមួយដើម្បីកែសម្រួលវា។</td></tr><tr><td>Esc</td><td>បោះបង់ការកែសម្រួល។</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>រុករក។</td></tr><tr><td>Tab, Enter</td><td>បញ្ចប់ការវាយបញ្ចូល ហើយរុករកឆ្លង / ចុះក្រឡាមួយ។</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>រុករកថយក្រោយ។</td></tr><tr><td>Shift+arrow keys</td><td>ពង្រីកជម្រើស។</td></tr><tr><td>Ctrl+C</td><td>ចម្លងជម្រើស។</td></tr><tr><td>Ctrl+D</td><td>បំពេញជម្រើសចុះពីជួរដេកខាងលើរបស់វា។</td></tr><tr><td>Ctrl+Enter</td><td>បំពេញជម្រើសដោយតម្លៃក្រឡាសកម្ម។</td></tr><tr><td>Ctrl+A</td><td>ជ្រើសរើសតារាងទាំងមូល។</td></tr><tr><td>Ctrl+Shift+V</td><td>បិទភ្ជាប់ជាជួរដេកថ្មីនៅចុងតារាង។</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>ប្តូរទៅតារាងបន្ទាប់ ឬតារាងមុន។</td></tr><tr><td>Delete</td><td>សម្អាតក្រឡាមួយ។</td></tr><tr><td>F2</td><td>បើកក្រឡាមួយដើម្បីកែសម្រួលវា។</td></tr><tr><td>Esc</td><td>បោះបង់ការកែសម្រួល។</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

@@ -1,0 +1,5 @@
+{
+    "sprint": "2026-09-30-fox",
+    "description": "Delta sprint for the three branches merged 2026-09-30: feat/frequency-plot's nine lpn_freq_ keys (all ruled on by Tom), the one new row of lpn_notes_7_def from feat/table-tab-keys (Ctrl+Shift+PageDown/PageUp), and the equal-to-English lpn_field_lat_abbr/lon_abbr where a payload lists them. Wave 0: nine keys excluded as already ruled; the notes row was read adversarially by CC and has one reading. One agent per language, Sonnet.",
+    "entries": []
+}

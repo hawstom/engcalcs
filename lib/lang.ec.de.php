@@ -1656,6 +1656,15 @@ $ec_lang['lpn_ts_none']='Noch nichts zum Zeichnen vorhanden. Wählen Sie Element
 $ec_lang['lpn_ts_no_frames']='Noch keine Ergebnisse für den erweiterten Zeitraum. Drücken Sie Berechnen, um die Simulation auszuführen.';
 $ec_lang['lpn_ts_summary']='Elemente: {n}, Berichtszeitpunkte: {steps}';
 $ec_lang['lpn_ts_axis_time']='Verstrichene Zeit';
+$ec_lang['lpn_freq_menu']='Häufigkeit';
+$ec_lang['lpn_freq_tip']='Zeichnet die Häufigkeitsverteilung eines Werts über alle Entnahmeknoten oder alle Rohre zum angezeigten Zeitschritt auf.';
+$ec_lang['lpn_freq_title']='Verteilung der Werte';
+$ec_lang['lpn_freq_group_tip']='Ob der Graph Entnahmeknoten oder Rohre zeigt.';
+$ec_lang['lpn_freq_quantity_tip']='Welcher Wert aufgezeichnet wird.';
+$ec_lang['lpn_freq_none']='Für diesen Wert liegen noch keine Ergebnisse vor, daher gibt es nichts zu zeichnen.';
+$ec_lang['lpn_freq_summary']='Gezeichnet: {n} von {total}';
+$ec_lang['lpn_freq_summary_time']='Gezeichnet: {n} von {total}, bei {time}';
+$ec_lang['lpn_freq_axis_percent']='Prozent kleiner als';
 $ec_lang['lpn_view_units']='Einheiten';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Alle speichern';
@@ -2123,7 +2132,7 @@ $ec_lang['lpn_notes_6_term']='Hilfe zu Tabellenspalten';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Spalte auswählen</td><td>Überschrift anklicken</td></tr><tr><td>Spaltenauswahl hinzufügen oder erweitern</td><td>Ctrl+click oder Shift+click auf eine weitere Überschrift</td></tr><tr><td>Ausgewählte Spalte(n) verschieben (neu anordnen)</td><td>Ziehen oder Spalten verwalten… im Rechtsklick- oder ⋮-Menü verwenden</td></tr><tr><td>Menü ⋮ und Sortierpfeil.</td><td>Mit dem Zeiger über die obere Ecke einer Überschrift fahren, oder eine Überschrift auswählen oder per Tab erreichen</td></tr><tr><td>Ausblenden, Alle anzeigen oder Sichtbarkeit und Reihenfolge verwalten</td><td>Überschrift rechtsklicken oder ⋮-Menü in der oberen rechten Ecke der Überschrift</td></tr><tr><td>Nach Spalte sortieren</td><td>Pfeilsymbol in der oberen rechten Ecke der Überschrift</td></tr><tr><td>Als neue Zeilen am Ende der Tabelle einfügen</td><td>Rechtsklick, ⋮-Menü in der oberen rechten Ecke der Überschrift, oder Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Tastenkürzel der Tabelle';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Pfeiltasten</td><td>Navigieren.</td></tr><tr><td>Tab, Enter</td><td>Eingabe abschließen und eine Zelle weiter / nach unten navigieren.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Rückwärts navigieren.</td></tr><tr><td>Shift+arrow keys</td><td>Auswahl erweitern.</td></tr><tr><td>Ctrl+C</td><td>Auswahl kopieren.</td></tr><tr><td>Ctrl+D</td><td>Auswahl von ihrer obersten Zeile aus nach unten ausfüllen.</td></tr><tr><td>Ctrl+Enter</td><td>Auswahl mit dem Wert der aktiven Zelle ausfüllen.</td></tr><tr><td>Ctrl+A</td><td>Die gesamte Tabelle auswählen.</td></tr><tr><td>Ctrl+Shift+V</td><td>Als neue Zeilen am Ende der Tabelle einfügen.</td></tr><tr><td>Delete</td><td>Zelle leeren.</td></tr><tr><td>F2</td><td>Eine Zelle zum Bearbeiten öffnen.</td></tr><tr><td>Esc</td><td>Bearbeitung abbrechen.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Pfeiltasten</td><td>Navigieren.</td></tr><tr><td>Tab, Enter</td><td>Eingabe abschließen und eine Zelle weiter / nach unten navigieren.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Rückwärts navigieren.</td></tr><tr><td>Shift+arrow keys</td><td>Auswahl erweitern.</td></tr><tr><td>Ctrl+C</td><td>Auswahl kopieren.</td></tr><tr><td>Ctrl+D</td><td>Auswahl von ihrer obersten Zeile aus nach unten ausfüllen.</td></tr><tr><td>Ctrl+Enter</td><td>Auswahl mit dem Wert der aktiven Zelle ausfüllen.</td></tr><tr><td>Ctrl+A</td><td>Die gesamte Tabelle auswählen.</td></tr><tr><td>Ctrl+Shift+V</td><td>Als neue Zeilen am Ende der Tabelle einfügen.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Zur nächsten oder vorherigen Tabelle wechseln.</td></tr><tr><td>Delete</td><td>Zelle leeren.</td></tr><tr><td>F2</td><td>Eine Zelle zum Bearbeiten öffnen.</td></tr><tr><td>Esc</td><td>Bearbeitung abbrechen.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is

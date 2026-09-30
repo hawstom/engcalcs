@@ -1655,6 +1655,15 @@ $ec_lang['lpn_ts_none']='Пока нечего отображать на диа�
 $ec_lang['lpn_ts_no_frames']='Пока нет результатов расчёта с продолжённым периодом. Нажмите «Рассчитать», чтобы выполнить расчёт.';
 $ec_lang['lpn_ts_summary']='Элементов: {n}, моментов отчёта: {steps}';
 $ec_lang['lpn_ts_axis_time']='Прошедшее время';
+$ec_lang['lpn_freq_menu']='Частота';
+$ec_lang['lpn_freq_tip']='Построить график распределения частот одного свойства по всем узлам или по всем трубам на текущем шаге по времени.';
+$ec_lang['lpn_freq_title']='Распределение значений';
+$ec_lang['lpn_freq_group_tip']='Показывает ли график узлы или трубы.';
+$ec_lang['lpn_freq_quantity_tip']='Какое значение отображать на диаграмме.';
+$ec_lang['lpn_freq_none']='Пока нет результатов для этого значения, поэтому строить график не из чего.';
+$ec_lang['lpn_freq_summary']='Построено: {n} из {total}';
+$ec_lang['lpn_freq_summary_time']='Построено: {n} из {total}, на {time}';
+$ec_lang['lpn_freq_axis_percent']='Процент меньших значений';
 $ec_lang['lpn_view_units']='Единицы измерения';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Сохранить всё';
@@ -2122,7 +2131,7 @@ $ec_lang['lpn_notes_6_term']='Справка по столбцам таблиц�
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Выбрать столбец</td><td>Щёлкните по заголовку</td></tr><tr><td>Добавить столбец к выделению или расширить его</td><td>Ctrl+щелчок или Shift+щелчок по другому заголовку</td></tr><tr><td>Переместить (изменить порядок) выбранного столбца (столбцов)</td><td>Перетащите или используйте «Управление столбцами…» в контекстном меню или меню ⋮</td></tr><tr><td>Меню ⋮ и стрелка сортировки.</td><td>Наведите на верхний угол заголовка или выберите заголовок либо перейдите к нему клавишей Tab</td></tr><tr><td>Скрыть, показать все или управлять видимостью и порядком</td><td>Правый клик по заголовку или меню ⋮ в верхнем правом углу заголовка</td></tr><tr><td>Сортировать по столбцу</td><td>Значок стрелки в верхнем правом углу заголовка</td></tr><tr><td>Вставить как новые строки в конец таблицы</td><td>Правый клик, меню ⋮ в верхнем правом углу заголовка, или Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Сочетания клавиш в таблице';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Клавиши со стрелками</td><td>Навигация.</td></tr><tr><td>Tab, Enter</td><td>Завершить ввод и перейти на одну ячейку вправо / вниз.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Перейти назад.</td></tr><tr><td>Shift+стрелки</td><td>Расширить выделение.</td></tr><tr><td>Ctrl+C</td><td>Скопировать выделение.</td></tr><tr><td>Ctrl+D</td><td>Заполнить выделение вниз от верхней строки.</td></tr><tr><td>Ctrl+Enter</td><td>Заполнить выделение значением активной ячейки.</td></tr><tr><td>Ctrl+A</td><td>Выбрать всю таблицу.</td></tr><tr><td>Ctrl+Shift+V</td><td>Вставить как новые строки в конец таблицы.</td></tr><tr><td>Delete</td><td>Очистить ячейку.</td></tr><tr><td>F2</td><td>Открыть ячейку для редактирования.</td></tr><tr><td>Esc</td><td>Отменить редактирование.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Клавиши со стрелками</td><td>Навигация.</td></tr><tr><td>Tab, Enter</td><td>Завершить ввод и перейти на одну ячейку вправо / вниз.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Перейти назад.</td></tr><tr><td>Shift+стрелки</td><td>Расширить выделение.</td></tr><tr><td>Ctrl+C</td><td>Скопировать выделение.</td></tr><tr><td>Ctrl+D</td><td>Заполнить выделение вниз от верхней строки.</td></tr><tr><td>Ctrl+Enter</td><td>Заполнить выделение значением активной ячейки.</td></tr><tr><td>Ctrl+A</td><td>Выбрать всю таблицу.</td></tr><tr><td>Ctrl+Shift+V</td><td>Вставить как новые строки в конец таблицы.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Переключиться на следующую или предыдущую таблицу.</td></tr><tr><td>Delete</td><td>Очистить ячейку.</td></tr><tr><td>F2</td><td>Открыть ячейку для редактирования.</td></tr><tr><td>Esc</td><td>Отменить редактирование.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
