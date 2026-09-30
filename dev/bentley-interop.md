@@ -44,6 +44,14 @@ Provenance tags: **CITED** (URL), **OBSERVED** (something run or measured here, 
   `EnableSchemaUpdate = false`,
   <https://github.com/worthapenny/WO-Open-WaterGEMS-WaterCAD-Database>. pyofw's own README: *"will
   not add any value without Bentley's OpenFlows application"*, <https://pypi.org/project/pyofw/>.
+- **CITED: Bentley's support articles leak some names.** An MDB-era query Bentley published reads
+  `HMIModelingElement` (columns `ElementID`, `Label`, `IsDeleted`) joined to `HMISelectionSet`, and
+  says that for SQLite-era models *"you'll need to use a different application that can work with
+  SQLITE databases"* (KB0058225). A CONNECT Edition error names the SQLite columns
+  `DomainElementID, AlternativeID` and the method `MakeRecordLocalBasic` in
+  `SqliteAlternativeRecordDataBrokerBase` (KB0058121). Articles are read through the public API
+  `https://bentleysystems.service-now.com/api/sn_km_api/knowledge/articles/<KB number>`; the
+  community pages themselves render only in a browser.
 - **CITED: the storage design, from Bentley's patent** US10311051B1, "Storing modeling alternatives
   with unitized data", assignee Bentley Systems, naming WaterGEMS V8i and WaterCAD V8i:
   an Element table (ID, type), a Scenario table (one alternative ID per facet), an Alternative table
@@ -103,9 +111,10 @@ Reported, not interpreted. Bentley EULA version 2023-10-16,
   vendored `js/vendor/epanet-js.js` (678,695 bytes), and like it would load only when someone
   chooses to import a Bentley file. It would be vendored beside epanet-js with its licence, not
   fetched from a CDN at run time, so it adds no third-party request.
-- **SPECULATION:** a model of a few thousand elements is a few MB of SQLite; sql.js loads the whole
-  file into memory, which is fine at that size. wa-sqlite (for large files, streamed) is not
-  needed.
+- **sql.js loads the whole file into memory, and some real files are huge.** Bentley reports a
+  6 GB `.sqlite` for a 7,000-pipe model, bloated by change-tracking rows (KB0015674). A browser
+  cannot hold that. A small, compacted model is fine; a working utility model may not be, and
+  wa-sqlite (which reads a file in pages) would be the fallback.
 - The browser part is the easy part. The cost is the resolver: scenarios and alternatives,
   inherited values, per-field storage units, and the mapping of Bentley element types (Hydrant,
   Customer, Isolation Valve, Pump Station, Variable Speed Pump Battery...) onto ours, each mismatch
@@ -139,6 +148,123 @@ Reported, not interpreted. Bentley EULA version 2023-10-16,
    purpose.
 3. **Never:** a writer, until a reader has survived several real models from different WaterGEMS
    versions, and then only after asking again.
+
+## The .sqlite and the .wtg: what Gemini said, checked
+
+Tom, 2026-09-30, after a chat with Google's Gemini: *"I think that Gemini either oversells or
+missells the value of the gap between the .sqlite and the .wtg. I would want a better rundown of
+the gap before I felt the least daunted. I need a better steel-man case against hoping the .sqlite
+may be a significant achievement toward interoperability."*
+
+Sources below are Bentley's own knowledge-base articles, read through
+`https://bentleysystems.service-now.com/api/sn_km_api/knowledge/articles/<KB number>` (the
+article pages load only in a browser), plus the Bentley help pages already cited above.
+
+### Each claim, checked
+
+| Gemini said | Verdict | Evidence |
+|---|---|---|
+| Modern WaterGEMS/WaterCAD split a project into two files. | **True.** | The starter file (`.wtg`) and the database (`.wtg.sqlite`); the database was Microsoft Access (`.wtg.mdb`) up to version 08.11.03 and SQLite from 08.11.04 (V8i SELECTseries 4, 2013). KB0057541, KB0059191, KB0014745. |
+| WaterCAD and WaterGEMS use the same files. | **True.** | KB0014745 lists `.WTG` and `.WTG.SQLITE` for WaterCAD, WaterGEMS and HAMMER alike. |
+| The `.wtg` holds "the primary scenario trees". | **Contradicted.** | Bentley's recovery for a broken `.wtg` is to import the database alone into a new project: *"The database file contains all of the physical data in the model. The only thing that is lost during this process are data in the element symbology and graphs."* KB0013701. The alternative records are in the SQLite file (KB0058121). |
+| The `.wtg` holds "binary presentation properties". | **Contradicted.** | Bentley tells users to open the `.wtg` in Notepad and search it; it is XML (`<GraphElement ...>`, `<NamedViewElement ...>`). KB0058225, KB0015270. |
+| The `.wtg` is "a compressed XML document". | **XML: true. Compressed: contradicted.** | Same articles: readable in a text editor. |
+| The `.wtg` holds symbology, labeling, colour coding and annotation. | **True.** | *"...the .STSW file, which stores presentation settings like graphs, annotations and color coding"* (KB0057843, the sewer twin of `.wtg`); KB0059145. Graphs and named views too (KB0058225). |
+| The `.wtg` holds background layers. | **Contradicted as stated.** | Bentley names the `.dwh` as *"the file that stores the background files for the model"* (KB0057554). The images themselves are separate files the user reattaches. |
+| Pipe diameters, demands, coordinates and elevations live in the `.sqlite`. | **True for the physical data; coordinates by inference.** | KB0013701 above; KB0059145: *"The database file contains almost all of the modeling data."* Coordinates are not named, but a database-only import produces a drawing, so the geometry must be there. |
+| "A model is completely blind without its partner .wtg file"; the `.sqlite` is "only half of a Bentley model". | **Contradicted. This is the mis-sell.** | Bentley's own support treats losing the `.wtg` as a routine, acceptable recovery (KB0013701, KB0059145, KB0057843). What is lost is how the model looks, not what it is. |
+| Reading only the `.sqlite` loses "custom labels". | **Partly wrong.** | Element labels (names) are in the database (`HMIModelingElement.Label`, KB0058225). Annotation *formats* are in the `.wtg`. |
+| Scenarios map to lists of alternatives; a reader must follow parent-child inheritance. | **True.** | The patent (above); KB0058121 names the per-alternative records and their "make local" step. |
+| Controls are stored in the database as conditions and actions with IDs. | **Unverified.** | They are model data, and nothing but symbology and graphs is lost without the `.wtg`, so they are in the database. Their table shape is unknown. |
+| HAMMER, Darwin and other non-EPANET features need handling. | **True, but not a `.sqlite` problem.** | That gap exists for any route into an EPANET engine, including Bentley's own EPANET export, which Bentley says loses data. |
+| SQLite is public, so no reverse engineering is needed, and you may "safely extract, update, or read" the model "without breaching the EULA". | **Half true, and the rest is a legal conclusion.** | The container is public. The meaning of its tables is not. Bentley's support itself sends users to "a different application that can work with SQLITE databases" to read labels (KB0058225); no Bentley source says updating the database outside the program is safe or supported. |
+| Ask the user to pick the active scenario in WaterGEMS first, then flatten. | **Self-defeating.** | A user sitting in WaterGEMS can already choose File > Export > EPANET. |
+
+**Tom's four follow-ups to Gemini, which it did not answer:**
+
+1. *Inheritance ("I can do this")*: yes, and it is the real work. See below.
+2. *"Can you confirm that the .sqlite doesn't include any annotation objects?"* Annotation and colour
+   coding settings are in the `.wtg` (Bentley, above). Whether the database carries any
+   annotation-related rows is unverified; selection sets were in the database in the MDB era
+   (KB0058225).
+3. *Controls, "`.wtg` or `.sqlite`?"*: the `.sqlite`, by Bentley's statement that only symbology and
+   graphs are lost without the `.wtg`. The shape is unknown.
+4. *Engine extensions, "the settings are in the .sqlite? All I have to do is handle them?"*: they are
+   in the `.sqlite` for the same reason. "Handle" means deciding, per feature, what to do with
+   something our engines cannot compute, and reporting it. That is the same list our `.inp`
+   importer already has to face.
+
+**Where Gemini went wrong:** it put the difficulty in the wrong file. The gap between `.sqlite` and
+`.wtg` is small and cosmetic. The daunting part is inside the `.sqlite`.
+
+### The case against (a steel man)
+
+1. **The file Bentley calls "the model" is also the file whose inside is undocumented.** We know
+   perhaps five table and column names, all from error messages and one old Access-era query.
+   Everything else would be learned by staring at files, and each thing learned is true of the
+   files we stared at, not of the format.
+2. **The format moves.** Models open only in the same or a newer version; *"a model cannot be saved
+   'down' and most versions are not forward compatible"*, and models are "schema compatible" only
+   when the first four digits of the version match (KB0057554). The field has Access-format files
+   (up to 2013) and SQLite files from 08.11.04, 08.11.05, 08.11.06, 10.00 through 10.04, 2023,
+   2024... Bentley's own program has tripped over its own upgrades (KB0058121: a unique-key
+   violation on upgraded models). A reader built from one sample is a reader for one release, and,
+   SPECULATION, the files people most want to rescue are likely the old ones.
+3. **Reading one number is a small program, not a lookup.** A pipe's diameter in a given scenario
+   means: which alternative that scenario uses for physical data, then that alternative's record
+   for the pipe, or its parent's, or its grandparent's; then which storage unit that field uses;
+   then skip the pipe altogether if it is marked deleted but not purged (`IsDeleted`, KB0058225;
+   KB0057778 describes deleted elements left in the file). Get any step wrong and the model imports
+   cleanly with the wrong numbers, which is the worst outcome and the one nobody notices.
+4. **Scenarios are the thing EPANET cannot hold.** A Bentley model's value is often its scenario
+   tree. We can import one flattened scenario, which is exactly what Bentley's EPANET export
+   already gives, or we can build a scenario structure the rest of the page does not have. The
+   first is duplication; the second is a new product.
+5. **Real files can be too big for a browser.** 6 GB for 7,000 pipes when change tracking is on
+   (KB0015674). The user would have to compact or archive in WaterGEMS first, and then they are
+   in WaterGEMS.
+6. **The obvious user already has the easy door.** Whoever holds a live WaterCAD licence can export
+   EPANET in three clicks. The `.sqlite` route helps only someone holding a model file with no
+   Bentley licence to open it: a recipient, or an archive from a lapsed licence. That person is
+   real, but rare, and we have never met one.
+7. **Portability people ask for usually means "hand it back".** A consultant must return the model
+   in the client's format. Reading does not do that; writing is the no-go above, and the one
+   Bentley-made door back in (File > Import > EPANET) already takes our `.inp`.
+8. **We have no file to test against, and no way to confirm a result** without a Windows machine
+   and a Bentley licence. Every claim of success would rest on Tom opening files by hand.
+9. **The licence question is not ours to settle** (§1.7 and §1.18, above). Bentley's support
+   telling users to read the database with other tools makes reading look ordinary; it is not a
+   licence term.
+
+### The case for (briefly)
+
+- The `.sqlite` really is the model: Bentley says losing the `.wtg` costs only looks. Gemini's
+  "half a model" is wrong in our favour.
+- It keeps what an EPANET export throws away: every scenario and alternative, element types
+  (hydrants, customer meters, isolation valves), labels, selection sets, and values in their
+  stored units rather than rounded into text.
+- It needs no Bentley software at all, which is the only route that serves someone without it: the
+  escape hatch from lock-in, which fits the project's reason for existing.
+- The container is solved (sql.js, MIT, about 320 KB compressed), and it is read-only work, which
+  never puts anyone's model at risk.
+
+### Verdict, and the one experiment that would change it
+
+**Not a significant step yet; a possible one.** The `.wtg` is not the obstacle Gemini made it. The
+obstacle is an undocumented, versioned schema with inheritance and per-field units, which we
+cannot see, for a user who mostly already has the EPANET door. Worth one cheap experiment, not a
+build.
+
+**The experiment:** Tom builds a small model in WaterCAD (about Net1's size) with one child
+scenario that changes a pipe diameter and a junction demand, one deleted pipe, one control, and
+one pump curve. He saves it and also exports it to EPANET. We dump the `.sqlite` and try to
+reproduce the `.inp` (nodes, links, coordinates, both scenarios) from the database alone.
+
+- **If the tables are readable and the child scenario resolves in about a day's work**, the case
+  turns to "go" for a base-scenario importer, and a second file saved in a different WaterCAD
+  version then tells us how badly the schema drifts.
+- **If values sit in opaque blobs, or the child scenario's numbers cannot be found**, stop, and
+  record why.
 
 ## What is unknown
 
