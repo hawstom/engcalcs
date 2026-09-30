@@ -7,21 +7,26 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**108 open tasks.** Next (100): 2 · Soon (75): 24 · Someday (50): 44 · Maybe (25): 15 · Parked (5): 19 · priority 99 (99): 4
+**110 open tasks.** Next (100): 14 · Soon (75): 17 · Someday (50): 45 · Maybe (25): 15 · Parked (5): 19
 
-## 100 — Next (2)
-
-- Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
-- Task 697 — EPANET++ as a competing front door, on its own two domains.
-
-## 99 — Priority 99 (4)
+## 100 — Next (14)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
+- Task 637 — A Graph button on the Properties box.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
+- Task 699 — Audit the language keys for lazy duplications.
+- Task 718 — File menu: Recents just above Close, and an Import submenu.
+- Task 737 — Coined names for interface elements, so every language names each one once.
+- ! Task 738 — A Find filter that stays standing, or a snapshot, by the visitor's choice.
+- Task 741 — The infinite map: generated networks for the label bench.
+- Task 743 — Ctrl+Shift+PageDown reaches the graph tabs, not only the tables.
+- Task 744 — Let the bottom pane shrink the map to almost nothing.
+- Task 745 — Help menu in three groups, and a Tables and Hotkeys box.
+- Task 746 — Fire flow dialog: one All/Selected choice for each of its two scopes.
 
-## 75 — Soon (24)
+## 75 — Soon (17)
 
 - Task 239 — The English-friction loop: run the mechanized Wave 0 and measure its yield.
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
@@ -33,22 +38,15 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 604 — Read an EPANET `.PRO` profile file.
 - Task 617 — More map view options, the opacity one having shipped.
 - Task 623 — File loss judged only by people whose files are throwaway.
-- Task 637 — A Graph button on the Properties box.
 - Task 639 — Layers: the first heading under Map and page.
 - Task 640 — Graphs: the umbrella, a submenu under Water holding five plots.
-- Task 699 — Audit the language keys for lazy duplications.
 - ! Task 701 — The panel guard is blind to forty sites, and the bottom panel is one.
 - Task 710 — Audit the 57 raw alert and confirm dialogs.
 - Task 711 — A pan is lost when File, New project opens beside it.
 - Task 714 — Theming: colour tokens first, then a Light/Dark choice in Settings.
-- Task 718 — File menu: Recents just above Exit, and an Import submenu.
-- ! Task 724 — System-wide available fire flow: every junction, as a table and a map colouring.
-- Task 737 — Coined names for interface elements, so every language names each one once.
-- ! Task 738 — A Find filter that stays standing, or a snapshot, by the visitor's choice.
 - Task 739 — Say where each setting is saved: the project or this browser.
-- Task 741 — The infinite map: generated networks for the label bench.
 
-## 50 — Someday (44)
+## 50 — Someday (45)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -94,6 +92,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 735 — Honour `[TIMES] Statistic` instead of discarding it.
 - Task 736 — [H] · Count installs and app launches, if the consent text allows it.
 - Task 740 — One sentence for the node-size cap, not three fragments.
+- Task 747 — A copied project file shares its original's lock.
 
 ## 25 — Maybe (15)
 
@@ -139,5 +138,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-97 of 108 titles are within 4–12 words. `!` marks the rest;
+100 of 110 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
