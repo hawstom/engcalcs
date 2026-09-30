@@ -28887,13 +28887,14 @@ var EngCalcs = EngCalcs || {};
 	}
 	function propGraphSync() {
 		var box = document.getElementById('lpn_popup_graph'), pc = EngCalcs.pageConfig || {},
-			subj, frames, avail, field, pick, row, lab, sel, host, note, lay, i;
+			subj, frames, avail, field, pick, row, lab, sel, host, note, lay, i, appearing;
 		if (!box) { return; }
 		pgWatch(box);
 		clearFields(box);
 		subj = pgSubject();
 		frames = subj && EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
 		if (!subj || !frames.length) { box.style.display = 'none'; pgLastWidth = null; return; }
+		appearing = box.style.display === 'none';
 		box.style.display = '';
 		avail = pgAvailable(subj.group, subj.e, frames);
 
@@ -28945,6 +28946,18 @@ var EngCalcs = EngCalcs || {};
 		tsDraw(host, lay, frames, [{ id: subj.e.id, color: LPN_TS_COLORS[0], points: pick.points }],
 			subj.group, pick.field);
 		initTipsIn(box);
+		if (appearing) { pgRefit(); }
+	}
+	// **A GRAPH THAT ARRIVES IN AN OPEN BOX MAKES IT TALLER**, which is the one case openPopupAt()'s
+	// fit never sees: the run finishing while the box stands open. So the box is capped to the room
+	// below where it stands, as openPopupAt() does, and the overflow scrolls inside the body rather
+	// than hanging off the bottom of a phone. Only on the graph's appearance, never on an ordinary
+	// refresh, and never over a size the reader dragged.
+	function pgRefit() {
+		var popup = document.getElementById('lpn_popup'), r;
+		if (!popup || !panelIsOpen(popup) || popupUserSize) { return; }
+		r = popup.getBoundingClientRect();
+		if (r.bottom > window.innerHeight - POPUP_EDGE) { capPanelToRoomBelow(popup, r.top); }
 	}
 
 	// Maps a tool mode to its pageConfig mode-hint key -- see the lang keys' own comment for why
@@ -49635,6 +49648,15 @@ var EngCalcs = EngCalcs || {};
 		r = popup.getBoundingClientRect();
 		at = clampPanel(sx, sy, r.width, h, window.innerWidth, window.innerHeight, chromeFloor());
 		popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
+		// **AND CAPPED TO THE ROOM BELOW WHERE IT LANDED** (Task 637). The fit above caps to the
+		// whole window, and the clamp then puts the top under the chrome floor, so a box as tall as
+		// the window hung off the bottom by the height of the chrome: measured on a 390 x 844 phone,
+		// 44 px of a Net3 junction's box before the graph, 77 px with it, and the graph is the foot.
+		// capPanelToRoomBelow() is the existing fix for this shape; the overflow scrolls inside the
+		// body instead. Not when the reader dragged a size: that is theirs.
+		if (!popupUserSize && at.top + h > window.innerHeight - POPUP_EDGE) {
+			capPanelToRoomBelow(popup, at.top);
+		}
 		ghostClickShield(popup);
 		initTipsIn(popup);
 	}
