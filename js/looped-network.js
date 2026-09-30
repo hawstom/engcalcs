@@ -31821,7 +31821,7 @@ var EngCalcs = EngCalcs || {};
 				EngCalcs.lpnTimeIsExtended(doc.times));
 			// scheduleArrivalSolve(), not scheduleSolve(): see the note at its definition. With the
 			// switch off it runs nothing at all, which is Tom's ruling and not an inference.
-			if (owed) { scheduleArrivalSolve(); } else { clearFireFlowRun(false); }
+			if (owed) { scheduleArrivalSolve(); } else { clearFireFlowRun(false); clearCriticalityRun(false); }
 		});
 		paneDocumentArrived();   // R-109: see its definition
 		perfDebugTime('tabs', function () { renderTabs(); });
@@ -55531,7 +55531,6 @@ var EngCalcs = EngCalcs || {};
 	// no longer exists, so an edit clears it rather than leaving a picture that is quietly wrong.
 	// Called from scheduleSolve(), which is the one thing every edit on this page goes through.
 	function clearFireFlowRun(quiet) {
-		clearCriticalityRun(quiet);
 		if (!fireFlowRun) { return; }
 		fireFlowRun = null;
 		refreshFireFlowMarks();
@@ -55669,7 +55668,10 @@ var EngCalcs = EngCalcs || {};
 		var buttons = ffEl('div', 'lpn-ff-buttons', null, host);
 		run = ffEl('button', 'lpn-ff-run', pc.lpn_ff_calculate || 'Run', buttons);
 		run.type = 'button';
-		run.disabled = fireFlowBusy;
+		run.disabled = fireFlowBusy || critBusy;
+		// **ONE ANALYSIS AT A TIME.** Fire flow and criticality share the one run dialog and the one
+		// engine; while the other is running, this Run waits, and says why.
+		if (critBusy) { run.title = pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.'; }
 		run.addEventListener('click', function () {
 			Object.keys(boxes).forEach(function (k) { ask[k] = boxes[k].value; });
 			runFireFlowSweep();
@@ -56262,6 +56264,10 @@ var EngCalcs = EngCalcs || {};
 			tally,
 			before;
 		if (fireFlowBusy) { return; }
+		if (critBusy) {
+			setNotice(pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.');
+			return;
+		}
 		if (!junctions.length) {
 			setNotice(pc.lpn_ff_no_junctions || 'This project has no junctions yet, so there is nothing to test.');
 			return;
@@ -56324,6 +56330,7 @@ var EngCalcs = EngCalcs || {};
 		fireFlowBusy = true;
 		fireFlowStop = false;
 		fireFlowRun = null;
+		if (critBoxIsOpen()) { buildCriticalityControls(); }
 		tally = { pass: 0, fail: 0, design: 0, error: 0 };
 		refreshFireFlowMarks();
 		rebuildFireFlowReport();
@@ -56359,6 +56366,7 @@ var EngCalcs = EngCalcs || {};
 		}).then(function (set) {
 			fireFlowBusy = false;
 			fireFlowRun = set;
+			if (critBoxIsOpen()) { buildCriticalityControls(); }
 			fireFlowDocGuard = (JSON.stringify(doc) === before);
 			closeFireFlowRunBox();
 			refreshFireFlowMarks();
@@ -56367,6 +56375,7 @@ var EngCalcs = EngCalcs || {};
 			return set;
 		}, function (err) {
 			fireFlowBusy = false;
+			if (critBoxIsOpen()) { buildCriticalityControls(); }
 			closeFireFlowRunBox();
 			buildFireFlowControls();
 			setStatus(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
@@ -56466,11 +56475,11 @@ var EngCalcs = EngCalcs || {};
 		host.innerHTML = '';
 		ffEl('p', 'lpn-ff-note', pc.lpn_crit_intro, host);
 		scope = ffSelect([
-			['all', pc.lpn_crit_scope_all || 'All pipes'],
-			['selected', pc.lpn_crit_scope_selected || 'Selected']
+			['all', pc.lpn_crit_scope_all || 'Every link'],
+			['selected', pc.lpn_crit_scope_selected || 'The selected links']
 		], critAsk.scope);
 		scope.addEventListener('change', function () { critAsk.scope = scope.value; });
-		ffRow(host, pc.lpn_crit_scope || 'Assets to break', pc.lpn_crit_scope_tip, scope, '');
+		ffRow(host, pc.lpn_crit_scope || 'Links to break', pc.lpn_crit_scope_tip, scope, '');
 		minP = ffInput(critFireFlowAsk().minPressure);
 		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
 		ffRow(host, pc.lpn_crit_minpressure || 'Lowest pressure allowed', pc.lpn_crit_minpressure_tip,
@@ -56480,7 +56489,8 @@ var EngCalcs = EngCalcs || {};
 		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
 		run = ffEl('button', 'lpn-ff-run', pc.lpn_ff_calculate || 'Run', buttons);
 		run.type = 'button';
-		run.disabled = critBusy;
+		run.disabled = critBusy || fireFlowBusy;
+		if (fireFlowBusy) { run.title = pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.'; }
 		run.addEventListener('click', function () {
 			critAsk.scope = scope.value;
 			critFireFlowAsk().minPressure = minP.value;
@@ -56542,8 +56552,11 @@ var EngCalcs = EngCalcs || {};
 			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_stopped || 'Stopped after {done} of {total} assets. The results below are the ones already finished.')
 				.replace('{done}', String(set.results.length)).replace('{total}', String(set.requested)), host);
 		}
-		hit = set.results.filter(function (r) { return r.state === EngCalcs.lpnCriticalityStates.IMPACT; }).length;
-		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || '{n} of {total} assets cut off demand or drop a junction below {pressure}.')
+		// Counted as the sentence reads: demand actually left unserved, or a junction actually below
+		// the minimum. A link that cuts off only zero-demand junctions shows them in its row, but it
+		// cut off no demand, so it is not counted here.
+		hit = set.results.filter(function (r) { return r.unserved > 0 || (r.below && r.below.length > 0); }).length;
+		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || '{n} of {total} assets leave demand unserved or drop a junction below {pressure}.')
 			.replace('{n}', String(hit)).replace('{total}', String(set.results.length))
 			.replace('{pressure}', ffQty(set.minPressure, 'lpn_u_pressure')), host);
 		if (set.baselineBelow) {
@@ -56560,6 +56573,8 @@ var EngCalcs = EngCalcs || {};
 			pc.lpn_crit_col_cutoff || 'Junctions cut off',
 			pc.lpn_crit_col_below || 'Junctions below minimum'
 		], { state: critSortState, by: critSortBy });
+		// Four columns, not ten: the headings wrap between words, never inside one (css/engcalcs.css).
+		if (body.parentNode && body.parentNode.classList) { body.parentNode.classList.add('lpn-crit-table'); }
 		shown.forEach(function (rec) {
 			var tr = ffEl('tr', 'lpn-crit-' + rec.state, null, body);
 			ffGotoLink(ffCell(tr, ''), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
@@ -56581,14 +56596,14 @@ var EngCalcs = EngCalcs || {};
 		ffRunUi.count.textContent = (pc.lpn_crit_working || 'Working: {done} of {total} assets.')
 			.replace('{done}', String(done)).replace('{total}', String(ffRunUi.total));
 	}
-	// The links to break. All: every pipe in the model this run solves, so an inactive one (which is
-	// already out) is not broken twice. Selected: every selected link -- a pump or a valve can be
-	// critical too -- and whatever else is selected is counted and said, not swallowed.
+	// The links to break. All: every link in the model this run solves -- pipes, pumps and valves,
+	// because Tom asked to "break each asset" -- so an inactive one (already out) is not broken
+	// twice. Selected: every selected link, and whatever else is selected is counted and said.
 	function criticalityLinks(model) {
 		var inModel = {}, ids = [], skipped = 0;
 		model.links.forEach(function (l) { inModel[l.id] = l; });
 		if (critAsk.scope !== 'selected') {
-			return { ids: model.links.filter(function (l) { return l.type === 'pipe'; }).map(function (l) { return l.id; }), skipped: 0 };
+			return { ids: model.links.map(function (l) { return l.id; }), skipped: 0 };
 		}
 		selections.forEach(function (s) {
 			if (s.kind === 'link' && inModel[s.id] && ids.indexOf(s.id) < 0) { ids.push(s.id); } else { skipped++; }
@@ -56598,13 +56613,17 @@ var EngCalcs = EngCalcs || {};
 	function runCriticality() {
 		var pc = EngCalcs.pageConfig || {}, model, engine, pick, minPressure, before;
 		if (critBusy || !EngCalcs.lpnCriticalitySweep) { return Promise.resolve(null); }
+		if (fireFlowBusy) {
+			setNotice(pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.');
+			return Promise.resolve(null);
+		}
 		model = assembleModel();
 		fireFlowAtFrame(model);
 		pick = criticalityLinks(model);
 		if (!pick.ids.length) {
 			setNotice(critAsk.scope === 'selected'
-				? (pc.lpn_crit_no_selection || 'No pipe, pump or valve is selected. Choose one on the map, or break all pipes.')
-				: (pc.lpn_crit_no_pipes || 'This project has no pipes yet, so there is nothing to break.'));
+				? (pc.lpn_crit_no_selection || 'No pipe, pump, or valve is selected. Choose one on the map, or break every link.')
+				: (pc.lpn_crit_no_links || 'This project has no links yet, so there is nothing to break.'));
 			return Promise.resolve(null);
 		}
 		minPressure = ffValue(critFireFlowAsk().minPressure, 'lpn_u_pressure');
@@ -56615,6 +56634,7 @@ var EngCalcs = EngCalcs || {};
 		critRun = null;
 		rebuildCriticalityReport();
 		buildCriticalityControls();
+		if (ffBoxIsOpen()) { buildFireFlowControls(); }
 		openFireFlowRunBox(pick.ids.length, {
 			title: pc.lpn_crit_title || 'Criticality analysis',
 			onStop: function () { critStop = true; },
@@ -56632,6 +56652,7 @@ var EngCalcs = EngCalcs || {};
 			shouldStop: function () { return critStop; }
 		}).then(function (set) {
 			critBusy = false;
+			if (ffBoxIsOpen()) { buildFireFlowControls(); }
 			closeFireFlowRunBox();
 			critDocGuard = (JSON.stringify(doc) === before);
 			if (!set.ok) {
@@ -56645,6 +56666,7 @@ var EngCalcs = EngCalcs || {};
 			return set;
 		}, function (err) {
 			critBusy = false;
+			if (ffBoxIsOpen()) { buildFireFlowControls(); }
 			closeFireFlowRunBox();
 			buildCriticalityControls();
 			setNotice(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
@@ -56654,8 +56676,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Read by the harness. Set by the run, never by a user action.
 	var critDocGuard = true;
-	// **A RESULT SET DESCRIBES THE NETWORK IT WAS RUN ON**, so it is cleared through the same door
-	// fire flow's results are, at the same moments (clearFireFlowRun() calls this first).
+	// **A RESULT SET DESCRIBES THE NETWORK IT WAS RUN ON**, so it is cleared at the same moments fire
+	// flow's results are (both calls sit side by side at each one) -- and ONLY then. Fire flow's
+	// "Clear rings" is that box's own act and leaves this report standing.
 	function clearCriticalityRun(quiet) {
 		if (!critRun) { return; }
 		critRun = null;
@@ -58089,6 +58112,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function scheduleArrivalSolve() {
 		clearFireFlowRun(false);
+		clearCriticalityRun(false);
 		if (solveTimer) { clearTimeout(solveTimer); }
 		solveTimer = null;
 		if (settings.autoRun === false) {

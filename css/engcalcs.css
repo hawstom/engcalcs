@@ -4121,6 +4121,12 @@ html:has(#lpn_canvas) { overflow: hidden; }
 /* The same three states as the rings, as a quiet tint on the row rather than as text colour: the
    verdict is already spelled out in the Result column, so this is a second channel and not the
    only one. */
+/* The criticality report has four columns, not ten, so its headings can afford to wrap between
+   words: "Asset" and "Junctions cut off" never break inside a word. A table too wide for a phone
+   scrolls sideways in .lpn-ff-tablewrap instead. */
+.lpn-ff-table.lpn-crit-table th { overflow-wrap: normal; word-break: normal; }
+tr.lpn-crit-impact { background: #fff4e5; }
+tr.lpn-crit-error { background: #f2f2f2; }
 tr.lpn-ff-fail { background: #fdecea; }
 tr.lpn-ff-design { background: #fff4e5; }
 tr.lpn-ff-error { background: #f2f2f2; }
