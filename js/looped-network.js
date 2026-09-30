@@ -20344,9 +20344,19 @@ var EngCalcs = EngCalcs || {};
 	// own note below).
 	var LPN_PANE_KEY = 'lpn_pane';
 	// The pane's own floor, and the map's. Between them they decide how far the grip can travel:
-	// a drag can always leave the map a canvas worth looking at, so there is no gesture that hides
-	// the drawing entirely and no state a user has to undo to get their map back.
-	var LPN_PANE_MIN = 110, LPN_PANE_MAP_MIN = 160, LPN_PANE_DEFAULT = 260;
+	// a drag can always leave the map a strip to grab the divider back from, so there is no gesture
+	// that hides the drawing entirely and no state a user has to undo to get their map back.
+	//
+	// **THE MAP'S SIDE IS A SLIVER, NOT A "WORKING MAP"** (Task 744, Tom: "It would be good to
+	// allow the bottom pane to shrink the map to almost nothing. More freedom for the user is a
+	// good thing."). It used to reserve 160px -- enough to still see the drawing -- which answered
+	// a question Tom did not ask: whether the shrunk map is USABLE. All this reserve has to
+	// guarantee is that the divider stays grabbable and the map's own overlays (zoom buttons, scale
+	// bar) do not break, which is a much smaller number. Below this, effectiveMapHeight()'s own
+	// LPN_MAP_MIN is still the hard floor a real canvas never crosses, so the two agree on what
+	// "almost nothing" means rather than this reserve promising a size the map floor would refuse
+	// to give it.
+	var LPN_PANE_MIN = 110, LPN_PANE_MAP_MIN = 32, LPN_PANE_DEFAULT = 260;
 	// One row per tab, in the order they are shown. `show` runs when the tab becomes the visible
 	// one, `hide` when it stops being -- a tab that draws on the MAP (the profile's route
 	// highlight) must clear that drawing when it is no longer the tab on show, or the map keeps a
@@ -20512,7 +20522,17 @@ var EngCalcs = EngCalcs || {};
 			mine = body ? body.getBoundingClientRect().height : 0,
 			room = map + mine - LPN_PANE_MAP_MIN;
 		if (!(map > 0) || map > vh) { room = Math.floor(vh / 2); }
-		return Math.max(LPN_PANE_MIN, Math.min(room, Math.floor(vh * 0.8) - paneChromeHeight()));
+		// **THE FRACTION IS A SANITY NET, NOT THE RESERVE** (Task 744). `room` is the number that
+		// actually answers "how much map is left" -- it is built from a MEASUREMENT of what is
+		// above the canvas, where the fraction below knows only the pane's own grip and tab strip.
+		// At 0.8 it came in ahead of `room` on an ordinary wide window (a short toolbar leaves the
+		// canvas most of the height, so 80% of the viewport is LESS than "leave LPN_PANE_MAP_MIN of
+		// map"), which is what silently undid the smaller reserve above: the map stalled around a
+		// fifth of the window no matter how far the grip was dragged. Raised so it stops being the
+		// one that binds in the ordinary case and goes back to being what it is named for -- a
+		// window can never become 100% pane -- while `effectiveMapHeight()`'s own LPN_MAP_MIN is
+		// still the one true floor a real canvas never crosses.
+		return Math.max(LPN_PANE_MIN, Math.min(room, Math.floor(vh * 0.95) - paneChromeHeight()));
 	}
 	function clampPaneHeight(h) {
 		if (!(h > 0)) { h = LPN_PANE_DEFAULT; }
