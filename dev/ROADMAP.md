@@ -478,10 +478,6 @@ the block.
   Left from the message log (Task 704, closed 2026-09-23): Ida's third item. Sort which must genuinely
   block and which are only information and belong in the log, which Tom's *"USER MUST HAVE CONTROL
   OVER MESSAGES"* argues for. Keep severity at the two colours the banner already uses.
-- 75|711| **A pan is lost when File, New project opens beside it.**
-  Found by the pre-reviewer 2026-09-23 while testing Task 647: New project and Open example never
-  call `rememberCurrentView()` for the tab being left, so switching back refits it and the pan is
-  gone. A tab opened from the gallery and switched to once keeps its view correctly.
 - 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
   Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
   important code discipline."* Ida's phased plan: `dev/theming-plan.md`. Phase 1 declares semantic

@@ -22,6 +22,7 @@ sentence**, so every close moves it — that is the whole connection, and it cos
 red builds on 2026-09-15 before anybody wrote it down.
 
 
+- 0|711| CLOSED 2026-09-30 (fix/new-project-view). New project, Open example, Save as and every import now remember the outgoing tab's view through one helper, rememberOutgoingProject(), as openProject() always did. dev/lpn-spike/new-project-pan-harness.js fails on the old code.
 - 0|322| CLOSED 2026-09-30 on CC's evaluation (Tom: "CC to evaluate: 239, 322"). Half A is done (4 rows left, each stating why no blocking check can hold it); half B's method (count a construct, ask what it assumes) is recorded in dev/enforceable-rules-survey.md. A standing survey for new checks now conflicts with CLAUDE.md's narrower rule: add a check for a defect a visitor could hit that a person would miss.
 - 0|239| CLOSED 2026-09-30 on CC's evaluation. The English-friction loop shipped and runs every sprint (friction_check.php gates launch and close; wave0_keyset.php; suggestion_box in every payload); yield measured twice, and the finding (Wave 0 pays for NEW English only) moved into dev/translation-process.md.
 - 0|724| CLOSED 2026-09-29 as delivered by Task 530: the fire flow run already tests every junction, with a table of every junction tested and pass/fail/design rings on the map. Tom, 2026-09-29: "Tasks complete to close ... 724 (I think, right?)".
