@@ -274,3 +274,13 @@ reproduce the `.inp` (nodes, links, coordinates, both scenarios) from the databa
 - Whether the schema differs across WaterCAD/WaterGEMS versions (V8i, CONNECT, 2023, 2024).
 - What WaterCAD's EPANET export drops or renames.
 - The licence questions above.
+
+## Where the difficulty really is (Tom, 2026-09-30)
+
+Both Gemini and this document put the difficulty in a file. Tom put it in the model: *"The difficulty
+is in providing/forcing inheritance and alternatives on the user. As I mention in the chat, it's a huge
+burden on the user unless we succeed in hiding it from 'basic mode' users."* Our scenarios are flat
+(each overrides Base); Bentley's are a tree, with alternatives as a layer beneath. Reading a
+`.wtg.sqlite` faithfully means holding that tree and those alternatives; flattening them on import
+loses exactly what a Bentley user built. So the decision that gates this task is not a parser, it is
+whether the suite takes on Bentley's scenario model at all, and how a basic mode would hide it (Task 721).
