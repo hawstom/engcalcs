@@ -35988,7 +35988,7 @@ var EngCalcs = EngCalcs || {};
 	var toolbarIconIndex = [];
 	// **THE REGISTRATION HALF, SPLIT OUT ON ITS OWN** (Perry's second review, 2026-09-22: dropping
 	// the message-log button's tip by building it by hand instead of calling setIconLabel() also,
-	// silently, dropped it out of Help > "Toolbar key" -- the one NON-hover way a first-time user
+	// silently, dropped it out of Help > "Toolbar" -- the one NON-hover way a first-time user
 	// or a touch user learns what an icon-only button does. The two jobs used to be bolted together
 	// so tightly that taking one meant losing the other, which nobody had asked for.). This is only
 	// the bookkeeping: keyed on the button so a repaint replaces its row rather than adding one, and
@@ -37239,7 +37239,7 @@ var EngCalcs = EngCalcs || {};
 			// probably time for an Import sub-menu."* The three rows below -- surveyed points, an
 			// EPANET file, and libraries -- moved here, WHOLESALE, out of the flat list. Each keeps
 			// its own key, tip and handler; only their container changed. `submenu` is the fly-out
-			// idiom Help > Toolbar key already uses (iconGuideRows), so this needed no new menu
+			// idiom Help > Toolbar already uses (iconGuideRows), so this needed no new menu
 			// mechanics, only a rows function of its own (importMenuRows()).
 			//
 			// **SITS WHERE Import EPANET file… used to, directly above Export EPANET file….** That
@@ -37539,7 +37539,7 @@ var EngCalcs = EngCalcs || {};
 			// whom a tip needs a deliberate press-and-hold -- has no way to read the strip. This is
 			// that way: the same icon, its name, and its explanation, in one list. DERIVED from the
 			// strip itself (toolbarIconIndex), so a button added later is in it already.
-			{ icon: 'help', label: pc.lpn_help_icons || 'Toolbar key', submenu: iconGuideRows },
+			{ icon: 'help', label: pc.lpn_help_icons || 'Toolbar', submenu: iconGuideRows },
 			{ separator: true },
 			// ---- Group 2: helpers ----
 			// **A VERB, not a noun.** "Contribute" reads as money or code to most visitors; the
@@ -53395,7 +53395,7 @@ var EngCalcs = EngCalcs || {};
 	// solution is to abandon the idea of adding 'Messages' to this submenu of dubious value and
 	// dubious fit."* **He is factually right and that is why this is settled rather than weighed:**
 	// the button is written in Looped-Network.php inside the map's own overlay row, not in the
-	// toolbar, so a row for it under "Toolbar key" would name a place it is not. The accessible
+	// toolbar, so a row for it under "Toolbar" would name a place it is not. The accessible
 	// name stays; the drawing carries the rest.
 	// `registerToolbarIcon()` -- the bookkeeping half of setIconLabel(), split out during the round
 	// trip -- is KEPT, because it is what stops the next tipless icon button losing its Help row by

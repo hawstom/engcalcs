@@ -166,7 +166,7 @@ console.log('\n-- Task 718: the three import rows are one Import submenu --');
 		report(importRowsBody.indexOf(fn) > 0, fn + ' is one of the submenu rows');
 	});
 	report(/label: pc\.lpn_file_import_menu[^,]*, submenu: importMenuRows/.test(fileBody),
-		'the File menu opens them through one submenu row, the same idiom Help > Toolbar key uses');
+		'the File menu opens them through one submenu row, the same idiom Help > Toolbar uses');
 	// None of the three stands loose in the flat top-level list any more.
 	const flatListMatch = fileBody.match(/openMenu\(anchor, \[([\s\S]*?)\]\.concat\(\[/);
 	const flatList = flatListMatch ? flatListMatch[1] : '';
