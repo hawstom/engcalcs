@@ -36,6 +36,7 @@ const L = loadLoopedNetwork(
 	"\t\trunSolve: runSolve, openBox: openCriticalityBox, wireBox: wireCriticalityBox,\n" +
 	"\t\trunCrit: runCriticality, run: function () { return critRun; },\n" +
 	"\t\tsetScope: function (v) { critAsk.scope = v; },\n" +
+	"\t\tsetSkipDead: function (v) { critAsk.skipDeadEnds = v; },\n" +
 	"\t\tdocGuard: function () { return critDocGuard; },\n" +
 	"\t\tminPressureText: function () { return critFireFlowAsk().minPressure; },\n" +
 	"\t\tsetMin: function (t) { critFireFlowAsk().minPressure = t; },\n" +
@@ -245,6 +246,22 @@ function openNet1() {
 	ok('Selected breaks exactly the selected links, pump included', !!set && set.results.map((r) => r.id).sort().join() === '31,9',
 		set && set.results.map((r) => r.id).join());
 	ok('...and says the node was not broken', L.notice() === PC.lpn_crit_skipped.replace('{n}', '1'), L.notice());
+
+	console.log('\n--- Skip dead ends (122 still out) ---');
+	L.setScope('all');
+	L.setSkipDead(true);
+	await L.runCrit();
+	set = L.run();
+	ok('checked: 31 and 121 are skipped, the ten looped links run', !!set && set.results.length === 10 &&
+		set.skippedDeadEnds.slice().sort().join() === '121,31' && !set.byId['31'] && !set.byId['121'],
+		set && (set.results.length + ' / ' + set.skippedDeadEnds.join()));
+	ok('...the looped ones are kept', !!set.byId['111'] && set.byId['111'].cutOff.length === 0);
+	ok('...and the summary says how many were skipped', text(byId.lpn_crit_report).indexOf(PC.lpn_crit_skipped_dead.replace('{n}', '2')) >= 0);
+	L.setSkipDead(false);
+	await L.runCrit();
+	set = L.run();
+	ok('unchecked is unchanged: 12 rows, none skipped', set.results.length === 12 && set.skippedDeadEnds.length === 0 &&
+		text(byId.lpn_crit_report).indexOf(PC.lpn_crit_skipped_dead.replace('{n}', '0')) < 0);
 
 	if (fails) { console.log('\n' + fails + ' criticality check(s) FAILED'); process.exit(1); }
 	console.log('\nCriticality harness: all checks passed.');

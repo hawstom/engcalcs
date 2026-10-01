@@ -124,10 +124,14 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	 *   links        REQUIRED array of link ids to break, one at a time. THE CALLER CHOOSES THE SET.
 	 *   minPressure  metres of head; a connected junction below it is counted. 0 when omitted.
 	 *   onProgress   function({ done, total, id, result }) after every asset.
+	 *   skipDeadEnds true: a link whose removal cuts off any junction (or other node) that the intact
+	 *                network reaches is NOT solved and is not in `results`. That is a bridge with no
+	 *                source on its far side, found by the same walk the case already makes, so a
+	 *                skipped link costs no solve. The ids come back in `skippedDeadEnds`.
 	 *   shouldStop   function() -> true to stop between assets; what is done is kept.
 	 *   yield        function() -> Promise, between assets, so a long run paints and can be stopped.
 	 *
-	 * Resolves to { ok, results, byId, requested, minPressure, baselineBelow, baselineCutOff,
+	 * Resolves to { ok, results, byId, requested, processed, skippedDeadEnds, minPressure, baselineBelow, baselineCutOff,
 	 * solves, stopped } -- or { ok: false, code, issues } when the intact network itself did not
 	 * solve, because every row would then be measured against nothing.
 	 */
@@ -138,6 +142,8 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			yieldTo = opts.yield || defaultYield,
 			results = [],
 			solves = 0,
+			processed = 0,
+			skippedDeadEnds = [],
 			stopped = false,
 			linkById = {},
 			demandOf = {},
@@ -187,6 +193,10 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			rec.type = linkById[id].type;
 			links = model.links.filter(function (l) { return l.id !== id; });
 			reach = reachable(model.nodes, links);
+			if (opts.skipDeadEnds && model.nodes.some(function (n) { return reach0[n.id] && !reach[n.id]; })) {
+				rec.skipped = true;
+				return Promise.resolve(rec);
+			}
 			model.nodes.forEach(function (n) {
 				if (reach[n.id]) { return; }
 				drop[n.id] = true;
@@ -227,9 +237,10 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			if (k >= ids.length) { return Promise.resolve(); }
 			if (opts.shouldStop && opts.shouldStop()) { stopped = true; return Promise.resolve(); }
 			return breakOne(ids[k]).then(function (rec) {
-				results.push(rec);
+				processed++;
+				if (rec.skipped) { skippedDeadEnds.push(rec.id); } else { results.push(rec); }
 				if (opts.onProgress) {
-					opts.onProgress({ done: results.length, total: ids.length, id: rec.id, result: rec });
+					opts.onProgress({ done: processed, total: ids.length, id: rec.id, result: rec });
 				}
 				return yieldTo().then(function () { return next(k + 1); });
 			});
@@ -249,6 +260,8 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 					results: results,
 					byId: byId,
 					requested: ids.length,
+					processed: processed,
+					skippedDeadEnds: skippedDeadEnds,
 					minPressure: minPressure,
 					baselineBelow: Object.keys(baseBelow).length,
 					baselineCutOff: baseCut,

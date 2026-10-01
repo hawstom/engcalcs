@@ -4070,6 +4070,9 @@ $ec_lang['lpn_crit_no_links']='This project has no links yet, so there is nothin
 $ec_lang['lpn_crit_busy']='Another analysis is running. Stop it, or wait for it to finish.';
 $ec_lang['lpn_crit_skipped']='{n} selected elements are not links, so they were not broken.';
 $ec_lang['lpn_crit_stale']='The drawing changed, so the criticality results were cleared. Run it again.';
+$ec_lang['lpn_crit_skipdead']='Skip dead ends';
+$ec_lang['lpn_crit_skipdead_tip']='A dead-end link is one whose removal cuts off junctions that can be reached only through it, with no reservoir or tank beyond. Its loss is everything beyond it, so it is not solved. The summary says how many were skipped.';
+$ec_lang['lpn_crit_skipped_dead']='Dead-end links skipped: {n}. Each one cuts off everything beyond it.';
 
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //

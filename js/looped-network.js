@@ -56466,7 +56466,7 @@ var EngCalcs = EngCalcs || {};
 	// localStorage; this one remembers only until the page is reloaded, so this feature stores
 	// nothing on a visitor's device. Adding the memory is a new `lpn_critbox` key and a line in
 	// dev/cookie-storage-inventory.md.
-	var critAsk = { scope: 'all' };
+	var critAsk = { scope: 'all', skipDeadEnds: false };
 	var critRun = null;
 	var critBusy = false;
 	var critStop = false;
@@ -56484,7 +56484,7 @@ var EngCalcs = EngCalcs || {};
 	function buildCriticalityControls() {
 		var pc = EngCalcs.pageConfig || {},
 			host = document.getElementById('lpn_crit_controls'),
-			scope, minP, buttons, run, stop, engine;
+			scope, minP, skip, buttons, run, stop, engine;
 		if (!host) { return; }
 		host.innerHTML = '';
 		ffEl('p', 'lpn-ff-note', pc.lpn_crit_intro, host);
@@ -56494,6 +56494,11 @@ var EngCalcs = EngCalcs || {};
 		], critAsk.scope);
 		scope.addEventListener('change', function () { critAsk.scope = scope.value; });
 		ffRow(host, pc.lpn_crit_scope || 'Links to break', pc.lpn_crit_scope_tip, scope, '');
+		skip = document.createElement('input');
+		skip.type = 'checkbox';
+		skip.checked = !!critAsk.skipDeadEnds;
+		skip.addEventListener('change', function () { critAsk.skipDeadEnds = skip.checked; });
+		ffRow(host, pc.lpn_crit_skipdead || 'Skip dead ends', pc.lpn_crit_skipdead_tip, skip, '');
 		minP = ffInput(critFireFlowAsk().minPressure);
 		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
 		ffRow(host, pc.lpn_crit_minpressure || 'Lowest pressure allowed', pc.lpn_crit_minpressure_tip,
@@ -56507,6 +56512,7 @@ var EngCalcs = EngCalcs || {};
 		if (fireFlowBusy) { run.title = pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.'; }
 		run.addEventListener('click', function () {
 			critAsk.scope = scope.value;
+			critAsk.skipDeadEnds = skip.checked;
 			critFireFlowAsk().minPressure = minP.value;
 			runCriticality();
 		});
@@ -56564,7 +56570,7 @@ var EngCalcs = EngCalcs || {};
 		if (!set) { return; }
 		if (set.stopped) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_stopped || 'Stopped after {done} of {total} assets. The results below are the ones already finished.')
-				.replace('{done}', String(set.results.length)).replace('{total}', String(set.requested)), host);
+				.replace('{done}', String(set.processed)).replace('{total}', String(set.requested)), host);
 		}
 		// Counted as the sentence reads: demand actually left unserved, or a junction actually below
 		// the minimum. A link that cuts off only zero-demand junctions shows them in its row, but it
@@ -56573,6 +56579,10 @@ var EngCalcs = EngCalcs || {};
 		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || '{n} of {total} assets leave demand unserved or drop a junction below {pressure}.')
 			.replace('{n}', String(hit)).replace('{total}', String(set.results.length))
 			.replace('{pressure}', ffQty(set.minPressure, 'lpn_u_pressure')), host);
+		if (set.skippedDeadEnds && set.skippedDeadEnds.length) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_skipped_dead || 'Dead-end links skipped: {n}. Each one cuts off everything beyond it.')
+				.replace('{n}', String(set.skippedDeadEnds.length)), host);
+		}
 		if (set.baselineBelow) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_baseline_below || 'Junctions already below it with nothing broken: {n}. They are not counted.')
 				.replace('{n}', String(set.baselineBelow)), host);
@@ -56661,6 +56671,7 @@ var EngCalcs = EngCalcs || {};
 		return EngCalcs.lpnCriticalitySweep(model, {
 			solve: engine.solve,
 			links: pick.ids,
+			skipDeadEnds: !!critAsk.skipDeadEnds,
 			minPressure: minPressure > 0 ? minPressure : 0,
 			onProgress: function (p) { updateCriticalityRunBox(p.done); },
 			shouldStop: function () { return critStop; }
