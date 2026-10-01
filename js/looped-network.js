@@ -57724,7 +57724,7 @@ var EngCalcs = EngCalcs || {};
 		// advised it stay a per-scenario option, as Bentley keeps it in Calculation Options). So it
 		// is the last column, after a divider, and its heading carries the option's own tip.
 		body = ffTable(host, [pc.lpn_scenario_label || 'Scenario'].concat(LPN_ALT_CATEGORIES.map(altCategoryLabel),
-			[[pc.bpn_demand_mult || 'Demand multiplier', pc.lpn_settings_demand_multiplier_tip || '']]));
+			[[pc.bpn_demand_mult || 'Demand multiplier', pc.lpn_settings_demand_multiplier_tip]]));
 		markLastHeading(body, 'lpn-alt-calcopt');
 		scenariosForDisplay().forEach(function (s) {
 			var tr = ffEl('tr', null, null, body), alts = alternativesOf(s);
