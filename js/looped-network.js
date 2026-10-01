@@ -51977,7 +51977,11 @@ var EngCalcs = EngCalcs || {};
 				readonlyUnitField(fields, pc.lpn_result_velocity || 'Velocity', resultUnit('velocity'), lastSolveResult.velocities[linkId]);
 			}
 			// Head loss, for a pump too, where it is shown as a positive Head gain (shownHeadloss()).
-			readonlyUnitField(fields, headlossLabelFor(l), resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]));
+			if (l.type === 'pump') {
+				readonlyUnitField(fields, pc.lpn_pgraph_head_gain || 'Head gain', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]));
+			} else {
+				readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]));
+			}
 			// Gradient is per unit of pipe LENGTH, so it is a pipe-only result -- a pump has no
 			// length to spread its head over. linkLengthSI(), not the declared length: see Task 255.
 			if (l.type !== 'pump' && linkLengthSI(l)) {
