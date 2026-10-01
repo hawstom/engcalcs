@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 2153 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**4 still to read on master**, of 13 untranslated keys, of 2166 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,26 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-None on master. Every English key here is present in at least one other language.
-
----
-
-# Strings waiting on a branch
-
-**8 still to read**, of 53 new keys across 11 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### chore/sprint-0930-golf (`78b3cae4`) — adds no English strings
-
-### feat/bentley-interop (`ee19f373`) — 13 new, 4 to read @@ NEEDS RULING
+## lpn_  (13, 4 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -86,7 +67,24 @@ build for that would be a gate nobody keeps. Refresh it with
   > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives table, which shows how those values are grouped by category.
   @@ NEEDS RULING
 
-### feat/copy-lock (`15288fa8`) — 7 new, 1 to read @@ NEEDS RULING
+---
+
+# Strings waiting on a branch
+
+**4 still to read**, of 40 new keys across 10 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/bentley-interop (`ed1fcae9`) — adds no English strings
+
+### feat/copy-lock (`4e1801df`) — 7 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_copy_body`**
   > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
@@ -98,7 +96,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > A copy; make new lock
   _Ruled OK 2026-10-01._
 - **`lpn_copy_kept_link`**
-  > Switched to {name}. It stays connected to the file it was opened from, {file}, and Save writes there, not to the file you just chose.
+  > Opened {name} as the original, moved to a new place. Save now writes to this file.
   @@ NEEDS RULING
 - **`lpn_copy_opened`**
   > Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.
