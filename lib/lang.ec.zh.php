@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='恢复默认值';
 $ec_lang['calc_defaults_confirm']='将计算器重置为原始默认值吗？';
 $ec_lang['points_data_note']='（或使用数据区域复制/粘贴）';
-$ec_lang['points_data_heading']='测点数据<br />（逗号或制表符分隔）';
+$ec_lang['points_data_heading']='计算数据<br />（使用“复制”查看格式）';
 $ec_lang['points_data_copy']='复制';
 $ec_lang['points_data_paste']='粘贴';
 $ec_lang['calc_inputs']='输入';
@@ -929,6 +929,11 @@ $ec_lang['lpn_examples_loading']='正在加载示例…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='提出更正';
 $ec_lang['lpn_help_notes']='本页说明';
+$ec_lang['lpn_help_hotkeys']='表格与快捷键';
+$ec_lang['lpn_hotkeys_tables_heading']='表格';
+$ec_lang['lpn_hotkeys_map_heading']='地图';
+$ec_lang['lpn_hotkeys_map_term']='地图键盘快捷键';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 或 Esc</td><td>选择。</td></tr><tr><td>2</td><td>添加节点。</td></tr><tr><td>3</td><td>添加水库。</td></tr><tr><td>4</td><td>添加水池。</td></tr><tr><td>5</td><td>添加管道。</td></tr><tr><td>6</td><td>添加水泵。</td></tr><tr><td>7</td><td>添加阀门。</td></tr><tr><td>8</td><td>添加用户。</td></tr><tr><td>9</td><td>添加文字。</td></tr><tr><td>Delete</td><td>删除所选内容。</td></tr><tr><td>Ctrl+Z</td><td>撤销上一次更改。</td></tr><tr><td>+ 或 =</td><td>放大。</td></tr><tr><td>-</td><td>缩小。</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1203,7 +1208,7 @@ $ec_lang['lpn_find_menu_tip']='按 ID 查找元件，或查找所有满足条件
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='工具栏图标含义说明';
+$ec_lang['lpn_help_icons']='工具栏';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='可见性';
 $ec_lang['lpn_pane_right_toggle_tip']='显示或隐藏地图右侧的面板。其中包含标签和颜色的选项。';
@@ -1312,6 +1317,7 @@ $ec_lang['lpn_pane_not_used']='未使用';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='已按 {q} 过滤，显示 {all} 项中的 {n} 项。';
 $ec_lang['lpn_pane_filter_clear']='显示全部';
+$ec_lang['lpn_pane_filter_stale']='不再匹配的行：{n}。';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='此表中没有与过滤条件匹配的内容。';
@@ -1768,6 +1774,7 @@ $ec_lang['lpn_import_no_room']='浏览器存储空间不足，无法添加该项
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='确定';
+$ec_lang['lpn_file_import_menu']='导入…';
 $ec_lang['lpn_file_import_inp']='导入 EPANET 文件…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='从 EPANET 文件中读取管网，可以是 .inp 文本文件，也可以是 EPANET 保存的 .net 文件，并将其作为新项目保存在本浏览器中。';
@@ -2110,7 +2117,7 @@ $ec_lang['lpn_notes_6_term']='表格列帮助';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>选择列</td><td>点击表头</td></tr><tr><td>添加或扩展列选择</td><td>Ctrl+click 或 Shift+click 另一个表头</td></tr><tr><td>移动（重新排列）所选的列</td><td>拖动，或在右键菜单或 ⋮ 菜单中使用“管理列…”</td></tr><tr><td>⋮ 菜单和排序箭头。</td><td>将指针悬停在表头的右上角，或选中表头或按 Tab 键移入表头</td></tr><tr><td>隐藏、显示全部或管理可见性与顺序</td><td>右键点击表头，或点击表头右上角的 ⋮ 菜单</td></tr><tr><td>按列排序</td><td>表头右上角的箭头图标</td></tr><tr><td>粘贴为表格末尾的新行</td><td>右键点击、表头右上角的 ⋮ 菜单，或 Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='表格键盘快捷键';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>方向键</td><td>移动。</td></tr><tr><td>Tab、Enter</td><td>完成输入并向右/向下移动一个单元格。</td></tr><tr><td>Shift+Tab、Shift+Enter</td><td>向反方向移动。</td></tr><tr><td>Shift+方向键</td><td>扩展选区。</td></tr><tr><td>Ctrl+C</td><td>复制所选内容。</td></tr><tr><td>Ctrl+D</td><td>用选区顶行的内容向下填充选区。</td></tr><tr><td>Ctrl+Enter</td><td>用活动单元格的数值填充选区。</td></tr><tr><td>Ctrl+A</td><td>选中整个表格。</td></tr><tr><td>Ctrl+Shift+V</td><td>粘贴为表格末尾的新行。</td></tr><tr><td>Ctrl+Shift+PageDown、Ctrl+Shift+PageUp</td><td>切换到下一个或上一个表格。</td></tr><tr><td>Delete</td><td>清空单元格。</td></tr><tr><td>F2</td><td>打开单元格进行编辑。</td></tr><tr><td>Esc</td><td>取消编辑。</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>方向键</td><td>移动。</td></tr><tr><td>Tab、Enter</td><td>完成输入并向右/向下移动一个单元格。</td></tr><tr><td>Shift+Tab、Shift+Enter</td><td>向反方向移动。</td></tr><tr><td>Shift+方向键</td><td>扩展选区。</td></tr><tr><td>Ctrl+C</td><td>复制所选内容。</td></tr><tr><td>Ctrl+D</td><td>用选区顶行的内容向下填充选区。</td></tr><tr><td>Ctrl+Enter</td><td>用活动单元格的数值填充选区。</td></tr><tr><td>Ctrl+A</td><td>选中整个表格。</td></tr><tr><td>Ctrl+Shift+V</td><td>粘贴为表格末尾的新行。</td></tr><tr><td>Ctrl+Shift+PageDown、Ctrl+Shift+PageUp</td><td>切换到下一个或上一个标签页，无论是表格还是图形。</td></tr><tr><td>Delete</td><td>清空单元格。</td></tr><tr><td>F2</td><td>打开单元格进行编辑。</td></tr><tr><td>Esc</td><td>取消编辑。</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2706,6 +2713,20 @@ $ec_lang['lpn_scenario_push_confirm']='使所有方案对这些属性都采用�
 $ec_lang['lpn_scenario_push_scenarios']='受影响的方案：';
 $ec_lang['lpn_scenario_push_values']='将被舍弃的数值：';
 $ec_lang['lpn_scenario_push_none']='没有任何方案对这些属性拥有自有数值，因此不会有任何变化，也不会舍弃任何数值。';
+$ec_lang['lpn_scenario_preset_flow_static']='1. 流量测试：静态';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='针对设计管网在零流量下的流量测试校准。在此方案中，将所有节点的需水量设为 0。';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. 流量测试：中等';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='针对设计管网在所报告的第一个流量下的流量测试校准。在此方案中，将出流节点的需水量设为所测的第一个流量，其他所有节点的需水量设为 0。';
+$ec_lang['lpn_scenario_preset_flow_max']='3. 流量测试：最大';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='针对设计管网在所报告的最大流量下的流量测试校准。在此方案中，将出流节点的需水量设为所测的最大流量，其他所有节点的需水量设为 0。';
+$ec_lang['lpn_scenario_preset_average_day']='4. 平均日';
+$ec_lang['lpn_scenario_preset_average_day_tip']='需水量倍数为 1：每一处需水量均按输入值计，视为平均日需水量。';
+$ec_lang['lpn_scenario_preset_max_day']='5. 最大日';
+$ec_lang['lpn_scenario_preset_max_day_tip']='需水量倍数为平均日的 2.0 倍，仅为占位数值。多数系统介于 1.2 至 3.0 之间（National Research Council, 2006）。请在“设置”“计算”“水力计算”中设置您自己系统的需水量倍数。';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. 高峰时段';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='需水量倍数为平均日的 3.0 倍，仅为占位数值。多数系统介于 3.0 至 6.0 之间（National Research Council, 2006）。请在“设置”“计算”“水力计算”中设置您自己系统的需水量倍数。';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. 消防加最大日';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='最大日需水量（倍数 2.0）。请在此方案中运行消防流量分析：它会在此需水量之上，在每个节点叠加消防流量。';
 $ec_lang['lpn_delete_drops_overrides']='删除此元件也会丢弃您各方案中为其保存的 {n} 个数值。是否继续？';
 $ec_lang['lpn_push_base_only']='此操作会更改图形本身，因此只能在"{base}"中执行。请切换到"{base}"后重试。';
 $ec_lang['lpn_field_active']='属于本管网';
@@ -3679,8 +3700,10 @@ $ec_lang['lpn_ff_title']='消防流量分析';
 $ec_lang['lpn_ff_intro']='依次让管网中的每个节点在其现有需水量之外再抽取一份消防流量。您的项目不会被更改；整个运行都在一份副本上进行。';
 $ec_lang['lpn_ff_scope']='要测试的节点';
 $ec_lang['lpn_ff_scope_tip']='请在运行前选择测试范围。在大型系统中测试每一个节点可能需要几分钟。';
+$ec_lang['lpn_ff_all']='全部';
+$ec_lang['lpn_ff_selected']='所选';
 $ec_lang['lpn_ff_no_junctions']='此项目目前还没有节点，因此没有可测试的对象。';
-$ec_lang['lpn_ff_no_selection']='未选中任何节点。请在地图上选择一个节点，或选择测试所有节点。';
+$ec_lang['lpn_ff_no_selection']='未选中任何节点。请选择节点，或选择“全部”选项。';
 $ec_lang['lpn_ff_skipped']='所选元素中有 {n} 个不是节点，因此未进行测试。';
 $ec_lang['lpn_ff_required']='所需消防流量';
 $ec_lang['lpn_ff_required_tip']='您的消防规范或消防部门要求消火栓提供的流量。除非某节点自带所需消防流量，否则都按此数值进行测试。';
@@ -3690,7 +3713,7 @@ $ec_lang['lpn_ff_residual']='需维持的余压';
 $ec_lang['lpn_ff_residual_tip']='节点在提供消防流量的同时必须维持的压力。AWWA M31 和 NFPA 291 采用 20 psi（140 kPa）。';
 $ec_lang['lpn_ff_design']='设计校核（对系统的影响）';
 $ec_lang['lpn_ff_design_tip']='这是一个独立的问题：抽取该流量后，是否有其他部位的压力低于其下限，或流速超过其限值？勾选此项不会增加额外的计算量。';
-$ec_lang['lpn_ff_design_no_selection']='设计校核范围已设置为所选节点，但目前未选中任何节点。请在地图上选择一些节点，或将其设置为“所有其他节点和所有管道”。';
+$ec_lang['lpn_ff_design_no_selection']='设计校核范围已设置为“所选”，但目前未选中任何元件。请选择元件，或选择“全部”选项。';
 $ec_lang['lpn_ff_minpressure']='其他部位允许的最低压力';
 $ec_lang['lpn_ff_minpressure_tip']='当某个节点正在抽取其消防流量时，若其他节点的压力低于此值，则报告为设计问题。';
 $ec_lang['lpn_ff_maxvelocity']='允许的最高流速';

@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='ডিফল্ট পুনরুদ্ধার করুন';
 $ec_lang['calc_defaults_confirm']='ক্যালকুলেটরটি মূল ডিফল্ট মানে পুনরায় সেট করবেন?';
 $ec_lang['points_data_note']='(অথবা ডেটা এলাকা ব্যবহার করে কপি/পেস্ট করুন)';
-$ec_lang['points_data_heading']='পয়েন্ট ডেটা<br />(কমা বা ট্যাব দ্বারা বিভক্ত)';
+$ec_lang['points_data_heading']='ক্যালকুলেটর ডেটা<br />(ফরম্যাট দেখতে কপি ব্যবহার করুন)';
 $ec_lang['points_data_copy']='কপি';
 $ec_lang['points_data_paste']='পেস্ট';
 $ec_lang['calc_inputs']='ইনপুট';
@@ -936,6 +936,11 @@ $ec_lang['lpn_examples_loading']='উদাহরণ লোড হচ্ছে�
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='কিছু ঠিক করুন';
 $ec_lang['lpn_help_notes']='এই পৃষ্ঠা সম্পর্কে নোট';
+$ec_lang['lpn_help_hotkeys']='টেবিল ও হটকি';
+$ec_lang['lpn_hotkeys_tables_heading']='সারণি';
+$ec_lang['lpn_hotkeys_map_heading']='মানচিত্র';
+$ec_lang['lpn_hotkeys_map_term']='মানচিত্রের কীবোর্ড শর্টকাট';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 বা Esc</td><td>নির্বাচন করুন।</td></tr><tr><td>2</td><td>একটি সংযোগস্থল যোগ করুন।</td></tr><tr><td>3</td><td>একটি জলাধার যোগ করুন।</td></tr><tr><td>4</td><td>একটি ট্যাংক যোগ করুন।</td></tr><tr><td>5</td><td>একটি পাইপ যোগ করুন।</td></tr><tr><td>6</td><td>একটি পাম্প যোগ করুন।</td></tr><tr><td>7</td><td>একটি ভালভ যোগ করুন।</td></tr><tr><td>8</td><td>একজন গ্রাহক যোগ করুন।</td></tr><tr><td>9</td><td>টেক্সট যোগ করুন।</td></tr><tr><td>Delete</td><td>নির্বাচিত অংশ মুছুন।</td></tr><tr><td>Ctrl+Z</td><td>শেষ পরিবর্তনটি পূর্বাবস্থায় ফিরিয়ে আনুন।</td></tr><tr><td>+ বা =</td><td>জুম ইন করুন।</td></tr><tr><td>-</td><td>জুম আউট করুন।</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1210,7 +1215,7 @@ $ec_lang['lpn_find_menu_tip']='একটি উপাদান তার ID দ�
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='টুলবার আইকনগুলোর অর্থ কী';
+$ec_lang['lpn_help_icons']='টুলবার';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='দৃশ্যমানতা';
 $ec_lang['lpn_pane_right_toggle_tip']='মানচিত্রের ডানদিকের প্যানেলটি দেখান বা লুকান। এতে লেবেল ও রঙের পছন্দগুলো থাকে।';
@@ -1319,6 +1324,7 @@ $ec_lang['lpn_pane_not_used']='ব্যবহৃত হয়নি';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='{q} দ্বারা ফিল্টার করা হয়েছে। {all}টির মধ্যে {n}টি দেখানো হচ্ছে।';
 $ec_lang['lpn_pane_filter_clear']='সব দেখান';
+$ec_lang['lpn_pane_filter_stale']='যে সারিগুলো আর মেলে না: {n}।';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='এই সারণিতে ফিল্টারের সাথে কিছুই মেলে না।';
@@ -1778,6 +1784,7 @@ $ec_lang['lpn_import_no_room']='এই প্রকল্প যোগ করা
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='ঠিক আছে';
+$ec_lang['lpn_file_import_menu']='আমদানি করুন…';
 $ec_lang['lpn_file_import_inp']='EPANET ফাইল আমদানি করুন…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='একটি EPANET ফাইল থেকে একটি নেটওয়ার্ক পড়ুন, .inp টেক্সট ফাইল বা EPANET যে .net ফাইল সংরক্ষণ করে তার যেকোনোটি, এবং এই ব্রাউজারে এটি একটি নতুন প্রকল্প হিসেবে সংরক্ষণ করুন।';
@@ -2120,7 +2127,7 @@ $ec_lang['lpn_notes_6_term']='টেবিল কলাম সহায়তা
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>কলাম নির্বাচন করুন</td><td>শিরোনামে ক্লিক করুন</td></tr><tr><td>কলাম নির্বাচন যোগ বা প্রসারিত করুন</td><td>Ctrl+ক্লিক অথবা Shift+ক্লিক অন্য শিরোনামে</td></tr><tr><td>নির্বাচিত কলাম(গুলো) সরান (পুনর্বিন্যাস করুন)</td><td>টেনে আনুন অথবা রাইট-ক্লিক বা ⋮ মেনুতে কলাম পরিচালনা করুন… ব্যবহার করুন</td></tr><tr><td>মেনু ⋮ ও সাজানোর তীরচিহ্ন।</td><td>একটি শিরোনামের উপরের কোণে হোভার করুন, অথবা একটি শিরোনামে নির্বাচন করুন বা Tab করুন</td></tr><tr><td>লুকান, সব দেখান, অথবা দৃশ্যমানতা ও ক্রম পরিচালনা করুন</td><td>শিরোনামে রাইট-ক্লিক করুন বা শিরোনামের উপরের ডান কোণে ⋮ মেনু</td></tr><tr><td>কলাম অনুসারে সাজান</td><td>শিরোনামের উপরের ডান কোণে তীরচিহ্ন আইকন</td></tr><tr><td>টেবিলের শেষে নতুন সারি হিসেবে পেস্ট করুন</td><td>রাইট-ক্লিক, শিরোনামের উপরের ডান কোণে ⋮ মেনু, অথবা Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='টেবিল কিবোর্ড শর্টকাট';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>তীর কী</td><td>নেভিগেট করুন।</td></tr><tr><td>Tab, Enter</td><td>প্রবেশ শেষ করুন এবং একটি কক্ষ পাশে / নিচে নেভিগেট করুন।</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>পেছনে নেভিগেট করুন।</td></tr><tr><td>Shift+তীর কী</td><td>নির্বাচন প্রসারিত করুন।</td></tr><tr><td>Ctrl+C</td><td>নির্বাচন কপি করুন।</td></tr><tr><td>Ctrl+D</td><td>নির্বাচনকে এর উপরের সারি থেকে নিচে পূরণ করুন।</td></tr><tr><td>Ctrl+Enter</td><td>নির্বাচনকে সক্রিয় কক্ষের মান দিয়ে পূরণ করুন।</td></tr><tr><td>Ctrl+A</td><td>পুরো টেবিল নির্বাচন করুন।</td></tr><tr><td>Ctrl+Shift+V</td><td>টেবিলের শেষে নতুন সারি হিসেবে পেস্ট করুন।</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>পরবর্তী বা পূর্ববর্তী টেবিলে যান।</td></tr><tr><td>Delete</td><td>একটি কক্ষ পরিষ্কার করুন।</td></tr><tr><td>F2</td><td>সম্পাদনার জন্য একটি কক্ষ খুলুন।</td></tr><tr><td>Esc</td><td>সম্পাদনা বাতিল করুন।</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>তীর কী</td><td>নেভিগেট করুন।</td></tr><tr><td>Tab, Enter</td><td>প্রবেশ শেষ করুন এবং একটি কক্ষ পাশে / নিচে নেভিগেট করুন।</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>পেছনে নেভিগেট করুন।</td></tr><tr><td>Shift+তীর কী</td><td>নির্বাচন প্রসারিত করুন।</td></tr><tr><td>Ctrl+C</td><td>নির্বাচন কপি করুন।</td></tr><tr><td>Ctrl+D</td><td>নির্বাচনকে এর উপরের সারি থেকে নিচে পূরণ করুন।</td></tr><tr><td>Ctrl+Enter</td><td>নির্বাচনকে সক্রিয় কক্ষের মান দিয়ে পূরণ করুন।</td></tr><tr><td>Ctrl+A</td><td>পুরো টেবিল নির্বাচন করুন।</td></tr><tr><td>Ctrl+Shift+V</td><td>টেবিলের শেষে নতুন সারি হিসেবে পেস্ট করুন।</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>পরবর্তী বা পূর্ববর্তী ট্যাবে যান, তা টেবিল হোক বা গ্রাফ।</td></tr><tr><td>Delete</td><td>একটি কক্ষ পরিষ্কার করুন।</td></tr><tr><td>F2</td><td>সম্পাদনার জন্য একটি কক্ষ খুলুন।</td></tr><tr><td>Esc</td><td>সম্পাদনা বাতিল করুন।</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2717,6 +2724,20 @@ $ec_lang['lpn_scenario_push_confirm']='প্রতিটি দৃশ্যক�
 $ec_lang['lpn_scenario_push_scenarios']='প্রভাবিত দৃশ্যকল্প:';
 $ec_lang['lpn_scenario_push_values']='ফেলে দেওয়া মান:';
 $ec_lang['lpn_scenario_push_none']='এই বৈশিষ্ট্যগুলোর কোনোটির জন্য কোনো দৃশ্যকল্পের নিজস্ব মান নেই, তাই কিছুই পরিবর্তিত হবে না। কিছুই ফেলে দেওয়া হবে না।';
+$ec_lang['lpn_scenario_preset_flow_static']='1. প্রবাহ পরীক্ষা: স্থির';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='শূন্য প্রবাহে একটি ডিজাইন নেটওয়ার্কের জন্য প্রবাহ পরীক্ষার ক্যালিব্রেশন। এই দৃশ্যকল্পে সব সংযোগস্থলের চাহিদা ০ সেট করুন।';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. প্রবাহ পরীক্ষা: মধ্য';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='প্রথম প্রতিবেদিত প্রবাহে একটি ডিজাইন নেটওয়ার্কের জন্য প্রবাহ পরীক্ষার ক্যালিব্রেশন। এই দৃশ্যকল্পে প্রবাহিত সংযোগস্থলের চাহিদা পরিমাপ করা প্রথম প্রবাহে এবং অন্য সব সংযোগস্থলের চাহিদা ০ সেট করুন।';
+$ec_lang['lpn_scenario_preset_flow_max']='3. প্রবাহ পরীক্ষা: সর্বোচ্চ';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='প্রতিবেদিত সর্বোচ্চ প্রবাহে একটি ডিজাইন নেটওয়ার্কের জন্য প্রবাহ পরীক্ষার ক্যালিব্রেশন। এই দৃশ্যকল্পে প্রবাহিত সংযোগস্থলের চাহিদা পরিমাপ করা সর্বোচ্চ প্রবাহে এবং অন্য সব সংযোগস্থলের চাহিদা ০ সেট করুন।';
+$ec_lang['lpn_scenario_preset_average_day']='4. গড় দিন';
+$ec_lang['lpn_scenario_preset_average_day_tip']='চাহিদা গুণক ১: প্রতিটি চাহিদা যেমন লেখা হয়েছে তেমনই, যা গড় দিনের চাহিদা বলে ধরা হয়।';
+$ec_lang['lpn_scenario_preset_max_day']='5. সর্বোচ্চ দিন';
+$ec_lang['lpn_scenario_preset_max_day_tip']='চাহিদা গুণক গড় দিনের ২.০ গুণ, একটি অস্থায়ী মান। বেশিরভাগ সিস্টেম ১.২ থেকে ৩.০-এর মধ্যে পড়ে (National Research Council, 2006)। আপনার নিজের সিস্টেমের মান সেটিংস, হিসাব, হাইড্রোলিক্স, চাহিদা গুণক-এ সেট করুন।';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. পিক ঘণ্টা';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='চাহিদা গুণক গড় দিনের ৩.০ গুণ, একটি অস্থায়ী মান। বেশিরভাগ সিস্টেম ৩.০ থেকে ৬.০-এর মধ্যে পড়ে (National Research Council, 2006)। আপনার নিজের সিস্টেমের মান সেটিংস, হিসাব, হাইড্রোলিক্স, চাহিদা গুণক-এ সেট করুন।';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. অগ্নিনির্বাপণসহ সর্বোচ্চ দিন';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='সর্বোচ্চ দিনের চাহিদা (গুণক ২.০)। এই দৃশ্যকল্পে অগ্নিনির্বাপণ প্রবাহ বিশ্লেষণ রান করুন: এটি এই চাহিদার উপরে প্রতিটি সংযোগস্থলে অগ্নিনির্বাপণ প্রবাহ যোগ করে।';
 $ec_lang['lpn_delete_drops_overrides']='এই উপাদানটি মুছে ফেললে আপনার দৃশ্যকল্পগুলোতে এর জন্য থাকা {n}টি মানও ফেলে দেওয়া হবে। চালিয়ে যাবেন?';
 $ec_lang['lpn_push_base_only']='এই কাজটি অঙ্কনটিকেই পরিবর্তন করে, তাই এটি শুধুমাত্র {base}-এ করা যায়। {base}-এ যান এবং আবার চেষ্টা করুন।';
 $ec_lang['lpn_field_active']='এই নেটওয়ার্কের অংশ';
@@ -3690,8 +3711,10 @@ $ec_lang['lpn_ff_title']='অগ্নিনির্বাপণ প্রব�
 $ec_lang['lpn_ff_intro']='প্রতিটি সংযোগস্থলকে পালাক্রমে তার বিদ্যমান চাহিদার উপর একটি অগ্নিনির্বাপণ প্রবাহ টানতে বলা হয়। আপনার প্রকল্পে কিছুই পরিবর্তিত হয় না; পুরো রানটি একটি কপিতে করা হয়।';
 $ec_lang['lpn_ff_scope']='যেসব সংযোগস্থল পরীক্ষা করতে হবে';
 $ec_lang['lpn_ff_scope_tip']='রান করার আগে সেটটি বেছে নিন। একটি বড় সিস্টেমের প্রতিটি সংযোগস্থল পরীক্ষা করতে কয়েক মিনিট লাগতে পারে।';
+$ec_lang['lpn_ff_all']='সব';
+$ec_lang['lpn_ff_selected']='নির্বাচিত';
 $ec_lang['lpn_ff_no_junctions']='এই প্রকল্পে এখনও কোনো সংযোগস্থল নেই, তাই পরীক্ষা করার মতো কিছু নেই।';
-$ec_lang['lpn_ff_no_selection']='কোনো সংযোগস্থল নির্বাচিত নেই। মানচিত্রে একটি বেছে নিন, অথবা প্রতিটি সংযোগস্থল পরীক্ষা করুন।';
+$ec_lang['lpn_ff_no_selection']='কোনো সংযোগস্থল নির্বাচিত নেই। সংযোগস্থল নির্বাচন করুন, অথবা সব বিকল্পটি নির্বাচন করুন।';
 $ec_lang['lpn_ff_skipped']='{n}টি নির্বাচিত উপাদান জাংশন নয়, তাই সেগুলো পরীক্ষা করা হয়নি।';
 $ec_lang['lpn_ff_required']='প্রয়োজনীয় অগ্নিনির্বাপণ প্রবাহ';
 $ec_lang['lpn_ff_required_tip']='আপনার ফায়ার কোড বা ফায়ার কর্তৃপক্ষ একটি হাইড্রেন্টে যে প্রবাহ দাবি করে। প্রতিটি সংযোগস্থল এই সংখ্যার বিপরীতে পরীক্ষা করা হয়, যদি না এর নিজস্ব একটি প্রয়োজনীয় অগ্নিনির্বাপণ প্রবাহ থাকে।';
@@ -3701,7 +3724,7 @@ $ec_lang['lpn_ff_residual']='ধরে রাখতে হবে এমন অ�
 $ec_lang['lpn_ff_residual_tip']='অগ্নিনির্বাপণ প্রবাহ সরবরাহ করার সময়ও সংযোগস্থলটিকে যে চাপ ধরে রাখতে হবে। AWWA M31 ও NFPA 291-এ ২০ psi (১৪০ kPa) ব্যবহার করা হয়।';
 $ec_lang['lpn_ff_design']='ডিজাইন যাচাই (সিস্টেমে প্রভাব)';
 $ec_lang['lpn_ff_design_tip']='সংযোগস্থলটি প্রবাহ সরবরাহ করতে পারে কিনা তার থেকে ভিন্ন একটি প্রশ্ন: সেখানে সেই প্রবাহ টানলে, অন্য কিছু কি তার সর্বনিম্ন চাপের নিচে নেমে যায় বা তার বেগ সীমা ছাড়িয়ে যায়? এটি পরীক্ষা করতে বেছে নিলে কোনো অতিরিক্ত হিসাব লাগে না।';
-$ec_lang['lpn_ff_design_no_selection']='ডিজাইন যাচাই নির্বাচিত সংযোগস্থলে সেট করা আছে, এবং কিছুই নির্বাচিত নেই। মানচিত্রে কয়েকটি নির্বাচন করুন, অথবা সব সেট করুন।';
+$ec_lang['lpn_ff_design_no_selection']='ডিজাইন যাচাইয়ের পরিসর নির্বাচিত-তে সেট করা আছে, কিন্তু কোনো উপাদান নির্বাচিত নেই। উপাদান নির্বাচন করুন, অথবা সব বিকল্পটি নির্বাচন করুন।';
 
 $ec_lang['lpn_ff_minpressure']='অন্যত্র অনুমোদিত সর্বনিম্ন চাপ';
 $ec_lang['lpn_ff_minpressure_tip']='অন্য একটি সংযোগস্থল তার অগ্নিনির্বাপণ প্রবাহ টানার সময় যে সংযোগস্থল এর নিচে নেমে যায় তা একটি ডিজাইন সমস্যা হিসেবে প্রতিবেদন করা হয়।';

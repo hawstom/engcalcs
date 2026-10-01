@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='پہلے سے مقررہ اقدار بحال کریں';
 $ec_lang['calc_defaults_confirm']='کیا حاسبے کو اصل پہلے سے مقرر اقدار میں دوبارہ مقرر کریں؟';
 $ec_lang['points_data_note']='(یا ڈیٹا علاقے سے کاپی/پیسٹ کریں)';
-$ec_lang['points_data_heading']='نقطہ ڈیٹا<br />(کاما یا ٹیب سے علیحدہ)';
+$ec_lang['points_data_heading']='کیلکولیٹر ڈیٹا<br />(فارمیٹ دیکھنے کے لیے کاپی استعمال کریں)';
 $ec_lang['points_data_copy']='کاپی';
 $ec_lang['points_data_paste']='پیسٹ';
 $ec_lang['calc_inputs']='ان پٹ';
@@ -928,6 +928,11 @@ $ec_lang['lpn_examples_loading']='مثالیں لوڈ ہو رہی ہیں…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='کچھ ٹھیک کریں';
 $ec_lang['lpn_help_notes']='اس صفحے سے متعلق نوٹس';
+$ec_lang['lpn_help_hotkeys']='جدول اور شارٹ کٹس';
+$ec_lang['lpn_hotkeys_tables_heading']='جدول';
+$ec_lang['lpn_hotkeys_map_heading']='نقشہ';
+$ec_lang['lpn_hotkeys_map_term']='نقشے کے کیبورڈ شارٹ کٹس';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 یا Esc</td><td>منتخب کریں۔</td></tr><tr><td>2</td><td>جنکشن شامل کریں۔</td></tr><tr><td>3</td><td>ریزروائر شامل کریں۔</td></tr><tr><td>4</td><td>ٹینک شامل کریں۔</td></tr><tr><td>5</td><td>پائپ شامل کریں۔</td></tr><tr><td>6</td><td>پمپ شامل کریں۔</td></tr><tr><td>7</td><td>والو شامل کریں۔</td></tr><tr><td>8</td><td>گاہک شامل کریں۔</td></tr><tr><td>9</td><td>متن شامل کریں۔</td></tr><tr><td>Delete</td><td>انتخاب حذف کریں۔</td></tr><tr><td>Ctrl+Z</td><td>آخری تبدیلی کو واپس کریں۔</td></tr><tr><td>+ یا =</td><td>زوم ان کریں۔</td></tr><tr><td>-</td><td>زوم آؤٹ کریں۔</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1202,7 +1207,7 @@ $ec_lang['lpn_find_menu_tip']='کسی عنصر کو اس کی ID سے تلاش �
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='ٹول بار کے آئیکنز کا مطلب';
+$ec_lang['lpn_help_icons']='ٹول بار';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='نمائش';
 $ec_lang['lpn_pane_right_toggle_tip']='نقشے کے دائیں طرف موجود پینل کو دکھائیں یا چھپائیں۔ اس میں لیبل اور رنگ کے انتخاب ہوتے ہیں۔';
@@ -1311,6 +1316,7 @@ $ec_lang['lpn_pane_not_used']='استعمال نہیں ہوا';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='{q} کے مطابق فلٹر کیا گیا۔ {all} میں سے {n} دکھائے جا رہے ہیں۔';
 $ec_lang['lpn_pane_filter_clear']='سب دکھائیں';
+$ec_lang['lpn_pane_filter_stale']='اب مطابقت نہ رکھنے والی قطاریں: {n}۔';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='اس جدول میں کچھ بھی فلٹر سے مطابقت نہیں رکھتا۔';
@@ -1767,6 +1773,7 @@ $ec_lang['lpn_import_no_room']='اس پراجیکٹ کو شامل کرنے کے 
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='ٹھیک ہے';
+$ec_lang['lpn_file_import_menu']='درآمد کریں…';
 $ec_lang['lpn_file_import_inp']='EPANET فائل درآمد کریں…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='کسی EPANET فائل سے نیٹ ورک پڑھیں، خواہ وہ .inp متنی فائل ہو یا EPANET کی محفوظ کردہ .net فائل، اور اسے اس براؤزر میں ایک نئے پراجیکٹ کے طور پر محفوظ کریں۔';
@@ -2109,7 +2116,7 @@ $ec_lang['lpn_notes_6_term']='جدول کے کالمز کی مدد';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>کالم منتخب کریں</td><td>عنوان پر کلک کریں</td></tr><tr><td>کالم کا انتخاب شامل یا بڑھائیں</td><td>کسی دوسرے عنوان پر Ctrl+کلک یا Shift+کلک کریں</td></tr><tr><td>منتخب کالم(ز) منتقل کریں (ترتیب بدلیں)</td><td>گھسیٹیں یا رائٹ کلک یا ⋮ مینو میں کالمز کا انتظام کریں… استعمال کریں</td></tr><tr><td>مینو ⋮ اور ترتیب کا تیر۔</td><td>عنوان کے اوپری کونے پر ہوور کریں، یا کسی عنوان کو منتخب کریں یا Tab سے اس میں جائیں</td></tr><tr><td>چھپائیں، سب دکھائیں، یا نمائش اور ترتیب کا انتظام کریں</td><td>عنوان پر رائٹ کلک کریں یا عنوان کے اوپری دائیں کونے میں ⋮ مینو</td></tr><tr><td>کالم کے مطابق ترتیب دیں</td><td>عنوان کے اوپری دائیں کونے میں تیر کی علامت</td></tr><tr><td>جدول کے آخر میں نئی قطاروں کے طور پر پیسٹ کریں</td><td>رائٹ کلک، عنوان کے اوپری دائیں کونے میں ⋮ مینو، یا Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='جدول کیبورڈ شارٹ کٹس';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>نیویگیٹ کریں۔</td></tr><tr><td>Tab, Enter</td><td>اندراج مکمل کریں اور ایک سیل آر پار / نیچے جائیں۔</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>پیچھے کی طرف نیویگیٹ کریں۔</td></tr><tr><td>Shift+arrow keys</td><td>انتخاب کو بڑھائیں۔</td></tr><tr><td>Ctrl+C</td><td>انتخاب کاپی کریں۔</td></tr><tr><td>Ctrl+D</td><td>انتخاب کو اس کی سب سے اوپر والی قطار سے نیچے بھریں۔</td></tr><tr><td>Ctrl+Enter</td><td>انتخاب کو فعال سیل کی قدر سے بھریں۔</td></tr><tr><td>Ctrl+A</td><td>پورا جدول منتخب کریں۔</td></tr><tr><td>Ctrl+Shift+V</td><td>جدول کے آخر میں نئی قطاروں کے طور پر پیسٹ کریں۔</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>اگلے یا پچھلے جدول پر جائیں۔</td></tr><tr><td>Delete</td><td>ایک سیل صاف کریں۔</td></tr><tr><td>F2</td><td>ترمیم کے لیے سیل کھولیں۔</td></tr><tr><td>Esc</td><td>ترمیم منسوخ کریں۔</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>نیویگیٹ کریں۔</td></tr><tr><td>Tab, Enter</td><td>اندراج مکمل کریں اور ایک سیل آر پار / نیچے جائیں۔</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>پیچھے کی طرف نیویگیٹ کریں۔</td></tr><tr><td>Shift+arrow keys</td><td>انتخاب کو بڑھائیں۔</td></tr><tr><td>Ctrl+C</td><td>انتخاب کاپی کریں۔</td></tr><tr><td>Ctrl+D</td><td>انتخاب کو اس کی سب سے اوپر والی قطار سے نیچے بھریں۔</td></tr><tr><td>Ctrl+Enter</td><td>انتخاب کو فعال سیل کی قدر سے بھریں۔</td></tr><tr><td>Ctrl+A</td><td>پورا جدول منتخب کریں۔</td></tr><tr><td>Ctrl+Shift+V</td><td>جدول کے آخر میں نئی قطاروں کے طور پر پیسٹ کریں۔</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>اگلے یا پچھلے ٹیب پر جائیں، چاہے وہ جدول ہو یا گراف۔</td></tr><tr><td>Delete</td><td>ایک سیل صاف کریں۔</td></tr><tr><td>F2</td><td>ترمیم کے لیے سیل کھولیں۔</td></tr><tr><td>Esc</td><td>ترمیم منسوخ کریں۔</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2705,6 +2712,20 @@ $ec_lang['lpn_scenario_push_confirm']='ہر منظرنامے کو ان خصوص�
 $ec_lang['lpn_scenario_push_scenarios']='متاثرہ منظرنامے:';
 $ec_lang['lpn_scenario_push_values']='ضائع کی گئی قدریں:';
 $ec_lang['lpn_scenario_push_none']='ان میں سے کسی خصوصیت کی کسی منظرنامے کے پاس اپنی قدر نہیں ہے، اس لیے کچھ بھی تبدیل نہیں ہوگا۔ کچھ بھی ضائع نہیں کیا جائے گا۔';
+$ec_lang['lpn_scenario_preset_flow_static']='1. فلو ٹیسٹ: جامد';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='ڈیزائن نیٹ ورک کے لیے صفر بہاؤ پر فلو ٹیسٹ کی کیلیبریشن۔ اس منظرنامے میں تمام جنکشنز کی طلب 0 مقرر کریں۔';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. فلو ٹیسٹ: درمیانہ';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='ڈیزائن نیٹ ورک کے لیے رپورٹ کیے گئے پہلے بہاؤ پر فلو ٹیسٹ کی کیلیبریشن۔ اس منظرنامے میں بہنے والے جنکشن کی طلب کو ناپے گئے پہلے بہاؤ پر، اور باقی تمام جنکشنز کی طلب کو 0 پر مقرر کریں۔';
+$ec_lang['lpn_scenario_preset_flow_max']='3. فلو ٹیسٹ: زیادہ سے زیادہ';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='ڈیزائن نیٹ ورک کے لیے رپورٹ کیے گئے زیادہ سے زیادہ بہاؤ پر فلو ٹیسٹ کی کیلیبریشن۔ اس منظرنامے میں بہنے والے جنکشن کی طلب کو ناپے گئے زیادہ سے زیادہ بہاؤ پر، اور باقی تمام جنکشنز کی طلب کو 0 پر مقرر کریں۔';
+$ec_lang['lpn_scenario_preset_average_day']='4. اوسط دن';
+$ec_lang['lpn_scenario_preset_average_day_tip']='طلب ضارب 1: ہر طلب جیسی درج کی گئی ہے، جسے اوسط دن کی طلب مانا جاتا ہے۔';
+$ec_lang['lpn_scenario_preset_max_day']='5. زیادہ سے زیادہ دن';
+$ec_lang['lpn_scenario_preset_max_day_tip']='طلب ضارب اوسط دن کا 2.0 گنا، ایک عارضی قدر۔ زیادہ تر نظام 1.2 اور 3.0 کے درمیان آتے ہیں (National Research Council, 2006)۔ اپنے نظام کی قدر ترتیبات، حساب، ہائیڈرالکس، طلب ضارب میں مقرر کریں۔';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. عروجی گھنٹہ';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='طلب ضارب اوسط دن کا 3.0 گنا، ایک عارضی قدر۔ زیادہ تر نظام 3.0 اور 6.0 کے درمیان آتے ہیں (National Research Council, 2006)۔ اپنے نظام کی قدر ترتیبات، حساب، ہائیڈرالکس، طلب ضارب میں مقرر کریں۔';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. فائر اور زیادہ سے زیادہ دن';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='زیادہ سے زیادہ دن کی طلب (ضارب 2.0)۔ اس منظرنامے میں فائر فلو تجزیہ چلائیں: یہ اس طلب کے اوپر ہر جنکشن پر فائر فلو شامل کرتا ہے۔';
 $ec_lang['lpn_delete_drops_overrides']='اس عنصر کو حذف کرنے سے وہ {n} قدریں بھی ضائع ہو جائیں گی جو آپ کے منظرنامے اس کے لیے رکھتے ہیں۔ جاری رکھیں؟';
 $ec_lang['lpn_push_base_only']='یہ عمل خود ڈرائنگ کو تبدیل کرتا ہے، اس لیے یہ صرف {base} میں کیا جا سکتا ہے۔ {base} پر جائیں اور دوبارہ کوشش کریں۔';
 $ec_lang['lpn_field_active']='نیٹ ورک کا حصہ';
@@ -3678,8 +3699,10 @@ $ec_lang['lpn_ff_title']='فائر فلو تجزیہ';
 $ec_lang['lpn_ff_intro']='ہر جنکشن کو باری باری اپنی موجودہ طلب پر فائر فلو کھینچنے کو کہا جاتا ہے۔ آپ کے پراجیکٹ میں کچھ تبدیل نہیں ہوتا؛ پورا رن ایک نقل پر کیا جاتا ہے۔';
 $ec_lang['lpn_ff_scope']='آزمانے کے لیے جنکشنز';
 $ec_lang['lpn_ff_scope_tip']='چلانے سے پہلے مجموعہ چنیں۔ بڑے نظام کے ہر جنکشن کو آزمانے میں منٹ لگ سکتے ہیں۔';
+$ec_lang['lpn_ff_all']='سب';
+$ec_lang['lpn_ff_selected']='منتخب';
 $ec_lang['lpn_ff_no_junctions']='اس پراجیکٹ میں ابھی تک کوئی جنکشن نہیں، اس لیے آزمانے کو کچھ نہیں۔';
-$ec_lang['lpn_ff_no_selection']='کوئی جنکشن منتخب نہیں۔ نقشے پر ایک چنیں، یا ہر جنکشن آزمائیں۔';
+$ec_lang['lpn_ff_no_selection']='کوئی جنکشن منتخب نہیں۔ جنکشن منتخب کریں یا «سب» کا اختیار چنیں۔';
 $ec_lang['lpn_ff_skipped']='{n} منتخب عناصر جنکشن نہیں، اس لیے انہیں آزمایا نہیں گیا۔';
 $ec_lang['lpn_ff_required']='درکار فائر فلو';
 $ec_lang['lpn_ff_required_tip']='وہ بہاؤ جو آپ کا فائر کوڈ یا فائر اتھارٹی ہائیڈرینٹ پر مانگتی ہے۔ ہر جنکشن اسی عدد کے مقابلے میں آزمایا جاتا ہے جب تک کہ اس کے پاس اپنا درکار فائر فلو نہ ہو۔';
@@ -3689,7 +3712,7 @@ $ec_lang['lpn_ff_residual']='برقرار رکھنے کے لیے بقایا دب
 $ec_lang['lpn_ff_residual_tip']='فائر فلو دیتے ہوئے جنکشن کو جو دباؤ برقرار رکھنا چاہیے۔ AWWA M31 اور NFPA 291 میں 20 psi (140 kPa) استعمال ہوتا ہے۔';
 $ec_lang['lpn_ff_design']='ڈیزائن جانچ (نظام پر اثر)';
 $ec_lang['lpn_ff_design_tip']='یہ ایک الگ سوال ہے کہ آیا جنکشن یہ بہاؤ دے سکتا ہے: کیا وہاں یہ بہاؤ کھینچنے پر کچھ اور اپنی کم از کم دباؤ سے نیچے گر جاتا ہے یا اپنی رفتار کی حد سے تجاوز کرتا ہے؟ اسے جانچنے کا انتخاب کوئی اضافی حساب نہیں مانگتا۔';
-$ec_lang['lpn_ff_design_no_selection']='ڈیزائن جانچ منتخب جنکشنز پر مقرر ہے، اور کوئی بھی منتخب نہیں۔ نقشے پر کچھ منتخب کریں، یا سب مقرر کریں۔';
+$ec_lang['lpn_ff_design_no_selection']='ڈیزائن جانچ منتخب پر مقرر ہے، اور کوئی عنصر منتخب نہیں۔ عناصر منتخب کریں یا «سب» کا اختیار چنیں۔';
 $ec_lang['lpn_ff_minpressure']='دوسری جگہ اجازت شدہ کم ترین دباؤ';
 $ec_lang['lpn_ff_minpressure_tip']='جو جنکشن اس سے نیچے گر جائے جب کوئی دوسرا اپنا فائر فلو کھینچ رہا ہو، اسے ڈیزائن مسئلے کے طور پر رپورٹ کیا جاتا ہے۔';
 $ec_lang['lpn_ff_maxvelocity']='اجازت شدہ زیادہ سے زیادہ رفتار';

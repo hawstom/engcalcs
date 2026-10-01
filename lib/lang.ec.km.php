@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='កំណត់ឡើងវិញតម្លៃលំនាំដើម';
 $ec_lang['calc_defaults_confirm']='កំណត់ឡើងវិញម៉ាស៊ីនគណនាទៅតម្លៃលំនាំដើមដែលបានកំណត់ដើម?';
 $ec_lang['points_data_note']='(ឬ ចម្លង/បិទភ្ជាប់ ដោយប្រើផ្ទៃទិន្នន័យ)';
-$ec_lang['points_data_heading']='ទិន្នន័យចំណុច<br />(បំបែកដោយក្បៀស ឬ tab)';
+$ec_lang['points_data_heading']='ទិន្នន័យម៉ាស៊ីនគណនា<br />(ប្រើ ចម្លង ដើម្បីមើលទម្រង់)';
 $ec_lang['points_data_copy']='ចម្លង';
 $ec_lang['points_data_paste']='បិទភ្ជាប់';
 $ec_lang['calc_inputs']='ទិន្នន័យបញ្ចូល';
@@ -930,6 +930,11 @@ $ec_lang['lpn_examples_loading']='កំពុងផ្ទុកគំរូ…'
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='ជួសជុលអ្វីមួយ';
 $ec_lang['lpn_help_notes']='កំណត់ចំណាំអំពីទំព័រនេះ';
+$ec_lang['lpn_help_hotkeys']='តារាង និងគ្រាប់ចុចផ្លូវកាត់';
+$ec_lang['lpn_hotkeys_tables_heading']='តារាង';
+$ec_lang['lpn_hotkeys_map_heading']='ផែនទី';
+$ec_lang['lpn_hotkeys_map_term']='ផ្លូវកាត់ក្តារចុចផែនទី';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 ឬ Esc</td><td>ជ្រើសរើស។</td></tr><tr><td>2</td><td>បន្ថែមថ្នាំង។</td></tr><tr><td>3</td><td>បន្ថែមអាងស្តុក។</td></tr><tr><td>4</td><td>បន្ថែមធុងទឹក។</td></tr><tr><td>5</td><td>បន្ថែមបំពង់។</td></tr><tr><td>6</td><td>បន្ថែមម៉ាស៊ីនបូម។</td></tr><tr><td>7</td><td>បន្ថែមវ៉ាល់។</td></tr><tr><td>8</td><td>បន្ថែមអតិថិជន។</td></tr><tr><td>9</td><td>បន្ថែមអត្ថបទ។</td></tr><tr><td>Delete</td><td>លុបអ្វីដែលបានជ្រើសរើស។</td></tr><tr><td>Ctrl+Z</td><td>ត្រឡប់ការផ្លាស់ប្ដូរចុងក្រោយ។</td></tr><tr><td>+ ឬ =</td><td>ពង្រីក។</td></tr><tr><td>-</td><td>បង្រួម។</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1204,7 +1209,7 @@ $ec_lang['lpn_find_menu_tip']='រកធាតុមួយតាមលេខស�
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='អត្ថន័យរូបតំណាងលើរបារឧបករណ៍';
+$ec_lang['lpn_help_icons']='អត្ថន័យរបារឧបករណ៍';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='ភាពមើលឃើញ';
 $ec_lang['lpn_pane_right_toggle_tip']='បង្ហាញ ឬលាក់ផ្ទាំងនៅខាងស្ដាំផែនទី។ វាមានជម្រើសស្លាក និងពណ៌។';
@@ -1313,6 +1318,7 @@ $ec_lang['lpn_pane_not_used']='មិនបានប្រើ';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='បានត្រងដោយ {q}។ កំពុងបង្ហាញ {n} ក្នុងចំណោម {all}។';
 $ec_lang['lpn_pane_filter_clear']='បង្ហាញទាំងអស់';
+$ec_lang['lpn_pane_filter_stale']='ជួរដេកដែលលែងត្រូវគ្នា៖ {n}។';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='គ្មានអ្វីនៅក្នុងតារាងនេះត្រូវនឹងតម្រងទេ។';
@@ -1773,6 +1779,7 @@ $ec_lang['lpn_import_no_room']='ទំហំផ្ទុករបស់កម្
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='យល់ព្រម';
+$ec_lang['lpn_file_import_menu']='នាំចូល…';
 $ec_lang['lpn_file_import_inp']='នាំចូលឯកសារ EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='អានបណ្ដាញចេញពីឯកសារ EPANET ទាំងឯកសារអត្ថបទ .inp ឬឯកសារ .net ដែល EPANET រក្សាទុក រួចរក្សាទុកវានៅក្នុងកម្មវិធីរុករកនេះជាគម្រោងថ្មី។';
@@ -2115,7 +2122,7 @@ $ec_lang['lpn_notes_6_term']='ជំនួយជួរឈរតារាង';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>ជ្រើសរើសជួរឈរ</td><td>ចុចលើក្បាល</td></tr><tr><td>បន្ថែម ឬពង្រីកជម្រើសជួរឈរ</td><td>Ctrl+ចុច ឬ Shift+ចុចលើក្បាលមួយទៀត</td></tr><tr><td>ផ្លាស់ទី (តម្រៀបលំដាប់ឡើងវិញ) ជួរឈរដែលបានជ្រើសរើស</td><td>អូស ឬប្រើ គ្រប់គ្រងជួរឈរ… នៅក្នុងម៉ឺនុយចុចខាងស្ដាំ ឬ ⋮</td></tr><tr><td>ម៉ឺនុយ ⋮ និងព្រួញតម្រៀប។</td><td>ដាក់ទ្រនិចលើជ្រុងខាងលើនៃក្បាលមួយ ឬជ្រើសរើស ឬចុច Tab ចូលក្បាលមួយ</td></tr><tr><td>លាក់ បង្ហាញទាំងអស់ ឬគ្រប់គ្រងភាពមើលឃើញ និងលំដាប់</td><td>ចុចស្ដាំលើក្បាល ឬម៉ឺនុយ ⋮ នៅជ្រុងខាងលើស្ដាំនៃក្បាល</td></tr><tr><td>តម្រៀបតាមជួរឈរ</td><td>រូបតំណាងព្រួញនៅជ្រុងខាងលើស្ដាំនៃក្បាល</td></tr><tr><td>បិទភ្ជាប់ជាជួរដេកថ្មីនៅចុងតារាង</td><td>ចុចស្ដាំ ម៉ឺនុយ ⋮ នៅជ្រុងខាងលើស្ដាំនៃក្បាល ឬ Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='ផ្លូវកាត់ក្តារចុចតារាង';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>រុករក។</td></tr><tr><td>Tab, Enter</td><td>បញ្ចប់ការវាយបញ្ចូល ហើយរុករកឆ្លង / ចុះក្រឡាមួយ។</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>រុករកថយក្រោយ។</td></tr><tr><td>Shift+arrow keys</td><td>ពង្រីកជម្រើស។</td></tr><tr><td>Ctrl+C</td><td>ចម្លងជម្រើស។</td></tr><tr><td>Ctrl+D</td><td>បំពេញជម្រើសចុះពីជួរដេកខាងលើរបស់វា។</td></tr><tr><td>Ctrl+Enter</td><td>បំពេញជម្រើសដោយតម្លៃក្រឡាសកម្ម។</td></tr><tr><td>Ctrl+A</td><td>ជ្រើសរើសតារាងទាំងមូល។</td></tr><tr><td>Ctrl+Shift+V</td><td>បិទភ្ជាប់ជាជួរដេកថ្មីនៅចុងតារាង។</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>ប្តូរទៅតារាងបន្ទាប់ ឬតារាងមុន។</td></tr><tr><td>Delete</td><td>សម្អាតក្រឡាមួយ។</td></tr><tr><td>F2</td><td>បើកក្រឡាមួយដើម្បីកែសម្រួលវា។</td></tr><tr><td>Esc</td><td>បោះបង់ការកែសម្រួល។</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>រុករក។</td></tr><tr><td>Tab, Enter</td><td>បញ្ចប់ការវាយបញ្ចូល ហើយរុករកឆ្លង / ចុះក្រឡាមួយ។</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>រុករកថយក្រោយ។</td></tr><tr><td>Shift+arrow keys</td><td>ពង្រីកជម្រើស។</td></tr><tr><td>Ctrl+C</td><td>ចម្លងជម្រើស។</td></tr><tr><td>Ctrl+D</td><td>បំពេញជម្រើសចុះពីជួរដេកខាងលើរបស់វា។</td></tr><tr><td>Ctrl+Enter</td><td>បំពេញជម្រើសដោយតម្លៃក្រឡាសកម្ម។</td></tr><tr><td>Ctrl+A</td><td>ជ្រើសរើសតារាងទាំងមូល។</td></tr><tr><td>Ctrl+Shift+V</td><td>បិទភ្ជាប់ជាជួរដេកថ្មីនៅចុងតារាង។</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>ប្តូរទៅផ្ទាំងបន្ទាប់ ឬផ្ទាំងមុន ទោះជាតារាង ឬក្រាហ្វ។</td></tr><tr><td>Delete</td><td>សម្អាតក្រឡាមួយ។</td></tr><tr><td>F2</td><td>បើកក្រឡាមួយដើម្បីកែសម្រួលវា។</td></tr><tr><td>Esc</td><td>បោះបង់ការកែសម្រួល។</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2712,6 +2719,20 @@ $ec_lang['lpn_scenario_push_confirm']='ធ្វើឲ្យសេណារី�
 $ec_lang['lpn_scenario_push_scenarios']='សេណារីយ៉ូដែលរងផលប៉ះពាល់៖';
 $ec_lang['lpn_scenario_push_values']='តម្លៃដែលនឹងត្រូវបោះបង់ចោល៖';
 $ec_lang['lpn_scenario_push_none']='គ្មានសេណារីយ៉ូណាមួយមានតម្លៃផ្ទាល់ខ្លួនសម្រាប់លក្ខណៈសម្បត្តិទាំងនេះទេ ដូច្នេះគ្មានអ្វីនឹងផ្លាស់ប្ដូរឡើយ។ គ្មានអ្វីត្រូវបានបោះបង់ចោលទេ។';
+$ec_lang['lpn_scenario_preset_flow_static']='1. តេស្តលំហូរ៖ ឋិតិ';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='ការក្រិតតាមតេស្តលំហូរសម្រាប់បណ្ដាញរចនាមួយនៅលំហូរ 0។ នៅក្នុងសេណារីយ៉ូនេះ សូមកំណត់តម្រូវការនៅថ្នាំងទាំងអស់ទៅ 0។';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. តេស្តលំហូរ៖ កណ្ដាល';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='ការក្រិតតាមតេស្តលំហូរសម្រាប់បណ្ដាញរចនាមួយនៅលំហូរដំបូងដែលបានរាយការណ៍។ នៅក្នុងសេណារីយ៉ូនេះ សូមកំណត់តម្រូវការនៅថ្នាំងដែលមានលំហូរទៅលំហូរដំបូងដែលបានវាស់ ហើយតម្រូវការនៅថ្នាំងផ្សេងទៀតទាំងអស់ទៅ 0។';
+$ec_lang['lpn_scenario_preset_flow_max']='3. តេស្តលំហូរ៖ អតិបរមា';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='ការក្រិតតាមតេស្តលំហូរសម្រាប់បណ្ដាញរចនាមួយនៅលំហូរអតិបរមាដែលបានរាយការណ៍។ នៅក្នុងសេណារីយ៉ូនេះ សូមកំណត់តម្រូវការនៅថ្នាំងដែលមានលំហូរទៅលំហូរអតិបរមាដែលបានវាស់ ហើយតម្រូវការនៅថ្នាំងផ្សេងទៀតទាំងអស់ទៅ 0។';
+$ec_lang['lpn_scenario_preset_average_day']='4. ថ្ងៃមធ្យម';
+$ec_lang['lpn_scenario_preset_average_day_tip']='កត្តាគុណតម្រូវការ 1៖ តម្រូវការនីមួយៗដូចដែលបានបញ្ចូល ដែលត្រូវបានចាត់ទុកថាជាតម្រូវការថ្ងៃមធ្យម។';
+$ec_lang['lpn_scenario_preset_max_day']='5. ថ្ងៃអតិបរមា';
+$ec_lang['lpn_scenario_preset_max_day_tip']='កត្តាគុណតម្រូវការ 2.0 ដងនៃថ្ងៃមធ្យម ជាតម្លៃកន្លែងទុក។ ប្រព័ន្ធភាគច្រើននៅចន្លោះ 1.2 និង 3.0 (National Research Council, 2006)។ កំណត់ផ្ទាល់ខ្លួនរបស់អ្នកនៅក្នុង ការកំណត់ ការគណនា ធារាសាស្ត្រ កត្តាគុណតម្រូវការ។';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. ម៉ោងកំពូល';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='កត្តាគុណតម្រូវការ 3.0 ដងនៃថ្ងៃមធ្យម ជាតម្លៃកន្លែងទុក។ ប្រព័ន្ធភាគច្រើននៅចន្លោះ 3.0 និង 6.0 (National Research Council, 2006)។ កំណត់ផ្ទាល់ខ្លួនរបស់អ្នកនៅក្នុង ការកំណត់ ការគណនា ធារាសាស្ត្រ កត្តាគុណតម្រូវការ។';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. អគ្គីភ័យបូកថ្ងៃអតិបរមា';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='តម្រូវការថ្ងៃអតិបរមា (កត្តាគុណ 2.0)។ ដំណើរការ ការវិភាគលំហូរពន្លត់អគ្គីភ័យ នៅក្នុងសេណារីយ៉ូនេះ៖ វាបន្ថែមលំហូរពន្លត់អគ្គីភ័យនៅថ្នាំងនីមួយៗលើតម្រូវការនេះ។';
 $ec_lang['lpn_delete_drops_overrides']='ការលុបធាតុនេះក៏បោះបង់ចោលតម្លៃ {n} ដែលសេណារីយ៉ូរបស់អ្នកកាន់សម្រាប់វាដែរ។ បន្តទេ?';
 $ec_lang['lpn_push_base_only']='សកម្មភាពនេះផ្លាស់ប្ដូរគំនូរខ្លួនវា ដូច្នេះវាអាចធ្វើបានតែនៅក្នុង {base} ប៉ុណ្ណោះ។ សូមប្ដូរទៅ {base} ហើយសាកល្បងម្ដងទៀត។';
 $ec_lang['lpn_field_active']='ជាផ្នែកនៃបណ្ដាញនេះ';
@@ -3685,8 +3706,10 @@ $ec_lang['lpn_ff_title']='ការវិភាគលំហូរពន្លត
 $ec_lang['lpn_ff_intro']='ថ្នាំងនីមួយៗម្ដងមួយៗ ត្រូវបានស្នើសុំឲ្យទាញលំហូរពន្លត់អគ្គីភ័យបន្ថែមលើតម្រូវការដែលវាមានរួចហើយ។ គ្មានអ្វីនៅក្នុងគម្រោងរបស់អ្នកត្រូវបានផ្លាស់ប្ដូរទេ; ការដំណើរការទាំងមូលធ្វើឡើងលើច្បាប់ចម្លងមួយ។';
 $ec_lang['lpn_ff_scope']='ថ្នាំងត្រូវធ្វើតេស្ត';
 $ec_lang['lpn_ff_scope_tip']='ជ្រើសរើសសំណុំមុននឹងអ្នកដំណើរការ។ ការធ្វើតេស្តថ្នាំងគ្រប់ក្នុងប្រព័ន្ធធំមួយ អាចចំណាយពេលច្រើននាទី។';
+$ec_lang['lpn_ff_all']='ទាំងអស់';
+$ec_lang['lpn_ff_selected']='ដែលបានជ្រើសរើស';
 $ec_lang['lpn_ff_no_junctions']='គម្រោងនេះមិនទាន់មានថ្នាំងនៅឡើយទេ ដូច្នេះគ្មានអ្វីត្រូវធ្វើតេស្តទេ។';
-$ec_lang['lpn_ff_no_selection']='គ្មានថ្នាំងណាមួយត្រូវបានជ្រើសរើសទេ។ សូមជ្រើសរើសមួយនៅលើផែនទី ឬធ្វើតេស្តថ្នាំងគ្រប់។';
+$ec_lang['lpn_ff_no_selection']='គ្មានថ្នាំងណាមួយត្រូវបានជ្រើសរើសទេ។ សូមជ្រើសរើសថ្នាំង ឬជ្រើសរើសជម្រើស ទាំងអស់។';
 $ec_lang['lpn_ff_skipped']='ធាតុ {n} ដែលបានជ្រើសរើសមិនមែនជាថ្នាំងទេ ដូច្នេះពួកវាមិនត្រូវបានសាកល្បងទេ។';
 $ec_lang['lpn_ff_required']='លំហូរពន្លត់អគ្គីភ័យដែលត្រូវការ';
 $ec_lang['lpn_ff_required_tip']='លំហូរដែលក្រម ឬអាជ្ញាធរពន្លត់អគ្គីភ័យរបស់អ្នកតម្រូវនៅចំណុចទឹកអគ្គីភ័យ។ ថ្នាំងនីមួយៗត្រូវបានធ្វើតេស្តធៀបនឹងលេខនេះ លុះត្រាតែវាមានលំហូរពន្លត់អគ្គីភ័យដែលត្រូវការផ្ទាល់ខ្លួនរបស់វា។';
@@ -3696,7 +3719,7 @@ $ec_lang['lpn_ff_residual']='សម្ពាធសល់ត្រូវរក្
 $ec_lang['lpn_ff_residual_tip']='សម្ពាធដែលថ្នាំងត្រូវតែនៅតែរក្សា ខណៈកំពុងផ្ដល់លំហូរពន្លត់អគ្គីភ័យ។ AWWA M31 និង NFPA 291 ប្រើ 20 psi (140 kPa)។';
 $ec_lang['lpn_ff_design']='ត្រួតពិនិត្យការរចនា (ផលប៉ះពាល់លើប្រព័ន្ធ)';
 $ec_lang['lpn_ff_design_tip']='ជាសំណួរដាច់ដោយឡែកពីថាតើថ្នាំងអាចផ្ដល់លំហូរបានឬអត់៖ ជាមួយលំហូរនោះត្រូវបានទាញនៅទីនោះ តើមានធាតុផ្សេងទៀតធ្លាក់ក្រោមសម្ពាធអប្បបរមារបស់វា ឬលើសដែនកំណត់ល្បឿនរបស់វាដែរឬទេ? ការជ្រើសរើសត្រួតពិនិត្យវាមិនចំណាយការគណនាបន្ថែមទេ។';
-$ec_lang['lpn_ff_design_no_selection']='ការត្រួតពិនិត្យការរចនាត្រូវបានកំណត់ទៅថ្នាំងដែលបានជ្រើសរើស ប៉ុន្តែគ្មានថ្នាំងណាមួយត្រូវបានជ្រើសរើសទេ។ សូមជ្រើសរើសខ្លះនៅលើផែនទី ឬកំណត់ជា ទាំងអស់។';
+$ec_lang['lpn_ff_design_no_selection']='វិសាលភាពនៃការត្រួតពិនិត្យការរចនាត្រូវបានកំណត់ទៅ ដែលបានជ្រើសរើស ប៉ុន្តែគ្មានធាតុណាមួយត្រូវបានជ្រើសរើសទេ។ សូមជ្រើសរើសធាតុ ឬជ្រើសរើសជម្រើស ទាំងអស់។';
 $ec_lang['lpn_ff_minpressure']='សម្ពាធទាបបំផុតដែលអនុញ្ញាតនៅកន្លែងផ្សេង';
 $ec_lang['lpn_ff_minpressure_tip']='ថ្នាំងមួយដែលធ្លាក់ក្រោមកម្រិតនេះ ខណៈមួយទៀតកំពុងទាញលំហូរពន្លត់អគ្គីភ័យរបស់វា ត្រូវបានរាយការណ៍ជាបញ្ហារចនា។';
 $ec_lang['lpn_ff_maxvelocity']='ល្បឿនខ្ពស់បំផុតដែលអនុញ្ញាត';

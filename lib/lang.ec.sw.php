@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Rejesha chaguo-msingi';
 $ec_lang['calc_defaults_confirm']='Weka upya kikokotoo hadi thamani za awali za chaguo-msingi?';
 $ec_lang['points_data_note']='(au Nakili/Bandika ukitumia eneo la data)';
-$ec_lang['points_data_heading']='Data za vituo<br />(kwa mkato au kichupo)';
+$ec_lang['points_data_heading']='Data za kikokotoo<br />(tumia Nakili kuona umbizo)';
 $ec_lang['points_data_copy']='Nakili';
 $ec_lang['points_data_paste']='Bandika';
 $ec_lang['calc_inputs']='Maingizo';
@@ -928,6 +928,11 @@ $ec_lang['lpn_examples_loading']='Inapakia mifano…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='Rekebisha kitu';
 $ec_lang['lpn_help_notes']='Maelezo kuhusu ukurasa huu';
+$ec_lang['lpn_help_hotkeys']='Jedwali na Vitufe vya Mkato';
+$ec_lang['lpn_hotkeys_tables_heading']='Jedwali';
+$ec_lang['lpn_hotkeys_map_heading']='Ramani';
+$ec_lang['lpn_hotkeys_map_term']='Vitufe vya mkato vya ramani';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 au Esc</td><td>Chagua.</td></tr><tr><td>2</td><td>Ongeza muunganiko.</td></tr><tr><td>3</td><td>Ongeza hifadhi ya maji.</td></tr><tr><td>4</td><td>Ongeza tanki.</td></tr><tr><td>5</td><td>Ongeza bomba.</td></tr><tr><td>6</td><td>Ongeza pampu.</td></tr><tr><td>7</td><td>Ongeza vali.</td></tr><tr><td>8</td><td>Ongeza mteja.</td></tr><tr><td>9</td><td>Ongeza maandishi.</td></tr><tr><td>Delete</td><td>Futa uteuzi.</td></tr><tr><td>Ctrl+Z</td><td>Tengua badiliko la mwisho.</td></tr><tr><td>+ au =</td><td>Kuza karibu.</td></tr><tr><td>-</td><td>Punguza.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1202,7 +1207,7 @@ $ec_lang['lpn_find_menu_tip']='Tafuta kipengele kwa kitambulisho chake, au tafut
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='Maana ya alama za upau wa zana';
+$ec_lang['lpn_help_icons']='Alama za upau wa zana';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Uonekanaji';
 $ec_lang['lpn_pane_right_toggle_tip']='Onyesha au ficha kidirisha kilicho kulia kwa ramani. Kina chaguo za lebo na rangi.';
@@ -1311,6 +1316,7 @@ $ec_lang['lpn_pane_not_used']='Haitumiki';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='Imechujwa kwa {q}. Inaonyesha {n} kati ya {all}.';
 $ec_lang['lpn_pane_filter_clear']='Onyesha vyote';
+$ec_lang['lpn_pane_filter_stale']='Safu mlalo ambazo hazilingani tena: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Hakuna kitu kwenye jedwali hili kinacholingana na kichujio.';
@@ -1768,6 +1774,7 @@ $ec_lang['lpn_import_no_room']='Hifadhi ya kivinjari haitoshi kuongeza mradi huu
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='Sawa';
+$ec_lang['lpn_file_import_menu']='Leta…';
 $ec_lang['lpn_file_import_inp']='Leta Faili la EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='Soma mtandao kutoka faili la EPANET, iwe faili la maandishi la .inp au faili la .net linalohifadhiwa na EPANET, na ulihifadhi katika kivinjari hiki kama mradi mpya.';
@@ -2110,7 +2117,7 @@ $ec_lang['lpn_notes_6_term']='Msaada wa safu za jedwali';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Chagua safu</td><td>Bofya kichwa</td></tr><tr><td>Ongeza au panua uteuzi wa safu</td><td>Ctrl+click au Shift+click kichwa kingine</td></tr><tr><td>Hamisha (panga upya) safu zilizoteuliwa</td><td>Buruta au tumia Simamia safu… kwenye menyu ya kubofya kulia au ⋮</td></tr><tr><td>Menyu ⋮ na mshale wa kupanga.</td><td>Elea juu ya kona ya juu ya kichwa, au chagua au Tab hadi kwenye kichwa</td></tr><tr><td>Ficha, Onyesha zote, au Simamia mwonekano na mpangilio</td><td>Bofya kulia kichwa au menyu ⋮ kwenye kona ya juu kulia ya kichwa</td></tr><tr><td>Panga kwa safu</td><td>Ikoni ya mshale kwenye kona ya juu kulia ya kichwa</td></tr><tr><td>Bandika kama safu mlalo mpya mwishoni mwa jedwali</td><td>Bofya kulia, menyu ⋮ kwenye kona ya juu kulia ya kichwa, au Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Njia za mkato za kibodi za jedwali';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Vitufe vya mshale</td><td>Songa.</td></tr><tr><td>Tab, Enter</td><td>Maliza uandishi kisha songa seli moja kando / chini.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Songa nyuma.</td></tr><tr><td>Shift+vitufe vya mshale</td><td>Panua uteuzi.</td></tr><tr><td>Ctrl+C</td><td>Nakili uteuzi.</td></tr><tr><td>Ctrl+D</td><td>Jaza uteuzi chini kutoka safu mlalo yake ya juu.</td></tr><tr><td>Ctrl+Enter</td><td>Jaza uteuzi kwa thamani ya seli inayotumika.</td></tr><tr><td>Ctrl+A</td><td>Chagua jedwali zima.</td></tr><tr><td>Ctrl+Shift+V</td><td>Bandika kama safu mlalo mpya mwishoni mwa jedwali.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Badilisha kwenda jedwali linalofuata au lililotangulia.</td></tr><tr><td>Delete</td><td>Futa seli.</td></tr><tr><td>F2</td><td>Fungua seli kuihariri.</td></tr><tr><td>Esc</td><td>Ghairi uhariri.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Vitufe vya mshale</td><td>Songa.</td></tr><tr><td>Tab, Enter</td><td>Maliza uandishi kisha songa seli moja kando / chini.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Songa nyuma.</td></tr><tr><td>Shift+vitufe vya mshale</td><td>Panua uteuzi.</td></tr><tr><td>Ctrl+C</td><td>Nakili uteuzi.</td></tr><tr><td>Ctrl+D</td><td>Jaza uteuzi chini kutoka safu mlalo yake ya juu.</td></tr><tr><td>Ctrl+Enter</td><td>Jaza uteuzi kwa thamani ya seli inayotumika.</td></tr><tr><td>Ctrl+A</td><td>Chagua jedwali zima.</td></tr><tr><td>Ctrl+Shift+V</td><td>Bandika kama safu mlalo mpya mwishoni mwa jedwali.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Badilisha kwenda kichupo kinachofuata au kilichotangulia, iwe jedwali au grafu.</td></tr><tr><td>Delete</td><td>Futa seli.</td></tr><tr><td>F2</td><td>Fungua seli kuihariri.</td></tr><tr><td>Esc</td><td>Ghairi uhariri.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2706,6 +2713,20 @@ $ec_lang['lpn_scenario_push_confirm']='Fanya kila senario itumie thamani za Msin
 $ec_lang['lpn_scenario_push_scenarios']='Senario zinazoathirika:';
 $ec_lang['lpn_scenario_push_values']='Thamani zinazotupwa:';
 $ec_lang['lpn_scenario_push_none']='Hakuna senario yenye thamani yake mwenyewe kwa sifa yoyote kati ya hizi, hivyo hakuna kitakachobadilika. Hakuna kinachotupwa.';
+$ec_lang['lpn_scenario_preset_flow_static']='1. Jaribio la mtiririko: Tuli';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='Urekebishaji wa jaribio la mtiririko kwa mtandao wa kubuni kwenye mtiririko 0. Katika senario hii, weka mahitaji kwenye miunganiko yote kuwa 0.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. Jaribio la mtiririko: Wastani';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='Urekebishaji wa jaribio la mtiririko kwa mtandao wa kubuni kwenye mtiririko wa kwanza ulioripotiwa. Katika senario hii, weka mahitaji kwenye muunganiko unaotiririka kuwa mtiririko wa kwanza uliopimwa, na mahitaji kwenye miunganiko mingine yote kuwa 0.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. Jaribio la mtiririko: Upeo';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='Urekebishaji wa jaribio la mtiririko kwa mtandao wa kubuni kwenye mtiririko wa juu kabisa ulioripotiwa. Katika senario hii, weka mahitaji kwenye muunganiko unaotiririka kuwa mtiririko wa juu kabisa uliopimwa, na mahitaji kwenye miunganiko mingine yote kuwa 0.';
+$ec_lang['lpn_scenario_preset_average_day']='4. Siku ya wastani';
+$ec_lang['lpn_scenario_preset_average_day_tip']='Kizidishi cha mahitaji 1: kila hitaji kama lilivyoingizwa, ambalo huchukuliwa kuwa mahitaji ya siku ya wastani.';
+$ec_lang['lpn_scenario_preset_max_day']='5. Siku ya upeo';
+$ec_lang['lpn_scenario_preset_max_day_tip']='Kizidishi cha mahitaji 2.0 mara siku ya wastani, thamani ya kishikilia nafasi. Mifumo mingi iko kati ya 1.2 na 3.0 (National Research Council, 2006). Weka ya mfumo wako mwenyewe kwenye Mipangilio, Ukokotoaji, Haidroliki, Kizidishi cha mahitaji.';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. Saa ya kilele';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='Kizidishi cha mahitaji 3.0 mara siku ya wastani, thamani ya kishikilia nafasi. Mifumo mingi iko kati ya 3.0 na 6.0 (National Research Council, 2006). Weka ya mfumo wako mwenyewe kwenye Mipangilio, Ukokotoaji, Haidroliki, Kizidishi cha mahitaji.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. Moto pamoja na siku ya upeo';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='Mahitaji ya siku ya upeo (kizidishi 2.0). Endesha Uchambuzi wa mtiririko wa moto kwenye senario hii: huongeza mtiririko wa moto kwenye kila muunganiko juu ya mahitaji haya.';
 $ec_lang['lpn_delete_drops_overrides']='Kufuta kipengele hiki pia kunatupa thamani {n} ambazo senario zako zinazishikilia kwa ajili yake. Endelea?';
 $ec_lang['lpn_push_base_only']='Kitendo hiki kinabadilisha mchoro wenyewe, hivyo kinaweza kufanywa tu katika {base}. Badilisha kwenda {base} na ujaribu tena.';
 $ec_lang['lpn_field_active']='Sehemu ya mtandao huu';
@@ -3679,8 +3700,10 @@ $ec_lang['lpn_ff_title']='Uchambuzi wa mtiririko wa moto';
 $ec_lang['lpn_ff_intro']='Kila muunganiko kwa zamu huulizwa kuchota mtiririko wa moto juu ya mahitaji aliyokwisha nayo. Hakuna kinachobadilika kwenye mradi wako; utendeshaji wote unafanywa kwenye nakala.';
 $ec_lang['lpn_ff_scope']='Miunganiko ya kujaribu';
 $ec_lang['lpn_ff_scope_tip']='Chagua kundi kabla ya kuendesha. Kujaribu kila muunganiko kwenye mfumo mkubwa kunaweza kuchukua dakika.';
+$ec_lang['lpn_ff_all']='Yote';
+$ec_lang['lpn_ff_selected']='Iliyochaguliwa';
 $ec_lang['lpn_ff_no_junctions']='Mradi huu bado hauna miunganiko, hivyo hakuna cha kujaribu.';
-$ec_lang['lpn_ff_no_selection']='Hakuna muunganiko uliochaguliwa. Chagua mmoja kwenye ramani, au jaribu kila muunganiko.';
+$ec_lang['lpn_ff_no_selection']='Hakuna miunganiko iliyochaguliwa. Chagua miunganiko au chagua chaguo la Yote.';
 $ec_lang['lpn_ff_skipped']='Vipengele {n} vilivyoteuliwa si miunganiko, hivyo havikujaribiwa.';
 $ec_lang['lpn_ff_required']='Mtiririko wa moto unaohitajika';
 $ec_lang['lpn_ff_required_tip']='Mtiririko unaohitajika na kanuni yako ya moto au mamlaka yako ya zimamoto kwenye hydranti. Kila muunganiko hujaribiwa dhidi ya namba hii isipokuwa una mtiririko wa moto unaohitajika wake mwenyewe.';
@@ -3690,7 +3713,7 @@ $ec_lang['lpn_ff_residual']='Shinikizo linalobaki la kushikilia';
 $ec_lang['lpn_ff_residual_tip']='Shinikizo ambalo muunganiko lazima liendelee kushikilia wakati unatoa mtiririko wa moto. AWWA M31 na NFPA 291 hutumia psi 20 (kPa 140).';
 $ec_lang['lpn_ff_design']='Ukaguzi wa kubuni (athari kwenye mfumo)';
 $ec_lang['lpn_ff_design_tip']='Swali tofauti na kama muunganiko unaweza kutoa mtiririko: mtiririko huo ukichotwa hapo, je, kuna kitu kingine kinachoshuka chini ya shinikizo lake la chini kabisa au kuzidi kikomo chake cha kasi? Kuchagua kukagua hakugharimu ukokotoaji wa ziada.';
-$ec_lang['lpn_ff_design_no_selection']='Ukaguzi wa kubuni umewekwa kwenye miunganiko iliyochaguliwa, na hakuna kilichochaguliwa. Chagua baadhi kwenye ramani, au weka Miunganiko mingine yote na mabomba yote.';
+$ec_lang['lpn_ff_design_no_selection']='Upeo wa ukaguzi wa kubuni umewekwa kuwa Iliyochaguliwa, lakini hakuna vipengele vilivyochaguliwa. Chagua vipengele au chagua chaguo la Yote.';
 $ec_lang['lpn_ff_minpressure']='Shinikizo la chini kabisa linaloruhusiwa mahali pengine';
 $ec_lang['lpn_ff_minpressure_tip']='Muunganiko unaoshuka chini ya hili wakati mwingine unachota mtiririko wake wa moto huripotiwa kama tatizo la kubuni.';
 $ec_lang['lpn_ff_maxvelocity']='Kasi ya juu kabisa inayoruhusiwa';

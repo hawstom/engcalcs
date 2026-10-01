@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Възстанови по подразбиране';
 $ec_lang['calc_defaults_confirm']='Нулирай ли калкулатора до първоначалните стойности?';
 $ec_lang['points_data_note']='(или Копиране/Поставяне чрез областта с данни)';
-$ec_lang['points_data_heading']='Данни за точки<br />(разделени със запетая или табулация)';
+$ec_lang['points_data_heading']='Данни на калкулатора<br />(използвайте Копирай, за да видите формата)';
 $ec_lang['points_data_copy']='Копирай';
 $ec_lang['points_data_paste']='Постави';
 $ec_lang['calc_inputs']='Входни данни';
@@ -930,6 +930,11 @@ $ec_lang['lpn_examples_loading']='Зареждане на примери…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='Поправи нещо';
 $ec_lang['lpn_help_notes']='Бележки за тази страница';
+$ec_lang['lpn_help_hotkeys']='Таблици и клавишни комбинации';
+$ec_lang['lpn_hotkeys_tables_heading']='Таблици';
+$ec_lang['lpn_hotkeys_map_heading']='Карта';
+$ec_lang['lpn_hotkeys_map_term']='Клавишни комбинации за картата';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 или Esc</td><td>Избор.</td></tr><tr><td>2</td><td>Добавя възел.</td></tr><tr><td>3</td><td>Добавя резервоар.</td></tr><tr><td>4</td><td>Добавя цистерна.</td></tr><tr><td>5</td><td>Добавя тръба.</td></tr><tr><td>6</td><td>Добавя помпа.</td></tr><tr><td>7</td><td>Добавя вентил.</td></tr><tr><td>8</td><td>Добавя абонат.</td></tr><tr><td>9</td><td>Добавя текст.</td></tr><tr><td>Delete</td><td>Изтрива избраното.</td></tr><tr><td>Ctrl+Z</td><td>Отменя последната промяна.</td></tr><tr><td>+ или =</td><td>Увеличава мащаба.</td></tr><tr><td>-</td><td>Намалява мащаба.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1204,7 +1209,7 @@ $ec_lang['lpn_find_menu_tip']='Намерете елемент по негово
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='Легенда на лентата с инструменти';
+$ec_lang['lpn_help_icons']='Легенда на лентата';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Видимост';
 $ec_lang['lpn_pane_right_toggle_tip']='Показва или скрива панела вдясно от картата. В него са изборите за етикети и цветове.';
@@ -1313,6 +1318,7 @@ $ec_lang['lpn_pane_not_used']='Не се използва';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='Филтрирано по {q}. Показани {n} от {all}.';
 $ec_lang['lpn_pane_filter_clear']='Показване на всички';
+$ec_lang['lpn_pane_filter_stale']='Редове, които вече не съответстват: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Нищо в тази таблица не отговаря на филтъра.';
@@ -1769,6 +1775,7 @@ $ec_lang['lpn_import_no_room']='Няма достатъчно свободно �
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='ОК';
+$ec_lang['lpn_file_import_menu']='Импортиране…';
 $ec_lang['lpn_file_import_inp']='Импортиране на файл на EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='Създайте нов проект от EPANET файл — или формата за износ .inp (предпочитан), или собствения формат .net (краен вариант).';
@@ -2111,7 +2118,7 @@ $ec_lang['lpn_notes_6_term']='Помощ за колоните на таблиц
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Избор на колона</td><td>Щракнете върху заглавието</td></tr><tr><td>Добавяне или разширяване на избора на колони</td><td>Ctrl+щракване или Shift+щракване върху друго заглавие</td></tr><tr><td>Преместване (пренареждане) на избраната(ите) колона(и)</td><td>Плъзнете или използвайте Управление на колони… в менюто при десен клик или ⋮</td></tr><tr><td>Меню ⋮ и стрелка за сортиране.</td><td>Задръжте показалеца върху горния ъгъл на заглавие, или го изберете, или преминете с Tab в него</td></tr><tr><td>Скриване, Покажи всички, или управление на видимостта и реда</td><td>Десен клик върху заглавие или менюто ⋮ в горния десен ъгъл на заглавието</td></tr><tr><td>Сортиране по колона</td><td>Иконата стрелка в горния десен ъгъл на заглавието</td></tr><tr><td>Постави като нови редове в края на таблицата</td><td>Десен клик, менюто ⋮ в горния десен ъгъл на заглавието, или Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Клавишни комбинации за таблицата';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Стрелки</td><td>Придвижване.</td></tr><tr><td>Tab, Enter</td><td>Завършва въвеждането и премества с една клетка встрани / надолу.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Придвижване назад.</td></tr><tr><td>Shift+стрелки</td><td>Разширява селекцията.</td></tr><tr><td>Ctrl+C</td><td>Копира селекцията.</td></tr><tr><td>Ctrl+D</td><td>Запълва селекцията надолу от горния ѝ ред.</td></tr><tr><td>Ctrl+Enter</td><td>Запълва селекцията със стойността на активната клетка.</td></tr><tr><td>Ctrl+A</td><td>Избира цялата таблица.</td></tr><tr><td>Ctrl+Shift+V</td><td>Постави като нови редове в края на таблицата.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Превключва към следващата или предишната таблица.</td></tr><tr><td>Delete</td><td>Изчиства клетка.</td></tr><tr><td>F2</td><td>Отваря клетка за редактиране.</td></tr><tr><td>Esc</td><td>Отменя редактиране.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Стрелки</td><td>Придвижване.</td></tr><tr><td>Tab, Enter</td><td>Завършва въвеждането и премества с една клетка встрани / надолу.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Придвижване назад.</td></tr><tr><td>Shift+стрелки</td><td>Разширява селекцията.</td></tr><tr><td>Ctrl+C</td><td>Копира селекцията.</td></tr><tr><td>Ctrl+D</td><td>Запълва селекцията надолу от горния ѝ ред.</td></tr><tr><td>Ctrl+Enter</td><td>Запълва селекцията със стойността на активната клетка.</td></tr><tr><td>Ctrl+A</td><td>Избира цялата таблица.</td></tr><tr><td>Ctrl+Shift+V</td><td>Постави като нови редове в края на таблицата.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Превключва към следващия или предишния раздел, независимо дали е таблица или графика.</td></tr><tr><td>Delete</td><td>Изчиства клетка.</td></tr><tr><td>F2</td><td>Отваря клетка за редактиране.</td></tr><tr><td>Esc</td><td>Отменя редактиране.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2707,6 +2714,20 @@ $ec_lang['lpn_scenario_push_confirm']='Да се направи ли всеки 
 $ec_lang['lpn_scenario_push_scenarios']='Засегнати сценарии:';
 $ec_lang['lpn_scenario_push_values']='Изхвърлени стойности:';
 $ec_lang['lpn_scenario_push_none']='Никой сценарий няма собствена стойност за нито едно от тези свойства, така че нищо няма да се промени. Нищо не се изхвърля.';
+$ec_lang['lpn_scenario_preset_flow_static']='1. Изпитване на водното количество: статично';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='Калибриране по изпитване на водното количество за проектна мрежа при нулево водно количество. В този сценарий задайте потреблението във всички възли на 0.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. Изпитване на водното количество: средно';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='Калибриране по изпитване на водното количество за проектна мрежа при първото отчетено водно количество. В този сценарий задайте потреблението във възела, от който тече вода, на първото измерено водно количество, а във всички останали възли на 0.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. Изпитване на водното количество: максимално';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='Калибриране по изпитване на водното количество за проектна мрежа при максималното отчетено водно количество. В този сценарий задайте потреблението във възела, от който тече вода, на максималното измерено водно количество, а във всички останали възли на 0.';
+$ec_lang['lpn_scenario_preset_average_day']='4. Средно денонощие';
+$ec_lang['lpn_scenario_preset_average_day_tip']='Множител на потреблението 1: всяко потребление такова, каквото е въведено, което се приема за потребление в средно денонощие.';
+$ec_lang['lpn_scenario_preset_max_day']='5. Максимално денонощие';
+$ec_lang['lpn_scenario_preset_max_day_tip']='Множител на потреблението 2,0 пъти средното денонощно потребление, примерна стойност. Повечето системи попадат между 1,2 и 3,0 (National Research Council, 2006). Задайте стойността за вашата система в Настройки, Изчисление, Хидравлика, Множител на потреблението.';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. Пиков час';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='Множител на потреблението 3,0 пъти средното денонощно потребление, примерна стойност. Повечето системи попадат между 3,0 и 6,0 (National Research Council, 2006). Задайте стойността за вашата система в Настройки, Изчисление, Хидравлика, Множител на потреблението.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. Пожар плюс максимално денонощие';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='Потребление в максимално денонощие (множител 2,0). Пуснете анализа на противопожарното водно количество в този сценарий: той добавя противопожарното водно количество във всеки възел върху това потребление.';
 $ec_lang['lpn_delete_drops_overrides']='Изтриването на този елемент изхвърля и {n} стойности, които сценариите ви пазят за него. Продължавате ли?';
 $ec_lang['lpn_push_base_only']='Това действие променя самия чертеж, затова може да се извърши само в {base}. Превключете към {base} и опитайте отново.';
 $ec_lang['lpn_field_active']='Част от мрежата';
@@ -3680,8 +3701,10 @@ $ec_lang['lpn_ff_title']='Анализ на противопожарно вод�
 $ec_lang['lpn_ff_intro']='От всеки възел поред се иска да изтегли противопожарно водно количество върху потребността, която вече има. Нищо в проекта ви не се променя; цялото изчисление се прави върху копие.';
 $ec_lang['lpn_ff_scope']='Възли за изпитване';
 $ec_lang['lpn_ff_scope_tip']='Изберете набора, преди да пуснете изчислението. Изпитването на всеки възел в голяма система може да отнеме минути.';
+$ec_lang['lpn_ff_all']='Всички';
+$ec_lang['lpn_ff_selected']='Избрани';
 $ec_lang['lpn_ff_no_junctions']='Този проект все още няма възли, затова няма какво да се изпитва.';
-$ec_lang['lpn_ff_no_selection']='Не е избран възел. Изберете такъв на картата или изпитайте всеки възел.';
+$ec_lang['lpn_ff_no_selection']='Не е избран възел. Изберете възли или изберете опцията Всички.';
 $ec_lang['lpn_ff_skipped']='{n} избрани елемента не са възли, затова не бяха изпитани.';
 $ec_lang['lpn_ff_required']='Изисквано противопожарно водно количество';
 $ec_lang['lpn_ff_required_tip']='Водното количество, което вашият противопожарен нормативен акт или противопожарен орган изисква на хидрант. Всеки възел се изпитва спрямо това число, освен ако не носи свое собствено изисквано противопожарно водно количество.';
@@ -3691,7 +3714,7 @@ $ec_lang['lpn_ff_residual']='Остатъчно налягане за поддъ
 $ec_lang['lpn_ff_residual_tip']='Налягането, което възелът трябва все още да поддържа, докато доставя противопожарното водно количество. AWWA M31 и NFPA 291 използват 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Проектна проверка (ефект върху системата)';
 $ec_lang['lpn_ff_design_tip']='Отделен въпрос от това дали възелът може да достави водното количество: докато то се тегли там, пада ли нещо друго под минималното си налягане или превишава ли ограничението си за скорост? Включването на тази проверка не струва допълнително изчисление.';
-$ec_lang['lpn_ff_design_no_selection']='Проектната проверка е зададена за избраните възли, но нито един не е избран. Изберете няколко на картата или задайте Всички.';
+$ec_lang['lpn_ff_design_no_selection']='Обхватът на проектната проверка е зададен на Избрани, но не са избрани елементи. Изберете елементи или изберете опцията Всички.';
 $ec_lang['lpn_ff_minpressure']='Най-ниско допустимо налягане другаде';
 $ec_lang['lpn_ff_minpressure_tip']='Възел, който пада под тази стойност, докато друг тегли своето противопожарно водно количество, се отчита като проектен проблем.';
 $ec_lang['lpn_ff_maxvelocity']='Най-висока допустима скорост';

@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**113 open tasks.** Next (100): 16 · Soon (75): 19 · Someday (50): 44 · Maybe (25): 15 · Parked (5): 19
+**115 open tasks.** Next (100): 16 · Soon (75): 21 · Someday (50): 44 · Maybe (25): 15 · Parked (5): 19
 
 ## 100 — Next (16)
 
@@ -28,7 +28,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 750 — Ready-made scenarios in every new project.
 - Task 751 — Criticality analysis: break each asset in turn and report.
 
-## 75 — Soon (19)
+## 75 — Soon (21)
 
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
@@ -49,6 +49,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 752 — A scenario workbook: the scenario list and its data as spreadsheet tabs.
 - Task 753 — [H] · · "Activation" as our word for EPANET's active status.
 - Task 754 — On-the-fly demand adjustment: an analysis that scales demands on a copy.
+- Task 755 — Per-scenario calculation options: run type and duration first.
+- Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 
 ## 50 — Someday (44)
 
@@ -141,5 +143,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-104 of 113 titles are within 4–12 words. `!` marks the rest;
+106 of 115 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

@@ -1,6 +1,10 @@
 {
     "_note": "See dev/scripts/new_english_keys.php. A ruling is remembered against the EXACT English it was made on; change the string and the ruling lapses.",
     "rulings": {
+        "bpn_demand_mult": {
+            "on": "Demand multiplier",
+            "ruled": "2026-08-29"
+        },
         "bpn_dup_id_short": {
             "on": "Duplicate ID",
             "ruled": "2026-09-06",
@@ -11,6 +15,10 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
+        "bpn_p_min": {
+            "on": "Lowest pressure",
+            "ruled": "2026-09-04"
+        },
         "lpn_about_credits": {
             "on": "Credits",
             "ruled": "2026-09-14",
@@ -20,6 +28,61 @@
             "on": "Licensed under the GNU General Public License v3.0 or later.",
             "ruled": "2026-09-14",
             "answer": "OK"
+        },
+        "lpn_alt_cat_constituent": {
+            "on": "Constituent",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_alt_cat_demand": {
+            "on": "Demand",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_alt_cat_energy": {
+            "on": "Energy cost",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_alt_cat_fireflow": {
+            "on": "Fire flow",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_alt_cat_initial": {
+            "on": "Initial settings",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_alt_cat_physical": {
+            "on": "Physical",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_alt_cat_text": {
+            "on": "Text",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_alt_cat_topology": {
+            "on": "Asset activation",
+            "ruled": "2026-10-01",
+            "answer": "Edited."
+        },
+        "lpn_alt_cat_userdata": {
+            "on": "Custom properties",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_alt_note": {
+            "on": "Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.",
+            "ruled": "2026-10-01",
+            "answer": "Edited."
+        },
+        "lpn_alt_title": {
+            "on": "Alternatives",
+            "ruled": "2026-10-01",
+            "answer": "OK."
         },
         "lpn_area_hint_lasso_go": {
             "on": "Move to draw the outline. Click to finish.",
@@ -226,9 +289,44 @@
             "ruled": "2026-09-17",
             "answer": "Edited."
         },
+        "lpn_copy_body": {
+            "on": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_copy_body_nodate": {
+            "on": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_copy_copy": {
+            "on": "A copy; make new lock",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_copy_kept_link": {
+            "on": "Opened {name} assuming it was moved, not copied. If this was a mistake, confusing lock share messages may appear. In the event that happens, simply Break the lock.",
+            "ruled": "2026-10-01",
+            "answer": "I think this is nonsense, but I dont know how to fix it. I tried."
+        },
         "lpn_copy_of": {
             "on": "Copy of {name}",
             "ruled": "2026-09-23",
+            "answer": "OK."
+        },
+        "lpn_copy_opened": {
+            "on": "Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_copy_original": {
+            "on": "Original; keep same lock",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_copy_title": {
+            "on": "Mark file as new copy?",
+            "ruled": "2026-10-01",
             "answer": "OK."
         },
         "lpn_cp_add": {
@@ -485,6 +583,121 @@
             "on": "Validate as: This says what a good value looks like. The case rules read the English alphabet only, which is a stated limit. Choose Do not validate to accept anything.",
             "ruled": "2026-09-14",
             "answer": "OK"
+        },
+        "lpn_crit_baseline_below": {
+            "on": "Junctions already below it with nothing broken: {n}. They are not counted.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_busy": {
+            "on": "Another analysis is running. Stop it, or wait for it to finish.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_col_asset": {
+            "on": "Asset",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_col_below": {
+            "on": "Junctions below minimum",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_col_cutoff": {
+            "on": "Junctions cut off",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_col_unserved": {
+            "on": "Demand not served",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_intro": {
+            "on": "Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in your project is changed; the whole run is made on a copy.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_menu": {
+            "on": "Criticality analysis…",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_menu_tip": {
+            "on": "Take each pipe, pump, and valve out of the network in turn and see what the system loses.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_minpressure": {
+            "on": "Lowest pressure allowed",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_minpressure_tip": {
+            "on": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_no_links": {
+            "on": "This project has no links yet, so there is nothing to break.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_no_selection": {
+            "on": "No pipe, pump, or valve is selected. Choose one on the map, or break every link.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_scope": {
+            "on": "Links to break",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_scope_all": {
+            "on": "Every link",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_scope_selected": {
+            "on": "The selected links",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_scope_tip": {
+            "on": "Every pipe, pump, and valve, or only the ones selected on the map. Choose the set before you run.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_skipped": {
+            "on": "{n} selected elements are not links, so they were not broken.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_stale": {
+            "on": "The drawing changed, so the criticality results were cleared. Run it again.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_stopped": {
+            "on": "Stopped after {done} of {total} assets. The results below are the ones already finished.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_summary": {
+            "on": "{n} of {total} assets leave demand unserved or drop a junction below {pressure}.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_title": {
+            "on": "Criticality analysis",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_crit_working": {
+            "on": "Working: {done} of {total} assets.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
         },
         "lpn_crs_choose": {
             "on": "Select",
@@ -883,6 +1096,11 @@
             "on": "{id} down to {pressure}",
             "ruled": "2026-09-01"
         },
+        "lpn_ff_all": {
+            "on": "All",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
         "lpn_ff_atleast": {
             "on": "over {flow}",
             "ruled": "2026-09-01"
@@ -958,9 +1176,9 @@
             "ruled": "2026-09-01"
         },
         "lpn_ff_design_no_selection": {
-            "on": "The design check scope is set to Selected, but no assets are selected. Select assets or select All.",
+            "on": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option.",
             "ruled": "2026-09-30",
-            "answer": "His own English (quoted, without a final period, which is added), and: (a) (Specify) Junctions to test: All/Selected\n(b) Design check (effect on system); (specify) pipes and other junctions to check: All/Selected"
+            "answer": "Both should indeed follow the same form, and it's not easy. \"No junctions are selected. Select junctions or select the All option.\" \"…no assets are selected. Select assets or select the All option.\""
         },
         "lpn_ff_design_none": {
             "on": "Nothing in the chosen set was drawn down by any junction tested.",
@@ -1072,8 +1290,9 @@
             "ruled": "2026-09-01"
         },
         "lpn_ff_no_selection": {
-            "on": "No junction is selected. Choose one on the map, or test every junction.",
-            "ruled": "2026-09-01"
+            "on": "No junctions are selected. Select junctions or select the All option.",
+            "ruled": "2026-09-30",
+            "answer": "Both should indeed follow the same form, and it's not easy. \"No junctions are selected. Select junctions or select the All option.\" \"…no assets are selected. Select assets or select the All option.\""
         },
         "lpn_ff_not_checked": {
             "on": "Not checked",
@@ -1118,6 +1337,11 @@
         "lpn_ff_scope_tip": {
             "on": "Choose the set before you run. Testing every junction in a large system can take minutes.",
             "ruled": "2026-09-01"
+        },
+        "lpn_ff_selected": {
+            "on": "Selected",
+            "ruled": "2026-10-01",
+            "answer": "OK."
         },
         "lpn_ff_skipped": {
             "on": "{n} selected elements are not junctions, so they were not tested.",
@@ -1404,6 +1628,11 @@
         "lpn_file_convert_as_tip": {
             "on": "Copies this project to a new tab and converts the copy to the coordinate system and units you choose. When the coordinate system changes, a wizard guides you through zooming the map behind your network approximately, then scaling and rotating your network on the map more closely. This project is left exactly as it is. To georeference without converting anything, use Map, World map, Attach instead.",
             "ruled": "2026-09-28",
+            "answer": "OK."
+        },
+        "lpn_file_import_menu": {
+            "on": "Import…",
+            "ruled": "2026-10-01",
             "answer": "OK."
         },
         "lpn_file_import_survey": {
@@ -1827,6 +2056,11 @@
             "on": "The curve in the Libraries box that says how much head this valve loses at each flow. Several valves can use the same curve, and editing it there changes all of them. This valve holds only the reference; the points themselves are read and edited under Libraries, Curves.",
             "ruled": "2026-09-06"
         },
+        "lpn_help_hotkeys": {
+            "on": "Tables and Hotkeys",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
         "lpn_help_screenshots": {
             "on": "Screenshot gallery",
             "ruled": "2026-09-07",
@@ -1841,6 +2075,26 @@
             "on": "Hide these titles",
             "ruled": "2026-09-09",
             "answer": "OK"
+        },
+        "lpn_hotkeys_map_def": {
+            "on": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_hotkeys_map_heading": {
+            "on": "Map",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_hotkeys_map_term": {
+            "on": "Map keyboard shortcuts",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_hotkeys_tables_heading": {
+            "on": "Tables",
+            "ruled": "2026-10-01",
+            "answer": "OK."
         },
         "lpn_inp_drop_energy": {
             "on": "This EPANET file includes pumping cost modelling data. This page does not work out energy or cost, so nothing here uses those numbers. They are kept, and they are written back if you save an EPANET file.",
@@ -1969,6 +2223,10 @@
             "on": "Tick to show the unit in the After box and on the label, and to keep it in step when the units change. Untick to type your own After text.",
             "ruled": "2026-09-28",
             "answer": "OK."
+        },
+        "lpn_library_control_missing": {
+            "on": "⚠ This network has nothing called {id}",
+            "ruled": "2026-09-05"
         },
         "lpn_library_curve_add": {
             "on": "Add a curve",
@@ -2708,6 +2966,11 @@
             "ruled": "2026-09-07",
             "answer": "OK."
         },
+        "lpn_pane_filter_stale": {
+            "on": "Rows that no longer match: {n}.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
         "lpn_pane_goto_tip": {
             "on": "Zoom & select",
             "ruled": "2026-09-23",
@@ -2951,6 +3214,26 @@
         "lpn_pane_unselect_on_map": {
             "on": "Unselect on map",
             "ruled": "2026-09-29",
+            "answer": "OK."
+        },
+        "lpn_pgraph_head_gain": {
+            "on": "Head gain",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_pgraph_head_gain_tip": {
+            "on": "The pump's head gain from suction to discharge, plotted positive. EPANET reports it as a negative head loss, as do the Tables and the map label.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_pgraph_none": {
+            "on": "This asset has no results in the current run.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_pgraph_source_share_from": {
+            "on": "Source share from {node}",
+            "ruled": "2026-10-01",
             "answer": "OK."
         },
         "lpn_pipetype_detach": {
@@ -3273,6 +3556,10 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
+        "lpn_result_pressure": {
+            "on": "Pressure",
+            "ruled": "2026-09-01"
+        },
         "lpn_result_reaction_rate": {
             "on": "Reaction rate",
             "ruled": "2026-09-14",
@@ -3301,6 +3588,10 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
+        "lpn_result_velocity": {
+            "on": "Velocity",
+            "ruled": "2026-09-01"
+        },
         "lpn_result_water_age": {
             "on": "Water age",
             "ruled": "2026-09-01"
@@ -3318,6 +3609,16 @@
             "on": "These rules could not be read, so they were ignored in this run: {ids}",
             "ruled": "2026-09-05"
         },
+        "lpn_scenario_basic": {
+            "on": "Basic mode",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_scenario_basic_tip": {
+            "on": "Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.",
+            "ruled": "2026-10-01",
+            "answer": "Edited."
+        },
         "lpn_scenario_mark_tip": {
             "on": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
             "ruled": "2026-08-29"
@@ -3328,6 +3629,76 @@
         "lpn_scenario_overrides_tip": {
             "on": "Each of those values is marked on the map with an amber ring. Switch to Base to see the drawing without them.",
             "ruled": "2026-08-29"
+        },
+        "lpn_scenario_preset_average_day": {
+            "on": "4. Average Day",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_scenario_preset_average_day_tip": {
+            "on": "Demand multiplier 1: every demand as entered, which is taken to be average day demand.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_scenario_preset_fire_max_day": {
+            "on": "7. Fire plus max day",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_scenario_preset_fire_max_day_tip": {
+            "on": "Max day demand (multiplier 2.0). Run Fire flow analysis in this scenario: it adds the fire flow at each junction on top of this demand.",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_scenario_preset_flow_max": {
+            "on": "3. Flow test: Max",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_scenario_preset_flow_max_tip": {
+            "on": "Flow test calibration for a design network at the max flow reported. In this scenario, set the demand at the flowing junction to the max flow measured, and the demand at all other junctions to 0.",
+            "ruled": "2026-10-01",
+            "answer": "Edited."
+        },
+        "lpn_scenario_preset_flow_mid": {
+            "on": "2. Flow test: Mid",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_scenario_preset_flow_mid_tip": {
+            "on": "Flow test calibration for a design network at the first flow reported. In this scenario, set the demand at the flowing junction to the first flow measured, and the demand at all other junctions to 0.",
+            "ruled": "2026-10-01",
+            "answer": "Edited."
+        },
+        "lpn_scenario_preset_flow_static": {
+            "on": "1. Flow test: Static",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_scenario_preset_flow_static_tip": {
+            "on": "Flow test calibration for a design network at 0 flow. In this scenario, set the demand at all junctions to 0.",
+            "ruled": "2026-10-01",
+            "answer": "Edited."
+        },
+        "lpn_scenario_preset_max_day": {
+            "on": "5. Max Day",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_scenario_preset_max_day_tip": {
+            "on": "Demand multiplier 2.0 times average day, a placeholder value. Most systems fall between 1.2 and 3.0 (National Research Council, 2006). Set your own system's in Settings, Calculation, Hydraulics, Demand multiplier.",
+            "ruled": "2026-10-01",
+            "answer": "Edited."
+        },
+        "lpn_scenario_preset_peak_hour": {
+            "on": "6. Peak hour",
+            "ruled": "2026-10-01",
+            "answer": "OK."
+        },
+        "lpn_scenario_preset_peak_hour_tip": {
+            "on": "Demand multiplier 3.0 times average day, a placeholder value. Most systems fall between 3.0 and 6.0 (National Research Council, 2006). Set your own system's in Settings, Calculation, Hydraulics, Demand multiplier.",
+            "ruled": "2026-10-01",
+            "answer": "Edited."
         },
         "lpn_scncmp_at": {
             "on": "{value} at {id}",
@@ -4342,26 +4713,6 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
-        },
-        "lpn_result_pressure": {
-            "on": "Pressure",
-            "ruled": "2026-09-01"
-        },
-        "lpn_result_velocity": {
-            "on": "Velocity",
-            "ruled": "2026-09-01"
-        },
-        "lpn_library_control_missing": {
-            "on": "⚠ This network has nothing called {id}",
-            "ruled": "2026-09-05"
-        },
-        "bpn_demand_mult": {
-            "on": "Demand multiplier",
-            "ruled": "2026-08-29"
-        },
-        "bpn_p_min": {
-            "on": "Lowest pressure",
-            "ruled": "2026-09-04"
         }
     }
 }

@@ -1,0 +1,307 @@
+{
+    "sprint": "2026-09-30-golf",
+    "description": "Delta and resync sprint for the five branches Tom cleared on 2026-09-30 evening (find-filter, scenario-preset, graph-tab-keys, fireflow-scope, help-menu) and fix/points-data-heading: 25 new keys and 5 changed (lpn_ff_design_no_selection, lpn_ff_no_selection, lpn_help_icons with a role change from 'Toolbar key' to 'Toolbar', lpn_notes_7_def, points_data_heading). Wave 0 by one agent over the 25 new keys.",
+    "entries": [
+        {
+            "key": "lpn_ff_all",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: 'All' and 'Selected' are option labels in the 'Junctions to test' pull-down (lpn_ff_scope), but each string stands alone with no noun. In gendered and inflected languages the adjective must agree with a noun the translator is not shown: Spanish Todos/Todas, Seleccionados/Seleccionadas; Russian, Arabic, Hebrew likewise. 'Selected' also reads as a bare past participle or a verb form.",
+            "readings": [
+                "All [junctions], Selected [junctions] (intended: the junctions to test, plural)",
+                "All / Selected as a state or command ('Select all', 'Selected')",
+                "'All' as a noun phrase ('everything') with no gender"
+            ],
+            "disposition": "intent",
+            "resolution": "PROPOSED. (a) English rewrite 'All junctions' / 'Selected junctions', which names the noun in the option and costs 2 keys x 26 = 52 retranslations; the cost is that the pull-down gets wider, though the row label already reads 'Junctions to test'. (b) Keep English; $ec_lang_syn note 'option under Junctions to test: agrees with junctions, plural' (off-limits to AI, awaits written permission; zero retranslations). Note lpn_ff_selected is the second reading of lpn_ff_no_selection and lpn_ff_design_no_selection, which quote 'Selected' and 'All' as the option labels, so whichever way is chosen the three keys' words must stay identical in each language. | TOM RULED 2026-09-30: Written to $ec_lang_syn for lpn_ff_all and lpn_ff_selected, with a note that the Design check pull-down reuses them.",
+            "human_answer": "_syn = \"All junctions\" / \"Selected junctions\"",
+            "human_answered": "2026-09-30"
+        },
+        {
+            "key": "lpn_ff_no_selection",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: 'select All' quotes the option label 'All' from lpn_ff_all, but in the sentence it reads as the Select All command (Ctrl+A in the tables, select all assets). A translator will render the command, not the option label, and the sentence then sends the visitor to a word that is not in the pull-down. 'Choose one' also has an antecedent only two words earlier ('junction'), which is fine in English and fragile where junction is gendered or a classifier language.",
+            "readings": [
+                "pick the option labelled All in the Junctions to test pull-down (intended)",
+                "use a Select All command on the map",
+                "choose one junction on the map, or choose all junctions (the plain-English paraphrase a translator will produce, dropping the quoted label)"
+            ],
+            "disposition": "english",
+            "resolution": "PROPOSED English: 'No junction is selected. Choose one on the map, or set Junctions to test to All.' It names the control, and the quoted All then matches the option label; 1 key x 26 = 26 retranslations (lpn_ff_design_no_selection has the same shape and was changed in this sprint too: 'set to Selected ... or select All'; it deserves the same wording). Needs Tom's ruling. Prefer folding into the lpn_ff_all decision. | TOM RULED 2026-09-30: English rewritten for lpn_ff_no_selection and lpn_ff_design_no_selection as he wrote.",
+            "human_answer": "Both should indeed follow the same form, and it's not easy. \"No junctions are selected. Select junctions or select the All option.\" \"...no assets are selected. Select assets or select the All option.\"",
+            "human_answered": "2026-09-30"
+        },
+        {
+            "key": "lpn_scenario_preset_flow_static_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: all of the flow-test tips (flow_static, flow_mid, flow_max) and the preset fire tip embed the other presets' titles as literal English ('2. Flow test: Mid', '3. Flow test: Max', '1. Flow test: Static'). Each key is translated separately, so a translator who renders 'Flow test: Mid' one way in the title and another way inside the tip leaves a cross-reference that matches nothing on screen; the digits and the colon are part of the quoted label. Verified in code: the titles are the button text, so the match is what the reader uses to find the other scenario.",
+            "readings": [
+                "quote the other scenario title exactly as translated in its own key (intended)",
+                "paraphrase the title in the tip (natural translation)",
+                "leave the English title inside a translated sentence"
+            ],
+            "disposition": "english",
+            "resolution": "PROPOSED: no English change if Tom accepts a $ec_lang_syn note on the four tips, 'quotes the titles of lpn_scenario_preset_flow_static, _mid and _max: copy the translated titles exactly, numbers included' (off-limits to AI, awaits written permission). Alternative with a retranslation cost: a {static}/{mid}/{max} placeholder filled from the title keys, which needs a JS change and a Tom ruling on whether presets titles are reachable at render time. The same applies to flow_mid_tip and flow_max_tip, which both say 'compare the pressures with 1. Flow test: Static'. | TOM RULED 2026-09-30: His rewrites quote no other title, so the drift risk is gone; no syn note needed.",
+            "human_answer": "OK. (and he rewrote all three flow-test tips in dev/new-english-keys.md)",
+            "human_answered": "2026-09-30"
+        },
+        {
+            "key": "lpn_scenario_preset_flow_mid",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low-medium: 'Mid' and 'Max' are clipped adjectives with no noun. 'Mid' is the middle of what (flow, residual pressure, test)? The tip says 'the first residual reading', which is a position in a sequence, not a middle, and 'Max' says 'the highest residual reading', which is not the maximum flow. A translator renders 'Mid' as middle/medium and 'Max' as maximum, whereas the intended senses are a first and a highest-flow hydrant test reading. Also 'Static' means 'static pressure' (no flow), not unchanging.",
+            "readings": [
+                "Mid = a middle-flow test, Max = the largest-flow test (title only)",
+                "Mid = the first residual reading, Max = the highest residual reading (per tip)",
+                "Static = zero flow, pressures at rest (intended) vs. static as 'not changing' or 'electrical static'"
+            ],
+            "disposition": "english",
+            "resolution": "REFERRED to Tom. Proposal: keep the titles, since Tom saw and approved them in the browser, and let the tip be the disambiguator: tips already carry 'residual reading'. If a rewrite is wanted, 'the first residual reading' in flow_mid_tip should read 'a residual reading between static and the highest' (the tip contradicts the word Mid otherwise). The title 'Mid' otherwise needs a $ec_lang_syn note (off-limits to AI): 'intermediate hydrant flow test; not the middle of a range'. | TOM RULED 2026-09-30: Titles kept; his tips say \"first flow reported\" / \"max flow reported\", which resolves Mid and Max.",
+            "human_answer": "Rewrote the three flow-test tips in dev/new-english-keys.md",
+            "human_answered": "2026-09-30"
+        },
+        {
+            "key": "lpn_scenario_preset_max_day_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: 'Demand multiplier 2.0 times average day, a starting value.' is a fragment with two parses (the multiplier is 2.0, so demand = 2.0 times average day; or the string is a noun phrase 'demand multiplier ... times'). 'Most systems fall between 1.2 and 3.0' does not say what falls: the multiplier, the ratio of max day to average day. And 'Set your own system's in Settings...' ends in a possessive with its noun elided (system's multiplier), which has no equivalent in most of the 26 languages and cannot be translated without guessing the elided noun. The same defects are in lpn_scenario_preset_peak_hour_tip.",
+            "readings": [
+                "the multiplier is 2.0, meaning max day demand = 2.0 x average day demand (intended)",
+                "'2.0 times average day' as a separate quantity from the multiplier",
+                "Most systems' multipliers fall between 1.2 and 3.0 (intended) vs most systems' demand falls between"
+            ],
+            "disposition": "english",
+            "resolution": "PROPOSED English, max_day_tip: 'Demand multiplier 2.0: max day demand is 2.0 times average day demand. This is a starting value; most systems fall between 1.2 and 3.0 (National Research Council, 2006). Set your own system\\'s multiplier in Settings, Calculation, Hydraulics, Demand multiplier.' and the same shape for peak_hour_tip (3.0; 3.0 to 6.0). It names the elided noun and the thing that falls in the range. 2 keys x 26 = 52 retranslations; needs Tom's ruling. Not verified: the Settings, Calculation, Hydraulics path itself was not located by key in lang.ec.en.php (grep only found the _tip of the setting), so the pre-sprint reader should confirm the menu path is right while the string is open. | TOM RULED 2026-09-30: His wording applied to max_day_tip and peak_hour_tip.",
+            "human_answer": "Edited in dev/new-english-keys.md: \"a placeholder value\"",
+            "human_answered": "2026-09-30"
+        },
+        {
+            "key": "lpn_scenario_preset_average_day_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: 'Demand multiplier 1: every demand as entered, which is taken to be average day demand.' reads two ways: 'which' modifies 'every demand as entered' (the entry is assumed to be average day) or the multiplier (1 is taken to be average). A translator picking the second inverts the instruction. 'Average day' is also a term that must be kept parallel with max_day_tip.",
+            "readings": [
+                "every demand as entered is assumed to be average day demand (intended)",
+                "a multiplier of 1 is taken to be the average day (grammatical alternative)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "PROPOSED English: 'Demand multiplier 1: every demand as entered. Demands you enter are taken to be average day demand.' 1 key x 26 = 26 retranslations. Low severity; Tom can dismiss on the grounds that the second reading gives the same engineering result. | TOM RULED 2026-09-30: Tom approved the English as is.",
+            "human_answer": "OK.",
+            "human_answered": "2026-09-30"
+        },
+        {
+            "key": "lpn_scenario_preset_fire_max_day_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: 'Run Fire flow analysis in this scenario: it adds the fire flow at each junction on top of this demand.' 'it' can be the scenario or the analysis. Worse, 'adds the fire flow at each junction' reads as the flow added at every junction at the same time, whereas lpn_ff_intro says each junction is tested in turn on its own, one at a time. A translator reading simultaneous produces a false instruction about a design-critical analysis. Also 'Run' is an imperative verb before a capitalised menu title (Fire flow analysis…), which looks like a noun phrase 'Run Fire flow' in some target languages.",
+            "readings": [
+                "the analysis tests each junction in turn, adding the fire flow at that one junction on top of this demand (intended)",
+                "the analysis adds the fire flow at every junction at once",
+                "'it' = the scenario adds the fire flow"
+            ],
+            "disposition": "dismissed",
+            "resolution": "PROPOSED English: 'Max day demand (multiplier 2.0). Run Fire flow analysis in this scenario: it tests each junction in turn, adding the fire flow at that junction on top of this demand.' 1 key x 26 = 26 retranslations. Needs Tom's ruling since it is a claim about the analysis (supported by lpn_ff_intro: 'Each junction in turn is asked to draw a fire flow'). | TOM RULED 2026-09-30: Tom approved the English as is.",
+            "human_answer": "OK.",
+            "human_answered": "2026-09-30"
+        },
+        {
+            "key": "lpn_help_hotkeys",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: 'Tables and Hotkeys' reads as two items joined by 'and' (Tables, plus Hotkeys), but the box it opens holds one list of keys under two headings, Tables and Map (lpn_hotkeys_tables_heading, lpn_hotkeys_map_heading). A reader or translator may produce 'Tables and shortcut keys' (two topics) or 'Hotkeys for tables'. 'Hotkeys' is also a different word from the box's own heading 'Map keyboard shortcuts' (lpn_hotkeys_map_term), so one concept has two English words in the same box and translators will diverge.",
+            "readings": [
+                "the box covers two topics, tables and hotkeys",
+                "the box lists hotkeys, for tables and for the map (intended)",
+                "'Hotkeys' and 'keyboard shortcuts' are two different things"
+            ],
+            "disposition": "dismissed",
+            "resolution": "PROPOSED English: 'Hotkeys' for lpn_help_hotkeys (the two headings inside already say Tables and Map) and, to match, 'Map hotkeys' for lpn_hotkeys_map_term, or the reverse, 'Keyboard shortcuts' / 'Map keyboard shortcuts'. Tom to choose the one word; it should also be a glossary.json concept so the 26 languages agree. 2 keys x 26 = 52 retranslations. | TOM RULED 2026-09-30: Hotkeys and keyboard shortcuts stay as deliberate synonyms.",
+            "human_answer": "Leave as is. Synonyms. One needs to be short. The other does not.",
+            "human_answered": "2026-09-30"
+        },
+        {
+            "key": "lpn_hotkeys_map_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low-medium: each row is a bare imperative with the tool name standing as a verb: 'Select.', 'Add text.', 'Delete the selection.' 'Select.' has no object and is the name of a tool (the Select tool, key 1) so a translator may render it as the verb 'select' (infinitive, imperative, or noun 'selection'), inconsistent with the toolbar's own label. 'Delete' in the left cell is a key name, and 'Delete the selection' the action; 'Esc' and 'Ctrl+Z' are key names to keep as printed. 'Add text.' is the Text tool (a label on the map), not 'add text to the selected thing'.",
+            "readings": [
+                "'Select.' = the Select tool (intended)",
+                "'Select.' = the imperative verb with no object",
+                "'Delete' = the Delete key (intended) vs the verb 'Delete' in the left cell"
+            ],
+            "disposition": "dismissed",
+            "resolution": "PROPOSED: no English edit if the toolbar's translated tool names can be reused; otherwise 'Select tool.' on the first row and 'Add text.' -> 'Add a text label.' (matches EPANET's Label = our Text, which needs Tom's vocabulary ruling). The key names (Esc, Delete, Ctrl) stay as printed on the keyboard; a $ec_lang_syn note to that effect is off-limits to AI and awaits written permission. Rows 'Add a junction.' ... 'Add a customer.' are fine. | TOM RULED 2026-09-30: English unchanged.",
+            "human_answer": "No better. Now it's a sentence. Leave as is. Trust the context.",
+            "human_answered": "2026-09-30"
+        },
+        {
+            "key": "lpn_notes_7_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "medium: 'Tab, Enter' (keys) sits in the same table as 'Switch to the next or previous table or graph tab' (a pane tab), so 'Tab' is both a key name and a UI object. 'Navigate.' and 'Navigate backward.' are intransitive (navigate where: across cells). 'Finish entry and navigate across / down one cell' has a slash that the reader must parse as 'across, or down, one cell' (Tab goes across, Enter goes down). 'table or graph tab' parses as '(table or graph) tab' (intended) or 'table, or graph tab'. 'Fill the selection down from its top row' has a second reading in which 'down' is a direction of the selection. Changed this sprint by adding the PageDown row.",
+            "readings": [
+                "Tab and Enter are keys; 'tab' is the pane tab (intended, two senses)",
+                "Tab, Enter as a single combined action",
+                "'across / down' = Tab goes across, Enter goes down (intended) vs a single movement across and down"
+            ],
+            "disposition": "english",
+            "resolution": "PROPOSED English rows: 'Tab, Enter' -> 'Finish entry and move one cell right (Tab) or down (Enter).' and 'Navigate.' -> 'Move between cells.' (same for 'Navigate backward.' -> 'Move backward.'); the pane tab sentence 'Switch to the next or previous tab, whether a table or a graph.' 1 key x 26 = 26 retranslations; Tom's ruling needed. Wave 0 of this sprint changed only the PageDown row; the others are older text newly in scope because the key changed. Keep key names as printed. | TOM RULED 2026-09-30: Navigate rows unchanged; PageDown row now \"Switch to the next or previous tab, whether a table or a graph.\"",
+            "human_answer": "Move means something else (move values around). Leave navigate. [PageDown row:] OK.",
+            "human_answered": "2026-09-30"
+        },
+        {
+            "key": "lpn_pane_filter_stale",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: 'Rows that no longer match: {n}.' does not say what the rows no longer match, and it follows 'Filtered by {q}. Showing {n} of {all}.' where {n} is a different count. Considered: the reading 'no longer match the filter' is the only one the position in the sentence supports, since it follows the filter note directly and the previous sentence names the filter. The deliberate absence of a plural form is Tom's choice for languages with several plural categories (a colon followed by the number takes no agreement).",
+            "readings": [
+                "rows that no longer match the filter (the only surviving reading)",
+                "rows that no longer match the data"
+            ],
+            "disposition": "dismissed",
+            "resolution": "DISMISSED, one reading survives in place; verified in code (paneFilterNoteText appends it after the filter note, only when spec.filterStaleCount is non-zero). Colon-then-number order is the deliberate no-plural design."
+        },
+        {
+            "key": "lpn_file_import_menu",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: 'Import…' is a bare verb with no object and an ellipsis.",
+            "readings": [
+                "Import [something], opening a fly-out submenu of choices (intended)",
+                "Import as a noun"
+            ],
+            "disposition": "dismissed",
+            "resolution": "DISMISSED. Verified in code: it is a menu row whose submenu (importMenuRows) lists surveyed points, EPANET file and libraries, so the objects are named one level down; the ellipsis follows the same menu convention as 'Open…' and 'Open example…'. A translator rendering the menu verb in the infinitive or imperative matches its siblings."
+        },
+        {
+            "key": "lpn_hotkeys_tables_heading",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: 'Tables' alone could be lookup tables, or in a data-structure sense.",
+            "readings": [
+                "the data tables in the bottom pane (intended)",
+                "lookup tables, or timetables"
+            ],
+            "disposition": "dismissed",
+            "resolution": "DISMISSED. It is a heading above the table-key help and 'Tables' is already an established term in the suite (the Tables pane, lpn_notes_7), with an existing glossary entry in play for the other lpn_ strings."
+        },
+        {
+            "key": "lpn_hotkeys_map_heading",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: a lone 'Map' could be the verb to map.",
+            "readings": [
+                "the map (the drawing area, intended)",
+                "the verb map (as in map a value)"
+            ],
+            "disposition": "dismissed",
+            "resolution": "DISMISSED. It is a section heading beside 'Tables' and above rows about the drawing's tools and zoom; 'Map' is the established noun across lpn_ (basemap, map labels). Only one reading survives."
+        },
+        {
+            "key": "lpn_scenario_preset_flow_static",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: the title is 'Flow test: Static'; 'Static' alone is ambiguous.",
+            "readings": [
+                "static pressure, hydrant not flowing (intended)",
+                "unchanging"
+            ],
+            "disposition": "dismissed",
+            "resolution": "DISMISSED as a title; the ambiguity of Static, Mid and Max is carried by lpn_scenario_preset_flow_mid, and the tip of flow_static says 'no hydrant flowing ... static readings'. The cross-reference matching is filed on lpn_scenario_preset_flow_static_tip."
+        },
+        {
+            "key": "lpn_scenario_preset_flow_max",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: see lpn_scenario_preset_flow_mid.",
+            "readings": [
+                "the highest residual reading (per tip)",
+                "the maximum flow"
+            ],
+            "disposition": "dismissed",
+            "resolution": "DISMISSED here and carried by lpn_scenario_preset_flow_mid, which files the Mid/Max ambiguity once for both."
+        },
+        {
+            "key": "lpn_scenario_preset_flow_mid_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: 'Nothing flows until you do.' - 'do' refers to adding the measured flow, and 'first residual reading' is a position in a sequence.",
+            "readings": [
+                "do = add the measured flow to the junction demand (intended)",
+                "do = compare the pressures"
+            ],
+            "disposition": "dismissed",
+            "resolution": "DISMISSED on the 'do' point: the sentence order makes adding the flow the nearest action, and 'Nothing flows' only makes sense of that reading. The 'first residual reading' versus Mid is filed on lpn_scenario_preset_flow_mid, and the cross-reference on ..._static_tip."
+        },
+        {
+            "key": "lpn_scenario_preset_flow_max_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: the same shape as flow_mid_tip.",
+            "readings": [
+                "see flow_mid_tip"
+            ],
+            "disposition": "dismissed",
+            "resolution": "DISMISSED here; its findings are filed under lpn_scenario_preset_flow_static_tip and lpn_scenario_preset_flow_mid."
+        },
+        {
+            "key": "lpn_scenario_preset_max_day",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: 'Max Day' abbreviates maximum day demand.",
+            "readings": [
+                "max day = maximum day demand (intended)",
+                "a maximum day of the calendar"
+            ],
+            "disposition": "dismissed",
+            "resolution": "DISMISSED. The tip states 'Demand multiplier 2.0 times average day'; reading the title as maximum day demand is the only one that survives. The title-case difference between 'Max Day' and 'Peak hour' is taste (Tom saw it in the browser) and is not a translator reading."
+        },
+        {
+            "key": "lpn_scenario_preset_peak_hour",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: 'Peak hour' is unambiguous standard waterworks usage.",
+            "readings": [
+                "the hour of peak demand"
+            ],
+            "disposition": "dismissed",
+            "resolution": "DISMISSED. One reading survives; the tip carries the multiplier. Defects in its tip are filed under lpn_scenario_preset_max_day_tip."
+        },
+        {
+            "key": "lpn_scenario_preset_peak_hour_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: same shape as max_day_tip.",
+            "readings": [
+                "see lpn_scenario_preset_max_day_tip"
+            ],
+            "disposition": "dismissed",
+            "resolution": "DISMISSED here; it is covered by the finding filed on lpn_scenario_preset_max_day_tip, which names it."
+        },
+        {
+            "key": "lpn_scenario_preset_average_day",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: 'Average Day' title.",
+            "readings": [
+                "average day demand"
+            ],
+            "disposition": "dismissed",
+            "resolution": "DISMISSED; one reading survives. The 'which' in the tip is filed under lpn_scenario_preset_average_day_tip."
+        },
+        {
+            "key": "lpn_scenario_preset_fire_max_day",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "low: 'Fire plus max day' could read as a fire plus a day.",
+            "readings": [
+                "fire flow on top of max day demand (intended)",
+                "a fire event on a max day"
+            ],
+            "disposition": "dismissed",
+            "resolution": "DISMISSED. Both readings are the same scenario, and the tip names it. The substantive error in the tip is filed on lpn_scenario_preset_fire_max_day_tip."
+        }
+    ]
+}
