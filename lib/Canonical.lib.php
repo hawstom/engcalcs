@@ -235,7 +235,28 @@ function ecCanonicalRedirectTarget($scriptName, $requestUri, $hostDeclared, $ori
     // that MOVES somebody, so getting this from the declaration rather than the host is not tidiness.
     // And on a host with its own declared origin (ecCanonicalHostOrigins()) the move stays on that
     // host: epanet-plus-plus.org's script path goes to epanet-plus-plus.org/app/, never across.
+    $page = basename($script);
+    $moves = ecRedirectOnlyOrigins();
+    $host = (string)$servingHost;
+    if ($host !== '' && isset($moves[$page][$host])) { return $moves[$page][$host] . $pretty . $query; }
     return ecCanonicalOrigin($script, $origin, $servingHost) . $pretty . $query;
+}
+
+/**
+ * Where a page's script path MOVES a visitor on one host, when that differs from its canonical.
+ *
+ * Only ecCanonicalRedirectTarget() reads this; canonical, hreflang, og:url and the sitemap do not,
+ * so no host nominates another host's copy (canonical_origin_check.php). Tom, 2026-10-01:
+ * hawsedc.com/engcalcs/Looped-Network.php redirects to https://epanet-plus-plus.org/app.
+ *
+ * @return array<string,array<string,string>> page filename => (serving host => absolute origin).
+ */
+function ecRedirectOnlyOrigins() {
+    return array(
+        'Looped-Network.php' => array(
+            'hawsedc.com' => 'https://epanet-plus-plus.org',
+        ),
+    );
 }
 
 /**
