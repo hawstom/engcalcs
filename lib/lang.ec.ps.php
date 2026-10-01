@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='ډيفالټ ارزښتونه بيرته راولئ';
 $ec_lang['calc_defaults_confirm']='ایا محاسبه اصلي (لومړنیو) ډيفالټ ارزښتونو ته بیرته تنظیم شي؟';
 $ec_lang['points_data_note']='(یا د معلوماتو ساحې له لارې کاپي/پیسټ وکړئ)';
-$ec_lang['points_data_heading']='د نقطو معلومات<br />(د کوما یا ټب لخوا جلا شوي)';
+$ec_lang['points_data_heading']='د محاسبې معلومات<br />(د بڼې لیدو لپاره کاپي وکاروئ)';
 $ec_lang['points_data_copy']='کاپي';
 $ec_lang['points_data_paste']='پیسټ';
 $ec_lang['calc_inputs']='ننوتنې';
@@ -930,6 +930,11 @@ $ec_lang['lpn_examples_loading']='بېلګې پورته کیږي…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='یو شی سم کړئ';
 $ec_lang['lpn_help_notes']='د دې پاڼې یادښتونه';
+$ec_lang['lpn_help_hotkeys']='جدولونه او ګړندي کلیدونه';
+$ec_lang['lpn_hotkeys_tables_heading']='جدولونه';
+$ec_lang['lpn_hotkeys_map_heading']='نقشه';
+$ec_lang['lpn_hotkeys_map_term']='د نقشې د کیبورډ شارټکټونه';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 یا Esc</td><td>ټاکل.</td></tr><tr><td>2</td><td>یو جنکشن زیاتول.</td></tr><tr><td>3</td><td>یو ذخیره زیاتول.</td></tr><tr><td>4</td><td>یو ټانک زیاتول.</td></tr><tr><td>5</td><td>یو پایپ زیاتول.</td></tr><tr><td>6</td><td>یو پمپ زیاتول.</td></tr><tr><td>7</td><td>یو والو زیاتول.</td></tr><tr><td>8</td><td>یو پیرودونکی زیاتول.</td></tr><tr><td>9</td><td>متن زیاتول.</td></tr><tr><td>Delete</td><td>ټاکنه ړنګول.</td></tr><tr><td>Ctrl+Z</td><td>وروستی بدلون بیرته کول.</td></tr><tr><td>+ یا =</td><td>لوی کول.</td></tr><tr><td>-</td><td>کوچنی کول.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1204,7 +1209,7 @@ $ec_lang['lpn_find_menu_tip']='یو عنصر د خپل ID له مخې ولټوئ
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='د ټول‌بار د آیکونونو معنی';
+$ec_lang['lpn_help_icons']='د ټول‌بار آیکونونه';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='لیدنه';
 $ec_lang['lpn_pane_right_toggle_tip']='د نقشې ښي خوا پینل ښکاره یا پټ کړئ. دا د لیبل او رنګ ټاکنې لري.';
@@ -1313,6 +1318,7 @@ $ec_lang['lpn_pane_not_used']='نه کارول شوی';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='د {q} له مخې فلټر شوی. {n} د {all} نه ښودل کیږي.';
 $ec_lang['lpn_pane_filter_clear']='ټول وښایاست';
+$ec_lang['lpn_pane_filter_stale']='هغه قطارونه چې نور نه سمون خوري: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='په دې جدول کې هیڅ شی له فلټر سره سمون نه خوري.';
@@ -1769,6 +1775,7 @@ $ec_lang['lpn_import_no_room']='د دې پروژې اضافه کولو لپار�
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='سمه ده';
+$ec_lang['lpn_file_import_menu']='دننه کول…';
 $ec_lang['lpn_file_import_inp']='د EPANET فایل دننه کول…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='د EPANET فایل نه یوه شبکه ولولئ، که .inp متني فایل وي یا هغه .net فایل چې EPANET یې ساتي، او یې د نوې پروژې په توګه پدې براوزر کې وساتئ.';
@@ -2111,7 +2118,7 @@ $ec_lang['lpn_notes_6_term']='د جدول کالمونو مرسته';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>کالم ټاکل</td><td>سرلیک کلیک کړئ</td></tr><tr><td>د کالم ټاکنه اضافه یا غزول</td><td>بل سرلیک Ctrl+click یا Shift+click کړئ</td></tr><tr><td>ټاکل شوي کالم(ونه) لیږدول (بیا ترتیبول)</td><td>راکاږئ یا ښي کلیک یا ⋮ مینو کې کالمونه اداره کول… وکاروئ</td></tr><tr><td>مینو ⋮ او د ترتیب غشی.</td><td>د سرلیک پورتنی کونج ونیسئ، یا سرلیک ته Tab یا یې وټاکئ</td></tr><tr><td>پټول، ټول ښودل، یا د ښکاره والي او ترتیب اداره کول</td><td>سرلیک ښي کلیک کړئ یا د سرلیک پورتنی ښی کونج کې ⋮ مینو</td></tr><tr><td>د کالم له مخې ترتیب کول</td><td>د سرلیک پورتنی ښی کونج کې د غشي نښه</td></tr><tr><td>د جدول په پای کې د نویو قطارونو په توګه پیسټ کول</td><td>ښي کلیک، د سرلیک پورتنی ښی کونج کې ⋮ مینو، یا Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='د جدول کیبورډ لنډلارې';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>د غشي تڼۍ</td><td>حرکت کول.</td></tr><tr><td>Tab, Enter</td><td>ننوتنه بشپړول او یوه حجره پر خوا / ښکته حرکت کول.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>شاته حرکت کول.</td></tr><tr><td>Shift+د غشي تڼۍ</td><td>ټاکنه غزول.</td></tr><tr><td>Ctrl+C</td><td>ټاکنه کاپي کول.</td></tr><tr><td>Ctrl+D</td><td>ټاکنه د خپل پورتني قطار نه ښکته ډکول.</td></tr><tr><td>Ctrl+Enter</td><td>ټاکنه د فعالې حجرې ارزښت سره ډکول.</td></tr><tr><td>Ctrl+A</td><td>ټول جدول ټاکل.</td></tr><tr><td>Ctrl+Shift+V</td><td>د جدول په پای کې د نویو قطارونو په توګه پیسټ کول.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>بل یا پخواني جدول ته لېږدول.</td></tr><tr><td>Delete</td><td>یوه حجره پاکول.</td></tr><tr><td>F2</td><td>د سمون لپاره یوه حجره پرانیستل.</td></tr><tr><td>Esc</td><td>یو سمون لغوه کول.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>د غشي تڼۍ</td><td>حرکت کول.</td></tr><tr><td>Tab, Enter</td><td>ننوتنه بشپړول او یوه حجره پر خوا / ښکته حرکت کول.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>شاته حرکت کول.</td></tr><tr><td>Shift+د غشي تڼۍ</td><td>ټاکنه غزول.</td></tr><tr><td>Ctrl+C</td><td>ټاکنه کاپي کول.</td></tr><tr><td>Ctrl+D</td><td>ټاکنه د خپل پورتني قطار نه ښکته ډکول.</td></tr><tr><td>Ctrl+Enter</td><td>ټاکنه د فعالې حجرې ارزښت سره ډکول.</td></tr><tr><td>Ctrl+A</td><td>ټول جدول ټاکل.</td></tr><tr><td>Ctrl+Shift+V</td><td>د جدول په پای کې د نویو قطارونو په توګه پیسټ کول.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>بل یا پخواني ټب ته تلل، که جدول وي یا ګراف.</td></tr><tr><td>Delete</td><td>یوه حجره پاکول.</td></tr><tr><td>F2</td><td>د سمون لپاره یوه حجره پرانیستل.</td></tr><tr><td>Esc</td><td>یو سمون لغوه کول.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2707,6 +2714,20 @@ $ec_lang['lpn_scenario_push_confirm']='ټولې سناریوګانې دې ملک
 $ec_lang['lpn_scenario_push_scenarios']='اغیزمن شوي سناریوګانې:';
 $ec_lang['lpn_scenario_push_values']='غورځول شوي ارزښتونه:';
 $ec_lang['lpn_scenario_push_none']='هیڅ سناریو د دې ملکیتونو لپاره خپل ارزښت نلري، نو هیڅ به ونه بدلیږي. هیڅ شی نه غورځول کیږي.';
+$ec_lang['lpn_scenario_preset_flow_static']='1. د بهاو ازموینه: ثابت';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='د ډیزاین شبکې لپاره د بهاو ازموینې کالیبریشن په 0 بهاو کې. پدې سناریو کې په ټولو جنکشنونو کې تقاضا 0 وټاکئ.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. د بهاو ازموینه: منځنی';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='د ډیزاین شبکې لپاره د بهاو ازموینې کالیبریشن په لومړي راپور شوي بهاو کې. پدې سناریو کې په بهیدونکي جنکشن کې تقاضا د لومړي اندازه شوي بهاو سره برابره کړئ، او په نورو ټولو جنکشنونو کې 0.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. د بهاو ازموینه: اعظمي';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='د ډیزاین شبکې لپاره د بهاو ازموینې کالیبریشن په راپور شوي اعظمي بهاو کې. پدې سناریو کې په بهیدونکي جنکشن کې تقاضا د اندازه شوي اعظمي بهاو سره برابره کړئ، او په نورو ټولو جنکشنونو کې 0.';
+$ec_lang['lpn_scenario_preset_average_day']='4. منځنۍ ورځ';
+$ec_lang['lpn_scenario_preset_average_day_tip']='د تقاضا ضریب 1: هره تقاضا لکه څنګه چې داخله شوې، چې د منځنۍ ورځې تقاضا ګڼل کیږي.';
+$ec_lang['lpn_scenario_preset_max_day']='5. اعظمي ورځ';
+$ec_lang['lpn_scenario_preset_max_day_tip']='د تقاضا ضریب د منځنۍ ورځې 2.0 چنده، یو ځای‌ناستی ارزښت. ډیری سیسټمونه د 1.2 او 3.0 ترمنځ وي (National Research Council, 2006). د خپل سیسټم ارزښت په Settings، Calculation، Hydraulics، Demand multiplier کې وټاکئ.';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. د لوړې تقاضا ساعت';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='د تقاضا ضریب د منځنۍ ورځې 3.0 چنده، یو ځای‌ناستی ارزښت. ډیری سیسټمونه د 3.0 او 6.0 ترمنځ وي (National Research Council, 2006). د خپل سیسټم ارزښت په Settings، Calculation، Hydraulics، Demand multiplier کې وټاکئ.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. اور او اعظمي ورځ';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='د اعظمي ورځې تقاضا (ضریب 2.0). پدې سناریو کې د اور د بهاو تحلیل چلوئ: دا په هر جنکشن کې د اور بهاو پر دې تقاضا زیاتوي.';
 $ec_lang['lpn_delete_drops_overrides']='د دې عنصر ړنګول هم هغه {n} ارزښتونه غورځوي چې ستاسو سناریوګانې ورته لري. دوام ورکړم؟';
 $ec_lang['lpn_push_base_only']='دا کړنه پخپله انځور بدلوي، نو دا یوازې په {base} کې کیدی شي. {base} ته لاړ شئ او بیا هڅه وکړئ.';
 $ec_lang['lpn_field_active']='د دې شبکې برخه';
@@ -3680,8 +3701,10 @@ $ec_lang['lpn_ff_title']='د اور بهاو شننه';
 $ec_lang['lpn_ff_intro']='هر جنکشن یو په یو غوښتل کیږي چې د خپلې دمخه لرلې غوښتنې پر سر یو اور بهاو راباسي. ستاسو پروژه کې هیڅ شی نه بدلیږي؛ ټول محاسبه یوه کاپي باندې کیږي.';
 $ec_lang['lpn_ff_scope']='هغه جنکشنونه چې ازمویل شي';
 $ec_lang['lpn_ff_scope_tip']='مخکې لدې چې محاسبه وکړئ ټاکنه وکړئ. په یوه لویه سیسټم کې د هر جنکشن ازموینه کیدای شي دقیقې ونیسي.';
+$ec_lang['lpn_ff_all']='ټول';
+$ec_lang['lpn_ff_selected']='ټاکل شوي';
 $ec_lang['lpn_ff_no_junctions']='دا پروژه لا هیڅ جنکشن نلري، نو د ازموینې لپاره هیڅ شی نشته.';
-$ec_lang['lpn_ff_no_selection']='هیڅ جنکشن ټاکل شوی نه دی. پر نقشه یو وټاکئ، یا هر جنکشن ازموئ.';
+$ec_lang['lpn_ff_no_selection']='هیڅ جنکشن ټاکل شوی نه دی. جنکشنونه وټاکئ یا د «ټول» اختیار وټاکئ.';
 $ec_lang['lpn_ff_skipped']='{n} ټاکل شوي عناصر جنکشنونه نه دي، نو ازمویل شوي نه دي.';
 $ec_lang['lpn_ff_required']='اړینه اور بهاو';
 $ec_lang['lpn_ff_required_tip']='هغه بهاو چې ستاسو د اور قانون یا ستاسو د اور اداره یې پر یوه اور-خونده غواړي. هر جنکشن دې شمېرې پر بنسټ ازمویل کیږي پرته لدې چې خپله اړینه اور بهاو ولري.';
@@ -3691,7 +3714,7 @@ $ec_lang['lpn_ff_residual']='پاتې فشار چې وساتل شي';
 $ec_lang['lpn_ff_residual_tip']='هغه فشار چې جنکشن باید لا هم وساتي پداسې حال کې چې اور بهاو وړاندې کوي. AWWA M31 او NFPA 291 20 psi (140 kPa) کاروي.';
 $ec_lang['lpn_ff_design']='ډیزاین چک (پر سیسټم اغیز)';
 $ec_lang['lpn_ff_design_tip']='یوه بېله پوښتنه له دې نه چې آیا جنکشن دا بهاو وړاندې کولی شي: کله چې هلته دا بهاو راایستل کیږي، آیا بل هر څه له خپل اعظمي دقت لاندې فشار یا خپل سرعت حد نه بهر ځي؟ د دې چک کولو ټاکنه هیڅ اضافي محاسبه نه لري.';
-$ec_lang['lpn_ff_design_no_selection']='ډیزاین چک ټاکل شویو جنکشنونو ته ټاکل شوی دی، خو هیڅ یو ټاکل شوی نه دی. پر نقشه ځینې وټاکئ، یا "ټول" وټاکئ.';
+$ec_lang['lpn_ff_design_no_selection']='د ډیزاین چک ساحه پر «ټاکل شوي» ټاکل شوې ده، خو هیڅ شی نه دی ټاکل شوی. شیان وټاکئ یا د «ټول» اختیار وټاکئ.';
 $ec_lang['lpn_ff_minpressure']='ټیټ ترین فشار چې چیرته نور اجازه لري';
 $ec_lang['lpn_ff_minpressure_tip']='یو جنکشن چې له دې نه ټیټ ځي پداسې حال کې چې بل یو خپل اور بهاو راباسي، د ډیزاین ستونزې په توګه راپور کیږي.';
 $ec_lang['lpn_ff_maxvelocity']='لوړ ترین سرعت چې اجازه لري';

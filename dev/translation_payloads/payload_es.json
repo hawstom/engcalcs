@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 2135,
-        "delta_key_count": 2,
+        "expected_key_count": 2153,
+        "delta_key_count": 1,
         "exempt_key_count": 45,
         "exempt_keys": [
             "calc_units_us",
@@ -724,12 +724,10 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_field_lat_abbr": "Lat",
-        "lpn_field_lon_abbr": "Lon"
+        "lpn_field_lat_abbr": "Lat"
     },
     "keys": {
-        "lpn_field_lat_abbr": "Lat",
-        "lpn_field_lon_abbr": "Lon"
+        "lpn_field_lat_abbr": "Lat"
     },
     "key_context": {
         "lpn_field_lat_abbr": {
@@ -742,25 +740,9 @@
                     "english": "Easting"
                 },
                 "next_translated": {
-                    "key": "lpn_field_coord_tip",
-                    "value": "Escriba una ubicación de coordenadas para colocar este nudo con exactitud. En un escenario esta ubicación se aplica solo en ese escenario, igual que arrastrarlo; en Base coloca el nudo en todas partes.",
-                    "english": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere."
-                }
-            }
-        },
-        "lpn_field_lon_abbr": {
-            "reason": "equal_to_english",
-            "current_value": "Lon",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_easting",
-                    "value": "Este",
-                    "english": "Easting"
-                },
-                "next_translated": {
-                    "key": "lpn_field_coord_tip",
-                    "value": "Escriba una ubicación de coordenadas para colocar este nudo con exactitud. En un escenario esta ubicación se aplica solo en ese escenario, igual que arrastrarlo; en Base coloca el nudo en todas partes.",
-                    "english": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere."
+                    "key": "lpn_field_lon_abbr",
+                    "value": "Long",
+                    "english": "Lon"
                 }
             }
         }
