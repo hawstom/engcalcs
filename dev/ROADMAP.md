@@ -305,6 +305,9 @@ the block.
   - **CONTOUR is the one he starred and is also the one with a real unknown**: it interpolates a
     nodal value over the plane between nodes, so it needs a decision about what happens where there
     are no nodes -- a pressure contour across a river a main crosses is drawn over nothing.
+    **Design: `dev/epanet-js-contour-contribution.md`.** Since 2026-10-01 (§2a there, Luke Butler's
+    proof of concept): contour HEAD, subtract the Terrain-RGB DEM per cell, and let pressure leave
+    the junctions' range where the terrain does. Open: pressure-zone boundaries, hard vs faded edge.
   - **FREQUENCY SHIPPED 2026-09-30** (`feat/frequency-plot`, merged on his word). Contour and flow
     balance remain.
   - **SYSTEM FLOW BALANCE -- AND HIS READING OF IT IS RIGHT, but confirm it against EPANET's own

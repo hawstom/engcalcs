@@ -330,9 +330,61 @@ given what the guidance above says about it.
 interpolates a field that is not smooth**, while contouring HGL and subtracting a DEM per cell
 interpolates the field that actually is. The trade press states the underlying distinction
 (`https://ecologixsystems.com/articles/hydraulic-grade-line-energy-grade-line-water-distribution`),
-but **no authoritative source recommending an HGL-first contouring workflow was found**. Treat it as
-a spike, not a citation — and note that `lpn_` already has a Mapbox Terrain-RGB elevation path
-(`js/lpn-terrain.js`), so we are unusually well placed to test it.
+but **no authoritative source recommending an HGL-first contouring workflow was found**. It is no
+longer only ours, though: **Luke Butler built exactly this** as a proof of concept (§2a below), so it
+is a practitioner's choice now, not a published recommendation. `lpn_` already has a Mapbox
+Terrain-RGB elevation path (`js/lpn-terrain.js`), so we are unusually well placed to test it.
+
+### 2a. Luke Butler's pressure-surface proof of concept (seen 2026-10-01)
+
+Luke sent Tom a 22-second silent screen capture of a "Pressure Surface POC", in his words *"an old
+proof of concept I did a while ago showing pressure contours. It interpolates the pressures based on
+the DEM so it gives a more accurate picture of pressure that isn't just based on junctions alone.
+The goal is to one day get this directly in epanet-js."* What follows is read off still frames. **He
+stated no algorithm, and nothing below about his method is his statement.** The video is his and is
+not committed here.
+
+**What the frames show:**
+
+- **The subtitle is the method:** *"EPANET INP → head − DEM elevation, over time"*. The HGL-first
+  hypothesis above, built: interpolate head, subtract terrain per cell.
+- **The terrain is Mapbox Terrain-RGB** (a "DEM zoom" selector at 14, a "change token" link), which is
+  the source `js/lpn-terrain.js` already reads.
+- **A grid, not a triangulation:** the status line reads *"256×256 coarse · 64 ms"*, and stays at
+  64–78 ms per recompute while an extended-period run plays 25 steps (00:00 to 24:00). That is a
+  real performance figure for a grid at this scale, about 130 junctions on screen.
+- **A soft boundary, stated in metres:** "Search radius 400 m" and "Confidence falloff (d₀) 150 m".
+  The fill fades with distance from the network instead of stopping at a hull. Both knobs are in
+  metres, which supports §2's point that a boundary should be a length an engineer can read.
+- **Nodes on top, in the same ramp:** every junction is a dot coloured by its own pressure, with a
+  value label. That is the planning engineer's mandatory-dots rule, arrived at independently.
+- **Banded legend, 10 m bands, a threshold (14 m head) and "negative (no service)"** as its own
+  class. Pressure range across frames runs about −5.7 to 67.6 m.
+- **"Show roads & water over the surface"** draws basemap streets above the fill so they stay
+  readable. That is a layer-order idea for Task 639.
+
+**What it changes in our design:**
+
+1. **The "never invents a value" argument for TIN applies to head, not to pressure.** Subtracting a
+   DEM makes the pressure surface leave the range of the junctions on purpose: in his frames the
+   lowest junction label reads 3.4 m while the status line reports a minimum of −5.7 m, so the
+   surface drops below every junction somewhere, most likely on the hill beside that junction. That
+   is not an artefact; it is terrain the model has no node on, which is the point of the method. So
+   the rule becomes: **interpolate head conservatively (TIN-linear still fits), and let pressure go
+   wherever the terrain takes it.** The legend's support sentence must then say both what the head
+   stands on (junctions) and what the pressure stands on (a DEM at a named resolution).
+2. **The boundary question now has two worked answers:** our hull plus max-edge mask (hard edge)
+   and his radius plus falloff (soft edge). Do not pick by taste. A fade hides where support ends;
+   a hard edge shows it. Hold to the hard edge as the default unless Tom rules otherwise, and
+   consider his falloff as opacity inside the hull.
+3. **Pressure zones are the open question for both of us.** Head jumps across a PRV, a pump or a
+   closed valve. Interpolating head across that line mixes two zones, and the HGL-first method makes
+   it worse, because the error is in the smooth field everything else trusts. His frames show one
+   zone, so they do not answer it. The barrier mask in §3 is still our answer.
+
+**Questions only he can answer** (for Tom's reply, if he wants to ask): what interpolates head inside
+the 400 m radius; whether d₀ fades opacity or value; how he treats a PRV or pump boundary; and
+whether he minds us citing the proof of concept by name.
 
 ### The extraction
 
@@ -704,7 +756,8 @@ into a user base larger than ours.
    — an argument in an issue thread that a ragged edge is better than a full rectangle loses to a
    screenshot, and a screenshot is a thing we can make.
 3. **Offer the design to epanet-js once it works**, pointing at a running page rather than a
-   proposal. At that point the conversation is about a demonstrated result, we have leverage we do
+   proposal. **Since 2026-10-01 they are building their own** (§2a), so the offer is a design
+   conversation with Luke Butler, not a code contribution. At that point the conversation is about a demonstrated result, we have leverage we do
    not have today, and if they want the code, the CLA question can be answered on its own merits
    with something concrete on the table.
 
@@ -737,8 +790,9 @@ in Step 0 and Step 3 happens without one.
   purposes"* — reads as TIN-linear, but **that is an inference, not their statement**.
 - **`d3.geoContour`'s behaviour and accuracy at sub-degree extents is undocumented.** It triangulates
   on the sphere; our drawing frame is Mercator. Spike before adopting.
-- **No source recommending contouring HGL rather than pressure was found.** The HGL-first idea in §2
-  is a hypothesis.
+- **No published source recommending contouring HGL rather than pressure was found.** The HGL-first
+  idea in §2 has one practitioner implementation (Luke Butler's unpublished proof of concept, §2a)
+  and no citation.
 - **Walski et al., *Advanced Water Distribution Modeling and Management*** could not be obtained; it
   is the most likely place a water-industry recommendation would exist.
 - **No numerical-parity claim between `d3-tricontour` and matplotlib's `tricontourf` should be
