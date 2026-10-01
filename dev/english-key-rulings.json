@@ -396,11 +396,6 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
-        "lpn_cp_remove": {
-            "on": "Remove",
-            "ruled": "2026-09-14",
-            "answer": "OK"
-        },
         "lpn_cp_remove_tip": {
             "on": "Removes this property from the design table. Values already typed on your assets are kept in the file and come back if you design the same key again.",
             "ruled": "2026-09-14",
@@ -413,11 +408,6 @@
         },
         "lpn_cp_restrict_allow": {
             "on": "Allow only these characters",
-            "ruled": "2026-09-14",
-            "answer": "Edited."
-        },
-        "lpn_cp_restrict_deny": {
-            "on": "Restrict these characters",
             "ruled": "2026-09-14",
             "answer": "Edited."
         },
@@ -516,11 +506,6 @@
             "ruled": "2026-09-25",
             "answer": "Edited. Probably no longer needed since we are not changing any of the entries."
         },
-        "lpn_crs_list": {
-            "on": "Projection",
-            "ruled": "2026-09-14",
-            "answer": "OK"
-        },
         "lpn_crs_list_tip": {
             "on": "The projections left by the two filters above. Choose one and press Select.",
             "ruled": "2026-09-14",
@@ -585,11 +570,6 @@
             "on": "Offers only the projections that cover the place the map is looking at. Turn it off to read the whole list.",
             "ruled": "2026-09-14",
             "answer": "OK"
-        },
-        "lpn_crsbox_title": {
-            "on": "Coordinate system",
-            "ruled": "2026-09-26",
-            "answer": "OK."
         },
         "lpn_curve_kind_effic": {
             "on": "Pump efficiency",
@@ -1047,14 +1027,6 @@
             "on": "Pressure and velocity",
             "ruled": "2026-09-01"
         },
-        "lpn_ff_limit_pressure": {
-            "on": "Pressure",
-            "ruled": "2026-09-01"
-        },
-        "lpn_ff_limit_velocity": {
-            "on": "Velocity",
-            "ruled": "2026-09-01"
-        },
         "lpn_ff_maxvelocity": {
             "on": "Highest velocity allowed",
             "ruled": "2026-09-01"
@@ -1448,24 +1420,8 @@
             "on": "This network has no reservoir or tank, so it has no source to reach. Only \"no links\" and \"no open links\" can be searched.",
             "ruled": "2026-08-29"
         },
-        "lpn_find_conn_nolinksource": {
-            "on": "No link path to a source",
-            "ruled": "2026-08-29"
-        },
         "lpn_find_conn_none": {
             "on": "Every node is connected.",
-            "ruled": "2026-08-29"
-        },
-        "lpn_find_conn_noopen": {
-            "on": "No open links at node",
-            "ruled": "2026-08-29"
-        },
-        "lpn_find_conn_noopensource": {
-            "on": "No open path to a source",
-            "ruled": "2026-09-01"
-        },
-        "lpn_find_conn_unlinked": {
-            "on": "No links at node",
             "ruled": "2026-08-29"
         },
         "lpn_find_filter_btn": {
@@ -2250,10 +2206,6 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
-        "lpn_library_rule_missing": {
-            "on": "⚠ This network has nothing called {id}",
-            "ruled": "2026-09-05"
-        },
         "lpn_library_rule_ok": {
             "on": "✓ This rule was read",
             "ruled": "2026-09-06",
@@ -2663,11 +2615,6 @@
         "lpn_new_create": {
             "on": "Create",
             "ruled": "2026-08-29"
-        },
-        "lpn_new_crs": {
-            "on": "Map projection",
-            "ruled": "2026-09-14",
-            "answer": "OK"
         },
         "lpn_new_place_hint": {
             "on": "Petaluma, California",
@@ -3117,10 +3064,6 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
-        "lpn_quality_age": {
-            "on": "Water age",
-            "ruled": "2026-09-01"
-        },
         "lpn_quality_chemical": {
             "on": "A chemical this file names (kept, not worked out)",
             "ruled": "2026-09-01"
@@ -3394,10 +3337,6 @@
             "on": "Highest velocity",
             "ruled": "2026-09-04"
         },
-        "lpn_scncmp_col_minpressure": {
-            "on": "Lowest pressure",
-            "ruled": "2026-09-04"
-        },
         "lpn_scncmp_current": {
             "on": "(currently open)",
             "ruled": "2026-09-06",
@@ -3471,10 +3410,6 @@
         "lpn_settings_default_is": {
             "on": "The default is {n}.",
             "ruled": "2026-09-02"
-        },
-        "lpn_settings_demand_multiplier": {
-            "on": "Demand multiplier",
-            "ruled": "2026-08-29"
         },
         "lpn_settings_demand_multiplier_tip": {
             "on": "One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed.",
@@ -3736,11 +3671,6 @@
         },
         "lpn_status_col_event": {
             "on": "Event",
-            "ruled": "2026-09-26",
-            "answer": "OK."
-        },
-        "lpn_status_col_time": {
-            "on": "Time",
             "ruled": "2026-09-26",
             "answer": "OK."
         },
@@ -4400,6 +4330,11 @@
             "on": "P as annual energy",
             "ruled": "2026-09-06"
         },
+        "points_data_heading": {
+            "on": "Calculator data<br />(use Copy to see format)",
+            "ruled": "2026-09-30",
+            "answer": "For mi and wi calculators, reword Points Data to \"Calculator data (use Copy to see format)\""
+        },
         "u_day": {
             "on": "day",
             "ruled": "2026-09-01"
@@ -4407,6 +4342,26 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
+        },
+        "lpn_result_pressure": {
+            "on": "Pressure",
+            "ruled": "2026-09-01"
+        },
+        "lpn_result_velocity": {
+            "on": "Velocity",
+            "ruled": "2026-09-01"
+        },
+        "lpn_library_control_missing": {
+            "on": "⚠ This network has nothing called {id}",
+            "ruled": "2026-09-05"
+        },
+        "bpn_demand_mult": {
+            "on": "Demand multiplier",
+            "ruled": "2026-08-29"
+        },
+        "bpn_p_min": {
+            "on": "Lowest pressure",
+            "ruled": "2026-09-04"
         }
     }
 }

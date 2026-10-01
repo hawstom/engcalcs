@@ -296,6 +296,41 @@
             "words": "feat/table-tab-keys, feat/frequency-plot, feat/pane-height",
             "context": "His pasted list of 2026-09-30 said 'Done. Close, merge, and delete branch.' for feat/table-tab-keys, feat/frequency-plot and feat/pane-height; because a pasted all-clear cannot be recorded, CC asked in the session which of the three may merge now, and he selected all three.",
             "pin_note": "Pinned one commit past what he tested: CC's merge of master into the branch (no feature change; frequency-plot's two generated-file conflicts taken from master's side). Its new English is translated on a separate sprint branch after the merge."
+        },
+        "feat/find-filter": {
+            "head": "df237d47",
+            "date": "2026-09-30",
+            "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
+            "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
+            "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
+        },
+        "feat/scenario-preset": {
+            "head": "b925cd58",
+            "date": "2026-09-30",
+            "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
+            "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
+            "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
+        },
+        "feat/graph-tab-keys": {
+            "head": "d2738ec3",
+            "date": "2026-09-30",
+            "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
+            "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
+            "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
+        },
+        "feat/fireflow-scope": {
+            "head": "6e512d9b",
+            "date": "2026-09-30",
+            "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
+            "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
+            "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
+        },
+        "feat/help-menu": {
+            "head": "c60d660e",
+            "date": "2026-09-30",
+            "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
+            "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
+            "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
         }
     }
 }

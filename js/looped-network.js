@@ -3192,6 +3192,68 @@ var EngCalcs = EngCalcs || {};
 		// its own localized word, never echo this string, so the stored data stays language-free.
 		return [{ id: 'base', name: 'Base', isBase: true, overrides: {} }];
 	}
+	// **THE READY-MADE SCENARIOS A NEW PROJECT IS BORN WITH** (ROADMAP Task 721; Tom, 2026-09-30:
+	// *"could we provide some pre-packaged Scenarios in all new projects? ... '1. Flow test: Static,
+	// 2. Flow test: Mid, 3. Flow test: Max, 4. Average Day, 5. Max Day, 6. Peak hour, 7. Fire plus
+	// max day'"*). His numbers are part of the names: scenariosForDisplay() sorts by name, and they
+	// are what keeps the list in his order.
+	//
+	// **ORDINARY SCENARIOS, AND ONLY WHAT THE MODEL ALREADY EXPRESSES.** Each is a row exactly like
+	// one createScenario() makes -- renamable, deletable, editable -- holding at most a demand
+	// multiplier. The name is written in the visitor's language at birth because it is the user's
+	// data from then on, like a name typed at the New scenario prompt. The id is language-free and
+	// descriptive rather than s1..s7, so it keys the menu tip (lpn_scenario_preset_<id>_tip) and a
+	// scenario the user adds next is still s1.
+	//
+	// **THE MULTIPLIERS: 2.0 FOR MAXIMUM DAY, 3.0 FOR PEAK HOUR**, times average day. National
+	// Research Council, *Drinking Water Distribution Systems: Assessing and Reducing Risks* (2006),
+	// ch. 5, pp. 192-193, citing Walski et al., *Advanced Water Distribution Modeling and
+	// Management* (2003): "For most water systems the ratio of the maximum day water demand to the
+	// average day water demand ranges from 1.2 to 3.0, and the ratio of the peak hour to the average
+	// day is typically between 3.0 and 6.0." They are starting points inside those ranges, stated in
+	// the tip, and the user sets their own system's in Settings > Hydraulics > Demand multiplier.
+	//
+	// **THE FLOW TESTS HOLD NO FLOW, BECAUSE WE CANNOT KNOW WHICH HYDRANT.** Static is the test with
+	// nothing flowing; Mid and Max are where the user gives the flowing hydrant's junction its test
+	// flow, which their tip says. A guessed flow at a guessed junction would be a number nobody
+	// typed. They seed the document's multiplier the way createScenario() does: a test is read at
+	// whatever demand the system has that day.
+	//
+	// **FIRE PLUS MAX DAY IS THE MAX DAY MULTIPLIER AND NOTHING ELSE**: Fire flow analysis already
+	// draws each junction's fire flow on top of the demand of the scenario it is run in, so this is
+	// the scenario to run it in, which its tip says.
+	//
+	// **ONLY A NEW PROJECT.** newProject() and the first visit call this; an opened file, an imported
+	// .inp and Delete network keep defaultScenarios(), so no file ever written changes shape. A new
+	// project made from an open one gets these, not the open one's list: a scenario is overrides
+	// keyed to that network's elements, which the new empty network does not have.
+	var LPN_PRESET_SCENARIOS = [
+		{ id: 'flow_static', key: 'lpn_scenario_preset_flow_static', en: '1. Flow test: Static' },
+		{ id: 'flow_mid', key: 'lpn_scenario_preset_flow_mid', en: '2. Flow test: Mid' },
+		{ id: 'flow_max', key: 'lpn_scenario_preset_flow_max', en: '3. Flow test: Max' },
+		{ id: 'average_day', key: 'lpn_scenario_preset_average_day', en: '4. Average Day', dm: 1 },
+		{ id: 'max_day', key: 'lpn_scenario_preset_max_day', en: '5. Max Day', dm: 2 },
+		{ id: 'peak_hour', key: 'lpn_scenario_preset_peak_hour', en: '6. Peak hour', dm: 3 },
+		{ id: 'fire_max_day', key: 'lpn_scenario_preset_fire_max_day', en: '7. Fire plus max day', dm: 2 }
+	];
+	function presetScenarios() {
+		var pc = EngCalcs.pageConfig || {}, docDm = (settings.hydraulics || {}).demandMultiplier;
+		return defaultScenarios().concat(LPN_PRESET_SCENARIOS.map(function (p) {
+			var s = { id: p.id, name: pc[p.key] || p.en, overrides: {} };
+			if (p.dm !== undefined) { s.demandMultiplier = p.dm; }
+			else if (typeof docDm === 'number' && isFinite(docDm)) { s.demandMultiplier = docDm; }
+			return s;
+		}));
+	}
+	// The tip a ready-made scenario's menu row carries, found by its id. It stays after a rename:
+	// the row is still the scenario that was made for that job.
+	function presetScenarioTip(s) {
+		var pc = EngCalcs.pageConfig || {}, i;
+		for (i = 0; i < LPN_PRESET_SCENARIOS.length; i++) {
+			if (LPN_PRESET_SCENARIOS[i].id === s.id) { return pc[LPN_PRESET_SCENARIOS[i].key + '_tip']; }
+		}
+		return undefined;
+	}
 	var scenarios = defaultScenarios();
 	// A blank name means "not named yet"; the UI renders its own localized "Untitled" for that case
 	// rather than storing an English word in the user's data.
@@ -4435,7 +4497,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return [
 			['allow', pc.lpn_cp_restrict_allow || 'Allow only these characters'],
-			['deny', pc.lpn_cp_restrict_deny || 'Restrict these characters']
+			['deny', pc.lpn_cp_restrict || 'Restrict these characters']
 		];
 	}
 	function customPropOptionLabel(opts, value, fallback) {
@@ -4551,8 +4613,14 @@ var EngCalcs = EngCalcs || {};
 		// the project's multiplier, counting the mere presence of the field would badge every
 		// freshly created scenario (1) before anybody had changed anything -- the opposite of the
 		// misreading the count exists to prevent.
+		//
+		// **A DOCUMENT THAT STATES NONE MEANS 1** (Task 721), which is what docDemandMultiplier()
+		// solves with. So a scenario stating 1 on such a document changes nothing and counts nothing:
+		// the ready-made 4. Average Day would otherwise read (1) beside a value equal to Base's.
+		var docDm = (settings.hydraulics || {}).demandMultiplier;
+		if (!(typeof docDm === 'number' && isFinite(docDm))) { docDm = 1; }
 		if (typeof scn.demandMultiplier === 'number' && isFinite(scn.demandMultiplier)
-			&& scn.demandMultiplier !== (settings.hydraulics || {}).demandMultiplier) { total += 1; }
+			&& scn.demandMultiplier !== docDm) { total += 1; }
 		return total;
 	}
 	// Every scenario's overrides on one element -- what a Base-side deletion is about to destroy,
@@ -4930,6 +4998,7 @@ var EngCalcs = EngCalcs || {};
 				// be mistaken for a command's glyph.
 				label: (s.id === scn.id ? '✓ ' : '  ') + scenarioDisplayName(s)
 					+ (s.isBase ? '' : ' (' + overrideCount(s) + ')'),
+				tip: presetScenarioTip(s),
 				fn: function () { switchScenario(s.id); }
 			});
 		});
@@ -4996,7 +5065,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (!scenarioBasicMode) {
 			rows.push({
-				icon: 'scenarios', label: pc.lpn_alt_title || 'Alternatives',
+				icon: 'scenarios', label: pc.lpn_alt_title || 'Alternatives preview',
 				fn: function () { openAlternativesBox(); }
 			});
 		}
@@ -8209,7 +8278,7 @@ var EngCalcs = EngCalcs || {};
 			stddev: pc.lpn_color_mode_stddev,
 			pretty: pc.lpn_color_mode_pretty,
 			log: pc.lpn_color_mode_log,
-			pressure: pc.lpn_color_mode_pressure,
+			pressure: pc.lpn_result_pressure,
 			manual: pc.lpn_color_mode_manual
 		};
 		return names[m.key] || m.name;
@@ -17781,13 +17850,27 @@ var EngCalcs = EngCalcs || {};
 		}
 		return 'ok';
 	}
+	// **ONE KEY PER CONDITION, CAPITALIZED HERE** (Task 699, Tom 2026-09-30: "do the Find
+	// redesign"). A result row used to read a second key per condition that differed from the
+	// pull-down's only in its first letter, so every language translated each phrase twice and the
+	// two could drift. The row now prints the pull-down's own words with the first letter raised.
+	// Raising is the safe direction: lowering would be wrong in a language that capitalizes nouns.
+	// The locale is the page's own `<html lang>`, as the Find collator reads it, so a Turkish i
+	// becomes a dotted capital.
+	function findConnCapitalize(s) {
+		var lang = (document.documentElement && document.documentElement.lang) || undefined, first;
+		s = String(s || '');
+		if (!s) { return s; }
+		first = s.charAt(0);
+		try { first = first.toLocaleUpperCase(lang); } catch (e) { first = first.toUpperCase(); }
+		return first + s.slice(1);
+	}
 	function findConnLabel(st) {
-		var pc = EngCalcs.pageConfig || {};
-		if (st === 'conn-unlinked') { return pc.lpn_find_conn_unlinked || 'No links at node'; }
-		if (st === 'conn-noopen') { return pc.lpn_find_conn_noopen || 'No open links at node'; }
-		if (st === 'conn-nolinksource') { return pc.lpn_find_conn_nolinksource || 'No link path to a source'; }
-		if (st === 'conn-noopensource') {
-			return pc.lpn_find_conn_noopensource || 'No open path to a source';
+		var i, defs;
+		if (st === 'ok' || FIND_CONN_OPS.indexOf(st) < 0) { return ''; }
+		defs = findConnOpDefs();
+		for (i = 0; i < defs.length; i++) {
+			if (defs[i][0] === st) { return findConnCapitalize(defs[i][1]); }
 		}
 		return '';
 	}
@@ -20578,6 +20661,10 @@ var EngCalcs = EngCalcs || {};
 	// the strip.
 	paneTabs.push({
 		id: 'timeseries', panel: 'lpn_pane_timeseries', label: 'lpn_ts_menu', tip: 'lpn_ts_tip',
+		// **WHERE THE TAB'S OWN CONTROLS LIVE, FOR paneFocusTabFirstControl() (Task 743)** --
+		// narrower than `panel`, which also holds the chart: rebuildTsForm() builds the group and
+		// quantity pickers into exactly this div.
+		formId: 'lpn_ts_form',
 		show: function () { tsTabShow(); },
 		// Every solve and every document change while this is the tab on show -- and that includes
 		// every step of the transport, which is what keeps the `now` line under the scrubber.
@@ -20590,6 +20677,7 @@ var EngCalcs = EngCalcs || {};
 	// placed Time series: a new drawing joins the drawings, inside their stretch of the strip.
 	paneTabs.push({
 		id: 'frequency', panel: 'lpn_pane_frequency', label: 'lpn_freq_menu', tip: 'lpn_freq_tip',
+		formId: 'lpn_freq_form',
 		show: function () { freqTabShow(); },
 		// Every solve, every edit and every step of the transport, so the curve is always the
 		// map's own moment.
@@ -20602,6 +20690,7 @@ var EngCalcs = EngCalcs || {};
 	// print acts on a TABLE, and the tabs it applies to are now the ones next to it.
 	paneTabs.push({
 		id: 'profile', panel: 'lpn_pane_profile', label: 'lpn_profile_menu', tip: 'lpn_profile_tip',
+		formId: 'lpn_profile_form',
 		// **PRESSING PROFILE AGAIN IS THE COMMAND THAT CHOOSES A PATH** (Task 506). Tom,
 		// 2026-08-24: *"Our button to create a new path can be the Profile button. That removes all
 		// our left-side controls."* So this tab has ONE meaning stated once -- show me the profile
@@ -20637,6 +20726,28 @@ var EngCalcs = EngCalcs || {};
 		if (!panel) { return; }
 		panel.addEventListener('pointerenter', function () { profileHoverSet(true); });
 		panel.addEventListener('pointerleave', function () { profileHoverSet(false); });
+	}());
+	// **CTRL+SHIFT+PAGEDOWN/PAGEUP STILL REACHES paneStepTab() FROM INSIDE A GRAPH OR PROFILE TAB'S
+	// OWN CONTROLS** (Task 743). Wired here, once per panel, at module load -- the same moment and
+	// the same reasoning as wireProfileHover() just above: these three panels are static markup,
+	// never rebuilt, so one listener apiece for the life of the page is enough, and wiring it here
+	// (rather than in wirePane(), which only the real page's own bootstrap ever calls) means a
+	// harness that drives setPaneTab()/openPane() directly, with no DOMContentLoaded and no
+	// wirePane(), still has it. Attached to the PANEL, not to each control inside it: a `<select>`
+	// has its own idea of what PageDown does (paging its option list), and only an ancestor's
+	// bubble-phase `preventDefault()` stops that default action once this claims the key.
+	(function wireGraphTabKeys() {
+		paneTabs.forEach(function (t) {
+			var panel;
+			if (paneTableById(t.id)) { return; }   // a table wires its own <table> (paneWireTable)
+			panel = document.getElementById(t.panel);
+			if (!panel) { return; }
+			panel.addEventListener('keydown', function (e) {
+				var key = e && e.key, jump = !!(e && (e.ctrlKey || e.metaKey)), ext = !!(e && e.shiftKey);
+				if (!jump || !ext || (key !== 'PageDown' && key !== 'PageUp')) { return; }
+				if (paneStepTab(t.id, key === 'PageDown' ? 1 : -1) && e.preventDefault) { e.preventDefault(); }
+			});
+		});
 	}());
 	// **THE PANE OPENS ON THE FIRST TABLE, WHICH IS THE CHANGE THIS REORDER MAKES.** paneTabs[0] is
 	// no longer the profile, and that is right: a reader who opens the pane without naming a tab
@@ -21111,7 +21222,7 @@ var EngCalcs = EngCalcs || {};
 	function familyExampleWord(pc, key) {
 		var f = FAMILY_EXAMPLE_FIELDS[key];
 		if (f) { return colorFieldLabel(f[0], f[1]); }
-		if (key === 'status') { return pc.lpn_color_example_status || 'Status'; }
+		if (key === 'status') { return pc.lpn_result_status || 'Status'; }
 		if (key === 'material') { return pc.lpn_color_example_material || 'Material'; }
 		return key;
 	}
@@ -22911,6 +23022,60 @@ var EngCalcs = EngCalcs || {};
 	// hides rows silently is the whole risk here, a filtered table SAYS what it is filtered by, in
 	// the query's own words, above the rows, with the way out beside it.
 	var paneFilters = {};
+	// **AN EDITED ROW STAYS UNTIL THE FILTER IS PRESSED AGAIN** (ROADMAP Task 738; Tom, 2026-09-30,
+	// ruling for Declan's rule with Ida's marking). Tom, 2026-09-28: editing a filtered value so the
+	// row no longer matched made it vanish from under him, and a Ctrl+Enter fill into a filtered
+	// selection made the whole selection vanish. So a row is in the table if it MATCHES, or if it
+	// has been EDITED since Filter in table was pressed -- QGIS's attribute-table rule. The filter is
+	// still re-asked on every draw (a row that newly matches still arrives); only the leaving is held.
+	//
+	// **"EDITED" IS DETECTED, NOT REPORTED.** Typing in a cell, Properties, Find and replace, both
+	// fills, a drag and Ctrl+Z all change an element by different doors, and a flag set at each door
+	// is a list somebody forgets to extend. Instead `paneFilterSeen` holds, per table, the
+	// fingerprint each row had the first time the filter admitted it, and a row whose fingerprint
+	// has moved since is edited -- whatever moved it. Results are not in the fingerprint (they live
+	// in lastSolveResult, not on the element), so a solve never counts as an edit. Once edited, a row
+	// is in `paneFilterKept` until the filter is set again: an undo that makes it match again simply
+	// un-marks it, and it never vanishes on its own.
+	var paneFilterSeen = {}, paneFilterKept = {};
+	function paneFilterForgetEdits(id) {
+		if (id) { delete paneFilterSeen[id]; delete paneFilterKept[id]; return; }
+		paneFilterSeen = {}; paneFilterKept = {};
+	}
+	// **ONLY WHAT AN EDIT CAN CHANGE**: the element's own values, and its override in each scenario,
+	// held PER SCENARIO ID. Switching scenario changes neither. Adding or deleting a scenario is not
+	// an edit of the row either (Perry's pre-review, 2026-09-30: one list of every scenario's entry
+	// changed length, so creating a scenario marked every filtered row). A scenario the snapshot has
+	// not met is compared against "no override", so an override written into a new scenario IS an
+	// edit; a scenario that has gone is simply not asked about.
+	function paneFilterOverride(s, key) {
+		return JSON.stringify((s.overrides && s.overrides[key]) || null);
+	}
+	function paneFilterFingerprint(el) {
+		var key = ovKey(el), ov = {};
+		scenarios.forEach(function (s) { ov[s.id] = paneFilterOverride(s, key); });
+		return { el: JSON.stringify(el), ov: ov };
+	}
+	function paneFilterEdited(fp, el) {
+		var key = ovKey(el), i, s, was;
+		if (fp.el !== JSON.stringify(el)) { return true; }
+		for (i = 0; i < scenarios.length; i++) {
+			s = scenarios[i];
+			was = Object.prototype.hasOwnProperty.call(fp.ov, s.id) ? fp.ov[s.id] : 'null';
+			if (was !== paneFilterOverride(s, key)) { return true; }
+		}
+		return false;
+	}
+	// A rename changes the key a row is known by, so both keys are held: the new one so the row does
+	// not vanish under an ID filter, the old one so an undo of the rename does not either.
+	function paneFilterRenamed(group, oldId, newId) {
+		Object.keys(paneFilterSeen).forEach(function (id) {
+			var seen = paneFilterSeen[id], kept = paneFilterKept[id] || (paneFilterKept[id] = {});
+			if (seen[group + ':' + oldId] === undefined) { return; }
+			kept[group + ':' + oldId] = true;
+			kept[group + ':' + newId] = true;
+		});
+	}
 	function paneFilterQuery(spec) {
 		return (spec && paneFilters[spec.id]) ? paneFilters[spec.id] : '';
 	}
@@ -22918,6 +23083,8 @@ var EngCalcs = EngCalcs || {};
 		var spec = paneTableById(id);
 		if (!spec) { return false; }
 		if (query) { paneFilters[id] = String(query); } else { delete paneFilters[id]; }
+		// Pressing Filter in table again is the re-apply: rows kept for having been edited go now.
+		paneFilterForgetEdits(id);
 		// The rows and the banner both change, so the table is rebuilt rather than refilled -- and
 		// the remembered ORDER goes with it, because a filtered table is a different list.
 		paneTableReset(spec);
@@ -22945,10 +23112,24 @@ var EngCalcs = EngCalcs || {};
 		if (spec.group === 'customer') { return (doc.customers || []).slice(); }
 		return pool.filter(function (x) { return x.type === spec.type; });
 	}
+	// **THE ONE PLACE A ROW'S MEMBERSHIP IS DECIDED**, and so the one place an edit is noticed.
+	// `spec.filterStale` is the rows kept only for having been edited -- what the table dims and
+	// marks and the banner counts.
 	function paneTableElements(spec) {
-		var rows = paneTableAllElements(spec), keys = paneFilterKeys(spec);
-		if (!keys) { return rows; }
-		return rows.filter(function (x) { return keys[spec.group + ':' + x.id] === true; });
+		var rows = paneTableAllElements(spec), keys = paneFilterKeys(spec), seen, kept, stale = {}, n = 0;
+		if (!keys) { spec.filterStale = null; spec.filterStaleCount = 0; return rows; }
+		seen = paneFilterSeen[spec.id] || (paneFilterSeen[spec.id] = {});
+		kept = paneFilterKept[spec.id] || (paneFilterKept[spec.id] = {});
+		rows = rows.filter(function (x) {
+			var k = spec.group + ':' + x.id, match = keys[k] === true;
+			if (!kept[k] && seen[k] !== undefined && paneFilterEdited(seen[k], x)) { kept[k] = true; }
+			if (match && seen[k] === undefined) { seen[k] = paneFilterFingerprint(x); }
+			if (!match && kept[k]) { stale[x.id] = true; n++; }
+			return match || kept[k] === true;
+		});
+		spec.filterStale = stale;
+		spec.filterStaleCount = n;
+		return rows;
 	}
 	// **A COLUMN MAY DECLARE WHEN IT EXISTS, and every reader of the list goes through here**
 	// (Task 566). The two reaction coefficients are inputs to an analysis the document may not be
@@ -24147,11 +24328,51 @@ var EngCalcs = EngCalcs || {};
 	// The line above a filtered table: what it is filtered by, how much of the table is showing,
 	// and the way out. Null where there is no filter, so an unfiltered table gains nothing.
 	function paneFilterNoteText(spec, rows) {
-		var pc = EngCalcs.pageConfig || {};
-		return String(pc.lpn_pane_filter_note || 'Filtered by {q}. Showing {n} of {all}.')
+		var pc = EngCalcs.pageConfig || {}, text;
+		text = String(pc.lpn_pane_filter_note || 'Filtered by {q}. Showing {n} of {all}.')
 			.split('{q}').join(paneFilterQuery(spec))
 			.split('{n}').join(String(rows.length))
 			.split('{all}').join(String(paneTableAllElements(spec).length));
+		// Task 738: the rows the table is holding only because they were edited, counted.
+		if (spec.filterStaleCount) {
+			text += ' ' + String(pc.lpn_pane_filter_stale || 'Rows that no longer match: {n}.')
+				.split('{n}').join(String(spec.filterStaleCount));
+		}
+		return text;
+	}
+	// **IDA'S MARKING** (Task 738): a row kept only for having been edited is dimmed and its ID cell
+	// carries a warning sign, so a row that no longer answers the query cannot pass for one that
+	// does. Run after every build AND every refill, because a row can stop (or start again) matching
+	// without the set of rows changing -- which is the refill path -- and the banner count with it.
+	function paneFilterMarkRows(spec, rows) {
+		var stale = spec.filterStale || {};
+		rows.forEach(function (el) {
+			var tds = spec.tds && spec.tds[el.id], idTd = tds && tds.id, anyTd, tr,
+				on = stale[el.id] === true, mark, i;
+			if (!tds) { return; }
+			// The row is dimmed even with the ID column hidden; only the sign needs that column.
+			anyTd = idTd || tds[Object.keys(tds)[0]];
+			tr = anyTd && anyTd.parentNode;
+			if (tr) {
+				tr.className = String(tr.className || '').replace(/(^|\s)lpn-pane-stale(?=\s|$)/g, '').trim() +
+					(on ? ' lpn-pane-stale' : '');
+			}
+			if (!idTd) { return; }
+			mark = null;
+			for (i = 0; i < (idTd.children || []).length; i++) {
+				if (/(^|\s)lpn-pane-stale-mark(\s|$)/.test(idTd.children[i].className || '')) { mark = idTd.children[i]; }
+			}
+			if (on && !mark) {
+				mark = document.createElement('span');
+				mark.className = 'lpn-pane-stale-mark';
+				mark.setAttribute('aria-hidden', 'true');
+				mark.textContent = '\u26A0';
+				if (idTd.firstChild) { idTd.insertBefore(mark, idTd.firstChild); } else { idTd.appendChild(mark); }
+			} else if (!on && mark) {
+				idTd.removeChild(mark);
+			}
+		});
+		if (spec.filterNoteText) { spec.filterNoteText.textContent = paneFilterNoteText(spec, rows); }
 	}
 	function paneFilterBanner(spec, rows, withClear) {
 		var pc = EngCalcs.pageConfig || {}, q = paneFilterQuery(spec), wrap, text, btn;
@@ -24161,6 +24382,9 @@ var EngCalcs = EngCalcs || {};
 		text = document.createElement('span');
 		text.textContent = paneFilterNoteText(spec, rows);
 		wrap.appendChild(text);
+		// The table's own banner is refreshed in place by paneFilterMarkRows(); the Find panel's copy
+		// (withClear false) is not this table's to hold.
+		if (withClear) { spec.filterNoteText = text; }
 		if (withClear) {
 			btn = document.createElement('button');
 			btn.type = 'button';
@@ -24182,6 +24406,7 @@ var EngCalcs = EngCalcs || {};
 		spec.tds = {};
 		spec.initEmCache = {};   // the rule's inputs (the rows) are about to change under it
 		spec.painted = null;   // fresh <td>s carry no class: see paneSelPaint()
+		spec.filterNoteText = null;
 		host.innerHTML = '';
 		// **A FILTERED TABLE SAYS SO BEFORE IT SAYS ANYTHING ELSE**, empty or not (Task 597). Hidden
 		// rows with no visible cause is the one way this feature can mislead somebody.
@@ -24234,13 +24459,15 @@ var EngCalcs = EngCalcs || {};
 			note.addEventListener('keydown', function (e) {
 				var key = e && e.key, jump = !!(e && (e.ctrlKey || e.metaKey)), ext = !!(e && e.shiftKey);
 				if (!jump || !ext || (key !== 'PageDown' && key !== 'PageUp')) { return; }
-				if (paneSwitchTableTab(spec, key === 'PageDown' ? 1 : -1) && e.preventDefault) { e.preventDefault(); }
+				if (paneStepTab(spec.id, key === 'PageDown' ? 1 : -1) && e.preventDefault) { e.preventDefault(); }
 			});
 			host.appendChild(note);
 			return;
 		}
 		table = document.createElement('table');
-		table.className = 'lpn-pane-table';
+		// Under a filter the ID column keeps room for Task 738's warning sign from the start, so the
+		// first sign to appear does not widen the column and shift the whole table sideways.
+		table.className = 'lpn-pane-table' + (filterNote ? ' lpn-pane-filtered' : '');
 		// **A <colgroup> IS HOW A TABLE COLUMN IS GIVEN A WIDTH**, rather than a width on each cell:
 		// one element per column, so a drag rewrites one style instead of four hundred, and the
 		// heading and its cells cannot end up at two different widths. The inputs keep their own
@@ -24643,6 +24870,8 @@ var EngCalcs = EngCalcs || {};
 				}
 			});
 		});
+		// Task 738's marks and count, which a refill changes as surely as it changes a value.
+		paneFilterMarkRows(spec, rows);
 	}
 	function activeElementSafe() {
 		try { return document.activeElement; } catch (e) { return null; }
@@ -24934,7 +25163,7 @@ var EngCalcs = EngCalcs || {};
 		if (!rows.length || !cols.length) {
 			// **AN EMPTY TABLE HAS NO CELL, BUT SOMETHING STILL HAS TO HOLD THE CARET** (Task 690,
 			// Perry's pre-review on b37ec130): every caller of this function -- setPaneTab(),
-			// openPane(), and paneSwitchTableTab() switching onto a table with no rows -- needs
+			// openPane(), and paneStepTab() switching onto a table with no rows -- needs
 			// Ctrl+Shift+PageDown/PageUp to keep working from here, and that shortcut is wired
 			// (renderPaneTable()) onto the "none of these yet" note that stands in for the missing
 			// <table>. Landing there is what lets the NEXT press find a keydown listener to answer.
@@ -26130,37 +26359,90 @@ var EngCalcs = EngCalcs || {};
 		});
 		return handle;
 	}
+	// **A TAB BUTTON THE STRIP ITSELF HAS HIDDEN IS SKIPPED; A VISIBLE ONE NEVER IS** (Task 743).
+	// Nothing in this suite hides a tab button today -- every one of the eight always shows -- but
+	// the strip's own convention for hiding a control is `btn.style.display = 'none'` (see the
+	// Print button, a few lines above this one), so a future "no results yet" graph tab hidden that
+	// way is a future case this already answers, without a second door for "unavailable."
+	function paneTabIsHidden(tab) {
+		var btn = document.getElementById('lpn_pane_tab_' + tab.id);
+		return !!(btn && btn.style && btn.style.display === 'none');
+	}
+	function paneTabIndex(id) {
+		var i;
+		for (i = 0; i < paneTabs.length; i++) { if (paneTabs[i].id === id) { return i; } }
+		return -1;
+	}
+	// **THE GRAPH'S (OR PROFILE'S) FIRST CONTROL CATCHES THE CARET** (Task 743), so the NEXT
+	// Ctrl+Shift+PageDown/PageUp has somewhere to read from, exactly as a table's first cell does.
+	// Found generically -- `select`, else `input`, else `textarea`, else `button`, whichever kind
+	// of control the tab's own panel builds first (Time series' and Frequency's own group picker
+	// is a `select` and is always built first; Profile's only control is its Edit `button`) --
+	// rather than naming each graph's quantity picker by id, so a future graph tab needs no new
+	// case here. One selector shape per call, a bare tag name, same as every other querySelector()
+	// in this file. A panel with no control at all (nothing plotted, nothing to choose) still
+	// needs a landing spot, so the panel itself becomes focusable.
+	function paneFocusTabFirstControl(tab) {
+		// **SEARCHED FROM `formId` WHEN THE TAB DECLARES ONE** -- the form div rebuildTsForm() /
+		// rebuildFreqForm() / rebuildProfileForm() actually build their controls into, narrower
+		// than `panel`, which also holds the chart. A future graph tab with no `formId` is
+		// searched from its whole panel instead, so declaring one is an optimization, not a
+		// requirement.
+		var root = document.getElementById(tab.formId || tab.panel), panel, el;
+		if (!root) { return false; }
+		el = root.querySelector('select') || root.querySelector('input') ||
+			root.querySelector('textarea') || root.querySelector('button');
+		if (!el) {
+			panel = document.getElementById(tab.panel) || root;
+			if (panel.tabIndex < 0) { panel.tabIndex = 0; }
+			el = panel;
+		}
+		if (!el.focus) { return false; }
+		try { el.focus({ preventScroll: true }); } catch (e) { el.focus(); }
+		return true;
+	}
 	/**
-	 * Ctrl+Shift+PageDown/PageUp between the DATA TABLES only (Task 690). `paneTables()`, never
-	 * `paneTabs` -- the latter also holds Time series and Profile, which carry no cell grid to land
-	 * a caret in, and this must not reach for either of them.
+	 * Ctrl+Shift+PageDown/PageUp across the WHOLE bottom-pane tab strip, tables and graph tabs
+	 * alike -- `paneTabs`, never only `paneTables()` (Task 743, Tom: *"It would be nice if it also
+	 * could proceed to the graphs."*, extending Task 690's table-only stepping).
 	 *
-	 * **EXCEL DOES NOT WRAP AT THE ENDS, SO NEITHER DOES THIS.** Past the last table or before the
+	 * **EXCEL DOES NOT WRAP AT THE ENDS, SO NEITHER DOES THIS.** Past the last tab or before the
 	 * first, the keystroke is still claimed (so the browser never sees it) but nothing moves --
-	 * Excel's own Ctrl+PageDown on its last sheet does exactly that, silently.
+	 * Excel's own Ctrl+PageDown on its last sheet does exactly that, silently. A hidden tab (see
+	 * `paneTabIsHidden()`) is stepped over on the way, never landed on and never counted as the end.
 	 *
-	 * **FOCUS LANDS ON THE SAME COLUMN KEY IF THE NEW TABLE HAS ONE, ELSE THE FIRST COLUMN, AND THE
-	 * SAME ROW INDEX, CLAMPED TO THE NEW TABLE'S ROW COUNT.** Two tables rarely share a row space --
-	 * Pipes and Junctions have no row in common -- but they often share a COLUMN, and Excel's own
-	 * sheet switch keeps the reader in the same column and row position it left, falling back to A1
-	 * only where that stops meaning anything.
+	 * **BETWEEN TWO TABLES, FOCUS LANDS ON THE SAME COLUMN KEY IF THE NEW TABLE HAS ONE, ELSE THE
+	 * FIRST COLUMN, AND THE SAME ROW INDEX, CLAMPED TO THE NEW TABLE'S ROW COUNT** -- unchanged from
+	 * Task 690. Two tables rarely share a row space -- Pipes and Junctions have no row in common --
+	 * but they often share a COLUMN, and Excel's own sheet switch keeps the reader in the same
+	 * column and row position it left, falling back to A1 only where that stops meaning anything.
+	 * Stepping FROM a graph/profile tab, or ONTO one, carries nothing across -- there is no column
+	 * or row on either side -- so a table landed on from a graph opens at its home cell, and a graph
+	 * landed on from anywhere opens on its own first control (`paneFocusTabFirstControl()`).
 	 *
 	 * **A DESTINATION TABLE WITH NO ROWS STILL BECOMES THE SHOWN TAB** -- no table is ever hidden
 	 * from the strip for being empty, so none is skipped here either -- it simply has no cell to
 	 * focus, exactly as clicking that tab by hand would leave it.
 	 */
-	function paneSwitchTableTab(spec, dir) {
-		var tables = paneTables(), idx = -1, i, newSpec, newIdx,
-			rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
-			box = paneSelBox(spec, rows, cols), colKey = null, rowIdx = 0,
-			newRows, newCols, newColIdx, newRowIdx;
-		for (i = 0; i < tables.length; i++) { if (tables[i].id === spec.id) { idx = i; break; } }
+	function paneStepTab(fromId, dir) {
+		var idx = paneTabIndex(fromId), newIdx, newTab, fromSpec = paneTableById(fromId),
+			rows, cols, box, colKey = null, rowIdx = 0,
+			newSpec, newRows, newCols, newColIdx, newRowIdx;
 		if (idx < 0) { return false; }
+		if (fromSpec) {
+			rows = paneTableRowsInOrder(fromSpec); cols = paneCols(fromSpec);
+			box = paneSelBox(fromSpec, rows, cols);
+			if (box) { colKey = cols[box.ac].key; rowIdx = box.ar; }
+		}
 		newIdx = idx + dir;
-		if (newIdx < 0 || newIdx >= tables.length) { return true; }
-		newSpec = tables[newIdx];
-		if (box) { colKey = cols[box.ac].key; rowIdx = box.ar; }
-		setPaneTab(newSpec.id);
+		while (newIdx >= 0 && newIdx < paneTabs.length && paneTabIsHidden(paneTabs[newIdx])) {
+			newIdx += dir;
+		}
+		if (newIdx < 0 || newIdx >= paneTabs.length) { return true; }
+		newTab = paneTabs[newIdx];
+		setPaneTab(newTab.id);
+		newSpec = paneTableById(newTab.id);
+		if (!newSpec) { paneFocusTabFirstControl(newTab); return true; }
 		newRows = paneTableRowsInOrder(newSpec); newCols = paneCols(newSpec);
 		if (!newRows.length || !newCols.length) { return true; }
 		newColIdx = colKey !== null ? paneIndexOfKey(newCols, colKey) : -1;
@@ -26264,7 +26546,7 @@ var EngCalcs = EngCalcs || {};
 		// blur -- so switching tables can never cost the person the character they just typed.
 		if (jump && ext && (key === 'PageDown' || key === 'PageUp')) {
 			if (editing && active) { paneCommitCell(active); }
-			return paneSwitchTableTab(spec, key === 'PageDown' ? 1 : -1);
+			return paneStepTab(spec.id, key === 'PageDown' ? 1 : -1);
 		}
 		if (!box) {
 			// Nothing selected yet and a navigation key pressed: start at the top left, which is
@@ -29735,7 +30017,7 @@ var EngCalcs = EngCalcs || {};
 		// drawing, so that wording reads as "throw it away" and they will not press the only control
 		// that leaves. Closing never touches a project either way.
 		var blank = elh('button', { type: 'button', 'class': 'lpn-examples-blank' },
-			(galleryForced ? pc.lpn_examples_close : pc.lpn_examples_blank) || '');
+			(galleryForced ? pc.lpn_close : pc.lpn_examples_blank) || '');
 		blank.addEventListener('click', function () { hideExamplesGallery(); });
 		pane.appendChild(blank);
 		var grid = elh('div', { 'class': 'lpn-examples-grid' });
@@ -30376,6 +30658,12 @@ var EngCalcs = EngCalcs || {};
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
 			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, LPN_LIBBOX_KEY,
 			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY,
+			// 'lpn_notesbox' and 'lpn_hotkeysbox' join the list here rather than a day later, for the
+			// same reason every entry above states its own miss: window furniture left out of this
+			// list makes "exactly as a brand-new visitor would see it" false for that one key. Named
+			// as literals because LPN_NOTESBOX_KEY and LPN_HOTKEYSBOX_KEY are declared later in this
+			// file, the same reason 'lpn_show_titles' below is a literal.
+			'lpn_notesbox', 'lpn_hotkeysbox',
 			// AREA_HINT_KEY joined 2026-09-09, having been missed on the day it was written.
 			// dev/cookie-storage-inventory.md already filed it beside PAGE_TITLES_KEY as a reading
 			// preference set deliberately on this screen, so the document and the code disagreed
@@ -32151,7 +32439,6 @@ var EngCalcs = EngCalcs || {};
 		var name = nextProjectName();
 		doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
 		nextId = newNextId();
-		scenarios = defaultScenarios();
 		project = { name: name, activeScenario: 'base' };
 		// Only when geographic: an absent key is the grid default, and writing 'grid' explicitly
 		// would put a word in every file that has always meant itself by saying nothing.
@@ -32170,6 +32457,9 @@ var EngCalcs = EngCalcs || {};
 		if (coords !== LPN_COORDS_GEO && crs) { assignProjectCrs(crs); }
 		settings = inheritedSettings;
 		labelSettings = inheritedLabels;
+		// AFTER `settings`, because the flow tests seed the new project's own demand multiplier.
+		// The ready-made list, never the outgoing project's: see LPN_PRESET_SCENARIOS (Task 721).
+		scenarios = presetScenarios();
 		backdrop = null;
 		// A project created now is written by the current code, so its numbers are declarative and
 		// its version is current. Without this it inherits openDocVersion from whatever project was
@@ -36316,7 +36606,7 @@ var EngCalcs = EngCalcs || {};
 		x.type = 'button';
 		x.className = 'lpn-tab-x';
 		x.textContent = '×';
-		x.title = pc.lpn_file_close || 'Close';
+		x.title = pc.lpn_close || 'Close';
 		x.addEventListener('click', function (e) { e.stopPropagation(); closeTab(p.id); });
 		tab.appendChild(x);
 		return tab;
@@ -36476,7 +36766,7 @@ var EngCalcs = EngCalcs || {};
 	var toolbarIconIndex = [];
 	// **THE REGISTRATION HALF, SPLIT OUT ON ITS OWN** (Perry's second review, 2026-09-22: dropping
 	// the message-log button's tip by building it by hand instead of calling setIconLabel() also,
-	// silently, dropped it out of Help > "Toolbar key" -- the one NON-hover way a first-time user
+	// silently, dropped it out of Help > "Toolbar" -- the one NON-hover way a first-time user
 	// or a touch user learns what an icon-only button does. The two jobs used to be bolted together
 	// so tightly that taking one meant losing the other, which nobody had asked for.). This is only
 	// the bookkeeping: keyed on the button so a repaint replaces its row rather than adding one, and
@@ -37644,6 +37934,34 @@ var EngCalcs = EngCalcs || {};
 		// only fires while focus is inside it -- and because a place is the first thing to type.
 		if (field && field.focus) { field.focus(); }
 	}
+	// **THE THREE IMPORT ROWS, APART FROM THE MENU THAT SHOWS THEM** (Task 718), the same split
+	// iconGuideRows() takes from openHelpMenu(): a harness can ask what the submenu offers without
+	// driving a popup. Each row is unchanged from the flat list it moved out of -- same icon, same
+	// label key, same tip, same handler.
+	function importMenuRows() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			// **IMPORT SURVEYED POINTS (Task 592), AND IT IS A FILE ROW BY TOM'S OWN VOTE** (2026-09-17:
+			// *"Probably Settings is a bad place for Import survey points. That traditionally goes
+			// under File or Water. But Map might make sense. My vote is File since they come from a
+			// file."*). It lived under Settings > New assets, on the argument that it makes new
+			// assets and takes the new-asset values; that argument is still true and is not where a
+			// person looks. A command named after a FILE belongs with the other file commands.
+			{ icon: 'position', label: pc.lpn_file_import_survey || 'Import surveyed points…',
+			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
+			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
+			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
+			// **THE LIBRARY IMPORT WIZARD'S OWN DOOR, AND ITS ONLY ONE** (Task 611). Tom,
+			// 2026-09-17: *"Move the button to the File menu. I thought you already did that."* Then
+			// 2026-09-18: *"Remove buttons except at the File menu."* The Libraries box carried the
+			// same button in each of its three sections until he used it, on his own earlier sentence
+			// asking for the wizard *"available from every applicable library"*; his later word wins,
+			// and the earlier one should have been questioned rather than built. **Do not put a
+			// button back in the Libraries box.**
+			{ icon: 'open', label: pc.lpn_library_import || 'Import libraries…',
+			  tip: pc.lpn_library_import_tip, fn: libImportPick }
+		];
+	}
 	function openFileMenu(anchor) {
 		// **THE FILE MENU AND THE OPEN BUTTON TAKE THE SAME REFUSAL AS THE TAB STRIP** (Tom,
 		// 2026-09-08: *"I think the File menu and Open toolbar also must be disabled just for
@@ -37654,9 +37972,11 @@ var EngCalcs = EngCalcs || {};
 		if (georefBlocksProjectSwitch()) { return; }
 		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
 		var linked = isLinked(id), api = fileApiAvailable();
-		// **RECENT FILES GO LAST, BELOW EVERYTHING.** Not under Open… where thirty years of File
-		// menus put it: a recents list grows, and every row it grows pushes SAVE further down a menu
-		// Save is the most-used row of.
+		// **RECENT FILES SIT JUST ABOVE CLOSE** (Tom, 2026-09-25, correcting "Exit" to "Close" on
+		// 2026-09-29). Not under Open… where thirty years of File menus put it: a recents list
+		// grows, and every row it grows pushes SAVE further down a menu Save is the most-used row
+		// of. It used to go last of all, below Close; that put it beneath the one row that leaves
+		// the menu behind for good, which is not where a list meant to be reached for again belongs.
 		//
 		// ABSENT when there are none -- an empty "Recent files" heading teaches the user only that
 		// the feature does not work. They cannot appear at all without the File System Access API,
@@ -37693,55 +38013,23 @@ var EngCalcs = EngCalcs || {};
 				// re-arming it for every empty tab: showExamplesOverlay() sets galleryForced, and
 				// dismissing or opening anything answers it again.
 				fn: function () { loadExamplesManifest(); showExamplesOverlay(); } },
-			// **IMPORT SURVEYED POINTS (Task 592), AND IT IS A FILE ROW BY TOM'S OWN VOTE** (2026-09-17:
-			// *"Probably Settings is a bad place for Import survey points. That traditionally goes
-			// under File or Water. But Map might make sense. My vote is File since they come from a
-			// file."*). It lived under Settings > New assets, on the argument that it makes new
-			// assets and takes the new-asset values; that argument is still true and is not where a
-			// person looks. A command named after a FILE belongs with the other file commands.
+			// **AN IMPORT SUBMENU (Task 718)**, Tom, 2026-09-25: *"We have three import items. It's
+			// probably time for an Import sub-menu."* The three rows below -- surveyed points, an
+			// EPANET file, and libraries -- moved here, WHOLESALE, out of the flat list. Each keeps
+			// its own key, tip and handler; only their container changed. `submenu` is the fly-out
+			// idiom Help > Toolbar already uses (iconGuideRows), so this needed no new menu
+			// mechanics, only a rows function of its own (importMenuRows()).
 			//
-			// **AFTER THE ROWS THAT MAKE A TAB, because it is the one that does NOT.** Open,
-			// Open example, Import EPANET and Open xy file all end in a project switch; this one
-			// drops points into the project already on screen. Grouping it with them says what kind
-			// of act it is; sitting after them keeps the ones that share an outcome together. It
-			// goes ABOVE the Import/Export EPANET pair rather than below Import, because those two
-			// are adjacent by Tom's own instruction and a row wedged between them breaks the pair.
-			{ icon: 'position', label: pc.lpn_file_import_survey || 'Import surveyed points…',
-			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
-			// **THE TWO EPANET ROWS ARE ADJACENT, IMPORT ABOVE EXPORT** (Tom, 2026-09-17, after
-			// demonstrating the page to an Engineers Without Borders chapter: *"I couldn't find
-			// Export EPANET file. Let's move Import EPANET file to just above it."*). Export was
-			// the last row of a five-row block and read as belonging to none of them; beside the
-			// row it is the other direction of, it is found by looking for its own pair.
-			//
-			// This costs Task 447's "third, below both rows it rescues": Open xy file on map… now
-			// sits above Import rather than below it. Kept deliberately -- the fallback is still
-			// below Open…, which is the row people actually reach for first, and a control nobody
-			// can find is a worse defect than a fallback reading one place too high.
-			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
-			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
+			// **SITS WHERE Import EPANET file… used to, directly above Export EPANET file….** That
+			// keeps as much as possible of the 2026-09-17 EWB-meeting finding -- Import and Export
+			// EPANET found each other by standing side by side -- even though the three import rows
+			// no longer stand in the flat list themselves.
+			{ icon: 'open', label: pc.lpn_file_import_menu || 'Import…', submenu: importMenuRows },
 			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
 			// file we hand over, not one this page keeps writing to -- the same reason Import is a
 			// separate row from Open rather than a second file type on it.
 			{ icon: 'save', label: pc.lpn_file_export_inp || 'Export EPANET file…',
 			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
-			// **THE LIBRARY IMPORT WIZARD'S OWN DOOR, AND ITS ONLY ONE** (Task 611). Tom,
-			// 2026-09-17: *"Move the button to the File menu. I thought you already did that."* Then
-			// 2026-09-18: *"Remove buttons except at the File menu."* The Libraries box carried the
-			// same button in each of its three sections until he used it, on his own earlier sentence
-			// asking for the wizard *"available from every applicable library"*; his later word wins,
-			// and the earlier one should have been questioned rather than built. **Do not put a
-			// button back in the Libraries box.** The section somebody happens to be looking at
-			// decides nothing -- the FILE says what is on offer -- so a second door bought nothing
-			// but a second control to notice.
-			//
-			// **LAST, AND BELOW THE EPANET PAIR, WHICH IS A MERGE DECISION WORTH STATING.** It does
-			// not open anything: it copies into the project already on screen, so it cannot sit among
-			// the rows that REPLACE what is open. And Import EPANET has to stay directly above Export
-			// EPANET, because he could not find Export at all while it ended a five-row block
-			// (2026-09-17, at the EWB meeting). Both hold only in this order.
-			{ icon: 'open', label: pc.lpn_library_import || 'Import libraries…',
-			  tip: pc.lpn_library_import_tip, fn: libImportPick },
 		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the
@@ -37798,10 +38086,11 @@ var EngCalcs = EngCalcs || {};
 			// out of a file wants when they decide the colleague's version wins. Disabling it there
 			// left "Save as to a new file" as the only exit, and forked a project that did not need
 			// forking. It writes nothing, so it is safe in every state.
-			{ icon: 'revert', label: pc.lpn_file_revert || 'Revert', fn: revertCurrent, disabled: !(linked && entry && entry.dirty) },
+			{ icon: 'revert', label: pc.lpn_file_revert || 'Revert', fn: revertCurrent, disabled: !(linked && entry && entry.dirty) }
+		], recentRows, [
 			{ separator: true },
-			{ icon: 'close', label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
-		], recentRows));
+			{ icon: 'close', label: pc.lpn_close || 'Close', fn: function () { closeTab(id); } }
+		]));
 	}
 	// ---- The menu bar (ROADMAP Task 211) ----
 	// Every command on this page is reachable from here; the toolbar is the high-use subset, so a
@@ -38007,49 +38296,36 @@ var EngCalcs = EngCalcs || {};
 			return { icon: b.icon, label: b.name, tip: b.tip, fn: function () {} };
 		});
 	}
+	// **THREE GROUPS, TOM'S OWN ORDER** (Task 745, 2026-09-29: *"(1) True help: Walkthroughs,
+	// Tables and Hotkeys ..., Toolbars. (2) Helpers: Fix something, Install, and Cookies.
+	// (3) True about: Notes on this page, Welcome page, Screenshot, Privacy, Terms, About."*).
+	// This replaces every earlier grouping in this file's history -- do not restore one from an
+	// older comment. Each row still carries the key and the reasoning it always had; what moved is
+	// only which group it stands in.
 	function openHelpMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		function ext(url) { return function () { window.open(url, '_blank', 'noopener'); }; }
 		openMenu(anchor, [
+			// ---- Group 1: true help ----
 			{ icon: 'help', label: pc.lpn_help_walkthroughs || 'Walkthroughs', fn: ext(LPN_WALKTHROUGHS_URL) },
-			// The page's own Notes, which used to sit below the map (Tom, 2026-08-14). This is the
-			// ONE row in this menu that does not open a new tab, because it does not leave the page
-			// at all -- the notes are still in this document, hidden, and this reveals them. See the
-			// comment on #lpn_notes_popup in Looped-Network.php for why the markup stayed in the
-			// page rather than becoming a JS string.
-			{ icon: 'help', label: pc.lpn_help_notes || 'Notes on this page', fn: toggleNotesPopup },
+			// **THE NEW BOX** (Task 745). Gathers the table-help entries that used to live only in
+			// the Notes list (lpn_notes_6/7 -- see #lpn_hotkeys_popup in Looped-Network.php) and the
+			// keyboard shortcuts that had never been gathered anywhere, divided by context.
+			{ icon: 'help', label: pc.lpn_help_hotkeys || 'Tables and Hotkeys', fn: toggleHotkeysBox },
 			// **THE DISCOVERY ROUTE THAT IS NOT A TOOLTIP** (dev/toolbar-icons.md). Once the toolbar
 			// is icons only, a first-time user who does not think to hover -- and a touch user, for
 			// whom a tip needs a deliberate press-and-hold -- has no way to read the strip. This is
 			// that way: the same icon, its name, and its explanation, in one list. DERIVED from the
 			// strip itself (toolbarIconIndex), so a button added later is in it already.
-			{ icon: 'help', label: pc.lpn_help_icons || 'Toolbar key', submenu: iconGuideRows },
-			// **THE WAY BACK TO THE SITE, AND IT IS ONE ROW** (Tom, 2026-09-11: *"Help menu to
-			// include Welcome Page ... as last item in top group"*). It replaces the whole
-			// far-left-mark experiment -- see buildMenuBar() for how that went and why it will not
-			// be retried with a tower.
-			//
-			// `ext()`, so it opens a new tab with `noopener`: a reader looking up what this
-			// software IS should not put an open project through `beforeunload` to do it. That is
-			// the same reasoning every other outbound row in this menu already follows.
-			{ icon: 'info', label: pc.lpn_help_welcome || 'Welcome page',
-				fn: ext(EngCalcs.lwnSiteUrl || 'https://librewaternet.org/') },
+			{ icon: 'help', label: pc.lpn_help_icons || 'Toolbar', submenu: iconGuideRows },
 			{ separator: true },
+			// ---- Group 2: helpers ----
 			// **A VERB, not a noun.** "Contribute" reads as money or code to most visitors; the
 			// reports actually received are a wrong word or a bad number, and "Fix something" invites
 			// those. It REPLACES the Contact row rather than joining it: both go to contact.php, and
 			// two links to one destination halve each other's weight rather than doubling the
 			// invitation (echoFeedback() in lib/Calculators.lib.php).
-
 			{ icon: 'mail', label: pc.lpn_help_fix || 'Fix something', fn: ext(suiteUrl('contact.php?from=Looped-Network')) },
-			{ separator: true },
-			// **HELP HOLDS THE COMMANDS AGAIN** (Task 625, Ida's reversal 2026-09-11). These rows
-			// spent an hour in a menu hanging off the product mark, on the theory that "what is
-			// this software" deserved its own door. It does -- but not that door: the mark is a
-			// LINK now, for the reasons at buildMenuBar(), and a Windows-majority audience has no
-			// left-corner brand menu to reach for. VS Code settles it for the cross-platform case
-			// by putting About in Help on Windows and Linux.
-			//
 			// **Not EPANET IS NOT AMONG THEM AND MUST NOT COME BACK.** Ida's ruling listed it,
 			// written without knowing Tom retired not-epanet.org the same day; a row pointing at a
 			// dead host is worse than no row. See the note at the top of this file's URL block.
@@ -38058,14 +38334,30 @@ var EngCalcs = EngCalcs || {};
 					if (EngCalcs._deferredInstallPrompt && EngCalcs.installPWA) { EngCalcs.installPWA(); return; }
 					window.open(suiteUrl('Install.php'), '_blank', 'noopener');
 				} },
-			{ icon: 'help', label: pc.lpn_help_screenshots || 'Screenshot gallery', fn: ext(LPN_SCREENSHOTS_URL) },
+			{ icon: 'settings', label: pc.consent_settings_link || 'Cookie settings',
+				fn: function () { if (window.ecReopenConsent) { window.ecReopenConsent(); } } },
 			{ separator: true },
+			// ---- Group 3: true about ----
+			// The page's own Notes, which used to sit below the map (Tom, 2026-08-14). This is the
+			// ONE row in this menu that does not open a new tab, because it does not leave the page
+			// at all -- the notes are still in this document, hidden, and this reveals them. See the
+			// comment on #lpn_notes_popup in Looped-Network.php for why the markup stayed in the
+			// page rather than becoming a JS string.
+			{ icon: 'help', label: pc.lpn_help_notes || 'Notes on this page', fn: toggleNotesPopup },
+			// **THE WAY BACK TO THE SITE, AND IT IS ONE ROW** (Tom, 2026-09-11: *"Help menu to
+			// include Welcome Page ... as last item in top group"* -- true of ITS group, now group
+			// 3, since Task 745 split the one group into three).
+			//
+			// `ext()`, so it opens a new tab with `noopener`: a reader looking up what this
+			// software IS should not put an open project through `beforeunload` to do it. That is
+			// the same reasoning every other outbound row in this menu already follows.
+			{ icon: 'info', label: pc.lpn_help_welcome || 'Welcome page',
+				fn: ext(EngCalcs.lwnSiteUrl || 'https://librewaternet.org/') },
+			{ icon: 'help', label: pc.lpn_help_screenshots || 'Screenshot gallery', fn: ext(LPN_SCREENSHOTS_URL) },
 			// Task 286 wants the notice FINDABLE and withdrawal as easy as consent; this page has
 			// no footer, so Help is its home and always was.
 			{ icon: 'info', label: pc.privacy_link || 'Privacy notice', fn: ext(suiteUrl('privacy.php')) },
 			{ icon: 'info', label: pc.terms_link || 'Terms of use', fn: ext(suiteUrl('terms.php')) },
-			{ icon: 'settings', label: pc.consent_settings_link || 'Cookie settings',
-				fn: function () { if (window.ecReopenConsent) { window.ecReopenConsent(); } } },
 			// About last, where every Help menu in the world puts it, and an IN-PAGE box rather
 			// than a link to the suite's About.php -- Tom's fourth embarrassment.
 			{ icon: 'info', label: pc.about_main_menu || 'About', fn: toggleAboutPopup }
@@ -38187,6 +38479,62 @@ var EngCalcs = EngCalcs || {};
 			if (e.key === 'Escape') { e.preventDefault(); closeNotesPopup(); }
 		});
 		wireBoxMemory(box, LPN_NOTESBOX_KEY, notesboxLayout, saveNotesboxLayout, notesBoxIsOpen);
+	}
+
+	// **THE TABLES AND HOTKEYS BOX** (Task 745). The same non-hog shell and memory as Notes --
+	// draggable, resizable, remembered per browser as window furniture (`lpn_hotkeysbox`), and
+	// dismissed only by its own X or an Escape pressed while focus is inside it.
+	function hotkeysBoxEl() { return document.getElementById('lpn_hotkeys_popup'); }
+	function hotkeysBoxIsOpen() {
+		var b = hotkeysBoxEl();
+		return !!b && b.style.display === 'flex';
+	}
+	var LPN_HOTKEYSBOX_KEY = 'lpn_hotkeysbox';
+	var hotkeysboxLayout = newBoxLayout();
+	function saveHotkeysboxLayout() {
+		try { localStorage.setItem(LPN_HOTKEYSBOX_KEY, JSON.stringify(hotkeysboxLayout)); } catch (e) {}
+	}
+	function openHotkeysBox() {
+		var box = hotkeysBoxEl(), r, at, home, floor;
+		if (!box) { return; }
+		closeMenu();
+		closeViewPopovers();
+		hideOpenTips();
+		box.style.display = 'flex';
+		placePanelForScreen(box, function () {
+			applyBoxSize(box, hotkeysboxLayout);
+			floor = chromeFloor();
+			capPanelToRoomBelow(box, floor);
+			r = box.getBoundingClientRect();
+			if (hotkeysboxLayout.left === null || hotkeysboxLayout.top === null) {
+				home = setboxHomeCorner(r.width, r.height);
+				at = clampPanel(home.left, home.top, r.width, r.height,
+					window.innerWidth, window.innerHeight, floor);
+			} else {
+				at = restoreBounds(hotkeysboxLayout.left, hotkeysboxLayout.top, r.width, r.height,
+					window.innerWidth, window.innerHeight);
+			}
+			box.style.left = at.left + 'px';
+			box.style.top = at.top + 'px';
+		});
+		if (!hotkeysboxLayout.open) { hotkeysboxLayout.open = true; saveHotkeysboxLayout(); }
+	}
+	function closeHotkeysBox() {
+		hidePanel(hotkeysBoxEl());
+		if (hotkeysboxLayout.open) { hotkeysboxLayout.open = false; saveHotkeysboxLayout(); }
+	}
+	function toggleHotkeysBox() {
+		if (hotkeysBoxIsOpen()) { closeHotkeysBox(); return; }
+		openHotkeysBox();
+	}
+	function wireHotkeysBox() {
+		var box = hotkeysBoxEl(), x = document.getElementById('lpn_hotkeys_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeHotkeysBox); }
+		box.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape') { e.preventDefault(); closeHotkeysBox(); }
+		});
+		wireBoxMemory(box, LPN_HOTKEYSBOX_KEY, hotkeysboxLayout, saveHotkeysboxLayout, hotkeysBoxIsOpen);
 	}
 	// **THE MAP MENU** -- View until 2026-08-27, renamed on Tom's word. It holds the drawing's frame,
 	// the pictures behind it, where on Earth it is, and the elevations read off that ground. Only
@@ -38325,7 +38673,7 @@ var EngCalcs = EngCalcs || {};
 			},
 			{ separator: true },
 			{
-				icon: 'settings', label: pc.lpn_menu_settings || 'Settings',
+				icon: 'settings', label: pc.lpn_tool_settings || 'Settings',
 				tip: pc.lpn_tool_settings_tip,
 				fn: function () { toggleSettingsBox(); }
 			},
@@ -38602,7 +38950,7 @@ var EngCalcs = EngCalcs || {};
 			{ label: pc.lpn_tab_move_left || 'Move left', disabled: idx <= 0, fn: function () { moveTab(id, -1); } },
 			{ label: pc.lpn_tab_move_right || 'Move right', disabled: idx < 0 || idx >= library.projects.length - 1, fn: function () { moveTab(id, 1); } },
 			{ separator: true },
-			{ icon: 'close', label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
+			{ icon: 'close', label: pc.lpn_close || 'Close', fn: function () { closeTab(id); } }
 		]);
 	}
 	function openTabListMenu(anchor) {
@@ -39034,6 +39382,9 @@ var EngCalcs = EngCalcs || {};
 			var firstId = newProjectId(), firstName = nextProjectName();
 			library.openId = firstId;
 			project.name = firstName; // the tab and the document have to agree from the first frame
+			// The first project is a new project, so it starts with the ready-made scenarios too
+			// (Task 721, "in all new projects").
+			scenarios = presetScenarios();
 			// **R-208: PROJECT1 OPENS GEOGRAPHIC, AT DOWNTOWN NOVATO CENTER, NOT ON AN UNPLACED
 			// GRID.** The reported defect was specific: attaching the world map to the default tab
 			// errored, because a schematic project has no coordinate system to place tiles with.
@@ -39076,6 +39427,7 @@ var EngCalcs = EngCalcs || {};
 			saveIndex();
 		}
 		wireNotesPopup();
+		wireHotkeysBox();
 		// **THE MAP STATUS STRIP HAS TO BE RE-READ HERE, AND THIS IS THE ONLY PLACE THAT DOES IT ON
 		// BOOT** (ROADMAP Task 521, Tom 2026-08-24 with a screenshot of the strip disagreeing with
 		// the Settings box). The order that produces the defect:
@@ -41596,8 +41948,8 @@ var EngCalcs = EngCalcs || {};
 		// the run takes -- the three pairs reorder in Arabic or Hebrew and the dividers stay between
 		// them. That caution IS right for a DIRECTIONAL glyph (an arrow, a guillemet, U+25B8).
 		el.textContent = [
-			(pc.lpn_units_flow || 'Flow') + ': ' + unitLabel('lpn_u_flow'),
-			(pc.lpn_units_pressure || 'Pressure') + ': ' + unitLabel('lpn_u_pressure'),
+			(pc.lpn_result_flow || 'Flow') + ': ' + unitLabel('lpn_u_flow'),
+			(pc.lpn_result_pressure || 'Pressure') + ': ' + unitLabel('lpn_u_pressure'),
 			(pc.bpn_method || 'Friction method') + ': ' + frictionMethodLabel()
 		].join(' | ');
 		refreshCoordsReadout();
@@ -43362,7 +43714,7 @@ var EngCalcs = EngCalcs || {};
 				var rm = document.createElement('button');
 				rm.type = 'button';
 				rm.className = 'lpn-cp-remove';
-				rm.textContent = pc.lpn_cp_remove || 'Remove';
+				rm.textContent = pc.lpn_fitting_remove || 'Remove';
 				helpTip(rm, pc.lpn_cp_remove_tip);
 				rm.addEventListener('click', function (e) {
 					if (e && e.preventDefault) { e.preventDefault(); }
@@ -44280,7 +44632,7 @@ var EngCalcs = EngCalcs || {};
 		// default quoted in the tip is what BLANK would inherit -- inside a scenario that is the
 		// document's own number, not the bare 1, or the tip would state a default the row does not
 		// have.
-		hydNumberRow('demandMultiplier', 'lpn_settings_demand_multiplier', 'Demand multiplier',
+		hydNumberRow('demandMultiplier', 'bpn_demand_mult', 'Demand multiplier',
 			'lpn_settings_demand_multiplier_tip',
 			inBaseScenario() ? 1 : ((settings.hydraulics || {}).demandMultiplier === undefined
 				? 1 : settings.hydraulics.demandMultiplier),
@@ -45110,6 +45462,7 @@ var EngCalcs = EngCalcs || {};
 		// The Notes box (Tom, 2026-09-28), after the reports and before Find for the same stacking
 		// reason: Find is the smallest and ends up on top.
 		if (notesboxLayout.open) { openNotesBox(); }
+		if (hotkeysboxLayout.open) { openHotkeysBox(); }
 		if (findUserOpen) { toggleFindPopup(null, true); }
 	}
 	// ---- THE DIVIDER BETWEEN THE TWO PANES (ROADMAP Task 576) ------------------------------------
@@ -46101,7 +46454,7 @@ var EngCalcs = EngCalcs || {};
 	// is a sentence about diameters and does not say so.
 	var LIB_IMPORT_UNIT_NAMES = {
 		lpn_u_diameter: 'lpn_field_diameter',
-		lpn_u_flow: 'lpn_units_flow',
+		lpn_u_flow: 'lpn_result_flow',
 		lpn_u_elevhead: 'lpn_units_elevhead'
 	};
 	/**
@@ -46623,7 +46976,7 @@ var EngCalcs = EngCalcs || {};
 				['none', pc.lpn_quality_none || 'Nothing'],
 				['chemical', pc.lpn_quality_chemical || 'A reactive chemical'],
 				['trace', pc.lpn_quality_trace || 'Source trace'],
-				['age', pc.lpn_quality_age || 'Water age']
+				['age', pc.lpn_result_water_age || 'Water age']
 			];
 		opts.forEach(function (o) {
 			var opt = document.createElement('option');
@@ -48425,7 +48778,7 @@ var EngCalcs = EngCalcs || {};
 				verdict.textContent = read.ok
 					? (pc.lpn_library_rule_ok || '✓ This rule was read')
 					: read.missing
-						? (pc.lpn_library_rule_missing || '⚠ This network has nothing called {id}').replace('{id}', read.missing)
+						? (pc.lpn_library_control_missing || '⚠ This network has nothing called {id}').replace('{id}', read.missing)
 						: (pc.lpn_library_rule_bad || '⚠ This rule could not be read');
 			}
 			showVerdict(libReadRule(box.value));
@@ -50108,6 +50461,7 @@ var EngCalcs = EngCalcs || {};
 			currentPopup = { kind: 'node', id: newId };
 		}
 		renameOverrides('node', oldId, newId);
+		paneFilterRenamed('node', oldId, newId);
 		nodeEls[newId] = nodeEls[oldId]; delete nodeEls[oldId];
 		incidentLinks[newId] = incidentLinks[oldId]; delete incidentLinks[oldId];
 		labelsByAnchor[newId] = labelsByAnchor[oldId]; delete labelsByAnchor[oldId];
@@ -50154,6 +50508,7 @@ var EngCalcs = EngCalcs || {};
 			currentPopup = { kind: 'link', id: newId };
 		}
 		renameOverrides('link', oldId, newId);
+		paneFilterRenamed('link', oldId, newId);
 		// **NOTHING FOLLOWS A LINK RENAME ANY MORE** (Task 586). It used to: `curveRef` named ANOTHER
 		// PUMP to copy points from, so renaming that pump silently emptied the borrower's curve. A
 		// curve is a document object now and both pumps name IT, so a link's name is nobody else's
@@ -52616,7 +52971,9 @@ var EngCalcs = EngCalcs || {};
 	// Switching projects drops the undo history (Task 146.08). The stack holds snapshots of the
 	// OUTGOING project's doc; leaving them in place would let one Undo in the newly-opened project
 	// paste the previous project's network over it -- silently, and with no way back.
-	function clearUndo() { undoStack.length = 0; }
+	// And the Tables' record of which filtered rows were edited (Task 738): it is keyed by id, and
+	// the next project's J1 is not this one's.
+	function clearUndo() { undoStack.length = 0; paneFilterForgetEdits(); }
 	function undo() {
 		if (undoStack.length === 0) { return; }
 		var snap = undoStack.pop();
@@ -53825,7 +54182,7 @@ var EngCalcs = EngCalcs || {};
 	// solution is to abandon the idea of adding 'Messages' to this submenu of dubious value and
 	// dubious fit."* **He is factually right and that is why this is settled rather than weighed:**
 	// the button is written in Looped-Network.php inside the map's own overlay row, not in the
-	// toolbar, so a row for it under "Toolbar key" would name a place it is not. The accessible
+	// toolbar, so a row for it under "Toolbar" would name a place it is not. The accessible
 	// name stays; the drawing carries the rest.
 	// `registerToolbarIcon()` -- the bookkeeping half of setIconLabel(), split out during the round
 	// trip -- is KEPT, because it is what stops the next tipless icon button losing its Help row by
@@ -55748,8 +56105,8 @@ var EngCalcs = EngCalcs || {};
 		ffEl('p', 'lpn-ff-note', pc.lpn_ff_intro, host);
 
 		boxes.scope = ffSelect([
-			['all', pc.lpn_ff_scope_all || 'Every junction'],
-			['selected', pc.lpn_ff_scope_selected || 'The selected junctions']
+			['all', pc.lpn_ff_all || 'All'],
+			['selected', pc.lpn_ff_selected || 'Selected']
 		], ask.scope);
 		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', pc.lpn_ff_scope_tip, boxes.scope, '');
 
@@ -55769,18 +56126,19 @@ var EngCalcs = EngCalcs || {};
 		ffRow(host, pc.lpn_ff_residual || 'Residual pressure to hold', pc.lpn_ff_residual_tip,
 			boxes.residual, unitLabel('lpn_u_pressure'));
 
-		// **THE SCOPE OF THE DESIGN SEARCH IS A NAMED SET, CHOSEN BEFORE THE RUN: NONE, ALL, OR
-		// SELECTED** (Tom, 2026-09-28, *"Selection set build: Yes."*). The old middle
-		// value, every other junction without the pipes, went: a blank velocity box already turns
-		// the velocity half off under All (runFireFlowSweep() reads blank as no limit), so it gave
-		// nothing a blank box did not. Selected is the new one -- the impact is checked only at the
-		// junctions selected on the map and the pipes that meet them, which is how a master-plan
-		// appendix scopes it (Sue's and Mary's journals, same day). ffDesignScope() maps the retired
-		// value, should anything still carry it, to All.
+		// **THE DESIGN CHECK'S SCOPE IS A NAMED SET, CHOSEN BEFORE THE RUN: NONE, ALL, OR SELECTED**
+		// (Tom, 2026-09-30: "Replace Design check toggle with a third option 'None All Selected'."),
+		// reverting the 2026-09-29 checkbox-plus-scope split (Task 746) back to the single selector
+		// Task 742 shipped, now in Tom's own shorter words rather than "Do not check" / "All other
+		// junctions and all pipes" / "The selected junctions and their pipes". One row, one control;
+		// the row label keeps naming the concept ("Design check (effect on system)") now that no
+		// checkbox carries it. `ask.design` already carried the 'off'/'all'/'selected' string
+		// underneath the checkbox, and runFireFlowSweep()/ffDesignScope() never changed, so only the
+		// control built here changes back.
 		boxes.design = ffSelect([
-			['off', pc.lpn_ff_design_off || 'Do not check'],
-			['all', pc.lpn_ff_design_all || 'All other junctions and all pipes'],
-			['selected', pc.lpn_ff_design_selected || 'The selected junctions and their pipes']
+			['off', pc.lpn_source_type_none || 'None'],
+			['all', pc.lpn_ff_all || 'All'],
+			['selected', pc.lpn_ff_selected || 'Selected']
 		], ffDesignScope(ask.design));
 		ffRow(host, pc.lpn_ff_design || 'Design check (effect on system)', pc.lpn_ff_design_tip,
 			boxes.design, '');
@@ -56038,8 +56396,8 @@ var EngCalcs = EngCalcs || {};
 		if (!rec.effects) { return pc.lpn_ff_not_checked || 'Not checked'; }
 		n = rec.effects.nodes.length; l = rec.effects.links.length;
 		if (n && l) { return pc.lpn_ff_limit_both || 'Pressure and velocity'; }
-		if (n) { return pc.lpn_ff_limit_pressure || 'Pressure'; }
-		if (l) { return pc.lpn_ff_limit_velocity || 'Velocity'; }
+		if (n) { return pc.lpn_result_pressure || 'Pressure'; }
+		if (l) { return pc.lpn_result_velocity || 'Velocity'; }
 		return FF_DASH;
 	}
 	function ffCell(row, text, cls) {
@@ -56418,7 +56776,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			if (!ids.length) {
 				setNotice(pc.lpn_ff_no_selection ||
-					'No junction is selected. Choose one on the map, or test every junction.');
+					'No junction is selected. Choose one on the map, or select All.');
 				return;
 			}
 		} else {
@@ -56435,7 +56793,7 @@ var EngCalcs = EngCalcs || {};
 			design = ffDesignSelectedSet(model);
 			if (!design.nodes.length && !design.links.length) {
 				setNotice(pc.lpn_ff_design_no_selection ||
-					'The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.');
+					'The design check scope is set to Selected, but no assets are selected. Select assets or select All.');
 				return;
 			}
 			design.minPressure = minPressure > 0 ? minPressure : 0;
@@ -56894,7 +57252,7 @@ var EngCalcs = EngCalcs || {};
 		body = ffTable(host, [
 			pc.lpn_scenario_label || 'Scenario',
 			pc.lpn_scenario_overrides || 'No. of custom values',
-			pc.lpn_scncmp_col_minpressure || 'Lowest pressure',
+			pc.bpn_p_min || 'Lowest pressure',
 			pc.lpn_scncmp_col_maxvelocity || 'Highest velocity'
 		]);
 		scenarioCompareRun.forEach(function (r) {
@@ -57264,7 +57622,7 @@ var EngCalcs = EngCalcs || {};
 			ffEl('p', 'lpn-ff-note', pc.lpn_status_empty || 'Nothing changed status during this run.', host);
 			return;
 		}
-		body = ffTable(host, [pc.lpn_status_col_time || 'Time', pc.lpn_status_col_event || 'Event']);
+		body = ffTable(host, [pc.lpn_full_col_time || 'Time', pc.lpn_status_col_event || 'Event']);
 		events.forEach(function (e) {
 			var tr = ffEl('tr', null, null, body);
 			ffCell(tr, EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(e.t) : String(e.t));

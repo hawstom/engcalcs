@@ -543,7 +543,6 @@ $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Elevação da extremidade a jusante deste trecho. Opcional em linhas interiores (padroniza para plano / mesma do nó acima se deixado em branco). Obrigatório na última linha: esse valor é a elevação do último emissor, que define diretamente a pressão de abastecimento necessária.">Elev. JUS <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='Elevação do último emissor (última linha) foi deixada em branco e padronizou para plano — entre com ela para um resultado preciso';
-$ec_lang['ip_flow']='Vazão';
 $ec_lang['ip_press']='Press.';
 $ec_lang['ip_hf']='h<sub>f</sub>';
 $ec_lang['ip_hm']='h<sub>m</sub>';
@@ -610,10 +609,6 @@ $ec_lang['bpn_p_down']='Press. JUS';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_p_down_tip']='Carga de pressão manométrica no nó a jusante deste trecho. Um valor negativo (sinalizado) indica pressão subatmosférica; verifique o projeto.';
 $ec_lang['bpn_sketch_heading']='Diagrama da rede';
-$ec_lang['bpn_show_length']='Comprimento';
-$ec_lang['bpn_show_diameter']='Diâmetro';
-$ec_lang['bpn_show_q']='Vazão';
-$ec_lang['bpn_show_p']='Pressão';
 $ec_lang['bpn_source_label']='Fonte';
 $ec_lang['bpn_line_problem']='Este trecho não está conectado à fonte: aponta para um ID montante desconhecido, aponta para si mesmo, repete um ID que outro trecho já usa, ou forma uma malha (loop). Trechos que não estão conectados ficam sem solução.';
 $ec_lang['bpn_bad_id_short']='ID inválido';
@@ -637,7 +632,6 @@ $ec_lang['bpn_supply3_h']='Carga de abastecimento 3';
 $ec_lang['bpn_supply_pt_tip']='Pontos opcionais 2 e 3 da curva de abastecimento. Informe uma vazão e uma carga para cada um, para modelar uma bomba ou qualquer fonte cuja carga diminui à medida que fornece mais vazão; a ferramenta lê a carga na vazão de projeto. O ponto 1 acima é a carga estática a vazão zero. Deixe 2 e 3 em branco para uma carga de reservatório constante.';
 $ec_lang['bpn_h_supply']='Carga de abastecimento';
 $ec_lang['bpn_h_supply_tip']='Carga da fonte na vazão de projeto, lida a partir da curva de abastecimento. É igual à carga da fonte informada quando a curva é constante (um reservatório).';
-$ec_lang['bpn_show_elevation']='Elevação';
 $ec_lang['bpn_supply1_h']='Carga estática de abastecimento';
 $ec_lang['lpn_main_menu']='Rede de Abastecimento de Água';
 $ec_lang['lpn_main_title']='Modelagem Gratuita Online de Rede de Distribuição de Água com o Solucionador EPANET';
@@ -925,7 +919,6 @@ $ec_lang['lpn_examples_blank']='Ou comece aqui';
 // screen, so "start with a blank map" reads as "discard it" and they do not dare press the
 // only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
 // open an example"). Closing never touches a project either way.
-$ec_lang['lpn_examples_close']='Fechar';
 $ec_lang['lpn_examples_size']='Nós: {nodes}, trechos: {links}';
 $ec_lang['lpn_examples_failed']='Não foi possível carregar os exemplos. Use Arquivo, Novo projeto para começar um desenho.';
 $ec_lang['lpn_examples_loading']='Carregando exemplos…';
@@ -1017,9 +1010,6 @@ $ec_lang['lpn_units_mapcoords']='Coordenadas do mapa';
 $ec_lang['lpn_units_mapcoords_deg']='graus';
 $ec_lang['lpn_units_usft']='ft de levantamento dos EUA';
 $ec_lang['lpn_units_elevhead']='Elevação e carga';
-$ec_lang['lpn_units_pressure']='Pressão';
-$ec_lang['lpn_units_flow']='Vazão';
-$ec_lang['lpn_units_velocity']='Velocidade';
 // Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
 // mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
 // alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
@@ -1239,13 +1229,11 @@ $ec_lang['lpn_color_break_count']='Deve haver um limite a menos que o número de
 $ec_lang['lpn_color_ramp_qualitative']='Qualitativa';
 $ec_lang['lpn_color_ramp_rainbow']='Arco-íris';
 $ec_lang['lpn_color_ramp_rainbow_eg']='igual ao EPANET';
-$ec_lang['lpn_color_example_status']='Status';
 $ec_lang['lpn_color_example_material']='Material';
 $ec_lang['lpn_color_ramp_ylgnbu']='Amarelo a azul';
 $ec_lang['lpn_color_ramp_rdylbu']='Vermelho a azul, passando por amarelo';
 $ec_lang['lpn_georef_drop']='Colocar o modelo aqui';
 $ec_lang['lpn_georef_finish']='Manter este posicionamento';
-$ec_lang['lpn_georef_cancel']='Cancelar';
 $ec_lang['lpn_georef_scale']='Distância no terreno por unidade de desenho';
 // Edited by TGH 2026-09-07
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
@@ -1342,7 +1330,7 @@ $ec_lang['lpn_pane_print_tip']='Imprime a tabela que você está vendo, com o no
 // lpn_clean_map_tip were deleted with the row; nothing else read them.
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
-// lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
+// lpn_tool_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
 // it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
 // alternative and Tom kept Project.
 // ROADMAP Task 523, Tom 2026-08-24. **The KEY is still lpn_menu_project and that is deliberate** --
@@ -1393,7 +1381,6 @@ $ec_lang['lpn_time_run_slow']='Esta rede levou {secs} s para calcular, e está c
 $ec_lang['lpn_time_no_report']='Ainda não há relatório de execução. O relatório é o próprio texto do EPANET, então ele aparece assim que esta rede for calculada com o solucionador EPANET.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
-$ec_lang['lpn_menu_settings']='Configurações';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -1510,10 +1497,6 @@ $ec_lang['lpn_find_op_conn_noopensource']='sem caminho aberto até uma origem';
 // What a result row prints beside the node id: the fault it has, in three words.
 // What a result row prints beside the id: the NARROWEST condition true of that node, because "no
 // links" says more than "no open path to a source" and both are true of the same node.
-$ec_lang['lpn_find_conn_unlinked']='Sem trechos no nó';
-$ec_lang['lpn_find_conn_noopen']='Sem trechos abertos no nó';
-$ec_lang['lpn_find_conn_nolinksource']='Sem caminho de trechos até uma origem';
-$ec_lang['lpn_find_conn_noopensource']='Sem caminho aberto até uma origem';
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='Todos os nós estão conectados.';
@@ -1702,10 +1685,8 @@ $ec_lang['lpn_new_coordsys_local_tip']='Não georreferenciado. Anexe sua própri
 // system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
 // the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
 // as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
-$ec_lang['lpn_new_crs']='Projeção do mapa';
 // **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
 // it names the box's own subject rather than either caller's radio label.
-$ec_lang['lpn_crsbox_title']='Sistema de coordenadas';
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
@@ -1716,7 +1697,6 @@ $ec_lang['lpn_crs_place_tip']='Digite uma cidade, um endereço ou um ponto de re
 $ec_lang['lpn_crs_search']='Buscar';
 $ec_lang['lpn_crs_name']='Filtro de nome da projeção';
 $ec_lang['lpn_crs_name_tip']='Mostra apenas as projeções cujo nome ou código EPSG contém o que você digitar. Tente um número de zona, ou UTM, ou Mercator.';
-$ec_lang['lpn_crs_list']='Projeção';
 $ec_lang['lpn_crs_list_tip']='As projeções restantes depois dos dois filtros acima. Escolha uma e pressione Selecionar.';
 $ec_lang['lpn_crs_choose']='Selecionar';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
@@ -1761,7 +1741,6 @@ $ec_lang['lpn_file_open']='Abrir…';
 $ec_lang['lpn_file_save']='Salvar';
 $ec_lang['lpn_file_saveas']='Salvar como…';
 $ec_lang['lpn_file_revert']='Reverter';
-$ec_lang['lpn_file_close']='Fechar';
 // Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Arquivos recentes';
@@ -2621,7 +2600,6 @@ $ec_lang['lpn_cp_design']='Definição';
 $ec_lang['lpn_cp_design_tip']='Uma linha por propriedade personalizada, e cada uma se abre para mostrar: Chave, Rótulo, Aplica-se a, Validar como, Permitir ou restringir, o campo de caracteres nomeado por essa escolha, Limite inferior de comprimento, Limite superior de comprimento, Limite baixo, Limite alto.';
 $ec_lang['lpn_cp_add']='Adicionar propriedade personalizada';
 $ec_lang['lpn_cp_add_tip']='Adiciona uma linha à tabela de design e a abre para edição.';
-$ec_lang['lpn_cp_remove']='Remover';
 $ec_lang['lpn_cp_remove_tip']='Remove esta propriedade da tabela de design. Os valores já digitados nos seus elementos são mantidos no arquivo e voltam se você projetar a mesma chave novamente.';
 $ec_lang['lpn_cp_none']='Nenhuma propriedade personalizada foi projetada ainda.';
 $ec_lang['lpn_cp_unnamed']='Ainda não nomeada';
@@ -2641,7 +2619,6 @@ $ec_lang['lpn_cp_restrict_tip']='Restringir estes caracteres: Um valor pode usar
 $ec_lang['lpn_cp_restrict_mode']='Permitir ou restringir';
 $ec_lang['lpn_cp_restrict_mode_tip']='Permitir ou restringir: Os caracteres informados são os únicos que um valor pode usar, ou os que ele não pode usar.';
 $ec_lang['lpn_cp_restrict_allow']='Permitir apenas estes caracteres';
-$ec_lang['lpn_cp_restrict_deny']='Restringir estes caracteres';
 $ec_lang['lpn_cp_minlength']='Limite inferior de comprimento';
 $ec_lang['lpn_cp_minlength_tip']='Limite inferior de comprimento: Qualquer entrada mais curta é sinalizada, o que é uma forma de encontrar as entradas vazias e as digitadas pela metade.';
 $ec_lang['lpn_cp_length']='Limite superior de comprimento';
@@ -2803,7 +2780,6 @@ $ec_lang['lpn_settings_flow_change_tip']='Um teste adicional que o solucionador 
 $ec_lang['lpn_settings_damp_limit']='Amortecimento começa em';
 $ec_lang['lpn_settings_damp_limit_tip']='A precisão na qual o solucionador começa a dar passos menores, o que pode ajudar uma rede oscilante a convergir. Zero significa que o solucionador nunca amortece.';
 $ec_lang['lpn_settings_option_unset']='Não informado';
-$ec_lang['lpn_settings_demand_multiplier']='Multiplicador de demanda';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_demand_multiplier_tip']='Um único fator aplicado a todas as demandas da rede de uma vez. Cada cenário pode ter o seu próprio, então dia médio, dia máximo ou hora de pico podem ser criados alterando apenas esta configuração.';
 $ec_lang['lpn_settings_engine_native']='Resolver com o solucionador do EPANET';
@@ -3036,7 +3012,7 @@ $ec_lang['lpn_time_speed_tip']='A velocidade com que a simulação é reproduzid
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,
 // with an index down the left and a search across the top. The section titles are not new keys --
-// each borrows the name it already had (lpn_tool_labels, lpn_menu_settings, lpn_time_menu,
+// each borrows the name it already had (lpn_tool_labels, lpn_tool_settings, lpn_time_menu,
 // lpn_settings_colors), so the box cannot drift from the doors that open it.
 $ec_lang['lpn_settings_search']='Pesquisar configurações';
 // **AND-OF-WORDS, STATED AS SUCH** (Tom, 2026-09-23 (g): "can Settings filter work as an AND word
@@ -3093,7 +3069,6 @@ $ec_lang['lpn_settings_quality_track_tip']='Escolha o que a execução deve acom
 $ec_lang['lpn_settings_quality_source']='Nó de rastreamento';
 $ec_lang['lpn_settings_quality_source_tip']='O nó cuja água é rastreada. Todo outro nó então mostra a parcela de sua água que veio desse nó.';
 $ec_lang['lpn_quality_none']='Nenhum';
-$ec_lang['lpn_quality_age']='Idade da água';
 $ec_lang['lpn_quality_trace']='Rastreamento de origem';
 $ec_lang['lpn_quality_chemical']='Um produto químico que reage';
 $ec_lang['lpn_quality_needs_run']='A qualidade da água é transportada pelos trechos conforme a água viaja, então precisa de uma simulação de período estendido: o motor EPANET e uma duração total da simulação. Defina uma Duração total da simulação em Tempo, depois pressione o botão Executar.';
@@ -3267,7 +3242,6 @@ $ec_lang['lpn_scncmp_title']='Comparação de cenários';
 $ec_lang['lpn_scncmp_menu_tip']='Resolve todos os cenários deste projeto e os mostra lado a lado: a menor pressão e a maior velocidade em cada um.';
 $ec_lang['lpn_scncmp_running']='Resolvendo todos os cenários…';
 $ec_lang['lpn_scncmp_empty']='Nada foi desenhado ainda, então não há nada para resolver.';
-$ec_lang['lpn_scncmp_col_minpressure']='Menor pressão';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Maior velocidade';
 $ec_lang['lpn_scncmp_at']='{value} em {id}';
 $ec_lang['lpn_scncmp_current']='(aberto no momento)';
@@ -3300,7 +3274,6 @@ $ec_lang['lpn_reports_status_tip']='O que mudou ao longo da última simulação 
 $ec_lang['lpn_status_title']='Relatório de estado';
 $ec_lang['lpn_status_needs_run']='O relatório de estado lista o que mudou durante uma simulação de período estendido. Defina uma Duração total da simulação em Configurações, Cálculo, Tempo, pressione Calcular, depois abra Água, Relatórios, Relatório de estado.';
 $ec_lang['lpn_status_empty']='Nada mudou de estado durante esta execução.';
-$ec_lang['lpn_status_col_time']='Tempo';
 $ec_lang['lpn_status_col_event']='Evento';
 $ec_lang['lpn_status_opened']='{type} {id} aberto';
 $ec_lang['lpn_status_closed']='{type} {id} fechado';
@@ -3359,7 +3332,6 @@ $ec_lang['lpn_color_mode_jenks']='Quebras naturais (Jenks)';
 $ec_lang['lpn_color_mode_stddev']='Desvio padrão';
 $ec_lang['lpn_color_mode_pretty']='Bonito (arredondado)';
 $ec_lang['lpn_color_mode_log']='Logarítmico';
-$ec_lang['lpn_color_mode_pressure']='Pressão';
 $ec_lang['lpn_color_mode_manual']='Manual';
 
 // ---- LIBRARIES (ROADMAP Tasks 462 and 460) ---------------------------------------------------
@@ -3369,7 +3341,7 @@ $ec_lang['lpn_color_mode_manual']='Manual';
 // Simulate, Transport, Time selectors."
 //
 // ONE NAME, THREE DOORS: the toolbar button, the Edit menu row and the box's own title all read
-// this key, exactly as lpn_menu_settings serves the Settings box's three.
+// this key, exactly as lpn_tool_settings serves the Settings box's three.
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='Bibliotecas';
@@ -3574,7 +3546,6 @@ $ec_lang['lpn_library_rule_add']='Adicionar uma regra';
 $ec_lang['lpn_library_rule_tip']='Uma regra, nas palavras que o EPANET usa, uma cláusula por linha. Uma primeira linha a nomeia: RULE 1. Depois uma condição: IF TANK 2 LEVEL BELOW 17.1. Depois o que fazer a respeito: THEN PUMP 9 STATUS IS OPEN. Uma última linha pode classificá-la: PRIORITY 1. Adicione linhas AND ou OR para testar mais de uma coisa, e linhas ELSE para indicar o que fazer quando o teste falha. Uma condição pode ler LEVEL, HEAD, GRADE, PRESSURE ou DEMAND em um nó, FLOW, STATUS ou SETTING em um trecho, ou TIME e CLOCKTIME em SYSTEM. Escreva os números nas unidades que este projeto está mostrando; eles são convertidos para você. Deixe as palavras-chave em inglês; são o que a página e o EPANET leem.';
 $ec_lang['lpn_library_rule_ok']='✓ Esta regra foi lida';
 $ec_lang['lpn_library_rule_bad']='⚠ Esta regra não pôde ser lida';
-$ec_lang['lpn_library_rule_missing']='⚠ Esta rede não tem nada chamado {id}';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
 // for the entire project it is in Settings") drawn on its other side. Without it a pattern you
 // author can only be used by making it the default one, which is not what a library is for.
@@ -3709,8 +3680,6 @@ $ec_lang['lpn_ff_title']='Análise de vazão de incêndio';
 $ec_lang['lpn_ff_intro']='Cada junção, por sua vez, é solicitada a fornecer uma vazão de incêndio além da demanda que já tem. Nada no seu projeto é alterado; todo o cálculo é feito em uma cópia.';
 $ec_lang['lpn_ff_scope']='Junções a testar';
 $ec_lang['lpn_ff_scope_tip']='Escolha o conjunto antes de calcular. Testar todas as junções em um sistema grande pode levar minutos.';
-$ec_lang['lpn_ff_scope_all']='Todas as junções';
-$ec_lang['lpn_ff_scope_selected']='Somente a junção selecionada';
 $ec_lang['lpn_ff_no_junctions']='Este projeto ainda não tem junções, então não há nada para testar.';
 $ec_lang['lpn_ff_no_selection']='Nenhuma junção está selecionada. Escolha uma no mapa, ou teste todas as junções.';
 $ec_lang['lpn_ff_skipped']='{n} elementos selecionados não são junções, então não foram testados.';
@@ -3722,9 +3691,6 @@ $ec_lang['lpn_ff_residual']='Pressão residual a manter';
 $ec_lang['lpn_ff_residual_tip']='A pressão que a junção precisa manter enquanto fornece a vazão de incêndio. A AWWA M31 e a NFPA 291 usam 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Verificação de projeto (efeito no sistema)';
 $ec_lang['lpn_ff_design_tip']='Uma pergunta separada de saber se a junção consegue fornecer a vazão: com essa vazão sendo fornecida ali, algo mais cai abaixo de sua pressão mínima ou ultrapassa seu limite de velocidade? Escolher verificar isso não custa cálculo extra.';
-$ec_lang['lpn_ff_design_off']='Não verificar';
-$ec_lang['lpn_ff_design_all']='Todas as outras junções e todos os trechos';
-$ec_lang['lpn_ff_design_selected']='As junções selecionadas e seus trechos';
 $ec_lang['lpn_ff_design_no_selection']='A verificação de projeto está definida para as junções selecionadas, e nenhuma está selecionada. Selecione algumas no mapa, ou defina Todas as outras junções e todos os trechos.';
 
 
@@ -3816,8 +3782,6 @@ $ec_lang['lpn_ff_mode_none']='Nenhum';
 $ec_lang['lpn_ff_col_solves']='Cálculos';
 // Which criterion the junction broke while drawing the required flow. A junction that broke nothing
 // shows a dash, never one of these words.
-$ec_lang['lpn_ff_limit_pressure']='Pressão';
-$ec_lang['lpn_ff_limit_velocity']='Velocidade';
 $ec_lang['lpn_ff_limit_both']='Pressão e velocidade';
 $ec_lang['lpn_ff_atleast']='mais que {flow}';
 $ec_lang['lpn_ff_affect_node']='{id} cai para {pressure}';

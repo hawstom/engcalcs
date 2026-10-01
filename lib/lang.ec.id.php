@@ -543,7 +543,6 @@ $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Elevasi ujung hilir segmen ini. Opsional pada baris tengah (default datar / sama dengan simpul di atasnya jika dikosongkan). Wajib pada baris terakhir: nilai tersebut adalah elevasi emiter terakhir, yang secara langsung menentukan tekanan pasokan yang diperlukan.">Elev. Hilir <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='Elevasi emiter terakhir (baris terakhir) dibiarkan kosong dan menggunakan default datar — masukkan nilainya untuk hasil yang akurat';
-$ec_lang['ip_flow']='Debit';
 $ec_lang['ip_press']='Tek.';
 $ec_lang['ip_hf']='h<sub>f</sub>';
 $ec_lang['ip_hm']='h<sub>m</sub>';
@@ -610,10 +609,6 @@ $ec_lang['bpn_p_down']='Tekanan hilir';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_p_down_tip']='Tinggi tekan ukur (gauge) di simpul hilir jalur ini. Nilai negatif (ditandai) berarti tekanan di bawah atmosfer; periksa kembali desainnya.';
 $ec_lang['bpn_sketch_heading']='Diagram Jaringan';
-$ec_lang['bpn_show_length']='Panjang';
-$ec_lang['bpn_show_diameter']='Diameter';
-$ec_lang['bpn_show_q']='Debit';
-$ec_lang['bpn_show_p']='Tekanan';
 $ec_lang['bpn_source_label']='Sumber';
 $ec_lang['bpn_line_problem']='Jalur ini tidak terhubung ke sumber: jalur ini menunjuk ke ID hulu yang tidak dikenal, menunjuk dirinya sendiri, mengulang ID yang sudah digunakan jalur lain, atau membentuk loop. Jalur yang tidak terhubung dibiarkan tidak terselesaikan.';
 $ec_lang['bpn_bad_id_short']='ID salah';
@@ -637,7 +632,6 @@ $ec_lang['bpn_supply3_h']='Tinggi tekan pasokan 3';
 $ec_lang['bpn_supply_pt_tip']='Titik kurva pasokan opsional 2 dan 3. Isi debit dan tinggi tekan untuk masing-masing guna memodelkan pompa, atau sumber mana pun yang tinggi tekannya menurun seiring bertambahnya debit yang disalurkan; alat ini membaca tinggi tekan pada debit rencana. Titik 1 di atas adalah tinggi tekan statis pada debit nol. Biarkan 2 dan 3 kosong untuk tinggi tekan reservoir yang konstan.';
 $ec_lang['bpn_h_supply']='Tinggi tekan pasokan';
 $ec_lang['bpn_h_supply_tip']='Tinggi tekan sumber pada debit rencana, dibaca dari kurva pasokan. Sama dengan tinggi tekan sumber yang dimasukkan bila kurvanya datar (reservoir).';
-$ec_lang['bpn_show_elevation']='Elevasi';
 $ec_lang['bpn_supply1_h']='Tinggi tekan pasokan statis';
 $ec_lang['lpn_main_menu']='Jaringan Distribusi Air';
 $ec_lang['lpn_main_title']='Pemodelan Daring Gratis Jaringan Distribusi Air dengan Penyelesai EPANET';
@@ -926,7 +920,6 @@ $ec_lang['lpn_examples_blank']='Atau mulai dengan peta kosong';
 // screen, so "start with a blank map" reads as "discard it" and they do not dare press the
 // only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
 // open an example"). Closing never touches a project either way.
-$ec_lang['lpn_examples_close']='Tutup';
 $ec_lang['lpn_examples_size']='Simpul: {nodes}, pipa: {links}';
 $ec_lang['lpn_examples_failed']='Contoh tidak dapat dimuat. Gunakan File, Proyek baru untuk memulai gambar.';
 $ec_lang['lpn_examples_loading']='Memuat contoh…';
@@ -1018,9 +1011,6 @@ $ec_lang['lpn_units_mapcoords']='Koordinat peta';
 $ec_lang['lpn_units_mapcoords_deg']='derajat';
 $ec_lang['lpn_units_usft']='Kaki survei AS';
 $ec_lang['lpn_units_elevhead']='Elevasi dan tinggi tekan';
-$ec_lang['lpn_units_pressure']='Tekanan';
-$ec_lang['lpn_units_flow']='Debit';
-$ec_lang['lpn_units_velocity']='Kecepatan';
 // Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
 // mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
 // alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
@@ -1240,13 +1230,11 @@ $ec_lang['lpn_color_break_count']='Jumlah batas harus satu lebih sedikit daripad
 $ec_lang['lpn_color_ramp_qualitative']='Kualitatif';
 $ec_lang['lpn_color_ramp_rainbow']='Pelangi';
 $ec_lang['lpn_color_ramp_rainbow_eg']='sesuai EPANET';
-$ec_lang['lpn_color_example_status']='Status';
 $ec_lang['lpn_color_example_material']='Material';
 $ec_lang['lpn_color_ramp_ylgnbu']='Kuning ke biru';
 $ec_lang['lpn_color_ramp_rdylbu']='Merah ke biru, melalui kuning';
 $ec_lang['lpn_georef_drop']='Letakkan model di sini';
 $ec_lang['lpn_georef_finish']='Simpan penempatan ini';
-$ec_lang['lpn_georef_cancel']='Batal';
 $ec_lang['lpn_georef_scale']='Jarak di lapangan per satuan gambar';
 // Edited by TGH 2026-09-07
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
@@ -1344,7 +1332,7 @@ $ec_lang['lpn_pane_print_tip']='Cetak tabel yang sedang Anda lihat, dengan nama 
 // lpn_clean_map_tip were deleted with the row; nothing else read them.
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
-// lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
+// lpn_tool_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
 // it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
 // alternative and Tom kept Project.
 // ROADMAP Task 523, Tom 2026-08-24. **The KEY is still lpn_menu_project and that is deliberate** --
@@ -1395,7 +1383,6 @@ $ec_lang['lpn_time_run_slow']='Jaringan ini membutuhkan {secs} s untuk dihitung,
 $ec_lang['lpn_time_no_report']='Belum ada laporan proses. Laporan ini adalah teks asli dari EPANET, sehingga baru muncul setelah jaringan ini dihitung dengan penyelesai EPANET.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
-$ec_lang['lpn_menu_settings']='Pengaturan';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -1513,10 +1500,6 @@ $ec_lang['lpn_find_op_conn_noopensource']='tidak ada jalur terbuka ke sumber';
 // What a result row prints beside the node id: the fault it has, in three words.
 // What a result row prints beside the id: the NARROWEST condition true of that node, because "no
 // links" says more than "no open path to a source" and both are true of the same node.
-$ec_lang['lpn_find_conn_unlinked']='Tidak ada penghubung di simpul';
-$ec_lang['lpn_find_conn_noopen']='Tidak ada penghubung terbuka di simpul';
-$ec_lang['lpn_find_conn_nolinksource']='Tidak ada jalur penghubung ke sumber';
-$ec_lang['lpn_find_conn_noopensource']='Tidak ada jalur terbuka ke sumber';
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='Setiap simpul telah terhubung.';
@@ -1705,10 +1688,8 @@ $ec_lang['lpn_new_coordsys_local_tip']='Tidak digeoreferensi. Lampirkan gambar l
 // system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
 // the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
 // as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
-$ec_lang['lpn_new_crs']='Proyeksi peta';
 // **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
 // it names the box's own subject rather than either caller's radio label.
-$ec_lang['lpn_crsbox_title']='Sistem koordinat';
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
@@ -1719,7 +1700,6 @@ $ec_lang['lpn_crs_place_tip']='Ketik nama kota, alamat, atau tempat terkenal, da
 $ec_lang['lpn_crs_search']='Cari';
 $ec_lang['lpn_crs_name']='Saring nama proyeksi';
 $ec_lang['lpn_crs_name_tip']='Hanya menampilkan proyeksi yang namanya atau kode EPSG-nya mengandung apa yang Anda ketik. Coba nomor zona, atau UTM, atau Mercator.';
-$ec_lang['lpn_crs_list']='Proyeksi';
 $ec_lang['lpn_crs_list_tip']='Proyeksi yang tersisa dari kedua penyaring di atas. Pilih salah satu lalu tekan Pilih.';
 $ec_lang['lpn_crs_choose']='Pilih';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
@@ -1764,7 +1744,6 @@ $ec_lang['lpn_file_open']='Buka…';
 $ec_lang['lpn_file_save']='Simpan';
 $ec_lang['lpn_file_saveas']='Simpan sebagai…';
 $ec_lang['lpn_file_revert']='Kembalikan';
-$ec_lang['lpn_file_close']='Tutup';
 // Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Berkas terbaru';
@@ -2624,7 +2603,6 @@ $ec_lang['lpn_cp_design']='Desain';
 $ec_lang['lpn_cp_design_tip']='Satu baris untuk setiap properti khusus, dan masing-masing dapat dibuka untuk menampilkan: Kunci, Label, Berlaku untuk, Validasi sebagai, Izinkan atau batasi, kolom karakter yang diberi nama sesuai pilihan itu, Batas bawah panjang, Batas atas panjang, Batas rendah, Batas tinggi.';
 $ec_lang['lpn_cp_add']='Tambah properti khusus';
 $ec_lang['lpn_cp_add_tip']='Menambahkan baris ke tabel desain dan membukanya untuk diedit.';
-$ec_lang['lpn_cp_remove']='Hapus';
 $ec_lang['lpn_cp_remove_tip']='Menghapus properti ini dari tabel desain. Nilai yang sudah diketik pada aset Anda tetap disimpan dalam berkas dan akan kembali jika Anda mendesain kunci yang sama lagi.';
 $ec_lang['lpn_cp_none']='Belum ada properti khusus yang didesain.';
 $ec_lang['lpn_cp_unnamed']='Belum diberi nama';
@@ -2644,7 +2622,6 @@ $ec_lang['lpn_cp_restrict_tip']='Batasi karakter ini: Suatu nilai hanya boleh me
 $ec_lang['lpn_cp_restrict_mode']='Izinkan atau batasi';
 $ec_lang['lpn_cp_restrict_mode_tip']='Izinkan atau batasi: Karakter yang diberikan adalah satu-satunya yang boleh digunakan suatu nilai, atau yang tidak boleh digunakan.';
 $ec_lang['lpn_cp_restrict_allow']='Hanya izinkan karakter ini';
-$ec_lang['lpn_cp_restrict_deny']='Batasi karakter ini';
 $ec_lang['lpn_cp_minlength']='Batas bawah panjang';
 $ec_lang['lpn_cp_minlength_tip']='Batas bawah panjang: Entri yang lebih pendek akan ditandai, sehingga Anda dapat menemukan entri yang kosong dan yang setengah diketik.';
 $ec_lang['lpn_cp_length']='Batas atas panjang';
@@ -2806,7 +2783,6 @@ $ec_lang['lpn_settings_flow_change_tip']='Uji tambahan yang harus dilalui penyel
 $ec_lang['lpn_settings_damp_limit']='Peredaman dimulai pada';
 $ec_lang['lpn_settings_damp_limit_tip']='Akurasi saat penyelesai mulai mengambil langkah yang lebih kecil, yang dapat membantu jaringan yang berosilasi untuk konvergen. Nol berarti penyelesai tidak pernah meredam. Hanya penyelesai EPANET yang membaca kotak ini.';
 $ec_lang['lpn_settings_option_unset']='Tidak dinyatakan';
-$ec_lang['lpn_settings_demand_multiplier']='Pengali kebutuhan';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_demand_multiplier_tip']='Satu faktor tunggal yang diterapkan pada seluruh kebutuhan dalam jaringan sekaligus. Gunakan untuk mengetahui apa yang terjadi pada sistem saat penggunaan lebih besar atau lebih kecil dari saat ini. Ini tidak mengubah angka yang Anda ketik. Sebuah skenario dapat memiliki pengalinya sendiri, sehingga hari rata-rata, hari maksimum, dan jam puncak masing-masing menjadi satu angka; biarkan kosong dalam skenario untuk menggunakan pengali milik proyek.';
 $ec_lang['lpn_settings_engine_native']='Selesaikan dengan penyelesai EPANET';
@@ -3039,7 +3015,7 @@ $ec_lang['lpn_time_speed_tip']='Kecepatan pemutaran';
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,
 // with an index down the left and a search across the top. The section titles are not new keys --
-// each borrows the name it already had (lpn_tool_labels, lpn_menu_settings, lpn_time_menu,
+// each borrows the name it already had (lpn_tool_labels, lpn_tool_settings, lpn_time_menu,
 // lpn_settings_colors), so the box cannot drift from the doors that open it.
 $ec_lang['lpn_settings_search']='Cari pengaturan';
 // **AND-OF-WORDS, STATED AS SUCH** (Tom, 2026-09-23 (g): "can Settings filter work as an AND word
@@ -3096,7 +3072,6 @@ $ec_lang['lpn_settings_quality_track_tip']='Pilih apa yang harus diikuti proses 
 $ec_lang['lpn_settings_quality_source']='Simpul penelusuran';
 $ec_lang['lpn_settings_quality_source_tip']='Simpul yang airnya ditelusuri. Setiap simpul lain kemudian menampilkan bagian airnya yang berasal dari simpul tersebut.';
 $ec_lang['lpn_quality_none']='Tidak ada';
-$ec_lang['lpn_quality_age']='Usia air';
 $ec_lang['lpn_quality_trace']='Penelusuran sumber';
 $ec_lang['lpn_quality_chemical']='Bahan kimia yang bereaksi';
 $ec_lang['lpn_quality_needs_run']='Kualitas air terbawa di sepanjang pipa seiring perjalanan airnya, sehingga memerlukan simulasi periode waktu: penyelesai EPANET dan Total waktu berjalan. Atur Total waktu berjalan di bawah Waktu, lalu tekan tombol Hitung.';
@@ -3270,7 +3245,6 @@ $ec_lang['lpn_scncmp_title']='Perbandingan skenario';
 $ec_lang['lpn_scncmp_menu_tip']='Selesaikan setiap skenario dalam proyek ini dan bacakan berdampingan: tekanan terendah dan kecepatan tertinggi pada masing-masing.';
 $ec_lang['lpn_scncmp_running']='Menyelesaikan setiap skenario…';
 $ec_lang['lpn_scncmp_empty']='Belum ada yang digambar, sehingga tidak ada yang perlu diselesaikan.';
-$ec_lang['lpn_scncmp_col_minpressure']='Tekanan terendah';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Kecepatan tertinggi';
 $ec_lang['lpn_scncmp_at']='{value} pada {id}';
 $ec_lang['lpn_scncmp_current']='(sedang dibuka)';
@@ -3303,7 +3277,6 @@ $ec_lang['lpn_reports_status_tip']='Apa yang berubah selama simulasi periode wak
 $ec_lang['lpn_status_title']='Laporan status';
 $ec_lang['lpn_status_needs_run']='Laporan status mencantumkan apa yang berubah selama simulasi periode waktu. Atur Total waktu berjalan di Pengaturan, Perhitungan, Waktu, tekan Hitung, lalu buka Air, Laporan, Laporan status.';
 $ec_lang['lpn_status_empty']='Tidak ada yang berubah status selama proses ini.';
-$ec_lang['lpn_status_col_time']='Waktu';
 $ec_lang['lpn_status_col_event']='Kejadian';
 $ec_lang['lpn_status_opened']='{type} {id} terbuka';
 $ec_lang['lpn_status_closed']='{type} {id} tertutup';
@@ -3362,7 +3335,6 @@ $ec_lang['lpn_color_mode_jenks']='Jeda alami (Jenks)';
 $ec_lang['lpn_color_mode_stddev']='Simpangan baku';
 $ec_lang['lpn_color_mode_pretty']='Rapi (dibulatkan)';
 $ec_lang['lpn_color_mode_log']='Logaritmik';
-$ec_lang['lpn_color_mode_pressure']='Tekanan';
 $ec_lang['lpn_color_mode_manual']='Manual';
 
 // ---- LIBRARIES (ROADMAP Tasks 462 and 460) ---------------------------------------------------
@@ -3372,7 +3344,7 @@ $ec_lang['lpn_color_mode_manual']='Manual';
 // Simulate, Transport, Time selectors."
 //
 // ONE NAME, THREE DOORS: the toolbar button, the Edit menu row and the box's own title all read
-// this key, exactly as lpn_menu_settings serves the Settings box's three.
+// this key, exactly as lpn_tool_settings serves the Settings box's three.
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='Pustaka';
@@ -3577,7 +3549,6 @@ $ec_lang['lpn_library_rule_add']='Tambah aturan';
 $ec_lang['lpn_library_rule_tip']='Satu aturan, dengan kata-kata yang digunakan EPANET, satu klausa per baris. Baris pertama menamainya: RULE 1. Lalu sebuah kondisi: IF TANK 2 LEVEL BELOW 17.1. Lalu apa yang harus dilakukan: THEN PUMP 9 STATUS IS OPEN. Baris terakhir dapat menetapkan peringkatnya: PRIORITY 1. Tambahkan baris AND atau OR untuk menguji lebih dari satu hal, dan baris ELSE untuk menyatakan apa yang harus dilakukan ketika pengujian gagal. Sebuah kondisi dapat membaca LEVEL, HEAD, GRADE, PRESSURE, atau DEMAND pada sebuah simpul, FLOW, STATUS, atau SETTING pada sebuah penghubung, atau TIME dan CLOCKTIME pada SYSTEM. Tulis angka-angkanya dalam satuan yang ditampilkan proyek ini; angka itu akan dikonversi untuk Anda. Biarkan kata kuncinya dalam bahasa Inggris; itulah yang dibaca halaman ini dan EPANET.';
 $ec_lang['lpn_library_rule_ok']='✓ Aturan ini terbaca';
 $ec_lang['lpn_library_rule_bad']='⚠ Aturan ini tidak dapat dibaca';
-$ec_lang['lpn_library_rule_missing']='⚠ Jaringan ini tidak memiliki apa pun bernama {id}';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
 // for the entire project it is in Settings") drawn on its other side. Without it a pattern you
 // author can only be used by making it the default one, which is not what a library is for.
@@ -3712,8 +3683,6 @@ $ec_lang['lpn_ff_title']='Analisis debit kebakaran';
 $ec_lang['lpn_ff_intro']='Setiap simpul secara bergiliran diminta untuk mengambil debit kebakaran di atas kebutuhan yang sudah dimilikinya. Tidak ada yang berubah pada proyek Anda; seluruh proses dijalankan pada salinan.';
 $ec_lang['lpn_ff_scope']='Simpul yang akan diuji';
 $ec_lang['lpn_ff_scope_tip']='Pilih kelompok simpul sebelum menjalankan. Menguji setiap simpul pada sistem besar dapat memakan waktu beberapa menit.';
-$ec_lang['lpn_ff_scope_all']='Setiap simpul';
-$ec_lang['lpn_ff_scope_selected']='Simpul-simpul yang dipilih';
 $ec_lang['lpn_ff_no_junctions']='Proyek ini belum memiliki simpul, sehingga tidak ada yang dapat diuji.';
 $ec_lang['lpn_ff_no_selection']='Tidak ada simpul yang dipilih. Pilih satu di peta, atau uji setiap simpul.';
 $ec_lang['lpn_ff_skipped']='{n} elemen yang dipilih bukan simpul, sehingga tidak diuji.';
@@ -3725,9 +3694,6 @@ $ec_lang['lpn_ff_residual']='Tekanan sisa yang dipertahankan';
 $ec_lang['lpn_ff_residual_tip']='Tekanan yang harus tetap dipertahankan simpul saat menyalurkan debit kebakaran. AWWA M31 dan NFPA 291 menggunakan 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Pemeriksaan desain (dampak pada sistem)';
 $ec_lang['lpn_ff_design_tip']='Pertanyaan terpisah dari apakah simpul dapat menyalurkan debit tersebut: dengan debit itu diambil di sana, apakah ada hal lain yang turun di bawah tekanan minimumnya atau melampaui batas kecepatannya? Memilih untuk memeriksanya tidak memerlukan perhitungan tambahan.';
-$ec_lang['lpn_ff_design_off']='Jangan periksa';
-$ec_lang['lpn_ff_design_all']='Semua simpul lainnya dan semua pipa';
-$ec_lang['lpn_ff_design_selected']='Simpul yang dipilih dan pipa-pipanya';
 $ec_lang['lpn_ff_design_no_selection']='Pemeriksaan desain diatur ke simpul yang dipilih, dan tidak ada yang dipilih. Pilih beberapa di peta, atau atur ke Semua.';
 
 $ec_lang['lpn_ff_minpressure']='Tekanan terendah yang diizinkan di tempat lain';
@@ -3818,8 +3784,6 @@ $ec_lang['lpn_ff_mode_none']='Tidak ada';
 $ec_lang['lpn_ff_col_solves']='Proses';
 // Which criterion the junction broke while drawing the required flow. A junction that broke nothing
 // shows a dash, never one of these words.
-$ec_lang['lpn_ff_limit_pressure']='Tekanan';
-$ec_lang['lpn_ff_limit_velocity']='Kecepatan';
 $ec_lang['lpn_ff_limit_both']='Tekanan dan kecepatan';
 $ec_lang['lpn_ff_atleast']='lebih dari {flow}';
 $ec_lang['lpn_ff_affect_node']='{id} turun ke {pressure}';

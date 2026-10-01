@@ -1,9 +1,9 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 2166,
+        "expected_key_count": 2135,
         "delta_key_count": 0,
-        "exempt_key_count": 50,
+        "exempt_key_count": 49,
         "exempt_keys": [
             "calc_units_us",
             "calc_units_si",
@@ -32,7 +32,6 @@
             "lpn_result_status",
             "lpn_convas_label_col",
             "lpn_tip_join",
-            "lpn_color_example_status",
             "lpn_color_example_material",
             "lpn_pane_tab_tanks",
             "lpn_dialog_ok",

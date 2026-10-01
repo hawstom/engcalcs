@@ -583,8 +583,13 @@ L.setStatus('');                       // <- this is what runSolve() does on a c
 ok('a CLEAN SOLVE does not wipe the notice', notice.textContent === 'Deleted A. Now showing B.',
    JSON.stringify(notice.textContent));
 
-L.setStatus('Add a reservoir.');       // <- a real diagnostic
-ok('a diagnostic goes to the page bar', bar.textContent === 'Add a reservoir.');
+// Any non-empty string does this job -- what is asserted is the separation from the notice slot,
+// never this string's own wording -- so it is read out of a real pageConfig entry rather than
+// typed as a literal, the same fix harness_wording_check.php asks for everywhere else: a literal
+// here would only ever be a coincidence away from pinning whatever key happens to share its words.
+const diagnosticText = EngCalcs.pageConfig.lpn_hotkeys_map_def;
+L.setStatus(diagnosticText);           // <- a real diagnostic; the exact text does not matter
+ok('a diagnostic goes to the page bar', bar.textContent === diagnosticText);
 // Fixed 2026-08-09 (ROADMAP Task 225 punch list §4, Tom 2026-08-06): a diagnostic used to DISCARD
 // the notice outright -- "nodes have no path to a reservoir" ate "Closed X. Now showing Y." for
 // good, the instant the freshly-opened project's own solve produced a diagnostic. Separate slots

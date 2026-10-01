@@ -212,3 +212,47 @@ it's already been located; no fresh 27-file read is needed.
   element because each is a distinct toolbar button with its own icon and tip, not a template
   slot; templating it would remove the ability to word each element's tip specifically, which
   the suite already does (see `lpn_tool_add_meter_tip` etc., each meaningfully different prose).
+
+---
+
+## Outcome (Task 699, applied 2026-09-30)
+
+Tom, 2026-09-30: *"Merge the listed groups and do the Find redesign."* Each member was checked in
+code for role and in all 27 files for translation before it was merged. `dev/lpn-spike/key-merge-harness.js`
+holds the result: 31 keys retired from all 27 files, every reader repointed.
+
+**Merged** (retired -> survivor): `bpn_show_p`, `lpn_units_pressure`, `lpn_color_mode_pressure`,
+`lpn_ff_limit_pressure` -> `lpn_result_pressure`; `lpn_new_crs`, `lpn_crsbox_title`, `lpn_crs_list`
+-> `lpn_new_coordsys`; `lpn_units_velocity`, `lpn_ff_limit_velocity` -> `lpn_result_velocity`;
+`ip_flow`, `bpn_show_q`, `lpn_units_flow` -> `lpn_result_flow`; `bpn_show_elevation` ->
+`lpn_field_elev`; `bpn_show_length` -> `lpn_field_length`; `lpn_examples_close`, `lpn_file_close` ->
+`lpn_close`; `lpn_color_example_status` -> `lpn_result_status`; `lpn_status_col_time` ->
+`lpn_full_col_time`; `lpn_cp_remove` -> `lpn_fitting_remove`; `lpn_cp_restrict_deny` ->
+`lpn_cp_restrict`; `lpn_library_rule_missing` -> `lpn_library_control_missing`; `lpn_georef_cancel`
+-> `lpn_cancel`; `lpn_menu_settings` -> `lpn_tool_settings`; `lpn_quality_age` ->
+`lpn_result_water_age`; `bpn_show_diameter` -> `lpn_field_diameter`; `lpn_settings_demand_multiplier`
+-> `bpn_demand_mult`; `lpn_scncmp_col_minpressure` -> `bpn_p_min`.
+
+**Find redesign (#5):** the four lowercase `lpn_find_op_conn_*` keys survive, because the query
+parser reads them; a result row raises the first letter in code. Raising, not lowering: lowering is
+wrong in a language that capitalizes nouns.
+
+**WITHDRAWN, with the evidence, so they are not re-proposed:**
+- `mi_elevation` (#6): a narrow column heading, abbreviated in es/pt ("Alt."), ru ("Отм."), id
+  ("Elev"), and it carries `layout: column heading` in `$ec_lang_syn`. Exactly the column-versus-label
+  risk.
+- `lpn_units_length` (#7): its `$ec_lang_syn` entry says it covers tank diameters too, not a pipe's
+  length; my translates it differently; and deleting it would edit `$ec_lang_syn`.
+- `mhp_notes_2_term` (#3): a notes-glossary term, the `mtc_note_2_term` precedent (D7.5); de writes
+  "Fließgeschwindigkeit" there.
+- `lpn_time_menu` (#10): a Settings sub-heading, not a column; ar writes a different word.
+- `lpn_reports_status` (#9): the Status REPORT, a different concept from a link's status; hr, sr, pt
+  translate it differently.
+- All of "None" (#11): gender agreement. fr Aucune/Aucun, pt Nenhuma/Nenhum, it Nessuna/Nessuno, cs
+  Žádná/Žádný, ro Niciuna/Niciunul.
+- `lpn_backdrop_remove` (#13): fr "Retirer" (take the image off) against "Supprimer" (delete) on the
+  other two.
+- "Convert" (#16): `lpn_v2_restore_yes` converts numbers between units, `lpn_convas_ok` converts a
+  project to another coordinate system; de Umrechnen/Umwandeln, ru and uk Перевести/Преобразовать,
+  and 7 more languages differ.
+- The second REDESIGN the counts name is not specified anywhere in the findings, so nothing was done.

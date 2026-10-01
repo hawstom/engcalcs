@@ -8,12 +8,10 @@ lines rather than appending corrections.
 
 ## Before merging anything
 
-- **Protected branches alive, each awaiting Tom's browser pass** (`feature_freeze` is OFF):
-  `feat/table-tab-keys` 8136 (Task 690; he wrote "close, merge, and delete" in a PASTED list, and the
-  classifier refused CC recording that as an all-clear, so it waits for his word typed in a session),
-  `feat/frequency-plot` 8137, `feat/help-menu` 8138, `feat/fireflow-scope` 8139, `feat/pane-height`
-  8140, `feat/property-graph` 8141, plus `feat/label-placer` (the seam; round-5 bench) and
-  `feat/label-gang-search` (bench only). Builder branches `feat/label-placer-a`..`-d` never merge alone.
+- **Protected branches alive, each awaiting Tom's browser pass** (`feature_freeze` is OFF; every one
+  is listed in `dev/branch-policy.json`, which until 2026-09-30 named none of them): see STATE below.
+  Plus `feat/label-placer` (the seam; round-5 bench), `feat/label-gang-search` (bench only), and
+  builders `feat/label-placer-a`..`-d`, which never merge alone.
 - **A branch that adds a key fails `payload freshness` and only that**, by design: agents never
   regenerate `dev/translation_payloads/`. Regenerate once on the merge commit, then run the suite.
 - The all-clear's pin field in `dev/branch-all-clears.json` is **`head`**. Tom can test a preview
@@ -98,47 +96,68 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-09-30
+## STATE — 2026-09-30 (evening)
 
-### Master = see `git log -1 master`, pushed (b722037e + this handoff). Production = 9c71d54f (Tom pulled 2026-09-28)
+### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged and pushed 09-29/30: roadmap reshuffle (99 tier retired, ten tasks to 100; 697 and 724 closed;
-239 and 322 closed on CC's evaluation; 743-747 added); sprint `2026-09-29-echo` (the 125 drift-audit
-keys resynced in every stale language, incl. `consent_body` in 26 -- no consent version bump, wording
-only -- plus his Shift-hint English and his `$ec_lang_syn` for `lpn_goto_on_map`, and "Show on map"
-in 16 languages that had "Go to map"); Task 711 (`fix/new-project-view`); Task 737's concept layer
-(`chore/term-concept`, `dev/term-concepts.md`). Drift baseline re-set 2026-09-30: CHANGED none.
+Merged and pushed 09-30: `feat/table-tab-keys`, `feat/frequency-plot`, `feat/pane-height` (his word
+typed in the session); sprint `2026-09-30-fox` (frequency keys and the table-step row in 26);
+`fix/scenario-sort` (lists by name, Base first); Task 699's 31 key merges (`chore/key-merge`, survivors
+and withdrawals in `dev/key-duplication-audit-2026-09-30.md`); `fix/category-desc` (harness only: R-369
+already fixed it; production predates R-369); `fix/mi-paste` (Paste wrote no cookie version token, so
+mi's v1->v2 migration re-ran and swapped is_bank with n; harness `dev/browser-pass/points-data-roundtrip.js`,
+NOT in check_all); concept ids re-keyed `label-sym-sally` etc.; roadmap 748-754. **Production is now
+far behind master: tell him what a pull brings** (the category bug he reported is one of them).
 
 ### Awaiting his browser pass (protected; merge on his all-clear, typed by him in a session)
 
-- 8136 `feat/table-tab-keys` (Task 690): needs master merged in again (roadmap conflict: take master's
-  side) and `lpn_notes_7_def`'s new row translated in 26 before master can go green.
-- 8137 `feat/frequency-plot`: now fills the pane (a CSS selector lacked `#lpn_freq_chart`). Its own
-  harvest of his rulings will conflict with master's: take master's side of `dev/english-key-rulings.json`,
-  the delta friction file and `dev/new-english-keys.md`, then regenerate.
-- 8138 `feat/help-menu` (745, 718): Perry READY; corner-resize of the new box unverified headless.
-  New furniture key `lpn_hotkeysbox` (told Tom). Last full run was queued when this was written.
-- 8139 `feat/fireflow-scope` (746): Perry READY; five `lpn_ff_*` keys deleted in 27 files.
-- 8140 `feat/pane-height` (744): map reserve 160 -> 32 px. Green but for the since-fixed fallback.
-- 8141 `feat/property-graph` (637): graph at the foot of Properties; also caps Properties to the room
-  below it on a phone (every Properties box, not only graphed ones). Green but payload freshness.
-- All six new ports need his Apache reload (commands at the foot).
+Every port needs his Apache reload (commands at the foot) before he can open 8142-8146.
+- 8138 `feat/help-menu` (745, 718): "Toolbar key" -> "Toolbar" done. Notes on probation (his words in 745).
+- 8139 `feat/fireflow-scope` (746): Design check is one None / All / Selected pull-down, as he asked.
+- 8141 `feat/property-graph` (637): selector reads "Source share from {node}".
+- 8142 `feat/graph-tab-keys` (743): never had a port until 09-30, which is why he "can't confirm".
+  Changes `lpn_notes_7_def` English again ("table or graph tab"): a 26-language resync on merge.
+- 8143 `feat/scenario-preset` (750): Base + his seven in new projects; max day 2.0, peak hour 3.0 (NRC 2006).
+- 8144 `feat/criticality` (751): Perry READY after fixes. His rulings owed: severity order (demand first
+  ranks a trunk main below a trickle); row tints were the builder's addition.
+- 8145 `feat/find-filter` (738): Perry READY after fixes. Rule `lpn_pane_filter_stale` wording.
+- 8146 `feat/copy-lock` (747): his whitelist design (Recent files; same entry as a held handle; save
+  permission; no document ID). No new storage. `dev/browser-pass/specs/locking.js` now meets the copy
+  question first and is not updated.
+- 8147 `feat/bentley-interop` (749): Basic mode built (derived alternatives, nothing stored in files;
+  the scenario-alternatives doc on that branch). New browser key `lpn_scnbasic`, written only when he
+  unchecks it (told Tom). 13 keys; "Active topology" waits on his Activation ruling (753). Full
+  check_all on its last head not run (two harness-label checks re-run alone and pass).
 
-### Awaiting his words -- https://claude.ai/artifact/J5Vb4829NzQYnwFWuHBkRm (answers in its db, `answers/*`)
+### Not protected, waiting only on a translation sprint
 
-Label rules from round 5 (the round-5 record lives only on branch `feat/label-placer`, in its label-trials folder), Task 738
-(Declan vs Ida), Task 699 merges (`dev/key-duplication-audit-2026-09-30.md`), Head vs HGL (737), Help
-menu labels and where Notes goes, the copied-file lock (747), keyboard menus. Read the answers with
-ArtifactData `list` on collection `answers` before anything else. Review queue R-338/R-351 still `[?]`.
+- `fix/points-data-heading`: his "Calculator data (use Copy to see format)" for mi and wi, ruled and
+  recorded; 26 languages owed. Batch it into the next sprint.
+
+### His answers of 09-30 (artifact J5Vb4829NzQYnwFWuHBkRm) are all acted on
+
+Except the label questions: CC adopted only R10's scale sentence (on `feat/label-placer`) and owes him
+written answers on G, R1 and R11 (see the session report of 09-30; re-derive from the round-5 record).
 
 ### Owed translation work
 
-New English waiting on branches (translate on each merge): help-menu 6 keys, fireflow-scope 4 new +
-2 changed, frequency-plot 9, property-graph 1, table-tab-keys `lpn_notes_7_def`. The concept layer's
-four new terms (label-sym-sally, label-user-tessa, label-long-dora, hydraulic-head) have empty
-translations. Glossary write-back owed
-from echo: "Chemical" is a literal EPANET token in `lpn_quality_chemical_name_tip`; Bef./Aft. read as
-prefix/suffix; `lpn_goto_on_map` = show on map.
+New English waiting on branches (translate on each merge, or one sprint when several clear): help-menu
+6 keys + `lpn_help_icons` changed; fireflow-scope `lpn_ff_all`/`lpn_ff_selected` + 2 changed;
+property-graph 2; graph-tab-keys `lpn_notes_7_def`; scenario-preset 14; criticality 23; find-filter 1;
+copy-lock 7; points-data-heading 1. Concept layer's new terms have empty translations. Glossary
+write-back owed from echo: "Chemical" is a literal EPANET token in `lpn_quality_chemical_name_tip`;
+Bef./Aft. read as prefix/suffix; `lpn_goto_on_map` = show on map.
+
+### Traps met 2026-09-30 (evening)
+
+- **`flock` is not a queue.** With seven suites waiting, master's run waited over two hours while branch
+  runs kept winning the lock. Merge master's batch early, before launching branch builds.
+- **An agent ran `git stash`/`pop` again** (graph-tab-keys) and applied another branch's stash; it reset
+  its own tree and the stash list survived. The rule is in every brief and still broke.
+- **A forced `new_english_keys.php --write --force` is safe only when the file equals master's generated
+  copy** (`git diff master -- dev/new-english-keys.md` empty). Check that first, every time.
+- **Bentley is not ours** (Tom): their scenarios are a tree over alternatives; their criticality and
+  on-the-fly analyses run on a copy. He has no WaterCAD.
 
 ### Traps met 2026-09-30
 

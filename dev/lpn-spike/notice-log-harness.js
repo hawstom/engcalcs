@@ -278,7 +278,7 @@ ok('it has an accessible name, which an icon-only button does not get for free',
 ok('it carries no title text -- no tip to show on hover', !btn.title);
 ok('and no .ec-help class -- initTips() must not wire a popup onto this button',
 	String(btn.className || '').indexOf('ec-help') < 0);
-// **AND IT IS DELIBERATELY ABSENT FROM HELP > "TOOLBAR KEY"** (Tom's ruling, 2026-09-23). Perry
+// **AND IT IS DELIBERATELY ABSENT FROM HELP > "TOOLBAR"** (Tom's ruling, 2026-09-23). Perry
 // found that dropping the tip had silently dropped the button out of that list too; it was put
 // back, and Tom then struck the whole idea -- *"that makes 'Toolbar' a lie since the 'Messages'
 // glyph is not really on the Toolbar"* -- which is factually right: the button is written into the
@@ -287,7 +287,7 @@ ok('and no .ec-help class -- initTips() must not wire a popup onto this button',
 // mean somebody had wired this button through setIconLabel() and given it a tip along with it.
 {
 	const guideRow = L.iconGuideRows().filter(r => r.icon === 'history')[0];
-	ok('it is NOT in the Toolbar key list -- that list names the toolbar, and this button is not on it',
+	ok('it is NOT in the Toolbar list -- that list names the toolbar, and this button is not on it',
 		!guideRow, JSON.stringify(L.iconGuideRows().map(r => r.icon)));
 }
 ok('it draws a real icon -- a misspelt name renders nothing at all',
@@ -724,7 +724,7 @@ console.log('9. THE LIVE MUTATION: take the log line out of setNotice() and grou
 }
 
 console.log('10. THE LIVE MUTATION: wiring this button through setIconLabel() would give it BOTH a '
-	+ 'tip and a Toolbar key row, which is the accident Tom struck -- group 7 must catch it');
+	+ 'tip and a Toolbar row, which is the accident Tom struck -- group 7 must catch it');
 {
 	const M6 = load(src => {
 		const mark = "\t\tbtn.setAttribute('aria-label', name);\n";
@@ -733,7 +733,7 @@ console.log('10. THE LIVE MUTATION: wiring this button through setIconLabel() wo
 	});
 	M6.wireMessageLogButton();
 	const guideRow = M6.iconGuideRows().filter(r => r.icon === 'history')[0];
-	ok('registering it again puts it back in the Toolbar key list -- so the assertion in group 7 '
+	ok('registering it again puts it back in the Toolbar list -- so the assertion in group 7 '
 		+ 'is live and would catch a future re-wiring through setIconLabel()',
 		!!guideRow, JSON.stringify(M6.iconGuideRows().map(r => r.icon)));
 }

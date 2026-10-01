@@ -170,19 +170,6 @@
             ],
             "reason": "'Material' is the natural word in these languages; Indonesian degraded it to 'Bahan' to pass this check before the exemption existed."
         },
-        "lpn_color_example_status": {
-            "category": "cognate",
-            "languages": [
-                "es",
-                "pt",
-                "de",
-                "ro",
-                "hr",
-                "id",
-                "sw"
-            ],
-            "reason": "'Status' is the natural word in these languages; a synonym would read as worse."
-        },
         "lpn_color_mode_manual": {
             "category": "cognate",
             "languages": [
@@ -233,13 +220,6 @@
             "category": "code-convention",
             "languages": "*",
             "reason": "snake_case -- same as lpn_cp_val_camel; the underscore IS the convention, so the name cannot be carried into another script."
-        },
-        "lpn_crs_list": {
-            "category": "cognate",
-            "languages": [
-                "fr"
-            ],
-            "reason": "Projection -- the French word, spelled identically, and the cartographic sense here."
         },
         "lpn_curve_volume_col": {
             "category": "cognate",
