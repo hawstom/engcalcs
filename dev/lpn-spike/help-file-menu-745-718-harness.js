@@ -151,9 +151,9 @@ console.log('\n-- Task 718: Recent files sits directly above Close --');
 	report(!!body, 'openFileMenu() is in the source');
 	report(/\], recentRows, \[/.test(body), 'recentRows is concatenated directly before the closing block');
 	const tail = body.slice(body.indexOf('], recentRows, ['));
-	report(/\{ separator: true \},\s*\n\s*\{ icon: 'close', label: pc\.lpn_file_close/.test(tail),
+	report(/\{ separator: true \},\s*\n\s*\{ icon: 'close', label: pc\.lpn_close/.test(tail),
 		'and the very next row after it is Close, with only its own separator between them');
-	report(!/lpn_file_close[\s\S]*recentFiles\.forEach/.test(body),
+	report(!/lpn_close[\s\S]*recentFiles\.forEach/.test(body),
 		'Recent files no longer builds below Close (the pre-Task-718 order)');
 }
 

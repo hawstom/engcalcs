@@ -543,3 +543,22 @@ does, is the odd one out. Ranked below the label-placement and epanet-plus-plus 
 a single control's option set, not a structural gap — but it is a real, cheap fix with two
 citations already in hand, not a guess.
 </content>
+
+
+<!-- 2026-09-30, Task 721, filed by the orchestrator from the seat's own text -->
+**New row, ranked near the top for cheapness and because it answers a live Tom question with a clean
+no/how-narrow verdict:**
+
+**Do not build Google Sheets as the scenario/alternative editing surface; if any Sheets bridge is ever
+built, scope it to `drive.file` + Sheets-on-picked-file only, and frame it as export/import, never as
+the source of truth.** Evidence: no competitor (WaterGEMS/WaterCAD, InfoWater Pro, HEC-RAS, or
+epanet-js — built in 2026, closest analog, shipped scenarios via in-app UI not a spreadsheet) puts a
+spreadsheet in this role; the broad `spreadsheets`/`drive` OAuth scopes are Google-classified
+"sensitive," require a verification process (demo video, verified domain, security review) and cap an
+unverified app at 100 users for the project's lifetime, non-resettable (Google Cloud Platform Console
+Help, cited above); the narrow `drive.file` scope avoids that but still reopens the same
+browser-only-vs-uploaded-data question Task 537 closed twice, for a population — state-firewalled
+countries, legally cautious small-utility counsel — this suite is disproportionately built for.
+**Cost: zero engineering now** (it is advice against a track, not a feature spec); the alternative worth
+costing out instead is a plain `.xlsx`/CSV import-export of scenario override tables, which gets
+engineers their spreadsheet workflow without a login, an OAuth scope, or a server in the loop.

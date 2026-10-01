@@ -428,7 +428,7 @@ ok('7.12 the design fields are the box’s own row primitive', designRows.length
 	modeSel.value = 'deny';
 	fire(modeSel, 'change');
 	ok('7.13.12 choosing Restrict re-captions the character box',
-		!!byAria(firstBody, PC.lpn_cp_restrict_deny), PC.lpn_cp_restrict_deny);
+		!!byAria(firstBody, PC.lpn_cp_restrict), PC.lpn_cp_restrict);
 	ok('7.13.13 ...and the old caption is gone, so the control is not saying both',
 		!byAria(firstBody, PC.lpn_cp_restrict_allow));
 	ok('7.13.14 ...and the design stored the mode it was given',
@@ -441,7 +441,7 @@ ok('7.12 the design fields are the box’s own row primitive', designRows.length
 	ok('7.13.16 ...and stores allow', settings().customProps[0].restrictMode === 'allow');
 }
 // Remove is on line one, because it is not a design field and should not cost opening the row.
-const rm = buttons(L.customBody(), PC.lpn_cp_remove);
+const rm = buttons(L.customBody(), PC.lpn_fitting_remove);
 ok('7.14 every row offers Remove', rm.length === settings().customProps.length);
 ok('7.15 and Remove is on line one, not under the expander',
 	byTag(byTag(L.customBody(), 'summary')[0], 'button').length === 1);
