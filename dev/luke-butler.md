@@ -37,12 +37,12 @@ it and logs contact with him, newest first.
   directly in epanet-js."* What it shows and what it changes for Task 600:
   `dev/epanet-js-contour-contribution.md` §2a, which also lists four questions only he can answer.
   The video is his and is not committed.
-- **Undated, before 2026-10-01: how to contribute.** Luke: *"If you've got an idea, feel free to
+- **2026-09-13, Luke; 2026-09-14, Tom: how to contribute.** Luke: *"If you've got an idea, feel free to
   open up an issue - just be aware we don't actually merge in pull request as it can cause issues
   with who owns the right to the code and what can be done afterwards with it. Also a bunch of
   security concerns too. So because of that, if you submitted a PR, we'd most likely end up
   rewriting most of it by hand. But if you do have an idea you're welcome to share it, or you have a
   suggestion you can also put it in our roadmap too."* Tom: *"If it's just about IP, I would happily
   release any contributions to the public domain in writing. If it's about security, I understand.
-  That makes it hard on you, though."* He did not answer that point; his next message was the
+  That makes it hard on you, though."* He did not answer that point; his next message, on 2026-10-01, was the
   proof of concept. Consequence: `dev/epanet-js-contour-contribution.md` §1 and §4.

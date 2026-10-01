@@ -19,11 +19,11 @@ said here about epanet-js. The feature background is not re-derived: it is in
 
 ### The short answer
 
-**Ideas, yes; code, in practice no.** Luke Butler told Tom directly (logged in
+**Ideas, yes; code, in practice no.** Luke Butler told Tom directly on 2026-09-13 (logged in
 `dev/luke-butler.md`): *"we don't actually merge in pull request as it can cause issues with who owns
 the right to the code ... Also a bunch of security concerns too. ... if you submitted a PR, we'd most
 likely end up rewriting most of it by hand."* The doors he named are **an issue** and **their
-roadmap**. Tom answered that he would release any contribution to the public domain in writing;
+roadmap**. Tom answered on 2026-09-14 that he would release any contribution to the public domain in writing;
 that answers the ownership reason but not the security one. The `CONTRIBUTING.md` reading below is
 kept as the record and is superseded by his word.
 
