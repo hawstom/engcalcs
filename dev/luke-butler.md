@@ -28,6 +28,9 @@ it and logs contact with him, newest first.
 
 ## Contact log
 
+- **2026-10-01, Tom's ruling on how we contribute:** *"My take-away is that the best way we can
+  contribute is by white papers."* Ideas reach him as a paper, pointed to from an issue or their
+  roadmap; never as a pull request.
 - **2026-10-01, he replied** to Tom's public-domain message below (*"sorry I forgot to reply to
   your message!"*). He sent a screen capture of a pressure-surface
   proof of concept: head minus a DEM, over an extended-period run. *"The goal is to one day get this

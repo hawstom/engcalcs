@@ -749,11 +749,16 @@ into a user base larger than ours.
 
 ### Recommendation
 
-**Build it here first, and publish the finding now.** In order:
+**Tom, 2026-10-01, after Luke's no-PR answer:** *"My take-away is that the best way we can
+contribute is by white papers."* So the contribution is a written, dated, citable paper; an issue or
+a roadmap post is only the pointer to it.
 
-1. **Do Step 0 this month** — the `Fcontour.pas` analysis, as a comment on their Canny item and a
-   GitHub issue. It is true, it is useful to them, it costs an hour, it carries no licence question,
-   and it is the move that is unambiguously right whatever else we decide.
+**Build it here first, and publish the finding as a white paper.** In order:
+
+1. **Write Step 0 up as the first white paper**: EPANET's actual contour rule from `Fcontour.pas`,
+   why TIN beats IDW at network density, head minus DEM, and the honest boundary. Then point to it
+   from a GitHub issue and their roadmap item. It carries no licence question, and it is useful to
+   anyone drawing a contour, not only to epanet-js.
 2. **Build contour in `lpn_` under Task 600**: TIN-linear over the Delaunay triangulation, the hull
    by construction, a max-edge mask in metres, no fill across closed valves, mandatory node dots, and
    the support sentence under the legend. Not because we are racing them, but because **the honesty argument is only persuasive once somebody has shipped it**
