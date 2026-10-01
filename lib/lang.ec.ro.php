@@ -1767,7 +1767,7 @@ $ec_lang['lpn_tab_move_right']='Mutare la dreapta';
 $ec_lang['lpn_tab_unsaved']='Nesalvat într-un fișier';
 $ec_lang['lpn_import_bad_file']='Acel fișier nu a putut fi citit ca proiect salvat de pe această pagină.';
 $ec_lang['lpn_import_no_room']='Nu mai există suficient spațiu de stocare în browser pentru a adăuga acest proiect. Ștergeți un proiect de care nu mai aveți nevoie și încercați din nou.';
-$ec_lang['lpn_file_import_menu']='Import…';
+$ec_lang['lpn_file_import_menu']='Importare…';
 // ---- EPANET .inp import (ROADMAP Task 196) ----
 // The import REPORTS every difference between the file and what this page can hold, so each
 // lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined

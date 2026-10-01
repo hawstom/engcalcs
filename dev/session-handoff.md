@@ -96,57 +96,53 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-09-30 (evening)
+## STATE — 2026-10-01 (night of 09-30)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged and pushed 09-30: `feat/table-tab-keys`, `feat/frequency-plot`, `feat/pane-height` (his word
-typed in the session); sprint `2026-09-30-fox` (frequency keys and the table-step row in 26);
-`fix/scenario-sort` (lists by name, Base first); Task 699's 31 key merges (`chore/key-merge`, survivors
-and withdrawals in `dev/key-duplication-audit-2026-09-30.md`); `fix/category-desc` (harness only: R-369
-already fixed it; production predates R-369); `fix/mi-paste` (Paste wrote no cookie version token, so
-mi's v1->v2 migration re-ran and swapped is_bank with n; harness `dev/browser-pass/points-data-roundtrip.js`,
-NOT in check_all); concept ids re-keyed `label-sym-sally` etc.; roadmap 748-754. **Production is now
-far behind master: tell him what a pull brings** (the category bug he reported is one of them).
+**Tom was told 8449b604 was safe to pull** (it carries the mi Paste fix). Master since then also carries,
+on his word typed in the session: `feat/find-filter`, `feat/scenario-preset`, `feat/graph-tab-keys`,
+`feat/fireflow-scope`, `feat/help-menu`; `fix/points-data-heading`; sprint `2026-09-30-golf` (their
+English in 26, with his rulings on 10 Wave 0 findings, his harvested marks, syn notes for
+`lpn_ff_all`/`lpn_ff_selected`); Task 755 (per-scenario calculation options), Task 756 and
+`dev/desktop-platforms-plan.md`. Merged branches' worktrees and branches are deleted.
 
 ### Awaiting his browser pass (protected; merge on his all-clear, typed by him in a session)
 
-Every port needs his Apache reload (commands at the foot) before he can open 8142-8146.
-- 8138 `feat/help-menu` (745, 718): "Toolbar key" -> "Toolbar" done. Notes on probation (his words in 745).
-- 8139 `feat/fireflow-scope` (746): Design check is one None / All / Selected pull-down, as he asked.
-- 8141 `feat/property-graph` (637): selector reads "Source share from {node}".
-- 8142 `feat/graph-tab-keys` (743): never had a port until 09-30, which is why he "can't confirm".
-  Changes `lpn_notes_7_def` English again ("table or graph tab"): a 26-language resync on merge.
-- 8143 `feat/scenario-preset` (750): Base + his seven in new projects; max day 2.0, peak hour 3.0 (NRC 2006).
-- 8144 `feat/criticality` (751): Perry READY after fixes. His rulings owed: severity order (demand first
-  ranks a trunk main below a trickle); row tints were the builder's addition.
-- 8145 `feat/find-filter` (738): Perry READY after fixes. Rule `lpn_pane_filter_stale` wording.
-- 8146 `feat/copy-lock` (747): his whitelist design (Recent files; same entry as a held handle; save
-  permission; no document ID). No new storage. `dev/browser-pass/specs/locking.js` now meets the copy
-  question first and is not updated.
-- 8147 `feat/bentley-interop` (749): Basic mode built (derived alternatives, nothing stored in files;
-  the scenario-alternatives doc on that branch). New browser key `lpn_scnbasic`, written only when he
-  unchecks it (told Tom). 13 keys; "Active topology" waits on his Activation ruling (753). Full
-  check_all on its last head not run (two harness-label checks re-run alone and pass).
-
-### Not protected, waiting only on a translation sprint
-
-- `fix/points-data-heading`: his "Calculator data (use Copy to see format)" for mi and wi, ruled and
-  recorded; 26 languages owed. Batch it into the next sprint.
-
-### His answers of 09-30 (artifact J5Vb4829NzQYnwFWuHBkRm) are all acted on
-
-Except the label questions: CC adopted only R10's scale sentence (on `feat/label-placer`) and owes him
-written answers on G, R1 and R11 (see the session report of 09-30; re-derive from the round-5 record).
+Ports need his Apache reload (commands at the foot). His notes arrive as pastes: ask him to confirm
+merges with AskUserQuestion, then record his selection as the words.
+- 8141 `feat/property-graph` (637): "Source share from {node}"; a pump's graph now reads "Head gain",
+  positive (Mary: EPANET says head gain; WaterGEMS shows positive Pump Head). Elsewhere a pump still
+  shows signed "Head loss" (Tables, Properties result, labels, Time series): his call to rename.
+- 8144 `feat/criticality` (751): his "Skip dead ends" toggle built (a bridge with no source beyond;
+  a single feed main from the only reservoir counts as one). Owed rulings: severity order; row tints
+  (builder's addition); whether Design check should get its own All/Selected keys (fr/pt "Toutes",
+  "Todas" agree with junctions only, and Design check reuses them for pipes and junctions).
+- 8146 `feat/copy-lock` (747): his wording ("This file says it was created on {date}, and this browser
+  doesn't recognize it...") and his "moved, not copied" reading: Original on a different file
+  reconnects the tab to it. `lpn_copy_kept_link` reworded, needs his ruling.
+- 8147 `feat/bentley-interop` (749): Basic mode; "Alternatives preview"; his "Asset activation",
+  note and tip applied; Demand multiplier column (a calculation option, blank = inherits). New browser
+  key `lpn_scnbasic` (told Tom). Last full check_all on this branch predates the final commits.
+- `feat/label-placer` (539/741): R10 scale sentence adopted; CC owes him written answers on G, R1 and
+  R11 (given in the 09-30 night report; re-derive from the round-5 record if lost) and needs his number
+  for the R10/R15 settle bound.
 
 ### Owed translation work
 
-New English waiting on branches (translate on each merge, or one sprint when several clear): help-menu
-6 keys + `lpn_help_icons` changed; fireflow-scope `lpn_ff_all`/`lpn_ff_selected` + 2 changed;
-property-graph 2; graph-tab-keys `lpn_notes_7_def`; scenario-preset 14; criticality 23; find-filter 1;
-copy-lock 7; points-data-heading 1. Concept layer's new terms have empty translations. Glossary
-write-back owed from echo: "Chemical" is a literal EPANET token in `lpn_quality_chemical_name_tip`;
-Bef./Aft. read as prefix/suffix; `lpn_goto_on_map` = show on map.
+On branches: property-graph 4 keys, criticality ~26, copy-lock 7, bentley-interop 13. Romanian file
+menu mixes noun and verb forms ("Importare…", "Importă puncte topografice…"): a consistency pass.
+Concept layer's new terms have empty translations. Glossary write-back owed from echo (see 09-30).
+
+### Traps met 2026-09-30 (night)
+
+- **The machine restarted mid-session** (kernel changed; scratchpad wiped; a master run lost). Every
+  agent had committed, so nothing was lost; branches are now also pushed to GitHub as backup.
+- **CC force-regenerated `dev/new-english-keys.md` in the main checkout without first checking it for
+  his uncommitted edits.** He may have lost an edit. Before ANY `--force`: `git status` and `git diff`
+  on that file in that checkout, and harvest first.
+- **A long check_all queue gets a background command killed at its time limit.** Start master's run
+  detached (`setsid nohup sh -c '...; echo EXIT=$? >> LOG'`) and wait with `dev/scripts/wait_for.sh`.
 
 ### Traps met 2026-09-30 (evening)
 
