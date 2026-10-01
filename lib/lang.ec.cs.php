@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Obnovit výchozí hodnoty';
 $ec_lang['calc_defaults_confirm']='Resetovat kalkulačku na výchozí hodnoty?';
 $ec_lang['points_data_note']='(nebo Kopírovat/Vložit pomocí datové oblasti)';
-$ec_lang['points_data_heading']='Data bodů<br />(oddělena čárkou nebo tabulátorem)';
+$ec_lang['points_data_heading']='Data kalkulátoru<br />(formát zobrazíte tlačítkem Kopírovat)';
 $ec_lang['points_data_copy']='Kopírovat';
 $ec_lang['points_data_paste']='Vložit';
 $ec_lang['calc_inputs']='Vstupy';
@@ -930,6 +930,11 @@ $ec_lang['lpn_examples_loading']='Načítání příkladů…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='Opravit něco';
 $ec_lang['lpn_help_notes']='Poznámky k této stránce';
+$ec_lang['lpn_help_hotkeys']='Tabulky a klávesové zkratky';
+$ec_lang['lpn_hotkeys_tables_heading']='Tabulky';
+$ec_lang['lpn_hotkeys_map_heading']='Mapa';
+$ec_lang['lpn_hotkeys_map_term']='Klávesové zkratky mapy';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 nebo Esc</td><td>Výběr.</td></tr><tr><td>2</td><td>Přidat uzel.</td></tr><tr><td>3</td><td>Přidat zdroj.</td></tr><tr><td>4</td><td>Přidat nádrž.</td></tr><tr><td>5</td><td>Přidat potrubí.</td></tr><tr><td>6</td><td>Přidat čerpadlo.</td></tr><tr><td>7</td><td>Přidat ventil.</td></tr><tr><td>8</td><td>Přidat odběratele.</td></tr><tr><td>9</td><td>Přidat text.</td></tr><tr><td>Delete</td><td>Smazat výběr.</td></tr><tr><td>Ctrl+Z</td><td>Vrátit poslední změnu.</td></tr><tr><td>+ nebo =</td><td>Přiblížit.</td></tr><tr><td>-</td><td>Oddálit.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1204,7 +1209,7 @@ $ec_lang['lpn_find_menu_tip']='Najděte prvek podle jeho ID, nebo najděte všec
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='Co znamenají ikony na panelu nástrojů';
+$ec_lang['lpn_help_icons']='Legenda panelu nástrojů';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Viditelnost';
 $ec_lang['lpn_pane_right_toggle_tip']='Zobrazí nebo skryje panel vpravo od mapy. Obsahuje volby popisků a barev.';
@@ -1313,6 +1318,7 @@ $ec_lang['lpn_pane_not_used']='Nepoužito';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='Filtrováno podle {q}. Zobrazeno {n} z {all}.';
 $ec_lang['lpn_pane_filter_clear']='Zobrazit vše';
+$ec_lang['lpn_pane_filter_stale']='Řádky, které už neodpovídají: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Ničemu v této tabulce filtr neodpovídá.';
@@ -1761,6 +1767,7 @@ $ec_lang['lpn_tab_move_right']='Přesunout doprava';
 $ec_lang['lpn_tab_unsaved']='Neuloženo do souboru';
 $ec_lang['lpn_import_bad_file']='Tento soubor se nepodařilo přečíst jako projekt uložený z této stránky.';
 $ec_lang['lpn_import_no_room']='V úložišti prohlížeče není dost místa pro přidání tohoto projektu. Smažte projekt, který už nepotřebujete, a zkuste to znovu.';
+$ec_lang['lpn_file_import_menu']='Importovat…';
 // ---- EPANET .inp import (ROADMAP Task 196) ----
 // The import REPORTS every difference between the file and what this page can hold, so each
 // lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
@@ -2111,7 +2118,7 @@ $ec_lang['lpn_notes_6_term']='Nápověda ke sloupcům tabulky';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Vybrat sloupec</td><td>Klikněte na záhlaví</td></tr><tr><td>Přidat do výběru sloupců nebo jej rozšířit</td><td>Ctrl+klik nebo Shift+klik na jiné záhlaví</td></tr><tr><td>Přesunout (změnit pořadí) vybraných sloupců</td><td>Přetáhněte, nebo v nabídce po kliknutí pravým tlačítkem či v nabídce ⋮ použijte Spravovat sloupce…</td></tr><tr><td>Nabídka ⋮ a šipka řazení.</td><td>Najeďte na horní roh záhlaví, nebo jej vyberte či na něj přejděte klávesou Tab</td></tr><tr><td>Skrýt, Zobrazit vše nebo Spravovat viditelnost a pořadí</td><td>Klikněte pravým tlačítkem na záhlaví, nebo použijte nabídku ⋮ v pravém horním rohu záhlaví</td></tr><tr><td>Seřadit podle sloupce</td><td>Ikona šipky v pravém horním rohu záhlaví</td></tr><tr><td>Vložit jako nové řádky na konec tabulky</td><td>Klikněte pravým tlačítkem, použijte nabídku ⋮ v pravém horním rohu záhlaví, nebo Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Klávesové zkratky tabulky';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Šipky</td><td>Pohyb po tabulce.</td></tr><tr><td>Tab, Enter</td><td>Dokončí zadání a přesune o jednu buňku napříč / dolů.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Přesun zpět.</td></tr><tr><td>Shift+šipky</td><td>Rozšíří výběr.</td></tr><tr><td>Ctrl+C</td><td>Zkopíruje výběr.</td></tr><tr><td>Ctrl+D</td><td>Vyplní výběr dolů z jeho horního řádku.</td></tr><tr><td>Ctrl+Enter</td><td>Vyplní výběr hodnotou aktivní buňky.</td></tr><tr><td>Ctrl+A</td><td>Vybere celou tabulku.</td></tr><tr><td>Ctrl+Shift+V</td><td>Vloží jako nové řádky na konec tabulky.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Přepne na další nebo předchozí tabulku.</td></tr><tr><td>Delete</td><td>Vymaže buňku.</td></tr><tr><td>F2</td><td>Otevře buňku k úpravě.</td></tr><tr><td>Esc</td><td>Zruší úpravu.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Šipky</td><td>Pohyb po tabulce.</td></tr><tr><td>Tab, Enter</td><td>Dokončí zadání a přesune o jednu buňku napříč / dolů.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Přesun zpět.</td></tr><tr><td>Shift+šipky</td><td>Rozšíří výběr.</td></tr><tr><td>Ctrl+C</td><td>Zkopíruje výběr.</td></tr><tr><td>Ctrl+D</td><td>Vyplní výběr dolů z jeho horního řádku.</td></tr><tr><td>Ctrl+Enter</td><td>Vyplní výběr hodnotou aktivní buňky.</td></tr><tr><td>Ctrl+A</td><td>Vybere celou tabulku.</td></tr><tr><td>Ctrl+Shift+V</td><td>Vloží jako nové řádky na konec tabulky.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Přepne na další nebo předchozí kartu, ať už tabulku, nebo graf.</td></tr><tr><td>Delete</td><td>Vymaže buňku.</td></tr><tr><td>F2</td><td>Otevře buňku k úpravě.</td></tr><tr><td>Esc</td><td>Zruší úpravu.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2708,6 +2715,20 @@ $ec_lang['lpn_scenario_push_confirm']='Nastavit ve všech scénářích základn
 $ec_lang['lpn_scenario_push_scenarios']='Dotčené scénáře:';
 $ec_lang['lpn_scenario_push_values']='Zahozené hodnoty:';
 $ec_lang['lpn_scenario_push_none']='Žádný scénář nemá u těchto vlastností specifickou hodnotu, takže by se nic nezměnilo. Nic se nezahazuje.';
+$ec_lang['lpn_scenario_preset_flow_static']='1. Zkouška průtoku: statická';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='Kalibrace zkoušky průtoku pro navrhovanou síť při nulovém průtoku. V tomto scénáři nastavte odběr ve všech uzlech na 0.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. Zkouška průtoku: střední';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='Kalibrace zkoušky průtoku pro navrhovanou síť při prvním uvedeném průtoku. V tomto scénáři nastavte odběr v uzlu, kterým voda protéká, na první naměřený průtok a odběr ve všech ostatních uzlech na 0.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. Zkouška průtoku: maximální';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='Kalibrace zkoušky průtoku pro navrhovanou síť při uvedeném maximálním průtoku. V tomto scénáři nastavte odběr v uzlu, kterým voda protéká, na maximální naměřený průtok a odběr ve všech ostatních uzlech na 0.';
+$ec_lang['lpn_scenario_preset_average_day']='4. Průměrný den';
+$ec_lang['lpn_scenario_preset_average_day_tip']='Násobitel odběru 1: každý odběr tak, jak byl zadán, což se považuje za odběr průměrného dne.';
+$ec_lang['lpn_scenario_preset_max_day']='5. Maximální den';
+$ec_lang['lpn_scenario_preset_max_day_tip']='Násobitel odběru 2,0 násobek průměrného dne, zástupná hodnota. Většina systémů se pohybuje mezi 1,2 a 3,0 (National Research Council, 2006). Hodnotu svého systému nastavte v Nastavení, Výpočet, Hydraulika, Násobitel odběru.';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. Špičková hodina';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='Násobitel odběru 3,0 násobek průměrného dne, zástupná hodnota. Většina systémů se pohybuje mezi 3,0 a 6,0 (National Research Council, 2006). Hodnotu svého systému nastavte v Nastavení, Výpočet, Hydraulika, Násobitel odběru.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. Požár plus maximální den';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='Odběr maximálního dne (násobitel 2,0). V tomto scénáři spusťte Analýzu požárního průtoku: ke stávajícímu odběru přidá požární průtok v každém uzlu.';
 $ec_lang['lpn_delete_drops_overrides']='Smazáním tohoto prvku se zahodí i {n} hodnot, které pro něj drží vaše scénáře. Pokračovat?';
 $ec_lang['lpn_push_base_only']='Tato akce mění samotnou kresbu, proto ji lze provést jen v {base}. Přepněte na {base} a zkuste to znovu.';
 $ec_lang['lpn_field_active']='Součást sítě';
@@ -3681,8 +3702,10 @@ $ec_lang['lpn_ff_title']='Analýza požárního průtoku';
 $ec_lang['lpn_ff_intro']='Každý uzel je postupně požádán, aby odebral požární průtok navíc k odběru, který už má. Nic ve vašem projektu se nemění; celý výpočet probíhá na kopii.';
 $ec_lang['lpn_ff_scope']='Uzly k otestování';
 $ec_lang['lpn_ff_scope_tip']='Zvolte množinu před spuštěním. Testování každého uzlu ve velké síti může trvat minuty.';
+$ec_lang['lpn_ff_all']='Všechny';
+$ec_lang['lpn_ff_selected']='Vybrané';
 $ec_lang['lpn_ff_no_junctions']='Tento projekt zatím nemá žádné uzly, takže není co testovat.';
-$ec_lang['lpn_ff_no_selection']='Není vybrán žádný uzel. Zvolte jeden na mapě, nebo otestujte každý uzel.';
+$ec_lang['lpn_ff_no_selection']='Není vybrán žádný uzel. Vyberte uzly, nebo zvolte možnost Všechny.';
 $ec_lang['lpn_ff_skipped']='{n} vybraných prvků nejsou uzly, takže nebyly testovány.';
 $ec_lang['lpn_ff_required']='Požadovaný požární průtok';
 $ec_lang['lpn_ff_required_tip']='Průtok, který vyžaduje váš požární předpis nebo hasičský sbor u hydrantu. Každý uzel je proti tomuto číslu testován, pokud nemá vlastní požadovaný požární průtok.';
@@ -3692,7 +3715,7 @@ $ec_lang['lpn_ff_residual']='Zbytkový tlak k udržení';
 $ec_lang['lpn_ff_residual_tip']='Tlak, který musí uzel stále držet při odběru požárního průtoku. AWWA M31 a NFPA 291 používají 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Návrhová kontrola (vliv na síť)';
 $ec_lang['lpn_ff_design_tip']='Samostatná otázka od toho, zda uzel dokáže dodat průtok: klesne při odběru tohoto průtoku tam něco jiného pod svůj minimální tlak, nebo přesáhne limit rychlosti? Volba tuto kontrolu provést nestojí žádný další výpočet navíc.';
-$ec_lang['lpn_ff_design_no_selection']='Návrhová kontrola je nastavena na vybrané uzly a žádný není vybrán. Vyberte nějaké na mapě, nebo nastavte Vše.';
+$ec_lang['lpn_ff_design_no_selection']='Návrhová kontrola je nastavena na vybrané prvky a žádný není vybrán. Vyberte prvky, nebo zvolte možnost Všechny.';
 $ec_lang['lpn_ff_minpressure']='Nejnižší povolený tlak jinde';
 $ec_lang['lpn_ff_minpressure_tip']='Uzel, který klesne pod tuto hodnotu, zatímco jiný odebírá svůj požární průtok, je nahlášen jako návrhový problém.';
 $ec_lang['lpn_ff_maxvelocity']='Nejvyšší povolená rychlost';

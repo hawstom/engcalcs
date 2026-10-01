@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Standardwerte wiederherstellen';
 $ec_lang['calc_defaults_confirm']='Rechner auf die ursprünglichen Standardwerte zurücksetzen?';
 $ec_lang['points_data_note']='(oder Kopieren/Einfügen im Datenbereich)';
-$ec_lang['points_data_heading']='Punktdaten<br />(durch Komma oder Tabulator getrennt)';
+$ec_lang['points_data_heading']='Rechnerdaten<br />(Format mit Kopieren anzeigen)';
 $ec_lang['points_data_copy']='Kopieren';
 $ec_lang['points_data_paste']='Einfügen';
 $ec_lang['calc_inputs']='Eingaben';
@@ -930,6 +930,11 @@ $ec_lang['lpn_examples_loading']='Beispiele werden geladen…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='Etwas reparieren';
 $ec_lang['lpn_help_notes']='Hinweise zu dieser Seite';
+$ec_lang['lpn_help_hotkeys']='Tabellen und Tastenkürzel';
+$ec_lang['lpn_hotkeys_tables_heading']='Tabellen';
+$ec_lang['lpn_hotkeys_map_heading']='Karte';
+$ec_lang['lpn_hotkeys_map_term']='Tastenkürzel der Karte';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 oder Esc</td><td>Auswählen.</td></tr><tr><td>2</td><td>Einen Entnahmeknoten hinzufügen.</td></tr><tr><td>3</td><td>Ein Reservoir hinzufügen.</td></tr><tr><td>4</td><td>Einen Tank hinzufügen.</td></tr><tr><td>5</td><td>Ein Rohr hinzufügen.</td></tr><tr><td>6</td><td>Eine Pumpe hinzufügen.</td></tr><tr><td>7</td><td>Ein Ventil hinzufügen.</td></tr><tr><td>8</td><td>Einen Kunden hinzufügen.</td></tr><tr><td>9</td><td>Text hinzufügen.</td></tr><tr><td>Delete</td><td>Die Auswahl löschen.</td></tr><tr><td>Ctrl+Z</td><td>Die letzte Änderung rückgängig machen.</td></tr><tr><td>+ oder =</td><td>Vergrößern.</td></tr><tr><td>-</td><td>Verkleinern.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1204,7 +1209,7 @@ $ec_lang['lpn_find_menu_tip']='Findet ein Element anhand seiner ID, oder findet 
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='Was die Symbole in der Werkzeugleiste bedeuten';
+$ec_lang['lpn_help_icons']='Legende der Symbolleiste';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Sichtbarkeit';
 $ec_lang['lpn_pane_right_toggle_tip']='Blendet das Panel rechts neben der Karte ein oder aus. Es enthält die Auswahl für Beschriftungen und Farben.';
@@ -1313,6 +1318,7 @@ $ec_lang['lpn_pane_not_used']='Nicht verwendet';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='Gefiltert nach {q}. Zeigt {n} von {all}.';
 $ec_lang['lpn_pane_filter_clear']='Alle anzeigen';
+$ec_lang['lpn_pane_filter_stale']='Zeilen, die nicht mehr passen: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Nichts in dieser Tabelle entspricht dem Filter.';
@@ -1761,6 +1767,7 @@ $ec_lang['lpn_tab_move_right']='Nach rechts verschieben';
 $ec_lang['lpn_tab_unsaved']='Nicht in einer Datei gespeichert';
 $ec_lang['lpn_import_bad_file']='Diese Datei konnte nicht als ein von dieser Seite gespeichertes Projekt gelesen werden.';
 $ec_lang['lpn_import_no_room']='Es ist nicht genug Browserspeicher übrig, um dieses Projekt hinzuzufügen. Löschen Sie ein nicht mehr benötigtes Projekt und versuchen Sie es erneut.';
+$ec_lang['lpn_file_import_menu']='Importieren…';
 // ---- EPANET .inp import (ROADMAP Task 196) ----
 // The import REPORTS every difference between the file and what this page can hold, so each
 // lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
@@ -2111,7 +2118,7 @@ $ec_lang['lpn_notes_6_term']='Hilfe zu Tabellenspalten';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Spalte auswählen</td><td>Überschrift anklicken</td></tr><tr><td>Spaltenauswahl hinzufügen oder erweitern</td><td>Ctrl+click oder Shift+click auf eine weitere Überschrift</td></tr><tr><td>Ausgewählte Spalte(n) verschieben (neu anordnen)</td><td>Ziehen oder Spalten verwalten… im Rechtsklick- oder ⋮-Menü verwenden</td></tr><tr><td>Menü ⋮ und Sortierpfeil.</td><td>Mit dem Zeiger über die obere Ecke einer Überschrift fahren, oder eine Überschrift auswählen oder per Tab erreichen</td></tr><tr><td>Ausblenden, Alle anzeigen oder Sichtbarkeit und Reihenfolge verwalten</td><td>Überschrift rechtsklicken oder ⋮-Menü in der oberen rechten Ecke der Überschrift</td></tr><tr><td>Nach Spalte sortieren</td><td>Pfeilsymbol in der oberen rechten Ecke der Überschrift</td></tr><tr><td>Als neue Zeilen am Ende der Tabelle einfügen</td><td>Rechtsklick, ⋮-Menü in der oberen rechten Ecke der Überschrift, oder Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Tastenkürzel der Tabelle';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Pfeiltasten</td><td>Navigieren.</td></tr><tr><td>Tab, Enter</td><td>Eingabe abschließen und eine Zelle weiter / nach unten navigieren.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Rückwärts navigieren.</td></tr><tr><td>Shift+arrow keys</td><td>Auswahl erweitern.</td></tr><tr><td>Ctrl+C</td><td>Auswahl kopieren.</td></tr><tr><td>Ctrl+D</td><td>Auswahl von ihrer obersten Zeile aus nach unten ausfüllen.</td></tr><tr><td>Ctrl+Enter</td><td>Auswahl mit dem Wert der aktiven Zelle ausfüllen.</td></tr><tr><td>Ctrl+A</td><td>Die gesamte Tabelle auswählen.</td></tr><tr><td>Ctrl+Shift+V</td><td>Als neue Zeilen am Ende der Tabelle einfügen.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Zur nächsten oder vorherigen Tabelle wechseln.</td></tr><tr><td>Delete</td><td>Zelle leeren.</td></tr><tr><td>F2</td><td>Eine Zelle zum Bearbeiten öffnen.</td></tr><tr><td>Esc</td><td>Bearbeitung abbrechen.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Pfeiltasten</td><td>Navigieren.</td></tr><tr><td>Tab, Enter</td><td>Eingabe abschließen und eine Zelle weiter / nach unten navigieren.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Rückwärts navigieren.</td></tr><tr><td>Shift+arrow keys</td><td>Auswahl erweitern.</td></tr><tr><td>Ctrl+C</td><td>Auswahl kopieren.</td></tr><tr><td>Ctrl+D</td><td>Auswahl von ihrer obersten Zeile aus nach unten ausfüllen.</td></tr><tr><td>Ctrl+Enter</td><td>Auswahl mit dem Wert der aktiven Zelle ausfüllen.</td></tr><tr><td>Ctrl+A</td><td>Die gesamte Tabelle auswählen.</td></tr><tr><td>Ctrl+Shift+V</td><td>Als neue Zeilen am Ende der Tabelle einfügen.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Zum nächsten oder vorherigen Tab wechseln, ob Tabelle oder Diagramm.</td></tr><tr><td>Delete</td><td>Zelle leeren.</td></tr><tr><td>F2</td><td>Eine Zelle zum Bearbeiten öffnen.</td></tr><tr><td>Esc</td><td>Bearbeitung abbrechen.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2708,6 +2715,20 @@ $ec_lang['lpn_scenario_push_confirm']='Sollen alle Szenarien für diese Eigensch
 $ec_lang['lpn_scenario_push_scenarios']='Betroffene Szenarien:';
 $ec_lang['lpn_scenario_push_values']='Verworfene Werte:';
 $ec_lang['lpn_scenario_push_none']='Kein Szenario hat für diese Eigenschaften einen eigenen Wert, daher würde sich nichts ändern. Es wird nichts verworfen.';
+$ec_lang['lpn_scenario_preset_flow_static']='1. Durchflusstest: Statisch';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='Kalibrierung des Durchflusstests für ein Planungsnetz bei Durchfluss 0. Setzen Sie in diesem Szenario die Entnahme an allen Entnahmeknoten auf 0.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. Durchflusstest: Mittel';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='Kalibrierung des Durchflusstests für ein Planungsnetz beim zuerst gemeldeten Durchfluss. Setzen Sie in diesem Szenario die Entnahme am Entnahmeknoten, an dem Wasser abfließt, auf den zuerst gemessenen Durchfluss und die Entnahme an allen anderen Entnahmeknoten auf 0.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. Durchflusstest: Maximum';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='Kalibrierung des Durchflusstests für ein Planungsnetz beim maximal gemeldeten Durchfluss. Setzen Sie in diesem Szenario die Entnahme am Entnahmeknoten, an dem Wasser abfließt, auf den maximal gemessenen Durchfluss und die Entnahme an allen anderen Entnahmeknoten auf 0.';
+$ec_lang['lpn_scenario_preset_average_day']='4. Mittlerer Tag';
+$ec_lang['lpn_scenario_preset_average_day_tip']='Entnahmefaktor 1: jede Entnahme wie eingegeben, die als mittlere Tagesentnahme gilt.';
+$ec_lang['lpn_scenario_preset_max_day']='5. Maximaltag';
+$ec_lang['lpn_scenario_preset_max_day_tip']='Entnahmefaktor 2,0 mal mittlere Tagesentnahme, ein Platzhalterwert. Die meisten Systeme liegen zwischen 1,2 und 3,0 (National Research Council, 2006). Den Wert Ihres eigenen Systems legen Sie unter Einstellungen, Berechnung, Hydraulik, Entnahmefaktor fest.';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. Spitzenstunde';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='Entnahmefaktor 3,0 mal mittlere Tagesentnahme, ein Platzhalterwert. Die meisten Systeme liegen zwischen 3,0 und 6,0 (National Research Council, 2006). Den Wert Ihres eigenen Systems legen Sie unter Einstellungen, Berechnung, Hydraulik, Entnahmefaktor fest.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. Löschwasser plus Maximaltag';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='Entnahme am Maximaltag (Faktor 2,0). Führen Sie in diesem Szenario die Löschwasserprüfung aus: Sie addiert die Löschwassermenge an jedem Entnahmeknoten zu dieser Entnahme.';
 $ec_lang['lpn_delete_drops_overrides']='Beim Löschen dieses Elements gehen auch {n} Werte verloren, die Ihre Szenarien dafür enthalten. Fortfahren?';
 $ec_lang['lpn_push_base_only']='Diese Aktion ändert die Zeichnung selbst und kann daher nur in {base} ausgeführt werden. Wechseln Sie zu {base} und versuchen Sie es erneut.';
 $ec_lang['lpn_field_active']='Teil dieses Netzes';
@@ -3681,8 +3702,10 @@ $ec_lang['lpn_ff_title']='Löschwasserprüfung';
 $ec_lang['lpn_ff_intro']='Jeder Entnahmeknoten wird der Reihe nach aufgefordert, zusätzlich zu seiner bisherigen Entnahme eine Löschwassermenge zu entnehmen. An Ihrem Projekt ändert sich nichts; der gesamte Lauf erfolgt auf einer Kopie.';
 $ec_lang['lpn_ff_scope']='Zu testende Entnahmeknoten';
 $ec_lang['lpn_ff_scope_tip']='Wählen Sie die Menge, bevor Sie starten. Das Testen jedes Entnahmeknotens in einem großen System kann Minuten dauern.';
+$ec_lang['lpn_ff_all']='Alle';
+$ec_lang['lpn_ff_selected']='Ausgewählte';
 $ec_lang['lpn_ff_no_junctions']='Dieses Projekt hat noch keine Entnahmeknoten, daher gibt es nichts zu testen.';
-$ec_lang['lpn_ff_no_selection']='Kein Entnahmeknoten ist ausgewählt. Wählen Sie einen auf der Karte, oder testen Sie jeden Entnahmeknoten.';
+$ec_lang['lpn_ff_no_selection']='Kein Entnahmeknoten ist ausgewählt. Wählen Sie Entnahmeknoten aus oder wählen Sie die Option Alle.';
 $ec_lang['lpn_ff_skipped']='{n} ausgewählte Elemente sind keine Entnahmeknoten, daher wurden sie nicht geprüft.';
 $ec_lang['lpn_ff_required']='Löschwasserbedarf';
 $ec_lang['lpn_ff_required_tip']='Der Durchfluss, den Ihre Feuerschutzvorschrift oder Ihre Feuerwehrbehörde an einem Hydranten verlangt. Jeder Entnahmeknoten wird gegen diese Zahl getestet, sofern er nicht einen eigenen Löschwasserbedarf trägt.';
@@ -3692,7 +3715,7 @@ $ec_lang['lpn_ff_residual']='Zu haltender Restdruck';
 $ec_lang['lpn_ff_residual_tip']='Der Druck, den der Entnahmeknoten noch halten muss, während er die Löschwassermenge liefert. AWWA M31 und NFPA 291 verwenden 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Systemprüfung (Auswirkung auf das Netz)';
 $ec_lang['lpn_ff_design_tip']='Eine eigene Frage, unabhängig davon, ob der Entnahmeknoten den Durchfluss liefern kann: Fällt, während dort dieser Durchfluss entnommen wird, irgendetwas anderes unter seinen Mindestdruck oder über seinen Geschwindigkeitsgrenzwert? Diese Prüfung zu wählen kostet keine zusätzliche Berechnung.';
-$ec_lang['lpn_ff_design_no_selection']='Die Systemprüfung ist auf die ausgewählten Entnahmeknoten eingestellt, aber keiner ist ausgewählt. Wählen Sie welche auf der Karte aus, oder stellen Sie auf Alle.';
+$ec_lang['lpn_ff_design_no_selection']='Die Systemprüfung ist auf Ausgewählte eingestellt, aber es sind keine Elemente ausgewählt. Wählen Sie Elemente aus oder wählen Sie die Option Alle.';
 $ec_lang['lpn_ff_minpressure']='Niedrigster zulässiger Druck andernorts';
 $ec_lang['lpn_ff_minpressure_tip']='Ein Entnahmeknoten, der unter diesen Wert fällt, während ein anderer seine Löschwassermenge liefert, wird als Systemproblem gemeldet.';
 $ec_lang['lpn_ff_maxvelocity']='Höchste zulässige Geschwindigkeit';

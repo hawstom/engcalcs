@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 23 untranslated keys, of 2153 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 0 untranslated keys, of 2153 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,77 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (23, all ruled)
-
-- **`lpn_ff_all`**
-  > All
-  _Ruled OK 2026-10-01._
-- **`lpn_ff_selected`**
-  > Selected
-  _Ruled OK 2026-10-01._
-- **`lpn_file_import_menu`**
-  > Import…
-  _Ruled OK 2026-10-01._
-- **`lpn_help_hotkeys`**
-  > Tables and Hotkeys
-  _Ruled OK 2026-10-01._
-- **`lpn_hotkeys_map_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>
-  _Ruled OK 2026-10-01._
-- **`lpn_hotkeys_map_heading`**
-  > Map
-  _Ruled OK 2026-10-01._
-- **`lpn_hotkeys_map_term`**
-  > Map keyboard shortcuts
-  _Ruled OK 2026-10-01._
-- **`lpn_hotkeys_tables_heading`**
-  > Tables
-  _Ruled OK 2026-10-01._
-- **`lpn_pane_filter_stale`**
-  > Rows that no longer match: {n}.
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_preset_average_day`**
-  > 4. Average Day
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_preset_average_day_tip`**
-  > Demand multiplier 1: every demand as entered, which is taken to be average day demand.
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_preset_fire_max_day`**
-  > 7. Fire plus max day
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_preset_fire_max_day_tip`**
-  > Max day demand (multiplier 2.0). Run Fire flow analysis in this scenario: it adds the fire flow at each junction on top of this demand.
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_preset_flow_max`**
-  > 3. Flow test: Max
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_preset_flow_max_tip`**
-  > Flow test calibration for a design network at the max flow reported. In this scenario, set the demand at the flowing junction to the max flow measured, and the demand at all other junctions to 0.
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_preset_flow_mid`**
-  > 2. Flow test: Mid
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_preset_flow_mid_tip`**
-  > Flow test calibration for a design network at the first flow reported. In this scenario, set the demand at the flowing junction to the first flow measured, and the demand at all other junctions to 0.
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_preset_flow_static`**
-  > 1. Flow test: Static
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_preset_flow_static_tip`**
-  > Flow test calibration for a design network at 0 flow. In this scenario, set the demand at all junctions to 0.
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_preset_max_day`**
-  > 5. Max Day
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_preset_max_day_tip`**
-  > Demand multiplier 2.0 times average day, a placeholder value. Most systems fall between 1.2 and 3.0 (National Research Council, 2006). Set your own system's in Settings, Calculation, Hydraulics, Demand multiplier.
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_preset_peak_hour`**
-  > 6. Peak hour
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_preset_peak_hour_tip`**
-  > Demand multiplier 3.0 times average day, a placeholder value. Most systems fall between 3.0 and 6.0 (National Research Council, 2006). Set your own system's in Settings, Calculation, Hydraulics, Demand multiplier.
-  _Ruled OK 2026-10-01._
+None on master. Every English key here is present in at least one other language.
 
 ---
 
@@ -112,7 +42,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/sprint-0930-golf (`5fe61e9d`) — adds no English strings
+### chore/sprint-0930-golf (`78b3cae4`) — adds no English strings
 
 ### feat/bentley-interop (`ee19f373`) — 13 new, 4 to read @@ NEEDS RULING
 

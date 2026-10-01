@@ -550,6 +550,11 @@ the block.
   duration next, quality mode later; friction method, units, accuracy and trials never vary silently
   between compared scenarios (state them once in the report header). Show as plain columns in the
   Alternatives preview, blank meaning inherits, not named sets, until scenarios number in the dozens.
+- 75|756| **Cross-platform: the suite as a desktop application, beyond the web folder.**
+  Tom, 2026-09-30: *"Put a cross platform project on our roadmap priority 75. Plan where/how to move
+  the project to transcend the web-centric hawsedc.com/engcalcs folder. Windows or Linux? Plan what
+  platforms and what frameworks to experiment with. I'm thinking about Windows, Linux, Mac; Flutter,
+  Tauri, (not Electron, Qt, or .NET MAUI?)"* Plan: `dev/desktop-platforms-plan.md` (to be written).
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
