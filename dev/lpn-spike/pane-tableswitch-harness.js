@@ -1,5 +1,6 @@
-// CTRL+SHIFT+PAGEDOWN/PAGEUP SWITCHES TABLES -- ROADMAP Task 690, the open item ("Ctrl+Shift+
-// PageUp/PageDn between tables"). Run with:
+// CTRL+SHIFT+PAGEDOWN/PAGEUP SWITCHES TABLES, AND NOW THE GRAPH TABS TOO -- ROADMAP Task 690
+// ("Ctrl+Shift+PageUp/PageDn between tables") extended by Task 743 (Tom: "It would be nice if it
+// also could proceed to the graphs."). Run with:
 //   node dev/lpn-spike/pane-tableswitch-harness.js
 //
 // What matters enough to assert headlessly:
@@ -7,17 +8,24 @@
 //   1. Ctrl+Shift+PageDown moves to the NEXT table in paneTables() order; Ctrl+Shift+PageUp moves
 //      back. Plain Ctrl+PageDown/PageUp (no Shift) is left untouched -- that combination is the
 //      BROWSER's own tab switch and must not be claimed.
-//   2. Excel does not wrap at the ends, so neither does this: PageUp on the first table and
-//      PageDown on the last are both no-ops (the keystroke is still claimed).
+//   2. Excel does not wrap at the ends, so neither does this: PageUp on the first tab and
+//      PageDown on the last are both no-ops (the keystroke is still claimed). Task 743 moves
+//      which tab is "the last" -- Profile, not Customers -- without changing the rule.
 //   3. Focus lands on the SAME COLUMN KEY if the destination table has one (Junctions' and
 //      Reservoirs' shared "elev"); otherwise the FIRST column (Junctions' "demand", which
 //      Reservoirs has no column for, falls back to "id").
 //   4. Focus lands on the SAME ROW INDEX, clamped to the destination table's row count.
-//   5. The switch is scoped to the DATA TABLES ONLY (paneTables()) -- it must never reach
-//      Time series or Profile, which sit on the same tab strip but hold no cell grid.
-//   6. Mid-edit, the typed-but-not-yet-committed value is committed before the switch, so no
+//   5. **(Task 743) THE STEP NOW WALKS THE WHOLE STRIP** (`paneTabs`, not only `paneTables()`):
+//      from the last table it proceeds onto Time series, then Frequency, then Profile, and back.
+//      A graph/profile tab carries no column or row across the boundary in either direction --
+//      there is nothing to carry -- so a table reached FROM a graph opens at its home cell.
+//   6. **A GRAPH OR PROFILE TAB LANDS THE CARET ON ITS OWN FIRST CONTROL** (its group/quantity
+//      `<select>`, or Profile's Edit button), so the NEXT press still has a keydown listener to
+//      answer -- and the listener lives on the TAB'S PANEL, not on the control, so it still fires
+//      with focus inside a `<select>`, which would otherwise page its own option list.
+//   7. Mid-edit, the typed-but-not-yet-committed value is committed before the switch, so no
 //      text is lost -- the same choice Enter and the arrow keys make.
-//   7. **AN EMPTY TABLE STILL ANSWERS THE SHORTCUT** (Perry's pre-review finding on b37ec130):
+//   8. **AN EMPTY TABLE STILL ANSWERS THE SHORTCUT** (Perry's pre-review finding on b37ec130):
 //      Pumps, Valves, Text and Customers are left with no rows at all in this harness -- a real
 //      network commonly has empty asset tables (Net3 has no valves) -- and the shortcut must
 //      still work FROM one of them, in both directions, including walking straight through
@@ -61,6 +69,10 @@ const L = loadLoopedNetwork(
 	"\t\tselBox: function (id) { var s = paneTableById(id);\n" +
 	"\t\t\treturn paneSelBox(s, paneTableRowsInOrder(s), paneCols(s)); },\n" +
 	"\t\tenterEdit: paneEnterEdit, cancelEdit: paneCancelEdit,\n" +
+	// Which element the caret landed on, by id -- a graph or profile tab has no cell grid, so this
+	// is how the test asks "did the step land somewhere sensible" without reaching into the tab's
+	// own private rendering functions.
+	"\t\tfocusedId: function () { var el = document.activeElement; return el ? el.id : null; },\n" +
 	"\t\tfocusable: function (id, elId, key) { var s = paneTableById(id);\n" +
 	"\t\t\treturn paneCellFocusable(s.tds[elId][key]); },\n" +
 	"\t\tfocused: function (id) { var s = paneTableById(id), k, el = document.activeElement;\n" +
@@ -81,15 +93,19 @@ function fire(el, type, ev) {
 }
 // **THE ELEMENT THE LISTENER LIVES ON, NOT A FIXED TAG** -- a table with rows carries the key
 // handler on its <table> (paneWireTable); an EMPTY table has no <table> at all (renderPaneTable()
-// draws its "none of these yet" note instead) and carries it on THAT. The stub's fire() does not
-// simulate bubbling (nor does any other harness here rely on that), so the target has to be
-// whichever one is really standing in the panel right now.
+// draws its "none of these yet" note instead) and carries it on THAT; a graph or profile tab
+// (Task 743) carries it on the PANEL ITSELF (wireGraphTabKeys()), never on a control inside it --
+// so a press fired here with the caret sitting in a `<select>` is exactly the case that matters:
+// the listener still answers even though the control it landed on has its own idea of PageDown.
+// The stub's fire() does not simulate bubbling (nor does any other harness here rely on that), so
+// the target has to be whichever one is really standing in the panel right now.
 function keyOwnerEl(id) {
 	const host = byId['lpn_pane_' + id];
 	if (!host || !host.children) { return null; }
 	const table = host.children.filter((c) => c._tag === 'table')[0];
 	if (table) { return table; }
-	return host.children.filter((c) => c._tag === 'p')[0];
+	const note = host.children.filter((c) => c._tag === 'p')[0];
+	return note || host;
 }
 function pressPageKey(id, key, opts) {
 	let prevented = false;
@@ -205,11 +221,13 @@ console.log('\n--- 5. focus lands on the SAME ROW INDEX, clamped to the destinat
 	L.setPaneTab('junctions');
 }
 
-console.log('\n--- 6. scoped to the data tables only -- never Time series or Profile ---');
+console.log('\n--- 6. the tab order this harness assumes for stepping onto the graph tabs ---');
 {
+	// Task 743: the strip's visual order is the eight tables, then Time series, then Frequency,
+	// then Profile -- the whole thing is now one walk, not two.
 	const tabs = L.tabIds();
-	report(tabs.indexOf('timeseries') > order.length - 1 && tabs.indexOf('profile') > order.length - 1,
-		'Time series and Profile sit after the data tables on the strip', JSON.stringify(tabs));
+	report(tabs.join(',') === order.join(',') + ',timeseries,frequency,profile',
+		'tables, then Time series, then Frequency, then Profile, in that order', JSON.stringify(tabs));
 }
 
 console.log('\n--- 7. mid-edit, the typed value is committed before the switch, never lost ---');
@@ -255,11 +273,9 @@ console.log('\n--- 8. an EMPTY table still answers the shortcut, in both directi
 	report(L.activeTab() === 'customers', 'Text -> Customers, the LAST table', L.activeTab());
 	report(focusedIsEmptyNoteOf('customers'), 'landed on Customers\' own empty-state note');
 
-	// The no-wrap boundary, now against a table that is GENUINELY empty (not a stand-in): one
-	// more PageDown from the last table, empty, is still claimed and still does not wrap.
-	const claimed3 = pressPageKey(L.activeTab(), 'PageDown', { shift: true });
-	report(claimed3, 'PageDown on the last table (empty) is still claimed');
-	report(L.activeTab() === 'customers', 'and it does not wrap to Junctions', L.activeTab());
+	// **Customers IS NO LONGER THE END OF THE STRIP (Task 743)** -- Time series, Frequency and
+	// Profile follow it, so one more PageDown from here is no longer a no-op; section 9 below
+	// picks the walk up from exactly this tab and follows it onto the graphs.
 
 	// FROM an empty table, PageUp works too, walking back into a table that has real rows.
 	const claimed4 = pressPageKey(L.activeTab(), 'PageUp', { shift: true });
@@ -275,6 +291,71 @@ console.log('\n--- 8. an EMPTY table still answers the shortcut, in both directi
 	report(!!at && at.id === pipeOrder[0] && at.key === 'id',
 		'with nothing to carry from an empty source, focus falls back to the first cell, row 0 / "id"',
 		JSON.stringify(at));
+	L.setPaneTab('junctions');
+}
+
+console.log('\n--- 9. (Task 743) stepping onward from the last TABLE onto the graph tabs, and back ---');
+{
+	// Customers is the last of the eight tables; the next three presses now reach Time series,
+	// Frequency and Profile in turn, each one landing on ITS OWN first control.
+	L.setPaneTab('customers');
+	const claimed1 = pressPageKey('customers', 'PageDown', { shift: true });
+	report(claimed1, 'Ctrl+Shift+PageDown out of Customers (the last table) is claimed');
+	report(L.activeTab() === 'timeseries', 'the tab moved onto Time series', L.activeTab());
+	report(L.focusedId() === 'lpn_ts_group',
+		'and the caret landed on Time series\' own first control, its group picker', L.focusedId());
+
+	// **THE CARET IS ACTUALLY INSIDE THE `<select>` RIGHT NOW** -- a real browser lets a focused
+	// `<select>` page its own option list on PageDown, so this press is the one this whole feature
+	// depends on: the listener lives on the PANEL (keyOwnerEl() falls back to it, finding no
+	// <table> or <p> child), never on the control, and still answers with focus down inside one.
+	report(L.focusedId() === 'lpn_ts_group', 'the caret is inside the group <select>, not on the panel');
+	const claimed2 = pressPageKey('timeseries', 'PageDown', { shift: true });
+	report(claimed2, 'Ctrl+Shift+PageDown FROM Time series is claimed, with focus still inside the <select>');
+	report(L.activeTab() === 'frequency', 'the tab moved on to Frequency', L.activeTab());
+	report(L.focusedId() === 'lpn_freq_group',
+		'and landed on Frequency\'s own first control, its group picker', L.focusedId());
+
+	const claimed3 = pressPageKey('frequency', 'PageDown', { shift: true });
+	report(claimed3, 'Ctrl+Shift+PageDown FROM Frequency is claimed');
+	report(L.activeTab() === 'profile', 'the tab moved on to Profile, the LAST tab on the strip', L.activeTab());
+	report(L.focusedId() === 'lpn_profile_edit_btn',
+		'and landed on Profile\'s own first (and only) control, its Edit button', L.focusedId());
+
+	// Excel's own rule, now against the TRUE last tab: one more PageDown is still claimed, but
+	// nothing moves.
+	const claimed4 = pressPageKey('profile', 'PageDown', { shift: true });
+	report(claimed4, 'PageDown on Profile, the true last tab, is still claimed');
+	report(L.activeTab() === 'profile', 'but it does not wrap to Junctions', L.activeTab());
+
+	// And back, the whole way: Profile -> Frequency -> Time series -> Customers.
+	const back1 = pressPageKey('profile', 'PageUp', { shift: true });
+	report(back1, 'Ctrl+Shift+PageUp FROM Profile is claimed');
+	report(L.activeTab() === 'frequency', 'Profile -> Frequency', L.activeTab());
+	report(L.focusedId() === 'lpn_freq_group', 'landing again on Frequency\'s first control', L.focusedId());
+
+	pressPageKey('frequency', 'PageUp', { shift: true });
+	report(L.activeTab() === 'timeseries', 'Frequency -> Time series', L.activeTab());
+	report(L.focusedId() === 'lpn_ts_group', 'landing again on Time series\' first control', L.focusedId());
+
+	const back3 = pressPageKey('timeseries', 'PageUp', { shift: true });
+	report(back3, 'Ctrl+Shift+PageUp FROM Time series is claimed');
+	report(L.activeTab() === 'customers', 'Time series -> Customers, back among the tables', L.activeTab());
+	// **A GRAPH TAB CARRIES NO COLUMN OR ROW ACROSS** -- landing back in a table finds `colKey`
+	// null exactly as an empty-table SOURCE already does (section 8), so it takes the same "home
+	// column" path proven there and in section 4; Customers being empty in this harness means the
+	// visible proof here is the same empty-state note section 8 already checked.
+	report(focusedIsEmptyNoteOf('customers'),
+		'landed on Customers\' own empty-state note, the same door an empty table always answers on');
+	L.setPaneTab('junctions');
+}
+
+console.log('\n--- 10. plain Ctrl+PageDown (no Shift) inside a graph tab is still left for the browser ---');
+{
+	L.setPaneTab('timeseries');
+	const undone = pressPageKey('timeseries', 'PageDown', { shift: false });
+	report(!undone, 'plain Ctrl+PageDown inside Time series is not claimed either');
+	report(L.activeTab() === 'timeseries', 'and the tab did not move', L.activeTab());
 	L.setPaneTab('junctions');
 }
 
