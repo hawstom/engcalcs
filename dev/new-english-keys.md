@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 13 untranslated keys, of 2166 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**1 still to read on master**, of 13 untranslated keys, of 2166 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (13, 4 to read @@ NEEDS RULING)
+## lpn_  (13, 1 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -49,14 +49,14 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Text
   _Ruled OK 2026-10-01._
 - **`lpn_alt_cat_topology`**
-  > Active topology
-  @@ NEEDS RULING
+  > Asset activation
+  _Ruled OK 2026-10-01._
 - **`lpn_alt_cat_userdata`**
   > Custom properties
   _Ruled OK 2026-10-01._
 - **`lpn_alt_note`**
-  > Read only. Base uses the Base alternative of every category. A scenario gets its own alternative in a category, a child of the Base one, once it holds a value of its own there. The number is how many values it holds.
-  @@ NEEDS RULING
+  > Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.
+  _Ruled OK 2026-10-01._
 - **`lpn_alt_title`**
   > Alternatives preview
   @@ NEEDS RULING
@@ -64,8 +64,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Basic mode
   _Ruled OK 2026-10-01._
 - **`lpn_scenario_basic_tip`**
-  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives table, which shows how those values are grouped by category.
-  @@ NEEDS RULING
+  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
+  _Ruled OK 2026-10-01._
 
 ---
 
@@ -82,7 +82,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`ed1fcae9`) — adds no English strings
+### feat/bentley-interop (`6ef7483d`) — adds no English strings
 
 ### feat/copy-lock (`4e1801df`) — 7 new, 1 to read @@ NEEDS RULING
 

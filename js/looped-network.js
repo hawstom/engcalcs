@@ -57693,7 +57693,7 @@ var EngCalcs = EngCalcs || {};
 		return {
 			physical: pc.lpn_alt_cat_physical || 'Physical',
 			demand: pc.lpn_alt_cat_demand || 'Demand',
-			topology: pc.lpn_alt_cat_topology || 'Active topology',
+			topology: pc.lpn_alt_cat_topology || 'Asset activation',
 			initial: pc.lpn_alt_cat_initial || 'Initial settings',
 			constituent: pc.lpn_alt_cat_constituent || 'Constituent',
 			fireflow: pc.lpn_alt_cat_fireflow || 'Fire flow',

@@ -201,7 +201,7 @@ console.log('\n--- the alternatives rebuild every override map exactly ---');
 	ok('the resolve chain finds every local value where the override map has it', !chainBad.length, chainBad.join(', '));
 	ok('effective() reads the same value the chain resolves', !effBad.length, effBad.join(', '));
 	ok('reading the alternatives changed nothing in the document', JSON.stringify(L.serializeProject()) === before);
-	ok('the topology-only scenario has one child, in Active topology',
+	ok('the topology-only scenario has one child, in Asset activation',
 		L.allAlternatives().filter(function (a) { return a.scenario === s3.id; }).map(function (a) { return a.category; }).join() === 'topology');
 	const cats = L.allAlternatives().filter(function (a) { return a.scenario === s2.id; }).map(function (a) { return a.category; }).sort();
 	ok('the everything scenario has a child in every category but User data',
