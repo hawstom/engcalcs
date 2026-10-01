@@ -13,6 +13,10 @@
 //   7. The project is byte-identical before and after every run, and the module never writes to
 //      the model it is handed.
 //   8. One analysis at a time: criticality refuses while a search runs.
+//   9. No plural has to agree with a number: never "1 times" or "1 junctions" (Perry, 2026-10-01).
+//  10. The time step a result describes: dev/lpn-spike/demand-scaling-eps-harness.js, which loads the
+//      extended-period engine this one leaves out.
+//  11. Each answer sits under its own part of the box, never under a repeat of that part's heading.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -36,7 +40,7 @@ const L = loadLoopedNetwork(
 	"\t\tsetMin: function (t) { critFireFlowAsk().minPressure = t; },\n" +
 	"\t\tminText: function () { return critFireFlowAsk().minPressure; },\n" +
 	"\t\tdocGuard: function () { return dsDocGuard; }, dsBusy: function () { return dsBusy; },\n" +
-	"\t\tsortDs: dsSortBy,\n" +
+	"\t\tsortDs: dsSortBy, rebuildDs: rebuildDemandScaleReport, clockMoved: demandScaleClockMoved,\n" +
 	"\t\tcurrentModel: function () { var m = assembleModel(); fireFlowAtFrame(m); return m; },\n" +
 	"\t\tsolveOnScreen: function (m) { return Promise.resolve(engineFor(m).solve(m)); },\n" +
 	"\t\ttoPsi: function (si) { return toDisplay(si, 'lpn_u_pressure'); },\n" +
@@ -86,6 +90,16 @@ function gotoIn(el) {
 	})(el);
 	return out;
 }
+// The part of the box an answer is written into: 'scale' under Run, 'search' under Find.
+function dsHost(which) {
+	let found = null;
+	(function walk(x) {
+		if (!x || found) { return; }
+		if (x.getAttribute && x.getAttribute('data-ds') === which) { found = x; return; }
+		kids(x).forEach(walk);
+	})(byId.lpn_ds_controls);
+	return found;
+}
 function openNet1() {
 	L.reset();
 	const saved = L.acceptImportedText(fs.readFileSync(ROOT + 'examples/Net1.lwn', 'utf8'));
@@ -129,7 +143,7 @@ async function minPsiAt(m) {
 	ok('...and equals its own unscaled column', !!set && set.pressures.every((x) => x.unscaled === x.pressure));
 	ok('the project is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
 	ok('the verdict leads with a check mark and reads in psi',
-		text(byId.lpn_ds_report).indexOf(PC.lpn_ds_scale_ok.replace('{m}', '1').replace('{pressure}', '20 psi')) >= 0);
+		text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_scale_ok.replace('{m}', '1').replace('{pressure}', '20 psi')) >= 0);
 
 	console.log('\n--- 2. Scale 2 lowers every pressure ---');
 	L.setMult('2');
@@ -142,19 +156,19 @@ async function minPsiAt(m) {
 	ok('the rows are lowest first', !!set && set.pressures.every((x, i, a) => !i || a[i - 1].pressure <= x.pressure));
 	const nBelow = set.pressures.filter((x) => L.toPsi(x.pressure) < 110).length;
 	ok('the below list is exactly the junctions under 110 psi', set.below.length === nBelow && nBelow > 0, nBelow);
-	ok('...and the verdict says how many, with a warning sign', text(byId.lpn_ds_report).indexOf(PC.lpn_ds_scale_below
-		.replace('{m}', '2').replace('{n}', String(nBelow)).replace('{pressure}', '110 psi')) >= 0, text(byId.lpn_ds_report).slice(0, 200));
-	let tr = rows(byId.lpn_ds_report);
+	ok('...and the verdict says how many, with a warning sign', text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_scale_below
+		.replace('{m}', '2').replace('{n}', String(nBelow)).replace('{pressure}', '110 psi')) >= 0, text(byId.lpn_ds_controls).slice(0, 200));
+	let tr = rows(byId.lpn_ds_controls);
 	ok('two tables: nine junctions and the top velocities', tr.length === 9 + Math.min(10, set.velocities.length), tr.length);
 	ok('the first row is the lowest junction, as a go-to link', gotoIn(tr[0][0])[0] && gotoIn(tr[0][0])[0].textContent === set.pressures[0].id);
 	L.sortDs('p', 0);
-	tr = rows(byId.lpn_ds_report);
+	tr = rows(byId.lpn_ds_controls);
 	const ids = tr.slice(0, 9).map((r) => gotoIn(r[0])[0].textContent);
 	ok('a heading re-sorts the same rows: by junction', ids.join() === ids.slice().sort((x, y) => x.localeCompare(y, undefined, { numeric: true })).join() &&
 		ids.slice().sort().join() === set.pressures.map((x) => x.id).sort().join(), ids.join());
 	L.sortDs('p', 0);
 	L.sortDs('p', 0);
-	ok('...and a third click is still a sort, never lost rows', rows(byId.lpn_ds_report).length === tr.length);
+	ok('...and a third click is still a sort, never lost rows', rows(byId.lpn_ds_controls).length === tr.length);
 	ok('velocities are highest first, pumps left out', set.velocities.every((x, i, a) => !i || a[i - 1].velocity >= x.velocity) &&
 		!set.velocities.some((x) => x.id === '9'));
 	ok('the project is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
@@ -171,9 +185,9 @@ async function minPsiAt(m) {
 	ok('the holding probe is the limiting junction at m', s.holding.lowest && L.toPsi(s.holding.lowest.pressure) >= 100 &&
 		Math.abs(L.toPsi(s.holding.lowest.pressure) - await minPsiAt(m)) < 1e-9);
 	ok('the search took at most 13 solves', s.solves <= 13, s.solves);
-	const rep = text(byId.lpn_ds_report);
+	const rep = text(byId.lpn_ds_controls);
 	ok('the verdict says so', rep.indexOf(PC.lpn_ds_found.replace('{pressure}', '100 psi').replace('{m}', String(m))) >= 0, rep.slice(0, 160));
-	const links = gotoIn(byId.lpn_ds_report);
+	const links = gotoIn(dsHost('search'));
 	ok('the limiting junction is a go-to link', links.length >= 1 && links[0].textContent === s.holding.lowest.id &&
 		links[0].title === PC.lpn_goto_on_map);
 	ok('the project is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
@@ -186,15 +200,15 @@ async function minPsiAt(m) {
 	ok('it says the system is already below the limit', s.belowAtOne === true && s.outcome === EC.lpnDemandScaleOutcomes.FOUND && s.multiplier < 1,
 		JSON.stringify({ o: s.outcome, m: s.multiplier, b: s.belowAtOne }));
 	ok('...the answer still brackets the limit', await minPsiAt(s.multiplier) >= Math.ceil(at1 + 1) && await minPsiAt(s.multiplier + 0.01) < Math.ceil(at1 + 1));
-	ok('...and the report leads with a warning sign', text(byId.lpn_ds_report).indexOf('⚠') >= 0 &&
-		text(byId.lpn_ds_report).indexOf(PC.lpn_ds_found_below.split('{pressure}')[0]) >= 0);
+	ok('...and the report leads with a warning sign', text(byId.lpn_ds_controls).indexOf('⚠') >= 0 &&
+		text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_found_below.split('{pressure}')[0]) >= 0);
 
 	console.log('\n--- 5. The two ends of the range ---');
 	L.setMin('1000');
 	await L.runFind();
 	s = L.searchRun();
 	ok('1000 psi: below even at zero', s.outcome === EC.lpnDemandScaleOutcomes.BELOW_AT_ZERO && s.solves === 2, s.outcome);
-	ok('...said with a warning sign', text(byId.lpn_ds_report).indexOf(PC.lpn_ds_below_zero.replace('{pressure}', '1000 psi')) >= 0);
+	ok('...said with a warning sign', text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_below_zero.replace('{pressure}', '1000 psi')) >= 0);
 	// A fake solve: pressure 100 m less 1 m per unit of multiplier, so 20x still holds 50 m.
 	const fake = (mdl) => {
 		const p = {};
@@ -231,7 +245,7 @@ async function minPsiAt(m) {
 	ok('...and says the link was left as it is', L.notice() === PC.lpn_ds_skipped.replace('{n}', '1'), L.notice());
 	const p32 = set.pressures.filter((x) => x.id === '32')[0];
 	ok('only junction 32\'s demand was scaled: its own pressure falls', p32.pressure < p32.unscaled);
-	ok('...and the report says only one junction was scaled', text(byId.lpn_ds_report).indexOf(PC.lpn_ds_scaled_selected.replace('{n}', '1')) >= 0);
+	ok('...and the report says only one junction was scaled', text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_scaled_selected.replace('{n}', '1')) >= 0);
 	const whole = EC.lpnDemandScaleModel(L.currentModel(), 3, ['32']);
 	ok('the copy scaled exactly one junction', whole.nodes.filter((n, i) => n !== L.currentModel().nodes[i] && n.type === 'junction').length >= 1 &&
 		whole.nodes.filter((n) => n.type === 'junction' && n.id !== '32').every((n) => n.demand === L.currentModel().nodes.filter((o) => o.id === n.id)[0].demand));
@@ -258,6 +272,37 @@ async function minPsiAt(m) {
 	await pf;
 	ok('the busy flag clears', !L.dsBusy());
 	ok('the project is unchanged after everything', JSON.stringify(L.getDoc()) === before && L.docGuard());
+
+	console.log('\n--- 9. No plural agreement with a number ---');
+	L.setScope('all');
+	L.setMult('1');
+	await L.runScale();
+	let rtext = text(byId.lpn_ds_controls);
+	ok('scale 1 reads "a demand scale of 1", never "1 times"', rtext.indexOf('demand scale of 1,') >= 0 && !/\b1 times/.test(rtext), rtext.slice(0, 120));
+	const p1 = L.scaleRun().pressures;
+	const between = (L.toPsi(p1[0].pressure) + L.toPsi(p1[1].pressure)) / 2;
+	L.setMin(String(+between.toFixed(2)));
+	await L.runScale();
+	rtext = text(byId.lpn_ds_controls);
+	ok('exactly one junction below the limit', L.scaleRun().below.length === 1, L.scaleRun().below.length);
+	const want = PC.lpn_ds_scale_below.replace('{m}', '1').split('{pressure}');
+	ok('...counted after a colon, never "1 junctions"', rtext.indexOf(want[0]) >= 0 && rtext.indexOf(want[1].replace('{n}', '1')) >= 0 &&
+		!/\b1 junctions/.test(rtext), text(dsHost('scale')).slice(0, 120));
+	['lpn_ds_holds_max', 'lpn_ds_found', 'lpn_ds_found_below', 'lpn_ds_lowest_at', 'lpn_ds_nosolve_at', 'lpn_ds_scale_ok',
+		'lpn_ds_scale_below', 'lpn_ds_scaled_selected', 'lpn_ds_skipped'].forEach(function (k) {
+		ok(k + ': no number before a plural noun', !/\{(n|m|max)\} (times|junctions|elements)/.test(PC[k]), PC[k]);
+	});
+
+	console.log('\n--- 11. Each answer under its own part, no repeated heading ---');
+	L.setMin('100');
+	await L.runFind();
+	const all = text(byId.lpn_ds_controls) + text(byId.lpn_ds_report);
+	ok('each heading appears once in the box', all.split(PC.lpn_ds_head_search).length === 2 && all.split(PC.lpn_ds_head_scale).length === 2,
+		(all.split(PC.lpn_ds_head_search).length - 1) + ' / ' + (all.split(PC.lpn_ds_head_scale).length - 1));
+	const searchHost = dsHost('search');
+	ok('the Run answer sits in the Run part', !!dsHost('scale') && text(dsHost('scale')).indexOf('⚠') === 0, text(dsHost('scale')).slice(0, 60));
+	ok('the Find verdict sits in the Find part', !!searchHost && text(searchHost).indexOf(PC.lpn_ds_found.split('{pressure}')[0]) === 0,
+		searchHost && text(searchHost).slice(0, 80));
 
 	if (fails) { console.log('\n' + fails + ' demand scaling check(s) FAILED'); process.exit(1); }
 	console.log('\nDemand scaling harness: all checks passed.');

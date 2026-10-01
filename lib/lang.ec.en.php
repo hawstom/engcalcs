@@ -4124,7 +4124,8 @@ $ec_lang['lpn_crit_skipped_dead']='Dead-end links skipped: {n}. Each one cuts of
 // the cost line, the Junction heading and the solver's reasons are fire flow's own keys.
 //
 // {m} and {max} are demand scales printed as numbers (1.37); {step} is the search's tolerance
-// (0.01); {n} is a whole number; {pressure} is a pressure with its unit; {id} becomes a link to the
+// (0.01); {n} is a whole number, always after a colon so no plural has to agree with it; {time} and
+// {now} are elapsed times (6:00); {pressure} is a pressure with its unit; {id} becomes a link to the
 // junction on the map; {reason} is a whole sentence saying why the solver gave no answer.
 $ec_lang['lpn_ds_menu']='Demand scaling…';
 $ec_lang['lpn_ds_menu_tip']='Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.';
@@ -4144,16 +4145,16 @@ $ec_lang['lpn_ds_run']='Run';
 $ec_lang['lpn_ds_head_search']='What demand scale can the system handle?';
 $ec_lang['lpn_ds_search_note']='Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which every junction keeps the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.';
 $ec_lang['lpn_ds_find']='Find';
-$ec_lang['lpn_ds_holds_max']='✓ Every junction keeps {pressure} up to {max} times the demands, the top of the search.';
+$ec_lang['lpn_ds_holds_max']='✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.';
 $ec_lang['lpn_ds_below_zero']='⚠ At least one junction is below {pressure} even with the scaled demands at zero.';
-$ec_lang['lpn_ds_found']='✓ Every junction keeps {pressure} up to {m} times the demands.';
-$ec_lang['lpn_ds_found_below']='⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to {m} times the demands.';
+$ec_lang['lpn_ds_found']='✓ Every junction keeps {pressure} up to a demand scale of {m}.';
+$ec_lang['lpn_ds_found_below']='⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.';
 $ec_lang['lpn_ds_search_stopped']='The search was stopped before it found an answer.';
-$ec_lang['lpn_ds_lowest_at']='At {m} times the demands, the lowest pressure is {pressure}, at junction {id}.';
-$ec_lang['lpn_ds_nosolve_at']='At {m} times the demands, the network gave no answer. {reason}';
-$ec_lang['lpn_ds_scale_ok']='✓ At {m} times the demands, every junction keeps {pressure}.';
-$ec_lang['lpn_ds_scale_below']='⚠ At {m} times the demands, {n} junctions fall below {pressure}.';
-$ec_lang['lpn_ds_scaled_selected']='Only the demands of the {n} selected junctions were scaled.';
+$ec_lang['lpn_ds_lowest_at']='At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.';
+$ec_lang['lpn_ds_nosolve_at']='At a demand scale of {m}, the network gave no answer. {reason}';
+$ec_lang['lpn_ds_scale_ok']='✓ At a demand scale of {m}, every junction keeps {pressure}.';
+$ec_lang['lpn_ds_scale_below']='⚠ At a demand scale of {m}, junctions below {pressure}: {n}.';
+$ec_lang['lpn_ds_scaled_selected']='Only the selected junctions were scaled. Junctions scaled: {n}.';
 $ec_lang['lpn_ds_head_lowest']='Lowest pressures';
 $ec_lang['lpn_ds_head_velocity']='Highest velocities';
 $ec_lang['lpn_ds_col_link']='Link';
@@ -4163,9 +4164,11 @@ $ec_lang['lpn_ds_col_unscaled']='Unscaled';
 $ec_lang['lpn_ds_col_unscaled_tip']='With the demands as they are in the active scenario at this time step, the same value the map shows.';
 $ec_lang['lpn_ds_no_junctions']='This project has no junctions yet, so there are no demands to scale.';
 $ec_lang['lpn_ds_no_selection']='No junctions are selected. Select junctions, or scale all of them.';
-$ec_lang['lpn_ds_skipped']='{n} selected elements are not junctions, so they were left as they are.';
+$ec_lang['lpn_ds_skipped']='Selected elements that are not junctions, left as they are: {n}.';
 $ec_lang['lpn_ds_bad_multiplier']='Type a demand scale of zero or more, such as 1.5.';
 $ec_lang['lpn_ds_stale']='The drawing changed, so the demand scaling results were cleared. Run it again.';
+$ec_lang['lpn_ds_at_time']='Time step: {time}.';
+$ec_lang['lpn_ds_time_moved']='⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.';
 
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //

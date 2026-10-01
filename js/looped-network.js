@@ -57187,6 +57187,7 @@ var EngCalcs = EngCalcs || {};
 		run.disabled = dsBusy || other;
 		if (other) { run.title = pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.'; }
 		run.addEventListener('click', function () { take(); runDemandScale(); });
+		ffEl('div', 'lpn-ds-result', null, host).setAttribute('data-ds', 'scale');
 
 		// 2. The largest scale that holds the limit.
 		ffEl('div', 'lpn-ff-head', pc.lpn_ds_head_search || 'What demand scale can the system handle?', host);
@@ -57203,7 +57204,57 @@ var EngCalcs = EngCalcs || {};
 		stop.type = 'button';
 		stop.disabled = !dsBusy;
 		stop.addEventListener('click', function () { dsStop = true; });
+		ffEl('div', 'lpn-ds-result', null, host).setAttribute('data-ds', 'search');
 		initTipsIn(host);
+		rebuildDemandScaleReport();
+	}
+	// Where each answer goes: directly under the part of the box that asked for it, so the Find
+	// answer is beside the Find button and not under the Run tables. Rebuilt with the controls;
+	// `#lpn_ds_report` is only the fallback for a page without them.
+	function dsReportHost(which) {
+		var c = document.getElementById('lpn_ds_controls'), found = null;
+		(function walk(n) {
+			Array.prototype.slice.call((n && n.children) || []).forEach(function (k) {
+				if (found) { return; }
+				if (k.getAttribute && k.getAttribute('data-ds') === which) { found = k; } else { walk(k); }
+			});
+		}(c));
+		return found || document.getElementById('lpn_ds_report');
+	}
+	// **AN ANSWER THAT ARRIVES BELOW THE FOLD IS BROUGHT INTO VIEW** (Perry, 2026-10-01: on a
+	// 390 x 844 phone the Find verdict landed off screen). The nearest scroll, so on a desktop where
+	// it is already visible nothing moves.
+	function dsScrollTo(which) {
+		var h = dsReportHost(which), first = h && h.firstChild;
+		if (first && first.scrollIntoView) {
+			try { first.scrollIntoView({ block: 'nearest' }); } catch (e) { first.scrollIntoView(false); }
+		}
+	}
+	// **WHICH INSTANT A RESULT DESCRIBES** (Perry's pre-review, 2026-10-01: on Net3 a search made
+	// at 0:00 still read 0.51 with the clock at 6:00, where the truth was 3.10). On an extended-period
+	// project every result names its time step, and once the clock moves away the result says so
+	// rather than passing for the moment on screen. It is not cleared: the siblings keep theirs
+	// across a clock move too, and a number with its time beside it is still a true number.
+	function dsExtended() { return !!(EngCalcs.lpnTimeIsExtended && EngCalcs.lpnTimeIsExtended(doc.times)); }
+	function dsNow() { return modelTimeSeconds(); }
+	function dsTimeText(t) { return EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(t) : String(t); }
+	function dsTimeLines(host, t) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!dsExtended() || typeof t !== 'number') { return; }
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_at_time || 'Time step: {time}.').replace('{time}', dsTimeText(t)), host);
+		if (dsNow() !== t) {
+			ffEl('p', 'lpn-ff-summary lpn-ds-stale', (pc.lpn_ds_time_moved ||
+				'⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.')
+				.replace('{time}', dsTimeText(t)).replace('{now}', dsTimeText(dsNow())), host);
+		}
+	}
+	var dsShownAt = null;
+	function demandScaleClockMoved() {
+		var now;
+		if (!(dsRun || dsSearch) || !dsBoxIsOpen()) { return; }
+		now = dsNow();
+		if (now === dsShownAt) { return; }
+		rebuildDemandScaleReport();
 	}
 	// A sentence with one go-to link in it: the template is split at `{id}`, so the id is a button
 	// and the words around it stay one translated string.
@@ -57225,12 +57276,12 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (!rec) { return; }
 		if (!rec.ok) {
-			ffEl('p', 'lpn-ff-note', (pc.lpn_ds_nosolve_at || 'At {m} times the demands, the network gave no answer. {reason}')
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ds_nosolve_at || 'At a demand scale of {m}, the network gave no answer. {reason}')
 				.replace('{m}', dsMult(rec.multiplier)).replace('{reason}', ffReasonText(rec)), host);
 			return;
 		}
 		if (!rec.lowest) { return; }
-		dsSentence(host, 'lpn-ff-note', pc.lpn_ds_lowest_at || 'At {m} times the demands, the lowest pressure is {pressure}, at junction {id}.',
+		dsSentence(host, 'lpn-ff-note', pc.lpn_ds_lowest_at || 'At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.',
 			'node', rec.lowest.id, { m: dsMult(rec.multiplier), pressure: ffQty(rec.lowest.pressure, 'lpn_u_pressure') });
 	}
 	function rebuildDemandScaleReport() {
@@ -57240,14 +57291,18 @@ var EngCalcs = EngCalcs || {};
 			set, s, body, pressure, verdict;
 		if (!host) { return; }
 		host.innerHTML = '';
+		['scale', 'search'].forEach(function (w) { var h = dsReportHost(w); if (h) { h.innerHTML = ''; } });
+		dsShownAt = dsNow();
 		s = dsSearch;
+		// **NO HEADING OF ITS OWN.** Each answer sits in its own part of the box, directly under
+		// that part's heading (dsReportHost()), so a second copy of the heading would only repeat it.
 		if (s) {
-			ffEl('div', 'lpn-ff-head', pc.lpn_ds_head_search || 'What demand scale can the system handle?', host);
+			host = dsReportHost('search');
 			pressure = ffQty(s.minPressure, 'lpn_u_pressure');
 			if (s.stopped) {
 				ffEl('p', 'lpn-ff-summary', pc.lpn_ds_search_stopped || 'The search was stopped before it found an answer.', host);
 			} else if (s.outcome === O.HOLDS_TO_MAX) {
-				verdict = pc.lpn_ds_holds_max || '✓ Every junction keeps {pressure} up to {max} times the demands, the top of the search.';
+				verdict = pc.lpn_ds_holds_max || '✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.';
 				ffEl('p', 'lpn-ff-summary', verdict.replace('{pressure}', pressure).replace('{max}', dsMult(s.max)), host);
 				dsProbeLine(host, s.holding);
 			} else if (s.outcome === O.BELOW_AT_ZERO) {
@@ -57256,31 +57311,34 @@ var EngCalcs = EngCalcs || {};
 				dsProbeLine(host, s.failing);
 			} else {
 				verdict = s.belowAtOne
-					? (pc.lpn_ds_found_below || '⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to {m} times the demands.')
-					: (pc.lpn_ds_found || '✓ Every junction keeps {pressure} up to {m} times the demands.');
+					? (pc.lpn_ds_found_below || '⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.')
+					: (pc.lpn_ds_found || '✓ Every junction keeps {pressure} up to a demand scale of {m}.');
 				ffEl('p', 'lpn-ff-summary', verdict.replace('{pressure}', pressure).replace('{m}', dsMult(s.multiplier)), host);
 				dsProbeLine(host, s.holding);
 				dsProbeLine(host, s.failing);
 			}
+			dsTimeLines(host, s.time);
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
 				.replace('{solves}', String(s.solves)), host);
 		}
 		set = dsRun;
 		if (!set) { return; }
-		ffEl('div', 'lpn-ff-head', pc.lpn_ds_head_scale || 'Scale the demands', host);
+		host = dsReportHost('scale');
 		if (!set.ok) {
-			ffEl('p', 'lpn-ff-summary', (pc.lpn_ds_nosolve_at || 'At {m} times the demands, the network gave no answer. {reason}')
+			ffEl('p', 'lpn-ff-summary', (pc.lpn_ds_nosolve_at || 'At a demand scale of {m}, the network gave no answer. {reason}')
 				.replace('{m}', dsMult(set.multiplier)).replace('{reason}', ffReasonText(set)), host);
+			dsTimeLines(host, set.time);
 			return;
 		}
 		pressure = ffQty(set.minPressure, 'lpn_u_pressure');
 		verdict = set.below.length
-			? (pc.lpn_ds_scale_below || '⚠ At {m} times the demands, {n} junctions fall below {pressure}.')
+			? (pc.lpn_ds_scale_below || '⚠ At a demand scale of {m}, junctions below {pressure}: {n}.')
 				.replace('{n}', String(set.below.length))
-			: (pc.lpn_ds_scale_ok || '✓ At {m} times the demands, every junction keeps {pressure}.');
+			: (pc.lpn_ds_scale_ok || '✓ At a demand scale of {m}, every junction keeps {pressure}.');
 		ffEl('p', 'lpn-ff-summary', verdict.replace('{m}', dsMult(set.multiplier)).replace('{pressure}', pressure), host);
+		dsTimeLines(host, set.time);
 		if (set.scaledCount !== undefined) {
-			ffEl('p', 'lpn-ff-note', (pc.lpn_ds_scaled_selected || 'Only the demands of the {n} selected junctions were scaled.')
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ds_scaled_selected || 'Only the selected junctions were scaled. Junctions scaled: {n}.')
 				.replace('{n}', String(set.scaledCount)), host);
 		}
 		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
@@ -57356,11 +57414,11 @@ var EngCalcs = EngCalcs || {};
 				return null;
 			}
 			if (skipped) {
-				setNotice((pc.lpn_ds_skipped || '{n} selected elements are not junctions, so they were left as they are.')
+				setNotice((pc.lpn_ds_skipped || 'Selected elements that are not junctions, left as they are: {n}.')
 					.replace('{n}', String(skipped)));
 			}
 		}
-		return { model: model, ids: ids, engine: engineFor(model) };
+		return { model: model, ids: ids, engine: engineFor(model), time: dsNow() };
 	}
 	function dsBegin() {
 		dsBusy = true;
@@ -57409,8 +57467,10 @@ var EngCalcs = EngCalcs || {};
 			minPressure: minPressure > 0 ? minPressure : 0
 		}).then(function (set) {
 			if (c.ids) { set.scaledCount = c.ids.length; }
+			set.time = c.time;
 			dsRun = set;
 			dsEnd(before);
+			dsScrollTo('scale');
 			return set;
 		}, function (err) { return dsFailed(before, err); });
 	}
@@ -57429,8 +57489,10 @@ var EngCalcs = EngCalcs || {};
 			minPressure: minPressure > 0 ? minPressure : 0,
 			shouldStop: function () { return dsStop; }
 		}).then(function (s) {
+			s.time = c.time;
 			dsSearch = s;
 			dsEnd(before);
+			dsScrollTo('search');
 			return s;
 		}, function (err) { return dsFailed(before, err); });
 	}
@@ -58497,6 +58559,9 @@ var EngCalcs = EngCalcs || {};
 
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
+		// The demand scaling report names the time step it was computed at, and says when the clock
+		// has left it; every frame the transport shows arrives here, so this is where it re-reads.
+		demandScaleClockMoved();
 		// A solve landing here never touches the view -- see the note at the end of zoomExtent()
 		// (Tom, 2026-09-25: results arriving after a Zoom to fit leave it exactly where it was).
 		if (!result.ok) {
