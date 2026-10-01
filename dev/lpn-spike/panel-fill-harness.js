@@ -154,7 +154,7 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		['openNotesBox', 'the Notes box'],
 		// The Alternatives table (dev/scenario-alternatives.md): one row per scenario and nine
 		// category columns, the widest case of all, so a phone wants the whole window for it.
-		['openAlternativesBox', 'the Alternatives table']];
+		['openAlternativesBox', 'the alternatives box']];
 	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
 	});
