@@ -1061,6 +1061,21 @@ $ec_lang['lpn_examples_loading']='Loading examples…';
 $ec_lang['lpn_help_fix']='Fix something';
 $ec_lang_syn['lpn_help_fix']='Fix something, Report a mistake, Tell us what is wrong, Send a correction, Suggest a fix | avoid: fix as fasten or attach; avoid: fix as prepare';
 $ec_lang['lpn_help_notes']='Notes on this page';
+// **THE NEW BOX, TASK 745** (Tom, 2026-09-29: reorganize Help into three groups, with a new
+// "Tables and Hotkeys" box gathering all table help and all keyboard shortcuts). One key names
+// both the Help row and the box's own title bar, the same pattern lpn_help_notes already carries
+// for the Notes box.
+$ec_lang['lpn_help_hotkeys']='Tables and Hotkeys';
+// The box's two context headings. "Tables" holds the two table-help entries that used to sit only
+// in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
+// keys, Undo and the zoom keys had never been gathered anywhere before.
+$ec_lang['lpn_hotkeys_tables_heading']='Tables';
+$ec_lang['lpn_hotkeys_map_heading']='Map';
+$ec_lang['lpn_hotkeys_map_term']='Map keyboard shortcuts';
+// Same shape as lpn_notes_7_def: one table, one row per key. The nine digits are LPN_TOOL_KEYS in
+// js/looped-network.js; Select also answers to Esc and Delete to the Delete key
+// (LPN_TOOL_ALT_KEYS); Ctrl+Z is undo(); +/- and = are keyZoom() (ROADMAP Task 682).
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1339,13 +1354,11 @@ $ec_lang['lpn_zoom_out_tip']='Zoom out. Shortcut: -';
 $ec_lang['lpn_tool_settings_tip']='Open the settings for this project.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='Find an asset by its ID, or find every asset matching a simple or custom condition, and change them all at once.';
-// **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
+// **"Toolbar"** (Tom renamed it from "Toolbar key" to "Toolbar" on 2026-09-30).
 // The row is not a second toolbar and not a repeat of one -- it is the LEGEND for an icon-only
 // strip, derived from toolbarIconIndex, and on a touch screen it is the only way to read the
-// strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
-// it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
-// key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='Toolbar key';
+// strip at all without a deliberate press-and-hold. The row earns its place.
+$ec_lang['lpn_help_icons']='Toolbar';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Visibility';
 $ec_lang['lpn_pane_right_toggle_tip']='Show or hide the panel at the right of the map. It holds the label and color choices.';
@@ -1926,6 +1939,11 @@ $ec_lang['lpn_import_no_room']='There is not enough browser storage left to add 
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='OK';
+// **TASK 718** (Tom, 2026-09-25: *"We have three import items. It's probably time for an Import
+// sub-menu."*). The three rows -- surveyed points, an EPANET file, and libraries -- now open as a
+// fly-out off one row, the same submenu idiom Help > Toolbar already uses. Each row keeps its
+// own existing key and tip; only this one row is new.
+$ec_lang['lpn_file_import_menu']='Import…';
 $ec_lang['lpn_file_import_inp']='Import EPANET file…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).';

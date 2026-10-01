@@ -30507,6 +30507,12 @@ var EngCalcs = EngCalcs || {};
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
 			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, LPN_LIBBOX_KEY,
 			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY,
+			// 'lpn_notesbox' and 'lpn_hotkeysbox' join the list here rather than a day later, for the
+			// same reason every entry above states its own miss: window furniture left out of this
+			// list makes "exactly as a brand-new visitor would see it" false for that one key. Named
+			// as literals because LPN_NOTESBOX_KEY and LPN_HOTKEYSBOX_KEY are declared later in this
+			// file, the same reason 'lpn_show_titles' below is a literal.
+			'lpn_notesbox', 'lpn_hotkeysbox',
 			// AREA_HINT_KEY joined 2026-09-09, having been missed on the day it was written.
 			// dev/cookie-storage-inventory.md already filed it beside PAGE_TITLES_KEY as a reading
 			// preference set deliberately on this screen, so the document and the code disagreed
@@ -36609,7 +36615,7 @@ var EngCalcs = EngCalcs || {};
 	var toolbarIconIndex = [];
 	// **THE REGISTRATION HALF, SPLIT OUT ON ITS OWN** (Perry's second review, 2026-09-22: dropping
 	// the message-log button's tip by building it by hand instead of calling setIconLabel() also,
-	// silently, dropped it out of Help > "Toolbar key" -- the one NON-hover way a first-time user
+	// silently, dropped it out of Help > "Toolbar" -- the one NON-hover way a first-time user
 	// or a touch user learns what an icon-only button does. The two jobs used to be bolted together
 	// so tightly that taking one meant losing the other, which nobody had asked for.). This is only
 	// the bookkeeping: keyed on the button so a repaint replaces its row rather than adding one, and
@@ -37777,6 +37783,34 @@ var EngCalcs = EngCalcs || {};
 		// only fires while focus is inside it -- and because a place is the first thing to type.
 		if (field && field.focus) { field.focus(); }
 	}
+	// **THE THREE IMPORT ROWS, APART FROM THE MENU THAT SHOWS THEM** (Task 718), the same split
+	// iconGuideRows() takes from openHelpMenu(): a harness can ask what the submenu offers without
+	// driving a popup. Each row is unchanged from the flat list it moved out of -- same icon, same
+	// label key, same tip, same handler.
+	function importMenuRows() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			// **IMPORT SURVEYED POINTS (Task 592), AND IT IS A FILE ROW BY TOM'S OWN VOTE** (2026-09-17:
+			// *"Probably Settings is a bad place for Import survey points. That traditionally goes
+			// under File or Water. But Map might make sense. My vote is File since they come from a
+			// file."*). It lived under Settings > New assets, on the argument that it makes new
+			// assets and takes the new-asset values; that argument is still true and is not where a
+			// person looks. A command named after a FILE belongs with the other file commands.
+			{ icon: 'position', label: pc.lpn_file_import_survey || 'Import surveyed points…',
+			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
+			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
+			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
+			// **THE LIBRARY IMPORT WIZARD'S OWN DOOR, AND ITS ONLY ONE** (Task 611). Tom,
+			// 2026-09-17: *"Move the button to the File menu. I thought you already did that."* Then
+			// 2026-09-18: *"Remove buttons except at the File menu."* The Libraries box carried the
+			// same button in each of its three sections until he used it, on his own earlier sentence
+			// asking for the wizard *"available from every applicable library"*; his later word wins,
+			// and the earlier one should have been questioned rather than built. **Do not put a
+			// button back in the Libraries box.**
+			{ icon: 'open', label: pc.lpn_library_import || 'Import libraries…',
+			  tip: pc.lpn_library_import_tip, fn: libImportPick }
+		];
+	}
 	function openFileMenu(anchor) {
 		// **THE FILE MENU AND THE OPEN BUTTON TAKE THE SAME REFUSAL AS THE TAB STRIP** (Tom,
 		// 2026-09-08: *"I think the File menu and Open toolbar also must be disabled just for
@@ -37787,9 +37821,11 @@ var EngCalcs = EngCalcs || {};
 		if (georefBlocksProjectSwitch()) { return; }
 		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
 		var linked = isLinked(id), api = fileApiAvailable();
-		// **RECENT FILES GO LAST, BELOW EVERYTHING.** Not under Open… where thirty years of File
-		// menus put it: a recents list grows, and every row it grows pushes SAVE further down a menu
-		// Save is the most-used row of.
+		// **RECENT FILES SIT JUST ABOVE CLOSE** (Tom, 2026-09-25, correcting "Exit" to "Close" on
+		// 2026-09-29). Not under Open… where thirty years of File menus put it: a recents list
+		// grows, and every row it grows pushes SAVE further down a menu Save is the most-used row
+		// of. It used to go last of all, below Close; that put it beneath the one row that leaves
+		// the menu behind for good, which is not where a list meant to be reached for again belongs.
 		//
 		// ABSENT when there are none -- an empty "Recent files" heading teaches the user only that
 		// the feature does not work. They cannot appear at all without the File System Access API,
@@ -37826,55 +37862,23 @@ var EngCalcs = EngCalcs || {};
 				// re-arming it for every empty tab: showExamplesOverlay() sets galleryForced, and
 				// dismissing or opening anything answers it again.
 				fn: function () { loadExamplesManifest(); showExamplesOverlay(); } },
-			// **IMPORT SURVEYED POINTS (Task 592), AND IT IS A FILE ROW BY TOM'S OWN VOTE** (2026-09-17:
-			// *"Probably Settings is a bad place for Import survey points. That traditionally goes
-			// under File or Water. But Map might make sense. My vote is File since they come from a
-			// file."*). It lived under Settings > New assets, on the argument that it makes new
-			// assets and takes the new-asset values; that argument is still true and is not where a
-			// person looks. A command named after a FILE belongs with the other file commands.
+			// **AN IMPORT SUBMENU (Task 718)**, Tom, 2026-09-25: *"We have three import items. It's
+			// probably time for an Import sub-menu."* The three rows below -- surveyed points, an
+			// EPANET file, and libraries -- moved here, WHOLESALE, out of the flat list. Each keeps
+			// its own key, tip and handler; only their container changed. `submenu` is the fly-out
+			// idiom Help > Toolbar already uses (iconGuideRows), so this needed no new menu
+			// mechanics, only a rows function of its own (importMenuRows()).
 			//
-			// **AFTER THE ROWS THAT MAKE A TAB, because it is the one that does NOT.** Open,
-			// Open example, Import EPANET and Open xy file all end in a project switch; this one
-			// drops points into the project already on screen. Grouping it with them says what kind
-			// of act it is; sitting after them keeps the ones that share an outcome together. It
-			// goes ABOVE the Import/Export EPANET pair rather than below Import, because those two
-			// are adjacent by Tom's own instruction and a row wedged between them breaks the pair.
-			{ icon: 'position', label: pc.lpn_file_import_survey || 'Import surveyed points…',
-			  tip: pc.lpn_file_import_survey_tip, fn: pickSurveyFile },
-			// **THE TWO EPANET ROWS ARE ADJACENT, IMPORT ABOVE EXPORT** (Tom, 2026-09-17, after
-			// demonstrating the page to an Engineers Without Borders chapter: *"I couldn't find
-			// Export EPANET file. Let's move Import EPANET file to just above it."*). Export was
-			// the last row of a five-row block and read as belonging to none of them; beside the
-			// row it is the other direction of, it is found by looking for its own pair.
-			//
-			// This costs Task 447's "third, below both rows it rescues": Open xy file on map… now
-			// sits above Import rather than below it. Kept deliberately -- the fallback is still
-			// below Open…, which is the row people actually reach for first, and a control nobody
-			// can find is a worse defect than a fallback reading one place too high.
-			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file…',
-			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
+			// **SITS WHERE Import EPANET file… used to, directly above Export EPANET file….** That
+			// keeps as much as possible of the 2026-09-17 EWB-meeting finding -- Import and Export
+			// EPANET found each other by standing side by side -- even though the three import rows
+			// no longer stand in the flat list themselves.
+			{ icon: 'open', label: pc.lpn_file_import_menu || 'Import…', submenu: importMenuRows },
 			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
 			// file we hand over, not one this page keeps writing to -- the same reason Import is a
 			// separate row from Open rather than a second file type on it.
 			{ icon: 'save', label: pc.lpn_file_export_inp || 'Export EPANET file…',
 			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
-			// **THE LIBRARY IMPORT WIZARD'S OWN DOOR, AND ITS ONLY ONE** (Task 611). Tom,
-			// 2026-09-17: *"Move the button to the File menu. I thought you already did that."* Then
-			// 2026-09-18: *"Remove buttons except at the File menu."* The Libraries box carried the
-			// same button in each of its three sections until he used it, on his own earlier sentence
-			// asking for the wizard *"available from every applicable library"*; his later word wins,
-			// and the earlier one should have been questioned rather than built. **Do not put a
-			// button back in the Libraries box.** The section somebody happens to be looking at
-			// decides nothing -- the FILE says what is on offer -- so a second door bought nothing
-			// but a second control to notice.
-			//
-			// **LAST, AND BELOW THE EPANET PAIR, WHICH IS A MERGE DECISION WORTH STATING.** It does
-			// not open anything: it copies into the project already on screen, so it cannot sit among
-			// the rows that REPLACE what is open. And Import EPANET has to stay directly above Export
-			// EPANET, because he could not find Export at all while it ended a five-row block
-			// (2026-09-17, at the EWB meeting). Both hold only in this order.
-			{ icon: 'open', label: pc.lpn_library_import || 'Import libraries…',
-			  tip: pc.lpn_library_import_tip, fn: libImportPick },
 		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the
@@ -37931,10 +37935,11 @@ var EngCalcs = EngCalcs || {};
 			// out of a file wants when they decide the colleague's version wins. Disabling it there
 			// left "Save as to a new file" as the only exit, and forked a project that did not need
 			// forking. It writes nothing, so it is safe in every state.
-			{ icon: 'revert', label: pc.lpn_file_revert || 'Revert', fn: revertCurrent, disabled: !(linked && entry && entry.dirty) },
+			{ icon: 'revert', label: pc.lpn_file_revert || 'Revert', fn: revertCurrent, disabled: !(linked && entry && entry.dirty) }
+		], recentRows, [
 			{ separator: true },
 			{ icon: 'close', label: pc.lpn_close || 'Close', fn: function () { closeTab(id); } }
-		], recentRows));
+		]));
 	}
 	// ---- The menu bar (ROADMAP Task 211) ----
 	// Every command on this page is reachable from here; the toolbar is the high-use subset, so a
@@ -38140,49 +38145,36 @@ var EngCalcs = EngCalcs || {};
 			return { icon: b.icon, label: b.name, tip: b.tip, fn: function () {} };
 		});
 	}
+	// **THREE GROUPS, TOM'S OWN ORDER** (Task 745, 2026-09-29: *"(1) True help: Walkthroughs,
+	// Tables and Hotkeys ..., Toolbars. (2) Helpers: Fix something, Install, and Cookies.
+	// (3) True about: Notes on this page, Welcome page, Screenshot, Privacy, Terms, About."*).
+	// This replaces every earlier grouping in this file's history -- do not restore one from an
+	// older comment. Each row still carries the key and the reasoning it always had; what moved is
+	// only which group it stands in.
 	function openHelpMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		function ext(url) { return function () { window.open(url, '_blank', 'noopener'); }; }
 		openMenu(anchor, [
+			// ---- Group 1: true help ----
 			{ icon: 'help', label: pc.lpn_help_walkthroughs || 'Walkthroughs', fn: ext(LPN_WALKTHROUGHS_URL) },
-			// The page's own Notes, which used to sit below the map (Tom, 2026-08-14). This is the
-			// ONE row in this menu that does not open a new tab, because it does not leave the page
-			// at all -- the notes are still in this document, hidden, and this reveals them. See the
-			// comment on #lpn_notes_popup in Looped-Network.php for why the markup stayed in the
-			// page rather than becoming a JS string.
-			{ icon: 'help', label: pc.lpn_help_notes || 'Notes on this page', fn: toggleNotesPopup },
+			// **THE NEW BOX** (Task 745). Gathers the table-help entries that used to live only in
+			// the Notes list (lpn_notes_6/7 -- see #lpn_hotkeys_popup in Looped-Network.php) and the
+			// keyboard shortcuts that had never been gathered anywhere, divided by context.
+			{ icon: 'help', label: pc.lpn_help_hotkeys || 'Tables and Hotkeys', fn: toggleHotkeysBox },
 			// **THE DISCOVERY ROUTE THAT IS NOT A TOOLTIP** (dev/toolbar-icons.md). Once the toolbar
 			// is icons only, a first-time user who does not think to hover -- and a touch user, for
 			// whom a tip needs a deliberate press-and-hold -- has no way to read the strip. This is
 			// that way: the same icon, its name, and its explanation, in one list. DERIVED from the
 			// strip itself (toolbarIconIndex), so a button added later is in it already.
-			{ icon: 'help', label: pc.lpn_help_icons || 'Toolbar key', submenu: iconGuideRows },
-			// **THE WAY BACK TO THE SITE, AND IT IS ONE ROW** (Tom, 2026-09-11: *"Help menu to
-			// include Welcome Page ... as last item in top group"*). It replaces the whole
-			// far-left-mark experiment -- see buildMenuBar() for how that went and why it will not
-			// be retried with a tower.
-			//
-			// `ext()`, so it opens a new tab with `noopener`: a reader looking up what this
-			// software IS should not put an open project through `beforeunload` to do it. That is
-			// the same reasoning every other outbound row in this menu already follows.
-			{ icon: 'info', label: pc.lpn_help_welcome || 'Welcome page',
-				fn: ext(EngCalcs.lwnSiteUrl || 'https://librewaternet.org/') },
+			{ icon: 'help', label: pc.lpn_help_icons || 'Toolbar', submenu: iconGuideRows },
 			{ separator: true },
+			// ---- Group 2: helpers ----
 			// **A VERB, not a noun.** "Contribute" reads as money or code to most visitors; the
 			// reports actually received are a wrong word or a bad number, and "Fix something" invites
 			// those. It REPLACES the Contact row rather than joining it: both go to contact.php, and
 			// two links to one destination halve each other's weight rather than doubling the
 			// invitation (echoFeedback() in lib/Calculators.lib.php).
-
 			{ icon: 'mail', label: pc.lpn_help_fix || 'Fix something', fn: ext(suiteUrl('contact.php?from=Looped-Network')) },
-			{ separator: true },
-			// **HELP HOLDS THE COMMANDS AGAIN** (Task 625, Ida's reversal 2026-09-11). These rows
-			// spent an hour in a menu hanging off the product mark, on the theory that "what is
-			// this software" deserved its own door. It does -- but not that door: the mark is a
-			// LINK now, for the reasons at buildMenuBar(), and a Windows-majority audience has no
-			// left-corner brand menu to reach for. VS Code settles it for the cross-platform case
-			// by putting About in Help on Windows and Linux.
-			//
 			// **Not EPANET IS NOT AMONG THEM AND MUST NOT COME BACK.** Ida's ruling listed it,
 			// written without knowing Tom retired not-epanet.org the same day; a row pointing at a
 			// dead host is worse than no row. See the note at the top of this file's URL block.
@@ -38191,14 +38183,30 @@ var EngCalcs = EngCalcs || {};
 					if (EngCalcs._deferredInstallPrompt && EngCalcs.installPWA) { EngCalcs.installPWA(); return; }
 					window.open(suiteUrl('Install.php'), '_blank', 'noopener');
 				} },
-			{ icon: 'help', label: pc.lpn_help_screenshots || 'Screenshot gallery', fn: ext(LPN_SCREENSHOTS_URL) },
+			{ icon: 'settings', label: pc.consent_settings_link || 'Cookie settings',
+				fn: function () { if (window.ecReopenConsent) { window.ecReopenConsent(); } } },
 			{ separator: true },
+			// ---- Group 3: true about ----
+			// The page's own Notes, which used to sit below the map (Tom, 2026-08-14). This is the
+			// ONE row in this menu that does not open a new tab, because it does not leave the page
+			// at all -- the notes are still in this document, hidden, and this reveals them. See the
+			// comment on #lpn_notes_popup in Looped-Network.php for why the markup stayed in the
+			// page rather than becoming a JS string.
+			{ icon: 'help', label: pc.lpn_help_notes || 'Notes on this page', fn: toggleNotesPopup },
+			// **THE WAY BACK TO THE SITE, AND IT IS ONE ROW** (Tom, 2026-09-11: *"Help menu to
+			// include Welcome Page ... as last item in top group"* -- true of ITS group, now group
+			// 3, since Task 745 split the one group into three).
+			//
+			// `ext()`, so it opens a new tab with `noopener`: a reader looking up what this
+			// software IS should not put an open project through `beforeunload` to do it. That is
+			// the same reasoning every other outbound row in this menu already follows.
+			{ icon: 'info', label: pc.lpn_help_welcome || 'Welcome page',
+				fn: ext(EngCalcs.lwnSiteUrl || 'https://librewaternet.org/') },
+			{ icon: 'help', label: pc.lpn_help_screenshots || 'Screenshot gallery', fn: ext(LPN_SCREENSHOTS_URL) },
 			// Task 286 wants the notice FINDABLE and withdrawal as easy as consent; this page has
 			// no footer, so Help is its home and always was.
 			{ icon: 'info', label: pc.privacy_link || 'Privacy notice', fn: ext(suiteUrl('privacy.php')) },
 			{ icon: 'info', label: pc.terms_link || 'Terms of use', fn: ext(suiteUrl('terms.php')) },
-			{ icon: 'settings', label: pc.consent_settings_link || 'Cookie settings',
-				fn: function () { if (window.ecReopenConsent) { window.ecReopenConsent(); } } },
 			// About last, where every Help menu in the world puts it, and an IN-PAGE box rather
 			// than a link to the suite's About.php -- Tom's fourth embarrassment.
 			{ icon: 'info', label: pc.about_main_menu || 'About', fn: toggleAboutPopup }
@@ -38320,6 +38328,62 @@ var EngCalcs = EngCalcs || {};
 			if (e.key === 'Escape') { e.preventDefault(); closeNotesPopup(); }
 		});
 		wireBoxMemory(box, LPN_NOTESBOX_KEY, notesboxLayout, saveNotesboxLayout, notesBoxIsOpen);
+	}
+
+	// **THE TABLES AND HOTKEYS BOX** (Task 745). The same non-hog shell and memory as Notes --
+	// draggable, resizable, remembered per browser as window furniture (`lpn_hotkeysbox`), and
+	// dismissed only by its own X or an Escape pressed while focus is inside it.
+	function hotkeysBoxEl() { return document.getElementById('lpn_hotkeys_popup'); }
+	function hotkeysBoxIsOpen() {
+		var b = hotkeysBoxEl();
+		return !!b && b.style.display === 'flex';
+	}
+	var LPN_HOTKEYSBOX_KEY = 'lpn_hotkeysbox';
+	var hotkeysboxLayout = newBoxLayout();
+	function saveHotkeysboxLayout() {
+		try { localStorage.setItem(LPN_HOTKEYSBOX_KEY, JSON.stringify(hotkeysboxLayout)); } catch (e) {}
+	}
+	function openHotkeysBox() {
+		var box = hotkeysBoxEl(), r, at, home, floor;
+		if (!box) { return; }
+		closeMenu();
+		closeViewPopovers();
+		hideOpenTips();
+		box.style.display = 'flex';
+		placePanelForScreen(box, function () {
+			applyBoxSize(box, hotkeysboxLayout);
+			floor = chromeFloor();
+			capPanelToRoomBelow(box, floor);
+			r = box.getBoundingClientRect();
+			if (hotkeysboxLayout.left === null || hotkeysboxLayout.top === null) {
+				home = setboxHomeCorner(r.width, r.height);
+				at = clampPanel(home.left, home.top, r.width, r.height,
+					window.innerWidth, window.innerHeight, floor);
+			} else {
+				at = restoreBounds(hotkeysboxLayout.left, hotkeysboxLayout.top, r.width, r.height,
+					window.innerWidth, window.innerHeight);
+			}
+			box.style.left = at.left + 'px';
+			box.style.top = at.top + 'px';
+		});
+		if (!hotkeysboxLayout.open) { hotkeysboxLayout.open = true; saveHotkeysboxLayout(); }
+	}
+	function closeHotkeysBox() {
+		hidePanel(hotkeysBoxEl());
+		if (hotkeysboxLayout.open) { hotkeysboxLayout.open = false; saveHotkeysboxLayout(); }
+	}
+	function toggleHotkeysBox() {
+		if (hotkeysBoxIsOpen()) { closeHotkeysBox(); return; }
+		openHotkeysBox();
+	}
+	function wireHotkeysBox() {
+		var box = hotkeysBoxEl(), x = document.getElementById('lpn_hotkeys_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeHotkeysBox); }
+		box.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape') { e.preventDefault(); closeHotkeysBox(); }
+		});
+		wireBoxMemory(box, LPN_HOTKEYSBOX_KEY, hotkeysboxLayout, saveHotkeysboxLayout, hotkeysBoxIsOpen);
 	}
 	// **THE MAP MENU** -- View until 2026-08-27, renamed on Tom's word. It holds the drawing's frame,
 	// the pictures behind it, where on Earth it is, and the elevations read off that ground. Only
@@ -39212,6 +39276,7 @@ var EngCalcs = EngCalcs || {};
 			saveIndex();
 		}
 		wireNotesPopup();
+		wireHotkeysBox();
 		// **THE MAP STATUS STRIP HAS TO BE RE-READ HERE, AND THIS IS THE ONLY PLACE THAT DOES IT ON
 		// BOOT** (ROADMAP Task 521, Tom 2026-08-24 with a screenshot of the strip disagreeing with
 		// the Settings box). The order that produces the defect:
@@ -45245,6 +45310,7 @@ var EngCalcs = EngCalcs || {};
 		// The Notes box (Tom, 2026-09-28), after the reports and before Find for the same stacking
 		// reason: Find is the smallest and ends up on top.
 		if (notesboxLayout.open) { openNotesBox(); }
+		if (hotkeysboxLayout.open) { openHotkeysBox(); }
 		if (findUserOpen) { toggleFindPopup(null, true); }
 	}
 	// ---- THE DIVIDER BETWEEN THE TWO PANES (ROADMAP Task 576) ------------------------------------
@@ -53964,7 +54030,7 @@ var EngCalcs = EngCalcs || {};
 	// solution is to abandon the idea of adding 'Messages' to this submenu of dubious value and
 	// dubious fit."* **He is factually right and that is why this is settled rather than weighed:**
 	// the button is written in Looped-Network.php inside the map's own overlay row, not in the
-	// toolbar, so a row for it under "Toolbar key" would name a place it is not. The accessible
+	// toolbar, so a row for it under "Toolbar" would name a place it is not. The accessible
 	// name stays; the drawing carries the rest.
 	// `registerToolbarIcon()` -- the bookkeeping half of setIconLabel(), split out during the round
 	// trip -- is KEPT, because it is what stops the next tipless icon button losing its Help row by
