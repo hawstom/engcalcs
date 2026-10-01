@@ -543,7 +543,6 @@ $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="רום קצה מורד הזרם של קטע זה. אופציונלי בשורות פנימיות (אם נשאר ריק, ברירת המחדל אופקי / זהה לצומת שמעליו). חובה בשורה האחרונה: ערך זה הוא רום המטפטף האחרון, הקובע ישירות את לחץ האספקה הנדרש.">רום מורד <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='רום המטפטף האחרון (שורה אחרונה) נשאר ריק וברירת המחדל הוגדרה כאופקי — הזינו אותו לקבלת תוצאה מדויקת';
-$ec_lang['ip_flow']='ספיקה';
 $ec_lang['ip_press']='לחץ';
 $ec_lang['ip_hf']='h<sub>f</sub>';
 $ec_lang['ip_hm']='h<sub>m</sub>';
@@ -610,10 +609,6 @@ $ec_lang['bpn_p_down']='לחץ מורד';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_p_down_tip']='גובה הלחץ (מד לחץ) בצומת מורד הזרם של קו זה. ערך שלילי (מסומן) פירושו לחץ תת-אטמוספרי; יש לבדוק את התכנון.';
 $ec_lang['bpn_sketch_heading']='תרשים הרשת';
-$ec_lang['bpn_show_length']='אורך';
-$ec_lang['bpn_show_diameter']='קוטר';
-$ec_lang['bpn_show_q']='ספיקה';
-$ec_lang['bpn_show_p']='לחץ';
 $ec_lang['bpn_source_label']='מקור';
 $ec_lang['bpn_line_problem']='קו זה אינו מחובר למקור: הוא מצביע על מזהה במעלה הזרם שאינו ידוע, מצביע על עצמו, חוזר על מזהה שקו אחר כבר משתמש בו, או יוצר לולאה. קווים שאינם מחוברים נשארים בלתי פתורים.';
 $ec_lang['bpn_bad_id_short']='מזהה שגוי';
@@ -637,7 +632,6 @@ $ec_lang['bpn_supply3_h']='גובה אספקה 3';
 $ec_lang['bpn_supply_pt_tip']='נקודות עקומת אספקה 2 ו-3, אופציונליות. הזינו ספיקה וגובה לכל אחת כדי לדגם משאבה, או כל מקור שהגובה שלו יורד ככל שהוא מספק יותר; הכלי קורא את הגובה בספיקת התכנון. נקודה 1 לעיל היא הגובה הסטטי בספיקה אפס. השאירו את 2 ו-3 ריקות עבור גובה מאגר קבוע.';
 $ec_lang['bpn_h_supply']='גובה אספקה';
 $ec_lang['bpn_h_supply_tip']='גובה המקור בספיקת התכנון, נקרא מעקומת האספקה. שווה לגובה המקור שהוזן כאשר העקומה שטוחה (מאגר).';
-$ec_lang['bpn_show_elevation']='רום';
 $ec_lang['bpn_supply1_h']='גובה אספקה סטטי';
 $ec_lang['lpn_main_menu']='רשת אספקת מים';
 $ec_lang['lpn_main_title']='מידול חינמי מקוון לרשת חלוקת מים עם פותר EPANET';
@@ -927,7 +921,6 @@ $ec_lang['lpn_examples_blank']='או התחילו כאן';
 // screen, so "start with a blank map" reads as "discard it" and they do not dare press the
 // only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
 // open an example"). Closing never touches a project either way.
-$ec_lang['lpn_examples_close']='סגור';
 $ec_lang['lpn_examples_size']='צמתים: {nodes}, קישורים: {links}';
 $ec_lang['lpn_examples_failed']='לא ניתן היה לטעון את הדוגמאות. השתמשו בקובץ, פרויקט חדש כדי להתחיל שרטוט.';
 $ec_lang['lpn_examples_loading']='טוען דוגמאות…';
@@ -1019,9 +1012,6 @@ $ec_lang['lpn_units_mapcoords']='קואורדינטות מפה';
 $ec_lang['lpn_units_mapcoords_deg']='מעלות';
 $ec_lang['lpn_units_usft']='רגל-מדידה אמריקאית (US survey ft)';
 $ec_lang['lpn_units_elevhead']='רום וגובה';
-$ec_lang['lpn_units_pressure']='לחץ';
-$ec_lang['lpn_units_flow']='ספיקה';
-$ec_lang['lpn_units_velocity']='מהירות';
 // Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
 // mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
 // alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
@@ -1241,13 +1231,11 @@ $ec_lang['lpn_color_break_count']='חייב להיות גבול אחד פחות 
 $ec_lang['lpn_color_ramp_qualitative']='איכותני';
 $ec_lang['lpn_color_ramp_rainbow']='קשת';
 $ec_lang['lpn_color_ramp_rainbow_eg']='תואם ל-EPANET';
-$ec_lang['lpn_color_example_status']='מצב';
 $ec_lang['lpn_color_example_material']='חומר';
 $ec_lang['lpn_color_ramp_ylgnbu']='צהוב לכחול';
 $ec_lang['lpn_color_ramp_rdylbu']='אדום לכחול, דרך צהוב';
 $ec_lang['lpn_georef_drop']='הנח את המודל כאן';
 $ec_lang['lpn_georef_finish']='שמור מיקום זה';
-$ec_lang['lpn_georef_cancel']='ביטול';
 $ec_lang['lpn_georef_scale']='מרחק בשטח ליחידת שרטוט';
 // Edited by TGH 2026-09-07
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
@@ -1344,7 +1332,7 @@ $ec_lang['lpn_pane_print_tip']='הדפיסו את הטבלה שאתם רואים
 // lpn_clean_map_tip were deleted with the row; nothing else read them.
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
-// lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
+// lpn_tool_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
 // it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
 // alternative and Tom kept Project.
 // ROADMAP Task 523, Tom 2026-08-24. **The KEY is still lpn_menu_project and that is deliberate** --
@@ -1395,7 +1383,6 @@ $ec_lang['lpn_time_run_slow']='חישוב רשת זו ארך {secs} שנ׳, וה
 $ec_lang['lpn_time_no_report']='עדיין אין דוח הרצה. הדוח הוא הטקסט של EPANET עצמו, כך שהוא מופיע לאחר שרשת זו חושבה בעזרת פותר EPANET.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
-$ec_lang['lpn_menu_settings']='הגדרות';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -1512,10 +1499,6 @@ $ec_lang['lpn_find_op_conn_noopensource']='אין מסלול פתוח למקור
 // What a result row prints beside the node id: the fault it has, in three words.
 // What a result row prints beside the id: the NARROWEST condition true of that node, because "no
 // links" says more than "no open path to a source" and both are true of the same node.
-$ec_lang['lpn_find_conn_unlinked']='אין קישורים בצומת';
-$ec_lang['lpn_find_conn_noopen']='אין קישורים פתוחים בצומת';
-$ec_lang['lpn_find_conn_nolinksource']='אין מסלול קישורים למקור';
-$ec_lang['lpn_find_conn_noopensource']='אין מסלול פתוח למקור';
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='כל צומת מחובר.';
@@ -1704,10 +1687,8 @@ $ec_lang['lpn_new_coordsys_local_tip']='ללא ייחוס גיאוגרפי. צר
 // system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
 // the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
 // as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
-$ec_lang['lpn_new_crs']='הטלת מפה';
 // **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
 // it names the box's own subject rather than either caller's radio label.
-$ec_lang['lpn_crsbox_title']='מערכת קואורדינטות';
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
@@ -1718,7 +1699,6 @@ $ec_lang['lpn_crs_place_tip']='הקלידו עיר, כתובת, או ציון ד
 $ec_lang['lpn_crs_search']='חיפוש';
 $ec_lang['lpn_crs_name']='סינון לפי שם הטלה';
 $ec_lang['lpn_crs_name_tip']='מציג רק את ההטלות ששמן או קוד ה-EPSG שלהן מכיל את מה שהקלדתם. נסו מספר אזור, או UTM, או Mercator.';
-$ec_lang['lpn_crs_list']='הטלה';
 $ec_lang['lpn_crs_list_tip']='ההטלות שנותרו לאחר שני הסינונים שלמעלה. בחרו אחת ולחצו על בחר.';
 $ec_lang['lpn_crs_choose']='בחר';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
@@ -1763,7 +1743,6 @@ $ec_lang['lpn_file_open']='פתח…';
 $ec_lang['lpn_file_save']='שמור';
 $ec_lang['lpn_file_saveas']='שמור בשם…';
 $ec_lang['lpn_file_revert']='שחזר';
-$ec_lang['lpn_file_close']='סגור';
 // Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='קבצים אחרונים';
@@ -2621,7 +2600,6 @@ $ec_lang['lpn_cp_design']='הגדרה';
 $ec_lang['lpn_cp_design_tip']='שורה אחת לכל מאפיין מותאם אישית, וכל שורה נפתחת כדי להציג: מפתח, תווית, חל על, אמת כ־, אפשר או הגבל, שדה התווים הנקרא לפי בחירה זו, גבול תחתון לאורך, גבול עליון לאורך, גבול תחתון, גבול עליון.';
 $ec_lang['lpn_cp_add']='הוסף מאפיין מותאם אישית';
 $ec_lang['lpn_cp_add_tip']='מוסיף שורה לטבלת ההגדרה ופותח אותה לעריכה.';
-$ec_lang['lpn_cp_remove']='הסר';
 $ec_lang['lpn_cp_remove_tip']='מסיר מאפיין זה מטבלת ההגדרה. ערכים שכבר הוקלדו על האלמנטים שלכם נשמרים בקובץ וחוזרים אם תגדירו שוב את אותו מפתח.';
 $ec_lang['lpn_cp_none']='עדיין לא הוגדר אף מאפיין מותאם אישית.';
 $ec_lang['lpn_cp_unnamed']='עדיין ללא שם';
@@ -2641,7 +2619,6 @@ $ec_lang['lpn_cp_restrict_tip']='הגבל תווים אלה: ערך רשאי ל�
 $ec_lang['lpn_cp_restrict_mode']='אפשר או הגבל';
 $ec_lang['lpn_cp_restrict_mode_tip']='אפשר או הגבל: התווים הנתונים הם או היחידים שערך רשאי להשתמש בהם, או אלה שאינו רשאי להשתמש בהם.';
 $ec_lang['lpn_cp_restrict_allow']='אפשר רק תווים אלה';
-$ec_lang['lpn_cp_restrict_deny']='הגבל תווים אלה';
 $ec_lang['lpn_cp_minlength']='גבול תחתון לאורך';
 $ec_lang['lpn_cp_minlength_tip']='גבול תחתון לאורך: כל ערך קצר יותר מסומן, וכך מוצאים ערכים ריקים וערכים שהוקלדו רק בחלקם.';
 $ec_lang['lpn_cp_length']='גבול עליון לאורך';
@@ -2803,7 +2780,6 @@ $ec_lang['lpn_settings_flow_change_tip']='בדיקה נוספת שהפותר ח�
 $ec_lang['lpn_settings_damp_limit']='ריסון מתחיל ב';
 $ec_lang['lpn_settings_damp_limit_tip']='הדיוק שבו הפותר מתחיל לנקוט צעדים קטנים יותר, מה שיכול לעזור לרשת מתנדנדת להתכנס. אפס פירושו שהפותר לעולם אינו מרסן. רק פותר EPANET קורא תיבה זו.';
 $ec_lang['lpn_settings_option_unset']='לא נקבע';
-$ec_lang['lpn_settings_demand_multiplier']='מכפיל דרישה';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_demand_multiplier_tip']='מקדם יחיד המוחל בבת אחת על כל דרישה ברשת. השתמשו בו כדי לשאול מה המערכת עושה בשימוש גבוה או נמוך יותר מהיום. הוא אינו משנה את המספרים שהקלדתם. לתרחיש יכול להיות מכפיל משלו, כך שיום ממוצע, יום מרבי ושעת שיא הם כל אחד מספר אחד; השאירו אותו ריק בתרחיש כדי להשתמש במכפיל של הפרויקט.';
 $ec_lang['lpn_settings_engine_native']='פתור עם פותר EPANET';
@@ -3036,7 +3012,7 @@ $ec_lang['lpn_time_speed_tip']='מהירות ניגון';
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,
 // with an index down the left and a search across the top. The section titles are not new keys --
-// each borrows the name it already had (lpn_tool_labels, lpn_menu_settings, lpn_time_menu,
+// each borrows the name it already had (lpn_tool_labels, lpn_tool_settings, lpn_time_menu,
 // lpn_settings_colors), so the box cannot drift from the doors that open it.
 $ec_lang['lpn_settings_search']='חיפוש הגדרות';
 // **AND-OF-WORDS, STATED AS SUCH** (Tom, 2026-09-23 (g): "can Settings filter work as an AND word
@@ -3093,7 +3069,6 @@ $ec_lang['lpn_settings_quality_track_tip']='בחרו מה ההרצה צריכה 
 $ec_lang['lpn_settings_quality_source']='צומת מעקב';
 $ec_lang['lpn_settings_quality_source_tip']='הצומת שהמים שלו מוקבים. כל צומת אחר מציג לאחר מכן את חלק המים שלו שהגיע מאותו צומת.';
 $ec_lang['lpn_quality_none']='ללא';
-$ec_lang['lpn_quality_age']='גיל המים';
 $ec_lang['lpn_quality_trace']='מעקב מקור';
 $ec_lang['lpn_quality_chemical']='חומר כימי שמגיב';
 $ec_lang['lpn_quality_needs_run']='איכות המים נישאת לאורך הצינורות תוך כדי מעבר המים, ולכן היא דורשת סימולציה על פני תקופת זמן: מנוע EPANET וזמן ריצה כולל. הגדירו זמן ריצה כולל תחת זמן, ולאחר מכן לחצו על כפתור חשב.';
@@ -3267,7 +3242,6 @@ $ec_lang['lpn_scncmp_title']='השוואת תרחישים';
 $ec_lang['lpn_scncmp_menu_tip']='פתרו כל תרחיש בפרויקט זה וקראו אותם זה לצד זה: הלחץ הנמוך ביותר והמהירות הגבוהה ביותר בכל אחד.';
 $ec_lang['lpn_scncmp_running']='פותר כל תרחיש…';
 $ec_lang['lpn_scncmp_empty']='עוד לא צויר דבר, כך שאין מה לפתור.';
-$ec_lang['lpn_scncmp_col_minpressure']='לחץ מזערי';
 $ec_lang['lpn_scncmp_col_maxvelocity']='מהירות מרבית';
 $ec_lang['lpn_scncmp_at']='{value} ב-{id}';
 $ec_lang['lpn_scncmp_current']='(פתוח כעת)';
@@ -3300,7 +3274,6 @@ $ec_lang['lpn_reports_status_tip']='מה השתנה במהלך סימולציי�
 $ec_lang['lpn_status_title']='דוח מצב';
 $ec_lang['lpn_status_needs_run']='דוח המצב מפרט מה השתנה במהלך סימולציה על פני תקופת זמן. קבעו משך ריצה כולל תחת הגדרות, חישוב, זמן, לחצו על חשב, ולאחר מכן פתחו את מים, דוחות, דוח מצב.';
 $ec_lang['lpn_status_empty']='שום דבר לא שינה מצב במהלך הרצה זו.';
-$ec_lang['lpn_status_col_time']='זמן';
 $ec_lang['lpn_status_col_event']='אירוע';
 $ec_lang['lpn_status_opened']='{type} {id} נפתח';
 $ec_lang['lpn_status_closed']='{type} {id} נסגר';
@@ -3359,7 +3332,6 @@ $ec_lang['lpn_color_mode_jenks']='חלוקות טבעיות (Jenks)';
 $ec_lang['lpn_color_mode_stddev']='סטיית תקן';
 $ec_lang['lpn_color_mode_pretty']='מעוגל (Pretty)';
 $ec_lang['lpn_color_mode_log']='לוגריתמי';
-$ec_lang['lpn_color_mode_pressure']='לחץ';
 $ec_lang['lpn_color_mode_manual']='ידני';
 
 // ---- LIBRARIES (ROADMAP Tasks 462 and 460) ---------------------------------------------------
@@ -3369,7 +3341,7 @@ $ec_lang['lpn_color_mode_manual']='ידני';
 // Simulate, Transport, Time selectors."
 //
 // ONE NAME, THREE DOORS: the toolbar button, the Edit menu row and the box's own title all read
-// this key, exactly as lpn_menu_settings serves the Settings box's three.
+// this key, exactly as lpn_tool_settings serves the Settings box's three.
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='ספריות';
@@ -3574,7 +3546,6 @@ $ec_lang['lpn_library_rule_add']='הוסיפו כלל';
 $ec_lang['lpn_library_rule_tip']='כלל אחד, במילים שבהן EPANET משתמש, סעיף אחד בכל שורה. שורה ראשונה נותנת לו שם: RULE 1. אחר כך תנאי: IF TANK 2 LEVEL BELOW 17.1. אחר כך מה לעשות בנידון: THEN PUMP 9 STATUS IS OPEN. שורה אחרונה יכולה לדרג אותו: PRIORITY 1. הוסיפו שורות AND או OR כדי לבדוק יותר מדבר אחד, ושורות ELSE כדי לומר מה לעשות כשהבדיקה נכשלת. תנאי יכול לקרוא LEVEL, HEAD, GRADE, PRESSURE או DEMAND בצומת, FLOW, STATUS או SETTING בקישור, או TIME ו-CLOCKTIME ב-SYSTEM. כתבו את המספרים ביחידות שהפרויקט הזה מציג; הם מומרים עבורכם. השאירו את מילות המפתח באנגלית; אלה מה שהעמוד ו-EPANET קוראים.';
 $ec_lang['lpn_library_rule_ok']='✓ כלל זה נקרא';
 $ec_lang['lpn_library_rule_bad']='⚠ לא ניתן היה לקרוא כלל זה';
-$ec_lang['lpn_library_rule_missing']='⚠ לרשת זו אין דבר בשם {id}';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
 // for the entire project it is in Settings") drawn on its other side. Without it a pattern you
 // author can only be used by making it the default one, which is not what a library is for.
@@ -3814,8 +3785,6 @@ $ec_lang['lpn_ff_mode_none']='ללא';
 $ec_lang['lpn_ff_col_solves']='הרצות';
 // Which criterion the junction broke while drawing the required flow. A junction that broke nothing
 // shows a dash, never one of these words.
-$ec_lang['lpn_ff_limit_pressure']='לחץ';
-$ec_lang['lpn_ff_limit_velocity']='מהירות';
 $ec_lang['lpn_ff_limit_both']='לחץ ומהירות';
 $ec_lang['lpn_ff_atleast']='יותר מ-{flow}';
 $ec_lang['lpn_ff_affect_node']='{id} יורד ל-{pressure}';

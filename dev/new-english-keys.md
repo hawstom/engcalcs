@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 2166 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 0 untranslated keys, of 2135 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -31,7 +31,7 @@ None on master. Every English key here is present in at least one other language
 
 # Strings waiting on a branch
 
-**54 still to read**, of 57 new keys across 19 unmerged branch(es).
+**68 still to read**, of 71 new keys across 18 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -42,13 +42,51 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/gemini-0930 (`13ca7fae`) — adds no English strings
+### chore/key-merge (`b11f88a5`) — adds no English strings
 
-### chore/key-merge (`c4482083`) — adds no English strings
+### feat/bentley-interop (`22fbb9b7`) — 13 new, 13 to read @@ NEEDS RULING
 
-### feat/bentley-interop (`8c5cc3a9`) — adds no English strings
+- **`lpn_alt_cat_constituent`**
+  > Constituent
+  @@ NEEDS RULING
+- **`lpn_alt_cat_demand`**
+  > Demand
+  @@ NEEDS RULING
+- **`lpn_alt_cat_energy`**
+  > Energy cost
+  @@ NEEDS RULING
+- **`lpn_alt_cat_fireflow`**
+  > Fire flow
+  @@ NEEDS RULING
+- **`lpn_alt_cat_initial`**
+  > Initial settings
+  @@ NEEDS RULING
+- **`lpn_alt_cat_physical`**
+  > Physical
+  @@ NEEDS RULING
+- **`lpn_alt_cat_text`**
+  > Text
+  @@ NEEDS RULING
+- **`lpn_alt_cat_topology`**
+  > Active topology
+  @@ NEEDS RULING
+- **`lpn_alt_cat_userdata`**
+  > Custom properties
+  @@ NEEDS RULING
+- **`lpn_alt_note`**
+  > Read only. Base uses the Base alternative of every category. A scenario gets its own alternative in a category, a child of the Base one, once it holds a value of its own there. The number is how many values it holds.
+  @@ NEEDS RULING
+- **`lpn_alt_title`**
+  > Alternatives
+  @@ NEEDS RULING
+- **`lpn_scenario_basic`**
+  > Basic mode
+  @@ NEEDS RULING
+- **`lpn_scenario_basic_tip`**
+  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives table, which shows how those values are grouped by category.
+  @@ NEEDS RULING
 
-### feat/copy-lock (`1d99970f`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/copy-lock (`9828fb80`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_copy_body`**
   > This file was originally created on {date}, but this browser doesn't remember it. Is this the Original file (keep same lock) or a Copy (make new lock)?
@@ -59,6 +97,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_copy_copy`**
   > A copy; make new lock
   @@ NEEDS RULING
+- **`lpn_copy_kept_link`**
+  > Switched to {name}. It stays connected to the file it was opened from, {file}, and Save writes there, not to the file you just chose.
+  @@ NEEDS RULING
 - **`lpn_copy_opened`**
   > Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.
   @@ NEEDS RULING
@@ -68,14 +109,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_copy_title`**
   > Mark file as new copy?
   @@ NEEDS RULING
-- **`lpn_copy_why`**
-  > Another browser has a file with this same lock open right now. A file copied outside this page keeps its original's lock.
-  @@ NEEDS RULING
 
-### feat/criticality (`31e545ca`) — 22 new, 22 to read @@ NEEDS RULING
+### feat/criticality (`614f8d48`) — 23 new, 23 to read @@ NEEDS RULING
 
 - **`lpn_crit_baseline_below`**
   > Junctions already below it with nothing broken: {n}. They are not counted.
+  @@ NEEDS RULING
+- **`lpn_crit_busy`**
+  > Another analysis is running. Stop it, or wait for it to finish.
   @@ NEEDS RULING
 - **`lpn_crit_col_asset`**
   > Asset
@@ -96,7 +137,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Criticality analysis…
   @@ NEEDS RULING
 - **`lpn_crit_menu_tip`**
-  > Take each pipe out of the network in turn and see what the system loses.
+  > Take each pipe, pump, and valve out of the network in turn and see what the system loses.
   @@ NEEDS RULING
 - **`lpn_crit_minpressure`**
   > Lowest pressure allowed
@@ -104,23 +145,23 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_crit_minpressure_tip`**
   > This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.
   @@ NEEDS RULING
-- **`lpn_crit_no_pipes`**
-  > This project has no pipes yet, so there is nothing to break.
+- **`lpn_crit_no_links`**
+  > This project has no links yet, so there is nothing to break.
   @@ NEEDS RULING
 - **`lpn_crit_no_selection`**
-  > No pipe, pump or valve is selected. Choose one on the map, or break all pipes.
+  > No pipe, pump, or valve is selected. Choose one on the map, or break every link.
   @@ NEEDS RULING
 - **`lpn_crit_scope`**
-  > Assets to break
+  > Links to break
   @@ NEEDS RULING
 - **`lpn_crit_scope_all`**
-  > All pipes
+  > Every link
   @@ NEEDS RULING
 - **`lpn_crit_scope_selected`**
-  > Selected
+  > The selected links
   @@ NEEDS RULING
 - **`lpn_crit_scope_tip`**
-  > All pipes, or only the pipes, pumps and valves selected on the map.
+  > Every pipe, pump, and valve, or only the ones selected on the map. Choose the set before you run.
   @@ NEEDS RULING
 - **`lpn_crit_skipped`**
   > {n} selected elements are not links, so they were not broken.
@@ -132,7 +173,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Stopped after {done} of {total} assets. The results below are the ones already finished.
   @@ NEEDS RULING
 - **`lpn_crit_summary`**
-  > {n} of {total} assets cut off demand or drop a junction below {pressure}.
+  > {n} of {total} assets leave demand unserved or drop a junction below {pressure}.
   @@ NEEDS RULING
 - **`lpn_crit_title`**
   > Criticality analysis
@@ -141,7 +182,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Working: {done} of {total} assets.
   @@ NEEDS RULING
 
-### feat/find-filter (`6e0bbf8d`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/find-filter (`59671f1b`) — 1 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_pane_filter_stale`**
   > Rows that no longer match: {n}.
@@ -156,7 +197,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selected
   @@ NEEDS RULING
 
-### feat/graph-tab-keys (`ee61d048`) — adds no English strings
+### feat/graph-tab-keys (`6e7b95fa`) — adds no English strings
 
 ### feat/help-menu (`d34b00e6`) — 6 new, 6 to read @@ NEEDS RULING
 
@@ -210,7 +251,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Source share from {node}
   @@ NEEDS RULING
 
-### feat/scenario-preset (`0f7792ec`) — 14 new, 14 to read @@ NEEDS RULING
+### feat/scenario-preset (`633e70fb`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_scenario_preset_average_day`**
   > 4. Average Day

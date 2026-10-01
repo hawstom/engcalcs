@@ -543,7 +543,6 @@ $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Отметка нижнего (конечного) узла участка. Дополнительная для промежуточных строк (при отсутствии принимается горизонтально / равна узлу выше). Обязательна для последней строки: это отметка последнего эмиттера, которая непосредственно определяет требуемое давление подачи.">Отм. НБ <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='Отметка последнего эмиттера (последняя строка) была оставлена пустой и установлена на горизонтальное положение — введите её для получения точного результата';
-$ec_lang['ip_flow']='Расход';
 $ec_lang['ip_press']='Давл.';
 $ec_lang['ip_hf']='h<sub>f</sub>';
 $ec_lang['ip_hm']='h<sub>m</sub>';
@@ -610,10 +609,6 @@ $ec_lang['bpn_p_down']='Давл. НБ';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_p_down_tip']='Избыточное давление (напор) в узле ниже по течению этого участка. Отрицательное значение (отмечено) означает давление ниже атмосферного; проверьте проект.';
 $ec_lang['bpn_sketch_heading']='Схема сети';
-$ec_lang['bpn_show_length']='Длина';
-$ec_lang['bpn_show_diameter']='Диаметр';
-$ec_lang['bpn_show_q']='Расход';
-$ec_lang['bpn_show_p']='Давление';
 $ec_lang['bpn_source_label']='Источник';
 $ec_lang['bpn_line_problem']='Этот участок не соединён с источником: он указывает на неизвестный вышестоящий ID, ссылается сам на себя, повторяет ID, уже использованный другим участком, или образует кольцо. Несоединённые участки остаются нерешёнными.';
 $ec_lang['bpn_bad_id_short']='Неверный ID';
@@ -637,7 +632,6 @@ $ec_lang['bpn_supply3_h']='Напор подачи 3';
 $ec_lang['bpn_supply_pt_tip']='Необязательные точки кривой подачи 2 и 3. Введите расход и напор для каждой, чтобы смоделировать насос или любой источник, напор которого падает по мере увеличения подачи; инструмент считывает напор при расчётном расходе. Точка 1 выше — статический напор при нулевом расходе. Оставьте 2 и 3 пустыми для постоянного напора резервуара.';
 $ec_lang['bpn_h_supply']='Напор подачи';
 $ec_lang['bpn_h_supply_tip']='Напор источника при расчётном расходе, считанный с кривой подачи. Равен введённому напору источника, если кривая постоянна (резервуар).';
-$ec_lang['bpn_show_elevation']='Отметка';
 $ec_lang['bpn_supply1_h']='Статический напор подачи';
 $ec_lang['lpn_main_menu']='Сеть водоснабжения';
 $ec_lang['lpn_main_title']='Бесплатное онлайн-моделирование сети водоснабжения с расчётным ядром EPANET';
@@ -926,7 +920,6 @@ $ec_lang['lpn_examples_blank']='Или начните здесь';
 // screen, so "start with a blank map" reads as "discard it" and they do not dare press the
 // only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
 // open an example"). Closing never touches a project either way.
-$ec_lang['lpn_examples_close']='Закрыть';
 $ec_lang['lpn_examples_size']='Узлов: {nodes}, связей: {links}';
 $ec_lang['lpn_examples_failed']='Не удалось загрузить примеры. Чтобы начать чертёж, используйте «Файл» → «Новый проект».';
 $ec_lang['lpn_examples_loading']='Загрузка примеров…';
@@ -1018,9 +1011,6 @@ $ec_lang['lpn_units_mapcoords']='Координаты карты';
 $ec_lang['lpn_units_mapcoords_deg']='градусы';
 $ec_lang['lpn_units_usft']='Геодезический фут США';
 $ec_lang['lpn_units_elevhead']='Отметка и напор';
-$ec_lang['lpn_units_pressure']='Давление';
-$ec_lang['lpn_units_flow']='Расход';
-$ec_lang['lpn_units_velocity']='Скорость';
 // Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
 // mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
 // alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
@@ -1240,13 +1230,11 @@ $ec_lang['lpn_color_break_count']='Границ должно быть на од�
 $ec_lang['lpn_color_ramp_qualitative']='Качественная';
 $ec_lang['lpn_color_ramp_rainbow']='Радуга';
 $ec_lang['lpn_color_ramp_rainbow_eg']='как в EPANET';
-$ec_lang['lpn_color_example_status']='Состояние';
 $ec_lang['lpn_color_example_material']='Материал';
 $ec_lang['lpn_color_ramp_ylgnbu']='От жёлтого к синему';
 $ec_lang['lpn_color_ramp_rdylbu']='От красного к синему через жёлтый';
 $ec_lang['lpn_georef_drop']='Поместить модель сюда';
 $ec_lang['lpn_georef_finish']='Сохранить это положение';
-$ec_lang['lpn_georef_cancel']='Отмена';
 $ec_lang['lpn_georef_scale']='Расстояние на местности на единицу чертежа';
 // Edited by TGH 2026-09-07
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
@@ -1343,7 +1331,7 @@ $ec_lang['lpn_pane_print_tip']='Печатает таблицу, которую 
 // lpn_clean_map_tip were deleted with the row; nothing else read them.
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
-// lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
+// lpn_tool_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
 // it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
 // alternative and Tom kept Project.
 // ROADMAP Task 523, Tom 2026-08-24. **The KEY is still lpn_menu_project and that is deliberate** --
@@ -1394,7 +1382,6 @@ $ec_lang['lpn_time_run_slow']='Расчёт этой сети занял {secs} 
 $ec_lang['lpn_time_no_report']='Отчёта о расчёте пока нет. Отчёт — это собственный текст EPANET, поэтому он появляется только после расчёта этой сети расчётным ядром EPANET.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
-$ec_lang['lpn_menu_settings']='Настройки';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -1511,10 +1498,6 @@ $ec_lang['lpn_find_op_conn_noopensource']='нет открытого пути д
 // What a result row prints beside the node id: the fault it has, in three words.
 // What a result row prints beside the id: the NARROWEST condition true of that node, because "no
 // links" says more than "no open path to a source" and both are true of the same node.
-$ec_lang['lpn_find_conn_unlinked']='Нет связей у узла';
-$ec_lang['lpn_find_conn_noopen']='Нет открытых связей у узла';
-$ec_lang['lpn_find_conn_nolinksource']='Нет пути по трубам до источника';
-$ec_lang['lpn_find_conn_noopensource']='Нет открытого пути до источника';
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='Все узлы связаны.';
@@ -1703,10 +1686,8 @@ $ec_lang['lpn_new_coordsys_local_tip']='Без географической пр
 // system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
 // the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
 // as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
-$ec_lang['lpn_new_crs']='Картографическая проекция';
 // **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
 // it names the box's own subject rather than either caller's radio label.
-$ec_lang['lpn_crsbox_title']='Система координат';
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
@@ -1717,7 +1698,6 @@ $ec_lang['lpn_crs_place_tip']='Введите город, адрес или ор
 $ec_lang['lpn_crs_search']='Поиск';
 $ec_lang['lpn_crs_name']='Фильтр по названию проекции';
 $ec_lang['lpn_crs_name_tip']='Показывает только проекции, в названии или коде EPSG которых есть введённый текст. Попробуйте номер зоны, либо «UTM», либо «Меркатор».';
-$ec_lang['lpn_crs_list']='Проекция';
 $ec_lang['lpn_crs_list_tip']='Проекции, оставшиеся после двух фильтров выше. Выберите одну и нажмите «Выбрать».';
 $ec_lang['lpn_crs_choose']='Выбрать';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
@@ -1762,7 +1742,6 @@ $ec_lang['lpn_file_open']='Открыть…';
 $ec_lang['lpn_file_save']='Сохранить';
 $ec_lang['lpn_file_saveas']='Сохранить как…';
 $ec_lang['lpn_file_revert']='Восстановить сохранённое';
-$ec_lang['lpn_file_close']='Закрыть';
 // Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Недавние файлы';
@@ -2621,7 +2600,6 @@ $ec_lang['lpn_cp_design']='Конструктор';
 $ec_lang['lpn_cp_design_tip']='По одной строке на каждое пользовательское свойство; при открытии строки показываются поля: Ключ, Заголовок, Применяется к, Проверять как, Разрешить или ограничить, поле символов, названное этим выбором, Нижний предел длины, Верхний предел длины, Нижний предел, Верхний предел.';
 $ec_lang['lpn_cp_add']='Добавить пользовательское свойство';
 $ec_lang['lpn_cp_add_tip']='Добавляет строку в таблицу конструктора и открывает её для редактирования.';
-$ec_lang['lpn_cp_remove']='Удалить';
 $ec_lang['lpn_cp_remove_tip']='Удаляет это свойство из таблицы конструктора. Значения, уже введённые для ваших элементов, сохраняются в файле и появятся снова, если вы заново создадите свойство с тем же ключом.';
 $ec_lang['lpn_cp_none']='Пока не создано ни одного пользовательского свойства.';
 $ec_lang['lpn_cp_unnamed']='Пока без имени';
@@ -2641,7 +2619,6 @@ $ec_lang['lpn_cp_restrict_tip']='Ограничить эти символы: з�
 $ec_lang['lpn_cp_restrict_mode']='Разрешить или ограничить';
 $ec_lang['lpn_cp_restrict_mode_tip']='Разрешить или ограничить: указанные символы — это либо единственные, которые может использовать значение, либо те, которые оно использовать не может.';
 $ec_lang['lpn_cp_restrict_allow']='Разрешить только эти символы';
-$ec_lang['lpn_cp_restrict_deny']='Ограничить эти символы';
 $ec_lang['lpn_cp_minlength']='Нижний предел длины';
 $ec_lang['lpn_cp_minlength_tip']='Нижний предел длины: любая более короткая запись отмечается — так вы находите пустые и недописанные значения.';
 $ec_lang['lpn_cp_length']='Верхний предел длины';
@@ -2803,7 +2780,6 @@ $ec_lang['lpn_settings_flow_change_tip']='Дополнительное усло�
 $ec_lang['lpn_settings_damp_limit']='Демпфирование начинается при';
 $ec_lang['lpn_settings_damp_limit_tip']='Точность, при которой расчёт начинает делать меньшие шаги, что может помочь колеблющейся сети сойтись. Ноль означает, что демпфирование никогда не применяется. Это поле читает только расчётное ядро EPANET.';
 $ec_lang['lpn_settings_option_unset']='Не задано';
-$ec_lang['lpn_settings_demand_multiplier']='Множитель расхода отбора';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_demand_multiplier_tip']='Единый коэффициент, применяемый сразу ко всем расходам отбора в сети. Используйте его, чтобы узнать, что делает система при потреблении больше или меньше текущего. Он не меняет введённые вами числа. Сценарий может иметь собственный множитель, поэтому средние сутки, максимальные сутки и час пик — это по одному числу каждый; оставьте его пустым в сценарии, чтобы использовать множитель проекта.';
 $ec_lang['lpn_settings_engine_native']='Решать с помощью расчётного ядра EPANET';
@@ -3036,7 +3012,7 @@ $ec_lang['lpn_time_speed_tip']='Скорость воспроизведения'
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,
 // with an index down the left and a search across the top. The section titles are not new keys --
-// each borrows the name it already had (lpn_tool_labels, lpn_menu_settings, lpn_time_menu,
+// each borrows the name it already had (lpn_tool_labels, lpn_tool_settings, lpn_time_menu,
 // lpn_settings_colors), so the box cannot drift from the doors that open it.
 $ec_lang['lpn_settings_search']='Поиск по настройкам';
 // **AND-OF-WORDS, STATED AS SUCH** (Tom, 2026-09-23 (g): "can Settings filter work as an AND word
@@ -3093,7 +3069,6 @@ $ec_lang['lpn_settings_quality_track_tip']='Выберите, что долже�
 $ec_lang['lpn_settings_quality_source']='Узел трассировки';
 $ec_lang['lpn_settings_quality_source_tip']='Узел, чья вода отслеживается. Каждый другой узел затем показывает долю своей воды, пришедшую от этого узла.';
 $ec_lang['lpn_quality_none']='Ничего';
-$ec_lang['lpn_quality_age']='Возраст воды';
 $ec_lang['lpn_quality_trace']='Трассировка источника';
 $ec_lang['lpn_quality_chemical']='Реагирующее химическое вещество';
 $ec_lang['lpn_quality_needs_run']='Качество воды переносится по трубам во времени, поэтому для этого нужен расчёт с продолжённым периодом. Задайте «Общую продолжительность работы» в разделе «Время», затем нажмите кнопку «Рассчитать».';
@@ -3267,7 +3242,6 @@ $ec_lang['lpn_scncmp_title']='Сравнение сценариев';
 $ec_lang['lpn_scncmp_menu_tip']='Рассчитывает каждый сценарий этого проекта и показывает их бок о бок: наименьшее давление и наибольшую скорость в каждом.';
 $ec_lang['lpn_scncmp_running']='Расчёт всех сценариев…';
 $ec_lang['lpn_scncmp_empty']='Пока ничего не нарисовано, поэтому рассчитывать нечего.';
-$ec_lang['lpn_scncmp_col_minpressure']='Наименьшее давление';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Наибольшая скорость';
 $ec_lang['lpn_scncmp_at']='{value} в {id}';
 $ec_lang['lpn_scncmp_current']='(сейчас открыт)';
@@ -3300,7 +3274,6 @@ $ec_lang['lpn_reports_status_tip']='Что изменилось за после�
 $ec_lang['lpn_status_title']='Отчёт о состоянии';
 $ec_lang['lpn_status_needs_run']='Отчёт о состоянии перечисляет, что изменилось во время расчёта с продолжённым периодом. Задайте «Общую продолжительность работы» в разделе «Настройки» → «Расчёт» → «Время», нажмите «Рассчитать», затем откройте «Вода» → «Отчёты» → «Отчёт о состоянии».';
 $ec_lang['lpn_status_empty']='За этот расчёт состояние ничего не изменило.';
-$ec_lang['lpn_status_col_time']='Время';
 $ec_lang['lpn_status_col_event']='Событие';
 $ec_lang['lpn_status_opened']='{type} {id} открыт(а)';
 $ec_lang['lpn_status_closed']='{type} {id} закрыт(а)';
@@ -3359,7 +3332,6 @@ $ec_lang['lpn_color_mode_jenks']='Естественные границы (Дж�
 $ec_lang['lpn_color_mode_stddev']='Стандартное отклонение';
 $ec_lang['lpn_color_mode_pretty']='Округлённые';
 $ec_lang['lpn_color_mode_log']='Логарифмическая';
-$ec_lang['lpn_color_mode_pressure']='Давление';
 $ec_lang['lpn_color_mode_manual']='Вручную';
 
 // ---- LIBRARIES (ROADMAP Tasks 462 and 460) ---------------------------------------------------
@@ -3369,7 +3341,7 @@ $ec_lang['lpn_color_mode_manual']='Вручную';
 // Simulate, Transport, Time selectors."
 //
 // ONE NAME, THREE DOORS: the toolbar button, the Edit menu row and the box's own title all read
-// this key, exactly as lpn_menu_settings serves the Settings box's three.
+// this key, exactly as lpn_tool_settings serves the Settings box's three.
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='Библиотеки';
@@ -3574,7 +3546,6 @@ $ec_lang['lpn_library_rule_add']='Добавить правило';
 $ec_lang['lpn_library_rule_tip']='Одно правило на языке ключевых слов EPANET, по одному предложению на строку. Первая строка называет его: RULE 1. Затем условие: IF TANK 2 LEVEL BELOW 17.1. Затем действие: THEN PUMP 9 STATUS IS OPEN. Последняя строка может задать его ранг: PRIORITY 1. Добавляйте строки AND или OR, чтобы проверять сразу несколько условий, и строки ELSE, чтобы указать, что делать, если проверка не пройдена. Условие может читать LEVEL, HEAD, GRADE, PRESSURE или DEMAND узла, FLOW, STATUS или SETTING связи, либо TIME и CLOCKTIME системы SYSTEM. Пишите числа в единицах, которые показывает этот проект, — они будут пересчитаны за вас. Оставляйте ключевые слова на английском языке: именно их читают эта страница и EPANET.';
 $ec_lang['lpn_library_rule_ok']='✓ Это правило распознано';
 $ec_lang['lpn_library_rule_bad']='⚠ Это правило не удалось прочитать';
-$ec_lang['lpn_library_rule_missing']='⚠ В этой сети нет ничего с именем {id}';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
 // for the entire project it is in Settings") drawn on its other side. Without it a pattern you
 // author can only be used by making it the default one, which is not what a library is for.
@@ -3814,8 +3785,6 @@ $ec_lang['lpn_ff_mode_none']='Нет';
 $ec_lang['lpn_ff_col_solves']='Расчёты';
 // Which criterion the junction broke while drawing the required flow. A junction that broke nothing
 // shows a dash, never one of these words.
-$ec_lang['lpn_ff_limit_pressure']='Давление';
-$ec_lang['lpn_ff_limit_velocity']='Скорость';
 $ec_lang['lpn_ff_limit_both']='Давление и скорость';
 $ec_lang['lpn_ff_atleast']='более {flow}';
 $ec_lang['lpn_ff_affect_node']='{id} падает до {pressure}';

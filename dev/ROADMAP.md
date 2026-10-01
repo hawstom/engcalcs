@@ -242,24 +242,7 @@ the block.
 - 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
   Everything named under it has shipped, the table stepping last (`feat/table-tab-keys`, merged
   2026-09-30 on his word). Graph tabs next: Task 743.
-- 100|699| **Audit the language keys for lazy duplications.**
-  **AUDIT DONE 2026-09-30**: `dev/key-duplication-audit-2026-09-30.md` (74 groups, ~33 keys mergeable).
-  **RULED 2026-09-30: merge the listed groups and do the Find redesign** (the 4 case-only pairs
-  capitalized in code). Merge with `rename_lang_key.php`-style tooling, never by hand.
-  Tom, 2026-09-19: *"can you make sure we have a Roadmap task to audit language for lazy
-  duplications where maybe a slight redesign can simplify or eliminate keys?"* He asked for it in
-  the same breath as deciding a customer takes the EXISTING Description and Tag rather than an
-  owned Account number -- which is the pattern in one instance: a new field invented where an
-  existing one would have done costs 26 translations and a key that must be maintained forever.
-  - **THE AUDIT IS THE CHEAP HALF AND THE REDESIGN IS THE POINT.** A near-duplicate pair is not
-    automatically debt -- `dev/label-normalization-decision.md` already rules that a shared concept
-    lives under ONE owning calculator's key and others borrow it, and that reuse stops at whole
-    labels. What this task adds is looking for the cases where a small INTERFACE change removes the
-    need for a key at all, rather than merging two keys that genuinely say different things.
-  - `key_hygiene_check.php` already names keys nothing renders and names that drifted from their
-    siblings; start from its output rather than from a fresh read of 27 files.
-  - **Cost is the argument for doing it and also for doing it carefully:** one deleted key is 26
-    translations never bought; one wrongly merged key is a wrong word on a control in 26 languages.
+
 - 100|718| **File menu: Recents just above Close, and an Import submenu.**
   **BUILT 2026-09-30 with Task 745 on `feat/help-menu`, port 8138**, awaiting his browser pass.
   Tom, 2026-09-25, from WaterCAD: *"File menu: Recents just above Exit"* and *"We have three import
