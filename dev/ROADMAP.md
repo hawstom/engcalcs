@@ -268,6 +268,8 @@ the block.
   label-word-gus/label-long-dora everywhere (glossary.json, key_concepts.json, concept_selftest.php,
   dev/term-concepts.md); definitions unchanged.
 - 100|738| **A Find filter that stays standing, or a snapshot, by the visitor's choice.**
+  **BUILT 2026-09-30 on `feat/find-filter`** to his ruling (no toggle; edited rows stay, dimmed and
+  marked, counted in the filter line); `filter-edited-row-harness.js`. New key `lpn_pane_filter_stale`.
   Tom, 2026-09-28: editing a filtered value out of the filter makes its row vanish. His proposal: a
   standing filter while the Find box is open, with a toggle next to Filter in table to make it a
   snapshot. Readings in, 2026-09-29, and they disagree: Declan, no toggle, a row edited since the
@@ -540,6 +542,19 @@ the block.
   touch the network. As such, our demand factors are similar and equivalent, but not the same UX or
   data state."* Our per-scenario multiplier changes the data; this runs on a copy, like Fire flow.
   Open: what it reports (a map of the adjusted run, or a table like Fire flow's).
+- 75|755| **Per-scenario calculation options: run type and duration first.**
+  Tom, 2026-09-30: *"A Demand Multiplier column with the alternatives? What about other settings?"*
+  Mary: WaterGEMS keeps run type, duration, steps, friction method, demand adjustments, PDD and
+  tolerances in per-scenario Calculation Options; InfoWater ties a simulation-options set to each
+  scenario. Ours: only the demand multiplier is per scenario. Sue's ranking: steady vs 24-hour run and
+  duration next, quality mode later; friction method, units, accuracy and trials never vary silently
+  between compared scenarios (state them once in the report header). Show as plain columns in the
+  Alternatives preview, blank meaning inherits, not named sets, until scenarios number in the dozens.
+- 75|756| **Cross-platform: the suite as a desktop application, beyond the web folder.**
+  Tom, 2026-09-30: *"Put a cross platform project on our roadmap priority 75. Plan where/how to move
+  the project to transcend the web-centric hawsedc.com/engcalcs folder. Windows or Linux? Plan what
+  platforms and what frameworks to experiment with. I'm thinking about Windows, Linux, Mac; Flutter,
+  Tauri, (not Electron, Qt, or .NET MAUI?)"* Plan: `dev/desktop-platforms-plan.md` (to be written).
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted

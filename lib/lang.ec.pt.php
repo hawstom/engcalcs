@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Restaurar padrões';
 $ec_lang['calc_defaults_confirm']='Restaurar calculadora aos valores padrão originais?';
 $ec_lang['points_data_note']='(ou Copiar/Colar usando a área de dados)';
-$ec_lang['points_data_heading']='Dados dos pontos<br />(separados por vírgula ou tabulação)';
+$ec_lang['points_data_heading']='Dados da calculadora<br />(use Copiar para ver o formato)';
 $ec_lang['points_data_copy']='Copiar';
 $ec_lang['points_data_paste']='Colar';
 $ec_lang['calc_inputs']='Entradas';
@@ -928,6 +928,11 @@ $ec_lang['lpn_examples_loading']='Carregando exemplos…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='Corrigir algo';
 $ec_lang['lpn_help_notes']='Notas sobre esta página';
+$ec_lang['lpn_help_hotkeys']='Tabelas e atalhos de teclado';
+$ec_lang['lpn_hotkeys_tables_heading']='Tabelas';
+$ec_lang['lpn_hotkeys_map_heading']='Mapa';
+$ec_lang['lpn_hotkeys_map_term']='Atalhos de teclado do mapa';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 ou Esc</td><td>Selecionar.</td></tr><tr><td>2</td><td>Adicionar uma junção.</td></tr><tr><td>3</td><td>Adicionar um reservatório.</td></tr><tr><td>4</td><td>Adicionar um tanque.</td></tr><tr><td>5</td><td>Adicionar um tubo.</td></tr><tr><td>6</td><td>Adicionar uma bomba.</td></tr><tr><td>7</td><td>Adicionar uma válvula.</td></tr><tr><td>8</td><td>Adicionar um cliente.</td></tr><tr><td>9</td><td>Adicionar texto.</td></tr><tr><td>Delete</td><td>Excluir a seleção.</td></tr><tr><td>Ctrl+Z</td><td>Desfazer a última alteração.</td></tr><tr><td>+ ou =</td><td>Aumentar o zoom.</td></tr><tr><td>-</td><td>Diminuir o zoom.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1202,7 +1207,7 @@ $ec_lang['lpn_find_menu_tip']='Encontre um elemento pelo seu ID, ou encontre tod
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='O que os ícones da barra de ferramentas significam';
+$ec_lang['lpn_help_icons']='Legenda da barra de ferramentas';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Visibilidade';
 $ec_lang['lpn_pane_right_toggle_tip']='Mostrar ou ocultar o painel à direita do mapa. Ele contém as opções de rótulo e cor.';
@@ -1311,6 +1316,7 @@ $ec_lang['lpn_pane_not_used']='Não usado';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='Filtrado por {q}. Mostrando {n} de {all}.';
 $ec_lang['lpn_pane_filter_clear']='Mostrar tudo';
+$ec_lang['lpn_pane_filter_stale']='Linhas que não correspondem mais: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Nada nesta tabela corresponde ao filtro.';
@@ -1759,6 +1765,7 @@ $ec_lang['lpn_tab_move_right']='Mover para a direita';
 $ec_lang['lpn_tab_unsaved']='Não salvo em um arquivo';
 $ec_lang['lpn_import_bad_file']='Esse arquivo não pôde ser lido como um projeto salvo a partir desta página.';
 $ec_lang['lpn_import_no_room']='Não há espaço suficiente no armazenamento do navegador para adicionar este projeto. Exclua um projeto de que não precisa mais e tente novamente.';
+$ec_lang['lpn_file_import_menu']='Importar…';
 // ---- EPANET .inp import (ROADMAP Task 196) ----
 // The import REPORTS every difference between the file and what this page can hold, so each
 // lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
@@ -2109,7 +2116,7 @@ $ec_lang['lpn_notes_6_term']='Ajuda das colunas da tabela';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Selecionar coluna</td><td>Clique no cabeçalho</td></tr><tr><td>Adicionar ou estender a seleção de colunas</td><td>Ctrl+clique ou Shift+clique em outro cabeçalho</td></tr><tr><td>Mover (reordenar) coluna(s) selecionada(s)</td><td>Arraste ou use Gerenciar colunas… no menu de clique direito ou ⋮</td></tr><tr><td>Menu ⋮ e seta de ordenação.</td><td>Passe o mouse no canto superior de um cabeçalho, ou selecione ou use Tab até um cabeçalho</td></tr><tr><td>Ocultar, Mostrar tudo, ou Gerenciar visibilidade e ordem</td><td>Clique direito no cabeçalho ou menu ⋮ no canto superior direito do cabeçalho</td></tr><tr><td>Ordenar por coluna</td><td>Ícone de seta no canto superior direito do cabeçalho</td></tr><tr><td>Colar como novas linhas no fim da tabela</td><td>Clique direito, menu ⋮ no canto superior direito do cabeçalho, ou Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Atalhos de teclado da tabela';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Teclas de seta</td><td>Navegar.</td></tr><tr><td>Tab, Enter</td><td>Concluir a entrada e navegar uma célula ao lado / abaixo.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navegar para trás.</td></tr><tr><td>Shift+teclas de seta</td><td>Estender a seleção.</td></tr><tr><td>Ctrl+C</td><td>Copiar a seleção.</td></tr><tr><td>Ctrl+D</td><td>Preencher a seleção para baixo a partir da sua linha superior.</td></tr><tr><td>Ctrl+Enter</td><td>Preencher a seleção com o valor da célula ativa.</td></tr><tr><td>Ctrl+A</td><td>Selecionar a tabela inteira.</td></tr><tr><td>Ctrl+Shift+V</td><td>Colar como novas linhas no fim da tabela.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Alternar para a próxima ou a tabela anterior.</td></tr><tr><td>Delete</td><td>Limpar uma célula.</td></tr><tr><td>F2</td><td>Abrir uma célula para editá-la.</td></tr><tr><td>Esc</td><td>Cancelar uma edição.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Teclas de seta</td><td>Navegar.</td></tr><tr><td>Tab, Enter</td><td>Concluir a entrada e navegar uma célula ao lado / abaixo.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navegar para trás.</td></tr><tr><td>Shift+teclas de seta</td><td>Estender a seleção.</td></tr><tr><td>Ctrl+C</td><td>Copiar a seleção.</td></tr><tr><td>Ctrl+D</td><td>Preencher a seleção para baixo a partir da sua linha superior.</td></tr><tr><td>Ctrl+Enter</td><td>Preencher a seleção com o valor da célula ativa.</td></tr><tr><td>Ctrl+A</td><td>Selecionar a tabela inteira.</td></tr><tr><td>Ctrl+Shift+V</td><td>Colar como novas linhas no fim da tabela.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Alternar para a aba seguinte ou a anterior, seja uma tabela ou um gráfico.</td></tr><tr><td>Delete</td><td>Limpar uma célula.</td></tr><tr><td>F2</td><td>Abrir uma célula para editá-la.</td></tr><tr><td>Esc</td><td>Cancelar uma edição.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2707,6 +2714,20 @@ $ec_lang['lpn_scenario_push_confirm']='Fazer todo cenário usar os valores da Ba
 $ec_lang['lpn_scenario_push_scenarios']='Cenários afetados:';
 $ec_lang['lpn_scenario_push_values']='Valores descartados:';
 $ec_lang['lpn_scenario_push_none']='Nenhum cenário tem um valor individual para nenhuma destas propriedades, então nada mudaria. Nada é descartado.';
+$ec_lang['lpn_scenario_preset_flow_static']='1. Teste de vazão: Estático';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='Calibração do teste de vazão para uma rede de projeto com vazão 0. Neste cenário, defina a demanda em todas as junções como 0.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. Teste de vazão: Intermediário';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='Calibração do teste de vazão para uma rede de projeto na primeira vazão reportada. Neste cenário, defina a demanda na junção com vazão como a primeira vazão medida, e a demanda em todas as outras junções como 0.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. Teste de vazão: Máximo';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='Calibração do teste de vazão para uma rede de projeto na vazão máxima reportada. Neste cenário, defina a demanda na junção com vazão como a vazão máxima medida, e a demanda em todas as outras junções como 0.';
+$ec_lang['lpn_scenario_preset_average_day']='4. Dia médio';
+$ec_lang['lpn_scenario_preset_average_day_tip']='Multiplicador de demanda 1: toda demanda como inserida, que é tomada como a demanda do dia médio.';
+$ec_lang['lpn_scenario_preset_max_day']='5. Dia máximo';
+$ec_lang['lpn_scenario_preset_max_day_tip']='Multiplicador de demanda 2,0 vezes a demanda média, um valor provisório. A maioria dos sistemas fica entre 1,2 e 3,0 (National Research Council, 2006). Defina o do seu próprio sistema em Configurações, Cálculo, Hidráulica, Multiplicador de demanda.';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. Hora de pico';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='Multiplicador de demanda 3,0 vezes a demanda média, um valor provisório. A maioria dos sistemas fica entre 3,0 e 6,0 (National Research Council, 2006). Defina o do seu próprio sistema em Configurações, Cálculo, Hidráulica, Multiplicador de demanda.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. Incêndio mais dia máximo';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='Demanda do dia máximo (multiplicador 2,0). Execute a Análise de vazão de incêndio neste cenário: ela adiciona a vazão de incêndio em cada junção sobre esta demanda.';
 $ec_lang['lpn_delete_drops_overrides']='Excluir este elemento também descarta {n} valores que seus cenários guardam para ele. Continuar?';
 $ec_lang['lpn_push_base_only']='Esta ação altera o desenho em si, então só pode ser feita em {base}. Mude para {base} e tente novamente.';
 $ec_lang['lpn_field_active']='Parte desta rede';
@@ -3680,10 +3701,10 @@ $ec_lang['lpn_ff_title']='Análise de vazão de incêndio';
 $ec_lang['lpn_ff_intro']='Cada junção, por sua vez, é solicitada a fornecer uma vazão de incêndio além da demanda que já tem. Nada no seu projeto é alterado; todo o cálculo é feito em uma cópia.';
 $ec_lang['lpn_ff_scope']='Junções a testar';
 $ec_lang['lpn_ff_scope_tip']='Escolha o conjunto antes de calcular. Testar todas as junções em um sistema grande pode levar minutos.';
-$ec_lang['lpn_ff_scope_all']='Todas as junções';
-$ec_lang['lpn_ff_scope_selected']='Somente a junção selecionada';
+$ec_lang['lpn_ff_all']='Todas';
+$ec_lang['lpn_ff_selected']='Selecionadas';
 $ec_lang['lpn_ff_no_junctions']='Este projeto ainda não tem junções, então não há nada para testar.';
-$ec_lang['lpn_ff_no_selection']='Nenhuma junção está selecionada. Escolha uma no mapa, ou teste todas as junções.';
+$ec_lang['lpn_ff_no_selection']='Nenhuma junção está selecionada. Selecione junções ou escolha a opção Todas.';
 $ec_lang['lpn_ff_skipped']='{n} elementos selecionados não são junções, então não foram testados.';
 $ec_lang['lpn_ff_required']='Vazão de incêndio exigida';
 $ec_lang['lpn_ff_required_tip']='A vazão que seu código de incêndio ou sua autoridade de incêndio exige em um hidrante. Cada junção é testada contra este número, a menos que tenha sua própria vazão de incêndio exigida.';
@@ -3693,10 +3714,7 @@ $ec_lang['lpn_ff_residual']='Pressão residual a manter';
 $ec_lang['lpn_ff_residual_tip']='A pressão que a junção precisa manter enquanto fornece a vazão de incêndio. A AWWA M31 e a NFPA 291 usam 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Verificação de projeto (efeito no sistema)';
 $ec_lang['lpn_ff_design_tip']='Uma pergunta separada de saber se a junção consegue fornecer a vazão: com essa vazão sendo fornecida ali, algo mais cai abaixo de sua pressão mínima ou ultrapassa seu limite de velocidade? Escolher verificar isso não custa cálculo extra.';
-$ec_lang['lpn_ff_design_off']='Não verificar';
-$ec_lang['lpn_ff_design_all']='Todas as outras junções e todos os trechos';
-$ec_lang['lpn_ff_design_selected']='As junções selecionadas e seus trechos';
-$ec_lang['lpn_ff_design_no_selection']='A verificação de projeto está definida para as junções selecionadas, e nenhuma está selecionada. Selecione algumas no mapa, ou defina Todas as outras junções e todos os trechos.';
+$ec_lang['lpn_ff_design_no_selection']='O escopo da verificação de projeto está definido como Selecionadas, mas nenhum elemento está selecionado. Selecione elementos ou escolha a opção Todas.';
 
 
 $ec_lang['lpn_ff_minpressure']='Menor pressão permitida em outros pontos';

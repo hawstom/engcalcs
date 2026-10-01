@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Врати подразумеване вредности';
 $ec_lang['calc_defaults_confirm']='Повратити калкулатор на подразумеване вредности?';
 $ec_lang['points_data_note']='(или Копирај/Налепи помоћу поља за податке)';
-$ec_lang['points_data_heading']='Подаци тачака<br />(одвојени зарезом или табулатором)';
+$ec_lang['points_data_heading']='Подаци калкулатора<br />(користите Копирај да видите формат)';
 $ec_lang['points_data_copy']='Копирај';
 $ec_lang['points_data_paste']='Налепи';
 $ec_lang['calc_inputs']='Улазне вредности';
@@ -929,6 +929,11 @@ $ec_lang['lpn_examples_loading']='Учитавање примера…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='Поправи нешто';
 $ec_lang['lpn_help_notes']='Напомене на овој страници';
+$ec_lang['lpn_help_hotkeys']='Табеле и пречице';
+$ec_lang['lpn_hotkeys_tables_heading']='Табеле';
+$ec_lang['lpn_hotkeys_map_heading']='Мапа';
+$ec_lang['lpn_hotkeys_map_term']='Пречице на тастатури за мапу';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 или Esc</td><td>Изабери.</td></tr><tr><td>2</td><td>Додај чвор.</td></tr><tr><td>3</td><td>Додај резервоар.</td></tr><tr><td>4</td><td>Додај танк.</td></tr><tr><td>5</td><td>Додај цев.</td></tr><tr><td>6</td><td>Додај пумпу.</td></tr><tr><td>7</td><td>Додај вентил.</td></tr><tr><td>8</td><td>Додај потрошача.</td></tr><tr><td>9</td><td>Додај текст.</td></tr><tr><td>Delete</td><td>Обриши избор.</td></tr><tr><td>Ctrl+Z</td><td>Поништи последњу измену.</td></tr><tr><td>+ или =</td><td>Увећај.</td></tr><tr><td>-</td><td>Умањи.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1203,7 +1208,7 @@ $ec_lang['lpn_find_menu_tip']='Пронађите елемент по његов
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='Шта значе иконе на траци алата';
+$ec_lang['lpn_help_icons']='Трака алата';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Видљивост';
 $ec_lang['lpn_pane_right_toggle_tip']='Прикажи или сакриј панел десно од мапе. У њему су избори за ознаке и боје.';
@@ -1312,6 +1317,7 @@ $ec_lang['lpn_pane_not_used']='Није коришћено';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='Филтрирано по {q}. Приказано {n} од {all}.';
 $ec_lang['lpn_pane_filter_clear']='Прикажи све';
+$ec_lang['lpn_pane_filter_stale']='Редови који више не одговарају: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Ништа у овој табели не одговара филтеру.';
@@ -1768,6 +1774,7 @@ $ec_lang['lpn_import_no_room']='Нема довољно слободног пр�
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='У реду';
+$ec_lang['lpn_file_import_menu']='Увези…';
 $ec_lang['lpn_file_import_inp']='Увези EPANET датотеку…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='Учитава мрежу из EPANET датотеке, било текстуалне .inp датотеке или .net датотеке коју EPANET чува, и чува је у овом прегледачу као нови пројекат.';
@@ -2110,7 +2117,7 @@ $ec_lang['lpn_notes_6_term']='Помоћ за колоне табеле';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Изабери колону</td><td>Кликните заглавље</td></tr><tr><td>Додај или прошири избор колона</td><td>Ctrl+клик или Shift+клик на друго заглавље</td></tr><tr><td>Помери (промени редослед) изабране колоне</td><td>Превуците или користите Управљај колонама… у менију десног клика или ⋮</td></tr><tr><td>Мени ⋮ и стрелица за сортирање.</td><td>Лебдите изнад горњег угла заглавља, или изаберите или уђите у заглавље тастером Tab</td></tr><tr><td>Сакриј, Прикажи све, или управљај видљивошћу и редоследом</td><td>Десни клик на заглавље или мени ⋮ у горњем десном углу заглавља</td></tr><tr><td>Сортирај по колони</td><td>Иконица стрелице у горњем десном углу заглавља</td></tr><tr><td>Налепи као нове редове на крају табеле</td><td>Десни клик, мени ⋮ у горњем десном углу заглавља, или Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Пречице на тастатури за табелу';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Тастери стрелица</td><td>Кретање.</td></tr><tr><td>Tab, Enter</td><td>Заврши унос и пређи једну ћелију удесно / надоле.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Кретање уназад.</td></tr><tr><td>Shift+тастери стрелица</td><td>Прошири избор.</td></tr><tr><td>Ctrl+C</td><td>Копирај избор.</td></tr><tr><td>Ctrl+D</td><td>Попуни избор надоле од његовог горњег реда.</td></tr><tr><td>Ctrl+Enter</td><td>Попуни избор вредношћу активне ћелије.</td></tr><tr><td>Ctrl+A</td><td>Изабери целу табелу.</td></tr><tr><td>Ctrl+Shift+V</td><td>Налепи као нове редове на крају табеле.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Пређи на следећу или претходну табелу.</td></tr><tr><td>Delete</td><td>Обриши ћелију.</td></tr><tr><td>F2</td><td>Отвори ћелију за уређивање.</td></tr><tr><td>Esc</td><td>Откажи уређивање.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Тастери стрелица</td><td>Кретање.</td></tr><tr><td>Tab, Enter</td><td>Заврши унос и пређи једну ћелију удесно / надоле.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Кретање уназад.</td></tr><tr><td>Shift+тастери стрелица</td><td>Прошири избор.</td></tr><tr><td>Ctrl+C</td><td>Копирај избор.</td></tr><tr><td>Ctrl+D</td><td>Попуни избор надоле од његовог горњег реда.</td></tr><tr><td>Ctrl+Enter</td><td>Попуни избор вредношћу активне ћелије.</td></tr><tr><td>Ctrl+A</td><td>Изабери целу табелу.</td></tr><tr><td>Ctrl+Shift+V</td><td>Налепи као нове редове на крају табеле.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Пређи на следећи или претходни језичак, било да је табела или график.</td></tr><tr><td>Delete</td><td>Обриши ћелију.</td></tr><tr><td>F2</td><td>Отвори ћелију за уређивање.</td></tr><tr><td>Esc</td><td>Откажи уређивање.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2706,6 +2713,20 @@ $ec_lang['lpn_scenario_push_confirm']='Да ли желите да сви сце
 $ec_lang['lpn_scenario_push_scenarios']='Погођени сценарији:';
 $ec_lang['lpn_scenario_push_values']='Одбачене вредности:';
 $ec_lang['lpn_scenario_push_none']='Ниједан сценарио нема властиту вредност ни за једну од ових особина, па се ништа не би променило. Ништа се не одбацује.';
+$ec_lang['lpn_scenario_preset_flow_static']='1. Тест протока: Статички';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='Калибрација теста протока за пројектовану мрежу при протоку 0. У овом сценарију поставите потрошњу на свим чворовима на 0.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. Тест протока: Средњи';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='Калибрација теста протока за пројектовану мрежу при првом пријављеном протоку. У овом сценарију поставите потрошњу на чвору кроз који тече на први измерени проток, а потрошњу на свим осталим чворовима на 0.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. Тест протока: Максимални';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='Калибрација теста протока за пројектовану мрежу при највећем пријављеном протоку. У овом сценарију поставите потрошњу на чвору кроз који тече на највећи измерени проток, а потрошњу на свим осталим чворовима на 0.';
+$ec_lang['lpn_scenario_preset_average_day']='4. Просечан дан';
+$ec_lang['lpn_scenario_preset_average_day_tip']='Множилац потрошње 1: свака потрошња како је унета, што се узима као потрошња просечног дана.';
+$ec_lang['lpn_scenario_preset_max_day']='5. Максималан дан';
+$ec_lang['lpn_scenario_preset_max_day_tip']='Множилац потрошње 2,0 пута просечан дан, привремена вредност. Већина система је између 1,2 и 3,0 (National Research Council, 2006). Своју вредност поставите у: Подешавања, Прорачун, Хидраулика, Множилац потрошње.';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. Часовни врхунац';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='Множилац потрошње 3,0 пута просечан дан, привремена вредност. Већина система је између 3,0 и 6,0 (National Research Council, 2006). Своју вредност поставите у: Подешавања, Прорачун, Хидраулика, Множилац потрошње.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. Пожар плус максималан дан';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='Потрошња максималног дана (множилац 2,0). У овом сценарију покрените Анализу противпожарног протока: она додаје противпожарни проток на сваком чвору преко ове потрошње.';
 $ec_lang['lpn_delete_drops_overrides']='Брисање овог елемента такође одбацује {n} вредности које ваши сценарији чувају за њега. Наставити?';
 $ec_lang['lpn_push_base_only']='Ова радња мења сам цртеж, па се може извршити само у {base}. Пређите на {base} и покушајте поново.';
 $ec_lang['lpn_field_active']='Део ове мреже';
@@ -3679,10 +3700,10 @@ $ec_lang['lpn_ff_title']='Анализа противпожарног прото
 $ec_lang['lpn_ff_intro']='Од сваког чвора се редом тражи да повуче противпожарни проток поред потрошње коју већ има. Ништа у вашем пројекту се не мења; цео прорачун се обавља на копији.';
 $ec_lang['lpn_ff_scope']='Чворови за тестирање';
 $ec_lang['lpn_ff_scope_tip']='Изаберите скуп пре покретања. Тестирање сваког чвора у великом систему може потрајати минутима.';
-$ec_lang['lpn_ff_scope_all']='Сваки чвор';
-$ec_lang['lpn_ff_scope_selected']='Изабрани чворови';
+$ec_lang['lpn_ff_all']='Сви';
+$ec_lang['lpn_ff_selected']='Изабрани';
 $ec_lang['lpn_ff_no_junctions']='Овај пројекат још нема чворова, па нема шта да се тестира.';
-$ec_lang['lpn_ff_no_selection']='Ниједан чвор није изабран. Изаберите један на мапи, или тестирајте сваки чвор.';
+$ec_lang['lpn_ff_no_selection']='Ниједан чвор није изабран. Изаберите чворове или изаберите опцију Сви.';
 $ec_lang['lpn_ff_skipped']='{n} изабраних елемената нису чворови, па нису тестирани.';
 $ec_lang['lpn_ff_required']='Потребан противпожарни проток';
 $ec_lang['lpn_ff_required_tip']='Проток који ваш противпожарни пропис или ваш ватрогасни орган захтева на хидранту. Сваки чвор се тестира према овом броју, осим ако не носи сопствени потребан противпожарни проток.';
@@ -3692,10 +3713,7 @@ $ec_lang['lpn_ff_residual']='Резидуални притисак који тр
 $ec_lang['lpn_ff_residual_tip']='Притисак који чвор мора и даље да одржи док испоручује противпожарни проток. AWWA M31 и NFPA 291 користе 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Провера пројекта (утицај на систем)';
 $ec_lang['lpn_ff_design_tip']='Ово је одвојено питање од тога да ли чвор може да испоручи проток: када се тамо повуче тај проток, да ли нешто друго падне испод свог минималног притиска или пређе своју граничну брзину? Укључивање ове провере не кошта додатно израчунавање.';
-$ec_lang['lpn_ff_design_off']='Не проверавај';
-$ec_lang['lpn_ff_design_all']='Сви остали чворови и све цеви';
-$ec_lang['lpn_ff_design_selected']='Изабрани чворови и њихове цеви';
-$ec_lang['lpn_ff_design_no_selection']='Провера пројекта је постављена на изабране чворове, а ниједан није изабран. Изаберите неке на мапи, или подесите на Све.';
+$ec_lang['lpn_ff_design_no_selection']='Провера пројекта је постављена на изабране елементе, а ниједан елемент није изабран. Изаберите елементе или изаберите опцију Сви.';
 $ec_lang['lpn_ff_minpressure']='Најнижи дозвољени притисак на другим местима';
 $ec_lang['lpn_ff_minpressure_tip']='Чвор који падне испод овога док други чвор повлачи свој противпожарни проток пријављује се као проблем у пројекту.';
 $ec_lang['lpn_ff_maxvelocity']='Највећа дозвољена брзина';

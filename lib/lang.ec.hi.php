@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='डिफ़ॉल्ट पुनर्स्थापित करें';
 $ec_lang['calc_defaults_confirm']='कैलकुलेटर को मूल डिफ़ॉल्ट मानों पर रीसेट करूँ?';
 $ec_lang['points_data_note']='(या डेटा क्षेत्र से कॉपी/पेस्ट करें)';
-$ec_lang['points_data_heading']='बिंदु डेटा<br />(अल्पविराम या टैब से अलग)';
+$ec_lang['points_data_heading']='कैलकुलेटर डेटा<br />(फ़ॉर्मैट देखने के लिए कॉपी का उपयोग करें)';
 $ec_lang['points_data_copy']='कॉपी';
 $ec_lang['points_data_paste']='पेस्ट';
 $ec_lang['calc_inputs']='इनपुट';
@@ -930,6 +930,11 @@ $ec_lang['lpn_examples_loading']='उदाहरण लोड हो रहे 
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='कुछ ठीक करें';
 $ec_lang['lpn_help_notes']='इस पृष्ठ पर टिप्पणियाँ';
+$ec_lang['lpn_help_hotkeys']='तालिकाएँ और कीबोर्ड शॉर्टकट';
+$ec_lang['lpn_hotkeys_tables_heading']='तालिकाएँ';
+$ec_lang['lpn_hotkeys_map_heading']='मानचित्र';
+$ec_lang['lpn_hotkeys_map_term']='मानचित्र कीबोर्ड शॉर्टकट';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 या Esc</td><td>चुनें।</td></tr><tr><td>2</td><td>जंक्शन जोड़ें।</td></tr><tr><td>3</td><td>जलाशय जोड़ें।</td></tr><tr><td>4</td><td>टैंक जोड़ें।</td></tr><tr><td>5</td><td>पाइप जोड़ें।</td></tr><tr><td>6</td><td>पंप जोड़ें।</td></tr><tr><td>7</td><td>वाल्व जोड़ें।</td></tr><tr><td>8</td><td>ग्राहक जोड़ें।</td></tr><tr><td>9</td><td>टेक्स्ट जोड़ें।</td></tr><tr><td>Delete</td><td>चयन हटाएँ।</td></tr><tr><td>Ctrl+Z</td><td>पिछला बदलाव पूर्ववत करें।</td></tr><tr><td>+ या =</td><td>ज़ूम इन।</td></tr><tr><td>-</td><td>ज़ूम आउट।</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1204,7 +1209,7 @@ $ec_lang['lpn_find_menu_tip']='किसी तत्व को उसकी ID 
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='टूलबार आइकनों का अर्थ';
+$ec_lang['lpn_help_icons']='टूलबार';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='दृश्यता';
 $ec_lang['lpn_pane_right_toggle_tip']='मानचित्र के दाईं ओर का पैनल दिखाएँ या छुपाएँ। इसमें लेबल और रंग के विकल्प होते हैं।';
@@ -1313,6 +1318,7 @@ $ec_lang['lpn_pane_not_used']='उपयोग नहीं हुआ';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='{q} से फ़िल्टर किया गया। {all} में से {n} दिखाए जा रहे हैं।';
 $ec_lang['lpn_pane_filter_clear']='सभी दिखाएँ';
+$ec_lang['lpn_pane_filter_stale']='अब मेल न खाने वाली पंक्तियाँ: {n}।';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='इस तालिका में कुछ भी इस फ़िल्टर से मेल नहीं खाता।';
@@ -1769,6 +1775,7 @@ $ec_lang['lpn_import_no_room']='इस प्रोजेक्ट को जो
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='ठीक है';
+$ec_lang['lpn_file_import_menu']='आयात करें…';
 $ec_lang['lpn_file_import_inp']='EPANET फ़ाइल आयात करें…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='एक EPANET फ़ाइल से नेटवर्क पढ़ें, चाहे वह .inp टेक्स्ट फ़ाइल हो या EPANET द्वारा सहेजी गई .net फ़ाइल, और उसे इस ब्राउज़र में एक नए प्रोजेक्ट के रूप में सहेजें।';
@@ -2111,7 +2118,7 @@ $ec_lang['lpn_notes_6_term']='तालिका कॉलम सहायता
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>कॉलम चुनें</td><td>शीर्षक पर क्लिक करें</td></tr><tr><td>कॉलम चयन जोड़ें या बढ़ाएँ</td><td>किसी अन्य शीर्षक पर Ctrl+click या Shift+click करें</td></tr><tr><td>चयनित कॉलम को स्थानांतरित करें (क्रम बदलें)</td><td>खींचें या राइट-क्लिक या ⋮ मेनू में Manage columns… का उपयोग करें</td></tr><tr><td>मेनू ⋮ और क्रमबद्ध तीर।</td><td>शीर्षक के ऊपरी कोने पर होवर करें, या किसी शीर्षक को चुनें या उसमें Tab करें</td></tr><tr><td>छिपाएँ, सभी दिखाएँ, या दृश्यता और क्रम प्रबंधित करें</td><td>शीर्षक पर राइट-क्लिक करें या शीर्षक के ऊपरी दाएँ कोने में ⋮ मेनू</td></tr><tr><td>कॉलम के अनुसार क्रमबद्ध करें</td><td>शीर्षक के ऊपरी दाएँ कोने में तीर आइकन</td></tr><tr><td>तालिका के अंत में नई पंक्तियों के रूप में पेस्ट करें</td><td>राइट-क्लिक करें, शीर्षक के ऊपरी दाएँ कोने में ⋮ मेनू, या Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='तालिका कीबोर्ड शॉर्टकट';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>नेविगेट करें।</td></tr><tr><td>Tab, Enter</td><td>प्रविष्टि पूर्ण करें और एक सेल आगे/नीचे नेविगेट करें।</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>पीछे की ओर नेविगेट करें।</td></tr><tr><td>Shift+arrow keys</td><td>चयन बढ़ाएँ।</td></tr><tr><td>Ctrl+C</td><td>चयन कॉपी करें।</td></tr><tr><td>Ctrl+D</td><td>चयन को उसकी शीर्ष पंक्ति से नीचे भरें।</td></tr><tr><td>Ctrl+Enter</td><td>चयन को सक्रिय सेल के मान से भरें।</td></tr><tr><td>Ctrl+A</td><td>पूरी तालिका चुनें।</td></tr><tr><td>Ctrl+Shift+V</td><td>तालिका के अंत में नई पंक्तियों के रूप में पेस्ट करें।</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>अगली या पिछली तालिका पर जाएँ।</td></tr><tr><td>Delete</td><td>एक सेल साफ़ करें।</td></tr><tr><td>F2</td><td>किसी सेल को संपादित करने के लिए खोलें।</td></tr><tr><td>Esc</td><td>एक संपादन रद्द करें।</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>नेविगेट करें।</td></tr><tr><td>Tab, Enter</td><td>प्रविष्टि पूर्ण करें और एक सेल आगे/नीचे नेविगेट करें।</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>पीछे की ओर नेविगेट करें।</td></tr><tr><td>Shift+arrow keys</td><td>चयन बढ़ाएँ।</td></tr><tr><td>Ctrl+C</td><td>चयन कॉपी करें।</td></tr><tr><td>Ctrl+D</td><td>चयन को उसकी शीर्ष पंक्ति से नीचे भरें।</td></tr><tr><td>Ctrl+Enter</td><td>चयन को सक्रिय सेल के मान से भरें।</td></tr><tr><td>Ctrl+A</td><td>पूरी तालिका चुनें।</td></tr><tr><td>Ctrl+Shift+V</td><td>तालिका के अंत में नई पंक्तियों के रूप में पेस्ट करें।</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>अगले या पिछले टैब पर जाएँ, चाहे वह तालिका हो या ग्राफ़।</td></tr><tr><td>Delete</td><td>एक सेल साफ़ करें।</td></tr><tr><td>F2</td><td>किसी सेल को संपादित करने के लिए खोलें।</td></tr><tr><td>Esc</td><td>एक संपादन रद्द करें।</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2708,6 +2715,20 @@ $ec_lang['lpn_scenario_push_confirm']='हर परिदृश्य को �
 $ec_lang['lpn_scenario_push_scenarios']='प्रभावित परिदृश्य:';
 $ec_lang['lpn_scenario_push_values']='त्यागे गए मान:';
 $ec_lang['lpn_scenario_push_none']='इनमें से किसी भी गुण के लिए किसी परिदृश्य के पास अपना मान नहीं है, इसलिए कुछ नहीं बदलेगा। कुछ भी त्यागा नहीं जाएगा।';
+$ec_lang['lpn_scenario_preset_flow_static']='1. प्रवाह परीक्षण: स्थिर';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='डिज़ाइन नेटवर्क के लिए 0 प्रवाह पर प्रवाह परीक्षण अंशांकन। इस परिदृश्य में सभी जंक्शनों की माँग 0 रखें।';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. प्रवाह परीक्षण: मध्य';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='डिज़ाइन नेटवर्क के लिए पहले दर्ज किए गए प्रवाह पर प्रवाह परीक्षण अंशांकन। इस परिदृश्य में बहते जंक्शन की माँग को मापे गए पहले प्रवाह के बराबर और अन्य सभी जंक्शनों की माँग को 0 रखें।';
+$ec_lang['lpn_scenario_preset_flow_max']='3. प्रवाह परीक्षण: अधिकतम';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='डिज़ाइन नेटवर्क के लिए दर्ज किए गए अधिकतम प्रवाह पर प्रवाह परीक्षण अंशांकन। इस परिदृश्य में बहते जंक्शन की माँग को मापे गए अधिकतम प्रवाह के बराबर और अन्य सभी जंक्शनों की माँग को 0 रखें।';
+$ec_lang['lpn_scenario_preset_average_day']='4. औसत दिन';
+$ec_lang['lpn_scenario_preset_average_day_tip']='माँग गुणक 1: हर माँग वैसी ही जैसी दर्ज की गई, जिसे औसत दिन की माँग माना जाता है।';
+$ec_lang['lpn_scenario_preset_max_day']='5. अधिकतम दिन';
+$ec_lang['lpn_scenario_preset_max_day_tip']='माँग गुणक औसत दिन का 2.0 गुना, जो एक प्लेसहोल्डर मान है। अधिकतर सिस्टम 1.2 और 3.0 के बीच आते हैं (National Research Council, 2006)। अपने सिस्टम का मान सेटिंग्स, गणना, हाइड्रॉलिक्स, माँग गुणक में सेट करें।';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. पीक घंटा';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='माँग गुणक औसत दिन का 3.0 गुना, जो एक प्लेसहोल्डर मान है। अधिकतर सिस्टम 3.0 और 6.0 के बीच आते हैं (National Research Council, 2006)। अपने सिस्टम का मान सेटिंग्स, गणना, हाइड्रॉलिक्स, माँग गुणक में सेट करें।';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. फायर और अधिकतम दिन';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='अधिकतम दिन की माँग (गुणक 2.0)। इस परिदृश्य में फायर फ्लो विश्लेषण चलाएँ: यह इस माँग के ऊपर हर जंक्शन पर फायर फ्लो जोड़ता है।';
 $ec_lang['lpn_delete_drops_overrides']='इस तत्व को हटाने से आपके परिदृश्यों के पास इसके लिए रखे {n} मान भी त्याग दिए जाते हैं। जारी रखें?';
 $ec_lang['lpn_push_base_only']='यह क्रिया स्वयं चित्र को बदलती है, इसलिए यह केवल {base} में ही की जा सकती है। {base} पर स्विच करें और फिर से प्रयास करें।';
 $ec_lang['lpn_field_active']='इस नेटवर्क का भाग';
@@ -3681,10 +3702,10 @@ $ec_lang['lpn_ff_title']='फायर फ्लो विश्लेषण';
 $ec_lang['lpn_ff_intro']='हर जंक्शन से बारी-बारी से पहले से मौजूद माँग के ऊपर एक फायर फ्लो खींचने को कहा जाता है। आपके प्रोजेक्ट में कुछ नहीं बदलता; पूरा रन एक प्रति पर किया जाता है।';
 $ec_lang['lpn_ff_scope']='जाँचने के लिए जंक्शन';
 $ec_lang['lpn_ff_scope_tip']='रन करने से पहले सेट चुनें। एक बड़े सिस्टम में हर जंक्शन जाँचने में कई मिनट लग सकते हैं।';
-$ec_lang['lpn_ff_scope_all']='हर जंक्शन';
-$ec_lang['lpn_ff_scope_selected']='चयनित जंक्शन';
+$ec_lang['lpn_ff_all']='सभी';
+$ec_lang['lpn_ff_selected']='चयनित';
 $ec_lang['lpn_ff_no_junctions']='इस प्रोजेक्ट में अभी तक कोई जंक्शन नहीं है, इसलिए जाँचने के लिए कुछ नहीं है।';
-$ec_lang['lpn_ff_no_selection']='कोई जंक्शन चयनित नहीं है। मानचित्र पर एक चुनें, या हर जंक्शन जाँचें।';
+$ec_lang['lpn_ff_no_selection']='कोई जंक्शन चयनित नहीं है। जंक्शन चुनें या सभी विकल्प चुनें।';
 $ec_lang['lpn_ff_skipped']='{n} चयनित तत्व जंक्शन नहीं हैं, इसलिए उनका परीक्षण नहीं किया गया।';
 $ec_lang['lpn_ff_required']='आवश्यक फायर फ्लो';
 $ec_lang['lpn_ff_required_tip']='वह प्रवाह जो आपकी अग्नि संहिता या अग्नि प्राधिकरण किसी हाइड्रेंट पर माँगता है। हर जंक्शन इस संख्या के मुकाबले जाँचा जाता है जब तक कि उसका अपना आवश्यक फायर फ्लो न हो।';
@@ -3694,10 +3715,7 @@ $ec_lang['lpn_ff_residual']='बनाए रखने के लिए अव�
 $ec_lang['lpn_ff_residual_tip']='वह दाब जो जंक्शन को फायर फ्लो देते समय भी बनाए रखना होता है। AWWA M31 और NFPA 291, 20 psi (140 kPa) उपयोग करते हैं।';
 $ec_lang['lpn_ff_design']='डिज़ाइन जाँच (सिस्टम पर असर)';
 $ec_lang['lpn_ff_design_tip']='यह सवाल इससे अलग है कि जंक्शन प्रवाह दे सकता है या नहीं: वहाँ वह प्रवाह खींचे जाने पर, क्या कुछ और अपने न्यूनतम दाब से नीचे जाता है या अपनी वेग सीमा से आगे निकलता है? इसे जाँचने का चुनाव कोई अतिरिक्त गणना नहीं माँगता।';
-$ec_lang['lpn_ff_design_off']='जाँच न करें';
-$ec_lang['lpn_ff_design_all']='सभी अन्य जंक्शन और सभी पाइप';
-$ec_lang['lpn_ff_design_selected']='चयनित जंक्शन और उनके पाइप';
-$ec_lang['lpn_ff_design_no_selection']='डिज़ाइन जाँच चयनित जंक्शनों पर सेट है, और कोई चयनित नहीं है। मानचित्र पर कुछ चुनें, या इसके बजाय "सभी" सेट करें।';
+$ec_lang['lpn_ff_design_no_selection']='डिज़ाइन जाँच का दायरा चयनित पर सेट है, पर कोई तत्व चयनित नहीं है। तत्व चुनें या सभी विकल्प चुनें।';
 
 $ec_lang['lpn_ff_minpressure']='अन्यत्र अनुमत न्यूनतम दाब';
 $ec_lang['lpn_ff_minpressure_tip']='एक जंक्शन जो इससे नीचे चला जाता है जबकि कोई दूसरा अपना फायर फ्लो खींच रहा है, उसे डिज़ाइन समस्या के रूप में रिपोर्ट किया जाता है।';

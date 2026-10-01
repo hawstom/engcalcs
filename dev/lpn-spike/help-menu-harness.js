@@ -186,19 +186,37 @@ console.log('\n-- the Help menu rows --');
 	report(!/pc\.contact_main_menu/.test(body),
 		'and Contact is gone, so two rows do not compete for one destination');
 
-	// **TWO MENUS NOW, AND THAT IS THE SPECIFICATION** (2026-09-11, Tom: *"The trade mark at the
-	// upper left now evokes Mac paradigm, and as such it carries expectations."*). Help answers
-	// "how do I use this page"; the mark at the far left answers "what is this software". They
-	// shared one menu for about an hour this session and that was the scope creep he named.
+	// **THREE GROUPS NOW, AND THAT IS THE SPECIFICATION** (Task 745, Tom, 2026-09-29: *"(1) True
+	// help: Walkthroughs, Tables and Hotkeys ..., Toolbars. (2) Helpers: Fix something, Install,
+	// and Cookies. (3) True about: Notes on this page, Welcome page, Screenshot, Privacy, Terms,
+	// About."*).
 	//
-	// This replaces the numbered list of 2026-09-06 AND the single-menu order shipped earlier
-	// today. Do not restore either from an older comment.
-	const order = ['lpn_help_walkthroughs', 'lpn_help_notes', 'lpn_help_icons', 'lpn_help_fix',
-		'install_main_menu', 'lpn_help_screenshots', 'privacy_link', 'terms_link',
-		'consent_settings_link', 'about_main_menu'];
+	// This replaces the single-group order of 2026-09-11 and every older comment. Do not restore
+	// any of them.
+	const order = ['lpn_help_walkthroughs', 'lpn_help_hotkeys', 'lpn_help_icons',
+		'lpn_help_fix', 'install_main_menu', 'consent_settings_link',
+		'lpn_help_notes', 'lpn_help_welcome', 'lpn_help_screenshots', 'privacy_link', 'terms_link',
+		'about_main_menu'];
 	const at = order.map(k => body.indexOf('pc.' + k));
 	report(at.every(i => i >= 0), 'every row Help kept is in Help');
 	report(at.every((v, i) => i === 0 || v > at[i - 1]), 'and they stand in that order');
+	// **THE THREE GROUPS ARE SEPARATED, NOT JUST ORDERED** (the menu's own idiom -- `{ separator:
+	// true }`). Exactly two separators inside the Help rows array: after Toolbars (end of group 1)
+	// and after Cookie settings (end of group 2).
+	const rowsListMatch = body.match(/openMenu\(anchor, \[([\s\S]*)\]\);/);
+	const rowsList = rowsListMatch ? rowsListMatch[1] : '';
+	report((rowsList.match(/\{ separator: true \}/g) || []).length === 2,
+		'exactly two separators divide the three groups');
+	{
+		const iconsAt = rowsList.indexOf('pc.lpn_help_icons'),
+			fixAt = rowsList.indexOf('pc.lpn_help_fix'),
+			cookiesAt = rowsList.indexOf('pc.consent_settings_link'),
+			notesAt = rowsList.indexOf('pc.lpn_help_notes'),
+			sep1 = rowsList.indexOf('{ separator: true }'),
+			sep2 = rowsList.indexOf('{ separator: true }', sep1 + 1);
+		report(sep1 > iconsAt && sep1 < fixAt, 'the first separator falls between Toolbars and Fix something');
+		report(sep2 > cookiesAt && sep2 < notesAt, 'the second separator falls between Cookie settings and Notes');
+	}
 	// Everything the mark's menu had borrowed is back where it started.
 	['about_main_menu', 'install_main_menu', 'privacy_link', 'terms_link', 'consent_settings_link']
 		.forEach(function (k) {

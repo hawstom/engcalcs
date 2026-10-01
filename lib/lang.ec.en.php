@@ -126,7 +126,7 @@ $ec_lang['calc_defaults']='Restore defaults';
 $ec_lang_syn['calc_defaults']='Restore (revert, return) to the original (initial, as-shipped, factory) values (state).';
 $ec_lang['calc_defaults_confirm']='Reset calculator to the original default values?';
 $ec_lang['points_data_note']='(or copy/paste using the data area)';
-$ec_lang['points_data_heading']='Points data<br />(comma or tab separated)';
+$ec_lang['points_data_heading']='Calculator data<br />(use Copy to see format)';
 $ec_lang['points_data_copy']='Copy';
 $ec_lang['points_data_paste']='Paste';
 $ec_lang['calc_inputs']='Inputs';
@@ -1061,6 +1061,21 @@ $ec_lang['lpn_examples_loading']='Loading examples…';
 $ec_lang['lpn_help_fix']='Fix something';
 $ec_lang_syn['lpn_help_fix']='Fix something, Report a mistake, Tell us what is wrong, Send a correction, Suggest a fix | avoid: fix as fasten or attach; avoid: fix as prepare';
 $ec_lang['lpn_help_notes']='Notes on this page';
+// **THE NEW BOX, TASK 745** (Tom, 2026-09-29: reorganize Help into three groups, with a new
+// "Tables and Hotkeys" box gathering all table help and all keyboard shortcuts). One key names
+// both the Help row and the box's own title bar, the same pattern lpn_help_notes already carries
+// for the Notes box.
+$ec_lang['lpn_help_hotkeys']='Tables and Hotkeys';
+// The box's two context headings. "Tables" holds the two table-help entries that used to sit only
+// in the Notes list (lpn_notes_6/7, moved rather than duplicated); "Map" is new -- the digit tool
+// keys, Undo and the zoom keys had never been gathered anywhere before.
+$ec_lang['lpn_hotkeys_tables_heading']='Tables';
+$ec_lang['lpn_hotkeys_map_heading']='Map';
+$ec_lang['lpn_hotkeys_map_term']='Map keyboard shortcuts';
+// Same shape as lpn_notes_7_def: one table, one row per key. The nine digits are LPN_TOOL_KEYS in
+// js/looped-network.js; Select also answers to Esc and Delete to the Delete key
+// (LPN_TOOL_ALT_KEYS); Ctrl+Z is undo(); +/- and = are keyZoom() (ROADMAP Task 682).
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1339,13 +1354,11 @@ $ec_lang['lpn_zoom_out_tip']='Zoom out. Shortcut: -';
 $ec_lang['lpn_tool_settings_tip']='Open the settings for this project.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='Find an asset by its ID, or find every asset matching a simple or custom condition, and change them all at once.';
-// **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
+// **"Toolbar"** (Tom renamed it from "Toolbar key" to "Toolbar" on 2026-09-30).
 // The row is not a second toolbar and not a repeat of one -- it is the LEGEND for an icon-only
 // strip, derived from toolbarIconIndex, and on a touch screen it is the only way to read the
-// strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
-// it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
-// key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='Toolbar key';
+// strip at all without a deliberate press-and-hold. The row earns its place.
+$ec_lang['lpn_help_icons']='Toolbar';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Visibility';
 $ec_lang['lpn_pane_right_toggle_tip']='Show or hide the panel at the right of the map. It holds the label and color choices.';
@@ -1455,6 +1468,10 @@ $ec_lang['lpn_pane_not_used']='Not used';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='Filtered by {q}. Showing {n} of {all}.';
 $ec_lang['lpn_pane_filter_clear']='Show all';
+// Added to the filtered table's line (Task 738): rows edited since Filter in table was pressed stay
+// in the table even when they no longer match, dimmed and marked, until it is pressed again. {n} is
+// how many. Worded as a label and a count so no plural form is needed.
+$ec_lang['lpn_pane_filter_stale']='Rows that no longer match: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Nothing in this table matches the filter.';
@@ -1930,6 +1947,11 @@ $ec_lang['lpn_import_no_room']='There is not enough browser storage left to add 
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='OK';
+// **TASK 718** (Tom, 2026-09-25: *"We have three import items. It's probably time for an Import
+// sub-menu."*). The three rows -- surveyed points, an EPANET file, and libraries -- now open as a
+// fly-out off one row, the same submenu idiom Help > Toolbar already uses. Each row keeps its
+// own existing key and tip; only this one row is new.
+$ec_lang['lpn_file_import_menu']='Import…';
 $ec_lang['lpn_file_import_inp']='Import EPANET file…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, either the .inp export format (preferred) or the native .net format (last resort).';
@@ -2274,7 +2296,7 @@ $ec_lang['lpn_notes_6_term']='Table columns help';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading\'s top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr><tr><td>Paste as new rows at end of table</td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Table keyboard shortcuts';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+Enter</td><td>Fill the selection with the active cell\'s value.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Switch to the next or previous table.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+Enter</td><td>Fill the selection with the active cell\'s value.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Switch to the next or previous tab, whether a table or a graph.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2905,6 +2927,22 @@ $ec_lang['lpn_scenario_push_values']='Values thrown away:';
 // A COUNT follows this label, not a list. Alternates are Tom's own (2026-08-14).
 $ec_lang_syn['lpn_scenario_push_values']='Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values';
 $ec_lang['lpn_scenario_push_none']='No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.';
+// Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
+// by name, and the numbers hold Tom's order in every language.
+$ec_lang['lpn_scenario_preset_flow_static']='1. Flow test: Static';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='Flow test calibration for a design network at 0 flow. In this scenario, set the demand at all junctions to 0.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. Flow test: Mid';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='Flow test calibration for a design network at the first flow reported. In this scenario, set the demand at the flowing junction to the first flow measured, and the demand at all other junctions to 0.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. Flow test: Max';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='Flow test calibration for a design network at the max flow reported. In this scenario, set the demand at the flowing junction to the max flow measured, and the demand at all other junctions to 0.';
+$ec_lang['lpn_scenario_preset_average_day']='4. Average Day';
+$ec_lang['lpn_scenario_preset_average_day_tip']='Demand multiplier 1: every demand as entered, which is taken to be average day demand.';
+$ec_lang['lpn_scenario_preset_max_day']='5. Max Day';
+$ec_lang['lpn_scenario_preset_max_day_tip']='Demand multiplier 2.0 times average day, a placeholder value. Most systems fall between 1.2 and 3.0 (National Research Council, 2006). Set your own system\'s in Settings, Calculation, Hydraulics, Demand multiplier.';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. Peak hour';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='Demand multiplier 3.0 times average day, a placeholder value. Most systems fall between 3.0 and 6.0 (National Research Council, 2006). Set your own system\'s in Settings, Calculation, Hydraulics, Demand multiplier.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. Fire plus max day';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='Max day demand (multiplier 2.0). Run Fire flow analysis in this scenario: it adds the fire flow at each junction on top of this demand.';
 $ec_lang['lpn_delete_drops_overrides']='Deleting this asset also throws away {n} values that your scenarios hold for it. Continue?';
 $ec_lang['lpn_push_base_only']='This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.';
 $ec_lang['lpn_field_active']='Part of this network';
@@ -3729,6 +3767,9 @@ $ec_lang_syn['lpn_scenario_push_tip']='labels here = the map labels (Settings, S
 $ec_lang_syn['lpn_labels_priority_node_tip']='more like neighboring nodes = numerically closer to the neighbors\' values | avoid: similar in kind';
 $ec_lang_syn['lpn_find_op_gt']='greater than, more than, exceeding | avoid: spatially above, higher on the map';
 $ec_lang_syn['lpn_find_op_lt']='less than | avoid: spatially below, lower on the map';
+// Tom, 2026-09-30, ruling sprint 2026-09-30-golf item 1: _syn = "All junctions" / "Selected junctions".
+$ec_lang_syn['lpn_ff_all']='All junctions | a pull-down option under Junctions to test; agrees with junctions, plural. The Design check pull-down reuses it, where it means all pipes and other junctions';
+$ec_lang_syn['lpn_ff_selected']='Selected junctions | a pull-down option under Junctions to test; agrees with junctions, plural. The Design check pull-down reuses it, where it means the selected pipes and junctions';
 $ec_lang['lpn_fitting_exit']='Exit';
 // THE ONE ROW THAT IS NOT THE MANUAL\'S: a fitting the table does not carry, whose coefficient the
 // user states. Without it the picker would quietly refuse every fitting nobody could source.
@@ -3908,10 +3949,10 @@ $ec_lang['lpn_ff_title']='Fire flow analysis';
 $ec_lang['lpn_ff_intro']='Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.';
 $ec_lang['lpn_ff_scope']='Junctions to test';
 $ec_lang['lpn_ff_scope_tip']='Choose the set before you run. Testing every junction in a large system can take minutes.';
-$ec_lang['lpn_ff_scope_all']='Every junction';
-$ec_lang['lpn_ff_scope_selected']='The selected junctions';
+$ec_lang['lpn_ff_all']='All';
+$ec_lang['lpn_ff_selected']='Selected';
 $ec_lang['lpn_ff_no_junctions']='This project has no junctions yet, so there is nothing to test.';
-$ec_lang['lpn_ff_no_selection']='No junction is selected. Choose one on the map, or test every junction.';
+$ec_lang['lpn_ff_no_selection']='No junctions are selected. Select junctions or select the All option.';
 $ec_lang['lpn_ff_skipped']='{n} selected elements are not junctions, so they were not tested.';
 $ec_lang['lpn_ff_required']='Required fire flow';
 $ec_lang['lpn_ff_required_tip']='The flow your fire code or your fire authority requires at a hydrant. Each junction is tested against this number unless it carries a required fire flow of its own.';
@@ -3921,10 +3962,7 @@ $ec_lang['lpn_ff_residual']='Residual pressure to hold';
 $ec_lang['lpn_ff_residual_tip']='The pressure the junction must still hold while delivering the fire flow. AWWA M31 and NFPA 291 use 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Design check (effect on system)';
 $ec_lang['lpn_ff_design_tip']='A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation.';
-$ec_lang['lpn_ff_design_off']='Do not check';
-$ec_lang['lpn_ff_design_all']='All other junctions and all pipes';
-$ec_lang['lpn_ff_design_selected']='The selected junctions and their pipes';
-$ec_lang['lpn_ff_design_no_selection']='The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.';
+$ec_lang['lpn_ff_design_no_selection']='The design check scope is set to Selected, but no assets are selected. Select assets or select the All option.';
 $ec_lang['lpn_ff_minpressure']='Lowest pressure allowed elsewhere';
 $ec_lang['lpn_ff_minpressure_tip']='A junction that falls below this while another one is drawing its fire flow is reported as a design issue.';
 $ec_lang['lpn_ff_maxvelocity']='Highest velocity allowed';

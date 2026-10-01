@@ -49,6 +49,7 @@ const L = loadLoopedNetwork(
 	"\t\tlibImportChoose: libImportChoose, libImportOffer: libImportOffer,\n" +
 	"\t\tundoDepth: function () { return undoStack.length; }, undo: undo,\n" +
 	"\t\tlibImportUnitDiffs: libImportUnitDiffs, openFileMenu: openFileMenu,\n" +
+	"\t\timportMenuRows: importMenuRows,\n" +
 	"\t\trebuildLibraryBox: rebuildLibraryBox, setLibSection: function (s) { libSection = s; },\n" +
 	"\t\tlibCurveRunnable: libCurveRunnable,\n" +
 	"\t\tbuildCurveSection: buildCurveSection, buildPipeTypeSection: buildPipeTypeSection,\n" +
@@ -691,6 +692,12 @@ head('11. one undo puts the document AND the Libraries box back');
 // button that stood in each library section -- 2026-09-18, after using it: *"Remove buttons except
 // at the File menu."* That reverses his earlier *"available from every applicable library"*, and
 // the later word wins. One wizard, ONE door.
+//
+// **TASK 718 MOVED IT BEHIND AN IMPORT SUBMENU** (2026-09-25: *"We have three import items. It's
+// probably time for an Import sub-menu."*), so "beside the rows that open a project file" is now
+// true of the SUBMENU row rather than of the wizard's own row -- the wizard's row is reached
+// through it (`importMenuRows()`, the row-function idiom `mapMenuRows()` and `iconGuideRows()`
+// already use), not through the flat list any more.
 head('12. the wizard has a row in the File menu, beside the rows that open a project file');
 (function () {
 	const pc = EngCalcs.pageConfig || {};
@@ -700,22 +707,39 @@ head('12. the wizard has a row in the File menu, beside the rows that open a pro
 	L.openFileMenu(document.createElement('div'));
 	const rows = walk(document.getElementById('lpn_menu_list'))
 		.map(e => String(e.textContent || ''));
-	check(rows.some(t => t.indexOf(String(pc.lpn_library_import)) >= 0),
-		`the File menu carries the wizard: ${JSON.stringify(rows.filter(Boolean).slice(0, 12))}`);
-	// BELOW THE ROWS THAT OPEN A WHOLE PROJECT, because this one does not open anything: it copies
-	// into the project already on screen, and a row that edits the open document sitting above the
-	// rows that REPLACE it would read as one of them. Convert as… dropped out of that group under
-	// R-213 (Task 696; Tom, 2026-09-24: it acts on the OPEN project, so it now sits beside Save as…
-	// instead) -- Import EPANET file… is the last of the rows this one still has to sit below.
+	check(rows.some(t => t.indexOf(String(pc.lpn_file_import_menu)) >= 0),
+		`the File menu carries the Import submenu row: ${JSON.stringify(rows.filter(Boolean).slice(0, 12))}`);
+	// The wizard is not loose in the flat list any more -- it is reachable only through the
+	// submenu, asserted below.
+	check(!rows.some(t => t.indexOf(String(pc.lpn_library_import)) >= 0),
+		'and the wizard\'s own row is NOT in the flat list -- only the submenu carries it');
+	// BELOW THE ROWS THAT OPEN A WHOLE PROJECT, because the Import submenu does not open anything
+	// itself: New project…, Open… and Open example… each end in a project switch, and the submenu
+	// (like the wizard row it replaced) sits after them. Convert as… dropped out of that group
+	// under R-213 (Task 696; Tom, 2026-09-24: it acts on the OPEN project, so it now sits beside
+	// Save as… instead) -- Open example… is the last of the rows this one still has to sit below.
 	const at = (label) => rows.map((t, i) => [t, i]).filter(p => p[0].indexOf(String(label)) >= 0)
 		.map(p => p[1])[0];
-	check(at(pc.lpn_library_import) > at(pc.lpn_file_import_inp),
-		'below Import EPANET file…, the last of the rows that open a project');
+	check(at(pc.lpn_file_import_menu) > at(pc.lpn_examples_menu),
+		'below Open example…, the last of the rows that open a whole project');
+	// **THROUGH THE SUBMENU, NOT AROUND IT.** importMenuRows() is the same function the File menu's
+	// own "Import…" row calls to build its fly-out (openMenu(b, r.submenu(), 1)) -- reading it
+	// directly is reading exactly what a click on that row would show, without driving the popup.
+	const subRows = L.importMenuRows().map(r => String(r.label || ''));
+	check(subRows.some(t => t.indexOf(String(pc.lpn_library_import)) >= 0),
+		`the Import submenu carries the wizard: ${JSON.stringify(subRows)}`);
 	// AND IT IS THE ONLY ROW ANYWHERE THAT OPENS THE WIZARD. Section 8 asserts the Libraries box
-	// has none; this asserts the menu row is genuinely there to have taken their place, so the
+	// has none; this asserts the submenu row is genuinely there to have taken their place, so the
 	// removal cannot leave the wizard unreachable.
-	check(rows.filter(t => t.indexOf(String(pc.lpn_library_import)) >= 0).length >= 1,
-		'and the File menu row is the door that remains');
+	check(subRows.filter(t => t.indexOf(String(pc.lpn_library_import)) >= 0).length === 1,
+		'and the submenu row is the one door that remains');
+	// Last of the three import rows, the same order Task 718 built: surveyed points, EPANET file,
+	// libraries.
+	check(subRows.length === 3 &&
+		subRows[0].indexOf(String(pc.lpn_file_import_survey)) >= 0 &&
+		subRows[1].indexOf(String(pc.lpn_file_import_inp)) >= 0 &&
+		subRows[2].indexOf(String(pc.lpn_library_import)) >= 0,
+		`the three import rows stand in order: surveyed points, EPANET file, libraries: ${JSON.stringify(subRows)}`);
 }());
 
 console.log('\n' + (failures ? failures + ' FAILURE(S)' : 'All library-import checks passed.'));

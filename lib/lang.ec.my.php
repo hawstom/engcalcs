@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='ပုံမှန်သို့ ပြန်ယူပါ';
 $ec_lang['calc_defaults_confirm']='တွက်ချက်မှုကိရိယာကို မူလ ပုံမှန် တန်ဖိုးများသို့ ပြန်လည်သတ်မှတ်မလား?';
 $ec_lang['points_data_note']='(သို့မဟုတ် ဒေတာနေရာကို အသုံးပြု၍ ကူးယူ/ကူးထည့်ပါ)';
-$ec_lang['points_data_heading']='အမှတ်ဒေတာ<br />(ကော်မာ သို့မဟုတ် tab ဖြင့် ခွဲ)';
+$ec_lang['points_data_heading']='တွက်ချက်စက် ဒေတာ<br />(ပုံစံကြည့်ရန် ကူးယူ ကို သုံးပါ)';
 $ec_lang['points_data_copy']='ကူးယူ';
 $ec_lang['points_data_paste']='ကူးထည့်';
 $ec_lang['calc_inputs']='ထည့်သွင်းချက်များ';
@@ -928,6 +928,11 @@ $ec_lang['lpn_examples_loading']='ဥပမာများ ဖွင့်နေ
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='တစ်ခုခု ပြင်ရန်';
 $ec_lang['lpn_help_notes']='ဤစာမျက်နှာအကြောင်း မှတ်ချက်များ';
+$ec_lang['lpn_help_hotkeys']='ဇယားများနှင့် ဖြတ်လမ်းခလုတ်များ';
+$ec_lang['lpn_hotkeys_tables_heading']='ဇယားများ';
+$ec_lang['lpn_hotkeys_map_heading']='မြေပုံ';
+$ec_lang['lpn_hotkeys_map_term']='မြေပုံ ဖြတ်လမ်းခလုတ်များ';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 (သို့) Esc</td><td>ရွေးချယ်ရန်။</td></tr><tr><td>2</td><td>ဆက်စပ်နေရာ ထည့်ရန်။</td></tr><tr><td>3</td><td>ရေကန် ထည့်ရန်။</td></tr><tr><td>4</td><td>ရေတိုက် ထည့်ရန်။</td></tr><tr><td>5</td><td>ပိုက်လိုင်း ထည့်ရန်။</td></tr><tr><td>6</td><td>ရေတင်စက် ထည့်ရန်။</td></tr><tr><td>7</td><td>ဗားလ် ထည့်ရန်။</td></tr><tr><td>8</td><td>ဖောက်သည် ထည့်ရန်။</td></tr><tr><td>9</td><td>စာသား ထည့်ရန်။</td></tr><tr><td>Delete</td><td>ရွေးချယ်ထားသည်ကို ဖျက်ရန်။</td></tr><tr><td>Ctrl+Z</td><td>နောက်ဆုံးပြောင်းလဲမှုကို ပြန်ဖျက်ရန်။</td></tr><tr><td>+ (သို့) =</td><td>ချဲ့ရန်။</td></tr><tr><td>-</td><td>ချုံ့ရန်။</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1202,7 +1207,7 @@ $ec_lang['lpn_find_menu_tip']='အစိတ်အပိုင်းတစ်ခ�
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='ကိရိယာဘား သင်္ကေတများ၏ အဓိပ္ပာယ်';
+$ec_lang['lpn_help_icons']='ကိရိယာဘား';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='မြင်နိုင်မှု';
 $ec_lang['lpn_pane_right_toggle_tip']='မြေပုံ၏ ညာဘက်ရှိ ဘောင်ကို ပြရန် (သို့) ဖျောက်ရန်။ ၎င်းတွင် အညွှန်းနှင့် အရောင် ရွေးချယ်မှုများ ပါဝင်သည်။';
@@ -1311,6 +1316,7 @@ $ec_lang['lpn_pane_not_used']='အသုံးမပြုပါ';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='{q} ဖြင့် စစ်ထုတ်ထားသည်။ {all} အနက် {n} ခု ပြသနေသည်။';
 $ec_lang['lpn_pane_filter_clear']='အားလုံး ပြရန်';
+$ec_lang['lpn_pane_filter_stale']='ကိုက်ညီမှု မရှိတော့သော အတန်းများ - {n}။';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='ဤဇယားတွင် စစ်ထုတ်မှုနှင့် ကိုက်ညီသော အရာ တစ်ခုမျှ မရှိပါ။';
@@ -1767,6 +1773,7 @@ $ec_lang['lpn_import_no_room']='ဤပရောဂျက်ကို ထည့�
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='အိုကေ';
+$ec_lang['lpn_file_import_menu']='တင်သွင်းရန်…';
 $ec_lang['lpn_file_import_inp']='EPANET ဖိုင် တင်သွင်းရန်…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='EPANET ဖိုင်တစ်ခု - .inp စာသားဖိုင် (သို့) EPANET သိမ်းဆည်းသော .net ဖိုင် တစ်ခုခုမှ ကွန်ရက်တစ်ခုကို ဖတ်ယူပြီး၊ ဤဘရောက်ဇာထဲတွင် ပရောဂျက်အသစ်တစ်ခုအဖြစ် သိမ်းဆည်းသည်။';
@@ -2109,7 +2116,7 @@ $ec_lang['lpn_notes_6_term']='ဇယား ကော်လံများ အက
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>ကော်လံကို ရွေးချယ်ရန်</td><td>ခေါင်းစီးကို နှိပ်ပါ</td></tr><tr><td>ကော်လံ ရွေးချယ်မှုကို ထပ်ထည့်ရန် (သို့) ချဲ့ရန်</td><td>အခြားခေါင်းစီးကို Ctrl+click (သို့) Shift+click နှိပ်ပါ</td></tr><tr><td>ရွေးထားသော ကော်လံ(များ)ကို ရွှေ့ရန် (စီစဉ်ပြန်ရန်)</td><td>ဖိဆွဲပါ (သို့) right-click (သို့) ⋮ မီနူးရှိ ကော်လံများ စီမံရန်… ကို သုံးပါ</td></tr><tr><td>မီနူး ⋮ နှင့် စီမြှားညွှန်။</td><td>ခေါင်းစီး၏ ထောင့်အပေါ်ကို ကာဆာထားပါ၊ (သို့) ခေါင်းစီးထဲသို့ ရွေးချယ် (သို့) Tab ဖြင့် ဝင်ပါ</td></tr><tr><td>ဖျောက်ရန်၊ အားလုံးပြရန်၊ (သို့) မြင်နိုင်မှုနှင့် အစီအစဉ်ကို စီမံရန်</td><td>ခေါင်းစီးကို right-click နှိပ်ပါ (သို့) ခေါင်းစီး၏ ညာဘက်အပေါ်ထောင့်ရှိ ⋮ မီနူး</td></tr><tr><td>ကော်လံအလိုက် စီရန်</td><td>ခေါင်းစီး၏ ညာဘက်အပေါ်ထောင့်ရှိ မြှားသင်္ကေတ</td></tr><tr><td>ဇယားအဆုံးတွင် အတန်းအသစ်များအဖြစ် ကူးထည့်ရန်</td><td>Right-click၊ ခေါင်းစီး၏ ညာဘက်အပေါ်ထောင့်ရှိ ⋮ မီနူး၊ (သို့) Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='ဇယား ကီးဘုတ် ဖြတ်လမ်းများ';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>မြှားခလုတ်များ</td><td>ရွှေ့ရန်။</td></tr><tr><td>Tab, Enter</td><td>ရိုက်ထည့်မှု ပြီးဆုံးပြီး ဆဲလ်တစ်ခု အလျားလိုက် / အောက်သို့ ရွှေ့ရန်။</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>နောက်ပြန် ရွှေ့ရန်။</td></tr><tr><td>Shift+မြှားခလုတ်များ</td><td>ရွေးချယ်မှုကို ချဲ့ရန်။</td></tr><tr><td>Ctrl+C</td><td>ရွေးချယ်ထားသည်ကို ကူးယူရန်။</td></tr><tr><td>Ctrl+D</td><td>ရွေးချယ်ထားသည်ကို ၎င်း၏ထိပ်ဆုံးအတန်းမှ အောက်သို့ ဖြည့်ရန်။</td></tr><tr><td>Ctrl+Enter</td><td>ရွေးချယ်ထားသည်ကို လက်ရှိဆဲလ်\'၏ တန်ဖိုးဖြင့် ဖြည့်ရန်။</td></tr><tr><td>Ctrl+A</td><td>ဇယားတစ်ခုလုံးကို ရွေးချယ်ရန်။</td></tr><tr><td>Ctrl+Shift+V</td><td>ဇယားအဆုံးတွင် အတန်းအသစ်များအဖြစ် ကူးထည့်ရန်။</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>နောက် (သို့) ယခင် ဇယားသို့ ပြောင်းရန်။</td></tr><tr><td>Delete</td><td>ဆဲလ်တစ်ခုကို ရှင်းလင်းရန်။</td></tr><tr><td>F2</td><td>ဆဲလ်တစ်ခုကို တည်းဖြတ်ရန် ဖွင့်ရန်။</td></tr><tr><td>Esc</td><td>တည်းဖြတ်မှုကို ပယ်ဖျက်ရန်။</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>မြှားခလုတ်များ</td><td>ရွှေ့ရန်။</td></tr><tr><td>Tab, Enter</td><td>ရိုက်ထည့်မှု ပြီးဆုံးပြီး ဆဲလ်တစ်ခု အလျားလိုက် / အောက်သို့ ရွှေ့ရန်။</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>နောက်ပြန် ရွှေ့ရန်။</td></tr><tr><td>Shift+မြှားခလုတ်များ</td><td>ရွေးချယ်မှုကို ချဲ့ရန်။</td></tr><tr><td>Ctrl+C</td><td>ရွေးချယ်ထားသည်ကို ကူးယူရန်။</td></tr><tr><td>Ctrl+D</td><td>ရွေးချယ်ထားသည်ကို ၎င်း၏ထိပ်ဆုံးအတန်းမှ အောက်သို့ ဖြည့်ရန်။</td></tr><tr><td>Ctrl+Enter</td><td>ရွေးချယ်ထားသည်ကို လက်ရှိဆဲလ်\'၏ တန်ဖိုးဖြင့် ဖြည့်ရန်။</td></tr><tr><td>Ctrl+A</td><td>ဇယားတစ်ခုလုံးကို ရွေးချယ်ရန်။</td></tr><tr><td>Ctrl+Shift+V</td><td>ဇယားအဆုံးတွင် အတန်းအသစ်များအဖြစ် ကူးထည့်ရန်။</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>နောက် (သို့) ယခင် တဘ်သို့ ပြောင်းရန်၊ ဇယား (သို့) ဂရပ် ဖြစ်စေ။</td></tr><tr><td>Delete</td><td>ဆဲလ်တစ်ခုကို ရှင်းလင်းရန်။</td></tr><tr><td>F2</td><td>ဆဲလ်တစ်ခုကို တည်းဖြတ်ရန် ဖွင့်ရန်။</td></tr><tr><td>Esc</td><td>တည်းဖြတ်မှုကို ပယ်ဖျက်ရန်။</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2705,6 +2712,20 @@ $ec_lang['lpn_scenario_push_confirm']='ဤဂုဏ်သတ္တိမျာ�
 $ec_lang['lpn_scenario_push_scenarios']='သက်ရောက်မည့် အခြေအနေများ -';
 $ec_lang['lpn_scenario_push_values']='ပယ်ချမည့် တန်ဖိုးများ -';
 $ec_lang['lpn_scenario_push_none']='ဤဂုဏ်သတ္တိများ မည်သည့်တစ်ခုအတွက်မျှ မည်သည့်အခြေအနေမျှ ကိုယ်ပိုင်တန်ဖိုး မရှိသောကြောင့်၊ မည်သည့်အရာမျှ ပြောင်းလဲမည် မဟုတ်ပါ။ ဘာမျှ ပယ်ချမည် မဟုတ်ပါ။';
+$ec_lang['lpn_scenario_preset_flow_static']='1. ရေစီးနှုန်း စမ်းသပ်မှု - တည်ငြိမ်';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='ရေစီးနှုန်း 0 ဖြင့် ဒီဇိုင်းကွန်ရက်တစ်ခုအတွက် ရေစီးနှုန်း စမ်းသပ်မှု ချိန်ညှိခြင်း။ ဤအခြေအနေတွင် ဆက်စပ်နေရာအားလုံးရှိ လိုအပ်ချက်ကို 0 အဖြစ် သတ်မှတ်ပါ။';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. ရေစီးနှုန်း စမ်းသပ်မှု - အလယ်';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='ပထမဆုံး အစီရင်ခံသော ရေစီးနှုန်းဖြင့် ဒီဇိုင်းကွန်ရက်တစ်ခုအတွက် ရေစီးနှုန်း စမ်းသပ်မှု ချိန်ညှိခြင်း။ ဤအခြေအနေတွင် ရေစီးနေသော ဆက်စပ်နေရာရှိ လိုအပ်ချက်ကို တိုင်းတာထားသော ပထမဆုံး ရေစီးနှုန်းအဖြစ်၊ အခြားဆက်စပ်နေရာအားလုံးရှိ လိုအပ်ချက်ကို 0 အဖြစ် သတ်မှတ်ပါ။';
+$ec_lang['lpn_scenario_preset_flow_max']='3. ရေစီးနှုန်း စမ်းသပ်မှု - အမြင့်ဆုံး';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='အစီရင်ခံထားသော အမြင့်ဆုံးရေစီးနှုန်းဖြင့် ဒီဇိုင်းကွန်ရက်တစ်ခုအတွက် ရေစီးနှုန်း စမ်းသပ်မှု ချိန်ညှိခြင်း။ ဤအခြေအနေတွင် ရေစီးနေသော ဆက်စပ်နေရာရှိ လိုအပ်ချက်ကို တိုင်းတာထားသော အမြင့်ဆုံးရေစီးနှုန်းအဖြစ်၊ အခြားဆက်စပ်နေရာအားလုံးရှိ လိုအပ်ချက်ကို 0 အဖြစ် သတ်မှတ်ပါ။';
+$ec_lang['lpn_scenario_preset_average_day']='4. ပျမ်းမျှနေ့';
+$ec_lang['lpn_scenario_preset_average_day_tip']='လိုအပ်ချက် မြှောက်ကိန်း 1 - လိုအပ်ချက်တိုင်းကို ထည့်သွင်းထားသည့်အတိုင်း ယူသည်၊ ၎င်းကို ပျမ်းမျှနေ့ လိုအပ်ချက်ဟု မှတ်ယူသည်။';
+$ec_lang['lpn_scenario_preset_max_day']='5. အမြင့်ဆုံးနေ့';
+$ec_lang['lpn_scenario_preset_max_day_tip']='လိုအပ်ချက် မြှောက်ကိန်းသည် ပျမ်းမျှနေ့၏ 2.0 ဆ ဖြစ်ပြီး ယာယီတန်ဖိုးတစ်ခု ဖြစ်သည်။ စနစ်အများစုသည် 1.2 နှင့် 3.0 ကြား ရှိသည် (National Research Council, 2006)။ သင့်စနစ်၏ကို ဆက်တင်များ၊ တွက်ချက်မှု၊ ဟိုက်ဒရောလစ်၊ လိုအပ်ချက် မြှောက်ကိန်း တွင် သတ်မှတ်ပါ။';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. အထွတ်အထိပ်နာရီ';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='လိုအပ်ချက် မြှောက်ကိန်းသည် ပျမ်းမျှနေ့၏ 3.0 ဆ ဖြစ်ပြီး ယာယီတန်ဖိုးတစ်ခု ဖြစ်သည်။ စနစ်အများစုသည် 3.0 နှင့် 6.0 ကြား ရှိသည် (National Research Council, 2006)။ သင့်စနစ်၏ကို ဆက်တင်များ၊ တွက်ချက်မှု၊ ဟိုက်ဒရောလစ်၊ လိုအပ်ချက် မြှောက်ကိန်း တွင် သတ်မှတ်ပါ။';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. မီးငြိမ်းသတ်ခြင်းနှင့် အမြင့်ဆုံးနေ့';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='အမြင့်ဆုံးနေ့ လိုအပ်ချက် (မြှောက်ကိန်း 2.0)။ ဤအခြေအနေတွင် မီးငြိမ်းသတ်ရေးစီးနှုန်း ခွဲခြမ်းစိတ်ဖြာမှုကို run ပါ - ၎င်းသည် ဤလိုအပ်ချက်ပေါ်တွင် ဆက်စပ်နေရာတစ်ခုစီ၌ မီးငြိမ်းသတ်ရေးစီးနှုန်းကို ထပ်ပေါင်းသည်။';
 $ec_lang['lpn_delete_drops_overrides']='ဤအစိတ်အပိုင်းကို ဖျက်ခြင်းသည် သင်၏ အခြေအနေများ ၎င်းအတွက် ကိုင်ဆောင်ထားသော တန်ဖိုး {n} ခုကိုပါ ပယ်ချမည်။ ဆက်လုပ်မလား?';
 $ec_lang['lpn_push_base_only']='ဤလုပ်ဆောင်ချက်သည် ပုံကိုယ်တိုင်ကို ပြောင်းလဲသောကြောင့်၊ {base} တွင်သာ ပြုလုပ်နိုင်သည်။ {base} သို့ ပြောင်းပြီး ထပ်ကြိုးစားပါ။';
 $ec_lang['lpn_field_active']='ဤကွန်ရက်၏ အစိတ်အပိုင်း';
@@ -3678,10 +3699,10 @@ $ec_lang['lpn_ff_title']='မီးငြိမ်းသတ်ရေးစီး
 $ec_lang['lpn_ff_intro']='ဆက်စပ်နေရာတစ်ခုစီအား ၎င်းတွင် ရှိပြီးသား လိုအင်အပေါ် ထပ်ပေါင်း၍ မီးငြိမ်းသတ်ရေးစီးနှုန်းတစ်ခု ဆွဲယူရန် အလှည့်ကျ တောင်းဆိုသည်။ သင့်ပရောဂျက်ထဲရှိ မည်သည့်အရာမျှ မပြောင်းလဲပါ။ run တစ်ခုလုံးကို မိတ္တူတစ်စောင်ပေါ်တွင် ပြုလုပ်သည်။';
 $ec_lang['lpn_ff_scope']='စစ်ဆေးမည့် ဆက်စပ်နေရာများ';
 $ec_lang['lpn_ff_scope_tip']='run မလုပ်မီ အစုအဝေးကို ရွေးပါ။ ကြီးမားသော စနစ်တစ်ခုရှိ ဆက်စပ်နေရာအားလုံးကို စစ်ဆေးခြင်းသည် မိနစ်များ ကြာနိုင်သည်။';
-$ec_lang['lpn_ff_scope_all']='ဆက်စပ်နေရာ အားလုံး';
-$ec_lang['lpn_ff_scope_selected']='ရွေးထားသော ဆက်စပ်နေရာများ';
+$ec_lang['lpn_ff_all']='အားလုံး';
+$ec_lang['lpn_ff_selected']='ရွေးထားသည်များ';
 $ec_lang['lpn_ff_no_junctions']='ဤပရောဂျက်တွင် ဆက်စပ်နေရာ မရှိသေးသောကြောင့်၊ စစ်ဆေးစရာ မရှိပါ။';
-$ec_lang['lpn_ff_no_selection']='ဆက်စပ်နေရာ မည်သည်ကိုမျှ မရွေးထားပါ။ မြေပုံပေါ်တွင် တစ်ခု ရွေးပါ၊ (သို့) ဆက်စပ်နေရာ အားလုံးကို စစ်ဆေးပါ။';
+$ec_lang['lpn_ff_no_selection']='ဆက်စပ်နေရာ မည်သည်ကိုမျှ မရွေးထားပါ။ ဆက်စပ်နေရာများကို ရွေးပါ၊ (သို့) အားလုံး ရွေးချယ်မှုကို ရွေးပါ။';
 $ec_lang['lpn_ff_skipped']='ရွေးထားသော အစိတ်အပိုင်း {n} ခုသည် ဆက်စပ်နေရာများ မဟုတ်သောကြောင့်၊ ၎င်းတို့ကို မစမ်းသပ်ခဲ့ပါ။';
 $ec_lang['lpn_ff_required']='လိုအပ်သော မီးငြိမ်းသတ်ရေးစီးနှုန်း';
 $ec_lang['lpn_ff_required_tip']='သင်၏ မီးဘေးကာကွယ်ရေး ဥပဒေ (သို့) မီးသတ်ဌာနက ဟိုက်ဒရင့်တစ်ခုတွင် တောင်းဆိုသော ရေစီးနှုန်း။ ဆက်စပ်နေရာတစ်ခုသည် ၎င်း၏ကိုယ်ပိုင် လိုအပ်သော မီးငြိမ်းသတ်ရေးစီးနှုန်း မရှိလျှင်၊ ဤဂဏန်းနှင့် စစ်ဆေးမည်။';
@@ -3691,10 +3712,7 @@ $ec_lang['lpn_ff_residual']='ဆက်ထိန်းထားရမည့် �
 $ec_lang['lpn_ff_residual_tip']='မီးငြိမ်းသတ်ရေးစီးနှုန်း ပေးဆောင်နေစဉ် ဆက်စပ်နေရာက ဆက်ထိန်းထားရမည့် ဖိအား။ AWWA M31 နှင့် NFPA 291 တို့သည် 20 psi (140 kPa) ကို သုံးသည်။';
 $ec_lang['lpn_ff_design']='ဒီဇိုင်း စစ်ဆေးမှု (စနစ်အပေါ် သက်ရောက်မှု)';
 $ec_lang['lpn_ff_design_tip']='ဆက်စပ်နေရာက ရေစီးနှုန်းကို ပေးနိုင်သလားဟူသော မေးခွန်းနှင့် ခွဲထားသော မေးခွန်းတစ်ခု - ထိုနေရာတွင် ထိုရေစီးနှုန်းကို ဆွဲယူထားစဉ်၊ အခြားအရာတစ်ခုခုသည် ၎င်း၏ အနည်းဆုံးဖိအားအောက် ကျဆင်းသည် (သို့) ၎င်း၏ အလျင်ကန့်သတ်ချက်ကို ကျော်လွန်သလား။ ၎င်းကို စစ်ဆေးရန် ရွေးချယ်ခြင်းသည် နောက်ထပ် တွက်ချက်မှု ကုန်ကျစရိတ် မရှိပါ။';
-$ec_lang['lpn_ff_design_off']='မစစ်ဆေးပါ';
-$ec_lang['lpn_ff_design_all']='အခြား ဆက်စပ်နေရာ အားလုံးနှင့် ပိုက်လိုင်း အားလုံး';
-$ec_lang['lpn_ff_design_selected']='ရွေးချယ်ထားသော ဆက်စပ်နေရာများနှင့် ၎င်းတို့၏ ပိုက်လိုင်းများ';
-$ec_lang['lpn_ff_design_no_selection']='ဒီဇိုင်း စစ်ဆေးမှုကို ရွေးချယ်ထားသော ဆက်စပ်နေရာများအဖြစ် သတ်မှတ်ထားသော်လည်း၊ မည်သည့်ဆက်စပ်နေရာကိုမျှ မရွေးချယ်ထားပါ။ မြေပုံပေါ်တွင် အချို့ကို ရွေးပါ၊ (သို့) အားလုံး ကို သတ်မှတ်ပါ။';
+$ec_lang['lpn_ff_design_no_selection']='ဒီဇိုင်း စစ်ဆေးမှုကို ရွေးထားသည်များအဖြစ် သတ်မှတ်ထားသော်လည်း၊ မည်သည့်အစိတ်အပိုင်းကိုမျှ မရွေးထားပါ။ အစိတ်အပိုင်းများကို ရွေးပါ၊ (သို့) အားလုံး ရွေးချယ်မှုကို ရွေးပါ။';
 $ec_lang['lpn_ff_minpressure']='အခြားနေရာများတွင် ခွင့်ပြုထားသော အနိမ့်ဆုံးဖိအား';
 $ec_lang['lpn_ff_minpressure_tip']='အခြားဆက်စပ်နေရာတစ်ခုက ၎င်း၏ မီးငြိမ်းသတ်ရေးစီးနှုန်းကို ဆွဲယူနေစဉ်၊ ဤဖိအားအောက် ကျဆင်းသွားသော ဆက်စပ်နေရာကို ဒီဇိုင်းပြဿနာတစ်ခုအဖြစ် အစီရင်ခံမည်။';
 $ec_lang['lpn_ff_maxvelocity']='ခွင့်ပြုထားသော အမြင့်ဆုံးအလျင်';

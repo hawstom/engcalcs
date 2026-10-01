@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='אפס לברירת מחדל';
 $ec_lang['calc_defaults_confirm']='האם לאפס את המחשבון לערכי ברירת המחדל?';
 $ec_lang['points_data_note']='(או העתק/הדבק באמצעות אזור הנתונים)';
-$ec_lang['points_data_heading']='נתוני נקודות<br />(מופרדות בפסיקים או טאבים)';
+$ec_lang['points_data_heading']='נתוני מחשבון<br />(השתמשו ב"העתק" כדי לראות את התבנית)';
 $ec_lang['points_data_copy']='העתק';
 $ec_lang['points_data_paste']='הדבק';
 $ec_lang['calc_inputs']='נתוני קלט';
@@ -930,6 +930,11 @@ $ec_lang['lpn_examples_loading']='טוען דוגמאות…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='תיקון בעיה';
 $ec_lang['lpn_help_notes']='הערות על עמוד זה';
+$ec_lang['lpn_help_hotkeys']='טבלאות ומקשי קיצור';
+$ec_lang['lpn_hotkeys_tables_heading']='טבלאות';
+$ec_lang['lpn_hotkeys_map_heading']='מפה';
+$ec_lang['lpn_hotkeys_map_term']='קיצורי מקלדת למפה';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 או Esc</td><td>בחירה.</td></tr><tr><td>2</td><td>הוספת צומת.</td></tr><tr><td>3</td><td>הוספת מאגר.</td></tr><tr><td>4</td><td>הוספת מכל.</td></tr><tr><td>5</td><td>הוספת צינור.</td></tr><tr><td>6</td><td>הוספת משאבה.</td></tr><tr><td>7</td><td>הוספת שסתום.</td></tr><tr><td>8</td><td>הוספת לקוח.</td></tr><tr><td>9</td><td>הוספת טקסט.</td></tr><tr><td>Delete</td><td>מחיקת הבחירה.</td></tr><tr><td>Ctrl+Z</td><td>ביטול השינוי האחרון.</td></tr><tr><td>+ או =</td><td>התקרבות.</td></tr><tr><td>-</td><td>התרחקות.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1204,7 +1209,7 @@ $ec_lang['lpn_find_menu_tip']='מצאו אלמנט לפי המזהה שלו, א�
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='מה משמעות סמלי סרגל הכלים';
+$ec_lang['lpn_help_icons']='מקרא סרגל הכלים';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='נראות';
 $ec_lang['lpn_pane_right_toggle_tip']='הצגה או הסתרה של הלוח מימין למפה. הוא מחזיק את בחירות התוויות והצבעים.';
@@ -1313,6 +1318,7 @@ $ec_lang['lpn_pane_not_used']='לא בשימוש';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='מסונן לפי {q}. מוצגים {n} מתוך {all}.';
 $ec_lang['lpn_pane_filter_clear']='הצג הכול';
+$ec_lang['lpn_pane_filter_stale']='שורות שאינן תואמות עוד: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='שום דבר בטבלה זו אינו תואם למסנן.';
@@ -1769,6 +1775,7 @@ $ec_lang['lpn_import_no_room']='אין מספיק מקום באחסון הדפד
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='אישור';
+$ec_lang['lpn_file_import_menu']='ייבוא…';
 $ec_lang['lpn_file_import_inp']='ייבוא קובץ EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='קוראים רשת מתוך קובץ EPANET, בין אם קובץ הטקסט ‎.inp ובין אם קובץ ה-‎.net ש-EPANET שומר, ושומרים אותה בדפדפן זה כפרויקט חדש.';
@@ -2111,7 +2118,7 @@ $ec_lang['lpn_notes_6_term']='עזרה בעמודות הטבלה';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>בחירת עמודה</td><td>לחיצה על הכותרת</td></tr><tr><td>הוספה או הרחבה של בחירת העמודות</td><td>Ctrl+לחיצה או Shift+לחיצה על כותרת אחרת</td></tr><tr><td>הזזה (שינוי סדר) של העמודות הנבחרות</td><td>גררו או השתמשו בניהול עמודות… בתפריט לחיצה ימנית או ⋮</td></tr><tr><td>תפריט ⋮ וחץ המיון.</td><td>רחפו מעל הפינה העליונה של כותרת, או בחרו או עברו בטאב אל כותרת</td></tr><tr><td>הסתרה, הצגת הכול, או ניהול הנראות והסדר</td><td>לחיצה ימנית על הכותרת או תפריט ⋮ בפינה הימנית העליונה של הכותרת</td></tr><tr><td>מיון לפי עמודה</td><td>סמל חץ בפינה הימנית העליונה של הכותרת</td></tr><tr><td>הדבקה כשורות חדשות בסוף הטבלה</td><td>לחיצה ימנית, תפריט ⋮ בפינה הימנית העליונה של הכותרת, או Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='קיצורי מקלדת לטבלה';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>מקשי חצים</td><td>ניווט.</td></tr><tr><td>Tab,‏ Enter</td><td>סיום הזנה וניווט תא אחד הצידה / למטה.</td></tr><tr><td>Shift+Tab,‏ Shift+Enter</td><td>ניווט אחורה.</td></tr><tr><td>Shift+מקשי חצים</td><td>הרחבת הבחירה.</td></tr><tr><td>Ctrl+C</td><td>העתקת הבחירה.</td></tr><tr><td>Ctrl+D</td><td>מילוי הבחירה למטה משורתה העליונה.</td></tr><tr><td>Ctrl+Enter</td><td>מילוי הבחירה בערך התא הפעיל.</td></tr><tr><td>Ctrl+A</td><td>בחירת הטבלה כולה.</td></tr><tr><td>Ctrl+Shift+V</td><td>הדבקה כשורות חדשות בסוף הטבלה.</td></tr><tr><td>Ctrl+Shift+PageDown,‏ Ctrl+Shift+PageUp</td><td>מעבר לטבלה הבאה או הקודמת.</td></tr><tr><td>Delete</td><td>ניקוי תא.</td></tr><tr><td>F2</td><td>פתיחת תא לעריכה.</td></tr><tr><td>Esc</td><td>ביטול עריכה.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>מקשי חצים</td><td>ניווט.</td></tr><tr><td>Tab,‏ Enter</td><td>סיום הזנה וניווט תא אחד הצידה / למטה.</td></tr><tr><td>Shift+Tab,‏ Shift+Enter</td><td>ניווט אחורה.</td></tr><tr><td>Shift+מקשי חצים</td><td>הרחבת הבחירה.</td></tr><tr><td>Ctrl+C</td><td>העתקת הבחירה.</td></tr><tr><td>Ctrl+D</td><td>מילוי הבחירה למטה משורתה העליונה.</td></tr><tr><td>Ctrl+Enter</td><td>מילוי הבחירה בערך התא הפעיל.</td></tr><tr><td>Ctrl+A</td><td>בחירת הטבלה כולה.</td></tr><tr><td>Ctrl+Shift+V</td><td>הדבקה כשורות חדשות בסוף הטבלה.</td></tr><tr><td>Ctrl+Shift+PageDown,‏ Ctrl+Shift+PageUp</td><td>מעבר ללשונית הבאה או הקודמת, בין אם טבלה ובין אם גרף.</td></tr><tr><td>Delete</td><td>ניקוי תא.</td></tr><tr><td>F2</td><td>פתיחת תא לעריכה.</td></tr><tr><td>Esc</td><td>ביטול עריכה.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2707,6 +2714,20 @@ $ec_lang['lpn_scenario_push_confirm']='להחיל על כל תרחיש את ער
 $ec_lang['lpn_scenario_push_scenarios']='תרחישים מושפעים:';
 $ec_lang['lpn_scenario_push_values']='ערכים שיימחקו:';
 $ec_lang['lpn_scenario_push_none']='לאף תרחיש אין ערך משלו עבור אחת מהתכונות האלה, כך שכלום לא ישתנה. שום דבר אינו נמחק.';
+$ec_lang['lpn_scenario_preset_flow_static']='1. מבחן ספיקה: סטטי';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='כיול מבחן ספיקה לרשת תכן בספיקה אפס. בתרחיש זה הגדירו את הדרישה בכל הצמתים ל-0.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. מבחן ספיקה: בינוני';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='כיול מבחן ספיקה לרשת תכן בספיקה הראשונה שדווחה. בתרחיש זה הגדירו את הדרישה בצומת הזורם לספיקה הראשונה שנמדדה, ואת הדרישה בכל שאר הצמתים ל-0.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. מבחן ספיקה: מרבי';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='כיול מבחן ספיקה לרשת תכן בספיקה המרבית שדווחה. בתרחיש זה הגדירו את הדרישה בצומת הזורם לספיקה המרבית שנמדדה, ואת הדרישה בכל שאר הצמתים ל-0.';
+$ec_lang['lpn_scenario_preset_average_day']='4. יום ממוצע';
+$ec_lang['lpn_scenario_preset_average_day_tip']='מכפיל דרישה 1: כל דרישה כפי שהוזנה, הנחשבת לדרישת יום ממוצע.';
+$ec_lang['lpn_scenario_preset_max_day']='5. יום מרבי';
+$ec_lang['lpn_scenario_preset_max_day_tip']='מכפיל דרישה 2.0 כפול יום ממוצע, ערך מציין מקום. רוב המערכות נמצאות בין 1.2 ל-3.0 (National Research Council, 2006). קבעו את הערך של המערכת שלכם בהגדרות, חישוב, הידראוליקה, מכפיל דרישה.';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. שעת שיא';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='מכפיל דרישה 3.0 כפול יום ממוצע, ערך מציין מקום. רוב המערכות נמצאות בין 3.0 ל-6.0 (National Research Council, 2006). קבעו את הערך של המערכת שלכם בהגדרות, חישוב, הידראוליקה, מכפיל דרישה.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. כיבוי אש בתוספת יום מרבי';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='דרישת יום מרבי (מכפיל 2.0). הריצו בתרחיש זה ניתוח ספיקת כיבוי אש: הוא מוסיף את ספיקת כיבוי האש בכל צומת על גבי דרישה זו.';
 $ec_lang['lpn_delete_drops_overrides']='מחיקת אלמנט זה מוחקת גם {n} ערכים שהתרחישים שלכם מחזיקים עבורו. להמשיך?';
 $ec_lang['lpn_push_base_only']='פעולה זו משנה את השרטוט עצמו, כך שניתן לבצע אותה רק ב-{base}. עברו ל-{base} ונסו שוב.';
 $ec_lang['lpn_field_active']='חלק מהרשת';
@@ -3680,10 +3701,10 @@ $ec_lang['lpn_ff_title']='ניתוח ספיקת כיבוי אש';
 $ec_lang['lpn_ff_intro']='מכל צומת בתורו מתבקש לשאוב ספיקת כיבוי אש בנוסף לדרישה שכבר יש לו. שום דבר בפרויקט שלכם אינו משתנה; כל ההרצה נעשית על עותק.';
 $ec_lang['lpn_ff_scope']='צמתים לבדיקה';
 $ec_lang['lpn_ff_scope_tip']='בחרו את הקבוצה לפני ההרצה. בדיקת כל צומת במערכת גדולה יכולה לקחת דקות.';
-$ec_lang['lpn_ff_scope_all']='כל צומת';
-$ec_lang['lpn_ff_scope_selected']='הצמתים הנבחרים';
+$ec_lang['lpn_ff_all']='כולם';
+$ec_lang['lpn_ff_selected']='הנבחרים';
 $ec_lang['lpn_ff_no_junctions']='לפרויקט זה אין עדיין צמתים, כך שאין מה לבדוק.';
-$ec_lang['lpn_ff_no_selection']='אין צומת נבחר. בחרו אחד על המפה, או בדקו כל צומת.';
+$ec_lang['lpn_ff_no_selection']='אין צמתים נבחרים. בחרו צמתים או בחרו באפשרות כולם.';
 $ec_lang['lpn_ff_skipped']='{n} האלמנטים הנבחרים אינם צמתים, כך שהם לא נבדקו.';
 $ec_lang['lpn_ff_required']='ספיקת כיבוי אש נדרשת';
 $ec_lang['lpn_ff_required_tip']='הספיקה שתקן הכיבוי או רשות הכיבוי שלכם דורשים בברז שריפה. כל צומת נבדק כנגד מספר זה, אלא אם יש לו ספיקת כיבוי אש נדרשת משלו.';
@@ -3693,10 +3714,7 @@ $ec_lang['lpn_ff_residual']='לחץ שארי לשמירה';
 $ec_lang['lpn_ff_residual_tip']='הלחץ שהצומת חייב עדיין להחזיק בעוד הוא מספק את ספיקת כיבוי האש. AWWA M31 ו-NFPA 291 משתמשים ב-20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='בדיקת תכן (השפעה על המערכת)';
 $ec_lang['lpn_ff_design_tip']='שאלה נפרדת מהאם הצומת יכול לספק את הספיקה: עם ספיקה זו נשאבת שם, האם משהו אחר יורד מתחת ללחץ המזערי שלו או חורג ממגבלת המהירות שלו? בחירה לבדוק זאת אינה עולה חישוב נוסף.';
-$ec_lang['lpn_ff_design_off']='אין לבדוק';
-$ec_lang['lpn_ff_design_all']='כל שאר הצמתים וכל הצינורות';
-$ec_lang['lpn_ff_design_selected']='הצמתים הנבחרים וצינוריהם';
-$ec_lang['lpn_ff_design_no_selection']='בדיקת התכן מוגדרת לצמתים הנבחרים, ואף אחד אינו נבחר. בחרו כמה במפה, או קבעו להכול.';
+$ec_lang['lpn_ff_design_no_selection']='בדיקת התכן מוגדרת לנבחרים, אך לא נבחרו אלמנטים. בחרו אלמנטים או בחרו באפשרות כולם.';
 $ec_lang['lpn_ff_minpressure']='הלחץ הנמוך ביותר המותר במקום אחר';
 $ec_lang['lpn_ff_minpressure_tip']='צומת שיורד מתחת לזה בעוד צומת אחר שואב את ספיקת כיבוי האש שלו מדווח כבעיית תכן.';
 $ec_lang['lpn_ff_maxvelocity']='המהירות הגבוהה ביותר המותרת';

@@ -1786,11 +1786,42 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_notes_3_term']?></dt><dd><?=$ec_lang['lpn_notes_3_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_5_term']?></dt><dd><?=$ec_lang['lpn_notes_5_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_4_term']?></dt><dd><?=$ec_lang['lpn_notes_4_def']?></dd>
-	<dt><?=$ec_lang['lpn_notes_6_term']?></dt><dd><?=$ec_lang['lpn_notes_6_def']?></dd>
-	<dt><?=$ec_lang['lpn_notes_7_term']?></dt><dd><?=$ec_lang['lpn_notes_7_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_color_term']?></dt><dd><?=$ec_lang['lpn_notes_color_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_epanet_term']?></dt><dd><?=$ec_lang['lpn_notes_epanet_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_engine_term']?></dt><dd><?=$ec_lang['lpn_notes_engine_def']?></dd>
+</dl>
+	</div>
+</div>
+
+<?php // ---- THE TABLES AND HOTKEYS BOX (ROADMAP Task 745) -------------------------------------------
+      //
+      // **MOVED HERE RATHER THAN DUPLICATED.** lpn_notes_6 (table columns help) and lpn_notes_7
+      // (table keyboard shortcuts) used to sit in the Notes list above; Tom, 2026-09-29, asked for
+      // one box gathering ALL table help and ALL keyboard shortcuts, divided by context, so they
+      // moved out of Notes rather than being shown twice. Neither key was deleted -- both still
+      // render here, and both are still real PHP-rendered markup, for the same reason the Notes
+      // list itself is: a search engine, print, and Find-in-page must still be able to see them.
+      //
+      // **Map is new content.** The digit tool keys, Undo and the zoom keys had tips of their own
+      // (toolTipWithKey(), lpn_zoom_in_tip, lpn_zoom_out_tip) but had never been gathered into one
+      // place a reader could scan. lpn_hotkeys_map_def states them once, in the same
+      // key-then-action table shape as lpn_notes_7_def.
+      //
+      // **SAME SHELL AS NOTES** (.lpn-setbox / .lpn-notesbox), wired by wireHotkeysBox() in
+      // js/looped-network.js: draggable, resizable, remembered per browser as `lpn_hotkeysbox`,
+      // dismissed only by its own X or an Escape pressed while focus is inside it. ?>
+<div id="lpn_hotkeys_popup" class="d-print-none lpn-popover lpn-setbox lpn-notesbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_hotkeys_title">
+	<div id="lpn_hotkeys_title" class="lpn-setbox-title"><?=$ec_lang['lpn_help_hotkeys']?></div>
+	<button type="button" id="lpn_hotkeys_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+<h2><?=$ec_lang['lpn_hotkeys_tables_heading']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_notes_6_term']?></dt><dd><?=$ec_lang['lpn_notes_6_def']?></dd>
+	<dt><?=$ec_lang['lpn_notes_7_term']?></dt><dd><?=$ec_lang['lpn_notes_7_def']?></dd>
+</dl>
+<h2><?=$ec_lang['lpn_hotkeys_map_heading']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_map_def']?></dd>
 </dl>
 	</div>
 </div>
@@ -2113,6 +2144,7 @@ EngCalcs.pageConfig = {
 	lpn_pane_text_attached: <?=json_encode($ec_lang['lpn_pane_text_attached'])?>,
 	lpn_pane_not_used: <?=json_encode($ec_lang['lpn_pane_not_used'])?>,
 	lpn_pane_filter_note: <?=json_encode($ec_lang['lpn_pane_filter_note'])?>,
+	lpn_pane_filter_stale: <?=json_encode($ec_lang['lpn_pane_filter_stale'])?>,
 	lpn_pane_filter_clear: <?=json_encode($ec_lang['lpn_pane_filter_clear'])?>,
 	lpn_pane_filter_none: <?=json_encode($ec_lang['lpn_pane_filter_none'])?>,
 	lpn_pane_goto_tip: <?=json_encode($ec_lang['lpn_pane_goto_tip'])?>,
@@ -2308,6 +2340,7 @@ EngCalcs.pageConfig = {
 	lpn_field_speed_pattern_tip: <?=json_encode($ec_lang['lpn_field_speed_pattern_tip'])?>,
 	lpn_help_fix: <?=json_encode($ec_lang['lpn_help_fix'])?>,
 	lpn_help_notes: <?=json_encode($ec_lang['lpn_help_notes'])?>,
+	lpn_help_hotkeys: <?=json_encode($ec_lang['lpn_help_hotkeys'])?>,
 <?php   // The suite's existing legal-link strings, needed here because this page's Help menu and
         // examples gallery carry them instead of a footer. Reused, never re-keyed: the wording must
         // match the identical links on every other page. ?>
@@ -2808,8 +2841,8 @@ EngCalcs.pageConfig = {
 	lpn_ff_intro: <?=json_encode($ec_lang['lpn_ff_intro'])?>,
 	lpn_ff_scope: <?=json_encode($ec_lang['lpn_ff_scope'])?>,
 	lpn_ff_scope_tip: <?=json_encode($ec_lang['lpn_ff_scope_tip'])?>,
-	lpn_ff_scope_all: <?=json_encode($ec_lang['lpn_ff_scope_all'])?>,
-	lpn_ff_scope_selected: <?=json_encode($ec_lang['lpn_ff_scope_selected'])?>,
+	lpn_ff_all: <?=json_encode($ec_lang['lpn_ff_all'])?>,
+	lpn_ff_selected: <?=json_encode($ec_lang['lpn_ff_selected'])?>,
 	lpn_ff_no_junctions: <?=json_encode($ec_lang['lpn_ff_no_junctions'])?>,
 	lpn_ff_no_selection: <?=json_encode($ec_lang['lpn_ff_no_selection'])?>,
 	lpn_ff_skipped: <?=json_encode($ec_lang['lpn_ff_skipped'])?>,
@@ -2821,9 +2854,6 @@ EngCalcs.pageConfig = {
 	lpn_ff_residual_tip: <?=json_encode($ec_lang['lpn_ff_residual_tip'])?>,
 	lpn_ff_design: <?=json_encode($ec_lang['lpn_ff_design'])?>,
 	lpn_ff_design_tip: <?=json_encode($ec_lang['lpn_ff_design_tip'])?>,
-	lpn_ff_design_off: <?=json_encode($ec_lang['lpn_ff_design_off'])?>,
-	lpn_ff_design_all: <?=json_encode($ec_lang['lpn_ff_design_all'])?>,
-	lpn_ff_design_selected: <?=json_encode($ec_lang['lpn_ff_design_selected'])?>,
 	lpn_ff_design_no_selection: <?=json_encode($ec_lang['lpn_ff_design_no_selection'])?>,
 	lpn_ff_minpressure: <?=json_encode($ec_lang['lpn_ff_minpressure'])?>,
 	lpn_ff_minpressure_tip: <?=json_encode($ec_lang['lpn_ff_minpressure_tip'])?>,
@@ -2916,6 +2946,7 @@ EngCalcs.pageConfig = {
 	lpn_msglog_empty: <?=json_encode($ec_lang['lpn_msglog_empty'])?>,
 	lpn_msglog_ago: <?=json_encode($ec_lang['lpn_msglog_ago'])?>,
 	lpn_msglog_note: <?=json_encode($ec_lang['lpn_msglog_note'])?>,
+	lpn_file_import_menu: <?=json_encode($ec_lang['lpn_file_import_menu'])?>,
 	lpn_file_import_inp: <?=json_encode($ec_lang['lpn_file_import_inp'])?>,
 	lpn_file_import_inp_tip: <?=json_encode($ec_lang['lpn_file_import_inp_tip'])?>,
 	lpn_inp_bad_file: <?=json_encode($ec_lang['lpn_inp_bad_file'])?>,
@@ -3183,6 +3214,21 @@ EngCalcs.pageConfig = {
 	lpn_scenario_push_scenarios: <?=json_encode($ec_lang['lpn_scenario_push_scenarios'])?>,
 	lpn_scenario_push_values: <?=json_encode($ec_lang['lpn_scenario_push_values'])?>,
 	lpn_scenario_push_none: <?=json_encode($ec_lang['lpn_scenario_push_none'])?>,
+<?php // Task 721: the ready-made scenarios' names and tips, read by key through LPN_PRESET_SCENARIOS. ?>
+	lpn_scenario_preset_flow_static: <?=json_encode($ec_lang['lpn_scenario_preset_flow_static'])?>,
+	lpn_scenario_preset_flow_static_tip: <?=json_encode($ec_lang['lpn_scenario_preset_flow_static_tip'])?>,
+	lpn_scenario_preset_flow_mid: <?=json_encode($ec_lang['lpn_scenario_preset_flow_mid'])?>,
+	lpn_scenario_preset_flow_mid_tip: <?=json_encode($ec_lang['lpn_scenario_preset_flow_mid_tip'])?>,
+	lpn_scenario_preset_flow_max: <?=json_encode($ec_lang['lpn_scenario_preset_flow_max'])?>,
+	lpn_scenario_preset_flow_max_tip: <?=json_encode($ec_lang['lpn_scenario_preset_flow_max_tip'])?>,
+	lpn_scenario_preset_average_day: <?=json_encode($ec_lang['lpn_scenario_preset_average_day'])?>,
+	lpn_scenario_preset_average_day_tip: <?=json_encode($ec_lang['lpn_scenario_preset_average_day_tip'])?>,
+	lpn_scenario_preset_max_day: <?=json_encode($ec_lang['lpn_scenario_preset_max_day'])?>,
+	lpn_scenario_preset_max_day_tip: <?=json_encode($ec_lang['lpn_scenario_preset_max_day_tip'])?>,
+	lpn_scenario_preset_peak_hour: <?=json_encode($ec_lang['lpn_scenario_preset_peak_hour'])?>,
+	lpn_scenario_preset_peak_hour_tip: <?=json_encode($ec_lang['lpn_scenario_preset_peak_hour_tip'])?>,
+	lpn_scenario_preset_fire_max_day: <?=json_encode($ec_lang['lpn_scenario_preset_fire_max_day'])?>,
+	lpn_scenario_preset_fire_max_day_tip: <?=json_encode($ec_lang['lpn_scenario_preset_fire_max_day_tip'])?>,
 	lpn_delete_drops_overrides: <?=json_encode($ec_lang['lpn_delete_drops_overrides'])?>,
 	lpn_push_base_only: <?=json_encode($ec_lang['lpn_push_base_only'])?>,
 	lpn_field_active: <?=json_encode($ec_lang['lpn_field_active'])?>,

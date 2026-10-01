@@ -80,7 +80,13 @@ function bodyOf(name) {
 // harness assertion rather than a comment, because a menu row is exactly the kind of thing a later
 // edit moves without noticing that its placement was a decision.
 section('0. the File menu is where it is reached from');
-ok('the File menu carries the row', /pickSurveyFile/.test(bodyOf('openFileMenu')));
+// **TASK 718 GATHERED THE THREE IMPORT ROWS INTO ONE SUBMENU** (2026-09-25: *"We have three import
+// items. It's probably time for an Import sub-menu."*), so the row now lives in importMenuRows(),
+// the fly-out's own row function, rather than loose in openFileMenu() itself. openFileMenu() still
+// carries the DOOR to it (the "Import…" row whose submenu is importMenuRows), asserted below.
+ok('the File menu carries the row', /pickSurveyFile/.test(bodyOf('importMenuRows')));
+ok('...and the File menu opens the submenu that holds it',
+	/submenu: importMenuRows/.test(bodyOf('openFileMenu')));
 ok('...and no other menu does, the Settings panel that used to hold it included',
 	['openEditMenu', 'mapMenuRows', 'openHelpMenu', 'rebuildSettingsFields']
 		.every(n => !/pickSurveyFile/.test(bodyOf(n))));

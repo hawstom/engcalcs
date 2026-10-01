@@ -1,9 +1,16 @@
-// THE FIRE-FLOW DESIGN CHECK IS NONE, ALL, OR SELECTED -- ROADMAP Task 742. Tom, 2026-09-28:
-// *"What would Mary and Sue think about changing the Fire flow analysis design check selector to
-// offer None, All, and Selected?"* then *"Selection set build: Yes."* Run with:
+// THE FIRE-FLOW DESIGN CHECK'S SCOPE IS ONE SELECTOR: NONE, ALL, OR SELECTED -- ROADMAP Task 742
+// and Task 746. Tom, 2026-09-28: *"What would Mary and Sue think about changing the Fire flow
+// analysis design check selector to offer None, All, and Selected?"* then *"Selection set build:
+// Yes."* Briefly split 2026-09-29-echo (Task 746) into a checkbox plus a two-way scope selector;
+// Tom, 2026-09-30: *"Replace Design check toggle with a third option 'None All Selected'."* --
+// back to one selector, now in his own shorter words (None/All/Selected) rather than Task 742's
+// "Do not check" / "All other junctions and all pipes" / "The selected junctions and their pipes".
+// `ask.design` carries the internal 'off'/'all'/'selected' string, unchanged since Task 742. Run
+// with:
 //   node dev/lpn-spike/fireflow-design-scope-harness.js
 //
-// 1. The selector offers exactly off / all / selected; the retired 'nodes' reads as All.
+// 1. The design check is one selector offering exactly None, All, Selected, in the page's own
+//    words; the retired 'nodes' (and any unknown value) still reads as All.
 // 2. Selected means the junctions selected on the map, the pipes that meet them, and any pipe
 //    selected on its own -- and a real sweep reports effects ONLY inside that set.
 // 3. Selected with nothing selected refuses out loud rather than silently checking nothing.
@@ -72,18 +79,30 @@ function links(el) {
 }
 function click(b) { ((b._listeners && b._listeners.click) || []).forEach((f) => f({})); }
 
-function selectOptions(el) {
-	let found = null;
+// A `.lpn-ff-row`'s label text and its control, the same shape buildFireFlowControls() builds
+// every row from -- so a UI-shape check reads the real DOM rather than trusting a comment.
+function ffFormRows(el) {
+	const out = [];
 	(function walk(x) {
-		if (!x || found) { return; }
-		if (isTag(x, 'select')) {
-			const vals = kids(x).map((o) => o.value);
-			if (vals.indexOf('selected') >= 0 && vals.indexOf('off') >= 0) { found = kids(x).map((o) => [o.value, o.textContent]); return; }
+		if (!x) { return; }
+		const cls = String((x.className || x['class'] || '')).split(/\s+/);
+		if (cls.indexOf('lpn-ff-row') >= 0) {
+			const c = kids(x);
+			out.push({ label: c[0] ? c[0].textContent : '', control: c[1] });
+			return;
 		}
 		kids(x).forEach(walk);
 	})(el);
-	return found;
+	return out;
 }
+function ffRowFor(el, labelText) {
+	const row = ffFormRows(el).filter((r) => r.label === labelText)[0];
+	return row ? row.control : null;
+}
+function selectOptions(sel) {
+	return sel ? kids(sel).map((o) => [o.value, o.textContent]) : null;
+}
+function fire(el) { ((el && el._listeners && el._listeners.change) || []).forEach((f) => f({})); }
 
 (async function () {
 	setUnitSet('us');
@@ -94,11 +113,31 @@ function selectOptions(el) {
 	L.openFireFlowBox();
 
 	console.log('--- 1. the selector ---');
-	const opts = selectOptions(byId.lpn_ff_controls);
-	ok('the design check offers exactly None, All, Selected', !!opts && opts.map((o) => o[0]).join() === 'off,all,selected', JSON.stringify(opts));
-	ok('...in the page\'s own words', !!opts && opts[0][1] === PC.lpn_ff_design_off && opts[1][1] === PC.lpn_ff_design_all &&
-		opts[2][1] === PC.lpn_ff_design_selected, JSON.stringify(opts));
-	ok('the retired "nodes" reads as All', L.designScope('nodes') === 'all');
+	const testScope = ffRowFor(byId.lpn_ff_controls, PC.lpn_ff_scope);
+	const testOpts = selectOptions(testScope);
+	ok('(a) junctions to test offers exactly All, Selected, in the page\'s own words',
+		!!testOpts && testOpts[0][0] === 'all' && testOpts[0][1] === PC.lpn_ff_all &&
+		testOpts[1][0] === 'selected' && testOpts[1][1] === PC.lpn_ff_selected, JSON.stringify(testOpts));
+
+	const designScope = ffRowFor(byId.lpn_ff_controls, PC.lpn_ff_design);
+	const designOpts = selectOptions(designScope);
+	ok('(b) the design check offers exactly None, All, Selected, in the page\'s own words',
+		!!designOpts && designOpts[0][0] === 'off' && designOpts[0][1] === PC.lpn_source_type_none &&
+		designOpts[1][0] === 'all' && designOpts[1][1] === PC.lpn_ff_all &&
+		designOpts[2][0] === 'selected' && designOpts[2][1] === PC.lpn_ff_selected, JSON.stringify(designOpts));
+	ok('All by default, since the default ask.design is All', designScope.value === 'all');
+
+	L.setAsk('required', '3000');
+	designScope.value = 'off';
+	fire(designScope);
+	await L.runFireFlowSweep();
+	ok('choosing None turns the design check off for a real run', L.run().design === null);
+	designScope.value = 'all';
+	fire(designScope);
+	await L.runFireFlowSweep();
+	ok('choosing it back on brings the design check back', L.run().design !== null);
+
+	ok('the retired "nodes" still reads as All', L.designScope('nodes') === 'all');
 	ok('an unknown value never means "do not check"', L.designScope(undefined) === 'all' && L.designScope('xyz') === 'all');
 	ok('off and selected are themselves', L.designScope('off') === 'off' && L.designScope('selected') === 'selected');
 
