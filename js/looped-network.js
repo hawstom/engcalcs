@@ -57726,6 +57726,7 @@ var EngCalcs = EngCalcs || {};
 		body = ffTable(host, [pc.lpn_scenario_label || 'Scenario'].concat(LPN_ALT_CATEGORIES.map(altCategoryLabel),
 			[[pc.bpn_demand_mult || 'Demand multiplier', pc.lpn_settings_demand_multiplier_tip]]));
 		markLastHeading(body, 'lpn-alt-calcopt');
+		body.parentNode.className += ' lpn-alt-table';
 		scenariosForDisplay().forEach(function (s) {
 			var tr = ffEl('tr', null, null, body), alts = alternativesOf(s);
 			ffCell(tr, scenarioDisplayName(s));

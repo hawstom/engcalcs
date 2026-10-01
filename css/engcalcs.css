@@ -4128,7 +4128,21 @@ html:has(#lpn_canvas) { overflow: hidden; }
    headings wrap mid-word rather than widening, and only the id and the two sentence-shaped cells
    are allowed to grow. */
 .lpn-ff-table th { font-weight: bold; white-space: normal; }
-.lpn-ff-table th, .lpn-ff-table td { text-align: left; padding: .15em .4em; border-bottom: 1px solid #ddd; overflow-wrap: anywhere; }
+/* The global `table, th, tr, td { border: 1px solid blue }` (top of this file) is the calculator
+   forms' debugging grid; these tables want a hairline under each row and nothing else. */
+.lpn-ff-table, .lpn-ff-table tr { border: 0; }
+.lpn-ff-table th, .lpn-ff-table td { text-align: left; padding: .15em .4em; border: 0; border-bottom: 1px solid #ddd; overflow-wrap: anywhere; }
+.lpn-ff-table th { overflow-wrap: normal; }
+/* THE ALTERNATIVES PREVIEW (Tom, 2026-10-01: *"Alternatives columns are crazy."*): `anywhere` above
+   shrinks every column's minimum to one character, so auto layout shared the width evenly and broke
+   words ("Scen|ario", cell "Bas|e") beside unused padding. Here a column is exactly as wide as its
+   longest heading word or its cell, and a table that cannot fit scrolls inside .lpn-ff-tablewrap.
+   `width: 1%` on a heading makes the column take its minimum, which is what nowrap cells set. */
+.lpn-ff-table.lpn-alt-table { width: auto; }
+.lpn-alt-table th { width: 1%; vertical-align: bottom; }
+.lpn-alt-table td { white-space: nowrap; overflow-wrap: normal; }
+.lpn-alt-table th.lpn-ff-sortable { padding-inline-end: .4em; }
+.lpn-alt-table .lpn-ff-sortarrow { display: none; }
 /* The same three states as the rings, as a quiet tint on the row rather than as text colour: the
    verdict is already spelled out in the Result column, so this is a second channel and not the
    only one. */
