@@ -35764,7 +35764,7 @@ var EngCalcs = EngCalcs || {};
 		if (!(project && project.docId === fresh)) { return; }   // it did not land (storage full)
 		var entry = indexEntry(library.openId);
 		if (entry) { entry.savedSig = ''; entry.dirty = true; saveIndex(); renderTabs(); }
-		setNotice((pc.lpn_copy_opened || 'Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.')
+		setNotice((pc.lpn_copy_opened || 'Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.')
 			.replace('{file}', (handle && handle.name) || projectDisplayName(project)));
 	}
 	// Opening a file this browser already has open: come forward, and take the connection with you.

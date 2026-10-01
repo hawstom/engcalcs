@@ -2153,7 +2153,7 @@ $ec_lang['lpn_copy_copy']='A copy; make new lock';
 // What "Original" does when the file's id is already open in a tab here with a different file:
 // switch to the tab, without changing the tab's file.
 $ec_lang['lpn_copy_kept_link']='Opened {name} as the original, moved to a new place. Save now writes to this file.';
-$ec_lang['lpn_copy_opened']='Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.';
+$ec_lang['lpn_copy_opened']='Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.';
 // The other end of the back channel, shown to the holder.
 $ec_lang['lpn_lock_requested']='{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over.';
 $ec_lang['lpn_ago_seconds']='{n} seconds';
