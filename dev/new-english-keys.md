@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 2153 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read on master**, of 2 untranslated keys, of 2155 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,13 +25,20 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-None on master. Every English key here is present in at least one other language.
+## lpn_  (2, 2 to read @@ NEEDS RULING)
+
+- **`lpn_graphs_menu`**
+  > Graphs
+  @@ NEEDS RULING
+- **`lpn_graphs_menu_tip`**
+  > Graphs of the network: the profile along a route, a property against time, and the distribution of a property.
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**8 still to read**, of 53 new keys across 11 unmerged branch(es).
+**60 still to read**, of 129 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -42,9 +49,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/sprint-0930-golf (`78b3cae4`) — adds no English strings
-
-### feat/bentley-interop (`ee19f373`) — 13 new, 4 to read @@ NEEDS RULING
+### feat/bentley-interop (`5b8f7cee`) — 13 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -68,14 +73,14 @@ build for that would be a gate nobody keeps. Refresh it with
   > Text
   _Ruled OK 2026-10-01._
 - **`lpn_alt_cat_topology`**
-  > Active topology
-  @@ NEEDS RULING
+  > Asset activation
+  _Ruled OK 2026-10-01._
 - **`lpn_alt_cat_userdata`**
   > Custom properties
   _Ruled OK 2026-10-01._
 - **`lpn_alt_note`**
-  > Read only. Base uses the Base alternative of every category. A scenario gets its own alternative in a category, a child of the Base one, once it holds a value of its own there. The number is how many values it holds.
-  @@ NEEDS RULING
+  > Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.
+  _Ruled OK 2026-10-01._
 - **`lpn_alt_title`**
   > Alternatives preview
   @@ NEEDS RULING
@@ -83,35 +88,17 @@ build for that would be a gate nobody keeps. Refresh it with
   > Basic mode
   _Ruled OK 2026-10-01._
 - **`lpn_scenario_basic_tip`**
-  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives table, which shows how those values are grouped by category.
+  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
+  _Ruled OK 2026-10-01._
+
+### feat/criticality (`bfb5bdbf`) — 31 new, 8 to read @@ NEEDS RULING
+
+- **`lpn_analyze_menu`**
+  > Analyze
   @@ NEEDS RULING
-
-### feat/copy-lock (`15288fa8`) — 7 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_copy_body`**
-  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_body_nodate`**
-  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_copy`**
-  > A copy; make new lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_kept_link`**
-  > Switched to {name}. It stays connected to the file it was opened from, {file}, and Save writes there, not to the file you just chose.
+- **`lpn_analyze_menu_tip`**
+  > Analyses that run the network many times over on a copy: fire flow at each junction, and the loss of each pipe, pump, and valve.
   @@ NEEDS RULING
-- **`lpn_copy_opened`**
-  > Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_original`**
-  > Original; keep same lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_title`**
-  > Mark file as new copy?
-  _Ruled OK 2026-10-01._
-
-### feat/criticality (`77bfe930`) — 26 new, 3 to read @@ NEEDS RULING
-
 - **`lpn_crit_baseline_below`**
   > Junctions already below it with nothing broken: {n}. They are not counted.
   _Ruled OK 2026-10-01._
@@ -190,6 +177,257 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_crit_working`**
   > Working: {done} of {total} assets.
   _Ruled OK 2026-10-01._
+- **`lpn_ff_design_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_ff_design_off`**
+  > None
+  @@ NEEDS RULING
+- **`lpn_ff_design_selected`**
+  > Selected
+  @@ NEEDS RULING
+
+### feat/demand-scaling (`79eb4032`) — 71 new, 48 to read @@ NEEDS RULING
+
+- **`lpn_analyze_menu`**
+  > Analyze
+  @@ NEEDS RULING
+- **`lpn_analyze_menu_tip`**
+  > Analyses that run the network on a copy: fire flow at each junction, the loss of each pipe, pump, and valve, and the demands scaled up or down.
+  @@ NEEDS RULING
+- **`lpn_crit_baseline_below`**
+  > Junctions already below it with nothing broken: {n}. They are not counted.
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_busy`**
+  > Another analysis is running. Stop it, or wait for it to finish.
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_col_asset`**
+  > Asset
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_col_below`**
+  > Junctions below minimum
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_col_cutoff`**
+  > Junctions cut off
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_col_unserved`**
+  > Demand not served
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_intro`**
+  > Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in your project is changed; the whole run is made on a copy.
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_menu`**
+  > Criticality analysis…
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_menu_tip`**
+  > Take each pipe, pump, and valve out of the network in turn and see what the system loses.
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_minpressure`**
+  > Lowest pressure allowed
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_minpressure_tip`**
+  > This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_no_links`**
+  > This project has no links yet, so there is nothing to break.
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_no_selection`**
+  > No pipe, pump, or valve is selected. Choose one on the map, or break every link.
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_scope`**
+  > Links to break
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_scope_all`**
+  > Every link
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_scope_selected`**
+  > The selected links
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_scope_tip`**
+  > Every pipe, pump, and valve, or only the ones selected on the map. Choose the set before you run.
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_skipdead`**
+  > Skip dead ends
+  @@ NEEDS RULING
+- **`lpn_crit_skipdead_tip`**
+  > A dead-end link is one whose removal cuts off junctions that can be reached only through it, with no reservoir or tank beyond. Its loss is everything beyond it, so it is not solved. The summary says how many were skipped.
+  @@ NEEDS RULING
+- **`lpn_crit_skipped`**
+  > {n} selected elements are not links, so they were not broken.
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_skipped_dead`**
+  > Dead-end links skipped: {n}. Each one cuts off everything beyond it.
+  @@ NEEDS RULING
+- **`lpn_crit_stale`**
+  > The drawing changed, so the criticality results were cleared. Run it again.
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_stopped`**
+  > Stopped after {done} of {total} assets. The results below are the ones already finished.
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_summary`**
+  > {n} of {total} assets leave demand unserved or drop a junction below {pressure}.
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_title`**
+  > Criticality analysis
+  _Ruled OK 2026-10-01._
+- **`lpn_crit_working`**
+  > Working: {done} of {total} assets.
+  _Ruled OK 2026-10-01._
+- **`lpn_ds_bad_multiplier`**
+  > Type a demand scale of zero or more, such as 1.5.
+  @@ NEEDS RULING
+- **`lpn_ds_below_zero`**
+  > ⚠ At least one junction is below {pressure} even with the scaled demands at zero.
+  @@ NEEDS RULING
+- **`lpn_ds_col_link`**
+  > Link
+  @@ NEEDS RULING
+- **`lpn_ds_col_scaled`**
+  > Scaled
+  @@ NEEDS RULING
+- **`lpn_ds_col_scaled_tip`**
+  > With the demands multiplied by the demand scale.
+  @@ NEEDS RULING
+- **`lpn_ds_col_unscaled`**
+  > Unscaled
+  @@ NEEDS RULING
+- **`lpn_ds_col_unscaled_tip`**
+  > With the demands as they are in the active scenario at this time step, the same value the map shows.
+  @@ NEEDS RULING
+- **`lpn_ds_eps_note`**
+  > Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.
+  @@ NEEDS RULING
+- **`lpn_ds_find`**
+  > Find
+  @@ NEEDS RULING
+- **`lpn_ds_found`**
+  > ✓ Every junction keeps {pressure} up to {m} times the demands.
+  @@ NEEDS RULING
+- **`lpn_ds_found_below`**
+  > ⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to {m} times the demands.
+  @@ NEEDS RULING
+- **`lpn_ds_head_lowest`**
+  > Lowest pressures
+  @@ NEEDS RULING
+- **`lpn_ds_head_scale`**
+  > Scale the demands
+  @@ NEEDS RULING
+- **`lpn_ds_head_search`**
+  > What demand scale can the system handle?
+  @@ NEEDS RULING
+- **`lpn_ds_head_velocity`**
+  > Highest velocities
+  @@ NEEDS RULING
+- **`lpn_ds_holds_max`**
+  > ✓ Every junction keeps {pressure} up to {max} times the demands, the top of the search.
+  @@ NEEDS RULING
+- **`lpn_ds_intro`**
+  > The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.
+  @@ NEEDS RULING
+- **`lpn_ds_lowest_at`**
+  > At {m} times the demands, the lowest pressure is {pressure}, at junction {id}.
+  @@ NEEDS RULING
+- **`lpn_ds_menu`**
+  > Demand scaling…
+  @@ NEEDS RULING
+- **`lpn_ds_menu_tip`**
+  > Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.
+  @@ NEEDS RULING
+- **`lpn_ds_minpressure`**
+  > Lowest pressure allowed
+  @@ NEEDS RULING
+- **`lpn_ds_minpressure_tip`**
+  > This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.
+  @@ NEEDS RULING
+- **`lpn_ds_multiplier`**
+  > Demand scale
+  @@ NEEDS RULING
+- **`lpn_ds_multiplier_tip`**
+  > The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.
+  @@ NEEDS RULING
+- **`lpn_ds_no_junctions`**
+  > This project has no junctions yet, so there are no demands to scale.
+  @@ NEEDS RULING
+- **`lpn_ds_no_selection`**
+  > No junctions are selected. Select junctions, or scale all of them.
+  @@ NEEDS RULING
+- **`lpn_ds_nosolve_at`**
+  > At {m} times the demands, the network gave no answer. {reason}
+  @@ NEEDS RULING
+- **`lpn_ds_run`**
+  > Run
+  @@ NEEDS RULING
+- **`lpn_ds_scale_below`**
+  > ⚠ At {m} times the demands, {n} junctions fall below {pressure}.
+  @@ NEEDS RULING
+- **`lpn_ds_scale_ok`**
+  > ✓ At {m} times the demands, every junction keeps {pressure}.
+  @@ NEEDS RULING
+- **`lpn_ds_scaled_selected`**
+  > Only the demands of the {n} selected junctions were scaled.
+  @@ NEEDS RULING
+- **`lpn_ds_scope`**
+  > Demands to scale
+  @@ NEEDS RULING
+- **`lpn_ds_scope_all`**
+  > All junctions
+  @@ NEEDS RULING
+- **`lpn_ds_scope_selected`**
+  > Selected junctions
+  @@ NEEDS RULING
+- **`lpn_ds_scope_tip`**
+  > Scale the demand of every junction, or only of the junctions selected on the map. Pressures are checked at every junction either way.
+  @@ NEEDS RULING
+- **`lpn_ds_search_note`**
+  > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which every junction keeps the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.
+  @@ NEEDS RULING
+- **`lpn_ds_search_stopped`**
+  > The search was stopped before it found an answer.
+  @@ NEEDS RULING
+- **`lpn_ds_skipped`**
+  > {n} selected elements are not junctions, so they were left as they are.
+  @@ NEEDS RULING
+- **`lpn_ds_stale`**
+  > The drawing changed, so the demand scaling results were cleared. Run it again.
+  @@ NEEDS RULING
+- **`lpn_ds_title`**
+  > Demand scaling
+  @@ NEEDS RULING
+- **`lpn_ff_design_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_ff_design_off`**
+  > None
+  @@ NEEDS RULING
+- **`lpn_ff_design_selected`**
+  > Selected
+  @@ NEEDS RULING
+
+### feat/desktop (`a7cbb6eb`) — 7 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_copy_body`**
+  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_body_nodate`**
+  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_copy`**
+  > A copy; make new lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_kept_link`**
+  > Opened {name} as the original, moved to a new place. Save now writes to this file.
+  @@ NEEDS RULING
+- **`lpn_copy_opened`**
+  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  @@ NEEDS RULING
+- **`lpn_copy_original`**
+  > Original; keep same lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_title`**
+  > Mark file as new copy?
+  _Ruled OK 2026-10-01._
+
+### feat/graph-menu (`0a8db639`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -213,14 +451,14 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/property-graph (`0bd3179b`) — 4 new, all ruled
+### feat/property-graph (`2628538a`) — 4 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_pgraph_head_gain`**
   > Head gain
   _Ruled OK 2026-10-01._
 - **`lpn_pgraph_head_gain_tip`**
-  > The pump's head gain from suction to discharge, plotted positive. EPANET reports it as a negative head loss, as do the Tables and the map label.
-  _Ruled OK 2026-10-01._
+  > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
+  @@ NEEDS RULING
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.
   _Ruled OK 2026-10-01._
