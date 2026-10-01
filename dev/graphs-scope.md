@@ -9,6 +9,10 @@ priorities. Nothing here is built.
 **A `Graphs` submenu in the Water menu**, holding five rows: Time series, Profile, Contour,
 Frequency, System flow balance.
 
+**Built (2026-10-01): the fly-out holds Profile, Time series, Frequency, in that order, replacing
+the Water menu's own Profile row.** Contour and System flow balance get rows when they are built;
+no placeholders. Harness: `dev/lpn-spike/graphs-menu-harness.js`.
+
 **Every graph opens in the BOTTOM PANE as a tab**, exactly as Profile already does -- except
 Contour, which is not a chart at all but a map LAYER, turned on and off under `Settings > Map and
 page > Layers` (Task 639).

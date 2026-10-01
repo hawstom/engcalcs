@@ -38536,9 +38536,28 @@ var EngCalcs = EngCalcs || {};
 			// in the bottom pane, so this opens the pane on that tab -- open, never toggle: a menu
 			// row that names a view shows it. The icon is the one drawn for it in
 			// lib/Icons.lib.php, a jagged ground line closed down to a datum.
+			// **PROFILE NOW HANGS UNDER GRAPHS** (Tom, 2026-10-01: *"Replace Profile with Graphs
+			// flyout containing Profile, Time series, Frequency."*, Task 640). Each row opens its
+			// bottom-pane tab, as the Profile row did. Contour and System flow are not built, so
+			// there are no placeholder rows.
 			{
-				icon: 'profile', label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
-				fn: function () { closeMenu(); openPane('profile'); }
+				icon: 'profile', label: pc.lpn_graphs_menu || 'Graphs', tip: pc.lpn_graphs_menu_tip,
+				submenu: function () {
+					return [
+						{
+							icon: 'profile', label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
+							fn: function () { closeMenu(); openPane('profile'); }
+						},
+						{
+							label: pc.lpn_ts_menu || 'Time series', tip: pc.lpn_ts_tip,
+							fn: function () { closeMenu(); openPane('timeseries'); }
+						},
+						{
+							label: pc.lpn_freq_menu || 'Frequency', tip: pc.lpn_freq_tip,
+							fn: function () { closeMenu(); openPane('frequency'); }
+						}
+					];
+				}
 			},
 			// **THE FIRST TABLE, NOT THE PROFILE TAB.** paneTables()[0] rather than a literal
 			// 'junctions', so this row cannot drift from the strip it opens; and the pane's own
@@ -39802,7 +39821,7 @@ var EngCalcs = EngCalcs || {};
 		// button existed because the tables were *"a gap barely discoverable with the bottom pane
 		// button"* (Tom, 2026-08-21) -- the toggle reports whether the pane is open, it does not
 		// name what is inside. That is still true, and he has now weighed it against a toolbar slot
-		// and chosen the slot. The menu rows (Water > Profile, Water > Tables) are unchanged and are
+		// and chosen the slot. The menu rows (Water > Graphs > Profile, Water > Tables) are unchanged and are
 		// the discoverable door; nothing about either feature moved.
 		//
 		// **THE STRIP NO LONGER MIRRORS THE PROJECT MENU, and that is a deliberate loss.** The
