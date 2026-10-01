@@ -651,3 +651,11 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|742| CLOSED 2026-09-29 with feat/selection-set (merged on Tom's "Done. Close, merge, and delete branch"): the fire-flow design check offers None, All, or Selected junctions.
 - 0|744| CLOSED 2026-09-30 with feat/pane-height (merged on Tom's word): the bottom pane can shrink the map to a 32 px strip.
 - 0|699| CLOSED 2026-09-30 with chore/key-merge (Tom: 'Merge the listed groups and do the Find redesign'): 31 keys retired; withdrawals in dev/key-duplication-audit-2026-09-30.md.
+- 0|745| CLOSED 2026-10-01 (Tom: "Done"), merged with feat/help-menu: Help menu in three groups, and a Tables and Hotkeys box.
+- 0|750| CLOSED 2026-10-01 (Tom: "Done"), merged with feat/scenario-preset: ready-made scenarios in every new project.
+- 0|718| CLOSED 2026-10-01, merged with feat/help-menu on Tom's word: File menu Recents above Close, and an Import submenu.
+- 0|738| CLOSED 2026-10-01, merged with feat/find-filter on Tom's word: edited rows stay in a Find filter, dimmed and counted.
+- 0|743| CLOSED 2026-10-01, merged with feat/graph-tab-keys on Tom's word: Ctrl+Shift+PageDown reaches the graph tabs.
+- 0|746| CLOSED 2026-10-01, merged with feat/fireflow-scope on Tom's word: one All/Selected choice for each fire flow scope.
+- 0|753| CLOSED 2026-10-01 (Tom: "I am not sure there is a task here. Delete the task?"): "Asset activation" names the Alternatives column; the Properties checkbox keeps "Part of this network".
+- 0|690| CLOSED 2026-10-01: everything named under it shipped; its last child, Task 743 (graph tabs), merged on Tom's word.

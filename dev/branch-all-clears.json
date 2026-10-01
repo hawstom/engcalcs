@@ -331,6 +331,13 @@
             "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
             "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
             "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
+        },
+        "feat/copy-lock": {
+            "head": "5341221933a347f1a456dfdc1e63d2a396b5f7d8",
+            "date": "2026-10-01",
+            "words": "Merge after wording",
+            "context": "His selection in an AskUserQuestion typed in the session, to: 'once I swap in your wording (\"Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.\"), may I merge it without another browser pass?' His paste the same day: \"8146 copy-lock: Wording change per this. This is good.\"",
+            "pin_note": "Pinned to the commit carrying his sentence and its ruling record; master was merged in just before."
         }
     }
 }
