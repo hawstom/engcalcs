@@ -1796,7 +1796,7 @@ $ec_lang['lpn_pgraph_none']='This asset has no results in the current run.';
 // popover and the colour legend -- where naming the trace node in every heading would be clutter.
 $ec_lang['lpn_pgraph_source_share_from']='Source share from {node}';
 $ec_lang['lpn_pgraph_head_gain']='Head gain';
-$ec_lang['lpn_pgraph_head_gain_tip']='The pump\'s head gain from suction to discharge, plotted positive. EPANET reports it as a negative head loss, as do the Tables and the map label.';
+$ec_lang['lpn_pgraph_head_gain_tip']='The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.';
 $ec_lang['lpn_ts_add']='Add selected';
 $ec_lang['lpn_ts_add_tip']='Put everything now chosen on the map onto the graph.';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
