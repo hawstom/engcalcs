@@ -171,7 +171,7 @@ async function until(pred, ms) {
 		check(optionTexts().indexOf('Head loss') < 0, 'and the pump offers no "Head loss"');
 		choose('headloss');
 		check(chartText().indexOf('Head gain (') >= 0, 'the y axis is named Head gain with its unit');
-		check(String(sel()['data-bs-original-title'] || sel().title).indexOf('negative head loss') >= 0, 'and the selector carries the tip');
+		check(String(sel()['data-bs-original-title'] || sel().title).indexOf(PC.lpn_pgraph_head_gain_tip) >= 0, 'and the selector carries the tip');
 		const got = titles().map(lastNum);
 		const wantv = frames.map((f) => -f.headlosses[pump] * ftPerM);
 		check(got.length === frames.length && got.length > 0, `one dot per step: ${got.length}`);
