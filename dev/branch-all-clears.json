@@ -275,6 +275,27 @@
             "date": "2026-09-29",
             "words": "Done. Close, merge, and delete branch",
             "context": "His message of 2026-09-29, one line per branch: 8134 fix/tables-legend, 8135 feat/selection-set, 8124 feat/table-width, 8131 feat/fill-handle, each 'Done. Close, merge, and delete branch', then 'Let me know when master is ready with all these so I can make a table-editing video.' Pinned to 001893a9, the branch after fix/table-paste's final commits were merged in (Text/Customer paste he confirmed: 'Text paste works now.')."
+        },
+        "feat/table-tab-keys": {
+            "head": "f61e6538",
+            "date": "2026-09-30",
+            "words": "feat/table-tab-keys, feat/frequency-plot, feat/pane-height",
+            "context": "His pasted list of 2026-09-30 said 'Done. Close, merge, and delete branch.' for feat/table-tab-keys, feat/frequency-plot and feat/pane-height; because a pasted all-clear cannot be recorded, CC asked in the session which of the three may merge now, and he selected all three.",
+            "pin_note": "Pinned one commit past what he tested: CC's merge of master into the branch (no feature change; frequency-plot's two generated-file conflicts taken from master's side). Its new English is translated on a separate sprint branch after the merge."
+        },
+        "feat/frequency-plot": {
+            "head": "cfac3895",
+            "date": "2026-09-30",
+            "words": "feat/table-tab-keys, feat/frequency-plot, feat/pane-height",
+            "context": "His pasted list of 2026-09-30 said 'Done. Close, merge, and delete branch.' for feat/table-tab-keys, feat/frequency-plot and feat/pane-height; because a pasted all-clear cannot be recorded, CC asked in the session which of the three may merge now, and he selected all three.",
+            "pin_note": "Pinned one commit past what he tested: CC's merge of master into the branch (no feature change; frequency-plot's two generated-file conflicts taken from master's side). Its new English is translated on a separate sprint branch after the merge."
+        },
+        "feat/pane-height": {
+            "head": "7913c548",
+            "date": "2026-09-30",
+            "words": "feat/table-tab-keys, feat/frequency-plot, feat/pane-height",
+            "context": "His pasted list of 2026-09-30 said 'Done. Close, merge, and delete branch.' for feat/table-tab-keys, feat/frequency-plot and feat/pane-height; because a pasted all-clear cannot be recorded, CC asked in the session which of the three may merge now, and he selected all three.",
+            "pin_note": "Pinned one commit past what he tested: CC's merge of master into the branch (no feature change; frequency-plot's two generated-file conflicts taken from master's side). Its new English is translated on a separate sprint branch after the merge."
         }
     }
 }

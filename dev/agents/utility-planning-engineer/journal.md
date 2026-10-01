@@ -2761,3 +2761,127 @@ velocity by making them an easy 'A.'" I read the control and its consumer before
   either.
 
 — Sue
+
+
+## 2026-09-30 -- a connected Google Sheet for scenarios (Task 721)
+
+2026-09-30. Tom asked (via Task 721 context) whether a "connected" Google Sheet with Sync In/Sync
+Out could replace the scenario/alternatives UI in the Looped Network calculator (`js/looped-network.js`,
+scenario functions `defaultScenarios`, `pushBaseToScenarios`, `activeScenario`, etc., and
+`dev/scripts/scenario_seam_check.php` guarding the write seam).
+
+**OBSERVED, `js/looped-network.js:4578-4842`**: scenarios here are already exactly the layered
+"Base + overrides" model Tom likes from HEC-RAS (Task 721, `dev/ROADMAP.md:1056-1060`) — an
+`overrides` object keyed per element/property, a `pushBaseToScenarios()` to collapse a scenario back
+onto Base, and `scenario_seam_check.php` enforcing that every write to an overridable property goes
+through one seam. This is a single-property-override model, not a named-alternative-category model.
+
+**CITED — WaterGEMS's shape is close but not identical.** Bentley's OpenFlows WaterGEMS documentation
+(`docs.bentley.com/.../GUID-825363E7E6714C02AB0B5D757991063C.html`, fetched via search 2026-09-30):
+"An alternative holds a family of related attributes... Physical, Demand, Topology and Operational
+[alternatives] are key categories," and "Scenarios in WaterGEMS are a compilation of alternatives and
+calculation options." That is: WaterGEMS scenarios compose named, reusable *alternative* objects (a
+demand alternative, a physical alternative) rather than a flat per-property override diff. EngCalcs'
+model is simpler (fewer moving parts, easier to explain to Tom's "new user") but cannot let a planner
+reuse "2050 buildout demands" as one object shared across five different pipe-replacement scenarios —
+every scenario in EngCalcs carries its own full override set. Worth naming to Tom as the one real gap
+between what he has and what Bentley ships, independent of the Sheets question.
+
+**CITED — real CIP scenario counts are small.** Lawrence, KS presented "seven Capital Improvement
+Plans... based on recently completed Master Plans," built from an initial two plus five more added on
+council request (`assets.lawrenceks.org/utilities/files/UT_Water_Wastewater_Capital_Improvement_Plan_
+Options_and_Revenue_Requirements_Final.pdf`, via search 2026-09-30). Rapid City's 100-year CIP runs
+"unconstrained and fiscally constrained" — two. This matches my own expectation from the utility seat:
+a submitted master plan or CIP alternatives analysis is normally single digits to maybe two dozen
+scenarios (a handful of growth horizons crossed with a handful of funding/phasing choices), not
+hundreds. A UI built to make scenario N=1000 convenient is solving a problem nobody submits.
+
+**On the Google Sheets proposal itself, my judgment (SPECULATION from the utility-planning seat, not
+independently CITED for this specific proposal):**
+
+Where it would help: a spreadsheet as the *data entry surface* for the parts of a scenario that
+really are bulk tabular data — a demand-by-year table, a pipe-replacement list (pipe ID, new diameter,
+new material, install year), a C-factor aging schedule. Consulting engineers already build exactly
+these tables in Excel today for submittal reports; letting a utility or the consultant paste that
+existing spreadsheet in instead of retyping it through a UI is a real win, and it is a win the calculator
+already half-delivers: `dev/paste-creates-rows-spec.md:14` documents that CSV-style paste-into-tables
+already exists ("a clerk who has done this in Excel or Sheets once needs no explanation here").
+
+Where it breaks, for a system-scale model, in rough order of how much damage each does:
+
+1. **Topology changes don't live in a spreadsheet's cell model.** Adding a main, splitting a pipe at a
+   new tee, reconnecting a zone — these are graph edits, not row edits. A Sheets round-trip has nowhere
+   to put "this alternative also adds three new pipes and moves a valve," which is routine content in a
+   real CIP alternative (a proposed looped connection, a pressure-zone boundary move). The scenario
+   model already has a name for this in the code: `bornInScenario()` (`js/looped-network.js:29084`) —
+   an element that exists only in some scenarios. That is a topology change the current override model
+   already supports natively in the map editor; a Sheets sync would need to reinvent it as some kind of
+   add/delete row convention, and would fight the map as the place topology actually gets drawn.
+
+2. **Which copy is the truth, under a two-way sync, is a real hazard at this scale.** A 2,000-node
+   model with 10 scenarios open in a utility's review cycle (engineer proposes, utility reviews, comments,
+   engineer revises) is exactly the setting where a spreadsheet and a project file can each be edited
+   between syncs. EngCalcs' own project-file discipline for `.inp` import is instructive by contrast:
+   "Import reports every difference, never rejects, never drops silently" (CLAUDE.md, `lpn_` section) —
+   that rule exists because silent conflict-resolution on an import is how a reviewer loses work without
+   noticing. A Sheets Sync In would need the identical discipline (diff and report, never silently
+   overwrite), and Sync Out even more so if a reviewer had typed comments or adjustments into the sheet
+   between syncs.
+
+3. **"Connected" implies an always-reachable third party**, which this suite's whole architecture has
+   so far refused. `dev/dependency-management.md:29-30` (OBSERVED): "Nothing is fetched from a
+   third-party host at runtime. A grep for `jsdelivr|cdnjs|unpkg|googleapis|cdn\.`... returns nothing,"
+   and `privacy.php` asserts this. A live Sheets connector is a new, ongoing runtime dependency on
+   Google's API, not a one-time vendor fetch — a different category from anything currently shipped.
+
+4. **market-researcher already scoped the real cost of a Google connector and it is non-trivial but not
+   prohibitive** (OBSERVED, `dev/agents/market-researcher/journal.md:1249-1262`): a Google Drive Picker
+   needs an OAuth client ID registered by Tom in Google Cloud Console, uses the `drive.file` scope
+   (non-sensitive, no 100-user cap), tokens live client-side, no server needed. That finding was about
+   file save/open, not a live two-way Sheets API sync, but it establishes the same shape of cost would
+   apply: registration, a new consent-flow conversation, and (my SPECULATION) a two-way *data* sync is a
+   materially bigger commitment than a one-time file picker, because it has to define conflict behavior,
+   not just a transfer.
+
+5. **Utility IT and public-records posture matters and I can only gesture at it, not settle it.**
+   CITED generally: more than half of US states exempt "critical infrastructure information" from public
+   -records (FOIA-type) disclosure for water systems specifically (AWWA/NARUC summary via
+   `awwaneb.org/pdfs/securityprivacy.pdf`, and NGA's CEII survey, both via search 2026-09-30) — pipe
+   network topology and capacity data is exactly the kind of content utilities are advised to treat as
+   sensitive. I could not find, and did not expect to find, a specific ruling that "a utility may not put
+   its distribution model in a personal Google Sheet" — that is an IT-department-by-IT-department policy
+   call, not a universal rule, and I am explicit that this is SPECULATION grounded only in the general
+   sensitivity finding above, not a specific citation. What I can say with more confidence: many utility
+   IT departments require GIS/asset data to stay inside the utility's own system of record (an
+   ArcGIS/Cityworks/CMMS instance) and treat an external consumer-Google-Workspace file as outside that
+   boundary by policy, independent of Google's own security posture. That is a reason a CIP alternatives
+   store built on "whatever consultant's personal Sheet" would not clear some utilities' data-governance
+   review even if it worked technically — but I have not verified this against a specific utility's IT
+   policy document and would rate it moderate-confidence field knowledge, not a citation.
+
+**My net advice for Tom, on the record here in full (condensed version goes to him directly):** a
+Sheets connector is a plausible *import/export format* for the tabular parts of scenario data (demand
+tables, pipe-replacement lists — the paste-into-tables machinery already three-quarters of the way
+there) but a poor *substitute* for the alternatives/scenario UI itself, because the UI's real job —
+topology changes, which-copy-is-truth conflict handling, and staying inside a utility's own review and
+audit trail — is exactly what a spreadsheet does not model. I would rather see the override model
+gain named, reusable alternative *categories* (closer to WaterGEMS's Physical/Demand/Topology split)
+than see the whole feature routed through an external service.
+
+**On sort order for the scenarios list (Tom's second, smaller question):** I lean toward *not* plain
+alphabetical by name as the durable answer, on the same scale logic as everywhere else in this brief —
+name-sort optimizes for finding one scenario you already know the name of, but a utility review cycle
+wants the list to communicate *relationship*: Base first always (already true structurally, since Base
+is not renameable — `js/looped-network.js:4800` disables rename on `scn.isBase`), then probably
+creation order or an explicit user-set order, because a reviewer comparing "2035 no-growth" against
+"2035 with-growth" against "2050 buildout" wants those to sit in the sequence the report tells the story
+in, not in alphabetical accident (a scenario named "Alt A — near-term" would jump ahead of "Base
+extension" purely on the letter A). This is SPECULATION — I have not read Task 721's full text or the
+scenario-list UI code closely enough to know how scenarios are currently ordered internally, and I
+would not block Tom's immediate ask (sort by name now) on this; I would just flag that name-sort is a
+short-term convenience, not what I would want load-bearing in a published CIP-alternatives report
+later. If the list ever needs to match a report's table order, only user-set/drag order or an explicit
+"sequence" field will do that; alphabetical will not, and creation-order breaks the moment someone
+deletes and recreates a scenario to rename it (Base can't be renamed, but non-Base scenarios can be, at
+`js/looped-network.js:4800-4810`, and rename-by-delete-recreate is a plausible workaround pattern that
+would scramble creation order unpredictably).

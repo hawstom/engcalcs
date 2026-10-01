@@ -963,3 +963,27 @@ already redundant: `minPressure`/`maxVelocity` default to 0/Infinity when left b
 TEST points, globally-applied thresholds, no documented narrower IMPACT scope) in journal
 2026-09-28. Does not duplicate Task 724 (every-junction sweep) or 725 (merged table) — this is a
 third axis, which locations the impact check reports on.
+
+
+<!-- 2026-09-30, Task 721, filed by the orchestrator from the seat's own text -->
+Add, ranked below the existing items (I have not re-read my full existing wishlist ranking in this
+session; inserting this as a new item near the bottom on the strength of "would not change my year" —
+see reasoning above):
+
+- **Named, reusable alternative categories for `lpn_` scenarios (Physical / Demand / Topology), closer
+  to WaterGEMS's alternative model**, rather than the current flat per-property override diff. SPECULATION,
+  my own inference from reading `js/looped-network.js:4578-4842` against the CITED WaterGEMS
+  documentation above. I rank this modest — the current flat-override model is simpler to explain
+  (matches Tom's own "ironclad rule" framing) and most of my own systems carry well under a dozen
+  scenarios per model, so the reuse problem a named-category model solves is real but not large at
+  EngCalcs' current scale. I would not push hard for this; it is a "would notice eventually" item, not
+  a "notice this week" item.
+- **Explicit note for the record: do not build a live Google Sheets sync connector for scenario data.**
+  This is not a new priority so much as a recommendation against a considered option — see the journal
+  entry above for the full reasoning (topology doesn't fit a spreadsheet's row model, sync-direction
+  conflict handling is undesigned, it breaks the "nothing fetched from a third party at runtime" claim
+  in `dev/dependency-management.md`, and utility IT/public-records posture toward infrastructure data in
+  an external consumer cloud service is a real but unverified risk). If Sheets-shaped data exchange is
+  wanted, I would rank a one-way CSV/Sheets *export/import* of the tabular scenario inputs (demands,
+  pipe-replacement lists) above a two-way live sync, for the same reason EngCalcs already treats every
+  other file exchange as explicit, reported, and user-triggered rather than ambient.
