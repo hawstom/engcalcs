@@ -1337,6 +1337,18 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<div id="lpn_crit_report" class="lpn-ff-report"></div>
 	</div>
 </div>
+<?php // DEMAND SCALING (ROADMAP Task 754; Tom, 2026-09-30 and 2026-10-01): the demands multiplied on
+      // a copy, and the largest multiplier the system holds above a pressure limit. The third
+      // sibling on fire flow's box shell; built in JS (buildDemandScaleControls,
+      // rebuildDemandScaleReport). ?>
+<div id="lpn_ds_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_dsbox_title">
+	<div id="lpn_dsbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ds_title']?></div>
+	<button type="button" id="lpn_ds_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_ds_controls" class="lpn-ff-controls"></div>
+		<div id="lpn_ds_report" class="lpn-ff-report"></div>
+	</div>
+</div>
 <?php // THE PUMP ENERGY REPORT (ROADMAP Task 566). What each pump ran, what it drew and what it
       // cost: the one answer on this page that is money. It borrows the fire flow box's whole
       // shell -- the drag band, the resize grip, the scrolling body -- so this page has one set of
@@ -2909,6 +2921,46 @@ EngCalcs.pageConfig = {
 	lpn_crit_skipdead_tip: <?=json_encode($ec_lang['lpn_crit_skipdead_tip'])?>,
 	lpn_crit_skipped_dead: <?=json_encode($ec_lang['lpn_crit_skipped_dead'])?>,
 	lpn_crit_stale: <?=json_encode($ec_lang['lpn_crit_stale'])?>,
+	lpn_ds_menu: <?=json_encode($ec_lang['lpn_ds_menu'])?>,
+	lpn_ds_menu_tip: <?=json_encode($ec_lang['lpn_ds_menu_tip'])?>,
+	lpn_ds_title: <?=json_encode($ec_lang['lpn_ds_title'])?>,
+	lpn_ds_intro: <?=json_encode($ec_lang['lpn_ds_intro'])?>,
+	lpn_ds_scope: <?=json_encode($ec_lang['lpn_ds_scope'])?>,
+	lpn_ds_scope_tip: <?=json_encode($ec_lang['lpn_ds_scope_tip'])?>,
+	lpn_ds_scope_all: <?=json_encode($ec_lang['lpn_ds_scope_all'])?>,
+	lpn_ds_scope_selected: <?=json_encode($ec_lang['lpn_ds_scope_selected'])?>,
+	lpn_ds_minpressure: <?=json_encode($ec_lang['lpn_ds_minpressure'])?>,
+	lpn_ds_minpressure_tip: <?=json_encode($ec_lang['lpn_ds_minpressure_tip'])?>,
+	lpn_ds_eps_note: <?=json_encode($ec_lang['lpn_ds_eps_note'])?>,
+	lpn_ds_head_scale: <?=json_encode($ec_lang['lpn_ds_head_scale'])?>,
+	lpn_ds_multiplier: <?=json_encode($ec_lang['lpn_ds_multiplier'])?>,
+	lpn_ds_multiplier_tip: <?=json_encode($ec_lang['lpn_ds_multiplier_tip'])?>,
+	lpn_ds_run: <?=json_encode($ec_lang['lpn_ds_run'])?>,
+	lpn_ds_head_search: <?=json_encode($ec_lang['lpn_ds_head_search'])?>,
+	lpn_ds_search_note: <?=json_encode($ec_lang['lpn_ds_search_note'])?>,
+	lpn_ds_find: <?=json_encode($ec_lang['lpn_ds_find'])?>,
+	lpn_ds_holds_max: <?=json_encode($ec_lang['lpn_ds_holds_max'])?>,
+	lpn_ds_below_zero: <?=json_encode($ec_lang['lpn_ds_below_zero'])?>,
+	lpn_ds_found: <?=json_encode($ec_lang['lpn_ds_found'])?>,
+	lpn_ds_found_below: <?=json_encode($ec_lang['lpn_ds_found_below'])?>,
+	lpn_ds_search_stopped: <?=json_encode($ec_lang['lpn_ds_search_stopped'])?>,
+	lpn_ds_lowest_at: <?=json_encode($ec_lang['lpn_ds_lowest_at'])?>,
+	lpn_ds_nosolve_at: <?=json_encode($ec_lang['lpn_ds_nosolve_at'])?>,
+	lpn_ds_scale_ok: <?=json_encode($ec_lang['lpn_ds_scale_ok'])?>,
+	lpn_ds_scale_below: <?=json_encode($ec_lang['lpn_ds_scale_below'])?>,
+	lpn_ds_scaled_selected: <?=json_encode($ec_lang['lpn_ds_scaled_selected'])?>,
+	lpn_ds_head_lowest: <?=json_encode($ec_lang['lpn_ds_head_lowest'])?>,
+	lpn_ds_head_velocity: <?=json_encode($ec_lang['lpn_ds_head_velocity'])?>,
+	lpn_ds_col_link: <?=json_encode($ec_lang['lpn_ds_col_link'])?>,
+	lpn_ds_col_scaled: <?=json_encode($ec_lang['lpn_ds_col_scaled'])?>,
+	lpn_ds_col_scaled_tip: <?=json_encode($ec_lang['lpn_ds_col_scaled_tip'])?>,
+	lpn_ds_col_unscaled: <?=json_encode($ec_lang['lpn_ds_col_unscaled'])?>,
+	lpn_ds_col_unscaled_tip: <?=json_encode($ec_lang['lpn_ds_col_unscaled_tip'])?>,
+	lpn_ds_no_junctions: <?=json_encode($ec_lang['lpn_ds_no_junctions'])?>,
+	lpn_ds_no_selection: <?=json_encode($ec_lang['lpn_ds_no_selection'])?>,
+	lpn_ds_skipped: <?=json_encode($ec_lang['lpn_ds_skipped'])?>,
+	lpn_ds_bad_multiplier: <?=json_encode($ec_lang['lpn_ds_bad_multiplier'])?>,
+	lpn_ds_stale: <?=json_encode($ec_lang['lpn_ds_stale'])?>,
 	lpn_ff_summary: <?=json_encode($ec_lang['lpn_ff_summary'])?>,
 	lpn_ff_summary_error: <?=json_encode($ec_lang['lpn_ff_summary_error'])?>,
 	lpn_ff_report_all: <?=json_encode($ec_lang['lpn_ff_report_all'])?>,
@@ -3551,6 +3603,7 @@ EngCalcs.pageConfig = {
 <?php // Criticality analysis (Tom, 2026-09-30). Pure arithmetic like the fire flow sweep, and BEFORE
       // looped-network.js for the same reason; absent, the Run button does nothing. ?>
 <script src="/engcalcs/js/lpn-criticality.js?v=<?=filemtime(__DIR__.'/js/lpn-criticality.js')?>"></script>
+<script src="/engcalcs/js/lpn-demandscale.js?v=<?=filemtime(__DIR__.'/js/lpn-demandscale.js')?>"></script>
 <?php // Reading a surveyed point list from a text file (ROADMAP Task 592). Pure parsing and column
       // mapping, no DOM, and no request of any kind. BEFORE looped-network.js, which calls
       // EngCalcs.lpnSurveyParse() when somebody picks a file; absent, the button reports that the

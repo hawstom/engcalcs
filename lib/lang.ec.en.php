@@ -3936,7 +3936,7 @@ $ec_lang['lpn_terrain_ids_more']='{ids}, and {n} more';
 // {id} a junction or pipe name, and {done}, {total}, {n}, {pass}, {fail}, {design} and {solves}
 // are whole numbers. Every one is substituted, never concatenated.
 $ec_lang['lpn_analyze_menu']='Analyze';
-$ec_lang['lpn_analyze_menu_tip']='Analyses that run the network many times over on a copy: fire flow at each junction, and the loss of each pipe, pump, and valve.';
+$ec_lang['lpn_analyze_menu_tip']='Analyses that run the network on a copy: fire flow at each junction, the loss of each pipe, pump, and valve, and the demands scaled up or down.';
 $ec_lang['lpn_ff_menu']='Fire flow analysis…';
 $ec_lang['lpn_ff_menu_tip']='Test junctions one at a time: how much can each deliver while still holding the residual pressure you set, and does drawing the required flow there push anything else out of limits?';
 $ec_lang['lpn_ff_title']='Fire flow analysis';
@@ -4116,6 +4116,56 @@ $ec_lang['lpn_crit_stale']='The drawing changed, so the criticality results were
 $ec_lang['lpn_crit_skipdead']='Skip dead ends';
 $ec_lang['lpn_crit_skipdead_tip']='A dead-end link is one whose removal cuts off junctions that can be reached only through it, with no reservoir or tank beyond. Its loss is everything beyond it, so it is not solved. The summary says how many were skipped.';
 $ec_lang['lpn_crit_skipped_dead']='Dead-end links skipped: {n}. Each one cuts off everything beyond it.';
+
+// ---- Water > Analyze > Demand scaling (ROADMAP Task 754) ----------------------------------------
+//
+// Tom, 2026-09-30 and 2026-10-01: the demands multiplied on a copy, like Fire flow, and "What demand
+// scale can the system handle with this pressure limit?" The run dialog's Stop, the engine sentence,
+// the cost line, the Junction heading and the solver's reasons are fire flow's own keys.
+//
+// {m} and {max} are demand scales printed as numbers (1.37); {step} is the search's tolerance
+// (0.01); {n} is a whole number; {pressure} is a pressure with its unit; {id} becomes a link to the
+// junction on the map; {reason} is a whole sentence saying why the solver gave no answer.
+$ec_lang['lpn_ds_menu']='Demand scaling…';
+$ec_lang['lpn_ds_menu_tip']='Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.';
+$ec_lang['lpn_ds_title']='Demand scaling';
+$ec_lang['lpn_ds_intro']='The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.';
+$ec_lang['lpn_ds_scope']='Demands to scale';
+$ec_lang['lpn_ds_scope_tip']='Scale the demand of every junction, or only of the junctions selected on the map. Pressures are checked at every junction either way.';
+$ec_lang['lpn_ds_scope_all']='All junctions';
+$ec_lang['lpn_ds_scope_selected']='Selected junctions';
+$ec_lang['lpn_ds_minpressure']='Lowest pressure allowed';
+$ec_lang['lpn_ds_minpressure_tip']='This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.';
+$ec_lang['lpn_ds_eps_note']='Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.';
+$ec_lang['lpn_ds_head_scale']='Scale the demands';
+$ec_lang['lpn_ds_multiplier']='Demand scale';
+$ec_lang['lpn_ds_multiplier_tip']='The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario\'s own demand multiplier, which is already in the demands, and it is never saved in your project.';
+$ec_lang['lpn_ds_run']='Run';
+$ec_lang['lpn_ds_head_search']='What demand scale can the system handle?';
+$ec_lang['lpn_ds_search_note']='Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which every junction keeps the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.';
+$ec_lang['lpn_ds_find']='Find';
+$ec_lang['lpn_ds_holds_max']='✓ Every junction keeps {pressure} up to {max} times the demands, the top of the search.';
+$ec_lang['lpn_ds_below_zero']='⚠ At least one junction is below {pressure} even with the scaled demands at zero.';
+$ec_lang['lpn_ds_found']='✓ Every junction keeps {pressure} up to {m} times the demands.';
+$ec_lang['lpn_ds_found_below']='⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to {m} times the demands.';
+$ec_lang['lpn_ds_search_stopped']='The search was stopped before it found an answer.';
+$ec_lang['lpn_ds_lowest_at']='At {m} times the demands, the lowest pressure is {pressure}, at junction {id}.';
+$ec_lang['lpn_ds_nosolve_at']='At {m} times the demands, the network gave no answer. {reason}';
+$ec_lang['lpn_ds_scale_ok']='✓ At {m} times the demands, every junction keeps {pressure}.';
+$ec_lang['lpn_ds_scale_below']='⚠ At {m} times the demands, {n} junctions fall below {pressure}.';
+$ec_lang['lpn_ds_scaled_selected']='Only the demands of the {n} selected junctions were scaled.';
+$ec_lang['lpn_ds_head_lowest']='Lowest pressures';
+$ec_lang['lpn_ds_head_velocity']='Highest velocities';
+$ec_lang['lpn_ds_col_link']='Link';
+$ec_lang['lpn_ds_col_scaled']='Scaled';
+$ec_lang['lpn_ds_col_scaled_tip']='With the demands multiplied by the demand scale.';
+$ec_lang['lpn_ds_col_unscaled']='Unscaled';
+$ec_lang['lpn_ds_col_unscaled_tip']='With the demands as they are in the active scenario at this time step, the same value the map shows.';
+$ec_lang['lpn_ds_no_junctions']='This project has no junctions yet, so there are no demands to scale.';
+$ec_lang['lpn_ds_no_selection']='No junctions are selected. Select junctions, or scale all of them.';
+$ec_lang['lpn_ds_skipped']='{n} selected elements are not junctions, so they were left as they are.';
+$ec_lang['lpn_ds_bad_multiplier']='Type a demand scale of zero or more, such as 1.5.';
+$ec_lang['lpn_ds_stale']='The drawing changed, so the demand scaling results were cleared. Run it again.';
 
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //

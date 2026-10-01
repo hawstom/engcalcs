@@ -158,7 +158,10 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		// The Tables and Hotkeys box (Task 745): the same non-hog shell and memory as Notes, built
 		// the same way and for the same reason -- reference prose a reader keeps open beside the
 		// work, so a phone wants the same fill.
-		['openHotkeysBox', 'the Tables and Hotkeys box']];
+		['openHotkeysBox', 'the Tables and Hotkeys box'],
+		// Demand scaling (Task 754): the third analysis on fire flow's shell, with two report
+		// tables, so a phone wants the whole window for it too.
+		['openDemandScaleBox', 'Demand scaling']];
 	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
 	});
