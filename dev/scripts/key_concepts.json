@@ -16,8 +16,6 @@
         "mtc_flow_depth": ["depth"],
         "lpn_field_tank_level": ["depth"],
         "lpn_result_pressure": ["pressure"],
-        "lpn_units_pressure": ["pressure"],
-        "lpn_color_mode_pressure": ["pressure"],
         "lpn_result_head": ["hydraulic-head"],
         "lpn_field_head": ["hydraulic-head"],
         "lpn_profile_hgl": ["hgl"],

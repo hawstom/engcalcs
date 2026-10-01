@@ -97,7 +97,10 @@
         "feat/label-placer-d",
         "feat/find-filter",
         "feat/copy-lock",
-        "feat/bentley-interop"
+        "feat/bentley-interop",
+        "feat/scenario-preset",
+        "feat/criticality",
+        "feat/graph-tab-keys"
     ],
     "feature_freeze": {
         "active": false,
