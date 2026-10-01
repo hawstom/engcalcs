@@ -23,8 +23,8 @@
  *   4. Every key in key_concepts.json exists in lib/lang.ec.en.php and cites at least one id, and
  *      every id it cites exists.
  *
- * Two concepts may share an English rendering ("Label" is both sally and a custom property's
- * display name). That is not an error: it is the case the concept layer exists for.
+ * Two concepts may share an English rendering ("Label" is both label-sym-sally and a custom
+ * property's display name). That is not an error: it is the case the concept layer exists for.
  *
  *   php dev/scripts/concept_check.php
  */

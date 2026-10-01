@@ -580,10 +580,13 @@ function panelLines(box) {
 	L.setState('all', 'connection', 'conn-noopensource', '');
 	L.pressFind();
 	const rows = panelLines(L.resultsBox()).join(' | ');
+	// A row prints the pull-down's own words with the first letter raised (Task 699): one key per
+	// condition, capitalized in code.
+	const capFirst = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
 	ok('each row names the NARROWEST fault true of it',
-		rows.indexOf(PC.lpn_find_conn_unlinked) >= 0 && rows.indexOf(PC.lpn_find_conn_noopen) >= 0 &&
-		rows.indexOf(PC.lpn_find_conn_nolinksource) >= 0 &&
-		rows.indexOf(PC.lpn_find_conn_noopensource) >= 0,
+		rows.indexOf(capFirst(PC.lpn_find_op_conn_unlinked)) >= 0 && rows.indexOf(capFirst(PC.lpn_find_op_conn_noopen)) >= 0 &&
+		rows.indexOf(capFirst(PC.lpn_find_op_conn_nolinksource)) >= 0 &&
+		rows.indexOf(capFirst(PC.lpn_find_op_conn_noopensource)) >= 0,
 		rows);
 
 	// A whole network, cleanly fed: the answer is none, and "none" is the good news the report was

@@ -2210,7 +2210,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* `min-height: 0` matters as much as `min-width`: a flex item's default minimum is its CONTENT,
    and without this the chart could not be measured smaller than the SVG already drawn in it, so a
    pane dragged shorter would leave the chart overflowing rather than reflowing. */
-#lpn_profile_chart, #lpn_ts_chart { flex: 1 1 auto; min-width: 0; min-height: 0; }
+#lpn_profile_chart, #lpn_ts_chart, #lpn_freq_chart { flex: 1 1 auto; min-width: 0; min-height: 0; }
 @media (max-width: 40rem) {
 	.lpn-profile-panel { flex-direction: column; overflow: auto; }
 	.lpn-profile-controls { flex: 0 0 auto; }

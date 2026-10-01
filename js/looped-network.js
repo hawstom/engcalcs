@@ -4435,7 +4435,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return [
 			['allow', pc.lpn_cp_restrict_allow || 'Allow only these characters'],
-			['deny', pc.lpn_cp_restrict_deny || 'Restrict these characters']
+			['deny', pc.lpn_cp_restrict || 'Restrict these characters']
 		];
 	}
 	function customPropOptionLabel(opts, value, fallback) {
@@ -4580,6 +4580,22 @@ var EngCalcs = EngCalcs || {};
 		// Base's stored name is the language-free literal 'Base' (defaultScenarios()); the word on
 		// screen comes from the lang file, so a user's data never carries an English word.
 		return s.isBase ? (pc.lpn_scenario_base || 'Base') : (s.name || '');
+	}
+	// **THE ONE SORT, FOR EVERY PLACE THAT LISTS SCENARIOS TO A USER** (Tom, 2026-09-30: "For now,
+	// let's sort it by name."). Base is not a peer of the others and always leads; the rest sort by
+	// display name, natural and case-insensitive so "Scenario 2" precedes "Scenario 10", with the id
+	// as a tiebreaker so two scenarios that render the same name still hold a stable order.
+	//
+	// **A COPY, NEVER THE STORED ARRAY.** `scenarios` is serializeProject()'s own order and a file
+	// round-trips byte-identical; only the reading of it for display is sorted.
+	function scenariosForDisplay() {
+		var base = [], rest = [];
+		scenarios.forEach(function (s) { (s.isBase ? base : rest).push(s); });
+		rest.sort(function (a, b) {
+			var byName = scenarioDisplayName(a).localeCompare(scenarioDisplayName(b), undefined, { numeric: true, sensitivity: 'base' });
+			return byName !== 0 ? byName : (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0));
+		});
+		return base.concat(rest);
 	}
 	function refreshScenarioStatus() {
 		var btn = document.getElementById('lpn_scenario_btn'), pc = EngCalcs.pageConfig || {};
@@ -4771,7 +4787,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function scenarioMenuRows() {
 		var pc = EngCalcs.pageConfig || {}, rows = [], scn = activeScenario();
-		scenarios.forEach(function (s) {
+		scenariosForDisplay().forEach(function (s) {
 			rows.push({
 				// A tick on the row you are already in, the way every view menu in this file's
 				// neighbourhood marks a current choice. No icon column entry, so the marker cannot
@@ -8042,7 +8058,7 @@ var EngCalcs = EngCalcs || {};
 			stddev: pc.lpn_color_mode_stddev,
 			pretty: pc.lpn_color_mode_pretty,
 			log: pc.lpn_color_mode_log,
-			pressure: pc.lpn_color_mode_pressure,
+			pressure: pc.lpn_result_pressure,
 			manual: pc.lpn_color_mode_manual
 		};
 		return names[m.key] || m.name;
@@ -17614,13 +17630,27 @@ var EngCalcs = EngCalcs || {};
 		}
 		return 'ok';
 	}
+	// **ONE KEY PER CONDITION, CAPITALIZED HERE** (Task 699, Tom 2026-09-30: "do the Find
+	// redesign"). A result row used to read a second key per condition that differed from the
+	// pull-down's only in its first letter, so every language translated each phrase twice and the
+	// two could drift. The row now prints the pull-down's own words with the first letter raised.
+	// Raising is the safe direction: lowering would be wrong in a language that capitalizes nouns.
+	// The locale is the page's own `<html lang>`, as the Find collator reads it, so a Turkish i
+	// becomes a dotted capital.
+	function findConnCapitalize(s) {
+		var lang = (document.documentElement && document.documentElement.lang) || undefined, first;
+		s = String(s || '');
+		if (!s) { return s; }
+		first = s.charAt(0);
+		try { first = first.toLocaleUpperCase(lang); } catch (e) { first = first.toUpperCase(); }
+		return first + s.slice(1);
+	}
 	function findConnLabel(st) {
-		var pc = EngCalcs.pageConfig || {};
-		if (st === 'conn-unlinked') { return pc.lpn_find_conn_unlinked || 'No links at node'; }
-		if (st === 'conn-noopen') { return pc.lpn_find_conn_noopen || 'No open links at node'; }
-		if (st === 'conn-nolinksource') { return pc.lpn_find_conn_nolinksource || 'No link path to a source'; }
-		if (st === 'conn-noopensource') {
-			return pc.lpn_find_conn_noopensource || 'No open path to a source';
+		var i, defs;
+		if (st === 'ok' || FIND_CONN_OPS.indexOf(st) < 0) { return ''; }
+		defs = findConnOpDefs();
+		for (i = 0; i < defs.length; i++) {
+			if (defs[i][0] === st) { return findConnCapitalize(defs[i][1]); }
 		}
 		return '';
 	}
@@ -20344,9 +20374,19 @@ var EngCalcs = EngCalcs || {};
 	// own note below).
 	var LPN_PANE_KEY = 'lpn_pane';
 	// The pane's own floor, and the map's. Between them they decide how far the grip can travel:
-	// a drag can always leave the map a canvas worth looking at, so there is no gesture that hides
-	// the drawing entirely and no state a user has to undo to get their map back.
-	var LPN_PANE_MIN = 110, LPN_PANE_MAP_MIN = 160, LPN_PANE_DEFAULT = 260;
+	// a drag can always leave the map a strip to grab the divider back from, so there is no gesture
+	// that hides the drawing entirely and no state a user has to undo to get their map back.
+	//
+	// **THE MAP'S SIDE IS A SLIVER, NOT A "WORKING MAP"** (Task 744, Tom: "It would be good to
+	// allow the bottom pane to shrink the map to almost nothing. More freedom for the user is a
+	// good thing."). It used to reserve 160px -- enough to still see the drawing -- which answered
+	// a question Tom did not ask: whether the shrunk map is USABLE. All this reserve has to
+	// guarantee is that the divider stays grabbable and the map's own overlays (zoom buttons, scale
+	// bar) do not break, which is a much smaller number. Below this, effectiveMapHeight()'s own
+	// LPN_MAP_MIN is still the hard floor a real canvas never crosses, so the two agree on what
+	// "almost nothing" means rather than this reserve promising a size the map floor would refuse
+	// to give it.
+	var LPN_PANE_MIN = 110, LPN_PANE_MAP_MIN = 32, LPN_PANE_DEFAULT = 260;
 	// One row per tab, in the order they are shown. `show` runs when the tab becomes the visible
 	// one, `hide` when it stops being -- a tab that draws on the MAP (the profile's route
 	// highlight) must clear that drawing when it is no longer the tab on show, or the map keeps a
@@ -20408,6 +20448,15 @@ var EngCalcs = EngCalcs || {};
 		// NO `hide`: this tab draws nothing on the map, so there is nothing to take away with it.
 		// (The profile's hide() exists because its route highlight would otherwise outlive the
 		// panel that explains it.)
+	});
+	// **FREQUENCY BESIDE TIME SERIES, AND PROFILE STILL LAST** (Task 600) -- the same argument that
+	// placed Time series: a new drawing joins the drawings, inside their stretch of the strip.
+	paneTabs.push({
+		id: 'frequency', panel: 'lpn_pane_frequency', label: 'lpn_freq_menu', tip: 'lpn_freq_tip',
+		show: function () { freqTabShow(); },
+		// Every solve, every edit and every step of the transport, so the curve is always the
+		// map's own moment.
+		refresh: function () { freqTabShow(); }
 	});
 	// **PROFILE IS LAST** (Tom, 2026-08-21: "making Profile the last tab"). It is still the odd one
 	// out -- a drawing where the other six are tables -- and the end of the strip is where an odd
@@ -20512,7 +20561,17 @@ var EngCalcs = EngCalcs || {};
 			mine = body ? body.getBoundingClientRect().height : 0,
 			room = map + mine - LPN_PANE_MAP_MIN;
 		if (!(map > 0) || map > vh) { room = Math.floor(vh / 2); }
-		return Math.max(LPN_PANE_MIN, Math.min(room, Math.floor(vh * 0.8) - paneChromeHeight()));
+		// **THE FRACTION IS A SANITY NET, NOT THE RESERVE** (Task 744). `room` is the number that
+		// actually answers "how much map is left" -- it is built from a MEASUREMENT of what is
+		// above the canvas, where the fraction below knows only the pane's own grip and tab strip.
+		// At 0.8 it came in ahead of `room` on an ordinary wide window (a short toolbar leaves the
+		// canvas most of the height, so 80% of the viewport is LESS than "leave LPN_PANE_MAP_MIN of
+		// map"), which is what silently undid the smaller reserve above: the map stalled around a
+		// fifth of the window no matter how far the grip was dragged. Raised so it stops being the
+		// one that binds in the ordinary case and goes back to being what it is named for -- a
+		// window can never become 100% pane -- while `effectiveMapHeight()`'s own LPN_MAP_MIN is
+		// still the one true floor a real canvas never crosses.
+		return Math.max(LPN_PANE_MIN, Math.min(room, Math.floor(vh * 0.95) - paneChromeHeight()));
 	}
 	function clampPaneHeight(h) {
 		if (!(h > 0)) { h = LPN_PANE_DEFAULT; }
@@ -20915,7 +20974,7 @@ var EngCalcs = EngCalcs || {};
 	function familyExampleWord(pc, key) {
 		var f = FAMILY_EXAMPLE_FIELDS[key];
 		if (f) { return colorFieldLabel(f[0], f[1]); }
-		if (key === 'status') { return pc.lpn_color_example_status || 'Status'; }
+		if (key === 'status') { return pc.lpn_result_status || 'Status'; }
 		if (key === 'material') { return pc.lpn_color_example_material || 'Material'; }
 		return key;
 	}
@@ -24127,7 +24186,6 @@ var EngCalcs = EngCalcs || {};
 			// hidden the moment they were made.
 			if (!filterNote && paneCanCreate(spec)) {
 				note.textContent += ' ' + (pc.lpn_pane_paste_here || 'Click here and paste rows from a spreadsheet to add them.');
-				note.tabIndex = 0;
 				note.className += ' lpn-pane-paste-target';
 				note.addEventListener('paste', function (e) {
 					var text, cells;
@@ -24140,6 +24198,21 @@ var EngCalcs = EngCalcs || {};
 					panePasteAt(spec, cells, { append: true });
 				});
 			}
+			// **FOCUSABLE EVEN WITH NOTHING TO PASTE INTO, AND EVEN UNDER A FILTER** (Task 690,
+			// Perry's pre-review on b37ec130: Ctrl+Shift+PageDown/PageUp went dead on Valves or
+			// Customers on Net3, which have no rows). `tabIndex` used to be set only inside the
+			// paste-target branch above, so a table with no create door -- or one hidden behind a
+			// filter -- left NOTHING in the panel the keyboard could reach, and this shortcut had
+			// no element to fire on. This note is the one thing left standing in an empty panel, so
+			// it carries the same keydown a real table's own <table> does (paneWireTable), scoped to
+			// itself exactly as that one is -- never a document- or pane-wide listener that could
+			// steal the key from the Find box or any other control outside the tables.
+			note.tabIndex = 0;
+			note.addEventListener('keydown', function (e) {
+				var key = e && e.key, jump = !!(e && (e.ctrlKey || e.metaKey)), ext = !!(e && e.shiftKey);
+				if (!jump || !ext || (key !== 'PageDown' && key !== 'PageUp')) { return; }
+				if (paneSwitchTableTab(spec, key === 'PageDown' ? 1 : -1) && e.preventDefault) { e.preventDefault(); }
+			});
 			host.appendChild(note);
 			return;
 		}
@@ -24836,10 +24909,29 @@ var EngCalcs = EngCalcs || {};
 	// border (see paneSelPaint()), so a Shift-extended range survives the trip untouched. A table
 	// nobody has touched yet gets its first cell, as a spreadsheet opens on A1.
 	function paneFocusActiveCell(spec) {
-		var rows, cols, box;
+		var rows, cols, box, host, note;
 		if (!spec || !spec.tds) { return false; }
 		rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
-		if (!rows.length || !cols.length) { return false; }
+		if (!rows.length || !cols.length) {
+			// **AN EMPTY TABLE HAS NO CELL, BUT SOMETHING STILL HAS TO HOLD THE CARET** (Task 690,
+			// Perry's pre-review on b37ec130): every caller of this function -- setPaneTab(),
+			// openPane(), and paneSwitchTableTab() switching onto a table with no rows -- needs
+			// Ctrl+Shift+PageDown/PageUp to keep working from here, and that shortcut is wired
+			// (renderPaneTable()) onto the "none of these yet" note that stands in for the missing
+			// <table>. Landing there is what lets the NEXT press find a keydown listener to answer.
+			// Positional, not a class-selector query: renderPaneTable() clears the panel and
+			// appends the note LAST (after an optional filter banner), so it is always the panel's
+			// last child in the empty case -- true in a real browser and in the headless DOM stub
+			// alike, where querySelector() only ever matches a bare tag name.
+			host = spec.panel ? document.getElementById(spec.panel) : null;
+			note = host && host.children && host.children.length ? host.children[host.children.length - 1] : null;
+			if (note && note.className && note.className.indexOf('lpn-lib-note') < 0) { note = null; }
+			if (note && note.focus) {
+				try { note.focus({ preventScroll: true }); } catch (e) { note.focus(); }
+				return true;
+			}
+			return false;
+		}
 		box = paneSelBox(spec, rows, cols);
 		if (!box) {
 			paneSelSet(spec, rows, cols, 0, 0, false);
@@ -26019,6 +26111,47 @@ var EngCalcs = EngCalcs || {};
 		});
 		return handle;
 	}
+	/**
+	 * Ctrl+Shift+PageDown/PageUp between the DATA TABLES only (Task 690). `paneTables()`, never
+	 * `paneTabs` -- the latter also holds Time series and Profile, which carry no cell grid to land
+	 * a caret in, and this must not reach for either of them.
+	 *
+	 * **EXCEL DOES NOT WRAP AT THE ENDS, SO NEITHER DOES THIS.** Past the last table or before the
+	 * first, the keystroke is still claimed (so the browser never sees it) but nothing moves --
+	 * Excel's own Ctrl+PageDown on its last sheet does exactly that, silently.
+	 *
+	 * **FOCUS LANDS ON THE SAME COLUMN KEY IF THE NEW TABLE HAS ONE, ELSE THE FIRST COLUMN, AND THE
+	 * SAME ROW INDEX, CLAMPED TO THE NEW TABLE'S ROW COUNT.** Two tables rarely share a row space --
+	 * Pipes and Junctions have no row in common -- but they often share a COLUMN, and Excel's own
+	 * sheet switch keeps the reader in the same column and row position it left, falling back to A1
+	 * only where that stops meaning anything.
+	 *
+	 * **A DESTINATION TABLE WITH NO ROWS STILL BECOMES THE SHOWN TAB** -- no table is ever hidden
+	 * from the strip for being empty, so none is skipped here either -- it simply has no cell to
+	 * focus, exactly as clicking that tab by hand would leave it.
+	 */
+	function paneSwitchTableTab(spec, dir) {
+		var tables = paneTables(), idx = -1, i, newSpec, newIdx,
+			rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
+			box = paneSelBox(spec, rows, cols), colKey = null, rowIdx = 0,
+			newRows, newCols, newColIdx, newRowIdx;
+		for (i = 0; i < tables.length; i++) { if (tables[i].id === spec.id) { idx = i; break; } }
+		if (idx < 0) { return false; }
+		newIdx = idx + dir;
+		if (newIdx < 0 || newIdx >= tables.length) { return true; }
+		newSpec = tables[newIdx];
+		if (box) { colKey = cols[box.ac].key; rowIdx = box.ar; }
+		setPaneTab(newSpec.id);
+		newRows = paneTableRowsInOrder(newSpec); newCols = paneCols(newSpec);
+		if (!newRows.length || !newCols.length) { return true; }
+		newColIdx = colKey !== null ? paneIndexOfKey(newCols, colKey) : -1;
+		if (newColIdx < 0) { newColIdx = paneHomeCol(newCols); }
+		newRowIdx = Math.min(rowIdx, newRows.length - 1);
+		paneSelSet(newSpec, newRows, newCols, newRowIdx, newColIdx, false);
+		paneSelPaint(newSpec, newRows, newCols);
+		paneFocusCell(newSpec, newRows[newRowIdx].id, newCols[newColIdx].key);
+		return true;
+	}
 	// Every key Tom named, in one place, against the table as it is rendered. Returns true where it
 	// handled the key, which is also what decides whether the browser still gets it -- an unhandled
 	// key is ordinary typing and must stay that way.
@@ -26100,6 +26233,19 @@ var EngCalcs = EngCalcs || {};
 				setNotice(pc.lpn_pane_fill_none || 'Nothing in this selection can be filled down.');
 			}
 			return true;
+		}
+		// **CTRL+SHIFT+PAGEDOWN/PAGEUP SWITCHES TABLES** (Task 690, the spreadsheet convention --
+		// Excel's own Ctrl+PageDown/PageUp moves between SHEETS). Shift is added because plain
+		// Ctrl+PageDown/PageUp is the BROWSER'S OWN shortcut for switching ITS tabs, and taking it
+		// back would fight every other tab the visitor has open; Shift is free. Checked before the
+		// `!box` early return below so it works with nothing selected yet in this table.
+		//
+		// **MID-EDIT, THE TYPED VALUE IS COMMITTED FIRST** -- the same choice Enter and the arrow
+		// keys make when they leave a cell, never Tab's choice of leaving it to the browser's own
+		// blur -- so switching tables can never cost the person the character they just typed.
+		if (jump && ext && (key === 'PageDown' || key === 'PageUp')) {
+			if (editing && active) { paneCommitCell(active); }
+			return paneSwitchTableTab(spec, key === 'PageDown' ? 1 : -1);
 		}
 		if (!box) {
 			// Nothing selected yet and a navigation key pressed: start at the top left, which is
@@ -27354,6 +27500,8 @@ var EngCalcs = EngCalcs || {};
 		// left on Time series was shown over the EMPTY startup document, chose nothing, and every
 		// run that landed afterwards redrew that nothing -- on a reload, the gallery and File > Open.
 		else if (paneIsOpen() && t && t.id === 'timeseries' && t.show) { t.show(); }
+		// The Frequency tab draws from the map's values, which a document can bring with no solve.
+		else if (paneIsOpen() && t && t.id === 'frequency' && t.show) { t.show(); }
 	}
 	function refreshPaneIfOpen() {
 		var t = activePaneTab();
@@ -28916,6 +29064,215 @@ var EngCalcs = EngCalcs || {};
 		}
 	}
 
+	// ---- FREQUENCY PLOT (ROADMAP Task 600, first slice) --------------------------------------------
+	//
+	// EPANET's Frequency Plot: one value over every junction or every pipe, at one time, drawn as
+	// the value against the percent of elements less than it. The EPANET 2.2 manual, Table 9.1:
+	// *"Plots value versus fraction of objects at or below the value ... All nodes or links at a
+	// specific time."* Its Graph window (Fgraph.pas) titles the vertical axis "Percent Less Than"
+	// and takes its values from GetJuncValues()/GetPipeValues() -- JUNCTIONS and PIPES only, never
+	// a tank, a reservoir, a pump or a valve -- which is the population used here too.
+	// EngCalcs.lpnProfile.frequencySeries() holds the curve itself.
+	//
+	// **IT READS WHAT THE MAP IS SHOWING, AND NOTHING ELSE.** Every value comes through
+	// colorValueOf(), the page's one value-and-unit seam, so the curve is the map's own numbers at
+	// the map's own moment: the transport's frame in a run, the single solve otherwise, and the
+	// kept snapshot when Recalculate is off -- the snapshot is never hidden here either. Nothing is
+	// solved, stored or re-read from the run.
+	//
+	// **THE SAME DRAWING AS TIME SERIES**, whose layout, text helper and line classes are called and
+	// not copied (tsLayout, tsText, .lpn-ts-line). No print and no export, because Profile has
+	// neither; the Graphs menu and the export row are Task 640's.
+	//
+	// **ABSOLUTE VALUES FOR THE THREE SIGNED LINK QUANTITIES, AND ONLY THOSE.** EPANET takes Abs()
+	// of everything it plots here. A flow's sign is only the direction the pipe was drawn in, so
+	// its absolute value is the honest distribution; the same holds for a head loss. A negative
+	// PRESSURE is a design fault, and folding it into a positive one would hide it, so a node value
+	// keeps its sign.
+	var FREQ_ABS = { link: { flow: 1, headloss: 1, gradient: 1 }, node: {} };
+	// A link's status is not a quantity, so it has no distribution. Everything else the map can be
+	// coloured by is offered, from the map's own list.
+	var FREQ_FIELD_SKIP = { node: {}, link: { status: 1 } };
+	// Above this many elements the per-point dots and their hover text are left off, for the reason
+	// LPN_TS_DOT_MAX gives. Higher than that one: here each dot names an element, which is the
+	// question a reader of this curve asks next ("which junction is the low one?").
+	var LPN_FREQ_DOT_MAX = 400;
+	var freqState = { group: 'node', fields: { node: '', link: '' } };
+	function freqGroup() { return freqState.group === 'link' ? 'link' : 'node'; }
+	function freqFieldOptions(group) {
+		var skip = FREQ_FIELD_SKIP[group] || {};
+		return colorFieldOptions(group).filter(function (o) { return !skip[o[0]]; });
+	}
+	function freqField() {
+		var group = freqGroup(), opts = freqFieldOptions(group), f = freqState.fields[group], i;
+		for (i = 0; i < opts.length; i++) { if (opts[i][0] === f) { return f; } }
+		return opts.length ? opts[0][0] : '';
+	}
+	// EPANET's population: junctions, or pipes. An inactive element is not in the network (Task 184).
+	function freqElements(group) {
+		return group === 'link'
+			? doc.links.filter(function (l) { return l.type === 'pipe' && isActive(l); })
+			: doc.nodes.filter(function (n) { return n.type === 'junction' && isActive(n); });
+	}
+	// One entry per element that HAS the value: {id, v}. The curve is built from these values.
+	function freqValues(group, field) {
+		var abs = (FREQ_ABS[group] || {})[field], out = [];
+		freqElements(group).forEach(function (e) {
+			var v = colorValueOf(group, e, field);
+			if (typeof v !== 'number' || !isFinite(v)) { return; }
+			out.push({ id: e.id, v: abs ? Math.abs(v) : v });
+		});
+		return out;
+	}
+	var freqLastSize = null;
+	function freqResizeWatch() {
+		var host = document.getElementById('lpn_freq_chart');
+		if (!host || !window.ResizeObserver) { return; }
+		new window.ResizeObserver(function () {
+			var r = host.getBoundingClientRect();
+			if (!(r.width > 0) || !(r.height > 0)) { return; }
+			if (freqLastSize && Math.abs(freqLastSize.w - r.width) < 1 &&
+				Math.abs(freqLastSize.h - r.height) < 1) { return; }
+			freqLastSize = { w: r.width, h: r.height };
+			renderFrequency();
+		}).observe(host);
+	}
+	function freqTabShow() { rebuildFreqForm(); renderFrequency(); }
+	// Two pull-downs, each in its own variable (see rebuildTsForm() for the defect that rule closes).
+	function rebuildFreqForm() {
+		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_freq_form'),
+			group = freqGroup(), field = freqField(), groupSel, fieldSel;
+		if (!box) { return; }
+		box.innerHTML = '';
+		groupSel = document.createElement('select');
+		groupSel.id = 'lpn_freq_group';
+		groupSel.className = 'lpn-ts-pick ec-help';
+		groupSel.title = pc.lpn_freq_group_tip || 'Whether the graph shows junctions or pipes.';
+		[['node', pc.lpn_pane_tab_junctions || 'Junctions'], ['link', pc.lpn_pane_tab_pipes || 'Pipes']]
+			.forEach(function (o) {
+				var op = document.createElement('option');
+				op.value = o[0]; op.textContent = o[1];
+				groupSel.appendChild(op);
+			});
+		groupSel.value = group;
+		groupSel.addEventListener('change', function () {
+			freqState.group = groupSel.value === 'link' ? 'link' : 'node';
+			rebuildFreqForm(); renderFrequency();
+		});
+		box.appendChild(groupSel);
+
+		fieldSel = document.createElement('select');
+		fieldSel.id = 'lpn_freq_quantity';
+		fieldSel.className = 'lpn-ts-pick ec-help';
+		fieldSel.title = pc.lpn_freq_quantity_tip || 'Which value to graph.';
+		freqFieldOptions(group).forEach(function (o) {
+			var op = document.createElement('option');
+			op.value = o[0]; op.textContent = o[1];
+			fieldSel.appendChild(op);
+		});
+		fieldSel.value = field;
+		fieldSel.addEventListener('change', function () {
+			freqState.fields[freqGroup()] = fieldSel.value;
+			renderFrequency();
+		});
+		box.appendChild(fieldSel);
+		initTipsIn(box);
+	}
+	function renderFrequency() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_freq_chart'),
+			note = document.getElementById('lpn_freq_note'),
+			group, field, vals, pts, lay, xB, yB, box, svg, unit, total, t, byVal, dots;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (note) { note.textContent = ''; }
+		group = freqGroup();
+		field = freqField();
+		total = freqElements(group).length;
+		vals = freqValues(group, field);
+		// **NOTHING TO GRAPH IS SAID IN WORDS, NEVER AS EMPTY AXES** -- Time series' rule. One
+		// sentence for every way of having no values (no solve yet, no quality run, a network with
+		// no pipes), and it names no button, so it is true in both states of Recalculate.
+		if (!vals.length) {
+			if (note) { note.textContent = pc.lpn_freq_none || 'No results for this value yet, so there is nothing to graph.'; }
+			return;
+		}
+		pts = EngCalcs.lpnProfile.frequencySeries(vals.map(function (o) { return o.v; }));
+		// The time is the one the VALUES are as of: a run's frame carries `t`, a single solve does not
+		// (the same test colorNodeValue() makes for a tank's head), and then there is no time to name.
+		t = (lastSolveResult && typeof lastSolveResult.t === 'number') ? lastSolveResult.t : null;
+		// Said before the chart is measured (Task 527; see renderTimeSeries()).
+		if (note) {
+			note.textContent = (t === null
+				? String(pc.lpn_freq_summary || 'Plotted: {n} of {total}')
+				: String(pc.lpn_freq_summary_time || 'Plotted: {n} of {total}, at {time}')
+					.replace('{time}', EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(t) : String(t)))
+				.replace('{n}', String(vals.length))
+				.replace('{total}', String(total));
+		}
+		lay = tsLayout(host);
+		freqLastSize = { w: lay.w, h: lay.h };
+		box = lay.box;
+		// The value axis is truncated like every axis here; the percent axis is 0 to 100 always, so
+		// two plots of the same network read against the same scale.
+		// A network whose pipes are all one diameter is a real answer: its curve is one vertical run,
+		// centred in a window a fiftieth of its own size rather than an axis of zero width.
+		xB = EngCalcs.lpnProfile.axisBounds(pts.map(function (p) { return p.x; }), {
+			ticks: 5, maxTicks: 8,
+			minSpan: Math.max(Math.abs(pts[0].x), Math.abs(pts[pts.length - 1].x)) / 50 || 1
+		});
+		yB = EngCalcs.lpnProfile.axisBounds([0, 100], lay.y);
+		svg = el('svg', { viewBox: '0 0 ' + lay.w + ' ' + lay.h, class: 'lpn-profile-svg' }, host);
+		function X(v) { return EngCalcs.lpnProfile.plotX(v, xB, box); }
+		function Y(v) { return EngCalcs.lpnProfile.plotY(v, yB, box); }
+		EngCalcs.lpnProfile.ticks(yB).forEach(function (v) {
+			el('line', { x1: box.left, y1: Y(v), x2: box.left + box.width, y2: Y(v),
+				class: 'lpn-profile-grid' }, svg);
+			tsText(svg, box.left - 5, Y(v) + 3, String(plainRound(v, 2)),
+				{ class: 'lpn-profile-tick', 'text-anchor': 'end' });
+		});
+		var xTicks = EngCalcs.lpnProfile.ticks(xB), xKeep = {};
+		EngCalcs.lpnProfile.labelStride(xTicks.map(X), LPN_TS_X_LABEL_PX)
+			.forEach(function (k) { xKeep[k] = true; });
+		xTicks.forEach(function (v, k) {
+			el('line', { x1: X(v), y1: box.top + box.height, x2: X(v), y2: box.top + box.height + 4,
+				class: 'lpn-profile-axis' }, svg);
+			if (!xKeep[k]) { return; }
+			tsText(svg, X(v), box.top + box.height + 14, String(plainRound(v, 4)),
+				{ class: 'lpn-profile-tick', 'text-anchor': 'middle' });
+		});
+		el('rect', { x: box.left, y: box.top, width: box.width, height: box.height,
+			class: 'lpn-profile-frame' }, svg);
+		if (pts.length > 1) {
+			el('polyline', {
+				points: pts.map(function (p) { return X(p.x) + ',' + Y(p.y); }).join(' '),
+				class: 'lpn-ts-line lpn-freq-line', stroke: LPN_TS_COLORS[0]
+			}, svg);
+		}
+		dots = pts.length <= LPN_FREQ_DOT_MAX || pts.length === 1;
+		if (dots) {
+			// Which element each dot is: the sorted values, matched back in the same order. Two
+			// elements with one value share a dot position, and each keeps its own name in turn.
+			byVal = vals.slice().sort(function (a, b) { return a.v - b.v; });
+			pts.forEach(function (p, k) {
+				var c = el('circle', { cx: X(p.x), cy: Y(p.y), r: 2, class: 'lpn-ts-dot', fill: LPN_TS_COLORS[0] }, svg),
+					ttl = el('title', {}, c);
+				ttl.appendChild(document.createTextNode(byVal[k].id + '   ' + plainRound(p.x, 4) +
+					'   ' + plainRound(p.y, 1) + ' %'));
+			});
+		}
+		// Axis titles: the value's whole label and unit, built as Time series and the map key build
+		// it; and EPANET's own "Percent less than" up the side.
+		unit = colorFieldUnitText(group, field);
+		if (lay.axisTitle) {
+			tsText(svg, box.left + box.width / 2, lay.titleY,
+				colorFieldLabel(group, field) + (unit ? ' (' + unit + ')' : ''),
+				{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
+		}
+		tsText(svg, 0, 0, pc.lpn_freq_axis_percent || 'Percent less than',
+			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
+			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
+	}
+
 	// Maps a tool mode to its pageConfig mode-hint key -- see the lang keys' own comment for why
 	// each is a whole sentence rather than "Mode:" + the tool's own label composed at render time.
 	var MODE_HINT_KEYS = {
@@ -29359,7 +29716,7 @@ var EngCalcs = EngCalcs || {};
 		// drawing, so that wording reads as "throw it away" and they will not press the only control
 		// that leaves. Closing never touches a project either way.
 		var blank = elh('button', { type: 'button', 'class': 'lpn-examples-blank' },
-			(galleryForced ? pc.lpn_examples_close : pc.lpn_examples_blank) || '');
+			(galleryForced ? pc.lpn_close : pc.lpn_examples_blank) || '');
 		blank.addEventListener('click', function () { hideExamplesGallery(); });
 		pane.appendChild(blank);
 		var grid = elh('div', { 'class': 'lpn-examples-grid' });
@@ -35940,7 +36297,7 @@ var EngCalcs = EngCalcs || {};
 		x.type = 'button';
 		x.className = 'lpn-tab-x';
 		x.textContent = '×';
-		x.title = pc.lpn_file_close || 'Close';
+		x.title = pc.lpn_close || 'Close';
 		x.addEventListener('click', function (e) { e.stopPropagation(); closeTab(p.id); });
 		tab.appendChild(x);
 		return tab;
@@ -37424,7 +37781,7 @@ var EngCalcs = EngCalcs || {};
 			// forking. It writes nothing, so it is safe in every state.
 			{ icon: 'revert', label: pc.lpn_file_revert || 'Revert', fn: revertCurrent, disabled: !(linked && entry && entry.dirty) },
 			{ separator: true },
-			{ icon: 'close', label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
+			{ icon: 'close', label: pc.lpn_close || 'Close', fn: function () { closeTab(id); } }
 		], recentRows));
 	}
 	// ---- The menu bar (ROADMAP Task 211) ----
@@ -37949,7 +38306,7 @@ var EngCalcs = EngCalcs || {};
 			},
 			{ separator: true },
 			{
-				icon: 'settings', label: pc.lpn_menu_settings || 'Settings',
+				icon: 'settings', label: pc.lpn_tool_settings || 'Settings',
 				tip: pc.lpn_tool_settings_tip,
 				fn: function () { toggleSettingsBox(); }
 			},
@@ -38226,7 +38583,7 @@ var EngCalcs = EngCalcs || {};
 			{ label: pc.lpn_tab_move_left || 'Move left', disabled: idx <= 0, fn: function () { moveTab(id, -1); } },
 			{ label: pc.lpn_tab_move_right || 'Move right', disabled: idx < 0 || idx >= library.projects.length - 1, fn: function () { moveTab(id, 1); } },
 			{ separator: true },
-			{ icon: 'close', label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
+			{ icon: 'close', label: pc.lpn_close || 'Close', fn: function () { closeTab(id); } }
 		]);
 	}
 	function openTabListMenu(anchor) {
@@ -38626,6 +38983,7 @@ var EngCalcs = EngCalcs || {};
 		// the pane before it starts reporting sizes.
 		profileResizeWatch();
 		tsResizeWatch();
+		freqResizeWatch();
 		wireUnitSelects();
 		var opening = initLibrary(), bornClean = false;
 		// **THREE STATES, NOT TWO** (Task 627): a document that opened, a document that is there and
@@ -41218,8 +41576,8 @@ var EngCalcs = EngCalcs || {};
 		// the run takes -- the three pairs reorder in Arabic or Hebrew and the dividers stay between
 		// them. That caution IS right for a DIRECTIONAL glyph (an arrow, a guillemet, U+25B8).
 		el.textContent = [
-			(pc.lpn_units_flow || 'Flow') + ': ' + unitLabel('lpn_u_flow'),
-			(pc.lpn_units_pressure || 'Pressure') + ': ' + unitLabel('lpn_u_pressure'),
+			(pc.lpn_result_flow || 'Flow') + ': ' + unitLabel('lpn_u_flow'),
+			(pc.lpn_result_pressure || 'Pressure') + ': ' + unitLabel('lpn_u_pressure'),
 			(pc.bpn_method || 'Friction method') + ': ' + frictionMethodLabel()
 		].join(' | ');
 		refreshCoordsReadout();
@@ -42984,7 +43342,7 @@ var EngCalcs = EngCalcs || {};
 				var rm = document.createElement('button');
 				rm.type = 'button';
 				rm.className = 'lpn-cp-remove';
-				rm.textContent = pc.lpn_cp_remove || 'Remove';
+				rm.textContent = pc.lpn_fitting_remove || 'Remove';
 				helpTip(rm, pc.lpn_cp_remove_tip);
 				rm.addEventListener('click', function (e) {
 					if (e && e.preventDefault) { e.preventDefault(); }
@@ -43902,7 +44260,7 @@ var EngCalcs = EngCalcs || {};
 		// default quoted in the tip is what BLANK would inherit -- inside a scenario that is the
 		// document's own number, not the bare 1, or the tip would state a default the row does not
 		// have.
-		hydNumberRow('demandMultiplier', 'lpn_settings_demand_multiplier', 'Demand multiplier',
+		hydNumberRow('demandMultiplier', 'bpn_demand_mult', 'Demand multiplier',
 			'lpn_settings_demand_multiplier_tip',
 			inBaseScenario() ? 1 : ((settings.hydraulics || {}).demandMultiplier === undefined
 				? 1 : settings.hydraulics.demandMultiplier),
@@ -45723,7 +46081,7 @@ var EngCalcs = EngCalcs || {};
 	// is a sentence about diameters and does not say so.
 	var LIB_IMPORT_UNIT_NAMES = {
 		lpn_u_diameter: 'lpn_field_diameter',
-		lpn_u_flow: 'lpn_units_flow',
+		lpn_u_flow: 'lpn_result_flow',
 		lpn_u_elevhead: 'lpn_units_elevhead'
 	};
 	/**
@@ -46245,7 +46603,7 @@ var EngCalcs = EngCalcs || {};
 				['none', pc.lpn_quality_none || 'Nothing'],
 				['chemical', pc.lpn_quality_chemical || 'A reactive chemical'],
 				['trace', pc.lpn_quality_trace || 'Source trace'],
-				['age', pc.lpn_quality_age || 'Water age']
+				['age', pc.lpn_result_water_age || 'Water age']
 			];
 		opts.forEach(function (o) {
 			var opt = document.createElement('option');
@@ -48047,7 +48405,7 @@ var EngCalcs = EngCalcs || {};
 				verdict.textContent = read.ok
 					? (pc.lpn_library_rule_ok || '✓ This rule was read')
 					: read.missing
-						? (pc.lpn_library_rule_missing || '⚠ This network has nothing called {id}').replace('{id}', read.missing)
+						? (pc.lpn_library_control_missing || '⚠ This network has nothing called {id}').replace('{id}', read.missing)
 						: (pc.lpn_library_rule_bad || '⚠ This rule could not be read');
 			}
 			showVerdict(libReadRule(box.value));
@@ -55664,8 +56022,8 @@ var EngCalcs = EngCalcs || {};
 		if (!rec.effects) { return pc.lpn_ff_not_checked || 'Not checked'; }
 		n = rec.effects.nodes.length; l = rec.effects.links.length;
 		if (n && l) { return pc.lpn_ff_limit_both || 'Pressure and velocity'; }
-		if (n) { return pc.lpn_ff_limit_pressure || 'Pressure'; }
-		if (l) { return pc.lpn_ff_limit_velocity || 'Velocity'; }
+		if (n) { return pc.lpn_result_pressure || 'Pressure'; }
+		if (l) { return pc.lpn_result_velocity || 'Velocity'; }
 		return FF_DASH;
 	}
 	function ffCell(row, text, cls) {
@@ -56392,7 +56750,7 @@ var EngCalcs = EngCalcs || {};
 	function scenarioCompareModels() {
 		var was = project.activeScenario, out = [];
 		try {
-			scenarios.forEach(function (s) {
+			scenariosForDisplay().forEach(function (s) {
 				project.activeScenario = s.id;
 				out.push({ scn: s, model: assembleModel() });
 			});
@@ -56520,7 +56878,7 @@ var EngCalcs = EngCalcs || {};
 		body = ffTable(host, [
 			pc.lpn_scenario_label || 'Scenario',
 			pc.lpn_scenario_overrides || 'No. of custom values',
-			pc.lpn_scncmp_col_minpressure || 'Lowest pressure',
+			pc.bpn_p_min || 'Lowest pressure',
 			pc.lpn_scncmp_col_maxvelocity || 'Highest velocity'
 		]);
 		scenarioCompareRun.forEach(function (r) {
@@ -56890,7 +57248,7 @@ var EngCalcs = EngCalcs || {};
 			ffEl('p', 'lpn-ff-note', pc.lpn_status_empty || 'Nothing changed status during this run.', host);
 			return;
 		}
-		body = ffTable(host, [pc.lpn_status_col_time || 'Time', pc.lpn_status_col_event || 'Event']);
+		body = ffTable(host, [pc.lpn_full_col_time || 'Time', pc.lpn_status_col_event || 'Event']);
 		events.forEach(function (e) {
 			var tr = ffEl('tr', null, null, body);
 			ffCell(tr, EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(e.t) : String(e.t));

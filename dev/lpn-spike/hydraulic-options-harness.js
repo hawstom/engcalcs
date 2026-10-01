@@ -252,7 +252,7 @@ console.log('\n--- four rows, and the rest carried without one ---');
 			const span = (line.children || []).filter(c => c.tagName === 'SPAN')[0];
 			return span ? span.textContent.replace(/\s+/g, ' ').trim() : '';
 		});
-	['lpn_settings_accuracy', 'lpn_settings_demand_multiplier', 'lpn_settings_specific_gravity',
+	['lpn_settings_accuracy', 'bpn_demand_mult', 'lpn_settings_specific_gravity',
 		'lpn_settings_viscosity', 'lpn_settings_emitter_exponent', 'lpn_settings_trials',
 		'lpn_settings_unbalanced', 'lpn_settings_unbalanced_trials', 'lpn_settings_head_error',
 		'lpn_settings_flow_change', 'lpn_settings_damp_limit'].forEach(function (k) {

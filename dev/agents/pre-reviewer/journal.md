@@ -3634,3 +3634,13 @@ every /engcalcs/... asset 404s as HTML and the app never boots (silent "Unexpect
 exceptions, page falls back to rendering something that looks like the homepage). Also: two
 php -S invocations on the same port fail silently (older one keeps serving) unless you check the
 log for "Address already in use".
+
+## 2026-09-30 -- three branches reviewed (filed by the orchestrator from Perry's scratch notes)
+
+- feat/copy-lock: READY; reproduced, OBSERVED in real headless Chrome, a pre-existing data-loss hazard
+  (an Explorer copy opened in the browser that has the original open rebinds the original's tab to the
+  copy's file); fixed on the branch the same day.
+- feat/criticality: READY with fixes; hand-checked four rows on Net3 against pattern multipliers and a
+  raw EPANET run; found two leaks (Clear rings wiped the report; both analyses could run at once).
+- feat/find-filter: READY with one leak (adding a scenario counted as an edit of every filtered row);
+  measured the snapshot cost at about 2% of existing waits on a 2,024-junction table.
