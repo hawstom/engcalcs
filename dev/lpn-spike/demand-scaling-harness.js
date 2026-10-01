@@ -36,6 +36,7 @@ const L = loadLoopedNetwork(
 	"\t\tsetMin: function (t) { critFireFlowAsk().minPressure = t; },\n" +
 	"\t\tminText: function () { return critFireFlowAsk().minPressure; },\n" +
 	"\t\tdocGuard: function () { return dsDocGuard; }, dsBusy: function () { return dsBusy; },\n" +
+	"\t\tsortDs: dsSortBy,\n" +
 	"\t\tcurrentModel: function () { var m = assembleModel(); fireFlowAtFrame(m); return m; },\n" +
 	"\t\tsolveOnScreen: function (m) { return Promise.resolve(engineFor(m).solve(m)); },\n" +
 	"\t\ttoPsi: function (si) { return toDisplay(si, 'lpn_u_pressure'); },\n" +
@@ -146,6 +147,14 @@ async function minPsiAt(m) {
 	let tr = rows(byId.lpn_ds_report);
 	ok('two tables: nine junctions and the top velocities', tr.length === 9 + Math.min(10, set.velocities.length), tr.length);
 	ok('the first row is the lowest junction, as a go-to link', gotoIn(tr[0][0])[0] && gotoIn(tr[0][0])[0].textContent === set.pressures[0].id);
+	L.sortDs('p', 0);
+	tr = rows(byId.lpn_ds_report);
+	const ids = tr.slice(0, 9).map((r) => gotoIn(r[0])[0].textContent);
+	ok('a heading re-sorts the same rows: by junction', ids.join() === ids.slice().sort((x, y) => x.localeCompare(y, undefined, { numeric: true })).join() &&
+		ids.slice().sort().join() === set.pressures.map((x) => x.id).sort().join(), ids.join());
+	L.sortDs('p', 0);
+	L.sortDs('p', 0);
+	ok('...and a third click is still a sort, never lost rows', rows(byId.lpn_ds_report).length === tr.length);
 	ok('velocities are highest first, pumps left out', set.velocities.every((x, i, a) => !i || a[i - 1].velocity >= x.velocity) &&
 		!set.velocities.some((x) => x.id === '9'));
 	ok('the project is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());

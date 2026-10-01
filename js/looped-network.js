@@ -57287,14 +57287,15 @@ var EngCalcs = EngCalcs || {};
 			.replace('{solves}', String(set.solves)), host);
 		// THE TWO TABLES ARE THE TWO READINGS A DESIGNER TAKES OF A HEAVIER DAY: where the pressure
 		// is lowest, and where the water moves fastest. The worst ten of each, worst first, with the
-		// same element unscaled beside it; the order is the answer, so the headings do not re-sort.
+		// same element unscaled beside it. A heading re-sorts those ten and never chooses another ten:
+		// which rows are here is the answer, and only their order is the reader's.
 		ffEl('div', 'lpn-ff-head', pc.lpn_ds_head_lowest || 'Lowest pressures', host);
 		body = ffTable(host, [
 			pc.lpn_ff_col_junction || 'Junction',
 			[pc.lpn_ds_col_scaled || 'Scaled', pc.lpn_ds_col_scaled_tip],
 			[pc.lpn_ds_col_unscaled || 'Unscaled', pc.lpn_ds_col_unscaled_tip]
-		], { state: { col: null, dir: 1 }, by: function () {} });
-		set.pressures.slice(0, DS_ROWS).forEach(function (x) {
+		], { state: dsSortState.p, by: function (col) { dsSortBy('p', col); } });
+		dsSortRows(set.pressures.slice(0, DS_ROWS), dsSortState.p, 'pressure').forEach(function (x) {
 			var tr = ffEl('tr', x.pressure < set.minPressure ? 'lpn-crit-impact' : null, null, body);
 			ffGotoLink(ffCell(tr, ''), 'node', x.id, labelPrefixFor('node', 'id') + x.id);
 			ffCell(tr, ffMaybeQty(x.pressure, 'lpn_u_pressure'));
@@ -57306,13 +57307,33 @@ var EngCalcs = EngCalcs || {};
 			pc.lpn_ds_col_link || 'Link',
 			[pc.lpn_ds_col_scaled || 'Scaled', pc.lpn_ds_col_scaled_tip],
 			[pc.lpn_ds_col_unscaled || 'Unscaled', pc.lpn_ds_col_unscaled_tip]
-		], { state: { col: null, dir: 1 }, by: function () {} });
-		set.velocities.slice(0, DS_ROWS).forEach(function (x) {
+		], { state: dsSortState.v, by: function (col) { dsSortBy('v', col); } });
+		dsSortRows(set.velocities.slice(0, DS_ROWS), dsSortState.v, 'velocity').forEach(function (x) {
 			var tr = ffEl('tr', null, null, body);
 			ffGotoLink(ffCell(tr, ''), 'link', x.id, labelPrefixFor('link', 'id') + x.id);
 			ffCell(tr, ffMaybeQty(x.velocity, 'lpn_u_velocity'));
 			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_velocity'));
 		});
+	}
+	// The two tables' sort, fire flow's rule: the same column flips, a new one starts ascending, and
+	// `col: null` is the worst-first order the run gave.
+	var dsSortState = { p: { col: null, dir: 1 }, v: { col: null, dir: 1 } };
+	function dsSortBy(which, col) {
+		var st = dsSortState[which];
+		dsSortState[which] = { col: col, dir: st.col === col ? -st.dir : 1 };
+		rebuildDemandScaleReport();
+	}
+	function dsSortRows(list, st, field) {
+		if (st.col === null) { return list; }
+		return list.map(function (r, i) { return { r: r, i: i }; }).sort(function (a, b) {
+			var ka = st.col === 0 ? a.r.id : (st.col === 1 ? a.r[field] : a.r.unscaled),
+				kb = st.col === 0 ? b.r.id : (st.col === 1 ? b.r[field] : b.r.unscaled),
+				ab = ffBlank(ka), bb = ffBlank(kb), c;
+			if (ab || bb) { return ab === bb ? a.i - b.i : (ab ? 1 : -1); }
+			c = (typeof ka === 'number' && typeof kb === 'number') ? ka - kb
+				: String(ka).localeCompare(String(kb), undefined, { numeric: true });
+			return c ? st.dir * c : a.i - b.i;
+		}).map(function (x) { return x.r; });
 	}
 	// The case both buttons solve: the network on screen, and which junctions' demands are scaled.
 	// Null `ids` scales every junction. Says so and returns null where there is nothing to scale.
