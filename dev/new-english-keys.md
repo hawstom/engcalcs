@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**1 still to read on master**, of 1 untranslated keys, of 2136 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**23 still to read on master**, of 23 untranslated keys, of 2153 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,17 +25,83 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (1, 1 to read @@ NEEDS RULING)
+## lpn_  (23, 23 to read @@ NEEDS RULING)
 
+- **`lpn_ff_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_ff_selected`**
+  > Selected
+  @@ NEEDS RULING
+- **`lpn_file_import_menu`**
+  > Import…
+  @@ NEEDS RULING
+- **`lpn_help_hotkeys`**
+  > Tables and Hotkeys
+  @@ NEEDS RULING
+- **`lpn_hotkeys_map_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_hotkeys_map_heading`**
+  > Map
+  @@ NEEDS RULING
+- **`lpn_hotkeys_map_term`**
+  > Map keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_hotkeys_tables_heading`**
+  > Tables
+  @@ NEEDS RULING
 - **`lpn_pane_filter_stale`**
   > Rows that no longer match: {n}.
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_average_day`**
+  > 4. Average Day
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_average_day_tip`**
+  > Demand multiplier 1: every demand as entered, which is taken to be average day demand.
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_fire_max_day`**
+  > 7. Fire plus max day
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_fire_max_day_tip`**
+  > Max day demand (multiplier 2.0). Run Fire flow analysis in this scenario: it adds the fire flow at each junction on top of this demand.
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_flow_max`**
+  > 3. Flow test: Max
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_flow_max_tip`**
+  > A hydrant flow test at the highest residual reading. In this scenario, add the flow measured at the flowing hydrant to the demand of its junction, then compare the pressures with 1. Flow test: Static. Nothing flows until you do.
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_flow_mid`**
+  > 2. Flow test: Mid
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_flow_mid_tip`**
+  > A hydrant flow test at the first residual reading. In this scenario, add the flow measured at the flowing hydrant to the demand of its junction, then compare the pressures with 1. Flow test: Static. Nothing flows until you do.
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_flow_static`**
+  > 1. Flow test: Static
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_flow_static_tip`**
+  > A hydrant flow test with no hydrant flowing. Its pressures are the static readings to compare with 2. Flow test: Mid and 3. Flow test: Max.
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_max_day`**
+  > 5. Max Day
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_max_day_tip`**
+  > Demand multiplier 2.0 times average day, a starting value. Most systems fall between 1.2 and 3.0 (National Research Council, 2006). Set your own system's in Settings, Calculation, Hydraulics, Demand multiplier.
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_peak_hour`**
+  > 6. Peak hour
+  @@ NEEDS RULING
+- **`lpn_scenario_preset_peak_hour_tip`**
+  > Demand multiplier 3.0 times average day, a starting value. Most systems fall between 3.0 and 6.0 (National Research Council, 2006). Set your own system's in Settings, Calculation, Hydraulics, Demand multiplier.
   @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**67 still to read**, of 70 new keys across 16 unmerged branch(es).
+**47 still to read**, of 50 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -184,40 +250,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Working: {done} of {total} assets.
   @@ NEEDS RULING
 
-### feat/find-filter (`59671f1b`) — adds no English strings
-
-### feat/fireflow-scope (`34872754`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_ff_all`**
-  > All
-  @@ NEEDS RULING
-- **`lpn_ff_selected`**
-  > Selected
-  @@ NEEDS RULING
-
-### feat/graph-tab-keys (`d2738ec3`) — adds no English strings
-
-### feat/help-menu (`d34b00e6`) — 6 new, 6 to read @@ NEEDS RULING
-
-- **`lpn_file_import_menu`**
-  > Import…
-  @@ NEEDS RULING
-- **`lpn_help_hotkeys`**
-  > Tables and Hotkeys
-  @@ NEEDS RULING
-- **`lpn_hotkeys_map_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>
-  @@ NEEDS RULING
-- **`lpn_hotkeys_map_heading`**
-  > Map
-  @@ NEEDS RULING
-- **`lpn_hotkeys_map_term`**
-  > Map keyboard shortcuts
-  @@ NEEDS RULING
-- **`lpn_hotkeys_tables_heading`**
-  > Tables
-  @@ NEEDS RULING
-
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
 - **`lpn_confirm_labels_restore`**
@@ -240,58 +272,17 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/property-graph (`f22d31af`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/property-graph (`1263d1f9`) — 4 new, 4 to read @@ NEEDS RULING
 
+- **`lpn_pgraph_head_gain`**
+  > Head gain
+  @@ NEEDS RULING
+- **`lpn_pgraph_head_gain_tip`**
+  > The pump's head gain from suction to discharge, plotted positive. EPANET reports it as a negative head loss, as do the Tables and the map label.
+  @@ NEEDS RULING
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.
   @@ NEEDS RULING
 - **`lpn_pgraph_source_share_from`**
   > Source share from {node}
   @@ NEEDS RULING
-
-### feat/scenario-preset (`633e70fb`) — 14 new, 14 to read @@ NEEDS RULING
-
-- **`lpn_scenario_preset_average_day`**
-  > 4. Average Day
-  @@ NEEDS RULING
-- **`lpn_scenario_preset_average_day_tip`**
-  > Demand multiplier 1: every demand as entered, which is taken to be average day demand.
-  @@ NEEDS RULING
-- **`lpn_scenario_preset_fire_max_day`**
-  > 7. Fire plus max day
-  @@ NEEDS RULING
-- **`lpn_scenario_preset_fire_max_day_tip`**
-  > Max day demand (multiplier 2.0). Run Fire flow analysis in this scenario: it adds the fire flow at each junction on top of this demand.
-  @@ NEEDS RULING
-- **`lpn_scenario_preset_flow_max`**
-  > 3. Flow test: Max
-  @@ NEEDS RULING
-- **`lpn_scenario_preset_flow_max_tip`**
-  > A hydrant flow test at the highest residual reading. In this scenario, add the flow measured at the flowing hydrant to the demand of its junction, then compare the pressures with 1. Flow test: Static. Nothing flows until you do.
-  @@ NEEDS RULING
-- **`lpn_scenario_preset_flow_mid`**
-  > 2. Flow test: Mid
-  @@ NEEDS RULING
-- **`lpn_scenario_preset_flow_mid_tip`**
-  > A hydrant flow test at the first residual reading. In this scenario, add the flow measured at the flowing hydrant to the demand of its junction, then compare the pressures with 1. Flow test: Static. Nothing flows until you do.
-  @@ NEEDS RULING
-- **`lpn_scenario_preset_flow_static`**
-  > 1. Flow test: Static
-  @@ NEEDS RULING
-- **`lpn_scenario_preset_flow_static_tip`**
-  > A hydrant flow test with no hydrant flowing. Its pressures are the static readings to compare with 2. Flow test: Mid and 3. Flow test: Max.
-  @@ NEEDS RULING
-- **`lpn_scenario_preset_max_day`**
-  > 5. Max Day
-  @@ NEEDS RULING
-- **`lpn_scenario_preset_max_day_tip`**
-  > Demand multiplier 2.0 times average day, a starting value. Most systems fall between 1.2 and 3.0 (National Research Council, 2006). Set your own system's in Settings, Calculation, Hydraulics, Demand multiplier.
-  @@ NEEDS RULING
-- **`lpn_scenario_preset_peak_hour`**
-  > 6. Peak hour
-  @@ NEEDS RULING
-- **`lpn_scenario_preset_peak_hour_tip`**
-  > Demand multiplier 3.0 times average day, a starting value. Most systems fall between 3.0 and 6.0 (National Research Council, 2006). Set your own system's in Settings, Calculation, Hydraulics, Demand multiplier.
-  @@ NEEDS RULING
-
-### fix/points-data-heading (`75707bd6`) — adds no English strings

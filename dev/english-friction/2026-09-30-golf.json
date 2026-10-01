@@ -1,0 +1,5 @@
+{
+    "sprint": "2026-09-30-golf",
+    "description": "Delta and resync sprint for the five branches Tom cleared on 2026-09-30 evening (find-filter, scenario-preset, graph-tab-keys, fireflow-scope, help-menu) and fix/points-data-heading: 25 new keys and 5 changed (lpn_ff_design_no_selection, lpn_ff_no_selection, lpn_help_icons with a role change from 'Toolbar key' to 'Toolbar', lpn_notes_7_def, points_data_heading). Wave 0 by one agent over the 25 new keys.",
+    "entries": []
+}
