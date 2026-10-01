@@ -29109,7 +29109,7 @@ var EngCalcs = EngCalcs || {};
 		sel.value = pick.field;
 		if (pgIsHeadGain(subj.group, subj.e, pick.field)) {
 			sel.title = pc.lpn_pgraph_head_gain_tip ||
-				'The pump\'s head gain from suction to discharge. EPANET reports it as a negative head loss.';
+				'The pump\'s head gain from suction to discharge, plotted positive. EPANET reports it as a negative head loss, as do the Tables and the map label.';
 		}
 		sel.addEventListener('change', function () {
 			pgFieldByType[subj.e.type] = sel.value;
