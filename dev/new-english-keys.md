@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**48 still to read on master**, of 71 untranslated keys, of 2224 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**50 still to read on master**, of 73 untranslated keys, of 2226 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (71, 48 to read @@ NEEDS RULING)
+## lpn_  (73, 50 to read @@ NEEDS RULING)
 
 - **`lpn_analyze_menu`**
   > Analyze
@@ -111,6 +111,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_crit_working`**
   > Working: {done} of {total} assets.
   _Ruled OK 2026-10-01._
+- **`lpn_ds_at_time`**
+  > Time step: {time}.
+  @@ NEEDS RULING
 - **`lpn_ds_bad_multiplier`**
   > Type a demand scale of zero or more, such as 1.5.
   @@ NEEDS RULING
@@ -139,10 +142,10 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Find
   @@ NEEDS RULING
 - **`lpn_ds_found`**
-  > ✓ Every junction keeps {pressure} up to {m} times the demands.
+  > ✓ Every junction keeps {pressure} up to a demand scale of {m}.
   @@ NEEDS RULING
 - **`lpn_ds_found_below`**
-  > ⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to {m} times the demands.
+  > ⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.
   @@ NEEDS RULING
 - **`lpn_ds_head_lowest`**
   > Lowest pressures
@@ -157,13 +160,13 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Highest velocities
   @@ NEEDS RULING
 - **`lpn_ds_holds_max`**
-  > ✓ Every junction keeps {pressure} up to {max} times the demands, the top of the search.
+  > ✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.
   @@ NEEDS RULING
 - **`lpn_ds_intro`**
   > The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.
   @@ NEEDS RULING
 - **`lpn_ds_lowest_at`**
-  > At {m} times the demands, the lowest pressure is {pressure}, at junction {id}.
+  > At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.
   @@ NEEDS RULING
 - **`lpn_ds_menu`**
   > Demand scaling…
@@ -190,19 +193,19 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > No junctions are selected. Select junctions, or scale all of them.
   @@ NEEDS RULING
 - **`lpn_ds_nosolve_at`**
-  > At {m} times the demands, the network gave no answer. {reason}
+  > At a demand scale of {m}, the network gave no answer. {reason}
   @@ NEEDS RULING
 - **`lpn_ds_run`**
   > Run
   @@ NEEDS RULING
 - **`lpn_ds_scale_below`**
-  > ⚠ At {m} times the demands, {n} junctions fall below {pressure}.
+  > ⚠ At a demand scale of {m}, junctions below {pressure}: {n}.
   @@ NEEDS RULING
 - **`lpn_ds_scale_ok`**
-  > ✓ At {m} times the demands, every junction keeps {pressure}.
+  > ✓ At a demand scale of {m}, every junction keeps {pressure}.
   @@ NEEDS RULING
 - **`lpn_ds_scaled_selected`**
-  > Only the demands of the {n} selected junctions were scaled.
+  > Only the selected junctions were scaled. Junctions scaled: {n}.
   @@ NEEDS RULING
 - **`lpn_ds_scope`**
   > Demands to scale
@@ -223,10 +226,13 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > The search was stopped before it found an answer.
   @@ NEEDS RULING
 - **`lpn_ds_skipped`**
-  > {n} selected elements are not junctions, so they were left as they are.
+  > Selected elements that are not junctions, left as they are: {n}.
   @@ NEEDS RULING
 - **`lpn_ds_stale`**
   > The drawing changed, so the demand scaling results were cleared. Run it again.
+  @@ NEEDS RULING
+- **`lpn_ds_time_moved`**
+  > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
   @@ NEEDS RULING
 - **`lpn_ds_title`**
   > Demand scaling
@@ -245,7 +251,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**4 still to read**, of 22 new keys across 12 unmerged branch(es).
+**6 still to read**, of 29 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -300,11 +306,33 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/criticality (`bfb5bdbf`) — adds no English strings
 
-### feat/demand-scaling (`bfb5bdbf`) — adds no English strings
+### feat/demand-scaling (`41008d90`) — adds no English strings
 
-### feat/desktop (`c45d847e`) — adds no English strings
+### feat/desktop (`a7cbb6eb`) — 7 new, 2 to read @@ NEEDS RULING
 
-### feat/graph-menu (`0a8db639`) — 2 new, 2 to read @@ NEEDS RULING
+- **`lpn_copy_body`**
+  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_body_nodate`**
+  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_copy`**
+  > A copy; make new lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_kept_link`**
+  > Opened {name} as the original, moved to a new place. Save now writes to this file.
+  @@ NEEDS RULING
+- **`lpn_copy_opened`**
+  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  @@ NEEDS RULING
+- **`lpn_copy_original`**
+  > Original; keep same lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_title`**
+  > Mark file as new copy?
+  _Ruled OK 2026-10-01._
+
+### feat/graph-menu (`f0ff54df`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_graphs_menu`**
   > Graphs
@@ -335,7 +363,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/property-graph (`c5c11bcf`) — 4 new, 1 to read @@ NEEDS RULING
+### feat/property-graph (`2628538a`) — 4 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_pgraph_head_gain`**
   > Head gain
