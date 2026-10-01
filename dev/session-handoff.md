@@ -96,43 +96,48 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-01 (night of 09-30)
+## STATE — 2026-10-01
 
-### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
+### Master = 05eac4a3, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-**Tom was told 8449b604 was safe to pull** (it carries the mi Paste fix). Master since then also carries,
-on his word typed in the session: `feat/find-filter`, `feat/scenario-preset`, `feat/graph-tab-keys`,
-`feat/fireflow-scope`, `feat/help-menu`; `fix/points-data-heading`; sprint `2026-09-30-golf` (their
-English in 26, with his rulings on 10 Wave 0 findings, his harvested marks, syn notes for
-`lpn_ff_all`/`lpn_ff_selected`); Task 755 (per-scenario calculation options), Task 756 and
-`dev/desktop-platforms-plan.md`. Merged branches' worktrees and branches are deleted.
+Master since 8449b604 (the SHA he was told was safe) also carries `feat/copy-lock` (his "Merge after
+wording"; his sentence for `lpn_copy_opened`), and roadmap closes 745, 750, 718, 738, 743, 746, 753,
+690. 640 and 754 are at 100. `feat/graph-menu`, `feat/demand-scaling`, `feat/desktop` are protected.
 
 ### Awaiting his browser pass (protected; merge on his all-clear, typed by him in a session)
 
-Ports need his Apache reload (commands at the foot). His notes arrive as pastes: ask him to confirm
-merges with AskUserQuestion, then record his selection as the words.
-- 8141 `feat/property-graph` (637): "Source share from {node}"; a pump's graph now reads "Head gain",
-  positive (Mary: EPANET says head gain; WaterGEMS shows positive Pump Head). Elsewhere a pump still
-  shows signed "Head loss" (Tables, Properties result, labels, Time series): his call to rename.
-- 8144 `feat/criticality` (751): his "Skip dead ends" toggle built (a bridge with no source beyond;
-  a single feed main from the only reservoir counts as one). Owed rulings: severity order; row tints
-  (builder's addition); whether Design check should get its own All/Selected keys (fr/pt "Toutes",
-  "Todas" agree with junctions only, and Design check reuses them for pipes and junctions).
-- 8146 `feat/copy-lock` (747): his wording ("This file says it was created on {date}, and this browser
-  doesn't recognize it...") and his "moved, not copied" reading: Original on a different file
-  reconnects the tab to it. `lpn_copy_kept_link` reworded, needs his ruling.
-- 8147 `feat/bentley-interop` (749): Basic mode; "Alternatives preview"; his "Asset activation",
-  note and tip applied; Demand multiplier column (a calculation option, blank = inherits). New browser
-  key `lpn_scnbasic` (told Tom). Last full check_all on this branch predates the final commits.
-- `feat/label-placer` (539/741): R10 scale sentence adopted; CC owes him written answers on G, R1 and
-  R11 (given in the 09-30 night report; re-derive from the round-5 record if lost) and needs his number
-  for the R10/R15 settle bound.
+Ports 8148/8149 are new: he needs the Apache reload (commands at the foot). Ask him to confirm merges
+with AskUserQuestion; a pasted "merge" is refused by the classifier.
+- 8141 `feat/property-graph` (637): his "Fix that first" is DONE: a pump reads Head gain, positive, in
+  Tables, Properties, labels, Time series, Find, Full report (CSV split into Head loss / Head gain
+  columns). Owed rulings: the label prefix "Hg=" (invented), pumps left out of the head-loss extrema badge.
+- 8144 `feat/criticality` (751): Design check has its own keys (`lpn_ff_design_off/_all/_selected`);
+  Water > Analyze fly-out holds Fire flow and Criticality. His rule is in `dev/language-strings.md`.
+  Still owed: severity order; row tints. Syn diff owed: `lpn_ff_all`/`lpn_ff_selected` still say the
+  Design check reuses them.
+- 8147 `feat/bentley-interop` (749): Alternatives preview columns fixed (`alt-table-layout-harness.js`);
+  every `.lpn-ff-table` lost the blue grid.
+- 8148 `feat/graph-menu` (640): Water > Graphs (Profile, Time series, Frequency). Tip wording his.
+- 8149 `feat/demand-scaling` (754), built ON criticality, so merge criticality first. Perry: ready.
+  "Demand scale" is his word; results name their time step and warn when the clock moves. Fire flow
+  and Criticality do not (same gap), and "{n} more junctions are not shown" reads "1 more junctions".
+- `feat/desktop` (756, stays 75, play): Spike 0 in `dev/desktop-platforms-plan.md`. His call: usage logs
+  in a desktop build, off or reported to hawsedc.com.
+- `feat/label-placer` (539/741): unchanged; CC owes written answers on G, R1, R11 and needs his R10/R15
+  settle bound.
 
 ### Owed translation work
 
-On branches: property-graph 4 keys, criticality ~26, copy-lock 7, bentley-interop 13. Romanian file
-menu mixes noun and verb forms ("Importare…", "Importă puncte topografice…"): a consistency pass.
-Concept layer's new terms have empty translations. Glossary write-back owed from echo (see 09-30).
+Run a sprint after this batch merges: property-graph 4 keys, criticality ~29, bentley-interop 13,
+graph-menu 2, demand-scaling ~42. Romanian file menu noun/verb pass. Concept layer: 67 empty
+definitions. Glossary write-back owed from echo (see 09-30).
+
+### Traps met 2026-10-01
+
+- **Two runs per branch queue up when an agent hands back while its run waits, and the classifier
+  refuses CC killing a queued waiter.** Brief agents to detach ONE run with a unique log name.
+- **`start-fresh-consent-harness.js` flakes under load** ("the banner is showing again"); 11/11 alone.
+- **Closing roadmap tasks makes `dev/features.md` stale**: regenerate with `generate_features.php`.
 
 ### Traps met 2026-09-30 (night)
 
