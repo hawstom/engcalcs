@@ -124,8 +124,10 @@ Every port needs his Apache reload (commands at the foot) before he can open 814
 - 8146 `feat/copy-lock` (747): his whitelist design (Recent files; same entry as a held handle; save
   permission; no document ID). No new storage. `dev/browser-pass/specs/locking.js` now meets the copy
   question first and is not updated.
-- `feat/bentley-interop` (749): Basic-mode scenario model being built when this was written; read
-  `git log master..feat/bentley-interop` and `dev/scenario-alternatives.md` there. No port yet.
+- 8147 `feat/bentley-interop` (749): Basic mode built (derived alternatives, nothing stored in files;
+  the scenario-alternatives doc on that branch). New browser key `lpn_scnbasic`, written only when he
+  unchecks it (told Tom). 13 keys; "Active topology" waits on his Activation ruling (753). Full
+  check_all on its last head not run (two harness-label checks re-run alone and pass).
 
 ### Not protected, waiting only on a translation sprint
 
