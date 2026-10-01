@@ -262,9 +262,9 @@ EngCalcs.pageCalculatorInitialize = function (objForm) {
 	this.dataString = (this.defaultUnitSet === 'us')
 		? "0,6\n30,3,true,0.04\n40,1,false,0.03\n60,1,false,0.03\n70,3,true,0.03\n100,6,true,0.04"
 		: "0,2\n10,1,true,0.04\n12,0.5,false,0.03\n18,0.5,false,0.03\n20,1,true,0.03\n30,2,true,0.04";
+	// dataStringToCookieValue() now stamps the current format itself, so this fresh seed is never
+	// read back as a legacy (v1) cookie and falsely migrated.
 	this.dataStringToCookieValue();
-	// Stamp the current format so this fresh seed isn't read back as a legacy (v1) cookie and migrated.
-	this.cookieValue = 'v' + (this.cookieFormatVersion || 1) + ',' + this.cookieValue;
 	this.createCookie();
 	this.cookieToForm(objForm);
 };

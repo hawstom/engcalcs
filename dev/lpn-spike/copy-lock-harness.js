@@ -6,6 +6,8 @@
 // copy and the original fight over one lock. Tom, 2026-09-30, gave the question:
 // *"Mark file as new copy? This file was originally created on {date}, but this browser doesn't
 // remember it. Is this the Original file (keep same lock) or a Copy (make new lock)?"*
+// and reworded it the same day: *"This file says it was created on {regional datetime format}, and
+// this browser doesn't recognize it. Is this the Original file ...."* The wording is read from the lang file.
 // and then the gate: *"We should be examining only the file itself and what we and this browser
 // know about the file. The question should appear when the file is unknown to the browser. If we
 // can't guarantee that it's the same file, we must ask... This is a whitelist exercise."*

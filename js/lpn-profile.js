@@ -456,7 +456,29 @@ EngCalcs.lpnProfile = (function () {
 		return box.top + box.height - (value - yB.min) / span * box.height;
 	}
 
+	// ---- the frequency plot (ROADMAP Task 600) -----------------------------
+	//
+	// **EPANET'S OWN CURVE, POINT FOR POINT.** Its Graph window (Fgraph.pas, RefreshFrequencyPlot)
+	// sorts the values ascending and plots the i-th of n at (value, 100*i/n), i counted from 0, under
+	// the axis title "Percent Less Than". So the first point sits at 0 and the last at 100*(n-1)/n,
+	// never at 100: for distinct values each y is exactly the share of the others that are smaller.
+	// Tied values give a vertical run of points at one x, which is how EPANET draws them too.
+	//
+	// Here, beside the axis half, because it is the same kind of thing: values in, numbers out, no
+	// DOM and no units. The caller has already chosen the elements and converted to display units.
+	// A value that is not a finite number is left out, never counted as 0.
+	function frequencySeries(values) {
+		var v = [], i, n;
+		for (i = 0; i < (values || []).length; i++) {
+			if (typeof values[i] === 'number' && isFinite(values[i])) { v.push(values[i]); }
+		}
+		v.sort(function (a, b) { return a - b; });
+		n = v.length;
+		return v.map(function (x, k) { return { x: x, y: 100 * k / n }; });
+	}
+
 	return {
+		frequencySeries: frequencySeries,
 		buildGraph: buildGraph,
 		shortestPath: shortestPath,
 		pathThrough: pathThrough,

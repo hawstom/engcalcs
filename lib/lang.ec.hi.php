@@ -543,7 +543,6 @@ $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="इस खंड का डाउनस्ट्रीम-छोर स्तर। आंतरिक पंक्तियों में वैकल्पिक (रिक्त छोड़ने पर समतल / ऊपर के नोड के समान डिफ़ॉल्ट)। अंतिम पंक्ति में आवश्यक: वह मान अंतिम उत्सर्जक का स्तर है, जो सीधे आवश्यक आपूर्ति दाब निर्धारित करता है।">DS स्तर <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='अंतिम उत्सर्जक स्तर (अंतिम पंक्ति) रिक्त छोड़ दी गई और समतल को डिफ़ॉल्ट दिया गया — सटीक परिणाम के लिए इसे दर्ज करें';
-$ec_lang['ip_flow']='प्रवाह';
 $ec_lang['ip_press']='दाब';
 $ec_lang['ip_hf']='h<sub>f</sub>';
 $ec_lang['ip_hm']='h<sub>m</sub>';
@@ -610,10 +609,6 @@ $ec_lang['bpn_p_down']='DS दाब';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_p_down_tip']='इस लाइन के अनुप्रवाह नोड पर गेज दाब शीर्ष। एक नकारात्मक मान (चिह्नित) अवायुमंडलीय दाब दर्शाता है; डिज़ाइन जाँचें।';
 $ec_lang['bpn_sketch_heading']='नेटवर्क आरेख';
-$ec_lang['bpn_show_length']='लंबाई';
-$ec_lang['bpn_show_diameter']='व्यास';
-$ec_lang['bpn_show_q']='प्रवाह';
-$ec_lang['bpn_show_p']='दाब';
 $ec_lang['bpn_source_label']='स्रोत';
 $ec_lang['bpn_line_problem']='यह लाइन स्रोत से जुड़ी नहीं है: यह किसी अज्ञात ऊर्ध्वप्रवाह ID की ओर इशारा करती है, स्वयं की ओर इशारा करती है, किसी अन्य लाइन द्वारा पहले से उपयोग की गई ID को दोहराती है, या एक लूप बनाती है। जो लाइनें जुड़ी नहीं हैं उन्हें अनसुलझा छोड़ दिया जाता है।';
 $ec_lang['bpn_bad_id_short']='अमान्य ID';
@@ -637,7 +632,6 @@ $ec_lang['bpn_supply3_h']='आपूर्ति शीर्ष 3';
 $ec_lang['bpn_supply_pt_tip']='वैकल्पिक आपूर्ति-वक्र बिंदु 2 और 3। पंप, या किसी भी ऐसे स्रोत को मॉडल करने के लिए प्रत्येक के लिए एक प्रवाह और शीर्ष दर्ज करें जिसका शीर्ष अधिक पहुँचाने पर घटता है; उपकरण डिज़ाइन प्रवाह पर शीर्ष पढ़ता है। ऊपर बिंदु 1 शून्य प्रवाह पर स्थिर शीर्ष है। स्थिर जलाशय शीर्ष के लिए 2 और 3 को रिक्त छोड़ें।';
 $ec_lang['bpn_h_supply']='आपूर्ति शीर्ष';
 $ec_lang['bpn_h_supply_tip']='आपूर्ति वक्र से पढ़ा गया, डिज़ाइन प्रवाह पर स्रोत शीर्ष। जब वक्र समतल हो (एक जलाशय), तो यह दर्ज किए गए स्रोत शीर्ष के बराबर होता है।';
-$ec_lang['bpn_show_elevation']='स्तर';
 $ec_lang['bpn_supply1_h']='स्थिर आपूर्ति शीर्ष';
 $ec_lang['lpn_main_menu']='जल आपूर्ति नेटवर्क';
 $ec_lang['lpn_main_title']='EPANET सॉल्वर के साथ मुफ़्त ऑनलाइन जल वितरण नेटवर्क मॉडलिंग';
@@ -927,7 +921,6 @@ $ec_lang['lpn_examples_blank']='या यहाँ से शुरू कर�
 // screen, so "start with a blank map" reads as "discard it" and they do not dare press the
 // only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
 // open an example"). Closing never touches a project either way.
-$ec_lang['lpn_examples_close']='बंद करें';
 $ec_lang['lpn_examples_size']='नोड: {nodes}, लिंक: {links}';
 $ec_lang['lpn_examples_failed']='उदाहरण लोड नहीं हो सके। ड्राइंग शुरू करने के लिए File, New project का उपयोग करें।';
 $ec_lang['lpn_examples_loading']='उदाहरण लोड हो रहे हैं…';
@@ -1019,9 +1012,6 @@ $ec_lang['lpn_units_mapcoords']='मानचित्र निर्देश�
 $ec_lang['lpn_units_mapcoords_deg']='डिग्री';
 $ec_lang['lpn_units_usft']='US सर्वेक्षण फ़ुट';
 $ec_lang['lpn_units_elevhead']='स्तर और हेड';
-$ec_lang['lpn_units_pressure']='दाब';
-$ec_lang['lpn_units_flow']='प्रवाह';
-$ec_lang['lpn_units_velocity']='वेग';
 // Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
 // mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
 // alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
@@ -1241,13 +1231,11 @@ $ec_lang['lpn_color_break_count']='रंगों की संख्या स
 $ec_lang['lpn_color_ramp_qualitative']='गुणात्मक';
 $ec_lang['lpn_color_ramp_rainbow']='इंद्रधनुष';
 $ec_lang['lpn_color_ramp_rainbow_eg']='EPANET जैसा';
-$ec_lang['lpn_color_example_status']='स्थिति';
 $ec_lang['lpn_color_example_material']='सामग्री';
 $ec_lang['lpn_color_ramp_ylgnbu']='पीले से नीला';
 $ec_lang['lpn_color_ramp_rdylbu']='लाल से नीला, पीले से होकर';
 $ec_lang['lpn_georef_drop']='मॉडल यहाँ रखें';
 $ec_lang['lpn_georef_finish']='यह स्थिति रखें';
-$ec_lang['lpn_georef_cancel']='रद्द करें';
 $ec_lang['lpn_georef_scale']='ड्राइंग की प्रति इकाई ज़मीनी दूरी';
 // Edited by TGH 2026-09-07
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
@@ -1344,7 +1332,7 @@ $ec_lang['lpn_pane_print_tip']='जो तालिका आप देख र�
 // lpn_clean_map_tip were deleted with the row; nothing else read them.
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
-// lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
+// lpn_tool_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
 // it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
 // alternative and Tom kept Project.
 // ROADMAP Task 523, Tom 2026-08-24. **The KEY is still lpn_menu_project and that is deliberate** --
@@ -1395,7 +1383,6 @@ $ec_lang['lpn_time_run_slow']='इस नेटवर्क की गणना 
 $ec_lang['lpn_time_no_report']='अभी तक कोई रन रिपोर्ट नहीं है। यह रिपोर्ट EPANET का अपना पाठ है, इसलिए यह तभी दिखती है जब इस नेटवर्क की गणना EPANET सॉल्वर से की गई हो।';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
-$ec_lang['lpn_menu_settings']='सेटिंग्स';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -1512,10 +1499,6 @@ $ec_lang['lpn_find_op_conn_noopensource']='स्रोत तक कोई ख�
 // What a result row prints beside the node id: the fault it has, in three words.
 // What a result row prints beside the id: the NARROWEST condition true of that node, because "no
 // links" says more than "no open path to a source" and both are true of the same node.
-$ec_lang['lpn_find_conn_unlinked']='नोड पर कोई लिंक नहीं';
-$ec_lang['lpn_find_conn_noopen']='नोड पर कोई खुला लिंक नहीं';
-$ec_lang['lpn_find_conn_nolinksource']='स्रोत तक कोई लिंक पथ नहीं';
-$ec_lang['lpn_find_conn_noopensource']='स्रोत तक कोई खुला पथ नहीं';
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='हर नोड जुड़ा हुआ है।';
@@ -1656,6 +1639,15 @@ $ec_lang['lpn_ts_none']='अभी आलेखित करने के लि
 $ec_lang['lpn_ts_no_frames']='अभी तक कोई विस्तारित अवधि परिणाम नहीं है। सिमुलेशन चलाने के लिए Calculate दबाएँ।';
 $ec_lang['lpn_ts_summary']='तत्व: {n}, रिपोर्टिंग समय: {steps}';
 $ec_lang['lpn_ts_axis_time']='व्यतीत समय';
+$ec_lang['lpn_freq_menu']='आवृत्ति';
+$ec_lang['lpn_freq_tip']='वर्तमान समय चरण पर सभी जंक्शनों या सभी पाइपों में किसी एक गुण के आवृत्ति वितरण को आलेखित करें।';
+$ec_lang['lpn_freq_title']='मानों का वितरण';
+$ec_lang['lpn_freq_group_tip']='क्या ग्राफ जंक्शन दिखाता है या पाइप।';
+$ec_lang['lpn_freq_quantity_tip']='कौन-सा मान आलेखित करना है।';
+$ec_lang['lpn_freq_none']='इस मान के लिए अभी तक कोई परिणाम नहीं है, इसलिए आलेखित करने के लिए कुछ नहीं है।';
+$ec_lang['lpn_freq_summary']='आलेखित: {total} में से {n}';
+$ec_lang['lpn_freq_summary_time']='आलेखित: {total} में से {n}, {time} पर';
+$ec_lang['lpn_freq_axis_percent']='इससे कम प्रतिशत';
 $ec_lang['lpn_view_units']='इकाइयाँ';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='सभी सहेजें';
@@ -1695,10 +1687,8 @@ $ec_lang['lpn_new_coordsys_local_tip']='भू-संदर्भित नह�
 // system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
 // the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
 // as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
-$ec_lang['lpn_new_crs']='मानचित्र प्रक्षेपण';
 // **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
 // it names the box's own subject rather than either caller's radio label.
-$ec_lang['lpn_crsbox_title']='निर्देशांक प्रणाली';
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
@@ -1709,7 +1699,6 @@ $ec_lang['lpn_crs_place_tip']='कोई शहर, पता, या स्थ�
 $ec_lang['lpn_crs_search']='खोजें';
 $ec_lang['lpn_crs_name']='प्रक्षेपण नाम फ़िल्टर';
 $ec_lang['lpn_crs_name_tip']='केवल वे प्रक्षेपण दिखाता है जिनके नाम या EPSG कोड में आपका टाइप किया हुआ शामिल है। कोई ज़ोन नंबर, या UTM, या Mercator आज़माएँ।';
-$ec_lang['lpn_crs_list']='प्रक्षेपण';
 $ec_lang['lpn_crs_list_tip']='ऊपर के दोनों फ़िल्टर के बाद बचे प्रक्षेपण। एक चुनें और Select दबाएँ।';
 $ec_lang['lpn_crs_choose']='चुनें';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
@@ -1754,7 +1743,6 @@ $ec_lang['lpn_file_open']='खोलें…';
 $ec_lang['lpn_file_save']='सहेजें';
 $ec_lang['lpn_file_saveas']='इस रूप में सहेजें…';
 $ec_lang['lpn_file_revert']='सहेजा गया संस्करण फिर लोड करें';
-$ec_lang['lpn_file_close']='बंद करें';
 // Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='हाल की फ़ाइलें';
@@ -2123,7 +2111,7 @@ $ec_lang['lpn_notes_6_term']='तालिका कॉलम सहायता
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>कॉलम चुनें</td><td>शीर्षक पर क्लिक करें</td></tr><tr><td>कॉलम चयन जोड़ें या बढ़ाएँ</td><td>किसी अन्य शीर्षक पर Ctrl+click या Shift+click करें</td></tr><tr><td>चयनित कॉलम को स्थानांतरित करें (क्रम बदलें)</td><td>खींचें या राइट-क्लिक या ⋮ मेनू में Manage columns… का उपयोग करें</td></tr><tr><td>मेनू ⋮ और क्रमबद्ध तीर।</td><td>शीर्षक के ऊपरी कोने पर होवर करें, या किसी शीर्षक को चुनें या उसमें Tab करें</td></tr><tr><td>छिपाएँ, सभी दिखाएँ, या दृश्यता और क्रम प्रबंधित करें</td><td>शीर्षक पर राइट-क्लिक करें या शीर्षक के ऊपरी दाएँ कोने में ⋮ मेनू</td></tr><tr><td>कॉलम के अनुसार क्रमबद्ध करें</td><td>शीर्षक के ऊपरी दाएँ कोने में तीर आइकन</td></tr><tr><td>तालिका के अंत में नई पंक्तियों के रूप में पेस्ट करें</td><td>राइट-क्लिक करें, शीर्षक के ऊपरी दाएँ कोने में ⋮ मेनू, या Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='तालिका कीबोर्ड शॉर्टकट';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>नेविगेट करें।</td></tr><tr><td>Tab, Enter</td><td>प्रविष्टि पूर्ण करें और एक सेल आगे/नीचे नेविगेट करें।</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>पीछे की ओर नेविगेट करें।</td></tr><tr><td>Shift+arrow keys</td><td>चयन बढ़ाएँ।</td></tr><tr><td>Ctrl+C</td><td>चयन कॉपी करें।</td></tr><tr><td>Ctrl+D</td><td>चयन को उसकी शीर्ष पंक्ति से नीचे भरें।</td></tr><tr><td>Ctrl+Enter</td><td>चयन को सक्रिय सेल के मान से भरें।</td></tr><tr><td>Ctrl+A</td><td>पूरी तालिका चुनें।</td></tr><tr><td>Ctrl+Shift+V</td><td>तालिका के अंत में नई पंक्तियों के रूप में पेस्ट करें।</td></tr><tr><td>Delete</td><td>एक सेल साफ़ करें।</td></tr><tr><td>F2</td><td>किसी सेल को संपादित करने के लिए खोलें।</td></tr><tr><td>Esc</td><td>एक संपादन रद्द करें।</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>नेविगेट करें।</td></tr><tr><td>Tab, Enter</td><td>प्रविष्टि पूर्ण करें और एक सेल आगे/नीचे नेविगेट करें।</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>पीछे की ओर नेविगेट करें।</td></tr><tr><td>Shift+arrow keys</td><td>चयन बढ़ाएँ।</td></tr><tr><td>Ctrl+C</td><td>चयन कॉपी करें।</td></tr><tr><td>Ctrl+D</td><td>चयन को उसकी शीर्ष पंक्ति से नीचे भरें।</td></tr><tr><td>Ctrl+Enter</td><td>चयन को सक्रिय सेल के मान से भरें।</td></tr><tr><td>Ctrl+A</td><td>पूरी तालिका चुनें।</td></tr><tr><td>Ctrl+Shift+V</td><td>तालिका के अंत में नई पंक्तियों के रूप में पेस्ट करें।</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>अगली या पिछली तालिका पर जाएँ।</td></tr><tr><td>Delete</td><td>एक सेल साफ़ करें।</td></tr><tr><td>F2</td><td>किसी सेल को संपादित करने के लिए खोलें।</td></tr><tr><td>Esc</td><td>एक संपादन रद्द करें।</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2613,7 +2601,6 @@ $ec_lang['lpn_cp_design']='डिज़ाइन';
 $ec_lang['lpn_cp_design_tip']='प्रत्येक कस्टम गुण के लिए एक पंक्ति, और हर एक खुलने पर दिखाती है: कुंजी, लेबल, इस पर लागू, इस रूप में सत्यापित करें, अनुमति दें या प्रतिबंधित करें, उस चुनाव द्वारा नामित वर्ण फ़ील्ड, लंबाई की निचली सीमा, लंबाई की ऊपरी सीमा, निचली सीमा, ऊपरी सीमा।';
 $ec_lang['lpn_cp_add']='कस्टम गुण जोड़ें';
 $ec_lang['lpn_cp_add_tip']='डिज़ाइन तालिका में एक पंक्ति जोड़ता है और उसे संपादन के लिए खोलता है।';
-$ec_lang['lpn_cp_remove']='हटाएँ';
 $ec_lang['lpn_cp_remove_tip']='इस गुण को डिज़ाइन तालिका से हटाता है। आपके तत्वों पर पहले से टाइप किए गए मान फ़ाइल में बने रहते हैं और यदि आप फिर से वही कुंजी डिज़ाइन करें तो वापस आ जाते हैं।';
 $ec_lang['lpn_cp_none']='अभी तक कोई कस्टम गुण डिज़ाइन नहीं किया गया है।';
 $ec_lang['lpn_cp_unnamed']='अभी नाम नहीं दिया गया';
@@ -2633,7 +2620,6 @@ $ec_lang['lpn_cp_restrict_tip']='इन वर्णों को प्रत�
 $ec_lang['lpn_cp_restrict_mode']='अनुमति दें या प्रतिबंधित करें';
 $ec_lang['lpn_cp_restrict_mode_tip']='अनुमति दें या प्रतिबंधित करें: दिए गए वर्ण या तो वे एकमात्र वर्ण हैं जिनका मान उपयोग कर सकता है, या वे वर्ण हैं जिनका वह उपयोग नहीं कर सकता।';
 $ec_lang['lpn_cp_restrict_allow']='केवल इन वर्णों की अनुमति दें';
-$ec_lang['lpn_cp_restrict_deny']='इन वर्णों को प्रतिबंधित करें';
 $ec_lang['lpn_cp_minlength']='लंबाई की निचली सीमा';
 $ec_lang['lpn_cp_minlength_tip']='लंबाई की निचली सीमा: इससे छोटी कोई भी प्रविष्टि चिह्नित की जाती है, इसी तरह आप खाली और आधी-टाइप की गई प्रविष्टियाँ ढूँढ सकते हैं।';
 $ec_lang['lpn_cp_length']='लंबाई की ऊपरी सीमा';
@@ -2795,7 +2781,6 @@ $ec_lang['lpn_settings_flow_change_tip']='सॉल्वर को रुकन
 $ec_lang['lpn_settings_damp_limit']='डैम्पिंग यहाँ से शुरू होती है';
 $ec_lang['lpn_settings_damp_limit_tip']='वह सटीकता जिस पर सॉल्वर छोटे कदम लेना शुरू करता है, जो एक दोलन करते नेटवर्क को अभिसरित होने में मदद कर सकता है। शून्य का मतलब है कि सॉल्वर कभी डैम्प नहीं करता। केवल EPANET सॉल्वर यह बॉक्स पढ़ता है।';
 $ec_lang['lpn_settings_option_unset']='नहीं बताया गया';
-$ec_lang['lpn_settings_demand_multiplier']='माँग गुणक';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_demand_multiplier_tip']='नेटवर्क की हर माँग पर एक साथ लागू होने वाला एक अकेला गुणक। इससे पूछा जा सकता है कि सिस्टम आज के उपयोग से ज़्यादा या कम पर क्या करता है। यह आपके टाइप किए अंकों को नहीं बदलता। एक परिदृश्य अपना खुद का गुणक रख सकता है, ताकि औसत दिन, अधिकतम दिन और पीक घंटा हर एक के लिए एक ही संख्या हो; प्रोजेक्ट का गुणक उपयोग करने के लिए परिदृश्य में इसे खाली छोड़ दें।';
 $ec_lang['lpn_settings_engine_native']='EPANET सॉल्वर से हल करें';
@@ -3028,7 +3013,7 @@ $ec_lang['lpn_time_speed_tip']='प्लेबैक गति';
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,
 // with an index down the left and a search across the top. The section titles are not new keys --
-// each borrows the name it already had (lpn_tool_labels, lpn_menu_settings, lpn_time_menu,
+// each borrows the name it already had (lpn_tool_labels, lpn_tool_settings, lpn_time_menu,
 // lpn_settings_colors), so the box cannot drift from the doors that open it.
 $ec_lang['lpn_settings_search']='सेटिंग्स खोजें';
 // **AND-OF-WORDS, STATED AS SUCH** (Tom, 2026-09-23 (g): "can Settings filter work as an AND word
@@ -3085,7 +3070,6 @@ $ec_lang['lpn_settings_quality_track_tip']='चुनें कि रन को
 $ec_lang['lpn_settings_quality_source']='अनुरेखण नोड';
 $ec_lang['lpn_settings_quality_source_tip']='वह नोड जिसके पानी का अनुरेखण किया जाता है। इसके बाद हर दूसरा नोड यह दिखाता है कि उसके पानी का कितना हिस्सा उस नोड से आया।';
 $ec_lang['lpn_quality_none']='कुछ नहीं';
-$ec_lang['lpn_quality_age']='जल आयु';
 $ec_lang['lpn_quality_trace']='स्रोत अनुरेखण';
 $ec_lang['lpn_quality_chemical']='एक रसायन जो प्रतिक्रिया करता है';
 $ec_lang['lpn_quality_needs_run']='जल गुणवत्ता समय के साथ पाइपों में साथ ले जाई जाती है, इसलिए इसके लिए EPANET इंजन और कुल रन समय चाहिए। Time के अंतर्गत एक Total run time सेट करें, फिर Calculate बटन दबाएँ।';
@@ -3259,7 +3243,6 @@ $ec_lang['lpn_scncmp_title']='परिदृश्य तुलना';
 $ec_lang['lpn_scncmp_menu_tip']='इस प्रोजेक्ट के हर परिदृश्य को हल करें और उन्हें साथ-साथ पढ़ें: हर एक में न्यूनतम दाब और अधिकतम वेग।';
 $ec_lang['lpn_scncmp_running']='हर परिदृश्य हल किया जा रहा है…';
 $ec_lang['lpn_scncmp_empty']='अभी तक कुछ नहीं खींचा गया है, इसलिए हल करने के लिए कुछ नहीं है।';
-$ec_lang['lpn_scncmp_col_minpressure']='न्यूनतम दाब';
 $ec_lang['lpn_scncmp_col_maxvelocity']='अधिकतम वेग';
 $ec_lang['lpn_scncmp_at']='{id} पर {value}';
 $ec_lang['lpn_scncmp_current']='(अभी खुला हुआ)';
@@ -3292,7 +3275,6 @@ $ec_lang['lpn_reports_status_tip']='पिछले विस्तारित 
 $ec_lang['lpn_status_title']='स्थिति रिपोर्ट';
 $ec_lang['lpn_status_needs_run']='स्थिति रिपोर्ट सूचीबद्ध करती है कि विस्तारित अवधि सिमुलेशन के दौरान क्या बदला। Settings, Calculation, Time में एक Total run time सेट करें, Calculate दबाएँ, फिर Water, Reports, Status report खोलें।';
 $ec_lang['lpn_status_empty']='इस रन के दौरान किसी की स्थिति नहीं बदली।';
-$ec_lang['lpn_status_col_time']='समय';
 $ec_lang['lpn_status_col_event']='घटना';
 $ec_lang['lpn_status_opened']='{type} {id} खुला';
 $ec_lang['lpn_status_closed']='{type} {id} बंद हुआ';
@@ -3351,7 +3333,6 @@ $ec_lang['lpn_color_mode_jenks']='प्राकृतिक विभाजन
 $ec_lang['lpn_color_mode_stddev']='मानक विचलन';
 $ec_lang['lpn_color_mode_pretty']='सुघड़ (गोल)';
 $ec_lang['lpn_color_mode_log']='लघुगणकीय';
-$ec_lang['lpn_color_mode_pressure']='दाब';
 $ec_lang['lpn_color_mode_manual']='मैन्युअल';
 
 // ---- LIBRARIES (ROADMAP Tasks 462 and 460) ---------------------------------------------------
@@ -3361,7 +3342,7 @@ $ec_lang['lpn_color_mode_manual']='मैन्युअल';
 // Simulate, Transport, Time selectors."
 //
 // ONE NAME, THREE DOORS: the toolbar button, the Edit menu row and the box's own title all read
-// this key, exactly as lpn_menu_settings serves the Settings box's three.
+// this key, exactly as lpn_tool_settings serves the Settings box's three.
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='लाइब्रेरी';
@@ -3566,7 +3547,6 @@ $ec_lang['lpn_library_rule_add']='एक नियम जोड़ें';
 $ec_lang['lpn_library_rule_tip']='एक नियम, EPANET के अपने शब्दों में, हर पंक्ति में एक उपवाक्य (क्लॉज़)। पहली पंक्ति उसे नाम देती है: RULE 1। फिर एक शर्त: IF TANK 2 LEVEL BELOW 17.1। फिर उसके बारे में क्या करना है: THEN PUMP 9 STATUS IS OPEN। अंतिम पंक्ति उसे क्रम दे सकती है: PRIORITY 1। एक से अधिक चीज़ों की जाँच के लिए AND या OR पंक्तियाँ जोड़ें, और जाँच विफल होने पर क्या करना है यह बताने के लिए ELSE पंक्तियाँ जोड़ें। एक शर्त किसी नोड पर LEVEL, HEAD, GRADE, PRESSURE या DEMAND पढ़ सकती है, किसी लिंक पर FLOW, STATUS या SETTING, या SYSTEM पर TIME और CLOCKTIME। संख्याएँ इस प्रोजेक्ट में दिखाई जा रही इकाइयों में लिखें; वे आपके लिए परिवर्तित की जाती हैं। कीवर्ड अंग्रेज़ी में ही रहने दें; यही वे शब्द हैं जिन्हें यह पृष्ठ और EPANET पढ़ते हैं।';
 $ec_lang['lpn_library_rule_ok']='✓ यह नियम पढ़ा गया';
 $ec_lang['lpn_library_rule_bad']='⚠ यह नियम पढ़ा नहीं जा सका';
-$ec_lang['lpn_library_rule_missing']='⚠ इस नेटवर्क में {id} नाम की कोई चीज़ नहीं है';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
 // for the entire project it is in Settings") drawn on its other side. Without it a pattern you
 // author can only be used by making it the default one, which is not what a library is for.
@@ -3807,8 +3787,6 @@ $ec_lang['lpn_ff_mode_none']='कोई नहीं';
 $ec_lang['lpn_ff_col_solves']='रन';
 // Which criterion the junction broke while drawing the required flow. A junction that broke nothing
 // shows a dash, never one of these words.
-$ec_lang['lpn_ff_limit_pressure']='दाब';
-$ec_lang['lpn_ff_limit_velocity']='वेग';
 $ec_lang['lpn_ff_limit_both']='दाब और वेग';
 $ec_lang['lpn_ff_atleast']='{flow} से अधिक';
 $ec_lang['lpn_ff_affect_node']='{id} घटकर {pressure} हो गया';

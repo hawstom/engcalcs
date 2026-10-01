@@ -120,9 +120,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<span class="lpn-units-item" id="lpn_u_mapcoords_row"><span class="lpn-units-name"><?=$ec_lang['lpn_units_mapcoords']?></span><span id="lpn_u_mapcoords" class="lpn-units-derived"></span></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_field_diameter']?></span><?php echoUnitSelect('lpn_u_diameter', 'distance_small', '', $ec_lang['lpn_field_diameter']); ?></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_elevhead']?></span><?php echoUnitSelect('lpn_u_elevhead', 'total_head', '', $ec_lang['lpn_units_elevhead']); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_pressure']?></span><?php echoUnitSelect('lpn_u_pressure', 'partial_head', '', $ec_lang['lpn_units_pressure']); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_flow']?></span><?php echoUnitSelect('lpn_u_flow', 'flow_epanet', '', $ec_lang['lpn_units_flow']); ?></span>
-		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_units_velocity']?></span><?php echoUnitSelect('lpn_u_velocity', 'velocity', '', $ec_lang['lpn_units_velocity']); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_pressure']?></span><?php echoUnitSelect('lpn_u_pressure', 'partial_head', '', $ec_lang['lpn_result_pressure']); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_flow']?></span><?php echoUnitSelect('lpn_u_flow', 'flow_epanet', '', $ec_lang['lpn_result_flow']); ?></span>
+		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_velocity']?></span><?php echoUnitSelect('lpn_u_velocity', 'velocity', '', $ec_lang['lpn_result_velocity']); ?></span>
 		<span class="lpn-units-item"><span class="lpn-units-name"><?=$ec_lang['lpn_result_gradient']?></span><?php echoUnitSelect('lpn_u_gradient', 'gradient', '', $ec_lang['lpn_result_gradient']); ?></span>
 		<?php // RESULTS-ONLY, like Velocity and Head loss gradient beside it: nothing on this page is
 		      // typed in hours. A source share is a percentage and has no selector at all. ?>
@@ -499,7 +499,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			<button type="button" id="lpn_georef_drop"><?=$ec_lang['lpn_georef_drop']?></button>
 			<button type="button" id="lpn_georef_detach"></button>
 			<button type="button" id="lpn_georef_finish"><?=$ec_lang['lpn_georef_finish']?></button>
-			<button type="button" id="lpn_georef_cancel"><?=$ec_lang['lpn_georef_cancel']?></button>
+			<button type="button" id="lpn_georef_cancel"><?=$ec_lang['lpn_cancel']?></button>
 		</div>
 		<?php // THE CUSTOM GEOREFERENCE WIZARD (Tom, 2026-09-18). Its own bar and not a second mode of
 		      // the placement bar above: that one ends by converting every coordinate in the project and
@@ -538,7 +538,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 				<span style="display:flex;flex-wrap:wrap;gap:6px;margin-left:auto">
 					<button type="button" id="lpn_mapgeo_place"><?=$ec_lang['lpn_mapgeo_place']?></button>
 					<button type="button" id="lpn_mapgeo_finish" style="display:none"><?=$ec_lang['lpn_mapgeo_finish']?></button>
-					<button type="button" id="lpn_mapgeo_cancel"><?=$ec_lang['lpn_georef_cancel']?></button>
+					<button type="button" id="lpn_mapgeo_cancel"><?=$ec_lang['lpn_cancel']?></button>
 				</span>
 			</div>
 		</div>
@@ -896,6 +896,18 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			</div>
 			<div id="lpn_ts_chart"></div>
 		</div>
+		<?php // ---- Tab: Frequency (ROADMAP Task 600) ----
+		      // EPANET's frequency plot: one value over every junction or every pipe, at the moment
+		      // the map shows, against the percent of them less than it. The profile's classes again,
+		      // for the reason the time-series panel gives above. ?>
+		<div id="lpn_pane_frequency" class="lpn-pane-panel lpn-profile-panel lpn-ts-panel" role="tabpanel" aria-labelledby="lpn_pane_tab_frequency">
+			<div class="lpn-profile-controls">
+				<div class="lpn-profile-heading"><?=$ec_lang['lpn_freq_title']?></div>
+				<div id="lpn_freq_form"></div>
+				<div id="lpn_freq_note" class="lpn-profile-say"></div>
+			</div>
+			<div id="lpn_freq_chart"></div>
+		</div>
 		<?php // ---- Tabs: one ASSET TABLE per type (Task 434, all six since Task 455) ----
 		      // The document as a spreadsheet, built entirely in JS: the rows are the network and
 		      // the headings carry the current units. Every write goes through the same seam the
@@ -1009,7 +1021,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<?php // The padded band at the top is the DRAG SURFACE, exactly as on #lpn_popup and #lpn_find_popup:
 	      // `e.target` is the box itself there and a child everywhere else, so a drag can never start
 	      // on a control. That is why the padding is 40px on top and 8px elsewhere. ?>
-	<div id="lpn_setbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_menu_settings']?></div>
+	<div id="lpn_setbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_tool_settings']?></div>
 	<button type="button" id="lpn_setbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
 		<?php // **THE SEARCH BOX MATCHES TIPS AS WELL AS TITLES** (Tom, same ruling). It is cheap
@@ -1029,7 +1041,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		</div>
 		<div id="lpn_setbox_panes" class="lpn-setbox-panes">
 			<?php // Built by buildSettingsIndex(), from the content pane's own headings. ?>
-			<nav id="lpn_setbox_index" class="lpn-setbox-index" aria-label="<?=htmlspecialchars($ec_lang['lpn_menu_settings'])?>"></nav>
+			<nav id="lpn_setbox_index" class="lpn-setbox-index" aria-label="<?=htmlspecialchars($ec_lang['lpn_tool_settings'])?>"></nav>
 			<?php // ROADMAP Task 576. A separator, not a decoration: it is what the reader grabs to
 			      // give the index more room, and it is focusable so a keyboard can move it too --
 			      // a drag handle that only answers a mouse is a control half the visitors do not
@@ -1495,7 +1507,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 				      // to, and it can wrap without dragging the button with it. The button names the
 				      // projection through aria-describedby, so a screen reader still hears what it
 				      // would be changing rather than a bare ellipsis. ?>
-				<button type="button" id="lpn_new_crs_pick" aria-describedby="lpn_new_crs_name" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_new_crs']))?>">&hellip;</button>
+				<button type="button" id="lpn_new_crs_pick" aria-describedby="lpn_new_crs_name" aria-label="<?=htmlspecialchars(strip_tags($ec_lang['lpn_new_coordsys']))?>">&hellip;</button>
 				<span id="lpn_new_crs_name" class="lpn-new-crs-name"></span>
 			</div>
 			<div>
@@ -1647,7 +1659,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // box title carries none elsewhere in this file -- see lpn_convas_title beside it). The
 	      // permanence-warning tip this title used to carry had no other reader and is retired
 	      // with it. ?>
-	<div id="lpn_crsbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_crsbox_title']?></div>
+	<div id="lpn_crsbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_new_coordsys']?></div>
 	<button type="button" id="lpn_crsbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body">
 		<?php // The two halves of Tom's top row: the spatial filter on the left and the control that
@@ -1665,7 +1677,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			<input type="text" id="lpn_crsbox_name" autocomplete="off">
 		</div>
 		<div class="lpn-new-block">
-			<label for="lpn_crsbox_list"><?=ecTipLabel($ec_lang['lpn_crs_list'], $ec_lang['lpn_crs_list_tip'])?></label>
+			<label for="lpn_crsbox_list"><?=ecTipLabel($ec_lang['lpn_new_coordsys'], $ec_lang['lpn_crs_list_tip'])?></label>
 			<select id="lpn_crsbox_list" size="10"></select>
 			<div id="lpn_crsbox_note"></div>
 		</div>
@@ -1908,7 +1920,6 @@ EngCalcs.pageConfig = {
 	lpn_examples_open: <?=json_encode($ec_lang['lpn_examples_open'])?>,
 	lpn_examples_menu: <?=json_encode($ec_lang['lpn_examples_menu'])?>,
 	lpn_examples_blank: <?=json_encode($ec_lang['lpn_examples_blank'])?>,
-	lpn_examples_close: <?=json_encode($ec_lang['lpn_examples_close'])?>,
 	lpn_examples_size: <?=json_encode($ec_lang['lpn_examples_size'])?>,
 	lpn_examples_failed: <?=json_encode($ec_lang['lpn_examples_failed'])?>,
 	lpn_examples_loading: <?=json_encode($ec_lang['lpn_examples_loading'])?>,
@@ -1992,10 +2003,6 @@ EngCalcs.pageConfig = {
 	lpn_find_op_conn_noopen: <?=json_encode($ec_lang['lpn_find_op_conn_noopen'])?>,
 	lpn_find_op_conn_nolinksource: <?=json_encode($ec_lang['lpn_find_op_conn_nolinksource'])?>,
 	lpn_find_op_conn_noopensource: <?=json_encode($ec_lang['lpn_find_op_conn_noopensource'])?>,
-	lpn_find_conn_unlinked: <?=json_encode($ec_lang['lpn_find_conn_unlinked'])?>,
-	lpn_find_conn_noopen: <?=json_encode($ec_lang['lpn_find_conn_noopen'])?>,
-	lpn_find_conn_nolinksource: <?=json_encode($ec_lang['lpn_find_conn_nolinksource'])?>,
-	lpn_find_conn_noopensource: <?=json_encode($ec_lang['lpn_find_conn_noopensource'])?>,
 	lpn_find_conn_none: <?=json_encode($ec_lang['lpn_find_conn_none'])?>,
 	lpn_find_conn_no_fixed: <?=json_encode($ec_lang['lpn_find_conn_no_fixed'])?>,
 	lpn_find_query_tip: <?=json_encode($ec_lang['lpn_find_query_tip'])?>,
@@ -2078,6 +2085,14 @@ EngCalcs.pageConfig = {
 	lpn_ts_no_frames: <?=json_encode($ec_lang['lpn_ts_no_frames'])?>,
 	lpn_ts_summary: <?=json_encode($ec_lang['lpn_ts_summary'])?>,
 	lpn_ts_axis_time: <?=json_encode($ec_lang['lpn_ts_axis_time'])?>,
+	lpn_freq_menu: <?=json_encode($ec_lang['lpn_freq_menu'])?>,
+	lpn_freq_tip: <?=json_encode($ec_lang['lpn_freq_tip'])?>,
+	lpn_freq_group_tip: <?=json_encode($ec_lang['lpn_freq_group_tip'])?>,
+	lpn_freq_quantity_tip: <?=json_encode($ec_lang['lpn_freq_quantity_tip'])?>,
+	lpn_freq_none: <?=json_encode($ec_lang['lpn_freq_none'])?>,
+	lpn_freq_summary: <?=json_encode($ec_lang['lpn_freq_summary'])?>,
+	lpn_freq_summary_time: <?=json_encode($ec_lang['lpn_freq_summary_time'])?>,
+	lpn_freq_axis_percent: <?=json_encode($ec_lang['lpn_freq_axis_percent'])?>,
 	lpn_pane_toggle: <?=json_encode($ec_lang['lpn_pane_toggle'])?>,
 	lpn_pane_toggle_tip: <?=json_encode($ec_lang['lpn_pane_toggle_tip'])?>,
 	lpn_pane_tab_junctions: <?=json_encode($ec_lang['lpn_pane_tab_junctions'])?>,
@@ -2214,7 +2229,7 @@ EngCalcs.pageConfig = {
 	lpn_library_import_units: <?=json_encode($ec_lang['lpn_library_import_units'])?>,
 	lpn_library_import_units_line: <?=json_encode($ec_lang['lpn_library_import_units_line'])?>,
 <?php // The quantity each unit selector is ABOUT, in the words the units strip already uses on it,
-      // named by the import wizard's unit disclosure. lpn_field_diameter and lpn_units_flow are
+      // named by the import wizard's unit disclosure. lpn_field_diameter and lpn_result_flow are
       // already supplied further up this object; the elevation one was not supplied by anything. ?>
 	lpn_units_elevhead: <?=json_encode($ec_lang['lpn_units_elevhead'])?>,
 	lpn_units_mapcoords_deg: <?=json_encode($ec_lang['lpn_units_mapcoords_deg'])?>,
@@ -2269,7 +2284,6 @@ EngCalcs.pageConfig = {
 	lpn_library_rule_tip: <?=json_encode($ec_lang['lpn_library_rule_tip'])?>,
 	lpn_library_rule_ok: <?=json_encode($ec_lang['lpn_library_rule_ok'])?>,
 	lpn_library_rule_bad: <?=json_encode($ec_lang['lpn_library_rule_bad'])?>,
-	lpn_library_rule_missing: <?=json_encode($ec_lang['lpn_library_rule_missing'])?>,
 	lpn_field_base_demand: <?=json_encode($ec_lang['lpn_field_base_demand'])?>,
 	lpn_result_demand_tip: <?=json_encode($ec_lang['lpn_result_demand_tip'])?>,
 	lpn_field_demand_pattern: <?=json_encode($ec_lang['lpn_field_demand_pattern'])?>,
@@ -2456,8 +2470,6 @@ EngCalcs.pageConfig = {
 	lpn_tip_select: <?=json_encode($ec_lang['lpn_tip_select'])?>,
 	lpn_tip_labels_draggable: <?=json_encode($ec_lang['lpn_tip_labels_draggable'])?>,
 	bpn_demand: <?=json_encode($ec_lang['bpn_demand'])?>,
-	lpn_units_flow: <?=json_encode($ec_lang['lpn_units_flow'])?>,
-	lpn_units_pressure: <?=json_encode($ec_lang['lpn_units_pressure'])?>,
 	bpn_method: <?=json_encode($ec_lang['bpn_method'])?>,
 	bpn_method_hw: <?=json_encode($ec_lang['bpn_method_hw'])?>,
 	bpn_method_dw: <?=json_encode($ec_lang['bpn_method_dw'])?>,
@@ -2527,7 +2539,6 @@ EngCalcs.pageConfig = {
 	lpn_settings_quality_source: <?=json_encode($ec_lang['lpn_settings_quality_source'])?>,
 	lpn_settings_quality_source_tip: <?=json_encode($ec_lang['lpn_settings_quality_source_tip'])?>,
 	lpn_quality_none: <?=json_encode($ec_lang['lpn_quality_none'])?>,
-	lpn_quality_age: <?=json_encode($ec_lang['lpn_quality_age'])?>,
 	lpn_quality_trace: <?=json_encode($ec_lang['lpn_quality_trace'])?>,
 	lpn_quality_chemical: <?=json_encode($ec_lang['lpn_quality_chemical'])?>,
 	lpn_quality_needs_run: <?=json_encode($ec_lang['lpn_quality_needs_run'])?>,
@@ -2595,7 +2606,6 @@ EngCalcs.pageConfig = {
 	lpn_scncmp_menu_tip: <?=json_encode($ec_lang['lpn_scncmp_menu_tip'])?>,
 	lpn_scncmp_running: <?=json_encode($ec_lang['lpn_scncmp_running'])?>,
 	lpn_scncmp_empty: <?=json_encode($ec_lang['lpn_scncmp_empty'])?>,
-	lpn_scncmp_col_minpressure: <?=json_encode($ec_lang['lpn_scncmp_col_minpressure'])?>,
 	lpn_scncmp_col_maxvelocity: <?=json_encode($ec_lang['lpn_scncmp_col_maxvelocity'])?>,
 	lpn_scncmp_at: <?=json_encode($ec_lang['lpn_scncmp_at'])?>,
 	lpn_scncmp_current: <?=json_encode($ec_lang['lpn_scncmp_current'])?>,
@@ -2608,7 +2618,6 @@ EngCalcs.pageConfig = {
 	lpn_status_title: <?=json_encode($ec_lang['lpn_status_title'])?>,
 	lpn_status_needs_run: <?=json_encode($ec_lang['lpn_status_needs_run'])?>,
 	lpn_status_empty: <?=json_encode($ec_lang['lpn_status_empty'])?>,
-	lpn_status_col_time: <?=json_encode($ec_lang['lpn_status_col_time'])?>,
 	lpn_status_col_event: <?=json_encode($ec_lang['lpn_status_col_event'])?>,
 	lpn_status_opened: <?=json_encode($ec_lang['lpn_status_opened'])?>,
 	lpn_status_closed: <?=json_encode($ec_lang['lpn_status_closed'])?>,
@@ -2730,7 +2739,6 @@ EngCalcs.pageConfig = {
 	lpn_color_mode_stddev: <?=json_encode($ec_lang['lpn_color_mode_stddev'])?>,
 	lpn_color_mode_pretty: <?=json_encode($ec_lang['lpn_color_mode_pretty'])?>,
 	lpn_color_mode_log: <?=json_encode($ec_lang['lpn_color_mode_log'])?>,
-	lpn_color_mode_pressure: <?=json_encode($ec_lang['lpn_color_mode_pressure'])?>,
 	lpn_color_mode_manual: <?=json_encode($ec_lang['lpn_color_mode_manual'])?>,
 	lpn_color_ranges_note: <?=json_encode($ec_lang['lpn_color_ranges_note'])?>,
 	lpn_color_criterion_note: <?=json_encode($ec_lang['lpn_color_criterion_note'])?>,
@@ -2740,7 +2748,6 @@ EngCalcs.pageConfig = {
 	lpn_color_ramp_qualitative: <?=json_encode($ec_lang['lpn_color_ramp_qualitative'])?>,
 	lpn_color_ramp_rainbow: <?=json_encode($ec_lang['lpn_color_ramp_rainbow'])?>,
 	lpn_color_ramp_rainbow_eg: <?=json_encode($ec_lang['lpn_color_ramp_rainbow_eg'])?>,
-	lpn_color_example_status: <?=json_encode($ec_lang['lpn_color_example_status'])?>,
 	lpn_color_example_material: <?=json_encode($ec_lang['lpn_color_example_material'])?>,
 	lpn_color_ramp_ylgnbu: <?=json_encode($ec_lang['lpn_color_ramp_ylgnbu'])?>,
 	lpn_color_ramp_rdylbu: <?=json_encode($ec_lang['lpn_color_ramp_rdylbu'])?>,
@@ -2775,7 +2782,6 @@ EngCalcs.pageConfig = {
 	lpn_terrain_cookie: <?=json_encode(EC_TERRAIN_COOKIE)?>,
 	lpn_terrain_version: <?=json_encode(EC_TERRAIN_VERSION)?>,
 	lpn_terrain_days: <?=json_encode(EC_TERRAIN_DAYS)?>,
-	lpn_menu_settings: <?=json_encode($ec_lang['lpn_menu_settings'])?>,
 	lpn_menu_project: <?=json_encode($ec_lang['lpn_menu_project'])?>,
 	lpn_menu_project_tip: <?=json_encode($ec_lang['lpn_menu_project_tip'])?>,
 	lpn_tables_menu: <?=json_encode($ec_lang['lpn_tables_menu'])?>,
@@ -2848,8 +2854,6 @@ EngCalcs.pageConfig = {
 	lpn_ff_mode_design: <?=json_encode($ec_lang['lpn_ff_mode_design'])?>,
 	lpn_ff_mode_none: <?=json_encode($ec_lang['lpn_ff_mode_none'])?>,
 	lpn_ff_col_solves: <?=json_encode($ec_lang['lpn_ff_col_solves'])?>,
-	lpn_ff_limit_pressure: <?=json_encode($ec_lang['lpn_ff_limit_pressure'])?>,
-	lpn_ff_limit_velocity: <?=json_encode($ec_lang['lpn_ff_limit_velocity'])?>,
 	lpn_ff_limit_both: <?=json_encode($ec_lang['lpn_ff_limit_both'])?>,
 	lpn_ff_atleast: <?=json_encode($ec_lang['lpn_ff_atleast'])?>,
 	lpn_ff_affect_node: <?=json_encode($ec_lang['lpn_ff_affect_node'])?>,
@@ -2887,7 +2891,6 @@ EngCalcs.pageConfig = {
 	lpn_file_save: <?=json_encode($ec_lang['lpn_file_save'])?>,
 	lpn_file_saveas: <?=json_encode($ec_lang['lpn_file_saveas'])?>,
 	lpn_file_revert: <?=json_encode($ec_lang['lpn_file_revert'])?>,
-	lpn_file_close: <?=json_encode($ec_lang['lpn_file_close'])?>,
 	lpn_file_recent: <?=json_encode($ec_lang['lpn_file_recent'])?>,
 	lpn_recent_tip: <?=json_encode($ec_lang['lpn_recent_tip'])?>,
 	lpn_recent_denied: <?=json_encode($ec_lang['lpn_recent_denied'])?>,
@@ -3127,11 +3130,9 @@ EngCalcs.pageConfig = {
 	lpn_cp_minlength: <?=json_encode($ec_lang['lpn_cp_minlength'])?>,
 	lpn_cp_minlength_tip: <?=json_encode($ec_lang['lpn_cp_minlength_tip'])?>,
 	lpn_cp_none: <?=json_encode($ec_lang['lpn_cp_none'])?>,
-	lpn_cp_remove: <?=json_encode($ec_lang['lpn_cp_remove'])?>,
 	lpn_cp_remove_tip: <?=json_encode($ec_lang['lpn_cp_remove_tip'])?>,
 	lpn_cp_restrict: <?=json_encode($ec_lang['lpn_cp_restrict'])?>,
 	lpn_cp_restrict_allow: <?=json_encode($ec_lang['lpn_cp_restrict_allow'])?>,
-	lpn_cp_restrict_deny: <?=json_encode($ec_lang['lpn_cp_restrict_deny'])?>,
 	lpn_cp_restrict_mode: <?=json_encode($ec_lang['lpn_cp_restrict_mode'])?>,
 	lpn_cp_restrict_mode_tip: <?=json_encode($ec_lang['lpn_cp_restrict_mode_tip'])?>,
 	lpn_cp_restrict_tip: <?=json_encode($ec_lang['lpn_cp_restrict_tip'])?>,
@@ -3201,7 +3202,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_viscosity_tip: <?=json_encode($ec_lang['lpn_settings_viscosity_tip'])?>,
 	lpn_settings_trials: <?=json_encode($ec_lang['lpn_settings_trials'])?>,
 	lpn_settings_trials_tip: <?=json_encode($ec_lang['lpn_settings_trials_tip'])?>,
-	lpn_settings_demand_multiplier: <?=json_encode($ec_lang['lpn_settings_demand_multiplier'])?>,
+	bpn_demand_mult: <?=json_encode($ec_lang['bpn_demand_mult'])?>,
 	lpn_settings_demand_multiplier_tip: <?=json_encode($ec_lang['lpn_settings_demand_multiplier_tip'])?>,
 <?php // **AND THE FIVE THAT ACT INSIDE EPANET ALONE** (Task 553, under Tom's 2026-08-29 ruling that
       // a setting now needs a REASON not to have a row rather than a reason to have one). Each tip
