@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 2135 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**1 still to read on master**, of 1 untranslated keys, of 2136 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,13 +25,17 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-None on master. Every English key here is present in at least one other language.
+## lpn_  (1, 1 to read @@ NEEDS RULING)
+
+- **`lpn_pane_filter_stale`**
+  > Rows that no longer match: {n}.
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**68 still to read**, of 71 new keys across 18 unmerged branch(es).
+**67 still to read**, of 70 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -42,9 +46,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/key-merge (`b11f88a5`) — adds no English strings
-
-### feat/bentley-interop (`22fbb9b7`) — 13 new, 13 to read @@ NEEDS RULING
+### feat/bentley-interop (`771f4a15`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -86,13 +88,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives table, which shows how those values are grouped by category.
   @@ NEEDS RULING
 
-### feat/copy-lock (`9828fb80`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/copy-lock (`15288fa8`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_copy_body`**
-  > This file was originally created on {date}, but this browser doesn't remember it. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
   @@ NEEDS RULING
 - **`lpn_copy_body_nodate`**
-  > This browser doesn't remember this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
   @@ NEEDS RULING
 - **`lpn_copy_copy`**
   > A copy; make new lock
@@ -110,7 +112,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Mark file as new copy?
   @@ NEEDS RULING
 
-### feat/criticality (`614f8d48`) — 23 new, 23 to read @@ NEEDS RULING
+### feat/criticality (`03412ac9`) — 23 new, 23 to read @@ NEEDS RULING
 
 - **`lpn_crit_baseline_below`**
   > Junctions already below it with nothing broken: {n}. They are not counted.
@@ -182,11 +184,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Working: {done} of {total} assets.
   @@ NEEDS RULING
 
-### feat/find-filter (`59671f1b`) — 1 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_pane_filter_stale`**
-  > Rows that no longer match: {n}.
-  @@ NEEDS RULING
+### feat/find-filter (`59671f1b`) — adds no English strings
 
 ### feat/fireflow-scope (`34872754`) — 2 new, 2 to read @@ NEEDS RULING
 
@@ -197,7 +195,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selected
   @@ NEEDS RULING
 
-### feat/graph-tab-keys (`6e7b95fa`) — adds no English strings
+### feat/graph-tab-keys (`d2738ec3`) — adds no English strings
 
 ### feat/help-menu (`d34b00e6`) — 6 new, 6 to read @@ NEEDS RULING
 
@@ -295,7 +293,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_scenario_preset_peak_hour_tip`**
   > Demand multiplier 3.0 times average day, a starting value. Most systems fall between 3.0 and 6.0 (National Research Council, 2006). Set your own system's in Settings, Calculation, Hydraulics, Demand multiplier.
   @@ NEEDS RULING
-
-### fix/category-desc (`f4bcaf94`) — adds no English strings
 
 ### fix/points-data-heading (`75707bd6`) — adds no English strings

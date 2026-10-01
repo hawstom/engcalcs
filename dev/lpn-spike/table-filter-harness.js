@@ -96,7 +96,7 @@ const L = loadLoopedNetwork(
 	"\t\t\tnextId = { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1 };\n" +
 	"\t\t\tproject = { name: '', activeScenario: 'base' }; scenarios = defaultScenarios();\n" +
 	"\t\t\tselection = null; findState = { scope: 'all', prop: 'id', op: 'contains', value: '' };\n" +
-	"\t\t\tpaneFilters = {};\n" +
+	"\t\t\tpaneFilters = {}; paneFilterForgetEdits();\n" +
 	"\t\t\tsettings = defaultSettings(); seedDefaultInputs();\n" +
 	"\t\t\tpaneTables().forEach(function (s) { paneTableReset(s); });\n" +
 	"\t\t\tsvg = document.getElementById('lpn_canvas');\n" +
@@ -189,8 +189,9 @@ console.log('\n--- a compound query filters too ---');
 
 // ---- 2. THE FILTER FOLLOWS THE DRAWING --------------------------------------------------------
 //
-// It is stored as TEXT and re-asked on every draw, so an edit moves a row in or out. A snapshot of
-// ids would be a report about a network that has moved on.
+// It is stored as TEXT and re-asked on every draw, so an edit brings a row IN. An edit no longer
+// takes one OUT (Task 738, Tom's ruling 2026-09-30): an edited row stays until the filter is set
+// again. filter-edited-row-harness.js is that rule's own harness.
 console.log('\n--- the filter is re-asked, not remembered ---');
 {
 	build();
@@ -199,7 +200,10 @@ console.log('\n--- the filter is re-asked, not remembered ---');
 	ok('two pipes are over 8 in to begin with', before.length === 2, JSON.stringify(before));
 	const doc = L.getDoc();
 	L.setProp(doc.links.filter((l) => l.id === before[0])[0], 'diameter', 2);
-	ok('...narrowing one takes it straight out of the table',
+	ok('...narrowing one no longer takes it out of the table (Task 738)',
+		L.filteredIds('pipes').length === 2, JSON.stringify(L.filteredIds('pipes')));
+	L.setFilter('pipes', 'Pipe.Diameter above 8');
+	ok('...until the filter is set again',
 		L.filteredIds('pipes').length === 1, JSON.stringify(L.filteredIds('pipes')));
 	L.setProp(doc.links.filter((l) => l.id === before[0])[0], 'diameter', 20);
 	ok('...and widening it brings it back',

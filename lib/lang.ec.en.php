@@ -1455,6 +1455,10 @@ $ec_lang['lpn_pane_not_used']='Not used';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='Filtered by {q}. Showing {n} of {all}.';
 $ec_lang['lpn_pane_filter_clear']='Show all';
+// Added to the filtered table's line (Task 738): rows edited since Filter in table was pressed stay
+// in the table even when they no longer match, dimmed and marked, until it is pressed again. {n} is
+// how many. Worded as a label and a count so no plural form is needed.
+$ec_lang['lpn_pane_filter_stale']='Rows that no longer match: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Nothing in this table matches the filter.';

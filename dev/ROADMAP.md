@@ -268,6 +268,8 @@ the block.
   label-word-gus/label-long-dora everywhere (glossary.json, key_concepts.json, concept_selftest.php,
   dev/term-concepts.md); definitions unchanged.
 - 100|738| **A Find filter that stays standing, or a snapshot, by the visitor's choice.**
+  **BUILT 2026-09-30 on `feat/find-filter`** to his ruling (no toggle; edited rows stay, dimmed and
+  marked, counted in the filter line); `filter-edited-row-harness.js`. New key `lpn_pane_filter_stale`.
   Tom, 2026-09-28: editing a filtered value out of the filter makes its row vanish. His proposal: a
   standing filter while the Find box is open, with a toggle next to Filter in table to make it a
   snapshot. Readings in, 2026-09-29, and they disagree: Declan, no toggle, a row edited since the
