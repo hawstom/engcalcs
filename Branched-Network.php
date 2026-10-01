@@ -118,11 +118,11 @@ function echoCalculatorFormAppend() {
 
 <h2><?=$ec_lang['bpn_sketch_heading']?></h2>
 <p class="d-print-none">
-	<label><input type="checkbox" id="bpn_show_length" onchange="EngCalcs.bpnToggleSketch('length', this.checked)" /> <span style="color:#2e7d32"><?=$ec_lang['bpn_show_length']?></span></label>
-	<label><input type="checkbox" id="bpn_show_diameter" onchange="EngCalcs.bpnToggleSketch('diameter', this.checked)" /> <span style="color:#bf4b2b"><?=$ec_lang['bpn_show_diameter']?></span></label>
-	<label><input type="checkbox" id="bpn_show_q" onchange="EngCalcs.bpnToggleSketch('q', this.checked)" /> <span style="color:#1565c0"><?=$ec_lang['bpn_show_q']?></span></label>
-	<label><input type="checkbox" id="bpn_show_elevation" onchange="EngCalcs.bpnToggleSketch('elevation', this.checked)" /> <span style="color:#8b5a2b"><?=$ec_lang['bpn_show_elevation']?></span></label>
-	<label><input type="checkbox" id="bpn_show_p" onchange="EngCalcs.bpnToggleSketch('p', this.checked)" /> <span style="color:#455a64"><?=$ec_lang['bpn_show_p']?></span></label>
+	<label><input type="checkbox" id="bpn_show_length" onchange="EngCalcs.bpnToggleSketch('length', this.checked)" /> <span style="color:#2e7d32"><?=$ec_lang['lpn_field_length']?></span></label>
+	<label><input type="checkbox" id="bpn_show_diameter" onchange="EngCalcs.bpnToggleSketch('diameter', this.checked)" /> <span style="color:#bf4b2b"><?=$ec_lang['lpn_field_diameter']?></span></label>
+	<label><input type="checkbox" id="bpn_show_q" onchange="EngCalcs.bpnToggleSketch('q', this.checked)" /> <span style="color:#1565c0"><?=$ec_lang['lpn_result_flow']?></span></label>
+	<label><input type="checkbox" id="bpn_show_elevation" onchange="EngCalcs.bpnToggleSketch('elevation', this.checked)" /> <span style="color:#8b5a2b"><?=$ec_lang['lpn_field_elev']?></span></label>
+	<label><input type="checkbox" id="bpn_show_p" onchange="EngCalcs.bpnToggleSketch('p', this.checked)" /> <span style="color:#455a64"><?=$ec_lang['lpn_result_pressure']?></span></label>
 </p>
 <div id="bpn_sketch" style="overflow-x:auto"></div>
 

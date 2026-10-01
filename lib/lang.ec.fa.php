@@ -543,7 +543,6 @@ $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="تراز انتهای پایین‌دست این بخش. در ردیف‌های میانی اختیاری است (در صورت خالی گذاشتن، به‌طور پیش‌فرض صاف / برابر با گره بالادست فرض می‌شود). در ردیف آخر الزامی است: این مقدار تراز آخرین قطره‌چکان است که مستقیماً فشار تامین موردنیاز را تعیین می‌کند.">تراز پایین‌دست <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='تراز آخرین قطره‌چکان (ردیف آخر) خالی گذاشته شد و به‌طور پیش‌فرض صاف در نظر گرفته شد — برای نتیجه دقیق آن را وارد کنید';
-$ec_lang['ip_flow']='جریان';
 $ec_lang['ip_press']='فشار';
 $ec_lang['ip_hf']='h<sub>f</sub>';
 $ec_lang['ip_hm']='h<sub>m</sub>';
@@ -610,10 +609,6 @@ $ec_lang['bpn_p_down']='فشار پ‌د';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_p_down_tip']='هد فشار مانومتری در گره پایین‌دست این خط. مقدار منفی (علامت‌گذاری‌شده) یعنی فشار زیر جو؛ طراحی را بررسی کنید.';
 $ec_lang['bpn_sketch_heading']='نمودار شبکه';
-$ec_lang['bpn_show_length']='طول';
-$ec_lang['bpn_show_diameter']='قطر';
-$ec_lang['bpn_show_q']='دبی';
-$ec_lang['bpn_show_p']='فشار';
 $ec_lang['bpn_source_label']='منبع';
 $ec_lang['bpn_line_problem']='این خط به منبع متصل نیست: به شناسه‌ای بالادست ناشناخته اشاره می‌کند، به خودش ارجاع می‌دهد، شناسه‌ای را که خط دیگری از پیش به کار برده تکرار می‌کند، یا حلقه‌ای تشکیل می‌دهد. خطوطی که متصل نیستند حل‌نشده باقی می‌مانند.';
 $ec_lang['bpn_bad_id_short']='شناسهٔ نامعتبر';
@@ -637,7 +632,6 @@ $ec_lang['bpn_supply3_h']='هد تأمین 3';
 $ec_lang['bpn_supply_pt_tip']='نقاط اختیاری منحنی تأمین 2 و 3. برای مدل‌سازی یک پمپ، یا هر منبعی که با افزایش تحویل دبی، هدش افت می‌کند، برای هر نقطه یک دبی و هد وارد کنید؛ ابزار هد را در دبی طراحی می‌خواند. نقطه 1 در بالا، هد استاتیک در دبی صفر است. برای هد ثابت مخزن، 2 و 3 را خالی بگذارید.';
 $ec_lang['bpn_h_supply']='هد تأمین';
 $ec_lang['bpn_h_supply_tip']='هد منبع در دبی طراحی، خوانده‌شده از منحنی تأمین. وقتی منحنی صاف باشد (یک مخزن)، برابر با هد منبع واردشده است.';
-$ec_lang['bpn_show_elevation']='تراز';
 $ec_lang['bpn_supply1_h']='هد استاتیک تأمین';
 $ec_lang['lpn_main_menu']='شبکه آبرسانی';
 $ec_lang['lpn_main_title']='مدل‌سازی رایگان آنلاین شبکهٔ توزیع آب با حل‌کنندهٔ EPANET';
@@ -926,7 +920,6 @@ $ec_lang['lpn_examples_blank']='یا از این‌جا شروع کنید';
 // screen, so "start with a blank map" reads as "discard it" and they do not dare press the
 // only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
 // open an example"). Closing never touches a project either way.
-$ec_lang['lpn_examples_close']='بستن';
 $ec_lang['lpn_examples_size']='گره‌ها: {nodes}، لوله‌ها: {links}';
 $ec_lang['lpn_examples_failed']='نمونه‌ها بارگیری نشدند. برای شروع یک ترسیم تازه، از منوی فایل، پروژهٔ جدید را انتخاب کنید.';
 $ec_lang['lpn_examples_loading']='در حال بارگیری نمونه‌ها…';
@@ -1018,9 +1011,6 @@ $ec_lang['lpn_units_mapcoords']='مختصات نقشه';
 $ec_lang['lpn_units_mapcoords_deg']='درجه';
 $ec_lang['lpn_units_usft']='فوت نقشه‌برداری آمریکا (US survey ft)';
 $ec_lang['lpn_units_elevhead']='تراز و هد';
-$ec_lang['lpn_units_pressure']='فشار';
-$ec_lang['lpn_units_flow']='دبی';
-$ec_lang['lpn_units_velocity']='سرعت';
 // Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
 // mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
 // alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
@@ -1240,13 +1230,11 @@ $ec_lang['lpn_color_break_count']='باید یک مرز کمتر از شمار �
 $ec_lang['lpn_color_ramp_qualitative']='کیفی';
 $ec_lang['lpn_color_ramp_rainbow']='رنگین‌کمان';
 $ec_lang['lpn_color_ramp_rainbow_eg']='مطابق با EPANET';
-$ec_lang['lpn_color_example_status']='وضعیت';
 $ec_lang['lpn_color_example_material']='جنس';
 $ec_lang['lpn_color_ramp_ylgnbu']='زرد به آبی';
 $ec_lang['lpn_color_ramp_rdylbu']='قرمز به آبی، از میان زرد';
 $ec_lang['lpn_georef_drop']='مدل را اینجا بگذار';
 $ec_lang['lpn_georef_finish']='این جای‌گیری نگه داشته شود';
-$ec_lang['lpn_georef_cancel']='انصراف';
 $ec_lang['lpn_georef_scale']='فاصلهٔ زمینی به ازای هر واحد ترسیم';
 // Edited by TGH 2026-09-07
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
@@ -1343,7 +1331,7 @@ $ec_lang['lpn_pane_print_tip']='جدولی را که در حال دیدن آن �
 // lpn_clean_map_tip were deleted with the row; nothing else read them.
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
-// lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
+// lpn_tool_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
 // it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
 // alternative and Tom kept Project.
 // ROADMAP Task 523, Tom 2026-08-24. **The KEY is still lpn_menu_project and that is deliberate** --
@@ -1394,7 +1382,6 @@ $ec_lang['lpn_time_run_slow']='محاسبهٔ این شبکه {secs} ثانیه 
 $ec_lang['lpn_time_no_report']='هنوز گزارش اجرایی وجود ندارد. این گزارش متن خود EPANET است، پس تنها زمانی نمایان می‌شود که این شبکه با حل‌کنندهٔ EPANET محاسبه شده باشد.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
-$ec_lang['lpn_menu_settings']='تنظیمات';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -1511,10 +1498,6 @@ $ec_lang['lpn_find_op_conn_noopensource']='بدون مسیر بازی به یک 
 // What a result row prints beside the node id: the fault it has, in three words.
 // What a result row prints beside the id: the NARROWEST condition true of that node, because "no
 // links" says more than "no open path to a source" and both are true of the same node.
-$ec_lang['lpn_find_conn_unlinked']='بدون اتصالی در گره';
-$ec_lang['lpn_find_conn_noopen']='بدون اتصال بازی در گره';
-$ec_lang['lpn_find_conn_nolinksource']='بدون مسیر اتصالی به یک منبع';
-$ec_lang['lpn_find_conn_noopensource']='بدون مسیر بازی به یک منبع';
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='همهٔ گره‌ها متصل‌اند.';
@@ -1655,6 +1638,15 @@ $ec_lang['lpn_ts_none']='هنوز چیزی برای نمودار نیست. ال�
 $ec_lang['lpn_ts_no_frames']='هنوز نتیجه‌ای از شبیه‌سازی بازهٔ زمانی نیست. برای اجرای شبیه‌سازی، محاسبه را بزنید.';
 $ec_lang['lpn_ts_summary']='المان‌ها: {n}، زمان‌های گزارش‌دهی: {steps}';
 $ec_lang['lpn_ts_axis_time']='زمان سپری‌شده';
+$ec_lang['lpn_freq_menu']='فراوانی';
+$ec_lang['lpn_freq_tip']='توزیع فراوانی یک ویژگی را در همهٔ گره‌ها یا همهٔ لوله‌ها، در گام زمانی کنونی، نمودار می‌کند.';
+$ec_lang['lpn_freq_title']='توزیع مقادیر';
+$ec_lang['lpn_freq_group_tip']='نمودار گره‌ها را نشان دهد یا لوله‌ها را.';
+$ec_lang['lpn_freq_quantity_tip']='کدام مقدار نمودار شود.';
+$ec_lang['lpn_freq_none']='هنوز نتیجه‌ای برای این مقدار نیست، پس چیزی برای نمودار کردن وجود ندارد.';
+$ec_lang['lpn_freq_summary']='رسم‌شده: {n} از {total}';
+$ec_lang['lpn_freq_summary_time']='رسم‌شده: {n} از {total}، در {time}';
+$ec_lang['lpn_freq_axis_percent']='درصد کمتر از';
 $ec_lang['lpn_view_units']='واحدها';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='ذخیره همه';
@@ -1694,10 +1686,8 @@ $ec_lang['lpn_new_coordsys_local_tip']='مرجع‌گذاری جغرافیایی
 // system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
 // the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
 // as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
-$ec_lang['lpn_new_crs']='فرافکنی نقشه';
 // **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
 // it names the box's own subject rather than either caller's radio label.
-$ec_lang['lpn_crsbox_title']='دستگاه مختصات';
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
@@ -1708,7 +1698,6 @@ $ec_lang['lpn_crs_place_tip']='یک شهر، نشانی، یا نشانه را �
 $ec_lang['lpn_crs_search']='جست‌وجو';
 $ec_lang['lpn_crs_name']='پالایش نام فرافکنی';
 $ec_lang['lpn_crs_name_tip']='فقط فرافکنی‌هایی را نشان می‌دهد که نام یا کد EPSG آن‌ها شامل آنچه تایپ می‌کنید باشد. یک شمارهٔ ناحیه، یا UTM، یا Mercator را امتحان کنید.';
-$ec_lang['lpn_crs_list']='فرافکنی';
 $ec_lang['lpn_crs_list_tip']='فرافکنی‌های باقی‌مانده از دو پالایهٔ بالا. یکی را انتخاب کنید و انتخاب را فشار دهید.';
 $ec_lang['lpn_crs_choose']='انتخاب';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
@@ -1753,7 +1742,6 @@ $ec_lang['lpn_file_open']='باز کردن…';
 $ec_lang['lpn_file_save']='ذخیره';
 $ec_lang['lpn_file_saveas']='ذخیره به‌نام…';
 $ec_lang['lpn_file_revert']='بازگشت به نسخه ذخیره‌شده';
-$ec_lang['lpn_file_close']='بستن';
 // Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='فایل‌های اخیر';
@@ -2122,7 +2110,7 @@ $ec_lang['lpn_notes_6_term']='راهنمای ستون‌های جدول';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>گزینش ستون</td><td>کلیک روی سرستون</td></tr><tr><td>افزودن یا گسترش گزینش ستون</td><td>Ctrl+click یا Shift+click روی سرستون دیگر</td></tr><tr><td>جابه‌جایی (تغییر ترتیب) ستون(های) گزینش‌شده</td><td>کشیدن، یا استفاده از مدیریت ستون‌ها… در منوی راست‌کلیک یا ⋮</td></tr><tr><td>منوی ⋮ و پیکان مرتب‌سازی.</td><td>نگه‌داشتن اشاره‌گر روی گوشهٔ بالای سرستون، یا گزینش یا Tab به سرستون</td></tr><tr><td>پنهان کردن، نمایش همه، یا مدیریت نمایانی و ترتیب</td><td>راست‌کلیک روی سرستون یا منوی ⋮ در گوشهٔ بالا-راستِ سرستون</td></tr><tr><td>مرتب‌سازی بر پایهٔ ستون</td><td>نماد پیکان در گوشهٔ بالا-راستِ سرستون</td></tr><tr><td>چسباندن به‌صورت ردیف‌های تازه در انتهای جدول</td><td>راست‌کلیک، منوی ⋮ در گوشهٔ بالا-راستِ سرستون، یا Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='میان‌برهای صفحه‌کلید جدول';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>کلیدهای جهت</td><td>پیمایش.</td></tr><tr><td>Tab، Enter</td><td>پایان دادن به ورودی و پیمایش یک سلول به کنار / پایین.</td></tr><tr><td>Shift+Tab، Shift+Enter</td><td>پیمایش به عقب.</td></tr><tr><td>Shift+کلیدهای جهت</td><td>گسترش گزینش.</td></tr><tr><td>Ctrl+C</td><td>کپی گزینش.</td></tr><tr><td>Ctrl+D</td><td>پر کردن گزینش رو به پایین از ردیف بالای آن.</td></tr><tr><td>Ctrl+Enter</td><td>پر کردن گزینش با مقدار سلول فعال.</td></tr><tr><td>Ctrl+A</td><td>گزینش کل جدول.</td></tr><tr><td>Ctrl+Shift+V</td><td>چسباندن به‌صورت ردیف‌های تازه در انتهای جدول.</td></tr><tr><td>Delete</td><td>پاک کردن یک سلول.</td></tr><tr><td>F2</td><td>باز کردن یک سلول برای ویرایش آن.</td></tr><tr><td>Esc</td><td>لغو یک ویرایش.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>کلیدهای جهت</td><td>پیمایش.</td></tr><tr><td>Tab، Enter</td><td>پایان دادن به ورودی و پیمایش یک سلول به کنار / پایین.</td></tr><tr><td>Shift+Tab، Shift+Enter</td><td>پیمایش به عقب.</td></tr><tr><td>Shift+کلیدهای جهت</td><td>گسترش گزینش.</td></tr><tr><td>Ctrl+C</td><td>کپی گزینش.</td></tr><tr><td>Ctrl+D</td><td>پر کردن گزینش رو به پایین از ردیف بالای آن.</td></tr><tr><td>Ctrl+Enter</td><td>پر کردن گزینش با مقدار سلول فعال.</td></tr><tr><td>Ctrl+A</td><td>گزینش کل جدول.</td></tr><tr><td>Ctrl+Shift+V</td><td>چسباندن به‌صورت ردیف‌های تازه در انتهای جدول.</td></tr><tr><td>Ctrl+Shift+PageDown، Ctrl+Shift+PageUp</td><td>رفتن به جدول بعدی یا پیشین.</td></tr><tr><td>Delete</td><td>پاک کردن یک سلول.</td></tr><tr><td>F2</td><td>باز کردن یک سلول برای ویرایش آن.</td></tr><tr><td>Esc</td><td>لغو یک ویرایش.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2611,7 +2599,6 @@ $ec_lang['lpn_cp_design']='طراحی';
 $ec_lang['lpn_cp_design_tip']='یک ردیف برای هر ویژگی سفارشی، و هر ردیف با باز شدن این‌ها را نشان می‌دهد: کلید، برچسب، اعمال‌شونده بر، اعتبارسنجی به‌صورت، اجازه یا محدودیت، فیلد نویسه‌هایی که آن انتخاب نام می‌برد، حد پایین طول، حد بالای طول، حد پایین، حد بالا.';
 $ec_lang['lpn_cp_add']='افزودن ویژگی سفارشی';
 $ec_lang['lpn_cp_add_tip']='یک ردیف به جدول طراحی می‌افزاید و آن را برای ویرایش باز می‌کند.';
-$ec_lang['lpn_cp_remove']='حذف';
 $ec_lang['lpn_cp_remove_tip']='این ویژگی را از جدول طراحی حذف می‌کند. مقادیری که از پیش روی المان‌های شما تایپ شده در پرونده نگه داشته می‌شوند و اگر همان کلید را دوباره طراحی کنید بازمی‌گردند.';
 $ec_lang['lpn_cp_none']='هنوز هیچ ویژگی سفارشی طراحی نشده است.';
 $ec_lang['lpn_cp_unnamed']='هنوز نام‌گذاری نشده';
@@ -2631,7 +2618,6 @@ $ec_lang['lpn_cp_restrict_tip']='این نویسه‌ها را محدود کن: 
 $ec_lang['lpn_cp_restrict_mode']='اجازه یا محدودیت';
 $ec_lang['lpn_cp_restrict_mode_tip']='اجازه یا محدودیت: نویسه‌های داده‌شده یا تنها نویسه‌هایی هستند که یک مقدار می‌تواند استفاده کند، یا نویسه‌هایی که نمی‌تواند.';
 $ec_lang['lpn_cp_restrict_allow']='فقط این نویسه‌ها مجازند';
-$ec_lang['lpn_cp_restrict_deny']='این نویسه‌ها را محدود کن';
 $ec_lang['lpn_cp_minlength']='حد پایین طول';
 $ec_lang['lpn_cp_minlength_tip']='حد پایین طول: هر ورودی کوتاه‌تر پرچم‌گذاری می‌شود، که این‌گونه ورودی‌های خالی و نیمه‌تایپ‌شده را می‌یابید.';
 $ec_lang['lpn_cp_length']='حد بالای طول';
@@ -2793,7 +2779,6 @@ $ec_lang['lpn_settings_flow_change_tip']='آزمونی افزوده که حل‌
 $ec_lang['lpn_settings_damp_limit']='میرایی از اینجا آغاز می‌شود';
 $ec_lang['lpn_settings_damp_limit_tip']='دقتی که در آن حل‌کننده گام‌های کوچک‌تری برمی‌دارد، که می‌تواند به همگرایی یک شبکهٔ نوسانی کمک کند. صفر یعنی حل‌کننده هرگز میرا نمی‌کند. فقط حل‌کنندهٔ EPANET این جعبه را می‌خواند.';
 $ec_lang['lpn_settings_option_unset']='بیان نشده';
-$ec_lang['lpn_settings_demand_multiplier']='ضریب مصرف';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_demand_multiplier_tip']='یک ضریب واحد که به‌طور همزمان به هر مصرف در شبکه اعمال می‌شود. از آن برای پرسیدن این‌که سیستم در مصرفی بیش‌تر یا کم‌تر از امروز چه می‌کند استفاده کنید. عددهایی را که تایپ کرده‌اید تغییر نمی‌دهد. یک سناریو می‌تواند ضریب خودش را داشته باشد، پس میانگین روز، حداکثر روز و اوج ساعت هرکدام یک عدد می‌شوند؛ آن را در یک سناریو خالی بگذارید تا از ضریب پروژه استفاده شود.';
 $ec_lang['lpn_settings_engine_native']='حل با حل‌کننده EPANET';
@@ -3026,7 +3011,7 @@ $ec_lang['lpn_time_speed_tip']='سرعت پخش';
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,
 // with an index down the left and a search across the top. The section titles are not new keys --
-// each borrows the name it already had (lpn_tool_labels, lpn_menu_settings, lpn_time_menu,
+// each borrows the name it already had (lpn_tool_labels, lpn_tool_settings, lpn_time_menu,
 // lpn_settings_colors), so the box cannot drift from the doors that open it.
 $ec_lang['lpn_settings_search']='جست‌وجوی تنظیمات';
 // **AND-OF-WORDS, STATED AS SUCH** (Tom, 2026-09-23 (g): "can Settings filter work as an AND word
@@ -3083,7 +3068,6 @@ $ec_lang['lpn_settings_quality_track_tip']='انتخاب کنید اجرا چه 
 $ec_lang['lpn_settings_quality_source']='گره ردیاب';
 $ec_lang['lpn_settings_quality_source_tip']='گره‌ای که آب آن ردیابی می‌شود. سپس هر گرهٔ دیگر سهم آبی را که از آن گره آمده نشان می‌دهد.';
 $ec_lang['lpn_quality_none']='هیچ‌چیز';
-$ec_lang['lpn_quality_age']='سن آب';
 $ec_lang['lpn_quality_trace']='ردیابی منبع';
 $ec_lang['lpn_quality_chemical']='مادهٔ شیمیایی‌ای که واکنش می‌دهد';
 $ec_lang['lpn_quality_needs_run']='کیفیت آب همراه با حرکت آب در طول لوله‌ها منتقل می‌شود، پس به یک شبیه‌سازی بازهٔ زمانی نیاز دارد: موتور EPANET و یک کل مدت اجرا. یک کل مدت اجرا زیر زمان تعیین کنید، سپس دکمهٔ محاسبه را بزنید.';
@@ -3257,7 +3241,6 @@ $ec_lang['lpn_scncmp_title']='مقایسهٔ سناریوها';
 $ec_lang['lpn_scncmp_menu_tip']='همهٔ سناریوهای این پروژه را حل کنید و آن‌ها را کنار هم بخوانید: کمترین فشار و بیشترین سرعت در هر یک.';
 $ec_lang['lpn_scncmp_running']='در حال حل همهٔ سناریوها…';
 $ec_lang['lpn_scncmp_empty']='هنوز چیزی رسم نشده، پس چیزی برای حل کردن نیست.';
-$ec_lang['lpn_scncmp_col_minpressure']='کمترین فشار';
 $ec_lang['lpn_scncmp_col_maxvelocity']='بیشترین سرعت';
 $ec_lang['lpn_scncmp_at']='{value} در {id}';
 $ec_lang['lpn_scncmp_current']='(اکنون باز است)';
@@ -3290,7 +3273,6 @@ $ec_lang['lpn_reports_status_tip']='آنچه در طول واپسین شبیه�
 $ec_lang['lpn_status_title']='گزارش وضعیت';
 $ec_lang['lpn_status_needs_run']='گزارش وضعیت آنچه را که در طول یک شبیه‌سازی بازهٔ زمانی تغییر کرده فهرست می‌کند. یک کل مدت اجرا را در تنظیمات، محاسبه، زمان تعیین کنید، محاسبه را بزنید، سپس آب، گزارش‌ها، گزارش وضعیت را باز کنید.';
 $ec_lang['lpn_status_empty']='چیزی در طول این اجرا وضعیت خود را تغییر نداد.';
-$ec_lang['lpn_status_col_time']='زمان';
 $ec_lang['lpn_status_col_event']='رویداد';
 $ec_lang['lpn_status_opened']='{type} {id} باز شد';
 $ec_lang['lpn_status_closed']='{type} {id} بسته شد';
@@ -3349,7 +3331,6 @@ $ec_lang['lpn_color_mode_jenks']='شکست طبیعی (جنکس)';
 $ec_lang['lpn_color_mode_stddev']='انحراف معیار';
 $ec_lang['lpn_color_mode_pretty']='زیبا (گرد شده)';
 $ec_lang['lpn_color_mode_log']='لگاریتمی';
-$ec_lang['lpn_color_mode_pressure']='فشار';
 $ec_lang['lpn_color_mode_manual']='دستی';
 
 // ---- LIBRARIES (ROADMAP Tasks 462 and 460) ---------------------------------------------------
@@ -3359,7 +3340,7 @@ $ec_lang['lpn_color_mode_manual']='دستی';
 // Simulate, Transport, Time selectors."
 //
 // ONE NAME, THREE DOORS: the toolbar button, the Edit menu row and the box's own title all read
-// this key, exactly as lpn_menu_settings serves the Settings box's three.
+// this key, exactly as lpn_tool_settings serves the Settings box's three.
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='کتابخانه‌ها';
@@ -3564,7 +3545,6 @@ $ec_lang['lpn_library_rule_add']='افزودن یک قاعده';
 $ec_lang['lpn_library_rule_tip']='یک قاعده، با واژه‌هایی که EPANET به کار می‌برد، یک بند در هر خط. خط اول آن را نام‌گذاری می‌کند: RULE 1. سپس یک شرط: IF TANK 2 LEVEL BELOW 17.1. سپس چه باید کرد: THEN PUMP 9 STATUS IS OPEN. آخرین خط می‌تواند رتبه‌ای به آن بدهد: PRIORITY 1. برای آزمودن بیش از یک چیز، خطوط AND یا OR بیفزایید، و برای گفتن این‌که وقتی آزمون شکست خورد چه باید کرد، خطوط ELSE بیفزایید. یک شرط می‌تواند LEVEL، HEAD، GRADE، PRESSURE یا DEMAND را روی یک گره، FLOW، STATUS یا SETTING را روی یک اتصال، یا TIME و CLOCKTIME را روی SYSTEM بخواند. عددها را با واحدهایی که این پروژه نشان می‌دهد بنویسید؛ آن‌ها برایتان تبدیل می‌شوند. کلیدواژه‌ها را به انگلیسی بگذارید؛ این‌ها همان چیزی هستند که صفحه و EPANET می‌خوانند.';
 $ec_lang['lpn_library_rule_ok']='✓ این قاعده خوانده شد';
 $ec_lang['lpn_library_rule_bad']='⚠ این قاعده را نمی‌شد خواند';
-$ec_lang['lpn_library_rule_missing']='⚠ این شبکه چیزی به‌نام {id} ندارد';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
 // for the entire project it is in Settings") drawn on its other side. Without it a pattern you
 // author can only be used by making it the default one, which is not what a library is for.
@@ -3799,8 +3779,6 @@ $ec_lang['lpn_ff_mode_none']='هیچ‌کدام';
 $ec_lang['lpn_ff_col_solves']='اجراها';
 // Which criterion the junction broke while drawing the required flow. A junction that broke nothing
 // shows a dash, never one of these words.
-$ec_lang['lpn_ff_limit_pressure']='فشار';
-$ec_lang['lpn_ff_limit_velocity']='سرعت';
 $ec_lang['lpn_ff_limit_both']='فشار و سرعت';
 $ec_lang['lpn_ff_atleast']='بیش از {flow}';
 $ec_lang['lpn_ff_affect_node']='{id} به {pressure} می‌افتد';

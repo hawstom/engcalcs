@@ -66,7 +66,7 @@ const PROFILE = '/tmp/setbox-initial-width-probe-profile';
 			document.getElementById('lpn_menu_project').dispatchEvent(new MouseEvent('click', {bubbles:true}));
 			var hit = null;
 			document.querySelectorAll('#lpn_menu_list *').forEach(function(el){
-				if (!hit && (el.textContent||'').trim() === ((EngCalcs.pageConfig||{}).lpn_menu_settings||'Settings')) hit = el;
+				if (!hit && (el.textContent||'').trim() === ((EngCalcs.pageConfig||{}).lpn_tool_settings||'Settings')) hit = el;
 			});
 			if (!hit) { return 'NOT FOUND settings menu item'; }
 			hit.dispatchEvent(new MouseEvent('click', {bubbles:true}));

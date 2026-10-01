@@ -543,7 +543,6 @@ $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="កម្ពស់ចុងខាងក្រោមទឹកនៃចម្រៀកនេះ។ ជាជម្រើសសម្រាប់ជួរខាងក្នុង (បើទុកទទេ នឹងចាត់ទុកជារាបស្មើ / ស្មើនឹងថ្នាំងខាងលើ)។ ចាំបាច់សម្រាប់ជួរចុងក្រោយ: តម្លៃនោះជាកម្ពស់ក្បាលបញ្ចេញទឹកចុងក្រោយ ដែលកំណត់ដោយផ្ទាល់នូវសម្ពាធផ្គត់ផ្គង់ដែលត្រូវការ។">កម្ពស់ក្រោម <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='កម្ពស់ក្បាលបញ្ចេញទឹកចុងក្រោយ (ជួរចុងក្រោយ) ត្រូវបានទុកទទេ និងបានកំណត់លំនាំដើមទៅរាបស្មើ — សូមបញ្ចូលវាដើម្បីទទួលបានលទ្ធផលត្រឹមត្រូវ';
-$ec_lang['ip_flow']='លំហូរ';
 $ec_lang['ip_press']='សម្ពាធ';
 $ec_lang['ip_hf']='h<sub>f</sub>';
 $ec_lang['ip_hm']='h<sub>m</sub>';
@@ -610,10 +609,6 @@ $ec_lang['bpn_p_down']='សម្ពាធក្រោម';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_p_down_tip']='សម្ពាធវាស់ (gauge) នៅថ្នាំងខាងក្រោមទឹករបស់ខ្សែបំពង់នេះ។ តម្លៃអវិជ្ជមាន (ដែលបានសម្គាល់) មានន័យថាសម្ពាធក្រោមបរិយាកាស; សូមពិនិត្យការរចនា។';
 $ec_lang['bpn_sketch_heading']='ប្លង់បណ្ដាញ';
-$ec_lang['bpn_show_length']='ប្រវែង';
-$ec_lang['bpn_show_diameter']='អង្កត់ផ្ចិត';
-$ec_lang['bpn_show_q']='លំហូរ';
-$ec_lang['bpn_show_p']='សម្ពាធ';
 $ec_lang['bpn_source_label']='ប្រភព';
 $ec_lang['bpn_line_problem']='បន្ទាត់នេះមិនបានភ្ជាប់ទៅប្រភពទេ៖ វាចង្អុលទៅ ID ដើមទឹកមួយដែលមិនស្គាល់ ចង្អុលទៅខ្លួនឯង ធ្វើម្ដងទៀត ID ដែលបន្ទាត់មួយផ្សេងទៀតបានប្រើរួច ឬបង្កើតជារង្វិលបិទ។ បន្ទាត់ដែលមិនបានភ្ជាប់ត្រូវបានទុកមិនដោះស្រាយ។';
 $ec_lang['bpn_bad_id_short']='ID មិនត្រឹមត្រូវ';
@@ -637,7 +632,6 @@ $ec_lang['bpn_supply3_h']='សម្ពាធផ្គត់ផ្គង់ ៣'
 $ec_lang['bpn_supply_pt_tip']='ចំណុចខ្សែកោងផ្គត់ផ្គង់ ២ និង ៣ ជាជម្រើស។ បញ្ចូលលំហូរ និងសម្ពាធសម្រាប់ចំណុចនីមួយៗ ដើម្បីតំណាងឲ្យម៉ាស៊ីនបូម ឬប្រភពណាមួយដែលសម្ពាធថយចុះនៅពេលបញ្ជូនទឹកកាន់តែច្រើន; ឧបករណ៍នេះអានយកសម្ពាធត្រង់លំហូររចនា។ ចំណុចទី ១ ខាងលើជាសម្ពាធថេរនៅពេលគ្មានលំហូរ (លំហូរសូន្យ)។ ទុកចំណុចទី ២ និង ៣ ទទេ សម្រាប់សម្ពាធអាងស្តុកថេរ។';
 $ec_lang['bpn_h_supply']='សម្ពាធផ្គត់ផ្គង់';
 $ec_lang['bpn_h_supply_tip']='សម្ពាធប្រភពត្រង់លំហូររចនា អានពីខ្សែកោងផ្គត់ផ្គង់។ ស្មើនឹងសម្ពាធប្រភពដែលបានបញ្ចូល ពេលខ្សែកោងរាបស្មើ (អាងស្តុក)។';
-$ec_lang['bpn_show_elevation']='កម្ពស់';
 $ec_lang['bpn_supply1_h']='សម្ពាធផ្គត់ផ្គង់ថេរ';
 $ec_lang['lpn_main_menu']='បណ្ដាញផ្គត់ផ្គង់ទឹក';
 $ec_lang['lpn_main_title']='ការធ្វើគំរូបណ្ដាញចែកចាយទឹកឥតគិតថ្លៃតាមអ៊ីនធឺណិត ដោយប្រើឧបករណ៍ដោះស្រាយ EPANET';
@@ -927,7 +921,6 @@ $ec_lang['lpn_examples_blank']='ឬចាប់ផ្ដើមជាមួយផ
 // screen, so "start with a blank map" reads as "discard it" and they do not dare press the
 // only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
 // open an example"). Closing never touches a project either way.
-$ec_lang['lpn_examples_close']='បិទ';
 $ec_lang['lpn_examples_size']='ថ្នាំង៖ {nodes}, តំណ៖ {links}';
 $ec_lang['lpn_examples_failed']='មិនអាចផ្ទុកគំរូបានទេ។ សូមប្រើម៉ឺនុយឯកសារ, គម្រោងថ្មី ដើម្បីចាប់ផ្ដើមគំនូរមួយ។';
 $ec_lang['lpn_examples_loading']='កំពុងផ្ទុកគំរូ…';
@@ -1019,9 +1012,6 @@ $ec_lang['lpn_units_mapcoords']='កូអរដោនេផែនទី';
 $ec_lang['lpn_units_mapcoords_deg']='អង្សា';
 $ec_lang['lpn_units_usft']='ហ្វីតស្ទង់សហរដ្ឋអាមេរិក';
 $ec_lang['lpn_units_elevhead']='កម្ពស់ និងថ្ពល់';
-$ec_lang['lpn_units_pressure']='សម្ពាធ';
-$ec_lang['lpn_units_flow']='លំហូរ';
-$ec_lang['lpn_units_velocity']='ល្បឿន';
 // Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
 // mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
 // alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
@@ -1241,13 +1231,11 @@ $ec_lang['lpn_color_break_count']='ត្រូវមានព្រំដែន
 $ec_lang['lpn_color_ramp_qualitative']='ចំណាត់ថ្នាក់';
 $ec_lang['lpn_color_ramp_rainbow']='ឥន្ទធនូ';
 $ec_lang['lpn_color_ramp_rainbow_eg']='ដូច EPANET';
-$ec_lang['lpn_color_example_status']='ស្ថានភាព';
 $ec_lang['lpn_color_example_material']='សម្ភារៈ';
 $ec_lang['lpn_color_ramp_ylgnbu']='លឿងទៅខៀវ';
 $ec_lang['lpn_color_ramp_rdylbu']='ក្រហមទៅខៀវ ឆ្លងកាត់លឿង';
 $ec_lang['lpn_georef_drop']='ដាក់គំរូនៅទីនេះ';
 $ec_lang['lpn_georef_finish']='រក្សាទីតាំងនេះ';
-$ec_lang['lpn_georef_cancel']='បោះបង់';
 $ec_lang['lpn_georef_scale']='ចម្ងាយដីក្នុងឯកតាគំនូរមួយ';
 // Edited by TGH 2026-09-07
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
@@ -1347,7 +1335,7 @@ $ec_lang['lpn_pane_print_tip']='បោះពុម្ពតារាងដែល
 // lpn_clean_map_tip were deleted with the row; nothing else read them.
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
-// lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
+// lpn_tool_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
 // it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
 // alternative and Tom kept Project.
 // ROADMAP Task 523, Tom 2026-08-24. **The KEY is still lpn_menu_project and that is deliberate** --
@@ -1398,7 +1386,6 @@ $ec_lang['lpn_time_run_slow']='បណ្ដាញនេះចំណាយពេ�
 $ec_lang['lpn_time_no_report']='មិនទាន់មានរបាយការណ៍ដំណើរការនៅឡើយទេ។ របាយការណ៍នេះជាអត្ថបទផ្ទាល់របស់ EPANET ដូច្នេះវានឹងបង្ហាញនៅពេលបណ្ដាញនេះត្រូវបានគណនាដោយឧបករណ៍ដោះស្រាយ EPANET។';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
-$ec_lang['lpn_menu_settings']='ការកំណត់';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -1516,10 +1503,6 @@ $ec_lang['lpn_find_op_conn_noopensource']='គ្មានផ្លូវបើ�
 // What a result row prints beside the node id: the fault it has, in three words.
 // What a result row prints beside the id: the NARROWEST condition true of that node, because "no
 // links" says more than "no open path to a source" and both are true of the same node.
-$ec_lang['lpn_find_conn_unlinked']='គ្មានតំណភ្ជាប់នៅថ្នាំង';
-$ec_lang['lpn_find_conn_noopen']='គ្មានតំណភ្ជាប់បើកនៅថ្នាំង';
-$ec_lang['lpn_find_conn_nolinksource']='គ្មានផ្លូវតំណភ្ជាប់ទៅប្រភព';
-$ec_lang['lpn_find_conn_noopensource']='គ្មានផ្លូវបើកទៅប្រភព';
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='ថ្នាំងទាំងអស់ត្រូវបានតភ្ជាប់។';
@@ -1660,6 +1643,15 @@ $ec_lang['lpn_ts_none']='មិនទាន់មានអ្វីត្រូ�
 $ec_lang['lpn_ts_no_frames']='មិនទាន់មានលទ្ធផលការក្លែងធ្វើលើរយៈពេលមួយនៅឡើយទេ។ ចុច ដំណើរការ ដើម្បីធ្វើការក្លែងធ្វើនេះ។';
 $ec_lang['lpn_ts_summary']='ធាតុ៖ {n} ពេលវេលារាយការណ៍៖ {steps}';
 $ec_lang['lpn_ts_axis_time']='ពេលវេលាកន្លងផុត';
+$ec_lang['lpn_freq_menu']='ប្រេកង់';
+$ec_lang['lpn_freq_tip']='គូរក្រាបការចែកចាយប្រេកង់នៃលក្ខណៈមួយ លើថ្នាំងទាំងអស់ ឬបំពង់ទាំងអស់ នៅជំហានពេលវេលាបច្ចុប្បន្ន។';
+$ec_lang['lpn_freq_title']='ការចែកចាយតម្លៃ';
+$ec_lang['lpn_freq_group_tip']='តើក្រាបបង្ហាញថ្នាំង ឬបំពង់។';
+$ec_lang['lpn_freq_quantity_tip']='តម្លៃមួយណាត្រូវគូរ។';
+$ec_lang['lpn_freq_none']='មិនទាន់មានលទ្ធផលសម្រាប់តម្លៃនេះនៅឡើយទេ ដូច្នេះគ្មានអ្វីត្រូវគូរទេ។';
+$ec_lang['lpn_freq_summary']='បានគូរ៖ {n} នៃ {total}';
+$ec_lang['lpn_freq_summary_time']='បានគូរ៖ {n} នៃ {total} នៅ {time}';
+$ec_lang['lpn_freq_axis_percent']='ភាគរយតិចជាង';
 $ec_lang['lpn_view_units']='ខ្នាតវាស់';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='រក្សាទុកទាំងអស់';
@@ -1699,10 +1691,8 @@ $ec_lang['lpn_new_coordsys_local_tip']='មិនមានប្រព័ន្�
 // system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
 // the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
 // as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
-$ec_lang['lpn_new_crs']='ប្រព័ន្ធតម្រៀបផែនទី';
 // **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
 // it names the box's own subject rather than either caller's radio label.
-$ec_lang['lpn_crsbox_title']='ប្រព័ន្ធកូអរដោនេ';
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
@@ -1713,7 +1703,6 @@ $ec_lang['lpn_crs_place_tip']='វាយបញ្ចូលទីក្រុង 
 $ec_lang['lpn_crs_search']='ស្វែងរក';
 $ec_lang['lpn_crs_name']='តម្រងឈ្មោះប្រព័ន្ធតម្រៀប';
 $ec_lang['lpn_crs_name_tip']='បង្ហាញតែប្រព័ន្ធតម្រៀបដែលឈ្មោះ ឬលេខកូដ EPSG របស់វាមានអ្វីដែលអ្នកវាយបញ្ចូល។ សាកល្បងវាយលេខតំបន់ ឬ UTM ឬ Mercator។';
-$ec_lang['lpn_crs_list']='ប្រព័ន្ធតម្រៀប';
 $ec_lang['lpn_crs_list_tip']='ប្រព័ន្ធតម្រៀបដែលនៅសល់ពីតម្រងទាំងពីរខាងលើ។ ជ្រើសរើសមួយ រួចចុច ជ្រើសរើស។';
 $ec_lang['lpn_crs_choose']='ជ្រើសរើស';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
@@ -1758,7 +1747,6 @@ $ec_lang['lpn_file_open']='បើក…';
 $ec_lang['lpn_file_save']='រក្សាទុក';
 $ec_lang['lpn_file_saveas']='រក្សាទុកជា…';
 $ec_lang['lpn_file_revert']='ត្រឡប់មកវិញ';
-$ec_lang['lpn_file_close']='បិទ';
 // Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='ឯកសារថ្មីៗ';
@@ -2127,7 +2115,7 @@ $ec_lang['lpn_notes_6_term']='ជំនួយជួរឈរតារាង';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>ជ្រើសរើសជួរឈរ</td><td>ចុចលើក្បាល</td></tr><tr><td>បន្ថែម ឬពង្រីកជម្រើសជួរឈរ</td><td>Ctrl+ចុច ឬ Shift+ចុចលើក្បាលមួយទៀត</td></tr><tr><td>ផ្លាស់ទី (តម្រៀបលំដាប់ឡើងវិញ) ជួរឈរដែលបានជ្រើសរើស</td><td>អូស ឬប្រើ គ្រប់គ្រងជួរឈរ… នៅក្នុងម៉ឺនុយចុចខាងស្ដាំ ឬ ⋮</td></tr><tr><td>ម៉ឺនុយ ⋮ និងព្រួញតម្រៀប។</td><td>ដាក់ទ្រនិចលើជ្រុងខាងលើនៃក្បាលមួយ ឬជ្រើសរើស ឬចុច Tab ចូលក្បាលមួយ</td></tr><tr><td>លាក់ បង្ហាញទាំងអស់ ឬគ្រប់គ្រងភាពមើលឃើញ និងលំដាប់</td><td>ចុចស្ដាំលើក្បាល ឬម៉ឺនុយ ⋮ នៅជ្រុងខាងលើស្ដាំនៃក្បាល</td></tr><tr><td>តម្រៀបតាមជួរឈរ</td><td>រូបតំណាងព្រួញនៅជ្រុងខាងលើស្ដាំនៃក្បាល</td></tr><tr><td>បិទភ្ជាប់ជាជួរដេកថ្មីនៅចុងតារាង</td><td>ចុចស្ដាំ ម៉ឺនុយ ⋮ នៅជ្រុងខាងលើស្ដាំនៃក្បាល ឬ Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='ផ្លូវកាត់ក្តារចុចតារាង';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>រុករក។</td></tr><tr><td>Tab, Enter</td><td>បញ្ចប់ការវាយបញ្ចូល ហើយរុករកឆ្លង / ចុះក្រឡាមួយ។</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>រុករកថយក្រោយ។</td></tr><tr><td>Shift+arrow keys</td><td>ពង្រីកជម្រើស។</td></tr><tr><td>Ctrl+C</td><td>ចម្លងជម្រើស។</td></tr><tr><td>Ctrl+D</td><td>បំពេញជម្រើសចុះពីជួរដេកខាងលើរបស់វា។</td></tr><tr><td>Ctrl+Enter</td><td>បំពេញជម្រើសដោយតម្លៃក្រឡាសកម្ម។</td></tr><tr><td>Ctrl+A</td><td>ជ្រើសរើសតារាងទាំងមូល។</td></tr><tr><td>Ctrl+Shift+V</td><td>បិទភ្ជាប់ជាជួរដេកថ្មីនៅចុងតារាង។</td></tr><tr><td>Delete</td><td>សម្អាតក្រឡាមួយ។</td></tr><tr><td>F2</td><td>បើកក្រឡាមួយដើម្បីកែសម្រួលវា។</td></tr><tr><td>Esc</td><td>បោះបង់ការកែសម្រួល។</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>រុករក។</td></tr><tr><td>Tab, Enter</td><td>បញ្ចប់ការវាយបញ្ចូល ហើយរុករកឆ្លង / ចុះក្រឡាមួយ។</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>រុករកថយក្រោយ។</td></tr><tr><td>Shift+arrow keys</td><td>ពង្រីកជម្រើស។</td></tr><tr><td>Ctrl+C</td><td>ចម្លងជម្រើស។</td></tr><tr><td>Ctrl+D</td><td>បំពេញជម្រើសចុះពីជួរដេកខាងលើរបស់វា។</td></tr><tr><td>Ctrl+Enter</td><td>បំពេញជម្រើសដោយតម្លៃក្រឡាសកម្ម។</td></tr><tr><td>Ctrl+A</td><td>ជ្រើសរើសតារាងទាំងមូល។</td></tr><tr><td>Ctrl+Shift+V</td><td>បិទភ្ជាប់ជាជួរដេកថ្មីនៅចុងតារាង។</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>ប្តូរទៅតារាងបន្ទាប់ ឬតារាងមុន។</td></tr><tr><td>Delete</td><td>សម្អាតក្រឡាមួយ។</td></tr><tr><td>F2</td><td>បើកក្រឡាមួយដើម្បីកែសម្រួលវា។</td></tr><tr><td>Esc</td><td>បោះបង់ការកែសម្រួល។</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2617,7 +2605,6 @@ $ec_lang['lpn_cp_design']='ការរចនា';
 $ec_lang['lpn_cp_design_tip']='មួយជួរក្នុងមួយលក្ខណៈសម្បត្តិផ្ទាល់ខ្លួន ហើយនីមួយៗបើកឲ្យបង្ហាញ៖ លេខសម្គាល់, ស្លាក, អនុវត្តចំពោះ, ផ្ទៀងផ្ទាត់ជា, អនុញ្ញាត ឬដាក់កម្រិត, វាលអក្សរដែលដាក់ឈ្មោះដោយជម្រើសនោះ, ដែនកំណត់ចំនួនតួអក្សរទាប, ដែនកំណត់ចំនួនតួអក្សរខ្ពស់, ដែនកំណត់ទាប, ដែនកំណត់ខ្ពស់។';
 $ec_lang['lpn_cp_add']='បន្ថែមលក្ខណៈសម្បត្តិផ្ទាល់ខ្លួន';
 $ec_lang['lpn_cp_add_tip']='បន្ថែមជួរមួយទៅតារាងរចនា ហើយបើកវាសម្រាប់ការកែសម្រួល។';
-$ec_lang['lpn_cp_remove']='លុបចេញ';
 $ec_lang['lpn_cp_remove_tip']='លុបលក្ខណៈសម្បត្តិនេះចេញពីតារាងរចនា។ តម្លៃដែលបានវាយបញ្ចូលរួចហើយនៅលើធាតុរបស់អ្នកនៅតែស្ថិតនៅក្នុងឯកសារ ហើយនឹងវិលត្រឡប់មកវិញ ប្រសិនបើអ្នករចនាលេខសម្គាល់ដដែលនោះម្ដងទៀត។';
 $ec_lang['lpn_cp_none']='មិនទាន់មានលក្ខណៈសម្បត្តិផ្ទាល់ខ្លួនណាមួយត្រូវបានរចនានៅឡើយទេ។';
 $ec_lang['lpn_cp_unnamed']='មិនទាន់មានឈ្មោះនៅឡើយទេ';
@@ -2637,7 +2624,6 @@ $ec_lang['lpn_cp_restrict_tip']='ដាក់កម្រិតតួអក្�
 $ec_lang['lpn_cp_restrict_mode']='អនុញ្ញាត ឬដាក់កម្រិត';
 $ec_lang['lpn_cp_restrict_mode_tip']='អនុញ្ញាត ឬដាក់កម្រិត៖ តួអក្សរដែលបានផ្ដល់ ជាតួដែលតម្លៃមួយអាចប្រើបានតែប៉ុណ្ណោះ ឬតួដែលវាមិនអាចប្រើបានឡើយ។';
 $ec_lang['lpn_cp_restrict_allow']='អនុញ្ញាតតែតួអក្សរទាំងនេះ';
-$ec_lang['lpn_cp_restrict_deny']='ដាក់កម្រិតតួអក្សរទាំងនេះ';
 $ec_lang['lpn_cp_minlength']='ដែនកំណត់ចំនួនតួអក្សរទាប';
 $ec_lang['lpn_cp_minlength_tip']='ដែនកំណត់ចំនួនតួអក្សរទាប៖ ការវាយបញ្ចូលខ្លីជាងនេះនឹងត្រូវបានសម្គាល់ ដែលជាមធ្យោបាយអ្នករកឃើញការវាយបញ្ចូលទទេ និងពាក់កណ្ដាល។';
 $ec_lang['lpn_cp_length']='ដែនកំណត់ចំនួនតួអក្សរខ្ពស់';
@@ -2799,7 +2785,6 @@ $ec_lang['lpn_settings_flow_change_tip']='ការធ្វើតេស្ត�
 $ec_lang['lpn_settings_damp_limit']='ការបន្ធូរចាប់ផ្ដើមនៅ';
 $ec_lang['lpn_settings_damp_limit_tip']='ភាពត្រឹមត្រូវដែលឧបករណ៍ដោះស្រាយចាប់ផ្ដើមប្រើជំហានតូចជាង ដែលអាចជួយបណ្ដាញកំពុងញ័រឲ្យប្រសព្វគ្នា។ សូន្យមានន័យថាឧបករណ៍ដោះស្រាយមិនដែលបន្ធូរទេ។ មានតែឧបករណ៍ដោះស្រាយ EPANET ប៉ុណ្ណោះដែលអានប្រអប់នេះ។';
 $ec_lang['lpn_settings_option_unset']='មិនបានចែង';
-$ec_lang['lpn_settings_demand_multiplier']='មេគុណគុណតម្រូវការ';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_demand_multiplier_tip']='កត្តាតែមួយដែលអនុវត្តទៅតម្រូវការទាំងអស់ក្នុងបណ្ដាញក្នុងពេលតែមួយ។ ប្រើវាដើម្បីសួរថាតើប្រព័ន្ធធ្វើអ្វីនៅកម្រិតការប្រើប្រាស់ច្រើន ឬតិចជាងបច្ចុប្បន្ន។ វាមិនផ្លាស់ប្ដូរលេខដែលអ្នកបានវាយបញ្ចូលទេ។ សេណារីយ៉ូអាចមានតម្លៃផ្ទាល់ខ្លួនរបស់វា ដូច្នេះថ្ងៃមធ្យម ថ្ងៃអតិបរមា និងម៉ោងកំពូល នីមួយៗមានលេខមួយ; ទុកវាទទេនៅក្នុងសេណារីយ៉ូ ដើម្បីប្រើតម្លៃរបស់គម្រោង។';
 $ec_lang['lpn_settings_engine_native']='ដោះស្រាយដោយប្រើឧបករណ៍ដោះស្រាយ EPANET';
@@ -3032,7 +3017,7 @@ $ec_lang['lpn_time_speed_tip']='ល្បឿននៃការចាក់ត្
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,
 // with an index down the left and a search across the top. The section titles are not new keys --
-// each borrows the name it already had (lpn_tool_labels, lpn_menu_settings, lpn_time_menu,
+// each borrows the name it already had (lpn_tool_labels, lpn_tool_settings, lpn_time_menu,
 // lpn_settings_colors), so the box cannot drift from the doors that open it.
 $ec_lang['lpn_settings_search']='ស្វែងរកការកំណត់';
 // **AND-OF-WORDS, STATED AS SUCH** (Tom, 2026-09-23 (g): "can Settings filter work as an AND word
@@ -3089,7 +3074,6 @@ $ec_lang['lpn_settings_quality_track_tip']='ជ្រើសរើសអ្វី
 $ec_lang['lpn_settings_quality_source']='ថ្នាំងតាមដាន';
 $ec_lang['lpn_settings_quality_source_tip']='ថ្នាំងដែលទឹករបស់វាត្រូវបានតាមដាន។ ថ្នាំងផ្សេងទៀតទាំងអស់នឹងបង្ហាញចំណែកទឹករបស់វាដែលមកពីថ្នាំងនោះ។';
 $ec_lang['lpn_quality_none']='គ្មានអ្វី';
-$ec_lang['lpn_quality_age']='អាយុទឹក';
 $ec_lang['lpn_quality_trace']='ការតាមដានប្រភព';
 $ec_lang['lpn_quality_chemical']='សារធាតុគីមីមួយដែលប្រតិកម្ម';
 $ec_lang['lpn_quality_needs_run']='គុណភាពទឹកត្រូវបានផ្ទុកតាមបំពង់ ខណៈទឹកធ្វើដំណើរ ដូច្នេះវាត្រូវការការក្លែងធ្វើលើរយៈពេលមួយ៖ ឧបករណ៍ដោះស្រាយ EPANET និងរយៈពេលដំណើរការសរុប។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្រោម ពេលវេលា រួចចុច ដំណើរការ។';
@@ -3263,7 +3247,6 @@ $ec_lang['lpn_scncmp_title']='ការប្រៀបធៀបសេណារ�
 $ec_lang['lpn_scncmp_menu_tip']='ដោះស្រាយសេណារីយ៉ូគ្រប់មួយនៅក្នុងគម្រោងនេះ ហើយអានពួកវារួមគ្នា៖ សម្ពាធទាបបំផុត និងល្បឿនខ្ពស់បំផុតនៅក្នុងនីមួយៗ។';
 $ec_lang['lpn_scncmp_running']='កំពុងដោះស្រាយសេណារីយ៉ូគ្រប់មួយ…';
 $ec_lang['lpn_scncmp_empty']='គ្មានអ្វីត្រូវបានគូរនៅឡើយទេ ដូច្នេះគ្មានអ្វីត្រូវដោះស្រាយឡើយ។';
-$ec_lang['lpn_scncmp_col_minpressure']='សម្ពាធទាបបំផុត';
 $ec_lang['lpn_scncmp_col_maxvelocity']='ល្បឿនខ្ពស់បំផុត';
 $ec_lang['lpn_scncmp_at']='{value} នៅ {id}';
 $ec_lang['lpn_scncmp_current']='(កំពុងបើកឥឡូវនេះ)';
@@ -3296,7 +3279,6 @@ $ec_lang['lpn_reports_status_tip']='អ្វីដែលបានផ្លា�
 $ec_lang['lpn_status_title']='របាយការណ៍ស្ថានភាព';
 $ec_lang['lpn_status_needs_run']='របាយការណ៍ស្ថានភាពរាយអ្វីដែលបានផ្លាស់ប្ដូរអំឡុងពេលការក្លែងធ្វើលើរយៈពេលមួយ។ កំណត់ រយៈពេលដំណើរការសរុប នៅក្នុង ការកំណត់, ការគណនា, ពេលវេលា ចុច ដំណើរការ រួចបើក ទឹក, របាយការណ៍, របាយការណ៍ស្ថានភាព។';
 $ec_lang['lpn_status_empty']='គ្មានអ្វីផ្លាស់ប្ដូរស្ថានភាពក្នុងអំឡុងការដំណើរការនេះទេ។';
-$ec_lang['lpn_status_col_time']='ពេលវេលា';
 $ec_lang['lpn_status_col_event']='ព្រឹត្តិការណ៍';
 $ec_lang['lpn_status_opened']='{type} {id} បានបើក';
 $ec_lang['lpn_status_closed']='{type} {id} បានបិទ';
@@ -3355,7 +3337,6 @@ $ec_lang['lpn_color_mode_jenks']='ការបំបែកធម្មជាត�
 $ec_lang['lpn_color_mode_stddev']='គម្លាតគំរូ';
 $ec_lang['lpn_color_mode_pretty']='ស្អាត (បង្គត់)';
 $ec_lang['lpn_color_mode_log']='លោការីត';
-$ec_lang['lpn_color_mode_pressure']='សម្ពាធ';
 $ec_lang['lpn_color_mode_manual']='ដោយដៃ';
 
 // ---- LIBRARIES (ROADMAP Tasks 462 and 460) ---------------------------------------------------
@@ -3365,7 +3346,7 @@ $ec_lang['lpn_color_mode_manual']='ដោយដៃ';
 // Simulate, Transport, Time selectors."
 //
 // ONE NAME, THREE DOORS: the toolbar button, the Edit menu row and the box's own title all read
-// this key, exactly as lpn_menu_settings serves the Settings box's three.
+// this key, exactly as lpn_tool_settings serves the Settings box's three.
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='បណ្ណាល័យ';
@@ -3570,7 +3551,6 @@ $ec_lang['lpn_library_rule_add']='បន្ថែមក្បួន';
 $ec_lang['lpn_library_rule_tip']='ក្បួនមួយ ជាមួយពាក្យដែល EPANET ប្រើ មួយឃ្លាក្នុងមួយបន្ទាត់។ បន្ទាត់ដំបូងដាក់ឈ្មោះវា៖ RULE 1។ បន្ទាប់មកលក្ខខណ្ឌមួយ៖ IF TANK 2 LEVEL BELOW 17.1។ បន្ទាប់មកអ្វីត្រូវធ្វើ៖ THEN PUMP 9 STATUS IS OPEN។ បន្ទាត់ចុងក្រោយអាចដាក់អាទិភាព៖ PRIORITY 1។ បន្ថែមបន្ទាត់ AND ឬ OR ដើម្បីធ្វើតេស្តលើសពីមួយ និងបន្ទាត់ ELSE ដើម្បីប្រាប់ថាត្រូវធ្វើអ្វីនៅពេលតេស្តបរាជ័យ។ លក្ខខណ្ឌមួយអាចអាន LEVEL, HEAD, GRADE, PRESSURE ឬ DEMAND នៅលើថ្នាំងមួយ, FLOW, STATUS ឬ SETTING នៅលើតំណមួយ ឬ TIME និង CLOCKTIME នៅលើ SYSTEM។ សរសេរលេខតាមឯកតាដែលគម្រោងនេះកំពុងបង្ហាញ ពួកវាត្រូវបានបំលែងជូនអ្នក។ ទុកពាក្យគន្លឹះជាភាសាអង់គ្លេស ព្រោះនោះជាអ្វីដែលទំព័រនេះ និង EPANET អាន។';
 $ec_lang['lpn_library_rule_ok']='✓ ក្បួននេះត្រូវបានអាន';
 $ec_lang['lpn_library_rule_bad']='⚠ ក្បួននេះមិនអាចអានបានទេ';
-$ec_lang['lpn_library_rule_missing']='⚠ បណ្ដាញនេះគ្មានអ្វីមួយឈ្មោះ {id} ទេ';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
 // for the entire project it is in Settings") drawn on its other side. Without it a pattern you
 // author can only be used by making it the default one, which is not what a library is for.
@@ -3805,8 +3785,6 @@ $ec_lang['lpn_ff_mode_none']='គ្មាន';
 $ec_lang['lpn_ff_col_solves']='ការដំណើរការ';
 // Which criterion the junction broke while drawing the required flow. A junction that broke nothing
 // shows a dash, never one of these words.
-$ec_lang['lpn_ff_limit_pressure']='សម្ពាធ';
-$ec_lang['lpn_ff_limit_velocity']='ល្បឿន';
 $ec_lang['lpn_ff_limit_both']='សម្ពាធ និងល្បឿន';
 $ec_lang['lpn_ff_atleast']='ច្រើនជាង {flow}';
 $ec_lang['lpn_ff_affect_node']='{id} ធ្លាក់ចុះដល់ {pressure}';

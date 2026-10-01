@@ -37,8 +37,8 @@ Before and after, one term:
 {"term": "tag (EPANET)", "symbol": "", "avoid": [...], "context": "...",
  "translations": {"am": "...", ...}}
 
-{"term": "tag (EPANET)", "concept": "gus", "definition": "A short identifier stored on an asset ...
- Not the Label (sally) ..., not the Text (tessa) ..., not the Description (dora) note ...",
+{"term": "tag (EPANET)", "concept": "label-word-gus", "definition": "A short identifier stored on an asset ...
+ Not the Label (label-sym-sally) ..., not the Text (label-user-tessa) ..., not the Description (label-long-dora) note ...",
  "symbol": "", "avoid": [...], "context": "...", "translations": {"en": "Tag", "am": "...", ...}}
 ```
 
@@ -52,16 +52,22 @@ citation resolves.
 
 | Concept | English | What it is, in short |
 |---|---|---|
-| `sally` | Label | the annotation the PAGE writes beside an asset from its data (EPANET: Notation) |
-| `tessa` | Text | the annotation the USER types and places (EPANET: Label) |
-| `gus` | Tag | a short identifier stored on an asset, to group and find it (EPANET [TAGS]) |
-| `dora` | Description | a free note stored on an asset; no calculation reads it |
+| `label-sym-sally` | Label | the annotation the PAGE writes beside an asset from its data (EPANET: Notation) |
+| `label-user-tessa` | Text | the annotation the USER types and places (EPANET: Label) |
+| `label-word-gus` | Tag | a short identifier stored on an asset, to group and find it (EPANET [TAGS]) |
+| `label-long-dora` | Description | a free note stored on an asset; no calculation reads it |
 | `elevation` | Elevation | z, a point's height above the project datum |
 | `depth` | depth | y, water measured up from a thing's own bottom (bed, invert, tank floor) |
 | `pressure` | Pressure | p, as a gauge reads it |
 | `hydraulic-head` | Head | z + p/γ at one point: EPANET's node Head |
 | `hgl` | Hydraulic grade line | the same quantity drawn as a line along a pipe |
 | `egl` | Energy grade line | z + p/γ + v²/2g as a line; above the HGL by the velocity head |
+
+**Renamed 2026-09-30.** The four coined ids were bare names (`sally`, `tessa`, `gus`, `dora`); Tom,
+2026-09-30: *"for clarity, we should say something like label-sym-sally, label-user-tessa,
+label-word-gus, and label-long-dora ... This way the languages know that they all are merely
+labels, and they can inter-compare what other languages (English) used for ideas."* Renamed in
+place; definitions unchanged.
 
 Tom listed "total potential = Head/HGL" as one row. It is two records here, `hydraulic-head` for
 the value at a point and `hgl` for the line, because a language may rightly use two words for them
@@ -89,7 +95,8 @@ line, and `glossary_terms_by_prefix` carries `concept` and `definition`.
   term with no id, two terms sharing an id, an id that reads as another term's English name, and a
   key citing a missing id or a key that no longer exists.
 - **Write-back:** a concept's word in each language goes into `translations[<lang>]` as before. A
-  new concept (sally, tessa, dora, hydraulic-head) starts with empty translations; the first sprint
+  new concept (label-sym-sally, label-user-tessa, label-long-dora, hydraulic-head) starts with empty
+  translations; the first sprint
   that translates a key citing it fills them, and must not give two neighbouring concepts one word.
 - **Adding a concept:** a new glossary term needs an id and a definition field (empty is fine). A
   new key naming an existing concept gets a line in `key_concepts.json`.
