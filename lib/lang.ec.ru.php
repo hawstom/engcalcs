@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Восстановить значения по умолчанию';
 $ec_lang['calc_defaults_confirm']='Сбросить калькулятор на исходные значения по умолчанию?';
 $ec_lang['points_data_note']='(или Копировать/Вставить через область данных)';
-$ec_lang['points_data_heading']='Данные точек<br />(разделены запятой или табуляцией)';
+$ec_lang['points_data_heading']='Данные точек<br />(чтобы увидеть формат, нажмите «Копировать»)';
 $ec_lang['points_data_copy']='Копировать';
 $ec_lang['points_data_paste']='Вставить';
 $ec_lang['calc_inputs']='Входные данные';
@@ -929,6 +929,11 @@ $ec_lang['lpn_examples_loading']='Загрузка примеров…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='Устранение проблем';
 $ec_lang['lpn_help_notes']='Заметки об этой странице';
+$ec_lang['lpn_help_hotkeys']='Таблицы и горячие клавиши';
+$ec_lang['lpn_hotkeys_tables_heading']='Таблицы';
+$ec_lang['lpn_hotkeys_map_heading']='Карта';
+$ec_lang['lpn_hotkeys_map_term']='Горячие клавиши карты';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 или Esc</td><td>Выбрать.</td></tr><tr><td>2</td><td>Добавить узел.</td></tr><tr><td>3</td><td>Добавить резервуар.</td></tr><tr><td>4</td><td>Добавить бак.</td></tr><tr><td>5</td><td>Добавить трубу.</td></tr><tr><td>6</td><td>Добавить насос.</td></tr><tr><td>7</td><td>Добавить клапан.</td></tr><tr><td>8</td><td>Добавить потребителя.</td></tr><tr><td>9</td><td>Добавить текст.</td></tr><tr><td>Delete</td><td>Удалить выделенное.</td></tr><tr><td>Ctrl+Z</td><td>Отменить последнее изменение.</td></tr><tr><td>+ или =</td><td>Приблизить.</td></tr><tr><td>-</td><td>Отдалить.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1203,7 +1208,7 @@ $ec_lang['lpn_find_menu_tip']='Найдите элемент по его ID ил
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='Что означают значки на панели инструментов';
+$ec_lang['lpn_help_icons']='Легенда панели инструментов';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Видимость';
 $ec_lang['lpn_pane_right_toggle_tip']='Показать или скрыть панель справа от карты. На ней находятся выбор подписей и цветов.';
@@ -1312,6 +1317,7 @@ $ec_lang['lpn_pane_not_used']='Не используется';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='Отфильтровано по «{q}». Показано {n} из {all}.';
 $ec_lang['lpn_pane_filter_clear']='Показать всё';
+$ec_lang['lpn_pane_filter_stale']='Строки, которые больше не соответствуют фильтру: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='В этой таблице нет совпадений с фильтром.';
@@ -1768,6 +1774,7 @@ $ec_lang['lpn_import_no_room']='В хранилище браузера недо�
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='ОК';
+$ec_lang['lpn_file_import_menu']='Импорт…';
 $ec_lang['lpn_file_import_inp']='Импорт файла EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='Считывает сеть из файла EPANET — текстового файла .inp или файла .net, который сохраняет EPANET, — и сохраняет её в этом браузере как новый проект.';
@@ -2110,7 +2117,7 @@ $ec_lang['lpn_notes_6_term']='Справка по столбцам таблиц�
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Выбрать столбец</td><td>Щёлкните по заголовку</td></tr><tr><td>Добавить столбец к выделению или расширить его</td><td>Ctrl+щелчок или Shift+щелчок по другому заголовку</td></tr><tr><td>Переместить (изменить порядок) выбранного столбца (столбцов)</td><td>Перетащите или используйте «Управление столбцами…» в контекстном меню или меню ⋮</td></tr><tr><td>Меню ⋮ и стрелка сортировки.</td><td>Наведите на верхний угол заголовка или выберите заголовок либо перейдите к нему клавишей Tab</td></tr><tr><td>Скрыть, показать все или управлять видимостью и порядком</td><td>Правый клик по заголовку или меню ⋮ в верхнем правом углу заголовка</td></tr><tr><td>Сортировать по столбцу</td><td>Значок стрелки в верхнем правом углу заголовка</td></tr><tr><td>Вставить как новые строки в конец таблицы</td><td>Правый клик, меню ⋮ в верхнем правом углу заголовка, или Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Сочетания клавиш в таблице';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Клавиши со стрелками</td><td>Навигация.</td></tr><tr><td>Tab, Enter</td><td>Завершить ввод и перейти на одну ячейку вправо / вниз.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Перейти назад.</td></tr><tr><td>Shift+стрелки</td><td>Расширить выделение.</td></tr><tr><td>Ctrl+C</td><td>Скопировать выделение.</td></tr><tr><td>Ctrl+D</td><td>Заполнить выделение вниз от верхней строки.</td></tr><tr><td>Ctrl+Enter</td><td>Заполнить выделение значением активной ячейки.</td></tr><tr><td>Ctrl+A</td><td>Выбрать всю таблицу.</td></tr><tr><td>Ctrl+Shift+V</td><td>Вставить как новые строки в конец таблицы.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Переключиться на следующую или предыдущую таблицу.</td></tr><tr><td>Delete</td><td>Очистить ячейку.</td></tr><tr><td>F2</td><td>Открыть ячейку для редактирования.</td></tr><tr><td>Esc</td><td>Отменить редактирование.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Клавиши со стрелками</td><td>Навигация.</td></tr><tr><td>Tab, Enter</td><td>Завершить ввод и перейти на одну ячейку вправо / вниз.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Перейти назад.</td></tr><tr><td>Shift+стрелки</td><td>Расширить выделение.</td></tr><tr><td>Ctrl+C</td><td>Скопировать выделение.</td></tr><tr><td>Ctrl+D</td><td>Заполнить выделение вниз от верхней строки.</td></tr><tr><td>Ctrl+Enter</td><td>Заполнить выделение значением активной ячейки.</td></tr><tr><td>Ctrl+A</td><td>Выбрать всю таблицу.</td></tr><tr><td>Ctrl+Shift+V</td><td>Вставить как новые строки в конец таблицы.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Переключиться на следующую или предыдущую вкладку, будь то таблица или график.</td></tr><tr><td>Delete</td><td>Очистить ячейку.</td></tr><tr><td>F2</td><td>Открыть ячейку для редактирования.</td></tr><tr><td>Esc</td><td>Отменить редактирование.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2707,6 +2714,20 @@ $ec_lang['lpn_scenario_push_confirm']='Заставить все сценари�
 $ec_lang['lpn_scenario_push_scenarios']='Затронутые сценарии:';
 $ec_lang['lpn_scenario_push_values']='Удаляемые значения:';
 $ec_lang['lpn_scenario_push_none']='Ни один сценарий не имеет собственного значения ни для одного из этих свойств, поэтому ничего не изменится. Ничего не будет удалено.';
+$ec_lang['lpn_scenario_preset_flow_static']='1. Проверка расхода: статика';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='Калибровка по проверке расхода для проектируемой сети при нулевом расходе. В этом сценарии задайте расход отбора во всех узлах равным 0.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. Проверка расхода: средний';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='Калибровка по проверке расхода для проектируемой сети при первом зарегистрированном расходе. В этом сценарии задайте расход отбора в узле, где идёт расход, равным первому измеренному расходу, а расход отбора во всех остальных узлах равным 0.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. Проверка расхода: максимальный';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='Калибровка по проверке расхода для проектируемой сети при зарегистрированном максимальном расходе. В этом сценарии задайте расход отбора в узле, где идёт расход, равным максимальному измеренному расходу, а расход отбора во всех остальных узлах равным 0.';
+$ec_lang['lpn_scenario_preset_average_day']='4. Средние сутки';
+$ec_lang['lpn_scenario_preset_average_day_tip']='Множитель расхода отбора 1: каждый расход отбора берётся как введён, и он считается расходом отбора в средние сутки.';
+$ec_lang['lpn_scenario_preset_max_day']='5. Максимальные сутки';
+$ec_lang['lpn_scenario_preset_max_day_tip']='Множитель расхода отбора 2,0 от среднесуточного, значение-заполнитель. У большинства систем он лежит между 1,2 и 3,0 (National Research Council, 2006). Задайте значение для вашей системы в разделе «Настройки», «Расчёт», «Гидравлика», «Множитель расхода отбора».';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. Час пик';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='Множитель расхода отбора 3,0 от среднесуточного, значение-заполнитель. У большинства систем он лежит между 3,0 и 6,0 (National Research Council, 2006). Задайте значение для вашей системы в разделе «Настройки», «Расчёт», «Гидравлика», «Множитель расхода отбора».';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. Пожар плюс максимальные сутки';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='Расход отбора в максимальные сутки (множитель 2,0). Запустите в этом сценарии анализ противопожарного расхода: он добавляет противопожарный расход в каждом узле сверх этого расхода отбора.';
 $ec_lang['lpn_delete_drops_overrides']='Удаление этого элемента также удалит {n} значений, которые ваши сценарии хранят для него. Продолжить?';
 $ec_lang['lpn_push_base_only']='Это действие изменяет сам чертёж, поэтому его можно выполнить только в {base}. Переключитесь в {base} и попробуйте снова.';
 $ec_lang['lpn_field_active']='Часть этой сети';
@@ -3680,10 +3701,10 @@ $ec_lang['lpn_ff_title']='Анализ противопожарного расх
 $ec_lang['lpn_ff_intro']='У каждого узла по очереди запрашивается забор противопожарного расхода сверх уже имеющегося расхода отбора. Ваш проект при этом не меняется: весь расчёт выполняется на копии.';
 $ec_lang['lpn_ff_scope']='Проверяемые узлы';
 $ec_lang['lpn_ff_scope_tip']='Выберите набор узлов перед запуском. Проверка каждого узла в большой системе может занять несколько минут.';
-$ec_lang['lpn_ff_scope_all']='Все узлы';
-$ec_lang['lpn_ff_scope_selected']='Только выбранный узел';
+$ec_lang['lpn_ff_all']='Все';
+$ec_lang['lpn_ff_selected']='Выбранные';
 $ec_lang['lpn_ff_no_junctions']='В этом проекте пока нет узлов, поэтому проверять нечего.';
-$ec_lang['lpn_ff_no_selection']='Узел не выбран. Выберите его на карте или проверьте все узлы.';
+$ec_lang['lpn_ff_no_selection']='Узлы не выбраны. Выберите узлы или выберите вариант «Все».';
 $ec_lang['lpn_ff_skipped']='{n} выбранных элементов не являются узлами, поэтому они не были проверены.';
 $ec_lang['lpn_ff_required']='Требуемый противопожарный расход';
 $ec_lang['lpn_ff_required_tip']='Расход, который ваши противопожарные нормы или ваша пожарная служба требуют на гидранте. Каждый узел проверяется по этому числу, если только у него нет собственного требуемого противопожарного расхода.';
@@ -3693,10 +3714,7 @@ $ec_lang['lpn_ff_residual']='Удерживаемое остаточное да�
 $ec_lang['lpn_ff_residual_tip']='Давление, которое узел должен сохранять, отдавая противопожарный расход. AWWA M31 и NFPA 291 используют 20 psi (140 кПа).';
 $ec_lang['lpn_ff_design']='Проверка проекта (влияние на систему)';
 $ec_lang['lpn_ff_design_tip']='Отдельный вопрос от того, может ли узел отдать этот расход: при заборе этого расхода там, не падает ли что-то ещё ниже своего минимального давления и не превышает ли предел скорости? Выбор этой проверки не требует дополнительного расчёта.';
-$ec_lang['lpn_ff_design_off']='Не проверять';
-$ec_lang['lpn_ff_design_all']='Все остальные узлы и все трубы';
-$ec_lang['lpn_ff_design_selected']='Выбранные узлы и их трубы';
-$ec_lang['lpn_ff_design_no_selection']='Проверка проекта настроена на выбранные узлы, но ни один не выбран. Выберите несколько на карте либо переключите на «Все».';
+$ec_lang['lpn_ff_design_no_selection']='Проверка проекта настроена на «Выбранные», но элементы не выбраны. Выберите элементы или выберите вариант «Все».';
 $ec_lang['lpn_ff_minpressure']='Наименьшее допустимое давление в остальной сети';
 $ec_lang['lpn_ff_minpressure_tip']='Узел, давление в котором падает ниже этого значения, пока другой узел отдаёт свой противопожарный расход, отмечается как проблема проекта.';
 $ec_lang['lpn_ff_maxvelocity']='Наибольшая допустимая скорость';

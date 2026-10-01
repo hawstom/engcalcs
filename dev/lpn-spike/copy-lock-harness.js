@@ -19,8 +19,8 @@
 //   (c) the browser already grants write permission on the file;
 //   and a file with no document ID, which has no identity to share.
 // Everything else is asked, including a KNOWN ID arriving in a file that is not provably the open
-// tab's own -- the pre-review's reproduction (2026-09-30), where switching to the tab used to rebind
-// it to the copy's file so Save overwrote the copy.
+// tab's own -- the pre-review's reproduction (2026-09-30). Answered "A copy" it gets a new ID; answered
+// "Original" (Tom: then it was MOVED) the tab is rebound to the chosen file, ID and lock kept.
 //
 // Driven through the page's own openHandle(), with the broker faked at fetch and fake file handles
 // whose identity is a PATH (isSameEntry compares paths, as Chrome's does) and which count writes.
@@ -55,6 +55,7 @@ const L = loadLoopedNetwork(
 	"\t\tregionalDateTime: regionalDateTime,\n" +
 	"\t\tensureIdentity: function () { var i = ensureIdentity(); i.trained = true; return i; },\n" +
 	"\t\topenRecentFile: openRecentFile,\n" +
+	"\t\tsave: function () { return writeOpenProjectToFile(); },\n" +
 	"\t\tserialize: function () { return serializeProject(); },\n" +
 	"\t\tdocId: function () { return project.docId; },\n" +
 	"\t\topenId: function () { return library.openId; },\n" +
@@ -116,7 +117,7 @@ function fileAt(path, docId, perm) {
 	const text = JSON.stringify(doc);
 	return {
 		kind: 'file', name: path.replace(/^.*\//, ''), path: path, writes: 0,
-		async getFile() { return { lastModified: 1, size: text.length, async text() { return text; } }; },
+		async getFile() { return { lastModified: 1, size: text.length, async text() { return text; }, slice() { return { async arrayBuffer() { return new ArrayBuffer(1); } }; } }; },
 		async createWritable() { this.writes++; return { async write() {}, async close() {} }; },
 		async queryPermission() { return perm || 'prompt'; },
 		async requestPermission() { return 'granted'; },
@@ -287,8 +288,12 @@ console.log('\n--- 5. a known ID open in a tab, arriving in a different file ---
 	press(ORIGINAL_BTN);
 	await settle();
 	ok('"Original" switches to Main\'s tab and opens nothing new', L.openId() === mainTab && L.projectCount() === tabs1);
-	ok('...and does NOT swap the tab\'s file connection', L.handleOf(mainTab).path === main.path);
-	ok('...and nothing was written to either file', main.writes === 0 && sameName.writes === 0);
+	ok('...and the tab is rebound to the chosen file (it was moved)', L.handleOf(mainTab) === sameName);
+	ok('...keeping the same ID', L.docId() === SHARED);
+	ok('...and nothing was written by the answer itself', main.writes === 0 && sameName.writes === 0);
+	await L.save();
+	await settle();
+	ok('...and the next Save writes the new file, not the old (a moved file)', sameName.writes >= 1 && main.writes === 0, sameName.writes + '/' + main.writes);
 
 	// A tab with no connection left to compare.
 	L.dropHandle(mainTab);

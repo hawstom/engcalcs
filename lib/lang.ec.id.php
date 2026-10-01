@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Pulihkan Default';
 $ec_lang['calc_defaults_confirm']='Setel ulang kalkulator ke nilai default asli?';
 $ec_lang['points_data_note']='(atau Salin/Tempel menggunakan area data)';
-$ec_lang['points_data_heading']='Data titik<br />(dipisah koma atau tabulasi)';
+$ec_lang['points_data_heading']='Data kalkulator<br />(gunakan Salin untuk melihat format)';
 $ec_lang['points_data_copy']='Salin';
 $ec_lang['points_data_paste']='Tempel';
 $ec_lang['calc_inputs']='Masukan';
@@ -929,6 +929,11 @@ $ec_lang['lpn_examples_loading']='Memuat contoh…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='Perbaiki sesuatu';
 $ec_lang['lpn_help_notes']='Catatan tentang halaman ini';
+$ec_lang['lpn_help_hotkeys']='Tabel dan pintasan keyboard';
+$ec_lang['lpn_hotkeys_tables_heading']='Tabel';
+$ec_lang['lpn_hotkeys_map_heading']='Peta';
+$ec_lang['lpn_hotkeys_map_term']='Pintasan keyboard peta';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 atau Esc</td><td>Pilih.</td></tr><tr><td>2</td><td>Tambah simpul.</td></tr><tr><td>3</td><td>Tambah reservoir.</td></tr><tr><td>4</td><td>Tambah tangki.</td></tr><tr><td>5</td><td>Tambah pipa.</td></tr><tr><td>6</td><td>Tambah pompa.</td></tr><tr><td>7</td><td>Tambah katup.</td></tr><tr><td>8</td><td>Tambah pelanggan.</td></tr><tr><td>9</td><td>Tambah teks.</td></tr><tr><td>Delete</td><td>Hapus pilihan.</td></tr><tr><td>Ctrl+Z</td><td>Urungkan perubahan terakhir.</td></tr><tr><td>+ atau =</td><td>Perbesar.</td></tr><tr><td>-</td><td>Perkecil.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1203,7 +1208,7 @@ $ec_lang['lpn_find_menu_tip']='Cari elemen berdasarkan ID-nya, atau cari semua e
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='Arti ikon-ikon bilah alat';
+$ec_lang['lpn_help_icons']='Bilah alat';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Visibilitas';
 $ec_lang['lpn_pane_right_toggle_tip']='Tampilkan atau sembunyikan panel di sebelah kanan peta. Panel ini berisi pilihan label dan warna.';
@@ -1312,6 +1317,7 @@ $ec_lang['lpn_pane_not_used']='Tidak digunakan';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='Difilter berdasarkan {q}. Menampilkan {n} dari {all}.';
 $ec_lang['lpn_pane_filter_clear']='Tampilkan semua';
+$ec_lang['lpn_pane_filter_stale']='Baris yang tidak lagi cocok: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Tidak ada yang cocok dengan filter di tabel ini.';
@@ -1762,6 +1768,7 @@ $ec_lang['lpn_tab_move_right']='Pindah ke kanan';
 $ec_lang['lpn_tab_unsaved']='Belum disimpan ke berkas';
 $ec_lang['lpn_import_bad_file']='Berkas itu tidak dapat dibaca sebagai proyek yang disimpan dari halaman ini.';
 $ec_lang['lpn_import_no_room']='Ruang penyimpanan peramban tidak cukup untuk menambahkan proyek ini. Hapus proyek yang sudah tidak Anda perlukan lalu coba lagi.';
+$ec_lang['lpn_file_import_menu']='Impor…';
 // ---- EPANET .inp import (ROADMAP Task 196) ----
 // The import REPORTS every difference between the file and what this page can hold, so each
 // lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
@@ -2112,7 +2119,7 @@ $ec_lang['lpn_notes_6_term']='Bantuan kolom tabel';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Pilih kolom</td><td>Klik judul kolom</td></tr><tr><td>Tambah atau perluas pilihan kolom</td><td>Ctrl+klik atau Shift+klik judul kolom lain</td></tr><tr><td>Pindahkan (urutkan ulang) kolom yang dipilih</td><td>Seret, atau gunakan Kelola kolom… pada menu klik-kanan atau menu ⋮</td></tr><tr><td>Menu ⋮ dan panah urutan.</td><td>Arahkan kursor ke sudut atas judul kolom, atau pilih atau Tab ke judul kolom</td></tr><tr><td>Sembunyikan, Tampilkan semua, atau Kelola visibilitas dan urutan</td><td>Klik-kanan judul kolom atau menu ⋮ di sudut kanan atas judul kolom</td></tr><tr><td>Urutkan berdasarkan kolom</td><td>Ikon panah di sudut kanan atas judul kolom</td></tr><tr><td>Tempel sebagai baris baru di akhir tabel</td><td>Klik-kanan, menu ⋮ di sudut kanan atas judul kolom, atau Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Pintasan keyboard tabel';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tombol panah</td><td>Navigasi.</td></tr><tr><td>Tab, Enter</td><td>Selesaikan entri dan berpindah satu sel ke samping / ke bawah.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigasi mundur.</td></tr><tr><td>Shift+tombol panah</td><td>Perluas pilihan.</td></tr><tr><td>Ctrl+C</td><td>Salin pilihan.</td></tr><tr><td>Ctrl+D</td><td>Isi pilihan ke bawah mulai dari baris paling atas.</td></tr><tr><td>Ctrl+Enter</td><td>Isi pilihan dengan nilai sel aktif.</td></tr><tr><td>Ctrl+A</td><td>Pilih seluruh tabel.</td></tr><tr><td>Ctrl+Shift+V</td><td>Tempel sebagai baris baru di akhir tabel.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Beralih ke tabel berikutnya atau sebelumnya.</td></tr><tr><td>Delete</td><td>Kosongkan sel.</td></tr><tr><td>F2</td><td>Buka sel untuk menyuntingnya.</td></tr><tr><td>Esc</td><td>Batalkan penyuntingan.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tombol panah</td><td>Navigasi.</td></tr><tr><td>Tab, Enter</td><td>Selesaikan entri dan berpindah satu sel ke samping / ke bawah.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigasi mundur.</td></tr><tr><td>Shift+tombol panah</td><td>Perluas pilihan.</td></tr><tr><td>Ctrl+C</td><td>Salin pilihan.</td></tr><tr><td>Ctrl+D</td><td>Isi pilihan ke bawah mulai dari baris paling atas.</td></tr><tr><td>Ctrl+Enter</td><td>Isi pilihan dengan nilai sel aktif.</td></tr><tr><td>Ctrl+A</td><td>Pilih seluruh tabel.</td></tr><tr><td>Ctrl+Shift+V</td><td>Tempel sebagai baris baru di akhir tabel.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Beralih ke tab berikutnya atau sebelumnya, baik tabel maupun grafik.</td></tr><tr><td>Delete</td><td>Kosongkan sel.</td></tr><tr><td>F2</td><td>Buka sel untuk menyuntingnya.</td></tr><tr><td>Esc</td><td>Batalkan penyuntingan.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2710,6 +2717,20 @@ $ec_lang['lpn_scenario_push_confirm']='Jadikan setiap skenario menggunakan nilai
 $ec_lang['lpn_scenario_push_scenarios']='Skenario yang terpengaruh:';
 $ec_lang['lpn_scenario_push_values']='Nilai yang dibuang:';
 $ec_lang['lpn_scenario_push_none']='Tidak ada skenario yang memiliki nilai sendiri untuk properti-properti ini, sehingga tidak ada yang berubah. Tidak ada yang dibuang.';
+$ec_lang['lpn_scenario_preset_flow_static']='1. Uji aliran: Statis';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='Kalibrasi uji aliran untuk jaringan desain pada debit 0. Dalam skenario ini, atur kebutuhan di semua simpul menjadi 0.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. Uji aliran: Menengah';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='Kalibrasi uji aliran untuk jaringan desain pada debit pertama yang dilaporkan. Dalam skenario ini, atur kebutuhan di simpul yang mengalirkan air sesuai debit pertama yang diukur, dan kebutuhan di semua simpul lain menjadi 0.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. Uji aliran: Maks';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='Kalibrasi uji aliran untuk jaringan desain pada debit maksimum yang dilaporkan. Dalam skenario ini, atur kebutuhan di simpul yang mengalirkan air sesuai debit maksimum yang diukur, dan kebutuhan di semua simpul lain menjadi 0.';
+$ec_lang['lpn_scenario_preset_average_day']='4. Hari rata-rata';
+$ec_lang['lpn_scenario_preset_average_day_tip']='Pengali kebutuhan 1: setiap kebutuhan sesuai yang dimasukkan, yang dianggap sebagai kebutuhan hari rata-rata.';
+$ec_lang['lpn_scenario_preset_max_day']='5. Hari puncak';
+$ec_lang['lpn_scenario_preset_max_day_tip']='Pengali kebutuhan 2,0 kali hari rata-rata, nilai sementara. Sebagian besar sistem berada di antara 1,2 dan 3,0 (National Research Council, 2006). Atur nilai sistem Anda sendiri di Pengaturan, Perhitungan, Hidrolika, Pengali kebutuhan.';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. Jam puncak';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='Pengali kebutuhan 3,0 kali hari rata-rata, nilai sementara. Sebagian besar sistem berada di antara 3,0 dan 6,0 (National Research Council, 2006). Atur nilai sistem Anda sendiri di Pengaturan, Perhitungan, Hidrolika, Pengali kebutuhan.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. Kebakaran ditambah hari puncak';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='Kebutuhan hari puncak (pengali 2,0). Jalankan Analisis debit kebakaran dalam skenario ini: analisis menambahkan debit kebakaran di setiap simpul di atas kebutuhan ini.';
 $ec_lang['lpn_delete_drops_overrides']='Menghapus elemen ini juga akan membuang {n} nilai yang dimiliki skenario Anda untuknya. Lanjutkan?';
 $ec_lang['lpn_push_base_only']='Tindakan ini mengubah gambar itu sendiri, sehingga hanya dapat dilakukan di {base}. Beralih ke {base} lalu coba lagi.';
 $ec_lang['lpn_field_active']='Bagian dari jaringan ini';
@@ -3683,10 +3704,10 @@ $ec_lang['lpn_ff_title']='Analisis debit kebakaran';
 $ec_lang['lpn_ff_intro']='Setiap simpul secara bergiliran diminta untuk mengambil debit kebakaran di atas kebutuhan yang sudah dimilikinya. Tidak ada yang berubah pada proyek Anda; seluruh proses dijalankan pada salinan.';
 $ec_lang['lpn_ff_scope']='Simpul yang akan diuji';
 $ec_lang['lpn_ff_scope_tip']='Pilih kelompok simpul sebelum menjalankan. Menguji setiap simpul pada sistem besar dapat memakan waktu beberapa menit.';
-$ec_lang['lpn_ff_scope_all']='Setiap simpul';
-$ec_lang['lpn_ff_scope_selected']='Simpul-simpul yang dipilih';
+$ec_lang['lpn_ff_all']='Semua';
+$ec_lang['lpn_ff_selected']='Terpilih';
 $ec_lang['lpn_ff_no_junctions']='Proyek ini belum memiliki simpul, sehingga tidak ada yang dapat diuji.';
-$ec_lang['lpn_ff_no_selection']='Tidak ada simpul yang dipilih. Pilih satu di peta, atau uji setiap simpul.';
+$ec_lang['lpn_ff_no_selection']='Tidak ada simpul yang dipilih. Pilih simpul atau pilih opsi Semua.';
 $ec_lang['lpn_ff_skipped']='{n} elemen yang dipilih bukan simpul, sehingga tidak diuji.';
 $ec_lang['lpn_ff_required']='Debit kebakaran yang diperlukan';
 $ec_lang['lpn_ff_required_tip']='Debit yang disyaratkan oleh kode kebakaran atau otoritas pemadam kebakaran Anda pada hidran. Setiap simpul diuji terhadap angka ini kecuali simpul tersebut memiliki debit kebakaran yang disyaratkan sendiri.';
@@ -3696,10 +3717,7 @@ $ec_lang['lpn_ff_residual']='Tekanan sisa yang dipertahankan';
 $ec_lang['lpn_ff_residual_tip']='Tekanan yang harus tetap dipertahankan simpul saat menyalurkan debit kebakaran. AWWA M31 dan NFPA 291 menggunakan 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Pemeriksaan desain (dampak pada sistem)';
 $ec_lang['lpn_ff_design_tip']='Pertanyaan terpisah dari apakah simpul dapat menyalurkan debit tersebut: dengan debit itu diambil di sana, apakah ada hal lain yang turun di bawah tekanan minimumnya atau melampaui batas kecepatannya? Memilih untuk memeriksanya tidak memerlukan perhitungan tambahan.';
-$ec_lang['lpn_ff_design_off']='Jangan periksa';
-$ec_lang['lpn_ff_design_all']='Semua simpul lainnya dan semua pipa';
-$ec_lang['lpn_ff_design_selected']='Simpul yang dipilih dan pipa-pipanya';
-$ec_lang['lpn_ff_design_no_selection']='Pemeriksaan desain diatur ke simpul yang dipilih, dan tidak ada yang dipilih. Pilih beberapa di peta, atau atur ke Semua.';
+$ec_lang['lpn_ff_design_no_selection']='Cakupan pemeriksaan desain diatur ke Terpilih, tetapi tidak ada elemen yang dipilih. Pilih elemen atau pilih opsi Semua.';
 
 $ec_lang['lpn_ff_minpressure']='Tekanan terendah yang diizinkan di tempat lain';
 $ec_lang['lpn_ff_minpressure_tip']='Simpul yang turun di bawah nilai ini saat simpul lain sedang mengambil debit kebakarannya akan dilaporkan sebagai masalah desain.';

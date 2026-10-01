@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Varsayılanları geri yükle';
 $ec_lang['calc_defaults_confirm']='Hesap makinesini varsayılan değerlere sıfırla?';
 $ec_lang['points_data_note']='(veya veri alanını kullanarak Kopyala/Yapıştır)';
-$ec_lang['points_data_heading']='Nokta verileri<br />(virgül veya sekme ile ayrılmış)';
+$ec_lang['points_data_heading']='Hesaplayıcı verileri<br />(biçimi görmek için Kopyala\'yı kullanın)';
 $ec_lang['points_data_copy']='Kopyala';
 $ec_lang['points_data_paste']='Yapıştır';
 $ec_lang['calc_inputs']='Girdiler';
@@ -928,6 +928,11 @@ $ec_lang['lpn_examples_loading']='Örnekler yükleniyor…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='Bir sorunu düzelt';
 $ec_lang['lpn_help_notes']='Bu sayfa hakkında notlar';
+$ec_lang['lpn_help_hotkeys']='Tablolar ve Kısayol Tuşları';
+$ec_lang['lpn_hotkeys_tables_heading']='Tablolar';
+$ec_lang['lpn_hotkeys_map_heading']='Harita';
+$ec_lang['lpn_hotkeys_map_term']='Harita klavye kısayolları';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 veya Esc</td><td>Seçin.</td></tr><tr><td>2</td><td>Düğüm ekleyin.</td></tr><tr><td>3</td><td>Rezervuar ekleyin.</td></tr><tr><td>4</td><td>Depo ekleyin.</td></tr><tr><td>5</td><td>Boru ekleyin.</td></tr><tr><td>6</td><td>Pompa ekleyin.</td></tr><tr><td>7</td><td>Vana ekleyin.</td></tr><tr><td>8</td><td>Müşteri ekleyin.</td></tr><tr><td>9</td><td>Metin ekleyin.</td></tr><tr><td>Delete</td><td>Seçimi silin.</td></tr><tr><td>Ctrl+Z</td><td>Son değişikliği geri alın.</td></tr><tr><td>+ veya =</td><td>Yakınlaştırın.</td></tr><tr><td>-</td><td>Uzaklaştırın.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1202,7 +1207,7 @@ $ec_lang['lpn_find_menu_tip']='Bir öğeyi kimliğine göre bulun, ya da bir ko�
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='Araç çubuğu simgelerinin anlamı';
+$ec_lang['lpn_help_icons']='Araç çubuğu';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Görünürlük';
 $ec_lang['lpn_pane_right_toggle_tip']='Haritanın sağındaki paneli gösterin ya da gizleyin. Etiket ve renk seçimlerini içerir.';
@@ -1311,6 +1316,7 @@ $ec_lang['lpn_pane_not_used']='Kullanılmıyor';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='{q} ile filtrelendi. {all} öğeden {n} tanesi gösteriliyor.';
 $ec_lang['lpn_pane_filter_clear']='Hepsini göster';
+$ec_lang['lpn_pane_filter_stale']='Artık eşleşmeyen satırlar: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Bu tabloda filtreyle eşleşen hiçbir şey yok.';
@@ -1767,6 +1773,7 @@ $ec_lang['lpn_import_no_room']='Bu projeyi eklemek için tarayıcı depolama ala
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='Tamam';
+$ec_lang['lpn_file_import_menu']='İçe aktar…';
 $ec_lang['lpn_file_import_inp']='EPANET dosyası içe aktar…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='Bir EPANET dosyasından — ister .inp metin dosyası ister EPANET\'in kaydettiği .net dosyası olsun — bir şebeke okur ve bu tarayıcıda yeni bir proje olarak kaydeder.';
@@ -2109,7 +2116,7 @@ $ec_lang['lpn_notes_6_term']='Tablo sütunları yardımı';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Sütun seç</td><td>Başlığa tıklayın</td></tr><tr><td>Sütun seçimini ekle veya genişlet</td><td>Başka bir başlığa Ctrl+tıklama veya Shift+tıklama yapın</td></tr><tr><td>Seçili sütun(lar)ı taşı (yeniden sırala)</td><td>Sürükleyin ya da sağ tık veya ⋮ menüsünde Sütunları yönet…\'i kullanın</td></tr><tr><td>⋮ menüsü ve sıralama oku.</td><td>Bir başlığın üst köşesinin üzerine gelin, ya da bir başlığı seçin veya Tab ile içine girin</td></tr><tr><td>Gizle, Tümünü göster, ya da görünürlüğü ve sırayı yönet</td><td>Başlığa sağ tıklayın ya da başlığın sağ üst köşesindeki ⋮ menüsü</td></tr><tr><td>Sütuna göre sırala</td><td>Başlığın sağ üst köşesindeki ok simgesi</td></tr><tr><td>Tablonun sonuna yeni satır olarak yapıştır</td><td>Sağ tık, başlığın sağ üst köşesindeki ⋮ menüsü, ya da Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Tablo klavye kısayolları';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Ok tuşları</td><td>Gezinin.</td></tr><tr><td>Tab, Enter</td><td>Girişi tamamlayın ve bir hücre yatayda / aşağıda gezinin.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Geriye doğru gezinin.</td></tr><tr><td>Shift+ok tuşları</td><td>Seçimi genişletin.</td></tr><tr><td>Ctrl+C</td><td>Seçimi kopyalayın.</td></tr><tr><td>Ctrl+D</td><td>Seçimi en üst satırından aşağı doldurun.</td></tr><tr><td>Ctrl+Enter</td><td>Seçimi etkin hücrenin değeriyle doldurun.</td></tr><tr><td>Ctrl+A</td><td>Tüm tabloyu seçin.</td></tr><tr><td>Ctrl+Shift+V</td><td>Tablonun sonuna yeni satır olarak yapıştırın.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Sonraki veya önceki tabloya geçin.</td></tr><tr><td>Delete</td><td>Bir hücreyi temizleyin.</td></tr><tr><td>F2</td><td>Bir hücreyi düzenlemek için açın.</td></tr><tr><td>Esc</td><td>Bir düzenlemeyi iptal edin.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Ok tuşları</td><td>Gezinin.</td></tr><tr><td>Tab, Enter</td><td>Girişi tamamlayın ve bir hücre yatayda / aşağıda gezinin.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Geriye doğru gezinin.</td></tr><tr><td>Shift+ok tuşları</td><td>Seçimi genişletin.</td></tr><tr><td>Ctrl+C</td><td>Seçimi kopyalayın.</td></tr><tr><td>Ctrl+D</td><td>Seçimi en üst satırından aşağı doldurun.</td></tr><tr><td>Ctrl+Enter</td><td>Seçimi etkin hücrenin değeriyle doldurun.</td></tr><tr><td>Ctrl+A</td><td>Tüm tabloyu seçin.</td></tr><tr><td>Ctrl+Shift+V</td><td>Tablonun sonuna yeni satır olarak yapıştırın.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Sonraki veya önceki sekmeye geçin; tablo da olsa grafik de olsa.</td></tr><tr><td>Delete</td><td>Bir hücreyi temizleyin.</td></tr><tr><td>F2</td><td>Bir hücreyi düzenlemek için açın.</td></tr><tr><td>Esc</td><td>Bir düzenlemeyi iptal edin.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2705,6 +2712,20 @@ $ec_lang['lpn_scenario_push_confirm']='Her senaryo bu özellikler için Temel de
 $ec_lang['lpn_scenario_push_scenarios']='Etkilenen senaryolar:';
 $ec_lang['lpn_scenario_push_values']='Atılan değerler:';
 $ec_lang['lpn_scenario_push_none']='Hiçbir senaryonun bu özelliklerden herhangi biri için kendi değeri yok, bu yüzden hiçbir şey değişmez. Hiçbir şey atılmaz.';
+$ec_lang['lpn_scenario_preset_flow_static']='1. Debi testi: Statik';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='Tasarım şebekesi için, debi sıfırken debi testi kalibrasyonu. Bu senaryoda tüm düğümlerdeki talebi 0 yapın.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. Debi testi: Orta';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='Tasarım şebekesi için, bildirilen ilk debide debi testi kalibrasyonu. Bu senaryoda akış olan düğümdeki talebi ölçülen ilk debiye, diğer tüm düğümlerdeki talebi 0\'a ayarlayın.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. Debi testi: Maks';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='Tasarım şebekesi için, bildirilen en yüksek debide debi testi kalibrasyonu. Bu senaryoda akış olan düğümdeki talebi ölçülen en yüksek debiye, diğer tüm düğümlerdeki talebi 0\'a ayarlayın.';
+$ec_lang['lpn_scenario_preset_average_day']='4. Ortalama gün';
+$ec_lang['lpn_scenario_preset_average_day_tip']='Talep çarpanı 1: girildiği haliyle her talep, ortalama gün talebi olarak kabul edilir.';
+$ec_lang['lpn_scenario_preset_max_day']='5. Maksimum gün';
+$ec_lang['lpn_scenario_preset_max_day_tip']='Talep çarpanı, ortalama günün 2,0 katı; bir yer tutucu değerdir. Çoğu sistem 1,2 ile 3,0 arasında kalır (National Research Council, 2006). Sisteminize ait değeri Ayarlar, Hesaplama, Hidrolik, Talep çarpanı altında girin.';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. Pik saat';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='Talep çarpanı, ortalama günün 3,0 katı; bir yer tutucu değerdir. Çoğu sistem 3,0 ile 6,0 arasında kalır (National Research Council, 2006). Sisteminize ait değeri Ayarlar, Hesaplama, Hidrolik, Talep çarpanı altında girin.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. Yangın artı maksimum gün';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='Maksimum gün talebi (çarpan 2,0). Bu senaryoda Yangın debisi analizini çalıştırın: her düğümde yangın debisini bu talebin üzerine ekler.';
 $ec_lang['lpn_delete_drops_overrides']='Bu öğeyi silmek, senaryolarınızın onun için tuttuğu {n} değeri de atar. Devam edilsin mi?';
 $ec_lang['lpn_push_base_only']='Bu işlem çizimin kendisini değiştirir, bu yüzden yalnızca {base} içinde yapılabilir. {base}\'e geçin ve tekrar deneyin.';
 $ec_lang['lpn_field_active']='Bu şebekenin parçası';
@@ -3678,10 +3699,10 @@ $ec_lang['lpn_ff_title']='Yangın debisi analizi';
 $ec_lang['lpn_ff_intro']='Her düğümden sırayla, zaten sahip olduğu talebin üzerine bir yangın debisi çekmesi istenir. Projenizde hiçbir şey değişmez; tüm çalışma bir kopya üzerinde yapılır.';
 $ec_lang['lpn_ff_scope']='Sınanacak düğümler';
 $ec_lang['lpn_ff_scope_tip']='Çalıştırmadan önce kümeyi seçin. Büyük bir sistemde her düğümü sınamak dakikalar sürebilir.';
-$ec_lang['lpn_ff_scope_all']='Her düğüm';
-$ec_lang['lpn_ff_scope_selected']='Yalnızca seçili düğüm';
+$ec_lang['lpn_ff_all']='Tümü';
+$ec_lang['lpn_ff_selected']='Seçili';
 $ec_lang['lpn_ff_no_junctions']='Bu projede henüz düğüm yok, bu yüzden sınanacak bir şey yok.';
-$ec_lang['lpn_ff_no_selection']='Hiçbir düğüm seçili değil. Haritada bir tane seçin veya her düğümü sınayın.';
+$ec_lang['lpn_ff_no_selection']='Hiçbir düğüm seçili değil. Düğümleri seçin veya Tümü seçeneğini seçin.';
 $ec_lang['lpn_ff_skipped']='{n} seçili öğe düğüm değil, bu yüzden test edilmedi.';
 $ec_lang['lpn_ff_required']='Gereken yangın debisi';
 $ec_lang['lpn_ff_required_tip']='Yangın yönetmeliğinizin veya itfaiye teşkilatınızın bir yangın musluğunda istediği debi. Her düğüm, kendi gereken yangın debisini taşımadığı sürece bu sayıya karşı sınanır.';
@@ -3691,10 +3712,7 @@ $ec_lang['lpn_ff_residual']='Korunacak kalıntı basınç';
 $ec_lang['lpn_ff_residual_tip']='Düğümün, yangın debisini sağlarken hâlâ koruması gereken basınç. AWWA M31 ve NFPA 291, 20 psi (140 kPa) kullanır.';
 $ec_lang['lpn_ff_design']='Tasarım kontrolü (sistem üzerindeki etki)';
 $ec_lang['lpn_ff_design_tip']='Düğümün debiyi sağlayıp sağlayamayacağından ayrı bir soru: orada o debi çekilirken başka bir şey asgari basıncının altına düşer mi veya hız sınırını aşar mı? Bunu kontrol etmeyi seçmek ek bir hesaplamaya mal olmaz.';
-$ec_lang['lpn_ff_design_off']='Kontrol etme';
-$ec_lang['lpn_ff_design_all']='Diğer tüm düğümler ve tüm borular';
-$ec_lang['lpn_ff_design_selected']='Seçili düğümler ve boruları';
-$ec_lang['lpn_ff_design_no_selection']='Tasarım kontrolü seçili düğümlere ayarlı, ama hiçbiri seçili değil. Haritada birkaçını seçin veya Diğer tüm düğümler ve tüm borular seçeneğini kullanın.';
+$ec_lang['lpn_ff_design_no_selection']='Tasarım kontrolü Seçili olarak ayarlı, ama hiçbir öğe seçili değil. Öğeleri seçin veya Tümü seçeneğini seçin.';
 $ec_lang['lpn_ff_minpressure']='Başka yerde izin verilen en düşük basınç';
 $ec_lang['lpn_ff_minpressure_tip']='Başka bir düğüm yangın debisini çekerken bunun altına düşen bir düğüm, tasarım sorunu olarak bildirilir.';
 $ec_lang['lpn_ff_maxvelocity']='İzin verilen en yüksek hız';

@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Restabilește valorile implicite';
 $ec_lang['calc_defaults_confirm']='Resetează calculatorul la valorile implicite inițiale?';
 $ec_lang['points_data_note']='(sau Copiați/Lipiți folosind zona de date)';
-$ec_lang['points_data_heading']='Date puncte<br />(separate prin virgulă sau tabulație)';
+$ec_lang['points_data_heading']='Date calculator<br />(folosiți Copiați pentru a vedea formatul)';
 $ec_lang['points_data_copy']='Copiați';
 $ec_lang['points_data_paste']='Lipiți';
 $ec_lang['calc_inputs']='Date de intrare';
@@ -930,6 +930,11 @@ $ec_lang['lpn_examples_loading']='Se încarcă exemplele…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='Reparați ceva';
 $ec_lang['lpn_help_notes']='Note despre această pagină';
+$ec_lang['lpn_help_hotkeys']='Tabele și taste rapide';
+$ec_lang['lpn_hotkeys_tables_heading']='Tabele';
+$ec_lang['lpn_hotkeys_map_heading']='Hartă';
+$ec_lang['lpn_hotkeys_map_term']='Comenzi rapide de la tastatură pentru hartă';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 sau Esc</td><td>Selectare.</td></tr><tr><td>2</td><td>Adaugă o joncțiune.</td></tr><tr><td>3</td><td>Adaugă un rezervor.</td></tr><tr><td>4</td><td>Adaugă un bazin.</td></tr><tr><td>5</td><td>Adaugă o conductă.</td></tr><tr><td>6</td><td>Adaugă o pompă.</td></tr><tr><td>7</td><td>Adaugă o vană.</td></tr><tr><td>8</td><td>Adaugă un abonat.</td></tr><tr><td>9</td><td>Adaugă text.</td></tr><tr><td>Delete</td><td>Șterge selecția.</td></tr><tr><td>Ctrl+Z</td><td>Anulează ultima modificare.</td></tr><tr><td>+ sau =</td><td>Mărire.</td></tr><tr><td>-</td><td>Micșorare.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1204,7 +1209,7 @@ $ec_lang['lpn_find_menu_tip']='Găsiți un element după ID-ul lui, sau găsiți
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='Ce înseamnă pictogramele din bara de instrumente';
+$ec_lang['lpn_help_icons']='Legenda barei de instrumente';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Vizibilitate';
 $ec_lang['lpn_pane_right_toggle_tip']='Afișează sau ascunde panoul din dreapta hărții. Acesta conține alegerile privind etichetele și culorile.';
@@ -1313,6 +1318,7 @@ $ec_lang['lpn_pane_not_used']='Nefolosit';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='Filtrat după {q}. Se afișează {n} din {all}.';
 $ec_lang['lpn_pane_filter_clear']='Afișează tot';
+$ec_lang['lpn_pane_filter_stale']='Rânduri care nu se mai potrivesc: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Nimic din acest tabel nu corespunde filtrului.';
@@ -1761,6 +1767,7 @@ $ec_lang['lpn_tab_move_right']='Mutare la dreapta';
 $ec_lang['lpn_tab_unsaved']='Nesalvat într-un fișier';
 $ec_lang['lpn_import_bad_file']='Acel fișier nu a putut fi citit ca proiect salvat de pe această pagină.';
 $ec_lang['lpn_import_no_room']='Nu mai există suficient spațiu de stocare în browser pentru a adăuga acest proiect. Ștergeți un proiect de care nu mai aveți nevoie și încercați din nou.';
+$ec_lang['lpn_file_import_menu']='Import…';
 // ---- EPANET .inp import (ROADMAP Task 196) ----
 // The import REPORTS every difference between the file and what this page can hold, so each
 // lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
@@ -2111,7 +2118,7 @@ $ec_lang['lpn_notes_6_term']='Ajutor pentru coloanele tabelului';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Selectare coloană</td><td>Clic pe antet</td></tr><tr><td>Adaugă sau extinde selecția de coloane</td><td>Ctrl+clic sau Shift+clic pe alt antet</td></tr><tr><td>Mută (reordonează) coloana (coloanele) selectată(e)</td><td>Trageți sau folosiți Gestionare coloane… din meniul clic-dreapta sau ⋮</td></tr><tr><td>Meniul ⋮ și săgeata de sortare.</td><td>Treceți cu indicatorul peste colțul de sus al unui antet, sau selectați ori navigați cu Tab într-un antet</td></tr><tr><td>Ascunde, Arată toate, sau Gestionează vizibilitatea și ordinea</td><td>Clic-dreapta pe antet sau meniul ⋮ din colțul din dreapta sus al antetului</td></tr><tr><td>Sortare după coloană</td><td>Pictograma săgeată din colțul din dreapta sus al antetului</td></tr><tr><td>Lipește ca rânduri noi la sfârșitul tabelului</td><td>Clic-dreapta, meniul ⋮ din colțul din dreapta sus al antetului, sau Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Comenzi rapide de la tastatură pentru tabel';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tastele săgeți</td><td>Navigare.</td></tr><tr><td>Tab, Enter</td><td>Finalizează introducerea și navighează o celulă la dreapta / în jos.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navighează înapoi.</td></tr><tr><td>Shift+tastele săgeți</td><td>Extinde selecția.</td></tr><tr><td>Ctrl+C</td><td>Copiază selecția.</td></tr><tr><td>Ctrl+D</td><td>Completează selecția în jos, de la rândul de sus.</td></tr><tr><td>Ctrl+Enter</td><td>Completează selecția cu valoarea celulei active.</td></tr><tr><td>Ctrl+A</td><td>Selectează întregul tabel.</td></tr><tr><td>Ctrl+Shift+V</td><td>Lipește ca rânduri noi la sfârșitul tabelului.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Comută la tabelul următor sau la cel precedent.</td></tr><tr><td>Delete</td><td>Golește o celulă.</td></tr><tr><td>F2</td><td>Deschide o celulă pentru editare.</td></tr><tr><td>Esc</td><td>Anulează o editare.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Tastele săgeți</td><td>Navigare.</td></tr><tr><td>Tab, Enter</td><td>Finalizează introducerea și navighează o celulă la dreapta / în jos.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navighează înapoi.</td></tr><tr><td>Shift+tastele săgeți</td><td>Extinde selecția.</td></tr><tr><td>Ctrl+C</td><td>Copiază selecția.</td></tr><tr><td>Ctrl+D</td><td>Completează selecția în jos, de la rândul de sus.</td></tr><tr><td>Ctrl+Enter</td><td>Completează selecția cu valoarea celulei active.</td></tr><tr><td>Ctrl+A</td><td>Selectează întregul tabel.</td></tr><tr><td>Ctrl+Shift+V</td><td>Lipește ca rânduri noi la sfârșitul tabelului.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Comută la fila următoare sau la cea precedentă, fie tabel, fie grafic.</td></tr><tr><td>Delete</td><td>Golește o celulă.</td></tr><tr><td>F2</td><td>Deschide o celulă pentru editare.</td></tr><tr><td>Esc</td><td>Anulează o editare.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2369,7 +2376,7 @@ $ec_lang['lpn_field_easting_abbr']='E';
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
 $ec_lang['lpn_field_lat_abbr']='Lat';
-$ec_lang['lpn_field_lon_abbr']='Lon';
+$ec_lang['lpn_field_lon_abbr']='Long';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -2707,6 +2714,20 @@ $ec_lang['lpn_scenario_push_confirm']='Faceți ca fiecare scenariu să foloseasc
 $ec_lang['lpn_scenario_push_scenarios']='Scenarii afectate:';
 $ec_lang['lpn_scenario_push_values']='Valori eliminate:';
 $ec_lang['lpn_scenario_push_none']='Niciun scenariu nu are o valoare specifică pentru vreuna dintre aceste proprietăți, deci nimic nu s-ar schimba. Nimic nu este eliminat.';
+$ec_lang['lpn_scenario_preset_flow_static']='1. Test de debit: Static';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='Calibrarea testului de debit pentru o rețea de proiectare la debit 0. În acest scenariu, setați cerința tuturor joncțiunilor la 0.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. Test de debit: Mediu';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='Calibrarea testului de debit pentru o rețea de proiectare la primul debit raportat. În acest scenariu, setați cerința joncțiunii prin care curge apa la primul debit măsurat, iar cerința tuturor celorlalte joncțiuni la 0.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. Test de debit: Max';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='Calibrarea testului de debit pentru o rețea de proiectare la debitul maxim raportat. În acest scenariu, setați cerința joncțiunii prin care curge apa la debitul maxim măsurat, iar cerința tuturor celorlalte joncțiuni la 0.';
+$ec_lang['lpn_scenario_preset_average_day']='4. Zi medie';
+$ec_lang['lpn_scenario_preset_average_day_tip']='Multiplicator de cerință 1: fiecare cerință așa cum a fost introdusă, considerată cerința zilei medii.';
+$ec_lang['lpn_scenario_preset_max_day']='5. Zi maximă';
+$ec_lang['lpn_scenario_preset_max_day_tip']='Multiplicator de cerință 2,0 ori cerința zilei medii, o valoare provizorie. Majoritatea sistemelor se situează între 1,2 și 3,0 (National Research Council, 2006). Stabiliți-l pe al sistemului dvs. în Setări, Calcul, Hidraulică, Multiplicator de cerință.';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. Oră de vârf';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='Multiplicator de cerință 3,0 ori cerința zilei medii, o valoare provizorie. Majoritatea sistemelor se situează între 3,0 și 6,0 (National Research Council, 2006). Stabiliți-l pe al sistemului dvs. în Setări, Calcul, Hidraulică, Multiplicator de cerință.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. Incendiu plus zi maximă';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='Cerința zilei maxime (multiplicator 2,0). Rulați Analiza debitului de incendiu în acest scenariu: ea adaugă debitul de incendiu la fiecare joncțiune peste această cerință.';
 $ec_lang['lpn_delete_drops_overrides']='Ștergerea acestui element aruncă și {n} valori pe care scenariile dvs. le au pentru el. Continuați?';
 $ec_lang['lpn_push_base_only']='Această acțiune modifică desenul propriu-zis, deci poate fi făcută doar în {base}. Comutați la {base} și încercați din nou.';
 $ec_lang['lpn_field_active']='Parte din rețea';
@@ -3680,10 +3701,10 @@ $ec_lang['lpn_ff_title']='Analiza debitului de incendiu';
 $ec_lang['lpn_ff_intro']='Fiecărei joncțiuni, pe rând, i se cere să preia un debit de incendiu peste cerința pe care o are deja. Nimic din proiectul dvs. nu este schimbat; toată rularea se face pe o copie.';
 $ec_lang['lpn_ff_scope']='Joncțiuni de testat';
 $ec_lang['lpn_ff_scope_tip']='Alegeți setul înainte de a rula. Testarea fiecărei joncțiuni dintr-un sistem mare poate dura minute.';
-$ec_lang['lpn_ff_scope_all']='Fiecare joncțiune';
-$ec_lang['lpn_ff_scope_selected']='Joncțiunile selectate';
+$ec_lang['lpn_ff_all']='Toate';
+$ec_lang['lpn_ff_selected']='Selectate';
 $ec_lang['lpn_ff_no_junctions']='Acest proiect nu are încă nicio joncțiune, deci nu este nimic de testat.';
-$ec_lang['lpn_ff_no_selection']='Nicio joncțiune nu este selectată. Alegeți una pe hartă, sau testați fiecare joncțiune.';
+$ec_lang['lpn_ff_no_selection']='Nicio joncțiune nu este selectată. Selectați joncțiuni sau selectați opțiunea Toate.';
 $ec_lang['lpn_ff_skipped']='{n} elemente selectate nu sunt joncțiuni, deci nu au fost testate.';
 $ec_lang['lpn_ff_required']='Debit de incendiu necesar';
 $ec_lang['lpn_ff_required_tip']='Debitul pe care codul dvs. de incendiu sau autoritatea dvs. pentru incendii îl cere la un hidrant. Fiecare joncțiune este testată față de acest număr, dacă nu are propriul ei debit de incendiu necesar.';
@@ -3693,10 +3714,7 @@ $ec_lang['lpn_ff_residual']='Presiune reziduală de menținut';
 $ec_lang['lpn_ff_residual_tip']='Presiunea pe care joncțiunea trebuie să o mențină în continuare în timp ce livrează debitul de incendiu. AWWA M31 și NFPA 291 folosesc 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Verificare de proiectare (efect asupra sistemului)';
 $ec_lang['lpn_ff_design_tip']='O întrebare separată de dacă joncțiunea poate livra debitul: cu acel debit preluat acolo, scade altceva sub presiunea sa minimă sau depășește limita sa de viteză? Alegerea de a verifica aceasta nu costă niciun calcul suplimentar.';
-$ec_lang['lpn_ff_design_off']='Nu verifica';
-$ec_lang['lpn_ff_design_all']='Toate celelalte joncțiuni și toate conductele';
-$ec_lang['lpn_ff_design_selected']='Joncțiunile selectate și conductele lor';
-$ec_lang['lpn_ff_design_no_selection']='Verificarea de proiectare este setată pe joncțiunile selectate, iar niciuna nu este selectată. Selectați unele pe hartă sau setați Toate.';
+$ec_lang['lpn_ff_design_no_selection']='Domeniul verificării de proiectare este setat pe Selectate, dar niciun element nu este selectat. Selectați elemente sau selectați opțiunea Toate.';
 $ec_lang['lpn_ff_minpressure']='Cea mai mică presiune permisă în altă parte';
 $ec_lang['lpn_ff_minpressure_tip']='O joncțiune care scade sub aceasta în timp ce alta își preia debitul de incendiu este raportată ca o problemă de proiectare.';
 $ec_lang['lpn_ff_maxvelocity']='Cea mai mare viteză permisă';
