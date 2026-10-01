@@ -658,3 +658,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|743| CLOSED 2026-10-01, merged with feat/graph-tab-keys on Tom's word: Ctrl+Shift+PageDown reaches the graph tabs.
 - 0|746| CLOSED 2026-10-01, merged with feat/fireflow-scope on Tom's word: one All/Selected choice for each fire flow scope.
 - 0|753| CLOSED 2026-10-01 (Tom: "I am not sure there is a task here. Delete the task?"): "Asset activation" names the Alternatives column; the Properties checkbox keeps "Part of this network".
+- 0|690| CLOSED 2026-10-01: everything named under it shipped; its last child, Task 743 (graph tabs), merged on Tom's word.

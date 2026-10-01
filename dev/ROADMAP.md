@@ -239,10 +239,6 @@ the block.
     burst actually costs before adding a second timer.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
-- 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
-  Everything named under it has shipped, the table stepping last (`feat/table-tab-keys`, merged
-  2026-09-30 on his word). Graph tabs next: Task 743.
-
 - 100|737| **Coined names for interface elements, so every language names each one once.**
   Tom, 2026-09-28: *"The key here is for every language to invent unique words for each interface
   element and to use them consistently... it might be handy to literally make up unique, but memorable
