@@ -69,10 +69,11 @@ async function pressures(page) {
 	});
 }
 async function setEngineCheckbox(page, builtIn) {
-	// The Settings box row "Use the built-in solver when possible"; checked means built-in.
+	// The Settings box row for the built-in solver, found by its language key; checked means built-in.
 	await page.evaluate((want) => {
+		const label = EngCalcs.pageConfig.lpn_settings_engine_native;
 		const row = [...document.querySelectorAll('input[type=checkbox]')].find(i =>
-			/Use the built-in solver when possible/.test((i.closest('div') || {}).textContent || ''));
+			((i.closest('div') || {}).textContent || '').indexOf(label) >= 0);
 		if (row.checked !== want) { row.click(); }
 	}, builtIn);
 	await page.waitForTimeout(3500);
@@ -116,7 +117,8 @@ async function setEngineCheckbox(page, builtIn) {
 		const epanetLoaded = log.ok.some(u => /epanet-js\.js/.test(u)) && log.ok.some(u => /slim\/index\.js/.test(u));
 		check(epanetLoaded, 'the EPANET engine files were served (epanet-js.js and slim/index.js)');
 		const stat = await page.evaluate(() => (document.getElementById('lpn_status') || {}).textContent || '');
-		check(!/Connect to the internet/.test(stat), 'the status line does not say the EPANET engine is missing');
+		const missing = await page.evaluate(() => EngCalcs.pageConfig.lpn_time_no_engine);
+		check(stat.indexOf(missing.slice(0, 40)) < 0, 'the status line does not say the EPANET engine is missing');
 		const worst = Math.max.apply(null, nat.map((r, i) => Math.abs(r.p - epa[i].p)));
 		note('largest pressure difference between the two engines: ' + worst.toFixed(2) + ' psi');
 
