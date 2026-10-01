@@ -2,7 +2,7 @@
     "meta": {
         "language": "ro",
         "expected_key_count": 2153,
-        "delta_key_count": 2,
+        "delta_key_count": 1,
         "exempt_key_count": 43,
         "exempt_keys": [
             "u_imgd",
@@ -722,30 +722,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_file_import_menu": "Import…",
         "lpn_field_lat_abbr": "Lat"
     },
     "keys": {
-        "lpn_file_import_menu": "Import…",
         "lpn_field_lat_abbr": "Lat"
     },
     "key_context": {
-        "lpn_file_import_menu": {
-            "reason": "equal_to_english",
-            "current_value": "Import…",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_import_no_room",
-                    "value": "Nu mai există suficient spațiu de stocare în browser pentru a adăuga acest proiect. Ștergeți un proiect de care nu mai aveți nevoie și încercați din nou.",
-                    "english": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_inp",
-                    "value": "Import fișier EPANET…",
-                    "english": "Import EPANET file…"
-                }
-            }
-        },
         "lpn_field_lat_abbr": {
             "reason": "equal_to_english",
             "current_value": "Lat",
