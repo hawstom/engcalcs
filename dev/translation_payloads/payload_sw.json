@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sw",
-        "expected_key_count": 2153,
-        "delta_key_count": 2,
+        "expected_key_count": 2160,
+        "delta_key_count": 9,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -714,14 +714,140 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_copy_title": "Mark file as new copy?",
+        "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
+        "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
+        "lpn_copy_original": "Original; keep same lock",
+        "lpn_copy_copy": "A copy; make new lock",
+        "lpn_copy_kept_link": "Opened {name} as the original, moved to a new place. Save now writes to this file.",
+        "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
         "lpn_field_lat_abbr": "Lat",
         "lpn_field_lon_abbr": "Lon"
     },
     "keys": {
+        "lpn_copy_title": "Mark file as new copy?",
+        "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
+        "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
+        "lpn_copy_original": "Original; keep same lock",
+        "lpn_copy_copy": "A copy; make new lock",
+        "lpn_copy_kept_link": "Opened {name} as the original, moved to a new place. Save now writes to this file.",
+        "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
         "lpn_field_lat_abbr": "Lat",
         "lpn_field_lon_abbr": "Lon"
     },
     "key_context": {
+        "lpn_copy_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_open_cancelled",
+                    "value": "Faili hilo halikufunguliwa, na hakuna kilichobadilika hapa. Bado kuna mtu mwingine aliye nalo wazi.",
+                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} angependa kuhariri faili hili. Ukiwa tayari, hifadhi kazi yako kisha tumia Faili, Funga mradi ili kulikabidhi.",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
+        "lpn_copy_body": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_open_cancelled",
+                    "value": "Faili hilo halikufunguliwa, na hakuna kilichobadilika hapa. Bado kuna mtu mwingine aliye nalo wazi.",
+                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} angependa kuhariri faili hili. Ukiwa tayari, hifadhi kazi yako kisha tumia Faili, Funga mradi ili kulikabidhi.",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
+        "lpn_copy_body_nodate": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_open_cancelled",
+                    "value": "Faili hilo halikufunguliwa, na hakuna kilichobadilika hapa. Bado kuna mtu mwingine aliye nalo wazi.",
+                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} angependa kuhariri faili hili. Ukiwa tayari, hifadhi kazi yako kisha tumia Faili, Funga mradi ili kulikabidhi.",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
+        "lpn_copy_original": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_open_cancelled",
+                    "value": "Faili hilo halikufunguliwa, na hakuna kilichobadilika hapa. Bado kuna mtu mwingine aliye nalo wazi.",
+                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} angependa kuhariri faili hili. Ukiwa tayari, hifadhi kazi yako kisha tumia Faili, Funga mradi ili kulikabidhi.",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
+        "lpn_copy_copy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_open_cancelled",
+                    "value": "Faili hilo halikufunguliwa, na hakuna kilichobadilika hapa. Bado kuna mtu mwingine aliye nalo wazi.",
+                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} angependa kuhariri faili hili. Ukiwa tayari, hifadhi kazi yako kisha tumia Faili, Funga mradi ili kulikabidhi.",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
+        "lpn_copy_kept_link": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_open_cancelled",
+                    "value": "Faili hilo halikufunguliwa, na hakuna kilichobadilika hapa. Bado kuna mtu mwingine aliye nalo wazi.",
+                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} angependa kuhariri faili hili. Ukiwa tayari, hifadhi kazi yako kisha tumia Faili, Funga mradi ili kulikabidhi.",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
+        "lpn_copy_opened": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_open_cancelled",
+                    "value": "Faili hilo halikufunguliwa, na hakuna kilichobadilika hapa. Bado kuna mtu mwingine aliye nalo wazi.",
+                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} angependa kuhariri faili hili. Ukiwa tayari, hifadhi kazi yako kisha tumia Faili, Funga mradi ili kulikabidhi.",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
         "lpn_field_lat_abbr": {
             "reason": "equal_to_english",
             "current_value": "Lat",
