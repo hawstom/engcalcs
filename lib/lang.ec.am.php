@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='ነባሪዎችን መልስ';
 $ec_lang['calc_defaults_confirm']='ካልኩሌተሩን ወደ ነባር ዋጋዎች ማስጀምር?';
 $ec_lang['points_data_note']='(ወይም የውሂብ ቦታ ተጠቅሞ ቅዳ/ለጥፍ)';
-$ec_lang['points_data_heading']='የነጥቦች ውሂብ<br />(በኮማ ወይም ታብ የተለዩ)';
+$ec_lang['points_data_heading']='የካልኩሌተር ውሂብ<br />(ቅርጸቱን ለማየት ቅዳ ይጠቀሙ)';
 $ec_lang['points_data_copy']='ቅዳ';
 $ec_lang['points_data_paste']='ለጥፍ';
 $ec_lang['calc_inputs']='ግቤቶች';
@@ -928,6 +928,11 @@ $ec_lang['lpn_examples_loading']='ናሙናዎች በመጫን ላይ…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='ችግር ማስተካከል';
 $ec_lang['lpn_help_notes']='የዚህ ገጽ ማስታወሻዎች';
+$ec_lang['lpn_help_hotkeys']='ሠንጠረዦችና አቋራጭ ቁልፎች';
+$ec_lang['lpn_hotkeys_tables_heading']='ሠንጠረዦች';
+$ec_lang['lpn_hotkeys_map_heading']='ካርታ';
+$ec_lang['lpn_hotkeys_map_term']='የካርታ የቁልፍ ሰሌዳ አቋራጮች';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 ወይም Esc</td><td>ምረጥ።</td></tr><tr><td>2</td><td>መገናኛ ጨምር።</td></tr><tr><td>3</td><td>ማጠራቀሚያ ጨምር።</td></tr><tr><td>4</td><td>ታንክ ጨምር።</td></tr><tr><td>5</td><td>ቧንቧ ጨምር።</td></tr><tr><td>6</td><td>ፓምፕ ጨምር።</td></tr><tr><td>7</td><td>ቫልቭ ጨምር።</td></tr><tr><td>8</td><td>ደንበኛ ጨምር።</td></tr><tr><td>9</td><td>ጽሑፍ ጨምር።</td></tr><tr><td>Delete</td><td>ምርጫውን ሰርዝ።</td></tr><tr><td>Ctrl+Z</td><td>የመጨረሻውን ለውጥ ቀልብስ።</td></tr><tr><td>+ ወይም =</td><td>አጉላ።</td></tr><tr><td>-</td><td>አሳንስ።</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1311,6 +1316,7 @@ $ec_lang['lpn_pane_not_used']='ጥቅም ላይ አልዋለም';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='በ{q} ተጣርቷል። {n} ከ{all} ውስጥ እያሳየ ነው።';
 $ec_lang['lpn_pane_filter_clear']='ሁሉንም አሳይ';
+$ec_lang['lpn_pane_filter_stale']='ከዚህ በኋላ የማይስማሙ ረድፎች፦ {n}።';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='በዚህ ሠንጠረዥ ውስጥ ከማጣሪያው ጋር የሚስማማ ምንም ነገር የለም።';
@@ -1767,6 +1773,7 @@ $ec_lang['lpn_import_no_room']='ይህን ፕሮጀክት ለመጨመር በቂ
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='እሺ';
+$ec_lang['lpn_file_import_menu']='አስገባ…';
 $ec_lang['lpn_file_import_inp']='የEPANET ፋይል አስገባ…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='ከEPANET ፋይል፣ ወይም ከ.inp የጽሑፍ ፋይል ወይም EPANET ከሚያስቀምጠው .net ፋይል፣ መረብ ያንብቡና በዚህ አሳሽ ውስጥ እንደ አዲስ ፕሮጀክት ያስቀምጡ።';
@@ -2109,7 +2116,7 @@ $ec_lang['lpn_notes_6_term']='የሠንጠረዥ አምዶች እርዳታ';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>አምድ ምረጥ</td><td>ራስጌ ይጫኑ</td></tr><tr><td>የአምድ ምርጫ ጨምር ወይም ዘርጋ</td><td>Ctrl+click ወይም Shift+click ሌላ ራስጌ</td></tr><tr><td>የተመረጡ አምድ(ዎችን) አንቀሳቅስ (ደርድር)</td><td>ይጎትቱ ወይም በቀኝ-ጠቅ ወይም ⋮ ምናሌ ውስጥ አምዶችን አስተዳድር… ይጠቀሙ</td></tr><tr><td>ምናሌ ⋮ እና የደርድር ቀስት።</td><td>የራስጌ የላይኛውን ጠርዝ ያንዣብቡ፣ ወይም ወደ ራስጌ ይምረጡ ወይም Tab ያድርጉ</td></tr><tr><td>ደብቅ፣ ሁሉንም አሳይ ወይም ታይነትና ቅደም ተከተል አስተዳድር</td><td>ራስጌ በቀኝ-ጠቅ ያድርጉ ወይም በራስጌ የላይኛው ቀኝ ጠርዝ ላይ ያለው ⋮ ምናሌ</td></tr><tr><td>በአምድ ደርድር</td><td>በራስጌ የላይኛው ቀኝ ጠርዝ ላይ ያለው የቀስት ምልክት</td></tr><tr><td>እንደ አዲስ ረድፎች በሠንጠረዡ መጨረሻ ለጥፍ</td><td>በቀኝ-ጠቅ፣ በራስጌ የላይኛው ቀኝ ጠርዝ ላይ ያለው ⋮ ምናሌ፣ ወይም Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='የሠንጠረዥ የቁልፍ ሰሌዳ አቋራጮች';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>የቀስት ቁልፎች</td><td>ዙር።</td></tr><tr><td>Tab, Enter</td><td>ግቤትን ጨርስና በአንድ ክፍል ላይ ተሻገር / ውረድ።</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>ወደ ኋላ ዙር።</td></tr><tr><td>Shift+የቀስት ቁልፎች</td><td>ምርጫውን ዘርጋ።</td></tr><tr><td>Ctrl+C</td><td>ምርጫውን ገልብጥ።</td></tr><tr><td>Ctrl+D</td><td>ምርጫውን ከላይኛው ረድፉ ወደታች ሙላ።</td></tr><tr><td>Ctrl+Enter</td><td>ምርጫውን በንቁ ክፍሉ ዋጋ ሙላ።</td></tr><tr><td>Ctrl+A</td><td>ጠቅላላውን ሠንጠረዥ ምረጥ።</td></tr><tr><td>Ctrl+Shift+V</td><td>እንደ አዲስ ረድፎች በሠንጠረዡ መጨረሻ ለጥፍ።</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>ወደ ቀጣዩ ወይም ቀዳሚው ሠንጠረዥ ቀይር።</td></tr><tr><td>Delete</td><td>ክፍል አጽዳ።</td></tr><tr><td>F2</td><td>ክፍል ለማስተካከል ክፈት።</td></tr><tr><td>Esc</td><td>ማስተካከል ተወው።</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>የቀስት ቁልፎች</td><td>ዙር።</td></tr><tr><td>Tab, Enter</td><td>ግቤትን ጨርስና በአንድ ክፍል ላይ ተሻገር / ውረድ።</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>ወደ ኋላ ዙር።</td></tr><tr><td>Shift+የቀስት ቁልፎች</td><td>ምርጫውን ዘርጋ።</td></tr><tr><td>Ctrl+C</td><td>ምርጫውን ገልብጥ።</td></tr><tr><td>Ctrl+D</td><td>ምርጫውን ከላይኛው ረድፉ ወደታች ሙላ።</td></tr><tr><td>Ctrl+Enter</td><td>ምርጫውን በንቁ ክፍሉ ዋጋ ሙላ።</td></tr><tr><td>Ctrl+A</td><td>ጠቅላላውን ሠንጠረዥ ምረጥ።</td></tr><tr><td>Ctrl+Shift+V</td><td>እንደ አዲስ ረድፎች በሠንጠረዡ መጨረሻ ለጥፍ።</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>ወደ ቀጣዩ ወይም ቀዳሚው ትር ቀይር፣ ሠንጠረዥም ይሁን ግራፍ።</td></tr><tr><td>Delete</td><td>ክፍል አጽዳ።</td></tr><tr><td>F2</td><td>ክፍል ለማስተካከል ክፈት።</td></tr><tr><td>Esc</td><td>ማስተካከል ተወው።</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2366,8 +2373,8 @@ $ec_lang['lpn_field_easting_abbr']='E';
 // layout: table heading, the Vertices column's order hint "(Lat/Lon|Lat/Lon|...)" (Tom, 2026-09-28).
 // The short forms of Latitude and Longitude above, in a narrow column heading; use your language's
 // own customary abbreviation.
-$ec_lang['lpn_field_lat_abbr']='Lat';
-$ec_lang['lpn_field_lon_abbr']='Lon';
+$ec_lang['lpn_field_lat_abbr']='ኬክ';
+$ec_lang['lpn_field_lon_abbr']='ኬንድ';
 // Task 674: the coordinate rows on a node are typeable, so the six axis names above now label an
 // INPUT as well as a readout. One tip for both boxes, because one sentence is true of both, and it
 // states the thing a reader cannot see: a position is shared by every scenario, exactly as it is
@@ -2705,6 +2712,20 @@ $ec_lang['lpn_scenario_push_confirm']='እያንዳንዱ ሁኔታ ለእነዚ
 $ec_lang['lpn_scenario_push_scenarios']='የተነኩ ሁኔታዎች፦';
 $ec_lang['lpn_scenario_push_values']='የተጣሉ ዋጋዎች፦';
 $ec_lang['lpn_scenario_push_none']='ለየትኛውም ከእነዚህ ንብረቶች የራሱ ዋጋ ያለው ሁኔታ የለም፣ ስለዚህ ምንም ነገር አይለወጥም። ምንም ነገር አይጣልም።';
+$ec_lang['lpn_scenario_preset_flow_static']='1. የፍሰት ሙከራ፦ የማይንቀሳቀስ';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='ለንድፍ መረብ የፍሰት ሙከራ ማስተካከያ በ0 ፍሰት። በዚህ ሁኔታ ውስጥ በሁሉም መገናኛዎች ላይ ያለውን ፍላጎት ወደ 0 ያዘጋጁ።';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. የፍሰት ሙከራ፦ መካከለኛ';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='ለንድፍ መረብ የፍሰት ሙከራ ማስተካከያ በመጀመሪያው በተመዘገበው ፍሰት። በዚህ ሁኔታ ውስጥ በሚፈሰው መገናኛ ላይ ያለውን ፍላጎት ወደ መጀመሪያው በተለካው ፍሰት፣ በሌሎች መገናኛዎች ሁሉ ላይ ያለውን ፍላጎት ወደ 0 ያዘጋጁ።';
+$ec_lang['lpn_scenario_preset_flow_max']='3. የፍሰት ሙከራ፦ ከፍተኛ';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='ለንድፍ መረብ የፍሰት ሙከራ ማስተካከያ በተመዘገበው ከፍተኛ ፍሰት። በዚህ ሁኔታ ውስጥ በሚፈሰው መገናኛ ላይ ያለውን ፍላጎት ወደ ተለካው ከፍተኛ ፍሰት፣ በሌሎች መገናኛዎች ሁሉ ላይ ያለውን ፍላጎት ወደ 0 ያዘጋጁ።';
+$ec_lang['lpn_scenario_preset_average_day']='4. አማካይ ቀን';
+$ec_lang['lpn_scenario_preset_average_day_tip']='የፍላጎት ማባዣ 1፦ እያንዳንዱ ፍላጎት እንደገባው ነው፣ ይህም እንደ አማካይ ቀን ፍላጎት ይወሰዳል።';
+$ec_lang['lpn_scenario_preset_max_day']='5. ከፍተኛ ቀን';
+$ec_lang['lpn_scenario_preset_max_day_tip']='የፍላጎት ማባዣ ከአማካይ ቀን 2.0 እጥፍ፣ ቦታ ያዥ ዋጋ ነው። አብዛኞቹ ስርዓቶች በ1.2 እና 3.0 መካከል ናቸው (National Research Council, 2006)። የራስዎን ስርዓት ዋጋ በቅንብሮች፣ ስሌት፣ ሃይድሮሊክስ፣ የፍላጎት ማባዣ ውስጥ ያዘጋጁ።';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. ከፍተኛ ሰዓት';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='የፍላጎት ማባዣ ከአማካይ ቀን 3.0 እጥፍ፣ ቦታ ያዥ ዋጋ ነው። አብዛኞቹ ስርዓቶች በ3.0 እና 6.0 መካከል ናቸው (National Research Council, 2006)። የራስዎን ስርዓት ዋጋ በቅንብሮች፣ ስሌት፣ ሃይድሮሊክስ፣ የፍላጎት ማባዣ ውስጥ ያዘጋጁ።';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. እሳት ሲደመር ከፍተኛ ቀን';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='የከፍተኛ ቀን ፍላጎት (ማባዣ 2.0)። በዚህ ሁኔታ ውስጥ የእሳት ፍሰት ትንተናን ያሩጡ፦ በእያንዳንዱ መገናኛ ላይ የእሳት ፍሰቱን ከዚህ ፍላጎት በላይ ይጨምራል።';
 $ec_lang['lpn_delete_drops_overrides']='ይህን አካል ማጥፋት ሁኔታዎችዎ ለእሱ የያዙትን {n} ዋጋዎችም ይጥላል። ይቀጥሉ?';
 $ec_lang['lpn_push_base_only']='ይህ ተግባር ራሱን ስዕሉን ይቀይራል፣ ስለዚህ ሊደረግ የሚችለው በ{base} ውስጥ ብቻ ነው። ወደ {base} ይቀይሩና እንደገና ይሞክሩ።';
 $ec_lang['lpn_field_active']='የዚህ መረብ አካል';
@@ -3678,10 +3699,10 @@ $ec_lang['lpn_ff_title']='የእሳት ፍሰት ትንተና';
 $ec_lang['lpn_ff_intro']='እያንዳንዱ መገናኛ በተራው ከያዘው ፍላጎት በተጨማሪ የእሳት ፍሰት እንዲወስድ ይጠየቃል። በፕሮጀክትዎ ውስጥ ምንም ነገር አይለወጥም፤ ጠቅላላው ስራ በቅጂ ላይ ይደረጋል።';
 $ec_lang['lpn_ff_scope']='የሚፈተኑ መገናኛዎች';
 $ec_lang['lpn_ff_scope_tip']='ከማሳት በፊት ስብስቡን ይምረጡ። በትልቅ ስርዓት ውስጥ እያንዳንዱን መገናኛ መፈተን ደቂቃዎችን ሊወስድ ይችላል።';
-$ec_lang['lpn_ff_scope_all']='እያንዳንዱ መገናኛ';
-$ec_lang['lpn_ff_scope_selected']='የተመረጡት መገናኛዎች';
+$ec_lang['lpn_ff_all']='ሁሉም';
+$ec_lang['lpn_ff_selected']='የተመረጡት';
 $ec_lang['lpn_ff_no_junctions']='ይህ ፕሮጀክት እስካሁን ምንም መገናኛ የለውም፣ ስለዚህ የሚፈተን ነገር የለም።';
-$ec_lang['lpn_ff_no_selection']='ምንም መገናኛ አልተመረጠም። በካርታው ላይ አንዱን ይምረጡ፣ ወይም እያንዳንዱን መገናኛ ይፈትኑ።';
+$ec_lang['lpn_ff_no_selection']='ምንም መገናኛ አልተመረጠም። መገናኛዎችን ይምረጡ ወይም ሁሉም የሚለውን አማራጭ ይምረጡ።';
 $ec_lang['lpn_ff_skipped']='{n} የተመረጡ አካሎች መገናኛዎች አይደሉም፣ ስለዚህ አልተፈተኑም።';
 $ec_lang['lpn_ff_required']='የሚያስፈልግ የእሳት ፍሰት';
 $ec_lang['lpn_ff_required_tip']='የእሳት ደንብዎ ወይም የእሳት ባለስልጣንዎ በአንድ ኃይድራንት ላይ የሚጠይቀው ፍሰት። እያንዳንዱ መገናኛ የራሱ የሚያስፈልግ የእሳት ፍሰት ካልያዘ በስተቀር በዚህ ቁጥር ላይ ይፈተናል።';
@@ -3691,10 +3712,7 @@ $ec_lang['lpn_ff_residual']='የሚያዝ ቀሪ ግፊት';
 $ec_lang['lpn_ff_residual_tip']='የእሳት ፍሰቱን እያደረሰ መገናኛው አሁንም መያዝ ያለበት ግፊት። AWWA M31 እና NFPA 291 20 psi (140 kPa) ይጠቀማሉ።';
 $ec_lang['lpn_ff_design']='የንድፍ ምርመራ (በስርዓቱ ላይ ያለው ተጽዕኖ)';
 $ec_lang['lpn_ff_design_tip']='መገናኛው ፍሰቱን ማድረስ ይችል እንደሆነ ከሚለው የተለየ ጥያቄ፦ ያ ፍሰት እዚያ ሲሳብ፣ ሌላ ማንኛውም ነገር ከዝቅተኛ ግፊቱ በታች ይወርዳል ወይስ የፍጥነት ገደቡን ያልፋል? መፈተኑን መምረጥ ምንም ተጨማሪ ስሌት አያስወጣም።';
-$ec_lang['lpn_ff_design_off']='አትፈትሽ';
-$ec_lang['lpn_ff_design_all']='ሌሎቹ መገናኛዎችና ቧንቧዎች ሁሉ';
-$ec_lang['lpn_ff_design_selected']='የተመረጡት መገናኛዎችና ቧንቧዎቻቸው';
-$ec_lang['lpn_ff_design_no_selection']='የንድፍ ምርመራው የተመረጡ መገናኛዎች ላይ ተቀናብሯል፣ ምንም ግን አልተመረጠም። በካርታው ላይ አንዳንዶቹን ይምረጡ፣ ወይም ሁሉንም ያዘጋጁ።';
+$ec_lang['lpn_ff_design_no_selection']='የንድፍ ምርመራው ወደ የተመረጡት ተቀናብሯል፣ ነገር ግን ምንም አካል አልተመረጠም። አካሎችን ይምረጡ ወይም ሁሉም የሚለውን አማራጭ ይምረጡ።';
 $ec_lang['lpn_ff_minpressure']='በሌላ ቦታ የሚፈቀድ ዝቅተኛ ግፊት';
 $ec_lang['lpn_ff_minpressure_tip']='ሌላ መገናኛ የእሳት ፍሰቱን እየሳበ ሳለ ከዚህ በታች የሚወርድ መገናኛ እንደ ንድፍ ችግር ይነገራል።';
 $ec_lang['lpn_ff_maxvelocity']='የሚፈቀድ ከፍተኛ ፍጥነት';

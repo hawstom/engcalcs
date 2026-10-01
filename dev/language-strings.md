@@ -407,6 +407,10 @@ constraint that had been false for weeks. `layout_tag_check.php` now verifies th
 vocabulary, that a `column heading` really is inside a `<th>`, that a `unit token` is named `u_*`,
 and that a `nav item` is not merely a pull-down row.
 
+### A control gets its own key whenever any language needs it
+
+A control never borrows another control's key just because the English word matches. If in any language the borrowed value would fail to agree (gender, number, case) with what the control actually covers, the control gets its own key, and English may carry the same value. Example: the Design check's None/All/Selected (`lpn_ff_design_off`, `_all`, `_selected`) cover pipes and junctions, where `lpn_ff_all` agrees only with junctions.
+
 ### Renaming a key, and finding key debt
 
 - **Never rename a key by hand.** `php dev/scripts/rename_lang_key.php old new --apply` does all 27

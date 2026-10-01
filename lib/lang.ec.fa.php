@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='بازگردانی مقادیر پیش‌فرض';
 $ec_lang['calc_defaults_confirm']='بازگردانی ماشین‌حساب به مقادیر پیش‌فرض اصلی؟';
 $ec_lang['points_data_note']='(یا با استفاده از ناحیه داده کپی/چسباندن کنید)';
-$ec_lang['points_data_heading']='داده‌های نقاط<br />(جداشده با کاما یا تب)';
+$ec_lang['points_data_heading']='داده‌های محاسبه‌گر<br />(برای دیدن قالب از «کپی» استفاده کنید)';
 $ec_lang['points_data_copy']='کپی';
 $ec_lang['points_data_paste']='چسباندن';
 $ec_lang['calc_inputs']='ورودی‌ها';
@@ -929,6 +929,11 @@ $ec_lang['lpn_examples_loading']='در حال بارگیری نمونه‌ها�
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='رفع یک مشکل';
 $ec_lang['lpn_help_notes']='یادداشت‌های این صفحه';
+$ec_lang['lpn_help_hotkeys']='جدول‌ها و کلیدهای میان‌بر';
+$ec_lang['lpn_hotkeys_tables_heading']='جدول‌ها';
+$ec_lang['lpn_hotkeys_map_heading']='نقشه';
+$ec_lang['lpn_hotkeys_map_term']='کلیدهای میان‌بر نقشه';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 یا Esc</td><td>انتخاب.</td></tr><tr><td>2</td><td>افزودن یک گره.</td></tr><tr><td>3</td><td>افزودن یک مخزن.</td></tr><tr><td>4</td><td>افزودن یک تانک.</td></tr><tr><td>5</td><td>افزودن یک لوله.</td></tr><tr><td>6</td><td>افزودن یک پمپ.</td></tr><tr><td>7</td><td>افزودن یک شیر.</td></tr><tr><td>8</td><td>افزودن یک مشترک.</td></tr><tr><td>9</td><td>افزودن متن.</td></tr><tr><td>Delete</td><td>حذف گزینش.</td></tr><tr><td>Ctrl+Z</td><td>واگرد آخرین تغییر.</td></tr><tr><td>+ یا =</td><td>بزرگ‌نمایی.</td></tr><tr><td>-</td><td>کوچک‌نمایی.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1203,7 +1208,7 @@ $ec_lang['lpn_find_menu_tip']='یک المان را با شناسه‌اش بی�
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='معنای نمادهای نوار ابزار';
+$ec_lang['lpn_help_icons']='راهنمای نمادهای نوار ابزار';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='نمایان‌سازی';
 $ec_lang['lpn_pane_right_toggle_tip']='پنل سمت راست نقشه را نمایش یا پنهان کنید. این پنل انتخاب‌های برچسب و رنگ را در بر دارد.';
@@ -1312,6 +1317,7 @@ $ec_lang['lpn_pane_not_used']='استفاده‌نشده';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='پالایش‌شده با {q}. نمایش {n} از {all}.';
 $ec_lang['lpn_pane_filter_clear']='نمایش همه';
+$ec_lang['lpn_pane_filter_stale']='ردیف‌هایی که دیگر هم‌خوانی ندارند: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='هیچ‌چیز در این جدول با پالایه هم‌خوانی ندارد.';
@@ -1768,6 +1774,7 @@ $ec_lang['lpn_import_no_room']='فضای کافی در حافظه مرورگر �
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='تأیید';
+$ec_lang['lpn_file_import_menu']='وارد کردن…';
 $ec_lang['lpn_file_import_inp']='وارد کردن فایل EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='یک شبکه را از یک فایل EPANET بخوانید، چه فایل متنی .inp و چه فایل .net که EPANET ذخیره می‌کند، و آن را در این مرورگر به‌صورت پروژهٔ تازه ذخیره کنید.';
@@ -2110,7 +2117,7 @@ $ec_lang['lpn_notes_6_term']='راهنمای ستون‌های جدول';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>گزینش ستون</td><td>کلیک روی سرستون</td></tr><tr><td>افزودن یا گسترش گزینش ستون</td><td>Ctrl+click یا Shift+click روی سرستون دیگر</td></tr><tr><td>جابه‌جایی (تغییر ترتیب) ستون(های) گزینش‌شده</td><td>کشیدن، یا استفاده از مدیریت ستون‌ها… در منوی راست‌کلیک یا ⋮</td></tr><tr><td>منوی ⋮ و پیکان مرتب‌سازی.</td><td>نگه‌داشتن اشاره‌گر روی گوشهٔ بالای سرستون، یا گزینش یا Tab به سرستون</td></tr><tr><td>پنهان کردن، نمایش همه، یا مدیریت نمایانی و ترتیب</td><td>راست‌کلیک روی سرستون یا منوی ⋮ در گوشهٔ بالا-راستِ سرستون</td></tr><tr><td>مرتب‌سازی بر پایهٔ ستون</td><td>نماد پیکان در گوشهٔ بالا-راستِ سرستون</td></tr><tr><td>چسباندن به‌صورت ردیف‌های تازه در انتهای جدول</td><td>راست‌کلیک، منوی ⋮ در گوشهٔ بالا-راستِ سرستون، یا Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='میان‌برهای صفحه‌کلید جدول';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>کلیدهای جهت</td><td>پیمایش.</td></tr><tr><td>Tab، Enter</td><td>پایان دادن به ورودی و پیمایش یک سلول به کنار / پایین.</td></tr><tr><td>Shift+Tab، Shift+Enter</td><td>پیمایش به عقب.</td></tr><tr><td>Shift+کلیدهای جهت</td><td>گسترش گزینش.</td></tr><tr><td>Ctrl+C</td><td>کپی گزینش.</td></tr><tr><td>Ctrl+D</td><td>پر کردن گزینش رو به پایین از ردیف بالای آن.</td></tr><tr><td>Ctrl+Enter</td><td>پر کردن گزینش با مقدار سلول فعال.</td></tr><tr><td>Ctrl+A</td><td>گزینش کل جدول.</td></tr><tr><td>Ctrl+Shift+V</td><td>چسباندن به‌صورت ردیف‌های تازه در انتهای جدول.</td></tr><tr><td>Ctrl+Shift+PageDown، Ctrl+Shift+PageUp</td><td>رفتن به جدول بعدی یا پیشین.</td></tr><tr><td>Delete</td><td>پاک کردن یک سلول.</td></tr><tr><td>F2</td><td>باز کردن یک سلول برای ویرایش آن.</td></tr><tr><td>Esc</td><td>لغو یک ویرایش.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>کلیدهای جهت</td><td>پیمایش.</td></tr><tr><td>Tab، Enter</td><td>پایان دادن به ورودی و پیمایش یک سلول به کنار / پایین.</td></tr><tr><td>Shift+Tab، Shift+Enter</td><td>پیمایش به عقب.</td></tr><tr><td>Shift+کلیدهای جهت</td><td>گسترش گزینش.</td></tr><tr><td>Ctrl+C</td><td>کپی گزینش.</td></tr><tr><td>Ctrl+D</td><td>پر کردن گزینش رو به پایین از ردیف بالای آن.</td></tr><tr><td>Ctrl+Enter</td><td>پر کردن گزینش با مقدار سلول فعال.</td></tr><tr><td>Ctrl+A</td><td>گزینش کل جدول.</td></tr><tr><td>Ctrl+Shift+V</td><td>چسباندن به‌صورت ردیف‌های تازه در انتهای جدول.</td></tr><tr><td>Ctrl+Shift+PageDown، Ctrl+Shift+PageUp</td><td>رفتن به زبانهٔ بعدی یا پیشین، چه جدول و چه نمودار.</td></tr><tr><td>Delete</td><td>پاک کردن یک سلول.</td></tr><tr><td>F2</td><td>باز کردن یک سلول برای ویرایش آن.</td></tr><tr><td>Esc</td><td>لغو یک ویرایش.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2706,6 +2713,20 @@ $ec_lang['lpn_scenario_push_confirm']='همه سناریوها برای این �
 $ec_lang['lpn_scenario_push_scenarios']='سناریوهای تحت تأثیر:';
 $ec_lang['lpn_scenario_push_values']='مقادیر دورریخته‌شده:';
 $ec_lang['lpn_scenario_push_none']='هیچ سناریویی برای هیچ‌یک از این ویژگی‌ها مقدار اختصاصی خود را ندارد، پس چیزی تغییر نمی‌کند. چیزی دور ریخته نمی‌شود.';
+$ec_lang['lpn_scenario_preset_flow_static']='۱. آزمایش جریان: ایستا';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='کالیبراسیون آزمایش جریان برای شبکهٔ طراحی در جریان صفر. در این سناریو، مصرف را در همهٔ گره‌ها صفر بگذارید.';
+$ec_lang['lpn_scenario_preset_flow_mid']='۲. آزمایش جریان: میانی';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='کالیبراسیون آزمایش جریان برای شبکهٔ طراحی در نخستین جریان گزارش‌شده. در این سناریو، مصرف گرهٔ جاری را برابر نخستین جریان اندازه‌گیری‌شده و مصرف همهٔ گره‌های دیگر را صفر بگذارید.';
+$ec_lang['lpn_scenario_preset_flow_max']='۳. آزمایش جریان: بیشینه';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='کالیبراسیون آزمایش جریان برای شبکهٔ طراحی در بیشینهٔ جریان گزارش‌شده. در این سناریو، مصرف گرهٔ جاری را برابر بیشینهٔ جریان اندازه‌گیری‌شده و مصرف همهٔ گره‌های دیگر را صفر بگذارید.';
+$ec_lang['lpn_scenario_preset_average_day']='۴. روز میانگین';
+$ec_lang['lpn_scenario_preset_average_day_tip']='ضریب مصرف ۱: هر مصرف همان‌طور که وارد شده، که مصرف روز میانگین فرض می‌شود.';
+$ec_lang['lpn_scenario_preset_max_day']='۵. روز بیشینه';
+$ec_lang['lpn_scenario_preset_max_day_tip']='ضریب مصرف ۲٫۰ برابر روز میانگین، مقداری موقت. بیشتر سیستم‌ها بین ۱٫۲ و ۳٫۰ هستند (National Research Council, 2006). مقدار سیستم خودتان را در تنظیمات، محاسبه، هیدرولیک، ضریب مصرف وارد کنید.';
+$ec_lang['lpn_scenario_preset_peak_hour']='۶. ساعت اوج';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='ضریب مصرف ۳٫۰ برابر روز میانگین، مقداری موقت. بیشتر سیستم‌ها بین ۳٫۰ و ۶٫۰ هستند (National Research Council, 2006). مقدار سیستم خودتان را در تنظیمات، محاسبه، هیدرولیک، ضریب مصرف وارد کنید.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='۷. آتش‌سوزی به‌علاوهٔ روز بیشینه';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='مصرف روز بیشینه (ضریب ۲٫۰). در این سناریو تحلیل جریان آتش‌نشانی را اجرا کنید: جریان آتش‌نشانی را در هر گره بر این مصرف می‌افزاید.';
 $ec_lang['lpn_delete_drops_overrides']='حذف این المان همچنین {n} مقداری را که سناریوهای شما برای آن نگه داشته‌اند دور می‌ریزد. ادامه می‌دهید؟';
 $ec_lang['lpn_push_base_only']='این عمل خود ترسیم را تغییر می‌دهد، پس فقط در {base} قابل انجام است. به {base} بروید و دوباره تلاش کنید.';
 $ec_lang['lpn_field_active']='بخشی از این شبکه';
@@ -3679,10 +3700,10 @@ $ec_lang['lpn_ff_title']='تحلیل جریان آتش‌نشانی';
 $ec_lang['lpn_ff_intro']='از هر گره به‌نوبت خواسته می‌شود جریان آتش‌نشانی را روی مصرفی که از پیش دارد اضافه بردارد. چیزی در پروژهٔ شما تغییر نمی‌کند؛ کل اجرا روی یک نسخه انجام می‌شود.';
 $ec_lang['lpn_ff_scope']='گره‌های آزمایش‌شونده';
 $ec_lang['lpn_ff_scope_tip']='مجموعه را پیش از اجرا انتخاب کنید. آزمایش هر گره در یک سیستم بزرگ می‌تواند دقیقه‌ها طول بکشد.';
-$ec_lang['lpn_ff_scope_all']='همهٔ گره‌ها';
-$ec_lang['lpn_ff_scope_selected']='گره‌های انتخاب‌شده';
+$ec_lang['lpn_ff_all']='همه';
+$ec_lang['lpn_ff_selected']='انتخاب‌شده‌ها';
 $ec_lang['lpn_ff_no_junctions']='این پروژه هنوز گره‌ای ندارد، پس چیزی برای آزمایش نیست.';
-$ec_lang['lpn_ff_no_selection']='هیچ گره‌ای انتخاب نشده. یکی را روی نقشه انتخاب کنید، یا همهٔ گره‌ها را آزمایش کنید.';
+$ec_lang['lpn_ff_no_selection']='هیچ گره‌ای انتخاب نشده. گره‌ها را انتخاب کنید یا گزینهٔ «همه» را انتخاب کنید.';
 $ec_lang['lpn_ff_skipped']='{n} المان انتخاب‌شده گره نیستند، پس آزموده نشدند.';
 $ec_lang['lpn_ff_required']='جریان آتش‌نشانی موردنیاز';
 $ec_lang['lpn_ff_required_tip']='دبی‌ای که مقررات آتش‌نشانی یا مرجع آتش‌نشانی شما در یک هیدرانت لازم می‌داند. هر گره در برابر این عدد آزمایش می‌شود، مگر آن‌که خودش یک جریان آتش‌نشانی موردنیاز داشته باشد.';
@@ -3692,10 +3713,7 @@ $ec_lang['lpn_ff_residual']='فشار باقی‌مانده برای نگه‌د
 $ec_lang['lpn_ff_residual_tip']='فشاری که گره باید هنگام تحویل جریان آتش‌نشانی هنوز نگه دارد. AWWA M31 و NFPA 291 از 20 psi (140 kPa) استفاده می‌کنند.';
 $ec_lang['lpn_ff_design']='بررسی طراحی (اثر بر سیستم)';
 $ec_lang['lpn_ff_design_tip']='پرسشی جدا از این‌که آیا گره می‌تواند آن دبی را تحویل دهد: با برداشت آن دبی در آن‌جا، آیا چیز دیگری زیر حداقل فشار خود می‌افتد یا از حد سرعت خود فراتر می‌رود؟ انتخاب بررسی آن هیچ محاسبهٔ اضافه‌ای هزینه ندارد.';
-$ec_lang['lpn_ff_design_off']='بررسی نشود';
-$ec_lang['lpn_ff_design_all']='همهٔ گره‌های دیگر و همهٔ لوله‌ها';
-$ec_lang['lpn_ff_design_selected']='گره‌های انتخاب‌شده و لوله‌های آن‌ها';
-$ec_lang['lpn_ff_design_no_selection']='بررسی طراحی روی گره‌های انتخاب‌شده تنظیم شده، و هیچ‌کدام انتخاب نشده. چند مورد را روی نقشه انتخاب کنید، یا «همه» را تنظیم کنید.';
+$ec_lang['lpn_ff_design_no_selection']='بررسی طراحی روی «انتخاب‌شده‌ها» تنظیم شده، اما هیچ المانی انتخاب نشده. المان‌ها را انتخاب کنید یا گزینهٔ «همه» را انتخاب کنید.';
 $ec_lang['lpn_ff_minpressure']='کمترین فشار مجاز در جای دیگر';
 $ec_lang['lpn_ff_minpressure_tip']='گره‌ای که درحالی‌که گرهٔ دیگری جریان آتش‌نشانی خود را برمی‌دارد زیر این فشار بیفتد، به‌عنوان یک مشکل طراحی گزارش می‌شود.';
 $ec_lang['lpn_ff_maxvelocity']='بیشترین سرعت مجاز';

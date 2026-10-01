@@ -2274,6 +2274,15 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	overflow-wrap: anywhere;
 }
 .lpn-pane-filter-clear { font-size: 1em; }
+/* **A ROW KEPT ONLY FOR HAVING BEEN EDITED** (Task 738): it no longer matches the filter and stays
+   until Filter in table is pressed again, so it must not pass for a row that does match. Dimmed by
+   opacity, which reads the same in both themes; the sign on its ID cell says why. */
+.lpn-pane-table tr.lpn-pane-stale td { opacity: .5; }
+/* The sign sits in a gutter the ID column reserves for as long as the table is filtered, so the
+   first one to appear moves nothing (Perry's pre-review, 2026-09-30: the column widened 16 px and
+   the table shifted sideways as the edit was left). */
+.lpn-pane-table.lpn-pane-filtered tbody td.lpn-pane-col-id { position: relative; padding-inline-start: 1.3em; }
+.lpn-pane-stale-mark { position: absolute; inset-inline-start: .2em; top: 50%; transform: translateY(-50%); line-height: 1; }
 /* **THE FIRST COLUMN IS LEFT AND EVERY OTHER COLUMN IS CENTRED, HEADING AND CELL ALIKE** (Tom,
    2026-08-23: "Right is great justification for numbers. But in tables, center is safest for
    everything but the first column... Make the headings center and we will be back to where we

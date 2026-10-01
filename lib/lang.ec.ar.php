@@ -107,7 +107,7 @@ $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='استعادة الافتراضي';
 $ec_lang['calc_defaults_confirm']='إعادة تعيين الحاسبة إلى القيم الافتراضية؟';
 $ec_lang['points_data_note']='(أو نسخ/لصق باستخدام منطقة البيانات)';
-$ec_lang['points_data_heading']='بيانات النقاط<br />(مفصولة بفاصلة أو مسافة جدولة)';
+$ec_lang['points_data_heading']='بيانات الحاسبة<br />(استخدم نسخ لرؤية الصيغة)';
 $ec_lang['points_data_copy']='نسخ';
 $ec_lang['points_data_paste']='لصق';
 $ec_lang['calc_inputs']='المدخلات';
@@ -930,6 +930,11 @@ $ec_lang['lpn_examples_loading']='جارٍ تحميل الأمثلة…';
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='إصلاح شيء ما';
 $ec_lang['lpn_help_notes']='ملاحظات حول هذه الصفحة';
+$ec_lang['lpn_help_hotkeys']='الجداول والاختصارات';
+$ec_lang['lpn_hotkeys_tables_heading']='الجداول';
+$ec_lang['lpn_hotkeys_map_heading']='الخريطة';
+$ec_lang['lpn_hotkeys_map_term']='اختصارات لوحة المفاتيح للخريطة';
+$ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 أو Esc</td><td>تحديد.</td></tr><tr><td>2</td><td>إضافة ملتقى.</td></tr><tr><td>3</td><td>إضافة خزان أرضي.</td></tr><tr><td>4</td><td>إضافة صهريج.</td></tr><tr><td>5</td><td>إضافة أنبوب.</td></tr><tr><td>6</td><td>إضافة مضخة.</td></tr><tr><td>7</td><td>إضافة صمام.</td></tr><tr><td>8</td><td>إضافة مشترك.</td></tr><tr><td>9</td><td>إضافة نص.</td></tr><tr><td>Delete</td><td>حذف العنصر المحدد.</td></tr><tr><td>Ctrl+Z</td><td>التراجع عن آخر تغيير.</td></tr><tr><td>+ أو =</td><td>تكبير.</td></tr><tr><td>-</td><td>تصغير.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -1204,7 +1209,7 @@ $ec_lang['lpn_find_menu_tip']='ابحث عن عنصر بمعرّفه، أو اب
 // strip at all without a deliberate press-and-hold. Tom: *"Is Help, Toolbar really useful when
 // it's just a repeat of the toolbar? ... Would it be more purposeful if it were called Toolbar
 // key?"* The row earns its place; only the label was lying about what it is.
-$ec_lang['lpn_help_icons']='ماذا تعني أيقونات شريط الأدوات';
+$ec_lang['lpn_help_icons']='شريط الأدوات';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='الظهور';
 $ec_lang['lpn_pane_right_toggle_tip']='إظهار أو إخفاء اللوحة الموجودة يمين الخريطة. تحتوي على خيارات التسميات والألوان.';
@@ -1313,6 +1318,7 @@ $ec_lang['lpn_pane_not_used']='غير مستخدَم';
 // query line, {n} how many rows are showing and {all} how many the table holds unfiltered.
 $ec_lang['lpn_pane_filter_note']='تمت التصفية حسب {q}. عرض {n} من {all}.';
 $ec_lang['lpn_pane_filter_clear']='إظهار الكل';
+$ec_lang['lpn_pane_filter_stale']='الصفوف التي لم تعد مطابقة: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='لا شيء في هذا الجدول يطابق عامل التصفية.';
@@ -1769,6 +1775,7 @@ $ec_lang['lpn_import_no_room']='لا توجد مساحة تخزين كافية �
 // {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='موافق';
+$ec_lang['lpn_file_import_menu']='استيراد…';
 $ec_lang['lpn_file_import_inp']='استيراد ملف EPANET…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_import_inp_tip']='اقرأ شبكة من ملف EPANET، سواء ملف .inp النصي أو ملف .net الذي يحفظه EPANET، واحفظها في هذا المتصفح كمشروع جديد.';
@@ -2111,7 +2118,7 @@ $ec_lang['lpn_notes_6_term']='مساعدة أعمدة الجدول';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>تحديد عمود</td><td>انقر العنوان</td></tr><tr><td>إضافة عمود إلى التحديد أو توسيعه</td><td>Ctrl+click أو Shift+click على عنوان آخر</td></tr><tr><td>نقل (إعادة ترتيب) العمود أو الأعمدة المحدَّدة</td><td>اسحب أو استخدم إدارة الأعمدة… في قائمة النقر بالزر الأيمن أو قائمة ⋮</td></tr><tr><td>قائمة ⋮ وسهم الفرز.</td><td>مرّر فوق الزاوية العلوية لعنوان، أو حدده أو انتقل إليه بمفتاح Tab</td></tr><tr><td>إخفاء، أو إظهار الكل، أو إدارة الظهور والترتيب</td><td>انقر العنوان بالزر الأيمن أو قائمة ⋮ في الزاوية العلوية اليمنى للعنوان</td></tr><tr><td>الفرز حسب العمود</td><td>أيقونة السهم في الزاوية العلوية اليمنى للعنوان</td></tr><tr><td>لصق كصفوف جديدة في نهاية الجدول</td><td>النقر بالزر الأيمن، قائمة ⋮ في الزاوية العلوية اليمنى للعنوان، أو Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='اختصارات لوحة المفاتيح للجدول';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>مفاتيح الأسهم</td><td>التنقل.</td></tr><tr><td>Tab، Enter</td><td>إنهاء الإدخال والتنقل عبر / أسفل خلية واحدة.</td></tr><tr><td>Shift+Tab، Shift+Enter</td><td>التنقل للخلف.</td></tr><tr><td>Shift+مفاتيح الأسهم</td><td>توسيع التحديد.</td></tr><tr><td>Ctrl+C</td><td>نسخ التحديد.</td></tr><tr><td>Ctrl+D</td><td>تعبئة التحديد إلى الأسفل من صفه العلوي.</td></tr><tr><td>Ctrl+Enter</td><td>تعبئة التحديد بقيمة الخلية النشطة.</td></tr><tr><td>Ctrl+A</td><td>تحديد الجدول كله.</td></tr><tr><td>Ctrl+Shift+V</td><td>لصق كصفوف جديدة في نهاية الجدول.</td></tr><tr><td>Ctrl+Shift+PageDown، Ctrl+Shift+PageUp</td><td>التبديل إلى الجدول التالي أو السابق.</td></tr><tr><td>Delete</td><td>مسح خلية.</td></tr><tr><td>F2</td><td>فتح خلية لتحريرها.</td></tr><tr><td>Esc</td><td>إلغاء تحرير.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>مفاتيح الأسهم</td><td>التنقل.</td></tr><tr><td>Tab، Enter</td><td>إنهاء الإدخال والتنقل عبر / أسفل خلية واحدة.</td></tr><tr><td>Shift+Tab، Shift+Enter</td><td>التنقل للخلف.</td></tr><tr><td>Shift+مفاتيح الأسهم</td><td>توسيع التحديد.</td></tr><tr><td>Ctrl+C</td><td>نسخ التحديد.</td></tr><tr><td>Ctrl+D</td><td>تعبئة التحديد إلى الأسفل من صفه العلوي.</td></tr><tr><td>Ctrl+Enter</td><td>تعبئة التحديد بقيمة الخلية النشطة.</td></tr><tr><td>Ctrl+A</td><td>تحديد الجدول كله.</td></tr><tr><td>Ctrl+Shift+V</td><td>لصق كصفوف جديدة في نهاية الجدول.</td></tr><tr><td>Ctrl+Shift+PageDown، Ctrl+Shift+PageUp</td><td>التبديل إلى علامة التبويب التالية أو السابقة، سواء كانت جدولاً أو رسماً بيانياً.</td></tr><tr><td>Delete</td><td>مسح خلية.</td></tr><tr><td>F2</td><td>فتح خلية لتحريرها.</td></tr><tr><td>Esc</td><td>إلغاء تحرير.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2707,6 +2714,20 @@ $ec_lang['lpn_scenario_push_confirm']='هل تريد جعل جميع السين�
 $ec_lang['lpn_scenario_push_scenarios']='السيناريوهات المتأثرة:';
 $ec_lang['lpn_scenario_push_values']='القيم الملغاة:';
 $ec_lang['lpn_scenario_push_none']='لا يملك أي سيناريو قيمة خاصة به لأي من هذه الخصائص، فلن يتغيّر شيء. لن تُلغى أي قيمة.';
+$ec_lang['lpn_scenario_preset_flow_static']='1. اختبار التدفق: ساكن';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='معايرة اختبار التدفق لشبكة تصميمية عند تدفق صفر. في هذا السيناريو، اضبط الطلب عند جميع الملتقيات على 0.';
+$ec_lang['lpn_scenario_preset_flow_mid']='2. اختبار التدفق: وسطي';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='معايرة اختبار التدفق لشبكة تصميمية عند أول تدفق مسجَّل. في هذا السيناريو، اضبط الطلب عند الملتقى المتدفق على أول تدفق مقيس، والطلب عند جميع الملتقيات الأخرى على 0.';
+$ec_lang['lpn_scenario_preset_flow_max']='3. اختبار التدفق: أقصى';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='معايرة اختبار التدفق لشبكة تصميمية عند أقصى تدفق مسجَّل. في هذا السيناريو، اضبط الطلب عند الملتقى المتدفق على أقصى تدفق مقيس، والطلب عند جميع الملتقيات الأخرى على 0.';
+$ec_lang['lpn_scenario_preset_average_day']='4. اليوم المتوسط';
+$ec_lang['lpn_scenario_preset_average_day_tip']='مضاعف الطلب 1: كل طلب كما أُدخل، ويُعدّ طلب اليوم المتوسط.';
+$ec_lang['lpn_scenario_preset_max_day']='5. اليوم الأقصى';
+$ec_lang['lpn_scenario_preset_max_day_tip']='مضاعف الطلب 2.0 مرة طلب اليوم المتوسط، وهي قيمة مؤقتة. تقع معظم الأنظمة بين 1.2 و3.0 (National Research Council, 2006). اضبط قيمة نظامك في الإعدادات، الحساب، الهيدروليكا، مضاعف الطلب.';
+$ec_lang['lpn_scenario_preset_peak_hour']='6. ساعة الذروة';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='مضاعف الطلب 3.0 مرة طلب اليوم المتوسط، وهي قيمة مؤقتة. تقع معظم الأنظمة بين 3.0 و6.0 (National Research Council, 2006). اضبط قيمة نظامك في الإعدادات، الحساب، الهيدروليكا، مضاعف الطلب.';
+$ec_lang['lpn_scenario_preset_fire_max_day']='7. الحريق مع اليوم الأقصى';
+$ec_lang['lpn_scenario_preset_fire_max_day_tip']='طلب اليوم الأقصى (المضاعف 2.0). شغّل تحليل تدفق الحريق في هذا السيناريو: فهو يضيف تدفق الحريق عند كل ملتقى فوق هذا الطلب.';
 $ec_lang['lpn_delete_drops_overrides']='يؤدي حذف هذا العنصر أيضاً إلى إلغاء {n} قيمة تحملها سيناريوهاتك له. هل تريد المتابعة؟';
 $ec_lang['lpn_push_base_only']='يغيّر هذا الإجراء الرسم نفسه، لذا لا يمكن تنفيذه إلا في {base}. انتقل إلى {base} وحاول مرة أخرى.';
 $ec_lang['lpn_field_active']='جزء من هذه الشبكة';
@@ -3680,10 +3701,10 @@ $ec_lang['lpn_ff_title']='تحليل تدفق الحريق';
 $ec_lang['lpn_ff_intro']='يُطلب من كل ملتقى بالتناوب سحب تدفق حريق إضافة إلى الطلب الذي يحمله بالفعل. لا يتغيّر أي شيء في مشروعك؛ يُجرى التشغيل بأكمله على نسخة.';
 $ec_lang['lpn_ff_scope']='الملتقيات المراد اختبارها';
 $ec_lang['lpn_ff_scope_tip']='اختر المجموعة قبل التشغيل. اختبار كل ملتقى في نظام كبير قد يستغرق دقائق.';
-$ec_lang['lpn_ff_scope_all']='كل ملتقى';
-$ec_lang['lpn_ff_scope_selected']='الملتقيات المحددة';
+$ec_lang['lpn_ff_all']='الكل';
+$ec_lang['lpn_ff_selected']='المحددة';
 $ec_lang['lpn_ff_no_junctions']='لا يحتوي هذا المشروع على ملتقيات بعد، فلا يوجد ما يُختبر.';
-$ec_lang['lpn_ff_no_selection']='لا يوجد ملتقى محدد. اختر واحداً على الخريطة، أو اختبر كل ملتقى.';
+$ec_lang['lpn_ff_no_selection']='لا يوجد ملتقى محدد. حدد ملتقيات أو اختر خيار الكل.';
 $ec_lang['lpn_ff_skipped']='{n} عنصراً محدَّداً ليست ملتقيات، فلم تُختبر.';
 $ec_lang['lpn_ff_required']='تدفق الحريق المطلوب';
 $ec_lang['lpn_ff_required_tip']='التدفق الذي يشترطه كود الحريق لديك أو جهة الإطفاء عند الحنفية. يُختبر كل ملتقى مقابل هذا الرقم ما لم يحمل تدفق حريق مطلوباً خاصاً به.';
@@ -3693,10 +3714,7 @@ $ec_lang['lpn_ff_residual']='الضغط المتبقي الواجب الحفاظ
 $ec_lang['lpn_ff_residual_tip']='الضغط الذي يجب أن يحافظ عليه الملتقى أثناء توصيل تدفق الحريق. يستخدم كل من AWWA M31 و NFPA 291 قيمة 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='فحص التصميم (الأثر على النظام)';
 $ec_lang['lpn_ff_design_tip']='سؤال منفصل عن قدرة الملتقى على توصيل التدفق: مع سحب ذلك التدفق هناك، هل ينخفض أي شيء آخر دون حده الأدنى للضغط أو يتجاوز حد سرعته؟ اختيار فحص هذا لا يكلّف حساباً إضافياً.';
-$ec_lang['lpn_ff_design_off']='عدم الفحص';
-$ec_lang['lpn_ff_design_all']='كل الملتقيات الأخرى وكل الأنابيب';
-$ec_lang['lpn_ff_design_selected']='الملتقيات المحددة وأنابيبها';
-$ec_lang['lpn_ff_design_no_selection']='فحص التصميم مضبوط على الملتقيات المحددة، ولا يوجد ملتقى محدد. حدد بعضها على الخريطة، أو اضبطه على الكل.';
+$ec_lang['lpn_ff_design_no_selection']='نطاق فحص التصميم مضبوط على المحددة، ولا يوجد عنصر محدد. حدد عناصر أو اختر خيار الكل.';
 $ec_lang['lpn_ff_minpressure']='أدنى ضغط مسموح به في أي مكان آخر';
 $ec_lang['lpn_ff_minpressure_tip']='يُبلَّغ عن أي ملتقى ينخفض دون هذا الحد بينما يسحب ملتقى آخر تدفق حريقه على أنه مشكلة تصميم.';
 $ec_lang['lpn_ff_maxvelocity']='أقصى سرعة مسموح بها';

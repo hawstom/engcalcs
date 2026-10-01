@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-09-30",
-    "count": 2135,
+    "count": 2158,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -2383,6 +2383,70 @@
                 "lpn_notes_7_def"
             ],
             "reason": "Sprint 2026-09-30-fox: all 26 languages inserted the new Ctrl+Shift+PageDown/PageUp row; tag parity checked against English"
+        },
+        {
+            "date": "2026-10-01",
+            "keys": [
+                "lpn_ff_design_no_selection"
+            ],
+            "reason": "Sprint 2026-09-30-golf: resynced in all 26 languages"
+        },
+        {
+            "date": "2026-10-01",
+            "keys": [
+                "lpn_ff_no_selection"
+            ],
+            "reason": "Sprint 2026-09-30-golf: resynced in all 26 languages"
+        },
+        {
+            "date": "2026-10-01",
+            "keys": [
+                "lpn_help_icons"
+            ],
+            "reason": "Sprint 2026-09-30-golf: resynced in all 26 languages"
+        },
+        {
+            "date": "2026-10-01",
+            "keys": [
+                "lpn_notes_7_def"
+            ],
+            "reason": "Sprint 2026-09-30-golf: resynced in all 26 languages"
+        },
+        {
+            "date": "2026-10-01",
+            "keys": [
+                "points_data_heading"
+            ],
+            "reason": "Sprint 2026-09-30-golf: resynced in all 26 languages"
+        },
+        {
+            "date": "2026-10-01",
+            "keys": [
+                "lpn_ff_all",
+                "lpn_ff_selected",
+                "lpn_file_import_menu",
+                "lpn_help_hotkeys",
+                "lpn_hotkeys_map_def",
+                "lpn_hotkeys_map_heading",
+                "lpn_hotkeys_map_term",
+                "lpn_hotkeys_tables_heading",
+                "lpn_pane_filter_stale",
+                "lpn_scenario_preset_average_day",
+                "lpn_scenario_preset_average_day_tip",
+                "lpn_scenario_preset_fire_max_day",
+                "lpn_scenario_preset_fire_max_day_tip",
+                "lpn_scenario_preset_flow_max",
+                "lpn_scenario_preset_flow_max_tip",
+                "lpn_scenario_preset_flow_mid",
+                "lpn_scenario_preset_flow_mid_tip",
+                "lpn_scenario_preset_flow_static",
+                "lpn_scenario_preset_flow_static_tip",
+                "lpn_scenario_preset_max_day",
+                "lpn_scenario_preset_max_day_tip",
+                "lpn_scenario_preset_peak_hour",
+                "lpn_scenario_preset_peak_hour_tip"
+            ],
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
         }
     ],
     "hashes": {
@@ -2906,6 +2970,7 @@
         "lpn_ff_accounting": "7581a6e311ae7190cbceab13d5a6c3c4ba99493d",
         "lpn_ff_affect_link": "86a3e78138eae43ef14ad5fe3c1335a39ba4d200",
         "lpn_ff_affect_node": "3c2b59a873244d27193e77d64a31dcb0964f3316",
+        "lpn_ff_all": "6a72085653e4c5be8c7640c868ef787cbcf063d1",
         "lpn_ff_atleast": "66d8fb7180913c0fbd06d8060e9022e28b68780b",
         "lpn_ff_calculate": "b1b392607deaf29a7e81453e069b7c07a32a6b18",
         "lpn_ff_clear": "e7654bbcceb3b6ef2ff743bacedd45bdc8ca101a",
@@ -2923,7 +2988,7 @@
         "lpn_ff_cost": "66a71c4168e7cc8bbefcd582a492c268d145138e",
         "lpn_ff_design": "b6e5eaf486df1f225d39b98a74607ed7845a97da",
         "lpn_ff_design_all": "b56ada991fcc364c0667a651346c32485f75e251",
-        "lpn_ff_design_no_selection": "9838c747b08d9b44c7a74cc520c3b5d6e0a632da",
+        "lpn_ff_design_no_selection": "7db1b29e5d61e5c588cdaa09ba738d99d4f9bef5",
         "lpn_ff_design_none": "e02543961d3e9ecbfaabd72204ab25316e517374",
         "lpn_ff_design_off": "bc10277c1e27efbb998067028b1be8d770b95de8",
         "lpn_ff_design_off_note": "77e938d422b07aca04c053b13772f9ff93f901e8",
@@ -2951,7 +3016,7 @@
         "lpn_ff_mode_none": "6eef6648406c333a4035cd5e60d0bf2ecf2606d7",
         "lpn_ff_more": "e38929f98513d39f8651b51211b6fa25513cd919",
         "lpn_ff_no_junctions": "fbc08158d07470605a079277a97ab3d821f0fd49",
-        "lpn_ff_no_selection": "8da522f316f546669f94fad087c2068ae78f0b1a",
+        "lpn_ff_no_selection": "be415c20b4e05c5b93661bacd529e69c66885b6c",
         "lpn_ff_not_checked": "22705e738a7a182dc29cb9c6ad3014a8b166191b",
         "lpn_ff_report_all": "52b28d6b1306346b3aef71fd2b808af7eaab735d",
         "lpn_ff_required": "85549ea8f73e12ebd964956baf76765b113ccf6b",
@@ -2966,6 +3031,7 @@
         "lpn_ff_scope_all": "216decebf8ba73304b9008436c31bfa072209ca7",
         "lpn_ff_scope_selected": "efc69bdb8dcd991ed479c5b1897a3f94b56d16a2",
         "lpn_ff_scope_tip": "c220976c861bb448cce3c74fd5526aef506ad60f",
+        "lpn_ff_selected": "9a976fc228b6b33656174ebd6decca02c9068378",
         "lpn_ff_skipped": "e3a9f59cd7e3aabe984950f5a7602c11e674dc0c",
         "lpn_ff_stale": "2a8f7a09662248de84a2ad1f5cabc19f4e127b81",
         "lpn_ff_static_failed": "8d3961b9e38b39ee986bbefc068180d1124a4998",
@@ -3092,6 +3158,7 @@
         "lpn_file_export_inp_tip": "5623e7c0eff07644ef0d32eccda484d204c49d55",
         "lpn_file_import_inp": "422aa12aac66e90544516fbace883e795deba9fd",
         "lpn_file_import_inp_tip": "a9c7de913fc40c9d97ff49f3456f625e79c70b5e",
+        "lpn_file_import_menu": "4834caf8f5aad3c480b7bd72e28e1fbf4da29472",
         "lpn_file_import_survey": "a7978b50b5ec272930b4c9e36810abfbc5416e58",
         "lpn_file_import_survey_tip": "42a5af224170df6a771cddc2bc9481809d169c3f",
         "lpn_file_needs_reopen": "21ae110d61e50bb7a2a02b67937d9dfa7603f601",
@@ -3245,12 +3312,17 @@
         "lpn_gpv_curve_source": "9798784210f8740b8cb706a239767af400d565bd",
         "lpn_gpv_curve_source_tip": "090ffc20e3a7086a2f8d0b230c3597e4667da579",
         "lpn_help_fix": "21556ba8411184cec8574bf3206020e7694b968d",
-        "lpn_help_icons": "2df3254323891f730a8a5a5920d4788cf9333368",
+        "lpn_help_hotkeys": "c772aa9b4b81358f6c4cc568d28feed8ab0de8d6",
+        "lpn_help_icons": "212af41073666530ad8bf245becce259a0964242",
         "lpn_help_notes": "8d4516cf570eac7e3e1854038b19f606d8cd5d99",
         "lpn_help_screenshots": "840633384797f338d9d827b9ec29692d74e882e4",
         "lpn_help_walkthroughs": "0b78ac5827cd7cc6424e5b9b334af5c2d003d310",
         "lpn_help_welcome": "2dcbd6608a5fde2a5e9f76d94a71704b8b9f4b80",
         "lpn_hide_titles": "41e04d52dd2b88c0e688e9a0a62cbfd234f1a280",
+        "lpn_hotkeys_map_def": "6f743a403a24385c70e97a8772ea9c047e3d605a",
+        "lpn_hotkeys_map_heading": "ab478f3efc840eebab919dff1b9512286f70c10c",
+        "lpn_hotkeys_map_term": "067b16574a977be86826d3ed392953bb560cab88",
+        "lpn_hotkeys_tables_heading": "193daf137ed8b89de36d47c3df5fd8f66c0e1d14",
         "lpn_id_invalid": "8a5f2c615619185cac2ae5645dba3a822172202b",
         "lpn_id_taken": "afa411f11b93f86d3e5593aef3404abe3f194817",
         "lpn_import_bad_file": "368d3659c55f93e76105b4c486e32f47fc930508",
@@ -3530,7 +3602,7 @@
         "lpn_notes_5_term": "04433f7fe8fbf41ae2e5d2354f718f4330e9c5ac",
         "lpn_notes_6_def": "7a690fe4507dd6a8016cbb6d1ee1ca3f620f396c",
         "lpn_notes_6_term": "81d3fc18f58b1f062d929392cf56424cce60fa14",
-        "lpn_notes_7_def": "c98208934143918caec8f7e3bcece0e46aafe13d",
+        "lpn_notes_7_def": "2df684887cb0fdd7cda7206963d15c312460575a",
         "lpn_notes_7_term": "f85f833914da7710e7a7fe82a00dc7b784dea9b5",
         "lpn_notes_color_def": "4a8aab914b966262f3a655b4025db3c236facf18",
         "lpn_notes_color_term": "67c44c744f65a9a0f9f43f6a39ab3e4d11d382c7",
@@ -3547,6 +3619,7 @@
         "lpn_pane_filter_clear": "50a279de829f2dc398ac2ac7c9367508ea4b5df5",
         "lpn_pane_filter_none": "778c378ebb7ab3fcde0dc3a817012bf89ba9d678",
         "lpn_pane_filter_note": "05e2eb74abd40d38d2d0d292c8d3c5d57c84f813",
+        "lpn_pane_filter_stale": "d804411167feeed421aaa0e4c08832dfc3a29ee9",
         "lpn_pane_goto_tip": "6821fdb6c38e15f1597b15a3c56f895a5cb67c80",
         "lpn_pane_hide_col": "9a89f95f88037a47e11f2228d1ce68db371c8bd8",
         "lpn_pane_hide_cols": "3367eae1f4a65d938a0f07c14bb3f35002227657",
@@ -3776,6 +3849,20 @@
         "lpn_scenario_override_tip": "1e7e60eb4723122c95d750aa9fd347ba2c8968d7",
         "lpn_scenario_overrides": "4c5e907de76fc870e96215896845410bc61e5815",
         "lpn_scenario_overrides_tip": "79c344a0e9d0558b4e893b05c2c796d2d5f7e29d",
+        "lpn_scenario_preset_average_day": "d674202c07877bd6471bc1832422f6d3640415c2",
+        "lpn_scenario_preset_average_day_tip": "354aa7503e8864731ed77ee15abc9701cbc7d671",
+        "lpn_scenario_preset_fire_max_day": "be63bc7d6dd967088ee2265564edc82c1a965f9e",
+        "lpn_scenario_preset_fire_max_day_tip": "333113ea00ad069c4b641689ddfb8697e80195af",
+        "lpn_scenario_preset_flow_max": "cbfe1c924815fe9c72c33c1f505588144f9268c1",
+        "lpn_scenario_preset_flow_max_tip": "9ccc0dc2a1fc98f4898b0be726be657f61ad5076",
+        "lpn_scenario_preset_flow_mid": "6532b5a20f4044c8973fd2ff7ea52e3d47f88c02",
+        "lpn_scenario_preset_flow_mid_tip": "5b36acc2459cd817cb8a883a5ec2d5f8f11a21b5",
+        "lpn_scenario_preset_flow_static": "a50f26a5f160bd9e01c2ef4284e27eda062c6a55",
+        "lpn_scenario_preset_flow_static_tip": "4ad9b9e55d141d7a923ceeaefa6d42db907b4727",
+        "lpn_scenario_preset_max_day": "70f824ba95e8654f577ca0a5967594273755d704",
+        "lpn_scenario_preset_max_day_tip": "13f01877d312710b9d3877d1c4ac8dae5285245b",
+        "lpn_scenario_preset_peak_hour": "e601dcacc8af2f2538b6b1d406e93522b54afd31",
+        "lpn_scenario_preset_peak_hour_tip": "3fb3664f8628b0070a847322c195d87c117177d1",
         "lpn_scenario_prompt_name": "f05ee5e127dbbf90ad0cde70708c2f2d84110677",
         "lpn_scenario_push_btn": "a6395ef6908a852924ef3e6a960cee547c57bc90",
         "lpn_scenario_push_confirm": "590e6acf48c9097bb958d8aef261fcc398053a08",
@@ -4376,7 +4463,7 @@
         "or_twe": "ca79c5240748bb0fe7f9e77010e926fc3de069d4",
         "or_width": "23f8c74f142bec4e4e96bd0ebbe2649323d3e572",
         "points_data_copy": "af74f7c5362aaee985bf8cda3dd75fc80751ce51",
-        "points_data_heading": "23f6f266b7c344a4bf4031981e3ecd514d991c07",
+        "points_data_heading": "08bf3740245e33175202b639c3bf7a41e8d833e4",
         "points_data_note": "80aa3d341546a15d2aa8e69687993b287c0fe202",
         "points_data_paste": "db2483000d154ca9fd74d41fc4e063a4b28faa87",
         "privacy_link": "ec7c829b39081dee8e886f1ca577b3fb1d099f64",
@@ -6603,6 +6690,10 @@
             "words": 4,
             "ends_sentence": false
         },
+        "lpn_ff_all": {
+            "words": 1,
+            "ends_sentence": false
+        },
         "lpn_ff_atleast": {
             "words": 3,
             "ends_sentence": false
@@ -6842,6 +6933,10 @@
         "lpn_ff_scope_tip": {
             "words": 16,
             "ends_sentence": true
+        },
+        "lpn_ff_selected": {
+            "words": 1,
+            "ends_sentence": false
         },
         "lpn_ff_skipped": {
             "words": 11,
@@ -7346,6 +7441,10 @@
         "lpn_file_import_inp_tip": {
             "words": 21,
             "ends_sentence": true
+        },
+        "lpn_file_import_menu": {
+            "words": 1,
+            "ends_sentence": false
         },
         "lpn_file_import_survey": {
             "words": 3,
@@ -7959,6 +8058,10 @@
             "words": 2,
             "ends_sentence": false
         },
+        "lpn_help_hotkeys": {
+            "words": 3,
+            "ends_sentence": false
+        },
         "lpn_help_icons": {
             "words": 2,
             "ends_sentence": false
@@ -7981,6 +8084,22 @@
         },
         "lpn_hide_titles": {
             "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_hotkeys_map_def": {
+            "words": 27,
+            "ends_sentence": true
+        },
+        "lpn_hotkeys_map_heading": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_hotkeys_map_term": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_hotkeys_tables_heading": {
+            "words": 1,
             "ends_sentence": false
         },
         "lpn_id_invalid": {
@@ -9167,6 +9286,10 @@
             "words": 7,
             "ends_sentence": true
         },
+        "lpn_pane_filter_stale": {
+            "words": 6,
+            "ends_sentence": true
+        },
         "lpn_pane_goto_tip": {
             "words": 3,
             "ends_sentence": false
@@ -10081,6 +10204,62 @@
         },
         "lpn_scenario_overrides_tip": {
             "words": 22,
+            "ends_sentence": true
+        },
+        "lpn_scenario_preset_average_day": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_scenario_preset_average_day_tip": {
+            "words": 15,
+            "ends_sentence": true
+        },
+        "lpn_scenario_preset_fire_max_day": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_scenario_preset_fire_max_day_tip": {
+            "words": 25,
+            "ends_sentence": true
+        },
+        "lpn_scenario_preset_flow_max": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_scenario_preset_flow_max_tip": {
+            "words": 36,
+            "ends_sentence": true
+        },
+        "lpn_scenario_preset_flow_mid": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_scenario_preset_flow_mid_tip": {
+            "words": 36,
+            "ends_sentence": true
+        },
+        "lpn_scenario_preset_flow_static": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_scenario_preset_flow_static_tip": {
+            "words": 21,
+            "ends_sentence": true
+        },
+        "lpn_scenario_preset_max_day": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_scenario_preset_max_day_tip": {
+            "words": 30,
+            "ends_sentence": true
+        },
+        "lpn_scenario_preset_peak_hour": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_scenario_preset_peak_hour_tip": {
+            "words": 30,
             "ends_sentence": true
         },
         "lpn_scenario_prompt_name": {

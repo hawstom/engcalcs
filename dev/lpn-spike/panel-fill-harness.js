@@ -154,7 +154,11 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		['openNotesBox', 'the Notes box'],
 		// Criticality analysis (Tom, 2026-09-30): fire flow's sibling on the same shell, with a
 		// report table, so a phone wants the whole window for it as it does for fire flow's.
-		['openCriticalityBox', 'Criticality analysis']];
+		['openCriticalityBox', 'Criticality analysis'],
+		// The Tables and Hotkeys box (Task 745): the same non-hog shell and memory as Notes, built
+		// the same way and for the same reason -- reference prose a reader keeps open beside the
+		// work, so a phone wants the same fill.
+		['openHotkeysBox', 'the Tables and Hotkeys box']];
 	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
 	});
