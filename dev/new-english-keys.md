@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 0 untranslated keys, of 2153 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**1 still to read on master**, of 7 untranslated keys, of 2160 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,13 +25,35 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-None on master. Every English key here is present in at least one other language.
+## lpn_  (7, 1 to read @@ NEEDS RULING)
+
+- **`lpn_copy_body`**
+  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_body_nodate`**
+  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_copy`**
+  > A copy; make new lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_kept_link`**
+  > Opened {name} as the original, moved to a new place. Save now writes to this file.
+  @@ NEEDS RULING
+- **`lpn_copy_opened`**
+  > Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_original`**
+  > Original; keep same lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_title`**
+  > Mark file as new copy?
+  _Ruled OK 2026-10-01._
 
 ---
 
 # Strings waiting on a branch
 
-**8 still to read**, of 53 new keys across 11 unmerged branch(es).
+**7 still to read**, of 46 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -42,9 +64,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/sprint-0930-golf (`78b3cae4`) — adds no English strings
-
-### feat/bentley-interop (`ee19f373`) — 13 new, 4 to read @@ NEEDS RULING
+### feat/bentley-interop (`e71a8f6b`) — 13 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -86,29 +106,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives table, which shows how those values are grouped by category.
   @@ NEEDS RULING
 
-### feat/copy-lock (`15288fa8`) — 7 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_copy_body`**
-  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_body_nodate`**
-  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_copy`**
-  > A copy; make new lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_kept_link`**
-  > Switched to {name}. It stays connected to the file it was opened from, {file}, and Save writes there, not to the file you just chose.
-  @@ NEEDS RULING
-- **`lpn_copy_opened`**
-  > Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_original`**
-  > Original; keep same lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_title`**
-  > Mark file as new copy?
-  _Ruled OK 2026-10-01._
+### feat/copy-lock (`3f84f0fb`) — adds no English strings
 
 ### feat/criticality (`77bfe930`) — 26 new, 3 to read @@ NEEDS RULING
 
