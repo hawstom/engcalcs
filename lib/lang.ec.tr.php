@@ -543,7 +543,6 @@ $ec_lang['ip_diameter']='D';
 $ec_lang['ip_roughness']='e';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Bu hattın mansap uç kotu. İç satırlarda isteğe bağlı (boş bırakılırsa düz olarak varsayılır / yukarıdaki düğümle aynı). Son satırda gerekli: bu değer son damlatıcının kotudur, doğrudan gerekli beslenme basıncını belirler.">MS Kot. <span class="ec-tip">?</span></span>';
 $ec_lang['ip_elev_ds_missing_warn']='Son damlatıcı kotu (son satır) boş bırakıldı ve düz olarak varsayıldı — doğru sonuç için girin';
-$ec_lang['ip_flow']='Debi';
 $ec_lang['ip_press']='Bas.';
 $ec_lang['ip_hf']='h<sub>f</sub>';
 $ec_lang['ip_hm']='h<sub>m</sub>';
@@ -610,10 +609,6 @@ $ec_lang['bpn_p_down']='MS basınç';
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_p_down_tip']='Bu hattın mansap düğümündeki manometrik basınç yükü. Negatif bir değer (işaretlenir), atmosfer altı basınç anlamına gelir; tasarımı kontrol edin.';
 $ec_lang['bpn_sketch_heading']='Şebeke Şeması';
-$ec_lang['bpn_show_length']='Uzunluk';
-$ec_lang['bpn_show_diameter']='Çap';
-$ec_lang['bpn_show_q']='Debi';
-$ec_lang['bpn_show_p']='Basınç';
 $ec_lang['bpn_source_label']='Kaynak';
 $ec_lang['bpn_line_problem']='Bu hat kaynağa bağlı değil: bilinmeyen bir memba ID\'sine işaret ediyor, kendine işaret ediyor, başka bir hattın zaten kullandığı bir ID\'yi tekrarlıyor veya bir döngü oluşturuyor. Kaynağa bağlı olmayan hatlar çözülmeden bırakılır.';
 $ec_lang['bpn_bad_id_short']='Geçersiz ID';
@@ -637,7 +632,6 @@ $ec_lang['bpn_supply3_h']='Besleme yükü 3';
 $ec_lang['bpn_supply_pt_tip']='İsteğe bağlı besleme eğrisi noktaları 2 ve 3. Bir pompayı veya daha fazla debi verdikçe yükü düşen herhangi bir kaynağı modellemek için her biri için bir debi ve yük girin; araç, tasarım debisindeki yükü okur. Yukarıdaki 1. nokta, sıfır debideki statik yüktür. Sabit bir rezervuar yükü için 2 ve 3\'ü boş bırakın.';
 $ec_lang['bpn_h_supply']='Besleme yükü';
 $ec_lang['bpn_h_supply_tip']='Besleme eğrisinden okunan, tasarım debisindeki kaynak yükü. Eğri düz olduğunda (bir rezervuar) girilen kaynak yüküne eşittir.';
-$ec_lang['bpn_show_elevation']='Kot';
 $ec_lang['bpn_supply1_h']='Statik besleme yükü';
 $ec_lang['lpn_main_menu']='Su Şebekesi';
 $ec_lang['lpn_main_title']='EPANET Çözücüsüyle Ücretsiz Çevrimiçi Su Dağıtım Şebekesi Modellemesi';
@@ -925,7 +919,6 @@ $ec_lang['lpn_examples_blank']='Ya da buradan başlayın';
 // screen, so "start with a blank map" reads as "discard it" and they do not dare press the
 // only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
 // open an example"). Closing never touches a project either way.
-$ec_lang['lpn_examples_close']='Kapat';
 $ec_lang['lpn_examples_size']='Düğümler: {nodes}, hatlar: {links}';
 $ec_lang['lpn_examples_failed']='Örnekler yüklenemedi. Bir çizime başlamak için Dosya, Yeni proje\'yi kullanın.';
 $ec_lang['lpn_examples_loading']='Örnekler yükleniyor…';
@@ -1017,9 +1010,6 @@ $ec_lang['lpn_units_mapcoords']='Harita koordinatları';
 $ec_lang['lpn_units_mapcoords_deg']='derece';
 $ec_lang['lpn_units_usft']='ABD ölçüm ft';
 $ec_lang['lpn_units_elevhead']='Kot ve yük';
-$ec_lang['lpn_units_pressure']='Basınç';
-$ec_lang['lpn_units_flow']='Debi';
-$ec_lang['lpn_units_velocity']='Hız';
 // Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
 // mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
 // alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
@@ -1239,13 +1229,11 @@ $ec_lang['lpn_color_break_count']='Renk sayısından bir eksik sınır olmalıd�
 $ec_lang['lpn_color_ramp_qualitative']='Nitel';
 $ec_lang['lpn_color_ramp_rainbow']='Gökkuşağı';
 $ec_lang['lpn_color_ramp_rainbow_eg']='EPANET ile eşleşir';
-$ec_lang['lpn_color_example_status']='Durum';
 $ec_lang['lpn_color_example_material']='Malzeme';
 $ec_lang['lpn_color_ramp_ylgnbu']='Sarıdan maviye';
 $ec_lang['lpn_color_ramp_rdylbu']='Kırmızıdan maviye, sarı üzerinden';
 $ec_lang['lpn_georef_drop']='Modeli buraya koy';
 $ec_lang['lpn_georef_finish']='Bu yerleşimi koru';
-$ec_lang['lpn_georef_cancel']='İptal';
 $ec_lang['lpn_georef_scale']='Çizim birimi başına yer mesafesi';
 // Edited by TGH 2026-09-07
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
@@ -1342,7 +1330,7 @@ $ec_lang['lpn_pane_print_tip']='Şu anda baktığınız tabloyu, proje adı, tab
 // lpn_clean_map_tip were deleted with the row; nothing else read them.
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
-// lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
+// lpn_tool_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
 // it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
 // alternative and Tom kept Project.
 // ROADMAP Task 523, Tom 2026-08-24. **The KEY is still lpn_menu_project and that is deliberate** --
@@ -1393,7 +1381,6 @@ $ec_lang['lpn_time_run_slow']='Bu şebekenin hesaplanması {secs} sn sürdü ve 
 $ec_lang['lpn_time_no_report']='Henüz bir çalışma raporu yok. Rapor, EPANET\'in kendi metnidir, bu yüzden bu şebeke EPANET çözücüsüyle hesaplandığında görünür.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
-$ec_lang['lpn_menu_settings']='Ayarlar';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -1510,10 +1497,6 @@ $ec_lang['lpn_find_op_conn_noopensource']='kaynağa giden açık yol yok';
 // What a result row prints beside the node id: the fault it has, in three words.
 // What a result row prints beside the id: the NARROWEST condition true of that node, because "no
 // links" says more than "no open path to a source" and both are true of the same node.
-$ec_lang['lpn_find_conn_unlinked']='Düğümde bağlantı yok';
-$ec_lang['lpn_find_conn_noopen']='Düğümde açık bağlantı yok';
-$ec_lang['lpn_find_conn_nolinksource']='Kaynağa giden bağlantı yolu yok';
-$ec_lang['lpn_find_conn_noopensource']='Kaynağa giden açık yol yok';
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='Her düğüm bağlı.';
@@ -1702,10 +1685,8 @@ $ec_lang['lpn_new_coordsys_local_tip']='Coğrafi referanslı değildir. Kendi ar
 // system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
 // the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
 // as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
-$ec_lang['lpn_new_crs']='Harita projeksiyonu';
 // **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
 // it names the box's own subject rather than either caller's radio label.
-$ec_lang['lpn_crsbox_title']='Koordinat sistemi';
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
@@ -1716,7 +1697,6 @@ $ec_lang['lpn_crs_place_tip']='Bir kasaba, adres veya işaret noktası yazın; h
 $ec_lang['lpn_crs_search']='Ara';
 $ec_lang['lpn_crs_name']='Projeksiyon adı filtresi';
 $ec_lang['lpn_crs_name_tip']='Adı veya EPSG kodu yazdığınızı içeren yalnızca projeksiyonları gösterir. Bir bölge numarası, UTM veya Mercator deneyin.';
-$ec_lang['lpn_crs_list']='Projeksiyon';
 $ec_lang['lpn_crs_list_tip']='Yukarıdaki iki filtreden kalan projeksiyonlar. Birini seçin ve Seç’e basın.';
 $ec_lang['lpn_crs_choose']='Seç';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
@@ -1761,7 +1741,6 @@ $ec_lang['lpn_file_open']='Aç…';
 $ec_lang['lpn_file_save']='Kaydet';
 $ec_lang['lpn_file_saveas']='Farklı kaydet…';
 $ec_lang['lpn_file_revert']='Eski haline getir';
-$ec_lang['lpn_file_close']='Kapat';
 // Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Son dosyalar';
@@ -2619,7 +2598,6 @@ $ec_lang['lpn_cp_design']='Tasarım';
 $ec_lang['lpn_cp_design_tip']='Her özel özellik için bir satır; her biri açıldığında şunları gösterir: Anahtar, Etiket, Uygulanır, Şu şekilde doğrula, İzin ver veya kısıtla, bu seçimin adlandırdığı karakter alanı, Uzunluk alt sınırı, Uzunluk üst sınırı, Alt sınır, Üst sınır.';
 $ec_lang['lpn_cp_add']='Özel özellik ekle';
 $ec_lang['lpn_cp_add_tip']='Tasarım tablosuna bir satır ekler ve düzenlemek üzere açar.';
-$ec_lang['lpn_cp_remove']='Kaldır';
 $ec_lang['lpn_cp_remove_tip']='Bu özelliği tasarım tablosundan kaldırır. Varlıklarınıza zaten yazılmış değerler dosyada saklı kalır ve aynı anahtarı yeniden tasarlarsanız geri gelir.';
 $ec_lang['lpn_cp_none']='Henüz tasarlanmış bir özel özellik yok.';
 $ec_lang['lpn_cp_unnamed']='Henüz adlandırılmadı';
@@ -2639,7 +2617,6 @@ $ec_lang['lpn_cp_restrict_tip']='Bu karakterleri kısıtla: Bir değer yalnızca
 $ec_lang['lpn_cp_restrict_mode']='İzin ver veya kısıtla';
 $ec_lang['lpn_cp_restrict_mode_tip']='İzin ver veya kısıtla: Verilen karakterler ya bir değerin kullanabileceği tek karakterlerdir ya da kullanamayacağı karakterlerdir.';
 $ec_lang['lpn_cp_restrict_allow']='Yalnızca bu karakterlere izin ver';
-$ec_lang['lpn_cp_restrict_deny']='Bu karakterleri kısıtla';
 $ec_lang['lpn_cp_minlength']='Uzunluk alt sınırı';
 $ec_lang['lpn_cp_minlength_tip']='Uzunluk alt sınırı: Daha kısa herhangi bir giriş işaretlenir; boş ve yarım yazılmış girişleri bu şekilde bulursunuz.';
 $ec_lang['lpn_cp_length']='Uzunluk üst sınırı';
@@ -2801,7 +2778,6 @@ $ec_lang['lpn_settings_flow_change_tip']='Çözücünün durmadan önce geçmesi
 $ec_lang['lpn_settings_damp_limit']='Sönümleme şurada başlar';
 $ec_lang['lpn_settings_damp_limit_tip']='Çözücünün, salınan bir şebekenin yakınsamasına yardımcı olabilecek daha küçük adımlar atmaya başladığı doğruluk. Sıfır, çözücünün hiç sönümleme yapmayacağı anlamına gelir. Yalnızca EPANET çözücüsü bu kutuyu okur.';
 $ec_lang['lpn_settings_option_unset']='Belirtilmemiş';
-$ec_lang['lpn_settings_demand_multiplier']='Talep çarpanı';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_demand_multiplier_tip']='Şebekedeki her talebe aynı anda uygulanan tek bir katsayı. Sistemin bugünkü kullanımdan daha fazla veya daha az kullanımda ne yaptığını sormak için kullanın. Yazdığınız sayıları değiştirmez. Bir senaryo kendi çarpanını taşıyabilir, böylece ortalama gün, azami gün ve tepe saat birer sayı olur; projeninkini kullanmak için bir senaryoda boş bırakın.';
 $ec_lang['lpn_settings_engine_native']='EPANET çözücüsüyle çöz';
@@ -3034,7 +3010,7 @@ $ec_lang['lpn_time_speed_tip']='Oynatma hızı';
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,
 // with an index down the left and a search across the top. The section titles are not new keys --
-// each borrows the name it already had (lpn_tool_labels, lpn_menu_settings, lpn_time_menu,
+// each borrows the name it already had (lpn_tool_labels, lpn_tool_settings, lpn_time_menu,
 // lpn_settings_colors), so the box cannot drift from the doors that open it.
 $ec_lang['lpn_settings_search']='Ayarlarda ara';
 // **AND-OF-WORDS, STATED AS SUCH** (Tom, 2026-09-23 (g): "can Settings filter work as an AND word
@@ -3091,7 +3067,6 @@ $ec_lang['lpn_settings_quality_track_tip']='Çalışmanın borular boyunca neyi 
 $ec_lang['lpn_settings_quality_source']='İzlenen düğüm';
 $ec_lang['lpn_settings_quality_source_tip']='Suyu izlenen düğüm. Diğer her düğüm, o düğümden gelen suyunun payını gösterir.';
 $ec_lang['lpn_quality_none']='Hiçbiri';
-$ec_lang['lpn_quality_age']='Su yaşı';
 $ec_lang['lpn_quality_trace']='Kaynak izleme';
 $ec_lang['lpn_quality_chemical']='Tepkimeye giren bir kimyasal';
 $ec_lang['lpn_quality_needs_run']='Su kalitesi, su borular boyunca ilerledikçe taşınır, bu yüzden bir zaman dilimi hesaplaması gerektirir: EPANET motoru ve bir toplam çalışma süresi. Zaman altında bir Toplam çalışma süresi belirleyin, sonra Hesapla düğmesine basın.';
@@ -3265,7 +3240,6 @@ $ec_lang['lpn_scncmp_title']='Senaryo karşılaştırması';
 $ec_lang['lpn_scncmp_menu_tip']='Bu projedeki her senaryoyu çözün ve yan yana okuyun: her birindeki en düşük basınç ve en yüksek hız.';
 $ec_lang['lpn_scncmp_running']='Her senaryo çözülüyor…';
 $ec_lang['lpn_scncmp_empty']='Henüz hiçbir şey çizilmedi, bu yüzden çözülecek bir şey yok.';
-$ec_lang['lpn_scncmp_col_minpressure']='En düşük basınç';
 $ec_lang['lpn_scncmp_col_maxvelocity']='En yüksek hız';
 $ec_lang['lpn_scncmp_at']='{id}\'de {value}';
 $ec_lang['lpn_scncmp_current']='(şu anda açık)';
@@ -3298,7 +3272,6 @@ $ec_lang['lpn_reports_status_tip']='Son uzatılmış dönem simülasyonu boyunca
 $ec_lang['lpn_status_title']='Durum raporu';
 $ec_lang['lpn_status_needs_run']='Durum raporu, bir uzatılmış dönem simülasyonu boyunca neyin değiştiğini listeler. Ayarlar, Hesaplama, Zaman altında bir Toplam çalışma süresi belirleyin, Hesapla\'ya basın, sonra Su, Raporlar, Durum raporu\'nu açın.';
 $ec_lang['lpn_status_empty']='Bu çalışma boyunca hiçbir şeyin durumu değişmedi.';
-$ec_lang['lpn_status_col_time']='Zaman';
 $ec_lang['lpn_status_col_event']='Olay';
 $ec_lang['lpn_status_opened']='{type} {id} açıldı';
 $ec_lang['lpn_status_closed']='{type} {id} kapandı';
@@ -3357,7 +3330,6 @@ $ec_lang['lpn_color_mode_jenks']='Doğal kırılımlar (Jenks)';
 $ec_lang['lpn_color_mode_stddev']='Standart sapma';
 $ec_lang['lpn_color_mode_pretty']='Düzgün (yuvarlak)';
 $ec_lang['lpn_color_mode_log']='Logaritmik';
-$ec_lang['lpn_color_mode_pressure']='Basınç';
 $ec_lang['lpn_color_mode_manual']='Elle';
 
 // ---- LIBRARIES (ROADMAP Tasks 462 and 460) ---------------------------------------------------
@@ -3367,7 +3339,7 @@ $ec_lang['lpn_color_mode_manual']='Elle';
 // Simulate, Transport, Time selectors."
 //
 // ONE NAME, THREE DOORS: the toolbar button, the Edit menu row and the box's own title all read
-// this key, exactly as lpn_menu_settings serves the Settings box's three.
+// this key, exactly as lpn_tool_settings serves the Settings box's three.
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='Kitaplıklar';
@@ -3572,7 +3544,6 @@ $ec_lang['lpn_library_rule_add']='Bir kural ekle';
 $ec_lang['lpn_library_rule_tip']='Tek bir kural, EPANET\'in kullandığı sözcüklerle, satır başına bir tümce. İlk satır onu adlandırır: RULE 1. Sonra bir koşul: IF TANK 2 LEVEL BELOW 17.1. Sonra bunun için ne yapılacağı: THEN PUMP 9 STATUS IS OPEN. Son bir satır ona bir sıra verebilir: PRIORITY 1. Birden fazla şeyi sınamak için AND veya OR satırları, sınama başarısız olduğunda ne yapılacağını söylemek için ELSE satırları ekleyin. Bir koşul, bir düğümde LEVEL, HEAD, GRADE, PRESSURE veya DEMAND\'i, bir hatta FLOW, STATUS veya SETTING\'i, ya da SYSTEM\'de TIME ve CLOCKTIME\'ı okuyabilir. Sayıları bu projenin gösterdiği birimlerde yazın; sizin için dönüştürülürler. Anahtar sözcükleri İngilizce bırakın; sayfanın ve EPANET\'in okuduğu şey budur.';
 $ec_lang['lpn_library_rule_ok']='✓ Bu kural okundu';
 $ec_lang['lpn_library_rule_bad']='⚠ Bu kural okunamadı';
-$ec_lang['lpn_library_rule_missing']='⚠ Bu şebekede {id} adında bir şey yok';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
 // for the entire project it is in Settings") drawn on its other side. Without it a pattern you
 // author can only be used by making it the default one, which is not what a library is for.
@@ -3812,8 +3783,6 @@ $ec_lang['lpn_ff_mode_none']='Yok';
 $ec_lang['lpn_ff_col_solves']='Çözümler';
 // Which criterion the junction broke while drawing the required flow. A junction that broke nothing
 // shows a dash, never one of these words.
-$ec_lang['lpn_ff_limit_pressure']='Basınç';
-$ec_lang['lpn_ff_limit_velocity']='Hız';
 $ec_lang['lpn_ff_limit_both']='Basınç ve hız';
 $ec_lang['lpn_ff_atleast']='{flow}\'den fazla';
 $ec_lang['lpn_ff_affect_node']='{id} {pressure}\'e düşüyor';

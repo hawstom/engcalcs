@@ -653,7 +653,6 @@ $ec_lang['ip_roughness']='e';
 $ec_lang['ip_elev_ds']='<span class="ec-help" title="Downstream-end elevation of this reach. Optional on interior rows (defaults to flat / same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.">DS Elev. <span class="ec-tip">?</span></span>';
 $ec_lang_syn['ip_elev_ds']='DS abbreviates downstream. Choose an abbreviation that is unambiguously downstream and cannot be confused with upstream.';
 $ec_lang['ip_elev_ds_missing_warn']='Last emitter elevation (last row) was left blank and defaulted to flat — enter it for an accurate result';
-$ec_lang['ip_flow']='Flow';
 $ec_lang['ip_press']='Press.';
 $ec_lang_syn['ip_press']='Pressure';
 $ec_lang['ip_hf']='h<sub>f</sub>';
@@ -737,10 +736,6 @@ $ec_lang_syn['bpn_p_down']='Downstream (DS) pressure — the gauge pressure head
 // Edited by TGH 2026-09-07
 $ec_lang['bpn_p_down_tip']='Gauge pressure head at this line’s downstream node. A negative value (flagged) means subatmospheric pressure; check the design.';
 $ec_lang['bpn_sketch_heading']='Network Diagram';
-$ec_lang['bpn_show_length']='Length';
-$ec_lang['bpn_show_diameter']='Diameter';
-$ec_lang['bpn_show_q']='Flow';
-$ec_lang['bpn_show_p']='Pressure';
 $ec_lang['bpn_source_label']='Source';
 $ec_lang['bpn_line_problem']='This line is not connected to the source: it points to an unknown upstream ID, points at itself, repeats an ID another line already uses, or forms a loop. Lines that are not connected are left unsolved.';
 $ec_lang['bpn_bad_id_short']='Bad ID';
@@ -764,7 +759,6 @@ $ec_lang['bpn_supply3_h']='Supply head 3';
 $ec_lang['bpn_supply_pt_tip']='Optional supply-curve points 2 and 3. Enter a flow and head for each to model a pump, or any source whose head drops as it delivers more; the tool reads the head at the design flow. Point 1 above is the static head at zero flow. Leave 2 and 3 blank for a constant reservoir head.';
 $ec_lang['bpn_h_supply']='Supply head';
 $ec_lang['bpn_h_supply_tip']='Source head at the design flow, read from the supply curve. Equals the entered source head when the curve is flat (a reservoir).';
-$ec_lang['bpn_show_elevation']='Elevation';
 $ec_lang['bpn_supply1_h']='Static supply head';
 $ec_lang['lpn_main_menu']='Water Supply Network';
 $ec_lang['lpn_main_title']='Free Online Water Distribution Network Modeling with the EPANET Solver';
@@ -1052,11 +1046,11 @@ $ec_lang['lpn_examples_open']='Open';
 $ec_lang_syn['lpn_examples_open']='Open, Open this example, Load, Load this example, Start with this one | layout: button; avoid: open as an adjective/state (something already open), not the imperative verb';
 $ec_lang['lpn_examples_menu']='Open example…';
 $ec_lang['lpn_examples_blank']='Or start here';
-// The SAME exit, worded for the other way in. Opened from File the user already has work on
-// screen, so "start with a blank map" reads as "discard it" and they do not dare press the
-// only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
-// open an example"). Closing never touches a project either way.
-$ec_lang['lpn_examples_close']='Close';
+// The SAME exit, worded for the other way in, is lpn_close (Task 699 merged its own 'Close' key
+// into it). Opened from File the user already has work on screen, so "start with a blank map"
+// reads as "discard it" and they do not dare press the only button that leaves (Tom, 2026-08-17:
+// "I can't back out of the gallery... I am forced to open an example"). Closing never touches a
+// project either way.
 $ec_lang['lpn_examples_size']='Nodes: {nodes}, links: {links}';
 $ec_lang['lpn_examples_failed']='The examples could not be loaded. Use File, New project to start a drawing.';
 $ec_lang['lpn_examples_loading']='Loading examples…';
@@ -1157,9 +1151,6 @@ $ec_lang['lpn_units_mapcoords_deg']='degrees';
 $ec_lang['lpn_units_usft']='US survey ft';
 $ec_lang_syn['lpn_units_length']='Pipe lengths, tank diameters, etc.';
 $ec_lang['lpn_units_elevhead']='Elevation and head';
-$ec_lang['lpn_units_pressure']='Pressure';
-$ec_lang['lpn_units_flow']='Flow';
-$ec_lang['lpn_units_velocity']='Velocity';
 // Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
 // mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
 // alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
@@ -1382,13 +1373,11 @@ $ec_lang['lpn_color_break_count']='There must be one boundary fewer than the num
 $ec_lang['lpn_color_ramp_qualitative']='Qualitative';
 $ec_lang['lpn_color_ramp_rainbow']='Rainbow';
 $ec_lang['lpn_color_ramp_rainbow_eg']='matches EPANET';
-$ec_lang['lpn_color_example_status']='Status';
 $ec_lang['lpn_color_example_material']='Material';
 $ec_lang['lpn_color_ramp_ylgnbu']='Yellow to blue';
 $ec_lang['lpn_color_ramp_rdylbu']='Red to blue, through yellow';
 $ec_lang['lpn_georef_drop']='Put the model here';
 $ec_lang['lpn_georef_finish']='Keep this placement';
-$ec_lang['lpn_georef_cancel']='Cancel';
 $ec_lang['lpn_georef_scale']='Ground distance per drawing unit';
 // Edited by TGH 2026-09-07
 // R-219 (Tom, 2026-09-24, answering R-190): the sentence that replaces the retired "These are
@@ -1486,7 +1475,7 @@ $ec_lang['lpn_pane_print_tip']='Print the table you are looking at, with the pro
 // lpn_clean_map_tip were deleted with the row; nothing else read them.
 // THE PROJECT MENU (ROADMAP Task 467). Tom, 2026-08-20: "Maybe we can have a Project menu with
 // Settings, Library, and Report under it?" Its rows borrow the names they already have --
-// lpn_menu_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
+// lpn_tool_settings, lpn_library_menu, lpn_time_run_report -- so a door cannot drift from the thing
 // it opens. EPANET and epanet-js both say "project" for a network and its settings; "model" was the
 // alternative and Tom kept Project.
 // ROADMAP Task 523, Tom 2026-08-24. **The KEY is still lpn_menu_project and that is deliberate** --
@@ -1535,9 +1524,6 @@ $ec_lang['lpn_settings_auto_run_tip']='Hides the Calculate button and recalculat
 // explained. {secs} is one decimal.
 $ec_lang['lpn_time_run_slow']='This network took {secs} s to calculate, and it is set to recalculate after every change. To stop that and get a Calculate button back, turn off “Recalculate automatically” in Settings, under Calculation, Hydraulics.';
 $ec_lang['lpn_time_no_report']='There is no run report yet. The report is EPANET’s own text, so it appears once this network has been calculated.';
-// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
-// this one, and of the three, Settings is the word a person is most likely to look for first.
-$ec_lang['lpn_menu_settings']='Settings';
 // Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
 // incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
 // could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
@@ -1653,13 +1639,10 @@ $ec_lang['lpn_find_op_conn_unlinked']='no links at node';
 $ec_lang['lpn_find_op_conn_noopen']='no open links at node';
 $ec_lang['lpn_find_op_conn_nolinksource']='no link path to a source';
 $ec_lang['lpn_find_op_conn_noopensource']='no open path to a source';
-// What a result row prints beside the node id: the fault it has, in three words.
-// What a result row prints beside the id: the NARROWEST condition true of that node, because "no
-// links" says more than "no open path to a source" and both are true of the same node.
-$ec_lang['lpn_find_conn_unlinked']='No links at node';
-$ec_lang['lpn_find_conn_noopen']='No open links at node';
-$ec_lang['lpn_find_conn_nolinksource']='No link path to a source';
-$ec_lang['lpn_find_conn_noopensource']='No open path to a source';
+// A result row prints the NARROWEST condition true of that node beside its id, because "no links"
+// says more than "no open path to a source" and both are true of the same node. It prints the
+// SAME four keys above with the first letter capitalized in code (findConnLabel()), not a second
+// capitalized copy of each (Task 699, Tom 2026-09-30: "do the Find redesign").
 // "None" is the good news a report is run for, so it is said out loud rather than left as a blank
 // box.
 $ec_lang['lpn_find_conn_none']='Every node is connected.';
@@ -1854,10 +1837,9 @@ $ec_lang['lpn_new_coordsys_local_tip']='Not georeferenced. Use the Map, World ma
 // system" on 2026-09-25 -- don't expose the word "projection".) Two filters over one catalogue, and
 // the catalogue itself is not keyed: a coordinate system's NAME is the EPSG register's own, exactly
 // as the OpenStreetMap credit is, and a GIS reader in any language looks for those characters.
-$ec_lang['lpn_new_crs']='Coordinate system';
-// **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25). Shared by the New project box and Convert as, so
-// it names the box's own subject rather than either caller's radio label.
-$ec_lang['lpn_crsbox_title']='Coordinate system';
+// **THE SUB-BOX'S OWN TITLE** (Tom, 2026-09-25) is lpn_new_coordsys, as are its list label and
+// the New project box's chooser button (Task 699): it names the box's own subject rather than
+// either caller's radio label.
 // The spatial filter. A zoned system covers a strip of the Earth and nothing outside it, so a place
 // answers most of the question by itself: searching a town in Arizona leaves two UTM zones standing
 // out of a hundred and twenty.
@@ -1868,7 +1850,6 @@ $ec_lang['lpn_crs_place_tip']='Type a town, an address, or a landmark, and the m
 $ec_lang['lpn_crs_search']='Search';
 $ec_lang['lpn_crs_name']='Coordinate system name filter';
 $ec_lang['lpn_crs_name_tip']='Shows only the coordinate systems whose name or EPSG code contains what you type.';
-$ec_lang['lpn_crs_list']='Coordinate system';
 $ec_lang['lpn_crs_list_tip']='The coordinate systems left by the two filters above. Choose one and press Select.';
 $ec_lang['lpn_crs_choose']='Select';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
@@ -1914,7 +1895,6 @@ $ec_lang['lpn_file_save']='Save';
 $ec_lang['lpn_file_saveas']='Save as…';
 $ec_lang['lpn_file_revert']='Revert';
 $ec_lang_syn['lpn_file_revert']='Throw away (discard) my changes by reloading the saved version (undo all changes, go back to the saved file).';
-$ec_lang['lpn_file_close']='Close';
 // Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Recent files';
@@ -2757,6 +2737,9 @@ $ec_lang['lpn_backdrop_target_free']='Any point on the map';
 $ec_lang['lpn_backdrop_target_coords']='Coordinates you type';
 $ec_lang['lpn_backdrop_coords_prompt']='Type the X,Y that point should move to';
 $ec_lang['lpn_backdrop_continue']='Continue';
+// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
+// this one, and of the three, Settings is the word a person is most likely to look for first.
+// One key for the toolbar button, the Project menu row and the Settings box's own title (Task 699).
 $ec_lang['lpn_tool_settings']='Settings';
 $ec_lang['lpn_settings_show_titles']='Show page titles';
 // Edited by TGH 2026-09-07
@@ -2800,7 +2783,6 @@ $ec_lang['lpn_cp_design']='Design';
 $ec_lang['lpn_cp_design_tip']='One row per custom property, and each opens to show: Key, Label, Applies to, Validate as, Allow or restrict, the characters field named by that choice, Length lower limit, Length upper limit, Low limit, High limit.';
 $ec_lang['lpn_cp_add']='Add custom property';
 $ec_lang['lpn_cp_add_tip']='Adds a row to the design table and opens it for editing.';
-$ec_lang['lpn_cp_remove']='Remove';
 $ec_lang['lpn_cp_remove_tip']='Removes this property from the design table. Values already typed on your assets are kept in the file and come back if you design the same key again.';
 $ec_lang['lpn_cp_none']='No custom property is designed yet.';
 $ec_lang['lpn_cp_unnamed']='Not named yet';
@@ -2820,7 +2802,6 @@ $ec_lang['lpn_cp_restrict_tip']='Restrict these characters: A value may use only
 $ec_lang['lpn_cp_restrict_mode']='Allow or restrict';
 $ec_lang['lpn_cp_restrict_mode_tip']='Allow or restrict: The given characters are either the only ones a value may use or the ones it may not use.';
 $ec_lang['lpn_cp_restrict_allow']='Allow only these characters';
-$ec_lang['lpn_cp_restrict_deny']='Restrict these characters';
 $ec_lang['lpn_cp_minlength']='Length lower limit';
 $ec_lang['lpn_cp_minlength_tip']='Length lower limit: Any shorter entry is flagged, which is how you find the empty and the half-typed entries.';
 $ec_lang['lpn_cp_length']='Length upper limit';
@@ -3014,7 +2995,6 @@ $ec_lang['lpn_settings_flow_change_tip']='An additional test the solver must pas
 $ec_lang['lpn_settings_damp_limit']='Damping starts at';
 $ec_lang['lpn_settings_damp_limit_tip']='The accuracy at which the solver begins taking smaller steps, which can help an oscillating network to converge. Zero means the solver never damps.';
 $ec_lang['lpn_settings_option_unset']='Not stated';
-$ec_lang['lpn_settings_demand_multiplier']='Demand multiplier';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_demand_multiplier_tip']='A single factor applied to every demand in the network at once. Each scenario can have its own, so average day, maximum day or peak hour can be created by changing only this setting.';
 $ec_lang['lpn_settings_engine_native']='Use the built-in solver when possible';
@@ -3250,7 +3230,7 @@ $ec_lang['lpn_time_speed_tip']='Playback speed';
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,
 // with an index down the left and a search across the top. The section titles are not new keys --
-// each borrows the name it already had (lpn_tool_labels, lpn_menu_settings, lpn_time_menu,
+// each borrows the name it already had (lpn_tool_labels, lpn_tool_settings, lpn_time_menu,
 // lpn_settings_colors), so the box cannot drift from the doors that open it.
 $ec_lang['lpn_settings_search']='Search settings';
 // **AND-OF-WORDS, STATED AS SUCH** (Tom, 2026-09-23 (g): "can Settings filter work as an AND word
@@ -3307,7 +3287,6 @@ $ec_lang['lpn_settings_quality_track_tip']='Choose what the run should trace thr
 $ec_lang['lpn_settings_quality_source']='Trace node';
 $ec_lang['lpn_settings_quality_source_tip']='The node whose water is traced. Every other node then shows the share of its water that came from that node.';
 $ec_lang['lpn_quality_none']='Nothing';
-$ec_lang['lpn_quality_age']='Water age';
 $ec_lang['lpn_quality_trace']='Source trace';
 $ec_lang['lpn_quality_chemical']='A reactive chemical';
 $ec_lang['lpn_quality_needs_run']='Water quality is carried along the pipes as the water travels, so it needs an extended period simulation. Set a Total run time under Time, then press the Calculate button.';
@@ -3483,7 +3462,6 @@ $ec_lang['lpn_scncmp_title']='Scenario comparison';
 $ec_lang['lpn_scncmp_menu_tip']='Solve every scenario in this project and read them side by side: the lowest pressure and the highest velocity in each.';
 $ec_lang['lpn_scncmp_running']='Solving every scenario…';
 $ec_lang['lpn_scncmp_empty']='Nothing has been drawn yet, so there is nothing to solve.';
-$ec_lang['lpn_scncmp_col_minpressure']='Lowest pressure';
 $ec_lang['lpn_scncmp_col_maxvelocity']='Highest velocity';
 $ec_lang['lpn_scncmp_at']='{value} at {id}';
 $ec_lang['lpn_scncmp_current']='(currently open)';
@@ -3516,7 +3494,6 @@ $ec_lang['lpn_reports_status_tip']='What changed over the last extended period s
 $ec_lang['lpn_status_title']='Status report';
 $ec_lang['lpn_status_needs_run']='The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.';
 $ec_lang['lpn_status_empty']='Nothing changed status during this run.';
-$ec_lang['lpn_status_col_time']='Time';
 $ec_lang['lpn_status_col_event']='Event';
 $ec_lang['lpn_status_opened']='{type} {id} opened';
 $ec_lang['lpn_status_closed']='{type} {id} closed';
@@ -3576,7 +3553,6 @@ $ec_lang['lpn_color_mode_stddev']='Standard deviation';
 $ec_lang['lpn_color_mode_pretty']='Pretty (rounded)';
 $ec_lang_syn['lpn_color_mode_pretty']='Equal intervals rounded for a pretty legend or Pretty legend (rounded equal intervals)';
 $ec_lang['lpn_color_mode_log']='Logarithmic';
-$ec_lang['lpn_color_mode_pressure']='Pressure';
 $ec_lang['lpn_color_mode_manual']='Manual';
 
 // ---- LIBRARIES (ROADMAP Tasks 462 and 460) ---------------------------------------------------
@@ -3586,7 +3562,7 @@ $ec_lang['lpn_color_mode_manual']='Manual';
 // Simulate, Transport, Time selectors."
 //
 // ONE NAME, THREE DOORS: the toolbar button, the Edit menu row and the box's own title all read
-// this key, exactly as lpn_menu_settings serves the Settings box's three.
+// this key, exactly as lpn_tool_settings serves the Settings box's three.
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='Libraries';
@@ -3806,7 +3782,6 @@ $ec_lang['lpn_library_rule_add']='Add a rule';
 $ec_lang['lpn_library_rule_tip']='One clause per line. Descriptions with examples in "ALL CAPS" follow. Line 1: Name of rule, "RULE 1". Line 2: A condition, "IF TANK 2 LEVEL BELOW 17.1". Line 3: An action, "THEN PUMP 9 STATUS IS OPEN". Line 4: A priority, "PRIORITY 1". Add "AND" or "OR" lines to test more than one thing, and "ELSE" lines to say what to do when the test fails. A condition can read LEVEL, HEAD, GRADE, PRESSURE or DEMAND on a node, FLOW, STATUS or SETTING on a link, or TIME and CLOCKTIME on SYSTEM. Use consistent project units. Keywords must be in English.';
 $ec_lang['lpn_library_rule_ok']='✓ This rule was read';
 $ec_lang['lpn_library_rule_bad']='⚠ This rule could not be read';
-$ec_lang['lpn_library_rule_missing']='⚠ This network has nothing called {id}';
 // PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
 // for the entire project it is in Settings") drawn on its other side. Without it a pattern you
 // author can only be used by making it the default one, which is not what a library is for.
@@ -4046,8 +4021,6 @@ $ec_lang['lpn_ff_mode_none']='None';
 $ec_lang['lpn_ff_col_solves']='Runs';
 // Which criterion the junction broke while drawing the required flow. A junction that broke nothing
 // shows a dash, never one of these words.
-$ec_lang['lpn_ff_limit_pressure']='Pressure';
-$ec_lang['lpn_ff_limit_velocity']='Velocity';
 $ec_lang['lpn_ff_limit_both']='Pressure and velocity';
 $ec_lang['lpn_ff_atleast']='more than {flow}';
 $ec_lang['lpn_ff_affect_node']='{id} drops to {pressure}';
