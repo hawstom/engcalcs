@@ -40,8 +40,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Opened {name} as the original, moved to a new place. Save now writes to this file.
   @@ NEEDS RULING
 - **`lpn_copy_opened`**
-  > Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.
-  _Ruled OK 2026-10-01._
+  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  _Ruled 2026-10-01: Wording change per this. This is good._
 - **`lpn_copy_original`**
   > Original; keep same lock
   _Ruled OK 2026-10-01._
@@ -53,7 +53,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**7 still to read**, of 46 new keys across 10 unmerged branch(es).
+**12 still to read**, of 53 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -64,7 +64,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`e71a8f6b`) — 13 new, 4 to read @@ NEEDS RULING
+### feat/bentley-interop (`5b8f7cee`) — 13 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -88,14 +88,14 @@ build for that would be a gate nobody keeps. Refresh it with
   > Text
   _Ruled OK 2026-10-01._
 - **`lpn_alt_cat_topology`**
-  > Active topology
-  @@ NEEDS RULING
+  > Asset activation
+  _Ruled OK 2026-10-01._
 - **`lpn_alt_cat_userdata`**
   > Custom properties
   _Ruled OK 2026-10-01._
 - **`lpn_alt_note`**
-  > Read only. Base uses the Base alternative of every category. A scenario gets its own alternative in a category, a child of the Base one, once it holds a value of its own there. The number is how many values it holds.
-  @@ NEEDS RULING
+  > Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.
+  _Ruled OK 2026-10-01._
 - **`lpn_alt_title`**
   > Alternatives preview
   @@ NEEDS RULING
@@ -103,13 +103,17 @@ build for that would be a gate nobody keeps. Refresh it with
   > Basic mode
   _Ruled OK 2026-10-01._
 - **`lpn_scenario_basic_tip`**
-  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives table, which shows how those values are grouped by category.
+  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
+  _Ruled OK 2026-10-01._
+
+### feat/criticality (`3c594bbd`) — 31 new, 8 to read @@ NEEDS RULING
+
+- **`lpn_analyze_menu`**
+  > Analyze
   @@ NEEDS RULING
-
-### feat/copy-lock (`3f84f0fb`) — adds no English strings
-
-### feat/criticality (`77bfe930`) — 26 new, 3 to read @@ NEEDS RULING
-
+- **`lpn_analyze_menu_tip`**
+  > Analyses that run the network many times over on a copy: fire flow at each junction, and the loss of each pipe, pump, and valve.
+  @@ NEEDS RULING
 - **`lpn_crit_baseline_below`**
   > Junctions already below it with nothing broken: {n}. They are not counted.
   _Ruled OK 2026-10-01._
@@ -188,6 +192,26 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_crit_working`**
   > Working: {done} of {total} assets.
   _Ruled OK 2026-10-01._
+- **`lpn_ff_design_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_ff_design_off`**
+  > None
+  @@ NEEDS RULING
+- **`lpn_ff_design_selected`**
+  > Selected
+  @@ NEEDS RULING
+
+### feat/desktop (`c45d847e`) — adds no English strings
+
+### feat/graph-menu (`0a8db639`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_graphs_menu`**
+  > Graphs
+  @@ NEEDS RULING
+- **`lpn_graphs_menu_tip`**
+  > Graphs of the network: the profile along a route, a property against time, and the distribution of a property.
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -211,14 +235,14 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/property-graph (`0bd3179b`) — 4 new, all ruled
+### feat/property-graph (`ac73a7b9`) — 4 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_pgraph_head_gain`**
   > Head gain
   _Ruled OK 2026-10-01._
 - **`lpn_pgraph_head_gain_tip`**
-  > The pump's head gain from suction to discharge, plotted positive. EPANET reports it as a negative head loss, as do the Tables and the map label.
-  _Ruled OK 2026-10-01._
+  > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
+  @@ NEEDS RULING
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.
   _Ruled OK 2026-10-01._
