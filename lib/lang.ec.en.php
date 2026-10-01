@@ -2288,7 +2288,7 @@ $ec_lang['lpn_notes_6_term']='Table columns help';
 $ec_lang['lpn_notes_6_def']='<table class="lpn-notes-table"><tbody><tr><td>Select column</td><td>Click heading</td></tr><tr><td>Add or extend column selection</td><td>Ctrl+click or Shift+click another heading</td></tr><tr><td>Move (reorder) selected column(s)</td><td>Drag or use Manage columns… in right-click or ⋮ menu</td></tr><tr><td>Menu ⋮ and sort arrow.</td><td>Hover a heading\'s top corner, or select or Tab into a heading</td></tr><tr><td>Hide, Show all, or Manage visibility and order</td><td>Right-click heading or ⋮ menu in heading top right corner</td></tr><tr><td>Sort by column</td><td>Arrow icon in heading top right corner</td></tr><tr><td>Paste as new rows at end of table</td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V</td></tr></tbody></table>';
 $ec_lang['lpn_notes_7_term']='Table keyboard shortcuts';
 // R-311, his own row: "Ctrl+Shift+V | Paste as new rows at end of table".
-$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+Enter</td><td>Fill the selection with the active cell\'s value.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Switch to the next or previous table or graph tab.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>';
+$ec_lang['lpn_notes_7_def']='<table class="lpn-notes-table"><tbody><tr><td>Arrow keys</td><td>Navigate.</td></tr><tr><td>Tab, Enter</td><td>Finish entry and navigate across / down one cell.</td></tr><tr><td>Shift+Tab, Shift+Enter</td><td>Navigate backward.</td></tr><tr><td>Shift+arrow keys</td><td>Extend the selection.</td></tr><tr><td>Ctrl+C</td><td>Copy the selection.</td></tr><tr><td>Ctrl+D</td><td>Fill the selection down from its top row.</td></tr><tr><td>Ctrl+Enter</td><td>Fill the selection with the active cell\'s value.</td></tr><tr><td>Ctrl+A</td><td>Select the whole table.</td></tr><tr><td>Ctrl+Shift+V</td><td>Paste as new rows at end of table.</td></tr><tr><td>Ctrl+Shift+PageDown, Ctrl+Shift+PageUp</td><td>Switch to the next or previous tab, whether a table or a graph.</td></tr><tr><td>Delete</td><td>Clear a cell.</td></tr><tr><td>F2</td><td>Open a cell to edit it.</td></tr><tr><td>Esc</td><td>Cancel an edit.</td></tr></tbody></table>';
 // COLOR BAND LIMITS ARE FROZEN, NOT LIVE (Task 448). Tom, 2026-08-19: *"colors are subconsciously
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
@@ -2922,17 +2922,17 @@ $ec_lang['lpn_scenario_push_none']='No scenario has a value of its own for any o
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. Flow test: Static';
-$ec_lang['lpn_scenario_preset_flow_static_tip']='A hydrant flow test with no hydrant flowing. Its pressures are the static readings to compare with 2. Flow test: Mid and 3. Flow test: Max.';
+$ec_lang['lpn_scenario_preset_flow_static_tip']='Flow test calibration for a design network at 0 flow. In this scenario, set the demand at all junctions to 0.';
 $ec_lang['lpn_scenario_preset_flow_mid']='2. Flow test: Mid';
-$ec_lang['lpn_scenario_preset_flow_mid_tip']='A hydrant flow test at the first residual reading. In this scenario, add the flow measured at the flowing hydrant to the demand of its junction, then compare the pressures with 1. Flow test: Static. Nothing flows until you do.';
+$ec_lang['lpn_scenario_preset_flow_mid_tip']='Flow test calibration for a design network at the first flow reported. In this scenario, set the demand at the flowing junction to the first flow measured, and the demand at all other junctions to 0.';
 $ec_lang['lpn_scenario_preset_flow_max']='3. Flow test: Max';
-$ec_lang['lpn_scenario_preset_flow_max_tip']='A hydrant flow test at the highest residual reading. In this scenario, add the flow measured at the flowing hydrant to the demand of its junction, then compare the pressures with 1. Flow test: Static. Nothing flows until you do.';
+$ec_lang['lpn_scenario_preset_flow_max_tip']='Flow test calibration for a design network at the max flow reported. In this scenario, set the demand at the flowing junction to the max flow measured, and the demand at all other junctions to 0.';
 $ec_lang['lpn_scenario_preset_average_day']='4. Average Day';
 $ec_lang['lpn_scenario_preset_average_day_tip']='Demand multiplier 1: every demand as entered, which is taken to be average day demand.';
 $ec_lang['lpn_scenario_preset_max_day']='5. Max Day';
-$ec_lang['lpn_scenario_preset_max_day_tip']='Demand multiplier 2.0 times average day, a starting value. Most systems fall between 1.2 and 3.0 (National Research Council, 2006). Set your own system\'s in Settings, Calculation, Hydraulics, Demand multiplier.';
+$ec_lang['lpn_scenario_preset_max_day_tip']='Demand multiplier 2.0 times average day, a placeholder value. Most systems fall between 1.2 and 3.0 (National Research Council, 2006). Set your own system\'s in Settings, Calculation, Hydraulics, Demand multiplier.';
 $ec_lang['lpn_scenario_preset_peak_hour']='6. Peak hour';
-$ec_lang['lpn_scenario_preset_peak_hour_tip']='Demand multiplier 3.0 times average day, a starting value. Most systems fall between 3.0 and 6.0 (National Research Council, 2006). Set your own system\'s in Settings, Calculation, Hydraulics, Demand multiplier.';
+$ec_lang['lpn_scenario_preset_peak_hour_tip']='Demand multiplier 3.0 times average day, a placeholder value. Most systems fall between 3.0 and 6.0 (National Research Council, 2006). Set your own system\'s in Settings, Calculation, Hydraulics, Demand multiplier.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Fire plus max day';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Max day demand (multiplier 2.0). Run Fire flow analysis in this scenario: it adds the fire flow at each junction on top of this demand.';
 $ec_lang['lpn_delete_drops_overrides']='Deleting this asset also throws away {n} values that your scenarios hold for it. Continue?';
@@ -3759,6 +3759,9 @@ $ec_lang_syn['lpn_scenario_push_tip']='labels here = the map labels (Settings, S
 $ec_lang_syn['lpn_labels_priority_node_tip']='more like neighboring nodes = numerically closer to the neighbors\' values | avoid: similar in kind';
 $ec_lang_syn['lpn_find_op_gt']='greater than, more than, exceeding | avoid: spatially above, higher on the map';
 $ec_lang_syn['lpn_find_op_lt']='less than | avoid: spatially below, lower on the map';
+// Tom, 2026-09-30, ruling sprint 2026-09-30-golf item 1: _syn = "All junctions" / "Selected junctions".
+$ec_lang_syn['lpn_ff_all']='All junctions | a pull-down option under Junctions to test; agrees with junctions, plural. The Design check pull-down reuses it, where it means all pipes and other junctions';
+$ec_lang_syn['lpn_ff_selected']='Selected junctions | a pull-down option under Junctions to test; agrees with junctions, plural. The Design check pull-down reuses it, where it means the selected pipes and junctions';
 $ec_lang['lpn_fitting_exit']='Exit';
 // THE ONE ROW THAT IS NOT THE MANUAL\'S: a fitting the table does not carry, whose coefficient the
 // user states. Without it the picker would quietly refuse every fitting nobody could source.
@@ -3941,7 +3944,7 @@ $ec_lang['lpn_ff_scope_tip']='Choose the set before you run. Testing every junct
 $ec_lang['lpn_ff_all']='All';
 $ec_lang['lpn_ff_selected']='Selected';
 $ec_lang['lpn_ff_no_junctions']='This project has no junctions yet, so there is nothing to test.';
-$ec_lang['lpn_ff_no_selection']='No junction is selected. Choose one on the map, or select All.';
+$ec_lang['lpn_ff_no_selection']='No junctions are selected. Select junctions or select the All option.';
 $ec_lang['lpn_ff_skipped']='{n} selected elements are not junctions, so they were not tested.';
 $ec_lang['lpn_ff_required']='Required fire flow';
 $ec_lang['lpn_ff_required_tip']='The flow your fire code or your fire authority requires at a hydrant. Each junction is tested against this number unless it carries a required fire flow of its own.';
@@ -3951,7 +3954,7 @@ $ec_lang['lpn_ff_residual']='Residual pressure to hold';
 $ec_lang['lpn_ff_residual_tip']='The pressure the junction must still hold while delivering the fire flow. AWWA M31 and NFPA 291 use 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Design check (effect on system)';
 $ec_lang['lpn_ff_design_tip']='A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation.';
-$ec_lang['lpn_ff_design_no_selection']='The design check scope is set to Selected, but no assets are selected. Select assets or select All.';
+$ec_lang['lpn_ff_design_no_selection']='The design check scope is set to Selected, but no assets are selected. Select assets or select the All option.';
 $ec_lang['lpn_ff_minpressure']='Lowest pressure allowed elsewhere';
 $ec_lang['lpn_ff_minpressure_tip']='A junction that falls below this while another one is drawing its fire flow is reported as a design issue.';
 $ec_lang['lpn_ff_maxvelocity']='Highest velocity allowed';
