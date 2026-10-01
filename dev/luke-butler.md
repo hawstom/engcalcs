@@ -28,6 +28,16 @@ it and logs contact with him, newest first.
 
 ## Contact log
 
+- **2026-10-01, later: EPANET-LSX.** *"we've released an extension to EPANET called EPANET-LSX. It
+  adds the Lua scripting language and allows you to do more advanced controls. We're using it to
+  add VSP and others into epanet-js ... The intention is to get these top of objects in EPANET 2.4
+  but for now it's a bit of a stopgap."* "top of" is read as "types of" (unconfirmed).
+  `github.com/epanet-js/EPANET-LSX`, MIT, v0.2.2 of 2026-09-30: a patched OWA-EPANET with Lua in an
+  `.inp` `[SCRIPT]` section (hooks per hydraulic step). Native builds only, no WebAssembly. Its patch
+  0002 stops stock EPANET's error 299 on an unknown section, so a `[SCRIPT]` file fails in stock
+  EPANET. Ours imports it, reports the section as unread, carries it whole and writes it back; our
+  runs ignore it.
+
 - **2026-10-01, Tom's ruling on how we contribute:** *"My take-away is that the best way we can
   contribute is by white papers."* Ideas reach him as a paper, pointed to from an issue or their
   roadmap; never as a pull request.
