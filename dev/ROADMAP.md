@@ -542,6 +542,14 @@ the block.
   touch the network. As such, our demand factors are similar and equivalent, but not the same UX or
   data state."* Our per-scenario multiplier changes the data; this runs on a copy, like Fire flow.
   Open: what it reports (a map of the adjusted run, or a table like Fire flow's).
+- 75|755| **Per-scenario calculation options: run type and duration first.**
+  Tom, 2026-09-30: *"A Demand Multiplier column with the alternatives? What about other settings?"*
+  Mary: WaterGEMS keeps run type, duration, steps, friction method, demand adjustments, PDD and
+  tolerances in per-scenario Calculation Options; InfoWater ties a simulation-options set to each
+  scenario. Ours: only the demand multiplier is per scenario. Sue's ranking: steady vs 24-hour run and
+  duration next, quality mode later; friction method, units, accuracy and trials never vary silently
+  between compared scenarios (state them once in the report header). Show as plain columns in the
+  Alternatives preview, blank meaning inherits, not named sets, until scenarios number in the dozens.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
