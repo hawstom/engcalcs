@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 2153,
-        "delta_key_count": 1,
+        "expected_key_count": 2160,
+        "delta_key_count": 8,
         "exempt_key_count": 42,
         "exempt_keys": [
             "calc_units_us",
@@ -721,12 +721,138 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_copy_title": "Mark file as new copy?",
+        "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
+        "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
+        "lpn_copy_original": "Original; keep same lock",
+        "lpn_copy_copy": "A copy; make new lock",
+        "lpn_copy_kept_link": "Opened {name} as the original, moved to a new place. Save now writes to this file.",
+        "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
         "lpn_field_lat_abbr": "Lat"
     },
     "keys": {
+        "lpn_copy_title": "Mark file as new copy?",
+        "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
+        "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
+        "lpn_copy_original": "Original; keep same lock",
+        "lpn_copy_copy": "A copy; make new lock",
+        "lpn_copy_kept_link": "Opened {name} as the original, moved to a new place. Save now writes to this file.",
+        "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
         "lpn_field_lat_abbr": "Lat"
     },
     "key_context": {
+        "lpn_copy_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_open_cancelled",
+                    "value": "Quel file non è stato aperto, e qui non è cambiato nulla. Qualcun altro lo ha ancora aperto.",
+                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} vorrebbe modificare questo file. Quando sei pronto, salva il tuo lavoro e usa File, Chiudi per cederlo.",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
+        "lpn_copy_body": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_open_cancelled",
+                    "value": "Quel file non è stato aperto, e qui non è cambiato nulla. Qualcun altro lo ha ancora aperto.",
+                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} vorrebbe modificare questo file. Quando sei pronto, salva il tuo lavoro e usa File, Chiudi per cederlo.",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
+        "lpn_copy_body_nodate": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_open_cancelled",
+                    "value": "Quel file non è stato aperto, e qui non è cambiato nulla. Qualcun altro lo ha ancora aperto.",
+                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} vorrebbe modificare questo file. Quando sei pronto, salva il tuo lavoro e usa File, Chiudi per cederlo.",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
+        "lpn_copy_original": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_open_cancelled",
+                    "value": "Quel file non è stato aperto, e qui non è cambiato nulla. Qualcun altro lo ha ancora aperto.",
+                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} vorrebbe modificare questo file. Quando sei pronto, salva il tuo lavoro e usa File, Chiudi per cederlo.",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
+        "lpn_copy_copy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_open_cancelled",
+                    "value": "Quel file non è stato aperto, e qui non è cambiato nulla. Qualcun altro lo ha ancora aperto.",
+                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} vorrebbe modificare questo file. Quando sei pronto, salva il tuo lavoro e usa File, Chiudi per cederlo.",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
+        "lpn_copy_kept_link": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_open_cancelled",
+                    "value": "Quel file non è stato aperto, e qui non è cambiato nulla. Qualcun altro lo ha ancora aperto.",
+                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} vorrebbe modificare questo file. Quando sei pronto, salva il tuo lavoro e usa File, Chiudi per cederlo.",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
+        "lpn_copy_opened": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_lock_open_cancelled",
+                    "value": "Quel file non è stato aperto, e qui non è cambiato nulla. Qualcun altro lo ha ancora aperto.",
+                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} vorrebbe modificare questo file. Quando sei pronto, salva il tuo lavoro e usa File, Chiudi per cederlo.",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
         "lpn_field_lat_abbr": {
             "reason": "equal_to_english",
             "current_value": "Lat",

@@ -7,28 +7,23 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**115 open tasks.** Next (100): 16 · Soon (75): 21 · Someday (50): 44 · Maybe (25): 15 · Parked (5): 19
+**107 open tasks.** Next (100): 11 · Soon (75): 18 · Someday (50): 44 · Maybe (25): 15 · Parked (5): 19
 
-## 100 — Next (16)
+## 100 — Next (11)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 637 — A Graph button on the Properties box.
+- Task 640 — Graphs: the umbrella, a submenu under Water holding five plots.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - Task 680 — Keep a project's drawing instead of rebuilding it on every tab switch.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
-- Task 690 — Spreadsheet editing in the tables: the long project nobody has opened.
-- Task 718 — File menu: Recents just above Close, and an Import submenu.
 - Task 737 — Coined names for interface elements, so every language names each one once.
-- ! Task 738 — A Find filter that stays standing, or a snapshot, by the visitor's choice.
 - Task 741 — The infinite map: generated networks for the label bench.
-- Task 743 — Ctrl+Shift+PageDown reaches the graph tabs, not only the tables.
-- Task 745 — Help menu in three groups, and a Tables and Hotkeys box.
-- Task 746 — Fire flow dialog: one All/Selected choice for each of its two scopes.
 - Task 747 — A copied project file shares its original's lock.
-- Task 750 — Ready-made scenarios in every new project.
 - Task 751 — Criticality analysis: break each asset in turn and report.
+- Task 754 — On-the-fly demand adjustment: an analysis that scales demands on a copy.
 
-## 75 — Soon (21)
+## 75 — Soon (18)
 
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
@@ -39,7 +34,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 617 — More map view options, the opacity one having shipped.
 - Task 623 — File loss judged only by people whose files are throwaway.
 - Task 639 — Layers: the first heading under Map and page.
-- Task 640 — Graphs: the umbrella, a submenu under Water holding five plots.
 - ! Task 701 — The panel guard is blind to forty sites, and the bottom panel is one.
 - Task 710 — Audit the 57 raw alert and confirm dialogs.
 - Task 714 — Theming: colour tokens first, then a Light/Dark choice in Settings.
@@ -47,8 +41,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 748 — Keyboard menus: arrow keys, Enter, Escape and the fly-outs.
 - Task 749 — Read Bentley WaterCAD/WaterGEMS models.
 - Task 752 — A scenario workbook: the scenario list and its data as spreadsheet tabs.
-- Task 753 — [H] · · "Activation" as our word for EPANET's active status.
-- Task 754 — On-the-fly demand adjustment: an analysis that scales demands on a copy.
 - Task 755 — Per-scenario calculation options: run type and duration first.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 
@@ -143,5 +135,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-106 of 115 titles are within 4–12 words. `!` marks the rest;
+99 of 107 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
