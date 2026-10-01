@@ -154,7 +154,14 @@ has an explicit tree" is read from its data.
 **Unchecked shows one thing only**: a read-only table, one row per scenario and one column per
 category, naming the alternative each scenario uses in each category and how many local values it
 holds. It is the minimum honest view of a model that otherwise has no screen, **and Tom may strike
-it.** No editing, no Bentley import or export, no Google Sheets: the Advanced UX is not designed.
+it.**
+
+**The Demand multiplier is a calculation option, shown beside the alternatives** (Tom, 2026-09-30:
+*"Demand multiplier: OK. A Demand Multiplier column with the alternatives?"*; Mary and Sue: Bentley
+keeps demand adjustments in Calculation Options, not alternatives). It is the last column, after a
+divider, so it reads as set apart from the categories. Base shows the project's value; a scenario
+shows its own, and blank means it inherits the project's. Task 755 covers more per-scenario options
+later. No editing, no Bentley import or export, no Google Sheets: the Advanced UX is not designed.
 
 ## The code
 

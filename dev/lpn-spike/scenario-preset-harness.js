@@ -66,7 +66,7 @@ const TOM = KEYS.map((k) => strings[k]);
 const WANT_DM = { average_day: 1, max_day: 2, peak_hour: 3, fire_max_day: 2 };
 
 function menuNames() {
-	return L.scenarioMenuRows().filter((r) => !r.separator && !r.icon && r.fn && /^(✓|\s)\s/.test(r.label))
+	return L.scenarioMenuRows().filter((r) => r.scenarioId !== undefined)
 		.map((r) => r.label.slice(2).replace(/ \(\d+\)$/, ''));
 }
 function checkPresets(where) {
@@ -75,7 +75,13 @@ function checkPresets(where) {
 	const names = menuNames();
 	check(JSON.stringify(names.slice(1)) === JSON.stringify(TOM), where + ': the menu lists them in Tom\'s order',
 		JSON.stringify(names));
-	const tips = L.scenarioMenuRows().filter((r) => r.tip && r.fn && /^(✓|\s)\s/.test(r.label || ''));
+	// The Basic mode row is a command, so it sits after the separator with the others.
+	{
+		const all = L.scenarioMenuRows(), firstSep = all.findIndex((r) => r.separator);
+		check(all.slice(0, firstSep).every((r) => r.scenarioId !== undefined) && all.slice(firstSep).every((r) => r.scenarioId === undefined),
+			where + ': scenarios come before the first separator, the commands (Basic mode among them) after');
+	}
+	const tips = L.scenarioMenuRows().filter((r) => r.scenarioId !== undefined && r.tip);
 	check(tips.length === 7, where + ': each of the seven carries its tip', tips.length + ' tips');
 	sc.forEach(function (s) {
 		if (s.isBase) { return; }

@@ -4993,6 +4993,9 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, rows = [], scn = activeScenario();
 		scenariosForDisplay().forEach(function (s) {
 			rows.push({
+				// scenarioId is what makes a row a scenario, so a reader of the rows (the harness)
+				// never has to tell one from a command by its position or its label.
+				scenarioId: s.id,
 				// A tick on the row you are already in, the way every view menu in this file's
 				// neighbourhood marks a current choice. No icon column entry, so the marker cannot
 				// be mistaken for a command's glyph.
@@ -57706,12 +57709,23 @@ var EngCalcs = EngCalcs || {};
 	}
 	// One row per scenario, one column per category. A cell names the alternative: Base's own word
 	// for a Base alternative, the scenario's name and its count of local values for its own.
+	// tbody -> its table -> thead -> the heading row -> the last heading.
+	function markLastHeading(tbody, cls) {
+		var hr = tbody.parentNode.children[0].children[0], th = hr.children[hr.children.length - 1];
+		th.className += ' ' + cls;
+	}
 	function rebuildAlternativesTable() {
 		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_alt_report'), body,
 			baseWord = pc.lpn_scenario_base || 'Base';
 		if (!host) { return; }
 		host.innerHTML = '';
-		body = ffTable(host, [pc.lpn_scenario_label || 'Scenario'].concat(LPN_ALT_CATEGORIES.map(altCategoryLabel)));
+		// **THE DEMAND MULTIPLIER IS A CALCULATION OPTION, NOT AN ALTERNATIVE** (Tom, 2026-09-30:
+		// *"Demand multiplier: OK. A Demand Multiplier column with the alternatives?"*; Mary and Sue
+		// advised it stay a per-scenario option, as Bentley keeps it in Calculation Options). So it
+		// is the last column, after a divider, and its heading carries the option's own tip.
+		body = ffTable(host, [pc.lpn_scenario_label || 'Scenario'].concat(LPN_ALT_CATEGORIES.map(altCategoryLabel),
+			[[pc.bpn_demand_mult || 'Demand multiplier', pc.lpn_settings_demand_multiplier_tip || '']]));
+		markLastHeading(body, 'lpn-alt-calcopt');
 		scenariosForDisplay().forEach(function (s) {
 			var tr = ffEl('tr', null, null, body), alts = alternativesOf(s);
 			ffCell(tr, scenarioDisplayName(s));
@@ -57719,6 +57733,11 @@ var EngCalcs = EngCalcs || {};
 				var a = alts[cat];
 				ffCell(tr, a.isBase ? baseWord : scenarioDisplayName(s) + ' (' + a.count + ')');
 			});
+			// Base shows the project's value (1 when it states none); a scenario shows its own, and
+			// BLANK means it inherits the project's (Sue).
+			var dm = s.isBase ? (settings.hydraulics || {}).demandMultiplier : s.demandMultiplier;
+			if (s.isBase && !(typeof dm === 'number' && isFinite(dm))) { dm = 1; }
+			ffCell(tr, (typeof dm === 'number' && isFinite(dm)) ? String(dm) : '', 'lpn-alt-calcopt');
 		});
 		ffEl('p', 'lpn-ff-note', pc.lpn_alt_note, host);
 	}
