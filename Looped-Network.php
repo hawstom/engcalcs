@@ -2841,6 +2841,8 @@ EngCalcs.pageConfig = {
 	      // these through its `pc` alias, so dev/scripts/pageconfig_check.php holds this list
 	      // against the file. Each site also carries its English literal as the fallback. ?>
 	lpn_ff_menu: <?=json_encode($ec_lang['lpn_ff_menu'])?>,
+	lpn_analyze_menu: <?=json_encode($ec_lang['lpn_analyze_menu'])?>,
+	lpn_analyze_menu_tip: <?=json_encode($ec_lang['lpn_analyze_menu_tip'])?>,
 	lpn_ff_menu_tip: <?=json_encode($ec_lang['lpn_ff_menu_tip'])?>,
 	lpn_ff_title: <?=json_encode($ec_lang['lpn_ff_title'])?>,
 	lpn_ff_intro: <?=json_encode($ec_lang['lpn_ff_intro'])?>,
@@ -2858,6 +2860,9 @@ EngCalcs.pageConfig = {
 	lpn_ff_residual: <?=json_encode($ec_lang['lpn_ff_residual'])?>,
 	lpn_ff_residual_tip: <?=json_encode($ec_lang['lpn_ff_residual_tip'])?>,
 	lpn_ff_design: <?=json_encode($ec_lang['lpn_ff_design'])?>,
+	lpn_ff_design_off: <?=json_encode($ec_lang['lpn_ff_design_off'])?>,
+	lpn_ff_design_all: <?=json_encode($ec_lang['lpn_ff_design_all'])?>,
+	lpn_ff_design_selected: <?=json_encode($ec_lang['lpn_ff_design_selected'])?>,
 	lpn_ff_design_tip: <?=json_encode($ec_lang['lpn_ff_design_tip'])?>,
 	lpn_ff_design_no_selection: <?=json_encode($ec_lang['lpn_ff_design_no_selection'])?>,
 	lpn_ff_minpressure: <?=json_encode($ec_lang['lpn_ff_minpressure'])?>,
