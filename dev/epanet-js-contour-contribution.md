@@ -19,10 +19,13 @@ said here about epanet-js. The feature background is not re-derived: it is in
 
 ### The short answer
 
-Yes, mechanically — the repository is public, issues are open, `CONTRIBUTING.md` says outside
-contributions are welcome, and three outside pull requests have been merged. **The licence is the
-catch, not the process:** the code is FSL-1.1-MIT, not FLOSS, and contributing means assigning
-rights to a company.
+**Ideas, yes; code, in practice no.** Luke Butler told Tom directly (logged in
+`dev/luke-butler.md`): *"we don't actually merge in pull request as it can cause issues with who owns
+the right to the code ... Also a bunch of security concerns too. ... if you submitted a PR, we'd most
+likely end up rewriting most of it by hand."* The doors he named are **an issue** and **their
+roadmap**. Tom answered that he would release any contribution to the public domain in writing;
+that answers the ownership reason but not the security one. The `CONTRIBUTING.md` reading below is
+kept as the record and is superseded by his word.
 
 ### Where the source lives
 
@@ -91,7 +94,8 @@ The door was opened immediately before we knocked. Operative text, verbatim:
 **The public repository is a mirror.** "Accepted PRs are closed here and handled manually by the
 Iterating team in our development repository" means our patch would be re-applied by them rather
 than merged; there would be no public review thread and no commit with our name on it in the branch
-that ships. Budget for that, and do not read a closed PR as a rejection.
+that ships. Budget for that, and do not read a closed PR as a rejection. **Luke has since said it
+more plainly** (§1, short answer): a PR would most likely be rewritten by hand.
 
 ### CLA / DCO
 
@@ -638,7 +642,7 @@ public-domain source are not ours to assign to anyone, and a comment is not a pu
 also the highest-value hour in this document: it saves whoever builds it a day of source reading and
 it opens the conversation on the design question rather than on our code.
 
-### Step 1 — the minimal reviewable patch, if it goes further
+### Step 1 — the minimal reviewable patch (retired as a contribution, see §4)
 
 **A pure function library, no UI.** In their layout, a new directory under `libs/map/src` (or a small
 new `libs/contour`), exporting roughly:
@@ -761,8 +765,9 @@ into a user base larger than ours.
    not have today, and if they want the code, the CLA question can be answered on its own merits
    with something concrete on the table.
 
-**Do not open a code pull request before the CLA exists and Tom has read it.** Everything valuable
-in Step 0 and Step 3 happens without one.
+**Do not open a code pull request at all.** Luke has said they would rewrite it by hand (§1), so
+Step 1 below is retired as a contribution; its function and its two tests remain the plan for
+`lpn_`. Everything valuable in Step 0 and Step 3 is an issue, a roadmap post or a conversation.
 
 ---
 

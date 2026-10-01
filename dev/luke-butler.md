@@ -28,9 +28,18 @@ it and logs contact with him, newest first.
 
 ## Contact log
 
-- **2026-10-01, he replied** to an earlier message from Tom (*"sorry I forgot to reply to your
-  message!"*). Tom's message is not on file here. He sent a screen capture of a pressure-surface
+- **2026-10-01, he replied** to Tom's public-domain message below (*"sorry I forgot to reply to
+  your message!"*). He sent a screen capture of a pressure-surface
   proof of concept: head minus a DEM, over an extended-period run. *"The goal is to one day get this
   directly in epanet-js."* What it shows and what it changes for Task 600:
   `dev/epanet-js-contour-contribution.md` §2a, which also lists four questions only he can answer.
   The video is his and is not committed.
+- **Undated, before 2026-10-01: how to contribute.** Luke: *"If you've got an idea, feel free to
+  open up an issue - just be aware we don't actually merge in pull request as it can cause issues
+  with who owns the right to the code and what can be done afterwards with it. Also a bunch of
+  security concerns too. So because of that, if you submitted a PR, we'd most likely end up
+  rewriting most of it by hand. But if you do have an idea you're welcome to share it, or you have a
+  suggestion you can also put it in our roadmap too."* Tom: *"If it's just about IP, I would happily
+  release any contributions to the public domain in writing. If it's about security, I understand.
+  That makes it hard on you, though."* He did not answer that point; his next message was the
+  proof of concept. Consequence: `dev/epanet-js-contour-contribution.md` §1 and §4.
