@@ -3680,8 +3680,6 @@ $ec_lang['lpn_ff_title']='Análise de vazão de incêndio';
 $ec_lang['lpn_ff_intro']='Cada junção, por sua vez, é solicitada a fornecer uma vazão de incêndio além da demanda que já tem. Nada no seu projeto é alterado; todo o cálculo é feito em uma cópia.';
 $ec_lang['lpn_ff_scope']='Junções a testar';
 $ec_lang['lpn_ff_scope_tip']='Escolha o conjunto antes de calcular. Testar todas as junções em um sistema grande pode levar minutos.';
-$ec_lang['lpn_ff_scope_all']='Todas as junções';
-$ec_lang['lpn_ff_scope_selected']='Somente a junção selecionada';
 $ec_lang['lpn_ff_no_junctions']='Este projeto ainda não tem junções, então não há nada para testar.';
 $ec_lang['lpn_ff_no_selection']='Nenhuma junção está selecionada. Escolha uma no mapa, ou teste todas as junções.';
 $ec_lang['lpn_ff_skipped']='{n} elementos selecionados não são junções, então não foram testados.';
@@ -3693,9 +3691,6 @@ $ec_lang['lpn_ff_residual']='Pressão residual a manter';
 $ec_lang['lpn_ff_residual_tip']='A pressão que a junção precisa manter enquanto fornece a vazão de incêndio. A AWWA M31 e a NFPA 291 usam 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Verificação de projeto (efeito no sistema)';
 $ec_lang['lpn_ff_design_tip']='Uma pergunta separada de saber se a junção consegue fornecer a vazão: com essa vazão sendo fornecida ali, algo mais cai abaixo de sua pressão mínima ou ultrapassa seu limite de velocidade? Escolher verificar isso não custa cálculo extra.';
-$ec_lang['lpn_ff_design_off']='Não verificar';
-$ec_lang['lpn_ff_design_all']='Todas as outras junções e todos os trechos';
-$ec_lang['lpn_ff_design_selected']='As junções selecionadas e seus trechos';
 $ec_lang['lpn_ff_design_no_selection']='A verificação de projeto está definida para as junções selecionadas, e nenhuma está selecionada. Selecione algumas no mapa, ou defina Todas as outras junções e todos os trechos.';
 
 

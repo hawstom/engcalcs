@@ -55887,8 +55887,8 @@ var EngCalcs = EngCalcs || {};
 		ffEl('p', 'lpn-ff-note', pc.lpn_ff_intro, host);
 
 		boxes.scope = ffSelect([
-			['all', pc.lpn_ff_scope_all || 'Every junction'],
-			['selected', pc.lpn_ff_scope_selected || 'The selected junctions']
+			['all', pc.lpn_ff_all || 'All'],
+			['selected', pc.lpn_ff_selected || 'Selected']
 		], ask.scope);
 		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', pc.lpn_ff_scope_tip, boxes.scope, '');
 
@@ -55908,18 +55908,19 @@ var EngCalcs = EngCalcs || {};
 		ffRow(host, pc.lpn_ff_residual || 'Residual pressure to hold', pc.lpn_ff_residual_tip,
 			boxes.residual, unitLabel('lpn_u_pressure'));
 
-		// **THE SCOPE OF THE DESIGN SEARCH IS A NAMED SET, CHOSEN BEFORE THE RUN: NONE, ALL, OR
-		// SELECTED** (Tom, 2026-09-28, *"Selection set build: Yes."*). The old middle
-		// value, every other junction without the pipes, went: a blank velocity box already turns
-		// the velocity half off under All (runFireFlowSweep() reads blank as no limit), so it gave
-		// nothing a blank box did not. Selected is the new one -- the impact is checked only at the
-		// junctions selected on the map and the pipes that meet them, which is how a master-plan
-		// appendix scopes it (Sue's and Mary's journals, same day). ffDesignScope() maps the retired
-		// value, should anything still carry it, to All.
+		// **THE DESIGN CHECK'S SCOPE IS A NAMED SET, CHOSEN BEFORE THE RUN: NONE, ALL, OR SELECTED**
+		// (Tom, 2026-09-30: "Replace Design check toggle with a third option 'None All Selected'."),
+		// reverting the 2026-09-29 checkbox-plus-scope split (Task 746) back to the single selector
+		// Task 742 shipped, now in Tom's own shorter words rather than "Do not check" / "All other
+		// junctions and all pipes" / "The selected junctions and their pipes". One row, one control;
+		// the row label keeps naming the concept ("Design check (effect on system)") now that no
+		// checkbox carries it. `ask.design` already carried the 'off'/'all'/'selected' string
+		// underneath the checkbox, and runFireFlowSweep()/ffDesignScope() never changed, so only the
+		// control built here changes back.
 		boxes.design = ffSelect([
-			['off', pc.lpn_ff_design_off || 'Do not check'],
-			['all', pc.lpn_ff_design_all || 'All other junctions and all pipes'],
-			['selected', pc.lpn_ff_design_selected || 'The selected junctions and their pipes']
+			['off', pc.lpn_source_type_none || 'None'],
+			['all', pc.lpn_ff_all || 'All'],
+			['selected', pc.lpn_ff_selected || 'Selected']
 		], ffDesignScope(ask.design));
 		ffRow(host, pc.lpn_ff_design || 'Design check (effect on system)', pc.lpn_ff_design_tip,
 			boxes.design, '');
@@ -56557,7 +56558,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			if (!ids.length) {
 				setNotice(pc.lpn_ff_no_selection ||
-					'No junction is selected. Choose one on the map, or test every junction.');
+					'No junction is selected. Choose one on the map, or select All.');
 				return;
 			}
 		} else {
@@ -56574,7 +56575,7 @@ var EngCalcs = EngCalcs || {};
 			design = ffDesignSelectedSet(model);
 			if (!design.nodes.length && !design.links.length) {
 				setNotice(pc.lpn_ff_design_no_selection ||
-					'The design check is set to the selected junctions, and none is selected. Select some on the map, or set All.');
+					'The design check scope is set to Selected, but no assets are selected. Select assets or select All.');
 				return;
 			}
 			design.minPressure = minPressure > 0 ? minPressure : 0;
