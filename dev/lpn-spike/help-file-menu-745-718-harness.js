@@ -119,7 +119,7 @@ console.log('\n-- Task 745: the Tables and Hotkeys box exists and opens from Hel
 	// Delete, Ctrl+Z, Zoom in and Zoom out -- 13 in all. THE HARNESS THAT COUNTS ROWS, the kind
 	// Task 745 asked to find for the existing shortcuts table (lpn_notes_7, asserted at 12 rows in
 	// help-menu-harness.js); this is that same discipline applied to the new table.
-	report(mapRows === 14, 'the Map table has all fourteen rows', `${mapRows}`);
+	report(mapRows === 13, 'the Map table has all thirteen rows', `${mapRows}`);
 	report(!!mapDefMatch && mapDefMatch[1].indexOf('lpn-notes-table') > 0,
 		'and it is a real <table class="lpn-notes-table">, the same shape as the Tables ones');
 
@@ -139,10 +139,6 @@ console.log('\n-- Task 745: the Tables and Hotkeys box exists and opens from Hel
 	report(/Delete/.test(mapDef), 'Delete is in the Map table');
 	report(/Ctrl\+Z/.test(mapDef) && /if \(k === 'z'\) \{ e\.preventDefault\(\); undo\(\); \}/.test(src),
 		'Ctrl+Z (undo) is in the Map table and still the key the page actually binds');
-	report(/Ctrl\+Y or Ctrl\+Shift\+Z/.test(mapDef) &&
-		/if \(k === 'z' && e\.shiftKey\) \{ e\.preventDefault\(\); redo\(\); return; \}/.test(src) &&
-		/if \(k === 'y' && e\.ctrlKey[^\n]*redo\(\)/.test(src),
-		'Ctrl+Y and Ctrl+Shift+Z (redo) are in the Map table and still the keys the page actually binds');
 	report(/\+ or =/.test(mapDef) && /e\.key === '\+' \|\| e\.key === '='/.test(src),
 		'the zoom-in keys (+ and =) are in the Map table and still the keys the page actually binds');
 	report(/<td>-<\/td>/.test(mapDef) && /e\.key === '-'/.test(src),

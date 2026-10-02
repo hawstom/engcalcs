@@ -53147,6 +53147,9 @@ var EngCalcs = EngCalcs || {};
 		// is NOT taken -- on a Mac it is the browser's History, which nobody pressing it expects to
 		// lose. Shift+Z is checked first: with Shift held, `key` is 'Z', which the plain Ctrl+Z test
 		// below must not read as an undo.
+		// **NOT YET IN THE MAP SHORTCUTS TABLE (lpn_hotkeys_map_def).** A row there is new markup,
+		// and 'lang markup matches English' refuses it until all 26 languages carry the row too --
+		// a translation pass, with Tom's ruling on the English first.
 		if (k === 'z' && e.shiftKey) { e.preventDefault(); redo(); return; }
 		if (k === 'y' && e.ctrlKey && !e.metaKey && !e.shiftKey) { e.preventDefault(); redo(); return; }
 		if (k === 'z') { e.preventDefault(); undo(); }
