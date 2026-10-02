@@ -2988,6 +2988,7 @@ EngCalcs.pageConfig = {
 	lpn_ff_affect_link: <?=json_encode($ec_lang['lpn_ff_affect_link'])?>,
 	lpn_ff_more: <?=json_encode($ec_lang['lpn_ff_more'])?>,
 	lpn_ff_rows_more: <?=json_encode($ec_lang['lpn_ff_rows_more'])?>,
+	lpn_ff_rows_more_links: <?=json_encode($ec_lang['lpn_ff_rows_more_links'])?>,
 	lpn_ff_design_none: <?=json_encode($ec_lang['lpn_ff_design_none'])?>,
 	lpn_ff_design_off_note: <?=json_encode($ec_lang['lpn_ff_design_off_note'])?>,
 	lpn_ff_iso: <?=json_encode($ec_lang['lpn_ff_iso'])?>,

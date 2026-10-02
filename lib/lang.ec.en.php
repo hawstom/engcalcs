@@ -4056,7 +4056,8 @@ $ec_lang['lpn_ff_more']='and {n} more affected';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
 // agree with one noun and would have been wrong at the other call site.
-$ec_lang['lpn_ff_rows_more']='{n} more junctions are not shown.';
+$ec_lang['lpn_ff_rows_more']='Junctions not shown: {n}.';
+$ec_lang['lpn_ff_rows_more_links']='Links not shown: {n}.';
 $ec_lang['lpn_ff_design_none']='Nothing in the chosen set went outside its limits while any junction drew its fire flow.';
 $ec_lang['lpn_ff_design_off_note']='The effect on the rest of the system was not checked in this run.';
 // **WHY IT IS SAID AND NEVER APPLIED, in Tom's words (2026-09-02), and the reason is the MODEL, not

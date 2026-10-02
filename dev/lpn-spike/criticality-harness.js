@@ -38,6 +38,7 @@ const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; },\n" +
 	"\t\trunSolve: runSolve, openBox: openCriticalityBox, wireBox: wireCriticalityBox,\n" +
 	"\t\trunCrit: runCriticality, run: function () { return critRun; },\n" +
+	"\t\tmoreLine: ffMoreLine,\n" +
 	"\t\tsetScope: function (v) { critAsk.scope = v; },\n" +
 	"\t\tsetSkipDead: function (v) { critAsk.skipDeadEnds = v; },\n" +
 	"\t\tdocGuard: function () { return critDocGuard; },\n" +
@@ -314,6 +315,20 @@ function openNet1() {
 	ok('order: most demand lost first, then most junctions below, then most cut off, then error, then none',
 		ord === 'f5,fe,f1,d3,d1,z,e,n', ord);
 	ok('the order is a copy; the run\'s own list is untouched', recs.map((r) => r.id).join() === 'n,e,d1,f1,z,d3,fe,f5');
+
+	// **{n} AFTER A COLON, AND THE RIGHT NOUN** (Tom's 2026-10-02 pass: "1 more junctions are not
+	// shown"). Criticality's hidden rows are links; fire flow's and the lowest pressures' are junctions.
+	console.log('\n--- Rows not shown: one and two, junctions and links ---');
+	[[1, false], [2, false], [1, true], [2, true]].forEach(([n, lk]) => {
+		const host = document.createElement('div');
+		L.moreLine(host, n, lk);
+		const want = (lk ? PC.lpn_ff_rows_more_links : PC.lpn_ff_rows_more).replace('{n}', String(n));
+		ok((lk ? 'links' : 'junctions') + ', n=' + n + ': "' + want + '"', !!want && text(host) === want &&
+			/: \{n\}\.$/.test(lk ? PC.lpn_ff_rows_more_links : PC.lpn_ff_rows_more), text(host));
+	});
+	const none = document.createElement('div');
+	L.moreLine(none, 0, true);
+	ok('nothing hidden: no line', text(none) === '');
 
 	if (fails) { console.log('\n' + fails + ' criticality check(s) FAILED'); process.exit(1); }
 	console.log('\nCriticality harness: all checks passed.');

@@ -56397,13 +56397,19 @@ var EngCalcs = EngCalcs || {};
 				(b.available === undefined ? -1 : b.available);
 		});
 	}
-	function ffMoreLine(parent, hidden) {
+	// `links`: the hidden rows are links (criticality, demand scaling's velocities), not junctions.
+	function ffMoreLine(parent, hidden, links) {
 		var pc = EngCalcs.pageConfig || {};
 		if (hidden <= 0) { return; }
 		// **ITS OWN KEY, NOT the Worst-effect cell's.** One string counted two different nouns
 		// (affected assets there, undisplayed junctions here), which a gendered language cannot
 		// agree with twice. Split 2026-09-02, Task 573 Wave 0.
-		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_rows_more || '{n} more junctions are not shown.')
+		// **{n} AFTER A COLON, SO NO PLURAL HAS TO AGREE WITH IT** -- "1 more junctions are not
+		// shown" was the sentence form's answer for one row. And a links noun of its own, since
+		// criticality's hidden rows were being counted as junctions.
+		ffEl('p', 'lpn-ff-note', (links
+			? (pc.lpn_ff_rows_more_links || 'Links not shown: {n}.')
+			: (pc.lpn_ff_rows_more || 'Junctions not shown: {n}.'))
 			.replace('{n}', String(hidden)), parent);
 	}
 	function rebuildFireFlowReport() {
@@ -56991,7 +56997,7 @@ var EngCalcs = EngCalcs || {};
 			if (rec.below) { critIdsCell(tr, rec.below.map(function (b) { return b.id; })); }
 			else { ffCell(tr, ffReasonText(rec)); }
 		});
-		ffMoreLine(host, sorted.length - shown.length);
+		ffMoreLine(host, sorted.length - shown.length, true);
 	}
 	function updateCriticalityRunBox(done) {
 		var pc = EngCalcs.pageConfig || {};
@@ -57403,6 +57409,7 @@ var EngCalcs = EngCalcs || {};
 			ffCell(tr, ffMaybeQty(x.velocity, 'lpn_u_velocity'));
 			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_velocity'));
 		});
+		ffMoreLine(host, set.velocities.length - Math.min(DS_ROWS, set.velocities.length), true);
 	}
 	// The two tables' sort, fire flow's rule: the same column flips, a new one starts ascending, and
 	// `col: null` is the worst-first order the run gave.
