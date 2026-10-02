@@ -151,7 +151,9 @@ async function main() {
 			const a = document.activeElement;
 			return a ? (a.tagName + '#' + a.id + (a.closest('#lpn_menu_popup, #lpn_menu_popup2') ? ' (in menu)' : '')) : 'null';
 		});
-		const activate = async (barId, label) => {
+		const pcText = (k) => page.evaluate((key) => EngCalcs.pageConfig[key], k);
+		const activate = async (barId, key0) => {
+			const label = await pcText(key0);
 			await page.focus('#' + barId);
 			await key('ArrowDown');
 			const rows = await rowTexts('lpn_menu_list');
@@ -162,10 +164,10 @@ async function main() {
 			await page.waitForTimeout(300);
 			return true;
 		};
-		ok('Map > Zoom to fit found', await activate('lpn_menu_map', 'Zoom to fit'));
+		ok('Map > Zoom to fit found (lpn_tool_zoom_extent)', await activate('lpn_menu_map', 'lpn_tool_zoom_extent'));
 		ok('plain command: menu closed', !(await shown('lpn_menu_popup')));
 		ok('plain command: focus returns to the Map button', await focusId() === 'lpn_menu_map', await focusDesc());
-		ok('Water > Settings found', await activate('lpn_menu_project', 'Settings'));
+		ok('Water > Settings found (lpn_tool_settings)', await activate('lpn_menu_project', 'lpn_tool_settings'));
 		ok('box command: menu closed', !(await shown('lpn_menu_popup')));
 		const inBox = await page.evaluate(() => {
 			const a = document.activeElement, b = document.getElementById('lpn_settings_box');
@@ -175,7 +177,7 @@ async function main() {
 		ok('box command: focus is inside the Settings box', inBox, await focusDesc());
 		console.log('       (box command focus: ' + (inBox ? 'inside the box' : onBar ? 'Water button' : 'elsewhere') + ')');
 		await key('Escape');
-		ok('Edit > Find and replace found', await activate('lpn_menu_edit', 'Find and replace'));
+		ok('Edit > Find and replace found (lpn_find_menu)', await activate('lpn_menu_edit', 'lpn_find_menu'));
 		const inInput = await page.evaluate(() => {
 			const a = document.activeElement;
 			return !!a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.tagName === 'SELECT') && !a.closest('#lpn_menu_popup, #lpn_menu_popup2');
