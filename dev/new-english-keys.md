@@ -31,14 +31,14 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Graphs
   @@ NEEDS RULING
 - **`lpn_graphs_menu_tip`**
-  > Graphs of the network: the profile along a route, a property against time, and the distribution of a property.
+  > Graphs: Profile, Time Series, and Frequency distribution
   @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**60 still to read**, of 129 new keys across 12 unmerged branch(es).
+**62 still to read**, of 128 new keys across 6 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -48,6 +48,30 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/luke-contour (`b8329369`) — 7 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_copy_body`**
+  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_body_nodate`**
+  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_copy`**
+  > A copy; make new lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_kept_link`**
+  > Opened {name} as the original, moved to a new place. Save now writes to this file.
+  @@ NEEDS RULING
+- **`lpn_copy_opened`**
+  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  @@ NEEDS RULING
+- **`lpn_copy_original`**
+  > Original; keep same lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_title`**
+  > Mark file as new copy?
+  _Ruled OK 2026-10-01._
 
 ### feat/bentley-interop (`5b8f7cee`) — 13 new, 1 to read @@ NEEDS RULING
 
@@ -187,7 +211,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selected
   @@ NEEDS RULING
 
-### feat/demand-scaling (`79eb4032`) — 71 new, 48 to read @@ NEEDS RULING
+### feat/demand-scaling (`d69cfc8e`) — 73 new, 50 to read @@ NEEDS RULING
 
 - **`lpn_analyze_menu`**
   > Analyze
@@ -273,6 +297,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_crit_working`**
   > Working: {done} of {total} assets.
   _Ruled OK 2026-10-01._
+- **`lpn_ds_at_time`**
+  > Time step: {time}.
+  @@ NEEDS RULING
 - **`lpn_ds_bad_multiplier`**
   > Type a demand scale of zero or more, such as 1.5.
   @@ NEEDS RULING
@@ -301,10 +328,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Find
   @@ NEEDS RULING
 - **`lpn_ds_found`**
-  > ✓ Every junction keeps {pressure} up to {m} times the demands.
+  > ✓ Every junction keeps {pressure} up to a demand scale of {m}.
   @@ NEEDS RULING
 - **`lpn_ds_found_below`**
-  > ⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to {m} times the demands.
+  > ⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.
   @@ NEEDS RULING
 - **`lpn_ds_head_lowest`**
   > Lowest pressures
@@ -319,13 +346,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Highest velocities
   @@ NEEDS RULING
 - **`lpn_ds_holds_max`**
-  > ✓ Every junction keeps {pressure} up to {max} times the demands, the top of the search.
+  > ✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.
   @@ NEEDS RULING
 - **`lpn_ds_intro`**
   > The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.
   @@ NEEDS RULING
 - **`lpn_ds_lowest_at`**
-  > At {m} times the demands, the lowest pressure is {pressure}, at junction {id}.
+  > At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.
   @@ NEEDS RULING
 - **`lpn_ds_menu`**
   > Demand scaling…
@@ -352,19 +379,19 @@ build for that would be a gate nobody keeps. Refresh it with
   > No junctions are selected. Select junctions, or scale all of them.
   @@ NEEDS RULING
 - **`lpn_ds_nosolve_at`**
-  > At {m} times the demands, the network gave no answer. {reason}
+  > At a demand scale of {m}, the network gave no answer. {reason}
   @@ NEEDS RULING
 - **`lpn_ds_run`**
   > Run
   @@ NEEDS RULING
 - **`lpn_ds_scale_below`**
-  > ⚠ At {m} times the demands, {n} junctions fall below {pressure}.
+  > ⚠ At a demand scale of {m}, junctions below {pressure}: {n}.
   @@ NEEDS RULING
 - **`lpn_ds_scale_ok`**
-  > ✓ At {m} times the demands, every junction keeps {pressure}.
+  > ✓ At a demand scale of {m}, every junction keeps {pressure}.
   @@ NEEDS RULING
 - **`lpn_ds_scaled_selected`**
-  > Only the demands of the {n} selected junctions were scaled.
+  > Only the selected junctions were scaled. Junctions scaled: {n}.
   @@ NEEDS RULING
 - **`lpn_ds_scope`**
   > Demands to scale
@@ -385,10 +412,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > The search was stopped before it found an answer.
   @@ NEEDS RULING
 - **`lpn_ds_skipped`**
-  > {n} selected elements are not junctions, so they were left as they are.
+  > Selected elements that are not junctions, left as they are: {n}.
   @@ NEEDS RULING
 - **`lpn_ds_stale`**
   > The drawing changed, so the demand scaling results were cleared. Run it again.
+  @@ NEEDS RULING
+- **`lpn_ds_time_moved`**
+  > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
   @@ NEEDS RULING
 - **`lpn_ds_title`**
   > Demand scaling
@@ -403,53 +433,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selected
   @@ NEEDS RULING
 
-### feat/desktop (`a7cbb6eb`) — 7 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_copy_body`**
-  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_body_nodate`**
-  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_copy`**
-  > A copy; make new lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_kept_link`**
-  > Opened {name} as the original, moved to a new place. Save now writes to this file.
-  @@ NEEDS RULING
-- **`lpn_copy_opened`**
-  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
-  @@ NEEDS RULING
-- **`lpn_copy_original`**
-  > Original; keep same lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_title`**
-  > Mark file as new copy?
-  _Ruled OK 2026-10-01._
-
-### feat/graph-menu (`0a8db639`) — adds no English strings
-
-### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
-
-- **`lpn_confirm_labels_restore`**
-  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  _Ruled OK 2026-09-23._
-- **`lpn_labels_restore`**
-  > Restore label defaults
-  _Ruled OK 2026-09-23._
-- **`lpn_labels_restore_tip`**
-  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  _Ruled OK 2026-09-23._
-
-### feat/label-placer (`4c2d1634`) — adds no English strings
-
-### feat/label-placer-a (`3483bfd6`) — adds no English strings
-
-### feat/label-placer-b (`c5905432`) — adds no English strings
-
-### feat/label-placer-c (`9a790a3e`) — adds no English strings
-
-### feat/label-placer-d (`129b63c4`) — adds no English strings
+### feat/graph-menu (`f0ff54df`) — adds no English strings
 
 ### feat/property-graph (`2628538a`) — 4 new, 1 to read @@ NEEDS RULING
 

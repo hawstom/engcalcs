@@ -38540,12 +38540,14 @@ var EngCalcs = EngCalcs || {};
 			// flyout containing Profile, Time series, Frequency."*, Task 640). Each row opens its
 			// bottom-pane tab, as the Profile row did. Contour and System flow are not built, so
 			// there are no placeholder rows.
+			// The Profile row has no icon of its own (Tom, 2026-10-02: *"We can remove the graph icon
+			// from the Profile command now."*); the Graphs row keeps it.
 			{
 				icon: 'profile', label: pc.lpn_graphs_menu || 'Graphs', tip: pc.lpn_graphs_menu_tip,
 				submenu: function () {
 					return [
 						{
-							icon: 'profile', label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
+							label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
 							fn: function () { closeMenu(); openPane('profile'); }
 						},
 						{
