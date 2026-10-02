@@ -33,6 +33,28 @@
 #   sh dev/scripts/check_all.sh          # all checks; exit 1 if any blocking check fails
 #   sh dev/scripts/check_all.sh --quiet  # only failures and the summary
 set -u
+
+# CONCURRENCY: up to EC_CHECK_SLOTS suites (default 4) run at once, each in its own slot, and each
+# slot has its own browser lock, so browser harnesses stay one at a time WITHIN a suite but run side
+# by side across suites. The single /tmp/engcalcs-checkall.lock was sized for WSL's 4 cores; on
+# jasmine (24 threads) eight queued suites waited ~28 min apiece at a load average near 1. Measured
+# 2026-10-02: two suites unlocked beside a third took 765 s and 799 s, both green, vs 444 s alone.
+# `flock -o` closes the lock's fd before the suite starts, so a leaked `php -S` child can never
+# hold a slot. Exit 75 means "slot busy" and only ever comes from flock here.
+if [ -z "${EC_CHECK_SLOT:-}" ]; then
+	while :; do
+		i=1
+		while [ "$i" -le "${EC_CHECK_SLOTS:-4}" ]; do
+			EC_CHECK_SLOT=$i EC_BROWSER_LOCK=/tmp/engcalcs-browser.slot$i.lock \
+				flock -o -n -E 75 /tmp/engcalcs-checkall.slot$i sh "$0" "$@"
+			rc=$?
+			[ $rc -ne 75 ] && exit $rc
+			i=$((i + 1))
+		done
+		sleep 5
+	done
+fi
+export EC_CHECK_SLOT EC_BROWSER_LOCK
 DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$DIR/../.." && pwd)"
 QUIET=0

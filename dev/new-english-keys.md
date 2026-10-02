@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**1 still to read on master**, of 13 untranslated keys, of 2166 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**1 still to read on master**, of 7 untranslated keys, of 2160 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,46 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (13, 1 to read @@ NEEDS RULING)
+## lpn_  (7, 1 to read @@ NEEDS RULING)
+
+- **`lpn_copy_body`**
+  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_body_nodate`**
+  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_copy`**
+  > A copy; make new lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_kept_link`**
+  > Opened {name} as the original, moved to a new place. Save now writes to this file.
+  @@ NEEDS RULING
+- **`lpn_copy_opened`**
+  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  _Ruled 2026-10-01: Wording change per this. This is good._
+- **`lpn_copy_original`**
+  > Original; keep same lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_title`**
+  > Mark file as new copy?
+  _Ruled OK 2026-10-01._
+
+---
+
+# Strings waiting on a branch
+
+**12 still to read**, of 53 new keys across 11 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/bentley-interop (`5b8f7cee`) — 13 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -67,49 +106,14 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
   _Ruled OK 2026-10-01._
 
----
+### feat/criticality (`3c594bbd`) — 31 new, 8 to read @@ NEEDS RULING
 
-# Strings waiting on a branch
-
-**4 still to read**, of 40 new keys across 10 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### feat/bentley-interop (`6ef7483d`) — adds no English strings
-
-### feat/copy-lock (`4e1801df`) — 7 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_copy_body`**
-  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_body_nodate`**
-  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_copy`**
-  > A copy; make new lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_kept_link`**
-  > Opened {name} as the original, moved to a new place. Save now writes to this file.
+- **`lpn_analyze_menu`**
+  > Analyze
   @@ NEEDS RULING
-- **`lpn_copy_opened`**
-  > Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_original`**
-  > Original; keep same lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_title`**
-  > Mark file as new copy?
-  _Ruled OK 2026-10-01._
-
-### feat/criticality (`77bfe930`) — 26 new, 3 to read @@ NEEDS RULING
-
+- **`lpn_analyze_menu_tip`**
+  > Analyses that run the network many times over on a copy: fire flow at each junction, and the loss of each pipe, pump, and valve.
+  @@ NEEDS RULING
 - **`lpn_crit_baseline_below`**
   > Junctions already below it with nothing broken: {n}. They are not counted.
   _Ruled OK 2026-10-01._
@@ -188,6 +192,26 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_crit_working`**
   > Working: {done} of {total} assets.
   _Ruled OK 2026-10-01._
+- **`lpn_ff_design_all`**
+  > All
+  @@ NEEDS RULING
+- **`lpn_ff_design_off`**
+  > None
+  @@ NEEDS RULING
+- **`lpn_ff_design_selected`**
+  > Selected
+  @@ NEEDS RULING
+
+### feat/desktop (`c45d847e`) — adds no English strings
+
+### feat/graph-menu (`0a8db639`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_graphs_menu`**
+  > Graphs
+  @@ NEEDS RULING
+- **`lpn_graphs_menu_tip`**
+  > Graphs of the network: the profile along a route, a property against time, and the distribution of a property.
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -211,14 +235,14 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/property-graph (`0bd3179b`) — 4 new, all ruled
+### feat/property-graph (`ac73a7b9`) — 4 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_pgraph_head_gain`**
   > Head gain
   _Ruled OK 2026-10-01._
 - **`lpn_pgraph_head_gain_tip`**
-  > The pump's head gain from suction to discharge, plotted positive. EPANET reports it as a negative head loss, as do the Tables and the map label.
-  _Ruled OK 2026-10-01._
+  > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
+  @@ NEEDS RULING
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.
   _Ruled OK 2026-10-01._
