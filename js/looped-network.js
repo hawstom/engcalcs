@@ -37034,10 +37034,22 @@ var EngCalcs = EngCalcs || {};
 		// A row that ran a command and opened nothing focusable leaves focus on a hidden button;
 		// give it back to the opener.
 		var t = e.target, opener = openMenuAnchor;
+		var boxVisible = function (id) { var b = document.getElementById(id); return !!b && b.getClientRects().length > 0; };
+		var boxesBefore = ESCAPE_SCOPED_BOXES.filter(boxVisible);
 		if (t && t.closest && t.closest('#lpn_menu_popup, #lpn_menu_popup2') && opener) {
 			setTimeout(function () {
+				// The closed menu's row still holds focus until the browser's next focus fix-up, so
+				// "dropped" means body, or a control inside either closed menu panel.
 				var a = document.activeElement;
-				if ((!a || a === document.body) && opener.isConnected) { opener.focus(); }
+				var dropped = !a || a === document.body || !!(a.closest && a.closest('#lpn_menu_popup, #lpn_menu_popup2'));
+				var still = document.getElementById('lpn_menu_popup');
+				if (still && still.style.display === 'block') { return; }   // a fly-out opened; keys own focus
+				if (!dropped) { return; }
+				// A command that opened a box: focus its first control. Otherwise the opener.
+				var opened = ESCAPE_SCOPED_BOXES.filter(function (id) { return boxVisible(id) && boxesBefore.indexOf(id) < 0; })[0];
+				var first = opened && document.getElementById(opened).querySelector(
+					'input:not([type=hidden]):not(:disabled), select:not(:disabled), textarea:not(:disabled), button:not(:disabled), [tabindex]:not([tabindex="-1"])');
+				if (first) { first.focus(); } else if (opener.isConnected) { opener.focus(); }
 			}, 0);
 		}
 	}, true);
@@ -37054,6 +37066,10 @@ var EngCalcs = EngCalcs || {};
 	window.addEventListener('keydown', function (e) {
 		if (e.defaultPrevented || e.ctrlKey || e.altKey || e.metaKey) { return; }
 		var k = e.key, ae = document.activeElement;
+		// Right-to-left pages mirror the horizontal keys (WAI-ARIA): Left is "next menu / open fly-out".
+		if ((k === 'ArrowLeft' || k === 'ArrowRight') && window.getComputedStyle(document.documentElement).direction === 'rtl') {
+			k = k === 'ArrowLeft' ? 'ArrowRight' : 'ArrowLeft';
+		}
 		var pop = document.getElementById('lpn_menu_popup'), sub = document.getElementById('lpn_menu_popup2');
 		var open = !!pop && pop.style.display === 'block';
 		var subOpen = !!sub && sub.style.display === 'block';

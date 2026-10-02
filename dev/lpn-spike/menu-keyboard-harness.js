@@ -146,6 +146,63 @@ async function main() {
 		await key('Enter');
 		ok('Enter closes the menu (the row ran)', !(await shown('lpn_menu_popup')));
 
+		console.log('\n--- where focus lands after Enter ---');
+		const focusDesc = () => page.evaluate(() => {
+			const a = document.activeElement;
+			return a ? (a.tagName + '#' + a.id + (a.closest('#lpn_menu_popup, #lpn_menu_popup2') ? ' (in menu)' : '')) : 'null';
+		});
+		const activate = async (barId, label) => {
+			await page.focus('#' + barId);
+			await key('ArrowDown');
+			const rows = await rowTexts('lpn_menu_list');
+			if (!rows.some((r) => r.t === label && !r.dis)) { return false; }
+			let g = 0;
+			while (await focusText() !== label && g++ < 60) { await key('ArrowDown'); }
+			await key('Enter');
+			await page.waitForTimeout(300);
+			return true;
+		};
+		ok('Map > Zoom to fit found', await activate('lpn_menu_map', 'Zoom to fit'));
+		ok('plain command: menu closed', !(await shown('lpn_menu_popup')));
+		ok('plain command: focus returns to the Map button', await focusId() === 'lpn_menu_map', await focusDesc());
+		ok('Water > Settings found', await activate('lpn_menu_project', 'Settings'));
+		ok('box command: menu closed', !(await shown('lpn_menu_popup')));
+		const inBox = await page.evaluate(() => {
+			const a = document.activeElement, b = document.getElementById('lpn_settings_box');
+			return !!b && b.contains(a) && a !== b;
+		});
+		const onBar = await focusId() === 'lpn_menu_project';
+		ok('box command: focus is inside the Settings box', inBox, await focusDesc());
+		console.log('       (box command focus: ' + (inBox ? 'inside the box' : onBar ? 'Water button' : 'elsewhere') + ')');
+		await key('Escape');
+		ok('Edit > Find and replace found', await activate('lpn_menu_edit', 'Find and replace'));
+		const inInput = await page.evaluate(() => {
+			const a = document.activeElement;
+			return !!a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.tagName === 'SELECT') && !a.closest('#lpn_menu_popup, #lpn_menu_popup2');
+		});
+		ok('input command: focus is in an input', inInput, await focusDesc());
+
+		console.log('\n--- right-to-left page (ar): Left and Right mirror ---');
+		const rtl = await context.newPage();
+		await rtl.goto(env.pageUrl('Looped-Network.php?ec_nolog=1&lang=ar'), { waitUntil: 'load' });
+		await rtl.waitForSelector('#lpn_menubar .lpn-menubar-item');
+		await rtl.waitForTimeout(400);
+		ok('the page is dir=rtl', await rtl.evaluate(() => getComputedStyle(document.documentElement).direction) === 'rtl');
+		await rtl.focus('#lpn_menu_file');
+		await rtl.keyboard.press('ArrowLeft');
+		ok('Left from File focuses Edit (next, mirrored)', await rtl.evaluate(() => document.activeElement.id) === 'lpn_menu_edit');
+		await rtl.keyboard.press('ArrowRight');
+		ok('Right goes back to File', await rtl.evaluate(() => document.activeElement.id) === 'lpn_menu_file');
+		await rtl.keyboard.press('ArrowDown');
+		const rsub = await rtl.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).findIndex((b) => b.getAttribute('aria-haspopup') === 'menu' && !b.disabled));
+		ok('File has an enabled fly-out row', rsub >= 0);
+		await rtl.evaluate((i) => document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')[i].focus(), rsub);
+		await rtl.keyboard.press('ArrowLeft');
+		ok('Left opens the fly-out', await rtl.evaluate(() => document.getElementById('lpn_menu_popup2').style.display === 'block'));
+		await rtl.keyboard.press('ArrowRight');
+		ok('Right closes it', await rtl.evaluate(() => document.getElementById('lpn_menu_popup2').style.display !== 'block'));
+		await rtl.close();
+
 		console.log('\n--- mouse behaviour unchanged: a click opens without moving focus into the menu ---');
 		await page.keyboard.press('Escape');
 		await page.click('#lpn_menu_file');
