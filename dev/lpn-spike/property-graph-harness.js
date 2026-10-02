@@ -20,6 +20,9 @@
 //   8. Recalculate off keeps the snapshot: an edit does not take the graph away.
 //   9. A steady-state project (no run time) has no graph.
 //  3b. A pump's head loss is graphed as its Head, positive (minus the signed value); a pipe's stays Head loss.
+//  3c. Sloping or stepped (Tom, 2026-10-02: "Do both, each as the situation requires"): a held
+//      value (a junction's demand, a pump's flow) draws as steps that hold FORWARD from each report
+//      time; an evolving one (a junction's pressure, a pipe's flow) draws as straight segments.
 //  10. A source-trace run: the selector's own wording, "Source share from {node}" (Tom, 2026-09-30),
 //      distinct from the shared lpn_result_source_share used everywhere else; and with no trace node
 //      set, the entry does not appear at all (no results to offer it from).
@@ -183,6 +186,51 @@ async function until(pred, ms) {
 		choose('headloss');
 		check(chartText().indexOf('Head loss (') >= 0 && !/(^|\| )Head \(/.test(chartText()), 'and its axis says Head loss');
 		choose(pOpts[0]);
+	}
+
+	head('3c. A HELD VALUE STEPS, AN EVOLVING ONE SLOPES');
+	{
+		const nFrames = EngCalcs.lpnTimeRunFrames().length;
+		const corners = () => byCls('lpn-ts-line').map((p) => String(p.points).trim().split(/\s+/)
+			.map((xy) => xy.split(',').map(Number)));
+		const runs = () => corners().filter((r) => r.length > 1);
+		// Stepped: every leg is flat or vertical, each flat leg runs FORWARD (left to right) from a
+		// report point, and a rise sits at the next report time, so n points give 2n - 1 corners.
+		function isStepped(r) {
+			for (let i = 1; i < r.length; i++) {
+				const flat = r[i][1] === r[i - 1][1], upright = r[i][0] === r[i - 1][0];
+				if (!(i % 2 ? flat && r[i][0] > r[i - 1][0] : upright)) { return false; }
+			}
+			return r.length % 2 === 1;
+		}
+		const diagonal = (r) => r.some((q, i) => i > 0 && q[0] !== r[i - 1][0] && q[1] !== r[i - 1][1]);
+		function expect(stepped, what) {
+			const rs = runs(), pts = rs.reduce((k, r) => k + (stepped ? (r.length + 1) / 2 : r.length), 0);
+			check(rs.length > 0 && rs.every((r) => stepped === isStepped(r)),
+				`${what}: ${stepped ? 'stepped' : 'sloping'} (${rs.map((r) => r.length).join('+')} corners)`);
+			check(pts === nFrames, `  and every report time is a corner of it, with no corner added between (${pts} of ${nFrames})`);
+			check(byCls('lpn-ts-line').every((p) => /lpn-ts-stepped/.test(String(p['class'] || p.className || '')) === stepped),
+				'  and the line says which in its class');
+		}
+		L.openPopup(J1, 100, 100);
+		choose('demandActual');
+		expect(true, `junction ${J1}'s demand, held by its pattern`);
+		const dv = corners()[0];
+		check(dv.some((q, i) => i > 0 && q[1] !== dv[i - 1][1]), '  and the demand actually changes somewhere, so a step is drawn and not just a flat line');
+		choose('pressure');
+		expect(false, `junction ${J1}'s pressure, which drifts with the tanks`);
+		check(corners().some(diagonal), '  with at least one sloping segment');
+		L.openLinkPopup(pump, 100, 100);
+		const pumpWas = sel().value;
+		choose('flow');
+		expect(true, `pump ${pump}'s flow, held between events`);
+		choose(pumpWas);
+		L.openLinkPopup(pipe, 100, 100);
+		choose('flow');
+		expect(false, `pipe ${pipe}'s flow`);
+		check(corners().some(diagonal), '  with at least one sloping segment');
+		choose(pOpts[0]);
+		L.closePopup();
 	}
 
 	// ---- 4 ------------------------------------------------------------------------------------

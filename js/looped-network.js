@@ -29125,6 +29125,44 @@ var EngCalcs = EngCalcs || {};
 		tsLastSize = { w: lay.w, h: lay.h };
 		tsDraw(host, lay, frames, series, group, field);
 	}
+	// **A HELD VALUE IS DRAWN AS STEPS, AN EVOLVING ONE AS SLOPES** (Tom, 2026-10-02, asked
+	// sloping or stepped: "Do both, each as the situation requires."). The market researcher's
+	// reading of the EPANET 2.2 manual (dev/agents/market-researcher/journal.md on feat/desktop,
+	// "Time series graph: sloping or stepped?"): a demand, a reservoir's head and whatever a pattern
+	// or a control sets is HELD from one hydraulic event to the next, so a straight segment between
+	// two report times would draw values that never existed; a tank level is INTEGRATED and a
+	// pressure, a head or a pipe flow drifts with the tanks, so a straight segment is the truthful
+	// one. A step HOLDS FORWARD from its report time: the number reported at t is the solution for
+	// the period beginning at t. One flag per property, with a per-type exception where one name
+	// means a held value on one kind of asset and an evolving one on another. A typed constant
+	// (elevation, base demand, diameter, roughness) is held, so it is listed; its line is flat
+	// either way. The status is held on every link. Everything not listed slopes.
+	var TS_STEPPED = {
+		node: { elev: 1, demand: 1, demandActual: 1 },
+		link: { diameter: 1, roughness: 1, status: 1 }
+	};
+	var TS_STEPPED_BY_TYPE = {
+		// Every reading of a reservoir is its pattern-held head, or follows from it.
+		reservoir: { head: 1, pressure: 1, quality: 1 },
+		// A pump's flow and speed are held between events, and its head is read off its curve at
+		// that held flow, so it is held too.
+		pump: { flow: 1, headloss: 1 }
+	};
+	function tsStepped(group, e, field) {
+		var byType = (e && TS_STEPPED_BY_TYPE[e.type]) || {};
+		return !!((TS_STEPPED[group] || {})[field] || byType[field]);
+	}
+	// A run of plotted {x, y} as the polyline's corners. Stepped: each value runs flat to the next
+	// report time and then rises or falls there, and the last one ends at its own report time,
+	// because it has no following interval to hold over.
+	function tsRunCorners(run, stepped) {
+		var out = [], i;
+		for (i = 0; i < run.length; i++) {
+			if (stepped && i > 0) { out.push({ x: run[i].x, y: run[i - 1].y }); }
+			out.push(run[i]);
+		}
+		return out;
+	}
 	// **THE ONE TIME-SERIES RENDERER** (Task 637, revised by Tom 2026-09-29). The bottom pane's
 	// tab and the graph at the foot of the Properties box both draw through this, so a second
 	// plotting idiom never enters the page: the axes, the `now` line, the breaks at a missing
@@ -29183,12 +29221,12 @@ var EngCalcs = EngCalcs || {};
 
 		dots = frames.length <= LPN_TS_DOT_MAX;
 		series.forEach(function (s) {
-			var run = [], i, p;
+			var run = [], i, p, stepped = tsStepped(group, tsElementById(group, s.id), field);
 			function flush() {
 				if (run.length > 1) {
 					el('polyline', {
-						points: run.map(function (q) { return q.x + ',' + q.y; }).join(' '),
-						class: 'lpn-ts-line', stroke: s.color
+						points: tsRunCorners(run, stepped).map(function (q) { return q.x + ',' + q.y; }).join(' '),
+						class: 'lpn-ts-line' + (stepped ? ' lpn-ts-stepped' : ''), stroke: s.color
 					}, svg);
 				} else if (run.length === 1) {
 					// A single reporting step with its neighbours missing is still a reading, and a
