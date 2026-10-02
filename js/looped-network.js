@@ -52947,9 +52947,21 @@ var EngCalcs = EngCalcs || {};
 			view: currentView()
 		};
 	}
+	// **REDO IS THE SAME SNAPSHOTS RUN THE OTHER WAY** (2026-10-02: on Net1, an elevation typed in
+	// the Tables pane, Ctrl+Z, then Ctrl+Y -- and the 810 never came back, because there was no
+	// Redo at all). undo() pushes the state it is leaving onto redoStack; redo() pushes the state IT
+	// is leaving back onto undoStack. Any NEW change empties redoStack, which is why the clearing
+	// lives in pushUndoSnapshot(), the one door every mutation's snapshot goes through (the
+	// georeferencing wizard's deferred push included) -- a redo after a fresh edit would paste an
+	// abandoned branch of history over it.
+	var redoStack = [];
 	function pushUndoSnapshot(snap) {
-		undoStack.push(snap);
-		if (undoStack.length > UNDO_LIMIT) { undoStack.shift(); }
+		redoStack.length = 0;
+		pushBounded(undoStack, snap);
+	}
+	function pushBounded(stack, snap) {
+		stack.push(snap);
+		if (stack.length > UNDO_LIMIT) { stack.shift(); }
 	}
 	function saveUndoSnapshot() {
 		markEdited(); // one seam, because every real mutation snapshots before it changes anything
@@ -52960,10 +52972,21 @@ var EngCalcs = EngCalcs || {};
 	// paste the previous project's network over it -- silently, and with no way back.
 	// And the Tables' record of which filtered rows were edited (Task 738): it is keyed by id, and
 	// the next project's J1 is not this one's.
-	function clearUndo() { undoStack.length = 0; paneFilterForgetEdits(); }
+	function clearUndo() { undoStack.length = 0; redoStack.length = 0; paneFilterForgetEdits(); }
 	function undo() {
 		if (undoStack.length === 0) { return; }
 		var snap = undoStack.pop();
+		pushBounded(redoStack, makeUndoSnapshot());
+		restoreUndoSnapshot(snap);
+	}
+	function redo() {
+		if (redoStack.length === 0) { return; }
+		var snap = redoStack.pop();
+		pushBounded(undoStack, makeUndoSnapshot());
+		restoreUndoSnapshot(snap);
+	}
+	// Puts the page back to one snapshot, for undo() and redo() alike.
+	function restoreUndoSnapshot(snap) {
 		// **UNDOING A MOVE IS ALSO A MOVE THE USER CANNOT SEE**, and it is the one other place a
 		// junction changes position without the pointer being on it -- so it gets the same mark the
 		// drag gets. Read BEFORE the document is replaced, compared AFTER buildDom() has rebuilt the
@@ -53007,7 +53030,13 @@ var EngCalcs = EngCalcs || {};
 		if (snap.units && applyUnitSelections(snap.units)) { refreshMapStatus(); }
 		rememberUnitSelections();
 		recountNextId();
-		closePopup(); // whatever it referenced may no longer exist post-undo (e.g. undoing an Add)
+		// **THE PROPERTIES BOX STAYS OPEN ON A SUBJECT THAT SURVIVED, AND SHOWS THE RESTORED VALUES.**
+		// It used to close on every undo, because whatever it referenced may no longer exist (undoing
+		// an Add). That is still the answer when the subject has gone, and for a multi-selection,
+		// whose ids are not re-checked here; an element that is still in the document gets its box
+		// re-rendered below, after buildDom(), so it reads what the document now holds.
+		var keepPopup = undoPopupSubjectSurvives();
+		if (!keepPopup) { closePopup(); }
 		// A KIND CHANGE IS THE ONE UNDO THAT REDRAWS THE PAGE AROUND THE DRAWING: the tiles, the
 		// coordinate readout and the camera all describe the frame, not the document, and only this
 		// one undo changes which frame that is. Undoing a georeferencing Finish is the only act that
@@ -53045,12 +53074,22 @@ var EngCalcs = EngCalcs || {};
 		// but a debounced solve is not a guarantee about the next paint, and an undo the user
 		// cannot see is indistinguishable from an undo that did nothing.
 		refreshPaneIfOpen();
+		if (keepPopup) { refreshPopupIfOpen(); }
 		// **AND THE CAMERA, ONLY THEN.** A view is a point in one frame and means nothing in the
 		// other -- the restored grid coordinates would be off screen under the lat/lon view the user
 		// was left in, which reads as a lost drawing. Restored AFTER buildDom() so the scale clamp
 		// is applied against the frame the document is now in.
 		if (coordsChanged && snap.view) { applyView(snap.view); }
 		scheduleSolve();
+	}
+	function undoPopupSubjectSurvives() {
+		var p = currentPopup;
+		if (!p || !panelIsOpen(document.getElementById('lpn_popup'))) { return false; }
+		if (p.kind === 'node') { return !!nodeById(p.id); }
+		if (p.kind === 'link') { return !!linkById(p.id); }
+		if (p.kind === 'customer') { return !!customerById(p.id); }
+		if (p.kind === 'label') { return !!labelById(p.id); }
+		return false;
 	}
 	// Ctrl+Z UNDOES THE MAP, EXCEPT WHERE THE USER IS TYPING (Tom, 2026-08-20, on the Controls
 	// library: "It was scary when I entered an unknown node... could/should there be a CTRL+Z in the
@@ -53101,7 +53140,16 @@ var EngCalcs = EngCalcs || {};
 	}
 	document.addEventListener('keydown', function (e) {
 		if (isTextEntry(e.target) && !paneCellNavigating(e.target)) { return; }
-		if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+		if (!(e.ctrlKey || e.metaKey) || e.altKey) { return; }
+		var k = (e.key || '').toLowerCase();
+		// REDO HAS TWO CHORDS, BECAUSE THE PLATFORMS DO: Ctrl+Y is Windows' (and LibreOffice's on
+		// every platform), Ctrl+Shift+Z / Cmd+Shift+Z is the Mac's and most Linux programs'. Cmd+Y
+		// is NOT taken -- on a Mac it is the browser's History, which nobody pressing it expects to
+		// lose. Shift+Z is checked first: with Shift held, `key` is 'Z', which the plain Ctrl+Z test
+		// below must not read as an undo.
+		if (k === 'z' && e.shiftKey) { e.preventDefault(); redo(); return; }
+		if (k === 'y' && e.ctrlKey && !e.metaKey && !e.shiftKey) { e.preventDefault(); redo(); return; }
+		if (k === 'z') { e.preventDefault(); undo(); }
 	});
 
 	/**
