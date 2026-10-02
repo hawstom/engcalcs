@@ -35,7 +35,7 @@ const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
 
 const REPO = path.resolve(__dirname, '..', '..');
-const LOCK_FILE = '/tmp/engcalcs-browser.lock';
+const LOCK_FILE = process.env.EC_BROWSER_LOCK || '/tmp/engcalcs-browser.lock';
 const LOCK_ENV = 'EC_LABEL_DRAG_FIT_LOCKED';
 const NAME = 'label-drag-fit-harness';
 

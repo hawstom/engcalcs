@@ -66,7 +66,7 @@ const os = require('os');
 const { execFileSync, spawnSync } = require('child_process');
 
 const REPO = path.resolve(__dirname, '..', '..');
-const LOCK_FILE = '/tmp/engcalcs-browser.lock';
+const LOCK_FILE = process.env.EC_BROWSER_LOCK || '/tmp/engcalcs-browser.lock';
 const LOCK_ENV = 'EC_PANE_RULE_LOCKED';
 
 if (process.env[LOCK_ENV] !== '1') {
