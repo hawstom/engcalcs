@@ -37,6 +37,9 @@
         "name that comes back meaning something else must not walk through an open door."
     ],
     "protected": [
+        "feat/keyboard-menu",
+        "feat/drawing-keep",
+        "feat/property-arrow-key",
         "feat/property-venue",
         "feat/convert-as",
         "customer",

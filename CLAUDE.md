@@ -282,8 +282,8 @@ merged. **`QUALITY`** in `lib/Language.Settings.php` is an honest defect-risk es
 
 `check_all.sh` runs every check, and the pre-push hook refuses to push master unless it passed on
 that exact commit. Each failure explains itself; what each check guards is in
-`dev/automated-checks.md`. Run it as `flock /tmp/engcalcs-checkall.lock sh dev/scripts/check_all.sh`,
-at most about three at once.
+`dev/automated-checks.md`. Run it as plain `sh dev/scripts/check_all.sh`, with no outer `flock`: it
+takes one of four slots itself (`EC_CHECK_SLOTS`), each with its own browser lock.
 
 **Add a check for a defect a visitor could hit that a person would miss.** Do not add checks that
 police the wording or layout of documentation, or that check other checks.
