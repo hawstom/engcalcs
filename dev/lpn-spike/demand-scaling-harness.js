@@ -9,7 +9,8 @@
 //      some junction does not at m + step -- both checked here by a solve of their own.
 //   4. A limit already broken at the demands as they are is said, and the search still answers.
 //   5. A limit that holds to the top of the range, and one broken even at zero, are said as such.
-//   6. Selected with nothing selected runs nothing; Selected scales only the selection.
+//   6. Selected with nothing selected runs nothing and says so in the box; Selected scales only the
+//      selection, under Run and under Find, and both answers say so.
 //   7. The project is byte-identical before and after every run, and the module never writes to
 //      the model it is handed.
 //   8. One analysis at a time: criticality refuses while a search runs.
@@ -233,10 +234,13 @@ async function minPsiAt(m) {
 	L.setMin('20');
 	L.clearSel();
 	L.setScope('selected');
-	const kept = L.scaleRun();
+	ok('an earlier All answer is on screen', !!L.scaleRun());
 	await L.runScale();
-	ok('nothing selected: no run', L.scaleRun() === kept);
+	ok('nothing selected: no run, and the All answer no longer stands as if it answered it', L.scaleRun() === null);
 	ok('...and the notice says so', L.notice() === PC.lpn_ds_no_selection, L.notice());
+	ok('...and so does the box, under Run (Tom, 2026-10-02)', text(dsHost('scale')) === PC.lpn_ds_no_selection, text(dsHost('scale')));
+	await L.runFind();
+	ok('...and under Find', L.searchRun() === null && text(dsHost('search')) === PC.lpn_ds_no_selection, text(dsHost('search')).slice(0, 80));
 	L.setSelectionList([{ kind: 'node', id: '32' }, { kind: 'link', id: '31' }]);
 	L.setMult('3');
 	await L.runScale();
@@ -250,7 +254,23 @@ async function minPsiAt(m) {
 	ok('the copy scaled exactly one junction', whole.nodes.filter((n, i) => n !== L.currentModel().nodes[i] && n.type === 'junction').length >= 1 &&
 		whole.nodes.filter((n) => n.type === 'junction' && n.id !== '32').every((n) => n.demand === L.currentModel().nodes.filter((o) => o.id === n.id)[0].demand));
 	ok('the project is unchanged', JSON.stringify(L.getDoc()) === before && L.docGuard());
+	// Find under Selected (Tom, 2026-10-02: "It appears that Find doesn't respect "Selected
+	// junctions"."): it scales only the selection, and its answer says so.
+	L.setSelectionList([{ kind: 'node', id: '10' }, { kind: 'node', id: '11' }]);
+	await L.runFind();
+	const sSel = L.searchRun();
 	L.setScope('all');
+	await L.runFind();
+	const sAll = L.searchRun();
+	ok('Find under Selected answers for the selection, not the system', !!sSel && !!sAll && sSel.multiplier !== sAll.multiplier &&
+		sSel.scaledCount === 2 && sAll.scaledCount === undefined, JSON.stringify({ sel: sSel && sSel.multiplier, all: sAll && sAll.multiplier }));
+	L.setScope('selected');
+	await L.runFind();
+	ok('...and its answer says only the selected junctions were scaled', text(dsHost('search')).indexOf(PC.lpn_ds_scaled_selected.replace('{n}', '2')) >= 0,
+		text(dsHost('search')).slice(0, 200));
+	L.setScope('all');
+	await L.runFind();
+	ok('...and an All answer does not', text(dsHost('search')).indexOf(PC.lpn_ds_scaled_selected.split('{n}')[0]) < 0);
 	L.clearSel();
 
 	console.log('\n--- 7. Bad input ---');

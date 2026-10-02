@@ -57136,6 +57136,12 @@ var EngCalcs = EngCalcs || {};
 	var dsAsk = { scope: 'all', multiplier: '2' };
 	var dsRun = null;      // the last Run at a scale, or null
 	var dsSearch = null;   // the last search, or null
+	// **A REFUSED PRESS IS ANSWERED IN THE BOX, WHERE THE PRESS WAS** (Tom, 2026-10-02: *"It appears
+	// that Find doesn't respect "Selected junctions"."*). "Selected junctions" with nothing selected
+	// used to refuse on the map's notice line alone, and leave the last answer -- an All answer --
+	// standing under the button, where it read as Find having ignored the scope. Now the refusal
+	// takes that part's place: { which: 'scale' | 'search', text }, or null.
+	var dsRefused = null;
 	var dsBusy = false;
 	var dsStop = false;
 	var DS_ROWS = 10;
@@ -57272,6 +57278,15 @@ var EngCalcs = EngCalcs || {};
 	}
 	// One probe of the search, in a sentence: the lowest junction and its pressure, or the reason the
 	// network gave no answer at that scale.
+	// **WHICH JUNCTIONS WERE SCALED, UNDER EVERY ANSWER THAT SCALED ONLY SOME** -- Find's as well as
+	// Run's. Find's verdict is one number, and "Every junction keeps 20 psi up to a demand scale of
+	// 20" with nothing beside it reads as every demand having been scaled (Tom, 2026-10-02).
+	function dsScopeLine(host, rec) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!rec || rec.scaledCount === undefined) { return; }
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_scaled_selected || 'Only the selected junctions were scaled. Junctions scaled: {n}.')
+			.replace('{n}', String(rec.scaledCount)), host);
+	}
 	function dsProbeLine(host, rec) {
 		var pc = EngCalcs.pageConfig || {};
 		if (!rec) { return; }
@@ -57293,6 +57308,7 @@ var EngCalcs = EngCalcs || {};
 		host.innerHTML = '';
 		['scale', 'search'].forEach(function (w) { var h = dsReportHost(w); if (h) { h.innerHTML = ''; } });
 		dsShownAt = dsNow();
+		if (dsRefused) { ffEl('p', 'lpn-ff-summary', dsRefused.text, dsReportHost(dsRefused.which)); }
 		s = dsSearch;
 		// **NO HEADING OF ITS OWN.** Each answer sits in its own part of the box, directly under
 		// that part's heading (dsReportHost()), so a second copy of the heading would only repeat it.
@@ -57318,6 +57334,7 @@ var EngCalcs = EngCalcs || {};
 				dsProbeLine(host, s.failing);
 			}
 			dsTimeLines(host, s.time);
+			dsScopeLine(host, s);
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
 				.replace('{solves}', String(s.solves)), host);
 		}
@@ -57337,10 +57354,7 @@ var EngCalcs = EngCalcs || {};
 			: (pc.lpn_ds_scale_ok || '✓ At a demand scale of {m}, every junction keeps {pressure}.');
 		ffEl('p', 'lpn-ff-summary', verdict.replace('{m}', dsMult(set.multiplier)).replace('{pressure}', pressure), host);
 		dsTimeLines(host, set.time);
-		if (set.scaledCount !== undefined) {
-			ffEl('p', 'lpn-ff-note', (pc.lpn_ds_scaled_selected || 'Only the selected junctions were scaled. Junctions scaled: {n}.')
-				.replace('{n}', String(set.scaledCount)), host);
-		}
+		dsScopeLine(host, set);
 		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
 			.replace('{solves}', String(set.solves)), host);
 		// THE TWO TABLES ARE THE TWO READINGS A DESIGNER TAKES OF A HEAVIER DAY: where the pressure
@@ -57394,15 +57408,24 @@ var EngCalcs = EngCalcs || {};
 		}).map(function (x) { return x.r; });
 	}
 	// The case both buttons solve: the network on screen, and which junctions' demands are scaled.
-	// Null `ids` scales every junction. Says so and returns null where there is nothing to scale.
-	function demandScaleCase() {
+	// Null `ids` scales every junction. Says so and returns null where there is nothing to scale,
+	// and the refusal replaces that part's last answer (`which`), which no longer answers the
+	// question now on screen. See dsRefused.
+	function demandScaleCase(which) {
 		var pc = EngCalcs.pageConfig || {}, model, ids = null, isJ = {}, skipped = 0;
+		function refuse(text) {
+			setNotice(text);
+			dsRefused = { which: which, text: text };
+			if (which === 'scale') { dsRun = null; } else { dsSearch = null; }
+			if (dsBoxIsOpen()) { rebuildDemandScaleReport(); }
+			return null;
+		}
+		if (dsRefused && dsRefused.which === which) { dsRefused = null; }
 		model = assembleModel();
 		fireFlowAtFrame(model);
 		model.nodes.forEach(function (n) { if (n.type === 'junction') { isJ[n.id] = true; } });
 		if (!Object.keys(isJ).length) {
-			setNotice(pc.lpn_ds_no_junctions || 'This project has no junctions yet, so there are no demands to scale.');
-			return null;
+			return refuse(pc.lpn_ds_no_junctions || 'This project has no junctions yet, so there are no demands to scale.');
 		}
 		if (dsAsk.scope === 'selected') {
 			ids = [];
@@ -57410,8 +57433,7 @@ var EngCalcs = EngCalcs || {};
 				if (s.kind === 'node' && isJ[s.id] && ids.indexOf(s.id) < 0) { ids.push(s.id); } else { skipped++; }
 			});
 			if (!ids.length) {
-				setNotice(pc.lpn_ds_no_selection || 'No junctions are selected. Select junctions, or scale all of them.');
-				return null;
+				return refuse(pc.lpn_ds_no_selection || 'No junctions are selected. Select junctions, or scale all of them.');
 			}
 			if (skipped) {
 				setNotice((pc.lpn_ds_skipped || 'Selected elements that are not junctions, left as they are: {n}.')
@@ -57454,7 +57476,7 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc.lpn_ds_bad_multiplier || 'Type a demand scale of zero or more, such as 1.5.');
 			return Promise.resolve(null);
 		}
-		c = demandScaleCase();
+		c = demandScaleCase('scale');
 		if (!c) { return Promise.resolve(null); }
 		minPressure = ffValue(critFireFlowAsk().minPressure, 'lpn_u_pressure');
 		before = JSON.stringify(doc);
@@ -57477,7 +57499,7 @@ var EngCalcs = EngCalcs || {};
 	function runDemandScaleSearch() {
 		var c, minPressure, before;
 		if (dsBusy || !EngCalcs.lpnDemandScaleSearch || dsBusyElsewhere()) { return Promise.resolve(null); }
-		c = demandScaleCase();
+		c = demandScaleCase('search');
 		if (!c) { return Promise.resolve(null); }
 		minPressure = ffValue(critFireFlowAsk().minPressure, 'lpn_u_pressure');
 		before = JSON.stringify(doc);
@@ -57489,6 +57511,7 @@ var EngCalcs = EngCalcs || {};
 			minPressure: minPressure > 0 ? minPressure : 0,
 			shouldStop: function () { return dsStop; }
 		}).then(function (s) {
+			if (c.ids) { s.scaledCount = c.ids.length; }
 			s.time = c.time;
 			dsSearch = s;
 			dsEnd(before);
@@ -57500,6 +57523,10 @@ var EngCalcs = EngCalcs || {};
 	var dsDocGuard = true;
 	// Cleared at the moments the siblings' results are, and only then.
 	function clearDemandScaleRun(quiet) {
+		if (dsRefused) {
+			dsRefused = null;
+			if (!dsRun && !dsSearch && dsBoxIsOpen()) { rebuildDemandScaleReport(); }
+		}
 		if (!dsRun && !dsSearch) { return; }
 		dsRun = null;
 		dsSearch = null;
