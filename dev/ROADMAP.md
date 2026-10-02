@@ -264,13 +264,6 @@ the block.
   Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
-- 100|747| **A copied project file shares its original's lock.**
-  An Explorer copy keeps the document ID, so opening both gives a false "somebody has this open";
-  never lost work. Tom, 2026-09-29: *"If you have a magic fix, go for it. I can't think of one."*
-  2026-09-30, rejecting the file-name idea: *"The fix doesn't help copies with same name. I am willing
-  to pay the privacy line if we get value."* His prompt instead: on open, when the server holds a lock
-  this browser does not remember, ask *"Is this the Original file (keep same lock) or a Copy (make
-  new lock)?"* Building on `feat/copy-lock`.
 - 100|751| **Criticality analysis: break each asset in turn and report.**
   Tom, 2026-09-30, on WaterGEMS's Criticality tool: *"This sounds like a fun report to build. Break
   each asset and report."* Fire flow's sibling: scope All/Selected, each pipe out of the network on
@@ -305,6 +298,9 @@ the block.
   - **CONTOUR is the one he starred and is also the one with a real unknown**: it interpolates a
     nodal value over the plane between nodes, so it needs a decision about what happens where there
     are no nodes -- a pressure contour across a river a main crosses is drawn over nothing.
+    **Design: `dev/epanet-js-contour-contribution.md`.** Since 2026-10-01 (§2a there, Luke Butler's
+    proof of concept): contour HEAD, subtract the Terrain-RGB DEM per cell, and let pressure leave
+    the junctions' range where the terrain does. Open: pressure-zone boundaries, hard vs faded edge.
   - **FREQUENCY SHIPPED 2026-09-30** (`feat/frequency-plot`, merged on his word). Contour and flow
     balance remain.
   - **SYSTEM FLOW BALANCE -- AND HIS READING OF IT IS RIGHT, but confirm it against EPANET's own
