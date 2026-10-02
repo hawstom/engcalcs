@@ -62,8 +62,12 @@ lines rather than appending corrections.
   merge; one branch's two harnesses were reported committed and were untracked.
 - **A usage limit kills every running agent at once**; only their commits survive. Brief agents to
   commit as they go, and relaunch with "read `git log master..HEAD` first".
-- **Preview ports:** `ports.conf`, the loaded Apache config, and the panel's `index.html` must
-  agree. The Apache reload needs `sudo`, so hand Tom the commands at the foot of this file.
+- **Preview ports live on jasmine since 2026-10-02**: `~/webdev/worktrees/_panel/ports.conf` lists
+  them, `sh ~/webdev/worktrees/_panel/generate.sh` makes any missing worktree and starts one
+  `php -S 127.0.0.1:PORT` per line (no Apache, no sudo; a crontab `@reboot` reruns it). They bind to
+  loopback; Tom reaches them through SSH forwarding, so his browser sees `localhost` (secure
+  context, and a host the Mapbox token accepts). A new port needs a new `LocalForward` line on his
+  side. `php -S` ignores `.htaccess`, and jasmine has PHP 8.5, production 8.3.
 - **Ask which branch a host is on before explaining what Tom sees.** `dev.hawsedc.com` has sat on
   an old feature branch; `curl` gets a 401 there. Answer about the surface he named.
 
@@ -196,7 +200,9 @@ definitions. Glossary write-back owed from echo (see 09-30).
 
 ## Commands to hand Tom with any panel change
 
+A new port needs one more line in his `~/.ssh/config` on the machine he browses from, under
+`Host jasmine`, then a fresh `ssh jasmine`:
+
 ```
-sudo cp ~/webdev/worktrees/_panel/branch-preview.conf /etc/apache2/sites-available/
-sudo apache2ctl configtest && sudo systemctl reload apache2
+  LocalForward 8150 localhost:8150
 ```

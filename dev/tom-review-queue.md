@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-370. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-379. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -123,3 +123,15 @@ judgement and does not belong to a script.
 
 - [?] R-351 feat/label-gang-search | "(1) Good. (2) Good. (3) It's instantaneous, unmeasurable for a human. (4) But we know that zooming and placement are broken beyond this. [his screenshot: Novato southwest, a descending gang of labels 185/183/181/179/177 with empty gaps circled between them and leaders running far from their nodes] shows gratuitous spacing, and you know that the delay is far worse than before." -- feat/label-gang-search bff8a35a: gaps closed at your zoom, 3 remain at 1.75x held by the R-075 ID reserve, but never got your pass, and that branch is bench-only now -- the label work moved to feat/label-placer and placers C/D. Does the round-4 placer work answer this, or do you still want your saved Novato southwest view re-checked against the gang-search fix itself?
 
+
+## Round of 2026-10-02 -- his pass over 8141-8149, the first on jasmine
+
+- [ ] R-370 feat/property-graph | "(1) You may want to check with Mary, but I am pretty sure that the industry term is pump "Head", not "Head gain". (2) And as such, "Hg" can be just "H". (3) Yes, pumps left out of highest head loss." -- build agent renaming on feat/property-graph
+- [ ] R-371 feat/criticality | "Proceed with the rest of the task." -- severity order and row tints being built on feat/criticality
+- [ ] R-372 feat/bentley-interop | "Alt. preview is good. It's of course critical that we have consistent styles throughout the app." -- nothing to build; awaiting his merge word
+- [ ] R-373 feat/graph-menu | "(1) We can remove the graph icon from the Profile command now. (2) Tip: "Graphs: Profile, Time Series, and Frequency distribution". In general, keep things simple." -- build agent on feat/graph-menu
+- [ ] R-374 feat/demand-scaling | "It appears that Find doesn't respect "Selected junctions"." -- build agent reproducing on feat/demand-scaling
+- [x] R-375 feat/desktop | (usage logs in a desktop build, off or reported to hawsedc.com) "I think logs are important to help focus development effort." -- ruled; carried in the handoff for feat/desktop: report to hawsedc.com, which makes it an outside call the desktop build must disclose and gate on consent
+- [x] R-376 -- | (browser EPANET) "There is such a thing?" -- answered 2026-10-02: epanet-js's app (app.epanetjs.com, Luke Butler's company) is one; our Looped Network runs the same EPANET engine in the browser
+- [ ] R-377 -- | (Time series graph, sloping or stepped) "Do both, each as the situation requires." -- built on feat/property-graph with R-370
+- [x] R-378 -- | "Set up the branch previews here." (jasmine) -- ~/webdev/worktrees/_panel, php -S per port on loopback, reached by SSH forwarding; see handoff
