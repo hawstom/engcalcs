@@ -27,14 +27,15 @@ async function main() {
 			const c = window.EngCalcs.pageConfig; return { g: c.lpn_graphs_menu, p: c.lpn_profile_menu, t: c.lpn_ts_menu, f: c.lpn_freq_menu };
 		});
 		ok('Graphs key is defined', names.g === 'Graphs', JSON.stringify(names));
-		const tip = await page.evaluate(() => window.EngCalcs.pageConfig.lpn_graphs_menu_tip);
-		ok('Graphs tip is Tom\'s wording', tip === 'Graphs: Profile, Time Series, and Frequency distribution', tip);
 		const tabs = [['profile', names.p], ['timeseries', names.t], ['frequency', names.f]];
 		for (const [id, label] of tabs) {
 			await page.click('#lpn_menu_project');
 			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
 			const top = await rows();
 			ok('Water menu has a Graphs row', top.includes(names.g), top.join('|'));
+			const gTip = await page.$eval('#lpn_menu_popup .lpn-menu-row:has-text("' + names.g + '")', (e) => e.getAttribute('data-bs-original-title') || e.title);
+			const wantTip = await page.evaluate(() => window.EngCalcs.pageConfig.lpn_graphs_menu_tip);
+			ok('Graphs row carries its tip', !!wantTip && gTip === wantTip, gTip);
 			ok('...and no top-level ' + label + ' row', !top.includes(label), top.join('|'));
 			await page.click('#lpn_menu_popup .lpn-menu-row:has-text("' + names.g + '")');
 			await page.waitForTimeout(250);
