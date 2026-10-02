@@ -49123,10 +49123,11 @@ var EngCalcs = EngCalcs || {};
 	// <select> keeps both arrows (they change the choice, and a closed select is where a person
 	// is most likely mid-decision), and the walk steps OVER a select rather than stopping on it:
 	// a stop there would trap the walker, every further press silently changing a pattern or a
-	// curve. Tab and the mouse are how a select is reached. An input with a
-	// datalist keeps them for its suggestions. A number field's own stepping is given up on purpose, since nearly every field here is type=number and the
-	// step is `any` (one whole unit per press, which no pipe diameter wants); Alt+Up/Down is
-	// left to the browser for anyone who wants it. A checkbox has no use for the arrows.
+	// curve. Tab and the mouse are how a select is reached. An input with a datalist keeps
+	// them for its suggestions. A number field's own stepping is given up on purpose: nearly
+	// every field here is type=number and the step is `any` (one whole unit per press, which no
+	// pipe diameter wants); Alt+Up/Down is left to the browser for anyone who wants it. A
+	// checkbox has no use for the arrows.
 	//
 	// **THE COMMIT IS THE BLUR'S.** Leaving a field fires its own `change`, the very path Tab
 	// and a mouse click take, so nothing here writes a property. The blur may re-render the box
