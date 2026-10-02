@@ -191,7 +191,9 @@ async function main() {
 			const href = (i) => i.getAttribute('href') || i.getAttribute('xlink:href') || '';
 			return {
 				plan: r(imgs.filter((i) => /^data:/.test(href(i)))[0]),
-				model: r(document.querySelector('#lpn_canvas g.lpn-symbols')),
+				// The drawing ON SCREEN: other open tabs keep theirs hidden beside it (Task 680).
+				model: r(Array.from(document.querySelectorAll('#lpn_canvas g.lpn-symbols'))
+					.filter((g) => getComputedStyle(g).display !== 'none')[0]),
 				tile: r(imgs.filter((i) => /^https?:/.test(href(i)))[0])
 			};
 		});
