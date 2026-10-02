@@ -33,7 +33,8 @@ on this page is the expensive mistake (Task 599 already records this).
   options is **Head with Elevation**, which draws TWO lines. Built.
 - **Contour.** The selected Node property's colour symbology plotted on the MAP at the current
   display time step, responding to the transport controls. Task 600 carries the unknown: what is
-  drawn where there are no nodes.
+  drawn where there are no nodes. For pressure, interpolate head and subtract the DEM
+  (`dev/epanet-js-contour-contribution.md` §2a).
 - **Frequency.** The selected property of either Node or Link type as one distribution line --
   property against per cent less than -- at the current display time step, responding to the
   transport. Task 600.

@@ -32,7 +32,7 @@ const fs = require('fs');
 const { execFileSync, spawnSync } = require('child_process');
 
 const REPO = path.resolve(__dirname, '..', '..');
-const LOCK_FILE = '/tmp/engcalcs-browser.lock';
+const LOCK_FILE = process.env.EC_BROWSER_LOCK || '/tmp/engcalcs-browser.lock';
 const LOCK_ENV = 'EC_START_FRESH_LOCKED';
 
 if (process.env[LOCK_ENV] !== '1') {

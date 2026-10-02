@@ -52,8 +52,8 @@ fi
 
 # **THEY RUN SEVERAL AT A TIME NOW, AND THE ACCOUNTING DID NOT MOVE** (2026-09-23). 241 harnesses
 # ran strictly one after another on a four-core box, so three cores sat idle through the longest
-# phase of check_all.sh -- and because every check_all in this project goes through one flock, that
-# serial phase is what a second worker waits behind. Measured here on 24 pure-node harnesses, on a
+# phase of check_all.sh -- and while every check_all went through one flock, that serial phase was
+# what a second worker waited behind (check_all.sh now runs suites in slots). Measured here on 24 pure-node harnesses, on a
 # machine ALREADY running three other suites: 80 s serial against 50 s at three at a time. The gain
 # on an idle machine is larger; 1.6x is the loaded, conservative number and is the one to quote.
 #
@@ -75,9 +75,10 @@ fi
 JOBS="${ENGCALCS_HARNESS_JOBS:-}"
 if [ -z "$JOBS" ]; then
 	CORES="$(nproc 2>/dev/null || echo 2)"
-	JOBS=$((CORES - 1))
+	# Share the cores among the suites check_all.sh lets run at once (its EC_CHECK_SLOTS).
+	JOBS=$((CORES / ${EC_CHECK_SLOTS:-4}))
 	[ "$JOBS" -lt 1 ] && JOBS=1
-	[ "$JOBS" -gt 3 ] && JOBS=3
+	[ "$JOBS" -gt 6 ] && JOBS=6
 fi
 
 OUT="$(mktemp -d)"
