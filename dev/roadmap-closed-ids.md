@@ -659,3 +659,5 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|746| CLOSED 2026-10-01, merged with feat/fireflow-scope on Tom's word: one All/Selected choice for each fire flow scope.
 - 0|753| CLOSED 2026-10-01 (Tom: "I am not sure there is a task here. Delete the task?"): "Asset activation" names the Alternatives column; the Properties checkbox keeps "Part of this network".
 - 0|690| CLOSED 2026-10-01: everything named under it shipped; its last child, Task 743 (graph tabs), merged on Tom's word.
+- 0|747| CLOSED 2026-10-02: merged with feat/copy-lock on Tom's "Merge after wording" (87a4d527); on open, a lock this browser cannot vouch for asks Original or Copy.
+- 0|701| CLOSED 2026-10-02 on `chore/panel-guard`: `panel-touch-harness.js` section 2b declares every conditional or computed display write (function + element + reason), section 2c fails if anything but `applyPaneLayout()` (or `applyRPaneLayout()`) opens or closes the bottom (or right) panel, in the DOM or in the state flag. Proved by a temporary second door that failed three assertions.
