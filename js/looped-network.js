@@ -30845,10 +30845,15 @@ var EngCalcs = EngCalcs || {};
 	function rememberSwitchState() {
 		var id = library.openId;
 		if (!id) { return; }
-		if (!switchKeep[id]) { switchKeepOrder.push(id); }
+		// Least-recent first, so the eviction below drops the tab left longest ago -- the same
+		// order the drawing keep evicts in, which is what lets a kept drawing count on its solve.
+		switchKeepOrder = switchKeepOrder.filter(function (x) { return x !== id; });
+		switchKeepOrder.push(id);
 		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult,
 			time: EngCalcs.lpnTimeKeep ? EngCalcs.lpnTimeKeep() : null,
 			layout: captureLabelLayout() };
+		// ...and the drawing itself, put away on arrival (see settleDrawingForArrival()).
+		outgoingDrawing = { id: id, sig: switchKeep[id].sig };
 		while (switchKeepOrder.length > SWITCH_KEEP_MAX) {
 			delete switchKeep[switchKeepOrder.shift()];
 		}
@@ -30962,9 +30967,164 @@ var EngCalcs = EngCalcs || {};
 		return true;
 	}
 	function forgetSwitchState(id) {
+		// The drawing goes with the tab too (Task 680): a closed tab frees its elements.
+		discardKeptDrawing(id);
 		if (!switchKeep[id]) { return; }
 		delete switchKeep[id];
 		switchKeepOrder = switchKeepOrder.filter(function (x) { return x !== id; });
+	}
+	/**
+	 * ---- THE DRAWING A TAB KEEPS (ROADMAP Task 680, the remaining phase) -----------------------
+	 *
+	 * Phase 1 kept the solve and the label layout; a switch still built every shape again, and
+	 * building them is what was left (nodes 77-128 ms, links 125-226 ms on the geographic Net3).
+	 * So the drawing itself is kept: the five layers and every index into them are ONE RECORD, the
+	 * globals the rest of this file walks (`nodeEls`, `linkEls`, `labelEls`, `nodesLayer`...) point
+	 * at the record on screen, and a switch swaps which record that is. Nothing that walks "the"
+	 * drawing had to learn there are several, because the globals only ever name one.
+	 *
+	 * **A KEPT DRAWING IS HIDDEN WITH `display:none`**, not `visibility`, so the browser does no
+	 * style or layout work for it and no hit test can land on it.
+	 *
+	 * **REUSED ONLY UNDER THE SAME SIGNATURE AS THE SOLVE**, `storedSignature()` over the bytes on
+	 * disk, so a document moved under a hidden tab (another window, a hand edit) is rebuilt rather
+	 * than shown stale. And only together with the kept solve it was drawn from: a drawing shows
+	 * values, and values without the result they came from would be the wrong-answer case phase 1
+	 * exists to prevent.
+	 *
+	 * **FOUR KEPT, LEAST-RECENT EVICTED.** One Net3-Novato drawing is ~2 MB and 1,931 shapes; four
+	 * is ~8 MB, which covers the back-and-forth between two or three projects that a switch delay
+	 * actually hurts, without a library of twenty tabs holding twenty drawings nobody returns to.
+	 * The solve keep (SWITCH_KEEP_MAX, 8) is the larger, so a kept drawing always has its solve.
+	 */
+	var keptDrawings = Object.create(null), keptDrawingOrder = [];
+	var DRAWING_KEEP_MAX = 4;
+	// The project whose drawing is on screen and leaving, set by rememberSwitchState() and acted on
+	// by the next arrival. Deferred to the arrival because a switch can still fail after it is set
+	// (an unreadable document), and then the drawing it names is still the one on screen.
+	var outgoingDrawing = null;
+	// Counted for the harness: a reuse that quietly never happens looks exactly like one that works.
+	var drawingsBuilt = 0, drawingsReused = 0;
+	function drawingLayers(d) {
+		return [d.customersLayer, d.linksLayer, d.linkSymbolLayer, d.nodesLayer, d.labelsLayer];
+	}
+	function captureDrawing() {
+		return { customersLayer: customersLayer, linksLayer: linksLayer,
+			linkSymbolLayer: linkSymbolLayer, nodesLayer: nodesLayer, labelsLayer: labelsLayer,
+			nodeEls: nodeEls, linkEls: linkEls, labelEls: labelEls, incidentLinks: incidentLinks,
+			labelsByAnchor: labelsByAnchor, labelsByLinkAnchor: labelsByLinkAnchor,
+			custEls: custEls, custLblEls: custLblEls, customersByLink: customersByLink,
+			// Facts about THESE elements, not about the page: an IOU for label work skipped while
+			// they were hidden, and the scale their labels were laid out at.
+			labelWorkSkipped: labelWorkSkipped, lastLayoutScale: lastLayoutScale };
+	}
+	function adoptDrawing(d) {
+		customersLayer = d.customersLayer; linksLayer = d.linksLayer;
+		linkSymbolLayer = d.linkSymbolLayer; nodesLayer = d.nodesLayer; labelsLayer = d.labelsLayer;
+		nodeEls = d.nodeEls; linkEls = d.linkEls; labelEls = d.labelEls; incidentLinks = d.incidentLinks;
+		labelsByAnchor = d.labelsByAnchor; labelsByLinkAnchor = d.labelsByLinkAnchor;
+		custEls = d.custEls; custLblEls = d.custLblEls; customersByLink = d.customersByLink;
+		labelWorkSkipped = d.labelWorkSkipped; lastLayoutScale = d.lastLayoutScale;
+		custHandleEl = null;
+	}
+	function showDrawing(d, on) {
+		drawingLayers(d).forEach(function (L) { if (L && L.style) { L.style.display = on ? '' : 'none'; } });
+	}
+	function discardDrawing(d) {
+		drawingLayers(d).forEach(function (L) { if (L && L.parentNode) { L.parentNode.removeChild(L); } });
+	}
+	function discardKeptDrawing(id) {
+		var k = keptDrawings[id];
+		if (!k) { return; }
+		delete keptDrawings[id];
+		keptDrawingOrder = keptDrawingOrder.filter(function (x) { return x !== id; });
+		discardDrawing(k.drawing);
+	}
+	// Empty layers for a new drawing, each a shallow twin of the one on screen and inserted beside
+	// it, so the paint order between the five (customers, pipes, pump symbols, nodes, labels) is
+	// the one init() set, whatever else the parent holds.
+	function startFreshDrawing() {
+		function twin(L) {
+			if (!L || !L.parentNode) { return L; }
+			var n = L.cloneNode(false);
+			if (n.style) { n.style.display = ''; }
+			L.parentNode.insertBefore(n, L);
+			return n;
+		}
+		adoptDrawing({ customersLayer: twin(customersLayer), linksLayer: twin(linksLayer),
+			linkSymbolLayer: twin(linkSymbolLayer), nodesLayer: twin(nodesLayer),
+			labelsLayer: twin(labelsLayer), nodeEls: {}, linkEls: {}, labelEls: {}, incidentLinks: {},
+			labelsByAnchor: {}, labelsByLinkAnchor: {}, custEls: {}, custLblEls: {}, customersByLink: {},
+			labelWorkSkipped: false, lastLayoutScale: lastLayoutScale });
+	}
+	// Marks that describe the MOMENT rather than the document come off before a drawing is put
+	// away: the hover ring, the half-drawn pipe's start, the meter's slide handle, the fading
+	// "just moved" flash. The selection is already gone (applySaved() clears it while this drawing
+	// is still the one on screen), and everything document-derived stays, which is the point.
+	function unmarkLeavingDrawing() {
+		if (hoverPreview) { paintHoverPreview(hoverPreview, false); hoverPreview = null; }
+		if (pendingLinkFrom && nodeEls[pendingLinkFrom] && nodeEls[pendingLinkFrom].circle) {
+			nodeEls[pendingLinkFrom].circle.classList.remove('lpn-node-pending');
+		}
+		if (custHandleEl) { custHandleEl.remove(); custHandleEl = null; }
+		[nodesLayer, labelsLayer].forEach(function (L) {
+			if (!L || !L.querySelectorAll) { return; }
+			Array.prototype.forEach.call(L.querySelectorAll('.lpn-just-dragged'), function (e) {
+				e.classList.remove('lpn-just-dragged');
+			});
+		});
+	}
+	function keepLeavingDrawing(id, sig) {
+		unmarkLeavingDrawing();
+		var d = captureDrawing();
+		showDrawing(d, false);
+		discardKeptDrawing(id);
+		keptDrawings[id] = { sig: sig, drawing: d };
+		keptDrawingOrder.push(id);
+		while (keptDrawingOrder.length > DRAWING_KEEP_MAX) { discardKeptDrawing(keptDrawingOrder[0]); }
+	}
+	/**
+	 * **THE ARRIVAL: put the leaving drawing away, then show the incoming one's or start one.**
+	 * Called by refreshAllFromDocument() with the incoming document installed. Returns true when a
+	 * kept drawing is now on screen and nothing needs building; false means the globals name a
+	 * drawing buildDom() must (re)build, exactly as it always has.
+	 */
+	function settleDrawingForArrival(kept) {
+		var out = outgoingDrawing, id = library.openId, k, sig, retained = false;
+		outgoingDrawing = null;
+		if (out && out.id !== id && keepLayoutEnabled && out.sig &&
+				library.projects.some(function (p) { return p.id === out.id; })) {
+			keepLeavingDrawing(out.id, out.sig);
+			retained = true;
+		}
+		k = id ? keptDrawings[id] : null;
+		if (k) {
+			// Out of the keep either way: shown, it is the drawing on screen; refused, it is a
+			// picture of a document that no longer exists.
+			delete keptDrawings[id];
+			keptDrawingOrder = keptDrawingOrder.filter(function (x) { return x !== id; });
+			sig = storedSignature(id);
+			if (keepLayoutEnabled && kept && sig && k.sig === sig && kept.sig === sig) {
+				// The one on screen goes: kept above, or orphaned (a closed tab's).
+				if (!retained) { discardDrawing(captureDrawing()); }
+				adoptDrawing(k.drawing);
+				showDrawing(k.drawing, true);
+				drawingsReused++;
+				return true;
+			}
+			discardDrawing(k.drawing);
+		}
+		if (retained) { startFreshDrawing(); }
+		drawingsBuilt++;
+		return false;
+	}
+	// What buildDom() does AFTER building, for a drawing that was not built: the marks that belong
+	// to the page's state rather than to the document, re-derived over the elements kept.
+	function reviveKeptDrawing() {
+		invalidateLinkLengths();
+		refreshSelection();
+		applyLabelVisibility();
+		refreshFireFlowMarks();
 	}
 	/**
 	 * ---- THE WHOLE-PROJECT WRITE WAITS FOR A PAUSE (ROADMAP Task 706) --------------------------
@@ -32038,7 +32198,12 @@ var EngCalcs = EngCalcs || {};
 		// once below (Task 653). Left set, it would run a second full pass a frame after arrival.
 		labelRefreshPending = false;
 		closePopup();
-		perfDebugTime('buildDom', function () { buildDom(); });
+		// **AND THE DRAWING SURVIVES TOO, UNDER THE SAME GUARD** (Task 680's remaining phase): a tab
+		// that comes back unchanged shows the elements it had, and nothing is built.
+		var drawingKept = false;
+		perfDebugTime('drawing', function () { drawingKept = settleDrawingForArrival(kept); });
+		if (drawingKept) { perfDebugTime('keptDrawing', function () { reviveKeptDrawing(); }); }
+		else { perfDebugTime('buildDom', function () { buildDom(); }); }
 		seedDefaultInputs();
 		// EVERY section, not two of them: a different project brings its own units, its own colour
 		// field and its own friction method, and all four sections carry one or more of those.
@@ -32088,7 +32253,13 @@ var EngCalcs = EngCalcs || {};
 		// otherwise. Either way it happens exactly once per switch.
 		labelPassDeferred = false;
 		perfDebugTime('  lblRestore', function () {
-			if (!applyKeptLabelLayout(kept)) { refreshLabelText(); }
+			// A kept drawing already carries its labels where they were. Laid out at this scale
+			// and owing nothing, there is no pass at all; otherwise it is relaid like any zoom.
+			if (drawingKept) {
+				if (lastLayoutScale === state.s && !labelWorkSkipped) {
+					switchRestoreCount++; keptLayoutMiss = '';
+				} else { refreshLabelText(); }
+			} else if (!applyKeptLabelLayout(kept)) { refreshLabelText(); }
 		});
 		// **A DOCUMENT THAT ARRIVES WITH A DURATION IS PRESENTED OVER THAT DURATION** (Task 248,
 		// 2026-08-19). On a slow network an EDIT shows the first reporting time first, but arriving is
