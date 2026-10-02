@@ -161,11 +161,18 @@ $redirectCases = [
     ['the app moves to LIBREWATERNET even when the host resolves to hawsedc.com',
         '/engcalcs/Looped-Network.php', '/engcalcs/Looped-Network.php', true,
         'https://librewaternet.org/app/', 'https://hawsedc.com'],
+    ['served BY hawsedc.com, the app moves to EPANET++ (Tom, 2026-10-01)',
+        '/engcalcs/Looped-Network.php', '/engcalcs/Looped-Network.php', true,
+        'https://epanet-plus-plus.org/app/', 'https://hawsedc.com', 'hawsedc.com'],
+    ['served by librewaternet.org at its script path, it stays on librewaternet.org',
+        '/engcalcs/Looped-Network.php', '/engcalcs/Looped-Network.php', true,
+        'https://librewaternet.org/app/', 'https://hawsedc.com', 'librewaternet.org'],
 ];
 foreach ($redirectCases as $case) {
     [$name, $script, $req, $declared, $want] = $case;
     $hostOrigin = isset($case[5]) ? $case[5] : $O;
-    $got = ecCanonicalRedirectTarget($script, $req, $declared, $hostOrigin);
+    $servingHost = isset($case[6]) ? $case[6] : '';
+    $got = ecCanonicalRedirectTarget($script, $req, $declared, $hostOrigin, $servingHost);
     if ($got !== $want) {
         $fails++;
         echo "  FAIL $name\n        wanted " . var_export($want, true)

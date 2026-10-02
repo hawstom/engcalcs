@@ -3644,3 +3644,9 @@ log for "Address already in use".
   raw EPANET run; found two leaks (Clear rings wiped the report; both analyses could run at once).
 - feat/find-filter: READY with one leak (adding a scenario counted as an edit of every filtered row);
   measured the snapshot cost at about 2% of existing waits on a 2,024-junction table.
+## 2026-10-01 pre-review feat/demand-scaling (Task 754), Perry
+
+OBSERVED (real Chromium, php -S worktree): Water > Analyze holds Fire flow, Criticality, Demand scaling. Net1 US default limit 20 psi: Find says 5.76; independent re-solve (own scaler, page engine AND built-in solver) 5.76 -> 20.11 psi, 5.77 -> 19.81 psi. Net3 limit 5 psi at 6 h: 3.10 holds, 3.11 does not, via the dialog's own Run. Save-as before/after runs: identical except project name and docId (the Save-as artefacts; a control save shows the same). SI example: 14.06 m H2O default (fire flow's own 20 psi converted, pre-existing).
+OBSERVED: a Find result stays on screen, unlabelled, when the clock is moved to another time step (Net3: t=0 verdict "0.51" still shown at 6 h, where the true answer is 3.1).
+OBSERVED: "1 times", "1 junctions" plurals; nothing grammatical handled.
+TRAP for method: Session Save as needs answerTrainingPanel() then a second queuePick; compare files with the project name and docId masked.

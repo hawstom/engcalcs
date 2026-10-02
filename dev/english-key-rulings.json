@@ -315,9 +315,9 @@
             "answer": "OK."
         },
         "lpn_copy_opened": {
-            "on": "Opened {file} as a copy, with a new lock of its own. The file itself changes only when you save.",
+            "on": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
             "ruled": "2026-10-01",
-            "answer": "OK."
+            "answer": "Wording change per this. This is good."
         },
         "lpn_copy_original": {
             "on": "Original; keep same lock",
