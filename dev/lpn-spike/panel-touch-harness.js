@@ -17,15 +17,11 @@
 //      fire either. Tom, 2026-08-29: *"Tips (? glyphs) in the Node editor survive the editor box on
 //      close on a phone."*
 //
-// **WHAT THIS HARNESS CANNOT SEE, stated rather than implied** (found 2026-09-19, answering Tom's
-// *"Why would the run progress bar do anything to the bottom panel?"* -- the answer is that it does
-// not; it shows and hides its own six-pixel track, and this scan reads EVERY display assignment in
-// the file). Both scans below match a LITERAL `'block'`, `'flex'` or `'none'`, so the ternary form
-// -- `el.style.display = open ? 'flex' : 'none'` -- is invisible to them, and about forty sites in
-// this file are written that way. **The bottom pane is one of them**: `applyPaneLayout()` is its
-// only writer today, by discipline rather than by anything asserted here, and a second writer added
-// next month would not fail this file. Widening the scan is ~40 new declared rows and several
-// genuine judgement calls, so it is named here rather than done quietly.
+// **THE LITERAL SCANS ARE NOT THE WHOLE GUARD** (found 2026-09-19, Task 701). Sections 1b and 2 match
+// a LITERAL `'block'`, `'flex'` or `'none'`, so the ternary form -- `el.style.display = open ?
+// 'flex' : 'none'` -- escaped them, about fifty sites. Section 2b now reads every other display
+// write and requires a declaration (function + element + reason); section 2c asserts that only
+// applyPaneLayout() opens or closes the bottom panel, in the DOM and in `paneState.open`.
 //
 // **THE FIX IS STRUCTURAL AND SO IS THIS HARNESS.** Neither is a list of six panels to keep up to
 // date -- makePanelDraggable() adds the class itself, and hidePanel() sweeps -- so what is asserted
@@ -251,6 +247,204 @@ console.log('\n--- one place hides a panel, tips and all ---');
 	// The six closers that DID sweep must not have grown a second copy of the sweep: one seam.
 	const inline = (js.match(/hideTipsIn\([a-z]+\); *[a-z]+\.style\.display/g) || []);
 	ok('no closer still sweeps by hand beside hiding', inline.length === 0, JSON.stringify(inline));
+}
+
+// ---------------------------------------------------------------------------
+// 2b. EVERY OTHER SPELLING OF A SHOW OR A HIDE (ROADMAP Task 701).
+//
+//     Sections 1b and 2 read a LITERAL `'block'`, `'flex'` or `'none'`. The same assignment written
+//     as a choice (`open ? 'flex' : 'none'`), as a variable, or as `''` (clear the inline rule and
+//     let the stylesheet decide) is invisible to them -- about fifty sites. This section reads the
+//     RHS-agnostic form: every `X.style.display = <anything that is not one of those three
+//     literals>` must be declared below with the function that may write it and the element it may
+//     touch, and a sentence saying why it is not a panel. A site that matches no row fails, so a
+//     new conditional show/hide has to be classified by somebody on the day it is written, which is
+//     what the literal scans already force for the plain form.
+//
+//     Keyed on FUNCTION NAME + LEFT-HAND SIDE, never on a line number or indentation. A row that is
+//     never matched fails too, because an unused row is a standing excuse for a site not yet written.
+// ---------------------------------------------------------------------------
+console.log('\n--- no conditional show or hide goes undeclared ---');
+const fnRanges = [];
+{
+	const fre = /function\s+([A-Za-z_$][\w$]*)\s*\(/g;
+	let fm;
+	while ((fm = fre.exec(code)) !== null) {
+		let i = code.indexOf('{', fm.index), depth = 0, end = i;
+		for (; end < code.length; end++) {
+			if (code[end] === '{') { depth++; }
+			else if (code[end] === '}') { depth--; if (depth === 0) { end++; break; } }
+		}
+		fnRanges.push({ name: fm[1], from: fm.index, to: end });
+	}
+}
+// The innermost NAMED function around an offset (an anonymous callback belongs to the named one).
+function namedFnAt(at) {
+	let best = null;
+	fnRanges.forEach(function (r) {
+		if (r.from <= at && at < r.to && (!best || r.from > best.from)) { best = r; }
+	});
+	return best ? best.name : '(top level)';
+}
+const LIT_DISPLAY = /^'(?:block|flex|none)'$/;
+const COND = 'a visibility that is a pure function of state, with no control to close and no tip to sweep';
+const OWN_ROW = 'a row or field inside a box that is already open';
+// [function regex, element regex, why it is not a panel]. The bottom panel, the right panel and
+// their buttons are NOT here: section 2c names who may write them, which is stricter than a reason.
+const CONDITIONAL_DISPLAY = [
+	[/^updateDataLeader$/, /^holder\.leader$/, 'a label leader line on the map'],
+	[/^updateArrow$/, /^le\.arrows\[i\]$/, 'a flow arrow on the map'],
+	[/^refreshScaleBar$/, /^el$/, 'the scale bar readout in the map footer strip'],
+	[/^renderColorLegend$/, /^box$/, 'the colour legend on the map: ' + COND + '. JUDGEMENT CALL: it is '
+		+ 'draggable furniture, but it is shown and hidden by what the map holds, never by the visitor, '
+		+ 'so there is no closer to route through hidePanel()'],
+	[/^renderLabelsLegend$/, /^box$/, 'the labels legend on the map: same reasoning as the colour legend above'],
+	[/^updateOffscreenNotice$/, /^el$/, 'the one-line "something is off screen" notice on the map'],
+	[/^refreshBasemapTeaser$/, /^b$/, 'the satellite toggle button'],
+	[/^refreshBasemapCredit$/, /^(?:c|el2)$/, 'a basemap attribution line in the map footer, required by the tile licences'],
+	[/^georefRefreshBar$/, /^bar$/, 'the georeference bar across the map: a fixed strip, not a draggable box'],
+	[/^georefRefreshBar$/, /^georefBarEl\('lpn_georef_\w+'\)$/, 'a control inside the georeference bar'],
+	[/^paintZoomWin$/, /^zoomWinEl$/, 'the Zoom Window drag box on the map'],
+	[/^mapgeoShow$/, /^b$/, 'a control inside the map-geometry bar'],
+	[/^mapgeoRefreshBar$/, /^bar$/, 'the map-geometry bar: a fixed strip, not a draggable box'],
+	[/^setPendingLinkFrom$/, /^rubberBandEl$/, 'the rubber-band line of a link being drawn'],
+	[/^drawPendingPath$/, /^pendingPathEl$/, 'the dashed line of a link being drawn'],
+	[/^paintAreaMarquee$/, /^selectAreaEl$/, 'the select-area marquee on the map'],
+	[/^updateAreaHint$/, /^box$/, 'the select-area instruction bubble, which holds no control (it raises itself)'],
+	[/^renderFindMessage$/, /^findQueryMsgEl$/, 'a one-line message inside the Find box'],
+	[/^setOpen$/, /^pop$/, 'a colour-ramp list under its own button, closed by that button'],
+	[/^writeBreaks$/, /^msg$/, 'a one-line message inside a box that is already open'],
+	[/^updateEmptyHint$/, /^hint$/, 'the empty-map welcome wall, laid over the map by state'],
+	[/^openConvertAsBox$/, /^u\.item$/, OWN_ROW],
+	[/^syncNewBoxRoughness$/, /^newBoxUnits\[i\]\.item$/, OWN_ROW],
+	[/^applyMethodUI$/, /^row$/, OWN_ROW],
+	[/^setboxShow$/, /^el$/, 'a row, group or section inside the Settings box, filtered by its search field. '
+		+ 'JUDGEMENT CALL: it can be handed any element of that box, but never the box itself; the box is '
+		+ 'opened and closed through placePanelForScreen() and hidePanel()'],
+	[/^filterSetboxContainer$/, /^(?:kid|pendingSub)$/, 'a row inside the Settings box, filtered by its search field'],
+	[/^applySetboxFilter$/, /^(?:sec|b|none)$/, 'a section, section button or "no match" line inside the Settings box'],
+	[/^libCurveEqRefresh$/, /^entry\._lpnEqField$/, 'a field inside the Library curve editor'],
+	[/^showNotice$/, /^el$/, 'the one-line map notice (lpn_map_notice): text only, no control'],
+	[/^syncStatusBoxVisibility$/, /^el$/, 'the status line (lpn_status): text only, no control. JUDGEMENT CALL: it is a box, '
+		+ 'but it holds no control, cannot be dragged and cannot be closed by the visitor'],
+	[/^paintEngineBanner$/, /^el$/, 'the engine-wait banner across the top of the map: text only']
+];
+// What section 2c owns instead, as function + element.
+const PANE_SEAM_WRITES = [['applyPaneLayout', 'pane'], ['applyPaneLayout', 'btn'], ['applyRPaneLayout', 'pane']];
+const condUsed = CONDITIONAL_DISPLAY.map(function () { return 0; });
+const condStray = [];
+let condSeen = 0;
+{
+	const re = /([A-Za-z_$][\w$.\[\]()']*?)\.style\.display\s*=(?!=)\s*([^;\n]*)/g;
+	let m;
+	while ((m = re.exec(code)) !== null) {
+		if (LIT_DISPLAY.test(m[2].trim())) { continue; }
+		condSeen++;
+		const fn = namedFnAt(m.index), lhs = m[1];
+		let hit = PANE_SEAM_WRITES.some(function (p) { return p[0] === fn && p[1] === lhs; });
+		CONDITIONAL_DISPLAY.forEach(function (d, i) {
+			if (d[0].test(fn) && d[1].test(lhs)) { hit = true; condUsed[i]++; }
+		});
+		if (!hit) { condStray.push(fn + ' ' + lhs + ' @' + code.slice(0, m.index).split('\n').length); }
+	}
+}
+ok('every conditional or computed display write is declared', condStray.length === 0, JSON.stringify(condStray));
+ok('...and the scan sees them (a scan that reads nothing passes everything)', condSeen >= 40, condSeen + ' sites');
+ok('...and no declaration is left unused', condUsed.every(function (n) { return n > 0; }),
+	JSON.stringify(CONDITIONAL_DISPLAY.filter(function (d, i) { return !condUsed[i]; })
+		.map(function (d) { return d[0].source + ' ' + d[1].source; })));
+// The other spellings of the same act. Not display assignments, so they need their own look.
+{
+	const other = [];
+	const reO = /\.style\.setProperty\(\s*'display'|\.style\.cssText\s*=[^;\n]*display\s*:|\.hidden\s*=(?!=)|removeAttribute\(\s*'hidden'|classList\.(?:toggle|add|remove)\(\s*'[^']*(?:hidden|hide|collaps)[^']*'/g;
+	// [function regex, matched-text regex, why]
+	const DECLARED_OTHER = [
+		[/.*/, /lpn-lbl-hidden|lpn-labels-hidden/, 'a CSS class that blanks the map\'s data labels'],
+		[/.*/, /^\.hidden\s*=\s*(?:\[|work\.filter)/, 'a list of hidden table columns, not an element'],
+		[/.*/, /^\.style\.cssText\s*=\s*'display:flex;gap:0\.5em/, 'a row built inside a box, with its layout'],
+		[/^wipeEverything$/, /^\.hidden\s*=\s*true/, 'a throwaway download form built and submitted in one breath, never in the page'],
+	];
+	let om;
+	while ((om = reO.exec(code)) !== null) {
+		const fn = namedFnAt(om.index), line = code.slice(0, om.index).split('\n').length,
+			text = om[0] + code.slice(om.index + om[0].length, om.index + om[0].length + 40).split('\n')[0];
+		if (DECLARED_OTHER.some(function (d) { return d[0].test(fn) && d[1].test(text); })) { continue; }
+		other.push(fn + ' "' + om[0].trim() + '" @' + line);
+	}
+	ok('no OTHER spelling of a show or hide (setProperty, cssText, .hidden, a hide class) goes undeclared',
+		other.length === 0, JSON.stringify(other));
+}
+
+// ---------------------------------------------------------------------------
+// 2c. ONLY applyPaneLayout() OPENS OR CLOSES THE BOTTOM PANEL (and only applyRPaneLayout() the right).
+//
+//     By discipline until Task 701, and the shape `dev/scenario-seam-repair.md` is about: one write
+//     seam, and the defects that followed when something else wrote around it. Two doors, closed here:
+//       (a) the DOM -- any function other than the seam that shows, hides, classes or hands to
+//           hidePanel() the element `paneEl()` returns (or `lpn_pane_body`), however the value is
+//           spelled, through a variable or directly;
+//       (b) the STATE -- `paneState.open = ...` anywhere but the functions that own it. They are
+//           allowed because each either calls the seam at once (openPane, closePane) or is the
+//           loader, whose caller applies the stored layout.
+//     The right panel is held to the same rule, as the same shape of seam beside it.
+// ---------------------------------------------------------------------------
+console.log('\n--- only applyPaneLayout() opens or closes the bottom panel ---');
+{
+	const PANES = [
+		{ label: 'bottom panel', seam: 'applyPaneLayout', getter: 'paneEl', ids: ['lpn_pane', 'lpn_pane_body'],
+			state: 'paneState', stateOwners: ['loadPaneState', 'openPane', 'closePane'],
+			callers: ['openPane', 'closePane'] },
+		{ label: 'right panel', seam: 'applyRPaneLayout', getter: 'rpaneEl', ids: ['lpn_rpane'],
+			state: 'rpaneState', stateOwners: ['loadRPaneState', 'openRightPane', 'closeRightPane'],
+			callers: ['openRightPane', 'closeRightPane'] }
+	];
+	PANES.forEach(function (P) {
+		ok(P.seam + '() exists', !!body(P.seam));
+		const idAlt = P.ids.join('|');
+		// Every way of GETTING the element: its getter, or its id directly.
+		const getSrc = '(?:' + P.getter + '\\(\\)|document\\.getElementById\\(\\s*\'(?:' + idAlt + ')\'\\s*\\))';
+		const doors = [];
+		let seamWrites = 0;
+		fnRanges.forEach(function (r) {
+			const src = code.slice(r.from, r.to);
+			const aliasRe = new RegExp('\\b([A-Za-z_$][\\w$]*)\\s*=\\s*' + getSrc, 'g');
+			const names = [getSrc];
+			let am;
+			while ((am = aliasRe.exec(src)) !== null) { names.push('\\b' + am[1] + '\\b'); }
+			const who = '(?:' + names.join('|') + ')';
+			const write = new RegExp(who + '\\s*\\.(?:style\\.(?:display|visibility|cssText)|hidden\\b|classList\\.(?:toggle|add|remove)\\(\\s*\'[^\']*(?:hid|collaps|open|clos|show)[^\']*\')'
+				+ '|' + who + '\\s*\\.setAttribute\\(\\s*\'(?:style|hidden)\''
+				+ '|\\b(?:hidePanel|placePanelForScreen)\\(\\s*' + who, 'g');
+			let wm;
+			while ((wm = write.exec(src)) !== null) {
+				const abs = r.from + wm.index;
+				if (namedFnAt(abs) !== r.name) { continue; }   // belongs to a nested named function
+				if (r.name === P.seam) { seamWrites++; continue; }
+				if (r.name === P.getter) { continue; }
+				doors.push(r.name + ' @' + code.slice(0, abs).split('\n').length + ': ' + wm[0].slice(0, 50));
+			}
+		});
+		ok('no function but ' + P.seam + '() writes the ' + P.label + '\'s display, class or hiding', doors.length === 0,
+			JSON.stringify(doors));
+		ok('...and the seam really does write it (a guard over a seam that writes nothing passes anything)',
+			seamWrites >= 1, seamWrites + ' writes');
+		// (b) the state.
+		const stateRe = new RegExp('\\b' + P.state + '\\s*(?:\\.open|\\[\\s*\'open\'\\s*\\])\\s*=(?!=)|\\b' + P.state + '\\s*=(?!=)', 'g');
+		const stateDoors = [];
+		let sm;
+		while ((sm = stateRe.exec(code)) !== null) {
+			const abs = sm.index, fn = namedFnAt(abs);
+			if (/\bvar\s+$/.test(code.slice(Math.max(0, abs - 6), abs))) { continue; }   // the declaration
+			if (P.stateOwners.indexOf(fn) >= 0) { continue; }
+			stateDoors.push(fn + ' @' + code.slice(0, abs).split('\n').length);
+		}
+		ok('no function but ' + P.stateOwners.join(', ') + ' sets whether the ' + P.label + ' is open',
+			stateDoors.length === 0, JSON.stringify(stateDoors));
+		P.callers.forEach(function (c) {
+			ok(c + '() applies the layout the moment it changes the state',
+				new RegExp(P.seam + '\\(\\)').test(body(c)), body(c) ? '' : 'FUNCTION NOT FOUND');
+		});
+	});
 }
 
 // ---------------------------------------------------------------------------
