@@ -115,9 +115,9 @@ merges with AskUserQuestion, then record his selection as the words.
   positive (Mary: EPANET says head gain; WaterGEMS shows positive Pump Head). Elsewhere a pump still
   shows signed "Head loss" (Tables, Properties result, labels, Time series): his call to rename.
 - 8144 `feat/criticality` (751): his "Skip dead ends" toggle built (a bridge with no source beyond;
-  a single feed main from the only reservoir counts as one). Owed rulings: severity order; row tints
-  (builder's addition); whether Design check should get its own All/Selected keys (fr/pt "Toutes",
-  "Todas" agree with junctions only, and Design check reuses them for pipes and junctions).
+  a single feed main from the only reservoir counts as one). Design check has its own keys; Water >
+  Analyze holds both analyses. Rows sort and tint in fire flow's tiers (unserved red, below minimum
+  orange, no answer grey). Owed: his ruling on the `$ec_lang_syn` diff for `lpn_ff_all`/`_selected`.
 - 8146 `feat/copy-lock` (747): his wording ("This file says it was created on {date}, and this browser
   doesn't recognize it...") and his "moved, not copied" reading: Original on a different file
   reconnects the tab to it. `lpn_copy_kept_link` reworded, needs his ruling.
