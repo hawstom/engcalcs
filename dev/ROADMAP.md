@@ -239,14 +239,6 @@ the block.
     burst actually costs before adding a second timer.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
-- 100|690| **Spreadsheet editing in the tables: the long project nobody has opened.**
-  Everything named under it has shipped, the table stepping last (`feat/table-tab-keys`, merged
-  2026-09-30 on his word). Graph tabs next: Task 743.
-
-- 100|718| **File menu: Recents just above Close, and an Import submenu.**
-  **BUILT 2026-09-30 with Task 745 on `feat/help-menu`, port 8138**, awaiting his browser pass.
-  Tom, 2026-09-25, from WaterCAD: *"File menu: Recents just above Exit"* and *"We have three import
-  items. It's probably time for an Import sub-menu."*
 - 100|737| **Coined names for interface elements, so every language names each one once.**
   Tom, 2026-09-28: *"The key here is for every language to invent unique words for each interface
   element and to use them consistently... it might be handy to literally make up unique, but memorable
@@ -267,55 +259,11 @@ the block.
   **RE-KEYED 2026-09-30**: sally/tessa/gus/dora are now label-sym-sally/label-user-tessa/
   label-word-gus/label-long-dora everywhere (glossary.json, key_concepts.json, concept_selftest.php,
   dev/term-concepts.md); definitions unchanged.
-- 100|738| **A Find filter that stays standing, or a snapshot, by the visitor's choice.**
-  **BUILT 2026-09-30 on `feat/find-filter`** to his ruling (no toggle; edited rows stay, dimmed and
-  marked, counted in the filter line); `filter-edited-row-harness.js`. New key `lpn_pane_filter_stale`.
-  Tom, 2026-09-28: editing a filtered value out of the filter makes its row vanish. His proposal: a
-  standing filter while the Find box is open, with a toggle next to Filter in table to make it a
-  snapshot. Readings in, 2026-09-29, and they disagree: Declan, no toggle, a row edited since the
-  filter was applied stays until Filter is pressed again (QGIS's pattern); Ida, a Snapshot checkbox
-  beside Filter in table, rows that stopped matching dimmed and marked with a warning sign, and the
-  count in the filter banner. **RULED 2026-09-30: the synthesis** -- Declan's rule, no toggle, with
-  Ida's dimming, warning sign and count on the rows that stay but no longer match. Building on
-  `feat/find-filter`.
 - 100|741| **The infinite map: generated networks for the label bench.**
   **ROUND 5 DONE 2026-09-30** on `feat/label-placer`: generator, L-Town and C-Town, pre-registered protocol, `dev/label-trials/round-5-2026-09-29.md`; five rule proposals await his ruling.
   Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
-- 100|743| **Ctrl+Shift+PageDown reaches the graph tabs, not only the tables.**
-  Unblocked 2026-09-30: `feat/table-tab-keys` merged.
-  Tom, 2026-09-29, on `feat/table-tab-keys`: *"It would be nice if it also could proceed to the
-  graphs."* Follows Task 690's table stepping onto the bottom pane's graph tabs (Frequency, Time
-  Series). Seam: the bottom-pane tab strip, shared with `feat/frequency-plot`.
-
-- 100|745| **Help menu in three groups, and a Tables and Hotkeys box.**
-  **BUILT 2026-09-30 on `feat/help-menu`, port 8138** (Perry: ready), awaiting his browser pass.
-  Tom, 2026-09-29: *"(1) True help: Walkthroughs, Tables and Hotkeys (new box that has all table help
-  and all keyboard shortcuts divided by context), Toolbars. (2) Helpers: Fix something, Install, and
-  Cookies. (3) True about: Notes on this page, Welcome page, Screenshot, Privacy, Terms, About."*
-  Seam: the menu definitions, shared with Task 718 (File menu); one track builds both.
-  **2026-09-30:** labels kept, Notes stays in group 3, except *"Change 'Toolbar key' to 'Toolbar'"*
-  (done on the branch). On Notes: *"Notes reads like a white paper, as much disclaimer as help. If it
-  needs to exist, it needs a clear job and identity ... For now, Notes is on probation."*
-- 100|746| **Fire flow dialog: one All/Selected choice for each of its two scopes.**
-  **BUILT 2026-09-30 on `feat/fireflow-scope`, port 8139** (Perry: ready), awaiting his browser pass.
-  Tom, 2026-09-29, ruling `lpn_ff_design_no_selection`: *"Our interface needs simplification as
-  follows: (a) (Specify) Junctions to test: All/Selected (b) Design check (effect on system);
-  (specify) pipes and other junctions to check: All/Selected"*, and the message: *"The design check
-  scope is set to Selected, but no assets are selected. Select assets or select All"*.
-
-- 100|747| **A copied project file shares its original's lock.**
-  An Explorer copy keeps the document ID, so opening both gives a false "somebody has this open";
-  never lost work. Tom, 2026-09-29: *"If you have a magic fix, go for it. I can't think of one."*
-  2026-09-30, rejecting the file-name idea: *"The fix doesn't help copies with same name. I am willing
-  to pay the privacy line if we get value."* His prompt instead: on open, when the server holds a lock
-  this browser does not remember, ask *"Is this the Original file (keep same lock) or a Copy (make
-  new lock)?"* Building on `feat/copy-lock`.
-- 100|750| **Ready-made scenarios in every new project.**
-  Tom, 2026-09-30: *"could we provide some pre-packaged Scenarios in all new projects? ... '1. Flow
-  test: Static, 2. Flow test: Mid, 3. Flow test: Max, 4. Average Day, 5. Max Day, 6. Peak hour,
-  7. Fire plus max day'"*. Building on `feat/scenario-preset`; flows for the flow tests are not guessed.
 - 100|751| **Criticality analysis: break each asset in turn and report.**
   Tom, 2026-09-30, on WaterGEMS's Criticality tool: *"This sounds like a fun report to build. Break
   each asset and report."* Fire flow's sibling: scope All/Selected, each pipe out of the network on
@@ -350,6 +298,9 @@ the block.
   - **CONTOUR is the one he starred and is also the one with a real unknown**: it interpolates a
     nodal value over the plane between nodes, so it needs a decision about what happens where there
     are no nodes -- a pressure contour across a river a main crosses is drawn over nothing.
+    **Design: `dev/epanet-js-contour-contribution.md`.** Since 2026-10-01 (§2a there, Luke Butler's
+    proof of concept): contour HEAD, subtract the Terrain-RGB DEM per cell, and let pressure leave
+    the junctions' range where the terrain does. Open: pressure-zone boundaries, hard vs faded edge.
   - **FREQUENCY SHIPPED 2026-09-30** (`feat/frequency-plot`, merged on his word). Contour and flow
     balance remain.
   - **SYSTEM FLOW BALANCE -- AND HIS READING OF IT IS RIGHT, but confirm it against EPANET's own
@@ -458,7 +409,8 @@ the block.
     layer never renumbers the others, which is the whole reason it is not an index.
   - A layer setting is MODELLING data by CLAUDE.md's project-versus-browser rule and rides in
     `serializeProject()`; it is not window furniture.
-- 75|640| **Graphs: the umbrella, a submenu under Water holding five plots.**
+- 100|640| **Graphs: the umbrella, a submenu under Water holding five plots.**
+  **Tom, 2026-10-01: promoted to 100.** *"Water menu: Replace Profile with Graphs flyout containing Profile, Time series, Frequency."* Building on `feat/graph-menu`. Contour and System flow are the two EPANET graphs still missing.
   **THE UMBRELLA, ON TOM'S WORD, 2026-09-15** (*"640 would make a nice umbrella"*). He asked whether
   there was an overall graphing project and there was not -- there were four unrelated rows. This is
   now the one place the programme is described, and the menu is where every plot surfaces, which is
@@ -479,22 +431,6 @@ the block.
       reached from the element rather than from the menu.
   - This row itself is the MENU, the tab shape and the export set. Full specification:
     `dev/graphs-scope.md`.
-- 75|701| **The panel guard is blind to forty sites, and the bottom panel is one.**
-  Found 2026-09-19 while answering Tom's *"why would the run progress bar do anything to the bottom
-  panel?"* -- the answer was that it does not, and the guard that said otherwise turned out to have
-  a hole of its own.
-  - **`dev/lpn-spike/panel-touch-harness.js` only recognises a show or a hide written as a plain
-    `'block'`, `'flex'` or `'none'`.** About FORTY places in `js/looped-network.js` write it as a
-    choice instead -- `open ? 'flex' : 'none'` -- and every one is invisible to it.
-  - **The bottom panel is one of them.** Only `applyPaneLayout()` opens and closes it today, **by
-    discipline and not because anything checks**, so a second door added next month would not be
-    noticed. That is precisely the arrangement `dev/scenario-seam-repair.md` exists because of: two
-    tracks wrote element properties, only one went through the single write seam, and five
-    user-reachable defects followed.
-  - **NOT slipped into the branch that found it**, deliberately: it is roughly forty new
-    declarations and several genuine judgement calls about what counts as a panel, on a branch Tom
-    has already passed in the browser. The limitation is now written at the top of the harness so it
-    no longer implies coverage it does not have.
 - 75|710| **Audit the 57 raw alert and confirm dialogs.**
   Left from the message log (Task 704, closed 2026-09-23): Ida's third item. Sort which must genuinely
   block and which are only information and belong in the log, which Tom's *"USER MUST HAVE CONTROL
@@ -530,13 +466,8 @@ the block.
   account, no upload); a Google Sheets sync is a fifth third-party service, so a `privacy.php`
   paragraph and his call. Mary, Sue and Declan's readings are under Task 721. The layout assumes
   Bentley's model (a scenario tree, alternatives beneath); ours is flat, so the tabs need rethinking.
-- 75|753| **[H] · "Activation" as our word for EPANET's active status.**
-  Tom, 2026-09-30, on Bentley's "Active Topology": *"I like the alias 'Activation' or 'Asset
-  activation'."* We already have it: the Properties checkbox `lpn_field_active`, "Part of this
-  network", scenario-overridable. **But not the same thing** (Tom, 2026-09-30): ours is a flat
-  per-scenario override; Bentley's Active Topology is an alternative in a scenario TREE, with
-  alternatives as a layer beneath scenarios. His call: which strings change, and to what.
-- 75|754| **On-the-fly demand adjustment: an analysis that scales demands on a copy.**
+- 100|754| **On-the-fly demand adjustment: an analysis that scales demands on a copy.**
+  **Tom, 2026-10-01:** *"let's do it and at the same time put Fire Flow, Criticality, and Demand scaling into a Water, Analyze flyout. I guess while we are at it, we could do some cooler things like 'What demand scale can the system handle with this pressure limit?'"* The Analyze fly-out is built on `feat/criticality`.
   Tom, 2026-09-30, on WaterGEMS's Active Demand Adjustments: *"This also sounds fun and easy to
   provide."* Then: *"Their Criticality and 'On-the-fly' are like our 'Fire flow' analysis; they do not
   touch the network. As such, our demand factors are similar and equivalent, but not the same UX or
@@ -554,7 +485,10 @@ the block.
   Tom, 2026-09-30: *"Put a cross platform project on our roadmap priority 75. Plan where/how to move
   the project to transcend the web-centric hawsedc.com/engcalcs folder. Windows or Linux? Plan what
   platforms and what frameworks to experiment with. I'm thinking about Windows, Linux, Mac; Flutter,
-  Tauri, (not Electron, Qt, or .NET MAUI?)"* Plan: `dev/desktop-platforms-plan.md` (to be written).
+  Tauri, (not Electron, Qt, or .NET MAUI?)"* Plan: `dev/desktop-platforms-plan.md`.
+  **Tom, 2026-10-01: stays at 75, with a branch to play on** (`feat/desktop`): *"my main concern is that we
+  could get too heavy for the browser or find limitations. Until then, let's just play and plan and see
+  what happens."*
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
