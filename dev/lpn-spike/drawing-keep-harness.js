@@ -30,7 +30,7 @@ const L = loadLoopedNetwork(
 	"\t\t\tlabelsLayer = el('g', {}, modelLayer);\n" +
 	"\t\t\trubberBandEl = el('line', {}, world); },\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h;\n" +
-	"\t\t\tsvg.getBoundingClientRect = function () { return { top: 0, bottom: h, width: w, height: h }; }; },\n" +
+	"\t\t\tsvg.getBoundingClientRect = function () { return { left: 0, right: w, top: 0, bottom: h, width: w, height: h }; }; },\n" +
 	"\t\tmarkSized: noteMapSized,\n" +
 	"\t\taddNode: addNode, addLink: addLink, getDoc: function () { return doc; },\n" +
 	"\t\tnewProject: newProject, openProject: openProject, discardProject: discardProject,\n" +
@@ -42,6 +42,18 @@ const L = loadLoopedNetwork(
 	"\t\tlayers: function () { return { model: modelLayer, nodes: nodesLayer, links: linksLayer,\n" +
 	"\t\t\tlabels: labelsLayer, customers: customersLayer, symbols: linkSymbolLayer }; },\n" +
 	"\t\tnodeEls: function () { return nodeEls; },\n" +
+	"\t\tscale: function () { return state.s; }, zoomAbout: zoomAbout,\n" +
+	"\t\tsettleZoom: function () { if (reshedTimer) { clearTimeout(reshedTimer); reshedTimer = null; } reshedNow(); },\n" +
+	"\t\trefreshFontSizes: refreshFontSizes, lastLayoutScale: function () { return lastLayoutScale; },\n" +
+	"\t\tsizes: function () {\n" +
+	"\t\t\tvar s = state.s, px = function (v) { return Math.round(parseFloat(v) * s * 1e4) / 1e4; }, out = {};\n" +
+	"\t\t\tObject.keys(nodeEls).forEach(function (id) { var h = nodeEls[id];\n" +
+	"\t\t\t\tout['n:' + id] = [px(h.circle.r), h.text && h.text.style.fontSize ? px(h.text.style.fontSize) : null]; });\n" +
+	"\t\t\tObject.keys(linkEls).forEach(function (id) { var h = linkEls[id];\n" +
+	"\t\t\t\tout['l:' + id] = h.text && h.text.style.fontSize ? px(h.text.style.fontSize) : null; });\n" +
+	"\t\t\t['--lpn-sym', '--lpn-symf', '--lpn-lw', '--lpn-hair'].forEach(function (k) {\n" +
+	"\t\t\t\tout[k] = px(svg.style.getPropertyValue(k)); });\n" +
+	"\t\t\treturn out; },\n" +
 	"\t\tkept: function (id) { return keptDrawings[id] || null; },\n" +
 	"\t\tkeptIds: function () { return keptDrawingOrder.slice(); },\n" +
 	"\t\tkeepMax: function () { return DRAWING_KEEP_MAX; },\n" +
@@ -238,6 +250,53 @@ console.log('\n--- (c) closing a tab frees its drawing; the keep is bounded ---'
 	ok('the page holds the kept drawings and the one on screen, nothing more',
 		nodeLayers === 3 * (L.keepMax() + 1), nodeLayers + ' symbol layers for ' + (L.keepMax() + 1) + ' drawings');
 	ok('the least recent was the one let go', !L.kept(ids[0]) && !L.kept(ids[1]) && !!L.kept(ids[ids.length - 2]));
+}
+
+console.log('\n--- (d) a drawing that comes back is sized for its OWN view, not the one it left ---');
+{
+	// Phase (a) went big -> small -> big at whatever zoom each fit to, and a stub fit gave them
+	// near enough the same scale that a drawing sized at the wrong one could not show. Here the two
+	// are as far apart as the page gets: a grid Net1 at pixels per foot, and the geographic Novato
+	// at tens of thousands of pixels per degree. A kept drawing sized at the outgoing project's
+	// scale draws its junctions 5x too large one way and sub-pixel the other (perry-680 t8).
+	function load(file) {
+		const j = JSON.parse(fs.readFileSync(path.join(__dirname, '../water-network-examples/' + file), 'utf8'));
+		L.newProject(); const id = L.openId(); L.applySaved(j); L.refreshAll(); L.saveToStorage(); return id;
+	}
+	const grid = load('Net1.lwn'), geo = load('Net3-Novato-CA-World.lwn');
+	// The same view, built from nothing: what the returned drawing must equal, element for element.
+	function fresh() { L.buildDom(); L.refreshFontSizes(true); return L.sizes(); }
+	function diff(a, b) {
+		const k = Object.keys(b).filter(function (x) { return JSON.stringify(a[x]) !== JSON.stringify(b[x]); });
+		return k.length + ' differ; first ' + k[0] + ' ' + JSON.stringify(a[k[0]]) + ' vs fresh ' + JSON.stringify(b[k[0]]);
+	}
+	function returnTo(id, from, label) {
+		L.openProject(id); const sOwn = L.scale();
+		L.openProject(from);
+		ok(label + ': the two projects really are at different scales (' + sOwn.toPrecision(3) + ' vs ' +
+			L.scale().toPrecision(3) + ')', Math.abs(Math.log(sOwn / L.scale())) > Math.log(2));
+		// A drawing left with its labels hidden (Novato at its fit) owes the pass it skipped; one
+		// laid out at the view it returns to owes nothing and must not run one.
+		const owes = L.kept(id).drawing.labelWorkSkipped || L.kept(id).drawing.lastLayoutScale !== sOwn;
+		const c0 = L.counts();
+		L.openProject(id);
+		const c1 = L.counts();
+		ok(label + ': it came back from the keep' + (owes ? ' (owing its skipped label pass)' : ', with no label pass'),
+			c1.reused === c0.reused + 1 && (owes || c1.restores === c0.restores + 1), JSON.stringify(c0) + ' -> ' + JSON.stringify(c1));
+		ok(label + ': ...at its own scale', L.scale() === sOwn, L.scale() + ' vs ' + sOwn);
+		const got = L.sizes(), want = fresh();
+		ok(label + ': every node symbol and label is the on-screen size a fresh build gives (' +
+			Object.keys(want).length + ')', JSON.stringify(got) === JSON.stringify(want), diff(got, want));
+	}
+	returnTo(grid, geo, 'grid Net1 back from geographic Novato');
+	returnTo(geo, grid, 'geographic Novato back from grid Net1');
+	// And after a zoom-in, laid out at the new scale, so the kept record's layout scale matches the
+	// view it comes back to -- the case that skipped the resize outright.
+	L.openProject(grid); L.zoomAbout(700, 350, 4); L.settleZoom();
+	ok('the zoom-in was laid out at its own scale', L.lastLayoutScale() === L.scale());
+	returnTo(grid, geo, 'zoomed-in Net1 back from Novato');
+	L.openProject(geo); L.zoomAbout(700, 350, 4); L.settleZoom();
+	returnTo(geo, grid, 'zoomed-in Novato back from Net1');
 }
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));

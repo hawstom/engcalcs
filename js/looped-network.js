@@ -31123,8 +31123,9 @@ var EngCalcs = EngCalcs || {};
 	function reviveKeptDrawing() {
 		invalidateLinkLengths();
 		refreshSelection();
-		applyLabelVisibility();
 		refreshFireFlowMarks();
+		// Not applyLabelVisibility(): it answers for the scale in force, which is still the outgoing
+		// project's. refreshAllFromDocument() asks it once the kept view is restored.
 	}
 	/**
 	 * ---- THE WHOLE-PROJECT WRITE WAITS FOR A PAUSE (ROADMAP Task 706) --------------------------
@@ -32230,8 +32231,14 @@ var EngCalcs = EngCalcs || {};
 
 		// `true` is deferLayout: while the label pass is deferred there is nothing placed to
 		// re-place, and running it here is the duplicate pass this whole change removes.
-		perfDebugTime('fontSizes', function () { refreshFontSizes(labelPassDeferred); });
-		refreshSymbolSizes();
+		// **NOT FOR A KEPT DRAWING, WHICH IS SIZED BELOW, AT THE VIEW IT COMES BACK TO.** Here the
+		// scale in force is still the OUTGOING project's, and sizing kept elements at it drew Net1's
+		// junctions 5x too big after Elm Street and sub-pixel after the geographic Novato --
+		// and applyView() then saw the kept layout scale equal the restored one and resized nothing.
+		if (!drawingKept) {
+			perfDebugTime('fontSizes', function () { refreshFontSizes(labelPassDeferred); });
+			refreshSymbolSizes();
+		}
 		refreshValueColors();
 		renderLabelsLegend();
 		applyMaskLabels();   // the setting belongs to the project, so opening one can change it
@@ -32248,6 +32255,16 @@ var EngCalcs = EngCalcs || {};
 		// type -- the case a warm-up hooked only to the type selector would miss entirely.
 		warmEpanetIfNeeded();
 		perfDebugTime('viewOrFit', function () { restoreViewOrFit(); });
+		if (drawingKept) {
+			// Sizes only, at the scale now in force; the labels are decided just below. A view
+			// still waiting for the canvas will set a scale later, and the kept layout scale is
+			// cleared so that applyView() resizes and relays at it instead of trusting it.
+			if (pendingRestore) { lastLayoutScale = null; }
+			// Hidden-or-not first: asked at the outgoing scale it would mark the kept labels as
+			// owing a pass they do not owe (labelWorkSkipped), and the switch would run one.
+			applyLabelVisibility();
+			perfDebugTime('fontSizes', function () { refreshFontSizes(true); });
+		}
 		// **AND NOW THE LABELS, ONCE, AT THE ZOOM THEY WILL BE READ AT** -- restored whole if this
 		// tab worked them out already and nothing has moved since, and computed from scratch
 		// otherwise. Either way it happens exactly once per switch.
