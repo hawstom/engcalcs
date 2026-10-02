@@ -14,6 +14,9 @@
 //      already under it with nothing broken.
 //   6. A closed pipe is no path; a junction already cut off is nobody's fault.
 //   7. Fire flow's Clear rings leaves this report alone; the two analyses never run at once.
+//   8. Severity order and row tints: fire flow's four tiers and its own row classes -- demand not
+//      served red (lpn-ff-fail), below minimum or a zero-demand junction cut off orange
+//      (lpn-ff-design), no answer grey (lpn-ff-error), nothing lost untinted -- most severe first.
 //
 // Mutations this must catch (Perry, 2026-09-30): the already-below exclusion removed; closed pipes
 // treated as open; already-unreachable junctions counted; the minimum forced to 0; Clear rings
@@ -86,6 +89,17 @@ function rows(el) {
 	})(el);
 	return out;
 }
+function trs(el) {
+	const out = [];
+	(function walk(x) {
+		if (!x) { return; }
+		if (isTag(x, 'tr')) { if (kids(x).some((c) => isTag(c, 'td'))) { out.push(x); } return; }
+		kids(x).forEach(walk);
+	})(el);
+	return out;
+}
+function rowTint(tr) { return (String(tr.className || '').match(/lpn-ff-(fail|design|error|none)/) || [])[1] || ''; }
+function rowId(tr) { const b = gotoIn(kids(tr)[0])[0]; return b ? b.textContent : ''; }
 function gotoIn(el) {
 	const out = [];
 	(function walk(x) {
@@ -150,6 +164,13 @@ function openNet1() {
 	ok('the summary counts the four links that lose something',
 		text(byId.lpn_crit_report).indexOf(PC.lpn_crit_summary.replace('{n}', '4').replace('{total}', '13')
 			.replace('{pressure}', '113 psi')) >= 0);
+	let trEls = trs(byId.lpn_crit_report);
+	const tints = trEls.map((t) => rowId(t) + ':' + rowTint(t));
+	ok('8. below-minimum rows wear the design tint and lead the table, most junctions first',
+		tints.slice(0, 4).join() === '111:design,9:design,10:design,121:design' &&
+		set.byId['111'].below.length === 2 && set.byId['9'].below.length === 2 && set.byId['121'].below.length === 1,
+		tints.join());
+	ok('8. the rest are untinted', tints.slice(4).every((x) => /:none$/.test(x)), tints.slice(4).join());
 	L.setMin('20');
 
 	console.log('\n--- 2. With 122 out, 31 and 121 isolate junctions ---');
@@ -178,6 +199,11 @@ function openNet1() {
 	ok('the cut-off cell names the junctions as links', gotoIn(tr[0][2]).map((b) => b.textContent).sort().join() === '31,32',
 		text(tr[0][2]));
 	ok('the demand cell reads in gpm', /^200 gpm$/.test(text(tr[0][1])), text(tr[0][1]));
+	trEls = trs(byId.lpn_crit_report);
+	ok('8. rows that leave demand unserved wear fire flow\'s fail tint', trEls.slice(0, 2).every((t) => rowTint(t) === 'fail'),
+		trEls.slice(0, 3).map((t) => rowId(t) + ':' + rowTint(t)).join());
+	ok('8. a row that loses nothing wears the untinted class', trEls.slice(2).every((t) => rowTint(t) === 'none'),
+		trEls.slice(2).map((t) => rowId(t) + ':' + rowTint(t)).join());
 	const ths = [];
 	(function walk(x) { if (!x) { return; } if (isTag(x, 'th')) { ths.push(x); return; } kids(x).forEach(walk); })(byId.lpn_crit_report);
 	ok('headings are the page\'s own words', ths.length === 4 && ths.some((t) => String(t.textContent).indexOf(PC.lpn_crit_col_unserved) >= 0));
@@ -196,6 +222,10 @@ function openNet1() {
 		Math.abs(e31.unserved / GPM - 100) < 1e-6, JSON.stringify(e31));
 	const row31 = rows(byId.lpn_crit_report).filter((r) => gotoIn(r[0])[0] && gotoIn(r[0])[0].textContent === '31')[0];
 	ok('...and its row says the solve failed', !!row31 && text(row31[3]) === PC.lpn_ff_err_solve, row31 && text(row31[3]));
+	trEls = trs(byId.lpn_crit_report);
+	ok('8. an unsolved row that still lost demand is red, not grey: the loss is known',
+		trEls.filter((t) => rowId(t) === '31').map(rowTint).join() === 'fail',
+		trEls.map((t) => rowId(t) + ':' + rowTint(t)).join());
 
 	console.log('\n--- 6. A closed pipe is no path; an already cut-off junction is nobody\'s fault ---');
 	L.setInactive('122', true);
@@ -262,6 +292,27 @@ function openNet1() {
 	set = L.run();
 	ok('unchecked is unchanged: 12 rows, none skipped', set.results.length === 12 && set.skippedDeadEnds.length === 0 &&
 		text(byId.lpn_crit_report).indexOf(PC.lpn_crit_skipped_dead.replace('{n}', '0')) < 0);
+
+	console.log('\n--- 8. Severity order and tiers, on records alone ---');
+	const E = global.EngCalcs, S = E.lpnCriticalityStates;
+	const recs = [
+		{ id: 'n', state: S.NONE, unserved: 0, cutOff: [], below: [] },
+		{ id: 'e', state: S.ERROR, unserved: 0, cutOff: [] },
+		{ id: 'd1', state: S.IMPACT, unserved: 0, cutOff: [], below: [{ id: 'x' }] },
+		{ id: 'f1', state: S.IMPACT, unserved: 1, cutOff: ['a'], below: [] },
+		{ id: 'z', state: S.IMPACT, unserved: 0, cutOff: ['q'], below: [] },
+		{ id: 'd3', state: S.IMPACT, unserved: 0, cutOff: [], below: [{ id: 'x' }, { id: 'y' }, { id: 'w' }] },
+		{ id: 'fe', state: S.ERROR, unserved: 2, cutOff: ['a', 'b'] },
+		{ id: 'f5', state: S.IMPACT, unserved: 5, cutOff: ['a'], below: [{ id: 'x' }] }
+	];
+	ok('tiers: unserved is fail, even unsolved; below or a zero-demand cut-off is design; then error; then none',
+		recs.map((r) => r.id + ':' + E.lpnCriticalitySeverity(r)).join() ===
+		'n:none,e:error,d1:design,f1:fail,z:design,d3:design,fe:fail,f5:fail',
+		recs.map((r) => r.id + ':' + E.lpnCriticalitySeverity(r)).join());
+	const ord = E.lpnCriticalityOrder(recs).map((r) => r.id).join();
+	ok('order: most demand lost first, then most junctions below, then most cut off, then error, then none',
+		ord === 'f5,fe,f1,d3,d1,z,e,n', ord);
+	ok('the order is a copy; the run\'s own list is untouched', recs.map((r) => r.id).join() === 'n,e,d1,f1,z,d3,fe,f5');
 
 	if (fails) { console.log('\n' + fails + ' criticality check(s) FAILED'); process.exit(1); }
 	console.log('\nCriticality harness: all checks passed.');
