@@ -264,13 +264,6 @@ the block.
   Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
-- 100|747| **A copied project file shares its original's lock.**
-  An Explorer copy keeps the document ID, so opening both gives a false "somebody has this open";
-  never lost work. Tom, 2026-09-29: *"If you have a magic fix, go for it. I can't think of one."*
-  2026-09-30, rejecting the file-name idea: *"The fix doesn't help copies with same name. I am willing
-  to pay the privacy line if we get value."* His prompt instead: on open, when the server holds a lock
-  this browser does not remember, ask *"Is this the Original file (keep same lock) or a Copy (make
-  new lock)?"* Building on `feat/copy-lock`.
 - 100|751| **Criticality analysis: break each asset in turn and report.**
   Tom, 2026-09-30, on WaterGEMS's Criticality tool: *"This sounds like a fun report to build. Break
   each asset and report."* Fire flow's sibling: scope All/Selected, each pipe out of the network on
