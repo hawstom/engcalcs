@@ -100,7 +100,10 @@
         "feat/bentley-interop",
         "feat/scenario-preset",
         "feat/criticality",
-        "feat/graph-tab-keys"
+        "feat/graph-tab-keys",
+        "feat/graph-menu",
+        "feat/demand-scaling",
+        "feat/desktop"
     ],
     "feature_freeze": {
         "active": false,

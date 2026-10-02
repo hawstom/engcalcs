@@ -35435,7 +35435,9 @@ var EngCalcs = EngCalcs || {};
 	// list opens a file by exactly the same route the picker does -- same identity check, same
 	// already-open rule, same lock question. A second copy of this would be a second place for the
 	// lock protocol to drift.
-	async function openHandle(handle) {
+	// `fromRecent` is set only by the recent list: a handle the browser handed back from its own
+	// store, which is therefore a file this browser already knows (Task 747's first whitelist door).
+	async function openHandle(handle, fromRecent) {
 		var pc = EngCalcs.pageConfig || {}, text;
 		try { text = await (await handle.getFile()).text(); }
 		catch (err) {
@@ -35444,18 +35446,39 @@ var EngCalcs = EngCalcs || {};
 		}
 		var saved = acceptImportedText(text);
 		if (!saved) { return; }
-		// **The lock is checked BEFORE the project lands** (Task 211). Task 195 opened the file, then
-		// sprang read-only on the user afterwards; Tom's AutoCAD instinct -- and Word's, and Excel's --
-		// is that this is a QUESTION asked at the moment of opening, with both real answers on it.
 		var docId = (saved.project && saved.project.docId) || null;
 		// **The same file must not become two tabs.** Two tabs over one file is a merge conflict with
 		// yourself: both wear the file's name, both think they own it, and whichever you Save last
 		// silently wins. Opening what is already open brings it forward, as every document program does.
 		//
-		// Identity is the `docId` INSIDE the file, never the name -- a copy saved under a new name is
-		// a different document and legitimately opens as its own tab.
+		// **BUT SAME ID IS NOT SAME FILE** (Task 747, reproduced by the pre-review 2026-09-30). An
+		// Explorer copy of an open file carries its id, and switching to the tab used to REBIND the
+		// tab to the copy's handle -- so the next Save overwrote the copy and the original silently
+		// stopped receiving saves. Only the browser can say two handles are one file, so the tab is
+		// switched to without a question only when it can: isSameEntry() on the tab's own handle, or,
+		// for a tab with no connection left to compare, a file this browser already knows.
 		var already = docId ? projectWithDocId(docId) : null;
-		if (already) { adoptAlreadyOpen(already, handle); return; }
+		var known = !docId || fromRecent || await fileKnownHere(handle);
+		if (already) {
+			var tabHandle = handleFor(already);
+			if (tabHandle ? await sameFileEntry(tabHandle, handle) : known) { adoptAlreadyOpen(already, handle); return; }
+			presentCopyQuestion(saved, handle, already);
+			return;
+		}
+		// **A FILE THIS BROWSER CANNOT VOUCH FOR IS ASKED ABOUT** (Tom, 2026-09-30): *"We should be
+		// examining only the file itself and what we and this browser know about the file. The
+		// question should appear when the file is unknown to the browser. If we can't guarantee that
+		// it's the same file, we must ask."* Nothing here looks at the lock server or other browsers.
+		// A file with no docId has no identity to share, so it is never asked about.
+		if (!known) { presentCopyQuestion(saved, handle, null); return; }
+		await openKnownFile(saved, handle);
+	}
+	// The lock step, exactly as it was before Task 747, now reached after the copy question.
+	// **The lock is checked BEFORE the project lands** (Task 211). Task 195 opened the file, then
+	// sprang read-only on the user afterwards; Tom's AutoCAD instinct -- and Word's, and Excel's --
+	// is that this is a QUESTION asked at the moment of opening, with both real answers on it.
+	async function openKnownFile(saved, handle) {
+		var docId = (saved.project && saved.project.docId) || null;
 		var r = docId ? await postLock('check', docId) : null;
 		if (r && r.ok && r.locked && !r.mine) {
 			presentOpenChoice(saved, handle, lockHolderName(r), r);
@@ -35489,7 +35512,7 @@ var EngCalcs = EngCalcs || {};
 			setNotice((pc.lpn_recent_gone || 'Could not open {file}. It may have been moved, renamed, or deleted, so it was taken off the recent list.').replace('{file}', rec.name));
 			return;
 		}
-		await openHandle(rec.handle);
+		await openHandle(rec.handle, true);
 	}
 	// The three-answer dialog: look at it, keep your own copy, or think better of it. Cancel is a real
 	// answer here and does nothing at all -- the project never lands, so backing out is free.
@@ -35645,6 +35668,122 @@ var EngCalcs = EngCalcs || {};
 			if (d && d.project && d.project.docId === docId) { return id; }
 		}
 		return null;
+	}
+	// ---- Is this a copy? (ROADMAP Task 747) ----
+	//
+	// A file copied in Explorer carries its original's docId, so the two share one lock. Nothing in
+	// the file can tell them apart, so the page asks whenever it cannot GUARANTEE the file is one
+	// this browser already knows. The guarantees are a whitelist, and every door in it is something
+	// the browser itself attests; no new storage (Tom, 2026-09-30: *"Don't we already keep a Recent
+	// files list?"*):
+	//   (a) opened from the recent list -- openHandle(handle, true);
+	//   (b) isSameEntry() with a handle this browser already holds: a recent-list row, or an open
+	//       tab's connection (which includes a file this browser just wrote with Save as);
+	//   (c) the browser already grants this page permission to WRITE to it.
+	async function fileKnownHere(handle) {
+		if (!handle) { return false; }
+		var i, held = [];
+		for (i = 0; i < recentFiles.length; i++) { held.push(recentFiles[i].handle); }
+		fileHandles.forEach(function (h) { held.push(h); });
+		for (i = 0; i < held.length; i++) {
+			if (await sameFileEntry(held[i], handle)) { return true; }
+		}
+		return (await handlePermission(handle, false)) === 'granted';
+	}
+	// **THE CREATION TIME IS IN THE ID ITSELF**: newDocId() is 'd' + Date.now() in base 36 + eight
+	// random characters, so the moment a document got its identity (its first save to a file, or a
+	// Save as) needs no server field. The broker's record cannot answer it anyway: it exists only
+	// while somebody holds the lock, and its `acquiredAt` restarts whenever the lock changes hands.
+	// Anything that does not read as a plausible time gives null, and the sentence without a date.
+	function docIdCreatedAt(docId) {
+		if (typeof docId !== 'string' || docId.length < 10 || docId.charAt(0) !== 'd') { return null; }
+		var t36 = docId.slice(1, -8);
+		if (!/^[0-9a-z]+$/.test(t36)) { return null; }
+		var ms = parseInt(t36, 36);
+		if (!(ms >= Date.UTC(2020, 0, 1)) || ms > Date.now() + 86400000) { return null; }
+		return ms;
+	}
+	// The visitor's own regional date and time (Intl with no locale named is the browser's locale).
+	function regionalDateTime(ms) {
+		try {
+			return new Intl.DateTimeFormat(undefined, { dateStyle: 'long', timeStyle: 'short' }).format(new Date(ms));
+		} catch (err) {
+			return new Date(ms).toLocaleString();
+		}
+	}
+	// Tom's dialog, his words and only his (2026-09-30). ORIGINAL LEADS, and so takes the keyboard
+	// focus: it changes nothing, and hands on to the ordinary open, lock question included. Tom's
+	// two answers and no Cancel.
+	// `tabId` is set when the id belongs to a tab open HERE whose file is not provably this one.
+	function presentCopyQuestion(saved, handle, tabId) {
+		var pc = EngCalcs.pageConfig || {};
+		var docId = saved.project && saved.project.docId;
+		var at = docIdCreatedAt(docId);
+		openDialog(function (body) {
+			var h = document.createElement('p');
+			h.style.margin = '0 0 8px';
+			h.style.fontWeight = 'bold';
+			h.textContent = pc.lpn_copy_title || 'Mark file as new copy?';
+			body.appendChild(h);
+			var p = document.createElement('p');
+			p.style.margin = '0 0 8px';
+			p.textContent = at
+				? (pc.lpn_copy_body || 'This file says it was created on {date}, and this browser doesn\'t recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?').replace('{date}', regionalDateTime(at))
+				: (pc.lpn_copy_body_nodate || 'This browser doesn\'t recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?');
+			body.appendChild(p);
+		}, [
+			{ label: pc.lpn_copy_original || 'Original; keep same lock', fn: function () {
+				// Keeps the id. Landing notes the file in the recent list, so next time it is known.
+				if (tabId) { originalOfOpenTab(tabId, handle); return; }
+				openKnownFile(saved, handle);
+			} },
+			{ label: pc.lpn_copy_copy || 'A copy; make new lock', fn: function () { openAsNewCopy(saved, handle); } }
+		]);
+	}
+	// True only when the browser itself says the two handles are one file. A handle without
+	// isSameEntry(), or one that throws, is "not provably the same", which is the safe answer.
+	async function sameFileEntry(a, b) {
+		if (!a || !b) { return false; }
+		if (a === b) { return true; }
+		try { return typeof a.isSameEntry === 'function' ? !!(await a.isSameEntry(b)) : false; }
+		catch (err) { return false; }
+	}
+	// "Original" said of a file whose id is already open in a tab here (Tom, 2026-09-30): the same
+	// document in a new place, so it was MOVED. Switch to the tab and reconnect it to the file just
+	// chosen; Save now writes there. The id and the lock are kept -- this tab already holds the lock,
+	// so nothing is acquired and no lock conflict can arise on this path. Unsaved edits stay in the
+	// tab and go to the newly connected file on the next Save. A dirty tab is not re-stamped, so Save
+	// still warns if that file changed on disk; a clean one is stamped, as it was just read.
+	async function originalOfOpenTab(tabId, handle) {
+		var pc = EngCalcs.pageConfig || {};
+		var entry = indexEntry(tabId);
+		if (handle) {
+			fileHandles.set(tabId, handle);
+			rememberHandle(tabId, handle);
+			if (entry) { entry.fileName = handle.name; }
+			saveIndex();
+			if (!(entry && entry.dirty)) { await stampFile(tabId, handle); }
+		}
+		openProject(tabId);
+		syncReadOnlyToOpenProject();
+		renderTabs();
+		setNotice((pc.lpn_copy_kept_link || 'Opened {name} as the original, moved to a new place. Save now writes to this file.')
+			.replace('{name}', projectDisplayName(indexEntry(tabId) || project)));
+	}
+	// "A copy; make new lock". The copy gets a NEW docId BEFORE it lands, so the lock it takes is its
+	// own and the original's lock is never touched -- not released, not stolen, not even acquired.
+	// **The file on disk is not written**: the tab is marked unsaved instead, because its identity
+	// now differs from the file's, and the next Save writes the new id into it.
+	function openAsNewCopy(saved, handle) {
+		var pc = EngCalcs.pageConfig || {};
+		var fresh = newDocId();
+		saved.project = Object.assign({}, saved.project, { docId: fresh });
+		landOpenedFile(saved, handle, false);
+		if (!(project && project.docId === fresh)) { return; }   // it did not land (storage full)
+		var entry = indexEntry(library.openId);
+		if (entry) { entry.savedSig = ''; entry.dirty = true; saveIndex(); renderTabs(); }
+		setNotice((pc.lpn_copy_opened || 'Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.')
+			.replace('{file}', (handle && handle.name) || projectDisplayName(project)));
 	}
 	// Opening a file this browser already has open: come forward, and take the connection with you.
 	// **Re-opening the file is a legitimate way to reconnect** -- the fallback the needs-reopen banner

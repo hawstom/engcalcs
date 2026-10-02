@@ -1209,6 +1209,13 @@
         "lpn_lock_ask_sent": "We have asked whoever has this file open to close it. They will see it within a minute, if their page is still open. Nothing else has changed, and the file is still theirs until they close it.",
         "lpn_lock_ask_failed": "Your message could not be delivered. Either nobody has this file open now, or the server could not be reached.",
         "lpn_lock_open_cancelled": "That file was not opened, and nothing here changed. Somebody else still has it open.",
+        "lpn_copy_title": "Mark file as new copy?",
+        "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
+        "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
+        "lpn_copy_original": "Original; keep same lock",
+        "lpn_copy_copy": "A copy; make new lock",
+        "lpn_copy_kept_link": "Opened {name} as the original, moved to a new place. Save now writes to this file.",
+        "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
         "lpn_lock_requested": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over.",
         "lpn_ago_seconds": "{n} seconds",
         "lpn_ago_minutes": "{n} minutes",
@@ -2155,7 +2162,7 @@
         "lpn_survey_note_id_taken": "Name already in project, new name assigned.",
         "lpn_survey_note_id_invalid": "Name cannot be used here, new name assigned."
     },
-    "count": 2153,
+    "count": 2160,
     "active_prefixes": [
         "about",
         "bpn",

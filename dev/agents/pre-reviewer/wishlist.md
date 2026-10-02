@@ -6,3 +6,4 @@
 - **State the case once and do not campaign.**
 
 *(Empty. A reviewer's wants should come from reviewing, not from being hired.)*
+- A browser-pass spec for the Analyze dialogs (open on Net3, move clock, Run, Find) so the stale-across-clock case is checked mechanically.

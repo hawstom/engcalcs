@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**8 still to read on master**, of 31 untranslated keys, of 2184 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**1 still to read on master**, of 7 untranslated keys, of 2160 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,88 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (31, 8 to read @@ NEEDS RULING)
+## lpn_  (7, 1 to read @@ NEEDS RULING)
+
+- **`lpn_copy_body`**
+  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_body_nodate`**
+  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_copy`**
+  > A copy; make new lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_kept_link`**
+  > Opened {name} as the original, moved to a new place. Save now writes to this file.
+  @@ NEEDS RULING
+- **`lpn_copy_opened`**
+  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  _Ruled 2026-10-01: Wording change per this. This is good._
+- **`lpn_copy_original`**
+  > Original; keep same lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_title`**
+  > Mark file as new copy?
+  _Ruled OK 2026-10-01._
+
+---
+
+# Strings waiting on a branch
+
+**12 still to read**, of 53 new keys across 11 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/bentley-interop (`5b8f7cee`) — 13 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_alt_cat_constituent`**
+  > Constituent
+  _Ruled OK 2026-10-01._
+- **`lpn_alt_cat_demand`**
+  > Demand
+  _Ruled OK 2026-10-01._
+- **`lpn_alt_cat_energy`**
+  > Energy cost
+  _Ruled OK 2026-10-01._
+- **`lpn_alt_cat_fireflow`**
+  > Fire flow
+  _Ruled OK 2026-10-01._
+- **`lpn_alt_cat_initial`**
+  > Initial settings
+  _Ruled OK 2026-10-01._
+- **`lpn_alt_cat_physical`**
+  > Physical
+  _Ruled OK 2026-10-01._
+- **`lpn_alt_cat_text`**
+  > Text
+  _Ruled OK 2026-10-01._
+- **`lpn_alt_cat_topology`**
+  > Asset activation
+  _Ruled OK 2026-10-01._
+- **`lpn_alt_cat_userdata`**
+  > Custom properties
+  _Ruled OK 2026-10-01._
+- **`lpn_alt_note`**
+  > Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.
+  _Ruled OK 2026-10-01._
+- **`lpn_alt_title`**
+  > Alternatives preview
+  @@ NEEDS RULING
+- **`lpn_scenario_basic`**
+  > Basic mode
+  _Ruled OK 2026-10-01._
+- **`lpn_scenario_basic_tip`**
+  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
+  _Ruled OK 2026-10-01._
+
+### feat/criticality (`3c594bbd`) — 31 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_analyze_menu`**
   > Analyze
@@ -121,90 +202,16 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Selected
   @@ NEEDS RULING
 
----
+### feat/desktop (`c45d847e`) — adds no English strings
 
-# Strings waiting on a branch
+### feat/graph-menu (`0a8db639`) — 2 new, 2 to read @@ NEEDS RULING
 
-**3 still to read**, of 27 new keys across 11 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### chore/roadmap-1001 (`bcb7d214`) — adds no English strings
-
-### feat/bentley-interop (`15536377`) — 13 new, 1 to read @@ NEEDS RULING
-
-- **`lpn_alt_cat_constituent`**
-  > Constituent
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_demand`**
-  > Demand
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_energy`**
-  > Energy cost
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_fireflow`**
-  > Fire flow
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_initial`**
-  > Initial settings
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_physical`**
-  > Physical
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_text`**
-  > Text
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_topology`**
-  > Asset activation
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_userdata`**
-  > Custom properties
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_note`**
-  > Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_title`**
-  > Alternatives preview
+- **`lpn_graphs_menu`**
+  > Graphs
   @@ NEEDS RULING
-- **`lpn_scenario_basic`**
-  > Basic mode
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_basic_tip`**
-  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
-  _Ruled OK 2026-10-01._
-
-### feat/copy-lock (`53412219`) — 7 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_copy_body`**
-  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_body_nodate`**
-  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_copy`**
-  > A copy; make new lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_kept_link`**
-  > Opened {name} as the original, moved to a new place. Save now writes to this file.
+- **`lpn_graphs_menu_tip`**
+  > Graphs of the network: the profile along a route, a property against time, and the distribution of a property.
   @@ NEEDS RULING
-- **`lpn_copy_opened`**
-  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
-  @@ NEEDS RULING
-- **`lpn_copy_original`**
-  > Original; keep same lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_title`**
-  > Mark file as new copy?
-  _Ruled OK 2026-10-01._
-
-### feat/criticality (`e38f5b8c`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -228,14 +235,14 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/property-graph (`3ec7628c`) — 4 new, all ruled
+### feat/property-graph (`ac73a7b9`) — 4 new, 1 to read @@ NEEDS RULING
 
 - **`lpn_pgraph_head_gain`**
   > Head gain
   _Ruled OK 2026-10-01._
 - **`lpn_pgraph_head_gain_tip`**
-  > The pump's head gain from suction to discharge, plotted positive. EPANET reports it as a negative head loss, as do the Tables and the map label.
-  _Ruled OK 2026-10-01._
+  > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
+  @@ NEEDS RULING
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.
   _Ruled OK 2026-10-01._
