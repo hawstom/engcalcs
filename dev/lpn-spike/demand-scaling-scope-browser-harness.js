@@ -131,10 +131,46 @@ async function main() {
 		const scaledNote = (await a.lang('lpn_ds_scaled_selected')).split('{n}')[0];
 		ok('the Find answer says only the selected junctions were scaled', picked.indexOf(scaledNote) >= 0, picked.slice(0, 200));
 
-		console.log('\n--- Selected with nothing selected, after an All answer ---');
 		await a.page.click('#lpn_ds_close');
 		await a.settle(200);
 		ok('closing the box keeps the selection', JSON.stringify(await selectedOnMap()) === JSON.stringify(sel), JSON.stringify(await selectedOnMap()));
+
+		// The other reading of Tom's sentence: a selection built in Edit > Find and replace (Shift+click
+		// on its result rows) must be the one the analysis scales.
+		console.log('\n--- Selected junctions, picked in Find and replace ---');
+		await a.page.keyboard.press('Escape');
+		await a.settle(200);
+		await a.menuClick(await a.lang('lpn_find_menu'), 'edit');
+		await a.page.waitForSelector('#lpn_find_form', { state: 'visible' });
+		await a.page.selectOption('#lpn_find_form select >> nth=0', 'junction');
+		await a.settle(100);
+		await a.page.fill('#lpn_find_form input[type="text"] >> nth=0', '2');
+		await a.page.click('#lpn_find_go');
+		await a.settle(300);
+		const shiftRow = async (id) => {
+			for (const r of await a.page.$$('#lpn_find_results .lpn-find-row')) {
+				if (await r.evaluate((e, want) => !!e._lpnFindRef && e._lpnFindRef.id === want, id)) {
+					await r.click({ modifiers: ['Shift'] });
+					break;
+				}
+			}
+			await a.settle(200);
+		};
+		await shiftRow('12');
+		await shiftRow('22');
+		const fsel = await selectedOnMap();
+		ok('Shift+click on two Find rows selects those two junctions', JSON.stringify(fsel) === '["12","22"]', JSON.stringify(fsel));
+		await a.page.click('#lpn_find_close');
+		await a.settle(200);
+		await openBox();
+		await setScope('selected');
+		const viaFind = await pressFind();
+		ok('the analysis scales the selection made in Find and replace',
+			viaFind.indexOf((await a.lang('lpn_ds_scaled_selected')).replace('{n}', '2')) >= 0 && viaFind !== all, viaFind.slice(0, 200));
+		await a.page.click('#lpn_ds_close');
+		await a.settle(200);
+
+		console.log('\n--- Selected with nothing selected, after an All answer ---');
 		await a.page.keyboard.press('Escape');
 		await a.settle(200);
 		ok('Escape clears it', (await selectedOnMap()).length === 0, JSON.stringify(await selectedOnMap()));
