@@ -36889,10 +36889,18 @@ var EngCalcs = EngCalcs || {};
 		}
 		parkAnchorTip(anchor, level);
 		list.innerHTML = '';
+		list.setAttribute('role', 'menu');
+		if (level) {
+			// The row that opened this fly-out: Left and Escape return focus to it, and its
+			// aria-expanded tells a screen reader the fly-out is out (Task 748).
+			subOpener = anchor;
+			if (anchor.setAttribute) { anchor.setAttribute('aria-expanded', 'true'); }
+		}
 		rows.forEach(function (r) {
 			if (r.hidden) { return; }
 			if (r.separator) {
 				var hr = document.createElement('hr');
+				hr.setAttribute('role', 'separator');
 				hr.style.cssText = 'margin:3px 0;border:0;border-top:1px solid #ccc';
 				list.appendChild(hr);
 				return;
@@ -36903,6 +36911,7 @@ var EngCalcs = EngCalcs || {};
 			if (r.heading) {
 				var hd = document.createElement('div');
 				hd.className = 'lpn-menu-heading';
+				hd.setAttribute('role', 'presentation');
 				hd.textContent = r.label;
 				list.appendChild(hd);
 				return;
@@ -36910,6 +36919,8 @@ var EngCalcs = EngCalcs || {};
 			var b = document.createElement('button');
 			b.type = 'button';
 			b.className = 'lpn-menu-row';
+			b.setAttribute('role', 'menuitem');
+			b.tabIndex = -1;   // arrows move through the rows; Tab leaves the menu (Task 748)
 			// A reserved icon column, not an inline prefix: a row with no natural glyph leaves the
 			// cell EMPTY and its text still lines up with its neighbours. Prefixing inline instead
 			// would ragged-edge the whole menu the moment one row went without.
@@ -36932,6 +36943,8 @@ var EngCalcs = EngCalcs || {};
 				// The universal marker for "there is more this way". Directional, so it wants a
 				// mirrored glyph in the five RTL languages -- the same outstanding caveat the
 				// Settings accordion's arrows already carry.
+				b.setAttribute('aria-haspopup', 'menu');
+				b.setAttribute('aria-expanded', 'false');
 				var arrow = document.createElement('span');
 				arrow.className = 'lpn-menu-arrow';
 				arrow.textContent = '▸';
@@ -36987,7 +37000,120 @@ var EngCalcs = EngCalcs || {};
 		// this is exactly the case ROADMAP Task 173 added initTips(root) for (a tooltip built after
 		// page load is dead on touch without it).
 		initTipsIn(popup);
+		// Opened from the keyboard, focus goes INTO the menu, on its first enabled row. A mouse
+		// open leaves focus where it was, exactly as before (Task 748).
+		if (menuKbIntent) {
+			menuKbIntent = false;
+			var first = menuRowsOf(list)[0];
+			if (first) { first.focus(); } else if (anchor.focus) { anchor.focus(); }
+		}
 	}
+	// ---- KEYBOARD (Task 748, the WAI-ARIA menubar pattern) -----------------------------------------
+	// One door, like the rest of this machinery: nothing here knows which menu it is serving. A menu
+	// or fly-out built by openMenu() -- rows, `submenu:` rows and all -- inherits the keys with no
+	// wiring of its own. Left/Right between top menus, Up/Down/Home/End through enabled rows, Right
+	// opens a fly-out and Left closes it, Escape closes one level and returns focus to its opener,
+	// Tab closes the menu and goes on, Enter/Space are the buttons' own click.
+	var subOpener = null;
+	var menuKbIntent = false;
+	function menuRowsOf(list) {
+		return Array.prototype.slice.call(list.querySelectorAll('button.lpn-menu-row:not(:disabled)'));
+	}
+	function menuBarItems() {
+		var bar = document.getElementById('lpn_menubar');
+		return bar ? Array.prototype.slice.call(bar.querySelectorAll('.lpn-menubar-item'))
+			.filter(function (b) { return b.getClientRects().length > 0; }) : [];
+	}
+	function menuFocus(el) { if (el && el.isConnected && el.focus) { el.focus(); } }
+	// A click from the keyboard (Enter or Space on a button) is trusted with detail 0; a mouse
+	// click has detail >= 1 and a script's .click() is untrusted, so neither moves focus.
+	window.addEventListener('click', function (e) {
+		if (!e.isTrusted || e.detail !== 0) { return; }
+		menuKbIntent = true;
+		setTimeout(function () { menuKbIntent = false; }, 0);
+		// A row that ran a command and opened nothing focusable leaves focus on a hidden button;
+		// give it back to the opener.
+		var t = e.target, opener = openMenuAnchor;
+		if (t && t.closest && t.closest('#lpn_menu_popup, #lpn_menu_popup2') && opener) {
+			setTimeout(function () {
+				var a = document.activeElement;
+				if ((!a || a === document.body) && opener.isConnected) { opener.focus(); }
+			}, 0);
+		}
+	}, true);
+	function menuKbOpen(btn) {
+		menuKbIntent = true;
+		try { btn.click(); } finally { menuKbIntent = false; }
+	}
+	function menuBarMove(dir, cur) {
+		var items = menuBarItems(), i = items.indexOf(cur);
+		if (i < 0) { return; }
+		var next = items[(i + dir + items.length) % items.length];
+		if (openMenuAnchor) { menuKbOpen(next); } else { next.focus(); }
+	}
+	window.addEventListener('keydown', function (e) {
+		if (e.defaultPrevented || e.ctrlKey || e.altKey || e.metaKey) { return; }
+		var k = e.key, ae = document.activeElement;
+		var pop = document.getElementById('lpn_menu_popup'), sub = document.getElementById('lpn_menu_popup2');
+		var open = !!pop && pop.style.display === 'block';
+		var subOpen = !!sub && sub.style.display === 'block';
+		if (!open) {
+			// Closed: a menu-bar button holding focus walks the bar, and Down/Up open its menu.
+			if (!ae || !ae.classList || !ae.classList.contains('lpn-menubar-item')) { return; }
+			if (k === 'ArrowRight' || k === 'ArrowLeft') {
+				e.preventDefault();
+				menuBarMove(k === 'ArrowRight' ? 1 : -1, ae);
+			} else if (k === 'ArrowDown' || k === 'ArrowUp') {
+				e.preventDefault();
+				menuKbOpen(ae);
+				if (k === 'ArrowUp') { var rs = menuRowsOf(document.getElementById('lpn_menu_list')); menuFocus(rs[rs.length - 1]); }
+			}
+			return;
+		}
+		var inSub = subOpen && sub.contains(ae), inPop = pop.contains(ae);
+		var onAnchor = !!openMenuAnchor && ae === openMenuAnchor;
+		// Focus elsewhere on the page: the menu was opened with the mouse, and the page-wide
+		// Escape and click-away dismissals own it.
+		if (!inSub && !inPop && !onAnchor) { return; }
+		var anchor = openMenuAnchor;
+		function stop() { e.preventDefault(); e.stopPropagation(); }
+		if (k === 'Tab') {
+			closeMenu();
+			if (!onAnchor) { menuFocus(anchor); }
+			return;
+		}
+		if (k === 'Escape') {
+			stop();
+			if (subOpen) { var so = subOpener; closeSubMenu(); menuFocus(inSub || onAnchor ? so : ae); }
+			else { closeMenu(); menuFocus(anchor); }
+			return;
+		}
+		if (k === 'ArrowDown' || k === 'ArrowUp' || k === 'Home' || k === 'End') {
+			stop();
+			var items = menuRowsOf(inSub ? document.getElementById('lpn_menu_list2') : document.getElementById('lpn_menu_list'));
+			if (!items.length) { return; }
+			var i = items.indexOf(ae), n = items.length, to;
+			if (k === 'Home') { to = 0; }
+			else if (k === 'End') { to = n - 1; }
+			else if (k === 'ArrowDown') { to = i < 0 ? 0 : (i + 1) % n; }
+			else { to = i < 0 ? n - 1 : (i - 1 + n) % n; }
+			if (!inSub && subOpen) { closeSubMenu(); }   // leaving the parent row takes its fly-out with it
+			items[to].focus();
+			return;
+		}
+		if (k === 'ArrowRight') {
+			stop();
+			if (inPop && ae.getAttribute && ae.getAttribute('aria-haspopup') === 'menu') { menuKbOpen(ae); }
+			else { menuBarMove(1, anchor); }
+			return;
+		}
+		if (k === 'ArrowLeft') {
+			stop();
+			if (inSub) { var so2 = subOpener; closeSubMenu(); menuFocus(so2); }
+			else { menuBarMove(-1, anchor); }
+			return;
+		}
+	}, true);
 	// The classic fly-out grace period. Travelling from the parent row to its fly-out is a DIAGONAL
 	// move across the rows below, so dismissing on the first row entered makes the submenu
 	// unreachable by pointer -- you can only ever get there in a straight line, and menus are not
@@ -37017,6 +37143,8 @@ var EngCalcs = EngCalcs || {};
 		cancelSubClose();
 		hidePanel(document.getElementById('lpn_menu_popup2'));
 		unparkAnchorTip(1);
+		if (subOpener && subOpener.setAttribute) { subOpener.setAttribute('aria-expanded', 'false'); }
+		subOpener = null;
 	}
 	function closeMenu() {
 		hidePanel(document.getElementById('lpn_menu_popup'));
@@ -38777,6 +38905,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, bar = document.getElementById('lpn_menubar');
 		if (!bar) { return; }
 		bar.innerHTML = '';
+		bar.setAttribute('role', 'menubar');
 		// **THERE IS NO MARK AT THE FAR LEFT, AND THE BAR STARTS WITH File** (Tom, 2026-09-11,
 		// closing this out: *"I can't remember why we went down this road ... But it was
 		// ill-advised."*).
@@ -38850,6 +38979,8 @@ var EngCalcs = EngCalcs || {};
 			// pressed. Set here too (not just by openMenu()) so a screen reader gets the right state
 			// on first render, before anything has been clicked.
 			b.setAttribute('aria-expanded', 'false');
+			b.setAttribute('role', 'menuitem');
+			b.setAttribute('aria-haspopup', 'menu');
 			// **THE WORD IS IN AN ELEMENT OF ITS OWN, and that is the whole mechanism behind Task
 			// 486's fourth item** ("Hide the Menu text, leaving only icons"). EngCalcs.setLabel()
 			// appends the label as a bare TEXT NODE, and a stylesheet cannot reach one -- so the

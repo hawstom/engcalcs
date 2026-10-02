@@ -4822,3 +4822,4 @@ tr.lpn-ff-error { background: #f2f2f2; }
 		50%      { opacity: .35; }
 	}
 }
+.lpn-menu-row:focus-visible:enabled { background: #def; }
