@@ -55929,6 +55929,18 @@ var EngCalcs = EngCalcs || {};
 		if (parent) { parent.appendChild(e); }
 		return e;
 	}
+	// **A REFUSED PRESS IS ANSWERED IN THE BOX, WHERE THE PRESS WAS** -- every analysis box's
+	// All/Selected scope, not demand scaling's alone (Tom, 2026-10-02: *"It appears that Find doesn't
+	// respect "Selected junctions"."*). "Selected" with nothing selected refused on the map's notice
+	// line only and left the last answer -- an All answer -- standing in the box, where it read as
+	// the button having ignored the scope. The caller clears its own run first; this says why there
+	// is no answer, in the answer's place. Demand scaling keeps the same rule in dsRefused.
+	function analysisRefused(host, text) {
+		setNotice(text);
+		if (!host) { return; }
+		host.innerHTML = '';
+		ffEl('p', 'lpn-ff-summary', text, host);
+	}
 	// One labelled row. The whole label text is the tip's target and not a one-character glyph --
 	// CLAUDE.md's tip-only nesting rule.
 	function ffRow(parent, labelText, tip, control, unitText) {
@@ -56667,7 +56679,8 @@ var EngCalcs = EngCalcs || {};
 				}
 			});
 			if (!ids.length) {
-				setNotice(pc.lpn_ff_no_selection ||
+				clearFireFlowRun(true);
+				analysisRefused(document.getElementById('lpn_ff_report'), pc.lpn_ff_no_selection ||
 					'No junctions are selected. Select junctions or select the All option.');
 				return;
 			}
@@ -56684,7 +56697,8 @@ var EngCalcs = EngCalcs || {};
 		if (ffDesignScope(ask.design) === 'selected') {
 			design = ffDesignSelectedSet(model);
 			if (!design.nodes.length && !design.links.length) {
-				setNotice(pc.lpn_ff_design_no_selection ||
+				clearFireFlowRun(true);
+				analysisRefused(document.getElementById('lpn_ff_report'), pc.lpn_ff_design_no_selection ||
 					'The design check scope is set to Selected, but no assets are selected. Select assets or select the All option.');
 				return;
 			}
@@ -57010,7 +57024,8 @@ var EngCalcs = EngCalcs || {};
 		fireFlowAtFrame(model);
 		pick = criticalityLinks(model);
 		if (!pick.ids.length) {
-			setNotice(critAsk.scope === 'selected'
+			clearCriticalityRun(true);
+			analysisRefused(document.getElementById('lpn_crit_report'), critAsk.scope === 'selected'
 				? (pc.lpn_crit_no_selection || 'No pipe, pump, or valve is selected. Choose one on the map, or break every link.')
 				: (pc.lpn_crit_no_links || 'This project has no links yet, so there is nothing to break.'));
 			return Promise.resolve(null);

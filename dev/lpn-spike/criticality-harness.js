@@ -236,10 +236,11 @@ function openNet1() {
 	console.log('\n--- 4. Selected scope ---');
 	L.clearSel();
 	L.setScope('selected');
-	const kept = L.run();
+	ok('an earlier All answer is on screen', !!L.run() && rows(byId.lpn_crit_report).length > 0);
 	await L.runCrit();
-	ok('nothing selected: no run', L.run() === kept);
+	ok('nothing selected: no run, and the All answer no longer stands as if it answered it', L.run() === null && rows(byId.lpn_crit_report).length === 0);
 	ok('...and the notice says so', L.notice() === PC.lpn_crit_no_selection, L.notice());
+	ok('...and so does the box (Tom, 2026-10-02)', text(byId.lpn_crit_report) === PC.lpn_crit_no_selection, text(byId.lpn_crit_report));
 	L.setSelectionList([{ kind: 'link', id: '31' }, { kind: 'link', id: '9' }, { kind: 'node', id: '32' }]);
 	await L.runCrit();
 	set = L.run();
