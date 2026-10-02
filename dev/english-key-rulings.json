@@ -3216,12 +3216,12 @@
             "ruled": "2026-09-29",
             "answer": "OK."
         },
-        "lpn_pgraph_head_gain": {
+        "lpn_result_pump_head": {
             "on": "Head gain",
             "ruled": "2026-10-01",
             "answer": "OK."
         },
-        "lpn_pgraph_head_gain_tip": {
+        "lpn_result_pump_head_tip": {
             "on": "The pump's head gain from suction to discharge, plotted positive. EPANET reports it as a negative head loss, as do the Tables and the map label.",
             "ruled": "2026-10-01",
             "answer": "OK."

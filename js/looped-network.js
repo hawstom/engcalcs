@@ -5898,8 +5898,8 @@ var EngCalcs = EngCalcs || {};
 	// budget, saved for MEANING (Task 327's colour-by-value view), not spent on identity; a prefix
 	// also survives greyscale, a printed sheet and a colour-blind reader.
 	//
-	// There is no separate head-GAIN field: a pump reports a negative head loss, under the same
-	// label, prefix and extrema bucket as every other link.
+	// There is no separate pump-head FIELD: a pump's result is the headloss field, shown positive
+	// as "Head" with the prefix "H=" (shownHeadloss(), affix()), and kept out of the head-loss extrema.
 
 	function el(tag, attrs, parent) {
 		var e = document.createElementNS(NS, tag), k;
@@ -8898,8 +8898,8 @@ var EngCalcs = EngCalcs || {};
 	// a display rule and lives only here.
 	function shownFlow(q) { return typeof q === 'number' ? Math.abs(q) : q; }
 	// Head loss is a LOSS, so it is a magnitude on a pipe or a valve for the same reason. A PUMP's is
-	// a head GAIN, and it is shown as one, POSITIVE, under the name "Head gain" (Tom, 2026-10-01:
-	// EPANET's manual and WaterGEMS both say head gain; the negative number is only the solver's
+	// the head it ADDS, and it is shown as one, POSITIVE, under the name "Head" (Tom, 2026-10-02:
+	// "the industry term is pump 'Head', not 'Head gain'"; the negative number is only the solver's
 	// signed convention, which stays in lastSolveResult and in every .inp). Every display of a
 	// head loss reads this function, so a pump reads the same in the Tables, Properties, a map
 	// label, the colour ramps, Find and the Time series graph. headlossLabelFor() names it.
@@ -8910,7 +8910,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function headlossLabelFor(l) {
 		var pc = EngCalcs.pageConfig || {};
-		return l && l.type === 'pump' ? (pc.lpn_pgraph_head_gain || 'Head gain') : (pc.lpn_result_headloss || 'Head loss');
+		return l && l.type === 'pump' ? (pc.lpn_result_pump_head || 'Head') : (pc.lpn_result_headloss || 'Head loss');
 	}
 	// ---- A TEXT LABEL'S ATTACHMENT POINT (ROADMAP Task 332) --------------------------------
 	// `lb.x`/`lb.y` is a POINT; `lb.align`/`lb.valign` say which corner or edge of the text that
@@ -21676,8 +21676,8 @@ var EngCalcs = EngCalcs || {};
 	// thing and is read-only, because a number the user supplied and a number we computed must
 	// never occupy the same field (CLAUDE.md). Results come through the same accessors the map
 	// labels and the colour ramp use, so a table cell and the label beside the symbol can never
-	// disagree -- which is also why a pump's head GAIN reads here as a negative head LOSS, the one
-	// way this page has ever expressed it.
+	// disagree -- which is also why a pump's column reads its positive Head through the same
+	// shownHeadloss() the label uses.
 	//
 	// **EACH TYPE KEEPS ITS OWN SORT**, on the spec itself, so sorting Pipes by velocity cannot
 	// re-order Junctions under the hand of somebody typing in them. Each keeps its own SCROLL
@@ -22760,9 +22760,9 @@ var EngCalcs = EngCalcs || {};
 				// points. It did not follow that the rest was unfit for a table: a relative speed, a
 				// speed pattern, a price of power and its pattern are ordinary numbers and names,
 				// and a person entering forty pumps wants them in rows like everything else.
-				// Head loss, not head gain: lpn-solver.js reports a pump's contribution as a
-				// NEGATIVE head loss, and this reads the same accessor the map label does, so the
-				// cell and the label beside the symbol cannot disagree.
+				// The pump's Head, positive: lpn-solver.js reports a pump's contribution as a
+				// NEGATIVE head loss, and this reads the same accessor (shownHeadloss()) the map
+				// label does, so the cell and the label beside the symbol cannot disagree.
 				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed()].concat(paneColEnds(), [
 					paneColCurveRef('curveId', 'head', 'lpn_pump_curve_source'),
 					paneColPumpSpeed(), paneColSpeedPattern(),
@@ -22770,7 +22770,7 @@ var EngCalcs = EngCalcs || {};
 					paneColEnergyPrice(), paneColEnergyPattern(),
 					paneColVerts(),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
-					paneColLinkResult('headloss', 'lpn_pgraph_head_gain', paneUnitHead),
+					paneColLinkResult('headloss', 'lpn_result_pump_head', paneUnitHead),
 					paneColLinkStatus(),
 					paneColLinkQuality()
 				])
@@ -29277,17 +29277,17 @@ var EngCalcs = EngCalcs || {};
 	// Falls back to colorFieldLabel()'s own "Source share" if somehow no trace node is set, which
 	// should not happen: pgAvailable() only offers 'quality' where the run already has numbers for
 	// it, and a trace run has none without a trace node chosen.
-	// **A PUMP'S HEAD LOSS IS GRAPHED AS HEAD GAIN, POSITIVE** (Tom, 2026-09-30, asking whether the
+	// **A PUMP'S HEAD LOSS IS GRAPHED AS ITS HEAD, POSITIVE** (Tom, 2026-09-30, asking whether the
 	// industry really states pump head as a negative head loss; Mary's finding: it does not -- the
-	// EPANET manual and WaterGEMS both say head gain, and the negative number is only the solver's
-	// signed convention). Since 2026-10-01 every display reads it, not only this graph:
-	// shownHeadloss() does the sign and pgIsHeadGain() only names the field here.
-	function pgIsHeadGain(group, e, field) {
+	// EPANET manual and WaterGEMS both state it positive, and the negative number is only the solver's
+	// signed convention; Tom, 2026-10-02, named it pump "Head"). Since 2026-10-01 every display reads it:
+	// shownHeadloss() does the sign and pgIsPumpHead() only names the field here.
+	function pgIsPumpHead(group, e, field) {
 		return group === 'link' && field === 'headloss' && !!e && e.type === 'pump';
 	}
 	function pgFieldLabel(group, field, e) {
 		var pc = EngCalcs.pageConfig || {}, node;
-		if (pgIsHeadGain(group, e, field)) { return pc.lpn_pgraph_head_gain || 'Head gain'; }
+		if (pgIsPumpHead(group, e, field)) { return pc.lpn_result_pump_head || 'Head'; }
 		if (field === 'quality' && qualityMode() === 'trace') {
 			node = (settings.quality || {}).traceNode;
 			if (node) {
@@ -29386,8 +29386,8 @@ var EngCalcs = EngCalcs || {};
 			sel.appendChild(op);
 		});
 		sel.value = pick.field;
-		if (pgIsHeadGain(subj.group, subj.e, pick.field)) {
-			sel.title = pc.lpn_pgraph_head_gain_tip ||
+		if (pgIsPumpHead(subj.group, subj.e, pick.field)) {
+			sel.title = pc.lpn_result_pump_head_tip ||
 				'The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.';
 		}
 		sel.addEventListener('change', function () {
@@ -51976,9 +51976,9 @@ var EngCalcs = EngCalcs || {};
 			if (l.type !== 'pump') {
 				readonlyUnitField(fields, pc.lpn_result_velocity || 'Velocity', resultUnit('velocity'), lastSolveResult.velocities[linkId]);
 			}
-			// Head loss, for a pump too, where it is shown as a positive Head gain (shownHeadloss()).
+			// Head loss, for a pump too, where it is shown as the pump's positive Head (shownHeadloss()).
 			if (l.type === 'pump') {
-				readonlyUnitField(fields, pc.lpn_pgraph_head_gain || 'Head gain', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]));
+				readonlyUnitField(fields, pc.lpn_result_pump_head || 'Head', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]));
 			} else {
 				readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]));
 			}
@@ -54730,9 +54730,11 @@ var EngCalcs = EngCalcs || {};
 
 	function affix(group, field, line, l) {
 		var p = labelPrefixFor(group, field), s = labelSuffixFor(group, field);
-		// A pump's number is a head GAIN, so the stock "Hl=" prefix would call it a loss. Only the
+		// A pump's number is its head (Tom, 2026-10-02: "'Hg' can be just 'H'"), so the stock "Hl="
+		// prefix would call it a loss. A node's "H=" is its hydraulic head; a pump's sits on a link,
+		// so the two never label the same symbol. Only the
 		// untouched default is swapped; a prefix the user typed is theirs.
-		if (l && l.type === 'pump' && field === 'headloss' && p === labelDefaultPrefix(group, field) && p === 'Hl=') { p = 'Hg='; }
+		if (l && l.type === 'pump' && field === 'headloss' && p === labelDefaultPrefix(group, field) && p === 'Hl=') { p = 'H='; }
 		// The field NAME rides along (Task 399). Everything downstream that has to rank a line --
 		// the shed cascade -- needs to know which quantity it is, and by the time the lines reach
 		// composeRows() they are indistinguishable strings.
@@ -54981,8 +54983,9 @@ var EngCalcs = EngCalcs || {};
 			km: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(pipeK(l), ld.km) : undefined; })),
 			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), ld.flow) : undefined; })),
 			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], resultUnit('velocity'), ld.velocity) : undefined; })),
-			// Pipes and valves only: a pump's number is a head GAIN, a different quantity, and
-			// would otherwise win the "highest head loss" badge.
+			// Pipes and valves only: a pump's number is the head it adds, a different quantity, and
+			// would otherwise win the "highest head loss" badge (Tom, 2026-10-02: "Yes, pumps left
+			// out of highest head loss").
 			headloss: fieldExtrema(doc.links.map(function (l) {
 				if (l.type === 'pump' || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
 				return displayRound(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), ld.headloss);
@@ -57750,17 +57753,19 @@ var EngCalcs = EngCalcs || {};
 		{ key: 'flow', group: 'link', field: 'flow' },
 		{ key: 'velocity', group: 'link', field: 'velocity' },
 		// **ONE COLUMN CANNOT BE BOTH A LOSS AND A GAIN.** Pipes and valves fill Head loss; a pump
-		// fills Head gain, positive, in a column of its own, and each is blank on the other's rows.
+		// fills its head, positive, in a column of its own, and each is blank on the other's rows.
 		// Put under a single "Head loss" heading, a pump's positive number would read as a loss.
+		// That column says "Pump head", not the bare "Head" a pump reads elsewhere, because this
+		// one table also carries a node's hydraulic Head and two columns must never share a name.
 		{ key: 'headloss', group: 'link', field: 'headloss' },
-		{ key: 'headgain', group: 'link', field: 'headloss', pump: true },
+		{ key: 'pumphead', group: 'link', field: 'headloss', pump: true },
 		{ key: 'status', group: 'link', field: 'status' }
 	];
 	function fullReportColHeading(col) {
 		var pc = EngCalcs.pageConfig || {};
 		if (col.field === 'status') { return pc.lpn_result_status || 'Status'; }
 		var unit = colorFieldUnitText(col.group, col.field);
-		return (col.pump ? headlossLabelFor({ type: 'pump' }) : colorFieldLabel(col.group, col.field)) + (unit ? ' (' + unit + ')' : '');
+		return (col.pump ? (pc.lpn_report_pump_head || 'Pump head') : colorFieldLabel(col.group, col.field)) + (unit ? ' (' + unit + ')' : '');
 	}
 	/**
 	 * **THE SAME ACCESSORS THE MAP AND THE TABLES PANE READ, ASKED ONCE PER FRAME.** tsAsOfFrame()
@@ -57788,7 +57793,7 @@ var EngCalcs = EngCalcs || {};
 						flow: colorLinkValue(l, 'flow'),
 						velocity: colorLinkValue(l, 'velocity'),
 						headloss: l.type === 'pump' ? undefined : colorLinkValue(l, 'headloss'),
-						headgain: l.type === 'pump' ? colorLinkValue(l, 'headloss') : undefined,
+						pumphead: l.type === 'pump' ? colorLinkValue(l, 'headloss') : undefined,
 						status: linkStatusText(l)
 					});
 				});

@@ -1,19 +1,21 @@
-// A PUMP READS "HEAD GAIN", POSITIVE, EVERYWHERE; a pipe still reads "Head loss". Run with:
-//   node dev/lpn-spike/pump-head-gain-harness.js
+// A PUMP READS "HEAD", POSITIVE, EVERYWHERE; a pipe still reads "Head loss". Run with:
+//   node dev/lpn-spike/pump-head-harness.js
 //
 // Tom, 2026-10-01 (refusing to merge feat/property-graph until the display agreed with itself):
 // the property graph already showed a pump's head as Head gain, but the Tables, Properties, map
 // labels and the Full report still said signed "Head loss". EPANET's manual and WaterGEMS both say
-// head gain. DISPLAY ONLY: the solver's result keeps its negative sign, and so does every .inp.
+// head gain. Tom, 2026-10-02: "the industry term is pump 'Head', not 'Head gain'... 'Hg' can be
+// just 'H'". DISPLAY ONLY: the solver's result keeps its negative sign, and so does every .inp.
 // Net3 is run through the engine (extended period) so the Time series graph has frames too.
 //   1. The solver's own pump head loss is still negative (nothing it computes changed).
-//   2. Tables: the Pumps table's column is headed Head gain, its cells are positive and equal
+//   2. Tables: the Pumps table's column is headed Head, its cells are positive and equal
 //      minus the solver's number; the Pipes table's column is still Head loss.
-//   3. Properties: a pump's row says Head gain, positive; a pipe's says Head loss.
-//   4. A map label: a pump's line is the positive value under the "Hg=" prefix, a pipe's under "Hl=".
+//   3. Properties: a pump's row says Head, positive; a pipe's says Head loss.
+//   4. A map label: a pump's line is the positive value under the "H=" prefix, a pipe's under "Hl=".
 //   5. Time series graph: axis and every plotted value positive.
 //   6. Full report (CSV, one row per link): a mixed column cannot be loss and gain at once, so a
-//      pump fills a separate Head gain column and is blank under Head loss, and vice versa.
+//      pump fills a separate Pump head column and is blank under Head loss, and vice versa. That
+//      column is "Pump head", not "Head", because the same table carries a node's hydraulic Head.
 
 const fs = require('fs');
 const { ROOT, byId, setUnitSet, loadLoopedNetwork, warmEpanet } = require('./lpn-dom-stub.js');
@@ -123,7 +125,7 @@ async function until(pred, ms) {
 	L.openPane('pumps');
 	const pumpCol = L.paneTableById('pumps').cols.filter((c) => c.key === 'headloss')[0];
 	const pipeCol = L.paneTableById('pipes').cols.filter((c) => c.key === 'headloss')[0];
-	check(L.paneHeadingLabelOnly(pumpCol) === 'Head gain', `the Pumps table heading: "${L.paneHeadingLabelOnly(pumpCol)}"`);
+	check(L.paneHeadingLabelOnly(pumpCol) === 'Head', `the Pumps table heading: "${L.paneHeadingLabelOnly(pumpCol)}"`);
 	check(L.paneHeadingLabelOnly(pipeCol) === 'Head loss', `the Pipes table heading: "${L.paneHeadingLabelOnly(pipeCol)}"`);
 	const gain = pumpCol.get(pump);
 	check(typeof gain === 'number' && gain > 0, `the pump's cell is positive: ${gain}`);
@@ -134,28 +136,28 @@ async function until(pred, ms) {
 	const popupText = () => { const out = []; (function go(e) { if (!e) { return; } if (e.tagName === 'LABEL') { out.push(String(e.textContent || '')); } else if (e.nodeType === 3 || !(e.children || []).length) { out.push(String(e.textContent || '')); } (e.children || []).forEach(go); }(byId.lpn_popup_fields)); return out.join(' | '); };
 	L.openLinkPopup(pump.id, 100, 100);
 	let t = popupText();
-	check(t.indexOf('Head gain (') >= 0 && t.indexOf('Head loss') < 0, `the pump's Properties row says Head gain: ${(/Head \w+ \([^|]*\|[^|]*/.exec(t) || [''])[0]}`);
-	const m = /Head gain \([^)]*\)\s*\|?\s*(-?[\d.]+)/.exec(t);
+	check(/(^|\| )Head \(/.test(t) && t.indexOf('Head loss') < 0 && t.indexOf('Head gain') < 0, `the pump's Properties row says Head: ${(/(^|\| )Head \([^|]*\|[^|]*/.exec(t) || [''])[0]}`);
+	const m = /(?:^|\| )Head \([^)]*\)\s*\|?\s*(-?[\d.]+)/.exec(t);
 	const inputs = []; (function go(e) { if (!e) { return; } if (e.tagName === 'INPUT' || e.value !== undefined) { inputs.push(e); } (e.children || []).forEach(go); }(byId.lpn_popup_fields));
 	check(t.indexOf('-' + gain.toFixed(2)) < 0 && (t.indexOf(gain.toFixed(2)) >= 0 || (m && Math.abs(+m[1] - gain) < 0.01)), `with the positive number ${gain.toFixed(2)}`);
 	L.openLinkPopup(pipe.id, 100, 100);
 	t = popupText();
-	check(t.indexOf('Head loss (') >= 0 && t.indexOf('Head gain') < 0, 'a pipe\'s row still says Head loss');
+	check(t.indexOf('Head loss (') >= 0 && !/(^|\| )Head \(/.test(t), 'a pipe\'s row still says Head loss');
 	L.closePopup();
 
 	headp('4. A MAP LABEL');
 	const ls = L.labelSettings();
 	ls.link.headloss = true;
 	L.refreshLabelText();
-	const pl = L.linkLabel(pump.id).filter((s) => /^Hg=/.test(s));
-	check(pl.length === 1 && lastNum(pl[0].replace('Hg=', '')) > 0, `the pump's label line: ${L.linkLabel(pump.id).join(' | ')}`);
+	const pl = L.linkLabel(pump.id).filter((s) => /^H=/.test(s));
+	check(pl.length === 1 && lastNum(pl[0].replace('H=', '')) > 0, `the pump's label line: ${L.linkLabel(pump.id).join(' | ')}`);
 	check(L.linkLabel(pump.id).every((s) => !/^Hl=/.test(s)), 'and no "Hl=" on a pump');
 	check(L.linkLabel(pipe.id).some((s) => /^Hl=/.test(s)), `a pipe keeps "Hl=": ${L.linkLabel(pipe.id).join(' | ')}`);
 
 	headp('5. TIME SERIES');
 	L.openLinkPopup(pump.id, 100, 100);
 	choose('headloss');
-	check(chartText().indexOf('Head gain (') >= 0, 'the axis reads Head gain');
+	check(/(^|\| )Head \(/.test(chartText()) && chartText().indexOf('Head gain') < 0, 'the axis reads Head');
 	const titles = byCls('lpn-ts-dot').map((c) => (c.children || []).map((x) =>
 		(x.children || []).map((y) => String(y.textContent)).join('')).join('')).filter(Boolean).map(lastNum);
 	check(titles.length > 0 && titles.every((v) => v >= 0) && titles.some((v) => v > 0), `every plotted value is positive (max ${Math.max.apply(null, titles)})`);
@@ -165,10 +167,12 @@ async function until(pred, ms) {
 	const rows = L.fullReportRows();
 	const pr = rows.filter((r) => r.group === 'link' && String(r.id) === String(pump.id));
 	const qr = rows.filter((r) => r.group === 'link' && String(r.id) === String(pipe.id));
-	check(pr.length > 0 && pr.every((r) => r.headloss === undefined && typeof r.headgain === 'number' && r.headgain >= 0), 'pump rows fill Head gain (>= 0) and leave Head loss blank');
-	check(qr.length > 0 && qr.every((r) => r.headgain === undefined && typeof r.headloss === 'number'), 'pipe rows fill Head loss and leave Head gain blank');
+	check(pr.length > 0 && pr.every((r) => r.headloss === undefined && typeof r.pumphead === 'number' && r.pumphead >= 0), 'pump rows fill Pump head (>= 0) and leave Head loss blank');
+	check(qr.length > 0 && qr.every((r) => r.pumphead === undefined && typeof r.headloss === 'number'), 'pipe rows fill Head loss and leave Pump head blank');
 	const header = L.fullReportCsvText(rows).split('\r\n')[0];
-	check(/Head loss \(/.test(header) && /Head gain \(/.test(header), `the CSV header has both columns: ${header}`);
+	check(/Head loss \(/.test(header) && /Pump head \(/.test(header), `the CSV header has both columns: ${header}`);
+	const names = header.split(',').map((h) => h.replace(/\s*\(.*$/, ''));
+	check(names.length === new Set(names).size, `and no two columns share a name: ${names.join(' | ')}`);
 
 	console.log(failures ? '\n' + failures + ' FAILED' : '\nall passed');
 	process.exit(failures ? 1 : 0);

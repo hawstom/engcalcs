@@ -13,9 +13,9 @@
 //
 // TWO THINGS MUST NOT BE "FIXED" BY THE SAME BRUSH, and both are checked:
 //   * the ARROW still reads the sign -- it is the only thing left that carries direction;
-//   * a PUMP is not magnitude'd either: its head is a GAIN, shown positive and headed "Head gain"
-//     (Tom, 2026-10-01, reversing 2026-07-30's "Negative head loss is fine"); the solver's own
-//     number stays negative. dev/lpn-spike/pump-head-gain-harness.js covers every place it reads.
+//   * a PUMP is not magnitude'd either: its head is shown positive and headed "Head", prefix "H="
+//     (Tom, 2026-10-01/02, reversing 2026-07-30's "Negative head loss is fine"); the solver's own
+//     number stays negative. dev/lpn-spike/pump-head-harness.js covers every place it reads.
 //
 // Also here because it is the same transform: the arrow is drawn at 75% of every other symbol
 // (Tom, 2026-08-14), and the fit test that decides whether one is drawn at all must use the same
@@ -114,8 +114,8 @@ ok('no pipe label prints a minus sign', negLabels.length === 0,
 ok('...and the numbers are the magnitudes, not zeroed or dropped',
 	reversed.every(function (l) { return L.linkLabel(l.id).some(function (t) { return parseFloat(numberPart(t)) > 0; }); }),
 	reversed.map(function (l) { return l.id + ': ' + L.linkLabel(l.id).join('/'); }).join('  '));
-ok('a PUMP shows its head as a positive gain, never a minus sign',
-	pumps.every(function (l) { return L.linkLabel(l.id).some(function (t) { return /^Hg=/.test(t) && parseFloat(numberPart(t)) > 0; }); }),
+ok('a PUMP shows its head positive under "H=", never a minus sign',
+	pumps.every(function (l) { return L.linkLabel(l.id).some(function (t) { return /^H=/.test(t) && parseFloat(numberPart(t)) > 0; }); }),
 	pumps.map(function (l) { return l.id + ': ' + L.linkLabel(l.id).join('/'); }).join('  '));
 
 // ---- 2. The POPUP, which is the canonical results location ---------------------------------
@@ -130,8 +130,8 @@ const gradRow = popupRow(/gradient/i);
 ok('...nor on the gradient, which is derived from it', !!gradRow && !/-\d/.test(gradRow), JSON.stringify(gradRow));
 
 L.renderLinkFields(pumps[0].id);
-const pumpHl = popupRow(/Head gain \(/);
-ok('the pump popup reads Head gain, with no minus sign', !!pumpHl && !/-\d/.test(pumpHl) && /\d/.test(pumpHl), JSON.stringify(pumpHl));
+const pumpHl = popupRow(/^Head \(/);
+ok('the pump popup reads Head, with no minus sign', !!pumpHl && !/-\d/.test(pumpHl) && /\d/.test(pumpHl), JSON.stringify(pumpHl));
 
 // ---- 3. The ARROW still carries the direction ----------------------------------------------
 // Read from the transform the page actually wrote, not recomputed: the sign has exactly one

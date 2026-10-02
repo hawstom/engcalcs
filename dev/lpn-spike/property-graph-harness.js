@@ -19,7 +19,7 @@
 //   7. The multi-element box carries no graph.
 //   8. Recalculate off keeps the snapshot: an edit does not take the graph away.
 //   9. A steady-state project (no run time) has no graph.
-//  3b. A pump's head loss is graphed as Head gain, positive (minus the signed value); a pipe's stays Head loss.
+//  3b. A pump's head loss is graphed as its Head, positive (minus the signed value); a pipe's stays Head loss.
 //  10. A source-trace run: the selector's own wording, "Source share from {node}" (Tom, 2026-09-30),
 //      distinct from the shared lpn_result_source_share used everywhere else; and with no trace node
 //      set, the entry does not appear at all (no results to offer it from).
@@ -157,7 +157,7 @@ async function until(pred, ms) {
 	check(uOpts.indexOf('flow') >= 0 && uOpts.indexOf('velocity') < 0 && uOpts.indexOf('gradient') < 0,
 		`a pump offers only what the run has for it, no velocity: ${uOpts.join(', ')}`);
 
-	head('3b. A PUMP GRAPHS HEAD GAIN, POSITIVE; A PIPE STILL GRAPHS HEAD LOSS');
+	head('3b. A PUMP GRAPHS ITS HEAD, POSITIVE; A PIPE STILL GRAPHS HEAD LOSS');
 	{
 		const frames = EngCalcs.lpnTimeRunFrames();
 		const ftPerM = 3.28084;
@@ -166,12 +166,12 @@ async function until(pred, ms) {
 		const lastNum = (t) => parseFloat(t.trim().split(/\s+/).pop());
 		L.openLinkPopup(pump, 100, 100);
 		check(options().indexOf('headloss') >= 0 &&
-			optionTexts()[options().indexOf('headloss')] === 'Head gain',
-			`the pump's selector entry reads "Head gain": ${optionTexts().join(', ')}`);
+			optionTexts()[options().indexOf('headloss')] === 'Head',
+			`the pump's selector entry reads "Head": ${optionTexts().join(', ')}`);
 		check(optionTexts().indexOf('Head loss') < 0, 'and the pump offers no "Head loss"');
 		choose('headloss');
-		check(chartText().indexOf('Head gain (') >= 0, 'the y axis is named Head gain with its unit');
-		check(String(sel()['data-bs-original-title'] || sel().title).indexOf(PC.lpn_pgraph_head_gain_tip) >= 0, 'and the selector carries the tip');
+		check(/(^|\| )Head \(/.test(chartText()), 'the y axis is named Head with its unit');
+		check(String(sel()['data-bs-original-title'] || sel().title).indexOf(PC.lpn_result_pump_head_tip) >= 0, 'and the selector carries the tip');
 		const got = titles().map(lastNum);
 		const wantv = frames.map((f) => -f.headlosses[pump] * ftPerM);
 		check(got.length === frames.length && got.length > 0, `one dot per step: ${got.length}`);
@@ -181,7 +181,7 @@ async function until(pred, ms) {
 		L.openLinkPopup(pipe, 100, 100);
 		check(optionTexts()[options().indexOf('headloss')] === 'Head loss', 'a pipe still offers "Head loss"');
 		choose('headloss');
-		check(chartText().indexOf('Head loss (') >= 0 && chartText().indexOf('Head gain') < 0, 'and its axis says Head loss');
+		check(chartText().indexOf('Head loss (') >= 0 && !/(^|\| )Head \(/.test(chartText()), 'and its axis says Head loss');
 		choose(pOpts[0]);
 	}
 

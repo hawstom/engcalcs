@@ -169,7 +169,7 @@ const EngCalcs = global.EngCalcs;
 	const header = csvLines[0].split(',');
 	check(header[0] === (PC.lpn_full_col_time || 'Time') && header[1] === (PC.lpn_full_col_type || 'Type')
 		&& header[2] === (PC.lpn_full_col_id || 'ID'), `header starts Time, Type, ID: ${header.slice(0, 3).join(', ')}`);
-	check(header.length === 12, `and carries all nine result columns (Head loss and Head gain apart) plus the three identifiers: ${header.join(' | ')}`);
+	check(header.length === 12, `and carries all nine result columns (Head loss and Pump head apart) plus the three identifiers: ${header.join(' | ')}`);
 
 	// **A SAMPLED ROW MUST AGREE WITH THE TABLES PANE AT THE SAME STEP.** paneColLinkResult() and
 	// paneColNodeResult() call the exact same colorLinkValue()/colorNodeValue() accessors this
