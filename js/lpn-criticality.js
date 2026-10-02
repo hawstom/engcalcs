@@ -275,21 +275,33 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		});
 	}
 
-	// The reading order: what the system loses most first. Demand not served, then the number of
-	// junctions pushed below the minimum; a row whose remainder did not solve sorts after every row
-	// that lost something it can measure, and before the rows that lost nothing.
+	// HOW BAD ONE ROW IS, in fire flow's own four tiers so the two reports tint and read alike (Tom,
+	// 2026-10-02: "It's of course critical that we have consistent styles throughout the app."):
+	//   'fail'    demand left unserved -- the system failed to deliver, as a fire-flow FAIL does. This
+	//             holds even when the remainder did not solve, because the loss is known by the walk.
+	//   'design'  nothing unserved, but a junction fell below the minimum or a zero-demand junction
+	//             was cut off -- fire flow's "pushes something else out of limits".
+	//   'error'   the remainder did not solve and no demand is known lost.
+	//   'none'    nothing was lost.
+	var TIERS = ['fail', 'design', 'error', 'none'];
+	function severity(r) {
+		if (r.unserved > 0) { return 'fail'; }
+		if (r.state === STATES.ERROR) { return 'error'; }
+		if (r.state === STATES.IMPACT) { return 'design'; }
+		return 'none';
+	}
+
+	// The reading order: what the system loses most first. The tier, then demand not served, then
+	// junctions pushed below the minimum, then junctions cut off; ties keep the order they ran in.
 	function severityOrder(results) {
-		function rank(r) {
-			if (r.state === STATES.IMPACT || (r.state === STATES.ERROR && r.unserved > 0)) { return 0; }
-			return r.state === STATES.ERROR ? 1 : 2;
-		}
-		return results.map(function (r, i) { return { r: r, i: i }; }).sort(function (a, b) {
-			var ra = rank(a.r), rb = rank(b.r), da, db, ba, bb;
-			if (ra !== rb) { return ra - rb; }
+		function count(a) { return a ? a.length : -1; }
+		return results.map(function (r, i) { return { r: r, i: i, t: TIERS.indexOf(severity(r)) }; }).sort(function (a, b) {
+			var da, db;
+			if (a.t !== b.t) { return a.t - b.t; }
 			da = a.r.unserved || 0; db = b.r.unserved || 0;
 			if (da !== db) { return db - da; }
-			ba = a.r.below ? a.r.below.length : -1; bb = b.r.below ? b.r.below.length : -1;
-			if (ba !== bb) { return bb - ba; }
+			if (count(a.r.below) !== count(b.r.below)) { return count(b.r.below) - count(a.r.below); }
+			if (count(a.r.cutOff) !== count(b.r.cutOff)) { return count(b.r.cutOff) - count(a.r.cutOff); }
 			return a.i - b.i;
 		}).map(function (x) { return x.r; });
 	}
@@ -298,6 +310,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	EngCalcs.lpnCriticalityStates = STATES;
 	EngCalcs.lpnCriticalityCodes = CODES;
 	EngCalcs.lpnCriticalityOrder = severityOrder;
+	EngCalcs.lpnCriticalitySeverity = severity;
 	EngCalcs.lpnCriticalityReachable = reachable;
 }());
 

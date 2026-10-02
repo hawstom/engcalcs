@@ -56979,7 +56979,9 @@ var EngCalcs = EngCalcs || {};
 		// Four columns, not ten: the headings wrap between words, never inside one (css/engcalcs.css).
 		if (body.parentNode && body.parentNode.classList) { body.parentNode.classList.add('lpn-crit-table'); }
 		shown.forEach(function (rec) {
-			var tr = ffEl('tr', 'lpn-crit-' + rec.state, null, body);
+			// Fire flow's own row tints, by the same four tiers (js/lpn-criticality.js), so a red
+			// row means "the system failed to deliver" in both reports. 'none' is untinted, as a pass.
+			var tr = ffEl('tr', 'lpn-ff-' + EngCalcs.lpnCriticalitySeverity(rec), null, body);
 			ffGotoLink(ffCell(tr, ''), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
 			ffCell(tr, typeof rec.unserved === 'number' ? ffQty(rec.unserved, 'lpn_u_flow') : FF_DASH);
 			if (rec.cutOff) { critIdsCell(tr, rec.cutOff); } else { ffCell(tr, FF_DASH); }
