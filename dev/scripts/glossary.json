@@ -578,7 +578,7 @@
         "12": {
             "term": "conveyance efficiency",
             "concept": "conveyance-efficiency",
-            "definition": "",
+            "definition": "The share of the water put into a canal reach that arrives at its far end, the outflow divided by the inflow. It measures loss along the canal, mostly seepage, and is not the efficiency of a pump, a farm, or an irrigation system as a whole.",
             "symbol": "E_c",
             "context": "Ratio of outflow to inflow in a canal reach — measures how much water delivered at the head is received at the tail. Appears in Canal Seepage calculator. E_c = Q_out / Q_in.",
             "translation_notes": "This is the most terminology-sensitive term in the suite. 'Conveyance' means transport of water along a canal — do not use a general word for 'efficiency' alone. The term should convey 'how well the canal transports water without loss'. DATA-ERROR FIX 2026-07-10 (category-4 wave-2 hi re-translation): glossary hi value was 'वहन दक्षता' (vahan dakshata), but lib/lang.ec.hi.php's own cs_ and irr_ keys (cs_main_menu, cs_main_title, cs_Ec, cs_Ec_check, cs_notes_1_def, cs_notes_2_term, irr_card_seepage_head, etc. — 10+ occurrences, predating this sprint) all already establish 'संवहन दक्षता' (sanvahan dakshata) as the incumbent term. Standardized the glossary to match established suite usage, same defect class as prior DATA-ERROR FIX entries in this file. DATA-ERROR FIX 2026-07-10 (category-4 wave-3 ps re-translation): glossary ps value was 'د اوبو د رسولو موثریت', but lib/lang.ec.ps.php's own irr_ keys (irr_quickref_html and others, 15+ occurrences, predating this sprint) all already establish 'د لیږدولو اغیزمنتیا' as the incumbent term. Standardized the glossary to match established suite usage rather than switch the shipped file mid-sprint. DATA-ERROR FIX 2026-07-10 (category-4 holistic pass, hr): glossary hr value was \"učinkovitost prijenosa\", but lib/lang.ec.hr.php own cs_ keys (cs_main_desc, cs_Ec, cs_Ec_check, cs_notes_1_def, cs_notes_2_term, cs_notes_2_def, cs_Ec_target — 7 occurrences, predating this pass) all already establish \"korisnost transporta\" as the incumbent term; irr_card_seepage_head/desc had drifted to the minority \"učinkovitost prijenosa\" and were corrected to match. Standardized glossary to match established suite usage, same defect class as prior DATA-ERROR FIX entries in this file. Task 109 stage 5 (2026-07-19): ru conveyance-efficiency terminology drift standardized (2 keys); hr 'target efficiency' aligned to the incumbent korisnost rather than a new ciljnu iskoristivost coinage.",
@@ -814,7 +814,7 @@
         "18": {
             "term": "distribution uniformity",
             "concept": "distribution-uniformity",
-            "definition": "",
+            "definition": "A measure of how evenly an irrigation system delivers water across the field, the lowest emitter flow divided by the average emitter flow. It describes the system's evenness, not the evenness of the ground or the crop.",
             "symbol": "DU",
             "context": "Ratio of minimum to average emitter flow rate in a drip or sprinkler system. DU = q_min / q_avg. Appears in Drip/Sprinkler calculator.",
             "translation_notes": "Use the irrigation engineering standard term. 'Uniformity' refers to how evenly water is distributed across the field, not physical evenness of the system. When the source says 'low-quarter DU', see the separate 'low-quarter distribution uniformity' entry. Hebrew: אחידות — never the nonword הוודות (found in shipped he file). Task 109 stage 5 (2026-07-19): tr confirmed on dağılım düzgünlüğü — transliteration+wrong-word forms Uniformluk/Dağıtım were corrected across 7 keys.",
@@ -889,7 +889,7 @@
         "20": {
             "term": "emitter",
             "concept": "emitter",
-            "definition": "",
+            "definition": "A small outlet that releases water at a low controlled rate, such as a dripper or micro-sprinkler in irrigation. On the looped network page it is also EPANET's emitter, a junction outflow equal to a coefficient times the pressure raised to the emitter exponent, used for a sprinkler or a leak.",
             "context": "A drip irrigation emitter (dripper/micro-sprinkler) that delivers water at a controlled low flow rate directly to the soil or plant root zone. Appears in Drip/Sprinkler calculator. ALSO, on the looped network page, EPANET's EMITTER: a sprinkler or a leak at a junction, whose flow is coefficient x pressure raised to the emitter exponent. Same word, second field. The setting is the Emitter exponent, and 'exponent' is the quantity -- never 'power', which on a page that models pumps is energy per unit time.",
             "translation_notes": "Use the field term most familiar to irrigation practitioners in the target language. Arabic: 'قطارة' (dripper) is the field term, preferred over the academic 'مُصدِر'. Spanish: 'gotero' is field-common in Latin America alongside the technical 'emisor'. Ukrainian: 'крапельниця' is the field term used by irrigation workers. zh CORRECTED (2026-07-10, category-4 wave-2 QA): the wave-2 zh translating agent initially deviated to the generic academic term '灌水器' throughout ip_ keys, reasoning that the calculator's emitter-exponent model (x from ~0 to 0.5) is generic rather than drip-only. Reverted to the established glossary field term '滴头' (dripper) for suite-wide consistency with the ar/es/uk pattern above — this glossary's own policy is field-term-over-academic-generality across all languages, and a generic hydraulic model doesn't change what practitioners actually call the part. | [2026-08-25, glossary_rendering_census.php] 22 English sites, and EIGHT FILES NEVER SHIP THE RENDERING THIS ENTRY HOLDS: bg капкоотделител, cs kapač, de Tropfer, km ឧបករណ៍ចំណោចទឹក, ru капельница, uk крапельниця, ur خارج کنندہ occur 0 times in their own file and fr émetteur once. What those files use instead is a transliteration of English \"emitter\" -- ur ایمیٹر 17, cs emitoru 15, de emitter 14, ru эмиттера 14, uk емітера 13, bg емитер 12 -- except fr, whose goutteur 19 is a real field word rather than a loan. The other 18 languages reach 17 to 22 of 22 sites; es emisor, pt emissor and hr emiter reach all of them. So the field-term-over-loanword policy recorded above has NOT in fact been applied in six files, and this entry is out of step with them. Which side moves is a native decision, not a countable one. [2026-09-02, sprint 573] CORRECTION, raised independently by the ru, bn and bg agents: the renderings above are the IRRIGATION dripper, and on the looped network page that is the wrong field. Russian капельница reads as an intravenous drip; Bengali ড্রিপার and Bulgarian капкоотделител are the drip-irrigation part. Each of those files already had a settled lpn_ incumbent (эмиттер, এমিটার, дюза) across a dozen shipped keys, and all three agents correctly kept the incumbent against this entry's advice. For an lpn_ string prefer the EPANET sense; the dripper stays right for ip_.",
             "translations": {
@@ -1199,7 +1199,7 @@
         "28": {
             "term": "rock chute",
             "concept": "rock-chute",
-            "definition": "",
+            "definition": "A steep channel or ramp lined with a layer of loose rock that carries water down a slope while the rock resists erosion and breaks up the flow's energy. It is a built drop structure, not a natural rapid and not a pipe.",
             "context": "A steep rock-lined drop structure (also called a 'rock ramp') that conveys water rapidly down a slope in irrigation, drainage, or watershed management. Key concepts for translation: rock-lined, steep gradient, spillway or drop structure — translate the concept, not the English word 'chute'. The rock riprap matrix dissipates energy and resists erosion. Appears in Rock Chute Design (Robinson) and Robinson Rock Chute calculators.",
             "translation_notes": "CRITICAL: 'Robinson' is the surname of K.M. Robinson, co-author of Robinson, Rice & Kadavy (1998) — it is a proper noun and must NEVER be translated or modified in any language. Translate only 'Rock Chute'. Concept to translate: 'rock-lined steep channel' or 'rock-lined spillway' — the drop/descent nature must be conveyed; a generic 'rock channel' is insufficient. CRITICAL for French: WMO No. 385 entry 517 establishes that the French word 'chute' means 'fall' (elevation difference) — it cannot name this structure. Use 'coursier en enrochement' (coursier = steep channel structure; enrochement = riprap). Spanish: USDA uses 'bajante de rocado' — 'bajante' (from bajar = to descend) correctly conveys the drop-structure nature; 'de rocado' = rock-lined. Russian: 'каменный быстроток' ('быстроток' = fast-flow/steep channel). Portuguese: changed from 'calha' (generic trough) to 'rampa em enrocamento' (rampa = ramp/slope, enrocamento = riprap) to convey steep character. Serbian: changed from 'жлеб' (gutter/trough) to 'брзоток' (fast-flow structure), consistent with ru/uk pattern. Bengali: changed from borrowed 'চ্যুট' (conveys nothing) to 'পাথর-আবৃত খাড়া নালা' (rock-lined steep channel). Persian: changed from generic 'آبراه سنگی' (stone waterway) to 'آبراه تند سنگچین' (تند = steep/swift, سنگچین = stone-laid/riprap). Pashto: added 'تند' (steep/swift) to original. Khmer: changed 'ចំហ' (open) to 'ជម្រាល' (sloped/inclined). NEEDS HUMAN REVIEW: am (ምቀጫ meaning uncertain), my (ထောင် may not clearly convey steep to all readers), de (Steinschütte is standard engineering term but doesn't explicitly say 'steep channel'). Turkish: changed to 'taş düşü' — 'düşü' is the established Turkish hydraulics term for a drop/chute structure (2026-07 audit; previous 'taş eğimli kanal' was descriptive but nonstandard). Spanish: NEEDS HUMAN VERIFICATION — 'bajante de rocado' claims a USDA source but 'rocado' is not standard Spanish ('enrocado' is); verify the USDA document or switch to 'bajante de enrocado'. 2026-07 reconciliation: fr/ro/ru/uk lang files updated to match this entry. NOT reconciled pending human review of the GLOSSARY side: hr 'kameni skluz' (consider 'kameni brzotok', parallel to sr/ru), bg 'каменна бързина' (consider 'каменен бързоток'), de 'Steinschütte' vs shipped 'Steingerinne' (both defensible - pick one). RESOLVED bg: native Bulgarian engineer confirmed 'каменен бързоток' (2026-07); lang file updated. Task 98 (2026-07-13): English source renamed 'Rock Chute' → 'Steep Channel' throughout the rc_ prefix (see CLAUDE.md 'Write English source strings in Simple English') — 'chute' itself is jargon-shaped English that some languages transliterated rather than translated. The earlier Bengali fix noted above only reached the calculator's title-level strings (rc_main_menu/rc_main_desc); a full-file grep found 'চ্যুট' still transliterated in 7 more rc_ body keys (rc_S0, rc_qt, rc_n_chute, rc_pond_ok_tip, rc_pond_warn_tip, rc_notes_2_def, rc_notes_3_def, rc_notes_7_def) — fixed 2026-07-13 to match the title's 'খাড়া নালা'. Hindi and Urdu had the same bare-transliteration defect suite-wide ('चूट'/'چوٹ') despite their titles being fine in some cases — fixed to 'तीव्र ढाल चैनल' (hi) and 'کھڑی نالی' (ur), applied consistently across every rc_ occurrence. Lesson: a healthy title-level translation does not guarantee the same concept was translated (vs. transliterated) in every short body label — check the whole file, not just the title strings, when auditing a jargon term.",
             "translations": {
@@ -1235,7 +1235,7 @@
         "29": {
             "term": "chute",
             "concept": "chute",
-            "definition": "",
+            "definition": "A steep open channel or drop structure that carries water quickly down a slope, as distinct from a gentle irrigation canal. Name the concept of a steep channel or spillway, not a borrowed word.",
             "avoid": [
                 "phonetic transliteration of the English word — translate the concept (steep channel / spillway)",
                 "the 'fall'/elevation-difference sense (fr chute, es caída, ru падение) — that word is NOT available for this structure"
@@ -1351,7 +1351,7 @@
         "32": {
             "term": "gradation",
             "concept": "gradation",
-            "definition": "",
+            "definition": "How widely the sizes of the rock pieces vary within a mix, stated as the ratio of the 84.1 percent size to the median size. A value near 1 means rock of nearly one size, and a larger value means a wider spread of sizes.",
             "symbol": "SD",
             "context": "The spread or uniformity of rock particle sizes. In the Robinson method, gradation is expressed as SD = D84.1/D50. Uniform rock ≈ 1.25; Robinson valid range 1.15–1.47. Appears in Rock Chute Design calculator.",
             "translation_notes": "Use the geotechnical/hydraulic engineering term for grain size distribution or grading. Do not translate as 'grade' (implies quality). The symbol 'SD' and ratio notation D84.1/D50 are universal. Spanish/Portuguese: 'granulometría'/'granulometria'. French: 'granulométrie'. Russian/Bulgarian/Serbian: 'гранулометрический состав'. Chinese: '级配'. bg: native engineer confirmed 2026-07-06 the standard term for the D84.1/D50 gradation SD label is 'Коефициент на градация' (superseding the earlier 'коефициент на едрозърнестост' proposal and the alternative 'коефициент на разнозърненост'); applied in rc_SD/rc_SD_check. 2026-07-13 reconciliation pass (roadmap item 42): glossary updated to match incumbent, internally-consistent lang-file usage discovered by 5 independent category-5-wave-1 translation agents (it, pt, ru, tr) — glossary values were stale, not the shipped files.",
@@ -1426,7 +1426,7 @@
         "34": {
             "term": "ponding",
             "concept": "ponding",
-            "definition": "",
+            "definition": "Water that collects in a pond just upstream of the inlet of a chute or spillway. In the Robinson method this is wanted, because the pooled water acts as a weir and lowers the risk of erosion upstream. For the irregular weir it is the depth of water held behind the weir.",
             "symbol": "",
             "context": "Upstream water accumulation at the inlet of a chute or spillway, forming a small pond. In the Robinson method, ponding (Hp > yn) is desirable -- the head at the inlet crest acts as a weir, reducing upstream erosion risk. Appears in Rock Chute Design (rc_Hp, rc_yn, rc_ponding_check and the rc_pond_* verdicts) and in Weir Flow Irregular (wi_pondingHeight).",
             "avoid": [
@@ -1468,7 +1468,7 @@
         "35": {
             "term": "junction loss",
             "concept": "junction-loss",
-            "definition": "",
+            "definition": "The head lost at one place where the flow is disturbed, such as a bend, fitting, valve, junction, or entrance, equal to a loss coefficient times the velocity head. It is a local loss at a point, as opposed to the friction loss spread along the length of the pipe.",
             "symbol": "h_m",
             "context": "Energy loss at pipe junctions, bends, fittings, and entrance — a local (point) loss as opposed to distributed friction loss along the pipe. h_m = k_m × v²/(2g). Appears in Manning Pipe Head Loss and Micro-Hydro Power calculators.",
             "translation_notes": "CANONICAL ENGLISH (label-normalization decision, item 90, 2026-07-07): the suite-wide English label for this concept is \"Minor (local) loss\" — 'junction loss' (formerly mphl_) and 'minor loss' (mhp_/ip_) are merged into it; see the 'minor loss' entry for the canonical treatment. The term 'minor' is conventional but misleading — do not imply these losses are always small; the parenthetical '(local)' carries the true sense. Use the hydraulic engineering term for local/point losses at fittings. French: 'perte singulière'. Spanish: 'pérdida local' or 'pérdida por accesorio'. Russian: 'местные потери'. Chinese: '局部水头损失'. Task 109 stage 4 (2026-07-19): de mphl_total_junction_k_tip aligned to örtlich/'(local)' label wording; hi/id/ur had the 'minor (local)' word order reversed against their own labels and were corrected.",
@@ -1505,7 +1505,7 @@
         "36": {
             "term": "run-of-river",
             "concept": "run-of-river",
-            "definition": "",
+            "definition": "A hydropower arrangement that uses the river's natural flow as it comes, with no dam and little or no stored water. Its power therefore rises and falls with the river's flow through the seasons.",
             "context": "A hydropower configuration that uses natural river flow without a dam or significant storage reservoir. Power output varies with seasonal river flow. Appears in Micro-Hydro Power calculator.",
             "translation_notes": "Use the established energy/hydropower sector term. 'Run' means natural river current — do not translate as jogging or running. WMO No. 385 entry 1263 gives the full facility names: Spanish 'central hidroeléctrica de pasada', French 'usine hydroélectrique au fil de l'eau', Russian 'русловая гидроэлектростанция' — these are the authoritative terms for the power plant noun. The abbreviated forms 'filo de agua' (es), 'au fil de l'eau' (fr), and 'русловая ГЭС' (ru) are standard in engineering use. German: 'Laufwasserkraftwerk'. Chinese: '径流式水电'. Task 98 audit (2026-07-13): 'micro-hydro' (the companion term this concept pairs with in mhp_ keys) had been left completely untranslated/transliterated in 4 languages, not just run-of-river — sw and km kept the raw Latin 'Micro-Hydro' embedded in otherwise-native sentences; km and ps also left 'Run-of-River' in an English parenthetical even where the surrounding sentence already translated the concept; ps separately phonetically transliterated 'مایکرو هایدرو' as its own word throughout (same defect, different script). All 4 fixed: sw → 'Umeme Mdogo wa Maji' (small electricity of water), km → 'ថាមពលវារីអគ្គិសនីខ្នាតតូច' (small-scale hydroelectric power, reusing km's own native hydro vocabulary), ps → 'کوچنی آبي ځواک' (small water-power, real Pashto not transliteration) with the redundant English '(Run-of-River)' parenthetical dropped in both km and ps since their own sentences already conveyed it. ar ('الطاقة الكهرومائية الصغيرة') and zh ('微型水力发电') were already clean and served as the quality reference for the fixes.",
             "translations": {
@@ -1541,7 +1541,7 @@
         "37": {
             "term": "headworks",
             "concept": "headworks",
-            "definition": "",
+            "definition": "The intake structure at the upstream end of a canal or penstock, where water is taken from a river or reservoir into the conveyance. It is the structure that diverts the water, not the water source itself.",
             "context": "The intake structure at the upstream end of a penstock or canal, where water is diverted from the river or reservoir into the conveyance system. Appears in Micro-Hydro Power calculator (penstock diameter and length descriptions).",
             "translation_notes": "Use the civil/irrigation engineering term for a water intake or diversion structure. Spanish: 'obra de toma'. French: 'ouvrage de prise d'eau'. Russian: 'водозаборное сооружение'. German: 'Einlaufbauwerk'. In many languages, 'intake structure' is preferred over a literal translation of 'headworks'.",
             "translations": {
@@ -1689,7 +1689,7 @@
         "41": {
             "term": "irregular channel",
             "concept": "irregular-channel",
-            "definition": "",
+            "definition": "A channel whose cross-section is not a regular shape, described by a series of surveyed points of station and elevation across it. It contrasts with a trapezoidal channel defined by a bottom width and side slopes.",
             "context": "A channel whose cross-section is non-uniform / non-prismatic — a natural or surveyed section defined by station-elevation points, as opposed to a regular trapezoidal shape. Titles the Manning Irregular Channel calculator (mi_) and, in the geometric sense, the Weir Flow Irregular calculator (wi_).",
             "translation_notes": "\"Irregular\" here is GEOMETRIC: the cross-section is non-uniform / natural / arbitrary shape. It is NOT the temporal sense \"sporadic / occasional / not-regular\" (bg \"нередовен\" WRONG, uk \"нерегулярний\" WRONG per Bulgarian-engineer-feedback.md), and NOT \"incorrect / faulty\" (ru \"неправильное русло\" reads as \"wrong channel\" — prefer \"произвольного сечения\"). Where the language allows, name the cross-section explicitly (\"of irregular cross-section\") rather than a bare adjective that could be read as temporal or evaluative. Task 98 audit (2026-07-13): uk/ru were already fixed to the geometric sense, but bg was still shipping the evaluative-sense defect this note itself warns against — \"неправилно сечение\" (= \"incorrect/wrong cross-section\"), across 7 occurrences (mi_menu, mi_main_title, mi_main_desc, wi_menu, wi_main_title, wi_main_desc, irr_card_canal_desc). Fixed to \"произволно сечение\" (\"arbitrary cross-section\"), a direct grammatical parallel to the Russian fix. Lesson: a documented glossary warning doesn't guarantee every flagged language was actually corrected — verify current shipped state, don't assume a note describes present reality.",
             "translations": {
@@ -1846,7 +1846,7 @@
         "45": {
             "term": "outlet apron",
             "concept": "outlet-apron",
-            "definition": "",
+            "definition": "A flat protective pad of rock or concrete at the downstream end of a chute, where the fast flow leaves the structure. It protects the bed from scour and is not the chute's sloping face.",
             "context": "Flat protective pad of rock/concrete at the chute outlet (hydraulic-structures term). Rock Chute output and sketch label.",
             "translation_notes": "Never clothing: it \"grembiule\" (kitchen apron) wrong — use \"platea\"; tr \"önlük\" (bib) wrong. Use the stilling-basin/apron family term: platea/radier/护坦.",
             "translations": {
@@ -2077,7 +2077,7 @@
         "52": {
             "term": "low-quarter distribution uniformity",
             "concept": "low-quarter-distribution-uniformity",
-            "definition": "",
+            "definition": "A measure of irrigation evenness that compares the average of the lowest quarter of the measured emitter flows with the average of all of them. It is stricter than distribution uniformity as defined by the single lowest flow, and the two are separate concepts.",
             "symbol": "DU_lq",
             "context": "Irrigation statistic: average of the lowest quarter of measured emitter flows divided by the overall average. Referenced in Irrigation Pressure notes as \"textbook low-quarter Distribution Uniformity\".",
             "translation_notes": "Use the established irrigation-engineering phrase; do not invent one. \"Textbook\" is an adjective meaning \"as defined in standard textbooks\" — fr rendered it \"manuel\" (manual check), wrong. he: uniformity = אחידות, never the nonword הוודות. Wave-1 coinages (2026-07, category-4 sprint): fr=\"uniformité de distribution du quart inférieur\", ro=\"Uniformitatea Distribuției de sfert inferior\", ru=\"равномерность распределения по нижней четверти\", uk=\"рівномірність розподілу по низькій чверті\", bg=\"равномерност на разпределение по долната четвърт\", sr=\"равномерност расподеле нижег квартила\", hr=\"jednolikost distribucije niske grupe\", cs=\"Uniformita distribuce nízké čtvrtiny\", tr=\"düşük-çeyrek Dağıtım Uniformluğu\", id=\"Keseragaman Distribusi kuartal-bawah\". es/pt/it/de already had glossary coverage pre-sprint. Not yet native-reviewed. ur ADDED (2026-07-10, category-4 wave-2 sprint): \"نچلی چوتھائی تقسیم یکسانیت\" (lower-quarter distribution uniformity) reuses the established ur terms چوتھائی (quarter), تقسیم (distribution), یکسانیت (uniformity, already glossary term for plain \"distribution uniformity\"). Not yet native-reviewed. hi ADDED (2026-07-10, category-4 wave-2 re-translation): 'निम्न-चतुर्थांश वितरण एकरूपता' (low-quarter distribution uniformity) reuses the glossary's own hi=\"वितरण एकरूपता\" for the base \"distribution uniformity\" term and prefixes \"निम्न-चतुर्थांश\" (low-quarter), matching the wave-1 pattern of naming the concept literally (fr/ru/uk/id etc.) rather than inventing a new metaphor. NOTE: the hi ip_ file's own pre-sprint text mistakenly used 'पाठ्यपुस्तक' (textbook) where the current English source says 'standard' — corrected to 'मानक' (standard) in lib/lang.ec.hi.php during this sprint; do not reintroduce पाठ्यपुस्तक. ar ADDED (2026-07-10, category-4 wave-2 re-translation): 'انتظام التوزيع للربع الأدنى' (uniformity of distribution of the lowest quarter) reuses the glossary's own ar=\"انتظام التوزيع\" base term for plain \"distribution uniformity\" (switched suite-wide in this sprint from a prior 'توحيد' root to 'انتظام', which better conveys 'evenness' rather than 'unification') and appends 'للربع الأدنى' (of the lowest quarter), naming the concept literally like the fr/ru/uk/id wave-1 coinages. Where the English source's own qualifier 'standard' appears in context (ip_du_estimate, ip_notes_3_def), it is rendered inline as 'القياسي' immediately after this base phrase, kept out of the pure glossary term here for parity with the other languages' entries. bn ADDED (2026-07-10, category-4 wave-2 re-translation): 'নিম্ন-চতুর্থাংশ বিতরণ সমতা' (low-quarter distribution uniformity), built on the glossary's own bn=\"বিতরণ সমতা\" base term, naming the concept literally. fa ADDED (2026-07-10, category-4 wave-2 re-translation): 'یکنواختی توزیع ربع پایین' (low-quarter distribution uniformity), built on the glossary's own fa=\"یکنواختی توزیع\" base term; where English says \"standard\" it is rendered inline as \"استاندارد\" immediately after this base phrase, same pattern as ar. Task 129 STALE-ENGLISH RESYNC (2026-07-21): the ip_ keys ip_du_estimate/ip_q_ratio/ip_notes_3_def (plus ip_worst_case_warn and mhp_notes_2_def) were resynced against the CURRENT English, which was shortened in the Wave-0 reform (commit 7bfbda1) after several languages had already translated the older, longer version. Canonical wording is now 'supply pressure' (NOT the retired 'inlet pressure') and ip_q_ratio's tooltip is ONE short sentence ('This is different than our approximation of the standard uniformity measure.'), not the old separate-check paragraph; mhp_notes_2_def dropped its old '1-3 m/s target range' numeric band. 9 languages carried drift and were rewritten (am, cs, es, hr, km, pt, ru, tr, uk); the other 17 already reflected current English. es/hi also had 'textbook'->'standard' aligned (Tom: negligible/synonymic, not swept elsewhere).",
@@ -2142,7 +2142,7 @@
         "54": {
             "term": "check structure",
             "concept": "check-structure",
-            "definition": "",
+            "definition": "A small gate or board structure across an irrigation canal that raises the upstream water level so water can be diverted or measured. The word check here means to hold back, and the term names a structure, not an inspection.",
             "symbol": "",
             "context": "A small flow-control structure (gate or board structure) in an irrigation canal, used to raise ('check') the upstream water level for diversion or measurement. 'Check' is part of the structure's name.",
             "translation_notes": "Use the local irrigation term for a canal check/control gate. 'Check' here is NOT the verb 'to verify/inspect' — do not translate as 'inspect the structure'. Wave-1 coinages (2026-07, category-4 sprint, this term had zero prior translations): es=\"estructura de control\", pt=\"estrutura de controle\", fr=\"ouvrage de régulation\", it=\"struttura di regolazione\", de=\"Kontrollbauwerk\", ro=\"stăvilar de control\", ru=\"регулирующее сооружение\", uk=\"контрольна споруда\", bg=\"контролно съоръжение\", sr=\"устава\", hr=\"regulacijska ustava\", cs=\"regulační objekt\", tr=\"kontrol yapısı\", id=\"bangunan pengatur\". Not yet reviewed by a native speaker; propagate to waves 2-3 for consistency. ur ADDED (2026-07-10, category-4 wave-2 sprint): \"کنٹرول ڈھانچہ\" (control structure) follows the majority \"control structure\" pattern (es/pt/it/de/ro/ru/uk/bg/hr/cs/tr/id) rather than a literal \"check\", avoiding the check=verify mistranslation trap. Matches the term already used consistently in the shipped ur file (irr_ keys) prior to this sprint. Not yet native-reviewed. hi ADDED (2026-07-10, category-4 wave-2 re-translation): 'नियंत्रण संरचना' (control/regulating structure) follows the majority wave-1 pattern (es/pt=\"estructura/estrutura de control(e)\", fr=\"ouvrage de régulation\", ru=\"регулирующее сооружение\") and matches the suite's own established incumbent Hindi phrase for this exact control-structure concept already used in lib/lang.ec.hi.php (irr_card_weir_irregular_desc: \"बहु-खंड नियंत्रण संरचनाएं\" = multi-section control structures, predates this sprint). ar ADDED (2026-07-10, category-4 wave-2 re-translation): 'منشأة تحكم' (control structure/facility) follows the same majority 'control structure' pattern, and matches the incumbent phrasing already used in the shipped ar file's irr_card_weir_uniform_desc and irr_quickref_html prior to this sprint (both already said منشأة تحكم/منشأة التحكم for this exact concept) — no change to established suite usage, just confirmed and propagated to the glossary. تحكم (control/regulation) keeps the 'check' = control-gate sense and avoids the verb-of-inspection trap. zh ADDED (2026-07-10, category-4 wave-2 re-translation): '节制闸' (jiézhìzhá, control/check gate) is the standard Chinese irrigation-engineering term for exactly this structure type, distinct from any 'inspect' sense. bn ADDED (2026-07-10, category-4 wave-2 re-translation): 'নিয়ন্ত্রণ কাঠামো' (control structure) follows the majority pattern. fa ADDED (2026-07-10, category-4 wave-2 re-translation): 'سازه کنترل' (control structure) follows the majority pattern. my ADDED (2026-07-10, category-4 cs_/irr_/ip_ re-translation): 'ထိန်းချုပ်ဆောက်လုပ်ရေး' (control structure) follows the same majority 'control structure' pattern (avoiding a literal 'check' translation and the verify/inspect trap) and matches the incumbent phrase already used in the shipped my file's irr_card_weir_irregular_desc ('...အပိုင်းများစွာပါသော ထိန်းချုပ်ဆောက်လုပ်ရေးများ' = multi-section control structures) prior to this sprint — no new coinage, just confirmed and propagated to irr_card_weir_uniform_desc and irr_quickref_html for suite-wide consistency, and recorded here for the glossary. Not yet native-reviewed (my is category-3 wave-3 tier, QUALITY 0.65). am/km/ps/sw ADDED (2026-07-10, category-4 wave-3 re-translation): am='የቁጥጥር መዋቅር', km='រចនាសម្ព័ន្ធត្រួតត្រា', ps='د کنترول جوړښت', sw='muundo wa kudhibiti' (sw's was already the shipped file's incumbent phrase in irr_card_weir_uniform_desc/irr_card_weir_irregular_desc prior to this sprint, just confirmed and propagated to the glossary) — all follow the majority 'control structure' pattern, avoiding the check=verify mistranslation trap. None yet native-reviewed (wave-3 low-resource tier, QUALITY 0.65).",
@@ -2203,7 +2203,7 @@
         "56": {
             "term": "centroid",
             "concept": "centroid",
-            "definition": "",
+            "definition": "The geometric center of the orifice opening. Its elevation is the point from which the head on the orifice is measured. It is a point in space, not a measure of deviation.",
             "symbol": "",
             "context": "Geometric centroid of the orifice opening; its elevation feeds the head equation h = HWE − centroid elevation (Orifice Flow, Orifice Drain Time). Not to be read as 'deviation/eccentricity'.",
             "translation_notes": "Task 109 stage 3 (2026-07-19): bn mistranslated as কেন্দ্রচ্যুতি (deviation/eccentricity) in 4 keys, corrected to কেন্দ্রবিন্দু; fa or_centroid_elev uses مرکز ثقل with تراز (datum elevation).",
@@ -2240,7 +2240,7 @@
         "57": {
             "term": "calculator",
             "concept": "calculator",
-            "definition": "",
+            "definition": "The word for one page of this application, a tool where a visitor enters values and reads computed results, as in the menu entries and page titles. Use the language's ordinary word and keep it the same wherever the application refers to its own tools.",
             "symbol": "",
             "context": "The UI/application word 'calculator' (menu entries, titles, note prose). A recurring intra-file and cross-category terminology-drift point: a transliterated loanword or a competing synonym often creeps into note/prose strings against the calculator's own established title term.",
             "translation_notes": "Task 109 stages 1-5 (2026-07-19): fr standardized on masculine Calculateur (calculatrice/calculateur drift, used in all _main_title keys); tr on hesaplayıcı (vs hesap makinesi); ur on حاسبہ (vs transliterated کیلکولیٹر). cs is intentionally left empty: kalkulátor wins within the audited categories but kalkulačka is dominant suite-wide — an unresolved full-suite decision, not settled here.",
@@ -2277,7 +2277,7 @@
         "58": {
             "term": "application (irrigation)",
             "concept": "application-irrigation",
-            "definition": "",
+            "definition": "The putting of water onto a field by irrigation, as in application depth and application rate. It means the act of applying water to land, not the use of software or the usage of a product.",
             "symbol": "",
             "context": "The irrigation water-application sense used across the Irrigation Pressure ip_ cluster (application depth d, application rate PR, Application Design section). MUST NOT be read/translated in the software or generic-'usage' sense — that is the exact defect this term guards against.",
             "translation_notes": "Task 109 stage 5 (2026-07-19): the software/generic 'application' sense was a repeated defect — am አፈፃፀም (performance) → ልፍፍ; ru software-'Application Design' → Проектирование полива (полив); zh generic 应用 → irrigation-specific 灌水; hi standardized on अनुप्रयोग (e.g. अनुप्रयोग डिज़ाइन, अनुप्रयोग दर). uk had it wrong as 'Program design' (correct target not captured in log, left empty).",
@@ -2352,7 +2352,7 @@
         "60": {
             "term": "branched network",
             "concept": "branched-network",
-            "definition": "",
+            "definition": "A pipe network shaped like a tree, in which a source feeds a main that splits into branches and every line has exactly one upstream line. It has no closed loops, so each flow is found directly from the demands downstream.",
             "symbol": "",
             "context": "A distributary (dendritic / tree) pipe network: a source feeds a main that splits downstream into branches, each line having exactly one upstream line, with no closed loops. The identity concept of the bpn_ calculator.",
             "avoid": [
@@ -2393,7 +2393,7 @@
         "61": {
             "term": "branch",
             "concept": "branch",
-            "definition": "",
+            "definition": "A pipe line that takes off from another line and is fed by it. As a verb, to branch means to connect a line so that it takes its water from a different upstream line.",
             "symbol": "",
             "context": "A pipe line that takes off from (is fed by) another line. As a verb, 'to branch' = to make a line take off from a different upstream line.",
             "avoid": [
@@ -2435,7 +2435,7 @@
         "62": {
             "term": "demand",
             "concept": "demand",
-            "definition": "",
+            "definition": "The fixed flow of water drawn off at the downstream end of a line. It is a design target the network is sized to meet, not a quantity the calculation finds. It is the flow taken out, not the flow passing through.",
             "symbol": "",
             "context": "The fixed water flow delivered (drawn off) at a line's downstream end. A design target the network is sized to meet, not a variable. Acceptable English synonyms (translate the concept, not the exact word): design flow, flow requirement, required flow.",
             "avoid": [
@@ -2477,7 +2477,7 @@
         "63": {
             "term": "static head",
             "concept": "static-head",
-            "definition": "",
+            "definition": "The head of the water source when no water is flowing, such as the water level of a reservoir or tank above the source, or the shutoff head of a pump. It is a height of water column and is not the head available at a given flow, which is the supply head.",
             "symbol": "H",
             "context": "The source head at zero flow (the no-flow condition): a reservoir or tank water level above the source, or a pump's shutoff head (the pump-source special case only). A length of water column. Root concept: head. Acceptable English synonyms (translate the concept, not the exact word): static supply head, supply head at zero flow, zero-flow supply head, no-flow head.",
             "avoid": [
@@ -2518,7 +2518,7 @@
         "64": {
             "term": "maximum allowable head",
             "concept": "maximum-allowable-head",
-            "definition": "",
+            "definition": "The largest internal head of water that a line is designed to carry, its pressure rating stated as a height of water column. A line whose head exceeds it is flagged for pressure reduction.",
             "symbol": "H",
             "context": "The pipe's pressure rating: the maximum internal head a line may carry before it is flagged for pressure reduction. A fixed design limit, a length of water column. Root concept: head. Acceptable English synonyms (translate the concept, not the exact word): maximum allowable head, pipe pressure rating, bursting head, breakage head.",
             "avoid": [
@@ -2558,7 +2558,7 @@
         "65": {
             "term": "supply head",
             "concept": "supply-head",
-            "definition": "",
+            "definition": "The head available at the source of the network at the design flow, read from the supply curve. It is constant for a reservoir and falls as flow rises for a pump. It differs from the static head, which is the head at zero flow.",
             "symbol": "H",
             "context": "The head available at the network source, read from the supply curve at the design flow. Constant for a reservoir, or falling with flow for a pump. Root concept: head.",
             "avoid": [
@@ -2599,7 +2599,7 @@
         "66": {
             "term": "supply curve",
             "concept": "supply-curve",
-            "definition": "",
+            "definition": "The source head as a function of flow. One point describes a reservoir with a flat head, and two or three points describe a pump whose head falls as flow rises. It is read at the design flow to give the supply head.",
             "symbol": "",
             "context": "Source head as a function of flow: one point = a flat reservoir head; two or three points = a pump curve (H = H0 - a*Q^b). Evaluated at the design flow to set the supply head.",
             "avoid": [
@@ -2640,7 +2640,7 @@
         "67": {
             "term": "looped network",
             "concept": "looped-network",
-            "definition": "",
+            "definition": "A pipe network that contains closed circuits, so that water can reach a point by more than one route and the flows must be found by iteration. It is the opposite of a branched network, which has no loops.",
             "symbol": "",
             "context": "A pipe network containing closed circuits (loops), whose flow distribution needs iterative solution (Hardy-Cross and similar). The bpn_ calculator deliberately excludes loops. Now also the subject of the lpn_ (Looped Pipe Network, Map Interface) calculator.",
             "avoid": [
@@ -2681,7 +2681,7 @@
         "68": {
             "term": "pipe line",
             "concept": "pipe-line",
-            "definition": "",
+            "definition": "One pipe segment, or reach, in the network table, with its own length, diameter, roughness, demand, and elevation. Here line means a stretch of pipe, not a row of text or a line drawn on a map.",
             "symbol": "",
             "context": "One pipe segment record in the network table, with its own length, diameter, roughness, demand, and elevation. Here 'line' means a pipe reach/segment. Acceptable English synonyms (translate the concept, not the exact word): reach, run, pipe segment.",
             "avoid": [
@@ -2724,7 +2724,7 @@
         "69": {
             "term": "pressure rating",
             "concept": "pressure-rating",
-            "definition": "",
+            "definition": "The highest internal pressure a pipe is built to withstand, stated here as a head of water. It is the upper limit for the high-pressure check. The pipe's pressure class or PN rating is the same idea.",
             "symbol": "",
             "context": "The maximum internal pressure a pipe is built to withstand, expressed here as a head of water. Used as the upper bound for the high-pressure check. Equivalent everyday terms include maximum allowable pressure, maximum allowable head, rated pressure, pressure class, and (for plastic pipe) the PN or SDR class. Any of these that is the normal term in the target language is correct.",
             "translation_notes": "Created 2026-07-24 for the bpn_/ip_ excessive-pressure check (ip_max_head, ip_max_head_tip). Tom, 2026-07-24: do not shoehorn languages into a calque of the English wording - provide and allow synonyms, and let each language use whatever pipe-industry or plumbing-code term its engineers actually use (pressure class and PN rating are common in metric-pipe markets). The quantity is a HEAD (a height of water column), not a force or a stress; keep it dimensionally a head wherever the language distinguishes. 2026-07-27 (bpn_ sprint, Task 137): populated all 26 from the ip_max_head label, which is this concept's only surface in the UI. Values are the full field label (\"max. allowable pipe head\"), often abbreviated to fit a narrow column, not a bare noun phrase — read them as attested label forms. Every language kept the quantity dimensionally a HEAD; none rendered it as a stress or a pressure class. NOTE: an initial read of this sprint claimed a suite-wide head-term inconsistency by comparing ip_max_head against ws_headWaterHeight; that comparison was invalid (weir head and pipe pressure head are different quantities and correctly differ) and the claim was withdrawn 2026-07-27. The only open question is whether sw Kichwa and ar الرأس are the standard hydraulic term in those two languages - see ROADMAP Task 141. The other 24 are not in question. [2026-07-28 Tom decision — English label now says PRESSURE, not head] ip_max_head was changed from \"Max. allow. pipe head\" to \"Max. allow. pipe pressure\". Task 142 flagged that the label said head while its own tip (ip_max_head_tip) said pressure; Tom chose to reconcile them on PRESSURE rather than on head, because a pipe pressure rating is how irrigation designers actually specify the limit (PVC class 160, PN 10) and the field already offers psi/kPa/bar alongside mH2O/ftH2O. This SUPERSEDES the earlier \"keep it dimensionally a head\" framing for THIS LABEL ONLY: the underlying quantity and its units are unchanged, and the head-vs-pressure guard still holds everywhere else in the suite (see the root \"head\" entry avoid list). For translators: use the natural pipe pressure-rating term in your language (pressure class, PN rating, maximum allowable pressure) — do NOT calque the English, and do not attach a stress or material-strength sense. RESYNC COMPLETE 2026-07-28 (ROADMAP Task 159): all 26 translations below were re-derived from the new English by a per-language Sonnet pass and independently re-verified. Every language landed on a genuine pressure term; none calqued the English and none drifted into a stress or material-strength sense.",
@@ -2766,7 +2766,7 @@
         "70": {
             "term": "pressure reduction",
             "concept": "pressure-reduction",
-            "definition": "",
+            "definition": "Lowering water pressure in a line where it is too high, for example by a pressure-reducing valve or a tank that returns the pressure to atmospheric. The calculator only reports where pressure is excessive. It does not size or place any device.",
             "symbol": "",
             "context": "Lowering excessive water pressure in a line, for example with a pressure-reducing valve or a tank that re-establishes atmospheric pressure. The calculator only reports where pressure is excessive; it does not size or place any device.",
             "translation_notes": "Created 2026-07-24. Plain, directly-translatable engineering language - use the ordinary term for reducing or relieving pressure. Tom, 2026-07-24 deliberately removed all break-pressure-tank terminology from this calculator, so do NOT reintroduce tank-specific vocabulary in any language; the concept is reducing pressure, not any particular device. 2026-07-27 (bpn_ sprint, Task 137): populated all 26 from the sprint output. Every language rendered this as a plain \"reduce/lower the pressure\" phrase; no language named a device, so the no-break-pressure-tank constraint held throughout. hi reused an incumbent already present in bpn_notes_3_def (दाब-न्यूनीकरण) rather than coining a new phrase.",
@@ -2894,7 +2894,7 @@
         "73": {
             "term": "draw (a diagram)",
             "concept": "draw-a-diagram",
-            "definition": "",
+            "definition": "To sketch a network on a drawing surface by pointing, clicking, or tracing with a finger. It is the main action of the looped network page, whose interface is a map the visitor draws on, and it means creating the drawing by hand, not printing it or showing it.",
             "symbol": "",
             "context": "To sketch or trace a network on a drawing surface with a pointer or finger -- the defining action of the lpn_ calculator, whose interface IS a map you draw on. Appears in lpn_main_desc (\"...You Draw on a Map\"), lpn_tool_example (\"Draw example network\"), lpn_empty_hint and the mode-hint lines.",
             "avoid": [
@@ -3148,7 +3148,7 @@
         "79": {
             "term": "background image",
             "concept": "background-image",
-            "definition": "",
+            "definition": "A picture the visitor supplies and the page shows behind the drawing, such as a plan sheet, a CAD export, or a scanned map. It is lined up with the drawing by clicking two points and typing the real distance between them, and it is not an online map service.",
             "symbol": "",
             "context": "A user-supplied image placed behind the drawing -- a plan sheet, a CAD export, a scanned drawing, or a screenshot with a bar scale on it -- registered to the map by clicking two points and typing the real distance between them. No projection, no online map service. lpn_backdrop_* keys.",
             "avoid": [
@@ -3189,7 +3189,7 @@
         "80": {
             "term": "pump curve",
             "concept": "pump-curve",
-            "definition": "",
+            "definition": "The relationship between the flow through a pump and the head the pump adds, which falls as flow rises. The page fits it from one, two, or three points taken from a manufacturer's published curve. It is a pump characteristic, not an efficiency curve.",
             "symbol": "",
             "context": "The relationship between the flow through a pump and the head it adds, H = H0 - aQ^b. lpn_ fits it from one, two, or three points read off a manufacturer's published curve. Documented in lpn_notes_5_def.",
             "avoid": [
@@ -3229,7 +3229,7 @@
         "81": {
             "term": "project (saved network)",
             "concept": "project-saved-network",
-            "definition": "",
+            "definition": "One saved network on the looped network page, together with its background image, settings, and scenarios. It is the unit the Projects panel opens, renames, copies, and deletes, and it is stored in the visitor's browser only.",
             "symbol": "",
             "context": "One saved lpn_ network with its background image, settings and scenarios -- the unit the Projects panel opens, renames, copies and deletes. Stored in the browser only.",
             "avoid": [
@@ -3270,7 +3270,7 @@
         "82": {
             "term": "scenario",
             "concept": "scenario",
-            "definition": "",
+            "definition": "A named set of property values that replace the Base values on top of one shared drawing, such as a fire flow case with higher demands and different valve states. The geometry is the same in every scenario and only properties vary. Base is itself a scenario with no overrides.",
             "symbol": "",
             "context": "A named set of property overrides on top of a project's canonical Base network -- e.g. a fire-flow case with higher demands and different valve states. The geometry is shared; only properties vary. Base is itself a scenario with no overrides. See ROADMAP Task 184 for the full delta model.",
             "avoid": [
@@ -3314,7 +3314,7 @@
         "83": {
             "term": "channel lining",
             "concept": "channel-lining",
-            "definition": "",
+            "definition": "The protective surface on the bed and banks of a channel, such as rock, concrete, or another material. It is the surface layer, not the channel itself and not the material of the soil beneath.",
             "context": "The protective surface on a channel bed and banks - rock, concrete, or other material. Used by mtc_ (mtc_vel_high), mi_ (mi_notes_2_term), rc_ (rc_main_desc) and cs_ (cs_lining_cost, cs_lining_area). This is the generic concept; rock-specific labels compose it with the local word for rock.",
             "translation_notes": "Established 2026-08-08 while translating mtc_vel_high, harvesting terms already shipped in mi_notes_2_term and rc_main_desc rather than coining new ones. zh takes 衬砌 (canal/tunnel lining) for the generic concept while rc_main_desc keeps 护坡 (rock slope protection) - both correct, different concepts, do not unify. ru крепление and cs opevnění are revetment-flavored and are each language's own standard; keep them. de composes as Gerinneauskleidung when the channel is named.",
             "translations": {
@@ -3350,7 +3350,7 @@
         "84": {
             "term": "erosion",
             "concept": "erosion",
-            "definition": "",
+            "definition": "The wearing away of a channel's surface by flowing water. It is caused by high velocity and is the opposite of sedimentation, which is deposit at low velocity.",
             "context": "Wearing away of a channel surface by flowing water. Used by mtc_ (mtc_vel_high) and rc_ (rc_yn tip). Distinct from sedimentation, its opposite, which is the low-velocity verdict.",
             "translation_notes": "Established 2026-08-08 from the terms already shipped in each rc_yn tooltip, so the velocity verdict and the Rock Chute tip agree. zh uses 冲刷 (scour by flowing water), not 侵蚀 (general/geological erosion). he סחיפה and my ရေတိုက်စားမှု are water-specific and correct.",
             "translations": {
@@ -3386,7 +3386,7 @@
         "85": {
             "term": "zoom to extents",
             "concept": "zoom-to-extents",
-            "definition": "",
+            "definition": "The toolbar command that rescales and recenters the view so the whole drawing fits in the window at once. It is one specific command that takes no amount and has no direction, and it is not a general zoom control.",
             "symbol": "",
             "context": "A map/drawing toolbar command that rescales and recentres the view so the WHOLE drawing is visible at once — it computes the bounding box of every element and fits it to the window. The English label is \"Zoom to fit\" (key lpn_tool_zoom_extent); the key name carries the real meaning. It is one specific command, not a general zoom control: it takes no amount and has no direction.",
             "avoid": [
@@ -3411,7 +3411,7 @@
         "86": {
             "term": "default (setting)",
             "concept": "default-setting",
-            "definition": "",
+            "definition": "The value a field or setting has before the visitor changes it, and the value that Restore defaults puts back. It is a software settings concept, not an engineering one.",
             "symbol": "",
             "context": "The value a field or setting starts with before the user changes it, and the value \"Restore defaults\" puts back. A software-settings concept, not an engineering one — it appears in suite chrome (calc_defaults, calc_defaults_confirm) and in lpn_ (lpn_settings_defaults \"Default inputs\", lpn_settings_push_btn, lpn_confirm_restore_defaults). Every language already ships a settled software term for this; the job is to USE that term, not to coin one.",
             "avoid": [
@@ -3455,7 +3455,7 @@
         "87": {
             "term": "connected file",
             "concept": "connected-file",
-            "definition": "",
+            "definition": "A saved project file that the browser still holds an open link to, so that saving writes straight back to it without asking where to put it again. It differs from a file that was merely downloaded or uploaded once.",
             "context": "A saved project file that the browser still holds a live handle to, so File, Save writes straight back to it without asking again. Coined for the File System Access API. Spans 7 lpn_ strings (lpn_file_save_tip, lpn_file_saveas_tip, lpn_file_upload_explain, lpn_status_uploaded, lpn_status_downloaded, lpn_file_needs_reopen, lpn_file_reconnect), so it must be rendered the SAME way in all of them.",
             "avoid": [
                 "a network connection sense -- connected to the internet, to a server, online. This is the dominant sense of \"connect\" and it is the wrong one: the file is local",
@@ -3470,7 +3470,7 @@
         "88": {
             "term": "tab (project tab)",
             "concept": "tab-project-tab",
-            "definition": "",
+            "definition": "One of the tabs in the strip inside the page, where each open project is a tab and is saved as the visitor works. It is not a browser tab, which is a separate meaning of the same word that also appears in the application.",
             "context": "The in-page tab strip where each open project is a tab. NOT the browser tab. Both senses appear in lpn_: lpn_notes_3_def says every project tab is saved as you work, while lpn_storage_full warns that changes \"will be lost when you close this tab\" meaning the BROWSER tab.",
             "avoid": [
                 "using one target word for both senses -- the two strings make opposite promises about whether work survives, so collapsing them produces a visible contradiction",
@@ -3485,7 +3485,7 @@
         "libre software": {
             "term": "libre software",
             "concept": "libre-software",
-            "definition": "",
+            "definition": "Software whose users are free to run, study, modify, and share it, in the sense of freedom and not of price. The word Libre was chosen deliberately, with LibreOffice as the precedent, and it names the license, not whether the software costs money.",
             "context": "Software licensed so that its users are free to run, study, modify and redistribute it -- the freedom sense, never the price sense. Appears as the navbar item (menu_libre) and in the About page license section. Tom chose the English word \"Libre\" deliberately on 2026-08-09, over \"Freely yours\" and \"Community software\", citing LibreOffice as precedent.",
             "translation_notes": "2026-08-09 (Task 244): DEFER TO EACH LANGUAGE ESTABLISHED TERM, do not coin a new one. This concept has been translated by the free-software movement for decades and most of these languages have a settled, published phrase; ours must match it or it will read as an amateur calque. The English $ec_lang_syn entry deliberately offers coinages (Liberated / Liberty / Freedom Software) to convey the SENSE, because English lacks an unambiguous word -- that is an English-only problem and must NOT be exported. Where a language already distinguishes freedom from price (Romance libre/livre/libero/liber, de frei, ru свободное), use that word and the trap disappears. Where it does not, translate the concept (software whose users hold the rights) rather than transliterating \"libre\" phonetically -- transliteration is the specific failure mode this entry exists to prevent, and it falls hardest on am, bn, km, my, ps, ur.",
             "avoid": [
@@ -3527,7 +3527,7 @@
         "count (tally)": {
             "term": "count (tally)",
             "concept": "count-tally",
-            "definition": "",
+            "definition": "To add something to a running total. In the consent banner and privacy notice it means counting a visitor once, so the distinction is between visitors, who are people counted once, and visits, which are single page loads.",
             "symbol": "",
             "context": "To add something to a running total. Used throughout the Task 286 consent banner (consent_body, consent_current_granted, consent_current_denied) and the privacy notice, where the whole ask is whether a visitor may be counted once rather than once per visit. The distinction the word carries here is VISITORS vs VISITS: a visitor is a person tallied once; a visit is a single page load. Use whatever ordinary verb your language uses for tallying or totalling; there is nothing technical about it, and the risk is entirely in the wrong sense being chosen.",
             "avoid": [
@@ -3543,7 +3543,7 @@
         "cookie (browser storage)": {
             "term": "cookie (browser storage)",
             "concept": "cookie-browser-storage",
-            "definition": "",
+            "definition": "A small piece of information a website stores in a visitor's browser. The word should be the one visitors and regulators in the language look for, so the conventional term wins over a more descriptive one.",
             "symbol": "",
             "context": "A small piece of information a website stores in a visitor's browser. Appears as the label consent_settings_link (\"Cookie settings\") — the control that reopens the consent choice — and throughout privacy.php. NOTE THE LABEL'S JOB: it must be the phrase a visitor or a regulator LOOKS FOR, so the conventional term in your language beats a more descriptive one. Most languages simply keep the English word 'cookie', and where that is the convention it is the right answer.",
             "avoid": [
@@ -3557,7 +3557,7 @@
         "log (record)": {
             "term": "log (record)",
             "concept": "log-record",
-            "definition": "",
+            "definition": "To write down in a file on the server that something happened, such as a page opened or a calculation run. What is recorded is the page name, the language, and the time, with no IP address, account, or identifier. Use the ordinary verb for recording an event.",
             "symbol": "",
             "context": "To write down that something happened, in a file kept on the server. What EngCalcs logs is that a page was opened or a calculation was run — the page name, the language, and the time — with no IP address, no account and no identifier of any kind. Used throughout the Task 286 consent banner and privacy notice. The everyday verb your language uses for RECORDING an event is the right choice; there is nothing technical about it, and no language needs to borrow the English word.",
             "avoid": [
@@ -3573,7 +3573,7 @@
         "bisection": {
             "term": "bisection",
             "concept": "bisection",
-            "definition": "",
+            "definition": "A numerical method that finds an answer by repeated halving. It guesses a value, checks whether the result comes out too high or too low, halves the remaining interval, and repeats until the result converges. It is the numerical analysis term for the method.",
             "symbol": "",
             "context": "A numerical root-finding method: guess a value, see whether the answer comes out too high or too low, halve the remaining interval, and repeat until it converges. Named in ip_notes_1_def, describing how the Irrigation Pressure calculator adjusts its guessed far-end pressure until the computed supply pressure matches the entered one. Use whatever your language calls the METHOD in numerical analysis; every language that teaches engineering has one.",
             "avoid": [
@@ -3588,7 +3588,7 @@
         "89": {
             "term": "solver",
             "concept": "solver",
-            "definition": "",
+            "definition": "The part of a program that computes the network's flows, pressures, and heads. The looped network page has two, EPANET's own and this application's built-in solver, so use one noun for both and let the qualifier tell them apart.",
             "avoid": [
                 "the word for a physical MOTOR or ENGINE (es/pt motor, fr moteur, it motore, de Motor, ro motor, id mesin, sw injini, zh 引擎, ar محرك, he מנוע, fa موتور, uk рушій). This calculator models PUMPS, which have real motors, so the software sense collides with a hydraulic component on the same page. This is the specific defect sprint 252 existed to repair.",
                 "a transliteration of English \"engine\" (ur انجن, bn ইঞ্জিন, my အင်ဂျင်, hi इंजन) -- same collision, plus it is a loanword where a real term exists.",
@@ -3629,7 +3629,7 @@
         "world file": {
             "term": "world file",
             "concept": "world-file",
-            "definition": "",
+            "definition": "A small plain-text file with six lines that says where an image sits in real-world coordinates and how large one pixel is. It lists the pixel size in the x direction, two rotation terms, the pixel size in the y direction, and the coordinates of the center of the top-left pixel.",
             "symbol": "",
             "avoid": [
                 "any reading of \"world\" as the PLANET, the globe, or the earth. The word names a coordinate space, not a place -- \"planet file\", \"earth file\", \"global file\" are all wrong.",
@@ -3761,7 +3761,7 @@
         "92": {
             "term": "valve setting",
             "concept": "valve-setting",
-            "definition": "",
+            "definition": "The single number that tells a valve what to do. It is a different quantity for each valve type: a pressure for a pressure reducing or pressure sustaining valve, a flow for a flow control valve, and a dimensionless loss coefficient for a throttle control valve.",
             "symbol": "",
             "context": "The one number that tells a valve what to do -- and it is A DIFFERENT PHYSICAL QUANTITY FOR EACH TYPE: a PRESSURE for a PRV or PSV, a FLOW for an FCV, and a dimensionless minor-loss coefficient for a TCV. The page therefore shows three different labels in the same slot (lpn_field_valve_setting_pressure / _flow / _loss) rather than one vague \"Setting\".",
             "avoid": [
@@ -3803,7 +3803,7 @@
         "93": {
             "term": "override (scenario value)",
             "concept": "override-scenario-value",
-            "definition": "",
+            "definition": "A property value that belongs to one scenario alone and replaces the Base value while that scenario is active. A scenario is a collection of such values laid over the shared drawing. The count of them is a number, not a label.",
             "symbol": "",
             "context": "A property value that belongs to ONE scenario alone and stands in place of the Base value while that scenario is active. A scenario is nothing but a collection of these laid over the shared drawing. The per-field checkbox that creates one is \"Only in this scenario\" (lpn_scenario_override). **lpn_scenario_overrides IS A COUNT, NOT A LABEL** -- its English is \"No. of custom values\" and it is rendered BOTH as a table column heading AND, on the scenario button, as the label followed by a colon and a number (\"No. of custom values: 3\"). So what is wanted there is a COUNT NOUN in your language -- \"number of values set in this scenario\" -- and not the bare term below, which names the value itself and reads as a label when a number follows it.",
             "avoid": [
@@ -3846,7 +3846,7 @@
         "94": {
             "term": "EngCalcs (product name)",
             "concept": "engcalcs-product-name",
-            "definition": "",
+            "definition": "The name of this application, a proper noun that is never translated or transliterated. Only the grammar around it, such as a case ending or article, changes by language.",
             "symbol": "",
             "context": "The name of this suite. It is a proper noun and is never translated or transliterated in any language. What DOES change per language is how a case suffix, article or preposition attaches to it — Turkish and the other agglutinative languages have to suffix it directly.",
             "avoid": [
@@ -3887,7 +3887,7 @@
         "colour ramp": {
             "term": "colour ramp",
             "concept": "colour-ramp",
-            "definition": "",
+            "definition": "The ordered set of colors that a range of values is painted onto, such as blue to red or light to dark gray. It is a named set of colors, also called a color scheme, and not a slope or a scale.",
             "symbol": "",
             "avoid": [
                 "the word for a GRADIENT (es gradiente, fr gradient, de Gefaelle, it gradiente, pt gradiente). In this suite 'gradient' is a HYDRAULIC QUANTITY -- lpn_result_gradient is the head loss gradient, a label field printed on every pipe -- so a colour 'gradient' collides with a number on the same map.",
@@ -3902,7 +3902,7 @@
         "colour band limit": {
             "term": "colour band limit",
             "concept": "colour-band-limit",
-            "definition": "",
+            "definition": "The value at which one color band ends and the next begins, so five bands have four limits. It is the boundary between classes, called a break value or class break in GIS.",
             "symbol": "",
             "avoid": [
                 "the word for a BREAK, BREAKAGE or BURST (es rotura, fr rupture, de Bruch, pt ruptura, ru razryv). A pipe break is a real event in water distribution and this control has nothing to do with one. The English label was 'Break values' and Wave 0 rewrote it for this reason.",
@@ -3916,7 +3916,7 @@
         "equal intervals / equal counts": {
             "term": "equal intervals / equal counts",
             "concept": "equal-intervals-equal-counts",
-            "definition": "",
+            "definition": "The two automatic ways of choosing color band limits. Equal intervals divides the range of values into bands of the same width. Equal counts puts the same number of elements in each band, which statistics calls quantile classification.",
             "symbol": "",
             "avoid": [
                 "translating 'counts' as a TALLY OF EVENTS -- it means how many elements fall in each colour band.",
@@ -3930,7 +3930,7 @@
         "fire flow": {
             "term": "fire flow",
             "concept": "fire-flow",
-            "definition": "",
+            "definition": "The flow a water distribution system must be able to supply for firefighting, at a stated residual pressure. It is a number a designer sizes pipes against, and it is not the flow presently in the pipes.",
             "symbol": "",
             "avoid": [
                 "a term meaning the flow OF a fire, or a firefighting operation. This is a DESIGN REQUIREMENT, not an event."
@@ -3948,7 +3948,7 @@
         "profile (long section)": {
             "term": "profile (long section)",
             "concept": "profile-long-section",
-            "definition": "",
+            "definition": "A drawing of ground elevation and hydraulic grade plotted against distance along a chosen route through the network. It is what a civil engineer calls a profile or long section, as opposed to the plan view the map shows.",
             "symbol": "",
             "avoid": [
                 "the USER ACCOUNT sense of \"profile\" -- the page holding a person's name and settings. This is the dominant sense of the English word in web software and it is the wrong one here; many languages use a different word for each (zh 剖面圖 section vs 個人資料 account).",
@@ -3980,7 +3980,7 @@
         "alignment (text)": {
             "term": "alignment (text)",
             "concept": "alignment-text",
-            "definition": "",
+            "definition": "Which edge or the center of a text annotation lines up with its anchor point, horizontally as left, center, or right, and vertically as top, middle, or bottom. It is the alignment control of a drawing or word-processing program.",
             "symbol": "",
             "avoid": [
                 "JUSTIFICATION, which in typography is the different operation of stretching a line to reach both margins. Left / Centre / Right is alignment.",
@@ -4046,7 +4046,7 @@
         "project mode name": {
             "term": "project mode name",
             "concept": "project-mode-name",
-            "definition": "",
+            "definition": "Whether a project is georeferenced or local. A georeferenced project has geographic coordinates and can show a street map behind it, and a local project is drawn on a plain grid with no place on the Earth.",
             "symbol": "",
             "avoid": [
                 "giving one mode TWO names inside one language. That is the only real defect here, and dev/scripts/mode_name_check.php now catches it: whatever your file calls the mode in lpn_geomap / lpn_xymap, every other string that names the mode uses that same rendering.",
@@ -4062,7 +4062,7 @@
         "drop (a label)": {
             "term": "drop (a label)",
             "concept": "drop-a-label",
-            "definition": "",
+            "definition": "To leave a value, or a whole label, off the map because there is not enough room to print it. It is a column in the Labels box that orders which value is given up first, so the sense is leaving out, not deleting data.",
             "symbol": "",
             "avoid": [
                 "the HYDRAULIC senses of \"drop\": a drop in elevation, a pressure drop, a head drop, a drop structure. This page prints all of those as numbers, so the wrong choice makes the column heading look like a quantity.",
@@ -4078,7 +4078,7 @@
         "run (a simulation)": {
             "term": "run (a simulation)",
             "concept": "run-a-simulation",
-            "definition": "",
+            "definition": "One computation of the network over its whole time period, from the first reporting time to the last. As a button it is an imperative verb telling the page to compute now. In surrounding text the same word is a noun, as in the start of the run.",
             "symbol": "",
             "avoid": [
                 "a RUN OF PIPE -- a straight length of main between two points. That sense is live on this very page and is the trap to guard against.",
@@ -4094,7 +4094,7 @@
         "work out (compute)": {
             "term": "work out (compute)",
             "concept": "work-out-compute",
-            "definition": "",
+            "definition": "The plain verb for computing the flows, pressures, and heads of the network, in place of calculate or solve. Use the ordinary verb for calculating a result in the language.",
             "symbol": "",
             "avoid": [
                 "the PHYSICAL EXERCISE sense of \"work out\".",
@@ -4110,7 +4110,7 @@
         "decimal separator": {
             "term": "decimal separator",
             "concept": "decimal-separator",
-            "definition": "",
+            "definition": "The mark between the whole and fractional parts of a number, a dot in English and a comma in many other languages. Example numbers inside translated strings use the language's own separator, and the page accepts either when the visitor types.",
             "symbol": "",
             "avoid": [
                 "changing the COLON in a time such as 17:30. The colon is not a decimal separator and the field accepts nothing else in its place; only the mark between the whole and fractional parts of a number is a locale fact.",
@@ -4191,7 +4191,7 @@
         "query keyword (AND, OR)": {
             "term": "query keyword (AND, OR)",
             "concept": "query-keyword-and-or",
-            "definition": "",
+            "definition": "The words that join conditions in the Find query box, AND and OR, with their labels in the pull-down. The page accepts both the English word and the translated word, so translating them is safe.",
             "symbol": "",
             "avoid": [
                 "leaving them in English out of a fear that translating will break the query -- it will not"
@@ -4204,7 +4204,7 @@
         "path (profile route)": {
             "term": "path (profile route)",
             "concept": "path-profile-route",
-            "definition": "",
+            "definition": "The route through the network that a profile is drawn along, an ordered list of nodes the visitor picks and can save by name. It names the route, not the drawing made from it, which is the profile.",
             "symbol": "",
             "avoid": [
                 "a FILE path or directory path -- the dominant sense of the English word in software, and the wrong one here",
@@ -4219,7 +4219,7 @@
         "static pressure (fire flow)": {
             "term": "static pressure (fire flow)",
             "concept": "static-pressure-fire-flow",
-            "definition": "",
+            "definition": "In a fire flow test, the pressure at the hydrant or junction before any fire flow is drawn, while the system's ordinary demands are still running. It is not a no-flow pressure, because nothing is shut off to measure it.",
             "symbol": "",
             "avoid": [
                 "a zero-flow or no-demand pressure -- the general hydraulic reading of 'static', and always a higher number than this column reports",
@@ -4239,7 +4239,7 @@
         "available fire flow": {
             "term": "available fire flow",
             "concept": "available-fire-flow",
-            "definition": "",
+            "definition": "The largest fire flow a junction can deliver while still holding the residual pressure the visitor set. It is reported beside the required fire flow, which is what a fire code or fire authority asks for at that point.",
             "symbol": "",
             "avoid": [
                 "'available' in the sense of spare or unused capacity in the pipes",
@@ -4296,7 +4296,7 @@
         "96": {
             "term": "projection (map)",
             "concept": "projection-map",
-            "definition": "",
+            "definition": "The rule that turns a position on the earth into a pair of numbers, longitude and latitude into an easting and a northing. It is the geometric sense of casting the earth onto a flat surface, and it is not a forecast of future values.",
             "context": "The rule that turns a position on the earth into a pair of numbers -- for a projected system, a longitude and latitude into an easting and a northing. **IT IS THE GEOMETRIC SENSE OF THE WORD, and a language's own geometry or optics term is the right one**, not a special cartographic coinage: the earth is cast onto a surface, so the mapmaker's meaning and the draughtsman's are one family. **AND IT IS NOT THE OPPOSITE OF 'GEOGRAPHIC'** (Tom, 2026-09-14: \"Even WGS 84 / Pseudo mercator is a projection of a cylinder onto the earth. Even its lat/lon is a projection onto the ellipsoid model WGS84 that we take to be approximately the earth.\") -- a latitude and longitude is ALREADY a projection, onto an ellipsoid standing in for a world that is not one, so the page's 'projected' and 'geographic' name two kinds of projection and not projection against its absence. What the word is NOT here is the psychological sense, and it is not a forecast. Appears in lpn_crs_list, the projection chooser, and the status bar.",
             "translation_notes": "[2026-09-14, sprint 667] Created during the projection sprint and harvested from the lpn_crs_list value each agent chose. **THE CONTEXT ABOVE WAS CORRECTED BY TOM THE SAME DAY** and the correction matters for translation: the first draft ruled out the optical sense, which is backwards -- a map projection IS a geometric projection, so a language that reaches for its geometry word is right, not loose. THREE RENDERINGS ARE WITHHELD AS UNCONFIRMED rather than recorded: fa فرافکنی is specifically the psychological sense and not the geometric one; km ប្រព័ន្ធតម្រៀប reads as a sorting system; sw Mchoro reads as a drawing. Absent means nobody has confirmed them, never that the language is untranslated -- the point of the term is that the next agent is told the sense rather than shown a precedent. See dev/english-friction/667-lpn-delta.json.",
             "translations": {
@@ -4329,7 +4329,7 @@
         "97": {
             "term": "symbology",
             "concept": "symbology",
-            "definition": "",
+            "definition": "The GIS term for how data is shown on a map by color, size, and label, as in QGIS and ArcGIS. It names a Settings section covering color by value and labels, and it does not mean symbolism in the figurative sense.",
             "context": "The GIS sense, as in QGIS and ArcGIS: how data is shown on the map by colour, size and label. It names a Settings section covering colour by value and the labels. NOT 'symbolism' (hidden, cultural or figurative meaning), which is a false friend in many languages. Use the word your language's GIS software uses for this settings section.",
             "translation_notes": "[2026-09-28, Wave 0 of the 2026-09-28-delta sprint] Created from a Wave 0 finding on lpn_settings_sec_symbology. No renderings recorded yet; the sprint's write-back fills them.",
             "translations": {},
@@ -4338,7 +4338,7 @@
         "customer": {
             "term": "customer",
             "concept": "customer",
-            "definition": "",
+            "definition": "A water customer served by a pipe, drawn as a symbol where the customer is and joined to the pipe or node that serves it. Its demand is added to the junction at the near end of that pipe. One customer may stand for several services, which are the individual connections, so keep the two words distinct.",
             "symbol": "",
             "avoid": [
                 "any word for a METER or counting device; the interface says Customer, never Meter (Tom's ruling).",
