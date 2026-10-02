@@ -135,10 +135,10 @@ expected `payload freshness`. Ask for merges with AskUserQuestion.
   write it into `dev/desktop-platforms-plan.md` (a fifth outside call: consent and privacy paragraph).
 - `feat/label-placer` (539/741): unchanged.
 
-### In flight at handoff
-
-- `fix/undo-label` (defect track, merges on green): after a Tables edit, Ctrl+Z restores the cell but
-  not the map label; Ctrl+Y does not redo. Same on master.
+- 8153 `fix/undo-label`: there was no Redo; now Ctrl+Y and Ctrl+Shift+Z (not Cmd+Y, the Mac's
+  History), a new edit empties it, and Undo keeps the Properties box open. Held for his pass because it
+  is new behaviour. The Help box's shortcut list lacks the Redo row: adding it needs his OK on "Ctrl+Y
+  or Ctrl+Shift+Z | Redo the last undone change." and a translation pass (the markup check needs all 27).
 
 ### Owed translation work
 
