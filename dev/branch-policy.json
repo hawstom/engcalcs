@@ -108,7 +108,11 @@
         "feat/demand-scaling",
         "feat/desktop",
         "feat/label-cache",
-        "feat/theme-token"
+        "feat/theme-token",
+        "feat/flow-balance",
+        "feat/contour",
+        "feat/calibration",
+        "feat/profile-file"
     ],
     "feature_freeze": {
         "active": false,
