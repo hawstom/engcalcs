@@ -51284,8 +51284,50 @@ var EngCalcs = EngCalcs || {};
 			panel.style.pointerEvents = '';
 		}, left);
 	}
+	var popupAutoW = 0;
+	// The width at which at most 5% of the Properties rows wrap: each row's one-line width (label
+	// and control, measured with the box as wide as the window allows), the ceil(0.95 n)-th
+	// smallest, plus the box's own padding, border and a scrollbar's worth. Never below the box's
+	// CSS minimum. A row is what lies between two <br>, or a block child on its own.
+	function popupFitWidth(popup) {
+		var fields = document.getElementById('lpn_popup_fields'), widths = [], cur = [], i, k, n,
+			left, cs, minW, chrome, w;
+		if (!fields) { return popup.getBoundingClientRect().width; }
+		left = fields.getBoundingClientRect().left;
+		function flush() {
+			var right = 0, j, el, rr, rg;
+			for (j = 0; j < cur.length; j++) {
+				el = cur[j];
+				if (el.nodeType === 3) {
+					if (!/\S/.test(el.nodeValue)) { continue; }
+					rg = document.createRange(); rg.selectNodeContents(el); rr = rg.getBoundingClientRect();
+				} else { rr = el.getBoundingClientRect(); }
+				if (rr.width > 0) { right = Math.max(right, rr.right); }
+			}
+			if (right > 0) { widths.push(right - left); }
+			cur = [];
+		}
+		for (i = 0; i < fields.childNodes.length; i++) {
+			k = fields.childNodes[i];
+			if (k.nodeName === 'BR') { flush(); } else if (k.nodeType === 1 && /^(DIV|TABLE|FIELDSET|P|H\d)$/.test(k.nodeName)) {
+				flush(); cur.push(k); flush();
+			} else { cur.push(k); }
+		}
+		flush();
+		if (!widths.length) { return popup.getBoundingClientRect().width; }
+		widths.sort(function (a, b) { return a - b; });
+		n = widths.length;
+		w = widths[Math.ceil(0.95 * n) - 1];
+		cs = window.getComputedStyle(popup);
+		chrome = popup.getBoundingClientRect().width - fields.getBoundingClientRect().width;
+		minW = parseFloat(cs.minWidth) || 0;
+		// A scrollbar's width only where the box is already as tall as the window lets it be.
+		return Math.max(minW, Math.ceil(w + chrome + 2 +
+			(popup.getBoundingClientRect().height > window.innerHeight - 80 ? 16 : 0)));
+	}
 	function openPopupAt(sx, sy) {
 		var popup = document.getElementById('lpn_popup'), r, h, at;
+		var wasOpen = popup.style.display !== 'none' && popup.style.display !== '';
 		if (popupUserPos) { sx = popupUserPos.left; sy = popupUserPos.top; }
 		popup.style.left = sx + 'px'; popup.style.top = sy + 'px';
 		// `flex`, not `block`: the box is a column now -- title band, then body -- so the body can
@@ -51316,8 +51358,12 @@ var EngCalcs = EngCalcs || {};
 		// before the fit below measures the box's height with it inside.
 		propGraphSync();
 		if (!popupUserSize && !smallScreen()) {
-			popup.style.width = Math.min(popup.getBoundingClientRect().width,
-				window.innerWidth - 2 * POPUP_EDGE) + 'px';
+			// **THE WIDTH IS THE SMALLEST AT WHICH AT MOST 5% OF THE ROWS WRAP, chosen once when the
+			// box opens** (Tom, 2026-10-03: *"initially no wider than needed to avoid all but the
+			// 5%-ile (1 line in 20 ...) wrapping"*). Selecting another element while it is open
+			// keeps the width it had, so it does not jump as he clicks around.
+			if (!(wasOpen && popupAutoW)) { popupAutoW = popupFitWidth(popup); }
+			popup.style.width = Math.min(popupAutoW, window.innerWidth - 2 * POPUP_EDGE) + 'px';
 			popup.style.left = sx + 'px';
 		}
 		// **RAISED HERE, WHERE IT BECOMES VISIBLE** (Tom, 2026-09-05: *"When an asset is clicked and
