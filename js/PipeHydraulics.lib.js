@@ -32,7 +32,7 @@ EngCalcs.hwDiaExp = 4.871;
 EngCalcs.hwExp = 1.852;
 
 // ---------------------------------------------------------------------------
-// Head to pressure in psi, on EPANET's constant -- for the Looped Network calculator only.
+// Head to pressure in psi and kPa, on EPANET's constants -- for the Looped Network calculator only.
 //
 // EPANET's types.h has PSIperFT = 0.4333 (psi per foot of water); the exact value is 0.4335275.
 // A user checks lpn_ against EPANET's report, and with the exact one every psi reads 0.05% above
@@ -42,6 +42,12 @@ EngCalcs.hwExp = 1.852;
 // js/lpn-fireflow.js and js/lpn-inp.js read these two, so there is one number on that page.
 EngCalcs.EPANET_PSI_PER_FT = 0.4333;
 EngCalcs.EPANET_PSI_PER_M = EngCalcs.EPANET_PSI_PER_FT / 0.3048;   // "psi per metre", a unitFactors entry
+// kPa too (Tom, 2026-10-03: "Yes"). EPANET's types.h has KPAperPSI = 6.895 (exact: 6.894757), and
+// its input1.c builds the kPa pressure factor as KPAperPSI * PSIperFT per foot of head, so kPa per
+// metre of head is 0.4333 * 6.895 / 0.3048 = 9.80185 (exact: 9.80665, 0.049% higher). Recalled from
+// EPANET 2.2's source; the source is not vendored here. Bar stays exact: EPANET has no bar.
+EngCalcs.EPANET_KPA_PER_PSI = 6.895;
+EngCalcs.EPANET_KPA_PER_M = EngCalcs.EPANET_PSI_PER_M * EngCalcs.EPANET_KPA_PER_PSI;
 
 // Friction slope Sf (m of head per m of pipe) for full-pipe flow.
 //   q  flow (m3/s, sign ignored)

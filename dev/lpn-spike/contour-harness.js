@@ -336,6 +336,8 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	const S = L.contourStats();
 	check(d.settings.contourFill === 'smooth' && d.settings.contourLines === true, 'Graphs > Contour turns on a smooth fill and contour lines');
 	check(findIn(byId.lpn_contour_body, 'lpn_contour_interval') !== null, '...and opens the contour box');
+	const fillSel = findIn(byId.lpn_contour_body, 'lpn_contour_fill');
+	check(!!fillSel && fillSel.children.filter((o) => o.selected).map((o) => o.value).join() === 'smooth', '...and the box\'s Fill selector has Smooth selected (the default fill)');
 	const ml = L.modelLayer();
 	check(ml.children[0] === L.contourLayer() && ml.children.indexOf(L.linksLayer()) > 0,
 		'the layer is the first child of the drawing group: under the pipes and the nodes');
