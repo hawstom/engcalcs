@@ -156,6 +156,9 @@ the block.
     procedure and the correction of the 2026-09-13 advice that a clean release could not be
     extracted.
 - 100|681| **Economize the label layout: it is half the cost of a project switch.**
+  **(c)/(d) BUILT 2026-10-03 on `feat/label-cache`**, awaiting his pass: a bank per wheel notch, rounded
+  outward, final; revisits run no pass (Novato ~85 -> ~13 ms). (e) already existed (one pass per wheel
+  burst). (b) is still open.
   Tom, 2026-09-16: *"if laying out the labels takes 2 sec, we have to figure out how to economize."*
   - **THE NUMBER IS HIS: the label pass is 56% of `buildDom`**, which is about 1.9 s of his 4.6 s
     switch into a geographic Net3 with every field on. Here, on a machine 6x faster, the same pass is
@@ -230,6 +233,10 @@ the block.
   Tom, 2026-10-03: *"it would be really nice if the tables could filter on the selection. I'm not
   sure how to work the UI unless it's part of the right-click menu."* Ask Ida and Declan where the
   switch lives before building.
+- 75|758| **A project switched back to after eviction redraws its labels differently.**
+  Perry, 2026-10-03, on master's code: visit Novato, zoom, visit five other tabs, return: 78 of 123
+  labels differ at the same view. `captureLabelLayout()` keeps no `alignedAlong`, `stationSides`,
+  `hiddenYielded` or customer-label spots. Valid layout, not stale values.
 - 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
