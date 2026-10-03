@@ -70,6 +70,7 @@ function walk(el, out) {
 }
 const alerts = [];
 global.alert = global.window.alert = function (m) { alerts.push(String(m)); };
+require('./lpn-dom-stub.js').captureNotices(global.alert);   // Task 710: the message is a notice now
 // The export alert is a DIALOG rather than an alert(). openDialog() builds real elements into
 // #lpn_dialog_body, so it is read back the way a user reads it -- inp-import-harness.js's rule for
 // the import report, which is the same channel pointed the other way.

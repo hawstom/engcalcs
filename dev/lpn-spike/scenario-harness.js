@@ -61,6 +61,7 @@ let confirmAnswer = true, promptAnswer = 'Fire flow', lastAlert = null, confirmT
 global.confirm = global.window.confirm = function (m) { confirmText = m; return confirmAnswer; };
 global.prompt = global.window.prompt = function () { return promptAnswer; };
 global.alert = global.window.alert = function (m) { lastAlert = m; };
+require('./lpn-dom-stub.js').captureNotices(global.alert);   // Task 710: the message is a notice now
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getProject: function () { return project; },\n" +

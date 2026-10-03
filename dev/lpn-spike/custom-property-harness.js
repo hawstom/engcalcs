@@ -34,6 +34,7 @@ const PC = global.EngCalcs.pageConfig;
 
 let lastAlert = null;
 global.alert = global.window.alert = function (m) { lastAlert = m; };
+require('./lpn-dom-stub.js').captureNotices(global.alert);   // Task 710: the message is a notice now
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getSettings: function () { return settings; },\n" +

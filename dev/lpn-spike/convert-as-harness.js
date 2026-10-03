@@ -62,8 +62,8 @@ const L = loadLoopedNetwork(
 	null,
 	// A spy on the one notice seam, so the harness can read what the page said.
 	function (src) {
-		return src.replace('\tfunction setNotice(text) {',
-			'\tvar harnessNotice = \'\';\n\tfunction setNotice(text) { harnessNotice = text;');
+		return src.replace('\tfunction setNotice(text, severity) {',
+			'\tvar harnessNotice = \'\';\n\tfunction setNotice(text, severity) { harnessNotice = text;');
 	}
 );
 L.buildLayers();
