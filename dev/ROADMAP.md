@@ -233,10 +233,6 @@ the block.
   Tom, 2026-10-03: *"it would be really nice if the tables could filter on the selection. I'm not
   sure how to work the UI unless it's part of the right-click menu."* Ask Ida and Declan where the
   switch lives before building.
-- 75|758| **A project switched back to after eviction redraws its labels differently.**
-  Perry, 2026-10-03, on master's code: visit Novato, zoom, visit five other tabs, return: 78 of 123
-  labels differ at the same view. `captureLabelLayout()` keeps no `alignedAlong`, `stationSides`,
-  `hiddenYielded` or customer-label spots. Valid layout, not stale values.
 - 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
