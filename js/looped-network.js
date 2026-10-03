@@ -9182,7 +9182,7 @@ var EngCalcs = EngCalcs || {};
 		hideOpenTips();
 		box.style.display = 'flex';
 		buildContourBox();
-		placePanelForScreen(box, function () { placeBoxRemembered(box, contourboxLayout); });
+		placePanelForScreen(box, function () { placeBoxRemembered(box, contourboxLayout, true); });
 		initTipsIn(box);
 		rememberBoxOpen(contourboxLayout, saveContourboxLayout, true);
 	}
@@ -47620,11 +47620,12 @@ var EngCalcs = EngCalcs || {};
 	// chosen", not zero. Either way the result goes through clampPanel(), so a corner left on a
 	// 32-inch monitor cannot open off the edge of a laptop. Runs inside placePanelForScreen(), so on
 	// a phone it never runs at all and the box fills the window.
-	function placeBoxRemembered(box, layout) {
+	function placeBoxRemembered(box, layout, dockTopRight) {
 		var floor = chromeFloor(), h, r, top, at;
 		applyBoxSize(box, layout);
 		h = fitPanelToViewport(box);
 		r = box.getBoundingClientRect();
+		if ((layout.left === null || layout.top === null) && dockTopRight && dockBoxTopRight(box, r)) { return; }
 		if (layout.left === null || layout.top === null) {
 			box.style.left = Math.max(0, (window.innerWidth - r.width) / 2) + 'px';
 			top = Math.max(floor, (window.innerHeight - h) / 2);
@@ -47652,6 +47653,32 @@ var EngCalcs = EngCalcs || {};
 		at = restoreBounds(layout.left, layout.top, r.width, r.height, window.innerWidth, window.innerHeight);
 		box.style.left = at.left + 'px';
 		box.style.top = at.top + 'px';
+	}
+	// **A PLOT'S CONTROL BOX OPENS DOCKED AT THE MAP'S TOP-RIGHT, NOT CENTRED** (Tom, 2026-10-03:
+	// centred, it hid the plot it controls). Right edge a gap inside the map's, top under the zoom
+	// buttons, height capped above the colour legend so it never covers either. First open only;
+	// a dragged position is remembered and wins. False when the map has no box yet.
+	function dockBoxTopRight(box, r) {
+		var wrap = svg && svg.parentNode, wr, zc, lg, gap = 8, top, left, bottom, lr;
+		if (!wrap || !wrap.getBoundingClientRect) { return false; }
+		wr = wrap.getBoundingClientRect();
+		if (!(wr.width > 0) || !(wr.height > 0)) { return false; }
+		top = Math.max(chromeFloor(), wr.top + gap);
+		zc = document.getElementById('lpn_zoom_control');
+		if (zc && zc.getBoundingClientRect().width > 0) { top = Math.max(top, zc.getBoundingClientRect().bottom + gap); }
+		left = Math.max(wr.left, wr.right - r.width - gap);
+		bottom = Math.min(window.innerHeight - POPUP_EDGE, wr.bottom - gap);
+		lg = colorLegendBox;
+		if (lg && lg.style.display !== 'none') {
+			lr = lg.getBoundingClientRect();
+			if (lr.width > 0 && lr.height > 0 && lr.right > left && lr.left < left + r.width && lr.top > top) {
+				bottom = Math.min(bottom, lr.top - gap);
+			}
+		}
+		capPanelToRoomBelow(box, window.innerHeight - Math.max(80, bottom - top) - POPUP_EDGE);
+		box.style.left = left + 'px';
+		box.style.top = top + 'px';
+		return true;
 	}
 	// The flag, written only when it changes: Escape and the closers run whether or not the box is
 	// showing, and an unguarded write would create the key for a visitor who never opened the box.

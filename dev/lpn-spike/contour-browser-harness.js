@@ -169,6 +169,26 @@ async function sectionDesk(Session, browser) {
 	}
 }
 
+async function sectionDocked(Session, browser) {
+	console.log('\n--- 3b. first open docks at the map top-right, 1400 x 900 ---');
+	const a = await openNet3(Session, browser, { width: 1400, height: 900 });
+	try {
+		await contourFromMenu(a);
+		const g = await a.page.evaluate(() => {
+			const R = (e) => { if (!e) { return null; } const r = e.getBoundingClientRect(); return (r.width > 0 && r.height > 0) ? { l: r.left, t: r.top, r: r.right, b: r.bottom } : null; };
+			const map = document.getElementById('lpn_canvas'), wrap = map.closest('svg') ? map.closest('svg').parentNode : map.parentNode;
+			return { box: R(document.getElementById('lpn_contour_box')), map: R(wrap), zoom: R(document.getElementById('lpn_zoom_control')),
+				legend: R(document.getElementById('lpn_color_legend')) };
+		});
+		const hit = (x, y) => x && y && x.l < y.r && x.r > y.l && x.t < y.b && x.b > y.t;
+		ok('the box lies in the right third of the map', g.box && g.map && g.box.l >= g.map.l + (g.map.r - g.map.l) * 2 / 3 - 1 && g.box.r <= g.map.r + 0.5, JSON.stringify(g));
+		ok('it does not cover the zoom buttons', g.zoom && !hit(g.box, g.zoom), JSON.stringify(g));
+		ok('it does not cover the colour legend', g.legend && !hit(g.box, g.legend), JSON.stringify(g));
+	} finally {
+		await a.close();
+	}
+}
+
 async function sectionPhone(Session, browser) {
 	console.log('\n--- 4. on a phone, 390 x 844 (f) ---');
 	const a = await openNet3(Session, browser, { width: 390, height: 844 });
@@ -207,6 +227,7 @@ async function main() {
 	const browser = await chromium.launch({ executablePath });
 	try {
 		await sectionDesk(Session, browser);
+		await sectionDocked(Session, browser);
 		await sectionPhone(Session, browser);
 	} finally {
 		await browser.close();
