@@ -3063,7 +3063,6 @@ EngCalcs.pageConfig = {
 	lpn_ds_run: <?=json_encode($ec_lang['lpn_ds_run'])?>,
 	lpn_ds_head_search: <?=json_encode($ec_lang['lpn_ds_head_search'])?>,
 	lpn_ds_search_note: <?=json_encode($ec_lang['lpn_ds_search_note'])?>,
-	lpn_ds_search_note_selected: <?=json_encode($ec_lang['lpn_ds_search_note_selected'])?>,
 	lpn_ds_head_search_selected: <?=json_encode($ec_lang['lpn_ds_head_search_selected'])?>,
 	lpn_ds_outside_below: <?=json_encode($ec_lang['lpn_ds_outside_below'])?>,
 	lpn_ds_find: <?=json_encode($ec_lang['lpn_ds_find'])?>,
