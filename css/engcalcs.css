@@ -4861,6 +4861,22 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	display: inline-block; width: 1.1em; height: 0; margin-right: .35em;
 	border-top: 2px solid currentColor; vertical-align: middle;
 }
+/* ---- The Calibration report (Task 601) -----------------------------------------------------------
+   Built from the time-series chart's own pieces (.lpn-profile-svg and friends, the series colors,
+   the chip-as-key) plus the pane's tab look for EPANET's three pages. A chart inside a box has no
+   pane to take its height from, so it is given one; the SVG scales to the box's width. */
+.lpn-calib-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-bottom: 6px; }
+.lpn-calib-tabs { display: flex; flex-wrap: wrap; gap: 2px; margin-top: 8px; border-bottom: 1px solid var(--ec-gray-bbb); }
+.lpn-calib-page { padding-top: 8px; }
+.lpn-calib-chart { height: 300px; min-width: 260px; }
+.lpn-calib-legend { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.lpn-calib-legend .lpn-profile-chip { cursor: default; }
+.lpn-calib-network td { font-weight: bold; }
+.lpn-calib-diagonal { stroke-dasharray: 4, 3; }
+.lpn-calib-point { opacity: .85; }
+/* A measured value on the time-series chart: hollow, in its asset's color (an inline stroke, for
+   the reason .lpn-ts-line gives), so a ring on top of a computed dot shows both. */
+.lpn-calib-ring { fill: var(--ec-bg); stroke-width: 1.5; }
 /* ---- The saved-path menu on the Profile tab (Task 510) ---------------------------------------
    An arrow ON the tab, not a second tab and not a toolbar button: Tom's placement, 2026-08-24, and
    it puts the list of names where the thing they name already lives.
