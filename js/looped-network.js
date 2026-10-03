@@ -2160,8 +2160,8 @@ var EngCalcs = EngCalcs || {};
 		// widest child, and a monospace report line has no wrap opportunities a browser will take, so
 		// an unbounded panel takes most of the window. Hence a max-width plus
 		// `overflow-wrap:anywhere` on the readout, which breaks the long token instead.
-		box.setAttribute('style', 'position:fixed;left:8px;bottom:8px;z-index:35;background:#fff;'
-			+ 'border:1px solid #333;padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px rgba(0,0,0,.3);'
+		box.setAttribute('style', 'position:fixed;left:8px;bottom:8px;z-index:35;background:var(--ec-bg);'
+			+ 'border:1px solid var(--ec-ink);padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3);'
 			+ 'max-height:70vh;max-width:min(26em,45vw);overflow:auto');
 		function row(label, get, set, step, hint) {
 			var l = document.createElement('label'), i = document.createElement('input');
@@ -2213,7 +2213,7 @@ var EngCalcs = EngCalcs || {};
 		row('zoom-to-fit room (text heights)', function () { return t.fitRoom; },
 			function (v) { t.fitRoom = v; }, 1, 'Extra room left on Zoom to fit\u2019s FIRST pass, before labels are placed. Bigger = the first pass sits further out, so labels land more comfortably at the final zoom. Press Zoom to fit to see it.');
 		var g = document.createElement('div');
-		g.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
+		g.setAttribute('style', 'margin-top:6px;border-top:1px solid var(--ec-border-strong);padding-top:4px');
 		g.textContent = 'rank weights';
 		box.appendChild(g);
 		Object.keys(Collide.GOAL_WEIGHT).forEach(function (key) {
@@ -2229,7 +2229,7 @@ var EngCalcs = EngCalcs || {};
 		// only by looking at a real map at several values. Generic over the table, like the rank
 		// weights: a knob added in lpn-collide.js appears here untouched.
 		var at = document.createElement('div');
-		at.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
+		at.setAttribute('style', 'margin-top:6px;border-top:1px solid var(--ec-border-strong);padding-top:4px');
 		at.textContent = 'corner angles (degrees)';
 		box.appendChild(at);
 		Object.keys(Collide.ANGLE_TUNING).forEach(function (key) {
@@ -2241,7 +2241,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		var out = document.createElement('div');
 		out.id = 'lpn_label_bench_out';
-		out.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px;'
+		out.setAttribute('style', 'margin-top:6px;border-top:1px solid var(--ec-border-strong);padding-top:4px;'
 			+ 'overflow-wrap:anywhere;white-space:normal');
 		box.appendChild(out);
 		var btns = document.createElement('div');
@@ -13096,8 +13096,8 @@ var EngCalcs = EngCalcs || {};
 		// LOWER RIGHT: the label bench already owns the lower left, and Settings and Labels are
 		// top-right. The width is capped for the reason the label bench states -- a fixed box with
 		// no width sizes to its widest child, and a tile key has no wrap opportunity.
-		box.setAttribute('style', 'position:fixed;right:8px;bottom:8px;z-index:35;background:#fff;'
-			+ 'border:1px solid #333;padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px rgba(0,0,0,.3);'
+		box.setAttribute('style', 'position:fixed;right:8px;bottom:8px;z-index:35;background:var(--ec-bg);'
+			+ 'border:1px solid var(--ec-ink);padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3);'
 			+ 'max-height:70vh;max-width:min(30em,45vw);overflow:auto;white-space:pre-wrap;'
 			+ 'overflow-wrap:anywhere');
 		var h = document.createElement('div');
@@ -37296,8 +37296,8 @@ var EngCalcs = EngCalcs || {};
 		// row per distinct message, so a repaint on every tab switch does not fill the log.
 		logMessage(state.message, 'warning');
 		// Amber for a warning you may work through, red for a state that has taken editing away.
-		banner.style.borderColor = bannerRO ? '#a00' : '#a80';
-		banner.style.background = bannerRO ? '#fff0f0' : '#fffbe6';
+		banner.style.borderColor = bannerRO ? 'var(--ec-error-ink)' : 'var(--ec-warn-border)';
+		banner.style.background = bannerRO ? 'var(--ec-error-bg-soft)' : 'var(--ec-warn-bg)';
 		var text = document.createElement('span');
 		text.textContent = state.message || '';
 		banner.appendChild(text);
@@ -38189,7 +38189,7 @@ var EngCalcs = EngCalcs || {};
 			if (r.separator) {
 				var hr = document.createElement('hr');
 				hr.setAttribute('role', 'separator');
-				hr.style.cssText = 'margin:3px 0;border:0;border-top:1px solid #ccc';
+				hr.style.cssText = 'margin:3px 0;border:0;border-top:1px solid var(--ec-border-strong)';
 				list.appendChild(hr);
 				return;
 			}
