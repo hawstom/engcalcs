@@ -35,6 +35,7 @@ const cases = require('./cases.js');
 
 const GPM_TO_M3S = 6.309019640343977e-5;
 const FT_TO_M = 0.3048;
+const EXACT_PSI_PER_M = 1.4223343307119563;   // lib/Units.lib.php $ec_units['psi'], for contrast only
 const IN_TO_M = 0.0254;
 
 let failures = 0;
@@ -333,6 +334,21 @@ function checkAgainstEpanet(name) {
 		const err = Math.abs(mine - n.head);
 		if (err > worstHead) { worstHead = err; worstHeadId = n.id; }
 	}
+
+	// PRESSURE IN PSI, which is what a user compares with EPANET's report. Head minus elevation, in
+	// metres, through the factor the Looped Network page itself uses (EPANET's PSIperFT, 0.4333).
+	// 0.005 psi is above the head noise (0.01 ft = 0.004 psi) and well below the 0.05% an exact psi
+	// factor used to add, which is 0.02 to 0.03 psi at Net3's 40 to 60 psi.
+	let worstPsi = 0, worstPsiId = null, worstExact = 0;
+	for (const n of ref.nodes) {
+		if (n.type !== 'Junction') { continue; }
+		const m = result.heads[n.id] - n.elevation * FT_TO_M;
+		const err = Math.abs(m * EngCalcs.EPANET_PSI_PER_M - n.pressure);
+		if (err > worstPsi) { worstPsi = err; worstPsiId = n.id; }
+		worstExact = Math.max(worstExact, Math.abs(m * EXACT_PSI_PER_M - n.pressure));
+	}
+	report(worstPsi < 0.005, `${name}: junction pressures match EPANET's psi`,
+		`max ${fmt(worstPsi, 5)} psi at ${worstPsiId}; the exact psi factor would be off by ${fmt(worstExact, 4)}`);
 
 	let worstFlow = 0, worstFlowId = null;
 	for (const l of ref.links) {

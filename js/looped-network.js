@@ -15,6 +15,15 @@ var EngCalcs = EngCalcs || {};
 	// Looped-Network.php; the harnesses in dev/lpn-spike/ require them directly.
 	var Geom = EngCalcs.lpnGeom, Collide = EngCalcs.lpnCollide;
 
+	// **PSI ON THIS PAGE IS EPANET'S PSI** (Tom, 2026-10-03). Head becomes pressure through
+	// EngCalcs.unitFactors, so this page's own copy of the psi factor carries EPANET's PSIperFT
+	// (0.4333, js/PipeHydraulics.lib.js) and every pressure here reads as EPANET reports it. The
+	// shared $ec_units['psi'] stays exact for the other calculators; this table is per page load.
+	// Only psi: EPANET's metres match ours, and kPa and bar are not offered by EPANET's US set.
+	if (EngCalcs.unitFactors && typeof EngCalcs.EPANET_PSI_PER_M === 'number') {
+		EngCalcs.unitFactors.psi = EngCalcs.EPANET_PSI_PER_M;
+	}
+
 	var NS = 'http://www.w3.org/2000/svg';
 	var svg, world, modelLayer, backdropLayer, gridLayer, customersLayer, linksLayer, linkSymbolLayer, nodesLayer, labelsLayer, debugBoxLayer;
 	var state = { tx: 0, ty: 0, s: 1 };

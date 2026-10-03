@@ -332,6 +332,9 @@ console.log('\n--- a .net built here, read back by the shipped reader ---');
 // ---------------------------------------------------------------------------
 console.log('\n--- and the .inp reader then agrees about the network ---');
 {
+	// The page loads PipeHydraulics.lib.js first, and lpn-inp.js reads EPANET's psi constant from it.
+	Object.assign(EngCalcs, require(ROOT + 'js/PipeHydraulics.lib.js'));
+	global.EngCalcs = EngCalcs;
 	require(ROOT + 'js/lpn-inp.js');
 	const parsed = EngCalcs.lpnInpParse(EngCalcs.lpnNetToInp(buildNet(), 'fixture.net').inp);
 	ok('it parses as a network', parsed.ok);

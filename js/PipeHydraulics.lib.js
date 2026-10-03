@@ -31,6 +31,18 @@ EngCalcs.hwCoef = 4.727 * Math.pow(0.3048, 4.871) / Math.pow(0.3048 * 0.3048 * 0
 EngCalcs.hwDiaExp = 4.871;
 EngCalcs.hwExp = 1.852;
 
+// ---------------------------------------------------------------------------
+// Head to pressure in psi, on EPANET's constant -- for the Looped Network calculator only.
+//
+// EPANET's types.h has PSIperFT = 0.4333 (psi per foot of water); the exact value is 0.4335275.
+// A user checks lpn_ against EPANET's report, and with the exact one every psi reads 0.05% above
+// it (Tom, 2026-10-03: "OK" to adopting EPANET's). The suite-wide $ec_units['psi'] stays exact,
+// because other calculators use psi as a general pressure unit (lib/Units.lib.php). js/looped-
+// network.js puts the factor below into its own copy of EngCalcs.unitFactors.psi, and
+// js/lpn-fireflow.js and js/lpn-inp.js read these two, so there is one number on that page.
+EngCalcs.EPANET_PSI_PER_FT = 0.4333;
+EngCalcs.EPANET_PSI_PER_M = EngCalcs.EPANET_PSI_PER_FT / 0.3048;   // "psi per metre", a unitFactors entry
+
 // Friction slope Sf (m of head per m of pipe) for full-pipe flow.
 //   q  flow (m3/s, sign ignored)
 //   d  inside diameter (m)

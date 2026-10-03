@@ -97,15 +97,21 @@ function ecJsConstantQuantities(float $g): array
 
 /**
  * DECLARED EXCEPTIONS. A near-miss that is deliberate goes here with its reason, never inferred
- * from a comment beside it. `basename => [literal => reason]`. Empty today, and that is the point:
- * the four that existed on 2026-09-09 were derived rather than declared, because none of them had
- * an argument for being approximate.
+ * from a comment beside it. `basename => [literal => reason]`. One today: EPANET's own
+ * PSIperFT, which is approximate by EPANET's definition and is wanted exactly as EPANET has it. The
+ * four found on 2026-09-09 were derived rather than declared, because none had that argument.
  *
  * @return array<string,array<string,string>>
  */
 function ecJsConstantExceptions(): array
 {
-    return [];
+    return [
+        'PipeHydraulics.lib.js' => [
+            '0.4333' => "EPANET's types.h PSIperFT, adopted on purpose for the Looped Network page "
+                . "(Tom, 2026-10-03) so its psi reads as EPANET's report does. lib/Units.lib.php "
+                . "keeps the exact factor for every other calculator.",
+        ],
+    ];
 }
 
 /**
