@@ -227,6 +227,7 @@ Follow the `add-calculator` skill (`.claude/skills/add-calculator/SKILL.md`) —
   use; reuse stops at sentences. Loss symbols: lowercase `h` for components (`h_f`, `h_m`, `h_L`,
   `k_m`), capital `H` for total heads; the term is **"Minor (local) loss"**. Record:
   `dev/label-normalization-decision.md`.
+- **Chrome colours are `--ec-*` tokens**, declared in one block at the top of `css/engcalcs.css`; never a literal in a rule or a style string. Map ink and paper are the exception, listed with reasons in `dev/scripts/chrome_colour_allow.json`. `chrome_colour_check.php` refuses the rest. Plan: `dev/theming-plan.md`.
 - **Verdict strings lead with `✓` or `⚠`, never a marker word**, and the whole string is the tip
   target.
 - **Results columns: width is king.** Keep headings narrow; do not re-flag terse abbreviations.

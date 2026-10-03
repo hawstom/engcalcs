@@ -493,3 +493,5 @@ skeptical it would work. Not proposing it now; no evidence it's needed.)
    and citations. Ranked first of its three parts: the toggle + dim class alone already makes a
    frozen row visibly different from a live one; the ⚠ glyph and the banner count are the next
    increments and can trail the demo without leaving the first change silently wrong.
+
+N. **Key badges in keyboard mode, not underlines** (2026-10-03): a mnemonic shown as a small boxed Latin letter beside each menu name survives all 27 languages and RTL; see journal 2026-10-03.

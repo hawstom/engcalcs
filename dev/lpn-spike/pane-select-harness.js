@@ -73,7 +73,7 @@ const L = loadLoopedNetwork(
 L.buildLayers();
 
 const src = fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8');
-const css = fs.readFileSync(path.join(ROOT, 'css', 'engcalcs.css'), 'utf8');
+const css = require('./css-tokens.js').readCss(path.join(ROOT, 'css', 'engcalcs.css'));
 
 // ---- a network with something to select ------------------------------------------------------
 // Four junctions, deliberately with a GAP in the demand column: J2 states none. Ctrl+Down has to

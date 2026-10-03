@@ -88,7 +88,7 @@ L.buildLayers();
 
 const src = fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8');
 const php = fs.readFileSync(path.join(ROOT, 'Looped-Network.php'), 'utf8');
-const css = fs.readFileSync(path.join(ROOT, 'css', 'engcalcs.css'), 'utf8');
+const css = require('./css-tokens.js').readCss(path.join(ROOT, 'css', 'engcalcs.css'));
 function stripComments(s) { return s.replace(/^[ \t]*\/\/.*$/gm, ''); }
 function fnBody(name) {
 	const at = src.indexOf('function ' + name + '(');
@@ -948,7 +948,7 @@ console.log('\n--- and the stylesheet answers accordingly ---');
 		// pseudo-class and to an attribute selector -- it says so in its own blind-spot report at
 		// the end of this section -- so these two are read out of the stylesheet as text. A weaker
 		// claim, stated rather than dressed up: it says the rules are written, not which one wins.
-		const css = fs.readFileSync(path.join(ROOT, 'css', 'engcalcs.css'), 'utf8');
+		const css = require('./css-tokens.js').readCss(path.join(ROOT, 'css', 'engcalcs.css'));
 		const rule = (sel) => {
 			const i = css.indexOf(sel + ' {');
 			return i < 0 ? '' : css.slice(i, css.indexOf('}', i));

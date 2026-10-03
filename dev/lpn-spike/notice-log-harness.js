@@ -351,7 +351,7 @@ console.log('7c. It lives where the messages do -- the top-left column, not the 
 		atWrong > 0 && html.slice(Math.max(0, atFooter), atFooter < 0 ? 0 : atWrong).indexOf('lpn_msglog') < 0);
 	ok('and it is the ONLY element with this id -- no duplicate left behind by the move',
 		(html.match(/id="lpn_msglog_btn"/g) || []).length === 1);
-	const css = fs.readFileSync(path.join(ROOT, 'css/engcalcs.css'), 'utf8');
+	const css = require('./css-tokens.js').readCss(path.join(ROOT, 'css/engcalcs.css'));
 	ok('and the control is styled, so it is not an unstyled default button on the map',
 		css.indexOf('.lpn-msglog-btn') >= 0);
 	ok('with a highlight rule for while a message is showing',
@@ -444,7 +444,7 @@ console.log('7f. The panel stacks messages top-to-bottom, and paints an opaque b
 	// edge in one line instead of stacking, and a container with no background of its own paints
 	// nothing in the gaps BETWEEN rows, which is how a Text object on the map (his "RIVER") showed
 	// through those gaps at full strength once there was more than one row to leave a gap between.
-	const css = fs.readFileSync(path.join(ROOT, 'css/engcalcs.css'), 'utf8');
+	const css = require('./css-tokens.js').readCss(path.join(ROOT, 'css/engcalcs.css'));
 	const m = css.match(/\.lpn-msglog-panel\s*\{([^}]*)\}/);
 	if (!m) { throw new Error('.lpn-msglog-panel has no rule of its own'); }
 	const decl = m[1];
@@ -476,7 +476,7 @@ console.log('7g. The GLYPH itself is opaque too (Tom, R-157: "I discovered what 
 	// opens it -- a live probe against the real page (a real "River" Text object panned under the
 	// closed button, EPANET Net3) showed the letter still bleeding through .lpn-msglog-btn's own
 	// rgba(255,255,255,.8) after that fix landed, so this is a separate box needing the same remedy.
-	const css = fs.readFileSync(path.join(ROOT, 'css/engcalcs.css'), 'utf8');
+	const css = require('./css-tokens.js').readCss(path.join(ROOT, 'css/engcalcs.css'));
 	const m = css.match(/\.lpn-msglog-btn\s*\{([^}]*)\}/);
 	if (!m) { throw new Error('.lpn-msglog-btn has no rule of its own'); }
 	const decl = m[1];

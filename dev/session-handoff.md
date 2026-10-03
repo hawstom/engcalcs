@@ -101,53 +101,60 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-02 (first day on jasmine)
+## STATE — 2026-10-03
 
-### Master = bb9b901e, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
+### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Master since 05eac4a3 carries: the 67 concept definitions (737's open item; projection-map corrected
-to his 09-14 ruling), check_all in four slots (`f9829cee`), the widened panel guard (701 closed),
-747 closed (shipped with copy-lock). Review queue R-370..R-378 is his 2026-10-02 pass.
+Merged 2026-10-03 on his word: graph-menu (640 closed), drawing-keep (680 closed),
+property-arrow-key, fix/undo-label (Redo), bentley-interop. `feat/bentley-interop` was then RECUT
+from master as the long-lived branch for the rest of 749 (his: "a long-term branch for all the
+bentley-interop things"); its old all-clear is pinned to the old head and has lapsed, as it should.
+New on master: localStorage `lpn_scnbasic` (Basic mode off), exempt category; Tom told.
 
-### Awaiting his browser pass (protected; merge on his all-clear, typed by him in a session)
+### Awaiting his browser pass (protected; merge on his all-clear, typed in a session)
 
-Every branch below has master merged in (2026-10-02) and a suite run on it; "green" = only the
-expected `payload freshness`. Ask for merges with AskUserQuestion.
-- 8106 `feat/property-graph` (637, R-370, R-377): pump reads "Head", prefix "H="; Full report/CSV
-  column "Pump head" (new key `lpn_report_pump_head`). Time series: held values step forward, others
-  slope (`TS_STEPPED`). Owed: his OK on "Head" and "Pump head" (rulings were keyed on "Head gain").
-- 8107 `feat/criticality` (751, R-371): rows in fire flow's tiers and tints. Owed: syn diff for
-  `lpn_ff_all`/`_selected` (drop the Design-check sentence) and proposed `lpn_ff_design_*` syn entries.
-  `lpn_crit_skipped` ("{n} selected elements are not links") still plural-agrees; not fixed.
-- 8110 `feat/demand-scaling` (754, R-374): contains criticality (merged 3d090fc3), so merging it merges
-  both. Find was always scoped; it now SAYS "Only the selected junctions were scaled", and a refused
-  Selected run clears the old answer in the box (fire flow and criticality too). New wording to rule:
-  "Junctions not shown: {n}." (was "{n} more junctions are not shown.") and "Links not shown: {n}."
-- 8108 `feat/bentley-interop` (749, R-372): "Alt. preview is good" — nothing to build; needs only his word.
-- 8109 `feat/graph-menu` (640, R-373): Profile row icon removed; tip is his text verbatim. The rows
-  still read "Time series" / "Frequency" against his tip's "Time Series" / "Frequency distribution".
-- 8112 `feat/keyboard-menu` (748): Perry passed it bar one defect (focus lost after Enter), fixed;
-  RTL mirrors Left/Right.
-- 8111 `feat/drawing-keep` (680): Perry found returns drawn at the previous project's zoom; fixed
-  (2b47ebe9) with a harness across scales. Keeps up to four drawings.
-- 8113 `feat/property-arrow-key` (Declan's wish 3): Up/Down walk the Properties fields.
-- `feat/desktop` (756): his ruling R-375 — usage logs ON in a desktop build, reported to hawsedc.com;
-  write it into `dev/desktop-platforms-plan.md` (a fifth outside call: consent and privacy paragraph).
-- `feat/label-placer` (539/741): unchanged.
+Each has master merged in and a green suite bar the expected `payload freshness`. Ask with
+AskUserQuestion; the classifier refuses an all-clear lifted from pasted text.
+- 8106 `feat/property-graph` (637): his pass said "Other than that, it looks great"; the Properties
+  box squeeze (R-379) is fixed (box pinned to its free width; only a corner drag counts as a chosen
+  size). "Head"/"Pump head" approved and recorded. Headless never reproduced his ~150 px, only 276 px.
+- 8110 `feat/demand-scaling` (754, contains criticality 751): R-380 fixed — Find/Run judged every
+  junction; now Selected judges only the selected. Two reworded strings need his OK:
+  `lpn_ds_scope_tip` "...Pressures are checked at the junctions scaled." and `lpn_ds_scaled_selected`
+  "Only the selected junctions were scaled and checked. Junctions scaled: {n}." Open question for
+  him: selection-only verdict vs also failing an unselected junction that the extra demand starves.
+  Approved syn entries (`lpn_ff_all/_selected`, three `lpn_ff_design_*`) are written there.
+- 8112 `feat/keyboard-menu` (748): Alt+Shift+F/E/M/W/H/L (Ctrl+Option on Mac), F10, key badges in
+  keyboard mode, pointer-only rows skipped, focus returns after a row runs. Perry passed it after two
+  fixes. New strings to rule: `lpn_hotkeys_menu_heading` "Menus", `lpn_hotkeys_menu_term` "Menu
+  keyboard shortcuts", `lpn_hotkeys_menu_def` rows "Open File, Edit, Map, Water, Help or Language
+  (Ctrl+Option on a Mac)." / "Go to the menu bar." UNTESTED: Windows' Alt+Shift layout switch with
+  two keyboard languages installed — only he can try it. If theme-token merges first, the badge CSS
+  needs `var(--ec-*)` colours.
+- 8108 `feat/label-cache` (681 c/d): per-notch label bank; Perry CONFIRMED no stale labels;
+  Novato revisit settle ~85 -> ~13 ms. Placer seam: feat/label-placer must route its settle through
+  `labelCacheSettle()` and register in `labelBankParts`, or it just runs uncached.
+- 8109 `feat/theme-token` (714 phase 1): 96 `--ec-*` tokens, zero pixel difference on 14 states,
+  new blocking check `chrome_colour_check.php`. After it merges, every branch adding a CSS colour
+  literal fails that check. Phase 1b (R-202 button base) and the 62 by-value tokens are left.
+- `feat/desktop` (756): his R-375/R-384 written in (logs kept, consent at install).
+- `feat/label-placer` (539/741): unchanged; round-5 rulings still his.
 
-- 8114 `fix/undo-label`: there was no Redo; now Ctrl+Y and Ctrl+Shift+Z (not Cmd+Y, the Mac's
-  History), a new edit empties it, and Undo keeps the Properties box open. Held for his pass because it
-  is new behaviour. The Help box's shortcut list lacks the Redo row: adding it needs his OK on "Ctrl+Y
-  or Ctrl+Shift+Z | Redo the last undone change." and a translation pass (the markup check needs all 27).
+### Found 2026-10-03, not yet a task
+
+- Task 680's keep is incomplete after EVICTION (more than four other tabs visited): returning to
+  Novato redrew 78 of 123 labels differently at the same view (Perry, on master's code). Valid
+  layout, not stale values. Logged as Task 758.
+- The uncached zoom pass gives two different answers at one scale on repeated runs (label-cache
+  builder); the cache hides it on revisits.
 
 ### Owed translation work
 
-Unchanged from 10-01 plus: property-graph 2 keys renamed/1 new, demand-scaling 1 new and
-`lpn_ff_rows_more` reworded. Sprint after his merges, not before: the branch keys are most of it.
-
-Run a sprint after this batch merges: property-graph 4 keys, criticality ~29, bentley-interop 13,
-graph-menu 2, demand-scaling ~42. Romanian file menu noun/verb pass. Concept layer: 67 empty
-definitions. Glossary write-back owed from echo (see 09-30).
+Not run 2026-10-03 on purpose: most owed keys sit on the five branches above. Run one sprint after
+they merge: property-graph 4, criticality ~29, demand-scaling ~42 (+2 reworded), keyboard-menu 3,
+plus master's bentley-interop 13, graph-menu 2 and the Redo Help row (approved: "Ctrl+Y or
+Ctrl+Shift+Z | Redo the last undone change."; the markup check needs all 27 at once). Romanian file
+menu noun/verb pass. Concept layer: four new terms untranslated. Glossary write-back owed from echo.
 
 ### Traps met 2026-10-02
 

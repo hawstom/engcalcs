@@ -301,7 +301,7 @@ console.log('\n-- flow unit leads, the way EPANET names a unit system --');
 
 console.log('\n-- layout: thumbnails are drawings on white paper, in both themes --');
 {
-	const css = fs.readFileSync(path.join(root, 'css/engcalcs.css'), 'utf8');
+	const css = require('./css-tokens.js').readCss(path.join(root, 'css/engcalcs.css'));
 	const thumb = css.slice(css.indexOf('.lpn-example-thumb'), css.indexOf('.lpn-example-title'));
 	report(/background:\s*#fff/.test(thumb), 'the thumbnail sets its own white ground');
 	report(/border:\s*1px solid/.test(thumb), 'and its own border');
