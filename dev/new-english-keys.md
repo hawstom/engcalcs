@@ -479,4 +479,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/property-graph (`ab00acc2`) — adds no English strings
+### feat/property-graph (`eb561b0a`) — adds no English strings
