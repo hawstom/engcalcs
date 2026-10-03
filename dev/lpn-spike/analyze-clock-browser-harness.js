@@ -108,7 +108,7 @@ async function main() {
 		console.log('\n--- Fire flow ---');
 		await openTool('lpn_ff_menu', 'lpn_ff_box');
 		await pressRun('#lpn_ff_controls', runLabel);
-		await waitDone('#lpn_ff_report', 'fire flow result');
+		await waitDone('#lpn_ff_report', 'the Fire flow answer');
 		const ffBefore = await txt('#lpn_ff_report');
 		console.log('  ' + ffBefore.slice(0, 120));
 		await goTo(6 * 3600);
@@ -120,7 +120,7 @@ async function main() {
 		await goTo(0);
 		await openTool('lpn_crit_menu', 'lpn_crit_box');
 		await pressRun('#lpn_crit_controls', runLabel);
-		await waitDone('#lpn_crit_report', 'criticality result');
+		await waitDone('#lpn_crit_report', 'the Criticality answer');
 		const crBefore = await txt('#lpn_crit_report');
 		console.log('  ' + crBefore.slice(0, 120));
 		await goTo(6 * 3600);
@@ -132,9 +132,9 @@ async function main() {
 		await goTo(0);
 		await openTool('lpn_ds_menu', 'lpn_ds_box');
 		await pressRun('#lpn_ds_controls', await a.lang('lpn_ds_run'));
-		await waitDone('#lpn_ds_controls [data-ds="scale"]', 'demand scaling run');
+		await waitDone('#lpn_ds_controls [data-ds="scale"]', 'the Demand scaling Run answer');
 		await pressRun('#lpn_ds_controls', await a.lang('lpn_ds_find'));
-		await waitDone('#lpn_ds_controls [data-ds="search"]', 'demand scaling find');
+		await waitDone('#lpn_ds_controls [data-ds="search"]', 'the Demand scaling Find answer');
 		const dsAt = (await a.lang('lpn_ds_at_time')).replace('{time}', zero);
 		ok('Run names 0:00', (await txt('#lpn_ds_controls [data-ds="scale"]')).indexOf(dsAt) >= 0);
 		ok('Find names 0:00', (await txt('#lpn_ds_controls [data-ds="search"]')).indexOf(dsAt) >= 0);
