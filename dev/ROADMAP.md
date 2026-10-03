@@ -106,6 +106,54 @@ the block.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
+- 100|600| **The three EPANET plots we do not have: contour, frequency, flow balance.**
+  **PROMOTED TO 100 BY TOM, 2026-10-03** (*"Promote to 100: 600, 601, 604"*). Building on `feat/flow-balance` and `feat/contour`.
+  Tom, 2026-09-06, surveying EPANET's plot menu: *"time series, profile, contour (very cool),
+  frequency distribution ... and system flow balance."* **We already have PROFILE** (`lpn_profile_*`)
+  and time series is Task 599, so this row is the remaining three.
+  - **CONTOUR is the one he starred and is also the one with a real unknown**: it interpolates a
+    nodal value over the plane between nodes, so it needs a decision about what happens where there
+    are no nodes -- a pressure contour across a river a main crosses is drawn over nothing.
+    **Design: `dev/epanet-js-contour-contribution.md`.** Since 2026-10-01 (§2a there, Luke Butler's
+    proof of concept): contour HEAD, subtract the Terrain-RGB DEM per cell, and let pressure leave
+    the junctions' range where the terrain does. Open: pressure-zone boundaries, hard vs faded edge.
+  - **FREQUENCY SHIPPED 2026-09-30** (`feat/frequency-plot`, merged on his word). Contour and flow
+    balance remain.
+  - **SYSTEM FLOW BALANCE -- AND HIS READING OF IT IS RIGHT, but confirm it against EPANET's own
+    help before writing a word of interface.** He guessed *"produced comes from reservoirs and
+    negative demands and consumed is positive demands"*; that matches how the engine accounts for
+    it, and a tank is the third term, swinging between the two as it fills and drains. Getting the
+    definition wrong here is a number a user would believe.
+- 100|601| **Calibration files: measured field data, against the model that predicts it.**
+  **PROMOTED TO 100 BY TOM, 2026-10-03** (*"Promote to 100: 600, 601, 604"*). Building on `feat/calibration`.
+  Tom, 2026-09-06: *"EPANET allows calibration files (measured system data) and offers a Calibration
+  Report with three tabbed pages. See EPANET help. Very interesting to be aware of."*
+  - **THIS IS THE FIRST FEATURE THAT BRINGS IN DATA FROM OUTSIDE THE MODEL**, which is why it is
+    filed at 50 rather than as an afterthought to the plots: every number on this page today is
+    either typed or derived, and a calibration file is neither. It has its own format, its own
+    units question, and its own answer to what happens when a measurement names a node that is not
+    in the network.
+  - **READ EPANET'S HELP FIRST AND COPY THE REPORT'S SHAPE.** Three tabbed pages is a design that
+    has been in front of users for twenty years; we have no evidence that beats it, and CLAUDE.md's
+    default-to-EPANET rule applies to the vocabulary as much as to the layout.
+  - Depends on nothing, but it is worth far more once Task 599 exists: a measured series and a
+    computed series belong on one axis, and that axis is the time-series plot.
+- 100|604| **Read an EPANET `.PRO` profile file.**
+  **PROMOTED TO 100 BY TOM, 2026-10-03** (*"Promote to 100: 600, 601, 604"*). Building on `feat/profile-file`.
+  It is the only route a profile can arrive by, and it falls out of closing Task 574. **A profile is in NO `.net` and no `.inp`** -- EPANET's Graph
+  Selection dialog writes its node list to a separate `.PRO` text file through an ordinary save
+  dialog, and nothing anywhere records the path, not even an MRU entry. So a user who has built a
+  profile in EPANET cannot bring it here by opening their project, and never will be able to.
+  - The format is small: an identifier line, then one node ID per line. The work is the
+    reconciliation -- what happens when a listed ID is not in this network -- and that answer is
+    already written for the calibration files of Task 601.
+  - Worth far more once Task 603 lands: an imported profile that cannot name its own nodes is a
+    line on an axis.
+  - **IT GETS A MINUSCULE SLICE OF THE INTERFACE, on Tom's ruling of 2026-09-06:** *"Creating a
+    profile is so easy now using the Google paradigm that I don't think there is much value in
+    importing a `.pro` file. If we do it, it needs to take up miniscule space in the UX/UI, hidden
+    deep under some menu or in the profile tab down arrow."* So the acceptance bar is a row in an
+    existing menu, never a control on the profile panel itself.
 - 100|637| **A Graph button on the Properties box.**
   **BUILT 2026-09-30 on `feat/property-graph`, port 8141**, awaiting his browser pass.
   **REVISED BY TOM, 2026-09-29:** *"But what we really want is a time series graph at the bottom of
@@ -156,8 +204,8 @@ the block.
     procedure and the correction of the 2026-09-13 advice that a clean release could not be
     extracted.
 - 100|681| **Economize the label layout: it is half the cost of a project switch.**
-  **(c)/(d) BUILT 2026-10-03 on `feat/label-cache`**, awaiting his pass: a bank per wheel notch, rounded
-  outward, final; revisits run no pass (Novato ~85 -> ~13 ms). (e) already existed (one pass per wheel
+  **(c)/(d) MERGED 2026-10-03** (`feat/label-cache`, Tom: *"I am impressed. This is a major efficiency
+  feature. Done."*): a bank per wheel notch, rounded outward, final; revisits run no pass (Novato ~85 -> ~13 ms). (e) already existed (one pass per wheel
   burst). (b) is still open.
   Tom, 2026-09-16: *"if laying out the labels takes 2 sec, we have to figure out how to economize."*
   - **THE NUMBER IS HIS: the label pass is 56% of `buildDom`**, which is about 1.9 s of his 4.6 s
@@ -260,51 +308,6 @@ the block.
   - **The Run concept, in Tom's own sketch (2026-08-27):** *"a Run names a scenario among its
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
-- 75|600| **The three EPANET plots we do not have: contour, frequency, flow balance.**
-  Tom, 2026-09-06, surveying EPANET's plot menu: *"time series, profile, contour (very cool),
-  frequency distribution ... and system flow balance."* **We already have PROFILE** (`lpn_profile_*`)
-  and time series is Task 599, so this row is the remaining three.
-  - **CONTOUR is the one he starred and is also the one with a real unknown**: it interpolates a
-    nodal value over the plane between nodes, so it needs a decision about what happens where there
-    are no nodes -- a pressure contour across a river a main crosses is drawn over nothing.
-    **Design: `dev/epanet-js-contour-contribution.md`.** Since 2026-10-01 (§2a there, Luke Butler's
-    proof of concept): contour HEAD, subtract the Terrain-RGB DEM per cell, and let pressure leave
-    the junctions' range where the terrain does. Open: pressure-zone boundaries, hard vs faded edge.
-  - **FREQUENCY SHIPPED 2026-09-30** (`feat/frequency-plot`, merged on his word). Contour and flow
-    balance remain.
-  - **SYSTEM FLOW BALANCE -- AND HIS READING OF IT IS RIGHT, but confirm it against EPANET's own
-    help before writing a word of interface.** He guessed *"produced comes from reservoirs and
-    negative demands and consumed is positive demands"*; that matches how the engine accounts for
-    it, and a tank is the third term, swinging between the two as it fills and drains. Getting the
-    definition wrong here is a number a user would believe.
-- 75|601| **Calibration files: measured field data, against the model that predicts it.**
-  Tom, 2026-09-06: *"EPANET allows calibration files (measured system data) and offers a Calibration
-  Report with three tabbed pages. See EPANET help. Very interesting to be aware of."*
-  - **THIS IS THE FIRST FEATURE THAT BRINGS IN DATA FROM OUTSIDE THE MODEL**, which is why it is
-    filed at 50 rather than as an afterthought to the plots: every number on this page today is
-    either typed or derived, and a calibration file is neither. It has its own format, its own
-    units question, and its own answer to what happens when a measurement names a node that is not
-    in the network.
-  - **READ EPANET'S HELP FIRST AND COPY THE REPORT'S SHAPE.** Three tabbed pages is a design that
-    has been in front of users for twenty years; we have no evidence that beats it, and CLAUDE.md's
-    default-to-EPANET rule applies to the vocabulary as much as to the layout.
-  - Depends on nothing, but it is worth far more once Task 599 exists: a measured series and a
-    computed series belong on one axis, and that axis is the time-series plot.
-- 75|604| **Read an EPANET `.PRO` profile file.**
-  It is the only route a profile can arrive by, and it falls out of closing Task 574. **A profile is in NO `.net` and no `.inp`** -- EPANET's Graph
-  Selection dialog writes its node list to a separate `.PRO` text file through an ordinary save
-  dialog, and nothing anywhere records the path, not even an MRU entry. So a user who has built a
-  profile in EPANET cannot bring it here by opening their project, and never will be able to.
-  - The format is small: an identifier line, then one node ID per line. The work is the
-    reconciliation -- what happens when a listed ID is not in this network -- and that answer is
-    already written for the calibration files of Task 601.
-  - Worth far more once Task 603 lands: an imported profile that cannot name its own nodes is a
-    line on an axis.
-  - **IT GETS A MINUSCULE SLICE OF THE INTERFACE, on Tom's ruling of 2026-09-06:** *"Creating a
-    profile is so easy now using the Google paradigm that I don't think there is much value in
-    importing a `.pro` file. If we do it, it needs to take up miniscule space in the UX/UI, hidden
-    deep under some menu or in the profile tab down arrow."* So the acceptance bar is a row in an
-    existing menu, never a control on the profile panel itself.
 - 75|617| **More map view options, the opacity one having shipped.**
   **RETITLED BY TOM, 2026-09-18: *"Edit and retitle the task to remove 'A basemap the reader can
   tone down'. That is already provided by Settings background opacity. Focus the task on other map

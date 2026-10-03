@@ -7,11 +7,14 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**105 open tasks.** Next (100): 8 · Soon (75): 19 · Someday (50): 44 · Maybe (25): 15 · Parked (5): 19
+**105 open tasks.** Next (100): 11 · Soon (75): 16 · Someday (50): 44 · Maybe (25): 15 · Parked (5): 19
 
-## 100 — Next (8)
+## 100 — Next (11)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
+- Task 600 — The three EPANET plots we do not have: contour, frequency, flow balance.
+- Task 601 — Calibration files: measured field data, against the model that predicts it.
+- Task 604 — Read an EPANET `.PRO` profile file.
 - Task 637 — A Graph button on the Properties box.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
@@ -20,14 +23,11 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 751 — Criticality analysis: break each asset in turn and report.
 - Task 754 — On-the-fly demand adjustment: an analysis that scales demands on a copy.
 
-## 75 — Soon (19)
+## 75 — Soon (16)
 
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
-- Task 600 — The three EPANET plots we do not have: contour, frequency, flow balance.
-- Task 601 — Calibration files: measured field data, against the model that predicts it.
-- Task 604 — Read an EPANET `.PRO` profile file.
 - Task 617 — More map view options, the opacity one having shipped.
 - Task 623 — File loss judged only by people whose files are throwaway.
 - Task 639 — Layers: the first heading under Map and page.
