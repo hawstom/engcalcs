@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**18 still to read on master**, of 36 untranslated keys, of 2189 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**20 still to read on master**, of 38 untranslated keys, of 2191 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (36, 18 to read @@ NEEDS RULING)
+## lpn_  (38, 20 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -62,6 +62,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   @@ NEEDS RULING
 - **`lpn_contour_consent_1`**
   > Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.
+  @@ NEEDS RULING
+- **`lpn_contour_consent_2`**
+  > This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.
+  @@ NEEDS RULING
+- **`lpn_contour_consent_3`**
+  > May we send the tile numbers of your network's area to Mapbox?
   @@ NEEDS RULING
 - **`lpn_contour_consent_4`**
   > If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.
@@ -140,7 +146,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**120 still to read**, of 171 new keys across 15 unmerged branch(es).
+**121 still to read**, of 172 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -151,7 +157,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/calibration (`712bb260`) — 41 new, 41 to read @@ NEEDS RULING
+### feat/calibration (`cce72f76`) — 42 new, 42 to read @@ NEEDS RULING
 
 - **`lpn_calib_axis_obs`**
   > Observed: {q}
@@ -249,6 +255,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_calib_session`**
   > A calibration file is held for this session only. It is not saved with the project or on this device.
   @@ NEEDS RULING
+- **`lpn_calib_single`**
+  > This is a single-period run, so every measurement is compared with its one result, whatever time the file gives.
+  @@ NEEDS RULING
 - **`lpn_calib_tab_corr`**
   > Correlation plot
   @@ NEEDS RULING
@@ -277,7 +286,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.
   @@ NEEDS RULING
 
-### feat/contour (`eff6df3a`) — adds no English strings
+### feat/contour (`72a5df5f`) — adds no English strings
 
 ### feat/criticality (`84ea5311`) — 31 new, 8 to read @@ NEEDS RULING
 
@@ -611,7 +620,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/flow-balance (`b7b530c6`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/flow-balance (`f5be7f04`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_sysflow_consumed`**
   > Consumed
@@ -635,7 +644,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > System flow balance
   @@ NEEDS RULING
 
-### feat/keyboard-menu (`f783fe5f`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/keyboard-menu (`db228dbd`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_hotkeys_menu_def`**
   > <table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>
@@ -699,5 +708,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_result_pump_head_tip`**
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   @@ NEEDS RULING
-
-### fix/label-eviction (`840cb7cc`) — adds no English strings
