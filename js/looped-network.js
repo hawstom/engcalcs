@@ -31029,11 +31029,9 @@ var EngCalcs = EngCalcs || {};
 		// A rebuilt drawing's meter labels are blank until a content pass writes them, so their
 		// content is kept as well as their spot.
 		Object.keys(custLblEls).forEach(function (id) {
-			var ce = custLblEls[id], g = grabBucketHolder(ce);
-			g.empty = !!ce.empty;
-			g.hidden = ce.text.style.visibility === 'hidden';
-			g.spot = ce.spot; g.trials = ce.trials;
-			out.custs[id] = g;
+			var ce = custLblEls[id];
+			out.custs[id] = Object.assign(grabBucketHolder(ce), { empty: !!ce.empty,
+				hidden: ce.text.style.visibility === 'hidden', spot: ce.spot, trials: ce.trials });
 		});
 		return out;
 	}
