@@ -114,7 +114,8 @@
         "feat/calibration",
         "feat/profile-file",
         "feat/dock",
-        "feat/dialog-audit"
+        "feat/dialog-audit",
+        "feat/table-selection"
     ],
     "feature_freeze": {
         "active": false,
