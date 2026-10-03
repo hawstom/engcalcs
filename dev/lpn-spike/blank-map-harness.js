@@ -63,7 +63,8 @@ const INJECT =
 	"\t\tinit: init, saveToStorage: saveToStorage, indexEntry: indexEntry,\n" +
 	"\t\taddNode: addNode, addLink: addLink,\n" +
 	"\t\tgetDoc: function () { return doc; },\n" +
-	"\t\tgetLibrary: function () { return library; }\n";
+	"\t\tgetLibrary: function () { return library; },\n" +
+	"\t\tnoticeLog: function () { return noticeLog.slice(); }\n";
 
 function boot() {
 	clearResizeObservers();
@@ -127,9 +128,11 @@ const after = boot();
 	// pinned literal would tax the next rewording with a red build.
 	const said = PC.lpn_storage_unreadable;
 	check(!!said, 'the page supplies lpn_storage_unreadable');
-	check(alerts.length === 1 && alerts[0] === said,
-		'THE USER IS TOLD: one modal, carrying lpn_storage_unreadable',
-		alerts.length + ' alert(s)');
+	// Task 710: the modal became a warning in the message log, which outlasts the status line.
+	const told = after.noticeLog().filter(r => r.text === said);
+	check(alerts.length === 0 && told.length === 1 && told[0].severity === 'warning',
+		'THE USER IS TOLD: one warning in the message log, and no blocking alert',
+		alerts.length + ' alert(s), ' + told.length + ' log row(s)');
 	check(byId.lpn_status_text.textContent === said,
 		'and the status line says the same thing');
 }
@@ -149,8 +152,8 @@ console.log('--- the solve debounce fires one autosave ---');
 	const now = localStorage.getItem(PKEY(openId));
 	check(now === corrupt, 'THE BYTES SURVIVE: the autosave refused to write over them',
 		now === null ? 'the key is gone' : now.length + ' chars');
-	check(alerts.length === 1, 'and the reader is not told a second time per debounce',
-		alerts.length + ' alert(s)');
+	check(after.noticeLog().filter(r => r.text === PC.lpn_storage_unreadable).length === 1,
+		'and the reader is not told a second time per debounce');
 
 	// Ten more, because the refusal has to hold for the whole session and not just the first frame.
 	for (let n = 0; n < 10; n++) { after.saveToStorage(); }

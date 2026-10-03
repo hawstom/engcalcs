@@ -5378,7 +5378,7 @@ var EngCalcs = EngCalcs || {};
 			return s.prop && pushFieldShown(s) && (!group || s.group === group);
 		});
 		if (!active.length) {
-			alert(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
+			setNotice(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
 			return;
 		}
 		// Counted, not estimated: how many overrides would actually be discarded. Zero says so in
@@ -5402,7 +5402,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			if (any) { touched++; }
 		});
-		if (!hits) { alert(pc.lpn_scenario_push_none || 'No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.'); return; }
+		if (!hits) { setNotice(pc.lpn_scenario_push_none || 'No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.'); return; }
 		// NAMES the properties as well as counting them, and NAMES THE ELEMENT when scoped to one --
 		// reusing lpn_field_id ("ID") rather than minting a key, per the whole-label reuse rule.
 		var msg = (pc.lpn_scenario_push_confirm || 'Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this.')
@@ -13819,7 +13819,7 @@ var EngCalcs = EngCalcs || {};
 		// tell it from a picture placed off screen.
 		img.onerror = function () {
 			var pc = EngCalcs.pageConfig || {};
-			alert(pc.lpn_backdrop_unreadable || 'This picture cannot be shown by your web browser. Save it as a PNG or JPEG picture and add it again.');
+			setWarning(pc.lpn_backdrop_unreadable || 'This picture cannot be shown by your web browser. Save it as a PNG or JPEG picture and add it again.');
 		};
 		img.src = dataUrl;
 	}
@@ -13919,8 +13919,8 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
 		reader.onload = function (ev) {
 			var w = parseWorldFile(ev.target.result);
-			if (!w) { alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.'); return; }
-			if (!w.ok) { alert(pc.lpn_backdrop_wld_bad || 'This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.'); return; }
+			if (!w) { setWarning(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.'); return; }
+			if (!w.ok) { setWarning(pc.lpn_backdrop_wld_bad || 'This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.'); return; }
 			applyWorldFile(w);
 		};
 		reader.readAsText(file);
@@ -13999,7 +13999,7 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {}, clicks = [];
 		setRegMode(true);
-		alert(pc.lpn_backdrop_scale_prompt1 || 'Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.');
+		setNotice(pc.lpn_backdrop_scale_prompt1 || 'Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.');
 		var handler = function (e) {
 			clicks.push(worldToImageLocal(screenToWorld(e.clientX, e.clientY)));
 			if (clicks.length === 2) {
@@ -14036,7 +14036,7 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {};
 		setRegMode(true);
-		alert(pc.lpn_backdrop_scale_from_prompt1
+		setNotice(pc.lpn_backdrop_scale_from_prompt1
 			|| 'Click the point on the background image that should stay where it is.');
 		var handler = function (e) {
 			svg.removeEventListener('pointerup', handler, true);
@@ -14088,12 +14088,12 @@ var EngCalcs = EngCalcs || {};
 		} else {
 			w = parseWorldFile(t);
 			if (w) {
-				if (!w.ok) { alert(pc.lpn_backdrop_wld_bad || 'This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.'); return; }
+				if (!w.ok) { setWarning(pc.lpn_backdrop_wld_bad || 'This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.'); return; }
 				applyWorldFile(w);
 				return;
 			}
 		}
-		alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.');
+		setWarning(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.');
 	}
 	// WE NEVER ASK FOR A WORLD FILE AS A FILE -- we ask for a paste of its CONTENTS, or for the image
 	// and its sidecar picked together in the one picker (readWorldFile). A sidecar cannot be
@@ -14113,11 +14113,11 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {};
 		setRegMode(true);
-		alert(pc.lpn_backdrop_position_prompt1 || 'Click the base point (on the image) for the move.');
+		setNotice(pc.lpn_backdrop_position_prompt1 || 'Click the base point (on the image) for the move.');
 		var handler = function (e) {
 			svg.removeEventListener('pointerup', handler, true);
 			var refWorld = screenToWorld(e.clientX, e.clientY);
-			alert(pc.lpn_backdrop_position_prompt2 || 'Choose the method for the destination point, then click Continue.');
+			setNotice(pc.lpn_backdrop_position_prompt2 || 'Choose the method for the destination point, then click Continue.');
 			showBackdropTargetPanel(refWorld);
 		};
 		svg.addEventListener('pointerup', handler, true);
@@ -22585,7 +22585,7 @@ var EngCalcs = EngCalcs || {};
 				// rule and its message; `reread` above then puts the old id back in the box, so a
 				// refused rename leaves the document and the cell saying the same thing.
 				ok = validateNewId(newId, el.id, group);
-				if (ok !== true) { alert(ok); return; }
+				if (ok !== true) { setWarning(ok); return; }
 				if (group === 'node') { applyNodeRename(el.id, newId); }
 				else { applyLinkRename(el.id, newId); }
 			} };
@@ -31562,7 +31562,7 @@ var EngCalcs = EngCalcs || {};
 			// answers a document that cannot be opened the same way, and this is that plus a refusal
 			// to write. The quota message keeps the status line alone: there the work is still on
 			// screen and still editable, so a modal per failed autosave would be unusable.
-			if (!unreadableTold) { unreadableTold = true; alert(said); }
+			if (!unreadableTold) { unreadableTold = true; setWarning(said); }
 			return;
 		}
 		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.');
@@ -32767,7 +32767,7 @@ var EngCalcs = EngCalcs || {};
 		if (!saved || typeof saved !== 'object' || typeof saved.v !== 'number') { return null; }
 		if (saved.v > LPN_STORAGE_VERSION) {
 			var pc = EngCalcs.pageConfig || {};
-			alert(pc.lpn_storage_too_new || 'This project was saved by a newer version of the page, so it cannot be opened here.');
+			setWarning(pc.lpn_storage_too_new || 'This project was saved by a newer version of the page, so it cannot be opened here.');
 			return null;
 		}
 		// The four collections are the one part applySaved() takes on trust (`saved.nodes || []`),
@@ -33885,7 +33885,7 @@ var EngCalcs = EngCalcs || {};
 		rememberOutgoingProject();
 		var id = newProjectId();
 		if (!writeJSON(projectKey(id), saved)) {
-			alert(pc.lpn_import_no_room || 'There is not enough browser storage left to add this project. Delete a project you no longer need and try again.');
+			setWarning(pc.lpn_import_no_room || 'There is not enough browser storage left to add this project. Delete a project you no longer need and try again.');
 			return null;
 		}
 		// **OPEN FIRST, THEN APPLY** -- the order openProject() has always used, and the reason is the
@@ -33922,7 +33922,7 @@ var EngCalcs = EngCalcs || {};
 		// prepareDocument() reports a too-new file itself, and returns null either way; a second
 		// alert on top of that one would be noise, so only the not-a-project case speaks here.
 		if (parsed && typeof parsed.v === 'number' && parsed.v > LPN_STORAGE_VERSION) { return null; }
-		alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
+		setWarning(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
 		return null;
 	}
 	function importProjectFromFile(file) {
@@ -33930,7 +33930,7 @@ var EngCalcs = EngCalcs || {};
 		reader.onload = function (ev) { landProjectText(ev.target.result, false); };
 		reader.onerror = function () {
 			var pc = EngCalcs.pageConfig || {};
-			alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
+			setWarning(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
 		};
 		reader.readAsText(file);
 	}
@@ -34780,7 +34780,7 @@ var EngCalcs = EngCalcs || {};
 		if (conv.ok) { lastNetUnnamed = conv.unnamedOptions || []; return conv.inp; }
 		// A `.net` we cannot read is refused outright, never half-read -- see the integrity check in
 		// js/lpn-net.js. The way out is always available and always works, so the message names it.
-		alert((pc.lpn_net_bad_file || 'This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use the File, Export, Network command there to save it as an .inp file, then import that.') +
+		setWarning((pc.lpn_net_bad_file || 'This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use the File, Export, Network command there to save it as an .inp file, then import that.') +
 			(conv.detail ? ' (' + conv.detail + ')' : ''));
 		return null;
 	}
@@ -34796,7 +34796,7 @@ var EngCalcs = EngCalcs || {};
 			if (text === null) { return; }   // inpTextFromBytes already said why
 			landInpText(text, file.name, false);
 		};
-		reader.onerror = function () { alert(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.'); };
+		reader.onerror = function () { setWarning(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.'); };
 		// BYTES, not text: which of EPANET's two formats this is gets decided by the content (see
 		// inpTextFromBytes), and decoding a binary .net as UTF-8 first would destroy it.
 		reader.readAsArrayBuffer(file);
@@ -34808,7 +34808,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		var parsed = EngCalcs.lpnInpParse ? EngCalcs.lpnInpParse(text) : { ok: false };
 		if (!parsed.ok) {
-			alert(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.');
+			setWarning(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.');
 			return;
 		}
 		// The units strip moves FIRST. docFromInp() is written against the selector state --
@@ -34918,7 +34918,7 @@ var EngCalcs = EngCalcs || {};
 		// what is in it is decided by reading it rather than by believing the name.
 		reader.onload = function (ev) { landSurveyText(String(ev.target.result), file.name); };
 		reader.onerror = function () {
-			alert(pc.lpn_survey_read_error || 'That file could not be read from your disk.');
+			setWarning(pc.lpn_survey_read_error || 'That file could not be read from your disk.');
 		};
 		reader.readAsText(file);
 	}
@@ -34980,8 +34980,8 @@ var EngCalcs = EngCalcs || {};
 		parsed = read();
 		// A file nothing can be read out of at all gets the sentence and no box: there is no
 		// question to ask about it, and a chooser over an empty file teaches nothing.
-		if (!parsed.ok && parsed.error === 'empty') { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
-		if (!parsed.ok && parsed.error === 'ambiguous-coord') { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
+		if (!parsed.ok && parsed.error === 'empty') { setWarning(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
+		if (!parsed.ok && parsed.error === 'ambiguous-coord') { setWarning(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 		openDialog(function (body) {
 			var wrap = document.createElement('div'), sel, note, preview, typeSel, typeNote, internalNote;
 			// **THE ASSET KIND COMES FIRST, AND THE REASON IS THAT IT IS IRREVERSIBLE** (Tom,
@@ -35095,7 +35095,7 @@ var EngCalcs = EngCalcs || {};
 			draw();
 		}, [
 			{ label: pc.lpn_survey_create || 'Create nodes', fn: function () {
-				if (!parsed.ok) { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
+				if (!parsed.ok) { setWarning(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 				rememberSurveyFormat(format);
 				showSurveyReport(parsed, createSurveyNodes(parsed, assetType));
 			} },
@@ -35261,7 +35261,7 @@ var EngCalcs = EngCalcs || {};
 			if (text.replace(/^\uFEFF/, '').trim().charCodeAt(0) === 0x7B) { landProjectText(text, true); }
 			else { landInpText(text, file.name, true); }
 		};
-		reader.onerror = function () { alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.'); };
+		reader.onerror = function () { setWarning(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.'); };
 		reader.readAsArrayBuffer(file);
 	}
 	// **AN UPLOAD, NOT A LIVE FILE HANDLE, in every browser.** What comes out of this is a placed
@@ -36573,7 +36573,7 @@ var EngCalcs = EngCalcs || {};
 		var target = await inspectSaveTarget(handle);
 		if (target.heldBy) {
 			// Somebody is in it right now. Not negotiable.
-			alert(pc.lpn_saveas_same_file || 'That is the same file somebody else has open, so it cannot be saved over. Choose a different file or a different name.');
+			setWarning(pc.lpn_saveas_same_file || 'That is the same file somebody else has open, so it cannot be saved over. Choose a different file or a different name.');
 			return;
 		}
 		// The file has moved on since we last saw it. Asked BEFORE the foreign question because it is
@@ -36709,7 +36709,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, text;
 		try { text = await (await handle.getFile()).text(); }
 		catch (err) {
-			alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
+			setWarning(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
 			return;
 		}
 		var saved = acceptImportedText(text);
@@ -45655,7 +45655,7 @@ var EngCalcs = EngCalcs || {};
 			wrap.className = 'lpn-set-ctlgroup';
 			input.type = 'text'; input.size = 4; input.value = settings.idPrefixes[key];
 			input.addEventListener('change', function () {
-				if (!validatePrefix(input.value)) { alert(pc.lpn_id_invalid || 'Enter an ID with no spaces and no quotation marks.'); input.value = settings.idPrefixes[key]; return; }
+				if (!validatePrefix(input.value)) { setWarning(pc.lpn_id_invalid || 'Enter an ID with no spaces and no quotation marks.'); input.value = settings.idPrefixes[key]; return; }
 				settings.idPrefixes[key] = input.value;
 				saveToStorage();
 			});
@@ -45829,12 +45829,12 @@ var EngCalcs = EngCalcs || {};
 				textRow('key', pc.lpn_cp_key || 'Key', pc.lpn_cp_key_tip, function (input) {
 					var k = customPropKey(input.value), all = customPropDefs(), j;
 					if (!k) {
-						alert(pc.lpn_cp_key_needed || 'Give this custom property a key with no spaces.');
+						setWarning(pc.lpn_cp_key_needed || 'Give this custom property a key with no spaces.');
 						input.value = customPropBareKey(def.key); return;
 					}
 					for (j = 0; j < all.length; j++) {
 						if (j !== i && all[j].key === k) {
-							alert(pc.lpn_cp_key_taken || 'Another custom property already uses that key.');
+							setWarning(pc.lpn_cp_key_taken || 'Another custom property already uses that key.');
 							input.value = customPropBareKey(def.key); return;
 						}
 					}
@@ -46002,7 +46002,7 @@ var EngCalcs = EngCalcs || {};
 			// most expensive thing this page can do to a document, from a button whose label says
 			// nothing about scenarios.
 			if (!inBaseScenario()) {
-				alert((pc.lpn_push_base_only || 'This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.')
+				setWarning((pc.lpn_push_base_only || 'This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.')
 					.replace(/\{base\}/g, pc.lpn_scenario_base || 'Base'));
 				return;
 			}
@@ -46022,7 +46022,7 @@ var EngCalcs = EngCalcs || {};
 			// displayed this button would otherwise look broken, and the reason is off-screen in
 			// another panel. Naming that panel is the whole value of the message.
 			if (!active.length) {
-				alert(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
+				setNotice(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
 				return;
 			}
 			// TWO different counts, because "nothing to do" has two causes needing different
@@ -46049,11 +46049,11 @@ var EngCalcs = EngCalcs || {};
 			var nodeCounts = counts(doc.nodes, 'node'), linkCounts = counts(doc.links, 'link');
 			var carriers = nodeCounts.carriers + linkCounts.carriers;
 			var targets = nodeCounts.changing + linkCounts.changing;
-			if (!carriers) { alert(pc.lpn_push_nothing || 'No existing asset has any of the properties being applied.'); return; }
+			if (!carriers) { setNotice(pc.lpn_push_nothing || 'No existing asset has any of the properties being applied.'); return; }
 			// Distinct from the message above on purpose: "nothing carries these properties" and
 			// "everything already has these values" are opposite situations, and telling a user the
 			// first when the second is true would send them hunting for a problem that isn't there.
-			if (!targets) { alert(pc.lpn_push_no_change || 'Every asset already has these values, so nothing would change.'); return; }
+			if (!targets) { setNotice(pc.lpn_push_no_change || 'Every asset already has these values, so nothing would change.'); return; }
 			// The confirm NAMES the properties, it does not merely count them -- a count alone
 			// ("push 2 properties?") leaves the user guessing which two, and this action is not
 			// something to guess at. Assembled from already-translated label text plus two short
@@ -48380,7 +48380,7 @@ var EngCalcs = EngCalcs || {};
 		reader.onload = function (ev) { libImportText(ev.target.result, file.name); };
 		reader.onerror = function () {
 			var pc = EngCalcs.pageConfig || {};
-			alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
+			setWarning(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
 		};
 		reader.readAsText(file);
 	}
@@ -49791,7 +49791,7 @@ var EngCalcs = EngCalcs || {};
 		del = libButton(pc.lpn_tool_delete || 'Delete', function () {
 			var inUse = pipeTypeUsers(t.id);
 			if (inUse.length) {
-				alert((pc.lpn_library_pipetype_in_use
+				setWarning((pc.lpn_library_pipetype_in_use
 					|| 'This pipe type is used by {count} pipes: {ids}. Detach it from them before deleting it.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
@@ -50054,7 +50054,7 @@ var EngCalcs = EngCalcs || {};
 		del = libButton(pc.lpn_tool_delete || 'Delete', function () {
 			var inUse = fittingSetUsers(set.id);
 			if (inUse.length) {
-				alert((pc.lpn_library_fittings_in_use
+				setWarning((pc.lpn_library_fittings_in_use
 					|| 'This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
@@ -50306,7 +50306,7 @@ var EngCalcs = EngCalcs || {};
 		del = libButton(pc.lpn_tool_delete || 'Delete', function () {
 			var inUse = curveUsers(c.id);
 			if (inUse.length) {
-				alert((pc.lpn_library_curve_in_use
+				setWarning((pc.lpn_library_curve_in_use
 					|| 'This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
@@ -52520,7 +52520,7 @@ var EngCalcs = EngCalcs || {};
 		input.setAttribute('aria-label', pc.lpn_field_id || 'ID');
 		input.addEventListener('change', function () {
 			var newId = input.value, result = validateNewId(newId, currentId, group);
-			if (result !== true) { alert(result); input.value = currentId; return; }
+			if (result !== true) { setWarning(result); input.value = currentId; return; }
 			if (newId !== currentId) { saveUndoSnapshot(); onRename(newId); }
 		});
 		title.appendChild(input);
@@ -56199,7 +56199,7 @@ var EngCalcs = EngCalcs || {};
 		if (!t) { return; }
 		kind = severity === 'warning' ? 'warning' : 'notice';
 		for (i = 0; i < noticeLog.length; i++) {
-			if (noticeLog[i].text === t && noticeLog[i].severity === kind) { noticeLog.splice(i, 1); break; }
+			if (noticeLog[i].text === t) { noticeLog.splice(i, 1); break; }
 		}
 		noticeLog.unshift({ text: t, severity: kind, at: Date.now() });
 		while (noticeLog.length > NOTICE_LOG_MAX) { noticeLog.pop(); }
@@ -56450,12 +56450,15 @@ var EngCalcs = EngCalcs || {};
 		if (el && el.textContent === words) { return; }
 		showNotice(words);
 	}
-	function setNotice(text) {
+	// Task 710: what used to be a blocking alert() is a notice, and a failure or refusal is the
+	// banner's second severity. Same door, same log; not a new message system.
+	function setWarning(text) { setNotice(text, 'warning'); }
+	function setNotice(text, severity) {
 		if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }
 		// **EVERY NOTICE IS KEPT BEFORE IT IS SHOWN** (Task 704). This is the one door 66 call
 		// sites already go through, which is why the log needed no second seam: teaching the door
 		// teaches all of them at once.
-		logMessage(text, 'notice');
+		logMessage(text, severity);
 		showNotice(text);
 		if (text) {
 			statusNoticeTimer = setTimeout(function () {
@@ -61406,7 +61409,7 @@ var EngCalcs = EngCalcs || {};
 	function loadCalibFile(file) {
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
 		reader.onload = function (ev) { landCalibText(String(ev.target.result), file.name); };
-		reader.onerror = function () { alert(pc.lpn_survey_read_error || 'That file could not be read from your disk.'); };
+		reader.onerror = function () { setWarning(pc.lpn_survey_read_error || 'That file could not be read from your disk.'); };
 		reader.readAsText(file);
 	}
 	function openCalibBox() {
