@@ -157,7 +157,6 @@ new unique prefix and document it here.
 | `lpn_` | Looped Pipe Network, map interface — see below |
 
 `mi`, `mtc`, `wi` predate the `*_main_menu` convention and name their menu entry `<prefix>_menu`.
-The coverage declaration also lists `irr`, which owns no keys — probably a legacy alias of `ip`.
 
 ### `lpn_` in particular
 

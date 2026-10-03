@@ -35,10 +35,9 @@
  * A declaration that no longer names a real prefix is itself a finding, the same way page_meta's
  * exempt list is: an entry nobody can reach describes a decision about something that is gone.
  *
- * WHAT IS ONLY A NOTE. A prefix wired in the map with no keys in English today (wfs, wfi, irr, ds,
- * pd, rrc) delivers nothing to nobody and costs nothing. Removing one is a judgement — CLAUDE.md
- * records `irr` as "probably a legacy alias of ip" and declines to guess — so these are listed and
- * do not fail.
+ * WHAT IS ONLY A NOTE. A prefix wired in the map with no keys in English today (wfs, wfi, ds,
+ * pd, rrc) delivers nothing to nobody and costs nothing. Removing one is a judgement, so these
+ * are listed and do not fail.
  *
  * Usage:
  *   php dev/scripts/prefix_map_check.php
@@ -175,7 +174,7 @@ echo 'Prefix glossary map OK -- ' . count($f['counts']) . ' prefixes in lib/lang
 if ($f['unused']) {
     echo 'NOTE: wired but owning no English key today: ' . implode(', ', $f['unused']) . ".\n";
     echo "      They deliver nothing to nobody and cost nothing. Whether one is legacy debt is a\n";
-    echo "      judgement (CLAUDE.md records 'irr' as probably a legacy alias of ip), so this is\n";
+    echo "      judgement, so this is\n";
     echo "      a note and not a failure.\n";
 }
 exit(0);
