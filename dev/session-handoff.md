@@ -101,60 +101,57 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-03 (night)
+## STATE — 2026-10-03 (late night)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged 2026-10-03 night: keyboard-menu (748) and calibration (601) on his "Merge both";
-fix/report-column (Full report Type column fits its longest word, 27 languages), fix/psi-factor
-(lpn uses EPANET's 0.4333 psi/ft, his "OK"; suite-wide factors stay exact, `lib/Units.lib.php`),
-chore/irr (it was the Irrigation landing page, deleted 2026-08-08), Ida's
-`dev/tip-and-selection-audit.md`, Mary's `dev/flow-balance-terms.md`. Roadmap: 441 to 100
-(dock/hide/autohide at every non-modal box's corner, his words), new 759 (selection words, tips).
+Merged 2026-10-03: keyboard-menu (748, closed) and calibration (601, closed) on his "Merge both";
+contour (600) on his "Merge contour", then fix/contour-hole (a pump-in-one-zone fault hid whole
+pipes; break lines now span one buffer width, his ruling). Defect/chore tracks: report-column (he
+closed it), psi-factor (lpn uses EPANET's 0.4333 psi/ft), menu-keyboard race, irr removed, About's
+message of love links to his blog post (all 27 languages). Ida's audit and follow-up, Mary's flow
+terms. Roadmap: 441 at 100 (box-corner dock/hide/autohide), new 759 (selection words, tips).
 
-### Awaiting his browser pass (protected; merge on his all-clear)
+### Awaiting him
 
-Each is green bar the expected `payload freshness`, pushed. His whole-message pastes are his own
-(`~/.claude/CLAUDE.md`, 2026-10-03); if the classifier still refuses an all-clear, ask with
-AskUserQuestion. ports.conf rows say what to test.
-- 8106 `feat/property-graph` (637): the box carrying a graph runs map top to window bottom (his
-  ask). To rule: a box with no graph keeps natural height (CC's choice).
-- 8110 `feat/demand-scaling` (754 + 751): his heading and Finds sentence; the three Analyze tools
-  parallel ("Junctions to test / Links to break / Junctions to scale", "All X / Selected X",
-  "Select junctions or choose All junctions."). To rule: five stale `$ec_lang_syn` entries
-  (lpn_ff_all, lpn_ff_selected, lpn_ds_head_search_selected, lpn_ds_scope_tip,
-  lpn_ds_search_note_selected), proposals in the 10-03 report; syn is his to approve.
-- 8109 `feat/flow-balance` (600): labelled "Flow balance"; lines stay Produced / Consumed (his
-  ruling after Mary's evidence); two-row tab strip is OK (his).
-- 8113 `feat/contour` (600): rebuilt from his pass: per-link corridor union at 2.5 x median pipe
-  length (all 22 Net3 loops filled), soft fade, zone break line at pumps/valves, labelled smoothed
-  contours (5 psi / 5 m), control box docked at the map's top-right; Perry clean. New localStorage
-  furniture key `lpn_contourbox` (told him). To rule: Smooth vs Bands default; 2.5 x; phone box
-  fills screen; the reworded `contour_consent_1..4` ("tile numbers"), which is public consent text.
-- 8108 `feat/profile-file` (604), `feat/desktop` (756), `feat/label-placer` (539/741): unchanged.
-- **Interview out:** https://claude.ai/artifact/4mL8BuUzFTJi7eqjGPu8RZ (Ida's 8 decisions, Task
-  759). Read answers with ArtifactData `list` collection `answers`; rules come from his note text.
+- **Browser pass (protected):** 8106 `feat/property-graph` (box carrying a graph runs map top to
+  window bottom; a box with no graph keeps natural height, CC's choice); 8110 `feat/demand-scaling`
+  (his wording; three Analyze tools parallel); 8109 `feat/flow-balance` ("Flow balance"; lines stay
+  Produced / Consumed, his ruling); 8108 `feat/profile-file`; `feat/desktop`; `feat/label-placer`.
+- **`chore/selection-word` (pushed, held):** applies his Q1-Q3 rule (select = map set, choose =
+  lists) to 9 strings, 7 of them ruled (those rulings lapse), plus `selection_word_check.php`. One
+  result reads badly: `lpn_crs_list_tip` "Choose one, then press Choose." Show him the list first.
+  Its baseline exempts lpn_ff_*/lpn_ds_*/lpn_crit_* until demand-scaling merges.
+- **Syn proposals (his to approve):** five stale `$ec_lang_syn` entries on demand-scaling.
+- **Interview answered** (https://claude.ai/artifact/4mL8BuUzFTJi7eqjGPu8RZ): Q1-Q3, Q5, Q6 = a
+  (rules from his notes); Q4/Q7 answered by Ida in `dev/tip-followup-2026-10-03.md` (two tiers by
+  content, about 75 characters; no status strip; her in-menu description line withdrawn). Q5 (a `?`
+  beside the X of the three Analyze tools) waits on demand-scaling.
+- **Tip review out:** https://claude.ai/artifact/V6DRoU2z8sCZgMHGV92XLx, 272 tips from
+  `dev/tip-review.csv`; read his verdicts with ArtifactData `list` collection `verdicts`. Hold tip
+  edits until then (108 are ruled).
+- **Wave 0, 3 strings to rule:** lpn_copy_kept_link, lpn_calib_network (EPANET says "Network";
+  recommend keep), lpn_graphs_menu_tip. File: `~/webdev/1003-wave0.json.pending`, to be committed
+  into `dev/english-friction/` once he rules (an open entry fails friction_check).
+- **Open questions:** kPa to follow EPANET's factor too (0.045%); contour Smooth vs Bands default;
+  privacy.php's "Ground elevations" row (the contour merge reworded the consent paragraphs to "tile
+  numbers"; privacy.php itself is unchanged).
 
-**Seams:** 441 (box-corner icons) waits on property-graph (Properties placement) and his interview
-answer Q5 (a `?` beside each box's X). 681(b) waits on the label-placer rulings (same code).
-
-### Found 2026-10-03, not yet a task
-
-- **privacy.php's "Ground elevations" row overstates what is sent**: Terrain-RGB requests carry tile
-  numbers and the token, not node latitude/longitude. Public text: his ruling. The contour branch
-  rewords the consent paragraphs to match; privacy.php itself is unchanged.
-- **EPANET's kPa is 6.895 x 0.4333 = 9.8021 kPa/m against our exact 9.80665** (0.045%). Not
-  changed; his call whether kPa follows psi.
+**Seams:** 441 waits on property-graph and Q5. 681(b) waits on the label-placer rulings.
 
 ### Owed translation work
 
-Wave 0 for master's 54 new lpn strings: `~/webdev/1003-wave0.json.pending`, to be committed into `dev/english-friction/` once he rules (an open entry fails friction_check); 51 dismissed, 3
-refer-to-human (lpn_copy_kept_link, lpn_calib_network, lpn_graphs_menu_tip). Sprint not launched:
-~67 keys a language on master, plus the four branches' keys; run one sprint after they merge.
-Master also owes the Redo Help row (approved text; needs all 27 at once), the Romanian file menu
-noun/verb pass, four concept terms, glossary write-back from echo.
+~92 lpn keys a language on master (calibration, contour, keyboard-menu, bentley 13, Status "now"
+strings, the Redo Help row), plus the pending branches' keys. Run one sprint after demand-scaling,
+flow-balance and selection-word land, after Wave 0 is ruled. Romanian file menu noun/verb pass;
+four concept terms; glossary write-back from echo.
 
 ### Traps met 2026-10-03
+
+- **Port 8100 shows origin/master only after `sh ~/webdev/worktrees/_panel/generate.sh`.** Run it
+  after every master push; once it was skipped and he saw no fix that was already pushed.
+- **He cannot paste images over ssh/tmux.** He saves the screenshot and runs
+  `scp $HOME\Pictures\x.png haws@192.168.0.234:/tmp/`; read it, then delete it.
 
 - **A harness that flakes only under load can be a real race.** `menu-keyboard-harness.js` failed
   3 times in check_all: a starved `setTimeout(0)` focus restore from one menu ran after the next
