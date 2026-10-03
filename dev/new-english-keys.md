@@ -259,7 +259,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > ✓ At a demand scale of {m}, every junction keeps {pressure}.
   @@ NEEDS RULING
 - **`lpn_ds_scaled_selected`**
-  > Only the selected junctions were scaled. Junctions scaled: {n}.
+  > Only the selected junctions were scaled and checked. Junctions scaled: {n}.
   @@ NEEDS RULING
 - **`lpn_ds_scope`**
   > Demands to scale
@@ -271,7 +271,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Selected junctions
   @@ NEEDS RULING
 - **`lpn_ds_scope_tip`**
-  > Scale the demand of every junction, or only of the junctions selected on the map. Pressures are checked at every junction either way.
+  > Scale the demand of every junction, or only of the junctions selected on the map. Pressures are checked at the junctions scaled.
   @@ NEEDS RULING
 - **`lpn_ds_search_note`**
   > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which every junction keeps the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.
@@ -320,7 +320,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**3 still to read**, of 8 new keys across 9 unmerged branch(es).
+**3 still to read**, of 8 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -331,11 +331,15 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### chore/roadmap-1003 (`961684fd`) — adds no English strings
+
 ### feat/criticality (`84ea5311`) — adds no English strings
 
-### feat/demand-scaling (`f8a1f61a`) — adds no English strings
+### feat/demand-scaling (`0503046e`) — adds no English strings
 
-### feat/keyboard-menu (`5d65b8f2`) — adds no English strings
+### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/keyboard-menu (`a277629f`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 

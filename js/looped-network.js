@@ -57916,7 +57916,7 @@ var EngCalcs = EngCalcs || {};
 	function dsScopeLine(host, rec) {
 		var pc = EngCalcs.pageConfig || {};
 		if (!rec || rec.scaledCount === undefined) { return; }
-		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_scaled_selected || 'Only the selected junctions were scaled. Junctions scaled: {n}.')
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_scaled_selected || 'Only the selected junctions were scaled and checked. Junctions scaled: {n}.')
 			.replace('{n}', String(rec.scaledCount)), host);
 	}
 	function dsProbeLine(host, rec) {

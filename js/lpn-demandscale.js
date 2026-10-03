@@ -19,6 +19,14 @@
 // that broke that rule (a pump or a valve changing state mid-range) would be answered at one of its
 // crossings, not necessarily the first.
 //
+// **THE JUNCTIONS SCALED ARE THE JUNCTIONS JUDGED** (Tom's browser pass, 2026-10-03, on Net3 at
+// 7:00: *"The Time Series graph shows all the selected junctions above 55 psi at 7:00. But Scaling
+// Find says '⚠ At least one junction is below 20 psi even with the scaled demands at zero.'"*). The
+// verdict had been taken over every junction, so a junction beside a tank, low whatever the
+// selection draws, answered a question about three others. Under "Selected junctions" the verdict,
+// Find's lowest junction and Run's count below the limit are the selection's; Run's tables still
+// list every junction, so what the scaling does elsewhere stays in view.
+//
 // PURE, like js/lpn-fireflow.js and js/lpn-criticality.js: values in, values out. No DOM, no `doc`,
 // no strings, no engine of its own (options.solve is injected). It never writes to the caller's
 // model: every case is a new model whose scaled junctions are new objects.
@@ -89,11 +97,14 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	function junctionIds(model) {
 		return model.nodes.filter(function (n) { return n.type === 'junction'; }).map(function (n) { return n.id; });
 	}
-	// Every junction's pressure, lowest first. A junction the result does not answer is left out.
-	function pressureList(model, r) {
-		var out = [];
+	// Every junction's pressure, lowest first, or only those in `only` (an id list) when it is given.
+	// A junction the result does not answer is left out.
+	function pressureList(model, r, only) {
+		var out = [], keep = null;
+		if (only) { keep = {}; only.forEach(function (id) { keep[id] = true; }); }
 		junctionIds(model).forEach(function (id) {
 			var p = r.pressures ? r.pressures[id] : undefined;
+			if (keep && !keep[id]) { return; }
 			if (typeof p === 'number' && isFinite(p)) { out.push({ id: id, pressure: p }); }
 		});
 		return out.sort(function (a, b) { return a.pressure - b.pressure; });
@@ -119,12 +130,14 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	 * options:
 	 *   solve        REQUIRED function(model) -> result | Promise<result>, in lpnSolve's shape
 	 *   multiplier   REQUIRED, zero or more
-	 *   junctions    ids whose demands are scaled; null or omitted for every junction
+	 *   junctions    ids whose demands are scaled, and whose pressures are judged; null or omitted
+	 *                for every junction
 	 *   minPressure  metres of head; 0 when omitted
 	 *
 	 * Two solves: the scaled case, and the same copy unscaled, so every row can show both.
 	 * Resolves to { ok, multiplier, minPressure, pressures: [{id, pressure, unscaled}],
 	 * velocities: [{id, velocity, unscaled}], below: [{id, pressure}], solves } -- or { ok: false,
+	 * `pressures` is every junction's; `below` only the judged ones' (see `junctions`).
 	 * code, issues, multiplier, solves } when the scaled case did not solve.
 	 */
 	function run(model, options) {
@@ -138,7 +151,8 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 		return solveCase(opts.solve, model, m, scaled).then(function (c) {
 			if (!c.ok) { return { ok: false, code: c.code, issues: c.issues, multiplier: m, minPressure: minP, solves: 1 }; }
 			return solveCase(opts.solve, model, 1, scaled).then(function (b) {
-				var pBase = {}, vBase = {}, pressures, velocities;
+				var pBase = {}, vBase = {}, pressures, velocities, judged = null;
+				if (scaled) { judged = {}; scaled.forEach(function (id) { judged[id] = true; }); }
 				if (b.ok) {
 					pressureList(model, b.result).forEach(function (x) { pBase[x.id] = x.pressure; });
 					velocityList(model, b.result).forEach(function (x) { vBase[x.id] = x.velocity; });
@@ -155,7 +169,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 					minPressure: minP,
 					pressures: pressures,
 					velocities: velocities,
-					below: pressures.filter(function (x) { return x.pressure < minP; })
+					below: pressures.filter(function (x) { return x.pressure < minP && (!judged || judged[x.id]); })
 						.map(function (x) { return { id: x.id, pressure: x.pressure }; }),
 					unscaledCode: b.code,
 					solves: 2
@@ -167,8 +181,8 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	/**
 	 * EngCalcs.lpnDemandScaleSearch(model, options) -> Promise<search>
 	 *
-	 * The largest multiplier, on a grid of `step` from 0 to `max`, at which every junction's pressure
-	 * is at or above minPressure. A case that does not solve counts as not holding, and says why.
+	 * The largest multiplier, on a grid of `step` from 0 to `max`, at which every judged junction's
+	 * pressure is at or above minPressure (the scaled ones; every junction when `junctions` is null). A case that does not solve counts as not holding, and says why.
 	 *
 	 * options:
 	 *   solve, junctions, minPressure   as for lpnDemandScaleRun
@@ -205,7 +219,7 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 			return solveCase(opts.solve, model, mAt(k), scaled).then(function (c) {
 				var rec = { multiplier: mAt(k), ok: c.ok, code: c.code }, list;
 				if (c.ok) {
-					list = pressureList(model, c.result);
+					list = pressureList(model, c.result, scaled);
 					rec.lowest = list.length ? list[0] : null;
 					rec.holds = !list.length || list[0].pressure >= minP;
 				} else {
