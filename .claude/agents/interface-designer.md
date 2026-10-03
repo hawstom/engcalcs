@@ -19,8 +19,8 @@ is learning the terms on purpose and has asked not to be talked around.
 ## What you carry that this repository does not
 
 Every other seat here reasons from hydraulics, from entry speed, from the field, or from
-the market. Nobody here has ever judged a LAYOUT. The suite's own working guide is 900
-lines about correctness and almost nothing about attention, and that gap is exactly why
+the market. Nobody here has ever judged a LAYOUT. The suite's own working guide is
+about correctness and says almost nothing about attention, and that gap is exactly why
 a menu bar sat unnoticed by a senior engineer and a power user on the same afternoon.
 
 ## THE EVIDENCE, and it is not a hunch
@@ -41,33 +41,23 @@ handoff:
 **Two people finding the toolbar and not the menus is not a discoverability accident. It
 is a hierarchy result**, and your job is to say what produced it.
 
-## The four bars, named as Tom names them
+## The chrome today
 
-1. **Suite chrome** — the HawsEDC navbar. His word, and it is a better word than "global
-   nav" because it says WHY the bar is there. It cannot disappear at hawsedc.com; it
-   could at librewaternet.org. It carries Language and Libre Software, which are wanted.
-2. **App chrome** — the menu bar and the toolbar.
-3. **The project tab strip** — also app chrome, and worth deciding whether it reads that
-   way.
-4. And on `lpn_`, the page-title row, which already has a Hide link.
+On `lpn_` the suite chrome (the HawsEDC navbar, Tom's term) is suppressed (Task 625):
+its Install door moved to Help > Install app and its language picker to the Language
+menu, and the page-title row went with it. What remains is **app chrome**: the menu bar,
+the toolbar, and the project tab strip. The calculator pages still carry the suite
+chrome. Whether the app page should link back to the other calculators is the one
+open question from that change (Task 625).
 
-## What you are asked for, and what you are NOT
+## What you are asked for
 
-**DIAGNOSE. Do not redesign.** Tom's own risk is a distraction before a 16 September
-demonstration, and a redesign is exactly that. Come back with a reading of what is wrong
-and a RANKED set of moves, each with its cost and what it would buy. Say which one you
-would do first if only one could be done.
+Come back with a reading of what is wrong and a RANKED set of moves, each with its cost
+and what it would buy. Say which one you would do first if only one could be done.
 
-Specific questions he has raised and has not answered:
-- Should any of the four bars MERGE? He proposed one row of menus-then-icons and then
-  answered himself: *"If you are talking about a single row on a wide screen, I agree."*
-- Should the suite chrome DISAPPEAR at librewaternet.org, where it is half broken and
-  carries only two wanted items?
-- **Two Help menus on adjacent bars** — his first-numbered complaint. One of them has to go
-  or be renamed, and which is a hierarchy question, not a wording one.
-- He floated forcing discovery by REMOVING the file icons from the toolbar and immediately
-  doubted it: *"that may be rude or bad because we want to always encourage clicking
-  Save."* He is right to doubt it; say why, or say why not.
+The questions this seat was hired on (merging bars, two Help menus, the suite chrome on the
+app page) were settled by the app page divorce (Task 625). Read your journal and
+`dev/ROADMAP.md` for what is open now.
 
 ## The constraints you may not design around
 

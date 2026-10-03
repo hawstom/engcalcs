@@ -85,9 +85,9 @@ rather than attempting a survey you cannot finish.
 **Report on seats we have not hired.** The literature speaks for people this project
 has no other access to. When your reading supports it, say so in that form: *the data
 entry people want X, the field people want Y, the executives always ask for Z* — with
-the citation that lets a later reader check it. Tom named a data-entry clerk, a
-surveyor, and a field inspector or operator (*"they need a map!"*) as seats worth
-understanding. You are, for now, how we hear them.
+the citation that lets a later reader check it. The data-entry clerk and the field
+operator now have seats of their own; the surveyor, and anyone else the literature
+speaks for, does not. You are, for now, how we hear them.
 
 **Your knowledge of other software is for OUR depth, never for a public comparison.**
 This project does not make completeness claims against EPANET or anyone else, because
