@@ -21,9 +21,23 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (0, all answered)
+## Questions from the translators  (1 to read @@ NEEDS RULING)
 
-Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
+**These are SHIPPED strings, already translated into 26 languages.** A wave-0
+reading or a translator found each one readable two ways, and no sprint launches while one is
+unanswered. You are not being asked to approve wording here; you are being asked which reading
+is the one you meant. "The first one" is a complete answer.
+
+### from sprint 1003-ds
+
+- **`lpn_ds_found_below`**
+  > ⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.
+  *The finding:* Tom: 'I think I need explanation, and this need clarification.' It appears after Find when the demands as entered (a demand scale of 1) leave at least one junction below the limit; {m} is the largest scale, always under 1, at which every judged junction keeps the limit (0.62 means demands cut to 62 percent). 'it' in 'keeps it' is vague, 'demands as they are' never says scale 1, and {m} reads as headroom when it is a cut.
+  1. the system can take up to {m} times today's demand (wrong)
+  2. demands must be cut to {m} times what is entered for every junction to keep the pressure (right)
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
+  @@ NEEDS RULING
 
 ## lpn_  (175, 5 to read @@ NEEDS RULING)
 
@@ -557,7 +571,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**0 still to read**, of 12 new keys across 16 unmerged branch(es).
+**10 still to read**, of 22 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -570,17 +584,28 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### chore/analyze-clock-spec (`346986a7`) — adds no English strings
 
-### chore/policy-1003 (`742349a6`) — adds no English strings
+### chore/review-file (`b9a5f35f`) — adds no English strings
 
-### chore/review-file (`c8014a0b`) — adds no English strings
-
-### chore/selection-word (`5638e7a0`) — adds no English strings
-
-### chore/theme-inline (`e6057e23`) — adds no English strings
+### chore/selection-word (`2a24ea5c`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
 ### feat/dialog-audit (`711f7c92`) — adds no English strings
+
+### feat/dock (`05b6ccd6`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -635,6 +660,23 @@ build for that would be a gate nobody keeps. Refresh it with
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   _Ruled OK 2026-10-03._
 
-### fix/ds-wording (`a824c9c6`) — adds no English strings
+### feat/table-selection (`c9f8eda9`) — 6 new, 6 to read @@ NEEDS RULING
 
-### fix/ruling-1003 (`b85600c0`) — adds no English strings
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map, then press Selection only.
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_tip`**
+  > Show only the elements selected on the map, in every table. Press again to update it after changing the selection, or to turn it off.
+  @@ NEEDS RULING
