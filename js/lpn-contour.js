@@ -26,7 +26,9 @@
 //      jumps where the two zones are equally near, and zoneBreaks() traces that line. A barrier
 //      whose two sides are still one zone (a booster pump inside a loop) carries a FAULT instead, a
 //      line across the corridor at its midpoint through which no pipe is seen: ITRC's fault, the
-//      line "across which the interpolation model does not exchange information".
+//      line "across which the interpolation model does not exchange information". A fault hides
+//      only the part of a pipe behind it, never the whole pipe. Every break line reaches at most R
+//      from its barrier (Tom, 2026-10-03: *"its length should match our buffer width"*).
 //   4. **WITH A GROUND SURFACE, PRESSURE MAY LEAVE THE NODES' RANGE**, on purpose (§2a, Luke
 //      Butler's proof of concept): head is the field interpolated, and the page subtracts the ground
 //      per cell.
