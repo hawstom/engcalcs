@@ -20574,10 +20574,18 @@ var EngCalcs = EngCalcs || {};
 		// **AND NOTHING MEASURED ON A PHONE IS REMEMBERED**, the ruling the fill path already
 		// carries: at that width the box fills the window, so every number here is the window's and
 		// not the user's.
+		popup.addEventListener('pointerdown', function (e) { if (e.target === popup) { popupSizing = true; } });
+		['pointerup', 'pointercancel'].forEach(function (t) {
+			window.addEventListener(t, function () { setTimeout(function () { popupSizing = false; }, 120); }, true);
+		});
 		if (window.ResizeObserver) {
 			new window.ResizeObserver(function () {
 				var r;
 				if (popup.style.display === 'none' || smallScreen()) { return; }
+				// Only a size the reader is dragging at the corner counts as chosen. The box also
+				// changes size on its own (a fit to the window, a graph arriving, the width pinned
+				// on opening), and recording those made the first automatic size look like a choice.
+				if (!popupSizing) { return; }
 				r = popup.getBoundingClientRect();
 				if (!(r.width > 0) || !(r.height > 0)) { return; }
 				findUserSize = { w: Math.round(r.width), h: Math.round(r.height) };
@@ -50892,7 +50900,7 @@ var EngCalcs = EngCalcs || {};
 	var popupUserPos = null;
 	// The size a drag gave the properties box, in the same session-only standing as the
 	// position above. Written by the observer in wirePopupDrag().
-	var popupUserSize = null;
+	var popupUserSize = null, popupSizing = false;
 	// **A BOX THAT OPENS UNDER A FINGER MUST NOT ANSWER THAT FINGER'S OWN CLICK** (Tom, 2026-08-31:
 	// *"the node editor open with the pattern selector open"*).
 	//
@@ -50947,6 +50955,16 @@ var EngCalcs = EngCalcs || {};
 		var popup = document.getElementById('lpn_popup'), r, h, at;
 		if (popupUserPos) { sx = popupUserPos.left; sy = popupUserPos.top; }
 		popup.style.left = sx + 'px'; popup.style.top = sy + 'px';
+		// **A BOX WITH NO CHOSEN WIDTH IS MEASURED AT THE LEFT EDGE AND PINNED** (Tom, 2026-10-03: a
+		// pipe's or pump's Properties opened about 150 px wide and the full height of the map, and
+		// widened and narrowed itself as he moved it). It is `position: fixed` with `width: auto`, so
+		// the browser sizes it to fit the room between its left edge and the window's right edge:
+		// opened or dragged toward the right it squeezed, its fields wrapped, and it grew tall. A pipe
+		// and a pump are wider than a junction, so they met it first. The width is now measured with
+		// the whole window to spread in, then written, so where the box stands never decides it.
+		if (!popupUserSize && !smallScreen()) {
+			popup.style.width = ''; popup.style.left = '0px';
+		}
 		// `flex`, not `block`: the box is a column now -- title band, then body -- so the body can
 		// take the height a drag gave the box and scroll inside it. Same reason the Find box is a
 		// flex column, and it is what makes `resize: both` mean anything here.
@@ -50964,6 +50982,11 @@ var EngCalcs = EngCalcs || {};
 		// The graph at the foot (Task 637) is built once the box has a width to lay it out in, and
 		// before the fit below measures the box's height with it inside.
 		propGraphSync();
+		if (!popupUserSize && !smallScreen()) {
+			popup.style.width = Math.min(popup.getBoundingClientRect().width,
+				window.innerWidth - 2 * POPUP_EDGE) + 'px';
+			popup.style.left = sx + 'px';
+		}
 		// **RAISED HERE, WHERE IT BECOMES VISIBLE** (Tom, 2026-09-05: *"When an asset is clicked and
 		// its properties box opens, it is hidden under Libraries... It needs to win at the moment the
 		// asset is clicked."*). The property popup is the one panel that does NOT go through
