@@ -390,6 +390,36 @@ not committed here.
 the 400 m radius; whether d₀ fades opacity or value; how he treats a PRV or pump boundary; and
 whether he minds us citing the proof of concept by name.
 
+### 2b. What `lpn_` built after Tom's browser pass (2026-10-03)
+
+The TIN-with-max-edge version shipped to a preview and Tom's pass overturned its boundary: *"The
+biggest bug I see is that the loops are not filled. ... maybe 'buffer the pipes' can work. Instead of
+'from the network', maybe the expression, logic, and algorithm should be 'from a link'. Every link
+has contours along it ... it should be very generous; in the case of Net3, I would say 2 or 3 * the
+median pipe length."* The max-edge mask had dropped every triangle spanning a large loop, so the
+loops were holes. What `js/lpn-contour.js` now does:
+
+- **The value runs along every open pipe**, linear between its end nodes by length, and a point
+  beside the network takes the modified Shepard (Franke and Nielson) average of the pipes within R:
+  weight ((R − d)/(R·d))². On a pipe it is the pipe's own value; it never leaves the nodes' range.
+  This replaces the triangulation, so the "never invents a value" property survives.
+- **Colour iff within R of a pipe**, R a multiple of the median pipe length (default 2.5), fading
+  out over the outer 40%. The buffer the earlier text below demoted for lack of support is supported
+  now, because the value is defined along the pipe itself, not only at its ends. Measured on Net3
+  (`dev/lpn-spike/contour-harness.js` §6a, 22 loops): 1.5× fills 21, 2× and above fill all 22; 2.5×
+  has 99.9% of loop interiors at full strength against 99.3% at 2×.
+- **Barriers:** pipes in different zones are never averaged (the nearest pipe decides), and the line
+  where the colour jumps is traced and drawn as a break line, Tom's *"retaining wall"*. A barrier
+  whose ends are still one zone (a booster pump in a loop) gets a fault in ITRC's sense instead. A
+  fault on every barrier was tried and rejected: at Net3's pump 335 the pump, its closed bypass and a
+  short pipe make a triangle, and three faults sliced it into wedges with no pipe visible.
+- **Labelled, smoothed contour lines** (marching squares, Chaikin) at 5 psi or 5 m to start, and the
+  fill drawn as one raster. Net3 builds in about 30 ms in Node; a generated 1,600-junction grid in
+  about 110 ms.
+
+The hull and max-edge reasoning below stands as the record of why a TIN was chosen first; the
+boundary recommendation it reaches is superseded by this section for `lpn_`.
+
 ### The extraction
 
 | Package | Licence | Weekly downloads | Latest | Unpacked | Input | Output |
@@ -524,7 +554,7 @@ ceiling.** Three candidates:
   values. **Demoted** — the max-edge mask above expresses the same intent using the actual support.
 
 **Revised recommendation on the boundary: the Delaunay hull by construction, tightened by masking
-triangles whose longest edge exceeds a user-visible distance.** One method, one parameter, both in
+triangles whose longest edge exceeds a user-visible distance.** *(Superseded for `lpn_` by §2b: a corridor along the pipes. A max-edge mask left every large loop empty.)* One method, one parameter, both in
 metres, and both defensible out loud.
 
 **And there is a fourth thing, which nobody in this field appears to have built and which is the most

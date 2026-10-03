@@ -471,6 +471,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // The pump energy report box (Task 566). Absent from this list, rebuildEnergyReport() returns at
   // its first line and the report is invisible to every harness.
   'lpn_energy_box', 'lpn_energy_close', 'lpn_energy_report',
+  // The contour box (Task 600): absent, buildContourBox() returns at its first line.
+  'lpn_contour_box', 'lpn_contour_close', 'lpn_contour_body',
   // The EPANET run report's own box (ROADMAP Task 570) -- the sixth of the family.
   'lpn_rptbox', 'lpn_rptbox_title', 'lpn_rptbox_close', 'lpn_rptbox_copy', 'lpn_rptbox_pre',
   // The scenario comparison box (planning engineer's wish-list row 2). Absent from this list,
@@ -1025,6 +1027,8 @@ Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-profile.js'));
 // degrade to the five fallback stops and every assertion about a 7-class ramp would pass on the
 // wrong thing.
 require(ROOT + 'js/lpn-ramps.js');
+// The contour plot's pure half (Task 600); installs EngCalcs.lpnContour as its <script> tag does.
+require(ROOT + 'js/lpn-contour.js');
 // The fire flow sweep (ROADMAP Task 530). Same argument as lpn-ramps.js above: it installs itself
 // on globalThis.EngCalcs exactly as its <script> tag does, and without it every fire-flow path in
 // looped-network.js falls through its `EngCalcs.lpnFireFlow*` guards and a harness would pass on a

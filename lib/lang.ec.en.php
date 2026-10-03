@@ -1825,6 +1825,36 @@ $ec_lang['lpn_freq_none']='No results for this value yet, so there is nothing to
 $ec_lang['lpn_freq_summary']='Plotted: {n} of {total}';
 $ec_lang['lpn_freq_summary_time']='Plotted: {n} of {total}, at {time}';
 $ec_lang['lpn_freq_axis_percent']='Percent less than';
+// EPANET's Contour Plot (Task 600), drawn as a layer under the map rather than in a window of its
+// own, from the pipes outward. {n} and {p} are counts, {k} and {i} numbers, {u} a unit symbol, {m} a
+// distance in metres; all substituted. lpn_contour_buffer_unit follows the Buffer number box.
+// lpn_contour_consent_1..4 are the terrain question's four paragraphs, reworded for what the contour
+// plot sends: tile numbers for the network's area, not each node's latitude and longitude.
+$ec_lang['lpn_contour_menu']='Contour';
+$ec_lang['lpn_contour_tip']='Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.';
+$ec_lang['lpn_contour_plot']='Contour plot';
+$ec_lang['lpn_contour_fill']='Fill';
+$ec_lang['lpn_contour_fill_tip']='Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.';
+$ec_lang['lpn_contour_fill_smooth']='Smooth';
+$ec_lang['lpn_contour_fill_bands']='Bands';
+$ec_lang['lpn_contour_opacity']='Fill opacity';
+$ec_lang['lpn_contour_lines']='Contour lines';
+$ec_lang['lpn_contour_interval']='Interval';
+$ec_lang['lpn_contour_buffer']='Buffer';
+$ec_lang['lpn_contour_buffer_unit']='× median pipe length';
+$ec_lang['lpn_contour_buffer_tip']='How far the color reaches from each pipe, as a multiple of the median pipe length. It fades out over the outer part.';
+$ec_lang['lpn_contour_few']='Too few nodes to contour.';
+$ec_lang['lpn_contour_support']='Contour plot: {n} nodes, interpolated along {p} pipes and up to {k} times the median pipe length beside them. No color across pumps, valves, or closed links.';
+$ec_lang['lpn_contour_support_lines']='Contour lines every {i} {u}.';
+$ec_lang['lpn_contour_too_many']='Too many contour lines at this interval; widen it to draw them.';
+$ec_lang['lpn_contour_dem']='Ground between nodes from Mapbox DEM';
+$ec_lang['lpn_contour_dem_tip']='Between nodes, pressure becomes the interpolated head minus the height of the ground from Mapbox DEM, so it can fall below the lowest node pressure on a hill the network has no node on. Treat the ground as a contour map, not a survey.';
+$ec_lang['lpn_contour_support_dem']='Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.';
+$ec_lang['lpn_contour_dem_failed']='The ground could not be read from Mapbox DEM, so pressure is interpolated between nodes alone.';
+$ec_lang['lpn_contour_consent_1']='Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.';
+$ec_lang['lpn_contour_consent_2']='This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.';
+$ec_lang['lpn_contour_consent_3']='May we send the tile numbers of your network\'s area to Mapbox?';
+$ec_lang['lpn_contour_consent_4']='If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.';
 $ec_lang['lpn_view_units']='Units';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Save all';

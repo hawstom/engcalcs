@@ -42,8 +42,11 @@ async function main() {
 			const all = await page.$$eval('#lpn_menu_popup2 .lpn-menu-row',
 				(els) => els.map((e) => e.textContent.replace('▸', '').trim()));
 			const i = all.indexOf(names.p);
-			ok('fly-out lists Profile, Time series, Frequency in order, and nothing else after them',
-				i >= 0 && all[i + 1] === names.t && all[i + 2] === names.f && all[i + 3] === undefined, all.join('|'));
+			// Contour joined them (Task 600): a map layer, so its row shows the plot rather than a tab.
+			const contourName = await page.evaluate(() => window.EngCalcs.pageConfig.lpn_contour_menu);
+			ok('fly-out lists Profile, Time series, Frequency, Contour in order, and nothing else after them',
+				i >= 0 && all[i + 1] === names.t && all[i + 2] === names.f && all[i + 3] === contourName &&
+				all[i + 4] === undefined, all.join('|'));
 			// Tom, 2026-10-02: no graph icon on the Profile row; the Graphs row keeps it.
 			const pIcon = await page.$$eval('#lpn_menu_popup2 .lpn-menu-row', (els, p) => {
 				const r = els.filter((e) => e.textContent.trim() === p).pop();
