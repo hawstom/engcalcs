@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hr",
-        "expected_key_count": 2245,
-        "delta_key_count": 92,
+        "expected_key_count": 2329,
+        "delta_key_count": 176,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -718,7 +718,7 @@
         "lpn_hotkeys_menu_term": "Menu keyboard shortcuts",
         "lpn_hotkeys_menu_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Alt+Shift+letter<\/td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.<\/td><\/tr><tr><td>F10<\/td><td>Go to the menu bar.<\/td><\/tr><\/tbody><\/table>",
         "lpn_graphs_menu": "Graphs",
-        "lpn_graphs_menu_tip": "Graphs: Profile, Time Series, and Frequency distribution",
+        "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
         "lpn_contour_menu": "Contour",
         "lpn_contour_tip": "Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.",
         "lpn_contour_plot": "Contour plot",
@@ -744,6 +744,13 @@
         "lpn_contour_consent_2": "This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.",
         "lpn_contour_consent_3": "May we send the tile numbers of your network's area to Mapbox?",
         "lpn_contour_consent_4": "If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.",
+        "lpn_sysflow_menu": "Flow balance",
+        "lpn_sysflow_tip": "Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.",
+        "lpn_sysflow_title": "Flow balance",
+        "lpn_sysflow_produced": "Produced",
+        "lpn_sysflow_produced_tip": "Total flow into the network from reservoirs and from negative demands.",
+        "lpn_sysflow_consumed": "Consumed",
+        "lpn_sysflow_consumed_tip": "Total of every positive demand: water drawn from the network at junctions, and any flow into a reservoir.",
         "lpn_copy_title": "Mark file as new copy?",
         "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
         "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
@@ -805,14 +812,91 @@
         "lpn_calib_point": "{id}, {time}: observed {o}, computed {s}",
         "lpn_calib_corr_note": "Each point is one measurement. The closer the points lie to the diagonal line, the closer the computed values match the observed ones.",
         "lpn_calib_ts_point": "Measured at {id}, {time}: {v}",
-        "lpn_calib_ts_note": "Rings are measured values from the calibration file."
+        "lpn_calib_ts_note": "Rings are measured values from the calibration file.",
+        "lpn_analyze_menu": "Analyze",
+        "lpn_analyze_menu_tip": "Analyses that run the network on a copy: fire flow at each junction, the loss of each pipe, pump, and valve, and the demands scaled up or down.",
+        "lpn_ff_design_off": "None",
+        "lpn_ff_design_all": "All",
+        "lpn_ff_design_selected": "Selected",
+        "lpn_ff_rows_more_links": "Links not shown: {n}.",
+        "lpn_crit_menu": "Criticality analysis…",
+        "lpn_crit_menu_tip": "Take each pipe, pump, and valve out of the network in turn and see what the system loses.",
+        "lpn_crit_title": "Criticality analysis",
+        "lpn_crit_intro": "Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in your project is changed; the whole run is made on a copy.",
+        "lpn_crit_scope": "Links to break",
+        "lpn_crit_scope_tip": "All pipes, pumps, and valves, or only those selected on the map. Choose the set before you run.",
+        "lpn_crit_scope_all": "All links",
+        "lpn_crit_scope_selected": "Selected links",
+        "lpn_crit_minpressure": "Lowest pressure allowed",
+        "lpn_crit_minpressure_tip": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
+        "lpn_crit_col_asset": "Asset",
+        "lpn_crit_col_unserved": "Demand not served",
+        "lpn_crit_col_cutoff": "Junctions cut off",
+        "lpn_crit_col_below": "Junctions below minimum",
+        "lpn_crit_summary": "{n} of {total} assets leave demand unserved or drop a junction below {pressure}.",
+        "lpn_crit_baseline_below": "Junctions already below it with nothing broken: {n}. They are not counted.",
+        "lpn_crit_working": "Working: {done} of {total} assets.",
+        "lpn_crit_stopped": "Stopped after {done} of {total} assets. The results below are the ones already finished.",
+        "lpn_crit_no_selection": "No links are selected. Select links or choose All links.",
+        "lpn_crit_no_links": "This project has no links yet, so there is nothing to break.",
+        "lpn_crit_busy": "Another analysis is running. Stop it, or wait for it to finish.",
+        "lpn_crit_skipped": "{n} selected elements are not links, so they were not broken.",
+        "lpn_crit_stale": "The drawing changed, so the criticality results were cleared. Run it again.",
+        "lpn_crit_skipdead": "Skip dead ends",
+        "lpn_crit_skipdead_tip": "A dead-end link is one whose removal cuts off junctions that can be reached only through it, with no reservoir or tank beyond. Its loss is everything beyond it, so it is not solved. The summary says how many were skipped.",
+        "lpn_crit_skipped_dead": "Dead-end links skipped: {n}. Each one cuts off everything beyond it.",
+        "lpn_ds_menu": "Demand scaling…",
+        "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
+        "lpn_ds_title": "Demand scaling",
+        "lpn_ds_intro": "The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.",
+        "lpn_ds_scope": "Junctions to scale",
+        "lpn_ds_scope_tip": "All junctions, or only those selected on the map. Pressures are checked at the scaled demand.",
+        "lpn_ds_scope_all": "All junctions",
+        "lpn_ds_scope_selected": "Selected junctions",
+        "lpn_ds_minpressure": "Lowest pressure allowed",
+        "lpn_ds_minpressure_tip": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_eps_note": "Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.",
+        "lpn_ds_head_scale": "Scale the demands",
+        "lpn_ds_multiplier": "Demand scale",
+        "lpn_ds_multiplier_tip": "The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.",
+        "lpn_ds_run": "Run",
+        "lpn_ds_head_search": "What demand scale can the system handle?",
+        "lpn_ds_head_search_selected": "What demand scale can these junctions handle?",
+        "lpn_ds_search_note_selected": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.",
+        "lpn_ds_outside_below": "At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.",
+        "lpn_ds_search_note": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
+        "lpn_ds_find": "Find",
+        "lpn_ds_holds_max": "✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.",
+        "lpn_ds_below_zero": "⚠ At least one junction is below {pressure} even with the scaled demands at zero.",
+        "lpn_ds_found": "✓ Every junction keeps {pressure} up to a demand scale of {m}.",
+        "lpn_ds_found_below": "⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.",
+        "lpn_ds_search_stopped": "The search was stopped before it found an answer.",
+        "lpn_ds_lowest_at": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.",
+        "lpn_ds_nosolve_at": "At a demand scale of {m}, the network gave no answer. {reason}",
+        "lpn_ds_scale_ok": "✓ At a demand scale of {m}, every junction keeps {pressure}.",
+        "lpn_ds_scale_below": "⚠ At a demand scale of {m}, junctions below {pressure}: {n}.",
+        "lpn_ds_scaled_selected": "Junctions scaled and checked: {n}.",
+        "lpn_ds_head_lowest": "Lowest pressures",
+        "lpn_ds_head_velocity": "Highest velocities",
+        "lpn_ds_col_link": "Link",
+        "lpn_ds_col_scaled": "Scaled",
+        "lpn_ds_col_scaled_tip": "With the demands multiplied by the demand scale.",
+        "lpn_ds_col_unscaled": "Unscaled",
+        "lpn_ds_col_unscaled_tip": "With the demands as they are in the active scenario at this time step, the same value the map shows.",
+        "lpn_ds_no_junctions": "This project has no junctions yet, so there are no demands to scale.",
+        "lpn_ds_no_selection": "No junctions are selected. Select junctions or choose All junctions.",
+        "lpn_ds_skipped": "Selected elements that are not junctions, left as they are: {n}.",
+        "lpn_ds_bad_multiplier": "Type a demand scale of zero or more, such as 1.5.",
+        "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
+        "lpn_ds_at_time": "Time step: {time}.",
+        "lpn_ds_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "keys": {
         "lpn_hotkeys_menu_heading": "Menus",
         "lpn_hotkeys_menu_term": "Menu keyboard shortcuts",
         "lpn_hotkeys_menu_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Alt+Shift+letter<\/td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.<\/td><\/tr><tr><td>F10<\/td><td>Go to the menu bar.<\/td><\/tr><\/tbody><\/table>",
         "lpn_graphs_menu": "Graphs",
-        "lpn_graphs_menu_tip": "Graphs: Profile, Time Series, and Frequency distribution",
+        "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
         "lpn_contour_menu": "Contour",
         "lpn_contour_tip": "Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.",
         "lpn_contour_plot": "Contour plot",
@@ -838,6 +922,13 @@
         "lpn_contour_consent_2": "This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.",
         "lpn_contour_consent_3": "May we send the tile numbers of your network's area to Mapbox?",
         "lpn_contour_consent_4": "If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.",
+        "lpn_sysflow_menu": "Flow balance",
+        "lpn_sysflow_tip": "Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.",
+        "lpn_sysflow_title": "Flow balance",
+        "lpn_sysflow_produced": "Produced",
+        "lpn_sysflow_produced_tip": "Total flow into the network from reservoirs and from negative demands.",
+        "lpn_sysflow_consumed": "Consumed",
+        "lpn_sysflow_consumed_tip": "Total of every positive demand: water drawn from the network at junctions, and any flow into a reservoir.",
         "lpn_copy_title": "Mark file as new copy?",
         "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
         "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
@@ -899,7 +990,84 @@
         "lpn_calib_point": "{id}, {time}: observed {o}, computed {s}",
         "lpn_calib_corr_note": "Each point is one measurement. The closer the points lie to the diagonal line, the closer the computed values match the observed ones.",
         "lpn_calib_ts_point": "Measured at {id}, {time}: {v}",
-        "lpn_calib_ts_note": "Rings are measured values from the calibration file."
+        "lpn_calib_ts_note": "Rings are measured values from the calibration file.",
+        "lpn_analyze_menu": "Analyze",
+        "lpn_analyze_menu_tip": "Analyses that run the network on a copy: fire flow at each junction, the loss of each pipe, pump, and valve, and the demands scaled up or down.",
+        "lpn_ff_design_off": "None",
+        "lpn_ff_design_all": "All",
+        "lpn_ff_design_selected": "Selected",
+        "lpn_ff_rows_more_links": "Links not shown: {n}.",
+        "lpn_crit_menu": "Criticality analysis…",
+        "lpn_crit_menu_tip": "Take each pipe, pump, and valve out of the network in turn and see what the system loses.",
+        "lpn_crit_title": "Criticality analysis",
+        "lpn_crit_intro": "Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in your project is changed; the whole run is made on a copy.",
+        "lpn_crit_scope": "Links to break",
+        "lpn_crit_scope_tip": "All pipes, pumps, and valves, or only those selected on the map. Choose the set before you run.",
+        "lpn_crit_scope_all": "All links",
+        "lpn_crit_scope_selected": "Selected links",
+        "lpn_crit_minpressure": "Lowest pressure allowed",
+        "lpn_crit_minpressure_tip": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
+        "lpn_crit_col_asset": "Asset",
+        "lpn_crit_col_unserved": "Demand not served",
+        "lpn_crit_col_cutoff": "Junctions cut off",
+        "lpn_crit_col_below": "Junctions below minimum",
+        "lpn_crit_summary": "{n} of {total} assets leave demand unserved or drop a junction below {pressure}.",
+        "lpn_crit_baseline_below": "Junctions already below it with nothing broken: {n}. They are not counted.",
+        "lpn_crit_working": "Working: {done} of {total} assets.",
+        "lpn_crit_stopped": "Stopped after {done} of {total} assets. The results below are the ones already finished.",
+        "lpn_crit_no_selection": "No links are selected. Select links or choose All links.",
+        "lpn_crit_no_links": "This project has no links yet, so there is nothing to break.",
+        "lpn_crit_busy": "Another analysis is running. Stop it, or wait for it to finish.",
+        "lpn_crit_skipped": "{n} selected elements are not links, so they were not broken.",
+        "lpn_crit_stale": "The drawing changed, so the criticality results were cleared. Run it again.",
+        "lpn_crit_skipdead": "Skip dead ends",
+        "lpn_crit_skipdead_tip": "A dead-end link is one whose removal cuts off junctions that can be reached only through it, with no reservoir or tank beyond. Its loss is everything beyond it, so it is not solved. The summary says how many were skipped.",
+        "lpn_crit_skipped_dead": "Dead-end links skipped: {n}. Each one cuts off everything beyond it.",
+        "lpn_ds_menu": "Demand scaling…",
+        "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
+        "lpn_ds_title": "Demand scaling",
+        "lpn_ds_intro": "The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.",
+        "lpn_ds_scope": "Junctions to scale",
+        "lpn_ds_scope_tip": "All junctions, or only those selected on the map. Pressures are checked at the scaled demand.",
+        "lpn_ds_scope_all": "All junctions",
+        "lpn_ds_scope_selected": "Selected junctions",
+        "lpn_ds_minpressure": "Lowest pressure allowed",
+        "lpn_ds_minpressure_tip": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_eps_note": "Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.",
+        "lpn_ds_head_scale": "Scale the demands",
+        "lpn_ds_multiplier": "Demand scale",
+        "lpn_ds_multiplier_tip": "The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.",
+        "lpn_ds_run": "Run",
+        "lpn_ds_head_search": "What demand scale can the system handle?",
+        "lpn_ds_head_search_selected": "What demand scale can these junctions handle?",
+        "lpn_ds_search_note_selected": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.",
+        "lpn_ds_outside_below": "At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.",
+        "lpn_ds_search_note": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
+        "lpn_ds_find": "Find",
+        "lpn_ds_holds_max": "✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.",
+        "lpn_ds_below_zero": "⚠ At least one junction is below {pressure} even with the scaled demands at zero.",
+        "lpn_ds_found": "✓ Every junction keeps {pressure} up to a demand scale of {m}.",
+        "lpn_ds_found_below": "⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.",
+        "lpn_ds_search_stopped": "The search was stopped before it found an answer.",
+        "lpn_ds_lowest_at": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.",
+        "lpn_ds_nosolve_at": "At a demand scale of {m}, the network gave no answer. {reason}",
+        "lpn_ds_scale_ok": "✓ At a demand scale of {m}, every junction keeps {pressure}.",
+        "lpn_ds_scale_below": "⚠ At a demand scale of {m}, junctions below {pressure}: {n}.",
+        "lpn_ds_scaled_selected": "Junctions scaled and checked: {n}.",
+        "lpn_ds_head_lowest": "Lowest pressures",
+        "lpn_ds_head_velocity": "Highest velocities",
+        "lpn_ds_col_link": "Link",
+        "lpn_ds_col_scaled": "Scaled",
+        "lpn_ds_col_scaled_tip": "With the demands multiplied by the demand scale.",
+        "lpn_ds_col_unscaled": "Unscaled",
+        "lpn_ds_col_unscaled_tip": "With the demands as they are in the active scenario at this time step, the same value the map shows.",
+        "lpn_ds_no_junctions": "This project has no junctions yet, so there are no demands to scale.",
+        "lpn_ds_no_selection": "No junctions are selected. Select junctions or choose All junctions.",
+        "lpn_ds_skipped": "Selected elements that are not junctions, left as they are: {n}.",
+        "lpn_ds_bad_multiplier": "Type a demand scale of zero or more, such as 1.5.",
+        "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
+        "lpn_ds_at_time": "Time step: {time}.",
+        "lpn_ds_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "key_context": {
         "lpn_hotkeys_menu_heading": {
@@ -1367,6 +1535,118 @@
             }
         },
         "lpn_contour_consent_4": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_sysflow_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_sysflow_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_sysflow_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_sysflow_produced": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_sysflow_produced_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_sysflow_consumed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_sysflow_consumed_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -2373,8 +2653,1247 @@
                     "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
                 }
             }
+        },
+        "lpn_analyze_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_ids_more",
+                    "value": "{ids}, i još {n}",
+                    "english": "{ids}, and {n} more"
+                },
+                "next_translated": {
+                    "key": "lpn_ff_menu",
+                    "value": "Analiza protupožarnog protoka…",
+                    "english": "Fire flow analysis…"
+                }
+            }
+        },
+        "lpn_analyze_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_terrain_ids_more",
+                    "value": "{ids}, i još {n}",
+                    "english": "{ids}, and {n} more"
+                },
+                "next_translated": {
+                    "key": "lpn_ff_menu",
+                    "value": "Analiza protupožarnog protoka…",
+                    "english": "Fire flow analysis…"
+                }
+            }
+        },
+        "lpn_ff_design_off": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_design_tip",
+                    "value": "Zasebno pitanje od toga može li čvor isporučiti protok: dok se taj protok ondje povlači, pada li nešto drugo ispod svog minimalnog tlaka ili prelazi svoju graničnu brzinu? Odabir provjere ne zahtijeva dodatni izračun.",
+                    "english": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_design_no_selection",
+                    "value": "Provjera projektnih uvjeta postavljena je na Odabrani, a nijedan element nije odabran. Odaberite elemente ili odaberite opciju Svi.",
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                }
+            }
+        },
+        "lpn_ff_design_all": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_design_tip",
+                    "value": "Zasebno pitanje od toga može li čvor isporučiti protok: dok se taj protok ondje povlači, pada li nešto drugo ispod svog minimalnog tlaka ili prelazi svoju graničnu brzinu? Odabir provjere ne zahtijeva dodatni izračun.",
+                    "english": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_design_no_selection",
+                    "value": "Provjera projektnih uvjeta postavljena je na Odabrani, a nijedan element nije odabran. Odaberite elemente ili odaberite opciju Svi.",
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                }
+            }
+        },
+        "lpn_ff_design_selected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_design_tip",
+                    "value": "Zasebno pitanje od toga može li čvor isporučiti protok: dok se taj protok ondje povlači, pada li nešto drugo ispod svog minimalnog tlaka ili prelazi svoju graničnu brzinu? Odabir provjere ne zahtijeva dodatni izračun.",
+                    "english": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_design_no_selection",
+                    "value": "Provjera projektnih uvjeta postavljena je na Odabrani, a nijedan element nije odabran. Odaberite elemente ili odaberite opciju Svi.",
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                }
+            }
+        },
+        "lpn_ff_rows_more_links": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_rows_more",
+                    "value": "Još {n} čvorova nije prikazano.",
+                    "english": "Junctions not shown: {n}."
+                },
+                "next_translated": {
+                    "key": "lpn_ff_design_none",
+                    "value": "Ništa u odabranom skupu nije prešlo svoje granice dok je bilo koji čvor povlačio svoj protupožarni protok.",
+                    "english": "Nothing in the chosen set went outside its limits while any junction drew its fire flow."
+                }
+            }
+        },
+        "lpn_crit_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_intro": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_scope": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_scope_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_scope_all": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_scope_selected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_minpressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_minpressure_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_col_asset": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_col_unserved": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_col_cutoff": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_col_below": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_summary": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_baseline_below": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_working": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_stopped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_no_selection": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_no_links": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_busy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_stale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_skipdead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_skipdead_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_crit_skipped_dead": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_intro": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_scope": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_scope_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_scope_all": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_scope_selected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_minpressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_minpressure_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_eps_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_head_scale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_multiplier": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_multiplier_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_run": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_head_search": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_head_search_selected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_search_note_selected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_outside_below": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_search_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_find": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_holds_max": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_below_zero": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_found": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_found_below": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_search_stopped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_lowest_at": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_nosolve_at": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_scale_ok": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_scale_below": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_scaled_selected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_head_lowest": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_head_velocity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_col_link": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_col_scaled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_col_scaled_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_col_unscaled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_col_unscaled_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_no_junctions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_no_selection": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_bad_multiplier": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_stale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_at_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_time_moved": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ff_err_unknown",
+                    "value": "Nema odgovora. Prijavljen je kod {code}.",
+                    "english": "No answer. The code reported was {code}."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Uvezi izmjerene točke…",
+                    "english": "Import surveyed points…"
+                }
+            }
         }
     },
-    "key_syn": [],
+    "key_syn": {
+        "lpn_ff_design_off": "No design check",
+        "lpn_ff_design_all": "All other junctions and all pipes",
+        "lpn_ff_design_selected": "The selected junctions and their pipes",
+        "lpn_ds_scope_tip": "Scale the demand at the junctions that you choose. Pressures are checked at the scaled demand.",
+        "lpn_ds_head_search_selected": "What demand can the junctions you choose handle",
+        "lpn_ds_search_note_selected": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the junctions that you choose keep the given lowest pressure allowed."
+    },
     "key_concepts": []
 }

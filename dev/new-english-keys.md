@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 92 untranslated keys, of 2245 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**4 still to read on master**, of 176 untranslated keys, of 2329 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (92, all ruled)
+## lpn_  (176, 4 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -59,6 +59,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-10-01._
 - **`lpn_alt_title`**
   > Alternatives preview
+  _Ruled OK 2026-10-03._
+- **`lpn_analyze_menu`**
+  > Analyze
+  _Ruled OK 2026-10-03._
+- **`lpn_analyze_menu_tip`**
+  > Analyses that run the network on a copy: fire flow at each junction, the loss of each pipe, pump, and valve, and the demands scaled up or down.
   _Ruled OK 2026-10-03._
 - **`lpn_calib_axis_obs`**
   > Observed: {q}
@@ -276,157 +282,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_copy_title`**
   > Mark file as new copy?
   _Ruled OK 2026-10-01._
-- **`lpn_graphs_menu`**
-  > Graphs
-  _Ruled OK 2026-10-03._
-- **`lpn_graphs_menu_tip`**
-  > Plot a profile along a path, a time series at one element, or the frequency distribution of results.
-  _Ruled 2026-10-03: OK. (Tom, answering the Wave 0 proposal in his session message)_
-- **`lpn_hotkeys_menu_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>
-  _Ruled OK 2026-10-03._
-- **`lpn_hotkeys_menu_heading`**
-  > Menus
-  _Ruled OK 2026-10-03._
-- **`lpn_hotkeys_menu_term`**
-  > Menu keyboard shortcuts
-  _Ruled OK 2026-10-03._
-- **`lpn_reports_calib`**
-  > Calibration
-  _Ruled OK 2026-10-03._
-- **`lpn_reports_calib_tip`**
-  > Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.
-  _Ruled OK 2026-10-03._
-- **`lpn_scenario_basic`**
-  > Basic mode
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_basic_tip`**
-  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
-  _Ruled OK 2026-10-01._
-
----
-
-# Strings waiting on a branch
-
-**8 still to read**, of 127 new keys across 13 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### chore/rulings-1003 (`ad75317c`) — adds no English strings
-
-### chore/selection-word (`16dce45b`) — adds no English strings
-
-### feat/criticality (`84ea5311`) — 31 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_analyze_menu`**
-  > Analyze
-  _Ruled OK 2026-10-03._
-- **`lpn_analyze_menu_tip`**
-  > Analyses that run the network many times over on a copy: fire flow at each junction, and the loss of each pipe, pump, and valve.
-  @@ NEEDS RULING
-- **`lpn_crit_baseline_below`**
-  > Junctions already below it with nothing broken: {n}. They are not counted.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_busy`**
-  > Another analysis is running. Stop it, or wait for it to finish.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_col_asset`**
-  > Asset
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_col_below`**
-  > Junctions below minimum
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_col_cutoff`**
-  > Junctions cut off
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_col_unserved`**
-  > Demand not served
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_intro`**
-  > Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in your project is changed; the whole run is made on a copy.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_menu`**
-  > Criticality analysis…
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_menu_tip`**
-  > Take each pipe, pump, and valve out of the network in turn and see what the system loses.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_minpressure`**
-  > Lowest pressure allowed
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_minpressure_tip`**
-  > This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_no_links`**
-  > This project has no links yet, so there is nothing to break.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_no_selection`**
-  > No pipe, pump, or valve is selected. Choose one on the map, or break every link.
-  @@ NEEDS RULING
-- **`lpn_crit_scope`**
-  > Links to break
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_scope_all`**
-  > Every link
-  @@ NEEDS RULING
-- **`lpn_crit_scope_selected`**
-  > The selected links
-  @@ NEEDS RULING
-- **`lpn_crit_scope_tip`**
-  > Every pipe, pump, and valve, or only the ones selected on the map. Choose the set before you run.
-  @@ NEEDS RULING
-- **`lpn_crit_skipdead`**
-  > Skip dead ends
-  _Ruled OK 2026-10-03._
-- **`lpn_crit_skipdead_tip`**
-  > A dead-end link is one whose removal cuts off junctions that can be reached only through it, with no reservoir or tank beyond. Its loss is everything beyond it, so it is not solved. The summary says how many were skipped.
-  _Ruled OK 2026-10-03._
-- **`lpn_crit_skipped`**
-  > {n} selected elements are not links, so they were not broken.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_skipped_dead`**
-  > Dead-end links skipped: {n}. Each one cuts off everything beyond it.
-  _Ruled OK 2026-10-03._
-- **`lpn_crit_stale`**
-  > The drawing changed, so the criticality results were cleared. Run it again.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_stopped`**
-  > Stopped after {done} of {total} assets. The results below are the ones already finished.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_summary`**
-  > {n} of {total} assets leave demand unserved or drop a junction below {pressure}.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_title`**
-  > Criticality analysis
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_working`**
-  > Working: {done} of {total} assets.
-  _Ruled OK 2026-10-01._
-- **`lpn_ff_design_all`**
-  > All
-  _Ruled OK 2026-10-03._
-- **`lpn_ff_design_off`**
-  > None
-  _Ruled OK 2026-10-03._
-- **`lpn_ff_design_selected`**
-  > Selected
-  _Ruled OK 2026-10-03._
-
-### feat/demand-scaling (`54179352`) — 77 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_analyze_menu`**
-  > Analyze
-  _Ruled OK 2026-10-03._
-- **`lpn_analyze_menu_tip`**
-  > Analyses that run the network on a copy: fire flow at each junction, the loss of each pipe, pump, and valve, and the demands scaled up or down.
-  _Ruled OK 2026-10-03._
 - **`lpn_crit_baseline_below`**
   > Junctions already below it with nothing broken: {n}. They are not counted.
   _Ruled OK 2026-10-01._
@@ -652,11 +507,33 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_ff_rows_more_links`**
   > Links not shown: {n}.
   _Ruled OK 2026-10-03._
-
-### feat/desktop (`baba0f04`) — adds no English strings
-
-### feat/flow-balance (`c31826a4`) — 7 new, all ruled
-
+- **`lpn_graphs_menu`**
+  > Graphs
+  _Ruled OK 2026-10-03._
+- **`lpn_graphs_menu_tip`**
+  > Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.
+  @@ NEEDS RULING
+- **`lpn_hotkeys_menu_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>
+  _Ruled OK 2026-10-03._
+- **`lpn_hotkeys_menu_heading`**
+  > Menus
+  _Ruled OK 2026-10-03._
+- **`lpn_hotkeys_menu_term`**
+  > Menu keyboard shortcuts
+  _Ruled OK 2026-10-03._
+- **`lpn_reports_calib`**
+  > Calibration
+  _Ruled OK 2026-10-03._
+- **`lpn_reports_calib_tip`**
+  > Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.
+  _Ruled OK 2026-10-03._
+- **`lpn_scenario_basic`**
+  > Basic mode
+  _Ruled OK 2026-10-01._
+- **`lpn_scenario_basic_tip`**
+  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
+  _Ruled OK 2026-10-01._
 - **`lpn_sysflow_consumed`**
   > Consumed
   _Ruled OK 2026-10-03._
@@ -678,6 +555,27 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_sysflow_title`**
   > Flow balance
   _Ruled OK 2026-10-03._
+
+---
+
+# Strings waiting on a branch
+
+**0 still to read**, of 12 new keys across 10 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### chore/selection-word (`16dce45b`) — adds no English strings
+
+### feat/criticality (`84ea5311`) — adds no English strings
+
+### feat/desktop (`baba0f04`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
