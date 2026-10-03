@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**5 still to read on master**, of 175 untranslated keys, of 2327 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**9 still to read on master**, of 179 untranslated keys, of 2331 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -171,7 +171,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (175, 5 to read @@ NEEDS RULING)
+## lpn_  (179, 9 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -506,6 +506,18 @@ never edits a synonym.
 - **`lpn_crit_working`**
   > Working: {done} of {total} assets.
   _Ruled OK 2026-10-01._
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
 - **`lpn_ds_at_time`**
   > Time step: {time}.
   _Ruled OK 2026-10-03._
@@ -703,7 +715,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**10 still to read**, of 22 new keys across 12 unmerged branch(es).
+**6 still to read**, of 18 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -716,24 +728,13 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### chore/analyze-clock-spec (`329c1278`) — adds no English strings
 
+### chore/wave0-1003b (`85644f61`) — adds no English strings
+
 ### feat/desktop (`baba0f04`) — adds no English strings
 
 ### feat/dialog-audit (`3b6989bd`) — adds no English strings
 
-### feat/dock (`05b6ccd6`) — 4 new, 4 to read @@ NEEDS RULING
-
-- **`lpn_dock_autohide`**
-  > Auto-hide
-  @@ NEEDS RULING
-- **`lpn_dock_float`**
-  > Float
-  @@ NEEDS RULING
-- **`lpn_dock_left`**
-  > Dock at the left of the map
-  @@ NEEDS RULING
-- **`lpn_dock_right`**
-  > Dock at the right of the map
-  @@ NEEDS RULING
+### feat/dock (`30d36ba9`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
