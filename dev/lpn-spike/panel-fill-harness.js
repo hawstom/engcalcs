@@ -161,7 +161,10 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		['openHotkeysBox', 'the Tables and Hotkeys box'],
 		// The Calibration report (Task 601): a six-column statistics table and two charts, the
 		// same report-box family as Status and Full, so a phone wants the whole window for it.
-		['openCalibBox', 'the calibration report box']];
+		['openCalibBox', 'the calibration report box'],
+		// The Contour plot box (Task 600): the Find box's shell and the same rule as Find -- a
+		// column of controls that is unreadable at a third of a phone's width.
+		['openContourBox', 'the contour plot box']];
 	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
 	});

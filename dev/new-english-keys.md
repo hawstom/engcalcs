@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**65 still to read on master**, of 83 untranslated keys, of 2236 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**74 still to read on master**, of 92 untranslated keys, of 2245 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (83, 65 to read @@ NEEDS RULING)
+## lpn_  (92, 74 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -180,6 +180,15 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_calib_units`**
   > The file's values are read in this project's units: {unit}.
   @@ NEEDS RULING
+- **`lpn_contour_buffer`**
+  > Buffer
+  @@ NEEDS RULING
+- **`lpn_contour_buffer_tip`**
+  > How far the color reaches from each pipe, as a multiple of the median pipe length. It fades out over the outer part.
+  @@ NEEDS RULING
+- **`lpn_contour_buffer_unit`**
+  > × median pipe length
+  @@ NEEDS RULING
 - **`lpn_contour_consent_1`**
   > Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.
   @@ NEEDS RULING
@@ -204,29 +213,47 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_contour_few`**
   > Too few nodes to contour.
   @@ NEEDS RULING
-- **`lpn_contour_filled`**
-  > Filled contours
+- **`lpn_contour_fill`**
+  > Fill
+  @@ NEEDS RULING
+- **`lpn_contour_fill_bands`**
+  > Bands
+  @@ NEEDS RULING
+- **`lpn_contour_fill_smooth`**
+  > Smooth
+  @@ NEEDS RULING
+- **`lpn_contour_fill_tip`**
+  > Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.
+  @@ NEEDS RULING
+- **`lpn_contour_interval`**
+  > Interval
   @@ NEEDS RULING
 - **`lpn_contour_lines`**
-  > Line contours
+  > Contour lines
   @@ NEEDS RULING
 - **`lpn_contour_menu`**
   > Contour
   @@ NEEDS RULING
+- **`lpn_contour_opacity`**
+  > Fill opacity
+  @@ NEEDS RULING
 - **`lpn_contour_plot`**
   > Contour plot
   @@ NEEDS RULING
-- **`lpn_contour_plot_tip`**
-  > Colors the map between nodes by the field the nodes are colored by, interpolated linearly between neighboring nodes. No color is drawn across pumps, valves, or closed links, or across wide gaps between nodes.
-  @@ NEEDS RULING
 - **`lpn_contour_support`**
-  > Contour plot: linear between {n} nodes. No color across pumps, valves, or closed links, or across gaps wider than {k} times the median pipe length.
+  > Contour plot: {n} nodes, interpolated along {p} pipes and up to {k} times the median pipe length beside them. No color across pumps, valves, or closed links.
   @@ NEEDS RULING
 - **`lpn_contour_support_dem`**
   > Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.
   @@ NEEDS RULING
+- **`lpn_contour_support_lines`**
+  > Contour lines every {i} {u}.
+  @@ NEEDS RULING
 - **`lpn_contour_tip`**
-  > Show a contour plot on the map: the colors of the nodes, spread over the area between them. Its style is in Settings, where you can also turn it off.
+  > Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.
+  @@ NEEDS RULING
+- **`lpn_contour_too_many`**
+  > Too many contour lines at this interval; widen it to draw them.
   @@ NEEDS RULING
 - **`lpn_copy_body`**
   > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
@@ -281,7 +308,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**80 still to read**, of 127 new keys across 13 unmerged branch(es).
+**80 still to read**, of 127 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -292,9 +319,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/irr (`b6913c44`) — adds no English strings
-
-### feat/contour (`5d7e57be`) — adds no English strings
+### feat/contour (`ab43b5b8`) — adds no English strings
 
 ### feat/criticality (`84ea5311`) — 31 new, 8 to read @@ NEEDS RULING
 
@@ -392,7 +417,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selected
   @@ NEEDS RULING
 
-### feat/demand-scaling (`e719b243`) — 77 new, 58 to read @@ NEEDS RULING
+### feat/demand-scaling (`54179352`) — 77 new, 58 to read @@ NEEDS RULING
 
 - **`lpn_analyze_menu`**
   > Analyze
@@ -704,3 +729,7 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_result_pump_head_tip`**
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   @@ NEEDS RULING
+
+### fix/psi-factor (`4217cd31`) — adds no English strings
+
+### fix/report-column (`31195c96`) — adds no English strings
