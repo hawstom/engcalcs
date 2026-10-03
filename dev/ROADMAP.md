@@ -114,25 +114,6 @@ the block.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
-- 100|600| **The three EPANET plots we do not have: contour, frequency, flow balance.**
-  **PROMOTED TO 100 BY TOM, 2026-10-03** (*"Promote to 100: 600, 601, 604"*). Building on `feat/flow-balance` and `feat/contour`.
-  Tom, 2026-09-06, surveying EPANET's plot menu: *"time series, profile, contour (very cool),
-  frequency distribution ... and system flow balance."* **We already have PROFILE** (`lpn_profile_*`)
-  and time series is Task 599, so this row is the remaining three.
-  - **CONTOUR is the one he starred and is also the one with a real unknown**: it interpolates a
-    nodal value over the plane between nodes, so it needs a decision about what happens where there
-    are no nodes -- a pressure contour across a river a main crosses is drawn over nothing.
-    **Design: `dev/epanet-js-contour-contribution.md`.** Since 2026-10-01 (§2a there, Luke Butler's
-    proof of concept): contour HEAD, subtract the Terrain-RGB DEM per cell, and let pressure leave
-    the junctions' range where the terrain does. Tom's 2026-10-03 browser pass settled the rest
-    (§2b there): colour from the links, a faded corridor, a break line at every zone boundary.
-  - **FREQUENCY SHIPPED 2026-09-30** (`feat/frequency-plot`, merged on his word). Contour and flow
-    balance remain.
-  - **SYSTEM FLOW BALANCE -- AND HIS READING OF IT IS RIGHT, but confirm it against EPANET's own
-    help before writing a word of interface.** He guessed *"produced comes from reservoirs and
-    negative demands and consumed is positive demands"*; that matches how the engine accounts for
-    it, and a tank is the third term, swinging between the two as it fills and drains. Getting the
-    definition wrong here is a number a user would believe.
 - 100|604| **Read an EPANET `.PRO` profile file.**
   **PROMOTED TO 100 BY TOM, 2026-10-03** (*"Promote to 100: 600, 601, 604"*). Building on `feat/profile-file`.
   It is the only route a profile can arrive by, and it falls out of closing Task 574. **A profile is in NO `.net` and no `.inp`** -- EPANET's Graph
@@ -268,10 +249,6 @@ the block.
   Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
-- 100|751| **Criticality analysis: break each asset in turn and report.**
-  Tom, 2026-09-30, on WaterGEMS's Criticality tool: *"This sounds like a fun report to build. Break
-  each asset and report."* Fire flow's sibling: scope All/Selected, each pipe out of the network on
-  a copy, report cut-off junctions, low pressures and demand not served. Building on `feat/criticality`.
 - 100|759| **One word for the map selection, another for a menu choice; tips that earn their place.**
   Tom, 2026-10-03: a "studied, considered, carefully adopted, and audited" strategy to tell the map
   selection set from menu choices (his leading candidate: Highlighted / Chosen), and an audit of tip
@@ -408,13 +385,6 @@ the block.
   account, no upload); a Google Sheets sync is a fifth third-party service, so a `privacy.php`
   paragraph and his call. Mary, Sue and Declan's readings are under Task 721. The layout assumes
   Bentley's model (a scenario tree, alternatives beneath); ours is flat, so the tabs need rethinking.
-- 100|754| **On-the-fly demand adjustment: an analysis that scales demands on a copy.**
-  **Tom, 2026-10-01:** *"let's do it and at the same time put Fire Flow, Criticality, and Demand scaling into a Water, Analyze flyout. I guess while we are at it, we could do some cooler things like 'What demand scale can the system handle with this pressure limit?'"* The Analyze fly-out is built on `feat/criticality`.
-  Tom, 2026-09-30, on WaterGEMS's Active Demand Adjustments: *"This also sounds fun and easy to
-  provide."* Then: *"Their Criticality and 'On-the-fly' are like our 'Fire flow' analysis; they do not
-  touch the network. As such, our demand factors are similar and equivalent, but not the same UX or
-  data state."* Our per-scenario multiplier changes the data; this runs on a copy, like Fire flow.
-  Open: what it reports (a map of the adjusted run, or a table like Fire flow's).
 - 75|755| **Per-scenario calculation options: run type and duration first.**
   Tom, 2026-09-30: *"A Demand Multiplier column with the alternatives? What about other settings?"*
   Mary: WaterGEMS keeps run type, duration, steps, friction method, demand adjustments, PDD and

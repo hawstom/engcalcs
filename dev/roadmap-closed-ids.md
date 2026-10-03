@@ -666,3 +666,6 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|758| CLOSED 2026-10-03 on `fix/label-eviction`: the tab keep restores the full bank record plus the node context; the zoom pass unsheds nodes before its link shed, so one scale draws one picture. `label-evict-return-harness.js`, `zoom-pass-determinism-harness.js`.
 - 0|748| CLOSED 2026-10-03: `feat/keyboard-menu` merged on Tom's "Merge both"; arrow keys, Enter, Escape, fly-outs, row letters and hotkeys. `menu-keyboard-harness.js`, `menu-mnemonic-harness.js`.
 - 0|601| CLOSED 2026-10-03: `feat/calibration` merged on Tom's "Merge both" (his "Amazing. Done."); EPANET's three-page calibration report, per-project, session-only. `calibration-harness.js`.
+- 0|600| CLOSED 2026-10-03: all three plots shipped. Frequency 09-30, contour on "Merge contour", flow balance (`feat/flow-balance`) on Tom's "Good. Done. Close, merge, and delete branch."
+- 0|751| CLOSED 2026-10-03: criticality reached master inside `feat/demand-scaling`, which Tom cleared after testing the three Analyze tools together. `criticality-harness.js`.
+- 0|754| CLOSED 2026-10-03: `feat/demand-scaling` merged on Tom's "Good. Done. Close, merge, and delete branch."; Water > Analyze > Demand scaling, on a copy, with a find-the-limit search. `demand-scaling-harness.js`.
