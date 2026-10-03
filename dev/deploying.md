@@ -40,7 +40,7 @@ short rule and points here; this file keeps the reasoning, the quotes and the me
   cannot know the mtimes the pages will actually request.
 
 - **A NEW HOST SERVING THE SUITE MUST BE SET TO THE SAME PHP VERSION, and cPanel does not do it
-  for you.** `librewaternet.org` was created on `ea-php56` while `hawsedc.com` runs `ea-php83`, so
+  for you.** `librewaternet.org` was created on `ea-php56` while `hawsedc.com` ran `ea-php83`, so
   the moment the symlink made the suite reachable there, every page returned 500 with
   `PHP Parse error: syntax error, unexpected '?' in lib/config.inc.php` -- the null coalescing
   operator, which needs PHP 7.0 and appears 17 times in `lib/` alone. **Nothing in the repository

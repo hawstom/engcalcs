@@ -282,8 +282,8 @@ merged. **`QUALITY`** in `lib/Language.Settings.php` is an honest defect-risk es
 
 `check_all.sh` runs every check, and the pre-push hook refuses to push master unless it passed on
 that exact commit. Each failure explains itself; what each check guards is in
-`dev/automated-checks.md`. Run it as `flock /tmp/engcalcs-checkall.lock sh dev/scripts/check_all.sh`,
-at most about three at once.
+`dev/automated-checks.md`. Run it as plain `sh dev/scripts/check_all.sh`, with no outer `flock`: it
+takes one of four slots itself (`EC_CHECK_SLOTS`), each with its own browser lock.
 
 **Add a check for a defect a visitor could hit that a person would miss.** Do not add checks that
 police the wording or layout of documentation, or that check other checks.
@@ -368,7 +368,7 @@ Full record: `dev/deploying.md`.
 - **`../sitemap.xml` is not tracked**; adding or removing a page owes a regenerate
   (`dev/scripts/generate_sitemap.php`) and a manual upload.
 - **`git pull` does not preserve mtimes**, which is why the service worker is generated per request.
-- **Every host serving the suite runs the same PHP version** (currently `ea-php83`); new cPanel
+- **Every host serving the suite runs the same PHP version** (currently `ea-php85`, every domain on the account since 2026-10-03); new cPanel
   domains default to `ea-php56` and 500 on every page.
 - Production SSH is blocked on port 22; origin is GitHub over `ssh.github.com:443`.
 

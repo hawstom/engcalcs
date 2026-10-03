@@ -3650,3 +3650,20 @@ OBSERVED (real Chromium, php -S worktree): Water > Analyze holds Fire flow, Crit
 OBSERVED: a Find result stays on screen, unlabelled, when the clock is moved to another time step (Net3: t=0 verdict "0.51" still shown at 6 h, where the true answer is 3.1).
 OBSERVED: "1 times", "1 junctions" plurals; nothing grammatical handled.
 TRAP for method: Session Save as needs answerTrainingPanel() then a second queuePick; compare files with the project name and docId masked.
+## 2026-10-02 -- pre-review feat/keyboard-menu a7daeafc (Task 748)
+- OBSERVED (headless Chrome, preview :8151): arrows, Home/End wrap, disabled rows skipped, Right/Left on fly-outs, Escape one level, Tab/Shift+Tab, Space/Enter open, mouse-open then arrow, keyboard-open then hover: all work in all 6 top menus and all 8 fly-outs. Focus ring plainly visible. Phone 390px: tap opens/fly-out, no trap.
+- OBSERVED DEFECT: Enter/Space on a command row (Edit>Select, Map>Zoom to fit, Water>Settings/Calculate, Help>About) closes the menu and leaves focus on BODY; the builder's "give focus back to opener" does not fire (focus log: row out -> null, no focusin after). Row that opens an input (Find and replace) is fine.
+- Method note: the harness checks "menu closed" after Enter, not where focus lands; a green harness said nothing about it.
+## 2026-10-02 -- Task 680 feat/drawing-keep (44c13d15)
+
+- OBSERVED: NOT READY. In real Chrome (Net1 <-> Elm-Street-Center, tab switch only), a kept drawing that returns is
+  sized for the OUTGOING project's zoom. Net1 back after Elm: node diameter 65.7/131.5 px (should be 12/24), label text
+  huge; Net1 back after Novato: nodes and labels vanish (sub-pixel). Control on master (port 8100): 12/24 every time.
+  Cause visible in refreshAllFromDocument(): refreshSymbolSizes()/refreshFontSizes() run before restoreViewOrFit();
+  applyView() then skips onZoomChanged() because the record's restored lastLayoutScale equals the new state.s.
+  Re-verify against the current tree before citing.
+- OBSERVED: the builder's harness cannot see this -- its stub never moves the zoom between projects.
+- OBSERVED clean: no document-level lookup in js/*.js reaches drawing elements (all via the globals or a layer);
+  no duplicate ids; hidden layers byte-identical across drag, undo, draw pipe, Calculate, Settings change;
+  closing a tab frees its 5 layers (25 -> 20 -> 15 -> 10).
+- Method note: the first-visit build is correct, so a test must RETURN to a kept tab and read sizes in pixels.

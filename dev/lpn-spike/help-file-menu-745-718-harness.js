@@ -137,7 +137,7 @@ console.log('\n-- Task 745: the Tables and Hotkeys box exists and opens from Hel
 	// two zoom keys -- read out of the same handlers the toolbar and the keydown listeners use.
 	report(/Esc/.test(mapDef), 'Select\'s Esc alternate is in the Map table (LPN_TOOL_ALT_KEYS)');
 	report(/Delete/.test(mapDef), 'Delete is in the Map table');
-	report(/Ctrl\+Z/.test(mapDef) && /\(e\.ctrlKey \|\| e\.metaKey\) && e\.key === 'z'/.test(src),
+	report(/Ctrl\+Z/.test(mapDef) && /if \(k === 'z'\) \{ e\.preventDefault\(\); undo\(\); \}/.test(src),
 		'Ctrl+Z (undo) is in the Map table and still the key the page actually binds');
 	report(/\+ or =/.test(mapDef) && /e\.key === '\+' \|\| e\.key === '='/.test(src),
 		'the zoom-in keys (+ and =) are in the Map table and still the keys the page actually binds');

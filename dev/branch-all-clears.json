@@ -338,6 +338,34 @@
             "words": "Merge after wording",
             "context": "His selection in an AskUserQuestion typed in the session, to: 'once I swap in your wording (\"Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.\"), may I merge it without another browser pass?' His paste the same day: \"8146 copy-lock: Wording change per this. This is good.\"",
             "pin_note": "Pinned to the commit carrying his sentence and its ruling record; master was merged in just before."
+        },
+        "feat/graph-menu": {
+            "head": "ab0c1f869ae7de27c55877bca3269d74e2e7f1a4",
+            "date": "2026-10-03",
+            "words": "Good. Done. Close, merge, and delete branch.",
+            "context": "His browser-pass note, then confirmed in session: Answered \"Yes, merge all\" in this session (2026-10-03) to: \"Should I merge all five to master now and delete them?\"",
+            "pin_note": "Pinned to the head he tested on his preview port; unchanged since."
+        },
+        "feat/drawing-keep": {
+            "head": "73c1e0b37b7909aa2b6f42ab3d38ef639c949fcb",
+            "date": "2026-10-03",
+            "words": "I think you described this branch poorly. It's simply a performance improvement that prevents placement recalc on switching. And it seems to work. Good. Done. Close, merge, and delete branch.",
+            "context": "His browser-pass note, then confirmed in session: Answered \"Yes, merge all\" in this session (2026-10-03) to: \"Should I merge all five to master now and delete them?\"",
+            "pin_note": "Pinned to the head he tested on his preview port; unchanged since."
+        },
+        "feat/property-arrow-key": {
+            "head": "389fd6298ca42ae30a4af05eb18bb18fe79c536f",
+            "date": "2026-10-03",
+            "words": "Very nice!  Close, merge, and delete branch.",
+            "context": "His browser-pass note, then confirmed in session: Answered \"Yes, merge all\" in this session (2026-10-03) to: \"Should I merge all five to master now and delete them?\"",
+            "pin_note": "Pinned to the head he tested on his preview port; unchanged since."
+        },
+        "feat/bentley-interop": {
+            "head": "fadae8269d24de7945146b683b4c65fb5d59affe",
+            "date": "2026-10-03",
+            "words": "Merge, recut branch (Recommended)",
+            "context": "His answer in this session (2026-10-03) to: \"Should I merge it to master now, then cut a fresh long-lived feat/bentley-interop from master for the WaterCAD reading work?\" His browser-pass note: \"The reason I didn't say to merge this branch is that my understanding was that this is a long-term branch for all the bentley-interop things.\"",
+            "pin_note": "Pinned to the head he tested on his preview port; unchanged since."
         }
     }
 }
