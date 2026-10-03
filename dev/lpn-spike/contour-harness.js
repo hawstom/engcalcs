@@ -209,6 +209,7 @@ const L = loadLoopedNetwork(
 	"\t\tcontourField: function () { return contourField; },\n" +
 	"\t\tcontourLayer: function () { return contourLayer; }, showContour: showContour, openContourBox: openContourBox,\n" +
 	"\t\tdrawContourLabels: drawContourLabels, setScale: function (s) { state.s = s; },\n" +
+	"\t\tsetView: function (s, tx, ty) { state.s = s; state.tx = tx; state.ty = ty; },\n" +
 	"\t\tcolorNodeValue: colorNodeValue, nodeDrawX: nodeDrawX, nodeDrawY: nodeDrawY,\n" +
 	"\t\tlegendText: function () { var b = colorLegendEl(), t = []; (function walk(e) { if (!e) { return; } if (e.nodeType === 3 || e._text) { t.push(String(e.textContent)); } (e.children || []).forEach(walk); }(b)); return t.join(' '); },\n" +
 	"\t\tsetProp: setProp, scheduleSolve: scheduleSolve, nodeById: nodeById,\n" +
@@ -369,12 +370,30 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	check(samples.length >= 20 && at25.full === at25.loops, `(a) at the default 2.5, every one of Net3's ${at25.loops} loops is coloured through`);
 	check(at15.full < at15.loops, `...and at 1.5 some loop has a bare hole (${at15.full} of ${at15.loops}), so the measure can fail`);
 
-	// (b) FAR FROM EVERY LINK.
+	// (b) FAR FROM EVERY LINK. Every cell of the grid more than 1.1 reaches from every link, by brute
+	// force against the drawing itself, is bare -- and there are such cells, so the claim is not empty.
 	let x0 = Infinity, x1 = -Infinity, y0 = Infinity;
 	Object.values(xy).forEach(([x, y]) => { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); });
 	const cf = L.contourField();
-	const corner = C.cellAt(cf.grid, cf.grid.x0 + cf.grid.dx / 2, cf.grid.y0 + cf.grid.dy / 2);
-	check(fieldAt(x1 + 0.4 * (x1 - x0), y0 - 0.4 * (x1 - x0)).a === 0 && cf.field.alpha[corner] === 0, '(b) a point far from every link, and the corner of the grid, are bare');
+	const segsXY = d.links.map((l) => [xy[l.from], xy[l.to]]).filter((p) => p[0] && p[1]);
+	const reach = 2.5 * C.median(d.links.filter((l) => l.type === 'pipe').map((l) => Math.hypot(xy[l.from][0] - xy[l.to][0], xy[l.from][1] - xy[l.to][1])));
+	function distToLinks(x, y) {
+		let best = Infinity;
+		segsXY.forEach(([p, q]) => {
+			const ex = q[0] - p[0], ey = q[1] - p[1], L2 = ex * ex + ey * ey;
+			let t = L2 > 0 ? ((x - p[0]) * ex + (y - p[1]) * ey) / L2 : 0; t = Math.max(0, Math.min(1, t));
+			best = Math.min(best, Math.hypot(x - p[0] - t * ex, y - p[1] - t * ey));
+		});
+		return best;
+	}
+	let farCells = 0, farColoured = 0;
+	for (let jj = 0; jj < cf.grid.ny; jj += 4) {
+		for (let ii = 0; ii < cf.grid.nx; ii += 4) {
+			const x = cf.grid.x0 + (ii + 0.5) * cf.grid.dx, y = cf.grid.y0 + (jj + 0.5) * cf.grid.dy;
+			if (distToLinks(x, y) > 1.1 * reach) { farCells++; if (cf.field.alpha[jj * cf.grid.nx + ii] > 0) { farColoured++; } }
+		}
+	}
+	check(farCells > 100 && farColoured === 0, `(b) every one of ${farCells} sampled cells more than 1.1 reaches from every link is bare: ${farColoured} coloured`);
 
 	// (c) THE PUMPS. Pump 335 lifts from the river's zone into the network's: the colour jumps across
 	// it and a break line is drawn there. (Pump 10, from the lake, is closed and has no pressure on
@@ -383,6 +402,10 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	const ax = L.nodeDrawX(a335), ay = L.nodeDrawY(a335), bx = L.nodeDrawX(b335), by = L.nodeDrawY(b335);
 	const side = (f) => fieldAt(ax + f * (bx - ax), ay + f * (by - ay));
 	const before335 = side(0.2), after335 = side(0.8);
+	// The suction side is the river's zone, whose only junction is 60: its colour is 60's pressure
+	// exactly, nothing from the network across the pump mixed in.
+	const p60 = L.colorNodeValue(a335, 'pressure');
+	check(Math.abs(before335.v - p60) < 1e-6, `(c) the suction side carries node ${a335.id}'s own pressure and nothing from across the pump: ${before335.v.toFixed(3)} | ${p60.toFixed(3)}`);
 	check(before335.a > 0 && after335.a > 0 && Math.abs(after335.v - before335.v) > 20,
 		`(c) across pump 335 the colour jumps: ${before335.v.toFixed(1)} psi on the suction side, ${after335.v.toFixed(1)} on the discharge`);
 	const plen = Math.hypot(bx - ax, by - ay), mx = (ax + bx) / 2, my = (ay + by) / 2;
@@ -402,31 +425,39 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	const lvls = lineEls.map((p) => +p.getAttribute('data-level'));
 	check(lineEls.length >= 8 && lvls.every((v) => Math.abs(v / 5 - Math.round(v / 5)) < 1e-9), `(d) ${lineEls.length} contour lines, every one at a multiple of 5 psi`);
 	check(layerOf('lpn-contour-index').length > 0 && layerOf('lpn-contour-index').every((p) => +p.getAttribute('data-level') % 25 === 0), 'every fifth level (25 psi) is an index contour');
-	// A scale an engineer would see Net3 at: the whole network across 1000 px, then zoomed 3 times.
-	const fit = 1000 / (x1 - x0);
-	L.setScale(3 * fit); L.drawContourLabels();
+	// The view an engineer would see Net3 in: the whole network across the canvas (1000 x 500 in the
+	// stub), centred, then zoomed three times on its middle.
+	const rect = byId.lpn_canvas.getBoundingClientRect();
+	let y1 = -Infinity;
+	Object.values(xy).forEach(([, y]) => { y1 = Math.max(y1, y); });
+	const fit = Math.min(rect.width / (x1 - x0), rect.height / (y1 - y0)), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+	const view = (s) => { L.setView(s, rect.width / 2 - s * cx, rect.height / 2 - s * cy); L.drawContourLabels(); };
+	view(fit);
 	const labels = layerOf('lpn-contour-label');
 	let wrong = 0, offLine = 0;
 	labels.forEach((t) => {
 		const lv = +t.getAttribute('data-level'), x = +t.getAttribute('x'), y = +t.getAttribute('y');
 		if (t.textContent !== C.levelText(lv, 5)) { wrong++; }
 		const cfl = L.contourField(), v = C.sampleField(cfl.field.val, cfl.grid, x, y);
-		if (!(Math.abs(v - lv) < 2.5)) { offLine++; if (process.env.CDEBUG) { console.log('OFF', lv, v, x, y); } }
+		if (!(Math.abs(v - lv) < 2.5)) { offLine++; }
 	});
 	check(labels.length >= 5 && wrong === 0, `(d) ${labels.length} labels, each printing its own level`);
 	check(offLine === 0, '(d) the field under every label is within half an interval of it: it labels the line it sits on');
 	check(labels.every((t) => { const m = /rotate\(([-\d.]+)/.exec(t.getAttribute('transform')); return m && +m[1] > -90 && +m[1] <= 90; }), 'every label upright');
-	check(labels.length && Math.abs(+labels[0].getAttribute('font-size') - 11 / (3 * fit)) < 1e-9, 'a label is 11 px on screen at any zoom');
-	L.setScale(fit); L.drawContourLabels();
-	const fitLabels = layerOf('lpn-contour-label').length;
-	check(fitLabels > 0 && fitLabels < labels.length, `zoomed out, fewer labels fit: ${fitLabels} at the whole-network view, ${labels.length} zoomed in 3 times`);
+	view(3 * fit);
+	const zl = layerOf('lpn-contour-label');
+	check(zl.length && Math.abs(+zl[0].getAttribute('font-size') - 11 / (3 * fit)) < 1e-9, 'a label is 11 px on screen at any zoom');
+	const inView = zl.every((t) => { const sx = 3 * fit * (+t.getAttribute('x')) + rect.width / 2 - 3 * fit * cx, sy = 3 * fit * (+t.getAttribute('y')) + rect.height / 2 - 3 * fit * cy;
+		return sx >= -0.25 * rect.width && sx <= 1.25 * rect.width && sy >= -0.25 * rect.height && sy <= 1.25 * rect.height; });
+	check(zl.length > 0 && inView, `zoomed in, labels are laid out only in and around the view: ${zl.length} labels`);
+	view(fit);
 
 	// Timing: a cold field, then the cached redraw a colour change costs.
 	let cold = Infinity, warm = Infinity;
 	for (let i = 0; i < 5; i++) { d.settings.contourBuffer = 2.5 + ((i % 2) + 1) * 1e-9; L.refreshValueColors(); cold = Math.min(cold, L.contourStats().ms); }
 	for (let i = 0; i < 5; i++) { L.refreshValueColors(); warm = Math.min(warm, L.contourStats().ms); }
 	d.settings.contourBuffer = 2.5; L.refreshValueColors();
-	console.log(`         Net3: ${L.contourStats().cells} cells; field and lines ${cold.toFixed(1)} ms, cached redraw ${warm.toFixed(1)} ms`);
+	console.log(`         Net3: ${L.contourStats().cells} cells; field, fill and lines ${cold.toFixed(1)} ms (the field ${L.contourStats().fieldMs.toFixed(1)} ms), cached redraw ${warm.toFixed(1)} ms`);
 	check(cold < 1500 && warm < cold, `Net3 builds in ${cold.toFixed(0)} ms and a cached redraw takes ${warm.toFixed(0)} ms`);
 	check(JSON.parse(JSON.stringify(L.serialize())).settings.contourFill === 'smooth', 'the contour settings ride in the project');
 
@@ -601,9 +632,10 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	for (let r = 0; r < N; r++) { for (let c = 0; c < N; c++) { const n = L.addNode('junction', 0, 0); n.x = c * 100 + (rnd() - 0.5) * 30; n.y = r * 100 + (rnd() - 0.5) * 30; n.elev = 50 + 20 * Math.sin(c / 6) + 15 * Math.cos(r / 5); gid.push(n.id); } }
 	for (let r = 0; r < N; r++) { for (let c = 0; c < N; c++) { const k = r * N + c; if (c < N - 1 && rnd() > 0.1) { L.addLink('pipe', gid[k], gid[k + 1]); } if (r < N - 1 && rnd() > 0.1) { L.addLink('pipe', gid[k], gid[k + N]); } } }
 	S4.colorNodeField = 'elev'; S4.contourFill = 'smooth'; S4.contourLines = true;
+	L.setView(rect.width / 4000, 0, 0);
 	let big = Infinity;
 	for (let i = 0; i < 3; i++) { S4.contourBuffer = 2.5 + (i + 1) * 1e-9; L.refreshValueColors(); big = Math.min(big, L.contourStats().ms); }
-	console.log(`         ${N * N} junctions, ${L.getDoc().links.length} pipes: ${L.contourStats().cells} cells, ${big.toFixed(1)} ms`);
+	console.log(`         ${N * N} junctions, ${L.getDoc().links.length} pipes: ${L.contourStats().cells} cells, ${big.toFixed(1)} ms (the field ${L.contourStats().fieldMs.toFixed(1)} ms, ${L.contourStats().levels} lines, ${L.contourStats().labels} labels)`);
 	check(big < 4000, `a ${N * N}-junction network builds in ${big.toFixed(0)} ms`);
 
 	console.log(failures ? `\n${failures} FAILED` : '\nall checks passed');

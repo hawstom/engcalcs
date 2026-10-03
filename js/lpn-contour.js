@@ -463,7 +463,8 @@
 	// LABELS ALONG A LINE -- where each label sits, at the SCREEN scale it will be read at:
 	//   lines   [{level, pts, closed}] in drawing units
 	//   opts    {scale: screen px per drawing unit, width(level) -> label width in px,
-	//            height: px, spacing: px between labels on one line, pad: px kept from an open end}
+	//            height: px, spacing: px between labels on one line, pad: px kept from an open end,
+	//            clip: {x0, y0, x1, y1} in drawing units, the part of the drawing on screen, optional}
 	// Labels go where the line is nearly straight across the label's own width, upright (never
 	// upside down), and never within a label's width of one already placed, longest lines first.
 	// Returns [{level, x, y, angle (degrees, SVG's clockwise sense)}].
@@ -478,6 +479,8 @@
 		}
 		var order = lines.map(function (l) { return { l: l, len: lenOf(l.pts, l.closed) * sc }; })
 			.sort(function (a, b) { return b.len - a.len; });
+		var K = opts.clip;
+		function onScreen(p) { return !K || (p[0] >= K.x0 && p[0] <= K.x1 && p[1] >= K.y0 && p[1] <= K.y1); }
 		order.forEach(function (o) {
 			var l = o.l, W = opts.width(l.level) + 6;
 			if (o.len < W + 2 * pad) { return; }
@@ -503,7 +506,7 @@
 					if (cum[v] <= s - W / 2 || cum[v] >= s + W / 2) { continue; }
 					if (Math.abs((p[2 * v] - A[0]) * uy - (p[2 * v + 1] - A[1]) * ux) / (ul || 1) * sc > H / 5) { straight = false; }
 				}
-				var clear = straight && placed.every(function (q) {
+				var clear = straight && onScreen(C) && placed.every(function (q) {
 					var dx = (q.x - C[0]) * sc, dy = (q.y - C[1]) * sc;
 					return Math.sqrt(dx * dx + dy * dy) > (q.w + W) / 2 + H;
 				});

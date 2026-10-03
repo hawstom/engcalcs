@@ -6143,6 +6143,9 @@ var EngCalcs = EngCalcs || {};
 		// setTransform(), so the basemap has exactly one place to learn that the visible window
 		// changed -- rather than six call sites that each have to remember. Debounced inside.
 		scheduleBasemapRefresh();
+		// The contour labels keep their size and spacing on screen and are laid out only where the
+		// view is, so a zoom or a pan re-places them once it settles (Task 600).
+		scheduleContourRelabel();
 		// The bar is a fact about the current zoom, so it belongs on the same seam as the basemap:
 		// every pan and every zoom in this file arrives here and nowhere else.
 		refreshScaleBar();
@@ -9067,8 +9070,16 @@ var EngCalcs = EngCalcs || {};
 		if (!settings.contourLabels || !settings.contourLines || !LC || !LC.lines.length || !(state.s > 0)) { return; }
 		var px = CONTOUR_LABEL_PX, lines = [];
 		LC.levels.forEach(function (lv, k) { (LC.lines[k] || []).forEach(function (pl) { lines.push({ level: lv, pts: pl.pts, closed: pl.closed }); }); });
+		// ONLY WHERE SOMEBODY CAN SEE THEM, plus a margin: a big network zoomed in would otherwise
+		// lay out tens of thousands of labels off screen. A pan re-places them (setTransform()).
+		var clip = null, r = svg && svg.getBoundingClientRect ? svg.getBoundingClientRect() : null;
+		if (r && r.width > 0 && r.height > 0) {
+			var mx = 0.25 * r.width, my = 0.25 * r.height;
+			clip = { x0: (-mx - state.tx) / state.s, y0: (-my - state.ty) / state.s,
+				x1: (r.width + mx - state.tx) / state.s, y1: (r.height + my - state.ty) / state.s };
+		}
 		var placed = C.placeLabels(lines, {
-			scale: state.s, height: px, spacing: CONTOUR_LABEL_SPACING_PX, pad: px,
+			scale: state.s, height: px, spacing: CONTOUR_LABEL_SPACING_PX, pad: px, clip: clip,
 			width: function (lv) { return 0.62 * px * C.levelText(lv, LC.step).length; }
 		});
 		var fs = px / state.s, halo = 3 / state.s;
@@ -44855,8 +44866,6 @@ var EngCalcs = EngCalcs || {};
 		}
 	}
 	function onZoomChangedNow() {
-		// The contour labels keep their size and spacing on screen, so a new scale re-places them.
-		scheduleContourRelabel();
 		// **ANYTHING DRAWN AT A SIZE IN SCREEN PIXELS HAS TO BE REDRAWN WHEN THE SCALE CHANGES**, or
 		// it is a constant in WORLD units instead and grows and shrinks with the drawing. Two things
 		// on this page are in that class, and the placement handles were the one that was missed:
