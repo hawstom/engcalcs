@@ -113,29 +113,29 @@ to his 09-14 ruling), check_all in four slots (`f9829cee`), the widened panel gu
 
 Every branch below has master merged in (2026-10-02) and a suite run on it; "green" = only the
 expected `payload freshness`. Ask for merges with AskUserQuestion.
-- 8141 `feat/property-graph` (637, R-370, R-377): pump reads "Head", prefix "H="; Full report/CSV
+- 8106 `feat/property-graph` (637, R-370, R-377): pump reads "Head", prefix "H="; Full report/CSV
   column "Pump head" (new key `lpn_report_pump_head`). Time series: held values step forward, others
   slope (`TS_STEPPED`). Owed: his OK on "Head" and "Pump head" (rulings were keyed on "Head gain").
-- 8144 `feat/criticality` (751, R-371): rows in fire flow's tiers and tints. Owed: syn diff for
+- 8107 `feat/criticality` (751, R-371): rows in fire flow's tiers and tints. Owed: syn diff for
   `lpn_ff_all`/`_selected` (drop the Design-check sentence) and proposed `lpn_ff_design_*` syn entries.
   `lpn_crit_skipped` ("{n} selected elements are not links") still plural-agrees; not fixed.
-- 8149 `feat/demand-scaling` (754, R-374): contains criticality (merged 3d090fc3), so merging it merges
+- 8110 `feat/demand-scaling` (754, R-374): contains criticality (merged 3d090fc3), so merging it merges
   both. Find was always scoped; it now SAYS "Only the selected junctions were scaled", and a refused
   Selected run clears the old answer in the box (fire flow and criticality too). New wording to rule:
   "Junctions not shown: {n}." (was "{n} more junctions are not shown.") and "Links not shown: {n}."
-- 8147 `feat/bentley-interop` (749, R-372): "Alt. preview is good" — nothing to build; needs only his word.
-- 8148 `feat/graph-menu` (640, R-373): Profile row icon removed; tip is his text verbatim. The rows
+- 8108 `feat/bentley-interop` (749, R-372): "Alt. preview is good" — nothing to build; needs only his word.
+- 8109 `feat/graph-menu` (640, R-373): Profile row icon removed; tip is his text verbatim. The rows
   still read "Time series" / "Frequency" against his tip's "Time Series" / "Frequency distribution".
-- 8151 `feat/keyboard-menu` (748): Perry passed it bar one defect (focus lost after Enter), fixed;
+- 8112 `feat/keyboard-menu` (748): Perry passed it bar one defect (focus lost after Enter), fixed;
   RTL mirrors Left/Right.
-- 8150 `feat/drawing-keep` (680): Perry found returns drawn at the previous project's zoom; fixed
+- 8111 `feat/drawing-keep` (680): Perry found returns drawn at the previous project's zoom; fixed
   (2b47ebe9) with a harness across scales. Keeps up to four drawings.
-- 8152 `feat/property-arrow-key` (Declan's wish 3): Up/Down walk the Properties fields.
+- 8113 `feat/property-arrow-key` (Declan's wish 3): Up/Down walk the Properties fields.
 - `feat/desktop` (756): his ruling R-375 — usage logs ON in a desktop build, reported to hawsedc.com;
   write it into `dev/desktop-platforms-plan.md` (a fifth outside call: consent and privacy paragraph).
 - `feat/label-placer` (539/741): unchanged.
 
-- 8153 `fix/undo-label`: there was no Redo; now Ctrl+Y and Ctrl+Shift+Z (not Cmd+Y, the Mac's
+- 8114 `fix/undo-label`: there was no Redo; now Ctrl+Y and Ctrl+Shift+Z (not Cmd+Y, the Mac's
   History), a new edit empties it, and Undo keeps the Properties box open. Held for his pass because it
   is new behaviour. The Help box's shortcut list lacks the Redo row: adding it needs his OK on "Ctrl+Y
   or Ctrl+Shift+Z | Redo the last undone change." and a translation pass (the markup check needs all 27).
@@ -222,9 +222,7 @@ definitions. Glossary write-back owed from echo (see 09-30).
 
 ## Commands to hand Tom with any panel change
 
-A new port needs one more line in his `~/.ssh/config` on the machine he browses from, under
-`Host jasmine`, then a fresh `ssh jasmine`:
-
-```
-  LocalForward 8150 localhost:8150
-```
+Nothing, normally. His Windows ssh config (`C:\Users\tomha\.ssh\config`, PowerShell's ssh)
+forwards 8080, 8100-8139 and 8201-8205. Ports are reusable: give a new branch the lowest number in
+8101-8139 that no `ports.conf` row holds. Windows' ssh dies past about 120 forwards, so never grow
+that pool past ~60. His WSL tab runs a different ssh that carries no forwards.
