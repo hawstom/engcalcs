@@ -35,12 +35,21 @@ const WRAP = (w) => {
 		cut(start, k.length);
 		return out;
 	}
+	const names = [];
+	(function () {
+		let t = ''; const k = f.childNodes;
+		for (let i = 0; i <= k.length; i++) {
+			if (i === k.length || k[i].nodeName === 'BR') { if (t.trim()) { names.push(t.trim().replace(/\s+/g, ' ').slice(0, 50)); } t = ''; }
+			else { t += k[i].textContent; }
+		}
+	})();
 	popup.style.width = '2400px'; const nat = rows();
 	if (window.__dumpRows) { window.__dumpRows(); }
 	popup.style.width = w + 'px'; const now = rows();
 	popup.style.width = keep;
-	let wrapped = 0; for (let i = 0; i < nat.length; i++) { if (now[i] > nat[i] + 2) { wrapped++; } }
-	return { rows: nat.length, wrapped };
+	let wrapped = 0; const which = [];
+	for (let i = 0; i < nat.length; i++) { if (now[i] > nat[i] + 2) { wrapped++; which.push(i); } }
+	return { rows: nat.length, wrapped, which: which.map((i) => names[i]) };
 };
 const info = (page) => page.evaluate(() => {
 	const p = document.getElementById('lpn_popup'), r = p.getBoundingClientRect();
@@ -79,14 +88,16 @@ async function main() {
 			if (!opened) { await a.close(); continue; }
 			const o = await info(page);
 			const at = await page.evaluate(WRAP, o.w);
-			console.log('  WIDTH ' + kind + ' ' + o.w + ' px (' + at.wrapped + ' of ' + at.rows + ' rows wrap)');
-			ok('at most 5% of the rows wrap on open', at.wrapped <= Math.floor(0.05 * at.rows), at.wrapped + '/' + at.rows);
+			console.log('  WIDTH ' + kind + ' ' + o.w + ' px (' + at.wrapped + ' of ' + at.rows + ' rows wrap: ' + at.which.join(' | ') + ')');
+			const allow = (n) => Math.max(1, Math.floor(0.05 * n));
+			ok('at most 5% of the rows (and at least one) wrap on open', at.wrapped <= allow(at.rows), at.wrapped + '/' + at.rows);
+			if (kind === 'pump') { ok('the pump opens well under the 652 px its prose note needs', o.w < 500, String(o.w)); }
 			if (kind === 'pipe' || kind === 'pump') {
 				// Minimal: a few pixels narrower must wrap more than the 5% allowance (or hit the CSS minimum).
 				const min = await page.evaluate(() => parseFloat(getComputedStyle(document.getElementById('lpn_popup')).minWidth));
 				const narrower = await page.evaluate(WRAP, o.w - 8);
-				ok('8 px narrower would wrap more than 5% of the rows (or is below the minimum)',
-					narrower.wrapped > Math.floor(0.05 * narrower.rows) || o.w - 8 < min,
+				ok('8 px narrower would wrap more than the allowance (or is below the minimum)',
+					narrower.wrapped > allow(narrower.rows) || o.w - 8 < min,
 					o.w + ' wide; ' + narrower.wrapped + '/' + narrower.rows + ' wrap at ' + (o.w - 8) + '; min ' + min);
 			}
 			// Selecting another element while it is open does not change the width.

@@ -51286,7 +51286,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	var popupAutoW = 0;
 	// The width at which at most 5% of the Properties rows wrap: each row's one-line width (label
-	// and control, measured with the box as wide as the window allows), the ceil(0.95 n)-th
+	// and control, measured with the box as wide as the window allows), the (n - max(1, floor(0.05 n)))-th
 	// smallest, plus the box's own padding, border and a scrollbar's worth. Never below the box's
 	// CSS minimum. A row is what lies between two <br>, or a block child on its own.
 	function popupFitWidth(popup) {
@@ -51317,7 +51317,9 @@ var EngCalcs = EngCalcs || {};
 		if (!widths.length) { return popup.getBoundingClientRect().width; }
 		widths.sort(function (a, b) { return a - b; });
 		n = widths.length;
-		w = widths[Math.ceil(0.95 * n) - 1];
+		// 5% of the rows may wrap, and at least one: a box of fewer than 20 rows would otherwise
+		// be sized to its widest row, usually a sentence that is meant to wrap.
+		w = widths[n - 1 - Math.min(n - 1, Math.max(1, Math.floor(0.05 * n)))];
 		cs = window.getComputedStyle(popup);
 		chrome = popup.getBoundingClientRect().width - fields.getBoundingClientRect().width;
 		minW = parseFloat(cs.minWidth) || 0;
