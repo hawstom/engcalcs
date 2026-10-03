@@ -62,14 +62,14 @@ ok('from, to, waypoints are the listed nodes in order', ps.from === '10' && ps.t
 	JSON.stringify([ps.from, ps.waypoints, ps.to]));
 const p = L.profilePath();
 same(p && p.nodes, ['10', '101', '103', '109', '111'], 'the drawn path runs through exactly those nodes');
-ok('no missing-IDs sentence when all are found', !/not in this network/.test(L.noticeText() || ''), L.noticeText());
+ok('no missing-IDs sentence when all are found', (L.noticeText() || '').indexOf(PC.lpn_profile_file_missing.split(' {ids}')[0]) < 0, L.noticeText());
 
 console.log('\n--- unknown IDs are reported and skipped ---');
 ok('load with two unknown IDs still succeeds',
 	L.loadProfileFileText('Mixed\r\n10\r\nZZ9\r\n101\r\n\r\nQQ1\r\n103\r\nZZ9\r\n') === true);
 same(L.profilePath().nodes, ['10', '101', '103'], 'the known nodes make the path');
 const note = L.noticeText() || '';
-ok('the notice lists each unknown ID once', /not in this network: ZZ9, QQ1\./.test(note), note);
+ok('the notice lists each unknown ID once', note.indexOf(PC.lpn_profile_file_missing.replace('{ids}', 'ZZ9, QQ1')) >= 0, note);
 ok('the notice counts what was used', /3 of 6 nodes/.test(note), note);
 
 console.log('\n--- too few usable nodes ---');
