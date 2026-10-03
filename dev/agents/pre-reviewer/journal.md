@@ -3684,3 +3684,10 @@ TRAP for method: Session Save as needs answerTrainingPanel() then a second queue
 - OBSERVED, on master-equivalent code (bank off): return to Novato after 5 other tabs (drawing evicted, rebuilt from kept layout) at identical view: 78 of 123 labels differ from before leaving (some rows shed, positions moved). captureLabelLayout() omits alignedAlong, stationSides, hiddenYielded, customer spots (by reading). Cause not isolated to those four fields.
 - NOT EXERCISED: Settings changes, recalc-off edits, hover/select, pinch, real customers, georeference change.
 - Method: snapshots must exclude other tabs' kept (display:none) layers; tab order at load is nondeterministic, so verify the current tab by name. Never pkill -f with a pattern that matches your own shell command.
+
+## 2026-10-03 feat/flow-balance @ 15250325 (Task 600, System flow tab)
+
+- CITED: EPANET 2.2 Delphi_GUI/epanet2w/Fgraph.pas GetSysFlow: loop `for i := JUNCS to RESERVS`, demand > 0 adds to CONSUMED, else subtracted into PRODUCED; tanks excluded. Builder's definition matches exactly.
+- OBSERVED (headless Chromium, this tree): Net1 and Net3 draw 25 points per line; the "now" line follows the step selector; sum of all node demands per step is ~1e-8 m3/s; flow unit change relabels and rescales the axis; no-run message appears on a blank project; mutation (tanks counted) makes the harness fail 4 checks.
+- OBSERVED DEFECT: no CSS for #lpn_sysflow_chart (css/engcalcs.css:2329 lists the other three), so at 1280x800 the chart is 340 px in a 260 px pane and the time axis is below the fold; Time series fits (211 px).
+- OBSERVED: the new tab pushes the strip to a second row at 1280 px in ru, fr, es, pt, tr (en and de fit); the "System flow" label is English in every language until translated. Decays when the tab label is translated.
