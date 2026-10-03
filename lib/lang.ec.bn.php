@@ -1715,7 +1715,6 @@ $ec_lang['lpn_crs_search']='অনুসন্ধান করুন';
 $ec_lang['lpn_crs_name']='প্রক্ষেপণের নাম ফিল্টার';
 $ec_lang['lpn_crs_name_tip']='আপনি যা টাইপ করেন তা যাদের নামে বা EPSG কোডে আছে কেবল সেই প্রক্ষেপণগুলো দেখায়। একটি জোন নম্বর, বা UTM, বা Mercator লিখে চেষ্টা করুন।';
 $ec_lang['lpn_crs_list_tip']='উপরের দুটি ফিল্টারের পর অবশিষ্ট থাকা প্রক্ষেপণগুলো। একটি নির্বাচন করুন এবং Select চাপুন।';
-$ec_lang['lpn_crs_choose']='নির্বাচন করুন';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='এখনও কোনো স্থান অনুসন্ধান করা হয়নি, তাই পুরো তালিকা দেখানো হচ্ছে। উপরে একটি স্থান খুঁজুন অথবা তালিকা সংকীর্ণ করতে মানচিত্র জুম করুন।';
 $ec_lang['lpn_crs_count']='{total}টির মধ্যে {n}টি প্রক্ষেপণ তালিকাভুক্ত।';

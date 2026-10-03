@@ -1706,7 +1706,6 @@ $ec_lang['lpn_crs_search']='खोजें';
 $ec_lang['lpn_crs_name']='प्रक्षेपण नाम फ़िल्टर';
 $ec_lang['lpn_crs_name_tip']='केवल वे प्रक्षेपण दिखाता है जिनके नाम या EPSG कोड में आपका टाइप किया हुआ शामिल है। कोई ज़ोन नंबर, या UTM, या Mercator आज़माएँ।';
 $ec_lang['lpn_crs_list_tip']='ऊपर के दोनों फ़िल्टर के बाद बचे प्रक्षेपण। एक चुनें और Select दबाएँ।';
-$ec_lang['lpn_crs_choose']='चुनें';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='अभी तक किसी स्थान की खोज नहीं की गई है, इसलिए पूरी सूची दिखाई जा रही है। सूची को सीमित करने के लिए ऊपर किसी स्थान को खोजें या मानचित्र को ज़ूम करें।';
 $ec_lang['lpn_crs_count']='{total} में से {n} प्रक्षेपण सूचीबद्ध।';

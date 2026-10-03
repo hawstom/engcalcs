@@ -1706,7 +1706,6 @@ $ec_lang['lpn_crs_search']='لټون';
 $ec_lang['lpn_crs_name']='د پروجیکشن نوم پاڼول';
 $ec_lang['lpn_crs_name_tip']='یوازې هغه پروجیکشنونه ښیي چې نوم یا EPSG کوډ یې هغه لري چې تاسو یې لیکئ. د زون شمېره، یا UTM، یا Mercator وازموئ.';
 $ec_lang['lpn_crs_list_tip']='هغه پروجیکشنونه چې د پورتنیو دوو پاڼونو نه پاتې شوي. یو یې وټاکئ او د ټاکل تڼۍ فشار ورکړئ.';
-$ec_lang['lpn_crs_choose']='ټاکل';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='تر اوسه هیڅ ځای ونه لټول شو، نو بشپړ لړلیک وړاندې کیږي. پورته یو ځای ولټوئ یا نقشه دې لړلیک لنډولو لپاره لوی یا کوچنی کړئ.';
 $ec_lang['lpn_crs_count']='{n} د {total} پروجیکشنونو نه لړلیک شوي.';

@@ -1706,7 +1706,6 @@ $ec_lang['lpn_crs_search']='Suchen';
 $ec_lang['lpn_crs_name']='Projektionsnamen-Filter';
 $ec_lang['lpn_crs_name_tip']='Zeigt nur die Projektionen, deren Name oder EPSG-Code den eingegebenen Text enthält. Versuchen Sie eine Zonennummer, UTM oder Mercator.';
 $ec_lang['lpn_crs_list_tip']='Die Projektionen, die von den beiden Filtern oben übrig bleiben. Wählen Sie eine aus und drücken Sie Auswählen.';
-$ec_lang['lpn_crs_choose']='Auswählen';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Es wurde noch nach keinem Ort gesucht, daher wird die gesamte Liste angeboten. Suchen Sie oben nach einem Ort, oder zoomen Sie die Karte, um sie einzugrenzen.';
 $ec_lang['lpn_crs_count']='{n} von {total} Projektionen aufgeführt.';

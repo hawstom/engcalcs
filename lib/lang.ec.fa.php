@@ -1705,7 +1705,6 @@ $ec_lang['lpn_crs_search']='جست‌وجو';
 $ec_lang['lpn_crs_name']='پالایش نام فرافکنی';
 $ec_lang['lpn_crs_name_tip']='فقط فرافکنی‌هایی را نشان می‌دهد که نام یا کد EPSG آن‌ها شامل آنچه تایپ می‌کنید باشد. یک شمارهٔ ناحیه، یا UTM، یا Mercator را امتحان کنید.';
 $ec_lang['lpn_crs_list_tip']='فرافکنی‌های باقی‌مانده از دو پالایهٔ بالا. یکی را انتخاب کنید و انتخاب را فشار دهید.';
-$ec_lang['lpn_crs_choose']='انتخاب';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='هنوز مکانی جست‌وجو نشده، پس کل فهرست ارائه می‌شود. مکانی را در بالا جست‌وجو کنید یا نقشه را بزرگ‌نمایی کنید تا فهرست باریک‌تر شود.';
 $ec_lang['lpn_crs_count']='{n} از {total} فرافکنی فهرست شده.';

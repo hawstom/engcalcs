@@ -1710,7 +1710,6 @@ $ec_lang['lpn_crs_search']='ស្វែងរក';
 $ec_lang['lpn_crs_name']='តម្រងឈ្មោះប្រព័ន្ធតម្រៀប';
 $ec_lang['lpn_crs_name_tip']='បង្ហាញតែប្រព័ន្ធតម្រៀបដែលឈ្មោះ ឬលេខកូដ EPSG របស់វាមានអ្វីដែលអ្នកវាយបញ្ចូល។ សាកល្បងវាយលេខតំបន់ ឬ UTM ឬ Mercator។';
 $ec_lang['lpn_crs_list_tip']='ប្រព័ន្ធតម្រៀបដែលនៅសល់ពីតម្រងទាំងពីរខាងលើ។ ជ្រើសរើសមួយ រួចចុច ជ្រើសរើស។';
-$ec_lang['lpn_crs_choose']='ជ្រើសរើស';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='មិនទាន់មានកន្លែងណាមួយត្រូវបានស្វែងរកនៅឡើយទេ ដូច្នេះបញ្ជីទាំងមូលត្រូវបានផ្ដល់ជូន។ ស្វែងរកកន្លែងមួយខាងលើ ឬពង្រីកផែនទីដើម្បីបង្រួមបញ្ជី។';
 $ec_lang['lpn_crs_count']='ប្រព័ន្ធតម្រៀប {n} ក្នុងចំណោម {total} ត្រូវបានរាយ។';

@@ -1706,7 +1706,6 @@ $ec_lang['lpn_crs_search']='بحث';
 $ec_lang['lpn_crs_name']='تصفية باسم الإسقاط';
 $ec_lang['lpn_crs_name_tip']='يعرض فقط الإسقاطات التي يحتوي اسمها أو رمز EPSG الخاص بها على ما تكتبه. جرّب رقم منطقة، أو UTM، أو Mercator.';
 $ec_lang['lpn_crs_list_tip']='الإسقاطات المتبقية بعد عاملي التصفية أعلاه. اختر واحداً واضغط تحديد.';
-$ec_lang['lpn_crs_choose']='تحديد';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='لم يُبحث عن أي مكان بعد، لذا تُعرض القائمة كاملة. ابحث عن مكان أعلاه أو قرّب الخريطة لتضييقها.';
 $ec_lang['lpn_crs_count']='{n} من {total} إسقاطاً مدرَجاً.';

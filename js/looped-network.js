@@ -29876,7 +29876,7 @@ var EngCalcs = EngCalcs || {};
 		btn.id = 'lpn_ts_add';
 		btn.className = 'lpn-profile-edit ec-help';
 		btn.textContent = pc.lpn_ts_add || 'Add selected';
-		btn.title = pc.lpn_ts_add_tip || 'Put everything now chosen on the map onto the graph.';
+		btn.title = pc.lpn_ts_add_tip || 'Put everything now selected on the map onto the graph.';
 		btn.addEventListener('click', tsAddSelection);
 		box.appendChild(btn);
 
@@ -29927,7 +29927,7 @@ var EngCalcs = EngCalcs || {};
 		if (added) { return; }
 		note = document.getElementById('lpn_ts_note');
 		if (note) {
-			note.textContent = pc.lpn_ts_add_none || 'Nothing of that kind is chosen on the map.';
+			note.textContent = pc.lpn_ts_add_none || 'Nothing of that kind is selected on the map.';
 		}
 	}
 	function tsRemove(id) {
@@ -29989,7 +29989,7 @@ var EngCalcs = EngCalcs || {};
 		if (!series.length) {
 			if (note) {
 				note.textContent = pc.lpn_ts_none ||
-					'Nothing to graph yet. Choose assets on the map and press Add selected.';
+					'Nothing to graph yet. Select assets on the map and press Add selected.';
 			}
 			return;
 		}
@@ -58774,7 +58774,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			if (!anyEffect) {
 				ffEl('p', 'lpn-ff-note', pc.lpn_ff_design_none ||
-					'Nothing in the chosen set went outside its limits while any junction drew its fire flow.', host);
+					'Nothing in the scope you chose went outside its limits while any junction drew its fire flow.', host);
 			}
 		}
 
@@ -59027,7 +59027,7 @@ var EngCalcs = EngCalcs || {};
 			if (!design.nodes.length && !design.links.length) {
 				clearFireFlowRun(true);
 				analysisRefused(document.getElementById('lpn_ff_report'), pc.lpn_ff_design_no_selection ||
-					'The design check scope is set to Selected, but no assets are selected. Select assets or select the All option.');
+					'The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All.');
 				return;
 			}
 			design.minPressure = minPressure > 0 ? minPressure : 0;
