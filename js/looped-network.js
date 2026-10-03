@@ -13979,6 +13979,14 @@ var EngCalcs = EngCalcs || {};
 		regModeBar.appendChild(btn);
 		document.body.appendChild(regModeBar);
 	}
+	// Task 710: the instruction a registration step used to put in an alert. A notice lasts eight
+	// seconds and the mode hint is hidden on a phone, so the bar that stays up for the whole mode
+	// carries the current step's words too (and the notice and log keep them).
+	function setRegStep(text) {
+		var pc = EngCalcs.pageConfig || {}, base = pc.lpn_backdrop_busy || 'Adjusting the background image.';
+		setNotice(text);
+		if (regModeBar && regModeBar.firstChild) { regModeBar.firstChild.textContent = base + ' ' + text; }
+	}
 	function setNodeCursorAllowed(v) { svg.classList.toggle('regmode-node', v); }
 	// Single mutual-exclusion point: every sequence below registers a teardown function here, and
 	// every entry point calls cancelActive() first, so re-picking the same action mid-sequence tears
@@ -13999,7 +14007,7 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {}, clicks = [];
 		setRegMode(true);
-		setNotice(pc.lpn_backdrop_scale_prompt1 || 'Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.');
+		setRegStep(pc.lpn_backdrop_scale_prompt1 || 'Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.');
 		var handler = function (e) {
 			clicks.push(worldToImageLocal(screenToWorld(e.clientX, e.clientY)));
 			if (clicks.length === 2) {
@@ -14036,7 +14044,7 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {};
 		setRegMode(true);
-		setNotice(pc.lpn_backdrop_scale_from_prompt1
+		setRegStep(pc.lpn_backdrop_scale_from_prompt1
 			|| 'Click the point on the background image that should stay where it is.');
 		var handler = function (e) {
 			svg.removeEventListener('pointerup', handler, true);
@@ -14113,11 +14121,11 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {};
 		setRegMode(true);
-		setNotice(pc.lpn_backdrop_position_prompt1 || 'Click the base point (on the image) for the move.');
+		setRegStep(pc.lpn_backdrop_position_prompt1 || 'Click the base point (on the image) for the move.');
 		var handler = function (e) {
 			svg.removeEventListener('pointerup', handler, true);
 			var refWorld = screenToWorld(e.clientX, e.clientY);
-			setNotice(pc.lpn_backdrop_position_prompt2 || 'Choose the method for the destination point, then click Continue.');
+			setRegStep(pc.lpn_backdrop_position_prompt2 || 'Choose the method for the destination point, then click Continue.');
 			showBackdropTargetPanel(refWorld);
 		};
 		svg.addEventListener('pointerup', handler, true);
@@ -31562,7 +31570,7 @@ var EngCalcs = EngCalcs || {};
 			// answers a document that cannot be opened the same way, and this is that plus a refusal
 			// to write. The quota message keeps the status line alone: there the work is still on
 			// screen and still editable, so a modal per failed autosave would be unusable.
-			if (!unreadableTold) { unreadableTold = true; setWarning(said); }
+			if (!unreadableTold) { unreadableTold = true; alert(said); }
 			return;
 		}
 		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.');
@@ -56453,6 +56461,24 @@ var EngCalcs = EngCalcs || {};
 	// Task 710: what used to be a blocking alert() is a notice, and a failure or refusal is the
 	// banner's second severity. Same door, same log; not a new message system.
 	function setWarning(text) { setNotice(text, 'warning'); }
+	// Task 710: a refusal raised by an action inside an open box (Libraries, Settings, the survey
+	// dialog) landed in the map's top-left corner, UNDER the box, so on a phone nothing visible
+	// happened. A warning is therefore also shown in this strip, fixed to the viewport above every
+	// box and click-through, for the same eight seconds. One element serves every box, which is the
+	// smaller change than a status line inside each. The log and the map notice still carry it.
+	function showWarnStrip(text) {
+		var el = document.getElementById('lpn_warn_strip');
+		if (!text) { if (el) { el.style.display = 'none'; } return; }
+		if (!el) {
+			el = document.createElement('div');
+			el.id = 'lpn_warn_strip';
+			el.className = 'lpn-warn-strip d-print-none';
+			el.setAttribute('role', 'alert');
+			document.body.appendChild(el);
+		}
+		el.textContent = text;
+		el.style.display = 'block';
+	}
 	function setNotice(text, severity) {
 		if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }
 		// **EVERY NOTICE IS KEPT BEFORE IT IS SHOWN** (Task 704). This is the one door 66 call
@@ -56460,10 +56486,12 @@ var EngCalcs = EngCalcs || {};
 		// teaches all of them at once.
 		logMessage(text, severity);
 		showNotice(text);
+		showWarnStrip(severity === 'warning' ? text : '');
 		if (text) {
 			statusNoticeTimer = setTimeout(function () {
 				statusNoticeTimer = null;
 				showNotice('');
+				showWarnStrip('');
 			}, STATUS_NOTICE_MS);
 		}
 	}

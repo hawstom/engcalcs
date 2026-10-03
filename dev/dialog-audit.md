@@ -15,28 +15,34 @@ The count was 57 when Ida wrote the item; today it is **77** non-comment call si
 
 | Verdict | Count | What happened |
 |---|---|---|
-| MUST BLOCK | 37 | Left as native dialogs (20 `confirm`, 17 `prompt`) |
+| MUST BLOCK | 38 | Left as native dialogs (20 `confirm`, 17 `prompt`, 1 `alert`) |
 | INFORMATION, info | 9 | Now `setNotice()` |
-| INFORMATION, warning | 31 | Now `setWarning()` (same door, severity `warning`) |
+| INFORMATION, warning | 30 | Now `setWarning()` (same door, severity `warning`) |
 | DELETE | 0 | Nothing was redundant |
 | **Total** | 77 | |
 
-`dev/lpn-spike/no-raw-alert-harness.js` holds this table: no `alert(` anywhere, and the MUST BLOCK
+`dev/lpn-spike/no-raw-alert-harness.js` holds this table: no `alert(` outside the one audited site, and the MUST BLOCK
 `confirm(`/`prompt(` counts per function are an allowlist. `dev/lpn-spike/dialog-audit-browser-harness.js`
 shows two converted messages landing in the log, with no dialog, in a real Chrome.
 
 ## Open question for Tom
 
-The 37 MUST BLOCK sites are still the browser's own plain dialogs. Whether they become one styled
+The 38 MUST BLOCK sites are still the browser's own plain dialogs. Whether they become one styled
 in-page modal (consistent look, can show the message log beside it, can carry a Cancel that names
 the thing being kept) is a separate decision and was not made here. One of them, `drawTestGrid`'s
 "add to the existing network" confirm, guards an undoable act on a developer button, so it is the
 likeliest to simply go.
 
-Two conversions change how long a message lives. The click-here instructions of the background
-image tools (scale by picking, scale from a point, position) were alerts, which stayed until
-dismissed; as notices they last eight seconds and are then in the log. The picking mode itself
-still shows its own hint. If that is too short, those three want the mode hint, not an alert.
+The click-here instructions of the background image tools (scale by picking, scale from a point,
+position) were alerts. They are now a notice and a log entry, and the "Adjusting the background
+image" bar at the bottom of the screen carries the current step's words for as long as the mode
+lasts (the mode hint is hidden on a phone, so it could not be relied on).
+
+A warning is also shown in a strip fixed above every open box (`#lpn_warn_strip`), because a
+refusal raised inside Libraries, Settings or the survey dialog landed under the box on a phone.
+
+The map notice line is one amber for every message and always was; only the log row's colour
+follows severity. Nothing was lost there.
 
 ## The sites
 
@@ -74,7 +80,7 @@ unless named. BLOCK = MUST BLOCK, INFO = information at info, WARN = information
 | `renameSavedProfile` | prompt | `lpn_profile_prompt_name` | BLOCK | needs a typed name |
 | `deleteSavedProfile` | confirm | `(computed text)` | BLOCK | deletes a saved path |
 | `deleteElement` | confirm | `lpn_delete_drops_overrides` | BLOCK | discards scenario values |
-| `setStorageError` | alert | `lpn_storage_unreadable` | WARN | modal was to outlast the status line; the log now does |
+| `setStorageError` | alert | `lpn_storage_unreadable` | BLOCK | "Not saved": the status line is wiped by the first solve and a user could edit for an hour into a tab that saves nothing |
 | `wipeEverything` | confirm | `lpn_confirm_wipe` | BLOCK | deletes everything saved |
 | `prepareDocument` | alert | `lpn_storage_too_new` | WARN | file refused |
 | `importProject` | alert | `lpn_import_no_room` | WARN | import refused, no storage |

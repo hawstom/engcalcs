@@ -4,8 +4,9 @@
 //
 // Task 704 gave every message a place to go (setNotice() and the message log). A blocking alert()
 // is the opposite: it holds the page, leaves nothing behind, and cannot be reviewed afterwards.
-// So an alert() is never right here, and the allowlist below is for the raw confirm() and prompt()
-// calls that dev/dialog-audit.md judged MUST BLOCK -- a confirm guarding data loss or an
+// So an alert() is almost never right here: the one exception is setStorageError()'s "Not saved"
+// (a tab that saves nothing must not be edited on for an hour). The allowlist is for that, and the
+// raw confirm() and prompt() calls that dev/dialog-audit.md judged MUST BLOCK -- a confirm guarding data loss or an
 // irreversible act, and a prompt that needs a typed answer -- keyed by enclosing function.
 // A new confirm()/prompt() fails here until somebody decides, in that file, that it must block.
 'use strict';
@@ -32,6 +33,7 @@ const ALLOW = {
 	'js/looped-network.js:renameSavedProfile': { prompt: 1 },
 	'js/looped-network.js:deleteSavedProfile': { confirm: 1 },
 	'js/looped-network.js:deleteElement': { confirm: 1 },
+	'js/looped-network.js:setStorageError': { alert: 1 },
 	'js/looped-network.js:wipeEverything': { confirm: 1 },
 	'js/looped-network.js:saveAs': { confirm: 2 },
 	'js/looped-network.js:revertCurrent': { confirm: 1 },
@@ -80,13 +82,13 @@ let total = 0;
 Object.keys(found).forEach(k => {
 	const f = found[k], allow = ALLOW[k] || {};
 	total += f.confirm + f.prompt;
-	ok(k + ': no alert()', f.alert === 0, 'alert() at line ' + f.at.join(',') + ' -- use setNotice()/setWarning()');
+	ok(k + ': alert() count is the audited ' + (allow.alert || 0), f.alert === (allow.alert || 0), 'alert() at line ' + f.at.join(',') + ' -- use setNotice()/setWarning()');
 	['confirm', 'prompt'].forEach(kind => {
 		ok(k + ': ' + kind + '() count is the audited ' + (allow[kind] || 0),
 			f[kind] === (allow[kind] || 0), f[kind] + ' found, line ' + f.at.join(',') + ' -- add it to dev/dialog-audit.md, then here');
 	});
 });
 Object.keys(ALLOW).forEach(k => ok(k + ' still exists', !!found[k], 'allowlist entry with no call site'));
-ok('the audited MUST BLOCK total is 37', total === 37, String(total));
+ok('the audited confirm()/prompt() total is 37', total === 37, String(total));
 console.log(fails ? '\n' + fails + ' FAILED' : '\nAll assertions passed.');
 process.exit(fails ? 1 : 0);
