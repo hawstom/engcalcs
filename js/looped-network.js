@@ -8703,13 +8703,10 @@ var EngCalcs = EngCalcs || {};
 		var s = settings.contourStyle;
 		return (s === 'filled' || s === 'lines') ? s : '';
 	}
-	// Where on the Earth a DRAWING point is -- nodeLonLat()'s question asked of a grid cell.
-	function drawLonLat(x, y) {
-		var ox = outwardX(x), oy = outwardY(y);
-		if (isLatLonProject()) { return { lon: ox, lat: oy }; }
-		if (!isProjectedProject() || !EngCalcs.lpnCrsInverse) { return null; }
-		return EngCalcs.lpnCrsInverse(projectCrsCode(), { x: ox, y: oy });
-	}
+	// Where on the Earth a DRAWING point is -- viewLonLat()'s question asked of a grid cell, through
+	// the same one crossing outward. Only reached once contourTerrainOffered() has required a
+	// project that projectLocatable() places, so the grid-with-world-map case never sends.
+	function drawLonLat(x, y) { return viewLonLat({ cx: x, cy: y }); }
 	// Whether the ground can be subtracted at all: pressure, a project placed on the Earth, a token,
 	// and the terrain module present. The consent is asked by the checkbox, never here.
 	function contourTerrainOffered() {
