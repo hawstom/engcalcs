@@ -21403,6 +21403,14 @@ var EngCalcs = EngCalcs || {};
 		// map's own moment.
 		refresh: function () { freqTabShow(); }
 	});
+	// **SYSTEM FLOW AFTER FREQUENCY, PROFILE STILL LAST** (Task 600) -- the same argument again. No
+	// formId: the tab has no controls, so paneFocusTabFirstControl() lands on the panel itself.
+	paneTabs.push({
+		id: 'sysflow', panel: 'lpn_pane_sysflow', label: 'lpn_sysflow_menu', tip: 'lpn_sysflow_tip',
+		show: function () { sysflowTabShow(); },
+		// Every solve and every step of the transport, which keeps the `now` line under the scrubber.
+		refresh: function () { sysflowTabShow(); }
+	});
 	// **PROFILE IS LAST** (Tom, 2026-08-21: "making Profile the last tab"). It is still the odd one
 	// out -- a drawing where the other six are tables -- and the end of the strip is where an odd
 	// one out belongs, rather than the front, where it stood between the reader and the six things
@@ -21661,8 +21669,16 @@ var EngCalcs = EngCalcs || {};
 				// .ec-help so a tap reveals it (EngCalcs.initTips()).
 				if (t.tip && pc[t.tip]) { b.title = pc[t.tip]; b.className += ' ec-help'; }
 				b.addEventListener('click', function () { setPaneTab(t.id); });
-				strip.appendChild(b);
-				if (!t.menu) { return; }
+				if (!t.menu) { strip.appendChild(b); return; }
+				// **A TAB AND ITS ARROW WRAP AS ONE** (Task 600 pre-review): as two separate items in
+				// the wrapping strip, a long-language row could break between them and leave the ▾
+				// alone on the second line, belonging to nothing. One unbreakable pair instead;
+				// role="none" so the tablist still owns the tab and the wrapper says nothing.
+				var pair = document.createElement('span');
+				pair.className = 'lpn-pane-tab-pair';
+				pair.setAttribute('role', 'none');
+				pair.appendChild(b);
+				strip.appendChild(pair);
 				// **THE ARROW NEVER GOES THROUGH THE TAB'S OWN show() WHEN THE TAB IS ALREADY ON
 				// SHOW**, and that is the whole care this button needs: on the profile, a second
 				// show() is the command that starts drawing a new path (Task 506), so an arrow that
@@ -21684,7 +21700,7 @@ var EngCalcs = EngCalcs || {};
 						if (!paneState.open || paneState.tab !== t.id) { openPane(t.id); }
 						t.menu(m);
 					});
-					strip.appendChild(m);
+					pair.appendChild(m);
 				}());
 			});
 		}
@@ -28524,6 +28540,8 @@ var EngCalcs = EngCalcs || {};
 		else if (paneIsOpen() && t && t.id === 'timeseries' && t.show) { t.show(); }
 		// The Frequency tab draws from the map's values, which a document can bring with no solve.
 		else if (paneIsOpen() && t && t.id === 'frequency' && t.show) { t.show(); }
+		// System flow draws from the run, as Time series does.
+		else if (paneIsOpen() && t && t.id === 'sysflow' && t.show) { t.show(); }
 	}
 	function refreshPaneIfOpen() {
 		var t = activePaneTab();
@@ -30320,6 +30338,169 @@ var EngCalcs = EngCalcs || {};
 		tsText(svg, 0, 0, pc.lpn_freq_axis_percent || 'Percent less than',
 			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
 			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
+	}
+
+	// ---- SYSTEM FLOW BALANCE (ROADMAP Task 600, last chart slice) ---------------------------------
+	//
+	// EPANET's System Flow plot: the total flow PRODUCED and the total flow CONSUMED against time,
+	// across the run. **THE DEFINITION IS EPANET'S OWN CODE, NOT A GUESS AT IT.** The 2.2 manual says
+	// only *"Plots total system production and consumption versus time ... Water demand for all nodes
+	// over all time periods"* (Table 9.1), so the authority is its Graph window, Fgraph.pas
+	// GetSysFlow(), which for each reporting period reads every node's DEMAND from the output file
+	// and loops over JUNCTIONS and RESERVOIRS ONLY (`for i := JUNCS to RESERVS`, and TANKS is the
+	// next list): a positive demand is added to Consumed, a negative one is subtracted into Produced.
+	// So a reservoir that supplies water (demand < 0) and a negative junction demand both produce; a
+	// positive junction demand, emitter flow included, consumes; and a reservoir being filled
+	// consumes too. **A TANK IS IN NEITHER TOTAL**, and because every node's demands sum to zero at
+	// every step, Produced minus Consumed is exactly the net flow into the tanks -- the gap between
+	// the two lines is the storage swinging. dev/lpn-spike/system-flow-harness.js holds that.
+	// Window title "System Flow Balance", series "Produced" and "Consumed", axis "Flow (units)":
+	// all EPANET's.
+	//
+	// **NO OPTIONS AT ALL** (dev/graphs-scope.md): nothing is chosen, so there is no form, and the
+	// key is two fixed names. **A READER OF THE RUN AND NOTHING ELSE**, like Time series: the frames
+	// js/lpn-time.js already holds carry EN_DEMAND per node (js/lpn-epanet.js), in m3/s, and this
+	// converts their sums into the project's flow unit through toDisplay() -- the seam every other
+	// flow on the page crosses. Nothing is solved, stored or written.
+	var SYSFLOW_COLORS = { produced: LPN_TS_COLORS[0], consumed: LPN_TS_COLORS[1] };
+	// One reporting step summed the way GetSysFlow() sums it, in SI (m3/s). `storage` is the tanks'
+	// own net inflow, kept beside the two totals so the balance can be checked against it; it is not
+	// drawn, because EPANET does not draw it.
+	function sysflowStep(frame) {
+		var out = { produced: 0, consumed: 0, storage: 0 }, d = (frame && frame.demands) || {};
+		Object.keys(d).forEach(function (id) {
+			var n = nodeById(id), q = d[id];
+			if (typeof q !== 'number' || !isFinite(q)) { return; }
+			if (n && n.type === 'tank') { out.storage += q; return; }
+			if (q > 0) { out.consumed += q; } else { out.produced -= q; }
+		});
+		return out;
+	}
+	// Both series in the PROJECT's flow unit, one point per reporting step: {t, produced, consumed,
+	// storage}. Empty with no run.
+	function sysflowSeries(frames) {
+		var u = resultUnit('flow');
+		return (frames || []).map(function (f) {
+			var s = sysflowStep(f);
+			return { t: f.t, produced: toDisplay(s.produced, u), consumed: toDisplay(s.consumed, u),
+				storage: toDisplay(s.storage, u) };
+		});
+	}
+	var sysflowLastSize = null;
+	function sysflowResizeWatch() {
+		var host = document.getElementById('lpn_sysflow_chart');
+		if (!host || !window.ResizeObserver) { return; }
+		new window.ResizeObserver(function () {
+			var r = host.getBoundingClientRect();
+			if (!(r.width > 0) || !(r.height > 0)) { return; }
+			if (sysflowLastSize && Math.abs(sysflowLastSize.w - r.width) < 1 &&
+				Math.abs(sysflowLastSize.h - r.height) < 1) { return; }
+			sysflowLastSize = { w: r.width, h: r.height };
+			renderSysflow();
+		}).observe(host);
+	}
+	function sysflowTabShow() { renderSysflowKey(); renderSysflow(); }
+	// The key: two fixed names, each wearing its line's color and carrying what it sums as its tip.
+	// Built here rather than in the page because the colors are the charts' own (LPN_TS_COLORS).
+	function renderSysflowKey() {
+		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_sysflow_key');
+		if (!box) { return; }
+		box.innerHTML = '';
+		[['produced', pc.lpn_sysflow_produced || 'Produced', pc.lpn_sysflow_produced_tip],
+			['consumed', pc.lpn_sysflow_consumed || 'Consumed', pc.lpn_sysflow_consumed_tip]]
+			.forEach(function (o) {
+				var s = document.createElement('span'), sw = document.createElement('i');
+				s.className = 'ec-help';
+				s.title = o[2] || '';
+				sw.className = 'lpn-ts-swatch';
+				sw.style.color = SYSFLOW_COLORS[o[0]];
+				s.appendChild(sw);
+				s.appendChild(document.createTextNode(o[1]));
+				box.appendChild(s);
+			});
+		initTipsIn(box);
+	}
+	function renderSysflow() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_sysflow_chart'),
+			note = document.getElementById('lpn_sysflow_note'),
+			frames, pts, values = [], lay, xB, yB, box, svg, unit, now, dots, ttlName;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (note) { note.textContent = ''; }
+		frames = EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
+		// **NOTHING TO GRAPH IS SAID IN WORDS** -- Time series' own sentences, because the ways of
+		// having no run are the same ways and the same things to do about them.
+		if (!frames.length) {
+			if (note) { note.textContent = tsWaitingText(pc); }
+			return;
+		}
+		pts = sysflowSeries(frames);
+		pts.forEach(function (p) { values.push(p.produced, p.consumed); });
+		lay = tsLayout(host);
+		sysflowLastSize = { w: lay.w, h: lay.h };
+		box = lay.box;
+		xB = EngCalcs.lpnProfile.axisBounds(
+			frames.map(function (f) { return tsHours(f.t); }), { ticks: 5, maxTicks: 8, minSpan: 1 });
+		// **ANCHORED AT ZERO**, unlike Time series: a total flow is a quantity, and "produced fell to
+		// nothing while the pump was off" is the reading this chart exists for (EPANET's own example,
+		// Net1, shows exactly that). A truncated axis would draw a low total as an empty system.
+		yB = EngCalcs.lpnProfile.axisBounds(values.concat([0]), lay.y);
+		svg = el('svg', { viewBox: '0 0 ' + lay.w + ' ' + lay.h, class: 'lpn-profile-svg' }, host);
+		function X(v) { return EngCalcs.lpnProfile.plotX(v, xB, box); }
+		function Y(v) { return EngCalcs.lpnProfile.plotY(v, yB, box); }
+		EngCalcs.lpnProfile.ticks(yB).forEach(function (v) {
+			el('line', { x1: box.left, y1: Y(v), x2: box.left + box.width, y2: Y(v),
+				class: 'lpn-profile-grid' }, svg);
+			tsText(svg, box.left - 5, Y(v) + 3, String(plainRound(v, 2)),
+				{ class: 'lpn-profile-tick', 'text-anchor': 'end' });
+		});
+		var xTicks = EngCalcs.lpnProfile.ticks(xB), xKeep = {};
+		EngCalcs.lpnProfile.labelStride(xTicks.map(X), LPN_TS_X_LABEL_PX)
+			.forEach(function (k) { xKeep[k] = true; });
+		xTicks.forEach(function (v, k) {
+			el('line', { x1: X(v), y1: box.top + box.height, x2: X(v), y2: box.top + box.height + 4,
+				class: 'lpn-profile-axis' }, svg);
+			if (!xKeep[k]) { return; }
+			tsText(svg, X(v), box.top + box.height + 14,
+				EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(v * 3600) : String(plainRound(v, 2)),
+				{ class: 'lpn-profile-tick', 'text-anchor': 'middle' });
+		});
+		el('rect', { x: box.left, y: box.top, width: box.width, height: box.height,
+			class: 'lpn-profile-frame' }, svg);
+		// Where the transport is parked, as on Time series.
+		now = tsHours(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0);
+		if (now >= xB.min && now <= xB.max) {
+			el('line', { x1: X(now), y1: box.top, x2: X(now), y2: box.top + box.height,
+				class: 'lpn-ts-now' }, svg);
+		}
+		dots = frames.length <= LPN_TS_DOT_MAX;
+		ttlName = { produced: pc.lpn_sysflow_produced || 'Produced', consumed: pc.lpn_sysflow_consumed || 'Consumed' };
+		['produced', 'consumed'].forEach(function (key) {
+			var color = SYSFLOW_COLORS[key];
+			if (pts.length > 1) {
+				el('polyline', {
+					points: pts.map(function (p) { return X(tsHours(p.t)) + ',' + Y(p[key]); }).join(' '),
+					class: 'lpn-ts-line lpn-sysflow-' + key, stroke: color
+				}, svg);
+			}
+			if (!dots && pts.length > 1) { return; }
+			pts.forEach(function (p) {
+				var c = el('circle', { cx: X(tsHours(p.t)), cy: Y(p[key]), r: 2, class: 'lpn-ts-dot', fill: color }, svg),
+					ttl = el('title', {}, c);
+				ttl.appendChild(document.createTextNode(ttlName[key] + '   ' +
+					(EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(p.t) : p.t) + '   ' + plainRound(p[key], 2)));
+			});
+		});
+		// Axis titles: EPANET's "Flow (units)", built from the page's own Flow label and the units
+		// strip, the way the map key and Time series build theirs.
+		unit = unitLabel(resultUnit('flow'));
+		tsText(svg, 0, 0, (pc.lpn_result_flow || 'Flow') + (unit ? ' (' + unit + ')' : ''),
+			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
+			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
+		if (lay.axisTitle) {
+			tsText(svg, box.left + box.width / 2, lay.titleY, pc.lpn_ts_axis_time || 'Elapsed time',
+				{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
+		}
 	}
 
 	// Maps a tool mode to its pageConfig mode-hint key -- see the lang keys' own comment for why
@@ -40201,6 +40382,10 @@ var EngCalcs = EngCalcs || {};
 						{
 							label: pc.lpn_contour_menu || 'Contour', tip: pc.lpn_contour_tip,
 							fn: function () { closeMenu(); showContour(); }
+						},
+						{
+							label: pc.lpn_sysflow_menu || 'Flow balance', tip: pc.lpn_sysflow_tip,
+							fn: function () { closeMenu(); openPane('sysflow'); }
 						}
 					];
 				}
@@ -40880,6 +41065,7 @@ var EngCalcs = EngCalcs || {};
 		profileResizeWatch();
 		tsResizeWatch();
 		freqResizeWatch();
+		sysflowResizeWatch();
 		wireUnitSelects();
 		var opening = initLibrary(), bornClean = false;
 		// **THREE STATES, NOT TWO** (Task 627): a document that opened, a document that is there and

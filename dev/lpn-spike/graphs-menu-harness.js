@@ -1,5 +1,5 @@
-// Task 640 (Tom, 2026-10-01): Water menu holds a Graphs fly-out with Profile, Time series and
-// Frequency, in that order, each opening its own bottom-pane tab. The old top-level Profile row is
+// Task 640 (Tom, 2026-10-01): Water menu holds a Graphs fly-out with Profile, Time series,
+// Frequency and (Task 600) Flow balance, in that order, each opening its own bottom-pane tab. The old top-level Profile row is
 // gone. Real headless Chrome, because a fly-out is hover/tap behaviour.
 //
 //   flock /tmp/engcalcs-browser.lock node dev/lpn-spike/graphs-menu-harness.js
@@ -24,10 +24,10 @@ async function main() {
 		await page.waitForTimeout(300);
 		const rows = () => page.$$eval('#lpn_menu_popup .lpn-menu-row', (els) => els.map((e) => e.textContent.replace('▸', '').trim()));
 		const names = await page.evaluate(() => {
-			const c = window.EngCalcs.pageConfig; return { g: c.lpn_graphs_menu, p: c.lpn_profile_menu, t: c.lpn_ts_menu, f: c.lpn_freq_menu };
+			const c = window.EngCalcs.pageConfig; return { g: c.lpn_graphs_menu, p: c.lpn_profile_menu, t: c.lpn_ts_menu, f: c.lpn_freq_menu, s: c.lpn_sysflow_menu };
 		});
 		ok('Graphs key is defined', names.g === 'Graphs', JSON.stringify(names));
-		const tabs = [['profile', names.p], ['timeseries', names.t], ['frequency', names.f]];
+		const tabs = [['profile', names.p], ['timeseries', names.t], ['frequency', names.f], ['sysflow', names.s]];
 		for (const [id, label] of tabs) {
 			await page.click('#lpn_menu_project');
 			await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
@@ -44,9 +44,10 @@ async function main() {
 			const i = all.indexOf(names.p);
 			// Contour joined them (Task 600): a map layer, so its row shows the plot rather than a tab.
 			const contourName = await page.evaluate(() => window.EngCalcs.pageConfig.lpn_contour_menu);
-			ok('fly-out lists Profile, Time series, Frequency, Contour in order, and nothing else after them',
+			ok('fly-out lists Profile, Time series, Frequency, Contour, Flow balance in order, and nothing else after them',
 				i >= 0 && all[i + 1] === names.t && all[i + 2] === names.f && all[i + 3] === contourName &&
-				all[i + 4] === undefined, all.join('|'));
+				all[i + 4] === names.s &&
+				all[i + 5] === undefined, all.join('|'));
 			// Tom, 2026-10-02: no graph icon on the Profile row; the Graphs row keeps it.
 			const pIcon = await page.$$eval('#lpn_menu_popup2 .lpn-menu-row', (els, p) => {
 				const r = els.filter((e) => e.textContent.trim() === p).pop();

@@ -1728,7 +1728,7 @@ $ec_lang['lpn_replace_scope']='Choose one kind of asset above to change values o
 // language that puts the unit somewhere else can.
 $ec_lang['lpn_profile_menu']='Profile';
 $ec_lang['lpn_graphs_menu']='Graphs';
-$ec_lang['lpn_graphs_menu_tip']='Plot a profile along a path, a time series at one element, or the frequency distribution of results.';
+$ec_lang['lpn_graphs_menu_tip']='Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.';
 // **THE SYNONYMS ARE IN THE SYNONYM CHANNEL, WHICH IS WHERE THEY WERE ALWAYS MEANT TO BE.** They
 // shipped as `lpn_profile_tip_syn` / `lpn_profile_title_syn` -- ordinary $ec_lang keys with no call
 // site, which nothing rendered and which a sprint would have translated into 26 languages for
@@ -1855,6 +1855,17 @@ $ec_lang['lpn_contour_consent_1']='Drawing pressure over the ground sends the ar
 $ec_lang['lpn_contour_consent_2']='This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.';
 $ec_lang['lpn_contour_consent_3']='May we send the tile numbers of your network\'s area to Mapbox?';
 $ec_lang['lpn_contour_consent_4']='If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.';
+// EPANET's System Flow plot (Task 600). "System flow" is its Graph Selection name, "System flow
+// balance" its window title, "Produced" and "Consumed" its series. The definition is its own code
+// (Fgraph.pas GetSysFlow): junction and reservoir demands only, split by sign; tanks in neither.
+// The axis reuses lpn_result_flow and lpn_ts_axis_time.
+$ec_lang['lpn_sysflow_menu']='Flow balance';
+$ec_lang['lpn_sysflow_tip']='Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.';
+$ec_lang['lpn_sysflow_title']='Flow balance';
+$ec_lang['lpn_sysflow_produced']='Produced';
+$ec_lang['lpn_sysflow_produced_tip']='Total flow into the network from reservoirs and from negative demands.';
+$ec_lang['lpn_sysflow_consumed']='Consumed';
+$ec_lang['lpn_sysflow_consumed_tip']='Total of every positive demand: water drawn from the network at junctions, and any flow into a reservoir.';
 $ec_lang['lpn_view_units']='Units';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Save all';

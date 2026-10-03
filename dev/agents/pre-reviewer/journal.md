@@ -3706,6 +3706,12 @@ TRAP for method: Session Save as needs answerTrainingPanel() then a second queue
 - NOT EXERCISED: Recalculate-off with a pressure-changing edit (only an unconnected node), Mapbox DEM option (needs token), real valve.
 - Method: playwright Session scripts in scratchpad; close the box with #lpn_contour_close.
 
+## 2026-10-03 feat/flow-balance @ 15250325 (Task 600, System flow tab)
+
+- CITED: EPANET 2.2 Delphi_GUI/epanet2w/Fgraph.pas GetSysFlow: loop `for i := JUNCS to RESERVS`, demand > 0 adds to CONSUMED, else subtracted into PRODUCED; tanks excluded. Builder's definition matches exactly.
+- OBSERVED (headless Chromium, this tree): Net1 and Net3 draw 25 points per line; the "now" line follows the step selector; sum of all node demands per step is ~1e-8 m3/s; flow unit change relabels and rescales the axis; no-run message appears on a blank project; mutation (tanks counted) makes the harness fail 4 checks.
+- OBSERVED DEFECT: no CSS for #lpn_sysflow_chart (css/engcalcs.css:2329 lists the other three), so at 1280x800 the chart is 340 px in a 260 px pane and the time axis is below the fold; Time series fits (211 px).
+- OBSERVED: the new tab pushes the strip to a second row at 1280 px in ru, fr, es, pt, tr (en and de fit); the "System flow" label is English in every language until translated. Decays when the tab label is translated.
 ## 2026-10-03 -- pre-review feat/keyboard-menu f783fe5f (row mnemonics, hotkeys, Help), Perry
 
 - OBSERVED (real headless Chromium, Net1, focus in a Junctions demand cell): Alt+Shift+W, G, P opens the Profile graph; letters show only after a keyboard open; a mouse-opened menu shows Ctrl+Z / 1 / Delete / 2-9 and no letters. No duplicate or missing letter in any top menu or fly-out in en de ru he zh am fr; letters identical with an empty project and Net1 (disabled rows keep theirs). Hotkey column: no wrap, no taller row, gap >= 40 px in all 27 languages; no row has both an arrow and a hotkey.

@@ -419,6 +419,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_pane_timeseries', 'lpn_ts_form', 'lpn_ts_chart', 'lpn_ts_note',
   // The Frequency tab (ROADMAP Task 600), the same shape.
   'lpn_pane_frequency', 'lpn_freq_form', 'lpn_freq_chart', 'lpn_freq_note',
+  // The System flow tab (Task 600), the same shape.
+  'lpn_pane_sysflow', 'lpn_sysflow_key', 'lpn_sysflow_chart', 'lpn_sysflow_note',
   // The Find panel's two hosts (ROADMAP Tasks 353/420, and the disconnected report of 540). Absent
   // from this list, rebuildFindForm() and renderFindResults() return at their first line and every
   // control on that panel -- the pull-downs, the query line, the result rows -- is invisible to
