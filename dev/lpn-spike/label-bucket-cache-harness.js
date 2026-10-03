@@ -46,7 +46,7 @@ const L = loadLoopedNetwork(
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h;\n" +
 	"\t\t\tsvg.getBoundingClientRect = function () { return { left: 0, top: 0, right: w, bottom: h, width: w, height: h }; }; },\n" +
 	"\t\tapplySaved: applySaved, buildDom: buildDom, noteMapSized: noteMapSized,\n" +
-	"\t\trefreshLabelText: refreshLabelText, zoomAbout: zoomAbout, reshedNow: reshedNow,\n" +
+	"\t\trefreshLabelText: refreshLabelText, zoomAbout: zoomAbout, reshedNow: reshedNow, zoomExtent: zoomExtent,\n" +
 	"\t\taddCustomer: addCustomer, updateNode: updateNode, applySolveResult: applySolveResult,\n" +
 	"\t\tsolveNative: function () { applySolveResult(EngCalcs.lpnSolve(assembleModel(), { tol: solveAccuracy() })); },\n" +
 	"\t\tsolve: function () { return lastSolveResult; },\n" +
@@ -252,6 +252,22 @@ console.log('\n--- 3. between two notches the bucket is the ZOOMED-OUT one, and 
 	const atNotch = L.overlaps();
 	ok('between notches, the notch\'s layout at the smaller text overlaps no more than at the notch',
 		between.pairs <= atNotch.pairs, between.pairs + ' vs ' + atNotch.pairs + ' overlapping pairs');
+	// ZOOM TO FIT MOVES THE NOTCHES. The wheel's notches after a fit are counted from where the fit
+	// lands, so the buckets must be too, or every notch after a fit would be "between notches". On
+	// Net3 the fit is past the labeling threshold, so no settle runs there: the first settle that
+	// draws labels after it starts the buckets instead.
+	L.zoomExtent();
+	L.reshedNow();
+	let k = 0;
+	while (L.labelsHidden() && k++ < 40) { notch(1.1); }
+	const atS = st.s;
+	ok('after Zoom to fit, the first settle that draws labels starts the buckets at its own scale',
+		!L.labelsHidden() && Math.abs(C.anchor / atS - 1) < 1e-9 && L.bucketOf(atS) === 0,
+		(C.anchor / atS).toFixed(6) + ' x the scale, ' + k + ' notches in from the fit');
+	notch(1.1);
+	const p3 = L.passes();
+	notch(1 / 1.1);
+	ok('...and a notch in and back out comes back to that bucket without a pass', L.passes() === p3, (L.passes() - p3) + ' passes');
 	L.zoomAbout(CX, CY, A / st.s); L.reshedNow();
 }
 

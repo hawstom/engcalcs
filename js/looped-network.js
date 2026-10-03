@@ -11892,6 +11892,7 @@ var EngCalcs = EngCalcs || {};
 	// still sees each scale laid out exactly (R-214), and the wheel notches counted from where it
 	// lands are bucket boundaries.
 	function zoomExtent(auto) {
+		labelCacheReanchorPending = true;
 		labelCacheReanchor++;
 		try { return zoomExtentRun(auto); } finally { labelCacheReanchor--; }
 	}
@@ -43874,8 +43875,11 @@ var EngCalcs = EngCalcs || {};
 	var LABEL_BUCKET_STEP = 1.1;                 // wheelZoom()'s own notch
 	var labelCacheEnabled = true;                // a harness switch: the same session with and without
 	var labelCacheInvalidates = true;            // a harness switch: proves the invalidation has teeth
-	var labelCache = { anchor: null, entries: {}, inputs: null, solve: null, drawing: null, gen: -1 };
-	var labelCacheGen = 0, labelCacheOwn = 0, labelCacheReanchor = 0;
+	var labelCache = { anchor: null, entries: {}, order: [], inputs: null, solve: null, drawing: null, gen: -1 };
+	var labelCacheGen = 0, labelCacheOwn = 0, labelCacheReanchor = 0, labelCacheReanchorPending = false;
+	// A bucket is a few hundred small records; the wheel's whole range is about a hundred notches.
+	// Bounded anyway, oldest banked first out, so no session grows without limit.
+	var LABEL_BUCKET_MAX = 48;
 	// Counted, because a bank that quietly never hits looks exactly like one that works.
 	var labelCachePasses = 0, labelCacheHits = 0, labelCacheMiss = '';
 	// **EVERY WRITER OF LABEL LAYOUT CALLS THIS FIRST.** While the bank itself is laying labels out
@@ -43885,6 +43889,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function labelCacheClear(why) {
 		labelCache.entries = {};
+		labelCache.order = [];
 		labelCache.anchor = null;
 		labelCacheMiss = why || '';
 	}
@@ -44059,9 +44064,14 @@ var EngCalcs = EngCalcs || {};
 		flushLabelRefresh();
 		labelCacheCheckInputs();
 		var C = labelCache, s = state.s, k, sc, e, why;
-		if (labelCacheReanchor || C.anchor === null) {
-			if (C.anchor !== null) { labelCacheClear('re-anchored'); }
-			C.anchor = s;
+		// Zoom to fit moves the notches, so it moves the boundaries: every settle inside a fit, or
+		// the first one after a fit that ran none, starts the buckets again at the scale on screen.
+		if (labelCacheReanchor || labelCacheReanchorPending || C.anchor === null) {
+			if (C.anchor === null || !sameScale(C.anchor, s)) {
+				if (C.anchor !== null) { labelCacheClear('re-anchored'); }
+				C.anchor = s;
+			}
+			if (!labelCacheReanchor) { labelCacheReanchorPending = false; }
 		}
 		k = labelBucketOf(s);
 		sc = C.anchor * Math.pow(LABEL_BUCKET_STEP, k);
@@ -44082,6 +44092,9 @@ var EngCalcs = EngCalcs || {};
 		} else {
 			labelCacheMiss = why;
 			C.entries[k] = withBucketView(sc, function () { zoomLabelPass(); return captureLabelBucket(sc); });
+			C.order = C.order.filter(function (x) { return x !== k; });
+			C.order.push(k);
+			while (C.order.length > LABEL_BUCKET_MAX) { delete C.entries[C.order.shift()]; }
 		}
 		// Drawn where the notch put them, at the size the screen asks for.
 		if (sc !== s) { refreshFontSizes(true); }
