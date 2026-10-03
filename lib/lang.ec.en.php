@@ -1076,6 +1076,14 @@ $ec_lang['lpn_hotkeys_map_term']='Map keyboard shortcuts';
 // js/looped-network.js; Select also answers to Esc and Delete to the Delete key
 // (LPN_TOOL_ALT_KEYS); Ctrl+Z is undo(); +/- and = are keyZoom() (ROADMAP Task 682).
 $ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1 or Esc</td><td>Select.</td></tr><tr><td>2</td><td>Add a junction.</td></tr><tr><td>3</td><td>Add a reservoir.</td></tr><tr><td>4</td><td>Add a tank.</td></tr><tr><td>5</td><td>Add a pipe.</td></tr><tr><td>6</td><td>Add a pump.</td></tr><tr><td>7</td><td>Add a valve.</td></tr><tr><td>8</td><td>Add a customer.</td></tr><tr><td>9</td><td>Add text.</td></tr><tr><td>Delete</td><td>Delete the selection.</td></tr><tr><td>Ctrl+Z</td><td>Undo the last change.</td></tr><tr><td>+ or =</td><td>Zoom in.</td></tr><tr><td>-</td><td>Zoom out.</td></tr></tbody></table>';
+// The menu chords (Task 748): Alt+Shift+letter on Windows and Linux, Ctrl+Option on a Mac, and F10.
+// Exactly two rows (Tom, 2026-10-03: "show only the Alt+Shift and the F10"); the letters themselves
+// are assigned per language by menuMnemonics() and shown on the menus, never listed here.
+// A separate block rather than rows in lpn_hotkeys_map_def, because a new row there is new markup
+// that 'lang markup matches English' refuses until all 26 languages carry it.
+$ec_lang['lpn_hotkeys_menu_heading']='Menus';
+$ec_lang['lpn_hotkeys_menu_term']='Menu keyboard shortcuts';
+$ec_lang['lpn_hotkeys_menu_def']='<table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row\'s letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>';
 // ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
 // The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
 // with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
@@ -3487,7 +3495,7 @@ $ec_lang['lpn_settings_energy']='Energy';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='Reports';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_menu_tip']='Reports on pumping energy cost, scenario comparison, the EPANET solver report, and, after an extended period simulation, the status report and the full report.';
+$ec_lang['lpn_reports_menu_tip']='Reports on pumping energy cost, scenario comparison, the EPANET solver report, calibration against measured data, and, after an extended period simulation, the status report and the full report.';
 $ec_lang['lpn_reports_epanet']='EPANET run';
 $ec_lang['lpn_energy_title']='Pump energy report';
 $ec_lang['lpn_energy_menu']='Pump energy';
@@ -3555,12 +3563,12 @@ $ec_lang['lpn_status_title']='Status report';
 $ec_lang['lpn_status_needs_run']='The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.';
 $ec_lang['lpn_status_empty']='Nothing changed status during this run.';
 $ec_lang['lpn_status_col_event']='Event';
-$ec_lang['lpn_status_opened']='{type} {id} opened';
-$ec_lang['lpn_status_closed']='{type} {id} closed';
-$ec_lang['lpn_status_filling']='{type} {id} is filling';
-$ec_lang['lpn_status_emptying']='{type} {id} is emptying';
-$ec_lang['lpn_status_full']='{type} {id} is full';
-$ec_lang['lpn_status_dry']='{type} {id} is empty';
+$ec_lang['lpn_status_opened']='{type} {id} now open';
+$ec_lang['lpn_status_closed']='{type} {id} now closed';
+$ec_lang['lpn_status_filling']='{type} {id} now filling';
+$ec_lang['lpn_status_emptying']='{type} {id} now emptying';
+$ec_lang['lpn_status_full']='{type} {id} now full';
+$ec_lang['lpn_status_dry']='{type} {id} now empty';
 $ec_lang['lpn_status_no_converge']='The hydraulic solution at this step did not fully converge; the numbers shown are its last iteration.';
 $ec_lang['lpn_status_note']='Read from the same extended period run as the Tables pane and the Full report. Only a change is listed, not every step.';
 
@@ -3577,6 +3585,54 @@ $ec_lang['lpn_full_col_time']='Time';
 $ec_lang['lpn_full_col_type']='Type';
 $ec_lang['lpn_full_col_id']='ID';
 $ec_lang['lpn_full_row_count']='{n} rows.';
+
+// ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
+// EPANET's Report > Calibration and its three tabbed pages, with EPANET's own column names (EPANET
+// 2.2 manual, section 9.6). Mean error is EPANET's term for the mean ABSOLUTE difference. "Num obs"
+// is EPANET's own column heading, kept short because results columns are narrow.
+// lpn_calib_missing: keep in step with feat/profile-file's lpn_profile_file_missing (Task 604), the same sentence.
+$ec_lang['lpn_reports_calib']='Calibration';
+$ec_lang['lpn_reports_calib_tip']='Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.';
+$ec_lang['lpn_calib_title']='Calibration report';
+$ec_lang['lpn_calib_param']='Parameter';
+$ec_lang['lpn_calib_param_tip']='The quantity the calibration file measures. One file is held for each parameter.';
+$ec_lang['lpn_calib_load']='Load calibration file…';
+$ec_lang['lpn_calib_load_tip']='A text file with a location ID, a time, and a measured value on each line. The time is measured from the start of the simulation, in decimal hours or hours:minutes. A semicolon starts a comment. A line with only a time and a value belongs to the location above it.';
+$ec_lang['lpn_calib_none']='No calibration file is loaded for this parameter.';
+$ec_lang['lpn_calib_session']='A calibration file is held for this session only. It is not saved with the project or on this device.';
+$ec_lang['lpn_calib_file']='{file}: {n} measurements at {m} locations.';
+$ec_lang['lpn_calib_units']='The file\'s values are read in this project\'s units: {unit}.';
+$ec_lang['lpn_calib_missing']='Named in the file but not in this network: {ids}.';
+$ec_lang['lpn_calib_missing_count']='Measurements skipped because their location is not in this network: {n}.';
+$ec_lang['lpn_calib_bad_lines']='Lines that could not be read, skipped: {lines}';
+$ec_lang['lpn_calib_outside']='Measurements outside the times this run reported, skipped: {n}.';
+$ec_lang['lpn_calib_no_value']='Measurements with no computed value at their time, skipped: {n}.';
+$ec_lang['lpn_calib_single']='This is a single-period run, so every measurement is compared with its one result, whatever time the file gives.';
+$ec_lang['lpn_calib_needs_run']='There are no results to compare with yet. The report fills in once the network has been calculated.';
+$ec_lang['lpn_calib_no_pairs']='No measurement could be compared, so there is nothing to plot.';
+$ec_lang['lpn_calib_tab_stats']='Statistics';
+$ec_lang['lpn_calib_tab_corr']='Correlation plot';
+$ec_lang['lpn_calib_tab_means']='Mean comparisons';
+$ec_lang['lpn_calib_col_location']='Location';
+$ec_lang['lpn_calib_col_n']='Num obs';
+$ec_lang['lpn_calib_col_n_tip']='Number of observations: the measurements at this location that were compared.';
+$ec_lang['lpn_calib_col_obs_mean']='Observed mean';
+$ec_lang['lpn_calib_col_sim_mean']='Computed mean';
+$ec_lang['lpn_calib_col_mean_err']='Mean error';
+$ec_lang['lpn_calib_col_mean_err_tip']='The mean of the absolute differences between each observed value and the computed value at the same time.';
+$ec_lang['lpn_calib_col_rms_err']='RMS error';
+$ec_lang['lpn_calib_col_rms_err_tip']='Root mean square error: the square root of the mean of the squared differences between observed and computed values.';
+$ec_lang['lpn_calib_network']='Network';
+$ec_lang['lpn_calib_corr_means']='Correlation between means: {r}';
+$ec_lang['lpn_calib_corr_none']='Correlation between means: it needs at least two locations whose means differ.';
+$ec_lang['lpn_calib_axis_obs']='Observed: {q}';
+$ec_lang['lpn_calib_axis_sim']='Computed: {q}';
+$ec_lang['lpn_calib_observed']='Observed';
+$ec_lang['lpn_calib_computed']='Computed';
+$ec_lang['lpn_calib_point']='{id}, {time}: observed {o}, computed {s}';
+$ec_lang['lpn_calib_corr_note']='Each point is one measurement. The closer the points lie to the diagonal line, the closer the computed values match the observed ones.';
+$ec_lang['lpn_calib_ts_point']='Measured at {id}, {time}: {v}';
+$ec_lang['lpn_calib_ts_note']='Rings are measured values from the calibration file.';
 $ec_lang['lpn_energy_no_price']='No price of power is stated, so every cost here is zero. Set one under Settings, Energy.';
 // The sibling of the line above, and the difference between them is the whole of Task 581: a file
 // that states a price of zero is not a file that states no price, and the report must not say the

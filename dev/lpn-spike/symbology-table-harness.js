@@ -274,14 +274,40 @@ console.log('== 5. decimals by unit (R-328) ==');
 {
 	setUnitSet('us');
 	L.resetLS();
-	ok('gpm opens at 0 places', L.ls().decimals.link.flow === 0);
+	// Tom, 2026-10-03: "I was wrong about the decimals for Qb and Q. ... 1 in US and 2 in SI for all
+	// examples and the initial default."
+	{
+		const d = L.ls().decimals;
+		ok('a US project opens Q (link flow), Qb (node demand), Q (resolved) and customer Qb at 1 place',
+			d.link.flow === 1 && d.node.demand === 1 && d.node.demandActual === 1 && d.customer.demand === 1, q(d.link) + q(d.node));
+		setUnitSet('si');
+		L.resetLS();
+		const e = L.ls().decimals;
+		ok('an SI project opens Q, Qb, resolved Q and customer Qb at 2 places',
+			e.link.flow === 2 && e.node.demand === 2 && e.node.demandActual === 2 && e.customer.demand === 2, q(e.link) + q(e.node));
+		setUnitSet('us');
+		L.resetLS();
+		// Every shipped example: a stored count must follow its flow unit; none stored means it
+		// follows the default above.
+		const man = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', 'manifest.json'), 'utf8'));
+		man.examples.forEach((ex) => {
+			const doc = JSON.parse(fs.readFileSync(path.join(ROOT, 'examples', ex.file), 'utf8'));
+			const dec = (doc.labelSettings || {}).decimals || {};
+			const want = ex.flow === 'gpm' ? 1 : ex.flow === 'lps' ? 2 : null;
+			const got = [(dec.link || {}).flow, (dec.node || {}).demand, (dec.node || {}).demandActual, (dec.customer || {}).demand]
+				.filter((v) => v !== undefined);
+			ok('example ' + ex.file + ' (' + ex.flow + ') stores no Q/Qb decimals other than ' + want,
+				want !== null && got.every((v) => v === want), q(got));
+		});
+	}
+	ok('gpm opens at 1 place', L.ls().decimals.link.flow === 1);
 	// WITH THE PANEL OPEN (pre-review, 2026-09-27: the stored count moved to 3 while the box on
 	// screen still read 0). afterUnitChange() is the seam both the plain switch and the
 	// reinterpretation dialog's Non-destructive and Destructive buttons end in.
 	L.rebuildLabels();
 	const flowBox = () => byId['lpn_labels_link_fields'].children
 		.find((r) => (r.children[0].textContent || '').indexOf('Flow') >= 0).children[4];
-	ok('the open panel shows Flow at 0 places', String(flowBox().value) === '0', flowBox().value);
+	ok('the open panel shows Flow at 1 place', String(flowBox().value) === '1', flowBox().value);
 	L.applyOneUnit('lpn_u_flow', 'mgd');
 	L.afterUnitChange({ lpn_u_flow: 'gpm' });
 	ok('switching to MGD moves an untouched flow to 3 places', L.ls().decimals.link.flow === 3, L.ls().decimals.link.flow);

@@ -3691,3 +3691,23 @@ TRAP for method: Session Save as needs answerTrainingPanel() then a second queue
 - OBSERVED (headless Chromium, this tree): Net1 and Net3 draw 25 points per line; the "now" line follows the step selector; sum of all node demands per step is ~1e-8 m3/s; flow unit change relabels and rescales the axis; no-run message appears on a blank project; mutation (tanks counted) makes the harness fail 4 checks.
 - OBSERVED DEFECT: no CSS for #lpn_sysflow_chart (css/engcalcs.css:2329 lists the other three), so at 1280x800 the chart is 340 px in a 260 px pane and the time axis is below the fold; Time series fits (211 px).
 - OBSERVED: the new tab pushes the strip to a second row at 1280 px in ru, fr, es, pt, tr (en and de fit); the "System flow" label is English in every language until translated. Decays when the tab label is translated.
+## 2026-10-03 -- pre-review feat/keyboard-menu f783fe5f (row mnemonics, hotkeys, Help), Perry
+
+- OBSERVED (real headless Chromium, Net1, focus in a Junctions demand cell): Alt+Shift+W, G, P opens the Profile graph; letters show only after a keyboard open; a mouse-opened menu shows Ctrl+Z / 1 / Delete / 2-9 and no letters. No duplicate or missing letter in any top menu or fly-out in en de ru he zh am fr; letters identical with an empty project and Net1 (disabled rows keep theirs). Hotkey column: no wrap, no taller row, gap >= 40 px in all 27 languages; no row has both an arrow and a hotkey.
+- OBSERVED DEFECTS: (1) Scenarios fly-out letters of the fixed rows move with the number of scenarios (Delete scenario S with 7 scenarios, D with none; Basic mode C vs M). (2) A Latin key with no row of its own falls back to the row at that QWERTY position: keydown key=b code=KeyN (Dvorak b) in Edit fired the Delete network confirm. (3) After W,G,P focus lands on BODY, so a following "5" switched the map to Add Pipe. (4) Branch-level, present at 90ff85d4 too: while the run box is up, the first Enter on a keyboard-focused menu row is eaten by lpn-time.js's document Enter-closes-box listener (menu stays open).
+- OBSERVED by running the page's own menuMnemonics(): a recent file whose name starts with L takes Close's letter (Close becomes 1).
+- OBSERVED: harness mutations (hotkeys off, disabled rows skipped, old Help text) each fail it. Help Menus block is English in all 26 other languages (key only in en).
+- Method: example cards fail to click once a chord+Escape has run; open the example first. ▸ renders as tofu in headless Linux (font), not a defect.
+
+## 2026-10-03 -- pre-review feat/calibration 712bb260 (Task 601), Perry
+
+- CITED (USEPA/EPANET2.2 Delphi_GUI Fcalib.pas, Uutils.pas): mean error = mean |sim-obs|; RMS; r between per-location means (0 when undefined); measured time linearly interpolated between report steps; Nsim=1 compares EVERY measurement to the one value; computed < 0 skipped; flow compared as |Q|; Tokenize splits on space, tab AND COMMA; a location group is a run of consecutive lines (a repeated ID later is a new row); t = duration is skipped (j2 out of range).
+- OBSERVED (real Chrome, php -S, Net3): Water > Reports > Calibration between Status and Full, rows do not overlap; sample loads; stats 15/35/123/247 = 6/5/4/3 obs, r 0.992, J999 listed and counted, 26 h skipped and counted; three tabs draw; 11 rings on Time series; reload clears; no localStorage/cookie/IndexedDB change across the calibration steps.
+- OBSERVED: independent epanet-js solve + EPANET's algorithm gives sim means 49.62/60.14/66.47/53.11; page shows 49.64/60.17/66.51/53.14 -- a uniform +0.05%, the suite's psi factor (0.43353 psi/ft) vs EPANET's 0.4333. Pre-existing, not this branch.
+- OBSERVED DEFECT: the file is page-global. Loaded on Net3, switch tab to Net1: the report compares it against Net1's node 10 and Net1's Time series draws Net3's measured rings on Net1's node 10.
+- OBSERVED DEFECT (parser, node): after an unreadable line ("J1 6:00 n/a") the continuation lines below it are filed under the PREVIOUS location (15), not J1; only the bad line is reported. EPANET files them under J1.
+- OBSERVED: comma-separated lines ("15,0,42.1") are all rejected; EPANET reads them.
+- OBSERVED: single-period run (Net3, duration 0): 18 of 19 measurements "outside the times", only t=0 compared; EPANET would compare all 19.
+- OBSERVED: chart text 10 px at desktop, 7 px at 390 px (fixed viewBox), where the house Time series chart stays 10 px.
+- OBSERVED: harness mutation-tested on a copy: signed mean error, nearest-step, correlation over points, continuation ignored, a localStorage write -- each fails it.
+- Method: Net3.lwn duration -> 0 with sed gives a steady copy; DOM.setFileInputFiles drives the real FileReader path.

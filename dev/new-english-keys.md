@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**11 still to read on master**, of 29 untranslated keys, of 2182 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**49 still to read on master**, of 67 untranslated keys, of 2220 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (29, 11 to read @@ NEEDS RULING)
+## lpn_  (67, 49 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -60,78 +60,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_alt_title`**
   > Alternatives preview
   @@ NEEDS RULING
-- **`lpn_copy_body`**
-  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_body_nodate`**
-  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_copy`**
-  > A copy; make new lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_kept_link`**
-  > Opened {name} as the original, moved to a new place. Save now writes to this file.
-  @@ NEEDS RULING
-- **`lpn_copy_opened`**
-  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
-  _Ruled 2026-10-01: Wording change per this. This is good._
-- **`lpn_copy_original`**
-  > Original; keep same lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_title`**
-  > Mark file as new copy?
-  _Ruled OK 2026-10-01._
-- **`lpn_graphs_menu`**
-  > Graphs
-  @@ NEEDS RULING
-- **`lpn_graphs_menu_tip`**
-  > Graphs: Profile, Time Series, Frequency distribution, and System flow balance
-  @@ NEEDS RULING
-- **`lpn_scenario_basic`**
-  > Basic mode
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_basic_tip`**
-  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
-  _Ruled OK 2026-10-01._
-- **`lpn_sysflow_consumed`**
-  > Consumed
-  @@ NEEDS RULING
-- **`lpn_sysflow_consumed_tip`**
-  > Total of every positive demand: water drawn from the network at junctions, and any flow into a reservoir.
-  @@ NEEDS RULING
-- **`lpn_sysflow_menu`**
-  > System flow
-  @@ NEEDS RULING
-- **`lpn_sysflow_produced`**
-  > Produced
-  @@ NEEDS RULING
-- **`lpn_sysflow_produced_tip`**
-  > Total flow into the network from reservoirs and from negative demands.
-  @@ NEEDS RULING
-- **`lpn_sysflow_tip`**
-  > Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.
-  @@ NEEDS RULING
-- **`lpn_sysflow_title`**
-  > System flow balance
-  @@ NEEDS RULING
-
----
-
-# Strings waiting on a branch
-
-**127 still to read**, of 178 new keys across 15 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### feat/calibration (`712bb260`) — 41 new, 41 to read @@ NEEDS RULING
-
 - **`lpn_calib_axis_obs`**
   > Observed: {q}
   @@ NEEDS RULING
@@ -228,6 +156,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_calib_session`**
   > A calibration file is held for this session only. It is not saved with the project or on this device.
   @@ NEEDS RULING
+- **`lpn_calib_single`**
+  > This is a single-period run, so every measurement is compared with its one result, whatever time the file gives.
+  @@ NEEDS RULING
 - **`lpn_calib_tab_corr`**
   > Correlation plot
   @@ NEEDS RULING
@@ -249,17 +180,80 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_calib_units`**
   > The file's values are read in this project's units: {unit}.
   @@ NEEDS RULING
+- **`lpn_copy_body`**
+  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_body_nodate`**
+  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_copy`**
+  > A copy; make new lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_kept_link`**
+  > Opened {name} as the original, moved to a new place. Save now writes to this file.
+  @@ NEEDS RULING
+- **`lpn_copy_opened`**
+  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  _Ruled 2026-10-01: Wording change per this. This is good._
+- **`lpn_copy_original`**
+  > Original; keep same lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_title`**
+  > Mark file as new copy?
+  _Ruled OK 2026-10-01._
+- **`lpn_graphs_menu`**
+  > Graphs
+  @@ NEEDS RULING
+- **`lpn_graphs_menu_tip`**
+  > Graphs: Profile, Time Series, and Frequency distribution
+  @@ NEEDS RULING
+- **`lpn_hotkeys_menu_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_hotkeys_menu_heading`**
+  > Menus
+  @@ NEEDS RULING
+- **`lpn_hotkeys_menu_term`**
+  > Menu keyboard shortcuts
+  @@ NEEDS RULING
 - **`lpn_reports_calib`**
   > Calibration
   @@ NEEDS RULING
 - **`lpn_reports_calib_tip`**
   > Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.
   @@ NEEDS RULING
+- **`lpn_scenario_basic`**
+  > Basic mode
+  _Ruled OK 2026-10-01._
+- **`lpn_scenario_basic_tip`**
+  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
+  _Ruled OK 2026-10-01._
 
-### feat/contour (`c07094a8`) — 14 new, 14 to read @@ NEEDS RULING
+---
+
+# Strings waiting on a branch
+
+**92 still to read**, of 143 new keys across 12 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/contour (`2418222a`) — 16 new, 16 to read @@ NEEDS RULING
 
 - **`lpn_contour_consent_1`**
   > Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.
+  @@ NEEDS RULING
+- **`lpn_contour_consent_2`**
+  > This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.
+  @@ NEEDS RULING
+- **`lpn_contour_consent_3`**
+  > May we send the tile numbers of your network's area to Mapbox?
   @@ NEEDS RULING
 - **`lpn_contour_consent_4`**
   > If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.
@@ -633,18 +627,28 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/flow-balance (`b7b530c6`) — adds no English strings
+### feat/flow-balance (`f5be7f04`) — 7 new, 7 to read @@ NEEDS RULING
 
-### feat/keyboard-menu (`826c5646`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_hotkeys_menu_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>
+- **`lpn_sysflow_consumed`**
+  > Consumed
   @@ NEEDS RULING
-- **`lpn_hotkeys_menu_heading`**
-  > Menus
+- **`lpn_sysflow_consumed_tip`**
+  > Total of every positive demand: water drawn from the network at junctions, and any flow into a reservoir.
   @@ NEEDS RULING
-- **`lpn_hotkeys_menu_term`**
-  > Menu keyboard shortcuts
+- **`lpn_sysflow_menu`**
+  > System flow
+  @@ NEEDS RULING
+- **`lpn_sysflow_produced`**
+  > Produced
+  @@ NEEDS RULING
+- **`lpn_sysflow_produced_tip`**
+  > Total flow into the network from reservoirs and from negative demands.
+  @@ NEEDS RULING
+- **`lpn_sysflow_tip`**
+  > Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.
+  @@ NEEDS RULING
+- **`lpn_sysflow_title`**
+  > System flow balance
   @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
@@ -699,5 +703,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_result_pump_head_tip`**
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   @@ NEEDS RULING
-
-### fix/label-eviction (`840cb7cc`) — adds no English strings

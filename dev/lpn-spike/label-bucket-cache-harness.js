@@ -176,8 +176,8 @@ function runSequence() {
 }
 
 // **THE UNCACHED REFERENCE RUNS IN ITS OWN PROCESS**, the same gesture with the bank switched off.
-// Not in this one: the zoom pass is not a pure function of the scale (below), so a reference pass
-// run here would start from whatever state the bank had just left and answer a different question.
+// Not in this one: a reference pass run here would start from whatever state the bank had just
+// left, and the two must be independent for the comparison to mean anything.
 if (process.env.LBC_CHILD === 'uncached') {
 	L.setEnabled(false);
 	const seq = runSequence();
@@ -204,10 +204,9 @@ ok('...and every first visit is exactly the uncached pass at that scale',
 	seq.slice(0, 4).every(function (r, i) { return hash(r.drawn) === ref[i].h; }),
 	seq.slice(0, 4).map(function (r, i) { return hash(r.drawn) === ref[i].h ? 'same' : 'DIFFERENT'; }).join(', '));
 ok('the view came back to the scale it started at', Math.abs(st.s / A - 1) < 1e-9, st.s + ' vs ' + A);
-// **WHAT THE BANK FIXES ON THE WAY: THE UNCACHED ZOOM PASS IS NOT A PURE FUNCTION OF THE SCALE.**
-// Run twice at one scale it alternates between two answers, so going in and back out drew a
-// different picture from the one that was there. Printed, not asserted: it is the reference's
-// property, and a later placer may cure it.
+// **THE UNCACHED ZOOM PASS WAS NOT A PURE FUNCTION OF THE SCALE** until 2026-10-03: run twice at one
+// scale it alternated between two answers (its link shed predicted node labels still shed for the
+// previous scale). zoom-pass-determinism-harness.js now asserts it; this line only prints it.
 {
 	const same = [[4, 2], [5, 1], [6, 0]].filter(function (p) { return ref[p[0]].h === ref[p[1]].h; }).length;
 	console.log('       (uncached, the same three revisits drew the first visit\'s picture ' + same + ' of 3 times)');
