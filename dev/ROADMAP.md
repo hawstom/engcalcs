@@ -155,52 +155,6 @@ the block.
     from `81792180`, the SHA Tom had deployed, and pushed. CLAUDE.md's Git Workflow carries the
     procedure and the correction of the 2026-09-13 advice that a clean release could not be
     extracted.
-- 100|680| **Keep a project's drawing instead of rebuilding it on every tab switch.**
-  **PHASE 1 SHIPPED 2026-09-16: the solve and the label layout are kept, and the switch is 38%
-  faster.** Measured in real Chrome on the geographic Net3 at his own zoom: **636 ms to 395 ms
-  median**, `lblPlace` 210 ms and `fontSizes` 65 ms gone entirely, **label passes 1 -> 0 and label
-  measurements 737 -> 0**. What is left is the element building -- `nodes` 77-128 ms and `links`
-  125-226 ms -- which is the rest of this task.
-  - **THE KEEP IS PINNED TO THE BYTES ON DISK.** `storedSignature()` hashes what `saveToStorage()
-    wrote`, on both sides of the switch. A first version hashed `serializeProject()` at each end and
-    **never matched once on a real drawing**: the same document through `JSON.stringify` and back
-    through `applySaved()` is the same data in a different key order.
-  - **AND IT FOUND A STANDING DEFECT, which is the finding to keep:** a plain rebuild does not
-    reproduce the layout it had. Measured with the keep switched off, **214 of 216 labels move on a
-    switch away and back**, same document, same zoom, same settings. So labels have always jumped on
-    a tab switch; the keep is the only thing that holds them still, and the cause is still unknown.
-    `dev/lpn-spike/switch-keep-harness.js` asserts both halves.
-  - **PHASE 2 BUILT on `feat/drawing-keep`, 2026-10-02, awaiting merge:** each open project's
-    drawing is one record (five layers plus every element index) that the globals point at; a switch
-    hides the outgoing one (`display:none`) and shows the incoming one's when `storedSignature()`
-    still matches, so a switch back builds nothing. Four kept, least-recent evicted; closing a tab
-    frees its drawing. Headless Chrome, Net1 -> geographic Net3: `SWITCH` median 50 -> 27 ms, to the
-    painted frame 56 -> 37 ms; `nodes`/`links` rows gone. `dev/lpn-spike/drawing-keep-harness.js`.
-
-  Tom, 2026-09-16, on a five-second switch into a geographic Net3: *"why aren't we storing these
-  things when we switch away?"*
-  - **THREE THINGS COULD BE KEPT AND ONLY TWO ARE.** The DOCUMENT is in `localStorage`, and the VIEW
-    is already kept per tab in memory (`tabViews`, keyed on the project id) -- so the precedent for
-    per-tab retention exists and is two lines long. What is thrown away is the DRAWING and the SOLVE:
-    `buildDom()` empties four layers and rebuilds every shape, and `refreshAllFromDocument()` sets
-    `lastSolveResult = null` on the way in. Nothing decided that; the library and its tabs were built
-    on machinery that had only ever held one document.
-  - **THE PRICE OF KEEPING IT IS MEASURED AND IT IS SMALL** (real Chrome, 2026-09-16, driven over the
-    DevTools protocol): **Net3-Novato's whole drawing is 1,931 shapes and about 2 MB of heap**;
-    Net1's is 317 shapes and about 1 MB. Five big projects open at once is on the order of 10 MB.
-    **Note the two counts are different questions**: a switch CREATES about 8,400 elements and KEEPS
-    1,931, because the label pass builds and discards rows as it goes.
-  - **THE PRICE OF NOT KEEPING IT, on his machine:** `buildDom` 3,389 ms of a 4,628 ms switch. Split
-    inside it, measured here at 6x this machine's speed and identical in shape: label pass 56%,
-    building the pipes 29%, the nodes 14%.
-  - **WHAT IT COSTS TO BUILD is not the memory, it is that one drawing becomes several**: four layers
-    and three element indexes (`nodeEls`, `linkEls`, `labelEls`) are singletons today, and every path
-    that walks "the" drawing has to learn which one it means. A hidden subtree still costs style
-    work, so the retained ones want `display:none` rather than visibility.
-  - **A SMALLER FIRST STEP THAT IS ALMOST FREE: keep the SOLVE.** A result belongs to a document, the
-    document has not changed while you were away, and the signature machinery that answers "has this
-    changed" already exists for the dirty asterisk. That alone does not fix the delay -- Tom
-    measured that turning auto-run off changes nothing -- but it is waste with a cheap remedy.
 - 100|681| **Economize the label layout: it is half the cost of a project switch.**
   Tom, 2026-09-16: *"if laying out the labels takes 2 sec, we have to figure out how to economize."*
   - **THE NUMBER IS HIS: the label pass is 56% of `buildDom`**, which is about 1.9 s of his 4.6 s
@@ -272,6 +226,10 @@ the block.
   Tom, 2026-09-30, on WaterGEMS's Criticality tool: *"This sounds like a fun report to build. Break
   each asset and report."* Fire flow's sibling: scope All/Selected, each pipe out of the network on
   a copy, report cut-off junctions, low pressures and demand not served. Building on `feat/criticality`.
+- 75|757| **Filter the Tables pane to the selection.**
+  Tom, 2026-10-03: *"it would be really nice if the tables could filter on the selection. I'm not
+  sure how to work the UI unless it's part of the right-click menu."* Ask Ida and Declan where the
+  switch lives before building.
 - 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
@@ -413,28 +371,6 @@ the block.
     layer never renumbers the others, which is the whole reason it is not an index.
   - A layer setting is MODELLING data by CLAUDE.md's project-versus-browser rule and rides in
     `serializeProject()`; it is not window furniture.
-- 100|640| **Graphs: the umbrella, a submenu under Water holding five plots.**
-  **Tom, 2026-10-01: promoted to 100.** *"Water menu: Replace Profile with Graphs flyout containing Profile, Time series, Frequency."* Building on `feat/graph-menu`. Contour and System flow are the two EPANET graphs still missing.
-  **THE UMBRELLA, ON TOM'S WORD, 2026-09-15** (*"640 would make a nice umbrella"*). He asked whether
-  there was an overall graphing project and there was not -- there were four unrelated rows. This is
-  now the one place the programme is described, and the menu is where every plot surfaces, which is
-  what makes it the right parent rather than 599 or 600.
-  - **THE FIVE PLOTS:** Time series, Profile, Contour, Frequency, System flow balance. All in the
-    bottom pane except **Contour, which is a map layer** switched under Layers (Task 639) -- it
-    draws over the network rather than beside it, so it is not a tab.
-  - **PROFILE IS BUILT** and MOVES under this menu rather than being written again. It already owns
-    an axis pair, a unit label per axis, a legend and a hand-rolled plot with nothing vendored, so
-    it is also the drawing idiom every other plot must reuse. **A second plotting idiom on this page
-    would be the expensive mistake.**
-  - **THE CHILDREN, which keep their own priorities and are not absorbed:**
-    - **Task 599, time series against an extended-period run** -- priority 100, and being built on
-      `feat/time-series-graph`. Ranks above the rest because the data is already there: a run holds
-      every reporting step and nothing has to be re-solved.
-    - **Task 600, the three EPANET plots we do not have** -- contour, frequency, flow balance.
-    - **Task 637, a Graph button on the Properties box** -- the other door into the same plots,
-      reached from the element rather than from the menu.
-  - This row itself is the MENU, the tab shape and the export set. Full specification:
-    `dev/graphs-scope.md`.
 - 75|710| **Audit the 57 raw alert and confirm dialogs.**
   Left from the message log (Task 704, closed 2026-09-23): Ida's third item. Sort which must genuinely
   block and which are only information and belong in the log, which Tom's *"USER MUST HAVE CONTROL
@@ -453,7 +389,12 @@ the block.
   Found by Perry on `feat/help-menu`: Tab leaves an open menu for the next thing on the page and the
   arrows do nothing, in every menu, because the one function that opens them wires only clicks.
   Predates that branch. Tom set 75 on 2026-09-30.
+  **Tom, 2026-10-03, on `feat/keyboard-menu`:** *"this does nothing for Declan. What Declan really
+  needs are menu mnemonics like Ctrl+Shift+{letter} or as determined with Ida's advice for File,
+  Edit, Map, Water, Help, and Language"*, underlined once in keyboard mode. Building on that branch.
 - 75|749| **Read Bentley WaterCAD/WaterGEMS models.**
+  Basic mode and the Alternatives table merged 2026-10-03; `feat/bentley-interop` was recut from
+  master as the long-lived branch for the rest (Tom: *"a long-term branch for all the bentley-interop things"*).
   Tom, 2026-09-30: *"We can see how far we get reading and writing the Bentley .sqlite file also."*
   Phase 1 (`feat/bentley-interop`, `dev/bentley-interop.md`): the `.wtg.sqlite` schema is unpublished,
   no public sample exists, the EULA's reverse-engineering clause is his to read; writing is a no-go.
