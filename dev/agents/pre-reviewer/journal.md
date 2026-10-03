@@ -3684,3 +3684,15 @@ TRAP for method: Session Save as needs answerTrainingPanel() then a second queue
 - OBSERVED, on master-equivalent code (bank off): return to Novato after 5 other tabs (drawing evicted, rebuilt from kept layout) at identical view: 78 of 123 labels differ from before leaving (some rows shed, positions moved). captureLabelLayout() omits alignedAlong, stationSides, hiddenYielded, customer spots (by reading). Cause not isolated to those four fields.
 - NOT EXERCISED: Settings changes, recalc-off edits, hover/select, pinch, real customers, georeference change.
 - Method: snapshots must exclude other tabs' kept (display:none) layers; tab order at load is nondeterministic, so verify the current tab by name. Never pkill -f with a pattern that matches your own shell command.
+
+## 2026-10-03 -- pre-review feat/contour c07094a8 (Task 600), Perry
+
+- OBSERVED (headless Chrome, php -S on the worktree, Net3 and Net3-Novato-CA-World): Graphs > Contour turns on filled contours and opens Settings at Node colors; Filled / Line / None all draw and clear; 1 layer under the pipes; legend sentence present. Recalculate off + node drag: plot unchanged until Calculate (snapshot holds, but the old outline stays where the node used to be). Play at 1x, nodal plot: no long tasks, 60 fps, redrawn once per step.
+- OBSERVED: 3x median leaves 39% of Net3's pipe length (40% Novato) outside the fill, whole outer loops bare. 6x gives 95%, unlimited 98% (copy with the factor tunable).
+- OBSERVED: nodal fill puts a low-pressure halo round each tank (tank level used as pressure); gone with the ground option.
+- OBSERVED (Mapbox tiles stubbed in page; the real token answers 401 "Invalid Token" from jasmine): with the ground option on, Play has ~22 long tasks up to ~150 ms in 9 s, and re-reads the ground tiles twice per pass (18 tile requests) because a one-entry cache is keyed on the plot outline, which moves when controls open/close pipes.
+- OBSERVED: the contour consent dialog says "the area ... as tile numbers" in paragraph 1 and then "these positions ... those coordinates" and "May we send your node positions" (paragraphs 2-3 unchanged). privacy.php still lists only "Ground elevations".
+- OBSERVED: a file saved with the ground option ticked opens on a browser with no terrain yes with the box ticked, no question, nodal plot, nothing in the legend.
+- OBSERVED clean: no new host, cookie or localStorage key (ec_terrain only on yes, a no stores nothing); settings ride in the project and survive reload; tab switching leaves one layer; .inp export byte-identical with the settings on or off.
+- OBSERVED (mutation, scratch copy): harness stays green with the 3x edge limit removed, with pumps joined, with closed links joined. Its "gap" case is two unconnected arms, so the zone rule masks it alone.
+- Method: tab order at load is nondeterministic, click the tab by name. My `pkill -f` matched my own shell again (exit 144): never pkill with a pattern on the command line.
