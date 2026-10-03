@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**7 still to read on master**, of 25 untranslated keys, of 2178 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**49 still to read on master**, of 67 untranslated keys, of 2220 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (25, 7 to read @@ NEEDS RULING)
+## lpn_  (67, 49 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -59,6 +59,126 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-10-01._
 - **`lpn_alt_title`**
   > Alternatives preview
+  @@ NEEDS RULING
+- **`lpn_calib_axis_obs`**
+  > Observed: {q}
+  @@ NEEDS RULING
+- **`lpn_calib_axis_sim`**
+  > Computed: {q}
+  @@ NEEDS RULING
+- **`lpn_calib_bad_lines`**
+  > Lines that could not be read, skipped: {lines}
+  @@ NEEDS RULING
+- **`lpn_calib_col_location`**
+  > Location
+  @@ NEEDS RULING
+- **`lpn_calib_col_mean_err`**
+  > Mean error
+  @@ NEEDS RULING
+- **`lpn_calib_col_mean_err_tip`**
+  > The mean of the absolute differences between each observed value and the computed value at the same time.
+  @@ NEEDS RULING
+- **`lpn_calib_col_n`**
+  > Num obs
+  @@ NEEDS RULING
+- **`lpn_calib_col_n_tip`**
+  > Number of observations: the measurements at this location that were compared.
+  @@ NEEDS RULING
+- **`lpn_calib_col_obs_mean`**
+  > Observed mean
+  @@ NEEDS RULING
+- **`lpn_calib_col_rms_err`**
+  > RMS error
+  @@ NEEDS RULING
+- **`lpn_calib_col_rms_err_tip`**
+  > Root mean square error: the square root of the mean of the squared differences between observed and computed values.
+  @@ NEEDS RULING
+- **`lpn_calib_col_sim_mean`**
+  > Computed mean
+  @@ NEEDS RULING
+- **`lpn_calib_computed`**
+  > Computed
+  @@ NEEDS RULING
+- **`lpn_calib_corr_means`**
+  > Correlation between means: {r}
+  @@ NEEDS RULING
+- **`lpn_calib_corr_none`**
+  > Correlation between means: it needs at least two locations whose means differ.
+  @@ NEEDS RULING
+- **`lpn_calib_corr_note`**
+  > Each point is one measurement. The closer the points lie to the diagonal line, the closer the computed values match the observed ones.
+  @@ NEEDS RULING
+- **`lpn_calib_file`**
+  > {file}: {n} measurements at {m} locations.
+  @@ NEEDS RULING
+- **`lpn_calib_load`**
+  > Load calibration file…
+  @@ NEEDS RULING
+- **`lpn_calib_load_tip`**
+  > A text file with a location ID, a time, and a measured value on each line. The time is measured from the start of the simulation, in decimal hours or hours:minutes. A semicolon starts a comment. A line with only a time and a value belongs to the location above it.
+  @@ NEEDS RULING
+- **`lpn_calib_missing`**
+  > Named in the file but not in this network: {ids}.
+  @@ NEEDS RULING
+- **`lpn_calib_missing_count`**
+  > Measurements skipped because their location is not in this network: {n}.
+  @@ NEEDS RULING
+- **`lpn_calib_needs_run`**
+  > There are no results to compare with yet. The report fills in once the network has been calculated.
+  @@ NEEDS RULING
+- **`lpn_calib_network`**
+  > Network
+  @@ NEEDS RULING
+- **`lpn_calib_no_pairs`**
+  > No measurement could be compared, so there is nothing to plot.
+  @@ NEEDS RULING
+- **`lpn_calib_no_value`**
+  > Measurements with no computed value at their time, skipped: {n}.
+  @@ NEEDS RULING
+- **`lpn_calib_none`**
+  > No calibration file is loaded for this parameter.
+  @@ NEEDS RULING
+- **`lpn_calib_observed`**
+  > Observed
+  @@ NEEDS RULING
+- **`lpn_calib_outside`**
+  > Measurements outside the times this run reported, skipped: {n}.
+  @@ NEEDS RULING
+- **`lpn_calib_param`**
+  > Parameter
+  @@ NEEDS RULING
+- **`lpn_calib_param_tip`**
+  > The quantity the calibration file measures. One file is held for each parameter.
+  @@ NEEDS RULING
+- **`lpn_calib_point`**
+  > {id}, {time}: observed {o}, computed {s}
+  @@ NEEDS RULING
+- **`lpn_calib_session`**
+  > A calibration file is held for this session only. It is not saved with the project or on this device.
+  @@ NEEDS RULING
+- **`lpn_calib_single`**
+  > This is a single-period run, so every measurement is compared with its one result, whatever time the file gives.
+  @@ NEEDS RULING
+- **`lpn_calib_tab_corr`**
+  > Correlation plot
+  @@ NEEDS RULING
+- **`lpn_calib_tab_means`**
+  > Mean comparisons
+  @@ NEEDS RULING
+- **`lpn_calib_tab_stats`**
+  > Statistics
+  @@ NEEDS RULING
+- **`lpn_calib_title`**
+  > Calibration report
+  @@ NEEDS RULING
+- **`lpn_calib_ts_note`**
+  > Rings are measured values from the calibration file.
+  @@ NEEDS RULING
+- **`lpn_calib_ts_point`**
+  > Measured at {id}, {time}: {v}
+  @@ NEEDS RULING
+- **`lpn_calib_units`**
+  > The file's values are read in this project's units: {unit}.
   @@ NEEDS RULING
 - **`lpn_copy_body`**
   > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
@@ -96,6 +216,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_hotkeys_menu_term`**
   > Menu keyboard shortcuts
   @@ NEEDS RULING
+- **`lpn_reports_calib`**
+  > Calibration
+  @@ NEEDS RULING
+- **`lpn_reports_calib_tip`**
+  > Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.
+  @@ NEEDS RULING
 - **`lpn_scenario_basic`**
   > Basic mode
   _Ruled OK 2026-10-01._
@@ -107,7 +233,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**69 still to read**, of 120 new keys across 13 unmerged branch(es).
+**92 still to read**, of 143 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -117,6 +243,57 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### feat/contour (`2418222a`) — 16 new, 16 to read @@ NEEDS RULING
+
+- **`lpn_contour_consent_1`**
+  > Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.
+  @@ NEEDS RULING
+- **`lpn_contour_consent_2`**
+  > This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.
+  @@ NEEDS RULING
+- **`lpn_contour_consent_3`**
+  > May we send the tile numbers of your network's area to Mapbox?
+  @@ NEEDS RULING
+- **`lpn_contour_consent_4`**
+  > If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.
+  @@ NEEDS RULING
+- **`lpn_contour_dem`**
+  > Ground between nodes from Mapbox DEM
+  @@ NEEDS RULING
+- **`lpn_contour_dem_failed`**
+  > The ground could not be read from Mapbox DEM, so pressure is interpolated between nodes alone.
+  @@ NEEDS RULING
+- **`lpn_contour_dem_tip`**
+  > Between nodes, pressure becomes the interpolated head minus the height of the ground from Mapbox DEM, so it can fall below the lowest node pressure on a hill the network has no node on. Treat the ground as a contour map, not a survey.
+  @@ NEEDS RULING
+- **`lpn_contour_few`**
+  > Too few nodes to contour.
+  @@ NEEDS RULING
+- **`lpn_contour_filled`**
+  > Filled contours
+  @@ NEEDS RULING
+- **`lpn_contour_lines`**
+  > Line contours
+  @@ NEEDS RULING
+- **`lpn_contour_menu`**
+  > Contour
+  @@ NEEDS RULING
+- **`lpn_contour_plot`**
+  > Contour plot
+  @@ NEEDS RULING
+- **`lpn_contour_plot_tip`**
+  > Colors the map between nodes by the field the nodes are colored by, interpolated linearly between neighboring nodes. No color is drawn across pumps, valves, or closed links, or across wide gaps between nodes.
+  @@ NEEDS RULING
+- **`lpn_contour_support`**
+  > Contour plot: linear between {n} nodes. No color across pumps, valves, or closed links, or across gaps wider than {k} times the median pipe length.
+  @@ NEEDS RULING
+- **`lpn_contour_support_dem`**
+  > Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.
+  @@ NEEDS RULING
+- **`lpn_contour_tip`**
+  > Show a contour plot on the map: the colors of the nodes, spread over the area between them. Its style is in Settings, where you can also turn it off.
+  @@ NEEDS RULING
 
 ### feat/criticality (`84ea5311`) — 31 new, 8 to read @@ NEEDS RULING
 
@@ -214,7 +391,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selected
   @@ NEEDS RULING
 
-### feat/demand-scaling (`de5bc272`) — 77 new, 54 to read @@ NEEDS RULING
+### feat/demand-scaling (`97943972`) — 77 new, 54 to read @@ NEEDS RULING
 
 - **`lpn_analyze_menu`**
   > Analyze
@@ -450,7 +627,29 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/keyboard-menu (`90ff85d4`) — adds no English strings
+### feat/flow-balance (`f5be7f04`) — 7 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_sysflow_consumed`**
+  > Consumed
+  @@ NEEDS RULING
+- **`lpn_sysflow_consumed_tip`**
+  > Total of every positive demand: water drawn from the network at junctions, and any flow into a reservoir.
+  @@ NEEDS RULING
+- **`lpn_sysflow_menu`**
+  > System flow
+  @@ NEEDS RULING
+- **`lpn_sysflow_produced`**
+  > Produced
+  @@ NEEDS RULING
+- **`lpn_sysflow_produced_tip`**
+  > Total flow into the network from reservoirs and from negative demands.
+  @@ NEEDS RULING
+- **`lpn_sysflow_tip`**
+  > Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.
+  @@ NEEDS RULING
+- **`lpn_sysflow_title`**
+  > System flow balance
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -472,7 +671,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/profile-file (`b779c50c`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/profile-file (`a095faf4`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_profile_file_done`**
   > Profile read from the file: {used} of {total} nodes found in this network.
@@ -487,7 +686,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   @@ NEEDS RULING
 
-### feat/property-graph (`9fcb6267`) — 5 new, 3 to read @@ NEEDS RULING
+### feat/property-graph (`7686ca67`) — 5 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.
@@ -504,7 +703,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_result_pump_head_tip`**
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   @@ NEEDS RULING
-
-### fix/flow-decimals (`3c0ec99f`) — adds no English strings
-
-### fix/status-now (`9cb539da`) — adds no English strings
