@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**54 still to read on master**, of 96 untranslated keys, of 2249 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**53 still to read on master**, of 99 untranslated keys, of 2252 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (96, 54 to read @@ NEEDS RULING)
+## lpn_  (99, 53 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -210,6 +210,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_ds_head_search`**
   > What demand scale can the system handle?
   @@ NEEDS RULING
+- **`lpn_ds_head_search_selected`**
+  > What demand can the selection handle
+  _Ruled 2026-10-03: "What demand can the selection handle"_
 - **`lpn_ds_head_velocity`**
   > Highest velocities
   @@ NEEDS RULING
@@ -249,6 +252,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_ds_nosolve_at`**
   > At a demand scale of {m}, the network gave no answer. {reason}
   @@ NEEDS RULING
+- **`lpn_ds_outside_below`**
+  > At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.
+  @@ NEEDS RULING
 - **`lpn_ds_run`**
   > Run
   @@ NEEDS RULING
@@ -259,8 +265,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > ✓ At a demand scale of {m}, every junction keeps {pressure}.
   @@ NEEDS RULING
 - **`lpn_ds_scaled_selected`**
-  > Only the selected junctions were scaled and checked. Junctions scaled: {n}.
-  @@ NEEDS RULING
+  > Junctions scaled and checked: {n}.
+  _Ruled 2026-10-03: "Junctions scaled and checked: {n}."_
 - **`lpn_ds_scope`**
   > Demands to scale
   @@ NEEDS RULING
@@ -271,11 +277,14 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Selected junctions
   @@ NEEDS RULING
 - **`lpn_ds_scope_tip`**
-  > Scale the demand of every junction, or only of the junctions selected on the map. Pressures are checked at the junctions scaled.
-  @@ NEEDS RULING
+  > Scale the demand of the selection. Pressures are checked at the scaled demand.
+  _Ruled 2026-10-03: "Scale the demand of of the selection. Pressures are checked at the scaled demand." (the doubled "of" is a typo, corrected)_
 - **`lpn_ds_search_note`**
   > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which every junction keeps the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.
   @@ NEEDS RULING
+- **`lpn_ds_search_note_selected`**
+  > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the selection keeps the given lowest pressure allowed.
+  _Ruled 2026-10-03: "Finds the largest demand scale, from 0 to 20 to the nearest 0.01, at which the selection keeps the given lowest pressure allowed." (0 and 20 and 0.01 are {max} and {step})_
 - **`lpn_ds_search_stopped`**
   > The search was stopped before it found an answer.
   @@ NEEDS RULING
@@ -320,7 +329,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**3 still to read**, of 8 new keys across 11 unmerged branch(es).
+**17 still to read**, of 22 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -331,15 +340,47 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1003 (`961684fd`) — adds no English strings
-
 ### feat/criticality (`84ea5311`) — adds no English strings
 
-### feat/demand-scaling (`49c2f7d5`) — adds no English strings
+### feat/demand-scaling (`de5bc272`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/keyboard-menu (`a277629f`) — adds no English strings
+### feat/flow-balance (`b7b530c6`) — 7 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_sysflow_consumed`**
+  > Consumed
+  @@ NEEDS RULING
+- **`lpn_sysflow_consumed_tip`**
+  > Total of every positive demand: water drawn from the network at junctions, and any flow into a reservoir.
+  @@ NEEDS RULING
+- **`lpn_sysflow_menu`**
+  > System flow
+  @@ NEEDS RULING
+- **`lpn_sysflow_produced`**
+  > Produced
+  @@ NEEDS RULING
+- **`lpn_sysflow_produced_tip`**
+  > Total flow into the network from reservoirs and from negative demands.
+  @@ NEEDS RULING
+- **`lpn_sysflow_tip`**
+  > Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.
+  @@ NEEDS RULING
+- **`lpn_sysflow_title`**
+  > System flow balance
+  @@ NEEDS RULING
+
+### feat/keyboard-menu (`f783fe5f`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_hotkeys_menu_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_hotkeys_menu_heading`**
+  > Menus
+  @@ NEEDS RULING
+- **`lpn_hotkeys_menu_term`**
+  > Menu keyboard shortcuts
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -361,7 +402,22 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/property-graph (`b39a0289`) — 5 new, 3 to read @@ NEEDS RULING
+### feat/profile-file (`b779c50c`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_profile_file_done`**
+  > Profile read from the file: {used} of {total} nodes found in this network.
+  @@ NEEDS RULING
+- **`lpn_profile_file_missing`**
+  > Named in the file but not in this network: {ids}.
+  @@ NEEDS RULING
+- **`lpn_profile_file_short`**
+  > The file names fewer than two nodes in this network, so there is no profile to draw.
+  @@ NEEDS RULING
+- **`lpn_profile_open`**
+  > Open EPANET profile file…
+  @@ NEEDS RULING
+
+### feat/property-graph (`9fcb6267`) — 5 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.
@@ -378,3 +434,7 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_result_pump_head_tip`**
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   @@ NEEDS RULING
+
+### fix/flow-decimals (`e72dd470`) — adds no English strings
+
+### fix/status-now (`1c7692dd`) — adds no English strings

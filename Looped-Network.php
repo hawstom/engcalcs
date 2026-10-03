@@ -1329,7 +1329,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // loses. Fire flow's sibling, on the same box shell; the controls and the report are built in
       // JS (buildCriticalityControls, rebuildCriticalityReport). Its progress uses fire flow's run
       // dialog below, retitled for the run. ?>
-<div id="lpn_crit_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_critbox_title">
+<div id="lpn_crit_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_critbox_title">
 	<div id="lpn_critbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_crit_title']?></div>
 	<button type="button" id="lpn_crit_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1341,7 +1341,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // a copy, and the largest multiplier the system holds above a pressure limit. The third
       // sibling on fire flow's box shell; built in JS (buildDemandScaleControls,
       // rebuildDemandScaleReport). ?>
-<div id="lpn_ds_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_dsbox_title">
+<div id="lpn_ds_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_dsbox_title">
 	<div id="lpn_dsbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ds_title']?></div>
 	<button type="button" id="lpn_ds_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -2951,6 +2951,9 @@ EngCalcs.pageConfig = {
 	lpn_ds_run: <?=json_encode($ec_lang['lpn_ds_run'])?>,
 	lpn_ds_head_search: <?=json_encode($ec_lang['lpn_ds_head_search'])?>,
 	lpn_ds_search_note: <?=json_encode($ec_lang['lpn_ds_search_note'])?>,
+	lpn_ds_search_note_selected: <?=json_encode($ec_lang['lpn_ds_search_note_selected'])?>,
+	lpn_ds_head_search_selected: <?=json_encode($ec_lang['lpn_ds_head_search_selected'])?>,
+	lpn_ds_outside_below: <?=json_encode($ec_lang['lpn_ds_outside_below'])?>,
 	lpn_ds_find: <?=json_encode($ec_lang['lpn_ds_find'])?>,
 	lpn_ds_holds_max: <?=json_encode($ec_lang['lpn_ds_holds_max'])?>,
 	lpn_ds_below_zero: <?=json_encode($ec_lang['lpn_ds_below_zero'])?>,
