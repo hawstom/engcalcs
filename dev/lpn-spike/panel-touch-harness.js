@@ -365,6 +365,10 @@ ok('...and no declaration is left unused', condUsed.every(function (n) { return 
 		[/.*/, /^\.hidden\s*=\s*(?:\[|work\.filter)/, 'a list of hidden table columns, not an element'],
 		[/.*/, /^\.style\.cssText\s*=\s*'display:flex;gap:0\.5em/, 'a row built inside a box, with its layout'],
 		[/^wipeEverything$/, /^\.hidden\s*=\s*true/, 'a throwaway download form built and submitted in one breath, never in the page'],
+		[/^(?:dockPlace|dockRelease)$/, /lpn-dock-collapsed/, 'auto-hide tucking a docked box into its tab (Task 441). '
+			+ 'The box stays OPEN (display untouched, so every isOpen() still says so) and is only made '
+			+ 'invisible; dockPlace() sweeps its tips with hideTipsIn() before adding the class, the rule '
+			+ 'hidePanel() keeps, and raises the box when it flies out. dev/lpn-spike/dock-browser-harness.js'],
 	];
 	let om;
 	while ((om = reO.exec(code)) !== null) {

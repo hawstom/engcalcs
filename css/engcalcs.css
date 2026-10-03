@@ -3282,6 +3282,73 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	border-bottom: 1px solid var(--ec-border-strong); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 }
 
+/* ---- THE CORNER BUTTONS AND DOCKING (ROADMAP Task 441) ---------------------------------------
+   Tom, 2026-10-03: *"the conventional docking, hide, autohide, etc icon buttons at the upper right
+   corner of non-hog (non-modal) boxes right before (next to) the exit X"*. One row per standing box,
+   built by wireBoxDocking() in looped-network.js, sitting in the title band immediately left of the
+   40 px X. The row ignores the pointer and its buttons take it, so the gaps between them still drag
+   the box (makePanelDraggable() starts a drag only on the box itself). The title stops short of the
+   row: `--lpn-corner-w` is written by the row's renderer, because how many buttons it shows depends
+   on whether the box is docked. */
+.lpn-box-corner {
+	position: absolute; top: 0; right: 40px; height: 39px;
+	display: flex; align-items: center; pointer-events: none;
+}
+.lpn-box-corner > * { pointer-events: auto; }
+.lpn-has-corner > .lpn-setbox-title { padding-right: calc(40px + var(--lpn-corner-w, 0px)); }
+.lpn-corner-btn {
+	width: 28px; height: 39px; padding: 0; border: 0; background: transparent;
+	color: var(--ec-ink); cursor: pointer;
+	display: inline-flex; align-items: center; justify-content: center;
+}
+.lpn-corner-btn:hover, .lpn-corner-btn:focus-visible { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
+.lpn-corner-btn[aria-pressed="true"] { background: var(--ec-pressed-bg); }
+.lpn-corner-help { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 39px; }
+/* A DOCKED BOX'S PLACE OUTRANKS EVERY INLINE WRITE. The openers, caps and fits on this page all
+   write a box's inline left/top/size; a docked box is placed by four custom properties instead, and
+   `!important` here beats every one of those inline writes without any of them having to know. The
+   floating geometry they go on writing is exactly what Float hands back. */
+.lpn-dragpanel.lpn-docked {
+	left: var(--lpn-dock-x) !important; top: var(--lpn-dock-y) !important;
+	width: var(--lpn-dock-w) !important; height: var(--lpn-dock-h) !important;
+	min-width: 0 !important; min-height: 0 !important; max-width: none !important; max-height: none !important;
+	resize: none !important; box-shadow: none !important;
+}
+.lpn-docked > .lpn-resize-grip { display: none !important; }
+.lpn-docked .lpn-popover-body { max-height: none; }
+/* Auto-hide: a tucked box is still OPEN (its display is untouched, so every isOpen() still says so);
+   it is only invisible and untouchable until its tab brings it out. */
+.lpn-dragpanel.lpn-dock-collapsed { visibility: hidden !important; pointer-events: none !important; }
+.lpn-dragpanel.lpn-dock-out { box-shadow: 2px 2px 8px var(--ec-a-0-0-0-3) !important; }
+/* The strip an auto-hidden box tucks into, one per side, at the map's outer edge. Empty, it is
+   nothing. Each tab is a button reading the box's own title, turned on its side. */
+.lpn-dock-strip {
+	position: fixed; z-index: 7; display: flex; flex-direction: column; gap: 4px;
+	width: 24px; box-sizing: border-box; padding: 4px 0; overflow: hidden;
+	background: var(--ec-gray-f2f2f2); border: 1px solid var(--ec-border-strong);
+}
+.lpn-dock-strip:empty { display: none; }
+.lpn-dock-tab {
+	writing-mode: vertical-rl; flex: 0 1 auto; min-height: 0; max-height: 14em;
+	padding: 8px 2px; margin: 0 1px; border: 1px solid var(--ec-border-strong); border-radius: 3px;
+	background: var(--ec-bg); color: var(--ec-ink); font-size: 12px; line-height: 1.2;
+	white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+}
+.lpn-dock-tab:hover, .lpn-dock-tab:focus-visible, .lpn-dock-tab[aria-expanded="true"] {
+	background: var(--ec-hover-bg); border-color: var(--ec-hover-border);
+}
+/* The column's inner edge: drag it to make the docked column wider or narrower. */
+.lpn-dock-grip {
+	position: fixed; z-index: 7; width: 8px; margin-left: -4px; cursor: col-resize; touch-action: none;
+	display: none;
+}
+.lpn-dock-grip.lpn-dock-grip-live { display: block; }
+.lpn-dock-grip:hover { background: var(--ec-gray-e8e8e8); }
+/* The map gives up the docked columns as margins on its wrapper; the canvas is `width: 100%`, so it
+   narrows, and every overlay inside the wrapper moves with it. Never on paper. */
+.lpn-map-wrap { margin-left: var(--lpn-dock-ml, 0px); margin-right: var(--lpn-dock-mr, 0px); }
+@media print { .lpn-map-wrap { margin-left: 0; margin-right: 0; } }
+
 /* ---- THE NEW-PROJECT BOX (ROADMAP Task 477) --------------------------------------------------
    Four blocks stacked, each a question. Nothing here sets a width: the box's own max-width in
    Looped-Network.php does that, and the unit strip inside it wraps on its own (.lpn-units-group),

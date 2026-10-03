@@ -21125,6 +21125,9 @@ var EngCalcs = EngCalcs || {};
 	// would be felt on a desktop that never chose it. Whether a box is open is a fact about what the
 	// reader was DOING, and each browser answers only for itself.
 	var findUserOpen = false;
+	// Where the box is docked (Task 441): wireBoxDocking() reads and writes it, and it rides on this
+	// same record, each field absent while it is the default.
+	var findDockRec = {};
 	function saveFindLayout() {
 		var v = {
 			left: findUserPos ? findUserPos.left : null,
@@ -21133,6 +21136,9 @@ var EngCalcs = EngCalcs || {};
 			h: findUserSize ? findUserSize.h : null,
 			open: findUserOpen
 		};
+		if (findDockRec.dock) { v.dock = findDockRec.dock; }
+		if (findDockRec.autohide) { v.autohide = true; }
+		if (findDockRec.dockW) { v.dockW = findDockRec.dockW; }
 		try { localStorage.setItem(LPN_FINDBOX_KEY, JSON.stringify(v)); } catch (e) {}
 	}
 	function loadFindLayout() {
@@ -21282,7 +21288,7 @@ var EngCalcs = EngCalcs || {};
 		if (window.ResizeObserver) {
 			new window.ResizeObserver(function () {
 				var r;
-				if (popup.style.display === 'none' || smallScreen()) { return; }
+				if (popup.style.display === 'none' || smallScreen() || boxIsDocked(popup)) { return; }
 				r = popup.getBoundingClientRect();
 				if (!(r.width > 0) || !(r.height > 0)) { return; }
 				findUserSize = { w: Math.round(r.width), h: Math.round(r.height) };
@@ -40109,7 +40115,7 @@ var EngCalcs = EngCalcs || {};
 		if (notesboxLayout.open) { notesboxLayout.open = false; saveNotesboxLayout(); }
 	}
 	function toggleNotesPopup() {
-		if (notesBoxIsOpen()) { closeNotesPopup(); return; }
+		if (notesBoxIsOpen() && !boxIsTucked(notesBoxEl())) { closeNotesPopup(); return; }
 		openNotesBox();
 	}
 	// The About box. Still a centred, click-away-dismissed popover -- unlike Notes since Tom's
@@ -40190,7 +40196,7 @@ var EngCalcs = EngCalcs || {};
 		if (hotkeysboxLayout.open) { hotkeysboxLayout.open = false; saveHotkeysboxLayout(); }
 	}
 	function toggleHotkeysBox() {
-		if (hotkeysBoxIsOpen()) { closeHotkeysBox(); return; }
+		if (hotkeysBoxIsOpen() && !boxIsTucked(hotkeysBoxEl())) { closeHotkeysBox(); return; }
 		openHotkeysBox();
 	}
 	function wireHotkeysBox() {
@@ -41220,7 +41226,11 @@ var EngCalcs = EngCalcs || {};
 		// document, and at wiring time there is not one yet: the project arrives at initLibrary()
 		// a hundred lines below them. This is the first point at which the drawing, the units and
 		// the tab strip are all the ones the visitor will actually be looking at.
+		// Docking (Task 441) is wired after every box it docks, and read before any of them reopens.
+		wireBoxDocking();
+		dockBooting = true;
 		restoreOpenBoxes();
+		dockBooting = false;
 		// **The banner has to be painted on the BOOT path too.** refreshAllFromDocument() ends with
 		// this call but is shared by openProject() and newProject() only, so the one situation the
 		// needs-reopen banner exists for -- a page load that dropped the file handle -- is the one
@@ -47350,6 +47360,8 @@ var EngCalcs = EngCalcs || {};
 	function hidePanel(el) {
 		if (!el) { return; }
 		hideTipsIn(el);
+		// A docked box gives its column back to the map once it is closed (Task 441).
+		if (el.__lpnDock) { dockLayoutSoon(); }
 		el.style.display = 'none';
 	}
 	function openSettingsBox(section) {
@@ -47423,7 +47435,7 @@ var EngCalcs = EngCalcs || {};
 		if (setboxLayout.open) { setboxLayout.open = false; saveSetboxLayout(); }
 	}
 	function toggleSettingsBox(evt) {
-		if (setboxIsOpen()) { closeSettingsBox(); return; }
+		if (setboxIsOpen() && !boxIsTucked(setboxEl())) { closeSettingsBox(); return; }
 		openSettingsBox(evt && evt.section);
 	}
 	// ---- WHICH BOXES COME BACK OPEN, AND WHICH DELIBERATELY DO NOT (Tom, 2026-09-04) -------------
@@ -47644,7 +47656,7 @@ var EngCalcs = EngCalcs || {};
 		if (window.ResizeObserver) {
 			new window.ResizeObserver(function () {
 				var r, at, capped;
-				if (!setboxIsOpen()) { return; }
+				if (!setboxIsOpen() || boxIsDocked(box)) { return; }
 				// **AND NOTHING MEASURED ON A PHONE IS STORED**, for the same reason the capped
 				// height below is not: the box fills the window at that width, so every number this
 				// observer sees there is the window's and not the user's, and storing it would
@@ -47933,7 +47945,7 @@ var EngCalcs = EngCalcs || {};
 		// user's. Recorded in the same record, never a second key.
 		function userResized() {
 			var r = box.getBoundingClientRect();
-			if (smallScreen() || !layout.hasOwnProperty('userSized') || !(r.width > 0) || !(r.height > 0)) { return; }
+			if (smallScreen() || boxIsDocked(box) || !layout.hasOwnProperty('userSized') || !(r.width > 0) || !(r.height > 0)) { return; }
 			layout.userSized = true;
 			layout.w = Math.round(r.width);
 			layout.h = Math.round(r.height);
@@ -47955,7 +47967,7 @@ var EngCalcs = EngCalcs || {};
 		if (window.ResizeObserver) {
 			new window.ResizeObserver(function () {
 				var r, capped;
-				if (!isOpen() || smallScreen()) { return; }
+				if (!isOpen() || smallScreen() || boxIsDocked(box)) { return; }
 				if (layout.hasOwnProperty('userSized') && !layout.userSized) { return; }
 				r = box.getBoundingClientRect();
 				if (!(r.width > 0) || !(r.height > 0)) { return; }
@@ -47965,6 +47977,504 @@ var EngCalcs = EngCalcs || {};
 				save();
 			}).observe(box);
 		}
+	}
+
+	// ---- DOCKING: DOCK LEFT, DOCK RIGHT, FLOAT, AUTO-HIDE (ROADMAP Task 441) ---------------------
+	//
+	// Tom, 2026-10-03: *"implementing the conventional docking, hide, autohide, etc icon buttons at
+	// the upper right corner of non-hog (non-modal) boxes right before (next to) the exit X"*, on
+	// every standing box rather than only Settings, *"since this could be an embarrassment."*
+	//
+	// **ONE ROW OF CORNER BUTTONS, BUILT HERE FOR EVERY STANDING BOX**, immediately left of the X
+	// the markup already carries. The row offers only what would CHANGE something: a floating box
+	// offers Dock left and Dock right; a docked one offers Auto-hide, the other side, and Float. The
+	// Water > Analyze tools also carry their one `?` there (Tom's interview ruling Q5, 2026-10-03).
+	//
+	// **A DOCKED BOX TAKES A COLUMN AND THE MAP GIVES IT UP.** The map's wrapper takes a margin on
+	// that side (two custom properties, `.lpn-map-wrap` in the stylesheet), so the canvas, whose
+	// width is `100%`, narrows and every overlay inside the wrapper moves with it; applyMapHeight()
+	// then re-centres the drawing exactly as it does for a window resize. Two boxes docked on one
+	// side share the column, stacked, at equal heights, and the column is as wide as the widest of
+	// them wants; its inner edge is a grip.
+	//
+	// **WHERE A DOCKED BOX SITS IS FOUR !important CUSTOM PROPERTIES, NEVER ITS left/top.** Every
+	// opener, cap and fit on this page writes a box's inline geometry; the docked class outranks all
+	// of them without any of them having to know, and the floating geometry they keep writing is
+	// exactly what Float hands back. A drag on a docked box's title band floats it, as a docked
+	// palette does everywhere else.
+	//
+	// **AUTO-HIDE** (AutoCAD's anchor-and-flyout, raised 2026-08-18): the docked box tucks into a tab
+	// on a slim strip at the map's edge and flies out over the map on hover, on a click of its tab,
+	// or when a menu row opens it; it tucks away once the pointer has left it AND focus is not inside
+	// it, on a press anywhere outside it, or on Escape. A tucked box is still OPEN -- its display is
+	// untouched, so every isOpen() and every rebuild on this page goes on treating it as open -- it
+	// is only invisible and untouchable.
+	//
+	// **STORAGE: NO NEW KEY.** `dock` ('left' or 'right'), `autohide` (true) and `dockW` (the docked
+	// width, px) ride on the furniture record each box ALREADY keeps, the way `open` and `ix` joined
+	// theirs: same purpose, same category, the same row of dev/cookie-storage-inventory.md. Each is
+	// absent while it is the default, so a visitor who never docks anything stores nothing new. The
+	// five boxes that keep no record across a reload (Properties, Criticality, Demand scaling,
+	// Alternatives, Calibration) dock for this page load only -- the ruling they already carry for
+	// their corner.
+	//
+	// **NOT ON A PHONE.** Below the one breakpoint every box fills the window (placePanelForScreen()),
+	// so there is no column to dock into: the dock buttons are not offered there, and a box that is
+	// docked on the desktop opens as it always did. Its docking is kept and comes back on a wider
+	// window.
+	var LPN_DOCK_MIN_W = 240, LPN_DOCK_MAX_FRAC = 0.45, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360,
+		LPN_DOCK_STRIP_W = 24, LPN_DOCK_TUCK_MS = 400, LPN_DOCK_HOVER_MS = 150, LPN_CORNER_BTN_W = 28,
+		LPN_UNDOCK_SLOP = 6;
+	var dockBoxes = [], dockFlyout = null, dockTimer = null, dockBooting = false, dockQueued = false,
+		dockMargins = { left: 0, right: 0 }, dockWasSmall = null;
+	function dockSideOf(d) {
+		var s = d && d.rec.dock;
+		return ((s === 'left' || s === 'right') && !smallScreen()) ? s : null;
+	}
+	function boxIsDocked(box) { return !!(box && box.__lpnDock && dockSideOf(box.__lpnDock)); }
+	// A toggle (the gear, a Help row) that finds its box tucked away brings it out instead of closing
+	// a box the reader cannot see.
+	function boxIsTucked(box) { return !!box && !!box.classList && box.classList.contains('lpn-dock-collapsed'); }
+	function dockBoxShown(d) { var v = d.box.style.display; return v !== 'none' && v !== ''; }
+	// The three fields, read off the box's own record. Its own loader reads the numbers it knows and
+	// passes over these, so they are read here, once, at wiring time.
+	function readDockRecord(key, rec) {
+		var raw = null, v;
+		if (!key) { return; }
+		try { raw = localStorage.getItem(key); } catch (e) { return; }
+		if (!raw) { return; }
+		try { v = JSON.parse(raw); } catch (e) { return; }
+		if (!v || typeof v !== 'object') { return; }
+		if (v.dock === 'left' || v.dock === 'right') { rec.dock = v.dock; }
+		if (v.autohide === true) { rec.autohide = true; }
+		if (typeof v.dockW === 'number' && isFinite(v.dockW) && v.dockW > 0) { rec.dockW = Math.round(v.dockW); }
+	}
+	function clampDockW(w, room) {
+		var max = Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) * LPN_DOCK_MAX_FRAC));
+		if (!(w > 0)) { w = LPN_DOCK_DEFAULT_W; }
+		if (room > 0) { max = Math.min(max, room); }
+		return Math.round(Math.max(Math.min(LPN_DOCK_MIN_W, max), Math.min(w, max)));
+	}
+	// Icons drawn in the button's own ink (currentColor), so they follow the theme with no colour of
+	// their own. A panel on the left or right of a window; a window; a pushpin, upright while the box
+	// stays out and on its side while it auto-hides -- the convention Visual Studio and AutoCAD share.
+	var DOCK_ICONS = {
+		left: [['rect', { x: 1.5, y: 2.5, width: 13, height: 11 }], ['rect', { x: 2, y: 3, width: 5, height: 10, fill: 'currentColor', stroke: 'none' }]],
+		right: [['rect', { x: 1.5, y: 2.5, width: 13, height: 11 }], ['rect', { x: 9, y: 3, width: 5, height: 10, fill: 'currentColor', stroke: 'none' }]],
+		float: [['rect', { x: 1.5, y: 3.5, width: 13, height: 10 }], ['path', { d: 'M1.5 6.5h13' }]],
+		pin: [['path', { d: 'M5.5 1.5h5M6.5 1.5v5l-2 2.5h7l-2-2.5v-5M8 9v5.5' }]]
+	};
+	function dockIcon(kind, turned) {
+		var NS = 'http://www.w3.org/2000/svg', s = document.createElementNS(NS, 'svg');
+		s.setAttribute('viewBox', '0 0 16 16');
+		s.setAttribute('width', '16');
+		s.setAttribute('height', '16');
+		s.setAttribute('aria-hidden', 'true');
+		s.setAttribute('focusable', 'false');
+		s.setAttribute('fill', 'none');
+		s.setAttribute('stroke', 'currentColor');
+		s.setAttribute('stroke-width', '1.3');
+		if (turned) { s.style.transform = 'rotate(90deg)'; }
+		DOCK_ICONS[kind].forEach(function (p) {
+			var e = document.createElementNS(NS, p[0]);
+			Object.keys(p[1]).forEach(function (k) { e.setAttribute(k, p[1][k]); });
+			s.appendChild(e);
+		});
+		return s;
+	}
+	function dockButton(d, act, label, pressed) {
+		var b = document.createElement('button');
+		b.type = 'button';
+		b.className = 'lpn-corner-btn';
+		b.setAttribute('data-dock', act);
+		b.title = label;
+		b.setAttribute('aria-label', label);
+		if (pressed !== undefined) { b.setAttribute('aria-pressed', pressed ? 'true' : 'false'); }
+		b.appendChild(act === 'autohide' ? dockIcon('pin', !!pressed) : dockIcon(act));
+		b.addEventListener('click', function (e) {
+			if (e.stopPropagation) { e.stopPropagation(); }
+			dockAct(d, act);
+		});
+		return b;
+	}
+	// The box's one `?` (Q5): the JS twin of ecTipLabel() with no label text, so the glyph IS the
+	// whole tip target, and focusable so a keyboard reaches the explanation as a pointer does.
+	function cornerHelp(tip) {
+		var help = document.createElement('span'), glyph = document.createElement('span');
+		help.className = 'ec-help lpn-corner-help';
+		help.title = tip;
+		help.tabIndex = 0;
+		glyph.className = 'ec-tip';
+		glyph.textContent = '?';
+		help.appendChild(glyph);
+		return help;
+	}
+	// Rebuilt whole on every change of state, because which buttons exist IS the state. A button the
+	// keyboard was on is replaced by its successor, so focus does not fall out of the box.
+	function renderDockCorner(d) {
+		var pc = EngCalcs.pageConfig || {}, row = d.corner, side = dockSideOf(d), n = 0,
+			had = (document.activeElement && row.contains(document.activeElement)) ?
+				document.activeElement.getAttribute('data-dock') : null, next;
+		hideTipsIn(row);
+		while (row.firstChild) { row.removeChild(row.firstChild); }
+		if (!smallScreen()) {
+			if (side) { row.appendChild(dockButton(d, 'autohide', pc.lpn_dock_autohide || 'Auto-hide', !!d.rec.autohide)); n++; }
+			if (side !== 'left') { row.appendChild(dockButton(d, 'left', pc.lpn_dock_left || 'Dock at the left of the map')); n++; }
+			if (side !== 'right') { row.appendChild(dockButton(d, 'right', pc.lpn_dock_right || 'Dock at the right of the map')); n++; }
+			if (side) { row.appendChild(dockButton(d, 'float', pc.lpn_dock_float || 'Float')); n++; }
+		}
+		if (d.help) { row.appendChild(d.help); n++; }
+		d.box.style.setProperty('--lpn-corner-w', (n * LPN_CORNER_BTN_W) + 'px');
+		if (had) {
+			next = row.querySelector('[data-dock="' + had + '"]') || row.querySelector('[data-dock="float"]') ||
+				row.querySelector('button');
+			if (next && !d.box.classList.contains('lpn-dock-collapsed')) { next.focus(); }
+		}
+	}
+	function dockAct(d, act) {
+		var r, wasSide = dockSideOf(d);
+		if (act === 'left' || act === 'right') {
+			// The width it floats at is the width it docks at, the first time.
+			if (!wasSide && !d.rec.dockW) {
+				r = d.box.getBoundingClientRect();
+				if (r.width > 0) { d.rec.dockW = Math.round(r.width); }
+			}
+			d.rec.dock = act;
+		} else if (act === 'float') {
+			delete d.rec.dock;
+			delete d.rec.autohide;
+		} else if (act === 'autohide') {
+			if (d.rec.autohide) { delete d.rec.autohide; } else { d.rec.autohide = true; }
+		}
+		if (dockFlyout === d) { dockFlyout = null; }
+		if (d.save) { d.save(); }
+		layoutDocks();
+		renderDockCorner(d);
+		// Turned on from inside the box, auto-hide tucks it at once; the keyboard lands on its tab.
+		if (act === 'autohide' && d.rec.autohide && d.tab) { d.tab.focus(); }
+	}
+	// A drag on a docked box's title band floats it under the pointer (makePanelDraggable() calls
+	// this once the press has moved past LPN_UNDOCK_SLOP, so a click on the band does nothing).
+	function dockUndockForDrag(box, ev) {
+		var d = box.__lpnDock, was, r;
+		if (!d || !dockSideOf(d)) { return false; }
+		was = box.getBoundingClientRect();
+		delete d.rec.dock;
+		delete d.rec.autohide;
+		if (dockFlyout === d) { dockFlyout = null; }
+		if (d.save) { d.save(); }
+		layoutDocks();
+		renderDockCorner(d);
+		r = box.getBoundingClientRect();
+		box.style.left = Math.round(ev.clientX - Math.min(ev.clientX - was.left, Math.max(20, r.width - 60))) + 'px';
+		box.style.top = Math.round(ev.clientY - Math.min(ev.clientY - was.top, 20)) + 'px';
+		return true;
+	}
+	// The one call every opener reaches (placePanelForScreen() and openPopupAt()). A box opened by a
+	// menu row while it auto-hides comes OUT -- the reader asked for it -- except during the boot
+	// restore, where it comes back tucked as it was left.
+	function dockPlaced(box) {
+		var d = box && box.__lpnDock;
+		if (!d || !dockSideOf(d)) { return; }
+		if (d.rec.autohide && !dockBooting) { dockFlyout = d; }
+		layoutDocks();
+	}
+	// hidePanel() runs this BEFORE it hides, so the layout is deferred a tick to see the box closed.
+	function dockLayoutSoon() {
+		if (dockQueued) { return; }
+		dockQueued = true;
+		setTimeout(layoutDocks, 0);
+	}
+	function dockStripEl(side) {
+		var id = 'lpn_dock_strip_' + side, el = document.getElementById(id);
+		if (!el) {
+			el = document.createElement('div');
+			el.id = id;
+			el.className = 'd-print-none lpn-dock-strip';
+			el.setAttribute('role', 'toolbar');
+			el.setAttribute('aria-orientation', 'vertical');
+			document.body.appendChild(el);
+		}
+		return el;
+	}
+	function dockGripEl(side) {
+		var id = 'lpn_dock_grip_' + side, el = document.getElementById(id);
+		if (!el) {
+			el = document.createElement('div');
+			el.id = id;
+			el.className = 'd-print-none lpn-dock-grip';
+			// Decoration to a screen reader, like the boxes' own resize grip (addPanelResizeGrip()).
+			el.setAttribute('aria-hidden', 'true');
+			document.body.appendChild(el);
+			wireDockGrip(el, side);
+		}
+		return el;
+	}
+	function dockTitleOf(d) {
+		var t = d.box.querySelector('.lpn-setbox-title');
+		return t ? t.textContent.replace(/\s+/g, ' ').trim() : d.box.id;
+	}
+	function renderDockStrip(side, list, x, y, h) {
+		var el = dockStripEl(side), same = el.children.length === list.length;
+		list.forEach(function (d, i) { if (el.children[i] !== d.tab) { same = false; } });
+		// Rebuilt only when the set changes: moving a focused tab would drop the keyboard's place.
+		if (!same) {
+			while (el.firstChild) { el.removeChild(el.firstChild); }
+			list.forEach(function (d) { el.appendChild(d.tab); });
+		}
+		list.forEach(function (d) {
+			var t = dockTitleOf(d);
+			if (d.tab.textContent !== t) { d.tab.textContent = t; }
+			d.tab.title = t;
+			d.tab.setAttribute('aria-expanded', d === dockFlyout ? 'true' : 'false');
+		});
+		el.style.left = Math.round(x) + 'px';
+		el.style.top = Math.round(y) + 'px';
+		el.style.height = Math.round(h) + 'px';
+	}
+	function placeDockGrip(side, x, y, h, list) {
+		var el = dockGripEl(side);
+		el.lpnDockList = list;
+		el.classList.toggle('lpn-dock-grip-live', x !== null);
+		if (x === null) { return; }
+		el.style.left = Math.round(x) + 'px';
+		el.style.top = Math.round(y) + 'px';
+		el.style.height = Math.round(h) + 'px';
+	}
+	// Dragging the column's inner edge sets the width of every box docked in it, together.
+	function wireDockGrip(el, side) {
+		var from = null;
+		el.addEventListener('pointerdown', function (e) {
+			var list = el.lpnDockList || [];
+			if (!list.length) { return; }
+			from = { x: e.clientX, w: list[0].box.getBoundingClientRect().width, list: list };
+			try { if (el.setPointerCapture) { el.setPointerCapture(e.pointerId); } } catch (err) { /* resize without capture */ }
+			e.preventDefault();
+		});
+		el.addEventListener('pointermove', function (e) {
+			var w;
+			if (!from) { return; }
+			w = from.w + (side === 'left' ? e.clientX - from.x : from.x - e.clientX);
+			w = clampDockW(w);
+			from.list.forEach(function (d) { d.rec.dockW = w; });
+			layoutDocks();
+		});
+		['pointerup', 'pointercancel'].forEach(function (evt) {
+			el.addEventListener(evt, function () {
+				if (!from) { return; }
+				from.list.forEach(function (d) { if (d.save) { d.save(); } });
+				from = null;
+			});
+		});
+	}
+	function dockPlace(d, x, y, w, h, mode) {
+		var b = d.box;
+		b.style.setProperty('--lpn-dock-x', Math.round(x) + 'px');
+		b.style.setProperty('--lpn-dock-y', Math.round(y) + 'px');
+		b.style.setProperty('--lpn-dock-w', Math.round(w) + 'px');
+		b.style.setProperty('--lpn-dock-h', Math.round(h) + 'px');
+		b.classList.add('lpn-docked');
+		b.classList.toggle('lpn-dock-out', mode === 'out');
+		if (mode === 'tucked') {
+			if (!b.classList.contains('lpn-dock-collapsed')) {
+				// Tucking hides it, so its tips go with it -- the rule hidePanel() keeps for a close.
+				hideTipsIn(b);
+				b.classList.add('lpn-dock-collapsed');
+			}
+		} else {
+			b.classList.remove('lpn-dock-collapsed');
+		}
+		if (mode === 'out' && b.__lpnRaise) { b.__lpnRaise(); }
+	}
+	function dockRelease(d) {
+		var b = d.box;
+		b.classList.remove('lpn-docked');
+		b.classList.remove('lpn-dock-out');
+		b.classList.remove('lpn-dock-collapsed');
+	}
+	function dockMapWrap() {
+		var w = svg && svg.parentNode;
+		return (w && w.classList && w.classList.contains('lpn-map-wrap')) ? w : null;
+	}
+	// **THE ONE PLACE A DOCKED BOX, ITS TAB AND THE MAP'S MARGINS ARE PLACED.** Everything is
+	// measured from the map's OUTER edges -- the wrapper's rect plus the margins this function
+	// last gave it -- so a pass that changes the margins does not move what it has just placed.
+	function layoutDocks() {
+		var wrap = dockMapWrap(), sides = { left: { pinned: [], auto: [] }, right: { pinned: [], auto: [] } },
+			col = {}, want = { left: 0, right: 0 }, wr, sr, outerL, outerR, top, h, room, n;
+		dockQueued = false;
+		if (!wrap) { return; }
+		dockBoxes.forEach(function (d) {
+			var side = dockSideOf(d);
+			if (side && dockBoxShown(d)) { (d.rec.autohide ? sides[side].auto : sides[side].pinned).push(d); }
+			else { dockRelease(d); }
+		});
+		if (dockFlyout && !(dockFlyout.rec.autohide && dockSideOf(dockFlyout) && dockBoxShown(dockFlyout))) {
+			dockFlyout = null;
+		}
+		wr = wrap.getBoundingClientRect();
+		sr = svg.getBoundingClientRect();
+		// Not laid out (a hidden tab, the boot curtain not yet measured): nothing true to place from.
+		if (!(wr.width > 0) || !(sr.height > 0)) { return; }
+		outerL = wr.left - dockMargins.left;
+		outerR = wr.right + dockMargins.right;
+		top = Math.max(0, sr.top);
+		h = Math.max(80, Math.min(sr.bottom, window.innerHeight || sr.bottom) - top);
+		['left', 'right'].forEach(function (s) {
+			var w = 0;
+			sides[s].pinned.forEach(function (d) { w = Math.max(w, d.rec.dockW || 0); });
+			col[s] = { strip: sides[s].auto.length ? LPN_DOCK_STRIP_W : 0, w: sides[s].pinned.length ? (w || LPN_DOCK_DEFAULT_W) : 0 };
+		});
+		// The map keeps LPN_DOCK_MAP_MIN of width; the columns give way to it, evenly.
+		room = (outerR - outerL) - LPN_DOCK_MAP_MIN - col.left.strip - col.right.strip;
+		n = (col.left.w ? 1 : 0) + (col.right.w ? 1 : 0);
+		['left', 'right'].forEach(function (s) {
+			var S = sides[s], c = col[s], x, each;
+			if (c.w) { c.w = clampDockW(c.w, Math.floor(room / n)); }
+			want[s] = c.strip + c.w;
+			x = s === 'left' ? outerL + c.strip : outerR - c.strip - c.w;
+			each = S.pinned.length ? h / S.pinned.length : 0;
+			S.pinned.forEach(function (d, i) {
+				var y0 = Math.round(i * each), y1 = Math.round((i + 1) * each);
+				dockPlace(d, x, top + y0, c.w, y1 - y0, 'pinned');
+			});
+			S.auto.forEach(function (d) {
+				var w = clampDockW(d.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W)),
+					ax = s === 'left' ? outerL + c.strip : outerR - c.strip - w;
+				dockPlace(d, ax, top, w, h, d === dockFlyout ? 'out' : 'tucked');
+			});
+			renderDockStrip(s, S.auto, s === 'left' ? outerL : outerR - c.strip, top, h);
+			placeDockGrip(s, c.w ? (s === 'left' ? outerL + c.strip + c.w : outerR - c.strip - c.w) : null, top, h, S.pinned);
+		});
+		if (want.left !== dockMargins.left || want.right !== dockMargins.right) {
+			dockMargins = want;
+			wrap.style.setProperty('--lpn-dock-ml', want.left + 'px');
+			wrap.style.setProperty('--lpn-dock-mr', want.right + 'px');
+			applyMapHeight();
+		}
+	}
+	// ---- the flyout ----
+	function dockPointerOver(d) {
+		try { return d.box.matches(':hover') || (!!d.tab && d.tab.matches(':hover')); } catch (e) { return false; }
+	}
+	function dockFlyOut(d, focusIn) {
+		var f;
+		clearTimeout(dockTimer);
+		if (dockFlyout !== d) { dockFlyout = d; layoutDocks(); }
+		if (focusIn) {
+			f = d.corner.querySelector('button');
+			if (f) { f.focus(); }
+		}
+	}
+	function dockTuck(d, focusTab) {
+		var had;
+		clearTimeout(dockTimer);
+		if (dockFlyout !== d) { return; }
+		had = !!document.activeElement && d.box.contains(document.activeElement);
+		dockFlyout = null;
+		layoutDocks();
+		if ((focusTab || had) && d.tab) { d.tab.focus(); }
+	}
+	// Tucked once the pointer is off it AND focus is elsewhere -- a reader typing into the box can
+	// move the mouse away to look at the map without losing it.
+	function dockTuckLater(d) {
+		clearTimeout(dockTimer);
+		dockTimer = setTimeout(function () {
+			if (dockFlyout !== d || dockPointerOver(d)) { return; }
+			if (document.activeElement && d.box.contains(document.activeElement)) { return; }
+			dockTuck(d);
+		}, LPN_DOCK_TUCK_MS);
+	}
+	function dockOutsidePress(e) {
+		var d = dockFlyout, t = e.target;
+		if (!d || !t || d.box.contains(t) || (d.tab && d.tab.contains(t))) { return; }
+		// A press inside a tip that box raised is still the box's.
+		if (t.closest && t.closest('.tooltip, .popover')) { return; }
+		dockTuck(d);
+	}
+	function wireDockTab(d) {
+		var tab = document.createElement('button');
+		tab.type = 'button';
+		tab.className = 'lpn-dock-tab';
+		tab.setAttribute('aria-controls', d.box.id);
+		tab.addEventListener('pointerenter', function (e) {
+			if (e.pointerType && e.pointerType !== 'mouse' && e.pointerType !== 'pen') { return; }
+			clearTimeout(dockTimer);
+			dockTimer = setTimeout(function () { dockFlyOut(d, false); }, LPN_DOCK_HOVER_MS);
+		});
+		tab.addEventListener('pointerleave', function () {
+			if (dockFlyout === d) { dockTuckLater(d); } else { clearTimeout(dockTimer); }
+		});
+		tab.addEventListener('click', function () { dockFlyOut(d, true); });
+		d.tab = tab;
+	}
+	function registerDockBox(id, rec, save, key, tipKey) {
+		var box = document.getElementById(id), pc = EngCalcs.pageConfig || {}, x, row, d;
+		if (!box || box.__lpnDock) { return; }
+		d = { box: box, rec: rec || {}, save: save || null, help: null, tab: null };
+		readDockRecord(key, d.rec);
+		row = document.createElement('div');
+		row.className = 'lpn-box-corner';
+		x = box.querySelector('.lpn-popover-x');
+		box.insertBefore(row, x || box.firstChild);
+		box.classList.add('lpn-has-corner');
+		d.corner = row;
+		if (tipKey && pc[tipKey]) { d.help = cornerHelp(pc[tipKey]); }
+		wireDockTab(d);
+		box.addEventListener('pointerenter', function () { if (dockFlyout === d) { clearTimeout(dockTimer); } });
+		box.addEventListener('pointerleave', function () { if (dockFlyout === d) { dockTuckLater(d); } });
+		box.addEventListener('focusout', function () {
+			if (dockFlyout === d) { setTimeout(function () { if (dockFlyout === d) { dockTuckLater(d); } }, 0); }
+		});
+		box.addEventListener('keydown', function (e) {
+			if (e.key !== 'Escape' || dockFlyout !== d) { return; }
+			e.preventDefault();
+			if (e.stopPropagation) { e.stopPropagation(); }
+			dockTuck(d, true);
+		});
+		box.__lpnDock = d;
+		dockBoxes.push(d);
+		renderDockCorner(d);
+		initTipsIn(row);
+	}
+	// **EVERY NON-MODAL BOX ON THE PAGE**, by the furniture record it already keeps (null: none, so
+	// it docks for this page load only). The last column is the `?` its corner carries (Q5), the
+	// tool's own menu tip until it has words of its own.
+	function wireBoxDocking() {
+		[
+			['lpn_popup', {}, null, null],
+			['lpn_find_popup', findDockRec, saveFindLayout, LPN_FINDBOX_KEY],
+			['lpn_settings_box', setboxLayout, saveSetboxLayout, LPN_SETBOX_KEY],
+			['lpn_library_box', libboxLayout, saveLibboxLayout, LPN_LIBBOX_KEY],
+			['lpn_ff_box', ffboxLayout, saveFfboxLayout, LPN_FFBOX_KEY, 'lpn_ff_menu_tip'],
+			['lpn_crit_box', critLayout, null, null, 'lpn_crit_menu_tip'],
+			['lpn_ds_box', dsLayout, null, null, 'lpn_ds_menu_tip'],
+			['lpn_energy_box', energyboxLayout, saveEnergyboxLayout, LPN_ENERGYBOX_KEY],
+			['lpn_contour_box', contourboxLayout, saveContourboxLayout, LPN_CONTOURBOX_KEY],
+			['lpn_scncmp_box', cmpboxLayout, saveCmpboxLayout, LPN_CMPBOX_KEY],
+			['lpn_rptbox', rptboxLayout, saveRptboxLayout, LPN_RPTBOX_KEY],
+			['lpn_status_box', statusboxLayout, saveStatusboxLayout, LPN_STATUSBOX_KEY],
+			['lpn_alt_box', altboxLayout, null, null],
+			['lpn_full_box', fullboxLayout, saveFullboxLayout, LPN_FULLBOX_KEY],
+			['lpn_calib_box', calibboxLayout, null, null],
+			['lpn_notes_popup', notesboxLayout, saveNotesboxLayout, LPN_NOTESBOX_KEY],
+			['lpn_hotkeys_popup', hotkeysboxLayout, saveHotkeysboxLayout, LPN_HOTKEYSBOX_KEY]
+		].forEach(function (r) { registerDockBox(r[0], r[1], r[2], r[3], r[4]); });
+		dockWasSmall = smallScreen();
+		window.addEventListener('resize', function () {
+			var small = smallScreen();
+			if (small !== dockWasSmall) {
+				dockWasSmall = small;
+				dockBoxes.forEach(renderDockCorner);
+			}
+			layoutDocks();
+		});
+		// The map is re-measured on a dozen environment events (a bottom pane opening, a banner, the
+		// fonts landing); the columns follow the canvas the way the right pane does.
+		if (window.ResizeObserver && svg) {
+			new window.ResizeObserver(function () { if (dockBoxes.some(dockSideOf)) { layoutDocks(); } }).observe(svg);
+		}
+		document.addEventListener('pointerdown', dockOutsidePress, true);
 	}
 
 	// ---- what the document holds, and the one place each kind is written --------------------------
@@ -50940,7 +51450,7 @@ var EngCalcs = EngCalcs || {};
 		if (libboxLayout.open) { libboxLayout.open = false; saveLibboxLayout(); }
 	}
 	function toggleLibraryBox() {
-		if (libBoxIsOpen()) { closeLibraryBox(); return; }
+		if (libBoxIsOpen() && !boxIsTucked(libBoxEl())) { closeLibraryBox(); return; }
 		openLibraryBox();
 	}
 	function wireLibraryBox() {
@@ -50974,7 +51484,7 @@ var EngCalcs = EngCalcs || {};
 		if (window.ResizeObserver) {
 			new window.ResizeObserver(function () {
 				var r, capped;
-				if (!libBoxIsOpen() || smallScreen()) { return; }
+				if (!libBoxIsOpen() || smallScreen() || boxIsDocked(box)) { return; }
 				r = box.getBoundingClientRect();
 				if (!(r.width > 0) || !(r.height > 0)) { return; }
 				libboxLayout.w = Math.round(r.width);
@@ -51176,7 +51686,10 @@ var EngCalcs = EngCalcs || {};
 				if (res && res !== 'none' &&
 					e.clientX > r.right - LPN_RESIZE_CORNER && e.clientY > r.bottom - LPN_RESIZE_CORNER) { return; }
 			}
-			drag = { dx: e.clientX - r.left, dy: e.clientY - r.top, w: r.width, h: r.height };
+			// A DOCKED box floats only once the press has really moved (Task 441), so a click on its
+			// title band leaves it docked.
+			drag = boxIsDocked(popup) ? { docked: true, x: e.clientX, y: e.clientY } :
+				{ dx: e.clientX - r.left, dy: e.clientY - r.top, w: r.width, h: r.height };
 			// **GUARDED, FOR THE REASON THE CANVAS PRESS IS** (Task 660). setPointerCapture() throws
 			// NotFoundError when the browser no longer treats the pointer as active, and Chromium's
 			// Wayland backend under WSLg is a place that happens. Unguarded, the throw skipped
@@ -51188,7 +51701,14 @@ var EngCalcs = EngCalcs || {};
 			e.preventDefault();
 		});
 		popup.addEventListener('pointermove', function (e) {
+			var dr;
 			if (!drag) { return; }
+			if (drag.docked) {
+				if (Math.abs(e.clientX - drag.x) + Math.abs(e.clientY - drag.y) < LPN_UNDOCK_SLOP) { return; }
+				if (!dockUndockForDrag(popup, e)) { drag = null; return; }
+				dr = popup.getBoundingClientRect();
+				drag = { dx: e.clientX - dr.left, dy: e.clientY - dr.top, w: dr.width, h: dr.height };
+			}
 			// **dragBounds, NOT the opening clamp: once the box is open, where it goes is the user's
 			// business** (Tom, 2026-09-01). The opening clamp still keeps every box fully on screen
 			// and below the chrome; a drag is allowed to park it over the page's own header, or to
@@ -51291,7 +51811,7 @@ var EngCalcs = EngCalcs || {};
 		if (window.ResizeObserver) {
 			new window.ResizeObserver(function () {
 				var r;
-				if (popup.style.display === 'none' || smallScreen()) { return; }
+				if (popup.style.display === 'none' || smallScreen() || boxIsDocked(popup)) { return; }
 				r = popup.getBoundingClientRect();
 				if (!(r.width > 0) || !(r.height > 0)) { return; }
 				popupUserSize = { w: Math.round(r.width), h: Math.round(r.height) };
@@ -52374,6 +52894,8 @@ var EngCalcs = EngCalcs || {};
 		if (smallScreen()) { return fillPanelToScreen(box); }
 		resetPanelFill(box);
 		place();
+		// A docked box keeps its floating place underneath and is laid into its column (Task 441).
+		if (box && box.__lpnDock) { dockPlaced(box); }
 		return null;
 	}
 	// WHERE THE PROPERTY POPUP OPENS once the user has moved it: exactly where they left it, as
@@ -52473,6 +52995,7 @@ var EngCalcs = EngCalcs || {};
 		r = popup.getBoundingClientRect();
 		at = clampPanel(sx, sy, r.width, h, window.innerWidth, window.innerHeight, chromeFloor());
 		popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
+		if (popup.__lpnDock) { dockPlaced(popup); }
 		ghostClickShield(popup);
 		initTipsIn(popup);
 	}
