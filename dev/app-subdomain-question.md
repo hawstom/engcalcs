@@ -94,7 +94,7 @@ redirect.
 - **AND THE TRAP CLAUDE.md WARNS ABOUT IS REAL AND WOULD BITE.** New domains on this account default
   to `ea-php56`. When librewaternet.org was created that took the whole suite down with
   `PHP Parse error: syntax error, unexpected '?'` on the null coalescing operator, on the same files
-  that parse fine on the other host. A new subdomain must be set to `ea-php83` (MultiPHP Manager, or
+  that parse fine on the other host. A new subdomain must be set to `ea-php85` (MultiPHP Manager, or
   `LangPHP::php_set_vhost_versions`) as part of creating it, not after somebody notices.
 - Related, measured on this account 2026-09-06 and worth knowing before automating any of it: several
   cPanel API calls report success while doing nothing (`Mime::add_redirect` ignores `type=temporary`,

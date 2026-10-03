@@ -64,11 +64,11 @@ lines rather than appending corrections.
 - **A usage limit kills every running agent at once**; only their commits survive. Brief agents to
   commit as they go, and relaunch with "read `git log master..HEAD` first".
 - **Preview ports live on jasmine since 2026-10-02**: `~/webdev/worktrees/_panel/ports.conf` lists
-  them, `sh ~/webdev/worktrees/_panel/generate.sh` makes any missing worktree and starts one
-  `php -S 127.0.0.1:PORT` per line (no Apache, no sudo; a crontab `@reboot` reruns it). They bind to
-  loopback; Tom reaches them through SSH forwarding, so his browser sees `localhost` (secure
+  them (pipe rows with what to test), `sh ~/webdev/worktrees/_panel/generate.sh` makes any missing
+  worktree, writes one Apache vhost per row and reloads Apache (passwordless via
+  `/etc/sudoers.d/previews`; a crontab `@reboot` reruns it). They bind to loopback; Tom reaches them through SSH forwarding, so his browser sees `localhost` (secure
   context, and a host the Mapbox token accepts). A new port needs a new `LocalForward` line on his
-  side. `php -S` ignores `.htaccess`, and jasmine has PHP 8.5, production 8.3.
+  side. Apache honours `.htaccess`; jasmine and production both run PHP 8.5 (2026-10-03).
 - **Ask which branch a host is on before explaining what Tom sees.** `dev.hawsedc.com` has sat on
   an old feature branch; `curl` gets a 401 there. Answer about the surface he named.
 

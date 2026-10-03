@@ -368,7 +368,7 @@ Full record: `dev/deploying.md`.
 - **`../sitemap.xml` is not tracked**; adding or removing a page owes a regenerate
   (`dev/scripts/generate_sitemap.php`) and a manual upload.
 - **`git pull` does not preserve mtimes**, which is why the service worker is generated per request.
-- **Every host serving the suite runs the same PHP version** (currently `ea-php83`); new cPanel
+- **Every host serving the suite runs the same PHP version** (currently `ea-php85`, every domain on the account since 2026-10-03); new cPanel
   domains default to `ea-php56` and 500 on every page.
 - Production SSH is blocked on port 22; origin is GitHub over `ssh.github.com:443`.
 
