@@ -140,14 +140,6 @@ AskUserQuestion; the classifier refuses an all-clear lifted from pasted text.
 - `feat/desktop` (756): his R-375/R-384 written in (logs kept, consent at install).
 - `feat/label-placer` (539/741): unchanged; round-5 rulings still his.
 
-### Found 2026-10-03, not yet a task
-
-- Task 680's keep is incomplete after EVICTION (more than four other tabs visited): returning to
-  Novato redrew 78 of 123 labels differently at the same view (Perry, on master's code). Valid
-  layout, not stale values. Logged as Task 758.
-- The uncached zoom pass gives two different answers at one scale on repeated runs (label-cache
-  builder); the cache hides it on revisits.
-
 ### Owed translation work
 
 Not run 2026-10-03 on purpose: most owed keys sit on the five branches above. Run one sprint after
