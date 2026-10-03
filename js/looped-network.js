@@ -43953,6 +43953,15 @@ var EngCalcs = EngCalcs || {};
 		});
 		return out;
 	}
+	/**
+	 * **WHAT A PLACER KEEPS OUTSIDE THE HOLDERS, IT REGISTERS HERE** -- the seam with the placement
+	 * rebuild (feat/label-placer). The shipped placer leaves every decision on the holders, which the
+	 * bank already copies; a contract placer that keeps its layout in a runtime of its own (its
+	 * `placed` map and the scale it was laid at) pushes one { capture, restore } pair, and a banked
+	 * bucket then carries and puts back that state too. capture() returns a copy; restore(copy) runs
+	 * before the position loops, so they redraw from it.
+	 */
+	var labelBankParts = [];
 	function grabBucketHolder(h) {
 		return { nudge: h.nudge ? { x: h.nudge.x, y: h.nudge.y } : null, nudgeManual: !!h.nudgeManual,
 			placedSide: h.placedSide, side: h.side, lines: h.lines ? h.lines.slice() : null,
@@ -43965,7 +43974,8 @@ var EngCalcs = EngCalcs || {};
 			segW: h.segW ? h.segW.slice() : null };
 	}
 	function captureLabelBucket(sc) {
-		var e = { scale: sc, nodes: {}, links: {}, texts: {}, custs: {}, chains: chainStationsNow() };
+		var e = { scale: sc, nodes: {}, links: {}, texts: {}, custs: {}, chains: chainStationsNow(),
+			parts: labelBankParts.map(function (p) { return p.capture(); }) };
 		Object.keys(nodeEls).forEach(function (id) { e.nodes[id] = grabBucketHolder(nodeEls[id]); });
 		Object.keys(linkEls).forEach(function (id) { e.links[id] = grabBucketHolder(linkEls[id]); });
 		Object.keys(labelEls).forEach(function (id) { e.texts[id] = grabBucketHolder(labelEls[id]); });
@@ -44041,6 +44051,7 @@ var EngCalcs = EngCalcs || {};
 			Object.keys(e.texts).forEach(function (id) {
 				var te = labelEls[id]; if (te) { restoreBucketHolder(te, e.texts[id]); }
 			});
+			labelBankParts.forEach(function (p, i) { p.restore(e.parts[i]); });
 			doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
 			doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
 			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
