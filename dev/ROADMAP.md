@@ -66,6 +66,14 @@ the block.
 
 ## 100 — Next.
 
+- 100|441| **Dock the non-modal boxes: dock, hide, autohide, at each box's corner.**
+  **PROMOTED TO 100 BY TOM, 2026-10-03** (*"I can see us headed toward task 441, docking of boxes.
+  Maybe we should promote it to 100, since this could be an embarrassment."*). Scope widened from
+  the Settings box to every non-modal box (Properties, Find, Settings, Energy, Compare, Report): the
+  conventional icon buttons at a box's upper right, beside its X (*"implementing the conventional
+  docking, hide, autohide, etc icon buttons at the upper right corner of non-hog (non-modal)
+  boxes right before (next to) the exit X"*). Docking left or right, and an AutoCAD-style
+  anchor-and-flyout with autohide (raised 2026-08-18). Positions are window furniture: localStorage.
 - 100|539| **Gang the neighbour labels so their leaders stop crossing.**
   **REBUILD FROM RULES, 2026-09-28:** rules reviewed (`dev/label-placement-rules.md`), bench and
   seam built, two clean-room placers done and both fail R-075; state in the handoff.
@@ -259,7 +267,7 @@ the block.
   it with the existing `gloss:` tag.
   **CONCEPT LAYER SHIPPED 2026-09-30** (`chore/term-concept`, `dev/term-concepts.md`): 131 glossary
   terms carry a coined `concept` id and a `definition`; a payload gives the definition as the source
-  and English as one rendering; `concept_check.php` blocks. Open: 67 definitions still empty, the four
+  and English as one rendering; `concept_check.php` blocks. All 131 definitions are filled (7d00bd86, 2026-10-02). Open: the four
   new terms (label-sym-sally, label-user-tessa, label-long-dora, hydraulic-head) untranslated.
   **RULED 2026-09-30: Head and HGL stay split.** And on the coined ids: *"we should say something like
   label-sym-sally, label-user-tessa, label-word-gus, and label-long-dora (assuming those are
@@ -277,6 +285,11 @@ the block.
   Tom, 2026-09-30, on WaterGEMS's Criticality tool: *"This sounds like a fun report to build. Break
   each asset and report."* Fire flow's sibling: scope All/Selected, each pipe out of the network on
   a copy, report cut-off junctions, low pressures and demand not served. Building on `feat/criticality`.
+- 100|759| **One word for the map selection, another for a menu choice; tips that earn their place.**
+  Tom, 2026-10-03: a "studied, considered, carefully adopted, and audited" strategy to tell the map
+  selection set from menu choices (his leading candidate: Highlighted / Chosen), and an audit of tip
+  pollution in lpn (status strip, click-to-open, delays in master styles, tips that talk down).
+  Ida's audit: `dev/tip-and-selection-audit.md` (branch `chore/ida-tip`); decisions go to him as an interview.
 - 75|757| **Filter the Tables pane to the selection.**
   Tom, 2026-10-03: *"it would be really nice if the tables could filter on the selection. I'm not
   sure how to work the UI unless it's part of the right-click menu."* Ask Ida and Declan where the
@@ -292,9 +305,6 @@ the block.
     gone from hypothetical to the common case. The registration half is the valuable half: an
     `[BACKDROP] DIMENSIONS` record places the image in the model's own coordinates exactly, which
     is strictly better than the two-point scale gesture a human would otherwise perform by eye.
-- 75|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
-  autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
-  against it — one element, one placement function.
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
   kept here so they are not lost in a closed block.
