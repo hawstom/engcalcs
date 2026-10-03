@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**105 open tasks.** Next (100): 11 · Soon (75): 16 · Someday (50): 44 · Maybe (25): 15 · Parked (5): 19
+**104 open tasks.** Next (100): 11 · Soon (75): 15 · Someday (50): 44 · Maybe (25): 15 · Parked (5): 19
 
 ## 100 — Next (11)
 
@@ -23,7 +23,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 751 — Criticality analysis: break each asset in turn and report.
 - Task 754 — On-the-fly demand adjustment: an analysis that scales demands on a copy.
 
-## 75 — Soon (16)
+## 75 — Soon (15)
 
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
@@ -40,7 +40,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 755 — Per-scenario calculation options: run type and duration first.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 757 — Filter the Tables pane to the selection.
-- Task 758 — A project switched back to after eviction redraws its labels differently.
 
 ## 50 — Someday (44)
 
@@ -133,5 +132,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-98 of 105 titles are within 4–12 words. `!` marks the rest;
+97 of 104 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
