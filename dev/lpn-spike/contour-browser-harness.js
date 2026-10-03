@@ -54,9 +54,10 @@ async function openNet3(Session, browser, viewport) {
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	await a.goto('Looped-Network.php');
 	await a.answerTrainingPanel().catch(() => {});
+	// The consent banner covers the bottom of a phone screen, cards included.
+	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 	await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
 	await a.settle(1500);
-	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 	return a;
 }
 // Water > Graphs > Contour, by the rows' own words.
@@ -93,6 +94,7 @@ function layerFacts(page) {
 			lines: Array.from(g.querySelectorAll('path.lpn-contour-line')).map((p) => +p.getAttribute('data-level')),
 			breaks: g.querySelectorAll('path.lpn-contour-break').length,
 			labels: labels.map((t) => +t.getAttribute('data-level')),
+			fontSize: labels.length ? +labels[0].getAttribute('font-size') : 0,
 			labelH: lb.length ? lb.reduce((s, b) => s + Math.min(b.width, b.height), 0) / lb.length : 0
 		};
 	});
@@ -140,12 +142,13 @@ async function sectionDesk(Session, browser) {
 
 		console.log('\n--- 3. a zoom keeps the labels\' size ---');
 		const before = await layerFacts(a.page);
-		const c = await a.page.evaluate(() => { const r = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
+		// Over the map, clear of the box (which opens in the middle).
+		const c = await a.page.evaluate(() => { const r = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: r.x + r.width * 0.25, y: r.y + r.height * 0.75 }; });
 		await a.page.mouse.move(c.x, c.y);
 		for (let i = 0; i < 4; i++) { await a.page.mouse.wheel(0, -240); await a.page.waitForTimeout(60); }
 		await a.settle(700);
 		const after = await layerFacts(a.page);
-		ok('zoomed in, labels are re-placed', after.labels.length > 0, before.labels.length + ' -> ' + after.labels.length);
+		ok('zoomed in, labels are re-placed', after.labels.length > 0 && after.fontSize < before.fontSize * 0.7, before.labels.length + ' -> ' + after.labels.length + ', font-size ' + before.fontSize + ' -> ' + after.fontSize + ' drawing units');
 		ok('...at the same size on screen', before.labelH > 0 && Math.abs(after.labelH - before.labelH) / before.labelH < 0.25,
 			before.labelH.toFixed(1) + ' px -> ' + after.labelH.toFixed(1) + ' px');
 		await shot(a.page, 'contour-desk-zoomed');
