@@ -37281,6 +37281,9 @@ var EngCalcs = EngCalcs || {};
 			// suite navbar's picker sets it. No `dir`: an RTL name would re-align an LTR row.
 			if (r.lang) { b.lang = r.lang; }
 			b.disabled = !!r.disabled;
+			// A row whose action ends in a drag or a click on the map has no keyboard meaning. It stays
+			// visible, and arrow navigation steps over it (menuRowsOf).
+			if (r.pointerOnly) { b.setAttribute('data-pointer-only', ''); }
 			if (r.submenu) {
 				// The universal marker for "there is more this way". Directional, so it wants a
 				// mirrored glyph in the five RTL languages -- the same outstanding caveat the
@@ -37359,7 +37362,7 @@ var EngCalcs = EngCalcs || {};
 	var subOpener = null;
 	var menuKbIntent = false;
 	function menuRowsOf(list) {
-		return Array.prototype.slice.call(list.querySelectorAll('button.lpn-menu-row:not(:disabled)'));
+		return Array.prototype.slice.call(list.querySelectorAll('button.lpn-menu-row:not(:disabled):not([data-pointer-only])'));
 	}
 	function menuBarItems() {
 		var bar = document.getElementById('lpn_menubar');
@@ -37471,6 +37474,102 @@ var EngCalcs = EngCalcs || {};
 			else { menuBarMove(-1, anchor); }
 			return;
 		}
+	}, true);
+	// ---- MENU MNEMONICS AND KEYBOARD MODE (Task 748) ---------------------------------------------
+	// Alt+Shift+{letter} (Ctrl+Option on a Mac, the Google Docs convention) opens a top menu from
+	// anywhere, text fields included, and F10 goes to the menu bar. The letter is the PHYSICAL key
+	// (`e.code`), so it works on every keyboard layout, and the badge that shows it is a fixed Latin
+	// letter, never a translated string and never an underline: an underline fails in Arabic,
+	// Hebrew, Chinese, Hindi and Burmese. The six are File, Edit, Map, Water, Help, Language.
+	var LPN_MENU_CHORDS = {
+		KeyF: 'lpn_menu_file', KeyE: 'lpn_menu_edit', KeyM: 'lpn_menu_map',
+		KeyW: 'lpn_menu_project', KeyH: 'lpn_menu_help', KeyL: 'lpn_menu_lang'
+	};
+	var kbdModeReturn = null;
+	function isMacPlatform() {
+		var p = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+		return /mac|iphone|ipad/i.test(p);
+	}
+	function kbdModeOn() {
+		var bar = document.getElementById('lpn_menubar');
+		return !!bar && bar.classList.contains('lpn-kbdmode');
+	}
+	function inMenuChrome(el) {
+		return !!el && !!el.closest && !!el.closest('#lpn_menubar, #lpn_menu_popup, #lpn_menu_popup2');
+	}
+	function kbdModeEnter() {
+		var bar = document.getElementById('lpn_menubar');
+		if (!bar) { return; }
+		if (!kbdModeOn() && !inMenuChrome(document.activeElement)) { kbdModeReturn = document.activeElement; }
+		bar.classList.add('lpn-kbdmode');
+	}
+	function kbdModeExit(restoreFocus) {
+		var bar = document.getElementById('lpn_menubar');
+		if (bar) { bar.classList.remove('lpn-kbdmode'); }
+		var back = kbdModeReturn;
+		kbdModeReturn = null;
+		if (!restoreFocus) { return; }
+		if (back && back !== document.body && back.isConnected && back.focus) { back.focus(); return; }
+		var cv = document.getElementById('lpn_canvas');
+		if (cv && cv.focus) {
+			if (!cv.hasAttribute('tabindex')) { cv.setAttribute('tabindex', '-1'); }
+			cv.focus({ preventScroll: true });
+		} else if (document.activeElement && document.activeElement.blur) { document.activeElement.blur(); }
+	}
+	window.addEventListener('keydown', function (e) {
+		if (e.defaultPrevented) { return; }
+		var mac = isMacPlatform(), id = LPN_MENU_CHORDS[e.code];
+		var chord = mac ? (e.ctrlKey && e.altKey && !e.shiftKey && !e.metaKey)
+			: (e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey);
+		if (id && chord) {
+			var btn = document.getElementById(id);
+			if (!btn || btn.getClientRects().length === 0) { return; }
+			e.preventDefault(); e.stopPropagation();
+			closeViewPopovers();
+			kbdModeEnter();
+			var pop = document.getElementById('lpn_menu_popup');
+			if (openMenuAnchor === btn && pop && pop.style.display === 'block') {
+				var rows = menuRowsOf(document.getElementById('lpn_menu_list'));
+				if (document.getElementById('lpn_menu_popup2') && document.getElementById('lpn_menu_popup2').style.display === 'block') { closeSubMenu(); }
+				menuFocus(rows[0] || btn);
+			} else {
+				menuKbOpen(btn);
+				if (!(pop && pop.style.display === 'block')) { btn.focus(); }
+			}
+			return;
+		}
+		if (e.key === 'F10' && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
+			e.preventDefault(); e.stopPropagation();
+			if (kbdModeOn() && inMenuChrome(document.activeElement)) {
+				closeMenu(); kbdModeExit(true); return;
+			}
+			var items = menuBarItems();
+			if (!items.length) { return; }
+			kbdModeEnter();
+			closeMenu();
+			items[0].focus();
+			return;
+		}
+		// Escape out of the bar (no menu open, focus on a bar button) leaves keyboard mode and gives
+		// focus back to where it was. Escape inside an open menu is the navigation handler's.
+		if (e.key === 'Escape' && kbdModeOn()) {
+			var ae = document.activeElement, pp = document.getElementById('lpn_menu_popup');
+			if (pp && pp.style.display === 'block') { return; }
+			if (ae && ae.classList && ae.classList.contains('lpn-menubar-item')) {
+				e.preventDefault(); e.stopPropagation();
+				kbdModeExit(true);
+			}
+		}
+	}, true);
+	// Any pointer press ends keyboard mode, and so does focus moving off the menus (Tab, or a command
+	// that opened a box) -- the badges are a hint for a person who is not using the mouse.
+	document.addEventListener('pointerdown', function () { if (kbdModeOn()) { kbdModeExit(false); } }, true);
+	document.addEventListener('focusin', function (e) {
+		if (kbdModeOn() && !inMenuChrome(e.target)) { kbdModeExit(false); }
+	}, true);
+	document.addEventListener('click', function (e) {
+		var t = e.target;
+		if (kbdModeOn() && t && t.closest && t.closest('#lpn_menu_popup .lpn-menu-row:not([aria-haspopup]), #lpn_menu_popup2 .lpn-menu-row')) { kbdModeExit(false); }
 	}, true);
 	// The classic fly-out grace period. Travelling from the parent row to its fly-out is a DIAGONAL
 	// move across the rows below, so dismissing on the first row entered makes the submenu
@@ -38586,7 +38685,7 @@ var EngCalcs = EngCalcs || {};
 			// this page does not have on a phone, which is where the gesture it replaces failed.
 			// It TOGGLES, like the Delete tool row above: the way out of a mode has to be the same
 			// control that got you into it, or the mode is a trap on a screen with no keyboard.
-			{ icon: 'vertices', label: pc.lpn_tool_vertices || 'Vertices', fn: function () {
+			{ icon: 'vertices', pointerOnly: true, label: pc.lpn_tool_vertices || 'Vertices', fn: function () {
 				setMode(mode === 'vertices' ? 'select' : 'vertices');
 			} },
 			// **THE THREE SHAPES GET THREE ROWS, WHERE THE TOOLBAR GETS ONE SLOT** (Task 266), and
@@ -38594,11 +38693,11 @@ var EngCalcs = EngCalcs || {};
 			// scarce, so it cycles; the menu is where a thing is FOUND, so it lists. It also gives
 			// the small-screen breakpoint a door, where the whole toolbar is hidden -- the same
 			// reason Select itself has a row above.
-			{ icon: 'select-window', label: pc.lpn_tool_area_window || 'Select a window',
+			{ icon: 'select-window', pointerOnly: true, label: pc.lpn_tool_area_window || 'Select a window',
 				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('window'); } },
-			{ icon: 'select-lasso', label: pc.lpn_tool_area_lasso || 'Select a lasso',
+			{ icon: 'select-lasso', pointerOnly: true, label: pc.lpn_tool_area_lasso || 'Select a lasso',
 				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('lasso'); } },
-			{ icon: 'select-polygon', label: pc.lpn_tool_area_polygon || 'Select a polygon',
+			{ icon: 'select-polygon', pointerOnly: true, label: pc.lpn_tool_area_polygon || 'Select a polygon',
 				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('polygon'); } },
 			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', tip: pc.lpn_tool_undo_tip, fn: undo },
 			// Find sits with Undo and Delete because it acts on the ELEMENTS, which is what this
@@ -38686,18 +38785,18 @@ var EngCalcs = EngCalcs || {};
 			// of the two doors: a reader who opens the menu rather than hovering the strip was told
 			// nothing at all, about any of the eight tools. No new key, and the digit still comes
 			// from LPN_TOOL_KEYS rather than from a translator.
-			{ icon: 'junction', label: pc.lpn_tool_add_junction || 'Junction', tip: toolTipWithKey('add-junction', pc.lpn_tool_add_junction_tip), fn: function () { setMode('add-junction'); } },
-			{ icon: 'reservoir', label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir', pc.lpn_tool_add_reservoir_tip), fn: function () { setMode('add-reservoir'); } },
-			{ icon: 'tank', label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank', pc.lpn_tool_add_tank_tip), fn: function () { setMode('add-tank'); } },
-			{ icon: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', tip: toolTipWithKey('add-pipe', pc.lpn_tool_add_pipe_tip), fn: function () { setMode('add-pipe'); } },
-			{ icon: 'pump', label: pc.lpn_tool_add_pump || 'Pump', tip: toolTipWithKey('add-pump', pc.lpn_tool_add_pump_tip), fn: function () { setMode('add-pump'); } },
-			{ icon: 'valve', label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve', pc.lpn_tool_add_valve_tip), fn: function () { setMode('add-valve'); } },
+			{ icon: 'junction', pointerOnly: true, label: pc.lpn_tool_add_junction || 'Junction', tip: toolTipWithKey('add-junction', pc.lpn_tool_add_junction_tip), fn: function () { setMode('add-junction'); } },
+			{ icon: 'reservoir', pointerOnly: true, label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir', pc.lpn_tool_add_reservoir_tip), fn: function () { setMode('add-reservoir'); } },
+			{ icon: 'tank', pointerOnly: true, label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank', pc.lpn_tool_add_tank_tip), fn: function () { setMode('add-tank'); } },
+			{ icon: 'pipe', pointerOnly: true, label: pc.lpn_tool_add_pipe || 'Pipe', tip: toolTipWithKey('add-pipe', pc.lpn_tool_add_pipe_tip), fn: function () { setMode('add-pipe'); } },
+			{ icon: 'pump', pointerOnly: true, label: pc.lpn_tool_add_pump || 'Pump', tip: toolTipWithKey('add-pump', pc.lpn_tool_add_pump_tip), fn: function () { setMode('add-pump'); } },
+			{ icon: 'valve', pointerOnly: true, label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve', pc.lpn_tool_add_valve_tip), fn: function () { setMode('add-valve'); } },
 			// **AFTER THE VALVE AND BEFORE THE TEXT** (Task 247). The order is the sentence a
 			// person draws in -- junctions, the sources that feed them, the pipe that joins them,
 			// the two things you put ON a pipe -- and a meter is the third thing you put on a pipe.
 			// Text stays last, being the only tool that adds nothing hydraulic.
-			{ icon: 'customer', label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), fn: function () { setMode('add-meter'); } },
-			{ icon: 'text', label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text', pc.lpn_tool_add_text_tip), fn: function () { setMode('add-text'); } },
+			{ icon: 'customer', pointerOnly: true, label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), fn: function () { setMode('add-meter'); } },
+			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text', pc.lpn_tool_add_text_tip), fn: function () { setMode('add-text'); } },
 			{ separator: true },
 			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
 			// Deliberately NOT translated: scaffolding for measuring how ~100 links performs, and it
@@ -39390,6 +39489,17 @@ var EngCalcs = EngCalcs || {};
 				e.stopPropagation();
 				m.open(e.currentTarget);
 			});
+			// The letter of this menu's Alt+Shift chord, shown only in keyboard mode (.lpn-kbdmode).
+			// Latin and fixed on purpose; aria-hidden because the name already says it all.
+			for (var code in LPN_MENU_CHORDS) {
+				if (LPN_MENU_CHORDS[code] === m.id) {
+					var badge = document.createElement('span');
+					badge.className = 'lpn-kbdbadge';
+					badge.setAttribute('aria-hidden', 'true');
+					badge.textContent = code.slice(3);
+					b.appendChild(badge);
+				}
+			}
 			bar.appendChild(b);
 		});
 		// The bar is built after page load, so its tips are new DOM and need arming for touch --

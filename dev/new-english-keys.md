@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 22 untranslated keys, of 2175 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**7 still to read on master**, of 25 untranslated keys, of 2178 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (22, 4 to read @@ NEEDS RULING)
+## lpn_  (25, 7 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -87,6 +87,15 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_graphs_menu_tip`**
   > Graphs: Profile, Time Series, and Frequency distribution
   @@ NEEDS RULING
+- **`lpn_hotkeys_menu_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+F, E, M, W, H or L</td><td>Open File, Edit, Map, Water, Help or Language (Ctrl+Option on a Mac).</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_hotkeys_menu_heading`**
+  > Menus
+  @@ NEEDS RULING
+- **`lpn_hotkeys_menu_term`**
+  > Menu keyboard shortcuts
+  @@ NEEDS RULING
 - **`lpn_scenario_basic`**
   > Basic mode
   _Ruled OK 2026-10-01._
@@ -98,7 +107,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**62 still to read**, of 113 new keys across 9 unmerged branch(es).
+**62 still to read**, of 113 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -108,6 +117,8 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/roadmap-1003 (`961684fd`) — adds no English strings
 
 ### feat/criticality (`84ea5311`) — 31 new, 8 to read @@ NEEDS RULING
 
@@ -205,7 +216,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selected
   @@ NEEDS RULING
 
-### feat/demand-scaling (`efc0efe8`) — 74 new, 51 to read @@ NEEDS RULING
+### feat/demand-scaling (`ec0470c1`) — 74 new, 51 to read @@ NEEDS RULING
 
 - **`lpn_analyze_menu`**
   > Analyze
@@ -385,7 +396,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > ✓ At a demand scale of {m}, every junction keeps {pressure}.
   @@ NEEDS RULING
 - **`lpn_ds_scaled_selected`**
-  > Only the selected junctions were scaled. Junctions scaled: {n}.
+  > Only the selected junctions were scaled and checked. Junctions scaled: {n}.
   @@ NEEDS RULING
 - **`lpn_ds_scope`**
   > Demands to scale
@@ -397,7 +408,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selected junctions
   @@ NEEDS RULING
 - **`lpn_ds_scope_tip`**
-  > Scale the demand of every junction, or only of the junctions selected on the map. Pressures are checked at every junction either way.
+  > Scale the demand of every junction, or only of the junctions selected on the map. Pressures are checked at the junctions scaled.
   @@ NEEDS RULING
 - **`lpn_ds_search_note`**
   > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which every junction keeps the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.
@@ -430,7 +441,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Links not shown: {n}.
   @@ NEEDS RULING
 
-### feat/keyboard-menu (`5d65b8f2`) — adds no English strings
+### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/keyboard-menu (`a277629f`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -452,7 +465,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/property-graph (`8e26cf83`) — 5 new, 3 to read @@ NEEDS RULING
+### feat/property-graph (`b39a0289`) — 5 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.

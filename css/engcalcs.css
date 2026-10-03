@@ -4839,3 +4839,16 @@ tr.lpn-ff-error { background: #f2f2f2; }
 	}
 }
 .lpn-menu-row:focus-visible:enabled { background: #def; }
+/* KEYBOARD MODE (Task 748): a small boxed Latin letter at the corner of each menu-bar item, the
+   key after Alt+Shift (Ctrl+Option on a Mac). Absolutely placed on the inline-end corner, so showing
+   it reflows nothing and mirrors in right-to-left pages; never an underline, which fails in the
+   scripts that have no underlinable letters. */
+.lpn-menubar-item { position: relative; }
+.lpn-kbdbadge { display: none; }
+.lpn-kbdmode .lpn-kbdbadge {
+	display: block; position: absolute; inset-inline-end: 0; inset-block-end: -7px; z-index: 2;
+	min-width: 12px; padding: 0 2px; box-sizing: border-box; text-align: center;
+	font: bold 10px/12px monospace; color: #fff; background: #05378a;
+	border: 1px solid #fff; border-radius: 3px; pointer-events: none;
+}
+.lpn-menu-row[data-pointer-only] { cursor: default; }
