@@ -62,18 +62,13 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	// here, DERIVED from the suite's exact definitions (CLAUDE.md: ft = 0.3048 m,
 	// gal = 3.785411784 L, lbf = 4.4482216152605 N) rather than retyped as decimals.
 	var M_PER_FT = 0.3048,
-		M_PER_IN = M_PER_FT / 12,
-		M3_PER_GAL = 3.785411784e-3,
-		// 1 psi = 1 lbf / in^2, in pascals.
-		PA_PER_PSI = 4.4482216152605 / (M_PER_IN * M_PER_IN),
-		// Water at ordinary distribution temperatures. 1000 kg/m3 is the density every
-		// pressure-to-head conversion in this suite assumes; g is the suite's one gravity.
-		RHO = 1000;
+		M3_PER_GAL = 3.785411784e-3;
 
 	// Pressure in psi -> head in metres of water. Exported because a caller that wants to offer
 	// "20 psi" in an interface must convert with THIS function, not its own.
 	function psiToHead(psi) {
-		return psi * PA_PER_PSI / (RHO * EngCalcs.G);
+		// On EPANET's psi per foot, the one this page's pressures are shown in (PipeHydraulics.lib.js).
+		return psi * M_PER_FT / EngCalcs.EPANET_PSI_PER_FT;
 	}
 	function gpmToSI(gpm) {
 		return gpm * M3_PER_GAL / 60;
