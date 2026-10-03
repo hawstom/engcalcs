@@ -25,6 +25,78 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
+## Synonym entries to approve  (8, 8 to read @@ NEEDS RULING)
+
+**These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
+English string that has since changed, or against a key that no longer exists. Say which: keep it
+as is, change it (a proposal may follow), or remove it. **Your answer on the flag line is the
+written permission** the rule requires; CC then applies it by hand and re-records it. A script
+never edits a synonym.
+
+- **`lpn_help_icons`**
+  > Toolbar
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Toolbar key
+  *Current synonym:* Toolbar legend, Key to the toolbar icons, What each toolbar icon means, Toolbar help, Toolbar | avoid: a keyboard key or shortcut
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_labels_col_after`**
+  > Aft.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* After
+  *Current synonym:* After, Suffix, Trailing text, Postfix | avoid: after in the sense of later in time
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_labels_col_before`**
+  > Bef.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Before
+  *Current synonym:* Before, In front, In front of the value, Prefix, Leading text | avoid: before in the sense of earlier in time
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_lock_break`**
+  > Break lock
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Break their lock
+  *Current synonym:* Break their lock, unlock the file, take over the file, release their hold on it, claim the file, override their claim | layout: button
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_settings_map_display`**
+  > Appearance
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Map appearance
+  *Current synonym:* How the map looks (appearance, style, the way it is drawn) — sizes, opacity, position.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_units_group_inputs`**
+  > (this key no longer exists in lib/lang.ec.en.php)
+  *Why stale:* the key no longer exists, so this entry describes nothing
+  *Written against:* Input units
+  *Current synonym:* Units of inputs, or Units of what you enter
+  **What this asks for:** WRITTEN PERMISSION to remove this `$ec_lang_syn` entry.
+  @@ NEEDS RULING
+
+- **`lpn_units_group_results`**
+  > (this key no longer exists in lib/lang.ec.en.php)
+  *Why stale:* the key no longer exists, so this entry describes nothing
+  *Written against:* Results units
+  *Current synonym:* Units of results, or Units of the answers
+  **What this asks for:** WRITTEN PERMISSION to remove this `$ec_lang_syn` entry.
+  @@ NEEDS RULING
+
+- **`mtc_note_1`**
+  > <dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.</dd><dt>Basic calculator (no iteration)</dt><dd>Enter your desired roughness value. Ignore the design rock size input area.</dd></dl>
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* <dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The r...
+  *Current synonym:* | avoid: compressing "Blodgett–Bathurst" to an initialism like "BB" — recurred independently across 8+ languages (it/ru/bg/es/uk/sr/hr/cs/tr/ps/my, corrected 2026-07-08) since nothing else in this string defines what the initials stand for; spell the full name out in every language, matching mtc_blodgett_v_bathurst
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
 ## lpn_  (176, 4 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
@@ -560,7 +632,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**0 still to read**, of 12 new keys across 10 unmerged branch(es).
+**0 still to read**, of 12 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -571,7 +643,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/selection-word (`16dce45b`) — adds no English strings
+### chore/policy-1003 (`68847d13`) — adds no English strings
+
+### chore/selection-word (`5638e7a0`) — adds no English strings
+
+### chore/theme-inline (`e6057e23`) — adds no English strings
 
 ### feat/criticality (`84ea5311`) — adds no English strings
 
@@ -629,3 +705,7 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_result_pump_head_tip`**
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   _Ruled OK 2026-10-03._
+
+### fix/ds-wording (`a824c9c6`) — adds no English strings
+
+### fix/ruling-1003 (`b85600c0`) — adds no English strings

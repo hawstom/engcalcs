@@ -1,0 +1,713 @@
+{
+    "_note": "The English and synonym text each $ec_lang_syn entry was last written against. See dev/scripts/syn_staleness.inc.php.",
+    "syn": {
+        "bpn_elev_down": {
+            "english": "DS elev.",
+            "syn": "Downstream (DS) elevation — the ground/invert elevation at this pipe line’s downstream end | layout: column heading"
+        },
+        "bpn_p_down": {
+            "english": "DS press.",
+            "syn": "Downstream (DS) pressure — the gauge pressure head at this pipe line’s downstream node | layout: column heading"
+        },
+        "calc_defaults": {
+            "english": "Restore defaults",
+            "syn": "Restore (revert, return) to the original (initial, as-shipped, factory) values (state)."
+        },
+        "calc_set_units_tip": {
+            "english": "Sets the unit of every field at once. Non-destructive: the numbers you typed stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.",
+            "syn": "Changes the unit shown on every field at once (switches the whole page to that unit system). Does not change the input data."
+        },
+        "consent_accept": {
+            "english": "Allow this",
+            "syn": "Allow (permit, accept) this ask (this request, this question)"
+        },
+        "consent_accept_all": {
+            "english": "Allow all",
+            "syn": "Allow (permit, accept) this and any later ask; do not ask (question) me again"
+        },
+        "consent_body": {
+            "english": "May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.",
+            "syn": "May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first."
+        },
+        "consent_current_denied": {
+            "english": "You refused this. We store nothing to limit logging for this browser profile.",
+            "syn": "You refused (declined or denied) this. We store (keep or save) nothing to limit logging (recording) for this browser profile."
+        },
+        "consent_current_granted": {
+            "english": "You allowed this. We limit logging for this browser profile.",
+            "syn": "You allowed this. We limit logging (recording) for this browser profile."
+        },
+        "consent_decline": {
+            "english": "Refuse all",
+            "syn": "Refuse (decline, deny) this and any later ask; do not ask (question) me again"
+        },
+        "consent_region_label": {
+            "english": "Your choice about limiting logging.",
+            "syn": "Your choice about limiting logging (recording)."
+        },
+        "cs_Ec": {
+            "english": "Conveyance efficiency, E<sub>c</sub>",
+            "syn": "| gloss: conveyance efficiency"
+        },
+        "cs_Q_loss": {
+            "english": "Seepage loss rate, Q<sub>loss</sub>",
+            "syn": "| gloss: seepage"
+        },
+        "cs_lining_cost": {
+            "english": "Lining cost",
+            "syn": "Cost (price) of canal lining per unit area. | Currency is deliberately unspecified: any local currency works if used consistently with water value."
+        },
+        "cs_main_desc": {
+            "english": "Canal Seepage Loss & Conveyance Efficiency — Inflow-Outflow Method",
+            "syn": "| gloss: seepage; gloss: conveyance efficiency"
+        },
+        "cs_main_menu": {
+            "english": "Canal Seepage",
+            "syn": "| gloss: seepage"
+        },
+        "cs_water_value": {
+            "english": "Water value",
+            "syn": "Monetary value (price, worth) of water per unit volume. | Currency is deliberately unspecified: any local currency works if used consistently with lining cost."
+        },
+        "dw_friction_factor_method": {
+            "english": "Friction factor method",
+            "syn": "Method used to compute friction factor from roughness"
+        },
+        "dw_main_desc": {
+            "english": "Darcy-Weisbach Pipe Head Loss at Given Diameter, Roughness, and Flow",
+            "syn": "| gloss: head loss"
+        },
+        "dw_main_menu": {
+            "english": "Darcy-Weisbach Pipe Head Loss",
+            "syn": "| gloss: head loss"
+        },
+        "dw_main_title": {
+            "english": "Free Online Darcy-Weisbach Pipe Head Loss Calculator",
+            "syn": "| gloss: head loss"
+        },
+        "ec_name_label": {
+            "english": "Save this calculation:",
+            "syn": "Save these inputs or values"
+        },
+        "hw_main_desc": {
+            "english": "Hazen-Williams Pipe Head Loss at Given Diameter, Roughness, and Flow",
+            "syn": "| gloss: head loss"
+        },
+        "hw_main_menu": {
+            "english": "Hazen-Williams Pipe Head Loss",
+            "syn": "| gloss: head loss"
+        },
+        "hw_main_title": {
+            "english": "Free Online Hazen-Williams Pipe Head Loss Calculator",
+            "syn": "| gloss: head loss"
+        },
+        "ip_count": {
+            "english": "<span class=\"ec-help\" title=\"Lateral rows: emitters in this reach only. Main rows: total emitters on laterals OTHER than this one that branch from this reach. For the reach of the main line that ends at the test lateral line, this also includes any laterals beyond that point along the main, or sharing the same junction (e.g. an opposite-side lateral) — their flow branches from this same reach too.\">Emitters <span class=\"ec-tip\">?</span></span>",
+            "syn": "| gloss: lateral, mainline, reach; avoid: \"branch\" as bough or office branch"
+        },
+        "ip_du_estimate": {
+            "english": "<span class=\"ec-help\" title=\"Last emitter’s computed flow divided by the estimated field-average emitter flow — this is an approximation of the standard low-quarter Distribution Uniformity (low-group average ÷ population mean); this is from a small modeled sample and a user-estimated correction instead of a full-field statistical sample. Values at or above 1 are possible and valid: they only mean the last emitter’s pressure is at or above the estimated field average, so some other emitter is the point of lowest pressure. This could be because the last emitter is on low ground or because the Δpressure estimate is too small.\">Uniformity check, q<sub>last</sub>/q<sub>avg,field</sub> <span class=\"ec-tip\">?</span></span>",
+            "syn": "| gloss: low-quarter distribution uniformity; symbol"
+        },
+        "ip_elev_ds": {
+            "english": "<span class=\"ec-help\" title=\"Downstream-end elevation of this reach. Optional on interior rows (defaults to flat / same as the node above if left blank). Required on the last row: that value is the last emitter’s elevation, which directly sets the required supply pressure.\">DS Elev. <span class=\"ec-tip\">?</span></span>",
+            "syn": "DS abbreviates downstream. Choose an abbreviation that is unambiguously downstream and cannot be confused with upstream."
+        },
+        "ip_elev_supply": {
+            "english": "Supply elevation, z<sub>supply</sub>",
+            "syn": "| symbol"
+        },
+        "ip_group_downstream": {
+            "english": "Downstream",
+            "syn": "| gloss: downstream"
+        },
+        "ip_group_upstream": {
+            "english": "Upstream",
+            "syn": "| gloss: upstream"
+        },
+        "ip_hf": {
+            "english": "h<sub>f</sub>",
+            "syn": "Friction head loss. | symbol"
+        },
+        "ip_hl": {
+            "english": "<span class=\"ec-help\" title=\"Total reach loss, h_f + h_m\">h<sub>L</sub> <span class=\"ec-tip\">?</span></span>",
+            "syn": "Total reach head loss. | symbol"
+        },
+        "ip_hm": {
+            "english": "h<sub>m</sub>",
+            "syn": "Minor (local) head loss. | symbol"
+        },
+        "ip_is_lateral": {
+            "english": "<span class=\"ec-help\" title=\"Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.\">Lat. <span class=\"ec-tip\">?</span></span>",
+            "syn": "| gloss: lateral, mainline; avoid: \"test\" read as typical/sample"
+        },
+        "ip_main_desc": {
+            "english": "Test Branch Pressure and Estimated Uniformity",
+            "syn": "Pressure in a branch of study and estimate of distribution uniformity."
+        },
+        "ip_main_menu": {
+            "english": "Irrigation Pressure",
+            "syn": "Pressure in a pressurized irrigation system (drip or sprinkler pipe network)."
+        },
+        "ip_main_title": {
+            "english": "Free Online Irrigation Pressure & Distribution Uniformity Calculator",
+            "syn": "Pressure in a pressurized drip/sprinkler irrigation network. Uniformity means evenness of water application among emitters, an irrigation-engineering statistic."
+        },
+        "ip_max_head": {
+            "english": "Max. allow. pipe pressure",
+            "syn": "maximum allowable pipe pressure"
+        },
+        "ip_notes_1_def": {
+            "english": "Guesses the pressure at the last (most remote) emitter, then steps the Energy Grade Line back toward the supply, reach by reach, adding friction and minor losses along the way. Elevation and velocity head are subtracted at each node to report the actual pressure there. The guessed far-end pressure is adjusted (bisection) until the computed required supply pressure matches the entered supply pressure — the same closed-loop problem addressed by the pipe-flow solver on the Manning Pipe Flow calculator, extended to a branching network.",
+            "syn": "| gloss: reach, energy grade line, bisection; symbol"
+        },
+        "ip_notes_2_def": {
+            "english": "Each row is one reach along the single hydraulically worst path (the test path) from the supply to the last emitter. A Main reach only passes flow to laterals not on the test path, so its withdrawal is a simple multiplication (design flow × the reach’s total emitter count) — no local pressure sensitivity. The main is a shared trunk pipe, so the reach of the main line that ends at the test lateral line must include not just laterals between its own endpoints but also any laterals still further down the main beyond that point, or sharing the same junction (e.g. an opposite-side lateral) — their flow travels through that same reach before splitting off, whether or not they appear anywhere else in this table. A Lateral reach is a segment of the test lateral itself: emitter discharge is computed from the actual local pressure via q = k·H<sup>x</sup>, and friction loss is reduced by Christiansen’s F(n) factor to account for flow decreasing as each emitter in the reach withdraws water.",
+            "syn": "| gloss: reach, lateral, mainline; symbol"
+        },
+        "ip_notes_3_def": {
+            "english": "Models one fixed supply pressure (no pump curve), one test path only (not the full field), and a 2-parameter emitter curve (set the exponent near 0 to approximate a pressure-compensating emitter). Two different uniformity ratios are reported, deliberately kept separate: q<sub>last</sub>/q<sub>avg,field</sub> is an approximation of the standard low-quarter Distribution Uniformity (low-group average ÷ population mean); but this is from a small modeled sample and a user-estimated correction instead of the standard full-field statistical sample. Also, the test lateral is deliberately the presumed worst case, so its raw, uncorrected average would understate the true field average and make uniformity look better than it is; the Δpressure input exists specifically to counter that bias. Values for uniformity at or above 1 are still possible: they only mean that the last emitter’s pressure is at or above the estimated field average, so some other emitter is the point of lowest pressure. This could be because the last emitter is on low ground or because the Δpressure estimate is too small. q<sub>last</sub>/q<sub>design</sub> is a different, non-uniformity check against the manufacturer’s rated flow — useful for detecting an over- or under-pressured system overall, but it is a separate check to read alongside the uniformity number, since the design/rated flow is independent of the system’s actual mean operating pressure.",
+            "syn": "| gloss: low-quarter distribution uniformity, energy grade line; symbol"
+        },
+        "ip_pr": {
+            "english": "Application rate, PR",
+            "syn": "| gloss: application rate"
+        },
+        "ip_press": {
+            "english": "Press.",
+            "syn": "Pressure"
+        },
+        "ip_q_avg_field": {
+            "english": "<span class=\"ec-help\" title=\"q_avg_lateral re-evaluated at each lateral row’s pressure plus the entered pressure difference above — an attempt to correct for the test lateral being the presumed worst case, not a representative one. Feeds both the uniformity check and the application-design section below.\">Est. field-average emitter flow, q<sub>avg,field</sub> <span class=\"ec-tip\">?</span></span>",
+            "syn": "| symbol"
+        },
+        "ip_q_avg_lateral": {
+            "english": "Average emitter flow (test lateral), q<sub>avg</sub>",
+            "syn": "| symbol"
+        },
+        "ip_q_critical": {
+            "english": "Last emitter flow, q<sub>last</sub>",
+            "syn": "| symbol"
+        },
+        "ip_q_design": {
+            "english": "Emitter design flow, q<sub>design</sub>",
+            "syn": "Design flow is the manufacturer-rated emitter flow. | symbol"
+        },
+        "ip_q_supply": {
+            "english": "<span class=\"ec-help\" title=\"Flow entering the modeled test path only — for the whole zone/system, see Q_zone in Application Design below.\">Test path supply flow, Q<sub>supply</sub> <span class=\"ec-tip\">?</span></span>",
+            "syn": "| symbol"
+        },
+        "ip_t_run": {
+            "english": "Runtime (hours)",
+            "syn": "Time (or duration or length of time) of the run (or flow or operation) required for the zone to apply the target depth."
+        },
+        "ip_x": {
+            "english": "<span class=\"ec-help\" title=\"0.5 for standard non-compensating emitters; near 0 for pressure-compensating emitters\">Emitter discharge exponent, x <span class=\"ec-tip\">?</span></span>",
+            "syn": "Discharge exponent: the exponent x in q = k*H^x describing emitter hydraulic behavior. | avoid: electrical \"discharge\""
+        },
+        "lpn_backdrop_scale_entry": {
+            "english": "Scale by world file or by the size of one pixel on the map",
+            "syn": "World (Map Coordinates or Georeference) File for the image | gloss: world file"
+        },
+        "lpn_backdrop_scale_entry_bad": {
+            "english": "Type one number for the size of one pixel on the map, or paste all six lines of a world file.",
+            "syn": "World (Map Coordinates or Georeference) File for the image | gloss: world file"
+        },
+        "lpn_backdrop_scale_entry_prompt": {
+            "english": "Enter the size of one pixel on the map, or paste the complete contents of the world file for the image",
+            "syn": "World (Map Coordinates or Georeference) File for the image | gloss: world file; runtime: units appended"
+        },
+        "lpn_backdrop_wld_bad": {
+            "english": "This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.",
+            "syn": "World (Map Coordinates or Georeference) File for the image | gloss: world file"
+        },
+        "lpn_color_link_field": {
+            "english": "Color links by",
+            "syn": "Color links by, Color the links to show, Colors show these values, Link color shows, Value that color shows | avoid: a rendering that cannot be completed by the value of the dropdown that follows it"
+        },
+        "lpn_color_mode_pretty": {
+            "english": "Pretty (rounded)",
+            "syn": "Equal intervals rounded for a pretty legend or Pretty legend (rounded equal intervals)"
+        },
+        "lpn_ds_head_search_selected": {
+            "english": "What demand scale can these junctions handle?",
+            "syn": "What demand can the junctions you choose handle"
+        },
+        "lpn_ds_scope_tip": {
+            "english": "All junctions, or only those selected on the map. Pressures are checked at the scaled demand.",
+            "syn": "Scale the demand at the junctions that you choose. Pressures are checked at the scaled demand."
+        },
+        "lpn_ds_search_note_selected": {
+            "english": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.",
+            "syn": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the junctions that you choose keep the given lowest pressure allowed."
+        },
+        "lpn_examples_open": {
+            "english": "Open",
+            "syn": "Open, Open this example, Load, Load this example, Start with this one | layout: button; avoid: open as an adjective/state (something already open), not the imperative verb"
+        },
+        "lpn_ff_all": {
+            "english": "All junctions",
+            "syn": "All junctions | a pull-down option under Junctions to test; agrees with junctions, plural"
+        },
+        "lpn_ff_design_all": {
+            "english": "All",
+            "syn": "All other junctions and all pipes | a pull-down option under Design check (effect on system); agrees with pipes and junctions together, plural"
+        },
+        "lpn_ff_design_off": {
+            "english": "None",
+            "syn": "No design check | a pull-down option under Design check (effect on system); avoid: switched off, power off"
+        },
+        "lpn_ff_design_selected": {
+            "english": "Selected",
+            "syn": "The selected junctions and their pipes | a pull-down option under Design check (effect on system); agrees with pipes and junctions together, plural"
+        },
+        "lpn_ff_selected": {
+            "english": "Selected junctions",
+            "syn": "Selected junctions | a pull-down option under Junctions to test; agrees with junctions, plural"
+        },
+        "lpn_field_easting_abbr": {
+            "english": "E",
+            "syn": "Easting | abbreviation of Easting, as short as the language has a short form for; the full word where it has none."
+        },
+        "lpn_field_meter_count": {
+            "english": "Number of services",
+            "syn": "| Number or count of services at this customer point"
+        },
+        "lpn_field_northing_abbr": {
+            "english": "N",
+            "syn": "Northing | abbreviation of Northing, as short as the language has a short form for; the full word where it has none."
+        },
+        "lpn_field_tag": {
+            "english": "Tag",
+            "syn": "Tag, Custom property, User property, Custom label | EPANET’s own [TAGS] value: one unspaced token of the user’s own meaning, often a pressure zone or a work order."
+        },
+        "lpn_file_revert": {
+            "english": "Revert",
+            "syn": "Throw away (discard) my changes by reloading the saved version (undo all changes, go back to the saved file)."
+        },
+        "lpn_find_op_gt": {
+            "english": "above",
+            "syn": "greater than, more than, exceeding | avoid: spatially above, higher on the map"
+        },
+        "lpn_find_op_lt": {
+            "english": "below",
+            "syn": "less than | avoid: spatially below, lower on the map"
+        },
+        "lpn_fitting_entrance": {
+            "english": "Square entrance",
+            "syn": "Sharp-edged entrance, Sharp-angled entrance, Square-edged entrance | avoid: an entrance that is square in outline"
+        },
+        "lpn_geomap": {
+            "english": "georeferenced",
+            "syn": "coordinate system referenced to the world map"
+        },
+        "lpn_goto_on_map": {
+            "english": "Go to on map",
+            "syn": "Bring this into view on the map, Zoom to this on the map, Show this on the map"
+        },
+        "lpn_help_fix": {
+            "english": "Fix something",
+            "syn": "Fix something, Report a mistake, Tell us what is wrong, Send a correction, Suggest a fix | avoid: fix as fasten or attach; avoid: fix as prepare"
+        },
+        "lpn_help_icons": {
+            "english": "Toolbar key",
+            "syn": "Toolbar legend, Key to the toolbar icons, What each toolbar icon means, Toolbar help, Toolbar | avoid: a keyboard key or shortcut"
+        },
+        "lpn_help_walkthroughs": {
+            "english": "Walkthroughs",
+            "syn": "Walkthroughs, Guided tours, Step-by-step guides, Worked examples, or Tutorials"
+        },
+        "lpn_labels_col_after": {
+            "english": "After",
+            "syn": "After, Suffix, Trailing text, Postfix | avoid: after in the sense of later in time"
+        },
+        "lpn_labels_col_before": {
+            "english": "Before",
+            "syn": "Before, In front, In front of the value, Prefix, Leading text | avoid: before in the sense of earlier in time"
+        },
+        "lpn_labels_priority_node_tip": {
+            "english": "The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.",
+            "syn": "more like neighboring nodes = numerically closer to the neighbors' values | avoid: similar in kind"
+        },
+        "lpn_library_patterns": {
+            "english": "Patterns",
+            "syn": "Data series, Sequence, Time series, Progression, Schedule, Variation profile"
+        },
+        "lpn_lock_break": {
+            "english": "Break their lock",
+            "syn": "Break their lock, unlock the file, take over the file, release their hold on it, claim the file, override their claim | layout: button"
+        },
+        "lpn_menu_help": {
+            "english": "Help",
+            "syn": "Help, Guidance, Assistance, Support, or Information | layout: nav item"
+        },
+        "lpn_new_text": {
+            "english": "Text",
+            "syn": "Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words"
+        },
+        "lpn_profile_tip": {
+            "english": "Draw the ground and the hydraulic grade line along a path through the network.",
+            "syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network."
+        },
+        "lpn_profile_title": {
+            "english": "Profile along a path",
+            "syn": "Profile or cross section along a path, route, or way"
+        },
+        "lpn_reaction_limiting": {
+            "english": "Limiting concentration",
+            "syn": "Concentration ceiling, Saturation concentration, Maximum attainable concentration | avoid: an unrealized capability or potential"
+        },
+        "lpn_reaction_rough_corr": {
+            "english": "Roughness correlation",
+            "syn": "Wall reaction from roughness, Roughness-linked wall reaction | avoid: a statistical correlation"
+        },
+        "lpn_scenario_base": {
+            "english": "Base",
+            "syn": "Base case, Baseline, Canonical, Source, Root, Trunk | gloss: scenario; avoid: a chemical base; a foundation; a military base; a base amount"
+        },
+        "lpn_scenario_push_tip": {
+            "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.",
+            "syn": "labels here = the map labels (Settings, Symbology, Labels) | avoid: the captions of form fields"
+        },
+        "lpn_scenario_push_values": {
+            "english": "Values thrown away:",
+            "syn": "Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values"
+        },
+        "lpn_settings_defaults": {
+            "english": "Values",
+            "syn": "Values, Values for new assets, Values given to new assets, Values used when an asset is created | avoid: starting values in the sense of the initial condition of a run; the current values of the selected asset"
+        },
+        "lpn_settings_legend_position": {
+            "english": "Labels legend position",
+            "syn": "The position where the key table (legend, map key — the box explaining the symbols) for node and link labels sits on the map. | avoid: legend as a myth or folk tale"
+        },
+        "lpn_settings_map_display": {
+            "english": "Map appearance",
+            "syn": "How the map looks (appearance, style, the way it is drawn) — sizes, opacity, position."
+        },
+        "lpn_settings_sym_all": {
+            "english": "All",
+            "syn": "For all labels | layout: sub-heading; avoid: select all, show all (a command)"
+        },
+        "lpn_settings_viscosity": {
+            "english": "Relative viscosity",
+            "syn": "Relative thickness of the fluid, Fluid viscosity compared with water | how thick the fluid is compared with water at 20 C. NOT a concentration and NOT a diffusivity; it changes the friction factor under Darcy-Weisbach and nothing else."
+        },
+        "lpn_tab_duplicate": {
+            "english": "Duplicate",
+            "syn": "Duplicate (Copy or Make a copy of) this."
+        },
+        "lpn_time_run": {
+            "english": "Calculate",
+            "syn": "Simulate, calculate, execute, or compute"
+        },
+        "lpn_tool_select": {
+            "english": "Select",
+            "syn": "Select mode; the mode (state) in which you pick (select, choose, pick, point at, indicate, signal) things to act on rather than add things."
+        },
+        "lpn_tool_zoom_extent": {
+            "english": "Zoom to fit",
+            "syn": "Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount"
+        },
+        "lpn_units_group_inputs": {
+            "english": "Input units",
+            "syn": "Units of inputs, or Units of what you enter"
+        },
+        "lpn_units_group_results": {
+            "english": "Results units",
+            "syn": "Units of results, or Units of the answers"
+        },
+        "lpn_units_length": {
+            "english": "Length",
+            "syn": "Pipe lengths, tank diameters, etc."
+        },
+        "lpn_valve_type_fcv": {
+            "english": "Flow control (FCV)",
+            "syn": "Flow control valve (FCV), Flow-limiting valve, Maximum-flow valve | gloss: valve"
+        },
+        "lpn_valve_type_prv": {
+            "english": "Pressure reducing (PRV)",
+            "syn": "Pressure reducing valve (PRV), Pressure-lowering valve | gloss: valve"
+        },
+        "lpn_valve_type_psv": {
+            "english": "Pressure sustaining (PSV)",
+            "syn": "Pressure sustaining valve (PSV), Pressure-supporting valve, Pressure-maintaining valve | gloss: valve"
+        },
+        "lpn_valve_type_tcv": {
+            "english": "Throttle (TCV)",
+            "syn": "Throttle valve (TCV), Throttling valve, Fixed-loss valve | gloss: valve"
+        },
+        "lpn_xymap": {
+            "english": "local",
+            "syn": "local, arbitrary, or schematic coordinate system"
+        },
+        "menu_libre": {
+            "english": "Libre Software",
+            "syn": "Lock-free Software, Unlocked Software, Unchained Software, FLOSS (Free Libre Open Source Software), Liberated Software, Liberty Software, Freedom Software, or Software you are free to use, study, change, and share. | layout: nav item; gloss: libre software; avoid: free of charge (gratis); transliterating \"libre\" as a brand name"
+        },
+        "mhp_annual_kwh": {
+            "english": "P as annual energy",
+            "syn": "Energy produced in a year if the plant ran at full output every hour (8760 h) -- an upper bound, before any capacity factor."
+        },
+        "mhp_diameter": {
+            "english": "<span class=\"ec-help\" title=\"Penstock (supply pipe) diameter\">Penstock diameter, D <span class=\"ec-tip\">?</span></span>",
+            "syn": "| gloss: penstock"
+        },
+        "mhp_efficiency": {
+            "english": "Plant efficiency, η (0–1)",
+            "syn": "| gloss: plant efficiency"
+        },
+        "mhp_gross_head": {
+            "english": "Gross head, H<sub>gross</sub>",
+            "syn": "| gloss: gross head"
+        },
+        "mhp_hl_check": {
+            "english": "Head loss check",
+            "syn": "| gloss: head loss"
+        },
+        "mhp_length": {
+            "english": "Length, L",
+            "syn": "| gloss: penstock"
+        },
+        "mhp_main_desc": {
+            "english": "Run-of-River Micro-Hydro Power Output Calculator",
+            "syn": "| gloss: run-of-river"
+        },
+        "mhp_main_menu": {
+            "english": "Microhydropower",
+            "syn": "Microhydropower electricity generation"
+        },
+        "mhp_main_title": {
+            "english": "Free Online Micro-Hydro Power Calculator",
+            "syn": "Microhydropower electricity generation"
+        },
+        "mhp_notes_1_term": {
+            "english": "Head Loss",
+            "syn": "| gloss: head loss"
+        },
+        "mhp_notes_3_term": {
+            "english": "Head Loss Target",
+            "syn": "| gloss: head loss"
+        },
+        "mhp_vel_high_short": {
+            "english": "High",
+            "syn": "(velocity is) high"
+        },
+        "mhp_vel_low_short": {
+            "english": "Low",
+            "syn": "(velocity is) low"
+        },
+        "mhp_vel_ok_short": {
+            "english": "OK",
+            "syn": "the velocity is high / low / acceptable"
+        },
+        "mi_a": {
+            "english": "A",
+            "syn": "| layout: column heading; symbol"
+        },
+        "mi_elevation": {
+            "english": "Elevation",
+            "syn": "| layout: column heading; symbol"
+        },
+        "mi_fr617": {
+            "english": "Fr",
+            "syn": "| layout: column heading; symbol"
+        },
+        "mi_hv617": {
+            "english": "h<sub>v</sub>",
+            "syn": "| layout: column heading; symbol"
+        },
+        "mi_is_bank": {
+            "english": "R<sub>h</sub>, Q region boundary (Bank)",
+            "syn": "Boundary (divider, edge, break, or bank as in HEC-RAS) between adjacent regions of differing flow, hydraulic radius, and composite n. | layout: column heading"
+        },
+        "mi_main_desc": {
+            "english": "Irregular Channel Manning Uniform Flow Calculator",
+            "syn": "| gloss: irregular channel"
+        },
+        "mi_main_title": {
+            "english": "Free Online Manning Irregular Channel Calculator",
+            "syn": "| gloss: irregular channel"
+        },
+        "mi_menu": {
+            "english": "Manning Irregular Channel",
+            "syn": "| gloss: irregular channel"
+        },
+        "mi_n617": {
+            "english": "Comp.<br />n",
+            "syn": "composite n for the region, by Chow 6-17 | layout: column heading; symbol"
+        },
+        "mi_notes_1_term": {
+            "english": "Composite n",
+            "syn": "The n for each region according to Chow 6-17, equal velocities "
+        },
+        "mi_pw": {
+            "english": "P<sub>w</sub>",
+            "syn": "| layout: column heading; symbol"
+        },
+        "mi_q617": {
+            "english": "Q",
+            "syn": "The composite flow, Q, using composite n for each region according to Chow 6-17, equal velocities | layout: column heading"
+        },
+        "mi_q_617": {
+            "english": "<span class=\"ec-help\" title=\"The composite flow, Q, using a composite n for each region according to Chow 6-17, equal velocities\">Q <span class=\"ec-tip\">?</span></span>",
+            "syn": "The composite flow, Q, using a composite n for each region according to Chow 6-17, equal velocities"
+        },
+        "mi_rh": {
+            "english": "R<sub>h</sub>",
+            "syn": "| layout: column heading; symbol"
+        },
+        "mi_station": {
+            "english": "Sta",
+            "syn": "Station (chainage, distance along the alignment) of this point — \"Distance\" is an acceptable alias where the surveying sense of \"station\" has no natural short word | layout: column heading; avoid: transit-stop \"bus/train station\" sense (found in he/hi/ur/ps/my/am, corrected 2026-07-08)"
+        },
+        "mi_t": {
+            "english": "T",
+            "syn": "| layout: column heading; symbol"
+        },
+        "mi_tau": {
+            "english": "Bottom shear τ",
+            "syn": "| layout: column heading; symbol"
+        },
+        "mi_v617": {
+            "english": "v",
+            "syn": "| layout: column heading; symbol"
+        },
+        "mpf_shear_stress": {
+            "english": "Average shear stress, τ",
+            "syn": "| gloss: shear stress; symbol"
+        },
+        "mpf_velocity_head": {
+            "english": "<span class=\"ec-help\" title=\"Kinetic energy as a height of water column, v²/2g\">Velocity head, h<sub>v</sub> <span class=\"ec-tip\">?</span></span>",
+            "syn": "| gloss: head"
+        },
+        "mphl_friction_loss": {
+            "english": "Friction loss, h<sub>f</sub>",
+            "syn": "| gloss: friction loss"
+        },
+        "mphl_junction_loss": {
+            "english": "Minor (local) loss, h<sub>m</sub>",
+            "syn": "| gloss: minor loss"
+        },
+        "mphl_main_desc": {
+            "english": "Manning Formula Head Loss at Given Full Flow",
+            "syn": "| gloss: head loss"
+        },
+        "mphl_main_menu": {
+            "english": "Manning Pipe Head Loss",
+            "syn": "| gloss: head loss"
+        },
+        "mphl_main_title": {
+            "english": "Free Online Manning Pipe Head Loss Calculator",
+            "syn": "| gloss: head loss"
+        },
+        "mphl_total_loss": {
+            "english": "Total loss, h<sub>L</sub>",
+            "syn": "| gloss: head loss"
+        },
+        "mtc_blodgett_v_bathurst": {
+            "english": "Blodgett vs. Bathurst",
+            "syn": "which of the two roughness methods applies at this relative submergence"
+        },
+        "mtc_n_strickler": {
+            "english": "n from design rock size (Strickler method)",
+            "syn": "Manning’s n from the design rock size, by the Strickler method | symbol; the bare lower-case n is Manning’s roughness coefficient, not a word"
+        },
+        "mtc_note_1": {
+            "english": "<dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The requested roughness calculation is copied to input roughness. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.</dd><dt>Basic calculator (no iteration)</dt><dd>Enter your desired roughness value. Ignore the design rock size input area.</dd></dl>",
+            "syn": " | avoid: compressing \"Blodgett–Bathurst\" to an initialism like \"BB\" — recurred independently across 8+ languages (it/ru/bg/es/uk/sr/hr/cs/tr/ps/my, corrected 2026-07-08) since nothing else in this string defines what the initials stand for; spell the full name out in every language, matching mtc_blodgett_v_bathurst"
+        },
+        "mtc_sgrock": {
+            "english": "<span class=\"ec-help\" title=\"Density relative to water. Typical ≈ 2.65 for crushed rock.\">Rock specific gravity, sg <span class=\"ec-tip\">?</span></span>",
+            "syn": "| gloss: specific gravity"
+        },
+        "odt_h2_ok": {
+            "english": "Ending elevation above orifice top",
+            "syn": "| gloss: crown"
+        },
+        "odt_h2_warn": {
+            "english": "Ending elevation at or below orifice top",
+            "syn": "| gloss: crown"
+        },
+        "odt_sketch_end": {
+            "english": "End",
+            "syn": "the ending water surface level"
+        },
+        "odt_sketch_start": {
+            "english": "Start",
+            "syn": "the starting water surface level"
+        },
+        "or_head": {
+            "english": "<span class=\"ec-help\" title=\"Energy per unit weight of water — a height of the water column, not a pressure\">Effective head, h <span class=\"ec-tip\">?</span></span>",
+            "syn": "| gloss: head"
+        },
+        "or_notes_2_def": {
+            "english": "Orifice flow equations apply when the headwater surface is above the crown (top) of the opening. When headwater is below the crown, use a weir equation instead.",
+            "syn": "| gloss: crown"
+        },
+        "or_notes_2_term": {
+            "english": "Orifice Regime",
+            "syn": "| gloss: crown"
+        },
+        "or_regime_warn_tip": {
+            "english": "Headwater below crown",
+            "syn": "| gloss: crown"
+        },
+        "rc_Hp": {
+            "english": "<span class=\"ec-help\" title=\"Ponding (Hp > yn) is good — reduces upstream erosion. (USDA)\">Inlet weir head, H<sub>p</sub> <span class=\"ec-tip\">?</span></span>",
+            "syn": "| gloss: weir head"
+        },
+        "rc_apron_length": {
+            "english": "<span class=\"ec-help\" title=\"Required for structural support of the rock lining. “The minimum tailwater that occurs as a result of the outlet reach and downstream channel resistance is sufficient to ensure stability of the riprap in the outlet reach.” (Robinson)\">Outlet apron length (15 × D<sub>50</sub>) <span class=\"ec-tip\">?</span></span>",
+            "syn": "This is the length of the horizontal or flat reach of rock that is required by Robinson to be placed downstream or below the chute to act as an outlet and thus to support the rock on the slope of the chute. Outlet toe support reach length. | The word apron refers to flat protective pad of rock at the chute outlet (hydraulic-structures term, the platea/radier family), never clothing."
+        },
+        "rc_notes_6_def": {
+            "english": "The elevation of the top of the rock lining in the outlet reach should be at or below the downstream channel bed elevation. If it is higher, the outlet rock will be unstable.",
+            "syn": "| gloss: outlet apron, downstream"
+        },
+        "rc_notes_7_def": {
+            "english": "When the normal depth in the inlet channel is less than the weir head (H<sub>p</sub>) required to pass q<sub>t</sub>, restricted flow or ponding occurs upstream of the steep channel inlet. This is generally acceptable — ponding reduces velocity and prevents erosion upstream. To check: use a weir flow calculator to find H<sub>p</sub> for the given q<sub>t</sub> and crest width, and compare it to the inlet channel normal depth. If H<sub>p</sub> exceeds normal depth, ponding will occur.",
+            "syn": "| gloss: weir head, upstream, ponding"
+        },
+        "rc_sg": {
+            "english": "<span class=\"ec-help\" title=\"Density relative to water. Typical crushed granite or basalt ≈ 2.65. Robinson valid range: 2.54 to 2.82.\">Rock specific gravity, sg <span class=\"ec-tip\">?</span></span>",
+            "syn": "| gloss: specific gravity"
+        },
+        "rc_sketch_filter": {
+            "english": "Filter",
+            "syn": "the filter (bedding) layer beneath the rock lining"
+        },
+        "rc_yn": {
+            "english": "<span class=\"ec-help\" title=\"Ponding (Hp > yn) is good — reduces upstream erosion. (USDA)\">Normal depth in inlet channel, y<sub>n</sub> <span class=\"ec-tip\">?</span></span>",
+            "syn": "Enter the normal depth in the channel that delivers flow to this chute. | Upstream, not downstream: ponding reduces erosion UPSTREAM of the chute inlet (above/before it, toward the source). Do not flip the direction."
+        },
+        "template_welcome": {
+            "english": "Drop your fears at the door; love is spoken here. You are not ruining everything. Enjoy the <a target=\"_blank\" href=\"https://hawsedc.com/download.php\">free libre HawsEDC AutoCAD tools</a> too.",
+            "syn": "Leave your fears behind when you enter this space; love is the language we speak here. You are not ruining everything."
+        },
+        "u_grade": {
+            "english": "rise/run",
+            "syn": "| gloss: slope; layout: unit token; avoid: activity sense \"running/walking/jogging\""
+        },
+        "u_gradePercent": {
+            "english": "% rise/run",
+            "syn": "| gloss: slope; layout: unit token; avoid: activity sense \"running/walking/jogging\""
+        },
+        "wi_menu": {
+            "english": "Weir Flow Irregular",
+            "syn": "| gloss: irregular channel"
+        },
+        "wi_notes_we_def": {
+            "english": "q = if (length = 0) then 0 else if (slope=0) then cw*length*d<sub>0</sub><sup>1.5</sup> else cw/(2.5*slope) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>) where d<sub>1</sub> and d<sub>0</sub> are always positive or zero",
+            "syn": "Weir equation written in if/then/else pseudocode. | symbol; the words if/then/else/where may be translated, the structure and symbols stay as in English"
+        },
+        "ws_headWaterHeight": {
+            "english": "<span class=\"ec-help\" title=\"Energy per unit weight of water — a height of the water column, not a pressure\">Head, h <span class=\"ec-tip\">?</span></span>",
+            "syn": "| gloss: head"
+        },
+        "ws_main_menu": {
+            "english": "Weir Flow Simple",
+            "syn": "Simple weir flow calculator, for a weir with a level (uniform, single-elevation) crest. | \"Simple\" describes the calculator variant, not a weir type name; use natural word order."
+        }
+    }
+}
