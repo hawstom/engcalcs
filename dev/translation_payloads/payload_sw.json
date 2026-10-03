@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sw",
-        "expected_key_count": 2160,
-        "delta_key_count": 9,
+        "expected_key_count": 2175,
+        "delta_key_count": 24,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -714,6 +714,8 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_graphs_menu": "Graphs",
+        "lpn_graphs_menu_tip": "Graphs: Profile, Time Series, and Frequency distribution",
         "lpn_copy_title": "Mark file as new copy?",
         "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
         "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
@@ -722,9 +724,24 @@
         "lpn_copy_kept_link": "Opened {name} as the original, moved to a new place. Save now writes to this file.",
         "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
         "lpn_field_lat_abbr": "Lat",
-        "lpn_field_lon_abbr": "Lon"
+        "lpn_field_lon_abbr": "Lon",
+        "lpn_scenario_basic": "Basic mode",
+        "lpn_scenario_basic_tip": "Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.",
+        "lpn_alt_title": "Alternatives preview",
+        "lpn_alt_note": "Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.",
+        "lpn_alt_cat_physical": "Physical",
+        "lpn_alt_cat_demand": "Demand",
+        "lpn_alt_cat_topology": "Asset activation",
+        "lpn_alt_cat_initial": "Initial settings",
+        "lpn_alt_cat_constituent": "Constituent",
+        "lpn_alt_cat_fireflow": "Fire flow",
+        "lpn_alt_cat_energy": "Energy cost",
+        "lpn_alt_cat_userdata": "Custom properties",
+        "lpn_alt_cat_text": "Text"
     },
     "keys": {
+        "lpn_graphs_menu": "Graphs",
+        "lpn_graphs_menu_tip": "Graphs: Profile, Time Series, and Frequency distribution",
         "lpn_copy_title": "Mark file as new copy?",
         "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
         "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
@@ -733,9 +750,54 @@
         "lpn_copy_kept_link": "Opened {name} as the original, moved to a new place. Save now writes to this file.",
         "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
         "lpn_field_lat_abbr": "Lat",
-        "lpn_field_lon_abbr": "Lon"
+        "lpn_field_lon_abbr": "Lon",
+        "lpn_scenario_basic": "Basic mode",
+        "lpn_scenario_basic_tip": "Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.",
+        "lpn_alt_title": "Alternatives preview",
+        "lpn_alt_note": "Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.",
+        "lpn_alt_cat_physical": "Physical",
+        "lpn_alt_cat_demand": "Demand",
+        "lpn_alt_cat_topology": "Asset activation",
+        "lpn_alt_cat_initial": "Initial settings",
+        "lpn_alt_cat_constituent": "Constituent",
+        "lpn_alt_cat_fireflow": "Fire flow",
+        "lpn_alt_cat_energy": "Energy cost",
+        "lpn_alt_cat_userdata": "Custom properties",
+        "lpn_alt_cat_text": "Text"
     },
     "key_context": {
+        "lpn_graphs_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_menu",
+                    "value": "Wasifu",
+                    "english": "Profile"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_tip",
+                    "value": "Chora ardhi na mstari wa kimo cha maji kwa njia iliyopita kwenye mtandao.",
+                    "english": "Draw the ground and the hydraulic grade line along a path through the network."
+                }
+            }
+        },
+        "lpn_graphs_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_menu",
+                    "value": "Wasifu",
+                    "english": "Profile"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_tip",
+                    "value": "Chora ardhi na mstari wa kimo cha maji kwa njia iliyopita kwenye mtandao.",
+                    "english": "Draw the ground and the hydraulic grade line along a path through the network."
+                }
+            }
+        },
         "lpn_copy_title": {
             "reason": "missing",
             "current_value": null,
@@ -877,6 +939,214 @@
                     "key": "lpn_field_coord_tip",
                     "value": "Andika mahali pa kuratibu ili kuweka kifundo hiki sawasawa. Katika senario, mahali hapa hutumika kwenye senario hiyo pekee, kama vile kuiburuta hufanya; katika Msingi huweka kifundo kila mahali.",
                     "english": "Type a coordinate location to place this node exactly. In a scenario this location applies in that scenario alone, just as dragging it does; in Base it places the node everywhere."
+                }
+            }
+        },
+        "lpn_scenario_basic": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_scenario_basic_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_physical": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_demand": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_topology": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_initial": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_constituent": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_fireflow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_energy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_userdata": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_text": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
                 }
             }
         }

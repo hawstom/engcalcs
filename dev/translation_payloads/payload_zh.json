@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 2160,
-        "delta_key_count": 7,
+        "expected_key_count": 2175,
+        "delta_key_count": 22,
         "exempt_key_count": 26,
         "exempt_keys": [
             "calc_units_us",
@@ -705,24 +705,86 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_graphs_menu": "Graphs",
+        "lpn_graphs_menu_tip": "Graphs: Profile, Time Series, and Frequency distribution",
         "lpn_copy_title": "Mark file as new copy?",
         "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
         "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
         "lpn_copy_original": "Original; keep same lock",
         "lpn_copy_copy": "A copy; make new lock",
         "lpn_copy_kept_link": "Opened {name} as the original, moved to a new place. Save now writes to this file.",
-        "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save."
+        "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
+        "lpn_scenario_basic": "Basic mode",
+        "lpn_scenario_basic_tip": "Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.",
+        "lpn_alt_title": "Alternatives preview",
+        "lpn_alt_note": "Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.",
+        "lpn_alt_cat_physical": "Physical",
+        "lpn_alt_cat_demand": "Demand",
+        "lpn_alt_cat_topology": "Asset activation",
+        "lpn_alt_cat_initial": "Initial settings",
+        "lpn_alt_cat_constituent": "Constituent",
+        "lpn_alt_cat_fireflow": "Fire flow",
+        "lpn_alt_cat_energy": "Energy cost",
+        "lpn_alt_cat_userdata": "Custom properties",
+        "lpn_alt_cat_text": "Text"
     },
     "keys": {
+        "lpn_graphs_menu": "Graphs",
+        "lpn_graphs_menu_tip": "Graphs: Profile, Time Series, and Frequency distribution",
         "lpn_copy_title": "Mark file as new copy?",
         "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
         "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
         "lpn_copy_original": "Original; keep same lock",
         "lpn_copy_copy": "A copy; make new lock",
         "lpn_copy_kept_link": "Opened {name} as the original, moved to a new place. Save now writes to this file.",
-        "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save."
+        "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
+        "lpn_scenario_basic": "Basic mode",
+        "lpn_scenario_basic_tip": "Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.",
+        "lpn_alt_title": "Alternatives preview",
+        "lpn_alt_note": "Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.",
+        "lpn_alt_cat_physical": "Physical",
+        "lpn_alt_cat_demand": "Demand",
+        "lpn_alt_cat_topology": "Asset activation",
+        "lpn_alt_cat_initial": "Initial settings",
+        "lpn_alt_cat_constituent": "Constituent",
+        "lpn_alt_cat_fireflow": "Fire flow",
+        "lpn_alt_cat_energy": "Energy cost",
+        "lpn_alt_cat_userdata": "Custom properties",
+        "lpn_alt_cat_text": "Text"
     },
     "key_context": {
+        "lpn_graphs_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_menu",
+                    "value": "剖面图",
+                    "english": "Profile"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_tip",
+                    "value": "沿贯穿管网的一条路线，绘制地面和水力坡降线。",
+                    "english": "Draw the ground and the hydraulic grade line along a path through the network."
+                }
+            }
+        },
+        "lpn_graphs_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_menu",
+                    "value": "剖面图",
+                    "english": "Profile"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_tip",
+                    "value": "沿贯穿管网的一条路线，绘制地面和水力坡降线。",
+                    "english": "Draw the ground and the hydraulic grade line along a path through the network."
+                }
+            }
+        },
         "lpn_copy_title": {
             "reason": "missing",
             "current_value": null,
@@ -832,6 +894,214 @@
                     "key": "lpn_lock_requested",
                     "value": "{name} 想要编辑此文件。请在准备好后保存您的工作，并使用“文件”、“关闭项目”将其移交。",
                     "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                }
+            }
+        },
+        "lpn_scenario_basic": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_scenario_basic_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_physical": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_demand": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_topology": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_initial": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_constituent": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_fireflow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_energy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_userdata": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_alt_cat_text": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scenario_push_tip",
+                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
+                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                },
+                "next_translated": {
+                    "key": "lpn_scenario_push_confirm",
+                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
+                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
                 }
             }
         }
