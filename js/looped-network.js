@@ -37305,6 +37305,7 @@ var EngCalcs = EngCalcs || {};
 		if (p.el && !p.el.title) { p.el.title = p.title; }
 	}
 	function openMenu(anchor, rows, level) {
+		menuRestoreSeq++;
 		var els = menuEls(level), popup = els.popup, list = els.list;
 		if (!popup || !list) { return; }
 		if (!level) {
@@ -37471,6 +37472,10 @@ var EngCalcs = EngCalcs || {};
 	// Tab closes the menu and goes on, Enter/Space are the buttons' own click.
 	var subOpener = null;
 	var menuKbIntent = false;
+	// Counts menu interactions. The deferred focus restore below runs from a timer, which a busy page
+	// can delay past the person's next keystrokes (input outranks timers); a restore whose number is
+	// no longer current is stale and must not move focus.
+	var menuRestoreSeq = 0;
 	function menuRowsOf(list) {
 		return Array.prototype.slice.call(list.querySelectorAll('button.lpn-menu-row:not(:disabled):not([data-pointer-only])'));
 	}
@@ -37493,11 +37498,13 @@ var EngCalcs = EngCalcs || {};
 	// or a mnemonic about to click), so it sees which boxes were open before the command.
 	function menuFocusAfterRow(t) {
 		var opener = openMenuAnchor;
+		var seq = ++menuRestoreSeq;
 		var ret = kbdModeReturn;   // the element that had focus before a chord or F10 (cleared by the click handler below)
 		var boxVisible = function (id) { var b = document.getElementById(id); return !!b && b.getClientRects().length > 0; };
 		var boxesBefore = ESCAPE_SCOPED_BOXES.filter(boxVisible);
 		if (t && t.closest && t.closest('#lpn_menu_popup, #lpn_menu_popup2') && opener) {
 			setTimeout(function () {
+				if (seq !== menuRestoreSeq) { return; }   // a later menu interaction owns focus
 				// The closed menu's row still holds focus until the browser's next focus fix-up, so
 				// "dropped" means body, or a control inside either closed menu panel.
 				var a = document.activeElement;
