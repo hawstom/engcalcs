@@ -495,3 +495,25 @@ skeptical it would work. Not proposing it now; no evidence it's needed.)
    increments and can trail the demo without leaving the first change silently wrong.
 
 N. **Key badges in keyboard mode, not underlines** (2026-10-03): a mnemonic shown as a small boxed Latin letter beside each menu name survives all 27 languages and RTL; see journal 2026-10-03.
+
+N+1. **Widen the tooltip: `.tooltip { --bs-tooltip-max-width: 22rem }`** in `css/engcalcs.css`. One
+    line, no strings, no risk. Turns a 92-word tip from ~20 lines to ~7. First move of the tip audit
+    (2026-10-03); see `dev/tip-and-selection-audit.md` section 4.3.
+
+N+2. **Make Fire flow, Criticality and Demand scaling parallel**: one row builder that draws the
+    standard `?` (they show no glyph today, `js/looped-network.js:57318`), and the Demand scaling
+    scope wording ("All junctions / Selected junctions"; "Select junctions or choose All junctions")
+    applied to the other two. Tom's first request, and the smallest change that answers it.
+
+N+3. **Explanations open on click of the `?` (Bootstrap popover, `trigger: focus`), names stay
+    hover-with-delay, and one `?` beside the × of each tool box.** Medium cost, no new strings,
+    one model on desktop and phone, meets WCAG 1.4.13. Needs a harness for box-close sweeping
+    (`dev/lpn-spike/tip-behaviour-harness.js` already guards the tooltip form of that defect).
+
+N+4. **A description line inside an open menu, under the hovered row** — the only honest form of
+    Tom's status-bar instinct. Rejected: a status strip at the window edge (Microsoft's own
+    guideline and Task 616 both argue against it).
+
+N+5. **A check that flags one English string holding both a select word and an option word
+    (option / menu / choose / All).** Would have caught all five Fire flow strings. A visitor-hit
+    defect a person misses, which is the bar CLAUDE.md sets for a new check.
