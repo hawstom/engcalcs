@@ -4301,8 +4301,8 @@ $ec_lang['lpn_ds_no_selection']='No junctions are selected. Select junctions or 
 $ec_lang['lpn_ds_skipped']='Selected elements that are not junctions, left as they are: {n}.';
 $ec_lang['lpn_ds_bad_multiplier']='Type a demand scale of zero or more, such as 1.5.';
 $ec_lang['lpn_ds_stale']='The drawing changed, so the demand scaling results were cleared. Run it again.';
-$ec_lang['lpn_ds_at_time']='Time step: {time}.';
-$ec_lang['lpn_ds_time_moved']='⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.';
+$ec_lang['lpn_analyze_at_time']='Time step: {time}.';
+$ec_lang['lpn_analyze_time_moved']='⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.';
 
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //

@@ -8,10 +8,8 @@
 // to another step, and ask what the tool shows. A result computed at 0:00 must not go on passing
 // for the step on screen: it must be re-run, cleared, or say it was computed at another time.
 //
-// KNOWN DEFECT, marked XFAIL below and not counted as a failure: Fire flow and Criticality keep
-// their results across a clock move and name no time step and no stale mark (only Demand scaling
-// has lpn_ds_at_time / lpn_ds_time_moved). An XFAIL that starts passing FAILS the harness: remove
-// the XFAIL, the defect is fixed.
+// Fire flow and Criticality share Demand scaling's two keys, lpn_analyze_at_time and
+// lpn_analyze_time_moved: each names its time step, and says so when the clock has left it.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -41,19 +39,11 @@ if (process.env[LOCK_ENV] !== '1') {
 	console.error('analyze-clock-browser-harness: no `flock` binary found -- running WITHOUT the browser lock.');
 }
 
-let fails = 0, xfails = 0;
+let fails = 0;
 function ok(name, cond, extra) {
 	console.log((cond ? '  ok   ' : '  FAIL ') + name + (extra === undefined ? '' : '   ' + extra));
 	if (!cond) { fails++; }
 }
-// A check that is known to fail today. Failing is reported and not counted; passing is a failure,
-// so the marker cannot outlive the defect.
-function xfail(name, cond, extra) {
-	if (cond) { console.log('  FAIL ' + name + '   (marked XFAIL but passes: the defect is fixed, make it a plain ok)'); fails++; return; }
-	xfails++;
-	console.log('  XFAIL ' + name + '   TODO known defect' + (extra === undefined ? '' : '   ' + extra));
-}
-
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	const { Session } = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'session.js'));
@@ -101,9 +91,8 @@ async function main() {
 		await goTo(0);
 		const runLabel = await a.lang('lpn_ff_calculate');
 
-		// The clock-moved verdict for a tool whose result host is `sel`: re-run or cleared (the
-		// text changed with no one pressing Run), or it names the time it was computed at.
-		const verdict = (before, after) => after !== before || after.indexOf(zero) >= 0 && after.indexOf(six) >= 0;
+		const at0 = (await a.lang('lpn_analyze_at_time')).replace('{time}', zero);
+		const moved = (await a.lang('lpn_analyze_time_moved')).replace('{time}', zero).replace('{now}', six);
 
 		console.log('\n--- Fire flow ---');
 		await openTool('lpn_ff_menu', 'lpn_ff_box');
@@ -113,7 +102,8 @@ async function main() {
 		console.log('  ' + ffBefore.slice(0, 120));
 		await goTo(6 * 3600);
 		const ffAfter = await txt('#lpn_ff_report');
-		xfail('Fire flow, after the clock moved 0:00 -> 6:00, re-ran, cleared, or marked its results stale', verdict(ffBefore, ffAfter), ffAfter.slice(0, 100));
+		ok('Fire flow names 0:00 while the clock is there', ffBefore.indexOf(at0) >= 0 && ffBefore.indexOf(moved) < 0);
+		ok('Fire flow says it was computed at 0:00 and the clock is at 6:00', ffAfter.indexOf(moved) >= 0, ffAfter.slice(0, 100));
 		await closeTool('lpn_ff_close');
 
 		console.log('\n--- Criticality ---');
@@ -125,7 +115,8 @@ async function main() {
 		console.log('  ' + crBefore.slice(0, 120));
 		await goTo(6 * 3600);
 		const crAfter = await txt('#lpn_crit_report');
-		xfail('Criticality, after the clock moved 0:00 -> 6:00, re-ran, cleared, or marked its results stale', verdict(crBefore, crAfter), crAfter.slice(0, 100));
+		ok('Criticality names 0:00 while the clock is there', crBefore.indexOf(at0) >= 0 && crBefore.indexOf(moved) < 0);
+		ok('Criticality says it was computed at 0:00 and the clock is at 6:00', crAfter.indexOf(moved) >= 0, crAfter.slice(0, 100));
 		await closeTool('lpn_crit_close');
 
 		console.log('\n--- Demand scaling ---');
@@ -135,11 +126,10 @@ async function main() {
 		await waitDone('#lpn_ds_controls [data-ds="scale"]', 'the Demand scaling Run answer');
 		await pressRun('#lpn_ds_controls', await a.lang('lpn_ds_find'));
 		await waitDone('#lpn_ds_controls [data-ds="search"]', 'the Demand scaling Find answer');
-		const dsAt = (await a.lang('lpn_ds_at_time')).replace('{time}', zero);
+		const dsAt = at0;
 		ok('Run names 0:00', (await txt('#lpn_ds_controls [data-ds="scale"]')).indexOf(dsAt) >= 0);
 		ok('Find names 0:00', (await txt('#lpn_ds_controls [data-ds="search"]')).indexOf(dsAt) >= 0);
 		await goTo(6 * 3600);
-		const moved = (await a.lang('lpn_ds_time_moved')).replace('{time}', zero).replace('{now}', six);
 		ok('Run says it was computed at 0:00 and the clock is at 6:00', (await txt('#lpn_ds_controls [data-ds="scale"]')).indexOf(moved) >= 0);
 		ok('Find says the same', (await txt('#lpn_ds_controls [data-ds="search"]')).indexOf(moved) >= 0);
 
@@ -163,7 +153,7 @@ async function main() {
 		await browser.close();
 		env.stopServer();
 	}
-	console.log(fails ? '\n' + fails + ' analyze clock check(s) FAILED' : '\nAnalyze clock harness: all checks passed (' + xfails + ' known defect(s) marked XFAIL).');
+	console.log(fails ? '\n' + fails + ' analyze clock check(s) FAILED' : '\nAnalyze clock harness: all checks passed.');
 	process.exit(fails ? 1 : 0);
 }
 main().catch((e) => { console.log('  FAIL threw: ' + (e && e.stack || e)); process.exit(1); });
