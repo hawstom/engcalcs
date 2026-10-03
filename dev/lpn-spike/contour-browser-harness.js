@@ -186,15 +186,14 @@ async function sectionDocked(Session, browser) {
 		const hit = (x, y) => x && y && x.l < y.r && x.r > y.l && x.t < y.b && x.b > y.t;
 		ok('the box lies in the right third of the map', g.box && g.map && g.box.l >= g.map.l + (g.map.r - g.map.l) * 2 / 3 - 1 && g.box.r <= g.map.r + 0.5, JSON.stringify(g));
 		ok('it does not cover the zoom buttons', g.zoom && !hit(g.box, g.zoom), JSON.stringify(g));
-		ok('it does not cover the colour legend', g.legend && !hit(g.box, g.legend), JSON.stringify(g));
 	} finally {
 		await a.close();
 	}
 }
 
 // ---- 3c. the box fits its contents -------------------------------------------------------------
-async function openNet3Saved(Session, browser, locale, saved) {
-	const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 }, locale });
+async function openNet3Saved(Session, browser, locale, saved, viewport, twoLegends) {
+	const a = await Session.open(browser, NAME, { viewport: viewport || { width: 1400, height: 900 }, locale });
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	if (saved) { await a.page.addInitScript((v) => { try { if (!localStorage.getItem('lpn_contourbox')) { localStorage.setItem('lpn_contourbox', v); } } catch (e) { /* none */ } }, JSON.stringify(saved)); }
 	await a.goto('Looped-Network.php');
@@ -202,6 +201,19 @@ async function openNet3Saved(Session, browser, locale, saved) {
 	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 	await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
 	await a.settle(1500);
+	if (twoLegends) {
+		// Pressure on the nodes and velocity on the links: two legends stacked on the map's bottom right.
+		await a.toolbarClick(await a.lang('lpn_tool_settings'));
+		await a.settle(400);
+		await a.page.evaluate(() => {
+			const n = document.getElementById('lpn_set_color_node'), l = document.getElementById('lpn_set_color_link');
+			n.value = 'pressure'; n.dispatchEvent(new Event('change', { bubbles: true }));
+			l.value = 'velocity'; l.dispatchEvent(new Event('change', { bubbles: true }));
+		});
+		await a.settle(400);
+		await a.page.keyboard.press('Escape');
+		await a.settle(300);
+	}
 	return a;
 }
 function boxFacts(page, withDem) {
@@ -235,8 +247,32 @@ async function sectionFit(Session, browser) {
 			ok(tag + ': all rows shown', f.rows >= 8, f.rows);
 			ok(tag + ': no vertical or horizontal scroll', g.vScroll <= 0 && g.hScroll <= 0, g.vScroll + ' / ' + g.hScroll);
 			ok(tag + ': within 600 x 600 and on screen', g.w <= 600 && g.h <= 600 && g.l >= 0 && g.t >= 0 && g.rt <= g.vw + 0.5 && g.bt <= g.vh + 0.5, JSON.stringify(g));
-			ok(tag + ': wider than the old 23 rem box (368 px)', g.w > 400, g.w);
+			ok(tag + ': not squat (height >= 0.9 x width)', g.h >= 0.9 * g.w, g.w + ' x ' + g.h);
 		} finally { await a.close(); }
+	}
+	// A TALL LEGEND must not squash the box (Tom, 2026-10-03: ~120 px tall and scrolling).
+	for (const vp of [{ width: 1400, height: 900 }, { width: 1280, height: 720 }]) {
+		const t = await openNet3Saved(Session, browser, 'en-US', null, vp, true);
+		try {
+			await contourFromMenu(t);
+			const f = await boxFacts(t.page, true);
+			await t.settle(300);
+			const g = await boxFacts(t.page, false);
+			const lg = await t.page.evaluate(() => {
+				const l = document.getElementById('lpn_color_legend'), r = l && l.getBoundingClientRect();
+				const b = document.getElementById('lpn_contour_box').getBoundingClientRect();
+				if (!r || !(r.width > 0)) { return null; }
+				const x = Math.max(r.left, b.left) + 2, y = Math.max(r.top, b.top) + 2, over = r.left < b.right && r.right > b.left && r.top < b.bottom && r.bottom > b.top;
+				const top = over ? document.elementFromPoint(x, y) : null;
+				return { h: Math.round(r.height), over, boxOnTop: !over || (!!top && !!top.closest('#lpn_contour_box')) };
+			});
+			const tag = vp.width + 'x' + vp.height + ' with two legends';
+			console.log('         ' + tag + ': box ' + g.w + ' x ' + g.h + ' px with the DEM row; legend ' + JSON.stringify(lg));
+			ok(tag + ': a legend is showing', !!lg && lg.h > 100, JSON.stringify(lg));
+			ok(tag + ': all rows, no vertical or horizontal scroll', g.rows >= 8 && g.vScroll <= 0 && g.hScroll <= 0, g.rows + ' rows ' + g.vScroll + ' / ' + g.hScroll);
+			ok(tag + ': on screen and not wide and squat (height >= 0.9 x width)', g.l >= 0 && g.t >= 0 && g.rt <= g.vw + 0.5 && g.bt <= g.vh + 0.5 && g.h >= 0.9 * g.w, JSON.stringify(g));
+			ok(tag + ': where it overlaps the legend, the box is on top', !!lg && lg.boxOnTop, JSON.stringify(lg));
+		} finally { await t.close(); }
 	}
 	// A size the user dragged wins.
 	const a = await openNet3Saved(Session, browser, 'en-US', { left: 200, top: 200, w: 520, h: 330, open: true, userSized: true });

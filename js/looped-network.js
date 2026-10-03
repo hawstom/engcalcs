@@ -47662,10 +47662,11 @@ var EngCalcs = EngCalcs || {};
 	}
 	// **A PLOT'S CONTROL BOX OPENS DOCKED AT THE MAP'S TOP-RIGHT, NOT CENTRED** (Tom, 2026-10-03:
 	// centred, it hid the plot it controls). Right edge a gap inside the map's, top under the zoom
-	// buttons, height capped above the colour legend so it never covers either. First open only;
+	// buttons. Height capped only at the window's bottom, NEVER at the colour legend: a tall legend
+	// squashed the box to a scrolling strip (Tom, 2026-10-03), so the box sits over the legend instead. First open only;
 	// a dragged position is remembered and wins. False when the map has no box yet.
 	function dockBoxTopRight(box, r) {
-		var wrap = svg && svg.parentNode, wr, zc, lg, gap = 8, top, left, bottom, lr;
+		var wrap = svg && svg.parentNode, wr, zc, gap = 8, top, left, bottom;
 		if (!wrap || !wrap.getBoundingClientRect) { return false; }
 		wr = wrap.getBoundingClientRect();
 		if (!(wr.width > 0) || !(wr.height > 0)) { return false; }
@@ -47674,13 +47675,6 @@ var EngCalcs = EngCalcs || {};
 		if (zc && zc.getBoundingClientRect().width > 0) { top = Math.max(top, zc.getBoundingClientRect().bottom + gap); }
 		left = Math.max(wr.left, wr.right - r.width - gap);
 		bottom = Math.min(window.innerHeight - POPUP_EDGE, wr.bottom - gap);
-		lg = colorLegendBox;
-		if (lg && lg.style.display !== 'none') {
-			lr = lg.getBoundingClientRect();
-			if (lr.width > 0 && lr.height > 0 && lr.right > left && lr.left < left + r.width && lr.top > top) {
-				bottom = Math.min(bottom, lr.top - gap);
-			}
-		}
 		capPanelToRoomBelow(box, window.innerHeight - Math.max(80, bottom - top) - POPUP_EDGE);
 		box.style.left = left + 'px';
 		box.style.top = top + 'px';
