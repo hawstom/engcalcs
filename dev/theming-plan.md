@@ -152,3 +152,25 @@ for, not a dependency for anything else on the roadmap.
   ask.
 - **Per-project theming.** Explicitly ruled out by the storage-question section — a theme is the
   reader's choice, not the file's.
+
+## Phase 1 result (branch `feat/theme-token`, 2026-10-03)
+
+- **Declared:** 96 `--ec-*` tokens in one block at the top of `css/engcalcs.css`, values exactly the
+  literals they replaced. 34 are named by ROLE (`--ec-bg`, `--ec-ink*`, `--ec-border*`,
+  `--ec-accent*`, `--ec-brand*`, `--ec-warn-*`, `--ec-hover-*`, `--ec-pressed-*`, `--ec-select*`,
+  `--ec-map-overlay-bg`); the rest are named by VALUE (`--ec-gray-eee`, `--ec-hue-05a`,
+  `--ec-a-0-0-0-3`) because one value serves several roles or its role is not yet known. **Phase 2's
+  first job is to give each of those a role and merge the near-duplicates**, not to write dark values
+  for 62 value-named tokens.
+- **Proof of no visible change:** expanding every token back to its value reproduces the previous
+  stylesheet character for character, and `dev/browser-pass/pixel-shots.js` pixel-diffs 14 states
+  (three calculators; the Looped Network page empty, with menus, Net3, Settings, Tables, Find,
+  Properties, hover states): zero differing pixels.
+- **Held by:** `dev/scripts/chrome_colour_check.php` (a literal outside the block, an undeclared
+  token, a rise in inline literals) and `dev/lpn-spike/chrome-tokens-harness.js`.
+- **Not done, phase 1b:** one button base and one accent for menu items and toolbar buttons (R-202),
+  which is a visible change and so is not a token rewrite; and the inline colour literals in
+  `js/*.js` (about 90) and `Branched-Network.php`, held by a ceiling until they become `var(--ec-*)`.
+- **Left literal on purpose** (`chrome_colour_allow.json`): the map's own ink and paper, the print
+  sheet, the scale bar and colour legend that sit on the white drawing, and the one pre-existing
+  `prefers-color-scheme: dark` rule, which Phase 2 replaces.

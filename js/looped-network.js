@@ -368,6 +368,7 @@ var EngCalcs = EngCalcs || {};
 	// Final per-frame layout of one node's data label -- text position and its leader. Called from
 	// buildNodeEls(), updateNode() and refreshLabelText().
 	function layoutNodeLabel(id) {
+		labelCacheTaint();
 		var n = nodeById(id), ne = nodeEls[id]; if (!ne) { return; }
 		// **A DROPPED LABEL IS HIDDEN, NOT MOVED** (Task 398). Set before anything is placed, through
 		// the same visibility seam a too-short link label uses. `visibility` rather than `display`:
@@ -565,6 +566,7 @@ var EngCalcs = EngCalcs || {};
 	// write them all and then measure them all -- one layout for the batch instead of one each.
 	// renderLinkLabel() is the two halves back to back, for the callers that hold exactly one label.
 	function writeLabelGlyphs(le, l, lines, fsNow) {
+		labelCacheTaint();
 		// **OWNERS: which LINE each tspan came from** (Task 436), with -1 for a separator.
 		// composeRows() has always been able to report this; nothing read it until the shed cascade
 		// needed to price a subset of the values without redrawing them.
@@ -1143,6 +1145,7 @@ var EngCalcs = EngCalcs || {};
 	// exactly the zoom ratio, making obstacle boxes enormous when you zoom out.
 	// It is a WRITE, which is why it belongs in the write half and not beside the measurement.
 	function writeNodeLabelGlyphs(ne, n, lines, fsNow) {
+		labelCacheTaint();
 		var rows = composeRows(lines, true);   // a node label always stacks -- see composeRows()
 		setMultilineText(ne.text, nodeLabelBase(n).x, rows);
 		ne.lineCount = rows.length;
@@ -1370,14 +1373,15 @@ var EngCalcs = EngCalcs || {};
 	// three parts, and the stations are COUNTED, because the only input that varies with the view
 	// is how many copies of a label a long pipe carries.
 	function layoutLinkLabel(id) {
+		labelCacheTaint();
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
 		// Set BEFORE anything is placed, so every station obeys it.
 		le.hiddenShort = linkLabelTooShort(l, le);
 		// FOUR WAYS A LINK LABEL IS NOT DRAWN, ONE SEAM: too long for its own segment, shed out and
 		// still in conflict, standing on ground a node label has just taken (yieldStationedLabels()),
 		// or the losing half of a crossing nothing could repair (shedCrossingLabels(), Task 539).
-		setLabelAssemblyHidden(le, le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenYielded
-			|| !!le.hiddenCrossed);
+		var hideAll = le.hiddenShort || !!le.hiddenCrowded || !!le.hiddenYielded || !!le.hiddenCrossed;
+		setLabelAssemblyHidden(le, hideAll);
 		var single = linkLabelStations(l).length === 1,
 			stations = perfDebugAccum('  lkL:stations', function () {
 				return single ? [le.alignedAlong] : drawnLinkLabelStations(l);
@@ -1386,6 +1390,11 @@ var EngCalcs = EngCalcs || {};
 		perfDebugAccum('  lkL:repeats', function () {
 			ensureLabelRepeats(le, Math.max(0, stations.length - 1), id);
 		});
+		// **A COPY GROWN JUST NOW OBEYS THE HIDE TOO.** The hide above reached only the copies that
+		// already existed; one grown by ensureLabelRepeats() starts visible, so a crowded or yielded
+		// chain showed its new copies over the label it had given way to -- and whether it did
+		// depended on the zoom the copies were first grown at (found by label-bucket-cache-harness.js).
+		if (hideAll) { setLabelAssemblyHidden(le, true); }
 		// The link's own elements take the FIRST DRAWN station, not a fixed one: with every copy
 		// pickable they are interchangeable, and a chain whose first stations are off-screen still
 		// renders through the element bbox() and the popup know about.
@@ -1829,6 +1838,10 @@ var EngCalcs = EngCalcs || {};
 	// one row per call -- 119 pipes would bury the line it is printed on -- so these accumulate and
 	// are flushed as one row each when the report is taken.
 	var perfDebugSums = null;
+	// **A WHEEL NOTCH'S OWN ROWS ARE SUMMED, NOT LISTED** (Task 681(e)). A burst of twenty notches
+	// would otherwise print forty `fontWrite`/`symSizes` rows ahead of the one settle they lead to;
+	// onZoomChanged() raises this while it runs and counts the notch and its time instead.
+	var perfDebugQuiet = 0, perfZoomNotches = 0, perfZoomNotchMs = 0;
 	function perfDebugAccum(name, fn) {
 		if (!perfDebugOn()) { return fn(); }
 		var t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now()), out = fn();
@@ -1850,7 +1863,7 @@ var EngCalcs = EngCalcs || {};
 	// Times `fn` and records it under `name`. Returns whatever fn returned, so a caller can wrap a
 	// call in place without restructuring anything.
 	function perfDebugTime(name, fn) {
-		if (!perfDebugOn()) { return fn(); }
+		if (!perfDebugOn() || perfDebugQuiet) { return fn(); }
 		var t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now()), out = fn();
 		var t1 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
 		perfDebugRows.push(name + ' ' + (t1 - t0).toFixed(1) + 'ms');
@@ -10137,6 +10150,7 @@ var EngCalcs = EngCalcs || {};
 			fs * LPN_ALIGNED_PAD_FRAC;
 	}
 	function layoutCustomerLabels(obs) {
+		labelCacheTaint();
 		var list = doc.customers || [], fs, pad, gap;
 		if (!customerLabelsAttempted()) {
 			Object.keys(custLblEls).forEach(function (id) {
@@ -10848,6 +10862,7 @@ var EngCalcs = EngCalcs || {};
 	// line, 100% = far edge at the line -- flipping later means the leader reaches across the text.
 	var ADVERSE_FRAC = 0.75;
 	function updateLabelGeometry(id) {
+		labelCacheTaint();
 		var lb = labelById(id), le = labelEls[id], an = textAnchorPoint(lb), px, py, box, halfW, att;
 		if (!an) {
 			// repositionMultilineText(), not two setAttribute()s: every ROW of a multi-line label
@@ -11141,6 +11156,7 @@ var EngCalcs = EngCalcs || {};
 	// project reopen) recomputes everything properly; this is only what has to be true the instant
 	// an edit lands, with recalculate off and no solve running.
 	function refreshOneLabelInPlace(el) {
+		labelCacheTaint();
 		// A pass already owed runs first (Task 653), so this one label is reflowed among neighbours
 		// that are where the owed pass puts them. It is the pass somebody else asked for, not one
 		// this edit triggers: with nothing owed this is a no-op.
@@ -11871,7 +11887,16 @@ var EngCalcs = EngCalcs || {};
 		}
 		return out;
 	}
+	// **ZOOM TO FIT STARTS THE WHEEL'S NOTCHES AGAIN, SO IT STARTS THE BANK'S BUCKETS AGAIN** (Task
+	// 681). Every settle inside the fit re-anchors the bank at the scale being tested, so the fit
+	// still sees each scale laid out exactly (R-214), and the wheel notches counted from where it
+	// lands are bucket boundaries.
 	function zoomExtent(auto) {
+		labelCacheReanchorPending = true;
+		labelCacheReanchor++;
+		try { return zoomExtentRun(auto); } finally { labelCacheReanchor--; }
+	}
+	function zoomExtentRun(auto) {
 		if (!mapSized) { fitWhenSized = true; autoFitWhenSized = autoFitWhenSized || !!auto; return; }
 		// ASYMMETRIC PADDING, because the canvas has permanent furniture on it: the mode hint sits
 		// top-left and the coordinate readout bottom-left, both inside the SVG's box, so a fit that
@@ -43981,6 +44006,16 @@ var EngCalcs = EngCalcs || {};
 	// size-scaled threshold. The transition in either direction takes the full path, so nothing comes
 	// back stale. (Nothing hydraulic runs here either -- scheduleSolve() is never called from a zoom.)
 	function onZoomChanged() {
+		if (!perfDebugOn()) { onZoomChangedNow(); return; }
+		var t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+		perfDebugQuiet++;
+		try { onZoomChangedNow(); } finally {
+			perfDebugQuiet--;
+			perfZoomNotches++;
+			perfZoomNotchMs += (typeof performance !== 'undefined' ? performance.now() : Date.now()) - t0;
+		}
+	}
+	function onZoomChangedNow() {
 		// **ANYTHING DRAWN AT A SIZE IN SCREEN PIXELS HAS TO BE REDRAWN WHEN THE SCALE CHANGES**, or
 		// it is a constant in WORLD units instead and grows and shrinks with the drawing. Two things
 		// on this page are in that class, and the placement handles were the one that was missed:
@@ -44024,7 +44059,19 @@ var EngCalcs = EngCalcs || {};
 	// The debounced pass above, run NOW -- for Zoom to fit, which has to see the labels exactly as
 	// they will be drawn at the scale it is testing (R-214). Cancels the pending timer, so the same
 	// work is not done twice.
+	// **?debug=perf COVERS A ZOOM TOO** (Task 681): one line per settle, carrying how many notches
+	// led to it, what they cost between them, and what the settle itself cost.
 	function reshedNow() {
+		if (!perfDebugOn()) { reshedNowRun(); return; }
+		perfDebugRows.push('ZOOM notches ' + perfZoomNotches + ' (' + perfZoomNotchMs.toFixed(1) + 'ms)');
+		perfZoomNotches = 0; perfZoomNotchMs = 0;
+		perfDebugTime('labelSettle', reshedNowRun);
+		if (labelCacheEnabled && !dataLabelsHidden) {
+			perfDebugRows.push('bank ' + (labelCacheMiss ? 'miss (' + labelCacheMiss + ')' : 'hit'));
+		}
+		perfDebugReport();
+	}
+	function reshedNowRun() {
 		if (reshedTimer) { clearTimeout(reshedTimer); }
 		reshedTimer = null;
 		// Task 647: this is the zoom gesture's own "settled" signal -- one notch or a whole wheel
@@ -44033,11 +44080,299 @@ var EngCalcs = EngCalcs || {};
 		// whether the model is on screen).
 		updateOffscreenNotice();
 		if (dataLabelsHidden) { return; }   // nothing drawn, nothing to decide
+		if (labelCacheEnabled) { labelCacheSettle(); return; }
+		zoomLabelPass();
+	}
+	// The zoom path's whole placement: the link shed re-decided at this scale, then the collision
+	// pass with the node shed. **THE PLACER IS CALLED HERE AND NOWHERE ELSE ON THE ZOOM PATH**, so
+	// the bank below wraps this call and never looks inside it -- whichever placer relayoutLabels()
+	// runs, the bank keeps what it decided.
+	function zoomLabelPass() {
+		// Counted with an explicit 1: the bare form marks the CONTENT pass, and three harnesses
+		// find that one by its exact text.
+		perfDebugCount('labelPasses', 1);
+		labelCachePasses++;
 		beginLinkGeomHold();
 		try {
 			reshedLinkLabels(effectiveFontSize() + 'px', effectiveFontSize());
 			relayoutLabels(true);   // a zoom changes the fit, so the node shed is re-decided too
 		} finally { endLinkGeomHold(); }
+	}
+	/**
+	 * ---- THE LABEL LAYOUT, BANKED PER ZOOM BUCKET (ROADMAP Task 681(c)/(d)) ----------------------
+	 *
+	 * Tom, 2026-09-17: *"We should be able to save label position and shedding state for every node
+	 * at every zoom level. And I assume that that would give us almost instantaneous zooming."* And
+	 * the rule that shapes it: *"What we need to be vigilant for is unnecessary passes. We have to be
+	 * aware of whether the pre-placements are final or not. I would agitate for using the next more
+	 * zoomed out (larger text) bucket and not revisiting it. And of course the buckets should
+	 * correlate to the PC mouse zoom levels."*
+	 *
+	 * **THE KEY IS A BUCKET OF THE SCALE; THE VIEW IS NEVER SNAPPED** (Task 683 ruled snapping out).
+	 * Bucket k covers [anchor x 1.1^k, anchor x 1.1^(k+1)): the boundaries ARE the wheel's notches
+	 * (wheelZoom()'s 1.1), counted from the scale the bank was started at -- the first settle after
+	 * it was emptied, or the scale Zoom to fit lands on. So a wheel, the +/- keys and the chip only
+	 * ever land ON a boundary, and every bucket they visit is laid out at exactly the scale on the
+	 * screen: for them the bank changes nothing but the cost of coming back.
+	 *
+	 * **A SCALE BETWEEN TWO NOTCHES ROUNDS OUTWARD, NEVER TO NEAREST** -- a pinch, a zoom window.
+	 * It takes the bucket whose boundary is the more zoomed-out notch, where the text is LARGER in
+	 * world units, so a layout clear at that notch stays clear as the lettering shrinks toward its
+	 * anchors. A bucket not yet banked is laid out AT THAT NOTCH (the view is lent the notch's scale
+	 * for the length of the pass, about its own centre), and the answer is FINAL: no refinement pass
+	 * at the exact scale follows, which is the cost this exists to remove. Its labels are then drawn
+	 * where the notch put them, at the size the screen asks for.
+	 *
+	 * **A STALE LABEL IN THE WRONG PLACE IS WORSE THAN A SLOW ONE**, so the bank is emptied, whole,
+	 * by anything that could change an answer in it:
+	 *   * ANY label work outside the bank -- a content pass (a solve, a time step, a unit, a scenario,
+	 *     a label setting), a relayout for any reason (a settings change, a drag), or one label laid
+	 *     out on its own (an element moved, added or edited). labelCacheTaint() sits in each of
+	 *     those functions, so a new caller of any of them cannot forget to invalidate.
+	 *   * a change to what feeds placement without touching a label: the canvas size, the settings
+	 *     and label settings, the solve result, the drawing on screen (a project switch swaps it),
+	 *     the element counts, georeferencing. Compared on every settle (labelCacheInputs()).
+	 *   * and per bucket, a pan that brings a chain station into view that the bucket never placed.
+	 * Language is a page load, which empties everything anyway.
+	 */
+	var LABEL_BUCKET_STEP = 1.1;                 // wheelZoom()'s own notch
+	var labelCacheEnabled = true;                // a harness switch: the same session with and without
+	var labelCacheInvalidates = true;            // a harness switch: proves the invalidation has teeth
+	var labelCache = { anchor: null, entries: {}, order: [], inputs: null, solve: null, drawing: null, gen: -1 };
+	var labelCacheGen = 0, labelCacheOwn = 0, labelCacheReanchor = 0, labelCacheReanchorPending = false;
+	// A bucket is a few hundred small records; the wheel's whole range is about a hundred notches.
+	// Bounded anyway, oldest banked first out, so no session grows without limit.
+	var LABEL_BUCKET_MAX = 48;
+	// Counted, because a bank that quietly never hits looks exactly like one that works.
+	var labelCachePasses = 0, labelCacheHits = 0, labelCacheMiss = '';
+	// **EVERY WRITER OF LABEL LAYOUT CALLS THIS FIRST.** While the bank itself is laying labels out
+	// (labelCacheOwn) it is the bank's own work and changes nothing; anything else is a change.
+	function labelCacheTaint() {
+		if (!labelCacheOwn && labelCacheInvalidates) { labelCacheGen++; }
+	}
+	function labelCacheClear(why) {
+		labelCache.entries = {};
+		labelCache.order = [];
+		labelCache.anchor = null;
+		labelCacheMiss = why || '';
+	}
+	// What feeds placement without passing through a label writer. Cheap: two small objects as
+	// JSON, the canvas box and a handful of counts, once per settle.
+	function labelCacheInputs() {
+		var b = mapBox();
+		return [b.w, b.h, JSON.stringify(settings), JSON.stringify(labelSettings), library.openId,
+			doc.nodes.length, doc.links.length, doc.labels.length,
+			// A meter moved by hand re-draws its own geometry, which is per notch too and so cannot
+			// carry the taint; its position is read here instead.
+			JSON.stringify(doc.customers || []),
+			georef ? 1 : 0, georefActive() ? 1 : 0].join('|');
+	}
+	function labelCacheCheckInputs() {
+		var inputs = labelCacheInputs(), C = labelCache;
+		if (!labelCacheInvalidates) {
+			if (C.inputs === null) { C.inputs = inputs; C.solve = lastSolveResult; C.drawing = nodeEls; C.gen = labelCacheGen; }
+			return;
+		}
+		if (C.inputs !== inputs || C.solve !== lastSolveResult || C.drawing !== nodeEls || C.gen !== labelCacheGen) {
+			labelCacheClear(C.inputs === null ? 'empty' : 'changed');
+			C.inputs = inputs; C.solve = lastSolveResult; C.drawing = nodeEls; C.gen = labelCacheGen;
+		}
+	}
+	// Bucket index of a scale. The 1e-7 is float dust: a scale ten notches in and ten out lands a
+	// few ulps either side of where it started, and must land in the SAME bucket.
+	function labelBucketOf(sc) {
+		return Math.floor(Math.log(sc / labelCache.anchor) / Math.log(LABEL_BUCKET_STEP) + 1e-7);
+	}
+	function sameScale(a, b) { return Math.abs(a / b - 1) < 1e-9; }
+	/**
+	 * Runs fn with the view lent the scale `sc`, about the view's own centre, and as the bank's own
+	 * work. Nothing is drawn while it is lent -- the transform is not written and fn is synchronous --
+	 * so the reader never sees the borrowed scale; only the placement reasons at it.
+	 */
+	function withBucketView(sc, fn) {
+		var s0 = state.s, tx0 = state.tx, ty0 = state.ty, b, cx, cy;
+		labelCacheOwn++;
+		beginMapBoxHold();
+		try {
+			if (!sameScale(sc, s0)) {
+				b = mapBox(); cx = b.w / 2; cy = b.h / 2;
+				state.s = sc;
+				state.tx = cx - (cx - tx0) / s0 * sc;
+				state.ty = cy - (cy - ty0) / s0 * sc;
+			}
+			return fn();
+		} finally {
+			state.s = s0; state.tx = tx0; state.ty = ty0;
+			endMapBoxHold();
+			labelCacheOwn--;
+		}
+	}
+	// Chain stations depend on the view (drawnLinkLabelStations() culls to it), so a bucket records
+	// which ones it placed; read under the bucket's own view.
+	function chainStationsNow() {
+		var out = {};
+		doc.links.forEach(function (l) {
+			if (linkEls[l.id] && linkLabelStations(l).length > 1) { out[l.id] = drawnLinkLabelStations(l); }
+		});
+		return out;
+	}
+	/**
+	 * **WHAT A PLACER KEEPS OUTSIDE THE HOLDERS, IT REGISTERS HERE** -- the seam with the placement
+	 * rebuild (feat/label-placer). The shipped placer leaves every decision on the holders, which the
+	 * bank already copies; a contract placer that keeps its layout in a runtime of its own (its
+	 * `placed` map and the scale it was laid at) pushes one { capture, restore } pair, and a banked
+	 * bucket then carries and puts back that state too. capture() returns a copy; restore(copy) runs
+	 * before the position loops, so they redraw from it.
+	 */
+	var labelBankParts = [];
+	function grabBucketHolder(h) {
+		return { nudge: h.nudge ? { x: h.nudge.x, y: h.nudge.y } : null, nudgeManual: !!h.nudgeManual,
+			placedSide: h.placedSide, side: h.side, lines: h.lines ? h.lines.slice() : null,
+			lineCount: h.lineCount, shedCount: h.shedCount || 0,
+			hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded, hiddenYielded: !!h.hiddenYielded,
+			hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
+			alignedAlong: h.alignedAlong, stationSides: h.stationSides ? h.stationSides.slice() : h.stationSides,
+			tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
+			rowW: h.rowW ? h.rowW.slice() : null, rowWPx: h.rowWPx ? h.rowWPx.slice() : null,
+			segW: h.segW ? h.segW.slice() : null };
+	}
+	function captureLabelBucket(sc) {
+		var e = { scale: sc, nodes: {}, links: {}, texts: {}, custs: {}, chains: chainStationsNow(),
+			parts: labelBankParts.map(function (p) { return p.capture(); }) };
+		Object.keys(nodeEls).forEach(function (id) { e.nodes[id] = grabBucketHolder(nodeEls[id]); });
+		Object.keys(linkEls).forEach(function (id) { e.links[id] = grabBucketHolder(linkEls[id]); });
+		Object.keys(labelEls).forEach(function (id) { e.texts[id] = grabBucketHolder(labelEls[id]); });
+		Object.keys(custLblEls).forEach(function (id) {
+			var ce = custLblEls[id];
+			e.custs[id] = { hidden: ce.text.style.visibility === 'hidden', spot: ce.spot, trials: ce.trials };
+		});
+		return e;
+	}
+	// Why a banked bucket cannot be used as it stands; '' when it can. Read under the bucket's view.
+	function labelBucketMiss(e) {
+		var why = '';
+		if (!labelCacheInvalidates) { return ''; }   // the harness's mutation switch: no check at all
+		function same(what, map, els) {
+			if (why) { return; }
+			var a = Object.keys(map), b = Object.keys(els), i;
+			if (a.length !== b.length) { why = what + ' count'; return; }
+			for (i = 0; i < b.length; i++) { if (!map[b[i]]) { why = what + ' ' + b[i]; return; } }
+		}
+		same('node', e.nodes, nodeEls); same('link', e.links, linkEls); same('text', e.texts, labelEls);
+		same('customer', e.custs, custLblEls);
+		if (why) { return why; }
+		var now = chainStationsNow(), id, k, had;
+		for (id in now) {
+			if (!Object.prototype.hasOwnProperty.call(now, id)) { continue; }
+			had = e.chains[id];
+			if (!had) { return 'chain ' + id; }
+			for (k = 0; k < now[id].length; k++) {
+				if (had.indexOf(now[id][k]) < 0) { return 'station on ' + id; }
+			}
+		}
+		return '';
+	}
+	function sameLines(a, b) {
+		var i;
+		if (!a || !b || a.length !== b.length) { return false; }
+		for (i = 0; i < a.length; i++) { if (a[i] !== b[i]) { return false; } }
+		return true;
+	}
+	function restoreBucketHolder(h, c) {
+		h.nudge = c.nudge ? { x: c.nudge.x, y: c.nudge.y } : { x: 0, y: 0 };
+		h.nudgeManual = c.nudgeManual; h.placedSide = c.placedSide; h.side = c.side;
+		h.shedCount = c.shedCount;
+		h.hiddenShort = c.hiddenShort; h.hiddenCrowded = c.hiddenCrowded; h.hiddenYielded = c.hiddenYielded;
+		h.hiddenCrossed = c.hiddenCrossed; h.hiddenDropped = c.hiddenDropped;
+		h.alignedAlong = c.alignedAlong;
+		h.stationSides = c.stationSides ? c.stationSides.slice() : c.stationSides;
+		h.tw = c.tw; h.twPx = c.twPx; h.width = c.width; h.widthPx = c.widthPx;
+		h.rowW = c.rowW ? c.rowW.slice() : null; h.rowWPx = c.rowWPx ? c.rowWPx.slice() : null;
+		h.segW = c.segW ? c.segW.slice() : null;
+	}
+	// **PUTTING A BANKED BUCKET BACK.** The decisions are written onto the holders, the glyphs only
+	// where the bucket's content differs from what is drawn, and then the same three position loops
+	// relayoutLabels() ends with. No shed, no placement, no measurement.
+	function applyLabelBucket(e) {
+		var fsNow = effectiveFontSize() + 'px';
+		beginLinkGeomHold();
+		try {
+			doc.nodes.forEach(function (n) {
+				var ne = nodeEls[n.id], c = e.nodes[n.id];
+				if (!ne || !c) { return; }
+				if (c.lines && !sameLines(ne.lines, c.lines)) { writeNodeLabelGlyphs(ne, n, c.lines.slice(), fsNow); }
+				ne.lineCount = c.lineCount;
+				restoreBucketHolder(ne, c);
+			});
+			doc.links.forEach(function (l) {
+				var le = linkEls[l.id], c = e.links[l.id];
+				if (!le || !c) { return; }
+				if (c.lines && !sameLines(le.lines, c.lines)) { writeLabelGlyphs(le, l, c.lines.slice(), fsNow); }
+				le.lineCount = c.lineCount;
+				restoreBucketHolder(le, c);
+			});
+			Object.keys(e.texts).forEach(function (id) {
+				var te = labelEls[id]; if (te) { restoreBucketHolder(te, e.texts[id]); }
+			});
+			labelBankParts.forEach(function (p, i) { p.restore(e.parts[i]); });
+			doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
+			doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
+			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
+			Object.keys(e.custs).forEach(function (id) {
+				var ce = custLblEls[id], c = e.custs[id], sp = c.spot;
+				if (!ce) { return; }
+				ce.trials = c.trials;
+				if (c.hidden || !sp) { setLabelAssemblyHidden(ce, true); return; }
+				ce.spot = sp;
+				setLabelAssemblyHidden(ce, false);
+				ce.text.setAttribute('text-anchor', sp.hAlign);
+				ce.text.setAttribute('transform', 'rotate(' + sp.angle.toFixed(3) + ' ' + sp.ax + ' ' + sp.ay + ')');
+				repositionMultilineText(ce.text, sp.ax, sp.ay);
+			});
+		} finally { endLinkGeomHold(); }
+	}
+	// The zoom settle, through the bank.
+	function labelCacheSettle() {
+		// A content pass somebody already asked for runs FIRST, outside the bank, so it empties it.
+		labelCacheMiss = '';
+		flushLabelRefresh();
+		labelCacheCheckInputs();
+		var C = labelCache, s = state.s, k, sc, e, why;
+		// Zoom to fit moves the notches, so it moves the boundaries: every settle inside a fit, or
+		// the first one after a fit that ran none, starts the buckets again at the scale on screen.
+		if (labelCacheReanchor || labelCacheReanchorPending || C.anchor === null) {
+			if (C.anchor === null || !sameScale(C.anchor, s)) {
+				if (C.anchor !== null) { labelCacheClear('re-anchored'); }
+				C.anchor = s;
+			}
+			if (!labelCacheReanchor) { labelCacheReanchorPending = false; }
+		}
+		k = labelBucketOf(s);
+		sc = C.anchor * Math.pow(LABEL_BUCKET_STEP, k);
+		e = C.entries[k];
+		if (e) {
+			// The bucket's own scale, or the one on screen when they are the same notch: a scale
+			// reached by ten wheel notches differs from anchor x 1.1^10 in the last bits.
+			sc = sameScale(e.scale, s) ? s : e.scale;
+			why = withBucketView(sc, function () { return labelBucketMiss(e); });
+		} else {
+			if (sameScale(sc, s)) { sc = s; }
+			why = (labelCacheMiss ? labelCacheMiss + ', so ' : '') + 'not banked';
+		}
+		if (!why) {
+			labelCacheHits++;
+			labelCacheMiss = '';
+			withBucketView(sc, function () { applyLabelBucket(e); });
+		} else {
+			labelCacheMiss = why;
+			C.entries[k] = withBucketView(sc, function () { zoomLabelPass(); return captureLabelBucket(sc); });
+			C.order = C.order.filter(function (x) { return x !== k; });
+			C.order.push(k);
+			while (C.order.length > LABEL_BUCKET_MAX) { delete C.entries[C.order.shift()]; }
+		}
+		// Drawn where the notch put them, at the size the screen asks for.
+		if (sc !== s) { refreshFontSizes(true); }
+		lastLayoutScale = s;
 	}
 	// ID-prefix validation, same illegal-character set as validateNewId() (no spaces/quotes) plus
 	// non-empty -- a prefix becomes the leading substring of every future auto-generated ID for that
@@ -55519,6 +55854,7 @@ var EngCalcs = EngCalcs || {};
 		// part of this pass a suppressor has no business cancelling.
 		// A synchronous pass answers every request made before it (see requestLabelRefresh()).
 		labelRefreshPending = false;
+		labelCacheTaint();
 		if (dataLabelsHidden) { labelWorkSkipped = true; refreshLabelPassTail(); return; }
 		perfDebugCount('labelPasses');
 		beginMapBoxHold();
@@ -56029,6 +56365,7 @@ var EngCalcs = EngCalcs || {};
 	// of a drag -- is position only, and places the content the last content pass decided.
 	var lastLayoutScale = null;
 	function relayoutLabels(shedNodes) {
+		labelCacheTaint();   // the zoom-bucket bank: any layout it did not ask for empties it
 		// Placing text that a requested content pass is about to rewrite would place the old text
 		// (Task 653). Inside the pass itself nothing is owed, so this is a no-op there.
 		flushLabelRefresh();

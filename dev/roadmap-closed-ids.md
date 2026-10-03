@@ -661,3 +661,5 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|690| CLOSED 2026-10-01: everything named under it shipped; its last child, Task 743 (graph tabs), merged on Tom's word.
 - 0|747| CLOSED 2026-10-02: merged with feat/copy-lock on Tom's "Merge after wording" (87a4d527); on open, a lock this browser cannot vouch for asks Original or Copy.
 - 0|701| CLOSED 2026-10-02 on `chore/panel-guard`: `panel-touch-harness.js` section 2b declares every conditional or computed display write (function + element + reason), section 2c fails if anything but `applyPaneLayout()` (or `applyRPaneLayout()`) opens or closes the bottom (or right) panel, in the DOM or in the state flag. Proved by a temporary second door that failed three assertions.
+- 0|640| CLOSED 2026-10-03: the Graphs fly-out under Water (Profile, Time series, Frequency) merged on Tom's "Done. Close, merge, and delete branch."; Contour and System flow stay with Task 600.
+- 0|680| CLOSED 2026-10-03: `feat/drawing-keep` merged on Tom's word; a switch keeps up to four drawings and runs no placement pass.

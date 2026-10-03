@@ -312,7 +312,7 @@ console.log('\n--- item 6(a): the pin is on the ID’s own line ---');
 	const idTd = td('junctions', ids[0], 'id');
 	report(String(idTd['class'] || '').indexOf('lpn-pane-idcell') >= 0,
 		'the ID cell says which cell it is', String(idTd['class']));
-	const css = require('fs').readFileSync('css/engcalcs.css', 'utf8');
+	const css = require('./css-tokens.js').readCss('css/engcalcs.css');
 	report(/td\.lpn-pane-idcell\s*\{[^}]*white-space:\s*nowrap/.test(css),
 		'...and the stylesheet keeps its two controls on one line');
 	// The pin must still be the SECOND control, or the caret would land on it instead of the box.
@@ -416,7 +416,7 @@ console.log('\n--- item 9: an inactive tab says it is one ---');
 {
 	// Tom: "Currently, all the non-active tables are undecorated plain text, which doesn't really
 	// say 'I'm an inactive tab.'" Asserted against the stylesheet, which is where the answer is.
-	const css = require('fs').readFileSync('css/engcalcs.css', 'utf8');
+	const css = require('./css-tokens.js').readCss('css/engcalcs.css');
 	const rest = (css.match(/\n\.lpn-pane-tab \{([^}]*)\}/) || [])[1] || '';
 	report(/background:\s*#[0-9a-f]{3,6}/i.test(rest),
 		'an inactive tab has a ground of its own, not `none`', rest.replace(/\s+/g, ' ').trim());

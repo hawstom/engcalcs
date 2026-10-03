@@ -27,7 +27,7 @@ paraphrase is how "put station and offset in Find" becomes "improve Find". `revi
 reads this file, prints every OPEN row, and fails only on a malformed one; deciding an item is
 judgement and does not belong to a script.
 
-**An ID is permanent and never reused.** Next free: R-379. (R-282 is taken on `feat/label-gang-search`.)
+**An ID is permanent and never reused.** Next free: R-385. (R-282 is taken on `feat/label-gang-search`.)
 
 ---
 
@@ -128,10 +128,20 @@ judgement and does not belong to a script.
 
 - [ ] R-370 feat/property-graph | "(1) You may want to check with Mary, but I am pretty sure that the industry term is pump "Head", not "Head gain". (2) And as such, "Hg" can be just "H". (3) Yes, pumps left out of highest head loss." -- build agent renaming on feat/property-graph
 - [ ] R-371 feat/criticality | "Proceed with the rest of the task." -- severity order and row tints being built on feat/criticality
-- [ ] R-372 feat/bentley-interop | "Alt. preview is good. It's of course critical that we have consistent styles throughout the app." -- nothing to build; awaiting his merge word
-- [ ] R-373 feat/graph-menu | "(1) We can remove the graph icon from the Profile command now. (2) Tip: "Graphs: Profile, Time Series, and Frequency distribution". In general, keep things simple." -- build agent on feat/graph-menu
+- [x] R-372 feat/bentley-interop | "Alt. preview is good. It's of course critical that we have consistent styles throughout the app." -- nothing to build; awaiting his merge word
+- [x] R-373 feat/graph-menu | "(1) We can remove the graph icon from the Profile command now. (2) Tip: "Graphs: Profile, Time Series, and Frequency distribution". In general, keep things simple." -- build agent on feat/graph-menu
 - [ ] R-374 feat/demand-scaling | "It appears that Find doesn't respect "Selected junctions"." -- build agent reproducing on feat/demand-scaling
 - [x] R-375 feat/desktop | (usage logs in a desktop build, off or reported to hawsedc.com) "I think logs are important to help focus development effort." -- ruled; carried in the handoff for feat/desktop: report to hawsedc.com, which makes it an outside call the desktop build must disclose and gate on consent
 - [x] R-376 -- | (browser EPANET) "There is such a thing?" -- answered 2026-10-02: epanet-js's app (app.epanetjs.com, Luke Butler's company) is one; our Looped Network runs the same EPANET engine in the browser
 - [ ] R-377 -- | (Time series graph, sloping or stepped) "Do both, each as the situation requires." -- built on feat/property-graph with R-370
 - [x] R-378 -- | "Set up the branch previews here." (jasmine) -- ~/webdev/worktrees/_panel, php -S per port on loopback, reached by SSH forwarding; see handoff
+
+
+## Round of 2026-10-03 -- his pass over 8106-8114
+
+- [ ] R-379 feat/property-graph | "Regression: Selecting a pump or pipe (but not a junction or reservoir) opens properties narrow ... and full height from bottom of screen to top of map. And when I move the box, it expands ... and contracts ... automatically. Once I manually size it, it stops acting like that. (2) Other than that, it looks great." -- build agent fixing on feat/property-graph
+- [ ] R-380 feat/demand-scaling | "The Time Series graph shows all the selected junctions above 55 psi at 7:00. But Scaling Find says '⚠ At least one junction is below 20 psi even with the scaled demands at zero.'" -- build agent on feat/demand-scaling
+- [x] R-381 feat/demand-scaling | "it would be really nice if the tables could filter on the selection." -- Task 757 at 75
+- [ ] R-382 feat/keyboard-menu | "What Declan really needs are menu mnemonics ... once in keyboard mode, the mnemonic for all the menus should highlight or underline." -- Ida consulted; building on feat/keyboard-menu
+- [x] R-383 -- | Merged on his word 2026-10-03: graph-menu, drawing-keep ("simply a performance improvement that prevents placement recalc on switching"), property-arrow-key, fix/undo-label, bentley-interop (recut as the long-term branch)
+- [x] R-384 feat/desktop | "Such consents are usually given on install." -- written into dev/desktop-platforms-plan.md on feat/desktop
