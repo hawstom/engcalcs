@@ -357,7 +357,8 @@ console.log('\n--- six tabs, one renderer ---');
 	// that lands.
 	// **TEN SINCE TASK 247**: Customers joined, with the tables, before the two drawings.
 	// **ELEVEN SINCE TASK 600**: Frequency joined the drawings, between Time series and Profile.
-	report(L.paneTabIds().length === 11, 'eleven tabs in all', String(L.paneTabIds().length));
+	// **TWELVE SINCE TASK 600's flow balance**: System flow joined them, after Frequency.
+	report(L.paneTabIds().length === 12, 'twelve tabs in all', String(L.paneTabIds().length));
 	report(L.paneTabIds().indexOf('text') === 6 && ids.indexOf('text') === 6,
 		'Text IS a tab since 2026-09-08 (Tom), after the six that solve and before the drawings');
 	report(L.paneTabIds().indexOf('timeseries') === 8,

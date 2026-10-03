@@ -226,8 +226,8 @@ console.log('\n--- 6. the tab order this harness assumes for stepping onto the g
 	// Task 743: the strip's visual order is the eight tables, then Time series, then Frequency,
 	// then Profile -- the whole thing is now one walk, not two.
 	const tabs = L.tabIds();
-	report(tabs.join(',') === order.join(',') + ',timeseries,frequency,profile',
-		'tables, then Time series, then Frequency, then Profile, in that order', JSON.stringify(tabs));
+	report(tabs.join(',') === order.join(',') + ',timeseries,frequency,sysflow,profile',
+		'tables, then Time series, Frequency, Flow balance, then Profile, in that order', JSON.stringify(tabs));
 }
 
 console.log('\n--- 7. mid-edit, the typed value is committed before the switch, never lost ---');
@@ -318,6 +318,13 @@ console.log('\n--- 9. (Task 743) stepping onward from the last TABLE onto the gr
 
 	const claimed3 = pressPageKey('frequency', 'PageDown', { shift: true });
 	report(claimed3, 'Ctrl+Shift+PageDown FROM Frequency is claimed');
+	report(L.activeTab() === 'sysflow', 'the tab moved on to Flow balance', L.activeTab());
+	// System flow has no controls at all, so focus lands on its panel -- which is where the key
+	// listener lives, so the next press still steps.
+	report(L.focusedId() === 'lpn_pane_sysflow',
+		'and, with no control of its own, focus landed on its panel', L.focusedId());
+	const claimed3b = pressPageKey('sysflow', 'PageDown', { shift: true });
+	report(claimed3b, 'Ctrl+Shift+PageDown FROM Flow balance is claimed');
 	report(L.activeTab() === 'profile', 'the tab moved on to Profile, the LAST tab on the strip', L.activeTab());
 	report(L.focusedId() === 'lpn_profile_edit_btn',
 		'and landed on Profile\'s own first (and only) control, its Edit button', L.focusedId());
@@ -331,7 +338,9 @@ console.log('\n--- 9. (Task 743) stepping onward from the last TABLE onto the gr
 	// And back, the whole way: Profile -> Frequency -> Time series -> Customers.
 	const back1 = pressPageKey('profile', 'PageUp', { shift: true });
 	report(back1, 'Ctrl+Shift+PageUp FROM Profile is claimed');
-	report(L.activeTab() === 'frequency', 'Profile -> Frequency', L.activeTab());
+	report(L.activeTab() === 'sysflow', 'Profile -> Flow balance', L.activeTab());
+	pressPageKey('sysflow', 'PageUp', { shift: true });
+	report(L.activeTab() === 'frequency', 'Flow balance -> Frequency', L.activeTab());
 	report(L.focusedId() === 'lpn_freq_group', 'landing again on Frequency\'s first control', L.focusedId());
 
 	pressPageKey('frequency', 'PageUp', { shift: true });

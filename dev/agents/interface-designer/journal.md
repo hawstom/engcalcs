@@ -3644,3 +3644,38 @@ CITED (not read at source): WCAG 1.4.13 (dismissible, hoverable, persistent). OB
 **Not found / not checked:** no reader was shown any of this; the 44 px touch target, Russian
 everyday usage of "highlight", and a popover's behaviour when its box closes are SPECULATION. I
 did not prototype the popover. The category counts are one reader, one pass (plus or minus ten).
+
+## 2026-10-03 — Tips follow-up: Tom's Q4 and Q7 (`chore/ida-tip-2`)
+
+Tom's challenge to Q4 was right: I had put "hover for icon-only buttons" and "`?` for explanations"
+in one recommendation without saying that I was dividing, or why. Written down now in
+`dev/tip-followup-2026-10-03.md`.
+
+**Two tiers, drawn by content.** CITED (Apple HIG, Offering help, developer.apple.com/design/human-interface-guidelines/offering-help;
+Carbon, carbondesignsystem.com/components/tooltip/usage/; NN/g, nngroup.com/articles/tooltip-guidelines/):
+a hover tip says what a control is or does, in a few words; anything longer or interactive goes behind
+a clicked glyph. Spectrum's contextual help says the same (CITED, search excerpt only; its pages 404'd
+to my fetcher). Apple's number is 60 to 75 characters. OBSERVED (`dev/tip-review.csv`): only 54 of 272
+tips (20%) fit in 75 characters; median 133. So most of our tips are tier 2 content on a tier 1
+delivery, which is a cleaner statement of the audit's finding than "too long".
+
+**Departure volunteered:** our `?` also opens on hover; Carbon's toggletip is click only. SPECULATION
+that it is harmless; no source for it either way.
+
+**Q7, menu-item help.** Autodesk and Bentley: hover tooltip (CITED, Autodesk help GUID-685FC42D...
+read; Bentley excerpts only). Adobe Spectrum Menu: a description line inside the item (CITED,
+react-spectrum.adobe.com/react-spectrum/Menu.html, read). Apple: Menus page says nothing (OBSERVED
+by fetch, 2026-10-03). AutoCAD's status-bar menu help was removed around 2015/2016: a USER'S forum
+post only, SPECULATION as to the vendor's reason; Autodesk confirmation not found. I withdraw my
+earlier "description line inside the menu" suggestion: only Adobe does it and it costs a line per
+item in 27 languages. Tooltip on the item is cheaper and has more precedent.
+
+**Not verified:** Photoshop/Illustrator menus; WaterGEMS menu bar; Material 3 tooltips page (unreadable);
+every Bentley page except as search excerpts; the Apple `NSMenuItem.toolTip` body.
+
+**Q8 deliverable:** `dev/tip-review.csv`, 272 rows (268 `lpn_*_tip` plus `lpn_tip_join`,
+`lpn_file_saveas_tip_download`, `lpn_tip_select`, `lpn_tip_labels_draggable`). `ruled` = yes on 108
+by exact-text match in `dev/english-key-rulings.json` (OBSERVED, same as the audit's count).
+Categories this pass: helpful 194, long 32 (45+ words, regex word count), restates 32, icon-name 9,
+filler 5; one reader, plus or minus ten. `where` is derived from key names, not clicked through
+(SPECULATION in the places it is generic).

@@ -3685,6 +3685,33 @@ TRAP for method: Session Save as needs answerTrainingPanel() then a second queue
 - NOT EXERCISED: Settings changes, recalc-off edits, hover/select, pinch, real customers, georeference change.
 - Method: snapshots must exclude other tabs' kept (display:none) layers; tab order at load is nondeterministic, so verify the current tab by name. Never pkill -f with a pattern that matches your own shell command.
 
+## 2026-10-03 -- pre-review feat/contour c07094a8 (Task 600), Perry
+
+- OBSERVED (headless Chrome, php -S on the worktree, Net3 and Net3-Novato-CA-World): Graphs > Contour turns on filled contours and opens Settings at Node colors; Filled / Line / None all draw and clear; 1 layer under the pipes; legend sentence present. Recalculate off + node drag: plot unchanged until Calculate (snapshot holds, but the old outline stays where the node used to be). Play at 1x, nodal plot: no long tasks, 60 fps, redrawn once per step.
+- OBSERVED: 3x median leaves 39% of Net3's pipe length (40% Novato) outside the fill, whole outer loops bare. 6x gives 95%, unlimited 98% (copy with the factor tunable).
+- OBSERVED: nodal fill puts a low-pressure halo round each tank (tank level used as pressure); gone with the ground option.
+- OBSERVED (Mapbox tiles stubbed in page; the real token answers 401 "Invalid Token" from jasmine): with the ground option on, Play has ~22 long tasks up to ~150 ms in 9 s, and re-reads the ground tiles twice per pass (18 tile requests) because a one-entry cache is keyed on the plot outline, which moves when controls open/close pipes.
+- OBSERVED: the contour consent dialog says "the area ... as tile numbers" in paragraph 1 and then "these positions ... those coordinates" and "May we send your node positions" (paragraphs 2-3 unchanged). privacy.php still lists only "Ground elevations".
+- OBSERVED: a file saved with the ground option ticked opens on a browser with no terrain yes with the box ticked, no question, nodal plot, nothing in the legend.
+- OBSERVED clean: no new host, cookie or localStorage key (ec_terrain only on yes, a no stores nothing); settings ride in the project and survive reload; tab switching leaves one layer; .inp export byte-identical with the settings on or off.
+- OBSERVED (mutation, scratch copy): harness stays green with the 3x edge limit removed, with pumps joined, with closed links joined. Its "gap" case is two unconnected arms, so the zone rule masks it alone.
+- Method: tab order at load is nondeterministic, click the tab by name. My `pkill -f` matched my own shell again (exit 144): never pkill with a pattern on the command line.
+
+## 2026-10-03 -- pre-review feat/contour acb3c811 (contour rework), Perry
+
+- OBSERVED (real headless Chrome via playwright-core Session, Net3, 1400x900 and 390x844): all loops filled at the 2.5x default; soft fade round the corridor ends; contour lines smooth at 1x and 2x zoom; 42 labels at 5 psi, 108 at 1 psi, zero label-label and zero label-over-node-label overlaps; a zoom keeps labels ~15.5 px; 8 colour-by choices draw without error (Head draws the wall at the closed Lake pump too).
+- OBSERVED: wall (black casing) drawn at the River pump 335 only; the closed Lake pump 10 shows no wall under Pressure (its far side is the same zone). No valve in Net3, so the in-zone fault line is verifiable only in the node harness.
+- OBSERVED: storage: one new key lpn_contourbox {left,top,w,h,open}, written on open and on close; toggling interval/opacity/labels/buffer writes nothing else; no cookie, no IndexedDB change. Contour settings ride in the project.
+- OBSERVED: the box opens centred on the map and hides most of the network on a desk; on a phone it fills the screen (like Find), so the map cannot be watched while tuning. Play with contour on: 2 long tasks of ~60 ms in 5 s, none with it off.
+- NOT EXERCISED: Recalculate-off with a pressure-changing edit (only an unconnected node), Mapbox DEM option (needs token), real valve.
+- Method: playwright Session scripts in scratchpad; close the box with #lpn_contour_close.
+
+## 2026-10-03 feat/flow-balance @ 15250325 (Task 600, System flow tab)
+
+- CITED: EPANET 2.2 Delphi_GUI/epanet2w/Fgraph.pas GetSysFlow: loop `for i := JUNCS to RESERVS`, demand > 0 adds to CONSUMED, else subtracted into PRODUCED; tanks excluded. Builder's definition matches exactly.
+- OBSERVED (headless Chromium, this tree): Net1 and Net3 draw 25 points per line; the "now" line follows the step selector; sum of all node demands per step is ~1e-8 m3/s; flow unit change relabels and rescales the axis; no-run message appears on a blank project; mutation (tanks counted) makes the harness fail 4 checks.
+- OBSERVED DEFECT: no CSS for #lpn_sysflow_chart (css/engcalcs.css:2329 lists the other three), so at 1280x800 the chart is 340 px in a 260 px pane and the time axis is below the fold; Time series fits (211 px).
+- OBSERVED: the new tab pushes the strip to a second row at 1280 px in ru, fr, es, pt, tr (en and de fit); the "System flow" label is English in every language until translated. Decays when the tab label is translated.
 ## 2026-10-03 -- pre-review feat/keyboard-menu f783fe5f (row mnemonics, hotkeys, Help), Perry
 
 - OBSERVED (real headless Chromium, Net1, focus in a Junctions demand cell): Alt+Shift+W, G, P opens the Profile graph; letters show only after a keyboard open; a mouse-opened menu shows Ctrl+Z / 1 / Delete / 2-9 and no letters. No duplicate or missing letter in any top menu or fly-out in en de ru he zh am fr; letters identical with an empty project and Net1 (disabled rows keep theirs). Hotkey column: no wrap, no taller row, gap >= 40 px in all 27 languages; no row has both an arrow and a hotkey.

@@ -101,66 +101,61 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-03 (evening)
+## STATE — 2026-10-03 (late night)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged 2026-10-03: graph-menu (640), drawing-keep (680), property-arrow-key, fix/undo-label,
-bentley-interop (recut as the long-lived 749 branch), then on his word label-cache (681 c/d) and
-theme-token (714 phase 1; every CSS colour is now a `var(--ec-*)` token or `chrome_colour_check`
-fails). Defect tracks merged on green: fix/status-now (Status report "Tank 1 now filling", his
-wording), fix/flow-decimals (Qb/Q 1 decimal US, 2 SI; R-328 reversed by him), fix/label-eviction
-(758 closed: zoom pass deterministic, tab keep complete). 600/601/604 promoted to 100 by him.
+Merged 2026-10-03: keyboard-menu (748, closed) and calibration (601, closed) on his "Merge both";
+contour (600) on his "Merge contour", then fix/contour-hole (a pump-in-one-zone fault hid whole
+pipes; break lines now span one buffer width, his ruling). Defect/chore tracks: report-column (he
+closed it), psi-factor (lpn uses EPANET's 0.4333 psi/ft), menu-keyboard race, irr removed, About's
+message of love links to his blog post (all 27 languages). Ida's audit and follow-up, Mary's flow
+terms. Roadmap: 441 at 100 (box-corner dock/hide/autohide), new 759 (selection words, tips).
 
-### Awaiting his browser pass (protected; merge on his all-clear, typed in a session)
+### Awaiting him
 
-Each has a green suite bar the expected `payload freshness`, and is pushed to GitHub. Ask with
-AskUserQuestion; the classifier refuses an all-clear lifted from pasted text. Rows in ports.conf say
-what to test.
-- 8106 `feat/property-graph` (637): box opens at the width where max(1, 5%) rows wrap (his "1 line
-  in 20"): pipe ~375, pump ~402 px. No keys changed.
-- 8110 `feat/demand-scaling` (754 + criticality 751): his wording and three syn entries written;
-  unselected junctions below the minimum are disclosed, never limit the answer. To rule:
-  `lpn_ds_outside_below` (CC's wording) and whether his selected heading takes a "?".
-- 8112 `feat/keyboard-menu` (748): his four notes built; Perry round 2 found four defects, all
-  fixed. A row whose label comes from the project needs `variable: true` (keeps fixed letters
-  stable). Other branches' menu rows get letters automatically; a hotkey is `hotkey: 'Mod+Z'`.
-- 8108 `feat/profile-file` (604): one row in the Profile tab's down-arrow menu. Perry clean; format
-  confirmed against EPANET's Dgraph.pas.
-- 8109 `feat/flow-balance` (600): System flow graph, EPANET's Fgraph.pas definition (tanks in
-  neither line). Perry's two fixes done. Bottom tab strip wraps to two rows at 1280 px in fr/es/pt/
-  tr/ru; 9 px tab padding would fit all (his/Ida's call, not built).
-- 8111 `feat/calibration` (601): EPANET's three-page report, per-project, session-only, 42 keys.
-  Perry's six fixes done. Changed `lpn_reports_menu_tip` (26 translations now stale).
-- 8113 `feat/contour` (600): map layer, Delaunay-linear, reuses node colouring; DEM ground under
-  the existing `ec_terrain` gate. Perry's fixes done. Fill limit is `CONTOUR_EDGE_FACTOR = 3`
-  (39% of Net3 pipe length bare; 6 covers 95%) — his call.
-- `feat/desktop` (756), `feat/label-placer` (539/741): unchanged.
+- **Browser pass (protected):** 8106 `feat/property-graph` (box carrying a graph runs map top to
+  window bottom; a box with no graph keeps natural height, CC's choice); 8110 `feat/demand-scaling`
+  (his wording; three Analyze tools parallel); 8109 `feat/flow-balance` ("Flow balance"; lines stay
+  Produced / Consumed, his ruling); 8108 `feat/profile-file`; `feat/desktop`; `feat/label-placer`.
+- **`chore/selection-word` (pushed, held):** applies his Q1-Q3 rule (select = map set, choose =
+  lists) to 9 strings, 7 of them ruled (those rulings lapse), plus `selection_word_check.php`. One
+  result reads badly: `lpn_crs_list_tip` "Choose one, then press Choose." Show him the list first.
+  Its baseline exempts lpn_ff_*/lpn_ds_*/lpn_crit_* until demand-scaling merges.
+- **Syn proposals (his to approve):** five stale `$ec_lang_syn` entries on demand-scaling.
+- **Interview answered** (https://claude.ai/artifact/4mL8BuUzFTJi7eqjGPu8RZ): Q1-Q3, Q5, Q6 = a
+  (rules from his notes); Q4/Q7 answered by Ida in `dev/tip-followup-2026-10-03.md` (two tiers by
+  content, about 75 characters; no status strip; her in-menu description line withdrawn). Q5 (a `?`
+  beside the X of the three Analyze tools) waits on demand-scaling.
+- **Tip review out:** https://claude.ai/artifact/V6DRoU2z8sCZgMHGV92XLx, 272 tips from
+  `dev/tip-review.csv`; read his verdicts with ArtifactData `list` collection `verdicts`. Hold tip
+  edits until then (108 are ruled).
+- **Wave 0, 3 strings to rule:** lpn_copy_kept_link, lpn_calib_network (EPANET says "Network";
+  recommend keep), lpn_graphs_menu_tip. File: `~/webdev/1003-wave0.json.pending`, to be committed
+  into `dev/english-friction/` once he rules (an open entry fails friction_check).
+- **Open questions:** kPa to follow EPANET's factor too (0.045%); contour Smooth vs Bands default;
+  privacy.php's "Ground elevations" row (the contour merge reworded the consent paragraphs to "tile
+  numbers"; privacy.php itself is unchanged).
 
-**Merge order and seams:** keyboard-menu first is cheapest (the others' menu rows then just get
-letters). flow-balance, contour and calibration each touched the Graphs/Reports menu definition
-and `lpn_graphs_menu_tip`; expect small conflicts there and in `dev/new-english-keys.md`
-(regenerate, never hand-merge). Regenerate payloads once per merge batch.
-
-### Found 2026-10-03, not yet a task
-
-- **privacy.php's "Ground elevations" row overstates what is sent**: Terrain-RGB requests carry tile
-  numbers and the token, not node latitude/longitude; the elevation-fill consent paragraphs 1 and 3
-  say the same. Public text: his ruling. Proposed row (contour builder): "The numbers of the map
-  tiles that cover your nodes or, for a contour plot over the ground, the area your network covers
-  (which says roughly where it is), and your IP address".
-- **The suite's psi factor is 0.43353 per ft; EPANET's is 0.4333**, so every pressure reads 0.05%
-  above EPANET's report (Perry, calibration review). His call whether to adopt EPANET's.
+**Seams:** 441 waits on property-graph and Q5. 681(b) waits on the label-placer rulings.
 
 ### Owed translation work
 
-Not run 2026-10-03 on purpose: the owed keys sit mostly on the seven branches above (~100+ keys).
-Run one sprint after they merge. Master already owes bentley-interop 13, graph-menu 2, the Redo
-Help row (approved: "Ctrl+Y or Ctrl+Shift+Z | Redo the last undone change."; the markup check needs
-all 27 at once) and the six Status report "now" strings. Romanian file menu noun/verb pass. Concept
-layer: four new terms untranslated. Glossary write-back owed from echo.
+~92 lpn keys a language on master (calibration, contour, keyboard-menu, bentley 13, Status "now"
+strings, the Redo Help row), plus the pending branches' keys. Run one sprint after demand-scaling,
+flow-balance and selection-word land, after Wave 0 is ruled. Romanian file menu noun/verb pass;
+four concept terms; glossary write-back from echo.
 
 ### Traps met 2026-10-03
+
+- **Port 8100 shows origin/master only after `sh ~/webdev/worktrees/_panel/generate.sh`.** Run it
+  after every master push; once it was skipped and he saw no fix that was already pushed.
+- **He cannot paste images over ssh/tmux.** He saves the screenshot and runs
+  `scp $HOME\Pictures\x.png haws@192.168.0.234:/tmp/`; read it, then delete it.
+
+- **A harness that flakes only under load can be a real race.** `menu-keyboard-harness.js` failed
+  3 times in check_all: a starved `setTimeout(0)` focus restore from one menu ran after the next
+  menu opened. Fixed in the page (`menuRestoreSeq`); proved with 24 busy loops, 8/10 to 12/12.
 
 - **A `cmd && merge && ...; setsid check_all &` line starts the suite even when the merge
   conflicts** (the `;` runs on). Start a suite only in its own command, after `git status` is clean.
