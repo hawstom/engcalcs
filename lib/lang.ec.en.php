@@ -1728,7 +1728,7 @@ $ec_lang['lpn_replace_scope']='Choose one kind of asset above to change values o
 // language that puts the unit somewhere else can.
 $ec_lang['lpn_profile_menu']='Profile';
 $ec_lang['lpn_graphs_menu']='Graphs';
-$ec_lang['lpn_graphs_menu_tip']='Graphs: Profile, Time Series, Frequency distribution, and System flow balance';
+$ec_lang['lpn_graphs_menu_tip']='Graphs: Profile, Time Series, Frequency distribution, and Flow balance';
 // **THE SYNONYMS ARE IN THE SYNONYM CHANNEL, WHICH IS WHERE THEY WERE ALWAYS MEANT TO BE.** They
 // shipped as `lpn_profile_tip_syn` / `lpn_profile_title_syn` -- ordinary $ec_lang keys with no call
 // site, which nothing rendered and which a sprint would have translated into 26 languages for
@@ -1829,9 +1829,9 @@ $ec_lang['lpn_freq_axis_percent']='Percent less than';
 // balance" its window title, "Produced" and "Consumed" its series. The definition is its own code
 // (Fgraph.pas GetSysFlow): junction and reservoir demands only, split by sign; tanks in neither.
 // The axis reuses lpn_result_flow and lpn_ts_axis_time.
-$ec_lang['lpn_sysflow_menu']='System flow';
+$ec_lang['lpn_sysflow_menu']='Flow balance';
 $ec_lang['lpn_sysflow_tip']='Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.';
-$ec_lang['lpn_sysflow_title']='System flow balance';
+$ec_lang['lpn_sysflow_title']='Flow balance';
 $ec_lang['lpn_sysflow_produced']='Produced';
 $ec_lang['lpn_sysflow_produced_tip']='Total flow into the network from reservoirs and from negative demands.';
 $ec_lang['lpn_sysflow_consumed']='Consumed';

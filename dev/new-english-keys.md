@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**49 still to read on master**, of 67 untranslated keys, of 2220 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**56 still to read on master**, of 74 untranslated keys, of 2227 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (67, 49 to read @@ NEEDS RULING)
+## lpn_  (74, 56 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -205,7 +205,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > Graphs
   @@ NEEDS RULING
 - **`lpn_graphs_menu_tip`**
-  > Graphs: Profile, Time Series, and Frequency distribution
+  > Graphs: Profile, Time Series, Frequency distribution, and Flow balance
   @@ NEEDS RULING
 - **`lpn_hotkeys_menu_def`**
   > <table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>
@@ -228,12 +228,33 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_scenario_basic_tip`**
   > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
   _Ruled OK 2026-10-01._
+- **`lpn_sysflow_consumed`**
+  > Consumed
+  @@ NEEDS RULING
+- **`lpn_sysflow_consumed_tip`**
+  > Total of every positive demand: water drawn from the network at junctions, and any flow into a reservoir.
+  @@ NEEDS RULING
+- **`lpn_sysflow_menu`**
+  > Flow balance
+  @@ NEEDS RULING
+- **`lpn_sysflow_produced`**
+  > Produced
+  @@ NEEDS RULING
+- **`lpn_sysflow_produced_tip`**
+  > Total flow into the network from reservoirs and from negative demands.
+  @@ NEEDS RULING
+- **`lpn_sysflow_tip`**
+  > Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.
+  @@ NEEDS RULING
+- **`lpn_sysflow_title`**
+  > Flow balance
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**92 still to read**, of 143 new keys across 12 unmerged branch(es).
+**85 still to read**, of 136 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -243,6 +264,8 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/irr (`b6913c44`) — adds no English strings
 
 ### feat/contour (`2418222a`) — 16 new, 16 to read @@ NEEDS RULING
 
@@ -391,7 +414,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selected
   @@ NEEDS RULING
 
-### feat/demand-scaling (`97943972`) — 77 new, 54 to read @@ NEEDS RULING
+### feat/demand-scaling (`1855baff`) — 77 new, 54 to read @@ NEEDS RULING
 
 - **`lpn_analyze_menu`**
   > Analyze
@@ -627,29 +650,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/flow-balance (`f5be7f04`) — 7 new, 7 to read @@ NEEDS RULING
-
-- **`lpn_sysflow_consumed`**
-  > Consumed
-  @@ NEEDS RULING
-- **`lpn_sysflow_consumed_tip`**
-  > Total of every positive demand: water drawn from the network at junctions, and any flow into a reservoir.
-  @@ NEEDS RULING
-- **`lpn_sysflow_menu`**
-  > System flow
-  @@ NEEDS RULING
-- **`lpn_sysflow_produced`**
-  > Produced
-  @@ NEEDS RULING
-- **`lpn_sysflow_produced_tip`**
-  > Total flow into the network from reservoirs and from negative demands.
-  @@ NEEDS RULING
-- **`lpn_sysflow_tip`**
-  > Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.
-  @@ NEEDS RULING
-- **`lpn_sysflow_title`**
-  > System flow balance
-  @@ NEEDS RULING
+### feat/flow-balance (`22d083b7`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -686,7 +687,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   @@ NEEDS RULING
 
-### feat/property-graph (`7686ca67`) — 5 new, 3 to read @@ NEEDS RULING
+### feat/property-graph (`ce47ab51`) — 5 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.

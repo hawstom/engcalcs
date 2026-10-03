@@ -1,4 +1,4 @@
-// The System flow tab (ROADMAP Task 600) in a real Chromium: EPA's Net1, the tab pressed as a reader
+// The Flow balance tab (ROADMAP Task 600) in a real Chromium: EPA's Net1, the tab pressed as a reader
 // presses it, and the two drawn lines read back off the SVG. dev/lpn-spike/system-flow-harness.js
 // checks the balance against the solved link flows; this checks that the real page draws it at a
 // real size, with the pump-off afternoon of EPANET's own example figure.
@@ -11,7 +11,7 @@
 
 const { Session } = require('../lib/session');
 
-exports.title = 'System flow tab';
+exports.title = 'Flow balance tab';
 
 const VIEW = { viewport: { width: 1280, height: 800 } };
 const LANGS = ['en', 'de', 'fr', 'es', 'pt', 'tr', 'ru'];

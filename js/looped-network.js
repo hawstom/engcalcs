@@ -39690,7 +39690,7 @@ var EngCalcs = EngCalcs || {};
 							fn: function () { closeMenu(); openPane('frequency'); }
 						},
 						{
-							label: pc.lpn_sysflow_menu || 'System flow', tip: pc.lpn_sysflow_tip,
+							label: pc.lpn_sysflow_menu || 'Flow balance', tip: pc.lpn_sysflow_tip,
 							fn: function () { closeMenu(); openPane('sysflow'); }
 						}
 					];
