@@ -6001,11 +6001,19 @@ var EngCalcs = EngCalcs || {};
 			colorClassesLink: 7,
 			colorReverseNode: false,
 			colorReverseLink: false,
-			// THE CONTOUR PLOT (Task 600): '' none, 'filled' or 'lines' -- EPANET's own two Styles.
-			// It spreads the NODE colouring over the plane, so it has no field, breaks or ramp of
-			// its own; see refreshContour(). `contourTerrain` asks for the ground between nodes
-			// from Mapbox DEM, used only for pressure and only once the terrain gate says yes.
-			contourStyle: '',
+			// THE CONTOUR PLOT (Task 600). It spreads the NODE colouring over the plane, so it has
+			// no field, breaks or ramp of its own; see refreshContour(). The fill is '' (none),
+			// 'smooth' or 'bands'; the plot is on while the fill or the lines are. The interval is
+			// stored per field AND unit ('pressure|psi'), so a unit change falls back to the default
+			// for the new unit rather than reading 5 psi as 5 kPa. `contourBuffer` is the corridor's
+			// reach as a multiple of the median pipe length. `contourTerrain` asks for the ground
+			// between nodes from Mapbox DEM, used only for pressure and only once the gate says yes.
+			contourFill: '',
+			contourLines: false,
+			contourLabels: true,
+			contourOpacity: 0.6,
+			contourInterval: {},
+			contourBuffer: 2.5,
 			contourTerrain: false,
 			// The colour key's own corner, separate from the labels legend's so the two do not
 			// stack on top of each other. Opposite default corner for the same reason.
@@ -8262,6 +8270,8 @@ var EngCalcs = EngCalcs || {};
 	function syncColorControls() {
 		// Through the keeper: the select that changed is one of the controls this rebuilds (Task 653).
 		keepSetboxControl(buildColoringSection);
+		// ...and the contour box, the second view of the node colouring (Task 600).
+		refreshContourBoxIfOpen();
 	}
 	function colorValueOf(group, elem, field) {
 		return group === 'node' ? colorNodeValue(elem, field) : colorLinkValue(elem, field);
@@ -8675,36 +8685,55 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **A MAP LAYER UNDER THE DRAWING, NOT A GRAPH IN THE BOTTOM PANE.** EPANET opens its Contour
 	// Plot in a window of its own with the network drawn over it; here the map already IS that
-	// window, so the plot is a fill under the pipes, in the same coordinates, panning and zooming
-	// with them for nothing. It spreads the NODE COLOURING over the plane -- the same field, the
-	// same bands, the same ramp, the same legend -- so there is one key on the map and the dots on
-	// top of the fill are in its colours, which is what makes a dot that disagrees with the fill
-	// under it visible (dev/epanet-js-contour-contribution.md, "The honesty problem").
+	// window, so the plot is a layer under the pipes, in the same coordinates, panning and zooming
+	// with them. It spreads the NODE COLOURING over the plane -- the same field, the same breaks,
+	// the same ramp, the same legend -- so there is one key on the map and the dots on top of the
+	// fill are in its colours (dev/epanet-js-contour-contribution.md, "The honesty problem").
 	//
-	// **THE GEOMETRY IS js/lpn-contour.js**, and the rules are its header's: linear over a Delaunay
-	// triangulation of the nodes carrying a value; no colour across a pump, a valve or a closed
-	// link (refreshContour() decides which links join); no colour in a triangle with an edge longer
-	// than CONTOUR_EDGE_FACTOR times the median pipe length as drawn. Each is one constant here.
+	// **THE GEOMETRY IS js/lpn-contour.js**, and the rules are its header's: the value runs along
+	// every open pipe; a point beside the network averages the pipes round it; colour reaches
+	// contourBuffer times the median pipe length from a pipe and fades out over the outer part;
+	// every pump, every valve but a TCV, and every closed link is a wall the colour does not cross,
+	// drawn as a break line across the corridor.
+	//
+	// THREE LAYERS, ONE GROUP: the fill is one raster (an offscreen canvas handed to an <image>, so
+	// it pans and zooms with the drawing and the browser smooths it), the contour lines and break
+	// lines are vector paths, and the labels are text re-placed at every zoom so they keep a
+	// constant size and spacing on screen. The raster and the lines are CACHED on everything they
+	// are computed from, so a colour, opacity or label change does not recompute the field.
 	//
 	// **IT READS WHAT THE COLOURS READ, SO RECALCULATE OFF IS A SNAPSHOT FOR FREE.** It is redrawn
 	// only from refreshValueColors(), which runs on a solve, a frame of a run, a colour setting and
 	// an arrival -- never on an edit while Recalculate is off -- so a stale plot stays on screen
 	// exactly as the stale dots do, and goes when they go.
 	//
-	// The fill limit, as a multiple of the median pipe length as drawn. A Delaunay triangle across
-	// a grid of pipes has edges of about one pipe length and diagonals of about 1.4, so 3 keeps the
-	// fill continuous along a network and drops it across a gap three typical pipes wide.
-	var CONTOUR_EDGE_FACTOR = 3;
-	// How much of the basemap shows through a filled plot. Applied to the whole layer, so abutting
-	// band polygons do not double up at their seams.
-	var CONTOUR_FILL_OPACITY = 0.6;
-	// Cells on the long side of the grid used only when the ground is subtracted (pressure over
-	// Mapbox DEM). Esri's default raster is the extent over 250; Luke Butler's proof of concept ran
-	// 256 x 256 at 64 ms.
-	var CONTOUR_RASTER_CELLS = 200;
+	// The corridor's default reach, as a multiple of the median pipe length. Tom asked for "very
+	// generous ... 2 or 3 * the median pipe length" on Net3; contour-harness.js measures how much of
+	// Net3's loops each multiple fills, and 2.5 is the least that fills them all.
+	var CONTOUR_BUFFER_DEFAULT = 2.5;
+	// The outer part of the corridor over which the colour fades to nothing (Tom: "Soft fade is
+	// good."), as a fraction of the reach.
+	var CONTOUR_FADE = 0.4;
+	// The raster: cells about a sixth of the reach, so the fade is drawn over several cells, between
+	// 256 and 768 on the longer side (Esri's default raster is the extent over 250; Luke Butler's
+	// proof of concept ran 256 x 256).
+	var CONTOUR_CELLS_MIN = 256, CONTOUR_CELLS_MAX = 768, CONTOUR_CELLS_PER_REACH = 6;
+	// The ground is read on a coarser grid of its own and sampled between: the fill grid can be
+	// ten times the cells, and every one of them would be a pixel asked of Mapbox.
+	var CONTOUR_DEM_CELLS = 200;
+	var CONTOUR_OPACITY_DEFAULT = 0.6;
+	// Labels: their size and spacing on SCREEN, re-placed whenever the zoom settles.
+	var CONTOUR_LABEL_PX = 11, CONTOUR_LABEL_SPACING_PX = 280;
+	// More lines than this at one interval is a solid ink smear, not a plot; the box says so.
+	var CONTOUR_MAX_LEVELS = 150;
+	// Every fifth level is an index contour, drawn heavier -- the topographic map's convention.
+	var CONTOUR_INDEX_EVERY = 5;
 	// The fields for which a tank or a reservoir is a vertex of the plot -- see refreshContour().
 	var CONTOUR_FIXED_HEAD_FIELDS = ['head', 'quality'];
 	var contourLayer = null, contourStats = null, contourDem = null;
+	// What was last computed, keyed on what it was computed from: {key, grid, field, lo, hi},
+	// {key, href} for the fill, {key, lines, levels, step} for the lines.
+	var contourField = null, contourFillCache = null, contourLinesCache = null, contourFaults = [];
 	function contourLayerEl() {
 		var host = modelLayer || world;
 		if (!host) { return null; }
@@ -8715,9 +8744,32 @@ var EngCalcs = EngCalcs || {};
 		host.insertBefore(contourLayer, host.firstChild || null);
 		return contourLayer;
 	}
-	function contourStyleOf() {
-		var s = settings.contourStyle;
-		return (s === 'filled' || s === 'lines') ? s : '';
+	function contourFillMode() {
+		var f = settings.contourFill;
+		return (f === 'smooth' || f === 'bands') ? f : '';
+	}
+	function contourIsOn() { return !!(contourFillMode() || settings.contourLines); }
+	function contourBufferOf() {
+		var b = Number(settings.contourBuffer);
+		return (isFinite(b) && b > 0) ? Math.min(20, b) : CONTOUR_BUFFER_DEFAULT;
+	}
+	function contourOpacityOf() {
+		var o = Number(settings.contourOpacity);
+		return (isFinite(o) && o >= 0) ? Math.min(1, o) : CONTOUR_OPACITY_DEFAULT;
+	}
+	// THE INTERVAL, per field and unit. Tom asked for 5 psi or 5 m to start; the other units of a
+	// pressure or a length get the step a contour map in that unit would use, and every other field
+	// a round step giving about ten lines over the values on the map.
+	var CONTOUR_UNIT_STEP = { psi: 5, m: 5, ft: 10, kPa: 50, bar: 0.5 };
+	function contourIntervalKey(field) { return field + '|' + colorFieldUnitText('node', field); }
+	function contourDefaultInterval(field, lo, hi) {
+		var u = colorFieldUnitText('node', field);
+		if ((field === 'pressure' || field === 'head' || field === 'elev') && CONTOUR_UNIT_STEP[u]) { return CONTOUR_UNIT_STEP[u]; }
+		return EngCalcs.lpnContour.niceStep(lo, hi, 10);
+	}
+	function contourIntervalOf(field, lo, hi) {
+		var v = Number((settings.contourInterval || {})[contourIntervalKey(field)]);
+		return (isFinite(v) && v > 0) ? v : contourDefaultInterval(field, lo, hi);
 	}
 	// Where on the Earth a DRAWING point is -- viewLonLat()'s question asked of a grid cell, through
 	// the same one crossing outward. Only reached once contourTerrainOffered() has required a
@@ -8748,161 +8800,297 @@ var EngCalcs = EngCalcs || {};
 	function clearContour() {
 		if (contourLayer) { while (contourLayer.firstChild) { contourLayer.removeChild(contourLayer.firstChild); } }
 	}
-	function refreshContour() {
-		var C = EngCalcs.lpnContour, style = contourStyleOf(), field = colorFieldOf('node');
-		contourStats = null;
-		clearContour();
-		if (!C || !style || !field || !svg) { return; }
-		var layer = contourLayerEl();
-		if (!layer) { return; }
-		var t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-		// ---- THE WHOLE NETWORK, for zones and for the ground grid ----
-		// Every active node with a position takes part in the ZONES, whether or not it carries a
-		// value: a tank in the middle of a network still joins the pipes either side of it.
-		var all = [], allIdx = {}, ax = [], ay = [];
+	function contourNow() { return (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now(); }
+	// A short, order-sensitive fingerprint of a list of numbers -- the cache key of the field, so a
+	// moved node or a new solve is a new field and nothing else is.
+	function contourHash(nums) {
+		var h1 = 0x811c9dc5, h2 = 0x01000193, i;
+		for (i = 0; i < nums.length; i++) {
+			var s = String(nums[i]), k;
+			for (k = 0; k < s.length; k++) {
+				h1 = Math.imul(h1 ^ s.charCodeAt(k), 16777619);
+				h2 = Math.imul(h2 ^ s.charCodeAt(k), 2246822519);
+			}
+			h1 = Math.imul(h1 ^ 44, 16777619);
+		}
+		return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36) + ':' + nums.length;
+	}
+	// ---- THE NETWORK, AS THE CONTOUR SEES IT ----
+	// Pieces of every open pipe carrying the value, the walls, the zones, the median pipe length,
+	// and the grid. Cheap (one pass over the links), so it runs on every redraw and is the key.
+	function contourNetwork(field, useHeads) {
+		var C = EngCalcs.lpnContour, all = [], allIdx = {}, ax = [], ay = [];
 		doc.nodes.forEach(function (n) {
 			if (!isActive(n)) { return; }
 			var x = nodeDrawX(n), y = nodeDrawY(n);
 			if (!isFinite(x) || !isFinite(y)) { return; }
 			allIdx[n.id] = all.length; all.push(n); ax.push(x); ay.push(y);
 		});
-		// ---- WHICH NODES CARRY THE VALUE ----
-		// **A TANK OR A RESERVOIR IS A VERTEX ONLY WHERE ITS VALUE MEANS WHAT A JUNCTION'S DOES.**
+		// **A TANK OR A RESERVOIR CARRIES THE VALUE ONLY WHERE IT MEANS WHAT A JUNCTION'S DOES.**
 		// Under pressure a tank's value is its water depth and a reservoir's is about zero, so as
-		// vertices they paint a false low-pressure halo round every one of them (pre-review,
-		// 2026-10-03). They take part for CONTOUR_FIXED_HEAD_FIELDS only -- head, where their water
-		// surface is the grade line the pipes leave at, and water quality, where the source is the
-		// most telling value on the map -- and still join zones either way.
-		var withFixed = CONTOUR_FIXED_HEAD_FIELDS.indexOf(field) >= 0;
-		var nodes = [], xs = [], ys = [], zs = [], idx = {};
-		all.forEach(function (n, i) {
+		// data they paint a false low-pressure halo round every one (pre-review, 2026-10-03). They
+		// count for CONTOUR_FIXED_HEAD_FIELDS only -- head, where their water surface is the grade
+		// line the pipes leave at, and water quality, where the source is the most telling value
+		// on the map -- and still join zones either way.
+		var withFixed = CONTOUR_FIXED_HEAD_FIELDS.indexOf(field) >= 0, val = {}, nVal = 0;
+		all.forEach(function (n) {
 			if (isFixedHeadNode(n) && !withFixed) { return; }
-			var v = colorNodeValue(n, field);
+			var v = useHeads ? contourHeadSI(n) : colorNodeValue(n, field);
 			if (typeof v !== 'number' || !isFinite(v)) { return; }
-			idx[n.id] = nodes.length;
-			nodes.push(n); xs.push(ax[i]); ys.push(ay[i]); zs.push(v);
+			val[n.id] = v; nVal++;
 		});
-		contourStats = { n: nodes.length, k: CONTOUR_EDGE_FACTOR, few: nodes.length < 3, dem: null };
-		if (contourStats.few) { return; }
-		// ---- WHICH LINKS JOIN TWO NODES INTO ONE HEAD FIELD ----
-		// An open pipe (a check valve is a pipe, and it is closed when it is shut), and an open
-		// throttle control valve, which is a loss like a pipe's. A pump, every other valve and
-		// anything closed is a barrier: head jumps across it.
-		var joins = [], lens = [];
+		// WHICH LINKS JOIN, AND WHICH ARE WALLS. An open pipe (a check valve is a pipe, closed when it
+		// is shut) and an open throttle control valve, which is a loss like a pipe's, join. A pump,
+		// every other valve and anything closed is a wall: head jumps across it.
+		var joins = [], lens = [], dataLinks = [], walls = [], geomPts = [];
 		doc.links.forEach(function (l) {
 			if (!isActive(l)) { return; }
 			var a = allIdx[l.from], b = allIdx[l.to];
 			if (a === undefined || b === undefined) { return; }
-			// The fill limit's scale is every pipe as drawn, open or closed: how far apart the
-			// network's nodes are does not change when a valve shuts.
-			if (l.type === 'pipe') {
-				var pts = linkPointList(l), len = 0, i;
-				for (i = 0; i + 1 < pts.length; i++) {
-					if (pts[i] && pts[i + 1]) { len += Math.sqrt(Math.pow(pts[i + 1].x - pts[i].x, 2) + Math.pow(pts[i + 1].y - pts[i].y, 2)); }
-				}
-				lens.push(len);
-			}
-			if (linkStatusOf(l) === 'closed') { return; }
+			var pts = linkPointList(l).filter(function (p) { return p && isFinite(p.x) && isFinite(p.y); });
+			if (pts.length < 2) { return; }
+			var len = 0, i;
+			for (i = 0; i + 1 < pts.length; i++) { len += Math.sqrt(Math.pow(pts[i + 1].x - pts[i].x, 2) + Math.pow(pts[i + 1].y - pts[i].y, 2)); }
+			pts.forEach(function (p) { geomPts.push(p.x, p.y); });
+			// The reach's scale is every pipe as drawn, open or closed: how far apart the network's
+			// nodes are does not change when a valve shuts.
+			if (l.type === 'pipe') { lens.push(len); }
 			var tcv = l.type === 'valve' && String(l.valveType || 'TCV').toUpperCase() === 'TCV';
-			if (l.type !== 'pipe' && !tcv) { return; }
+			if (linkStatusOf(l) === 'closed' || (l.type !== 'pipe' && !tcv)) { walls.push({ pts: pts, from: l.from, to: l.to }); return; }
 			joins.push([a, b]);
+			if (val[l.from] !== undefined && val[l.to] !== undefined) { dataLinks.push({ l: l, pts: pts, len: len }); }
 		});
-		var allZone = C.zones(all.length, joins), zoneOf = nodes.map(function (n) { return allZone[allIdx[n.id]]; });
-		var med = C.median(lens), maxEdge = med > 0 ? CONTOUR_EDGE_FACTOR * med : 0;
-		var tris = C.maskTriangles(C.triangulate(xs, ys), xs, ys, zoneOf, maxEdge);
-		contourStats.triangles = tris.length / 3;
-		var breaks = effectiveBreaks('node', field), nb = breaks.length + 1, k;
-		var span = 0;
-		tris.forEach(function (v) { span = Math.max(span, Math.abs(xs[v] - xs[tris[0]]), Math.abs(ys[v] - ys[tris[0]])); });
-		var digits = C.digitsFor(span);
-		layer.setAttribute('opacity', style === 'filled' ? String(CONTOUR_FILL_OPACITY) : '1');
+		var zoneOf = C.zones(all.length, joins), med = C.median(lens);
+		var segs = [], withData = {};
+		dataLinks.forEach(function (d) {
+			var v0 = val[d.l.from], v1 = val[d.l.to], run = 0, z = zoneOf[allIdx[d.l.from]], i;
+			withData[d.l.from] = 1; withData[d.l.to] = 1;
+			for (i = 0; i + 1 < d.pts.length; i++) {
+				var p = d.pts[i], q = d.pts[i + 1], sl = Math.sqrt(Math.pow(q.x - p.x, 2) + Math.pow(q.y - p.y, 2));
+				var f0 = d.len > 0 ? run / d.len : 0, f1 = d.len > 0 ? (run + sl) / d.len : 1;
+				segs.push({ x0: p.x, y0: p.y, x1: q.x, y1: q.y, v0: v0 + f0 * (v1 - v0), v1: v0 + f1 * (v1 - v0), zone: z });
+				run += sl;
+			}
+		});
+		// A node with a value and no open pipe carrying it still colours its own surroundings.
+		all.forEach(function (n, i) {
+			if (val[n.id] === undefined || withData[n.id]) { return; }
+			segs.push({ x0: ax[i], y0: ay[i], x1: ax[i], y1: ay[i], v0: val[n.id], v1: val[n.id], zone: zoneOf[i] });
+		});
+		// A network with no pipe at all still needs a length to reach: a tenth of its extent.
+		if (!(med > 0) && all.length > 1) {
+			var ex = Math.max(Math.max.apply(null, ax) - Math.min.apply(null, ax), Math.max.apply(null, ay) - Math.min.apply(null, ay));
+			med = ex / 10;
+		}
+		var R = med * contourBufferOf();
+		// The grid covers EVERY node and link, open or closed, valued or not: closing a pipe during
+		// a run must not move the grid, or the ground under it would be read again (pre-review,
+		// 2026-10-03).
+		ax.forEach(function (x, i) { geomPts.push(x, ay[i]); });
+		var gsegs = [];
+		for (var g = 0; g + 1 < geomPts.length; g += 2) { gsegs.push({ x0: geomPts[g], y0: geomPts[g + 1], x1: geomPts[g], y1: geomPts[g + 1], v0: 0, v1: 0, zone: 0 }); }
+		var G = C.segmentSet(gsegs), grid = null;
+		if (R > 0 && G.n) {
+			var w0 = Infinity, w1 = -Infinity, h0 = Infinity, h1 = -Infinity;
+			for (g = 0; g < G.n; g++) { w0 = Math.min(w0, G.x0[g]); w1 = Math.max(w1, G.x0[g]); h0 = Math.min(h0, G.y0[g]); h1 = Math.max(h1, G.y0[g]); }
+			var span = Math.max(w1 - w0, h1 - h0) + 2 * R;
+			var cells = Math.max(CONTOUR_CELLS_MIN, Math.min(CONTOUR_CELLS_MAX, Math.ceil(span / (R / CONTOUR_CELLS_PER_REACH))));
+			grid = C.gridAround(G, R, cells);
+		}
+		// A WALL BETWEEN TWO ZONES NEEDS NO FAULT: the zones are never averaged, and the line where
+		// the colour jumps is traced from the field (contourWallLines()). A fault is only for a
+		// barrier both of whose ends are still one zone -- a booster pump inside a loop -- where
+		// nothing else would stop the colour running across it. A fault on every barrier sliced a
+		// pump station's short links into wedges with no pipe visible in them (Net3's pump 335, its
+		// bypass 330 and pipe 333: a bare hole in the one loop they make).
+		var faults = walls.filter(function (w) { return zoneOf[allIdx[w.from]] === zoneOf[allIdx[w.to]]; })
+			.map(function (w) { return C.faultAcross(w.pts, R); }).filter(Boolean);
+		return { nodes: nVal, pipes: dataLinks.length, segs: segs, faults: faults, R: R, med: med, grid: grid };
+	}
+	function refreshContour() {
+		var C = EngCalcs.lpnContour, field = colorFieldOf('node');
+		contourStats = null;
+		if (!C || !contourIsOn() || !field || !svg) { clearContour(); contourField = null; return; }
+		var layer = contourLayerEl();
+		if (!layer) { return; }
+		var t0 = contourNow(), dem = contourTerrainWanted();
+		var net = contourNetwork(field, dem);
+		contourStats = { n: net.nodes, pipes: net.pipes, k: contourBufferOf(), few: !net.segs.length || !net.grid, dem: null };
+		if (contourStats.few) { clearContour(); contourField = null; return; }
+		var grid = net.grid, ground = null;
 		// ---- PRESSURE OVER THE GROUND: head interpolated, ground subtracted per cell ----
-		if (contourTerrainWanted() && tris.length) {
-			// **THE GROUND GRID COVERS THE WHOLE NETWORK, NOT THE PLOT'S OUTLINE.** The outline
-			// moves every time a control opens or closes a pipe, and a grid keyed on it re-read the
-			// ground tiles twice per pass of Play (pre-review, 2026-10-03). Over every node's extent
-			// it changes only when the network itself does.
-			var allTris = [], q;
-			for (q = 0; q < all.length; q++) { allTris.push(q); }
-			var grid = C.gridFor(allTris, ax, ay, CONTOUR_RASTER_CELLS);
-			var heads = nodes.map(contourHeadSI);
-			if (grid && heads.every(function (h) { return typeof h === 'number' && isFinite(h); })) {
-				var demKey = [project && project.docId, grid.x0, grid.y0, grid.dx, grid.dy, grid.nx, grid.ny].join('|');
-				if (!contourDem || contourDem.key !== demKey) { requestContourDem(demKey, grid); }
-				if (contourDem && contourDem.key === demKey && contourDem.elev) {
-					drawContourRaster(layer, C, tris, xs, ys, heads, grid, breaks, style, digits);
-					contourStats.dem = contourDem.metres;
-					contourStats.ms = elapsedSince(t0);
-					return;
-				}
-				// While the ground is being read, or if it could not be, the nodal plot stands.
-				if (contourDem && contourDem.key === demKey && contourDem.failed) { contourStats.demFailed = true; }
-			}
+		if (dem) {
+			var demGrid = contourDemGrid(grid), demKey = [project && project.docId, demGrid.x0, demGrid.y0, demGrid.dx, demGrid.nx, demGrid.ny].join('|');
+			if (!contourDem || contourDem.key !== demKey) { requestContourDem(demKey, demGrid); }
+			if (contourDem && contourDem.key === demKey && contourDem.elev) { ground = contourDem; }
+			else if (contourDem && contourDem.key === demKey && contourDem.failed) { contourStats.demFailed = true; }
+			// While the ground is being read, or if it could not be, the plot between nodes stands:
+			// the same network, by the field's own values.
+			if (!ground) { net = contourNetwork(field, false); }
 		}
-		// ---- THE NODAL PLOT: linear in each triangle ----
-		if (style === 'filled') {
-			var bands = C.isobands(tris, xs, ys, zs, breaks);
-			for (k = 0; k < nb; k++) {
-				if (!bands[k].length) { continue; }
-				var col = bandColor('node', k, nb);
-				el('path', { d: C.pathOf(bands[k], digits, true), fill: col, stroke: col, 'stroke-width': 1,
-					'vector-effect': 'non-scaling-stroke', 'stroke-linejoin': 'round', 'class': 'lpn-contour-band' }, layer);
-			}
-		} else {
-			drawContourLines(layer, C.isolines(tris, xs, ys, zs, breaks), breaks, digits);
+		var key = [field, ground ? 'g' + ground.key : '', net.R, CONTOUR_FADE, grid.x0, grid.y0, grid.dx, grid.nx, grid.ny,
+			contourHash([].concat.apply([], net.segs.map(function (s) { return [s.x0, s.y0, s.x1, s.y1, s.v0, s.v1, s.zone]; }))),
+			contourHash([].concat.apply([], net.faults.map(function (f) { return [f.x0, f.y0, f.x1, f.y1]; })))].join('|');
+		if (!contourField || contourField.key !== key) {
+			var S = C.segmentSet(net.segs), F = C.corridorField(S, net.faults, grid, net.R, { fade: CONTOUR_FADE });
+			if (ground) { contourSubtractGround(F, grid, ground); }
+			var lo = Infinity, hi = -Infinity, i;
+			for (i = 0; i < F.val.length; i++) { if (F.alpha[i] > 0 && isFinite(F.val[i])) { lo = Math.min(lo, F.val[i]); hi = Math.max(hi, F.val[i]); } }
+			contourField = { key: key, grid: grid, field: F, lo: lo, hi: hi, ms: contourNow() - t0 };
+			contourFillCache = null; contourLinesCache = null;
 		}
-		contourStats.ms = elapsedSince(t0);
+		contourFaults = net.faults;
+		if (ground) { contourStats.dem = ground.metres; contourStats.demRange = isFinite(contourField.lo) ? [contourField.lo, contourField.hi] : null; }
+		contourStats.cells = grid.nx * grid.ny;
+		contourStats.fieldMs = contourField.ms;
+		drawContourLayers(layer, field);
+		contourStats.ms = contourNow() - t0;
 	}
-	function elapsedSince(t0) {
-		var t1 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-		return t1 - t0;
-	}
-	// One path per level, in the colour of the band the level opens -- EPANET's coloured line
-	// contours, one line per level.
-	function drawContourLines(layer, lines, breaks, digits) {
-		var C = EngCalcs.lpnContour, k, nb = breaks.length + 1;
-		for (k = 0; k < lines.length; k++) {
-			if (!lines[k].length) { continue; }
-			el('path', { d: C.pathOf(lines[k], digits, false), fill: 'none', stroke: bandColor('node', k + 1, nb),
-				'stroke-width': 2, 'vector-effect': 'non-scaling-stroke', 'stroke-linecap': 'round',
-				'class': 'lpn-contour-line' }, layer);
-		}
+	// The ground grid: the fill grid's extent at a coarser cell, so it changes only when the network
+	// does.
+	function contourDemGrid(grid) {
+		var w = grid.nx * grid.dx, h = grid.ny * grid.dy, cell = Math.max(w, h) / CONTOUR_DEM_CELLS;
+		return { x0: grid.x0, y0: grid.y0, dx: cell, dy: cell, nx: Math.max(2, Math.ceil(w / cell)), ny: Math.max(2, Math.ceil(h / cell)) };
 	}
 	// The pressure in the display unit at every cell, from head interpolated and ground subtracted.
-	function contourPressureGrid(C, tris, xs, ys, heads, grid) {
-		var H = C.rasterField(tris, xs, ys, heads, grid), elev = contourDem.elev, i,
+	function contourSubtractGround(F, grid, ground) {
+		var C = EngCalcs.lpnContour, i, j,
 			sg = (settings.hydraulics && typeof settings.hydraulics.specificGravity === 'number' &&
 				isFinite(settings.hydraulics.specificGravity)) ? settings.hydraulics.specificGravity : 1,
 			f = toDisplay(1, resultUnit('pressure'));
-		for (i = 0; i < H.length; i++) { H[i] = (isFinite(H[i]) && isFinite(elev[i])) ? (H[i] - elev[i]) * sg * f : NaN; }
-		return H;
+		for (j = 0; j < grid.ny; j++) {
+			for (i = 0; i < grid.nx; i++) {
+				var c = j * grid.nx + i;
+				if (!isFinite(F.val[c])) { continue; }
+				var e = C.sampleField(ground.elev, ground.grid, grid.x0 + (i + 0.5) * grid.dx, grid.y0 + (j + 0.5) * grid.dy);
+				if (!isFinite(e)) { var cc = C.cellAt(ground.grid, grid.x0 + (i + 0.5) * grid.dx, grid.y0 + (j + 0.5) * grid.dy); e = cc >= 0 ? ground.elev[cc] : NaN; }
+				F.val[c] = isFinite(e) ? (F.val[c] - e) * sg * f : NaN;
+				if (!isFinite(F.val[c])) { F.alpha[c] = 0; }
+			}
+		}
 	}
-	function drawContourRaster(layer, C, tris, xs, ys, heads, grid, breaks, style, digits) {
-		var P = contourPressureGrid(C, tris, xs, ys, heads, grid), nb = breaks.length + 1;
-		var lo = Infinity, hi = -Infinity, i;
-		for (i = 0; i < P.length; i++) { if (isFinite(P[i])) { if (P[i] < lo) { lo = P[i]; } if (P[i] > hi) { hi = P[i]; } } }
-		contourStats.demRange = isFinite(lo) ? [lo, hi] : null;
-		if (style === 'lines') { drawContourLines(layer, C.isolinesGrid(P, grid, breaks), breaks, digits); return; }
+	// ---- DRAWING: fill, lines, walls, labels -------------------------------------------------------
+	function drawContourLayers(layer, field) {
+		var C = EngCalcs.lpnContour, cf = contourField, grid = cf.grid, mode = contourFillMode();
+		clearContour();
+		var breaks = effectiveBreaks('node', field), nb = breaks.length + 1, k;
+		// THE FILL. One raster, rebuilt only when the field, the colours or the mode change.
+		if (mode) {
+			var cols = [];
+			for (k = 0; k < nb; k++) { cols.push(hexRgb(bandColor('node', k, nb))); }
+			var fkey = [cf.key, mode, breaks.join(','), cols.join(';')].join('|');
+			if (!contourFillCache || contourFillCache.key !== fkey) {
+				var rgba = C.fillRGBA(cf.field, grid, breaks, cols, mode);
+				contourFillCache = { key: fkey, rgba: rgba, href: contourRasterHref(rgba, grid) };
+			}
+			var img = el('image', { x: grid.x0, y: grid.y0, width: grid.nx * grid.dx, height: grid.ny * grid.dy,
+				preserveAspectRatio: 'none', opacity: String(contourOpacityOf()), 'class': 'lpn-contour-fill' }, layer);
+			if (contourFillCache.href) { img.setAttribute('href', contourFillCache.href); }
+		}
+		var span = Math.max(grid.nx * grid.dx, grid.ny * grid.dy), digits = C.digitsFor(span);
+		// THE WALLS: a break line across the corridor at every pump, valve and closed link, cut to the
+		// stretch of it that lies over colour -- a retaining wall on a grading plan.
+		var walls = contourWallLines(grid, cf.field);
+		if (walls.length) {
+			var wd = C.pathOf(walls, digits, false);
+			el('path', { d: wd, 'class': 'lpn-contour-break-casing' }, layer);
+			el('path', { d: wd, 'class': 'lpn-contour-break' }, layer);
+		}
+		contourStats.walls = walls.length;
+		// THE LINES, at every multiple of the interval.
+		contourStats.levels = 0; contourStats.tooMany = false;
+		if (settings.contourLines && isFinite(cf.lo)) {
+			var step = contourIntervalOf(field, cf.lo, cf.hi);
+			contourStats.interval = step;
+			contourStats.unit = colorFieldUnitText('node', field);
+			var lkey = cf.key + '|' + step;
+			if (!contourLinesCache || contourLinesCache.key !== lkey) {
+				var levels = C.levelsFor(cf.lo, cf.hi, step, CONTOUR_MAX_LEVELS);
+				contourLinesCache = { key: lkey, step: step, levels: levels || [], tooMany: levels === null,
+					lines: levels ? C.contourLines(cf.field, grid, levels, { minAlpha: 0.35, smooth: 2 }) : [] };
+			}
+			var LC = contourLinesCache;
+			contourStats.tooMany = LC.tooMany;
+			var g = el('g', { 'class': 'lpn-contour-lines' }, layer);
+			LC.levels.forEach(function (lv, i) {
+				if (!LC.lines[i] || !LC.lines[i].length) { return; }
+				contourStats.levels++;
+				var index = Math.abs(Math.round(lv / LC.step)) % CONTOUR_INDEX_EVERY === 0;
+				el('path', { d: C.pathOf(LC.lines[i], digits, false), 'data-level': String(lv),
+					'class': 'lpn-contour-line' + (index ? ' lpn-contour-index' : '') }, g);
+			});
+			el('g', { 'class': 'lpn-contour-labels' }, layer);
+			drawContourLabels();
+		}
+	}
+	// The raster as an image the <image> element can show, or '' where there is no canvas (Node).
+	function contourRasterHref(rgba, grid) {
 		var canvas = (typeof document.createElement === 'function') ? document.createElement('canvas') : null;
 		var ctx = canvas && canvas.getContext ? canvas.getContext('2d') : null;
-		if (!ctx) { return; }
+		if (!ctx || !ctx.createImageData) { return ''; }
 		canvas.width = grid.nx; canvas.height = grid.ny;
-		var img = ctx.createImageData(grid.nx, grid.ny), d = img.data, cols = [], k;
-		for (k = 0; k < nb; k++) { cols.push(hexRgb(bandColor('node', k, nb))); }
-		for (i = 0; i < P.length; i++) {
-			k = C.bandOf(P[i], breaks);
-			if (k < 0) { continue; }
-			d[4 * i] = cols[k][0]; d[4 * i + 1] = cols[k][1]; d[4 * i + 2] = cols[k][2]; d[4 * i + 3] = 255;
-		}
+		var img = ctx.createImageData(grid.nx, grid.ny);
+		img.data.set(rgba);
 		ctx.putImageData(img, 0, 0);
-		el('image', { href: canvas.toDataURL(), x: grid.x0, y: grid.y0, width: grid.nx * grid.dx,
-			height: grid.ny * grid.dy, preserveAspectRatio: 'none', 'class': 'lpn-contour-raster' }, layer);
+		return canvas.toDataURL('image/png');
+	}
+	// The break lines: every boundary between two coloured zones, traced from the field, and each
+	// fault cut to the run of it round the link's midpoint that lies over colour.
+	function contourWallLines(grid, F) {
+		var C = EngCalcs.lpnContour, out = C.zoneBreaks(F, grid, { minAlpha: 0.2, smooth: 2 });
+		contourFaults.forEach(function (f) {
+			var n = 40, s;
+			// From the middle outward in both directions, while the colour lasts.
+			function covered(t) {
+				var x = f.x0 + t * (f.x1 - f.x0), y = f.y0 + t * (f.y1 - f.y0), c = C.cellAt(grid, x, y);
+				return c >= 0 && F.alpha[c] >= 0.2;
+			}
+			var lo = 0.5, hi = 0.5;
+			for (s = 1; s <= n / 2; s++) { if (covered(0.5 - s / n)) { lo = 0.5 - s / n; } else { break; } }
+			for (s = 1; s <= n / 2; s++) { if (covered(0.5 + s / n)) { hi = 0.5 + s / n; } else { break; } }
+			if (hi - lo < 2 / n) { return; }
+			out.push([f.x0 + lo * (f.x1 - f.x0), f.y0 + lo * (f.y1 - f.y0), f.x0 + hi * (f.x1 - f.x0), f.y0 + hi * (f.y1 - f.y0)]);
+		});
+		return out;
+	}
+	// THE LABELS, placed for the zoom on screen now: a constant size and spacing in pixels, upright,
+	// along the straight stretches of each line. Called by every redraw and by a settled zoom.
+	function drawContourLabels() {
+		var C = EngCalcs.lpnContour, host = null, LC = contourLinesCache, i;
+		if (!contourLayer) { return; }
+		for (i = 0; i < (contourLayer.children || contourLayer.childNodes || []).length; i++) {
+			var ch = (contourLayer.children || contourLayer.childNodes)[i];
+			if (String(ch.getAttribute && ch.getAttribute('class')) === 'lpn-contour-labels') { host = ch; }
+		}
+		if (!host) { return; }
+		while (host.firstChild) { host.removeChild(host.firstChild); }
+		if (!settings.contourLabels || !settings.contourLines || !LC || !LC.lines.length || !(state.s > 0)) { return; }
+		var px = CONTOUR_LABEL_PX, lines = [];
+		LC.levels.forEach(function (lv, k) { (LC.lines[k] || []).forEach(function (pl) { lines.push({ level: lv, pts: pl.pts, closed: pl.closed }); }); });
+		var placed = C.placeLabels(lines, {
+			scale: state.s, height: px, spacing: CONTOUR_LABEL_SPACING_PX, pad: px,
+			width: function (lv) { return 0.62 * px * C.levelText(lv, LC.step).length; }
+		});
+		var fs = px / state.s, halo = 3 / state.s;
+		placed.forEach(function (q) {
+			var t = el('text', { x: q.x, y: q.y, 'font-size': fs, 'stroke-width': halo, 'data-level': String(q.level),
+				'text-anchor': 'middle', 'dominant-baseline': 'central', 'class': 'lpn-contour-label',
+				transform: 'rotate(' + q.angle.toFixed(2) + ' ' + q.x + ' ' + q.y + ')' }, host);
+			t.textContent = C.levelText(q.level, LC.step);
+		});
+		if (contourStats) { contourStats.labels = placed.length; }
+	}
+	var contourRelabelTimer = null;
+	function scheduleContourRelabel() {
+		if (!contourLinesCache || !settings.contourLines) { return; }
+		if (contourRelabelTimer) { clearTimeout(contourRelabelTimer); }
+		contourRelabelTimer = setTimeout(function () { contourRelabelTimer = null; drawContourLabels(); }, 150);
 	}
 	// Read the ground under the grid, once per grid. Kept in memory for this page only, never on the
 	// device (js/lpn-terrain.js's rule), and redrawn by the contour alone when it arrives.
 	function requestContourDem(key, grid) {
 		var pts = [], i, j;
-		contourDem = { key: key, elev: null, failed: false, metres: 0 };
+		contourDem = { key: key, grid: grid, elev: null, failed: false, metres: 0 };
 		for (j = 0; j < grid.ny; j++) {
 			for (i = 0; i < grid.nx; i++) {
 				var ll = drawLonLat(grid.x0 + (i + 0.5) * grid.dx, grid.y0 + (j + 0.5) * grid.dy);
@@ -8931,20 +9119,14 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function refreshContourOnly() { refreshContour(); renderColorLegend(); }
-	function showContour() {
-		if (!colorFieldOf('node')) { settings.colorNodeField = 'pressure'; }
-		if (!contourStyleOf()) { settings.contourStyle = 'filled'; }
-		refreshValueColors(); saveToStorage(); syncColorControls();
-		openSettingsBox('nodeColors');
-	}
 	// The support line under the colour key: what the colour between the nodes stands on.
 	function contourNoteText() {
 		var pc = EngCalcs.pageConfig || {}, s = contourStats;
 		if (!s) { return ''; }
 		if (s.few) { return pc.lpn_contour_few || 'Too few nodes to contour.'; }
 		var out = (pc.lpn_contour_support ||
-			'Contour plot: linear between {n} nodes. No color across pumps, valves, or closed links, or across gaps wider than {k} times the median pipe length.')
-			.replace('{n}', String(s.n)).replace('{k}', String(s.k));
+			'Contour plot: {n} nodes, interpolated along {p} pipes and up to {k} times the median pipe length beside them. No color across pumps, valves, or closed links.')
+			.replace('{n}', String(s.n)).replace('{p}', String(s.pipes)).replace('{k}', String(s.k));
 		if (s.dem) {
 			out += ' ' + (pc.lpn_contour_support_dem ||
 				'Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.')
@@ -8953,7 +9135,158 @@ var EngCalcs = EngCalcs || {};
 			out += ' ' + (pc.lpn_contour_dem_failed ||
 				'The ground could not be read from Mapbox DEM, so pressure is interpolated between nodes alone.');
 		}
+		if (s.tooMany) {
+			out += ' ' + (pc.lpn_contour_too_many || 'Too many contour lines at this interval; widen it to draw them.');
+		} else if (s.interval) {
+			out += ' ' + (pc.lpn_contour_support_lines || 'Contour lines every {i} {u}.')
+				.replace('{i}', String(s.interval)).replace(' {u}', s.unit ? ' ' + s.unit : '');
+		}
 		return out;
+	}
+	// ---- THE CONTOUR BOX ------------------------------------------------------------------------
+	//
+	// Tom, 2026-10-03: *"we may want the Contour graph command open a control box for this with color
+	// and contour controls."* A small non-modal box on the standing-box shell (drag band, resize
+	// grip, remembered corner), labels only. Everything it sets is the PROJECT's (it rides in
+	// serializeProject()); only where the box sits and whether it is open is the browser's, as
+	// `lpn_contourbox`. The value and the colour scheme are the node colouring's own two settings,
+	// so the Settings box and this one can never disagree with each other or with the dots.
+	function contourBoxEl() { return document.getElementById('lpn_contour_box'); }
+	function contourBoxIsOpen() {
+		var box = contourBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	// THE MENU ROW: turns the plot on if it is off (a smooth fill with labelled lines, of pressure
+	// if the nodes are not coloured yet), then opens the box where it is tuned or turned off.
+	function showContour() {
+		if (!colorFieldOf('node')) { settings.colorNodeField = 'pressure'; }
+		if (!contourIsOn()) { settings.contourFill = 'smooth'; settings.contourLines = true; }
+		refreshValueColors(); saveToStorage(); syncColorControls();
+		openContourBox();
+	}
+	function openContourBox() {
+		var box = contourBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		buildContourBox();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, contourboxLayout); });
+		initTipsIn(box);
+		rememberBoxOpen(contourboxLayout, saveContourboxLayout, true);
+	}
+	function closeContourBox() {
+		hidePanel(contourBoxEl());
+		rememberBoxOpen(contourboxLayout, saveContourboxLayout, false);
+	}
+	var LPN_CONTOURBOX_KEY = 'lpn_contourbox';
+	var contourboxLayout = newBoxLayout();
+	function saveContourboxLayout() {
+		try { localStorage.setItem(LPN_CONTOURBOX_KEY, JSON.stringify(contourboxLayout)); } catch (e) {}
+	}
+	function wireContourBox() {
+		var box = contourBoxEl(), x = document.getElementById('lpn_contour_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeContourBox); }
+		wireBoxMemory(box, LPN_CONTOURBOX_KEY, contourboxLayout, saveContourboxLayout, contourBoxIsOpen);
+	}
+	function refreshContourBoxIfOpen() { if (contourBoxIsOpen()) { buildContourBox(); } }
+	function contourChanged() { refreshValueColors(); saveToStorage(); syncColorControls(); }
+	function buildContourBox() {
+		var pc = EngCalcs.pageConfig || {}, body = document.getElementById('lpn_contour_body');
+		if (!body) { return; }
+		var focusedId = document.activeElement && body.contains && body.contains(document.activeElement) ? document.activeElement.id : '';
+		body.innerHTML = '';
+		function row(label, control, tip, suffix) {
+			var r = document.createElement('div'), lab = document.createElement('span'), cell = document.createElement('span');
+			r.className = 'lpn-set-row';
+			lab.textContent = label;
+			if (tip) { lab.title = tip; lab.className = 'ec-help'; }
+			cell.className = 'lpn-contour-ctl';
+			cell.appendChild(control);
+			if (suffix) { var u = document.createElement('span'); u.className = 'lpn-contour-unit'; u.textContent = suffix; cell.appendChild(u); }
+			r.appendChild(lab); r.appendChild(cell);
+			body.appendChild(r);
+			return r;
+		}
+		function select(id, opts, cur, onPick) {
+			var sel = document.createElement('select');
+			sel.id = id;
+			opts.forEach(function (o) {
+				var opt = document.createElement('option');
+				opt.value = o[0]; opt.textContent = o[1];
+				if (o[0] === cur) { opt.selected = true; }
+				sel.appendChild(opt);
+			});
+			sel.addEventListener('change', function () { onPick(sel.value); });
+			return sel;
+		}
+		function check(id, on, onPick) {
+			var c = document.createElement('input');
+			c.type = 'checkbox'; c.id = id; c.checked = !!on;
+			c.addEventListener('change', function () { onPick(c.checked, c); });
+			return c;
+		}
+		function number(id, v, min, step, onPick) {
+			var n = document.createElement('input');
+			n.type = 'number'; n.id = id; n.value = String(v); n.min = String(min); n.step = String(step);
+			n.className = 'lpn-contour-num';
+			n.addEventListener('change', function () {
+				var x = parseFloat(n.value);
+				if (isFinite(x) && x > 0) { onPick(x); } else { n.value = String(v); }
+			});
+			return n;
+		}
+		var field = colorFieldOf('node');
+		row(pc.lpn_color_node_field || 'Color nodes by',
+			select('lpn_contour_field', [['', pc.lpn_color_none || 'No color']].concat(colorFieldOptions('node')), field || '', function (v) {
+				settings.colorNodeField = v; contourChanged();
+			}));
+		row(pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, 'node', '_contour'));
+		row(pc.lpn_contour_fill || 'Fill', select('lpn_contour_fill', [
+			['', pc.lpn_settings_legend_off || 'None'],
+			['smooth', pc.lpn_contour_fill_smooth || 'Smooth'],
+			['bands', pc.lpn_contour_fill_bands || 'Bands']], contourFillMode(), function (v) {
+			settings.contourFill = v; contourChanged();
+		}), pc.lpn_contour_fill_tip);
+		row(pc.lpn_contour_opacity || 'Fill opacity', number('lpn_contour_opacity', Math.round(100 * contourOpacityOf()), 1, 5, function (v) {
+			settings.contourOpacity = Math.max(0.01, Math.min(1, v / 100)); contourChanged();
+		}), null, '%');
+		row(pc.lpn_contour_lines || 'Contour lines', check('lpn_contour_lines', settings.contourLines, function (on) {
+			settings.contourLines = on; contourChanged();
+		}));
+		var cf = contourField, lo = cf ? cf.lo : 0, hi = cf ? cf.hi : 1;
+		row(pc.lpn_contour_interval || 'Interval', number('lpn_contour_interval', field ? contourIntervalOf(field, lo, hi) : 5, 0, 'any', function (v) {
+			if (!field) { return; }
+			settings.contourInterval = settings.contourInterval || {};
+			settings.contourInterval[contourIntervalKey(field)] = v; contourChanged();
+		}), null, field ? colorFieldUnitText('node', field) : '');
+		row(pc.lpn_tool_labels || 'Labels', check('lpn_contour_labels', settings.contourLabels !== false, function (on) {
+			settings.contourLabels = on; contourChanged();
+		}));
+		row(pc.lpn_contour_buffer || 'Buffer', number('lpn_contour_buffer', contourBufferOf(), 0.1, 0.5, function (v) {
+			settings.contourBuffer = Math.min(20, v); contourChanged();
+		}), pc.lpn_contour_buffer_tip, pc.lpn_contour_buffer_unit || '× median pipe length');
+		if (contourTerrainOffered()) {
+			// **TICKED ONLY WHEN IT WILL DRAW.** A project saved with the box ticked, opened in a
+			// browser that never said yes, would otherwise show a ticked box drawing the plain plot
+			// (pre-review, 2026-10-03). Unticked here, the project's own setting kept: ticking it
+			// asks the question, as on any first use.
+			row(pc.lpn_contour_dem || 'Ground between nodes from Mapbox DEM', check('lpn_contour_dem', contourTerrainWanted(), function (on, c) {
+				// THE QUESTION IS ASKED HERE AND NOWHERE ELSE: a redraw never asks, so a no is never
+				// asked again on the next solve. A no unticks the box and stores nothing.
+				if (on && EngCalcs.lpnTerrainAskForContour && !EngCalcs.lpnTerrainAskForContour()) { c.checked = false; on = false; }
+				settings.contourTerrain = on; contourChanged();
+			}), pc.lpn_contour_dem_tip);
+		}
+		// Every control waits on a coloured field but the field itself.
+		if (!field) {
+			Array.prototype.forEach.call(body.querySelectorAll ? body.querySelectorAll('input, select, button') : [], function (c) {
+				if (c.id !== 'lpn_contour_field') { c.disabled = true; }
+			});
+		}
+		if (focusedId) { var f = document.getElementById(focusedId); if (f && f.focus) { f.focus(); } }
+		initTipsIn(body);
 	}
 	function buildNodeEls(n) {
 		// **THE GRAB BAND FIRST, so the drawn disc paints over it** -- see LPN_NODE_HIT_PX. It
@@ -21666,21 +21999,22 @@ var EngCalcs = EngCalcs || {};
 	 * Keyboard: the button opens on Enter, Space or Down; inside the list Up/Down/Home/End move,
 	 * Enter or Space chooses, Escape closes and gives the button back the focus.
 	 */
-	function buildRampPicker(pc, group) {
+	// `idSuffix` lets a second view of the same picker (the contour box, Task 600) carry ids of its own.
+	function buildRampPicker(pc, group, idSuffix) {
 		var R = ramps(), wrap = document.createElement('div'), btn = document.createElement('button'),
 			pop = document.createElement('div'), opts = [], open = false, active = 0, name,
 			cur = colorRampKey(group), n = colorClassCount(group);
 		wrap.className = 'lpn-ramp-picker';
 		name = ((R && R.RAMPS[cur]) || { name: cur }).name;
 		btn.type = 'button';
-		btn.id = 'lpn_set_ramp_' + group;
+		btn.id = 'lpn_set_ramp_' + group + (idSuffix || '');
 		btn.className = 'lpn-ramp-btn';
 		btn.setAttribute('aria-haspopup', 'listbox');
 		btn.setAttribute('aria-expanded', 'false');
 		btn.setAttribute('aria-label', (pc.lpn_settings_color_ramp || 'Color scheme') + ': ' + name);
 		btn.title = name;
 		btn.appendChild(swatchBarEl(group, cur, n));
-		pop.id = 'lpn_set_ramp_list_' + group;
+		pop.id = 'lpn_set_ramp_list_' + group + (idSuffix || '');
 		pop.className = 'lpn-ramp-pop';
 		pop.setAttribute('role', 'listbox');
 		pop.setAttribute('aria-label', pc.lpn_settings_color_ramp || 'Color scheme');
@@ -21855,47 +22189,6 @@ var EngCalcs = EngCalcs || {};
 		// *"Add the modes selector we discussed"*, which existed but sat where nobody found it. The
 		// limits follow the method that generates them, because they are its output and are
 		// meaningless above it.
-		// **THE CONTOUR PLOT, DIRECTLY UNDER THE FIELD IT SPREADS OVER THE MAP** (Task 600). EPANET's
-		// own two Styles, and None. It has no field of its own -- it is this group's colouring --
-		// so it is disabled while nodes are not coloured. The ground checkbox appears only where it
-		// can work: pressure, a project placed on the Earth, and a Mapbox token.
-		function buildContourRows(target) {
-			var sel = document.createElement('select'), cur = contourStyleOf();
-			sel.id = 'lpn_set_contour_style';
-			[['', pc.lpn_settings_legend_off || 'None'],
-				['filled', pc.lpn_contour_filled || 'Filled contours'],
-				['lines', pc.lpn_contour_lines || 'Line contours']].forEach(function (o) {
-				var opt = document.createElement('option');
-				opt.value = o[0]; opt.textContent = o[1];
-				if (o[0] === cur) { opt.selected = true; }
-				sel.appendChild(opt);
-			});
-			sel.disabled = !colorFieldOf('node');
-			sel.addEventListener('change', function () {
-				settings.contourStyle = sel.value;
-				refreshValueColors(); saveToStorage(); syncColorControls();
-			});
-			rowIn(target, pc.lpn_contour_plot || 'Contour plot', sel, pc.lpn_contour_plot_tip);
-			if (!contourTerrainOffered()) { return; }
-			var dem = document.createElement('input');
-			dem.type = 'checkbox'; dem.id = 'lpn_set_contour_dem';
-			// **TICKED ONLY WHEN IT WILL DRAW.** A project saved with the box ticked, opened in a
-			// browser that never said yes, would otherwise show a ticked box drawing the plain plot
-			// (pre-review, 2026-10-03). Unticked here, the project's own setting kept: ticking it
-			// asks the question, as on any first use.
-			dem.checked = contourTerrainWanted();
-			dem.disabled = !cur;
-			dem.addEventListener('change', function () {
-				// THE QUESTION IS ASKED HERE AND NOWHERE ELSE: a redraw never asks, so a no is never
-				// asked again on the next solve. A no unticks the box and stores nothing.
-				if (dem.checked && EngCalcs.lpnTerrainAskForContour && !EngCalcs.lpnTerrainAskForContour()) {
-					dem.checked = false;
-				}
-				settings.contourTerrain = dem.checked;
-				refreshValueColors(); saveToStorage(); syncColorControls();
-			});
-			rowIn(target, pc.lpn_contour_dem || 'Ground between nodes from Mapbox DEM', dem, pc.lpn_contour_dem_tip);
-		}
 		function buildGroup(group) {
 			var target = group === 'node' ? nodeHost : linkHost,
 				field = colorFieldOf(group),
@@ -21905,7 +22198,6 @@ var EngCalcs = EngCalcs || {};
 			rowIn(target, (group === 'node'
 				? (pc.lpn_color_node_field || 'Color nodes by')
 				: (pc.lpn_color_link_field || 'Color links by')), fieldSelect(group));
-			if (group === 'node') { buildContourRows(target); }
 
 			// THE SCHEME. A button showing a bar of this group's own colours -- see buildRampPicker.
 			rowIn(target, pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, group));
@@ -31066,7 +31358,7 @@ var EngCalcs = EngCalcs || {};
 		// same reason.
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
 			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, LPN_LIBBOX_KEY,
-			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY,
+			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY,
 			// 'lpn_notesbox' and 'lpn_hotkeysbox' join the list here rather than a day later, for the
 			// same reason every entry above states its own miss: window furniture left out of this
 			// list makes "exactly as a brand-new visitor would see it" false for that one key. Named
@@ -39849,9 +40141,9 @@ var EngCalcs = EngCalcs || {};
 							fn: function () { closeMenu(); openPane('frequency'); }
 						},
 						// THE CONTOUR PLOT IS A MAP LAYER, so this row SHOWS it rather than opening a
-						// tab: filled contours of the node colouring (pressure, if nodes are not
-						// coloured yet), then the Settings box where its style lives and where it is
-						// turned off. See refreshContour().
+						// tab: a smooth fill of the node colouring with labelled lines (pressure, if
+						// nodes are not coloured yet), then its own box, where it is tuned and turned
+						// off. See refreshContour() and showContour().
 						{
 							label: pc.lpn_contour_menu || 'Contour', tip: pc.lpn_contour_tip,
 							fn: function () { closeMenu(); showContour(); }
@@ -40653,6 +40945,7 @@ var EngCalcs = EngCalcs || {};
 		wireWizardBars();
 		wireFireFlowBox();
 		wireEnergyBox();
+		wireContourBox();
 		wireScenarioCompareBox();
 		wireRunReportBox();
 		wireStatusReportBox();
@@ -44562,6 +44855,8 @@ var EngCalcs = EngCalcs || {};
 		}
 	}
 	function onZoomChangedNow() {
+		// The contour labels keep their size and spacing on screen, so a new scale re-places them.
+		scheduleContourRelabel();
 		// **ANYTHING DRAWN AT A SIZE IN SCREEN PIXELS HAS TO BE REDRAWN WHEN THE SCALE CHANGES**, or
 		// it is a constant in WORLD units instead and grows and shrinks with the drawing. Two things
 		// on this page are in that class, and the placement handles were the one that was missed:
@@ -46240,8 +46535,6 @@ var EngCalcs = EngCalcs || {};
 	var SETBOX_TARGETS = {
 		labels: 'lpn_set_sub_nodeSym',
 		coloring: 'lpn_set_sub_nodeSym',
-		// The node colours themselves, where the contour plot's own row sits (Task 600).
-		nodeColors: 'lpn_set_sub_nodeColors',
 		map: 'lpn_set_sec_map',
 		elements: 'lpn_set_sec_elements',
 		calc: 'lpn_set_sec_calc',
@@ -46957,6 +47250,7 @@ var EngCalcs = EngCalcs || {};
 		// no .rpt yet opens the box with its "no report yet" sentence inside rather than a notice.
 		if (ffboxLayout.open) { openFireFlowBox(); }
 		if (energyboxLayout.open) { openEnergyBox(); }
+		if (contourboxLayout.open) { openContourBox(); }
 		if (cmpboxLayout.open) { openScenarioCompareBox(); }
 		if (rptboxLayout.open) { openRunReportBox(true); }
 		// The Notes box (Tom, 2026-09-28), after the reports and before Find for the same stacking

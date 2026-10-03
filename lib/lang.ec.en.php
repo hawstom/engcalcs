@@ -1826,18 +1826,27 @@ $ec_lang['lpn_freq_summary']='Plotted: {n} of {total}';
 $ec_lang['lpn_freq_summary_time']='Plotted: {n} of {total}, at {time}';
 $ec_lang['lpn_freq_axis_percent']='Percent less than';
 // EPANET's Contour Plot (Task 600), drawn as a layer under the map rather than in a window of its
-// own. "Filled contours" and "Line contours" are EPANET's own two Styles. {n} is a node count, {k}
-// a whole number, {m} a distance in metres; all substituted. The consent paragraphs replace the first
+// own, from the pipes outward. {n} and {p} are counts, {k} and {i} numbers, {u} a unit symbol, {m} a
+// distance in metres; all substituted. lpn_contour_buffer_unit follows the Buffer number box.
 // lpn_contour_consent_1..4 are the terrain question's four paragraphs, reworded for what the contour
 // plot sends: tile numbers for the network's area, not each node's latitude and longitude.
 $ec_lang['lpn_contour_menu']='Contour';
-$ec_lang['lpn_contour_tip']='Show a contour plot on the map: the colors of the nodes, spread over the area between them. Its style is in Settings, where you can also turn it off.';
+$ec_lang['lpn_contour_tip']='Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.';
 $ec_lang['lpn_contour_plot']='Contour plot';
-$ec_lang['lpn_contour_plot_tip']='Colors the map between nodes by the field the nodes are colored by, interpolated linearly between neighboring nodes. No color is drawn across pumps, valves, or closed links, or across wide gaps between nodes.';
-$ec_lang['lpn_contour_filled']='Filled contours';
-$ec_lang['lpn_contour_lines']='Line contours';
+$ec_lang['lpn_contour_fill']='Fill';
+$ec_lang['lpn_contour_fill_tip']='Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.';
+$ec_lang['lpn_contour_fill_smooth']='Smooth';
+$ec_lang['lpn_contour_fill_bands']='Bands';
+$ec_lang['lpn_contour_opacity']='Fill opacity';
+$ec_lang['lpn_contour_lines']='Contour lines';
+$ec_lang['lpn_contour_interval']='Interval';
+$ec_lang['lpn_contour_buffer']='Buffer';
+$ec_lang['lpn_contour_buffer_unit']='× median pipe length';
+$ec_lang['lpn_contour_buffer_tip']='How far the color reaches from each pipe, as a multiple of the median pipe length. It fades out over the outer part.';
 $ec_lang['lpn_contour_few']='Too few nodes to contour.';
-$ec_lang['lpn_contour_support']='Contour plot: linear between {n} nodes. No color across pumps, valves, or closed links, or across gaps wider than {k} times the median pipe length.';
+$ec_lang['lpn_contour_support']='Contour plot: {n} nodes, interpolated along {p} pipes and up to {k} times the median pipe length beside them. No color across pumps, valves, or closed links.';
+$ec_lang['lpn_contour_support_lines']='Contour lines every {i} {u}.';
+$ec_lang['lpn_contour_too_many']='Too many contour lines at this interval; widen it to draw them.';
 $ec_lang['lpn_contour_dem']='Ground between nodes from Mapbox DEM';
 $ec_lang['lpn_contour_dem_tip']='Between nodes, pressure becomes the interpolated head minus the height of the ground from Mapbox DEM, so it can fall below the lowest node pressure on a hill the network has no node on. Treat the ground as a contour map, not a survey.';
 $ec_lang['lpn_contour_support_dem']='Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.';

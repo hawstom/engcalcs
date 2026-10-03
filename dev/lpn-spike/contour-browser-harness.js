@@ -1,0 +1,205 @@
+// THE CONTOUR PLOT IN A REAL BROWSER (ROADMAP Task 600). The Node half is contour-harness.js; this
+// is what a stub cannot show: the raster on screen, the menu row, the box on a desk and on a phone,
+// and labels that keep their size through a zoom.
+//
+//   1. Water > Graphs > Contour on Net3 opens the box and draws a fill image (a PNG data URL), lines
+//      and labels, under the pipes.
+//   2. (e) The box: interval 10 redraws the lines at multiples of 10; opacity 30 sets the image to
+//      0.3; the label count follows Labels.
+//   3. A zoom re-places the labels at the same size on screen.
+//   4. (f) At 390 x 844 the box fits the screen, with nothing wider than it.
+//
+//   flock /tmp/engcalcs-browser.lock node dev/lpn-spike/contour-browser-harness.js
+// CONTOUR_SHOT=<dir> also writes a screenshot of each view there, for a person to look at.
+'use strict';
+
+const path = require('path');
+const { execFileSync, spawnSync } = require('child_process');
+
+const REPO = path.resolve(__dirname, '..', '..');
+const LOCK_FILE = process.env.EC_BROWSER_LOCK || '/tmp/engcalcs-browser.lock';
+const LOCK_ENV = 'EC_CONTOUR_BROWSER_LOCKED';
+const NAME = 'contour-browser-harness';
+
+if (process.env[LOCK_ENV] !== '1') {
+	let hasFlock = false;
+	try { execFileSync('which', ['flock'], { stdio: 'ignore' }); hasFlock = true; } catch (e) { /* no flock */ }
+	if (hasFlock) {
+		const r = spawnSync('flock', ['-E', '75', '-w', '280', LOCK_FILE, process.execPath, __filename], {
+			stdio: 'inherit', env: Object.assign({}, process.env, { [LOCK_ENV]: '1' })
+		});
+		if (r.error) { console.error(NAME + ': flock re-exec failed: ' + r.error.message); process.exit(1); }
+		if (r.status === 75) {
+			console.error(NAME + ': NOT RUN -- another session held ' + LOCK_FILE + ' for 280 s. Lock contention, not a failure of what this measures; re-run it alone.');
+			process.exit(1);
+		}
+		process.exit(r.status === null ? 1 : r.status);
+	}
+	console.error(NAME + ': no `flock` binary found -- running WITHOUT the browser lock.');
+}
+
+let checks = 0, failures = 0;
+function ok(label, cond, detail) {
+	checks++;
+	if (!cond) { failures++; }
+	console.log((cond ? '  ok   ' : '  FAIL ') + label + (detail === undefined ? '' : '   ' + detail));
+}
+async function shot(page, name) {
+	if (!process.env.CONTOUR_SHOT) { return; }
+	await page.screenshot({ path: path.join(process.env.CONTOUR_SHOT, name + '.png') });
+}
+
+async function openNet3(Session, browser, viewport) {
+	const a = await Session.open(browser, NAME, viewport ? { viewport } : undefined);
+	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+	await a.goto('Looped-Network.php');
+	await a.answerTrainingPanel().catch(() => {});
+	await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
+	await a.settle(1500);
+	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+	return a;
+}
+// Water > Graphs > Contour, by the rows' own words.
+async function contourFromMenu(a) {
+	const names = await a.page.evaluate(() => ({ g: EngCalcs.pageConfig.lpn_graphs_menu, c: EngCalcs.pageConfig.lpn_contour_menu }));
+	await a.page.click('#lpn_menu_project');
+	await a.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+	const clickRow = (sel, label) => a.page.evaluate(([s, l]) => {
+		const r = Array.from(document.querySelectorAll(s + ' button.lpn-menu-row')).find((b) => {
+			const t = Array.from(b.childNodes).filter((n) => !(n.classList && (n.classList.contains('lpn-menu-arrow') || n.classList.contains('lpn-kbdbadge') || n.classList.contains('lpn-menu-key'))))
+				.map((n) => n.textContent).join('').trim();
+			return t === l || t.indexOf(l) === 0;
+		});
+		if (r) { r.click(); }
+		return !!r;
+	}, [sel, label]);
+	ok('Water has a Graphs row', await clickRow('#lpn_menu_list', names.g));
+	await a.page.waitForSelector('#lpn_menu_popup2', { state: 'visible' });
+	ok('Graphs has a Contour row', await clickRow('#lpn_menu_list2', names.c));
+	await a.settle(600);
+}
+function layerFacts(page) {
+	return page.evaluate(() => {
+		const g = document.querySelector('#lpn_canvas g.lpn-contour');
+		if (!g) { return null; }
+		const img = g.querySelector('image.lpn-contour-fill'), r = img ? img.getBoundingClientRect() : null;
+		const labels = Array.from(g.querySelectorAll('text.lpn-contour-label'));
+		const lb = labels.map((t) => t.getBoundingClientRect());
+		return {
+			first: g.parentNode.firstChild === g,
+			href: img ? (img.getAttribute('href') || '').slice(0, 22) : '',
+			opacity: img ? img.getAttribute('opacity') : null,
+			imgW: r ? r.width : 0, imgH: r ? r.height : 0,
+			lines: Array.from(g.querySelectorAll('path.lpn-contour-line')).map((p) => +p.getAttribute('data-level')),
+			breaks: g.querySelectorAll('path.lpn-contour-break').length,
+			labels: labels.map((t) => +t.getAttribute('data-level')),
+			labelH: lb.length ? lb.reduce((s, b) => s + Math.min(b.width, b.height), 0) / lb.length : 0
+		};
+	});
+}
+async function setBox(a, id, value) {
+	await a.page.evaluate(([i, v]) => {
+		const e = document.getElementById(i);
+		if (e.type === 'checkbox') { e.checked = !!v; } else { e.value = String(v); }
+		e.dispatchEvent(new Event('change', { bubbles: true }));
+	}, [id, value]);
+	await a.settle(300);
+}
+
+async function sectionDesk(Session, browser) {
+	console.log('\n--- 1. Net3 on a desk ---');
+	const a = await openNet3(Session, browser, { width: 1440, height: 900 });
+	try {
+		// Colour the nodes by pressure needs a solve; the example solves on open.
+		await contourFromMenu(a);
+		const open = await a.page.evaluate(() => { const b = document.getElementById('lpn_contour_box'); return !!b && getComputedStyle(b).display !== 'none'; });
+		ok('the Contour row opens the contour box', open);
+		let f = await layerFacts(a.page);
+		ok('the layer is the first thing in the drawing group, under the pipes', f && f.first);
+		ok('the fill is a PNG raster on screen', f && f.href.indexOf('data:image/png') === 0 && f.imgW > 200 && f.imgH > 100, f && (f.href + ' ' + f.imgW + 'x' + f.imgH));
+		ok('at 60% opacity', f && f.opacity === '0.6', f && f.opacity);
+		ok('contour lines every 5 psi', f && f.lines.length >= 8 && f.lines.every((v) => v % 5 === 0), f && f.lines.join(','));
+		ok('labels on them', f && f.labels.length >= 3, f && f.labels.length);
+		ok('a break line at the pump', f && f.breaks >= 1);
+		await shot(a.page, 'contour-desk');
+
+		console.log('\n--- 2. the box redraws the layer (e) ---');
+		await setBox(a, 'lpn_contour_interval', 10);
+		f = await layerFacts(a.page);
+		ok('interval 10: the lines redraw at multiples of 10', f.lines.length >= 4 && f.lines.every((v) => v % 10 === 0), f.lines.join(','));
+		ok('...and the labels follow', f.labels.length > 0 && f.labels.every((v) => v % 10 === 0), f.labels.join(','));
+		await setBox(a, 'lpn_contour_opacity', 30);
+		f = await layerFacts(a.page);
+		ok('opacity 30: the image is drawn at 0.3', f.opacity === '0.3', f.opacity);
+		await setBox(a, 'lpn_contour_labels', false);
+		f = await layerFacts(a.page);
+		ok('Labels off: no labels, lines kept', f.labels.length === 0 && f.lines.length > 0);
+		await setBox(a, 'lpn_contour_labels', true);
+		await setBox(a, 'lpn_contour_opacity', 60);
+		await setBox(a, 'lpn_contour_interval', 5);
+
+		console.log('\n--- 3. a zoom keeps the labels\' size ---');
+		const before = await layerFacts(a.page);
+		const c = await a.page.evaluate(() => { const r = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
+		await a.page.mouse.move(c.x, c.y);
+		for (let i = 0; i < 4; i++) { await a.page.mouse.wheel(0, -240); await a.page.waitForTimeout(60); }
+		await a.settle(700);
+		const after = await layerFacts(a.page);
+		ok('zoomed in, labels are re-placed', after.labels.length > 0, before.labels.length + ' -> ' + after.labels.length);
+		ok('...at the same size on screen', before.labelH > 0 && Math.abs(after.labelH - before.labelH) / before.labelH < 0.25,
+			before.labelH.toFixed(1) + ' px -> ' + after.labelH.toFixed(1) + ' px');
+		await shot(a.page, 'contour-desk-zoomed');
+		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	} finally {
+		await a.close();
+	}
+}
+
+async function sectionPhone(Session, browser) {
+	console.log('\n--- 4. on a phone, 390 x 844 (f) ---');
+	const a = await openNet3(Session, browser, { width: 390, height: 844 });
+	try {
+		await contourFromMenu(a);
+		const fit = await a.page.evaluate(() => {
+			const b = document.getElementById('lpn_contour_box'), r = b.getBoundingClientRect(), body = document.getElementById('lpn_contour_body');
+			const wide = Array.from(b.querySelectorAll('input, select, button, .lpn-set-row')).filter((e) => {
+				const q = e.getBoundingClientRect();
+				return q.width > 0 && (q.right > r.right + 0.5 || q.left < r.left - 0.5);
+			}).map((e) => e.id || e.className);
+			return { l: r.left, t: r.top, r: r.right, b: r.bottom, vw: window.innerWidth, vh: window.innerHeight,
+				over: body.scrollWidth - body.clientWidth, wide, shown: getComputedStyle(b).display !== 'none' };
+		});
+		ok('the box is open', fit.shown);
+		ok('it lies inside the screen', fit.l >= 0 && fit.t >= 0 && fit.r <= fit.vw + 0.5 && fit.b <= fit.vh + 0.5, JSON.stringify(fit));
+		ok('nothing in it is wider than it, and it does not scroll sideways', fit.over <= 1 && fit.wide.length === 0, fit.over + ' ' + fit.wide.join(','));
+		await shot(a.page, 'contour-phone');
+		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	} finally {
+		await a.close();
+	}
+}
+
+async function main() {
+	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
+	const { Session } = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'session.js'));
+	const { chromium } = require(path.join(REPO, 'dev', 'browser-pass', 'node_modules', 'playwright-core'));
+	await env.startServer();
+	const executablePath = env.findChromium();
+	if (!executablePath) {
+		console.error(NAME + ': no Chromium found (set CHROME_PATH). SKIPPING rather than failing the build on an environment gap.');
+		env.stopServer();
+		process.exit(0);
+	}
+	const browser = await chromium.launch({ executablePath });
+	try {
+		await sectionDesk(Session, browser);
+		await sectionPhone(Session, browser);
+	} finally {
+		await browser.close();
+		env.stopServer();
+	}
+	console.log('\n' + NAME + ': ' + (checks - failures) + '/' + checks + ' checks passed');
+	if (failures) { process.exitCode = 1; }
+}
+
+main().catch((e) => { console.error(e); process.exitCode = 1; }).finally(() => { process.exit(process.exitCode || 0); });

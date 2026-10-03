@@ -1337,6 +1337,16 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<div id="lpn_energy_report" class="lpn-ff-report"></div>
 	</div>
 </div>
+<?php // THE CONTOUR BOX (ROADMAP Task 600; Tom, 2026-10-03: *"we may want the Contour graph command
+      // open a control box for this with color and contour controls"*). Small and non-modal, on the
+      // Find box's shell: the drag band holds the title, the body is rows of a name and a control,
+      // built in JS by buildContourBox() because every row reads the project's settings. Remembered
+      // per browser as `lpn_contourbox`, like every other standing box. ?>
+<div id="lpn_contour_box" class="d-print-none lpn-popover lpn-findbox lpn-contourbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_contour_title">
+	<div id="lpn_contour_title" class="lpn-setbox-title"><?=$ec_lang['lpn_contour_plot']?></div>
+	<button type="button" id="lpn_contour_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div id="lpn_contour_body" class="lpn-popover-body"></div>
+</div>
 <?php // THE SCENARIO COMPARISON (the planning engineer's wish-list row 2). Solve every scenario in
       // the project and print one row each: the lowest pressure and the highest velocity, and where
       // each was found. It borrows the fire flow box's shell for the reason the pump energy report
@@ -2157,11 +2167,20 @@ EngCalcs.pageConfig = {
 	lpn_contour_menu: <?=json_encode($ec_lang['lpn_contour_menu'])?>,
 	lpn_contour_tip: <?=json_encode($ec_lang['lpn_contour_tip'])?>,
 	lpn_contour_plot: <?=json_encode($ec_lang['lpn_contour_plot'])?>,
-	lpn_contour_plot_tip: <?=json_encode($ec_lang['lpn_contour_plot_tip'])?>,
-	lpn_contour_filled: <?=json_encode($ec_lang['lpn_contour_filled'])?>,
+	lpn_contour_fill: <?=json_encode($ec_lang['lpn_contour_fill'])?>,
+	lpn_contour_fill_tip: <?=json_encode($ec_lang['lpn_contour_fill_tip'])?>,
+	lpn_contour_fill_smooth: <?=json_encode($ec_lang['lpn_contour_fill_smooth'])?>,
+	lpn_contour_fill_bands: <?=json_encode($ec_lang['lpn_contour_fill_bands'])?>,
+	lpn_contour_opacity: <?=json_encode($ec_lang['lpn_contour_opacity'])?>,
 	lpn_contour_lines: <?=json_encode($ec_lang['lpn_contour_lines'])?>,
+	lpn_contour_interval: <?=json_encode($ec_lang['lpn_contour_interval'])?>,
+	lpn_contour_buffer: <?=json_encode($ec_lang['lpn_contour_buffer'])?>,
+	lpn_contour_buffer_unit: <?=json_encode($ec_lang['lpn_contour_buffer_unit'])?>,
+	lpn_contour_buffer_tip: <?=json_encode($ec_lang['lpn_contour_buffer_tip'])?>,
 	lpn_contour_few: <?=json_encode($ec_lang['lpn_contour_few'])?>,
 	lpn_contour_support: <?=json_encode($ec_lang['lpn_contour_support'])?>,
+	lpn_contour_support_lines: <?=json_encode($ec_lang['lpn_contour_support_lines'])?>,
+	lpn_contour_too_many: <?=json_encode($ec_lang['lpn_contour_too_many'])?>,
 	lpn_contour_dem: <?=json_encode($ec_lang['lpn_contour_dem'])?>,
 	lpn_contour_dem_tip: <?=json_encode($ec_lang['lpn_contour_dem_tip'])?>,
 	lpn_contour_support_dem: <?=json_encode($ec_lang['lpn_contour_support_dem'])?>,
