@@ -1,3 +1,119 @@
+/* ec-colour-tokens:begin */
+/* CHROME COLOUR TOKENS (Task 714, Phase 1; dev/theming-plan.md). Every colour of the application's own
+   chrome is declared here and used as var(--ec-...) everywhere else. Values are exactly the literals the
+   stylesheet carried before, so nothing changed on screen. A later dark set overrides these names and
+   nothing else. Map symbology and paper are NOT chrome and stay literal: dev/scripts/chrome_colour_allow.json.
+   dev/scripts/chrome_colour_check.php refuses a colour literal outside this block. */
+:root {
+	/* Surfaces and text */
+	--ec-bg: #fff;
+	--ec-ink: #333;
+	--ec-ink-strong: #222;
+	--ec-ink-muted: #555;
+	--ec-ink-subtle: #666;
+	--ec-ink-black: #000;
+	/* Rules and borders */
+	--ec-border: #ddd;
+	--ec-border-strong: #ccc;
+	/* Accent: links, outlined buttons, menu bar */
+	--ec-accent: #0645ad;
+	--ec-accent-hover: #1f58b5;
+	--ec-accent-open: #05378a;
+	--ec-accent-hover-bg: #eaf1fc;
+	--ec-accent-open-bg: #d7e6fb;
+	/* Brand blue: consent buttons, nav */
+	--ec-brand: #1a6faf;
+	--ec-brand-hover: #14588c;
+	/* Notice and status */
+	--ec-warn-bg: #fffbe6;
+	--ec-warn-border: #a80;
+	--ec-warn-ink: #c60;
+	--ec-ok-ink: #267326;
+	--ec-bad-ink: #c00;
+	--ec-error-ink: #a00;
+	--ec-error-bg: #fdecea;
+	--ec-neutral-ink: gray;
+	/* Interaction: toolbar hover and pressed, table selection */
+	--ec-hover-bg: #def;
+	--ec-hover-border: #9bd;
+	--ec-pressed-bg: #cfe3f7;
+	--ec-pressed-border: #6aa6d8;
+	--ec-select: #0b57d0;
+	--ec-select-bg: #e8f0fe;
+	--ec-select-bg-strong: #d3e3fd;
+	/* Calculator forms and the debug grid */
+	--ec-form-bg: #f7f9ff;
+	--ec-form-border: #66c;
+	--ec-debug-grid: blue;
+	/* Neutral greys, named by value: one role each is a Phase 2 job */
+	--ec-gray-444: #444;
+	--ec-gray-767676: #767676;
+	--ec-gray-777: #777;
+	--ec-gray-888: #888;
+	--ec-gray-999: #999;
+	--ec-gray-aaa: #aaa;
+	--ec-gray-bbb: #bbb;
+	--ec-gray-d6d6d6: #d6d6d6;
+	--ec-gray-dcdcdc: #dcdcdc;
+	--ec-gray-e0e0e0: #e0e0e0;
+	--ec-gray-e6e6e6: #e6e6e6;
+	--ec-gray-e8e8e8: #e8e8e8;
+	--ec-gray-eaeaea: #eaeaea;
+	--ec-gray-ececec: #ececec;
+	--ec-gray-eee: #eee;
+	--ec-gray-f0f0f0: #f0f0f0;
+	--ec-gray-f2f2f2: #f2f2f2;
+	--ec-gray-f6f6f6: #f6f6f6;
+	--ec-gray-f7f7f7: #f7f7f7;
+	--ec-gray-fafafa: #fafafa;
+	/* Other hues, named by value: role not yet assigned */
+	--ec-hue-037: #037;
+	--ec-hue-05a: #05a;
+	--ec-hue-0b0080: #0b0080;
+	--ec-hue-10304f: #10304f;
+	--ec-hue-12211f: #12211f;
+	--ec-hue-1565c0: #1565c0;
+	--ec-hue-17406b: #17406b;
+	--ec-hue-1976d2: #1976d2;
+	--ec-hue-2a6ebb: #2a6ebb;
+	--ec-hue-3c4043: #3c4043;
+	--ec-hue-5a6570: #5a6570;
+	--ec-hue-5f6368: #5f6368;
+	--ec-hue-667: #667;
+	--ec-hue-8ab: #8ab;
+	--ec-hue-b00020: #b00020;
+	--ec-hue-c0392b: #c0392b;
+	--ec-hue-d99: #d99;
+	--ec-hue-e8a33d: #e8a33d;
+	--ec-hue-eae7e0: #eae7e0;
+	--ec-hue-eef1f4: #eef1f4;
+	--ec-hue-eef3fd: #eef3fd;
+	--ec-hue-eef4ff: #eef4ff;
+	--ec-hue-f4d4d4: #f4d4d4;
+	--ec-hue-fdd: #fdd;
+	--ec-hue-fff3cd: #fff3cd;
+	--ec-hue-fff4e5: #fff4e5;
+	/* Translucent colours (shadows, scrims, tints), named by RGB and alpha */
+	--ec-a-0-0-0-12: rgba(0, 0, 0, .12);
+	--ec-a-0-0-0-18: rgba(0, 0, 0, .18);
+	--ec-a-0-0-0-2: rgba(0, 0, 0, .2);
+	--ec-a-0-0-0-25: rgba(0, 0, 0, .25);
+	--ec-a-0-0-0-3: rgba(0, 0, 0, .3);
+	--ec-a-0-0-0-35: rgba(0, 0, 0, .35);
+	--ec-a-0-0-0-4: rgba(0, 0, 0, .4);
+	--ec-a-6-69-173-12: rgba(6, 69, 173, .12);
+	--ec-a-6-69-173-35: rgba(6, 69, 173, .35);
+	--ec-a-60-64-67-14: rgba(60, 64, 67, .14);
+	--ec-a-60-64-67-5: rgba(60, 64, 67, .5);
+	--ec-a-128-128-128-4: rgba(128, 128, 128, .4);
+	--ec-a-128-128-128-45: rgba(128, 128, 128, .45);
+	--ec-map-overlay-bg: rgba(255, 255, 255, .8);
+	--ec-a-255-255-255-85: rgba(255, 255, 255, .85);
+	--ec-a-255-255-255-9: rgba(255, 255, 255, .9);
+	--ec-a-255-255-255-94: rgba(255, 255, 255, .94);
+}
+/* ec-colour-tokens:end */
+
 /* ---------------------------------------------------------------------------------------------
    SELF-SUFFICIENCY BLOCK -- rules this suite needs that used to live only in the PARENT SITE.
    Added 2026-08-14 after dev.hawsedc.com's first deploy came up with no blue form backgrounds and
@@ -22,13 +138,13 @@
    --------------------------------------------------------------------------------------------- */
 body { font-family: sans-serif; }
 form {
-	background: #f7f9ff;
-	border: 1px solid #66c;
+	background: var(--ec-form-bg);
+	border: 1px solid var(--ec-form-border);
 	margin-bottom: 1px;
 }
 .left { float: left; margin: 0.5em; }
 table, th, tr, td {
-	border: 1px solid blue;
+	border: 1px solid var(--ec-debug-grid);
 	border-collapse: collapse;
 	padding: 0px 2px 0px 2px;
 }
@@ -83,8 +199,8 @@ table.bare > tbody > tr > td { vertical-align: top; }
 	display: grid;
 	grid-template-columns: auto auto auto auto;
 	justify-content: start;
-	border-block-start: 1px solid blue;
-	border-inline-start: 1px solid blue;
+	border-block-start: 1px solid var(--ec-debug-grid);
+	border-inline-start: 1px solid var(--ec-debug-grid);
 }
 /* ONE CLASS, NO DESCENDANT COMBINATOR, and that is load-bearing: Bootstrap hides a collapsed line
    with `.collapse:not(.show) { display: none }`, specificity (0,2,0). A `.ec-fieldgrid > .ec-fg-cell`
@@ -101,8 +217,8 @@ table.bare > tbody > tr > td { vertical-align: top; }
 .ec-line-off { display: none; }
 .ec-fieldgrid > .ec-fg-cell {
 	padding: 0px 2px 0px 2px;
-	border-block-end: 1px solid blue;
-	border-inline-end: 1px solid blue;
+	border-block-end: 1px solid var(--ec-debug-grid);
+	border-inline-end: 1px solid var(--ec-debug-grid);
 }
 .ec-fieldgrid > .ec-fg-cell > .ec-fg-in { min-width: 0; }
 .ec-fieldgrid > .ec-fg-label { grid-column: 1; }
@@ -181,19 +297,19 @@ input.ec-spin[type=number] {
 /* Validity/status check results (velocity checks, regime checks, DU quality,
    D50 range checks, head-loss checks, conveyance efficiency, etc.) */
 .ec-status-ok {
-	color: #267326;
+	color: var(--ec-ok-ink);
 }
 .ec-status-info {
 	color: steelblue;
 }
 .ec-status-warn {
-	color: #c60;
+	color: var(--ec-warn-ink);
 }
 .ec-status-bad {
-	color: #c00;
+	color: var(--ec-bad-ink);
 }
 .ec-status-neutral {
-	color: gray;
+	color: var(--ec-neutral-ink);
 }
 
 /* Branched-Network per-row topology verdict. It sits in the ID or Upstream cell of the
@@ -202,7 +318,7 @@ input.ec-spin[type=number] {
    2026-09-06: "out of place and confusing"). */
 .bpn-rowflag {
 	display: block;
-	color: #c60;
+	color: var(--ec-warn-ink);
 	font-size: 11px;
 	white-space: nowrap;
 }
@@ -965,7 +1081,7 @@ html[lang="zh"] .ec-welcome {
    every editable field once you are inside a scenario, and at full weight they would outnumber and
    outshout the numbers they annotate. */
 .lpn-ov-marker { margin-left: 1.5em; font-size: 0.85em; }
-.lpn-ov-base { margin-left: 0.6em; color: #666; }
+.lpn-ov-base { margin-left: 0.6em; color: var(--ec-ink-subtle); }
 /* Feedback for the first-picked node of a pipe/pump (Tom, 2026-07-30: "otherwise there's no
    indication that anything is working") -- a wide red ring around the existing node fill/stroke,
    cleared by setPendingLinkFrom(null) in looped-network.js on completion or cancel. */
@@ -996,10 +1112,10 @@ html[lang="zh"] .ec-welcome {
 .lpn-area-hint {
 	position: fixed; pointer-events: auto;
 	font-size: 11px; line-height: 1.35; max-width: 22em;
-	background: #fff; color: #12211f;
-	border: 1px solid #0645ad; border-radius: 3px;
+	background: var(--ec-bg); color: var(--ec-hue-12211f);
+	border: 1px solid var(--ec-accent); border-radius: 3px;
 	padding: 6px 10px;
-	box-shadow: 0 2px 6px rgba(0,0,0,.3);
+	box-shadow: 0 2px 6px var(--ec-a-0-0-0-3);
 }
 .lpn-area-hint > div { pointer-events: none; }
 .lpn-area-hint-note { font-weight: bold; margin-bottom: 2px; }
@@ -1231,8 +1347,8 @@ html[lang="zh"] .ec-welcome {
 	position: fixed; left: 50%; transform: translateX(-50%); bottom: 1em;
 	z-index: 3000; display: flex; align-items: center; gap: 0.75em;
 	padding: 0.5em 0.9em; border-radius: 4px;
-	background: #222; color: #fff; font-size: 0.95em;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+	background: var(--ec-ink-strong); color: var(--ec-bg); font-size: 0.95em;
+	box-shadow: 0 2px 8px var(--ec-a-0-0-0-35);
 }
 .lpn-regmode-bar button { font: inherit; padding: 0.15em 0.7em; cursor: pointer; }
 @media print { .lpn-regmode-bar { display: none; } }
@@ -1345,9 +1461,9 @@ html[lang="zh"] .ec-welcome {
    control" signal belongs. */
 .lpn-demand-del {
 	background: none; border: 1px solid transparent; border-radius: 4px;
-	font: inherit; line-height: 1; padding: 0 4px; cursor: pointer; color: #a00;
+	font: inherit; line-height: 1; padding: 0 4px; cursor: pointer; color: var(--ec-error-ink);
 }
-.lpn-demand-del:hover { background: #fdd; border-color: #d99; }
+.lpn-demand-del:hover { background: var(--ec-hue-fdd); border-color: var(--ec-hue-d99); }
 .lpn-demand-add { font: inherit; margin: 2px 0; }
 /* The Elevation field's DEM control in the node popup (Task 542). A button and, once it has been
    asked, one line saying what the terrain service reported — kept together so the sentence reads as
@@ -1374,8 +1490,8 @@ html[lang="zh"] .ec-welcome {
 	background: none; border: 1px solid transparent; border-radius: 4px;
 	font: inherit; color: inherit; padding: 3px 5px; line-height: 1; cursor: pointer;
 }
-#lpn_toolbar button:not(.lpn-transport-btn):hover { background: #def; border-color: #9bd; }
-#lpn_toolbar button:not(.lpn-transport-btn)[aria-pressed="true"] { background: #cfe3f7; border-color: #6aa6d8; }
+#lpn_toolbar button:not(.lpn-transport-btn):hover { background: var(--ec-hover-bg); border-color: var(--ec-hover-border); }
+#lpn_toolbar button:not(.lpn-transport-btn)[aria-pressed="true"] { background: var(--ec-pressed-bg); border-color: var(--ec-pressed-border); }
 #lpn_toolbar button:not(.lpn-transport-btn):disabled { opacity: .4; cursor: default; background: none; border-color: transparent; }
 #lpn_toolbar button .ec-icon { width: 1.35em; height: 1.35em; vertical-align: -0.25em; }
 /* **THE TRANSPORT IS THE ONE EXCEPTION, AND IT KEEPS ITS BUTTONS** (same message: "The Transport is
@@ -1399,11 +1515,11 @@ html[lang="zh"] .ec-welcome {
    beside it would mark a gap the eye has already read. */
 #lpn_toolbar {
 	display: flex; flex-wrap: wrap; align-items: center; row-gap: 4px;
-	border-bottom: 1px solid #d6d6d6; padding-bottom: 4px; margin-bottom: 4px;
+	border-bottom: 1px solid var(--ec-gray-d6d6d6); padding-bottom: 4px; margin-bottom: 4px;
 }
 .lpn-toolbar-group { display: inline-flex; gap: 6px; margin-right: 12px; align-items: center; }
 .lpn-toolbar-group + .lpn-toolbar-group:not(.lpn-toolbar-end) {
-	border-left: 1px solid #d6d6d6; padding-left: 12px;
+	border-left: 1px solid var(--ec-gray-d6d6d6); padding-left: 12px;
 }
 .lpn-transport-btn { font: inherit; cursor: pointer; }
 /* The right-hand end of the strip: Find and the bottom-pane toggle (Task 434). Pushed there by an
@@ -1513,12 +1629,12 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    the text in every state (so the rule reads as one outlined shape, not a box with a stray ring),
    and both move together on hover and open. */
 .lpn-menubar-item {
-	background: #fff; color: #0645ad; border: 1px solid #0645ad; border-radius: 5px;
+	background: var(--ec-bg); color: var(--ec-accent); border: 1px solid var(--ec-accent); border-radius: 5px;
 	font: inherit; padding: 3px 10px; cursor: pointer;
 }
-.lpn-menubar-item:hover { background: #eaf1fc; border-color: #1f58b5; color: #1f58b5; }
-.lpn-menubar-item[aria-expanded="true"] { background: #d7e6fb; border-color: #05378a; color: #05378a; }
-.lpn-menubar-item:focus-visible { outline: 2px solid #0645ad; outline-offset: 2px; }
+.lpn-menubar-item:hover { background: var(--ec-accent-hover-bg); border-color: var(--ec-accent-hover); color: var(--ec-accent-hover); }
+.lpn-menubar-item[aria-expanded="true"] { background: var(--ec-accent-open-bg); border-color: var(--ec-accent-open); color: var(--ec-accent-open); }
+.lpn-menubar-item:focus-visible { outline: 2px solid var(--ec-accent); outline-offset: 2px; }
 /* THE HOME MARK (Task 625). Now an ordinary .lpn-menubar-item button -- it became a MENU when Tom
    pointed out that the leftmost slot is the Apple-menu position and carries that expectation -- so
    it inherits the bar's own paint, hover and 640px collapse and needs none of its own. All that is
@@ -1544,28 +1660,28 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    a hole in it. */
 #lpn_tabs {
 	display: flex; align-items: flex-end; gap: 2px;
-	border-bottom: 1px solid #999; margin-bottom: 6px; padding: 0 2px;
+	border-bottom: 1px solid var(--ec-gray-999); margin-bottom: 6px; padding: 0 2px;
 }
 /* **overflow-y MUST BE STATED.** A box with `overflow-x: auto` and overflow-y left at `visible`
    computes the y axis to `auto` too (CSS Overflow 3), so the strip grew a vertical scrollbar at
    its right edge for content that is one row tall and can never overflow that way (Tom,
    2026-08-21). `hidden` is the fix; there is nothing above or below a tab to reach. */
 .lpn-tabs-scroll { display: flex; align-items: flex-end; gap: 2px; overflow-x: auto; overflow-y: hidden; flex: 1 1 auto; }
-.lpn-tab { display: inline-flex; align-items: stretch; background: #ececec; border: 1px solid #999; border-bottom: none; border-radius: 4px 4px 0 0; margin-bottom: -1px; }
+.lpn-tab { display: inline-flex; align-items: stretch; background: var(--ec-gray-ececec); border: 1px solid var(--ec-gray-999); border-bottom: none; border-radius: 4px 4px 0 0; margin-bottom: -1px; }
 /* The current tab is white and open at the bottom -- continuous with the page under it. */
-.lpn-tab-current { background: #fff; }
+.lpn-tab-current { background: var(--ec-bg); }
 .lpn-tab-current .lpn-tab-name { font-weight: bold; }
 .lpn-tab-name, .lpn-tab-caret, .lpn-tab-btn {
 	background: none; border: 0; font: inherit; color: inherit; cursor: pointer; padding: 3px 8px; white-space: nowrap;
 }
-.lpn-tab-caret, .lpn-tab-x { padding: 3px 5px; border-left: 1px solid #ccc; background: none; border-top: 0; border-right: 0; border-bottom: 0; font: inherit; color: inherit; cursor: pointer; }
+.lpn-tab-caret, .lpn-tab-x { padding: 3px 5px; border-left: 1px solid var(--ec-border-strong); background: none; border-top: 0; border-right: 0; border-bottom: 0; font: inherit; color: inherit; cursor: pointer; }
 /* The [X] is on EVERY tab, not just the current one -- that is what the paradigm we are adopting
    does, and the whole return on adopting one is that nobody has to be taught it (Tom, 2026-08-04).
    Muted until hovered so a strip of tabs does not read as a row of close buttons. */
-.lpn-tab-x { color: #777; }
-.lpn-tab-x:hover { color: #a00; background: #f4d4d4; }
+.lpn-tab-x { color: var(--ec-gray-777); }
+.lpn-tab-x:hover { color: var(--ec-error-ink); background: var(--ec-hue-f4d4d4); }
 .lpn-tab-btn { border: 1px solid transparent; align-self: center; }
-.lpn-tab-name:hover, .lpn-tab-caret:hover, .lpn-tab-btn:hover { background: #ddd; }
+.lpn-tab-name:hover, .lpn-tab-caret:hover, .lpn-tab-btn:hover { background: var(--ec-border); }
 /* THE ASTERISK. Full strength means "there are changes this file does not have" -- something to go
    and do. Faded means "this project is in no file at all", a standing condition rather than a task.
    Both genuinely mean unsaved; only the salience differs (Tom, 2026-08-04). If the faded one reads
@@ -1580,15 +1696,15 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	.lpn-tabs-scroll .lpn-tab:not(.lpn-tab-current) { display: none; }
 }
 .lpn-menu-row { display: block; width: 100%; text-align: left; background: none; border: 0; font: inherit; padding: 4px 12px 4px 8px; cursor: pointer; white-space: nowrap; }
-.lpn-menu-row:hover:enabled { background: #def; }
-.lpn-menu-row:disabled { color: #999; cursor: default; }
+.lpn-menu-row:hover:enabled { background: var(--ec-hover-bg); }
+.lpn-menu-row:disabled { color: var(--ec-gray-999); cursor: default; }
 /* Group label above the recent-file rows (Task 258). Indented to the icon column so it reads as a
    heading over those rows rather than as a row of its own that failed to get a glyph. */
-.lpn-menu-heading { padding: 4px 12px 1px 8px; font-size: 0.8em; color: #666; white-space: nowrap; }
+.lpn-menu-heading { padding: 4px 12px 1px 8px; font-size: 0.8em; color: var(--ec-ink-subtle); white-space: nowrap; }
 /* "There is more this way" on a row that opens a fly-out (Task 264). Pushed to the trailing edge so
    the arrow lines up down the menu regardless of label length; margin-inline-start, not left,
    because in the five RTL languages the fly-out opens on the other side. */
-.lpn-menu-arrow { margin-inline-start: 1.5em; float: inline-end; color: #666; }
+.lpn-menu-arrow { margin-inline-start: 1.5em; float: inline-end; color: var(--ec-ink-subtle); }
 /* Reserved icon column for menu rows (Task 231). Fixed width and always present, even when the
    row has no icon, so one iconless row cannot ragged-edge the labels around it. */
 .lpn-menu-icon { display: inline-block; width: 1.6em; text-align: center; }
@@ -1637,9 +1753,9 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	position: absolute; top: 0; right: 0;
 	width: 40px; height: 40px; line-height: 1;
 	padding: 0; border: 0; background: transparent;
-	font-size: 20px; color: #333; cursor: pointer;
+	font-size: 20px; color: var(--ec-ink); cursor: pointer;
 }
-.lpn-popover-x:hover, .lpn-popover-x:focus { background: #eee; color: #000; }
+.lpn-popover-x:hover, .lpn-popover-x:focus { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
 /* Popover fit-to-screen (Tom, 2026-07-31, testing on a phone: "everything right of the middle of
    the X is allowed to overflow off the right edge... I would have expected the right edge of the
    popup to align with the right edge of the screen"). The JS clamp in looped-network.js can only
@@ -1721,14 +1837,14 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    standing note rather than an answer to anything the user just did. */
 .lpn-find-hint {
 	font-size: .8em;
-	color: #666;
+	color: var(--ec-ink-subtle);
 	margin: 0 0 4px;
 }
 /* A parse failure. It is the one message on this panel that means NOTHING WILL BE SEARCHED, so it
    is the one that is allowed to be loud. `display` is set from script -- empty means no error. */
 .lpn-find-msg {
 	font-size: .85em;
-	color: #a00;
+	color: var(--ec-error-ink);
 	margin: 0 0 6px;
 	overflow-wrap: break-word;
 }
@@ -1736,7 +1852,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    quiet: it explains an absence, and the query input under it is what the eye should go to. */
 .lpn-find-aside {
 	font-size: .85em;
-	color: #555;
+	color: var(--ec-ink-muted);
 	margin: 4px 0;
 	overflow-wrap: break-word;
 }
@@ -1813,9 +1929,9 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	font-size: 0.85rem;
 	white-space: nowrap;
 	text-decoration: none;
-	color: #5a6570;
+	color: var(--ec-hue-5a6570);
 }
-.ec-nav-libre:hover, .ec-nav-libre:focus { color: #1a6faf; text-decoration: underline; }
+.ec-nav-libre:hover, .ec-nav-libre:focus { color: var(--ec-brand); text-decoration: underline; }
 .ec-nav-libre > .ec-icon { margin-inline-end: 0.3em; }
 
 /* Narrow phones: the brand plus a long translation (bg "Свободен софтуер", id "Perangkat
@@ -1871,9 +1987,9 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	inset-inline: 0;
 	bottom: 0;
 	z-index: 1080; /* over Bootstrap's fixed navbar (1030) and its dropdowns (1000) */
-	background: #fff;
-	border-top: 2px solid #1a6faf;
-	box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+	background: var(--ec-bg);
+	border-top: 2px solid var(--ec-brand);
+	box-shadow: 0 -2px 10px var(--ec-a-0-0-0-2);
 	padding: 0.75rem 1rem;
 	max-height: 70vh;
 	overflow-y: auto;
@@ -1895,13 +2011,13 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	flex: 1 1 12rem; /* equal share of the row, so neither answer is the bigger target */
 	padding: 0.5rem 1rem;
 	font: inherit;
-	color: #fff;
-	background: #1a6faf;
-	border: 1px solid #1a6faf;
+	color: var(--ec-bg);
+	background: var(--ec-brand);
+	border: 1px solid var(--ec-brand);
 	border-radius: 0.25rem;
 	cursor: pointer;
 }
-.ec-consent-btn:hover, .ec-consent-btn:focus { background: #14588c; border-color: #14588c; }
+.ec-consent-btn:hover, .ec-consent-btn:focus { background: var(--ec-brand-hover); border-color: var(--ec-brand-hover); }
 .ec-consent-links, .ec-legal-links { margin: 0; font-size: 0.9rem; }
 .ec-consent-links a, .ec-legal-links a { margin-inline-end: 1rem; }
 
@@ -1912,7 +2028,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .ec-legal h2 { font-size: 1.25rem; margin-top: 1.5rem; }
 .ec-legal h3 { font-size: 1.05rem; margin-top: 1rem; }
 .ec-legal-table { display: block; overflow-x: auto; border-collapse: collapse; margin: 0.5rem 0 1rem; }
-.ec-legal-table th, .ec-legal-table td { border: 1px solid #ccc; padding: 0.3rem 0.5rem; text-align: start; vertical-align: top; }
+.ec-legal-table th, .ec-legal-table td { border: 1px solid var(--ec-border-strong); padding: 0.3rem 0.5rem; text-align: start; vertical-align: top; }
 
 /* ---- The examples gallery (ROADMAP Task 314) --------------------------------------------------
    Sits over the map canvas when there is nothing drawn, and on demand from File > Open example.
@@ -1954,17 +2070,17 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	align-items: stretch;
 	gap: .25em;
 	padding: .5rem .5rem .6rem;
-	border: 1px solid rgba(128, 128, 128, .45);
+	border: 1px solid var(--ec-a-128-128-128-45);
 	border-radius: 6px;
-	background: rgba(255, 255, 255, .94);
-	color: #222;
+	background: var(--ec-a-255-255-255-94);
+	color: var(--ec-ink-strong);
 	font: inherit;
 	text-align: left;
 	cursor: pointer;
 }
 .lpn-example-card:hover, .lpn-example-card:focus-visible {
-	border-color: #2a6ebb;
-	box-shadow: 0 1px 6px rgba(0, 0, 0, .18);
+	border-color: var(--ec-hue-2a6ebb);
+	box-shadow: 0 1px 6px var(--ec-a-0-0-0-18);
 }
 /* **THE DRAWING SITS ON WHITE PAPER, IN BOTH THEMES** (Tom, 2026-08-14: "The examples all have
    very dark backgrounds. It would be better for them to have white backgrounds with a nice
@@ -1982,10 +2098,10 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	margin-bottom: .15em;
 	padding: 2px;
 	box-sizing: border-box;
-	background: #fff;
-	border: 1px solid rgba(128, 128, 128, .4);
+	background: var(--ec-bg);
+	border: 1px solid var(--ec-a-128-128-128-4);
 	border-radius: 3px;
-	color: #17406b;
+	color: var(--ec-hue-17406b);
 }
 .lpn-example-title { font-weight: 600; font-size: .92em; }
 .lpn-example-desc { font-size: .8em; opacity: .8; line-height: 1.3; }
@@ -1999,7 +2115,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 	padding: .3em;
 	font: inherit;
 	font-size: .9em;
-	color: #17406b;
+	color: var(--ec-hue-17406b);
 	text-decoration: underline;
 	cursor: pointer;
 }
@@ -2108,25 +2224,25 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    a ResizeObserver redraws it when the pane is dragged. The CSS's only job is to make the host a
    real box for that measurement to find. */
 .lpn-profile-svg { display: block; width: 100%; height: 100%; }
-.lpn-profile-frame { fill: none; stroke: #333; stroke-width: 1; }
-.lpn-profile-grid { stroke: #ddd; stroke-width: 1; }
-.lpn-profile-axis { stroke: #333; stroke-width: 1; }
+.lpn-profile-frame { fill: none; stroke: var(--ec-ink); stroke-width: 1; }
+.lpn-profile-grid { stroke: var(--ec-border); stroke-width: 1; }
+.lpn-profile-axis { stroke: var(--ec-ink); stroke-width: 1; }
 /* The vertical hairline at each node. Lighter than a gridline: it says WHERE a node is without
    competing with the two lines the drawing is about. */
-.lpn-profile-station { stroke: #eee; stroke-width: 1; }
-.lpn-profile-ground { fill: none; stroke: #000; stroke-width: 1.5; }
-.lpn-profile-hgl { fill: none; stroke: #0645ad; stroke-width: 1.5; }
-.lpn-profile-band { fill: #0645ad; fill-opacity: .12; stroke: none; }
-.lpn-profile-dot { fill: #000; }
-.lpn-profile-tick { font-size: 10px; fill: #333; }
-.lpn-profile-nodeid { font-size: 10px; fill: #333; }
-.lpn-profile-axistitle { font-size: 11px; fill: #333; }
+.lpn-profile-station { stroke: var(--ec-gray-eee); stroke-width: 1; }
+.lpn-profile-ground { fill: none; stroke: var(--ec-ink-black); stroke-width: 1.5; }
+.lpn-profile-hgl { fill: none; stroke: var(--ec-accent); stroke-width: 1.5; }
+.lpn-profile-band { fill: var(--ec-accent); fill-opacity: .12; stroke: none; }
+.lpn-profile-dot { fill: var(--ec-ink-black); }
+.lpn-profile-tick { font-size: 10px; fill: var(--ec-ink); }
+.lpn-profile-nodeid { font-size: 10px; fill: var(--ec-ink); }
+.lpn-profile-axistitle { font-size: 11px; fill: var(--ec-ink); }
 /* The key, and the waypoint chips. Both are ordinary flow content under the chart. */
 .lpn-profile-key { display: flex; flex-wrap: wrap; gap: .1em 1em; font-size: .85em; margin: .2em 0; }
 .lpn-profile-key i { display: inline-block; width: 1.4em; height: .6em; margin-right: .35em; vertical-align: middle; }
-.lpn-profile-key-ground { border-top: 2px solid #000; }
-.lpn-profile-key-hgl { border-top: 2px solid #0645ad; }
-.lpn-profile-key-band { background: rgba(6, 69, 173, .12); border: 1px solid rgba(6, 69, 173, .35); }
+.lpn-profile-key-ground { border-top: 2px solid var(--ec-ink-black); }
+.lpn-profile-key-hgl { border-top: 2px solid var(--ec-accent); }
+.lpn-profile-key-band { background: var(--ec-a-6-69-173-12); border: 1px solid var(--ec-a-6-69-173-35); }
 .lpn-profile-heading { font-weight: bold; margin-bottom: .2em; }
 
 /* ==== The bottom pane (ROADMAP Task 434) =====================================================
@@ -2137,24 +2253,24 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 
    `flex: column` with the body carrying the only explicit height -- the grip and the tab strip
    are whatever they need, and JS writes one number in one place. */
-.lpn-pane { display: flex; flex-direction: column; border-top: 1px solid #ccc; background: #fff; }
+.lpn-pane { display: flex; flex-direction: column; border-top: 1px solid var(--ec-border-strong); background: var(--ec-bg); }
 /* The drag handle IS the top edge, which is where a hand aims. Tall enough to hit with a mouse
    and a real amount of pointer slop; the ruled line inside says "grab me" without a glyph. */
 .lpn-pane-grip {
-	height: 8px; cursor: row-resize; background: #f2f2f2;
-	border-bottom: 1px solid #e0e0e0; touch-action: none;
+	height: 8px; cursor: row-resize; background: var(--ec-gray-f2f2f2);
+	border-bottom: 1px solid var(--ec-gray-e0e0e0); touch-action: none;
 }
 .lpn-pane-grip::after {
 	content: ""; display: block; width: 3rem; height: 2px; margin: 3px auto 0;
-	background: #bbb;
+	background: var(--ec-gray-bbb);
 }
-.lpn-pane-grip:hover { background: #e8e8e8; }
+.lpn-pane-grip:hover { background: var(--ec-gray-e8e8e8); }
 /* SEVEN TABS, AND THEY WRAP (Task 455). Tom chose wrapping over hiding five behind a type
    selector, so the strip is allowed to become two lines and the X stays pinned to the top-right
    rather than stretching down beside them. The pane's own height accounting reads the chrome by
    MEASUREMENT (paneChromeHeight), so a second line is subtracted from the window like anything
    else -- nothing here assumes one line, and nothing here scrolls sideways. */
-.lpn-pane-head { display: flex; align-items: flex-start; gap: 4px; border-bottom: 1px solid #ddd; }
+.lpn-pane-head { display: flex; align-items: flex-start; gap: 4px; border-bottom: 1px solid var(--ec-border); }
 .lpn-pane-strip {
 	display: flex; flex-wrap: wrap; align-items: flex-start; gap: 2px 2px;
 	flex: 1 1 auto; min-width: 0;
@@ -2180,21 +2296,21 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    toolbar. The selected tab keeps the whole of its distinction: white, a darker edge, bold, and no
    bottom border, so it alone is joined to the panel below. */
 .lpn-pane-tab {
-	background: #f0f0f0; border: 1px solid #dcdcdc; border-bottom: 0; font: inherit;
-	border-radius: 3px 3px 0 0; color: #444;
+	background: var(--ec-gray-f0f0f0); border: 1px solid var(--ec-gray-dcdcdc); border-bottom: 0; font: inherit;
+	border-radius: 3px 3px 0 0; color: var(--ec-gray-444);
 	padding: 3px 12px; cursor: pointer;
 }
-.lpn-pane-tab:hover { background: #f7f7f7; }
+.lpn-pane-tab:hover { background: var(--ec-gray-f7f7f7); }
 /* The tabs give up their side padding before they give up a line. A narrow window fits more of
    them per row, so the strip wraps to two lines later and to three never. */
 @media (max-width: 60rem) { .lpn-pane-tab { padding: 3px 7px; } }
 @media (max-width: 40rem) { .lpn-pane-tab { padding: 3px 5px; } }
-.lpn-pane-tab[aria-selected="true"] { background: #fff; border-color: #bbb; font-weight: bold; color: inherit; }
+.lpn-pane-tab[aria-selected="true"] { background: var(--ec-bg); border-color: var(--ec-gray-bbb); font-weight: bold; color: inherit; }
 .lpn-pane-x {
 	flex: 0 0 auto; align-self: flex-start; width: 2.2rem; height: 1.7rem; padding: 0; border: 0;
-	background: transparent; font-size: 18px; line-height: 1; color: #333; cursor: pointer;
+	background: transparent; font-size: 18px; line-height: 1; color: var(--ec-ink); cursor: pointer;
 }
-.lpn-pane-x:hover, .lpn-pane-x:focus { background: #eee; color: #000; }
+.lpn-pane-x:hover, .lpn-pane-x:focus { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
 /* The height JS writes lands here. Overflow is the panel's own business, never the page's: the
    root is `overflow: hidden` on this page (Task 432), so anything that does not fit must scroll
    INSIDE its tab. */
@@ -2315,10 +2431,10 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    harness.js`. **The fix is to stop mixing the two mechanisms**: the body cell's divider is now an
    `inset box-shadow` too, the same kind of paint as the heading's, so both are positioned by the
    same cell-box-edge arithmetic and inherit the same rounding whatever it is. */
-.lpn-pane-table tbody td { padding: 0; border: 0; box-shadow: inset -1px 0 0 #ddd, inset 0 -1px 0 #ddd; }
-.lpn-pane-table tbody td.lpn-pane-first { padding: 1px 6px 1px 4px; box-shadow: inset -1px 0 0 #ddd, inset 0 -1px 0 #ddd, inset 1px 0 0 #ddd; }
-html[dir="rtl"] .lpn-pane-table tbody td { box-shadow: inset 1px 0 0 #ddd, inset 0 -1px 0 #ddd; }
-html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 0 0 #ddd, inset 0 -1px 0 #ddd, inset -1px 0 0 #ddd; }
+.lpn-pane-table tbody td { padding: 0; border: 0; box-shadow: inset -1px 0 0 var(--ec-border), inset 0 -1px 0 var(--ec-border); }
+.lpn-pane-table tbody td.lpn-pane-first { padding: 1px 6px 1px 4px; box-shadow: inset -1px 0 0 var(--ec-border), inset 0 -1px 0 var(--ec-border), inset 1px 0 0 var(--ec-border); }
+html[dir="rtl"] .lpn-pane-table tbody td { box-shadow: inset 1px 0 0 var(--ec-border), inset 0 -1px 0 var(--ec-border); }
+html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 0 0 var(--ec-border), inset 0 -1px 0 var(--ec-border), inset -1px 0 0 var(--ec-border); }
 /* A pull-down, like an input, IS its cell and brings its own padding (R-356: the column's rule
    width counts the pull-down's own box, so a cell padding around it pushed the column 12px past
    the rule). */
@@ -2352,22 +2468,22 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
    table around it. Measured on a 92-junction Net3 with recalculation off: dropping it took one
    committed cell from 19.2 ms to 15.0 ms, about a fifth of what typing a value cost. */
 .lpn-pane-table tbody td.lpn-pane-cur {
-	outline: 2px solid #0645ad; outline-offset: -2px;
+	outline: 2px solid var(--ec-accent); outline-offset: -2px;
 }
 .lpn-pane-table tbody td input:focus { outline: 0; }
 /* A table waiting for Paste as new rows (Task 610): visibly armed until Ctrl+V or Esc. */
-.lpn-pane-appending .lpn-pane-table { outline: 2px dashed #0645ad; outline-offset: 2px; }
+.lpn-pane-appending .lpn-pane-table { outline: 2px dashed var(--ec-accent); outline-offset: 2px; }
 /* The selected RANGE. A wash rather than a border, so a rectangle of forty rows reads as one
    block; the current cell keeps its border on top of it. */
-.lpn-pane-table tbody td.lpn-pane-sel { background: #e8f0fe; }
+.lpn-pane-table tbody td.lpn-pane-sel { background: var(--ec-select-bg); }
 /* A ROW WHOSE ELEMENT IS SELECTED ON THE MAP carries a heavy bar at its start (Tom, 2026-09-28),
    in the map's selection blue. An inset shadow on the row's first cell, so no column gets narrower. */
-.lpn-pane-table tbody tr.lpn-mapsel td.lpn-pane-first { box-shadow: inset 5px 0 0 #1976d2, inset -1px 0 0 #ddd, inset 0 -1px 0 #ddd; }
-html[dir="rtl"] .lpn-pane-table tbody tr.lpn-mapsel td.lpn-pane-first { box-shadow: inset -5px 0 0 #1976d2, inset 1px 0 0 #ddd, inset 0 -1px 0 #ddd; }
+.lpn-pane-table tbody tr.lpn-mapsel td.lpn-pane-first { box-shadow: inset 5px 0 0 var(--ec-hue-1976d2), inset -1px 0 0 var(--ec-border), inset 0 -1px 0 var(--ec-border); }
+html[dir="rtl"] .lpn-pane-table tbody tr.lpn-mapsel td.lpn-pane-first { box-shadow: inset -5px 0 0 var(--ec-hue-1976d2), inset 1px 0 0 var(--ec-border), inset 0 -1px 0 var(--ec-border); }
 /* The Find list's rows wear the same bar (Shift+click builds the set from there). */
-.lpn-find-row.lpn-mapsel { box-shadow: inset 5px 0 0 #1976d2; }
-html[dir="rtl"] .lpn-find-row.lpn-mapsel { box-shadow: inset -5px 0 0 #1976d2; }
-.lpn-find-hint { margin: 0 0 2px; font-size: .85em; color: #555; }
+.lpn-find-row.lpn-mapsel { box-shadow: inset 5px 0 0 var(--ec-hue-1976d2); }
+html[dir="rtl"] .lpn-find-row.lpn-mapsel { box-shadow: inset -5px 0 0 var(--ec-hue-1976d2); }
+.lpn-find-hint { margin: 0 0 2px; font-size: .85em; color: var(--ec-ink-muted); }
 /* **THE AUTOFILL DOT WAS REMOVED, NOT WIRED UP** (Tom: *"Autofill with the little square button is
    yet to come? At the moment it's non-functioning and non-clickable. If it were gone (once
    implemented) where autofill is not offered, that would be nice."*). Fill-down shipped since the
@@ -2386,13 +2502,13 @@ html[dir="rtl"] .lpn-find-row.lpn-mapsel { box-shadow: inset -5px 0 0 #1976d2; }
 .lpn-pane-table tbody td.lpn-pane-fillcorner { position: relative; }
 .lpn-pane-fillhandle {
 	position: absolute; inset-inline-end: 0; inset-block-end: 0; width: 6px; height: 6px;
-	background: #0645ad; border: 1px solid #fff; box-sizing: border-box; cursor: crosshair;
+	background: var(--ec-accent); border: 1px solid var(--ec-bg); box-sizing: border-box; cursor: crosshair;
 	touch-action: none; z-index: 3;
 }
 /* The dashed preview of where a drag would land, painted only on cells NOT already part of the
    source being copied from -- an outline rather than a wash, so it never reads as a second, live
    selection while the drag is still a proposal. */
-.lpn-pane-table tbody td.lpn-pane-fillrange { outline: 1px dashed #0645ad; outline-offset: -1px; }
+.lpn-pane-table tbody td.lpn-pane-fillrange { outline: 1px dashed var(--ec-accent); outline-offset: -1px; }
 /* start, not left: the first column is the leading one, and in an RTL language that is the
    right-hand edge. Same rule the Labels panel's affix headings follow (Task 435). */
 .lpn-pane-table th.lpn-pane-first, .lpn-pane-table td.lpn-pane-first { text-align: start; }
@@ -2466,20 +2582,20 @@ html[dir="rtl"] .lpn-find-row.lpn-mapsel { box-shadow: inset -5px 0 0 #1976d2; }
    which the browser DOES give the row's real height -- padding stays on the `<th>` exactly as it
    always was, and the button (`.lpn-pane-sort`) is sized to its own content, same as before. */
 .lpn-pane-table thead th {
-	position: relative; background: #fff;
-	padding-top: 6px; box-shadow: inset -1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
+	position: relative; background: var(--ec-bg);
+	padding-top: 6px; box-shadow: inset -1px 0 0 var(--ec-border), inset 0 1px 0 var(--ec-border), inset 0 -1px 0 var(--ec-border-strong);
 }
 .lpn-pane-table thead th:first-child {
-	box-shadow: inset -1px 0 0 #ddd, inset 1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
+	box-shadow: inset -1px 0 0 var(--ec-border), inset 1px 0 0 var(--ec-border), inset 0 1px 0 var(--ec-border), inset 0 -1px 0 var(--ec-border-strong);
 }
 /* A box-shadow offset is PHYSICAL and these edges are not: in Arabic, Farsi, Hebrew, Pashto and
    Urdu the trailing edge of a heading is its left one and the first column is on the right. Mirrored
    here rather than written with a logical property, because box-shadow has none. */
 html[dir="rtl"] .lpn-pane-table thead th {
-	box-shadow: inset 1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
+	box-shadow: inset 1px 0 0 var(--ec-border), inset 0 1px 0 var(--ec-border), inset 0 -1px 0 var(--ec-border-strong);
 }
 html[dir="rtl"] .lpn-pane-table thead th:first-child {
-	box-shadow: inset 1px 0 0 #ddd, inset -1px 0 0 #ddd, inset 0 1px 0 #ddd, inset 0 -1px 0 #ccc;
+	box-shadow: inset 1px 0 0 var(--ec-border), inset -1px 0 0 var(--ec-border), inset 0 1px 0 var(--ec-border), inset 0 -1px 0 var(--ec-border-strong);
 }
 /* **SEVERAL HEADINGS, MARKED BEFORE THE RIGHT-CLICK THAT HIDES THEM** (Tom: *"can we select
    multiple heading cells to hide multiple columns at once?"*). The same wash the body cells use
@@ -2489,7 +2605,7 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    solid blue on select."*), as Google Sheets draws a selected column's letter: the cells beneath
    keep the light wash, the heading above them is the one solid block, and its text turns white.
    #0b57d0 against white text is 6.6:1. */
-.lpn-pane-table thead th.lpn-pane-head-sel { background: #0b57d0; color: #fff; }
+.lpn-pane-table thead th.lpn-pane-head-sel { background: var(--ec-select); color: var(--ec-bg); }
 /* **A CONTROL DOES NOT INHERIT ITS CELL'S ALIGNMENT; IT HAS TO BE TOLD.** Every browser's own
    stylesheet aligns a form control's text for itself -- `start` on an <input>, centre on a
    <button> -- so a <td> that declares an alignment aligns the BOX and not the number inside the
@@ -2506,7 +2622,7 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    quieter, which is the ordinary typographic mark for "this is about the row, not in it". The tip
    on it is the property popup's own sentence, so there is one explanation for the rule and not
    two. */
-.lpn-pane-table td.lpn-pane-stated { font-style: italic; color: #555; }
+.lpn-pane-table td.lpn-pane-stated { font-style: italic; color: var(--ec-ink-muted); }
 /* **THE BOX WIDTH BELONGS TO THE COLUMN, AND THE COLUMN DECLARES IT** (Tom, 2026-08-23, over three
    rounds of review ending in "round the final widths to nice numbers always": Minor loss 3em,
    Roughness 6em, Length 4.2em, Diameter 3em, and 3.5em for the tank, reservoir and junction
@@ -2640,7 +2756,7 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    text alignment with it -- it sits after the box, in its own ink. */
 .lpn-pane-goto {
 	display: inline-flex; align-items: center; margin-inline-start: 4px; padding: 1px;
-	color: #667; vertical-align: middle; line-height: 0;
+	color: var(--ec-hue-667); vertical-align: middle; line-height: 0;
 }
 /* **ONE LINE, NOT TWO** (Tom, 2026-09-21: *"We have a gratuitous space waster at ID where the goto
    map icon (nice unsolicited touch!) is a line break below the ID number. Put on same line"*). The
@@ -2650,10 +2766,10 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    and `min-width: 0`, so the input gives up its own width first and the pin stays in view. */
 .lpn-pane-table tbody td.lpn-pane-idcell { white-space: nowrap; }
 .lpn-pane-goto svg { width: 0.95em; height: 0.95em; }
-.lpn-pane-goto:hover, .lpn-pane-goto:focus-visible { color: #0645ad; }
+.lpn-pane-goto:hover, .lpn-pane-goto:focus-visible { color: var(--ec-accent); }
 /* A keyboard user must still see where they are. `:focus-visible` rather than `:focus`, so a mouse
    press does not leave a ring behind on a control whose whole job is to move the map. */
-.lpn-pane-goto:focus-visible { outline: 2px solid #0645ad; outline-offset: 1px; }
+.lpn-pane-goto:focus-visible { outline: 2px solid var(--ec-accent); outline-offset: 1px; }
 /* **THE RING BELONGS TO THE WHOLE HEADING, NEVER TO THE TEXT INSIDE IT** (Tom, 2026-09-26,
    fourth pass: *"I still see special highlighting on the text"* -- a screenshot of a dark
    rectangle drawn tight around the word "Longitude", which was `.lpn-pane-sort:focus-visible`'s
@@ -2668,16 +2784,16 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    heading that holds keyboard focus wears the light selection wash instead -- still exactly what
    Tab reveals, and nothing drawn round the text -- and a SELECTED heading stays solid blue whether
    it has focus or not. */
-.lpn-pane-table thead th:has(:focus-visible) { outline: 0; background: #e8f0fe; }
-.lpn-pane-table thead th.lpn-pane-head-sel:has(:focus-visible) { background: #0b57d0; }
+.lpn-pane-table thead th:has(:focus-visible) { outline: 0; background: var(--ec-select-bg); }
+.lpn-pane-table thead th.lpn-pane-head-sel:has(:focus-visible) { background: var(--ec-select); }
 /* THE RIGHT-CLICK MENU (Tom, 2026-09-21: Copy, Paste, Select in map, Delete). `position: fixed`
    because its `left`/`top` are the pointer's own client coordinates, which are already relative to
    the viewport and not to any scrolled ancestor -- the same reasoning the popup positioning already
    uses. A plain list of full-width buttons, not a `<ul>`: a menu item here is a button that runs an
    action and never a link, exactly the sort heading's own reasoning two rules up. */
 .lpn-pane-ctxmenu {
-	position: fixed; z-index: 1900; background: #fff; border: 1px solid #999; border-radius: 3px;
-	box-shadow: 0 2px 8px rgba(0,0,0,.25); padding: 2px; min-width: 9em;
+	position: fixed; z-index: 1900; background: var(--ec-bg); border: 1px solid var(--ec-gray-999); border-radius: 3px;
+	box-shadow: 0 2px 8px var(--ec-a-0-0-0-25); padding: 2px; min-width: 9em;
 }
 .lpn-pane-ctxmenu button {
 	display: flex; justify-content: space-between; align-items: center; gap: 1.5em; width: 100%;
@@ -2686,8 +2802,8 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 }
 /* The keyboard equivalent, named beside its row the way a desktop menu does (Tom: "I did not know
    about Ctrl+D"). Quieter than the label, so the row still reads as one action first. */
-.lpn-pane-ctxmenu-accel { color: #888; font-size: .85em; white-space: nowrap; }
-.lpn-pane-ctxmenu button:hover, .lpn-pane-ctxmenu button:focus-visible { background: #eef1f4; outline: 0; }
+.lpn-pane-ctxmenu-accel { color: var(--ec-gray-888); font-size: .85em; white-space: nowrap; }
+.lpn-pane-ctxmenu button:hover, .lpn-pane-ctxmenu button:focus-visible { background: var(--ec-hue-eef1f4); outline: 0; }
 /* THE DIVIDER BETWEEN TWO HEADINGS, which is where a spreadsheet user aims to resize a column
    (Tom's point (d), 2026-09-18). It sits on the trailing edge of its own heading, is as tall as the
    heading row, and is the ONLY thing there that takes a col-resize cursor -- so the gesture
@@ -2727,7 +2843,7 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	position: absolute; top: 0; inset-inline-end: 0; width: 7px; height: 100%;
 	cursor: col-resize; user-select: none;
 }
-.lpn-pane-colgrip:hover { background: linear-gradient(to right, transparent 5px, #8ab 5px, #8ab 6px, transparent 6px); }
+.lpn-pane-colgrip:hover { background: linear-gradient(to right, transparent 5px, var(--ec-hue-8ab) 5px, var(--ec-hue-8ab) 6px, transparent 6px); }
 /* **A PLAIN CLICK NO LONGER SORTS -- IT SELECTS** (Tom, 2026-09-25, second pass: *"there is only
    one selection possible and one cursor for a heading... A click anywhere on the cell selects the
    column."*). The whole heading is one target, like a spreadsheet's own column letter: no text
@@ -2772,8 +2888,8 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    a `mousemove` lands on. */
 .lpn-pane-col-ghost {
 	position: fixed; z-index: 2000; pointer-events: none; box-sizing: border-box;
-	background: rgba(60, 64, 67, .14); border: 1px solid rgba(60, 64, 67, .5);
-	box-shadow: 0 1px 4px rgba(0, 0, 0, .18);
+	background: var(--ec-a-60-64-67-14); border: 1px solid var(--ec-a-60-64-67-5);
+	box-shadow: 0 1px 4px var(--ec-a-0-0-0-18);
 }
 /* **THE DESTINATION IS A WIDE DARK LINE DOWN THE WHOLE DIVIDER** (fifth pass: *"Make a wide black
    or dark gray destination line on entire column (not heading) divider when middle of drag
@@ -2781,7 +2897,7 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    has passed a neighbour's middle; at the column's own two edges there is none, because dropping
    there does nothing. Dark grey rather than the page's blue, so it cannot be read as a selection. */
 .lpn-pane-col-marker {
-	position: fixed; z-index: 2001; pointer-events: none; width: 4px; background: #3c4043;
+	position: fixed; z-index: 2001; pointer-events: none; width: 4px; background: var(--ec-hue-3c4043);
 }
 /* **AND NOTHING ELSE ON THE HEADINGS SHOWS WHILE A COLUMN IS IN THE HAND** (fifth pass: *"Suppress
    the menu and sort arrow during dragging."*) -- the sorted column's standing arrow included. */
@@ -2807,8 +2923,8 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 .lpn-pane-colmenu {
 	position: absolute; inset-inline-end: 1px; top: 2px; height: 1.1em; width: 15px;
 	display: flex; align-items: center; justify-content: center;
-	background: #fff; border: 0; border-radius: 2px; padding: 0; margin: 0; font: inherit;
-	font-weight: normal; color: #5f6368; cursor: pointer; opacity: 0;
+	background: var(--ec-bg); border: 0; border-radius: 2px; padding: 0; margin: 0; font: inherit;
+	font-weight: normal; color: var(--ec-hue-5f6368); cursor: pointer; opacity: 0;
 }
 /* The glyph itself, same reasoning as the sort arrow below: `content:` rather than a text node, so
    print.js's per-text-node line count never sees it. */
@@ -2828,8 +2944,8 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	position: absolute; inset-inline-end: 1px; top: calc(2px + 1.1em); height: calc(5px + 1.05em);
 	width: 15px; box-sizing: border-box; padding: 5px 0 0; margin: 0;
 	display: flex; align-items: center; justify-content: center;
-	background: #fff; background-clip: content-box; border: 0; border-radius: 2px; font: inherit;
-	font-weight: normal; color: #5f6368; cursor: pointer; opacity: 0;
+	background: var(--ec-bg); background-clip: content-box; border: 0; border-radius: 2px; font: inherit;
+	font-weight: normal; color: var(--ec-hue-5f6368); cursor: pointer; opacity: 0;
 }
 .lpn-pane-sortarrow::after { content: '▲'; font-size: .8em; }
 .lpn-pane-sortarrow-desc::after { content: '▼'; }
@@ -2848,16 +2964,16 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 .lpn-pane-table thead th:has(:focus-visible) .lpn-pane-sortarrow,
 .lpn-pane-sortarrow-active { opacity: 1; }
 .lpn-pane-colmenu:hover, .lpn-pane-colmenu:focus-visible,
-.lpn-pane-sortarrow:hover, .lpn-pane-sortarrow:focus-visible { color: #0b57d0; outline: 0; }
+.lpn-pane-sortarrow:hover, .lpn-pane-sortarrow:focus-visible { color: var(--ec-select); outline: 0; }
 /* On a solid-blue selected heading the badges turn blue with it, and their marks white. */
 .lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-colmenu,
-.lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-sortarrow { background-color: #0b57d0; color: #fff; }
+.lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-sortarrow { background-color: var(--ec-select); color: var(--ec-bg); }
 .lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-colmenu:hover,
-.lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-sortarrow:hover { color: #d3e3fd; }
+.lpn-pane-table thead th.lpn-pane-head-sel .lpn-pane-sortarrow:hover { color: var(--ec-select-bg-strong); }
 /* A focused heading wears the light wash (above), and so do its badges, rather than two white
    patches on it. */
 .lpn-pane-table thead th:not(.lpn-pane-head-sel):has(:focus-visible) .lpn-pane-colmenu,
-.lpn-pane-table thead th:not(.lpn-pane-head-sel):has(:focus-visible) .lpn-pane-sortarrow { background-color: #e8f0fe; }
+.lpn-pane-table thead th:not(.lpn-pane-head-sel):has(:focus-visible) .lpn-pane-sortarrow { background-color: var(--ec-select-bg); }
 @media (hover: none) { .lpn-pane-colmenu, .lpn-pane-sortarrow { opacity: 1; } }
 /* The Manage columns dialog (openDialog(), #lpn_dialog): one row per column, a Show checkbox and
    two reorder buttons. Plain and compact -- this dialog is open for a few seconds, not a page of
@@ -2867,23 +2983,23 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    the list move the whole selection as a block. */
 .lpn-managecols-wrap { display: flex; gap: 10px; align-items: flex-start; }
 .lpn-managecols-list {
-	flex: 1 1 auto; max-height: 16em; overflow-y: auto; border: 1px solid #ccc; border-radius: 3px;
+	flex: 1 1 auto; max-height: 16em; overflow-y: auto; border: 1px solid var(--ec-border-strong); border-radius: 3px;
 	user-select: none;
 }
-.lpn-managecols-list:focus-visible { outline: 2px solid #0645ad; outline-offset: -2px; }
+.lpn-managecols-list:focus-visible { outline: 2px solid var(--ec-accent); outline-offset: -2px; }
 .lpn-managecols-row {
-	display: flex; align-items: center; gap: 6px; padding: 3px 6px; border-bottom: 1px solid #eee;
+	display: flex; align-items: center; gap: 6px; padding: 3px 6px; border-bottom: 1px solid var(--ec-gray-eee);
 	cursor: pointer;
 }
 .lpn-managecols-row:last-child { border-bottom: 0; }
-.lpn-managecols-row-sel { background: #d3e3fd; }
-.lpn-managecols-row-focus { box-shadow: inset 0 0 0 1px #667; }
+.lpn-managecols-row-sel { background: var(--ec-select-bg-strong); }
+.lpn-managecols-row-focus { box-shadow: inset 0 0 0 1px var(--ec-hue-667); }
 .lpn-managecols-btns { display: flex; flex-direction: column; gap: 4px; flex: 0 0 auto; }
 .lpn-managecols-btns button {
-	background: none; border: 1px solid #ccc; border-radius: 2px; cursor: pointer;
+	background: none; border: 1px solid var(--ec-border-strong); border-radius: 2px; cursor: pointer;
 	padding: 3px 8px; font: inherit; white-space: nowrap;
 }
-.lpn-managecols-btns button:disabled { color: #bbb; border-color: #eee; cursor: default; }
+.lpn-managecols-btns button:disabled { color: var(--ec-gray-bbb); border-color: var(--ec-gray-eee); cursor: default; }
 /* Print, at the LEADING edge of the pane head, ahead of the tab strip (Tom, 2026-08-21: it was
    "poorly discoverable" in the top-right corner, where the eye reads window controls rather than
    an action). flex:0 0 auto keeps it its own width while the tab strip beside it does the
@@ -2891,9 +3007,9 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    than an icon: it is the only control in this row that DOES something to the content. */
 .lpn-pane-print {
 	flex: 0 0 auto; align-self: flex-start; margin: 1px 6px 0 0; padding: 2px 8px; font: inherit;
-	font-size: .85em; background: #f6f6f6; border: 1px solid #bbb; color: #333; cursor: pointer;
+	font-size: .85em; background: var(--ec-gray-f6f6f6); border: 1px solid var(--ec-gray-bbb); color: var(--ec-ink); cursor: pointer;
 }
-.lpn-pane-print:hover, .lpn-pane-print:focus { background: #eee; color: #000; }
+.lpn-pane-print:hover, .lpn-pane-print:focus { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
 
 /* PRINTING ONE TABLE (Tom, 2026-08-21: "Make a way to print any table").
    The sheet is a STATIC COPY of the active table, built by paneBuildPrintable() and appended
@@ -3083,7 +3199,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 		display: block; position: absolute; right: 0; bottom: 0; width: 28px; height: 28px;
 		z-index: 2; cursor: se-resize; touch-action: none;
 		background:
-			linear-gradient(315deg, transparent 0 8px, #999 8px 10px, transparent 10px 13px, #999 13px 15px, transparent 15px);
+			linear-gradient(315deg, transparent 0 8px, var(--ec-gray-999) 8px 10px, transparent 10px 13px, var(--ec-gray-999) 13px 15px, transparent 15px);
 	}
 }
 /* **AND THE SAME THREE HEIGHTS IN dvh** (Tom, 2026-08-22: "The settings box and possibly other
@@ -3121,7 +3237,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 .lpn-setbox-title {
 	position: absolute; top: 0; left: 0; right: 0; height: 39px; box-sizing: border-box;
 	padding: 10px 12px 0; font-weight: bold; pointer-events: none;
-	border-bottom: 1px solid #ccc; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+	border-bottom: 1px solid var(--ec-border-strong); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 }
 
 /* ---- THE NEW-PROJECT BOX (ROADMAP Task 477) --------------------------------------------------
@@ -3161,7 +3277,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 .lpn-convas-round-head .lpn-convas-round-col:nth-child(3) { width: 5rem; flex: 0 0 auto; }
 /* A disabled place field still has to READ as a question that belongs to the other choice, rather
    than as a broken control: greyed, and the pointer says so. */
-.lpn-new-block > input[type="text"]:disabled { background: #f2f2f2; color: #777; cursor: not-allowed; }
+.lpn-new-block > input[type="text"]:disabled { background: var(--ec-gray-f2f2f2); color: var(--ec-gray-777); cursor: not-allowed; }
 .lpn-new-presets { margin: 4px 0 6px; display: flex; gap: 6px; }
 /* Create first, and it is the one with weight -- it is what the box is for, and it is what Enter
    presses. NOT a coloured button beside a grey one for a consent-style pair; this is a create/cancel
@@ -3192,7 +3308,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    derives its own figure from ITS OWN 4.5rem and is untouched. */
 .lpn-setbox-index {
 	flex: 0 0 7.26rem; min-width: 0; overflow: auto;
-	border-right: 1px solid #ddd; padding-right: 6px; font-size: .9em;
+	border-right: 1px solid var(--ec-border); padding-right: 6px; font-size: .9em;
 }
 .lpn-setbox-content { flex: 1 1 auto; min-width: 0; overflow: auto; font-size: .9em; }
 /* **THE DIVIDER BETWEEN THE TWO PANES** (ROADMAP Task 576; Tom, 2026-09-04: *"It might be nice...
@@ -3231,14 +3347,14 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 }
 .lpn-setbox-divider::before {
 	content: ""; display: block; width: 2px; height: 22px;
-	background: repeating-linear-gradient(to bottom, #aaa 0 2px, transparent 2px 5px);
+	background: repeating-linear-gradient(to bottom, var(--ec-gray-aaa) 0 2px, transparent 2px 5px);
 }
 /* `:focus`, not `:focus-visible`, and that is the load-bearing half of Tom's 2026-09-04 note. A
    pointer press focuses the divider so Home works from where the hand already is -- but
    `:focus-visible` is defined not to fire for a pointer, so with only that rule the divider would be
    listening and nothing on screen would say so. The grip going blue after a drag IS the message. */
 .lpn-setbox-divider:hover::before, .lpn-setbox-divider:focus::before {
-	background: repeating-linear-gradient(to bottom, #0645ad 0 2px, transparent 2px 5px);
+	background: repeating-linear-gradient(to bottom, var(--ec-accent) 0 2px, transparent 2px 5px);
 }
 /* **THE LAST SECTION MUST BE ABLE TO REACH THE TOP** (Tom, 2026-09-04: *"We are being bit by the
    bottom of the page when we select the Water Quality bookmark. I believe that the standard answer
@@ -3270,10 +3386,10 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	font: inherit; padding: 2px 4px; cursor: pointer; color: inherit;
 	white-space: normal; overflow-wrap: anywhere;
 }
-.lpn-setbox-link:hover, .lpn-setbox-link:focus { background: #eef4ff; color: #0645ad; }
+.lpn-setbox-link:hover, .lpn-setbox-link:focus { background: var(--ec-hue-eef4ff); color: var(--ec-accent); }
 .lpn-setbox-link.lpn-setbox-link-sec { font-weight: bold; margin-top: 4px; }
 .lpn-setbox-link.lpn-setbox-link-sub { padding-left: 16px; }
-.lpn-setbox-link[aria-current="true"] { background: #eef4ff; font-weight: bold; }
+.lpn-setbox-link[aria-current="true"] { background: var(--ec-hue-eef4ff); font-weight: bold; }
 .lpn-setbox-none { margin: 8px 4px; opacity: .8; }
 /* A section heading STICKS to the top of the content pane while its section is being read, so a
    long scroll never leaves the reader wondering which section they are in. */
@@ -3288,8 +3404,8 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	   z-index:1 so they can straddle their swatch join; at an equal z-index the later element in
 	   the DOM wins, and a sticky heading that scrolls UNDER its own section's controls is not
 	   sticky. 2 is the whole fix -- the heading is opaque already. */
-	position: sticky; top: 0; z-index: 2; background: #fff; margin: 0 0 4px;
-	padding: 4px 0; font-size: 1.15rem; font-weight: bold; border-bottom: 1px solid #ccc;
+	position: sticky; top: 0; z-index: 2; background: var(--ec-bg); margin: 0 0 4px;
+	padding: 4px 0; font-size: 1.15rem; font-weight: bold; border-bottom: 1px solid var(--ec-border-strong);
 }
 .lpn-set-sec { margin-bottom: 14px; }
 /* A sub-heading, with NO disclosure triangle: nothing here collapses (Tom, 2026-08-18: "No need
@@ -3339,7 +3455,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 /* **A VALUE THAT BREAKS ITS OWN DESIGN IS FLAGGED IN PLACE AND NEVER CLEARED** (Tom, 2026-09-13:
    tightening a limit is a way of ASKING a question about the data). The outline says which cells
    answer the question; the value underneath it is untouched. */
-.lpn-cp-bad { outline: 2px solid #c0392b; background: #fdecea; }
+.lpn-cp-bad { outline: 2px solid var(--ec-hue-c0392b); background: var(--ec-error-bg); }
 /* A heading INSIDE a sub-heading's body -- the colour band limits, which name the field they belong
    to. Same weight as a sub-heading, not full bold, so it reads as one level further in. */
 .lpn-set-minihead { margin-top: 6px; font-weight: 600; opacity: .8; }
@@ -3356,22 +3472,22 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    Its width is the user's, dragged on the left edge and clamped in JS; the default is wide enough
    for the Labels rows, which are the tallest and widest thing it holds. */
 .lpn-rpane {
-	position: fixed; z-index: 6; display: flex; background: #fff;
-	border: 1px solid #ccc; box-shadow: -2px 0 6px rgba(0, 0, 0, .12);
+	position: fixed; z-index: 6; display: flex; background: var(--ec-bg);
+	border: 1px solid var(--ec-border-strong); box-shadow: -2px 0 6px var(--ec-a-0-0-0-12);
 }
 /* The grip IS the left edge, the mirror of the bottom pane's top edge, and the same 8px of
    pointer slop. */
 .lpn-rpane-grip {
-	flex: 0 0 8px; cursor: col-resize; background: #f2f2f2;
-	border-right: 1px solid #e0e0e0; touch-action: none;
+	flex: 0 0 8px; cursor: col-resize; background: var(--ec-gray-f2f2f2);
+	border-right: 1px solid var(--ec-gray-e0e0e0); touch-action: none;
 }
 .lpn-rpane-grip::after {
-	content: ""; display: block; width: 2px; height: 3rem; margin: 1rem auto 0; background: #bbb;
+	content: ""; display: block; width: 2px; height: 3rem; margin: 1rem auto 0; background: var(--ec-gray-bbb);
 }
-.lpn-rpane-grip:hover { background: #e8e8e8; }
+.lpn-rpane-grip:hover { background: var(--ec-gray-e8e8e8); }
 .lpn-rpane { flex-direction: row; }
 .lpn-rpane-inner { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
-.lpn-rpane-head { display: flex; align-items: center; gap: 4px; border-bottom: 1px solid #ddd; }
+.lpn-rpane-head { display: flex; align-items: center; gap: 4px; border-bottom: 1px solid var(--ec-border); }
 .lpn-rpane-title { flex: 1 1 auto; font-weight: bold; padding: 3px 8px; }
 /* The body scrolls INSIDE the panel: the page may not scroll (Task 432), and the label lists are
    longer than any window this panel will ever be given. */
@@ -3449,8 +3565,8 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    rather than a colour on the words: the row's name is already drawn at .8 opacity to match a unit
    select, and recolouring it would make it read as a different KIND of row. */
 .lpn-set-row-flash {
-	background: #fff3cd;
-	outline: 2px solid #e8a33d;
+	background: var(--ec-hue-fff3cd);
+	outline: 2px solid var(--ec-hue-e8a33d);
 	border-radius: 3px;
 }
 /* **AND IT REDUCES GRACEFULLY** (Tom, 2026-08-19: "the width does not reduce gracefully"). Below
@@ -3484,7 +3600,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    in the footer where nothing has to be read past it, and this line scrolls the reader to it and
    marks it for a moment. */
 .lpn-set-creditlink { font-size: .85em; margin: 0 0 4px; }
-.lpn-set-flash { outline: 2px solid #0b57d0; outline-offset: 2px; }
+.lpn-set-flash { outline: 2px solid var(--ec-select); outline-offset: 2px; }
 /* **A NUMBER BOX IS AS WIDE AS THE NUMBERS IT HOLDS** (Tom, 2026-08-19: "Some inputs are
    gratuitously wide. Comprehensive list: Map appearance, New element prefixes and values, time,
    convergence"). Chrome sizes an `input[type=number]` from its own min/max, so the box shipped a
@@ -3552,16 +3668,16 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    a control since 2026-08-20, so the bar stops where a select stops instead of filling the column. */
 #lpn_settings_box .lpn-ramp-picker { max-width: var(--lpn-set-ctl); }
 .lpn-ramp-btn {
-	display: block; width: 100%; padding: 2px 3px; background: #fff;
-	border: 1px solid #767676; border-radius: 3px; cursor: pointer;
+	display: block; width: 100%; padding: 2px 3px; background: var(--ec-bg);
+	border: 1px solid var(--ec-gray-767676); border-radius: 3px; cursor: pointer;
 }
 .lpn-ramp-btn .lpn-ramp-strip { margin: 0; }
 /* The list is taller than the panel and scrolls inside itself, for the same reason every other
    overlay here does: the page may not scroll (Task 432). 41 ramps is a column, not a menu. */
 .lpn-ramp-pop {
 	position: absolute; z-index: 20; top: 100%; right: 0; width: 15rem; max-height: 60vh;
-	overflow-y: auto; padding: 4px 6px; background: #fff; border: 1px solid #999;
-	box-shadow: 0 4px 10px rgba(0, 0, 0, .2);
+	overflow-y: auto; padding: 4px 6px; background: var(--ec-bg); border: 1px solid var(--ec-gray-999);
+	box-shadow: 0 4px 10px var(--ec-a-0-0-0-2);
 }
 /* A family heading and its abbreviated example. The example is quieter because it is a hint about
    the DATA, not a name to choose from -- the rows below carry no names at all. */
@@ -3569,12 +3685,12 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 .lpn-ramp-fam:first-child { margin-top: 0; }
 .lpn-ramp-fam-eg { font-weight: normal; opacity: .75; }
 .lpn-ramp-opt { padding: 2px 3px; cursor: pointer; border: 1px solid transparent; }
-.lpn-ramp-opt:hover, .lpn-ramp-opt:focus { border-color: #0b57d0; background: #eef3fd; outline: none; }
-.lpn-ramp-opt[aria-selected="true"] { border-color: #333; background: #f0f0f0; }
+.lpn-ramp-opt:hover, .lpn-ramp-opt:focus { border-color: var(--ec-select); background: var(--ec-hue-eef3fd); outline: none; }
+.lpn-ramp-opt[aria-selected="true"] { border-color: var(--ec-ink); background: var(--ec-gray-f0f0f0); }
 /* A break the user typed that this file will not accept: marked where it is, so no message has to
    carry a box number into 27 languages. The map is left exactly as it was, which the message says. */
-.lpn-bad { outline: 2px solid #b00020; }
-.lpn-color-msg { color: #b00020; font-size: .85em; margin: 2px 0; }
+.lpn-bad { outline: 2px solid var(--ec-hue-b00020); }
+.lpn-color-msg { color: var(--ec-hue-b00020); font-size: .85em; margin: 2px 0; }
 /* **THE BAND BOUNDARIES ARE A LEGEND, NOT A ROW OF BOXES** (Tom, 2026-08-20: "Color band boundaries
    inputs: They are too wide. They could be about half as wide. But the real problem is that they are
    not fitting in the width of the box, and we should make them vertical, one row for each color").
@@ -3637,14 +3753,14 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	pointer-events: auto;
 	width: 40px; height: 40px; flex: 0 0 auto;
 	padding: 0; cursor: pointer;
-	border: 1px solid #666; border-radius: 4px;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
-	background-color: #10304f;
+	border: 1px solid var(--ec-ink-subtle); border-radius: 4px;
+	box-shadow: 0 1px 3px var(--ec-a-0-0-0-3);
+	background-color: var(--ec-hue-10304f);
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%2310304f'/%3E%3Cg fill='%233d8b3d'%3E%3Cpath d='M1.8 3 L9.6 2.6 L8.8 5.8 L7.2 6.6 L6.4 9.2 L5 8.4 L3.4 6 L1.8 4.4 Z'/%3E%3Cpath d='M7 10 L10.6 9.4 L10.2 12.8 L8.8 15.6 L8 19 L7 15 L6.4 11.8 Z'/%3E%3Cpath d='M10.6 3.2 L22.6 2.6 L22.8 7.4 L18 8.8 L16.2 8.4 L16 10.6 L15 14 L13.6 16.8 L12.4 13 L12.2 9.2 L10.2 6.2 Z'/%3E%3Cpath d='M18.6 14.2 L22.6 13.6 L22.8 17.4 L19.4 18 Z'/%3E%3C/g%3E%3C/svg%3E");
 	background-size: 100% 100%;
 	background-repeat: no-repeat;
 }
-.lpn-basemap-teaser:hover, .lpn-basemap-teaser:focus { border-color: #0b57d0; }
+.lpn-basemap-teaser:hover, .lpn-basemap-teaser:focus { border-color: var(--ec-select); }
 
 /* ==== The one-tap grievance link (ROADMAP Task 207, Rung 0) =================================
    QUIET IS THE SPECIFICATION, not a taste. This page is a full-window drawing surface, and a
@@ -3666,13 +3782,13 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	padding: 0 4px;
 	font: inherit;
 	font-size: 11px;
-	color: #555;
+	color: var(--ec-ink-muted);
 	cursor: pointer;
 }
-.lpn-wrong-btn:hover, .lpn-wrong-btn:focus { border-color: #bbb; color: #222; }
+.lpn-wrong-btn:hover, .lpn-wrong-btn:focus { border-color: var(--ec-gray-bbb); color: var(--ec-ink-strong); }
 /* Once tapped it is no longer a control, and it must not keep looking like one: the label is the
    thank-you, so a hover border on it would invite a second press that posts nothing. */
-.lpn-wrong-btn[disabled] { color: #555; cursor: default; border-color: transparent; opacity: 1; }
+.lpn-wrong-btn[disabled] { color: var(--ec-ink-muted); cursor: default; border-color: transparent; opacity: 1; }
 /* ---- The message log button and list (ROADMAP Task 704) ----
    Moved 2026-09-21 into #lpn_map_overlay_tl, beside the mode hint it recalls (Tom: "the
    button/glyph must be where the messages appear"). **OPAQUE, not the translucent pill paint the
@@ -3685,19 +3801,19 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 .lpn-msglog-btn {
 	pointer-events: auto;
 	display: inline-flex; align-items: center;
-	background: #fff;
-	border: 1px solid #bbb; border-radius: 3px;
+	background: var(--ec-bg);
+	border: 1px solid var(--ec-gray-bbb); border-radius: 3px;
 	padding: 1px 4px; font: inherit; font-size: 11px; line-height: 1;
-	color: #555; cursor: pointer;
+	color: var(--ec-ink-muted); cursor: pointer;
 }
-.lpn-msglog-btn:hover, .lpn-msglog-btn:focus { color: #222; border-color: #888; }
+.lpn-msglog-btn:hover, .lpn-msglog-btn:focus { color: var(--ec-ink-strong); border-color: var(--ec-gray-888); }
 /* HIGHLIGHTED WHILE A MESSAGE IS ON SCREEN (Tom: "it must appear and possibly highlight while a
    message displays"), toggled by markMsglogActive() in js/looped-network.js. Blue rather than
    amber or red -- both of those already mean "something is wrong" on this page (the diagnostic
    box, the warning banner), and this says only "something is being shown," which is also true of
    an ordinary save confirmation. */
-.lpn-msglog-btn.lpn-msglog-active { background: #05a; border-color: #05a; color: #fff; }
-.lpn-msglog-btn.lpn-msglog-active:hover, .lpn-msglog-btn.lpn-msglog-active:focus { color: #fff; border-color: #037; }
+.lpn-msglog-btn.lpn-msglog-active { background: var(--ec-hue-05a); border-color: var(--ec-hue-05a); color: var(--ec-bg); }
+.lpn-msglog-btn.lpn-msglog-active:hover, .lpn-msglog-btn.lpn-msglog-active:focus { color: var(--ec-bg); border-color: var(--ec-hue-037); }
 /* The list inside the dialog. Capped and scrolled rather than allowed to push the buttons off a
    short window: the modal is positioned at 20% from the top, so an unbounded list on a laptop
    takes the Close button with it. */
@@ -3722,43 +3838,43 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	box-sizing: border-box;
 	flex-direction: column;
 	gap: 4px;
-	background: #fff;
+	background: var(--ec-bg);
 	border-radius: 3px;
 	padding: 4px;
 }
 .lpn-msglog-panel-row {
 	display: flex; gap: 8px; align-items: baseline;
-	background: rgba(255, 255, 255, .8);
-	border: 1px solid #bbb; border-radius: 3px;
+	background: var(--ec-map-overlay-bg);
+	border: 1px solid var(--ec-gray-bbb); border-radius: 3px;
 	padding: 2px 6px; font-size: 11px;
 }
 /* The age leads the row and is a fixed column, so thirty rows read as a column of times against a
    column of sentences rather than as ragged prose. It is the quieter of the two: the message is
    what the reader came back for. */
-.lpn-msglog-panel-when { flex: none; color: #666; }
+.lpn-msglog-panel-when { flex: none; color: var(--ec-ink-subtle); }
 .lpn-msglog-panel-text { flex: 1 1 auto; min-width: 0; }
 /* THE SECOND OF EXACTLY TWO LEVELS, painted the same amber #lpn_map_notice and #lpn_status
    already use for a warning -- the log says the same thing the map said; a marker WORD would be a
    word to translate and one more thing to get wrong in five right-to-left languages. */
-.lpn-msglog-panel-warn { background: #fffbe6; border-color: #a80; }
+.lpn-msglog-panel-warn { background: var(--ec-warn-bg); border-color: var(--ec-warn-border); }
 /* The empty state, deliberately NOT .lpn-msglog-panel-row -- it is not itself a kept message. */
 .lpn-msglog-panel-empty {
-	background: rgba(255, 255, 255, .8);
-	border: 1px solid #bbb; border-radius: 3px;
-	padding: 2px 6px; font-size: 11px; color: #666;
+	background: var(--ec-map-overlay-bg);
+	border: 1px solid var(--ec-gray-bbb); border-radius: 3px;
+	padding: 2px 6px; font-size: 11px; color: var(--ec-ink-subtle);
 }
 /* "Your network is intact." (Task 647) wears the suite's NEUTRAL panel pair, the one above, not the
    #fffbe6/#a80 warning pair: it is reassurance, not a warning (Ida, R-227). Theming phase 1
    (Task 714) turns both into one token rather than two copies of the same two values. */
 .lpn-offscreen-card {
 	pointer-events: auto;
-	background: rgba(255, 255, 255, .8);
-	border: 1px solid #bbb; border-radius: 3px;
+	background: var(--ec-map-overlay-bg);
+	border: 1px solid var(--ec-gray-bbb); border-radius: 3px;
 	padding: 10px 16px;
 }
 /* The closing privacy line, kept when the dialog it was written for was not -- see the JS comment
    on why. No background of its own: it is a caption under the pills, not one more of them. */
-.lpn-msglog-panel-note { font-size: 0.85em; color: #666; padding: 2px 6px; }
+.lpn-msglog-panel-note { font-size: 0.85em; color: var(--ec-ink-subtle); padding: 2px 6px; }
 /* THE CORNER PEEL, and it is the one part of epanet-js's own switcher worth taking (Tom,
    2026-08-23, pasting two screenshots of it: *"It's acceptable now. But see what I see at
    epanetjs"*). A tile that shows only the destination says what you get and not what you leave;
@@ -3770,7 +3886,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    left corner. Naming a control after its provider is promotion, and the attribution it discharges
    for them is already discharged here by #lpn_basemap_credit, which appears whenever a tile does. */
 .lpn-basemap-teaser.lpn-basemap-teaser-on {
-	background-color: #eae7e0;
+	background-color: var(--ec-hue-eae7e0);
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%23eae7e0'/%3E%3Cg stroke='%23c3bdb1' stroke-width='0.9' fill='none'%3E%3Cpath d='M0 6.5 L24 6.5'/%3E%3Cpath d='M0 13.5 L24 13.5'/%3E%3Cpath d='M0 19.5 L24 19.5'/%3E%3Cpath d='M5.5 0 L5.5 24'/%3E%3Cpath d='M12 0 L12 24'/%3E%3Cpath d='M18.5 0 L18.5 24'/%3E%3C/g%3E%3Cpath stroke='%23c3bdb1' stroke-width='1.4' fill='none' d='M0 10 L24 10.6'/%3E%3Cpath fill='%2310304f' d='M24 0 L24 11 L13 0 Z'/%3E%3Cpath fill='%232e7d32' d='M24 4 L24 9 L19 4 Z'/%3E%3Cpath stroke='%23fff' stroke-width='0.8' fill='none' d='M13 0 L24 11'/%3E%3C/svg%3E");
 }
 
@@ -4019,24 +4135,24 @@ html:has(#lpn_canvas) { overflow: hidden; }
 .lpn-runbox {
 	position: fixed; right: 1em; bottom: 2.2em; z-index: 1200;
 	box-sizing: border-box; width: 26rem; max-width: calc(100vw - 2em);
-	padding: 0.5em 0.75em 0.6em; border: 1px solid #ccc; border-radius: 4px;
-	background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, .2); font-size: 0.9em;
+	padding: 0.5em 0.75em 0.6em; border: 1px solid var(--ec-border-strong); border-radius: 4px;
+	background: var(--ec-bg); box-shadow: 0 2px 8px var(--ec-a-0-0-0-2); font-size: 0.9em;
 }
 .lpn-runbox-head { display: flex; align-items: center; gap: 0.5em; }
 .lpn-runbox-title { font-weight: bold; flex: 1 1 auto; }
 /* The percentage is a bare number and a percent sign, so it needs no width reserved for a longer
    translation -- there is no translation. Tabular figures stop it jittering as it counts up. */
-.lpn-runbox-pct { flex: 0 0 auto; font-variant-numeric: tabular-nums; color: #555; }
+.lpn-runbox-pct { flex: 0 0 auto; font-variant-numeric: tabular-nums; color: var(--ec-ink-muted); }
 .lpn-runbox-x {
 	flex: 0 0 auto; width: 1.8em; height: 1.8em; line-height: 1;
-	padding: 0; border: 0; background: transparent; font-size: 1.1em; color: #333; cursor: pointer;
+	padding: 0; border: 0; background: transparent; font-size: 1.1em; color: var(--ec-ink); cursor: pointer;
 }
-.lpn-runbox-x:hover, .lpn-runbox-x:focus { background: #eee; color: #000; }
+.lpn-runbox-x:hover, .lpn-runbox-x:focus { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
 .lpn-runbox-msg { margin: 0.25em 0 0.4em; }
-.lpn-runbox-bar { height: 0.5em; background: #e6e6e6; border-radius: 3px; overflow: hidden; }
+.lpn-runbox-bar { height: 0.5em; background: var(--ec-gray-e6e6e6); border-radius: 3px; overflow: hidden; }
 /* No transition on the width. The fill is driven by EPANET's own clock at the end of each slice,
    so an animation would be a second, slower, made-up progress bar drawn over the real one. */
-.lpn-runbox-fill { height: 100%; width: 0; background: #1976d2; }
+.lpn-runbox-fill { height: 100%; width: 0; background: var(--ec-hue-1976d2); }
 /* THE DOOR TO THE REPORT, not the report (ROADMAP Task 570). The .rpt used to be a `<details>`
    with its own `<pre>` and its own Copy inside this PROGRESS box; it has a draggable, sizeable box
    of its own now (.lpn-rptbox-pre, above), and what is left here is one button that opens it.
@@ -4045,15 +4161,15 @@ html:has(#lpn_canvas) { overflow: hidden; }
 /* The off switch, quietest thing in the box: it is an offer, and it is permanent, so it must not
    compete with the close X for the press that means "not now". */
 .lpn-runbox-hide {
-	display: block; margin-top: 0.5em; font-size: .85em; color: #555; cursor: pointer;
+	display: block; margin-top: 0.5em; font-size: .85em; color: var(--ec-ink-muted); cursor: pointer;
 }
 .lpn-runbox-hide input { margin-right: 0.15em; vertical-align: baseline; }
 .lpn-runbox-reportbtn {
 	margin-top: 0.4em; font: inherit; font-size: .85em;
-	padding: 1px 8px; cursor: pointer; background: none; border: 1px solid var(--rule, #999);
+	padding: 1px 8px; cursor: pointer; background: none; border: 1px solid var(--rule, var(--ec-gray-999));
 	border-radius: 3px; color: inherit;
 }
-.lpn-runbox-reportbtn:hover, .lpn-runbox-reportbtn:focus { background: #eef3fd; }
+.lpn-runbox-reportbtn:hover, .lpn-runbox-reportbtn:focus { background: var(--ec-hue-eef3fd); }
 /* ---- THE LIBRARIES BOX (ROADMAP Tasks 462 and 460) -------------------------------------------
 
    It borrows the Settings box's whole shell -- .lpn-popover for the size caps, .lpn-setbox for the
@@ -4093,18 +4209,18 @@ html:has(#lpn_canvas) { overflow: hidden; }
 /* The determinate bar. Its own colour rather than a system accent, because the three verdict
    colours on this page are already spoken for and a bar in one of them would read as a verdict. */
 .lpn-ff-bar {
-	height: 14px; border: 1px solid #999; background: #f0f0f0; border-radius: 3px;
+	height: 14px; border: 1px solid var(--ec-gray-999); background: var(--ec-gray-f0f0f0); border-radius: 3px;
 	overflow: hidden; margin: .2em 0 .6em;
 }
-.lpn-ff-bar-fill { height: 100%; width: 0; background: #1565c0; transition: width .15s linear; }
+.lpn-ff-bar-fill { height: 100%; width: 0; background: var(--ec-hue-1565c0); transition: width .15s linear; }
 .lpn-ff-controls, .lpn-ff-report { flex: 0 0 auto; }
 .lpn-ff-report { overflow: auto; min-height: 0; }
 .lpn-ff-row { display: flex; align-items: baseline; gap: .5em; margin: .25em 0; }
 .lpn-ff-row > span:first-child { flex: 1 1 auto; }
 .lpn-ff-row > input, .lpn-ff-row > select { flex: 0 0 8rem; min-width: 0; }
-.lpn-ff-unit { flex: 0 0 4rem; color: #555; font-size: .9em; }
+.lpn-ff-unit { flex: 0 0 4rem; color: var(--ec-ink-muted); font-size: .9em; }
 .lpn-ff-head { font-weight: bold; margin: .8em 0 .3em; }
-.lpn-ff-note { margin: .3em 0; font-size: .9em; color: #444; }
+.lpn-ff-note { margin: .3em 0; font-size: .9em; color: var(--ec-gray-444); }
 .lpn-ff-summary { margin: .4em 0; font-weight: bold; }
 .lpn-ff-buttons { margin: .6em 0; display: flex; gap: .5em; }
 /* Column width is king (CLAUDE.md): the table is read in a box a reader may have made narrow, so
@@ -4112,11 +4228,11 @@ html:has(#lpn_canvas) { overflow: hidden; }
 .lpn-ff-tablewrap { overflow-x: auto; }
 .lpn-ff-table { width: 100%; border-collapse: collapse; font-size: .9em; }
 /* A calculation option shown beside the alternatives (the Alternatives preview's Demand multiplier). */
-.lpn-ff-table .lpn-alt-calcopt { border-inline-start: 2px solid #999; text-align: center; }
+.lpn-ff-table .lpn-alt-calcopt { border-inline-start: 2px solid var(--ec-gray-999); text-align: center; }
 /* An id in the fire-flow table goes to its element (Tom, 2026-09-28: "can every node have a
    hyperlink to go to it?"): a button dressed as the link he asked for. */
-.lpn-ff-goto { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: #0645ad; text-decoration: underline; cursor: pointer; text-align: inherit; }
-.lpn-ff-goto:hover, .lpn-ff-goto:focus-visible { color: #0b0080; }
+.lpn-ff-goto { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: var(--ec-accent); text-decoration: underline; cursor: pointer; text-align: inherit; }
+.lpn-ff-goto:hover, .lpn-ff-goto:focus-visible { color: var(--ec-hue-0b0080); }
 /* EVERY HEADING SORTS (Tom, 2026-09-28: "Sort Fire flow analysis columns."): the Tables pane's own
    arrow (.lpn-pane-sortarrow, below), in a gutter kept clear for it, shown on the sorted column and
    on a heading under the pointer or holding keyboard focus. */
@@ -4131,7 +4247,7 @@ html:has(#lpn_canvas) { overflow: hidden; }
 /* The global `table, th, tr, td { border: 1px solid blue }` (top of this file) is the calculator
    forms' debugging grid; these tables want a hairline under each row and nothing else. */
 .lpn-ff-table, .lpn-ff-table tr { border: 0; }
-.lpn-ff-table th, .lpn-ff-table td { text-align: left; padding: .15em .4em; border: 0; border-bottom: 1px solid #ddd; overflow-wrap: anywhere; }
+.lpn-ff-table th, .lpn-ff-table td { text-align: left; padding: .15em .4em; border: 0; border-bottom: 1px solid var(--ec-border); overflow-wrap: anywhere; }
 .lpn-ff-table th { overflow-wrap: normal; }
 /* THE ALTERNATIVES PREVIEW (Tom, 2026-10-01: *"Alternatives columns are crazy."*): `anywhere` above
    shrinks every column's minimum to one character, so auto layout shared the width evenly and broke
@@ -4146,9 +4262,9 @@ html:has(#lpn_canvas) { overflow: hidden; }
 /* The same three states as the rings, as a quiet tint on the row rather than as text colour: the
    verdict is already spelled out in the Result column, so this is a second channel and not the
    only one. */
-tr.lpn-ff-fail { background: #fdecea; }
-tr.lpn-ff-design { background: #fff4e5; }
-tr.lpn-ff-error { background: #f2f2f2; }
+tr.lpn-ff-fail { background: var(--ec-error-bg); }
+tr.lpn-ff-design { background: var(--ec-hue-fff4e5); }
+tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 /* **AND A NARROWER INDEX AGAIN** (Tom, 2026-08-22: "The Libraries box can have an Index pane width
    0.70 * current, at least in English"). 0.7 x the 7.5rem both boxes shipped at. It is a shorter
    list of shorter names than Settings' -- Patterns, Curves, Controls -- so it can give up more, and
@@ -4157,7 +4273,7 @@ tr.lpn-ff-error { background: #f2f2f2; }
 #lpn_library_box .lpn-setbox-index { flex-basis: 5.25rem; }
 /* An entry is one pattern, one curve or one control: a block with a rule under it, so a list of
    them reads as a list of things rather than as a paragraph of controls. */
-.lpn-lib-entry { padding: 6px 0 8px; border-bottom: 1px solid #eee; }
+.lpn-lib-entry { padding: 6px 0 8px; border-bottom: 1px solid var(--ec-gray-eee); }
 .lpn-lib-entry:last-child { border-bottom: 0; }
 /* The head row: the thing's name, then its own delete, pushed to the right where a destructive
    command belongs and away from the fields the hand is aiming at. */
@@ -4188,7 +4304,7 @@ tr.lpn-ff-error { background: #f2f2f2; }
 .lpn-lib-values { font-variant-numeric: tabular-nums; }
 /* The sparkline. A fixed height and a fluid width: it is a SHAPE check ("is this the daily curve I
    meant?"), not a chart to read values off, so it needs no axis and no numbers. */
-.lpn-lib-spark { display: block; width: 100%; height: 46px; background: #fafafa; border: 1px solid #ddd; }
+.lpn-lib-spark { display: block; width: 100%; height: 46px; background: var(--ec-gray-fafafa); border: 1px solid var(--ec-border); }
 /* A curve is read in two dimensions -- flow across, head up -- so it gets more height than a
    pattern, which is read only for its ups and downs along one axis. */
 .lpn-lib-chart { height: 76px; }
@@ -4197,7 +4313,7 @@ tr.lpn-ff-error { background: #f2f2f2; }
 /* The section a library entry list sits under. Its heading is not sticky -- unlike Settings, only
    one section is on screen at a time, so there is nothing to lose track of. */
 .lpn-lib-sec { margin: 0; }
-.lpn-lib-sec > h3 { margin: 0 0 4px; padding: 0 0 4px; font-size: 1.15rem; font-weight: bold; border-bottom: 1px solid #ccc; }
+.lpn-lib-sec > h3 { margin: 0 0 4px; padding: 0 0 4px; font-size: 1.15rem; font-weight: bold; border-bottom: 1px solid var(--ec-border-strong); }
 
 /* THE FIELDS AN INPUT UNIT DECIDES, ONE PER LINE (ROADMAP Task 425). Tom asked for a column rather
    than a comma list, and the reason is what the reader is doing with it: scanning for whether their
@@ -4698,13 +4814,13 @@ tr.lpn-ff-error { background: #f2f2f2; }
    beside it still has to be the thing the eye reads first. */
 .lpn-profile-edit {
 	flex: 0 0 auto; font: inherit; font-size: .95em; padding: 1px 8px;
-	border: 1px solid #bbb; border-radius: 3px; background: #f6f6f6; cursor: pointer;
+	border: 1px solid var(--ec-gray-bbb); border-radius: 3px; background: var(--ec-gray-f6f6f6); cursor: pointer;
 }
-.lpn-profile-edit:hover, .lpn-profile-edit:focus { background: #eaeaea; border-color: #888; }
+.lpn-profile-edit:hover, .lpn-profile-edit:focus { background: var(--ec-gray-eaeaea); border-color: var(--ec-gray-888); }
 /* **PRESSED MEANS THE PATH IS IN EDIT MODE** (Task 509) -- the drawing is now carrying handles, and
    a mode whose only evidence is on the map is a mode somebody gets stuck in. The toolbar's own
    pressed colours, not a new pair, because it is the same fact wearing the same clothes. */
-.lpn-profile-edit[aria-pressed="true"] { background: #cfe3f7; border-color: #6aa6d8; }
+.lpn-profile-edit[aria-pressed="true"] { background: var(--ec-pressed-bg); border-color: var(--ec-pressed-border); }
 /* The grab handles themselves. A SOLID dot is a stop the reader chose -- drag it to move it, click
    it to take it off; a HOLLOW one is a node the route merely passes through, and dragging it makes
    it a stop. Told apart by fill rather than by hue, so the distinction survives a colour-blind
@@ -4715,9 +4831,9 @@ tr.lpn-ff-error { background: #f2f2f2; }
    rather than a second control inside the chip, so the whole chip is the target a hand can hit. */
 .lpn-profile-chip {
 	font: inherit; font-size: .9em; margin: 0 .25em .25em 0; padding: 1px 6px;
-	border: 1px solid #bbb; border-radius: 10px; background: #f6f6f6; cursor: pointer;
+	border: 1px solid var(--ec-gray-bbb); border-radius: 10px; background: var(--ec-gray-f6f6f6); cursor: pointer;
 }
-.lpn-profile-chip:hover, .lpn-profile-chip:focus { background: #eaeaea; border-color: #888; }
+.lpn-profile-chip:hover, .lpn-profile-chip:focus { background: var(--ec-gray-eaeaea); border-color: var(--ec-gray-888); }
 
 /* ---- The time-series chart (Task 599) -------------------------------------------------------
    The panel, the control row and every piece of axis furniture are the PROFILE's -- .lpn-ts-panel
@@ -4734,7 +4850,7 @@ tr.lpn-ff-error { background: #f2f2f2; }
 .lpn-ts-dot { stroke: none; }
 /* Where the transport is parked. Dashed and grey on purpose: it is the one mark on the chart that
    is not a reading, so it must not read as a series. */
-.lpn-ts-now { stroke: #888; stroke-width: 1; stroke-dasharray: 3, 3; }
+.lpn-ts-now { stroke: var(--ec-gray-888); stroke-width: 1; stroke-dasharray: 3, 3; }
 /* The two pull-downs sit on the control row's baseline with the chips and the buttons, so they take
    the row's own type size rather than the browser's default form size. */
 .lpn-ts-pick { font: inherit; font-size: .95em; max-width: 12em; }
@@ -4775,15 +4891,15 @@ tr.lpn-ff-error { background: #f2f2f2; }
 /* The arrow rides on its tab's own card, so a tab with one does not read as a tab plus a stray
    button -- the same reason .lpn-pane-tab-menu-current below matches the selected tab. */
 .lpn-pane-tab-menu {
-	background: #f0f0f0; border: 1px solid #dcdcdc; border-bottom: 0;
-	border-inline-start: 1px solid #ccc; font: inherit;
+	background: var(--ec-gray-f0f0f0); border: 1px solid var(--ec-gray-dcdcdc); border-bottom: 0;
+	border-inline-start: 1px solid var(--ec-border-strong); font: inherit;
 	padding: 3px 8px; margin-inline-start: -2px; min-width: 2rem;
-	cursor: pointer; color: #333;
+	cursor: pointer; color: var(--ec-ink);
 }
-.lpn-pane-tab-menu:hover, .lpn-pane-tab-menu:focus { background: #ddd; }
+.lpn-pane-tab-menu:hover, .lpn-pane-tab-menu:focus { background: var(--ec-border); }
 /* Joined to the tab it belongs to, the way .lpn-tab-caret is joined to .lpn-tab-current: one
    selected tab carrying a caret, not a selected tab beside an unselected button. */
-.lpn-pane-tab-menu-current { background: #fff; border-color: #bbb; border-inline-start-color: #ccc; }
+.lpn-pane-tab-menu-current { background: var(--ec-bg); border-color: var(--ec-gray-bbb); border-inline-start-color: var(--ec-border-strong); }
 @media (max-width: 40rem) {
 	.lpn-pane-tab-menu { min-width: 2.75rem; padding: 3px 12px; }
 }
@@ -4815,15 +4931,15 @@ tr.lpn-ff-error { background: #f2f2f2; }
 	max-width: 60%;
 	height: 6px;
 	margin: 0;
-	background: rgba(255, 255, 255, .9);
-	border: 1px solid #05a;
+	background: var(--ec-a-255-255-255-9);
+	border: 1px solid var(--ec-hue-05a);
 	border-top: 0;
 	overflow: hidden;
 }
 .lpn-engine-bar-fill {
 	height: 100%;
 	width: 0;
-	background: #05a;
+	background: var(--ec-hue-05a);
 	transition: width .2s linear;
 }
 .lpn-engine-bar-unknown .lpn-engine-bar-fill {

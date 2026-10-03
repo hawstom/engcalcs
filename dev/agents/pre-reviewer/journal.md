@@ -3667,3 +3667,20 @@ TRAP for method: Session Save as needs answerTrainingPanel() then a second queue
   no duplicate ids; hidden layers byte-identical across drag, undo, draw pipe, Calculate, Settings change;
   closing a tab frees its 5 layers (25 -> 20 -> 15 -> 10).
 - Method note: the first-visit build is correct, so a test must RETURN to a kept tab and read sizes in pixels.
+
+## 2026-10-03 feat/keyboard-menu (3b0c190a), menu mnemonics
+- OBSERVED: builder's two harnesses green. Real Chromium, Net3, focus in Junctions table cell: Alt+Shift+F/E/M/W/H/L all open with first row focused. Enter on a command row with no box (Undo, Select, Zoom to fit, Calculate) leaves focus on the menu-bar button, keyboard mode already ended, so he cannot get back to the cell (kbdModeReturn only used on Escape). Settings lands focus on the box's close button.
+- OBSERVED: Map > Background image > Move / Scale by picking / Scale ... around a point you pick are not marked pointer-only. Zoom Window is a toolbar button only (no menu row).
+- CITED (code): chord matches e.code, so Dvorak/Hebrew users press the key at the QWERTY position while the badge shows a Latin letter. Ctrl+Option on Mac is VoiceOver's modifier.
+- SPECULATION: Windows Alt+Shift layout switch interaction not testable here.
+
+## 2026-10-03 — feat/label-cache (Task 681) pre-review
+
+## 2026-10-03 -- pre-review feat/label-cache 5d5d9727 (Task 681), Perry
+
+- OBSERVED (real headless Chrome, php -S, worktree vs a copy with labelCacheEnabled=false, same scripted session, visible label text/position compared): Net1, Elm Street, Novato world. Wheel in 6 / out 6, demand edit 0->777, time step, node drag, undo, delete, window resize, tab switch away and back, pan, zoom window (off-notch), Zoom to fit then wheel. No stale value, no label on a moved/deleted element anywhere. A revisited notch equals its first visit exactly (Novato, 5 of 5). After every change the next settle reports "bank miss (changed)" and rebuilds.
+- OBSERVED: Novato revisit settle 10-15 ms, 0 passes, vs 70-100 ms with the bank off; first visits unchanged (~90-100 ms). Net1 ~1.3 vs ~3.5 ms.
+- OBSERVED: the bank survives a tab switch away and back (same drawing object); values after a time step were current.
+- OBSERVED, on master-equivalent code (bank off): return to Novato after 5 other tabs (drawing evicted, rebuilt from kept layout) at identical view: 78 of 123 labels differ from before leaving (some rows shed, positions moved). captureLabelLayout() omits alignedAlong, stationSides, hiddenYielded, customer spots (by reading). Cause not isolated to those four fields.
+- NOT EXERCISED: Settings changes, recalc-off edits, hover/select, pinch, real customers, georeference change.
+- Method: snapshots must exclude other tabs' kept (display:none) layers; tab order at load is nondeterministic, so verify the current tab by name. Never pkill -f with a pattern that matches your own shell command.

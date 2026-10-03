@@ -322,6 +322,12 @@ run_check "scenario write seam"          blocking php dev/scripts/scenario_seam_
 # direct localStorage writes, not typed: CLAUDE.md names four and the page writes six.
 run_check "lpn project/browser split"    blocking php dev/scripts/lpn_furniture_check.php
 run_check "lpn furniture selftest"       blocking php dev/scripts/lpn_furniture_selftest.php
+# Task 714 Phase 1. A dark theme is "write the dark values once" only while every chrome colour is a
+# token; one literal left in a rule is a light patch on a dark box that nobody on a light screen can see.
+# Refuses a colour literal outside the token block in css/engcalcs.css (map ink and paper are allow-listed
+# with reasons), an undeclared var(--ec-...), and a rise in inline literals in js/*.js and the PHP pages.
+# dev/lpn-spike/chrome-tokens-harness.js holds the browser half, and runs with the other harnesses.
+run_check "chrome colour tokens"         blocking php dev/scripts/chrome_colour_check.php
 # Task 690, the spreadsheet-parity half. Every property in an element's property popup is also a
 # column in that element's table -- and, because multiGroups() derives its sections from
 # paneTables(), in the multi-properties box with it. Adding a popup field is a complete, working,

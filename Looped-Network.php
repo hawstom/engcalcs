@@ -168,7 +168,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // on the project file (read-only, red) or something needs warning about but not blocking --
 	      // no server to lock against, or a linked file that has gone missing (amber). renderBanner()
 	      // in js/looped-network.js fills it and sets the colors; read-only wins when both apply. ?>
-	<div class="d-print-none" id="lpn_lock_banner" role="status" style="display:none;margin:4px 0;padding:6px 8px;border:1px solid #a80;background:#fffbe6"></div>
+	<div class="d-print-none" id="lpn_lock_banner" role="status" style="display:none;margin:4px 0;padding:6px 8px;border:1px solid var(--ec-warn-border);background:var(--ec-warn-bg)"></div>
 	<?php // `multiple` is the EXPERT shortcut for Task 276: pick the picture and its world file
 	      // together and the registration happens with no further step. Picking only the picture is
 	      // the ordinary path, and it now asks for NOTHING further (Task 297, Tom 2026-08-13: "We
@@ -234,7 +234,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // mirrors #lpn_settings_box's static-PHP-plus-JS-clamped-position pattern (position:fixed,
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
 	      // fixed center-screen placement. ?>
-	<div id="lpn_backdrop_target_panel" class="d-print-none" style="display:none;position:fixed;z-index:30;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+	<div id="lpn_backdrop_target_panel" class="d-print-none" style="display:none;position:fixed;z-index:30;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)">
 		<label for="lpn_backdrop_target_mode"><?=$ec_lang['lpn_backdrop_target_label']?></label>
 		<select id="lpn_backdrop_target_mode">
 			<option value="node"><?=$ec_lang['lpn_backdrop_target_node']?></option>
@@ -351,7 +351,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // longer starts at the map's own corner. One number to get right, not two that have
 			      // to be kept in step. ?>
 			<div id="lpn_map_overlay_tl_col" style="position:relative;flex:1 1 auto;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:4px">
-			<div id="lpn_mode_hint" style="font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px"></div>
+			<div id="lpn_mode_hint" style="font-size:11px;background:var(--ec-map-overlay-bg);padding:2px 6px"></div>
 			<?php // ONE-SHOT NOTICES SIT ON THE MAP, IN THE MODE HINT'S SLOT, AND EXPIRE (Tom, 2026-08-17:
 			      // saving a project put a line of text above the canvas and "moves the map down past the
 			      // bottom of the screen" -- then answered his own question, "maybe covering or replacing
@@ -375,7 +375,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // property is what keeps this correct in RTL: the column's own start edge is its
 			      // right edge under `dir="rtl"`, and `inset-inline-start` follows that automatically
 			      // where a physical `left` would not. ?>
-			<div id="lpn_map_notice" class="d-print-none" role="status" style="display:none;position:absolute;top:0;inset-inline-start:0;z-index:5;max-width:60%;font-size:11px;background:#fffbe6;border:1px solid #a80;padding:2px 6px;pointer-events:none"></div>
+			<div id="lpn_map_notice" class="d-print-none" role="status" style="display:none;position:absolute;top:0;inset-inline-start:0;z-index:5;max-width:60%;font-size:11px;background:var(--ec-warn-bg);border:1px solid var(--ec-warn-border);padding:2px 6px;pointer-events:none"></div>
 			<?php // **THE MESSAGE LOG IS AN ON-MAP LIST NOW, NOT A DIALOG** (ROADMAP Task 704, Tom
 			      // 2026-09-22, live on port 8099: *"The alert paradigm is not a good UX for showing
 			      // past messages. User expects them to descend below the glyph, below the Mode status
@@ -410,7 +410,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			<?php // The solver's standing diagnostic ("Add a reservoir"), true until the model
 			      // changes. Deliberately NOT d-print-none: if the drawing on screen has no answers,
 			      // a print of it should say why rather than look like a finished network. ?>
-			<p id="lpn_status" class="ec-status-warn" style="display:none;max-width:60%;margin:0;font-size:11px;padding:2px 6px;background:#fffbe6;border:1px solid #a80"><?php
+			<p id="lpn_status" class="ec-status-warn" style="display:none;max-width:60%;margin:0;font-size:11px;padding:2px 6px;background:var(--ec-warn-bg);border:1px solid var(--ec-warn-border)"><?php
 			      // THE TEXT IS ITS OWN ELEMENT NOW, and that is the whole DOM change Task 207 asks
 			      // of this box. setStatus() used to write the <p>'s textContent, which would wipe
 			      // any sibling control on every solve; it writes #lpn_status_text instead, so the
@@ -442,7 +442,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      //
 			      // d-print-none, unlike the diagnostic beside it: a printed sheet should say why a
 			      // drawing has no answers, and "still loading" will not be true of the paper. ?>
-			<p id="lpn_engine_banner" class="d-print-none" role="status" style="display:none;max-width:60%;margin:0;font-size:11px;padding:2px 6px;background:rgba(255,255,255,.9);border:1px solid #05a"></p>
+			<p id="lpn_engine_banner" class="d-print-none" role="status" style="display:none;max-width:60%;margin:0;font-size:11px;padding:2px 6px;background:var(--ec-a-255-255-255-9);border:1px solid var(--ec-hue-05a)"></p>
 			<?php // **THE BAR, AND WHY ITS END IS NOT THE END OF THE TRANSFER** (Task 608, Tom
 			      // 2026-09-19: *"We must include the unknown in the progress bar. The progress bar can
 			      // stall at the end if necessary. But it can't disappear prematurely."*). The bytes are
@@ -466,7 +466,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // STATIC MARKUP, filled and shown by georefRefreshBar() in looped-network.js, for the
 		      // same reason #lpn_backdrop_target_panel is static: the strings are language keys and
 		      // PHP is where those live. ?>
-		<div id="lpn_georef_bar" class="d-print-none" style="display:none;position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:6;max-width:92%;font-size:12px;background:#fff;border:1px solid #05a;padding:6px 10px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+		<div id="lpn_georef_bar" class="d-print-none" style="display:none;position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:6;max-width:92%;font-size:12px;background:var(--ec-bg);border:1px solid var(--ec-hue-05a);padding:6px 10px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)">
 			<?php // WHICH STEP YOU ARE IN, SAID OUT LOUD (Tom, 2026-08-18: "there is an uncomfortable
 			      // gray area between the described modes"). Filled by georefRefreshBar(); its text
 			      // and the Detach button's are English literals in looped-network.js until their
@@ -506,7 +506,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // this one ends by converting none, so a shared strip would be one set of buttons meaning
 		      // two opposite things. Go to and Place name search are the placement bar's own labels
 		      // reused whole, because they are the same two commands. ?>
-		<div id="lpn_mapgeo_bar" class="d-print-none" style="display:none;position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:6;max-width:92%;font-size:12px;background:#fff;border:1px solid #05a;padding:6px 10px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+		<div id="lpn_mapgeo_bar" class="d-print-none" style="display:none;position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:6;max-width:92%;font-size:12px;background:var(--ec-bg);border:1px solid var(--ec-hue-05a);padding:6px 10px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)">
 			<div id="lpn_mapgeo_step" style="margin-bottom:2px;font-weight:bold"></div>
 			<div id="lpn_mapgeo_hint" style="margin-bottom:4px"></div>
 			<?php // Its own line rather than a second sentence glued to the one above: a string
@@ -564,7 +564,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // pane cuts the canvas at will, and a control sized from the markup slid up under the
 		      // toolbar. See mapgeoPlaceDial().
 		      ?>
-		<div id="lpn_mapgeo_dial" class="d-print-none" style="display:none;position:absolute;right:12px;top:8px;z-index:6;font-size:11px;text-align:center;background:#fff;border:1px solid #05a;padding:6px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+		<div id="lpn_mapgeo_dial" class="d-print-none" style="display:none;position:absolute;right:12px;top:8px;z-index:6;font-size:11px;text-align:center;background:var(--ec-bg);border:1px solid var(--ec-hue-05a);padding:6px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)">
 			<?php // **THE NUMBER BOX AND THE READOUT SIT ABOVE THE BAR, not under it.** The bar is
 			      // as tall as the map by instruction, so anything below it is at the far end of a
 			      // 600 px control from the label that names it, and on a first-visit page the
@@ -606,7 +606,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // next reordering could undo. legendInsetFor() keeps the boxes from overlapping in
 		      // the ordinary case; this is what decides it on the rare frame where they still do
 		      // (a very long message list, a very long legend). ?>
-		<div id="lpn_labels_legend" style="display:none;position:absolute;z-index:3;font-size:0.9em;line-height:1.4;background:rgba(255,255,255,.85);padding:4px 8px;pointer-events:none"></div>
+		<div id="lpn_labels_legend" style="display:none;position:absolute;z-index:3;font-size:0.9em;line-height:1.4;background:var(--ec-a-255-255-255-85);padding:4px 8px;pointer-events:none"></div>
 		<?php // THE ON-MAP ZOOM CHIP (ROADMAP Task 682) -- for a visitor with no wheel and no pinch
 		      // surface: a trackpad, a trackball, a presentation remote. Fixed top-right, the same
 		      // corner the labels legend above defaults to and the one Mapbox's own NavigationControl
@@ -624,9 +624,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // (EngCalcs.setIconLabel()), so this gets an accessible name and a touch-reachable tip
 		      // with no tip markup written by hand here. Registered in overlayOccupants() so a top-right
 		      // labels legend dodges under it instead of through it. ?>
-		<div id="lpn_zoom_control" class="d-print-none" style="position:absolute;top:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:4;background:rgba(255,255,255,.85);border:1px solid #999">
+		<div id="lpn_zoom_control" class="d-print-none" style="position:absolute;top:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:4;background:var(--ec-a-255-255-255-85);border:1px solid var(--ec-gray-999)">
 			<button type="button" id="lpn_zoom_in" style="width:26px;height:26px;padding:0;margin:0;border:0;background:none;cursor:pointer;color:inherit"></button>
-			<button type="button" id="lpn_zoom_out" style="width:26px;height:26px;padding:0;margin:0;border:0;border-top:1px solid #999;background:none;cursor:pointer;color:inherit"></button>
+			<button type="button" id="lpn_zoom_out" style="width:26px;height:26px;padding:0;margin:0;border:0;border-top:1px solid var(--ec-gray-999);background:none;cursor:pointer;color:inherit"></button>
 		</div>
 		<?php // No template_welcome here (Tom, 2026-07-30): it already shows at the top of every
 		      // page via echoHeader(), and its link wasn't even clickable in this pointer-events:
@@ -713,17 +713,17 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // precisely what the basemap is opt-in to avoid. It is CSS, in css/engcalcs.css.
 			      // Shown, labelled and wired by refreshBasemapTeaser() in looped-network.js. ?>
 			<button type="button" id="lpn_basemap_teaser" class="lpn-basemap-teaser" style="display:none"></button>
-			<button type="button" id="lpn_scenario_btn" style="pointer-events:auto;font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px;border:1px solid #bbb"></button>
-			<div id="lpn_map_status" style="background:rgba(255,255,255,.8);padding:2px 6px"></div>
+			<button type="button" id="lpn_scenario_btn" style="pointer-events:auto;font-size:11px;background:var(--ec-map-overlay-bg);padding:2px 6px;border:1px solid var(--ec-gray-bbb)"></button>
+			<div id="lpn_map_status" style="background:var(--ec-map-overlay-bg);padding:2px 6px"></div>
 			<?php // Monospace, and only this one: the X/Y digits change on every pointer move, and a
 			      // proportional font makes the whole readout jitter as they do. ?>
-			<div id="lpn_coords" style="font-family:monospace;background:rgba(255,255,255,.8);padding:2px 6px">X: --  Y: --</div>
+			<div id="lpn_coords" style="font-family:monospace;background:var(--ec-map-overlay-bg);padding:2px 6px">X: --  Y: --</div>
 			<?php // **THE PROJECTION, BESIDE THE COORDINATES IT EXPLAINS** (Task 641). A pair of numbers
 			      // with no coordinate system named is the defect Tom found at 89.99 degrees: the
 			      // readout was lying and nothing on screen said in what. Filled by
 			      // refreshCrsReadout() in js/looped-network.js; NOT monospace, because it is a name
 			      // rather than digits that change under the pointer. ?>
-			<div id="lpn_crs" style="background:rgba(255,255,255,.8);padding:2px 6px"><?=$ec_lang['lpn_crs_none']?></div>
+			<div id="lpn_crs" style="background:var(--ec-map-overlay-bg);padding:2px 6px"><?=$ec_lang['lpn_crs_none']?></div>
 			<?php // **THE SCALE BAR** (Tom, 2026-09-11: *"let's add it"*). A cell of this strip like
 			      // everything else in it, so it wraps on a narrow window and is reserved against by
 			      // zoomExtent() with the rest. Its WIDTH is the measurement -- refreshScaleBar() in
@@ -769,7 +769,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      //
 		      // Its own corner, not a cell of #lpn_map_footer: the footer is left-packed and hidden
 		      // on print, and this has to survive both. Shown and hidden by refreshBasemapCredit(). ?>
-		<div id="lpn_basemap_credit" style="display:none;position:absolute;bottom:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:4;font-size:10px;line-height:1.4;background:rgba(255,255,255,.85);padding:1px 5px"><!-- Required attribution, one set per tile source; js/looped-network.js shows the set whose tiles are on screen. Mapbox's terms name Mapbox and its imagery supplier as well as OpenStreetMap, so the satellite set is not a superset of the street one. --><span data-basemap-credit="osm"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></span><span data-basemap-credit="satellite" style="display:none"><!-- Mapbox's required attribution is the WORDMARK plus three links with their exact labels and URLs (ROADMAP Task 489, docs.mapbox.com/help/getting-started/attribution/). The mark is a CSS data: URI (.lpn-mapbox-logo), never an image fetched from Mapbox: no request may reach them before the visitor turns satellite on. Maxar is the imagery supplier and is credited beside them. --><a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener" title="Mapbox"><span class="lpn-mapbox-logo" role="img" aria-label="Mapbox"></span></a> <a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener">© Mapbox</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> <a href="https://www.maxar.com/" target="_blank" rel="noopener">© Maxar</a> <a href="https://apps.mapbox.com/feedback/" target="_blank" rel="noopener">Improve this map</a></span></div>
+		<div id="lpn_basemap_credit" style="display:none;position:absolute;bottom:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:4;font-size:10px;line-height:1.4;background:var(--ec-a-255-255-255-85);padding:1px 5px"><!-- Required attribution, one set per tile source; js/looped-network.js shows the set whose tiles are on screen. Mapbox's terms name Mapbox and its imagery supplier as well as OpenStreetMap, so the satellite set is not a superset of the street one. --><span data-basemap-credit="osm"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></span><span data-basemap-credit="satellite" style="display:none"><!-- Mapbox's required attribution is the WORDMARK plus three links with their exact labels and URLs (ROADMAP Task 489, docs.mapbox.com/help/getting-started/attribution/). The mark is a CSS data: URI (.lpn-mapbox-logo), never an image fetched from Mapbox: no request may reach them before the visitor turns satellite on. Maxar is the imagery supplier and is credited beside them. --><a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener" title="Mapbox"><span class="lpn-mapbox-logo" role="img" aria-label="Mapbox"></span></a> <a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener">© Mapbox</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> <a href="https://www.maxar.com/" target="_blank" rel="noopener">© Maxar</a> <a href="https://apps.mapbox.com/feedback/" target="_blank" rel="noopener">Improve this map</a></span></div>
 	</div>
 </form>
 <?php // ---- THE BOTTOM PANE (ROADMAP Task 434) ----------------------------------------------------
@@ -943,7 +943,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // somewhere other than where it visually appeared, so the tap fell through to the canvas
       // underneath and was read as a background pan). fixed is always viewport-relative, matching
       // clientX/clientY directly with no scroll math needed. ?>
-<div id="lpn_popup" class="d-print-none lpn-popover lpn-propbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+<div id="lpn_popup" class="d-print-none lpn-popover lpn-propbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)">
 	<?php // **THE DRAG BAND IS NAMED AND DELINEATED** (Tom, 2026-09-08: *"There is no visual title bar
 	      // depiction. For a non-hog box like this I would expect a title bar with a title in it;
 	      // maybe the right title is 'Properties'. Or empty for now. But a nice line delineating the
@@ -974,7 +974,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // modeless for a reason -- you find something, look at the map, and search again without the
       // panel ever taking the map away. Everything inside is built in JS (wireFindPopup()), because
       // the property and condition lists depend on which kind of element you chose. ?>
-<div id="lpn_find_popup" class="d-print-none lpn-popover lpn-findbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+<div id="lpn_find_popup" class="d-print-none lpn-popover lpn-findbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)">
 	<?php // The padded band at the top is the DRAG SURFACE, exactly as on #lpn_popup: `e.target` is
 	      // the panel itself there and a child everywhere else, so a drag can never start on a
 	      // control. That is why the padding is 40px on top and 8px elsewhere. ?>
@@ -1020,7 +1020,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // AutoCAD palette." Nothing here assumes a floating box: the whole thing is one element with
       // one placement function, so a future dock changes where it is put and nothing about what is
       // in it. ?>
-<div id="lpn_settings_box" class="d-print-none lpn-popover lpn-setbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_setbox_title">
+<div id="lpn_settings_box" class="d-print-none lpn-popover lpn-setbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_setbox_title">
 	<?php // The padded band at the top is the DRAG SURFACE, exactly as on #lpn_popup and #lpn_find_popup:
 	      // `e.target` is the box itself there and a child everywhere else, so a drag can never start
 	      // on a control. That is why the padding is 40px on top and 8px elsewhere. ?>
@@ -1293,7 +1293,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // and scrolls to them; these three are disjoint editors rather than sections of one document,
       // so a click SHOWS one and hides the others. Built in JS (buildLibraryBox), because what is
       // in each depends entirely on the document. ?>
-<div id="lpn_library_box" class="d-print-none lpn-popover lpn-setbox lpn-libbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_libbox_title">
+<div id="lpn_library_box" class="d-print-none lpn-popover lpn-setbox lpn-libbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_libbox_title">
 	<div id="lpn_libbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_library_menu']?></div>
 	<button type="button" id="lpn_libbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1315,7 +1315,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // scrolling body -- so there is one set of box mechanics on this page rather than a third.
       // The controls and both reports are built in JS (buildFireFlowBox), because what is in them
       // depends entirely on the document and on what the last run found. ?>
-<div id="lpn_ff_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffbox_title">
+<div id="lpn_ff_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_ffbox_title">
 	<div id="lpn_ffbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_title']?></div>
 	<button type="button" id="lpn_ff_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1333,7 +1333,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // shell -- the drag band, the resize grip, the scrolling body -- so this page has one set of
       // box mechanics and not a fourth. The report itself is built in JS (rebuildEnergyReport),
       // because it exists only for as long as the run that produced it. ?>
-<div id="lpn_energy_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_energybox_title">
+<div id="lpn_energy_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_energybox_title">
 	<div id="lpn_energybox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_energy_title']?></div>
 	<button type="button" id="lpn_energy_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1345,7 +1345,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // each was found. It borrows the fire flow box's shell for the reason the pump energy report
       // does -- one set of box mechanics on this page, not a fifth -- and its table is built in JS
       // (rebuildScenarioCompareReport), because it exists only for as long as the run behind it. ?>
-<div id="lpn_scncmp_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_scncmp_title">
+<div id="lpn_scncmp_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_scncmp_title">
 	<div id="lpn_scncmp_title" class="lpn-setbox-title"><?=$ec_lang['lpn_scncmp_title']?></div>
 	<button type="button" id="lpn_scncmp_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1362,7 +1362,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // text is EPANET's own and untranslated (lpn_time_run_report_tip says so), and an EPANET
       // .rpt is column-aligned monospace: wrapping it destroys the only structure it has. The
       // popover body scrolls vertically already; this adds the other axis, inside the box. ?>
-<div id="lpn_rptbox" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_rptbox_title">
+<div id="lpn_rptbox" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_rptbox_title">
 	<div id="lpn_rptbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_time_run_report']?></div>
 	<?php // Beside the close button rather than inside the body: the report can be thousands of
 	      // lines, and a Copy that scrolls away with the text is a Copy nobody finds. ?>
@@ -1377,7 +1377,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // tanks filling, emptying, filling up or running dry, and a step that did not converge. It
       // borrows the same box shell as the reports above it; the list is built in JS
       // (rebuildStatusReport) because it exists only for as long as the run behind it. ?>
-<div id="lpn_status_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_statusbox_title">
+<div id="lpn_status_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_statusbox_title">
 	<div id="lpn_statusbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_status_title']?></div>
 	<button type="button" id="lpn_status_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1388,7 +1388,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // mode unticked: for each scenario, which alternative it uses in each category, read-only.
       // The minimum honest view of a model that otherwise has no screen; the Advanced UX is not
       // designed. Its position is NOT remembered, so it adds nothing to what a browser stores. ?>
-<div id="lpn_alt_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_altbox_title">
+<div id="lpn_alt_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_altbox_title">
 	<div id="lpn_altbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_alt_title']?></div>
 	<button type="button" id="lpn_alt_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1401,7 +1401,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // and Print sit beside the close button, the same placement the run report's Copy button
       // uses, because this table can run to thousands of rows and a button that scrolls away with
       // it is a button nobody finds. ?>
-<div id="lpn_full_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_fullbox_title">
+<div id="lpn_full_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_fullbox_title">
 	<div id="lpn_fullbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_full_title']?></div>
 	<button type="button" id="lpn_full_csv" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_download_csv']?></button>
 	<button type="button" id="lpn_full_print" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_print']?></button>
@@ -1410,7 +1410,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<div id="lpn_full_report" class="lpn-ff-report"></div>
 	</div>
 </div>
-<div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_ffrun_title">
+<div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_ffrun_title">
 	<div id="lpn_ffrun_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_run_title']?></div>
 	<div class="lpn-popover-body">
 		<div id="lpn_ff_run_body"></div>
@@ -1421,7 +1421,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // js/looped-network.js builds those, so three popovers would have been three copies of the
       // same positioning and dismissal code. Replaces the Projects panel of Task 146.08 -- the tab
       // strip now answers "which network am I looking at", permanently and without a click. ?>
-<div id="lpn_menu_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:1850;background:#fff;border:1px solid #333;padding:4px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+<div id="lpn_menu_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:1850;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:4px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)">
 	<div id="lpn_menu_list"></div>
 </div>
 <?php // The SUBMENU layer (Task 264 rework, Tom 2026-08-10: "the universal convention is for that to
@@ -1430,7 +1430,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // PARENT STAYS ON SCREEN -- replacing the list in one popup is what made New read as a menu
       // that had been navigated away from. z-index one above its parent so it paints over it where
       // the clamp has to overlap them on a narrow window. ?>
-<div id="lpn_menu_popup2" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:1851;background:#fff;border:1px solid #333;padding:4px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+<div id="lpn_menu_popup2" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:1851;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:4px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)">
 	<div id="lpn_menu_list2"></div>
 </div>
 <?php // ONE dialog, reused for every question that has to be answered before anything else happens:
@@ -1441,8 +1441,8 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // is a fresh click, so it always has an activation of its own. ?>
 <!-- Swallows every click that is not in the dialog, which is what makes aria-modal true.
      z-index sits one below the dialog's 40. -->
-<div id="lpn_dialog_backdrop" class="d-print-none" style="display:none;position:fixed;z-index:1860;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.25)"></div>
-<div id="lpn_dialog" class="d-print-none" role="dialog" aria-modal="true" style="display:none;position:fixed;z-index:1870;left:50%;top:20%;transform:translateX(-50%);max-width:34em;background:#fff;border:1px solid #333;padding:12px;box-shadow:2px 2px 12px rgba(0,0,0,.4)">
+<div id="lpn_dialog_backdrop" class="d-print-none" style="display:none;position:fixed;z-index:1860;left:0;top:0;right:0;bottom:0;background:var(--ec-a-0-0-0-25)"></div>
+<div id="lpn_dialog" class="d-print-none" role="dialog" aria-modal="true" style="display:none;position:fixed;z-index:1870;left:50%;top:20%;transform:translateX(-50%);max-width:34em;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:12px;box-shadow:2px 2px 12px var(--ec-a-0-0-0-4)">
 	<div id="lpn_dialog_body"></div>
 	<div id="lpn_dialog_buttons" style="margin-top:10px;text-align:right"></div>
 </div>
@@ -1483,7 +1483,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // reason every other panel on this page is: the strings are language keys and PHP is where
       // those live. What JS builds here is only the eight unit selects, and those are CLONED from
       // the page's own strip so nothing about a unit family or an option value is retyped. ?>
-<div id="lpn_new_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:40rem" role="dialog" aria-labelledby="lpn_new_title">
+<div id="lpn_new_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 12px 12px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3);max-width:40rem" role="dialog" aria-labelledby="lpn_new_title">
 	<div id="lpn_new_title" class="lpn-setbox-title"><?=$ec_lang['lpn_new_title']?></div>
 	<button type="button" id="lpn_new_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body">
@@ -1569,7 +1569,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // three cases are his (R-155): EPSG, unnamed (local) georeference, not georeferenced. The
       // EPSG chooser is the New project box's own, and the units are cloned from the strip exactly
       // as that box clones them. Filled by js/looped-network.js (openConvertAsBox). ?>
-<div id="lpn_convas_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:40rem" role="dialog" aria-labelledby="lpn_convas_title">
+<div id="lpn_convas_panel" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:22;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 12px 12px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3);max-width:40rem" role="dialog" aria-labelledby="lpn_convas_title">
 	<div id="lpn_convas_title" class="lpn-setbox-title"><?=$ec_lang['lpn_convas_title']?></div>
 	<button type="button" id="lpn_convas_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body">
@@ -1668,7 +1668,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       //
       // STATIC MARKUP filled by js/looped-network.js, like every other panel here, because the
       // strings are language keys and PHP is where those live. ?>
-<div id="lpn_crsbox" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:23;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:40rem" role="dialog" aria-labelledby="lpn_crsbox_title">
+<div id="lpn_crsbox" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:23;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 12px 12px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3);max-width:40rem" role="dialog" aria-labelledby="lpn_crsbox_title">
 	<?php // Plain text, no tip (Tom, 2026-09-25: the old tip here read as non-functional, and a
 	      // box title carries none elsewhere in this file -- see lpn_convas_title beside it). The
 	      // permanence-warning tip this title used to carry had no other reader and is retired
@@ -1722,7 +1722,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       //
       // **THE VERSION IS DERIVED, NOT DECLARED** -- see ecDeployIdentity(). A website has no
       // release to number, and what a bug report actually needs is which code answered. ?>
-<div id="lpn_about_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:30rem">
+<div id="lpn_about_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 12px 12px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3);max-width:30rem">
 	<button type="button" id="lpn_about_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 <?php // ONE TITLE BAR ON EVERY NON-HOGGING BOX (2026-09-09). The class carries the band and the
       // divider; the 40px top padding above is the room it sits in. ?>
@@ -1786,7 +1786,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // whole shell (`.lpn-setbox` for the drag band, the resize grabber and the viewport caps),
       // is wired through wireBoxMemory() like the report boxes, and is no longer in VIEW_POPOVERS:
       // nothing closes it but its own × or an Escape pressed while focus is inside it. ?>
-<div id="lpn_notes_popup" class="d-print-none lpn-popover lpn-setbox lpn-notesbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_notes_title">
+<div id="lpn_notes_popup" class="d-print-none lpn-popover lpn-setbox lpn-notesbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_notes_title">
 	<div id="lpn_notes_title" class="lpn-setbox-title"><?=$ec_lang['lpn_help_notes']?></div>
 	<button type="button" id="lpn_notes_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
@@ -1821,7 +1821,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // **SAME SHELL AS NOTES** (.lpn-setbox / .lpn-notesbox), wired by wireHotkeysBox() in
       // js/looped-network.js: draggable, resizable, remembered per browser as `lpn_hotkeysbox`,
       // dismissed only by its own X or an Escape pressed while focus is inside it. ?>
-<div id="lpn_hotkeys_popup" class="d-print-none lpn-popover lpn-setbox lpn-notesbox" style="display:none;position:fixed;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_hotkeys_title">
+<div id="lpn_hotkeys_popup" class="d-print-none lpn-popover lpn-setbox lpn-notesbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_hotkeys_title">
 	<div id="lpn_hotkeys_title" class="lpn-setbox-title"><?=$ec_lang['lpn_help_hotkeys']?></div>
 	<button type="button" id="lpn_hotkeys_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">

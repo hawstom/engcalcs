@@ -106,7 +106,9 @@
         "feat/graph-tab-keys",
         "feat/graph-menu",
         "feat/demand-scaling",
-        "feat/desktop"
+        "feat/desktop",
+        "feat/label-cache",
+        "feat/theme-token"
     ],
     "feature_freeze": {
         "active": false,

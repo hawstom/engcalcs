@@ -366,6 +366,18 @@
             "words": "Merge, recut branch (Recommended)",
             "context": "His answer in this session (2026-10-03) to: \"Should I merge it to master now, then cut a fresh long-lived feat/bentley-interop from master for the WaterCAD reading work?\" His browser-pass note: \"The reason I didn't say to merge this branch is that my understanding was that this is a long-term branch for all the bentley-interop things.\"",
             "pin_note": "Pinned to the head he tested on his preview port; unchanged since."
+        },
+        "feat/label-cache": {
+            "head": "5d5d97270b6712dfadc05009a741e250414b54dc",
+            "date": "2026-10-03",
+            "words": "I am impressed. This is a major efficiency feature. Done. Close, merge, and delete the branch.",
+            "context": "Given in the 2026-10-03 session: his pasted report read \"feat/label-cache: (1) I am impressed. This is a major efficiency feature. Done. Close, merge, and delete the branch.\", and he confirmed it by choosing \"Merge both\" when asked in the session to merge feat/label-cache and feat/theme-token and delete both branches."
+        },
+        "feat/theme-token": {
+            "head": "b4265770d4095f5fb7075a061d0b9b87abf77695",
+            "date": "2026-10-03",
+            "words": "Good. Done. Close, merge, and delete the branch.",
+            "context": "Given in the 2026-10-03 session: his pasted report read \"feat/theme-token: Good. Done. Close, merge, and delete the branch.\", and he confirmed it by choosing \"Merge both\" when asked in the session to merge feat/label-cache and feat/theme-token and delete both branches."
         }
     }
 }
