@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 176 untranslated keys, of 2329 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**10 still to read on master**, of 182 untranslated keys, of 2335 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (176, 4 to read @@ NEEDS RULING)
+## lpn_  (182, 10 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -522,6 +522,24 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_hotkeys_menu_term`**
   > Menu keyboard shortcuts
   _Ruled OK 2026-10-03._
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map, then press Selection only.
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_tip`**
+  > Show only the elements selected on the map, in every table. Press again to update it after changing the selection, or to turn it off.
+  @@ NEEDS RULING
 - **`lpn_reports_calib`**
   > Calibration
   _Ruled OK 2026-10-03._
@@ -560,7 +578,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**0 still to read**, of 12 new keys across 10 unmerged branch(es).
+**0 still to read**, of 12 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -571,11 +589,19 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/selection-word (`16dce45b`) — adds no English strings
+### chore/analyze-clock-spec (`346986a7`) — adds no English strings
 
-### feat/criticality (`84ea5311`) — adds no English strings
+### chore/policy-1003 (`742349a6`) — adds no English strings
+
+### chore/review-file (`c8014a0b`) — adds no English strings
+
+### chore/selection-word (`2a24ea5c`) — adds no English strings
+
+### chore/theme-inline (`e6057e23`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/dialog-audit (`711f7c92`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -629,3 +655,7 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_result_pump_head_tip`**
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   _Ruled OK 2026-10-03._
+
+### fix/ds-wording (`385e0d7f`) — adds no English strings
+
+### fix/ruling-1003 (`306ab2e9`) — adds no English strings

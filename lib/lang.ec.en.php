@@ -1483,6 +1483,14 @@ $ec_lang['lpn_pane_filter_stale']='Rows that no longer match: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Nothing in this table matches the filter.';
+// Selection only (Task 757): the Tables pane filtered to what is selected on the map. Parallel to
+// lpn_pane_filter_note. The line names the Find filter too when both are on.
+$ec_lang['lpn_pane_filter_sel_note']='Selection only. Showing {n} of {all}.';
+$ec_lang['lpn_pane_filter_sel_and']='Filtered by {q} and selection only. Showing {n} of {all}.';
+$ec_lang['lpn_pane_filter_sel_none']='None of the selected elements are in this table.';
+$ec_lang['lpn_pane_sel_only']='Selection only';
+$ec_lang['lpn_pane_sel_only_tip']='Show only the elements selected on the map, in every table. Press again to update it after changing the selection, or to turn it off.';
+$ec_lang['lpn_pane_sel_only_none']='No elements are selected. Select elements on the map, then press Selection only.';
 // The pin beside the ID in the first column. The ID itself was this control until 2026-09-19,
 // underlined and turning link blue; the ID is an ordinary editable cell now and this is the way
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip

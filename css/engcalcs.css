@@ -3052,6 +3052,8 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	font-size: .85em; background: var(--ec-gray-f6f6f6); border: 1px solid var(--ec-gray-bbb); color: var(--ec-ink); cursor: pointer;
 }
 .lpn-pane-print:hover, .lpn-pane-print:focus { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
+/* Selection only, pressed (Task 757): the same button, held down. */
+.lpn-pane-selonly-on, .lpn-pane-selonly-on:hover { background: var(--ec-gray-bbb); color: var(--ec-ink-black); border-color: var(--ec-ink); font-weight: bold; }
 
 /* PRINTING ONE TABLE (Tom, 2026-08-21: "Make a way to print any table").
    The sheet is a STATIC COPY of the active table, built by paneBuildPrintable() and appended
