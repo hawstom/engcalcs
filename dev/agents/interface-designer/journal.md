@@ -3679,3 +3679,40 @@ by exact-text match in `dev/english-key-rulings.json` (OBSERVED, same as the aud
 Categories this pass: helpful 194, long 32 (45+ words, regex word count), restates 32, icon-name 9,
 filler 5; one reader, plus or minus ten. `where` is derived from key names, not clicked through
 (SPECULATION in the places it is generic).
+
+
+## 2026-10-03 — Task 757, Tables pane to the selection; and Tom's Q4 challenge, round 2
+
+**757: what already exists.** OBSERVED `js/looped-network.js:25067-25140`: a filtered Tables pane already
+prints a banner ("Filtered by {q}. Showing {n} of {all}." `lpn_pane_filter_note`) with a "Show all" button
+(`lpn_pane_filter_clear`), above everything else, empty or not (Task 597), and Task 738 dims and marks rows
+kept only because edited. The entry door for a query filter is Find's "Filter in table" button (`:20136`);
+the exit is the banner. So the selection filter needs a new ENTRY and a new predicate, not a new display.
+OBSERVED: the only two `contextmenu` listeners in `js/looped-network.js` are the Tables pane's (`:25272`
+column header, `:27581` table body); the MAP HAS NO RIGHT-CLICK MENU, so Tom's "right-click menu" can only
+mean the table's, and a phone has neither. The table's menu already holds Select on map / Unselect on map /
+Zoom & select (`:27862-27872`), all acting on the clicked rows, not on the map selection.
+**Ranked:** (1) a pressed-state toggle in the pane header; (2) a row on the table's right-click menu; (3) a
+Tables-menu item. Recommend (1) for visibility (the PCW/MJH finding applies to right-click harder than to the
+menu bar: there is no cue at all); (2) is one `mk()` line and a fine accelerator, not the only door.
+Banner while on: "Selection only. Showing {n} of {all}." + Show all; empty table says what is selected
+elsewhere. SPECULATION throughout: no reader was shown any of this; live-vs-snapshot is my judgement.
+
+**Q4 round 2: counts and sources.** OBSERVED: `ecTipLabel(` 21 call sites in `Looped-Network.php`; JS twin
+builders at `js/looped-network.js:19895,51313`; `setIconLabel(` 23 call sites in `js/looped-network.js`, 1 in
+the PHP. OBSERVED `dev/tip-review.csv` (272 tip keys): 23 toolbar buttons, 9 menu-bar names, 17 menu items,
+about 223 on labels, fields and boxes. MEASURED earlier today: 28 tip-bearing elements on screen, 1 `?`.
+Today's trigger (OBSERVED `js/Calculators.lib.js:75-110`): any control, and any label on a hover device,
+opens on hover or focus; a label on touch opens on click; a control on touch opens on long press.
+CITED (fetched 2026-10-03): WCAG 1.4.13 Understanding doc,
+w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus.html: dismissible, hoverable, persistent apply to
+ANY hover/focus content; it exempts only browser-drawn `title` tooltips. It does NOT justify a split: both
+tiers owe the same three behaviours. CITED: Microsoft Learn "Tooltips and Infotips" (learn.microsoft.com/en-us/
+windows/win32/uxguide/ctrl-tooltips-and-infotips): tooltip = label for an unlabeled control, "five words or
+less"; infotip = supplemental description, full sentences, and BOTH are hover-triggered, "the distinction is in
+usage". So Microsoft documents a split by CONTENT, not by trigger. It also says infotips "Avoid large", Start
+menu/Control Panel infotips 25 words or less. The trigger split (click for the explanation) is documented only
+by Carbon (toggletip), Spectrum (contextual help) and NN/g (touch pairs tips with ? or i), earlier today.
+Material 3 tooltips page: fetch returned no usable content; NOT cited. Apple HIG as in `dev/tip-followup`.
+Concession: for a menu row or a toolbar button the hover infotip is documented (Microsoft, Autodesk); my
+recommendation of one click door is documented for the `?` glyph only.
