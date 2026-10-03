@@ -170,8 +170,12 @@ the block.
     switch away and back**, same document, same zoom, same settings. So labels have always jumped on
     a tab switch; the keep is the only thing that holds them still, and the cause is still unknown.
     `dev/lpn-spike/switch-keep-harness.js` asserts both halves.
-  - The remaining phase is the big one: several drawings alive at once, `nodeEls`/`linkEls`/
-    `labelEls` and the four layers stop being singletons. Memory measured at ~2 MB for Net3-Novato.
+  - **PHASE 2 BUILT on `feat/drawing-keep`, 2026-10-02, awaiting merge:** each open project's
+    drawing is one record (five layers plus every element index) that the globals point at; a switch
+    hides the outgoing one (`display:none`) and shows the incoming one's when `storedSignature()`
+    still matches, so a switch back builds nothing. Four kept, least-recent evicted; closing a tab
+    frees its drawing. Headless Chrome, Net1 -> geographic Net3: `SWITCH` median 50 -> 27 ms, to the
+    painted frame 56 -> 37 ms; `nodes`/`links` rows gone. `dev/lpn-spike/drawing-keep-harness.js`.
 
   Tom, 2026-09-16, on a five-second switch into a geographic Net3: *"why aren't we storing these
   things when we switch away?"*

@@ -18,7 +18,7 @@ the same directory, so both hostnames reach it by different path prefixes. Deplo
 `git pull` on the production checkout.
 
 **The production path is `~/addon_html/hawsedc.com/engcalcs`, user `jconstru`, and PHP is
-`/usr/local/bin/php` (8.3).** *(Corrected 2026-09-02 from a production shell. This table said
+`/usr/local/bin/php` (8.5 since 2026-10-03; a cPanel wrapper that takes the version from the nearest `.htaccess` handler, so it is 5.6 when run from `~`).** *(Corrected 2026-09-02 from a production shell. This table said
 `~/public_html/hawsedc/engcalcs`, which does not exist there — a `cd` to it fails. The wrong path
 had never been executed, only written, which is the whole argument for pasting a command instead
 of citing a location.)*

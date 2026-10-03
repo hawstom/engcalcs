@@ -294,6 +294,8 @@ const OWN_ROW = 'a row or field inside a box that is already open';
 const CONDITIONAL_DISPLAY = [
 	[/^updateDataLeader$/, /^holder\.leader$/, 'a label leader line on the map'],
 	[/^propGraphSync$/, /^box$/, 'the Graph section inside the Properties box (lpn_popup_graph): shown when the element has run frames, hidden through hidePanel() otherwise; part of the Properties box, not a panel of its own'],
+	[/^showDrawing$/, /^L$/, 'a map drawing layer of a kept project (Task 680): hidden while its project is not on screen, shown on its return; map layers, not a panel'],
+	[/^twin$/, /^n$/, 'a fresh map drawing layer cloned from a possibly hidden one (Task 680), so it starts visible; a map layer, not a panel'],
 	[/^updateArrow$/, /^le\.arrows\[i\]$/, 'a flow arrow on the map'],
 	[/^refreshScaleBar$/, /^el$/, 'the scale bar readout in the map footer strip'],
 	[/^renderColorLegend$/, /^box$/, 'the colour legend on the map: ' + COND + '. JUDGEMENT CALL: it is '

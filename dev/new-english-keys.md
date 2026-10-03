@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 12 untranslated keys, of 2165 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**4 still to read on master**, of 22 untranslated keys, of 2175 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,61 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (12, 4 to read @@ NEEDS RULING)
-
-- **`lpn_copy_body`**
-  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_body_nodate`**
-  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_copy`**
-  > A copy; make new lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_kept_link`**
-  > Opened {name} as the original, moved to a new place. Save now writes to this file.
-  @@ NEEDS RULING
-- **`lpn_copy_opened`**
-  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
-  _Ruled 2026-10-01: Wording change per this. This is good._
-- **`lpn_copy_original`**
-  > Original; keep same lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_title`**
-  > Mark file as new copy?
-  _Ruled OK 2026-10-01._
-- **`lpn_pgraph_none`**
-  > This asset has no results in the current run.
-  _Ruled OK 2026-10-01._
-- **`lpn_pgraph_source_share_from`**
-  > Source share from {node}
-  _Ruled OK 2026-10-01._
-- **`lpn_report_pump_head`**
-  > Pump head
-  @@ NEEDS RULING
-- **`lpn_result_pump_head`**
-  > Head
-  @@ NEEDS RULING
-- **`lpn_result_pump_head_tip`**
-  > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
-  @@ NEEDS RULING
-
----
-
-# Strings waiting on a branch
-
-**62 still to read**, of 120 new keys across 8 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### feat/bentley-interop (`7b7ca795`) — 13 new, 1 to read @@ NEEDS RULING
+## lpn_  (22, 4 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -114,6 +60,33 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_alt_title`**
   > Alternatives preview
   @@ NEEDS RULING
+- **`lpn_copy_body`**
+  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_body_nodate`**
+  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_copy`**
+  > A copy; make new lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_kept_link`**
+  > Opened {name} as the original, moved to a new place. Save now writes to this file.
+  @@ NEEDS RULING
+- **`lpn_copy_opened`**
+  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  _Ruled 2026-10-01: Wording change per this. This is good._
+- **`lpn_copy_original`**
+  > Original; keep same lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_title`**
+  > Mark file as new copy?
+  _Ruled OK 2026-10-01._
+- **`lpn_graphs_menu`**
+  > Graphs
+  @@ NEEDS RULING
+- **`lpn_graphs_menu_tip`**
+  > Graphs: Profile, Time Series, and Frequency distribution
+  @@ NEEDS RULING
 - **`lpn_scenario_basic`**
   > Basic mode
   _Ruled OK 2026-10-01._
@@ -121,7 +94,22 @@ build for that would be a gate nobody keeps. Refresh it with
   > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
   _Ruled OK 2026-10-01._
 
-### feat/criticality (`73dccaef`) — 31 new, 8 to read @@ NEEDS RULING
+---
+
+# Strings waiting on a branch
+
+**62 still to read**, of 113 new keys across 9 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/criticality (`84ea5311`) — 31 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_analyze_menu`**
   > Analyze
@@ -217,7 +205,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selected
   @@ NEEDS RULING
 
-### feat/demand-scaling (`22c3bacc`) — 74 new, 51 to read @@ NEEDS RULING
+### feat/demand-scaling (`efc0efe8`) — 74 new, 51 to read @@ NEEDS RULING
 
 - **`lpn_analyze_menu`**
   > Analyze
@@ -442,19 +430,42 @@ build for that would be a gate nobody keeps. Refresh it with
   > Links not shown: {n}.
   @@ NEEDS RULING
 
-### feat/drawing-keep (`2b47ebe9`) — adds no English strings
+### feat/keyboard-menu (`5d65b8f2`) — adds no English strings
 
-### feat/graph-menu (`4f5d8448`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
-- **`lpn_graphs_menu`**
-  > Graphs
+- **`lpn_confirm_labels_restore`**
+  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  _Ruled OK 2026-09-23._
+- **`lpn_labels_restore`**
+  > Restore label defaults
+  _Ruled OK 2026-09-23._
+- **`lpn_labels_restore_tip`**
+  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  _Ruled OK 2026-09-23._
+
+### feat/label-placer-a (`3483bfd6`) — adds no English strings
+
+### feat/label-placer-b (`c5905432`) — adds no English strings
+
+### feat/label-placer-c (`9a790a3e`) — adds no English strings
+
+### feat/label-placer-d (`129b63c4`) — adds no English strings
+
+### feat/property-graph (`8e26cf83`) — 5 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_pgraph_none`**
+  > This asset has no results in the current run.
+  _Ruled OK 2026-10-01._
+- **`lpn_pgraph_source_share_from`**
+  > Source share from {node}
+  _Ruled OK 2026-10-01._
+- **`lpn_report_pump_head`**
+  > Pump head
   @@ NEEDS RULING
-- **`lpn_graphs_menu_tip`**
-  > Graphs: Profile, Time Series, and Frequency distribution
+- **`lpn_result_pump_head`**
+  > Head
   @@ NEEDS RULING
-
-### feat/keyboard-menu (`84b1abd3`) — adds no English strings
-
-### feat/property-arrow-key (`389fd629`) — adds no English strings
-
-### feat/property-graph (`85ab5d08`) — adds no English strings
+- **`lpn_result_pump_head_tip`**
+  > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
+  @@ NEEDS RULING
