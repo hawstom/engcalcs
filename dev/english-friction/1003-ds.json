@@ -1,0 +1,18 @@
+{
+ "sprint": "1003-ds",
+ "description": "Tom's note on a demand-scaling string, 2026-10-03: 'I think I need explanation, and this need clarification.' Explanation and two rewordings from the fix/ds-wording agent.",
+ "entries": [
+  {
+   "key": "lpn_ds_found_below",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "Tom: 'I think I need explanation, and this need clarification.' It appears after Find when the demands as entered (a demand scale of 1) leave at least one junction below the limit; {m} is the largest scale, always under 1, at which every judged junction keeps the limit (0.62 means demands cut to 62 percent). 'it' in 'keeps it' is vague, 'demands as they are' never says scale 1, and {m} reads as headroom when it is a cut.",
+   "readings": [
+    "the system can take up to {m} times today's demand (wrong)",
+    "demands must be cut to {m} times what is entered for every junction to keep the pressure (right)"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B parallels lpn_ds_found."
+  }
+ ]
+}
