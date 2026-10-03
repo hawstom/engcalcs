@@ -399,6 +399,20 @@
             "words": "Merge contour",
             "context": "Given in the 2026-10-03 session after his browser pass on 8113 (\"Contours are amazing now. I am excited to pull to prod and make a video of graphs.\"): he chose \"Merge contour\" when asked in the session whether to merge feat/contour once the box looked right, then delete the branch.",
             "pin_note": "Pinned to the merge of master into 52242784 (the head he cleared) plus the regenerated English keys list; no other change."
+        },
+        "feat/demand-scaling": {
+            "head": "5417935242f3fb2397a87b1e19317c74569b1047",
+            "date": "2026-10-03",
+            "words": "8110 demand-scaling: Good. Done. Close, merge, and delete branch.",
+            "context": "His own message in the late-night 2026-10-03 session, after his browser pass on port 8110. The branch carries feat/criticality (merged into it for the shared Analyze fly-out), which he tested there as one of the three parallel Analyze tools.",
+            "pin_note": "Pinned to the head he tested; master is merged in on master itself, not into the branch."
+        },
+        "feat/flow-balance": {
+            "head": "c31826a451e8f838c36d3a0b3df03439402722f5",
+            "date": "2026-10-03",
+            "words": "8109 flow-balance: Good. Done. Close, merge, and delete branch.",
+            "context": "His own message in the late-night 2026-10-03 session, after his browser pass on port 8109.",
+            "pin_note": "Pinned to the head he tested."
         }
     }
 }

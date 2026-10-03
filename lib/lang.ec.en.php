@@ -1728,7 +1728,7 @@ $ec_lang['lpn_replace_scope']='Choose one kind of asset above to change values o
 // language that puts the unit somewhere else can.
 $ec_lang['lpn_profile_menu']='Profile';
 $ec_lang['lpn_graphs_menu']='Graphs';
-$ec_lang['lpn_graphs_menu_tip']='Graphs: Profile, Time Series, and Frequency distribution';
+$ec_lang['lpn_graphs_menu_tip']='Plot a profile along a path, a time series at one element, or the frequency distribution of results.';
 // **THE SYNONYMS ARE IN THE SYNONYM CHANNEL, WHICH IS WHERE THEY WERE ALWAYS MEANT TO BE.** They
 // shipped as `lpn_profile_tip_syn` / `lpn_profile_title_syn` -- ordinary $ec_lang keys with no call
 // site, which nothing rendered and which a sprint would have translated into 26 languages for
