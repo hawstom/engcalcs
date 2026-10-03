@@ -58631,13 +58631,13 @@ var EngCalcs = EngCalcs || {};
 		// 2. The largest scale that holds the limit.
 		// Tom, 2026-10-03: under Selected junctions the question is the selection's.
 		ffEl('div', 'lpn-ff-head', dsAsk.scope === 'selected'
-			? (pc.lpn_ds_head_search_selected || 'What demand can the selection handle')
+			? (pc.lpn_ds_head_search_selected || 'What demand scale can these junctions handle?')
 			: (pc.lpn_ds_head_search || 'What demand scale can the system handle?'), host);
 		ffEl('p', 'lpn-ff-note', (dsAsk.scope === 'selected'
 			? (pc.lpn_ds_search_note_selected ||
-				'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the selection keeps the given lowest pressure allowed.')
+				'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.')
 			: (pc.lpn_ds_search_note ||
-				'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which every junction keeps the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.'))
+				'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.'))
 			.replace('{max}', dsMult(D.max)).replace('{step}', String(D.step)), host);
 		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
 		find = ffEl('button', 'lpn-ff-run', pc.lpn_ds_find || 'Find', buttons);
