@@ -566,3 +566,7 @@ engineers their spreadsheet workflow without a login, an OAuth scope, or a serve
 ## Time series graph drawing: step for held properties, slope for tank level, markers at the report points
 
 2026-09-30, answering Tom's 2026-10-01 question (journal entry of the same date). Every outside tool I could verify draws all properties as straight segments: EPANET's GUI offers only line and marker styling, and epanet-js's Quick Graph is `smooth:false` with no step key (source read at commit 4019bab). The one exception is epanet-js's Custom graph, which steps link status-type values with `step:"end"`. No source found for WaterGEMS, InfoWater or KYPipe line style. So "stepped for held values" is not market-validated; it rests on EPANET's own documented model (demands held per pattern period, tank levels integrated). Cheap, honest option: straight segments with point markers at the reporting times as the default, and steps for status and pattern-held properties only. Cost: one drawing flag per property; no new data. Not mine to size. If anyone can get a WaterGEMS or InfoWater screenshot of an EPS tank-level and pump-flow graph, that closes the open half.
+
+## Added 2026-10-03: map the browser-EPANET field once, properly
+
+Today's answer rests on three half-verified rivals. Worth one session: price and engine location for HydroBOA, CityWater and Qatium; whether EPANET-UI is a web tool; whether any other client-side port is alive. Until then, public copy should never say "the browser version of EPANET" or imply we are the only one. (Journal 2026-10-03.)

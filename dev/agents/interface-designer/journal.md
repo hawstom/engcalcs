@@ -3566,3 +3566,11 @@ long-word RTL languages — not a new failure mode, an existing one inherited.
 (the visible defect Tom named); the ⚠ glyph and the banner count are the second and third increments
 and can trail without leaving the first change silently wrong — a dimmed-but-unmarked row is at least
 visibly DIFFERENT from a live row, which is most of the fix.
+
+## 2026-10-03 — Keyboard access to the menu bar (consult, `feat/keyboard-menu`)
+
+**Mnemonic that opens a menu.** Recommend Windows/Linux Alt+Shift+letter, macOS Ctrl+Option+letter, matched on `e.code` (KeyF), never `e.key` (Option types glyphs). CITED: Google Docs Help "Keyboard shortcuts for Google Docs" (support.google.com/docs/answer/179738): Alt+Shift+F opens File in Docs/Sheets on Windows; Alt+F suffices only in Chrome (a hijack of Chrome's own menu) — via computerhope.com summary of the same. Alt+/ is Docs' menu search. Rejected Ctrl+Shift+letter: SPECULATION from memory of Chrome's shortcut list (not re-fetched), Ctrl+Shift+W (close window), N, T are browser-reserved and page-uninterceptable, and Tom's own "Water" letter is W. Alt+Shift+letter is also the HTML `accesskey` chord Firefox uses on Windows, so it is the least surprising to Firefox users. SPECULATION: Windows' Alt+Shift layout-switch fires on modifier release with no letter, so should not collide.
+**Existing page keys.** OBSERVED js/looped-network.js:53286-53292 (worktree): unmodified single letters (LPN_TOOL_KEYS) set drawing modes outside text entry, so a menu mnemonic MUST be modified; :53251 Ctrl+Z undo; :37066 menu-nav handler already ignores any ctrl/alt/meta key, so the new chord needs its own listener ahead of it.
+**Underlines.** Recommend: hidden until keyboard mode (chord pressed, or F10), a key badge rather than an underline because underlines fail in non-Latin scripts and RTL. SPECULATION: Windows' own "hide keyboard indicators until Alt" default is the convention being followed; not looked up.
+**In-menu mnemonics.** Deferred; type-ahead on the shown label instead (WAI-ARIA APG menu pattern, from memory, not re-fetched). SPECULATION.
+**Not found / not checked:** epanet-js app, Figma, VS Code web, Photopea, Office on the web behaviour — no evidence gathered this session; do not cite them for this decision.
