@@ -101,60 +101,70 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-03
+## STATE — 2026-10-03 (evening)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged 2026-10-03 on his word: graph-menu (640 closed), drawing-keep (680 closed),
-property-arrow-key, fix/undo-label (Redo), bentley-interop. `feat/bentley-interop` was then RECUT
-from master as the long-lived branch for the rest of 749 (his: "a long-term branch for all the
-bentley-interop things"); its old all-clear is pinned to the old head and has lapsed, as it should.
-New on master: localStorage `lpn_scnbasic` (Basic mode off), exempt category; Tom told.
+Merged 2026-10-03: graph-menu (640), drawing-keep (680), property-arrow-key, fix/undo-label,
+bentley-interop (recut as the long-lived 749 branch), then on his word label-cache (681 c/d) and
+theme-token (714 phase 1; every CSS colour is now a `var(--ec-*)` token or `chrome_colour_check`
+fails). Defect tracks merged on green: fix/status-now (Status report "Tank 1 now filling", his
+wording), fix/flow-decimals (Qb/Q 1 decimal US, 2 SI; R-328 reversed by him), fix/label-eviction
+(758 closed: zoom pass deterministic, tab keep complete). 600/601/604 promoted to 100 by him.
 
 ### Awaiting his browser pass (protected; merge on his all-clear, typed in a session)
 
-Each has master merged in and a green suite bar the expected `payload freshness`. Ask with
-AskUserQuestion; the classifier refuses an all-clear lifted from pasted text.
-- 8106 `feat/property-graph` (637): his pass said "Other than that, it looks great"; the Properties
-  box squeeze (R-379) is fixed (box pinned to its free width; only a corner drag counts as a chosen
-  size). "Head"/"Pump head" approved and recorded. Headless never reproduced his ~150 px, only 276 px.
-- 8110 `feat/demand-scaling` (754, contains criticality 751): R-380 fixed — Find/Run judged every
-  junction; now Selected judges only the selected. Two reworded strings need his OK:
-  `lpn_ds_scope_tip` "...Pressures are checked at the junctions scaled." and `lpn_ds_scaled_selected`
-  "Only the selected junctions were scaled and checked. Junctions scaled: {n}." Open question for
-  him: selection-only verdict vs also failing an unselected junction that the extra demand starves.
-  Approved syn entries (`lpn_ff_all/_selected`, three `lpn_ff_design_*`) are written there.
-- 8112 `feat/keyboard-menu` (748): Alt+Shift+F/E/M/W/H/L (Ctrl+Option on Mac), F10, key badges in
-  keyboard mode, pointer-only rows skipped, focus returns after a row runs. Perry passed it after two
-  fixes. New strings to rule: `lpn_hotkeys_menu_heading` "Menus", `lpn_hotkeys_menu_term` "Menu
-  keyboard shortcuts", `lpn_hotkeys_menu_def` rows "Open File, Edit, Map, Water, Help or Language
-  (Ctrl+Option on a Mac)." / "Go to the menu bar." UNTESTED: Windows' Alt+Shift layout switch with
-  two keyboard languages installed — only he can try it. If theme-token merges first, the badge CSS
-  needs `var(--ec-*)` colours.
-- 8108 `feat/label-cache` (681 c/d): per-notch label bank; Perry CONFIRMED no stale labels;
-  Novato revisit settle ~85 -> ~13 ms. Placer seam: feat/label-placer must route its settle through
-  `labelCacheSettle()` and register in `labelBankParts`, or it just runs uncached.
-- 8109 `feat/theme-token` (714 phase 1): 96 `--ec-*` tokens, zero pixel difference on 14 states,
-  new blocking check `chrome_colour_check.php`. After it merges, every branch adding a CSS colour
-  literal fails that check. Phase 1b (R-202 button base) and the 62 by-value tokens are left.
-- `feat/desktop` (756): his R-375/R-384 written in (logs kept, consent at install).
-- `feat/label-placer` (539/741): unchanged; round-5 rulings still his.
+Each has a green suite bar the expected `payload freshness`, and is pushed to GitHub. Ask with
+AskUserQuestion; the classifier refuses an all-clear lifted from pasted text. Rows in ports.conf say
+what to test.
+- 8106 `feat/property-graph` (637): box opens at the width where max(1, 5%) rows wrap (his "1 line
+  in 20"): pipe ~375, pump ~402 px. No keys changed.
+- 8110 `feat/demand-scaling` (754 + criticality 751): his wording and three syn entries written;
+  unselected junctions below the minimum are disclosed, never limit the answer. To rule:
+  `lpn_ds_outside_below` (CC's wording) and whether his selected heading takes a "?".
+- 8112 `feat/keyboard-menu` (748): his four notes built; Perry round 2 found four defects, all
+  fixed. A row whose label comes from the project needs `variable: true` (keeps fixed letters
+  stable). Other branches' menu rows get letters automatically; a hotkey is `hotkey: 'Mod+Z'`.
+- 8108 `feat/profile-file` (604): one row in the Profile tab's down-arrow menu. Perry clean; format
+  confirmed against EPANET's Dgraph.pas.
+- 8109 `feat/flow-balance` (600): System flow graph, EPANET's Fgraph.pas definition (tanks in
+  neither line). Perry's two fixes done. Bottom tab strip wraps to two rows at 1280 px in fr/es/pt/
+  tr/ru; 9 px tab padding would fit all (his/Ida's call, not built).
+- 8111 `feat/calibration` (601): EPANET's three-page report, per-project, session-only, 42 keys.
+  Perry's six fixes done. Changed `lpn_reports_menu_tip` (26 translations now stale).
+- 8113 `feat/contour` (600): map layer, Delaunay-linear, reuses node colouring; DEM ground under
+  the existing `ec_terrain` gate. Perry's fixes done. Fill limit is `CONTOUR_EDGE_FACTOR = 3`
+  (39% of Net3 pipe length bare; 6 covers 95%) — his call.
+- `feat/desktop` (756), `feat/label-placer` (539/741): unchanged.
+
+**Merge order and seams:** keyboard-menu first is cheapest (the others' menu rows then just get
+letters). flow-balance, contour and calibration each touched the Graphs/Reports menu definition
+and `lpn_graphs_menu_tip`; expect small conflicts there and in `dev/new-english-keys.md`
+(regenerate, never hand-merge). Regenerate payloads once per merge batch.
 
 ### Found 2026-10-03, not yet a task
 
-- Task 680's keep is incomplete after EVICTION (more than four other tabs visited): returning to
-  Novato redrew 78 of 123 labels differently at the same view (Perry, on master's code). Valid
-  layout, not stale values. Logged as Task 758.
-- The uncached zoom pass gives two different answers at one scale on repeated runs (label-cache
-  builder); the cache hides it on revisits.
+- **privacy.php's "Ground elevations" row overstates what is sent**: Terrain-RGB requests carry tile
+  numbers and the token, not node latitude/longitude; the elevation-fill consent paragraphs 1 and 3
+  say the same. Public text: his ruling. Proposed row (contour builder): "The numbers of the map
+  tiles that cover your nodes or, for a contour plot over the ground, the area your network covers
+  (which says roughly where it is), and your IP address".
+- **The suite's psi factor is 0.43353 per ft; EPANET's is 0.4333**, so every pressure reads 0.05%
+  above EPANET's report (Perry, calibration review). His call whether to adopt EPANET's.
 
 ### Owed translation work
 
-Not run 2026-10-03 on purpose: most owed keys sit on the five branches above. Run one sprint after
-they merge: property-graph 4, criticality ~29, demand-scaling ~42 (+2 reworded), keyboard-menu 3,
-plus master's bentley-interop 13, graph-menu 2 and the Redo Help row (approved: "Ctrl+Y or
-Ctrl+Shift+Z | Redo the last undone change."; the markup check needs all 27 at once). Romanian file
-menu noun/verb pass. Concept layer: four new terms untranslated. Glossary write-back owed from echo.
+Not run 2026-10-03 on purpose: the owed keys sit mostly on the seven branches above (~100+ keys).
+Run one sprint after they merge. Master already owes bentley-interop 13, graph-menu 2, the Redo
+Help row (approved: "Ctrl+Y or Ctrl+Shift+Z | Redo the last undone change."; the markup check needs
+all 27 at once) and the six Status report "now" strings. Romanian file menu noun/verb pass. Concept
+layer: four new terms untranslated. Glossary write-back owed from echo.
+
+### Traps met 2026-10-03
+
+- **A `cmd && merge && ...; setsid check_all &` line starts the suite even when the merge
+  conflicts** (the `;` runs on). Start a suite only in its own command, after `git status` is clean.
+- **Ctrl+B in his terminal backgrounds CC's running wait**, not the suite. He meant tmux detach.
 
 ### Traps met 2026-10-02
 

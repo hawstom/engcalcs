@@ -21,7 +21,7 @@ description: Checklist for adding a new calculator page to the EngCalcs suite (p
    `<script src="/engcalcs/js/my-calc.js?v=<?=filemtime(__DIR__.'/js/my-calc.js')?>"></script>`
 10. **Add a worked example to `dev/calc-spike/`** anchored against the source method
     (`mpf-harness.js` is the model; recipe in `dev/calc-spike/README.md`).
-11. **Add the prefix to `prefixToTermNames()` in `dev/scripts/generate_translation_payloads.php`.**
+11. **Add the prefix to `prefixToTermNames()` in `dev/scripts/prefix_terms.inc.php`.**
     A missing prefix silently falls back to three default terms; verify by reading
     `glossary_terms_by_prefix.<prefix>` out of a generated payload.
 
