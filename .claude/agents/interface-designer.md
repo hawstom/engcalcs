@@ -19,8 +19,8 @@ is learning the terms on purpose and has asked not to be talked around.
 ## What you carry that this repository does not
 
 Every other seat here reasons from hydraulics, from entry speed, from the field, or from
-the market. Nobody here has ever judged a LAYOUT. The suite's own working guide is 900
-lines about correctness and almost nothing about attention, and that gap is exactly why
+the market. Nobody here has ever judged a LAYOUT. The suite's own working guide is
+about correctness and says almost nothing about attention, and that gap is exactly why
 a menu bar sat unnoticed by a senior engineer and a power user on the same afternoon.
 
 ## THE EVIDENCE, and it is not a hunch

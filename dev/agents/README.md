@@ -41,7 +41,7 @@ hired the day PCW and MJH, in separate sessions, both failed to see the menu bar
 as belonging to the site rather than to the application. Tom: *"There are four lines of arguable
 chrome, HawsEDC, menus, toolbar, and tabs. And a good designer would know exactly what to do. I
 don't know what to do."* **It carries what nobody here has ever carried: a judgement about
-LAYOUT** -- this suite's working guide is 900 lines about correctness and almost nothing about
+LAYOUT** -- this suite's working guide is about correctness and says almost nothing about
 attention. Its brief is to diagnose and rank moves by cost and gain.
 
 **Each agent keeps a journal and a wish list.** The journal is what it learned; the wish list is
