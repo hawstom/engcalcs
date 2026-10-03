@@ -17,6 +17,8 @@
 //      label the value of the field under it; timing.
 //   7. THE BOX: interval, opacity, fill, lines and labels redraw the layer; the menu row turns it on.
 //   8. RECALCULATE OFF IS A SNAPSHOT.
+//  8b. NET3 WITH PUMP 335 OFF: no bare hole beside the pump station; the break line reaches the
+//      buffer from its pump and no further.
 //   9. THE GROUND THROUGH THE PAGE (stubbed Mapbox DEM, consent).
 //  10. TWO ARMS THROUGH THE PAGE: a wide gap stays bare; a pump between them is a wall.
 //  11. A LARGER NETWORK: a generated 40 x 40 grid, for the timing.
@@ -501,6 +503,53 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	for (let i = 0; i < 400 && allD() === before; i++) { await new Promise((r) => setTimeout(r, 25)); }
 	check(allD() !== before, 'Calculate redraws it');
 
+	head('8b. NET3 WITH PUMP 335 OFF AND ITS BYPASS OPEN (Tom, 2026-10-03)');
+	{
+		// Pump 335 off and pipe 330 open, as Net3's own controls do when Tank 1 is full: 60, 601 and
+		// 61 are one zone, so the pump gets a fault, and the fault cuts across pipe 330. Before the
+		// fix every pipe whose NEAREST point lay through the fault was dropped whole, leaving a bare
+		// wedge with a ragged edge north-west of junction 601.
+		const lk = (id) => d.links.find((l) => l.id === id);
+		lk('335')._status = 'closed'; lk('330')._status = 'open';
+		L.setResult(null); L.runSolve();
+		for (let i = 0; i < 400 && !L.lastResult(); i++) { await new Promise((r) => setTimeout(r, 25)); }
+		L.refreshValueColors();
+		const res = L.lastResult(), cfo = L.contourField(), g = cfo.grid, Rr = +cfo.key.split('|')[2];
+		const statusOf = (l) => (res.statuses && res.statuses[l.id]) || l._status || 'open';
+		check(statusOf(lk('335')) === 'closed' && statusOf(lk('330')) === 'open', 'pump 335 off, bypass 330 open');
+		const P = (id) => L.colorNodeValue(L.nodeById(id), 'pressure');
+		const valued = d.links.filter((l) => l.type === 'pipe' && statusOf(l) !== 'closed' && isFinite(P(l.from)) && isFinite(P(l.to)) && xy[l.from] && xy[l.to])
+			.map((l) => [xy[l.from], xy[l.to]]);
+		const dist = (x, y, list) => Math.min(...list.map(([p, q]) => {
+			const ex = q[0] - p[0], ey = q[1] - p[1], L2 = ex * ex + ey * ey;
+			const t = Math.max(0, Math.min(1, L2 > 0 ? ((x - p[0]) * ex + (y - p[1]) * ey) / L2 : 0));
+			return Math.hypot(x - p[0] - t * ex, y - p[1] - t * ey);
+		}));
+		// Every cell within the buffer of an open pipe with values, round the pump station, coloured.
+		const [x601, y601] = xy['601'];
+		let near = 0, bare = 0, wedge = 0, wedgeBare = 0;
+		for (let jj = 0; jj < g.ny; jj++) {
+			for (let ii = 0; ii < g.nx; ii++) {
+				const x = g.x0 + (ii + 0.5) * g.dx, y = g.y0 + (jj + 0.5) * g.dy;
+				if (Math.hypot(x - x601, y - y601) > 1.5 * Rr || dist(x, y, valued) > 0.9 * Rr) { continue; }
+				near++;
+				const isBare = !(cfo.field.alpha[jj * g.nx + ii] > 0);
+				if (isBare) { bare++; }
+				if (x < x601 && y > y601 + 0.2) { wedge++; if (isBare) { wedgeBare++; } }
+			}
+		}
+		check(near > 1000 && wedge > 100 && bare === 0,
+			`every one of ${near} cells within 0.9 of the buffer of a valued pipe round the pump station is coloured: ${bare} bare (${wedgeBare} of ${wedge} north-west of 601)`);
+		// THE BREAK LINE'S LENGTH IS THE BUFFER: every point of every break line within the reach of
+		// the pump, valve or closed link that makes it, give or take a cell.
+		const barriers = d.links.filter((l) => l.type !== 'pipe' || statusOf(l) === 'closed').filter((l) => xy[l.from] && xy[l.to]).map((l) => [xy[l.from], xy[l.to]]);
+		const bpts = [].concat(...layerOf('lpn-contour-break').map(pathPts));
+		const worst = Math.max(...bpts.map(([x, y]) => dist(x, y, barriers)));
+		check(bpts.length >= 2 && worst <= Rr + g.dx, `the break line reaches at most the buffer from its pump: ${(worst / Rr).toFixed(3)} of the reach (${bpts.length} points)`);
+		lk('335')._status = undefined; lk('330')._status = 'closed';
+		delete lk('335')._status;
+	}
+
 	head('9. THE GROUND THROUGH THE PAGE');
 	L.newGeo();
 	const S2 = L.getSettings();
@@ -616,6 +665,10 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	const wall = [].concat(...layerOf('lpn-contour-break').map(pathPts)), wy = wall.map((w) => w[1]);
 	check(wall.length >= 2 && wall.every((w) => Math.abs(w[0] - px) < 0.05) && Math.max(...wy) - Math.min(...wy) > 4,
 		`the break line stands across the corridor at the pump: x ${wall.length && wall[0][0].toFixed(3)}, y ${Math.min(...wy).toFixed(2)} to ${Math.max(...wy).toFixed(2)}`);
+	// The two arms face each other along their whole side, but the wall is the pump's: it reaches the
+	// buffer (2.5 pipe lengths) either side of the pump at y = 2 and no further (Tom, 2026-10-03).
+	check(wall.length >= 2 && Math.min(...wy) >= 2 - 2.5 - 0.1 && Math.max(...wy) <= 2 + 2.5 + 0.1,
+		`...and only within the buffer of the pump, not along the arms' whole facing sides: y ${Math.min(...wy).toFixed(2)} to ${Math.max(...wy).toFixed(2)}`);
 	let crossing = 0;
 	layerOf('lpn-contour-line').forEach((p) => { const qq = pathPts(p); for (let i = 0; i + 1 < qq.length; i++) { if ((qq[i][0] - px) * (qq[i + 1][0] - px) < 0 && Math.abs(qq[i][1] - 2) < 2) { crossing++; } } });
 	check(crossing === 0, 'no contour line crosses the wall');

@@ -205,15 +205,32 @@
 				var m = 0, fb = bucketOf(FB, grid, x, y), f0 = fb >= 0 ? FB.start[fb] : 0, f1 = fb >= 0 ? FB.start[fb + 1] : 0;
 				for (k = SB.start[b]; k < SB.start[b + 1]; k++) {
 					var s = SB.items[k], ex = S.x1[s] - S.x0[s], ey = S.y1[s] - S.y0[s], L2 = ex * ex + ey * ey;
-					var t = L2 > 0 ? ((x - S.x0[s]) * ex + (y - S.y0[s]) * ey) / L2 : 0;
-					if (t < 0) { t = 0; } else if (t > 1) { t = 1; }
-					var px = S.x0[s] + t * ex, py = S.y0[s] + t * ey, d2 = (x - px) * (x - px) + (y - py) * (y - py);
-					if (d2 >= R2) { continue; }
-					// THE WALL: a pipe seen only through a fault does not count here at all.
-					var seen = true, q;
-					for (q = f0; q < f1 && seen; q++) {
-						var fl = faults[FB.items[q]];
-						if (crosses(x, y, px, py, fl.x0, fl.y0, fl.x1, fl.y1)) { seen = false; }
+					var t0 = L2 > 0 ? ((x - S.x0[s]) * ex + (y - S.y0[s]) * ey) / L2 : 0;
+					// THE WALL: only the part of a pipe on this side of a fault is seen. Its nearest
+					// point may lie through a fault while the rest of it is in plain view (a pipe the
+					// fault cuts across), so the visible part is narrowed and its own nearest point
+					// taken, rather than the whole pipe dropped: dropping it left a bare hole with a
+					// ragged edge beside Net3's pump 335 when the pump was off (Tom, 2026-10-03).
+					var tlo = 0, thi = 1, tries = 0, seen = false, t, px, py, d2;
+					for (;;) {
+						t = t0 < tlo ? tlo : (t0 > thi ? thi : t0);
+						px = S.x0[s] + t * ex; py = S.y0[s] + t * ey; d2 = (x - px) * (x - px) + (y - py) * (y - py);
+						if (d2 >= R2) { break; }
+						var block = null, q;
+						for (q = f0; q < f1 && !block; q++) {
+							var fl = faults[FB.items[q]];
+							if (crosses(x, y, px, py, fl.x0, fl.y0, fl.x1, fl.y1)) { block = fl; }
+						}
+						if (!block) { seen = true; break; }
+						if (++tries > 4 || !(L2 > 0)) { break; }
+						// Where the pipe crosses the fault's line, and which end of it is on this side.
+						var gx = block.x1 - block.x0, gy = block.y1 - block.y0;
+						var sA = gx * (S.y0[s] - block.y0) - gy * (S.x0[s] - block.x0), sB = gx * (S.y1[s] - block.y0) - gy * (S.x1[s] - block.x0);
+						var sC = gx * (y - block.y0) - gy * (x - block.x0);
+						if ((sA > 0) === (sB > 0) || sA === sB || sC === 0) { break; }
+						var tc = sA / (sA - sB), eps = 1e-9;
+						if ((sC > 0) === (sA > 0)) { thi = Math.min(thi, tc - eps); } else { tlo = Math.max(tlo, tc + eps); }
+						if (!(tlo <= thi)) { break; }
 					}
 					if (!seen) { continue; }
 					cd[m] = Math.sqrt(d2); cv[m] = S.v0[s] + t * (S.v1[s] - S.v0[s]); cz[m] = S.zone[s]; m++;
@@ -409,6 +426,63 @@
 			}
 		}
 		return joinSegments(segs).map(function (pl) { return smoothLine(pl, smooth); });
+	}
+
+	// ============================================================================================
+	// A BREAK LINE IS A RETAINING WALL AT ITS PUMP OR VALVE: it crosses the corridor there and no
+	// further (Tom, 2026-10-03: *"its length should match our buffer width"*). `polys` are
+	// [{pts, closed}] or flat arrays, `guides` the barrier links as polylines [[{x, y}, ...]], and
+	// what is kept is every stretch within `reach` of some guide, each cut where it leaves.
+	// Returns flat arrays.
+	// ============================================================================================
+	function distToPolyline(x, y, pl) {
+		var best = Infinity, i;
+		for (i = 0; i + 1 < pl.length || (i === 0 && pl.length === 1); i++) {
+			var a = pl[i], b = pl[i + 1] || pl[i], ex = b.x - a.x, ey = b.y - a.y, L2 = ex * ex + ey * ey;
+			var t = L2 > 0 ? ((x - a.x) * ex + (y - a.y) * ey) / L2 : 0;
+			if (t < 0) { t = 0; } else if (t > 1) { t = 1; }
+			var dx = x - a.x - t * ex, dy = y - a.y - t * ey, d = Math.sqrt(dx * dx + dy * dy);
+			if (d < best) { best = d; }
+		}
+		return best;
+	}
+	function clipNear(polys, guides, reach) {
+		var out = [];
+		function near(x, y) {
+			for (var g = 0; g < guides.length; g++) { if (distToPolyline(x, y, guides[g]) <= reach) { return true; } }
+			return false;
+		}
+		// The point on a -> b where it crosses the reach, by halving: `inA` says which end is in.
+		function edgePoint(ax, ay, bx, by, inA) {
+			var lo = 0, hi = 1, it;
+			for (it = 0; it < 30; it++) {
+				var mid = (lo + hi) / 2, isIn = near(ax + mid * (bx - ax), ay + mid * (by - ay));
+				if (isIn === inA) { lo = mid; } else { hi = mid; }
+			}
+			var f = inA ? lo : hi;
+			return [ax + f * (bx - ax), ay + f * (by - ay)];
+		}
+		(polys || []).forEach(function (pl) {
+			var p = pl.pts || pl, closed = pl.pts ? pl.closed : false, n = p.length / 2, i;
+			if (n < 2) { return; }
+			var q = p.slice();
+			if (closed) { q.push(p[0], p[1]); n++; }
+			var cur = null;
+			for (i = 0; i < n; i++) {
+				var x = q[2 * i], y = q[2 * i + 1], isIn = near(x, y);
+				if (isIn) {
+					if (!cur) { cur = []; if (i > 0) { var e0 = edgePoint(q[2 * i - 2], q[2 * i - 1], x, y, false); cur.push(e0[0], e0[1]); } }
+					cur.push(x, y);
+				} else if (cur) {
+					var e1 = edgePoint(q[2 * i - 2], q[2 * i - 1], x, y, true);
+					cur.push(e1[0], e1[1]);
+					if (cur.length >= 4) { out.push(cur); }
+					cur = null;
+				}
+			}
+			if (cur && cur.length >= 4) { out.push(cur); }
+		});
+		return out;
 	}
 
 	// Chaikin's corner cutting, `iters` times: each pass replaces every corner with two points a
@@ -616,6 +690,8 @@
 		cellAt: cellAt,
 		contourLines: contourLines,
 		zoneBreaks: zoneBreaks,
+		clipNear: clipNear,
+		distToPolyline: distToPolyline,
 		smoothLine: smoothLine,
 		levelsFor: levelsFor,
 		niceStep: niceStep,

@@ -413,6 +413,11 @@ loops were holes. What `js/lpn-contour.js` now does:
   whose ends are still one zone (a booster pump in a loop) gets a fault in ITRC's sense instead. A
   fault on every barrier was tried and rejected: at Net3's pump 335 the pump, its closed bypass and a
   short pipe make a triangle, and three faults sliced it into wedges with no pipe visible.
+  **A fault hides only the part of a pipe behind it**: a pipe it cuts across is narrowed to the part
+  on the cell's side, not dropped whole (with 335 off and bypass 330 open, dropping 330 left a bare
+  wedge north-west of junction 601). **A break line reaches at most R from its pump, valve or
+  closed link** (Tom: *"its length should match our buffer width"*): a fault is R each side of the
+  link's midpoint, and a traced zone boundary is clipped to within R of the barrier that makes it.
 - **Labelled, smoothed contour lines** (marching squares, Chaikin) at 5 psi or 5 m to start, and the
   fill drawn as one raster. Net3 builds in about 30 ms in Node; a generated 1,600-junction grid in
   about 110 ms.

@@ -8745,7 +8745,7 @@ var EngCalcs = EngCalcs || {};
 	var contourLayer = null, contourStats = null, contourDem = null;
 	// What was last computed, keyed on what it was computed from: {key, grid, field, lo, hi},
 	// {key, href} for the fill, {key, lines, levels, step} for the lines.
-	var contourField = null, contourFillCache = null, contourLinesCache = null, contourFaults = [];
+	var contourField = null, contourFillCache = null, contourLinesCache = null, contourFaults = [], contourWalls = [], contourReach = 0;
 	function contourLayerEl() {
 		var host = modelLayer || world;
 		if (!host) { return null; }
@@ -8917,7 +8917,8 @@ var EngCalcs = EngCalcs || {};
 		// bypass 330 and pipe 333: a bare hole in the one loop they make).
 		var faults = walls.filter(function (w) { return zoneOf[allIdx[w.from]] === zoneOf[allIdx[w.to]]; })
 			.map(function (w) { return C.faultAcross(w.pts, R); }).filter(Boolean);
-		return { nodes: nVal, pipes: dataLinks.length, segs: segs, faults: faults, R: R, med: med, grid: grid };
+		return { nodes: nVal, pipes: dataLinks.length, segs: segs, faults: faults, R: R, med: med, grid: grid,
+			walls: walls.map(function (w) { return w.pts; }) };
 	}
 	function refreshContour() {
 		var C = EngCalcs.lpnContour, field = colorFieldOf('node');
@@ -8951,7 +8952,7 @@ var EngCalcs = EngCalcs || {};
 			contourField = { key: key, grid: grid, field: F, lo: lo, hi: hi, ms: contourNow() - t0 };
 			contourFillCache = null; contourLinesCache = null;
 		}
-		contourFaults = net.faults;
+		contourFaults = net.faults; contourWalls = net.walls; contourReach = net.R;
 		if (ground) { contourStats.dem = ground.metres; contourStats.demRange = isFinite(contourField.lo) ? [contourField.lo, contourField.hi] : null; }
 		contourStats.cells = grid.nx * grid.ny;
 		contourStats.fieldMs = contourField.ms;
@@ -9049,7 +9050,9 @@ var EngCalcs = EngCalcs || {};
 	// The break lines: every boundary between two coloured zones, traced from the field, and each
 	// fault cut to the run of it round the link's midpoint that lies over colour.
 	function contourWallLines(grid, F) {
-		var C = EngCalcs.lpnContour, out = C.zoneBreaks(F, grid, { minAlpha: 0.2, smooth: 2 });
+		// A zone boundary is drawn only within the reach of the pump, valve or closed link that makes
+		// it, so it crosses the corridor there and never runs on across open land.
+		var C = EngCalcs.lpnContour, out = C.clipNear(C.zoneBreaks(F, grid, { minAlpha: 0.2, smooth: 2 }), contourWalls, contourReach);
 		contourFaults.forEach(function (f) {
 			var n = 40, s;
 			// From the middle outward in both directions, while the colour lasts.
