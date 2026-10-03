@@ -1706,7 +1706,6 @@ $ec_lang['lpn_crs_search']='Caută';
 $ec_lang['lpn_crs_name']='Filtru după numele proiecției';
 $ec_lang['lpn_crs_name_tip']='Arată doar proiecțiile al căror nume sau cod EPSG conține ceea ce introduceți. Încercați un număr de zonă, sau UTM, sau Mercator.';
 $ec_lang['lpn_crs_list_tip']='Proiecțiile rămase după cele două filtre de mai sus. Alegeți una și apăsați Selectează.';
-$ec_lang['lpn_crs_choose']='Selectează';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Niciun loc nu a fost căutat încă, deci este oferită lista completă. Căutați un loc mai sus sau măriți harta pentru a o restrânge.';
 $ec_lang['lpn_crs_count']='{n} din {total} proiecții listate.';

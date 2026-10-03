@@ -1704,7 +1704,6 @@ $ec_lang['lpn_crs_search']='ፈልግ';
 $ec_lang['lpn_crs_name']='የፕሮጀክሽን ስም ማጣሪያ';
 $ec_lang['lpn_crs_name_tip']='እርስዎ የተየቡትን የያዙ ስም ወይም EPSG ኮድ ያላቸውን ፕሮጀክሽኖች ብቻ ያሳያል። የዞን ቁጥር፣ ወይም UTM፣ ወይም Mercator ይሞክሩ።';
 $ec_lang['lpn_crs_list_tip']='ከላይ ባሉት ሁለት ማጣሪያዎች የቀሩት ፕሮጀክሽኖች ናቸው። አንዱን መርጠው ምረጥ ይጫኑ።';
-$ec_lang['lpn_crs_choose']='ምረጥ';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='እስካሁን ምንም ቦታ አልተፈለገም፣ ስለዚህ ሙሉው ዝርዝር ቀርቧል። ከላይ ቦታ ይፈልጉ ወይም ካርታውን ያጥቡት (ዙም ያድርጉ) ዝርዝሩን ለማጥበብ።';
 $ec_lang['lpn_crs_count']='ከ{total} ፕሮጀክሽኖች {n} ተዘርዝረዋል።';

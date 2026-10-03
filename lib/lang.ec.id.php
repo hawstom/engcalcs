@@ -1707,7 +1707,6 @@ $ec_lang['lpn_crs_search']='Cari';
 $ec_lang['lpn_crs_name']='Saring nama proyeksi';
 $ec_lang['lpn_crs_name_tip']='Hanya menampilkan proyeksi yang namanya atau kode EPSG-nya mengandung apa yang Anda ketik. Coba nomor zona, atau UTM, atau Mercator.';
 $ec_lang['lpn_crs_list_tip']='Proyeksi yang tersisa dari kedua penyaring di atas. Pilih salah satu lalu tekan Pilih.';
-$ec_lang['lpn_crs_choose']='Pilih';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Belum ada tempat yang dicari, sehingga seluruh daftar ditawarkan. Cari tempat di atas atau perbesar peta untuk mempersempit daftar.';
 $ec_lang['lpn_crs_count']='{n} dari {total} proyeksi ditampilkan.';

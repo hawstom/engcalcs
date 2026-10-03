@@ -1752,7 +1752,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			<div id="lpn_crsbox_note"></div>
 		</div>
 		<div class="lpn-new-actions">
-			<button type="button" id="lpn_crsbox_ok"><?=$ec_lang['lpn_crs_choose']?></button>
+			<button type="button" id="lpn_crsbox_ok"><?=$ec_lang['lpn_dialog_ok']?></button>
 			<button type="button" id="lpn_crsbox_cancel"><?=$ec_lang['lpn_cancel']?></button>
 		</div>
 	</div>

@@ -1706,7 +1706,6 @@ $ec_lang['lpn_crs_search']='Pretraži';
 $ec_lang['lpn_crs_name']='Filtar naziva projekcije';
 $ec_lang['lpn_crs_name_tip']='Prikazuje samo projekcije čiji naziv ili EPSG kod sadrži ono što upišete. Pokušajte s brojem zone, ili UTM, ili Mercator.';
 $ec_lang['lpn_crs_list_tip']='Projekcije koje su preostale nakon dva gornja filtra. Odaberite jednu i pritisnite Odaberi.';
-$ec_lang['lpn_crs_choose']='Odaberi';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Još nije pretraženo nijedno mjesto, pa je ponuđen cijeli popis. Pretražite mjesto iznad ili zumirajte kartu da ga suzite.';
 $ec_lang['lpn_crs_count']='{n} od {total} projekcija na popisu.';

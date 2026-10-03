@@ -1704,7 +1704,6 @@ $ec_lang['lpn_crs_search']='Ara';
 $ec_lang['lpn_crs_name']='Projeksiyon adı filtresi';
 $ec_lang['lpn_crs_name_tip']='Adı veya EPSG kodu yazdığınızı içeren yalnızca projeksiyonları gösterir. Bir bölge numarası, UTM veya Mercator deneyin.';
 $ec_lang['lpn_crs_list_tip']='Yukarıdaki iki filtreden kalan projeksiyonlar. Birini seçin ve Seç’e basın.';
-$ec_lang['lpn_crs_choose']='Seç';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Henüz bir yer aranmadı, bu yüzden tüm liste sunuluyor. Yukarıdan bir yer arayın veya listeyi daraltmak için haritayı yakınlaştırın.';
 $ec_lang['lpn_crs_count']='{total} projeksiyondan {n} tanesi listelendi.';

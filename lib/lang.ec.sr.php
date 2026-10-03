@@ -1705,7 +1705,6 @@ $ec_lang['lpn_crs_search']='Претражи';
 $ec_lang['lpn_crs_name']='Филтер по називу пројекције';
 $ec_lang['lpn_crs_name_tip']='Приказује само пројекције чији назив или EPSG код садржи оно што уписујете. Пробајте број зоне, или UTM, или Меркатор.';
 $ec_lang['lpn_crs_list_tip']='Пројекције преостале након два филтера изнад. Изаберите једну и притисните Изабери.';
-$ec_lang['lpn_crs_choose']='Изабери';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Још није претражено ниједно место, па се нуди читав списак. Претражите место изнад или зумирајте карту да бисте га сузили.';
 $ec_lang['lpn_crs_count']='Приказано {n} од {total} пројекција.';

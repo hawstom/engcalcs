@@ -15,8 +15,8 @@
  * name of a tool or mode ("Select mode") and "selected" as the state of a list ("No curve
  * selected") are ordinary and are not matched.
  *
- * BASELINE. Keys fixed on another branch but not yet merged here; remove each entry after the merge.
- * A trailing * is a prefix. An entry that matches no key is fine (the branch is not here yet).
+ * BASELINE. Keys that knowingly break the rule, each with a reason.
+ * A trailing * is a prefix.
  *
  * Usage:
  *   php dev/scripts/selection_word_check.php
@@ -55,12 +55,6 @@ const EC_SELECTION_PATTERNS = [
 
 /** key (or prefix*) => reason. */
 const EC_SELECTION_BASELINE = [
-    'lpn_ff_all'          => 'fixed on feat/demand-scaling; remove after merge',
-    'lpn_ff_selected'     => 'fixed on feat/demand-scaling; remove after merge',
-    'lpn_ff_no_selection' => 'fixed on feat/demand-scaling; remove after merge',
-    'lpn_ff_scope_tip'    => 'fixed on feat/demand-scaling; remove after merge',
-    'lpn_ds_*'            => 'fixed on feat/demand-scaling; remove after merge',
-    'lpn_crit_*'          => 'fixed on feat/demand-scaling; remove after merge',
     'lpn_profile_say_idle' => 'pointing at a place on the map (a third sense), not the set; audit C.1 lowest priority',
     'lpn_profile_none'    => 'pointing at a place on the map (a third sense), not the set; audit C.1 lowest priority',
 ];

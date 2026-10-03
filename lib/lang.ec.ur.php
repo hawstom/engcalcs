@@ -1704,7 +1704,6 @@ $ec_lang['lpn_crs_search']='تلاش کریں';
 $ec_lang['lpn_crs_name']='پروجیکشن کے نام کا فلٹر';
 $ec_lang['lpn_crs_name_tip']='صرف وہ پروجیکشنز دکھاتا ہے جن کے نام یا EPSG کوڈ میں وہ شامل ہو جو آپ ٹائپ کریں۔ کوئی زون نمبر، یا UTM، یا Mercator آزمائیں۔';
 $ec_lang['lpn_crs_list_tip']='اوپر کے دونوں فلٹرز کے بعد باقی رہ جانے والی پروجیکشنز۔ ایک منتخب کریں اور منتخب کریں دبائیں۔';
-$ec_lang['lpn_crs_choose']='منتخب کریں';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='ابھی تک کوئی جگہ تلاش نہیں کی گئی، اس لیے پوری فہرست پیش کی جا رہی ہے۔ اسے محدود کرنے کے لیے اوپر کوئی جگہ تلاش کریں یا نقشے کو زوم کریں۔';
 $ec_lang['lpn_crs_count']='{total} میں سے {n} پروجیکشنز درج ہیں۔';
