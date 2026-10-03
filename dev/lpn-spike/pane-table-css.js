@@ -125,6 +125,6 @@ function winning(rules, chain, widthPx, prop, unreadable, mediaType) {
 module.exports = {
 	// The parsed sheet, with the readers attached to it -- one object, so a caller cannot ask the
 	// wrong sheet a question.
-	load(path) { return Object.assign(parse(fs.readFileSync(path, 'utf8')), { winning, matches, mediaApplies }); },
+	load(path) { return Object.assign(parse(require('./css-tokens.js').expandTokens(fs.readFileSync(path, 'utf8'))), { winning, matches, mediaApplies }); },
 	parse, winning, matches, mediaApplies
 };
