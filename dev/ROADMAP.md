@@ -132,20 +132,6 @@ the block.
     negative demands and consumed is positive demands"*; that matches how the engine accounts for
     it, and a tank is the third term, swinging between the two as it fills and drains. Getting the
     definition wrong here is a number a user would believe.
-- 100|601| **Calibration files: measured field data, against the model that predicts it.**
-  **PROMOTED TO 100 BY TOM, 2026-10-03** (*"Promote to 100: 600, 601, 604"*). Building on `feat/calibration`.
-  Tom, 2026-09-06: *"EPANET allows calibration files (measured system data) and offers a Calibration
-  Report with three tabbed pages. See EPANET help. Very interesting to be aware of."*
-  - **THIS IS THE FIRST FEATURE THAT BRINGS IN DATA FROM OUTSIDE THE MODEL**, which is why it is
-    filed at 50 rather than as an afterthought to the plots: every number on this page today is
-    either typed or derived, and a calibration file is neither. It has its own format, its own
-    units question, and its own answer to what happens when a measurement names a node that is not
-    in the network.
-  - **READ EPANET'S HELP FIRST AND COPY THE REPORT'S SHAPE.** Three tabbed pages is a design that
-    has been in front of users for twenty years; we have no evidence that beats it, and CLAUDE.md's
-    default-to-EPANET rule applies to the vocabulary as much as to the layout.
-  - Depends on nothing, but it is worth far more once Task 599 exists: a measured series and a
-    computed series belong on one axis, and that axis is the time-series plot.
 - 100|604| **Read an EPANET `.PRO` profile file.**
   **PROMOTED TO 100 BY TOM, 2026-10-03** (*"Promote to 100: 600, 601, 604"*). Building on `feat/profile-file`.
   It is the only route a profile can arrive by, and it falls out of closing Task 574. **A profile is in NO `.net` and no `.inp`** -- EPANET's Graph
@@ -402,13 +388,6 @@ the block.
 - 75|739| **Say where each setting is saved: the project or this browser.**
   Tom, 2026-09-28, on learning dragged column widths live in the browser: *"Systematically disclose to users where things are stored. Autodesk does this so well that I, a user can cite by memory that variables are stored in the drawing (project), session, or user profile. Every sysvar listing includes 'Where it's stored.'"* Also *"Maybe include Width in the manage columns box with a tip glyph as a secondary discovery path"*, and a delayed tip on the column dragger (never on a phone). The inventory is `dev/cookie-storage-inventory.md`; CLAUDE.md already splits project vs browser settings.
 
-- 75|748| **Keyboard menus: arrow keys, Enter, Escape and the fly-outs.**
-  Found by Perry on `feat/help-menu`: Tab leaves an open menu for the next thing on the page and the
-  arrows do nothing, in every menu, because the one function that opens them wires only clicks.
-  Predates that branch. Tom set 75 on 2026-09-30.
-  **Tom, 2026-10-03, on `feat/keyboard-menu`:** *"this does nothing for Declan. What Declan really
-  needs are menu mnemonics like Ctrl+Shift+{letter} or as determined with Ida's advice for File,
-  Edit, Map, Water, Help, and Language"*, underlined once in keyboard mode. Building on that branch.
 - 75|749| **Read Bentley WaterCAD/WaterGEMS models.**
   Basic mode and the Alternatives table merged 2026-10-03; `feat/bentley-interop` was recut from
   master as the long-lived branch for the rest (Tom: *"a long-term branch for all the bentley-interop things"*).
