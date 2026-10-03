@@ -3667,3 +3667,9 @@ TRAP for method: Session Save as needs answerTrainingPanel() then a second queue
   no duplicate ids; hidden layers byte-identical across drag, undo, draw pipe, Calculate, Settings change;
   closing a tab frees its 5 layers (25 -> 20 -> 15 -> 10).
 - Method note: the first-visit build is correct, so a test must RETURN to a kept tab and read sizes in pixels.
+
+## 2026-10-03 feat/keyboard-menu (3b0c190a), menu mnemonics
+- OBSERVED: builder's two harnesses green. Real Chromium, Net3, focus in Junctions table cell: Alt+Shift+F/E/M/W/H/L all open with first row focused. Enter on a command row with no box (Undo, Select, Zoom to fit, Calculate) leaves focus on the menu-bar button, keyboard mode already ended, so he cannot get back to the cell (kbdModeReturn only used on Escape). Settings lands focus on the box's close button.
+- OBSERVED: Map > Background image > Move / Scale by picking / Scale ... around a point you pick are not marked pointer-only. Zoom Window is a toolbar button only (no menu row).
+- CITED (code): chord matches e.code, so Dvorak/Hebrew users press the key at the QWERTY position while the badge shows a Latin letter. Ctrl+Option on Mac is VoiceOver's modifier.
+- SPECULATION: Windows Alt+Shift layout switch interaction not testable here.
