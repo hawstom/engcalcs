@@ -69,7 +69,7 @@ async function main() {
 			const normal = await dragBy(page, a, -first.l);
 			ok('it opened at its normal width, not squeezed by the right edge',
 				Math.abs(first.w - normal.w) <= 2, first.w + ' opened, ' + normal.w + ' with room');
-			ok('it opened at its normal height, not the full height of the map',
+			ok('it opened at its normal height (the map's full height, with the graph)',
 				Math.abs(first.h - normal.h) <= 2,
 				first.h + ' opened, ' + normal.h + ' with room');
 			ok('and that width is a real box, not a sliver', normal.w >= 300, String(normal.w));

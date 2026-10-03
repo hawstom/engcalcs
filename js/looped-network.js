@@ -51790,6 +51790,15 @@ var EngCalcs = EngCalcs || {};
 		return Math.max(minW, Math.ceil(w + chrome + 2 +
 			(popup.getBoundingClientRect().height > window.innerHeight - 80 ? 16 : 0)));
 	}
+	function popupFillMapHeight(popup) {
+		var g = document.getElementById('lpn_popup_graph'), top, map = svg && svg.getBoundingClientRect();
+		if (popupUserSize || popupUserPos || !g || g.style.display === 'none') { return; }
+		top = Math.max(map ? map.top : 0, chromeFloor() - POPUP_EDGE);
+		// The caps above were for a box hanging off where it landed; this one is placed instead.
+		resetPanelHeight(popup, panelBody(popup));
+		popup.style.top = top + 'px';
+		popup.style.height = Math.max(0, window.innerHeight - top) + 'px';
+	}
 	function openPopupAt(sx, sy) {
 		var popup = document.getElementById('lpn_popup'), r, h, at;
 		var wasOpen = popup.style.display !== 'none' && popup.style.display !== '';
@@ -51860,6 +51869,13 @@ var EngCalcs = EngCalcs || {};
 		if (!popupUserSize && at.top + h > window.innerHeight - POPUP_EDGE) {
 			capPanelToRoomBelow(popup, at.top);
 		}
+		// **WITH THE GRAPH AT ITS FOOT, THE BOX RUNS THE FULL HEIGHT OF THE MAP** (Tom, 2026-10-03,
+		// browser pass on Task 637: *"put the top of Properties at the top of the map and its bottom
+		// at the bottom of the screen."*). Its top is the map canvas's top and its bottom is the
+		// window's, so the graph gets all the room there is and the fields scroll above it. Only a
+		// box that carries the graph: one with nothing at its foot keeps its natural, shorter
+		// height. A position or size the reader dragged is theirs (both are session-only).
+		popupFillMapHeight(popup);
 		ghostClickShield(popup);
 		initTipsIn(popup);
 	}
