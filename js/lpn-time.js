@@ -1436,6 +1436,9 @@
 			t = e.target || {};
 			tag = (t.tagName || '').toUpperCase();
 			if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || t.isContentEditable) { return; }
+			// A key pressed in the menu bar or an open menu is the menu's (Task 748): Enter there
+			// activates the focused row, and eating it left the first Enter doing nothing.
+			if (t.closest && t.closest('#lpn_menubar, #lpn_menu_popup, #lpn_menu_popup2')) { return; }
 			e.preventDefault();
 			boxHide();
 		});

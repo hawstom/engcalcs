@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sw",
-        "expected_key_count": 2175,
-        "delta_key_count": 24,
+        "expected_key_count": 2220,
+        "delta_key_count": 69,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -714,6 +714,9 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_hotkeys_menu_heading": "Menus",
+        "lpn_hotkeys_menu_term": "Menu keyboard shortcuts",
+        "lpn_hotkeys_menu_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Alt+Shift+letter<\/td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.<\/td><\/tr><tr><td>F10<\/td><td>Go to the menu bar.<\/td><\/tr><\/tbody><\/table>",
         "lpn_graphs_menu": "Graphs",
         "lpn_graphs_menu_tip": "Graphs: Profile, Time Series, and Frequency distribution",
         "lpn_copy_title": "Mark file as new copy?",
@@ -737,9 +740,54 @@
         "lpn_alt_cat_fireflow": "Fire flow",
         "lpn_alt_cat_energy": "Energy cost",
         "lpn_alt_cat_userdata": "Custom properties",
-        "lpn_alt_cat_text": "Text"
+        "lpn_alt_cat_text": "Text",
+        "lpn_reports_calib": "Calibration",
+        "lpn_reports_calib_tip": "Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.",
+        "lpn_calib_title": "Calibration report",
+        "lpn_calib_param": "Parameter",
+        "lpn_calib_param_tip": "The quantity the calibration file measures. One file is held for each parameter.",
+        "lpn_calib_load": "Load calibration file…",
+        "lpn_calib_load_tip": "A text file with a location ID, a time, and a measured value on each line. The time is measured from the start of the simulation, in decimal hours or hours:minutes. A semicolon starts a comment. A line with only a time and a value belongs to the location above it.",
+        "lpn_calib_none": "No calibration file is loaded for this parameter.",
+        "lpn_calib_session": "A calibration file is held for this session only. It is not saved with the project or on this device.",
+        "lpn_calib_file": "{file}: {n} measurements at {m} locations.",
+        "lpn_calib_units": "The file's values are read in this project's units: {unit}.",
+        "lpn_calib_missing": "Named in the file but not in this network: {ids}.",
+        "lpn_calib_missing_count": "Measurements skipped because their location is not in this network: {n}.",
+        "lpn_calib_bad_lines": "Lines that could not be read, skipped: {lines}",
+        "lpn_calib_outside": "Measurements outside the times this run reported, skipped: {n}.",
+        "lpn_calib_no_value": "Measurements with no computed value at their time, skipped: {n}.",
+        "lpn_calib_single": "This is a single-period run, so every measurement is compared with its one result, whatever time the file gives.",
+        "lpn_calib_needs_run": "There are no results to compare with yet. The report fills in once the network has been calculated.",
+        "lpn_calib_no_pairs": "No measurement could be compared, so there is nothing to plot.",
+        "lpn_calib_tab_stats": "Statistics",
+        "lpn_calib_tab_corr": "Correlation plot",
+        "lpn_calib_tab_means": "Mean comparisons",
+        "lpn_calib_col_location": "Location",
+        "lpn_calib_col_n": "Num obs",
+        "lpn_calib_col_n_tip": "Number of observations: the measurements at this location that were compared.",
+        "lpn_calib_col_obs_mean": "Observed mean",
+        "lpn_calib_col_sim_mean": "Computed mean",
+        "lpn_calib_col_mean_err": "Mean error",
+        "lpn_calib_col_mean_err_tip": "The mean of the absolute differences between each observed value and the computed value at the same time.",
+        "lpn_calib_col_rms_err": "RMS error",
+        "lpn_calib_col_rms_err_tip": "Root mean square error: the square root of the mean of the squared differences between observed and computed values.",
+        "lpn_calib_network": "Network",
+        "lpn_calib_corr_means": "Correlation between means: {r}",
+        "lpn_calib_corr_none": "Correlation between means: it needs at least two locations whose means differ.",
+        "lpn_calib_axis_obs": "Observed: {q}",
+        "lpn_calib_axis_sim": "Computed: {q}",
+        "lpn_calib_observed": "Observed",
+        "lpn_calib_computed": "Computed",
+        "lpn_calib_point": "{id}, {time}: observed {o}, computed {s}",
+        "lpn_calib_corr_note": "Each point is one measurement. The closer the points lie to the diagonal line, the closer the computed values match the observed ones.",
+        "lpn_calib_ts_point": "Measured at {id}, {time}: {v}",
+        "lpn_calib_ts_note": "Rings are measured values from the calibration file."
     },
     "keys": {
+        "lpn_hotkeys_menu_heading": "Menus",
+        "lpn_hotkeys_menu_term": "Menu keyboard shortcuts",
+        "lpn_hotkeys_menu_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Alt+Shift+letter<\/td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.<\/td><\/tr><tr><td>F10<\/td><td>Go to the menu bar.<\/td><\/tr><\/tbody><\/table>",
         "lpn_graphs_menu": "Graphs",
         "lpn_graphs_menu_tip": "Graphs: Profile, Time Series, and Frequency distribution",
         "lpn_copy_title": "Mark file as new copy?",
@@ -763,9 +811,99 @@
         "lpn_alt_cat_fireflow": "Fire flow",
         "lpn_alt_cat_energy": "Energy cost",
         "lpn_alt_cat_userdata": "Custom properties",
-        "lpn_alt_cat_text": "Text"
+        "lpn_alt_cat_text": "Text",
+        "lpn_reports_calib": "Calibration",
+        "lpn_reports_calib_tip": "Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.",
+        "lpn_calib_title": "Calibration report",
+        "lpn_calib_param": "Parameter",
+        "lpn_calib_param_tip": "The quantity the calibration file measures. One file is held for each parameter.",
+        "lpn_calib_load": "Load calibration file…",
+        "lpn_calib_load_tip": "A text file with a location ID, a time, and a measured value on each line. The time is measured from the start of the simulation, in decimal hours or hours:minutes. A semicolon starts a comment. A line with only a time and a value belongs to the location above it.",
+        "lpn_calib_none": "No calibration file is loaded for this parameter.",
+        "lpn_calib_session": "A calibration file is held for this session only. It is not saved with the project or on this device.",
+        "lpn_calib_file": "{file}: {n} measurements at {m} locations.",
+        "lpn_calib_units": "The file's values are read in this project's units: {unit}.",
+        "lpn_calib_missing": "Named in the file but not in this network: {ids}.",
+        "lpn_calib_missing_count": "Measurements skipped because their location is not in this network: {n}.",
+        "lpn_calib_bad_lines": "Lines that could not be read, skipped: {lines}",
+        "lpn_calib_outside": "Measurements outside the times this run reported, skipped: {n}.",
+        "lpn_calib_no_value": "Measurements with no computed value at their time, skipped: {n}.",
+        "lpn_calib_single": "This is a single-period run, so every measurement is compared with its one result, whatever time the file gives.",
+        "lpn_calib_needs_run": "There are no results to compare with yet. The report fills in once the network has been calculated.",
+        "lpn_calib_no_pairs": "No measurement could be compared, so there is nothing to plot.",
+        "lpn_calib_tab_stats": "Statistics",
+        "lpn_calib_tab_corr": "Correlation plot",
+        "lpn_calib_tab_means": "Mean comparisons",
+        "lpn_calib_col_location": "Location",
+        "lpn_calib_col_n": "Num obs",
+        "lpn_calib_col_n_tip": "Number of observations: the measurements at this location that were compared.",
+        "lpn_calib_col_obs_mean": "Observed mean",
+        "lpn_calib_col_sim_mean": "Computed mean",
+        "lpn_calib_col_mean_err": "Mean error",
+        "lpn_calib_col_mean_err_tip": "The mean of the absolute differences between each observed value and the computed value at the same time.",
+        "lpn_calib_col_rms_err": "RMS error",
+        "lpn_calib_col_rms_err_tip": "Root mean square error: the square root of the mean of the squared differences between observed and computed values.",
+        "lpn_calib_network": "Network",
+        "lpn_calib_corr_means": "Correlation between means: {r}",
+        "lpn_calib_corr_none": "Correlation between means: it needs at least two locations whose means differ.",
+        "lpn_calib_axis_obs": "Observed: {q}",
+        "lpn_calib_axis_sim": "Computed: {q}",
+        "lpn_calib_observed": "Observed",
+        "lpn_calib_computed": "Computed",
+        "lpn_calib_point": "{id}, {time}: observed {o}, computed {s}",
+        "lpn_calib_corr_note": "Each point is one measurement. The closer the points lie to the diagonal line, the closer the computed values match the observed ones.",
+        "lpn_calib_ts_point": "Measured at {id}, {time}: {v}",
+        "lpn_calib_ts_note": "Rings are measured values from the calibration file."
     },
     "key_context": {
+        "lpn_hotkeys_menu_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_hotkeys_map_def",
+                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 au Esc<\/td><td>Chagua.<\/td><\/tr><tr><td>2<\/td><td>Ongeza muunganiko.<\/td><\/tr><tr><td>3<\/td><td>Ongeza hifadhi ya maji.<\/td><\/tr><tr><td>4<\/td><td>Ongeza tanki.<\/td><\/tr><tr><td>5<\/td><td>Ongeza bomba.<\/td><\/tr><tr><td>6<\/td><td>Ongeza pampu.<\/td><\/tr><tr><td>7<\/td><td>Ongeza vali.<\/td><\/tr><tr><td>8<\/td><td>Ongeza mteja.<\/td><\/tr><tr><td>9<\/td><td>Ongeza maandishi.<\/td><\/tr><tr><td>Delete<\/td><td>Futa uteuzi.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Tengua badiliko la mwisho.<\/td><\/tr><tr><td>+ au =<\/td><td>Kuza karibu.<\/td><\/tr><tr><td>-<\/td><td>Punguza.<\/td><\/tr><\/tbody><\/table>",
+                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 or Esc<\/td><td>Select.<\/td><\/tr><tr><td>2<\/td><td>Add a junction.<\/td><\/tr><tr><td>3<\/td><td>Add a reservoir.<\/td><\/tr><tr><td>4<\/td><td>Add a tank.<\/td><\/tr><tr><td>5<\/td><td>Add a pipe.<\/td><\/tr><tr><td>6<\/td><td>Add a pump.<\/td><\/tr><tr><td>7<\/td><td>Add a valve.<\/td><\/tr><tr><td>8<\/td><td>Add a customer.<\/td><\/tr><tr><td>9<\/td><td>Add text.<\/td><\/tr><tr><td>Delete<\/td><td>Delete the selection.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Undo the last change.<\/td><\/tr><tr><td>+ or =<\/td><td>Zoom in.<\/td><\/tr><tr><td>-<\/td><td>Zoom out.<\/td><\/tr><\/tbody><\/table>"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Kuna tatizo hapa?",
+                    "english": "Something wrong here?"
+                }
+            }
+        },
+        "lpn_hotkeys_menu_term": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_hotkeys_map_def",
+                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 au Esc<\/td><td>Chagua.<\/td><\/tr><tr><td>2<\/td><td>Ongeza muunganiko.<\/td><\/tr><tr><td>3<\/td><td>Ongeza hifadhi ya maji.<\/td><\/tr><tr><td>4<\/td><td>Ongeza tanki.<\/td><\/tr><tr><td>5<\/td><td>Ongeza bomba.<\/td><\/tr><tr><td>6<\/td><td>Ongeza pampu.<\/td><\/tr><tr><td>7<\/td><td>Ongeza vali.<\/td><\/tr><tr><td>8<\/td><td>Ongeza mteja.<\/td><\/tr><tr><td>9<\/td><td>Ongeza maandishi.<\/td><\/tr><tr><td>Delete<\/td><td>Futa uteuzi.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Tengua badiliko la mwisho.<\/td><\/tr><tr><td>+ au =<\/td><td>Kuza karibu.<\/td><\/tr><tr><td>-<\/td><td>Punguza.<\/td><\/tr><\/tbody><\/table>",
+                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 or Esc<\/td><td>Select.<\/td><\/tr><tr><td>2<\/td><td>Add a junction.<\/td><\/tr><tr><td>3<\/td><td>Add a reservoir.<\/td><\/tr><tr><td>4<\/td><td>Add a tank.<\/td><\/tr><tr><td>5<\/td><td>Add a pipe.<\/td><\/tr><tr><td>6<\/td><td>Add a pump.<\/td><\/tr><tr><td>7<\/td><td>Add a valve.<\/td><\/tr><tr><td>8<\/td><td>Add a customer.<\/td><\/tr><tr><td>9<\/td><td>Add text.<\/td><\/tr><tr><td>Delete<\/td><td>Delete the selection.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Undo the last change.<\/td><\/tr><tr><td>+ or =<\/td><td>Zoom in.<\/td><\/tr><tr><td>-<\/td><td>Zoom out.<\/td><\/tr><\/tbody><\/table>"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Kuna tatizo hapa?",
+                    "english": "Something wrong here?"
+                }
+            }
+        },
+        "lpn_hotkeys_menu_def": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_hotkeys_map_def",
+                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 au Esc<\/td><td>Chagua.<\/td><\/tr><tr><td>2<\/td><td>Ongeza muunganiko.<\/td><\/tr><tr><td>3<\/td><td>Ongeza hifadhi ya maji.<\/td><\/tr><tr><td>4<\/td><td>Ongeza tanki.<\/td><\/tr><tr><td>5<\/td><td>Ongeza bomba.<\/td><\/tr><tr><td>6<\/td><td>Ongeza pampu.<\/td><\/tr><tr><td>7<\/td><td>Ongeza vali.<\/td><\/tr><tr><td>8<\/td><td>Ongeza mteja.<\/td><\/tr><tr><td>9<\/td><td>Ongeza maandishi.<\/td><\/tr><tr><td>Delete<\/td><td>Futa uteuzi.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Tengua badiliko la mwisho.<\/td><\/tr><tr><td>+ au =<\/td><td>Kuza karibu.<\/td><\/tr><tr><td>-<\/td><td>Punguza.<\/td><\/tr><\/tbody><\/table>",
+                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 or Esc<\/td><td>Select.<\/td><\/tr><tr><td>2<\/td><td>Add a junction.<\/td><\/tr><tr><td>3<\/td><td>Add a reservoir.<\/td><\/tr><tr><td>4<\/td><td>Add a tank.<\/td><\/tr><tr><td>5<\/td><td>Add a pipe.<\/td><\/tr><tr><td>6<\/td><td>Add a pump.<\/td><\/tr><tr><td>7<\/td><td>Add a valve.<\/td><\/tr><tr><td>8<\/td><td>Add a customer.<\/td><\/tr><tr><td>9<\/td><td>Add text.<\/td><\/tr><tr><td>Delete<\/td><td>Delete the selection.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Undo the last change.<\/td><\/tr><tr><td>+ or =<\/td><td>Zoom in.<\/td><\/tr><tr><td>-<\/td><td>Zoom out.<\/td><\/tr><\/tbody><\/table>"
+                },
+                "next_translated": {
+                    "key": "lpn_wrong_btn",
+                    "value": "Kuna tatizo hapa?",
+                    "english": "Something wrong here?"
+                }
+            }
+        },
         "lpn_graphs_menu": {
             "reason": "missing",
             "current_value": null,
@@ -1147,6 +1285,678 @@
                     "key": "lpn_scenario_push_confirm",
                     "value": "Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.",
                     "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                }
+            }
+        },
+        "lpn_reports_calib": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_reports_calib_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_param": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_param_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_load": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_load_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_session": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_file": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_units": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_missing_count": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_bad_lines": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_outside": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_no_value": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_single": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_needs_run": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_no_pairs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_tab_stats": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_tab_corr": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_tab_means": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_col_location": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_col_n": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_col_n_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_col_obs_mean": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_col_sim_mean": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_col_mean_err": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_col_mean_err_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_col_rms_err": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_col_rms_err_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_network": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_corr_means": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_corr_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_axis_obs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_axis_sim": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_observed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_computed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_point": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_corr_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_ts_point": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
+                }
+            }
+        },
+        "lpn_calib_ts_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_full_row_count",
+                    "value": "Safu mlalo {n}.",
+                    "english": "{n} rows."
+                },
+                "next_translated": {
+                    "key": "lpn_energy_no_price",
+                    "value": "Hakuna bei ya nguvu iliyotajwa, hivyo kila gharama hapa ni sifuri. Weka moja chini ya Mipangilio, Nishati.",
+                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
                 }
             }
         }

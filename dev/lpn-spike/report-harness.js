@@ -124,7 +124,7 @@ const EngCalcs = global.EngCalcs;
 		pump10Events.map((e) => e.t).join(', '));
 	check(wantSwitches.every((s) => pump10Events.some((e) => e.t === s.t)),
 		'and every one of them lands on the frame the engine itself switched, not a neighbour');
-	check(pump10Events.every((e, i) => (e.text.indexOf('opened') >= 0) === (wantSwitches[i].to === 'open')),
+	check(pump10Events.every((e, i) => (e.text.indexOf(PC.lpn_status_opened.replace('{type} {id} ', '')) >= 0) === (wantSwitches[i].to === 'open')),
 		'opened/closed in the report matches the run\'s own open/closed');
 
 	// ---- 3. THE STATUS REPORT: A TANK FILLS AND DRAINS -----------------------------------------

@@ -4041,9 +4041,9 @@
             "answer": "OK."
         },
         "lpn_status_closed": {
-            "on": "{type} {id} closed",
-            "ruled": "2026-09-26",
-            "answer": "OK."
+            "on": "{type} {id} now closed",
+            "ruled": "2026-10-03",
+            "answer": "What if we merely used the word \"now\" as in \"Tank 1 now filling\" or \"Pump 10 now closed\"."
         },
         "lpn_status_col_event": {
             "on": "Event",
@@ -4066,9 +4066,9 @@
             "answer": "OK."
         },
         "lpn_status_filling": {
-            "on": "{type} {id} is filling",
-            "ruled": "2026-09-26",
-            "answer": "OK."
+            "on": "{type} {id} now filling",
+            "ruled": "2026-10-03",
+            "answer": "What if we merely used the word \"now\" as in \"Tank 1 now filling\" or \"Pump 10 now closed\"."
         },
         "lpn_status_full": {
             "on": "{type} {id} is full",

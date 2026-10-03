@@ -260,7 +260,7 @@ console.log('\n--- a label given up for one crowded moment comes back ---');
 	zoomTo(12000);
 	const crowded = yieldedIds();
 	report(crowded.length > 0, 'the crowded zoom really gave some up', crowded.join(', '));
-	zoomTo(5000);
+	zoomTo(3000); // 3000, not 5000: one more decimal on Qb and Q widens labels, and 5000 only reshuffled
 	const roomy = yieldedIds();
 	report(roomy.length < crowded.length, 'zoomed out, most of them are back',
 		crowded.length + ' -> ' + roomy.length + ' given up');

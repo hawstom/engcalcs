@@ -46,8 +46,8 @@ public claim, and a claim that contradicts it is a defect even in a private note
 
 He named these on 2026-09-04 and explicitly did not answer them: *"Do we create a
 windows executable? Do we offer logins and cloud saves? All to be revealed."* Treat
-them as open questions to gather evidence for, not as a roadmap. **Note that both
-existing seats have already argued against the cloud one** from different directions —
+them as open questions to gather evidence for, not as a roadmap. **Note that the
+planning engineer and the field operator have already argued against the cloud one** from different directions —
 read Task 537 in `dev/ROADMAP.md` before adding to that pile, and if your evidence
 points the other way, say so plainly and say why.
 
