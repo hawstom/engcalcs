@@ -117,6 +117,12 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_calib_load_tip`**
   > A text file with a location ID, a time, and a measured value on each line. The time is measured from the start of the simulation, in decimal hours or hours:minutes. A semicolon starts a comment. A line with only a time and a value belongs to the location above it.
   @@ NEEDS RULING
+- **`lpn_calib_missing`**
+  > Named in the file but not in this network: {ids}.
+  @@ NEEDS RULING
+- **`lpn_calib_missing_count`**
+  > Measurements skipped because their location is not in this network: {n}.
+  @@ NEEDS RULING
 - **`lpn_calib_needs_run`**
   > There are no results to compare with yet. The report fills in once the network has been calculated.
   @@ NEEDS RULING
@@ -171,12 +177,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_calib_units`**
   > The file's values are read in this project's units: {unit}.
   @@ NEEDS RULING
-- **`lpn_calib_unknown_count`**
-  > Measurements skipped because their location is not in this network: {n}.
-  @@ NEEDS RULING
-- **`lpn_calib_unknown_ids`**
-  > Named in the file but not in this network: {ids}
-  @@ NEEDS RULING
 - **`lpn_copy_body`**
   > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
   _Ruled OK 2026-10-01._
@@ -221,7 +221,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**93 still to read**, of 144 new keys across 17 unmerged branch(es).
+**93 still to read**, of 144 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -232,7 +232,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/calibration (`728b2a0f`) — adds no English strings
+### feat/calibration (`b50ae755`) — adds no English strings
 
 ### feat/contour (`eff6df3a`) — 14 new, 14 to read @@ NEEDS RULING
 
@@ -667,7 +667,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/profile-file (`0c7d728e`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/profile-file (`a095faf4`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_profile_file_done`**
   > Profile read from the file: {used} of {total} nodes found in this network.
@@ -700,8 +700,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   @@ NEEDS RULING
 
-### fix/flow-decimals (`e72dd470`) — adds no English strings
-
-### fix/label-eviction (`d8c92507`) — adds no English strings
-
-### fix/status-now (`1c7692dd`) — adds no English strings
+### fix/label-eviction (`840cb7cc`) — adds no English strings

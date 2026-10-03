@@ -3571,7 +3571,7 @@ $ec_lang['lpn_full_row_count']='{n} rows.';
 // EPANET's Report > Calibration and its three tabbed pages, with EPANET's own column names (EPANET
 // 2.2 manual, section 9.6). Mean error is EPANET's term for the mean ABSOLUTE difference. "Num obs"
 // is EPANET's own column heading, kept short because results columns are narrow.
-// lpn_calib_unknown_ids is worded to match the profile-file import (Task 604) so the two converge.
+// lpn_calib_missing is the same sentence as lpn_profile_file_missing (Task 604); keep the two identical.
 $ec_lang['lpn_reports_calib']='Calibration';
 $ec_lang['lpn_reports_calib_tip']='Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.';
 $ec_lang['lpn_calib_title']='Calibration report';
@@ -3583,8 +3583,8 @@ $ec_lang['lpn_calib_none']='No calibration file is loaded for this parameter.';
 $ec_lang['lpn_calib_session']='A calibration file is held for this session only. It is not saved with the project or on this device.';
 $ec_lang['lpn_calib_file']='{file}: {n} measurements at {m} locations.';
 $ec_lang['lpn_calib_units']='The file\'s values are read in this project\'s units: {unit}.';
-$ec_lang['lpn_calib_unknown_ids']='Named in the file but not in this network: {ids}';
-$ec_lang['lpn_calib_unknown_count']='Measurements skipped because their location is not in this network: {n}.';
+$ec_lang['lpn_calib_missing']='Named in the file but not in this network: {ids}.';
+$ec_lang['lpn_calib_missing_count']='Measurements skipped because their location is not in this network: {n}.';
 $ec_lang['lpn_calib_bad_lines']='Lines that could not be read, skipped: {lines}';
 $ec_lang['lpn_calib_outside']='Measurements outside the times this run reported, skipped: {n}.';
 $ec_lang['lpn_calib_no_value']='Measurements with no computed value at their time, skipped: {n}.';

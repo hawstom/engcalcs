@@ -233,8 +233,8 @@ function fire(el, type) {
 	head('5. THE STATISTICS PAGE: EPANET\'s columns, its Network row, its correlation line');
 	const report = byId.lpn_calib_report;
 	const all = textOf(report);
-	check(all.indexOf(PC.lpn_calib_unknown_ids.replace('{ids}', 'J999')) >= 0, `the box lists it: "${PC.lpn_calib_unknown_ids.replace('{ids}', 'J999')}"`);
-	check(all.indexOf(PC.lpn_calib_unknown_count.replace('{n}', '2')) >= 0, 'and counts it');
+	check(all.indexOf(PC.lpn_calib_missing.replace('{ids}', 'J999')) >= 0, `the box lists it: "${PC.lpn_calib_missing.replace('{ids}', 'J999')}"`);
+	check(all.indexOf(PC.lpn_calib_missing_count.replace('{n}', '2')) >= 0, 'and counts it');
 	check(all.indexOf(PC.lpn_calib_outside.replace('{n}', '1')) >= 0, 'and counts the measurement outside the run');
 	check(all.indexOf(PC.lpn_calib_units.replace('{unit}', 'psi')) >= 0, 'and says the file is read in the project\'s unit, psi');
 	check(all.indexOf(PC.lpn_calib_session) >= 0, 'and that the file is held for this session only');

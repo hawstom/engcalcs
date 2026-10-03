@@ -58991,9 +58991,9 @@ var EngCalcs = EngCalcs || {};
 		// **SKIPPED IS SAID, WITH WHAT AND HOW MANY** -- each reason its own line, so a reader can
 		// tell a typo in an ID from a time outside the run from a line that was not data at all.
 		if (res.unknown.length) {
-			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_unknown_ids || 'Named in the file but not in this network: {ids}')
-				.replace('{ids}', res.unknown.join(', ')), host).id = 'lpn_calib_unknown';
-			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_unknown_count || 'Measurements skipped because their location is not in this network: {n}.')
+			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_missing || 'Named in the file but not in this network: {ids}.')
+				.replace('{ids}', res.unknown.join(', ')), host).id = 'lpn_calib_missing';
+			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_missing_count || 'Measurements skipped because their location is not in this network: {n}.')
 				.replace('{n}', String(res.unknownCount)), host);
 		}
 		if (file.parsed.bad.length) {
