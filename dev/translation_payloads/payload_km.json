@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 2328,
+        "expected_key_count": 2327,
         "delta_key_count": 175,
         "exempt_key_count": 33,
         "exempt_keys": [
@@ -2694,7 +2694,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "វិសាលភាពនៃការត្រួតពិនិត្យការរចនាត្រូវបានកំណត់ទៅ ដែលបានជ្រើសរើស ប៉ុន្តែគ្មានធាតុណាមួយត្រូវបានជ្រើសរើសទេ។ សូមជ្រើសរើសធាតុ ឬជ្រើសរើសជម្រើស ទាំងអស់។",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2710,7 +2710,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "វិសាលភាពនៃការត្រួតពិនិត្យការរចនាត្រូវបានកំណត់ទៅ ដែលបានជ្រើសរើស ប៉ុន្តែគ្មានធាតុណាមួយត្រូវបានជ្រើសរើសទេ។ សូមជ្រើសរើសធាតុ ឬជ្រើសរើសជម្រើស ទាំងអស់។",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2726,7 +2726,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "វិសាលភាពនៃការត្រួតពិនិត្យការរចនាត្រូវបានកំណត់ទៅ ដែលបានជ្រើសរើស ប៉ុន្តែគ្មានធាតុណាមួយត្រូវបានជ្រើសរើសទេ។ សូមជ្រើសរើសធាតុ ឬជ្រើសរើសជម្រើស ទាំងអស់។",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2742,7 +2742,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_none",
                     "value": "គ្មានធាតុណាមួយក្នុងសំណុំដែលបានជ្រើសរើសលើសដែនកំណត់របស់វា ខណៈថ្នាំងណាមួយកំពុងទាញលំហូរពន្លត់អគ្គីភ័យរបស់វានោះទេ។",
-                    "english": "Nothing in the chosen set went outside its limits while any junction drew its fire flow."
+                    "english": "Nothing in the scope you chose went outside its limits while any junction drew its fire flow."
                 }
             }
         },

@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 2328,
+        "expected_key_count": 2327,
         "delta_key_count": 175,
         "exempt_key_count": 40,
         "exempt_keys": [
@@ -2701,7 +2701,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "ডিজাইন যাচাইয়ের পরিসর নির্বাচিত-তে সেট করা আছে, কিন্তু কোনো উপাদান নির্বাচিত নেই। উপাদান নির্বাচন করুন, অথবা সব বিকল্পটি নির্বাচন করুন।",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2717,7 +2717,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "ডিজাইন যাচাইয়ের পরিসর নির্বাচিত-তে সেট করা আছে, কিন্তু কোনো উপাদান নির্বাচিত নেই। উপাদান নির্বাচন করুন, অথবা সব বিকল্পটি নির্বাচন করুন।",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2733,7 +2733,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "ডিজাইন যাচাইয়ের পরিসর নির্বাচিত-তে সেট করা আছে, কিন্তু কোনো উপাদান নির্বাচিত নেই। উপাদান নির্বাচন করুন, অথবা সব বিকল্পটি নির্বাচন করুন।",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2749,7 +2749,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_none",
                     "value": "কোনো সংযোগস্থল তার অগ্নিনির্বাপণ প্রবাহ টানার সময় নির্বাচিত সেটের কিছুই তার সীমার বাইরে যায়নি।",
-                    "english": "Nothing in the chosen set went outside its limits while any junction drew its fire flow."
+                    "english": "Nothing in the scope you chose went outside its limits while any junction drew its fire flow."
                 }
             }
         },

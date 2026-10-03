@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 2328,
+        "expected_key_count": 2327,
         "delta_key_count": 175,
         "exempt_key_count": 34,
         "exempt_keys": [
@@ -2695,7 +2695,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "ڈیزائن جانچ منتخب پر مقرر ہے، اور کوئی عنصر منتخب نہیں۔ عناصر منتخب کریں یا «سب» کا اختیار چنیں۔",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2711,7 +2711,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "ڈیزائن جانچ منتخب پر مقرر ہے، اور کوئی عنصر منتخب نہیں۔ عناصر منتخب کریں یا «سب» کا اختیار چنیں۔",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2727,7 +2727,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "ڈیزائن جانچ منتخب پر مقرر ہے، اور کوئی عنصر منتخب نہیں۔ عناصر منتخب کریں یا «سب» کا اختیار چنیں۔",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2743,7 +2743,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_none",
                     "value": "چنے گئے مجموعے میں کچھ بھی اپنی حد سے باہر نہیں گیا جب کہ کوئی جنکشن اپنا فائر فلو کھینچ رہا تھا۔",
-                    "english": "Nothing in the chosen set went outside its limits while any junction drew its fire flow."
+                    "english": "Nothing in the scope you chose went outside its limits while any junction drew its fire flow."
                 }
             }
         },

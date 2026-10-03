@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "ps",
-        "expected_key_count": 2328,
+        "expected_key_count": 2327,
         "delta_key_count": 175,
         "exempt_key_count": 35,
         "exempt_keys": [
@@ -2696,7 +2696,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "د ډیزاین چک ساحه پر «ټاکل شوي» ټاکل شوې ده، خو هیڅ شی نه دی ټاکل شوی. شیان وټاکئ یا د «ټول» اختیار وټاکئ.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2712,7 +2712,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "د ډیزاین چک ساحه پر «ټاکل شوي» ټاکل شوې ده، خو هیڅ شی نه دی ټاکل شوی. شیان وټاکئ یا د «ټول» اختیار وټاکئ.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2728,7 +2728,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "د ډیزاین چک ساحه پر «ټاکل شوي» ټاکل شوې ده، خو هیڅ شی نه دی ټاکل شوی. شیان وټاکئ یا د «ټول» اختیار وټاکئ.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2744,7 +2744,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_none",
                     "value": "هیڅ شی د ټاکل شوي ټولګي کې له خپلو حدونو نه بهر نه شو تللی پداسې حال کې چې هر جنکشن خپل اور بهاو راایست.",
-                    "english": "Nothing in the chosen set went outside its limits while any junction drew its fire flow."
+                    "english": "Nothing in the scope you chose went outside its limits while any junction drew its fire flow."
                 }
             }
         },

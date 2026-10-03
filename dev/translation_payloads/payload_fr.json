@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 2328,
+        "expected_key_count": 2327,
         "delta_key_count": 176,
         "exempt_key_count": 57,
         "exempt_keys": [
@@ -2736,7 +2736,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "La vérification de conception est réglée sur Sélectionnées, et aucun élément n'est sélectionné. Sélectionnez des éléments ou sélectionnez l'option Toutes.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2752,7 +2752,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "La vérification de conception est réglée sur Sélectionnées, et aucun élément n'est sélectionné. Sélectionnez des éléments ou sélectionnez l'option Toutes.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2768,7 +2768,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "La vérification de conception est réglée sur Sélectionnées, et aucun élément n'est sélectionné. Sélectionnez des éléments ou sélectionnez l'option Toutes.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2784,7 +2784,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_none",
                     "value": "Rien dans l'ensemble choisi n'est sorti de ses limites pendant qu'une jonction quelconque prélevait son débit d'incendie.",
-                    "english": "Nothing in the chosen set went outside its limits while any junction drew its fire flow."
+                    "english": "Nothing in the scope you chose went outside its limits while any junction drew its fire flow."
                 }
             }
         },

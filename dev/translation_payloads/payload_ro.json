@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 2328,
+        "expected_key_count": 2327,
         "delta_key_count": 176,
         "exempt_key_count": 43,
         "exempt_keys": [
@@ -2722,7 +2722,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "Domeniul verificării de proiectare este setat pe Selectate, dar niciun element nu este selectat. Selectați elemente sau selectați opțiunea Toate.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2738,7 +2738,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "Domeniul verificării de proiectare este setat pe Selectate, dar niciun element nu este selectat. Selectați elemente sau selectați opțiunea Toate.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2754,7 +2754,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "Domeniul verificării de proiectare este setat pe Selectate, dar niciun element nu este selectat. Selectați elemente sau selectați opțiunea Toate.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2770,7 +2770,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_none",
                     "value": "Nimic din setul ales nu a ieșit din limitele sale în timp ce vreo joncțiune și-a preluat debitul de incendiu.",
-                    "english": "Nothing in the chosen set went outside its limits while any junction drew its fire flow."
+                    "english": "Nothing in the scope you chose went outside its limits while any junction drew its fire flow."
                 }
             }
         },

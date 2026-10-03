@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 2328,
+        "expected_key_count": 2327,
         "delta_key_count": 177,
         "exempt_key_count": 40,
         "exempt_keys": [
@@ -2737,7 +2737,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "ဒီဇိုင်း စစ်ဆေးမှုကို ရွေးထားသည်များအဖြစ် သတ်မှတ်ထားသော်လည်း၊ မည်သည့်အစိတ်အပိုင်းကိုမျှ မရွေးထားပါ။ အစိတ်အပိုင်းများကို ရွေးပါ၊ (သို့) အားလုံး ရွေးချယ်မှုကို ရွေးပါ။",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2753,7 +2753,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "ဒီဇိုင်း စစ်ဆေးမှုကို ရွေးထားသည်များအဖြစ် သတ်မှတ်ထားသော်လည်း၊ မည်သည့်အစိတ်အပိုင်းကိုမျှ မရွေးထားပါ။ အစိတ်အပိုင်းများကို ရွေးပါ၊ (သို့) အားလုံး ရွေးချယ်မှုကို ရွေးပါ။",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2769,7 +2769,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "ဒီဇိုင်း စစ်ဆေးမှုကို ရွေးထားသည်များအဖြစ် သတ်မှတ်ထားသော်လည်း၊ မည်သည့်အစိတ်အပိုင်းကိုမျှ မရွေးထားပါ။ အစိတ်အပိုင်းများကို ရွေးပါ၊ (သို့) အားလုံး ရွေးချယ်မှုကို ရွေးပါ။",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2785,7 +2785,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_none",
                     "value": "ဆက်စပ်နေရာ မည်သည်က မီးငြိမ်းသတ်ရေးစီးနှုန်းကို ဆွဲယူနေစဉ်ဖြစ်စေ၊ ရွေးထားသော အစုအဝေးရှိ မည်သည့်အရာမျှ ၎င်း၏ ကန့်သတ်ချက်များထက် ကျော်လွန်ခြင်း မရှိခဲ့ပါ။",
-                    "english": "Nothing in the chosen set went outside its limits while any junction drew its fire flow."
+                    "english": "Nothing in the scope you chose went outside its limits while any junction drew its fire flow."
                 }
             }
         },
