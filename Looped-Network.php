@@ -908,6 +908,18 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			</div>
 			<div id="lpn_freq_chart"></div>
 		</div>
+		<?php // ---- Tab: System flow (ROADMAP Task 600) ----
+		      // EPANET's System Flow Balance: total produced and total consumed against time across
+		      // the run. No options, so no form: the key is two fixed names, built in JS because the
+		      // colors are the charts' own. ?>
+		<div id="lpn_pane_sysflow" class="lpn-pane-panel lpn-profile-panel lpn-ts-panel" role="tabpanel" aria-labelledby="lpn_pane_tab_sysflow">
+			<div class="lpn-profile-controls">
+				<div class="lpn-profile-heading"><?=$ec_lang['lpn_sysflow_title']?></div>
+				<div id="lpn_sysflow_key" class="lpn-profile-key"></div>
+				<div id="lpn_sysflow_note" class="lpn-profile-say"></div>
+			</div>
+			<div id="lpn_sysflow_chart"></div>
+		</div>
 		<?php // ---- Tabs: one ASSET TABLE per type (Task 434, all six since Task 455) ----
 		      // The document as a spreadsheet, built entirely in JS: the rows are the network and
 		      // the headings carry the current units. Every write goes through the same seam the
@@ -2137,6 +2149,12 @@ EngCalcs.pageConfig = {
 	lpn_freq_summary: <?=json_encode($ec_lang['lpn_freq_summary'])?>,
 	lpn_freq_summary_time: <?=json_encode($ec_lang['lpn_freq_summary_time'])?>,
 	lpn_freq_axis_percent: <?=json_encode($ec_lang['lpn_freq_axis_percent'])?>,
+	lpn_sysflow_menu: <?=json_encode($ec_lang['lpn_sysflow_menu'])?>,
+	lpn_sysflow_tip: <?=json_encode($ec_lang['lpn_sysflow_tip'])?>,
+	lpn_sysflow_produced: <?=json_encode($ec_lang['lpn_sysflow_produced'])?>,
+	lpn_sysflow_produced_tip: <?=json_encode($ec_lang['lpn_sysflow_produced_tip'])?>,
+	lpn_sysflow_consumed: <?=json_encode($ec_lang['lpn_sysflow_consumed'])?>,
+	lpn_sysflow_consumed_tip: <?=json_encode($ec_lang['lpn_sysflow_consumed_tip'])?>,
 	lpn_pane_toggle: <?=json_encode($ec_lang['lpn_pane_toggle'])?>,
 	lpn_pane_toggle_tip: <?=json_encode($ec_lang['lpn_pane_toggle_tip'])?>,
 	lpn_pane_tab_junctions: <?=json_encode($ec_lang['lpn_pane_tab_junctions'])?>,

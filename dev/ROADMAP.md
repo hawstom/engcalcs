@@ -272,11 +272,9 @@ the block.
     the junctions' range where the terrain does. Open: pressure-zone boundaries, hard vs faded edge.
   - **FREQUENCY SHIPPED 2026-09-30** (`feat/frequency-plot`, merged on his word). Contour and flow
     balance remain.
-  - **SYSTEM FLOW BALANCE -- AND HIS READING OF IT IS RIGHT, but confirm it against EPANET's own
-    help before writing a word of interface.** He guessed *"produced comes from reservoirs and
-    negative demands and consumed is positive demands"*; that matches how the engine accounts for
-    it, and a tank is the third term, swinging between the two as it fills and drains. Getting the
-    definition wrong here is a number a user would believe.
+  - **SYSTEM FLOW BALANCE BUILT on `feat/flow-balance`, awaiting his pass.** Definition confirmed
+    in EPANET's own Fgraph.pas GetSysFlow(): junction and reservoir demands split by sign, tanks in
+    neither, so Produced - Consumed is net tank inflow. `dev/lpn-spike/system-flow-harness.js`.
 - 75|601| **Calibration files: measured field data, against the model that predicts it.**
   Tom, 2026-09-06: *"EPANET allows calibration files (measured system data) and offers a Calibration
   Report with three tabbed pages. See EPANET help. Very interesting to be aware of."*
