@@ -43827,7 +43827,9 @@ var EngCalcs = EngCalcs || {};
 	// the bank below wraps this call and never looks inside it -- whichever placer relayoutLabels()
 	// runs, the bank keeps what it decided.
 	function zoomLabelPass() {
-		perfDebugCount('labelPasses');
+		// Counted with an explicit 1: the bare form marks the CONTENT pass, and three harnesses
+		// find that one by its exact text.
+		perfDebugCount('labelPasses', 1);
 		labelCachePasses++;
 		beginLinkGeomHold();
 		try {
