@@ -1753,7 +1753,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			<div id="lpn_crsbox_note"></div>
 		</div>
 		<div class="lpn-new-actions">
-			<button type="button" id="lpn_crsbox_ok"><?=$ec_lang['lpn_crs_choose']?></button>
+			<button type="button" id="lpn_crsbox_ok"><?=$ec_lang['lpn_dialog_ok']?></button>
 			<button type="button" id="lpn_crsbox_cancel"><?=$ec_lang['lpn_cancel']?></button>
 		</div>
 	</div>
@@ -3068,7 +3068,6 @@ EngCalcs.pageConfig = {
 	lpn_ds_run: <?=json_encode($ec_lang['lpn_ds_run'])?>,
 	lpn_ds_head_search: <?=json_encode($ec_lang['lpn_ds_head_search'])?>,
 	lpn_ds_search_note: <?=json_encode($ec_lang['lpn_ds_search_note'])?>,
-	lpn_ds_search_note_selected: <?=json_encode($ec_lang['lpn_ds_search_note_selected'])?>,
 	lpn_ds_head_search_selected: <?=json_encode($ec_lang['lpn_ds_head_search_selected'])?>,
 	lpn_ds_outside_below: <?=json_encode($ec_lang['lpn_ds_outside_below'])?>,
 	lpn_ds_find: <?=json_encode($ec_lang['lpn_ds_find'])?>,

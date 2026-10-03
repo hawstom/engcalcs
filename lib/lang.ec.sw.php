@@ -1705,7 +1705,6 @@ $ec_lang['lpn_crs_search']='Tafuta';
 $ec_lang['lpn_crs_name']='Chuja jina la mchoro';
 $ec_lang['lpn_crs_name_tip']='Huonyesha michoro ambayo jina lake au msimbo wa EPSG unaofanana na unachoandika pekee. Jaribu namba ya eneo, au UTM, au Mercator.';
 $ec_lang['lpn_crs_list_tip']='Michoro iliyobaki baada ya vichujio viwili hapo juu. Chagua mmoja kisha bonyeza Chagua.';
-$ec_lang['lpn_crs_choose']='Chagua';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Hakuna mahali palipotafutwa bado, hivyo orodha nzima inatolewa. Tafuta mahali hapo juu au kuza ramani ili kupunguza orodha.';
 $ec_lang['lpn_crs_count']='Michoro {n} kati ya {total} imeorodheshwa.';

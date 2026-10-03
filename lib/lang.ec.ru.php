@@ -1705,7 +1705,6 @@ $ec_lang['lpn_crs_search']='Поиск';
 $ec_lang['lpn_crs_name']='Фильтр по названию проекции';
 $ec_lang['lpn_crs_name_tip']='Показывает только проекции, в названии или коде EPSG которых есть введённый текст. Попробуйте номер зоны, либо «UTM», либо «Меркатор».';
 $ec_lang['lpn_crs_list_tip']='Проекции, оставшиеся после двух фильтров выше. Выберите одну и нажмите «Выбрать».';
-$ec_lang['lpn_crs_choose']='Выбрать';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Место ещё не искали, поэтому предлагается весь список. Найдите место выше или измените масштаб карты, чтобы сузить список.';
 $ec_lang['lpn_crs_count']='Показано проекций: {n} из {total}.';

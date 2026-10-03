@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 176 untranslated keys, of 2329 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read on master**, of 175 untranslated keys, of 2327 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,11 +21,157 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (0, all answered)
+## Questions from the translators  (1 to read @@ NEEDS RULING)
 
-Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
+**These are SHIPPED strings, already translated into 26 languages.** A wave-0
+reading or a translator found each one readable two ways, and no sprint launches while one is
+unanswered. You are not being asked to approve wording here; you are being asked which reading
+is the one you meant. "The first one" is a complete answer.
 
-## lpn_  (176, 4 to read @@ NEEDS RULING)
+### from sprint 1003-ds
+
+- **`lpn_ds_found_below`**
+  > ⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.
+  *The finding:* Tom: 'I think I need explanation, and this need clarification.' It appears after Find when the demands as entered (a demand scale of 1) leave at least one junction below the limit; {m} is the largest scale, always under 1, at which every judged junction keeps the limit (0.62 means demands cut to 62 percent). 'it' in 'keeps it' is vague, 'demands as they are' never says scale 1, and {m} reads as headroom when it is a cut.
+  1. the system can take up to {m} times today's demand (wrong)
+  2. demands must be cut to {m} times what is entered for every junction to keep the pressure (right)
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
+  @@ NEEDS RULING
+
+## Synonym entries to approve  (13, 13 to read @@ NEEDS RULING)
+
+**These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
+English string that has since changed, or against a key that no longer exists. Say which: keep it
+as is, change it (a proposal may follow), or remove it. **Your answer on the flag line is the
+written permission** the rule requires; CC then applies it by hand and re-records it. A script
+never edits a synonym.
+
+- **`lpn_ds_head_search_selected`**
+  > What demand scale can these junctions handle?
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* What demand can the selection handle
+  *Current synonym:* What demand can the junctions you choose handle
+  *Proposed synonym:* What demand scale can these junctions carry?, How far can the demand at these junctions be scaled?
+  *Why this proposal:* The heading is now a question about a demand scale at these junctions; both rephrasings could head the same box.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_ds_scope_tip`**
+  > All junctions, or only those selected on the map. Pressures are checked at the scaled demand.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Scale the demand of the selection. Pressures are checked at the scaled demand.
+  *Current synonym:* Scale the demand at the junctions that you choose. Pressures are checked at the scaled demand.
+  *Proposed synonym:* Every junction, or just the junctions selected on the map. Pressures are checked at the scaled demand.
+  *Why this proposal:* Whole-string rephrasing of the new two-option sentence; the old text described only the selection.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_ds_search_note_selected`**
+  > (this key no longer exists in lib/lang.ec.en.php)
+  *Why stale:* the key no longer exists, so this entry describes nothing
+  *Written against:* Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the selection keeps the given lowest pressure allowed.
+  *Current synonym:* Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the junctions that you choose keep the given lowest pressure allowed.
+  **What this asks for:** WRITTEN PERMISSION to remove this `$ec_lang_syn` entry.
+  @@ NEEDS RULING
+
+- **`lpn_ff_all`**
+  > All junctions
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* All
+  *Current synonym:* All junctions | a pull-down option under Junctions to test; agrees with junctions, plural
+  *Proposed synonym:* Every junction, All the junctions | a pull-down option under Junctions to test; agrees with junctions, plural
+  *Why this proposal:* Both would fit the pull-down; the English now says junctions, plural, which the commentary already required.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_ff_selected`**
+  > Selected junctions
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Selected
+  *Current synonym:* Selected junctions | a pull-down option under Junctions to test; agrees with junctions, plural
+  *Proposed synonym:* Only the selected junctions, The junctions selected on the map | a pull-down option under Junctions to test; agrees with junctions, plural
+  *Why this proposal:* Each could stand in the pull-down row; the old text only repeated the English.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_help_icons`**
+  > Toolbar
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Toolbar key
+  *Current synonym:* Toolbar legend, Key to the toolbar icons, What each toolbar icon means, Toolbar help, Toolbar | avoid: a keyboard key or shortcut
+  *Proposed synonym:* Toolbar legend, Toolbar icon key, Toolbar help | avoid: a keyboard key or shortcut
+  *Why this proposal:* The English dropped the word key; each could stand in the menu row.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_labels_col_after`**
+  > Aft.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* After
+  *Current synonym:* After, Suffix, Trailing text, Postfix | avoid: after in the sense of later in time
+  *Proposed synonym:* Aft. (After, Suffix, Trailing text) | layout: column heading; avoid: after in the sense of later in time
+  *Why this proposal:* The English is now the short heading; the full words are the alternates.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_labels_col_before`**
+  > Bef.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Before
+  *Current synonym:* Before, In front, In front of the value, Prefix, Leading text | avoid: before in the sense of earlier in time
+  *Proposed synonym:* Bef. (Before, Prefix, Leading text) | layout: column heading; avoid: before in the sense of earlier in time
+  *Why this proposal:* The English is now the short heading; the full words are the alternates.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_lock_break`**
+  > Break lock
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Break their lock
+  *Current synonym:* Break their lock, unlock the file, take over the file, release their hold on it, claim the file, override their claim | layout: button
+  *Proposed synonym:* Break lock, Unlock the file, Take over the file, Override their claim | layout: button
+  *Why this proposal:* Dropped the options that only made sense with the old English "Break their lock".
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_settings_map_display`**
+  > Appearance
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Map appearance
+  *Current synonym:* How the map looks (appearance, style, the way it is drawn) — sizes, opacity, position.
+  *Proposed synonym:* Appearance, Look, Style, How the map is drawn
+  *Why this proposal:* The old text was a description; each of these could be the heading.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_units_group_inputs`**
+  > (this key no longer exists in lib/lang.ec.en.php)
+  *Why stale:* the key no longer exists, so this entry describes nothing
+  *Written against:* Input units
+  *Current synonym:* Units of inputs, or Units of what you enter
+  **What this asks for:** WRITTEN PERMISSION to remove this `$ec_lang_syn` entry.
+  @@ NEEDS RULING
+
+- **`lpn_units_group_results`**
+  > (this key no longer exists in lib/lang.ec.en.php)
+  *Why stale:* the key no longer exists, so this entry describes nothing
+  *Written against:* Results units
+  *Current synonym:* Units of results, or Units of the answers
+  **What this asks for:** WRITTEN PERMISSION to remove this `$ec_lang_syn` entry.
+  @@ NEEDS RULING
+
+- **`mtc_note_1`**
+  > <dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.</dd><dt>Basic calculator (no iteration)</dt><dd>Enter your desired roughness value. Ignore the design rock size input area.</dd></dl>
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* <dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The r...
+  *Current synonym:* | avoid: compressing "Blodgett–Bathurst" to an initialism like "BB" — recurred independently across 8+ languages (it/ru/bg/es/uk/sr/hr/cs/tr/ps/my, corrected 2026-07-08) since nothing else in this string defines what the initials stand for; spell the full name out in every language, matching mtc_blodgett_v_bathurst
+  *Proposed synonym:* | avoid: compressing "Blodgett–Bathurst" to an initialism like "BB" — recurred independently across 8+ languages (it/ru/bg/es/uk/sr/hr/cs/tr/ps/my, corrected 2026-07-08) since nothing else in this string defines what the initials stand for; spell the full name out in every language, matching mtc_blodgett_v_bathurst
+  *Why this proposal:* No change proposed: the note is about the initialism, not the reworded step 2, and still holds.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+## lpn_  (175, 5 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -475,11 +621,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > All junctions, or only those selected on the map. Pressures are checked at the scaled demand.
   _Ruled OK 2026-10-03._
 - **`lpn_ds_search_note`**
-  > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.
-  _Ruled OK 2026-10-03._
-- **`lpn_ds_search_note_selected`**
-  > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.
-  _Ruled 2026-10-03: There is no need for this key. "These" applies to all and to selected._
+  > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.
+  @@ NEEDS RULING
 - **`lpn_ds_search_stopped`**
   > The search was stopped before it found an answer.
   _Ruled 2026-10-03: OK. Are we sure this isn't already provided by a different key?_
@@ -560,7 +703,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**0 still to read**, of 12 new keys across 10 unmerged branch(es).
+**10 still to read**, of 22 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -571,11 +714,26 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/selection-word (`16dce45b`) — adds no English strings
-
-### feat/criticality (`84ea5311`) — adds no English strings
+### chore/analyze-clock-spec (`329c1278`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/dialog-audit (`3b6989bd`) — adds no English strings
+
+### feat/dock (`05b6ccd6`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -629,3 +787,24 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_result_pump_head_tip`**
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   _Ruled OK 2026-10-03._
+
+### feat/table-selection (`d2276943`) — 6 new, 6 to read @@ NEEDS RULING
+
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map, then press Selection only.
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_tip`**
+  > Show only the elements selected on the map, in every table. Press again to update it after changing the selection, or to turn it off.
+  @@ NEEDS RULING

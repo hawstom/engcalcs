@@ -32,6 +32,7 @@
 	--ec-bad-ink: #c00;
 	--ec-error-ink: #a00;
 	--ec-error-bg: #fdecea;
+	--ec-error-bg-soft: #fff0f0;
 	--ec-neutral-ink: gray;
 	/* Interaction: toolbar hover and pressed, table selection */
 	--ec-hover-bg: #def;

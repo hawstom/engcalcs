@@ -434,6 +434,11 @@ question about paths.
    there is more than one, propose a rewrite."** Falsification, not review. Findings go to
    `dev/english-friction/<sprint>.json` and route through the English/synonym/glossary rule above.
    **`php dev/scripts/friction_check.php --sprint=<id>` must exit 0.**
+   **An open Wave 0 file is committed into `dev/english-friction/` at once, never kept outside the repo
+   (as a `.pending`) to dodge `friction_check.php`.** Its `refer-to-human` entries reach Tom through
+   `dev/new-english-keys.md` ("Questions from the translators"), and his answer is harvested onto the
+   entry as `human_answer`. That blocks a sprint until he rules; the block is the point. Never ask him
+   for a ruling in chat that the file can carry.
    **Assemble the pass set with `php dev/scripts/wave0_keyset.php --new-and-changed --prefix=<p>`**,
    which drops keys already carrying a non-empty `$ec_lang_syn` — that channel has already answered
    this exact question, and re-asking produces a re-flag. Measured against `239-wave0-calcs.json`:

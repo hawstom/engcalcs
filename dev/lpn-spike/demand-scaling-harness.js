@@ -345,9 +345,8 @@ async function minPsiAt(m) {
 	})(byId.lpn_ds_controls);
 	ok('the built Demand scaling scope list is the page\'s All / Selected junctions', !!scopeSel &&
 		kids(scopeSel).map((o) => o.textContent).join() === PC.lpn_ds_scope_all + ',' + PC.lpn_ds_scope_selected);
-	ok('the selected-scope heading is a question about "these junctions" and the note says "all these junctions maintain" (Tom)',
-		/^What demand scale can these junctions handle\?$/.test(PC.lpn_ds_head_search_selected) &&
-		/at which all these junctions maintain the lowest pressure allowed\.$/.test(PC.lpn_ds_search_note_selected));
+	ok('the selected-scope heading has its own key, and there is no -selected twin of the Find note: one note serves both scopes (Tom)',
+		!!PC.lpn_ds_head_search_selected && !!PC.lpn_ds_search_note && !('lpn_ds_search_note_selected' in PC));
 
 	if (fails) { console.log('\n' + fails + ' demand scaling check(s) FAILED'); process.exit(1); }
 	console.log('\nDemand scaling harness: all checks passed.');

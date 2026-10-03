@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 2329,
-        "delta_key_count": 176,
+        "expected_key_count": 2327,
+        "delta_key_count": 175,
         "exempt_key_count": 49,
         "exempt_keys": [
             "calc_units_us",
@@ -876,9 +876,8 @@
         "lpn_ds_run": "Run",
         "lpn_ds_head_search": "What demand scale can the system handle?",
         "lpn_ds_head_search_selected": "What demand scale can these junctions handle?",
-        "lpn_ds_search_note_selected": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.",
         "lpn_ds_outside_below": "At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.",
-        "lpn_ds_search_note": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
+        "lpn_ds_search_note": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
         "lpn_ds_find": "Find",
         "lpn_ds_holds_max": "✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.",
         "lpn_ds_below_zero": "⚠ At least one junction is below {pressure} even with the scaled demands at zero.",
@@ -1054,9 +1053,8 @@
         "lpn_ds_run": "Run",
         "lpn_ds_head_search": "What demand scale can the system handle?",
         "lpn_ds_head_search_selected": "What demand scale can these junctions handle?",
-        "lpn_ds_search_note_selected": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.",
         "lpn_ds_outside_below": "At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.",
-        "lpn_ds_search_note": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
+        "lpn_ds_search_note": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
         "lpn_ds_find": "Find",
         "lpn_ds_holds_max": "✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.",
         "lpn_ds_below_zero": "⚠ At least one junction is below {pressure} even with the scaled demands at zero.",
@@ -2712,7 +2710,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "Die Systemprüfung ist auf Ausgewählte eingestellt, aber es sind keine Elemente ausgewählt. Wählen Sie Elemente aus oder wählen Sie die Option Alle.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2728,7 +2726,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "Die Systemprüfung ist auf Ausgewählte eingestellt, aber es sind keine Elemente ausgewählt. Wählen Sie Elemente aus oder wählen Sie die Option Alle.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2744,7 +2742,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "Die Systemprüfung ist auf Ausgewählte eingestellt, aber es sind keine Elemente ausgewählt. Wählen Sie Elemente aus oder wählen Sie die Option Alle.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2760,7 +2758,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_none",
                     "value": "In der gewählten Menge ist nichts über seine Grenzwerte hinausgegangen, während irgendein Entnahmeknoten seine Löschwassermenge entnahm.",
-                    "english": "Nothing in the chosen set went outside its limits while any junction drew its fire flow."
+                    "english": "Nothing in the scope you chose went outside its limits while any junction drew its fire flow."
                 }
             }
         },
@@ -3452,22 +3450,6 @@
                 }
             }
         },
-        "lpn_ds_search_note_selected": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "Keine Antwort. Der gemeldete Code war {code}.",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "Vermessene Punkte importieren…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
         "lpn_ds_outside_below": {
             "reason": "missing",
             "current_value": null,
@@ -3906,8 +3888,7 @@
         "lpn_ff_design_all": "All other junctions and all pipes",
         "lpn_ff_design_selected": "The selected junctions and their pipes",
         "lpn_ds_scope_tip": "Scale the demand at the junctions that you choose. Pressures are checked at the scaled demand.",
-        "lpn_ds_head_search_selected": "What demand can the junctions you choose handle",
-        "lpn_ds_search_note_selected": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the junctions that you choose keep the given lowest pressure allowed."
+        "lpn_ds_head_search_selected": "What demand can the junctions you choose handle"
     },
     "key_concepts": []
 }

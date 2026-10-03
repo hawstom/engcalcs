@@ -1706,7 +1706,6 @@ $ec_lang['lpn_crs_search']='Hledat';
 $ec_lang['lpn_crs_name']='Filtr podle názvu projekce';
 $ec_lang['lpn_crs_name_tip']='Zobrazí jen projekce, jejichž název nebo kód EPSG obsahuje to, co zadáte. Zkuste číslo pásma, nebo UTM, nebo Mercator.';
 $ec_lang['lpn_crs_list_tip']='Projekce, které zbyly po použití obou filtrů výše. Vyberte jednu a stiskněte Vybrat.';
-$ec_lang['lpn_crs_choose']='Vybrat';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Zatím nebylo vyhledáno žádné místo, takže je nabízen celý seznam. Vyhledejte místo výše nebo přibližte mapu, aby se seznam zúžil.';
 $ec_lang['lpn_crs_count']='Zobrazeno {n} z {total} projekcí.';

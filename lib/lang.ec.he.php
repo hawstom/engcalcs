@@ -1706,7 +1706,6 @@ $ec_lang['lpn_crs_search']='חיפוש';
 $ec_lang['lpn_crs_name']='סינון לפי שם הטלה';
 $ec_lang['lpn_crs_name_tip']='מציג רק את ההטלות ששמן או קוד ה-EPSG שלהן מכיל את מה שהקלדתם. נסו מספר אזור, או UTM, או Mercator.';
 $ec_lang['lpn_crs_list_tip']='ההטלות שנותרו לאחר שני הסינונים שלמעלה. בחרו אחת ולחצו על בחר.';
-$ec_lang['lpn_crs_choose']='בחר';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='עדיין לא חיפשתם מקום, ולכן מוצעת הרשימה המלאה. חפשו מקום למעלה או הגדילו את המפה כדי לצמצם אותה.';
 $ec_lang['lpn_crs_count']='{n} מתוך {total} הטלות ברשימה.';

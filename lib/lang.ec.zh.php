@@ -1705,7 +1705,6 @@ $ec_lang['lpn_crs_search']='搜索';
 $ec_lang['lpn_crs_name']='投影名称筛选';
 $ec_lang['lpn_crs_name_tip']='仅显示名称或 EPSG 代码中包含您所输入内容的投影。可以尝试输入带号、UTM 或 Mercator。';
 $ec_lang['lpn_crs_list_tip']='经过以上两项筛选后剩下的投影。选择一项后点击"选择"。';
-$ec_lang['lpn_crs_choose']='选择';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='尚未搜索任何地点，因此显示完整列表。请在上方搜索地点，或缩放地图以缩小范围。';
 $ec_lang['lpn_crs_count']='已列出 {total} 个投影中的 {n} 个。';

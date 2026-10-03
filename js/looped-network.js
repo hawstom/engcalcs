@@ -15,13 +15,15 @@ var EngCalcs = EngCalcs || {};
 	// Looped-Network.php; the harnesses in dev/lpn-spike/ require them directly.
 	var Geom = EngCalcs.lpnGeom, Collide = EngCalcs.lpnCollide;
 
-	// **PSI ON THIS PAGE IS EPANET'S PSI** (Tom, 2026-10-03). Head becomes pressure through
-	// EngCalcs.unitFactors, so this page's own copy of the psi factor carries EPANET's PSIperFT
-	// (0.4333, js/PipeHydraulics.lib.js) and every pressure here reads as EPANET reports it. The
-	// shared $ec_units['psi'] stays exact for the other calculators; this table is per page load.
-	// Only psi: EPANET's metres match ours, and kPa and bar are not offered by EPANET's US set.
+	// **PSI, KPA AND BAR ON THIS PAGE ARE EPANET'S** (Tom, 2026-10-03). Head becomes pressure through
+	// EngCalcs.unitFactors, so this page's own copy of the psi and kPa factors carries EPANET's
+	// PSIperFT (0.4333), KPAperPSI (6.895) and BARperPSI (0.068948), js/PipeHydraulics.lib.js, and
+	// every pressure here reads as EPANET reports it. The shared $ec_units table stays exact for the
+	// other calculators; this one is per page load. Metres match EPANET's already.
 	if (EngCalcs.unitFactors && typeof EngCalcs.EPANET_PSI_PER_M === 'number') {
 		EngCalcs.unitFactors.psi = EngCalcs.EPANET_PSI_PER_M;
+		EngCalcs.unitFactors.kpa = EngCalcs.EPANET_KPA_PER_M;
+		EngCalcs.unitFactors.bar = EngCalcs.EPANET_BAR_PER_M;
 	}
 
 	var NS = 'http://www.w3.org/2000/svg';
@@ -2160,8 +2162,8 @@ var EngCalcs = EngCalcs || {};
 		// widest child, and a monospace report line has no wrap opportunities a browser will take, so
 		// an unbounded panel takes most of the window. Hence a max-width plus
 		// `overflow-wrap:anywhere` on the readout, which breaks the long token instead.
-		box.setAttribute('style', 'position:fixed;left:8px;bottom:8px;z-index:35;background:#fff;'
-			+ 'border:1px solid #333;padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px rgba(0,0,0,.3);'
+		box.setAttribute('style', 'position:fixed;left:8px;bottom:8px;z-index:35;background:var(--ec-bg);'
+			+ 'border:1px solid var(--ec-ink);padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3);'
 			+ 'max-height:70vh;max-width:min(26em,45vw);overflow:auto');
 		function row(label, get, set, step, hint) {
 			var l = document.createElement('label'), i = document.createElement('input');
@@ -2213,7 +2215,7 @@ var EngCalcs = EngCalcs || {};
 		row('zoom-to-fit room (text heights)', function () { return t.fitRoom; },
 			function (v) { t.fitRoom = v; }, 1, 'Extra room left on Zoom to fit\u2019s FIRST pass, before labels are placed. Bigger = the first pass sits further out, so labels land more comfortably at the final zoom. Press Zoom to fit to see it.');
 		var g = document.createElement('div');
-		g.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
+		g.setAttribute('style', 'margin-top:6px;border-top:1px solid var(--ec-border-strong);padding-top:4px');
 		g.textContent = 'rank weights';
 		box.appendChild(g);
 		Object.keys(Collide.GOAL_WEIGHT).forEach(function (key) {
@@ -2229,7 +2231,7 @@ var EngCalcs = EngCalcs || {};
 		// only by looking at a real map at several values. Generic over the table, like the rank
 		// weights: a knob added in lpn-collide.js appears here untouched.
 		var at = document.createElement('div');
-		at.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
+		at.setAttribute('style', 'margin-top:6px;border-top:1px solid var(--ec-border-strong);padding-top:4px');
 		at.textContent = 'corner angles (degrees)';
 		box.appendChild(at);
 		Object.keys(Collide.ANGLE_TUNING).forEach(function (key) {
@@ -2241,7 +2243,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		var out = document.createElement('div');
 		out.id = 'lpn_label_bench_out';
-		out.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px;'
+		out.setAttribute('style', 'margin-top:6px;border-top:1px solid var(--ec-border-strong);padding-top:4px;'
 			+ 'overflow-wrap:anywhere;white-space:normal');
 		box.appendChild(out);
 		var btns = document.createElement('div');
@@ -13096,8 +13098,8 @@ var EngCalcs = EngCalcs || {};
 		// LOWER RIGHT: the label bench already owns the lower left, and Settings and Labels are
 		// top-right. The width is capped for the reason the label bench states -- a fixed box with
 		// no width sizes to its widest child, and a tile key has no wrap opportunity.
-		box.setAttribute('style', 'position:fixed;right:8px;bottom:8px;z-index:35;background:#fff;'
-			+ 'border:1px solid #333;padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px rgba(0,0,0,.3);'
+		box.setAttribute('style', 'position:fixed;right:8px;bottom:8px;z-index:35;background:var(--ec-bg);'
+			+ 'border:1px solid var(--ec-ink);padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3);'
 			+ 'max-height:70vh;max-width:min(30em,45vw);overflow:auto;white-space:pre-wrap;'
 			+ 'overflow-wrap:anywhere');
 		var h = document.createElement('div');
@@ -29880,7 +29882,7 @@ var EngCalcs = EngCalcs || {};
 		btn.id = 'lpn_ts_add';
 		btn.className = 'lpn-profile-edit ec-help';
 		btn.textContent = pc.lpn_ts_add || 'Add selected';
-		btn.title = pc.lpn_ts_add_tip || 'Put everything now chosen on the map onto the graph.';
+		btn.title = pc.lpn_ts_add_tip || 'Put everything now selected on the map onto the graph.';
 		btn.addEventListener('click', tsAddSelection);
 		box.appendChild(btn);
 
@@ -29931,7 +29933,7 @@ var EngCalcs = EngCalcs || {};
 		if (added) { return; }
 		note = document.getElementById('lpn_ts_note');
 		if (note) {
-			note.textContent = pc.lpn_ts_add_none || 'Nothing of that kind is chosen on the map.';
+			note.textContent = pc.lpn_ts_add_none || 'Nothing of that kind is selected on the map.';
 		}
 	}
 	function tsRemove(id) {
@@ -29993,7 +29995,7 @@ var EngCalcs = EngCalcs || {};
 		if (!series.length) {
 			if (note) {
 				note.textContent = pc.lpn_ts_none ||
-					'Nothing to graph yet. Choose assets on the map and press Add selected.';
+					'Nothing to graph yet. Select assets on the map and press Add selected.';
 			}
 			return;
 		}
@@ -37302,8 +37304,8 @@ var EngCalcs = EngCalcs || {};
 		// row per distinct message, so a repaint on every tab switch does not fill the log.
 		logMessage(state.message, 'warning');
 		// Amber for a warning you may work through, red for a state that has taken editing away.
-		banner.style.borderColor = bannerRO ? '#a00' : '#a80';
-		banner.style.background = bannerRO ? '#fff0f0' : '#fffbe6';
+		banner.style.borderColor = bannerRO ? 'var(--ec-error-ink)' : 'var(--ec-warn-border)';
+		banner.style.background = bannerRO ? 'var(--ec-error-bg-soft)' : 'var(--ec-warn-bg)';
 		var text = document.createElement('span');
 		text.textContent = state.message || '';
 		banner.appendChild(text);
@@ -38195,7 +38197,7 @@ var EngCalcs = EngCalcs || {};
 			if (r.separator) {
 				var hr = document.createElement('hr');
 				hr.setAttribute('role', 'separator');
-				hr.style.cssText = 'margin:3px 0;border:0;border-top:1px solid #ccc';
+				hr.style.cssText = 'margin:3px 0;border:0;border-top:1px solid var(--ec-border-strong)';
 				list.appendChild(hr);
 				return;
 			}
@@ -59295,7 +59297,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			if (!anyEffect) {
 				ffEl('p', 'lpn-ff-note', pc.lpn_ff_design_none ||
-					'Nothing in the chosen set went outside its limits while any junction drew its fire flow.', host);
+					'Nothing in the scope you chose went outside its limits while any junction drew its fire flow.', host);
 			}
 		}
 
@@ -59548,7 +59550,7 @@ var EngCalcs = EngCalcs || {};
 			if (!design.nodes.length && !design.links.length) {
 				clearFireFlowRun(true);
 				analysisRefused(document.getElementById('lpn_ff_report'), pc.lpn_ff_design_no_selection ||
-					'The design check scope is set to Selected, but no assets are selected. Select assets or select the All option.');
+					'The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All.');
 				return;
 			}
 			design.minPressure = minPressure > 0 ? minPressure : 0;
@@ -60066,11 +60068,8 @@ var EngCalcs = EngCalcs || {};
 		ffEl('div', 'lpn-ff-head', dsAsk.scope === 'selected'
 			? (pc.lpn_ds_head_search_selected || 'What demand scale can these junctions handle?')
 			: (pc.lpn_ds_head_search || 'What demand scale can the system handle?'), host);
-		ffEl('p', 'lpn-ff-note', (dsAsk.scope === 'selected'
-			? (pc.lpn_ds_search_note_selected ||
-				'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.')
-			: (pc.lpn_ds_search_note ||
-				'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.'))
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_search_note ||
+			'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.')
 			.replace('{max}', dsMult(D.max)).replace('{step}', String(D.step)), host);
 		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
 		find = ffEl('button', 'lpn-ff-run', pc.lpn_ds_find || 'Find', buttons);

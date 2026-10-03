@@ -154,7 +154,7 @@ function dsHost(which) {
 	ok('...the found scale is still the selection\'s (not cut short by junction 40)', s.multiplier > 1, s.multiplier);
 	ok('Run at scale 1 lists junction 40 as outside, and not in the count below', r1.outside.some((x) => x.id === '40') && r1.below.length === 0);
 	ok('the heading under Selected is the selection\'s', text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_head_search_selected) >= 0);
-	ok('...with the selection\'s explanation of Find', text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_search_note_selected.replace('{max}', '20').replace('{step}', '0.01')) >= 0);
+	ok('...with the selection\'s explanation of Find', text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_search_note.replace('{max}', '20').replace('{step}', '0.01')) >= 0);
 	ok('the range in that sentence is the code\'s: 0 to 20, step 0.01', EC.lpnDemandScaleDefaults.max === 20 && EC.lpnDemandScaleDefaults.step === 0.01);
 	// Pure: an unselected junction stuck below the limit does not move the answer.
 	const fake = { nodes: [{ id: 'A', type: 'junction', demand: 1 }, { id: 'B', type: 'junction', demand: 1 }], links: [] };
