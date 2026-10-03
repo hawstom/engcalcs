@@ -58348,8 +58348,8 @@ var EngCalcs = EngCalcs || {};
 				linkState[l.id] = st;
 				events.push({
 					t: f.t,
-					text: (st === 'open' ? (pc.lpn_status_opened || '{type} {id} opened')
-						: (pc.lpn_status_closed || '{type} {id} closed'))
+					text: (st === 'open' ? (pc.lpn_status_opened || '{type} {id} now open')
+						: (pc.lpn_status_closed || '{type} {id} now closed'))
 						.replace('{type}', reportTypeNoun('link', l.type))
 						.replace('{id}', labelPrefixFor('link', 'id') + l.id)
 				});
@@ -58366,8 +58366,8 @@ var EngCalcs = EngCalcs || {};
 						st.dir = dir;
 						events.push({
 							t: f.t,
-							text: (dir > 0 ? (pc.lpn_status_filling || '{type} {id} is filling')
-								: (pc.lpn_status_emptying || '{type} {id} is emptying'))
+							text: (dir > 0 ? (pc.lpn_status_filling || '{type} {id} now filling')
+								: (pc.lpn_status_emptying || '{type} {id} now emptying'))
 								.replace('{type}', reportTypeNoun('node', 'tank')).replace('{id}', name)
 						});
 					}
@@ -58377,7 +58377,7 @@ var EngCalcs = EngCalcs || {};
 						st.full = true;
 						events.push({
 							t: f.t,
-							text: (pc.lpn_status_full || '{type} {id} is full')
+							text: (pc.lpn_status_full || '{type} {id} now full')
 								.replace('{type}', reportTypeNoun('node', 'tank')).replace('{id}', name)
 						});
 					} else if (lvl < band.max - st.eps) { st.full = false; }
@@ -58387,7 +58387,7 @@ var EngCalcs = EngCalcs || {};
 						st.dry = true;
 						events.push({
 							t: f.t,
-							text: (pc.lpn_status_dry || '{type} {id} is empty')
+							text: (pc.lpn_status_dry || '{type} {id} now empty')
 								.replace('{type}', reportTypeNoun('node', 'tank')).replace('{id}', name)
 						});
 					} else if (lvl > band.min + st.eps) { st.dry = false; }
