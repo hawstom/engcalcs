@@ -58966,7 +58966,7 @@ var EngCalcs = EngCalcs || {};
 		btn = ffEl('button', 'lpn-profile-edit ec-help', pc.lpn_calib_load || 'Load calibration file…', controls);
 		btn.type = 'button';
 		btn.id = 'lpn_calib_load';
-		btn.title = pc.lpn_calib_load_tip || '';
+		if (pc.lpn_calib_load_tip) { btn.title = pc.lpn_calib_load_tip; }
 		btn.addEventListener('click', function () {
 			var input = document.getElementById('lpn_calib_file');
 			if (input) { input.value = ''; input.click(); }
