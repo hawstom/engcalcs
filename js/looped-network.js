@@ -4640,6 +4640,140 @@ var EngCalcs = EngCalcs || {};
 		scenarios.forEach(function (s) { delete s.overrides[key]; });
 	}
 
+	// ---- SCENARIO ALTERNATIVES: BENTLEY'S LAYER, DERIVED (dev/scenario-alternatives.md) --------
+	//
+	// Tom, 2026-09-30: *"I think we can implement Bentley scenarios and hide it from users until we
+	// have a UX design."* In Bentley's model a scenario names one ALTERNATIVE per CATEGORY, and an
+	// alternative inherits from a parent alternative. Tom's Basic-mode rules make that tree a pure
+	// function of what this page already stores: Base uses the Base alternative of every category,
+	// and a scenario gets its own child of that Base alternative in a category exactly when it holds
+	// a local value of a property in it. So each scenario's `overrides`, grouped by category, ARE
+	// its child alternatives, and **NOTHING HERE IS STORED** -- no file changes, no migration, and
+	// removing a scenario's last local value in a category makes that child alternative vanish.
+	//
+	// **effective() IS DELIBERATELY NOT ROUTED THROUGH THIS.** It runs per property per element per
+	// render and per solve, and in Basic mode its one override lookup already IS the one-hop chain.
+	// dev/lpn-spike/scenario-alternatives-harness.js holds the two equal: alternativeOverrides()
+	// rebuilt from the chain must be the scenario's own override map, element by element.
+	//
+	// **EVERY OVERRIDABLE PROPERTY IS IN EXACTLY ONE CATEGORY**, and the harness fails a property in
+	// LPN_OVERRIDABLE that is missing here. A custom property (Task 636), and any stray name an old
+	// file carries, is User data -- so "exactly one" holds for every key a file can contain.
+	// The demand multiplier is NOT here: it is a scenario's calculation option, as in Bentley.
+	var LPN_ALT_CATEGORIES = ['physical', 'demand', 'topology', 'initial', 'constituent', 'fireflow', 'energy', 'userdata', 'text'];
+	var LPN_ALT_CATEGORY_OF = {
+		node: { x: 'physical', y: 'physical', emitter: 'physical', head: 'physical',
+			demand: 'demand', demands: 'demand',
+			active: 'topology',
+			level: 'initial',
+			initQuality: 'constituent', tankCoeff: 'constituent', sourceType: 'constituent',
+			sourceQuality: 'constituent', sourcePattern: 'constituent',
+			fireFlow: 'fireflow' },
+		link: { diameter: 'physical', roughness: 'physical', k: 'physical', length: 'physical',
+			typeId: 'physical', fittingsId: 'physical', curveId: 'physical', efficCurveId: 'physical',
+			active: 'topology',
+			status: 'initial', setting: 'initial',
+			bulkCoeff: 'constituent', wallCoeff: 'constituent',
+			energyPrice: 'energy', energyPattern: 'energy' },
+		// A Text's `active` is not topology: it takes nothing out of the solve, and Bentley keeps
+		// annotation outside the model altogether.
+		label: { text: 'text', active: 'text' }
+	};
+	function categoryOf(prop, group) {
+		var g = LPN_ALT_CATEGORY_OF[group || 'node'] || {};
+		return Object.prototype.hasOwnProperty.call(g, prop) ? g[prop] : 'userdata';
+	}
+	// The group an override KEY belongs to, asked of ovKeyFor() itself so the key format is still
+	// spelled in one place (dev/scripts/scenario_seam_check.php).
+	function ovKeyGroup(key) {
+		var groups = ['link', 'label', 'node'], i;
+		for (i = 0; i < groups.length; i++) {
+			if (String(key).indexOf(ovKeyFor(groups[i], '')) === 0) { return groups[i]; }
+		}
+		return 'node';
+	}
+	function altCopy(v) { return (v && typeof v === 'object') ? JSON.parse(JSON.stringify(v)) : v; }
+	function altBase(cat) {
+		var b = baseScenario();
+		return { id: b.id + ':' + cat, category: cat, parent: null, scenario: b.id, isBase: true, values: {}, count: 0 };
+	}
+	/**
+	 * **ONE ALTERNATIVE PER CATEGORY, FOR ONE SCENARIO**, as {category: alternative}. An alternative
+	 * is {id, category, parent, scenario, isBase, values, count}: `values` is {ovKey: {prop: value}}
+	 * holding only its LOCAL values (copies, so no reader can edit an override by holding them),
+	 * and a Base alternative's are empty because its values are the elements' own.
+	 */
+	function alternativesOf(scn) {
+		var out = {}, own = {};
+		LPN_ALT_CATEGORIES.forEach(function (cat) { out[cat] = altBase(cat); });
+		if (!scn || scn.isBase) { return out; }
+		Object.keys(scn.overrides || {}).forEach(function (key) {
+			var group = ovKeyGroup(key), ov = scn.overrides[key];
+			Object.keys(ov || {}).forEach(function (prop) {
+				var cat = categoryOf(prop, group), a = own[cat];
+				if (!a) {
+					a = own[cat] = { id: scn.id + ':' + cat, category: cat, parent: baseScenario().id + ':' + cat,
+						scenario: scn.id, isBase: false, values: {}, count: 0 };
+				}
+				if (!a.values[key]) { a.values[key] = {}; }
+				a.values[key][prop] = altCopy(ov[prop]);
+				a.count++;
+			});
+		});
+		Object.keys(own).forEach(function (cat) { out[cat] = own[cat]; });
+		return out;
+	}
+	function alternativeFor(scn, cat) { return alternativesOf(scn)[cat] || null; }
+	// Every alternative the project has: the Base one of each category, then each scenario's
+	// children, in stored scenario order.
+	function allAlternatives() {
+		var list = LPN_ALT_CATEGORIES.map(altBase);
+		scenarios.forEach(function (s) {
+			if (s.isBase) { return; }
+			var alts = alternativesOf(s);
+			LPN_ALT_CATEGORIES.forEach(function (cat) { if (!alts[cat].isBase) { list.push(alts[cat]); } });
+		});
+		return list;
+	}
+	function alternativeById(id) {
+		var all = allAlternatives(), i;
+		for (i = 0; i < all.length; i++) { if (all[i].id === id) { return all[i]; } }
+		return null;
+	}
+	/**
+	 * **THE RESOLVE CHAIN**: scenario -> its alternative for the property's category -> that
+	 * alternative's local value, else its parent's, up to the category's Base alternative, whose
+	 * value is the element's own. Returns {found, value, alternative}; found=false means "the
+	 * element's own", which effective() then reads through the pipe type, the auto length and the
+	 * rest of its layers exactly as it always has.
+	 */
+	function resolveThroughAlternatives(scn, el, prop) {
+		var key = ovKey(el), alt = alternativeFor(scn, categoryOf(prop, elGroup(el))), vals;
+		while (alt) {
+			vals = alt.values[key];
+			// Row 0's base IS the breakdown's first row once an alternative holds the whole list
+			// (R-369), the same rule effective() applies; both are in the Demand category.
+			if (prop === 'demand' && vals && Array.isArray(vals.demands) && vals.demands.length) {
+				return { found: true, value: vals.demands[0].base, alternative: alt };
+			}
+			if (vals && Object.prototype.hasOwnProperty.call(vals, prop)) {
+				return { found: true, value: vals[prop], alternative: alt };
+			}
+			alt = alt.parent ? alternativeById(alt.parent) : null;
+		}
+		return { found: false, value: undefined, alternative: alternativeFor(baseScenario(), categoryOf(prop, elGroup(el))) };
+	}
+	// The override map one element would have if it were REBUILT from the alternatives, category by
+	// category -- the object effective() reads. Equal to the stored one is the whole claim of "A".
+	function alternativeOverrides(scn, el) {
+		var key = ovKey(el), out = {}, alts = alternativesOf(scn);
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			var v = alts[cat].values[key];
+			if (v) { Object.keys(v).forEach(function (p) { out[p] = v[p]; }); }
+		});
+		return Object.keys(out).length ? out : undefined;
+	}
+
 	// ---- the scenario selector, and its "what am I working on right now" readout ----
 	// The count is only cheap to compute because a scenario IS its overrides -- there is no second
 	// document to diff against.
@@ -4681,6 +4815,8 @@ var EngCalcs = EngCalcs || {};
 			(pc.lpn_scenario_label || 'Scenario') + ': ' + scenarioDisplayName(scn)
 			+ ' | ' + (pc.lpn_scenario_overrides || 'No. of custom values') + ': ' + overrideCount(scn));
 		refreshScenarioTip(btn);
+		// Every override written or cleared lands here, so the Alternatives table follows it.
+		refreshAlternativesBoxIfOpen();
 		// The scenario name is user-typed and can be long, so the bottom band's width is not knowable
 		// in advance -- a bottom legend re-dodges around whatever it now measures.
 		placeLegends();
@@ -4857,6 +4993,9 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, rows = [], scn = activeScenario();
 		scenariosForDisplay().forEach(function (s) {
 			rows.push({
+				// scenarioId is what makes a row a scenario, so a reader of the rows (the harness)
+				// never has to tell one from a command by its position or its label.
+				scenarioId: s.id,
 				// A tick on the row you are already in, the way every view menu in this file's
 				// neighbourhood marks a current choice. No icon column entry, so the marker cannot
 				// be mistaken for a command's glyph.
@@ -4918,6 +5057,21 @@ var EngCalcs = EngCalcs || {};
 			// push into a push against whatever it happened to hand over.
 			fn: function () { pushBaseToScenarios(); }
 		});
+		// **BASIC MODE** (Tom, 2026-09-30), ticked by default. Unticked reveals the one thing the
+		// Advanced scenarios view has so far: the read-only Alternatives table. See
+		// setScenarioBasicMode() for why the answer lives in the browser.
+		rows.push({ separator: true });
+		rows.push({
+			label: (scenarioBasicMode ? '✓ ' : '  ') + (pc.lpn_scenario_basic || 'Basic mode'),
+			tip: pc.lpn_scenario_basic_tip,
+			fn: function () { setScenarioBasicMode(!scenarioBasicMode); }
+		});
+		if (!scenarioBasicMode) {
+			rows.push({
+				icon: 'scenarios', label: pc.lpn_alt_title || 'Alternatives preview',
+				fn: function () { openAlternativesBox(); }
+			});
+		}
 		return rows;
 	}
 	function openScenarioMenu(anchor) { openMenu(anchor, scenarioMenuRows()); }
@@ -30524,7 +30678,7 @@ var EngCalcs = EngCalcs || {};
 			// page-title toggle went with the titles; a browser that used it before still carries
 			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
 			// Erasing a key we no longer write is the one direction that is always safe.
-			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY];
+			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY, LPN_SCNBASIC_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -30845,10 +30999,15 @@ var EngCalcs = EngCalcs || {};
 	function rememberSwitchState() {
 		var id = library.openId;
 		if (!id) { return; }
-		if (!switchKeep[id]) { switchKeepOrder.push(id); }
+		// Least-recent first, so the eviction below drops the tab left longest ago -- the same
+		// order the drawing keep evicts in, which is what lets a kept drawing count on its solve.
+		switchKeepOrder = switchKeepOrder.filter(function (x) { return x !== id; });
+		switchKeepOrder.push(id);
 		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult,
 			time: EngCalcs.lpnTimeKeep ? EngCalcs.lpnTimeKeep() : null,
 			layout: captureLabelLayout() };
+		// ...and the drawing itself, put away on arrival (see settleDrawingForArrival()).
+		outgoingDrawing = { id: id, sig: switchKeep[id].sig };
 		while (switchKeepOrder.length > SWITCH_KEEP_MAX) {
 			delete switchKeep[switchKeepOrder.shift()];
 		}
@@ -30962,9 +31121,165 @@ var EngCalcs = EngCalcs || {};
 		return true;
 	}
 	function forgetSwitchState(id) {
+		// The drawing goes with the tab too (Task 680): a closed tab frees its elements.
+		discardKeptDrawing(id);
 		if (!switchKeep[id]) { return; }
 		delete switchKeep[id];
 		switchKeepOrder = switchKeepOrder.filter(function (x) { return x !== id; });
+	}
+	/**
+	 * ---- THE DRAWING A TAB KEEPS (ROADMAP Task 680, the remaining phase) -----------------------
+	 *
+	 * Phase 1 kept the solve and the label layout; a switch still built every shape again, and
+	 * building them is what was left (nodes 77-128 ms, links 125-226 ms on the geographic Net3).
+	 * So the drawing itself is kept: the five layers and every index into them are ONE RECORD, the
+	 * globals the rest of this file walks (`nodeEls`, `linkEls`, `labelEls`, `nodesLayer`...) point
+	 * at the record on screen, and a switch swaps which record that is. Nothing that walks "the"
+	 * drawing had to learn there are several, because the globals only ever name one.
+	 *
+	 * **A KEPT DRAWING IS HIDDEN WITH `display:none`**, not `visibility`, so the browser does no
+	 * style or layout work for it and no hit test can land on it.
+	 *
+	 * **REUSED ONLY UNDER THE SAME SIGNATURE AS THE SOLVE**, `storedSignature()` over the bytes on
+	 * disk, so a document moved under a hidden tab (another window, a hand edit) is rebuilt rather
+	 * than shown stale. And only together with the kept solve it was drawn from: a drawing shows
+	 * values, and values without the result they came from would be the wrong-answer case phase 1
+	 * exists to prevent.
+	 *
+	 * **FOUR KEPT, LEAST-RECENT EVICTED.** One Net3-Novato drawing is ~2 MB and 1,931 shapes; four
+	 * is ~8 MB, which covers the back-and-forth between two or three projects that a switch delay
+	 * actually hurts, without a library of twenty tabs holding twenty drawings nobody returns to.
+	 * The solve keep (SWITCH_KEEP_MAX, 8) is the larger, so a kept drawing always has its solve.
+	 */
+	var keptDrawings = Object.create(null), keptDrawingOrder = [];
+	var DRAWING_KEEP_MAX = 4;
+	// The project whose drawing is on screen and leaving, set by rememberSwitchState() and acted on
+	// by the next arrival. Deferred to the arrival because a switch can still fail after it is set
+	// (an unreadable document), and then the drawing it names is still the one on screen.
+	var outgoingDrawing = null;
+	// Counted for the harness: a reuse that quietly never happens looks exactly like one that works.
+	var drawingsBuilt = 0, drawingsReused = 0;
+	function drawingLayers(d) {
+		return [d.customersLayer, d.linksLayer, d.linkSymbolLayer, d.nodesLayer, d.labelsLayer];
+	}
+	function captureDrawing() {
+		return { customersLayer: customersLayer, linksLayer: linksLayer,
+			linkSymbolLayer: linkSymbolLayer, nodesLayer: nodesLayer, labelsLayer: labelsLayer,
+			nodeEls: nodeEls, linkEls: linkEls, labelEls: labelEls, incidentLinks: incidentLinks,
+			labelsByAnchor: labelsByAnchor, labelsByLinkAnchor: labelsByLinkAnchor,
+			custEls: custEls, custLblEls: custLblEls, customersByLink: customersByLink,
+			// Facts about THESE elements, not about the page: an IOU for label work skipped while
+			// they were hidden, and the scale their labels were laid out at.
+			labelWorkSkipped: labelWorkSkipped, lastLayoutScale: lastLayoutScale };
+	}
+	function adoptDrawing(d) {
+		customersLayer = d.customersLayer; linksLayer = d.linksLayer;
+		linkSymbolLayer = d.linkSymbolLayer; nodesLayer = d.nodesLayer; labelsLayer = d.labelsLayer;
+		nodeEls = d.nodeEls; linkEls = d.linkEls; labelEls = d.labelEls; incidentLinks = d.incidentLinks;
+		labelsByAnchor = d.labelsByAnchor; labelsByLinkAnchor = d.labelsByLinkAnchor;
+		custEls = d.custEls; custLblEls = d.custLblEls; customersByLink = d.customersByLink;
+		labelWorkSkipped = d.labelWorkSkipped; lastLayoutScale = d.lastLayoutScale;
+		custHandleEl = null;
+	}
+	function showDrawing(d, on) {
+		drawingLayers(d).forEach(function (L) { if (L && L.style) { L.style.display = on ? '' : 'none'; } });
+	}
+	function discardDrawing(d) {
+		drawingLayers(d).forEach(function (L) { if (L && L.parentNode) { L.parentNode.removeChild(L); } });
+	}
+	function discardKeptDrawing(id) {
+		var k = keptDrawings[id];
+		if (!k) { return; }
+		delete keptDrawings[id];
+		keptDrawingOrder = keptDrawingOrder.filter(function (x) { return x !== id; });
+		discardDrawing(k.drawing);
+	}
+	// Empty layers for a new drawing, each a shallow twin of the one on screen and inserted beside
+	// it, so the paint order between the five (customers, pipes, pump symbols, nodes, labels) is
+	// the one init() set, whatever else the parent holds.
+	function startFreshDrawing() {
+		function twin(L) {
+			if (!L || !L.parentNode) { return L; }
+			var n = L.cloneNode(false);
+			if (n.style) { n.style.display = ''; }
+			L.parentNode.insertBefore(n, L);
+			return n;
+		}
+		adoptDrawing({ customersLayer: twin(customersLayer), linksLayer: twin(linksLayer),
+			linkSymbolLayer: twin(linkSymbolLayer), nodesLayer: twin(nodesLayer),
+			labelsLayer: twin(labelsLayer), nodeEls: {}, linkEls: {}, labelEls: {}, incidentLinks: {},
+			labelsByAnchor: {}, labelsByLinkAnchor: {}, custEls: {}, custLblEls: {}, customersByLink: {},
+			labelWorkSkipped: false, lastLayoutScale: lastLayoutScale });
+	}
+	// Marks that describe the MOMENT rather than the document come off before a drawing is put
+	// away: the hover ring, the half-drawn pipe's start, the meter's slide handle, the fading
+	// "just moved" flash. The selection is already gone (applySaved() clears it while this drawing
+	// is still the one on screen), and everything document-derived stays, which is the point.
+	function unmarkLeavingDrawing() {
+		if (hoverPreview) { paintHoverPreview(hoverPreview, false); hoverPreview = null; }
+		if (pendingLinkFrom && nodeEls[pendingLinkFrom] && nodeEls[pendingLinkFrom].circle) {
+			nodeEls[pendingLinkFrom].circle.classList.remove('lpn-node-pending');
+		}
+		if (custHandleEl) { custHandleEl.remove(); custHandleEl = null; }
+		[nodesLayer, labelsLayer].forEach(function (L) {
+			if (!L || !L.querySelectorAll) { return; }
+			Array.prototype.forEach.call(L.querySelectorAll('.lpn-just-dragged'), function (e) {
+				e.classList.remove('lpn-just-dragged');
+			});
+		});
+	}
+	function keepLeavingDrawing(id, sig) {
+		unmarkLeavingDrawing();
+		var d = captureDrawing();
+		showDrawing(d, false);
+		discardKeptDrawing(id);
+		keptDrawings[id] = { sig: sig, drawing: d };
+		keptDrawingOrder.push(id);
+		while (keptDrawingOrder.length > DRAWING_KEEP_MAX) { discardKeptDrawing(keptDrawingOrder[0]); }
+	}
+	/**
+	 * **THE ARRIVAL: put the leaving drawing away, then show the incoming one's or start one.**
+	 * Called by refreshAllFromDocument() with the incoming document installed. Returns true when a
+	 * kept drawing is now on screen and nothing needs building; false means the globals name a
+	 * drawing buildDom() must (re)build, exactly as it always has.
+	 */
+	function settleDrawingForArrival(kept) {
+		var out = outgoingDrawing, id = library.openId, k, sig, retained = false;
+		outgoingDrawing = null;
+		if (out && out.id !== id && keepLayoutEnabled && out.sig &&
+				library.projects.some(function (p) { return p.id === out.id; })) {
+			keepLeavingDrawing(out.id, out.sig);
+			retained = true;
+		}
+		k = id ? keptDrawings[id] : null;
+		if (k) {
+			// Out of the keep either way: shown, it is the drawing on screen; refused, it is a
+			// picture of a document that no longer exists.
+			delete keptDrawings[id];
+			keptDrawingOrder = keptDrawingOrder.filter(function (x) { return x !== id; });
+			sig = storedSignature(id);
+			if (keepLayoutEnabled && kept && sig && k.sig === sig && kept.sig === sig) {
+				// The one on screen goes: kept above, or orphaned (a closed tab's).
+				if (!retained) { discardDrawing(captureDrawing()); }
+				adoptDrawing(k.drawing);
+				showDrawing(k.drawing, true);
+				drawingsReused++;
+				return true;
+			}
+			discardDrawing(k.drawing);
+		}
+		if (retained) { startFreshDrawing(); }
+		drawingsBuilt++;
+		return false;
+	}
+	// What buildDom() does AFTER building, for a drawing that was not built: the marks that belong
+	// to the page's state rather than to the document, re-derived over the elements kept.
+	function reviveKeptDrawing() {
+		invalidateLinkLengths();
+		refreshSelection();
+		refreshFireFlowMarks();
+		// Not applyLabelVisibility(): it answers for the scale in force, which is still the outgoing
+		// project's. refreshAllFromDocument() asks it once the kept view is restored.
 	}
 	/**
 	 * ---- THE WHOLE-PROJECT WRITE WAITS FOR A PAUSE (ROADMAP Task 706) --------------------------
@@ -32038,7 +32353,12 @@ var EngCalcs = EngCalcs || {};
 		// once below (Task 653). Left set, it would run a second full pass a frame after arrival.
 		labelRefreshPending = false;
 		closePopup();
-		perfDebugTime('buildDom', function () { buildDom(); });
+		// **AND THE DRAWING SURVIVES TOO, UNDER THE SAME GUARD** (Task 680's remaining phase): a tab
+		// that comes back unchanged shows the elements it had, and nothing is built.
+		var drawingKept = false;
+		perfDebugTime('drawing', function () { drawingKept = settleDrawingForArrival(kept); });
+		if (drawingKept) { perfDebugTime('keptDrawing', function () { reviveKeptDrawing(); }); }
+		else { perfDebugTime('buildDom', function () { buildDom(); }); }
 		seedDefaultInputs();
 		// EVERY section, not two of them: a different project brings its own units, its own colour
 		// field and its own friction method, and all four sections carry one or more of those.
@@ -32065,8 +32385,14 @@ var EngCalcs = EngCalcs || {};
 
 		// `true` is deferLayout: while the label pass is deferred there is nothing placed to
 		// re-place, and running it here is the duplicate pass this whole change removes.
-		perfDebugTime('fontSizes', function () { refreshFontSizes(labelPassDeferred); });
-		refreshSymbolSizes();
+		// **NOT FOR A KEPT DRAWING, WHICH IS SIZED BELOW, AT THE VIEW IT COMES BACK TO.** Here the
+		// scale in force is still the OUTGOING project's, and sizing kept elements at it drew Net1's
+		// junctions 5x too big after Elm Street and sub-pixel after the geographic Novato --
+		// and applyView() then saw the kept layout scale equal the restored one and resized nothing.
+		if (!drawingKept) {
+			perfDebugTime('fontSizes', function () { refreshFontSizes(labelPassDeferred); });
+			refreshSymbolSizes();
+		}
 		refreshValueColors();
 		renderLabelsLegend();
 		applyMaskLabels();   // the setting belongs to the project, so opening one can change it
@@ -32083,12 +32409,28 @@ var EngCalcs = EngCalcs || {};
 		// type -- the case a warm-up hooked only to the type selector would miss entirely.
 		warmEpanetIfNeeded();
 		perfDebugTime('viewOrFit', function () { restoreViewOrFit(); });
+		if (drawingKept) {
+			// Sizes only, at the scale now in force; the labels are decided just below. A view
+			// still waiting for the canvas will set a scale later, and the kept layout scale is
+			// cleared so that applyView() resizes and relays at it instead of trusting it.
+			if (pendingRestore) { lastLayoutScale = null; }
+			// Hidden-or-not first: asked at the outgoing scale it would mark the kept labels as
+			// owing a pass they do not owe (labelWorkSkipped), and the switch would run one.
+			applyLabelVisibility();
+			perfDebugTime('fontSizes', function () { refreshFontSizes(true); });
+		}
 		// **AND NOW THE LABELS, ONCE, AT THE ZOOM THEY WILL BE READ AT** -- restored whole if this
 		// tab worked them out already and nothing has moved since, and computed from scratch
 		// otherwise. Either way it happens exactly once per switch.
 		labelPassDeferred = false;
 		perfDebugTime('  lblRestore', function () {
-			if (!applyKeptLabelLayout(kept)) { refreshLabelText(); }
+			// A kept drawing already carries its labels where they were. Laid out at this scale
+			// and owing nothing, there is no pass at all; otherwise it is relaid like any zoom.
+			if (drawingKept) {
+				if (lastLayoutScale === state.s && !labelWorkSkipped) {
+					switchRestoreCount++; keptLayoutMiss = '';
+				} else { refreshLabelText(); }
+			} else if (!applyKeptLabelLayout(kept)) { refreshLabelText(); }
 		});
 		// **A DOCUMENT THAT ARRIVES WITH A DURATION IS PRESENTED OVER THAT DURATION** (Task 248,
 		// 2026-08-19). On a slow network an EDIT shows the first reporting time first, but arriving is
@@ -38819,9 +39161,30 @@ var EngCalcs = EngCalcs || {};
 			// in the bottom pane, so this opens the pane on that tab -- open, never toggle: a menu
 			// row that names a view shows it. The icon is the one drawn for it in
 			// lib/Icons.lib.php, a jagged ground line closed down to a datum.
+			// **PROFILE NOW HANGS UNDER GRAPHS** (Tom, 2026-10-01: *"Replace Profile with Graphs
+			// flyout containing Profile, Time series, Frequency."*, Task 640). Each row opens its
+			// bottom-pane tab, as the Profile row did. Contour and System flow are not built, so
+			// there are no placeholder rows.
+			// The Profile row has no icon of its own (Tom, 2026-10-02: *"We can remove the graph icon
+			// from the Profile command now."*); the Graphs row keeps it.
 			{
-				icon: 'profile', label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
-				fn: function () { closeMenu(); openPane('profile'); }
+				icon: 'profile', label: pc.lpn_graphs_menu || 'Graphs', tip: pc.lpn_graphs_menu_tip,
+				submenu: function () {
+					return [
+						{
+							label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
+							fn: function () { closeMenu(); openPane('profile'); }
+						},
+						{
+							label: pc.lpn_ts_menu || 'Time series', tip: pc.lpn_ts_tip,
+							fn: function () { closeMenu(); openPane('timeseries'); }
+						},
+						{
+							label: pc.lpn_freq_menu || 'Frequency', tip: pc.lpn_freq_tip,
+							fn: function () { closeMenu(); openPane('frequency'); }
+						}
+					];
+				}
 			},
 			// **THE FIRST TABLE, NOT THE PROFILE TAB.** paneTables()[0] rather than a literal
 			// 'junctions', so this row cannot drift from the strip it opens; and the pane's own
@@ -39609,6 +39972,7 @@ var EngCalcs = EngCalcs || {};
 		wireScenarioCompareBox();
 		wireRunReportBox();
 		wireStatusReportBox();
+		wireAlternativesBox();
 		wireFullReportBox();
 		buildMenuBar();
 		wireScenarioButton();
@@ -40088,7 +40452,7 @@ var EngCalcs = EngCalcs || {};
 		// button existed because the tables were *"a gap barely discoverable with the bottom pane
 		// button"* (Tom, 2026-08-21) -- the toggle reports whether the pane is open, it does not
 		// name what is inside. That is still true, and he has now weighed it against a toolbar slot
-		// and chosen the slot. The menu rows (Water > Profile, Water > Tables) are unchanged and are
+		// and chosen the slot. The menu rows (Water > Graphs > Profile, Water > Tables) are unchanged and are
 		// the discoverable door; nothing about either feature moved.
 		//
 		// **THE STRIP NO LONGER MIRRORS THE PROJECT MENU, and that is a deliberate loss.** The
@@ -49261,9 +49625,64 @@ var EngCalcs = EngCalcs || {};
 		popup.addEventListener('pointerup', endDrag);
 		popup.addEventListener('pointercancel', endDrag);
 	}
+	// **UP AND DOWN WALK THE PROPERTIES BOX'S FIELDS, AS THEY DO IN EPANET'S PROPERTY EDITOR**
+	// (data-entry clerk's wish 3). The fields are the ones Tab reaches, in Tab's order: DOM order,
+	// skipping what Tab skips (read-only, disabled, tabindex -1, hidden), and only inputs
+	// -- a button is a command, not a field.
+	//
+	// **WHAT IT NEVER TAKES.** Alt, Ctrl, Meta or Shift with the arrow is the browser's. A
+	// <select> keeps both arrows (they change the choice, and a closed select is where a person
+	// is most likely mid-decision), and the walk steps OVER a select rather than stopping on it:
+	// a stop there would trap the walker, every further press silently changing a pattern or a
+	// curve. Tab and the mouse are how a select is reached. An input with a datalist keeps
+	// them for its suggestions. A number field's own stepping is given up on purpose: nearly
+	// every field here is type=number and the step is `any` (one whole unit per press, which no
+	// pipe diameter wants); Alt+Up/Down is left to the browser for anyone who wants it. A
+	// checkbox has no use for the arrows.
+	//
+	// **THE COMMIT IS THE BLUR'S.** Leaving a field fires its own `change`, the very path Tab
+	// and a mouse click take, so nothing here writes a property. The blur may re-render the box
+	// (a diameter edit does), which throws the next field away, so the target is looked up AFTER
+	// the blur, by position.
+	function popupWalkableFields(popup) {
+		var out = [];
+		Array.prototype.forEach.call(popup.querySelectorAll('input, select'), function (el) {
+			var t = (el.type || '').toLowerCase();
+			if (el.disabled || el.readOnly || el.tabIndex < 0 || t === 'hidden') { return; }
+			if (el.tagName.toLowerCase() === 'select') { return; }
+			if (!el.offsetParent && !el.getClientRects().length) { return; }
+			out.push(el);
+		});
+		return out;
+	}
+	function popupArrowKey(e, popup) {
+		var cur = e.target, tag, t, list, idx, dir, tgt;
+		if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') { return; }
+		if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) { return; }
+		if (!cur || !cur.tagName) { return; }
+		tag = cur.tagName.toLowerCase();
+		if (tag !== 'input' || cur.getAttribute('list')) { return; }
+		if (!document.getElementById('lpn_popup_title').contains(cur) &&
+			!document.getElementById('lpn_popup_fields').contains(cur)) { return; }
+		t = (cur.type || '').toLowerCase();
+		if (t === 'radio' || t === 'range' || t === 'button') { return; }
+		list = popupWalkableFields(popup);
+		idx = list.indexOf(cur);
+		if (idx < 0) { return; }
+		e.preventDefault();
+		dir = e.key === 'ArrowDown' ? 1 : -1;
+		if (idx + dir < 0 || idx + dir >= list.length) { return; }
+		cur.blur();
+		list = popupWalkableFields(popup);
+		tgt = list[idx + dir];
+		if (!tgt) { return; }
+		tgt.focus();
+		if (tgt.tagName.toLowerCase() === 'input' && (tgt.type === 'text' || tgt.type === 'number')) { tgt.select(); }
+	}
 	function wirePopup() {
 		var popup = document.getElementById('lpn_popup');
 		document.getElementById('lpn_popup_close').addEventListener('click', closePopup);
+		popup.addEventListener('keydown', function (e) { popupArrowKey(e, popup); });
 		makePanelDraggable(popup, function (at) { popupUserPos = at; });
 		popup.addEventListener('dblclick', function (e) {
 			if (e.target !== popup) { return; }
@@ -53094,9 +53513,21 @@ var EngCalcs = EngCalcs || {};
 			view: currentView()
 		};
 	}
+	// **REDO IS THE SAME SNAPSHOTS RUN THE OTHER WAY** (2026-10-02: on Net1, an elevation typed in
+	// the Tables pane, Ctrl+Z, then Ctrl+Y -- and the 810 never came back, because there was no
+	// Redo at all). undo() pushes the state it is leaving onto redoStack; redo() pushes the state IT
+	// is leaving back onto undoStack. Any NEW change empties redoStack, which is why the clearing
+	// lives in pushUndoSnapshot(), the one door every mutation's snapshot goes through (the
+	// georeferencing wizard's deferred push included) -- a redo after a fresh edit would paste an
+	// abandoned branch of history over it.
+	var redoStack = [];
 	function pushUndoSnapshot(snap) {
-		undoStack.push(snap);
-		if (undoStack.length > UNDO_LIMIT) { undoStack.shift(); }
+		redoStack.length = 0;
+		pushBounded(undoStack, snap);
+	}
+	function pushBounded(stack, snap) {
+		stack.push(snap);
+		if (stack.length > UNDO_LIMIT) { stack.shift(); }
 	}
 	function saveUndoSnapshot() {
 		markEdited(); // one seam, because every real mutation snapshots before it changes anything
@@ -53107,10 +53538,21 @@ var EngCalcs = EngCalcs || {};
 	// paste the previous project's network over it -- silently, and with no way back.
 	// And the Tables' record of which filtered rows were edited (Task 738): it is keyed by id, and
 	// the next project's J1 is not this one's.
-	function clearUndo() { undoStack.length = 0; paneFilterForgetEdits(); }
+	function clearUndo() { undoStack.length = 0; redoStack.length = 0; paneFilterForgetEdits(); }
 	function undo() {
 		if (undoStack.length === 0) { return; }
 		var snap = undoStack.pop();
+		pushBounded(redoStack, makeUndoSnapshot());
+		restoreUndoSnapshot(snap);
+	}
+	function redo() {
+		if (redoStack.length === 0) { return; }
+		var snap = redoStack.pop();
+		pushBounded(undoStack, makeUndoSnapshot());
+		restoreUndoSnapshot(snap);
+	}
+	// Puts the page back to one snapshot, for undo() and redo() alike.
+	function restoreUndoSnapshot(snap) {
 		// **UNDOING A MOVE IS ALSO A MOVE THE USER CANNOT SEE**, and it is the one other place a
 		// junction changes position without the pointer being on it -- so it gets the same mark the
 		// drag gets. Read BEFORE the document is replaced, compared AFTER buildDom() has rebuilt the
@@ -53154,7 +53596,13 @@ var EngCalcs = EngCalcs || {};
 		if (snap.units && applyUnitSelections(snap.units)) { refreshMapStatus(); }
 		rememberUnitSelections();
 		recountNextId();
-		closePopup(); // whatever it referenced may no longer exist post-undo (e.g. undoing an Add)
+		// **THE PROPERTIES BOX STAYS OPEN ON A SUBJECT THAT SURVIVED, AND SHOWS THE RESTORED VALUES.**
+		// It used to close on every undo, because whatever it referenced may no longer exist (undoing
+		// an Add). That is still the answer when the subject has gone, and for a multi-selection,
+		// whose ids are not re-checked here; an element that is still in the document gets its box
+		// re-rendered below, after buildDom(), so it reads what the document now holds.
+		var keepPopup = undoPopupSubjectSurvives();
+		if (!keepPopup) { closePopup(); }
 		// A KIND CHANGE IS THE ONE UNDO THAT REDRAWS THE PAGE AROUND THE DRAWING: the tiles, the
 		// coordinate readout and the camera all describe the frame, not the document, and only this
 		// one undo changes which frame that is. Undoing a georeferencing Finish is the only act that
@@ -53192,12 +53640,22 @@ var EngCalcs = EngCalcs || {};
 		// but a debounced solve is not a guarantee about the next paint, and an undo the user
 		// cannot see is indistinguishable from an undo that did nothing.
 		refreshPaneIfOpen();
+		if (keepPopup) { refreshPopupIfOpen(); }
 		// **AND THE CAMERA, ONLY THEN.** A view is a point in one frame and means nothing in the
 		// other -- the restored grid coordinates would be off screen under the lat/lon view the user
 		// was left in, which reads as a lost drawing. Restored AFTER buildDom() so the scale clamp
 		// is applied against the frame the document is now in.
 		if (coordsChanged && snap.view) { applyView(snap.view); }
 		scheduleSolve();
+	}
+	function undoPopupSubjectSurvives() {
+		var p = currentPopup;
+		if (!p || !panelIsOpen(document.getElementById('lpn_popup'))) { return false; }
+		if (p.kind === 'node') { return !!nodeById(p.id); }
+		if (p.kind === 'link') { return !!linkById(p.id); }
+		if (p.kind === 'customer') { return !!customerById(p.id); }
+		if (p.kind === 'label') { return !!labelById(p.id); }
+		return false;
 	}
 	// Ctrl+Z UNDOES THE MAP, EXCEPT WHERE THE USER IS TYPING (Tom, 2026-08-20, on the Controls
 	// library: "It was scary when I entered an unknown node... could/should there be a CTRL+Z in the
@@ -53248,7 +53706,19 @@ var EngCalcs = EngCalcs || {};
 	}
 	document.addEventListener('keydown', function (e) {
 		if (isTextEntry(e.target) && !paneCellNavigating(e.target)) { return; }
-		if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undo(); }
+		if (!(e.ctrlKey || e.metaKey) || e.altKey) { return; }
+		var k = (e.key || '').toLowerCase();
+		// REDO HAS TWO CHORDS, BECAUSE THE PLATFORMS DO: Ctrl+Y is Windows' (and LibreOffice's on
+		// every platform), Ctrl+Shift+Z / Cmd+Shift+Z is the Mac's and most Linux programs'. Cmd+Y
+		// is NOT taken -- on a Mac it is the browser's History, which nobody pressing it expects to
+		// lose. Shift+Z is checked first: with Shift held, `key` is 'Z', which the plain Ctrl+Z test
+		// below must not read as an undo.
+		// **NOT YET IN THE MAP SHORTCUTS TABLE (lpn_hotkeys_map_def).** A row there is new markup,
+		// and 'lang markup matches English' refuses it until all 26 languages carry the row too --
+		// a translation pass, with Tom's ruling on the English first.
+		if (k === 'z' && e.shiftKey) { e.preventDefault(); redo(); return; }
+		if (k === 'y' && e.ctrlKey && !e.metaKey && !e.shiftKey) { e.preventDefault(); redo(); return; }
+		if (k === 'z') { e.preventDefault(); undo(); }
 	});
 
 	/**
@@ -57792,6 +58262,110 @@ var EngCalcs = EngCalcs || {};
 	}
 	function refreshStatusReportBoxIfOpen() {
 		if (statusBoxIsOpen()) { rebuildStatusReport(); }
+	}
+
+	// ---- SCENARIOS > BASIC MODE, AND THE ALTERNATIVES TABLE (dev/scenario-alternatives.md) -----
+	//
+	// Tom, 2026-09-30: *"In our Scenarios menu, we have an 'Basic mode' command/row that is checked
+	// by default. If they uncheck it, our full Advanced (Bentley) Scenarios UX (to be designed later)
+	// is revealed."* The Advanced UX is NOT designed, so unticking reveals one thing only: a
+	// read-only table of which alternative each scenario uses in each category. Tom may strike it.
+	//
+	// **A BROWSER SETTING, NOT A PROJECT ONE.** The alternatives are derived from the overrides, so
+	// the mode changes no value, no solve and no stored byte -- only how much machinery the person at
+	// this screen wants shown, which a colleague opening the file must not inherit. Written only
+	// when OFF, like lpn_runbox, so a browser that never touched it holds nothing.
+	var LPN_SCNBASIC_KEY = 'lpn_scnbasic';
+	var scenarioBasicMode = true;
+	function loadScenarioBasicPref() {
+		try { scenarioBasicMode = localStorage.getItem(LPN_SCNBASIC_KEY) !== 'off'; } catch (e) {}
+	}
+	function setScenarioBasicMode(on) {
+		scenarioBasicMode = !!on;
+		try {
+			if (scenarioBasicMode) { localStorage.removeItem(LPN_SCNBASIC_KEY); }
+			else { localStorage.setItem(LPN_SCNBASIC_KEY, 'off'); }
+		} catch (e) {}
+		if (scenarioBasicMode) { closeAlternativesBox(); }
+	}
+	loadScenarioBasicPref();
+	function altCategoryLabel(cat) {
+		var pc = EngCalcs.pageConfig || {};
+		return {
+			physical: pc.lpn_alt_cat_physical || 'Physical',
+			demand: pc.lpn_alt_cat_demand || 'Demand',
+			topology: pc.lpn_alt_cat_topology || 'Asset activation',
+			initial: pc.lpn_alt_cat_initial || 'Initial settings',
+			constituent: pc.lpn_alt_cat_constituent || 'Constituent',
+			fireflow: pc.lpn_alt_cat_fireflow || 'Fire flow',
+			energy: pc.lpn_alt_cat_energy || 'Energy cost',
+			userdata: pc.lpn_alt_cat_userdata || 'Custom properties',
+			text: pc.lpn_alt_cat_text || 'Text'
+		}[cat] || cat;
+	}
+	function altBoxEl() { return document.getElementById('lpn_alt_box'); }
+	function altBoxIsOpen() {
+		var box = altBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	// One row per scenario, one column per category. A cell names the alternative: Base's own word
+	// for a Base alternative, the scenario's name and its count of local values for its own.
+	// tbody -> its table -> thead -> the heading row -> the last heading.
+	function markLastHeading(tbody, cls) {
+		var hr = tbody.parentNode.children[0].children[0], th = hr.children[hr.children.length - 1];
+		th.className += ' ' + cls;
+	}
+	function rebuildAlternativesTable() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_alt_report'), body,
+			baseWord = pc.lpn_scenario_base || 'Base';
+		if (!host) { return; }
+		host.innerHTML = '';
+		// **THE DEMAND MULTIPLIER IS A CALCULATION OPTION, NOT AN ALTERNATIVE** (Tom, 2026-09-30:
+		// *"Demand multiplier: OK. A Demand Multiplier column with the alternatives?"*; Mary and Sue
+		// advised it stay a per-scenario option, as Bentley keeps it in Calculation Options). So it
+		// is the last column, after a divider, and its heading carries the option's own tip.
+		body = ffTable(host, [pc.lpn_scenario_label || 'Scenario'].concat(LPN_ALT_CATEGORIES.map(altCategoryLabel),
+			[[pc.bpn_demand_mult || 'Demand multiplier', pc.lpn_settings_demand_multiplier_tip]]));
+		markLastHeading(body, 'lpn-alt-calcopt');
+		body.parentNode.className += ' lpn-alt-table';
+		scenariosForDisplay().forEach(function (s) {
+			var tr = ffEl('tr', null, null, body), alts = alternativesOf(s);
+			ffCell(tr, scenarioDisplayName(s));
+			LPN_ALT_CATEGORIES.forEach(function (cat) {
+				var a = alts[cat];
+				ffCell(tr, a.isBase ? baseWord : scenarioDisplayName(s) + ' (' + a.count + ')');
+			});
+			// Base shows the project's value (1 when it states none); a scenario shows its own, and
+			// BLANK means it inherits the project's (Sue).
+			var dm = s.isBase ? (settings.hydraulics || {}).demandMultiplier : s.demandMultiplier;
+			if (s.isBase && !(typeof dm === 'number' && isFinite(dm))) { dm = 1; }
+			ffCell(tr, (typeof dm === 'number' && isFinite(dm)) ? String(dm) : '', 'lpn-alt-calcopt');
+		});
+		ffEl('p', 'lpn-ff-note', pc.lpn_alt_note, host);
+	}
+	// Position and size for the life of the page only: remembering them would be a new key in the
+	// browser for a view Tom has not yet decided to keep.
+	var altboxLayout = newBoxLayout();
+	function openAlternativesBox() {
+		var box = altBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		rebuildAlternativesTable();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, altboxLayout); });
+		initTipsIn(box);
+	}
+	function closeAlternativesBox() { if (altBoxIsOpen()) { hidePanel(altBoxEl()); } }
+	function wireAlternativesBox() {
+		var box = altBoxEl(), x = document.getElementById('lpn_alt_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeAlternativesBox); }
+		makePanelDraggable(box);
+		addPanelResizeGrip(box);
+	}
+	function refreshAlternativesBoxIfOpen() {
+		if (altBoxIsOpen()) { rebuildAlternativesTable(); }
 	}
 
 	// ---- THE FULL REPORT: every node and every link, at every reporting time step -----------------

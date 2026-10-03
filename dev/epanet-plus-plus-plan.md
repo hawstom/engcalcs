@@ -106,7 +106,7 @@ campaign needed; it is one more honestly labeled door.
    viewport line). Not built here — this session may not create a new repo or touch sibling sites.
 4. **(AI)** Build `epanetpp.org` as a bare `.htaccess`-only doc root with the 301 above.
 5. **(Tom, cPanel)** Confirm the two addon domains (both seen 2026-09-17) point at the new roots.
-6. **(Tom, cPanel)** Set PHP to `ea-php83` on both IF either ever serves `.php` — Option A is pure
+6. **(Tom, cPanel)** Set PHP to `ea-php85` on both IF either ever serves `.php` — Option A is pure
    static + `.htaccess` and should need none; confirm before assuming so.
 7. **(Whoever edits `.htaccess`)** Test `Options -Indexes` needs `AllowOverride Options` on the new
    hosts before relying on it — this has 500'd a whole suite before on a host lacking the grant.
@@ -167,7 +167,7 @@ spoofed one) and the per-host legs added to `canonical_origin_check.php`.
 
 ### Host setup for Tom (cPanel account; docroot `~/addon_html/epanet-plus-plus.org`)
 
-1. **PHP version first.** MultiPHP Manager → set `epanet-plus-plus.org` to **ea-php83**. A new
+1. **PHP version first.** MultiPHP Manager → set `epanet-plus-plus.org` to **ea-php85**. A new
    domain defaults to ea-php56, on which every page 500s (`??` in `lib/config.inc.php`). cPanel
    writes its handler block into the docroot `.htaccess`; leave that block alone.
 2. **The suite symlink**, exactly as librewaternet.org has it (check its target first):
