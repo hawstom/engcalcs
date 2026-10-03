@@ -39,6 +39,7 @@ async function shoot(dir) {
 		await page.addStyleTag({ content: FREEZE });
 		await page.waitForTimeout(2500);
 	};
+	const lang = (key) => page.evaluate((k) => EngCalcs.pageConfig[k], key);
 	const rowClick = async (menu, label) => {
 		await page.click('#lpn_menu_' + menu);
 		await page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
@@ -61,15 +62,16 @@ async function shoot(dir) {
 		await snap('lpn-file-menu-open');
 		await open('Looped-Network.php');
 		const cards = await page.$$('#lpn_examples_pane .lpn-example-card');
+		const net3Title = await lang('lpn_ex_net3_title');
 		let net3 = null;
-		for (const c of cards) { const t = await c.$eval('.lpn-example-title', (e) => e.textContent.trim()); if (t === 'EPANET Net3') { net3 = c; } }
+		for (const c of cards) { const t = await c.$eval('.lpn-example-title', (e) => e.textContent.trim()); if (t === net3Title) { net3 = c; } }
 		await cards[1].hover(); await snap('lpn-gallery-card-hover');
 		await net3.evaluate((e) => e.click()); await page.waitForTimeout(2500);
 		await page.mouse.move(5, 5);
 		await snap('lpn-net3');
-		await rowClick('project', 'Settings'); await snap('lpn-net3-settings');
-		await rowClick('project', 'Tables'); await snap('lpn-net3-tables');
-		await rowClick('edit', 'Find and replace'); await snap('lpn-net3-find');
+		await rowClick('project', await lang('lpn_tool_settings')); await snap('lpn-net3-settings');
+		await rowClick('project', await lang('lpn_tables_menu')); await snap('lpn-net3-tables');
+		await rowClick('edit', await lang('lpn_find_menu')); await snap('lpn-net3-find');
 		await page.click('#lpn_settings_box button[aria-label], #lpn_settings_box .lpn-popover-x', { timeout: 2000 }).catch(() => {});
 		await page.evaluate(() => { for (const id of ['lpn_settings_box', 'lpn_findbox']) { const e = document.getElementById(id); if (e) { e.style.display = 'none'; } } });
 		const pt = await page.evaluate(() => { for (const n of document.querySelectorAll('#lpn_canvas .lpn-node')) { const r = n.getBoundingClientRect(); if (r.x > 480 && r.x < 780 && r.y > 200 && r.y < 560) { return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; } } return null; });
