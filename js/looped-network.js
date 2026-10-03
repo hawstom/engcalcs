@@ -5009,6 +5009,7 @@ var EngCalcs = EngCalcs || {};
 				// scenarioId is what makes a row a scenario, so a reader of the rows (the harness)
 				// never has to tell one from a command by its position or its label.
 				scenarioId: s.id,
+				variable: true,   // a name from the project: its letter must not move the fixed rows' (Task 748)
 				// A tick on the row you are already in, the way every view menu in this file's
 				// neighbourhood marks a current choice. No icon column entry, so the marker cannot
 				// be mistaken for a command's glyph.
@@ -37442,10 +37443,33 @@ var EngCalcs = EngCalcs || {};
 				var obox = opened && document.getElementById(opened);
 				var first = obox && (obox.querySelector('input:not([type=hidden]):not(:disabled), select:not(:disabled), textarea:not(:disabled)')
 					|| obox.querySelector('button:not(:disabled), [tabindex]:not([tabindex="-1"])'));
-				if (first) { first.focus(); }
-				else if (ret && ret !== document.body && ret.isConnected && ret.focus) { ret.focus(); }
-				else if (opener.isConnected) { opener.focus(); }
+				if (first) { first.focus(); return; }
+				if (ret && ret !== document.body && ret.isConnected && ret.focus && ret.getClientRects().length > 0) {
+					ret.focus();
+					if (document.activeElement === ret) { return; }
+				}
+				// No place to go back to (the menu was opened from the page itself): the menu's button.
+				if (!(ret && ret !== document.body) && opener.isConnected && opener.getClientRects().length > 0) { opener.focus(); return; }
+				// The place it came from is gone or hidden (W, G, P switches the bottom pane's tab away
+				// from the cell): the pane the command showed, else the map. Never the page body,
+				// where nothing answers the keyboard's next press the way the person expects.
+				menuFocusSane();
 			}, 0);
+		}
+	}
+	function menuFocusSane() {
+		var pane = document.getElementById('lpn_pane');
+		if (pane && pane.getClientRects().length > 0) {
+			var tab = pane.querySelector('[role=tab][aria-selected="true"]');
+			var f = (tab && tab.getClientRects().length > 0 && tab)
+				|| Array.prototype.filter.call(pane.querySelectorAll('button:not(:disabled), select:not(:disabled), input:not([type=hidden]):not(:disabled), [tabindex]:not([tabindex="-1"])'),
+					function (el) { return el.getClientRects().length > 0; })[0];
+			if (f) { f.focus(); if (document.activeElement === f) { return; } }
+		}
+		var cv = document.getElementById('lpn_canvas');
+		if (cv && cv.focus) {
+			if (!cv.hasAttribute('tabindex')) { cv.setAttribute('tabindex', '-1'); }
+			cv.focus({ preventScroll: true });
 		}
 	}
 	// **EVERY ROW GETS A LETTER, AND NOBODY ASSIGNS ONE** (Tom, 2026-10-03: *"Every appropriate menu
@@ -37462,7 +37486,8 @@ var EngCalcs = EngCalcs || {};
 	// has; Arabic, Hebrew, Cyrillic, Devanagari and the rest are typed directly on their own layouts
 	// and keep their own letters (e.key matches them). Combining marks never qualify. Pointer-only
 	// rows, headings, separators and hidden rows get none; a disabled row keeps its letter, so the
-	// letters do not shuffle as rows enable.
+	// letters do not shuffle as rows enable. A row whose label is CONTENT (a scenario name, a file
+	// name) says `variable: true`, and takes its letter only after every fixed row has its own.
 	function menuMnemonicChar(ch) {
 		if (!/^\p{L}$/u.test(ch)) { return ''; }
 		if (/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Script=Ethiopic}\p{Script=Yi}]/u.test(ch)) { return ''; }
@@ -37471,8 +37496,14 @@ var EngCalcs = EngCalcs || {};
 	}
 	function menuMnemonics(rows) {
 		var used = {}, out = [], digits = '1234567890abcdefghijklmnopqrstuvwxyz', di = 0;
-		rows.forEach(function (r, i) {
-			out[i] = '';
+		var idx = rows.map(function (r, i) { return i; });
+		var isVar = function (i) { return !!(rows[i] && rows[i].variable); };
+		rows.forEach(function (r, i) { out[i] = ''; });
+		// Fixed rows first, as if the `variable: true` rows (scenario names, recent files -- project
+		// or browser content) were absent, so a fixed row's letter never depends on what is in the
+		// project; the variable rows then share what is left.
+		idx.filter(function (i) { return !isVar(i); }).concat(idx.filter(isVar)).forEach(function (i) {
+			var r = rows[i];
 			if (!r || r.hidden || r.separator || r.heading || r.pointerOnly || !(r.fn || r.submenu)) { return; }
 			var chars = Array.from(String(r.label || '')), pick = '', j, c;
 			for (j = 0; j < chars.length && !pick; j++) {
@@ -37505,7 +37536,9 @@ var EngCalcs = EngCalcs || {};
 		var rows = Array.prototype.slice.call(list.querySelectorAll('button.lpn-menu-row[data-mnemonic]'));
 		var k = e.key.toLowerCase(), m = /^(?:Key([A-Z])|Digit([0-9]))$/.exec(e.code || '');
 		var byKey = rows.filter(function (b) { return b.getAttribute('data-mnemonic') === k; })[0];
-		if (byKey || !m) { return byKey || null; }
+		// The physical position answers only for a layout that does not type Latin there: a Latin
+		// letter with no row of its own is simply no row (a Dvorak "b" must never run QWERTY "n").
+		if (byKey || !m || /^[\p{Script=Latin}0-9]$/u.test(e.key)) { return byKey || null; }
 		var phys = (m[1] || m[2]).toLowerCase();
 		return rows.filter(function (b) { return b.getAttribute('data-mnemonic') === phys; })[0] || null;
 	}
@@ -38695,6 +38728,7 @@ var EngCalcs = EngCalcs || {};
 			recentFiles.forEach(function (rec) {
 				recentRows.push({
 					icon: 'open',
+					variable: true,   // a file name: never takes a fixed row's letter (Task 748)
 					// The file NAME, not the project name: this list is about files on the disk, and
 					// the project inside one may since have been renamed or may not exist here at all.
 					label: rec.name,

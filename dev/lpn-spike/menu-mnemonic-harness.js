@@ -263,6 +263,106 @@ async function rowSuite(page, label, opts) {
 	await page.mouse.click(700, 500);
 }
 
+// ---- the four pre-review defects (Perry, 2026-10-03, on f783fe5f) ----------------------------------
+async function preReviewSuite(browser, open) {
+	console.log('\n=== pre-review fixes ===');
+	// An example opened FIRST (a gallery card stops answering clicks once a chord has run).
+	const openNet1 = async (pg) => {
+		await pg.evaluate(() => {
+			const cards = [...document.querySelectorAll('#lpn_examples_pane .lpn-example-card')];
+			const card = cards.find((c) => ((c.querySelector('.lpn-example-title') || c).textContent || '').trim() === 'EPANET Net1') || cards[0];
+			card.click();
+		});
+		await pg.waitForTimeout(1500);
+	};
+	const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+	const page = await open(ctx, '');
+	await openNet1(page);
+	const pc = await page.evaluate(() => EngCalcs.pageConfig);
+	const sub2 = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list2 button.lpn-menu-row'))
+		.map((b) => ({ t: b.textContent.replace(/[▸\s]+$/, '').trim(), m: b.getAttribute('data-mnemonic') || '' })));
+	const key = (k, code) => page.evaluate(([k, code]) => (document.activeElement || document.body).dispatchEvent(
+		new KeyboardEvent('keydown', { key: k, code: code, bubbles: true, cancelable: true })), [k, code]);
+
+	// (1) A fixed row's letter does not depend on the project's scenario names.
+	const fixedLetters = async () => {
+		await page.keyboard.press('Alt+Shift+W');
+		await page.keyboard.press('c');   // Scenarios
+		const rs = await sub2();
+		const want = [pc.lpn_scenario_new, pc.lpn_scenario_rename, pc.lpn_scenario_delete, pc.lpn_scenario_basic];
+		const got = want.map((w) => (rs.find((r) => r.t === w || r.t.endsWith(w)) || { m: '?' }).m);
+		return { got, rows: rs };
+	};
+	const before = await fixedLetters();
+	await page.evaluate(() => { window.prompt = () => 'Delta'; window.prompt2 = 1; });
+	const newM = before.got[0];
+	await page.keyboard.press(newM);   // New scenario..., named Delta (takes D first if allowed)
+	await page.waitForTimeout(300);
+	await page.keyboard.press('Escape'); await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
+	const after = await fixedLetters();
+	ok('the scenario Delta was created', after.rows.some((r) => /Delta/.test(r.t)), JSON.stringify(after.rows));
+	ok('New/Rename/Delete scenario and Basic mode keep their letters when a scenario is added', before.got.join('') === after.got.join('') && !before.got.includes('?'),
+		before.got.join('') + ' -> ' + after.got.join(''));
+	await page.keyboard.press('Escape'); await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
+
+	// (3) A Latin key with no row never falls back to the QWERTY position: Dvorak "b" is code KeyN,
+	// and N in Edit is Delete network.
+	await page.evaluate(() => { window.__confirms = 0; window.confirm = () => { window.__confirms++; return false; }; });
+	await page.keyboard.press('Alt+Shift+E');
+	const nRow = await page.evaluate(() => !!document.querySelector('#lpn_menu_list button.lpn-menu-row[data-mnemonic="n"]'));
+	const hasB = await page.evaluate(() => !!document.querySelector('#lpn_menu_list button.lpn-menu-row[data-mnemonic="b"]'));
+	await key('b', 'KeyN');
+	ok('Dvorak "b" (code KeyN) in Edit runs nothing', nRow && !hasB && (await page.evaluate(() => window.__confirms)) === 0
+		&& (await page.evaluate(() => document.getElementById('lpn_menu_popup').style.display === 'block')), 'n row ' + nRow + ', b row ' + hasB);
+	await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
+	// ...while a non-Latin layout still reaches a Latin letter by position: Russian "п" is KeyG.
+	await page.keyboard.press('Alt+Shift+W');
+	await key('п', 'KeyG');
+	ok('Russian-layout "п" (code KeyG) in Water opens Graphs', await page.evaluate(() => document.getElementById('lpn_menu_popup2').style.display === 'block'));
+	await page.keyboard.press('Escape'); await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
+
+	// (2) After W, G, P from a table cell the cell is hidden by the tab switch; focus must not fall
+	// to the page body.
+	await page.keyboard.press('Alt+Shift+W');
+	await page.keyboard.press('t');   // Tables
+	await page.waitForTimeout(300);
+	const cellOk = await page.evaluate(() => {
+		const tabs = document.getElementById('lpn_pane_tabs');
+		const c = Array.from(document.querySelectorAll('#lpn_pane .on td, #lpn_pane .on [tabindex="0"], #lpn_pane .on input'))
+			.filter((el) => el.getClientRects().length > 0 && !(tabs && tabs.contains(el)))[0];
+		if (!c) { return ''; }
+		if (!c.hasAttribute('tabindex') && c.tagName === 'TD') { c.tabIndex = 0; }
+		c.id = c.id || 'km_tablecell'; c.focus();
+		return document.activeElement === c ? c.id : '';
+	});
+	await page.keyboard.press('Alt+Shift+W'); await page.keyboard.press('g'); await page.keyboard.press('p');
+	await page.waitForTimeout(300);
+	const fx = await page.evaluate((id) => {
+		const a = document.activeElement, c = document.getElementById(id);
+		return { body: a === document.body || !a, inPane: !!document.getElementById('lpn_pane') && document.getElementById('lpn_pane').contains(a),
+			canvas: a && a.id === 'lpn_canvas', what: a ? a.tagName + '#' + a.id : '' };
+	}, cellOk);
+	ok('W, G, P from a table cell (' + cellOk + '), which the Profile tab hides: focus is in the pane or on the map, not the body',
+		!!cellOk && !fx.body && (fx.inPane || fx.canvas), JSON.stringify(fx));
+	await ctx.close();
+
+	// (4) With the Calculate run box up, the first Enter on a keyboard-opened menu row runs the row.
+	const c2 = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+	const p2 = await open(c2, '');
+	await openNet1(p2);
+	await p2.evaluate(() => window.EngCalcs.lpnTimeRunNow());
+	for (let i = 0; i < 60 && (await p2.evaluate(() => { const s = window.EngCalcs.lpnTimeRunBoxState(); return !s.open || s.phase === 'running'; })); i++) { await p2.waitForTimeout(250); }
+	const boxUp = await p2.evaluate(() => window.EngCalcs.lpnTimeRunBoxState().open);
+	ok('the run box is showing (precondition)', boxUp);
+	await p2.keyboard.press('Alt+Shift+E');
+	const focused = await p2.evaluate(() => document.activeElement.textContent.trim());
+	await p2.keyboard.press('Enter');
+	await p2.waitForTimeout(200);
+	ok('Enter on Edit > ' + focused + ' runs it: the menu closes, the run box is not what took the key',
+		await p2.evaluate(() => document.getElementById('lpn_menu_popup').style.display !== 'block' && window.EngCalcs.lpnTimeRunBoxState().open));
+	await c2.close();
+}
+
 async function main() {
 	let playwright;
 	try { playwright = require(path.join(__dirname, '..', 'browser-pass', 'node_modules', 'playwright-core')); }
@@ -319,6 +419,8 @@ async function main() {
 		});
 		ok('in RTL the badge sits at the inline-end (left) corner and reads as a Latin letter', geo.badgeNearLeft && geo.text === 'F', JSON.stringify(geo));
 		await rtl.close();
+
+		await preReviewSuite(browser, open);
 
 		const zc = await browser.newContext({ viewport: { width: 1440, height: 900 } });
 		await rowSuite(await open(zc, '&lang=zh'), 'Chinese, digits', { digits: true });
