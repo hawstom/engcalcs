@@ -152,6 +152,9 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		// The Notes box (Tom, 2026-09-28): it left VIEW_POPOVERS for the standing-box shell and is
 		// now draggable and resizeable like the boxes above it, so a phone wants the same fill.
 		['openNotesBox', 'the Notes box'],
+		// The Alternatives table (dev/scenario-alternatives.md): one row per scenario and nine
+		// category columns, the widest case of all, so a phone wants the whole window for it.
+		['openAlternativesBox', 'the alternatives box'],
 		// The Tables and Hotkeys box (Task 745): the same non-hog shell and memory as Notes, built
 		// the same way and for the same reason -- reference prose a reader keeps open beside the
 		// work, so a phone wants the same fill.

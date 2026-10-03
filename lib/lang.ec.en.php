@@ -2926,6 +2926,19 @@ $ec_lang['lpn_scenario_deactivated']='{id} is out of the network in {scenario}. 
 $ec_lang['lpn_scenario_push_btn']='Apply Base values to all scenarios';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_tip']='Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.';
+$ec_lang['lpn_scenario_basic']='Basic mode';
+$ec_lang['lpn_scenario_basic_tip']='Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.';
+$ec_lang['lpn_alt_title']='Alternatives preview';
+$ec_lang['lpn_alt_note']='Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.';
+$ec_lang['lpn_alt_cat_physical']='Physical';
+$ec_lang['lpn_alt_cat_demand']='Demand';
+$ec_lang['lpn_alt_cat_topology']='Asset activation';
+$ec_lang['lpn_alt_cat_initial']='Initial settings';
+$ec_lang['lpn_alt_cat_constituent']='Constituent';
+$ec_lang['lpn_alt_cat_fireflow']='Fire flow';
+$ec_lang['lpn_alt_cat_energy']='Energy cost';
+$ec_lang['lpn_alt_cat_userdata']='Custom properties';
+$ec_lang['lpn_alt_cat_text']='Text';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_confirm']='Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this.';
 $ec_lang['lpn_scenario_push_scenarios']='Scenarios affected:';

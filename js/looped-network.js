@@ -4640,6 +4640,140 @@ var EngCalcs = EngCalcs || {};
 		scenarios.forEach(function (s) { delete s.overrides[key]; });
 	}
 
+	// ---- SCENARIO ALTERNATIVES: BENTLEY'S LAYER, DERIVED (dev/scenario-alternatives.md) --------
+	//
+	// Tom, 2026-09-30: *"I think we can implement Bentley scenarios and hide it from users until we
+	// have a UX design."* In Bentley's model a scenario names one ALTERNATIVE per CATEGORY, and an
+	// alternative inherits from a parent alternative. Tom's Basic-mode rules make that tree a pure
+	// function of what this page already stores: Base uses the Base alternative of every category,
+	// and a scenario gets its own child of that Base alternative in a category exactly when it holds
+	// a local value of a property in it. So each scenario's `overrides`, grouped by category, ARE
+	// its child alternatives, and **NOTHING HERE IS STORED** -- no file changes, no migration, and
+	// removing a scenario's last local value in a category makes that child alternative vanish.
+	//
+	// **effective() IS DELIBERATELY NOT ROUTED THROUGH THIS.** It runs per property per element per
+	// render and per solve, and in Basic mode its one override lookup already IS the one-hop chain.
+	// dev/lpn-spike/scenario-alternatives-harness.js holds the two equal: alternativeOverrides()
+	// rebuilt from the chain must be the scenario's own override map, element by element.
+	//
+	// **EVERY OVERRIDABLE PROPERTY IS IN EXACTLY ONE CATEGORY**, and the harness fails a property in
+	// LPN_OVERRIDABLE that is missing here. A custom property (Task 636), and any stray name an old
+	// file carries, is User data -- so "exactly one" holds for every key a file can contain.
+	// The demand multiplier is NOT here: it is a scenario's calculation option, as in Bentley.
+	var LPN_ALT_CATEGORIES = ['physical', 'demand', 'topology', 'initial', 'constituent', 'fireflow', 'energy', 'userdata', 'text'];
+	var LPN_ALT_CATEGORY_OF = {
+		node: { x: 'physical', y: 'physical', emitter: 'physical', head: 'physical',
+			demand: 'demand', demands: 'demand',
+			active: 'topology',
+			level: 'initial',
+			initQuality: 'constituent', tankCoeff: 'constituent', sourceType: 'constituent',
+			sourceQuality: 'constituent', sourcePattern: 'constituent',
+			fireFlow: 'fireflow' },
+		link: { diameter: 'physical', roughness: 'physical', k: 'physical', length: 'physical',
+			typeId: 'physical', fittingsId: 'physical', curveId: 'physical', efficCurveId: 'physical',
+			active: 'topology',
+			status: 'initial', setting: 'initial',
+			bulkCoeff: 'constituent', wallCoeff: 'constituent',
+			energyPrice: 'energy', energyPattern: 'energy' },
+		// A Text's `active` is not topology: it takes nothing out of the solve, and Bentley keeps
+		// annotation outside the model altogether.
+		label: { text: 'text', active: 'text' }
+	};
+	function categoryOf(prop, group) {
+		var g = LPN_ALT_CATEGORY_OF[group || 'node'] || {};
+		return Object.prototype.hasOwnProperty.call(g, prop) ? g[prop] : 'userdata';
+	}
+	// The group an override KEY belongs to, asked of ovKeyFor() itself so the key format is still
+	// spelled in one place (dev/scripts/scenario_seam_check.php).
+	function ovKeyGroup(key) {
+		var groups = ['link', 'label', 'node'], i;
+		for (i = 0; i < groups.length; i++) {
+			if (String(key).indexOf(ovKeyFor(groups[i], '')) === 0) { return groups[i]; }
+		}
+		return 'node';
+	}
+	function altCopy(v) { return (v && typeof v === 'object') ? JSON.parse(JSON.stringify(v)) : v; }
+	function altBase(cat) {
+		var b = baseScenario();
+		return { id: b.id + ':' + cat, category: cat, parent: null, scenario: b.id, isBase: true, values: {}, count: 0 };
+	}
+	/**
+	 * **ONE ALTERNATIVE PER CATEGORY, FOR ONE SCENARIO**, as {category: alternative}. An alternative
+	 * is {id, category, parent, scenario, isBase, values, count}: `values` is {ovKey: {prop: value}}
+	 * holding only its LOCAL values (copies, so no reader can edit an override by holding them),
+	 * and a Base alternative's are empty because its values are the elements' own.
+	 */
+	function alternativesOf(scn) {
+		var out = {}, own = {};
+		LPN_ALT_CATEGORIES.forEach(function (cat) { out[cat] = altBase(cat); });
+		if (!scn || scn.isBase) { return out; }
+		Object.keys(scn.overrides || {}).forEach(function (key) {
+			var group = ovKeyGroup(key), ov = scn.overrides[key];
+			Object.keys(ov || {}).forEach(function (prop) {
+				var cat = categoryOf(prop, group), a = own[cat];
+				if (!a) {
+					a = own[cat] = { id: scn.id + ':' + cat, category: cat, parent: baseScenario().id + ':' + cat,
+						scenario: scn.id, isBase: false, values: {}, count: 0 };
+				}
+				if (!a.values[key]) { a.values[key] = {}; }
+				a.values[key][prop] = altCopy(ov[prop]);
+				a.count++;
+			});
+		});
+		Object.keys(own).forEach(function (cat) { out[cat] = own[cat]; });
+		return out;
+	}
+	function alternativeFor(scn, cat) { return alternativesOf(scn)[cat] || null; }
+	// Every alternative the project has: the Base one of each category, then each scenario's
+	// children, in stored scenario order.
+	function allAlternatives() {
+		var list = LPN_ALT_CATEGORIES.map(altBase);
+		scenarios.forEach(function (s) {
+			if (s.isBase) { return; }
+			var alts = alternativesOf(s);
+			LPN_ALT_CATEGORIES.forEach(function (cat) { if (!alts[cat].isBase) { list.push(alts[cat]); } });
+		});
+		return list;
+	}
+	function alternativeById(id) {
+		var all = allAlternatives(), i;
+		for (i = 0; i < all.length; i++) { if (all[i].id === id) { return all[i]; } }
+		return null;
+	}
+	/**
+	 * **THE RESOLVE CHAIN**: scenario -> its alternative for the property's category -> that
+	 * alternative's local value, else its parent's, up to the category's Base alternative, whose
+	 * value is the element's own. Returns {found, value, alternative}; found=false means "the
+	 * element's own", which effective() then reads through the pipe type, the auto length and the
+	 * rest of its layers exactly as it always has.
+	 */
+	function resolveThroughAlternatives(scn, el, prop) {
+		var key = ovKey(el), alt = alternativeFor(scn, categoryOf(prop, elGroup(el))), vals;
+		while (alt) {
+			vals = alt.values[key];
+			// Row 0's base IS the breakdown's first row once an alternative holds the whole list
+			// (R-369), the same rule effective() applies; both are in the Demand category.
+			if (prop === 'demand' && vals && Array.isArray(vals.demands) && vals.demands.length) {
+				return { found: true, value: vals.demands[0].base, alternative: alt };
+			}
+			if (vals && Object.prototype.hasOwnProperty.call(vals, prop)) {
+				return { found: true, value: vals[prop], alternative: alt };
+			}
+			alt = alt.parent ? alternativeById(alt.parent) : null;
+		}
+		return { found: false, value: undefined, alternative: alternativeFor(baseScenario(), categoryOf(prop, elGroup(el))) };
+	}
+	// The override map one element would have if it were REBUILT from the alternatives, category by
+	// category -- the object effective() reads. Equal to the stored one is the whole claim of "A".
+	function alternativeOverrides(scn, el) {
+		var key = ovKey(el), out = {}, alts = alternativesOf(scn);
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			var v = alts[cat].values[key];
+			if (v) { Object.keys(v).forEach(function (p) { out[p] = v[p]; }); }
+		});
+		return Object.keys(out).length ? out : undefined;
+	}
+
 	// ---- the scenario selector, and its "what am I working on right now" readout ----
 	// The count is only cheap to compute because a scenario IS its overrides -- there is no second
 	// document to diff against.
@@ -4681,6 +4815,8 @@ var EngCalcs = EngCalcs || {};
 			(pc.lpn_scenario_label || 'Scenario') + ': ' + scenarioDisplayName(scn)
 			+ ' | ' + (pc.lpn_scenario_overrides || 'No. of custom values') + ': ' + overrideCount(scn));
 		refreshScenarioTip(btn);
+		// Every override written or cleared lands here, so the Alternatives table follows it.
+		refreshAlternativesBoxIfOpen();
 		// The scenario name is user-typed and can be long, so the bottom band's width is not knowable
 		// in advance -- a bottom legend re-dodges around whatever it now measures.
 		placeLegends();
@@ -4857,6 +4993,9 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, rows = [], scn = activeScenario();
 		scenariosForDisplay().forEach(function (s) {
 			rows.push({
+				// scenarioId is what makes a row a scenario, so a reader of the rows (the harness)
+				// never has to tell one from a command by its position or its label.
+				scenarioId: s.id,
 				// A tick on the row you are already in, the way every view menu in this file's
 				// neighbourhood marks a current choice. No icon column entry, so the marker cannot
 				// be mistaken for a command's glyph.
@@ -4918,6 +5057,21 @@ var EngCalcs = EngCalcs || {};
 			// push into a push against whatever it happened to hand over.
 			fn: function () { pushBaseToScenarios(); }
 		});
+		// **BASIC MODE** (Tom, 2026-09-30), ticked by default. Unticked reveals the one thing the
+		// Advanced scenarios view has so far: the read-only Alternatives table. See
+		// setScenarioBasicMode() for why the answer lives in the browser.
+		rows.push({ separator: true });
+		rows.push({
+			label: (scenarioBasicMode ? '✓ ' : '  ') + (pc.lpn_scenario_basic || 'Basic mode'),
+			tip: pc.lpn_scenario_basic_tip,
+			fn: function () { setScenarioBasicMode(!scenarioBasicMode); }
+		});
+		if (!scenarioBasicMode) {
+			rows.push({
+				icon: 'scenarios', label: pc.lpn_alt_title || 'Alternatives preview',
+				fn: function () { openAlternativesBox(); }
+			});
+		}
 		return rows;
 	}
 	function openScenarioMenu(anchor) { openMenu(anchor, scenarioMenuRows()); }
@@ -30524,7 +30678,7 @@ var EngCalcs = EngCalcs || {};
 			// page-title toggle went with the titles; a browser that used it before still carries
 			// the key, and "exactly as a brand-new visitor would see it" has to mean that too.
 			// Erasing a key we no longer write is the one direction that is always safe.
-			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY];
+			'lpn_show_titles', 'lpn_menucue', AREA_HINT_KEY, LPN_RUNBOX_KEY, LPN_SCNBASIC_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -39671,6 +39825,7 @@ var EngCalcs = EngCalcs || {};
 		wireScenarioCompareBox();
 		wireRunReportBox();
 		wireStatusReportBox();
+		wireAlternativesBox();
 		wireFullReportBox();
 		buildMenuBar();
 		wireScenarioButton();
@@ -57960,6 +58115,110 @@ var EngCalcs = EngCalcs || {};
 	}
 	function refreshStatusReportBoxIfOpen() {
 		if (statusBoxIsOpen()) { rebuildStatusReport(); }
+	}
+
+	// ---- SCENARIOS > BASIC MODE, AND THE ALTERNATIVES TABLE (dev/scenario-alternatives.md) -----
+	//
+	// Tom, 2026-09-30: *"In our Scenarios menu, we have an 'Basic mode' command/row that is checked
+	// by default. If they uncheck it, our full Advanced (Bentley) Scenarios UX (to be designed later)
+	// is revealed."* The Advanced UX is NOT designed, so unticking reveals one thing only: a
+	// read-only table of which alternative each scenario uses in each category. Tom may strike it.
+	//
+	// **A BROWSER SETTING, NOT A PROJECT ONE.** The alternatives are derived from the overrides, so
+	// the mode changes no value, no solve and no stored byte -- only how much machinery the person at
+	// this screen wants shown, which a colleague opening the file must not inherit. Written only
+	// when OFF, like lpn_runbox, so a browser that never touched it holds nothing.
+	var LPN_SCNBASIC_KEY = 'lpn_scnbasic';
+	var scenarioBasicMode = true;
+	function loadScenarioBasicPref() {
+		try { scenarioBasicMode = localStorage.getItem(LPN_SCNBASIC_KEY) !== 'off'; } catch (e) {}
+	}
+	function setScenarioBasicMode(on) {
+		scenarioBasicMode = !!on;
+		try {
+			if (scenarioBasicMode) { localStorage.removeItem(LPN_SCNBASIC_KEY); }
+			else { localStorage.setItem(LPN_SCNBASIC_KEY, 'off'); }
+		} catch (e) {}
+		if (scenarioBasicMode) { closeAlternativesBox(); }
+	}
+	loadScenarioBasicPref();
+	function altCategoryLabel(cat) {
+		var pc = EngCalcs.pageConfig || {};
+		return {
+			physical: pc.lpn_alt_cat_physical || 'Physical',
+			demand: pc.lpn_alt_cat_demand || 'Demand',
+			topology: pc.lpn_alt_cat_topology || 'Asset activation',
+			initial: pc.lpn_alt_cat_initial || 'Initial settings',
+			constituent: pc.lpn_alt_cat_constituent || 'Constituent',
+			fireflow: pc.lpn_alt_cat_fireflow || 'Fire flow',
+			energy: pc.lpn_alt_cat_energy || 'Energy cost',
+			userdata: pc.lpn_alt_cat_userdata || 'Custom properties',
+			text: pc.lpn_alt_cat_text || 'Text'
+		}[cat] || cat;
+	}
+	function altBoxEl() { return document.getElementById('lpn_alt_box'); }
+	function altBoxIsOpen() {
+		var box = altBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	// One row per scenario, one column per category. A cell names the alternative: Base's own word
+	// for a Base alternative, the scenario's name and its count of local values for its own.
+	// tbody -> its table -> thead -> the heading row -> the last heading.
+	function markLastHeading(tbody, cls) {
+		var hr = tbody.parentNode.children[0].children[0], th = hr.children[hr.children.length - 1];
+		th.className += ' ' + cls;
+	}
+	function rebuildAlternativesTable() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_alt_report'), body,
+			baseWord = pc.lpn_scenario_base || 'Base';
+		if (!host) { return; }
+		host.innerHTML = '';
+		// **THE DEMAND MULTIPLIER IS A CALCULATION OPTION, NOT AN ALTERNATIVE** (Tom, 2026-09-30:
+		// *"Demand multiplier: OK. A Demand Multiplier column with the alternatives?"*; Mary and Sue
+		// advised it stay a per-scenario option, as Bentley keeps it in Calculation Options). So it
+		// is the last column, after a divider, and its heading carries the option's own tip.
+		body = ffTable(host, [pc.lpn_scenario_label || 'Scenario'].concat(LPN_ALT_CATEGORIES.map(altCategoryLabel),
+			[[pc.bpn_demand_mult || 'Demand multiplier', pc.lpn_settings_demand_multiplier_tip]]));
+		markLastHeading(body, 'lpn-alt-calcopt');
+		body.parentNode.className += ' lpn-alt-table';
+		scenariosForDisplay().forEach(function (s) {
+			var tr = ffEl('tr', null, null, body), alts = alternativesOf(s);
+			ffCell(tr, scenarioDisplayName(s));
+			LPN_ALT_CATEGORIES.forEach(function (cat) {
+				var a = alts[cat];
+				ffCell(tr, a.isBase ? baseWord : scenarioDisplayName(s) + ' (' + a.count + ')');
+			});
+			// Base shows the project's value (1 when it states none); a scenario shows its own, and
+			// BLANK means it inherits the project's (Sue).
+			var dm = s.isBase ? (settings.hydraulics || {}).demandMultiplier : s.demandMultiplier;
+			if (s.isBase && !(typeof dm === 'number' && isFinite(dm))) { dm = 1; }
+			ffCell(tr, (typeof dm === 'number' && isFinite(dm)) ? String(dm) : '', 'lpn-alt-calcopt');
+		});
+		ffEl('p', 'lpn-ff-note', pc.lpn_alt_note, host);
+	}
+	// Position and size for the life of the page only: remembering them would be a new key in the
+	// browser for a view Tom has not yet decided to keep.
+	var altboxLayout = newBoxLayout();
+	function openAlternativesBox() {
+		var box = altBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		rebuildAlternativesTable();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, altboxLayout); });
+		initTipsIn(box);
+	}
+	function closeAlternativesBox() { if (altBoxIsOpen()) { hidePanel(altBoxEl()); } }
+	function wireAlternativesBox() {
+		var box = altBoxEl(), x = document.getElementById('lpn_alt_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeAlternativesBox); }
+		makePanelDraggable(box);
+		addPanelResizeGrip(box);
+	}
+	function refreshAlternativesBoxIfOpen() {
+		if (altBoxIsOpen()) { rebuildAlternativesTable(); }
 	}
 
 	// ---- THE FULL REPORT: every node and every link, at every reporting time step -----------------
