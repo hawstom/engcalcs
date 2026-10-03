@@ -62,7 +62,7 @@ const L = loadLoopedNetwork(
 	"\t\topenPane: openPane,\n" +
 	"\t\tprofileTabBtn: function () {\n" +
 	"\t\t\tvar strip = document.getElementById('lpn_pane_tabs');\n" +
-	"\t\t\treturn (strip.children || []).filter(function (c) { return c.id === 'lpn_pane_tab_profile'; })[0] || null;\n" +
+	"\t\t\treturn [].concat.apply([], (strip.children || []).map(function (c) { return [c].concat(c.children || []); })).filter(function (c) { return c.id === 'lpn_pane_tab_profile'; })[0] || null;\n" +
 	"\t\t},\n" +
 	// The REAL Edit button, off the panel rebuildProfileForm() built -- not a call to
 	// toggleProfileEdit(), which would skip the wiring this task actually changed.

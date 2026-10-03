@@ -60,7 +60,7 @@ const L = loadLoopedNetwork(
 	// strip, so a check on it is a check on the strip and not on a description of it.
 	"\t\tprofileMenuBtn: function () {\n" +
 	"\t\t\tvar strip = document.getElementById('lpn_pane_tabs');\n" +
-	"\t\t\treturn (strip.children || []).filter(function (c) { return c.id === 'lpn_pane_tab_menu_profile'; })[0] || null;\n" +
+	"\t\t\treturn [].concat.apply([], (strip.children || []).map(function (c) { return [c].concat(c.children || []); })).filter(function (c) { return c.id === 'lpn_pane_tab_menu_profile'; })[0] || null;\n" +
 	"\t\t},\n" +
 	// The rows of whichever menu is open, off the popup openMenu() filled.
 	"\t\tmenuRows: function () {\n" +

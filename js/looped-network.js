@@ -20977,8 +20977,16 @@ var EngCalcs = EngCalcs || {};
 				// .ec-help so a tap reveals it (EngCalcs.initTips()).
 				if (t.tip && pc[t.tip]) { b.title = pc[t.tip]; b.className += ' ec-help'; }
 				b.addEventListener('click', function () { setPaneTab(t.id); });
-				strip.appendChild(b);
-				if (!t.menu) { return; }
+				if (!t.menu) { strip.appendChild(b); return; }
+				// **A TAB AND ITS ARROW WRAP AS ONE** (Task 600 pre-review): as two separate items in
+				// the wrapping strip, a long-language row could break between them and leave the ▾
+				// alone on the second line, belonging to nothing. One unbreakable pair instead;
+				// role="none" so the tablist still owns the tab and the wrapper says nothing.
+				var pair = document.createElement('span');
+				pair.className = 'lpn-pane-tab-pair';
+				pair.setAttribute('role', 'none');
+				pair.appendChild(b);
+				strip.appendChild(pair);
 				// **THE ARROW NEVER GOES THROUGH THE TAB'S OWN show() WHEN THE TAB IS ALREADY ON
 				// SHOW**, and that is the whole care this button needs: on the profile, a second
 				// show() is the command that starts drawing a new path (Task 506), so an arrow that
@@ -21000,7 +21008,7 @@ var EngCalcs = EngCalcs || {};
 						if (!paneState.open || paneState.tab !== t.id) { openPane(t.id); }
 						t.menu(m);
 					});
-					strip.appendChild(m);
+					pair.appendChild(m);
 				}());
 			});
 		}

@@ -2326,7 +2326,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* `min-height: 0` matters as much as `min-width`: a flex item's default minimum is its CONTENT,
    and without this the chart could not be measured smaller than the SVG already drawn in it, so a
    pane dragged shorter would leave the chart overflowing rather than reflowing. */
-#lpn_profile_chart, #lpn_ts_chart, #lpn_freq_chart { flex: 1 1 auto; min-width: 0; min-height: 0; }
+#lpn_profile_chart, #lpn_ts_chart, #lpn_freq_chart, #lpn_sysflow_chart { flex: 1 1 auto; min-width: 0; min-height: 0; }
 @media (max-width: 40rem) {
 	.lpn-profile-panel { flex-direction: column; overflow: auto; }
 	.lpn-profile-controls { flex: 0 0 auto; }
@@ -4888,6 +4888,8 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	cursor: pointer; color: var(--ec-ink);
 }
 .lpn-pane-tab-menu:hover, .lpn-pane-tab-menu:focus { background: var(--ec-border); }
+/* The tab and its arrow, as one flex item of the strip, so a wrap can never strand the arrow. */
+.lpn-pane-tab-pair { display: inline-flex; flex-wrap: nowrap; align-items: flex-start; }
 /* Joined to the tab it belongs to, the way .lpn-tab-caret is joined to .lpn-tab-current: one
    selected tab carrying a caret, not a selected tab beside an unselected button. */
 .lpn-pane-tab-menu-current { background: var(--ec-bg); border-color: var(--ec-gray-bbb); border-inline-start-color: var(--ec-border-strong); }
