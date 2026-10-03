@@ -210,7 +210,7 @@ function boxFacts(page, withDem) {
 		if (dem) {
 			// The DEM row is offered only with a located project and a token; stand one in, labelled as the page words it.
 			const rows = body.querySelectorAll('.lpn-set-row'), c = rows[rows.length - 1].cloneNode(true);
-			c.firstChild.textContent = EngCalcs.pageConfig.lpn_contour_dem || 'Ground between nodes from Mapbox DEM';
+			c.firstChild.textContent = EngCalcs.pageConfig.lpn_contour_dem;
 			body.appendChild(c);
 		}
 		const r = b.getBoundingClientRect();
