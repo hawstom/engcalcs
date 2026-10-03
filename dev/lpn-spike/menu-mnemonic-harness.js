@@ -91,6 +91,51 @@ async function suite(page, label, mac) {
 	ok('the bar does not move when the badges show', (await widths()) === w0);
 	await page.keyboard.press('Escape');
 
+	console.log('--- focus returns to where it was after a row that opens no box ---');
+	await page.evaluate(() => { const d = document.createElement('div'); d.id = 'km_cell'; d.tabIndex = 0; d.textContent = 'cell'; document.body.appendChild(d); });
+	const onCell = () => page.evaluate(() => document.activeElement.id === 'km_cell');
+	await page.focus('#km_cell');
+	await chord('E');
+	const undoLabel = await page.evaluate(() => EngCalcs.pageConfig.lpn_tool_undo);
+	for (let g = 0; g < 40 && (await page.evaluate(() => document.activeElement.textContent.trim())) !== undoLabel; g++) { await page.keyboard.press('ArrowDown'); }
+	await page.keyboard.press('Enter');
+	await page.waitForTimeout(250);
+	ok('Edit > Undo: focus is back on the cell', await onCell(), await page.evaluate(() => document.activeElement.id || document.activeElement.tagName));
+	ok('...the menu is closed and keyboard mode over', !(await shown()) && (await badgesVisible()) === '');
+	await page.focus('#km_cell');
+	await chord('M');
+	await page.keyboard.press('Enter');   // first row: Zoom to fit
+	await page.waitForTimeout(250);
+	ok('Map > Zoom to fit: focus is back on the cell', await onCell(), await page.evaluate(() => document.activeElement.id || document.activeElement.tagName));
+	await page.focus('#km_cell');
+	await chord('W');
+	const setLabel = await page.evaluate(() => EngCalcs.pageConfig.lpn_tool_settings);
+	for (let g = 0; g < 40 && (await page.evaluate(() => document.activeElement.textContent.trim())) !== setLabel; g++) { await page.keyboard.press('ArrowDown'); }
+	await page.keyboard.press('Enter');
+	await page.waitForTimeout(250);
+	ok('Water > Settings: focus lands on a field, not the close button', await page.evaluate(() => {
+		const a = document.activeElement, b = document.getElementById('lpn_settings_box');
+		return !!b && b.contains(a) && a.id !== 'lpn_settings_close' && !a.classList.contains('lpn-popover-x');
+	}), await page.evaluate(() => document.activeElement.tagName + '#' + document.activeElement.id));
+	await page.keyboard.press('Escape');
+	await page.evaluate(() => document.getElementById('km_cell').remove());
+
+	console.log('--- Map > Background image: the pick rows are pointer-only ---');
+	await chord('M');
+	// The Background image row is the first fly-out row in the Map menu whose fly-out has an Add row.
+	const nsub = await page.evaluate(() => document.querySelectorAll('#lpn_menu_list button.lpn-menu-row[aria-haspopup]').length);
+	let bd = [];
+	for (let i = 0; i < nsub && !bd.length; i++) {
+		await page.evaluate((k) => document.querySelectorAll('#lpn_menu_list button.lpn-menu-row[aria-haspopup]')[k].focus(), i);
+		await page.keyboard.press(await page.evaluate(() => getComputedStyle(document.documentElement).direction) === 'rtl' ? 'ArrowLeft' : 'ArrowRight');
+		bd = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_menu_list2 button.lpn-menu-row')).map((b) => ({ t: b.textContent.trim(), po: b.hasAttribute('data-pointer-only') })));
+		if (!bd.some((r) => r.po)) { bd = []; }
+	}
+	const pc = await page.evaluate(() => [EngCalcs.pageConfig.lpn_backdrop_position, EngCalcs.pageConfig.lpn_backdrop_scale, EngCalcs.pageConfig.lpn_backdrop_scale_from]);
+	ok('Move, Scale by picking and Scale from... are flagged', pc.every((t) => bd.some((r) => r.t === t && r.po)), JSON.stringify(bd));
+	ok('Add and the world-file row are not', bd.filter((r) => !r.po).length >= 2);
+	await page.keyboard.press('Escape'); await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
+
 	console.log('--- pointer-only rows ---');
 	const pointerOnly = await page.evaluate(() => null);
 	await chord('E');

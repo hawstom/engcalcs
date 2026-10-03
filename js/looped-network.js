@@ -13475,10 +13475,10 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return (withHeading ? [{ heading: true, label: pc.lpn_backdrop_menu || 'Background image…' }] : []).concat([
 			{ icon: 'image', label: pc.lpn_backdrop_add || 'Add', fn: function () { backdropAction('add'); } },
-			{ icon: 'position', label: pc.lpn_backdrop_position || 'Move', fn: function () { backdropAction('position'); }, disabled: !backdrop },
-			{ icon: 'scale', label: pc.lpn_backdrop_scale || 'Scale by picking', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
+			{ pointerOnly: true, icon: 'position', label: pc.lpn_backdrop_position || 'Move', fn: function () { backdropAction('position'); }, disabled: !backdrop },
+			{ pointerOnly: true, icon: 'scale', label: pc.lpn_backdrop_scale || 'Scale by picking', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
 			{ icon: 'scale', label: pc.lpn_backdrop_scale_entry || 'Scale by world file or by the size of one pixel on the map', fn: function () { backdropAction('scale-entry'); }, disabled: !backdrop },
-			{ icon: 'scale', label: pc.lpn_backdrop_scale_from || 'Scale from current size, around a point you pick', fn: function () { backdropAction('scale-from'); }, disabled: !backdrop },
+			{ pointerOnly: true, icon: 'scale', label: pc.lpn_backdrop_scale_from || 'Scale from current size, around a point you pick', fn: function () { backdropAction('scale-from'); }, disabled: !backdrop },
 			{ icon: 'del', label: pc.lpn_backdrop_remove || 'Remove', fn: function () { backdropAction('remove'); }, disabled: !backdrop }
 		]);
 	}
@@ -37379,6 +37379,7 @@ var EngCalcs = EngCalcs || {};
 		// A row that ran a command and opened nothing focusable leaves focus on a hidden button;
 		// give it back to the opener.
 		var t = e.target, opener = openMenuAnchor;
+		var ret = kbdModeReturn;   // the element that had focus before a chord or F10 (cleared by the click handler below)
 		var boxVisible = function (id) { var b = document.getElementById(id); return !!b && b.getClientRects().length > 0; };
 		var boxesBefore = ESCAPE_SCOPED_BOXES.filter(boxVisible);
 		if (t && t.closest && t.closest('#lpn_menu_popup, #lpn_menu_popup2') && opener) {
@@ -37392,9 +37393,12 @@ var EngCalcs = EngCalcs || {};
 				if (!dropped) { return; }
 				// A command that opened a box: focus its first control. Otherwise the opener.
 				var opened = ESCAPE_SCOPED_BOXES.filter(function (id) { return boxVisible(id) && boxesBefore.indexOf(id) < 0; })[0];
-				var first = opened && document.getElementById(opened).querySelector(
-					'input:not([type=hidden]):not(:disabled), select:not(:disabled), textarea:not(:disabled), button:not(:disabled), [tabindex]:not([tabindex="-1"])');
-				if (first) { first.focus(); } else if (opener.isConnected) { opener.focus(); }
+				var obox = opened && document.getElementById(opened);
+				var first = obox && (obox.querySelector('input:not([type=hidden]):not(:disabled), select:not(:disabled), textarea:not(:disabled)')
+					|| obox.querySelector('button:not(:disabled), [tabindex]:not([tabindex="-1"])'));
+				if (first) { first.focus(); }
+				else if (ret && ret !== document.body && ret.isConnected && ret.focus) { ret.focus(); }
+				else if (opener.isConnected) { opener.focus(); }
 			}, 0);
 		}
 	}, true);
