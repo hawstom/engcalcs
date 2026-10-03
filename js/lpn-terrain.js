@@ -391,16 +391,11 @@
 	 */
 	EC.lpnTerrainAskForContour = function () {
 		if (EC.lpnTerrainConsented()) { return true; }
-		// The fill's own four paragraphs, with the first and the last replaced.
-		var paras = consentText(0).split('\n\n');
-		paras[0] = t('lpn_contour_consent_1',
-			'Drawing pressure over the ground sends the area your network covers, as Mapbox map ' +
-			'tile numbers, to api.mapbox.com, to read the height of the ground there.');
-		paras[paras.length - 1] = t('lpn_contour_consent_4',
-			'If you say no, everything else on this page keeps working exactly as it does now, ' +
-			'and the contour plot is drawn between nodes alone. We remember a yes so that we need ' +
-			'not ask again. A no is not stored at all.');
-		var text = paras.join('\n\n');
+		// FOUR PARAGRAPHS OF ITS OWN, in the fill's order. What is sent here is TILE NUMBERS for the
+		// area the network covers, not each node's latitude and longitude, so every paragraph that
+		// names what is sent says that -- borrowing the fill's second and third paragraphs made the
+		// question say "tile numbers" and then "your node positions" (pre-review, 2026-10-03).
+		var text = contourConsentParagraphs().join('\n\n');
 		if (!root.confirm || !root.confirm(text)) { return false; }
 		recordConsent();
 		return true;
@@ -413,6 +408,25 @@
 	 * asked only by lpnTerrainAskForContour(), from the checkbox a person ticked, never from a
 	 * redraw. Shares the plan, the budget, the decode and the fetch with the fill.
 	 */
+	function contourConsentParagraphs() {
+		return [
+			t('lpn_contour_consent_1',
+				'Drawing pressure over the ground sends the area your network covers, as Mapbox map ' +
+				'tile numbers, to api.mapbox.com, to read the height of the ground there.'),
+			t('lpn_contour_consent_2',
+				'This is a different question from the map pictures behind your project. The pictures ' +
+				'only say where you are looking. These tiles say where your network is. Mapbox will ' +
+				'receive those tile numbers and your IP address. We send nothing else: no name, no ' +
+				'pipes, no project. We keep no record of it, and nothing is stored on this device ' +
+				'except your answer to this question.'),
+			t('lpn_contour_consent_3', 'May we send the tile numbers of your network\'s area to Mapbox?'),
+			t('lpn_contour_consent_4',
+				'If you say no, everything else on this page keeps working exactly as it does now, ' +
+				'and the contour plot is drawn between nodes alone. We remember a yes so that we need ' +
+				'not ask again. A no is not stored at all.')
+		];
+	}
+	EC.lpnTerrainContourConsentText = function () { return contourConsentParagraphs().join('\n\n'); };
 	var gridRunning = false;
 	EC.lpnTerrainGrid = function (points, done) {
 		function finish(h, info) { if (typeof done === 'function') { done(h, info || {}); } }

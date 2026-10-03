@@ -196,6 +196,8 @@ global.window.document = global.document;
 global.window.setTimeout = setTimeout;
 global.window.clearTimeout = clearTimeout;
 global.window.location = { protocol: 'https:' };
+let confirmText = null, confirmAnswer = false;
+global.window.confirm = function (t) { confirmText = t; return confirmAnswer; };
 let realFetches = 0;
 global.window.fetch = function () { realFetches++; return Promise.reject(new Error('no network in a harness')); };
 const jar = { value: '' };
@@ -235,7 +237,13 @@ const L = loadLoopedNetwork(
 	"\t\t\tlinksLayer = el('g', {}, modelLayer); nodesLayer = el('g', {}, modelLayer);\n" +
 	"\t\t\tlabelsLayer = el('g', {}, modelLayer);\n" +
 	"\t\t\trubberBandEl = el('line', {}, world); },\n" +
-	"\t\tmodelLayer: function () { return modelLayer; }, linksLayer: function () { return linksLayer; },\n"
+	"\t\tmodelLayer: function () { return modelLayer; }, linksLayer: function () { return linksLayer; },\n" +
+	"\t\tbuildColoringSection: buildColoringSection, linkById: linkById,\n" +
+	"\t\tnewPlain: function () { doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };\n" +
+	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
+	"\t\t\tnextId = { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1 };\n" +
+	"\t\t\tproject = { name: 'P', docId: 'plain-test', activeScenario: 'base' };\n" +
+	"\t\t\tscenarios = defaultScenarios(); settings = defaultSettings(); seedDefaultInputs(); lastSolveResult = null; },\n"
 );
 const EngCalcs = global.EngCalcs;
 
@@ -249,6 +257,27 @@ function pathPoints(p) {
 	while ((m = re.exec(d))) { out.push([+m[1], +m[2]]); }
 	return out;
 }
+// Is (x, y) inside any filled band polygon? Even-odd over every closed subpath of every band.
+function coloredAt(x, y) {
+	return layerPaths('lpn-contour-band').some((p) => {
+		return (p.getAttribute('d') || '').split('M').filter(Boolean).some((sub) => {
+			const pts = [], re = /([-\d.e]+) ([-\d.e]+)/g;
+			let m, inside = false;
+			while ((m = re.exec('M' + sub))) { pts.push([+m[1], +m[2]]); }
+			for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+				const [xi, yi] = pts[i], [xj, yj] = pts[j];
+				if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) { inside = !inside; }
+			}
+			return inside;
+		});
+	});
+}
+function findIn(host, id) {
+	let hit = null;
+	(function walk(e) { if (!e || hit) { return; } if (e.id === id) { hit = e; return; } (e.children || []).forEach(walk); }(host));
+	return hit;
+}
+function fireEl(el, type) { ((el && el._listeners && el._listeners[type]) || []).forEach((f) => f({ type: type, target: el, currentTarget: el })); }
 function allD() { return layerPaths('lpn-contour').map((p) => p.getAttribute('d')).join('|'); }
 
 // The colour key is created as a SIBLING of #lpn_labels_legend, which the stub makes as an orphan;
@@ -281,8 +310,18 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	check(ml.children[0] === L.contourLayer() && ml.children.indexOf(L.linksLayer()) > 0,
 		'the layer is the first child of the drawing group: under the pipes and the nodes');
 	check(L.contourLayer().getAttribute('pointer-events') === 'none', 'and it never takes a click');
-	const want = PC.lpn_contour_support.replace('{n}', String(S.n)).replace('{k}', '3');
+	const want = PC.lpn_contour_support.replace('{n}', String(L.contourStats().n)).replace('{k}', '3');
 	check(L.legendText().indexOf(want) >= 0, `the legend carries the support sentence: "${want}"`);
+	// THE TANK HALO. Under pressure a tank's value is its water depth and a reservoir's about zero:
+	// as vertices they would paint false low pressure round each one. Junctions only, for pressure.
+	const juncWithP = d.nodes.filter((n) => n.type === 'junction' && isFinite(L.colorNodeValue(n, 'pressure'))).length;
+	check(S.n === juncWithP, `pressure: the plot stands on the ${juncWithP} junctions alone, no tank or reservoir: ${S.n}`);
+	d.settings.colorNodeField = 'head';
+	L.refreshValueColors();
+	const fixedN = d.nodes.filter((n) => n.type !== 'junction').length;
+	check(L.contourStats().n === juncWithP + fixedN, `head: tanks and reservoirs are vertices too (their water surface is the grade line): ${L.contourStats().n}`);
+	d.settings.colorNodeField = 'pressure';
+	L.refreshValueColors();
 	// Every vertex lies on a kept triangle's edge, so within half the fill limit of a node is too
 	// strict; within the fill limit of SOME node is the claim.
 	const nodesXY = d.nodes.map((n) => [L.nodeDrawX(n), L.nodeDrawY(n)]);
@@ -383,6 +422,25 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 	L.refreshValueColors();
 	await new Promise((r) => setTimeout(r, 50));
 	check(tileCalls === 0 && !L.contourStats().dem, 'without a stored yes, nothing is fetched and the nodal plot stands');
+	// A FILE SAVED WITH THE BOX TICKED, OPENED WHERE NOBODY SAID YES: the box must not show
+	// ticked while the plain plot draws.
+	S2.contourStyle = 'filled';
+	L.buildColoringSection();
+	const demBox = findIn(byId.lpn_set_colors_node, 'lpn_set_contour_dem');
+	check(!!demBox && demBox.checked === false && S2.contourTerrain === true,
+		'a saved tick with no yes in this browser shows UNticked, the project setting kept');
+	// Ticking it asks, and the question says one thing about what is sent: tile numbers.
+	confirmAnswer = false; confirmText = null;
+	demBox.checked = true; fireEl(demBox, 'change');
+	const paras = String(confirmText || '').split('\n\n');
+	check(paras.length === 4 && paras.every((t, i) => t === PC['lpn_contour_consent_' + (i + 1)]),
+		'ticking asks the contour question, its own four paragraphs');
+	check(/tile numbers/.test(paras[1]) && /tile numbers/.test(paras[2]) &&
+		!/node position|coordinates|latitude/i.test(confirmText || ''),
+		'paragraphs 2 and 3 say tile numbers too, never node positions or coordinates');
+	check(demBox.checked === false && S2.contourTerrain === false && tileCalls === 0, 'a no unticks it, stores nothing and fetches nothing');
+	S2.contourTerrain = true;
+	S2.contourStyle = 'lines';
 	jar.value = 'ec_terrain=1.' + Math.floor(Date.now() / 1000) + '.' + (PC.lpn_terrain_version || '1');
 	L.refreshValueColors();
 	for (let i = 0; i < 200 && !(L.contourStats() && L.contourStats().dem); i++) { await new Promise((r) => setTimeout(r, 10)); }
@@ -394,7 +452,62 @@ byId.lpn_canvas.appendChild(byId.lpn_labels_legend);
 		`pressure over the hill reaches ${G && G.demRange && G.demRange[0].toFixed(1)}, below every junction's ${lo.toFixed(1)} (display unit)`);
 	check(L.legendText().indexOf(PC.lpn_contour_support_dem.split('{m}')[0]) >= 0, 'and the legend says what the pressure stands on');
 	check(layerPaths('lpn-contour-line').length > 0, 'the line contours are drawn from the ground-subtracted grid');
+	// PLAY MUST NOT RE-READ THE GROUND. Close the four pipes between the bottom row and the rest,
+	// as a control would: the plot's outline shrinks by a whole row, the network does not.
+	const callsBefore = tileCalls;
+	const res = L.lastResult();
+	for (let c = 0; c < 4; c++) {
+		const lk = L.getDoc().links.find((l) => l.from === ids[c] && l.to === ids[4 + c]);
+		res.statuses[lk.id] = 'closed';
+	}
+	L.refreshValueColors();
+	await new Promise((r) => setTimeout(r, 50));
+	check(tileCalls === callsBefore && L.contourStats().dem > 0,
+		`closing pipes moves the outline but re-reads no ground: ${tileCalls - callsBefore} more tile request(s)`);
 	check(realFetches === 0, 'no real network request was made');
+
+	head('8. THE MASK THROUGH THE PAGE: THE FILL LIMIT, PUMPS AND CLOSED LINKS');
+	// Two 6 x 6 arms of junctions, pipes of length 1, coloured by ELEVATION (an input, so no solve),
+	// joined in different ways. The probe point is in the middle of the space between the arms.
+	function twoArms(gap, joinType, closed) {
+		L.newPlain();
+		const S3 = L.getSettings();
+		const grid = [];
+		[0, 5 + gap].forEach((x0) => {
+			for (let r = 0; r < 6; r++) {
+				for (let c = 0; c < 6; c++) {
+					const n = L.addNode('junction', 0, 0);
+					n.x = x0 + c; n.y = r; n.elev = 100 + x0 + c;
+					grid.push(n.id);
+				}
+			}
+		});
+		for (let a = 0; a < 2; a++) {
+			for (let r = 0; r < 6; r++) {
+				for (let c = 0; c < 6; c++) {
+					const k = a * 36 + r * 6 + c;
+					if (c < 5) { L.addLink('pipe', grid[k], grid[k + 1]); }
+					if (r < 5) { L.addLink('pipe', grid[k], grid[k + 6]); }
+				}
+			}
+		}
+		// The join: from the right edge of arm one to the left edge of arm two, on row 2.
+		const j = L.addLink(joinType, grid[2 * 6 + 5], grid[36 + 2 * 6]);
+		if (closed) { j._status = 'closed'; }
+		S3.colorNodeField = 'elev';
+		S3.contourStyle = 'filled';
+		L.refreshValueColors();
+		return 5 + gap / 2;
+	}
+	let px = twoArms(8, 'pipe', false);
+	check(!coloredAt(px, 2.5) && coloredAt(2.5, 2.5) && coloredAt(15.5, 2.5),
+		'a gap of 8 pipe lengths joined by one open pipe: the arms are coloured, the gap is not (the fill limit)');
+	px = twoArms(1, 'pipe', false);
+	check(coloredAt(px, 2.5), 'a gap of 1 joined by an open pipe is coloured -- so the next two are not vacuous');
+	px = twoArms(1, 'pump', false);
+	check(!coloredAt(px, 2.5) && coloredAt(2.5, 2.5), 'the same gap joined only by a pump is not coloured');
+	px = twoArms(1, 'pipe', true);
+	check(!coloredAt(px, 2.5) && coloredAt(2.5, 2.5), 'the same gap joined only by a CLOSED pipe is not coloured');
 
 	console.log(failures ? `\n${failures} FAILED` : '\nall checks passed');
 	process.exit(failures ? 1 : 0);

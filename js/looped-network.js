@@ -8693,6 +8693,8 @@ var EngCalcs = EngCalcs || {};
 	// Mapbox DEM). Esri's default raster is the extent over 250; Luke Butler's proof of concept ran
 	// 256 x 256 at 64 ms.
 	var CONTOUR_RASTER_CELLS = 200;
+	// The fields for which a tank or a reservoir is a vertex of the plot -- see refreshContour().
+	var CONTOUR_FIXED_HEAD_FIELDS = ['head', 'quality'];
 	var contourLayer = null, contourStats = null, contourDem = null;
 	function contourLayerEl() {
 		var host = modelLayer || world;
@@ -8745,14 +8747,31 @@ var EngCalcs = EngCalcs || {};
 		var layer = contourLayerEl();
 		if (!layer) { return; }
 		var t0 = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-		// ---- WHICH NODES CARRY THE VALUE ----
-		var nodes = [], xs = [], ys = [], zs = [], idx = {};
+		// ---- THE WHOLE NETWORK, for zones and for the ground grid ----
+		// Every active node with a position takes part in the ZONES, whether or not it carries a
+		// value: a tank in the middle of a network still joins the pipes either side of it.
+		var all = [], allIdx = {}, ax = [], ay = [];
 		doc.nodes.forEach(function (n) {
 			if (!isActive(n)) { return; }
-			var v = colorNodeValue(n, field), x = nodeDrawX(n), y = nodeDrawY(n);
-			if (typeof v !== 'number' || !isFinite(v) || !isFinite(x) || !isFinite(y)) { return; }
+			var x = nodeDrawX(n), y = nodeDrawY(n);
+			if (!isFinite(x) || !isFinite(y)) { return; }
+			allIdx[n.id] = all.length; all.push(n); ax.push(x); ay.push(y);
+		});
+		// ---- WHICH NODES CARRY THE VALUE ----
+		// **A TANK OR A RESERVOIR IS A VERTEX ONLY WHERE ITS VALUE MEANS WHAT A JUNCTION'S DOES.**
+		// Under pressure a tank's value is its water depth and a reservoir's is about zero, so as
+		// vertices they paint a false low-pressure halo round every one of them (pre-review,
+		// 2026-10-03). They take part for CONTOUR_FIXED_HEAD_FIELDS only -- head, where their water
+		// surface is the grade line the pipes leave at, and water quality, where the source is the
+		// most telling value on the map -- and still join zones either way.
+		var withFixed = CONTOUR_FIXED_HEAD_FIELDS.indexOf(field) >= 0;
+		var nodes = [], xs = [], ys = [], zs = [], idx = {};
+		all.forEach(function (n, i) {
+			if (isFixedHeadNode(n) && !withFixed) { return; }
+			var v = colorNodeValue(n, field);
+			if (typeof v !== 'number' || !isFinite(v)) { return; }
 			idx[n.id] = nodes.length;
-			nodes.push(n); xs.push(x); ys.push(y); zs.push(v);
+			nodes.push(n); xs.push(ax[i]); ys.push(ay[i]); zs.push(v);
 		});
 		contourStats = { n: nodes.length, k: CONTOUR_EDGE_FACTOR, few: nodes.length < 3, dem: null };
 		if (contourStats.few) { return; }
@@ -8762,12 +8781,11 @@ var EngCalcs = EngCalcs || {};
 		// anything closed is a barrier: head jumps across it.
 		var joins = [], lens = [];
 		doc.links.forEach(function (l) {
-			if (!isActive(l) || linkStatusOf(l) === 'closed') { return; }
-			var tcv = l.type === 'valve' && String(l.valveType || 'TCV').toUpperCase() === 'TCV';
-			if (l.type !== 'pipe' && !tcv) { return; }
-			var a = idx[l.from], b = idx[l.to];
+			if (!isActive(l)) { return; }
+			var a = allIdx[l.from], b = allIdx[l.to];
 			if (a === undefined || b === undefined) { return; }
-			joins.push([a, b]);
+			// The fill limit's scale is every pipe as drawn, open or closed: how far apart the
+			// network's nodes are does not change when a valve shuts.
 			if (l.type === 'pipe') {
 				var pts = linkPointList(l), len = 0, i;
 				for (i = 0; i + 1 < pts.length; i++) {
@@ -8775,9 +8793,14 @@ var EngCalcs = EngCalcs || {};
 				}
 				lens.push(len);
 			}
+			if (linkStatusOf(l) === 'closed') { return; }
+			var tcv = l.type === 'valve' && String(l.valveType || 'TCV').toUpperCase() === 'TCV';
+			if (l.type !== 'pipe' && !tcv) { return; }
+			joins.push([a, b]);
 		});
+		var allZone = C.zones(all.length, joins), zoneOf = nodes.map(function (n) { return allZone[allIdx[n.id]]; });
 		var med = C.median(lens), maxEdge = med > 0 ? CONTOUR_EDGE_FACTOR * med : 0;
-		var tris = C.maskTriangles(C.triangulate(xs, ys), xs, ys, C.zones(nodes.length, joins), maxEdge);
+		var tris = C.maskTriangles(C.triangulate(xs, ys), xs, ys, zoneOf, maxEdge);
 		contourStats.triangles = tris.length / 3;
 		var breaks = effectiveBreaks('node', field), nb = breaks.length + 1, k;
 		var span = 0;
@@ -8786,7 +8809,13 @@ var EngCalcs = EngCalcs || {};
 		layer.setAttribute('opacity', style === 'filled' ? String(CONTOUR_FILL_OPACITY) : '1');
 		// ---- PRESSURE OVER THE GROUND: head interpolated, ground subtracted per cell ----
 		if (contourTerrainWanted() && tris.length) {
-			var grid = C.gridFor(tris, xs, ys, CONTOUR_RASTER_CELLS);
+			// **THE GROUND GRID COVERS THE WHOLE NETWORK, NOT THE PLOT'S OUTLINE.** The outline
+			// moves every time a control opens or closes a pipe, and a grid keyed on it re-read the
+			// ground tiles twice per pass of Play (pre-review, 2026-10-03). Over every node's extent
+			// it changes only when the network itself does.
+			var allTris = [], q;
+			for (q = 0; q < all.length; q++) { allTris.push(q); }
+			var grid = C.gridFor(allTris, ax, ay, CONTOUR_RASTER_CELLS);
 			var heads = nodes.map(contourHeadSI);
 			if (grid && heads.every(function (h) { return typeof h === 'number' && isFinite(h); })) {
 				var demKey = [project && project.docId, grid.x0, grid.y0, grid.dx, grid.dy, grid.nx, grid.ny].join('|');
@@ -8874,7 +8903,9 @@ var EngCalcs = EngCalcs || {};
 		var mid = pts.length ? pts[pts.length >> 1] : null;
 		EngCalcs.lpnTerrainGrid(pts, function (heights, info) {
 			if (!contourDem || contourDem.key !== key) { return; }
-			if (!heights || !heights.length) { contourDem.failed = !!heights; refreshContourOnly(); return; }
+			// Refused for being busy, or with no yes: forget the request so a later redraw asks again.
+			if (!heights) { contourDem = null; return; }
+			if (!heights.length) { contourDem.failed = true; refreshContourOnly(); return; }
 			var elev = new Float64Array(grid.nx * grid.ny), m;
 			for (m = 0; m < elev.length; m++) { elev[m] = NaN; }
 			heights.forEach(function (h) { elev[h.id] = h.meters; });
@@ -21839,7 +21870,11 @@ var EngCalcs = EngCalcs || {};
 			if (!contourTerrainOffered()) { return; }
 			var dem = document.createElement('input');
 			dem.type = 'checkbox'; dem.id = 'lpn_set_contour_dem';
-			dem.checked = !!settings.contourTerrain;
+			// **TICKED ONLY WHEN IT WILL DRAW.** A project saved with the box ticked, opened in a
+			// browser that never said yes, would otherwise show a ticked box drawing the plain plot
+			// (pre-review, 2026-10-03). Unticked here, the project's own setting kept: ticking it
+			// asks the question, as on any first use.
+			dem.checked = contourTerrainWanted();
 			dem.disabled = !cur;
 			dem.addEventListener('change', function () {
 				// THE QUESTION IS ASKED HERE AND NOWHERE ELSE: a redraw never asks, so a no is never

@@ -1820,7 +1820,8 @@ $ec_lang['lpn_freq_axis_percent']='Percent less than';
 // EPANET's Contour Plot (Task 600), drawn as a layer under the map rather than in a window of its
 // own. "Filled contours" and "Line contours" are EPANET's own two Styles. {n} is a node count, {k}
 // a whole number, {m} a distance in metres; all substituted. The consent paragraphs replace the first
-// and last of lpn_terrain_consent_1..4 when the question is asked for the contour plot.
+// lpn_contour_consent_1..4 are the terrain question's four paragraphs, reworded for what the contour
+// plot sends: tile numbers for the network's area, not each node's latitude and longitude.
 $ec_lang['lpn_contour_menu']='Contour';
 $ec_lang['lpn_contour_tip']='Show a contour plot on the map: the colors of the nodes, spread over the area between them. Its style is in Settings, where you can also turn it off.';
 $ec_lang['lpn_contour_plot']='Contour plot';
@@ -1834,6 +1835,8 @@ $ec_lang['lpn_contour_dem_tip']='Between nodes, pressure becomes the interpolate
 $ec_lang['lpn_contour_support_dem']='Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.';
 $ec_lang['lpn_contour_dem_failed']='The ground could not be read from Mapbox DEM, so pressure is interpolated between nodes alone.';
 $ec_lang['lpn_contour_consent_1']='Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.';
+$ec_lang['lpn_contour_consent_2']='This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.';
+$ec_lang['lpn_contour_consent_3']='May we send the tile numbers of your network\'s area to Mapbox?';
 $ec_lang['lpn_contour_consent_4']='If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.';
 $ec_lang['lpn_view_units']='Units';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
