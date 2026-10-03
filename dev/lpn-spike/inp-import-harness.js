@@ -28,11 +28,8 @@ const path = require('path');
 // here as 0.703070 until 2026-09-09, which is the same rounded copy dev/scripts/js_constant_check.php
 // found in the module itself -- a second copy of a conversion constant is a second chance for the
 // two to disagree. emitter-harness.js reads it the same way.
-const PSI_M = (function () {
-	const src = fs.readFileSync(path.join(ROOT, 'js', 'lpn-inp.js'), 'utf8');
-	const IN = parseFloat(/\bIN = ([0-9.eE+-]+)/.exec(src)[1]);
-	return Function('IN', 'return (' + /var PSI_M = ([^;]+);/.exec(src)[1] + ');')(IN);
-}());
+// EPANET's own PSIperFT, 0.4333, which the page now converts psi on (Tom, 2026-10-03).
+const PSI_M = 0.3048 / global.EngCalcs.EPANET_PSI_PER_FT;
 
 // The page loads both readers before js/looped-network.js; do the same, onto the same EngCalcs.
 require(ROOT + 'js/lpn-inp.js');

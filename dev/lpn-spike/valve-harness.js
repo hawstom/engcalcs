@@ -168,7 +168,7 @@ console.log('\n--- a GPM (US) file ---');
 	// DERIVED from the exact definitions, never typed off a calculator: PSI_M was a rounded
 	// 0.703070 here and in js/lpn-inp.js until dev/scripts/js_constant_check.php found it.
 	const IN = 0.0254, FT = 0.3048,
-		PSI_M = (4.4482216152605 / (IN * IN)) / (1000 * 9.80665),
+		PSI_M = FT / global.EngCalcs.EPANET_PSI_PER_FT,   // EPANET's PSIperFT, as the page reads a psi
 		GPM = 3.785411784e-3 / 60;
 	const inp = [
 		'[JUNCTIONS]', ' J1  100  50', ' J2  100  0', ' J3  100  0', ' J4  100  0', '',
