@@ -141,7 +141,7 @@ function ecParseRulingsMd(string $text): array
         if (preg_match('/^  \d+\. /', $line)) { continue; }
         /* The synonym section's generated lines. The two synonym lines are read, not skipped: a
          * ruling is keyed on them. */
-        if (preg_match('/^  \*Why stale:\*/', $line) || preg_match('/^  \*Written against:\*/', $line)) { continue; }
+        if (preg_match('/^  \*Why stale:\*/', $line) || preg_match('/^  \*Why this proposal:\*/', $line) || preg_match('/^  \*Written against:\*/', $line)) { continue; }
         if (preg_match('/^  \*Current synonym:\* ?(.*)$/', $line, $sm)) { $synCur = trim($sm[1]); continue; }
         if (preg_match('/^  \*Proposed synonym:\* ?(.*)$/', $line, $sm)) { $synProp = trim($sm[1]); continue; }
         $mark[] = trim($line);

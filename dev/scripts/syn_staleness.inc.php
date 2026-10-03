@@ -68,13 +68,14 @@ function ecSynStaleRows(string $root): array
         elseif ($rec !== $cur) { $reason = 'the English changed after this synonym was written'; }
         elseif ($recSyn !== $s) { $reason = 'the synonym text was edited and the edit was not recorded'; }
         if ($reason === '') { continue; }
-        $p = '';
+        $p = ''; $note = '';
         if ($cur !== null && isset($prop[$k]['on']) && $prop[$k]['on'] === $cur && !empty($prop[$k]['syn'])) {
             $p = (string) $prop[$k]['syn'];
+            $note = isset($prop[$k]['note']) ? (string) $prop[$k]['note'] : '';
         }
         $rows[$k] = array(
             'key' => $k, 'english' => $cur === null ? EC_SYN_ORPHAN_ENGLISH : $cur, 'recorded' => $rec,
-            'syn' => $s, 'proposed' => $p, 'reason' => $reason, 'subject' => $p !== '' ? $p : $s,
+            'syn' => $s, 'proposed' => $p, 'reason' => $reason, 'note' => $note, 'subject' => $p !== '' ? $p : $s,
         );
     }
     ksort($rows);
@@ -123,10 +124,11 @@ function ecSynSection(string $root, string $flag): string
         $out .= "  *Current synonym:* " . ecSynOneLine($r['syn'], 1000) . "\n";
         if ($r['proposed'] !== '') {
             $out .= "  *Proposed synonym:* " . ecSynOneLine($r['proposed'], 1000) . "\n";
+            if ($r['note'] !== '') { $out .= "  *Why this proposal:* " . ecSynOneLine($r['note'], 500) . "\n"; }
         }
         $out .= "  **What this asks for:** WRITTEN PERMISSION to "
             . ($r['english'] === EC_SYN_ORPHAN_ENGLISH ? 'remove this `$ec_lang_syn` entry'
-                : ($r['proposed'] !== '' ? 'replace the current `$ec_lang_syn` entry with the proposed one'
+                : ($r['proposed'] !== '' ? 'replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is)'
                     : 'keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing)')) . ".\n";
         $ruling = ecSynRuling($root, $r);
         if ($ruling === null) { $out .= "  " . $flag . "\n"; }

@@ -230,15 +230,15 @@
             "syn": "Equal intervals rounded for a pretty legend or Pretty legend (rounded equal intervals)"
         },
         "lpn_ds_head_search_selected": {
-            "english": "What demand scale can these junctions handle?",
+            "english": "What demand can the selection handle",
             "syn": "What demand can the junctions you choose handle"
         },
         "lpn_ds_scope_tip": {
-            "english": "All junctions, or only those selected on the map. Pressures are checked at the scaled demand.",
+            "english": "Scale the demand of the selection. Pressures are checked at the scaled demand.",
             "syn": "Scale the demand at the junctions that you choose. Pressures are checked at the scaled demand."
         },
         "lpn_ds_search_note_selected": {
-            "english": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.",
+            "english": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the selection keeps the given lowest pressure allowed.",
             "syn": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the junctions that you choose keep the given lowest pressure allowed."
         },
         "lpn_examples_open": {
@@ -246,7 +246,7 @@
             "syn": "Open, Open this example, Load, Load this example, Start with this one | layout: button; avoid: open as an adjective/state (something already open), not the imperative verb"
         },
         "lpn_ff_all": {
-            "english": "All junctions",
+            "english": "All",
             "syn": "All junctions | a pull-down option under Junctions to test; agrees with junctions, plural"
         },
         "lpn_ff_design_all": {
@@ -262,7 +262,7 @@
             "syn": "The selected junctions and their pipes | a pull-down option under Design check (effect on system); agrees with pipes and junctions together, plural"
         },
         "lpn_ff_selected": {
-            "english": "Selected junctions",
+            "english": "Selected",
             "syn": "Selected junctions | a pull-down option under Junctions to test; agrees with junctions, plural"
         },
         "lpn_field_easting_abbr": {
