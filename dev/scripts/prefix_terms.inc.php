@@ -37,7 +37,6 @@ function prefixToTermNames(): array
         'wi' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient', 'irregular channel'],
         'or' => ['flow', 'orifice', 'discharge coefficient', 'head', 'headwater elevation', 'tailwater elevation', 'crown'],
         'odt' => ['orifice', 'discharge coefficient', 'headwater elevation', 'tailwater elevation', 'crown'],
-        'irr' => ['flow', 'weir', 'orifice', 'seepage', 'conveyance efficiency', 'check structure'],
         'ds' => ['flow', 'application rate', 'distribution uniformity', 'emitter'],
         'cs' => ['flow', 'conveyance efficiency', 'seepage'],
         'mhp' => ['flow', 'penstock', 'gross head', 'net head', 'plant efficiency', 'head loss', 'run-of-river', 'headworks', 'junction loss', 'minor loss'],
