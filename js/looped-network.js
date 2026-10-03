@@ -20582,9 +20582,7 @@ var EngCalcs = EngCalcs || {};
 			new window.ResizeObserver(function () {
 				var r;
 				if (popup.style.display === 'none' || smallScreen()) { return; }
-				// Only a size the reader is dragging at the corner counts as chosen. The box also
-				// changes size on its own (a fit to the window, a graph arriving, the width pinned
-				// on opening), and recording those made the first automatic size look like a choice.
+				// Only a corner drag counts as chosen, not the box's own fits and the width pin.
 				if (!popupSizing) { return; }
 				r = popup.getBoundingClientRect();
 				if (!(r.width > 0) || !(r.height > 0)) { return; }
@@ -50955,6 +50953,10 @@ var EngCalcs = EngCalcs || {};
 		var popup = document.getElementById('lpn_popup'), r, h, at;
 		if (popupUserPos) { sx = popupUserPos.left; sy = popupUserPos.top; }
 		popup.style.left = sx + 'px'; popup.style.top = sy + 'px';
+		// `flex`, not `block`: the box is a column now -- title band, then body -- so the body can
+		// take the height a drag gave the box and scroll inside it. Same reason the Find box is a
+		// flex column, and it is what makes `resize: both` mean anything here.
+		popup.style.display = 'flex';
 		// **A BOX WITH NO CHOSEN WIDTH IS MEASURED AT THE LEFT EDGE AND PINNED** (Tom, 2026-10-03: a
 		// pipe's or pump's Properties opened about 150 px wide and the full height of the map, and
 		// widened and narrowed itself as he moved it). It is `position: fixed` with `width: auto`, so
@@ -50965,10 +50967,6 @@ var EngCalcs = EngCalcs || {};
 		if (!popupUserSize && !smallScreen()) {
 			popup.style.width = ''; popup.style.left = '0px';
 		}
-		// `flex`, not `block`: the box is a column now -- title band, then body -- so the body can
-		// take the height a drag gave the box and scroll inside it. Same reason the Find box is a
-		// flex column, and it is what makes `resize: both` mean anything here.
-		popup.style.display = 'flex';
 		// **A SIZE THE USER DRAGGED IS RE-APPLIED ON EVERY OPEN, and it is a SESSION choice like
 		// popupUserPos beside it** -- neither is written to storage. That is the existing ruling
 		// for this box and it is left alone: the properties popup opens per element, dozens of
