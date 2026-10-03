@@ -664,3 +664,5 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|640| CLOSED 2026-10-03: the Graphs fly-out under Water (Profile, Time series, Frequency) merged on Tom's "Done. Close, merge, and delete branch."; Contour and System flow stay with Task 600.
 - 0|680| CLOSED 2026-10-03: `feat/drawing-keep` merged on Tom's word; a switch keeps up to four drawings and runs no placement pass.
 - 0|758| CLOSED 2026-10-03 on `fix/label-eviction`: the tab keep restores the full bank record plus the node context; the zoom pass unsheds nodes before its link shed, so one scale draws one picture. `label-evict-return-harness.js`, `zoom-pass-determinism-harness.js`.
+- 0|748| CLOSED 2026-10-03: `feat/keyboard-menu` merged on Tom's "Merge both"; arrow keys, Enter, Escape, fly-outs, row letters and hotkeys. `menu-keyboard-harness.js`, `menu-mnemonic-harness.js`.
+- 0|601| CLOSED 2026-10-03: `feat/calibration` merged on Tom's "Merge both" (his "Amazing. Done."); EPANET's three-page calibration report, per-project, session-only. `calibration-harness.js`.

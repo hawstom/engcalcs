@@ -88,10 +88,10 @@ if ($leftBehind['stale'] !== ['gone']) {
 }
 
 // A wired prefix with no keys is the one thing that must stay a NOTE: removing it is a judgement
-// call (CLAUDE.md declines to guess about 'irr'), so it must never reach the fatal count.
-$noteOnly = ecPrefixMapFindings(['mpf_flow' => 'Flow'], ['mpf' => ['flow'], 'irr' => ['flow']], []);
+// call (a wired prefix may be a retired page's), so it must never reach the fatal count.
+$noteOnly = ecPrefixMapFindings(['mpf_flow' => 'Flow'], ['mpf' => ['flow'], 'zzz' => ['flow']], []);
 $fatal = count($noteOnly['unwired']) + count($noteOnly['contradictory']) + count($noteOnly['stale']);
-if ($fatal !== 0 || $noteOnly['unused'] !== ['irr']) {
+if ($fatal !== 0 || $noteOnly['unused'] !== ['zzz']) {
     $fails++;
     echo "  FAIL a wired prefix with no keys is a note, never a failure\n";
     echo "        fatal=$fatal, unused=[" . implode(', ', $noteOnly['unused']) . "]\n";

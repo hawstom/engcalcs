@@ -3574,3 +3574,108 @@ visibly DIFFERENT from a live row, which is most of the fix.
 **Underlines.** Recommend: hidden until keyboard mode (chord pressed, or F10), a key badge rather than an underline because underlines fail in non-Latin scripts and RTL. SPECULATION: Windows' own "hide keyboard indicators until Alt" default is the convention being followed; not looked up.
 **In-menu mnemonics.** Deferred; type-ahead on the shown label instead (WAI-ARIA APG menu pattern, from memory, not re-fetched). SPECULATION.
 **Not found / not checked:** epanet-js app, Figma, VS Code web, Photopea, Office on the web behaviour — no evidence gathered this session; do not cite them for this decision.
+
+## 2026-10-03 — Tips and the word "selection": the deep audit (`chore/ida-tip`)
+
+Tom's brief: a studied strategy for disambiguating the map selection set from menu choices, and an
+audit of tip pollution (Gemini's "hover maps", the persistent status bar, click-to-open, one `?` per
+box, "is this really helpful?", delays in master styles). Full audit and the 8 decisions for Tom:
+`dev/tip-and-selection-audit.md`. This entry keeps only what a later invocation must not re-derive.
+
+**The finding that reorders the brief.** OBSERVED (`lib/lang.ec.en.php`, regex over all keys): 95
+keys, 119 hits for select/choose/pick/highlight, 87 on `lpn_`. About 80% of hits (53 of 66) already
+follow "select = the map set, choose = an option". The real defects are 11 strings plus the five
+Fire flow strings that carry BOTH senses in one sentence (`lpn_ff_no_selection`: "Select junctions
+or select the All option"). OBSERVED (`git show feat/demand-scaling:lib/lang.ec.en.php`): that
+branch already repaired it ("Select junctions or choose All junctions"), while `feat/criticality`
+says "Choose one on the map" (wrong side). The three tools are not parallel today; the Demand
+scaling wording is the pattern.
+
+**Recommendation: keep Select/Selected/the selection for the map set; Choose/option for lists;
+a sentence needing both says WHERE ("on the map"). Reject "Highlighted".** CITED: Microsoft Writing
+Style Guide, "select" (learn.microsoft.com/style-guide/a-z-word-list-term-collections/s/select):
+"Don't use highlight or pick as a synonym for select"; the marked items are "the selection".
+CITED: same guide, "Describing interactions with the UI": "Choose" is for an option by preference.
+Honest limit, volunteered: that page also says *select* for menu items, so Microsoft does not split
+the verb as cleanly as I propose. CITED: EPANET 2.2 manual (Select Object/Vertex/Region/All);
+AutoCAD Help, SELECT command ("selection set"). OBSERVED: "highlight" already means a transient
+flash on this page (`lpn_tip_labels_draggable`; Task 616's Hide-titles highlight), so Tom's
+candidate re-creates the collision. OBSERVED (shipped files, 7 languages): es, pt, fr have a clean
+verb pair (seleccionar/elegir, selecionar/escolher, sélectionner/choisir); tr, de, ru do not (one
+root); zh half (选中/选择). So the English split cannot be the only defence; "on the map" is.
+`pt` already split the Fire flow sentence unprompted.
+
+**Recommendation: do NOT build the persistent status strip.** CITED: Microsoft Learn, Win32 UX
+guide "Status Bars (Design basics)" (fetched 2026-10-03): "Don't use the status bar to explain menu
+bar items. This help pattern isn't discoverable"; "status bars are easy to overlook... many users
+don't notice status bars at all"; "Users should never have to know what is in the status bar"; for
+how to use a control, "display the information next to the associated control"; novice users are
+generally unaware of status bars. That is Tom's conditioned habit, and the guideline that retired
+it. OBSERVED: PCW and MJH never saw the menu bar; MJH did not see a 120 s highlight (ROADMAP:1474,
+Task 616): a mark on a strip nobody is looking at is the wrong instrument, and a bottom strip is
+one by construction. SPECULATION: not tested with a reader. What survives of his instinct: a
+description line INSIDE the open menu popup (the eye is already there), not at the window edge.
+
+**Delivery, not copy, is the pollution.** OBSERVED: 268 `lpn_*_tip` keys; median 24 words; 90 over
+30; 30 at 45+; 108 ruled by Tom on current text (`dev/english-key-rulings.json`). My one-pass sort:
+~71% helpful, 12% restate the label, 3% legitimate names for icon-only controls, 2% filler, 11% too
+long. Bootstrap's 200 px tooltip width (OBSERVED `css/vendor/bootstrap.min.css`
+`--bs-tooltip-max-width`) turns a 92-word tip into a box 200 x 554 px in a 900 px window (MEASURED,
+Chromium, 2026-10-03). First move if only one: widen it to 22 rem (one CSS line): MEASURED 352 x
+302 px. Also MEASURED: only 28 tip-bearing elements are on screen at 1400 px (7 on a 390 px phone)
+and ONE visible `?` glyph; the drawing is 87% of the window (86% phone); pressing Esc leaves a
+tooltip up (fails "dismissible"); the project tab strip and the transport's step/speed still use
+native `title=` (not `initTips`). Three tip affordances coexist: label+`?`, control title, and
+(Fire flow / Criticality / Demand scaling rows, `ffRow` `js/looped-network.js:57318`) a label with a
+title and NO glyph, which breaks CLAUDE.md's "exactly one ? per label". Also OBSERVED: `setIconLabel`
+joins `{name} — {tip}` (`js/Calculators.lib.js:798`), so Undo's tip prints "Undo — Undo the last
+change."; and the `×` close buttons carry bare native `title=` (20 in `Looped-Network.php`), the only
+tips that bypass `initTips`.
+
+**Delays.** OBSERVED: the tooltip delay is one literal, `js/Calculators.lib.js:107` (show 500, hide
+100), plus the same 500 repeated for long-press at `:172`. CITED: Microsoft Learn "Tooltips and
+Infotips": Initial 0.5 s, Reshow 0.1 s, Removal 5 s: the values already match Windows. They cannot
+live in CSS (Bootstrap takes JS options); they can be READ from an `--ec-*` variable. Ten other
+timers are hard-coded in `js/looped-network.js`, four of them the same unnamed `300`.
+CITED (not read at source): WCAG 1.4.13 (dismissible, hoverable, persistent). OBSERVED
+`css/engcalcs.css:434` `.tooltip { pointer-events: none }` means a tip cannot be hovered
+(MEASURED: computed `none`), so it fails "hoverable" and, with Esc leaving it up, "dismissible".
+
+**Not found / not checked:** no reader was shown any of this; the 44 px touch target, Russian
+everyday usage of "highlight", and a popover's behaviour when its box closes are SPECULATION. I
+did not prototype the popover. The category counts are one reader, one pass (plus or minus ten).
+
+## 2026-10-03 — Tips follow-up: Tom's Q4 and Q7 (`chore/ida-tip-2`)
+
+Tom's challenge to Q4 was right: I had put "hover for icon-only buttons" and "`?` for explanations"
+in one recommendation without saying that I was dividing, or why. Written down now in
+`dev/tip-followup-2026-10-03.md`.
+
+**Two tiers, drawn by content.** CITED (Apple HIG, Offering help, developer.apple.com/design/human-interface-guidelines/offering-help;
+Carbon, carbondesignsystem.com/components/tooltip/usage/; NN/g, nngroup.com/articles/tooltip-guidelines/):
+a hover tip says what a control is or does, in a few words; anything longer or interactive goes behind
+a clicked glyph. Spectrum's contextual help says the same (CITED, search excerpt only; its pages 404'd
+to my fetcher). Apple's number is 60 to 75 characters. OBSERVED (`dev/tip-review.csv`): only 54 of 272
+tips (20%) fit in 75 characters; median 133. So most of our tips are tier 2 content on a tier 1
+delivery, which is a cleaner statement of the audit's finding than "too long".
+
+**Departure volunteered:** our `?` also opens on hover; Carbon's toggletip is click only. SPECULATION
+that it is harmless; no source for it either way.
+
+**Q7, menu-item help.** Autodesk and Bentley: hover tooltip (CITED, Autodesk help GUID-685FC42D...
+read; Bentley excerpts only). Adobe Spectrum Menu: a description line inside the item (CITED,
+react-spectrum.adobe.com/react-spectrum/Menu.html, read). Apple: Menus page says nothing (OBSERVED
+by fetch, 2026-10-03). AutoCAD's status-bar menu help was removed around 2015/2016: a USER'S forum
+post only, SPECULATION as to the vendor's reason; Autodesk confirmation not found. I withdraw my
+earlier "description line inside the menu" suggestion: only Adobe does it and it costs a line per
+item in 27 languages. Tooltip on the item is cheaper and has more precedent.
+
+**Not verified:** Photoshop/Illustrator menus; WaterGEMS menu bar; Material 3 tooltips page (unreadable);
+every Bentley page except as search excerpts; the Apple `NSMenuItem.toolTip` body.
+
+**Q8 deliverable:** `dev/tip-review.csv`, 272 rows (268 `lpn_*_tip` plus `lpn_tip_join`,
+`lpn_file_saveas_tip_download`, `lpn_tip_select`, `lpn_tip_labels_draggable`). `ruled` = yes on 108
+by exact-text match in `dev/english-key-rulings.json` (OBSERVED, same as the audit's count).
+Categories this pass: helpful 194, long 32 (45+ words, regex word count), restates 32, icon-name 9,
+filler 5; one reader, plus or minus ten. `where` is derived from key names, not clicked through
+(SPECULATION in the places it is generic).

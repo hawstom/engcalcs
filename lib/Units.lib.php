@@ -282,15 +282,22 @@ define('EC_DEFAULT_UNIT_SET', ecDefaultUnitSet(
  * reprojection and datum handling outright. If georeferenced import is ever built, this
  * is the paragraph to come back to -- it is the one place the survey foot could enter.
  *
- * WE DO NOT COPY EPANET'S CONSTANTS, and it is worth saying why, because "follow
- * EPANET" is otherwise the obvious instinct. EPANET is not more precise than we were --
- * its types.h carries 5-significant-figure constants of its own (GPMperCFS 448.831
- * against an exact 448.83116883, PSIperFT 0.4333 against 0.4335275), so adopting them
- * would import their rounding AND re-break internal coherence, since their gpm and
- * their ft imply different feet. Exact is also independent of which EPANET version we
- * happen to vendor. This costs us nothing at the interop seam: an .inp round trip is
- * made lossless by passing the file's own number through when the display unit already
- * matches, not by any choice of constant -- exact factors do NOT round-trip in doubles
+ * SUITE-WIDE FACTORS STAY EXACT; THE LOOPED NETWORK PAGE ADOPTS ONE OF EPANET'S. "Follow
+ * EPANET" is the obvious instinct and it is right at exactly one seam: a user compares a
+ * Looped Network pressure with EPANET's report. EPANET's types.h has PSIperFT = 0.4333 against
+ * the exact 0.4335275, so an exact psi read 0.05% above EPANET's on every junction. Tom ruled
+ * on 2026-10-03 that lpn_ adopts it, for head <-> pressure in psi only: js/PipeHydraulics.lib.js
+ * holds EngCalcs.EPANET_PSI_PER_FT, and js/looped-network.js overrides its own page's copy of
+ * EngCalcs.unitFactors.psi with it. $ec_units['psi'] below is NOT changed, because the other
+ * calculators use psi as a general pressure unit and this table is their authority.
+ *
+ * THE REJECTED ALTERNATIVE is adopting EPANET's constants suite-wide. EPANET is not more precise
+ * than we are -- its types.h carries 5-significant-figure constants (GPMperCFS 448.831 against
+ * an exact 448.83116883) -- so copying them would import their rounding AND re-break internal
+ * coherence, since their gpm and their ft imply different feet. It also ties us to whichever
+ * EPANET version we vendor. The interop seam does not need it: an .inp round trip is made
+ * lossless by passing the file's own number through when the display unit already matches, not
+ * by any choice of constant -- exact factors do NOT round-trip in doubles
  * (150 * 0.3048 * (1/0.3048) === 149.99999999999997).
  *
  * The exact definitions used:

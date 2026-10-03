@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**74 still to read on master**, of 92 untranslated keys, of 2245 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**49 still to read on master**, of 67 untranslated keys, of 2220 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (92, 74 to read @@ NEEDS RULING)
+## lpn_  (67, 49 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -180,6 +180,74 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_calib_units`**
   > The file's values are read in this project's units: {unit}.
   @@ NEEDS RULING
+- **`lpn_copy_body`**
+  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_body_nodate`**
+  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_copy`**
+  > A copy; make new lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_kept_link`**
+  > Opened {name} as the original, moved to a new place. Save now writes to this file.
+  @@ NEEDS RULING
+- **`lpn_copy_opened`**
+  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  _Ruled 2026-10-01: Wording change per this. This is good._
+- **`lpn_copy_original`**
+  > Original; keep same lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_title`**
+  > Mark file as new copy?
+  _Ruled OK 2026-10-01._
+- **`lpn_graphs_menu`**
+  > Graphs
+  @@ NEEDS RULING
+- **`lpn_graphs_menu_tip`**
+  > Graphs: Profile, Time Series, and Frequency distribution
+  @@ NEEDS RULING
+- **`lpn_hotkeys_menu_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_hotkeys_menu_heading`**
+  > Menus
+  @@ NEEDS RULING
+- **`lpn_hotkeys_menu_term`**
+  > Menu keyboard shortcuts
+  @@ NEEDS RULING
+- **`lpn_reports_calib`**
+  > Calibration
+  @@ NEEDS RULING
+- **`lpn_reports_calib_tip`**
+  > Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.
+  @@ NEEDS RULING
+- **`lpn_scenario_basic`**
+  > Basic mode
+  _Ruled OK 2026-10-01._
+- **`lpn_scenario_basic_tip`**
+  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
+  _Ruled OK 2026-10-01._
+
+---
+
+# Strings waiting on a branch
+
+**105 still to read**, of 152 new keys across 13 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### chore/selection-word (`16dce45b`) — adds no English strings
+
+### feat/contour (`1871dcb7`) — 25 new, 25 to read @@ NEEDS RULING
+
 - **`lpn_contour_buffer`**
   > Buffer
   @@ NEEDS RULING
@@ -255,71 +323,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_contour_too_many`**
   > Too many contour lines at this interval; widen it to draw them.
   @@ NEEDS RULING
-- **`lpn_copy_body`**
-  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_body_nodate`**
-  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_copy`**
-  > A copy; make new lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_kept_link`**
-  > Opened {name} as the original, moved to a new place. Save now writes to this file.
-  @@ NEEDS RULING
-- **`lpn_copy_opened`**
-  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
-  _Ruled 2026-10-01: Wording change per this. This is good._
-- **`lpn_copy_original`**
-  > Original; keep same lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_title`**
-  > Mark file as new copy?
-  _Ruled OK 2026-10-01._
-- **`lpn_graphs_menu`**
-  > Graphs
-  @@ NEEDS RULING
-- **`lpn_graphs_menu_tip`**
-  > Graphs: Profile, Time Series, and Frequency distribution
-  @@ NEEDS RULING
-- **`lpn_hotkeys_menu_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>
-  @@ NEEDS RULING
-- **`lpn_hotkeys_menu_heading`**
-  > Menus
-  @@ NEEDS RULING
-- **`lpn_hotkeys_menu_term`**
-  > Menu keyboard shortcuts
-  @@ NEEDS RULING
-- **`lpn_reports_calib`**
-  > Calibration
-  @@ NEEDS RULING
-- **`lpn_reports_calib_tip`**
-  > Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.
-  @@ NEEDS RULING
-- **`lpn_scenario_basic`**
-  > Basic mode
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_basic_tip`**
-  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
-  _Ruled OK 2026-10-01._
-
----
-
-# Strings waiting on a branch
-
-**80 still to read**, of 127 new keys across 14 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### feat/contour (`ab43b5b8`) — adds no English strings
 
 ### feat/criticality (`84ea5311`) — 31 new, 8 to read @@ NEEDS RULING
 
@@ -712,7 +715,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   @@ NEEDS RULING
 
-### feat/property-graph (`ce47ab51`) — 5 new, 3 to read @@ NEEDS RULING
+### feat/property-graph (`3c987393`) — 5 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.
@@ -729,7 +732,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_result_pump_head_tip`**
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   @@ NEEDS RULING
-
-### fix/psi-factor (`4217cd31`) — adds no English strings
-
-### fix/report-column (`31195c96`) — adds no English strings

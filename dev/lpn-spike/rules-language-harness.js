@@ -135,8 +135,8 @@ console.log('\n--- a rule\'s numbers reach the engine in the engine\'s units ---
 	// SI pressure unit -- so the factor is psi per metre of water and nothing else.
 	ok('a junction PRESSURE is a pressure: 50 psi goes out as metres of water',
 		near(valueAfter('AND JUNCTION J1 PRESSURE BELOW') || valueAfter('IF JUNCTION J1 PRESSURE BELOW'),
-			50 / 1.4223343307119563),
-		valueAfter('IF JUNCTION J1 PRESSURE BELOW') + ' vs ' + (50 / 1.4223343307119563));
+			50 / global.EngCalcs.EPANET_PSI_PER_M),
+		valueAfter('IF JUNCTION J1 PRESSURE BELOW') + ' vs ' + (50 / global.EngCalcs.EPANET_PSI_PER_M));
 	// A FLOW. m3/s on the model, L/s in the input, the same 1000 every other flow in that file makes.
 	// 1 gal = 3.785411784 L exactly, so 100 gpm = 6.30901964 L/s exactly.
 	ok('a pipe FLOW is a flow: 100 gpm goes out in L/s',

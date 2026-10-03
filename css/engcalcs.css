@@ -4291,6 +4291,10 @@ html:has(#lpn_canvas) { overflow: hidden; }
 .lpn-ff-table, .lpn-ff-table tr { border: 0; }
 .lpn-ff-table th, .lpn-ff-table td { text-align: left; padding: .15em .4em; border: 0; border-bottom: 1px solid var(--ec-border); overflow-wrap: anywhere; }
 .lpn-ff-table th { overflow-wrap: normal; }
+/* A cell whose text is a short localized noun (the Full report's Type: Junction, Reservoir) is
+   exactly as wide as that word in the current language, never broken: `anywhere` above would let
+   auto layout squeeze the column to one letter ("Junctio|n"). Nothing is reserved beyond the word. */
+.lpn-ff-table td.lpn-ff-fit { white-space: nowrap; overflow-wrap: normal; }
 /* THE ALTERNATIVES PREVIEW (Tom, 2026-10-01: *"Alternatives columns are crazy."*): `anywhere` above
    shrinks every column's minimum to one character, so auto layout shared the width evenly and broke
    words ("Scen|ario", cell "Bas|e") beside unused padding. Here a column is exactly as wide as its

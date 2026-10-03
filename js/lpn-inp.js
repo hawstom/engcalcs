@@ -94,14 +94,11 @@
 	EngCalcs.lpnInpFlowUnits = FLOW_UNITS;
 
 	var FT = 0.3048, IN = 0.0254, MM = 0.001;
-	// 1 psi of water column, in metres, DERIVED from lbf = 4.4482216152605 N and g = 9.80665 the
-	// way lib/Units.lib.php derives $ec_units['psi'] from the same two numbers. Only used for
-	// emitters, which are the one place EPANET states a coefficient per unit of PRESSURE rather
-	// than per unit of head.
-	// (9.80665 is EngCalcs.G written out rather than read: this module loads before
-	// js/Calculators.lib.js in a Node harness, and it is DOM-free and load-order-free by design.
-	// dev/scripts/js_constant_check.php holds the two to the same value.)
-	var PSI_M = (4.4482216152605 / (IN * IN)) / (1000 * 9.80665);
+	// 1 psi of water column, in metres, on EPANET's PSIperFT = 0.4333 (EngCalcs.EPANET_PSI_PER_FT,
+	// js/PipeHydraulics.lib.js) so a file's PRV/PSV setting and emitter coefficient mean here what
+	// they mean to EPANET, which divides by that same constant. Only used for emitters and valve
+	// settings, the places EPANET states a number per unit of PRESSURE rather than per unit of head.
+	var PSI_M = FT / EngCalcs.EPANET_PSI_PER_FT;
 
 	// Sections we read. Anything else in the file is either irrelevant to a steady-state hydraulic
 	// solve (report/times/graphics settings) or a cut feature, and the cut ones are named in

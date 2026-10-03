@@ -15,6 +15,15 @@ var EngCalcs = EngCalcs || {};
 	// Looped-Network.php; the harnesses in dev/lpn-spike/ require them directly.
 	var Geom = EngCalcs.lpnGeom, Collide = EngCalcs.lpnCollide;
 
+	// **PSI ON THIS PAGE IS EPANET'S PSI** (Tom, 2026-10-03). Head becomes pressure through
+	// EngCalcs.unitFactors, so this page's own copy of the psi factor carries EPANET's PSIperFT
+	// (0.4333, js/PipeHydraulics.lib.js) and every pressure here reads as EPANET reports it. The
+	// shared $ec_units['psi'] stays exact for the other calculators; this table is per page load.
+	// Only psi: EPANET's metres match ours, and kPa and bar are not offered by EPANET's US set.
+	if (EngCalcs.unitFactors && typeof EngCalcs.EPANET_PSI_PER_M === 'number') {
+		EngCalcs.unitFactors.psi = EngCalcs.EPANET_PSI_PER_M;
+	}
+
 	var NS = 'http://www.w3.org/2000/svg';
 	var svg, world, modelLayer, backdropLayer, gridLayer, customersLayer, linksLayer, linkSymbolLayer, nodesLayer, labelsLayer, debugBoxLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
@@ -37940,6 +37949,7 @@ var EngCalcs = EngCalcs || {};
 		if (p.el && !p.el.title) { p.el.title = p.title; }
 	}
 	function openMenu(anchor, rows, level) {
+		menuRestoreSeq++;
 		var els = menuEls(level), popup = els.popup, list = els.list;
 		if (!popup || !list) { return; }
 		if (!level) {
@@ -38106,6 +38116,10 @@ var EngCalcs = EngCalcs || {};
 	// Tab closes the menu and goes on, Enter/Space are the buttons' own click.
 	var subOpener = null;
 	var menuKbIntent = false;
+	// Counts menu interactions. The deferred focus restore below runs from a timer, which a busy page
+	// can delay past the person's next keystrokes (input outranks timers); a restore whose number is
+	// no longer current is stale and must not move focus.
+	var menuRestoreSeq = 0;
 	function menuRowsOf(list) {
 		return Array.prototype.slice.call(list.querySelectorAll('button.lpn-menu-row:not(:disabled):not([data-pointer-only])'));
 	}
@@ -38128,11 +38142,13 @@ var EngCalcs = EngCalcs || {};
 	// or a mnemonic about to click), so it sees which boxes were open before the command.
 	function menuFocusAfterRow(t) {
 		var opener = openMenuAnchor;
+		var seq = ++menuRestoreSeq;
 		var ret = kbdModeReturn;   // the element that had focus before a chord or F10 (cleared by the click handler below)
 		var boxVisible = function (id) { var b = document.getElementById(id); return !!b && b.getClientRects().length > 0; };
 		var boxesBefore = ESCAPE_SCOPED_BOXES.filter(boxVisible);
 		if (t && t.closest && t.closest('#lpn_menu_popup, #lpn_menu_popup2') && opener) {
 			setTimeout(function () {
+				if (seq !== menuRestoreSeq) { return; }   // a later menu interaction owns focus
 				// The closed menu's row still holds focus until the browser's next focus fix-up, so
 				// "dropped" means body, or a control inside either closed menu panel.
 				var a = document.activeElement;
@@ -59962,7 +59978,7 @@ var EngCalcs = EngCalcs || {};
 			.concat(FULL_REPORT_COLS.map(fullReportColHeading)));
 		stepRows.forEach(function (r) {
 			var tr = ffEl('tr', null, null, body);
-			ffCell(tr, r.type);
+			ffCell(tr, r.type, 'lpn-ff-fit');
 			ffCell(tr, r.id);
 			FULL_REPORT_COLS.forEach(function (c) { ffCell(tr, fullReportCellText(r, c.key)); });
 		});
@@ -60845,6 +60861,8 @@ var EngCalcs = EngCalcs || {};
 	// file draws it, so the dependency runs one way: lpn-time.js owns the text, looped-network.js
 	// owns the boxes, and neither reaches into the other's state.
 	EngCalcs.lpnOpenRunReportBox = function () { return openRunReportBox(); };
+	// The Full report's Type column harness opens the box through this, not through the menu.
+	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };
 
 	EngCalcs.pageCalculatorInitialize = function (objForm) {};
 	EngCalcs.pageCalculator = function (objForm) {
