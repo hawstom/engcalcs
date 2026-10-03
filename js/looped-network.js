@@ -1102,6 +1102,11 @@ var EngCalcs = EngCalcs || {};
 		work.forEach(function (rec) { measureLabelWidths(rec.le); });
 		shedToSegmentBatch(work, fsNow);
 		work.forEach(function (rec) { rec.le.shedCount = rec.all.length - rec.le.lines.length; });
+		// **BACK TO FULL CONTENT BEFORE THE SHED PREDICTS THE NODE LABELS** -- the content pass's
+		// Task 539 rule, which this zoom path missed. Without it the prediction read node labels
+		// shed for the PREVIOUS scale, so one scale reached by two wheel histories drew two
+		// pictures (2026-10-03; dev/lpn-spike/zoom-pass-determinism-harness.js).
+		unshedNodeLabels(fsNow);
 		shedAlignedForConflicts(fsNow, fs);
 	}
 	/**
@@ -30998,27 +31003,38 @@ var EngCalcs = EngCalcs || {};
 	 * has the measurement: a layout computed at scale 1 has a median nudge of 43 world units on a
 	 * model 37 units across. The document half is `modelSignature()`, which covers the settings and
 	 * the label choices too, since both are serialized.
+	 *
+	 * **THE SAME RECORD THE ZOOM BANK KEEPS, PLUS THE CONTENT** (Task 758). This keep once copied
+	 * its own shorter list of holder fields and missed four the pass decides -- `alignedAlong`,
+	 * `stationSides`, `hiddenYielded` and the customer labels' spots -- so a tab whose drawing was
+	 * evicted came back with 78 of 123 Novato labels drawn differently. One list,
+	 * grabBucketHolder(), now serves both keeps, so a field a placer adds is kept by both or by
+	 * neither. dev/lpn-spike/label-evict-return-harness.js.
 	 */
 	function captureLabelLayout() {
 		// The kept layout must be the settled one: a pass owed and not yet run would otherwise be
 		// kept as the answer and restored on the way back (Task 653).
 		flushLabelRefresh();
-		var out = { scale: state.s, nodes: {}, links: {}, texts: {} };
+		var out = { scale: state.s, nodes: {}, links: {}, texts: {}, custs: {},
+			parts: labelBankParts.map(function (p) { return p.capture(); }) };
 		function grab(h) {
-			return { nudge: h.nudge ? { x: h.nudge.x, y: h.nudge.y } : null,
-				nudgeManual: !!h.nudgeManual, placedSide: h.placedSide,
-				lines: h.lines ? h.lines.slice() : null, rows: h.rows ? h.rows.slice() : null,
-				allLines: h.allLines ? h.allLines.slice() : null,
-				lineCount: h.lineCount, empty: !!h.empty, shedCount: h.shedCount || 0,
-				hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded,
-				hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
-				tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
-				rowW: h.rowW ? h.rowW.slice() : null, rowWPx: h.rowWPx ? h.rowWPx.slice() : null,
-				segW: h.segW ? h.segW.slice() : null };
+			var g = grabBucketHolder(h);
+			g.allLines = h.allLines ? h.allLines.slice() : null;
+			g.empty = !!h.empty;
+			return g;
 		}
 		Object.keys(nodeEls).forEach(function (id) { out.nodes[id] = grab(nodeEls[id]); });
 		Object.keys(linkEls).forEach(function (id) { out.links[id] = grab(linkEls[id]); });
 		Object.keys(labelEls).forEach(function (id) { out.texts[id] = grab(labelEls[id]); });
+		// A rebuilt drawing's meter labels are blank until a content pass writes them, so their
+		// content is kept as well as their spot.
+		Object.keys(custLblEls).forEach(function (id) {
+			var ce = custLblEls[id], g = grabBucketHolder(ce);
+			g.empty = !!ce.empty;
+			g.hidden = ce.text.style.visibility === 'hidden';
+			g.spot = ce.spot; g.trials = ce.trials;
+			out.custs[id] = g;
+		});
 		return out;
 	}
 	function rememberSwitchState() {
@@ -31028,9 +31044,15 @@ var EngCalcs = EngCalcs || {};
 		// order the drawing keep evicts in, which is what lets a kept drawing count on its solve.
 		switchKeepOrder = switchKeepOrder.filter(function (x) { return x !== id; });
 		switchKeepOrder.push(id);
+		var layout = captureLabelLayout();
 		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult,
 			time: EngCalcs.lpnTimeKeep ? EngCalcs.lpnTimeKeep() : null,
-			layout: captureLabelLayout() };
+			layout: layout,
+			// **AND THE NODE CONTEXT THE PASS RANKED AND SIDED BY** (Task 758). Built only by a
+			// content pass, which a restored arrival skips -- so without this the next zoom on the
+			// returning tab placed its labels by the PREVIOUS tab's context. A function of the
+			// document and the solve, both of which the signature already guards.
+			context: nodeContext, fieldMid: nodeFieldMid };
 		// ...and the drawing itself, put away on arrival (see settleDrawingForArrival()).
 		outgoingDrawing = { id: id, sig: switchKeep[id].sig };
 		while (switchKeepOrder.length > SWITCH_KEEP_MAX) {
@@ -31074,27 +31096,9 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		check('node', L.nodes, nodeEls); check('link', L.links, linkEls);
-		check('text', L.texts, labelEls);
+		check('text', L.texts, labelEls); check('customer', L.custs || {}, custLblEls);
 		keptLayoutMiss = ok ? '' : why;
 		return ok;
-	}
-	function restoreHolderFields(h, c) {
-		h.nudge = c.nudge ? { x: c.nudge.x, y: c.nudge.y } : { x: 0, y: 0 };
-		h.nudgeManual = c.nudgeManual;
-		h.placedSide = c.placedSide;
-		h.shedCount = c.shedCount;
-		h.hiddenShort = c.hiddenShort;
-		h.hiddenCrowded = c.hiddenCrowded;
-		h.hiddenCrossed = c.hiddenCrossed;
-		h.hiddenDropped = c.hiddenDropped;
-		// The measured widths, so a restore asks the browser nothing at all.
-		if (c.tw !== undefined) { h.tw = c.tw; }
-		if (c.twPx !== undefined) { h.twPx = c.twPx; }
-		if (c.width !== undefined) { h.width = c.width; }
-		if (c.widthPx !== undefined) { h.widthPx = c.widthPx; }
-		if (c.rowW) { h.rowW = c.rowW.slice(); }
-		if (c.rowWPx) { h.rowWPx = c.rowWPx.slice(); }
-		if (c.segW) { h.segW = c.segW.slice(); }
 	}
 	// Counted so a harness can tell a restore from a recomputation that happens to agree with it --
 	// without this, "the restored layout equals the computed one" passes trivially when no restore
@@ -31119,25 +31123,43 @@ var EngCalcs = EngCalcs || {};
 				// The glyphs have to be WRITTEN -- these are new elements -- but they are written
 				// from the content the shed already decided, so no cascade runs and nothing is
 				// measured.
-				if (c.lines && !c.empty) { writeNodeLabelGlyphs(ne, n, c.lines, fsNow); }
+				if (c.lines && !c.empty) { writeNodeLabelGlyphs(ne, n, c.lines.slice(), fsNow); }
 				ne.allLines = c.allLines || (c.lines ? c.lines.slice() : ne.allLines);
-				restoreHolderFields(ne, c);
+				ne.empty = c.empty; ne.lineCount = c.lineCount;
+				restoreBucketHolder(ne, c);
 			});
 			doc.links.forEach(function (l) {
 				var le = linkEls[l.id], c = L.links[l.id];
 				if (!le || !c) { return; }
-				if (c.lines && !c.empty) { writeLabelGlyphs(le, l, c.lines, fsNow); }
-				restoreHolderFields(le, c);
+				if (c.lines && !c.empty) { writeLabelGlyphs(le, l, c.lines.slice(), fsNow); }
+				if (c.allLines) { le.allLines = c.allLines.slice(); }
+				le.empty = c.empty; le.lineCount = c.lineCount;
+				restoreBucketHolder(le, c);
 			});
 			Object.keys(L.texts).forEach(function (id) {
-				var te = labelEls[id]; if (te) { restoreHolderFields(te, L.texts[id]); }
+				var te = labelEls[id]; if (te) { restoreBucketHolder(te, L.texts[id]); }
 			});
+			(L.parts || []).forEach(function (part, i) { if (labelBankParts[i]) { labelBankParts[i].restore(part); } });
 			// The same three loops relayoutLabels() ends with -- every label laid out for real at
 			// the position it already had -- and then the arrows and the legend, which
 			// refreshLabelTextPass() does after it.
 			doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
 			doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
 			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
+			// The meters last, as the pass places them: content written (these are new elements),
+			// then the kept spot.
+			(doc.customers || []).forEach(function (cu) {
+				var ce = custLblEls[cu.id], c = L.custs && L.custs[cu.id];
+				if (!ce || !c) { return; }
+				ce.empty = c.empty; ce.lineCount = c.lineCount;
+				if (c.lines) {
+					ce.lines = c.lines.slice(); ce.allLines = ce.lines;
+					setMultilineText(ce.text, customerPoint(cu).x, composeRows(c.lines, false));
+					ce.text.style.fontSize = fsNow;
+				}
+				restoreBucketHolder(ce, c);
+				restoreCustomerLabelSpot(ce, c);
+			});
 		} finally { endMapBoxHold(); endLinkGeomHold(); }
 		doc.links.forEach(function (l) { updateArrow(l.id); });
 		renderLabelsLegend();
@@ -32372,6 +32394,9 @@ var EngCalcs = EngCalcs || {};
 		// label would be drawn empty and drawn again when the values arrived.
 		var kept = keptStateForOpenProject();
 		lastSolveResult = (kept && kept.solve) || null;
+		// The context the kept layout was ranked and sided by, for the same reason (Task 758): a
+		// restored arrival runs no content pass, which is the only builder of it.
+		if (kept && kept.context) { nodeContext = kept.context; nodeFieldMid = kept.fieldMid || {}; }
 		// The labels wait for the camera -- see buildDom() and the restore below.
 		labelPassDeferred = true;
 		// And a pass requested for the OUTGOING document is not owed to this one, which is laid out
@@ -44058,17 +44083,22 @@ var EngCalcs = EngCalcs || {};
 			doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
 			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
 			Object.keys(e.custs).forEach(function (id) {
-				var ce = custLblEls[id], c = e.custs[id], sp = c.spot;
-				if (!ce) { return; }
-				ce.trials = c.trials;
-				if (c.hidden || !sp) { setLabelAssemblyHidden(ce, true); return; }
-				ce.spot = sp;
-				setLabelAssemblyHidden(ce, false);
-				ce.text.setAttribute('text-anchor', sp.hAlign);
-				ce.text.setAttribute('transform', 'rotate(' + sp.angle.toFixed(3) + ' ' + sp.ax + ' ' + sp.ay + ')');
-				repositionMultilineText(ce.text, sp.ax, sp.ay);
+				var ce = custLblEls[id];
+				if (ce) { restoreCustomerLabelSpot(ce, e.custs[id]); }
 			});
 		} finally { endLinkGeomHold(); }
+	}
+	// A meter label put back where a kept pass left it -- layoutCustomerLabels()'s last lines, with
+	// the spot it chose. Shared by the zoom bank and the tab keep.
+	function restoreCustomerLabelSpot(ce, c) {
+		var sp = c.spot;
+		ce.trials = c.trials;
+		if (c.hidden || !sp) { setLabelAssemblyHidden(ce, true); return; }
+		ce.spot = sp;
+		setLabelAssemblyHidden(ce, false);
+		ce.text.setAttribute('text-anchor', sp.hAlign);
+		ce.text.setAttribute('transform', 'rotate(' + sp.angle.toFixed(3) + ' ' + sp.ax + ' ' + sp.ay + ')');
+		repositionMultilineText(ce.text, sp.ax, sp.ay);
 	}
 	// The zoom settle, through the bank.
 	function labelCacheSettle() {
