@@ -59257,7 +59257,7 @@ var EngCalcs = EngCalcs || {};
 			.concat(FULL_REPORT_COLS.map(fullReportColHeading)));
 		stepRows.forEach(function (r) {
 			var tr = ffEl('tr', null, null, body);
-			ffCell(tr, r.type);
+			ffCell(tr, r.type, 'lpn-ff-fit');
 			ffCell(tr, r.id);
 			FULL_REPORT_COLS.forEach(function (c) { ffCell(tr, fullReportCellText(r, c.key)); });
 		});
@@ -60140,6 +60140,8 @@ var EngCalcs = EngCalcs || {};
 	// file draws it, so the dependency runs one way: lpn-time.js owns the text, looped-network.js
 	// owns the boxes, and neither reaches into the other's state.
 	EngCalcs.lpnOpenRunReportBox = function () { return openRunReportBox(); };
+	// The Full report's Type column harness opens the box through this, not through the menu.
+	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };
 
 	EngCalcs.pageCalculatorInitialize = function (objForm) {};
 	EngCalcs.pageCalculator = function (objForm) {
