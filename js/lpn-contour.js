@@ -445,4 +445,4 @@
 	};
 
 	if (typeof module !== 'undefined' && module.exports) { module.exports = EC.lpnContour; }
-}(typeof window !== 'undefined' ? window : globalThis));
+}(typeof globalThis !== 'undefined' ? globalThis : this));

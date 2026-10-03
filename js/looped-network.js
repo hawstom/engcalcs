@@ -8893,7 +8893,7 @@ var EngCalcs = EngCalcs || {};
 		if (!colorFieldOf('node')) { settings.colorNodeField = 'pressure'; }
 		if (!contourStyleOf()) { settings.contourStyle = 'filled'; }
 		refreshValueColors(); saveToStorage(); syncColorControls();
-		openSettingsBox('coloring');
+		openSettingsBox('nodeColors');
 	}
 	// The support line under the colour key: what the colour between the nodes stands on.
 	function contourNoteText() {
@@ -45744,6 +45744,8 @@ var EngCalcs = EngCalcs || {};
 	var SETBOX_TARGETS = {
 		labels: 'lpn_set_sub_nodeSym',
 		coloring: 'lpn_set_sub_nodeSym',
+		// The node colours themselves, where the contour plot's own row sits (Task 600).
+		nodeColors: 'lpn_set_sub_nodeColors',
 		map: 'lpn_set_sec_map',
 		elements: 'lpn_set_sec_elements',
 		calc: 'lpn_set_sec_calc',
