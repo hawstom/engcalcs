@@ -7,6 +7,9 @@
 //   2. (e) The box: interval 10 redraws the lines at multiples of 10; opacity 30 sets the image to
 //      0.3; the label count follows Labels.
 //   3. A zoom re-places the labels at the same size on screen.
+//   3c. The box's size fits its contents (no scrolling, within 600 x 600, on screen) in en, de, ru,
+//      fr at 1400 x 900, with no saved state AND with a stale small saved size that lacks
+//      `userSized`; with `userSized: true` the saved size wins; a drag of the corner sets the flag.
 //   4. (f) At 390 x 844 the box fits the screen, with nothing wider than it.
 //
 //   flock /tmp/engcalcs-browser.lock node dev/lpn-spike/contour-browser-harness.js
@@ -189,6 +192,77 @@ async function sectionDocked(Session, browser) {
 	}
 }
 
+// ---- 3c. the box fits its contents -------------------------------------------------------------
+async function openNet3Saved(Session, browser, locale, saved) {
+	const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 }, locale });
+	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+	if (saved) { await a.page.addInitScript((v) => { try { if (!localStorage.getItem('lpn_contourbox')) { localStorage.setItem('lpn_contourbox', v); } } catch (e) { /* none */ } }, JSON.stringify(saved)); }
+	await a.goto('Looped-Network.php');
+	await a.answerTrainingPanel().catch(() => {});
+	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+	await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
+	await a.settle(1500);
+	return a;
+}
+function boxFacts(page, withDem) {
+	return page.evaluate((dem) => {
+		const b = document.getElementById('lpn_contour_box'), body = document.getElementById('lpn_contour_body');
+		if (dem) {
+			// The DEM row is offered only with a located project and a token; stand one in, labelled as the page words it.
+			const rows = body.querySelectorAll('.lpn-set-row'), c = rows[rows.length - 1].cloneNode(true);
+			c.firstChild.textContent = EngCalcs.pageConfig.lpn_contour_dem || 'Ground between nodes from Mapbox DEM';
+			body.appendChild(c);
+		}
+		const r = b.getBoundingClientRect();
+		return { w: Math.round(r.width), h: Math.round(r.height), l: r.left, t: r.top, rt: r.right, bt: r.bottom, vw: window.innerWidth, vh: window.innerHeight,
+			rows: body.querySelectorAll('.lpn-set-row').length, vScroll: body.scrollHeight - body.clientHeight, hScroll: body.scrollWidth - body.clientWidth,
+			saved: localStorage.getItem('lpn_contourbox') };
+	}, !!withDem);
+}
+async function sectionFit(Session, browser) {
+	console.log('\n--- 3c. the box fits its contents, 1400 x 900 ---');
+	const cases = [['en-US', null], ['de-DE', null], ['ru-RU', null], ['fr-FR', null],
+		['de-DE', { left: null, top: null, w: 300, h: 250, open: true }]];
+	for (const [loc, saved] of cases) {
+		const a = await openNet3Saved(Session, browser, loc, saved);
+		try {
+			await contourFromMenu(a);
+			const f = await boxFacts(a.page, true);
+			await a.settle(300);
+			const g = await boxFacts(a.page, false);
+			const tag = loc + (saved ? ' (stale saved 300x250, no flag)' : ' (no saved state)');
+			console.log('         ' + tag + ': box ' + f.w + ' x ' + g.h + ' px with the DEM row');
+			ok(tag + ': all rows shown', f.rows >= 8, f.rows);
+			ok(tag + ': no vertical or horizontal scroll', g.vScroll <= 0 && g.hScroll <= 0, g.vScroll + ' / ' + g.hScroll);
+			ok(tag + ': within 600 x 600 and on screen', g.w <= 600 && g.h <= 600 && g.l >= 0 && g.t >= 0 && g.rt <= g.vw + 0.5 && g.bt <= g.vh + 0.5, JSON.stringify(g));
+			ok(tag + ': wider than the old 23 rem box (368 px)', g.w > 400, g.w);
+		} finally { await a.close(); }
+	}
+	// A size the user dragged wins.
+	const a = await openNet3Saved(Session, browser, 'en-US', { left: 200, top: 200, w: 520, h: 330, open: true, userSized: true });
+	try {
+		await contourFromMenu(a);
+		const g = await boxFacts(a.page, false);
+		ok('userSized:true: the saved size wins', Math.abs(g.w - 520) <= 2 && Math.abs(g.h - 330) <= 2, g.w + ' x ' + g.h);
+	} finally { await a.close(); }
+	// ... and a drag of the corner is what sets the flag.
+	const d = await openNet3Saved(Session, browser, 'en-US', null);
+	try {
+		await contourFromMenu(d);
+		const before = await boxFacts(d.page, false);
+		ok('a fresh open stores no size flag', !before.saved || JSON.parse(before.saved).userSized !== true, before.saved);
+		// A mouse machine's resizer is the browser's own corner (the 28 px grip is for a finger).
+		const grip = await d.page.evaluate(() => { const r = document.getElementById('lpn_contour_box').getBoundingClientRect(); return { x: r.right - 5, y: r.bottom - 5 }; });
+		await d.page.mouse.move(grip.x, grip.y);
+		await d.page.mouse.down();
+		await d.page.mouse.move(grip.x - 60, grip.y + 40, { steps: 5 });
+		await d.page.mouse.up();
+		await d.settle(300);
+		const after = await boxFacts(d.page, false), rec = JSON.parse(after.saved || '{}');
+		ok('a drag of the corner resizes the box and sets userSized', rec.userSized === true && Math.abs(after.w - (before.w - 60)) <= 3 && Math.abs(rec.w - after.w) <= 1, after.saved);
+	} finally { await d.close(); }
+}
+
 async function sectionPhone(Session, browser) {
 	console.log('\n--- 4. on a phone, 390 x 844 (f) ---');
 	const a = await openNet3(Session, browser, { width: 390, height: 844 });
@@ -228,6 +302,7 @@ async function main() {
 	try {
 		await sectionDesk(Session, browser);
 		await sectionDocked(Session, browser);
+		await sectionFit(Session, browser);
 		await sectionPhone(Session, browser);
 	} finally {
 		await browser.close();

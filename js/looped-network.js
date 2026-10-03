@@ -9192,6 +9192,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	var LPN_CONTOURBOX_KEY = 'lpn_contourbox';
 	var contourboxLayout = newBoxLayout();
+	contourboxLayout.userSized = false;
 	function saveContourboxLayout() {
 		try { localStorage.setItem(LPN_CONTOURBOX_KEY, JSON.stringify(contourboxLayout)); } catch (e) {}
 	}
@@ -47607,11 +47608,16 @@ var EngCalcs = EngCalcs || {};
 			// `open` is the one boolean among four numbers -- see loadLibboxLayout() for the defect
 			// a loader that types every field as a number produced.
 			if (k === 'open') { layout.open = !!v.open; }
+			else if (k === 'userSized') { layout.userSized = v.userSized === true; }
 			else if (typeof v[k] === 'number' && isFinite(v[k])) { layout[k] = v[k]; }
 		}
 	}
 	// A remembered size is a wish: applied, then left to the stylesheet's own min/max.
+	// **A BOX THAT CARRIES `userSized` APPLIES A SIZE ONLY IF A DRAG PUT IT THERE** (Tom, 2026-10-03:
+	// the contour box was too small for its contents). The observer used to store whatever size the
+	// box happened to open at, so an old, too-small default was remembered as if he had chosen it.
 	function applyBoxSize(box, layout) {
+		if (layout.hasOwnProperty('userSized') && !layout.userSized) { return; }
 		if (layout.w) { box.style.width = layout.w + 'px'; }
 		if (layout.h) { box.style.height = layout.h + 'px'; }
 	}
@@ -47698,12 +47704,34 @@ var EngCalcs = EngCalcs || {};
 			layout.top = pos.top;
 			save();
 		});
-		addPanelResizeGrip(box);
+		// A drag of the grip or of the browser's own corner is the one thing that makes a size the
+		// user's. Recorded in the same record, never a second key.
+		function userResized() {
+			var r = box.getBoundingClientRect();
+			if (smallScreen() || !layout.hasOwnProperty('userSized') || !(r.width > 0) || !(r.height > 0)) { return; }
+			layout.userSized = true;
+			layout.w = Math.round(r.width);
+			layout.h = Math.round(r.height);
+			save();
+		}
+		addPanelResizeGrip(box, userResized);
+		if (layout.hasOwnProperty('userSized')) {
+			var down = null;
+			box.addEventListener('mousedown', function () { var r = box.getBoundingClientRect(); down = { w: r.width, h: r.height }; });
+			window.addEventListener('mouseup', function () {
+				var r;
+				if (!down) { return; }
+				r = box.getBoundingClientRect();
+				if (Math.abs(r.width - down.w) > 1 || Math.abs(r.height - down.h) > 1) { userResized(); }
+				down = null;
+			});
+		}
 		loadBoxLayout(key, layout);
 		if (window.ResizeObserver) {
 			new window.ResizeObserver(function () {
 				var r, capped;
 				if (!isOpen() || smallScreen()) { return; }
+				if (layout.hasOwnProperty('userSized') && !layout.userSized) { return; }
 				r = box.getBoundingClientRect();
 				if (!(r.width > 0) || !(r.height > 0)) { return; }
 				layout.w = Math.round(r.width);
@@ -50787,9 +50815,9 @@ var EngCalcs = EngCalcs || {};
 	// inline width exactly as they clamp the CSS one, so the floors measured for this box hold
 	// without being restated -- and the ResizeObserver in wireSettingsBox() stores what resulted and
 	// slides the box back on screen, exactly as it does after a mouse resize.
-	function addPanelResizeGrip(box) {
+	function addPanelResizeGrip(box, onResized) {
 		if (!box || (box.querySelector && box.querySelector('.lpn-resize-grip'))) { return; }
-		var grip = document.createElement('div'), from = null;
+		var grip = document.createElement('div'), from = null, moved = false;
 		grip.className = 'lpn-resize-grip';
 		// Decoration to a screen reader: it performs no command and carries no name, which also
 		// keeps it out of the 26 languages a labelled control would cost.
@@ -50807,6 +50835,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		grip.addEventListener('pointermove', function (e) {
 			if (!from) { return; }
+			moved = true;
 			box.style.width = Math.round(e.clientX + from.dx - from.left) + 'px';
 			box.style.height = Math.round(e.clientY + from.dy - from.top) + 'px';
 		});
@@ -50814,6 +50843,8 @@ var EngCalcs = EngCalcs || {};
 			grip.addEventListener(evt, function (e) {
 				if (!from) { return; }
 				from = null;
+				if (moved && onResized) { onResized(); }
+				moved = false;
 				if (grip.hasPointerCapture && grip.hasPointerCapture(e.pointerId)) {
 					grip.releasePointerCapture(e.pointerId);
 				}

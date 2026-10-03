@@ -2212,7 +2212,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 }
 /* The contour box: the Find box's shell, a little wider for a name column and a number with its
    unit. */
-.lpn-contourbox { width: min(23rem, calc(100vw - 8px)); --lpn-set-name: 8rem; --lpn-set-col: 12.5rem; }
+.lpn-contourbox { width: min(28rem, calc(100vw - 8px)); --lpn-set-name: 10.5rem; --lpn-set-col: 15rem; }
 .lpn-contour-ctl { display: flex; gap: 4px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
 /* The colour scheme button draws its swatches absolutely, so as a flex item it has no width of its
    own to offer: it takes the row. */
