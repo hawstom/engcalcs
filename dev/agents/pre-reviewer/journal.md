@@ -3697,6 +3697,15 @@ TRAP for method: Session Save as needs answerTrainingPanel() then a second queue
 - OBSERVED (mutation, scratch copy): harness stays green with the 3x edge limit removed, with pumps joined, with closed links joined. Its "gap" case is two unconnected arms, so the zone rule masks it alone.
 - Method: tab order at load is nondeterministic, click the tab by name. My `pkill -f` matched my own shell again (exit 144): never pkill with a pattern on the command line.
 
+## 2026-10-03 -- pre-review feat/contour acb3c811 (contour rework), Perry
+
+- OBSERVED (real headless Chrome via playwright-core Session, Net3, 1400x900 and 390x844): all loops filled at the 2.5x default; soft fade round the corridor ends; contour lines smooth at 1x and 2x zoom; 42 labels at 5 psi, 108 at 1 psi, zero label-label and zero label-over-node-label overlaps; a zoom keeps labels ~15.5 px; 8 colour-by choices draw without error (Head draws the wall at the closed Lake pump too).
+- OBSERVED: wall (black casing) drawn at the River pump 335 only; the closed Lake pump 10 shows no wall under Pressure (its far side is the same zone). No valve in Net3, so the in-zone fault line is verifiable only in the node harness.
+- OBSERVED: storage: one new key lpn_contourbox {left,top,w,h,open}, written on open and on close; toggling interval/opacity/labels/buffer writes nothing else; no cookie, no IndexedDB change. Contour settings ride in the project.
+- OBSERVED: the box opens centred on the map and hides most of the network on a desk; on a phone it fills the screen (like Find), so the map cannot be watched while tuning. Play with contour on: 2 long tasks of ~60 ms in 5 s, none with it off.
+- NOT EXERCISED: Recalculate-off with a pressure-changing edit (only an unconnected node), Mapbox DEM option (needs token), real valve.
+- Method: playwright Session scripts in scratchpad; close the box with #lpn_contour_close.
+
 ## 2026-10-03 -- pre-review feat/keyboard-menu f783fe5f (row mnemonics, hotkeys, Help), Perry
 
 - OBSERVED (real headless Chromium, Net1, focus in a Junctions demand cell): Alt+Shift+W, G, P opens the Profile graph; letters show only after a keyboard open; a mouse-opened menu shows Ctrl+Z / 1 / Delete / 2-9 and no letters. No duplicate or missing letter in any top menu or fly-out in en de ru he zh am fr; letters identical with an empty project and Net1 (disabled rows keep theirs). Hotkey column: no wrap, no taller row, gap >= 40 px in all 27 languages; no row has both an arrow and a hotkey.
