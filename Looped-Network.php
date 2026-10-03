@@ -221,6 +221,8 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // three above are their own: this one lands points in the OPEN project instead of making a
 	      // new tab, so an input shared with them would have to guess which act was meant. A text
 	      // point list; the accept list only tidies the picker, as it does for the three above. ?>
+	<?php // The Profile tab menu's EPANET .PRO picker (Task 604). Its own input: it sets the profile path, not a project. ?>
+	<input type="file" id="lpn_profile_file" accept=".pro,.txt,text/plain" style="display:none">
 	<input type="file" id="lpn_survey_file" accept=".csv,.txt,.pnt,.pts,text/csv,text/plain" style="display:none">
 	<?php // Library import (Task 611). A picker of its own, and it takes the same two extensions
 	      // #lpn_project_file does because it reads the same kind of file -- but it lands somewhere
