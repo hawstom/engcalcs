@@ -382,6 +382,61 @@
 		].join('\n\n').replace(/\{n\}/g, count);
 	}
 
+	/**
+	 * **THE SAME GATE, ASKED FOR THE CONTOUR PLOT** (Task 600). Not a new gate and not a new
+	 * cookie: what is sent is the same kind of thing (where the network is, as tile numbers, to
+	 * read the ground), so the one yes answers both. Only the first and last paragraphs change,
+	 * because "filling in elevations" is not what the person is doing. Returns true for a yes
+	 * given now or before; a no stores nothing.
+	 */
+	EC.lpnTerrainAskForContour = function () {
+		if (EC.lpnTerrainConsented()) { return true; }
+		// The fill's own four paragraphs, with the first and the last replaced.
+		var paras = consentText(0).split('\n\n');
+		paras[0] = t('lpn_contour_consent_1',
+			'Drawing pressure over the ground sends the area your network covers, as Mapbox map ' +
+			'tile numbers, to api.mapbox.com, to read the height of the ground there.');
+		paras[paras.length - 1] = t('lpn_contour_consent_4',
+			'If you say no, everything else on this page keeps working exactly as it does now, ' +
+			'and the contour plot is drawn between nodes alone. We remember a yes so that we need ' +
+			'not ask again. A no is not stored at all.');
+		var text = paras.join('\n\n');
+		if (!root.confirm || !root.confirm(text)) { return false; }
+		recordConsent();
+		return true;
+	};
+
+	/**
+	 * **THE GROUND UNDER A GRID, FOR THE CONTOUR PLOT. WRITES NOTHING AND NEVER ASKS** (Task 600).
+	 * `points` is [{id, lon, lat}]; `done(heights, info)` gets [{id, meters}] (empty on failure)
+	 * and {zoom, failed, why}. It refuses (done with null) without a stored yes -- the question is
+	 * asked only by lpnTerrainAskForContour(), from the checkbox a person ticked, never from a
+	 * redraw. Shares the plan, the budget, the decode and the fetch with the fill.
+	 */
+	var gridRunning = false;
+	EC.lpnTerrainGrid = function (points, done) {
+		function finish(h, info) { if (typeof done === 'function') { done(h, info || {}); } }
+		if (!seam || (seam.locatable && !seam.locatable())) { finish(null); return; }
+		var token = seam.token && seam.token();
+		if (!token || !EC.lpnTerrainConsented() || typeof root.fetch !== 'function') { finish(null); return; }
+		if (gridRunning || !points || !points.length) { finish(null, { busy: gridRunning }); return; }
+		var plan = EC.lpnTerrainPlan(points);
+		if (!plan || !plan.tiles.length || plan.tiles.length > HARD_TILES) { finish([], { zoom: plan && plan.zoom, failed: 1 }); return; }
+		gridRunning = true;
+		var heights = [], failed = 0, why = null;
+		Promise.all(plan.tiles.map(function (tile) {
+			return EC.lpnTerrainFetchPixels(tile, token).then(function (pixels) {
+				pixels.forEach(function (p) {
+					var m = EC.lpnTerrainDecode(p.r, p.g, p.b);
+					if (m !== undefined && isFinite(m)) { heights.push({ id: p.id, meters: m }); }
+				});
+			}, function (err) { failed++; why = why || failureOf(err); });
+		})).then(function () {
+			gridRunning = false;
+			finish(heights, { zoom: plan.zoom, failed: failed, why: why });
+		});
+	};
+
 	/** The gate. Returns true if we may send. Asks at most once per invocation. */
 	function mayWeSend(count) {
 		if (EC.lpnTerrainConsented()) { return true; }
@@ -498,11 +553,13 @@
 			canvas.width = bitmap.width; canvas.height = bitmap.height;
 			var ctx = canvas.getContext('2d');
 			ctx.drawImage(bitmap, 0, 0);
-			var out = [], i, p, d;
+			// ONE read of the whole tile, then indexed: the contour plot asks for thousands of
+			// pixels per tile (Task 600), and a 1 x 1 getImageData per pixel costs far more.
+			var out = [], i, p, w = bitmap.width, all = ctx.getImageData(0, 0, w, bitmap.height).data, o;
 			for (i = 0; i < tile.points.length; i++) {
 				p = tile.points[i];
-				d = ctx.getImageData(p.px, p.py, 1, 1).data;
-				out.push({ id: p.id, r: d[0], g: d[1], b: d[2] });
+				o = 4 * (p.py * w + p.px);
+				out.push({ id: p.id, r: all[o], g: all[o + 1], b: all[o + 2] });
 			}
 			if (bitmap.close) { bitmap.close(); }
 			return out;

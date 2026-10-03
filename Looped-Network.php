@@ -2137,6 +2137,20 @@ EngCalcs.pageConfig = {
 	lpn_freq_summary: <?=json_encode($ec_lang['lpn_freq_summary'])?>,
 	lpn_freq_summary_time: <?=json_encode($ec_lang['lpn_freq_summary_time'])?>,
 	lpn_freq_axis_percent: <?=json_encode($ec_lang['lpn_freq_axis_percent'])?>,
+	lpn_contour_menu: <?=json_encode($ec_lang['lpn_contour_menu'])?>,
+	lpn_contour_tip: <?=json_encode($ec_lang['lpn_contour_tip'])?>,
+	lpn_contour_plot: <?=json_encode($ec_lang['lpn_contour_plot'])?>,
+	lpn_contour_plot_tip: <?=json_encode($ec_lang['lpn_contour_plot_tip'])?>,
+	lpn_contour_filled: <?=json_encode($ec_lang['lpn_contour_filled'])?>,
+	lpn_contour_lines: <?=json_encode($ec_lang['lpn_contour_lines'])?>,
+	lpn_contour_few: <?=json_encode($ec_lang['lpn_contour_few'])?>,
+	lpn_contour_support: <?=json_encode($ec_lang['lpn_contour_support'])?>,
+	lpn_contour_dem: <?=json_encode($ec_lang['lpn_contour_dem'])?>,
+	lpn_contour_dem_tip: <?=json_encode($ec_lang['lpn_contour_dem_tip'])?>,
+	lpn_contour_support_dem: <?=json_encode($ec_lang['lpn_contour_support_dem'])?>,
+	lpn_contour_dem_failed: <?=json_encode($ec_lang['lpn_contour_dem_failed'])?>,
+	lpn_contour_consent_1: <?=json_encode($ec_lang['lpn_contour_consent_1'])?>,
+	lpn_contour_consent_4: <?=json_encode($ec_lang['lpn_contour_consent_4'])?>,
 	lpn_pane_toggle: <?=json_encode($ec_lang['lpn_pane_toggle'])?>,
 	lpn_pane_toggle_tip: <?=json_encode($ec_lang['lpn_pane_toggle_tip'])?>,
 	lpn_pane_tab_junctions: <?=json_encode($ec_lang['lpn_pane_tab_junctions'])?>,
@@ -3510,6 +3524,9 @@ EngCalcs.pageConfig = {
 <script src="/engcalcs/js/lpn-geom.js?v=<?=filemtime(__DIR__.'/js/lpn-geom.js')?>"></script>
 <script src="/engcalcs/js/lpn-collide.js?v=<?=filemtime(__DIR__.'/js/lpn-collide.js')?>"></script>
 <script src="/engcalcs/js/lpn-profile.js?v=<?=filemtime(__DIR__.'/js/lpn-profile.js')?>"></script>
+<?php // The contour plot's pure half (Task 600): triangulation, zones, bands. No DOM; BEFORE
+      // looped-network.js, which reads EngCalcs.lpnContour on every colour pass. ?>
+<script src="/engcalcs/js/lpn-contour.js?v=<?=filemtime(__DIR__.'/js/lpn-contour.js')?>"></script>
 <script src="/engcalcs/js/lpn-georef.js?v=<?=filemtime(__DIR__.'/js/lpn-georef.js')?>"></script>
 <?php // **THE TRANSFORM, AND IT IS THE LOADER THAT SHIPS HERE, NOT THE LIBRARY** (Task 641 phase
       // 5). js/lpn-crs.js is a few kilobytes and fetches js/vendor/proj4.js (130 KB) and the 5,240

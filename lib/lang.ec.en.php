@@ -1817,6 +1817,24 @@ $ec_lang['lpn_freq_none']='No results for this value yet, so there is nothing to
 $ec_lang['lpn_freq_summary']='Plotted: {n} of {total}';
 $ec_lang['lpn_freq_summary_time']='Plotted: {n} of {total}, at {time}';
 $ec_lang['lpn_freq_axis_percent']='Percent less than';
+// EPANET's Contour Plot (Task 600), drawn as a layer under the map rather than in a window of its
+// own. "Filled contours" and "Line contours" are EPANET's own two Styles. {n} is a node count, {k}
+// a whole number, {m} a distance in metres; all substituted. The consent paragraphs replace the first
+// and last of lpn_terrain_consent_1..4 when the question is asked for the contour plot.
+$ec_lang['lpn_contour_menu']='Contour';
+$ec_lang['lpn_contour_tip']='Show a contour plot on the map: the colors of the nodes, spread over the area between them. Its style is in Settings, where you can also turn it off.';
+$ec_lang['lpn_contour_plot']='Contour plot';
+$ec_lang['lpn_contour_plot_tip']='Colors the map between nodes by the field the nodes are colored by, interpolated linearly between neighboring nodes. No color is drawn across pumps, valves, or closed links, or across wide gaps between nodes.';
+$ec_lang['lpn_contour_filled']='Filled contours';
+$ec_lang['lpn_contour_lines']='Line contours';
+$ec_lang['lpn_contour_few']='Too few nodes to contour.';
+$ec_lang['lpn_contour_support']='Contour plot: linear between {n} nodes. No color across pumps, valves, or closed links, or across gaps wider than {k} times the median pipe length.';
+$ec_lang['lpn_contour_dem']='Ground between nodes from Mapbox DEM';
+$ec_lang['lpn_contour_dem_tip']='Between nodes, pressure becomes the interpolated head minus the height of the ground from Mapbox DEM, so it can fall below the lowest node pressure on a hill the network has no node on. Treat the ground as a contour map, not a survey.';
+$ec_lang['lpn_contour_support_dem']='Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.';
+$ec_lang['lpn_contour_dem_failed']='The ground could not be read from Mapbox DEM, so pressure is interpolated between nodes alone.';
+$ec_lang['lpn_contour_consent_1']='Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.';
+$ec_lang['lpn_contour_consent_4']='If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.';
 $ec_lang['lpn_view_units']='Units';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Save all';
