@@ -324,6 +324,30 @@ async function minPsiAt(m) {
 	ok('the Find verdict sits in the Find part', !!searchHost && text(searchHost).indexOf(PC.lpn_ds_found.split('{pressure}')[0]) === 0,
 		searchHost && text(searchHost).slice(0, 80));
 
+	console.log('\n--- 12. Fire flow, Criticality and Demand scaling say their scope the same way (Tom, 2026-10-03) ---');
+	// One pattern for all three: label "<Nouns> to <verb>", options "All <nouns>" / "Selected <nouns>",
+	// refusal "No <nouns> are selected. Select <nouns> or choose All <nouns>."
+	const SCOPES = [['lpn_ff_scope', 'lpn_ff_all', 'lpn_ff_selected', 'lpn_ff_no_selection', 'junctions'],
+		['lpn_crit_scope', 'lpn_crit_scope_all', 'lpn_crit_scope_selected', 'lpn_crit_no_selection', 'links'],
+		['lpn_ds_scope', 'lpn_ds_scope_all', 'lpn_ds_scope_selected', 'lpn_ds_no_selection', 'junctions']];
+	SCOPES.forEach((k) => {
+		const noun = k[4];
+		ok(k[0] + ': label is "' + noun + ' to <verb>"', new RegExp('^' + noun[0].toUpperCase() + noun.slice(1) + ' to [a-z]+$').test(PC[k[0]]), PC[k[0]]);
+		ok(k[1] + ' / ' + k[2] + ': options are All / Selected ' + noun, PC[k[1]] === 'All ' + noun && PC[k[2]] === 'Selected ' + noun,
+			PC[k[1]] + ' | ' + PC[k[2]]);
+		ok(k[3] + ': refusal pattern', PC[k[3]] === 'No ' + noun + ' are selected. Select ' + noun + ' or choose All ' + noun + '.', PC[k[3]]);
+	});
+	let scopeSel = null;
+	(function walk(x) {
+		if (!x || scopeSel) { return; }
+		if (isTag(x, 'select') && kids(x).map((o) => o.value).join() === 'all,selected') { scopeSel = x; return; }
+		kids(x).forEach(walk);
+	})(byId.lpn_ds_controls);
+	ok('the built Demand scaling scope list is the page\'s All / Selected junctions', !!scopeSel &&
+		kids(scopeSel).map((o) => o.textContent).join() === PC.lpn_ds_scope_all + ',' + PC.lpn_ds_scope_selected);
+	ok('the selected-scope heading and note carry Tom\'s wording', PC.lpn_ds_head_search_selected === 'What demand scale can these junctions handle?' &&
+		PC.lpn_ds_search_note_selected === 'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.');
+
 	if (fails) { console.log('\n' + fails + ' demand scaling check(s) FAILED'); process.exit(1); }
 	console.log('\nDemand scaling harness: all checks passed.');
 	process.exit(0);

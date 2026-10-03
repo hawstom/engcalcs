@@ -57401,8 +57401,8 @@ var EngCalcs = EngCalcs || {};
 		ffEl('p', 'lpn-ff-note', pc.lpn_ff_intro, host);
 
 		boxes.scope = ffSelect([
-			['all', pc.lpn_ff_all || 'All'],
-			['selected', pc.lpn_ff_selected || 'Selected']
+			['all', pc.lpn_ff_all || 'All junctions'],
+			['selected', pc.lpn_ff_selected || 'Selected junctions']
 		], ask.scope);
 		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', pc.lpn_ff_scope_tip, boxes.scope, '');
 
@@ -58097,7 +58097,7 @@ var EngCalcs = EngCalcs || {};
 			if (!ids.length) {
 				clearFireFlowRun(true);
 				analysisRefused(document.getElementById('lpn_ff_report'), pc.lpn_ff_no_selection ||
-					'No junctions are selected. Select junctions or select the All option.');
+					'No junctions are selected. Select junctions or choose All junctions.');
 				return;
 			}
 		} else {
@@ -58284,8 +58284,8 @@ var EngCalcs = EngCalcs || {};
 		host.innerHTML = '';
 		ffEl('p', 'lpn-ff-note', pc.lpn_crit_intro, host);
 		scope = ffSelect([
-			['all', pc.lpn_crit_scope_all || 'Every link'],
-			['selected', pc.lpn_crit_scope_selected || 'The selected links']
+			['all', pc.lpn_crit_scope_all || 'All links'],
+			['selected', pc.lpn_crit_scope_selected || 'Selected links']
 		], critAsk.scope);
 		scope.addEventListener('change', function () { critAsk.scope = scope.value; });
 		ffRow(host, pc.lpn_crit_scope || 'Links to break', pc.lpn_crit_scope_tip, scope, '');
@@ -58444,7 +58444,7 @@ var EngCalcs = EngCalcs || {};
 		if (!pick.ids.length) {
 			clearCriticalityRun(true);
 			analysisRefused(document.getElementById('lpn_crit_report'), critAsk.scope === 'selected'
-				? (pc.lpn_crit_no_selection || 'No pipe, pump, or valve is selected. Choose one on the map, or break every link.')
+				? (pc.lpn_crit_no_selection || 'No links are selected. Select links or choose All links.')
 				: (pc.lpn_crit_no_links || 'This project has no links yet, so there is nothing to break.'));
 			return Promise.resolve(null);
 		}
@@ -58598,7 +58598,7 @@ var EngCalcs = EngCalcs || {};
 			['selected', pc.lpn_ds_scope_selected || 'Selected junctions']
 		], dsAsk.scope);
 		scope.addEventListener('change', function () { dsAsk.scope = scope.value; buildDemandScaleControls(); });
-		ffRow(host, pc.lpn_ds_scope || 'Demands to scale', pc.lpn_ds_scope_tip, scope, '');
+		ffRow(host, pc.lpn_ds_scope || 'Junctions to scale', pc.lpn_ds_scope_tip, scope, '');
 		minP = ffInput(critFireFlowAsk().minPressure);
 		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
 		ffRow(host, pc.lpn_ds_minpressure || 'Lowest pressure allowed', pc.lpn_ds_minpressure_tip,
@@ -58892,7 +58892,7 @@ var EngCalcs = EngCalcs || {};
 				if (s.kind === 'node' && isJ[s.id] && ids.indexOf(s.id) < 0) { ids.push(s.id); } else { skipped++; }
 			});
 			if (!ids.length) {
-				return refuse(pc.lpn_ds_no_selection || 'No junctions are selected. Select junctions, or scale all of them.');
+				return refuse(pc.lpn_ds_no_selection || 'No junctions are selected. Select junctions or choose All junctions.');
 			}
 			if (skipped) {
 				setNotice((pc.lpn_ds_skipped || 'Selected elements that are not junctions, left as they are: {n}.')
