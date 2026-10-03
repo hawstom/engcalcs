@@ -116,7 +116,8 @@ the block.
     are no nodes -- a pressure contour across a river a main crosses is drawn over nothing.
     **Design: `dev/epanet-js-contour-contribution.md`.** Since 2026-10-01 (§2a there, Luke Butler's
     proof of concept): contour HEAD, subtract the Terrain-RGB DEM per cell, and let pressure leave
-    the junctions' range where the terrain does. Open: pressure-zone boundaries, hard vs faded edge.
+    the junctions' range where the terrain does. Tom's 2026-10-03 browser pass settled the rest
+    (§2b there): colour from the links, a faded corridor, a break line at every zone boundary.
   - **FREQUENCY SHIPPED 2026-09-30** (`feat/frequency-plot`, merged on his word). Contour and flow
     balance remain.
   - **SYSTEM FLOW BALANCE -- AND HIS READING OF IT IS RIGHT, but confirm it against EPANET's own

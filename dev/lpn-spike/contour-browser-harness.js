@@ -137,6 +137,17 @@ async function sectionDesk(Session, browser) {
 		f = await layerFacts(a.page);
 		ok('Labels off: no labels, lines kept', f.labels.length === 0 && f.lines.length > 0);
 		await setBox(a, 'lpn_contour_labels', true);
+		// TIMING, the whole change as the page does it (Settings and legend included): a new reach
+		// recomputes the field, the raster and its PNG; an opacity change reuses all three.
+		const timeChange = (id, v) => a.page.evaluate(([i, val]) => {
+			const e = document.getElementById(i), t0 = performance.now();
+			e.value = String(val); e.dispatchEvent(new Event('change', { bubbles: true }));
+			return performance.now() - t0;
+		}, [id, v]);
+		const cold = Math.min(await timeChange('lpn_contour_buffer', 2.6), await timeChange('lpn_contour_buffer', 2.5));
+		const warm = Math.min(await timeChange('lpn_contour_opacity', 50), await timeChange('lpn_contour_opacity', 40));
+		console.log('         Net3 in Chromium: a new reach ' + cold.toFixed(0) + ' ms, an opacity change ' + warm.toFixed(0) + ' ms');
+		ok('Net3 stays interactive: a full rebuild in under half a second', cold < 500, cold.toFixed(0) + ' ms');
 		await setBox(a, 'lpn_contour_opacity', 60);
 		await setBox(a, 'lpn_contour_interval', 5);
 
