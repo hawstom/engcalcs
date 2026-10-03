@@ -5468,7 +5468,7 @@ var EngCalcs = EngCalcs || {};
 	 * engineer's review (2026-09-26). A unit not listed falls to LPN_LABEL_TYPICAL_SI below.
 	 */
 	var LPN_UNIT_DECIMALS = {
-		lpn_u_flow: { gpm: 0, lps: 1, mgd: 3, m3ps: 3, ft3ps: 3 },
+		lpn_u_flow: { gpm: 1, lps: 2, mgd: 3, m3ps: 3, ft3ps: 3 },
 		lpn_u_length: { ft: 0, m: 1 },
 		lpn_u_diameter: { 'in': 0, mm: 0 },
 		lpn_u_elevhead: { fth2o: 2, mh2o: 3 },
