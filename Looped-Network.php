@@ -1831,6 +1831,10 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <dl>
 	<dt><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_map_def']?></dd>
 </dl>
+<h2><?=$ec_lang['lpn_hotkeys_menu_heading']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_hotkeys_menu_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_menu_def']?></dd>
+</dl>
 	</div>
 </div>
 

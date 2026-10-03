@@ -1695,7 +1695,7 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 @media (max-width: 640px) {
 	.lpn-tabs-scroll .lpn-tab:not(.lpn-tab-current) { display: none; }
 }
-.lpn-menu-row { display: block; width: 100%; text-align: left; background: none; border: 0; font: inherit; padding: 4px 12px 4px 8px; cursor: pointer; white-space: nowrap; }
+.lpn-menu-row { display: block; width: 100%; text-align: start; background: none; border: 0; font: inherit; padding: 4px 12px 4px 8px; cursor: pointer; white-space: nowrap; }
 .lpn-menu-row:hover:enabled { background: var(--ec-hover-bg); }
 .lpn-menu-row:disabled { color: var(--ec-gray-999); cursor: default; }
 /* Group label above the recent-file rows (Task 258). Indented to the icon column so it reads as a
@@ -4954,3 +4954,35 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 		50%      { opacity: .35; }
 	}
 }
+.lpn-menu-row:focus-visible:enabled { background: var(--ec-hover-bg); }
+/* KEYBOARD MODE (Task 748): a small boxed Latin letter at the corner of each menu-bar item, the
+   key after Alt+Shift (Ctrl+Option on a Mac). Absolutely placed on the inline-end corner, so showing
+   it reflows nothing and mirrors in right-to-left pages; never an underline, which fails in the
+   scripts that have no underlinable letters. */
+.lpn-menubar-item { position: relative; }
+.lpn-kbdbadge { display: none; }
+.lpn-kbdmode .lpn-kbdbadge {
+	display: block; position: absolute; inset-inline-end: 0; inset-block-end: -7px; z-index: 2;
+	min-width: 12px; padding: 0 2px; box-sizing: border-box; text-align: center;
+	font: bold 10px/12px monospace; color: var(--ec-bg); background: var(--ec-accent-open);
+	border: 1px solid var(--ec-bg); border-radius: 3px; pointer-events: none;
+}
+/* A menu row's own letter (Task 748): the same box, on the inline-start corner of the row's icon
+   cell, so it covers no text and moves nothing when it appears. It is the row's label's own
+   letter, or a digit where the label has none a keyboard types directly. Generated content, so the
+   row's text stays its label; the "/ ''" alternative keeps it out of the accessible name. */
+.lpn-menu-icon { position: relative; }
+.lpn-kbdmode .lpn-menu-icon[data-mnemonic]::after {
+	content: attr(data-mnemonic); content: attr(data-mnemonic) / '';
+	display: block; position: absolute; inset-inline-start: -6px; inset-block-end: -3px;
+	min-width: 12px; padding: 0 2px; box-sizing: border-box; text-align: center;
+	font: bold 10px/12px monospace; color: var(--ec-bg); background: var(--ec-accent-open);
+	border: 1px solid var(--ec-bg); border-radius: 3px; pointer-events: none;
+}
+/* The existing keyboard shortcut of a row's command, right-justified and muted, always shown, as
+   every desktop menu does. Isolated, so a key name reads left to right inside an RTL row. */
+.lpn-menu-row[data-hotkey]::after {
+	content: attr(data-hotkey); content: attr(data-hotkey) / '';
+	float: inline-end; margin-inline-start: 2.5em; color: var(--ec-ink-subtle); unicode-bidi: isolate;
+}
+.lpn-menu-row[data-pointer-only] { cursor: default; }
