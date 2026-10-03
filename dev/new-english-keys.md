@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**20 still to read on master**, of 38 untranslated keys, of 2191 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**49 still to read on master**, of 67 untranslated keys, of 2220 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (38, 20 to read @@ NEEDS RULING)
+## lpn_  (67, 49 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -60,105 +60,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_alt_title`**
   > Alternatives preview
   @@ NEEDS RULING
-- **`lpn_contour_consent_1`**
-  > Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.
-  @@ NEEDS RULING
-- **`lpn_contour_consent_2`**
-  > This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.
-  @@ NEEDS RULING
-- **`lpn_contour_consent_3`**
-  > May we send the tile numbers of your network's area to Mapbox?
-  @@ NEEDS RULING
-- **`lpn_contour_consent_4`**
-  > If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.
-  @@ NEEDS RULING
-- **`lpn_contour_dem`**
-  > Ground between nodes from Mapbox DEM
-  @@ NEEDS RULING
-- **`lpn_contour_dem_failed`**
-  > The ground could not be read from Mapbox DEM, so pressure is interpolated between nodes alone.
-  @@ NEEDS RULING
-- **`lpn_contour_dem_tip`**
-  > Between nodes, pressure becomes the interpolated head minus the height of the ground from Mapbox DEM, so it can fall below the lowest node pressure on a hill the network has no node on. Treat the ground as a contour map, not a survey.
-  @@ NEEDS RULING
-- **`lpn_contour_few`**
-  > Too few nodes to contour.
-  @@ NEEDS RULING
-- **`lpn_contour_filled`**
-  > Filled contours
-  @@ NEEDS RULING
-- **`lpn_contour_lines`**
-  > Line contours
-  @@ NEEDS RULING
-- **`lpn_contour_menu`**
-  > Contour
-  @@ NEEDS RULING
-- **`lpn_contour_plot`**
-  > Contour plot
-  @@ NEEDS RULING
-- **`lpn_contour_plot_tip`**
-  > Colors the map between nodes by the field the nodes are colored by, interpolated linearly between neighboring nodes. No color is drawn across pumps, valves, or closed links, or across wide gaps between nodes.
-  @@ NEEDS RULING
-- **`lpn_contour_support`**
-  > Contour plot: linear between {n} nodes. No color across pumps, valves, or closed links, or across gaps wider than {k} times the median pipe length.
-  @@ NEEDS RULING
-- **`lpn_contour_support_dem`**
-  > Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.
-  @@ NEEDS RULING
-- **`lpn_contour_tip`**
-  > Show a contour plot on the map: the colors of the nodes, spread over the area between them. Its style is in Settings, where you can also turn it off.
-  @@ NEEDS RULING
-- **`lpn_copy_body`**
-  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_body_nodate`**
-  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_copy`**
-  > A copy; make new lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_kept_link`**
-  > Opened {name} as the original, moved to a new place. Save now writes to this file.
-  @@ NEEDS RULING
-- **`lpn_copy_opened`**
-  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
-  _Ruled 2026-10-01: Wording change per this. This is good._
-- **`lpn_copy_original`**
-  > Original; keep same lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_title`**
-  > Mark file as new copy?
-  _Ruled OK 2026-10-01._
-- **`lpn_graphs_menu`**
-  > Graphs
-  @@ NEEDS RULING
-- **`lpn_graphs_menu_tip`**
-  > Graphs: Profile, Time Series, and Frequency distribution
-  @@ NEEDS RULING
-- **`lpn_scenario_basic`**
-  > Basic mode
-  _Ruled OK 2026-10-01._
-- **`lpn_scenario_basic_tip`**
-  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
-  _Ruled OK 2026-10-01._
-
----
-
-# Strings waiting on a branch
-
-**121 still to read**, of 172 new keys across 14 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### feat/calibration (`cce72f76`) — 42 new, 42 to read @@ NEEDS RULING
-
 - **`lpn_calib_axis_obs`**
   > Observed: {q}
   @@ NEEDS RULING
@@ -279,14 +180,120 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_calib_units`**
   > The file's values are read in this project's units: {unit}.
   @@ NEEDS RULING
+- **`lpn_copy_body`**
+  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_body_nodate`**
+  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_copy`**
+  > A copy; make new lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_kept_link`**
+  > Opened {name} as the original, moved to a new place. Save now writes to this file.
+  @@ NEEDS RULING
+- **`lpn_copy_opened`**
+  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  _Ruled 2026-10-01: Wording change per this. This is good._
+- **`lpn_copy_original`**
+  > Original; keep same lock
+  _Ruled OK 2026-10-01._
+- **`lpn_copy_title`**
+  > Mark file as new copy?
+  _Ruled OK 2026-10-01._
+- **`lpn_graphs_menu`**
+  > Graphs
+  @@ NEEDS RULING
+- **`lpn_graphs_menu_tip`**
+  > Graphs: Profile, Time Series, and Frequency distribution
+  @@ NEEDS RULING
+- **`lpn_hotkeys_menu_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_hotkeys_menu_heading`**
+  > Menus
+  @@ NEEDS RULING
+- **`lpn_hotkeys_menu_term`**
+  > Menu keyboard shortcuts
+  @@ NEEDS RULING
 - **`lpn_reports_calib`**
   > Calibration
   @@ NEEDS RULING
 - **`lpn_reports_calib_tip`**
   > Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.
   @@ NEEDS RULING
+- **`lpn_scenario_basic`**
+  > Basic mode
+  _Ruled OK 2026-10-01._
+- **`lpn_scenario_basic_tip`**
+  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
+  _Ruled OK 2026-10-01._
 
-### feat/contour (`72a5df5f`) — adds no English strings
+---
+
+# Strings waiting on a branch
+
+**92 still to read**, of 143 new keys across 12 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/contour (`2418222a`) — 16 new, 16 to read @@ NEEDS RULING
+
+- **`lpn_contour_consent_1`**
+  > Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.
+  @@ NEEDS RULING
+- **`lpn_contour_consent_2`**
+  > This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.
+  @@ NEEDS RULING
+- **`lpn_contour_consent_3`**
+  > May we send the tile numbers of your network's area to Mapbox?
+  @@ NEEDS RULING
+- **`lpn_contour_consent_4`**
+  > If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.
+  @@ NEEDS RULING
+- **`lpn_contour_dem`**
+  > Ground between nodes from Mapbox DEM
+  @@ NEEDS RULING
+- **`lpn_contour_dem_failed`**
+  > The ground could not be read from Mapbox DEM, so pressure is interpolated between nodes alone.
+  @@ NEEDS RULING
+- **`lpn_contour_dem_tip`**
+  > Between nodes, pressure becomes the interpolated head minus the height of the ground from Mapbox DEM, so it can fall below the lowest node pressure on a hill the network has no node on. Treat the ground as a contour map, not a survey.
+  @@ NEEDS RULING
+- **`lpn_contour_few`**
+  > Too few nodes to contour.
+  @@ NEEDS RULING
+- **`lpn_contour_filled`**
+  > Filled contours
+  @@ NEEDS RULING
+- **`lpn_contour_lines`**
+  > Line contours
+  @@ NEEDS RULING
+- **`lpn_contour_menu`**
+  > Contour
+  @@ NEEDS RULING
+- **`lpn_contour_plot`**
+  > Contour plot
+  @@ NEEDS RULING
+- **`lpn_contour_plot_tip`**
+  > Colors the map between nodes by the field the nodes are colored by, interpolated linearly between neighboring nodes. No color is drawn across pumps, valves, or closed links, or across wide gaps between nodes.
+  @@ NEEDS RULING
+- **`lpn_contour_support`**
+  > Contour plot: linear between {n} nodes. No color across pumps, valves, or closed links, or across gaps wider than {k} times the median pipe length.
+  @@ NEEDS RULING
+- **`lpn_contour_support_dem`**
+  > Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.
+  @@ NEEDS RULING
+- **`lpn_contour_tip`**
+  > Show a contour plot on the map: the colors of the nodes, spread over the area between them. Its style is in Settings, where you can also turn it off.
+  @@ NEEDS RULING
 
 ### feat/criticality (`84ea5311`) — 31 new, 8 to read @@ NEEDS RULING
 
@@ -642,18 +649,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_sysflow_title`**
   > System flow balance
-  @@ NEEDS RULING
-
-### feat/keyboard-menu (`db228dbd`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_hotkeys_menu_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>
-  @@ NEEDS RULING
-- **`lpn_hotkeys_menu_heading`**
-  > Menus
-  @@ NEEDS RULING
-- **`lpn_hotkeys_menu_term`**
-  > Menu keyboard shortcuts
   @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled

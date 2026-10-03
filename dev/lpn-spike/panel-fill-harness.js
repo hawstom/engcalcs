@@ -158,7 +158,10 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		// The Tables and Hotkeys box (Task 745): the same non-hog shell and memory as Notes, built
 		// the same way and for the same reason -- reference prose a reader keeps open beside the
 		// work, so a phone wants the same fill.
-		['openHotkeysBox', 'the Tables and Hotkeys box']];
+		['openHotkeysBox', 'the Tables and Hotkeys box'],
+		// The Calibration report (Task 601): a six-column statistics table and two charts, the
+		// same report-box family as Status and Full, so a phone wants the whole window for it.
+		['openCalibBox', 'the calibration report box']];
 	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
 	});
