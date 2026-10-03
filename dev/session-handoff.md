@@ -148,7 +148,7 @@ answer Q5 (a `?` beside each box's X). 681(b) waits on the label-placer rulings 
 
 ### Owed translation work
 
-Wave 0 for master's 54 new lpn strings: `~/webdev/1003-wave0.json.pending`, to be committed as `dev/english-friction/1003-wave0.json` once he rules (an open entry fails friction_check); 51 dismissed, 3
+Wave 0 for master's 54 new lpn strings: `~/webdev/1003-wave0.json.pending`, to be committed into `dev/english-friction/` once he rules (an open entry fails friction_check); 51 dismissed, 3
 refer-to-human (lpn_copy_kept_link, lpn_calib_network, lpn_graphs_menu_tip). Sprint not launched:
 ~67 keys a language on master, plus the four branches' keys; run one sprint after they merge.
 Master also owes the Redo Help row (approved text; needs all 27 at once), the Romanian file menu
