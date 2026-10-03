@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 2328,
+        "expected_key_count": 2327,
         "delta_key_count": 175,
         "exempt_key_count": 49,
         "exempt_keys": [
@@ -2710,7 +2710,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "Die Systemprüfung ist auf Ausgewählte eingestellt, aber es sind keine Elemente ausgewählt. Wählen Sie Elemente aus oder wählen Sie die Option Alle.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2726,7 +2726,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "Die Systemprüfung ist auf Ausgewählte eingestellt, aber es sind keine Elemente ausgewählt. Wählen Sie Elemente aus oder wählen Sie die Option Alle.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2742,7 +2742,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "Die Systemprüfung ist auf Ausgewählte eingestellt, aber es sind keine Elemente ausgewählt. Wählen Sie Elemente aus oder wählen Sie die Option Alle.",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2758,7 +2758,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_none",
                     "value": "In der gewählten Menge ist nichts über seine Grenzwerte hinausgegangen, während irgendein Entnahmeknoten seine Löschwassermenge entnahm.",
-                    "english": "Nothing in the chosen set went outside its limits while any junction drew its fire flow."
+                    "english": "Nothing in the scope you chose went outside its limits while any junction drew its fire flow."
                 }
             }
         },

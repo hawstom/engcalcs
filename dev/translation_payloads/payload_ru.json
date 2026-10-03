@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 2328,
+        "expected_key_count": 2327,
         "delta_key_count": 175,
         "exempt_key_count": 26,
         "exempt_keys": [
@@ -2687,7 +2687,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "Проверка проекта настроена на «Выбранные», но элементы не выбраны. Выберите элементы или выберите вариант «Все».",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2703,7 +2703,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "Проверка проекта настроена на «Выбранные», но элементы не выбраны. Выберите элементы или выберите вариант «Все».",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2719,7 +2719,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_no_selection",
                     "value": "Проверка проекта настроена на «Выбранные», но элементы не выбраны. Выберите элементы или выберите вариант «Все».",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
+                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All."
                 }
             }
         },
@@ -2735,7 +2735,7 @@
                 "next_translated": {
                     "key": "lpn_ff_design_none",
                     "value": "Ничто в выбранном наборе не вышло за свои пределы, пока какой-либо узел отдавал свой противопожарный расход.",
-                    "english": "Nothing in the chosen set went outside its limits while any junction drew its fire flow."
+                    "english": "Nothing in the scope you chose went outside its limits while any junction drew its fire flow."
                 }
             }
         },
