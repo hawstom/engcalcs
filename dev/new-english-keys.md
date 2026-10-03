@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 22 untranslated keys, of 2175 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**7 still to read on master**, of 27 untranslated keys, of 2180 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (22, 4 to read @@ NEEDS RULING)
+## lpn_  (27, 7 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -87,6 +87,21 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_graphs_menu_tip`**
   > Graphs: Profile, Time Series, and Frequency distribution
   @@ NEEDS RULING
+- **`lpn_pgraph_none`**
+  > This asset has no results in the current run.
+  _Ruled OK 2026-10-01._
+- **`lpn_pgraph_source_share_from`**
+  > Source share from {node}
+  _Ruled OK 2026-10-01._
+- **`lpn_report_pump_head`**
+  > Pump head
+  @@ NEEDS RULING
+- **`lpn_result_pump_head`**
+  > Head
+  @@ NEEDS RULING
+- **`lpn_result_pump_head_tip`**
+  > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
+  @@ NEEDS RULING
 - **`lpn_scenario_basic`**
   > Basic mode
   _Ruled OK 2026-10-01._
@@ -98,7 +113,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**62 still to read**, of 113 new keys across 9 unmerged branch(es).
+**59 still to read**, of 108 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -452,20 +467,4 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/property-graph (`8e26cf83`) — 5 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_pgraph_none`**
-  > This asset has no results in the current run.
-  _Ruled OK 2026-10-01._
-- **`lpn_pgraph_source_share_from`**
-  > Source share from {node}
-  _Ruled OK 2026-10-01._
-- **`lpn_report_pump_head`**
-  > Pump head
-  @@ NEEDS RULING
-- **`lpn_result_pump_head`**
-  > Head
-  @@ NEEDS RULING
-- **`lpn_result_pump_head_tip`**
-  > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
-  @@ NEEDS RULING
+### feat/property-graph (`050fd279`) — adds no English strings
