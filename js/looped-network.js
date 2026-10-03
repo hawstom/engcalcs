@@ -1102,6 +1102,11 @@ var EngCalcs = EngCalcs || {};
 		work.forEach(function (rec) { measureLabelWidths(rec.le); });
 		shedToSegmentBatch(work, fsNow);
 		work.forEach(function (rec) { rec.le.shedCount = rec.all.length - rec.le.lines.length; });
+		// **BACK TO FULL CONTENT BEFORE THE SHED PREDICTS THE NODE LABELS** -- the content pass's
+		// Task 539 rule, which this zoom path missed. Without it the prediction read node labels
+		// shed for the PREVIOUS scale, so one scale reached by two wheel histories drew two
+		// pictures (2026-10-03; dev/lpn-spike/zoom-pass-determinism-harness.js).
+		unshedNodeLabels(fsNow);
 		shedAlignedForConflicts(fsNow, fs);
 	}
 	/**
@@ -5018,6 +5023,14 @@ var EngCalcs = EngCalcs || {};
 				tip: pc.lpn_reports_status_tip,
 				fn: function () { closeMenu(); openStatusReportBox(); }
 			},
+			// **CALIBRATION, WHERE EPANET'S OWN REPORT MENU PUTS IT** -- after Status, before Full
+			// (ROADMAP Task 601). The box holds the file loading as well as the report, so this one
+			// row is the whole of the feature's footprint in the menus.
+			{
+				icon: 'info', label: pc.lpn_reports_calib || 'Calibration',
+				tip: pc.lpn_reports_calib_tip,
+				fn: function () { closeMenu(); openCalibBox(); }
+			},
 			{
 				icon: 'info', label: pc.lpn_reports_full || 'Full',
 				tip: pc.lpn_reports_full_tip,
@@ -5032,6 +5045,7 @@ var EngCalcs = EngCalcs || {};
 				// scenarioId is what makes a row a scenario, so a reader of the rows (the harness)
 				// never has to tell one from a command by its position or its label.
 				scenarioId: s.id,
+				variable: true,   // a name from the project: its letter must not move the fixed rows' (Task 748)
 				// A tick on the row you are already in, the way every view menu in this file's
 				// neighbourhood marks a current choice. No icon column entry, so the marker cannot
 				// be mistaken for a command's glyph.
@@ -5491,7 +5505,7 @@ var EngCalcs = EngCalcs || {};
 	 * engineer's review (2026-09-26). A unit not listed falls to LPN_LABEL_TYPICAL_SI below.
 	 */
 	var LPN_UNIT_DECIMALS = {
-		lpn_u_flow: { gpm: 0, lps: 1, mgd: 3, m3ps: 3, ft3ps: 3 },
+		lpn_u_flow: { gpm: 1, lps: 2, mgd: 3, m3ps: 3, ft3ps: 3 },
 		lpn_u_length: { ft: 0, m: 1 },
 		lpn_u_diameter: { 'in': 0, mm: 0 },
 		lpn_u_elevhead: { fth2o: 2, mh2o: 3 },
@@ -13523,10 +13537,10 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return (withHeading ? [{ heading: true, label: pc.lpn_backdrop_menu || 'Background image…' }] : []).concat([
 			{ icon: 'image', label: pc.lpn_backdrop_add || 'Add', fn: function () { backdropAction('add'); } },
-			{ icon: 'position', label: pc.lpn_backdrop_position || 'Move', fn: function () { backdropAction('position'); }, disabled: !backdrop },
-			{ icon: 'scale', label: pc.lpn_backdrop_scale || 'Scale by picking', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
+			{ pointerOnly: true, icon: 'position', label: pc.lpn_backdrop_position || 'Move', fn: function () { backdropAction('position'); }, disabled: !backdrop },
+			{ pointerOnly: true, icon: 'scale', label: pc.lpn_backdrop_scale || 'Scale by picking', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
 			{ icon: 'scale', label: pc.lpn_backdrop_scale_entry || 'Scale by world file or by the size of one pixel on the map', fn: function () { backdropAction('scale-entry'); }, disabled: !backdrop },
-			{ icon: 'scale', label: pc.lpn_backdrop_scale_from || 'Scale from current size, around a point you pick', fn: function () { backdropAction('scale-from'); }, disabled: !backdrop },
+			{ pointerOnly: true, icon: 'scale', label: pc.lpn_backdrop_scale_from || 'Scale from current size, around a point you pick', fn: function () { backdropAction('scale-from'); }, disabled: !backdrop },
 			{ icon: 'del', label: pc.lpn_backdrop_remove || 'Remove', fn: function () { backdropAction('remove'); }, disabled: !backdrop }
 		]);
 	}
@@ -29274,7 +29288,8 @@ var EngCalcs = EngCalcs || {};
 	function renderTimeSeries() {
 		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_ts_chart'),
 			note = document.getElementById('lpn_ts_note'),
-			frames, series, values = [], lay, xB, yB, box, svg, group, field, unit, now, dots;
+			frames, series, values = [], lay, xB, yB, box, svg, group, field, unit, now, dots,
+			measured, tFirst, tLast, nMeasured = 0;
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (note) { note.textContent = ''; }
@@ -29305,6 +29320,19 @@ var EngCalcs = EngCalcs || {};
 		series.forEach(function (s) {
 			s.points.forEach(function (p) { if (p.y !== undefined) { values.push(p.y); } });
 		});
+		// **MEASURED VALUES FROM A CALIBRATION FILE, ON THE SAME AXES** (Task 601), for the plotted
+		// assets the file names and only inside the reported span -- a measurement at an hour the
+		// run did not report has no line to be read against. They join the vertical bounds, so a
+		// measurement far from the model is drawn far from the line rather than clipped.
+		measured = calibMeasuredFor(group, field);
+		tFirst = frames[0].t; tLast = frames[frames.length - 1].t;
+		series.forEach(function (s) {
+			s.measured = (measured[s.id] || []).filter(function (m) {
+				return m.t >= tFirst - 1e-6 && m.t <= tLast + 1e-6;
+			});
+			s.measured.forEach(function (m) { values.push(m.v); });
+			nMeasured += s.measured.length;
+		});
 		// **SAID BEFORE THE CHART IS MEASURED**, which is load-bearing and is Task 527's lesson
 		// restated: this line shares the panel with the chart and wraps on a narrow one, so writing
 		// it afterwards would take height off the host the chart had just been laid out for, and the
@@ -29312,7 +29340,8 @@ var EngCalcs = EngCalcs || {};
 		if (note) {
 			note.textContent = String(pc.lpn_ts_summary || 'Assets: {n}, reporting times: {steps}')
 				.replace('{n}', String(series.length))
-				.replace('{steps}', String(frames.length));
+				.replace('{steps}', String(frames.length))
+				+ (nMeasured ? ' ' + (pc.lpn_calib_ts_note || 'Rings are measured values from the calibration file.') : '');
 		}
 		lay = tsLayout(host);
 		tsLastSize = { w: lay.w, h: lay.h };
@@ -29397,6 +29426,18 @@ var EngCalcs = EngCalcs || {};
 				ttl.appendChild(document.createTextNode(
 					s.id + '   ' + (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(q.t) : q.t) +
 					'   ' + plainRound(q.y, 2)));
+			});
+		});
+		// The measured rings, in their asset's own color, drawn last so a line never hides one.
+		// Hollow, so a ring sitting exactly on the computed dot still shows both.
+		series.forEach(function (s) {
+			(s.measured || []).forEach(function (m) {
+				var c = el('circle', { cx: X(tsHours(m.t)), cy: Y(m.v), r: 3.5,
+					class: 'lpn-calib-ring', stroke: m.color || s.color }, svg);
+				el('title', {}, c).appendChild(document.createTextNode(
+					String(pc.lpn_calib_ts_point || 'Measured at {id}, {time}: {v}').replace('{id}', s.id)
+						.replace('{time}', EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(m.t) : String(m.t))
+						.replace('{v}', String(plainRound(m.v, 2)))));
 			});
 		});
 
@@ -31021,27 +31062,36 @@ var EngCalcs = EngCalcs || {};
 	 * has the measurement: a layout computed at scale 1 has a median nudge of 43 world units on a
 	 * model 37 units across. The document half is `modelSignature()`, which covers the settings and
 	 * the label choices too, since both are serialized.
+	 *
+	 * **THE SAME RECORD THE ZOOM BANK KEEPS, PLUS THE CONTENT** (Task 758). This keep once copied
+	 * its own shorter list of holder fields and missed four the pass decides -- `alignedAlong`,
+	 * `stationSides`, `hiddenYielded` and the customer labels' spots -- so a tab whose drawing was
+	 * evicted came back with 78 of 123 Novato labels drawn differently. One list,
+	 * grabBucketHolder(), now serves both keeps, so a field a placer adds is kept by both or by
+	 * neither. dev/lpn-spike/label-evict-return-harness.js.
 	 */
 	function captureLabelLayout() {
 		// The kept layout must be the settled one: a pass owed and not yet run would otherwise be
 		// kept as the answer and restored on the way back (Task 653).
 		flushLabelRefresh();
-		var out = { scale: state.s, nodes: {}, links: {}, texts: {} };
+		var out = { scale: state.s, nodes: {}, links: {}, texts: {}, custs: {},
+			parts: labelBankParts.map(function (p) { return p.capture(); }) };
 		function grab(h) {
-			return { nudge: h.nudge ? { x: h.nudge.x, y: h.nudge.y } : null,
-				nudgeManual: !!h.nudgeManual, placedSide: h.placedSide,
-				lines: h.lines ? h.lines.slice() : null, rows: h.rows ? h.rows.slice() : null,
-				allLines: h.allLines ? h.allLines.slice() : null,
-				lineCount: h.lineCount, empty: !!h.empty, shedCount: h.shedCount || 0,
-				hiddenShort: !!h.hiddenShort, hiddenCrowded: !!h.hiddenCrowded,
-				hiddenCrossed: !!h.hiddenCrossed, hiddenDropped: !!h.hiddenDropped,
-				tw: h.tw, twPx: h.twPx, width: h.width, widthPx: h.widthPx,
-				rowW: h.rowW ? h.rowW.slice() : null, rowWPx: h.rowWPx ? h.rowWPx.slice() : null,
-				segW: h.segW ? h.segW.slice() : null };
+			var g = grabBucketHolder(h);
+			g.allLines = h.allLines ? h.allLines.slice() : null;
+			g.empty = !!h.empty;
+			return g;
 		}
 		Object.keys(nodeEls).forEach(function (id) { out.nodes[id] = grab(nodeEls[id]); });
 		Object.keys(linkEls).forEach(function (id) { out.links[id] = grab(linkEls[id]); });
 		Object.keys(labelEls).forEach(function (id) { out.texts[id] = grab(labelEls[id]); });
+		// A rebuilt drawing's meter labels are blank until a content pass writes them, so their
+		// content is kept as well as their spot.
+		Object.keys(custLblEls).forEach(function (id) {
+			var ce = custLblEls[id];
+			out.custs[id] = Object.assign(grabBucketHolder(ce), { empty: !!ce.empty,
+				hidden: ce.text.style.visibility === 'hidden', spot: ce.spot, trials: ce.trials });
+		});
 		return out;
 	}
 	function rememberSwitchState() {
@@ -31051,9 +31101,15 @@ var EngCalcs = EngCalcs || {};
 		// order the drawing keep evicts in, which is what lets a kept drawing count on its solve.
 		switchKeepOrder = switchKeepOrder.filter(function (x) { return x !== id; });
 		switchKeepOrder.push(id);
+		var layout = captureLabelLayout();
 		switchKeep[id] = { sig: storedSignature(id), solve: lastSolveResult,
 			time: EngCalcs.lpnTimeKeep ? EngCalcs.lpnTimeKeep() : null,
-			layout: captureLabelLayout() };
+			layout: layout,
+			// **AND THE NODE CONTEXT THE PASS RANKED AND SIDED BY** (Task 758). Built only by a
+			// content pass, which a restored arrival skips -- so without this the next zoom on the
+			// returning tab placed its labels by the PREVIOUS tab's context. A function of the
+			// document and the solve, both of which the signature already guards.
+			context: nodeContext, fieldMid: nodeFieldMid };
 		// ...and the drawing itself, put away on arrival (see settleDrawingForArrival()).
 		outgoingDrawing = { id: id, sig: switchKeep[id].sig };
 		while (switchKeepOrder.length > SWITCH_KEEP_MAX) {
@@ -31097,27 +31153,9 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		check('node', L.nodes, nodeEls); check('link', L.links, linkEls);
-		check('text', L.texts, labelEls);
+		check('text', L.texts, labelEls); check('customer', L.custs || {}, custLblEls);
 		keptLayoutMiss = ok ? '' : why;
 		return ok;
-	}
-	function restoreHolderFields(h, c) {
-		h.nudge = c.nudge ? { x: c.nudge.x, y: c.nudge.y } : { x: 0, y: 0 };
-		h.nudgeManual = c.nudgeManual;
-		h.placedSide = c.placedSide;
-		h.shedCount = c.shedCount;
-		h.hiddenShort = c.hiddenShort;
-		h.hiddenCrowded = c.hiddenCrowded;
-		h.hiddenCrossed = c.hiddenCrossed;
-		h.hiddenDropped = c.hiddenDropped;
-		// The measured widths, so a restore asks the browser nothing at all.
-		if (c.tw !== undefined) { h.tw = c.tw; }
-		if (c.twPx !== undefined) { h.twPx = c.twPx; }
-		if (c.width !== undefined) { h.width = c.width; }
-		if (c.widthPx !== undefined) { h.widthPx = c.widthPx; }
-		if (c.rowW) { h.rowW = c.rowW.slice(); }
-		if (c.rowWPx) { h.rowWPx = c.rowWPx.slice(); }
-		if (c.segW) { h.segW = c.segW.slice(); }
 	}
 	// Counted so a harness can tell a restore from a recomputation that happens to agree with it --
 	// without this, "the restored layout equals the computed one" passes trivially when no restore
@@ -31142,25 +31180,43 @@ var EngCalcs = EngCalcs || {};
 				// The glyphs have to be WRITTEN -- these are new elements -- but they are written
 				// from the content the shed already decided, so no cascade runs and nothing is
 				// measured.
-				if (c.lines && !c.empty) { writeNodeLabelGlyphs(ne, n, c.lines, fsNow); }
+				if (c.lines && !c.empty) { writeNodeLabelGlyphs(ne, n, c.lines.slice(), fsNow); }
 				ne.allLines = c.allLines || (c.lines ? c.lines.slice() : ne.allLines);
-				restoreHolderFields(ne, c);
+				ne.empty = c.empty; ne.lineCount = c.lineCount;
+				restoreBucketHolder(ne, c);
 			});
 			doc.links.forEach(function (l) {
 				var le = linkEls[l.id], c = L.links[l.id];
 				if (!le || !c) { return; }
-				if (c.lines && !c.empty) { writeLabelGlyphs(le, l, c.lines, fsNow); }
-				restoreHolderFields(le, c);
+				if (c.lines && !c.empty) { writeLabelGlyphs(le, l, c.lines.slice(), fsNow); }
+				if (c.allLines) { le.allLines = c.allLines.slice(); }
+				le.empty = c.empty; le.lineCount = c.lineCount;
+				restoreBucketHolder(le, c);
 			});
 			Object.keys(L.texts).forEach(function (id) {
-				var te = labelEls[id]; if (te) { restoreHolderFields(te, L.texts[id]); }
+				var te = labelEls[id]; if (te) { restoreBucketHolder(te, L.texts[id]); }
 			});
+			(L.parts || []).forEach(function (part, i) { if (labelBankParts[i]) { labelBankParts[i].restore(part); } });
 			// The same three loops relayoutLabels() ends with -- every label laid out for real at
 			// the position it already had -- and then the arrows and the legend, which
 			// refreshLabelTextPass() does after it.
 			doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
 			doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
 			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
+			// The meters last, as the pass places them: content written (these are new elements),
+			// then the kept spot.
+			(doc.customers || []).forEach(function (cu) {
+				var ce = custLblEls[cu.id], c = L.custs && L.custs[cu.id];
+				if (!ce || !c) { return; }
+				ce.empty = c.empty; ce.lineCount = c.lineCount;
+				if (c.lines) {
+					ce.lines = c.lines.slice(); ce.allLines = ce.lines;
+					setMultilineText(ce.text, customerPoint(cu).x, composeRows(c.lines, false));
+					ce.text.style.fontSize = fsNow;
+				}
+				restoreBucketHolder(ce, c);
+				restoreCustomerLabelSpot(ce, c);
+			});
 		} finally { endMapBoxHold(); endLinkGeomHold(); }
 		doc.links.forEach(function (l) { updateArrow(l.id); });
 		renderLabelsLegend();
@@ -32395,6 +32451,9 @@ var EngCalcs = EngCalcs || {};
 		// label would be drawn empty and drawn again when the values arrived.
 		var kept = keptStateForOpenProject();
 		lastSolveResult = (kept && kept.solve) || null;
+		// The context the kept layout was ranked and sided by, for the same reason (Task 758): a
+		// restored arrival runs no content pass, which is the only builder of it.
+		if (kept && kept.context) { nodeContext = kept.context; nodeFieldMid = kept.fieldMid || {}; }
 		// The labels wait for the camera -- see buildDom() and the restore below.
 		labelPassDeferred = true;
 		// And a pass requested for the OUTGOING document is not owed to this one, which is laid out
@@ -37279,10 +37338,19 @@ var EngCalcs = EngCalcs || {};
 		}
 		parkAnchorTip(anchor, level);
 		list.innerHTML = '';
-		rows.forEach(function (r) {
+		list.setAttribute('role', 'menu');
+		var mnemonics = menuMnemonics(rows);
+		if (level) {
+			// The row that opened this fly-out: Left and Escape return focus to it, and its
+			// aria-expanded tells a screen reader the fly-out is out (Task 748).
+			subOpener = anchor;
+			if (anchor.setAttribute) { anchor.setAttribute('aria-expanded', 'true'); }
+		}
+		rows.forEach(function (r, ri) {
 			if (r.hidden) { return; }
 			if (r.separator) {
 				var hr = document.createElement('hr');
+				hr.setAttribute('role', 'separator');
 				hr.style.cssText = 'margin:3px 0;border:0;border-top:1px solid #ccc';
 				list.appendChild(hr);
 				return;
@@ -37293,6 +37361,7 @@ var EngCalcs = EngCalcs || {};
 			if (r.heading) {
 				var hd = document.createElement('div');
 				hd.className = 'lpn-menu-heading';
+				hd.setAttribute('role', 'presentation');
 				hd.textContent = r.label;
 				list.appendChild(hd);
 				return;
@@ -37300,6 +37369,8 @@ var EngCalcs = EngCalcs || {};
 			var b = document.createElement('button');
 			b.type = 'button';
 			b.className = 'lpn-menu-row';
+			b.setAttribute('role', 'menuitem');
+			b.tabIndex = -1;   // arrows move through the rows; Tab leaves the menu (Task 748)
 			// A reserved icon column, not an inline prefix: a row with no natural glyph leaves the
 			// cell EMPTY and its text still lines up with its neighbours. Prefixing inline instead
 			// would ragged-edge the whole menu the moment one row went without.
@@ -37307,8 +37378,23 @@ var EngCalcs = EngCalcs || {};
 			ic.className = 'lpn-menu-icon';
 			var ic2 = r.icon ? iconEl(r.icon) : null;
 			if (ic2) { ic.appendChild(ic2); }
+			// The row's mnemonic (Task 748): typed while the menu has keyboard focus, shown as a
+			// badge on the icon cell only in keyboard mode. Assigned by menuMnemonics(), never by hand.
+			// **BOTH MARKS ARE CSS-GENERATED FROM ATTRIBUTES, NOT TEXT IN THE ROW**: a row's text is
+			// its label alone, which is what every harness, the type-to-find and a screen reader's
+			// name read; aria-keyshortcuts tells assistive technology the shortcut instead.
+			if (mnemonics[ri]) {
+				b.setAttribute('data-mnemonic', mnemonics[ri]);
+				ic.setAttribute('data-mnemonic', mnemonics[ri].toUpperCase());
+			}
 			b.appendChild(ic);
 			b.appendChild(document.createTextNode(r.label));
+			// An EXISTING keyboard shortcut for this row's command, right-justified and muted, as on
+			// every desktop menu. A row says so with `hotkey:`; nothing here invents one.
+			if (r.hotkey) {
+				b.setAttribute('data-hotkey', menuHotkeyText(r.hotkey));
+				b.setAttribute('aria-keyshortcuts', r.hotkey.replace(/^Mod\+/, isMacPlatform() ? 'Meta+' : 'Control+'));
+			}
 			// A menu row is its own click target, so the tip goes straight on it as a title matched to
 			// .ec-help for touch -- the same pattern the toolbar buttons use.
 			if (r.tip) { b.title = r.tip; b.className += ' ec-help'; }
@@ -37318,10 +37404,15 @@ var EngCalcs = EngCalcs || {};
 			// suite navbar's picker sets it. No `dir`: an RTL name would re-align an LTR row.
 			if (r.lang) { b.lang = r.lang; }
 			b.disabled = !!r.disabled;
+			// A row whose action ends in a drag or a click on the map has no keyboard meaning. It stays
+			// visible, and arrow navigation steps over it (menuRowsOf).
+			if (r.pointerOnly) { b.setAttribute('data-pointer-only', ''); }
 			if (r.submenu) {
 				// The universal marker for "there is more this way". Directional, so it wants a
 				// mirrored glyph in the five RTL languages -- the same outstanding caveat the
 				// Settings accordion's arrows already carry.
+				b.setAttribute('aria-haspopup', 'menu');
+				b.setAttribute('aria-expanded', 'false');
 				var arrow = document.createElement('span');
 				arrow.className = 'lpn-menu-arrow';
 				arrow.textContent = '▸';
@@ -37377,7 +37468,357 @@ var EngCalcs = EngCalcs || {};
 		// this is exactly the case ROADMAP Task 173 added initTips(root) for (a tooltip built after
 		// page load is dead on touch without it).
 		initTipsIn(popup);
+		// Opened from the keyboard, focus goes INTO the menu, on its first enabled row. A mouse
+		// open leaves focus where it was, exactly as before (Task 748).
+		if (menuKbIntent) {
+			menuKbIntent = false;
+			kbdModeEnter();   // the row letters show whenever the keyboard opened the menu
+			var first = menuRowsOf(list)[0];
+			if (first) { first.focus(); } else if (anchor.focus) { anchor.focus(); }
+		}
 	}
+	// ---- KEYBOARD (Task 748, the WAI-ARIA menubar pattern) -----------------------------------------
+	// One door, like the rest of this machinery: nothing here knows which menu it is serving. A menu
+	// or fly-out built by openMenu() -- rows, `submenu:` rows and all -- inherits the keys with no
+	// wiring of its own. Left/Right between top menus, Up/Down/Home/End through enabled rows, Right
+	// opens a fly-out and Left closes it, Escape closes one level and returns focus to its opener,
+	// Tab closes the menu and goes on, Enter/Space are the buttons' own click.
+	var subOpener = null;
+	var menuKbIntent = false;
+	function menuRowsOf(list) {
+		return Array.prototype.slice.call(list.querySelectorAll('button.lpn-menu-row:not(:disabled):not([data-pointer-only])'));
+	}
+	function menuBarItems() {
+		var bar = document.getElementById('lpn_menubar');
+		return bar ? Array.prototype.slice.call(bar.querySelectorAll('.lpn-menubar-item'))
+			.filter(function (b) { return b.getClientRects().length > 0; }) : [];
+	}
+	function menuFocus(el) { if (el && el.isConnected && el.focus) { el.focus(); } }
+	// A click from the keyboard (Enter or Space on a button) is trusted with detail 0; a mouse
+	// click has detail >= 1 and a script's .click() is untrusted, so neither moves focus.
+	window.addEventListener('click', function (e) {
+		if (!e.isTrusted || e.detail !== 0) { return; }
+		menuKbIntent = true;
+		setTimeout(function () { menuKbIntent = false; }, 0);
+		menuFocusAfterRow(e.target);
+	}, true);
+	// A row that ran a command and opened nothing focusable leaves focus on a hidden button; give it
+	// back to the opener. Called BEFORE the row's own click handler runs (the capture listener above,
+	// or a mnemonic about to click), so it sees which boxes were open before the command.
+	function menuFocusAfterRow(t) {
+		var opener = openMenuAnchor;
+		var ret = kbdModeReturn;   // the element that had focus before a chord or F10 (cleared by the click handler below)
+		var boxVisible = function (id) { var b = document.getElementById(id); return !!b && b.getClientRects().length > 0; };
+		var boxesBefore = ESCAPE_SCOPED_BOXES.filter(boxVisible);
+		if (t && t.closest && t.closest('#lpn_menu_popup, #lpn_menu_popup2') && opener) {
+			setTimeout(function () {
+				// The closed menu's row still holds focus until the browser's next focus fix-up, so
+				// "dropped" means body, or a control inside either closed menu panel.
+				var a = document.activeElement;
+				var dropped = !a || a === document.body || !!(a.closest && a.closest('#lpn_menu_popup, #lpn_menu_popup2'));
+				var still = document.getElementById('lpn_menu_popup');
+				if (still && still.style.display === 'block') { return; }   // a fly-out opened; keys own focus
+				if (!dropped) { return; }
+				// A command that opened a box: focus its first control. Otherwise the opener.
+				var opened = ESCAPE_SCOPED_BOXES.filter(function (id) { return boxVisible(id) && boxesBefore.indexOf(id) < 0; })[0];
+				var obox = opened && document.getElementById(opened);
+				var first = obox && (obox.querySelector('input:not([type=hidden]):not(:disabled), select:not(:disabled), textarea:not(:disabled)')
+					|| obox.querySelector('button:not(:disabled), [tabindex]:not([tabindex="-1"])'));
+				if (first) { first.focus(); return; }
+				if (ret && ret !== document.body && ret.isConnected && ret.focus && ret.getClientRects().length > 0) {
+					ret.focus();
+					if (document.activeElement === ret) { return; }
+				}
+				// No place to go back to (the menu was opened from the page itself): the menu's button.
+				if (!(ret && ret !== document.body) && opener.isConnected && opener.getClientRects().length > 0) { opener.focus(); return; }
+				// The place it came from is gone or hidden (W, G, P switches the bottom pane's tab away
+				// from the cell): the pane the command showed, else the map. Never the page body,
+				// where nothing answers the keyboard's next press the way the person expects.
+				menuFocusSane();
+			}, 0);
+		}
+	}
+	function menuFocusSane() {
+		var pane = document.getElementById('lpn_pane');
+		if (pane && pane.getClientRects().length > 0) {
+			var tab = pane.querySelector('[role=tab][aria-selected="true"]');
+			var f = (tab && tab.getClientRects().length > 0 && tab)
+				|| Array.prototype.filter.call(pane.querySelectorAll('button:not(:disabled), select:not(:disabled), input:not([type=hidden]):not(:disabled), [tabindex]:not([tabindex="-1"])'),
+					function (el) { return el.getClientRects().length > 0; })[0];
+			if (f) { f.focus(); if (document.activeElement === f) { return; } }
+		}
+		var cv = document.getElementById('lpn_canvas');
+		if (cv && cv.focus) {
+			if (!cv.hasAttribute('tabindex')) { cv.setAttribute('tabindex', '-1'); }
+			cv.focus({ preventScroll: true });
+		}
+	}
+	// **EVERY ROW GETS A LETTER, AND NOBODY ASSIGNS ONE** (Tom, 2026-10-03: *"Every appropriate menu
+	// row should now be a mnemonic so that I can type Alt+Shift+W,G,P for a Profile Graph."*). The
+	// letter is read off the row's own label in the page's language, so it works in all 27, and a
+	// row another branch adds later gets one the moment it exists. Deterministic: rows in order,
+	// each takes the first letter that starts a word of its label and no row above has taken, else
+	// the first unused letter anywhere in it, else the next unused digit 1-9, 0, then Latin a-z (a
+	// Chinese menu of twelve rows outruns the digits). Letters are UNIQUE
+	// within one menu, so one press always does one thing -- no Windows-style cycling between rows.
+	//
+	// Only letters a keyboard types in one keystroke qualify. Han, kana, Hangul and Ethiopic go
+	// through an input method, so a Chinese or Amharic menu falls back to digits, which every layout
+	// has; Arabic, Hebrew, Cyrillic, Devanagari and the rest are typed directly on their own layouts
+	// and keep their own letters (e.key matches them). Combining marks never qualify. Pointer-only
+	// rows, headings, separators and hidden rows get none; a disabled row keeps its letter, so the
+	// letters do not shuffle as rows enable. A row whose label is CONTENT (a scenario name, a file
+	// name) says `variable: true`, and takes its letter only after every fixed row has its own.
+	function menuMnemonicChar(ch) {
+		if (!/^\p{L}$/u.test(ch)) { return ''; }
+		if (/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Script=Ethiopic}\p{Script=Yi}]/u.test(ch)) { return ''; }
+		var lo = ch.toLowerCase();
+		return Array.from(lo).length === 1 ? lo : '';
+	}
+	function menuMnemonics(rows) {
+		var used = {}, out = [], digits = '1234567890abcdefghijklmnopqrstuvwxyz', di = 0;
+		var idx = rows.map(function (r, i) { return i; });
+		var isVar = function (i) { return !!(rows[i] && rows[i].variable); };
+		rows.forEach(function (r, i) { out[i] = ''; });
+		// Fixed rows first, as if the `variable: true` rows (scenario names, recent files -- project
+		// or browser content) were absent, so a fixed row's letter never depends on what is in the
+		// project; the variable rows then share what is left.
+		idx.filter(function (i) { return !isVar(i); }).concat(idx.filter(isVar)).forEach(function (i) {
+			var r = rows[i];
+			if (!r || r.hidden || r.separator || r.heading || r.pointerOnly || !(r.fn || r.submenu)) { return; }
+			var chars = Array.from(String(r.label || '')), pick = '', j, c;
+			for (j = 0; j < chars.length && !pick; j++) {
+				if (j > 0 && /[\p{L}\p{N}]/u.test(chars[j - 1])) { continue; }
+				c = menuMnemonicChar(chars[j]);
+				if (c && !used[c]) { pick = c; }
+			}
+			for (j = 0; j < chars.length && !pick; j++) {
+				c = menuMnemonicChar(chars[j]);
+				if (c && !used[c]) { pick = c; }
+			}
+			while (!pick && di < digits.length) {
+				c = digits.charAt(di++);
+				if (!used[c]) { pick = c; }
+			}
+			if (pick) { used[pick] = true; out[i] = pick; }
+		});
+		return out;
+	}
+	// A row's `hotkey:` in the platform's words: Mod is Ctrl, or Cmd on a Mac (the undo handler
+	// takes either modifier). Key names stay as printed on the keys, as the Help table writes them.
+	function menuHotkeyText(spec) {
+		return String(spec).replace(/^Mod\+/, isMacPlatform() ? 'Cmd+' : 'Ctrl+');
+	}
+	// The row a typed key picks in this list: its own character first (a Russian or Hebrew layout
+	// types the label's letter), then the PHYSICAL key, so a Latin letter still answers on a layout
+	// that types something else at that position (the chord's own e.code rule).
+	function menuRowForKey(list, e) {
+		if (!list || !e.key || Array.from(e.key).length !== 1 || e.key === ' ') { return null; }
+		var rows = Array.prototype.slice.call(list.querySelectorAll('button.lpn-menu-row[data-mnemonic]'));
+		var k = e.key.toLowerCase(), m = /^(?:Key([A-Z])|Digit([0-9]))$/.exec(e.code || '');
+		var byKey = rows.filter(function (b) { return b.getAttribute('data-mnemonic') === k; })[0];
+		// The physical position answers only for a layout that does not type Latin there: a Latin
+		// letter with no row of its own is simply no row (a Dvorak "b" must never run QWERTY "n").
+		if (byKey || !m || /^[\p{Script=Latin}0-9]$/u.test(e.key)) { return byKey || null; }
+		var phys = (m[1] || m[2]).toLowerCase();
+		return rows.filter(function (b) { return b.getAttribute('data-mnemonic') === phys; })[0] || null;
+	}
+	function menuKbOpen(btn) {
+		menuKbIntent = true;
+		try { btn.click(); } finally { menuKbIntent = false; }
+	}
+	function menuBarMove(dir, cur) {
+		var items = menuBarItems(), i = items.indexOf(cur);
+		if (i < 0) { return; }
+		var next = items[(i + dir + items.length) % items.length];
+		if (openMenuAnchor) { menuKbOpen(next); } else { next.focus(); }
+	}
+	window.addEventListener('keydown', function (e) {
+		if (e.defaultPrevented || e.ctrlKey || e.altKey || e.metaKey) { return; }
+		var k = e.key, ae = document.activeElement;
+		// Right-to-left pages mirror the horizontal keys (WAI-ARIA): Left is "next menu / open fly-out".
+		if ((k === 'ArrowLeft' || k === 'ArrowRight') && window.getComputedStyle(document.documentElement).direction === 'rtl') {
+			k = k === 'ArrowLeft' ? 'ArrowRight' : 'ArrowLeft';
+		}
+		var pop = document.getElementById('lpn_menu_popup'), sub = document.getElementById('lpn_menu_popup2');
+		var open = !!pop && pop.style.display === 'block';
+		var subOpen = !!sub && sub.style.display === 'block';
+		if (!open) {
+			// Closed: a menu-bar button holding focus walks the bar, and Down/Up open its menu.
+			if (!ae || !ae.classList || !ae.classList.contains('lpn-menubar-item')) { return; }
+			// After F10, a menu's badge letter alone opens it, as Alt then a letter does on Windows.
+			if (kbdModeOn() && !e.shiftKey && LPN_MENU_CHORDS[e.code]) {
+				var mb = document.getElementById(LPN_MENU_CHORDS[e.code]);
+				if (mb && mb.getClientRects().length > 0) { e.preventDefault(); e.stopPropagation(); menuKbOpen(mb); }
+				return;
+			}
+			if (k === 'ArrowRight' || k === 'ArrowLeft') {
+				e.preventDefault();
+				menuBarMove(k === 'ArrowRight' ? 1 : -1, ae);
+			} else if (k === 'ArrowDown' || k === 'ArrowUp') {
+				e.preventDefault();
+				menuKbOpen(ae);
+				if (k === 'ArrowUp') { var rs = menuRowsOf(document.getElementById('lpn_menu_list')); menuFocus(rs[rs.length - 1]); }
+			}
+			return;
+		}
+		var inSub = subOpen && sub.contains(ae), inPop = pop.contains(ae);
+		var onAnchor = !!openMenuAnchor && ae === openMenuAnchor;
+		// Focus elsewhere on the page: the menu was opened with the mouse, and the page-wide
+		// Escape and click-away dismissals own it.
+		if (!inSub && !inPop && !onAnchor) { return; }
+		var anchor = openMenuAnchor;
+		function stop() { e.preventDefault(); e.stopPropagation(); }
+		if (k === 'Tab') {
+			closeMenu();
+			if (!onAnchor) { menuFocus(anchor); }
+			return;
+		}
+		if (k === 'Escape') {
+			stop();
+			if (subOpen) { var so = subOpener; closeSubMenu(); menuFocus(inSub || onAnchor ? so : ae); }
+			else { closeMenu(); menuFocus(anchor); }
+			return;
+		}
+		if (k === 'ArrowDown' || k === 'ArrowUp' || k === 'Home' || k === 'End') {
+			stop();
+			var items = menuRowsOf(inSub ? document.getElementById('lpn_menu_list2') : document.getElementById('lpn_menu_list'));
+			if (!items.length) { return; }
+			var i = items.indexOf(ae), n = items.length, to;
+			if (k === 'Home') { to = 0; }
+			else if (k === 'End') { to = n - 1; }
+			else if (k === 'ArrowDown') { to = i < 0 ? 0 : (i + 1) % n; }
+			else { to = i < 0 ? n - 1 : (i - 1 + n) % n; }
+			if (!inSub && subOpen) { closeSubMenu(); }   // leaving the parent row takes its fly-out with it
+			items[to].focus();
+			return;
+		}
+		if (k === 'ArrowRight') {
+			stop();
+			if (inPop && ae.getAttribute && ae.getAttribute('aria-haspopup') === 'menu') { menuKbOpen(ae); }
+			else { menuBarMove(1, anchor); }
+			return;
+		}
+		if (k === 'ArrowLeft') {
+			stop();
+			if (inSub) { var so2 = subOpener; closeSubMenu(); menuFocus(so2); }
+			else { menuBarMove(-1, anchor); }
+			return;
+		}
+		// A row's mnemonic: a fly-out row opens its fly-out with focus inside, a command row runs.
+		// The key is swallowed even on a disabled row, so a letter never falls through to a tool key.
+		var hit = menuRowForKey(inSub ? sub : pop, e);
+		if (hit) {
+			stop();
+			if (hit.disabled) { return; }
+			if (hit.getAttribute('aria-haspopup') === 'menu') {
+				hit.focus();
+				menuKbOpen(hit);
+			} else {
+				hit.focus();
+				menuFocusAfterRow(hit);
+				hit.click();
+			}
+		}
+	}, true);
+	// ---- MENU MNEMONICS AND KEYBOARD MODE (Task 748) ---------------------------------------------
+	// Alt+Shift+{letter} (Ctrl+Option on a Mac, the Google Docs convention) opens a top menu from
+	// anywhere, text fields included, and F10 goes to the menu bar. The letter is the PHYSICAL key
+	// (`e.code`), so it works on every keyboard layout, and the badge that shows it is a fixed Latin
+	// letter, never a translated string and never an underline: an underline fails in Arabic,
+	// Hebrew, Chinese, Hindi and Burmese. The six are File, Edit, Map, Water, Help, Language.
+	var LPN_MENU_CHORDS = {
+		KeyF: 'lpn_menu_file', KeyE: 'lpn_menu_edit', KeyM: 'lpn_menu_map',
+		KeyW: 'lpn_menu_project', KeyH: 'lpn_menu_help', KeyL: 'lpn_menu_lang'
+	};
+	var kbdModeReturn = null;
+	function isMacPlatform() {
+		var p = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+		return /mac|iphone|ipad/i.test(p);
+	}
+	function kbdModeOn() {
+		var bar = document.getElementById('lpn_menubar');
+		return !!bar && bar.classList.contains('lpn-kbdmode');
+	}
+	function inMenuChrome(el) {
+		return !!el && !!el.closest && !!el.closest('#lpn_menubar, #lpn_menu_popup, #lpn_menu_popup2');
+	}
+	function kbdModeEnter() {
+		var bar = document.getElementById('lpn_menubar');
+		if (!bar) { return; }
+		if (!kbdModeOn() && !inMenuChrome(document.activeElement)) { kbdModeReturn = document.activeElement; }
+		bar.classList.add('lpn-kbdmode');
+		document.documentElement.classList.add('lpn-kbdmode');   // reaches the pop-up rows' letters
+	}
+	function kbdModeExit(restoreFocus) {
+		var bar = document.getElementById('lpn_menubar');
+		if (bar) { bar.classList.remove('lpn-kbdmode'); }
+		document.documentElement.classList.remove('lpn-kbdmode');
+		var back = kbdModeReturn;
+		kbdModeReturn = null;
+		if (!restoreFocus) { return; }
+		if (back && back !== document.body && back.isConnected && back.focus) { back.focus(); return; }
+		var cv = document.getElementById('lpn_canvas');
+		if (cv && cv.focus) {
+			if (!cv.hasAttribute('tabindex')) { cv.setAttribute('tabindex', '-1'); }
+			cv.focus({ preventScroll: true });
+		} else if (document.activeElement && document.activeElement.blur) { document.activeElement.blur(); }
+	}
+	window.addEventListener('keydown', function (e) {
+		if (e.defaultPrevented) { return; }
+		var mac = isMacPlatform(), id = LPN_MENU_CHORDS[e.code];
+		var chord = mac ? (e.ctrlKey && e.altKey && !e.shiftKey && !e.metaKey)
+			: (e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey);
+		if (id && chord) {
+			var btn = document.getElementById(id);
+			if (!btn || btn.getClientRects().length === 0) { return; }
+			e.preventDefault(); e.stopPropagation();
+			closeViewPopovers();
+			kbdModeEnter();
+			var pop = document.getElementById('lpn_menu_popup');
+			if (openMenuAnchor === btn && pop && pop.style.display === 'block') {
+				var rows = menuRowsOf(document.getElementById('lpn_menu_list'));
+				if (document.getElementById('lpn_menu_popup2') && document.getElementById('lpn_menu_popup2').style.display === 'block') { closeSubMenu(); }
+				menuFocus(rows[0] || btn);
+			} else {
+				menuKbOpen(btn);
+				if (!(pop && pop.style.display === 'block')) { btn.focus(); }
+			}
+			return;
+		}
+		if (e.key === 'F10' && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
+			e.preventDefault(); e.stopPropagation();
+			if (kbdModeOn() && inMenuChrome(document.activeElement)) {
+				closeMenu(); kbdModeExit(true); return;
+			}
+			var items = menuBarItems();
+			if (!items.length) { return; }
+			kbdModeEnter();
+			closeMenu();
+			items[0].focus();
+			return;
+		}
+		// Escape out of the bar (no menu open, focus on a bar button) leaves keyboard mode and gives
+		// focus back to where it was. Escape inside an open menu is the navigation handler's.
+		if (e.key === 'Escape' && kbdModeOn()) {
+			var ae = document.activeElement, pp = document.getElementById('lpn_menu_popup');
+			if (pp && pp.style.display === 'block') { return; }
+			if (ae && ae.classList && ae.classList.contains('lpn-menubar-item')) {
+				e.preventDefault(); e.stopPropagation();
+				kbdModeExit(true);
+			}
+		}
+	}, true);
+	// Any pointer press ends keyboard mode, and so does focus moving off the menus (Tab, or a command
+	// that opened a box) -- the badges are a hint for a person who is not using the mouse.
+	document.addEventListener('pointerdown', function () { if (kbdModeOn()) { kbdModeExit(false); } }, true);
+	document.addEventListener('focusin', function (e) {
+		if (kbdModeOn() && !inMenuChrome(e.target)) { kbdModeExit(false); }
+	}, true);
+	document.addEventListener('click', function (e) {
+		var t = e.target;
+		if (kbdModeOn() && t && t.closest && t.closest('#lpn_menu_popup .lpn-menu-row:not([aria-haspopup]), #lpn_menu_popup2 .lpn-menu-row')) { kbdModeExit(false); }
+	}, true);
 	// The classic fly-out grace period. Travelling from the parent row to its fly-out is a DIAGONAL
 	// move across the rows below, so dismissing on the first row entered makes the submenu
 	// unreachable by pointer -- you can only ever get there in a straight line, and menus are not
@@ -37407,6 +37848,8 @@ var EngCalcs = EngCalcs || {};
 		cancelSubClose();
 		hidePanel(document.getElementById('lpn_menu_popup2'));
 		unparkAnchorTip(1);
+		if (subOpener && subOpener.setAttribute) { subOpener.setAttribute('aria-expanded', 'false'); }
+		subOpener = null;
 	}
 	function closeMenu() {
 		hidePanel(document.getElementById('lpn_menu_popup'));
@@ -38366,6 +38809,7 @@ var EngCalcs = EngCalcs || {};
 			recentFiles.forEach(function (rec) {
 				recentRows.push({
 					icon: 'open',
+					variable: true,   // a file name: never takes a fixed row's letter (Task 748)
 					// The file NAME, not the project name: this list is about files on the disk, and
 					// the project inside one may since have been renamed or may not exist here at all.
 					label: rec.name,
@@ -38484,13 +38928,13 @@ var EngCalcs = EngCalcs || {};
 			// mode from the menu bar, and nothing in the menus could put you back. Escape does it,
 			// which is no answer on the device the concession is for. Same key, same icon, same
 			// call as the toolbar button -- two doors, one implementation.
-			{ icon: 'select', label: pc.lpn_tool_select || 'Select', fn: function () { setMode('select'); } },
+			{ icon: 'select', label: pc.lpn_tool_select || 'Select', hotkey: toolKeyFor('select'), fn: function () { setMode('select'); } },
 			// **THE DOOR** (Task 567). Beside Select because it is the other thing a press on the
 			// map can mean, and because EPANET puts Vertices on its own right-click menu -- a menu
 			// this page does not have on a phone, which is where the gesture it replaces failed.
 			// It TOGGLES, like the Delete tool row above: the way out of a mode has to be the same
 			// control that got you into it, or the mode is a trap on a screen with no keyboard.
-			{ icon: 'vertices', label: pc.lpn_tool_vertices || 'Vertices', fn: function () {
+			{ icon: 'vertices', pointerOnly: true, label: pc.lpn_tool_vertices || 'Vertices', fn: function () {
 				setMode(mode === 'vertices' ? 'select' : 'vertices');
 			} },
 			// **THE THREE SHAPES GET THREE ROWS, WHERE THE TOOLBAR GETS ONE SLOT** (Task 266), and
@@ -38498,13 +38942,13 @@ var EngCalcs = EngCalcs || {};
 			// scarce, so it cycles; the menu is where a thing is FOUND, so it lists. It also gives
 			// the small-screen breakpoint a door, where the whole toolbar is hidden -- the same
 			// reason Select itself has a row above.
-			{ icon: 'select-window', label: pc.lpn_tool_area_window || 'Select a window',
+			{ icon: 'select-window', pointerOnly: true, label: pc.lpn_tool_area_window || 'Select a window',
 				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('window'); } },
-			{ icon: 'select-lasso', label: pc.lpn_tool_area_lasso || 'Select a lasso',
+			{ icon: 'select-lasso', pointerOnly: true, label: pc.lpn_tool_area_lasso || 'Select a lasso',
 				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('lasso'); } },
-			{ icon: 'select-polygon', label: pc.lpn_tool_area_polygon || 'Select a polygon',
+			{ icon: 'select-polygon', pointerOnly: true, label: pc.lpn_tool_area_polygon || 'Select a polygon',
 				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('polygon'); } },
-			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', tip: pc.lpn_tool_undo_tip, fn: undo },
+			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', tip: pc.lpn_tool_undo_tip, hotkey: 'Mod+Z', fn: undo },
 			// Find sits with Undo and Delete because it acts on the ELEMENTS, which is what this
 			// menu is about; View holds the things that change how the map is drawn. Every editor
 			// puts Find in Edit for the same reason.
@@ -38519,7 +38963,7 @@ var EngCalcs = EngCalcs || {};
 			// TOOL -- the verb-then-subject path, kept because it is the only way to delete on a
 			// touch screen with no keyboard, and because a repeated delete spree is genuinely
 			// quicker with it. Task 266 turns the selected case into "and everything else selected".
-			{ icon: 'del', label: pc.lpn_tool_delete || 'Delete', fn: function () {
+			{ icon: 'del', label: pc.lpn_tool_delete || 'Delete', hotkey: LPN_TOOL_ALT_KEYS['delete'], fn: function () {
 				if (deleteSelection()) { return; }
 				setMode(mode === 'delete' ? 'select' : 'delete');
 			} },
@@ -38590,18 +39034,18 @@ var EngCalcs = EngCalcs || {};
 			// of the two doors: a reader who opens the menu rather than hovering the strip was told
 			// nothing at all, about any of the eight tools. No new key, and the digit still comes
 			// from LPN_TOOL_KEYS rather than from a translator.
-			{ icon: 'junction', label: pc.lpn_tool_add_junction || 'Junction', tip: toolTipWithKey('add-junction', pc.lpn_tool_add_junction_tip), fn: function () { setMode('add-junction'); } },
-			{ icon: 'reservoir', label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir', pc.lpn_tool_add_reservoir_tip), fn: function () { setMode('add-reservoir'); } },
-			{ icon: 'tank', label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank', pc.lpn_tool_add_tank_tip), fn: function () { setMode('add-tank'); } },
-			{ icon: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', tip: toolTipWithKey('add-pipe', pc.lpn_tool_add_pipe_tip), fn: function () { setMode('add-pipe'); } },
-			{ icon: 'pump', label: pc.lpn_tool_add_pump || 'Pump', tip: toolTipWithKey('add-pump', pc.lpn_tool_add_pump_tip), fn: function () { setMode('add-pump'); } },
-			{ icon: 'valve', label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve', pc.lpn_tool_add_valve_tip), fn: function () { setMode('add-valve'); } },
+			{ icon: 'junction', pointerOnly: true, label: pc.lpn_tool_add_junction || 'Junction', tip: toolTipWithKey('add-junction', pc.lpn_tool_add_junction_tip), hotkey: toolKeyFor('add-junction'), fn: function () { setMode('add-junction'); } },
+			{ icon: 'reservoir', pointerOnly: true, label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir', pc.lpn_tool_add_reservoir_tip), hotkey: toolKeyFor('add-reservoir'), fn: function () { setMode('add-reservoir'); } },
+			{ icon: 'tank', pointerOnly: true, label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank', pc.lpn_tool_add_tank_tip), hotkey: toolKeyFor('add-tank'), fn: function () { setMode('add-tank'); } },
+			{ icon: 'pipe', pointerOnly: true, label: pc.lpn_tool_add_pipe || 'Pipe', tip: toolTipWithKey('add-pipe', pc.lpn_tool_add_pipe_tip), hotkey: toolKeyFor('add-pipe'), fn: function () { setMode('add-pipe'); } },
+			{ icon: 'pump', pointerOnly: true, label: pc.lpn_tool_add_pump || 'Pump', tip: toolTipWithKey('add-pump', pc.lpn_tool_add_pump_tip), hotkey: toolKeyFor('add-pump'), fn: function () { setMode('add-pump'); } },
+			{ icon: 'valve', pointerOnly: true, label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve', pc.lpn_tool_add_valve_tip), hotkey: toolKeyFor('add-valve'), fn: function () { setMode('add-valve'); } },
 			// **AFTER THE VALVE AND BEFORE THE TEXT** (Task 247). The order is the sentence a
 			// person draws in -- junctions, the sources that feed them, the pipe that joins them,
 			// the two things you put ON a pipe -- and a meter is the third thing you put on a pipe.
 			// Text stays last, being the only tool that adds nothing hydraulic.
-			{ icon: 'customer', label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), fn: function () { setMode('add-meter'); } },
-			{ icon: 'text', label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text', pc.lpn_tool_add_text_tip), fn: function () { setMode('add-text'); } },
+			{ icon: 'customer', pointerOnly: true, label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), hotkey: toolKeyFor('add-meter'), fn: function () { setMode('add-meter'); } },
+			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text', pc.lpn_tool_add_text_tip), hotkey: toolKeyFor('add-text'), fn: function () { setMode('add-text'); } },
 			{ separator: true },
 			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
 			// Deliberately NOT translated: scaffolding for measuring how ~100 links performs, and it
@@ -39189,6 +39633,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, bar = document.getElementById('lpn_menubar');
 		if (!bar) { return; }
 		bar.innerHTML = '';
+		bar.setAttribute('role', 'menubar');
 		// **THERE IS NO MARK AT THE FAR LEFT, AND THE BAR STARTS WITH File** (Tom, 2026-09-11,
 		// closing this out: *"I can't remember why we went down this road ... But it was
 		// ill-advised."*).
@@ -39262,6 +39707,8 @@ var EngCalcs = EngCalcs || {};
 			// pressed. Set here too (not just by openMenu()) so a screen reader gets the right state
 			// on first render, before anything has been clicked.
 			b.setAttribute('aria-expanded', 'false');
+			b.setAttribute('role', 'menuitem');
+			b.setAttribute('aria-haspopup', 'menu');
 			// **THE WORD IS IN AN ELEMENT OF ITS OWN, and that is the whole mechanism behind Task
 			// 486's fourth item** ("Hide the Menu text, leaving only icons"). EngCalcs.setLabel()
 			// appends the label as a bare TEXT NODE, and a stylesheet cannot reach one -- so the
@@ -39292,6 +39739,17 @@ var EngCalcs = EngCalcs || {};
 				e.stopPropagation();
 				m.open(e.currentTarget);
 			});
+			// The letter of this menu's Alt+Shift chord, shown only in keyboard mode (.lpn-kbdmode).
+			// Latin and fixed on purpose; aria-hidden because the name already says it all.
+			for (var code in LPN_MENU_CHORDS) {
+				if (LPN_MENU_CHORDS[code] === m.id) {
+					var badge = document.createElement('span');
+					badge.className = 'lpn-kbdbadge';
+					badge.setAttribute('aria-hidden', 'true');
+					badge.textContent = code.slice(3);
+					b.appendChild(badge);
+				}
+			}
 			bar.appendChild(b);
 		});
 		// The bar is built after page load, so its tips are new DOM and need arming for touch --
@@ -39878,6 +40336,7 @@ var EngCalcs = EngCalcs || {};
 		wireStatusReportBox();
 		wireAlternativesBox();
 		wireFullReportBox();
+		wireCalibBox();
 		buildMenuBar();
 		wireScenarioButton();
 		wireWrongButtons();
@@ -44084,17 +44543,22 @@ var EngCalcs = EngCalcs || {};
 			doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
 			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
 			Object.keys(e.custs).forEach(function (id) {
-				var ce = custLblEls[id], c = e.custs[id], sp = c.spot;
-				if (!ce) { return; }
-				ce.trials = c.trials;
-				if (c.hidden || !sp) { setLabelAssemblyHidden(ce, true); return; }
-				ce.spot = sp;
-				setLabelAssemblyHidden(ce, false);
-				ce.text.setAttribute('text-anchor', sp.hAlign);
-				ce.text.setAttribute('transform', 'rotate(' + sp.angle.toFixed(3) + ' ' + sp.ax + ' ' + sp.ay + ')');
-				repositionMultilineText(ce.text, sp.ax, sp.ay);
+				var ce = custLblEls[id];
+				if (ce) { restoreCustomerLabelSpot(ce, e.custs[id]); }
 			});
 		} finally { endLinkGeomHold(); }
+	}
+	// A meter label put back where a kept pass left it -- layoutCustomerLabels()'s last lines, with
+	// the spot it chose. Shared by the zoom bank and the tab keep.
+	function restoreCustomerLabelSpot(ce, c) {
+		var sp = c.spot;
+		ce.trials = c.trials;
+		if (c.hidden || !sp) { setLabelAssemblyHidden(ce, true); return; }
+		ce.spot = sp;
+		setLabelAssemblyHidden(ce, false);
+		ce.text.setAttribute('text-anchor', sp.hAlign);
+		ce.text.setAttribute('transform', 'rotate(' + sp.angle.toFixed(3) + ' ' + sp.ax + ' ' + sp.ay + ')');
+		repositionMultilineText(ce.text, sp.ax, sp.ay);
 	}
 	// The zoom settle, through the bank.
 	function labelCacheSettle() {
@@ -59200,8 +59664,8 @@ var EngCalcs = EngCalcs || {};
 				linkState[l.id] = st;
 				events.push({
 					t: f.t,
-					text: (st === 'open' ? (pc.lpn_status_opened || '{type} {id} opened')
-						: (pc.lpn_status_closed || '{type} {id} closed'))
+					text: (st === 'open' ? (pc.lpn_status_opened || '{type} {id} now open')
+						: (pc.lpn_status_closed || '{type} {id} now closed'))
 						.replace('{type}', reportTypeNoun('link', l.type))
 						.replace('{id}', labelPrefixFor('link', 'id') + l.id)
 				});
@@ -59218,8 +59682,8 @@ var EngCalcs = EngCalcs || {};
 						st.dir = dir;
 						events.push({
 							t: f.t,
-							text: (dir > 0 ? (pc.lpn_status_filling || '{type} {id} is filling')
-								: (pc.lpn_status_emptying || '{type} {id} is emptying'))
+							text: (dir > 0 ? (pc.lpn_status_filling || '{type} {id} now filling')
+								: (pc.lpn_status_emptying || '{type} {id} now emptying'))
 								.replace('{type}', reportTypeNoun('node', 'tank')).replace('{id}', name)
 						});
 					}
@@ -59229,7 +59693,7 @@ var EngCalcs = EngCalcs || {};
 						st.full = true;
 						events.push({
 							t: f.t,
-							text: (pc.lpn_status_full || '{type} {id} is full')
+							text: (pc.lpn_status_full || '{type} {id} now full')
 								.replace('{type}', reportTypeNoun('node', 'tank')).replace('{id}', name)
 						});
 					} else if (lvl < band.max - st.eps) { st.full = false; }
@@ -59239,7 +59703,7 @@ var EngCalcs = EngCalcs || {};
 						st.dry = true;
 						events.push({
 							t: f.t,
-							text: (pc.lpn_status_dry || '{type} {id} is empty')
+							text: (pc.lpn_status_dry || '{type} {id} now empty')
 								.replace('{type}', reportTypeNoun('node', 'tank')).replace('{id}', name)
 						});
 					} else if (lvl > band.min + st.eps) { st.dry = false; }
@@ -59683,6 +60147,410 @@ var EngCalcs = EngCalcs || {};
 		if (fullBoxIsOpen()) { rebuildFullReport(); }
 	}
 
+	// ---- THE CALIBRATION REPORT (ROADMAP Task 601) -----------------------------------------------
+	//
+	// Tom, 2026-09-06: *"EPANET allows calibration files (measured system data) and offers a
+	// Calibration Report with three tabbed pages. See EPANET help."* So this is EPANET's report in
+	// EPANET's shape and words: a file of measurements per parameter, and three pages --
+	// Statistics, Correlation Plot, Mean Comparisons (EPANET 2.2 manual §5.3, §9.6). The parsing
+	// and the arithmetic are js/lpn-calib.js's; this half resolves the network and draws.
+	//
+	// **THE FIRST DATA ON THIS PAGE FROM OUTSIDE THE MODEL**, so its two rules are stated where they
+	// bite. A location the network does not have is LISTED AND COUNTED and its measurements are
+	// skipped -- never a silent drop, never a refusal of the file (the .inp import rule). And the
+	// file's numbers are read in the PROJECT'S units, which is what EPANET assumes too; the box says
+	// which unit, because a file written in psi read against a kPa project is otherwise invisible.
+	//
+	// **HELD IN MEMORY FOR THIS PAGE LOAD ONLY.** Nothing goes into serializeProject(), and no
+	// localStorage key is written -- not even for where the box sits, which is why it uses the
+	// in-memory layout the Alternatives box uses rather than wireBoxMemory(). Whether a calibration
+	// file should travel with the project is a question for Tom, not a default to slip in.
+	//
+	// **EVERY COMPUTED VALUE COMES THROUGH colorValueOf() AS OF ONE FRAME** (tsAsOfFrame()), the
+	// seam the time-series chart and the Full report already trust, so a computed mean here can
+	// never disagree with the number the Tables pane shows at that step.
+	// **PER PROJECT, NOT PER PAGE.** Keyed by the open project's library id, so a file loaded on one
+	// project tab is never compared against another project's elements after a tab switch, and a new
+	// or different project starts with none. Still memory only.
+	var calibStore = {};      // project id -> { parameter key -> { name, parsed } }
+	function calibFilesNow() {
+		var k = String(library.openId || '');
+		if (!calibStore[k]) { calibStore[k] = {}; }
+		return calibStore[k];
+	}
+	var calibParam = 'pressure';
+	var calibTab = 'stats';
+	var calibboxLayout = newBoxLayout();
+	// **ONE COLOUR PER LOCATION, THE SAME ON EVERY VIEW OF IT**: by the location's place in the
+	// file, so the report's points and bars and the time-series rings name a location the same way.
+	function calibColor(k) { return LPN_TS_COLORS[Math.max(0, k) % LPN_TS_COLORS.length]; }
+	function calibParamDef(key) {
+		var P = (EngCalcs.lpnCalib && EngCalcs.lpnCalib.PARAMS) || [], i;
+		for (i = 0; i < P.length; i++) { if (P[i].key === key) { return P[i]; } }
+		return P[2] || null;
+	}
+	function calibParamLabel(def) {
+		var unit = colorFieldUnitText(def.group, def.field);
+		return colorFieldLabel(def.group, def.field) + (unit ? ' (' + unit + ')' : '');
+	}
+	// The frames compared against: the extended period run's, or the single solve standing alone
+	// at time 0 -- EPANET's own allowance ("for a single-period analysis all time values can be 0").
+	function calibFrames() {
+		var frames = reportFrames();
+		if (!frames.length && lastSolveResult) { frames = [lastSolveResult]; }
+		return frames;
+	}
+	/**
+	 * The comparison for one parameter: every location the file names, matched to the network,
+	 * each measurement paired with the computed value at its time. Null with no file loaded.
+	 */
+	function calibCompute(key) {
+		var file = calibFilesNow()[key], def = calibParamDef(key), C = EngCalcs.lpnCalib,
+			frames, times, locs = [], unknown = [], unknownCount = 0, outside = 0, noValue = 0, st;
+		if (!file || !def || !C) { return null; }
+		frames = calibFrames();
+		times = frames.map(function (f) { return typeof f.t === 'number' ? f.t : 0; });
+		file.parsed.order.forEach(function (id, k) {
+			var e = def.group === 'link' ? linkById(id) : nodeById(id), obs, series, pairs = [];
+			obs = file.parsed.obs.filter(function (o) { return o.id === id; });
+			if (!e) { unknown.push(id); unknownCount += obs.length; return; }
+			series = frames.map(function (f) {
+				var v = tsAsOfFrame(f, function () { return colorValueOf(def.group, e, def.field); });
+				return (typeof v === 'number' && isFinite(v)) ? v : undefined;
+			});
+			obs.forEach(function (o) {
+				var s;
+				if (!frames.length) { return; }
+				// **A SINGLE-PERIOD RUN ANSWERS EVERY MEASUREMENT** with its one result, whatever time
+				// the file gives -- EPANET's own rule (Fcalib.pas), and the box says so.
+				if (frames.length === 1) {
+					s = series[0];
+					if (s === undefined) { noValue++; return; }
+					pairs.push({ t: o.t, o: o.v, s: s });
+					return;
+				}
+				if (o.t < times[0] - 1e-6 || o.t > times[times.length - 1] + 1e-6) { outside++; return; }
+				s = C.interp(times, series, o.t);
+				if (s === undefined) { noValue++; return; }
+				pairs.push({ t: o.t, o: o.v, s: s });
+			});
+			locs.push({ id: id, pairs: pairs, color: calibColor(k) });
+		});
+		st = C.stats(locs);
+		st.locations.forEach(function (s, i) { s.pairs = locs[i].pairs; s.color = locs[i].color; });
+		return {
+			def: def, file: file, frames: frames.length, stats: st,
+			unknown: unknown, unknownCount: unknownCount, outside: outside, noValue: noValue
+		};
+	}
+	function calibBoxEl() { return document.getElementById('lpn_calib_box'); }
+	function calibBoxIsOpen() {
+		var box = calibBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	// Fixed decimals, as EPANET prints them: two for a value, three for the correlation.
+	function calibNum(v, d) { return (typeof v === 'number' && isFinite(v)) ? v.toFixed(d === undefined ? 2 : d) : '–'; }
+	function rebuildCalibReport() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_calib_report'),
+			C = EngCalcs.lpnCalib, def, sel, btn, file, res, unit, tabs, page, controls;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (!C) { return; }
+		def = calibParamDef(calibParam);
+		controls = ffEl('div', 'lpn-calib-controls', null, host);
+		sel = ffSelect(C.PARAMS.map(function (p) { return [p.key, colorFieldLabel(p.group, p.field)]; }), def.key);
+		sel.id = 'lpn_calib_param';
+		sel.addEventListener('change', function () { calibParam = sel.value; rebuildCalibReport(); });
+		ffRow(controls, pc.lpn_calib_param || 'Parameter', pc.lpn_calib_param_tip, sel, '');
+		btn = ffEl('button', 'lpn-profile-edit ec-help', pc.lpn_calib_load || 'Load calibration file…', controls);
+		btn.type = 'button';
+		btn.id = 'lpn_calib_load';
+		if (pc.lpn_calib_load_tip) { btn.title = pc.lpn_calib_load_tip; }
+		btn.addEventListener('click', function () {
+			var input = document.getElementById('lpn_calib_file');
+			if (input) { input.value = ''; input.click(); }
+		});
+
+		file = calibFilesNow()[def.key];
+		unit = colorFieldUnitText(def.group, def.field);
+		if (!file) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_calib_none || 'No calibration file is loaded for this parameter.', host);
+			ffEl('p', 'lpn-ff-note', pc.lpn_calib_session || 'A calibration file is held for this session only. It is not saved with the project or on this device.', host);
+			initTipsIn(host);
+			return;
+		}
+		res = calibCompute(def.key);
+		ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_file || '{file}: {n} measurements at {m} locations.')
+			.replace('{file}', file.name).replace('{n}', String(file.parsed.obs.length))
+			.replace('{m}', String(file.parsed.order.length)), host);
+		if (unit) {
+			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_units || 'The file\'s values are read in this project\'s units: {unit}.')
+				.replace('{unit}', unit), host).id = 'lpn_calib_units_note';
+		}
+		// **SKIPPED IS SAID, WITH WHAT AND HOW MANY** -- each reason its own line, so a reader can
+		// tell a typo in an ID from a time outside the run from a line that was not data at all.
+		if (res.unknown.length) {
+			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_missing || 'Named in the file but not in this network: {ids}.')
+				.replace('{ids}', res.unknown.join(', ')), host).id = 'lpn_calib_missing';
+			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_missing_count || 'Measurements skipped because their location is not in this network: {n}.')
+				.replace('{n}', String(res.unknownCount)), host);
+		}
+		if (file.parsed.bad.length) {
+			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_bad_lines || 'Lines that could not be read, skipped: {lines}')
+				.replace('{lines}', file.parsed.bad.map(function (b) { return b.line; }).join(', ')), host).id = 'lpn_calib_bad';
+		}
+		if (res.outside) {
+			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_outside || 'Measurements outside the times this run reported, skipped: {n}.')
+				.replace('{n}', String(res.outside)), host);
+		}
+		if (res.noValue) {
+			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_no_value || 'Measurements with no computed value at their time, skipped: {n}.')
+				.replace('{n}', String(res.noValue)), host);
+		}
+		ffEl('p', 'lpn-ff-note', pc.lpn_calib_session || 'A calibration file is held for this session only. It is not saved with the project or on this device.', host);
+		if (res.frames === 1) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_calib_single || 'This is a single-period run, so every measurement is compared with its one result, whatever time the file gives.', host).id = 'lpn_calib_single';
+		}
+		if (!res.frames) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_calib_needs_run || 'There are no results to compare with yet. The report fills in once the network has been calculated.', host);
+			initTipsIn(host);
+			return;
+		}
+
+		// EPANET's three tabbed pages, in its order and under its names.
+		tabs = ffEl('div', 'lpn-calib-tabs', null, host);
+		tabs.setAttribute('role', 'tablist');
+		[['stats', pc.lpn_calib_tab_stats || 'Statistics'],
+			['corr', pc.lpn_calib_tab_corr || 'Correlation plot'],
+			['means', pc.lpn_calib_tab_means || 'Mean comparisons']].forEach(function (t) {
+			var b = ffEl('button', 'lpn-pane-tab', t[1], tabs);
+			b.type = 'button';
+			b.id = 'lpn_calib_tab_' + t[0];
+			b.setAttribute('role', 'tab');
+			b.setAttribute('aria-selected', calibTab === t[0] ? 'true' : 'false');
+			b.addEventListener('click', function () { calibTab = t[0]; rebuildCalibReport(); });
+		});
+		page = ffEl('div', 'lpn-calib-page', null, host);
+		page.id = 'lpn_calib_page';
+		page.setAttribute('role', 'tabpanel');
+		if (calibTab === 'corr') { calibCorrelationPlot(page, res); }
+		else if (calibTab === 'means') { calibMeanChart(page, res); }
+		else { calibStatsTable(page, res); }
+		initTipsIn(host);
+	}
+	// **THE STATISTICS PAGE**: EPANET's columns, its Network row, and its correlation line.
+	function calibStatsTable(parent, res) {
+		var pc = EngCalcs.pageConfig || {}, wrap = ffEl('div', 'lpn-ff-tablewrap', null, parent),
+			table = ffEl('table', 'lpn-ff-table', null, wrap), hr = ffEl('tr', null, null, ffEl('thead', null, null, table)),
+			body = ffEl('tbody', null, null, table), r = res.stats.r;
+		[[pc.lpn_calib_col_location || 'Location'],
+			[pc.lpn_calib_col_n || 'Num obs', pc.lpn_calib_col_n_tip],
+			[pc.lpn_calib_col_obs_mean || 'Observed mean'],
+			[pc.lpn_calib_col_sim_mean || 'Computed mean'],
+			[pc.lpn_calib_col_mean_err || 'Mean error', pc.lpn_calib_col_mean_err_tip],
+			[pc.lpn_calib_col_rms_err || 'RMS error', pc.lpn_calib_col_rms_err_tip]].forEach(function (h) {
+			var th = ffEl('th', null, h[0], hr);
+			if (h[1]) { th.title = h[1]; th.className = 'ec-help'; }
+		});
+		function row(name, s, cls) {
+			var tr = ffEl('tr', cls || null, null, body);
+			ffCell(tr, name);
+			ffCell(tr, String(s.n));
+			ffCell(tr, calibNum(s.obsMean));
+			ffCell(tr, calibNum(s.simMean));
+			ffCell(tr, calibNum(s.meanErr));
+			ffCell(tr, calibNum(s.rmsErr));
+		}
+		res.stats.locations.forEach(function (s) { row(s.id, s); });
+		row(pc.lpn_calib_network || 'Network', res.stats.network, 'lpn-calib-network');
+		ffEl('p', 'lpn-ff-note', typeof r === 'number'
+			? String(pc.lpn_calib_corr_means || 'Correlation between means: {r}').replace('{r}', r.toFixed(3))
+			: (pc.lpn_calib_corr_none || 'Correlation between means: it needs at least two locations whose means differ.'),
+			parent).id = 'lpn_calib_corr';
+	}
+	// **THE DRAWING IS AS WIDE AS THE BOX, IN PIXELS**, so its 10 px text stays 10 px on a phone.
+	// A fixed viewBox scaled down to a 390 px screen drew it at 7 px; the time-series chart sizes
+	// itself to its host for the same reason (tsLayout()).
+	var LPN_CALIB_W = 520, LPN_CALIB_H = 300, LPN_CALIB_MARGIN = { left: 58, top: 12, right: 12, bottom: 44 };
+	function calibChartWidth() {
+		var host = document.getElementById('lpn_calib_report'),
+			r = host && host.getBoundingClientRect ? host.getBoundingClientRect() : null;
+		return (r && r.width > 0) ? Math.max(260, Math.min(900, Math.round(r.width))) : LPN_CALIB_W;
+	}
+	function calibSvg(parent, w) {
+		var host = ffEl('div', 'lpn-calib-chart', null, parent);
+		return el('svg', { viewBox: '0 0 ' + w + ' ' + LPN_CALIB_H, class: 'lpn-profile-svg' }, host);
+	}
+	function calibBox(w) {
+		return {
+			left: LPN_CALIB_MARGIN.left, top: LPN_CALIB_MARGIN.top,
+			width: w - LPN_CALIB_MARGIN.left - LPN_CALIB_MARGIN.right,
+			height: LPN_CALIB_H - LPN_CALIB_MARGIN.top - LPN_CALIB_MARGIN.bottom
+		};
+	}
+	function calibMinSpan(values) {
+		var m = 0;
+		values.forEach(function (v) { m = Math.max(m, Math.abs(v)); });
+		return Math.max(1e-3, m * 0.05);
+	}
+	function calibYAxis(svg, yB, box, title) {
+		EngCalcs.lpnProfile.ticks(yB).forEach(function (v) {
+			var y = EngCalcs.lpnProfile.plotY(v, yB, box);
+			el('line', { x1: box.left, y1: y, x2: box.left + box.width, y2: y, class: 'lpn-profile-grid' }, svg);
+			tsText(svg, box.left - 5, y + 3, String(plainRound(v, 2)), { class: 'lpn-profile-tick', 'text-anchor': 'end' });
+		});
+		tsText(svg, 0, 0, title, { class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
+			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
+	}
+	function calibLegend(parent, items) {
+		var row = ffEl('div', 'lpn-calib-legend', null, parent);
+		items.forEach(function (it) {
+			var chip = ffEl('span', 'lpn-profile-chip lpn-ts-chip', null, row), sw = ffEl('i', 'lpn-ts-swatch', null, chip);
+			sw.style.color = it.color;
+			chip.appendChild(document.createTextNode(it.text));
+		});
+	}
+	// **THE CORRELATION PLOT PAGE**: every measurement, observed across and computed up, one color
+	// per location, against the 45-degree line where the two would agree. ONE set of bounds for both
+	// axes, or the diagonal is not 45 degrees and the plot flatters or slanders the model.
+	function calibCorrelationPlot(parent, res) {
+		var pc = EngCalcs.pageConfig || {}, values = [], svg, W = calibChartWidth(), box = calibBox(W), B, q = calibParamLabel(res.def), withPairs;
+		withPairs = res.stats.locations.filter(function (s) { return s.pairs.length; });
+		withPairs.forEach(function (s) { s.pairs.forEach(function (p) { values.push(p.o, p.s); }); });
+		if (!values.length) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_calib_no_pairs || 'No measurement could be compared, so there is nothing to plot.', parent);
+			return;
+		}
+		B = EngCalcs.lpnProfile.axisBounds(values, { ticks: 5, maxTicks: 8, minSpan: calibMinSpan(values) });
+		svg = calibSvg(parent, W);
+		function X(v) { return EngCalcs.lpnProfile.plotX(v, B, box); }
+		function Y(v) { return EngCalcs.lpnProfile.plotY(v, B, box); }
+		calibYAxis(svg, B, box, String(pc.lpn_calib_axis_sim || 'Computed: {q}').replace('{q}', q));
+		EngCalcs.lpnProfile.ticks(B).forEach(function (v) {
+			el('line', { x1: X(v), y1: box.top, x2: X(v), y2: box.top + box.height, class: 'lpn-profile-grid' }, svg);
+			tsText(svg, X(v), box.top + box.height + 14, String(plainRound(v, 2)), { class: 'lpn-profile-tick', 'text-anchor': 'middle' });
+		});
+		el('rect', { x: box.left, y: box.top, width: box.width, height: box.height, class: 'lpn-profile-frame' }, svg);
+		el('line', { x1: X(B.min), y1: Y(B.min), x2: X(B.max), y2: Y(B.max), class: 'lpn-profile-axis lpn-calib-diagonal' }, svg);
+		withPairs.forEach(function (s) {
+			s.pairs.forEach(function (p) {
+				var c = el('circle', { cx: X(p.o), cy: Y(p.s), r: 3, class: 'lpn-ts-dot lpn-calib-point', fill: s.color }, svg);
+				el('title', {}, c).appendChild(document.createTextNode(
+					String(pc.lpn_calib_point || '{id}, {time}: observed {o}, computed {s}')
+						.replace('{id}', s.id).replace('{time}', EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(p.t) : String(p.t))
+						.replace('{o}', calibNum(p.o)).replace('{s}', calibNum(p.s))));
+			});
+		});
+		tsText(svg, box.left + box.width / 2, LPN_CALIB_H - 6,
+			String(pc.lpn_calib_axis_obs || 'Observed: {q}').replace('{q}', q),
+			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
+		calibLegend(parent, withPairs.map(function (s) { return { color: s.color, text: s.id }; }));
+		ffEl('p', 'lpn-ff-note', pc.lpn_calib_corr_note || 'Each point is one measurement. The closer the points lie to the diagonal line, the closer the computed values match the observed ones.', parent);
+	}
+	// **THE MEAN COMPARISONS PAGE**: a bar pair per location, observed beside computed. The bars
+	// stand on ZERO, so zero is always on this axis -- a bar measured from a truncated floor tells
+	// the eye a ratio the numbers do not have.
+	function calibMeanChart(parent, res) {
+		var pc = EngCalcs.pageConfig || {}, svg, W = calibChartWidth(), box = calibBox(W), B, values = [0], locs, slot, bw, keep = {},
+			cObs = LPN_TS_COLORS[0], cSim = LPN_TS_COLORS[1];
+		locs = res.stats.locations.filter(function (s) { return s.n > 0; });
+		if (!locs.length) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_calib_no_pairs || 'No measurement could be compared, so there is nothing to plot.', parent);
+			return;
+		}
+		locs.forEach(function (s) { values.push(s.obsMean, s.simMean); });
+		B = EngCalcs.lpnProfile.axisBounds(values, { ticks: 5, maxTicks: 8, minSpan: calibMinSpan(values) });
+		svg = calibSvg(parent, W);
+		function Y(v) { return EngCalcs.lpnProfile.plotY(v, B, box); }
+		calibYAxis(svg, B, box, calibParamLabel(res.def));
+		slot = box.width / locs.length;
+		bw = Math.max(2, Math.min(28, slot * 0.35));
+		EngCalcs.lpnProfile.labelStride(locs.map(function (s, i) { return box.left + slot * (i + 0.5); }), 40)
+			.forEach(function (k) { keep[k] = true; });
+		locs.forEach(function (s, i) {
+			var cx = box.left + slot * (i + 0.5);
+			[[s.obsMean, cObs, cx - bw], [s.simMean, cSim, cx]].forEach(function (b) {
+				var y0 = Y(0), y1 = Y(b[0]), r = el('rect', {
+					x: b[2], y: Math.min(y0, y1), width: bw, height: Math.max(0.5, Math.abs(y1 - y0)),
+					class: 'lpn-calib-bar', fill: b[1]
+				}, svg);
+				el('title', {}, r).appendChild(document.createTextNode(s.id + '   ' + calibNum(b[0])));
+			});
+			if (keep[i]) {
+				tsText(svg, cx, box.top + box.height + 14, s.id, { class: 'lpn-profile-tick', 'text-anchor': 'middle' });
+			}
+		});
+		el('rect', { x: box.left, y: box.top, width: box.width, height: box.height, class: 'lpn-profile-frame' }, svg);
+		tsText(svg, box.left + box.width / 2, LPN_CALIB_H - 6, pc.lpn_calib_col_location || 'Location',
+			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
+		calibLegend(parent, [{ color: cObs, text: pc.lpn_calib_observed || 'Observed' },
+			{ color: cSim, text: pc.lpn_calib_computed || 'Computed' }]);
+	}
+	/** A file was chosen: read it as text, keep it for the chosen parameter, redraw. */
+	function landCalibText(text, name) {
+		calibFilesNow()[calibParam] = { name: name || '', parsed: EngCalcs.lpnCalib.parse(text) };
+		calibTab = 'stats';
+		rebuildCalibReport();
+		refreshCalibOverlay();
+	}
+	function loadCalibFile(file) {
+		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
+		reader.onload = function (ev) { landCalibText(String(ev.target.result), file.name); };
+		reader.onerror = function () { alert(pc.lpn_survey_read_error || 'That file could not be read from your disk.'); };
+		reader.readAsText(file);
+	}
+	function openCalibBox() {
+		var box = calibBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		rebuildCalibReport();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, calibboxLayout); });
+		initTipsIn(box);
+	}
+	function closeCalibBox() { if (calibBoxIsOpen()) { hidePanel(calibBoxEl()); } }
+	function wireCalibBox() {
+		var box = calibBoxEl(), x = document.getElementById('lpn_calib_close'),
+			input = document.getElementById('lpn_calib_file');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeCalibBox); }
+		if (input) {
+			input.addEventListener('change', function () {
+				if (input.files && input.files[0]) { loadCalibFile(input.files[0]); }
+			});
+		}
+		makePanelDraggable(box);
+		addPanelResizeGrip(box);
+	}
+	function refreshCalibBoxIfOpen() {
+		if (calibBoxIsOpen()) { rebuildCalibReport(); }
+	}
+	// The time-series chart draws the measured points of whichever file matches what it is showing,
+	// so a newly loaded file has to reach an open chart too.
+	function refreshCalibOverlay() {
+		if (paneIsOpen() && paneState.tab === 'timeseries') { renderTimeSeries(); }
+	}
+	/**
+	 * **MEASURED POINTS FOR THE TIME-SERIES CHART**: the loaded file whose parameter is the quantity
+	 * the chart is showing, as `{id: [{t, v}]}`. Empty when no file matches, which is every chart
+	 * until somebody loads one -- so the chart is unchanged for everyone else.
+	 */
+	function calibMeasuredFor(group, field) {
+		var C = EngCalcs.lpnCalib, out = {}, k, def, f, files = calibFilesNow();
+		if (!C) { return out; }
+		for (k in files) {
+			if (!files.hasOwnProperty(k)) { continue; }
+			def = calibParamDef(k);
+			if (!def || def.group !== group || def.field !== field) { continue; }
+			f = files[k];
+			f.parsed.obs.forEach(function (o) {
+				(out[o.id] = out[o.id] || []).push({ t: o.t, v: o.v, color: calibColor(f.parsed.order.indexOf(o.id)) });
+			});
+		}
+		return out;
+	}
+
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
 		// The demand scaling report names the time step it was computed at, and says when the clock
@@ -59870,6 +60738,8 @@ var EngCalcs = EngCalcs || {};
 		// box left open must show this run's answer and not the one it replaced.
 		refreshStatusReportBoxIfOpen();
 		refreshFullReportBoxIfOpen();
+		// And the calibration report, which compares against those same frames.
+		refreshCalibBoxIfOpen();
 		// And the scenario comparison, on the same seam and for exactly the same reason: the table
 		// answered a network that has just changed under it, so it is dropped rather than left
 		// standing as though it were still true.

@@ -378,6 +378,20 @@
             "date": "2026-10-03",
             "words": "Good. Done. Close, merge, and delete the branch.",
             "context": "Given in the 2026-10-03 session: his pasted report read \"feat/theme-token: Good. Done. Close, merge, and delete the branch.\", and he confirmed it by choosing \"Merge both\" when asked in the session to merge feat/label-cache and feat/theme-token and delete both branches."
+        },
+        "feat/keyboard-menu": {
+            "head": "51f9f3d357e8e1bf3e09589824cedf574426082a",
+            "date": "2026-10-03",
+            "words": "Merge both. But I need to know this will not keep happening.",
+            "context": "Given in the 2026-10-03 session. His pasted report read \"8112 keyboard-menu: Good. Done. Close, merge, and delete branch.\"; he then chose \"Merge both\" in the session when asked to merge feat/keyboard-menu and feat/calibration and delete both branches.",
+            "pin_note": "Pinned to the merge of master into the head he tested (db228dbd); no other change."
+        },
+        "feat/calibration": {
+            "head": "6010c73f3a8fe650784a5d007f26de9e1f811742",
+            "date": "2026-10-03",
+            "words": "Merge both. But I need to know this will not keep happening.",
+            "context": "Given in the 2026-10-03 session. His pasted report read \"8111 calibration (Task 601): (1) Amazing. Done. Close, merge, and delete branch.\"; he then chose \"Merge both\" in the session when asked to merge feat/keyboard-menu and feat/calibration and delete both branches. His item (2), the Junction column width, is fixed on a separate defect track.",
+            "pin_note": "Pinned to the merge of master into the head he tested (cce72f76); no other change."
         }
     }
 }

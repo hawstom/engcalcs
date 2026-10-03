@@ -3,10 +3,10 @@ Property	Show?	Before	After US	After SI	Dec. US	Dec. SI	Show order	Drop order	Ke
 ID	1						1	2	node:id
 Description	0						2	4	node:desc
 Tag	0						3	6	node:tag
-Base demand	1	Qb=			0	1	4	10	node:demand
+Base demand	1	Qb=			1	2	4	10	node:demand
 Elevation	1	Z=			2	3	5	8	node:elev
 Initial quality	0	Init. 	 mg/L	 mg/L	2	2	6	16	node:initQuality
-Demand	0	Q=			0	1	7	26	node:demandActual
+Demand	0	Q=			1	2	7	26	node:demandActual
 Net inflow	0	Qin=			0	1	8	24	-
 Water depth	0	Y=			2	3	9	12	node:level
 Total head (HGL)	0	H=			2	3	10	14	node:head
@@ -26,7 +26,7 @@ Minor loss, k	0	km=			2	2	7	16	link:km
 Initial status	0	Init. 					8	12	link:initStatus
 Bulk coeff.	0	Cb=			1	1	9	10	link:bulkCoeff
 Wall coeff.	0	Cw=			1	1	10	8	link:wallCoeff
-Flow	1	Q=			0	1	11	40	link:flow
+Flow	1	Q=			1	2	11	40	link:flow
 Velocity	1	V=			1	2	12	36	link:velocity
 Head loss	0	Hl=			2	3	13	28	link:headloss
 Head loss gradient %	0	S=			2	2	14	34	link:gradient
@@ -41,6 +41,6 @@ Status	0						20	24	link:status
 ID	0						1	2	customer:id
 Description	0						2	4	customer:desc
 Tag	0						3	6	customer:tag
-Base demand	1	Qb=			0	1	4	8	customer:demand
+Base demand	1	Qb=			1	2	4	8	customer:demand
 Number of services	0	x			0	1	5	10	customer:count
-Demand	0	Q=			0	1	6	12	customer:demandActual
+Demand	0	Q=			1	2	6	12	customer:demandActual

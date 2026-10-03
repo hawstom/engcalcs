@@ -164,7 +164,10 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		['openHotkeysBox', 'the Tables and Hotkeys box'],
 		// Demand scaling (Task 754): the third analysis on fire flow's shell, with two report
 		// tables, so a phone wants the whole window for it too.
-		['openDemandScaleBox', 'Demand scaling']];
+		['openDemandScaleBox', 'Demand scaling'],
+		// The Calibration report (Task 601): a six-column statistics table and two charts, the
+		// same report-box family as Status and Full, so a phone wants the whole window for it.
+		['openCalibBox', 'the calibration report box']];
 	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
 	});
