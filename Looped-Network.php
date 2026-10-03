@@ -2714,6 +2714,7 @@ EngCalcs.pageConfig = {
 	lpn_calib_bad_lines: <?=json_encode($ec_lang['lpn_calib_bad_lines'])?>,
 	lpn_calib_outside: <?=json_encode($ec_lang['lpn_calib_outside'])?>,
 	lpn_calib_no_value: <?=json_encode($ec_lang['lpn_calib_no_value'])?>,
+	lpn_calib_single: <?=json_encode($ec_lang['lpn_calib_single'])?>,
 	lpn_calib_needs_run: <?=json_encode($ec_lang['lpn_calib_needs_run'])?>,
 	lpn_calib_no_pairs: <?=json_encode($ec_lang['lpn_calib_no_pairs'])?>,
 	lpn_calib_tab_stats: <?=json_encode($ec_lang['lpn_calib_tab_stats'])?>,

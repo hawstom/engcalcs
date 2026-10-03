@@ -3476,7 +3476,7 @@ $ec_lang['lpn_settings_energy']='Energy';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='Reports';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_menu_tip']='Reports on pumping energy cost, scenario comparison, the EPANET solver report, and, after an extended period simulation, the status report and the full report.';
+$ec_lang['lpn_reports_menu_tip']='Reports on pumping energy cost, scenario comparison, the EPANET solver report, calibration against measured data, and, after an extended period simulation, the status report and the full report.';
 $ec_lang['lpn_reports_epanet']='EPANET run';
 $ec_lang['lpn_energy_title']='Pump energy report';
 $ec_lang['lpn_energy_menu']='Pump energy';
@@ -3571,7 +3571,7 @@ $ec_lang['lpn_full_row_count']='{n} rows.';
 // EPANET's Report > Calibration and its three tabbed pages, with EPANET's own column names (EPANET
 // 2.2 manual, section 9.6). Mean error is EPANET's term for the mean ABSOLUTE difference. "Num obs"
 // is EPANET's own column heading, kept short because results columns are narrow.
-// lpn_calib_missing is the same sentence as lpn_profile_file_missing (Task 604); keep the two identical.
+// lpn_calib_missing: keep in step with feat/profile-file's lpn_profile_file_missing (Task 604), the same sentence.
 $ec_lang['lpn_reports_calib']='Calibration';
 $ec_lang['lpn_reports_calib_tip']='Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.';
 $ec_lang['lpn_calib_title']='Calibration report';
@@ -3588,6 +3588,7 @@ $ec_lang['lpn_calib_missing_count']='Measurements skipped because their location
 $ec_lang['lpn_calib_bad_lines']='Lines that could not be read, skipped: {lines}';
 $ec_lang['lpn_calib_outside']='Measurements outside the times this run reported, skipped: {n}.';
 $ec_lang['lpn_calib_no_value']='Measurements with no computed value at their time, skipped: {n}.';
+$ec_lang['lpn_calib_single']='This is a single-period run, so every measurement is compared with its one result, whatever time the file gives.';
 $ec_lang['lpn_calib_needs_run']='There are no results to compare with yet. The report fills in once the network has been calculated.';
 $ec_lang['lpn_calib_no_pairs']='No measurement could be compared, so there is nothing to plot.';
 $ec_lang['lpn_calib_tab_stats']='Statistics';

@@ -29409,7 +29409,7 @@ var EngCalcs = EngCalcs || {};
 		series.forEach(function (s) {
 			(s.measured || []).forEach(function (m) {
 				var c = el('circle', { cx: X(tsHours(m.t)), cy: Y(m.v), r: 3.5,
-					class: 'lpn-calib-ring', stroke: s.color }, svg);
+					class: 'lpn-calib-ring', stroke: m.color || s.color }, svg);
 				el('title', {}, c).appendChild(document.createTextNode(
 					String(pc.lpn_calib_ts_point || 'Measured at {id}, {time}: {v}').replace('{id}', s.id)
 						.replace('{time}', EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(m.t) : String(m.t))
@@ -58917,10 +58917,21 @@ var EngCalcs = EngCalcs || {};
 	// **EVERY COMPUTED VALUE COMES THROUGH colorValueOf() AS OF ONE FRAME** (tsAsOfFrame()), the
 	// seam the time-series chart and the Full report already trust, so a computed mean here can
 	// never disagree with the number the Tables pane shows at that step.
-	var calibFiles = {};      // parameter key -> { name, parsed }
+	// **PER PROJECT, NOT PER PAGE.** Keyed by the open project's library id, so a file loaded on one
+	// project tab is never compared against another project's elements after a tab switch, and a new
+	// or different project starts with none. Still memory only.
+	var calibStore = {};      // project id -> { parameter key -> { name, parsed } }
+	function calibFilesNow() {
+		var k = String(library.openId || '');
+		if (!calibStore[k]) { calibStore[k] = {}; }
+		return calibStore[k];
+	}
 	var calibParam = 'pressure';
 	var calibTab = 'stats';
 	var calibboxLayout = newBoxLayout();
+	// **ONE COLOUR PER LOCATION, THE SAME ON EVERY VIEW OF IT**: by the location's place in the
+	// file, so the report's points and bars and the time-series rings name a location the same way.
+	function calibColor(k) { return LPN_TS_COLORS[Math.max(0, k) % LPN_TS_COLORS.length]; }
 	function calibParamDef(key) {
 		var P = (EngCalcs.lpnCalib && EngCalcs.lpnCalib.PARAMS) || [], i;
 		for (i = 0; i < P.length; i++) { if (P[i].key === key) { return P[i]; } }
@@ -58942,7 +58953,7 @@ var EngCalcs = EngCalcs || {};
 	 * each measurement paired with the computed value at its time. Null with no file loaded.
 	 */
 	function calibCompute(key) {
-		var file = calibFiles[key], def = calibParamDef(key), C = EngCalcs.lpnCalib,
+		var file = calibFilesNow()[key], def = calibParamDef(key), C = EngCalcs.lpnCalib,
 			frames, times, locs = [], unknown = [], unknownCount = 0, outside = 0, noValue = 0, st;
 		if (!file || !def || !C) { return null; }
 		frames = calibFrames();
@@ -58958,13 +58969,20 @@ var EngCalcs = EngCalcs || {};
 			obs.forEach(function (o) {
 				var s;
 				if (!frames.length) { return; }
-				if (o.t < times[0] - 1e-6 || o.t > times[times.length - 1] + 1e-6 ||
-					(times.length === 1 && Math.abs(o.t - times[0]) > 1e-6)) { outside++; return; }
+				// **A SINGLE-PERIOD RUN ANSWERS EVERY MEASUREMENT** with its one result, whatever time
+				// the file gives -- EPANET's own rule (Fcalib.pas), and the box says so.
+				if (frames.length === 1) {
+					s = series[0];
+					if (s === undefined) { noValue++; return; }
+					pairs.push({ t: o.t, o: o.v, s: s });
+					return;
+				}
+				if (o.t < times[0] - 1e-6 || o.t > times[times.length - 1] + 1e-6) { outside++; return; }
 				s = C.interp(times, series, o.t);
 				if (s === undefined) { noValue++; return; }
 				pairs.push({ t: o.t, o: o.v, s: s });
 			});
-			locs.push({ id: id, pairs: pairs, color: LPN_TS_COLORS[k % LPN_TS_COLORS.length] });
+			locs.push({ id: id, pairs: pairs, color: calibColor(k) });
 		});
 		st = C.stats(locs);
 		st.locations.forEach(function (s, i) { s.pairs = locs[i].pairs; s.color = locs[i].color; });
@@ -58978,7 +58996,8 @@ var EngCalcs = EngCalcs || {};
 		var box = calibBoxEl();
 		return !!box && box.style.display !== 'none' && box.style.display !== '';
 	}
-	function calibNum(v, d) { return (typeof v === 'number' && isFinite(v)) ? String(plainRound(v, d === undefined ? 2 : d)) : '–'; }
+	// Fixed decimals, as EPANET prints them: two for a value, three for the correlation.
+	function calibNum(v, d) { return (typeof v === 'number' && isFinite(v)) ? v.toFixed(d === undefined ? 2 : d) : '–'; }
 	function rebuildCalibReport() {
 		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_calib_report'),
 			C = EngCalcs.lpnCalib, def, sel, btn, file, res, unit, tabs, page, controls;
@@ -59000,7 +59019,7 @@ var EngCalcs = EngCalcs || {};
 			if (input) { input.value = ''; input.click(); }
 		});
 
-		file = calibFiles[def.key];
+		file = calibFilesNow()[def.key];
 		unit = colorFieldUnitText(def.group, def.field);
 		if (!file) {
 			ffEl('p', 'lpn-ff-note', pc.lpn_calib_none || 'No calibration file is loaded for this parameter.', host);
@@ -59037,6 +59056,9 @@ var EngCalcs = EngCalcs || {};
 				.replace('{n}', String(res.noValue)), host);
 		}
 		ffEl('p', 'lpn-ff-note', pc.lpn_calib_session || 'A calibration file is held for this session only. It is not saved with the project or on this device.', host);
+		if (res.frames === 1) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_calib_single || 'This is a single-period run, so every measurement is compared with its one result, whatever time the file gives.', host).id = 'lpn_calib_single';
+		}
 		if (!res.frames) {
 			ffEl('p', 'lpn-ff-note', pc.lpn_calib_needs_run || 'There are no results to compare with yet. The report fills in once the network has been calculated.', host);
 			initTipsIn(host);
@@ -59094,15 +59116,23 @@ var EngCalcs = EngCalcs || {};
 			: (pc.lpn_calib_corr_none || 'Correlation between means: it needs at least two locations whose means differ.'),
 			parent).id = 'lpn_calib_corr';
 	}
-	var LPN_CALIB_W = 520, LPN_CALIB_H = 320, LPN_CALIB_MARGIN = { left: 58, top: 12, right: 12, bottom: 44 };
-	function calibSvg(parent) {
-		var host = ffEl('div', 'lpn-calib-chart', null, parent);
-		return el('svg', { viewBox: '0 0 ' + LPN_CALIB_W + ' ' + LPN_CALIB_H, class: 'lpn-profile-svg' }, host);
+	// **THE DRAWING IS AS WIDE AS THE BOX, IN PIXELS**, so its 10 px text stays 10 px on a phone.
+	// A fixed viewBox scaled down to a 390 px screen drew it at 7 px; the time-series chart sizes
+	// itself to its host for the same reason (tsLayout()).
+	var LPN_CALIB_W = 520, LPN_CALIB_H = 300, LPN_CALIB_MARGIN = { left: 58, top: 12, right: 12, bottom: 44 };
+	function calibChartWidth() {
+		var host = document.getElementById('lpn_calib_report'),
+			r = host && host.getBoundingClientRect ? host.getBoundingClientRect() : null;
+		return (r && r.width > 0) ? Math.max(260, Math.min(900, Math.round(r.width))) : LPN_CALIB_W;
 	}
-	function calibBox() {
+	function calibSvg(parent, w) {
+		var host = ffEl('div', 'lpn-calib-chart', null, parent);
+		return el('svg', { viewBox: '0 0 ' + w + ' ' + LPN_CALIB_H, class: 'lpn-profile-svg' }, host);
+	}
+	function calibBox(w) {
 		return {
 			left: LPN_CALIB_MARGIN.left, top: LPN_CALIB_MARGIN.top,
-			width: LPN_CALIB_W - LPN_CALIB_MARGIN.left - LPN_CALIB_MARGIN.right,
+			width: w - LPN_CALIB_MARGIN.left - LPN_CALIB_MARGIN.right,
 			height: LPN_CALIB_H - LPN_CALIB_MARGIN.top - LPN_CALIB_MARGIN.bottom
 		};
 	}
@@ -59132,7 +59162,7 @@ var EngCalcs = EngCalcs || {};
 	// per location, against the 45-degree line where the two would agree. ONE set of bounds for both
 	// axes, or the diagonal is not 45 degrees and the plot flatters or slanders the model.
 	function calibCorrelationPlot(parent, res) {
-		var pc = EngCalcs.pageConfig || {}, values = [], svg, box = calibBox(), B, q = calibParamLabel(res.def), withPairs;
+		var pc = EngCalcs.pageConfig || {}, values = [], svg, W = calibChartWidth(), box = calibBox(W), B, q = calibParamLabel(res.def), withPairs;
 		withPairs = res.stats.locations.filter(function (s) { return s.pairs.length; });
 		withPairs.forEach(function (s) { s.pairs.forEach(function (p) { values.push(p.o, p.s); }); });
 		if (!values.length) {
@@ -59140,7 +59170,7 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		B = EngCalcs.lpnProfile.axisBounds(values, { ticks: 5, maxTicks: 8, minSpan: calibMinSpan(values) });
-		svg = calibSvg(parent);
+		svg = calibSvg(parent, W);
 		function X(v) { return EngCalcs.lpnProfile.plotX(v, B, box); }
 		function Y(v) { return EngCalcs.lpnProfile.plotY(v, B, box); }
 		calibYAxis(svg, B, box, String(pc.lpn_calib_axis_sim || 'Computed: {q}').replace('{q}', q));
@@ -59169,7 +59199,7 @@ var EngCalcs = EngCalcs || {};
 	// stand on ZERO, so zero is always on this axis -- a bar measured from a truncated floor tells
 	// the eye a ratio the numbers do not have.
 	function calibMeanChart(parent, res) {
-		var pc = EngCalcs.pageConfig || {}, svg, box = calibBox(), B, values = [0], locs, slot, bw, keep = {},
+		var pc = EngCalcs.pageConfig || {}, svg, W = calibChartWidth(), box = calibBox(W), B, values = [0], locs, slot, bw, keep = {},
 			cObs = LPN_TS_COLORS[0], cSim = LPN_TS_COLORS[1];
 		locs = res.stats.locations.filter(function (s) { return s.n > 0; });
 		if (!locs.length) {
@@ -59178,7 +59208,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		locs.forEach(function (s) { values.push(s.obsMean, s.simMean); });
 		B = EngCalcs.lpnProfile.axisBounds(values, { ticks: 5, maxTicks: 8, minSpan: calibMinSpan(values) });
-		svg = calibSvg(parent);
+		svg = calibSvg(parent, W);
 		function Y(v) { return EngCalcs.lpnProfile.plotY(v, B, box); }
 		calibYAxis(svg, B, box, calibParamLabel(res.def));
 		slot = box.width / locs.length;
@@ -59206,7 +59236,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	/** A file was chosen: read it as text, keep it for the chosen parameter, redraw. */
 	function landCalibText(text, name) {
-		calibFiles[calibParam] = { name: name || '', parsed: EngCalcs.lpnCalib.parse(text) };
+		calibFilesNow()[calibParam] = { name: name || '', parsed: EngCalcs.lpnCalib.parse(text) };
 		calibTab = 'stats';
 		rebuildCalibReport();
 		refreshCalibOverlay();
@@ -59255,14 +59285,16 @@ var EngCalcs = EngCalcs || {};
 	 * until somebody loads one -- so the chart is unchanged for everyone else.
 	 */
 	function calibMeasuredFor(group, field) {
-		var C = EngCalcs.lpnCalib, out = {}, k, def, f;
+		var C = EngCalcs.lpnCalib, out = {}, k, def, f, files = calibFilesNow();
 		if (!C) { return out; }
-		for (k in calibFiles) {
-			if (!calibFiles.hasOwnProperty(k)) { continue; }
+		for (k in files) {
+			if (!files.hasOwnProperty(k)) { continue; }
 			def = calibParamDef(k);
 			if (!def || def.group !== group || def.field !== field) { continue; }
-			f = calibFiles[k];
-			f.parsed.obs.forEach(function (o) { (out[o.id] = out[o.id] || []).push({ t: o.t, v: o.v }); });
+			f = files[k];
+			f.parsed.obs.forEach(function (o) {
+				(out[o.id] = out[o.id] || []).push({ t: o.t, v: o.v, color: calibColor(f.parsed.order.indexOf(o.id)) });
+			});
 		}
 		return out;
 	}

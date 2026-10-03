@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**45 still to read on master**, of 63 untranslated keys, of 2216 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**46 still to read on master**, of 64 untranslated keys, of 2217 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (63, 45 to read @@ NEEDS RULING)
+## lpn_  (64, 46 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -156,6 +156,9 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_calib_session`**
   > A calibration file is held for this session only. It is not saved with the project or on this device.
   @@ NEEDS RULING
+- **`lpn_calib_single`**
+  > This is a single-period run, so every measurement is compared with its one result, whatever time the file gives.
+  @@ NEEDS RULING
 - **`lpn_calib_tab_corr`**
   > Correlation plot
   @@ NEEDS RULING
@@ -221,7 +224,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**93 still to read**, of 144 new keys across 15 unmerged branch(es).
+**93 still to read**, of 144 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -232,9 +235,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/calibration (`b50ae755`) — adds no English strings
+### feat/calibration (`fecf6d69`) — adds no English strings
 
-### feat/contour (`eff6df3a`) — 14 new, 14 to read @@ NEEDS RULING
+### feat/contour (`c07094a8`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_contour_consent_1`**
   > Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.
@@ -611,7 +614,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/flow-balance (`b7b530c6`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/flow-balance (`f5be7f04`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_sysflow_consumed`**
   > Consumed
@@ -635,7 +638,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > System flow balance
   @@ NEEDS RULING
 
-### feat/keyboard-menu (`f783fe5f`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/keyboard-menu (`db228dbd`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_hotkeys_menu_def`**
   > <table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>
@@ -699,5 +702,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_result_pump_head_tip`**
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   @@ NEEDS RULING
-
-### fix/label-eviction (`840cb7cc`) — adds no English strings

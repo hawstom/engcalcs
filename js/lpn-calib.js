@@ -74,14 +74,17 @@ EngCalcs.lpnCalib = (function () {
 			if (semi >= 0) { line = line.slice(0, semi); }
 			line = line.trim();
 			if (!line) { return; }
-			tok = line.split(/\s+/);
+			// A comma separates like a space or a tab, as EPANET's own tokenizer (Uutils.pas) has it.
+			tok = line.split(/[\s,]+/).filter(function (x) { return x !== ''; });
 			if (tok.length === 3) { id = tok[0]; t = tok[1]; v = tok[2]; }
 			else if (tok.length === 2 && current !== null) { id = current; t = tok[0]; v = tok[1]; }
 			else { bad.push({ line: i + 1, text: raw.trim() }); return; }
+			// **THE ID ON AN UNREADABLE LINE STILL NAMES THE LOCATION THAT FOLLOWS** -- EPANET files
+			// the ID-less lines under it, so a bad value must not hand them to the location before.
+			current = id;
 			t = parseTime(t);
 			v = num(v);
 			if (!isFinite(t) || !isFinite(v)) { bad.push({ line: i + 1, text: raw.trim() }); return; }
-			current = id;
 			if (!seen[id]) { seen[id] = true; order.push(id); }
 			obs.push({ id: id, t: t, v: v, line: i + 1 });
 		});

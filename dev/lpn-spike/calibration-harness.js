@@ -68,6 +68,17 @@ head('1. THE FILE FORMAT: both time forms, comments, continuation lines, a bad l
 	check(p.obs[4].id === 'N2' && p.obs[4].v === 0.77, 'continuation follows the most recent location, N2');
 	check(p.bad.length === 2 && p.bad[0].line === 9 && p.bad[1].line === 10,
 		`the unreadable lines are reported by number, not dropped: ${p.bad.map((b) => b.line).join(', ')}`);
+	// **PERRY'S PRE-REVIEW, 2026-10-03: an unreadable line's ID still names the location below it.**
+	// The ID-less lines after `J1 6:00 n/a` went to the location BEFORE J1; EPANET files them under J1.
+	const afterBad = C.parse('15 0 42.1\nJ1 6:00 n/a\n 7:00 40\n 8:00 41\n');
+	check(afterBad.bad.length === 1 && afterBad.obs.filter((o) => o.id === 'J1').length === 2 &&
+		afterBad.obs.filter((o) => o.id === '15').length === 1,
+		`continuation lines after an unreadable line are filed under ITS ID, J1: ${afterBad.obs.map((o) => o.id).join(',')}`);
+	check(afterBad.order.join(',') === '15,J1', 'and J1 is a location of the file');
+	// A comma separates like a space or a tab (EPANET's Uutils.pas tokenizer).
+	const commas = C.parse('15,0,42.1\n,3,44.0\n35 , 0:30 , 58.4\n');
+	check(commas.bad.length === 0 && commas.obs.length === 3 && commas.obs[1].id === '15' && commas.obs[2].v === 58.4,
+		`comma-separated lines are read: ${commas.obs.map((o) => o.id + '@' + o.t + '=' + o.v).join(' ')}`);
 	const lead = C.parse('  6  40.1\nJ1 1 40\n');
 	check(lead.bad.length === 1 && lead.bad[0].line === 1 && lead.obs.length === 1,
 		'a two-value line before any location is reported, since it has no place to belong');
@@ -123,6 +134,8 @@ const L = loadLoopedNetwork(
 	"\t\tfullReportRows: fullReportRows, serialize: serializeProject,\n" +
 	"\t\tcalibCompute: calibCompute, landCalibText: landCalibText, wireCalibBox: wireCalibBox,\n" +
 	"\t\tcalibBoxIsOpen: calibBoxIsOpen, setCalibParam: function (k) { calibParam = k; },\n" +
+	"\t\tsetOpenId: function (id) { library.openId = id; }, getOpenId: function () { return library.openId; },\n" +
+	"\t\tsetLastResult: function (r) { lastSolveResult = r; }, calibColor: calibColor,\n" +
 	"\t\tcalibRow: function () {\n" +
 	"\t\t\tvar pc = EngCalcs.pageConfig || {};\n" +
 	"\t\t\treturn reportMenuRows().filter(function (r) { return r && r.label === pc.lpn_reports_calib; })[0] || null;\n" +
@@ -248,12 +261,22 @@ function fire(el, type) {
 	check(trs.length === 5, `one row per location used plus the Network row: ${trs.length}`);
 	check(trs.length && byTag(trs[4], 'TD')[0].textContent === PC.lpn_calib_network, 'the last row is the Network row');
 	check(trs.length && byTag(trs[4], 'TD')[1].textContent === '18', 'pooling all 18 measurements');
+	const numCells = trs.length ? byTag(trs[0], 'TD').slice(2).map((td) => td.textContent) : [];
+	check(numCells.length === 4 && numCells.every((t) => /^-?\d+\.\d\d$/.test(t)),
+		`fixed two decimals, as EPANET prints them: ${numCells.join(' ')}`);
 	check(findId(report, 'lpn_calib_corr') && typeof res.stats.r === 'number' &&
 		findId(report, 'lpn_calib_corr').textContent === PC.lpn_calib_corr_means.replace('{r}', res.stats.r.toFixed(3)),
 		`the correlation line: "${findId(report, 'lpn_calib_corr') && findId(report, 'lpn_calib_corr').textContent}"`);
 
 	head('6. THE OTHER TWO PAGES');
+	// **THE DRAWING IS AS WIDE AS THE BOX IN PIXELS** (Perry: 7 px text at 390 px from a fixed
+	// viewBox). A phone-width host gets a 390-unit viewBox, so 10 px text stays 10 px.
+	byId.lpn_calib_report.style.width = '390px';
 	fire(findId(report, 'lpn_calib_tab_corr'), 'click');
+	const corrSvg = byTag(findId(report, 'lpn_calib_page'), 'svg')[0];
+	check(corrSvg && /^0 0 390 /.test(corrSvg.getAttribute('viewBox')),
+		`at 390 px the chart is drawn 390 units wide, not scaled down: ${corrSvg && corrSvg.getAttribute('viewBox')}`);
+	byId.lpn_calib_report.style.width = '';
 	const pts = byClass(findId(report, 'lpn_calib_page'), 'lpn-calib-point');
 	check(pts.length === 18, `the correlation plot draws one point per measurement compared: ${pts.length}`);
 	check(byClass(findId(report, 'lpn_calib_page'), 'lpn-calib-diagonal').length === 1, 'against the 45-degree line');
@@ -273,15 +296,58 @@ function fire(el, type) {
 	check(fres.stats.locations.length === 1 && fres.stats.locations[0].id === '10', 'and the link, Pump 10, is compared');
 	check(L.calibCompute('pressure').stats.network.n === 18, 'the Pressure file is still held beside it');
 
+	head('7a. A SINGLE-PERIOD RUN COMPARES EVERY MEASUREMENT WITH ITS ONE RESULT (EPANET\'s rule)');
+	{
+		const realFrames = EngCalcs.lpnTimeRunFrames;
+		EngCalcs.lpnTimeRunFrames = function () { return []; };
+		L.setLastResult(frames[0]);
+		L.setCalibParam('pressure');
+		const one = L.calibCompute('pressure');
+		check(one.frames === 1 && one.outside === 0 && one.stats.network.n === 19,
+			`all 19 measurements at known locations are compared, whatever their time: ${one.stats.network.n}, outside ${one.outside}`);
+		const p15 = one.stats.locations[0].pairs;
+		check(p15.every((q) => q.s === p15[0].s), 'every one against the same single result');
+		L.landCalibText(sample, 'Net3-pressure.dat');
+		check(!!findId(byId.lpn_calib_report, 'lpn_calib_single'), 'and the box says so');
+		EngCalcs.lpnTimeRunFrames = realFrames;
+		L.landCalibText(sample, 'Net3-pressure.dat');
+	}
+
+	head('7b. FILES BELONG TO THE PROJECT THEY WERE LOADED ON (Perry: Net3\'s file compared against Net1)');
+	{
+		const was = L.getOpenId();
+		L.setOpenId('another-project');
+		check(L.calibCompute('pressure') === null, 'another project tab has no calibration file');
+		L.landCalibText('; other\n 15 0 1\n', 'other.dat');
+		L.setOpenId(was);
+		check(L.calibCompute('pressure').file.name === 'Net3-pressure.dat', 'and loading one there leaves this project\'s file as it was');
+		L.setOpenId('a-new-project');
+		check(L.calibCompute('pressure') === null && L.calibCompute('flow') === null, 'a new project starts with none');
+		L.setOpenId(was);
+	}
+
 	head('8. THE TIME-SERIES CHART CARRIES THE MEASURED POINTS');
 	global.localStorage.setItem = realSet;
 	L.setCalibParam('pressure');
 	const ts = L.tsState();
-	ts.group = 'node'; ts.fields.node = 'pressure'; ts.picks.node = ['15', '35'];
+	ts.group = 'node'; ts.fields.node = 'pressure'; ts.picks.node = ['35', '15'];
 	L.openPane('timeseries');
 	L.renderTimeSeries();
 	const rings = byClass(byId.lpn_ts_chart, 'lpn-calib-ring');
 	check(rings.length === 11, `one ring per measurement at the two plotted junctions: ${rings.length} (6 + 5)`);
+	// **THE RING WEARS THE LOCATION'S REPORT COLOUR**, whatever order the graph lists the assets in:
+	// 35 is plotted first here but is the file's second location.
+	const ring35 = rings.filter((r) => textOf(r).indexOf('35') >= 0 && textOf(r).indexOf('15') < 0);
+	const rep35 = L.calibCompute('pressure').stats.locations.filter((s) => s.id === '35')[0];
+	check(ring35.length === 5 && ring35.every((r) => r.getAttribute('stroke') === rep35.color) && rep35.color === L.calibColor(1),
+		`35's rings are its report colour ${rep35.color}: ${ring35.map((r) => r.getAttribute('stroke')).join(',')}`);
+	const thisProject = L.getOpenId();
+	L.setOpenId('another-project');
+	L.renderTimeSeries();
+	check(byClass(byId.lpn_ts_chart, 'lpn-calib-ring').length === 1,
+		'on another project the graph draws THAT project\'s file, not this one\'s');
+	L.setOpenId(thisProject);
+	L.renderTimeSeries();
 	check(String(byId.lpn_ts_note._text || byId.lpn_ts_note.textContent).indexOf(PC.lpn_calib_ts_note) >= 0, 'and the note says what the rings are');
 	ts.fields.node = 'head';
 	L.renderTimeSeries();
