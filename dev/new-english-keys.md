@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**55 still to read on master**, of 96 untranslated keys, of 2249 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**54 still to read on master**, of 96 untranslated keys, of 2249 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -25,7 +25,7 @@ Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
 Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
 
-## lpn_  (96, 55 to read @@ NEEDS RULING)
+## lpn_  (96, 54 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_constituent`**
   > Constituent
@@ -302,7 +302,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   @@ NEEDS RULING
 - **`lpn_ff_rows_more_links`**
   > Links not shown: {n}.
-  @@ NEEDS RULING
+  _Ruled 2026-10-03: Approved._
 - **`lpn_graphs_menu`**
   > Graphs
   @@ NEEDS RULING
@@ -335,7 +335,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/criticality (`84ea5311`) — adds no English strings
 
-### feat/demand-scaling (`0503046e`) — adds no English strings
+### feat/demand-scaling (`49c2f7d5`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 

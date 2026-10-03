@@ -1318,6 +1318,16 @@
             "on": "20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.",
             "ruled": "2026-09-01"
         },
+        "lpn_ff_rows_more": {
+            "on": "Junctions not shown: {n}.",
+            "ruled": "2026-10-03",
+            "answer": "Approved."
+        },
+        "lpn_ff_rows_more_links": {
+            "on": "Links not shown: {n}.",
+            "ruled": "2026-10-03",
+            "answer": "Approved."
+        },
         "lpn_ff_run_title": {
             "on": "Fire flow run",
             "ruled": "2026-09-01"
