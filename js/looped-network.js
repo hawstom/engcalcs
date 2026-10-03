@@ -49323,9 +49323,64 @@ var EngCalcs = EngCalcs || {};
 		popup.addEventListener('pointerup', endDrag);
 		popup.addEventListener('pointercancel', endDrag);
 	}
+	// **UP AND DOWN WALK THE PROPERTIES BOX'S FIELDS, AS THEY DO IN EPANET'S PROPERTY EDITOR**
+	// (data-entry clerk's wish 3). The fields are the ones Tab reaches, in Tab's order: DOM order,
+	// skipping what Tab skips (read-only, disabled, tabindex -1, hidden), and only inputs
+	// -- a button is a command, not a field.
+	//
+	// **WHAT IT NEVER TAKES.** Alt, Ctrl, Meta or Shift with the arrow is the browser's. A
+	// <select> keeps both arrows (they change the choice, and a closed select is where a person
+	// is most likely mid-decision), and the walk steps OVER a select rather than stopping on it:
+	// a stop there would trap the walker, every further press silently changing a pattern or a
+	// curve. Tab and the mouse are how a select is reached. An input with a datalist keeps
+	// them for its suggestions. A number field's own stepping is given up on purpose: nearly
+	// every field here is type=number and the step is `any` (one whole unit per press, which no
+	// pipe diameter wants); Alt+Up/Down is left to the browser for anyone who wants it. A
+	// checkbox has no use for the arrows.
+	//
+	// **THE COMMIT IS THE BLUR'S.** Leaving a field fires its own `change`, the very path Tab
+	// and a mouse click take, so nothing here writes a property. The blur may re-render the box
+	// (a diameter edit does), which throws the next field away, so the target is looked up AFTER
+	// the blur, by position.
+	function popupWalkableFields(popup) {
+		var out = [];
+		Array.prototype.forEach.call(popup.querySelectorAll('input, select'), function (el) {
+			var t = (el.type || '').toLowerCase();
+			if (el.disabled || el.readOnly || el.tabIndex < 0 || t === 'hidden') { return; }
+			if (el.tagName.toLowerCase() === 'select') { return; }
+			if (!el.offsetParent && !el.getClientRects().length) { return; }
+			out.push(el);
+		});
+		return out;
+	}
+	function popupArrowKey(e, popup) {
+		var cur = e.target, tag, t, list, idx, dir, tgt;
+		if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') { return; }
+		if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) { return; }
+		if (!cur || !cur.tagName) { return; }
+		tag = cur.tagName.toLowerCase();
+		if (tag !== 'input' || cur.getAttribute('list')) { return; }
+		if (!document.getElementById('lpn_popup_title').contains(cur) &&
+			!document.getElementById('lpn_popup_fields').contains(cur)) { return; }
+		t = (cur.type || '').toLowerCase();
+		if (t === 'radio' || t === 'range' || t === 'button') { return; }
+		list = popupWalkableFields(popup);
+		idx = list.indexOf(cur);
+		if (idx < 0) { return; }
+		e.preventDefault();
+		dir = e.key === 'ArrowDown' ? 1 : -1;
+		if (idx + dir < 0 || idx + dir >= list.length) { return; }
+		cur.blur();
+		list = popupWalkableFields(popup);
+		tgt = list[idx + dir];
+		if (!tgt) { return; }
+		tgt.focus();
+		if (tgt.tagName.toLowerCase() === 'input' && (tgt.type === 'text' || tgt.type === 'number')) { tgt.select(); }
+	}
 	function wirePopup() {
 		var popup = document.getElementById('lpn_popup');
 		document.getElementById('lpn_popup_close').addEventListener('click', closePopup);
+		popup.addEventListener('keydown', function (e) { popupArrowKey(e, popup); });
 		makePanelDraggable(popup, function (at) { popupUserPos = at; });
 		popup.addEventListener('dblclick', function (e) {
 			if (e.target !== popup) { return; }
