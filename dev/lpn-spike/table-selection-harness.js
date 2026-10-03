@@ -193,8 +193,8 @@ L.setFilter('junctions', L.queryFor('junction', 'demand', 'gt', '0'));
 report(order('junctions') !== J.join(',') && L.bannerText('junctions') !== '', 'a Find filter alone narrows Junctions', order('junctions'));
 pressButton();
 report(order('junctions') === [J2, J4].join(','), 'with Selection only, a row must pass both (J1 has demand 0)', order('junctions'));
-report(L.bannerText('junctions').indexOf(say('lpn_pane_filter_sel_and', { q: L.queryFor('junction', 'demand', 'gt', '0'), n: 2, all: 8 })) === 0 ||
-	L.bannerText('junctions').indexOf('and selection only') > 0, 'the banner names both', L.bannerText('junctions'));
+report(L.bannerText('junctions').indexOf(say('lpn_pane_filter_sel_and', { q: L.queryFor('junction', 'demand', 'gt', '0'), n: 2, all: 8 })) === 0,
+	'the banner names both', L.bannerText('junctions'));
 pressButton();   // off
 report(!L.on() && order('junctions') !== J.join(','), 'turning it off leaves the Find filter', order('junctions'));
 L.setFilter('junctions', '');

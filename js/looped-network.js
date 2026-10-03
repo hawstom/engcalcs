@@ -21720,6 +21720,22 @@ var EngCalcs = EngCalcs || {};
 		// strip holds a column of its own and the tabs can only wrap within what is left. In the
 		// strip it is one wrapping item among the tabs, so a second line starts at the left edge.
 		head = document.getElementById('lpn_pane_strip') || document.getElementById('lpn_pane_head');
+		// **SELECTION ONLY, a pressed-state toggle beside Print** (Task 757). Same chrome as Print:
+		// it is the other thing in this row that acts on the tables rather than choosing one.
+		if (!document.getElementById('lpn_pane_selonly') && head) {
+			(function () {
+				var b = document.createElement('button');
+				b.type = 'button';
+				b.id = 'lpn_pane_selonly';
+				b.className = 'lpn-pane-print lpn-pane-selonly';
+				b.setAttribute('aria-pressed', 'false');
+				b.textContent = pc.lpn_pane_sel_only || 'Selection only';
+				if (pc.lpn_pane_sel_only_tip) { b.title = pc.lpn_pane_sel_only_tip; b.className += ' ec-help'; }
+				b.addEventListener('click', function () { paneSelFilterPress(); });
+				// First child for now; Print is built next and takes the first place ahead of it.
+				head.insertBefore(b, head.firstChild);
+			}());
+		}
 		if (!document.getElementById('lpn_pane_print') && head) {
 			(function () {
 				var b = document.createElement('button');
@@ -21730,21 +21746,6 @@ var EngCalcs = EngCalcs || {};
 				if (pc.lpn_pane_print_tip) { b.title = pc.lpn_pane_print_tip; b.className += ' ec-help'; }
 				b.addEventListener('click', function () { printPaneTable(activePaneTableSpec()); });
 				head.insertBefore(b, head.firstChild);
-			}());
-		}
-		// **SELECTION ONLY, a pressed-state toggle beside Print** (Task 757). Same chrome as Print:
-		// it is the other thing in this row that acts on the tables rather than choosing one.
-		if (!document.getElementById('lpn_pane_selonly') && head) {
-			(function () {
-				var b = document.createElement('button'), pr = document.getElementById('lpn_pane_print');
-				b.type = 'button';
-				b.id = 'lpn_pane_selonly';
-				b.className = 'lpn-pane-print lpn-pane-selonly';
-				b.setAttribute('aria-pressed', 'false');
-				b.textContent = pc.lpn_pane_sel_only || 'Selection only';
-				if (pc.lpn_pane_sel_only_tip) { b.title = pc.lpn_pane_sel_only_tip; b.className += ' ec-help'; }
-				b.addEventListener('click', function () { paneSelFilterPress(); });
-				head.insertBefore(b, pr && pr.nextSibling ? pr.nextSibling : head.firstChild);
 			}());
 		}
 		// **THE TOP EDGE IS THE HANDLE.** Pointer events, not mouse: one code path for mouse, pen
