@@ -3,6 +3,10 @@
 // Language with focus on the first enabled row, from inside a text field too; F10 goes to the bar;
 // the Latin key badges show only in keyboard mode; pointer-only rows are skipped by the arrow keys;
 // no chord reaches a drawing tool; and a right-to-left page opens the same menus.
+// Rows (Tom, 2026-10-03): every actionable row carries an automatic letter, unique in its menu, so
+// Alt+Shift+W, G, P opens the Profile graph; a Chinese menu falls back to digits; a row's existing
+// shortcut (Undo's Ctrl+Z, Cmd+Z on a Mac; a tool's digit) shows right-justified, always; and Help's
+// Menus block has exactly two rows, Alt+Shift+letter and F10.
 //
 // Run with:
 //   flock /tmp/engcalcs-browser.lock node dev/lpn-spike/menu-mnemonic-harness.js
@@ -160,6 +164,105 @@ async function suite(page, label, mac) {
 	await page.keyboard.press('Escape'); await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
 }
 
+// ---- row mnemonics and right-justified shortcuts ----------------------------------------------------
+async function rowSuite(page, label, opts) {
+	console.log('\n=== rows: ' + label + ' ===');
+	const chord = async (letter) => {
+		if (opts.mac) { await page.keyboard.press('Control+Alt+' + letter.toLowerCase()); }
+		else { await page.keyboard.press('Alt+Shift+' + letter); }
+	};
+	const listRows = (sel) => page.evaluate((s) => Array.from(document.querySelectorAll(s + ' button.lpn-menu-row')).map((b) => ({
+		t: b.textContent.replace(/[▸\s]+$/, '').trim(), m: b.getAttribute('data-mnemonic') || '',
+		po: b.hasAttribute('data-pointer-only'), sub: b.getAttribute('aria-haspopup') === 'menu',
+		badge: (() => { const ic = b.querySelector('.lpn-menu-icon'), cs = ic && getComputedStyle(ic, '::after');
+			return cs && cs.display !== 'none' && cs.content && cs.content !== 'none' && cs.content !== 'normal' ? ic.getAttribute('data-mnemonic') : ''; })(),
+		hk: (() => { const cs = getComputedStyle(b, '::after');
+			return cs.content && cs.content !== 'none' && cs.content !== 'normal' ? b.getAttribute('data-hotkey') || '' : ''; })()
+	})), sel);
+	// A Latin letter or digit is a real key press; another script's letter is the keydown its own
+	// layout would send (the test browser's layout is US).
+	const pressRowKey = async (ch) => {
+		if (/^[a-z0-9]$/.test(ch)) { await page.keyboard.press(ch); return; }
+		await page.evaluate((k) => (document.activeElement || document.body).dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true })), ch);
+	};
+	const pc = await page.evaluate(() => EngCalcs.pageConfig);
+	const hint0 = await page.evaluate(() => document.getElementById('lpn_mode_hint') ? document.getElementById('lpn_mode_hint').textContent : '');
+	await page.evaluate(() => { try { localStorage.removeItem('lpn_pane'); } catch (e) {} });
+	await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
+
+	// Every menu: actionable rows have a letter, letters are unique, pointer-only rows have none,
+	// and the letters show as badges in keyboard mode.
+	for (const L of ['F', 'E', 'M', 'W', 'H']) {
+		await chord(L);
+		const rs = await listRows('#lpn_menu_list');
+		const act = rs.filter((r) => !r.po);
+		const ms = act.map((r) => r.m);
+		ok(L + ': every keyboard row has a letter', act.length > 0 && ms.every((m) => m !== ''), JSON.stringify(rs));
+		ok(L + ': letters are unique in the menu', new Set(ms).size === ms.length, ms.join(''));
+		ok(L + ': no pointer-only row has one', rs.filter((r) => r.po).every((r) => r.m === ''));
+		ok(L + ': the letters show in keyboard mode', act.every((r) => r.badge !== ''), JSON.stringify(act.map((r) => r.badge)));
+		if (opts.digits) {
+			// A Han label never yields its own character (an input method types it); it falls back to a
+			// digit, then a Latin letter. A Latin word inside the label (Cookie, EPANET) keeps its letter.
+			ok(L + ': no mnemonic is a character typed through an input method', ms.every((m) => /^[0-9a-z]$/.test(m)), ms.join(''));
+			ok(L + ': an all-Han label gets a digit first', act.filter((r) => /^[\u3400-\u9fff\s]+$/.test(r.t)).slice(0, 10).every((r) => /^[0-9]$/.test(r.m)), ms.join(''));
+		}
+		await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
+	}
+
+	// Alt+Shift+W, then the Graphs row's letter, then the Profile row's letter.
+	await chord('W');
+	const water = await listRows('#lpn_menu_list');
+	const g = water.find((r) => r.t === pc.lpn_graphs_menu);
+	if (opts.english) { ok('Graphs is G in the Water menu', g && g.m === 'g', JSON.stringify(water.map((r) => r.t + '=' + r.m))); }
+	await pressRowKey(g ? g.m : 'g');
+	const sub = await page.evaluate(() => document.getElementById('lpn_menu_popup2').style.display === 'block');
+	ok('the Graphs letter opens its fly-out', sub);
+	const graphs = await listRows('#lpn_menu_list2');
+	const p = graphs.find((r) => r.t === pc.lpn_profile_menu);
+	if (opts.english) { ok('Profile is P in Graphs', p && p.m === 'p', JSON.stringify(graphs)); }
+	ok('...with focus on its first row', await page.evaluate(() => document.getElementById('lpn_menu_list2').contains(document.activeElement)));
+	await pressRowKey(p ? p.m : 'p');
+	await page.waitForTimeout(250);
+	const pane = await page.evaluate(() => { try { return JSON.parse(localStorage.getItem('lpn_pane') || 'null'); } catch (e) { return null; } });
+	ok((opts.english ? 'W, G, P' : 'W, then the two letters') + ' opens the Profile graph', !!pane && pane.open && pane.tab === 'profile', JSON.stringify(pane));
+	ok('...and closes the menu', await page.evaluate(() => document.getElementById('lpn_menu_popup').style.display !== 'block'));
+	ok('no letter reached a drawing tool', (await page.evaluate(() => document.getElementById('lpn_mode_hint') ? document.getElementById('lpn_mode_hint').textContent : '')) === hint0);
+	await page.evaluate(() => document.activeElement && document.activeElement.blur());
+
+	// Shortcuts: Undo's, right-justified and muted, shown on a mouse-opened menu too.
+	await page.click('#lpn_menu_edit');
+	const edit = await listRows('#lpn_menu_list');
+	const undo = edit.find((r) => r.t === pc.lpn_tool_undo);
+	ok('Edit > Undo shows ' + (opts.mac ? 'Cmd+Z' : 'Ctrl+Z') + ' with the mouse', undo && undo.hk === (opts.mac ? 'Cmd+Z' : 'Ctrl+Z'), JSON.stringify(undo));
+	ok('...and no row letter badge without keyboard mode', edit.every((r) => r.badge === ''));
+	// Generated content has no box of its own to measure, so the row is measured with and without it:
+	// the label must not move, the row must not grow a line, and the float sits at the inline end.
+	const geo = await page.evaluate((lbl) => {
+		const b = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).find((x) => x.textContent.trim() === lbl);
+		const cs = getComputedStyle(b, '::after'), tn = b.childNodes[1];
+		const rng = document.createRange(); rng.selectNodeContents(tn);
+		const t1 = rng.getBoundingClientRect(), h1 = b.getBoundingClientRect().height;
+		const hk = b.getAttribute('data-hotkey'); b.removeAttribute('data-hotkey');
+		const t0 = rng.getBoundingClientRect(), h0 = b.getBoundingClientRect().height;
+		b.setAttribute('data-hotkey', hk);
+		return { float: cs.float, labelStill: t0.left === t1.left && t0.top === t1.top, oneLine: h0 === h1,
+			color: cs.color, rowColor: getComputedStyle(b).color };
+	}, pc.lpn_tool_undo);
+	ok('...right-justified (floated to the inline end), on the label\'s line, label unmoved', /inline-end|right/.test(geo.float) && geo.labelStill && geo.oneLine, JSON.stringify(geo));
+	ok('...in a muted colour', geo.color !== geo.rowColor, JSON.stringify(geo));
+	ok('Select shows its digit 1, Delete the Delete key', (edit.find((r) => r.t === pc.lpn_tool_select) || {}).hk === '1' && (edit.find((r) => r.t === pc.lpn_tool_delete) || {}).hk === 'Delete');
+	ok('a row with no shortcut shows none (Find and replace)', (edit.find((r) => r.t === pc.lpn_find_menu) || { hk: 'x' }).hk === '');
+	await page.click('#lpn_menu_edit');
+	await page.click('#lpn_menu_project');
+	await page.hover('#lpn_menu_list button.lpn-menu-row[aria-haspopup]');
+	await page.waitForTimeout(150);
+	const ins = await listRows('#lpn_menu_list2');
+	ok('Water > Insert > Junction shows 2, Text 9', (ins.find((r) => r.t === pc.lpn_tool_add_junction) || {}).hk === '2' && (ins.find((r) => r.t === pc.lpn_tool_add_text) || {}).hk === '9', JSON.stringify(ins.map((r) => r.hk)));
+	await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
+	await page.mouse.click(700, 500);
+}
+
 async function main() {
 	let playwright;
 	try { playwright = require(path.join(__dirname, '..', 'browser-pass', 'node_modules', 'playwright-core')); }
@@ -175,7 +278,15 @@ async function main() {
 			return page;
 		};
 		const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-		await suite(await open(ctx, ''), 'Windows/Linux, English', false);
+		const enPage = await open(ctx, '');
+		await suite(enPage, 'Windows/Linux, English', false);
+		await rowSuite(enPage, 'English', { english: true });
+		console.log('\n=== Help > Tables and Hotkeys: the Menus block is two rows ===');
+		const help = await enPage.evaluate(() => {
+			const tbl = Array.from(document.querySelectorAll('table')).filter((t) => /Alt\+Shift/.test(t.textContent));
+			return { n: tbl.length, rows: tbl[0] ? Array.from(tbl[0].querySelectorAll('tr')).map((r) => r.cells[0].textContent) : [] };
+		});
+		ok('one table mentions Alt+Shift, with exactly two rows: Alt+Shift+letter and F10', help.n === 1 && help.rows.length === 2 && help.rows[0] === 'Alt+Shift+letter' && help.rows[1] === 'F10', JSON.stringify(help));
 		await ctx.close();
 
 		const mac = await browser.newContext({ viewport: { width: 1440, height: 900 }, userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120 Safari/537.36' });
@@ -188,6 +299,8 @@ async function main() {
 			ok('Alt+Shift+F is not a chord on a Mac', await mp.evaluate(() => document.getElementById('lpn_menu_popup').style.display !== 'block'));
 			await mp.keyboard.press('Control+Alt+f');
 			ok('Ctrl+Option+F opens File', await mp.evaluate(() => document.getElementById('lpn_menu_file').getAttribute('aria-expanded') === 'true'));
+			await mp.keyboard.press('Escape'); await mp.keyboard.press('Escape');
+			await rowSuite(mp, 'Mac', { english: true, mac: true });
 		} else {
 			console.log('  (platform string is not Mac under this browser; Mac branch not exercised)');
 		}
@@ -197,6 +310,7 @@ async function main() {
 		const rp = await open(rtl, '&lang=he');
 		ok('the page is dir=rtl', await rp.evaluate(() => getComputedStyle(document.documentElement).direction) === 'rtl');
 		await suite(rp, 'right-to-left (he)', false);
+		await rowSuite(rp, 'right-to-left (he)', {});
 		await rp.keyboard.press('F10');
 		const geo = await rp.evaluate(() => {
 			const b = document.querySelector('#lpn_menu_file'), g = b.querySelector('.lpn-kbdbadge');
@@ -205,6 +319,10 @@ async function main() {
 		});
 		ok('in RTL the badge sits at the inline-end (left) corner and reads as a Latin letter', geo.badgeNearLeft && geo.text === 'F', JSON.stringify(geo));
 		await rtl.close();
+
+		const zc = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+		await rowSuite(await open(zc, '&lang=zh'), 'Chinese, digits', { digits: true });
+		await zc.close();
 
 		const ph = await browser.newContext({ viewport: { width: 390, height: 800 } });
 		const pp = await open(ph, '');

@@ -37257,13 +37257,14 @@ var EngCalcs = EngCalcs || {};
 		parkAnchorTip(anchor, level);
 		list.innerHTML = '';
 		list.setAttribute('role', 'menu');
+		var mnemonics = menuMnemonics(rows);
 		if (level) {
 			// The row that opened this fly-out: Left and Escape return focus to it, and its
 			// aria-expanded tells a screen reader the fly-out is out (Task 748).
 			subOpener = anchor;
 			if (anchor.setAttribute) { anchor.setAttribute('aria-expanded', 'true'); }
 		}
-		rows.forEach(function (r) {
+		rows.forEach(function (r, ri) {
 			if (r.hidden) { return; }
 			if (r.separator) {
 				var hr = document.createElement('hr');
@@ -37295,8 +37296,23 @@ var EngCalcs = EngCalcs || {};
 			ic.className = 'lpn-menu-icon';
 			var ic2 = r.icon ? iconEl(r.icon) : null;
 			if (ic2) { ic.appendChild(ic2); }
+			// The row's mnemonic (Task 748): typed while the menu has keyboard focus, shown as a
+			// badge on the icon cell only in keyboard mode. Assigned by menuMnemonics(), never by hand.
+			// **BOTH MARKS ARE CSS-GENERATED FROM ATTRIBUTES, NOT TEXT IN THE ROW**: a row's text is
+			// its label alone, which is what every harness, the type-to-find and a screen reader's
+			// name read; aria-keyshortcuts tells assistive technology the shortcut instead.
+			if (mnemonics[ri]) {
+				b.setAttribute('data-mnemonic', mnemonics[ri]);
+				ic.setAttribute('data-mnemonic', mnemonics[ri].toUpperCase());
+			}
 			b.appendChild(ic);
 			b.appendChild(document.createTextNode(r.label));
+			// An EXISTING keyboard shortcut for this row's command, right-justified and muted, as on
+			// every desktop menu. A row says so with `hotkey:`; nothing here invents one.
+			if (r.hotkey) {
+				b.setAttribute('data-hotkey', menuHotkeyText(r.hotkey));
+				b.setAttribute('aria-keyshortcuts', r.hotkey.replace(/^Mod\+/, isMacPlatform() ? 'Meta+' : 'Control+'));
+			}
 			// A menu row is its own click target, so the tip goes straight on it as a title matched to
 			// .ec-help for touch -- the same pattern the toolbar buttons use.
 			if (r.tip) { b.title = r.tip; b.className += ' ec-help'; }
@@ -37374,6 +37390,7 @@ var EngCalcs = EngCalcs || {};
 		// open leaves focus where it was, exactly as before (Task 748).
 		if (menuKbIntent) {
 			menuKbIntent = false;
+			kbdModeEnter();   // the row letters show whenever the keyboard opened the menu
 			var first = menuRowsOf(list)[0];
 			if (first) { first.focus(); } else if (anchor.focus) { anchor.focus(); }
 		}
@@ -37401,9 +37418,13 @@ var EngCalcs = EngCalcs || {};
 		if (!e.isTrusted || e.detail !== 0) { return; }
 		menuKbIntent = true;
 		setTimeout(function () { menuKbIntent = false; }, 0);
-		// A row that ran a command and opened nothing focusable leaves focus on a hidden button;
-		// give it back to the opener.
-		var t = e.target, opener = openMenuAnchor;
+		menuFocusAfterRow(e.target);
+	}, true);
+	// A row that ran a command and opened nothing focusable leaves focus on a hidden button; give it
+	// back to the opener. Called BEFORE the row's own click handler runs (the capture listener above,
+	// or a mnemonic about to click), so it sees which boxes were open before the command.
+	function menuFocusAfterRow(t) {
+		var opener = openMenuAnchor;
 		var ret = kbdModeReturn;   // the element that had focus before a chord or F10 (cleared by the click handler below)
 		var boxVisible = function (id) { var b = document.getElementById(id); return !!b && b.getClientRects().length > 0; };
 		var boxesBefore = ESCAPE_SCOPED_BOXES.filter(boxVisible);
@@ -37426,7 +37447,68 @@ var EngCalcs = EngCalcs || {};
 				else if (opener.isConnected) { opener.focus(); }
 			}, 0);
 		}
-	}, true);
+	}
+	// **EVERY ROW GETS A LETTER, AND NOBODY ASSIGNS ONE** (Tom, 2026-10-03: *"Every appropriate menu
+	// row should now be a mnemonic so that I can type Alt+Shift+W,G,P for a Profile Graph."*). The
+	// letter is read off the row's own label in the page's language, so it works in all 27, and a
+	// row another branch adds later gets one the moment it exists. Deterministic: rows in order,
+	// each takes the first letter that starts a word of its label and no row above has taken, else
+	// the first unused letter anywhere in it, else the next unused digit 1-9, 0, then Latin a-z (a
+	// Chinese menu of twelve rows outruns the digits). Letters are UNIQUE
+	// within one menu, so one press always does one thing -- no Windows-style cycling between rows.
+	//
+	// Only letters a keyboard types in one keystroke qualify. Han, kana, Hangul and Ethiopic go
+	// through an input method, so a Chinese or Amharic menu falls back to digits, which every layout
+	// has; Arabic, Hebrew, Cyrillic, Devanagari and the rest are typed directly on their own layouts
+	// and keep their own letters (e.key matches them). Combining marks never qualify. Pointer-only
+	// rows, headings, separators and hidden rows get none; a disabled row keeps its letter, so the
+	// letters do not shuffle as rows enable.
+	function menuMnemonicChar(ch) {
+		if (!/^\p{L}$/u.test(ch)) { return ''; }
+		if (/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}\p{Script=Ethiopic}\p{Script=Yi}]/u.test(ch)) { return ''; }
+		var lo = ch.toLowerCase();
+		return Array.from(lo).length === 1 ? lo : '';
+	}
+	function menuMnemonics(rows) {
+		var used = {}, out = [], digits = '1234567890abcdefghijklmnopqrstuvwxyz', di = 0;
+		rows.forEach(function (r, i) {
+			out[i] = '';
+			if (!r || r.hidden || r.separator || r.heading || r.pointerOnly || !(r.fn || r.submenu)) { return; }
+			var chars = Array.from(String(r.label || '')), pick = '', j, c;
+			for (j = 0; j < chars.length && !pick; j++) {
+				if (j > 0 && /[\p{L}\p{N}]/u.test(chars[j - 1])) { continue; }
+				c = menuMnemonicChar(chars[j]);
+				if (c && !used[c]) { pick = c; }
+			}
+			for (j = 0; j < chars.length && !pick; j++) {
+				c = menuMnemonicChar(chars[j]);
+				if (c && !used[c]) { pick = c; }
+			}
+			while (!pick && di < digits.length) {
+				c = digits.charAt(di++);
+				if (!used[c]) { pick = c; }
+			}
+			if (pick) { used[pick] = true; out[i] = pick; }
+		});
+		return out;
+	}
+	// A row's `hotkey:` in the platform's words: Mod is Ctrl, or Cmd on a Mac (the undo handler
+	// takes either modifier). Key names stay as printed on the keys, as the Help table writes them.
+	function menuHotkeyText(spec) {
+		return String(spec).replace(/^Mod\+/, isMacPlatform() ? 'Cmd+' : 'Ctrl+');
+	}
+	// The row a typed key picks in this list: its own character first (a Russian or Hebrew layout
+	// types the label's letter), then the PHYSICAL key, so a Latin letter still answers on a layout
+	// that types something else at that position (the chord's own e.code rule).
+	function menuRowForKey(list, e) {
+		if (!list || !e.key || Array.from(e.key).length !== 1 || e.key === ' ') { return null; }
+		var rows = Array.prototype.slice.call(list.querySelectorAll('button.lpn-menu-row[data-mnemonic]'));
+		var k = e.key.toLowerCase(), m = /^(?:Key([A-Z])|Digit([0-9]))$/.exec(e.code || '');
+		var byKey = rows.filter(function (b) { return b.getAttribute('data-mnemonic') === k; })[0];
+		if (byKey || !m) { return byKey || null; }
+		var phys = (m[1] || m[2]).toLowerCase();
+		return rows.filter(function (b) { return b.getAttribute('data-mnemonic') === phys; })[0] || null;
+	}
 	function menuKbOpen(btn) {
 		menuKbIntent = true;
 		try { btn.click(); } finally { menuKbIntent = false; }
@@ -37450,6 +37532,12 @@ var EngCalcs = EngCalcs || {};
 		if (!open) {
 			// Closed: a menu-bar button holding focus walks the bar, and Down/Up open its menu.
 			if (!ae || !ae.classList || !ae.classList.contains('lpn-menubar-item')) { return; }
+			// After F10, a menu's badge letter alone opens it, as Alt then a letter does on Windows.
+			if (kbdModeOn() && !e.shiftKey && LPN_MENU_CHORDS[e.code]) {
+				var mb = document.getElementById(LPN_MENU_CHORDS[e.code]);
+				if (mb && mb.getClientRects().length > 0) { e.preventDefault(); e.stopPropagation(); menuKbOpen(mb); }
+				return;
+			}
 			if (k === 'ArrowRight' || k === 'ArrowLeft') {
 				e.preventDefault();
 				menuBarMove(k === 'ArrowRight' ? 1 : -1, ae);
@@ -37503,6 +37591,21 @@ var EngCalcs = EngCalcs || {};
 			else { menuBarMove(-1, anchor); }
 			return;
 		}
+		// A row's mnemonic: a fly-out row opens its fly-out with focus inside, a command row runs.
+		// The key is swallowed even on a disabled row, so a letter never falls through to a tool key.
+		var hit = menuRowForKey(inSub ? sub : pop, e);
+		if (hit) {
+			stop();
+			if (hit.disabled) { return; }
+			if (hit.getAttribute('aria-haspopup') === 'menu') {
+				hit.focus();
+				menuKbOpen(hit);
+			} else {
+				hit.focus();
+				menuFocusAfterRow(hit);
+				hit.click();
+			}
+		}
 	}, true);
 	// ---- MENU MNEMONICS AND KEYBOARD MODE (Task 748) ---------------------------------------------
 	// Alt+Shift+{letter} (Ctrl+Option on a Mac, the Google Docs convention) opens a top menu from
@@ -37531,10 +37634,12 @@ var EngCalcs = EngCalcs || {};
 		if (!bar) { return; }
 		if (!kbdModeOn() && !inMenuChrome(document.activeElement)) { kbdModeReturn = document.activeElement; }
 		bar.classList.add('lpn-kbdmode');
+		document.documentElement.classList.add('lpn-kbdmode');   // reaches the pop-up rows' letters
 	}
 	function kbdModeExit(restoreFocus) {
 		var bar = document.getElementById('lpn_menubar');
 		if (bar) { bar.classList.remove('lpn-kbdmode'); }
+		document.documentElement.classList.remove('lpn-kbdmode');
 		var back = kbdModeReturn;
 		kbdModeReturn = null;
 		if (!restoreFocus) { return; }
@@ -38708,7 +38813,7 @@ var EngCalcs = EngCalcs || {};
 			// mode from the menu bar, and nothing in the menus could put you back. Escape does it,
 			// which is no answer on the device the concession is for. Same key, same icon, same
 			// call as the toolbar button -- two doors, one implementation.
-			{ icon: 'select', label: pc.lpn_tool_select || 'Select', fn: function () { setMode('select'); } },
+			{ icon: 'select', label: pc.lpn_tool_select || 'Select', hotkey: toolKeyFor('select'), fn: function () { setMode('select'); } },
 			// **THE DOOR** (Task 567). Beside Select because it is the other thing a press on the
 			// map can mean, and because EPANET puts Vertices on its own right-click menu -- a menu
 			// this page does not have on a phone, which is where the gesture it replaces failed.
@@ -38728,7 +38833,7 @@ var EngCalcs = EngCalcs || {};
 				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('lasso'); } },
 			{ icon: 'select-polygon', pointerOnly: true, label: pc.lpn_tool_area_polygon || 'Select a polygon',
 				tip: pc.lpn_tool_area_tip, fn: function () { setSelectAreaShape('polygon'); } },
-			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', tip: pc.lpn_tool_undo_tip, fn: undo },
+			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', tip: pc.lpn_tool_undo_tip, hotkey: 'Mod+Z', fn: undo },
 			// Find sits with Undo and Delete because it acts on the ELEMENTS, which is what this
 			// menu is about; View holds the things that change how the map is drawn. Every editor
 			// puts Find in Edit for the same reason.
@@ -38743,7 +38848,7 @@ var EngCalcs = EngCalcs || {};
 			// TOOL -- the verb-then-subject path, kept because it is the only way to delete on a
 			// touch screen with no keyboard, and because a repeated delete spree is genuinely
 			// quicker with it. Task 266 turns the selected case into "and everything else selected".
-			{ icon: 'del', label: pc.lpn_tool_delete || 'Delete', fn: function () {
+			{ icon: 'del', label: pc.lpn_tool_delete || 'Delete', hotkey: LPN_TOOL_ALT_KEYS['delete'], fn: function () {
 				if (deleteSelection()) { return; }
 				setMode(mode === 'delete' ? 'select' : 'delete');
 			} },
@@ -38814,18 +38919,18 @@ var EngCalcs = EngCalcs || {};
 			// of the two doors: a reader who opens the menu rather than hovering the strip was told
 			// nothing at all, about any of the eight tools. No new key, and the digit still comes
 			// from LPN_TOOL_KEYS rather than from a translator.
-			{ icon: 'junction', pointerOnly: true, label: pc.lpn_tool_add_junction || 'Junction', tip: toolTipWithKey('add-junction', pc.lpn_tool_add_junction_tip), fn: function () { setMode('add-junction'); } },
-			{ icon: 'reservoir', pointerOnly: true, label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir', pc.lpn_tool_add_reservoir_tip), fn: function () { setMode('add-reservoir'); } },
-			{ icon: 'tank', pointerOnly: true, label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank', pc.lpn_tool_add_tank_tip), fn: function () { setMode('add-tank'); } },
-			{ icon: 'pipe', pointerOnly: true, label: pc.lpn_tool_add_pipe || 'Pipe', tip: toolTipWithKey('add-pipe', pc.lpn_tool_add_pipe_tip), fn: function () { setMode('add-pipe'); } },
-			{ icon: 'pump', pointerOnly: true, label: pc.lpn_tool_add_pump || 'Pump', tip: toolTipWithKey('add-pump', pc.lpn_tool_add_pump_tip), fn: function () { setMode('add-pump'); } },
-			{ icon: 'valve', pointerOnly: true, label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve', pc.lpn_tool_add_valve_tip), fn: function () { setMode('add-valve'); } },
+			{ icon: 'junction', pointerOnly: true, label: pc.lpn_tool_add_junction || 'Junction', tip: toolTipWithKey('add-junction', pc.lpn_tool_add_junction_tip), hotkey: toolKeyFor('add-junction'), fn: function () { setMode('add-junction'); } },
+			{ icon: 'reservoir', pointerOnly: true, label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir', pc.lpn_tool_add_reservoir_tip), hotkey: toolKeyFor('add-reservoir'), fn: function () { setMode('add-reservoir'); } },
+			{ icon: 'tank', pointerOnly: true, label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank', pc.lpn_tool_add_tank_tip), hotkey: toolKeyFor('add-tank'), fn: function () { setMode('add-tank'); } },
+			{ icon: 'pipe', pointerOnly: true, label: pc.lpn_tool_add_pipe || 'Pipe', tip: toolTipWithKey('add-pipe', pc.lpn_tool_add_pipe_tip), hotkey: toolKeyFor('add-pipe'), fn: function () { setMode('add-pipe'); } },
+			{ icon: 'pump', pointerOnly: true, label: pc.lpn_tool_add_pump || 'Pump', tip: toolTipWithKey('add-pump', pc.lpn_tool_add_pump_tip), hotkey: toolKeyFor('add-pump'), fn: function () { setMode('add-pump'); } },
+			{ icon: 'valve', pointerOnly: true, label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve', pc.lpn_tool_add_valve_tip), hotkey: toolKeyFor('add-valve'), fn: function () { setMode('add-valve'); } },
 			// **AFTER THE VALVE AND BEFORE THE TEXT** (Task 247). The order is the sentence a
 			// person draws in -- junctions, the sources that feed them, the pipe that joins them,
 			// the two things you put ON a pipe -- and a meter is the third thing you put on a pipe.
 			// Text stays last, being the only tool that adds nothing hydraulic.
-			{ icon: 'customer', pointerOnly: true, label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), fn: function () { setMode('add-meter'); } },
-			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text', pc.lpn_tool_add_text_tip), fn: function () { setMode('add-text'); } },
+			{ icon: 'customer', pointerOnly: true, label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), hotkey: toolKeyFor('add-meter'), fn: function () { setMode('add-meter'); } },
+			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text', pc.lpn_tool_add_text_tip), hotkey: toolKeyFor('add-text'), fn: function () { setMode('add-text'); } },
 			{ separator: true },
 			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
 			// Deliberately NOT translated: scaffolding for measuring how ~100 links performs, and it
