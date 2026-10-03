@@ -570,3 +570,6 @@ engineers their spreadsheet workflow without a login, an OAuth scope, or a serve
 ## Added 2026-10-03: map the browser-EPANET field once, properly
 
 Today's answer rests on three half-verified rivals. Worth one session: price and engine location for HydroBOA, CityWater and Qatium; whether EPANET-UI is a web tool; whether any other client-side port is alive. Until then, public copy should never say "the browser version of EPANET" or imply we are the only one. (Journal 2026-10-03.)
+
+
+- Verify with screenshots: WaterGEMS/WaterCAD menu hover behaviour, Adobe Illustrator/Acrobat menu rows, VS Code command palette and Windows 11 Settings search descriptions (not checked 2026-10-03).
