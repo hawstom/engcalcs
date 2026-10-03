@@ -4955,6 +4955,29 @@ var EngCalcs = EngCalcs || {};
 	 * Both doors read this one list -- the fly-out and the map's bottom status strip -- so the two
 	 * cannot drift.
 	 */
+	// THE ANALYZE FLY-OUT (Task 754). Each row names its criteria in a dialog and then solves a
+	// copy of the network many times over. Fire flow and Criticality share the one run dialog and
+	// the one engine, one analysis at a time. Another analysis is another entry in this list.
+	function analyzeMenuRows() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{
+				icon: 'hydrant', label: pc.lpn_ff_menu || 'Fire flow analysis…',
+				tip: pc.lpn_ff_menu_tip,
+				fn: function () { closeMenu(); openFireFlowBox(); }
+			},
+			{
+				icon: 'pipe', label: pc.lpn_crit_menu || 'Criticality analysis…',
+				tip: pc.lpn_crit_menu_tip,
+				fn: function () { closeMenu(); openCriticalityBox(); }
+			},
+			{
+				icon: 'customer', label: pc.lpn_ds_menu || 'Demand scaling…',
+				tip: pc.lpn_ds_menu_tip,
+				fn: function () { closeMenu(); openDemandScaleBox(); }
+			}
+		];
+	}
 	// THE REPORTS FLY-OUT (Tom, 2026-09-04; the Status and Full rows added for ROADMAP Tasks 716
 	// and 715). Five finished answers, each of which opens and is simply there -- no criteria to
 	// set, nothing to press.
@@ -33191,7 +33214,7 @@ var EngCalcs = EngCalcs || {};
 				EngCalcs.lpnTimeIsExtended(doc.times));
 			// scheduleArrivalSolve(), not scheduleSolve(): see the note at its definition. With the
 			// switch off it runs nothing at all, which is Tom's ruling and not an inference.
-			if (owed) { scheduleArrivalSolve(); } else { clearFireFlowRun(false); }
+			if (owed) { scheduleArrivalSolve(); } else { clearFireFlowRun(false); clearCriticalityRun(false); clearDemandScaleRun(false); }
 		});
 		paneDocumentArrived();   // R-109: see its definition
 		perfDebugTime('tabs', function () { renderTabs(); });
@@ -40245,13 +40268,14 @@ var EngCalcs = EngCalcs || {};
 					else { runSolve(); }
 				}
 			},
-			// **FIRE FLOW SITS WITH CALCULATE**, between Run and the run report, wearing the
-			// hydrant glyph (lib/Icons.lib.php). It is a kind of run: it names the criteria and
-			// solves the network, many times over. ROADMAP Task 530.
+			// **FIRE FLOW AND CRITICALITY SIT IN AN ANALYZE FLY-OUT, WITH CALCULATE** (Task 754;
+			// Tom, 2026-09-30). Each is a kind of run: criteria first, then the network solved many
+			// times over on a copy. The rows live in analyzeMenuRows(), a list, so the next analysis
+			// is one more entry there and no change to this menu.
 			{
-				icon: 'hydrant', label: pc.lpn_ff_menu || 'Fire flow analysis…',
-				tip: pc.lpn_ff_menu_tip,
-				fn: function () { closeMenu(); openFireFlowBox(); }
+				icon: 'hydrant', label: pc.lpn_analyze_menu || 'Analyze',
+				tip: pc.lpn_analyze_menu_tip,
+				submenu: analyzeMenuRows
 			},
 			// **A DIVIDER, AND ONE ROW UNDER IT THAT IS THE REPORTS** (Tom, 2026-09-04: *"We can
 			// put a divider before the reports"*, and then, having seen them: *"It's strange and
@@ -40975,6 +40999,8 @@ var EngCalcs = EngCalcs || {};
 		wireAreaHint();
 		wireWizardBars();
 		wireFireFlowBox();
+		wireCriticalityBox();
+		wireDemandScaleBox();
 		wireEnergyBox();
 		wireContourBox();
 		wireScenarioCompareBox();
@@ -58037,6 +58063,18 @@ var EngCalcs = EngCalcs || {};
 		if (parent) { parent.appendChild(e); }
 		return e;
 	}
+	// **A REFUSED PRESS IS ANSWERED IN THE BOX, WHERE THE PRESS WAS** -- every analysis box's
+	// All/Selected scope, not demand scaling's alone (Tom, 2026-10-02: *"It appears that Find doesn't
+	// respect "Selected junctions"."*). "Selected" with nothing selected refused on the map's notice
+	// line only and left the last answer -- an All answer -- standing in the box, where it read as
+	// the button having ignored the scope. The caller clears its own run first; this says why there
+	// is no answer, in the answer's place. Demand scaling keeps the same rule in dsRefused.
+	function analysisRefused(host, text) {
+		setNotice(text);
+		if (!host) { return; }
+		host.innerHTML = '';
+		ffEl('p', 'lpn-ff-summary', text, host);
+	}
 	// One labelled row. The whole label text is the tip's target and not a one-character glyph --
 	// CLAUDE.md's tip-only nesting rule.
 	function ffRow(parent, labelText, tip, control, unitText) {
@@ -58087,8 +58125,8 @@ var EngCalcs = EngCalcs || {};
 		ffEl('p', 'lpn-ff-note', pc.lpn_ff_intro, host);
 
 		boxes.scope = ffSelect([
-			['all', pc.lpn_ff_all || 'All'],
-			['selected', pc.lpn_ff_selected || 'Selected']
+			['all', pc.lpn_ff_all || 'All junctions'],
+			['selected', pc.lpn_ff_selected || 'Selected junctions']
 		], ask.scope);
 		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', pc.lpn_ff_scope_tip, boxes.scope, '');
 
@@ -58118,9 +58156,9 @@ var EngCalcs = EngCalcs || {};
 		// underneath the checkbox, and runFireFlowSweep()/ffDesignScope() never changed, so only the
 		// control built here changes back.
 		boxes.design = ffSelect([
-			['off', pc.lpn_source_type_none || 'None'],
-			['all', pc.lpn_ff_all || 'All'],
-			['selected', pc.lpn_ff_selected || 'Selected']
+			['off', pc.lpn_ff_design_off || 'None'],
+			['all', pc.lpn_ff_design_all || 'All'],
+			['selected', pc.lpn_ff_design_selected || 'Selected']
 		], ffDesignScope(ask.design));
 		ffRow(host, pc.lpn_ff_design || 'Design check (effect on system)', pc.lpn_ff_design_tip,
 			boxes.design, '');
@@ -58152,7 +58190,10 @@ var EngCalcs = EngCalcs || {};
 		var buttons = ffEl('div', 'lpn-ff-buttons', null, host);
 		run = ffEl('button', 'lpn-ff-run', pc.lpn_ff_calculate || 'Run', buttons);
 		run.type = 'button';
-		run.disabled = fireFlowBusy;
+		run.disabled = fireFlowBusy || critBusy || dsBusy;
+		// **ONE ANALYSIS AT A TIME.** Fire flow and criticality share the one run dialog and the one
+		// engine; while the other is running, this Run waits, and says why.
+		if (critBusy || dsBusy) { run.title = pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.'; }
 		run.addEventListener('click', function () {
 			Object.keys(boxes).forEach(function (k) { ask[k] = boxes[k].value; });
 			runFireFlowSweep();
@@ -58436,7 +58477,10 @@ var EngCalcs = EngCalcs || {};
 		}(host));
 		if (btn && btn.focus) { try { btn.focus({ preventScroll: true }); } catch (e) { btn.focus(); } }
 	}
-	function ffTable(parent, headings) {
+	// `sorter` is { state: {col, dir}, by: function (col) } for a table that is not fire flow's own
+	// (the criticality report); omitted, the headings sort the fire flow table as they always did.
+	function ffTable(parent, headings, sorter) {
+		var sortState = sorter ? sorter.state : ffSortState, sortBy = sorter ? sorter.by : ffSortBy;
 		// **THE WIDE TABLE SCROLLS SIDEWAYS INSIDE ITS OWN BOX**, so ten columns can never push the
 		// dialog's own edges off the screen (CLAUDE.md: wide content scrolls in its own container).
 		var wrap = ffEl('div', 'lpn-ff-tablewrap', null, parent),
@@ -58450,7 +58494,7 @@ var EngCalcs = EngCalcs || {};
 		// Zero flow from this hydrant? Zero flow in the system?"* The answer is the first, and a
 		// column heading that does not say so leaves the reader to pick.
 		headings.forEach(function (h, i) {
-			var text = h, tip = null, th, arrow, pc = EngCalcs.pageConfig || {}, on = ffSortState.col === i;
+			var text = h, tip = null, th, arrow, pc = EngCalcs.pageConfig || {}, on = sortState.col === i;
 			if (h && h.length === 2 && typeof h !== 'string') { text = h[0]; tip = h[1]; }
 			th = ffEl('th', 'lpn-ff-sortable', text, hr);
 			if (tip) { th.title = tip; }
@@ -58459,17 +58503,17 @@ var EngCalcs = EngCalcs || {};
 			arrow = document.createElement('button');
 			arrow.type = 'button';
 			arrow.className = 'lpn-pane-sortarrow lpn-ff-sortarrow' + (on ? ' lpn-pane-sortarrow-active' : '') +
-				(on && ffSortState.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
+				(on && sortState.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
 			arrow.title = on ? (pc.lpn_pane_sortarrow_tip || 'Reverse the sort') : (pc.lpn_pane_sort_asc || 'Sort ascending');
 			arrow.setAttribute('aria-label', arrow.title + ': ' + text);
 			arrow._lpnFfSortCol = i;
 			arrow.addEventListener('click', function (ev) {
 				if (ev && ev.stopPropagation) { ev.stopPropagation(); }
-				ffSortBy(i);
+				sortBy(i);
 			});
 			th.appendChild(arrow);
-			th.setAttribute('aria-sort', on ? (ffSortState.dir < 0 ? 'descending' : 'ascending') : 'none');
-			th.addEventListener('click', function () { ffSortBy(i); });
+			th.setAttribute('aria-sort', on ? (sortState.dir < 0 ? 'descending' : 'ascending') : 'none');
+			th.addEventListener('click', function () { sortBy(i); });
 		});
 		return ffEl('tbody', null, null, table);
 	}
@@ -58487,13 +58531,19 @@ var EngCalcs = EngCalcs || {};
 				(b.available === undefined ? -1 : b.available);
 		});
 	}
-	function ffMoreLine(parent, hidden) {
+	// `links`: the hidden rows are links (criticality, demand scaling's velocities), not junctions.
+	function ffMoreLine(parent, hidden, links) {
 		var pc = EngCalcs.pageConfig || {};
 		if (hidden <= 0) { return; }
 		// **ITS OWN KEY, NOT the Worst-effect cell's.** One string counted two different nouns
 		// (affected assets there, undisplayed junctions here), which a gendered language cannot
 		// agree with twice. Split 2026-09-02, Task 573 Wave 0.
-		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_rows_more || '{n} more junctions are not shown.')
+		// **{n} AFTER A COLON, SO NO PLURAL HAS TO AGREE WITH IT** -- "1 more junctions are not
+		// shown" was the sentence form's answer for one row. And a links noun of its own, since
+		// criticality's hidden rows were being counted as junctions.
+		ffEl('p', 'lpn-ff-note', (links
+			? (pc.lpn_ff_rows_more_links || 'Links not shown: {n}.')
+			: (pc.lpn_ff_rows_more || 'Junctions not shown: {n}.'))
 			.replace('{n}', String(hidden)), parent);
 	}
 	function rebuildFireFlowReport() {
@@ -58616,18 +58666,25 @@ var EngCalcs = EngCalcs || {};
 	// it is.
 	var ffRunUi = null;
 	function ffRunBoxEl() { return document.getElementById('lpn_ff_run_box'); }
-	function openFireFlowRunBox(total) {
+	// **SHARED WITH THE CRITICALITY RUN** (Tom, 2026-09-30), which is the same kind of act: a known
+	// number of cases, solved one at a time, stoppable. `opts` names the title, what Stop sets and
+	// the first paint; omitted, it is the fire flow run exactly as it always was.
+	function openFireFlowRunBox(total, opts) {
 		var pc = EngCalcs.pageConfig || {},
+			o = opts || {},
+			title = o.title || pc.lpn_ff_run_title || 'Fire flow run',
+			titleEl = document.getElementById('lpn_ffrun_title'),
 			box = ffRunBoxEl(), host, track, buttons, h, r, top;
 		if (!box) { return; }
 		host = document.getElementById('lpn_ff_run_body');
 		if (!host) { return; }
 		host.innerHTML = '';
+		if (titleEl) { titleEl.textContent = title; }
 		track = ffEl('div', 'lpn-ff-bar', null, host);
 		track.setAttribute('role', 'progressbar');
 		track.setAttribute('aria-valuemin', '0');
 		track.setAttribute('aria-valuemax', String(total));
-		track.setAttribute('aria-label', pc.lpn_ff_run_title || 'Fire flow run');
+		track.setAttribute('aria-label', title);
 		ffRunUi = {
 			total: total,
 			track: track,
@@ -58639,8 +58696,9 @@ var EngCalcs = EngCalcs || {};
 		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
 		ffRunUi.stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', buttons);
 		ffRunUi.stop.type = 'button';
-		ffRunUi.stop.addEventListener('click', function () { fireFlowStop = true; });
-		updateFireFlowRunBox(0, { pass: 0, fail: 0, design: 0, error: 0 }, { fire: 0, design: 0, clean: 0 });
+		ffRunUi.stop.addEventListener('click', o.onStop || function () { fireFlowStop = true; });
+		if (o.update) { o.update(0); }
+		else { updateFireFlowRunBox(0, { pass: 0, fail: 0, design: 0, error: 0 }, { fire: 0, design: 0, clean: 0 }); }
 		box.style.display = 'block';
 		// **RAISED HERE, AT OPEN, AND NOT WHERE IT IS WIRED** (Tom, 2026-09-02: *"Run box: still
 		// invisible"*, twice). The first attempt raised it inside wireFireFlowBox(), which runs once
@@ -58734,6 +58792,10 @@ var EngCalcs = EngCalcs || {};
 			tally,
 			before;
 		if (fireFlowBusy) { return; }
+		if (critBusy || dsBusy) {
+			setNotice(pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.');
+			return;
+		}
 		if (!junctions.length) {
 			setNotice(pc.lpn_ff_no_junctions || 'This project has no junctions yet, so there is nothing to test.');
 			return;
@@ -58757,8 +58819,9 @@ var EngCalcs = EngCalcs || {};
 				}
 			});
 			if (!ids.length) {
-				setNotice(pc.lpn_ff_no_selection ||
-					'No junctions are selected. Select junctions or select the All option.');
+				clearFireFlowRun(true);
+				analysisRefused(document.getElementById('lpn_ff_report'), pc.lpn_ff_no_selection ||
+					'No junctions are selected. Select junctions or choose All junctions.');
 				return;
 			}
 		} else {
@@ -58774,7 +58837,8 @@ var EngCalcs = EngCalcs || {};
 		if (ffDesignScope(ask.design) === 'selected') {
 			design = ffDesignSelectedSet(model);
 			if (!design.nodes.length && !design.links.length) {
-				setNotice(pc.lpn_ff_design_no_selection ||
+				clearFireFlowRun(true);
+				analysisRefused(document.getElementById('lpn_ff_report'), pc.lpn_ff_design_no_selection ||
 					'The design check scope is set to Selected, but no assets are selected. Select assets or select the All option.');
 				return;
 			}
@@ -58796,6 +58860,8 @@ var EngCalcs = EngCalcs || {};
 		fireFlowBusy = true;
 		fireFlowStop = false;
 		fireFlowRun = null;
+		if (critBoxIsOpen()) { buildCriticalityControls(); }
+		if (dsBoxIsOpen()) { buildDemandScaleControls(); }
 		tally = { pass: 0, fail: 0, design: 0, error: 0 };
 		refreshFireFlowMarks();
 		rebuildFireFlowReport();
@@ -58831,6 +58897,8 @@ var EngCalcs = EngCalcs || {};
 		}).then(function (set) {
 			fireFlowBusy = false;
 			fireFlowRun = set;
+			if (critBoxIsOpen()) { buildCriticalityControls(); }
+			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
 			fireFlowDocGuard = (JSON.stringify(doc) === before);
 			closeFireFlowRunBox();
 			refreshFireFlowMarks();
@@ -58839,6 +58907,8 @@ var EngCalcs = EngCalcs || {};
 			return set;
 		}, function (err) {
 			fireFlowBusy = false;
+			if (critBoxIsOpen()) { buildCriticalityControls(); }
+			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
 			closeFireFlowRunBox();
 			buildFireFlowControls();
 			setStatus(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
@@ -58893,6 +58963,788 @@ var EngCalcs = EngCalcs || {};
 		// aside is one they cannot see the map through.
 		run = document.getElementById('lpn_ff_run_box');
 		if (run) { makePanelDraggable(run, null); }
+	}
+
+	// ================================================================================================
+	// CRITICALITY ANALYSIS -- break each asset in turn and report what the system loses
+	// ================================================================================================
+	//
+	// Tom, 2026-09-30, reading about WaterGEMS: *"Criticality analysis: This sounds like a fun report
+	// to build. Break each asset and report."* The arithmetic is js/lpn-criticality.js. What is here
+	// is fire flow's sibling, on fire flow's own parts: the same box shell, the same scope idiom (All
+	// or Selected, picked before the run), the same run dialog with its bar and Stop, the same table
+	// with its go-to links, the same engine choice, and the same time step -- assembleModel() plus
+	// fireFlowAtFrame(), so what is broken is the network on screen.
+	//
+	// **THE MINIMUM PRESSURE IS FIRE FLOW'S "LOWEST PRESSURE ALLOWED ELSEWHERE", NOT A SECOND ONE.**
+	// Two boxes holding one fact about the utility would disagree the first time somebody edited one
+	// (the scenario comparison declined a threshold of its own for the same reason). The box here
+	// edits `fireFlowAsk.minPressure` itself, and its tip says so.
+	//
+	// **NO BOX MEMORY ACROSS PAGE LOADS YET.** The report boxes remember where they were left in
+	// localStorage; this one remembers only until the page is reloaded, so this feature stores
+	// nothing on a visitor's device. Adding the memory is a new `lpn_critbox` key and a line in
+	// dev/cookie-storage-inventory.md.
+	var critAsk = { scope: 'all', skipDeadEnds: false };
+	var critRun = null;
+	var critBusy = false;
+	var critStop = false;
+	var critSortState = { col: null, dir: 1 };
+	function critBoxEl() { return document.getElementById('lpn_crit_box'); }
+	function critBoxIsOpen() {
+		var box = critBoxEl();
+		return !!box && box.style.display !== 'none';
+	}
+	// The shared criterion, created on first use exactly as opening the fire flow box creates it.
+	function critFireFlowAsk() {
+		if (!fireFlowAsk && EngCalcs.lpnFireFlowDefaults) { fireFlowAsk = fireFlowDefaults(); }
+		return fireFlowAsk || { minPressure: '' };
+	}
+	function buildCriticalityControls() {
+		var pc = EngCalcs.pageConfig || {},
+			host = document.getElementById('lpn_crit_controls'),
+			scope, minP, skip, buttons, run, stop, engine;
+		if (!host) { return; }
+		host.innerHTML = '';
+		ffEl('p', 'lpn-ff-note', pc.lpn_crit_intro, host);
+		scope = ffSelect([
+			['all', pc.lpn_crit_scope_all || 'All links'],
+			['selected', pc.lpn_crit_scope_selected || 'Selected links']
+		], critAsk.scope);
+		scope.addEventListener('change', function () { critAsk.scope = scope.value; });
+		ffRow(host, pc.lpn_crit_scope || 'Links to break', pc.lpn_crit_scope_tip, scope, '');
+		skip = document.createElement('input');
+		skip.type = 'checkbox';
+		skip.checked = !!critAsk.skipDeadEnds;
+		skip.addEventListener('change', function () { critAsk.skipDeadEnds = skip.checked; });
+		ffRow(host, pc.lpn_crit_skipdead || 'Skip dead ends', pc.lpn_crit_skipdead_tip, skip, '');
+		minP = ffInput(critFireFlowAsk().minPressure);
+		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
+		ffRow(host, pc.lpn_crit_minpressure || 'Lowest pressure allowed', pc.lpn_crit_minpressure_tip,
+			minP, unitLabel('lpn_u_pressure'));
+		engine = engineFor(assembleModel());
+		ffEl('p', 'lpn-ff-note', engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native, host);
+		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
+		run = ffEl('button', 'lpn-ff-run', pc.lpn_ff_calculate || 'Run', buttons);
+		run.type = 'button';
+		run.disabled = critBusy || fireFlowBusy || dsBusy;
+		if (fireFlowBusy || dsBusy) { run.title = pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.'; }
+		run.addEventListener('click', function () {
+			critAsk.scope = scope.value;
+			critAsk.skipDeadEnds = skip.checked;
+			critFireFlowAsk().minPressure = minP.value;
+			runCriticality();
+		});
+		stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', buttons);
+		stop.type = 'button';
+		stop.disabled = !critBusy;
+		stop.addEventListener('click', function () { critStop = true; });
+		initTipsIn(host);
+	}
+	// A list of junction ids as go-to links: the first few, then how many more. The count is the
+	// cell's number; the links are where the reader goes next.
+	var CRIT_MAX_IDS = 5;
+	function critIdsCell(tr, ids) {
+		var pc = EngCalcs.pageConfig || {}, td = ffCell(tr, String(ids.length) + (ids.length ? ': ' : ''));
+		ids.slice(0, CRIT_MAX_IDS).forEach(function (id, i) {
+			if (i) { td.appendChild(document.createTextNode(', ')); }
+			ffGotoLink(td, 'node', id, labelPrefixFor('node', 'id') + id);
+		});
+		if (ids.length > CRIT_MAX_IDS) {
+			td.appendChild(document.createTextNode(' ' + (pc.lpn_ff_more || 'and {n} more affected')
+				.replace('{n}', String(ids.length - CRIT_MAX_IDS))));
+		}
+		return td;
+	}
+	function critSortKey(rec, col) {
+		switch (col) {
+		case 0: return rec.id;
+		case 1: return rec.unserved;
+		case 2: return rec.cutOff ? rec.cutOff.length : undefined;
+		case 3: return rec.below ? rec.below.length : undefined;
+		}
+		return undefined;
+	}
+	function critSorted(results) {
+		var base = EngCalcs.lpnCriticalityOrder(results), col = critSortState.col, dir = critSortState.dir;
+		if (col === null) { return base; }
+		return base.map(function (r, i) { return { r: r, i: i, k: critSortKey(r, col) }; }).sort(function (a, b) {
+			var ab = ffBlank(a.k), bb = ffBlank(b.k), c;
+			if (ab || bb) { return ab === bb ? a.i - b.i : (ab ? 1 : -1); }
+			c = (typeof a.k === 'number' && typeof b.k === 'number') ? a.k - b.k
+				: String(a.k).localeCompare(String(b.k), undefined, { numeric: true });
+			return c ? dir * c : a.i - b.i;
+		}).map(function (x) { return x.r; });
+	}
+	function critSortBy(col) {
+		critSortState = { col: col, dir: critSortState.col === col ? -critSortState.dir : 1 };
+		rebuildCriticalityReport();
+	}
+	function rebuildCriticalityReport() {
+		var pc = EngCalcs.pageConfig || {},
+			host = document.getElementById('lpn_crit_report'),
+			set = critRun, body, sorted, shown, hit;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (!set) { return; }
+		if (set.stopped) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_stopped || 'Stopped after {done} of {total} assets. The results below are the ones already finished.')
+				.replace('{done}', String(set.processed)).replace('{total}', String(set.requested)), host);
+		}
+		// Counted as the sentence reads: demand actually left unserved, or a junction actually below
+		// the minimum. A link that cuts off only zero-demand junctions shows them in its row, but it
+		// cut off no demand, so it is not counted here.
+		hit = set.results.filter(function (r) { return r.unserved > 0 || (r.below && r.below.length > 0); }).length;
+		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || '{n} of {total} assets leave demand unserved or drop a junction below {pressure}.')
+			.replace('{n}', String(hit)).replace('{total}', String(set.results.length))
+			.replace('{pressure}', ffQty(set.minPressure, 'lpn_u_pressure')), host);
+		if (set.skippedDeadEnds && set.skippedDeadEnds.length) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_skipped_dead || 'Dead-end links skipped: {n}. Each one cuts off everything beyond it.')
+				.replace('{n}', String(set.skippedDeadEnds.length)), host);
+		}
+		if (set.baselineBelow) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_baseline_below || 'Junctions already below it with nothing broken: {n}. They are not counted.')
+				.replace('{n}', String(set.baselineBelow)), host);
+		}
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
+			.replace('{solves}', String(set.solves)), host);
+		sorted = critSorted(set.results);
+		shown = sorted.slice(0, FF_MAX_ROWS);
+		body = ffTable(host, [
+			pc.lpn_crit_col_asset || 'Asset',
+			pc.lpn_crit_col_unserved || 'Demand not served',
+			pc.lpn_crit_col_cutoff || 'Junctions cut off',
+			pc.lpn_crit_col_below || 'Junctions below minimum'
+		], { state: critSortState, by: critSortBy });
+		// Four columns, not ten: the headings wrap between words, never inside one (css/engcalcs.css).
+		if (body.parentNode && body.parentNode.classList) { body.parentNode.classList.add('lpn-crit-table'); }
+		shown.forEach(function (rec) {
+			// Fire flow's own row tints, by the same four tiers (js/lpn-criticality.js), so a red
+			// row means "the system failed to deliver" in both reports. 'none' is untinted, as a pass.
+			var tr = ffEl('tr', 'lpn-ff-' + EngCalcs.lpnCriticalitySeverity(rec), null, body);
+			ffGotoLink(ffCell(tr, ''), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
+			ffCell(tr, typeof rec.unserved === 'number' ? ffQty(rec.unserved, 'lpn_u_flow') : FF_DASH);
+			if (rec.cutOff) { critIdsCell(tr, rec.cutOff); } else { ffCell(tr, FF_DASH); }
+			// **A CASE THAT DID NOT SOLVE IS A ROW SAYING SO, NEVER AN ABORT.** What was cut off is
+			// known without a solve and is still printed; only the pressures are missing, so the
+			// reason stands in the pressure column.
+			if (rec.below) { critIdsCell(tr, rec.below.map(function (b) { return b.id; })); }
+			else { ffCell(tr, ffReasonText(rec)); }
+		});
+		ffMoreLine(host, sorted.length - shown.length, true);
+	}
+	function updateCriticalityRunBox(done) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!ffRunUi) { return; }
+		ffRunUi.fill.style.width = (ffRunUi.total > 0 ? Math.round(1000 * done / ffRunUi.total) / 10 : 0) + '%';
+		ffRunUi.track.setAttribute('aria-valuenow', String(done));
+		ffRunUi.count.textContent = (pc.lpn_crit_working || 'Working: {done} of {total} assets.')
+			.replace('{done}', String(done)).replace('{total}', String(ffRunUi.total));
+	}
+	// The links to break. All: every link in the model this run solves -- pipes, pumps and valves,
+	// because Tom asked to "break each asset" -- so an inactive one (already out) is not broken
+	// twice. Selected: every selected link, and whatever else is selected is counted and said.
+	function criticalityLinks(model) {
+		var inModel = {}, ids = [], skipped = 0;
+		model.links.forEach(function (l) { inModel[l.id] = l; });
+		if (critAsk.scope !== 'selected') {
+			return { ids: model.links.map(function (l) { return l.id; }), skipped: 0 };
+		}
+		selections.forEach(function (s) {
+			if (s.kind === 'link' && inModel[s.id] && ids.indexOf(s.id) < 0) { ids.push(s.id); } else { skipped++; }
+		});
+		return { ids: ids, skipped: skipped };
+	}
+	function runCriticality() {
+		var pc = EngCalcs.pageConfig || {}, model, engine, pick, minPressure, before;
+		if (critBusy || !EngCalcs.lpnCriticalitySweep) { return Promise.resolve(null); }
+		if (fireFlowBusy || dsBusy) {
+			setNotice(pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.');
+			return Promise.resolve(null);
+		}
+		model = assembleModel();
+		fireFlowAtFrame(model);
+		pick = criticalityLinks(model);
+		if (!pick.ids.length) {
+			clearCriticalityRun(true);
+			analysisRefused(document.getElementById('lpn_crit_report'), critAsk.scope === 'selected'
+				? (pc.lpn_crit_no_selection || 'No links are selected. Select links or choose All links.')
+				: (pc.lpn_crit_no_links || 'This project has no links yet, so there is nothing to break.'));
+			return Promise.resolve(null);
+		}
+		minPressure = ffValue(critFireFlowAsk().minPressure, 'lpn_u_pressure');
+		engine = engineFor(model);
+		before = JSON.stringify(doc);
+		critBusy = true;
+		critStop = false;
+		critRun = null;
+		rebuildCriticalityReport();
+		buildCriticalityControls();
+		if (ffBoxIsOpen()) { buildFireFlowControls(); }
+		if (dsBoxIsOpen()) { buildDemandScaleControls(); }
+		openFireFlowRunBox(pick.ids.length, {
+			title: pc.lpn_crit_title || 'Criticality analysis',
+			onStop: function () { critStop = true; },
+			update: updateCriticalityRunBox
+		});
+		if (pick.skipped) {
+			setNotice((pc.lpn_crit_skipped || '{n} selected elements are not links, so they were not broken.')
+				.replace('{n}', String(pick.skipped)));
+		}
+		return EngCalcs.lpnCriticalitySweep(model, {
+			solve: engine.solve,
+			links: pick.ids,
+			skipDeadEnds: !!critAsk.skipDeadEnds,
+			minPressure: minPressure > 0 ? minPressure : 0,
+			onProgress: function (p) { updateCriticalityRunBox(p.done); },
+			shouldStop: function () { return critStop; }
+		}).then(function (set) {
+			critBusy = false;
+			if (ffBoxIsOpen()) { buildFireFlowControls(); }
+			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
+			closeFireFlowRunBox();
+			critDocGuard = (JSON.stringify(doc) === before);
+			if (!set.ok) {
+				critRun = null;
+				setNotice(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
+			} else {
+				critRun = set;
+			}
+			rebuildCriticalityReport();
+			buildCriticalityControls();
+			return set;
+		}, function (err) {
+			critBusy = false;
+			if (ffBoxIsOpen()) { buildFireFlowControls(); }
+			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
+			closeFireFlowRunBox();
+			buildCriticalityControls();
+			setNotice(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
+			if (window.console && console.warn) { console.warn('criticality run failed:', err); }
+			return null;
+		});
+	}
+	// Read by the harness. Set by the run, never by a user action.
+	var critDocGuard = true;
+	// **A RESULT SET DESCRIBES THE NETWORK IT WAS RUN ON**, so it is cleared at the same moments fire
+	// flow's results are (both calls sit side by side at each one) -- and ONLY then. Fire flow's
+	// "Clear rings" is that box's own act and leaves this report standing.
+	function clearCriticalityRun(quiet) {
+		if (!critRun) { return; }
+		critRun = null;
+		if (critBoxIsOpen()) { rebuildCriticalityReport(); }
+		if (!quiet) {
+			setNotice((EngCalcs.pageConfig || {}).lpn_crit_stale ||
+				'The drawing changed, so the criticality results were cleared. Run it again.');
+		}
+	}
+	var critLayout = newBoxLayout();
+	function openCriticalityBox() {
+		var box = critBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		buildCriticalityControls();
+		rebuildCriticalityReport();
+		// Centred the first time, then where it was left -- for this page load only (see above).
+		placePanelForScreen(box, function () { placeBoxRemembered(box, critLayout); });
+		initTipsIn(box);
+	}
+	function closeCriticalityBox() {
+		hidePanel(critBoxEl());
+		if (critBusy) { critStop = true; }
+	}
+	function wireCriticalityBox() {
+		var box = critBoxEl(), x = document.getElementById('lpn_crit_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeCriticalityBox); }
+		makePanelDraggable(box, function (pos) {
+			if (smallScreen()) { return; }
+			critLayout.left = pos.left;
+			critLayout.top = pos.top;
+		});
+		addPanelResizeGrip(box);
+	}
+
+	// ================================================================================================
+	// DEMAND SCALING -- the demands multiplied on a copy, and the largest multiplier the system holds
+	// ================================================================================================
+	//
+	// Tom, 2026-09-30, on WaterGEMS's Active Demand Adjustments: *"This also sounds fun and easy to
+	// provide."* And 2026-10-01: *"This is absurdly simple, but let's do it ... we could do some
+	// cooler things like 'What demand scale can the system handle with this pressure limit?'"* The
+	// arithmetic is js/lpn-demandscale.js; this is the third sibling on fire flow's box shell, with
+	// fire flow's engine choice and fire flow's time step (assembleModel() plus fireFlowAtFrame()).
+	//
+	// **NOT THE SCENARIO'S DEMAND MULTIPLIER, AND IT NEVER WRITES ONE.** That one is data and rides in
+	// the project; this one is a question asked of the network on screen, on a copy, and lives for the
+	// page load. It multiplies on top of the scenario's, and the box's tip says so.
+	//
+	// **ONE INSTANT, THE ONE ON SCREEN**, for an extended-period project as for the siblings: its
+	// demands at that time, its tank levels and its link statuses from the run. A peak step chosen
+	// for the user would need a run to know the tank levels at it, and would be a second idea of
+	// "the condition tested" beside fire flow's and criticality's. Move the clock to the peak first.
+	//
+	// **THE MINIMUM PRESSURE IS FIRE FLOW'S "LOWEST PRESSURE ALLOWED ELSEWHERE"**, shared exactly as
+	// criticality shares it: one fact about the utility, one box value.
+	//
+	// **NO BOX MEMORY ACROSS PAGE LOADS**, like criticality: nothing is stored on a visitor's device.
+	var dsAsk = { scope: 'all', multiplier: '2' };
+	var dsRun = null;      // the last Run at a scale, or null
+	var dsSearch = null;   // the last search, or null
+	// **A REFUSED PRESS IS ANSWERED IN THE BOX, WHERE THE PRESS WAS** (Tom, 2026-10-02: *"It appears
+	// that Find doesn't respect "Selected junctions"."*). "Selected junctions" with nothing selected
+	// used to refuse on the map's notice line alone, and leave the last answer -- an All answer --
+	// standing under the button, where it read as Find having ignored the scope. Now the refusal
+	// takes that part's place: { which: 'scale' | 'search', text }, or null.
+	var dsRefused = null;
+	var dsBusy = false;
+	var dsStop = false;
+	var DS_ROWS = 10;
+	function dsBoxEl() { return document.getElementById('lpn_ds_box'); }
+	function dsBoxIsOpen() {
+		var box = dsBoxEl();
+		return !!box && box.style.display !== 'none';
+	}
+	// A multiplier as a person reads it: to the search's own step, never more.
+	function dsMult(m) { return String(+(+m).toFixed(2)); }
+	function buildDemandScaleControls() {
+		var pc = EngCalcs.pageConfig || {},
+			host = document.getElementById('lpn_ds_controls'),
+			D = EngCalcs.lpnDemandScaleDefaults || { max: 20, step: 0.01 },
+			scope, minP, mult, buttons, run, find, stop, engine, other;
+		if (!host) { return; }
+		host.innerHTML = '';
+		ffEl('p', 'lpn-ff-note', pc.lpn_ds_intro, host);
+		scope = ffSelect([
+			['all', pc.lpn_ds_scope_all || 'All junctions'],
+			['selected', pc.lpn_ds_scope_selected || 'Selected junctions']
+		], dsAsk.scope);
+		scope.addEventListener('change', function () { dsAsk.scope = scope.value; buildDemandScaleControls(); });
+		ffRow(host, pc.lpn_ds_scope || 'Junctions to scale', pc.lpn_ds_scope_tip, scope, '');
+		minP = ffInput(critFireFlowAsk().minPressure);
+		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
+		ffRow(host, pc.lpn_ds_minpressure || 'Lowest pressure allowed', pc.lpn_ds_minpressure_tip,
+			minP, unitLabel('lpn_u_pressure'));
+		engine = engineFor(assembleModel());
+		ffEl('p', 'lpn-ff-note', engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native, host);
+		if (EngCalcs.lpnTimeIsExtended && EngCalcs.lpnTimeIsExtended(doc.times)) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_ds_eps_note, host);
+		}
+		other = fireFlowBusy || critBusy;
+		function take() {
+			dsAsk.scope = scope.value;
+			dsAsk.multiplier = mult.value;
+			critFireFlowAsk().minPressure = minP.value;
+		}
+
+		// 1. At a scale.
+		ffEl('div', 'lpn-ff-head', pc.lpn_ds_head_scale || 'Scale the demands', host);
+		mult = ffInput(dsAsk.multiplier);
+		mult.addEventListener('change', function () { dsAsk.multiplier = mult.value; });
+		ffRow(host, pc.lpn_ds_multiplier || 'Demand scale', pc.lpn_ds_multiplier_tip, mult, '');
+		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
+		run = ffEl('button', 'lpn-ff-run', pc.lpn_ds_run || 'Run', buttons);
+		run.type = 'button';
+		run.disabled = dsBusy || other;
+		if (other) { run.title = pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.'; }
+		run.addEventListener('click', function () { take(); runDemandScale(); });
+		ffEl('div', 'lpn-ds-result', null, host).setAttribute('data-ds', 'scale');
+
+		// 2. The largest scale that holds the limit.
+		// Tom, 2026-10-03: under Selected junctions the question is the selection's.
+		ffEl('div', 'lpn-ff-head', dsAsk.scope === 'selected'
+			? (pc.lpn_ds_head_search_selected || 'What demand scale can these junctions handle?')
+			: (pc.lpn_ds_head_search || 'What demand scale can the system handle?'), host);
+		ffEl('p', 'lpn-ff-note', (dsAsk.scope === 'selected'
+			? (pc.lpn_ds_search_note_selected ||
+				'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.')
+			: (pc.lpn_ds_search_note ||
+				'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.'))
+			.replace('{max}', dsMult(D.max)).replace('{step}', String(D.step)), host);
+		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
+		find = ffEl('button', 'lpn-ff-run', pc.lpn_ds_find || 'Find', buttons);
+		find.type = 'button';
+		find.disabled = dsBusy || other;
+		if (other) { find.title = run.title; }
+		find.addEventListener('click', function () { take(); runDemandScaleSearch(); });
+		stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', buttons);
+		stop.type = 'button';
+		stop.disabled = !dsBusy;
+		stop.addEventListener('click', function () { dsStop = true; });
+		ffEl('div', 'lpn-ds-result', null, host).setAttribute('data-ds', 'search');
+		initTipsIn(host);
+		rebuildDemandScaleReport();
+	}
+	// Where each answer goes: directly under the part of the box that asked for it, so the Find
+	// answer is beside the Find button and not under the Run tables. Rebuilt with the controls;
+	// `#lpn_ds_report` is only the fallback for a page without them.
+	function dsReportHost(which) {
+		var c = document.getElementById('lpn_ds_controls'), found = null;
+		(function walk(n) {
+			Array.prototype.slice.call((n && n.children) || []).forEach(function (k) {
+				if (found) { return; }
+				if (k.getAttribute && k.getAttribute('data-ds') === which) { found = k; } else { walk(k); }
+			});
+		}(c));
+		return found || document.getElementById('lpn_ds_report');
+	}
+	// **AN ANSWER THAT ARRIVES BELOW THE FOLD IS BROUGHT INTO VIEW** (Perry, 2026-10-01: on a
+	// 390 x 844 phone the Find verdict landed off screen). The nearest scroll, so on a desktop where
+	// it is already visible nothing moves.
+	function dsScrollTo(which) {
+		var h = dsReportHost(which), first = h && h.firstChild;
+		if (first && first.scrollIntoView) {
+			try { first.scrollIntoView({ block: 'nearest' }); } catch (e) { first.scrollIntoView(false); }
+		}
+	}
+	// **WHICH INSTANT A RESULT DESCRIBES** (Perry's pre-review, 2026-10-01: on Net3 a search made
+	// at 0:00 still read 0.51 with the clock at 6:00, where the truth was 3.10). On an extended-period
+	// project every result names its time step, and once the clock moves away the result says so
+	// rather than passing for the moment on screen. It is not cleared: the siblings keep theirs
+	// across a clock move too, and a number with its time beside it is still a true number.
+	function dsExtended() { return !!(EngCalcs.lpnTimeIsExtended && EngCalcs.lpnTimeIsExtended(doc.times)); }
+	function dsNow() { return modelTimeSeconds(); }
+	function dsTimeText(t) { return EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(t) : String(t); }
+	function dsTimeLines(host, t) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!dsExtended() || typeof t !== 'number') { return; }
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_at_time || 'Time step: {time}.').replace('{time}', dsTimeText(t)), host);
+		if (dsNow() !== t) {
+			ffEl('p', 'lpn-ff-summary lpn-ds-stale', (pc.lpn_ds_time_moved ||
+				'⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.')
+				.replace('{time}', dsTimeText(t)).replace('{now}', dsTimeText(dsNow())), host);
+		}
+	}
+	var dsShownAt = null;
+	function demandScaleClockMoved() {
+		var now;
+		if (!(dsRun || dsSearch) || !dsBoxIsOpen()) { return; }
+		now = dsNow();
+		if (now === dsShownAt) { return; }
+		rebuildDemandScaleReport();
+	}
+	// A sentence with one go-to link in it: the template is split at `{id}`, so the id is a button
+	// and the words around it stay one translated string.
+	function dsSentence(parent, cls, tpl, group, id, values) {
+		var p = ffEl('p', cls, null, parent), parts, k;
+		for (k in values) {
+			if (Object.prototype.hasOwnProperty.call(values, k)) { tpl = tpl.split('{' + k + '}').join(values[k]); }
+		}
+		parts = tpl.split('{id}');
+		parts.forEach(function (s, i) {
+			if (i) { ffGotoLink(p, group, id, labelPrefixFor(group, 'id') + id); }
+			if (s) { p.appendChild(document.createTextNode(s)); }
+		});
+		return p;
+	}
+	// One probe of the search, in a sentence: the lowest junction and its pressure, or the reason the
+	// network gave no answer at that scale.
+	// **WHICH JUNCTIONS WERE SCALED, UNDER EVERY ANSWER THAT SCALED ONLY SOME** -- Find's as well as
+	// Run's. Find's verdict is one number, and "Every junction keeps 20 psi up to a demand scale of
+	// 20" with nothing beside it reads as every demand having been scaled (Tom, 2026-10-02).
+	function dsScopeLine(host, rec) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!rec || rec.scaledCount === undefined) { return; }
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_scaled_selected || 'Junctions scaled and checked: {n}.')
+			.replace('{n}', String(rec.scaledCount)), host);
+	}
+	// **UNSELECTED JUNCTIONS BELOW THE LIMIT ARE DISCLOSED, NEVER JUDGED** (Tom, 2026-10-03: "Unselected
+	// fails should be allowed and disclosed."). The verdict above is the selection's; this line says
+	// which other junctions the scaled demand leaves below the lowest pressure allowed.
+	function dsOutsideLine(host, list, m, minPressure) {
+		var pc = EngCalcs.pageConfig || {}, p, parts;
+		if (!list || !list.length) { return; }
+		p = ffEl('p', 'lpn-ff-note', null, host);
+		parts = (pc.lpn_ds_outside_below || 'At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.')
+			.replace('{m}', dsMult(m)).replace('{pressure}', ffQty(minPressure, 'lpn_u_pressure'))
+			.replace('{n}', String(list.length)).split('{ids}');
+		p.appendChild(document.createTextNode(parts[0]));
+		list.forEach(function (x, i) {
+			if (i) { p.appendChild(document.createTextNode(', ')); }
+			ffGotoLink(p, 'node', x.id, labelPrefixFor('node', 'id') + x.id);
+		});
+		if (parts[1]) { p.appendChild(document.createTextNode(parts[1])); }
+	}
+	function dsProbeLine(host, rec) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!rec) { return; }
+		if (!rec.ok) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ds_nosolve_at || 'At a demand scale of {m}, the network gave no answer. {reason}')
+				.replace('{m}', dsMult(rec.multiplier)).replace('{reason}', ffReasonText(rec)), host);
+			return;
+		}
+		if (!rec.lowest) { return; }
+		dsSentence(host, 'lpn-ff-note', pc.lpn_ds_lowest_at || 'At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.',
+			'node', rec.lowest.id, { m: dsMult(rec.multiplier), pressure: ffQty(rec.lowest.pressure, 'lpn_u_pressure') });
+	}
+	function rebuildDemandScaleReport() {
+		var pc = EngCalcs.pageConfig || {},
+			host = document.getElementById('lpn_ds_report'),
+			O = EngCalcs.lpnDemandScaleOutcomes || {},
+			set, s, body, pressure, verdict;
+		if (!host) { return; }
+		host.innerHTML = '';
+		['scale', 'search'].forEach(function (w) { var h = dsReportHost(w); if (h) { h.innerHTML = ''; } });
+		dsShownAt = dsNow();
+		if (dsRefused) { ffEl('p', 'lpn-ff-summary', dsRefused.text, dsReportHost(dsRefused.which)); }
+		s = dsSearch;
+		// **NO HEADING OF ITS OWN.** Each answer sits in its own part of the box, directly under
+		// that part's heading (dsReportHost()), so a second copy of the heading would only repeat it.
+		if (s) {
+			host = dsReportHost('search');
+			pressure = ffQty(s.minPressure, 'lpn_u_pressure');
+			if (s.stopped) {
+				ffEl('p', 'lpn-ff-summary', pc.lpn_ds_search_stopped || 'The search was stopped before it found an answer.', host);
+			} else if (s.outcome === O.HOLDS_TO_MAX) {
+				verdict = pc.lpn_ds_holds_max || '✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.';
+				ffEl('p', 'lpn-ff-summary', verdict.replace('{pressure}', pressure).replace('{max}', dsMult(s.max)), host);
+				dsProbeLine(host, s.holding);
+			} else if (s.outcome === O.BELOW_AT_ZERO) {
+				ffEl('p', 'lpn-ff-summary', (pc.lpn_ds_below_zero || '⚠ At least one junction is below {pressure} even with the scaled demands at zero.')
+					.replace('{pressure}', pressure), host);
+				dsProbeLine(host, s.failing);
+			} else {
+				verdict = s.belowAtOne
+					? (pc.lpn_ds_found_below || '⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.')
+					: (pc.lpn_ds_found || '✓ Every junction keeps {pressure} up to a demand scale of {m}.');
+				ffEl('p', 'lpn-ff-summary', verdict.replace('{pressure}', pressure).replace('{m}', dsMult(s.multiplier)), host);
+				dsProbeLine(host, s.holding);
+				dsProbeLine(host, s.failing);
+			}
+			dsTimeLines(host, s.time);
+			dsScopeLine(host, s);
+			if (s.holding) { dsOutsideLine(host, s.holding.outside, s.holding.multiplier, s.minPressure); }
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
+				.replace('{solves}', String(s.solves)), host);
+		}
+		set = dsRun;
+		if (!set) { return; }
+		host = dsReportHost('scale');
+		if (!set.ok) {
+			ffEl('p', 'lpn-ff-summary', (pc.lpn_ds_nosolve_at || 'At a demand scale of {m}, the network gave no answer. {reason}')
+				.replace('{m}', dsMult(set.multiplier)).replace('{reason}', ffReasonText(set)), host);
+			dsTimeLines(host, set.time);
+			return;
+		}
+		pressure = ffQty(set.minPressure, 'lpn_u_pressure');
+		verdict = set.below.length
+			? (pc.lpn_ds_scale_below || '⚠ At a demand scale of {m}, junctions below {pressure}: {n}.')
+				.replace('{n}', String(set.below.length))
+			: (pc.lpn_ds_scale_ok || '✓ At a demand scale of {m}, every junction keeps {pressure}.');
+		ffEl('p', 'lpn-ff-summary', verdict.replace('{m}', dsMult(set.multiplier)).replace('{pressure}', pressure), host);
+		dsTimeLines(host, set.time);
+		dsScopeLine(host, set);
+		dsOutsideLine(host, set.outside, set.multiplier, set.minPressure);
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
+			.replace('{solves}', String(set.solves)), host);
+		// THE TWO TABLES ARE THE TWO READINGS A DESIGNER TAKES OF A HEAVIER DAY: where the pressure
+		// is lowest, and where the water moves fastest. The worst ten of each, worst first, with the
+		// same element unscaled beside it. A heading re-sorts those ten and never chooses another ten:
+		// which rows are here is the answer, and only their order is the reader's.
+		ffEl('div', 'lpn-ff-head', pc.lpn_ds_head_lowest || 'Lowest pressures', host);
+		body = ffTable(host, [
+			pc.lpn_ff_col_junction || 'Junction',
+			[pc.lpn_ds_col_scaled || 'Scaled', pc.lpn_ds_col_scaled_tip],
+			[pc.lpn_ds_col_unscaled || 'Unscaled', pc.lpn_ds_col_unscaled_tip]
+		], { state: dsSortState.p, by: function (col) { dsSortBy('p', col); } });
+		dsSortRows(set.pressures.slice(0, DS_ROWS), dsSortState.p, 'pressure').forEach(function (x) {
+			var tr = ffEl('tr', x.pressure < set.minPressure ? 'lpn-crit-impact' : null, null, body);
+			ffGotoLink(ffCell(tr, ''), 'node', x.id, labelPrefixFor('node', 'id') + x.id);
+			ffCell(tr, ffMaybeQty(x.pressure, 'lpn_u_pressure'));
+			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_pressure'));
+		});
+		ffMoreLine(host, set.pressures.length - Math.min(DS_ROWS, set.pressures.length));
+		ffEl('div', 'lpn-ff-head', pc.lpn_ds_head_velocity || 'Highest velocities', host);
+		body = ffTable(host, [
+			pc.lpn_ds_col_link || 'Link',
+			[pc.lpn_ds_col_scaled || 'Scaled', pc.lpn_ds_col_scaled_tip],
+			[pc.lpn_ds_col_unscaled || 'Unscaled', pc.lpn_ds_col_unscaled_tip]
+		], { state: dsSortState.v, by: function (col) { dsSortBy('v', col); } });
+		dsSortRows(set.velocities.slice(0, DS_ROWS), dsSortState.v, 'velocity').forEach(function (x) {
+			var tr = ffEl('tr', null, null, body);
+			ffGotoLink(ffCell(tr, ''), 'link', x.id, labelPrefixFor('link', 'id') + x.id);
+			ffCell(tr, ffMaybeQty(x.velocity, 'lpn_u_velocity'));
+			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_velocity'));
+		});
+		ffMoreLine(host, set.velocities.length - Math.min(DS_ROWS, set.velocities.length), true);
+	}
+	// The two tables' sort, fire flow's rule: the same column flips, a new one starts ascending, and
+	// `col: null` is the worst-first order the run gave.
+	var dsSortState = { p: { col: null, dir: 1 }, v: { col: null, dir: 1 } };
+	function dsSortBy(which, col) {
+		var st = dsSortState[which];
+		dsSortState[which] = { col: col, dir: st.col === col ? -st.dir : 1 };
+		rebuildDemandScaleReport();
+	}
+	function dsSortRows(list, st, field) {
+		if (st.col === null) { return list; }
+		return list.map(function (r, i) { return { r: r, i: i }; }).sort(function (a, b) {
+			var ka = st.col === 0 ? a.r.id : (st.col === 1 ? a.r[field] : a.r.unscaled),
+				kb = st.col === 0 ? b.r.id : (st.col === 1 ? b.r[field] : b.r.unscaled),
+				ab = ffBlank(ka), bb = ffBlank(kb), c;
+			if (ab || bb) { return ab === bb ? a.i - b.i : (ab ? 1 : -1); }
+			c = (typeof ka === 'number' && typeof kb === 'number') ? ka - kb
+				: String(ka).localeCompare(String(kb), undefined, { numeric: true });
+			return c ? st.dir * c : a.i - b.i;
+		}).map(function (x) { return x.r; });
+	}
+	// The case both buttons solve: the network on screen, and which junctions' demands are scaled.
+	// Null `ids` scales every junction. Says so and returns null where there is nothing to scale,
+	// and the refusal replaces that part's last answer (`which`), which no longer answers the
+	// question now on screen. See dsRefused.
+	function demandScaleCase(which) {
+		var pc = EngCalcs.pageConfig || {}, model, ids = null, isJ = {}, skipped = 0;
+		function refuse(text) {
+			setNotice(text);
+			dsRefused = { which: which, text: text };
+			if (which === 'scale') { dsRun = null; } else { dsSearch = null; }
+			if (dsBoxIsOpen()) { rebuildDemandScaleReport(); }
+			return null;
+		}
+		if (dsRefused && dsRefused.which === which) { dsRefused = null; }
+		model = assembleModel();
+		fireFlowAtFrame(model);
+		model.nodes.forEach(function (n) { if (n.type === 'junction') { isJ[n.id] = true; } });
+		if (!Object.keys(isJ).length) {
+			return refuse(pc.lpn_ds_no_junctions || 'This project has no junctions yet, so there are no demands to scale.');
+		}
+		if (dsAsk.scope === 'selected') {
+			ids = [];
+			selections.forEach(function (s) {
+				if (s.kind === 'node' && isJ[s.id] && ids.indexOf(s.id) < 0) { ids.push(s.id); } else { skipped++; }
+			});
+			if (!ids.length) {
+				return refuse(pc.lpn_ds_no_selection || 'No junctions are selected. Select junctions or choose All junctions.');
+			}
+			if (skipped) {
+				setNotice((pc.lpn_ds_skipped || 'Selected elements that are not junctions, left as they are: {n}.')
+					.replace('{n}', String(skipped)));
+			}
+		}
+		return { model: model, ids: ids, engine: engineFor(model), time: dsNow() };
+	}
+	function dsBegin() {
+		dsBusy = true;
+		dsStop = false;
+		buildDemandScaleControls();
+		if (ffBoxIsOpen()) { buildFireFlowControls(); }
+		if (critBoxIsOpen()) { buildCriticalityControls(); }
+	}
+	function dsEnd(before) {
+		dsBusy = false;
+		dsDocGuard = (JSON.stringify(doc) === before);
+		if (ffBoxIsOpen()) { buildFireFlowControls(); }
+		if (critBoxIsOpen()) { buildCriticalityControls(); }
+		rebuildDemandScaleReport();
+		buildDemandScaleControls();
+	}
+	function dsFailed(before, err) {
+		dsEnd(before);
+		setNotice((EngCalcs.pageConfig || {}).lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
+		if (window.console && console.warn) { console.warn('demand scaling failed:', err); }
+		return null;
+	}
+	function dsBusyElsewhere() {
+		if (!(fireFlowBusy || critBusy)) { return false; }
+		setNotice((EngCalcs.pageConfig || {}).lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.');
+		return true;
+	}
+	function runDemandScale() {
+		var pc = EngCalcs.pageConfig || {}, c, m, minPressure, before;
+		if (dsBusy || !EngCalcs.lpnDemandScaleRun || dsBusyElsewhere()) { return Promise.resolve(null); }
+		m = ffValue(dsAsk.multiplier, null);
+		if (!(m >= 0)) {
+			setNotice(pc.lpn_ds_bad_multiplier || 'Type a demand scale of zero or more, such as 1.5.');
+			return Promise.resolve(null);
+		}
+		c = demandScaleCase('scale');
+		if (!c) { return Promise.resolve(null); }
+		minPressure = ffValue(critFireFlowAsk().minPressure, 'lpn_u_pressure');
+		before = JSON.stringify(doc);
+		dsRun = null;
+		dsBegin();
+		return EngCalcs.lpnDemandScaleRun(c.model, {
+			solve: c.engine.solve,
+			multiplier: m,
+			junctions: c.ids,
+			minPressure: minPressure > 0 ? minPressure : 0
+		}).then(function (set) {
+			if (c.ids) { set.scaledCount = c.ids.length; }
+			set.time = c.time;
+			dsRun = set;
+			dsEnd(before);
+			dsScrollTo('scale');
+			return set;
+		}, function (err) { return dsFailed(before, err); });
+	}
+	function runDemandScaleSearch() {
+		var c, minPressure, before;
+		if (dsBusy || !EngCalcs.lpnDemandScaleSearch || dsBusyElsewhere()) { return Promise.resolve(null); }
+		c = demandScaleCase('search');
+		if (!c) { return Promise.resolve(null); }
+		minPressure = ffValue(critFireFlowAsk().minPressure, 'lpn_u_pressure');
+		before = JSON.stringify(doc);
+		dsSearch = null;
+		dsBegin();
+		return EngCalcs.lpnDemandScaleSearch(c.model, {
+			solve: c.engine.solve,
+			junctions: c.ids,
+			minPressure: minPressure > 0 ? minPressure : 0,
+			shouldStop: function () { return dsStop; }
+		}).then(function (s) {
+			if (c.ids) { s.scaledCount = c.ids.length; }
+			s.time = c.time;
+			dsSearch = s;
+			dsEnd(before);
+			dsScrollTo('search');
+			return s;
+		}, function (err) { return dsFailed(before, err); });
+	}
+	// Read by the harness. Set by a run, never by a user action.
+	var dsDocGuard = true;
+	// Cleared at the moments the siblings' results are, and only then.
+	function clearDemandScaleRun(quiet) {
+		if (dsRefused) {
+			dsRefused = null;
+			if (!dsRun && !dsSearch && dsBoxIsOpen()) { rebuildDemandScaleReport(); }
+		}
+		if (!dsRun && !dsSearch) { return; }
+		dsRun = null;
+		dsSearch = null;
+		if (dsBoxIsOpen()) { rebuildDemandScaleReport(); }
+		if (!quiet) {
+			setNotice((EngCalcs.pageConfig || {}).lpn_ds_stale ||
+				'The drawing changed, so the demand scaling results were cleared. Run it again.');
+		}
+	}
+	var dsLayout = newBoxLayout();
+	function openDemandScaleBox() {
+		var box = dsBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		buildDemandScaleControls();
+		rebuildDemandScaleReport();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, dsLayout); });
+		initTipsIn(box);
+	}
+	function closeDemandScaleBox() {
+		hidePanel(dsBoxEl());
+		if (dsBusy) { dsStop = true; }
+	}
+	function wireDemandScaleBox() {
+		var box = dsBoxEl(), x = document.getElementById('lpn_ds_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeDemandScaleBox); }
+		makePanelDraggable(box, function (pos) {
+			if (smallScreen()) { return; }
+			dsLayout.left = pos.left;
+			dsLayout.top = pos.top;
+		});
+		addPanelResizeGrip(box);
 	}
 
 	// ================================================================================================
@@ -60425,6 +61277,9 @@ var EngCalcs = EngCalcs || {};
 
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
+		// The demand scaling report names the time step it was computed at, and says when the clock
+		// has left it; every frame the transport shows arrives here, so this is where it re-reads.
+		demandScaleClockMoved();
 		// A solve landing here never touches the view -- see the note at the end of zoomExtent()
 		// (Tom, 2026-09-25: results arriving after a Zoom to fit leave it exactly where it was).
 		if (!result.ok) {
@@ -60800,6 +61655,8 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function scheduleArrivalSolve() {
 		clearFireFlowRun(false);
+		clearCriticalityRun(false);
+		clearDemandScaleRun(false);
 		if (solveTimer) { clearTimeout(solveTimer); }
 		solveTimer = null;
 		if (settings.autoRun === false) {

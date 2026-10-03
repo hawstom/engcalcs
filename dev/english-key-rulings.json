@@ -5385,6 +5385,11 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
+        },
+        "lpn_ff_rows_more": {
+            "on": "Junctions not shown: {n}.",
+            "ruled": "2026-10-03",
+            "answer": "Approved."
         }
     }
 }

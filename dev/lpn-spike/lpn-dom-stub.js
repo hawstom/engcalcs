@@ -468,6 +468,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // 2026-08-30). Absent from this list, openFireFlowRunBox() returns before it builds anything and
   // a sweep runs with no progress on screen at all -- which is exactly the state it exists to end.
   'lpn_ff_run_box', 'lpn_ff_run_body',
+  // The criticality box (Tom, 2026-09-30), and the run dialog's title, which that run retitles.
+  'lpn_crit_box', 'lpn_crit_close', 'lpn_crit_controls', 'lpn_crit_report', 'lpn_ffrun_title',
+  // The demand scaling box (Task 754), the third sibling on the same shell.
+  'lpn_ds_box', 'lpn_ds_close', 'lpn_ds_controls', 'lpn_ds_report',
   // The pump energy report box (Task 566). Absent from this list, rebuildEnergyReport() returns at
   // its first line and the report is invisible to every harness.
   'lpn_energy_box', 'lpn_energy_close', 'lpn_energy_report',
@@ -1034,6 +1038,9 @@ require(ROOT + 'js/lpn-contour.js');
 // looped-network.js falls through its `EngCalcs.lpnFireFlow*` guards and a harness would pass on a
 // feature that had quietly turned itself off.
 Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-fireflow.js'));
+// Criticality analysis, for the same reason.
+Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-criticality.js'));
+Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-demandscale.js'));
 // The [RULES] grammar (ROADMAP Task 248.03). In the SHARED stub rather than per-harness, because
 // looped-network.js's modelRules() reaches it on EVERY model assembly -- so a harness that merely
 // solves a document holding rules would otherwise send the engine nothing and pass on a page the

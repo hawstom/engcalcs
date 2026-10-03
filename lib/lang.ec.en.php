@@ -3873,8 +3873,14 @@ $ec_lang_syn['lpn_labels_priority_node_tip']='more like neighboring nodes = nume
 $ec_lang_syn['lpn_find_op_gt']='greater than, more than, exceeding | avoid: spatially above, higher on the map';
 $ec_lang_syn['lpn_find_op_lt']='less than | avoid: spatially below, lower on the map';
 // Tom, 2026-09-30, ruling sprint 2026-09-30-golf item 1: _syn = "All junctions" / "Selected junctions".
-$ec_lang_syn['lpn_ff_all']='All junctions | a pull-down option under Junctions to test; agrees with junctions, plural. The Design check pull-down reuses it, where it means all pipes and other junctions';
-$ec_lang_syn['lpn_ff_selected']='Selected junctions | a pull-down option under Junctions to test; agrees with junctions, plural. The Design check pull-down reuses it, where it means the selected pipes and junctions';
+$ec_lang_syn['lpn_ff_all']='All junctions | a pull-down option under Junctions to test; agrees with junctions, plural';
+$ec_lang_syn['lpn_ff_selected']='Selected junctions | a pull-down option under Junctions to test; agrees with junctions, plural';
+$ec_lang_syn['lpn_ds_head_search_selected']='What demand can the junctions you choose handle';
+$ec_lang_syn['lpn_ds_scope_tip']='Scale the demand at the junctions that you choose. Pressures are checked at the scaled demand.';
+$ec_lang_syn['lpn_ds_search_note_selected']='Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the junctions that you choose keep the given lowest pressure allowed.';
+$ec_lang_syn['lpn_ff_design_off']='No design check | a pull-down option under Design check (effect on system); avoid: switched off, power off';
+$ec_lang_syn['lpn_ff_design_all']='All other junctions and all pipes | a pull-down option under Design check (effect on system); agrees with pipes and junctions together, plural';
+$ec_lang_syn['lpn_ff_design_selected']='The selected junctions and their pipes | a pull-down option under Design check (effect on system); agrees with pipes and junctions together, plural';
 $ec_lang['lpn_fitting_exit']='Exit';
 // THE ONE ROW THAT IS NOT THE MANUAL\'S: a fitting the table does not carry, whose coefficient the
 // user states. Without it the picker would quietly refuse every fitting nobody could source.
@@ -4048,16 +4054,18 @@ $ec_lang['lpn_terrain_ids_more']='{ids}, and {n} more';
 // {flow} and {velocity} are quantities with their units, {pressure} a pressure with its unit,
 // {id} a junction or pipe name, and {done}, {total}, {n}, {pass}, {fail}, {design} and {solves}
 // are whole numbers. Every one is substituted, never concatenated.
+$ec_lang['lpn_analyze_menu']='Analyze';
+$ec_lang['lpn_analyze_menu_tip']='Analyses that run the network on a copy: fire flow at each junction, the loss of each pipe, pump, and valve, and the demands scaled up or down.';
 $ec_lang['lpn_ff_menu']='Fire flow analysis…';
 $ec_lang['lpn_ff_menu_tip']='Test junctions one at a time: how much can each deliver while still holding the residual pressure you set, and does drawing the required flow there push anything else out of limits?';
 $ec_lang['lpn_ff_title']='Fire flow analysis';
 $ec_lang['lpn_ff_intro']='Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.';
 $ec_lang['lpn_ff_scope']='Junctions to test';
 $ec_lang['lpn_ff_scope_tip']='Choose the set before you run. Testing every junction in a large system can take minutes.';
-$ec_lang['lpn_ff_all']='All';
-$ec_lang['lpn_ff_selected']='Selected';
+$ec_lang['lpn_ff_all']='All junctions';
+$ec_lang['lpn_ff_selected']='Selected junctions';
 $ec_lang['lpn_ff_no_junctions']='This project has no junctions yet, so there is nothing to test.';
-$ec_lang['lpn_ff_no_selection']='No junctions are selected. Select junctions or select the All option.';
+$ec_lang['lpn_ff_no_selection']='No junctions are selected. Select junctions or choose All junctions.';
 $ec_lang['lpn_ff_skipped']='{n} selected elements are not junctions, so they were not tested.';
 $ec_lang['lpn_ff_required']='Required fire flow';
 $ec_lang['lpn_ff_required_tip']='The flow your fire code or your fire authority requires at a hydrant. Each junction is tested against this number unless it carries a required fire flow of its own.';
@@ -4067,6 +4075,9 @@ $ec_lang['lpn_ff_residual']='Residual pressure to hold';
 $ec_lang['lpn_ff_residual_tip']='The pressure the junction must still hold while delivering the fire flow. AWWA M31 and NFPA 291 use 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Design check (effect on system)';
 $ec_lang['lpn_ff_design_tip']='A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation.';
+$ec_lang['lpn_ff_design_off']='None';
+$ec_lang['lpn_ff_design_all']='All';
+$ec_lang['lpn_ff_design_selected']='Selected';
 $ec_lang['lpn_ff_design_no_selection']='The design check scope is set to Selected, but no assets are selected. Select assets or select the All option.';
 $ec_lang['lpn_ff_minpressure']='Lowest pressure allowed elsewhere';
 $ec_lang['lpn_ff_minpressure_tip']='A junction that falls below this while another one is drawing its fire flow is reported as a design issue.';
@@ -4164,7 +4175,8 @@ $ec_lang['lpn_ff_more']='and {n} more affected';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
 // agree with one noun and would have been wrong at the other call site.
-$ec_lang['lpn_ff_rows_more']='{n} more junctions are not shown.';
+$ec_lang['lpn_ff_rows_more']='Junctions not shown: {n}.';
+$ec_lang['lpn_ff_rows_more_links']='Links not shown: {n}.';
 $ec_lang['lpn_ff_design_none']='Nothing in the chosen set went outside its limits while any junction drew its fire flow.';
 $ec_lang['lpn_ff_design_off_note']='The effect on the rest of the system was not checked in this run.';
 // **WHY IT IS SAID AND NEVER APPLIED, in Tom's words (2026-09-02), and the reason is the MODEL, not
@@ -4190,6 +4202,96 @@ $ec_lang['lpn_ff_err_converge']='The network did not converge.';
 $ec_lang['lpn_ff_err_solve']='The solver reported an error and gave no answer.';
 $ec_lang['lpn_ff_err_not_junction']='Not a junction';
 $ec_lang['lpn_ff_err_unknown']='No answer. The code reported was {code}.';
+
+// ---- Water > Criticality analysis (Tom, 2026-09-30) -------------------------------------------
+//
+// Break each asset in turn, on a copy, and report what the system loses. "Criticality analysis" is
+// the industry's term (WaterGEMS, InfoWater); EPANET has no such tool and no word for it. The run
+// dialog, Run, Stop, the engine sentence and the cost line are fire flow's own keys.
+//
+// {n}, {done} and {total} are whole numbers; {pressure} is a pressure with its unit.
+$ec_lang['lpn_crit_menu']='Criticality analysis…';
+$ec_lang['lpn_crit_menu_tip']='Take each pipe, pump, and valve out of the network in turn and see what the system loses.';
+$ec_lang['lpn_crit_title']='Criticality analysis';
+$ec_lang['lpn_crit_intro']='Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in your project is changed; the whole run is made on a copy.';
+$ec_lang['lpn_crit_scope']='Links to break';
+$ec_lang['lpn_crit_scope_tip']='All pipes, pumps, and valves, or only those selected on the map. Choose the set before you run.';
+$ec_lang['lpn_crit_scope_all']='All links';
+$ec_lang['lpn_crit_scope_selected']='Selected links';
+$ec_lang['lpn_crit_minpressure']='Lowest pressure allowed';
+$ec_lang['lpn_crit_minpressure_tip']='This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.';
+$ec_lang['lpn_crit_col_asset']='Asset';
+$ec_lang['lpn_crit_col_unserved']='Demand not served';
+$ec_lang['lpn_crit_col_cutoff']='Junctions cut off';
+$ec_lang['lpn_crit_col_below']='Junctions below minimum';
+$ec_lang['lpn_crit_summary']='{n} of {total} assets leave demand unserved or drop a junction below {pressure}.';
+$ec_lang['lpn_crit_baseline_below']='Junctions already below it with nothing broken: {n}. They are not counted.';
+$ec_lang['lpn_crit_working']='Working: {done} of {total} assets.';
+$ec_lang['lpn_crit_stopped']='Stopped after {done} of {total} assets. The results below are the ones already finished.';
+$ec_lang['lpn_crit_no_selection']='No links are selected. Select links or choose All links.';
+$ec_lang['lpn_crit_no_links']='This project has no links yet, so there is nothing to break.';
+$ec_lang['lpn_crit_busy']='Another analysis is running. Stop it, or wait for it to finish.';
+$ec_lang['lpn_crit_skipped']='{n} selected elements are not links, so they were not broken.';
+$ec_lang['lpn_crit_stale']='The drawing changed, so the criticality results were cleared. Run it again.';
+$ec_lang['lpn_crit_skipdead']='Skip dead ends';
+$ec_lang['lpn_crit_skipdead_tip']='A dead-end link is one whose removal cuts off junctions that can be reached only through it, with no reservoir or tank beyond. Its loss is everything beyond it, so it is not solved. The summary says how many were skipped.';
+$ec_lang['lpn_crit_skipped_dead']='Dead-end links skipped: {n}. Each one cuts off everything beyond it.';
+
+// ---- Water > Analyze > Demand scaling (ROADMAP Task 754) ----------------------------------------
+//
+// Tom, 2026-09-30 and 2026-10-01: the demands multiplied on a copy, like Fire flow, and "What demand
+// scale can the system handle with this pressure limit?" The run dialog's Stop, the engine sentence,
+// the cost line, the Junction heading and the solver's reasons are fire flow's own keys.
+//
+// {m} and {max} are demand scales printed as numbers (1.37); {step} is the search's tolerance
+// (0.01); {n} is a whole number, always after a colon so no plural has to agree with it; {time} and
+// {now} are elapsed times (6:00); {pressure} is a pressure with its unit; {id} becomes a link to the
+// junction on the map; {reason} is a whole sentence saying why the solver gave no answer.
+$ec_lang['lpn_ds_menu']='Demand scaling…';
+$ec_lang['lpn_ds_menu_tip']='Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.';
+$ec_lang['lpn_ds_title']='Demand scaling';
+$ec_lang['lpn_ds_intro']='The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.';
+$ec_lang['lpn_ds_scope']='Junctions to scale';
+$ec_lang['lpn_ds_scope_tip']='All junctions, or only those selected on the map. Pressures are checked at the scaled demand.';
+$ec_lang['lpn_ds_scope_all']='All junctions';
+$ec_lang['lpn_ds_scope_selected']='Selected junctions';
+$ec_lang['lpn_ds_minpressure']='Lowest pressure allowed';
+$ec_lang['lpn_ds_minpressure_tip']='This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.';
+$ec_lang['lpn_ds_eps_note']='Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.';
+$ec_lang['lpn_ds_head_scale']='Scale the demands';
+$ec_lang['lpn_ds_multiplier']='Demand scale';
+$ec_lang['lpn_ds_multiplier_tip']='The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario\'s own demand multiplier, which is already in the demands, and it is never saved in your project.';
+$ec_lang['lpn_ds_run']='Run';
+$ec_lang['lpn_ds_head_search']='What demand scale can the system handle?';
+$ec_lang['lpn_ds_head_search_selected']='What demand scale can these junctions handle?';
+$ec_lang['lpn_ds_search_note_selected']='Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.';
+$ec_lang['lpn_ds_outside_below']='At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.';
+$ec_lang['lpn_ds_search_note']='Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.';
+$ec_lang['lpn_ds_find']='Find';
+$ec_lang['lpn_ds_holds_max']='✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.';
+$ec_lang['lpn_ds_below_zero']='⚠ At least one junction is below {pressure} even with the scaled demands at zero.';
+$ec_lang['lpn_ds_found']='✓ Every junction keeps {pressure} up to a demand scale of {m}.';
+$ec_lang['lpn_ds_found_below']='⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.';
+$ec_lang['lpn_ds_search_stopped']='The search was stopped before it found an answer.';
+$ec_lang['lpn_ds_lowest_at']='At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.';
+$ec_lang['lpn_ds_nosolve_at']='At a demand scale of {m}, the network gave no answer. {reason}';
+$ec_lang['lpn_ds_scale_ok']='✓ At a demand scale of {m}, every junction keeps {pressure}.';
+$ec_lang['lpn_ds_scale_below']='⚠ At a demand scale of {m}, junctions below {pressure}: {n}.';
+$ec_lang['lpn_ds_scaled_selected']='Junctions scaled and checked: {n}.';
+$ec_lang['lpn_ds_head_lowest']='Lowest pressures';
+$ec_lang['lpn_ds_head_velocity']='Highest velocities';
+$ec_lang['lpn_ds_col_link']='Link';
+$ec_lang['lpn_ds_col_scaled']='Scaled';
+$ec_lang['lpn_ds_col_scaled_tip']='With the demands multiplied by the demand scale.';
+$ec_lang['lpn_ds_col_unscaled']='Unscaled';
+$ec_lang['lpn_ds_col_unscaled_tip']='With the demands as they are in the active scenario at this time step, the same value the map shows.';
+$ec_lang['lpn_ds_no_junctions']='This project has no junctions yet, so there are no demands to scale.';
+$ec_lang['lpn_ds_no_selection']='No junctions are selected. Select junctions or choose All junctions.';
+$ec_lang['lpn_ds_skipped']='Selected elements that are not junctions, left as they are: {n}.';
+$ec_lang['lpn_ds_bad_multiplier']='Type a demand scale of zero or more, such as 1.5.';
+$ec_lang['lpn_ds_stale']='The drawing changed, so the demand scaling results were cleared. Run it again.';
+$ec_lang['lpn_ds_at_time']='Time step: {time}.';
+$ec_lang['lpn_ds_time_moved']='⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.';
 
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //
