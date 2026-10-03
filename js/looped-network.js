@@ -1829,6 +1829,10 @@ var EngCalcs = EngCalcs || {};
 	// one row per call -- 119 pipes would bury the line it is printed on -- so these accumulate and
 	// are flushed as one row each when the report is taken.
 	var perfDebugSums = null;
+	// **A WHEEL NOTCH'S OWN ROWS ARE SUMMED, NOT LISTED** (Task 681(e)). A burst of twenty notches
+	// would otherwise print forty `fontWrite`/`symSizes` rows ahead of the one settle they lead to;
+	// onZoomChanged() raises this while it runs and counts the notch and its time instead.
+	var perfDebugQuiet = 0, perfZoomNotches = 0, perfZoomNotchMs = 0;
 	function perfDebugAccum(name, fn) {
 		if (!perfDebugOn()) { return fn(); }
 		var t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now()), out = fn();
@@ -1850,7 +1854,7 @@ var EngCalcs = EngCalcs || {};
 	// Times `fn` and records it under `name`. Returns whatever fn returned, so a caller can wrap a
 	// call in place without restructuring anything.
 	function perfDebugTime(name, fn) {
-		if (!perfDebugOn()) { return fn(); }
+		if (!perfDebugOn() || perfDebugQuiet) { return fn(); }
 		var t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now()), out = fn();
 		var t1 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
 		perfDebugRows.push(name + ' ' + (t1 - t0).toFixed(1) + 'ms');
@@ -43720,6 +43724,16 @@ var EngCalcs = EngCalcs || {};
 	// size-scaled threshold. The transition in either direction takes the full path, so nothing comes
 	// back stale. (Nothing hydraulic runs here either -- scheduleSolve() is never called from a zoom.)
 	function onZoomChanged() {
+		if (!perfDebugOn()) { onZoomChangedNow(); return; }
+		var t0 = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+		perfDebugQuiet++;
+		try { onZoomChangedNow(); } finally {
+			perfDebugQuiet--;
+			perfZoomNotches++;
+			perfZoomNotchMs += (typeof performance !== 'undefined' ? performance.now() : Date.now()) - t0;
+		}
+	}
+	function onZoomChangedNow() {
 		// **ANYTHING DRAWN AT A SIZE IN SCREEN PIXELS HAS TO BE REDRAWN WHEN THE SCALE CHANGES**, or
 		// it is a constant in WORLD units instead and grows and shrinks with the drawing. Two things
 		// on this page are in that class, and the placement handles were the one that was missed:
@@ -43763,7 +43777,16 @@ var EngCalcs = EngCalcs || {};
 	// The debounced pass above, run NOW -- for Zoom to fit, which has to see the labels exactly as
 	// they will be drawn at the scale it is testing (R-214). Cancels the pending timer, so the same
 	// work is not done twice.
+	// **?debug=perf COVERS A ZOOM TOO** (Task 681): one line per settle, carrying how many notches
+	// led to it, what they cost between them, and what the settle itself cost.
 	function reshedNow() {
+		if (!perfDebugOn()) { reshedNowRun(); return; }
+		perfDebugRows.push('ZOOM notches ' + perfZoomNotches + ' (' + perfZoomNotchMs.toFixed(1) + 'ms)');
+		perfZoomNotches = 0; perfZoomNotchMs = 0;
+		perfDebugTime('labelSettle', reshedNowRun);
+		perfDebugReport();
+	}
+	function reshedNowRun() {
 		if (reshedTimer) { clearTimeout(reshedTimer); }
 		reshedTimer = null;
 		// Task 647: this is the zoom gesture's own "settled" signal -- one notch or a whole wheel
@@ -43772,6 +43795,7 @@ var EngCalcs = EngCalcs || {};
 		// whether the model is on screen).
 		updateOffscreenNotice();
 		if (dataLabelsHidden) { return; }   // nothing drawn, nothing to decide
+		perfDebugCount('labelPasses');
 		beginLinkGeomHold();
 		try {
 			reshedLinkLabels(effectiveFontSize() + 'px', effectiveFontSize());
