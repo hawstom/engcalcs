@@ -875,6 +875,26 @@
             "on": "It stopped after {iterations} iterations.",
             "ruled": "2026-09-02"
         },
+        "lpn_ds_head_search_selected": {
+            "on": "What demand can the selection handle",
+            "ruled": "2026-10-03",
+            "answer": "\"What demand can the selection handle\""
+        },
+        "lpn_ds_scaled_selected": {
+            "on": "Junctions scaled and checked: {n}.",
+            "ruled": "2026-10-03",
+            "answer": "\"Junctions scaled and checked: {n}.\""
+        },
+        "lpn_ds_scope_tip": {
+            "on": "Scale the demand of the selection. Pressures are checked at the scaled demand.",
+            "ruled": "2026-10-03",
+            "answer": "\"Scale the demand of of the selection. Pressures are checked at the scaled demand.\" (the doubled \"of\" is a typo, corrected)"
+        },
+        "lpn_ds_search_note_selected": {
+            "on": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the selection keeps the given lowest pressure allowed.",
+            "ruled": "2026-10-03",
+            "answer": "\"Finds the largest demand scale, from 0 to 20 to the nearest 0.01, at which the selection keeps the given lowest pressure allowed.\" (0 and 20 and 0.01 are {max} and {step})"
+        },
         "lpn_elev_dem_none": {
             "on": "The DEM gave no height for this node.",
             "ruled": "2026-09-01"

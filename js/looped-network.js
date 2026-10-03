@@ -58133,7 +58133,7 @@ var EngCalcs = EngCalcs || {};
 			['all', pc.lpn_ds_scope_all || 'All junctions'],
 			['selected', pc.lpn_ds_scope_selected || 'Selected junctions']
 		], dsAsk.scope);
-		scope.addEventListener('change', function () { dsAsk.scope = scope.value; });
+		scope.addEventListener('change', function () { dsAsk.scope = scope.value; buildDemandScaleControls(); });
 		ffRow(host, pc.lpn_ds_scope || 'Demands to scale', pc.lpn_ds_scope_tip, scope, '');
 		minP = ffInput(critFireFlowAsk().minPressure);
 		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
@@ -58165,9 +58165,15 @@ var EngCalcs = EngCalcs || {};
 		ffEl('div', 'lpn-ds-result', null, host).setAttribute('data-ds', 'scale');
 
 		// 2. The largest scale that holds the limit.
-		ffEl('div', 'lpn-ff-head', pc.lpn_ds_head_search || 'What demand scale can the system handle?', host);
-		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_search_note ||
-			'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which every junction keeps the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.')
+		// Tom, 2026-10-03: under Selected junctions the question is the selection's.
+		ffEl('div', 'lpn-ff-head', dsAsk.scope === 'selected'
+			? (pc.lpn_ds_head_search_selected || 'What demand can the selection handle')
+			: (pc.lpn_ds_head_search || 'What demand scale can the system handle?'), host);
+		ffEl('p', 'lpn-ff-note', (dsAsk.scope === 'selected'
+			? (pc.lpn_ds_search_note_selected ||
+				'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the selection keeps the given lowest pressure allowed.')
+			: (pc.lpn_ds_search_note ||
+				'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which every junction keeps the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.'))
 			.replace('{max}', dsMult(D.max)).replace('{step}', String(D.step)), host);
 		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
 		find = ffEl('button', 'lpn-ff-run', pc.lpn_ds_find || 'Find', buttons);
@@ -58253,8 +58259,25 @@ var EngCalcs = EngCalcs || {};
 	function dsScopeLine(host, rec) {
 		var pc = EngCalcs.pageConfig || {};
 		if (!rec || rec.scaledCount === undefined) { return; }
-		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_scaled_selected || 'Only the selected junctions were scaled and checked. Junctions scaled: {n}.')
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_scaled_selected || 'Junctions scaled and checked: {n}.')
 			.replace('{n}', String(rec.scaledCount)), host);
+	}
+	// **UNSELECTED JUNCTIONS BELOW THE LIMIT ARE DISCLOSED, NEVER JUDGED** (Tom, 2026-10-03: "Unselected
+	// fails should be allowed and disclosed."). The verdict above is the selection's; this line says
+	// which other junctions the scaled demand leaves below the lowest pressure allowed.
+	function dsOutsideLine(host, list, m, minPressure) {
+		var pc = EngCalcs.pageConfig || {}, p, parts;
+		if (!list || !list.length) { return; }
+		p = ffEl('p', 'lpn-ff-note', null, host);
+		parts = (pc.lpn_ds_outside_below || 'At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.')
+			.replace('{m}', dsMult(m)).replace('{pressure}', ffQty(minPressure, 'lpn_u_pressure'))
+			.replace('{n}', String(list.length)).split('{ids}');
+		p.appendChild(document.createTextNode(parts[0]));
+		list.forEach(function (x, i) {
+			if (i) { p.appendChild(document.createTextNode(', ')); }
+			ffGotoLink(p, 'node', x.id, labelPrefixFor('node', 'id') + x.id);
+		});
+		if (parts[1]) { p.appendChild(document.createTextNode(parts[1])); }
 	}
 	function dsProbeLine(host, rec) {
 		var pc = EngCalcs.pageConfig || {};
@@ -58304,6 +58327,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			dsTimeLines(host, s.time);
 			dsScopeLine(host, s);
+			if (s.holding) { dsOutsideLine(host, s.holding.outside, s.holding.multiplier, s.minPressure); }
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
 				.replace('{solves}', String(s.solves)), host);
 		}
@@ -58324,6 +58348,7 @@ var EngCalcs = EngCalcs || {};
 		ffEl('p', 'lpn-ff-summary', verdict.replace('{m}', dsMult(set.multiplier)).replace('{pressure}', pressure), host);
 		dsTimeLines(host, set.time);
 		dsScopeLine(host, set);
+		dsOutsideLine(host, set.outside, set.multiplier, set.minPressure);
 		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
 			.replace('{solves}', String(set.solves)), host);
 		// THE TWO TABLES ARE THE TWO READINGS A DESIGNER TAKES OF A HEAVIER DAY: where the pressure

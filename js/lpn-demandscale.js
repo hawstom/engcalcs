@@ -137,7 +137,9 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	 * Two solves: the scaled case, and the same copy unscaled, so every row can show both.
 	 * Resolves to { ok, multiplier, minPressure, pressures: [{id, pressure, unscaled}],
 	 * velocities: [{id, velocity, unscaled}], below: [{id, pressure}], solves } -- or { ok: false,
-	 * `pressures` is every junction's; `below` only the judged ones' (see `junctions`).
+	 * `pressures` is every junction's; `below` only the judged ones' (see `junctions`). `outside` is
+	 * the junctions NOT judged that are below minPressure, listed so the page can disclose them: they
+	 * never limit an answer (Tom, 2026-10-03).
 	 * code, issues, multiplier, solves } when the scaled case did not solve.
 	 */
 	function run(model, options) {
@@ -171,6 +173,8 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 					velocities: velocities,
 					below: pressures.filter(function (x) { return x.pressure < minP && (!judged || judged[x.id]); })
 						.map(function (x) { return { id: x.id, pressure: x.pressure }; }),
+					outside: pressures.filter(function (x) { return judged && !judged[x.id] && x.pressure < minP; })
+						.map(function (x) { return { id: x.id, pressure: x.pressure }; }),
 					unscaledCode: b.code,
 					solves: 2
 				};
@@ -195,7 +199,8 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 	 * Resolves to { ok: true, outcome, multiplier, holding, failing, belowAtOne, max, step,
 	 * minPressure, solves, stopped }. `holding` is the probe at `multiplier` and `failing` the probe
 	 * one step above it (or at zero, for BELOW_AT_ZERO; absent for HOLDS_TO_MAX); each is
-	 * { multiplier, ok, code, lowest: {id, pressure} }. A stopped search resolves with outcome null.
+	 * { multiplier, ok, code, lowest: {id, pressure}, outside: [{id, pressure}] } -- `outside` being
+	 * the unselected junctions below minPressure there, which do not limit the answer. A stopped search resolves with outcome null.
 	 */
 	function search(model, options) {
 		var opts = options || {},
@@ -222,6 +227,11 @@ var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
 					list = pressureList(model, c.result, scaled);
 					rec.lowest = list.length ? list[0] : null;
 					rec.holds = !list.length || list[0].pressure >= minP;
+					// Junctions outside the selection that are below the limit at this scale: disclosed,
+					// never judged, so they leave `holds` alone.
+					rec.outside = scaled ? pressureList(model, c.result).filter(function (x) {
+						return scaled.indexOf(x.id) < 0 && x.pressure < minP;
+					}) : [];
 				} else {
 					rec.holds = false;
 				}

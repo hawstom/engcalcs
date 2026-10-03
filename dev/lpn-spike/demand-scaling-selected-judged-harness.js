@@ -144,6 +144,31 @@ function dsHost(which) {
 		ok('one does not at one step more', !up.ok || selMin(up) < s.minPressure, up.ok ? L.toPsi(selMin(up)).toFixed(2) + ' psi' : up.code);
 	}
 
+	console.log('\n--- 7. Unselected junctions below the limit are disclosed, never judged ---');
+	const outAt = (probe) => (probe && probe.outside || []).map((x) => x.id);
+	ok('Find lists junction 40 (unselected, low at 7:00) at the found scale', outAt(s.holding).indexOf('40') >= 0, JSON.stringify(outAt(s.holding)));
+	ok('...every listed junction is unselected', outAt(s.holding).every((id) => sel.indexOf(id) < 0));
+	const outTxt = PC.lpn_ds_outside_below.split('{ids}')[0].replace('{m}', String(+s.multiplier.toFixed(2)))
+		.replace('{n}', String(outAt(s.holding).length)).split('{pressure}')[1];
+	ok('...and the box says how many, and names them', out.indexOf(outTxt) >= 0 && out.indexOf('40') >= 0, out.slice(0, 300));
+	ok('...the found scale is still the selection\'s (not cut short by junction 40)', s.multiplier > 1, s.multiplier);
+	ok('Run at scale 1 lists junction 40 as outside, and not in the count below', r1.outside.some((x) => x.id === '40') && r1.below.length === 0);
+	ok('the heading under Selected is the selection\'s', text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_head_search_selected) >= 0);
+	ok('...with the selection\'s explanation of Find', text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_search_note_selected.replace('{max}', '20').replace('{step}', '0.01')) >= 0);
+	ok('Tom\'s wording, exactly', PC.lpn_ds_head_search_selected === 'What demand can the selection handle'
+		&& PC.lpn_ds_scope_tip === 'Scale the demand of the selection. Pressures are checked at the scaled demand.'
+		&& PC.lpn_ds_scaled_selected === 'Junctions scaled and checked: {n}.'
+		&& PC.lpn_ds_search_note_selected === 'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the selection keeps the given lowest pressure allowed.');
+	ok('the range in that sentence is the code\'s: 0 to 20, step 0.01', EC.lpnDemandScaleDefaults.max === 20 && EC.lpnDemandScaleDefaults.step === 0.01);
+	// Pure: an unselected junction stuck below the limit does not move the answer.
+	const fake = { nodes: [{ id: 'A', type: 'junction', demand: 1 }, { id: 'B', type: 'junction', demand: 1 }], links: [] };
+	const fakeSolve = (m) => ({ ok: true, converged: true, pressures: { A: 100 - 10 * m.nodes[0].demand, B: 5 } });
+	const fs1 = await EC.lpnDemandScaleSearch(fake, { solve: fakeSolve, junctions: ['A'], minPressure: 50, yield: () => Promise.resolve() });
+	ok('synthetic: found scale 5 on A alone', fs1.multiplier === 5, fs1.multiplier);
+	ok('synthetic: B is disclosed at that scale', JSON.stringify(outAt(fs1.holding)) === '["B"]', JSON.stringify(outAt(fs1.holding)));
+	const fr = await EC.lpnDemandScaleRun(fake, { solve: fakeSolve, multiplier: 2, junctions: ['A'], minPressure: 50 });
+	ok('synthetic Run: B outside, nothing below', fr.below.length === 0 && fr.outside.length === 1 && fr.outside[0].id === 'B');
+
 	console.log('\n--- 5. All junctions still judges every junction ---');
 	L.setScope('all');
 	const a = await L.runFind();

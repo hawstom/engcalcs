@@ -119,10 +119,8 @@ AskUserQuestion; the classifier refuses an all-clear lifted from pasted text.
   box squeeze (R-379) is fixed (box pinned to its free width; only a corner drag counts as a chosen
   size). "Head"/"Pump head" approved and recorded. Headless never reproduced his ~150 px, only 276 px.
 - 8110 `feat/demand-scaling` (754, contains criticality 751): R-380 fixed — Find/Run judged every
-  junction; now Selected judges only the selected. Two reworded strings need his OK:
-  `lpn_ds_scope_tip` "...Pressures are checked at the junctions scaled." and `lpn_ds_scaled_selected`
-  "Only the selected junctions were scaled and checked. Junctions scaled: {n}." Open question for
-  him: selection-only verdict vs also failing an unselected junction that the extra demand starves.
+  junction; now Selected judges only the selected, and unselected junctions below the minimum are
+  disclosed (never judged). His wording for the four strings is built and recorded. Untested by him.
   Approved syn entries (`lpn_ff_all/_selected`, three `lpn_ff_design_*`) are written there.
 - 8112 `feat/keyboard-menu` (748): Alt+Shift+F/E/M/W/H/L (Ctrl+Option on Mac), F10, key badges in
   keyboard mode, pointer-only rows skipped, focus returns after a row runs. Perry passed it after two
