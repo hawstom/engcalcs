@@ -308,7 +308,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**80 still to read**, of 127 new keys across 13 unmerged branch(es).
+**80 still to read**, of 127 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -320,8 +320,6 @@ build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
 ### chore/selection-word (`16dce45b`) — adds no English strings
-
-### feat/contour (`b1d7c223`) — adds no English strings
 
 ### feat/criticality (`84ea5311`) — 31 new, 8 to read @@ NEEDS RULING
 

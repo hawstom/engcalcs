@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hr",
-        "expected_key_count": 2220,
-        "delta_key_count": 67,
+        "expected_key_count": 2245,
+        "delta_key_count": 92,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -719,6 +719,31 @@
         "lpn_hotkeys_menu_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Alt+Shift+letter<\/td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.<\/td><\/tr><tr><td>F10<\/td><td>Go to the menu bar.<\/td><\/tr><\/tbody><\/table>",
         "lpn_graphs_menu": "Graphs",
         "lpn_graphs_menu_tip": "Graphs: Profile, Time Series, and Frequency distribution",
+        "lpn_contour_menu": "Contour",
+        "lpn_contour_tip": "Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.",
+        "lpn_contour_plot": "Contour plot",
+        "lpn_contour_fill": "Fill",
+        "lpn_contour_fill_tip": "Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.",
+        "lpn_contour_fill_smooth": "Smooth",
+        "lpn_contour_fill_bands": "Bands",
+        "lpn_contour_opacity": "Fill opacity",
+        "lpn_contour_lines": "Contour lines",
+        "lpn_contour_interval": "Interval",
+        "lpn_contour_buffer": "Buffer",
+        "lpn_contour_buffer_unit": "× median pipe length",
+        "lpn_contour_buffer_tip": "How far the color reaches from each pipe, as a multiple of the median pipe length. It fades out over the outer part.",
+        "lpn_contour_few": "Too few nodes to contour.",
+        "lpn_contour_support": "Contour plot: {n} nodes, interpolated along {p} pipes and up to {k} times the median pipe length beside them. No color across pumps, valves, or closed links.",
+        "lpn_contour_support_lines": "Contour lines every {i} {u}.",
+        "lpn_contour_too_many": "Too many contour lines at this interval; widen it to draw them.",
+        "lpn_contour_dem": "Ground between nodes from Mapbox DEM",
+        "lpn_contour_dem_tip": "Between nodes, pressure becomes the interpolated head minus the height of the ground from Mapbox DEM, so it can fall below the lowest node pressure on a hill the network has no node on. Treat the ground as a contour map, not a survey.",
+        "lpn_contour_support_dem": "Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.",
+        "lpn_contour_dem_failed": "The ground could not be read from Mapbox DEM, so pressure is interpolated between nodes alone.",
+        "lpn_contour_consent_1": "Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.",
+        "lpn_contour_consent_2": "This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.",
+        "lpn_contour_consent_3": "May we send the tile numbers of your network's area to Mapbox?",
+        "lpn_contour_consent_4": "If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.",
         "lpn_copy_title": "Mark file as new copy?",
         "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
         "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
@@ -788,6 +813,31 @@
         "lpn_hotkeys_menu_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Alt+Shift+letter<\/td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.<\/td><\/tr><tr><td>F10<\/td><td>Go to the menu bar.<\/td><\/tr><\/tbody><\/table>",
         "lpn_graphs_menu": "Graphs",
         "lpn_graphs_menu_tip": "Graphs: Profile, Time Series, and Frequency distribution",
+        "lpn_contour_menu": "Contour",
+        "lpn_contour_tip": "Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.",
+        "lpn_contour_plot": "Contour plot",
+        "lpn_contour_fill": "Fill",
+        "lpn_contour_fill_tip": "Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.",
+        "lpn_contour_fill_smooth": "Smooth",
+        "lpn_contour_fill_bands": "Bands",
+        "lpn_contour_opacity": "Fill opacity",
+        "lpn_contour_lines": "Contour lines",
+        "lpn_contour_interval": "Interval",
+        "lpn_contour_buffer": "Buffer",
+        "lpn_contour_buffer_unit": "× median pipe length",
+        "lpn_contour_buffer_tip": "How far the color reaches from each pipe, as a multiple of the median pipe length. It fades out over the outer part.",
+        "lpn_contour_few": "Too few nodes to contour.",
+        "lpn_contour_support": "Contour plot: {n} nodes, interpolated along {p} pipes and up to {k} times the median pipe length beside them. No color across pumps, valves, or closed links.",
+        "lpn_contour_support_lines": "Contour lines every {i} {u}.",
+        "lpn_contour_too_many": "Too many contour lines at this interval; widen it to draw them.",
+        "lpn_contour_dem": "Ground between nodes from Mapbox DEM",
+        "lpn_contour_dem_tip": "Between nodes, pressure becomes the interpolated head minus the height of the ground from Mapbox DEM, so it can fall below the lowest node pressure on a hill the network has no node on. Treat the ground as a contour map, not a survey.",
+        "lpn_contour_support_dem": "Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.",
+        "lpn_contour_dem_failed": "The ground could not be read from Mapbox DEM, so pressure is interpolated between nodes alone.",
+        "lpn_contour_consent_1": "Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.",
+        "lpn_contour_consent_2": "This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.",
+        "lpn_contour_consent_3": "May we send the tile numbers of your network's area to Mapbox?",
+        "lpn_contour_consent_4": "If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.",
         "lpn_copy_title": "Mark file as new copy?",
         "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
         "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
@@ -929,6 +979,406 @@
                     "key": "lpn_profile_tip",
                     "value": "Nacrtajte teren i hidrauličku liniju (HGL) duž rute kroz mrežu.",
                     "english": "Draw the ground and the hydraulic grade line along a path through the network."
+                }
+            }
+        },
+        "lpn_contour_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_plot": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_fill": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_fill_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_fill_smooth": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_fill_bands": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_opacity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_lines": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_interval": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_buffer": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_buffer_unit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_buffer_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_few": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_support": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_support_lines": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_too_many": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_dem": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_dem_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_support_dem": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_dem_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_consent_1": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_consent_2": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_consent_3": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_contour_consent_4": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_freq_axis_percent",
+                    "value": "Postotak manje od",
+                    "english": "Percent less than"
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Jedinice",
+                    "english": "Units"
                 }
             }
         },
