@@ -1407,6 +1407,19 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<div id="lpn_full_report" class="lpn-ff-report"></div>
 	</div>
 </div>
+<?php // THE CALIBRATION REPORT (ROADMAP Task 601). EPANET's Report > Calibration: measured field
+      // data from a calibration file against the last run, on EPANET's three tabbed pages. The
+      // file input lives inside the box because loading a file is the box's own first step; the
+      // file is held in memory only, and so is where the box sits -- it writes nothing to the
+      // visitor's device. Built in JS (rebuildCalibReport). ?>
+<div id="lpn_calib_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_calibbox_title">
+	<div id="lpn_calibbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_calib_title']?></div>
+	<button type="button" id="lpn_calib_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<input type="file" id="lpn_calib_file" accept=".dat,.txt,.cal,text/plain" style="display:none">
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div id="lpn_calib_report" class="lpn-ff-report"></div>
+	</div>
+</div>
 <div id="lpn_ff_run_box" class="d-print-none lpn-popover lpn-ffrunbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_ffrun_title">
 	<div id="lpn_ffrun_title" class="lpn-setbox-title"><?=$ec_lang['lpn_ff_run_title']?></div>
 	<div class="lpn-popover-body">
@@ -2685,6 +2698,47 @@ EngCalcs.pageConfig = {
 	lpn_full_col_id: <?=json_encode($ec_lang['lpn_full_col_id'])?>,
 	lpn_full_row_count: <?=json_encode($ec_lang['lpn_full_row_count'])?>,
 	lpn_full_step_label: <?=json_encode($ec_lang['lpn_full_step_label'])?>,
+<?php // The Calibration report (ROADMAP Task 601). ?>
+	lpn_reports_calib: <?=json_encode($ec_lang['lpn_reports_calib'])?>,
+	lpn_reports_calib_tip: <?=json_encode($ec_lang['lpn_reports_calib_tip'])?>,
+	lpn_calib_param: <?=json_encode($ec_lang['lpn_calib_param'])?>,
+	lpn_calib_param_tip: <?=json_encode($ec_lang['lpn_calib_param_tip'])?>,
+	lpn_calib_load: <?=json_encode($ec_lang['lpn_calib_load'])?>,
+	lpn_calib_load_tip: <?=json_encode($ec_lang['lpn_calib_load_tip'])?>,
+	lpn_calib_none: <?=json_encode($ec_lang['lpn_calib_none'])?>,
+	lpn_calib_session: <?=json_encode($ec_lang['lpn_calib_session'])?>,
+	lpn_calib_file: <?=json_encode($ec_lang['lpn_calib_file'])?>,
+	lpn_calib_units: <?=json_encode($ec_lang['lpn_calib_units'])?>,
+	lpn_calib_unknown_ids: <?=json_encode($ec_lang['lpn_calib_unknown_ids'])?>,
+	lpn_calib_unknown_count: <?=json_encode($ec_lang['lpn_calib_unknown_count'])?>,
+	lpn_calib_bad_lines: <?=json_encode($ec_lang['lpn_calib_bad_lines'])?>,
+	lpn_calib_outside: <?=json_encode($ec_lang['lpn_calib_outside'])?>,
+	lpn_calib_no_value: <?=json_encode($ec_lang['lpn_calib_no_value'])?>,
+	lpn_calib_needs_run: <?=json_encode($ec_lang['lpn_calib_needs_run'])?>,
+	lpn_calib_no_pairs: <?=json_encode($ec_lang['lpn_calib_no_pairs'])?>,
+	lpn_calib_tab_stats: <?=json_encode($ec_lang['lpn_calib_tab_stats'])?>,
+	lpn_calib_tab_corr: <?=json_encode($ec_lang['lpn_calib_tab_corr'])?>,
+	lpn_calib_tab_means: <?=json_encode($ec_lang['lpn_calib_tab_means'])?>,
+	lpn_calib_col_location: <?=json_encode($ec_lang['lpn_calib_col_location'])?>,
+	lpn_calib_col_n: <?=json_encode($ec_lang['lpn_calib_col_n'])?>,
+	lpn_calib_col_n_tip: <?=json_encode($ec_lang['lpn_calib_col_n_tip'])?>,
+	lpn_calib_col_obs_mean: <?=json_encode($ec_lang['lpn_calib_col_obs_mean'])?>,
+	lpn_calib_col_sim_mean: <?=json_encode($ec_lang['lpn_calib_col_sim_mean'])?>,
+	lpn_calib_col_mean_err: <?=json_encode($ec_lang['lpn_calib_col_mean_err'])?>,
+	lpn_calib_col_mean_err_tip: <?=json_encode($ec_lang['lpn_calib_col_mean_err_tip'])?>,
+	lpn_calib_col_rms_err: <?=json_encode($ec_lang['lpn_calib_col_rms_err'])?>,
+	lpn_calib_col_rms_err_tip: <?=json_encode($ec_lang['lpn_calib_col_rms_err_tip'])?>,
+	lpn_calib_network: <?=json_encode($ec_lang['lpn_calib_network'])?>,
+	lpn_calib_corr_means: <?=json_encode($ec_lang['lpn_calib_corr_means'])?>,
+	lpn_calib_corr_none: <?=json_encode($ec_lang['lpn_calib_corr_none'])?>,
+	lpn_calib_axis_obs: <?=json_encode($ec_lang['lpn_calib_axis_obs'])?>,
+	lpn_calib_axis_sim: <?=json_encode($ec_lang['lpn_calib_axis_sim'])?>,
+	lpn_calib_observed: <?=json_encode($ec_lang['lpn_calib_observed'])?>,
+	lpn_calib_computed: <?=json_encode($ec_lang['lpn_calib_computed'])?>,
+	lpn_calib_point: <?=json_encode($ec_lang['lpn_calib_point'])?>,
+	lpn_calib_corr_note: <?=json_encode($ec_lang['lpn_calib_corr_note'])?>,
+	lpn_calib_ts_point: <?=json_encode($ec_lang['lpn_calib_ts_point'])?>,
+	lpn_calib_ts_note: <?=json_encode($ec_lang['lpn_calib_ts_note'])?>,
 	lpn_energy_title: <?=json_encode($ec_lang['lpn_energy_title'])?>,
 	lpn_energy_menu: <?=json_encode($ec_lang['lpn_energy_menu'])?>,
 	lpn_energy_menu_tip: <?=json_encode($ec_lang['lpn_energy_menu_tip'])?>,
@@ -3542,6 +3596,10 @@ EngCalcs.pageConfig = {
       // EngCalcs.lpnSurveyParse() when somebody picks a file; absent, the button reports that the
       // file could not be read, which is a lie about the file. ?>
 <script src="/engcalcs/js/lpn-survey.js?v=<?=filemtime(__DIR__.'/js/lpn-survey.js')?>"></script>
+<?php // Calibration files and their statistics (ROADMAP Task 601). Pure parsing and arithmetic, no
+      // DOM. BEFORE looped-network.js, which reads EngCalcs.lpnCalib when the Calibration report
+      // opens; absent, the report draws nothing. ?>
+<script src="/engcalcs/js/lpn-calib.js?v=<?=filemtime(__DIR__.'/js/lpn-calib.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

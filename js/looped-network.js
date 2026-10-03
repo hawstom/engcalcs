@@ -4995,6 +4995,14 @@ var EngCalcs = EngCalcs || {};
 				tip: pc.lpn_reports_status_tip,
 				fn: function () { closeMenu(); openStatusReportBox(); }
 			},
+			// **CALIBRATION, WHERE EPANET'S OWN REPORT MENU PUTS IT** -- after Status, before Full
+			// (ROADMAP Task 601). The box holds the file loading as well as the report, so this one
+			// row is the whole of the feature's footprint in the menus.
+			{
+				icon: 'info', label: pc.lpn_reports_calib || 'Calibration',
+				tip: pc.lpn_reports_calib_tip,
+				fn: function () { closeMenu(); openCalibBox(); }
+			},
 			{
 				icon: 'info', label: pc.lpn_reports_full || 'Full',
 				tip: pc.lpn_reports_full_tip,
@@ -29251,7 +29259,8 @@ var EngCalcs = EngCalcs || {};
 	function renderTimeSeries() {
 		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_ts_chart'),
 			note = document.getElementById('lpn_ts_note'),
-			frames, series, values = [], lay, xB, yB, box, svg, group, field, unit, now, dots;
+			frames, series, values = [], lay, xB, yB, box, svg, group, field, unit, now, dots,
+			measured, tFirst, tLast, nMeasured = 0;
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (note) { note.textContent = ''; }
@@ -29282,6 +29291,19 @@ var EngCalcs = EngCalcs || {};
 		series.forEach(function (s) {
 			s.points.forEach(function (p) { if (p.y !== undefined) { values.push(p.y); } });
 		});
+		// **MEASURED VALUES FROM A CALIBRATION FILE, ON THE SAME AXES** (Task 601), for the plotted
+		// assets the file names and only inside the reported span -- a measurement at an hour the
+		// run did not report has no line to be read against. They join the vertical bounds, so a
+		// measurement far from the model is drawn far from the line rather than clipped.
+		measured = calibMeasuredFor(group, field);
+		tFirst = frames[0].t; tLast = frames[frames.length - 1].t;
+		series.forEach(function (s) {
+			s.measured = (measured[s.id] || []).filter(function (m) {
+				return m.t >= tFirst - 1e-6 && m.t <= tLast + 1e-6;
+			});
+			s.measured.forEach(function (m) { values.push(m.v); });
+			nMeasured += s.measured.length;
+		});
 		// **SAID BEFORE THE CHART IS MEASURED**, which is load-bearing and is Task 527's lesson
 		// restated: this line shares the panel with the chart and wraps on a narrow one, so writing
 		// it afterwards would take height off the host the chart had just been laid out for, and the
@@ -29289,7 +29311,8 @@ var EngCalcs = EngCalcs || {};
 		if (note) {
 			note.textContent = String(pc.lpn_ts_summary || 'Assets: {n}, reporting times: {steps}')
 				.replace('{n}', String(series.length))
-				.replace('{steps}', String(frames.length));
+				.replace('{steps}', String(frames.length))
+				+ (nMeasured ? ' ' + (pc.lpn_calib_ts_note || 'Rings are measured values from the calibration file.') : '');
 		}
 		lay = tsLayout(host);
 		tsLastSize = { w: lay.w, h: lay.h };
@@ -29374,6 +29397,18 @@ var EngCalcs = EngCalcs || {};
 				ttl.appendChild(document.createTextNode(
 					s.id + '   ' + (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(q.t) : q.t) +
 					'   ' + plainRound(q.y, 2)));
+			});
+		});
+		// The measured rings, in their asset's own color, drawn last so a line never hides one.
+		// Hollow, so a ring sitting exactly on the computed dot still shows both.
+		series.forEach(function (s) {
+			(s.measured || []).forEach(function (m) {
+				var c = el('circle', { cx: X(tsHours(m.t)), cy: Y(m.v), r: 3.5,
+					class: 'lpn-calib-ring', stroke: s.color }, svg);
+				el('title', {}, c).appendChild(document.createTextNode(
+					String(pc.lpn_calib_ts_point || 'Measured at {id}, {time}: {v}').replace('{id}', s.id)
+						.replace('{time}', EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(m.t) : String(m.t))
+						.replace('{v}', String(plainRound(m.v, 2)))));
 			});
 		});
 
@@ -39852,6 +39887,7 @@ var EngCalcs = EngCalcs || {};
 		wireStatusReportBox();
 		wireAlternativesBox();
 		wireFullReportBox();
+		wireCalibBox();
 		buildMenuBar();
 		wireScenarioButton();
 		wireWrongButtons();
@@ -58831,6 +58867,378 @@ var EngCalcs = EngCalcs || {};
 		if (fullBoxIsOpen()) { rebuildFullReport(); }
 	}
 
+	// ---- THE CALIBRATION REPORT (ROADMAP Task 601) -----------------------------------------------
+	//
+	// Tom, 2026-09-06: *"EPANET allows calibration files (measured system data) and offers a
+	// Calibration Report with three tabbed pages. See EPANET help."* So this is EPANET's report in
+	// EPANET's shape and words: a file of measurements per parameter, and three pages --
+	// Statistics, Correlation Plot, Mean Comparisons (EPANET 2.2 manual §5.3, §9.6). The parsing
+	// and the arithmetic are js/lpn-calib.js's; this half resolves the network and draws.
+	//
+	// **THE FIRST DATA ON THIS PAGE FROM OUTSIDE THE MODEL**, so its two rules are stated where they
+	// bite. A location the network does not have is LISTED AND COUNTED and its measurements are
+	// skipped -- never a silent drop, never a refusal of the file (the .inp import rule). And the
+	// file's numbers are read in the PROJECT'S units, which is what EPANET assumes too; the box says
+	// which unit, because a file written in psi read against a kPa project is otherwise invisible.
+	//
+	// **HELD IN MEMORY FOR THIS PAGE LOAD ONLY.** Nothing goes into serializeProject(), and no
+	// localStorage key is written -- not even for where the box sits, which is why it uses the
+	// in-memory layout the Alternatives box uses rather than wireBoxMemory(). Whether a calibration
+	// file should travel with the project is a question for Tom, not a default to slip in.
+	//
+	// **EVERY COMPUTED VALUE COMES THROUGH colorValueOf() AS OF ONE FRAME** (tsAsOfFrame()), the
+	// seam the time-series chart and the Full report already trust, so a computed mean here can
+	// never disagree with the number the Tables pane shows at that step.
+	var calibFiles = {};      // parameter key -> { name, parsed }
+	var calibParam = 'pressure';
+	var calibTab = 'stats';
+	var calibboxLayout = newBoxLayout();
+	function calibParamDef(key) {
+		var P = (EngCalcs.lpnCalib && EngCalcs.lpnCalib.PARAMS) || [], i;
+		for (i = 0; i < P.length; i++) { if (P[i].key === key) { return P[i]; } }
+		return P[2] || null;
+	}
+	function calibParamLabel(def) {
+		var unit = colorFieldUnitText(def.group, def.field);
+		return colorFieldLabel(def.group, def.field) + (unit ? ' (' + unit + ')' : '');
+	}
+	// The frames compared against: the extended period run's, or the single solve standing alone
+	// at time 0 -- EPANET's own allowance ("for a single-period analysis all time values can be 0").
+	function calibFrames() {
+		var frames = reportFrames();
+		if (!frames.length && lastSolveResult) { frames = [lastSolveResult]; }
+		return frames;
+	}
+	/**
+	 * The comparison for one parameter: every location the file names, matched to the network,
+	 * each measurement paired with the computed value at its time. Null with no file loaded.
+	 */
+	function calibCompute(key) {
+		var file = calibFiles[key], def = calibParamDef(key), C = EngCalcs.lpnCalib,
+			frames, times, locs = [], unknown = [], unknownCount = 0, outside = 0, noValue = 0, st;
+		if (!file || !def || !C) { return null; }
+		frames = calibFrames();
+		times = frames.map(function (f) { return typeof f.t === 'number' ? f.t : 0; });
+		file.parsed.order.forEach(function (id, k) {
+			var e = def.group === 'link' ? linkById(id) : nodeById(id), obs, series, pairs = [];
+			obs = file.parsed.obs.filter(function (o) { return o.id === id; });
+			if (!e) { unknown.push(id); unknownCount += obs.length; return; }
+			series = frames.map(function (f) {
+				var v = tsAsOfFrame(f, function () { return colorValueOf(def.group, e, def.field); });
+				return (typeof v === 'number' && isFinite(v)) ? v : undefined;
+			});
+			obs.forEach(function (o) {
+				var s;
+				if (!frames.length) { return; }
+				if (o.t < times[0] - 1e-6 || o.t > times[times.length - 1] + 1e-6 ||
+					(times.length === 1 && Math.abs(o.t - times[0]) > 1e-6)) { outside++; return; }
+				s = C.interp(times, series, o.t);
+				if (s === undefined) { noValue++; return; }
+				pairs.push({ t: o.t, o: o.v, s: s });
+			});
+			locs.push({ id: id, pairs: pairs, color: LPN_TS_COLORS[k % LPN_TS_COLORS.length] });
+		});
+		st = C.stats(locs);
+		st.locations.forEach(function (s, i) { s.pairs = locs[i].pairs; s.color = locs[i].color; });
+		return {
+			def: def, file: file, frames: frames.length, stats: st,
+			unknown: unknown, unknownCount: unknownCount, outside: outside, noValue: noValue
+		};
+	}
+	function calibBoxEl() { return document.getElementById('lpn_calib_box'); }
+	function calibBoxIsOpen() {
+		var box = calibBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	function calibNum(v, d) { return (typeof v === 'number' && isFinite(v)) ? String(plainRound(v, d === undefined ? 2 : d)) : '–'; }
+	function rebuildCalibReport() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_calib_report'),
+			C = EngCalcs.lpnCalib, def, sel, btn, file, res, unit, tabs, page, controls;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (!C) { return; }
+		def = calibParamDef(calibParam);
+		controls = ffEl('div', 'lpn-calib-controls', null, host);
+		sel = ffSelect(C.PARAMS.map(function (p) { return [p.key, colorFieldLabel(p.group, p.field)]; }), def.key);
+		sel.id = 'lpn_calib_param';
+		sel.addEventListener('change', function () { calibParam = sel.value; rebuildCalibReport(); });
+		ffRow(controls, pc.lpn_calib_param || 'Parameter', pc.lpn_calib_param_tip, sel, '');
+		btn = ffEl('button', 'lpn-profile-edit ec-help', pc.lpn_calib_load || 'Load calibration file…', controls);
+		btn.type = 'button';
+		btn.id = 'lpn_calib_load';
+		btn.title = pc.lpn_calib_load_tip || '';
+		btn.addEventListener('click', function () {
+			var input = document.getElementById('lpn_calib_file');
+			if (input) { input.value = ''; input.click(); }
+		});
+
+		file = calibFiles[def.key];
+		unit = colorFieldUnitText(def.group, def.field);
+		if (!file) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_calib_none || 'No calibration file is loaded for this parameter.', host);
+			ffEl('p', 'lpn-ff-note', pc.lpn_calib_session || 'A calibration file is held for this session only. It is not saved with the project or on this device.', host);
+			initTipsIn(host);
+			return;
+		}
+		res = calibCompute(def.key);
+		ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_file || '{file}: {n} measurements at {m} locations.')
+			.replace('{file}', file.name).replace('{n}', String(file.parsed.obs.length))
+			.replace('{m}', String(file.parsed.order.length)), host);
+		if (unit) {
+			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_units || 'The file\'s values are read in this project\'s units: {unit}.')
+				.replace('{unit}', unit), host).id = 'lpn_calib_units_note';
+		}
+		// **SKIPPED IS SAID, WITH WHAT AND HOW MANY** -- each reason its own line, so a reader can
+		// tell a typo in an ID from a time outside the run from a line that was not data at all.
+		if (res.unknown.length) {
+			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_unknown_ids || 'Named in the file but not in this network: {ids}')
+				.replace('{ids}', res.unknown.join(', ')), host).id = 'lpn_calib_unknown';
+			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_unknown_count || 'Measurements skipped because their location is not in this network: {n}.')
+				.replace('{n}', String(res.unknownCount)), host);
+		}
+		if (file.parsed.bad.length) {
+			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_bad_lines || 'Lines that could not be read, skipped: {lines}')
+				.replace('{lines}', file.parsed.bad.map(function (b) { return b.line; }).join(', ')), host).id = 'lpn_calib_bad';
+		}
+		if (res.outside) {
+			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_outside || 'Measurements outside the times this run reported, skipped: {n}.')
+				.replace('{n}', String(res.outside)), host);
+		}
+		if (res.noValue) {
+			ffEl('p', 'lpn-ff-note', String(pc.lpn_calib_no_value || 'Measurements with no computed value at their time, skipped: {n}.')
+				.replace('{n}', String(res.noValue)), host);
+		}
+		ffEl('p', 'lpn-ff-note', pc.lpn_calib_session || 'A calibration file is held for this session only. It is not saved with the project or on this device.', host);
+		if (!res.frames) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_calib_needs_run || 'There are no results to compare with yet. The report fills in once the network has been calculated.', host);
+			initTipsIn(host);
+			return;
+		}
+
+		// EPANET's three tabbed pages, in its order and under its names.
+		tabs = ffEl('div', 'lpn-calib-tabs', null, host);
+		tabs.setAttribute('role', 'tablist');
+		[['stats', pc.lpn_calib_tab_stats || 'Statistics'],
+			['corr', pc.lpn_calib_tab_corr || 'Correlation plot'],
+			['means', pc.lpn_calib_tab_means || 'Mean comparisons']].forEach(function (t) {
+			var b = ffEl('button', 'lpn-pane-tab', t[1], tabs);
+			b.type = 'button';
+			b.id = 'lpn_calib_tab_' + t[0];
+			b.setAttribute('role', 'tab');
+			b.setAttribute('aria-selected', calibTab === t[0] ? 'true' : 'false');
+			b.addEventListener('click', function () { calibTab = t[0]; rebuildCalibReport(); });
+		});
+		page = ffEl('div', 'lpn-calib-page', null, host);
+		page.id = 'lpn_calib_page';
+		page.setAttribute('role', 'tabpanel');
+		if (calibTab === 'corr') { calibCorrelationPlot(page, res); }
+		else if (calibTab === 'means') { calibMeanChart(page, res); }
+		else { calibStatsTable(page, res); }
+		initTipsIn(host);
+	}
+	// **THE STATISTICS PAGE**: EPANET's columns, its Network row, and its correlation line.
+	function calibStatsTable(parent, res) {
+		var pc = EngCalcs.pageConfig || {}, wrap = ffEl('div', 'lpn-ff-tablewrap', null, parent),
+			table = ffEl('table', 'lpn-ff-table', null, wrap), hr = ffEl('tr', null, null, ffEl('thead', null, null, table)),
+			body = ffEl('tbody', null, null, table), r = res.stats.r;
+		[[pc.lpn_calib_col_location || 'Location'],
+			[pc.lpn_calib_col_n || 'Num obs', pc.lpn_calib_col_n_tip],
+			[pc.lpn_calib_col_obs_mean || 'Observed mean'],
+			[pc.lpn_calib_col_sim_mean || 'Computed mean'],
+			[pc.lpn_calib_col_mean_err || 'Mean error', pc.lpn_calib_col_mean_err_tip],
+			[pc.lpn_calib_col_rms_err || 'RMS error', pc.lpn_calib_col_rms_err_tip]].forEach(function (h) {
+			var th = ffEl('th', null, h[0], hr);
+			if (h[1]) { th.title = h[1]; th.className = 'ec-help'; }
+		});
+		function row(name, s, cls) {
+			var tr = ffEl('tr', cls || null, null, body);
+			ffCell(tr, name);
+			ffCell(tr, String(s.n));
+			ffCell(tr, calibNum(s.obsMean));
+			ffCell(tr, calibNum(s.simMean));
+			ffCell(tr, calibNum(s.meanErr));
+			ffCell(tr, calibNum(s.rmsErr));
+		}
+		res.stats.locations.forEach(function (s) { row(s.id, s); });
+		row(pc.lpn_calib_network || 'Network', res.stats.network, 'lpn-calib-network');
+		ffEl('p', 'lpn-ff-note', typeof r === 'number'
+			? String(pc.lpn_calib_corr_means || 'Correlation between means: {r}').replace('{r}', r.toFixed(3))
+			: (pc.lpn_calib_corr_none || 'Correlation between means: it needs at least two locations whose means differ.'),
+			parent).id = 'lpn_calib_corr';
+	}
+	var LPN_CALIB_W = 520, LPN_CALIB_H = 320, LPN_CALIB_MARGIN = { left: 58, top: 12, right: 12, bottom: 44 };
+	function calibSvg(parent) {
+		var host = ffEl('div', 'lpn-calib-chart', null, parent);
+		return el('svg', { viewBox: '0 0 ' + LPN_CALIB_W + ' ' + LPN_CALIB_H, class: 'lpn-profile-svg' }, host);
+	}
+	function calibBox() {
+		return {
+			left: LPN_CALIB_MARGIN.left, top: LPN_CALIB_MARGIN.top,
+			width: LPN_CALIB_W - LPN_CALIB_MARGIN.left - LPN_CALIB_MARGIN.right,
+			height: LPN_CALIB_H - LPN_CALIB_MARGIN.top - LPN_CALIB_MARGIN.bottom
+		};
+	}
+	function calibMinSpan(values) {
+		var m = 0;
+		values.forEach(function (v) { m = Math.max(m, Math.abs(v)); });
+		return Math.max(1e-3, m * 0.05);
+	}
+	function calibYAxis(svg, yB, box, title) {
+		EngCalcs.lpnProfile.ticks(yB).forEach(function (v) {
+			var y = EngCalcs.lpnProfile.plotY(v, yB, box);
+			el('line', { x1: box.left, y1: y, x2: box.left + box.width, y2: y, class: 'lpn-profile-grid' }, svg);
+			tsText(svg, box.left - 5, y + 3, String(plainRound(v, 2)), { class: 'lpn-profile-tick', 'text-anchor': 'end' });
+		});
+		tsText(svg, 0, 0, title, { class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
+			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
+	}
+	function calibLegend(parent, items) {
+		var row = ffEl('div', 'lpn-calib-legend', null, parent);
+		items.forEach(function (it) {
+			var chip = ffEl('span', 'lpn-profile-chip lpn-ts-chip', null, row), sw = ffEl('i', 'lpn-ts-swatch', null, chip);
+			sw.style.color = it.color;
+			chip.appendChild(document.createTextNode(it.text));
+		});
+	}
+	// **THE CORRELATION PLOT PAGE**: every measurement, observed across and computed up, one color
+	// per location, against the 45-degree line where the two would agree. ONE set of bounds for both
+	// axes, or the diagonal is not 45 degrees and the plot flatters or slanders the model.
+	function calibCorrelationPlot(parent, res) {
+		var pc = EngCalcs.pageConfig || {}, values = [], svg, box = calibBox(), B, q = calibParamLabel(res.def), withPairs;
+		withPairs = res.stats.locations.filter(function (s) { return s.pairs.length; });
+		withPairs.forEach(function (s) { s.pairs.forEach(function (p) { values.push(p.o, p.s); }); });
+		if (!values.length) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_calib_no_pairs || 'No measurement could be compared, so there is nothing to plot.', parent);
+			return;
+		}
+		B = EngCalcs.lpnProfile.axisBounds(values, { ticks: 5, maxTicks: 8, minSpan: calibMinSpan(values) });
+		svg = calibSvg(parent);
+		function X(v) { return EngCalcs.lpnProfile.plotX(v, B, box); }
+		function Y(v) { return EngCalcs.lpnProfile.plotY(v, B, box); }
+		calibYAxis(svg, B, box, String(pc.lpn_calib_axis_sim || 'Computed: {q}').replace('{q}', q));
+		EngCalcs.lpnProfile.ticks(B).forEach(function (v) {
+			el('line', { x1: X(v), y1: box.top, x2: X(v), y2: box.top + box.height, class: 'lpn-profile-grid' }, svg);
+			tsText(svg, X(v), box.top + box.height + 14, String(plainRound(v, 2)), { class: 'lpn-profile-tick', 'text-anchor': 'middle' });
+		});
+		el('rect', { x: box.left, y: box.top, width: box.width, height: box.height, class: 'lpn-profile-frame' }, svg);
+		el('line', { x1: X(B.min), y1: Y(B.min), x2: X(B.max), y2: Y(B.max), class: 'lpn-profile-axis lpn-calib-diagonal' }, svg);
+		withPairs.forEach(function (s) {
+			s.pairs.forEach(function (p) {
+				var c = el('circle', { cx: X(p.o), cy: Y(p.s), r: 3, class: 'lpn-ts-dot lpn-calib-point', fill: s.color }, svg);
+				el('title', {}, c).appendChild(document.createTextNode(
+					String(pc.lpn_calib_point || '{id}, {time}: observed {o}, computed {s}')
+						.replace('{id}', s.id).replace('{time}', EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(p.t) : String(p.t))
+						.replace('{o}', calibNum(p.o)).replace('{s}', calibNum(p.s))));
+			});
+		});
+		tsText(svg, box.left + box.width / 2, LPN_CALIB_H - 6,
+			String(pc.lpn_calib_axis_obs || 'Observed: {q}').replace('{q}', q),
+			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
+		calibLegend(parent, withPairs.map(function (s) { return { color: s.color, text: s.id }; }));
+		ffEl('p', 'lpn-ff-note', pc.lpn_calib_corr_note || 'Each point is one measurement. The closer the points lie to the diagonal line, the closer the computed values match the observed ones.', parent);
+	}
+	// **THE MEAN COMPARISONS PAGE**: a bar pair per location, observed beside computed. The bars
+	// stand on ZERO, so zero is always on this axis -- a bar measured from a truncated floor tells
+	// the eye a ratio the numbers do not have.
+	function calibMeanChart(parent, res) {
+		var pc = EngCalcs.pageConfig || {}, svg, box = calibBox(), B, values = [0], locs, slot, bw, keep = {},
+			cObs = LPN_TS_COLORS[0], cSim = LPN_TS_COLORS[1];
+		locs = res.stats.locations.filter(function (s) { return s.n > 0; });
+		if (!locs.length) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_calib_no_pairs || 'No measurement could be compared, so there is nothing to plot.', parent);
+			return;
+		}
+		locs.forEach(function (s) { values.push(s.obsMean, s.simMean); });
+		B = EngCalcs.lpnProfile.axisBounds(values, { ticks: 5, maxTicks: 8, minSpan: calibMinSpan(values) });
+		svg = calibSvg(parent);
+		function Y(v) { return EngCalcs.lpnProfile.plotY(v, B, box); }
+		calibYAxis(svg, B, box, calibParamLabel(res.def));
+		slot = box.width / locs.length;
+		bw = Math.max(2, Math.min(28, slot * 0.35));
+		EngCalcs.lpnProfile.labelStride(locs.map(function (s, i) { return box.left + slot * (i + 0.5); }), 40)
+			.forEach(function (k) { keep[k] = true; });
+		locs.forEach(function (s, i) {
+			var cx = box.left + slot * (i + 0.5);
+			[[s.obsMean, cObs, cx - bw], [s.simMean, cSim, cx]].forEach(function (b) {
+				var y0 = Y(0), y1 = Y(b[0]), r = el('rect', {
+					x: b[2], y: Math.min(y0, y1), width: bw, height: Math.max(0.5, Math.abs(y1 - y0)),
+					class: 'lpn-calib-bar', fill: b[1]
+				}, svg);
+				el('title', {}, r).appendChild(document.createTextNode(s.id + '   ' + calibNum(b[0])));
+			});
+			if (keep[i]) {
+				tsText(svg, cx, box.top + box.height + 14, s.id, { class: 'lpn-profile-tick', 'text-anchor': 'middle' });
+			}
+		});
+		el('rect', { x: box.left, y: box.top, width: box.width, height: box.height, class: 'lpn-profile-frame' }, svg);
+		tsText(svg, box.left + box.width / 2, LPN_CALIB_H - 6, pc.lpn_calib_col_location || 'Location',
+			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
+		calibLegend(parent, [{ color: cObs, text: pc.lpn_calib_observed || 'Observed' },
+			{ color: cSim, text: pc.lpn_calib_computed || 'Computed' }]);
+	}
+	/** A file was chosen: read it as text, keep it for the chosen parameter, redraw. */
+	function landCalibText(text, name) {
+		calibFiles[calibParam] = { name: name || '', parsed: EngCalcs.lpnCalib.parse(text) };
+		calibTab = 'stats';
+		rebuildCalibReport();
+		refreshCalibOverlay();
+	}
+	function loadCalibFile(file) {
+		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
+		reader.onload = function (ev) { landCalibText(String(ev.target.result), file.name); };
+		reader.onerror = function () { alert(pc.lpn_survey_read_error || 'That file could not be read from your disk.'); };
+		reader.readAsText(file);
+	}
+	function openCalibBox() {
+		var box = calibBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		rebuildCalibReport();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, calibboxLayout); });
+		initTipsIn(box);
+	}
+	function closeCalibBox() { if (calibBoxIsOpen()) { hidePanel(calibBoxEl()); } }
+	function wireCalibBox() {
+		var box = calibBoxEl(), x = document.getElementById('lpn_calib_close'),
+			input = document.getElementById('lpn_calib_file');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeCalibBox); }
+		if (input) {
+			input.addEventListener('change', function () {
+				if (input.files && input.files[0]) { loadCalibFile(input.files[0]); }
+			});
+		}
+		makePanelDraggable(box);
+		addPanelResizeGrip(box);
+	}
+	function refreshCalibBoxIfOpen() {
+		if (calibBoxIsOpen()) { rebuildCalibReport(); }
+	}
+	// The time-series chart draws the measured points of whichever file matches what it is showing,
+	// so a newly loaded file has to reach an open chart too.
+	function refreshCalibOverlay() {
+		if (paneIsOpen() && paneState.tab === 'timeseries') { renderTimeSeries(); }
+	}
+	/**
+	 * **MEASURED POINTS FOR THE TIME-SERIES CHART**: the loaded file whose parameter is the quantity
+	 * the chart is showing, as `{id: [{t, v}]}`. Empty when no file matches, which is every chart
+	 * until somebody loads one -- so the chart is unchanged for everyone else.
+	 */
+	function calibMeasuredFor(group, field) {
+		var C = EngCalcs.lpnCalib, out = {}, k, def, f;
+		if (!C) { return out; }
+		for (k in calibFiles) {
+			if (!calibFiles.hasOwnProperty(k)) { continue; }
+			def = calibParamDef(k);
+			if (!def || def.group !== group || def.field !== field) { continue; }
+			f = calibFiles[k];
+			f.parsed.obs.forEach(function (o) { (out[o.id] = out[o.id] || []).push({ t: o.t, v: o.v }); });
+		}
+		return out;
+	}
+
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
 		// A solve landing here never touches the view -- see the note at the end of zoomExtent()
@@ -59015,6 +59423,8 @@ var EngCalcs = EngCalcs || {};
 		// box left open must show this run's answer and not the one it replaced.
 		refreshStatusReportBoxIfOpen();
 		refreshFullReportBoxIfOpen();
+		// And the calibration report, which compares against those same frames.
+		refreshCalibBoxIfOpen();
 		// And the scenario comparison, on the same seam and for exactly the same reason: the table
 		// answered a network that has just changed under it, so it is dropped rather than left
 		// standing as though it were still true.

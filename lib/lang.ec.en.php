@@ -3566,6 +3566,53 @@ $ec_lang['lpn_full_col_time']='Time';
 $ec_lang['lpn_full_col_type']='Type';
 $ec_lang['lpn_full_col_id']='ID';
 $ec_lang['lpn_full_row_count']='{n} rows.';
+
+// ---- The Calibration report (ROADMAP Task 601) -------------------------------------------------
+// EPANET's Report > Calibration and its three tabbed pages, with EPANET's own column names (EPANET
+// 2.2 manual, section 9.6). Mean error is EPANET's term for the mean ABSOLUTE difference. "Num obs"
+// is EPANET's own column heading, kept short because results columns are narrow.
+// lpn_calib_unknown_ids is worded to match the profile-file import (Task 604) so the two converge.
+$ec_lang['lpn_reports_calib']='Calibration';
+$ec_lang['lpn_reports_calib_tip']='Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.';
+$ec_lang['lpn_calib_title']='Calibration report';
+$ec_lang['lpn_calib_param']='Parameter';
+$ec_lang['lpn_calib_param_tip']='The quantity the calibration file measures. One file is held for each parameter.';
+$ec_lang['lpn_calib_load']='Load calibration file…';
+$ec_lang['lpn_calib_load_tip']='A text file with a location ID, a time, and a measured value on each line. The time is measured from the start of the simulation, in decimal hours or hours:minutes. A semicolon starts a comment. A line with only a time and a value belongs to the location above it.';
+$ec_lang['lpn_calib_none']='No calibration file is loaded for this parameter.';
+$ec_lang['lpn_calib_session']='A calibration file is held for this session only. It is not saved with the project or on this device.';
+$ec_lang['lpn_calib_file']='{file}: {n} measurements at {m} locations.';
+$ec_lang['lpn_calib_units']='The file\'s values are read in this project\'s units: {unit}.';
+$ec_lang['lpn_calib_unknown_ids']='Named in the file but not in this network: {ids}';
+$ec_lang['lpn_calib_unknown_count']='Measurements skipped because their location is not in this network: {n}.';
+$ec_lang['lpn_calib_bad_lines']='Lines that could not be read, skipped: {lines}';
+$ec_lang['lpn_calib_outside']='Measurements outside the times this run reported, skipped: {n}.';
+$ec_lang['lpn_calib_no_value']='Measurements with no computed value at their time, skipped: {n}.';
+$ec_lang['lpn_calib_needs_run']='There are no results to compare with yet. The report fills in once the network has been calculated.';
+$ec_lang['lpn_calib_no_pairs']='No measurement could be compared, so there is nothing to plot.';
+$ec_lang['lpn_calib_tab_stats']='Statistics';
+$ec_lang['lpn_calib_tab_corr']='Correlation plot';
+$ec_lang['lpn_calib_tab_means']='Mean comparisons';
+$ec_lang['lpn_calib_col_location']='Location';
+$ec_lang['lpn_calib_col_n']='Num obs';
+$ec_lang['lpn_calib_col_n_tip']='Number of observations: the measurements at this location that were compared.';
+$ec_lang['lpn_calib_col_obs_mean']='Observed mean';
+$ec_lang['lpn_calib_col_sim_mean']='Computed mean';
+$ec_lang['lpn_calib_col_mean_err']='Mean error';
+$ec_lang['lpn_calib_col_mean_err_tip']='The mean of the absolute differences between each observed value and the computed value at the same time.';
+$ec_lang['lpn_calib_col_rms_err']='RMS error';
+$ec_lang['lpn_calib_col_rms_err_tip']='Root mean square error: the square root of the mean of the squared differences between observed and computed values.';
+$ec_lang['lpn_calib_network']='Network';
+$ec_lang['lpn_calib_corr_means']='Correlation between means: {r}';
+$ec_lang['lpn_calib_corr_none']='Correlation between means: it needs at least two locations whose means differ.';
+$ec_lang['lpn_calib_axis_obs']='Observed: {q}';
+$ec_lang['lpn_calib_axis_sim']='Computed: {q}';
+$ec_lang['lpn_calib_observed']='Observed';
+$ec_lang['lpn_calib_computed']='Computed';
+$ec_lang['lpn_calib_point']='{id}, {time}: observed {o}, computed {s}';
+$ec_lang['lpn_calib_corr_note']='Each point is one measurement. The closer the points lie to the diagonal line, the closer the computed values match the observed ones.';
+$ec_lang['lpn_calib_ts_point']='Measured at {id}, {time}: {v}';
+$ec_lang['lpn_calib_ts_note']='Rings are measured values from the calibration file.';
 $ec_lang['lpn_energy_no_price']='No price of power is stated, so every cost here is zero. Set one under Settings, Energy.';
 // The sibling of the line above, and the difference between them is the whole of Task 581: a file
 // that states a price of zero is not a file that states no price, and the report must not say the
