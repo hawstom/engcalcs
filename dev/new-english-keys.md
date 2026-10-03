@@ -233,7 +233,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**92 still to read**, of 143 new keys across 12 unmerged branch(es).
+**105 still to read**, of 152 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -244,8 +244,19 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/contour (`2418222a`) — 16 new, 16 to read @@ NEEDS RULING
+### chore/selection-word (`16dce45b`) — adds no English strings
 
+### feat/contour (`1871dcb7`) — 25 new, 25 to read @@ NEEDS RULING
+
+- **`lpn_contour_buffer`**
+  > Buffer
+  @@ NEEDS RULING
+- **`lpn_contour_buffer_tip`**
+  > How far the color reaches from each pipe, as a multiple of the median pipe length. It fades out over the outer part.
+  @@ NEEDS RULING
+- **`lpn_contour_buffer_unit`**
+  > × median pipe length
+  @@ NEEDS RULING
 - **`lpn_contour_consent_1`**
   > Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.
   @@ NEEDS RULING
@@ -270,29 +281,47 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_contour_few`**
   > Too few nodes to contour.
   @@ NEEDS RULING
-- **`lpn_contour_filled`**
-  > Filled contours
+- **`lpn_contour_fill`**
+  > Fill
+  @@ NEEDS RULING
+- **`lpn_contour_fill_bands`**
+  > Bands
+  @@ NEEDS RULING
+- **`lpn_contour_fill_smooth`**
+  > Smooth
+  @@ NEEDS RULING
+- **`lpn_contour_fill_tip`**
+  > Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.
+  @@ NEEDS RULING
+- **`lpn_contour_interval`**
+  > Interval
   @@ NEEDS RULING
 - **`lpn_contour_lines`**
-  > Line contours
+  > Contour lines
   @@ NEEDS RULING
 - **`lpn_contour_menu`**
   > Contour
   @@ NEEDS RULING
+- **`lpn_contour_opacity`**
+  > Fill opacity
+  @@ NEEDS RULING
 - **`lpn_contour_plot`**
   > Contour plot
   @@ NEEDS RULING
-- **`lpn_contour_plot_tip`**
-  > Colors the map between nodes by the field the nodes are colored by, interpolated linearly between neighboring nodes. No color is drawn across pumps, valves, or closed links, or across wide gaps between nodes.
-  @@ NEEDS RULING
 - **`lpn_contour_support`**
-  > Contour plot: linear between {n} nodes. No color across pumps, valves, or closed links, or across gaps wider than {k} times the median pipe length.
+  > Contour plot: {n} nodes, interpolated along {p} pipes and up to {k} times the median pipe length beside them. No color across pumps, valves, or closed links.
   @@ NEEDS RULING
 - **`lpn_contour_support_dem`**
   > Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.
   @@ NEEDS RULING
+- **`lpn_contour_support_lines`**
+  > Contour lines every {i} {u}.
+  @@ NEEDS RULING
 - **`lpn_contour_tip`**
-  > Show a contour plot on the map: the colors of the nodes, spread over the area between them. Its style is in Settings, where you can also turn it off.
+  > Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.
+  @@ NEEDS RULING
+- **`lpn_contour_too_many`**
+  > Too many contour lines at this interval; widen it to draw them.
   @@ NEEDS RULING
 
 ### feat/criticality (`84ea5311`) — 31 new, 8 to read @@ NEEDS RULING
@@ -391,7 +420,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selected
   @@ NEEDS RULING
 
-### feat/demand-scaling (`97943972`) — 77 new, 54 to read @@ NEEDS RULING
+### feat/demand-scaling (`54179352`) — 77 new, 58 to read @@ NEEDS RULING
 
 - **`lpn_analyze_menu`**
   > Analyze
@@ -436,20 +465,20 @@ build for that would be a gate nobody keeps. Refresh it with
   > This project has no links yet, so there is nothing to break.
   _Ruled OK 2026-10-01._
 - **`lpn_crit_no_selection`**
-  > No pipe, pump, or valve is selected. Choose one on the map, or break every link.
-  _Ruled OK 2026-10-01._
+  > No links are selected. Select links or choose All links.
+  @@ NEEDS RULING
 - **`lpn_crit_scope`**
   > Links to break
   _Ruled OK 2026-10-01._
 - **`lpn_crit_scope_all`**
-  > Every link
-  _Ruled OK 2026-10-01._
+  > All links
+  @@ NEEDS RULING
 - **`lpn_crit_scope_selected`**
-  > The selected links
-  _Ruled OK 2026-10-01._
+  > Selected links
+  @@ NEEDS RULING
 - **`lpn_crit_scope_tip`**
-  > Every pipe, pump, and valve, or only the ones selected on the map. Choose the set before you run.
-  _Ruled OK 2026-10-01._
+  > All pipes, pumps, and valves, or only those selected on the map. Choose the set before you run.
+  @@ NEEDS RULING
 - **`lpn_crit_skipdead`**
   > Skip dead ends
   @@ NEEDS RULING
@@ -523,7 +552,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > What demand scale can the system handle?
   @@ NEEDS RULING
 - **`lpn_ds_head_search_selected`**
-  > What demand can the selection handle
+  > What demand scale can these junctions handle?
   @@ NEEDS RULING
 - **`lpn_ds_head_velocity`**
   > Highest velocities
@@ -559,7 +588,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > This project has no junctions yet, so there are no demands to scale.
   @@ NEEDS RULING
 - **`lpn_ds_no_selection`**
-  > No junctions are selected. Select junctions, or scale all of them.
+  > No junctions are selected. Select junctions or choose All junctions.
   @@ NEEDS RULING
 - **`lpn_ds_nosolve_at`**
   > At a demand scale of {m}, the network gave no answer. {reason}
@@ -580,7 +609,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Junctions scaled and checked: {n}.
   @@ NEEDS RULING
 - **`lpn_ds_scope`**
-  > Demands to scale
+  > Junctions to scale
   @@ NEEDS RULING
 - **`lpn_ds_scope_all`**
   > All junctions
@@ -589,13 +618,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selected junctions
   @@ NEEDS RULING
 - **`lpn_ds_scope_tip`**
-  > Scale the demand of the selection. Pressures are checked at the scaled demand.
+  > All junctions, or only those selected on the map. Pressures are checked at the scaled demand.
   @@ NEEDS RULING
 - **`lpn_ds_search_note`**
-  > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which every junction keeps the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.
+  > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.
   @@ NEEDS RULING
 - **`lpn_ds_search_note_selected`**
-  > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the selection keeps the given lowest pressure allowed.
+  > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.
   @@ NEEDS RULING
 - **`lpn_ds_search_stopped`**
   > The search was stopped before it found an answer.
@@ -627,7 +656,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/flow-balance (`f5be7f04`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/flow-balance (`c31826a4`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_sysflow_consumed`**
   > Consumed
@@ -636,7 +665,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Total of every positive demand: water drawn from the network at junctions, and any flow into a reservoir.
   @@ NEEDS RULING
 - **`lpn_sysflow_menu`**
-  > System flow
+  > Flow balance
   @@ NEEDS RULING
 - **`lpn_sysflow_produced`**
   > Produced
@@ -648,7 +677,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.
   @@ NEEDS RULING
 - **`lpn_sysflow_title`**
-  > System flow balance
+  > Flow balance
   @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
@@ -686,7 +715,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   @@ NEEDS RULING
 
-### feat/property-graph (`7686ca67`) — 5 new, 3 to read @@ NEEDS RULING
+### feat/property-graph (`3c987393`) — 5 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.
