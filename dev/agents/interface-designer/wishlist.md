@@ -517,3 +517,14 @@ N+4. **A description line inside an open menu, under the hovered row** — the o
 N+5. **A check that flags one English string holding both a select word and an option word
     (option / menu / choose / All).** Would have caught all five Fire flow strings. A visitor-hit
     defect a person misses, which is the bar CLAUDE.md sets for a new check.
+
+## 2026-10-03 -- tips follow-up (Tom's Q4, Q7)
+
+- **Draw the two-tier line by content and write it into the working guide:** hover tip = what a
+  control does, about 75 characters, no glyph; anything longer or with a source/limit/consequence =
+  `?` tier. Evidence in `dev/tip-followup-2026-10-03.md`. The Fire flow / Criticality / Demand scaling
+  glyphless rows are the tier 2 tips missing their glyph.
+- **Tom's CSV pass (`dev/tip-review.csv`) before any tip is edited**, since 108 are ruled and an edit
+  lapses the ruling. Hold the copy edits until his `tom` column is back.
+- **Shorten the three long menu-item tips** (`lpn_tables_menu_tip`, `lpn_run_menu_tip`,
+  `lpn_reports_menu_tip`); a menu has no room for a glyph.
