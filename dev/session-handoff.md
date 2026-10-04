@@ -112,12 +112,10 @@ pull there. He phone-tested dialog-audit: "Dialogs are good."
 
 ### In flight
 
-- **`fix/dock-title-buttons`** (agent running at /clear time; worktree
-  `~/webdev/worktrees/fix-dock-title-buttons`, on Branch previews): Full Report's Download and Print
-  collide with the dock icons; audit every dockable box, one rule, try his "middle". `git log` and
-  `git status` there first; relaunch from its commits if the agent died. A defect track: merges on
-  green, but show him the before/after.
-- **`feat/dock-flag-order`** (NOT started; queued behind the above, same dock code): drag a hidden
+- **`fix/dock-title-buttons` MERGED** on his "is good. Merge": a box's own buttons (Full report,
+  Run report) sit on a sticky row under the title bar; the band holds only title, dock icons and x.
+  Not his "middle": a docked column can be 240 px. `dock-title-band-harness.js` checks all 17 boxes.
+- **`feat/dock-flag-order`** (NOT started; the dock seam is now free, so it can start): drag a hidden
   box's flag along its bar to reorder; order in the existing layout key in this browser; a click still
   opens; phone tap works. His words: "I would like a good college try." Protect it in
   dev/branch-policy.json when made.
