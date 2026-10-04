@@ -15,39 +15,50 @@ The count was 57 when Ida wrote the item; today it is **77** non-comment call si
 
 | Verdict | Count | What happened |
 |---|---|---|
-| MUST BLOCK | 38 | Left as native dialogs (20 `confirm`, 17 `prompt`, 1 `alert`) |
+| MUST BLOCK | 38 | Now `askDialog()`, the page's one in-page box (20 confirm, 17 prompt, 1 alert) |
 | INFORMATION, info | 9 | Now `setNotice()` |
 | INFORMATION, warning | 30 | Now `setWarning()` (same door, severity `warning`) |
 | DELETE | 0 | Nothing was redundant |
-| **Total** | 77 | |
+| **Total** | 77 | No native alert/confirm/prompt is left on the page |
 
-`dev/lpn-spike/no-raw-alert-harness.js` holds this table: no `alert(` outside the one audited site, and the MUST BLOCK
-`confirm(`/`prompt(` counts per function are an allowlist. `dev/lpn-spike/dialog-audit-browser-harness.js`
-shows two converted messages landing in the log, with no dialog, in a real Chrome.
+## The one question box
 
-## Open question for Tom
+Tom, 2026-10-04: *"The browser-style boxes aren't pretty. I think they all should be converted."*
+The 38 MUST BLOCK sites still block, but in the page's own box: `askDialog(req, done)` in
+`js/looped-network.js` (`EngCalcs.lpnAsk` for `js/lpn-search.js` and `js/lpn-terrain.js`;
+`askDialogP()` is the Promise form the async file commands `await`). It is not a second modal: it
+fills `#lpn_dialog`, the box `openDialog()` already used for the close prompt and the lock choice,
+which gained a title band (`.lpn-setbox-title`, as on every other box), Enter for the default
+button, Escape for Cancel, a Tab trap, focus returned to the opener, `role="alertdialog"` for a
+question, and a width that fits a phone in tall mode. A question asked while another is open waits
+its turn. Buttons are plain page buttons dressed alike, so the consent questions still cannot
+dress Accept to stand out.
 
-The 38 MUST BLOCK sites are still the browser's own plain dialogs. Whether they become one styled
-in-page modal (consistent look, can show the message log beside it, can carry a Cancel that names
-the thing being kept) is a separate decision and was not made here. One of them, `drawTestGrid`'s
-"add to the existing network" confirm, guards an undoable act on a developer button, so it is the
-likeliest to simply go.
+A native dialog held the script until answered; this cannot, so every caller moved what followed
+the answer into the callback. The one native dialog left is the browser's own "Leave site?" box
+on `beforeunload`, which no page can replace.
 
-The click-here instructions of the background image tools (scale by picking, scale from a point,
-position) were alerts. They are now a notice and a log entry, and the "Adjusting the background
-image" bar at the bottom of the screen carries the current step's words for as long as the mode
-lasts (the mode hint is hidden on a phone, so it could not be relied on).
+`dev/lpn-spike/no-raw-alert-harness.js` refuses any raw `alert(`/`confirm(`/`prompt(` in
+`js/looped-network.js`, `js/lpn-*.js` and `Looped-Network.php`. Headless harnesses answer the box
+through `window.lpnDialogAnswerer`, which `lpn-dom-stub.js` routes to their scripted
+`window.confirm`/`prompt` (the browser-pass Session routes it to the native dialog, so its
+`answerConfirmsWith`/`answerPromptWith` still work). `dev/lpn-spike/dialog-modal-browser-harness.js`
+removes that seam and clicks the real box in Chrome, desk and 390 px.
+
+The background image tools' click instructions are a notice and a log entry, and the "Adjusting the
+background image" bar carries the current step's words for as long as the mode lasts. That bar now
+wears the same light background, ink and border as every other box (it was the one dark strip).
 
 A warning is also shown in a strip fixed above every open box (`#lpn_warn_strip`), because a
 refusal raised inside Libraries, Settings or the survey dialog landed under the box on a phone.
 
 The map notice line is one amber for every message and always was; only the log row's colour
-follows severity. Nothing was lost there.
+follows severity.
 
 ## The sites
 
 Function names, not line numbers, so the table survives edits. File is `js/looped-network.js`
-unless named. BLOCK = MUST BLOCK, INFO = information at info, WARN = information at warning.
+unless named. BLOCK = MUST BLOCK (now `askDialog()`), INFO = information at info, WARN = information at warning.
 
 | Function | Call | String key | Verdict | Reason |
 |---|---|---|---|---|

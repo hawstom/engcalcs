@@ -871,8 +871,8 @@ global.prompt = global.window.prompt;
 // **THE QUESTION BOX ANSWERS THROUGH THE OLD STUBS** (Task 710). The page's alert/confirm/prompt
 // calls became askDialog(), an in-page box answered by a click. Here it is answered at once by
 // whichever of window.X / global.X the harness last replaced, so every harness that scripts
-// `window.confirm = () => false` still drives the same flow. dialog-modal-harness.js tests the
-// box itself; dialog-modal-browser-harness.js clicks it in a real Chrome.
+// `window.confirm = () => false` still drives the same flow. dialog-modal-browser-harness.js
+// removes this seam and clicks the box itself in a real Chrome.
 const stubDialogDefaults = { alert: global.window.alert, confirm: global.window.confirm, prompt: global.window.prompt };
 global.window.lpnDialogAnswerer = function (req) {
   const kind = req.kind === 'copy' ? 'prompt' : (req.kind || 'alert');
