@@ -45,9 +45,9 @@ const L = loadLoopedNetwork(
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
 	"\t\tsetView: function (v) { applyView(v); }, geoHome: geoHomeView,\n" +
 	"\t\tlayer: function () { return basemapLayer; },\n" +
-	"\t\tsetStyle: setBasemapStyle, setBasemapOn: setBasemapOn,\n" +
+	"\t\tsetStyle: setBasemapSource, setBasemapOn: setBasemapOn,\n" +
 	"\t\tteaserPress: toggleBasemapTeaser,\n" +
-	"\t\tstyle: basemapStyle, basemapOn: basemapOn, isGeo: isLatLonProject,\n" +
+	"\t\tstyle: basemapSource, basemapOn: basemapOn, isGeo: isLatLonProject,\n" +
 	"\t\tsatAvailable: satelliteAvailable,\n" +
 	"\t\trefreshAll: refreshAllFromDocument,\n" +
 	"\t\tgetProject: function () { return project; }, serialize: serializeProject "

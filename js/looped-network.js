@@ -5954,9 +5954,9 @@ var EngCalcs = EngCalcs || {};
 			// (a ratio and a percentage), so neither is reinterpreted on a unit change.
 			symbolCapMultiple: 0.5,
 			symbolCapPercentile: 20,
-			// Task 617: a CSS filter on the TILE LAYER only (LPN_BASEMAP_FILTERS). Project data on the
+			// Task 617: a CSS look (grayscale etc.) on the TILE LAYER only (LPN_BASEMAP_STYLES). Project data on the
 			// precedent of backdropOpacity beside it; an old file merges onto this and opens Normal.
-			basemapFilter: 'normal',
+			basemapStyle: 'normal',
 			backdropOpacity: 0.5, // 0-1, applied to the backdrop image -- the other half of the same control (R-205: new-project default, matched by every shipped example)
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
 			// (ROADMAP Task 329).
@@ -7546,22 +7546,23 @@ var EngCalcs = EngCalcs || {};
 		bop = (bop === undefined || bop === null || !isFinite(bop)) ? 1 : bop;
 		return (georefActive() || mapgeoActive()) ? Math.min(bop, LPN_WIZARD_BACKDROP_MAX) : bop;
 	}
-	// **BASEMAP FILTER (Task 617).** A display-time CSS filter on the tile layer `.lpn-basemap` and
+	// **BASEMAP STYLE (Task 617).** A display-time CSS filter on the tile layer `.lpn-basemap` and
 	// nothing else: the network, the labels and the attribution (separate DOM) are never filtered, and
 	// nothing new is fetched. No invert or hue-rotate preset, on purpose. An unknown stored name is Normal.
-	var LPN_BASEMAP_FILTERS = {
+	var LPN_BASEMAP_STYLES = {
 		normal: 'none',
 		muted: 'grayscale(60%) contrast(0.9)',
 		faded: 'grayscale(40%) brightness(1.1) contrast(0.8)',
 		grayscale: 'grayscale(100%)'
 	};
-	function basemapFilterName() {
-		var f = settings.basemapFilter;
-		return (typeof f === 'string' && LPN_BASEMAP_FILTERS.hasOwnProperty(f)) ? f : 'normal';
+	function basemapStyleName() {
+		var f = settings.basemapStyle;
+		if ((f === undefined || f === 'normal') && settings.basemapFilter) { f = settings.basemapFilter; } // pre-release field name
+		return (typeof f === 'string' && LPN_BASEMAP_STYLES.hasOwnProperty(f)) ? f : 'normal';
 	}
 	function refreshBackdropOpacity() {
 		if (!svg) { return; }
-		svg.style.setProperty('--lpn-basemap-filter', LPN_BASEMAP_FILTERS[basemapFilterName()]);
+		svg.style.setProperty('--lpn-basemap-style', LPN_BASEMAP_STYLES[basemapStyleName()]);
 		var bop = settings.backdropOpacity;
 		svg.style.setProperty('--lpn-backdrop-opacity', (bop === undefined || bop === null) ? 1 : bop);
 		svg.style.setProperty('--lpn-backdrop-img-opacity', backdropImageOpacity());
@@ -13109,7 +13110,7 @@ var EngCalcs = EngCalcs || {};
 		var c = tileDebugCounts(), z = basemapWantKeys.length
 			? basemapWantKeys[0].split('/')[1] : '—';
 		var lines = [
-			'source ' + basemapStyle() + ' • zoom ' + z
+			'source ' + basemapSource() + ' • zoom ' + z
 				+ ' • token ' + (mapboxToken() ? 'present' : 'ABSENT'),
 			'wanted ' + c.wanted + ' • from cache ' + c.cached + ' • requested ' + c.requested,
 			'arrived ' + c.arrived + ' • drawn ' + c.drawn + ' • failed ' + c.failed,
@@ -13194,12 +13195,12 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 	};
-	function basemapStyle() {
+	function basemapSource() {
 		var st = project.basemap;
 		if (st === 'satellite' && !satelliteAvailable()) { return 'osm'; }
 		return LPN_TILE_SOURCES[st] ? st : 'osm';
 	}
-	function tileSource() { return LPN_TILE_SOURCES[basemapStyle()]; }
+	function tileSource() { return LPN_TILE_SOURCES[basemapSource()]; }
 
 	// **A CEILING ON REQUESTS PER REFRESH, WHICH IS THE POLICY-RELEVANT NUMBER.** The tile usage
 	// policy forbids bulk downloading; a viewport is not bulk, but a bug that asked for a whole
@@ -13258,7 +13259,7 @@ var EngCalcs = EngCalcs || {};
 					// changed and kept the OLD <image>: switching the street map to satellite left
 					// OpenStreetMap tiles on screen -- under the Mapbox credit -- until a pan or a
 					// zoom happened to ask for different tile numbers.
-					key: basemapStyle() + '/' + z + '/' + x + '/' + y, z: z, x: x, y: y,
+					key: basemapSource() + '/' + z + '/' + x + '/' + y, z: z, x: x, y: y,
 					url: tileSource().url().replace('{z}', z).replace('{x}', x).replace('{y}', y),
 					px: inwardX(lonL), py: yT, pw: lonR - lonL, ph: inwardY(latB) - yT,
 					// The tile's own corner of the Earth, carried so a PROJECTED project can ask
@@ -13388,7 +13389,7 @@ var EngCalcs = EngCalcs || {};
 	// **THE STYLE IN USE IS REMEMBERED WHEN THE MAP GOES OFF**, so Detach then Attach brings back
 	// satellite for somebody who was on satellite, not the street map. `basemapLast` is on the
 	// project for the same reason `basemap` is: it is a statement about this document's picture.
-	function setBasemapStyle(style) {
+	function setBasemapSource(style) {
 		if (style === 'off' && project.basemap && project.basemap !== 'off') {
 			project.basemapLast = project.basemap;
 		}
@@ -13397,7 +13398,7 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 	}
 	function setBasemapOn(on) {
-		setBasemapStyle(on ? (project.basemapLast || 'osm') : 'off');
+		setBasemapSource(on ? (project.basemapLast || 'osm') : 'off');
 	}
 	// **THE ATTRIBUTION IS REQUIRED BY BOTH PROVIDERS AND IS NOT DISMISSIBLE.** It appears whenever
 	// a tile can, and the only thing that removes it is turning the basemap off. The two sources
@@ -13414,7 +13415,7 @@ var EngCalcs = EngCalcs || {};
 	// **THE TEASER APPEARS ON EXACTLY THE CONDITION THE MENU ROW DOES**, by calling the same two
 	// predicates rather than by restating them: a third copy of "geographic, and we have a token"
 	// is a third thing to keep in step with openMapMenu(). It carries the SAME two strings as that
-	// row and toggles through the SAME setBasemapStyle() seam, so the corner and the menu cannot
+	// row and toggles through the SAME setBasemapSource() seam, so the corner and the menu cannot
 	// come to mean different things.
 	//
 	// IT SURVIVES BELOW 640px. The small-screen pass takes the toolbar away and reduces the menu
@@ -13431,7 +13432,7 @@ var EngCalcs = EngCalcs || {};
 		// that is already showing.
 		if (!worldMapAttached() || !satelliteAvailable()) { b.style.display = 'none'; return; }
 		b.style.display = '';
-		on = basemapOn() && basemapStyle() === 'satellite';
+		on = basemapOn() && basemapSource() === 'satellite';
 		b.classList.toggle('lpn-basemap-teaser-on', on);
 		// The name says what the PRESS will do, not what is showing -- the button swaps the two
 		// basemaps, so from satellite it offers the street map and never "Hide".
@@ -13452,7 +13453,7 @@ var EngCalcs = EngCalcs || {};
 	function toggleBasemapTeaser() {
 		if (!worldMapAttached()) { return; }
 		saveUndoSnapshot();
-		setBasemapStyle(basemapStyle() === 'satellite' ? 'osm' : 'satellite');
+		setBasemapSource(basemapSource() === 'satellite' ? 'osm' : 'satellite');
 	}
 	function wireBasemapTeaser() {
 		var b = document.getElementById('lpn_basemap_teaser');
@@ -13463,7 +13464,7 @@ var EngCalcs = EngCalcs || {};
 		var c = document.getElementById('lpn_basemap_credit'), sat;
 		if (!c) { return; }
 		c.style.display = basemapOn() ? 'block' : 'none';
-		sat = basemapOn() && basemapStyle() === 'satellite';
+		sat = basemapOn() && basemapSource() === 'satellite';
 		Array.prototype.forEach.call(c.querySelectorAll('[data-basemap-credit]'), function (el2) {
 			el2.style.display = (el2.getAttribute('data-basemap-credit') === (sat ? 'satellite' : 'osm'))
 				? 'inline' : 'none';
@@ -13768,7 +13769,7 @@ var EngCalcs = EngCalcs || {};
 		// failure the key's own style prefix was introduced to stop. A source change therefore
 		// blanks, as it always did; only a zoom or a pan carries. Caught by
 		// dev/lpn-spike/basemap-credit-harness.js the first time this shipped without the test.
-		var style = basemapStyle(), carried = {};
+		var style = basemapSource(), carried = {};
 		for (k in basemapEls) {
 			if (basemapEls.hasOwnProperty(k) && !want[k]) {
 				if (k.slice(0, style.length + 1) === style + '/') {
@@ -46553,21 +46554,21 @@ var EngCalcs = EngCalcs || {};
 		});
 		row(mapBody, pc.lpn_settings_backdrop_opacity || 'Background image opacity (0 to 1)', backdropOpacityInput);
 		// Task 617: tone the street or satellite tiles down. Same save path as the opacity row above.
-		var basemapFilterSelect = document.createElement('select');
-		basemapFilterSelect.id = 'lpn_set_basemap_filter';
-		[['normal', pc.lpn_basemap_filter_normal || 'Normal'],
-			['muted', pc.lpn_basemap_filter_muted || 'Muted'],
-			['faded', pc.lpn_basemap_filter_faded || 'Faded'],
-			['grayscale', pc.lpn_basemap_filter_grayscale || 'Grayscale']].forEach(function (o) {
+		var basemapStyleSelect = document.createElement('select');
+		basemapStyleSelect.id = 'lpn_set_basemap_style';
+		[['normal', pc.lpn_basemap_style_normal || 'Normal'],
+			['muted', pc.lpn_basemap_style_muted || 'Muted'],
+			['faded', pc.lpn_basemap_style_faded || 'Faded'],
+			['grayscale', pc.lpn_basemap_style_grayscale || 'Grayscale']].forEach(function (o) {
 			var opt = document.createElement('option');
-			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === basemapFilterName()) { opt.selected = true; }
-			basemapFilterSelect.appendChild(opt);
+			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === basemapStyleName()) { opt.selected = true; }
+			basemapStyleSelect.appendChild(opt);
 		});
-		basemapFilterSelect.addEventListener('change', function () {
-			settings.basemapFilter = basemapFilterSelect.value; refreshBackdropOpacity(); saveToStorage();
+		basemapStyleSelect.addEventListener('change', function () {
+			settings.basemapStyle = basemapStyleSelect.value; delete settings.basemapFilter; refreshBackdropOpacity(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_basemap_filter || 'Basemap filter', basemapFilterSelect,
-			pc.lpn_settings_basemap_filter_tip);
+		row(mapBody, pc.lpn_settings_basemap_style || 'Basemap style', basemapStyleSelect,
+			pc.lpn_settings_basemap_style_tip);
 		var legendSelect = document.createElement('select');
 		legendPositionOptions(pc).forEach(function (o) {
 			var opt = document.createElement('option');

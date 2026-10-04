@@ -2,11 +2,11 @@
 //   node dev/lpn-spike/basemap-style-harness.js
 //
 // WHY THIS EXISTS. The Settings > Map row "Basemap filter" tones the street or satellite tiles with
-// a CSS filter. Four ways it can be wrong without anything throwing: the filter lands on the whole
+// a CSS filter. Four ways it can be wrong without anything throwing: the style lands on the whole
 // canvas (greying the network and its labels), it is not saved so a reopened project forgets it, an
 // old file without the field opens in something other than Normal, or a preset (invert, hue-rotate)
 // quietly makes the credit or the drawing unreadable. The row is driven through its real <select>
-// and its real change event; the filter is read off the canvas as the CSS variable the tile layer's
+// and its real change event; the style is read off the canvas as the CSS variable the tile layer's
 // rule consumes, and the rules themselves are read from css/engcalcs.css.
 
 const fs = require('fs');
@@ -33,7 +33,7 @@ const L = loadLoopedNetwork(
 	"\t\tsetView: function (v) { return applyView(v); }, geoHome: geoHomeView,\n" +
 	"\t\trebuildSettings: function () { rebuildSettingsBox(); },\n" +
 	"\t\tsettings: function () { return settings; }, serialize: serializeProject,\n" +
-	"\t\tfilters: function () { return LPN_BASEMAP_FILTERS; }"
+	"\t\tstyles: function () { return LPN_BASEMAP_STYLES; }"
 );
 L.buildLayers();
 L.setCanvas(1000, 500);
@@ -51,25 +51,33 @@ function find(id) {
 	return hit;
 }
 const canvasFilter = () => stub.byId.lpn_canvas.style.getPropertyValue
-	? stub.byId.lpn_canvas.style.getPropertyValue('--lpn-basemap-filter')
-	: stub.byId.lpn_canvas.style['--lpn-basemap-filter'];
+	? stub.byId.lpn_canvas.style.getPropertyValue('--lpn-basemap-style')
+	: stub.byId.lpn_canvas.style['--lpn-basemap-style'];
 function open(saved) { L.applySaved(saved); L.buildDom(); L.setView(L.geoHome()); L.noteMapSized(); L.rebuildSettings(); }
 
 console.log('\n--- the presets ---');
-const F = L.filters();
+const F = L.styles();
 ok('four presets: normal, muted, faded, grayscale', Object.keys(F).join() === 'normal,muted,faded,grayscale', Object.keys(F).join());
 ok('Normal is no filter at all', F.normal === 'none');
 ok('no preset inverts or rotates hue', Object.values(F).every(v => !/invert|hue-rotate/.test(v)));
 ok('every preset is plain filter functions, no colour literal', Object.values(F).every(v => v === 'none' || /^(\w+\([\d.]+%?\)\s?)+$/.test(v)));
 
+console.log('\n--- a pre-release file with basemapFilter keeps its choice ---');
+{
+	const pre = NET3W();
+	delete pre.settings.basemapStyle; pre.settings.basemapFilter = 'faded';
+	open(pre);
+	ok('basemapFilter field read as fallback', canvasFilter() === F.faded, String(canvasFilter()));
+}
+
 console.log('\n--- an old project opens Normal ---');
 {
 	const old = NET3W();
-	delete old.settings.basemapFilter;
+	delete old.settings.basemapStyle; delete old.settings.basemapFilter;
 	open(old);
-	ok('old file: setting reads normal', L.settings().basemapFilter === 'normal', String(L.settings().basemapFilter));
+	ok('old file: setting reads normal', L.settings().basemapStyle === 'normal', String(L.settings().basemapStyle));
 	ok('...and the canvas carries no filter', canvasFilter() === 'none', String(canvasFilter()));
-	const sel = find('lpn_set_basemap_filter');
+	const sel = find('lpn_set_basemap_style');
 	ok('the select is in Settings > Map', !!sel);
 	ok('...showing Normal', sel && sel.children.filter(o => o.selected).map(o => o.value).join() === 'normal');
 	ok('...with four options', sel && sel.children.length === 4);
@@ -77,19 +85,19 @@ console.log('\n--- an old project opens Normal ---');
 
 console.log('\n--- choosing a preset, through the real control ---');
 {
-	const sel = find('lpn_set_basemap_filter');
+	const sel = find('lpn_set_basemap_style');
 	sel.value = 'muted'; fire(sel, 'change');
-	ok('Muted is stored on settings', L.settings().basemapFilter === 'muted');
+	ok('Muted is stored on settings', L.settings().basemapStyle === 'muted');
 	ok('...and lands on the canvas as the tile-layer variable', canvasFilter() === F.muted, String(canvasFilter()));
 	sel.value = 'grayscale'; fire(sel, 'change');
 	ok('Grayscale replaces it', canvasFilter() === F.grayscale, String(canvasFilter()));
 }
 
-console.log('\n--- the filter reaches the tile layer and nothing else ---');
+console.log('\n--- the style reaches the tile layer and nothing else ---');
 {
 	const css = fs.readFileSync(ROOT + 'css/engcalcs.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
-	const rules = [...css.matchAll(/([^{}]+)\{([^{}]*--lpn-basemap-filter[^{}]*)\}/g)];
-	const consumers = rules.filter(r => /(^|[^-\w])filter\s*:\s*var\(--lpn-basemap-filter/.test(r[2]));
+	const rules = [...css.matchAll(/([^{}]+)\{([^{}]*--lpn-basemap-style[^{}]*)\}/g)];
+	const consumers = rules.filter(r => /(^|[^-\w])filter\s*:\s*var\(--lpn-basemap-style/.test(r[2]));
 	ok('exactly one rule consumes the variable', consumers.length === 1, consumers.map(r => r[1].trim()).join(' | '));
 	ok('...and its selector is the tile layer, .lpn-basemap', consumers[0] && consumers[0][1].trim() === '.lpn-basemap');
 	ok('...the canvas only DECLARES it (no filter on #lpn_canvas)',
@@ -103,16 +111,16 @@ console.log('\n--- the filter reaches the tile layer and nothing else ---');
 console.log('\n--- save, reopen, export ---');
 {
 	const out = JSON.parse(JSON.stringify(L.serialize()));
-	ok('serializeProject carries the choice in settings', out.settings.basemapFilter === 'grayscale', String(out.settings.basemapFilter));
+	ok('serializeProject carries the choice in settings', out.settings.basemapStyle === 'grayscale', String(out.settings.basemapStyle));
 	open(out);
-	ok('reopened: grayscale again', L.settings().basemapFilter === 'grayscale' && canvasFilter() === F.grayscale);
-	const sel = find('lpn_set_basemap_filter');
+	ok('reopened: grayscale again', L.settings().basemapStyle === 'grayscale' && canvasFilter() === F.grayscale);
+	const sel = find('lpn_set_basemap_style');
 	ok('...and the select shows it', sel.children.filter(o => o.selected).map(o => o.value).join() === 'grayscale');
-	const bad = JSON.parse(JSON.stringify(out)); bad.settings.basemapFilter = 'invert(1)';
+	const bad = JSON.parse(JSON.stringify(out)); bad.settings.basemapStyle = 'invert(1)';
 	open(bad);
 	ok('a hand-edited unknown value opens Normal, never an injected filter string', canvasFilter() === 'none', String(canvasFilter()));
 	const src = fs.readFileSync(ROOT + 'js/lpn-inp.js', 'utf8');
-	ok('.inp writer never mentions the filter', !/basemapFilter/.test(src));
+	ok('.inp writer never mentions the style', !/basemapStyle|basemapFilter/.test(src));
 }
 
 console.log('\n--- R-342: a new project follows the one it was opened from ---');
@@ -121,7 +129,7 @@ console.log('\n--- R-342: a new project follows the one it was opened from ---')
 	const at = js.indexOf('var inheritedSettings = JSON.parse(JSON.stringify(settings))');
 	const block = js.slice(at, js.indexOf('settings = inheritedSettings;', at));
 	ok('newProject clones the whole of settings', at > 0);
-	ok('...and deletes nothing about the basemap filter', !/basemapFilter/.test(block));
+	ok('...and deletes nothing about the basemap style', !/basemapStyle|basemapFilter/.test(block));
 }
 console.log(fails ? `\n${fails} FAILED` : '\nall passed');
 process.exit(fails ? 1 : 0);

@@ -262,16 +262,16 @@ never edits a synonym.
 - **`lpn_analyze_time_moved`**
   > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
   _Ruled OK 2026-10-03._
-- **`lpn_basemap_filter_faded`**
+- **`lpn_basemap_style_faded`**
   > Faded
   @@ NEEDS RULING
-- **`lpn_basemap_filter_grayscale`**
+- **`lpn_basemap_style_grayscale`**
   > Grayscale
   @@ NEEDS RULING
-- **`lpn_basemap_filter_muted`**
+- **`lpn_basemap_style_muted`**
   > Muted
   @@ NEEDS RULING
-- **`lpn_basemap_filter_normal`**
+- **`lpn_basemap_style_normal`**
   > Normal
   @@ NEEDS RULING
 - **`lpn_ds_bad_multiplier`**
@@ -418,11 +418,11 @@ never edits a synonym.
 - **`lpn_result_pump_head_tip`**
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   _Ruled OK 2026-10-03._
-- **`lpn_settings_basemap_filter`**
-  > Basemap filter
+- **`lpn_settings_basemap_style`**
+  > Basemap style
   @@ NEEDS RULING
-- **`lpn_settings_basemap_filter_tip`**
-  > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen; the drawing, labels and credit are not filtered.
+- **`lpn_settings_basemap_style_tip`**
+  > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.
   @@ NEEDS RULING
 - **`lpn_sysflow_title`**
   > Flow balance
@@ -432,7 +432,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**20 still to read**, of 27 new keys across 14 unmerged branch(es).
+**6 still to read**, of 13 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -443,26 +443,13 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/basemap-style (`c4da18dc`) — adds no English strings
+### feat/basemap-style (`dc220cf3`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
 ### feat/dialog-audit (`4a665186`) — adds no English strings
 
-### feat/dock (`6eed29b6`) — 4 new, 4 to read @@ NEEDS RULING
-
-- **`lpn_dock_autohide`**
-  > Auto-hide
-  @@ NEEDS RULING
-- **`lpn_dock_float`**
-  > Float
-  @@ NEEDS RULING
-- **`lpn_dock_left`**
-  > Dock at the left of the map
-  @@ NEEDS RULING
-- **`lpn_dock_right`**
-  > Dock at the right of the map
-  @@ NEEDS RULING
+### feat/epanet-pp-brand (`2b3f411b`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -518,42 +505,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_time_scn_overrides`**
   > Scenario overrides:
-  @@ NEEDS RULING
-
-### feat/setting-scope (`77c810be`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_pane_manage_cols_width`**
-  > Width (em)
-  @@ NEEDS RULING
-- **`lpn_pane_width_tip`**
-  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
-  @@ NEEDS RULING
-- **`lpn_saved_browser`**
-  > Saved in this browser
-  @@ NEEDS RULING
-- **`lpn_saved_project`**
-  > Saved with the project
-  @@ NEEDS RULING
-- **`lpn_saved_session`**
-  > Not saved
-  @@ NEEDS RULING
-
-### feat/table-selection (`0f413504`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_pane_filter_sel_and`**
-  > Filtered by {q} and selection only. Showing {n} of {all}.
-  @@ NEEDS RULING
-- **`lpn_pane_filter_sel_none`**
-  > None of the selected elements are in this table.
-  @@ NEEDS RULING
-- **`lpn_pane_filter_sel_note`**
-  > Selection only. Showing {n} of {all}.
-  @@ NEEDS RULING
-- **`lpn_pane_sel_only`**
-  > Selection only
-  @@ NEEDS RULING
-- **`lpn_pane_sel_only_none`**
-  > No elements are selected. Select elements on the map first.
   @@ NEEDS RULING
 
 ### fix/tip-width (`5aa1cd2d`) — adds no English strings
