@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Isbash (1936) এবং
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Isbash (1936) এবং Maricopa County, Arizona, US অনুযায়ী।">পার্শ্ব ঢাল ১-এর জন্য প্রয়োজনীয় কৌণিক পাথরের আকার, D<sub>50</sub> (Isbash ও MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Isbash (1936) এবং Maricopa County, Arizona, US অনুযায়ী।">পার্শ্ব ঢাল ২-এর জন্য প্রয়োজনীয় কৌণিক পাথরের আকার, D<sub>50</sub> (Isbash ও MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='প্রতিটি হাইড্রোলিক সময় ধাপে এই নেটওয়ার্কটি সমাধান করুন।';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Maynord, Ruff, এবং Abt (1989) অনুযায়ী। একটি বাঁকে পাথরকে গড়ের ৪/৩ গুণ বাঁক বেগের জন্য আকার দেওয়া হয়, California Division of Highways (1970) অনুযায়ী; Maynord-এর নিজস্ব ১.৫ প্রাকৃতিক চ্যানেলে প্রযোজ্য।">প্রয়োজনীয় কৌণিক পাথরের আকার, D<sub>50</sub> (Maynord, Ruff, এবং Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='প্রয়োজনীয় কৌণিক পাথরের আকার, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='অভিন্ন-প্রবাহ অনুমানের জন্য বেগ যুক্তিসঙ্গত।';

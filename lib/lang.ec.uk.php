@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="За Isbash (1936) та
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="За Isbash (1936) та округом Марікопа, Аризона, США.">Необхідний розмір кутастого каменю для укосу 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="За Isbash (1936) та округом Марікопа, Аризона, США.">Необхідний розмір кутастого каменю для укосу 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Розраховує цю мережу на кожному гідравлічному часовому кроці.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="За Maynord, Ruff та Abt (1989). На повороті камінь підбирають на швидкість повороту 4/3 від середньої, за California Division of Highways (1970); власна величина Maynord\'а 1,5 застосовується до природних русел.">Необхідний розмір кутастого каменю, D<sub>50</sub> (Maynord, Ruff та Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Необхідний розмір кутастого каменю, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Швидкість прийнятна для умов рівномірної течії.';

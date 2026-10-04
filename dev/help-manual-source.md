@@ -171,7 +171,3 @@ Tip text removed from the Looped Network page on Tom's 2026-10-04 tip verdicts, 
 ## Toolbar > Settings button (hover)
 
 - Open the settings for this project. (`lpn_tool_settings_tip`)
-
-## Toolbar > transport (play controls, hover)
-
-- Solve this network at every hydraulic time step. (`lpn_time_run_tip`)

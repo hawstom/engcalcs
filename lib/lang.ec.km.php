@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="តាមលោក Isba
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="តាមលោក Isbash (1936) និង Maricopa County រដ្ឋ Arizona សហរដ្ឋអាមេរិក។">ទំហំថ្មខ្ចាញ់ជម្រាលចំហៀង 1 ដែលត្រូវការ, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="តាមលោក Isbash (1936) និង Maricopa County រដ្ឋ Arizona សហរដ្ឋអាមេរិក។">ទំហំថ្មខ្ចាញ់ជម្រាលចំហៀង 2 ដែលត្រូវការ, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='ដោះស្រាយបណ្ដាញនេះនៅរាល់ជំហានពេលវេលាធារាសាស្ត្ររបស់វា។';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="តាមលោក Maynord, Ruff, and Abt (1989)។ នៅចំណុចបត់ ថ្មត្រូវបានកំណត់ទំហំសម្រាប់ល្បឿននៅចំណុចបត់ស្មើនឹង 4/3 នៃល្បឿនមធ្យម តាម California Division of Highways (1970); ចំណែកតម្លៃ 1.5 ផ្ទាល់ខ្លួនរបស់ Maynord អនុវត្តចំពោះប្រឡាយធម្មជាតិ។">ទំហំថ្មខ្ចាញ់ដែលត្រូវការ, D<sub>50</sub> (Maynord, Ruff, and Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='ទំហំថ្មខ្ចាញ់ដែលត្រូវការ, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='ល្បឿនសមស្របសម្រាប់សន្មតការហូរឯកសណ្ឋាន។';

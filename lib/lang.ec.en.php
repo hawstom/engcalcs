@@ -99,6 +99,7 @@ $ec_lang['template_printable_subtitle']='Printable Subtitle';
 // has already answered, for no change they could act on.
 $ec_lang['consent_body']='May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Solve this network at every hydraulic time step.';
 $ec_lang_syn['consent_body']='May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.';
 $ec_lang['consent_accept']='Allow this';
 $ec_lang_syn['consent_accept']='Allow (permit, accept) this ask (this request, this question)';
@@ -1719,6 +1720,7 @@ $ec_lang['lpn_graphs_menu']='Graphs';
 // are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
 // permission $ec_lang_syn requires. Same text, correct array.
 $ec_lang['lpn_profile_title']='Profile along a path';
+$ec_lang_syn['lpn_profile_tip']='Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.';
 $ec_lang_syn['lpn_profile_title']='Profile or cross section along a path, route, or way';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.

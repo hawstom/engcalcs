@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Dle Isbash (1936) a Mar
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Dle Isbash (1936) a Maricopa County, Arizona, USA.">Požadovaná velikost lomového kamene svahu 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Dle Isbash (1936) a Maricopa County, Arizona, USA.">Požadovaná velikost lomového kamene svahu 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Vypočítá tuto síť v každém hydraulickém časovém kroku.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Podle Maynorda, Ruffa a Abta (1989). V zatáčce je kámen navržen na rychlost v zatáčce rovnou 4/3 průměrné rychlosti, podle California Division of Highways (1970); Maynordova vlastní hodnota 1,5 platí pro přirozené kanály.">Požadovaná velikost lomového kamene, D<sub>50</sub> (Maynord, Ruff a Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Požadovaná velikost lomového kamene, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Rychlost přiměřená pro předpoklady rovnoměrného proudění.';

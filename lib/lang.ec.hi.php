@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Isbash (1936) और Ma
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Isbash (1936) और Maricopa County, Arizona, US के अनुसार।">पार्श्व ढलान 1 के लिए आवश्यक कोणीय चट्टान आकार, D<sub>50</sub> (Isbash और MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Isbash (1936) और Maricopa County, Arizona, US के अनुसार।">पार्श्व ढलान 2 के लिए आवश्यक कोणीय चट्टान आकार, D<sub>50</sub> (Isbash और MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='इस नेटवर्क को हर हाइड्रॉलिक समय-चरण पर हल करें।';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Maynord, Ruff, and Abt (1989) के अनुसार। मोड़ पर चट्टान का आकार औसत के 4/3 गुना मोड़-वेग के लिए तय किया जाता है, California Division of Highways (1970) के अनुसार; Maynord का अपना 1.5 प्राकृतिक चैनलों पर लागू होता है।">आवश्यक कोणीय चट्टान आकार, D<sub>50</sub> (Maynord, Ruff, and Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='आवश्यक कोणीय चट्टान आकार, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='वेग एकसमान-प्रवाह मान्यताओं के लिए उचित है।';

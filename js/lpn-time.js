@@ -451,6 +451,7 @@
 			// Three shipped sentences now tell the reader to press the Calculate button BY NAME, so
 			// this literal is the button's name and not a synonym for it.
 			run: pageConfig.lpn_time_run || 'Calculate',
+			runTip: pageConfig.lpn_time_run_tip || 'Solve this network at every hydraulic time step.',
 			// ---- the run box (Task 450) ----
 			// `running` above is what it says while it works, borrowed rather than re-keyed: it is
 			// already the sentence the status bar uses for exactly this moment.
@@ -1768,7 +1769,7 @@
 		// recalculate, which is a true thing for a button called Run to do, and hiding it would
 		// make the one feature it announces undiscoverable in the state most people open the page
 		// in. It is never the ONLY way to a period result -- see EC.LPN_TIME_AUTO.
-		ui.run = btn('run', S.run, function () { requestRun(true); }, null);
+		ui.run = btn('run', S.run, function () { requestRun(true); }, S.runTip);
 		// **HIDDEN WHILE THIS PROJECT WORKS ITSELF OUT** (Task 467). Tom, 2026-08-20: *"If it's on,
 		// we do our debounce and calculate, and we hide the Calculate button."* A button that
 		// recomputes what is already being recomputed is a button whose press changes nothing

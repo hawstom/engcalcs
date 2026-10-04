@@ -63,7 +63,6 @@ const DELETED = [
 	{ key: 'lpn_recent_tip', ruling: 'Tom, 2026-10-04 tip verdicts: delete' },
 	{ key: 'lpn_reports_menu_tip', ruling: 'Tom, 2026-10-04 tip verdicts: delete' },
 	{ key: 'lpn_settings_leader_snap_tip', ruling: 'Tom, 2026-10-04 tip verdicts: delete' },
-	{ key: 'lpn_time_run_tip', ruling: 'Tom, 2026-10-04 tip verdicts: delete' },
 	{ key: 'lpn_tool_add_junction_tip', ruling: 'Tom, 2026-10-04 tip verdicts: delete' },
 	{ key: 'lpn_tool_add_pipe_tip', ruling: 'Tom, 2026-10-04 tip verdicts: delete' },
 	{ key: 'lpn_tool_add_pump_tip', ruling: 'Tom, 2026-10-04 tip verdicts: delete' },

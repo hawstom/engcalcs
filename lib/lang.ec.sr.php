@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="По Isbashu (1936) и 
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="По Isbashu (1936) и округу Maricopa, Аризона, САД.">Потребна величина угаоног камена бочне стране 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="По Isbashu (1936) и округу Maricopa, Аризона, САД.">Потребна величина угаоног камена бочне стране 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Реши ову мрежу у сваком хидрауличком временском кораку.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Према Maynord, Ruff и Abt (1989). У кривини се камен димензионише за брзину у кривини од 4/3 просечне брзине, према California Division of Highways (1970); сопствена вредност Maynord-a од 1,5 важи за природне канале.">Потребна величина угаоног камена, D<sub>50</sub> (Maynord, Ruff и Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Потребна величина угаоног камена, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Брзина прихватљива за претпоставке равномерног тецања.';

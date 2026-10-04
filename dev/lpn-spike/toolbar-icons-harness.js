@@ -113,13 +113,12 @@ console.log('\n-- the time transport on the strip --');
 	// everything else on the strip -- and it carries a TIP, which no other button in this group
 	// does, because "Run" alone does not say what is run or how far.
 	report(/ui\.run = btn\('run'/.test(mount), 'the Run button is built through the same helper');
-	// Tom's 2026-10-04 tip verdicts deleted lpn_time_run_tip, so Run now carries its name only.
-	report(!/S\.runTip/.test(mount), '...and carries no tip of its own (lpn_time_run_tip deleted)');
+	report(/S\.runTip/.test(mount), '...and is the one control here that carries a tip');
 	report(/'run'\s*=>/.test(icons), 'run is in lib/Icons.lib.php');
 	// `lpn_time_run_note` was in this list until 2026-09-19 and is deliberately gone: it named the
 	// half-fresh state that "Recalculate automatically" used to leave behind, and off means off now,
 	// so there is no such state and no such key. See scheduleSolve() in js/looped-network.js.
-	['lpn_time_run'].forEach(function (k) {
+	['lpn_time_run', 'lpn_time_run_tip'].forEach(function (k) {
 		report(en.indexOf("$ec_lang['" + k + "']") >= 0, k + ' is in lib/lang.ec.en.php');
 	});
 	// A select gets no .ec-help (a tip in front of a dropdown is a tip in the way of it), so its

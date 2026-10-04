@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Según Isbash (1936) y 
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Según Isbash (1936) y el condado de Maricopa, Arizona, EE. UU.">Tamaño de roca angular requerido en el lado 1, D<sub>50</sub> (Isbash y MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Según Isbash (1936) y el condado de Maricopa, Arizona, EE. UU.">Tamaño de roca angular requerido en el lado 2, D<sub>50</sub> (Isbash y MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Calcula esta red en cada paso de tiempo hidráulico.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Según Maynord, Ruff, y Abt (1989). En una curva, la roca se dimensiona para una velocidad de curva de 4/3 de la media, según el Departamento de Carreteras de California (1970); el valor propio de Maynord de 1.5 se aplica a canales naturales.">Tamaño de roca angular requerido, D<sub>50</sub> (Maynord, Ruff, y Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Tamaño de roca angular requerido, D<sub>50</sub>, según Searcy (1967)';
 $ec_lang['mtc_vel_ok']='Velocidad razonable para supuestos de flujo uniforme.';

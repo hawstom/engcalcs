@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Nach Isbash (1936) und 
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Nach Isbash (1936) und Maricopa County, Arizona, USA.">Erforderliche Körnung kantenreicher Steine Böschung 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Nach Isbash (1936) und Maricopa County, Arizona, USA.">Erforderliche Körnung kantenreicher Steine Böschung 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Löst dieses Netz zu jedem hydraulischen Zeitschritt.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Nach Maynord, Ruff und Abt (1989). In einer Kurve wird das Gestein für eine Kurvengeschwindigkeit von 4/3 der mittleren Geschwindigkeit bemessen, nach California Division of Highways (1970); Maynords eigener Wert von 1,5 gilt für natürliche Gerinne.">Erforderliche Körnung kantenreicher Steine, D<sub>50</sub> (Maynord, Ruff und Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Erforderliche Körnung kantenreicher Steine, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Geschwindigkeit plausibel für Gleichströmungsannahmen.';

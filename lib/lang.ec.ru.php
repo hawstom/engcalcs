@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="По Isbash (1936) и M
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="По Isbash (1936) и Maricopa County, Arizona, US.">Требуемый размер угловатого камня, откос 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="По Isbash (1936) и Maricopa County, Arizona, US.">Требуемый размер угловатого камня, откос 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Рассчитывает эту сеть на каждом гидравлическом шаге по времени.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="По Maynord, Ruff и Abt (1989). На повороте камень подбирается по скорости в повороте, равной 4/3 от средней, по California Division of Highways (1970); собственное значение Мейнорда 1,5 применяется к естественным руслам.">Требуемый размер угловатого камня, D<sub>50</sub> (Maynord, Ruff и Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Требуемый размер угловатого камня, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Скорость приемлема для допущений равномерного течения.';

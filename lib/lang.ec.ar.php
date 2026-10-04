@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="وفق Isbash (1936) و
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="وفق Isbash (1936) ومقاطعة ماريكوبا (Maricopa County)، أريزونا، الولايات المتحدة.">حجم الصخور الزاوية المطلوب للميل الجانبي 1، D<sub>50</sub> (Isbash وMC) <span class="ec-tip">؟</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="وفق Isbash (1936) ومقاطعة ماريكوبا (Maricopa County)، أريزونا، الولايات المتحدة.">حجم الصخور الزاوية المطلوب للميل الجانبي 2، D<sub>50</sub> (Isbash وMC) <span class="ec-tip">؟</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='حلّ هذه الشبكة عند كل خطوة زمنية هيدروليكية.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="وفق Maynord وRuff وAbt (1989). عند المنعطف تُحدَّد أبعاد الصخور بسرعة انحناء تعادل 4/3 من المتوسط، وفق California Division of Highways (1970)؛ أما نسبة Maynord الأصلية 1.5 فتُطبَّق على القنوات الطبيعية.">حجم الصخور الزاوية المطلوب، D<sub>50</sub> (Maynord وRuff وAbt 1989) <span class="ec-tip">؟</span></span>';
 $ec_lang['mtc_d50_searcy']='حجم الصخور الزاوية المطلوب، D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='السرعة معقولة بالنسبة إلى افتراضات الجريان المنتظم.';

@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Isbash (1936) ve Marico
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Isbash (1936) ve Maricopa County, Arizona, US\'ye göre.">Yan eğim 1 için gerekli köşeli taş boyutu, D<sub>50</sub> (Isbash ve MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Isbash (1936) ve Maricopa County, Arizona, US\'ye göre.">Yan eğim 2 için gerekli köşeli taş boyutu, D<sub>50</sub> (Isbash ve MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Bu şebekeyi her hidrolik zaman adımında çözer.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Maynord, Ruff ve Abt\'a (1989) göre. Bir dönemeçte kaya, California Division of Highways\'e (1970) göre ortalamanın 4/3\'ü olan dönemeç hızına göre boyutlandırılır; Maynord\'un kendi 1,5 katsayısı doğal kanallara uygulanır.">Gerekli köşeli taş boyutu, D<sub>50</sub> (Maynord, Ruff ve Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Gerekli köşeli taş boyutu, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Hız, düzgün akış varsayımları için makul.';

@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="د Isbash (1936) او M
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="د Isbash (1936) او Maricopa County, Arizona, US له مخې.">اړین د اړخ میل ۱ زاویه لرونکي کاڼو اندازه، D<sub>50</sub> (Isbash او MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="د Isbash (1936) او Maricopa County, Arizona, US له مخې.">اړین د اړخ میل ۲ زاویه لرونکي کاڼو اندازه، D<sub>50</sub> (Isbash او MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='دا شبکه پر هر هایدرولیکي وخت پړاو حل کړئ.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="د Maynord, Ruff, and Abt (1989) له مخې. په یوه ګونج کې کاڼی د اوسط 4/3 د ګونج سرعت لپاره اندازه کیږي، د California Division of Highways (1970) له مخې؛ د Maynord خپل 1.5 په طبیعي چینلونو پورې اړه لري.">اړین زاویه لرونکي کاڼو اندازه، D<sub>50</sub> (Maynord, Ruff, and Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='اړین زاویه لرونکي کاڼو اندازه، D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='سرعت د یکسان بهاو فرضیو لپاره معقول دی.';

@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Secondo Isbash (1936) e
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Secondo Isbash (1936) e Maricopa County, Arizona, US.">Dimensione roccia angolare richiesta scarpata 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Secondo Isbash (1936) e Maricopa County, Arizona, US.">Dimensione roccia angolare richiesta scarpata 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Calcola questa rete a ogni passo temporale idraulico.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Secondo Maynord, Ruff e Abt (1989). In una curva la roccia è dimensionata per una velocità di curva pari a 4/3 della media, secondo California Division of Highways (1970); il valore originale di Maynord di 1,5 si applica ai canali naturali.">Dimensione roccia angolare richiesta, D<sub>50</sub> (Maynord, Ruff, e Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Dimensione roccia angolare richiesta, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Velocità ragionevole per le ipotesi di flusso uniforme.';

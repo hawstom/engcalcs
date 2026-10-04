@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Selon Isbash (1936) et 
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Selon Isbash (1936) et le comté de Maricopa, Arizona, États-Unis.">Granulométrie d\'enrochement anguleux requise sur talus 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Selon Isbash (1936) et le comté de Maricopa, Arizona, États-Unis.">Granulométrie d\'enrochement anguleux requise sur talus 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Résout ce réseau à chaque pas de temps hydraulique.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Selon Maynord, Ruff et Abt (1989). Dans une courbe, la roche est dimensionnée pour une vitesse de courbure de 4/3 de la moyenne, selon California Division of Highways (1970) ; le facteur 1,5 propre à Maynord s\'applique aux chenaux naturels.">Granulométrie d\'enrochement anguleux requise, D<sub>50</sub> (Maynord, Ruff et Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Granulométrie d\'enrochement anguleux requise, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Vitesse raisonnable pour les hypothèses d\'écoulement uniforme.';

@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="依据 Isbash（1936）
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="依据 Isbash（1936）及美国亚利桑那州马里科帕县（Maricopa County）标准。">边坡 1 所需棱角石材粒径，D<sub>50</sub>（Isbash 与 MC）<span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="依据 Isbash（1936）及美国亚利桑那州马里科帕县（Maricopa County）标准。">边坡 2 所需棱角石材粒径，D<sub>50</sub>（Isbash 与 MC）<span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='按管网的每个水力时间步，从运行开始一直计算到运行结束。';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="依据 Maynord、Ruff 和 Abt（1989）。弯道处按平均流速的 4/3 确定石料粒径，依据美国加利福尼亚州公路局（1970）；Maynord 本人提出的 1.5 倍系数适用于天然河道。">所需棱角石材粒径，D<sub>50</sub>（Maynord、Ruff 和 Abt，1989）<span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='所需棱角石材粒径，D<sub>50</sub>（Searcy，1967）';
 $ec_lang['mtc_vel_ok']='流速符合均匀流假设，属合理范围。';

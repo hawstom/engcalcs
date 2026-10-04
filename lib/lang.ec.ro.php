@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Conform Isbash (1936) �
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Conform Isbash (1936) și Comitatul Maricopa, Arizona, SUA.">Dimensiunea necesară a rocii unghiulare pentru taluzul 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Conform Isbash (1936) și Comitatul Maricopa, Arizona, SUA.">Dimensiunea necesară a rocii unghiulare pentru taluzul 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Rezolvă această rețea la fiecare pas de timp hidraulic.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Conform Maynord, Ruff și Abt (1989). Într-o curbă, roca este dimensionată pentru o viteză de curbă de 4/3 din viteza medie, conform California Division of Highways (1970); valoarea proprie de 1,5 a lui Maynord se aplică canalelor naturale.">Dimensiunea necesară a rocii unghiulare, D<sub>50</sub> (Maynord, Ruff și Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Dimensiunea necesară a rocii unghiulare, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Viteză rezonabilă pentru ipotezele de curgere uniformă.';

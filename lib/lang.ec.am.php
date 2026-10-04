@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="በIsbash (1936) እና
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="በIsbash (1936) እና Maricopa County, Arizona, US. መሠረት">የሚፈለግ የጎን ቁልቁለት 1 ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="በIsbash (1936) እና Maricopa County, Arizona, US. መሠረት">የሚፈለግ የጎን ቁልቁለት 2 ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='ይህን መረብ በእያንዳንዱ የሃይድሮሊክ ጊዜ ደረጃ ይፈታል።';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="በMaynord, Ruff, and Abt (1989) መሠረት። በመዞሪያ ላይ ድንጋዩ እንደ California Division of Highways (1970) በአማካይ ፍጥነት 4/3 የመዞሪያ ፍጥነት ይለካል፤ የMaynord ራሱ 1.5 ለተፈጥሮ ቻናሎች ይሠራል።">የሚፈለግ ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Maynord, Ruff, and Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='የሚፈለግ ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='ፍጥነቱ ለወጥ ፍሰት ግምቶች ምክንያታዊ ነው።';

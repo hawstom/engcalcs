@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Menurut Isbash (1936) d
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Menurut Isbash (1936) dan Maricopa County, Arizona, AS.">Ukuran batu sudut yang dibutuhkan di tebing 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Menurut Isbash (1936) dan Maricopa County, Arizona, AS.">Ukuran batu sudut yang dibutuhkan di tebing 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Selesaikan jaringan ini pada setiap langkah waktu hidrolik.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Menurut Maynord, Ruff, dan Abt (1989). Di tikungan, batu diukur untuk kecepatan tikungan sebesar 4/3 dari rata-rata, menurut California Division of Highways (1970); nilai 1,5 dari Maynord sendiri berlaku untuk saluran alami.">Ukuran batu sudut yang dibutuhkan, D<sub>50</sub> (Maynord, Ruff, dan Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Ukuran batu sudut yang dibutuhkan, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Kecepatan wajar untuk asumsi aliran seragam.';

@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="לפי Isbash (1936) ו
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה״ב">גודל סלע זוויתי נדרש לשיפוע צד 1, D<sub>50</sub> (Isbash ו-MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="לפי Isbash (1936) ו-Maricopa County, אריזונה, ארה״ב">גודל סלע זוויתי נדרש לשיפוע צד 2, D<sub>50</sub> (Isbash ו-MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='פתרו רשת זו בכל צעד זמן הידראולי.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="לפי Maynord, Ruff ו-Abt (1989). בעיקול, גודל הסלע נקבע למהירות עיקול של 4/3 מהממוצע, לפי California Division of Highways (1970); הערך המקורי 1.5 של Maynord חל על ערוצים טבעיים.">גודל סלע זוויתי נדרש, D<sub>50</sub> (Maynord, Ruff ו-Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='גודל סלע זוויתי נדרש, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='המהירות סבירה בהתאם להנחות הזרימה האחידה.';

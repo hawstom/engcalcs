@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Isbash (1936) နှင
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Isbash (1936) နှင့် Maricopa County, Arizona, US အရ.">လိုအပ်သောဘေးစောက် ၁ ထောင့်ချောင်းကျောက်တုံးအရွယ်, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Isbash (1936) နှင့် Maricopa County, Arizona, US အရ.">လိုအပ်သောဘေးစောက် ၂ ထောင့်ချောင်းကျောက်တုံးအရွယ်, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='ဤကွန်ရက်ကို ဟိုက်ဒရောလစ် အချိန်အဆင့်တိုင်းတွင် ဖြေရှင်းသည်။';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Maynord, Ruff, and Abt (1989) အရ။ ချောင်းကွေးတစ်ခုတွင် ကျောက်တုံးကို California Division of Highways (1970) အရ ပျမ်းမျှနှုန်း၏ 4/3 ဖြစ်သော ကွေးအရွယ်အနေဖြင့် ချိန်ညှိထားသည်; Maynord ကိုယ်ပိုင် 1.5 မှာ သဘာဝချောင်းများ အတွက် အသုံးပြုသည်။">လိုအပ်သောထောင့်ချောင်းကျောက်တုံးအရွယ်, D<sub>50</sub> (Maynord, Ruff, and Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='လိုအပ်သောထောင့်ချောင်းကျောက်တုံးအရွယ်, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='တစ်သမတ်တည်းစီးဆင်းမှုဆင်ခြင်ချက်များအတွက် ရေအလျင်နှုန်း သင့်တော်သည်။';

@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Kulingana na Isbash (19
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Kulingana na Isbash (1936) na Maricopa County, Arizona, US.">Ukubwa wa jiwe la pembe unaohitajika kwa mteremko wa upande 1, D<sub>50</sub> (Isbash na MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Kulingana na Isbash (1936) na Maricopa County, Arizona, US.">Ukubwa wa jiwe la pembe unaohitajika kwa mteremko wa upande 2, D<sub>50</sub> (Isbash na MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Tatua mtandao huu kwa kila hatua ya wakati wa haidroliki, kutoka mwanzo wa uendeshaji hadi mwisho wake.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Kulingana na Maynord, Ruff, na Abt (1989). Kwenye kona, jiwe hupimwa kwa kasi ya kona ya 4/3 ya wastani, kulingana na California Division of Highways (1970); thamani ya awali ya Maynord ya 1.5 hutumika kwa mikondo ya asili.">Ukubwa wa jiwe la pembe unaohitajika, D<sub>50</sub> (Maynord, Ruff, na Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Ukubwa wa jiwe la pembe unaohitajika, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Kasi inakubalika kwa makadirio ya mtiririko sawia.';

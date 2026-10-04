@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Съгласно Isbash
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Съгласно Isbash (1936) и Maricopa County, Аризона, САЩ.">Необходим размер на ъглести камъни за страничен откос 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Съгласно Isbash (1936) и Maricopa County, Аризона, САЩ.">Необходим размер на ъглести камъни за страничен откос 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Решава тази мрежа при всяка хидравлична времева стъпка.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Според Maynord, Ruff и Abt (1989). На завой камъкът се оразмерява за скорост на завоя 4/3 от средната, съгласно California Division of Highways (1970); собствената стойност 1,5 на Maynord важи за естествени канали.">Необходим размер на ъглести камъни, D<sub>50</sub> (Maynord, Ruff и Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Необходим размер на ъглести камъни, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Скоростта е разумна за предположения за равномерно течение.';

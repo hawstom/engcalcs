@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Prema Isbash (1936) i M
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Prema Isbash (1936) i Maricopa County, Arizona, US.">Potrebna veličina uglatog kamena bočne strane 1, D<sub>50</sub> (Isbash i MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Prema Isbash (1936) i Maricopa County, Arizona, US.">Potrebna veličina uglatog kamena bočne strane 2, D<sub>50</sub> (Isbash i MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Riješi ovu mrežu u svakom hidrauličkom vremenskom koraku.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Prema Maynordu, Ruffu i Abtu (1989). U zavoju je kamen dimenzioniran za brzinu u zavoju od 4/3 prosječne brzine, prema California Division of Highways (1970); Maynordova vlastita vrijednost 1,5 primjenjuje se na prirodne kanale.">Potrebna veličina uglatog kamena, D<sub>50</sub> (Maynord, Ruff i Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Potrebna veličina uglatog kamena, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Brzina prihvatljiva za pretpostavke jednolikog tečenja.';

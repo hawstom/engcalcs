@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Isbash (1936) اور Ma
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Isbash (1936) اور Maricopa County، Arizona، US کے مطابق">جانبی ڈھلان 1 کے لیے مطلوبہ زاویہ دار پتھر کا حجم، D<sub>50</sub> (Isbash اور MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Isbash (1936) اور Maricopa County، Arizona، US کے مطابق">جانبی ڈھلان 2 کے لیے مطلوبہ زاویہ دار پتھر کا حجم، D<sub>50</sub> (Isbash اور MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='اس نیٹ ورک کو ہر ہائیڈرالک وقتی مرحلے پر حل کریں۔';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Maynord، Ruff، اور Abt (1989) کے مطابق۔ موڑ پر پتھر کا حجم اوسط کے 4/3 موڑ کی رفتار کے لیے مقرر کیا جاتا ہے، California Division of Highways (1970) کے مطابق؛ Maynord کی اپنی 1.5 قدر قدرتی نالوں پر لاگو ہوتی ہے۔">مطلوبہ زاویہ دار پتھر کا حجم، D<sub>50</sub> (Maynord، Ruff، اور Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='مطلوبہ زاویہ دار پتھر کا حجم، D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='رفتار یکساں بہاؤ کے مفروضات کے لیے مناسب ہے۔';

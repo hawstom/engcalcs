@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="بر اساس Isbash (1
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="بر اساس Isbash (1936) و شهرستان ماریکوپا، آریزونا، آمریکا.">اندازه سنگ زاویه‌دار مورد نیاز برای شیب جانبی ۱، D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="بر اساس Isbash (1936) و شهرستان ماریکوپا، آریزونا، آمریکا.">اندازه سنگ زاویه‌دار مورد نیاز برای شیب جانبی ۲، D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='این شبکه را در هر گام زمانی هیدرولیکی حل کنید.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="بر اساس Maynord، Ruff و Abt (1989). در یک قوس، سنگ برای سرعتی معادل 4/3 سرعت متوسط اندازه‌گذاری می‌شود، بر اساس California Division of Highways (1970)؛ ضریب 1.5 خود Maynord برای کانال‌های طبیعی به کار می‌رود.">اندازه سنگ زاویه‌دار مورد نیاز، D<sub>50</sub> (Maynord, Ruff, and Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='اندازه سنگ زاویه‌دار مورد نیاز، D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='سرعت برای فرض‌های جریان یکنواخت مناسب است.';
