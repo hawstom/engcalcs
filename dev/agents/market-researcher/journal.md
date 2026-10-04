@@ -2623,3 +2623,12 @@ Full note with the table: `dev/flow-balance-terms.md`. Tom chose the title "Flow
 - **CITED (search summary only).** InfoWater Pro: unique Data Sets per scenario give "unique data in that scenario" (Autodesk learn / help.innovyze.com Scenario Explorer); the word "override" not confirmed there.
 - **OBSERVED.** The exact string "Type a scenario's own value" is not in lib/lang.ec.en.php. Nearest: lpn_scenario_override(_tip) :2975-2977, lpn_scenario_mark_tip :2965, lpn_scenario_overrides_tip :2966, lpn_scenario_push_none :3007, lpn_delete_drops_overrides :3024. :2944-2957 records Tom's 2026-08-14 "custom" ruling and the translation reason against "Own" (eigenvalue calque).
 - **SPECULATION.** "Override" (verb/noun) is the industry word (Bentley); "local" is Bentley's adjective. Keep "Base" and "Custom" labels already ruled; use "override" in tips only.
+
+## 2026-10-04b -- Mary: tip verb mood, Click vs Specify, Tick
+- **CITED.** Microsoft Style Guide, Describing interactions with the UI, learn.microsoft.com/en-us/style-guide/procedures-instructions/describing-interactions-with-ui : "Don't use input-specific verbs, such as click or swipe"; Select for buttons/checkboxes/menu items; Clear for unchecking; Choose for preference; Enter for values.
+- **CITED.** Google developer style guide developers.google.com/style/ui-elements : "Be wary of check and uncheck... use select and clear"; lists Click, Tap, Select as verbs.
+- **CITED (search summary).** GNOME HIG, developer.gnome.org/hig/guidelines/writing-style.html: imperative verb for menu-item tooltips. Apple HIG foundations/writing: verb in base form for action labels. Material tooltips m3.material.io/components/tooltips/guidelines: short, descriptive, no grammatical rule.
+- **CITED (search summary).** AutoCAD LINE prompts: "Specify first point:", "Specify next point or [Undo]:" (peachpit.com/articles/article.aspx?p=3188176&seqNum=5).
+- **NOT FOUND.** Apple help-tag mood rule, Apple select/deselect (not verified), Microsoft tooltip mood page (404), EPANET GUI hints.
+- **OBSERVED.** lib/lang.ec.en.php: 287 lpn *_tip; first word imperative ~50, third-person -s ~24, "The/How/What/A/This" noun-phrase ~100+, "You" 0. Click 51 lpn lines, Specify 0, tick 3/untick 2, uncheck/checked 2-3, "clear the box" 1.
+- **SPECULATION.** Recommendations in the report below.
