@@ -35028,6 +35028,7 @@ var EngCalcs = EngCalcs || {};
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
 			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and all three are used. Water age, source trace and a chemical are each worked out here, and the two chemical settings are used when you run a chemical. All of them are written back if you save an EPANET file.';
+			case 'pressure-unit': return pc.lpn_inp_drop_pressure_unit || 'This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.';
 			case 'other-options': return pc.lpn_inp_drop_other_options || 'This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.';
 			// **THE ONE LOSS ON THE `.net` PATH THAT CANNOT BE CARRIED**, so it is told instead. A
 			// `.net` stores its options as an indexed array with no keywords, so a slot this page
@@ -43526,13 +43527,18 @@ var EngCalcs = EngCalcs || {};
 		if (name === 'lpn_u_roughness') { return [roughnessLabel()]; }
 		if (name === 'lpn_u_elevhead') {
 			return [pc.lpn_field_elev || 'Elevation', pc.lpn_field_head || 'Head',
-				pc.lpn_field_tank_level || 'Water depth',
+				pc.lpn_field_tank_level || 'Water depth', pc.lpn_settings_head_error || 'Head error limit',
 				(pc.lpn_result_head || 'Head') + ' (pump curve)'];
 		}
-		if (name === 'lpn_u_pressure') { return [pc.lpn_field_valve_setting_pressure || 'Pressure setting']; }
+		if (name === 'lpn_u_pressure') {
+			return [pc.lpn_field_valve_setting_pressure || 'Pressure setting',
+				pc.lpn_settings_min_pressure || 'Minimum pressure',
+				pc.lpn_settings_req_pressure || 'Required pressure'];
+		}
 		if (name === 'lpn_u_flow') {
 			return [pc.lpn_field_base_demand || 'Base demand', pc.lpn_field_valve_setting_flow || 'Flow setting',
-				(pc.lpn_result_flow || 'Flow') + ' (pump curve)'];
+				(pc.lpn_result_flow || 'Flow') + ' (pump curve)',
+				pc.lpn_settings_flow_change || 'Flow change limit'];
 		}
 		return [];
 	}
@@ -43614,10 +43620,16 @@ var EngCalcs = EngCalcs || {};
 				conv(nd, 'maxLevel'); conv(nd, '_head');
 			});
 			convOverrides('level'); convOverrides('head');
+			// Head error limit is a head typed in this unit (Task 762 pass: it was missed here).
+			conv(settings.hydraulics, 'headError');
 			// A curve point is [flow, value]; this unit owns the second, for the two kinds whose
 			// second column IS a head (Task 586). An efficiency curve's is a percent.
 			n += convCurveAxis(1, ['head', 'headloss'], k);
 		} else if (name === 'lpn_u_pressure') {
+			// The pressure-driven limits are typed in this unit (Task 762). conv() leaves a stale
+			// text token behind, and lpnNumText() drops it by itself because it no longer parses
+			// to the new value.
+			conv(settings.hydraulics, 'minPressure'); conv(settings.hydraulics, 'reqPressure');
 			doc.links.forEach(function (l) {
 				if (l.type !== 'valve') { return; }
 				var t = String(l.valveType || 'TCV').toUpperCase();
@@ -43634,6 +43646,7 @@ var EngCalcs = EngCalcs || {};
 				});
 			});
 		} else if (name === 'lpn_u_flow') {
+			conv(settings.hydraulics, 'flowChange');   // a flow typed in this unit
 			doc.nodes.forEach(function (nd) { conv(nd, '_demand'); });
 			// A junction's further demand categories (Task 468) and a customer's own demand (Task
 			// 247) are flows in the same unit, and were missed until File, Convert as needed them.
@@ -47102,6 +47115,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		demandModelSel.value = String(settings.hydraulics.demandModel || 'DDA').toUpperCase() === 'PDA' ? 'PDA' : 'DDA';
 		demandModelSel.addEventListener('change', function () {
+			if (demandModelSel.value !== 'PDA') { delete settings.hydraulics.pdaSrc; }
 			// Back to demand driven removes the line: DDA is EPANET's own default, and the numbers
 			// stay in the document so that choosing PDA again finds them where they were left.
 			if (demandModelSel.value === 'PDA') { settings.hydraulics.demandModel = 'PDA'; }
@@ -47117,7 +47131,8 @@ var EngCalcs = EngCalcs || {};
 			hydNumberRow('minPressure', 'lpn_settings_min_pressure', 'Minimum pressure',
 				'lpn_settings_min_pressure_tip', 0, { allowZero: true, unitOf: 'lpn_u_pressure' });
 			hydNumberRow('reqPressure', 'lpn_settings_req_pressure', 'Required pressure',
-				'lpn_settings_req_pressure_tip', Math.round(toDisplay(0.1, 'lpn_u_pressure') * 1000) / 1000,
+				'lpn_settings_req_pressure_tip',
+				'0.1 ' + unitLabelFor(unitEl('lpn_u_pressure'), pdaFilePressureUnit()),
 				{ unitOf: 'lpn_u_pressure' });
 			hydNumberRow('pressureExponent', 'lpn_settings_pressure_exponent', 'Pressure exponent',
 				'lpn_settings_pressure_exponent_tip', 0.5);
@@ -56769,6 +56784,15 @@ var EngCalcs = EngCalcs || {};
 			? { model: n.mixingModel, fraction: n.mixingFraction }
 			: { model: n.mixingModel };
 	}
+	// **BLANK REQUIRED PRESSURE MEANS WHAT EPANET MEANS** (Task 762): 0.1 in the pressure unit the
+	// exported file is read in, psi for a US flow unit and metres otherwise, whatever the project's
+	// own pressure unit shows. Returned in metres, for the solver.
+	function pdaFilePressureUnit() {
+		return EngCalcs.lpnFilePressureUnit(unitKey('lpn_u_flow'), unitKey('lpn_u_length'), unitKey('lpn_u_diameter'));
+	}
+	function pdaDefaultRequiredMetres() {
+		return 0.1 / (EngCalcs.unitFactors[pdaFilePressureUnit()] || 1);
+	}
 	function engineHydraulics(hyd, scenarioDM) {
 		var out = {}, k;
 		for (k in hyd) { if (Object.prototype.hasOwnProperty.call(hyd, k)) { out[k] = hyd[k]; } }
@@ -56781,6 +56805,7 @@ var EngCalcs = EngCalcs || {};
 		// pressure unit and cross to metres of water here, at the solver handoff, and nowhere else.
 		if (typeof out.minPressure === 'number') { out.minPressure = toSI(out.minPressure, 'lpn_u_pressure'); }
 		if (typeof out.reqPressure === 'number') { out.reqPressure = toSI(out.reqPressure, 'lpn_u_pressure'); }
+		else if (String(out.demandModel || '').toUpperCase() === 'PDA') { out.reqPressure = pdaDefaultRequiredMetres(); }
 		return out;
 	}
 	// **A SCENARIO MAY CARRY ITS OWN DEMAND MULTIPLIER** (the utility planning engineer's wish list,
@@ -57245,6 +57270,7 @@ var EngCalcs = EngCalcs || {};
 		// NAMES THE VALVES, which is the entire reason this page keeps its own diagnostics instead
 		// of surfacing EPANET's numeric error codes. A user staring at a drawing can act on "V3".
 		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'pda-pressures') { return pc.lpn_diag_pda_pressures || 'Required pressure must be greater than Minimum pressure. Change one of them in Settings.'; }
 		if (issue.code === 'pda-needs-epanet') { return pc.lpn_diag_pda_needs_epanet || 'The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.'; }
 		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		return issue.code;

@@ -516,9 +516,9 @@
 			// keeps its own text (`Minimum Pressure 0.0` must not come back as `0`). A line that
 			// lacks its value still falls through to the carry at the end of this chain.
 			else if (key === 'DEMAND' && /^MODEL$/i.test(r[1] || '') && /^(DDA|PDA)$/i.test(r[2] || '')) { hydraulics.demandModel = r[2].toUpperCase(); }
-			else if (key === 'MINIMUM' && /^PRESSURE$/i.test(r[1] || '') && r[2] && isFinite(+r[2])) { hydraulics.minPressure = mergeTok(hydraulics, 'minPressure', r[2], +r[2]); }
-			else if (key === 'REQUIRED' && /^PRESSURE$/i.test(r[1] || '') && r[2] && isFinite(+r[2])) { hydraulics.reqPressure = mergeTok(hydraulics, 'reqPressure', r[2], +r[2]); }
-			else if (key === 'PRESSURE' && /^EXPONENT$/i.test(r[1] || '') && r[2] && isFinite(+r[2])) { hydraulics.pressureExponent = mergeTok(hydraulics, 'pressureExponent', r[2], +r[2]); }
+			else if (key === 'MINIMUM' && /^PRESSURE$/i.test(r[1] || '') && r[2] && isFinite(+r[2])) { hydraulics.pdaSrc = true; hydraulics.minPressure = mergeTok(hydraulics, 'minPressure', r[2], +r[2]); }
+			else if (key === 'REQUIRED' && /^PRESSURE$/i.test(r[1] || '') && r[2] && isFinite(+r[2])) { hydraulics.pdaSrc = true; hydraulics.reqPressure = mergeTok(hydraulics, 'reqPressure', r[2], +r[2]); }
+			else if (key === 'PRESSURE' && /^EXPONENT$/i.test(r[1] || '') && r[2] && isFinite(+r[2])) { hydraulics.pdaSrc = true; hydraulics.pressureExponent = mergeTok(hydraulics, 'pressureExponent', r[2], +r[2]); }
 			// **THE REST OF EPANET'S HYDRAULIC OPTIONS** (Task 553, Tom's own list). Every one was
 			// read past in silence until now -- not even reported as a difference -- so a file
 			// stating `Viscosity 1.3` came back out of the exporter stating nothing, which is the
@@ -630,6 +630,19 @@
 		// this reader still has no branch for are counted.
 		var otherCount = (fileOptions.other || []).length;
 		if (otherCount) { drop('other-options', [], otherCount); }
+
+		// **THE FILE'S OWN `Pressure` UNIT IS NOT HONOURED, SO IT IS REPORTED** (Task 762). This reader
+		// takes every pressure in the file (valve settings, emitters, the pressure-driven limits) as
+		// psi for a US flow unit and metres otherwise. A `Pressure KPA` line that says otherwise
+		// would be misread in silence, and honouring it would mean changing how PRV and emitters
+		// are read, which is beyond this task. The line is kept and written back.
+		(fileOptions.other || []).forEach(function (o) {
+			var u;
+			if (!/^PRESSURE$/i.test(o[0] || '') || /^EXPONENT$/i.test(o[1] || '') || !o[1]) { return; }
+			u = o[1].toUpperCase();
+			var sysUs = (FLOW_UNITS[flowKey] || FLOW_UNITS.GPM).system === 'us';
+			if (u !== (sysUs ? 'PSI' : 'METERS') && !(!sysUs && u === 'M')) { drop('pressure-unit', [], u); }
+		});
 
 		var fu = FLOW_UNITS[flowKey];
 		if (!fu) { drop('unknown-flow-units', [], flowKey); fu = FLOW_UNITS.GPM; flowKey = 'GPM'; }
@@ -1589,6 +1602,18 @@
 		us: { len: 'ft', dia: 'in', head: 'ft', press: 'psi' },
 		si: { len: 'm', dia: 'mm', head: 'm', press: 'mh2o' }
 	};
+	/**
+	 * The pressure unit an `.inp` written for this project's flow unit is read in (psi for a US
+	 * flow keyword, metres otherwise), which is the unit EPANET's own unstated defaults are in.
+	 */
+	EngCalcs.lpnFilePressureUnit = function (flowUnit, lengthUnit, diameterUnit) {
+		var kw, sys = null;
+		for (kw in FLOW_KEYWORD_UNIT) {
+			if (FLOW_KEYWORD_UNIT[kw] === flowUnit) { sys = FLOW_UNITS[kw].system; break; }
+		}
+		if (!sys) { sys = (lengthUnit === 'ft' || diameterUnit === 'in') ? 'us' : 'si'; }
+		return FILE_UNITS[sys].press;
+	};
 
 	/**
 	 * **WHICH ELEMENTS A [RULES] BLOCK NAMES, WITHOUT UNDERSTANDING A RULE** (ROADMAP Task 248.03).
@@ -2351,9 +2376,14 @@
 		// The pressures are stored in the project's pressure unit; `pressNum` writes them in the
 		// file's, and hands the user's own characters back while nothing has changed.
 		if (h.demandModel) { out += row(['Demand', 'Model', String(h.demandModel)]) + '\n'; }
+		// The three companions go out only when PDA is chosen, or when the source file stated them
+		// (carried, character for character). Numbers left behind after a switch back to demand
+		// driven are not written: EPANET's own reader refuses them.
+		var pdaOn = String(h.demandModel || '').toUpperCase() === 'PDA';
 		[['minPressure', 'Minimum', true], ['reqPressure', 'Required', true],
 			['pressureExponent', 'Pressure', false]].forEach(function (t) {
 			var v = h[t[0]];
+			if (!pdaOn && !h.pdaSrc) { return; }
 			if (typeof v !== 'number' || !isFinite(v)) { return; }
 			out += row([t[1], t[0] === 'pressureExponent' ? 'Exponent' : 'Pressure',
 				t[2] && pressNum ? pressNum(h, t[0], v) : EngCalcs.lpnNumText(h, t[0], v)]) + '\n';

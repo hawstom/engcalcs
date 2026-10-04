@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**33 still to read on master**, of 82 untranslated keys, of 2360 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**35 still to read on master**, of 84 untranslated keys, of 2362 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -254,7 +254,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (82, 33 to read @@ NEEDS RULING)
+## lpn_  (84, 35 to read @@ NEEDS RULING)
 
 - **`lpn_analyze_at_time`**
   > Time step: {time}.
@@ -264,6 +264,9 @@ never edits a synonym.
   _Ruled OK 2026-10-03._
 - **`lpn_diag_pda_needs_epanet`**
   > The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.
+  @@ NEEDS RULING
+- **`lpn_diag_pda_pressures`**
+  > Required pressure must be greater than Minimum pressure. Change one of them in Settings.
   @@ NEEDS RULING
 - **`lpn_dock_autohide`**
   > Auto-hide
@@ -409,6 +412,9 @@ never edits a synonym.
 - **`lpn_graphs_menu_tip`**
   > Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.
   @@ NEEDS RULING
+- **`lpn_inp_drop_pressure_unit`**
+  > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
+  @@ NEEDS RULING
 - **`lpn_pane_filter_sel_and`**
   > Filtered by {q} and selection only. Showing {n} of {all}.
   @@ NEEDS RULING
@@ -473,13 +479,13 @@ never edits a synonym.
   > Demand model
   @@ NEEDS RULING
 - **`lpn_settings_demand_model_dda`**
-  > Demand driven (DDA)
+  > Demand driven
   @@ NEEDS RULING
 - **`lpn_settings_demand_model_pda`**
-  > Pressure driven (PDA)
+  > Pressure driven
   @@ NEEDS RULING
 - **`lpn_settings_demand_model_tip`**
-  > Choose how junctions receive water. Demand driven delivers every demand in full, whatever the pressure. Pressure driven delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.
+  > Choose how junctions receive water. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.
   @@ NEEDS RULING
 - **`lpn_settings_min_pressure`**
   > Minimum pressure
@@ -497,7 +503,7 @@ never edits a synonym.
   > Required pressure
   @@ NEEDS RULING
 - **`lpn_settings_req_pressure_tip`**
-  > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit.
+  > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.
   @@ NEEDS RULING
 - **`lpn_sysflow_title`**
   > Flow balance
@@ -507,7 +513,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**20 still to read**, of 28 new keys across 16 unmerged branch(es).
+**18 still to read**, of 26 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -539,7 +545,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.
   @@ NEEDS RULING
 
-### feat/chain-draw (`e0bc5e0f`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/chain-draw (`ed834396`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_mode_add_chain`**
   > Mode: Add Junction and Pipe. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
@@ -579,7 +585,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/pda (`d895a470`) — adds no English strings
+### feat/pda (`ac32b95f`) — adds no English strings
 
 ### feat/profile-file (`a095faf4`) — 4 new, all ruled
 
@@ -596,13 +602,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/scenario-option (`af125b8e`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/scenario-option (`5c8c454e`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_scenario_duration_tip`**
-  > Overrides the project's total run time in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
+  > Overrides the total run time in this scenario. Leave it blank to use its parent's. A total run time of 0:00 is a steady-state run.
   @@ NEEDS RULING
 - **`lpn_scenario_hyd_step_tip`**
-  > Overrides the project's hydraulic time step in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time.
+  > Overrides the hydraulic time step in this scenario. Leave it blank to use its parent's.
   @@ NEEDS RULING
 - **`lpn_scncmp_at_time`**
   > {value} at {id}, {time}
@@ -632,11 +638,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sort descending
   _Ruled OK 2026-09-26._
 
-### fix/contour-off (`f2faac66`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_contour_show`**
-  > Show contours
-  @@ NEEDS RULING
-- **`lpn_contour_show_tip`**
-  > Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.
-  @@ NEEDS RULING
+### fix/browser-pass-specs (`1d1d64d9`) — adds no English strings

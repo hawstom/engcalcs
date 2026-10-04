@@ -43,7 +43,7 @@ const L = loadLoopedNetwork(
 	"\t\tlastResult: function () { return lastSolveResult; },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\texportInp: function () { return EngCalcs.lpnExportInp(serializeProject(), { effective: effective }); },\n" +
-	"\t\trebuildSettings: rebuildSettingsFields,\n" +
+	"\t\trebuildSettings: rebuildSettingsFields, convert: convertUnitValues,\n" +
 	"\t\trenderNodeFields: renderNodeFields,\n" +
 	"\t\tpopupFields: function () { return document.getElementById('lpn_popup_fields'); },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -203,6 +203,56 @@ console.log('\n=== 5b. Settings shows the three numbers only while PDA is chosen
 		!rows.some((t) => /^(Minimum pressure|Required pressure|Pressure exponent)/.test(t)), rows.join(' | '));
 }
 
+console.log('\n=== 5c. a Minimum pressure above zero, the order check, Convert as, and the default ===');
+{
+	network();
+	L.settings().engine = 'epanet';
+	L.settings().hydraulics = { demandModel: 'PDA', minPressure: 5, reqPressure: 20, pressureExponent: 0.5 };
+	const r = await solved();
+	const expect = reference(5, 20, 0.5), flat = reference(0, 20, 0.5);
+	ok('a non-zero Minimum pressure gives its own hand-worked flow (and not the zero-minimum one)',
+		Math.abs(r.demands.J1 - expect) / expect < 0.005 && Math.abs(expect - flat) / flat > 0.02,
+		(r.demands.J1 * 1000).toFixed(4) + ' vs ' + (expect * 1000).toFixed(4) + ' (zero minimum ' + (flat * 1000).toFixed(4) + ')');
+	const out = optionLines(EngCalcs.lpnToInp(L.assembleModel()).inp);
+	ok('the engine file states the Minimum pressure line', out.indexOf('Minimum Pressure 5') >= 0, JSON.stringify(out));
+
+	// Required <= Minimum: a plain message naming the settings, and no claim that the built-in solver answered.
+	L.settings().hydraulics = { demandModel: 'PDA', minPressure: 20, reqPressure: 20 };
+	const bad = await solved();
+	const say = statusEl.textContent || '';
+	ok('Required not above Minimum is refused with a plain message',
+		/Required pressure must be greater than Minimum pressure/.test(say), JSON.stringify(say));
+	ok('...and nothing claims the built-in solver answered', !/built-in/i.test(say) && !bad, JSON.stringify(say));
+	// Minimum set, Required blank: the default (0.1 m under SI) falls below it.
+	L.settings().hydraulics = { demandModel: 'PDA', minPressure: 5 };
+	await solved();
+	ok('...and a Minimum above the blank Required default says the same',
+		/Required pressure must be greater/.test(statusEl.textContent || ''), JSON.stringify(statusEl.textContent));
+
+	// The blank Required pressure is EPANET's 0.1 in the FILE's pressure unit: metres here.
+	L.settings().hydraulics = { demandModel: 'PDA' };
+	ok('blank Required pressure is 0.1 m for a metric project', Math.abs(L.assembleModel().hydraulics.reqPressure - 0.1) < 1e-12,
+		JSON.stringify(L.assembleModel().hydraulics));
+
+	// Convert as: the typed pressures move with the unit, and so do the two limits that carry units.
+	L.settings().hydraulics = { demandModel: 'PDA', minPressure: 5, reqPressure: 20, headError: 0.5, flowChange: 2 };
+	L.convert('lpn_u_pressure', 2);
+	L.convert('lpn_u_elevhead', 3);
+	L.convert('lpn_u_flow', 4);
+	const hh = L.settings().hydraulics;
+	ok('Convert as rewrites Minimum and Required pressure', hh.minPressure === 10 && hh.reqPressure === 40, JSON.stringify(hh));
+	ok('...and Head error limit and Flow change limit', hh.headError === 1.5 && hh.flowChange === 8, JSON.stringify(hh));
+
+	// Back to demand driven: the numbers left behind are not exported, unless the file stated them.
+	L.settings().hydraulics = { minPressure: 5, reqPressure: 20, pressureExponent: 0.5 };
+	let got = optionLines(L.exportInp().inp);
+	ok('demand driven after PDA exports none of the pressure lines',
+		!got.some((l) => /^(Minimum|Required|Pressure Exponent|Demand Model)/.test(l)), JSON.stringify(got));
+	L.settings().hydraulics = { demandModel: 'PDA', minPressure: 5, reqPressure: 20, pressureExponent: 0.5 };
+	got = optionLines(L.exportInp().inp);
+	ok('...and PDA exports all four', ['Demand Model PDA', 'Minimum Pressure 5', 'Required Pressure 20', 'Pressure Exponent 0.5'].every((l) => got.indexOf(l) >= 0), JSON.stringify(got));
+}
+
 console.log('=== 6. the file states PDA: Settings holds it, nothing is lost (run last: it imports files) ===');
 setUnitSet('us');
 L.buildLayers();
@@ -239,6 +289,25 @@ L.seedDefaultInputs();
 	['Demand Model PDA', 'Minimum Pressure 0', 'Required Pressure 0.1', 'Pressure Exponent 0.5'].forEach((line) => {
 		ok('Net3 with PDA round-trips: ' + line, got.indexOf(line) >= 0, JSON.stringify(got.slice(0, 20)));
 	});
+}
+
+
+{
+	const inp = fs.readFileSync(path.join(ROOT, 'dev', 'pda-sample.inp'), 'utf8').replace(' Pressure Exponent  \t0.5', ' Pressure Exponent  \t0.5\n Pressure           \tKPA');
+	const parsed = EngCalcs.lpnInpParse(inp);
+	ok('a file\'s own Pressure KPA is reported as unread, not silently misread',
+		(parsed.dropped || []).some((d) => d.code === 'pressure-unit'), JSON.stringify((parsed.dropped || []).map((d) => d.code)));
+	ok('...and a file that states the default unit is told nothing',
+		!(EngCalcs.lpnInpParse(inp.replace('KPA', 'PSI')).dropped || []).some((d) => d.code === 'pressure-unit'));
+	// A US project with Required pressure blank: EPANET's 0.1 is psi.
+	setUnitSet('us');
+	L.importInp({ name: 'x.inp', _text: fs.readFileSync(path.join(ROOT, 'dev', 'pda-sample.inp'), 'utf8').replace(/ Required Pressure[^\n]*\n/, '') });
+	ok('blank Required pressure is 0.1 psi for a US project',
+		Math.abs(L.assembleModel().hydraulics.reqPressure - 0.1 / EngCalcs.unitFactors.psi) < 1e-9, JSON.stringify(L.assembleModel().hydraulics));
+	// A source that stated the lines but is demand driven keeps them, character for character.
+	L.importInp({ name: 'y.inp', _text: fs.readFileSync(path.join(ROOT, 'dev', 'pda-sample.inp'), 'utf8').replace('PDA', 'DDA') });
+	const kept = optionLines(L.exportInp().inp);
+	ok('a demand driven file that states the pressure lines gets them back', kept.indexOf('Minimum Pressure 0.0') >= 0 && kept.indexOf('Demand Model DDA') >= 0, JSON.stringify(kept));
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall pda checks passed');

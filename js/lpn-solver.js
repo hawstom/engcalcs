@@ -532,6 +532,12 @@ EngCalcs.lpnDiagnose = function (model, options) {
 		}
 	}
 
+	if (EngCalcs.lpnDemandModelIsPda(model)) {
+		var hy = model.hydraulics, mn = typeof hy.minPressure === 'number' ? hy.minPressure : 0;
+		if (typeof hy.reqPressure === 'number' && hy.reqPressure <= mn) {
+			issues.push({ code: 'pda-pressures', ids: [] });
+		}
+	}
 	if (opts.engine === 'native' && EngCalcs.lpnDemandModelIsPda(model)) {
 		issues.push({ code: 'pda-needs-epanet', ids: [] });
 	}
