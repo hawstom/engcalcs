@@ -136,9 +136,11 @@ async function main() {
 		await a.openExampleCard(await a.lang('lpn_ex_net3_title'));
 		await a.settle(800);
 		const P = (fn, arg) => a.page.evaluate(fn, arg);
+		// A pointer press has detail 1; the page ignores a detail-0 click as a keyboard activation
+		// that no fresh key armed (Task 710), so a bare b.click() answers nothing.
 		// A dialog button is pressed from inside the page: Playwright's own click waits for the
 		// button to be stable and unobscured, and a dialog opened by a rebuild can stay neither.
-		const press = (i) => P((n) => { const b = document.querySelectorAll('#lpn_dialog_buttons button')[n]; if (b) { b.click(); } }, i);
+		const press = (i) => P((n) => { const b = document.querySelectorAll('#lpn_dialog_buttons button')[n]; if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); } }, i);
 		const classes = ['project', 'browser', 'session'];
 		const words = {};
 		for (const c of classes) { words[c] = await a.lang('lpn_saved_' + c); }
@@ -321,7 +323,7 @@ async function main() {
 		await P(() => { const i = document.querySelector('.lpn-managecols-width input'); i.value = '11'; i.dispatchEvent(new Event('change', { bubbles: true })); });
 		const unstaged = await P(SNAPSHOT);
 		ok('...a typed width stages and writes nothing until OK', !differs(before2, unstaged));
-		await P((t) => { const b = [...document.querySelectorAll('#lpn_dialog_buttons button')].find((x) => x.textContent.trim() === t); if (b) { b.click(); } }, await a.lang('lpn_dialog_ok'));
+		await P((t) => { const b = [...document.querySelectorAll('#lpn_dialog_buttons button')].find((x) => x.textContent.trim() === t); if (b) { b.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 })); } }, await a.lang('lpn_dialog_ok'));
 		await a.settle(200);
 		await a.settle(300);
 		const after2 = await P(SNAPSHOT);
