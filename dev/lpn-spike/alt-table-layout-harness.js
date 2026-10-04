@@ -76,6 +76,9 @@ function measureInPage() {
 			let w = 0;
 			pieces.forEach((p) => { probe.textContent = p; w = Math.max(w, probe.getBoundingClientRect().width); });
 			probe.remove();
+			// A scenario's calculation option is a box it is typed into (Task 755): the box is the content.
+			const box = !isHead && c.querySelector('input');
+			if (box) { w = box.getBoundingClientRect().width; }
 			widest = Math.max(widest, w + pad);
 		});
 		out.cols.push({ name, colW, widest, slack: colW - widest });
@@ -145,6 +148,29 @@ async function main() {
 		check('in a 420 px box', narrow);
 		ok('...the table scrolls sideways inside its box', narrow.scrolls, `${narrow.tableW.toFixed(0)} in ${narrow.wrapW}`);
 		if (shot) { await a.page.locator('#lpn_alt_box').screenshot({ path: shot.replace(/\.png$/, '') + '-narrow.png' }); }
+
+		// TASK 755: a scenario's own Total run time, typed into its box. Tab commits it and the next
+		// option box keeps the focus through the table's rebuild; the open scenario then runs 48 hours;
+		// and Ctrl+Z, pressed outside the box, takes it back.
+		await a.page.evaluate(() => { document.getElementById('lpn_alt_box').style.width = ''; });
+		const sel = (key) => '#lpn_alt_report input[data-alt-key="' + key + '"]';
+		await a.page.click(sel('duration'));
+		await a.page.keyboard.type('48:00');
+		await a.page.keyboard.press('Tab');
+		await a.settle(400);
+		const after = await a.page.evaluate((s) => ({
+			value: document.querySelector(s).value,
+			focus: document.activeElement && document.activeElement.getAttribute('data-alt-key'),
+			button: document.getElementById('lpn_scenario_btn').textContent
+		}), sel('duration'));
+		ok('a typed Total run time stays in its box after Tab', after.value === '48:00', JSON.stringify(after));
+		ok('...and the focus moved on to the Hydraulic time step box', after.focus === 'hydraulicStep', after.focus);
+		ok('...and the scenario badge counts it beside the demand edit', /: 2\s*$/.test(after.button), after.button);
+		await a.page.evaluate(() => { if (document.activeElement) { document.activeElement.blur(); } });
+		await a.page.keyboard.press('Control+z');
+		await a.settle(400);
+		const undone = await a.page.evaluate((s) => document.querySelector(s).value, sel('duration'));
+		ok('Ctrl+Z takes it back', undone === '', JSON.stringify(undone));
 	} finally { await browser.close(); env.stopServer(); }
 	console.log(fails ? `\n${fails} FAILED` : '\nall ok');
 	process.exit(fails ? 1 : 0);

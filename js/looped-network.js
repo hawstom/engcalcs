@@ -61058,9 +61058,14 @@ var EngCalcs = EngCalcs || {};
 		}
 		afterScenarioOptionEdit(s);
 	}
+	// **THE TABLE IS NOT REBUILT UNDER THE PERSON TYPING IN IT.** An option edit changes no
+	// category cell and no other row, and the box already shows what was typed; rebuilding it here
+	// (refreshScenarioStatus() redraws this box) would throw away the box Tab is moving focus to.
+	var altOptionEditing = false;
 	function afterScenarioOptionEdit(s) {
 		var active = s.id === project.activeScenario;
-		refreshScenarioStatus();
+		altOptionEditing = true;
+		try { refreshScenarioStatus(); } finally { altOptionEditing = false; }
 		saveToStorage();
 		if (active) {
 			// The Settings box reads the open scenario's multiplier, and the transport its clock.
@@ -61094,7 +61099,7 @@ var EngCalcs = EngCalcs || {};
 		addPanelResizeGrip(box);
 	}
 	function refreshAlternativesBoxIfOpen() {
-		if (altBoxIsOpen()) { rebuildAlternativesTable(); }
+		if (altBoxIsOpen() && !altOptionEditing) { rebuildAlternativesTable(); }
 	}
 
 	// ---- THE FULL REPORT: every node and every link, at every reporting time step -----------------
