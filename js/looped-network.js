@@ -47143,8 +47143,7 @@ var EngCalcs = EngCalcs || {};
 		// ratio and a percentage), so there is no unit to show and neither is reinterpreted on a
 		// unit change.
 		var capWrap = document.createElement('span'), capMultInput = document.createElement('input'),
-			capMid = document.createElement('span'), capPctInput = document.createElement('input'),
-			capPctSign = document.createElement('span'), capPost = document.createElement('span');
+			capPctInput = document.createElement('input'), capPctSign = document.createElement('span');
 		capWrap.className = 'lpn-set-ctlgroup';
 		capMultInput.type = 'number'; capMultInput.step = 'any'; capMultInput.min = '0';
 		capMultInput.id = 'lpn_set_symbol_cap_mult';
@@ -47158,8 +47157,6 @@ var EngCalcs = EngCalcs || {};
 				capMultInput.value = trimNum(symbolCapMultiple());
 			}
 		});
-		capMid.className = 'lpn-set-note';
-		capMid.textContent = pc.lpn_settings_symbol_cap_mid || 'times the length of the';
 		capPctInput.type = 'number'; capPctInput.step = 'any'; capPctInput.min = '0'; capPctInput.max = '100';
 		capPctInput.id = 'lpn_set_symbol_cap_pct';
 		capPctInput.style.width = '4em';
@@ -47173,12 +47170,23 @@ var EngCalcs = EngCalcs || {};
 			}
 		});
 		capPctSign.className = 'lpn-set-note'; capPctSign.textContent = '%';
-		capPost.className = 'lpn-set-note';
-		capPost.textContent = pc.lpn_settings_symbol_cap_post || 'percentile pipe';
-		capWrap.appendChild(capMultInput); capWrap.appendChild(capMid); capWrap.appendChild(capPctInput);
-		capWrap.appendChild(capPctSign); capWrap.appendChild(capPost);
-		row(mapBody, pc.lpn_settings_symbol_cap || 'Prevent nodes from scaling larger than', capWrap,
-			pc.lpn_settings_symbol_cap_tip);
+		// ONE sentence, {n} and {p} where the two boxes go (Task 740), so a language can order it as
+		// it needs to. Whatever precedes the first box is the row's label (and carries the tip); the
+		// rest is note text and the boxes, in the order the sentence states them.
+		var capPieces = (pc.lpn_settings_symbol_cap_sentence ||
+			'Prevent nodes from scaling larger than {n} times the length of the {p} percentile pipe')
+			.split(/(\{n\}|\{p\})/), capLabel = capPieces[0].trim();
+		for (var cpi = 1; cpi < capPieces.length; cpi++) {
+			var cp = capPieces[cpi];
+			if (cp === '{n}') { capWrap.appendChild(capMultInput); }
+			else if (cp === '{p}') { capWrap.appendChild(capPctInput); capWrap.appendChild(capPctSign); }
+			else if (cp.trim() !== '') {
+				var capNote = document.createElement('span');
+				capNote.className = 'lpn-set-note'; capNote.textContent = cp.trim();
+				capWrap.appendChild(capNote);
+			}
+		}
+		row(mapBody, capLabel || '\u00a0', capWrap, pc.lpn_settings_symbol_cap_tip);
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;

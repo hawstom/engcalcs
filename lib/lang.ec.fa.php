@@ -2852,9 +2852,7 @@ $ec_lang['lpn_settings_label_always']='همیشه نمایش داده شود';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='جلوگیری از بزرگ‌تر شدن گره‌ها بیش از';
-$ec_lang['lpn_settings_symbol_cap_mid']='برابر طول';
-$ec_lang['lpn_settings_symbol_cap_post']='صدک لوله';
+$ec_lang['lpn_settings_symbol_cap_sentence']='جلوگیری از بزرگ‌تر شدن گره‌ها بیش از {n} برابر طول {p} صدک لوله';
 $ec_lang['lpn_settings_symbol_cap_tip']='یک گره وقتی قطرش به این‌اندازه برابر طول لولهٔ این صدک از میان همهٔ طول‌های لوله در شبکه برسد، از رشد روی زمین بازمی‌ایستد. از آن نقطه به بعد روی نقشه، گره‌ها، لوله‌ها و دیگر نمادها هنگام کوچک‌نمایی روی صفحه کوچک می‌شوند، به‌جای آنکه روی زمین بزرگ شوند. مخزن‌ها و تانک‌ها استثنا هستند و اندازهٔ صفحهٔ خود را در هر بزرگ‌نمایی حفظ می‌کنند.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

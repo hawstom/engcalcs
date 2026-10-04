@@ -2906,9 +2906,7 @@ $ec_lang['lpn_settings_label_always']='အမြဲ ပြရန်';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='အမှတ်များကို ဤထက် ပိုမကြီးစေရန် ကန့်သတ်ရန် -';
-$ec_lang['lpn_settings_symbol_cap_mid']='ဆမြောက်အထိ ရာခိုင်နှုန်း';
-$ec_lang['lpn_settings_symbol_cap_post']='ရှိ ပိုက်၏ အလျား';
+$ec_lang['lpn_settings_symbol_cap_sentence']='အမှတ်များကို ဤထက် ပိုမကြီးစေရန် ကန့်သတ်ရန် - {n} ဆမြောက်အထိ ရာခိုင်နှုန်း {p} ရှိ ပိုက်၏ အလျား';
 $ec_lang['lpn_settings_symbol_cap_tip']='ဆက်စပ်နေရာတစ်ခု၏ အချင်းသည် ကွန်ရက်ရှိ ပိုက်အလျားအားလုံး၏ ဤရာခိုင်နှုန်းအမှတ်ရှိ ပိုက်အလျား၏ ဤဆအထိ ရောက်ရှိသောအခါ၊ မြေပြင်ပေါ်တွင် ကြီးထွားခြင်း ရပ်တန့်သည်။ ထိုအမှတ်ကို ကျော်လွန်ပြီးနောက်၊ မြေပုံပေါ်ရှိ ဆက်စပ်နေရာများ၊ ပိုက်လိုင်းများနှင့် အခြားသင်္ကေတများသည် သင် ဇူးမ်လျှော့ချသည်နှင့်အမျှ မြေပြင်ပေါ်တွင် ကြီးထွားမည့်အစား၊ စခရင်ပေါ်တွင် ကျုံ့သွားသည်။ ရေကန်များနှင့် ရေတိုက်များသည် ခြွင်းချက်ဖြစ်ပြီး ဇူးမ်အဆင့်တိုင်းတွင် ၎င်းတို့၏ စခရင်အရွယ်အစားကို ထိန်းထားသည်။';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

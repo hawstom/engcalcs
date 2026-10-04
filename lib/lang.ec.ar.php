@@ -2924,9 +2924,7 @@ $ec_lang['lpn_settings_label_always']='إظهار دائماً';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='منع العُقَد من التكبّر أكثر من';
-$ec_lang['lpn_settings_symbol_cap_mid']='ضعف طول';
-$ec_lang['lpn_settings_symbol_cap_post']='الأنبوب عند المئين';
+$ec_lang['lpn_settings_symbol_cap_sentence']='منع العُقَد من التكبّر أكثر من {n} ضعف طول {p} الأنبوب عند المئين';
 $ec_lang['lpn_settings_symbol_cap_tip']='يتوقف الملتقى عن التكبّر على الأرض بمجرد أن يصبح قطره بهذا العدد من الأضعاف لطول الأنبوب عند هذا المئين من كل أطوال الأنابيب في الشبكة. بعد تلك النقطة على الخريطة، تتقلص الملتقيات والأنابيب والرموز الأخرى على الشاشة عند التصغير بدلاً من التكبّر على الأرض. الخزانات والصهاريج استثناء، وتحتفظ بحجمها على الشاشة عند كل تكبير.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

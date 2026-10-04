@@ -2852,9 +2852,7 @@ $ec_lang['lpn_settings_label_always']='Onyesha daima';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='Zuia vifundo visipime kubwa zaidi ya';
-$ec_lang['lpn_settings_symbol_cap_mid']='mara urefu wa';
-$ec_lang['lpn_settings_symbol_cap_post']='bomba la asilimia';
+$ec_lang['lpn_settings_symbol_cap_sentence']='Zuia vifundo visipime kubwa zaidi ya {n} mara urefu wa {p} bomba la asilimia';
 $ec_lang['lpn_settings_symbol_cap_tip']='Muunganiko huacha kukua ardhini pale kipenyo chake kingefikia mara hii nyingi ya urefu wa bomba katika asilimia hii ya urefu wa mabomba yote kwenye mtandao. Kupita hatua hiyo kwenye ramani, miunganiko, mabomba na alama nyingine hupungua kwenye skrini unapopunguza kukuza badala ya kukua ardhini. Hifadhi za maji na matanki ni tofauti na hubaki na ukubwa wao wa skrini katika kukuza yoyote.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

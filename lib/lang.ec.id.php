@@ -2856,9 +2856,7 @@ $ec_lang['lpn_settings_label_always']='Selalu tampilkan';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='Cegah simpul membesar melebihi';
-$ec_lang['lpn_settings_symbol_cap_mid']='kali panjang';
-$ec_lang['lpn_settings_symbol_cap_post']='pipa persentil';
+$ec_lang['lpn_settings_symbol_cap_sentence']='Cegah simpul membesar melebihi {n} kali panjang {p} pipa persentil';
 $ec_lang['lpn_settings_symbol_cap_tip']='Sebuah simpul berhenti membesar di lapangan begitu diameternya mencapai sekian kali panjang pipa pada persentil ini dari seluruh panjang pipa dalam jaringan. Melewati titik itu pada peta, simpul, pipa, dan simbol lainnya menyusut di layar seiring Anda memperkecil tampilan, alih-alih membesar di lapangan. Reservoir dan tangki adalah pengecualian dan mempertahankan ukuran layarnya pada setiap tingkat pembesaran.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

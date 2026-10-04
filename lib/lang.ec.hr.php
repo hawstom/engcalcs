@@ -2853,9 +2853,7 @@ $ec_lang['lpn_settings_label_always']='Uvijek prikaži';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='Spriječi čvorove da rastu veći od';
-$ec_lang['lpn_settings_symbol_cap_mid']='puta duljine';
-$ec_lang['lpn_settings_symbol_cap_post']='percentilne cijevi';
+$ec_lang['lpn_settings_symbol_cap_sentence']='Spriječi čvorove da rastu veći od {n} puta duljine {p} percentilne cijevi';
 $ec_lang['lpn_settings_symbol_cap_tip']='Čvor prestaje rasti na tlu čim bi njegov promjer bio ovoliko puta veći od duljine cijevi na ovom percentilu svih duljina cijevi u mreži. Nakon te točke na karti, čvorovi, cijevi i drugi simboli smanjuju se na zaslonu dok umanjujete, umjesto da rastu na tlu. Rezervoari i spremnici su iznimka i zadržavaju svoju veličinu na zaslonu pri svakom zumiranju.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
