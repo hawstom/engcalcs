@@ -10402,12 +10402,18 @@ var EngCalcs = EngCalcs || {};
 	 * already made once (*"Put the meter where user clicks"*): the pointer names WHICH pipe, and
 	 * the meter's own position names where along it, which is what makes the stub square.
 	 *
+	 * **ON A BENT PIPE THE POINTER ALSO NAMES WHICH LEG** (Tom, 2026-10-04: *"Customer won't
+	 * connect to a pipe under a certain geometry"*). The meter's nearest point on the WHOLE pipe
+	 * was the station, so a main that bends up toward the meter handed back the far end of the
+	 * rising leg -- a node -- for a press square below the meter on the long leg. The foot is now
+	 * dropped on the leg nearest the press. dev/lpn-spike/customer-connect-geometry-harness.js.
+	 *
 	 * A node wins a tie, on the finger-fallback's own argument: every pipe ends at a node, so near
 	 * a junction both are in reach and the node is the more specific thing the user can have meant.
 	 */
 	function customerConnectionAt(clientX, clientY, pt, pxTolerance, target) {
 		var n = nearestNodeNearScreen(clientX, clientY, pxTolerance),
-			a = n ? customerAttachAtNode(n, pt) : null, l, p;
+			a = n ? customerAttachAtNode(n, pt) : null, l, p, w;
 		if (!a) {
 			// The pipe under the press by the browser's own hit test on its wide stroke, falling
 			// back to the same finder every other tool on this page uses.
@@ -10416,8 +10422,9 @@ var EngCalcs = EngCalcs || {};
 				? { link: linkById(target.dataset.link) }
 				: nearestLinkNearScreen(clientX, clientY, pxTolerance);
 			if (!l || !l.link) { return null; }
+			w = screenToWorld(clientX, clientY);
 			a = { link: l.link, t: customerSnapT(l.link,
-				Geom.nearestFractionOnPolyline(linkPointList(l.link), pt.x, pt.y).f) };
+				Geom.footOnPolylineLegNear(linkPointList(l.link), pt.x, pt.y, w.x, w.y).f) };
 		}
 		if (!a.link || !nodeById(a.link.from) || !nodeById(a.link.to)) { return null; }
 		p = Geom.pointAlongPolyline(linkPointList(a.link), a.t);
@@ -10507,13 +10514,21 @@ var EngCalcs = EngCalcs || {};
 		n = linkNormalAt(l, c.t);
 		return setCustomerPerp(c, c.t, (x - an.x) * n.x + (y - an.y) * n.y);
 	}
-	// The same thing with the station DERIVED as well: the nearest point on this pipe to where the
-	// meter is, snapped onto an end within reach of it (customerSnapT()). This is what a drag, a
-	// typed location, a typed pipe and the second press of the placement gesture all want.
-	function setCustomerAt(c, l, x, y) {
+	// The same thing with the station DERIVED as well: the foot of the perpendicular on this pipe
+	// from where the meter is, snapped onto an end within reach of it (customerSnapT()). This is
+	// what a drag, a typed location and a typed pipe all want.
+	//
+	// **A METER ALREADY ON THIS PIPE STAYS ON ITS LEG** (Tom, 2026-10-04): the nearest point on a
+	// bent pipe can be the far end of another leg, so a drag along the long leg jumped the service
+	// to a node. It moves to another leg only where its foot falls inside that leg and is shorter
+	// (Geom.footOnPolylineKeepingLeg()). dev/lpn-spike/customer-connect-geometry-harness.js.
+	// `newPipe` says the pipe was just named, so the meter's old station means nothing on it.
+	function setCustomerAt(c, l, x, y, newPipe) {
+		var ref;
 		if (!l) { return false; }
-		return setCustomerOffsetTo(c, l,
-			customerSnapT(l, Geom.nearestFractionOnPolyline(linkPointList(l), x, y).f), x, y);
+		ref = (!newPipe && c.link === l.id && customerLink(c)) ? customerAttachPoint(c) : null;
+		return setCustomerOffsetTo(c, l, customerSnapT(l, Geom.footOnPolylineKeepingLeg(
+			linkPointList(l), x, y, ref ? ref.x : undefined, ref ? ref.y : undefined).f), x, y);
 	}
 	// Where the METER sits. `c.x`/`c.y` is an OFFSET from the attachment point while the
 	// customer is attached and an absolute position while it is not -- the same dual meaning a Text
@@ -11237,7 +11252,7 @@ var EngCalcs = EngCalcs || {};
 		delete c.node;   // a live pipe is always the fresh answer -- see setCustomerConnection()
 		if (!customersByLink[l.id]) { customersByLink[l.id] = []; }
 		customersByLink[l.id].push(c.id);
-		setCustomerAt(c, l, pt.x, pt.y);
+		setCustomerAt(c, l, pt.x, pt.y, true);
 		return true;
 	}
 	// **THE PIPE THIS METER MOST LIKELY BELONGS TO, AS A SUGGESTION AND NOT AS A WRITE.** The
