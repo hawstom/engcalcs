@@ -58031,6 +58031,8 @@ var EngCalcs = EngCalcs || {};
 	// ring on each tested junction and writes no property either.
 	var fireFlowAsk = null;      // what is in the boxes, for this page load only
 	var fireFlowRun = null;      // the last run's result set, or null
+	var fireFlowRunT = null;     // the time step it was computed at (seconds)
+	var ffShownAt = null;
 	var fireFlowBusy = false;    // a run is in progress
 	var fireFlowStop = false;    // the Stop button was pressed
 
@@ -58750,7 +58752,9 @@ var EngCalcs = EngCalcs || {};
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_stopped || 'Stopped after {done} of {total} junctions. The results below are the ones already finished.')
 				.replace('{done}', String(set.results.length)).replace('{total}', String(set.requested)), host);
 		}
+		ffShownAt = dsNow();
 		ffEl('p', 'lpn-ff-summary', ffSummaryText(set), host);
+		dsTimeLines(host, fireFlowRunT);
 		if (set.counts.error) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_summary_error || '{n} junctions could not be answered.')
 				.replace('{n}', String(set.counts.error)), host);
@@ -59045,6 +59049,7 @@ var EngCalcs = EngCalcs || {};
 		// belt-and-braces assertion rather than a repair, and if it ever fires the fix is in
 		// whatever wrote to `doc`, not here.
 		before = JSON.stringify(doc);
+		fireFlowRunT = modelTimeSeconds();
 		fireFlowBusy = true;
 		fireFlowStop = false;
 		fireFlowRun = null;
@@ -59175,6 +59180,8 @@ var EngCalcs = EngCalcs || {};
 	// dev/cookie-storage-inventory.md.
 	var critAsk = { scope: 'all', skipDeadEnds: false };
 	var critRun = null;
+	var critRunT = null;
+	var critShownAt = null;
 	var critBusy = false;
 	var critStop = false;
 	var critSortState = { col: null, dir: 1 };
@@ -59275,6 +59282,7 @@ var EngCalcs = EngCalcs || {};
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (!set) { return; }
+		critShownAt = dsNow();
 		if (set.stopped) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_stopped || 'Stopped after {done} of {total} assets. The results below are the ones already finished.')
 				.replace('{done}', String(set.processed)).replace('{total}', String(set.requested)), host);
@@ -59286,6 +59294,7 @@ var EngCalcs = EngCalcs || {};
 		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || '{n} of {total} assets leave demand unserved or drop a junction below {pressure}.')
 			.replace('{n}', String(hit)).replace('{total}', String(set.results.length))
 			.replace('{pressure}', ffQty(set.minPressure, 'lpn_u_pressure')), host);
+		dsTimeLines(host, critRunT);
 		if (set.skippedDeadEnds && set.skippedDeadEnds.length) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_skipped_dead || 'Dead-end links skipped: {n}. Each one cuts off everything beyond it.')
 				.replace('{n}', String(set.skippedDeadEnds.length)), host);
@@ -59363,6 +59372,7 @@ var EngCalcs = EngCalcs || {};
 		minPressure = ffValue(critFireFlowAsk().minPressure, 'lpn_u_pressure');
 		engine = engineFor(model);
 		before = JSON.stringify(doc);
+		critRunT = modelTimeSeconds();
 		critBusy = true;
 		critStop = false;
 		critRun = null;
@@ -59595,18 +59605,19 @@ var EngCalcs = EngCalcs || {};
 	function dsTimeLines(host, t) {
 		var pc = EngCalcs.pageConfig || {};
 		if (!dsExtended() || typeof t !== 'number') { return; }
-		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_at_time || 'Time step: {time}.').replace('{time}', dsTimeText(t)), host);
+		ffEl('p', 'lpn-ff-note', (pc.lpn_analyze_at_time || 'Time step: {time}.').replace('{time}', dsTimeText(t)), host);
 		if (dsNow() !== t) {
-			ffEl('p', 'lpn-ff-summary lpn-ds-stale', (pc.lpn_ds_time_moved ||
+			ffEl('p', 'lpn-ff-summary lpn-ds-stale', (pc.lpn_analyze_time_moved ||
 				'⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.')
 				.replace('{time}', dsTimeText(t)).replace('{now}', dsTimeText(dsNow())), host);
 		}
 	}
 	var dsShownAt = null;
 	function demandScaleClockMoved() {
-		var now;
+		var now = dsNow();
+		if (fireFlowRun && ffBoxIsOpen() && now !== ffShownAt) { rebuildFireFlowReport(); }
+		if (critRun && critBoxIsOpen() && now !== critShownAt) { rebuildCriticalityReport(); }
 		if (!(dsRun || dsSearch) || !dsBoxIsOpen()) { return; }
-		now = dsNow();
 		if (now === dsShownAt) { return; }
 		rebuildDemandScaleReport();
 	}

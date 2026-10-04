@@ -1220,7 +1220,7 @@
             "on": "It stopped after {iterations} iterations.",
             "ruled": "2026-09-02"
         },
-        "lpn_ds_at_time": {
+        "lpn_analyze_at_time": {
             "on": "Time step: {time}.",
             "ruled": "2026-10-03",
             "answer": "OK."
@@ -1420,7 +1420,7 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
-        "lpn_ds_time_moved": {
+        "lpn_analyze_time_moved": {
             "on": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.",
             "ruled": "2026-10-03",
             "answer": "OK."
