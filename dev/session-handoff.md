@@ -101,46 +101,50 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-04 (early morning)
+## STATE — 2026-10-04 (morning session)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged 2026-10-03/04: demand-scaling (with criticality) and flow-balance on his "Good. Done. Close,
-merge, and delete branch." (Tasks 600, 751, 754 closed); his 143 rulings harvested from his edit of
-`dev/new-english-keys.md`; selection-word (CRS button now OK, ff/ds/crit under the rule);
-review-file (Wave 0 entries and stale synonyms now reach him in `new-english-keys.md`, with
-proposals in `dev/syn-proposals.json`); kPa and bar on EPANET's factors (types.h, input1.c);
-theme-inline (714 phase 1b); ds-wording (lpn_ds_search_note_selected deleted); the Analyze clock
-fix (Fire flow and Criticality name their time step; lpn_ds_at_time / lpn_ds_time_moved renamed
-lpn_analyze_*); scncmp-reservoir (comparison's lowest pressure judges junctions only); sprint
-1004-lpn (130 ruled keys + 14 resyncs, 26 languages, five glossary terms incl. "edit lock").
+Merged this session: feat/property-graph (Task 637 closed, his "Done. Close, merge, and delete
+branch."); the Graphs fly-out in EPANET's order (Time series, Profile, Contour, Frequency, Flow
+balance; he asked whether Mary found a reason to differ, she found none); Task 732 (five
+browser-pass specs current); two check flakes (usage selftest port collided with the preview ports;
+three browser harnesses hard-coded the shared lock instead of `EC_BROWSER_LOCK`). Task 727 closed as
+already shipped (25a3cf2a). Task 760 (Settings scrolled sideways at 360 px) found and fixed the
+same session; Task 761 (four more stale specs) is open.
 
-### Awaiting him
+### Awaiting him (every port row in ports.conf says what to test)
 
-- **Browser pass (protected), each Perry-reviewed:** 8107 `feat/dock` (441, clean; judge the icons);
-  8109 `feat/table-selection` (757, clean); 8110 `feat/dialog-audit` (710, three findings fixed);
-  8111 `feat/scenario-option` (755, clean; open: a note in Settings > Time when a scenario runs its own run time); 8112 `feat/setting-scope` (739, clean). Still from before: 8106
-  `feat/property-graph` (he wrote "I can't think of any [box] that wouldn't have a graph"; no merge
-  word yet), 8108 `feat/profile-file`, `feat/desktop`, `feat/label-placer`.
-- **`dev/new-english-keys.md` is the one place he rules English** (his question, asked twice). Open
-  there: 10 Wave 0 rewrites (1003b-wave0), lpn_ds_found_below (two rewordings, 1003-ds), 13 synonym
-  entries with proposals, the reworded Graphs tip and lpn_ds_search_note, the branch keys.
-- **Tip review** (https://claude.ai/artifact/V6DRoU2z8sCZgMHGV92XLx) waits on him; hold tip edits.
-  Interview answers read 2026-10-04: Q4 he questioned (Ida's reply: click door for `?` glyphs only,
-  control tips stay hover plus Esc); Q7 Mary found none of Adobe/Autodesk/Bentley/Apple put a line
-  inside the menu, hover tip is the common practice; Q8 he wants a CSV (key, where, text) to re-rate,
-  and says tip length is not high on the list.
-- **Open questions:** a styled modal for the 38 blocking dialogs; privacy.php's "Ground elevations"
-  row vs contour's tile-number wording.
+- **Browser pass (protected):** 8107 `feat/dock` (441; his two notes fixed: autohide width grip,
+  `?` tip closes on a title-bar click); 8109 `feat/table-selection` (757; buttons gone, right-click
+  only, keys lpn_pane_sel_only_tip and lpn_pane_print_tip deleted); 8110 `feat/dialog-audit` (710;
+  all 38 converted, Perry's three findings fixed, four bar instructions left non-modal by CC's call);
+  8111 `feat/scenario-option` (755; Settings > Time names the overrides; "override" rewording of
+  seven translated keys for him to read); 8112 `feat/setting-scope` (739; he wrote "(1) Start fresh
+  is not a setting. So OK, I think." -- no merge word); 8113 `feat/basemap-style` (617; Perry clean;
+  label "Basemap filter" vs Perry's "Map tile filter" is his call); 8106 `fix/tip-width` (he said
+  yes to it; tooltip cap 200 px to 22rem, merge on his look). Still from before: 8108
+  `feat/profile-file`, `feat/desktop`, `feat/label-placer`.
+- **His tip verdicts** are in progress (he is "cutting hard"). When they arrive: apply on a branch,
+  check every cut for a lost warning, unit or caveat and ask rather than drop, list deleted keys.
+  He does not like the word "rulings" for his answers; say calls or verdicts.
+- **Expert level:** he floated Tutorial/Normal/Expert tiers and an early notice. CC and Ida both
+  advised against tiers now: cut the tips first, then at most one "Show explanations" switch (a
+  browser-storage change he must be told about). His answer is pending.
+- **`dev/new-english-keys.md`:** he edited a stale copy again (his 10-03 file plus three OKs, which
+  were harvested). Tell him to reopen the file before editing; the 10 Wave 0 rewrites, the Graphs
+  tip and lpn_ds_search_note rewordings still wait there.
 
-**Seams:** feat/dock and feat/property-graph both size the Properties box; dock's column wins while
-docked. feat/scenario-option and the merged reservoir fix both touch scenarioCompareExtremes.
+**Seams:** feat/dock and feat/table-selection both touch the bottom pane; feat/dialog-audit
+touches nearly every confirm in js/looped-network.js, so merge it last and rerun the others'
+harnesses on the merge.
 
 ### Owed translation work
 
-46 lpn keys held back from sprint 1004 until he rules (every lpn_ds_*, the Graphs tip, sysflow
-title, the 10 Wave 0 keys, the stale-syn keys); plus each pending branch's keys. Romanian file menu
-noun/verb pass; four concept terms.
+46 lpn keys held until he rules (lpn_ds_*, the Graphs tip, the 10 Wave 0 keys, the stale-syn keys);
+each pending branch's keys (basemap filter six, "Scenario overrides:", the seven override
+rewrites, lpn_pane_sel_only_none). Romanian file menu noun/verb pass; four concept terms. No sprint
+was run this session: almost everything owed waits on his reading.
 
 ### Traps met 2026-10-04
 
@@ -151,6 +155,18 @@ noun/verb pass; four concept terms.
   (label-measure-cache, pane-follows-doc). Read the log before calling it a defect; rerun.
 - **Agents' generated-file conflicts** (`new-english-keys.md`, `english-key-rulings.json`) on every
   merge: take master's side, union the rulings JSON, regenerate on a chore branch.
+- **A stale copy's marks make the harvest print false "EDIT" lines**: his old copy shows the OLD
+  English, so the harvester reports it as his rewrite. Before applying an EDIT, check the "now" text
+  is not simply an earlier version in `git log -S`.
+- **The roadmap lagged again**: Task 727 had shipped nine days earlier. `git log --all --grep` and a
+  grep of the code before briefing, every time.
+- **Killing a setsid'd check_all with `kill -- -PGID` left run_harnesses.sh and a harness alive**
+  (they sit in the session, not the group). Kill by session: `ps -eo pid,sess,args | awk '$2==SID'`.
+- **A worktree that never had `dev/browser-pass/node_modules` symlinked prints "playwright-core is
+  not installed"**: symlink it when making any worktree, fix branches too.
+- **The pre-reviewer earns his keep on large mechanical conversions**: the dialog conversion was
+  reported finished and green; Perry found held Enter deleting a network and 18 alerts quietly
+  downgraded to fading strips.
 
 ### Traps met 2026-10-03
 
