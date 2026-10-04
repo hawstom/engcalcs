@@ -131,7 +131,7 @@ function dsHost(which) {
 	ok('...and the box does not say it', out.indexOf(PC.lpn_ds_below_zero.split('{pressure}')[0]) < 0);
 	const probe = s.failing || s.holding;
 	ok('the lowest junction it names is a selected one', !!probe && !!probe.lowest && sel.indexOf(probe.lowest.id) >= 0, probe && JSON.stringify(probe.lowest));
-	ok('6. the answer names 7:00', out.indexOf(PC.lpn_ds_at_time.replace('{time}', EC.lpnTimeElapsedText(T))) >= 0);
+	ok('6. the answer names 7:00', out.indexOf(PC.lpn_analyze_at_time.replace('{time}', EC.lpnTimeElapsedText(T))) >= 0);
 	ok('it says the selected junctions were scaled and checked', out.indexOf(PC.lpn_ds_scaled_selected.replace('{n}', '3')) >= 0);
 
 	console.log('\n--- 3. The answer, by solves of its own ---');
@@ -154,7 +154,7 @@ function dsHost(which) {
 	ok('...the found scale is still the selection\'s (not cut short by junction 40)', s.multiplier > 1, s.multiplier);
 	ok('Run at scale 1 lists junction 40 as outside, and not in the count below', r1.outside.some((x) => x.id === '40') && r1.below.length === 0);
 	ok('the heading under Selected is the selection\'s', text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_head_search_selected) >= 0);
-	ok('...with the selection\'s explanation of Find', text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_search_note_selected.replace('{max}', '20').replace('{step}', '0.01')) >= 0);
+	ok('...with the selection\'s explanation of Find', text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_search_note.replace('{max}', '20').replace('{step}', '0.01')) >= 0);
 	ok('the range in that sentence is the code\'s: 0 to 20, step 0.01', EC.lpnDemandScaleDefaults.max === 20 && EC.lpnDemandScaleDefaults.step === 0.01);
 	// Pure: an unselected junction stuck below the limit does not move the answer.
 	const fake = { nodes: [{ id: 'A', type: 'junction', demand: 1 }, { id: 'B', type: 'junction', demand: 1 }], links: [] };

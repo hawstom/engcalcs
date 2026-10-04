@@ -101,50 +101,56 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-03 (late night)
+## STATE — 2026-10-04 (early morning)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged 2026-10-03: keyboard-menu (748, closed) and calibration (601, closed) on his "Merge both";
-contour (600) on his "Merge contour", then fix/contour-hole (a pump-in-one-zone fault hid whole
-pipes; break lines now span one buffer width, his ruling). Defect/chore tracks: report-column (he
-closed it), psi-factor (lpn uses EPANET's 0.4333 psi/ft), menu-keyboard race, irr removed, About's
-message of love links to his blog post (all 27 languages). Ida's audit and follow-up, Mary's flow
-terms. Roadmap: 441 at 100 (box-corner dock/hide/autohide), new 759 (selection words, tips).
+Merged 2026-10-03/04: demand-scaling (with criticality) and flow-balance on his "Good. Done. Close,
+merge, and delete branch." (Tasks 600, 751, 754 closed); his 143 rulings harvested from his edit of
+`dev/new-english-keys.md`; selection-word (CRS button now OK, ff/ds/crit under the rule);
+review-file (Wave 0 entries and stale synonyms now reach him in `new-english-keys.md`, with
+proposals in `dev/syn-proposals.json`); kPa and bar on EPANET's factors (types.h, input1.c);
+theme-inline (714 phase 1b); ds-wording (lpn_ds_search_note_selected deleted); the Analyze clock
+fix (Fire flow and Criticality name their time step; lpn_ds_at_time / lpn_ds_time_moved renamed
+lpn_analyze_*); scncmp-reservoir (comparison's lowest pressure judges junctions only); sprint
+1004-lpn (130 ruled keys + 14 resyncs, 26 languages, five glossary terms incl. "edit lock").
 
 ### Awaiting him
 
-- **Browser pass (protected):** 8106 `feat/property-graph` (box carrying a graph runs map top to
-  window bottom; a box with no graph keeps natural height, CC's choice); 8110 `feat/demand-scaling`
-  (his wording; three Analyze tools parallel); 8109 `feat/flow-balance` ("Flow balance"; lines stay
-  Produced / Consumed, his ruling); 8108 `feat/profile-file`; `feat/desktop`; `feat/label-placer`.
-- **`chore/selection-word` (pushed, held):** applies his Q1-Q3 rule (select = map set, choose =
-  lists) to 9 strings, 7 of them ruled (those rulings lapse), plus `selection_word_check.php`. One
-  result reads badly: `lpn_crs_list_tip` "Choose one, then press Choose." Show him the list first.
-  Its baseline exempts lpn_ff_*/lpn_ds_*/lpn_crit_* until demand-scaling merges.
-- **Syn proposals (his to approve):** five stale `$ec_lang_syn` entries on demand-scaling.
-- **Interview answered** (https://claude.ai/artifact/4mL8BuUzFTJi7eqjGPu8RZ): Q1-Q3, Q5, Q6 = a
-  (rules from his notes); Q4/Q7 answered by Ida in `dev/tip-followup-2026-10-03.md` (two tiers by
-  content, about 75 characters; no status strip; her in-menu description line withdrawn). Q5 (a `?`
-  beside the X of the three Analyze tools) waits on demand-scaling.
-- **Tip review out:** https://claude.ai/artifact/V6DRoU2z8sCZgMHGV92XLx, 272 tips from
-  `dev/tip-review.csv`; read his verdicts with ArtifactData `list` collection `verdicts`. Hold tip
-  edits until then (108 are ruled).
-- **Wave 0, 3 strings to rule:** lpn_copy_kept_link, lpn_calib_network (EPANET says "Network";
-  recommend keep), lpn_graphs_menu_tip. File: `~/webdev/1003-wave0.json.pending`, to be committed
-  into `dev/english-friction/` once he rules (an open entry fails friction_check).
-- **Open questions:** kPa to follow EPANET's factor too (0.045%); contour Smooth vs Bands default;
-  privacy.php's "Ground elevations" row (the contour merge reworded the consent paragraphs to "tile
-  numbers"; privacy.php itself is unchanged).
+- **Browser pass (protected), each Perry-reviewed:** 8107 `feat/dock` (441, clean; judge the icons);
+  8109 `feat/table-selection` (757, clean); 8110 `feat/dialog-audit` (710, three findings fixed);
+  8111 `feat/scenario-option` (755, clean; open: a note in Settings > Time when a scenario runs its own run time); 8112 `feat/setting-scope` (739, clean). Still from before: 8106
+  `feat/property-graph` (he wrote "I can't think of any [box] that wouldn't have a graph"; no merge
+  word yet), 8108 `feat/profile-file`, `feat/desktop`, `feat/label-placer`.
+- **`dev/new-english-keys.md` is the one place he rules English** (his question, asked twice). Open
+  there: 10 Wave 0 rewrites (1003b-wave0), lpn_ds_found_below (two rewordings, 1003-ds), 13 synonym
+  entries with proposals, the reworded Graphs tip and lpn_ds_search_note, the branch keys.
+- **Tip review** (https://claude.ai/artifact/V6DRoU2z8sCZgMHGV92XLx) waits on him; hold tip edits.
+  Interview answers read 2026-10-04: Q4 he questioned (Ida's reply: click door for `?` glyphs only,
+  control tips stay hover plus Esc); Q7 Mary found none of Adobe/Autodesk/Bentley/Apple put a line
+  inside the menu, hover tip is the common practice; Q8 he wants a CSV (key, where, text) to re-rate,
+  and says tip length is not high on the list.
+- **Open questions:** a styled modal for the 38 blocking dialogs; privacy.php's "Ground elevations"
+  row vs contour's tile-number wording.
 
-**Seams:** 441 waits on property-graph and Q5. 681(b) waits on the label-placer rulings.
+**Seams:** feat/dock and feat/property-graph both size the Properties box; dock's column wins while
+docked. feat/scenario-option and the merged reservoir fix both touch scenarioCompareExtremes.
 
 ### Owed translation work
 
-~92 lpn keys a language on master (calibration, contour, keyboard-menu, bentley 13, Status "now"
-strings, the Redo Help row), plus the pending branches' keys. Run one sprint after demand-scaling,
-flow-balance and selection-word land, after Wave 0 is ruled. Romanian file menu noun/verb pass;
-four concept terms; glossary write-back from echo.
+46 lpn keys held back from sprint 1004 until he rules (every lpn_ds_*, the Graphs tip, sysflow
+title, the 10 Wave 0 keys, the stale-syn keys); plus each pending branch's keys. Romanian file menu
+noun/verb pass; four concept terms.
+
+### Traps met 2026-10-04
+
+- **His edit of `dev/new-english-keys.md` was made on a copy older than the last regeneration**
+  (header counts 92 vs 67): the harvest still worked because it reads marks by key. Commit his edit
+  on a chore branch first, harvest, then regenerate; never regenerate over it.
+- **A harness that prints ALL PASS can still fail by not exiting** within 300 s under load
+  (label-measure-cache, pane-follows-doc). Read the log before calling it a defect; rerun.
+- **Agents' generated-file conflicts** (`new-english-keys.md`, `english-key-rulings.json`) on every
+  merge: take master's side, union the rulings JSON, regenerate on a chore branch.
 
 ### Traps met 2026-10-03
 

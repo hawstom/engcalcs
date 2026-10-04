@@ -1922,3 +1922,20 @@ list with no native `<select>` under it, type-ahead does not come for free the w
 native control, and is worth asking for explicitly rather than assuming the browser supplies it.
 
 — Declan
+
+
+## Invocation, 2026-10-03 -- Task 757: filter the Tables pane to the map selection
+
+Tom: *"it would be really nice if the tables could filter on the selection. I'm not sure how to work the UI unless it's part of the right-click menu."*
+
+**OBSERVED** The Tables pane filter is a QUERY, not an id list: `paneFilters[spec.id]` (`js/looped-network.js:23816`), resolved each draw by `paneFilterKeys()` through `findSelectByQuery()` (`:23836`). A selection filter is a second kind of predicate (a set of `group:id`), so it needs its own slot beside the query, not a query string. Edits do not move a row out of it, because membership is by identity, not by value: the Task 738 "edited row stays" machinery (`paneFilterSeen`/`paneFilterKept`, `:23764-23810`) is not needed for it.
+
+**OBSERVED** Fill handle, Ctrl+Enter, fill down, row paste and range copy all read `paneTableRowsInOrder(spec)` (`:26826`, `:26966`, `:27197`), i.e. the RENDERED rows. So under a selection filter they act on exactly the selected elements, by construction. This is the real payoff: "set roughness on the 80 pipes I just boxed on the map" becomes select, filter, Ctrl+Enter.
+
+**OBSERVED** The right-click menu already has Select on map / Unselect on map / Zoom & select (`:27852-27878`), the heading menu exists (`:25272`, `:27900`), and the map selection is already marked on rows (`paneMarkMapSelAll()`, `:17430`). The new item belongs next to those, on both menus. Existing Tables keys: Ctrl+D, Ctrl+Enter, Ctrl+Shift+V.
+
+**SPECULATION** (re-derive before relying) Recommended: snapshot of the map selection taken when the switch is pressed; applied to every table at once; Ctrl+Shift+L (Excel's AutoFilter toggle) pressed again with the selection unchanged clears it, pressed with a changed selection re-snapshots; rows created by "Paste as new rows" or drawn while it is on join the set; the banner reads "Showing n of N selected on map" with the existing Show all. Live-follow rejected: a stray map click while typing down a column would reshuffle or empty the table under the keystroke (the same shifting-target defect as Task 738 trace 2). Browser conflicts for Ctrl+Shift+L were not checked.
+
+**SPECULATION** Gesture count, common case (box-select pipes on map, set one value on all): drag on map (1), Ctrl+Shift+L with focus in table (1) or right-click + menu click (2), click first cell (1), type value + Ctrl+Enter after selecting column (about 3). About 6, versus today's per-row popup route of roughly 6 per element.
+
+-- Declan

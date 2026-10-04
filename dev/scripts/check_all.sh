@@ -293,6 +293,9 @@ run_check "public claim selftest"        blocking php dev/scripts/public_claim_s
 # was written.
 run_check "plain-English swaps"          blocking php dev/scripts/plain_english_swap_check.php
 run_check "plain-English swap selftest"  blocking php dev/scripts/plain_english_swap_selftest.php
+# Select is the map set, Choose is the list (Tom, 2026-10-03); no string uses one for the other.
+run_check "select/choose words"          blocking php dev/scripts/selection_word_check.php
+run_check "select/choose selftest"       blocking php dev/scripts/selection_word_selftest.php
 # The one advisory that survived striking the house style, held as a RATCHET rather than a rule:
 # 69 em dashes are already in shipped English and rewriting them would buy 1,560 retranslations of
 # text whose meaning did not move. The number may fall and may not rise. Code comments and dev/*.md

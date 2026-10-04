@@ -972,6 +972,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<div class="lpn-popover-body">
 	<div id="lpn_popup_title"></div>
 	<div id="lpn_popup_fields"></div>
+	<?php // The time series of one property of this element over the run (Task 637, revised by Tom
+	      // 2026-09-29). Built by propGraphSync(), and hidden whenever there is no run to draw. ?>
+	<div id="lpn_popup_graph" class="lpn-pgraph" style="display:none"></div>
 	</div>
 	<button type="button" id="lpn_popup_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">×</button>
 </div>
@@ -1752,7 +1755,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			<div id="lpn_crsbox_note"></div>
 		</div>
 		<div class="lpn-new-actions">
-			<button type="button" id="lpn_crsbox_ok"><?=$ec_lang['lpn_crs_choose']?></button>
+			<button type="button" id="lpn_crsbox_ok"><?=$ec_lang['lpn_dialog_ok']?></button>
 			<button type="button" id="lpn_crsbox_cancel"><?=$ec_lang['lpn_cancel']?></button>
 		</div>
 	</div>
@@ -2192,6 +2195,11 @@ EngCalcs.pageConfig = {
 	lpn_ts_no_frames: <?=json_encode($ec_lang['lpn_ts_no_frames'])?>,
 	lpn_ts_summary: <?=json_encode($ec_lang['lpn_ts_summary'])?>,
 	lpn_ts_axis_time: <?=json_encode($ec_lang['lpn_ts_axis_time'])?>,
+	lpn_pgraph_none: <?=json_encode($ec_lang['lpn_pgraph_none'])?>,
+	lpn_pgraph_source_share_from: <?=json_encode($ec_lang['lpn_pgraph_source_share_from'])?>,
+	lpn_result_pump_head: <?=json_encode($ec_lang['lpn_result_pump_head'])?>,
+	lpn_result_pump_head_tip: <?=json_encode($ec_lang['lpn_result_pump_head_tip'])?>,
+	lpn_report_pump_head: <?=json_encode($ec_lang['lpn_report_pump_head'])?>,
 	lpn_freq_menu: <?=json_encode($ec_lang['lpn_freq_menu'])?>,
 	lpn_freq_tip: <?=json_encode($ec_lang['lpn_freq_tip'])?>,
 	lpn_freq_group_tip: <?=json_encode($ec_lang['lpn_freq_group_tip'])?>,
@@ -3063,7 +3071,6 @@ EngCalcs.pageConfig = {
 	lpn_ds_run: <?=json_encode($ec_lang['lpn_ds_run'])?>,
 	lpn_ds_head_search: <?=json_encode($ec_lang['lpn_ds_head_search'])?>,
 	lpn_ds_search_note: <?=json_encode($ec_lang['lpn_ds_search_note'])?>,
-	lpn_ds_search_note_selected: <?=json_encode($ec_lang['lpn_ds_search_note_selected'])?>,
 	lpn_ds_head_search_selected: <?=json_encode($ec_lang['lpn_ds_head_search_selected'])?>,
 	lpn_ds_outside_below: <?=json_encode($ec_lang['lpn_ds_outside_below'])?>,
 	lpn_ds_find: <?=json_encode($ec_lang['lpn_ds_find'])?>,
@@ -3089,8 +3096,8 @@ EngCalcs.pageConfig = {
 	lpn_ds_skipped: <?=json_encode($ec_lang['lpn_ds_skipped'])?>,
 	lpn_ds_bad_multiplier: <?=json_encode($ec_lang['lpn_ds_bad_multiplier'])?>,
 	lpn_ds_stale: <?=json_encode($ec_lang['lpn_ds_stale'])?>,
-	lpn_ds_at_time: <?=json_encode($ec_lang['lpn_ds_at_time'])?>,
-	lpn_ds_time_moved: <?=json_encode($ec_lang['lpn_ds_time_moved'])?>,
+	lpn_analyze_at_time: <?=json_encode($ec_lang['lpn_analyze_at_time'])?>,
+	lpn_analyze_time_moved: <?=json_encode($ec_lang['lpn_analyze_time_moved'])?>,
 	lpn_ff_summary: <?=json_encode($ec_lang['lpn_ff_summary'])?>,
 	lpn_ff_summary_error: <?=json_encode($ec_lang['lpn_ff_summary_error'])?>,
 	lpn_ff_report_all: <?=json_encode($ec_lang['lpn_ff_report_all'])?>,

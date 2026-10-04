@@ -93,21 +93,21 @@ function dsHost(which) {
 	await L.runScale();
 	await L.runFind();
 	const at0 = L.searchRun().multiplier;
-	ok('the Find answer names 0:00', text(dsHost('search')).indexOf(PC.lpn_ds_at_time.replace('{time}', zero)) >= 0, text(dsHost('search')).slice(-160));
-	ok('the Run answer names 0:00', text(dsHost('scale')).indexOf(PC.lpn_ds_at_time.replace('{time}', zero)) >= 0);
-	ok('neither is marked while the clock is there', text(byId.lpn_ds_controls).indexOf(PC.lpn_ds_time_moved.split('{time}')[0]) < 0);
+	ok('the Find answer names 0:00', text(dsHost('search')).indexOf(PC.lpn_analyze_at_time.replace('{time}', zero)) >= 0, text(dsHost('search')).slice(-160));
+	ok('the Run answer names 0:00', text(dsHost('scale')).indexOf(PC.lpn_analyze_at_time.replace('{time}', zero)) >= 0);
+	ok('neither is marked while the clock is there', text(byId.lpn_ds_controls).indexOf(PC.lpn_analyze_time_moved.split('{time}')[0]) < 0);
 
 	console.log('\n--- 2. The clock moves to 6:00 ---');
 	EC.lpnTimeGoTo(6 * 3600);
-	const moved = PC.lpn_ds_time_moved.replace('{time}', zero).replace('{now}', six);
+	const moved = PC.lpn_analyze_time_moved.replace('{time}', zero).replace('{now}', six);
 	ok('both answers say they were computed at 0:00 and the clock is at 6:00',
 		text(byId.lpn_ds_controls).split(moved).length - 1 === 2, text(dsHost('search')).slice(-200));
 
 	console.log('\n--- 3. Find again at 6:00 ---');
 	await L.runFind();
 	const at6 = L.searchRun().multiplier;
-	ok('it names 6:00', text(dsHost('search')).indexOf(PC.lpn_ds_at_time.replace('{time}', six)) >= 0);
-	ok('the Find answer is no longer marked', text(dsHost('search')).indexOf(PC.lpn_ds_time_moved.split('{time}')[0]) < 0);
+	ok('it names 6:00', text(dsHost('search')).indexOf(PC.lpn_analyze_at_time.replace('{time}', six)) >= 0);
+	ok('the Find answer is no longer marked', text(dsHost('search')).indexOf(PC.lpn_analyze_time_moved.split('{time}')[0]) < 0);
 	ok('...while the Run answer, still from 0:00, is', text(dsHost('scale')).indexOf(moved) >= 0);
 	ok('6:00 has an answer of its own', at6 !== at0, at0 + ' at 0:00, ' + at6 + ' at 6:00');
 	ok('the project is unchanged', JSON.stringify(L.getDoc()) === before);

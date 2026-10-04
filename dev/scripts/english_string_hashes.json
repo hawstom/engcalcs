@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-09-30",
-    "count": 2158,
+    "count": 2283,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -2447,10 +2447,240 @@
                 "lpn_scenario_preset_peak_hour_tip"
             ],
             "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "lpn_alt_cat_constituent",
+                "lpn_alt_cat_demand",
+                "lpn_alt_cat_energy",
+                "lpn_alt_cat_fireflow",
+                "lpn_alt_cat_initial",
+                "lpn_alt_cat_physical",
+                "lpn_alt_cat_text",
+                "lpn_alt_cat_topology",
+                "lpn_alt_cat_userdata",
+                "lpn_alt_note",
+                "lpn_alt_title",
+                "lpn_analyze_menu",
+                "lpn_analyze_menu_tip",
+                "lpn_calib_axis_obs",
+                "lpn_calib_axis_sim",
+                "lpn_calib_bad_lines",
+                "lpn_calib_col_location",
+                "lpn_calib_col_mean_err",
+                "lpn_calib_col_mean_err_tip",
+                "lpn_calib_col_n",
+                "lpn_calib_col_n_tip",
+                "lpn_calib_col_obs_mean",
+                "lpn_calib_col_rms_err",
+                "lpn_calib_col_rms_err_tip",
+                "lpn_calib_col_sim_mean",
+                "lpn_calib_computed",
+                "lpn_calib_corr_means",
+                "lpn_calib_corr_none",
+                "lpn_calib_corr_note",
+                "lpn_calib_file",
+                "lpn_calib_load",
+                "lpn_calib_load_tip",
+                "lpn_calib_missing",
+                "lpn_calib_missing_count",
+                "lpn_calib_needs_run",
+                "lpn_calib_network",
+                "lpn_calib_no_pairs",
+                "lpn_calib_no_value",
+                "lpn_calib_none",
+                "lpn_calib_observed",
+                "lpn_calib_outside",
+                "lpn_calib_param",
+                "lpn_calib_param_tip",
+                "lpn_calib_point",
+                "lpn_calib_session",
+                "lpn_calib_single",
+                "lpn_calib_tab_corr",
+                "lpn_calib_tab_means",
+                "lpn_calib_tab_stats",
+                "lpn_calib_title",
+                "lpn_calib_ts_note",
+                "lpn_calib_ts_point",
+                "lpn_calib_units",
+                "lpn_contour_buffer",
+                "lpn_contour_buffer_tip",
+                "lpn_contour_buffer_unit",
+                "lpn_contour_consent_1",
+                "lpn_contour_consent_2",
+                "lpn_contour_consent_3",
+                "lpn_contour_consent_4",
+                "lpn_contour_dem",
+                "lpn_contour_dem_failed",
+                "lpn_contour_dem_tip",
+                "lpn_contour_few",
+                "lpn_contour_fill",
+                "lpn_contour_fill_bands",
+                "lpn_contour_fill_smooth",
+                "lpn_contour_fill_tip",
+                "lpn_contour_interval",
+                "lpn_contour_lines",
+                "lpn_contour_menu",
+                "lpn_contour_opacity",
+                "lpn_contour_plot",
+                "lpn_contour_support",
+                "lpn_contour_support_dem",
+                "lpn_contour_support_lines",
+                "lpn_contour_tip",
+                "lpn_contour_too_many",
+                "lpn_copy_body",
+                "lpn_copy_body_nodate",
+                "lpn_copy_copy",
+                "lpn_copy_kept_link",
+                "lpn_copy_opened",
+                "lpn_copy_original",
+                "lpn_copy_title",
+                "lpn_crit_baseline_below",
+                "lpn_crit_busy",
+                "lpn_crit_col_asset",
+                "lpn_crit_col_below",
+                "lpn_crit_col_cutoff",
+                "lpn_crit_col_unserved",
+                "lpn_crit_intro",
+                "lpn_crit_menu",
+                "lpn_crit_menu_tip",
+                "lpn_crit_minpressure",
+                "lpn_crit_minpressure_tip",
+                "lpn_crit_no_links",
+                "lpn_crit_no_selection",
+                "lpn_crit_scope",
+                "lpn_crit_scope_all",
+                "lpn_crit_scope_selected",
+                "lpn_crit_scope_tip",
+                "lpn_crit_skipdead",
+                "lpn_crit_skipdead_tip",
+                "lpn_crit_skipped",
+                "lpn_crit_skipped_dead",
+                "lpn_crit_stale",
+                "lpn_crit_stopped",
+                "lpn_crit_summary",
+                "lpn_crit_title",
+                "lpn_crit_working",
+                "lpn_ff_rows_more_links",
+                "lpn_graphs_menu",
+                "lpn_hotkeys_menu_def",
+                "lpn_hotkeys_menu_heading",
+                "lpn_hotkeys_menu_term",
+                "lpn_reports_calib",
+                "lpn_reports_calib_tip",
+                "lpn_scenario_basic",
+                "lpn_scenario_basic_tip",
+                "lpn_sysflow_consumed",
+                "lpn_sysflow_consumed_tip",
+                "lpn_sysflow_menu",
+                "lpn_sysflow_produced",
+                "lpn_sysflow_produced_tip",
+                "lpn_sysflow_tip"
+            ],
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED. Held back as still-stale: lpn_ds_at_time, lpn_ds_bad_multiplier, lpn_ds_below_zero, lpn_ds_col_link, lpn_ds_col_scaled, lpn_ds_col_scaled_tip, lpn_ds_col_unscaled, lpn_ds_col_unscaled_tip, lpn_ds_eps_note, lpn_ds_find, lpn_ds_found, lpn_ds_found_below, lpn_ds_head_lowest, lpn_ds_head_scale, lpn_ds_head_search, lpn_ds_head_search_selected, lpn_ds_head_velocity, lpn_ds_holds_max, lpn_ds_intro, lpn_ds_lowest_at, lpn_ds_menu, lpn_ds_menu_tip, lpn_ds_minpressure, lpn_ds_minpressure_tip, lpn_ds_multiplier, lpn_ds_multiplier_tip, lpn_ds_no_junctions, lpn_ds_no_selection, lpn_ds_nosolve_at, lpn_ds_outside_below, lpn_ds_run, lpn_ds_scale_below, lpn_ds_scale_ok, lpn_ds_scaled_selected, lpn_ds_scope, lpn_ds_scope_all, lpn_ds_scope_selected, lpn_ds_scope_tip, lpn_ds_search_note, lpn_ds_search_stopped, lpn_ds_skipped, lpn_ds_stale, lpn_ds_time_moved, lpn_ds_title, lpn_graphs_menu_tip, lpn_sysflow_title"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "about_body_html"
+            ],
+            "reason": "resynced in sprint 1004-lpn, all 26 languages"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "lpn_ff_design_all"
+            ],
+            "reason": "resynced in sprint 1004-lpn, all 26 languages"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "lpn_ff_design_off"
+            ],
+            "reason": "resynced in sprint 1004-lpn, all 26 languages"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "lpn_ff_design_selected"
+            ],
+            "reason": "resynced in sprint 1004-lpn, all 26 languages"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "lpn_ff_no_selection"
+            ],
+            "reason": "resynced in sprint 1004-lpn, all 26 languages"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "lpn_ff_rows_more"
+            ],
+            "reason": "resynced in sprint 1004-lpn, all 26 languages"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "lpn_reports_menu_tip"
+            ],
+            "reason": "resynced in sprint 1004-lpn, all 26 languages"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "lpn_status_closed"
+            ],
+            "reason": "resynced in sprint 1004-lpn, all 26 languages"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "lpn_status_dry"
+            ],
+            "reason": "resynced in sprint 1004-lpn, all 26 languages"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "lpn_status_emptying"
+            ],
+            "reason": "resynced in sprint 1004-lpn, all 26 languages"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "lpn_status_filling"
+            ],
+            "reason": "resynced in sprint 1004-lpn, all 26 languages"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "lpn_status_full"
+            ],
+            "reason": "resynced in sprint 1004-lpn, all 26 languages"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "lpn_status_opened"
+            ],
+            "reason": "resynced in sprint 1004-lpn, all 26 languages"
+        },
+        {
+            "date": "2026-10-04",
+            "keys": [
+                "lpn_ts_none"
+            ],
+            "reason": "resynced in sprint 1004-lpn, all 26 languages"
         }
     ],
     "hashes": {
-        "about_body_html": "e25bdea9a42c3e40361238a0d8c907c3e1c75bc9",
+        "about_body_html": "b90acfc1cecea5704d033c54aea67f291f955c22",
         "about_main_desc": "c671d6afea684309c2946e6ec2c059b9fd1fb656",
         "about_main_menu": "6b21fb791ac05170893860c248401cd24a59b732",
         "about_main_title": "364db8c9061b9cfc77f1f69ac886590c1dfee5d9",
@@ -2688,6 +2918,19 @@
         "lpn_ago_minutes": "5bac86d4ed544f09d349c91c624aa7241b3b56d4",
         "lpn_ago_seconds": "c6619272c6c3cf26a6256ccc0a1bc81015d52ff0",
         "lpn_ago_unknown": "e5d8e78c934822133d687f84c0ba00f97fa6a57f",
+        "lpn_alt_cat_constituent": "23f55ca65c4227d087e565eb5b3356e1890408a9",
+        "lpn_alt_cat_demand": "5dfc68721f3d071b69d27ebcd8245d0506b058de",
+        "lpn_alt_cat_energy": "ff77aee41d3e26ecab377c93148d5ed4a9ef856d",
+        "lpn_alt_cat_fireflow": "8a08cbc499174edce5a23077457fb5a320ed56c8",
+        "lpn_alt_cat_initial": "ff89905488c3ef74018be410e15dbdd87bb358ca",
+        "lpn_alt_cat_physical": "919b82a0b4b5d5896760f3a05f1930eaf0d6d1e1",
+        "lpn_alt_cat_text": "c3328c39b0e29f78e9ff45db674248b1d245887d",
+        "lpn_alt_cat_topology": "60f589c77fc1c75bf9a0f9e443e9c8884d498733",
+        "lpn_alt_cat_userdata": "07daf13a314add9a92c0f8e5564d81ce72e4937c",
+        "lpn_alt_note": "a5b86c6f4877cee97429a1d76b1c8140c6c4d909",
+        "lpn_alt_title": "3b483c7274ec40fc831af1911b39edbd7951e704",
+        "lpn_analyze_menu": "0e524de0b8226a149e73a5ad0308dee279154e71",
+        "lpn_analyze_menu_tip": "b325bff790d5e9886437194b2056a0b394e134d7",
         "lpn_area_hint_lasso_go": "3e3f661db994d5fecc6b21804b8164ad74b717bf",
         "lpn_area_hint_lasso_start": "2b8e6f172a53f223915b67667ac981bb428cd908",
         "lpn_area_hint_polygon_go": "9d6a621453acafd412b7e018096c51f20b27b90b",
@@ -2727,6 +2970,46 @@
         "lpn_backdrop_wld_bad": "529372c670e9e66a1f223cb8b7529c9d6f8b7ae3",
         "lpn_basemap_satellite_show": "69498fece0c6824bc408acab86bef9af0e7a3f70",
         "lpn_basemap_show": "8f8081a5a647869c4fed59181d04d45c919e9fad",
+        "lpn_calib_axis_obs": "e46b1f7416c29aa434d59b71de0b49bc910d53ba",
+        "lpn_calib_axis_sim": "ad29b30053f8c5cfe7f0dd410974b636eb4df959",
+        "lpn_calib_bad_lines": "7afe47b010028eb810081bee3fea0a624b1bf0ba",
+        "lpn_calib_col_location": "d219c68101f532de10add2cf42fb9dbeca73d3be",
+        "lpn_calib_col_mean_err": "e9f909a6adae4bcfce653f0b587e98e85da360bf",
+        "lpn_calib_col_mean_err_tip": "59fdd9812c7e655abd5d9d0b95b50b13851c384b",
+        "lpn_calib_col_n": "d33f677adc94a099e29b5cfd2a734fd2c6b4dbdd",
+        "lpn_calib_col_n_tip": "74064c285a35847fec9a77d359498f866b1a04aa",
+        "lpn_calib_col_obs_mean": "a57ffa67ead9587324ebc2bdd4eb5775ddb8eba0",
+        "lpn_calib_col_rms_err": "f7a669b147b3c5e8973595152aa7858d62f3fba0",
+        "lpn_calib_col_rms_err_tip": "9fb18131d06237e43977da2c9595e9e13fd31af7",
+        "lpn_calib_col_sim_mean": "2e1666f1584fa11136d37354612fdb813cf068ef",
+        "lpn_calib_computed": "4989824a0e7fca733dc355824b0694624810eff3",
+        "lpn_calib_corr_means": "a9c24e3ddad293f196eca949b120d4136bb25b6c",
+        "lpn_calib_corr_none": "62740a669115280fb15ee62f29aa7f21eee18de4",
+        "lpn_calib_corr_note": "f3b0c9830a163bad188b3664a7da16c3fef6dc64",
+        "lpn_calib_file": "e2f13f7556fe4cd12c1bb9d04313513eccd56582",
+        "lpn_calib_load": "23744282ff60ec0a319bf80b6e9cfeba370d9988",
+        "lpn_calib_load_tip": "518e81491084e3c1818641404970c37bfc8dcc7e",
+        "lpn_calib_missing": "1a56c2418808f45265d23fde6311f11ed7546f2f",
+        "lpn_calib_missing_count": "9767e5f80fa1b0ddba6e463942eb4f43187fb3a3",
+        "lpn_calib_needs_run": "606f0d8d44a34c9cdb1b0c3f1add71236fc258e0",
+        "lpn_calib_network": "53ebc572b4a44802ba114729f07bdaaf5409a9d7",
+        "lpn_calib_no_pairs": "1728221c2a6b12cb69ae4ebfe3c42e95b0aca7be",
+        "lpn_calib_no_value": "6e81a6c8e0cd3bf7ce3e895d9ca9f761deb84dc7",
+        "lpn_calib_none": "04dcd18f198cf3a1f84ca5816b3f09e3fbd24735",
+        "lpn_calib_observed": "2e159b4438d24b3b9978372b3a32114ea96760f8",
+        "lpn_calib_outside": "a6f756d24697c0fe8591adec763a531ae187a7bb",
+        "lpn_calib_param": "f699f295e5ae4ac633cfa18437fed38d028b3fdb",
+        "lpn_calib_param_tip": "b543cd299fa2c336a90d792e01b129cd0ad4486e",
+        "lpn_calib_point": "5feaa44355729772c194b565be161ebaf6fabca1",
+        "lpn_calib_session": "603e14551a96dcbb9ba366979dfdce7abf30d57f",
+        "lpn_calib_single": "63e4de0586ad26f96580ae3beeae1f432b4b7b5f",
+        "lpn_calib_tab_corr": "0bd02e5d1da0e93d93ce25ba45f24d869137f87c",
+        "lpn_calib_tab_means": "fb8c6a0f7ca22e4c98a326f70b72f1eecf4a22e9",
+        "lpn_calib_tab_stats": "2086b21f8f49274138c38d476bee317a84a8aecc",
+        "lpn_calib_title": "e0778b34fdc2476c2d84439ec184dc7ee6236c22",
+        "lpn_calib_ts_note": "4ecedd878466289effbf752daae2a8c6d2b1426c",
+        "lpn_calib_ts_point": "2ea5f9e316de689173a8a901ca37b05a196c58c0",
+        "lpn_calib_units": "a403b0b44471c99546a615e5fdba2830e2c603d4",
         "lpn_cancel": "77dfd2135f4db726c47299bb55be26f7f4525a46",
         "lpn_close": "bbfa773e5a63a5ea58c9b6207e608ca0120e592a",
         "lpn_close_browser_confirm": "62f3b41b1e8e979db82162dc2f37c8e55bc65b80",
@@ -2765,6 +3048,31 @@
         "lpn_confirm_example": "a37dfb08ed3bcb4faae1781660bedfdd43f2465a",
         "lpn_confirm_restore_defaults": "e55654deccb6f0c5322ce0cf2f2e95dbd5c71437",
         "lpn_confirm_wipe": "492d1be7160cfcf910a1c76db503a9f94b64d702",
+        "lpn_contour_buffer": "2be5f64b36230104ef9c6e230215846a83d18df6",
+        "lpn_contour_buffer_tip": "bf1f139bf475ad78f189092360913c289f93d71f",
+        "lpn_contour_buffer_unit": "770a9647790a39851380bad62e22e8d6ff98e0a5",
+        "lpn_contour_consent_1": "1025e683fb9fd592288309d9a632002fbf1e7031",
+        "lpn_contour_consent_2": "9936d56c937a3eec0f5f796e3e8a227b44b33801",
+        "lpn_contour_consent_3": "028d7495b640b192e9b6869f1e06cf1996719297",
+        "lpn_contour_consent_4": "8fd65fb8f82098b3fe12f80f84806338b546f80f",
+        "lpn_contour_dem": "d2a88c11c01e802b20418d5dfd9725f109a0055f",
+        "lpn_contour_dem_failed": "cd208f9123792c1fc96277a574bdae3016b6527b",
+        "lpn_contour_dem_tip": "3bd8a594c0c8e0dfd2eed0090cf165fc8371d254",
+        "lpn_contour_few": "dc8ebea341abcedc9ba5e53fd3c66f801acbc8ae",
+        "lpn_contour_fill": "7adb6736cf2c9ae017b128f98738ffbae0e58655",
+        "lpn_contour_fill_bands": "2bc0aa16b98b0465c8e6c100447b9efe60275cb2",
+        "lpn_contour_fill_smooth": "7f93ca7e76657582bac8abe7f42d5cf5c783d1b1",
+        "lpn_contour_fill_tip": "1aee1e52867c7068e85353a52667215040d23097",
+        "lpn_contour_interval": "011efcd591019b5969a332a24dff728a8107dbe2",
+        "lpn_contour_lines": "4c7f418c6db8b51e51b67c1f3a7f1ebdd1996fe5",
+        "lpn_contour_menu": "ae77a05fc2676633970990bc1a0060eeec26548a",
+        "lpn_contour_opacity": "bc7b9a208b5edfcb8abd970849e73e89fddd34ab",
+        "lpn_contour_plot": "d708b174a0e64380136a667c558020798f258fc7",
+        "lpn_contour_support": "6c63cdc5c71aafdd53cb5bd1ed7c2bf5b82fc58b",
+        "lpn_contour_support_dem": "e48840d0d47b61924e0364b54ad0832c833e14a9",
+        "lpn_contour_support_lines": "83cb6df3575f1ce1812a9f6a75a47af0c6e34f7b",
+        "lpn_contour_tip": "86fe40c16eabf16d03cc0d89b414da743734659f",
+        "lpn_contour_too_many": "2950b76eee78f5453833df0682594d4b81be813f",
         "lpn_control_dangling_note": "b01c38604bf3c0278c158dea4cf29d0ee0a19ca6",
         "lpn_control_unreadable_note": "819d5a1cb56933e768e1c0f31118c358d48ffcd5",
         "lpn_convas_cancelled": "9667c3e14b0cbd3e0b20819f952e3c670636240c",
@@ -2788,7 +3096,14 @@
         "lpn_convas_unnamed": "439c425c2cb3d0e389161a27db8aeb54e41e165e",
         "lpn_convas_unnamed_tip": "0a46da30335f08172dc887d49085b10605e84aa1",
         "lpn_coord_off_world": "1a935ee67ded0c51d8b4a4c6a5b4403c9e507015",
+        "lpn_copy_body": "aa5eeefadeb1ba93f4dfbf27e0b2a0243401660a",
+        "lpn_copy_body_nodate": "5e915ed2f93fc264c6a09e5bf08d493903d5416c",
+        "lpn_copy_copy": "d08d3a65e36c4ed1fb026811ddcf6395f6c359f1",
+        "lpn_copy_kept_link": "9f3d43c3441aee2d6ffc19c605fcd3dab7f55629",
         "lpn_copy_of": "f5445421140d08b99aa27a7078d0a4d5017e8e13",
+        "lpn_copy_opened": "2baa6f46e73bce6f4a0a7f0f2022f968a128b280",
+        "lpn_copy_original": "f9a7da56611d51d837a9763a9d6bf357f30ea046",
+        "lpn_copy_title": "79e00da7140cfea6128a3de8198a78d2ea7e79cb",
         "lpn_cp_add": "1635d174deb7f8be0aa270dd6c6e998f042d4a53",
         "lpn_cp_add_tip": "22395645aad0a20d1614d5b0e003accfab9a63dd",
         "lpn_cp_applies": "0c9d314d2bc393e3f1f05e8d542e041cf9231697",
@@ -2838,7 +3153,32 @@
         "lpn_cp_val_upper": "baf48506da4f8fcb158b020e9780f52833d663a4",
         "lpn_cp_validate": "0dedc33fe43ff7644c8e0c2a0c5bdcaba10e66b7",
         "lpn_cp_validate_tip": "835208194276544da0af9ef6b2a501552b94853e",
-        "lpn_crs_choose": "8598222918d3c6e513d63060cf55e2971ded729a",
+        "lpn_crit_baseline_below": "88b35b69447972b9ffd5cf43ac8594151ac7a143",
+        "lpn_crit_busy": "07d0d1dfea5b4bfa0e64ddcd1004edf89e70ccd4",
+        "lpn_crit_col_asset": "4426afd90a77a35fb37ebd7110b9989cf7bed224",
+        "lpn_crit_col_below": "867a4c88f5c62542d90d7b2add2c72a15f9fdb72",
+        "lpn_crit_col_cutoff": "a4bdaa1e5eeb051f2e3cca07344f33a41dd022d0",
+        "lpn_crit_col_unserved": "dd1d4b98c4a5d6ff723d81429e5de56d9ef5ada0",
+        "lpn_crit_intro": "8ac1cd1cbd39f5d08311c7378bf5e2e9a162a739",
+        "lpn_crit_menu": "6bd947301d58efecdd79a930a86285c97b2a7c6c",
+        "lpn_crit_menu_tip": "cf464ae4beb897851e4f48dd0abcd6bbe3c69985",
+        "lpn_crit_minpressure": "3599aa27c9510b06fea28c9f909c95f77968e562",
+        "lpn_crit_minpressure_tip": "f03e9716746bcb25b5da8e2dea53b4ce9d3f2330",
+        "lpn_crit_no_links": "390cdff7dac5069ac79d4525b6d2c210ba3dd453",
+        "lpn_crit_no_selection": "18902c9862073c2a598539997048b2df742eac59",
+        "lpn_crit_scope": "bcf7b6421b575b83c34ef0b3543828ff25f738ca",
+        "lpn_crit_scope_all": "9d44af3248c401c569a966b112d609b62eeb482f",
+        "lpn_crit_scope_selected": "829ca90d5c6200a4ea4cd0750726aeab7d098c4e",
+        "lpn_crit_scope_tip": "05cde8c9be91f148012b0c820d949c46e0a6ada7",
+        "lpn_crit_skipdead": "e3e3a2cc169002e2ff5a88aabf32c5ad4ff8f1ad",
+        "lpn_crit_skipdead_tip": "5c289ede448b8556f9fb0858141af53334579089",
+        "lpn_crit_skipped": "e4dfa6df60dfcfc36cce73c95fa0e771808182bc",
+        "lpn_crit_skipped_dead": "2cc0dae02bac36cd6f52835c2c4113718ee64176",
+        "lpn_crit_stale": "ef2e426c2cc6f775d2f472da43591fee74b17bdb",
+        "lpn_crit_stopped": "8b4f2d016f6c33ceee7904276131e080f1470b99",
+        "lpn_crit_summary": "5aab6c73895b43295dead17d06dae61f7ca97280",
+        "lpn_crit_title": "1c3b3dfc7a92707a0172c40766a9edabfa62d064",
+        "lpn_crit_working": "eba5d465e458d250c7fa089e8b714c190bee0dfb",
         "lpn_crs_count": "d636e243e3f41c3cca31d9446342d6cf4328c17a",
         "lpn_crs_count_network": "717836e7f3297639845a136e7599c4cd1cfcc6a0",
         "lpn_crs_list_tip": "6341a524c1cdd0c91eb0068020afeee9fdd805a4",
@@ -2987,12 +3327,12 @@
         "lpn_ff_col_static_tip": "750b8cb67135b7ad7d30428424e07d5c5573f534",
         "lpn_ff_cost": "66a71c4168e7cc8bbefcd582a492c268d145138e",
         "lpn_ff_design": "b6e5eaf486df1f225d39b98a74607ed7845a97da",
-        "lpn_ff_design_all": "b56ada991fcc364c0667a651346c32485f75e251",
+        "lpn_ff_design_all": "6a72085653e4c5be8c7640c868ef787cbcf063d1",
         "lpn_ff_design_no_selection": "7db1b29e5d61e5c588cdaa09ba738d99d4f9bef5",
         "lpn_ff_design_none": "e02543961d3e9ecbfaabd72204ab25316e517374",
-        "lpn_ff_design_off": "bc10277c1e27efbb998067028b1be8d770b95de8",
+        "lpn_ff_design_off": "6eef6648406c333a4035cd5e60d0bf2ecf2606d7",
         "lpn_ff_design_off_note": "77e938d422b07aca04c053b13772f9ff93f901e8",
-        "lpn_ff_design_selected": "9cca76b4e82b3348a05cdeb5701197e6e3b00040",
+        "lpn_ff_design_selected": "9a976fc228b6b33656174ebd6decca02c9068378",
         "lpn_ff_design_tip": "ec2706244f138c3dce9b27c5f5afd772684ed4f6",
         "lpn_ff_engine_cost": "157e56eee7e4204199f890642c52bf96832b7b7b",
         "lpn_ff_engine_epanet": "aa9ed6dea9711eaf20d4afebec64ee81815b8f70",
@@ -3016,7 +3356,7 @@
         "lpn_ff_mode_none": "6eef6648406c333a4035cd5e60d0bf2ecf2606d7",
         "lpn_ff_more": "e38929f98513d39f8651b51211b6fa25513cd919",
         "lpn_ff_no_junctions": "fbc08158d07470605a079277a97ab3d821f0fd49",
-        "lpn_ff_no_selection": "be415c20b4e05c5b93661bacd529e69c66885b6c",
+        "lpn_ff_no_selection": "80c362cde256a79f0e02a9c8e041243422701bc9",
         "lpn_ff_not_checked": "22705e738a7a182dc29cb9c6ad3014a8b166191b",
         "lpn_ff_report_all": "52b28d6b1306346b3aef71fd2b808af7eaab735d",
         "lpn_ff_required": "85549ea8f73e12ebd964956baf76765b113ccf6b",
@@ -3025,7 +3365,8 @@
         "lpn_ff_required_tip": "4b1582b5cb52f9c68b7c0c37451d775bf1311345",
         "lpn_ff_residual": "a507618ef00e010279e4b229638df38c09010945",
         "lpn_ff_residual_tip": "0d5a9b310595eef38301f4934a8fd7a5bbe84a0b",
-        "lpn_ff_rows_more": "4b7af83df176d9a2fbbf0493c62757ae136a2ae6",
+        "lpn_ff_rows_more": "bcd23dc83f36c3066efe4297b8eeeb830949556c",
+        "lpn_ff_rows_more_links": "451229871c712bca43ad78c0798e012e7d9dea00",
         "lpn_ff_run_title": "290d0ca4f32d3759f9834649d259ab1a5044b960",
         "lpn_ff_scope": "3e6ac1066ba7438ea2fb7ecb0c95eca0f78595bf",
         "lpn_ff_scope_all": "216decebf8ba73304b9008436c31bfa072209ca7",
@@ -3311,6 +3652,7 @@
         "lpn_goto_tip": "7a3c2fcd5540cd323e61e808493e5dae516be1bc",
         "lpn_gpv_curve_source": "9798784210f8740b8cb706a239767af400d565bd",
         "lpn_gpv_curve_source_tip": "090ffc20e3a7086a2f8d0b230c3597e4667da579",
+        "lpn_graphs_menu": "78399476ef1665a7b5a92cf906aaca4e5a94e9a0",
         "lpn_help_fix": "21556ba8411184cec8574bf3206020e7694b968d",
         "lpn_help_hotkeys": "c772aa9b4b81358f6c4cc568d28feed8ab0de8d6",
         "lpn_help_icons": "212af41073666530ad8bf245becce259a0964242",
@@ -3322,6 +3664,9 @@
         "lpn_hotkeys_map_def": "6f743a403a24385c70e97a8772ea9c047e3d605a",
         "lpn_hotkeys_map_heading": "ab478f3efc840eebab919dff1b9512286f70c10c",
         "lpn_hotkeys_map_term": "067b16574a977be86826d3ed392953bb560cab88",
+        "lpn_hotkeys_menu_def": "1c34a7975ab22f762327d235957b367a72e93245",
+        "lpn_hotkeys_menu_heading": "e7c3800e31ff2e7695b9f5bed95a6de6715dca44",
+        "lpn_hotkeys_menu_term": "45459ebb1ae0e462e9e0d232cda10d9f97b11529",
         "lpn_hotkeys_tables_heading": "193daf137ed8b89de36d47c3df5fd8f66c0e1d14",
         "lpn_id_invalid": "8a5f2c615619185cac2ae5645dba3a822172202b",
         "lpn_id_taken": "afa411f11b93f86d3e5593aef3404abe3f194817",
@@ -3796,11 +4141,13 @@
         "lpn_replace_source": "bfab2d98edca23467fa5ecb30ee79ae9ddb70021",
         "lpn_replace_title": "fbffb7914056d83b0e2d6fd06f66519995dd7aa0",
         "lpn_replace_value": "520d572d79925b3c142bc37274e943736c2b6902",
+        "lpn_reports_calib": "f5ed075f00edd0132316935e88c331ca039fab0d",
+        "lpn_reports_calib_tip": "42b430b31d3b5c6ef4120a3dbd24c59c90a1d4eb",
         "lpn_reports_epanet": "9ee989527bd24c98b2da7085406800e36d76170e",
         "lpn_reports_full": "10b28a8c1e445017f5c61e4266d4b7ad9e9a3748",
         "lpn_reports_full_tip": "1282c207c9e7564643eb964e08bba5eb97867ceb",
         "lpn_reports_menu": "88bc3fe3daddee139809d036f18b985fbe165957",
-        "lpn_reports_menu_tip": "24741635fc3b314b7beedcf47dc2eab20555af9f",
+        "lpn_reports_menu_tip": "204ea61104fc0b5865cab2b9a78572732feb2732",
         "lpn_reports_status": "bae7d5be70820ed56467bd9a63744e23b47bd711",
         "lpn_reports_status_tip": "cf9785f2b77ae7b3dbdf4f34830b9dc576bc4d98",
         "lpn_reset_all_tip": "ebd2596e8d975f0f2694252ae21ee8e54330d756",
@@ -3837,6 +4184,8 @@
         "lpn_saveas_same_file": "304ca763bd1a84a61a60dff7eb9921ff571e9953",
         "lpn_scenario_base": "077fe9c54ed5ed26fa547f4ded3ef9a9bb066d65",
         "lpn_scenario_base_value": "85aac122ab80c9b097d80d80bc89c3cebd922797",
+        "lpn_scenario_basic": "700ed102a28fe8fc4eddc583c6a8a0bbe5b01d1d",
+        "lpn_scenario_basic_tip": "d7c23f5cfef50a5810c2b41e60aa93e15ef9ad0c",
         "lpn_scenario_deactivated": "8736e9dec3cfb5583591c8b9d175e092332d3277",
         "lpn_scenario_delete": "92f18604ed3875b89df8b049319e29504e03e6d5",
         "lpn_scenario_delete_confirm": "8d2e748cfa713feabec0575452893bd60cc99b68",
@@ -4032,25 +4381,25 @@
         "lpn_source_type_tip": "80422618a24fa43194a6344fea1c6699a8adfeb2",
         "lpn_status_already_open": "f032ac4e9f577a0a653a50394849743abf7ee139",
         "lpn_status_already_open_dirty": "9412f17b043bac255391b2f5c8c1e0dec70bf11c",
-        "lpn_status_closed": "9f7867601444fabd1d3f18e0ee3a7b956a42ac11",
+        "lpn_status_closed": "be149b4b67f8ca2c38dc64de9c7cc6e81706269d",
         "lpn_status_closed_empty": "a4ab662fabbf7e1b9457a30f7dfeb79534ecff8d",
         "lpn_status_closed_opened": "b3877c759b085058c1bc9ce7b08ff85b9b28ad35",
         "lpn_status_col_event": "ad8919ace091b14011c6439cfd5e1707b58f5abd",
         "lpn_status_converted": "8192b468b8c0d3fd7188d32a30a73bf8693eaca2",
         "lpn_status_downloaded": "a57f725b331fd7c607634b439ad2bc83835fc045",
-        "lpn_status_dry": "60710b95d97c44fa8baa2f5f43a7fee79abe6b2e",
+        "lpn_status_dry": "2e93f7bb5fb2938a78be31de72ecbf397593e48e",
         "lpn_status_empty": "f406f506d682dd4c06a02cc9ae8afeaf1fd30c45",
-        "lpn_status_emptying": "07c82cf9fd79853192836c1faf5ed323de0023e8",
+        "lpn_status_emptying": "e64bc053e86fa4a9818642bbf835ee94539c20e8",
         "lpn_status_example_opened": "5f88beb4d021f650c76fe14106edc1f6edacf929",
         "lpn_status_file_opened": "d81570ddc8ac7d7a85ac3fda16808fa21239415c",
-        "lpn_status_filling": "06c706512c013c5fd0510623485005162d7fc716",
-        "lpn_status_full": "7f2203d7ef1d1ae53b7d1a0b3e17ccccb6672592",
+        "lpn_status_filling": "f0f7cf5626cd0c676ef8fd70c0f91caa6a649401",
+        "lpn_status_full": "7a9b7c3e27be349ea00586ca7bdd2198293c6b86",
         "lpn_status_imported": "9ffa4f2c399654872dfadb6ae74442d198662810",
         "lpn_status_inp_exported": "ad5d10d52cbda8a3dfe24d56e88aef2edaa08610",
         "lpn_status_needs_run": "8c81ab84ba05db41cdc66a9dec2b701fe33c8ba5",
         "lpn_status_no_converge": "acfebcbd3a99830cd73e3060b1d574bf633755fd",
         "lpn_status_note": "49127878bf43879e07ee145d66e58396438cca0b",
-        "lpn_status_opened": "fc1813b48c68d200a3fbf4f269c0f1b1b90fe369",
+        "lpn_status_opened": "d0dee9ac0e093a1c4cfb557b8cd0d39138f4210f",
         "lpn_status_reinterpreted": "ef3e39f5732a2bb548c6fcd7e0513e23dba034c8",
         "lpn_status_reverted": "631aa4b5982c019692705a984ea08640d5c3dadd",
         "lpn_status_saved": "a9d8670946e9de872478753575178a92fc7cf9ba",
@@ -4093,6 +4442,12 @@
         "lpn_survey_sev_error": "11f9578d05e6f7bb58a3cdd00107e9f4e3882671",
         "lpn_survey_sev_warning": "383fd7bf84aa027bdc40159c5d7c5805664a8eb2",
         "lpn_survey_type_label": "c272575d58828ee0b669982b2a1e399a437d22a2",
+        "lpn_sysflow_consumed": "cf12704be37bd6ccd3de06eea21b725a20d88ab4",
+        "lpn_sysflow_consumed_tip": "9f6efb41624644dfc646a2a33e8729866c17e345",
+        "lpn_sysflow_menu": "ec79e7b1f963fef308050d1748f880a8e5d60416",
+        "lpn_sysflow_produced": "5d717336f5a1b840114527968aa213496e1ecc46",
+        "lpn_sysflow_produced_tip": "6895cf44191d071feea130ae11b03c89b7dd3f74",
+        "lpn_sysflow_tip": "4bd9c4f0fc5754ed1b1673d211ef179dee39c8d7",
         "lpn_tab_all": "403b21693efab2805499d4aee91052b2caeaaca4",
         "lpn_tab_duplicate": "972d57379db3e5be76d4ead709fef1ad71ff03d6",
         "lpn_tab_menu": "9366f1f5f9f30a76d9aec360abb78a963c39bf1e",
@@ -4227,7 +4582,7 @@
         "lpn_ts_group_tip": "b9b8313cfed1cf848d55912c81d6474f354784a9",
         "lpn_ts_menu": "044562ecb24a4347ae12d2ecd7afe6cd46dc5f01",
         "lpn_ts_no_frames": "7ec216fb703574fbfd006ce41517b9c36bd64ba6",
-        "lpn_ts_none": "1d6aa27d37d278a59ecf96513845ec6eb0c96d65",
+        "lpn_ts_none": "ee6dab9bc41b6ceb385cf293adef32fbb8b3cc1a",
         "lpn_ts_quantity_tip": "54c0601b9db4e6c10090387a17fbb07c6ff3e0dc",
         "lpn_ts_summary": "9fa16f32be735d5a3024d0aae7bd210f1c20d8b7",
         "lpn_ts_tip": "b723d8a0d48db276e7d07a989333bd5a69ad6abc",
@@ -5562,6 +5917,58 @@
             "words": 3,
             "ends_sentence": false
         },
+        "lpn_alt_cat_constituent": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_alt_cat_demand": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_alt_cat_energy": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_alt_cat_fireflow": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_alt_cat_initial": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_alt_cat_physical": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_alt_cat_text": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_alt_cat_topology": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_alt_cat_userdata": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_alt_note": {
+            "words": 37,
+            "ends_sentence": true
+        },
+        "lpn_alt_title": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_analyze_menu": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_analyze_menu_tip": {
+            "words": 28,
+            "ends_sentence": true
+        },
         "lpn_area_hint_lasso_go": {
             "words": 8,
             "ends_sentence": true
@@ -5718,6 +6125,166 @@
             "words": 3,
             "ends_sentence": false
         },
+        "lpn_calib_axis_obs": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_calib_axis_sim": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_calib_bad_lines": {
+            "words": 8,
+            "ends_sentence": false
+        },
+        "lpn_calib_col_location": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_calib_col_mean_err": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_calib_col_mean_err_tip": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "lpn_calib_col_n": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_calib_col_n_tip": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_calib_col_obs_mean": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_calib_col_rms_err": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_calib_col_rms_err_tip": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_calib_col_sim_mean": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_calib_computed": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_calib_corr_means": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_calib_corr_none": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_calib_corr_note": {
+            "words": 23,
+            "ends_sentence": true
+        },
+        "lpn_calib_file": {
+            "words": 6,
+            "ends_sentence": true
+        },
+        "lpn_calib_load": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_calib_load_tip": {
+            "words": 51,
+            "ends_sentence": true
+        },
+        "lpn_calib_missing": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "lpn_calib_missing_count": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_calib_needs_run": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "lpn_calib_network": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_calib_no_pairs": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_calib_no_value": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "lpn_calib_none": {
+            "words": 8,
+            "ends_sentence": true
+        },
+        "lpn_calib_observed": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_calib_outside": {
+            "words": 9,
+            "ends_sentence": true
+        },
+        "lpn_calib_param": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_calib_param_tip": {
+            "words": 13,
+            "ends_sentence": true
+        },
+        "lpn_calib_point": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_calib_session": {
+            "words": 20,
+            "ends_sentence": true
+        },
+        "lpn_calib_single": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_calib_tab_corr": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_calib_tab_means": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_calib_tab_stats": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_calib_title": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_calib_ts_note": {
+            "words": 8,
+            "ends_sentence": true
+        },
+        "lpn_calib_ts_point": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_calib_units": {
+            "words": 10,
+            "ends_sentence": true
+        },
         "lpn_cancel": {
             "words": 1,
             "ends_sentence": false
@@ -5870,6 +6437,106 @@
             "words": 35,
             "ends_sentence": true
         },
+        "lpn_contour_buffer": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_contour_buffer_tip": {
+            "words": 23,
+            "ends_sentence": true
+        },
+        "lpn_contour_buffer_unit": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_contour_consent_1": {
+            "words": 26,
+            "ends_sentence": true
+        },
+        "lpn_contour_consent_2": {
+            "words": 66,
+            "ends_sentence": true
+        },
+        "lpn_contour_consent_3": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_contour_consent_4": {
+            "words": 43,
+            "ends_sentence": true
+        },
+        "lpn_contour_dem": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_contour_dem_failed": {
+            "words": 16,
+            "ends_sentence": true
+        },
+        "lpn_contour_dem_tip": {
+            "words": 44,
+            "ends_sentence": true
+        },
+        "lpn_contour_few": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "lpn_contour_fill": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_contour_fill_bands": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_contour_fill_smooth": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_contour_fill_tip": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_contour_interval": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_contour_lines": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_contour_menu": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_contour_opacity": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_contour_plot": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_contour_support": {
+            "words": 27,
+            "ends_sentence": true
+        },
+        "lpn_contour_support_dem": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_contour_support_lines": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "lpn_contour_tip": {
+            "words": 30,
+            "ends_sentence": true
+        },
+        "lpn_contour_too_many": {
+            "words": 12,
+            "ends_sentence": true
+        },
         "lpn_control_dangling_note": {
             "words": 18,
             "ends_sentence": false
@@ -5962,9 +6629,37 @@
             "words": 20,
             "ends_sentence": true
         },
+        "lpn_copy_body": {
+            "words": 28,
+            "ends_sentence": true
+        },
+        "lpn_copy_body_nodate": {
+            "words": 20,
+            "ends_sentence": true
+        },
+        "lpn_copy_copy": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_copy_kept_link": {
+            "words": 16,
+            "ends_sentence": true
+        },
         "lpn_copy_of": {
             "words": 3,
             "ends_sentence": false
+        },
+        "lpn_copy_opened": {
+            "words": 21,
+            "ends_sentence": true
+        },
+        "lpn_copy_original": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_copy_title": {
+            "words": 5,
+            "ends_sentence": true
         },
         "lpn_cp_add": {
             "words": 3,
@@ -6162,9 +6857,109 @@
             "words": 30,
             "ends_sentence": true
         },
-        "lpn_crs_choose": {
+        "lpn_crit_baseline_below": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_crit_busy": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_crit_col_asset": {
             "words": 1,
             "ends_sentence": false
+        },
+        "lpn_crit_col_below": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_crit_col_cutoff": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_crit_col_unserved": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_crit_intro": {
+            "words": 39,
+            "ends_sentence": true
+        },
+        "lpn_crit_menu": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_crit_menu_tip": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "lpn_crit_minpressure": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_crit_minpressure_tip": {
+            "words": 20,
+            "ends_sentence": true
+        },
+        "lpn_crit_no_links": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_crit_no_selection": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "lpn_crit_scope": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_crit_scope_all": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_crit_scope_selected": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_crit_scope_tip": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "lpn_crit_skipdead": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_crit_skipdead_tip": {
+            "words": 41,
+            "ends_sentence": true
+        },
+        "lpn_crit_skipped": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_crit_skipped_dead": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_crit_stale": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_crit_stopped": {
+            "words": 14,
+            "ends_sentence": true
+        },
+        "lpn_crit_summary": {
+            "words": 13,
+            "ends_sentence": true
+        },
+        "lpn_crit_title": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_crit_working": {
+            "words": 5,
+            "ends_sentence": true
         },
         "lpn_crs_count": {
             "words": 6,
@@ -6912,6 +7707,10 @@
         },
         "lpn_ff_rows_more": {
             "words": 6,
+            "ends_sentence": true
+        },
+        "lpn_ff_rows_more_links": {
+            "words": 4,
             "ends_sentence": true
         },
         "lpn_ff_run_title": {
@@ -8054,6 +8853,10 @@
             "words": 32,
             "ends_sentence": true
         },
+        "lpn_graphs_menu": {
+            "words": 1,
+            "ends_sentence": false
+        },
         "lpn_help_fix": {
             "words": 2,
             "ends_sentence": false
@@ -8095,6 +8898,18 @@
             "ends_sentence": false
         },
         "lpn_hotkeys_map_term": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_hotkeys_menu_def": {
+            "words": 31,
+            "ends_sentence": true
+        },
+        "lpn_hotkeys_menu_heading": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_hotkeys_menu_term": {
             "words": 3,
             "ends_sentence": false
         },
@@ -9994,6 +10809,14 @@
             "words": 2,
             "ends_sentence": false
         },
+        "lpn_reports_calib": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_reports_calib_tip": {
+            "words": 19,
+            "ends_sentence": true
+        },
         "lpn_reports_epanet": {
             "words": 2,
             "ends_sentence": false
@@ -10157,6 +10980,14 @@
         "lpn_scenario_base_value": {
             "words": 3,
             "ends_sentence": false
+        },
+        "lpn_scenario_basic": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_scenario_basic_tip": {
+            "words": 33,
+            "ends_sentence": true
         },
         "lpn_scenario_deactivated": {
             "words": 19,
@@ -11180,6 +12011,30 @@
         },
         "lpn_survey_type_label": {
             "words": 2,
+            "ends_sentence": true
+        },
+        "lpn_sysflow_consumed": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_sysflow_consumed_tip": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "lpn_sysflow_menu": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_sysflow_produced": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_sysflow_produced_tip": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_sysflow_tip": {
+            "words": 34,
             "ends_sentence": true
         },
         "lpn_tab_all": {

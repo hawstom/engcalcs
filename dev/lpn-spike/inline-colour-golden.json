@@ -1,0 +1,55 @@
+{
+	"pinned": "1920777d",
+	"rows": [
+		{
+			"sel": "#lpn_label_bench",
+			"prop": "background-color",
+			"value": "rgb(255, 255, 255)"
+		},
+		{
+			"sel": "#lpn_label_bench",
+			"prop": "border-top-color",
+			"value": "rgb(51, 51, 51)"
+		},
+		{
+			"sel": "#lpn_label_bench",
+			"prop": "border-left-color",
+			"value": "rgb(51, 51, 51)"
+		},
+		{
+			"sel": "#lpn_label_bench",
+			"prop": "box-shadow",
+			"value": "rgba(0, 0, 0, 0.3) 2px 2px 6px 0px"
+		},
+		{
+			"sel": "#lpn_label_bench_out",
+			"prop": "border-top-color",
+			"value": "rgb(204, 204, 204)"
+		},
+		{
+			"sel": "#lpn_label_bench div:nth-of-type(1)",
+			"prop": "border-top-color",
+			"value": "rgb(33, 37, 41)"
+		},
+		{
+			"sel": "#lpn_tile_bench",
+			"prop": "background-color",
+			"value": "rgb(255, 255, 255)"
+		},
+		{
+			"sel": "#lpn_tile_bench",
+			"prop": "border-top-color",
+			"value": "rgb(51, 51, 51)"
+		},
+		{
+			"sel": "#lpn_tile_bench",
+			"prop": "box-shadow",
+			"value": "rgba(0, 0, 0, 0.3) 2px 2px 6px 0px"
+		},
+		{
+			"sel": "#lpn_menu_popup hr",
+			"prop": "border-top-color",
+			"value": "rgb(204, 204, 204)"
+		}
+	]
+}

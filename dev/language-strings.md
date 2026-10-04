@@ -292,6 +292,14 @@ $ec_lang_syn['calc_defaults']='Restore (revert, return) to the original (initial
 permission in that conversation. The pattern is: AI proposes entries as a diff in the conversation;
 the human approves; only then does AI write them. There are **no standing carve-outs.**
 
+**Stale synonyms reach Tom through `dev/new-english-keys.md` ("Synonym entries to approve"), never chat.**
+An entry is stale when its key is gone or its English changed after it was written;
+`dev/syn-baseline.json` records the English and text each was written against. His answer on the flag
+line is harvested into `dev/syn-rulings.json` (keyed on key + English + synonym text). CC proposes a
+replacement in `dev/syn-proposals.json` (`{"proposals": {key: {"on": English, "syn": text}}}`), applies
+what he approves by hand, then runs `php dev/scripts/syn_baseline.php --record <key>` (`--prune` after a
+removal). A script never edits `$ec_lang_syn`.
+
 ### Routing rule: English, intent, or glossary?
 
 One question decides it: **does an English reader also stumble?**

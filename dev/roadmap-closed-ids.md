@@ -669,3 +669,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|600| CLOSED 2026-10-03: all three plots shipped. Frequency 09-30, contour on "Merge contour", flow balance (`feat/flow-balance`) on Tom's "Good. Done. Close, merge, and delete branch."
 - 0|751| CLOSED 2026-10-03: criticality reached master inside `feat/demand-scaling`, which Tom cleared after testing the three Analyze tools together. `criticality-harness.js`.
 - 0|754| CLOSED 2026-10-03: `feat/demand-scaling` merged on Tom's "Good. Done. Close, merge, and delete branch."; Water > Analyze > Demand scaling, on a copy, with a find-the-limit search. `demand-scaling-harness.js`.
+- 0|637| CLOSED 2026-10-04: time-series graph at the foot of Properties (`feat/property-graph`), merged on Tom's "Done. Close, merge, and delete branch." `property-graph-harness.js`.

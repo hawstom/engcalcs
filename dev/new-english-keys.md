@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**4 still to read on master**, of 176 untranslated keys, of 2329 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**2 still to read on master**, of 51 untranslated keys, of 2332 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,347 +21,246 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (0, all answered)
+## Questions from the translators  (11 to read @@ NEEDS RULING)
 
-Nothing is waiting. Every English-friction finding has a disposition, so `friction_check.php` is clear and a sprint can launch.
+**These are SHIPPED strings, already translated into 26 languages.** A wave-0
+reading or a translator found each one readable two ways, and no sprint launches while one is
+unanswered. You are not being asked to approve wording here; you are being asked which reading
+is the one you meant. "The first one" is a complete answer.
 
-## lpn_  (176, 4 to read @@ NEEDS RULING)
+### from sprint 1003-ds
 
-- **`lpn_alt_cat_constituent`**
-  > Constituent
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_demand`**
-  > Demand
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_energy`**
-  > Energy cost
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_fireflow`**
-  > Fire flow
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_initial`**
-  > Initial settings
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_physical`**
-  > Physical
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_text`**
-  > Text
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_topology`**
-  > Asset activation
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_cat_userdata`**
-  > Custom properties
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_note`**
-  > Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.
-  _Ruled OK 2026-10-01._
-- **`lpn_alt_title`**
-  > Alternatives preview
-  _Ruled OK 2026-10-03._
-- **`lpn_analyze_menu`**
-  > Analyze
-  _Ruled OK 2026-10-03._
-- **`lpn_analyze_menu_tip`**
-  > Analyses that run the network on a copy: fire flow at each junction, the loss of each pipe, pump, and valve, and the demands scaled up or down.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_axis_obs`**
-  > Observed: {q}
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_axis_sim`**
-  > Computed: {q}
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_bad_lines`**
-  > Lines that could not be read, skipped: {lines}
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_col_location`**
-  > Location
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_col_mean_err`**
-  > Mean error
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_col_mean_err_tip`**
-  > The mean of the absolute differences between each observed value and the computed value at the same time.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_col_n`**
-  > Num obs
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_col_n_tip`**
-  > Number of observations: the measurements at this location that were compared.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_col_obs_mean`**
-  > Observed mean
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_col_rms_err`**
-  > RMS error
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_col_rms_err_tip`**
-  > Root mean square error: the square root of the mean of the squared differences between observed and computed values.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_col_sim_mean`**
-  > Computed mean
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_computed`**
-  > Computed
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_corr_means`**
-  > Correlation between means: {r}
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_corr_none`**
-  > Correlation between means: it needs at least two locations whose means differ.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_corr_note`**
-  > Each point is one measurement. The closer the points lie to the diagonal line, the closer the computed values match the observed ones.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_file`**
-  > {file}: {n} measurements at {m} locations.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_load`**
-  > Load calibration file…
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_load_tip`**
-  > A text file with a location ID, a time, and a measured value on each line. The time is measured from the start of the simulation, in decimal hours or hours:minutes. A semicolon starts a comment. A line with only a time and a value belongs to the location above it.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_missing`**
-  > Named in the file but not in this network: {ids}.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_missing_count`**
-  > Measurements skipped because their location is not in this network: {n}.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_needs_run`**
-  > There are no results to compare with yet. The report fills in once the network has been calculated.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_network`**
-  > Network
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_no_pairs`**
-  > No measurement could be compared, so there is nothing to plot.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_no_value`**
-  > Measurements with no computed value at their time, skipped: {n}.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_none`**
-  > No calibration file is loaded for this parameter.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_observed`**
-  > Observed
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_outside`**
-  > Measurements outside the times this run reported, skipped: {n}.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_param`**
-  > Parameter
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_param_tip`**
-  > The quantity the calibration file measures. One file is held for each parameter.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_point`**
-  > {id}, {time}: observed {o}, computed {s}
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_session`**
-  > A calibration file is held for this session only. It is not saved with the project or on this device.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_single`**
-  > This is a single-period run, so every measurement is compared with its one result, whatever time the file gives.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_tab_corr`**
-  > Correlation plot
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_tab_means`**
-  > Mean comparisons
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_tab_stats`**
-  > Statistics
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_title`**
-  > Calibration report
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_ts_note`**
-  > Rings are measured values from the calibration file.
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_ts_point`**
-  > Measured at {id}, {time}: {v}
-  _Ruled OK 2026-10-03._
-- **`lpn_calib_units`**
-  > The file's values are read in this project's units: {unit}.
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_buffer`**
-  > Buffer
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_buffer_tip`**
-  > How far the color reaches from each pipe, as a multiple of the median pipe length. It fades out over the outer part.
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_buffer_unit`**
-  > × median pipe length
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_consent_1`**
-  > Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_consent_2`**
-  > This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_consent_3`**
-  > May we send the tile numbers of your network's area to Mapbox?
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_consent_4`**
-  > If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_dem`**
-  > Ground between nodes from Mapbox DEM
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_dem_failed`**
-  > The ground could not be read from Mapbox DEM, so pressure is interpolated between nodes alone.
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_dem_tip`**
-  > Between nodes, pressure becomes the interpolated head minus the height of the ground from Mapbox DEM, so it can fall below the lowest node pressure on a hill the network has no node on. Treat the ground as a contour map, not a survey.
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_few`**
-  > Too few nodes to contour.
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_fill`**
-  > Fill
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_fill_bands`**
-  > Bands
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_fill_smooth`**
-  > Smooth
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_fill_tip`**
-  > Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_interval`**
-  > Interval
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_lines`**
-  > Contour lines
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_menu`**
-  > Contour
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_opacity`**
-  > Fill opacity
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_plot`**
-  > Contour plot
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_support`**
-  > Contour plot: {n} nodes, interpolated along {p} pipes and up to {k} times the median pipe length beside them. No color across pumps, valves, or closed links.
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_support_dem`**
-  > Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_support_lines`**
-  > Contour lines every {i} {u}.
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_tip`**
-  > Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.
-  _Ruled OK 2026-10-03._
-- **`lpn_contour_too_many`**
-  > Too many contour lines at this interval; widen it to draw them.
-  _Ruled OK 2026-10-03._
-- **`lpn_copy_body`**
-  > This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_body_nodate`**
-  > This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_copy`**
-  > A copy; make new lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_kept_link`**
-  > Opened {name} as the original, moved to a new place. Save now writes to this file.
-  _Ruled OK 2026-10-03._
-- **`lpn_copy_opened`**
-  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
-  _Ruled 2026-10-01: Wording change per this. This is good._
-- **`lpn_copy_original`**
-  > Original; keep same lock
-  _Ruled OK 2026-10-01._
-- **`lpn_copy_title`**
-  > Mark file as new copy?
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_baseline_below`**
-  > Junctions already below it with nothing broken: {n}. They are not counted.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_busy`**
-  > Another analysis is running. Stop it, or wait for it to finish.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_col_asset`**
-  > Asset
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_col_below`**
-  > Junctions below minimum
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_col_cutoff`**
-  > Junctions cut off
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_col_unserved`**
-  > Demand not served
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_intro`**
-  > Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in your project is changed; the whole run is made on a copy.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_menu`**
-  > Criticality analysis…
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_menu_tip`**
-  > Take each pipe, pump, and valve out of the network in turn and see what the system loses.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_minpressure`**
-  > Lowest pressure allowed
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_minpressure_tip`**
-  > This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_no_links`**
-  > This project has no links yet, so there is nothing to break.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_no_selection`**
-  > No links are selected. Select links or choose All links.
-  _Ruled OK 2026-10-03._
-- **`lpn_crit_scope`**
-  > Links to break
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_scope_all`**
-  > All links
-  _Ruled OK 2026-10-03._
-- **`lpn_crit_scope_selected`**
-  > Selected links
-  _Ruled OK 2026-10-03._
-- **`lpn_crit_scope_tip`**
-  > All pipes, pumps, and valves, or only those selected on the map. Choose the set before you run.
-  _Ruled OK 2026-10-03._
-- **`lpn_crit_skipdead`**
-  > Skip dead ends
-  _Ruled OK 2026-10-03._
-- **`lpn_crit_skipdead_tip`**
-  > A dead-end link is one whose removal cuts off junctions that can be reached only through it, with no reservoir or tank beyond. Its loss is everything beyond it, so it is not solved. The summary says how many were skipped.
-  _Ruled OK 2026-10-03._
-- **`lpn_crit_skipped`**
-  > {n} selected elements are not links, so they were not broken.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_skipped_dead`**
-  > Dead-end links skipped: {n}. Each one cuts off everything beyond it.
-  _Ruled OK 2026-10-03._
-- **`lpn_crit_stale`**
-  > The drawing changed, so the criticality results were cleared. Run it again.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_stopped`**
-  > Stopped after {done} of {total} assets. The results below are the ones already finished.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_summary`**
-  > {n} of {total} assets leave demand unserved or drop a junction below {pressure}.
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_title`**
-  > Criticality analysis
-  _Ruled OK 2026-10-01._
-- **`lpn_crit_working`**
-  > Working: {done} of {total} assets.
-  _Ruled OK 2026-10-01._
-- **`lpn_ds_at_time`**
+- **`lpn_ds_found_below`**
+  > ⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.
+  *The finding:* Tom: 'I think I need explanation, and this need clarification.' It appears after Find when the demands as entered (a demand scale of 1) leave at least one junction below the limit; {m} is the largest scale, always under 1, at which every judged junction keeps the limit (0.62 means demands cut to 62 percent). 'it' in 'keeps it' is vague, 'demands as they are' never says scale 1, and {m} reads as headroom when it is a cut.
+  1. the system can take up to {m} times today's demand (wrong)
+  2. demands must be cut to {m} times what is entered for every junction to keep the pressure (right)
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
+  @@ NEEDS RULING
+
+### from sprint 1003b-wave0
+
+- **`lpn_crs_list_tip`**
+  > The coordinate systems left by the two filters above. Choose one, then press OK.
+  *The finding:* 'The two filters above' is not countable on the page (Looped-Network.php:1738-1750 shows a map-view checkbox, a place search, and a name filter)
+  1. map-view checkbox and name filter
+  2. place search and name filter
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'The coordinate systems that pass the map view filter and the name filter above. Choose one, then press OK.'
+  @@ NEEDS RULING
+- **`lpn_ds_eps_note`**
+  > Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.
+  *The finding:* 'Only the time step now on screen is scaled, with its tank levels and link statuses' reads as if the levels and statuses are scaled too; 'run' can mean the Run button or the EPANET simulation
+  1. the time step's demands, tank levels and link statuses are all scaled
+  2. only the demands are scaled; levels and statuses are taken from that step
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'The demands of the time step now on screen are scaled, and the network is solved with that step’s tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.'
+  @@ NEEDS RULING
+- **`lpn_ds_find`**
+  > Find
+  *The finding:* A bare 'Find' collides with the Find feature that selects assets by condition (lpn_notes_4_def), and a translator cannot tell which; Run sits beside it with the same bare style
+  1. find assets matching a condition
+  2. find the largest demand scale (the button at js/looped-network.js:59552)
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'Find largest scale'
+  @@ NEEDS RULING
+- **`lpn_ds_found`**
+  > ✓ Every junction keeps {pressure} up to a demand scale of {m}.
+  *The finding:* 'Every junction' is false under the Selected scope, where only the chosen junctions are checked; 'keeps {pressure}' is elliptical for 'at least'
+  1. the whole system holds the pressure
+  2. only the checked junctions hold at least the pressure
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: '✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.'
+  @@ NEEDS RULING
+- **`lpn_ds_search_note`**
+  > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.
+  *The finding:* 'from 0 to {max} to the nearest {step}' stacks two 'to's; 'maintain the lowest pressure allowed' reads as maintaining a pressure setpoint rather than staying at or above it
+  1. search from 0 up to the maximum, rounding to the step
+  2. search from 0 to the maximum, and keep the pressure at exactly the minimum
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'Finds the largest demand scale at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}, to the nearest {step}, and assumes that more demand never raises the lowest pressure.'
+  @@ NEEDS RULING
+- **`lpn_ff_design_none`**
+  > Nothing in the scope you chose went outside its limits while any junction drew its fire flow.
+  *The finding:* Two scopes exist on this page (Junctions to test, and the Design check All/Selected), and 'the scope you chose' does not say which; 'any junction drew' can read as 'whenever one did' or 'if some junction did'
+  1. no limit was exceeded during any tested junction's fire flow, within the design check scope
+  2. no limit was exceeded in the junctions-to-test scope
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'With each tested junction’s fire flow drawn in turn, nothing in the design check scope went outside its limits.'
+  @@ NEEDS RULING
+- **`lpn_new_coordsys_tip`**
+  > Choose the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Convert as…”, and it is approximate.
+  *The finding:* 'This is permanent' is contradicted by 'the only way ... convert', and 'it is approximate' has no clear referent (the choice, the conversion, or the network)
+  1. the choice cannot change, except by a conversion that is approximate
+  2. the network can be converted by one route only, and the network's coordinates are approximate
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'Choose the coordinate system of your network. The choice is permanent, except that “File, Convert as…” can convert the network to other coordinates, and that conversion is approximate.'
+  @@ NEEDS RULING
+- **`lpn_notes_4_def`**
+  > A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.
+  *The finding:* 'lists the junctions' says neither where nor what; 'route' where the Graphs tip says 'path'; 'sit on real ground' is idiom; the bottom panel is called a pane elsewhere (Looped-Network.php:1855 renders it as one About-box paragraph)
+  1. the bottom panel lists every junction with its results
+  2. the bottom panel lists only the junctions along the profile route
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'A project can be placed on real ground with a street map behind it. EPANET .inp files can be read and written. The bottom pane plots a profile along a path and tabulates the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.'
+  @@ NEEDS RULING
+- **`lpn_ts_add_none`**
+  > Nothing of that kind is selected on the map.
+  *The finding:* 'Nothing of that kind' has no antecedent in the note, and the note also appears when the selected assets are already on the graph (added === 0), where 'not selected' is false
+  1. no asset of the shown group (Nodes or Links) is selected
+  2. the selected assets are already on the graph, so none was added
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'No new assets of this group are selected on the map.'
+  @@ NEEDS RULING
+- **`lpn_ts_add_tip`**
+  > Put everything now selected on the map onto the graph.
+  *The finding:* Says 'everything now selected', but tsAddSelection() (js/looped-network.js:29915) adds only selected assets of the current group (Nodes or Links); 'now' also reads as 'at this moment' vs 'newly'
+  1. every selected asset of any kind goes onto the graph
+  2. only the selected assets of the group shown (Nodes or Links) go onto the graph
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'Put the selected nodes or links (whichever group is shown) on the map onto the graph.'
+  @@ NEEDS RULING
+
+## Synonym entries to approve  (13, 13 to read @@ NEEDS RULING)
+
+**These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
+English string that has since changed, or against a key that no longer exists. Say which: keep it
+as is, change it (a proposal may follow), or remove it. **Your answer on the flag line is the
+written permission** the rule requires; CC then applies it by hand and re-records it. A script
+never edits a synonym.
+
+- **`lpn_ds_head_search_selected`**
+  > What demand scale can these junctions handle?
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* What demand can the selection handle
+  *Current synonym:* What demand can the junctions you choose handle
+  *Proposed synonym:* What demand scale can these junctions carry?, How far can the demand at these junctions be scaled?
+  *Why this proposal:* The heading is now a question about a demand scale at these junctions; both rephrasings could head the same box.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_ds_scope_tip`**
+  > All junctions, or only those selected on the map. Pressures are checked at the scaled demand.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Scale the demand of the selection. Pressures are checked at the scaled demand.
+  *Current synonym:* Scale the demand at the junctions that you choose. Pressures are checked at the scaled demand.
+  *Proposed synonym:* Every junction, or just the junctions selected on the map. Pressures are checked at the scaled demand.
+  *Why this proposal:* Whole-string rephrasing of the new two-option sentence; the old text described only the selection.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_ds_search_note_selected`**
+  > (this key no longer exists in lib/lang.ec.en.php)
+  *Why stale:* the key no longer exists, so this entry describes nothing
+  *Written against:* Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the selection keeps the given lowest pressure allowed.
+  *Current synonym:* Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the junctions that you choose keep the given lowest pressure allowed.
+  **What this asks for:** WRITTEN PERMISSION to remove this `$ec_lang_syn` entry.
+  @@ NEEDS RULING
+
+- **`lpn_ff_all`**
+  > All junctions
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* All
+  *Current synonym:* All junctions | a pull-down option under Junctions to test; agrees with junctions, plural
+  *Proposed synonym:* Every junction, All the junctions | a pull-down option under Junctions to test; agrees with junctions, plural
+  *Why this proposal:* Both would fit the pull-down; the English now says junctions, plural, which the commentary already required.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_ff_selected`**
+  > Selected junctions
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Selected
+  *Current synonym:* Selected junctions | a pull-down option under Junctions to test; agrees with junctions, plural
+  *Proposed synonym:* Only the selected junctions, The junctions selected on the map | a pull-down option under Junctions to test; agrees with junctions, plural
+  *Why this proposal:* Each could stand in the pull-down row; the old text only repeated the English.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_help_icons`**
+  > Toolbar
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Toolbar key
+  *Current synonym:* Toolbar legend, Key to the toolbar icons, What each toolbar icon means, Toolbar help, Toolbar | avoid: a keyboard key or shortcut
+  *Proposed synonym:* Toolbar legend, Toolbar icon key, Toolbar help | avoid: a keyboard key or shortcut
+  *Why this proposal:* The English dropped the word key; each could stand in the menu row.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_labels_col_after`**
+  > Aft.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* After
+  *Current synonym:* After, Suffix, Trailing text, Postfix | avoid: after in the sense of later in time
+  *Proposed synonym:* Aft. (After, Suffix, Trailing text) | layout: column heading; avoid: after in the sense of later in time
+  *Why this proposal:* The English is now the short heading; the full words are the alternates.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_labels_col_before`**
+  > Bef.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Before
+  *Current synonym:* Before, In front, In front of the value, Prefix, Leading text | avoid: before in the sense of earlier in time
+  *Proposed synonym:* Bef. (Before, Prefix, Leading text) | layout: column heading; avoid: before in the sense of earlier in time
+  *Why this proposal:* The English is now the short heading; the full words are the alternates.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_lock_break`**
+  > Break lock
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Break their lock
+  *Current synonym:* Break their lock, unlock the file, take over the file, release their hold on it, claim the file, override their claim | layout: button
+  *Proposed synonym:* Break lock, Unlock the file, Take over the file, Override their claim | layout: button
+  *Why this proposal:* Dropped the options that only made sense with the old English "Break their lock".
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_settings_map_display`**
+  > Appearance
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Map appearance
+  *Current synonym:* How the map looks (appearance, style, the way it is drawn) — sizes, opacity, position.
+  *Proposed synonym:* Appearance, Look, Style, How the map is drawn
+  *Why this proposal:* The old text was a description; each of these could be the heading.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_units_group_inputs`**
+  > (this key no longer exists in lib/lang.ec.en.php)
+  *Why stale:* the key no longer exists, so this entry describes nothing
+  *Written against:* Input units
+  *Current synonym:* Units of inputs, or Units of what you enter
+  **What this asks for:** WRITTEN PERMISSION to remove this `$ec_lang_syn` entry.
+  @@ NEEDS RULING
+
+- **`lpn_units_group_results`**
+  > (this key no longer exists in lib/lang.ec.en.php)
+  *Why stale:* the key no longer exists, so this entry describes nothing
+  *Written against:* Results units
+  *Current synonym:* Units of results, or Units of the answers
+  **What this asks for:** WRITTEN PERMISSION to remove this `$ec_lang_syn` entry.
+  @@ NEEDS RULING
+
+- **`mtc_note_1`**
+  > <dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.</dd><dt>Basic calculator (no iteration)</dt><dd>Enter your desired roughness value. Ignore the design rock size input area.</dd></dl>
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* <dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The r...
+  *Current synonym:* | avoid: compressing "Blodgett–Bathurst" to an initialism like "BB" — recurred independently across 8+ languages (it/ru/bg/es/uk/sr/hr/cs/tr/ps/my, corrected 2026-07-08) since nothing else in this string defines what the initials stand for; spell the full name out in every language, matching mtc_blodgett_v_bathurst
+  *Proposed synonym:* | avoid: compressing "Blodgett–Bathurst" to an initialism like "BB" — recurred independently across 8+ languages (it/ru/bg/es/uk/sr/hr/cs/tr/ps/my, corrected 2026-07-08) since nothing else in this string defines what the initials stand for; spell the full name out in every language, matching mtc_blodgett_v_bathurst
+  *Why this proposal:* No change proposed: the note is about the initialism, not the reworded step 2, and still holds.
+  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+## lpn_  (51, 2 to read @@ NEEDS RULING)
+
+- **`lpn_analyze_at_time`**
   > Time step: {time}.
+  _Ruled OK 2026-10-03._
+- **`lpn_analyze_time_moved`**
+  > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
   _Ruled OK 2026-10-03._
 - **`lpn_ds_bad_multiplier`**
   > Type a demand scale of zero or more, such as 1.5.
@@ -386,13 +285,13 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   _Ruled OK 2026-10-03._
 - **`lpn_ds_eps_note`**
   > Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-04._
 - **`lpn_ds_find`**
   > Find
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-04._
 - **`lpn_ds_found`**
   > ✓ Every junction keeps {pressure} up to a demand scale of {m}.
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-04._
 - **`lpn_ds_found_below`**
   > ⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.
   _Ruled 2026-10-03: I think I need explanation, and this need clarification._
@@ -475,11 +374,8 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
   > All junctions, or only those selected on the map. Pressures are checked at the scaled demand.
   _Ruled OK 2026-10-03._
 - **`lpn_ds_search_note`**
-  > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.
-  _Ruled OK 2026-10-03._
-- **`lpn_ds_search_note_selected`**
-  > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.
-  _Ruled 2026-10-03: There is no need for this key. "These" applies to all and to selected._
+  > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.
+  @@ NEEDS RULING
 - **`lpn_ds_search_stopped`**
   > The search was stopped before it found an answer.
   _Ruled 2026-10-03: OK. Are we sure this isn't already provided by a different key?_
@@ -489,68 +385,26 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_ds_stale`**
   > The drawing changed, so the demand scaling results were cleared. Run it again.
   _Ruled OK 2026-10-03._
-- **`lpn_ds_time_moved`**
-  > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
-  _Ruled OK 2026-10-03._
 - **`lpn_ds_title`**
   > Demand scaling
-  _Ruled OK 2026-10-03._
-- **`lpn_ff_design_all`**
-  > All
-  _Ruled OK 2026-10-03._
-- **`lpn_ff_design_off`**
-  > None
-  _Ruled OK 2026-10-03._
-- **`lpn_ff_design_selected`**
-  > Selected
-  _Ruled OK 2026-10-03._
-- **`lpn_ff_rows_more_links`**
-  > Links not shown: {n}.
-  _Ruled OK 2026-10-03._
-- **`lpn_graphs_menu`**
-  > Graphs
   _Ruled OK 2026-10-03._
 - **`lpn_graphs_menu_tip`**
   > Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.
   @@ NEEDS RULING
-- **`lpn_hotkeys_menu_def`**
-  > <table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>
-  _Ruled OK 2026-10-03._
-- **`lpn_hotkeys_menu_heading`**
-  > Menus
-  _Ruled OK 2026-10-03._
-- **`lpn_hotkeys_menu_term`**
-  > Menu keyboard shortcuts
-  _Ruled OK 2026-10-03._
-- **`lpn_reports_calib`**
-  > Calibration
-  _Ruled OK 2026-10-03._
-- **`lpn_reports_calib_tip`**
-  > Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.
-  _Ruled OK 2026-10-03._
-- **`lpn_scenario_basic`**
-  > Basic mode
+- **`lpn_pgraph_none`**
+  > This asset has no results in the current run.
   _Ruled OK 2026-10-01._
-- **`lpn_scenario_basic_tip`**
-  > Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.
+- **`lpn_pgraph_source_share_from`**
+  > Source share from {node}
   _Ruled OK 2026-10-01._
-- **`lpn_sysflow_consumed`**
-  > Consumed
+- **`lpn_report_pump_head`**
+  > Pump head
   _Ruled OK 2026-10-03._
-- **`lpn_sysflow_consumed_tip`**
-  > Total of every positive demand: water drawn from the network at junctions, and any flow into a reservoir.
+- **`lpn_result_pump_head`**
+  > Head
   _Ruled OK 2026-10-03._
-- **`lpn_sysflow_menu`**
-  > Flow balance
-  _Ruled OK 2026-10-03._
-- **`lpn_sysflow_produced`**
-  > Produced
-  _Ruled OK 2026-10-03._
-- **`lpn_sysflow_produced_tip`**
-  > Total flow into the network from reservoirs and from negative demands.
-  _Ruled OK 2026-10-03._
-- **`lpn_sysflow_tip`**
-  > Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.
+- **`lpn_result_pump_head_tip`**
+  > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   _Ruled OK 2026-10-03._
 - **`lpn_sysflow_title`**
   > Flow balance
@@ -560,7 +414,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**0 still to read**, of 12 new keys across 10 unmerged branch(es).
+**20 still to read**, of 27 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -571,11 +425,24 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/selection-word (`16dce45b`) — adds no English strings
-
-### feat/criticality (`84ea5311`) — adds no English strings
-
 ### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/dialog-audit (`8b42bf67`) — adds no English strings
+
+### feat/dock (`1365f0f3`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -612,20 +479,59 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/property-graph (`3c987393`) — 5 new, all ruled
+### feat/scenario-option (`5ca59b4f`) — 5 new, 5 to read @@ NEEDS RULING
 
-- **`lpn_pgraph_none`**
-  > This asset has no results in the current run.
-  _Ruled OK 2026-10-01._
-- **`lpn_pgraph_source_share_from`**
-  > Source share from {node}
-  _Ruled OK 2026-10-01._
-- **`lpn_report_pump_head`**
-  > Pump head
-  _Ruled OK 2026-10-03._
-- **`lpn_result_pump_head`**
-  > Head
-  _Ruled OK 2026-10-03._
-- **`lpn_result_pump_head_tip`**
-  > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
-  _Ruled OK 2026-10-03._
+- **`lpn_scenario_duration_tip`**
+  > This scenario's own total run time. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
+  @@ NEEDS RULING
+- **`lpn_scenario_hyd_step_tip`**
+  > This scenario's own hydraulic time step. Leave it blank to use the project's, set in Settings, Calculation, Time.
+  @@ NEEDS RULING
+- **`lpn_scncmp_at_time`**
+  > {value} at {id}, {time}
+  @@ NEEDS RULING
+- **`lpn_scncmp_period_note`**
+  > Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.
+  @@ NEEDS RULING
+- **`lpn_scncmp_same`**
+  > The same in every scenario
+  @@ NEEDS RULING
+
+### feat/setting-scope (`8e493fe5`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
+
+### feat/table-selection (`d2276943`) — 6 new, 6 to read @@ NEEDS RULING
+
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map, then press Selection only.
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_tip`**
+  > Show only the elements selected on the map, in every table. Press again to update it after changing the selection, or to turn it off.
+  @@ NEEDS RULING
