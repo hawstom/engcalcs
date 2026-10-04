@@ -2962,8 +2962,8 @@ $ec_lang['lpn_scenario_overrides']='No. of custom values';
 // the readout's, so neither requires clicking the element to find out what is going on.
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
-$ec_lang['lpn_scenario_mark_tip']='The amber ring means this asset holds a value that belongs to the scenario {name} alone.';
-$ec_lang['lpn_scenario_overrides_tip']='Each of those values is marked on the map with an amber ring. Switch to {base} to see the drawing without them.';
+$ec_lang['lpn_scenario_mark_tip']='The amber ring means this asset has an override in the scenario {name}.';
+$ec_lang['lpn_scenario_overrides_tip']='Each override is marked on the map with an amber ring. Switch to {base} to see the drawing without them.';
 $ec_lang['lpn_scenario_menu']='Scenarios';
 $ec_lang['lpn_scenario_tip']='The set of values the drawing is showing and the page is solving right now. Click to switch scenarios, or to add, rename, or delete one.';
 $ec_lang['lpn_scenario_new']='New scenario…';
@@ -2971,10 +2971,10 @@ $ec_lang['lpn_scenario_new_name']='Scenario {n}';
 $ec_lang['lpn_scenario_prompt_name']='Name for this scenario';
 $ec_lang['lpn_scenario_rename']='Rename scenario…';
 $ec_lang['lpn_scenario_delete']='Delete scenario';
-$ec_lang['lpn_scenario_delete_confirm']='Delete the scenario {name}, and the {n} values that belong to it alone? The drawing itself is not changed.';
-$ec_lang['lpn_scenario_override']='Only in this scenario';
+$ec_lang['lpn_scenario_delete_confirm']='Delete the scenario {name}, and its {n} overrides? The drawing itself is not changed.';
+$ec_lang['lpn_scenario_override']='Override in this scenario';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Checked means this scenario has an entry for this value, even when it is the same number as Base. Clear the box to use the Base value again.';
+$ec_lang['lpn_scenario_override_tip']='Checked means this scenario overrides Base for this value, even when the number is the same. Clear the box to use the Base value again.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -2989,8 +2989,8 @@ $ec_lang['lpn_scenario_basic']='Basic mode';
 $ec_lang['lpn_scenario_basic_tip']='Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.';
 $ec_lang['lpn_alt_title']='Alternatives preview';
 $ec_lang['lpn_alt_note']='Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario\'s own value, or leave it blank to use the project\'s.';
-$ec_lang['lpn_scenario_duration_tip']='This scenario\'s own total run time. Leave it blank to use the project\'s, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.';
-$ec_lang['lpn_scenario_hyd_step_tip']='This scenario\'s own hydraulic time step. Leave it blank to use the project\'s, set in Settings, Calculation, Time.';
+$ec_lang['lpn_scenario_duration_tip']='Overrides the project\'s total run time in this scenario. Leave it blank to use the project\'s, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.';
+$ec_lang['lpn_scenario_hyd_step_tip']='Overrides the project\'s hydraulic time step in this scenario. Leave it blank to use the project\'s, set in Settings, Calculation, Time.';
 $ec_lang['lpn_time_scn_overrides']='Scenario overrides:';
 $ec_lang['lpn_alt_cat_physical']='Physical';
 $ec_lang['lpn_alt_cat_demand']='Demand';
@@ -3007,7 +3007,7 @@ $ec_lang['lpn_scenario_push_scenarios']='Scenarios affected:';
 $ec_lang['lpn_scenario_push_values']='Values thrown away:';
 // A COUNT follows this label, not a list. Alternates are Tom's own (2026-08-14).
 $ec_lang_syn['lpn_scenario_push_values']='Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values';
-$ec_lang['lpn_scenario_push_none']='No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.';
+$ec_lang['lpn_scenario_push_none']='No scenario overrides Base for any of these properties, so nothing would change. Nothing is thrown away.';
 // Task 721: the scenarios every new project starts with. Keep the leading number: the list sorts
 // by name, and the numbers hold Tom's order in every language.
 $ec_lang['lpn_scenario_preset_flow_static']='1. Flow test: Static';
@@ -3024,7 +3024,7 @@ $ec_lang['lpn_scenario_preset_peak_hour']='6. Peak hour';
 $ec_lang['lpn_scenario_preset_peak_hour_tip']='Demand multiplier 3.0 times average day, a placeholder value. Most systems fall between 3.0 and 6.0 (National Research Council, 2006). Set your own system\'s in Settings, Calculation, Hydraulics, Demand multiplier.';
 $ec_lang['lpn_scenario_preset_fire_max_day']='7. Fire plus max day';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Max day demand (multiplier 2.0). Run Fire flow analysis in this scenario: it adds the fire flow at each junction on top of this demand.';
-$ec_lang['lpn_delete_drops_overrides']='Deleting this asset also throws away {n} values that your scenarios hold for it. Continue?';
+$ec_lang['lpn_delete_drops_overrides']='Deleting this asset also throws away {n} scenario overrides for it. Continue?';
 $ec_lang['lpn_push_base_only']='This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.';
 $ec_lang['lpn_field_active']='Part of this network';
 // Edited by TGH 2026-09-07

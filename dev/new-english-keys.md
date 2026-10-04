@@ -407,10 +407,10 @@ never edits a synonym.
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   _Ruled OK 2026-10-03._
 - **`lpn_scenario_duration_tip`**
-  > This scenario's own total run time. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
+  > Overrides the project's total run time in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
   @@ NEEDS RULING
 - **`lpn_scenario_hyd_step_tip`**
-  > This scenario's own hydraulic time step. Leave it blank to use the project's, set in Settings, Calculation, Time.
+  > Overrides the project's hydraulic time step in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time.
   @@ NEEDS RULING
 - **`lpn_scncmp_at_time`**
   > {value} at {id}, {time}
@@ -468,7 +468,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/dialog-audit (`4ad58f1e`) — adds no English strings
 
-### feat/dock (`b0848b89`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/dock (`6cafde0f`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_dock_autohide`**
   > Auto-hide
@@ -518,7 +518,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/scenario-option (`7e81e557`) — adds no English strings
+### feat/scenario-option (`676ae6b9`) — adds no English strings
 
 ### feat/setting-scope (`8e493fe5`) — 5 new, 5 to read @@ NEEDS RULING
 
