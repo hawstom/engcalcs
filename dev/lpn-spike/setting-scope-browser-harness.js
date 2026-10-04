@@ -1,7 +1,7 @@
 // WHERE EACH SETTING IS KEPT -- ROADMAP Task 739. Run with:
 //   node dev/lpn-spike/setting-scope-browser-harness.js            (compare with dev/setting-scope.md)
 //   node dev/lpn-spike/setting-scope-browser-harness.js --write    (rewrite its inventory table)
-// (it takes /tmp/engcalcs-browser.lock itself; never wrap it in that lock).
+// (it takes its slot's browser lock, EC_BROWSER_LOCK, itself; never wrap it in that lock).
 //
 // Tom, 2026-09-28, on learning that dragged column widths live in the browser: *"Systematically
 // disclose to users where things are stored. Autodesk does this so well that I, a user, can cite
@@ -34,7 +34,7 @@ const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
 
 const REPO = path.resolve(__dirname, '..', '..');
-const LOCK_FILE = '/tmp/engcalcs-browser.lock';
+const LOCK_FILE = process.env.EC_BROWSER_LOCK || '/tmp/engcalcs-browser.lock';
 const LOCK_ENV = 'EC_SETSCOPE_LOCKED';
 const MD = path.join(REPO, 'dev', 'setting-scope.md');
 const WRITE = process.argv.includes('--write');
