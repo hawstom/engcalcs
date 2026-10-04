@@ -469,6 +469,13 @@
    "words": "merge 8110 8113 8114 8115",
    "context": "Typed in the session, 2026-10-04 evening: \"merge 8110 8113 8114 8115\". Earlier the same evening, in his pasted message after his browser pass: \"8115: Done.  Close, merge, and delete branch. No source citation, but I can see that it ballparks my intuition.\"",
    "pin_note": "He tested the branch head of earlier today; the pin adds only a merge of master into the branch."
+  },
+  "feat/tip-verdict": {
+   "head": "dea1581f0490feaeed41e241a3a71bf6c57fbfb2",
+   "date": "2026-10-04",
+   "words": "8116: OK. Merge.",
+   "context": "Typed in the session, 2026-10-04 evening, after his browser pass on port 8116 of the four follow-up answers (customer and zoom window Specify wording, quality tolerance, specific gravity tip deleted).",
+   "pin_note": "He tested a08acce9; the pin adds only a merge of master into the branch (conflicts resolved as master code with the branch wording) and a regenerated keys list."
   }
  }
 }
