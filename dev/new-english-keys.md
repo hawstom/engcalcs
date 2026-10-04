@@ -432,7 +432,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**21 still to read**, of 28 new keys across 13 unmerged branch(es).
+**20 still to read**, of 27 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -443,7 +443,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/basemap-style (`1233fc70`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/basemap-style (`c4da18dc`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_basemap_filter_faded`**
   > Faded
@@ -466,9 +466,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dialog-audit (`4ad58f1e`) — adds no English strings
+### feat/dialog-audit (`4a665186`) — adds no English strings
 
-### feat/dock (`6cafde0f`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/dock (`6eed29b6`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_dock_autohide`**
   > Auto-hide
@@ -518,9 +518,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/scenario-option (`676ae6b9`) — adds no English strings
+### feat/scenario-option (`6fa65d6f`) — adds no English strings
 
-### feat/setting-scope (`8e493fe5`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/setting-scope (`77c810be`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_pane_manage_cols_width`**
   > Width (em)
@@ -538,7 +538,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not saved
   @@ NEEDS RULING
 
-### feat/table-selection (`66d09eb7`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/table-selection (`0f413504`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_pane_filter_sel_and`**
   > Filtered by {q} and selection only. Showing {n} of {all}.
@@ -553,8 +553,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selection only
   @@ NEEDS RULING
 - **`lpn_pane_sel_only_none`**
-  > No elements are selected. Select elements on the map, then press Selection only.
+  > No elements are selected. Select elements on the map first.
   @@ NEEDS RULING
-- **`lpn_pane_sel_only_tip`**
-  > Show only the elements selected on the map, in every table. Press again to update it after changing the selection, or to turn it off.
-  @@ NEEDS RULING
+
+### fix/tip-width (`5aa1cd2d`) — adds no English strings
