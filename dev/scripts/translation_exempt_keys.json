@@ -774,6 +774,58 @@
             "category": "abbreviation",
             "languages": "*",
             "reason": "IMGD -- imperial million gallons per day. Sibling of u_mgd ('MGD'), which needs no entry because ecIsUniversalKey() auto-exempts a u_ key whose English has no run of four letters. IMGD has exactly four, so it falls off that heuristic by one character while meaning the same kind of thing. Several languages do render it (Mgal imp/dia, Mgal imp/j, Mgal imp/Tag) and exemption does not stop them -- it only says that keeping the Latin abbreviation, as many scripts do for unit symbols, is a legitimate answer rather than an untranslated string."
+        },
+        "lpn_alt_cat_text": {
+            "category": "cognate",
+            "languages": [
+                "cs",
+                "de",
+                "ro"
+            ],
+            "reason": "Text is the ordinary word in these languages (sprint 1004-lpn friction)."
+        },
+        "lpn_contour_interval": {
+            "category": "cognate",
+            "languages": [
+                "cs",
+                "id",
+                "ro"
+            ],
+            "reason": "Interval is the ordinary word in these languages (sprint 1004-lpn friction)."
+        },
+        "lpn_calib_param": {
+            "category": "cognate",
+            "languages": [
+                "de",
+                "id"
+            ],
+            "reason": "Parameter is the ordinary word in these languages (sprint 1004-lpn friction)."
+        },
+        "lpn_field_lat_abbr": {
+            "category": "cognate",
+            "languages": [
+                "fr",
+                "it",
+                "pt",
+                "ro",
+                "sw"
+            ],
+            "reason": "Lat is the standard latitude abbreviation in these languages (sprint 1004-lpn friction)."
+        },
+        "lpn_field_lon_abbr": {
+            "category": "cognate",
+            "languages": [
+                "sw"
+            ],
+            "reason": "Lon is the standard longitude abbreviation in Swahili (sprint 1004-lpn friction)."
+        },
+        "lpn_hotkeys_menu_heading": {
+            "category": "cognate",
+            "languages": [
+                "fr",
+                "pt"
+            ],
+            "reason": "Menus is the ordinary plural in French and Portuguese (sprint 1004-lpn friction)."
         }
     }
 }
