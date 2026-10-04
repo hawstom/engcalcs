@@ -8693,6 +8693,17 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < defs.length; i++) { if (defs[i][0] === field) { return defs[i][1]; } }
 		return field;
 	}
+	// **A STATISTIC VIEW SAYS SO IN THE HEADING** (Task 735): with the transport on Averaged, the map's
+	// "Pressure" is not an instant, and the label "P=124.88" cannot say so. Result fields only; an
+	// input (elevation, diameter) is the same in every view.
+	var STATISTIC_RESULT_FIELDS = { demandActual: 1, level: 1, head: 1, pressure: 1, quality: 1,
+		flow: 1, velocity: 1, headloss: 1, rate: 1 };
+	function colorHeadingText(group, field, unit, labelOverride) {
+		var stat = EngCalcs.lpnTimeStatisticLabel && !labelOverride && STATISTIC_RESULT_FIELDS[field] ?
+			EngCalcs.lpnTimeStatisticLabel() : null,
+			name = labelOverride || colorFieldLabel(group, field);
+		return name + (stat ? ' (' + stat + (unit ? ', ' + unit : '') + ')' : (unit ? ' (' + unit + ')' : ''));
+	}
 	// 3 significant figures, then trailing zeros stripped. A break the user typed prints back as
 	// they typed it; an automatic one prints short enough to read in a corner overlay.
 	function colorNum(v) {
@@ -8723,7 +8734,7 @@ var EngCalcs = EngCalcs || {};
 			var unit = colorFieldUnitText(group, field);
 			var h = document.createElement('div');
 			h.style.fontWeight = 'bold';
-			h.textContent = colorFieldLabel(group, field) + (unit ? ' (' + unit + ')' : '');
+			h.textContent = colorHeadingText(group, field, unit);
 			box.appendChild(h);
 			// TOP BAND FIRST. A legend reads high-at-the-top the way a thermometer does, and the
 			// map's own high values are the ones a reviewer is scanning for.

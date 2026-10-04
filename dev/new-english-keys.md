@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**56 still to read on master**, of 105 untranslated keys, of 2333 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**62 still to read on master**, of 111 untranslated keys, of 2339 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -294,7 +294,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (105, 56 to read @@ NEEDS RULING)
+## lpn_  (111, 62 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -605,6 +605,24 @@ never edits a synonym.
 - **`lpn_time_scn_overrides`**
   > Scenario overrides:
   @@ NEEDS RULING
+- **`lpn_time_stat_averaged`**
+  > Averaged
+  @@ NEEDS RULING
+- **`lpn_time_stat_maximum`**
+  > Maximum
+  @@ NEEDS RULING
+- **`lpn_time_stat_minimum`**
+  > Minimum
+  @@ NEEDS RULING
+- **`lpn_time_stat_none`**
+  > None
+  @@ NEEDS RULING
+- **`lpn_time_stat_range`**
+  > Range
+  @@ NEEDS RULING
+- **`lpn_time_statistic`**
+  > Statistic
+  @@ NEEDS RULING
 - **`lpn_tool_add_chain`**
   > Junction Pipe Chain
   @@ NEEDS RULING
@@ -616,7 +634,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**6 still to read**, of 13 new keys across 11 unmerged branch(es).
+**0 still to read**, of 7 new keys across 9 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -629,7 +647,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dock-flag-order (`8fa3fea5`) — adds no English strings
+### feat/dock-flag-order (`ce43cdea`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -666,27 +684,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/times-statistic (`a18d28ac`) — 6 new, 6 to read @@ NEEDS RULING
-
-- **`lpn_time_stat_averaged`**
-  > Averaged
-  @@ NEEDS RULING
-- **`lpn_time_stat_maximum`**
-  > Maximum
-  @@ NEEDS RULING
-- **`lpn_time_stat_minimum`**
-  > Minimum
-  @@ NEEDS RULING
-- **`lpn_time_stat_none`**
-  > None
-  @@ NEEDS RULING
-- **`lpn_time_stat_range`**
-  > Range
-  @@ NEEDS RULING
-- **`lpn_time_statistic`**
-  > Statistic
-  @@ NEEDS RULING
-
-### fix/mac-cmd-words (`90b781f2`) — adds no English strings
-
-### fix/status-legend (`4cf853c6`) — adds no English strings
+### feat/times-statistic (`9e4768ec`) — adds no English strings

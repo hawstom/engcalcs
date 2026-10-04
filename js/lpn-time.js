@@ -170,7 +170,15 @@
 	 * reporting frames the run already holds, for every per-node and per-link number a frame has,
 	 * in the shape lpnTimeFrameResult returns so every reader swallows it. AVERAGED is the plain
 	 * mean of the reporting-period values (each reporting period weighs the same, as EPANET's
-	 * report does), RANGE is maximum minus minimum. A value missing from a frame is skipped; a
+	 * report does), RANGE is maximum minus minimum.
+	 *
+	 * **LINK FLOW IS STATISTICED ON ITS ABSOLUTE VALUE, AND NOTHING ELSE IS.** Measured against the
+	 * vendored EPANET 2.3 on Net1 (dev/lpn-spike/times-statistic-harness.js section 5): link 110,
+	 * which reverses, reports Averaged 575.06 gpm, where the signed mean is 5.74. This matches
+	 * OWA-EPANET's output code, which takes |Q| for the flow statistic; I could not read that
+	 * source here, so the measurement, not a line number, is the citation. Pressure, head, demand
+	 * and PUMP headloss stay signed (pump 9 Averaged headloss is -126.05); a pipe's headloss and a
+	 * velocity are already non-negative as the engine hands them over. A value missing from a frame is skipped; a
 	 * status (open/closed) is not a number and is carried from the last frame.
 	 * null for NONE, an unknown name, or a run with no frames.
 	 */
@@ -194,7 +202,7 @@
 				vals = [];
 				frames.forEach(function (fr) {
 					v = fr[f] && fr[f][id];
-					if (typeof v === 'number' && isFinite(v)) { vals.push(v); }
+					if (typeof v === 'number' && isFinite(v)) { vals.push(f === 'flows' ? Math.abs(v) : v); }
 				});
 				if (!vals.length) { continue; }
 				sum = 0; lo = Infinity; hi = -Infinity;
@@ -1205,6 +1213,11 @@
 		state.statView = !!r;
 		return r || EC.lpnTimeFrameResult(state.run, state.t);
 	}
+	// The statistic the transport is showing, as the visitor's word for it ("Averaged"), or null on
+	// an ordinary time step. The map legend names it so an average never reads as an instant.
+	EC.lpnTimeStatisticLabel = function () {
+		return (state.statView && state.run && statName()) ? statLabelOf(statName()) : null;
+	};
 	function showStatistic() {
 		pause();
 		state.statView = !!(state.run && statName());
@@ -1983,6 +1996,8 @@
 		if (i < 0) {
 			i = EC.lpnTimeFrameIndexAt(stops.map(function (t) { return { t: t }; }), state.t);
 		}
+		// Wide enough for the statistic's own word, which the 8.5rem cap sized for `24:00` clips.
+		ui.step.style.minWidth = statLabel ? '7rem' : '';
 		ui.step.value = (state.statView && statLabel) ? 'stat' : String(i < 0 ? 0 : i);
 		ui.play.setAttribute('aria-pressed', state.playing ? 'true' : 'false');
 		swapIcon(ui.play, state.playing ? 'pause' : 'play');
