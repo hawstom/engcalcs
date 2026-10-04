@@ -46108,12 +46108,32 @@ var EngCalcs = EngCalcs || {};
 					for (j = 0; j < mOpts.length; j++) { if (mOpts[j][0] === mode) { return mOpts[j][1]; } }
 					return pc.lpn_cp_restrict || 'Restrict these characters';
 				}
+				// **AND THE TIP FOLLOWS THE MODE TOO** (Tom, 2026-10-04 tip verdicts: *"Bug: Allow
+				// uses restrict and restrict uses nothing"*). The re-caption above wrote the new
+				// words with textContent, which wiped the label's `?` along with them: Allow showed
+				// the Restrict tip, and after a switch to Restrict there was no tip at all. Each
+				// mode now leads with its own caption (the rule section 8 of the harness holds) and
+				// shares one sentence about what may be listed.
+				function restrictTip(mode) {
+					var lead = mode === 'deny' ? (pc.lpn_cp_restrict_tip || 'Restrict these characters:')
+						: (pc.lpn_cp_allow_tip || 'Allow only these characters:');
+					return lead + ' ' + (pc.lpn_cp_characters_tip || '"@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.');
+				}
 				var restrictInput;
 				selectRow('restrictMode', pc.lpn_cp_restrict_mode || 'Allow or restrict', pc.lpn_cp_restrict_mode_tip,
 					mOpts, 'allow', function (mode) {
 						var cap = restrictCaption(mode),
 							lab = restrictInput && restrictInput.lpnRow && restrictInput.lpnRow.firstChild;
-						if (lab) { lab.textContent = cap; }
+						if (lab) {
+							if (window.bootstrap && bootstrap.Tooltip) {
+								Array.prototype.forEach.call(lab.querySelectorAll ? lab.querySelectorAll('.ec-help') : [], function (el) {
+									var t = bootstrap.Tooltip.getInstance(el);
+									if (t) { t.dispose(); }
+								});
+							}
+							setFieldLabel(lab, cap, restrictTip(mode));
+							initTipsIn(lab);
+						}
 						// **BOTH CAPTIONS, OR THE FIX IS HALF DONE.** The visible span and the
 						// input's own aria-label are two statements of the same thing, and a
 						// screen reader hears only the second -- so updating one of them would
@@ -46122,7 +46142,7 @@ var EngCalcs = EngCalcs || {};
 						if (restrictInput) { restrictInput.setAttribute('aria-label', cap); }
 					});
 				restrictInput = textRow('restrict', restrictCaption(def.restrictMode || 'allow'),
-					pc.lpn_cp_restrict_tip);
+					restrictTip(def.restrictMode || 'allow'));
 				textRow('minLength', pc.lpn_cp_minlength || 'Length lower limit', pc.lpn_cp_minlength_tip);
 				textRow('maxLength', pc.lpn_cp_length || 'Length upper limit', pc.lpn_cp_length_tip);
 				textRow('low', pc.lpn_cp_low || 'Low limit', pc.lpn_cp_low_tip);
