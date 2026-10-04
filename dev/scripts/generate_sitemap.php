@@ -114,7 +114,7 @@ foreach ($parentPages as $p) {
 
 // --- One HOST's own front doors (Task 697, B1) ------------------------------------------------
 // **THIS FILE'S SITEMAP IS hawsedc.com's, AND IT LISTS EACH PAGE ONCE, AT ITS HOST-INDEPENDENT
-// ANSWER** -- which for the map application stays https://librewaternet.org/app/. A page that
+// ANSWER** -- except a page canonical on another host's own front door (see the main loop). A page that
 // nominates a different origin on one named host (ecCanonicalHostOrigins()) is NOT listed here
 // under that host: epanet-plus-plus.org is its own Search Console property, and a URL of it in
 // hawsedc.com's sitemap is cross-submission that needs both verified by one owner. Its addresses
@@ -144,6 +144,7 @@ if ($onlyHost !== '') {
 }
 
 $count = count($parentPages);
+$ownDoorPages = [];
 foreach ($pages as $file) {
     // Match ec_canonical_url() exactly: the pretty URL, the /index.php collapse, AND the per-page
     // ORIGIN. Since 2026-09-17 the suite does not have one origin -- Looped-Network.php nominates
@@ -151,6 +152,13 @@ foreach ($pages as $file) {
     // would disown one page or the other. sitemap_canonical_check.php holds both halves.
     $path = ecCanonicalPath('/engcalcs/' . $file);
     $pageOrigin = ecCanonicalOrigin('/engcalcs/' . $file, $origin);
+    // **A PAGE WHOSE CANONICAL IS ANOTHER HOST'S OWN FRONT DOOR IS LISTED ONLY THERE** (2026-10-04,
+    // the map app made canonical on epanet-plus-plus.org on every host). That host serves its own
+    // sitemap from `--host=`, so listing the same URLs here as well is cross-submission (honoured
+    // only with both properties verified by one owner) and a second copy of one list, which drifts.
+    $ownDoor = false;
+    foreach (ecCanonicalHostOrigins()[$file] ?? [] as $h => $ho) { if ($ho === $pageOrigin) { $ownDoor = true; } }
+    if ($ownDoor) { $ownDoorPages[] = $file . ' (' . $pageOrigin . ')'; continue; }
     if (in_array($file, $englishOnly, true)) {
         // **?lang=en, NOT the bare path, and this is the whole of the fix made 2026-09-17.** These
         // two pages have no language variants, so the loop below never runs for them and the bare
@@ -199,6 +207,9 @@ if ($lwnPages) {
     echo "  That is CROSS-SUBMISSION: Google honours another host's URLs in this sitemap only when\n";
     echo "  both properties are verified by the same owner, so librewaternet.org must stay a\n";
     echo "  verified property in Search Console alongside hawsedc.com.\n";
+}
+if ($ownDoorPages) {
+    echo "  Left to their own host's sitemap (canonical there on every host): " . implode(', ', $ownDoorPages) . ".\n";
 }
 foreach (ecCanonicalHostOrigins() as $hp => $hosts) {
     foreach ($hosts as $h => $ho) {
