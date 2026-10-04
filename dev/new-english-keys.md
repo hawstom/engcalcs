@@ -60,11 +60,17 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_alt_title`**
   > Alternatives preview
   _Ruled OK 2026-10-03._
+- **`lpn_analyze_at_time`**
+  > Time step: {time}.
+  _Ruled OK 2026-10-03._
 - **`lpn_analyze_menu`**
   > Analyze
   _Ruled OK 2026-10-03._
 - **`lpn_analyze_menu_tip`**
   > Analyses that run the network on a copy: fire flow at each junction, the loss of each pipe, pump, and valve, and the demands scaled up or down.
+  _Ruled OK 2026-10-03._
+- **`lpn_analyze_time_moved`**
+  > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
   _Ruled OK 2026-10-03._
 - **`lpn_calib_axis_obs`**
   > Observed: {q}
@@ -360,9 +366,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_crit_working`**
   > Working: {done} of {total} assets.
   _Ruled OK 2026-10-01._
-- **`lpn_ds_at_time`**
-  > Time step: {time}.
-  _Ruled OK 2026-10-03._
 - **`lpn_ds_bad_multiplier`**
   > Type a demand scale of zero or more, such as 1.5.
   _Ruled OK 2026-10-03._
@@ -489,9 +492,6 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 - **`lpn_ds_stale`**
   > The drawing changed, so the demand scaling results were cleared. Run it again.
   _Ruled OK 2026-10-03._
-- **`lpn_ds_time_moved`**
-  > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
-  _Ruled OK 2026-10-03._
 - **`lpn_ds_title`**
   > Demand scaling
   _Ruled OK 2026-10-03._
@@ -560,7 +560,7 @@ Nothing is waiting. Every English-friction finding has a disposition, so `fricti
 
 # Strings waiting on a branch
 
-**0 still to read**, of 12 new keys across 10 unmerged branch(es).
+**10 still to read**, of 22 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -571,11 +571,26 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/selection-word (`16dce45b`) — adds no English strings
-
-### feat/criticality (`84ea5311`) — adds no English strings
+### chore/analyze-clock-spec (`9ff4ac0a`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/dialog-audit (`6e1a76a2`) — adds no English strings
+
+### feat/dock (`1365f0f3`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -629,3 +644,24 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_result_pump_head_tip`**
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   _Ruled OK 2026-10-03._
+
+### feat/table-selection (`d2276943`) — 6 new, 6 to read @@ NEEDS RULING
+
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map, then press Selection only.
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_tip`**
+  > Show only the elements selected on the map, in every table. Press again to update it after changing the selection, or to turn it off.
+  @@ NEEDS RULING
