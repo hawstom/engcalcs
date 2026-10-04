@@ -120,6 +120,7 @@ const CURATED_SETTING = {
 	linkWidth: 'line weight',
 	textSize: 'label size', symbolSize: 'symbol size', mapHeight: 'pane height',
 	backdropOpacity: 'how strongly the site plan shows through',
+	basemapFilter: 'how the map tiles are toned (Task 617); a display choice, not the model',
 	// **CURATED ON Net3.lwn, 2026-09-22** (Tom, asked whether it should get a threshold back:
 	// *"Yes. 30."*; the "Zoom in to see labels" note it was chosen for went 2026-09-28). EPA's
 	// Net3.inp has no notion of this setting at all, so a raw import carries none -- this is a

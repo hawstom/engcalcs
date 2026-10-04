@@ -505,7 +505,7 @@ html[lang="zh"] .ec-welcome {
    dev/browser-pass/specs/cursorflicker.js, and that spec still holds that bare map says the map's
    own cursor everywhere it shows through. What is superseded is the GLYPH twice over: `grab`,
    because this is not a web map, and then `pointer`, because he looked at it. */
-#lpn_canvas { touch-action: none; cursor: default; --lpn-sym: 1; --lpn-symf: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-backdrop-img-opacity: 1; --lpn-map-bg: #fff; }
+#lpn_canvas { touch-action: none; cursor: default; --lpn-sym: 1; --lpn-symf: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-backdrop-img-opacity: 1; --lpn-basemap-filter: none; --lpn-map-bg: #fff; }
 /* **AND NOTHING CHANGES WHILE THE MAP IS MOVING**, which is why there is no `#lpn_canvas.lpn-panning`
    rule here any more. It was `cursor: grabbing`, the closing half of the open hand, and it goes with
    the hand. `setPanning()` still writes the class on the one frame a pan really translates the map,
@@ -529,7 +529,7 @@ html[lang="zh"] .ec-welcome {
    the cursor, and a tile that could become an event target would sit between the user and every node
    it happens to cover. It shares the backdrop's fade for the same reason the backdrop has one -- a
    dense city map swallows a thin pipe. */
-.lpn-basemap { opacity: var(--lpn-backdrop-opacity, 1); pointer-events: none; }
+.lpn-basemap { opacity: var(--lpn-backdrop-opacity, 1); filter: var(--lpn-basemap-filter, none); pointer-events: none; }
 /* Symbol opacity, for laying the network out over a backdrop image: applied to the two whole
    layers that hold symbols, so nodes/pipes/arrows/vertex handles fade together as one drawing
    rather than each fading independently and showing where they overlap. Labels, masks and leaders

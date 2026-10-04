@@ -5954,6 +5954,9 @@ var EngCalcs = EngCalcs || {};
 			// (a ratio and a percentage), so neither is reinterpreted on a unit change.
 			symbolCapMultiple: 0.5,
 			symbolCapPercentile: 20,
+			// Task 617: a CSS filter on the TILE LAYER only (LPN_BASEMAP_FILTERS). Project data on the
+			// precedent of backdropOpacity beside it; an old file merges onto this and opens Normal.
+			basemapFilter: 'normal',
 			backdropOpacity: 0.5, // 0-1, applied to the backdrop image -- the other half of the same control (R-205: new-project default, matched by every shipped example)
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
 			// (ROADMAP Task 329).
@@ -7543,8 +7546,22 @@ var EngCalcs = EngCalcs || {};
 		bop = (bop === undefined || bop === null || !isFinite(bop)) ? 1 : bop;
 		return (georefActive() || mapgeoActive()) ? Math.min(bop, LPN_WIZARD_BACKDROP_MAX) : bop;
 	}
+	// **BASEMAP FILTER (Task 617).** A display-time CSS filter on the tile layer `.lpn-basemap` and
+	// nothing else: the network, the labels and the attribution (separate DOM) are never filtered, and
+	// nothing new is fetched. No invert or hue-rotate preset, on purpose. An unknown stored name is Normal.
+	var LPN_BASEMAP_FILTERS = {
+		normal: 'none',
+		muted: 'grayscale(60%) contrast(0.9)',
+		faded: 'grayscale(40%) brightness(1.1) contrast(0.8)',
+		grayscale: 'grayscale(100%)'
+	};
+	function basemapFilterName() {
+		var f = settings.basemapFilter;
+		return (typeof f === 'string' && LPN_BASEMAP_FILTERS.hasOwnProperty(f)) ? f : 'normal';
+	}
 	function refreshBackdropOpacity() {
 		if (!svg) { return; }
+		svg.style.setProperty('--lpn-basemap-filter', LPN_BASEMAP_FILTERS[basemapFilterName()]);
 		var bop = settings.backdropOpacity;
 		svg.style.setProperty('--lpn-backdrop-opacity', (bop === undefined || bop === null) ? 1 : bop);
 		svg.style.setProperty('--lpn-backdrop-img-opacity', backdropImageOpacity());
@@ -46533,6 +46550,22 @@ var EngCalcs = EngCalcs || {};
 			else { backdropOpacityInput.value = settings.backdropOpacity; }
 		});
 		row(mapBody, pc.lpn_settings_backdrop_opacity || 'Background image opacity (0 to 1)', backdropOpacityInput);
+		// Task 617: tone the street or satellite tiles down. Same save path as the opacity row above.
+		var basemapFilterSelect = document.createElement('select');
+		basemapFilterSelect.id = 'lpn_set_basemap_filter';
+		[['normal', pc.lpn_basemap_filter_normal || 'Normal'],
+			['muted', pc.lpn_basemap_filter_muted || 'Muted'],
+			['faded', pc.lpn_basemap_filter_faded || 'Faded'],
+			['grayscale', pc.lpn_basemap_filter_grayscale || 'Grayscale']].forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === basemapFilterName()) { opt.selected = true; }
+			basemapFilterSelect.appendChild(opt);
+		});
+		basemapFilterSelect.addEventListener('change', function () {
+			settings.basemapFilter = basemapFilterSelect.value; refreshBackdropOpacity(); saveToStorage();
+		});
+		row(mapBody, pc.lpn_settings_basemap_filter || 'Basemap filter', basemapFilterSelect,
+			pc.lpn_settings_basemap_filter_tip);
 		var legendSelect = document.createElement('select');
 		legendPositionOptions(pc).forEach(function (o) {
 			var opt = document.createElement('option');
