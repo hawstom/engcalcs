@@ -476,6 +476,20 @@
    "words": "8116: OK. Merge.",
    "context": "Typed in the session, 2026-10-04 evening, after his browser pass on port 8116 of the four follow-up answers (customer and zoom window Specify wording, quality tolerance, specific gravity tip deleted).",
    "pin_note": "He tested a08acce9; the pin adds only a merge of master into the branch (conflicts resolved as master code with the branch wording) and a regenerated keys list."
+  },
+  "feat/chain-draw": {
+   "head": "42b5df39f08b5bc6bb7b417130355e6babf8bb74",
+   "date": "2026-10-04",
+   "words": "8113 chain tool: Done. Close, merge, and delete branch.",
+   "context": "His own pasted message, 2026-10-04 late evening, after his browser pass on the Junction Pipe Chain (his icon sketch, name and Chain-first tip applied, junctions sized to the Junction icon).",
+   "pin_note": "He tested the head that serves the preview, 42b5df39, which already includes a merge of master."
+  },
+  "feat/scenario-option": {
+   "head": "c3f82b7df06e2e97718e33c489c15d191a7edc59",
+   "date": "2026-10-04",
+   "words": "8111 the \"Calculation options\" heading and the fixed double tip:  Done. Close, merge, and delete branch.",
+   "context": "His own pasted message, 2026-10-04 late evening, after his browser pass.",
+   "pin_note": "He tested f0d9897a; the pin adds only a merge of master (conflicts resolved as master code with the branch override wording) and a regenerated keys list."
   }
  }
 }
