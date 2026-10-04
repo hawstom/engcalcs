@@ -1614,7 +1614,10 @@ html[lang="zh"] .ec-welcome {
    phone in tall mode, never wider. The message keeps its own line breaks (consent paragraphs). */
 /* `width: max-content` because a box placed at left: 50% only shrinks to fit the HALF of the window
    to its right: a long question on a phone was a 195 px column. Capped, it takes the room it needs. */
-#lpn_dialog { width: max-content; max-width: min(34em, calc(100vw - 2em)); box-sizing: border-box; }
+/* The padding lives HERE, not in the element's inline style: an inline `padding: 12px` outranked the
+   titled rule below, and the title band lay over the first line of every question (Tom, 2026-10-04,
+   Delete network). */
+#lpn_dialog { width: max-content; max-width: min(34em, calc(100vw - 2em)); box-sizing: border-box; padding: 12px; }
 #lpn_dialog.lpn-dialog-titled { padding-top: 51px; }
 .lpn-dialog-msg { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .lpn-dialog-input { display: block; width: 100%; box-sizing: border-box; margin-top: 8px; padding: 3px 6px; font: inherit; }

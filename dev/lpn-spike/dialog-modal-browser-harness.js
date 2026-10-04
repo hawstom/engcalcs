@@ -21,7 +21,9 @@
 //   (7) no native dialog is raised anywhere in it;
 //   (8) on a phone the registration bar is a short band along the foot, not a column over the map;
 //   (9) a HELD Enter on Edit > Delete network opens the box and never presses its OK (Perry,
-//       2026-10-04: the auto-repeat deleted all 45 nodes); a fresh Enter still confirms.
+//       2026-10-04: the auto-repeat deleted all 45 nodes); a fresh Enter still confirms, and
+//       Ctrl+Z, Ctrl+Y and the Undo button take the deletion back and forth;
+//  (10) the title band never lies over the message, for every kind, at three window sizes;
 'use strict';
 
 const path = require('path');
@@ -320,9 +322,52 @@ async function sectionHeldEnter(browser) {
 	await a.page.keyboard.press('Enter');
 	await a.settle(800);
 	ok('a fresh Enter confirms: the network is deleted', !(await box(a)) && (await nodes()) === 0, String(await nodes()));
+	// Tom, 2026-10-04: *"Undo key doesn't work for Delete network."* One undoable step now.
+	await a.page.evaluate(() => { if (document.activeElement && document.activeElement.blur) { document.activeElement.blur(); } });
+	await a.page.keyboard.press('Control+z');
+	await a.settle(800);
+	ok('Ctrl+Z gives the whole network back', (await nodes()) === before, String(await nodes()));
+	await a.page.keyboard.press('Control+y');
+	await a.settle(800);
+	ok('Ctrl+Y deletes it again', (await nodes()) === 0, String(await nodes()));
+	const undoClicked = await a.page.evaluate((l) => {
+		const b = Array.from(document.querySelectorAll('button')).find((x) => x.offsetParent && (x.getAttribute('aria-label') === l || x.title === l || (x.textContent || '').trim() === l));
+		if (b) { b.click(); }
+		return !!b;
+	}, await a.page.evaluate(() => EngCalcs.pageConfig.lpn_tool_undo));
+	await a.settle(800);
+	ok('the Undo button gives it back too', undoClicked && (await nodes()) === before, undoClicked + ' ' + (await nodes()));
+	ok('the question no longer says it cannot be undone', await a.page.evaluate(() => !/undone/.test(EngCalcs.pageConfig.lpn_confirm_delete_network)));
 	ok('no native dialog was raised', natives.length === 0, natives.join(' | '));
 	ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	await a.close();
+}
+
+async function sectionTitleBand(browser) {
+	// Tom, 2026-10-04 (Delete network): the title band lay over the first line of the question,
+	// because the box's inline `padding: 12px` outranked the titled rule's top padding.
+	for (const vp of [{ width: 1440, height: 900 }, { width: 1100, height: 700 }, { width: 390, height: 844 }]) {
+		console.log('\n--- the title band clears the message (' + vp.width + ' x ' + vp.height + ') ---');
+		const natives = [];
+		const a = await openSession(browser, vp, natives);
+		const long = await a.page.evaluate(() => EngCalcs.pageConfig.lpn_confirm_wipe);
+		for (const kind of ['alert', 'confirm', 'prompt', 'copy']) {
+			await ask(a, { kind, text: long, value: 'x' });
+			const r = await a.page.evaluate(() => {
+				const d = document.getElementById('lpn_dialog'), t = document.getElementById('lpn_dialog_title');
+				const m = document.querySelector('#lpn_dialog_body .lpn-dialog-msg');
+				if (!d || !t || !m) { return null; }
+				const dr = d.getBoundingClientRect(), tr = t.getBoundingClientRect(), mr = m.getBoundingClientRect();
+				return { tb: tr.bottom, mt: mr.top, left: dr.left, top: dr.top, w: dr.width, vw: window.innerWidth, vh: window.innerHeight };
+			});
+			ok(kind + ': the title band\'s bottom is above the message\'s top', r && r.tb <= r.mt, r && (r.tb + ' vs ' + r.mt));
+			ok(kind + ': the box is centred across the window, not in a corner', r && Math.abs(r.left + r.w / 2 - r.vw / 2) <= 2 && r.top >= r.vh * 0.1, r && JSON.stringify([r.left, r.top, r.w]));
+			await a.page.keyboard.press('Escape');
+			await a.settle(150);
+		}
+		ok('no native dialog was raised', natives.length === 0, natives.join(' | '));
+		await a.close();
+	}
 }
 
 async function main() {
@@ -340,6 +385,7 @@ async function main() {
 	try {
 		await sectionComponent(browser);
 		await sectionPhone(browser);
+		await sectionTitleBand(browser);
 		await sectionScaleByPicking(browser);
 		await sectionPhoneBar(browser);
 		await sectionHeldEnter(browser);

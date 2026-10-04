@@ -1503,7 +1503,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <div id="lpn_dialog_backdrop" class="d-print-none" style="display:none;position:fixed;z-index:1860;left:0;top:0;right:0;bottom:0;background:var(--ec-a-0-0-0-25)"></div>
 <?php // **AND EVERY QUESTION THE PAGE ASKS** (Task 710): askDialog() in js/looped-network.js puts each
       // former alert/confirm/prompt in here, with the same title bar as the page's other boxes. ?>
-<div id="lpn_dialog" class="d-print-none lpn-dialog" role="dialog" aria-modal="true" aria-describedby="lpn_dialog_body" style="display:none;position:fixed;z-index:1870;left:50%;top:20%;transform:translateX(-50%);background:var(--ec-bg);border:1px solid var(--ec-ink);padding:12px;box-shadow:2px 2px 12px var(--ec-a-0-0-0-4)">
+<div id="lpn_dialog" class="d-print-none lpn-dialog" role="dialog" aria-modal="true" aria-describedby="lpn_dialog_body" style="display:none;position:fixed;z-index:1870;left:50%;top:20%;transform:translateX(-50%);background:var(--ec-bg);border:1px solid var(--ec-ink);box-shadow:2px 2px 12px var(--ec-a-0-0-0-4)">
 	<div id="lpn_dialog_title" class="lpn-setbox-title" style="display:none"></div>
 	<div id="lpn_dialog_body"></div>
 	<div id="lpn_dialog_buttons" style="margin-top:10px;text-align:right"></div>
