@@ -20,6 +20,10 @@
 // the same network solved as one instant leaves the pump exactly where it was, whatever any rule
 // says. Net1's own `[TIMES]` state a 24 h duration, which is why the rules were written against a
 // clock: the shipped example already runs long enough to reach both of their windows.
+//
+// **SO THE EXAMPLE DEPARTS FROM EPA'S Net1 FROM 10 AM, BY DESIGN.** Compared with the bare
+// reference Net1.inp, pipe 110 reverses at 10:00; that is these rules, not a misread control.
+// examples-vs-epanet-harness.js compares it with Net1.inp plus the same two rules instead.
 
 'use strict';
 
