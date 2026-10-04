@@ -680,6 +680,8 @@
         "lpn_pane_manage_cols_down": "Move down",
         "lpn_pane_manage_cols_top": "Move to beginning",
         "lpn_pane_manage_cols_bottom": "Move to end",
+        "lpn_pane_manage_cols_width": "Width (em)",
+        "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
         "lpn_pane_colmenu_tip": "Hide or manage columns",
         "lpn_pane_sortarrow_tip": "Reverse the sort",
         "lpn_tool_area_window": "Select a window",
@@ -1776,7 +1778,9 @@
         "lpn_labels_customer_width_tip": "Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.",
         "lpn_settings_label_use_view": "Use current view",
         "lpn_settings_page": "Page",
-        "lpn_settings_page_note": "Saved in this calculator, not in the project.",
+        "lpn_saved_project": "Saved with the project",
+        "lpn_saved_browser": "Saved in this browser",
+        "lpn_saved_session": "Not saved",
         "lpn_settings_hydraulics": "Hydraulics",
         "lpn_settings_quality": "Quality",
         "lpn_settings_quality_track": "Quality parameter",
@@ -2334,7 +2338,7 @@
         "lpn_survey_note_id_taken": "Name already in project, new name assigned.",
         "lpn_survey_note_id_invalid": "Name cannot be used here, new name assigned."
     },
-    "count": 2332,
+    "count": 2336,
     "active_prefixes": [
         "about",
         "bpn",
