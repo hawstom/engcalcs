@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**16 still to read on master**, of 65 untranslated keys, of 2344 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**18 still to read on master**, of 67 untranslated keys, of 2346 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -254,7 +254,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (65, 16 to read @@ NEEDS RULING)
+## lpn_  (67, 18 to read @@ NEEDS RULING)
 
 - **`lpn_analyze_at_time`**
   > Time step: {time}.
@@ -262,6 +262,12 @@ never edits a synonym.
 - **`lpn_analyze_time_moved`**
   > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
   _Ruled OK 2026-10-03._
+- **`lpn_contour_show`**
+  > Show contours
+  @@ NEEDS RULING
+- **`lpn_contour_show_tip`**
+  > Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.
+  @@ NEEDS RULING
 - **`lpn_dock_autohide`**
   > Auto-hide
   @@ NEEDS RULING
@@ -456,7 +462,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**12 still to read**, of 19 new keys across 11 unmerged branch(es).
+**35 still to read**, of 43 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -467,30 +473,46 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/basemap-style (`dc220cf3`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/basemap-style (`0bc4d9bb`) — 6 new, 6 to read @@ NEEDS RULING
 
-- **`lpn_basemap_filter_faded`**
+- **`lpn_basemap_style_faded`**
   > Faded
   @@ NEEDS RULING
-- **`lpn_basemap_filter_grayscale`**
+- **`lpn_basemap_style_grayscale`**
   > Grayscale
   @@ NEEDS RULING
-- **`lpn_basemap_filter_muted`**
+- **`lpn_basemap_style_muted`**
   > Muted
   @@ NEEDS RULING
-- **`lpn_basemap_filter_normal`**
+- **`lpn_basemap_style_normal`**
   > Normal
   @@ NEEDS RULING
-- **`lpn_settings_basemap_filter`**
-  > Basemap filter
+- **`lpn_settings_basemap_style`**
+  > Basemap style
   @@ NEEDS RULING
-- **`lpn_settings_basemap_filter_tip`**
-  > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen; the drawing, labels and credit are not filtered.
+- **`lpn_settings_basemap_style_tip`**
+  > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.
+  @@ NEEDS RULING
+
+### feat/chain-draw (`e0bc5e0f`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_mode_add_chain`**
+  > Mode: Add Junction and Pipe. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
+  @@ NEEDS RULING
+- **`lpn_tool_add_chain`**
+  > Junction and Pipe
+  @@ NEEDS RULING
+- **`lpn_tool_add_chain_tip`**
+  > Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
   @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dialog-audit (`4a665186`) — adds no English strings
+### feat/dialog-audit (`9bdb5559`) — adds no English strings
+
+### feat/elev-default (`90f33841`) — adds no English strings
+
+### feat/epanet-pp-brand (`3655b959`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -512,6 +534,60 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
+### feat/pda (`d895a470`) — 17 new, 17 to read @@ NEEDS RULING
+
+- **`lpn_diag_pda_needs_epanet`**
+  > The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.
+  @@ NEEDS RULING
+- **`lpn_engine_pda_route`**
+  > Solved with the EPANET solver, because the demand model is pressure driven.
+  @@ NEEDS RULING
+- **`lpn_pda_deficit_note`**
+  > Junctions receiving less than their demand: {n}.
+  @@ NEEDS RULING
+- **`lpn_result_delivered_demand`**
+  > Delivered demand
+  @@ NEEDS RULING
+- **`lpn_result_delivered_demand_tip`**
+  > The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.
+  @@ NEEDS RULING
+- **`lpn_result_demand_deficit`**
+  > Demand deficit
+  @@ NEEDS RULING
+- **`lpn_result_demand_deficit_tip`**
+  > The demand this junction asks for and does not receive, because the pressure is below the required pressure.
+  @@ NEEDS RULING
+- **`lpn_settings_demand_model`**
+  > Demand model
+  @@ NEEDS RULING
+- **`lpn_settings_demand_model_dda`**
+  > Demand driven (DDA)
+  @@ NEEDS RULING
+- **`lpn_settings_demand_model_pda`**
+  > Pressure driven (PDA)
+  @@ NEEDS RULING
+- **`lpn_settings_demand_model_tip`**
+  > Choose how junctions receive water. Demand driven delivers every demand in full, whatever the pressure. Pressure driven delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.
+  @@ NEEDS RULING
+- **`lpn_settings_min_pressure`**
+  > Minimum pressure
+  @@ NEEDS RULING
+- **`lpn_settings_min_pressure_tip`**
+  > Enter the pressure at or below which a junction receives no water. Use this project's pressure unit.
+  @@ NEEDS RULING
+- **`lpn_settings_pressure_exponent`**
+  > Pressure exponent
+  @@ NEEDS RULING
+- **`lpn_settings_pressure_exponent_tip`**
+  > Enter the exponent of the curve that rises from no water at the minimum pressure to the full demand at the required pressure.
+  @@ NEEDS RULING
+- **`lpn_settings_req_pressure`**
+  > Required pressure
+  @@ NEEDS RULING
+- **`lpn_settings_req_pressure_tip`**
+  > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit.
+  @@ NEEDS RULING
+
 ### feat/profile-file (`a095faf4`) — 4 new, all ruled
 
 - **`lpn_profile_file_done`**
@@ -527,7 +603,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/scenario-option (`40d49c55`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/scenario-option (`af125b8e`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_scenario_duration_tip`**
   > Overrides the project's total run time in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
@@ -548,4 +624,17 @@ build for that would be a gate nobody keeps. Refresh it with
   > Scenario overrides:
   @@ NEEDS RULING
 
-### fix/tip-width (`5aa1cd2d`) — adds no English strings
+### feat/tip-verdict (`a08acce9`) — 4 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_choice_default`**
+  > Default
+  @@ NEEDS RULING
+- **`lpn_cp_allow_tip`**
+  > Allow only these characters:
+  @@ NEEDS RULING
+- **`lpn_cp_characters_tip`**
+  > "@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.
+  @@ NEEDS RULING
+- **`lpn_pane_sort_desc`**
+  > Sort descending
+  _Ruled OK 2026-09-26._
