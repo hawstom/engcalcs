@@ -304,7 +304,6 @@ const CONDITIONAL_DISPLAY = [
 	[/^renderLabelsLegend$/, /^box$/, 'the labels legend on the map: same reasoning as the colour legend above'],
 	[/^updateOffscreenNotice$/, /^el$/, 'the one-line "something is off screen" notice on the map'],
 	[/^refreshBasemapTeaser$/, /^b$/, 'the satellite toggle button'],
-	[/^paneSelButtonSync$/, /^b$/, 'the Tables pane\'s Selection only button (Task 757): shown on a table tab only, like Print; a control in the pane head, not a panel'],
 	[/^refreshBasemapCredit$/, /^(?:c|el2)$/, 'a basemap attribution line in the map footer, required by the tile licences'],
 	[/^georefRefreshBar$/, /^bar$/, 'the georeference bar across the map: a fixed strip, not a draggable box'],
 	[/^georefRefreshBar$/, /^georefBarEl\('lpn_georef_\w+'\)$/, 'a control inside the georeference bar'],
