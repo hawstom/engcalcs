@@ -1420,11 +1420,12 @@ echoHeader("EngCalcsApp", $html_title, "", false);
       // popover body scrolls vertically already; this adds the other axis, inside the box. ?>
 <div id="lpn_rptbox" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_rptbox_title">
 	<div id="lpn_rptbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_time_run_report']?></div>
-	<?php // Beside the close button rather than inside the body: the report can be thousands of
-	      // lines, and a Copy that scrolls away with the text is a Copy nobody finds. ?>
-	<button type="button" id="lpn_rptbox_copy" class="lpn-rptbox-copy"><?=$ec_lang['lpn_time_run_report_copy']?></button>
+	<?php // Copy sits in the sticky .lpn-box-tools row, not the title band (the dock icons' and the
+	      // X's): the report can be thousands of lines, and a Copy that scrolls away with the text
+	      // is a Copy nobody finds. ?>
 	<button type="button" id="lpn_rptbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
+		<div class="lpn-box-tools"><button type="button" id="lpn_rptbox_copy" class="lpn-rptbox-copy"><?=$ec_lang['lpn_time_run_report_copy']?></button></div>
 		<pre id="lpn_rptbox_pre" class="lpn-rptbox-pre"></pre>
 	</div>
 </div>
@@ -1454,15 +1455,18 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 <?php // THE FULL REPORT (ROADMAP Task 715). EPANET's Report > Full: every node and every link at
       // every reporting time step of the last run. Built in JS (rebuildFullReport) from the same
       // frames the Status report and the Tables pane read, so the three cannot disagree. Download
-      // and Print sit beside the close button, the same placement the run report's Copy button
-      // uses, because this table can run to thousands of rows and a button that scrolls away with
-      // it is a button nobody finds. ?>
+      // and Print sit in the sticky .lpn-box-tools row at the top of the body, never in the title
+      // band (that band is the dock icons' and the X's), and the row stays put as the table
+      // scrolls, because this table can run to thousands of rows and a button that scrolls away
+      // with it is a button nobody finds. ?>
 <div id="lpn_full_box" class="d-print-none lpn-popover lpn-setbox lpn-ffbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_fullbox_title">
 	<div id="lpn_fullbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_full_title']?></div>
-	<button type="button" id="lpn_full_csv" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_download_csv']?></button>
-	<button type="button" id="lpn_full_print" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_print']?></button>
 	<button type="button" id="lpn_full_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body">
+		<div class="lpn-box-tools">
+			<button type="button" id="lpn_full_csv" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_download_csv']?></button>
+			<button type="button" id="lpn_full_print" class="lpn-rptbox-copy"><?=$ec_lang['lpn_full_print']?></button>
+		</div>
 		<div id="lpn_full_report" class="lpn-ff-report"></div>
 	</div>
 </div>
