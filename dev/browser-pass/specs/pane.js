@@ -23,7 +23,8 @@ const { Session } = require('../lib/session');
 
 exports.title = '17. Bottom pane: the asset tables';
 
-// **PROFILE IS LAST** (Tom, 2026-08-21: *"making Profile the last tab"*; this spec still had it
+// **PROFILE WAS LAST** until 2026-10-04, when the graph tabs took the Graphs menu's order (Time series,
+// Profile, Frequency, Flow balance). Older note (Tom, 2026-08-21: *"making Profile the last tab"*; this spec still had it
 // first until Task 511). It is the odd one out — a drawing where the other six are tables — and the
 // end of the strip is where an odd one out belongs rather than the front, standing between the
 // reader and the six things that are alike. It is also what lets the Print button hold the leading

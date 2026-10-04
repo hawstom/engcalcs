@@ -339,16 +339,15 @@ console.log('\n--- six tabs, one renderer ---');
 	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers',
 		'eight asset tables, the six water assets in the toolbar’s Add order, nodes before links',
 		ids.join(','));
-	// **PROFILE IS LAST, NOT FIRST** (Tom, 2026-08-21: "making Profile the last tab"). It is still
-	// the odd one out -- a drawing where the other six are tables -- and the end of the strip is
-	// where an odd one out belongs; at the front it stood between the reader and the six things
-	// that are alike. Asserted at BOTH ends, because the bug this catches is a reorder that drops
-	// it somewhere in the middle of the six.
-	report(L.paneTabIds()[L.paneTabIds().length - 1] === 'profile',
-		'Profile is the LAST tab — it is a drawing, the six before it are tables',
+	// **PROFILE FOLLOWS TIME SERIES** (Tom, 2026-10-04: the graph tabs match the Graphs menu):
+	// after the eight tables, Time series, Profile, Frequency, Flow balance. It was last until
+	// then (2026-08-21). Asserted so a reorder cannot drop it among the tables.
+	report(L.paneTabIds().indexOf('profile') === L.paneTabIds().indexOf('timeseries') + 1
+		&& L.paneTabIds().indexOf('profile') >= 8,
+		'Profile follows Time series, after the eight tables',
 		L.paneTabIds().join(','));
 	report(L.paneTabIds()[0] === 'junctions',
-		'...so the strip OPENS on a table, which is what the Print button beside it acts on',
+		'...so the strip OPENS on a table, which is what the Print table menu row acts on',
 		L.paneTabIds()[0]);
 	// **NINE SINCE TASK 599**: Time series joined, the second DRAWING in the strip. It sits with
 	// the profile rather than before the tables, which keeps the shape Tom's ordering rule is about
@@ -675,7 +674,7 @@ console.log('\n--- the write seam ---');
 // silently growing past the share of the window the ceiling reserves for it.
 console.log('\n--- the strip may be two lines ---');
 {
-	// The wrapping row is .lpn-pane-strip, which holds the Print button AND the tablist; the
+	// The wrapping row is .lpn-pane-strip, which holds the tablist; the
 	// tablist itself is `display: contents` so both wrap as one flow (Task 488). Asking
 	// .lpn-pane-tabs for flex-wrap here would pass on a strip that cannot wrap at all.
 	report(/\.lpn-pane-strip \{[^}]*flex-wrap: wrap/.test(css), 'the tab strip wraps rather than overflowing');
