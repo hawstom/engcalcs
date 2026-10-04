@@ -5071,12 +5071,13 @@ var EngCalcs = EngCalcs || {};
 			icon: 'insert', label: pc.lpn_scenario_new || 'New scenario…',
 			fn: function () {
 				var suggested = (pc.lpn_scenario_new_name || 'Scenario {n}').replace('{n}', scenarios.length);
-				var v = window.prompt(pc.lpn_scenario_prompt_name || 'Name for this scenario', suggested);
-				if (v === null) { return; }
-				v = v.trim();
-				if (!v) { return; }
-				saveUndoSnapshot();
-				createScenario(v);
+				askDialog({ kind: 'prompt', text: pc.lpn_scenario_prompt_name || 'Name for this scenario', value: suggested }, function (v) {
+					if (v === null) { return; }
+					v = v.trim();
+					if (!v) { return; }
+					saveUndoSnapshot();
+					createScenario(v);
+				});
 			}
 		});
 		rows.push({
@@ -5084,12 +5085,13 @@ var EngCalcs = EngCalcs || {};
 			// selector keys off isBase, so a rename here would rename nothing a user can see.
 			icon: 'edit', label: pc.lpn_scenario_rename || 'Rename scenario…', disabled: scn.isBase,
 			fn: function () {
-				var v = window.prompt(pc.lpn_scenario_prompt_name || 'Name for this scenario', scn.name || '');
-				if (v === null || !v.trim()) { return; }
-				saveUndoSnapshot();
-				scn.name = v.trim();
-				refreshScenarioStatus();
-				saveToStorage();
+				askDialog({ kind: 'prompt', text: pc.lpn_scenario_prompt_name || 'Name for this scenario', value: scn.name || '' }, function (v) {
+					if (v === null || !v.trim()) { return; }
+					saveUndoSnapshot();
+					scn.name = v.trim();
+					refreshScenarioStatus();
+					saveToStorage();
+				});
 			}
 		});
 		rows.push({
@@ -5099,9 +5101,11 @@ var EngCalcs = EngCalcs || {};
 				// question, and one holding forty values is worth a specific one.
 				var msg = (pc.lpn_scenario_delete_confirm || 'Delete the scenario {name}, and the {n} values that belong to it alone? The drawing itself is not changed.')
 					.replace('{name}', scenarioDisplayName(scn)).replace('{n}', overrideCount(scn));
-				if (!window.confirm(msg)) { return; }
-				saveUndoSnapshot();
-				deleteScenario(scn.id);
+				askDialog({ kind: 'confirm', text: msg }, function (yes) {
+					if (!yes) { return; }
+					saveUndoSnapshot();
+					deleteScenario(scn.id);
+				});
 			}
 		});
 		rows.push({ separator: true });
@@ -5380,7 +5384,7 @@ var EngCalcs = EngCalcs || {};
 			return s.prop && pushFieldShown(s) && (!group || s.group === group);
 		});
 		if (!active.length) {
-			alert(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
+			tellNotice(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
 			return;
 		}
 		// Counted, not estimated: how many overrides would actually be discarded. Zero says so in
@@ -5404,7 +5408,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			if (any) { touched++; }
 		});
-		if (!hits) { alert(pc.lpn_scenario_push_none || 'No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.'); return; }
+		if (!hits) { tellNotice(pc.lpn_scenario_push_none || 'No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.'); return; }
 		// NAMES the properties as well as counting them, and NAMES THE ELEMENT when scoped to one --
 		// reusing lpn_field_id ("ID") rather than minting a key, per the whole-label reuse rule.
 		var msg = (pc.lpn_scenario_push_confirm || 'Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this.')
@@ -5412,18 +5416,20 @@ var EngCalcs = EngCalcs || {};
 			+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
 			+ '\n' + (pc.lpn_scenario_push_scenarios || 'Scenarios affected:') + ' ' + touched
 			+ '\n' + (pc.lpn_scenario_push_values || 'Values thrown away:') + ' ' + hits;
-		if (!window.confirm(msg)) { return; }
-		saveUndoSnapshot();
-		scenarios.forEach(function (s) {
-			if (s.isBase) { return; }
-			scopedKeys(s).forEach(function (k) {
-				active.forEach(function (spec) {
-					(spec.ovProps || [spec.prop]).forEach(function (p) { delete s.overrides[k][p]; });
+		askDialog({ kind: 'confirm', text: msg }, function (yes) {
+			if (!yes) { return; }
+			saveUndoSnapshot();
+			scenarios.forEach(function (s) {
+				if (s.isBase) { return; }
+				scopedKeys(s).forEach(function (k) {
+					active.forEach(function (spec) {
+						(spec.ovProps || [spec.prop]).forEach(function (p) { delete s.overrides[k][p]; });
+					});
+					if (!Object.keys(s.overrides[k]).length) { delete s.overrides[k]; }
 				});
-				if (!Object.keys(s.overrides[k]).length) { delete s.overrides[k]; }
 			});
+			applyScenarioChange();
 		});
-		applyScenarioChange();
 	}
 
 	/**
@@ -9341,7 +9347,15 @@ var EngCalcs = EngCalcs || {};
 			row(pc.lpn_contour_dem || 'Ground between nodes from Mapbox DEM', check('lpn_contour_dem', contourTerrainWanted(), function (on, c) {
 				// THE QUESTION IS ASKED HERE AND NOWHERE ELSE: a redraw never asks, so a no is never
 				// asked again on the next solve. A no unticks the box and stores nothing.
-				if (on && EngCalcs.lpnTerrainAskForContour && !EngCalcs.lpnTerrainAskForContour()) { c.checked = false; on = false; }
+				if (on && EngCalcs.lpnTerrainAskForContour) {
+					// Unticked until the answer, so a No has nothing to take back.
+					c.checked = false;
+					EngCalcs.lpnTerrainAskForContour(function (yes) {
+						c.checked = !!yes;
+						settings.contourTerrain = !!yes; contourChanged();
+					});
+					return;
+				}
 				settings.contourTerrain = on; contourChanged();
 			}), pc.lpn_contour_dem_tip);
 		}
@@ -13864,7 +13878,7 @@ var EngCalcs = EngCalcs || {};
 		// tell it from a picture placed off screen.
 		img.onerror = function () {
 			var pc = EngCalcs.pageConfig || {};
-			alert(pc.lpn_backdrop_unreadable || 'This picture cannot be shown by your web browser. Save it as a PNG or JPEG picture and add it again.');
+			setWarning(pc.lpn_backdrop_unreadable || 'This picture cannot be shown by your web browser. Save it as a PNG or JPEG picture and add it again.');
 		};
 		img.src = dataUrl;
 	}
@@ -13964,8 +13978,8 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
 		reader.onload = function (ev) {
 			var w = parseWorldFile(ev.target.result);
-			if (!w) { alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.'); return; }
-			if (!w.ok) { alert(pc.lpn_backdrop_wld_bad || 'This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.'); return; }
+			if (!w) { setWarning(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.'); return; }
+			if (!w.ok) { setWarning(pc.lpn_backdrop_wld_bad || 'This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.'); return; }
 			applyWorldFile(w);
 		};
 		reader.readAsText(file);
@@ -14024,6 +14038,14 @@ var EngCalcs = EngCalcs || {};
 		regModeBar.appendChild(btn);
 		document.body.appendChild(regModeBar);
 	}
+	// Task 710: the instruction a registration step used to put in an alert. A notice lasts eight
+	// seconds and the mode hint is hidden on a phone, so the bar that stays up for the whole mode
+	// carries the current step's words too (and the notice and log keep them).
+	function setRegStep(text) {
+		var pc = EngCalcs.pageConfig || {}, base = pc.lpn_backdrop_busy || 'Adjusting the background image.';
+		setNotice(text);
+		if (regModeBar && regModeBar.firstChild) { regModeBar.firstChild.textContent = base + ' ' + text; }
+	}
 	function setNodeCursorAllowed(v) { svg.classList.toggle('regmode-node', v); }
 	// Single mutual-exclusion point: every sequence below registers a teardown function here, and
 	// every entry point calls cancelActive() first, so re-picking the same action mid-sequence tears
@@ -14044,7 +14066,7 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {}, clicks = [];
 		setRegMode(true);
-		alert(pc.lpn_backdrop_scale_prompt1 || 'Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.');
+		setRegStep(pc.lpn_backdrop_scale_prompt1 || 'Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.');
 		var handler = function (e) {
 			clicks.push(worldToImageLocal(screenToWorld(e.clientX, e.clientY)));
 			if (clicks.length === 2) {
@@ -14052,8 +14074,10 @@ var EngCalcs = EngCalcs || {};
 				activeCancel = null; setRegMode(false);
 				var pxDist = Math.hypot(clicks[1].x - clicks[0].x, clicks[1].y - clicks[0].y);
 				var promptText = (pc.lpn_backdrop_scale_prompt2 || 'Real distance between the two points') + ' (' + unitLabel('lpn_u_length') + '):';
-				var real = +prompt(promptText, '');
-				if (real > 0) { saveUndoSnapshot(); backdrop.s = real / pxDist; applyBackdropTransform(); saveToStorage(); }
+				askDialog({ kind: 'prompt', text: promptText, value: '' }, function (txt) {
+					var real = +txt;
+					if (txt !== null && real > 0) { saveUndoSnapshot(); backdrop.s = real / pxDist; applyBackdropTransform(); saveToStorage(); }
+				});
 			}
 		};
 		svg.addEventListener('pointerup', handler, true);
@@ -14081,20 +14105,21 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {};
 		setRegMode(true);
-		alert(pc.lpn_backdrop_scale_from_prompt1
+		setRegStep(pc.lpn_backdrop_scale_from_prompt1
 			|| 'Click the point on the background image that should stay where it is.');
 		var handler = function (e) {
 			svg.removeEventListener('pointerup', handler, true);
 			activeCancel = null; setRegMode(false);
-			var p = screenToWorld(e.clientX, e.clientY),
-				txt = prompt(pc.lpn_backdrop_scale_from_prompt2
-					|| 'Scale from its current size. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.', '1');
-			if (txt === null) { return; }
-			var f = parseFloat(txt);
-			// A zero or negative factor would collapse or mirror the picture, and neither is a thing
-			// a user means by "scale". Refused rather than clamped, so nothing happens silently.
-			if (!(f > 0) || !isFinite(f)) { return; }
-			scaleBackdropAbout(p, f);
+			var p = screenToWorld(e.clientX, e.clientY);
+			askDialog({ kind: 'prompt', text: pc.lpn_backdrop_scale_from_prompt2
+				|| 'Scale from its current size. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.', value: '1' }, function (txt) {
+				if (txt === null) { return; }
+				var f = parseFloat(txt);
+				// A zero or negative factor would collapse or mirror the picture, and neither is a thing
+				// a user means by "scale". Refused rather than clamped, so nothing happens silently.
+				if (!(f > 0) || !isFinite(f)) { return; }
+				scaleBackdropAbout(p, f);
+			});
 		};
 		svg.addEventListener('pointerup', handler, true);
 		activeCancel = function () { svg.removeEventListener('pointerup', handler, true); setRegMode(false); };
@@ -14133,12 +14158,12 @@ var EngCalcs = EngCalcs || {};
 		} else {
 			w = parseWorldFile(t);
 			if (w) {
-				if (!w.ok) { alert(pc.lpn_backdrop_wld_bad || 'This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.'); return; }
+				if (!w.ok) { setWarning(pc.lpn_backdrop_wld_bad || 'This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.'); return; }
 				applyWorldFile(w);
 				return;
 			}
 		}
-		alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.');
+		setWarning(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.');
 	}
 	// WE NEVER ASK FOR A WORLD FILE AS A FILE -- we ask for a paste of its CONTENTS, or for the image
 	// and its sidecar picked together in the one picker (readWorldFile). A sidecar cannot be
@@ -14158,11 +14183,11 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {};
 		setRegMode(true);
-		alert(pc.lpn_backdrop_position_prompt1 || 'Click the base point (on the image) for the move.');
+		setRegStep(pc.lpn_backdrop_position_prompt1 || 'Click the base point (on the image) for the move.');
 		var handler = function (e) {
 			svg.removeEventListener('pointerup', handler, true);
 			var refWorld = screenToWorld(e.clientX, e.clientY);
-			alert(pc.lpn_backdrop_position_prompt2 || 'Choose the method for the destination point, then click Continue.');
+			setRegStep(pc.lpn_backdrop_position_prompt2 || 'Choose the method for the destination point, then click Continue.');
 			showBackdropTargetPanel(refWorld);
 		};
 		svg.addEventListener('pointerup', handler, true);
@@ -14186,11 +14211,12 @@ var EngCalcs = EngCalcs || {};
 			hidePanel(panel);
 			if (mode === 'coords') {
 				activeCancel = null; setRegMode(false);
-				var txt = prompt((pc.lpn_backdrop_coords_prompt || 'Type the X,Y that point should move to') + ' (' + unitLabel('lpn_u_length') + '):', '');
-				var parts = (txt || '').split(',').map(Number);
-				// The one ENTRY site (Task 274): what the user types is Cartesian, and positionTo()
-				// works in the internal Y-down frame.
-				if (txt && !isNaN(parts[0]) && !isNaN(parts[1])) { positionTo(refWorld, { x: inwardX(parts[0]), y: inwardY(parts[1]) }); }
+				askDialog({ kind: 'prompt', text: (pc.lpn_backdrop_coords_prompt || 'Type the X,Y that point should move to') + ' (' + unitLabel('lpn_u_length') + '):', value: '' }, function (txt) {
+					var parts = (txt || '').split(',').map(Number);
+					// The one ENTRY site (Task 274): what the user types is Cartesian, and positionTo()
+					// works in the internal Y-down frame.
+					if (txt && !isNaN(parts[0]) && !isNaN(parts[1])) { positionTo(refWorld, { x: inwardX(parts[0]), y: inwardY(parts[1]) }); }
+				});
 				return;
 			}
 			// No further blocking dialog here -- the panel + Continue already made the transition
@@ -14225,7 +14251,7 @@ var EngCalcs = EngCalcs || {};
 		else if (v === 'scale-from') { startBackdropScaleFrom(); }
 		else if (v === 'position') { startBackdropPosition(); }
 		else if (v === 'remove') {
-			if (window.confirm(pc.lpn_backdrop_remove_confirm || 'Remove the background image?')) { removeBackdrop(); }
+			askDialog({ kind: 'confirm', text: pc.lpn_backdrop_remove_confirm || 'Remove the background image?' }, function (yes) { if (yes) { removeBackdrop(); } });
 		}
 	}
 	// Rows built fresh on every open, so `disabled` is read from the current state, and the COMMANDS
@@ -15304,14 +15330,15 @@ var EngCalcs = EngCalcs || {};
 		// transform, so there is nothing here a projected project cannot do. The wizard's own live
 		// transform is the one addition: while it is open, the drawing can say where it is.
 		if (!placeFindable() && !mapgeoActive()) { return; }
-		var v = window.prompt(pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space', '');
-		if (v === null) { return; }
-		var ll = parseLatLon(v);
-		if (!ll) {
-			setNotice(pc.lpn_goto_bad || 'Can\'t read coordinates. Try again. Examples: 38,-122 or 38.122 or 38 -122');
-			return;
-		}
-		goToPoint(ll);
+		askDialog({ kind: 'prompt', text: pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space', value: '' }, function (v) {
+			if (v === null) { return; }
+			var ll = parseLatLon(v);
+			if (!ll) {
+				setNotice(pc.lpn_goto_bad || 'Can\'t read coordinates. Try again. Examples: 38,-122 or 38.122 or 38 -122');
+				return;
+			}
+			goToPoint(ll);
+		});
 	}
 	// **THE ONE DOOR TO A PLACE ON THE EARTH** (Task 437). js/lpn-search.js resolves a place NAME
 	// and then travels through here, so the size question, the zoom floor and the placement case
@@ -15331,9 +15358,17 @@ var EngCalcs = EngCalcs || {};
 		// site turns the whole tool from a hunt into an adjustment. Outside the placement tool there
 		// is no model to size, so the question is not asked.
 		if (georefActive()) {
-			var span = georefAskSize();
-			if (span > 0) { georefGoTo(ll, span); return; }
+			georefAskSize(undefined, function (span) {
+				if (span > 0) { georefGoTo(ll, span); return; }
+				goToPointCamera(ll, extent);
+			});
+			return;
 		}
+		goToPointCamera(ll, extent);
+	}
+	// The camera half of goToPoint(), split off when the size question became an in-page box
+	// (Task 710): it runs after the answer, or at once when no question is asked.
+	function goToPointCamera(ll, extent) {
 		// **THE ZOOM IS THE USER'S AND TYPING A COORDINATE DOES NOT SPEND IT** (Tom, 2026-09-08:
 		// *"Goto should preserve the zoom factor. Otherwise good."*, and again 2026-09-12: *"Goto,
 		// however, should not zoom."*). This used to zoom IN to a site-sized span (a kilometre
@@ -15832,15 +15867,17 @@ var EngCalcs = EngCalcs || {};
 	}
 	// `defSI` is optional and is what the box opens on, in SI: the attachment wizard re-runs with
 	// the width already on file, so adjusting an attachment is an edit rather than a retype.
-	function georefAskSize(defSI) {
+	// `done(spanSI)` gets 0 for a cancel or an unreadable answer (Task 710: asked in the page's box).
+	function georefAskSize(defSI, done) {
 		var pc = EngCalcs.pageConfig || {};
 		var text = (pc.lpn_georef_size_prompt || 'About how wide is the site, across the whole project?')
 			+ ' (' + unitLabel('lpn_u_length') + ')';
 		var def = defSI > 0 ? +toDisplay(defSI, 'lpn_u_length').toPrecision(6) : georefDefaultSpan();
-		var v = window.prompt(text, String(def));
-		if (v === null) { return 0; }
-		var n = parseFloat(String(v).replace(',', '.'));
-		return isFinite(n) && n > 0 ? toSI(n, 'lpn_u_length') : 0;
+		askDialog({ kind: 'prompt', text: text, value: String(def) }, function (v) {
+			if (v === null) { done(0); return; }
+			var n = parseFloat(String(v).replace(',', '.'));
+			done(isFinite(n) && n > 0 ? toSI(n, 'lpn_u_length') : 0);
+		});
 	}
 	// Travel AND scale in one move: the view is zoomed so that the model, which is standing still on
 	// the screen, covers exactly the ground width the user just gave -- and centred on the model, so
@@ -15969,32 +16006,34 @@ var EngCalcs = EngCalcs || {};
 		// second chance to get 38,106 wrong. The node's id rides along in parentheses exactly as
 		// georefAskSize() carries its unit -- it names WHICH point is being answered for, which is
 		// what makes a mis-snapped pick visible before it is committed.
-		var typed = window.prompt(
-			(pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space') +
-				' (' + node.id + ')', '');
-		if (typed === null) { georefTwoPointStop(); return; }
-		var ll = parseLatLon(typed);
-		if (!ll) {
-			// Still armed, and on the SAME point: a typo costs one more click, not the whole sequence.
-			setNotice(pc.lpn_goto_bad || 'Can\'t read coordinates. Try again. Examples: 38,-122 or 38.122 or 38 -122');
-			return;
-		}
-		pk.pts.push({ i: idx, x: s.x, y: s.y, lon: ll.lon, lat: ll.lat });
-		if (pk.pts.length < 2) {
-			setNotice(pc.lpn_georef_twopt_pick2 || 'Now click a second known point, as far from the first one as you can.');
-			return;
-		}
-		georef.pick = null;
-		georefSetTransform(EngCalcs.lpnGeorefFromTwoPoints(pk.pts[0], pk.pts[1]));
-		// **AND THE VIEW GOES TO THE MODEL**, on the same argument georefArmAsDegrees() makes: the two
-		// coordinates the user typed have almost certainly moved the network off the screen, and a
-		// placement nobody can see cannot be checked. AUTOMATIC, so it does not set the edited
-		// asterisk for a camera move nobody made.
-		zoomExtent(true);
-		// Redrawn after the fit, because every handle is CLAMPED into the visible canvas and the
-		// canvas it must be clamped into is the one the fit just chose.
-		georefDrawFrame();
-		setNotice(pc.lpn_georef_twopt_done || 'The model now sits on the two points you gave. Check it, then press the Keep this placement button.');
+		askDialog({ kind: 'prompt', text: (pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space') +
+				' (' + node.id + ')', value: '' }, function (typed) {
+			// The wizard may have been closed while the question was open.
+			if (!georef || georef.pick !== pk) { return; }
+			if (typed === null) { georefTwoPointStop(); return; }
+			var ll = parseLatLon(typed);
+			if (!ll) {
+				// Still armed, and on the SAME point: a typo costs one more click, not the whole sequence.
+				setNotice(pc.lpn_goto_bad || 'Can\'t read coordinates. Try again. Examples: 38,-122 or 38.122 or 38 -122');
+				return;
+			}
+			pk.pts.push({ i: idx, x: s.x, y: s.y, lon: ll.lon, lat: ll.lat });
+			if (pk.pts.length < 2) {
+				setNotice(pc.lpn_georef_twopt_pick2 || 'Now click a second known point, as far from the first one as you can.');
+				return;
+			}
+			georef.pick = null;
+			georefSetTransform(EngCalcs.lpnGeorefFromTwoPoints(pk.pts[0], pk.pts[1]));
+			// **AND THE VIEW GOES TO THE MODEL**, on the same argument georefArmAsDegrees() makes: the two
+			// coordinates the user typed have almost certainly moved the network off the screen, and a
+			// placement nobody can see cannot be checked. AUTOMATIC, so it does not set the edited
+			// asterisk for a camera move nobody made.
+			zoomExtent(true);
+			// Redrawn after the fit, because every handle is CLAMPED into the visible canvas and the
+			// canvas it must be clamped into is the one the fit just chose.
+			georefDrawFrame();
+			setNotice(pc.lpn_georef_twopt_done || 'The model now sits on the two points you gave. Check it, then press the Keep this placement button.');
+		});
 	}
 
 	function georefStart() {
@@ -16292,49 +16331,51 @@ var EngCalcs = EngCalcs || {};
 		// gone at the next project switch, and never in a file -- and because this is still the
 		// moment a project changes kind. If the wording is ever revisited it is `lpn_georef_confirm`,
 		// and that is Tom's.
-		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.')) { return; }
-		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
-		// On File, Convert as's answered steps the attached map's own turn was laid into the copy
-		// before the steps began, so the steps see 0 degrees while the picture was left unturned
-		// all the same; convas.bdTurn carries that turn here so the sentence is still said.
-		var unrotated = georefBackdropRotated(georef.t) ||
-			!!(convas && convas.copyId === library.openId && convas.bdTurn && georefBackdropRotated({ rotDeg: convas.bdTurn }));
-		if (georef.undoSnap) { pushUndoSnapshot(georef.undoSnap); markEdited(); }
-		// **THE VIEW IS CAPTURED BEFORE THE REFRESH AND PUT BACK AFTER IT.**
-		// refreshAllFromDocument() ends in restoreViewOrFit(), whose answer is the view remembered
-		// for this tab -- which is where the user was looking at the XY GRID, half a world away.
-		// Without this, finishing snaps the map back to the grid view and the model appears lost.
-		var v = currentView();
-		georef = null;
-		georefClearLayer();
-		georefApplyCompensation();   // the model is the map's again
-		georefSuspend(false);
-		georefRefreshBar();
-		// FULL refresh now, and only now: this is the moment the project really did change kind, so
-		// the basemap, the status strip, the settings panel and the solve all have to be re-derived.
-		// **REBASED THE MOMENT IT BECOMES GEOGRAPHIC** (Task 439). Everything else here runs on a
-		// document whose coordinates are already degrees; without this it would carry origin {0, 0}
-		// until the tab was closed and reopened, and street-level zoom is the very next thing the
-		// user does.
-		var shift = rebaseLiveGeoDoc();
-		// `v` was read in the OLD frame, a few lines above and before the rebase. Moved with
-		// everything else, or putting it back below would undo the compensation and jump the map by
-		// the whole origin -- half the world, at this zoom.
-		if (v && shift) { v.cx += shift.dx; v.cy += shift.dy; }
-		refreshAllFromDocument();
-		if (v) { applyView(v); }
-		saveToStorage();
-		renderTabs();
-		// **A PICTURE THAT COULD NOT BE TURNED SAYS SO.** Two whole sentences joined, not a label
-		// built from fragments: the second is only true when the placement was turned and there was
-		// an image to turn, and saying nothing would leave a site plan silently off its own network.
-		// Wording and key name are Tom's, 2026-08-25. He chose ROTATED over "turned", so the key and
-		// the local both follow the word a user will read.
-		setNotice((pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.')
-			+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
-				|| 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.') : ''));
-		// File, Convert as: lay the lat/lon result onto the coordinate system the box chose.
-		convasPlaced(unrotated);
+		askDialog({ kind: 'confirm', text: pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.' }, function (yes) {
+			if (!yes) { return; }
+			if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
+			// On File, Convert as's answered steps the attached map's own turn was laid into the copy
+			// before the steps began, so the steps see 0 degrees while the picture was left unturned
+			// all the same; convas.bdTurn carries that turn here so the sentence is still said.
+			var unrotated = georefBackdropRotated(georef.t) ||
+				!!(convas && convas.copyId === library.openId && convas.bdTurn && georefBackdropRotated({ rotDeg: convas.bdTurn }));
+			if (georef.undoSnap) { pushUndoSnapshot(georef.undoSnap); markEdited(); }
+			// **THE VIEW IS CAPTURED BEFORE THE REFRESH AND PUT BACK AFTER IT.**
+			// refreshAllFromDocument() ends in restoreViewOrFit(), whose answer is the view remembered
+			// for this tab -- which is where the user was looking at the XY GRID, half a world away.
+			// Without this, finishing snaps the map back to the grid view and the model appears lost.
+			var v = currentView();
+			georef = null;
+			georefClearLayer();
+			georefApplyCompensation();   // the model is the map's again
+			georefSuspend(false);
+			georefRefreshBar();
+			// FULL refresh now, and only now: this is the moment the project really did change kind, so
+			// the basemap, the status strip, the settings panel and the solve all have to be re-derived.
+			// **REBASED THE MOMENT IT BECOMES GEOGRAPHIC** (Task 439). Everything else here runs on a
+			// document whose coordinates are already degrees; without this it would carry origin {0, 0}
+			// until the tab was closed and reopened, and street-level zoom is the very next thing the
+			// user does.
+			var shift = rebaseLiveGeoDoc();
+			// `v` was read in the OLD frame, a few lines above and before the rebase. Moved with
+			// everything else, or putting it back below would undo the compensation and jump the map by
+			// the whole origin -- half the world, at this zoom.
+			if (v && shift) { v.cx += shift.dx; v.cy += shift.dy; }
+			refreshAllFromDocument();
+			if (v) { applyView(v); }
+			saveToStorage();
+			renderTabs();
+			// **A PICTURE THAT COULD NOT BE TURNED SAYS SO.** Two whole sentences joined, not a label
+			// built from fragments: the second is only true when the placement was turned and there was
+			// an image to turn, and saying nothing would leave a site plan silently off its own network.
+			// Wording and key name are Tom's, 2026-08-25. He chose ROTATED over "turned", so the key and
+			// the local both follow the word a user will read.
+			setNotice((pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.')
+				+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
+					|| 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.') : ''));
+			// File, Convert as: lay the lat/lon result onto the coordinate system the box chose.
+			convasPlaced(unrotated);
+		});
 	}
 	function georefCancel() {
 		if (!georef) { return; }
@@ -16981,22 +17022,23 @@ var EngCalcs = EngCalcs || {};
 				'There is no world map attached to this project yet. Use Map, World map, Attach first.');
 			return;
 		}
-		answer = window.prompt(pc.lpn_map_attach_scale_from_prompt ||
-			'Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.', '1');
-		if (answer === null) { return; }
-		f = parseFloat(String(answer).replace(',', '.'));
-		if (!(f > 0) || !isFinite(f)) {
-			setNotice(pc.lpn_map_attach_scale_from_bad || 'Type a single number greater than zero.');
-			return;
-		}
-		ext = mapgeoExtent();
-		project.georef = mapgeoScaled(t, f, { x: ext.cx, y: ext.cy });
-		markEdited();
-		saveToStorage();
-		refreshBasemap();
-		refreshMapStatus();
-		setNotice(pc.lpn_map_attach_scale_from_done ||
-			'The map is resized, and your drawing and every coordinate in it are exactly as they were.');
+		askDialog({ kind: 'prompt', text: pc.lpn_map_attach_scale_from_prompt ||
+			'Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.', value: '1' }, function (answer) {
+			if (answer === null) { return; }
+			f = parseFloat(String(answer).replace(',', '.'));
+			if (!(f > 0) || !isFinite(f)) {
+				setNotice(pc.lpn_map_attach_scale_from_bad || 'Type a single number greater than zero.');
+				return;
+			}
+			ext = mapgeoExtent();
+			project.georef = mapgeoScaled(t, f, { x: ext.cx, y: ext.cy });
+			markEdited();
+			saveToStorage();
+			refreshBasemap();
+			refreshMapStatus();
+			setNotice(pc.lpn_map_attach_scale_from_done ||
+				'The map is resized, and your drawing and every coordinate in it are exactly as they were.');
+		});
 	}
 	// **STEP 2 NAILS A RECTANGLE TO THE GROUND.** It is stated in latitude and longitude, so it
 	// belongs to the Earth and not to the drawing: when the map moves, the rectangle moves with it,
@@ -22614,7 +22656,7 @@ var EngCalcs = EngCalcs || {};
 				// rule and its message; `reread` above then puts the old id back in the box, so a
 				// refused rename leaves the document and the cell saying the same thing.
 				ok = validateNewId(newId, el.id, group);
-				if (ok !== true) { alert(ok); return; }
+				if (ok !== true) { setWarning(ok); return; }
 				if (group === 'node') { applyNodeRename(el.id, newId); }
 				else { applyLinkRename(el.id, newId); }
 			} };
@@ -29195,40 +29237,44 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		suggested = (pc.lpn_profile_new_name || 'Path {n}').replace('{n}', String(list.length + 1));
-		v = window.prompt(pc.lpn_profile_prompt_name || 'Name for this path', suggested);
-		if (v === null) { return; }
-		v = v.trim();
-		if (!v) { return; }
-		saveUndoSnapshot();
-		p = { id: newSavedProfileId(), name: v, stops: stops };
-		savedProfiles().push(p);
-		profileState.activeId = p.id;
-		saveToStorage();
-		rebuildProfileForm();
+		askDialog({ kind: 'prompt', text: pc.lpn_profile_prompt_name || 'Name for this path', value: suggested }, function (v) {
+			if (v === null) { return; }
+			v = v.trim();
+			if (!v) { return; }
+			saveUndoSnapshot();
+			p = { id: newSavedProfileId(), name: v, stops: stops };
+			savedProfiles().push(p);
+			profileState.activeId = p.id;
+			saveToStorage();
+			rebuildProfileForm();
+		});
 	}
 	function renameSavedProfile() {
 		var pc = EngCalcs.pageConfig || {}, p = activeSavedProfile(), v;
 		if (!p) { return; }
-		v = window.prompt(pc.lpn_profile_prompt_name || 'Name for this path', p.name || '');
-		if (v === null || !v.trim()) { return; }
-		saveUndoSnapshot();
-		p.name = v.trim();
-		saveToStorage();
-		rebuildProfileForm();
+		askDialog({ kind: 'prompt', text: pc.lpn_profile_prompt_name || 'Name for this path', value: p.name || '' }, function (v) {
+			if (v === null || !v.trim()) { return; }
+			saveUndoSnapshot();
+			p.name = v.trim();
+			saveToStorage();
+			rebuildProfileForm();
+		});
 	}
 	function deleteSavedProfile() {
 		var pc = EngCalcs.pageConfig || {}, p = activeSavedProfile(), msg;
 		if (!p) { return; }
 		msg = (pc.lpn_profile_delete_confirm || 'Delete the saved path {name}? The drawing itself is not changed.')
 			.replace('{name}', p.name || '');
-		if (!window.confirm(msg)) { return; }
-		saveUndoSnapshot();
-		doc.profiles = savedProfilesRead().filter(function (x) { return x !== p; });
-		// The path stays on screen: deleting its NAME is not deleting the drawing, which is what the
-		// confirmation just promised.
-		profileState.activeId = '';
-		saveToStorage();
-		rebuildProfileForm();
+		askDialog({ kind: 'confirm', text: msg }, function (yes) {
+			if (!yes) { return; }
+			saveUndoSnapshot();
+			doc.profiles = savedProfilesRead().filter(function (x) { return x !== p; });
+			// The path stays on screen: deleting its NAME is not deleting the drawing, which is what the
+			// confirmation just promised.
+			profileState.activeId = '';
+			saveToStorage();
+			rebuildProfileForm();
+		});
 	}
 	// **THE MENU HANGS OFF THE PROFILE TAB** (Tom, 2026-08-24: "a menu arrow on the Profile tab").
 	// That is what keeps the panel at one line of commentary -- Task 506's whole point -- and it
@@ -31242,12 +31288,20 @@ var EngCalcs = EngCalcs || {};
 		}
 		var lost = 0;
 		keys.forEach(function (k) { lost += overrideCountForElement(k); });
-		if (lost && !window.confirm((pc.lpn_delete_drops_overrides || 'Deleting this asset also throws away {n} values that your scenarios hold for it. Continue?').replace('{n}', lost))) { return; }
-		saveUndoSnapshot();
-		if (kind === 'node') { deleteNode(id); }
-		else if (kind === 'label') { deleteLabelById(id); }
-		else { deleteLink(id); }
-		refreshScenarioStatus();
+		function proceed() {
+			// Asked in the page's box (Task 710), so a multi-delete's later cascade may have taken this
+			// one while the question was open.
+			if (!(kind === 'node' ? nodeById(id) : kind === 'label' ? labelById(id) : linkById(id))) { return; }
+			saveUndoSnapshot();
+			if (kind === 'node') { deleteNode(id); }
+			else if (kind === 'label') { deleteLabelById(id); }
+			else { deleteLink(id); }
+			refreshScenarioStatus();
+		}
+		if (!lost) { proceed(); return; }
+		askDialog({ kind: 'confirm', text: (pc.lpn_delete_drops_overrides || 'Deleting this asset also throws away {n} values that your scenarios hold for it. Continue?').replace('{n}', lost) }, function (yes) {
+			if (yes) { proceed(); }
+		});
 	}
 	function deleteNode(id) {
 		var links = incidentLinks[id].slice(), i, orphaned = 0;
@@ -31964,7 +32018,7 @@ var EngCalcs = EngCalcs || {};
 			// answers a document that cannot be opened the same way, and this is that plus a refusal
 			// to write. The quota message keeps the status line alone: there the work is still on
 			// screen and still editable, so a modal per failed autosave would be unusable.
-			if (!unreadableTold) { unreadableTold = true; alert(said); }
+			if (!unreadableTold) { unreadableTold = true; askDialog({ kind: 'alert', text: said }); }
 			return;
 		}
 		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.');
@@ -32055,32 +32109,34 @@ var EngCalcs = EngCalcs || {};
 	// is the rule for every command that appears in both a menu and a control.
 	function wipeEverything() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!window.confirm(pc.lpn_confirm_wipe || 'Start fresh, and delete EVERYTHING saved for this page: every project, every background image, all settings, and your unit choices? The page reloads exactly as a brand-new visitor would see it. This cannot be undone.')) { return; }
-		wipeAllStorage();
-		// **AND THE CONSENT RECORD ITSELF, PLUS WHAT IT GATES.** A brand-new visitor has never
-		// answered the banner, so ec_consent has to go, not just be set to refused -- and
-		// ec_consent's own JS mirror only ever WRITES an answer (Consent.lib.php), never erases
-		// one, while ec_blang and ec_seen are HttpOnly by design (config.inc.php) and JS cannot
-		// reach them at all. consent.php's `ec_wipe` is the one door for this (ecConsentForget(),
-		// which reuses ecForgetAnalyticsStorage() rather than a second cookie list) -- and that
-		// request's own redirect back to this page IS the reload the confirm promised, so there
-		// is no separate window.location.reload() to race it.
-		var form = document.createElement('form');
-		form.method = 'post';
-		// Through suiteUrl(), the one door every suite page addressed from JS goes through.
-		form.action = suiteUrl('consent.php');
-		// `hidden`, not `style.display = 'none'` -- this is a throwaway navigation carrier, not a
-		// panel, and panel-touch-harness.js polices that exact string as "nothing hides a panel
-		// except hidePanel()".
-		form.hidden = true;
-		[['ec_wipe', '1'], ['return', window.location.pathname + window.location.search]].forEach(function (pair) {
-			var field = document.createElement('input');
-			field.name = pair[0];
-			field.value = pair[1];
-			form.appendChild(field);
+		askDialog({ kind: 'confirm', text: pc.lpn_confirm_wipe || 'Start fresh, and delete EVERYTHING saved for this page: every project, every background image, all settings, and your unit choices? The page reloads exactly as a brand-new visitor would see it. This cannot be undone.' }, function (yes) {
+			if (!yes) { return; }
+			wipeAllStorage();
+			// **AND THE CONSENT RECORD ITSELF, PLUS WHAT IT GATES.** A brand-new visitor has never
+			// answered the banner, so ec_consent has to go, not just be set to refused -- and
+			// ec_consent's own JS mirror only ever WRITES an answer (Consent.lib.php), never erases
+			// one, while ec_blang and ec_seen are HttpOnly by design (config.inc.php) and JS cannot
+			// reach them at all. consent.php's `ec_wipe` is the one door for this (ecConsentForget(),
+			// which reuses ecForgetAnalyticsStorage() rather than a second cookie list) -- and that
+			// request's own redirect back to this page IS the reload the confirm promised, so there
+			// is no separate window.location.reload() to race it.
+			var form = document.createElement('form');
+			form.method = 'post';
+			// Through suiteUrl(), the one door every suite page addressed from JS goes through.
+			form.action = suiteUrl('consent.php');
+			// `hidden`, not `style.display = 'none'` -- this is a throwaway navigation carrier, not a
+			// panel, and panel-touch-harness.js polices that exact string as "nothing hides a panel
+			// except hidePanel()".
+			form.hidden = true;
+			[['ec_wipe', '1'], ['return', window.location.pathname + window.location.search]].forEach(function (pair) {
+				var field = document.createElement('input');
+				field.name = pair[0];
+				field.value = pair[1];
+				form.appendChild(field);
+			});
+			document.body.appendChild(form);
+			form.submit();
 		});
-		document.body.appendChild(form);
-		form.submit();
 	}
 	// Time-ordered prefix plus randomness: sortable for debugging, and collision-free even when two
 	// projects are created in the same millisecond in two tabs.
@@ -33169,7 +33225,7 @@ var EngCalcs = EngCalcs || {};
 		if (!saved || typeof saved !== 'object' || typeof saved.v !== 'number') { return null; }
 		if (saved.v > LPN_STORAGE_VERSION) {
 			var pc = EngCalcs.pageConfig || {};
-			alert(pc.lpn_storage_too_new || 'This project was saved by a newer version of the page, so it cannot be opened here.');
+			setWarning(pc.lpn_storage_too_new || 'This project was saved by a newer version of the page, so it cannot be opened here.');
 			return null;
 		}
 		// The four collections are the one part applySaved() takes on trust (`saved.nodes || []`),
@@ -34288,7 +34344,7 @@ var EngCalcs = EngCalcs || {};
 		rememberOutgoingProject();
 		var id = newProjectId();
 		if (!writeJSON(projectKey(id), saved)) {
-			alert(pc.lpn_import_no_room || 'There is not enough browser storage left to add this project. Delete a project you no longer need and try again.');
+			setWarning(pc.lpn_import_no_room || 'There is not enough browser storage left to add this project. Delete a project you no longer need and try again.');
 			return null;
 		}
 		// **OPEN FIRST, THEN APPLY** -- the order openProject() has always used, and the reason is the
@@ -34325,7 +34381,7 @@ var EngCalcs = EngCalcs || {};
 		// prepareDocument() reports a too-new file itself, and returns null either way; a second
 		// alert on top of that one would be noise, so only the not-a-project case speaks here.
 		if (parsed && typeof parsed.v === 'number' && parsed.v > LPN_STORAGE_VERSION) { return null; }
-		alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
+		setWarning(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
 		return null;
 	}
 	function importProjectFromFile(file) {
@@ -34333,7 +34389,7 @@ var EngCalcs = EngCalcs || {};
 		reader.onload = function (ev) { landProjectText(ev.target.result, false); };
 		reader.onerror = function () {
 			var pc = EngCalcs.pageConfig || {};
-			alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
+			setWarning(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
 		};
 		reader.readAsText(file);
 	}
@@ -35183,7 +35239,7 @@ var EngCalcs = EngCalcs || {};
 		if (conv.ok) { lastNetUnnamed = conv.unnamedOptions || []; return conv.inp; }
 		// A `.net` we cannot read is refused outright, never half-read -- see the integrity check in
 		// js/lpn-net.js. The way out is always available and always works, so the message names it.
-		alert((pc.lpn_net_bad_file || 'This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use the File, Export, Network command there to save it as an .inp file, then import that.') +
+		setWarning((pc.lpn_net_bad_file || 'This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use the File, Export, Network command there to save it as an .inp file, then import that.') +
 			(conv.detail ? ' (' + conv.detail + ')' : ''));
 		return null;
 	}
@@ -35199,7 +35255,7 @@ var EngCalcs = EngCalcs || {};
 			if (text === null) { return; }   // inpTextFromBytes already said why
 			landInpText(text, file.name, false);
 		};
-		reader.onerror = function () { alert(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.'); };
+		reader.onerror = function () { setWarning(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.'); };
 		// BYTES, not text: which of EPANET's two formats this is gets decided by the content (see
 		// inpTextFromBytes), and decoding a binary .net as UTF-8 first would destroy it.
 		reader.readAsArrayBuffer(file);
@@ -35211,7 +35267,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		var parsed = EngCalcs.lpnInpParse ? EngCalcs.lpnInpParse(text) : { ok: false };
 		if (!parsed.ok) {
-			alert(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.');
+			setWarning(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.');
 			return;
 		}
 		// The units strip moves FIRST. docFromInp() is written against the selector state --
@@ -35321,7 +35377,7 @@ var EngCalcs = EngCalcs || {};
 		// what is in it is decided by reading it rather than by believing the name.
 		reader.onload = function (ev) { landSurveyText(String(ev.target.result), file.name); };
 		reader.onerror = function () {
-			alert(pc.lpn_survey_read_error || 'That file could not be read from your disk.');
+			setWarning(pc.lpn_survey_read_error || 'That file could not be read from your disk.');
 		};
 		reader.readAsText(file);
 	}
@@ -35383,8 +35439,8 @@ var EngCalcs = EngCalcs || {};
 		parsed = read();
 		// A file nothing can be read out of at all gets the sentence and no box: there is no
 		// question to ask about it, and a chooser over an empty file teaches nothing.
-		if (!parsed.ok && parsed.error === 'empty') { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
-		if (!parsed.ok && parsed.error === 'ambiguous-coord') { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
+		if (!parsed.ok && parsed.error === 'empty') { setWarning(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
+		if (!parsed.ok && parsed.error === 'ambiguous-coord') { setWarning(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 		openDialog(function (body) {
 			var wrap = document.createElement('div'), sel, note, preview, typeSel, typeNote, internalNote;
 			// **THE ASSET KIND COMES FIRST, AND THE REASON IS THAT IT IS IRREVERSIBLE** (Tom,
@@ -35498,7 +35554,7 @@ var EngCalcs = EngCalcs || {};
 			draw();
 		}, [
 			{ label: pc.lpn_survey_create || 'Create nodes', fn: function () {
-				if (!parsed.ok) { alert(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
+				if (!parsed.ok) { setWarning(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 				rememberSurveyFormat(format);
 				showSurveyReport(parsed, createSurveyNodes(parsed, assetType));
 			} },
@@ -35664,7 +35720,7 @@ var EngCalcs = EngCalcs || {};
 			if (text.replace(/^\uFEFF/, '').trim().charCodeAt(0) === 0x7B) { landProjectText(text, true); }
 			else { landInpText(text, file.name, true); }
 		};
-		reader.onerror = function () { alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.'); };
+		reader.onerror = function () { setWarning(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.'); };
 		reader.readAsArrayBuffer(file);
 	}
 	// **AN UPLOAD, NOT A LIVE FILE HANDLE, in every browser.** What comes out of this is a placed
@@ -36976,7 +37032,7 @@ var EngCalcs = EngCalcs || {};
 		var target = await inspectSaveTarget(handle);
 		if (target.heldBy) {
 			// Somebody is in it right now. Not negotiable.
-			alert(pc.lpn_saveas_same_file || 'That is the same file somebody else has open, so it cannot be saved over. Choose a different file or a different name.');
+			setWarning(pc.lpn_saveas_same_file || 'That is the same file somebody else has open, so it cannot be saved over. Choose a different file or a different name.');
 			return;
 		}
 		// The file has moved on since we last saw it. Asked BEFORE the foreign question because it is
@@ -36985,7 +37041,7 @@ var EngCalcs = EngCalcs || {};
 		if (target.stale) {
 			var warnStale = (pc.lpn_saveas_overwrites_newer || 'That file has changed since you last saw it, so somebody else has almost certainly saved to it. Saving here replaces their version with yours. Continue?')
 				.replace('{name}', target.name || (pc.lpn_lock_somebody || 'Somebody else'));
-			if (!window.confirm(warnStale)) { return; }
+			if (!(await askDialogP({ kind: 'confirm', text: warnStale }))) { return; }
 		}
 		if (target.foreign) {
 			// Nobody has it open -- or nobody we can ASK, which from here is the same thing. Still a
@@ -36993,7 +37049,7 @@ var EngCalcs = EngCalcs || {};
 			// works with the broker down, which is the entire point.
 			var warn = (pc.lpn_saveas_overwrites_project || 'That file already holds a different project, {name}. Saving here replaces it completely. Continue?')
 				.replace('{name}', target.name || (pc.lpn_lock_somebody || 'Somebody else'));
-			if (!window.confirm(warn)) { return; }
+			if (!(await askDialogP({ kind: 'confirm', text: warn }))) { return; }
 		}
 		// Writing somewhere new makes this a DIFFERENT document, so it needs its own lock key: a copy
 		// and its original must never contend over one lock, and a copy must never be able to abort
@@ -37045,7 +37101,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, id = library.openId;
 		var entry = indexEntry(id), handle = handleFor(id);
 		if (!entry || !handle) { return; }
-		if (!window.confirm((pc.lpn_revert_confirm || 'Throw away the changes you have made and load {file} again from the disk?').replace('{file}', entry.fileName))) { return; }
+		if (!(await askDialogP({ kind: 'confirm', text: (pc.lpn_revert_confirm || 'Throw away the changes you have made and load {file} again from the disk?').replace('{file}', entry.fileName) }))) { return; }
 		var text;
 		try { text = await (await handle.getFile()).text(); }
 		catch (err) { setFileError(true); return; }
@@ -37112,7 +37168,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, text;
 		try { text = await (await handle.getFile()).text(); }
 		catch (err) {
-			alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
+			setWarning(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
 			return;
 		}
 		var saved = acceptImportedText(text);
@@ -37261,7 +37317,7 @@ var EngCalcs = EngCalcs || {};
 	async function askForLockedFile(saved) {
 		var pc = EngCalcs.pageConfig || {};
 		var docId = saved.project && saved.project.docId;
-		var initials = window.prompt(pc.lpn_lock_ask_prompt || 'Who should we say is asking? Your initials are ideal. They are kept with this file\'s lock on our server, for whoever has it open, and deleted within 30 days.', '');
+		var initials = await askDialogP({ kind: 'prompt', text: pc.lpn_lock_ask_prompt || 'Who should we say is asking? Your initials are ideal. They are kept with this file\'s lock on our server, for whoever has it open, and deleted within 30 days.', value: '' });
 		// Backed out: nothing sent, and nothing opened -- and it says so, for the same reason the
 		// Cancel button below does (Task 704). A dialog closing on its own is not an answer.
 		if (initials === null) {
@@ -41044,13 +41100,14 @@ var EngCalcs = EngCalcs || {};
 				label: renameLabel,
 				fn: function () {
 					if (isFileProject(entry)) { saveAs(); return; }
-					var v = window.prompt(pc.lpn_prompt_project_name || 'Name for this project', entry.name || '');
-					if (v === null) { return; }
-					renameProject(id, v.trim());
-					// Here rather than inside renameProject(), which a future caller could reach
-					// programmatically: what this records is a PERSON deciding on a name.
-					if (EngCalcs.logNamingEvent) { EngCalcs.logNamingEvent('rename'); }
-					renderTabs();
+					askDialog({ kind: 'prompt', text: pc.lpn_prompt_project_name || 'Name for this project', value: entry.name || '' }, function (v) {
+						if (v === null) { return; }
+						renameProject(id, v.trim());
+						// Here rather than inside renameProject(), which a future caller could reach
+						// programmatically: what this records is a PERSON deciding on a name.
+						if (EngCalcs.logNamingEvent) { EngCalcs.logNamingEvent('rename'); }
+						renderTabs();
+					});
 				}
 			},
 			{
@@ -41058,11 +41115,12 @@ var EngCalcs = EngCalcs || {};
 				label: pc.lpn_tab_duplicate || 'Duplicate',
 				fn: function () {
 					var suggested = projectDisplayName(entry) + ' ' + (pc.lpn_project_copy_suffix || '(copy)');
-					var v = window.prompt(pc.lpn_prompt_project_name || 'Name for this project', suggested);
-					if (v === null) { return; }
-					if (id !== library.openId) { openProject(id); }
-					saveProjectAs(v.trim());
-					renderTabs();
+					askDialog({ kind: 'prompt', text: pc.lpn_prompt_project_name || 'Name for this project', value: suggested }, function (v) {
+						if (v === null) { return; }
+						if (id !== library.openId) { openProject(id); }
+						saveProjectAs(v.trim());
+						renderTabs();
+					});
 				}
 			},
 			{ separator: true },
@@ -41137,14 +41195,130 @@ var EngCalcs = EngCalcs || {};
 	// Chrome's transient activation expires after a few seconds -- so a blocking dialog would work for
 	// a fast reader and throw "must be handling a user gesture" for a careful one. A button in here is
 	// a fresh click. The dialog is dismissed BEFORE the action runs, so the action inherits that click.
-	function openDialog(buildBody, buttons) {
-		var dlg = document.getElementById('lpn_dialog');
+	//
+	// **IT IS ALSO THE PAGE'S ONE QUESTION BOX** (Task 710, Tom 2026-10-04: *"The browser-style
+	// boxes aren't pretty. I think they all should be converted."*). askDialog() below puts every
+	// former alert/confirm/prompt in here, so there is one in-page modal, not two. What it adds to
+	// every dialog, old callers included: Enter presses the default button (`isDefault`, else the
+	// first), Escape presses the `cancel` button (else the only button), Tab stays inside, and
+	// focus goes back to whatever had it when the box opened. `opts.title` draws the same title band
+	// as every other box; `opts.alert` makes the role alertdialog; `opts.focus` names the control
+	// that takes focus first (a prompt's field).
+	// **A HELD KEY NEVER ANSWERS** (Perry's review, 2026-10-04: hold Enter on Edit > Delete network
+	// and the auto-repeat opened the box, then pressed its focused OK, deleting every node; the
+	// browser's own box ignored the held key). `dialogKeyArmed` is set only by a FRESH keydown made
+	// while the box is open: a repeat, or a press that began before it opened, arms nothing, and a
+	// keyboard click (detail 0) on one of its buttons is ignored until it is armed.
+	var dialogOpener = null, dialogButtons = [], dialogQueue = [], dialogKeysWired = false;
+	var dialogKeyArmed = false, dialogOpenedAt = 0;
+	function dialogEl() { return document.getElementById('lpn_dialog'); }
+	function dialogIsOpen() { var d = dialogEl(); return !!(d && d.style.display === 'block'); }
+	function dialogFocusables() {
+		var d = dialogEl();
+		if (!d || !d.querySelectorAll) { return []; }
+		return Array.prototype.slice.call(d.querySelectorAll('button, input, textarea, select, a[href]'))
+			.filter(function (el) { return !el.disabled && el.offsetParent !== null; });
+	}
+	function pressDialogButton(b) {
+		closeDialog();
+		var r = b.fn();
+		// The answer may ask the next question; only when it did not does the queue or the opener
+		// get the focus back. An async fn has already opened whatever it opens synchronously.
+		afterDialogAnswer();
+		return r;
+	}
+	function afterDialogAnswer() {
+		if (dialogIsOpen()) { return; }
+		if (dialogQueue.length) { var next = dialogQueue.shift(); next(); return; }
+		var o = dialogOpener;
+		dialogOpener = null;
+		if (o && o.focus && document.body && document.body.contains && document.body.contains(o)) {
+			try { o.focus(); } catch (e) { /* a detached or unfocusable opener: nothing to return to */ }
+		}
+	}
+	function wireDialogKeys() {
+		if (dialogKeysWired) { return; }
+		dialogKeysWired = true;
+		// WINDOW, CAPTURE PHASE: ahead of every document-level Escape on this page (the
+		// registration mode's, the path chooser's), so an Escape aimed at the question costs the
+		// question and nothing under it.
+		var host = (typeof window !== 'undefined' && window.addEventListener) ? window : document;
+		host.addEventListener('keydown', function (e) {
+			if (!dialogIsOpen()) { return; }
+			var d = dialogEl(), inside = !!(d && e.target && d.contains && d.contains(e.target));
+			var key = e.key;
+			if (e.repeat || (e.timeStamp && dialogOpenedAt && e.timeStamp < dialogOpenedAt)) {
+				// Held over from before the box, or auto-repeat: it neither answers nor reaches a
+				// button's default activation.
+				if (key === 'Enter' || key === ' ' || key === 'Spacebar' || key === 'Escape' || key === 'Esc') {
+					e.preventDefault();
+					e.stopPropagation();
+				}
+				return;
+			}
+			dialogKeyArmed = true;
+			if (key === 'Escape' || key === 'Esc') {
+				var cw = (EngCalcs.pageConfig || {}).lpn_cancel || 'Cancel';
+				var c = dialogButtons.filter(function (b) { return b.cancel || b.label === cw; })[0] ||
+					(dialogButtons.length === 1 ? dialogButtons[0] : null);
+				e.preventDefault();
+				e.stopPropagation();
+				if (c) { pressDialogButton(c); }
+				return;
+			}
+			if (key === 'Tab') {
+				var f = dialogFocusables();
+				if (!f.length) { return; }
+				var i = f.indexOf(e.target);
+				var to = e.shiftKey ? (i <= 0 ? f[f.length - 1] : f[i - 1]) : (i < 0 || i === f.length - 1 ? f[0] : f[i + 1]);
+				e.preventDefault();
+				e.stopPropagation();
+				to.focus();
+				return;
+			}
+			if (!inside) {
+				// Focus fell out (a click on the scrim): nothing behind a modal hears a key.
+				e.preventDefault();
+				e.stopPropagation();
+				var g = dialogFocusables();
+				if (g.length) { g[0].focus(); }
+				return;
+			}
+			if (key === 'Enter' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'TEXTAREA') {
+				var def = dialogButtons.filter(function (b) { return b.isDefault; })[0] || dialogButtons[0];
+				e.preventDefault();
+				e.stopPropagation();
+				if (def) { pressDialogButton(def); }
+			}
+		}, true);
+		// And no key typed inside it reaches the page's own shortcuts.
+		var d0 = dialogEl();
+		if (d0) { d0.addEventListener('keydown', function (e) { e.stopPropagation(); }); }
+	}
+	function openDialog(buildBody, buttons, opts) {
+		opts = opts || {};
+		var dlg = dialogEl();
 		var body = document.getElementById('lpn_dialog_body');
 		var bar = document.getElementById('lpn_dialog_buttons');
+		var title = document.getElementById('lpn_dialog_title');
 		if (!dlg || !body || !bar) { return; }
+		wireDialogKeys();
+		if (!dialogIsOpen()) { dialogOpener = document.activeElement || null; }
+		dialogKeyArmed = false;
+		dialogOpenedAt = (typeof performance !== 'undefined' && performance.now) ? performance.now() : 0;
 		body.innerHTML = '';
 		bar.innerHTML = '';
+		if (title) {
+			title.textContent = opts.title || '';
+			title.style.display = opts.title ? 'block' : 'none';
+		}
+		if (dlg.classList) { dlg.classList.toggle('lpn-dialog-titled', !!opts.title); }
+		dlg.setAttribute('role', opts.alert ? 'alertdialog' : 'dialog');
+		if (opts.title) { dlg.setAttribute('aria-labelledby', 'lpn_dialog_title'); }
+		else { dlg.removeAttribute('aria-labelledby'); }
 		buildBody(body);
+		dialogButtons = buttons.slice();
+		var firstFocus = null;
 		buttons.forEach(function (b) {
 			var btn = document.createElement('button');
 			btn.type = 'button';
@@ -41154,8 +41328,13 @@ var EngCalcs = EngCalcs || {};
 			// consent answer is distance from the hand that was reaching for Cancel.
 			btn.style.marginLeft = b.gapBefore ? '28px' : '6px';
 			btn.textContent = b.label;
-			btn.addEventListener('click', function () { closeDialog(); b.fn(); });
+			btn.addEventListener('click', function (e) {
+				// A keyboard activation (detail 0) counts only after a fresh key inside the box.
+				if (e && e.detail === 0 && !dialogKeyArmed) { return; }
+				pressDialogButton(b);
+			});
 			bar.appendChild(btn);
+			if (b.isDefault && !firstFocus) { firstFocus = btn; }
 		});
 		// **MODAL MEANS MODAL** (Tom, 2026-08-05: "I still can change tabs/projects, and this can
 		// confuse my feeble human mind"). The element has always claimed `aria-modal="true"`, but
@@ -41165,8 +41344,25 @@ var EngCalcs = EngCalcs || {};
 		var back = document.getElementById('lpn_dialog_backdrop');
 		if (back) { back.style.display = 'block'; }
 		dlg.style.display = 'block';
-		var first = bar.querySelector('button');
-		if (first) { first.focus(); }
+		var want = typeof opts.focus === 'function' ? opts.focus() : opts.focus;
+		var first = want || firstFocus || bar.querySelector('button');
+		if (first && first.focus) {
+			first.focus();
+			if (want && first.select) { first.select(); }
+			// **A BOX OPENED BY A PRESS ON THE MAP KEEPS ITS FOCUS** (Task 710, georeferencing's
+			// two-point pick). That question opens on pointerdown, and the press's own default
+			// action -- focusing what was pressed -- runs after the handler, so the field lost the
+			// focus it had just been given and the first typed character was spent on taking it back
+			// (34.61 arrived as 4.61). A native prompt held the press; this takes the focus back
+			// once the press is over.
+			if (typeof setTimeout === 'function' && dlg.contains) {
+				setTimeout(function () {
+					if (!dialogIsOpen() || !dlg.contains(first) || dlg.contains(document.activeElement)) { return; }
+					first.focus();
+					if (want && first.select) { first.select(); }
+				}, 0);
+			}
+		}
 	}
 	function closeDialog() {
 		hidePanel(document.getElementById('lpn_dialog'));
@@ -41176,6 +41372,74 @@ var EngCalcs = EngCalcs || {};
 		// are not panels is written down somewhere.
 		if (back) { back.style.display = 'none'; }
 	}
+	/**
+	 * **THE ONE QUESTION BOX** (Task 710). `req` is {kind, text, value, title, ok, cancel}:
+	 *   kind 'alert'   -- one OK; done() when it is pressed.
+	 *   kind 'confirm' -- OK and Cancel; done(true|false). Escape is Cancel.
+	 *   kind 'prompt'  -- a field holding `value`; done(text) on OK or Enter, done(null) on Cancel.
+	 *   kind 'copy'    -- a selected read-only text area to copy from, and OK.
+	 * `ok`/`cancel` replace the button words. The title defaults to the page's own name, which is
+	 * what the browser's box said in its own way ("hawsedc.com says").
+	 *
+	 * A native confirm() held the script until it was answered; this cannot, so EVERY caller puts
+	 * all of what used to follow the answer inside `done`, and nothing after the call. Asked while
+	 * another question is open, it waits its turn rather than replacing it.
+	 *
+	 * **THE HARNESS SEAM**: when `window.lpnDialogAnswerer` is a function (only the headless DOM
+	 * stub sets one), it answers at once, synchronously, as the old dialogs did, so every harness
+	 * that scripted a confirm/prompt answer still drives the same flow. A real page never has one.
+	 */
+	function askDialog(req, done) {
+		req = req || {};
+		done = done || function () { };
+		var pcd = EngCalcs.pageConfig || {};
+		var answerer = (typeof window !== 'undefined') ? window.lpnDialogAnswerer : null;
+		if (typeof answerer === 'function') { done(answerer(req)); return; }
+		if (!dialogEl()) { done(req.kind === 'confirm' ? false : (req.kind === 'prompt' ? null : undefined)); return; }
+		if (dialogIsOpen()) { dialogQueue.push(function () { askDialog(req, done); }); return; }
+		var field = null;
+		var okLabel = req.ok || pcd.lpn_dialog_ok || 'OK';
+		var cancelLabel = req.cancel || pcd.lpn_cancel || 'Cancel';
+		var buttons;
+		if (req.kind === 'confirm') {
+			buttons = [
+				{ label: okLabel, isDefault: true, fn: function () { done(true); } },
+				{ label: cancelLabel, cancel: true, fn: function () { done(false); } }
+			];
+		} else if (req.kind === 'prompt') {
+			buttons = [
+				{ label: okLabel, isDefault: true, fn: function () { done(field ? field.value : ''); } },
+				{ label: cancelLabel, cancel: true, fn: function () { done(null); } }
+			];
+		} else {
+			buttons = [{ label: okLabel, isDefault: true, cancel: true, fn: function () { done(); } }];
+		}
+		openDialog(function (body) {
+			var p = document.createElement('p');
+			p.className = 'lpn-dialog-msg';
+			p.textContent = String(req.text == null ? '' : req.text);
+			body.appendChild(p);
+			if (req.kind === 'prompt' || req.kind === 'copy') {
+				field = document.createElement(req.kind === 'copy' ? 'textarea' : 'input');
+				if (req.kind === 'prompt') { field.type = 'text'; }
+				else { field.readOnly = true; }
+				field.className = 'lpn-dialog-input';
+				field.value = req.value == null ? '' : String(req.value);
+				field.setAttribute('aria-label', String(req.text == null ? '' : req.text).split('\n')[0]);
+				body.appendChild(field);
+			}
+		}, buttons, {
+			title: req.title || pcd.lpn_main_menu || 'Water Supply Network',
+			alert: req.kind !== 'prompt' && req.kind !== 'copy',
+			focus: function () { return field; }
+		});
+	}
+	// The same question as a Promise, for the async file commands, so `await` holds the command
+	// exactly where the native confirm() used to.
+	function askDialogP(req) {
+		return new Promise(function (resolve) { askDialog(req, resolve); });
+	}
+	EngCalcs.lpnAsk = askDialog;
 	function wireTabs() {
 		// Dismiss the menu, and the view popovers, on any click that is not inside them. The dialog is
 		// deliberately NOT dismissed this way -- it asks a question that has to be answered, and
@@ -41339,38 +41603,49 @@ var EngCalcs = EngCalcs || {};
 	// selection model is single-element. Until multi-select exists, this named command IS that route.
 	function deleteNetwork() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!window.confirm(pc.lpn_confirm_delete_network || 'Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.')) { return; }
-		doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
-		nextId = newNextId();
-		// Empties the PROJECT, so the container resets with the network: scenarios back to Base alone,
-		// since their overrides key element IDs that no longer exist. Preferences survive.
-		//
-		// **The NAME and the docId survive too** (Task 211). Wiping them leaves the tab you are
-		// looking at nameless, and makes a file project a different document to the lock broker.
-		// Clearing the canvas is not the same act as throwing the project away -- that is Close.
-		scenarios = defaultScenarios();
-		// **`coords` SURVIVES, like the name and the docId.** Emptying the drawing is not a change of
-		// what kind of document this is -- and it is the one property that cannot be re-chosen later.
-		project = { name: project.name, docId: project.docId, coords: project.coords,
-			// **AND SO DOES `crs`, on exactly the same argument** (Task 641): emptying the drawing
-			// does not change what plane it was drawn in, and it is the other property that can
-			// never be re-chosen.
-			crs: project.crs, activeScenario: 'base' };
-		// The backdrop is deliberately NOT removed -- see the note above the function.
-		// saveToStorage(), NOT removeItem(): labelSettings/settings are preferences, not network
-		// content, and must survive "New / Clear". removeItem() wipes them out of localStorage too,
-		// leaving them intact only in memory until some later unrelated mutation saves again.
-		saveToStorage();
-		lastSolveResult = null;
-		closePopup();
-		buildDom();
-		updateEmptyHint();
-		setStatus('');
-		setMode('select');
-		refreshScenarioStatus();
-		// **NO FIT HERE.** An empty drawing has no extent, so bbox() falls back to a 0-10 square and
-		// the "fit" is a zoom to an invented ten-unit box. The reader keeps the view they were
-		// looking at: there is nothing to look at, and where they were is where they will draw.
+		askDialog({ kind: 'confirm', text: pc.lpn_confirm_delete_network || 'Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept.' }, function (yes) {
+			if (!yes) { return; }
+			// **ONE UNDOABLE STEP** (Tom, 2026-10-04: *"Undo key doesn't work for Delete network."*).
+			// It never took a snapshot, on master either. The snapshot carries the whole outgoing
+			// `project` too, because this act also drops the fields no other edit touches (the world
+			// map's placement, the gallery name), and an undo that gave the drawing back without
+			// them would put a lat/lon drawing under no map.
+			var snap = makeUndoSnapshot();
+			snap.project = JSON.parse(JSON.stringify(project));
+			markEdited();
+			pushUndoSnapshot(snap);
+			doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
+			nextId = newNextId();
+			// Empties the PROJECT, so the container resets with the network: scenarios back to Base alone,
+			// since their overrides key element IDs that no longer exist. Preferences survive.
+			//
+			// **The NAME and the docId survive too** (Task 211). Wiping them leaves the tab you are
+			// looking at nameless, and makes a file project a different document to the lock broker.
+			// Clearing the canvas is not the same act as throwing the project away -- that is Close.
+			scenarios = defaultScenarios();
+			// **`coords` SURVIVES, like the name and the docId.** Emptying the drawing is not a change of
+			// what kind of document this is -- and it is the one property that cannot be re-chosen later.
+			project = { name: project.name, docId: project.docId, coords: project.coords,
+				// **AND SO DOES `crs`, on exactly the same argument** (Task 641): emptying the drawing
+				// does not change what plane it was drawn in, and it is the other property that can
+				// never be re-chosen.
+				crs: project.crs, activeScenario: 'base' };
+			// The backdrop is deliberately NOT removed -- see the note above the function.
+			// saveToStorage(), NOT removeItem(): labelSettings/settings are preferences, not network
+			// content, and must survive "New / Clear". removeItem() wipes them out of localStorage too,
+			// leaving them intact only in memory until some later unrelated mutation saves again.
+			saveToStorage();
+			lastSolveResult = null;
+			closePopup();
+			buildDom();
+			updateEmptyHint();
+			setStatus('');
+			setMode('select');
+			refreshScenarioStatus();
+			// **NO FIT HERE.** An empty drawing has no extent, so bbox() falls back to a 0-10 square and
+			// the "fit" is a zoom to an invented ten-unit box. The reader keeps the view they were
+			// looking at: there is nothing to look at, and where they were is where they will draw.
+		});
 	}
 
 	function init() {
@@ -42147,8 +42422,12 @@ var EngCalcs = EngCalcs || {};
 	// this function and its toolbar button once satisfied with how the debounce/solve holds up.
 	function drawTestGrid() {
 		if (doc.nodes.length > 0) {
-			if (!window.confirm('This will add to the existing network. Continue?')) { return; }
+			askDialog({ kind: 'confirm', text: 'This will add to the existing network. Continue?' }, function (yes) { if (yes) { drawTestGridNow(); } });
+			return;
 		}
+		drawTestGridNow();
+	}
+	function drawTestGridNow() {
 		saveUndoSnapshot();
 		var SIZE = 8, SPACING = 20, grid = [], row, col, n, demand = niceDefault('lpn_u_flow', 'gpm', 5, 0.0003);
 		for (row = 0; row < SIZE; row++) {
@@ -46081,7 +46360,7 @@ var EngCalcs = EngCalcs || {};
 			wrap.className = 'lpn-set-ctlgroup';
 			input.type = 'text'; input.size = 4; input.value = settings.idPrefixes[key];
 			input.addEventListener('change', function () {
-				if (!validatePrefix(input.value)) { alert(pc.lpn_id_invalid || 'Enter an ID with no spaces and no quotation marks.'); input.value = settings.idPrefixes[key]; return; }
+				if (!validatePrefix(input.value)) { setWarning(pc.lpn_id_invalid || 'Enter an ID with no spaces and no quotation marks.'); input.value = settings.idPrefixes[key]; return; }
 				settings.idPrefixes[key] = input.value;
 				saveToStorage();
 			});
@@ -46255,12 +46534,12 @@ var EngCalcs = EngCalcs || {};
 				textRow('key', pc.lpn_cp_key || 'Key', pc.lpn_cp_key_tip, function (input) {
 					var k = customPropKey(input.value), all = customPropDefs(), j;
 					if (!k) {
-						alert(pc.lpn_cp_key_needed || 'Give this custom property a key with no spaces.');
+						setWarning(pc.lpn_cp_key_needed || 'Give this custom property a key with no spaces.');
 						input.value = customPropBareKey(def.key); return;
 					}
 					for (j = 0; j < all.length; j++) {
 						if (j !== i && all[j].key === k) {
-							alert(pc.lpn_cp_key_taken || 'Another custom property already uses that key.');
+							setWarning(pc.lpn_cp_key_taken || 'Another custom property already uses that key.');
 							input.value = customPropBareKey(def.key); return;
 						}
 					}
@@ -46428,7 +46707,7 @@ var EngCalcs = EngCalcs || {};
 			// most expensive thing this page can do to a document, from a button whose label says
 			// nothing about scenarios.
 			if (!inBaseScenario()) {
-				alert((pc.lpn_push_base_only || 'This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.')
+				setWarning((pc.lpn_push_base_only || 'This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.')
 					.replace(/\{base\}/g, pc.lpn_scenario_base || 'Base'));
 				return;
 			}
@@ -46448,7 +46727,7 @@ var EngCalcs = EngCalcs || {};
 			// displayed this button would otherwise look broken, and the reason is off-screen in
 			// another panel. Naming that panel is the whole value of the message.
 			if (!active.length) {
-				alert(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
+				tellNotice(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
 				return;
 			}
 			// TWO different counts, because "nothing to do" has two causes needing different
@@ -46475,11 +46754,11 @@ var EngCalcs = EngCalcs || {};
 			var nodeCounts = counts(doc.nodes, 'node'), linkCounts = counts(doc.links, 'link');
 			var carriers = nodeCounts.carriers + linkCounts.carriers;
 			var targets = nodeCounts.changing + linkCounts.changing;
-			if (!carriers) { alert(pc.lpn_push_nothing || 'No existing asset has any of the properties being applied.'); return; }
+			if (!carriers) { tellNotice(pc.lpn_push_nothing || 'No existing asset has any of the properties being applied.'); return; }
 			// Distinct from the message above on purpose: "nothing carries these properties" and
 			// "everything already has these values" are opposite situations, and telling a user the
 			// first when the second is true would send them hunting for a problem that isn't there.
-			if (!targets) { alert(pc.lpn_push_no_change || 'Every asset already has these values, so nothing would change.'); return; }
+			if (!targets) { tellNotice(pc.lpn_push_no_change || 'Every asset already has these values, so nothing would change.'); return; }
 			// The confirm NAMES the properties, it does not merely count them -- a count alone
 			// ("push 2 properties?") leaves the user guessing which two, and this action is not
 			// something to guess at. Assembled from already-translated label text plus two short
@@ -46488,20 +46767,22 @@ var EngCalcs = EngCalcs || {};
 			var msg = (pc.lpn_push_confirm || 'Replace these properties on every existing asset with the values now set for new assets? Values you have typed will be overwritten. You can undo this.')
 				+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
 				+ '\n' + (pc.lpn_push_assets || 'Nodes and pipes:') + ' ' + targets;
-			if (!window.confirm(msg)) { return; }
-			saveUndoSnapshot();
-			doc.nodes.forEach(function (n) {
-				active.forEach(function (s) { if (s.group === 'node' && s.applies(n)) { s.set(n, settings.defaults[s.key]); } });
+			askDialog({ kind: 'confirm', text: msg }, function (yes) {
+				if (!yes) { return; }
+				saveUndoSnapshot();
+				doc.nodes.forEach(function (n) {
+					active.forEach(function (s) { if (s.group === 'node' && s.applies(n)) { s.set(n, settings.defaults[s.key]); } });
+				});
+				doc.links.forEach(function (l) {
+					active.forEach(function (s) { if (s.group === 'link' && s.applies(l)) { s.set(l, settings.defaults[s.key]); } });
+				});
+				// refreshPopupIfOpen() because an open element popup is now showing stale numbers for
+				// the very element that just changed under it.
+				refreshPopupIfOpen();
+				requestLabelRefresh();
+				scheduleSolve();
+				saveToStorage();
 			});
-			doc.links.forEach(function (l) {
-				active.forEach(function (s) { if (s.group === 'link' && s.applies(l)) { s.set(l, settings.defaults[s.key]); } });
-			});
-			// refreshPopupIfOpen() because an open element popup is now showing stale numbers for
-			// the very element that just changed under it.
-			refreshPopupIfOpen();
-			requestLabelRefresh();
-			scheduleSolve();
-			saveToStorage();
 		});
 		defBody.appendChild(pushBtn);
 		defBody.appendChild(document.createElement('br'));
@@ -47058,27 +47339,34 @@ var EngCalcs = EngCalcs || {};
 			// the stored number is what the user typed -- except that here we ASK first, because
 			// there is no unit strip to make the change self-evident afterwards.
 			if (doc.links.some(function (l) { return l.type !== 'pump'; })) {
-				if (!confirm(pc.lpn_method_switch_confirm
-					|| 'Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?')) {
-					methodSelect.value = was;
-					return;
-				}
+				// The select shows the old method until the answer: a No leaves nothing to put back.
+				methodSelect.value = was;
+				askDialog({ kind: 'confirm', text: pc.lpn_method_switch_confirm
+					|| 'Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?' }, function (yes) {
+					if (!yes) { return; }
+					methodSelect.value = now;
+					switchMethod();
+				});
+				return;
 			}
-			settings.method = now;
-			// The DEFAULT follows the method -- future elements only, never existing ones, per the
-			// Default inputs section's own stated rule. Without this, a user who switches to Manning
-			// and draws a pipe gets C = 130 as an n.
-			settings.defaults.roughness = defaultRoughnessFor(now);
-			applyMethodUI();
-			saveToStorage();
-			// Rebuild rather than patch: the roughness row's LABEL and its unit both changed, and so
-			// did this select's own read of frictionMethod(). THE WHOLE BOX, not just this section
-			// -- roughnessLabel() also names a Labels checkbox and a Coloring field, and those two
-			// carried the old method's symbol until the box was next opened from scratch.
-			rebuildSettingsBox();
-			refreshPopupIfOpen();
-			refreshMapStatus();
-			scheduleSolve();
+			switchMethod();
+			function switchMethod() {
+				settings.method = now;
+				// The DEFAULT follows the method -- future elements only, never existing ones, per the
+				// Default inputs section's own stated rule. Without this, a user who switches to Manning
+				// and draws a pipe gets C = 130 as an n.
+				settings.defaults.roughness = defaultRoughnessFor(now);
+				applyMethodUI();
+				saveToStorage();
+				// Rebuild rather than patch: the roughness row's LABEL and its unit both changed, and so
+				// did this select's own read of frictionMethod(). THE WHOLE BOX, not just this section
+				// -- roughnessLabel() also names a Labels checkbox and a Coloring field, and those two
+				// carried the old method's symbol until the box was next opened from scratch.
+				rebuildSettingsBox();
+				refreshPopupIfOpen();
+				refreshMapStatus();
+				scheduleSolve();
+			}
 		});
 		row(compBody, pc.bpn_method || 'Friction method', methodSelect, pc.bpn_roughness_tip);
 		hydNumberRow('accuracy', 'lpn_settings_accuracy', 'Accuracy',
@@ -47129,28 +47417,30 @@ var EngCalcs = EngCalcs || {};
 		restoreBtn.textContent = pc.calc_defaults || 'Restore defaults';
 		helpTip(restoreBtn, pc.lpn_settings_restore_tip);
 		restoreBtn.addEventListener('click', function () {
-			if (!window.confirm(pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own.')) { return; }
-			settings = defaultSettings();
-			// defaultSettings() leaves settings.defaults full of nulls on purpose -- refill them
-			// here, or every default input would come back blank instead of at its starting value.
-			seedDefaultInputs();
-			labelSettings = defaultLabelSettings();
-			roughnessDecimalsAuto = 0;
-			// No applyMapHeight() -- the canvas height stopped being a setting when the Map height
-			// row was retired, and it is a fact about the ENVIRONMENT (Tom, 2026-08-15: *"Map bottom
-			// has nothing to do with the model at all. It's the environment."*). Restoring defaults
-			// cannot change how much room the window has.
-			applyLegendPosition();
-			refreshFontSizes();
-			// refreshLabelText(), not renderLabelsLegend(): resetting labelSettings changes which
-			// fields are printed and what prefix each carries, so the labels themselves have to be
-			// rebuilt -- and that call renders the legend on its way through. Restoring defaults
-			// used to redraw only the legend, which left the map showing the old label set.
-			requestLabelRefresh();
-			// The whole box: defaultSettings() resets the colour field, the ramp and the legend
-			// positions too, and the colour controls were showing the old ones.
-			rebuildSettingsBox();
-			saveToStorage();
+			askDialog({ kind: 'confirm', text: pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own.' }, function (yes) {
+				if (!yes) { return; }
+				settings = defaultSettings();
+				// defaultSettings() leaves settings.defaults full of nulls on purpose -- refill them
+				// here, or every default input would come back blank instead of at its starting value.
+				seedDefaultInputs();
+				labelSettings = defaultLabelSettings();
+				roughnessDecimalsAuto = 0;
+				// No applyMapHeight() -- the canvas height stopped being a setting when the Map height
+				// row was retired, and it is a fact about the ENVIRONMENT (Tom, 2026-08-15: *"Map bottom
+				// has nothing to do with the model at all. It's the environment."*). Restoring defaults
+				// cannot change how much room the window has.
+				applyLegendPosition();
+				refreshFontSizes();
+				// refreshLabelText(), not renderLabelsLegend(): resetting labelSettings changes which
+				// fields are printed and what prefix each carries, so the labels themselves have to be
+				// rebuilt -- and that call renders the legend on its way through. Restoring defaults
+				// used to redraw only the legend, which left the map showing the old label set.
+				requestLabelRefresh();
+				// The whole box: defaultSettings() resets the colour field, the ramp and the legend
+				// positions too, and the colour controls were showing the old ones.
+				rebuildSettingsBox();
+				saveToStorage();
+			});
 		});
 		tail.appendChild(restoreBtn);
 		// "Wipe memory" (Tom, 2026-07-30, temporary): the full reset above the URL-param path
@@ -49343,7 +49633,7 @@ var EngCalcs = EngCalcs || {};
 		reader.onload = function (ev) { libImportText(ev.target.result, file.name); };
 		reader.onerror = function () {
 			var pc = EngCalcs.pageConfig || {};
-			alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
+			setWarning(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
 		};
 		reader.readAsText(file);
 	}
@@ -50754,7 +51044,7 @@ var EngCalcs = EngCalcs || {};
 		del = libButton(pc.lpn_tool_delete || 'Delete', function () {
 			var inUse = pipeTypeUsers(t.id);
 			if (inUse.length) {
-				alert((pc.lpn_library_pipetype_in_use
+				setWarning((pc.lpn_library_pipetype_in_use
 					|| 'This pipe type is used by {count} pipes: {ids}. Detach it from them before deleting it.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
@@ -51017,7 +51307,7 @@ var EngCalcs = EngCalcs || {};
 		del = libButton(pc.lpn_tool_delete || 'Delete', function () {
 			var inUse = fittingSetUsers(set.id);
 			if (inUse.length) {
-				alert((pc.lpn_library_fittings_in_use
+				setWarning((pc.lpn_library_fittings_in_use
 					|| 'This fittings list is used by {count} pipes: {ids}. Detach it from them before deleting it.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
@@ -51269,7 +51559,7 @@ var EngCalcs = EngCalcs || {};
 		del = libButton(pc.lpn_tool_delete || 'Delete', function () {
 			var inUse = curveUsers(c.id);
 			if (inUse.length) {
-				alert((pc.lpn_library_curve_in_use
+				setWarning((pc.lpn_library_curve_in_use
 					|| 'This curve is used by {count} elements: {ids}. Point them at another curve first, then delete this one.')
 					.replace('{count}', String(inUse.length)).replace('{ids}', inUse.join(', ')));
 				return;
@@ -51402,9 +51692,9 @@ var EngCalcs = EngCalcs || {};
 	function libCurveTsv(pts) {
 		return (pts || []).map(function (p) { return String(p[0]) + '\t' + String(p[1]); }).join('\n');
 	}
-	// **THE PROMPT IS NOT A FALLBACK NOBODY NEEDS.** navigator.clipboard is absent on a page served
+	// **THE COPY BOX IS NOT A FALLBACK NOBODY NEEDS.** navigator.clipboard is absent on a page served
 	// over plain http and refused where the gesture is not trusted, and a Copy button that silently
-	// does nothing is worse than no button. The prompt hands over the same text, selectable.
+	// does nothing is worse than no button. The question box hands over the same text, selected.
 	function libCopyOut(text) {
 		var pc = EngCalcs.pageConfig || {};
 		try {
@@ -51413,9 +51703,7 @@ var EngCalcs = EngCalcs || {};
 				return true;
 			}
 		} catch (e) { /* fall through to the prompt */ }
-		if (typeof window !== 'undefined' && window.prompt) {
-			window.prompt(pc.lpn_library_curve_copy_manual || 'Copy these points', text);
-		}
+		askDialog({ kind: 'copy', text: pc.lpn_library_curve_copy_manual || 'Copy these points', value: text });
 		return false;
 	}
 	/**
@@ -53587,7 +53875,7 @@ var EngCalcs = EngCalcs || {};
 		input.setAttribute('aria-label', pc.lpn_field_id || 'ID');
 		input.addEventListener('change', function () {
 			var newId = input.value, result = validateNewId(newId, currentId, group);
-			if (result !== true) { alert(result); input.value = currentId; return; }
+			if (result !== true) { setWarning(result); input.value = currentId; return; }
 			if (newId !== currentId) { saveUndoSnapshot(); onRename(newId); }
 		});
 		title.appendChild(input);
@@ -53815,26 +54103,28 @@ var EngCalcs = EngCalcs || {};
 				.replace('{n}', '0').replace('{skipped}', String(skipped)));
 			return;
 		}
-		if (!window.confirm((pc.lpn_confirm_apply_prefix || 'Rename {n} assets so their IDs start with {prefix}? Each one keeps its number.')
-			.replace('{n}', String(plan.length)).replace('{prefix}', prefix))) { return; }
-		saveUndoSnapshot();
-		// Phase 1 parks every one of them on an id nothing can answer to: '#' is rejected by
-		// validateNewId()'s rules for a typed id, so no user-authored id can be sitting on one.
-		plan.forEach(function (step, i) {
-			step.tmp = '#tmp' + i;
-			if (step.isNode) { applyNodeRename(step.id, step.tmp); } else { applyLinkRename(step.id, step.tmp); }
+		askDialog({ kind: 'confirm', text: (pc.lpn_confirm_apply_prefix || 'Rename {n} assets so their IDs start with {prefix}? Each one keeps its number.')
+			.replace('{n}', String(plan.length)).replace('{prefix}', prefix) }, function (yes) {
+			if (!yes) { return; }
+			saveUndoSnapshot();
+			// Phase 1 parks every one of them on an id nothing can answer to: '#' is rejected by
+			// validateNewId()'s rules for a typed id, so no user-authored id can be sitting on one.
+			plan.forEach(function (step, i) {
+				step.tmp = '#tmp' + i;
+				if (step.isNode) { applyNodeRename(step.id, step.tmp); } else { applyLinkRename(step.id, step.tmp); }
+			});
+			plan.forEach(function (step) {
+				if (step.isNode) { applyNodeRename(step.tmp, step.want); } else { applyLinkRename(step.tmp, step.want); }
+			});
+			// The next element drawn must not land on a number now in use.
+			if (nextId[key] === undefined || nextId[key] <= highest) { nextId[key] = highest + 1; }
+			if (currentPopup) { closePopup(); }   // it names an id that may no longer exist
+			requestLabelRefresh();
+			scheduleSolve();
+			saveToStorage();
+			setNotice((pc.lpn_prefix_applied || 'Renamed {n} assets. {skipped} others were left alone.')
+				.replace('{n}', String(plan.length)).replace('{skipped}', String(skipped)));
 		});
-		plan.forEach(function (step) {
-			if (step.isNode) { applyNodeRename(step.tmp, step.want); } else { applyLinkRename(step.tmp, step.want); }
-		});
-		// The next element drawn must not land on a number now in use.
-		if (nextId[key] === undefined || nextId[key] <= highest) { nextId[key] = highest + 1; }
-		if (currentPopup) { closePopup(); }   // it names an id that may no longer exist
-		requestLabelRefresh();
-		scheduleSolve();
-		saveToStorage();
-		setNotice((pc.lpn_prefix_applied || 'Renamed {n} assets. {skipped} others were left alone.')
-			.replace('{n}', String(plan.length)).replace('{skipped}', String(skipped)));
 	}
 	/**
 	 * The read-only water-quality row.
@@ -56205,14 +56495,22 @@ var EngCalcs = EngCalcs || {};
 	function undo() {
 		if (undoStack.length === 0) { return; }
 		var snap = undoStack.pop();
-		pushBounded(redoStack, makeUndoSnapshot());
+		pushBounded(redoStack, counterSnapshot(snap));
 		restoreUndoSnapshot(snap);
 	}
 	function redo() {
 		if (redoStack.length === 0) { return; }
 		var snap = redoStack.pop();
-		pushBounded(undoStack, makeUndoSnapshot());
+		pushBounded(undoStack, counterSnapshot(snap));
 		restoreUndoSnapshot(snap);
+	}
+	// The state being left, recorded the same way `snap` was: a snapshot carrying the whole
+	// `project` (Delete network's) is answered by one that carries it too, so Redo drops again
+	// exactly what Undo gave back.
+	function counterSnapshot(snap) {
+		var back = makeUndoSnapshot();
+		if (snap.project) { back.project = JSON.parse(JSON.stringify(project)); }
+		return back;
 	}
 	// Puts the page back to one snapshot, for undo() and redo() alike.
 	function restoreUndoSnapshot(snap) {
@@ -56226,6 +56524,10 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) { wasAt[n.id] = nodeDrawX(n) + ',' + nodeDrawY(n); });
 		doc = snap.state.doc;
 		scenarios = snap.state.scenarios;
+		// The fields only Delete network's snapshot carries (see deleteNetwork()). Assigned before
+		// the comparisons below, which then read the snapshot's own coords and basemap anyway.
+		var prevBasemap = project.basemap, prevCoords = project.coords;
+		if (snap.project) { project = JSON.parse(JSON.stringify(snap.project)); project.coords = prevCoords; project.basemap = prevBasemap; }
 		// **THE FRAME COMES BACK BEFORE ANYTHING READS A COORDINATE** (Task 436). outwardX/outwardY
 		// ask isLatLonProject(), and minScale()/maxScale() do too, so a document restored under the
 		// wrong `coords` is drawn in the wrong frame for the length of this function.
@@ -57525,6 +57827,16 @@ var EngCalcs = EngCalcs || {};
 		if (el && el.textContent === words) { return; }
 		showNotice(words);
 	}
+	// **A FORMER alert() IS STILL A MODAL, IN THE PAGE'S OWN BOX** (Task 710; coordinator relaying
+	// Tom, 2026-10-04: convert, do not downgrade). A failure or refusal must not vanish unread, so it
+	// waits for OK in askDialog(), and it is kept in the message log at its own severity as well.
+	function tellDialog(text, severity) {
+		if (!text) { return; }
+		logMessage(text, severity === 'warning' ? 'warning' : 'notice');
+		askDialog({ kind: 'alert', text: text });
+	}
+	function setWarning(text) { tellDialog(text, 'warning'); }
+	function tellNotice(text) { tellDialog(text, 'notice'); }
 	var lastNoticeText = '';   // what setNotice() last put up, so a later notice is never taken back by mistake
 	function setNotice(text) {
 		if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }
@@ -62518,7 +62830,7 @@ var EngCalcs = EngCalcs || {};
 	function loadCalibFile(file) {
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
 		reader.onload = function (ev) { landCalibText(String(ev.target.result), file.name); };
-		reader.onerror = function () { alert(pc.lpn_survey_read_error || 'That file could not be read from your disk.'); };
+		reader.onerror = function () { setWarning(pc.lpn_survey_read_error || 'That file could not be read from your disk.'); };
 		reader.readAsText(file);
 	}
 	function openCalibBox() {

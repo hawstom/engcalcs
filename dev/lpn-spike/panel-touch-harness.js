@@ -330,7 +330,8 @@ const CONDITIONAL_DISPLAY = [
 	[/^showNotice$/, /^el$/, 'the one-line map notice (lpn_map_notice): text only, no control'],
 	[/^syncStatusBoxVisibility$/, /^el$/, 'the status line (lpn_status): text only, no control. JUDGEMENT CALL: it is a box, '
 		+ 'but it holds no control, cannot be dragged and cannot be closed by the visitor'],
-	[/^paintEngineBanner$/, /^el$/, 'the engine-wait banner across the top of the map: text only']
+	[/^paintEngineBanner$/, /^el$/, 'the engine-wait banner across the top of the map: text only'],
+	[/^openDialog$/, /^title$/, 'the modal dialog\'s own title band (Task 710): shown when a question names one, inside #lpn_dialog, holding no control']
 ];
 // What section 2c owns instead, as function + element.
 const PANE_SEAM_WRITES = [['applyPaneLayout', 'pane'], ['applyPaneLayout', 'btn'], ['applyRPaneLayout', 'pane']];
