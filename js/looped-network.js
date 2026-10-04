@@ -57508,12 +57508,14 @@ var EngCalcs = EngCalcs || {};
 		if (el && el.textContent === words) { return; }
 		showNotice(words);
 	}
+	var lastNoticeText = '';   // what setNotice() last put up, so a later notice is never taken back by mistake
 	function setNotice(text) {
 		if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }
 		// **EVERY NOTICE IS KEPT BEFORE IT IS SHOWN** (Task 704). This is the one door 66 call
 		// sites already go through, which is why the log needed no second seam: teaching the door
 		// teaches all of them at once.
 		logMessage(text, 'notice');
+		lastNoticeText = text;
 		showNotice(text);
 		if (text) {
 			statusNoticeTimer = setTimeout(function () {
@@ -57586,9 +57588,22 @@ var EngCalcs = EngCalcs || {};
 		}, ms);
 	}
 
+	// The advice is a notice now (see adviseIfSlow() in js/lpn-time.js), so what can be standing is
+	// the notice, and only while it is still the slow-run sentence: any other notice is left alone.
+	var slowAdviceText = '';
+	// The seam's notice door for js/lpn-time.js: logged and transient. Only the slow-run advice is
+	// remembered for clearSlowAdvice(); the run summary is old news and just fades.
+	function showSlowAdvice(text, code) {
+		slowAdviceText = code === (EngCalcs.LPN_TIME_SLOW_CODE || 'timeslow') ? text : '';
+		setNotice(text);
+	}
 	function clearSlowAdvice() {
-		var code = (EngCalcs.LPN_TIME_SLOW_CODE || 'timeslow');
-		if (statusWrongCode === code) { setStatus(''); }
+		if (slowAdviceText && lastNoticeText === slowAdviceText) {
+			if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }
+			lastNoticeText = '';
+			showNotice('');
+		}
+		slowAdviceText = '';
 	}
 
 	// ---- The engine-difference notes, which expire on a clock of their own ----
@@ -62794,7 +62809,7 @@ var EngCalcs = EngCalcs || {};
 		EngCalcs.lpnTimeInit({
 			tabs: paneTabs,
 			doc: function () { return doc; },
-			apply: applySolveResult, status: setStatus, solve: scheduleSolve,
+			apply: applySolveResult, status: setStatus, notice: showSlowAdvice, solve: scheduleSolve,
 			// **AND THE UNDEBOUNCED ONE, which is what asking for a run needs** (Task 248,
 			// 2026-08-19). A period run is provoked by a deliberate act -- the Run button, or a
 			// quiet moment that has already been waited out -- and going through the 300 ms
