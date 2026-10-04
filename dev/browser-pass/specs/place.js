@@ -733,7 +733,7 @@ exports.run = async function ({ browser, report }) {
 		report.ok(/Longitude/.test(read) && /Latitude/.test(read),
 			'the project is geographic afterwards: the readout speaks in degrees', read);
 		report.eq(await shownNodeCount(a), before, '...with the same network still drawn');
-		report.has(await a.notice(), 'new coordinate system', '...and it says so');
+		report.has(await a.notice(), await a.lang('lpn_georef_done'), '...and it says so');
 		report.ok(!(await labelsHidden(a)), '...with the labels back on');
 		const onMap = await fileRow(a, ROW);
 		report.ok(!!onMap, 'a project already on the map still SHOWS the command',
