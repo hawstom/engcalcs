@@ -47,7 +47,9 @@ async function openPane(a) {
 }
 
 // In the page: every column of the table on show, against the floor its own content sets.
-// The heading may wrap between words and never inside one, so its floor is its LONGEST WORD; a
+// The heading may wrap between words, and a word of eight characters or more carries a soft hyphen
+// at its middle (R-356, PANE_WORD_MAX), so its floor is its LONGEST PIECE between spaces and soft
+// hyphens, never a whole long word (a unit breaks after its slash, <wbr>); a
 // pull-down's floor is the text of the option it is showing, because a pull-down that clips its
 // own choice is the "due to selector?" Tom suspected. An input's width is a declared, approved em
 // and a long value scrolls inside it (his own rule: "inputs are flexible"), so it sets no floor.
@@ -61,12 +63,14 @@ const COLUMN_FLOORS = (id) => {
 	const body = [...table.querySelectorAll('tbody tr')];
 	const cols = ths.map((th, i) => {
 		const btn = th.querySelector('button') || th;
-		const words = btn.textContent.replace(/[▲▼]/g, '').trim().split(/\s+/);
+		const words = btn.textContent.replace(/[▲▼]/g, '').trim().split(/[\s\u00ad/]+/);
 		const word = Math.max(...words.map((w) => textW(btn, w)));
 		let pick = 0, pickText = '';
 		body.forEach((tr) => {
 			const sel = tr.children[i] && tr.children[i].querySelector('select');
-			if (!sel || sel.selectedIndex < 0) { return; }
+			// An UNSET pull-down shows its "No ... selected" placeholder and sets no floor: the page
+			// skips it on purpose (paneColContentEm), so a column of only those is sized by its heading.
+			if (!sel || sel.selectedIndex < 0 || sel.value === '') { return; }
 			const t = sel.options[sel.selectedIndex].textContent;
 			const w = textW(sel, t);
 			if (w > pick) { pick = w; pickText = t; }
