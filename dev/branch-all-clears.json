@@ -420,6 +420,27 @@
    "words": "property-graph (8106): Done. Close, merge, and delete branch.",
    "context": "His own pasted message, 2026-10-04 morning session, after his browser pass on port 8106.",
    "pin_note": "He tested 3c987393. The pin is two commits later: a merge of master into the branch and the regeneration of new-english-keys.md and the translation payloads, no feature change."
+  },
+  "feat/dock": {
+   "head": "6eed29b6f694b62537270966eced65692eb39fb9",
+   "date": "2026-10-04",
+   "words": "8107 dock: Good. Done. Close, merge, and delete branch.",
+   "context": "His own pasted message, 2026-10-04 late-morning session, after his browser pass on port 8107.",
+   "pin_note": "He tested the branch head of earlier today; the pin adds only a merge of master into the branch and regenerated features list, keys list and translation payloads."
+  },
+  "feat/table-selection": {
+   "head": "0f4135044d60d650c5addb67c46418f601ca87a3",
+   "date": "2026-10-04",
+   "words": "8109 table-selection: Good. Done. Close, merge, and delete branch.",
+   "context": "His own pasted message, 2026-10-04 late-morning session, after his browser pass on port 8109.",
+   "pin_note": "He tested the branch head of earlier today; the pin adds only a merge of master into the branch and regenerated features list, keys list and translation payloads."
+  },
+  "feat/setting-scope": {
+   "head": "77c810be8a41ba979f93bdca740882e9f4972542",
+   "date": "2026-10-04",
+   "words": "8112 setting-scope: Good. Done. Close, merge, and delete branch.",
+   "context": "His own pasted message, 2026-10-04 late-morning session, after his browser pass on port 8112.",
+   "pin_note": "He tested the branch head of earlier today; the pin adds only a merge of master into the branch and regenerated features list, keys list and translation payloads."
   }
  }
 }

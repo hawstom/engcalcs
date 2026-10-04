@@ -118,7 +118,10 @@
         "feat/table-selection",
         "feat/setting-scope",
         "feat/scenario-option",
-        "feat/basemap-style"
+        "feat/basemap-style",
+        "feat/tip-verdict",
+        "feat/elev-default",
+        "feat/epanet-pp-brand"
     ],
     "feature_freeze": {
         "active": false,
