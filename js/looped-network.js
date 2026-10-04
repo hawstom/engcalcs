@@ -40608,22 +40608,20 @@ var EngCalcs = EngCalcs || {};
 			// bottom-pane tab, as the Profile row did. System flow is not built, so there is no
 			// placeholder row. Contour is the exception: a map layer, so its row shows it on the map.
 			// The Profile row has no icon of its own (Tom, 2026-10-02: *"We can remove the graph icon
-			// from the Profile command now."*); the Graphs row keeps it.
+			// from the Profile command now."*); the Graphs row keeps it. Row order is EPANET's Graph
+			// Selection order (Uglobals.pas: time series, profile, contour, frequency, system flow), which
+			// Tom asked be kept unless there was a reason not to (2026-10-04); Mary found none.
 			{
 				icon: 'profile', label: pc.lpn_graphs_menu || 'Graphs', tip: pc.lpn_graphs_menu_tip,
 				submenu: function () {
 					return [
 						{
-							label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
-							fn: function () { closeMenu(); openPane('profile'); }
-						},
-						{
 							label: pc.lpn_ts_menu || 'Time series', tip: pc.lpn_ts_tip,
 							fn: function () { closeMenu(); openPane('timeseries'); }
 						},
 						{
-							label: pc.lpn_freq_menu || 'Frequency', tip: pc.lpn_freq_tip,
-							fn: function () { closeMenu(); openPane('frequency'); }
+							label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
+							fn: function () { closeMenu(); openPane('profile'); }
 						},
 						// THE CONTOUR PLOT IS A MAP LAYER, so this row SHOWS it rather than opening a
 						// tab: a smooth fill of the node colouring with labelled lines (pressure, if
@@ -40632,6 +40630,10 @@ var EngCalcs = EngCalcs || {};
 						{
 							label: pc.lpn_contour_menu || 'Contour', tip: pc.lpn_contour_tip,
 							fn: function () { closeMenu(); showContour(); }
+						},
+						{
+							label: pc.lpn_freq_menu || 'Frequency', tip: pc.lpn_freq_tip,
+							fn: function () { closeMenu(); openPane('frequency'); }
 						},
 						{
 							label: pc.lpn_sysflow_menu || 'Flow balance', tip: pc.lpn_sysflow_tip,
