@@ -56468,7 +56468,7 @@ var EngCalcs = EngCalcs || {};
 	// smaller change than a status line inside each. The log and the map notice still carry it.
 	function showWarnStrip(text) {
 		var el = document.getElementById('lpn_warn_strip');
-		if (!text) { if (el) { el.style.display = 'none'; } return; }
+		if (!text) { if (el) { el.classList.add('lpn-warn-strip-off'); } return; }
 		if (!el) {
 			el = document.createElement('div');
 			el.id = 'lpn_warn_strip';
@@ -56477,7 +56477,7 @@ var EngCalcs = EngCalcs || {};
 			document.body.appendChild(el);
 		}
 		el.textContent = text;
-		el.style.display = 'block';
+		el.classList.remove('lpn-warn-strip-off');
 	}
 	function setNotice(text, severity) {
 		if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }

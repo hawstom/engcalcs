@@ -1359,6 +1359,7 @@ html[lang="zh"] .ec-welcome {
 	box-shadow: 0 2px 8px var(--ec-a-0-0-0-35);
 }
 @media print { .lpn-warn-strip { display: none; } }
+.lpn-warn-strip.lpn-warn-strip-off { display: none; }
 .lpn-regmode-bar button { font: inherit; padding: 0.15em 0.7em; cursor: pointer; }
 @media print { .lpn-regmode-bar { display: none; } }
 /* **A THING THE USER CANNOT SEE CANNOT BE GRABBED**, and this one keyword is what makes invisibility
