@@ -529,7 +529,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**29 still to read**, of 36 new keys across 11 unmerged branch(es).
+**29 still to read**, of 36 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -672,5 +672,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_time_scn_overrides`**
   > Scenario overrides:
   @@ NEEDS RULING
-
-### feat/tip-verdict (`4ce48243`) — adds no English strings

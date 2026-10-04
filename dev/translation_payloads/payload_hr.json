@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hr",
-        "expected_key_count": 2352,
-        "delta_key_count": 73,
+        "expected_key_count": 2307,
+        "delta_key_count": 76,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -714,6 +714,7 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_pane_sort_desc": "Sort descending",
         "lpn_pane_manage_cols_width": "Width (em)",
         "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
         "lpn_dock_left": "Dock at the left of the map",
@@ -725,7 +726,6 @@
         "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
         "lpn_pane_sel_only": "Selection only",
         "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
-        "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
         "lpn_result_pump_head": "Head",
@@ -734,6 +734,8 @@
         "lpn_contour_show": "Show contours",
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_cp_allow_tip": "Allow only these characters:",
+        "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
         "lpn_settings_basemap_style": "Basemap style",
         "lpn_settings_basemap_style_tip": "Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.",
         "lpn_basemap_style_normal": "Normal",
@@ -743,6 +745,7 @@
         "lpn_saved_project": "Saved with the project",
         "lpn_saved_browser": "Saved in this browser",
         "lpn_saved_session": "Not saved",
+        "lpn_choice_default": "Default",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
         "lpn_ds_title": "Demand scaling",
@@ -783,12 +786,13 @@
         "lpn_ds_no_junctions": "This project has no junctions yet, so there are no demands to scale.",
         "lpn_ds_no_selection": "No junctions are selected. Select junctions or choose All junctions.",
         "lpn_ds_skipped": "Selected elements that are not junctions, left as they are: {n}.",
-        "lpn_ds_bad_multiplier": "Type a demand scale of zero or more, such as 1.5.",
+        "lpn_ds_bad_multiplier": "Enter a demand scale of zero or more, such as 1.5.",
         "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
         "lpn_analyze_at_time": "Time step: {time}.",
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "keys": {
+        "lpn_pane_sort_desc": "Sort descending",
         "lpn_pane_manage_cols_width": "Width (em)",
         "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
         "lpn_dock_left": "Dock at the left of the map",
@@ -800,7 +804,6 @@
         "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
         "lpn_pane_sel_only": "Selection only",
         "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
-        "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
         "lpn_result_pump_head": "Head",
@@ -809,6 +812,8 @@
         "lpn_contour_show": "Show contours",
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_cp_allow_tip": "Allow only these characters:",
+        "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
         "lpn_settings_basemap_style": "Basemap style",
         "lpn_settings_basemap_style_tip": "Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.",
         "lpn_basemap_style_normal": "Normal",
@@ -818,6 +823,7 @@
         "lpn_saved_project": "Saved with the project",
         "lpn_saved_browser": "Saved in this browser",
         "lpn_saved_session": "Not saved",
+        "lpn_choice_default": "Default",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
         "lpn_ds_title": "Demand scaling",
@@ -858,12 +864,28 @@
         "lpn_ds_no_junctions": "This project has no junctions yet, so there are no demands to scale.",
         "lpn_ds_no_selection": "No junctions are selected. Select junctions or choose All junctions.",
         "lpn_ds_skipped": "Selected elements that are not junctions, left as they are: {n}.",
-        "lpn_ds_bad_multiplier": "Type a demand scale of zero or more, such as 1.5.",
+        "lpn_ds_bad_multiplier": "Enter a demand scale of zero or more, such as 1.5.",
         "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
         "lpn_analyze_at_time": "Time step: {time}.",
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "key_context": {
+        "lpn_pane_sort_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_sort_asc",
+                    "value": "Razvrstaj uzlazno",
+                    "english": "Sort ascending"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_manage_cols",
+                    "value": "Upravljaj stupcima…",
+                    "english": "Manage columns…"
+                }
+            }
+        },
         "lpn_pane_manage_cols_width": {
             "reason": "missing",
             "current_value": null,
@@ -1040,30 +1062,14 @@
                 }
             }
         },
-        "lpn_graphs_menu_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_graphs_menu",
-                    "value": "Grafikoni",
-                    "english": "Graphs"
-                },
-                "next_translated": {
-                    "key": "lpn_profile_tip",
-                    "value": "Nacrtajte teren i hidrauličku liniju (HGL) duž rute kroz mrežu.",
-                    "english": "Draw the ground and the hydraulic grade line along a path through the network."
-                }
-            }
-        },
         "lpn_pgraph_none": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ts_quantity_tip",
-                    "value": "Koju vrijednost prikazati na grafikonu u odnosu na vrijeme.",
-                    "english": "Which value to graph against time."
+                    "key": "lpn_ts_group_links",
+                    "value": "Vodovi",
+                    "english": "Links"
                 },
                 "next_translated": {
                     "key": "lpn_ts_add",
@@ -1077,9 +1083,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ts_quantity_tip",
-                    "value": "Koju vrijednost prikazati na grafikonu u odnosu na vrijeme.",
-                    "english": "Which value to graph against time."
+                    "key": "lpn_ts_group_links",
+                    "value": "Vodovi",
+                    "english": "Links"
                 },
                 "next_translated": {
                     "key": "lpn_ts_add",
@@ -1093,9 +1099,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ts_quantity_tip",
-                    "value": "Koju vrijednost prikazati na grafikonu u odnosu na vrijeme.",
-                    "english": "Which value to graph against time."
+                    "key": "lpn_ts_group_links",
+                    "value": "Vodovi",
+                    "english": "Links"
                 },
                 "next_translated": {
                     "key": "lpn_ts_add",
@@ -1109,9 +1115,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ts_quantity_tip",
-                    "value": "Koju vrijednost prikazati na grafikonu u odnosu na vrijeme.",
-                    "english": "Which value to graph against time."
+                    "key": "lpn_ts_group_links",
+                    "value": "Vodovi",
+                    "english": "Links"
                 },
                 "next_translated": {
                     "key": "lpn_ts_add",
@@ -1125,9 +1131,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ts_quantity_tip",
-                    "value": "Koju vrijednost prikazati na grafikonu u odnosu na vrijeme.",
-                    "english": "Which value to graph against time."
+                    "key": "lpn_ts_group_links",
+                    "value": "Vodovi",
+                    "english": "Links"
                 },
                 "next_translated": {
                     "key": "lpn_ts_add",
@@ -1181,6 +1187,38 @@
                     "key": "lpn_sysflow_produced",
                     "value": "Proizvedeno",
                     "english": "Produced"
+                }
+            }
+        },
+        "lpn_cp_allow_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_cp_restrict_tip",
+                    "value": "Ograniči ove znakove: Vrijednost smije koristiti samo ovdje navedene znakove, ili nijedan od njih, gdje „@” znači bilo koje slovo; „#” znači bilo koju znamenku, a „-”, „.” i „,” morate zasebno navesti ako su dopušteni; a svi razmaci moraju biti između drugih znakova.",
+                    "english": "Restrict these characters:"
+                },
+                "next_translated": {
+                    "key": "lpn_cp_restrict_mode",
+                    "value": "Dopusti ili ograniči",
+                    "english": "Allow or restrict"
+                }
+            }
+        },
+        "lpn_cp_characters_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_cp_restrict_tip",
+                    "value": "Ograniči ove znakove: Vrijednost smije koristiti samo ovdje navedene znakove, ili nijedan od njih, gdje „@” znači bilo koje slovo; „#” znači bilo koju znamenku, a „-”, „.” i „,” morate zasebno navesti ako su dopušteni; a svi razmaci moraju biti između drugih znakova.",
+                    "english": "Restrict these characters:"
+                },
+                "next_translated": {
+                    "key": "lpn_cp_restrict_mode",
+                    "value": "Dopusti ili ograniči",
+                    "english": "Allow or restrict"
                 }
             }
         },
@@ -1325,6 +1363,22 @@
                     "key": "lpn_settings_hydraulics",
                     "value": "Hidraulika",
                     "english": "Hydraulics"
+                }
+            }
+        },
+        "lpn_choice_default": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_pattern_none",
+                    "value": "Bez obrasca",
+                    "english": "No pattern"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_default_pattern",
+                    "value": "Zadani obrazac potražnje",
+                    "english": "Default demand pattern"
                 }
             }
         },
