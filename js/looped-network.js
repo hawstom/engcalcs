@@ -5071,12 +5071,13 @@ var EngCalcs = EngCalcs || {};
 			icon: 'insert', label: pc.lpn_scenario_new || 'New scenario…',
 			fn: function () {
 				var suggested = (pc.lpn_scenario_new_name || 'Scenario {n}').replace('{n}', scenarios.length);
-				var v = window.prompt(pc.lpn_scenario_prompt_name || 'Name for this scenario', suggested);
-				if (v === null) { return; }
-				v = v.trim();
-				if (!v) { return; }
-				saveUndoSnapshot();
-				createScenario(v);
+				askDialog({ kind: 'prompt', text: pc.lpn_scenario_prompt_name || 'Name for this scenario', value: suggested }, function (v) {
+					if (v === null) { return; }
+					v = v.trim();
+					if (!v) { return; }
+					saveUndoSnapshot();
+					createScenario(v);
+				});
 			}
 		});
 		rows.push({
@@ -5084,12 +5085,13 @@ var EngCalcs = EngCalcs || {};
 			// selector keys off isBase, so a rename here would rename nothing a user can see.
 			icon: 'edit', label: pc.lpn_scenario_rename || 'Rename scenario…', disabled: scn.isBase,
 			fn: function () {
-				var v = window.prompt(pc.lpn_scenario_prompt_name || 'Name for this scenario', scn.name || '');
-				if (v === null || !v.trim()) { return; }
-				saveUndoSnapshot();
-				scn.name = v.trim();
-				refreshScenarioStatus();
-				saveToStorage();
+				askDialog({ kind: 'prompt', text: pc.lpn_scenario_prompt_name || 'Name for this scenario', value: scn.name || '' }, function (v) {
+					if (v === null || !v.trim()) { return; }
+					saveUndoSnapshot();
+					scn.name = v.trim();
+					refreshScenarioStatus();
+					saveToStorage();
+				});
 			}
 		});
 		rows.push({
@@ -5099,9 +5101,11 @@ var EngCalcs = EngCalcs || {};
 				// question, and one holding forty values is worth a specific one.
 				var msg = (pc.lpn_scenario_delete_confirm || 'Delete the scenario {name}, and the {n} values that belong to it alone? The drawing itself is not changed.')
 					.replace('{name}', scenarioDisplayName(scn)).replace('{n}', overrideCount(scn));
-				if (!window.confirm(msg)) { return; }
-				saveUndoSnapshot();
-				deleteScenario(scn.id);
+				askDialog({ kind: 'confirm', text: msg }, function (yes) {
+					if (!yes) { return; }
+					saveUndoSnapshot();
+					deleteScenario(scn.id);
+				});
 			}
 		});
 		rows.push({ separator: true });
@@ -5412,18 +5416,20 @@ var EngCalcs = EngCalcs || {};
 			+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
 			+ '\n' + (pc.lpn_scenario_push_scenarios || 'Scenarios affected:') + ' ' + touched
 			+ '\n' + (pc.lpn_scenario_push_values || 'Values thrown away:') + ' ' + hits;
-		if (!window.confirm(msg)) { return; }
-		saveUndoSnapshot();
-		scenarios.forEach(function (s) {
-			if (s.isBase) { return; }
-			scopedKeys(s).forEach(function (k) {
-				active.forEach(function (spec) {
-					(spec.ovProps || [spec.prop]).forEach(function (p) { delete s.overrides[k][p]; });
+		askDialog({ kind: 'confirm', text: msg }, function (yes) {
+			if (!yes) { return; }
+			saveUndoSnapshot();
+			scenarios.forEach(function (s) {
+				if (s.isBase) { return; }
+				scopedKeys(s).forEach(function (k) {
+					active.forEach(function (spec) {
+						(spec.ovProps || [spec.prop]).forEach(function (p) { delete s.overrides[k][p]; });
+					});
+					if (!Object.keys(s.overrides[k]).length) { delete s.overrides[k]; }
 				});
-				if (!Object.keys(s.overrides[k]).length) { delete s.overrides[k]; }
 			});
+			applyScenarioChange();
 		});
-		applyScenarioChange();
 	}
 
 	/**
@@ -14028,8 +14034,10 @@ var EngCalcs = EngCalcs || {};
 				activeCancel = null; setRegMode(false);
 				var pxDist = Math.hypot(clicks[1].x - clicks[0].x, clicks[1].y - clicks[0].y);
 				var promptText = (pc.lpn_backdrop_scale_prompt2 || 'Real distance between the two points') + ' (' + unitLabel('lpn_u_length') + '):';
-				var real = +prompt(promptText, '');
-				if (real > 0) { saveUndoSnapshot(); backdrop.s = real / pxDist; applyBackdropTransform(); saveToStorage(); }
+				askDialog({ kind: 'prompt', text: promptText, value: '' }, function (txt) {
+					var real = +txt;
+					if (txt !== null && real > 0) { saveUndoSnapshot(); backdrop.s = real / pxDist; applyBackdropTransform(); saveToStorage(); }
+				});
 			}
 		};
 		svg.addEventListener('pointerup', handler, true);
@@ -14062,15 +14070,16 @@ var EngCalcs = EngCalcs || {};
 		var handler = function (e) {
 			svg.removeEventListener('pointerup', handler, true);
 			activeCancel = null; setRegMode(false);
-			var p = screenToWorld(e.clientX, e.clientY),
-				txt = prompt(pc.lpn_backdrop_scale_from_prompt2
-					|| 'Scale from its current size. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.', '1');
-			if (txt === null) { return; }
-			var f = parseFloat(txt);
-			// A zero or negative factor would collapse or mirror the picture, and neither is a thing
-			// a user means by "scale". Refused rather than clamped, so nothing happens silently.
-			if (!(f > 0) || !isFinite(f)) { return; }
-			scaleBackdropAbout(p, f);
+			var p = screenToWorld(e.clientX, e.clientY);
+			askDialog({ kind: 'prompt', text: pc.lpn_backdrop_scale_from_prompt2
+				|| 'Scale from its current size. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.', value: '1' }, function (txt) {
+				if (txt === null) { return; }
+				var f = parseFloat(txt);
+				// A zero or negative factor would collapse or mirror the picture, and neither is a thing
+				// a user means by "scale". Refused rather than clamped, so nothing happens silently.
+				if (!(f > 0) || !isFinite(f)) { return; }
+				scaleBackdropAbout(p, f);
+			});
 		};
 		svg.addEventListener('pointerup', handler, true);
 		activeCancel = function () { svg.removeEventListener('pointerup', handler, true); setRegMode(false); };
@@ -14162,11 +14171,12 @@ var EngCalcs = EngCalcs || {};
 			hidePanel(panel);
 			if (mode === 'coords') {
 				activeCancel = null; setRegMode(false);
-				var txt = prompt((pc.lpn_backdrop_coords_prompt || 'Type the X,Y that point should move to') + ' (' + unitLabel('lpn_u_length') + '):', '');
-				var parts = (txt || '').split(',').map(Number);
-				// The one ENTRY site (Task 274): what the user types is Cartesian, and positionTo()
-				// works in the internal Y-down frame.
-				if (txt && !isNaN(parts[0]) && !isNaN(parts[1])) { positionTo(refWorld, { x: inwardX(parts[0]), y: inwardY(parts[1]) }); }
+				askDialog({ kind: 'prompt', text: (pc.lpn_backdrop_coords_prompt || 'Type the X,Y that point should move to') + ' (' + unitLabel('lpn_u_length') + '):', value: '' }, function (txt) {
+					var parts = (txt || '').split(',').map(Number);
+					// The one ENTRY site (Task 274): what the user types is Cartesian, and positionTo()
+					// works in the internal Y-down frame.
+					if (txt && !isNaN(parts[0]) && !isNaN(parts[1])) { positionTo(refWorld, { x: inwardX(parts[0]), y: inwardY(parts[1]) }); }
+				});
 				return;
 			}
 			// No further blocking dialog here -- the panel + Continue already made the transition
@@ -14201,7 +14211,7 @@ var EngCalcs = EngCalcs || {};
 		else if (v === 'scale-from') { startBackdropScaleFrom(); }
 		else if (v === 'position') { startBackdropPosition(); }
 		else if (v === 'remove') {
-			if (window.confirm(pc.lpn_backdrop_remove_confirm || 'Remove the background image?')) { removeBackdrop(); }
+			askDialog({ kind: 'confirm', text: pc.lpn_backdrop_remove_confirm || 'Remove the background image?' }, function (yes) { if (yes) { removeBackdrop(); } });
 		}
 	}
 	// Rows built fresh on every open, so `disabled` is read from the current state, and the COMMANDS
@@ -15280,14 +15290,15 @@ var EngCalcs = EngCalcs || {};
 		// transform, so there is nothing here a projected project cannot do. The wizard's own live
 		// transform is the one addition: while it is open, the drawing can say where it is.
 		if (!placeFindable() && !mapgeoActive()) { return; }
-		var v = window.prompt(pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space', '');
-		if (v === null) { return; }
-		var ll = parseLatLon(v);
-		if (!ll) {
-			setNotice(pc.lpn_goto_bad || 'Can\'t read coordinates. Try again. Examples: 38,-122 or 38.122 or 38 -122');
-			return;
-		}
-		goToPoint(ll);
+		askDialog({ kind: 'prompt', text: pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space', value: '' }, function (v) {
+			if (v === null) { return; }
+			var ll = parseLatLon(v);
+			if (!ll) {
+				setNotice(pc.lpn_goto_bad || 'Can\'t read coordinates. Try again. Examples: 38,-122 or 38.122 or 38 -122');
+				return;
+			}
+			goToPoint(ll);
+		});
 	}
 	// **THE ONE DOOR TO A PLACE ON THE EARTH** (Task 437). js/lpn-search.js resolves a place NAME
 	// and then travels through here, so the size question, the zoom floor and the placement case
@@ -15307,9 +15318,17 @@ var EngCalcs = EngCalcs || {};
 		// site turns the whole tool from a hunt into an adjustment. Outside the placement tool there
 		// is no model to size, so the question is not asked.
 		if (georefActive()) {
-			var span = georefAskSize();
-			if (span > 0) { georefGoTo(ll, span); return; }
+			georefAskSize(undefined, function (span) {
+				if (span > 0) { georefGoTo(ll, span); return; }
+				goToPointCamera(ll, extent);
+			});
+			return;
 		}
+		goToPointCamera(ll, extent);
+	}
+	// The camera half of goToPoint(), split off when the size question became an in-page box
+	// (Task 710): it runs after the answer, or at once when no question is asked.
+	function goToPointCamera(ll, extent) {
 		// **THE ZOOM IS THE USER'S AND TYPING A COORDINATE DOES NOT SPEND IT** (Tom, 2026-09-08:
 		// *"Goto should preserve the zoom factor. Otherwise good."*, and again 2026-09-12: *"Goto,
 		// however, should not zoom."*). This used to zoom IN to a site-sized span (a kilometre
@@ -15808,15 +15827,17 @@ var EngCalcs = EngCalcs || {};
 	}
 	// `defSI` is optional and is what the box opens on, in SI: the attachment wizard re-runs with
 	// the width already on file, so adjusting an attachment is an edit rather than a retype.
-	function georefAskSize(defSI) {
+	// `done(spanSI)` gets 0 for a cancel or an unreadable answer (Task 710: asked in the page's box).
+	function georefAskSize(defSI, done) {
 		var pc = EngCalcs.pageConfig || {};
 		var text = (pc.lpn_georef_size_prompt || 'About how wide is the site, across the whole project?')
 			+ ' (' + unitLabel('lpn_u_length') + ')';
 		var def = defSI > 0 ? +toDisplay(defSI, 'lpn_u_length').toPrecision(6) : georefDefaultSpan();
-		var v = window.prompt(text, String(def));
-		if (v === null) { return 0; }
-		var n = parseFloat(String(v).replace(',', '.'));
-		return isFinite(n) && n > 0 ? toSI(n, 'lpn_u_length') : 0;
+		askDialog({ kind: 'prompt', text: text, value: String(def) }, function (v) {
+			if (v === null) { done(0); return; }
+			var n = parseFloat(String(v).replace(',', '.'));
+			done(isFinite(n) && n > 0 ? toSI(n, 'lpn_u_length') : 0);
+		});
 	}
 	// Travel AND scale in one move: the view is zoomed so that the model, which is standing still on
 	// the screen, covers exactly the ground width the user just gave -- and centred on the model, so
@@ -15945,32 +15966,34 @@ var EngCalcs = EngCalcs || {};
 		// second chance to get 38,106 wrong. The node's id rides along in parentheses exactly as
 		// georefAskSize() carries its unit -- it names WHICH point is being answered for, which is
 		// what makes a mis-snapped pick visible before it is committed.
-		var typed = window.prompt(
-			(pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space') +
-				' (' + node.id + ')', '');
-		if (typed === null) { georefTwoPointStop(); return; }
-		var ll = parseLatLon(typed);
-		if (!ll) {
-			// Still armed, and on the SAME point: a typo costs one more click, not the whole sequence.
-			setNotice(pc.lpn_goto_bad || 'Can\'t read coordinates. Try again. Examples: 38,-122 or 38.122 or 38 -122');
-			return;
-		}
-		pk.pts.push({ i: idx, x: s.x, y: s.y, lon: ll.lon, lat: ll.lat });
-		if (pk.pts.length < 2) {
-			setNotice(pc.lpn_georef_twopt_pick2 || 'Now click a second known point, as far from the first one as you can.');
-			return;
-		}
-		georef.pick = null;
-		georefSetTransform(EngCalcs.lpnGeorefFromTwoPoints(pk.pts[0], pk.pts[1]));
-		// **AND THE VIEW GOES TO THE MODEL**, on the same argument georefArmAsDegrees() makes: the two
-		// coordinates the user typed have almost certainly moved the network off the screen, and a
-		// placement nobody can see cannot be checked. AUTOMATIC, so it does not set the edited
-		// asterisk for a camera move nobody made.
-		zoomExtent(true);
-		// Redrawn after the fit, because every handle is CLAMPED into the visible canvas and the
-		// canvas it must be clamped into is the one the fit just chose.
-		georefDrawFrame();
-		setNotice(pc.lpn_georef_twopt_done || 'The model now sits on the two points you gave. Check it, then press the Keep this placement button.');
+		askDialog({ kind: 'prompt', text: (pc.lpn_goto_prompt || 'Latitude and longitude, in that order, separated by a comma or a space') +
+				' (' + node.id + ')', value: '' }, function (typed) {
+			// The wizard may have been closed while the question was open.
+			if (!georef || georef.pick !== pk) { return; }
+			if (typed === null) { georefTwoPointStop(); return; }
+			var ll = parseLatLon(typed);
+			if (!ll) {
+				// Still armed, and on the SAME point: a typo costs one more click, not the whole sequence.
+				setNotice(pc.lpn_goto_bad || 'Can\'t read coordinates. Try again. Examples: 38,-122 or 38.122 or 38 -122');
+				return;
+			}
+			pk.pts.push({ i: idx, x: s.x, y: s.y, lon: ll.lon, lat: ll.lat });
+			if (pk.pts.length < 2) {
+				setNotice(pc.lpn_georef_twopt_pick2 || 'Now click a second known point, as far from the first one as you can.');
+				return;
+			}
+			georef.pick = null;
+			georefSetTransform(EngCalcs.lpnGeorefFromTwoPoints(pk.pts[0], pk.pts[1]));
+			// **AND THE VIEW GOES TO THE MODEL**, on the same argument georefArmAsDegrees() makes: the two
+			// coordinates the user typed have almost certainly moved the network off the screen, and a
+			// placement nobody can see cannot be checked. AUTOMATIC, so it does not set the edited
+			// asterisk for a camera move nobody made.
+			zoomExtent(true);
+			// Redrawn after the fit, because every handle is CLAMPED into the visible canvas and the
+			// canvas it must be clamped into is the one the fit just chose.
+			georefDrawFrame();
+			setNotice(pc.lpn_georef_twopt_done || 'The model now sits on the two points you gave. Check it, then press the Keep this placement button.');
+		});
 	}
 
 	function georefStart() {
@@ -16268,49 +16291,51 @@ var EngCalcs = EngCalcs || {};
 		// gone at the next project switch, and never in a file -- and because this is still the
 		// moment a project changes kind. If the wording is ever revisited it is `lpn_georef_confirm`,
 		// and that is Tom's.
-		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.')) { return; }
-		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
-		// On File, Convert as's answered steps the attached map's own turn was laid into the copy
-		// before the steps began, so the steps see 0 degrees while the picture was left unturned
-		// all the same; convas.bdTurn carries that turn here so the sentence is still said.
-		var unrotated = georefBackdropRotated(georef.t) ||
-			!!(convas && convas.copyId === library.openId && convas.bdTurn && georefBackdropRotated({ rotDeg: convas.bdTurn }));
-		if (georef.undoSnap) { pushUndoSnapshot(georef.undoSnap); markEdited(); }
-		// **THE VIEW IS CAPTURED BEFORE THE REFRESH AND PUT BACK AFTER IT.**
-		// refreshAllFromDocument() ends in restoreViewOrFit(), whose answer is the view remembered
-		// for this tab -- which is where the user was looking at the XY GRID, half a world away.
-		// Without this, finishing snaps the map back to the grid view and the model appears lost.
-		var v = currentView();
-		georef = null;
-		georefClearLayer();
-		georefApplyCompensation();   // the model is the map's again
-		georefSuspend(false);
-		georefRefreshBar();
-		// FULL refresh now, and only now: this is the moment the project really did change kind, so
-		// the basemap, the status strip, the settings panel and the solve all have to be re-derived.
-		// **REBASED THE MOMENT IT BECOMES GEOGRAPHIC** (Task 439). Everything else here runs on a
-		// document whose coordinates are already degrees; without this it would carry origin {0, 0}
-		// until the tab was closed and reopened, and street-level zoom is the very next thing the
-		// user does.
-		var shift = rebaseLiveGeoDoc();
-		// `v` was read in the OLD frame, a few lines above and before the rebase. Moved with
-		// everything else, or putting it back below would undo the compensation and jump the map by
-		// the whole origin -- half the world, at this zoom.
-		if (v && shift) { v.cx += shift.dx; v.cy += shift.dy; }
-		refreshAllFromDocument();
-		if (v) { applyView(v); }
-		saveToStorage();
-		renderTabs();
-		// **A PICTURE THAT COULD NOT BE TURNED SAYS SO.** Two whole sentences joined, not a label
-		// built from fragments: the second is only true when the placement was turned and there was
-		// an image to turn, and saying nothing would leave a site plan silently off its own network.
-		// Wording and key name are Tom's, 2026-08-25. He chose ROTATED over "turned", so the key and
-		// the local both follow the word a user will read.
-		setNotice((pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.')
-			+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
-				|| 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.') : ''));
-		// File, Convert as: lay the lat/lon result onto the coordinate system the box chose.
-		convasPlaced(unrotated);
+		askDialog({ kind: 'confirm', text: pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.' }, function (yes) {
+			if (!yes) { return; }
+			if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
+			// On File, Convert as's answered steps the attached map's own turn was laid into the copy
+			// before the steps began, so the steps see 0 degrees while the picture was left unturned
+			// all the same; convas.bdTurn carries that turn here so the sentence is still said.
+			var unrotated = georefBackdropRotated(georef.t) ||
+				!!(convas && convas.copyId === library.openId && convas.bdTurn && georefBackdropRotated({ rotDeg: convas.bdTurn }));
+			if (georef.undoSnap) { pushUndoSnapshot(georef.undoSnap); markEdited(); }
+			// **THE VIEW IS CAPTURED BEFORE THE REFRESH AND PUT BACK AFTER IT.**
+			// refreshAllFromDocument() ends in restoreViewOrFit(), whose answer is the view remembered
+			// for this tab -- which is where the user was looking at the XY GRID, half a world away.
+			// Without this, finishing snaps the map back to the grid view and the model appears lost.
+			var v = currentView();
+			georef = null;
+			georefClearLayer();
+			georefApplyCompensation();   // the model is the map's again
+			georefSuspend(false);
+			georefRefreshBar();
+			// FULL refresh now, and only now: this is the moment the project really did change kind, so
+			// the basemap, the status strip, the settings panel and the solve all have to be re-derived.
+			// **REBASED THE MOMENT IT BECOMES GEOGRAPHIC** (Task 439). Everything else here runs on a
+			// document whose coordinates are already degrees; without this it would carry origin {0, 0}
+			// until the tab was closed and reopened, and street-level zoom is the very next thing the
+			// user does.
+			var shift = rebaseLiveGeoDoc();
+			// `v` was read in the OLD frame, a few lines above and before the rebase. Moved with
+			// everything else, or putting it back below would undo the compensation and jump the map by
+			// the whole origin -- half the world, at this zoom.
+			if (v && shift) { v.cx += shift.dx; v.cy += shift.dy; }
+			refreshAllFromDocument();
+			if (v) { applyView(v); }
+			saveToStorage();
+			renderTabs();
+			// **A PICTURE THAT COULD NOT BE TURNED SAYS SO.** Two whole sentences joined, not a label
+			// built from fragments: the second is only true when the placement was turned and there was
+			// an image to turn, and saying nothing would leave a site plan silently off its own network.
+			// Wording and key name are Tom's, 2026-08-25. He chose ROTATED over "turned", so the key and
+			// the local both follow the word a user will read.
+			setNotice((pc.lpn_georef_done || 'This project is now on the new coordinate system. You may continue to drag any assets that need further adjustment.')
+				+ (unrotated ? ' ' + (pc.lpn_georef_backdrop_unrotated
+					|| 'The background image was moved and resized with the model, but it could not be rotated. Use Map, Background image, Move to align it.') : ''));
+			// File, Convert as: lay the lat/lon result onto the coordinate system the box chose.
+			convasPlaced(unrotated);
+		});
 	}
 	function georefCancel() {
 		if (!georef) { return; }
@@ -16957,22 +16982,23 @@ var EngCalcs = EngCalcs || {};
 				'There is no world map attached to this project yet. Use Map, World map, Attach first.');
 			return;
 		}
-		answer = window.prompt(pc.lpn_map_attach_scale_from_prompt ||
-			'Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.', '1');
-		if (answer === null) { return; }
-		f = parseFloat(String(answer).replace(',', '.'));
-		if (!(f > 0) || !isFinite(f)) {
-			setNotice(pc.lpn_map_attach_scale_from_bad || 'Type a single number greater than zero.');
-			return;
-		}
-		ext = mapgeoExtent();
-		project.georef = mapgeoScaled(t, f, { x: ext.cx, y: ext.cy });
-		markEdited();
-		saveToStorage();
-		refreshBasemap();
-		refreshMapStatus();
-		setNotice(pc.lpn_map_attach_scale_from_done ||
-			'The map is resized, and your drawing and every coordinate in it are exactly as they were.');
+		askDialog({ kind: 'prompt', text: pc.lpn_map_attach_scale_from_prompt ||
+			'Scale the map from its current size, about the middle of your drawing. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.', value: '1' }, function (answer) {
+			if (answer === null) { return; }
+			f = parseFloat(String(answer).replace(',', '.'));
+			if (!(f > 0) || !isFinite(f)) {
+				setNotice(pc.lpn_map_attach_scale_from_bad || 'Type a single number greater than zero.');
+				return;
+			}
+			ext = mapgeoExtent();
+			project.georef = mapgeoScaled(t, f, { x: ext.cx, y: ext.cy });
+			markEdited();
+			saveToStorage();
+			refreshBasemap();
+			refreshMapStatus();
+			setNotice(pc.lpn_map_attach_scale_from_done ||
+				'The map is resized, and your drawing and every coordinate in it are exactly as they were.');
+		});
 	}
 	// **STEP 2 NAILS A RECTANGLE TO THE GROUND.** It is stated in latitude and longitude, so it
 	// belongs to the Earth and not to the drawing: when the map moves, the rectangle moves with it,
@@ -29051,40 +29077,44 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		suggested = (pc.lpn_profile_new_name || 'Path {n}').replace('{n}', String(list.length + 1));
-		v = window.prompt(pc.lpn_profile_prompt_name || 'Name for this path', suggested);
-		if (v === null) { return; }
-		v = v.trim();
-		if (!v) { return; }
-		saveUndoSnapshot();
-		p = { id: newSavedProfileId(), name: v, stops: stops };
-		savedProfiles().push(p);
-		profileState.activeId = p.id;
-		saveToStorage();
-		rebuildProfileForm();
+		askDialog({ kind: 'prompt', text: pc.lpn_profile_prompt_name || 'Name for this path', value: suggested }, function (v) {
+			if (v === null) { return; }
+			v = v.trim();
+			if (!v) { return; }
+			saveUndoSnapshot();
+			p = { id: newSavedProfileId(), name: v, stops: stops };
+			savedProfiles().push(p);
+			profileState.activeId = p.id;
+			saveToStorage();
+			rebuildProfileForm();
+		});
 	}
 	function renameSavedProfile() {
 		var pc = EngCalcs.pageConfig || {}, p = activeSavedProfile(), v;
 		if (!p) { return; }
-		v = window.prompt(pc.lpn_profile_prompt_name || 'Name for this path', p.name || '');
-		if (v === null || !v.trim()) { return; }
-		saveUndoSnapshot();
-		p.name = v.trim();
-		saveToStorage();
-		rebuildProfileForm();
+		askDialog({ kind: 'prompt', text: pc.lpn_profile_prompt_name || 'Name for this path', value: p.name || '' }, function (v) {
+			if (v === null || !v.trim()) { return; }
+			saveUndoSnapshot();
+			p.name = v.trim();
+			saveToStorage();
+			rebuildProfileForm();
+		});
 	}
 	function deleteSavedProfile() {
 		var pc = EngCalcs.pageConfig || {}, p = activeSavedProfile(), msg;
 		if (!p) { return; }
 		msg = (pc.lpn_profile_delete_confirm || 'Delete the saved path {name}? The drawing itself is not changed.')
 			.replace('{name}', p.name || '');
-		if (!window.confirm(msg)) { return; }
-		saveUndoSnapshot();
-		doc.profiles = savedProfilesRead().filter(function (x) { return x !== p; });
-		// The path stays on screen: deleting its NAME is not deleting the drawing, which is what the
-		// confirmation just promised.
-		profileState.activeId = '';
-		saveToStorage();
-		rebuildProfileForm();
+		askDialog({ kind: 'confirm', text: msg }, function (yes) {
+			if (!yes) { return; }
+			saveUndoSnapshot();
+			doc.profiles = savedProfilesRead().filter(function (x) { return x !== p; });
+			// The path stays on screen: deleting its NAME is not deleting the drawing, which is what the
+			// confirmation just promised.
+			profileState.activeId = '';
+			saveToStorage();
+			rebuildProfileForm();
+		});
 	}
 	// **THE MENU HANGS OFF THE PROFILE TAB** (Tom, 2026-08-24: "a menu arrow on the Profile tab").
 	// That is what keeps the panel at one line of commentary -- Task 506's whole point -- and it
@@ -40990,14 +41020,112 @@ var EngCalcs = EngCalcs || {};
 	// Chrome's transient activation expires after a few seconds -- so a blocking dialog would work for
 	// a fast reader and throw "must be handling a user gesture" for a careful one. A button in here is
 	// a fresh click. The dialog is dismissed BEFORE the action runs, so the action inherits that click.
-	function openDialog(buildBody, buttons) {
-		var dlg = document.getElementById('lpn_dialog');
+	//
+	// **IT IS ALSO THE PAGE'S ONE QUESTION BOX** (Task 710, Tom 2026-10-04: *"The browser-style
+	// boxes aren't pretty. I think they all should be converted."*). askDialog() below puts every
+	// former alert/confirm/prompt in here, so there is one in-page modal, not two. What it adds to
+	// every dialog, old callers included: Enter presses the default button (`isDefault`, else the
+	// first), Escape presses the `cancel` button (else the only button), Tab stays inside, and
+	// focus goes back to whatever had it when the box opened. `opts.title` draws the same title band
+	// as every other box; `opts.alert` makes the role alertdialog; `opts.focus` names the control
+	// that takes focus first (a prompt's field).
+	var dialogOpener = null, dialogButtons = [], dialogQueue = [], dialogKeysWired = false;
+	function dialogEl() { return document.getElementById('lpn_dialog'); }
+	function dialogIsOpen() { var d = dialogEl(); return !!(d && d.style.display === 'block'); }
+	function dialogFocusables() {
+		var d = dialogEl();
+		if (!d || !d.querySelectorAll) { return []; }
+		return Array.prototype.slice.call(d.querySelectorAll('button, input, textarea, select, a[href]'))
+			.filter(function (el) { return !el.disabled && el.offsetParent !== null; });
+	}
+	function pressDialogButton(b) {
+		closeDialog();
+		var r = b.fn();
+		// The answer may ask the next question; only when it did not does the queue or the opener
+		// get the focus back. An async fn has already opened whatever it opens synchronously.
+		afterDialogAnswer();
+		return r;
+	}
+	function afterDialogAnswer() {
+		if (dialogIsOpen()) { return; }
+		if (dialogQueue.length) { var next = dialogQueue.shift(); next(); return; }
+		var o = dialogOpener;
+		dialogOpener = null;
+		if (o && o.focus && document.body && document.body.contains && document.body.contains(o)) {
+			try { o.focus(); } catch (e) { /* a detached or unfocusable opener: nothing to return to */ }
+		}
+	}
+	function wireDialogKeys() {
+		if (dialogKeysWired) { return; }
+		dialogKeysWired = true;
+		// WINDOW, CAPTURE PHASE: ahead of every document-level Escape on this page (the
+		// registration mode's, the path chooser's), so an Escape aimed at the question costs the
+		// question and nothing under it.
+		var host = (typeof window !== 'undefined' && window.addEventListener) ? window : document;
+		host.addEventListener('keydown', function (e) {
+			if (!dialogIsOpen()) { return; }
+			var d = dialogEl(), inside = !!(d && e.target && d.contains && d.contains(e.target));
+			var key = e.key;
+			if (key === 'Escape' || key === 'Esc') {
+				var cw = (EngCalcs.pageConfig || {}).lpn_cancel || 'Cancel';
+				var c = dialogButtons.filter(function (b) { return b.cancel || b.label === cw; })[0] ||
+					(dialogButtons.length === 1 ? dialogButtons[0] : null);
+				e.preventDefault();
+				e.stopPropagation();
+				if (c) { pressDialogButton(c); }
+				return;
+			}
+			if (key === 'Tab') {
+				var f = dialogFocusables();
+				if (!f.length) { return; }
+				var i = f.indexOf(e.target);
+				var to = e.shiftKey ? (i <= 0 ? f[f.length - 1] : f[i - 1]) : (i < 0 || i === f.length - 1 ? f[0] : f[i + 1]);
+				e.preventDefault();
+				e.stopPropagation();
+				to.focus();
+				return;
+			}
+			if (!inside) {
+				// Focus fell out (a click on the scrim): nothing behind a modal hears a key.
+				e.preventDefault();
+				e.stopPropagation();
+				var g = dialogFocusables();
+				if (g.length) { g[0].focus(); }
+				return;
+			}
+			if (key === 'Enter' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'TEXTAREA') {
+				var def = dialogButtons.filter(function (b) { return b.isDefault; })[0] || dialogButtons[0];
+				e.preventDefault();
+				e.stopPropagation();
+				if (def) { pressDialogButton(def); }
+			}
+		}, true);
+		// And no key typed inside it reaches the page's own shortcuts.
+		var d0 = dialogEl();
+		if (d0) { d0.addEventListener('keydown', function (e) { e.stopPropagation(); }); }
+	}
+	function openDialog(buildBody, buttons, opts) {
+		opts = opts || {};
+		var dlg = dialogEl();
 		var body = document.getElementById('lpn_dialog_body');
 		var bar = document.getElementById('lpn_dialog_buttons');
+		var title = document.getElementById('lpn_dialog_title');
 		if (!dlg || !body || !bar) { return; }
+		wireDialogKeys();
+		if (!dialogIsOpen()) { dialogOpener = document.activeElement || null; }
 		body.innerHTML = '';
 		bar.innerHTML = '';
+		if (title) {
+			title.textContent = opts.title || '';
+			title.style.display = opts.title ? 'block' : 'none';
+		}
+		if (dlg.classList) { dlg.classList.toggle('lpn-dialog-titled', !!opts.title); }
+		dlg.setAttribute('role', opts.alert ? 'alertdialog' : 'dialog');
+		if (opts.title) { dlg.setAttribute('aria-labelledby', 'lpn_dialog_title'); }
+		else { dlg.removeAttribute('aria-labelledby'); }
 		buildBody(body);
+		dialogButtons = buttons.slice();
+		var firstFocus = null;
 		buttons.forEach(function (b) {
 			var btn = document.createElement('button');
 			btn.type = 'button';
@@ -41007,8 +41135,9 @@ var EngCalcs = EngCalcs || {};
 			// consent answer is distance from the hand that was reaching for Cancel.
 			btn.style.marginLeft = b.gapBefore ? '28px' : '6px';
 			btn.textContent = b.label;
-			btn.addEventListener('click', function () { closeDialog(); b.fn(); });
+			btn.addEventListener('click', function () { pressDialogButton(b); });
 			bar.appendChild(btn);
+			if (b.isDefault && !firstFocus) { firstFocus = btn; }
 		});
 		// **MODAL MEANS MODAL** (Tom, 2026-08-05: "I still can change tabs/projects, and this can
 		// confuse my feeble human mind"). The element has always claimed `aria-modal="true"`, but
@@ -41018,8 +41147,12 @@ var EngCalcs = EngCalcs || {};
 		var back = document.getElementById('lpn_dialog_backdrop');
 		if (back) { back.style.display = 'block'; }
 		dlg.style.display = 'block';
-		var first = bar.querySelector('button');
-		if (first) { first.focus(); }
+		var want = typeof opts.focus === 'function' ? opts.focus() : opts.focus;
+		var first = want || firstFocus || bar.querySelector('button');
+		if (first && first.focus) {
+			first.focus();
+			if (want && first.select) { first.select(); }
+		}
 	}
 	function closeDialog() {
 		hidePanel(document.getElementById('lpn_dialog'));
@@ -41029,6 +41162,69 @@ var EngCalcs = EngCalcs || {};
 		// are not panels is written down somewhere.
 		if (back) { back.style.display = 'none'; }
 	}
+	/**
+	 * **THE ONE QUESTION BOX** (Task 710). `req` is {kind, text, value, title, ok, cancel}:
+	 *   kind 'alert'   -- one OK; done() when it is pressed.
+	 *   kind 'confirm' -- OK and Cancel; done(true|false). Escape is Cancel.
+	 *   kind 'prompt'  -- a field holding `value`; done(text) on OK or Enter, done(null) on Cancel.
+	 *   kind 'copy'    -- a selected read-only text area to copy from, and OK.
+	 * `ok`/`cancel` replace the button words. The title defaults to the page's own name, which is
+	 * what the browser's box said in its own way ("hawsedc.com says").
+	 *
+	 * A native confirm() held the script until it was answered; this cannot, so EVERY caller puts
+	 * all of what used to follow the answer inside `done`, and nothing after the call. Asked while
+	 * another question is open, it waits its turn rather than replacing it.
+	 *
+	 * **THE HARNESS SEAM**: when `window.lpnDialogAnswerer` is a function (only the headless DOM
+	 * stub sets one), it answers at once, synchronously, as the old dialogs did, so every harness
+	 * that scripted a confirm/prompt answer still drives the same flow. A real page never has one.
+	 */
+	function askDialog(req, done) {
+		req = req || {};
+		done = done || function () { };
+		var pcd = EngCalcs.pageConfig || {};
+		var answerer = (typeof window !== 'undefined') ? window.lpnDialogAnswerer : null;
+		if (typeof answerer === 'function') { done(answerer(req)); return; }
+		if (!dialogEl()) { done(req.kind === 'confirm' ? false : (req.kind === 'prompt' ? null : undefined)); return; }
+		if (dialogIsOpen()) { dialogQueue.push(function () { askDialog(req, done); }); return; }
+		var field = null;
+		var okLabel = req.ok || pcd.lpn_dialog_ok || 'OK';
+		var cancelLabel = req.cancel || pcd.lpn_cancel || 'Cancel';
+		var buttons;
+		if (req.kind === 'confirm') {
+			buttons = [
+				{ label: okLabel, isDefault: true, fn: function () { done(true); } },
+				{ label: cancelLabel, cancel: true, fn: function () { done(false); } }
+			];
+		} else if (req.kind === 'prompt') {
+			buttons = [
+				{ label: okLabel, isDefault: true, fn: function () { done(field ? field.value : ''); } },
+				{ label: cancelLabel, cancel: true, fn: function () { done(null); } }
+			];
+		} else {
+			buttons = [{ label: okLabel, isDefault: true, cancel: true, fn: function () { done(); } }];
+		}
+		openDialog(function (body) {
+			var p = document.createElement('p');
+			p.className = 'lpn-dialog-msg';
+			p.textContent = String(req.text == null ? '' : req.text);
+			body.appendChild(p);
+			if (req.kind === 'prompt' || req.kind === 'copy') {
+				field = document.createElement(req.kind === 'copy' ? 'textarea' : 'input');
+				if (req.kind === 'prompt') { field.type = 'text'; }
+				else { field.readOnly = true; }
+				field.className = 'lpn-dialog-input';
+				field.value = req.value == null ? '' : String(req.value);
+				field.setAttribute('aria-label', String(req.text == null ? '' : req.text).split('\n')[0]);
+				body.appendChild(field);
+			}
+		}, buttons, {
+			title: req.title || pcd.lpn_main_menu || 'Water Supply Network',
+			alert: req.kind !== 'prompt' && req.kind !== 'copy',
+			focus: function () { return field; }
+		});
+	}
+	EngCalcs.lpnAsk = askDialog;
 	function wireTabs() {
 		// Dismiss the menu, and the view popovers, on any click that is not inside them. The dialog is
 		// deliberately NOT dismissed this way -- it asks a question that has to be answered, and

@@ -1603,6 +1603,16 @@ html[lang="zh"] .ec-welcome {
    exceeded. This is the same rule every other overlay here follows: wide and tall content scrolls
    inside its own container rather than moving the page. */
 #lpn_dialog_body { max-height: 60vh; overflow-y: auto; overscroll-behavior: contain; }
+/* **THE ONE QUESTION BOX** (Task 710, Tom 2026-10-04: *"The browser-style boxes aren't pretty. I
+   think they all should be converted."*). Every former alert/confirm/prompt is askDialog() in
+   js/looped-network.js, drawn in #lpn_dialog. A titled ask wears the same 40 px title band as every
+   other box (.lpn-setbox-title), so the padding makes room for it. Narrower than the window on a
+   phone in tall mode, never wider. The message keeps its own line breaks (consent paragraphs). */
+#lpn_dialog { max-width: min(34em, calc(100vw - 2em)); box-sizing: border-box; }
+#lpn_dialog.lpn-dialog-titled { padding-top: 51px; }
+.lpn-dialog-msg { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.lpn-dialog-input { display: block; width: 100%; box-sizing: border-box; margin-top: 8px; padding: 3px 6px; font: inherit; }
+textarea.lpn-dialog-input { min-height: 8em; font-family: monospace; }
 /* **AND THE SUITE NAVBAR'S OWN DROPDOWNS RISE WHILE THEY ARE OPEN** (Tom, 2026-09-02: *"The
    English selector is behind the non-modal (non-hog) boxes."*). Every menu that hangs off that bar -- the language selector among them -- opened behind them. A child cannot climb out
    of its parent's stacking context, so the bar itself has to rise, and it may only do so WHILE a

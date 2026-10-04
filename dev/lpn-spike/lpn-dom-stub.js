@@ -868,6 +868,18 @@ function clearResizeObservers() { resizeWatchers.length = 0; }
 global.alert = global.window.alert;
 global.confirm = global.window.confirm;
 global.prompt = global.window.prompt;
+// **THE QUESTION BOX ANSWERS THROUGH THE OLD STUBS** (Task 710). The page's alert/confirm/prompt
+// calls became askDialog(), an in-page box answered by a click. Here it is answered at once by
+// whichever of window.X / global.X the harness last replaced, so every harness that scripts
+// `window.confirm = () => false` still drives the same flow. dialog-modal-harness.js tests the
+// box itself; dialog-modal-browser-harness.js clicks it in a real Chrome.
+const stubDialogDefaults = { alert: global.window.alert, confirm: global.window.confirm, prompt: global.window.prompt };
+global.window.lpnDialogAnswerer = function (req) {
+  const kind = req.kind === 'copy' ? 'prompt' : (req.kind || 'alert');
+  const w = global.window[kind], g = global[kind];
+  const f = (w !== stubDialogDefaults[kind]) ? w : g;
+  return f.call(global.window, req.text, req.value);
+};
 global.navigator = { userAgent: 'node' };
 global.requestAnimationFrame = f => setTimeout(f, 0);
 // iconEl/setLabel come from js/Calculators.lib.js in the browser.
