@@ -1323,7 +1323,6 @@ $ec_lang['lpn_pane_unselect_on_map']='মানচিত্রে নির্�
 
 
 $ec_lang['lpn_pane_print']='টেবিল প্রিন্ট করুন';
-$ec_lang['lpn_pane_print_tip']='আপনি এখন যে টেবিলটি দেখছেন তা প্রিন্ট করুন, শিরোনামে প্রকল্পের নাম, টেবিলের নাম ও এককসহ। সারিগুলো আপনি যে ক্রমে সাজিয়েছেন সেই ক্রমেই প্রিন্ট হয়।';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1404,7 +1403,7 @@ $ec_lang['lpn_help_walkthroughs']='ধাপে ধাপে নির্দে�
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='নেটওয়ার্ক মুছুন';
-$ec_lang['lpn_confirm_delete_network']='এই প্রকল্পের প্রতিটি নোড, পাইপ ও টেক্সট লেবেল মুছে ফেলবেন? পটভূমি চিত্র, প্রকল্পের নাম ও আপনার সেটিংস রাখা থাকবে। এটি পূর্বাবস্থায় ফেরানো যাবে না।';
+$ec_lang['lpn_confirm_delete_network']='এই প্রকল্পের প্রতিটি নোড, পাইপ ও টেক্সট লেবেল মুছে ফেলবেন? পটভূমি চিত্র, প্রকল্পের নাম ও আপনার সেটিংস রাখা থাকবে।';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -3051,7 +3050,6 @@ $ec_lang['lpn_labels_customer_width_tip']='গ্রাহক লেবেলগ
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='বর্তমান দৃশ্য ব্যবহার করুন';
 $ec_lang['lpn_settings_page']='পৃষ্ঠা';
-$ec_lang['lpn_settings_page_note']='এই ক্যালকুলেটরে সংরক্ষিত, প্রকল্পে নয়।';
 $ec_lang['lpn_settings_hydraulics']='হাইড্রোলিক্স';
 $ec_lang['lpn_settings_quality']='পানির গুণমান';
 $ec_lang['lpn_settings_quality_track']='গুণমান প্যারামিটার';

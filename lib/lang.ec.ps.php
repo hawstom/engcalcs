@@ -1315,7 +1315,6 @@ $ec_lang['lpn_goto_on_map']='پر نقشه ښودل';
 $ec_lang['lpn_pane_select_on_map']='پر نقشه ټاکل';
 $ec_lang['lpn_pane_unselect_on_map']='پر نقشه له ټاکنې ایستل';
 $ec_lang['lpn_pane_print']='جدول چاپ کړئ';
-$ec_lang['lpn_pane_print_tip']='هغه جدول چاپ کړئ چې تاسو یې ګورئ، د پروژې نوم، د جدول نوم، او واحدونه په سرلیکونو کې شامل دي. کرښې په هماغه ترتیب چاپیږي چې تاسو یې ترتیب کړي.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1396,7 +1395,7 @@ $ec_lang['lpn_help_walkthroughs']='لارښودونه';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='شبکه ړنګول';
-$ec_lang['lpn_confirm_delete_network']='په دې پروژه کې هر نقطه، پایپ، او متن لیبل ړنګ کړئ؟ شاليد انځور، د پروژې نوم، او ستاسو تنظیمات ساتل کیږي. دا نشي بېرته کیدی.';
+$ec_lang['lpn_confirm_delete_network']='په دې پروژه کې هر نقطه، پایپ، او متن لیبل ړنګ کړئ؟ شاليد انځور، د پروژې نوم، او ستاسو تنظیمات ساتل کیږي.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -3041,7 +3040,6 @@ $ec_lang['lpn_labels_customer_width_tip']='د مشتریانو لیبلونه ی
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='اوسنی لید کارول';
 $ec_lang['lpn_settings_page']='پاڼه';
-$ec_lang['lpn_settings_page_note']='په دې محاسبګر کې ساتل کیږي، نه په پروژه کې.';
 $ec_lang['lpn_settings_hydraulics']='هایدرولیکس';
 $ec_lang['lpn_settings_quality']='د اوبو کیفیت';
 $ec_lang['lpn_settings_quality_track']='د کیفیت پارامیټر';

@@ -1323,7 +1323,6 @@ $ec_lang['lpn_pane_unselect_on_map']='Désélectionner sur la carte';
 
 
 $ec_lang['lpn_pane_print']='Imprimer le tableau';
-$ec_lang['lpn_pane_print_tip']='Imprime le tableau que vous consultez, avec le nom du projet, le nom du tableau et les unités dans les en-têtes. Les lignes s\'impriment dans l\'ordre où vous les avez triées.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1404,7 +1403,7 @@ $ec_lang['lpn_help_walkthroughs']='Tutoriels';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Supprimer le réseau';
-$ec_lang['lpn_confirm_delete_network']='Supprimer tous les nœuds, conduites et étiquettes de texte de ce projet ? L\'image de fond, le nom du projet et vos paramètres sont conservés. Cette action est irréversible.';
+$ec_lang['lpn_confirm_delete_network']='Supprimer tous les nœuds, conduites et étiquettes de texte de ce projet ? L\'image de fond, le nom du projet et vos paramètres sont conservés.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -3052,7 +3051,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Les étiquettes de client ne sont des
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Utiliser la vue actuelle';
 $ec_lang['lpn_settings_page']='Page';
-$ec_lang['lpn_settings_page_note']='Enregistré dans ce calculateur, pas dans le projet.';
 $ec_lang['lpn_settings_hydraulics']='Hydraulique';
 $ec_lang['lpn_settings_quality']='Qualité de l\'eau';
 $ec_lang['lpn_settings_quality_track']='Paramètre de qualité';

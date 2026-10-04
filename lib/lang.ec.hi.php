@@ -1315,7 +1315,6 @@ $ec_lang['lpn_goto_on_map']='मानचित्र पर दिखाएँ'
 $ec_lang['lpn_pane_select_on_map']='मानचित्र पर चुनें';
 $ec_lang['lpn_pane_unselect_on_map']='मानचित्र पर चयन हटाएँ';
 $ec_lang['lpn_pane_print']='तालिका छापें';
-$ec_lang['lpn_pane_print_tip']='जो तालिका आप देख रहे हैं उसे प्रोजेक्ट का नाम, तालिका का नाम और शीर्षकों में इकाइयों के साथ छापें। पंक्तियाँ उसी क्रम में छपती हैं जिस क्रम में आपने उन्हें क्रमबद्ध किया था।';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1396,7 +1395,7 @@ $ec_lang['lpn_help_walkthroughs']='मार्गदर्शिकाएँ';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='नेटवर्क हटाएँ';
-$ec_lang['lpn_confirm_delete_network']='इस प्रोजेक्ट के हर नोड, पाइप और टेक्स्ट लेबल को हटाएँ? पृष्ठभूमि छवि, प्रोजेक्ट का नाम, और आपकी सेटिंग्स बनी रहेंगी। इसे पूर्ववत नहीं किया जा सकता।';
+$ec_lang['lpn_confirm_delete_network']='इस प्रोजेक्ट के हर नोड, पाइप और टेक्स्ट लेबल को हटाएँ? पृष्ठभूमि छवि, प्रोजेक्ट का नाम, और आपकी सेटिंग्स बनी रहेंगी।';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -3042,7 +3041,6 @@ $ec_lang['lpn_labels_customer_width_tip']='ग्राहक लेबल क�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='वर्तमान दृश्य उपयोग करें';
 $ec_lang['lpn_settings_page']='पृष्ठ';
-$ec_lang['lpn_settings_page_note']='इस कैलकुलेटर में सहेजा गया, प्रोजेक्ट में नहीं।';
 $ec_lang['lpn_settings_hydraulics']='हाइड्रॉलिक्स';
 $ec_lang['lpn_settings_quality']='जल गुणवत्ता';
 $ec_lang['lpn_settings_quality_track']='गुणवत्ता पैरामीटर';

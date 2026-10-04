@@ -1314,7 +1314,6 @@ $ec_lang['lpn_goto_on_map']='Mostra sulla mappa';
 $ec_lang['lpn_pane_select_on_map']='Seleziona sulla mappa';
 $ec_lang['lpn_pane_unselect_on_map']='Deseleziona sulla mappa';
 $ec_lang['lpn_pane_print']='Stampa tabella';
-$ec_lang['lpn_pane_print_tip']='Stampa la tabella che stai guardando, con il nome del progetto, il nome della tabella e le unità nelle intestazioni. Le righe vengono stampate nell\'ordine in cui le hai ordinate.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1395,7 +1394,7 @@ $ec_lang['lpn_help_walkthroughs']='Esercitazioni';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Elimina rete';
-$ec_lang['lpn_confirm_delete_network']='Eliminare ogni nodo, tubazione ed etichetta di testo di questo progetto? L\'immagine di sfondo, il nome del progetto e le impostazioni vengono conservati. Questa azione non può essere annullata.';
+$ec_lang['lpn_confirm_delete_network']='Eliminare ogni nodo, tubazione ed etichetta di testo di questo progetto? L\'immagine di sfondo, il nome del progetto e le impostazioni vengono conservati.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -3040,7 +3039,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Le etichette cliente vengono disegnat
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Usa la vista attuale';
 $ec_lang['lpn_settings_page']='Pagina';
-$ec_lang['lpn_settings_page_note']='Salvato in questo calcolatore, non nel progetto.';
 $ec_lang['lpn_settings_hydraulics']='Idraulica';
 $ec_lang['lpn_settings_quality']='Qualità dell\'acqua';
 $ec_lang['lpn_settings_quality_track']='Parametro di qualità';

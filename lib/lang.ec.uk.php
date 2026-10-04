@@ -1318,7 +1318,6 @@ $ec_lang['lpn_goto_on_map']='Показати на карті';
 $ec_lang['lpn_pane_select_on_map']='Вибрати на карті';
 $ec_lang['lpn_pane_unselect_on_map']='Скасувати вибір на карті';
 $ec_lang['lpn_pane_print']='Надрукувати таблицю';
-$ec_lang['lpn_pane_print_tip']='Друкує таблицю, яку ви зараз переглядаєте, із назвою проєкту, назвою таблиці та одиницями в заголовках. Рядки друкуються в тому порядку, в якому ви їх відсортували.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1399,7 +1398,7 @@ $ec_lang['lpn_help_walkthroughs']='Покрокові посібники';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Видалити мережу';
-$ec_lang['lpn_confirm_delete_network']='Видалити всі вузли, труби й текстові підписи в цьому проєкті? Фонове зображення, назва проєкту та налаштування збережуться. Це неможливо скасувати.';
+$ec_lang['lpn_confirm_delete_network']='Видалити всі вузли, труби й текстові підписи в цьому проєкті? Фонове зображення, назва проєкту та налаштування збережуться.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -3096,7 +3095,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Підписи абонентів м�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Використати поточний вигляд';
 $ec_lang['lpn_settings_page']='Сторінка';
-$ec_lang['lpn_settings_page_note']='Зберігається в цьому калькуляторі, а не в проєкті.';
 $ec_lang['lpn_settings_hydraulics']='Гідравліка';
 $ec_lang['lpn_settings_quality']='Якість води';
 $ec_lang['lpn_settings_quality_track']='Параметр якості';

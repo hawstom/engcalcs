@@ -285,11 +285,10 @@
 	// not, because "we remember a yes and store nothing on a no" is a fact a person may reasonably
 	// want before answering.
 	//
-	// A NATIVE confirm(), not a styled box, and that is a decision rather than a shortcut: its two
-	// buttons cannot be styled by us at all, so the coloured-Accept-beside-grey-Reject dark pattern
-	// that lib/Consent.lib.php spends a paragraph avoiding is not merely avoided here, it is
-	// impossible. Cancel and Escape both mean no. This page already asks its other questions the
-	// same way (Go to a latitude and longitude, Clear everything).
+	// ASKED IN THE PAGE'S ONE QUESTION BOX (EC.lpnAsk, Task 710), like every other question on this
+	// page. Its two buttons are drawn identically -- that box dresses no answer to stand out -- so
+	// the coloured-Accept-beside-grey-Reject dark pattern lib/Consent.lib.php spends a paragraph
+	// avoiding is still avoided. Cancel and Escape both mean no.
 	//
 	// ONE KEY PER PARAGRAPH, joined here (Task 507). A $ec_lang value is a single line by
 	// construction, so the alternative was a line-break placeholder inside one long value; four
@@ -327,37 +326,50 @@
 			'OpenStreetMap’s place-name service.');
 	};
 
-	/** The gate. Returns true if we may send. Asks at most once per invocation. */
-	function mayWeSend() {
-		if (EC.lpnSearchConsented()) { return true; }
-		if (!root.confirm || !root.confirm(consentText())) {
-			notice(t('lpn_search_refused',
-				'Place-name search is off, and nothing was sent. You can still use Go to a ' +
-				'latitude and longitude.'));
-			return false;
-		}
-		recordConsent();
-		return true;
+	/**
+	 * The page's question box (js/looped-network.js's askDialog(), Task 710). Absent -- this file
+	 * loaded on its own in a harness -- a harness answerer is used, and with none the answer is no.
+	 */
+	function ask(req, done) {
+		if (typeof EC.lpnAsk === 'function') { EC.lpnAsk(req, done); return; }
+		var a = root.lpnDialogAnswerer;
+		done(typeof a === 'function' ? a(req) : (req.kind === 'confirm' ? false : null));
+	}
+
+	/** The gate. Calls `then` if we may send. Asks at most once per invocation. */
+	function mayWeSend(then) {
+		if (EC.lpnSearchConsented()) { then(); return; }
+		ask({ kind: 'confirm', text: consentText() }, function (yes) {
+			if (!yes) {
+				notice(t('lpn_search_refused',
+					'Place-name search is off, and nothing was sent. You can still use Go to a ' +
+					'latitude and longitude.'));
+				return;
+			}
+			recordConsent();
+			then();
+		});
 	}
 
 	/** One result, or a choice, or an honest refusal. Never a silent no-op. */
-	function chooseFrom(results) {
-		if (results.length === 1) { return results[0]; }
+	function chooseFrom(results, then) {
+		if (results.length === 1) { then(results[0]); return; }
 		var lines = [], i;
 		for (i = 0; i < results.length; i++) { lines.push((i + 1) + '. ' + results[i].label); }
 		var text = t('lpn_search_choose', 'More than one place matches. Which one?') + '\n\n' +
 			lines.join('\n') + '\n\n' + CREDIT;
-		var v = root.prompt(text, '1');
-		if (v === null) {
-			notice(t('lpn_search_nochoice', 'Nothing chosen, so the map has not moved.'));
-			return null;
-		}
-		var n = parseInt(String(v).replace(/[^0-9]/g, ''), 10);
-		if (!(n >= 1 && n <= results.length)) {
-			notice(t('lpn_search_badchoice', 'That is not one of the numbers in the list.'));
-			return null;
-		}
-		return results[n - 1];
+		ask({ kind: 'prompt', text: text, value: '1' }, function (v) {
+			if (v === null) {
+				notice(t('lpn_search_nochoice', 'Nothing chosen, so the map has not moved.'));
+				return;
+			}
+			var n = parseInt(String(v).replace(/[^0-9]/g, ''), 10);
+			if (!(n >= 1 && n <= results.length)) {
+				notice(t('lpn_search_badchoice', 'That is not one of the numbers in the list.'));
+				return;
+			}
+			then(results[n - 1]);
+		});
 	}
 
 	// **THE EXTENT IS WHAT MAKES SEARCH DIFFERENT FROM GO TO, AND IT IS THE ONLY DIFFERENCE.**
@@ -387,8 +399,7 @@
 				' “' + query + '”');
 			return;
 		}
-		var hit = chooseFrom(results);
-		if (hit) { arrive(hit, to); }
+		chooseFrom(results, function (hit) { arrive(hit, to); });
 	}
 
 	/**
@@ -456,12 +467,14 @@
 			notice(t('lpn_search_busy', 'A search is already running. Wait for it to answer.'));
 			return;
 		}
-		if (!mayWeSend()) { return; }
-		var v = root.prompt(t('lpn_search_prompt',
-			'Search for a place by name. A town, a street, a landmark — for example: ' +
-			'Petaluma, California'), '');
-		if (v === null) { return; }
-		EC.lpnSearchRun(v, true);
+		mayWeSend(function () {
+			ask({ kind: 'prompt', text: t('lpn_search_prompt',
+				'Search for a place by name. A town, a street, a landmark — for example: ' +
+				'Petaluma, California'), value: '' }, function (v) {
+				if (v === null) { return; }
+				EC.lpnSearchRun(v, true);
+			});
+		});
 	};
 
 	/**
@@ -492,7 +505,7 @@
 			notice(t('lpn_search_empty', 'Enter a place name to search for.'));
 			return;
 		}
-		if (!gated && !mayWeSend()) { return; }
+		if (!gated) { mayWeSend(function () { EC.lpnSearchRun(query, true, to); }); return; }
 		// THE SAME QUERY TWICE IS ANSWERED WITHOUT A SECOND REQUEST -- the policy's "clients
 		// sending repeatedly the same query may be classified as faulty" clause, honoured in
 		// memory rather than on the device. It is also the common case in real use: you search,

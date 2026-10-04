@@ -1314,7 +1314,6 @@ $ec_lang['lpn_goto_on_map']='在地图上定位';
 $ec_lang['lpn_pane_select_on_map']='在地图上选中';
 $ec_lang['lpn_pane_unselect_on_map']='在地图上取消选中';
 $ec_lang['lpn_pane_print']='打印表格';
-$ec_lang['lpn_pane_print_tip']='打印您正在查看的表格，标题中包含项目名称、表格名称和单位。行按您排序的顺序打印。';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1395,7 +1394,7 @@ $ec_lang['lpn_help_walkthroughs']='教程';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='删除管网';
-$ec_lang['lpn_confirm_delete_network']='删除本项目中的所有节点、管道和文字标签？背景图片、项目名称和设置会保留。此操作无法撤销。';
+$ec_lang['lpn_confirm_delete_network']='删除本项目中的所有节点、管道和文字标签？背景图片、项目名称和设置会保留。';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -3040,7 +3039,6 @@ $ec_lang['lpn_labels_customer_width_tip']='只有当地图视图宽度等于或�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='使用当前视图';
 $ec_lang['lpn_settings_page']='页面';
-$ec_lang['lpn_settings_page_note']='保存在本计算器中，而非项目中。';
 $ec_lang['lpn_settings_hydraulics']='水力计算';
 $ec_lang['lpn_settings_quality']='水质';
 $ec_lang['lpn_settings_quality_track']='水质参数';

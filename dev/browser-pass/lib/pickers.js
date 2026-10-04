@@ -146,4 +146,17 @@ const INIT_SCRIPT = `
 }());
 `;
 
-module.exports = { INIT_SCRIPT };
+// **THE PAGE'S QUESTION BOX ROUTED BACK TO THE NATIVE DIALOGS** (Task 710). Every alert/confirm/
+// prompt on the Looped Network page became askDialog(), an in-page box. A browser spec that scripts
+// its answers through Playwright's 'dialog' event (Session.answerConfirmsWith, answerPromptWith) keeps
+// working because askDialog() asks window.lpnDialogAnswerer first when one exists, and this one hands
+// the question to the native dialog. dev/lpn-spike/dialog-modal-browser-harness.js deletes it and
+// clicks the real box.
+const NATIVE_DIALOG_SEAM = `
+window.lpnDialogAnswerer = function (req) {
+	var kind = req.kind === 'copy' ? 'prompt' : (req.kind || 'alert');
+	return window[kind](req.text, req.value);
+};
+`;
+
+module.exports = { INIT_SCRIPT, NATIVE_DIALOG_SEAM };

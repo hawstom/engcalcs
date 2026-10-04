@@ -120,6 +120,9 @@ exports.run = async function ({ browser, report }) {
 		// ---- 1. where the row is, and is not ---------------------------------------------------
 		// **GREYED, NOT HIDDEN, SINCE 2026-09-22**, exactly as the Go to… row is (Tom: "can show
 		// for unnamed CRS projects, but disabled when a world map is not attached").
+		// The page boots into a geographic Project1 (R-208), so the XY case is a new local project.
+		await a.newProject();
+		await a.settle(500);
 		let full = await a.menuRows('map');
 		let srow = full.find(r => r.label === SEARCH_ROW);
 		report.ok(!!srow && srow.disabled,

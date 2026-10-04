@@ -1315,7 +1315,6 @@ $ec_lang['lpn_goto_on_map']='Prikaži na karti';
 $ec_lang['lpn_pane_select_on_map']='Odaberi na karti';
 $ec_lang['lpn_pane_unselect_on_map']='Poništi odabir na karti';
 $ec_lang['lpn_pane_print']='Ispiši tablicu';
-$ec_lang['lpn_pane_print_tip']='Ispisuje tablicu koju trenutačno gledate, s nazivom projekta, nazivom tablice i jedinicama u zaglavljima. Retci se ispisuju redoslijedom kojim ste ih razvrstali.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1396,7 +1395,7 @@ $ec_lang['lpn_help_walkthroughs']='Vodiči';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Izbriši mrežu';
-$ec_lang['lpn_confirm_delete_network']='Izbrisati svaki čvor, cijev i tekstnu oznaku u ovom projektu? Pozadinska slika, naziv projekta i vaše postavke se zadržavaju. Ovo se ne može poništiti.';
+$ec_lang['lpn_confirm_delete_network']='Izbrisati svaki čvor, cijev i tekstnu oznaku u ovom projektu? Pozadinska slika, naziv projekta i vaše postavke se zadržavaju.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -3041,7 +3040,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Oznake korisnika crtaju se samo dok j
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Koristi trenutačni prikaz';
 $ec_lang['lpn_settings_page']='Stranica';
-$ec_lang['lpn_settings_page_note']='Spremljeno u ovom kalkulatoru, a ne u projektu.';
 $ec_lang['lpn_settings_hydraulics']='Hidraulika';
 $ec_lang['lpn_settings_quality']='Kvaliteta vode';
 $ec_lang['lpn_settings_quality_track']='Parametar kvalitete';

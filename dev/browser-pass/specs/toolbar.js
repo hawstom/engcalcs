@@ -97,9 +97,15 @@ exports.run = async function ({ browser, report }) {
 		const PROFILE = await a.lang('lpn_profile_menu');
 		report.ok(names.indexOf(PROFILE) < 0,
 			'the profile is NOT on the strip — it is read, not drawn', names.join(' | '));
-		const water = await a.menuRows('project');
-		report.ok(water.some(r => r.label === PROFILE),
-			'...and its one door is the Water menu row', water.map(r => r.label).join(' | '));
+		// Updated 2026-10-04: the door is a row in the Graphs fly-out (fix/graphs-order, EPANET's order).
+		const GRAPHS = await a.lang('lpn_graphs_menu');
+		await a.openMenu('project');
+		await a._clickRow('#lpn_menu_list', GRAPHS);
+		await a.page.waitForSelector('#lpn_menu_popup2', { state: 'visible' });
+		const graphRows = await a.page.$$eval('#lpn_menu_list2 button.lpn-menu-row', (els) => els.map(e => e.textContent.trim()));
+		await a.closeMenu();
+		report.ok(graphRows.some(r => r.indexOf(PROFILE) === 0),
+			'...and its one door is the Graphs menu row', graphRows.join(' | '));
 
 		// **THE TIME TRANSPORT IS ON THE STRIP AT ALL TIMES.** This page has just been opened on an
 		// empty project with no duration, which is the state most visitors are in and exactly the

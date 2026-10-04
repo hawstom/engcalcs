@@ -924,6 +924,8 @@ $ec_lang['lpn_pane_manage_cols_up']='Move up';
 $ec_lang['lpn_pane_manage_cols_down']='Move down';
 $ec_lang['lpn_pane_manage_cols_top']='Move to beginning';
 $ec_lang['lpn_pane_manage_cols_bottom']='Move to end';
+$ec_lang['lpn_pane_manage_cols_width']='Width (em)';
+$ec_lang['lpn_pane_width_tip']='Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.';
 $ec_lang['lpn_pane_colmenu_tip']='Hide or manage columns';
 $ec_lang['lpn_tool_area_window']='Select a window';
 $ec_lang['lpn_tool_area_lasso']='Select a lasso';
@@ -1016,6 +1018,13 @@ $ec_lang['lpn_field_tank_diameter_tip']='For a vertical cylinder. Same units as 
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tank_head_tip']='Water surface elevation in the tank: the tank bottom elevation plus the water depth.';
 $ec_lang['lpn_close']='Close';
+// The corner buttons beside every standing box's X (Task 441). Each is an icon-only button, so the
+// value is its name: the hover tip and the screen reader's label at once. Auto-hide is a toggle and
+// says its state through aria-pressed, so one wording serves both states (AutoCAD's own word).
+$ec_lang['lpn_dock_left']='Dock at the left of the map';
+$ec_lang['lpn_dock_right']='Dock at the right of the map';
+$ec_lang['lpn_dock_float']='Float';
+$ec_lang['lpn_dock_autohide']='Auto-hide';
 // The property popup's own name, in its drag bar (Tom, 2026-09-08: *"maybe the right title is
 // 'Properties'"*). It names the BOX, not the element in it: lpn_popup_title below the bar carries
 // the element's id and its rename box, and the two are read one under the other.
@@ -1468,6 +1477,13 @@ $ec_lang['lpn_pane_filter_stale']='Rows that no longer match: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Nothing in this table matches the filter.';
+// Selection only (Task 757): the Tables pane filtered to what is selected on the map. Parallel to
+// lpn_pane_filter_note. The line names the Find filter too when both are on.
+$ec_lang['lpn_pane_filter_sel_note']='Selection only. Showing {n} of {all}.';
+$ec_lang['lpn_pane_filter_sel_and']='Filtered by {q} and selection only. Showing {n} of {all}.';
+$ec_lang['lpn_pane_filter_sel_none']='None of the selected elements are in this table.';
+$ec_lang['lpn_pane_sel_only']='Selection only';
+$ec_lang['lpn_pane_sel_only_none']='No elements are selected. Select elements on the map first.';
 // The pin beside the ID in the first column. The ID itself was this control until 2026-09-19,
 // underlined and turning link blue; the ID is an ordinary editable cell now and this is the way
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
@@ -1478,7 +1494,6 @@ $ec_lang_syn['lpn_goto_on_map']='Bring this into view on the map, Zoom to this o
 $ec_lang['lpn_pane_select_on_map']='Select on map';
 $ec_lang['lpn_pane_unselect_on_map']='Unselect on map';
 $ec_lang['lpn_pane_print']='Print table';
-$ec_lang['lpn_pane_print_tip']='Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1559,7 +1574,7 @@ $ec_lang_syn['lpn_help_walkthroughs']='Walkthroughs, Guided tours, Step-by-step 
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Delete network';
-$ec_lang['lpn_confirm_delete_network']='Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.';
+$ec_lang['lpn_confirm_delete_network']='Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -1822,6 +1837,8 @@ $ec_lang['lpn_freq_axis_percent']='Percent less than';
 $ec_lang['lpn_contour_menu']='Contour';
 $ec_lang['lpn_contour_tip']='Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.';
 $ec_lang['lpn_contour_plot']='Contour plot';
+$ec_lang['lpn_contour_show']='Show contours';
+$ec_lang['lpn_contour_show_tip']='Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.';
 $ec_lang['lpn_contour_fill']='Fill';
 $ec_lang['lpn_contour_fill_tip']='Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.';
 $ec_lang['lpn_contour_fill_smooth']='Smooth';
@@ -3012,8 +3029,8 @@ $ec_lang['lpn_elev_dem_use_tip']='Put the elevation of the DEM at this node into
 $ec_lang['lpn_elev_dem_none']='The DEM has no elevation for this node.';
 $ec_lang['lpn_elev_dem_said']='Mapbox DEM says {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Elevation source';
-$ec_lang['lpn_settings_elev_source_tip']='Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.';
-$ec_lang['lpn_settings_elev_source_typed']='The elevation typed above';
+$ec_lang['lpn_settings_elev_source_tip']='2026 Mapbox DEM horizontal and vertical accuracy ranges through 1–10 m and <1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and >16 m at the poles.';
+$ec_lang['lpn_settings_elev_source_typed']='Above';
 $ec_lang['lpn_settings_elev_source_dem']='Mapbox DEM';
 $ec_lang['lpn_settings_accuracy']='Accuracy';
 // **APPENDED TO EVERY HYDRAULICS TIP, because the box no longer shows the default** (Tom,
@@ -3170,6 +3187,13 @@ $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Background image opacity (0 to 1)';
+// Task 617: a display-time filter on the street or satellite tiles only; the drawing and the credit are untouched.
+$ec_lang['lpn_settings_basemap_style']='Basemap style';
+$ec_lang['lpn_settings_basemap_style_tip']='Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.';
+$ec_lang['lpn_basemap_style_normal']='Normal';
+$ec_lang['lpn_basemap_style_muted']='Muted';
+$ec_lang['lpn_basemap_style_faded']='Faded';
+$ec_lang['lpn_basemap_style_grayscale']='Grayscale';
 $ec_lang['lpn_settings_map_display']='Appearance';
 $ec_lang_syn['lpn_settings_map_display']='How the map looks (appearance, style, the way it is drawn) — sizes, opacity, position.';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
@@ -3349,7 +3373,9 @@ $ec_lang['lpn_labels_customer_width_tip']='Customer labels are drawn only while 
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Use current view';
 $ec_lang['lpn_settings_page']='Page';
-$ec_lang['lpn_settings_page_note']='Saved in this calculator, not in the project.';
+$ec_lang['lpn_saved_project']='Saved with the project';
+$ec_lang['lpn_saved_browser']='Saved in this browser';
+$ec_lang['lpn_saved_session']='Not saved';
 $ec_lang['lpn_settings_hydraulics']='Hydraulics';
 $ec_lang['lpn_settings_quality']='Quality';
 $ec_lang['lpn_settings_quality_track']='Quality parameter';

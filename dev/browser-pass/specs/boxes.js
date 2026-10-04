@@ -26,6 +26,8 @@ exports.run = async function ({ browser, report }) {
 		await a.makeEdit();
 		await a.settle(400);
 
+		// Rounded to 9 places and compared against the row height, not a fixed 0.01: a new project opens
+		// geographic (R-208), so box sizes are in degrees, about 3e-5, and 3-place rounding made every box 0.
 		const seen = await a.page.evaluate(() => {
 			// Blue is what the pass PLACED; green is what it went round. Only the placed boxes are
 			// this spec's business.
@@ -34,9 +36,9 @@ exports.run = async function ({ browser, report }) {
 			const rect = (p) => {
 				const pts = p.getAttribute('points').split(' ').map(s => s.split(',').map(Number));
 				const xs = pts.map(q => q[0]), ys = pts.map(q => q[1]);
-				return { w: +(Math.max(...xs) - Math.min(...xs)).toFixed(3),
-					h: +(Math.max(...ys) - Math.min(...ys)).toFixed(3),
-					left: +Math.min(...xs).toFixed(3), top: +Math.min(...ys).toFixed(3) };
+				return { w: +(Math.max(...xs) - Math.min(...xs)).toFixed(9),
+					h: +(Math.max(...ys) - Math.min(...ys)).toFixed(9),
+					left: +Math.min(...xs).toFixed(9), top: +Math.min(...ys).toFixed(9) };
 			};
 			const lbl = document.querySelector('#lpn_canvas text.lpn-lbl');
 			return { boxes: blue.map(rect), rows: lbl ? lbl.querySelectorAll('tspan[x]').length : -1 };
@@ -58,7 +60,7 @@ exports.run = async function ({ browser, report }) {
 		// Stacked, not scattered: sorted by top edge, each row starts where the last one ended.
 		const tops = seen.boxes.map(b => b.top).sort((x, y) => x - y);
 		const step = heights[0];
-		report.ok(tops.every((t, i) => i === 0 || Math.abs(t - tops[i - 1] - step) < 0.01),
+		report.ok(tops.every((t, i) => i === 0 || Math.abs(t - tops[i - 1] - step) < step * 0.01),
 			'and they stack, edge to edge, with no gap and no overlap', tops.join(' / '));
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript');

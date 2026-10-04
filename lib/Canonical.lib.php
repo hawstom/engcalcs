@@ -94,7 +94,10 @@ function ecCanonicalPaths() {
  */
 function ecCanonicalOrigins() {
     return array(
-        'Looped-Network.php' => 'https://librewaternet.org',
+        // Tom, 2026-10-04: "I guess the momentum is toward EPANET++. Let's make that canonical."
+        // EVERY host serving the map application nominates epanet-plus-plus.org, librewaternet.org
+        // included; the brand NAME stays per host (ecAppBrandCurrent() in lib/config.inc.php).
+        'Looped-Network.php' => 'https://epanet-plus-plus.org',
     );
 }
 
@@ -255,6 +258,10 @@ function ecRedirectOnlyOrigins() {
     return array(
         'Looped-Network.php' => array(
             'hawsedc.com' => 'https://epanet-plus-plus.org',
+            // librewaternet.org/app/ is a rewrite onto the script, so its script path must move to
+            // ITS OWN /app/, never across to the canonical host (a cross-host 301 there would take
+            // a visitor off the site they chose).
+            'librewaternet.org' => 'https://librewaternet.org',
         ),
     );
 }

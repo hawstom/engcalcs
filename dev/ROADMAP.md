@@ -66,15 +66,6 @@ the block.
 
 ## 100 — Next.
 
-- 100|441| **Dock the non-modal boxes: dock, hide, autohide, at each box's corner.**
-  **BUILT 2026-10-04 on `feat/dock`, port 8107**, Perry clean; awaiting his browser pass. 17 boxes dock left/right, share a column, auto-hide to an edge tab; Q5's `?` on the three Analyze tools.
-  **PROMOTED TO 100 BY TOM, 2026-10-03** (*"I can see us headed toward task 441, docking of boxes.
-  Maybe we should promote it to 100, since this could be an embarrassment."*). Scope widened from
-  the Settings box to every non-modal box (Properties, Find, Settings, Energy, Compare, Report): the
-  conventional icon buttons at a box's upper right, beside its X (*"implementing the conventional
-  docking, hide, autohide, etc icon buttons at the upper right corner of non-hog (non-modal)
-  boxes right before (next to) the exit X"*). Docking left or right, and an AutoCAD-style
-  anchor-and-flyout with autohide (raised 2026-08-18). Positions are window furniture: localStorage.
 - 100|539| **Gang the neighbour labels so their leaders stop crossing.**
   **REBUILD FROM RULES, 2026-09-28:** rules reviewed (`dev/label-placement-rules.md`), bench and
   seam built, two clean-room placers done and both fail R-075; state in the handoff.
@@ -244,11 +235,6 @@ the block.
   selection set from menu choices (his leading candidate: Highlighted / Chosen), and an audit of tip
   pollution in lpn (status strip, click-to-open, delays in master styles, tips that talk down).
   Ida's audit: `dev/tip-and-selection-audit.md` (branch `chore/ida-tip`); decisions go to him as an interview.
-- 75|757| **Filter the Tables pane to the selection.**
-  **BUILT 2026-10-04 on `feat/table-selection`, port 8109** (Ida and Declan consulted; snapshot, three doors), Perry clean; awaiting his browser pass.
-  Tom, 2026-10-03: *"it would be really nice if the tables could filter on the selection. I'm not
-  sure how to work the UI unless it's part of the right-click menu."* Ask Ida and Declan where the
-  switch lives before building.
 - 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
@@ -356,10 +342,6 @@ the block.
   - **Phase 1 tokens and the check are built on `feat/theme-token` (see the end of the plan).** Phase 1b remains: the button base below, and inline colours in `js/*.js`.
   - **MOD's phone-like buttons (R-202) belong inside phase 1**: one button base for menu items and
     toolbar buttons, one accent colour, previewed on a branch. Retire the menu hint (R-203) once it ships.
-- 75|739| **Say where each setting is saved: the project or this browser.**
-  **BUILT 2026-10-04 on `feat/setting-scope`, port 8112**: a quiet "Saved with the project" / "Saved in this browser" line on each Settings group; a Width entry in Manage columns; awaiting his pass.
-  Tom, 2026-09-28, on learning dragged column widths live in the browser: *"Systematically disclose to users where things are stored. Autodesk does this so well that I, a user can cite by memory that variables are stored in the drawing (project), session, or user profile. Every sysvar listing includes 'Where it's stored.'"* Also *"Maybe include Width in the manage columns box with a tip glyph as a secondary discovery path"*, and a delayed tip on the column dragger (never on a phone). The inventory is `dev/cookie-storage-inventory.md`; CLAUDE.md already splits project vs browser settings.
-
 - 75|749| **Read Bentley WaterCAD/WaterGEMS models.**
   Basic mode and the Alternatives table merged 2026-10-03; `feat/bentley-interop` was recut from
   master as the long-lived branch for the rest (Tom: *"a long-term branch for all the bentley-interop things"*).
@@ -396,6 +378,21 @@ the block.
   **Tom, 2026-10-01: stays at 75, with a branch to play on** (`feat/desktop`): *"my main concern is that we
   could get too heavy for the browser or find limitations. Until then, let's just play and plan and see
   what happens."*
+- 75|719| **Draw a chain: junction, pipe, junction, pipe, until Escape.**
+  Tom, 2026-09-25, from WaterCAD: *"a Junction and Pipe toolbar command that adds Junction, Pipe,
+  Junction, Pipe, etc until escape."*
+  **PROMOTED TO 75 BY TOM, 2026-10-04** (*"Ensure that we have a roadmap item for a Junction and Pipe tool and that it's promoted to high priority (at least 75)."*).
+- 75|762| **Pressure-driven analysis (PDA) through the EPANET engine.** EPANET 2.2 solves
+  `[OPTIONS] Demand Model PDA` with Minimum/Required Pressure and Pressure Exponent; we read and
+  carry those lines and report that we solve demand-driven (js/lpn-inp.js ~586). Tom, 2026-10-04:
+  *"Is this (PDA) an EPANET++ gap that we must fill urgently?"* An EPANET feature we lack is a gap in the EPANET++ claim.
+- 75|763| **A searchable help manual, built from the tips Tom cut.** Tom, 2026-10-04: *"Almost all
+  the deletes could be turned into a searchable help manual."* The cut tips' English is kept in
+  `dev/help-manual-source.md` (feat/tip-verdict) as its first material.
+- 75|764| **One voice for tips and prompts: mood, Click vs Specify, check boxes.** Tom, 2026-10-04:
+  *"Are we indicative, imperative, or indecisive?"*; *"'Specify' would be better than 'Click'
+  everywhere"*; *"'Tick'? ... let's audit and discipline this too."* Mary's research first; then a
+  rule in dev/language-strings.md and one English pass.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -943,9 +940,6 @@ the block.
   Tom, 2026-09-26 (R-320): *"This is an extension, not base EPANET. We can provide this, but it's
   not a blocker for EPANET++."* His UI sketch: Settings, Quality holds a short list of parameters
   with toggles plus an open-ended list of reactive species, no scarier than Custom Properties.
-- 50|719| **Draw a chain: junction, pipe, junction, pipe, until Escape.**
-  Tom, 2026-09-25, from WaterCAD: *"a Junction and Pipe toolbar command that adds Junction, Pipe,
-  Junction, Pipe, etc until escape."*
 - 50|720| **Background layers from a GIS server.**
   Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server offering."*
   A fifth third-party service is a new paragraph in `privacy.php` (CLAUDE.md).
@@ -993,9 +987,6 @@ the block.
   lpn_settings_symbol_cap + _mid + _post around two number inputs in their word order. One key with
   {n} and {p} placeholders, split into inputs at render time.
 
-- 50|761| **Four more browser-pass specs throw: units, profile, cleanmap, notesbox.** The full
-  `node dev/browser-pass/run.js` gave 1703/1769 on 2026-10-04 with those four throwing and stale
-  menu-row, table-tab, print and cursor checks elsewhere; outside check_all, so nothing catches it. Task 732 fixed five.
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary

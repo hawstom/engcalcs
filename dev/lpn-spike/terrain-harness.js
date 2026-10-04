@@ -273,6 +273,7 @@ const L = loadLoopedNetwork(
 	"\t\tGEO: LPN_COORDS_GEO,\n" +
 	// Task 542's two new doors, and the queue between the first one and the tiles.
 	"\t\tsetElevSource: function (v) { settings.defaults.nodeElevSource = v; },\n" +
+	"\t\tnewProjectElevSource: newProjectElevSource,\n" +
 	"\t\tflushNewNodes: flushTerrainForNewNodes,\n" +
 	// The three lists EC.lpnTerrainFill() used to consult before it was deleted; see decideFill().
 	"\t\tneeding: terrainNodesNeedingElevation, withElev: terrainNodesWithElevation,\n" +
@@ -622,6 +623,21 @@ function runFill(answers) {
 		const words = rows.map(r => String(r.label || '')).join(' | ');
 		ok('the Map menu no longer offers a terrain-elevations row',
 			!/[Ee]levation/.test(words), words);
+	}
+
+	// ---- 6a. WHAT A NEW PROJECT'S ELEVATION SOURCE IS (Tom, 2026-10-04) ------------------------
+	{
+		L.reset(L.GEO);
+		ok('a new geographic project defaults to Mapbox DEM', L.newProjectElevSource() === 'dem');
+		L.reset(null);
+		ok('a new local project keeps the typed elevation', L.newProjectElevSource() === 'value');
+		const fs = require('fs'), path = require('path');
+		const ex = JSON.parse(fs.readFileSync(path.join(__dirname, '../../examples/Net3-Novato-CA-World.lwn'), 'utf8'));
+		ok('the georeferenced example carries Mapbox DEM', ex.settings.defaults.nodeElevSource === 'dem');
+		['Net1', 'Net2', 'Net3', 'Elm-Street-Center', 'Basic-example-SI-units', 'Basic-example-US-units'].forEach(function (n) {
+			const e = JSON.parse(fs.readFileSync(path.join(__dirname, '../../examples/' + n + '.lwn'), 'utf8'));
+			ok(n + ' (local) is unchanged', (e.settings.defaults.nodeElevSource || 'value') === 'value');
+		});
 	}
 
 	// ---- 6b. A NODE BORN ON A GEOGRAPHIC PROJECT READS ITS OWN GROUND --------------------------

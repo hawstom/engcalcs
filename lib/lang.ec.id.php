@@ -1315,7 +1315,6 @@ $ec_lang['lpn_pane_select_on_map']='Pilih di peta';
 $ec_lang['lpn_pane_unselect_on_map']='Batalkan pilihan di peta';
 
 $ec_lang['lpn_pane_print']='Cetak tabel';
-$ec_lang['lpn_pane_print_tip']='Cetak tabel yang sedang Anda lihat, dengan nama proyek, nama tabel, dan satuan pada judul kolom. Baris dicetak sesuai urutan pengurutan yang Anda pilih.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1396,7 +1395,7 @@ $ec_lang['lpn_help_walkthroughs']='Tutorial';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Hapus jaringan';
-$ec_lang['lpn_confirm_delete_network']='Hapus semua simpul, pipa, dan label teks di proyek ini? Gambar latar, nama proyek, dan pengaturan Anda tetap disimpan. Tindakan ini tidak dapat dibatalkan.';
+$ec_lang['lpn_confirm_delete_network']='Hapus semua simpul, pipa, dan label teks di proyek ini? Gambar latar, nama proyek, dan pengaturan Anda tetap disimpan.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -3044,7 +3043,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Label pelanggan hanya digambar selama
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Gunakan tampilan saat ini';
 $ec_lang['lpn_settings_page']='Halaman';
-$ec_lang['lpn_settings_page_note']='Disimpan di kalkulator ini, bukan di dalam proyek.';
 $ec_lang['lpn_settings_hydraulics']='Hidraulika';
 $ec_lang['lpn_settings_quality']='Kualitas air';
 $ec_lang['lpn_settings_quality_track']='Parameter kualitas';

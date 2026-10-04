@@ -1313,7 +1313,6 @@ $ec_lang['lpn_goto_on_map']='Haritada göster';
 $ec_lang['lpn_pane_select_on_map']='Haritada seç';
 $ec_lang['lpn_pane_unselect_on_map']='Haritada seçimi kaldır';
 $ec_lang['lpn_pane_print']='Tabloyu yazdır';
-$ec_lang['lpn_pane_print_tip']='Şu anda baktığınız tabloyu, proje adı, tablo adı ve başlıklardaki birimlerle birlikte yazdırır. Satırlar, sıraladığınız düzende yazdırılır.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1394,7 +1393,7 @@ $ec_lang['lpn_help_walkthroughs']='Rehberler';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Şebekeyi sil';
-$ec_lang['lpn_confirm_delete_network']='Bu projedeki her düğüm, boru ve metin etiketi silinsin mi? Arka plan görüntüsü, proje adı ve ayarlarınız korunur. Bu işlem geri alınamaz.';
+$ec_lang['lpn_confirm_delete_network']='Bu projedeki her düğüm, boru ve metin etiketi silinsin mi? Arka plan görüntüsü, proje adı ve ayarlarınız korunur.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -3039,7 +3038,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Müşteri etiketleri yalnızca harita
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Şimdiki görünümü kullan';
 $ec_lang['lpn_settings_page']='Sayfa';
-$ec_lang['lpn_settings_page_note']='Projede değil, bu hesaplayıcıda kaydedilir.';
 $ec_lang['lpn_settings_hydraulics']='Hidrolik';
 $ec_lang['lpn_settings_quality']='Su kalitesi';
 $ec_lang['lpn_settings_quality_track']='Kalite parametresi';

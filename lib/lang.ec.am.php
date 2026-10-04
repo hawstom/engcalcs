@@ -1313,7 +1313,6 @@ $ec_lang['lpn_goto_on_map']='በካርታው ላይ አሳይ';
 $ec_lang['lpn_pane_select_on_map']='ካርታ ላይ ምረጥ';
 $ec_lang['lpn_pane_unselect_on_map']='ካርታ ላይ ምርጫ አጥፋ';
 $ec_lang['lpn_pane_print']='ሠንጠረዥ አትም';
-$ec_lang['lpn_pane_print_tip']='እየተመለከቱት ያለውን ሠንጠረዥ ያትማል፣ ከፕሮጀክቱ ስም፣ ከሠንጠረዡ ስምና ከመለኪያ ክፍሎቹ ጋር በራስጌዎቹ ውስጥ። ረድፎች የደረደሩበትን ቅደም ተከተል ይዘው ይታተማሉ።';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1394,7 +1393,7 @@ $ec_lang['lpn_help_walkthroughs']='ደረጃ በደረጃ መመሪያ';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='መረብ ሰርዝ';
-$ec_lang['lpn_confirm_delete_network']='በዚህ ፕሮጀክት ውስጥ ያሉትን ሁሉንም ነጥቦች፣ ቧንቧዎችና የጽሑፍ ምልክቶች ይሰርዙ? የበስተጀርባ ምስሉ፣ የፕሮጀክቱ ስምና ቅንብሮችዎ ይቆያሉ። ይህ ሊቀለበስ አይችልም።';
+$ec_lang['lpn_confirm_delete_network']='በዚህ ፕሮጀክት ውስጥ ያሉትን ሁሉንም ነጥቦች፣ ቧንቧዎችና የጽሑፍ ምልክቶች ይሰርዙ? የበስተጀርባ ምስሉ፣ የፕሮጀክቱ ስምና ቅንብሮችዎ ይቆያሉ።';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -3039,7 +3038,6 @@ $ec_lang['lpn_labels_customer_width_tip']='የደንበኛ ምልክቶች የ�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='አሁን ያለውን እይታ ተጠቀም';
 $ec_lang['lpn_settings_page']='ገጽ';
-$ec_lang['lpn_settings_page_note']='በዚህ ካልኩሌተር ውስጥ ተቀምጧል፣ በፕሮጀክቱ ውስጥ አይደለም።';
 $ec_lang['lpn_settings_hydraulics']='ሃይድሮሊክስ';
 $ec_lang['lpn_settings_quality']='የውሃ ጥራት';
 $ec_lang['lpn_settings_quality_track']='የጥራት መለኪያ';

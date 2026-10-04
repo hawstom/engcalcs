@@ -67,6 +67,7 @@ const PRELUDE = `
   window.__ALERTS = [];
   window.prompt = function(){ return window.__ASKNAME; };
   window.alert = function(m){ window.__ALERTS.push(String(m)); };
+  window.lpnDialogAnswerer = function(req){ return window[req.kind === 'copy' ? 'prompt' : req.kind](req.text, req.value); };
   window.__driveMenu = function(menuId, label){
     document.getElementById(menuId).dispatchEvent(new MouseEvent('click',{bubbles:true}));
     var hit = null;

@@ -276,6 +276,8 @@ async function preReviewSuite(browser, open) {
 		await pg.waitForTimeout(1500);
 	};
 	const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+	// Task 710: the page's question box answers through window.prompt/confirm, which this run scripts.
+	await ctx.addInitScript(require('../browser-pass/lib/pickers').NATIVE_DIALOG_SEAM);
 	const page = await open(ctx, '');
 	await openNet1(page);
 	const pc = await page.evaluate(() => EngCalcs.pageConfig);

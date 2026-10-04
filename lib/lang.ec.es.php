@@ -1318,7 +1318,6 @@ $ec_lang['lpn_goto_on_map']='Mostrar en el mapa';
 $ec_lang['lpn_pane_select_on_map']='Seleccionar en el mapa';
 $ec_lang['lpn_pane_unselect_on_map']='Anular selección en el mapa';
 $ec_lang['lpn_pane_print']='Imprimir tabla';
-$ec_lang['lpn_pane_print_tip']='Imprime la tabla que está viendo, con el nombre del proyecto, el nombre de la tabla y las unidades en los encabezados. Las filas se imprimen en el orden en que las ordenó.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1399,7 +1398,7 @@ $ec_lang['lpn_help_walkthroughs']='Tutoriales';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Eliminar red';
-$ec_lang['lpn_confirm_delete_network']='¿Eliminar todos los nodos, tuberías y etiquetas de texto de este proyecto? La imagen de fondo, el nombre del proyecto y su configuración se conservan. Esto no se puede deshacer.';
+$ec_lang['lpn_confirm_delete_network']='¿Eliminar todos los nodos, tuberías y etiquetas de texto de este proyecto? La imagen de fondo, el nombre del proyecto y su configuración se conservan.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -3096,7 +3095,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Las etiquetas de cliente se dibujan s
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Usar la vista actual';
 $ec_lang['lpn_settings_page']='Página';
-$ec_lang['lpn_settings_page_note']='Se guarda en esta calculadora, no en el proyecto.';
 $ec_lang['lpn_settings_hydraulics']='Hidráulica';
 $ec_lang['lpn_settings_quality']='Calidad';
 $ec_lang['lpn_settings_quality_track']='Parámetro de calidad';

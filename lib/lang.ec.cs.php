@@ -1315,7 +1315,6 @@ $ec_lang['lpn_goto_on_map']='Zobrazit na mapě';
 $ec_lang['lpn_pane_select_on_map']='Vybrat na mapě';
 $ec_lang['lpn_pane_unselect_on_map']='Zrušit výběr na mapě';
 $ec_lang['lpn_pane_print']='Vytisknout tabulku';
-$ec_lang['lpn_pane_print_tip']='Vytiskne tabulku, na kterou se právě díváte, s názvem projektu, názvem tabulky a jednotkami v záhlavích. Řádky se vytisknou v pořadí, do kterého jste je seřadili.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1396,7 +1395,7 @@ $ec_lang['lpn_help_walkthroughs']='Návody';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Smazat síť';
-$ec_lang['lpn_confirm_delete_network']='Smazat všechny uzly, potrubí a textové popisky v tomto projektu? Podkladový obrázek, název projektu a nastavení zůstanou zachovány. Tuto akci nelze vrátit zpět.';
+$ec_lang['lpn_confirm_delete_network']='Smazat všechny uzly, potrubí a textové popisky v tomto projektu? Podkladový obrázek, název projektu a nastavení zůstanou zachovány.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -3042,7 +3041,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Popisky odběratelů se kreslí pouze
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Použít aktuální pohled';
 $ec_lang['lpn_settings_page']='Stránka';
-$ec_lang['lpn_settings_page_note']='Uloženo v této kalkulačce, ne v projektu.';
 $ec_lang['lpn_settings_hydraulics']='Hydraulika';
 $ec_lang['lpn_settings_quality']='Kvalita vody';
 $ec_lang['lpn_settings_quality_track']='Sledovaný parametr kvality';

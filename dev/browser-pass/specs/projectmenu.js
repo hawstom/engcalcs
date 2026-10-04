@@ -40,9 +40,11 @@ exports.title = '35. The Project menu';
 //
 // **NAMED BY KEY, NOT BY TOM'S ENGLISH** (dev/session-handoff.md §4). What this list is about is
 // which rows exist and in what order, and it broke on wording twice.
+// Updated 2026-10-04: Profile and the other graphs are one "Graphs" fly-out (fix/graphs-order), and the
+// fire flow row sits under the "Analyze" fly-out.
 const EXPECTED_KEYS = ['lpn_menu_insert', 'lpn_tool_settings', 'lpn_library_menu',
-	'lpn_profile_menu', 'lpn_tables_menu', 'lpn_scenario_menu', 'lpn_time_run',
-	'lpn_ff_menu', 'lpn_reports_menu'];
+	'lpn_graphs_menu', 'lpn_tables_menu', 'lpn_scenario_menu', 'lpn_time_run',
+	'lpn_analyze_menu', 'lpn_reports_menu'];
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');

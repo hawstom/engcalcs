@@ -1314,7 +1314,6 @@ $ec_lang['lpn_goto_on_map']='Прикажи на мапи';
 $ec_lang['lpn_pane_select_on_map']='Изабери на мапи';
 $ec_lang['lpn_pane_unselect_on_map']='Поништи избор на мапи';
 $ec_lang['lpn_pane_print']='Штампај табелу';
-$ec_lang['lpn_pane_print_tip']='Штампа табелу коју гледате, са називом пројекта, називом табеле и јединицама у заглављима. Редови се штампају редоследом по коме сте их сортирали.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1395,7 +1394,7 @@ $ec_lang['lpn_help_walkthroughs']='Водичи';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Обриши мрежу';
-$ec_lang['lpn_confirm_delete_network']='Обрисати сваки чвор, цев и текстуалну ознаку у овом пројекту? Позадинска слика, назив пројекта и ваша подешавања се задржавају. Ово се не може поништити.';
+$ec_lang['lpn_confirm_delete_network']='Обрисати сваки чвор, цев и текстуалну ознаку у овом пројекту? Позадинска слика, назив пројекта и ваша подешавања се задржавају.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -3040,7 +3039,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Ознаке потрошача се 
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Користи тренутни приказ';
 $ec_lang['lpn_settings_page']='Страница';
-$ec_lang['lpn_settings_page_note']='Сачувано у овом калкулатору, не у пројекту.';
 $ec_lang['lpn_settings_hydraulics']='Хидраулика';
 $ec_lang['lpn_settings_quality']='Квалитет воде';
 $ec_lang['lpn_settings_quality_track']='Параметар квалитета';
