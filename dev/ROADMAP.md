@@ -743,21 +743,6 @@ the block.
   - Meanwhile `nested_repo_boundary_check.php` (advisory) holds the line, and the worktree layout
     simplifies as a side effect: `worktrees/<branch>` Aliased, with no stand-in parent directory
     whose only job is to make `/engcalcs/...` resolve.
-- 50|664| **A link's status colours correctly and its legend prints numbers.**
-  Left open when Task 638 closed 2026-09-13. `status` is CATEGORICAL and this page's colour system
-  is a break-based numeric ramp, so status enters as 1 open / 0 closed. **The map reads correctly**
-  -- closed links land in the bottom band, as EPANET's own Status view draws them -- and the words
-  are one tick away as a label. **The LEGEND is what is wrong**: it prints numeric bands where it
-  should print the two words.
-  - **THE FIX MEANS CHANGING THE FIELD-DEFINITION SHAPE**, which is why it was not done: Task 636
-    was in flight beside it feeding the same structures, and changing the shape under a concurrent
-    track is the seam collision this project has already paid five defects for. That constraint is
-    gone now; both have landed.
-  - The shape question is real and worth answering once: a field definition is `[key, label]` and a
-    colour map is `{key: unitId}`, neither of which can say "this quantity is a small set of named
-    states". Whatever carries that will also serve any future categorical field.
-  - Weigh against doing nothing: a legend reading 0 and 1 beside a map that is visibly right is a
-    blemish, not a wrong answer, and this page has wrong answers to fix first.
 - 50|667| **Tom's reflections on saving, locking and who can see your work.**
   **DROPPED TO 50 BY TOM, 2026-09-18.** Its urgent leg shipped -- (b), asking for initials only when
   a colleague wants in, is built on `feat/lock-initials-later` -- and (f) was extracted to Task 696
