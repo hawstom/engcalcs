@@ -1672,9 +1672,7 @@
         "lpn_settings_label_max_width": "Show labels when zoomed to this map width or less",
         "lpn_settings_label_max_width_tip": "Labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Enter 0 to never draw a label, at any zoom.",
         "lpn_settings_label_always": "Always show",
-        "lpn_settings_symbol_cap": "Prevent nodes from scaling larger than",
-        "lpn_settings_symbol_cap_mid": "times the length of the",
-        "lpn_settings_symbol_cap_post": "percentile pipe",
+        "lpn_settings_symbol_cap_sentence": "Prevent nodes from scaling larger than {n} times the length of the {p} percentile pipe",
         "lpn_settings_symbol_cap_tip": "Junctions stop holding their screen size once their map diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out. Reservoirs and tanks are the exception and keep their screen size at every zoom.",
         "lpn_settings_symbol_opacity": "Symbol opacity (0 to 1)",
         "lpn_settings_backdrop_opacity": "Background image opacity (0 to 1)",
@@ -2337,7 +2335,7 @@
         "lpn_diag_pda_pressures": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
         "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back."
     },
-    "count": 2335,
+    "count": 2333,
     "active_prefixes": [
         "about",
         "bpn",

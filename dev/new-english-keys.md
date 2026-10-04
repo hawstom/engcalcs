@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**56 still to read on master**, of 105 untranslated keys, of 2335 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**56 still to read on master**, of 105 untranslated keys, of 2333 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -616,7 +616,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**0 still to read**, of 7 new keys across 10 unmerged branch(es).
+**6 still to read**, of 13 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -627,9 +627,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/roadmap-1005 (`fe4730ab`) — adds no English strings
-
 ### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/dock-flag-order (`8fa3fea5`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -651,7 +651,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/profile-file (`4e0309e6`) — 4 new, all ruled
+### feat/profile-file (`5a6152f1`) — 4 new, all ruled
 
 - **`lpn_profile_file_done`**
   > Profile read from the file: {used} of {total} nodes found in this network.
@@ -666,6 +666,27 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### fix/status-legend (`3de51a47`) — adds no English strings
+### feat/times-statistic (`a18d28ac`) — 6 new, 6 to read @@ NEEDS RULING
 
-### fix/status-mail-headings (`4196c9b0`) — adds no English strings
+- **`lpn_time_stat_averaged`**
+  > Averaged
+  @@ NEEDS RULING
+- **`lpn_time_stat_maximum`**
+  > Maximum
+  @@ NEEDS RULING
+- **`lpn_time_stat_minimum`**
+  > Minimum
+  @@ NEEDS RULING
+- **`lpn_time_stat_none`**
+  > None
+  @@ NEEDS RULING
+- **`lpn_time_stat_range`**
+  > Range
+  @@ NEEDS RULING
+- **`lpn_time_statistic`**
+  > Statistic
+  @@ NEEDS RULING
+
+### fix/mac-cmd-words (`90b781f2`) — adds no English strings
+
+### fix/status-legend (`4cf853c6`) — adds no English strings

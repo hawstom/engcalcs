@@ -946,11 +946,6 @@ the block.
   *"Do we have a way of knowing whether people are installing?"* No: `appinstalled` only hides the
   button (`js/Calculators.lib.js:195`). One install event plus an app/tab field on view rows would
   answer it; it is a new logged fact about visitors, so it goes past `consent_body` and him first.
-- 50|740| **One sentence for the node-size cap, not three fragments.**
-  Sprint 2026-09-28-delta: five languages (it, he, ur, my, am) could not assemble
-  lpn_settings_symbol_cap + _mid + _post around two number inputs in their word order. One key with
-  {n} and {p} placeholders, split into inputs at render time.
-
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary

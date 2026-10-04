@@ -1,7 +1,7 @@
 {
     "meta": {
         "language": "ar",
-        "expected_key_count": 2335,
+        "expected_key_count": 2333,
         "delta_key_count": 105,
         "exempt_key_count": 30,
         "exempt_keys": [
