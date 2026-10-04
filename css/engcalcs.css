@@ -363,18 +363,20 @@ input.ec-spin[type=number] {
 	overflow-x: auto;
 }
 .lpn-rptbox-copy {
-	position: absolute;
-	top: 8px;
-	right: 34px;
 	font-size: 11px;
 	padding: 1px 6px;
 }
-/* THE FULL REPORT BOX CARRIES TWO OF THESE, NOT ONE (ROADMAP Task 715), so each needs its own
-   offset from the close button rather than sharing lpn-rptbox-copy's single `right`. Print sits
-   immediately left of the X, as Copy does everywhere else; Download CSV sits left of Print, with
-   enough room for its own longer label. */
-#lpn_full_print { right: 34px; }
-#lpn_full_csv { right: 128px; }
+/* **THE TITLE BAND BELONGS TO THE TITLE, THE DOCK ICONS AND THE X -- NEVER TO A BOX'S OWN BUTTONS**
+   (Tom, 2026-10-04: the Full Report's Download and Print sat on its dock icons). One rule for every
+   box: a button the box brings of its own goes in this row, the first thing in the body. Sticky, so
+   a report of thousands of rows never scrolls its buttons away; a docked column can be 240 px wide,
+   which has no room in the band for a title, four dock icons, the X and two more buttons, so
+   "the middle of the band" was weighed and rejected. dev/lpn-spike/dock-title-band-harness.js. */
+.lpn-box-tools {
+	position: sticky; top: 0; z-index: 1; flex: none;
+	display: flex; flex-wrap: wrap; gap: 6px; padding: 0 0 6px;
+	background: var(--ec-bg);
+}
 @media (prefers-reduced-motion: reduce) {
 	.lpn-status-notes { transition: none; }
 }
