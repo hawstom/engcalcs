@@ -2969,7 +2969,7 @@ $ec_lang['lpn_scenario_delete']='Delete scenario';
 $ec_lang['lpn_scenario_delete_confirm']='Delete the scenario {name}, and its {n} overrides? The drawing itself is not changed.';
 $ec_lang['lpn_scenario_override']='Override in this scenario';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Checked means this scenario overrides its parent for this value, even when the number is the same. Clear the box to use the Base value again.';
+$ec_lang['lpn_scenario_override_tip']='Checked means this scenario overrides its parent for this value, even when the number is the same. Clear the box to use its parent\'s.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
@@ -2981,11 +2981,11 @@ $ec_lang['lpn_scenario_push_btn']='Apply Base values to all scenarios';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_tip']='Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded.';
 $ec_lang['lpn_scenario_basic']='Basic mode';
-$ec_lang['lpn_scenario_basic_tip']='Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.';
+$ec_lang['lpn_scenario_basic_tip']='Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category, and lets a scenario carry its own total run time and hydraulic time step. It invites your feedback.';
 $ec_lang['lpn_alt_title']='Alternatives preview';
-$ec_lang['lpn_alt_note']='Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario\'s own value, or leave it blank to use the project\'s.';
-$ec_lang['lpn_scenario_duration_tip']='Overrides the project\'s total run time in this scenario. Leave it blank to use the project\'s, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.';
-$ec_lang['lpn_scenario_hyd_step_tip']='Overrides the project\'s hydraulic time step in this scenario. Leave it blank to use the project\'s, set in Settings, Calculation, Time.';
+$ec_lang['lpn_alt_note']='Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario\'s own value, or leave it blank to use its parent\'s. The project\'s own are in Settings, Calculation, Time.';
+$ec_lang['lpn_scenario_duration_tip']='Overrides the total run time in this scenario. Leave it blank to use its parent\'s. A total run time of 0:00 is a steady-state run.';
+$ec_lang['lpn_scenario_hyd_step_tip']='Overrides the hydraulic time step in this scenario. Leave it blank to use its parent\'s.';
 $ec_lang['lpn_time_scn_overrides']='Scenario overrides:';
 $ec_lang['lpn_alt_cat_physical']='Physical';
 $ec_lang['lpn_alt_cat_demand']='Demand';

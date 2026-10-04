@@ -239,6 +239,24 @@ function timesLines(inp) {
 	ok('a scenario shows its own in a box', cellText(an['Two days'][aD]) === '48:00' && cellText(an['Two days'][aH]) === '0:30');
 	ok('...and one that inherits shows a blank box', cellText(an.Steady[aH]) === '');
 
+	// TOM, 2026-10-04, on a preview: *"I can't find Scenario options or the tip in question."* The
+	// column tips were a bare `title` (nothing on the heading said a tip existed, and touch never
+	// shows one), the blank box did not say what blank means, and Settings, Calculation, Time sits
+	// thousands of pixels down a box that opens on Symbology.
+	const optTh = [PC.lpn_time_duration, PC.lpn_time_hyd_step].map(function (lab) { return kids(at[0])[col(lab)]; });
+	ok('each calculation-option heading shows a ? for its tip', optTh.every(function (th) {
+		let q = false; walk(th, function (x) { if (/(^|\s)ec-tip(\s|$)/.test(x.className || '')) { q = true; } }); return q; }));
+	const blank = kids(an.Steady[aH]).filter(function (k) { return k._tag === 'input'; })[0];
+	ok('a blank box shows the Base value it falls back to', blank && blank.placeholder === '1:00', blank && blank.placeholder);
+	const door = kids(an[PC.lpn_scenario_base][aD]).filter(function (k) { return k._tag === 'button'; })[0];
+	ok('Base\'s own value is a button into Settings, Time', !!door && door.textContent === '24:00');
+	if (door) {
+		const sb = ensure('lpn_settings_box'); sb.style.display = 'none';
+		(door._listeners.click || []).forEach(function (f) { f(); });
+		ok('...and pressing it opens the Settings box', sb.style.display === 'flex', sb.style.display);
+		sb.style.display = 'none';
+	}
+
 	console.log('\n--- 8. Settings > Time states which scenarios override it ---');
 	// Two days: 48:00 and 0:30; Steady: duration 0 and no step. Rebuilt from the document each time.
 	EC.lpnTimeRenderSettings();

@@ -59184,10 +59184,22 @@ var EngCalcs = EngCalcs || {};
 		// Zero flow from this hydrant? Zero flow in the system?"* The answer is the first, and a
 		// column heading that does not say so leaves the reader to pick.
 		headings.forEach(function (h, i) {
-			var text = h, tip = null, th, arrow, pc = EngCalcs.pageConfig || {}, on = sortState.col === i;
-			if (h && h.length === 2 && typeof h !== 'string') { text = h[0]; tip = h[1]; }
+			var text = h, tip = null, shown = false, help, glyph, th, arrow, pc = EngCalcs.pageConfig || {}, on = sortState.col === i;
+			if (h && h.length >= 2 && typeof h !== 'string') { text = h[0]; tip = h[1]; shown = h[2]; }
 			th = ffEl('th', 'lpn-ff-sortable', text, hr);
 			if (tip) { th.title = tip; }
+			// A third member says the tip must be SEEN: the `?` the labels carry, because a `title`
+			// alone never shows on a touch screen and nothing on the heading says it is there.
+			if (tip && shown) {
+				th.textContent = '';
+				help = document.createElement('span');
+				help.className = 'ec-help'; help.title = tip;
+				help.appendChild(document.createTextNode(text + ' '));
+				glyph = document.createElement('span');
+				glyph.className = 'ec-tip'; glyph.textContent = '?';
+				help.appendChild(glyph);
+				th.appendChild(help);
+			}
 			// The pane's arrow, in the pane's words: shown on the sorted column, and on any other
 			// under the pointer or the keyboard. A click anywhere on the heading sorts too.
 			arrow = document.createElement('button');
@@ -61343,9 +61355,9 @@ var EngCalcs = EngCalcs || {};
 		// number in the dozens). Task 755 made them editable here.
 		nCat = LPN_ALT_CATEGORIES.length;
 		body = ffTable(host, [pc.lpn_scenario_label || 'Scenario'].concat(LPN_ALT_CATEGORIES.map(altCategoryLabel),
-			[[pc.bpn_demand_mult || 'Demand multiplier', pc.lpn_settings_demand_multiplier_tip],
-				[pc.lpn_time_duration || 'Total run time', pc.lpn_scenario_duration_tip],
-				[pc.lpn_time_hyd_step || 'Hydraulic time step', pc.lpn_scenario_hyd_step_tip]]));
+			[[pc.bpn_demand_mult || 'Demand multiplier', pc.lpn_settings_demand_multiplier_tip, true],
+				[pc.lpn_time_duration || 'Total run time', pc.lpn_scenario_duration_tip, true],
+				[pc.lpn_time_hyd_step || 'Hydraulic time step', pc.lpn_scenario_hyd_step_tip, true]]));
 		markHeadingsFrom(body, nCat + 1);
 		body.parentNode.className += ' lpn-alt-table';
 		scenariosForDisplay().forEach(function (s) {
@@ -61362,8 +61374,14 @@ var EngCalcs = EngCalcs || {};
 				dm = (settings.hydraulics || {}).demandMultiplier;
 				if (!(typeof dm === 'number' && isFinite(dm))) { dm = 1; }
 				ffCell(tr, String(dm), 'lpn-alt-calcopt lpn-alt-opt');
+				// Base's run time and step are the project's own, which Settings edits: the value
+				// is the door to it, so nobody has to know where Settings keeps them.
 				LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
-					ffCell(tr, scenarioTimeText(s, key), 'lpn-alt-opt');
+					var td = ffCell(tr, null, 'lpn-alt-opt'), b = document.createElement('button');
+					b.type = 'button'; b.className = 'lpn-time-ovr-btn';
+					b.textContent = scenarioTimeText(s, key);
+					b.addEventListener('click', function () { openSettingsBox('time'); });
+					td.appendChild(b);
 				});
 				return;
 			}
@@ -61406,6 +61424,8 @@ var EngCalcs = EngCalcs || {};
 		input.inputMode = key === 'demandMultiplier' ? 'decimal' : 'text';
 		input.className = 'lpn-alt-input';
 		input.value = altOptionText(s, key);
+		// A blank box shows what it falls back to, so "blank" reads as "same as Base".
+		if (key !== 'demandMultiplier') { input.placeholder = scenarioTimeText(baseScenario(), key); }
 		input.setAttribute('data-alt-scn', s.id);
 		input.setAttribute('data-alt-key', key);
 		input.setAttribute('aria-label', scenarioDisplayName(s) + ': ' + altOptionLabel(key));
