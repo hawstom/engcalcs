@@ -339,13 +339,12 @@ console.log('\n--- six tabs, one renderer ---');
 	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers',
 		'eight asset tables, the six water assets in the toolbar’s Add order, nodes before links',
 		ids.join(','));
-	// **PROFILE IS LAST, NOT FIRST** (Tom, 2026-08-21: "making Profile the last tab"). It is still
-	// the odd one out -- a drawing where the other six are tables -- and the end of the strip is
-	// where an odd one out belongs; at the front it stood between the reader and the six things
-	// that are alike. Asserted at BOTH ends, because the bug this catches is a reorder that drops
-	// it somewhere in the middle of the six.
-	report(L.paneTabIds()[L.paneTabIds().length - 1] === 'profile',
-		'Profile is the LAST tab — it is a drawing, the six before it are tables',
+	// **PROFILE FOLLOWS TIME SERIES** (Tom, 2026-10-04: the graph tabs match the Graphs menu):
+	// after the eight tables, Time series, Profile, Frequency, Flow balance. It was last until
+	// then (2026-08-21). Asserted so a reorder cannot drop it among the tables.
+	report(L.paneTabIds().indexOf('profile') === L.paneTabIds().indexOf('timeseries') + 1
+		&& L.paneTabIds().indexOf('profile') >= 8,
+		'Profile follows Time series, after the eight tables',
 		L.paneTabIds().join(','));
 	report(L.paneTabIds()[0] === 'junctions',
 		'...so the strip OPENS on a table, which is what the Print table menu row acts on',
