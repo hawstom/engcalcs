@@ -381,7 +381,7 @@ async function sectionSaveAsRevert(browser) {
 	console.log('\n--- File > Save as, then File > Revert, in the real box ---');
 	const natives = [];
 	const a = await openSession(browser, { width: 1440, height: 900 }, natives);
-	await a.openExampleCard('EPANET Net1 plus rule-based controls');
+	await a.openExampleCard(await a.page.evaluate(() => EngCalcs.pageConfig.lpn_ex_net1_title));
 	await a.settle(1500);
 	await a.page.evaluate(() => { delete window.lpnDialogAnswerer; });
 	const L = await a.page.evaluate(() => ({ sa: EngCalcs.pageConfig.lpn_file_saveas, rv: EngCalcs.pageConfig.lpn_file_revert, ok: EngCalcs.pageConfig.lpn_dialog_ok }));
