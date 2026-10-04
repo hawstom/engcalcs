@@ -9240,6 +9240,7 @@ var EngCalcs = EngCalcs || {};
 		wireBoxMemory(box, LPN_CONTOURBOX_KEY, contourboxLayout, saveContourboxLayout, contourBoxIsOpen);
 	}
 	function refreshContourBoxIfOpen() { if (contourBoxIsOpen()) { buildContourBox(); } }
+	var contourShownBefore = null;   // fill and lines as they were when Show contours was last cleared
 	function contourChanged() { refreshValueColors(); saveToStorage(); syncColorControls(); }
 	function buildContourBox() {
 		var pc = EngCalcs.pageConfig || {}, body = document.getElementById('lpn_contour_body');
@@ -9286,6 +9287,22 @@ var EngCalcs = EngCalcs || {};
 			});
 			return n;
 		}
+		// **ONE CHECK BOX SHOWS OR HIDES THE PLOT** (Tom, 2026-10-04: "How do we turn off contour plot
+		// view?" ... "Maybe instead we have a toggle for [ ] Show contours"). Hiding had taken two
+		// controls, Fill None AND Contour lines cleared, and the box's x, which looks like the off
+		// switch, only closes the box. Clearing it remembers fill and lines for this visit, so a tick
+		// brings back the plot as it was; the node colouring is the dots' and is left alone.
+		row(pc.lpn_contour_show || 'Show contours', check('lpn_contour_show', contourIsOn(), function (on) {
+			if (on) {
+				var was = contourShownBefore || { fill: 'smooth', lines: true };
+				settings.contourFill = was.fill; settings.contourLines = was.lines;
+				if (!colorFieldOf('node')) { settings.colorNodeField = 'pressure'; }
+			} else {
+				contourShownBefore = { fill: contourFillMode(), lines: !!settings.contourLines };
+				settings.contourFill = ''; settings.contourLines = false;
+			}
+			contourChanged();
+		}), pc.lpn_contour_show_tip);
 		var field = colorFieldOf('node');
 		row(pc.lpn_color_node_field || 'Color nodes by',
 			select('lpn_contour_field', [['', pc.lpn_color_none || 'No color']].concat(colorFieldOptions('node')), field || '', function (v) {
