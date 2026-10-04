@@ -3771,3 +3771,5 @@ OBSERVED defect: phone 390px, Scale-by-picking bar is a 195px x 400px column ove
 OBSERVED defect: held Enter after keyboard-opening Edit > Delete network auto-repeats into OK and wipes network.
 NOT RUN: georef two-point/Keep placement, Revert/Save as, cascade multi-delete with scenario overrides, terrain consent. Code-read only.
 Seam lpnDialogAnswerer: only lpn-dom-stub.js, lock-ask-browser-drive.js, dev/browser-pass/lib/pickers.js inject it; none in shipped js.
+# Perry 1004c feat/tip-verdict
+OBSERVED: elev_source_tip rewrite+2 requests not applied; mean_err_tip/pane_print_tip/time_run_tip delete verdicts not honoured; style leftovers (Checked/Click in scenario tips, "typed above"). Harnesses tip-verdict, deleted-key, default-pattern, custom-property pass. Headless load: 0 console errors, no empty titles.

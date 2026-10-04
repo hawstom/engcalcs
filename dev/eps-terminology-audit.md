@@ -117,7 +117,7 @@ owns.
   removed in favour of the checkbox, so nothing the page measures can stop running the period by
   itself.
 - **The page only ADVISES.** When a completed run exceeds `EC.LPN_TIME_SLOW_MS` (1000 ms),
-  `adviseIfSlow()` writes `lpn_time_run_slow` to the status bar, which names the control in words:
+  `adviseIfSlow()` posts `lpn_time_run_slow` as a messenger notice (logged, fades; it no longer stands on the status line), which names the control in words:
   *turn off "Recalculate automatically" in Settings, under Calculation, Hydraulics*. That sentence
   is advice, and acting on it is a second deliberate act.
 - **Once it is off**, an edit whose model fingerprint has moved drops the frames, puts the clock

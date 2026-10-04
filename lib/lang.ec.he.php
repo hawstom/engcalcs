@@ -1331,7 +1331,6 @@ $ec_lang['lpn_goto_on_map']='הצגה במפה';
 $ec_lang['lpn_pane_select_on_map']='בחירה במפה';
 $ec_lang['lpn_pane_unselect_on_map']='ביטול בחירה במפה';
 $ec_lang['lpn_pane_print']='הדפסת טבלה';
-$ec_lang['lpn_pane_print_tip']='הדפיסו את הטבלה שאתם רואים כעת, עם שם הפרויקט, שם הטבלה, והיחידות בכותרות. השורות מודפסות בסדר שמיינתם אותן אליו.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -3080,7 +3079,6 @@ $ec_lang['lpn_labels_customer_width_tip']='תוויות לקוחות מצויר�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='שימוש בתצוגה הנוכחית';
 $ec_lang['lpn_settings_page']='עמוד';
-$ec_lang['lpn_settings_page_note']='נשמר במחשבון זה, לא בפרויקט.';
 $ec_lang['lpn_settings_hydraulics']='הידראוליקה';
 $ec_lang['lpn_settings_quality']='איכות מים';
 $ec_lang['lpn_settings_quality_track']='פרמטר איכות';

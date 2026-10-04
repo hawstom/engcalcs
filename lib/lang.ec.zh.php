@@ -1330,7 +1330,6 @@ $ec_lang['lpn_goto_on_map']='在地图上定位';
 $ec_lang['lpn_pane_select_on_map']='在地图上选中';
 $ec_lang['lpn_pane_unselect_on_map']='在地图上取消选中';
 $ec_lang['lpn_pane_print']='打印表格';
-$ec_lang['lpn_pane_print_tip']='打印您正在查看的表格，标题中包含项目名称、表格名称和单位。行按您排序的顺序打印。';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -3079,7 +3078,6 @@ $ec_lang['lpn_labels_customer_width_tip']='只有当地图视图宽度等于或�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='使用当前视图';
 $ec_lang['lpn_settings_page']='页面';
-$ec_lang['lpn_settings_page_note']='保存在本计算器中，而非项目中。';
 $ec_lang['lpn_settings_hydraulics']='水力计算';
 $ec_lang['lpn_settings_quality']='水质';
 $ec_lang['lpn_settings_quality_track']='水质参数';

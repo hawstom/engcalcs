@@ -101,50 +101,51 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-04 (morning session)
+## STATE — 2026-10-04 (afternoon)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged this session: feat/property-graph (Task 637 closed, his "Done. Close, merge, and delete
-branch."); the Graphs fly-out in EPANET's order (Time series, Profile, Contour, Frequency, Flow
-balance; he asked whether Mary found a reason to differ, she found none); Task 732 (five
-browser-pass specs current); two check flakes (usage selftest port collided with the preview ports;
-three browser harnesses hard-coded the shared lock instead of `EC_BROWSER_LOCK`). Task 727 closed as
-already shipped (25a3cf2a). Task 760 (Settings scrolled sideways at 360 px) found and fixed the
-same session; Task 761 (four more stale specs) is open.
+Merged 2026-10-04: property-graph (637), dock (441), table-selection (757), setting-scope (739) on
+his "Good. Done."; Graphs menu and pane tabs in EPANET's order (Time series, Profile, Contour,
+Frequency, Flow balance); tooltips 17rem (his "happy medium"); customer connects at the foot on the
+clicked leg of a bent pipe, and a drag keeps its leg; the solve-time line moved to the messenger;
+Task 732 specs; Task 760 phone Settings; the saved-where marker wraps on a phone; two check flakes.
+New tasks: 719 promoted to 75 (Junction and Pipe chain tool), 762 PDA, 763 help manual from cut
+tips, 764 one voice for tips (its rules are now written, see below), 761 four stale specs.
 
-### Awaiting him (every port row in ports.conf says what to test)
+### Awaiting his browser pass (protected; ports.conf rows say what to try)
 
-- **Browser pass (protected):** 8107 `feat/dock` (441; his two notes fixed: autohide width grip,
-  `?` tip closes on a title-bar click); 8109 `feat/table-selection` (757; buttons gone, right-click
-  only, keys lpn_pane_sel_only_tip and lpn_pane_print_tip deleted); 8110 `feat/dialog-audit` (710;
-  all 38 converted, Perry's three findings fixed, four bar instructions left non-modal by CC's call);
-  8111 `feat/scenario-option` (755; Settings > Time names the overrides; "override" rewording of
-  seven translated keys for him to read); 8112 `feat/setting-scope` (739; he wrote "(1) Start fresh
-  is not a setting. So OK, I think." -- no merge word); 8113 `feat/basemap-style` (617; Perry clean;
-  label "Basemap filter" vs Perry's "Map tile filter" is his call); 8106 `fix/tip-width` (he said
-  yes to it; tooltip cap 200 px to 22rem, merge on his look). Still from before: 8108
-  `feat/profile-file`, `feat/desktop`, `feat/label-placer`.
-- **His tip verdicts** are in progress (he is "cutting hard"). When they arrive: apply on a branch,
-  check every cut for a lost warning, unit or caveat and ask rather than drop, list deleted keys.
-  He does not like the word "rulings" for his answers; say calls or verdicts.
-- **Expert level:** he floated Tutorial/Normal/Expert tiers and an early notice. CC and Ida both
-  advised against tiers now: cut the tips first, then at most one "Show explanations" switch (a
-  browser-storage change he must be told about). His answer is pending.
-- **`dev/new-english-keys.md`:** he edited a stale copy again (his 10-03 file plus three OKs, which
-  were harvested). Tell him to reopen the file before editing; the 10 Wave 0 rewrites, the Graphs
-  tip and lpn_ds_search_note rewordings still wait there.
+- 8110 `feat/dialog-audit` (710): his three findings fixed (title band overlap; Delete network now
+  undoable, so "This cannot be undone" left the confirm, his look owed; georeference two-point pick
+  lost the first typed digit). He wants a phone test on dev.hawsedc.com: tell him when it merges.
+- 8111 `feat/scenario-option` (755): his wording applied; "No. of overrides"; box 1500 px. Open
+  question to him: the override tip's second sentence still says "use the Base value again".
+  After merge, apply the three style rules to lpn_scenario_* ("Checked/Unchecked", "Click to switch").
+- 8113 `feat/basemap-style` (617): "Basemap style", Muted the default for new projects and the
+  Novato example. Seam: feat/elev-default also edits Net3-Novato-CA-World.lwn (both sources).
+- 8114 `feat/epanet-pp-brand`: EPANET++ in About/Welcome/Hydraulics menu/related-calcs; the map
+  app's canonical is epanet-plus-plus.org on every host; About dedication links his blog post. After
+  merge: drop `/app/` from librewaternet.org's sitemap, add the app to epanet-plus-plus.org's
+  (`generate_sitemap.php --host=epanet-plus-plus.org`), push both siblings. He chose to stay "under
+  the radar for a few months": no outreach push.
+- 8115 `feat/elev-default`: Mapbox DEM default for new geographic projects and Novato; first option
+  "Above". His DEM accuracy numbers could not be sourced from Mapbox's docs; asked him for a source.
+- 8116 `feat/tip-verdict`: his 270 verdicts (42 rewrites, 48 deletes kept in dev/help-manual-source.md,
+  "Default" in four selectors, the custom-property Allow/Restrict bug) and Mary's three rules applied
+  (97 strings; rules in dev/language-strings.md). Asked him: bring three of his own texts in line
+  (add-customer "Click...", zoom window "Click or drag.", quality tolerance "How much..."); his use-units
+  tip now says Select/Clear; Calculate tip restored (his delete assumed it orphaned; it is not); mean
+  error tip held back; specific gravity tip deletion suggested; emitter exponent tip is stale.
+- Still from before: 8108 `feat/profile-file`, `feat/desktop`, `feat/label-placer`.
 
-**Seams:** feat/dock and feat/table-selection both touch the bottom pane; feat/dialog-audit
-touches nearly every confirm in js/looped-network.js, so merge it last and rerun the others'
-harnesses on the merge.
+**Seams:** tip-verdict touches most lpn strings; merge it before or after the others, never between,
+and re-run the payload regeneration once on the last merge.
 
 ### Owed translation work
 
-46 lpn keys held until he rules (lpn_ds_*, the Graphs tip, the 10 Wave 0 keys, the stale-syn keys);
-each pending branch's keys (basemap filter six, "Scenario overrides:", the seven override
-rewrites, lpn_pane_sel_only_none). Romanian file menu noun/verb pass; four concept terms. No sprint
-was run this session: almost everything owed waits on his reading.
+Every pending branch's English (tip-verdict's ~140 changed keys dominate), the 46 lpn keys held
+before, the Romanian file menu pass, four concept terms. Run one sprint after tip-verdict and the
+other wording branches merge, not before: most English is still moving.
 
 ### Traps met 2026-10-04
 
@@ -164,6 +165,13 @@ was run this session: almost everything owed waits on his reading.
   (they sit in the session, not the group). Kill by session: `ps -eo pid,sess,args | awk '$2==SID'`.
 - **A worktree that never had `dev/browser-pass/node_modules` symlinked prints "playwright-core is
   not installed"**: symlink it when making any worktree, fix branches too.
+- **An agent wrote Tom's approval into `english-key-rulings.json`** for a label it had interpreted
+  ("Above"); it happened to be his literal word. Brief agents: never write a ruling, only the
+  orchestrator does, from his words.
+- **`lang_key_order_normalizer.php` with no flags rewrites all 27 language files**; an agent ran it
+  by accident. Revert with `git checkout -- lib/`.
+- **Two merges that each pass can fail together**: setting-scope's nowrap marker broke the Task 760
+  phone harness only once both were on master. The suite on the merge commit is what caught it.
 - **The pre-reviewer earns his keep on large mechanical conversions**: the dialog conversion was
   reported finished and green; Perry found held Enter deleting a network and 18 alerts quietly
   downgraded to fading strips.

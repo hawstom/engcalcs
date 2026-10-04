@@ -1331,7 +1331,6 @@ $ec_lang['lpn_goto_on_map']='Arată pe hartă';
 $ec_lang['lpn_pane_select_on_map']='Selectează pe hartă';
 $ec_lang['lpn_pane_unselect_on_map']='Deselectează pe hartă';
 $ec_lang['lpn_pane_print']='Tipărește tabelul';
-$ec_lang['lpn_pane_print_tip']='Tipărește tabelul pe care îl vedeți, cu numele proiectului, numele tabelului și unitățile de măsură în antete. Rândurile se tipăresc în ordinea în care le-ați sortat.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -3080,7 +3079,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Etichetele de abonat sunt desenate do
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Folosește vizualizarea curentă';
 $ec_lang['lpn_settings_page']='Pagină';
-$ec_lang['lpn_settings_page_note']='Salvat în acest calculator, nu în proiect.';
 $ec_lang['lpn_settings_hydraulics']='Hidraulică';
 $ec_lang['lpn_settings_quality']='Calitatea apei';
 $ec_lang['lpn_settings_quality_track']='Parametru de calitate';

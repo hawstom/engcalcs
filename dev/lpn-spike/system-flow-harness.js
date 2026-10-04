@@ -108,8 +108,8 @@ function textOf(root) {
 	// ---- the tab, and no run ---------------------------------------------------------------
 	head('2. THE TAB, AND WHAT IT SAYS WITH NO RUN');
 	const ids = L.paneTabIds();
-	check(ids.indexOf('sysflow') === ids.indexOf('frequency') + 1 && ids[ids.length - 1] === 'profile',
-		`Flow balance sits after Frequency and Profile is still last: ${ids.slice(-4).join(', ')}`);
+	check(ids.indexOf('sysflow') === ids.indexOf('frequency') + 1 && ids[ids.length - 1] === 'sysflow',
+		`Flow balance sits after Frequency and is the last tab (menu order, 2026-10-04): ${ids.slice(-4).join(', ')}`);
 	const tabBtn = (byId.lpn_pane_tabs.children || []).filter((b) => b.id === 'lpn_pane_tab_sysflow')[0];
 	check(!!tabBtn && tabBtn.textContent === PC.lpn_sysflow_menu && tabBtn.title === PC.lpn_sysflow_tip,
 		'with a button in the strip, named and tipped from the language file');

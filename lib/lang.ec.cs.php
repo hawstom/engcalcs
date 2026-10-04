@@ -1331,7 +1331,6 @@ $ec_lang['lpn_goto_on_map']='Zobrazit na mapě';
 $ec_lang['lpn_pane_select_on_map']='Vybrat na mapě';
 $ec_lang['lpn_pane_unselect_on_map']='Zrušit výběr na mapě';
 $ec_lang['lpn_pane_print']='Vytisknout tabulku';
-$ec_lang['lpn_pane_print_tip']='Vytiskne tabulku, na kterou se právě díváte, s názvem projektu, názvem tabulky a jednotkami v záhlavích. Řádky se vytisknou v pořadí, do kterého jste je seřadili.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -3081,7 +3080,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Popisky odběratelů se kreslí pouze
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Použít aktuální pohled';
 $ec_lang['lpn_settings_page']='Stránka';
-$ec_lang['lpn_settings_page_note']='Uloženo v této kalkulačce, ne v projektu.';
 $ec_lang['lpn_settings_hydraulics']='Hydraulika';
 $ec_lang['lpn_settings_quality']='Kvalita vody';
 $ec_lang['lpn_settings_quality_track']='Sledovaný parametr kvality';

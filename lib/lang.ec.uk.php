@@ -1334,7 +1334,6 @@ $ec_lang['lpn_goto_on_map']='Показати на карті';
 $ec_lang['lpn_pane_select_on_map']='Вибрати на карті';
 $ec_lang['lpn_pane_unselect_on_map']='Скасувати вибір на карті';
 $ec_lang['lpn_pane_print']='Надрукувати таблицю';
-$ec_lang['lpn_pane_print_tip']='Друкує таблицю, яку ви зараз переглядаєте, із назвою проєкту, назвою таблиці та одиницями в заголовках. Рядки друкуються в тому порядку, в якому ви їх відсортували.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -3135,7 +3134,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Підписи абонентів м�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Використати поточний вигляд';
 $ec_lang['lpn_settings_page']='Сторінка';
-$ec_lang['lpn_settings_page_note']='Зберігається в цьому калькуляторі, а не в проєкті.';
 $ec_lang['lpn_settings_hydraulics']='Гідравліка';
 $ec_lang['lpn_settings_quality']='Якість води';
 $ec_lang['lpn_settings_quality_track']='Параметр якості';
