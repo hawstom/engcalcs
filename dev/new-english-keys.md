@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**5 still to read on master**, of 54 untranslated keys, of 2287 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read on master**, of 54 untranslated keys, of 2288 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -90,7 +90,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED: 'With each tested junction’s fire flow drawn in turn, nothing in the design check scope went outside its limits.'
   @@ NEEDS RULING
 - **`lpn_new_coordsys_tip`**
-  > Choose the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Convert as…”, and it is approximate.
+  > Choose the coordinate system of your network. This is permanent; the only way to convert a network to different coordinates is with “File, Convert as…”, and it is approximate.
   *The finding:* 'This is permanent' is contradicted by 'the only way ... convert', and 'it is approximate' has no clear referent (the choice, the conversion, or the network)
   1. the choice cannot change, except by a conversion that is approximate
   2. the network can be converted by one route only, and the network's coordinates are approximate
@@ -114,7 +114,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED: 'No new assets of this group are selected on the map.'
   @@ NEEDS RULING
 
-## Synonym entries to approve  (17, 17 to read @@ NEEDS RULING)
+## Synonym entries to approve  (19, 19 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
@@ -135,6 +135,14 @@ never edits a synonym.
   *Why stale:* the English changed after this synonym was written
   *Written against:* May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.
   *Current synonym:* May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`ip_is_lateral`**
+  > <span class="ec-help" title="Selected: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* <span class="ec-help" title="Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
+  *Current synonym:* | gloss: lateral, mainline; avoid: "test" read as typical/sample
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   @@ NEEDS RULING
 
@@ -240,6 +248,14 @@ never edits a synonym.
   *Proposed synonym:* Break lock, Unlock the file, Take over the file, Override their claim | layout: button
   *Why this proposal:* Dropped the options that only made sense with the old English "Break their lock".
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_profile_tip`**
+  > (this key no longer exists in lib/lang.ec.en.php)
+  *Why stale:* the key no longer exists, so this entry describes nothing
+  *Written against:* Draw the ground and the hydraulic grade line along a path through the network.
+  *Current synonym:* Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.
+  **What this asks for:** WRITTEN PERMISSION to remove this `$ec_lang_syn` entry.
   @@ NEEDS RULING
 
 - **`lpn_settings_map_display`**
@@ -447,7 +463,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**12 still to read**, of 19 new keys across 16 unmerged branch(es).
+**12 still to read**, of 19 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -458,7 +474,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/basemap-style (`ffd4a73a`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/basemap-style (`e1e05de5`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_basemap_style_faded`**
   > Faded
@@ -481,11 +497,11 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dialog-audit (`e9476152`) — adds no English strings
+### feat/dialog-audit (`343c3783`) — adds no English strings
 
-### feat/elev-default (`a0dde78c`) — adds no English strings
+### feat/elev-default (`af1d7176`) — adds no English strings
 
-### feat/epanet-pp-brand (`2b3f411b`) — adds no English strings
+### feat/epanet-pp-brand (`15efa631`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -522,7 +538,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/scenario-option (`f13e7ed6`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/scenario-option (`af125b8e`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_scenario_duration_tip`**
   > Overrides the project's total run time in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
@@ -543,10 +559,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > Scenario overrides:
   @@ NEEDS RULING
 
-### feat/tip-verdict (`e32a0eaa`) — adds no English strings
+### feat/tip-verdict (`78d9cf5f`) — adds no English strings
 
-### fix/customer-connect (`6475160d`) — adds no English strings
+### fix/graph-tab-order (`c3848af5`) — adds no English strings
 
-### fix/graph-tab-order (`d8a85241`) — adds no English strings
-
-### fix/run-time-message (`476ea1e3`) — adds no English strings
+### fix/run-time-message (`a38b91dd`) — adds no English strings

@@ -14011,7 +14011,7 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {}, clicks = [];
 		setRegMode(true);
-		alert(pc.lpn_backdrop_scale_prompt1 || 'Click two points on the background image, such as the two ends of a bar scale. Then enter the real distance between them.');
+		alert(pc.lpn_backdrop_scale_prompt1 || 'Specify two points on the background image, such as the two ends of a bar scale. Then enter the real distance between them.');
 		var handler = function (e) {
 			clicks.push(worldToImageLocal(screenToWorld(e.clientX, e.clientY)));
 			if (clicks.length === 2) {
@@ -14049,7 +14049,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		setRegMode(true);
 		alert(pc.lpn_backdrop_scale_from_prompt1
-			|| 'Click the point on the background image that should stay where it is.');
+			|| 'Specify the point on the background image that should stay where it is.');
 		var handler = function (e) {
 			svg.removeEventListener('pointerup', handler, true);
 			activeCancel = null; setRegMode(false);
@@ -14125,11 +14125,11 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {};
 		setRegMode(true);
-		alert(pc.lpn_backdrop_position_prompt1 || 'Click the base point (on the image) for the move.');
+		alert(pc.lpn_backdrop_position_prompt1 || 'Specify the base point (on the image) for the move.');
 		var handler = function (e) {
 			svg.removeEventListener('pointerup', handler, true);
 			var refWorld = screenToWorld(e.clientX, e.clientY);
-			alert(pc.lpn_backdrop_position_prompt2 || 'Choose the method for the destination point, then click Continue.');
+			alert(pc.lpn_backdrop_position_prompt2 || 'Choose the method for the destination point, then select Continue.');
 			showBackdropTargetPanel(refWorld);
 		};
 		svg.addEventListener('pointerup', handler, true);
@@ -15877,7 +15877,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (!georef || !georef.t || georef.step !== GEOREF_STEP_ATTACHED) { return; }
 		georef.pick = { pts: [] };
-		setNotice(pc.lpn_georef_twopt_pick1 || 'Click a point on your drawing whose latitude and longitude you know.');
+		setNotice(pc.lpn_georef_twopt_pick1 || 'Specify a point on your drawing whose latitude and longitude you know.');
 	}
 	// Disarming says WHAT THE USER IS BACK TO rather than that something stopped -- the step 2
 	// instructions are the notice that was there before, so putting them back is the whole message.
@@ -15948,7 +15948,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		pk.pts.push({ i: idx, x: s.x, y: s.y, lon: ll.lon, lat: ll.lat });
 		if (pk.pts.length < 2) {
-			setNotice(pc.lpn_georef_twopt_pick2 || 'Now click a second known point, as far from the first one as you can.');
+			setNotice(pc.lpn_georef_twopt_pick2 || 'Now specify a second known point, as far from the first one as you can.');
 			return;
 		}
 		georef.pick = null;
@@ -16259,7 +16259,7 @@ var EngCalcs = EngCalcs || {};
 		// gone at the next project switch, and never in a file -- and because this is still the
 		// moment a project changes kind. If the wording is ever revisited it is `lpn_georef_confirm`,
 		// and that is Tom's.
-		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.')) { return; }
+		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here permanently? Assets can still be dragged one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.')) { return; }
 		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
 		// On File, Convert as's answered steps the attached map's own turn was laid into the copy
 		// before the steps began, so the steps see 0 degrees while the picture was left unturned
@@ -17115,7 +17115,7 @@ var EngCalcs = EngCalcs || {};
 		// Step 2 only, both of them: in step 1 the drag and the wheel both spend on the map, so
 		// there is no split to state and a sentence about one would be noise.
 		mapgeoBarEl('lpn_mapgeo_hint_gestures').textContent = world1 ? '' :
-			(pc.lpn_mapgeo_gestures || 'Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.');
+			(pc.lpn_mapgeo_gestures || 'Zoom moves your drawing and the map together, to show how well they line up. Dragging moves the map only.');
 		mapgeoBarEl('lpn_mapgeo_hint_dial').textContent = world1 ? '' :
 			(pc.lpn_mapgeo_dial_help || 'Slide the two bars, or enter numbers in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change. Arrow keys work on both.');
 		mapgeoShow('lpn_mapgeo_search', world1);
@@ -17282,7 +17282,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		drawPendingMeter(null);
 		setNotice((EngCalcs.pageConfig || {}).lpn_meter_pick_pipe ||
-			'Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.');
+			'Now select the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.');
 	}
 	/**
 	 * The preview dot, plus the band from it to the connection the next press would make. `to` is
@@ -20303,7 +20303,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		head = document.createElement('div');
 		head.style.margin = '6px 0 2px';
-		head.textContent = String(pc.lpn_find_count || '{n} found. Click one to go to it.')
+		head.textContent = String(pc.lpn_find_count || '{n} found. Select one to go to it.')
 			.replace('{n}', String(findResults.length));
 		box.appendChild(head);
 		// Its own line rather than a second sentence in the count, which is a ruled string.
@@ -20942,7 +20942,7 @@ var EngCalcs = EngCalcs || {};
 		// claim about the map: after "diameter equal to 6, set to 8" that list is correctly empty.
 		findResults = replaceFoundSet();
 		renderFindResults(null);
-		renderReplace(String(pc.lpn_replace_done || '{n} assets changed. You can undo this in one step.').replace('{n}', String(n)));
+		renderReplace(String(pc.lpn_replace_done || '{n} assets changed. This can be undone in one step.').replace('{n}', String(n)));
 		return n;
 	}
 	// The preview line and its two buttons. `message` is a state the write cannot start from -- no
@@ -25190,7 +25190,7 @@ var EngCalcs = EngCalcs || {};
 			// rows from the first column. Not under a filter, where the rows it made would be
 			// hidden the moment they were made.
 			if (!filterNote && paneCanCreate(spec)) {
-				note.textContent += ' ' + (pc.lpn_pane_paste_here || 'Click here and paste rows from a spreadsheet to add them.');
+				note.textContent += ' ' + (pc.lpn_pane_paste_here || 'Select this area and paste rows from a spreadsheet to add them.');
 				note.className += ' lpn-pane-paste-target';
 				note.addEventListener('paste', function (e) {
 					var text, cells;
@@ -29214,9 +29214,9 @@ var EngCalcs = EngCalcs || {};
 		if (which === 'edit') {
 			txt = profileTouch
 				? (pc.lpn_profile_edit_tap ||
-					'Drag any point on the path to move it. Tap a point you added to take it off.')
+					'Drag any point on the path to move it. Select a point you added to take it off.')
 				: (pc.lpn_profile_edit_click ||
-					'Drag any point on the path to move it. Click a point you added to take it off.');
+					'Drag any point on the path to move it. Select a point you added to take it off.');
 		} else if (which === 'nowhere') {
 			txt = pc.lpn_profile_edit_nowhere || 'A point on the path has to be a node. The path is unchanged.';
 		} else if (which === 'blocked') {
@@ -29226,14 +29226,14 @@ var EngCalcs = EngCalcs || {};
 			txt = pc.lpn_profile_say_idle || 'Press Profile again to choose a new path on the map.';
 		} else if (which === 'start') {
 			txt = profileTouch
-				? (pc.lpn_profile_tap_start || 'Tap the node where the path starts.')
-				: (pc.lpn_profile_draw_start || 'Click the node where the path starts.');
+				? (pc.lpn_profile_tap_start || 'Select the node where the path starts.')
+				: (pc.lpn_profile_draw_start || 'Select the node where the path starts.');
 		} else {
 			txt = profileTouch
 				? (pc.lpn_profile_tap_more ||
-					'Tap a node to see the path. Press and hold to add it. Double-tap to finish. Press Profile again to cancel.')
+					'Select a node to see the path. Press and hold to add it. Double-tap to finish. Press Profile again to cancel.')
 				: (pc.lpn_profile_draw_more ||
-					'Move over the map to see the path. Click a node to add it. Double-click to finish. Esc cancels.');
+					'Move over the map to see the path. Select a node to add it. Double-click to finish. Esc cancels.');
 		}
 		if (d) { d.say = txt; }
 		// Written straight into the line rather than through rebuildProfileForm(): this runs on every
@@ -33746,7 +33746,7 @@ var EngCalcs = EngCalcs || {};
 		openDialog(function (body) {
 			var p1 = document.createElement('p');
 			p1.style.margin = '0 0 8px';
-			p1.textContent = (pc.lpn_v2_restore_confirm || 'This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? So that you can judge, here are some diameters that would be converted, with their values before and after:');
+			p1.textContent = (pc.lpn_v2_restore_confirm || 'This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? To help you judge, here are some diameters that would be converted, with their values before and after:');
 			body.appendChild(p1);
 			var p2 = document.createElement('p');
 			p2.style.cssText = 'margin:0;font-weight:bold';
@@ -34866,8 +34866,8 @@ var EngCalcs = EngCalcs || {};
 			case 'sources':
 			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are used when the network is run over a total run time.';
 			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
-			case 'tags': return pc.lpn_inp_drop_tags || 'This file gives tags to some of its junctions, pipes or other assets. Every tag came in whole, and each one sits on its own asset’s properties, where you can read it or change it.';
-			case 'report': return pc.lpn_inp_drop_report || 'This file holds EPANET’s own settings for how it formats the report it prints. You can read the engine’s report here, under Reports, EPANET run, but it comes out in the engine’s standard format rather than the one these settings ask for. The lines are kept, and they are written back if you save an EPANET file.';
+			case 'tags': return pc.lpn_inp_drop_tags || 'This file gives tags to some of its junctions, pipes or other assets. Every tag came in whole, and each one sits on its own asset’s properties, where it can be read or changed.';
+			case 'report': return pc.lpn_inp_drop_report || 'This file holds EPANET’s own settings for how it formats the report it prints. The engine’s report is here, under Reports, EPANET run, but it comes out in the engine’s standard format rather than the one these settings ask for. The lines are kept, and they are written back if you save an EPANET file.';
 			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
 			// about a part of the format nobody here has read.
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
@@ -37619,7 +37619,7 @@ var EngCalcs = EngCalcs || {};
 		readOnly = roProjects.has(id);
 		if (readOnly) {
 			bannerRO = {
-				message: (pc.lpn_lock_readonly_banner || 'Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file.')
+				message: (pc.lpn_lock_readonly_banner || 'Read-only: {name} has this file open. Anything here can be changed, but not saved. Use File, Save as to save to a different file.')
 					.replace('{name}', lockedByName.get(id) || (pc.lpn_lock_somebody || 'Somebody else'))
 			};
 		} else {
@@ -44344,7 +44344,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		note.className = 'lpn-set-note';
 		note.textContent = pc.lpn_labels_customer_note ||
-			'A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.';
+			'A customer label shows the values selected here. It is drawn at the same text size as every other label on the map.';
 		host.appendChild(note);
 		// **THE SAME ROW SHAPE AS THE ALL-LABELS ROW BELOW IT IN SETTINGS, BUILT BY THE SAME SHARED
 		// CONTROL** (Tom, 2026-09-23: "Make the Customer labels and All labels zoom limits settings
@@ -46317,7 +46317,7 @@ var EngCalcs = EngCalcs || {};
 			// something to guess at. Assembled from already-translated label text plus two short
 			// heading keys, with no plural agreement anywhere: "Elements: 17" needs no plural rule,
 			// while "17 pipes and 5 junctions" would need one in every target language.
-			var msg = (pc.lpn_push_confirm || 'Replace these properties on every existing asset with the values now set for new assets? Values you have entered will be overwritten. You can undo this.')
+			var msg = (pc.lpn_push_confirm || 'Replace these properties on every existing asset with the values now set for new assets? Values you have entered will be overwritten. This can be undone.')
 				+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
 				+ '\n' + (pc.lpn_push_assets || 'Nodes and pipes:') + ' ' + targets;
 			if (!window.confirm(msg)) { return; }
@@ -50159,7 +50159,7 @@ var EngCalcs = EngCalcs || {};
 		// **WHERE THE OFFERED COEFFICIENTS COME FROM, SAID ONCE FOR THE SECTION.** An unsourced
 		// number that looks authoritative is worse than none at all, so the source is named on the
 		// screen and not only at the code.
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_fittings_source || 'The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.'));
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_fittings_source || 'The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where it can be changed. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.'));
 		host.appendChild(libButton(pc.lpn_library_fittings_add || 'Add a fittings list', function () {
 			saveUndoSnapshot();
 			// EMPTY, for the reason a new curve has no points: a list that arrived with an elbow in
@@ -50369,7 +50369,7 @@ var EngCalcs = EngCalcs || {};
 		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curves_note || 'Curves are attached to pumps and valves. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.'));
 		// **SAID ONCE FOR THE SECTION, NOT ONCE PER CURVE.** It is the same sentence for every
 		// curve in the list, and twenty copies of it is what makes a panel unreadable.
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curve_values_tip || 'Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. You can also paste lines copied straight out of an EPANET file, including the curve name.'));
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curve_values_tip || 'Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. Lines copied straight out of an EPANET file, including the curve name, can also be pasted.'));
 		host.appendChild(libButton(pc.lpn_library_curve_add || 'Add a curve', function () {
 			saveUndoSnapshot();
 			// A NEW CURVE IS A PUMP HEAD CURVE WITH NO POINTS. `head` because that is what a person
