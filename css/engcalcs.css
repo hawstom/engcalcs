@@ -5217,3 +5217,9 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	float: inline-end; margin-inline-start: 2.5em; color: var(--ec-ink-subtle); unicode-bidi: isolate;
 }
 .lpn-menu-row[data-pointer-only] { cursor: default; }
+/* NO SHORTCUT KEYS ON A TOUCH SCREEN (Tom, 2026-10-04, on a phone: "Letters on menus have no use on
+   phone. We assume that all phone users have seen this on PC."). A key name is a desktop habit;
+   on a device with no hover and a coarse pointer it is noise in a row already short of room. */
+@media (hover: none) and (pointer: coarse) {
+	.lpn-menu-row[data-hotkey]::after { content: none; }
+}
