@@ -1,0 +1,210 @@
+{
+ "sprint": "1004-lpn",
+ "description": "Sprint 1004-lpn: 130 ruled lpn_ keys (calibration, criticality, contour, alternatives, copy lock, flow balance, fire-flow design check, hotkeys) into 26 languages, plus a 14-key resync; 46 keys awaiting Tom's ruling held back.",
+ "entries": [
+  {
+   "key": "lpn_contour_interval",
+   "lang": "cs",
+   "complaint": "Czech word for the contour spacing is identical to English: 'Interval' is correct Czech.",
+   "readings": [
+    "Interval (identical, correct)",
+    "Rozestup (rejected, less standard)"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_alt_cat_text",
+   "lang": "cs",
+   "complaint": "Czech 'Text' is identical to English and is the correct word for a text annotation.",
+   "readings": [
+    "Text (identical, correct)",
+    "Popisek (rejected, collides with Label/Notation)"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_alt_cat_text",
+   "lang": "de",
+   "complaint": "German \"Text\" is the same word as English; keeping it identical is correct, not a missed translation.",
+   "readings": [
+    "Text (identical, correct German)",
+    "Beschriftung"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_calib_param",
+   "lang": "de",
+   "complaint": "German \"Parameter\" is the same word as English; keeping it identical is correct.",
+   "readings": [
+    "Parameter (identical, correct German)",
+    "Größe"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_field_lat_abbr",
+   "lang": "fr",
+   "complaint": "The correct French abbreviation for latitude is Lat, identical to English, so it equals English by necessity.",
+   "readings": [
+    "Lat kept (standard French abbreviation)",
+    "an invented distinct word rejected"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_hotkeys_menu_heading",
+   "lang": "fr",
+   "complaint": "The French word for Menus is also Menus, identical to English by necessity.",
+   "readings": [
+    "Menus kept",
+    "an invented alternative rejected"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_copy_original",
+   "lang": "hr",
+   "complaint": "'Lock' in 'keep same lock' / 'make new lock' is an undefined metaphor for a file identity token.",
+   "readings": [
+    "identity key (ključ)",
+    "a physical lock or write-protection"
+   ],
+   "source": "translator",
+   "disposition": "glossary",
+   "resolution": "The lock is the edit lock of lpn_lock_* (it stops two people editing one file), not an identity token. Post-QA aligned every language's copy-lock wording with its own lpn_lock_* word and wrote the term to glossary.json."
+  },
+  {
+   "key": "lpn_contour_interval",
+   "lang": "id",
+   "complaint": "Interval is the correct Indonesian word, identical to English",
+   "readings": [
+    "Interval",
+    "none better"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_calib_param",
+   "lang": "id",
+   "complaint": "Parameter is the correct Indonesian word, identical to English",
+   "readings": [
+    "Parameter",
+    "none better"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_copy_original",
+   "lang": "it",
+   "complaint": "\"lock\" is used as a metaphor for a file identity token with no stated object; it has no obvious equivalent and a literal word could be read as a physical padlock or as a locked/read-only file.",
+   "readings": [
+    "identity token that distinguishes a file (rendered lucchetto)",
+    "read-only or locked file state"
+   ],
+   "source": "translator",
+   "disposition": "glossary",
+   "resolution": "The lock is the edit lock of lpn_lock_* (it stops two people editing one file), not an identity token. Post-QA aligned every language's copy-lock wording with its own lpn_lock_* word and wrote the term to glossary.json."
+  },
+  {
+   "key": "lpn_field_lat_abbr",
+   "lang": "it",
+   "complaint": "Italian abbreviation of latitudine is Lat, identical to English; flagged because the identical-to-English check would otherwise suggest it is untranslated.",
+   "readings": [
+    "Lat is the correct Italian abbreviation",
+    "invent a distinct abbreviation"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_hotkeys_menu_heading",
+   "lang": "pt",
+   "complaint": "Menus is the correct Portuguese word, identical to English.",
+   "readings": [
+    "Menus (kept)",
+    "Menu (singular)"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_field_lat_abbr",
+   "lang": "ro",
+   "complaint": "The correct Romanian abbreviation for latitude is Lat, identical to English.",
+   "readings": [
+    "Lat kept",
+    "no distinct alternative"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_contour_interval",
+   "lang": "ro",
+   "complaint": "Romanian word for contour interval is Interval, identical to English.",
+   "readings": [
+    "Interval kept",
+    "none"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_alt_cat_text",
+   "lang": "ro",
+   "complaint": "Romanian word is Text, identical to English.",
+   "readings": [
+    "Text kept",
+    "none"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_field_lat_abbr",
+   "lang": "sw",
+   "complaint": "Lat and Lon are the correct Swahili abbreviations too (Latitudo, Longitudo), so identical to English is right.",
+   "readings": [
+    "kept Lat/Lon",
+    "invented a distinct abbreviation"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  },
+  {
+   "key": "lpn_field_lon_abbr",
+   "lang": "sw",
+   "complaint": "Same as lpn_field_lat_abbr: Lon is the correct abbreviation of Longitudo.",
+   "readings": [
+    "kept Lon",
+    "invented a distinct abbreviation"
+   ],
+   "source": "translator",
+   "disposition": "dismissed",
+   "resolution": "Identical to English is correct in this language; exempted per language in dev/scripts/translation_exempt_keys.json."
+  }
+ ]
+}
