@@ -58,7 +58,8 @@ const TIME_RE = () => {
 	const frames = () => EC.lpnReportTimes(doc.times).map((t) => ({ t, heads: {}, pressures: {}, flows: {}, headlosses: {}, velocities: {}, demands: {}, levels: {}, statuses: {} }));
 	EC.lpnEpanetRun = function () { return wait(1100).then(() => ({ ok: true, engineVersion: 'fake', warnings: [], frames: frames(), report: 'r' })); };
 	const host = Object.assign({}, pageHost, {
-		doc: () => doc, apply: () => { lpn.setStatus(WARN, 'nonconv'); }, solve: () => {},
+		// The open scenario's [TIMES] (Task 755) are this test's own one-hour run, not the page project's.
+		doc: () => doc, times: () => doc.times, apply: () => { lpn.setStatus(WARN, 'nonconv'); }, solve: () => {},
 		solveNow: () => { EC.lpnTimeRun({ nodes: [{ id: 'J1', type: 'junction', elev: 100 }], links: [] }); },
 		autoRun: () => true, runBoxHidden: () => true, expireStatus: () => {},
 		native: () => ({ ok: true, converged: true, heads: {}, flows: {} }),
