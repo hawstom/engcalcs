@@ -110,8 +110,8 @@ branch."); the Graphs fly-out in EPANET's order (Time series, Profile, Contour, 
 balance; he asked whether Mary found a reason to differ, she found none); Task 732 (five
 browser-pass specs current); two check flakes (usage selftest port collided with the preview ports;
 three browser harnesses hard-coded the shared lock instead of `EC_BROWSER_LOCK`). Task 727 closed as
-already shipped (25a3cf2a). New: Task 760 (phone Settings overflow, fix in flight on
-`fix/settings-phone-width`), Task 761 (four more stale specs).
+already shipped (25a3cf2a). Task 760 (Settings scrolled sideways at 360 px) found and fixed the
+same session; Task 761 (four more stale specs) is open.
 
 ### Awaiting him (every port row in ports.conf says what to test)
 
