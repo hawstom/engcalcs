@@ -5107,7 +5107,7 @@ var EngCalcs = EngCalcs || {};
 			fn: function () {
 				// The count is the whole of the warning: a scenario holding nothing is worth no
 				// question, and one holding forty values is worth a specific one.
-				var msg = (pc.lpn_scenario_delete_confirm || 'Delete the scenario {name}, and the {n} values that belong to it alone? The drawing itself is not changed.')
+				var msg = (pc.lpn_scenario_delete_confirm || 'Delete the scenario {name}, and its {n} overrides? The drawing itself is not changed.')
 					.replace('{name}', scenarioDisplayName(scn)).replace('{n}', overrideCount(scn));
 				if (!window.confirm(msg)) { return; }
 				saveUndoSnapshot();
@@ -5414,7 +5414,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			if (any) { touched++; }
 		});
-		if (!hits) { alert(pc.lpn_scenario_push_none || 'No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.'); return; }
+		if (!hits) { alert(pc.lpn_scenario_push_none || 'No scenario overrides Base for any of these properties, so nothing would change. Nothing is thrown away.'); return; }
 		// NAMES the properties as well as counting them, and NAMES THE ELEMENT when scoped to one --
 		// reusing lpn_field_id ("ID") rather than minting a key, per the whole-label reuse rule.
 		var msg = (pc.lpn_scenario_push_confirm || 'Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this.')
@@ -31100,7 +31100,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		var lost = 0;
 		keys.forEach(function (k) { lost += overrideCountForElement(k); });
-		if (lost && !window.confirm((pc.lpn_delete_drops_overrides || 'Deleting this asset also throws away {n} values that your scenarios hold for it. Continue?').replace('{n}', lost))) { return; }
+		if (lost && !window.confirm((pc.lpn_delete_drops_overrides || 'Deleting this asset also throws away {n} scenario overrides for it. Continue?').replace('{n}', lost))) { return; }
 		saveUndoSnapshot();
 		if (kind === 'node') { deleteNode(id); }
 		else if (kind === 'label') { deleteLabelById(id); }
@@ -51720,7 +51720,7 @@ var EngCalcs = EngCalcs || {};
 			afterPropertyEdit(el);
 			refreshPopupIfOpen();
 		});
-		setFieldLabel(text, pc.lpn_scenario_override || 'Only in this scenario', pc.lpn_scenario_override_tip);
+		setFieldLabel(text, pc.lpn_scenario_override || 'Override in this scenario', pc.lpn_scenario_override_tip);
 		label.appendChild(box);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);
@@ -51761,7 +51761,7 @@ var EngCalcs = EngCalcs || {};
 			afterPropertyEdit(n);
 			refreshPopupIfOpen();
 		});
-		setFieldLabel(text, pc.lpn_scenario_override || 'Only in this scenario', pc.lpn_scenario_override_tip);
+		setFieldLabel(text, pc.lpn_scenario_override || 'Override in this scenario', pc.lpn_scenario_override_tip);
 		label.appendChild(box);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);
@@ -57933,7 +57933,7 @@ var EngCalcs = EngCalcs || {};
 	function overrideMarkText() {
 		var pc = EngCalcs.pageConfig || {};
 		return (pc.lpn_scenario_mark_tip
-			|| 'The amber ring means this asset holds a value that belongs to the scenario {name} alone.')
+			|| 'The amber ring means this asset has an override in the scenario {name}.')
 			.replace('{name}', scenarioDisplayName(activeScenario()));
 	}
 	/**
