@@ -16,8 +16,8 @@ The count was 57 when Ida wrote the item; today it is **77** non-comment call si
 | Verdict | Count | What happened |
 |---|---|---|
 | MUST BLOCK | 38 | Now `askDialog()`, the page's one in-page box (20 confirm, 17 prompt, 1 alert) |
-| INFORMATION, info | 9 | Now `setNotice()` |
-| INFORMATION, warning | 30 | Now `setWarning()` (same door, severity `warning`) |
+| INFORMATION, info | 9 | 5 are an `askDialog` alert again (`tellNotice()`); the 4 click instructions of the background image tools are a notice and stay on the mode bar |
+| INFORMATION, warning | 30 | `setWarning()`: an `askDialog` alert, waiting for OK, and logged at severity `warning` |
 | DELETE | 0 | Nothing was redundant |
 | **Total** | 77 | No native alert/confirm/prompt is left on the page |
 
@@ -49,8 +49,12 @@ The background image tools' click instructions are a notice and a log entry, and
 background image" bar carries the current step's words for as long as the mode lasts. That bar now
 wears the same light background, ink and border as every other box (it was the one dark strip).
 
-A warning is also shown in a strip fixed above every open box (`#lpn_warn_strip`), because a
-refusal raised inside Libraries, Settings or the survey dialog landed under the box on a phone.
+**Convert, never downgrade** (coordinator relaying Tom, 2026-10-04). An earlier pass made 39 of
+the alerts 8-second notices and a warning strip; a failure message must not vanish unread, so every
+former alert that reported something is a modal again, in the page's box, and kept in the log. The
+warning strip is gone. A held Enter or Space never answers the box (Perry's review: a held Enter on
+Delete network pressed OK); only a fresh key pressed while it is open does. On a phone the mode bar
+is a short band along the foot of the window.
 
 The map notice line is one amber for every message and always was; only the log row's colour
 follows severity.
