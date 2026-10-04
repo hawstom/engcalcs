@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**2 still to read on master**, of 51 untranslated keys, of 2332 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read on master**, of 54 untranslated keys, of 2287 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (11 to read @@ NEEDS RULING)
+## Questions from the translators  (10 to read @@ NEEDS RULING)
 
 **These are SHIPPED strings, already translated into 26 languages.** A wave-0
 reading or a translator found each one readable two ways, and no sprint launches while one is
@@ -113,22 +113,38 @@ is the one you meant. "The first one" is a complete answer.
   **What this asks for:** which of the readings above you meant.
   *The proposal:* PROPOSED: 'No new assets of this group are selected on the map.'
   @@ NEEDS RULING
-- **`lpn_ts_add_tip`**
-  > Put everything now selected on the map onto the graph.
-  *The finding:* Says 'everything now selected', but tsAddSelection() (js/looped-network.js:29915) adds only selected assets of the current group (Nodes or Links); 'now' also reads as 'at this moment' vs 'newly'
-  1. every selected asset of any kind goes onto the graph
-  2. only the selected assets of the group shown (Nodes or Links) go onto the graph
-  **What this asks for:** which of the readings above you meant.
-  *The proposal:* PROPOSED: 'Put the selected nodes or links (whichever group is shown) on the map onto the graph.'
-  @@ NEEDS RULING
 
-## Synonym entries to approve  (13, 13 to read @@ NEEDS RULING)
+## Synonym entries to approve  (17, 17 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
 as is, change it (a proposal may follow), or remove it. **Your answer on the flag line is the
 written permission** the rule requires; CC then applies it by hand and re-records it. A script
 never edits a synonym.
+
+- **`calc_set_units_tip`**
+  > Sets the unit of every field at once. Non-destructive: the numbers you entered stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Sets the unit of every field at once. Non-destructive: the numbers you typed stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.
+  *Current synonym:* Changes the unit shown on every field at once (switches the whole page to that unit system). Does not change the input data.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`consent_body`**
+  > May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.
+  *Current synonym:* May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_backdrop_scale_entry_bad`**
+  > Enter one number for the size of one pixel on the map, or paste all six lines of a world file.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Type one number for the size of one pixel on the map, or paste all six lines of a world file.
+  *Current synonym:* World (Map Coordinates or Georeference) File for the image | gloss: world file
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
 
 - **`lpn_ds_head_search_selected`**
   > What demand scale can these junctions handle?
@@ -208,6 +224,14 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
+- **`lpn_labels_priority_node_tip`**
+  > The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first. When only one value is left and two labels still overlap, one of them is hidden: the one with the lower demand, with pressure nearer the middle of the range, or with elevation or head more like its neighboring nodes.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.
+  *Current synonym:* more like neighboring nodes = numerically closer to the neighbors' values | avoid: similar in kind
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
 - **`lpn_lock_break`**
   > Break lock
   *Why stale:* the English changed after this synonym was written
@@ -254,7 +278,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (51, 2 to read @@ NEEDS RULING)
+## lpn_  (54, 5 to read @@ NEEDS RULING)
 
 - **`lpn_analyze_at_time`**
   > Time step: {time}.
@@ -262,9 +286,18 @@ never edits a synonym.
 - **`lpn_analyze_time_moved`**
   > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
   _Ruled OK 2026-10-03._
+- **`lpn_choice_default`**
+  > Default
+  @@ NEEDS RULING
+- **`lpn_cp_allow_tip`**
+  > Allow only these characters:
+  @@ NEEDS RULING
+- **`lpn_cp_characters_tip`**
+  > "@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.
+  @@ NEEDS RULING
 - **`lpn_ds_bad_multiplier`**
-  > Type a demand scale of zero or more, such as 1.5.
-  _Ruled OK 2026-10-03._
+  > Enter a demand scale of zero or more, such as 1.5.
+  @@ NEEDS RULING
 - **`lpn_ds_below_zero`**
   > ⚠ At least one junction is below {pressure} even with the scaled demands at zero.
   _Ruled OK 2026-10-03._
@@ -388,9 +421,9 @@ never edits a synonym.
 - **`lpn_ds_title`**
   > Demand scaling
   _Ruled OK 2026-10-03._
-- **`lpn_graphs_menu_tip`**
-  > Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.
-  @@ NEEDS RULING
+- **`lpn_pane_sort_desc`**
+  > Sort descending
+  _Ruled OK 2026-09-26._
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.
   _Ruled OK 2026-10-01._
@@ -414,7 +447,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**20 still to read**, of 27 new keys across 12 unmerged branch(es).
+**12 still to read**, of 19 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -425,24 +458,34 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### feat/basemap-style (`ffd4a73a`) — 6 new, 6 to read @@ NEEDS RULING
+
+- **`lpn_basemap_style_faded`**
+  > Faded
+  @@ NEEDS RULING
+- **`lpn_basemap_style_grayscale`**
+  > Grayscale
+  @@ NEEDS RULING
+- **`lpn_basemap_style_muted`**
+  > Muted
+  @@ NEEDS RULING
+- **`lpn_basemap_style_normal`**
+  > Normal
+  @@ NEEDS RULING
+- **`lpn_settings_basemap_style`**
+  > Basemap style
+  @@ NEEDS RULING
+- **`lpn_settings_basemap_style_tip`**
+  > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.
+  @@ NEEDS RULING
+
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dialog-audit (`8b42bf67`) — adds no English strings
+### feat/dialog-audit (`e9476152`) — adds no English strings
 
-### feat/dock (`1365f0f3`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/elev-default (`a0dde78c`) — adds no English strings
 
-- **`lpn_dock_autohide`**
-  > Auto-hide
-  @@ NEEDS RULING
-- **`lpn_dock_float`**
-  > Float
-  @@ NEEDS RULING
-- **`lpn_dock_left`**
-  > Dock at the left of the map
-  @@ NEEDS RULING
-- **`lpn_dock_right`**
-  > Dock at the right of the map
-  @@ NEEDS RULING
+### feat/epanet-pp-brand (`2b3f411b`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -479,13 +522,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/scenario-option (`5ca59b4f`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/scenario-option (`f13e7ed6`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_scenario_duration_tip`**
-  > This scenario's own total run time. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
+  > Overrides the project's total run time in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
   @@ NEEDS RULING
 - **`lpn_scenario_hyd_step_tip`**
-  > This scenario's own hydraulic time step. Leave it blank to use the project's, set in Settings, Calculation, Time.
+  > Overrides the project's hydraulic time step in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time.
   @@ NEEDS RULING
 - **`lpn_scncmp_at_time`**
   > {value} at {id}, {time}
@@ -496,42 +539,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_scncmp_same`**
   > The same in every scenario
   @@ NEEDS RULING
-
-### feat/setting-scope (`8e493fe5`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_pane_manage_cols_width`**
-  > Width (em)
-  @@ NEEDS RULING
-- **`lpn_pane_width_tip`**
-  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
-  @@ NEEDS RULING
-- **`lpn_saved_browser`**
-  > Saved in this browser
-  @@ NEEDS RULING
-- **`lpn_saved_project`**
-  > Saved with the project
-  @@ NEEDS RULING
-- **`lpn_saved_session`**
-  > Not saved
+- **`lpn_time_scn_overrides`**
+  > Scenario overrides:
   @@ NEEDS RULING
 
-### feat/table-selection (`d2276943`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/tip-verdict (`e32a0eaa`) — adds no English strings
 
-- **`lpn_pane_filter_sel_and`**
-  > Filtered by {q} and selection only. Showing {n} of {all}.
-  @@ NEEDS RULING
-- **`lpn_pane_filter_sel_none`**
-  > None of the selected elements are in this table.
-  @@ NEEDS RULING
-- **`lpn_pane_filter_sel_note`**
-  > Selection only. Showing {n} of {all}.
-  @@ NEEDS RULING
-- **`lpn_pane_sel_only`**
-  > Selection only
-  @@ NEEDS RULING
-- **`lpn_pane_sel_only_none`**
-  > No elements are selected. Select elements on the map, then press Selection only.
-  @@ NEEDS RULING
-- **`lpn_pane_sel_only_tip`**
-  > Show only the elements selected on the map, in every table. Press again to update it after changing the selection, or to turn it off.
-  @@ NEEDS RULING
+### fix/customer-connect (`6475160d`) — adds no English strings
+
+### fix/graph-tab-order (`d8a85241`) — adds no English strings
+
+### fix/run-time-message (`476ea1e3`) — adds no English strings
