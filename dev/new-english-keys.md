@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (1 to read @@ NEEDS RULING)
+## Questions from the translators  (11 to read @@ NEEDS RULING)
 
 **These are SHIPPED strings, already translated into 26 languages.** A wave-0
 reading or a translator found each one readable two ways, and no sprint launches while one is
@@ -37,6 +37,89 @@ is the one you meant. "The first one" is a complete answer.
   2. demands must be cut to {m} times what is entered for every junction to keep the pressure (right)
   **What this asks for:** which of the readings above you meant.
   *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
+  @@ NEEDS RULING
+
+### from sprint 1003b-wave0
+
+- **`lpn_crs_list_tip`**
+  > The coordinate systems left by the two filters above. Choose one, then press OK.
+  *The finding:* 'The two filters above' is not countable on the page (Looped-Network.php:1738-1750 shows a map-view checkbox, a place search, and a name filter)
+  1. map-view checkbox and name filter
+  2. place search and name filter
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'The coordinate systems that pass the map view filter and the name filter above. Choose one, then press OK.'
+  @@ NEEDS RULING
+- **`lpn_ds_eps_note`**
+  > Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.
+  *The finding:* 'Only the time step now on screen is scaled, with its tank levels and link statuses' reads as if the levels and statuses are scaled too; 'run' can mean the Run button or the EPANET simulation
+  1. the time step's demands, tank levels and link statuses are all scaled
+  2. only the demands are scaled; levels and statuses are taken from that step
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'The demands of the time step now on screen are scaled, and the network is solved with that step’s tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.'
+  @@ NEEDS RULING
+- **`lpn_ds_find`**
+  > Find
+  *The finding:* A bare 'Find' collides with the Find feature that selects assets by condition (lpn_notes_4_def), and a translator cannot tell which; Run sits beside it with the same bare style
+  1. find assets matching a condition
+  2. find the largest demand scale (the button at js/looped-network.js:59552)
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'Find largest scale'
+  @@ NEEDS RULING
+- **`lpn_ds_found`**
+  > ✓ Every junction keeps {pressure} up to a demand scale of {m}.
+  *The finding:* 'Every junction' is false under the Selected scope, where only the chosen junctions are checked; 'keeps {pressure}' is elliptical for 'at least'
+  1. the whole system holds the pressure
+  2. only the checked junctions hold at least the pressure
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: '✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.'
+  @@ NEEDS RULING
+- **`lpn_ds_search_note`**
+  > Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.
+  *The finding:* 'from 0 to {max} to the nearest {step}' stacks two 'to's; 'maintain the lowest pressure allowed' reads as maintaining a pressure setpoint rather than staying at or above it
+  1. search from 0 up to the maximum, rounding to the step
+  2. search from 0 to the maximum, and keep the pressure at exactly the minimum
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'Finds the largest demand scale at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}, to the nearest {step}, and assumes that more demand never raises the lowest pressure.'
+  @@ NEEDS RULING
+- **`lpn_ff_design_none`**
+  > Nothing in the scope you chose went outside its limits while any junction drew its fire flow.
+  *The finding:* Two scopes exist on this page (Junctions to test, and the Design check All/Selected), and 'the scope you chose' does not say which; 'any junction drew' can read as 'whenever one did' or 'if some junction did'
+  1. no limit was exceeded during any tested junction's fire flow, within the design check scope
+  2. no limit was exceeded in the junctions-to-test scope
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'With each tested junction’s fire flow drawn in turn, nothing in the design check scope went outside its limits.'
+  @@ NEEDS RULING
+- **`lpn_new_coordsys_tip`**
+  > Choose the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Convert as…”, and it is approximate.
+  *The finding:* 'This is permanent' is contradicted by 'the only way ... convert', and 'it is approximate' has no clear referent (the choice, the conversion, or the network)
+  1. the choice cannot change, except by a conversion that is approximate
+  2. the network can be converted by one route only, and the network's coordinates are approximate
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'Choose the coordinate system of your network. The choice is permanent, except that “File, Convert as…” can convert the network to other coordinates, and that conversion is approximate.'
+  @@ NEEDS RULING
+- **`lpn_notes_4_def`**
+  > A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.
+  *The finding:* 'lists the junctions' says neither where nor what; 'route' where the Graphs tip says 'path'; 'sit on real ground' is idiom; the bottom panel is called a pane elsewhere (Looped-Network.php:1855 renders it as one About-box paragraph)
+  1. the bottom panel lists every junction with its results
+  2. the bottom panel lists only the junctions along the profile route
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'A project can be placed on real ground with a street map behind it. EPANET .inp files can be read and written. The bottom pane plots a profile along a path and tabulates the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.'
+  @@ NEEDS RULING
+- **`lpn_ts_add_none`**
+  > Nothing of that kind is selected on the map.
+  *The finding:* 'Nothing of that kind' has no antecedent in the note, and the note also appears when the selected assets are already on the graph (added === 0), where 'not selected' is false
+  1. no asset of the shown group (Nodes or Links) is selected
+  2. the selected assets are already on the graph, so none was added
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'No new assets of this group are selected on the map.'
+  @@ NEEDS RULING
+- **`lpn_ts_add_tip`**
+  > Put everything now selected on the map onto the graph.
+  *The finding:* Says 'everything now selected', but tsAddSelection() (js/looped-network.js:29915) adds only selected assets of the current group (Nodes or Links); 'now' also reads as 'at this moment' vs 'newly'
+  1. every selected asset of any kind goes onto the graph
+  2. only the selected assets of the group shown (Nodes or Links) go onto the graph
+  **What this asks for:** which of the readings above you meant.
+  *The proposal:* PROPOSED: 'Put the selected nodes or links (whichever group is shown) on the map onto the graph.'
   @@ NEEDS RULING
 
 ## Synonym entries to approve  (13, 13 to read @@ NEEDS RULING)
