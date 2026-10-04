@@ -335,7 +335,7 @@ console.log('== 6. Settings > Symbology is Node labels, Node colors, Link labels
 	const html = execFileSync('php', [path.join(ROOT, 'dev', 'scripts', 'render_page.php'), 'Looped-Network.php'],
 		{ cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64 * 1024 * 1024 });
 	const sec = html.slice(html.indexOf('id="lpn_set_sec_visual"'), html.indexOf('id="lpn_set_sec_map"'));
-	const subs = [...sec.matchAll(/<div class="lpn-set-sub" id="([^"]+)">([^<]*)<\/div>\s*<div class="lpn-set-subbody">([\s\S]*?)<\/div>\s*<\/div>/g)]
+	const subs = [...sec.matchAll(/<div class="lpn-set-sub" id="([^"]+)"[^>]*>([^<]*)(?:<span[^>]*>[^<]*<\/span>)?<\/div>\s*<div class="lpn-set-subbody">([\s\S]*?)<\/div>\s*<\/div>/g)]
 		.map((m) => ({ id: m[1], text: m[2].trim(), hosts: [...m[3].matchAll(/id="([^"]+)"/g)].map((h) => h[1]) }));
 	const want = ['Node labels', 'Node colors', 'Link labels', 'Link colors', 'Customer'];
 	ok('the first five Symbology entries are Tom\'s five, in his order',

@@ -92,7 +92,7 @@ function modelHeadingWidths() {
 }
 function gripOf(key) {
 	modelHeadingWidths();
-	return thFor(key).children.filter((c) => c.className === 'lpn-pane-colgrip')[0];
+	return thFor(key).children.filter((c) => String(c.className).split(/\s+/).indexOf('lpn-pane-colgrip') !== -1)[0];
 }
 function sortBtnOf(key) { return thFor(key).children.filter((c) => String(c.className || '').indexOf('lpn-pane-sort') === 0)[0]; }
 // **REAL LEFT-TO-RIGHT POSITIONS, FOR THE MOVE-DRAG TESTS BELOW** (2026-09-26, fourth pass:

@@ -106,7 +106,7 @@ EngCalcs.initTips = function (root) {
 			// delay, since nothing auto-triggers it.
 			// A control may ask for a longer wait before its tip (data-ec-tip-delay, ms): the column
 			// divider in the Looped-Network tables, which the pointer crosses on its way elsewhere.
-			delay: { show: parseInt(el.getAttribute('data-ec-tip-delay'), 10) || 500, hide: 100 }
+			delay: { show: parseInt((el.dataset || {}).ecTipDelay, 10) || 500, hide: 100 }
 		});
 		// A control also hides its tip on click: hide() clears every active trigger at once, so
 		// the tip cannot hang over the panel the button just opened. Kept for the long-press case

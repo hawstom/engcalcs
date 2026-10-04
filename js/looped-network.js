@@ -25266,7 +25266,7 @@ var EngCalcs = EngCalcs || {};
 			// else in the heading, so the usual 500 ms would fire on transit; a finger has no hover
 			// and the Manage columns box carries the same sentence for it.
 			if (typeof ecCanHover !== 'function' || ecCanHover()) {
-				grip.title = pc.lpn_pane_width_tip || 'Column widths are saved in this browser, not in the project.';
+				grip.title = pc.lpn_pane_width_tip || 'Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.';
 				grip.className += ' ec-help';
 				grip.setAttribute('data-ec-tip-delay', '1000');
 			}
