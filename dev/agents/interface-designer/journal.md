@@ -3716,3 +3716,10 @@ by Carbon (toggletip), Spectrum (contextual help) and NN/g (touch pairs tips wit
 Material 3 tooltips page: fetch returned no usable content; NOT cited. Apple HIG as in `dev/tip-followup`.
 Concession: for a menu row or a toolbar button the hover infotip is documented (Microsoft, Autodesk); my
 recommendation of one click door is documented for the `?` glyph only.
+
+## 2026-10-04 Expert-level tiers (Tom's question)
+- OBSERVED: dev/tip-and-selection-audit.md (branch chore/ida-tip, 8c7b53cc): 71% of 268 lpn tips carry an actionable fact; the harm was delivery (554 px tall tip), not count.
+- CITED: Microsoft Office 2000-2003 adaptive "personalized menus" were retired in Office 2007 (ribbon) because hidden items moved and users could not build location memory. Precedent against hiding by inferred level.
+- CITED: Nielsen Norman Group, progressive disclosure (more than two disclosure levels typically fail usability). Mackay 1991 "Triggers and barriers to customizing software" (CHI): ~5% of users changed any default.
+- SPECULATION: a 0-2 "level" setting would be touched by few; an early message adds a fourth thing to a crowded first screen next to the consent banner.
+- Recommendation: no three-tier now. Fix tip quality via verdicts, widen tooltip; if a switch is wanted, one binary "Show explanations" in Settings, localStorage window-furniture (counts as a stored-item change; tell Tom). No early message; surface via Help.
