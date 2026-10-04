@@ -7,6 +7,7 @@
 //   2. (e) The box: interval 10 redraws the lines at multiples of 10; opacity 30 sets the image to
 //      0.3; the label count follows Labels.
 //   3. A zoom re-places the labels at the same size on screen.
+//   3a. Show contours: cleared hides fill, lines and labels; ticked restores them as they were.
 //   3c. The box's size fits its contents (no scrolling, within 600 x 600, on screen) in en, de, ru,
 //      fr at 1400 x 900, with no saved state AND with a stale small saved size that lacks
 //      `userSized`; with `userSized: true` the saved size wins; a drag of the corner sets the flag.
@@ -166,6 +167,24 @@ async function sectionDesk(Session, browser) {
 		ok('...at the same size on screen', before.labelH > 0 && Math.abs(after.labelH - before.labelH) / before.labelH < 0.25,
 			before.labelH.toFixed(1) + ' px -> ' + after.labelH.toFixed(1) + ' px');
 		await shot(a.page, 'contour-desk-zoomed');
+
+		console.log('\n--- 3a. Show contours hides and restores the whole plot ---');
+		// Tom, 2026-10-04: "How do we turn off contour plot view?" ... "[ ] Show contours". It had taken Fill None AND lines cleared.
+		await setBox(a, 'lpn_contour_fill', 'bands');
+		ok('Show contours is ticked while the plot shows', await a.page.evaluate(() => { const c = document.getElementById('lpn_contour_show'); return !!c && c.checked; }));
+		await setBox(a, 'lpn_contour_show', false);
+		f = await layerFacts(a.page);
+		ok('cleared: no fill image, lines or labels left on the map', !f || (!f.href && f.lines.length === 0 && f.labels.length === 0), f && (f.href + ' lines ' + f.lines.length));
+		const hidden = await a.page.evaluate(() => ({
+			boxOpen: getComputedStyle(document.getElementById('lpn_contour_box')).display !== 'none',
+			fill: document.getElementById('lpn_contour_fill').value, lines: document.getElementById('lpn_contour_lines').checked
+		}));
+		ok('...the box stays open, its Fill None and lines cleared', hidden.boxOpen && hidden.fill === '' && !hidden.lines, JSON.stringify(hidden));
+		await setBox(a, 'lpn_contour_show', true);
+		f = await layerFacts(a.page);
+		const back = await a.page.evaluate(() => document.getElementById('lpn_contour_fill').value);
+		ok('ticked again: the plot comes back as it was (Bands, with lines)', f && f.href.indexOf('data:image/png') === 0 && f.lines.length > 0 && back === 'bands', back);
+		await setBox(a, 'lpn_contour_fill', 'smooth');
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally {
 		await a.close();

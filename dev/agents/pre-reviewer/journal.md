@@ -3773,3 +3773,15 @@ NOT RUN: georef two-point/Keep placement, Revert/Save as, cascade multi-delete w
 Seam lpnDialogAnswerer: only lpn-dom-stub.js, lock-ask-browser-drive.js, dev/browser-pass/lib/pickers.js inject it; none in shipped js.
 # Perry 1004c feat/tip-verdict
 OBSERVED: elev_source_tip rewrite+2 requests not applied; mean_err_tip/pane_print_tip/time_run_tip delete verdicts not honoured; style leftovers (Checked/Click in scenario tips, "typed above"). Harnesses tip-verdict, deleted-key, default-pattern, custom-property pass. Headless load: 0 console errors, no empty titles.
+
+## 2026-10-04 -- feat/chain-draw (Task 719), SHA b480ed0b
+OBSERVED (real Chromium, preview :8106; probes in scratchpad/perry/p*.js):
+- Core chain works: nodes/pipes counts exact on every exit (Escape, 2xEsc, right-click, button again, keys 1/2, new project, tab switch). No dangling pipe/orphan found. Snap radius ~12-14 screen px at all zooms.
+- Dbl-click makes one junction, not two. Undo walks chain back correctly; Redo does NOT carry the ring forward.
+- Click on a pipe ends the chain AND drops to Select with Properties open (inherited LINK_CLICK_EXITS_MODE).
+- Phone: mode line is 0x0 (hidden), so "Press Escape" never shown; no on-screen way to end chain except Edit > Select.
+- Toolbar goes 1 row -> 2 rows at window widths ~1201-1300 because of the extra button (measured by hiding it).
+- Stale red rubber band over last pipe until pointer moves; after pan/pinch on touch it persists -- same in Pipe tool (inherited).
+- Harness mutation: 4 mutants all caught (8,8,5,2 FAILs).
+- Agent report said "Insert > Junction and Pipe": true, it is Water > Insert.
+SPECULATION: none left.
