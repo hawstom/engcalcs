@@ -399,7 +399,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**10 still to read**, of 22 new keys across 11 unmerged branch(es).
+**20 still to read**, of 32 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -481,6 +481,42 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_result_pump_head_tip`**
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   _Ruled OK 2026-10-03._
+
+### feat/scenario-option (`5ca59b4f`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_scenario_duration_tip`**
+  > This scenario's own total run time. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
+  @@ NEEDS RULING
+- **`lpn_scenario_hyd_step_tip`**
+  > This scenario's own hydraulic time step. Leave it blank to use the project's, set in Settings, Calculation, Time.
+  @@ NEEDS RULING
+- **`lpn_scncmp_at_time`**
+  > {value} at {id}, {time}
+  @@ NEEDS RULING
+- **`lpn_scncmp_period_note`**
+  > Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.
+  @@ NEEDS RULING
+- **`lpn_scncmp_same`**
+  > The same in every scenario
+  @@ NEEDS RULING
+
+### feat/setting-scope (`8e493fe5`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
 
 ### feat/table-selection (`d2276943`) — 6 new, 6 to read @@ NEEDS RULING
 
