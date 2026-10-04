@@ -14,9 +14,10 @@
  *
  *   1. On each declared host: <link rel="canonical">, EVERY hreflang alternate, og:url and og:image
  *      name that host's declared origin, and the About box and Help > Welcome page name its brand.
+ *      (librewaternet.org wears LibreWaterNet.org; every other host wears EPANET++, 2026-10-04.)
  *   2. A www., mixed-case, ported spelling of a declared host is the same host.
- *   3. A SPOOFED host, and hawsedc.com (which only ever redirects to the app), get
- *      librewaternet.org and LibreWaterNet.org -- the answer from before Task 697.
+ *   3. A SPOOFED host, and hawsedc.com (which only ever redirects to the app), get the
+ *      librewaternet.org canonical but the EPANET++ name.
  *   4. A calculator served on epanet-plus-plus.org still nominates hawsedc.com: the per-host
  *      declaration is per PAGE, and the calculators are hawsedc.com's (Tom, 2026-09-17).
  *   5. The script-path redirect stays on its own host: epanet-plus-plus.org's
@@ -50,9 +51,11 @@ $cases = array(
     'librewaternet.org'                   => array('https://librewaternet.org',    'LibreWaterNet.org'),
     'epanet-plus-plus.org'                => array('https://epanet-plus-plus.org', 'EPANET++'),
     'WWW.Epanet-Plus-Plus.org:443'        => array('https://epanet-plus-plus.org', 'EPANET++'),
-    'evil.example'                        => array('https://librewaternet.org',    'LibreWaterNet.org'),
-    'epanet-plus-plus.org.evil.example'   => array('https://librewaternet.org',    'LibreWaterNet.org'),
-    'hawsedc.com'                         => array('https://librewaternet.org',    'LibreWaterNet.org'),
+    // Canonical stays librewaternet.org on a host with no front door of its own, but the NAME is
+    // EPANET++ there (Tom, 2026-10-04): LibreWaterNet.org is librewaternet.org's name alone.
+    'evil.example'                        => array('https://librewaternet.org',    'EPANET++'),
+    'epanet-plus-plus.org.evil.example'   => array('https://librewaternet.org',    'EPANET++'),
+    'hawsedc.com'                         => array('https://librewaternet.org',    'EPANET++'),
 );
 
 foreach ($cases as $host => $want) {
@@ -78,9 +81,13 @@ foreach ($cases as $host => $want) {
 
     $about = preg_match('/class="lpn-about-name">.*?<a href="([^"]*)"[^>]*>([^<]*)<\/a>/s', $html, $m) ? $m : array('', '', '');
     hc_ok(html_entity_decode($about[2]) === $brand, "$tag: About box name", "got '{$about[2]}'");
-    hc_ok($about[1] === $origin . '/', "$tag: About box name links home", "got '{$about[1]}'");
+    $brandHome = $brand === 'EPANET++' ? 'https://epanet-plus-plus.org/' : 'https://librewaternet.org/';
+    hc_ok($about[1] === $brandHome, "$tag: About box name links the brand's own site", "got '{$about[1]}'");
     $site = preg_match('/EngCalcs\.lwnSiteUrl = ("[^"]*")/', $html, $m) ? json_decode($m[1]) : '';
-    hc_ok($site === $origin . '/', "$tag: Help > Welcome page", "got '$site'");
+    hc_ok($site === $brandHome, "$tag: Help > Welcome page", "got '$site'");
+    // The dedication links the blog post, new tab, noopener.
+    hc_ok(preg_match('~<p class="lpn-about-dedication"[^>]*><a href="https://tomsthird\.blogspot\.com/2026/10/why-engineering-calculator-needs-to\.html" target="_blank" rel="noopener">You are loved~', $html) === 1,
+        "$tag: the dedication links the blog post in a new tab");
 
     // The other brand must not leak onto this host's page as a visible name.
     $other = $brand === 'EPANET++' ? '>LibreWaterNet.org<' : '>EPANET++<';
@@ -94,14 +101,14 @@ foreach ($cases as $host => $want) {
     preg_match_all('/<a href="([^"]*credits\.html)"/', $html, $call);
     hc_ok(count($call[1]) === 1, "$tag: exactly one credits.html link", json_encode($call[1]));
     if ($call[1]) {
-        hc_ok($call[1][0] === $origin . '/credits.html', "$tag: Credits follows THIS brand's own site",
+        hc_ok($call[1][0] === $brandHome . 'credits.html', "$tag: Credits follows THIS brand's own site",
             "got '{$call[1][0]}'");
     }
     // AND THE GENERAL RULE, stated as broadly as Tom asked for it: on the EPANET++ front door, no
     // visitor-facing link anywhere in the page points at librewaternet.org at all -- not just the
     // one row this defect was found on. (`EngCalcs.lwnSiteUrl`'s own JS variable NAME is exempt: it
     // is source code, not a link a visitor can click, and it is asserted by value two lines above.)
-    if ($brand === 'EPANET++') {
+    if ($brand === 'EPANET++' && $origin === 'https://epanet-plus-plus.org') {
         $withoutVarName = str_replace('EngCalcs.lwnSiteUrl', '', $html);
         hc_ok(strpos($withoutVarName, 'librewaternet.org') === false,
             "$tag: no visitor-facing link anywhere on the page names librewaternet.org");
@@ -146,8 +153,18 @@ if (strlen($prodHtml) < 10000) {
     hc_ok($canon === 'https://librewaternet.org/app/?lang=en',
         'epanet-plus-plus.localhost (no development): falls through to librewaternet.org', "got '$canon'");
     $about = preg_match('/class="lpn-about-name">.*?<a href="([^"]*)"[^>]*>([^<]*)<\/a>/s', $prodHtml, $m) ? $m : array('', '', '');
-    hc_ok(html_entity_decode($about[2]) === 'LibreWaterNet.org',
-        'epanet-plus-plus.localhost (no development): never shows EPANET++', "got '{$about[2]}'");
+    hc_ok(html_entity_decode($about[2]) === 'EPANET++',
+        'epanet-plus-plus.localhost (no development): an undeclared host still wears EPANET++', "got '{$about[2]}'");
+}
+
+// 3d. THE SUITE'S HYDRAULICS MENU says EPANET++ and links the map application, on every host.
+foreach (array('hawsedc.com', 'librewaternet.org', 'epanet-plus-plus.org') as $mh) {
+    $calcHtml = hc_render('Manning-Pipe-Flow.php', $mh);
+    hc_ok(strpos($calcHtml, '<a class="dropdown-item" href="https://epanet-plus-plus.org/app/"') !== false
+        && preg_match('~href="https://epanet-plus-plus\.org/app/"[^>]*>EPANET\+\+</a>~', $calcHtml) === 1,
+        "Hydraulics menu on $mh: EPANET++ linking epanet-plus-plus.org/app/");
+    hc_ok(strpos($calcHtml, 'dropdown-item" href="https://librewaternet.org/app/"') === false,
+        "Hydraulics menu on $mh: no LibreWaterNet.org menu entry");
 }
 
 // 4. A calculator on the new host is still hawsedc.com's.
