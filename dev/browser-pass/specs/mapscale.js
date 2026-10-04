@@ -118,7 +118,6 @@ exports.run = async function ({ browser, report }) {
 		// has no business pinning it: what it is checking is that the figure is in SCREEN pixels at
 		// all. A stroke that is 0.7 world units at this scale is 4,535 px, so the two answers are
 		// three orders of magnitude apart and no realistic setting sits between them.
-		const startPx = d.linkPx;
 		report.ok(d.linkPx > 0.5 && d.linkPx < 20,
 			'a pipe is drawn at a few SCREEN pixels, not at world units times the scale',
 			d.linkPx && d.linkPx.toFixed(3) + ' px');
@@ -135,8 +134,10 @@ exports.run = async function ({ browser, report }) {
 			d.bandPx === null ? '(no band element)' : d.bandPx.toFixed(2) + ' px');
 		// The stylesheet's own fallbacks, which is what these numbers are protecting against. The
 		// arithmetic is stated so a future change to either end cannot make the note false quietly.
-		report.ok(0.7 * d.s > 4000 && 12 * d.s > 70000,
-			'...where the stylesheet fallback would be over 4,000 px of pipe and 70,000 px of band',
+		// The opening scale depends on the window and the example's extent (5,354 px/degree at 1400 x 1200,
+		// where it was 6,478+), so the bars are 2,000 and 30,000: still three orders above a few pixels.
+		report.ok(0.7 * d.s > 2000 && 12 * d.s > 30000,
+			'...where the stylesheet fallback would be over 2,000 px of pipe and 30,000 px of band',
 			Math.round(0.7 * d.s) + ' px / ' + Math.round(12 * d.s) + ' px');
 		report.ok(d.sym > 0 && d.lw > 0 && d.hit > 0 && d.hair > 0,
 			'all four scale-derived properties are published', JSON.stringify(d));
@@ -169,8 +170,13 @@ exports.run = async function ({ browser, report }) {
 		for (let i = 0; i < 5; i++) { await a.page.mouse.wheel(0, -120); await a.settle(120); }
 		await a.settle(600);
 		d = await drawing(a);
-		report.ok(Math.abs(d.linkPx - startPx) < 0.05,
-			'after five wheel notches in, a pipe is the same number of screen pixels',
+		// **NOT "THE SAME NUMBER OF PIXELS" ANY MORE** (Task 705, d039bb13, Tom 2026-09-22: "Everything
+		// shrinks except reservoirs and tanks"): a pipe's width is held on the GROUND past the symbol cap,
+		// so on screen it follows the zoom (1.43 px -> 2.30 px here, in step with the 1.61x scale).
+		// What the line was guarding is that the width is a SCREEN figure of a few pixels and not the
+		// world-unit fallback, which is thousands.
+		report.ok(d.linkPx > 0.5 && d.linkPx < 20,
+			'after five wheel notches in, a pipe is still a few screen pixels, not world units times the scale',
 			d.linkPx && d.linkPx.toFixed(3) + ' px at scale ' + (d.s && d.s.toFixed(0)));
 		hits = await reachable(a);
 		report.ok(hits.onBand <= 8, '...and the canvas is still reachable',
@@ -180,7 +186,7 @@ exports.run = async function ({ browser, report }) {
 		await a.page.setViewportSize({ width: 1100, height: 900 });
 		await a.settle(800);
 		d = await drawing(a);
-		report.ok(Math.abs(d.linkPx - startPx) < 0.05, 'and after a window resize',
+		report.ok(d.linkPx > 0.5 && d.linkPx < 20, 'and after a window resize',
 			d.linkPx && d.linkPx.toFixed(3) + ' px at scale ' + (d.s && d.s.toFixed(0)));
 
 		report.eq(a.errors.length, 0, 'no uncaught page errors anywhere in the pass');

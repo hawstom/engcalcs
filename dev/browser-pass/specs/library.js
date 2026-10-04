@@ -65,9 +65,10 @@ exports.run = async function ({ browser, report }) {
 			// Profile Tables | Run"*. The separators are the request as much as the sequence — what
 			// the project IS, what you READ beside it, what you RUN on it.
 			const water = (await a.menuRows('project')).map((r) => r.label);
-			const PROF = await a.lang('lpn_profile_menu'), TAB = await a.lang('lpn_tables_menu');
+			// Profile is a row in the Graphs fly-out now (fix/graphs-order), so the Water menu carries Graphs.
+			const PROF = await a.lang('lpn_graphs_menu'), TAB = await a.lang('lpn_tables_menu');
 			report.ok(water.indexOf(LIB) >= 0, 'the Water menu carries Libraries', water.join(' | '));
-			report.ok(water.indexOf(PROF) >= 0, '...and Profile', water.join(' | '));
+			report.ok(water.indexOf(PROF) >= 0, '...and Graphs (which holds Profile)', water.join(' | '));
 			report.ok(water.indexOf(TAB) >= 0, '...and Tables', water.join(' | '));
 		}
 		// The strip's own remaining group is still checked: Settings sits alone in it and is not
@@ -78,7 +79,9 @@ exports.run = async function ({ browser, report }) {
 		if (net) {
 			// What you RUN on the project is still a group of its own, immediately after it.
 			const after = strip.slice(net.i + 1).filter((g) => !g.end).map((g) => g.items.join(' | '));
-			report.ok(/^Calculate \| Step back \| Play \| Step forward \| Time \| Speed$/.test(after[0] || ''),
+			// The step selector is named by lpn_time_slider ("Elapsed simulation time"), no longer "Time".
+			const STEP = await a.lang('lpn_time_slider');
+			report.ok(after[0] === `Calculate | Step back | Play | Step forward | ${STEP} | Speed`,
 				'...followed by what you RUN on it: Calculate and the transport, in their own group',
 				after[0]);
 		}
@@ -224,6 +227,16 @@ exports.run = async function ({ browser, report }) {
 
 		// ---- CLOSING ---------------------------------------------------------------------------
 		// The same three ways every standing box on this page closes.
+		// Escape reaches a box only when focus AND the pointer are on it (bdf0b552, Tom 2026-09-19), so a
+		// real click on the box's own index puts both there first.
+		const inBox = await a.page.evaluate(() => {
+			// The wide sentence field the verdict check above typed into: a click there leaves focus
+			// genuinely inside the box (a click on an index button re-renders it and drops focus).
+			const r = document.querySelector('#lpn_libbox_content input.lpn-lib-wide').getBoundingClientRect();
+			return { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+		});
+		await a.page.mouse.click(inBox.x, inBox.y);
+		await a.settle(150);
 		await a.page.keyboard.press('Escape');
 		await a.settle(200);
 		report.ok(!(await open()).shown, 'Escape closes it');

@@ -54,9 +54,12 @@ exports.run = async function ({ browser, report }) {
 					const input = document.getElementById('lpn_convas_suffix_' + k);
 					return input && input.parentElement ? input.parentElement.children.length : -1;
 				}),
+				// Depth's suffix box is an ordinary one since 2026-09-25 (Looped-Network.php: tank water depth is
+				// a label field with a suffix like the other three, no longer disabled and no native title),
+				// so what it owes is an accessible name and to be enabled.
 				depthTitle: (function () {
 					const el = document.getElementById('lpn_convas_suffix_depth');
-					return el ? el.getAttribute('title') : null;
+					return el && !el.disabled ? el.getAttribute('aria-label') : null;
 				})(),
 				depthHasTipGlyph: !!document.querySelector('#lpn_convas_panel .lpn-convas-round-row .ec-tip')
 			};
@@ -97,7 +100,7 @@ exports.run = async function ({ browser, report }) {
 		report.ok(!geo.depthHasTipGlyph,
 			'the depth row carries no separate "?" tip glyph');
 		report.ok(!!geo.depthTitle && geo.depthTitle.length > 0,
-			'...and its box still explains itself, as a native title',
+			'...and its box is enabled and named for a screen reader, like the other three',
 			geo.depthTitle);
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript', a.errors[0] || '');

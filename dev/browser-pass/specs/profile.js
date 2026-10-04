@@ -73,10 +73,12 @@ exports.run = async function ({ browser, report }) {
 		// **THE DOOR IS PROJECT > PROFILE** (Task 467 moved it out of View, which now holds only the
 		// things that change how the map is DRAWN). Updated 2026-08-24, when this spec was found
 		// throwing on a View row that no longer exists.
+		// Updated 2026-10-04: Profile is a row in the Graphs fly-out now (fix/graphs-order), not a Project row.
+		const graphsLabel = await a.lang('lpn_graphs_menu'), profileLabel = await a.lang('lpn_profile_menu');
 		const rows = await a.menuRows('project');
-		report.ok(rows.some(r => r.label === 'Profile'), 'Project carries a Profile row',
+		report.ok(rows.some(r => r.label === graphsLabel && r.submenu), 'Project carries a Graphs fly-out',
 			rows.map(r => r.label).join(' | '));
-		await a.menuClick('Profile', 'project');
+		await a.menuClickSub(graphsLabel, profileLabel, 'project');
 		await a.settle(400);
 
 		// **1. THE PANE IS ON THE SCREEN, AND THE PAGE STILL FITS THE WINDOW.** The pane takes its
@@ -319,6 +321,11 @@ exports.run = async function ({ browser, report }) {
 			}
 		}
 
+		// The Properties box stays docked over the pane once opened (feat/dock, 7e646684, 2026-10-04); close
+		// it so it neither covers the profile panel nor intercepts the hover below.
+		await a.page.evaluate(() => { const c = document.getElementById('lpn_popup_close'); if (c) { c.click(); } });
+		await a.settle(200);
+
 		// ---- **THE EDIT DOOR AND THE SAVED-PATH ARROW** (Tasks 509, 510) ------------------------
 		//
 		// dev/lpn-spike/profile-saved-harness.js owns what these two DO -- one end moves and the
@@ -407,7 +414,7 @@ exports.run = async function ({ browser, report }) {
 					};
 				});
 				report.ok(menu.open, '...and it opens a menu');
-				report.ok(menu.rows.some(r => /Saved paths/.test(r)) &&
+				report.ok(menu.rows.some(r => /[Ss]aved paths?/.test(r)) &&
 					menu.rows.some(r => /New saved path/.test(r)),
 					'...holding the saved paths and the New row', menu.rows.join(' | '));
 				report.ok(!/[Cc]lick the node|[Tt]ap the node/.test(menu.say),

@@ -784,7 +784,12 @@
 		if (!host || !autoRunAllowed()) { return; }
 		if (state.lastRunMs === null || state.lastRunMs <= EC.LPN_TIME_SLOW_MS) { return; }
 		secs = (state.lastRunMs / 1000).toFixed(1);
-		host.status(S.runSlowAdvice.replace('{secs}', secs), EC.LPN_TIME_SLOW_CODE);
+		// **A MESSENGER NOTICE, NOT THE STATUS LINE** (Tom, 2026-10-04: the solve-time message
+		// "stays on-screen indefinitely, and this is no longer necessary now that we have the
+		// messenger system"). It is logged once per run and fades by itself, and it can no longer
+		// overwrite a diagnostic the status line is holding for the model.
+		if (host.notice) { host.notice(S.runSlowAdvice.replace('{secs}', secs), EC.LPN_TIME_SLOW_CODE); }
+		else { host.status(S.runSlowAdvice.replace('{secs}', secs), EC.LPN_TIME_SLOW_CODE); }
 	}
 	function cancelIdleRun() {
 		if (state.idle) { clearTimeout(state.idle); state.idle = null; }
@@ -894,7 +899,6 @@
 			state.runSig = sig;
 			clampTime();
 			showFrame();
-			// Last, so the advice is the sentence left standing rather than one this run overwrites.
 			adviseIfSlow();
 		}, function (err) {
 			state.lastRunMs = nowMs() - t0;
@@ -1432,7 +1436,9 @@
 		// finishes while nobody is editing leaves the page quiet, and a report of a finished run
 		// standing an hour later reads as a report of the CURRENT state of the model.
 		if (boxState.suppressed) {
-			if (host && host.status) {
+			// A notice where the host has one: logged, transient, and never over a diagnostic.
+			if (host && host.notice) { host.notice(boxMessage(strings()), EC.LPN_TIME_DONE_CODE); }
+			else if (host && host.status) {
 				host.status(boxMessage(strings()), EC.LPN_TIME_DONE_CODE);
 				if (host.expireStatus) { host.expireStatus(EC.LPN_TIME_DONE_CODE, EC.LPN_TIME_DONE_MS); }
 			}

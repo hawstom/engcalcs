@@ -126,6 +126,8 @@ const EC_NON_REQUEST_HOSTS = [
     'www.epa.gov'            => "the EPANET credit link. EPA's page about the engine we bridge to.",
     'librewaternet.org'      => "the Help menu's screenshots row (Task 178). Same shape: a new "
                               . 'tab the visitor asks for, not a request this page makes.',
+    'epanet-plus-plus.org'   => 'the app address a saved project file carries back (LPN_FILE_APP), '
+                              . 'the map application\'s canonical. Text in a file, not a request.',
 ];
 
 /**

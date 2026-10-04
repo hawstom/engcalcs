@@ -363,8 +363,10 @@ function findAll(kids, tag) {
 		findAll([table], 'INPUT').length === 6 && findAll([table], 'SELECT').length === 3);
 	// The headings are the only labels these columns have, so they carry the tips the vanished
 	// fields used to (Tom: *"Maybe you can put the tip here"*).
-	ok('...and the column headings carry the tips',
-		findAll([table], 'TH').filter(th => /\?/.test(th.textContent)).length === 3,
+	// Tom's 2026-10-04 tip verdicts deleted the Pattern and Description column tips (the Pattern
+	// select's blank option now reads Default), so only Base demand keeps its `?`.
+	ok('...and only the Base demand heading carries a tip',
+		findAll([table], 'TH').filter(th => /\?/.test(th.textContent)).length === 1,
 		findAll([table], 'TH').map(th => th.textContent).join(' | '));
 	ok('the resolved Demand row is still there and still says the total',
 		labels.some(t => /^Demand \(/.test(t)));

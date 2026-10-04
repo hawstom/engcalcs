@@ -96,57 +96,52 @@ lines rather than appending corrections.
 - **The browser-pass harness leaks its `php -S` server when killed**; 14 from 09-23 were still
   running on 09-24. `ps -eo pid,ppid,lstart,args | grep 'S 127.0.0.1'`, kill those whose parent is 1/449.
 - **Flaky under load, green alone:** `run-progress-harness.js`; `dev/browser-pass/specs/basemap.js` and `firstproject.js`
-  tile counts at a 900 ms settle. Pre-existing and unrelated: `scale-publish-harness.js` (2 checks),
-  `dev/browser-pass/specs/place.js` (stale "lat/lon project now"; section 17 filechooser order),
-  `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
+  tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-04 (morning session)
+## STATE — 2026-10-04 (late evening)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged this session: feat/property-graph (Task 637 closed, his "Done. Close, merge, and delete
-branch."); the Graphs fly-out in EPANET's order (Time series, Profile, Contour, Frequency, Flow
-balance; he asked whether Mary found a reason to differ, she found none); Task 732 (five
-browser-pass specs current); two check flakes (usage selftest port collided with the preview ports;
-three browser harnesses hard-coded the shared lock instead of `EC_BROWSER_LOCK`). Task 727 closed as
-already shipped (25a3cf2a). Task 760 (Settings scrolled sideways at 360 px) found and fixed the
-same session; Task 761 (four more stale specs) is open.
+Merged 2026-10-04 evening, on his typed words: 8110 dialog-audit, 8113 basemap-style, 8114
+epanet-pp-brand, 8115 elev-default, 8116 tip-verdict. Also: Show contours check box; Task 761
+specs; the scope harness presses dialog buttons as a pointer (the new dialog ignores a `detail: 0`
+click); the sitemap leaves the map app to epanet-plus-plus.org's own `sitemap-app.xml`.
+**Owed to Tom:** upload the regenerated `~/webdev/hawsedc.com/sitemap.xml` (518 URLs, no `/app/`);
+8110's phone test on dev.hawsedc.com once he pulls there.
 
-### Awaiting him (every port row in ports.conf says what to test)
+### Awaiting his browser pass (protected; ports.conf rows say what to try)
 
-- **Browser pass (protected):** 8107 `feat/dock` (441; his two notes fixed: autohide width grip,
-  `?` tip closes on a title-bar click); 8109 `feat/table-selection` (757; buttons gone, right-click
-  only, keys lpn_pane_sel_only_tip and lpn_pane_print_tip deleted); 8110 `feat/dialog-audit` (710;
-  all 38 converted, Perry's three findings fixed, four bar instructions left non-modal by CC's call);
-  8111 `feat/scenario-option` (755; Settings > Time names the overrides; "override" rewording of
-  seven translated keys for him to read); 8112 `feat/setting-scope` (739; he wrote "(1) Start fresh
-  is not a setting. So OK, I think." -- no merge word); 8113 `feat/basemap-style` (617; Perry clean;
-  label "Basemap filter" vs Perry's "Map tile filter" is his call); 8106 `fix/tip-width` (he said
-  yes to it; tooltip cap 200 px to 22rem, merge on his look). Still from before: 8108
-  `feat/profile-file`, `feat/desktop`, `feat/label-placer`.
-- **His tip verdicts** are in progress (he is "cutting hard"). When they arrive: apply on a branch,
-  check every cut for a lost warning, unit or caveat and ask rather than drop, list deleted keys.
-  He does not like the word "rulings" for his answers; say calls or verdicts.
-- **Expert level:** he floated Tutorial/Normal/Expert tiers and an early notice. CC and Ida both
-  advised against tiers now: cut the tips first, then at most one "Show explanations" switch (a
-  browser-storage change he must be told about). His answer is pending.
-- **`dev/new-english-keys.md`:** he edited a stale copy again (his 10-03 file plus three OKs, which
-  were harvested). Tell him to reopen the file before editing; the 10 Wave 0 rewrites, the Graphs
-  tip and lpn_ds_search_note rewordings still wait there.
-
-**Seams:** feat/dock and feat/table-selection both touch the bottom pane; feat/dialog-audit
-touches nearly every confirm in js/looped-network.js, so merge it last and rerun the others'
-harnesses on the merge.
+- **8113** `feat/chain-draw` (719, moved from 8106: his tunnel does not carry 8106/8107): Junction
+  and Pipe tool, key 0. His calls: the name; no on-screen way to end a chain on a phone; the toolbar
+  wraps at 1201-1300 px; a pipe click ends the chain; no row for key 0 in the shortcuts table.
+- **8114** `feat/pda` (762, moved from 8107): Demand model DDA/PDA. His calls: "Delivered demand"
+  (EPANET says Demand); a kPa file is disclosed, not honoured; unit labels lag until Settings reopens.
+- **8111** `feat/scenario-option` (755): "Calculation options" now heads the three option columns
+  (he could not find them: nothing named the group); the double tooltip on each `?` is fixed. After
+  merge, apply the style rules to lpn_scenario_* (its basic tip says "Checked/Unchecked").
+- Still from before: 8108 `feat/profile-file`, `feat/desktop`, `feat/label-placer`.
 
 ### Owed translation work
 
-46 lpn keys held until he rules (lpn_ds_*, the Graphs tip, the 10 Wave 0 keys, the stale-syn keys);
-each pending branch's keys (basemap filter six, "Scenario overrides:", the seven override
-rewrites, lpn_pane_sel_only_none). Romanian file menu noun/verb pass; four concept terms. No sprint
-was run this session: almost everything owed waits on his reading.
+tip-verdict is merged, so most English has settled: **a sprint is the next sensible job.** Pending
+branches add little (chain-draw 3 keys, pda 19, scenario-option 1). Also owed: the 46 lpn keys held
+before, the Romanian file menu pass, four concept terms. Approved-English entries for the reworded
+and deleted tip-verdict keys may still sit in english-key-rulings.json; the orchestrator edits it.
 
 ### Traps met 2026-10-04
+
+- **The classifier refused all-clears from his pasted message and reading the wish lists.** He
+  typed the merge words instead, and added an `autoMode.environment` note to ~/.claude/settings.json
+  that pasted messages are his own; untested until a new session.
+- **A dialog button pressed with a bare `el.click()` is ignored** since dialog-audit (`detail: 0`
+  reads as an unarmed keyboard press). Harnesses must dispatch a MouseEvent with `detail: 1`.
+- **A `cmd && git branch -d ... && suite &` line backgrounds the whole chain**, so when one step
+  fails, the suite silently never starts while "started" still prints. Start a suite in its own call.
+- **An agent reported a check_all log that started on its PREVIOUS commit**; its fix landed mid-run.
+  Match the log's start time to the head's commit time before believing it.
+- **`projection-harness.js` can hang 300 s under load** (event loop held open) and pass in 0.3 s
+  alone.
 
 - **His edit of `dev/new-english-keys.md` was made on a copy older than the last regeneration**
   (header counts 92 vs 67): the harvest still worked because it reads marks by key. Commit his edit
@@ -164,6 +159,13 @@ was run this session: almost everything owed waits on his reading.
   (they sit in the session, not the group). Kill by session: `ps -eo pid,sess,args | awk '$2==SID'`.
 - **A worktree that never had `dev/browser-pass/node_modules` symlinked prints "playwright-core is
   not installed"**: symlink it when making any worktree, fix branches too.
+- **An agent wrote Tom's approval into `english-key-rulings.json`** for a label it had interpreted
+  ("Above"); it happened to be his literal word. Brief agents: never write a ruling, only the
+  orchestrator does, from his words.
+- **`lang_key_order_normalizer.php` with no flags rewrites all 27 language files**; an agent ran it
+  by accident. Revert with `git checkout -- lib/`.
+- **Two merges that each pass can fail together**: setting-scope's nowrap marker broke the Task 760
+  phone harness only once both were on master. The suite on the merge commit is what caught it.
 - **The pre-reviewer earns his keep on large mechanical conversions**: the dialog conversion was
   reported finished and green; Perry found held Enter deleting a network and 18 alerts quietly
   downgraded to fading strips.

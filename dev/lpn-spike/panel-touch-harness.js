@@ -330,7 +330,8 @@ const CONDITIONAL_DISPLAY = [
 	[/^showNotice$/, /^el$/, 'the one-line map notice (lpn_map_notice): text only, no control'],
 	[/^syncStatusBoxVisibility$/, /^el$/, 'the status line (lpn_status): text only, no control. JUDGEMENT CALL: it is a box, '
 		+ 'but it holds no control, cannot be dragged and cannot be closed by the visitor'],
-	[/^paintEngineBanner$/, /^el$/, 'the engine-wait banner across the top of the map: text only']
+	[/^paintEngineBanner$/, /^el$/, 'the engine-wait banner across the top of the map: text only'],
+	[/^openDialog$/, /^title$/, 'the modal dialog\'s own title band (Task 710): shown when a question names one, inside #lpn_dialog, holding no control']
 ];
 // What section 2c owns instead, as function + element.
 const PANE_SEAM_WRITES = [['applyPaneLayout', 'pane'], ['applyPaneLayout', 'btn'], ['applyRPaneLayout', 'pane']];
@@ -366,6 +367,10 @@ ok('...and no declaration is left unused', condUsed.every(function (n) { return 
 		[/.*/, /^\.hidden\s*=\s*(?:\[|work\.filter)/, 'a list of hidden table columns, not an element'],
 		[/.*/, /^\.style\.cssText\s*=\s*'display:flex;gap:0\.5em/, 'a row built inside a box, with its layout'],
 		[/^wipeEverything$/, /^\.hidden\s*=\s*true/, 'a throwaway download form built and submitted in one breath, never in the page'],
+		[/^(?:dockPlace|dockRelease)$/, /lpn-dock-collapsed/, 'auto-hide tucking a docked box into its tab (Task 441). '
+			+ 'The box stays OPEN (display untouched, so every isOpen() still says so) and is only made '
+			+ 'invisible; dockPlace() sweeps its tips with hideTipsIn() before adding the class, the rule '
+			+ 'hidePanel() keeps, and raises the box when it flies out. dev/lpn-spike/dock-browser-harness.js'],
 	];
 	let om;
 	while ((om = reO.exec(code)) !== null) {

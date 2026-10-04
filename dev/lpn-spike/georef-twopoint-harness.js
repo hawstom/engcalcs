@@ -342,7 +342,7 @@ console.log('\n--- Go to: a comma separates them, and one shape is refused on pu
 	// rejecting int,int or int.int. Both are obvious. Accept them."*). They used to be refused, and
 	// THE REASON IS STILL TRUE: in about half of this suite's 26 languages `38,122` IS the single
 	// number 38.122. What changed is the answer. A lone decimal number is not a coordinate at all,
-	// so the pair is the only reading that can do anything, and lpn_goto_tip states it in words --
+	// so the pair is the only reading that can do anything, and lpn_goto_prompt states it in words --
 	// asserted below, because a rule the reader is not told about is the surprise the old refusal
 	// was avoiding.
 	ok('int,int is a pair', at('38,122', 38, 122));
@@ -376,8 +376,10 @@ console.log('\n--- Go to: a comma separates them, and one shape is refused on pu
 		return m ? m[1].replace(/\\'/g, "'") : null;
 	};
 	{
-		const tip = val('lpn_goto_tip');
-		ok('lpn_goto_tip names both separators it accepts', !!tip && /lat lon/.test(tip) && /lat,lon/.test(tip), tip);
+		// lpn_goto_tip was deleted on Tom's 2026-10-04 tip verdicts; the prompt the box opens with
+		// is now the one place the two separators are named.
+		const tip = val('lpn_goto_prompt');
+		ok('lpn_goto_prompt names both separators it accepts', !!tip && /comma/.test(tip) && /space/.test(tip), tip);
 		ok('...and does not explain the parser, which Tom struck', !!tip && tip.length < 120, tip && String(tip.length));
 	}
 	{

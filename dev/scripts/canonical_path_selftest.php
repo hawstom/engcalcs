@@ -140,7 +140,7 @@ foreach ($switchCases as [$name, $script, $req, $want]) {
 //
 // Fixture 5 is the other one that matters: an UNDECLARED host is dev.hawsedc.com or a local
 // checkout, and moving a developer to production would be the worst kind of helpful.
-$O = 'https://librewaternet.org';
+$O = 'https://epanet-plus-plus.org'; // the map's canonical since 2026-10-04
 $redirectCases = [
     ['the script path on a declared host moves to the pretty address',
         '/engcalcs/Looped-Network.php', '/engcalcs/Looped-Network.php', true, $O . '/app/'],
@@ -158,9 +158,9 @@ $redirectCases = [
     // entry now answers hawsedc.com, so a redirect built from the host argument would send the
     // visitor to hawsedc.com/app/ -- an address that does not exist, /app/ being a rewrite only
     // librewaternet.org carries. This fixture passes the calculators' origin and demands the app's.
-    ['the app moves to LIBREWATERNET even when the host resolves to hawsedc.com',
+    ['the app moves to EPANET++ even when the host resolves to hawsedc.com',
         '/engcalcs/Looped-Network.php', '/engcalcs/Looped-Network.php', true,
-        'https://librewaternet.org/app/', 'https://hawsedc.com'],
+        'https://epanet-plus-plus.org/app/', 'https://hawsedc.com'],
     ['served BY hawsedc.com, the app moves to EPANET++ (Tom, 2026-10-01)',
         '/engcalcs/Looped-Network.php', '/engcalcs/Looped-Network.php', true,
         'https://epanet-plus-plus.org/app/', 'https://hawsedc.com', 'hawsedc.com'],

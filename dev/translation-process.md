@@ -286,6 +286,11 @@ read-only watchlist dump and grep-slice are free and can be done any time.
 - **Wrong-sense traps propagate across language families.** When a native reviewer rejects a word
   sense in one language, check the same concept in every cognate/family-mate language in the
   current category before calling the audit done — don't wait for a second complaint.
+- **An English command imperative takes your language's menu-label form** (Tom, 2026-10-04).
+  English button and command tips are imperative (*Show the legend.*); render them the way your
+  language labels a menu command, which in es, pt, fr and it is the infinitive (*Mostrar la
+  leyenda.*), not a second-person imperative. Field tips are noun phrases and messages are
+  indicative in every language. Rules: `dev/language-strings.md`, "mood, device verbs, checkboxes".
 - **Column-heading vs. tooltip width discipline**: shared label's short form goes in the
   column-heading key, long form in the tooltip — never the reverse (width-is-king).
 

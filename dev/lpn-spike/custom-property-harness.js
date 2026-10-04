@@ -440,6 +440,40 @@ ok('7.12 the design fields are the box’s own row primitive', designRows.length
 		!!byAria(firstBody, PC.lpn_cp_restrict_allow));
 	ok('7.13.16 ...and stores allow', settings().customProps[0].restrictMode === 'allow');
 }
+// **THE TIP FOLLOWS THE MODE AS WELL AS THE CAPTION** (Tom, 2026-10-04 tip verdicts: *"Bug: Allow
+// uses restrict and restrict uses nothing"*). The re-caption wrote textContent and wiped the `?`,
+// so Allow carried the Restrict tip and Restrict, after a switch, carried none. Each mode leads
+// with its own caption and both share lpn_cp_characters_tip; exactly one character tip at a time.
+{
+	const modeSel = byAria(firstBody, PC.lpn_cp_restrict_mode);
+	// Read as a reader sees it: an armed tip has moved its title into Bootstrap's cache.
+	const charTips = () => {
+		const out = [];
+		(function walk(el) {
+			if ((el['class'] || '').indexOf('ec-help') >= 0) {
+				const t = (el.getAttribute && el.getAttribute('data-bs-original-title')) || el.title;
+				if (t && t.indexOf(PC.lpn_cp_characters_tip) >= 0) { out.push(t); }
+			}
+			(el.children || []).forEach(walk);
+		})(firstBody);
+		return out;
+	};
+	let ct = charTips();
+	ok('7.13.17 Allow mode: the character box tip leads with the Allow tip',
+		ct.length === 1 && ct[0].indexOf(PC.lpn_cp_allow_tip) === 0, JSON.stringify(ct));
+	modeSel.value = 'deny';
+	fire(modeSel, 'change');
+	ct = charTips();
+	ok('7.13.18 Restrict mode: the character box still has a tip, and it leads with the Restrict tip',
+		ct.length === 1 && ct[0].indexOf(PC.lpn_cp_restrict_tip) === 0, JSON.stringify(ct));
+	ok('7.13.19 ...and the caption is still Restrict', !!byAria(firstBody, PC.lpn_cp_restrict));
+	modeSel.value = 'allow';
+	fire(modeSel, 'change');
+	ct = charTips();
+	ok('7.13.20 back to Allow: the Allow tip again, and only one',
+		ct.length === 1 && ct[0].indexOf(PC.lpn_cp_allow_tip) === 0, JSON.stringify(ct));
+	ok('7.13.21 the three keys are supplied', !!PC.lpn_cp_allow_tip && !!PC.lpn_cp_restrict_tip && !!PC.lpn_cp_characters_tip);
+}
 // Remove is on line one, because it is not a design field and should not cost opening the row.
 const rm = buttons(L.customBody(), PC.lpn_fitting_remove);
 ok('7.14 every row offers Remove', rm.length === settings().customProps.length);
@@ -481,7 +515,7 @@ ok('7.19 and no expander state rides in the saved project',
 const tips = headTips(L.customBody());
 ok('8.2 the design heading carries its own tip', tips.indexOf(PC.lpn_cp_design_tip) >= 0);
 [PC.lpn_cp_key_tip, PC.lpn_cp_label_tip, PC.lpn_cp_applies_tip, PC.lpn_cp_validate_tip,
-	PC.lpn_cp_restrict_mode_tip, PC.lpn_cp_restrict_tip, PC.lpn_cp_minlength_tip,
+	PC.lpn_cp_restrict_mode_tip, PC.lpn_cp_allow_tip + ' ' + PC.lpn_cp_characters_tip, PC.lpn_cp_minlength_tip,
 	PC.lpn_cp_length_tip, PC.lpn_cp_low_tip, PC.lpn_cp_high_tip].forEach(function (t, i) {
 	ok('8.3.' + (i + 1) + ' one more design field carries its tip', tips.indexOf(t) >= 0);
 });
