@@ -99,64 +99,43 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-04 (evening)
+## STATE — 2026-10-04 (late evening)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged 2026-10-04 evening: Show contours check box (his idea, "[ ] Show contours"; fix/contour-off);
-Task 761 browser-pass specs (1853/1853); setting-scope harness takes its slot lock; feat/chain-draw
-and feat/pda protected. No key on master is deletable (only lpn_geomap/lpn_xymap, held by a check).
-
-### CLEARED BY TOM, NOT MERGED: the classifier refused the all-clears from his pasted message
-
-8110 `feat/dialog-audit`, 8113 `feat/basemap-style`, 8114 `feat/epanet-pp-brand`, 8115
-`feat/elev-default`. His words, 2026-10-04 evening: "8110: Done. Close, merge, and delete branch."
-"8113: Done. Close, merge, and delete branch." "8114: Lovely. Close, merge, and delete branch."
-"8115: Done. Close, merge, and delete branch. No source citation, but I can see that it ballparks
-my intuition." Master is already merged into each (heads 9bdb5559, 0bc4d9bb, 3655b959, 90f33841);
-pin to those heads. Ask him to TYPE "merge 8110 8113 8114 8115" in the session. Then: merge in
-that order (basemap-style and elev-default share Net3-Novato-CA-World.lwn), regenerate payloads
-once, suite on the merge, push; tell him 8110 is on master for his phone test on dev.hawsedc.com;
-8114's sibling sitemap steps (drop `/app/` from librewaternet.org's, add the app to
-epanet-plus-plus.org's with `generate_sitemap.php --host=epanet-plus-plus.org`, push both).
+Merged 2026-10-04 evening, on his typed words: 8110 dialog-audit, 8113 basemap-style, 8114
+epanet-pp-brand, 8115 elev-default, 8116 tip-verdict. Also: Show contours check box; Task 761
+specs; the scope harness presses dialog buttons as a pointer (the new dialog ignores a `detail: 0`
+click); the sitemap leaves the map app to epanet-plus-plus.org's own `sitemap-app.xml`.
+**Owed to Tom:** upload the regenerated `~/webdev/hawsedc.com/sitemap.xml` (518 URLs, no `/app/`);
+8110's phone test on dev.hawsedc.com once he pulls there.
 
 ### Awaiting his browser pass (protected; ports.conf rows say what to try)
 
-- 8106 `feat/chain-draw` (719): Junction and Pipe tool, key 0, after Text. Perry clean bar five
-  rough edges; Redo and the stale rubber band fixed. His calls: name "Junction and Pipe"; on a phone
-  nothing says how to end a chain (Edit > Select only); the toolbar wraps to two rows at
-  1201-1300 px; a click on a pipe ends the chain and opens Properties (inherited); the Map shortcuts
-  table has no row for key 0 (needs 26 languages).
-- 8107 `feat/pda` (762): Demand model DDA/PDA in Settings > Calculation > Hydraulics; routes to
-  EPANET; Delivered demand and Demand deficit. Perry twice; numbers equal EPANET's. His calls:
-  "Delivered demand" (EPANET's own label is just Demand); a file's `Pressure KPA` is disclosed in
-  the import report, not honoured (PRV/emitter pressures share that blind spot); Settings unit
-  labels lag a unit change until reopened (old behaviour).
-- 8111 `feat/scenario-option` (755): his "leave it blank to use its parent's" in four strings; the
-  option columns' tips now show a ?; a blank box shows the parent's value greyed; Base's run-time
-  cell opens Settings at Calculation > Time. Why he could not find it: Basic mode hides the preview,
-  and Settings opens 5,600 px above Time. After merge, apply the style rules to lpn_scenario_*
-  (its new basic tip says "Checked/Unchecked").
-- 8116 `feat/tip-verdict`: his four answers applied (add-customer "Specify the customer point, then
-  its connection", zoom window "Specify corners or drag a rectangle.", quality tolerance
-  "Concentration difference below which...", specific gravity tip deleted). Mean error tip held
-  back; emitter exponent tip stale. Approved-English entries for the reworded and deleted keys still
-  sit in english-key-rulings.json; only the orchestrator, from his words, edits it.
+- **8113** `feat/chain-draw` (719, moved from 8106: his tunnel does not carry 8106/8107): Junction
+  and Pipe tool, key 0. His calls: the name; no on-screen way to end a chain on a phone; the toolbar
+  wraps at 1201-1300 px; a pipe click ends the chain; no row for key 0 in the shortcuts table.
+- **8114** `feat/pda` (762, moved from 8107): Demand model DDA/PDA. His calls: "Delivered demand"
+  (EPANET says Demand); a kPa file is disclosed, not honoured; unit labels lag until Settings reopens.
+- **8111** `feat/scenario-option` (755): "Calculation options" now heads the three option columns
+  (he could not find them: nothing named the group); the double tooltip on each `?` is fixed. After
+  merge, apply the style rules to lpn_scenario_* (its basic tip says "Checked/Unchecked").
 - Still from before: 8108 `feat/profile-file`, `feat/desktop`, `feat/label-placer`.
-
-**Seams:** tip-verdict touches most lpn strings; merge it before or after the others, never between,
-and re-run the payload regeneration once on the last merge.
 
 ### Owed translation work
 
-Every pending branch's English (tip-verdict's ~140 changed keys dominate; chain-draw 3 keys, pda
-19), the 46 lpn keys held before, the Romanian file menu pass, four concept terms. Run one sprint
-after tip-verdict and the other wording branches merge, not before: most English is still moving.
+tip-verdict is merged, so most English has settled: **a sprint is the next sensible job.** Pending
+branches add little (chain-draw 3 keys, pda 19, scenario-option 1). Also owed: the 46 lpn keys held
+before, the Romanian file menu pass, four concept terms. Approved-English entries for the reworded
+and deleted tip-verdict keys may still sit in english-key-rulings.json; the orchestrator edits it.
 
 ### Traps met 2026-10-04
 
-- **Reading the agents' wish lists was refused by the classifier** this evening (reason given:
-  instruction poisoning), as was writing all-clears from his pasted message. Nothing was read.
+- **The classifier refused all-clears from his pasted message and reading the wish lists.** He
+  typed the merge words instead, and added an `autoMode.environment` note to ~/.claude/settings.json
+  that pasted messages are his own; untested until a new session.
+- **A dialog button pressed with a bare `el.click()` is ignored** since dialog-audit (`detail: 0`
+  reads as an unarmed keyboard press). Harnesses must dispatch a MouseEvent with `detail: 1`.
 - **A `cmd && git branch -d ... && suite &` line backgrounds the whole chain**, so when one step
   fails, the suite silently never starts while "started" still prints. Start a suite in its own call.
 - **An agent reported a check_all log that started on its PREVIOUS commit**; its fix landed mid-run.
