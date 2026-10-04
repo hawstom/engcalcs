@@ -166,7 +166,9 @@ async function main() {
 		if (screen.error) { ok('the on-screen Junctions table is present', false, screen.error); }
 		else { COLS.forEach((c) => ok('the on-screen table has a ' + c + ' column', screen[c] === true)); }
 
-		await a.page.evaluate(() => { window.print = function () {}; document.getElementById('lpn_pane_print').click(); });
+		await a.page.evaluate(() => { window.print = function () {}; var td = document.querySelector('#lpn_pane_junctions tbody td.lpn-pane-cell, #lpn_pane_junctions tbody td:not(:first-child)');
+			td.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 5, clientY: 5 }));
+			Array.from(document.querySelectorAll('.lpn-pane-ctxmenu button')).filter(function (b) { return /^Print table/.test(b.textContent); })[0].click(); });
 		for (const paper of PAPERS) {
 			await a.page.setViewportSize({ width: paper.w, height: 1400 });
 			await a.page.emulateMedia({ media: 'print' });
@@ -192,7 +194,9 @@ async function main() {
 		// own box, which `overflow-wrap: anywhere` can legitimately make taller but never wider than)
 		// against the very first pixel of the next real column's own text.
 		await a.page.setViewportSize({ width: PAPERS[0].w, height: 1400 });
-		await a.page.evaluate(() => { window.print = function () {}; document.getElementById('lpn_pane_print').click(); });
+		await a.page.evaluate(() => { window.print = function () {}; var td = document.querySelector('#lpn_pane_junctions tbody td.lpn-pane-cell, #lpn_pane_junctions tbody td:not(:first-child)');
+			td.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 5, clientY: 5 }));
+			Array.from(document.querySelectorAll('.lpn-pane-ctxmenu button')).filter(function (b) { return /^Print table/.test(b.textContent); })[0].click(); });
 		await a.settle(250);
 		await a.page.emulateMedia({ media: 'print' });
 		await a.settle(150);
@@ -241,7 +245,9 @@ async function main() {
 				'#lpn_pane_tanks table tbody tr:first-child select');
 			return sel ? sel.options[sel.selectedIndex].textContent : null;
 		});
-		await a.page.evaluate(() => { window.print = function () {}; document.getElementById('lpn_pane_print').click(); });
+		await a.page.evaluate(() => { window.print = function () {}; var td = document.querySelector('#lpn_pane_junctions tbody td.lpn-pane-cell, #lpn_pane_junctions tbody td:not(:first-child)');
+			td.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 5, clientY: 5 }));
+			Array.from(document.querySelectorAll('.lpn-pane-ctxmenu button')).filter(function (b) { return /^Print table/.test(b.textContent); })[0].click(); });
 		await a.page.emulateMedia({ media: 'print' });
 		await a.settle(150);
 		const printedMixing = await a.page.evaluate(() => {

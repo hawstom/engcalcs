@@ -3043,19 +3043,6 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	padding: 3px 8px; font: inherit; white-space: nowrap;
 }
 .lpn-managecols-btns button:disabled { color: var(--ec-gray-bbb); border-color: var(--ec-gray-eee); cursor: default; }
-/* Print, at the LEADING edge of the pane head, ahead of the tab strip (Tom, 2026-08-21: it was
-   "poorly discoverable" in the top-right corner, where the eye reads window controls rather than
-   an action). flex:0 0 auto keeps it its own width while the tab strip beside it does the
-   wrapping, so a strip that wraps to two rows never moves it. It is a small text button rather
-   than an icon: it is the only control in this row that DOES something to the content. */
-.lpn-pane-print {
-	flex: 0 0 auto; align-self: flex-start; margin: 1px 6px 0 0; padding: 2px 8px; font: inherit;
-	font-size: .85em; background: var(--ec-gray-f6f6f6); border: 1px solid var(--ec-gray-bbb); color: var(--ec-ink); cursor: pointer;
-}
-.lpn-pane-print:hover, .lpn-pane-print:focus { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
-/* Selection only, pressed (Task 757): the same button, held down. */
-.lpn-pane-selonly-on, .lpn-pane-selonly-on:hover { background: var(--ec-gray-bbb); color: var(--ec-ink-black); border-color: var(--ec-ink); font-weight: bold; }
-
 /* PRINTING ONE TABLE (Tom, 2026-08-21: "Make a way to print any table").
    The sheet is a STATIC COPY of the active table, built by paneBuildPrintable() and appended
    straight to <body> so that hiding "everything else" is one rule with no ancestor to fight. It

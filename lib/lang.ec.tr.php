@@ -1329,7 +1329,6 @@ $ec_lang['lpn_goto_on_map']='Haritada göster';
 $ec_lang['lpn_pane_select_on_map']='Haritada seç';
 $ec_lang['lpn_pane_unselect_on_map']='Haritada seçimi kaldır';
 $ec_lang['lpn_pane_print']='Tabloyu yazdır';
-$ec_lang['lpn_pane_print_tip']='Şu anda baktığınız tabloyu, proje adı, tablo adı ve başlıklardaki birimlerle birlikte yazdırır. Satırlar, sıraladığınız düzende yazdırılır.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and

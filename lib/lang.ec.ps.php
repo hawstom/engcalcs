@@ -1331,7 +1331,6 @@ $ec_lang['lpn_goto_on_map']='پر نقشه ښودل';
 $ec_lang['lpn_pane_select_on_map']='پر نقشه ټاکل';
 $ec_lang['lpn_pane_unselect_on_map']='پر نقشه له ټاکنې ایستل';
 $ec_lang['lpn_pane_print']='جدول چاپ کړئ';
-$ec_lang['lpn_pane_print_tip']='هغه جدول چاپ کړئ چې تاسو یې ګورئ، د پروژې نوم، د جدول نوم، او واحدونه په سرلیکونو کې شامل دي. کرښې په هماغه ترتیب چاپیږي چې تاسو یې ترتیب کړي.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and

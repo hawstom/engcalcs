@@ -18,6 +18,9 @@
 'use strict';
 
 const { byId, ensure, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+const fs = require('fs'), path = require('path');
+const ROOT = path.join(__dirname, '..', '..');
+const src = fs.readFileSync(path.join(ROOT, 'js/looped-network.js'), 'utf8');
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
@@ -73,8 +76,6 @@ const L = loadLoopedNetwork(
 L.buildLayers();
 L.wirePane();
 // The stub's getElementById knows only registered ids, so the built button is registered here.
-byId.lpn_pane_selonly = byId.lpn_pane_strip.children.filter((c) => c.id === 'lpn_pane_selonly')[0];
-byId.lpn_pane_print = byId.lpn_pane_strip.children.filter((c) => c.id === 'lpn_pane_print')[0];
 
 const PC = global.EngCalcs.pageConfig;
 function fire(el, type, ev) {
@@ -87,8 +88,15 @@ function chord(id, key) {
 		preventDefault: function () { prevented = true; } });
 	return prevented;
 }
-function button() { return byId.lpn_pane_strip.children.filter((c) => c.id === 'lpn_pane_selonly')[0]; }
-function pressButton() { fire(button(), 'click', {}); }
+function stripIds() { return byId.lpn_pane_strip.children.map((c) => c.id); }
+// The doors are the right-click row (when it is offered) and Ctrl+Shift+L; there is no button.
+function firstRow() { return L.tableOrder('junctions')[0]; }
+function pressButton() {
+	L.selectCell('junctions', firstRow(), 'elev');
+	L.ctxMenu('junctions', firstRow(), 'elev');
+	const it = menuItem();
+	if (it) { fire(it, 'click', {}); } else { chord('junctions', 'L'); }
+}
 function menuEl() { return global.document.body.children.filter((c) => c.className === 'lpn-pane-ctxmenu').slice(-1)[0]; }
 function menuItem() {
 	const m = menuEl();
@@ -113,8 +121,8 @@ L.openPane('junctions');
 L.renderTable('junctions');
 
 console.log('\n--- 0. nothing selected: the door refuses ---');
-report(!!button(), 'the header has a Selection only button');
-report(button().textContent === PC.lpn_pane_sel_only, '...worded from the language file', button().textContent);
+report(stripIds().every((i) => i !== 'lpn_pane_selonly' && i !== 'lpn_pane_print'),
+	'the pane head carries no Selection only or Print table button (Tom, 2026-10-04: cleaner UI)');
 pressButton();
 report(!L.on() && L.notice() === PC.lpn_pane_sel_only_none, 'pressing it with nothing selected refuses with a notice', L.notice());
 report(order('junctions') === [J1, J2, J3, J4, J5].join(','), '...and the table is untouched');
@@ -128,7 +136,9 @@ console.log('\n--- 1. the button turns it on for every table ---');
 sel(['node', J2], ['node', J4], ['link', P1]);
 pressButton();
 report(L.on(), 'it is on');
-report(button().getAttribute('aria-pressed') === 'true', '...and the button is pressed');
+L.selectCell('junctions', firstRow(), 'elev');
+L.ctxMenu('junctions', firstRow(), 'elev');
+report(!!menuItem() && menuItem().textContent.indexOf('\u2713 ') === 0, '...and its right-click row wears a checkmark', menuItem() && menuItem().textContent);
 report(order('junctions') === [J2, J4].join(','), 'Junctions shows only the two selected', order('junctions'));
 L.renderTable('pipes');
 report(order('pipes') === P1, 'Pipes shows only the selected pipe', order('pipes'));
@@ -144,7 +154,6 @@ pressButton();
 report(L.on() && order('junctions') === J1, 'a changed selection re-applies to the new one', order('junctions'));
 pressButton();
 report(!L.on() && order('junctions') === J.join(','), 'the selection unchanged: it turns off', order('junctions'));
-report(button().getAttribute('aria-pressed') === 'false', '...and the button is released');
 report(L.bannerText('junctions') === '', '...and the banner is gone', L.bannerText('junctions'));
 
 console.log('\n--- 4. the right-click row ---');
@@ -213,11 +222,15 @@ report(L.bannerText('reservoirs').indexOf(say('lpn_pane_filter_sel_note', { n: 0
 }());
 report(!L.on() && order('junctions').split(',').sort().join(',') === [J1, J2, J3, J4, J5, 'N1', 'N2', N3].sort().join(','), 'Show all turns it off in every table', order('junctions'));
 
-console.log('\n--- 9. the button is only on a table tab ---');
-L.setPaneTab('profile');
-report(button().style.display === 'none', 'on the Profile tab the button is hidden');
-L.setPaneTab('junctions');
-report(button().style.display !== 'none', '...and back on a table it shows');
+console.log('\n--- 9. Print table is a right-click row, and the menu opens from the keyboard ---');
+L.selectCell('junctions', J1, 'elev');
+L.ctxMenu('junctions', J1, 'elev');
+report(!!menuEl() && menuEl().children.some((b) => (b.textContent || '').indexOf(PC.lpn_pane_print) >= 0),
+	'the right-click menu offers Print table', PC.lpn_pane_print);
+report(/e\.key === 'ContextMenu' \|\| \(e\.key === 'F10' && e\.shiftKey\)/.test(src),
+	'Menu key or Shift+F10 on a cell opens that menu, so both actions have a keyboard door');
+report(!/lpn_pane_(sel_only_tip|print_tip)'\]=/.test(fs.readFileSync(path.join(ROOT, 'lib/lang.ec.en.php'), 'utf8')),
+	'the two tips of the removed buttons are gone from the language file');
 
 console.log(`\n${checks - failures} of ${checks} passed`);
 process.exit(failures ? 1 : 0);
