@@ -123,7 +123,9 @@
         "feat/elev-default",
         "feat/epanet-pp-brand",
         "feat/chain-draw",
-        "feat/pda"
+        "feat/pda",
+        "feat/dock-flag-order",
+        "feat/times-statistic"
     ],
     "feature_freeze": {
         "active": false,

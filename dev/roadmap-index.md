@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**97 open tasks.** Next (100): 7 · Soon (75): 15 · Someday (50): 41 · Maybe (25): 15 · Parked (5): 19
+**92 open tasks.** Next (100): 7 · Soon (75): 10 · Someday (50): 41 · Maybe (25): 15 · Parked (5): 19
 
 ## 100 — Next (7)
 
@@ -19,23 +19,18 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 741 — The infinite map: generated networks for the label bench.
 - ! Task 759 — One word for the map selection, another for a menu choice; tips that earn their place.
 
-## 75 — Soon (15)
+## 75 — Soon (10)
 
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - Task 617 — More map view options, the opacity one having shipped.
 - Task 623 — File loss judged only by people whose files are throwaway.
 - Task 639 — Layers: the first heading under Map and page.
-- Task 710 — Audit the 57 raw alert and confirm dialogs.
 - Task 714 — Theming: colour tokens first, then a Light/Dark choice in Settings.
-- Task 719 — Draw a chain: junction, pipe, junction, pipe, until Escape.
 - Task 749 — Read Bentley WaterCAD/WaterGEMS models.
 - Task 752 — A scenario workbook: the scenario list and its data as spreadsheet tabs.
-- Task 755 — Per-scenario calculation options: run type and duration first.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
-- Task 762 — Pressure-driven analysis (PDA) through the EPANET engine.
 - Task 763 — A searchable help manual, built from the tips Tom cut.
-- Task 764 — One voice for tips and prompts: mood, Click vs Specify, check boxes.
 
 ## 50 — Someday (41)
 
@@ -125,5 +120,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-89 of 97 titles are within 4–12 words. `!` marks the rest;
+84 of 92 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

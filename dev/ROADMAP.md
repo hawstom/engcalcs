@@ -328,11 +328,6 @@ the block.
     layer never renumbers the others, which is the whole reason it is not an index.
   - A layer setting is MODELLING data by CLAUDE.md's project-versus-browser rule and rides in
     `serializeProject()`; it is not window furniture.
-- 75|710| **Audit the 57 raw alert and confirm dialogs.**
-  **BUILT 2026-10-04 on `feat/dialog-audit`, port 8110**: 77 sites, 39 informational ones moved to the notice line and log, 38 still block (`dev/dialog-audit.md`); Perry's three findings fixed. Open: a styled in-page modal for the 38?
-  Left from the message log (Task 704, closed 2026-09-23): Ida's third item. Sort which must genuinely
-  block and which are only information and belong in the log, which Tom's *"USER MUST HAVE CONTROL
-  OVER MESSAGES"* argues for. Keep severity at the two colours the banner already uses.
 - 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
   **Phase 1b inline colours MERGED 2026-10-04** (`chore/theme-inline`): js/*.js literals on tokens or allow-listed; the check refuses new ones. Left: the button base (R-202), then dark mode.
   Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
@@ -361,15 +356,6 @@ the block.
   account, no upload); a Google Sheets sync is a fifth third-party service, so a `privacy.php`
   paragraph and his call. Mary, Sue and Declan's readings are under Task 721. The layout assumes
   Bentley's model (a scenario tree, alternatives beneath); ours is flat, so the tabs need rethinking.
-- 75|755| **Per-scenario calculation options: run type and duration first.**
-  **BUILT 2026-10-04 on `feat/scenario-option`, port 8111**: per-scenario Total run time and Hydraulic time step in the Alternatives preview; Perry clean; awaiting his pass.
-  Tom, 2026-09-30: *"A Demand Multiplier column with the alternatives? What about other settings?"*
-  Mary: WaterGEMS keeps run type, duration, steps, friction method, demand adjustments, PDD and
-  tolerances in per-scenario Calculation Options; InfoWater ties a simulation-options set to each
-  scenario. Ours: only the demand multiplier is per scenario. Sue's ranking: steady vs 24-hour run and
-  duration next, quality mode later; friction method, units, accuracy and trials never vary silently
-  between compared scenarios (state them once in the report header). Show as plain columns in the
-  Alternatives preview, blank meaning inherits, not named sets, until scenarios number in the dozens.
 - 75|756| **Cross-platform: the suite as a desktop application, beyond the web folder.**
   Tom, 2026-09-30: *"Put a cross platform project on our roadmap priority 75. Plan where/how to move
   the project to transcend the web-centric hawsedc.com/engcalcs folder. Windows or Linux? Plan what
@@ -378,21 +364,9 @@ the block.
   **Tom, 2026-10-01: stays at 75, with a branch to play on** (`feat/desktop`): *"my main concern is that we
   could get too heavy for the browser or find limitations. Until then, let's just play and plan and see
   what happens."*
-- 75|719| **Draw a chain: junction, pipe, junction, pipe, until Escape.**
-  Tom, 2026-09-25, from WaterCAD: *"a Junction and Pipe toolbar command that adds Junction, Pipe,
-  Junction, Pipe, etc until escape."*
-  **PROMOTED TO 75 BY TOM, 2026-10-04** (*"Ensure that we have a roadmap item for a Junction and Pipe tool and that it's promoted to high priority (at least 75)."*).
-- 75|762| **Pressure-driven analysis (PDA) through the EPANET engine.** EPANET 2.2 solves
-  `[OPTIONS] Demand Model PDA` with Minimum/Required Pressure and Pressure Exponent; we read and
-  carry those lines and report that we solve demand-driven (js/lpn-inp.js ~586). Tom, 2026-10-04:
-  *"Is this (PDA) an EPANET++ gap that we must fill urgently?"* An EPANET feature we lack is a gap in the EPANET++ claim.
 - 75|763| **A searchable help manual, built from the tips Tom cut.** Tom, 2026-10-04: *"Almost all
   the deletes could be turned into a searchable help manual."* The cut tips' English is kept in
   `dev/help-manual-source.md` (feat/tip-verdict) as its first material.
-- 75|764| **One voice for tips and prompts: mood, Click vs Specify, check boxes.** Tom, 2026-10-04:
-  *"Are we indicative, imperative, or indecisive?"*; *"'Specify' would be better than 'Click'
-  everywhere"*; *"'Tick'? ... let's audit and discipline this too."* Mary's research first; then a
-  rule in dev/language-strings.md and one English pass.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
