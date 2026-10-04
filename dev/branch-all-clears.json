@@ -1,418 +1,425 @@
 {
-    "_comment": [
-        "TOM'S ALL-CLEARS, one per protected branch, pinned to the commit he cleared.",
-        "",
-        "Keyed and pinned the way dev/english-key-rulings.json is keyed on the exact English text,",
-        "and for the same reason: AN APPROVAL MUST LAPSE BY ITSELF WHEN WHAT WAS APPROVED CHANGES.",
-        "Clear a branch at one commit, push three more, and 'head' no longer matches -- the gate",
-        "closes again without anybody remembering to close it.",
-        "",
-        "WRITE HIS WORDS VERBATIM. 'Yes' and 'Yes, but drop the date validator' are both all-clears",
-        "and only one of them is finished. A boolean would lose the difference, which is exactly the",
-        "mistake the rulings file already avoids.",
-        "",
-        "AI PROPOSES, TOM APPROVES, THEN AI WRITES -- never AI writing its own permission. If this",
-        "file is edited in the same session that merges the branch, and Tom's words are not in the",
-        "transcript, the gate has been walked around rather than passed."
-    ],
-    "cleared": {
-        "674-coordinate-entry": {
-            "date": "2026-09-17",
-            "words": "I think this branch can be merged and deleted.",
-            "context": "Said after he tested it, in the same message as his ruling that the Properties box does not need collapsing yet: \"We discussed making Properties collapsible. To be honest, I don't think they are too long (long/numerous enough to need collapsing) yet.\"",
-            "pin_note": "HE CLEARED IT AT bfd05abf AND THE PIN IS ONE COMMIT LATER, WHICH IS STATED RATHER THAN GLOSSED. The extra commit is 690a67c0, which applies HIS OWN three wording edits to lib/lang.ec.en.php -- lpn_coord_off_world, lpn_field_coord_tip and lpn_field_desc_tip -- harvested from the marks he wrote on dev/new-english-keys.md the same day. So the content of the commit he did not see is text he wrote himself. Recorded here because an all-clear is supposed to lapse when the branch moves, and this one was extended by a judgement rather than by him; if that judgement was wrong, the place to catch it is this line.",
-            "head": "690a67c0f6415a1b557236a92c608801384cbcd2"
-        },
-        "feat/time-series-graph": {
-            "head": "c8a929486e459c81840fb523582306064cc56863",
-            "date": "2026-09-18",
-            "words": "Merge and delete",
-            "context": "Said after testing, in the same message as his earlier verdict on the branch: \"This is exciting. Bravo! Well done.\" The two defects he had reported -- the Links selector that could not switch, and Initial quality offered as a node field -- were both fixed before he cleared it. His axis labels, pressure unit and selector-tracking verdicts were confirmed as already right and were not touched."
-        },
-        "feat/library-import": {
-            "head": "825d760e5cb8202f29e8c55a1f2e64eb2ce66225",
-            "date": "2026-09-18",
-            "words": "feat/library-import: Done. Merge and delete.",
-            "context": "Cleared after his second round of testing. His three findings from the first round were all built before he cleared it: undo did not work (the document WAS being restored; the Libraries box was never rebuilt by undo, so it still listed rows that had gone), the wizard was not under File, and nothing said the incoming file's numbers were in different units. His own wording for the units warning was used verbatim, opening with 'Warning' and 'Not recommended', and the per-section buttons were removed so the File menu row is the only door -- which reversed an earlier instruction of his asking for both."
-        },
-        "feat/customer-demands": {
-            "head": "0476f882",
-            "date": "2026-09-18",
-            "words": "feat/customer-demands: Nice. Let's call it done, merge it, and delete it.",
-            "context": "Cleared in the same message as two other branch reports, after he had tested the branch on its preview port. THE COMMIT HE CLEARED IS THE OFFSET ONE and that is the point of the pin: Offset beside Station, in the properties box and in the customers table, was the thing he had asked for TWICE and had twice not been given -- 'I told you to add Offset in properties and tables. Do it.' He cleared the branch in the round after it finally landed. Nothing else was added between his test and this record.",
-            "pin_note": "PINNED TO THE SHORT SHA AS HE CLEARED IT. The branch was 8 commits BEHIND master when he cleared it, and master was deliberately NOT merged into the branch afterwards -- doing so would have moved the head and lapsed his approval for no gain, since the merge into master resolves the same divergence and is the tree the suite actually runs on."
-        },
-        "feat/survey-import": {
-            "head": "f4ef6cdea957cd5353f6b285bd04a78b44e0e1f3",
-            "date": "2026-09-18",
-            "words": "The task is complete. Merge, delete, and close.",
-            "context": "Cleared after three rounds of his testing. His own wording throughout: the short PNEZD-only chooser, the cut format box, 'Create nodes' rather than 'Create junctions', 'specified internally' as text beside a disabled selector rather than inside the option, the asset-type selector first because a node's kind cannot be changed after import, and lower-case hyphenated error codes to match the CSV-validator world rather than the operating-system one. Units detection from a column name was REMOVED on his instruction -- a PNEZD file often has no header at all -- and GPX with it, since no seat had asked for it."
-        },
-        "feat/customer-find-labels": {
-            "head": "8ef7868a5cba567f0a758ce40e32d5e49355f481",
-            "date": "2026-09-21",
-            "words": "feat/customer-find-labels: (1)I think this is done. Merge and delete?",
-            "context": "Said after his own browser pass on port 8098, in the same message as six fresh findings on the tables branch and four on the notice-log branch -- so he was reading closely and this branch is the one he passed. It closes a round in which he had reopened four rows: R-011 (restore the caution glyph), R-013 and R-090 (the Use current view button, which he could not find because pressing it hid the labels), R-051 (the service line), and R-053 (reserve a link label's room so nothing has to dodge one). All five are built. Task 247 -- customers, metered demands lumped to the nearest node -- stays open: the label density rule and Slice 4 are still his call.",
-            "pin_note": "PINNED TO 8ef7868a, WHICH IS ONE COMMIT PAST WHAT HE SAW: the last commit is Perry the pre-reviewer's own journal entry and touches nothing the page renders. The two commits BEFORE it are Perry's findings acted on -- the service line was as heavy as the main at a 1 px link width and heavier below it (the Settings box's min=\"1\" is advice to a spinner and nothing at all to a typed entry, so 0.5 went in), and a drop rate that had been reported as a single favourable seed is now reported as a range over ten. Both landed before his pass, not after."
-        },
-        "feat/xy-world-map": {
-            "head": "765ac3bc21cecec85175e15628746c9dc465ff22",
-            "date": "2026-09-21",
-            "words": "feat/xy-world-map: Why is this branch still present? The task has been closed. Merge, delete, and update?",
-            "context": "Said in his 2026-09-21 list under Branch previews, in the same breath as the same instruction for feat/lock-initials-later and feat/engine-fetch-wait. What he cleared is the map-attach wizard and the georeferencing work. WHAT HE HAS NOT CLEARED, AND MUST NOT BE READ AS CLEARED, IS TASK 703: he still sees white squares after four measured-and-fixed causes, and that task stays OPEN on master after this merge, as do queue rows R-019 and R-056.",
-            "pin_note": "HE CLEARED IT AT 731ab367 AND THE PIN IS FOUR COMMITS LATER, WHICH IS STATED RATHER THAN GLOSSED, because those four are work he has not seen. They are: 5f2b49ab and 2b12b16d, the `?debug=tiles` readout -- an instrument built so HE can diagnose Task 703 himself, invisible to anyone who does not type the switch; 69d9c8ee, a fifth measured cause closed (a tile still hanging on screen under the new view was thrown away and re-fetched on an overshoot-and-correct gesture, with a harness and two killed mutations); and 5ade3041 and 765ac3bc, edits to dev/tom-review-queue.md, one of them deleting R-066 on his own written instruction (*\"If it has been fixed, please delete this.\"*). The judgement made here was that an instrument switched off by default plus one measured defect fix is not a feature he needs to re-clear, and that leaving the branch alive for an open task is the stale-ref problem. If that judgement was wrong, this line is where to catch it."
-        },
-        "feat/engine-fetch-wait": {
-            "head": "e9319a0ad8af40c6f86f2cee2204e80c95afbf96",
-            "date": "2026-09-21",
-            "words": "feat/engine-fetch-wait: Why is this branch still present? Is there something to do? Or merge, delete, and update?",
-            "context": "HIS WORDS ARE A QUESTION WITH TWO BRANCHES AND THE ANSWER TO THE FIRST IS NO, which is why this is recorded as an all-clear rather than glossed as one. He had already closed Task 608 outright on 2026-09-21 -- 'Done, right? Or is there more?' -- after testing the branch himself in a private window throttled to Slow 3G: 'Worked for me. No problems or alerts.' He also ruled all three halves on 2026-09-19: 'Continue working: Worked great. Banner can show always' and 'We must include the unknown in the progress bar. The progress bar can stall at the end if necessary. But it can't disappear prematurely.' Nothing was added to the branch after that ruling. dev/session-handoff.md said this branch had already MERGED and it had not, which is why he found it still on the preview panel.",
-            "pin_note": "PINNED TO THE BRANCH HEAD AS IT STANDS, e9319a0a, which is the commit he tested and ruled on. The merge into master resolved two conflicts, both of them bookkeeping and neither of them code: dev/ROADMAP.md, where master had already DELETED the closed Task 608 block and the branch still carried it (master's deletion kept), and dev/new-english-keys.md, which is a GENERATED file and was regenerated after the merge."
-        },
-        "feat/lock-initials-later": {
-            "head": "1c9aba51aba4f9c31b203dfadb5b671f9c364517",
-            "date": "2026-09-21",
-            "words": "feat/lock-initials-later: Done except for the messenger system, right? Was anything changed that I should review? Merge, delete, and update so that we can move on to the messenger task?",
-            "context": "Said in his 2026-09-21 list under Branch previews, in the same breath as the same instruction for feat/xy-world-map and feat/engine-fetch-wait. His R-004 answer had already ruled the design: 'A name given once for one purpose becomes a standing per-browser label: Confirmed. And we are adding \"Not you? Change this\" opportunities.' The one thing he names as NOT done is the messaging system, which is Task 704 on its own branch.",
-            "pin_note": "HE CLEARED IT AT 37f05c7e AND THE PIN IS ONE COMMIT LATER, STATED RATHER THAN GLOSSED. The extra commit is 1c9aba51 and it changes a CODE COMMENT and nothing else: the comment claimed the initials are 'SENT, never stored', which was a misreading of his own 2026-09-18 ruling that the objection was always to the PROMPT and never to the storage. No shipped behaviour and no string moved. If extending the pin for a comment was the wrong call, this line is where to catch it."
-        },
-        "feat/zoom-symbol-size": {
-            "head": "5c7bbcaf28df2cdabe2712d5e0a013eb4c66bc51",
-            "date": "2026-09-22",
-            "words": "I think this feature works for now and can be closed, merged, and the branch deleted. Good work.",
-            "context": "Said after testing port 8100, in the same message as his peripheral question (now Task 708): \"Show at all zoom levels does not appear for Text in multi-properties. Should we do an audit to ensure that all properties are represented in all venues?\"",
-            "pin_note": "HE TESTED THE LIVE PREVIEW WHILE THE BUILD AGENT WAS STILL FINISHING, so the exact commit he saw is not knowable: the preview serves the worktree as it stands. The pin is the agent's final head, whose only additions after his pass are the harness, the Settings-row wording and the merge of master. Extended by a judgement, not by him; if that judgement was wrong, this line is where to catch it."
-        },
-        "feat/map-menu": {
-            "head": "2cdc639750d160a45987e148b0a72d6d8824b728",
-            "date": "2026-09-22",
-            "words": "feat/map-menu: (1) I believe this is done now. Great decisions and great execution. Merge and delete branch.",
-            "context": "Cleared in his 2026-09-22 message, after his R-126/R-127/R-128 round. In the same breath he asked two questions that do NOT gate the merge and are being answered separately: what the missing 'discard a grid placement' case actually is, and a terminology synchronisation (EPSG, unnamed local georeference, not georeferenced -- lat/lon retired as a label). He also confirmed 'Only three rows left. Zoom to fit, Background image, and World map.'",
-            "pin_note": "Pinned to the branch head as it stood when he cleared it; nothing was committed to the branch after his words."
-        },
-        "feat/tables-spreadsheet": {
-            "head": "17b902028c65c243059c2847b3aa38dcba847d25",
-            "date": "2026-09-23",
-            "words": "feat/tables-spreadsheet\n- Done. Merge and delete branch.",
-            "context": "Said after his pass over the fixes for R-110 (unreasonable column widths), R-161 (the 1px divider misalignment) and R-162 (print not respecting on-screen widths), in the same message as his rulings on feat/zoom-scale-rules, feat/notice-log and Settings undo.",
-            "pin_note": "Pinned to the branch head as it stood when he cleared it; nothing was committed to the branch after his words. The branch was 94 commits behind master and was deliberately not re-merged from master first, which would have moved the head and lapsed the approval."
-        },
-        "feat/notice-log": {
-            "head": "80bc539e649db2042c5d6f4714ee03b08cb3d3bf",
-            "date": "2026-09-23",
-            "words": "feat/notice-log\n- Done. Close, merge, and delete branch.",
-            "context": "Said after his pass over R-175 (the glyph drawn as a plain selector-style down triangle), R-157 (the RIVER text showing through the button, now opaque) and R-160 (no tip), in the same message as his all-clear for feat/zoom-scale-rules and three findings on feat/zoom-control.",
-            "pin_note": "Pinned to the branch head as it stood when he cleared it; nothing was committed to the branch after the R-175 round."
-        },
-        "feat/zoom-scale-rules": {
-            "head": "53ae1a15423b348f3f713c7d6bc9f1c5fe8b0736",
-            "date": "2026-09-23",
-            "words": "feat/zoom-scale-rules\n- Done. Close, merge, and delete branch.",
-            "context": "Said after his pass over R-174 (Show at all zoom levels off by default, on only for the largest text in each example, and present in multi-properties, Tables and Find/Replace), with R-167 to R-170 from the earlier round.",
-            "pin_note": "Pinned to 53ae1a15, one commit past the R-174 build: that commit is the pre-reviewer's journal entry and touches nothing the page renders."
-        },
-        "feat/label-limit": {
-            "head": "4bcf92abc077fad0cb4fc2b7c0fab70aa2dec746",
-            "date": "2026-09-25",
-            "words": "Good. Close, merge, and delete branch.",
-            "context": "Said after his browser pass on the preview port, in his 2026-09-25 message reviewing ten branches.",
-            "pin_note": "Pinned at the head he tested; merged through merge/0925 with master and three other cleared branches, one suite run on the result."
-        },
-        "feat/offscreen-notice": {
-            "head": "291bd4c7a4bec26b5c7fcb1c38588c1e36c42a0a",
-            "date": "2026-09-25",
-            "words": "Good. Close, merge, and delete branch.",
-            "context": "Said after his browser pass on the preview port, in his 2026-09-25 message reviewing ten branches.",
-            "pin_note": "Pinned at the head he tested; merged through merge/0925 with master and three other cleared branches, one suite run on the result."
-        },
-        "feat/select-on-focus": {
-            "head": "11edc1ad1a7bdb1b66aebff7132ffe3f60bbd360",
-            "date": "2026-09-25",
-            "words": "Good. Close, merge, and delete branch.",
-            "context": "Said after his browser pass on the preview port, in his 2026-09-25 message reviewing ten branches.",
-            "pin_note": "Pinned at the head he tested; merged through merge/0925 with master and three other cleared branches, one suite run on the result."
-        },
-        "feat/usage-report": {
-            "head": "5da3e7aefac50bf60f4cafde385d475013ae882d",
-            "date": "2026-09-25",
-            "words": "It doesn't make all my wildest dreams come true. And we probably will need to tweak it later to make it really compelling for me to use. But for now the only thing we can do is deploy it. Close, merge, and delete branch.",
-            "context": "Said after his browser pass on the preview port, in his 2026-09-25 message reviewing ten branches.",
-            "pin_note": "Pinned at the head he tested; merged through merge/0925."
-        },
-        "feat/first-project": {
-            "head": "f6760e1e",
-            "date": "2026-09-25",
-            "words": "feat/first-project: (1) On the gallery welcome, end it \"Or start here\". (2) With that, we can close, merge, and delete the branch. Nice work.",
-            "context": "Said after his browser pass on port 8112, in the same message as his decision \"Street map on at first load: Yes.\"",
-            "pin_note": "HE CLEARED IT AT f775f0a6 ON THE CONDITION OF ONE WORDING CHANGE, AND THE PIN IS THREE COMMITS LATER: a merge of master (d0eef965), his own \"Or start here\" (8aa04872), and CLAUDE.md's third-party line rewritten to match his street-map ruling (f6760e1e). Nothing else changed."
-        },
-        "feat/convert-as": {
-            "head": "1641f58b",
-            "date": "2026-09-26",
-            "words": "Step 1 zoom is good. Image stays with the model on pan. ... Step 2 is good. Satellite is good. Done! Merge and delete.",
-            "context": "Said 2026-09-26 evening after his browser pass on port 8116, the branch's second round (it merged once on 2026-09-25 and was reopened). The same message asked for five follow-ups (backdrop opacity cap, a draggable wizard, EPSG list filtered to the area, the UTM zone from the location, Step 1 opening where the world map already is), which go to feat/placement-wizard rather than holding this merge. Recorded on his explicit approval, the permission guard having refused the edit.",
-            "pin_note": "HE CLEARED IT AT 483da66b AND THE PIN IS LATER: a merge of master (feat/table-editing had just landed; new-english-keys.md regenerated to resolve the conflict) and the regenerated translation payloads, nothing of the branch's own."
-        },
-        "feat/property-venue": {
-            "head": "f76a98e1",
-            "date": "2026-09-25",
-            "words": "(1) I found a curiosity. Edit, Find, Everyting, ID, empty finds Junctions Lake and River. But those IDs are not empty. Fix or put in roadmap. (2) It works! We can close, merge, and delete the branch. Nice work.",
-            "context": "His bullet was headed feat/table-editing, but its content is this branch's Find box, and his other feat/table-editing bullet in the same message says that branch is not ready. Read as property-venue; say so in the report.",
-            "pin_note": "HE CLEARED IT AT b8733c5d AND THE PIN IS LATER: a merge of master, his own rewrite of lpn_find_filter_none, and a harness probe of his Lake/River report, which did not reproduce; that item went back to him (R-260) rather than to the roadmap."
-        },
-        "feat/zoom-control": {
-            "head": "43902998",
-            "date": "2026-09-26",
-            "words": "8103 zoom-control: Merge",
-            "context": "Said 2026-09-26 after his browser pass on the preview panel, in one message that also sent feat/table-editing back for a third round.",
-            "pin_note": "Pinned to the head he tested; merged into master without further commits on the branch."
-        },
-        "feat/customer-node": {
-            "head": "105d9f68",
-            "date": "2026-09-26",
-            "words": "8113 customer-node: Merge. Nice!",
-            "context": "Said 2026-09-26 after his browser pass on the preview panel, in one message that also sent feat/table-editing back for a third round.",
-            "pin_note": "Pinned to the head he tested; merged into master without further commits on the branch."
-        },
-        "feat/menu-button": {
-            "head": "eceab3ab",
-            "date": "2026-09-26",
-            "words": "8114 menu-button: Merge.",
-            "context": "Said 2026-09-26 after his browser pass on the preview panel, in one message that also sent feat/table-editing back for a third round.",
-            "pin_note": "Pinned to the head he tested; merged into master without further commits on the branch."
-        },
-        "feat/report": {
-            "head": "87e15a16",
-            "date": "2026-09-26",
-            "words": "8115 reports: Merge. Very nice. And the file name was good.",
-            "context": "Said 2026-09-26 after his browser pass on the preview panel, in one message that also sent feat/table-editing back for a third round.",
-            "pin_note": "Pinned to the head he tested; merged into master without further commits on the branch."
-        },
-        "feat/table-editing": {
-            "head": "23535175",
-            "date": "2026-09-26",
-            "words": "Corner marks: Good. Selecting: Good. Great! Dragging: Wow. We are gold! Tabbing: Good. Done! Merge and delete.",
-            "context": "Said 2026-09-26 evening after his browser pass on port 8105, in the same message as R-285 (\"Yes. It's perfect. We are gold now.\"). Recorded on his explicit approval, the permission guard having refused the edit.",
-            "pin_note": "HE CLEARED IT AT c28c6f3c AND THE PIN IS LATER: a merge of master and the regenerated translation payloads, nothing of the branch's own."
-        },
-        "feat/placement-wizard": {
-            "head": "56c6e88b6dd83340ffe038e8a717781b46654236",
-            "date": "2026-09-26",
-            "words": "1. (a) Step 1 happily fades my image to 50%. ... 2. OK. 3. OK. 4. OK. Done. Close, merge, and delete branch.",
-            "context": "Said 2026-09-26 night after his browser pass on port 8117, and confirmed when asked whether to record it ('Yes, write both'). His 1(b), the Step 1 initial world view, is R-306 on fix/placement-world-view rather than holding this merge.",
-            "pin_note": "HE CLEARED IT AT a7917752 AND THE PIN IS LATER: the merge of master carrying fix/label-columns, which he asked for in the same message ('Merge this fix into the branches'), and a regenerated dev/new-english-keys.md. Nothing of the branch's own."
-        },
-        "feat/find-coordinate": {
-            "head": "a3688c0ec84886c38bb28cef148678c150a67b13",
-            "date": "2026-09-26",
-            "words": "All good. Close, merge, and delete branch.",
-            "context": "Said 2026-09-26 night after his browser pass on port 8118, and confirmed when asked whether to record it ('Yes, write both').",
-            "pin_note": "HE CLEARED IT AT a75480e0 AND THE PIN IS LATER: the merge of master carrying fix/label-columns, which he asked for in the same message. Nothing of the branch's own."
-        },
-        "feat/row-paste": {
-            "head": "2db90b59",
-            "date": "2026-09-27",
-            "words": "8119 row-paste: OK. Done. Close, merge and delete branch.",
-            "context": "Said 2026-09-27 after his browser pass on port 8119, in the message that also carried his R-315/R-318 decisions.",
-            "pin_note": "HE CLEARED IT AT 56ab0925 AND THE PIN IS LATER: the merge of master (placement-wizard, find-coordinate, R-306), one harness count conflict resolved. Nothing of the branch's own."
-        },
-        "feat/symbology-label": {
-            "head": "78b7ef98",
-            "date": "2026-09-27",
-            "words": "Branch seems good. No new problems.",
-            "context": "Said after his pass on port 8120, answering items 1-3 OK and R-342 with \"Only what depends\". Asked in the same session whether those words were his all-clear to merge and delete, he chose \"Yes, merge and delete\". His two peripheral notes (the mode-button outline after Esc, the vertices format in Tables) went to their own branches, fix/mode-focus and feat/table-width."
-        },
-        "feat/quality-settings": {
-            "head": "24aa4bfa",
-            "date": "2026-09-27",
-            "words": "1. OK. 2. OK. BTW, mouse cursor and selection are perfect. 3. OK.",
-            "context": "His pass on port 8121. Asked in the same session whether to merge and delete, he chose \"Yes, merge and delete\". His peripheral rules (4.1 initial column widths, 4.2 centred ID column) are built on feat/table-width, not here."
-        },
-        "feat/selection-preview": {
-            "head": "25a3cf2a",
-            "date": "2026-09-28",
-            "words": "Select mode highlights: Good. Done. Merge and delete.",
-            "context": "His pass on port 8128 after Perry's READY pre-review (journal 2026-09-28). The branch is one commit; merged with master on the merge commit itself."
-        },
-        "feat/water-tower": {
-            "head": "6541f700",
-            "date": "2026-09-28",
-            "words": "We are gold. Publish it everywhere.",
-            "context": "His answer to round two of the roof shading (dev/icon-preview/roof-shading-2026-09-28b.html): cone-shaded roof, rim seam, catwalk lowered with its underside in shadow. Round one's picks stand: option 3 for About and 192, option 4 with bracing and rivets for 512. 'Everywhere' also went to the librewaternet.org and not-epanet.org favicons the same day; EPANET++ keeps its own E++ mark."
-        },
-        "feat/epanet-plus-plus": {
-            "head": "a2e9fb6c",
-            "date": "2026-09-28",
-            "words": "1. Your word \"release\": Release",
-            "context": "After his look on port 8127 (\"lpn: Good\") and with his host steps done the same message: ea-php83 set, the engcalcs symlink made, the Mapbox token allowing epanet-plus-plus.org. Pinned to a2e9fb6c, the branch after master was merged in for the release; the content he saw is 111b6243 plus master."
-        },
-        "feat/ctrl-enter": {
-            "head": "d6558eb4",
-            "date": "2026-09-28",
-            "words": "your all-clear to merge Ctrl+Enter: Approved.",
-            "context": "His answer to the request for his merge word on port 8123, which had sat unchanged at d6558eb4 since 2026-09-27 with Mary's and Ida's endorsement and Perry's pre-review. Pinned to the head he saw; master is merged in on the merge commit itself."
-        },
-        "feat/table-width": {
-            "head": "7fc48a12",
-            "date": "2026-09-29",
-            "words": "Done. Close, merge, and delete branch",
-            "context": "His message of 2026-09-29, one line per branch: 8134 fix/tables-legend, 8135 feat/selection-set, 8124 feat/table-width, 8131 feat/fill-handle, each 'Done. Close, merge, and delete branch', then 'Let me know when master is ready with all these so I can make a table-editing video.' He tested 8124 through round 3 (KLmax 0.8 with ceil, Vertices (Lat/Lon|Lat/Lon|...))."
-        },
-        "feat/fill-handle": {
-            "head": "76716393",
-            "date": "2026-09-29",
-            "words": "Done. Close, merge, and delete branch",
-            "context": "His message of 2026-09-29, one line per branch: 8134 fix/tables-legend, 8135 feat/selection-set, 8124 feat/table-width, 8131 feat/fill-handle, each 'Done. Close, merge, and delete branch', then 'Let me know when master is ready with all these so I can make a table-editing video.' Earlier, 2026-09-28: 'Pretty amazing. Everything seems to work.'"
-        },
-        "feat/selection-set": {
-            "head": "5fe5c2a7",
-            "date": "2026-09-29",
-            "words": "Done. Close, merge, and delete branch",
-            "context": "His message of 2026-09-29, one line per branch: 8134 fix/tables-legend, 8135 feat/selection-set, 8124 feat/table-width, 8131 feat/fill-handle, each 'Done. Close, merge, and delete branch', then 'Let me know when master is ready with all these so I can make a table-editing video.' He tested it: 'Select from Table is wonderful now.' 'Zoom from Fire flow is good now.'"
-        },
-        "fix/tables-legend": {
-            "head": "001893a9",
-            "date": "2026-09-29",
-            "words": "Done. Close, merge, and delete branch",
-            "context": "His message of 2026-09-29, one line per branch: 8134 fix/tables-legend, 8135 feat/selection-set, 8124 feat/table-width, 8131 feat/fill-handle, each 'Done. Close, merge, and delete branch', then 'Let me know when master is ready with all these so I can make a table-editing video.' Pinned to 001893a9, the branch after fix/table-paste's final commits were merged in (Text/Customer paste he confirmed: 'Text paste works now.')."
-        },
-        "feat/table-tab-keys": {
-            "head": "f61e6538",
-            "date": "2026-09-30",
-            "words": "feat/table-tab-keys, feat/frequency-plot, feat/pane-height",
-            "context": "His pasted list of 2026-09-30 said 'Done. Close, merge, and delete branch.' for feat/table-tab-keys, feat/frequency-plot and feat/pane-height; because a pasted all-clear cannot be recorded, CC asked in the session which of the three may merge now, and he selected all three.",
-            "pin_note": "Pinned one commit past what he tested: CC's merge of master into the branch (no feature change; frequency-plot's two generated-file conflicts taken from master's side). Its new English is translated on a separate sprint branch after the merge."
-        },
-        "feat/frequency-plot": {
-            "head": "cfac3895",
-            "date": "2026-09-30",
-            "words": "feat/table-tab-keys, feat/frequency-plot, feat/pane-height",
-            "context": "His pasted list of 2026-09-30 said 'Done. Close, merge, and delete branch.' for feat/table-tab-keys, feat/frequency-plot and feat/pane-height; because a pasted all-clear cannot be recorded, CC asked in the session which of the three may merge now, and he selected all three.",
-            "pin_note": "Pinned one commit past what he tested: CC's merge of master into the branch (no feature change; frequency-plot's two generated-file conflicts taken from master's side). Its new English is translated on a separate sprint branch after the merge."
-        },
-        "feat/pane-height": {
-            "head": "7913c548",
-            "date": "2026-09-30",
-            "words": "feat/table-tab-keys, feat/frequency-plot, feat/pane-height",
-            "context": "His pasted list of 2026-09-30 said 'Done. Close, merge, and delete branch.' for feat/table-tab-keys, feat/frequency-plot and feat/pane-height; because a pasted all-clear cannot be recorded, CC asked in the session which of the three may merge now, and he selected all three.",
-            "pin_note": "Pinned one commit past what he tested: CC's merge of master into the branch (no feature change; frequency-plot's two generated-file conflicts taken from master's side). Its new English is translated on a separate sprint branch after the merge."
-        },
-        "feat/find-filter": {
-            "head": "df237d47",
-            "date": "2026-09-30",
-            "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
-            "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
-            "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
-        },
-        "feat/scenario-preset": {
-            "head": "b925cd58",
-            "date": "2026-09-30",
-            "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
-            "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
-            "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
-        },
-        "feat/graph-tab-keys": {
-            "head": "d2738ec3",
-            "date": "2026-09-30",
-            "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
-            "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
-            "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
-        },
-        "feat/fireflow-scope": {
-            "head": "6e512d9b",
-            "date": "2026-09-30",
-            "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
-            "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
-            "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
-        },
-        "feat/help-menu": {
-            "head": "c60d660e",
-            "date": "2026-09-30",
-            "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
-            "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
-            "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
-        },
-        "feat/copy-lock": {
-            "head": "5341221933a347f1a456dfdc1e63d2a396b5f7d8",
-            "date": "2026-10-01",
-            "words": "Merge after wording",
-            "context": "His selection in an AskUserQuestion typed in the session, to: 'once I swap in your wording (\"Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.\"), may I merge it without another browser pass?' His paste the same day: \"8146 copy-lock: Wording change per this. This is good.\"",
-            "pin_note": "Pinned to the commit carrying his sentence and its ruling record; master was merged in just before."
-        },
-        "feat/graph-menu": {
-            "head": "ab0c1f869ae7de27c55877bca3269d74e2e7f1a4",
-            "date": "2026-10-03",
-            "words": "Good. Done. Close, merge, and delete branch.",
-            "context": "His browser-pass note, then confirmed in session: Answered \"Yes, merge all\" in this session (2026-10-03) to: \"Should I merge all five to master now and delete them?\"",
-            "pin_note": "Pinned to the head he tested on his preview port; unchanged since."
-        },
-        "feat/drawing-keep": {
-            "head": "73c1e0b37b7909aa2b6f42ab3d38ef639c949fcb",
-            "date": "2026-10-03",
-            "words": "I think you described this branch poorly. It's simply a performance improvement that prevents placement recalc on switching. And it seems to work. Good. Done. Close, merge, and delete branch.",
-            "context": "His browser-pass note, then confirmed in session: Answered \"Yes, merge all\" in this session (2026-10-03) to: \"Should I merge all five to master now and delete them?\"",
-            "pin_note": "Pinned to the head he tested on his preview port; unchanged since."
-        },
-        "feat/property-arrow-key": {
-            "head": "389fd6298ca42ae30a4af05eb18bb18fe79c536f",
-            "date": "2026-10-03",
-            "words": "Very nice!  Close, merge, and delete branch.",
-            "context": "His browser-pass note, then confirmed in session: Answered \"Yes, merge all\" in this session (2026-10-03) to: \"Should I merge all five to master now and delete them?\"",
-            "pin_note": "Pinned to the head he tested on his preview port; unchanged since."
-        },
-        "feat/bentley-interop": {
-            "head": "fadae8269d24de7945146b683b4c65fb5d59affe",
-            "date": "2026-10-03",
-            "words": "Merge, recut branch (Recommended)",
-            "context": "His answer in this session (2026-10-03) to: \"Should I merge it to master now, then cut a fresh long-lived feat/bentley-interop from master for the WaterCAD reading work?\" His browser-pass note: \"The reason I didn't say to merge this branch is that my understanding was that this is a long-term branch for all the bentley-interop things.\"",
-            "pin_note": "Pinned to the head he tested on his preview port; unchanged since."
-        },
-        "feat/label-cache": {
-            "head": "5d5d97270b6712dfadc05009a741e250414b54dc",
-            "date": "2026-10-03",
-            "words": "I am impressed. This is a major efficiency feature. Done. Close, merge, and delete the branch.",
-            "context": "Given in the 2026-10-03 session: his pasted report read \"feat/label-cache: (1) I am impressed. This is a major efficiency feature. Done. Close, merge, and delete the branch.\", and he confirmed it by choosing \"Merge both\" when asked in the session to merge feat/label-cache and feat/theme-token and delete both branches."
-        },
-        "feat/theme-token": {
-            "head": "b4265770d4095f5fb7075a061d0b9b87abf77695",
-            "date": "2026-10-03",
-            "words": "Good. Done. Close, merge, and delete the branch.",
-            "context": "Given in the 2026-10-03 session: his pasted report read \"feat/theme-token: Good. Done. Close, merge, and delete the branch.\", and he confirmed it by choosing \"Merge both\" when asked in the session to merge feat/label-cache and feat/theme-token and delete both branches."
-        },
-        "feat/keyboard-menu": {
-            "head": "51f9f3d357e8e1bf3e09589824cedf574426082a",
-            "date": "2026-10-03",
-            "words": "Merge both. But I need to know this will not keep happening.",
-            "context": "Given in the 2026-10-03 session. His pasted report read \"8112 keyboard-menu: Good. Done. Close, merge, and delete branch.\"; he then chose \"Merge both\" in the session when asked to merge feat/keyboard-menu and feat/calibration and delete both branches.",
-            "pin_note": "Pinned to the merge of master into the head he tested (db228dbd); no other change."
-        },
-        "feat/calibration": {
-            "head": "6010c73f3a8fe650784a5d007f26de9e1f811742",
-            "date": "2026-10-03",
-            "words": "Merge both. But I need to know this will not keep happening.",
-            "context": "Given in the 2026-10-03 session. His pasted report read \"8111 calibration (Task 601): (1) Amazing. Done. Close, merge, and delete branch.\"; he then chose \"Merge both\" in the session when asked to merge feat/keyboard-menu and feat/calibration and delete both branches. His item (2), the Junction column width, is fixed on a separate defect track.",
-            "pin_note": "Pinned to the merge of master into the head he tested (cce72f76); no other change."
-        },
-        "feat/contour": {
-            "head": "4309c1af3ef1b5498bfd5109ca64bf8529934111",
-            "date": "2026-10-03",
-            "words": "Merge contour",
-            "context": "Given in the 2026-10-03 session after his browser pass on 8113 (\"Contours are amazing now. I am excited to pull to prod and make a video of graphs.\"): he chose \"Merge contour\" when asked in the session whether to merge feat/contour once the box looked right, then delete the branch.",
-            "pin_note": "Pinned to the merge of master into 52242784 (the head he cleared) plus the regenerated English keys list; no other change."
-        },
-        "feat/demand-scaling": {
-            "head": "5417935242f3fb2397a87b1e19317c74569b1047",
-            "date": "2026-10-03",
-            "words": "8110 demand-scaling: Good. Done. Close, merge, and delete branch.",
-            "context": "His own message in the late-night 2026-10-03 session, after his browser pass on port 8110. The branch carries feat/criticality (merged into it for the shared Analyze fly-out), which he tested there as one of the three parallel Analyze tools.",
-            "pin_note": "Pinned to the head he tested; master is merged in on master itself, not into the branch."
-        },
-        "feat/flow-balance": {
-            "head": "c31826a451e8f838c36d3a0b3df03439402722f5",
-            "date": "2026-10-03",
-            "words": "8109 flow-balance: Good. Done. Close, merge, and delete branch.",
-            "context": "His own message in the late-night 2026-10-03 session, after his browser pass on port 8109.",
-            "pin_note": "Pinned to the head he tested."
-        }
-    }
+ "_comment": [
+  "TOM'S ALL-CLEARS, one per protected branch, pinned to the commit he cleared.",
+  "",
+  "Keyed and pinned the way dev/english-key-rulings.json is keyed on the exact English text,",
+  "and for the same reason: AN APPROVAL MUST LAPSE BY ITSELF WHEN WHAT WAS APPROVED CHANGES.",
+  "Clear a branch at one commit, push three more, and 'head' no longer matches -- the gate",
+  "closes again without anybody remembering to close it.",
+  "",
+  "WRITE HIS WORDS VERBATIM. 'Yes' and 'Yes, but drop the date validator' are both all-clears",
+  "and only one of them is finished. A boolean would lose the difference, which is exactly the",
+  "mistake the rulings file already avoids.",
+  "",
+  "AI PROPOSES, TOM APPROVES, THEN AI WRITES -- never AI writing its own permission. If this",
+  "file is edited in the same session that merges the branch, and Tom's words are not in the",
+  "transcript, the gate has been walked around rather than passed."
+ ],
+ "cleared": {
+  "674-coordinate-entry": {
+   "date": "2026-09-17",
+   "words": "I think this branch can be merged and deleted.",
+   "context": "Said after he tested it, in the same message as his ruling that the Properties box does not need collapsing yet: \"We discussed making Properties collapsible. To be honest, I don't think they are too long (long/numerous enough to need collapsing) yet.\"",
+   "pin_note": "HE CLEARED IT AT bfd05abf AND THE PIN IS ONE COMMIT LATER, WHICH IS STATED RATHER THAN GLOSSED. The extra commit is 690a67c0, which applies HIS OWN three wording edits to lib/lang.ec.en.php -- lpn_coord_off_world, lpn_field_coord_tip and lpn_field_desc_tip -- harvested from the marks he wrote on dev/new-english-keys.md the same day. So the content of the commit he did not see is text he wrote himself. Recorded here because an all-clear is supposed to lapse when the branch moves, and this one was extended by a judgement rather than by him; if that judgement was wrong, the place to catch it is this line.",
+   "head": "690a67c0f6415a1b557236a92c608801384cbcd2"
+  },
+  "feat/time-series-graph": {
+   "head": "c8a929486e459c81840fb523582306064cc56863",
+   "date": "2026-09-18",
+   "words": "Merge and delete",
+   "context": "Said after testing, in the same message as his earlier verdict on the branch: \"This is exciting. Bravo! Well done.\" The two defects he had reported -- the Links selector that could not switch, and Initial quality offered as a node field -- were both fixed before he cleared it. His axis labels, pressure unit and selector-tracking verdicts were confirmed as already right and were not touched."
+  },
+  "feat/library-import": {
+   "head": "825d760e5cb8202f29e8c55a1f2e64eb2ce66225",
+   "date": "2026-09-18",
+   "words": "feat/library-import: Done. Merge and delete.",
+   "context": "Cleared after his second round of testing. His three findings from the first round were all built before he cleared it: undo did not work (the document WAS being restored; the Libraries box was never rebuilt by undo, so it still listed rows that had gone), the wizard was not under File, and nothing said the incoming file's numbers were in different units. His own wording for the units warning was used verbatim, opening with 'Warning' and 'Not recommended', and the per-section buttons were removed so the File menu row is the only door -- which reversed an earlier instruction of his asking for both."
+  },
+  "feat/customer-demands": {
+   "head": "0476f882",
+   "date": "2026-09-18",
+   "words": "feat/customer-demands: Nice. Let's call it done, merge it, and delete it.",
+   "context": "Cleared in the same message as two other branch reports, after he had tested the branch on its preview port. THE COMMIT HE CLEARED IS THE OFFSET ONE and that is the point of the pin: Offset beside Station, in the properties box and in the customers table, was the thing he had asked for TWICE and had twice not been given -- 'I told you to add Offset in properties and tables. Do it.' He cleared the branch in the round after it finally landed. Nothing else was added between his test and this record.",
+   "pin_note": "PINNED TO THE SHORT SHA AS HE CLEARED IT. The branch was 8 commits BEHIND master when he cleared it, and master was deliberately NOT merged into the branch afterwards -- doing so would have moved the head and lapsed his approval for no gain, since the merge into master resolves the same divergence and is the tree the suite actually runs on."
+  },
+  "feat/survey-import": {
+   "head": "f4ef6cdea957cd5353f6b285bd04a78b44e0e1f3",
+   "date": "2026-09-18",
+   "words": "The task is complete. Merge, delete, and close.",
+   "context": "Cleared after three rounds of his testing. His own wording throughout: the short PNEZD-only chooser, the cut format box, 'Create nodes' rather than 'Create junctions', 'specified internally' as text beside a disabled selector rather than inside the option, the asset-type selector first because a node's kind cannot be changed after import, and lower-case hyphenated error codes to match the CSV-validator world rather than the operating-system one. Units detection from a column name was REMOVED on his instruction -- a PNEZD file often has no header at all -- and GPX with it, since no seat had asked for it."
+  },
+  "feat/customer-find-labels": {
+   "head": "8ef7868a5cba567f0a758ce40e32d5e49355f481",
+   "date": "2026-09-21",
+   "words": "feat/customer-find-labels: (1)I think this is done. Merge and delete?",
+   "context": "Said after his own browser pass on port 8098, in the same message as six fresh findings on the tables branch and four on the notice-log branch -- so he was reading closely and this branch is the one he passed. It closes a round in which he had reopened four rows: R-011 (restore the caution glyph), R-013 and R-090 (the Use current view button, which he could not find because pressing it hid the labels), R-051 (the service line), and R-053 (reserve a link label's room so nothing has to dodge one). All five are built. Task 247 -- customers, metered demands lumped to the nearest node -- stays open: the label density rule and Slice 4 are still his call.",
+   "pin_note": "PINNED TO 8ef7868a, WHICH IS ONE COMMIT PAST WHAT HE SAW: the last commit is Perry the pre-reviewer's own journal entry and touches nothing the page renders. The two commits BEFORE it are Perry's findings acted on -- the service line was as heavy as the main at a 1 px link width and heavier below it (the Settings box's min=\"1\" is advice to a spinner and nothing at all to a typed entry, so 0.5 went in), and a drop rate that had been reported as a single favourable seed is now reported as a range over ten. Both landed before his pass, not after."
+  },
+  "feat/xy-world-map": {
+   "head": "765ac3bc21cecec85175e15628746c9dc465ff22",
+   "date": "2026-09-21",
+   "words": "feat/xy-world-map: Why is this branch still present? The task has been closed. Merge, delete, and update?",
+   "context": "Said in his 2026-09-21 list under Branch previews, in the same breath as the same instruction for feat/lock-initials-later and feat/engine-fetch-wait. What he cleared is the map-attach wizard and the georeferencing work. WHAT HE HAS NOT CLEARED, AND MUST NOT BE READ AS CLEARED, IS TASK 703: he still sees white squares after four measured-and-fixed causes, and that task stays OPEN on master after this merge, as do queue rows R-019 and R-056.",
+   "pin_note": "HE CLEARED IT AT 731ab367 AND THE PIN IS FOUR COMMITS LATER, WHICH IS STATED RATHER THAN GLOSSED, because those four are work he has not seen. They are: 5f2b49ab and 2b12b16d, the `?debug=tiles` readout -- an instrument built so HE can diagnose Task 703 himself, invisible to anyone who does not type the switch; 69d9c8ee, a fifth measured cause closed (a tile still hanging on screen under the new view was thrown away and re-fetched on an overshoot-and-correct gesture, with a harness and two killed mutations); and 5ade3041 and 765ac3bc, edits to dev/tom-review-queue.md, one of them deleting R-066 on his own written instruction (*\"If it has been fixed, please delete this.\"*). The judgement made here was that an instrument switched off by default plus one measured defect fix is not a feature he needs to re-clear, and that leaving the branch alive for an open task is the stale-ref problem. If that judgement was wrong, this line is where to catch it."
+  },
+  "feat/engine-fetch-wait": {
+   "head": "e9319a0ad8af40c6f86f2cee2204e80c95afbf96",
+   "date": "2026-09-21",
+   "words": "feat/engine-fetch-wait: Why is this branch still present? Is there something to do? Or merge, delete, and update?",
+   "context": "HIS WORDS ARE A QUESTION WITH TWO BRANCHES AND THE ANSWER TO THE FIRST IS NO, which is why this is recorded as an all-clear rather than glossed as one. He had already closed Task 608 outright on 2026-09-21 -- 'Done, right? Or is there more?' -- after testing the branch himself in a private window throttled to Slow 3G: 'Worked for me. No problems or alerts.' He also ruled all three halves on 2026-09-19: 'Continue working: Worked great. Banner can show always' and 'We must include the unknown in the progress bar. The progress bar can stall at the end if necessary. But it can't disappear prematurely.' Nothing was added to the branch after that ruling. dev/session-handoff.md said this branch had already MERGED and it had not, which is why he found it still on the preview panel.",
+   "pin_note": "PINNED TO THE BRANCH HEAD AS IT STANDS, e9319a0a, which is the commit he tested and ruled on. The merge into master resolved two conflicts, both of them bookkeeping and neither of them code: dev/ROADMAP.md, where master had already DELETED the closed Task 608 block and the branch still carried it (master's deletion kept), and dev/new-english-keys.md, which is a GENERATED file and was regenerated after the merge."
+  },
+  "feat/lock-initials-later": {
+   "head": "1c9aba51aba4f9c31b203dfadb5b671f9c364517",
+   "date": "2026-09-21",
+   "words": "feat/lock-initials-later: Done except for the messenger system, right? Was anything changed that I should review? Merge, delete, and update so that we can move on to the messenger task?",
+   "context": "Said in his 2026-09-21 list under Branch previews, in the same breath as the same instruction for feat/xy-world-map and feat/engine-fetch-wait. His R-004 answer had already ruled the design: 'A name given once for one purpose becomes a standing per-browser label: Confirmed. And we are adding \"Not you? Change this\" opportunities.' The one thing he names as NOT done is the messaging system, which is Task 704 on its own branch.",
+   "pin_note": "HE CLEARED IT AT 37f05c7e AND THE PIN IS ONE COMMIT LATER, STATED RATHER THAN GLOSSED. The extra commit is 1c9aba51 and it changes a CODE COMMENT and nothing else: the comment claimed the initials are 'SENT, never stored', which was a misreading of his own 2026-09-18 ruling that the objection was always to the PROMPT and never to the storage. No shipped behaviour and no string moved. If extending the pin for a comment was the wrong call, this line is where to catch it."
+  },
+  "feat/zoom-symbol-size": {
+   "head": "5c7bbcaf28df2cdabe2712d5e0a013eb4c66bc51",
+   "date": "2026-09-22",
+   "words": "I think this feature works for now and can be closed, merged, and the branch deleted. Good work.",
+   "context": "Said after testing port 8100, in the same message as his peripheral question (now Task 708): \"Show at all zoom levels does not appear for Text in multi-properties. Should we do an audit to ensure that all properties are represented in all venues?\"",
+   "pin_note": "HE TESTED THE LIVE PREVIEW WHILE THE BUILD AGENT WAS STILL FINISHING, so the exact commit he saw is not knowable: the preview serves the worktree as it stands. The pin is the agent's final head, whose only additions after his pass are the harness, the Settings-row wording and the merge of master. Extended by a judgement, not by him; if that judgement was wrong, this line is where to catch it."
+  },
+  "feat/map-menu": {
+   "head": "2cdc639750d160a45987e148b0a72d6d8824b728",
+   "date": "2026-09-22",
+   "words": "feat/map-menu: (1) I believe this is done now. Great decisions and great execution. Merge and delete branch.",
+   "context": "Cleared in his 2026-09-22 message, after his R-126/R-127/R-128 round. In the same breath he asked two questions that do NOT gate the merge and are being answered separately: what the missing 'discard a grid placement' case actually is, and a terminology synchronisation (EPSG, unnamed local georeference, not georeferenced -- lat/lon retired as a label). He also confirmed 'Only three rows left. Zoom to fit, Background image, and World map.'",
+   "pin_note": "Pinned to the branch head as it stood when he cleared it; nothing was committed to the branch after his words."
+  },
+  "feat/tables-spreadsheet": {
+   "head": "17b902028c65c243059c2847b3aa38dcba847d25",
+   "date": "2026-09-23",
+   "words": "feat/tables-spreadsheet\n- Done. Merge and delete branch.",
+   "context": "Said after his pass over the fixes for R-110 (unreasonable column widths), R-161 (the 1px divider misalignment) and R-162 (print not respecting on-screen widths), in the same message as his rulings on feat/zoom-scale-rules, feat/notice-log and Settings undo.",
+   "pin_note": "Pinned to the branch head as it stood when he cleared it; nothing was committed to the branch after his words. The branch was 94 commits behind master and was deliberately not re-merged from master first, which would have moved the head and lapsed the approval."
+  },
+  "feat/notice-log": {
+   "head": "80bc539e649db2042c5d6f4714ee03b08cb3d3bf",
+   "date": "2026-09-23",
+   "words": "feat/notice-log\n- Done. Close, merge, and delete branch.",
+   "context": "Said after his pass over R-175 (the glyph drawn as a plain selector-style down triangle), R-157 (the RIVER text showing through the button, now opaque) and R-160 (no tip), in the same message as his all-clear for feat/zoom-scale-rules and three findings on feat/zoom-control.",
+   "pin_note": "Pinned to the branch head as it stood when he cleared it; nothing was committed to the branch after the R-175 round."
+  },
+  "feat/zoom-scale-rules": {
+   "head": "53ae1a15423b348f3f713c7d6bc9f1c5fe8b0736",
+   "date": "2026-09-23",
+   "words": "feat/zoom-scale-rules\n- Done. Close, merge, and delete branch.",
+   "context": "Said after his pass over R-174 (Show at all zoom levels off by default, on only for the largest text in each example, and present in multi-properties, Tables and Find/Replace), with R-167 to R-170 from the earlier round.",
+   "pin_note": "Pinned to 53ae1a15, one commit past the R-174 build: that commit is the pre-reviewer's journal entry and touches nothing the page renders."
+  },
+  "feat/label-limit": {
+   "head": "4bcf92abc077fad0cb4fc2b7c0fab70aa2dec746",
+   "date": "2026-09-25",
+   "words": "Good. Close, merge, and delete branch.",
+   "context": "Said after his browser pass on the preview port, in his 2026-09-25 message reviewing ten branches.",
+   "pin_note": "Pinned at the head he tested; merged through merge/0925 with master and three other cleared branches, one suite run on the result."
+  },
+  "feat/offscreen-notice": {
+   "head": "291bd4c7a4bec26b5c7fcb1c38588c1e36c42a0a",
+   "date": "2026-09-25",
+   "words": "Good. Close, merge, and delete branch.",
+   "context": "Said after his browser pass on the preview port, in his 2026-09-25 message reviewing ten branches.",
+   "pin_note": "Pinned at the head he tested; merged through merge/0925 with master and three other cleared branches, one suite run on the result."
+  },
+  "feat/select-on-focus": {
+   "head": "11edc1ad1a7bdb1b66aebff7132ffe3f60bbd360",
+   "date": "2026-09-25",
+   "words": "Good. Close, merge, and delete branch.",
+   "context": "Said after his browser pass on the preview port, in his 2026-09-25 message reviewing ten branches.",
+   "pin_note": "Pinned at the head he tested; merged through merge/0925 with master and three other cleared branches, one suite run on the result."
+  },
+  "feat/usage-report": {
+   "head": "5da3e7aefac50bf60f4cafde385d475013ae882d",
+   "date": "2026-09-25",
+   "words": "It doesn't make all my wildest dreams come true. And we probably will need to tweak it later to make it really compelling for me to use. But for now the only thing we can do is deploy it. Close, merge, and delete branch.",
+   "context": "Said after his browser pass on the preview port, in his 2026-09-25 message reviewing ten branches.",
+   "pin_note": "Pinned at the head he tested; merged through merge/0925."
+  },
+  "feat/first-project": {
+   "head": "f6760e1e",
+   "date": "2026-09-25",
+   "words": "feat/first-project: (1) On the gallery welcome, end it \"Or start here\". (2) With that, we can close, merge, and delete the branch. Nice work.",
+   "context": "Said after his browser pass on port 8112, in the same message as his decision \"Street map on at first load: Yes.\"",
+   "pin_note": "HE CLEARED IT AT f775f0a6 ON THE CONDITION OF ONE WORDING CHANGE, AND THE PIN IS THREE COMMITS LATER: a merge of master (d0eef965), his own \"Or start here\" (8aa04872), and CLAUDE.md's third-party line rewritten to match his street-map ruling (f6760e1e). Nothing else changed."
+  },
+  "feat/convert-as": {
+   "head": "1641f58b",
+   "date": "2026-09-26",
+   "words": "Step 1 zoom is good. Image stays with the model on pan. ... Step 2 is good. Satellite is good. Done! Merge and delete.",
+   "context": "Said 2026-09-26 evening after his browser pass on port 8116, the branch's second round (it merged once on 2026-09-25 and was reopened). The same message asked for five follow-ups (backdrop opacity cap, a draggable wizard, EPSG list filtered to the area, the UTM zone from the location, Step 1 opening where the world map already is), which go to feat/placement-wizard rather than holding this merge. Recorded on his explicit approval, the permission guard having refused the edit.",
+   "pin_note": "HE CLEARED IT AT 483da66b AND THE PIN IS LATER: a merge of master (feat/table-editing had just landed; new-english-keys.md regenerated to resolve the conflict) and the regenerated translation payloads, nothing of the branch's own."
+  },
+  "feat/property-venue": {
+   "head": "f76a98e1",
+   "date": "2026-09-25",
+   "words": "(1) I found a curiosity. Edit, Find, Everyting, ID, empty finds Junctions Lake and River. But those IDs are not empty. Fix or put in roadmap. (2) It works! We can close, merge, and delete the branch. Nice work.",
+   "context": "His bullet was headed feat/table-editing, but its content is this branch's Find box, and his other feat/table-editing bullet in the same message says that branch is not ready. Read as property-venue; say so in the report.",
+   "pin_note": "HE CLEARED IT AT b8733c5d AND THE PIN IS LATER: a merge of master, his own rewrite of lpn_find_filter_none, and a harness probe of his Lake/River report, which did not reproduce; that item went back to him (R-260) rather than to the roadmap."
+  },
+  "feat/zoom-control": {
+   "head": "43902998",
+   "date": "2026-09-26",
+   "words": "8103 zoom-control: Merge",
+   "context": "Said 2026-09-26 after his browser pass on the preview panel, in one message that also sent feat/table-editing back for a third round.",
+   "pin_note": "Pinned to the head he tested; merged into master without further commits on the branch."
+  },
+  "feat/customer-node": {
+   "head": "105d9f68",
+   "date": "2026-09-26",
+   "words": "8113 customer-node: Merge. Nice!",
+   "context": "Said 2026-09-26 after his browser pass on the preview panel, in one message that also sent feat/table-editing back for a third round.",
+   "pin_note": "Pinned to the head he tested; merged into master without further commits on the branch."
+  },
+  "feat/menu-button": {
+   "head": "eceab3ab",
+   "date": "2026-09-26",
+   "words": "8114 menu-button: Merge.",
+   "context": "Said 2026-09-26 after his browser pass on the preview panel, in one message that also sent feat/table-editing back for a third round.",
+   "pin_note": "Pinned to the head he tested; merged into master without further commits on the branch."
+  },
+  "feat/report": {
+   "head": "87e15a16",
+   "date": "2026-09-26",
+   "words": "8115 reports: Merge. Very nice. And the file name was good.",
+   "context": "Said 2026-09-26 after his browser pass on the preview panel, in one message that also sent feat/table-editing back for a third round.",
+   "pin_note": "Pinned to the head he tested; merged into master without further commits on the branch."
+  },
+  "feat/table-editing": {
+   "head": "23535175",
+   "date": "2026-09-26",
+   "words": "Corner marks: Good. Selecting: Good. Great! Dragging: Wow. We are gold! Tabbing: Good. Done! Merge and delete.",
+   "context": "Said 2026-09-26 evening after his browser pass on port 8105, in the same message as R-285 (\"Yes. It's perfect. We are gold now.\"). Recorded on his explicit approval, the permission guard having refused the edit.",
+   "pin_note": "HE CLEARED IT AT c28c6f3c AND THE PIN IS LATER: a merge of master and the regenerated translation payloads, nothing of the branch's own."
+  },
+  "feat/placement-wizard": {
+   "head": "56c6e88b6dd83340ffe038e8a717781b46654236",
+   "date": "2026-09-26",
+   "words": "1. (a) Step 1 happily fades my image to 50%. ... 2. OK. 3. OK. 4. OK. Done. Close, merge, and delete branch.",
+   "context": "Said 2026-09-26 night after his browser pass on port 8117, and confirmed when asked whether to record it ('Yes, write both'). His 1(b), the Step 1 initial world view, is R-306 on fix/placement-world-view rather than holding this merge.",
+   "pin_note": "HE CLEARED IT AT a7917752 AND THE PIN IS LATER: the merge of master carrying fix/label-columns, which he asked for in the same message ('Merge this fix into the branches'), and a regenerated dev/new-english-keys.md. Nothing of the branch's own."
+  },
+  "feat/find-coordinate": {
+   "head": "a3688c0ec84886c38bb28cef148678c150a67b13",
+   "date": "2026-09-26",
+   "words": "All good. Close, merge, and delete branch.",
+   "context": "Said 2026-09-26 night after his browser pass on port 8118, and confirmed when asked whether to record it ('Yes, write both').",
+   "pin_note": "HE CLEARED IT AT a75480e0 AND THE PIN IS LATER: the merge of master carrying fix/label-columns, which he asked for in the same message. Nothing of the branch's own."
+  },
+  "feat/row-paste": {
+   "head": "2db90b59",
+   "date": "2026-09-27",
+   "words": "8119 row-paste: OK. Done. Close, merge and delete branch.",
+   "context": "Said 2026-09-27 after his browser pass on port 8119, in the message that also carried his R-315/R-318 decisions.",
+   "pin_note": "HE CLEARED IT AT 56ab0925 AND THE PIN IS LATER: the merge of master (placement-wizard, find-coordinate, R-306), one harness count conflict resolved. Nothing of the branch's own."
+  },
+  "feat/symbology-label": {
+   "head": "78b7ef98",
+   "date": "2026-09-27",
+   "words": "Branch seems good. No new problems.",
+   "context": "Said after his pass on port 8120, answering items 1-3 OK and R-342 with \"Only what depends\". Asked in the same session whether those words were his all-clear to merge and delete, he chose \"Yes, merge and delete\". His two peripheral notes (the mode-button outline after Esc, the vertices format in Tables) went to their own branches, fix/mode-focus and feat/table-width."
+  },
+  "feat/quality-settings": {
+   "head": "24aa4bfa",
+   "date": "2026-09-27",
+   "words": "1. OK. 2. OK. BTW, mouse cursor and selection are perfect. 3. OK.",
+   "context": "His pass on port 8121. Asked in the same session whether to merge and delete, he chose \"Yes, merge and delete\". His peripheral rules (4.1 initial column widths, 4.2 centred ID column) are built on feat/table-width, not here."
+  },
+  "feat/selection-preview": {
+   "head": "25a3cf2a",
+   "date": "2026-09-28",
+   "words": "Select mode highlights: Good. Done. Merge and delete.",
+   "context": "His pass on port 8128 after Perry's READY pre-review (journal 2026-09-28). The branch is one commit; merged with master on the merge commit itself."
+  },
+  "feat/water-tower": {
+   "head": "6541f700",
+   "date": "2026-09-28",
+   "words": "We are gold. Publish it everywhere.",
+   "context": "His answer to round two of the roof shading (dev/icon-preview/roof-shading-2026-09-28b.html): cone-shaded roof, rim seam, catwalk lowered with its underside in shadow. Round one's picks stand: option 3 for About and 192, option 4 with bracing and rivets for 512. 'Everywhere' also went to the librewaternet.org and not-epanet.org favicons the same day; EPANET++ keeps its own E++ mark."
+  },
+  "feat/epanet-plus-plus": {
+   "head": "a2e9fb6c",
+   "date": "2026-09-28",
+   "words": "1. Your word \"release\": Release",
+   "context": "After his look on port 8127 (\"lpn: Good\") and with his host steps done the same message: ea-php83 set, the engcalcs symlink made, the Mapbox token allowing epanet-plus-plus.org. Pinned to a2e9fb6c, the branch after master was merged in for the release; the content he saw is 111b6243 plus master."
+  },
+  "feat/ctrl-enter": {
+   "head": "d6558eb4",
+   "date": "2026-09-28",
+   "words": "your all-clear to merge Ctrl+Enter: Approved.",
+   "context": "His answer to the request for his merge word on port 8123, which had sat unchanged at d6558eb4 since 2026-09-27 with Mary's and Ida's endorsement and Perry's pre-review. Pinned to the head he saw; master is merged in on the merge commit itself."
+  },
+  "feat/table-width": {
+   "head": "7fc48a12",
+   "date": "2026-09-29",
+   "words": "Done. Close, merge, and delete branch",
+   "context": "His message of 2026-09-29, one line per branch: 8134 fix/tables-legend, 8135 feat/selection-set, 8124 feat/table-width, 8131 feat/fill-handle, each 'Done. Close, merge, and delete branch', then 'Let me know when master is ready with all these so I can make a table-editing video.' He tested 8124 through round 3 (KLmax 0.8 with ceil, Vertices (Lat/Lon|Lat/Lon|...))."
+  },
+  "feat/fill-handle": {
+   "head": "76716393",
+   "date": "2026-09-29",
+   "words": "Done. Close, merge, and delete branch",
+   "context": "His message of 2026-09-29, one line per branch: 8134 fix/tables-legend, 8135 feat/selection-set, 8124 feat/table-width, 8131 feat/fill-handle, each 'Done. Close, merge, and delete branch', then 'Let me know when master is ready with all these so I can make a table-editing video.' Earlier, 2026-09-28: 'Pretty amazing. Everything seems to work.'"
+  },
+  "feat/selection-set": {
+   "head": "5fe5c2a7",
+   "date": "2026-09-29",
+   "words": "Done. Close, merge, and delete branch",
+   "context": "His message of 2026-09-29, one line per branch: 8134 fix/tables-legend, 8135 feat/selection-set, 8124 feat/table-width, 8131 feat/fill-handle, each 'Done. Close, merge, and delete branch', then 'Let me know when master is ready with all these so I can make a table-editing video.' He tested it: 'Select from Table is wonderful now.' 'Zoom from Fire flow is good now.'"
+  },
+  "fix/tables-legend": {
+   "head": "001893a9",
+   "date": "2026-09-29",
+   "words": "Done. Close, merge, and delete branch",
+   "context": "His message of 2026-09-29, one line per branch: 8134 fix/tables-legend, 8135 feat/selection-set, 8124 feat/table-width, 8131 feat/fill-handle, each 'Done. Close, merge, and delete branch', then 'Let me know when master is ready with all these so I can make a table-editing video.' Pinned to 001893a9, the branch after fix/table-paste's final commits were merged in (Text/Customer paste he confirmed: 'Text paste works now.')."
+  },
+  "feat/table-tab-keys": {
+   "head": "f61e6538",
+   "date": "2026-09-30",
+   "words": "feat/table-tab-keys, feat/frequency-plot, feat/pane-height",
+   "context": "His pasted list of 2026-09-30 said 'Done. Close, merge, and delete branch.' for feat/table-tab-keys, feat/frequency-plot and feat/pane-height; because a pasted all-clear cannot be recorded, CC asked in the session which of the three may merge now, and he selected all three.",
+   "pin_note": "Pinned one commit past what he tested: CC's merge of master into the branch (no feature change; frequency-plot's two generated-file conflicts taken from master's side). Its new English is translated on a separate sprint branch after the merge."
+  },
+  "feat/frequency-plot": {
+   "head": "cfac3895",
+   "date": "2026-09-30",
+   "words": "feat/table-tab-keys, feat/frequency-plot, feat/pane-height",
+   "context": "His pasted list of 2026-09-30 said 'Done. Close, merge, and delete branch.' for feat/table-tab-keys, feat/frequency-plot and feat/pane-height; because a pasted all-clear cannot be recorded, CC asked in the session which of the three may merge now, and he selected all three.",
+   "pin_note": "Pinned one commit past what he tested: CC's merge of master into the branch (no feature change; frequency-plot's two generated-file conflicts taken from master's side). Its new English is translated on a separate sprint branch after the merge."
+  },
+  "feat/pane-height": {
+   "head": "7913c548",
+   "date": "2026-09-30",
+   "words": "feat/table-tab-keys, feat/frequency-plot, feat/pane-height",
+   "context": "His pasted list of 2026-09-30 said 'Done. Close, merge, and delete branch.' for feat/table-tab-keys, feat/frequency-plot and feat/pane-height; because a pasted all-clear cannot be recorded, CC asked in the session which of the three may merge now, and he selected all three.",
+   "pin_note": "Pinned one commit past what he tested: CC's merge of master into the branch (no feature change; frequency-plot's two generated-file conflicts taken from master's side). Its new English is translated on a separate sprint branch after the merge."
+  },
+  "feat/find-filter": {
+   "head": "df237d47",
+   "date": "2026-09-30",
+   "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
+   "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
+   "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
+  },
+  "feat/scenario-preset": {
+   "head": "b925cd58",
+   "date": "2026-09-30",
+   "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
+   "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
+   "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
+  },
+  "feat/graph-tab-keys": {
+   "head": "d2738ec3",
+   "date": "2026-09-30",
+   "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
+   "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
+   "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
+  },
+  "feat/fireflow-scope": {
+   "head": "6e512d9b",
+   "date": "2026-09-30",
+   "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
+   "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
+   "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
+  },
+  "feat/help-menu": {
+   "head": "c60d660e",
+   "date": "2026-09-30",
+   "words": "feat/find-filter, feat/scenario-preset, feat/graph-tab-keys, feat/fireflow-scope + feat/help-menu",
+   "context": "His pasted list of 2026-09-30 (evening) said \"Good. Done. Close, merge, and delete.\" for each; because a pasted all-clear cannot be recorded, CC asked in the session and he selected all five.",
+   "pin_note": "Pinned one merge past what he tested: CC merged master (8449b604) into the branch; generated files taken from master and regenerated. help-menu also repointed lpn_file_close to lpn_close after master retired it. Its new English is translated on a sprint branch after the merge."
+  },
+  "feat/copy-lock": {
+   "head": "5341221933a347f1a456dfdc1e63d2a396b5f7d8",
+   "date": "2026-10-01",
+   "words": "Merge after wording",
+   "context": "His selection in an AskUserQuestion typed in the session, to: 'once I swap in your wording (\"Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.\"), may I merge it without another browser pass?' His paste the same day: \"8146 copy-lock: Wording change per this. This is good.\"",
+   "pin_note": "Pinned to the commit carrying his sentence and its ruling record; master was merged in just before."
+  },
+  "feat/graph-menu": {
+   "head": "ab0c1f869ae7de27c55877bca3269d74e2e7f1a4",
+   "date": "2026-10-03",
+   "words": "Good. Done. Close, merge, and delete branch.",
+   "context": "His browser-pass note, then confirmed in session: Answered \"Yes, merge all\" in this session (2026-10-03) to: \"Should I merge all five to master now and delete them?\"",
+   "pin_note": "Pinned to the head he tested on his preview port; unchanged since."
+  },
+  "feat/drawing-keep": {
+   "head": "73c1e0b37b7909aa2b6f42ab3d38ef639c949fcb",
+   "date": "2026-10-03",
+   "words": "I think you described this branch poorly. It's simply a performance improvement that prevents placement recalc on switching. And it seems to work. Good. Done. Close, merge, and delete branch.",
+   "context": "His browser-pass note, then confirmed in session: Answered \"Yes, merge all\" in this session (2026-10-03) to: \"Should I merge all five to master now and delete them?\"",
+   "pin_note": "Pinned to the head he tested on his preview port; unchanged since."
+  },
+  "feat/property-arrow-key": {
+   "head": "389fd6298ca42ae30a4af05eb18bb18fe79c536f",
+   "date": "2026-10-03",
+   "words": "Very nice!  Close, merge, and delete branch.",
+   "context": "His browser-pass note, then confirmed in session: Answered \"Yes, merge all\" in this session (2026-10-03) to: \"Should I merge all five to master now and delete them?\"",
+   "pin_note": "Pinned to the head he tested on his preview port; unchanged since."
+  },
+  "feat/bentley-interop": {
+   "head": "fadae8269d24de7945146b683b4c65fb5d59affe",
+   "date": "2026-10-03",
+   "words": "Merge, recut branch (Recommended)",
+   "context": "His answer in this session (2026-10-03) to: \"Should I merge it to master now, then cut a fresh long-lived feat/bentley-interop from master for the WaterCAD reading work?\" His browser-pass note: \"The reason I didn't say to merge this branch is that my understanding was that this is a long-term branch for all the bentley-interop things.\"",
+   "pin_note": "Pinned to the head he tested on his preview port; unchanged since."
+  },
+  "feat/label-cache": {
+   "head": "5d5d97270b6712dfadc05009a741e250414b54dc",
+   "date": "2026-10-03",
+   "words": "I am impressed. This is a major efficiency feature. Done. Close, merge, and delete the branch.",
+   "context": "Given in the 2026-10-03 session: his pasted report read \"feat/label-cache: (1) I am impressed. This is a major efficiency feature. Done. Close, merge, and delete the branch.\", and he confirmed it by choosing \"Merge both\" when asked in the session to merge feat/label-cache and feat/theme-token and delete both branches."
+  },
+  "feat/theme-token": {
+   "head": "b4265770d4095f5fb7075a061d0b9b87abf77695",
+   "date": "2026-10-03",
+   "words": "Good. Done. Close, merge, and delete the branch.",
+   "context": "Given in the 2026-10-03 session: his pasted report read \"feat/theme-token: Good. Done. Close, merge, and delete the branch.\", and he confirmed it by choosing \"Merge both\" when asked in the session to merge feat/label-cache and feat/theme-token and delete both branches."
+  },
+  "feat/keyboard-menu": {
+   "head": "51f9f3d357e8e1bf3e09589824cedf574426082a",
+   "date": "2026-10-03",
+   "words": "Merge both. But I need to know this will not keep happening.",
+   "context": "Given in the 2026-10-03 session. His pasted report read \"8112 keyboard-menu: Good. Done. Close, merge, and delete branch.\"; he then chose \"Merge both\" in the session when asked to merge feat/keyboard-menu and feat/calibration and delete both branches.",
+   "pin_note": "Pinned to the merge of master into the head he tested (db228dbd); no other change."
+  },
+  "feat/calibration": {
+   "head": "6010c73f3a8fe650784a5d007f26de9e1f811742",
+   "date": "2026-10-03",
+   "words": "Merge both. But I need to know this will not keep happening.",
+   "context": "Given in the 2026-10-03 session. His pasted report read \"8111 calibration (Task 601): (1) Amazing. Done. Close, merge, and delete branch.\"; he then chose \"Merge both\" in the session when asked to merge feat/keyboard-menu and feat/calibration and delete both branches. His item (2), the Junction column width, is fixed on a separate defect track.",
+   "pin_note": "Pinned to the merge of master into the head he tested (cce72f76); no other change."
+  },
+  "feat/contour": {
+   "head": "4309c1af3ef1b5498bfd5109ca64bf8529934111",
+   "date": "2026-10-03",
+   "words": "Merge contour",
+   "context": "Given in the 2026-10-03 session after his browser pass on 8113 (\"Contours are amazing now. I am excited to pull to prod and make a video of graphs.\"): he chose \"Merge contour\" when asked in the session whether to merge feat/contour once the box looked right, then delete the branch.",
+   "pin_note": "Pinned to the merge of master into 52242784 (the head he cleared) plus the regenerated English keys list; no other change."
+  },
+  "feat/demand-scaling": {
+   "head": "5417935242f3fb2397a87b1e19317c74569b1047",
+   "date": "2026-10-03",
+   "words": "8110 demand-scaling: Good. Done. Close, merge, and delete branch.",
+   "context": "His own message in the late-night 2026-10-03 session, after his browser pass on port 8110. The branch carries feat/criticality (merged into it for the shared Analyze fly-out), which he tested there as one of the three parallel Analyze tools.",
+   "pin_note": "Pinned to the head he tested; master is merged in on master itself, not into the branch."
+  },
+  "feat/flow-balance": {
+   "head": "c31826a451e8f838c36d3a0b3df03439402722f5",
+   "date": "2026-10-03",
+   "words": "8109 flow-balance: Good. Done. Close, merge, and delete branch.",
+   "context": "His own message in the late-night 2026-10-03 session, after his browser pass on port 8109.",
+   "pin_note": "Pinned to the head he tested."
+  },
+  "feat/property-graph": {
+   "head": "0c8d159be70812d14a5f62348c62eb42c56b9590",
+   "date": "2026-10-04",
+   "words": "property-graph (8106): Done. Close, merge, and delete branch.",
+   "context": "His own pasted message, 2026-10-04 morning session, after his browser pass on port 8106.",
+   "pin_note": "He tested 3c987393. The pin is two commits later: a merge of master into the branch and the regeneration of new-english-keys.md and the translation payloads, no feature change."
+  }
+ }
 }
