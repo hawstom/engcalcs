@@ -22,8 +22,9 @@ exports.title = '3. The File menu';
 // dev/session-handoff.md §4 records as having cost three harnesses. What this spec is actually
 // about is WHICH ROWS ARE THERE AND IN WHAT ORDER, so it asserts the keys' own values, resolved
 // from the page at run time.
-const EXPECTED_KEYS = ['lpn_file_new', 'lpn_file_open', 'lpn_examples_menu', 'lpn_file_import_survey',
-	'lpn_file_import_inp', 'lpn_file_export_inp', 'lpn_library_import',
+// The three import rows are one fly-out row, "Import…" (Task 718, e6c05a1b, 2026-09-29).
+const EXPECTED_KEYS = ['lpn_file_new', 'lpn_file_open', 'lpn_examples_menu', 'lpn_file_import_menu',
+	'lpn_file_export_inp',
 	'lpn_file_save', 'lpn_file_saveas', 'lpn_file_convert_as', 'lpn_file_saveall', 'lpn_file_revert',
 	'lpn_close'];
 

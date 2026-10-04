@@ -54,7 +54,7 @@
   "identity_keys_extra": ["mi_menu", "mtc_menu", "wi_menu"],
 
   "calculator_prefixes": [
-    "bpn", "cs", "dw", "hw", "ip", "irr", "lpn", "mhp", "mi", "mpf",
+    "bpn", "cs", "dw", "hw", "ip", "lpn", "mhp", "mi", "mpf",
     "mphl", "mtc", "odt", "or", "rc", "wi", "ws"
   ],
 

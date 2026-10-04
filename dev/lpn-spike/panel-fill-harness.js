@@ -152,13 +152,25 @@ console.log('\n--- one seam decides how a standing box opens (rule 2) ---');
 		// The Notes box (Tom, 2026-09-28): it left VIEW_POPOVERS for the standing-box shell and is
 		// now draggable and resizeable like the boxes above it, so a phone wants the same fill.
 		['openNotesBox', 'the Notes box'],
+		// Criticality analysis (Tom, 2026-09-30): fire flow's sibling on the same shell, with a
+		// report table, so a phone wants the whole window for it as it does for fire flow's.
+		['openCriticalityBox', 'Criticality analysis'],
 		// The Alternatives table (dev/scenario-alternatives.md): one row per scenario and nine
 		// category columns, the widest case of all, so a phone wants the whole window for it.
 		['openAlternativesBox', 'the alternatives box'],
 		// The Tables and Hotkeys box (Task 745): the same non-hog shell and memory as Notes, built
 		// the same way and for the same reason -- reference prose a reader keeps open beside the
 		// work, so a phone wants the same fill.
-		['openHotkeysBox', 'the Tables and Hotkeys box']];
+		['openHotkeysBox', 'the Tables and Hotkeys box'],
+		// Demand scaling (Task 754): the third analysis on fire flow's shell, with two report
+		// tables, so a phone wants the whole window for it too.
+		['openDemandScaleBox', 'Demand scaling'],
+		// The Calibration report (Task 601): a six-column statistics table and two charts, the
+		// same report-box family as Status and Full, so a phone wants the whole window for it.
+		['openCalibBox', 'the calibration report box'],
+		// The Contour plot box (Task 600): the Find box's shell and the same rule as Find -- a
+		// column of controls that is unreadable at a third of a phone's width.
+		['openContourBox', 'the contour plot box']];
 	FILLS.forEach(function (p) {
 		ok(p[1] + ' opens through the seam', /placePanelForScreen\(/.test(body(p[0])));
 	});

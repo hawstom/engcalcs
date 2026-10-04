@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "uk",
-        "expected_key_count": 2175,
-        "delta_key_count": 22,
+        "expected_key_count": 2335,
+        "delta_key_count": 105,
         "exempt_key_count": 31,
         "exempt_keys": [
             "u_imgd",
@@ -710,407 +710,1828 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_graphs_menu": "Graphs",
-        "lpn_graphs_menu_tip": "Graphs: Profile, Time Series, and Frequency distribution",
-        "lpn_copy_title": "Mark file as new copy?",
-        "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
-        "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
-        "lpn_copy_original": "Original; keep same lock",
-        "lpn_copy_copy": "A copy; make new lock",
-        "lpn_copy_kept_link": "Opened {name} as the original, moved to a new place. Save now writes to this file.",
-        "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
-        "lpn_scenario_basic": "Basic mode",
-        "lpn_scenario_basic_tip": "Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.",
-        "lpn_alt_title": "Alternatives preview",
-        "lpn_alt_note": "Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.",
-        "lpn_alt_cat_physical": "Physical",
-        "lpn_alt_cat_demand": "Demand",
-        "lpn_alt_cat_topology": "Asset activation",
-        "lpn_alt_cat_initial": "Initial settings",
-        "lpn_alt_cat_constituent": "Constituent",
-        "lpn_alt_cat_fireflow": "Fire flow",
-        "lpn_alt_cat_energy": "Energy cost",
-        "lpn_alt_cat_userdata": "Custom properties",
-        "lpn_alt_cat_text": "Text"
+        "lpn_tool_add_chain": "Junction Pipe Chain",
+        "lpn_pane_sort_desc": "Sort descending",
+        "lpn_pane_manage_cols_width": "Width (em)",
+        "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
+        "lpn_dock_left": "Dock at the left of the map",
+        "lpn_dock_right": "Dock at the right of the map",
+        "lpn_dock_float": "Float",
+        "lpn_dock_autohide": "Auto-hide",
+        "lpn_tool_add_chain_tip": "Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.",
+        "lpn_pane_filter_sel_note": "Selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_and": "Filtered by {q} and selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
+        "lpn_pane_sel_only": "Selection only",
+        "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
+        "lpn_pgraph_none": "This asset has no results in the current run.",
+        "lpn_pgraph_source_share_from": "Source share from {node}",
+        "lpn_result_pump_head": "Head",
+        "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
+        "lpn_report_pump_head": "Pump head",
+        "lpn_contour_show": "Show contours",
+        "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
+        "lpn_sysflow_title": "Flow balance",
+        "lpn_mode_add_chain": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
+        "lpn_cp_allow_tip": "Allow only these characters:",
+        "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
+        "lpn_alt_calc_options": "Calculation options",
+        "lpn_scenario_duration_tip": "Overrides the total run time in this scenario. Leave it blank to use its parent's. A total run time of 0:00 is a steady-state run.",
+        "lpn_scenario_hyd_step_tip": "Overrides the hydraulic time step in this scenario. Leave it blank to use its parent's.",
+        "lpn_time_scn_overrides": "Scenario overrides:",
+        "lpn_settings_basemap_style": "Basemap style",
+        "lpn_settings_basemap_style_tip": "Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.",
+        "lpn_basemap_style_normal": "Normal",
+        "lpn_basemap_style_muted": "Muted",
+        "lpn_basemap_style_faded": "Faded",
+        "lpn_basemap_style_grayscale": "Grayscale",
+        "lpn_saved_project": "Saved with the project",
+        "lpn_saved_browser": "Saved in this browser",
+        "lpn_saved_session": "Not saved",
+        "lpn_scncmp_at_time": "{value} at {id}, {time}",
+        "lpn_scncmp_same": "The same in every scenario",
+        "lpn_scncmp_period_note": "Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.",
+        "lpn_choice_default": "Default",
+        "lpn_ds_menu": "Demand scaling…",
+        "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
+        "lpn_ds_title": "Demand scaling",
+        "lpn_ds_intro": "The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.",
+        "lpn_ds_scope": "Junctions to scale",
+        "lpn_ds_scope_tip": "All junctions, or only those selected on the map. Pressures are checked at the scaled demand.",
+        "lpn_ds_scope_all": "All junctions",
+        "lpn_ds_scope_selected": "Selected junctions",
+        "lpn_ds_minpressure": "Lowest pressure allowed",
+        "lpn_ds_minpressure_tip": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_eps_note": "Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.",
+        "lpn_ds_head_scale": "Scale the demands",
+        "lpn_ds_multiplier": "Demand scale",
+        "lpn_ds_multiplier_tip": "The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.",
+        "lpn_ds_run": "Run",
+        "lpn_ds_head_search": "What demand scale can the system handle?",
+        "lpn_ds_head_search_selected": "What demand scale can these junctions handle?",
+        "lpn_ds_outside_below": "At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.",
+        "lpn_ds_search_note": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
+        "lpn_ds_find": "Find",
+        "lpn_ds_holds_max": "✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.",
+        "lpn_ds_below_zero": "⚠ At least one junction is below {pressure} even with the scaled demands at zero.",
+        "lpn_ds_found": "✓ Every junction keeps {pressure} up to a demand scale of {m}.",
+        "lpn_ds_found_below": "⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.",
+        "lpn_ds_search_stopped": "The search was stopped before it found an answer.",
+        "lpn_ds_lowest_at": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.",
+        "lpn_ds_nosolve_at": "At a demand scale of {m}, the network gave no answer. {reason}",
+        "lpn_ds_scale_ok": "✓ At a demand scale of {m}, every junction keeps {pressure}.",
+        "lpn_ds_scale_below": "⚠ At a demand scale of {m}, junctions below {pressure}: {n}.",
+        "lpn_ds_scaled_selected": "Junctions scaled and checked: {n}.",
+        "lpn_ds_head_lowest": "Lowest pressures",
+        "lpn_ds_head_velocity": "Highest velocities",
+        "lpn_ds_col_link": "Link",
+        "lpn_ds_col_scaled": "Scaled",
+        "lpn_ds_col_scaled_tip": "With the demands multiplied by the demand scale.",
+        "lpn_ds_col_unscaled": "Unscaled",
+        "lpn_ds_col_unscaled_tip": "With the demands as they are in the active scenario at this time step, the same value the map shows.",
+        "lpn_ds_no_junctions": "This project has no junctions yet, so there are no demands to scale.",
+        "lpn_ds_no_selection": "No junctions are selected. Select junctions or choose All junctions.",
+        "lpn_ds_skipped": "Selected elements that are not junctions, left as they are: {n}.",
+        "lpn_ds_bad_multiplier": "Enter a demand scale of zero or more, such as 1.5.",
+        "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
+        "lpn_analyze_at_time": "Time step: {time}.",
+        "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.",
+        "lpn_settings_demand_model": "Demand model",
+        "lpn_settings_demand_model_tip": "Choose how junctions receive water. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.",
+        "lpn_settings_demand_model_dda": "Demand driven",
+        "lpn_settings_demand_model_pda": "Pressure driven",
+        "lpn_settings_min_pressure": "Minimum pressure",
+        "lpn_settings_min_pressure_tip": "Enter the pressure at or below which a junction receives no water. Use this project's pressure unit.",
+        "lpn_settings_req_pressure": "Required pressure",
+        "lpn_settings_req_pressure_tip": "Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.",
+        "lpn_settings_pressure_exponent": "Pressure exponent",
+        "lpn_settings_pressure_exponent_tip": "Enter the exponent of the curve that rises from no water at the minimum pressure to the full demand at the required pressure.",
+        "lpn_engine_pda_route": "Solved with the EPANET solver, because the demand model is pressure driven.",
+        "lpn_diag_pda_needs_epanet": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.",
+        "lpn_result_delivered_demand": "Delivered demand",
+        "lpn_result_delivered_demand_tip": "The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.",
+        "lpn_result_demand_deficit": "Demand deficit",
+        "lpn_result_demand_deficit_tip": "The demand this junction asks for and does not receive, because the pressure is below the required pressure.",
+        "lpn_pda_deficit_note": "Junctions receiving less than their demand: {n}.",
+        "lpn_diag_pda_pressures": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
+        "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back."
     },
     "keys": {
-        "lpn_graphs_menu": "Graphs",
-        "lpn_graphs_menu_tip": "Graphs: Profile, Time Series, and Frequency distribution",
-        "lpn_copy_title": "Mark file as new copy?",
-        "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
-        "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
-        "lpn_copy_original": "Original; keep same lock",
-        "lpn_copy_copy": "A copy; make new lock",
-        "lpn_copy_kept_link": "Opened {name} as the original, moved to a new place. Save now writes to this file.",
-        "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
-        "lpn_scenario_basic": "Basic mode",
-        "lpn_scenario_basic_tip": "Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.",
-        "lpn_alt_title": "Alternatives preview",
-        "lpn_alt_note": "Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.",
-        "lpn_alt_cat_physical": "Physical",
-        "lpn_alt_cat_demand": "Demand",
-        "lpn_alt_cat_topology": "Asset activation",
-        "lpn_alt_cat_initial": "Initial settings",
-        "lpn_alt_cat_constituent": "Constituent",
-        "lpn_alt_cat_fireflow": "Fire flow",
-        "lpn_alt_cat_energy": "Energy cost",
-        "lpn_alt_cat_userdata": "Custom properties",
-        "lpn_alt_cat_text": "Text"
+        "lpn_tool_add_chain": "Junction Pipe Chain",
+        "lpn_pane_sort_desc": "Sort descending",
+        "lpn_pane_manage_cols_width": "Width (em)",
+        "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
+        "lpn_dock_left": "Dock at the left of the map",
+        "lpn_dock_right": "Dock at the right of the map",
+        "lpn_dock_float": "Float",
+        "lpn_dock_autohide": "Auto-hide",
+        "lpn_tool_add_chain_tip": "Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.",
+        "lpn_pane_filter_sel_note": "Selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_and": "Filtered by {q} and selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
+        "lpn_pane_sel_only": "Selection only",
+        "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
+        "lpn_pgraph_none": "This asset has no results in the current run.",
+        "lpn_pgraph_source_share_from": "Source share from {node}",
+        "lpn_result_pump_head": "Head",
+        "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
+        "lpn_report_pump_head": "Pump head",
+        "lpn_contour_show": "Show contours",
+        "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
+        "lpn_sysflow_title": "Flow balance",
+        "lpn_mode_add_chain": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
+        "lpn_cp_allow_tip": "Allow only these characters:",
+        "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
+        "lpn_alt_calc_options": "Calculation options",
+        "lpn_scenario_duration_tip": "Overrides the total run time in this scenario. Leave it blank to use its parent's. A total run time of 0:00 is a steady-state run.",
+        "lpn_scenario_hyd_step_tip": "Overrides the hydraulic time step in this scenario. Leave it blank to use its parent's.",
+        "lpn_time_scn_overrides": "Scenario overrides:",
+        "lpn_settings_basemap_style": "Basemap style",
+        "lpn_settings_basemap_style_tip": "Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.",
+        "lpn_basemap_style_normal": "Normal",
+        "lpn_basemap_style_muted": "Muted",
+        "lpn_basemap_style_faded": "Faded",
+        "lpn_basemap_style_grayscale": "Grayscale",
+        "lpn_saved_project": "Saved with the project",
+        "lpn_saved_browser": "Saved in this browser",
+        "lpn_saved_session": "Not saved",
+        "lpn_scncmp_at_time": "{value} at {id}, {time}",
+        "lpn_scncmp_same": "The same in every scenario",
+        "lpn_scncmp_period_note": "Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.",
+        "lpn_choice_default": "Default",
+        "lpn_ds_menu": "Demand scaling…",
+        "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
+        "lpn_ds_title": "Demand scaling",
+        "lpn_ds_intro": "The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.",
+        "lpn_ds_scope": "Junctions to scale",
+        "lpn_ds_scope_tip": "All junctions, or only those selected on the map. Pressures are checked at the scaled demand.",
+        "lpn_ds_scope_all": "All junctions",
+        "lpn_ds_scope_selected": "Selected junctions",
+        "lpn_ds_minpressure": "Lowest pressure allowed",
+        "lpn_ds_minpressure_tip": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
+        "lpn_ds_eps_note": "Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.",
+        "lpn_ds_head_scale": "Scale the demands",
+        "lpn_ds_multiplier": "Demand scale",
+        "lpn_ds_multiplier_tip": "The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.",
+        "lpn_ds_run": "Run",
+        "lpn_ds_head_search": "What demand scale can the system handle?",
+        "lpn_ds_head_search_selected": "What demand scale can these junctions handle?",
+        "lpn_ds_outside_below": "At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.",
+        "lpn_ds_search_note": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
+        "lpn_ds_find": "Find",
+        "lpn_ds_holds_max": "✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.",
+        "lpn_ds_below_zero": "⚠ At least one junction is below {pressure} even with the scaled demands at zero.",
+        "lpn_ds_found": "✓ Every junction keeps {pressure} up to a demand scale of {m}.",
+        "lpn_ds_found_below": "⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.",
+        "lpn_ds_search_stopped": "The search was stopped before it found an answer.",
+        "lpn_ds_lowest_at": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.",
+        "lpn_ds_nosolve_at": "At a demand scale of {m}, the network gave no answer. {reason}",
+        "lpn_ds_scale_ok": "✓ At a demand scale of {m}, every junction keeps {pressure}.",
+        "lpn_ds_scale_below": "⚠ At a demand scale of {m}, junctions below {pressure}: {n}.",
+        "lpn_ds_scaled_selected": "Junctions scaled and checked: {n}.",
+        "lpn_ds_head_lowest": "Lowest pressures",
+        "lpn_ds_head_velocity": "Highest velocities",
+        "lpn_ds_col_link": "Link",
+        "lpn_ds_col_scaled": "Scaled",
+        "lpn_ds_col_scaled_tip": "With the demands multiplied by the demand scale.",
+        "lpn_ds_col_unscaled": "Unscaled",
+        "lpn_ds_col_unscaled_tip": "With the demands as they are in the active scenario at this time step, the same value the map shows.",
+        "lpn_ds_no_junctions": "This project has no junctions yet, so there are no demands to scale.",
+        "lpn_ds_no_selection": "No junctions are selected. Select junctions or choose All junctions.",
+        "lpn_ds_skipped": "Selected elements that are not junctions, left as they are: {n}.",
+        "lpn_ds_bad_multiplier": "Enter a demand scale of zero or more, such as 1.5.",
+        "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
+        "lpn_analyze_at_time": "Time step: {time}.",
+        "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.",
+        "lpn_settings_demand_model": "Demand model",
+        "lpn_settings_demand_model_tip": "Choose how junctions receive water. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.",
+        "lpn_settings_demand_model_dda": "Demand driven",
+        "lpn_settings_demand_model_pda": "Pressure driven",
+        "lpn_settings_min_pressure": "Minimum pressure",
+        "lpn_settings_min_pressure_tip": "Enter the pressure at or below which a junction receives no water. Use this project's pressure unit.",
+        "lpn_settings_req_pressure": "Required pressure",
+        "lpn_settings_req_pressure_tip": "Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.",
+        "lpn_settings_pressure_exponent": "Pressure exponent",
+        "lpn_settings_pressure_exponent_tip": "Enter the exponent of the curve that rises from no water at the minimum pressure to the full demand at the required pressure.",
+        "lpn_engine_pda_route": "Solved with the EPANET solver, because the demand model is pressure driven.",
+        "lpn_diag_pda_needs_epanet": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.",
+        "lpn_result_delivered_demand": "Delivered demand",
+        "lpn_result_delivered_demand_tip": "The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.",
+        "lpn_result_demand_deficit": "Demand deficit",
+        "lpn_result_demand_deficit_tip": "The demand this junction asks for and does not receive, because the pressure is below the required pressure.",
+        "lpn_pda_deficit_note": "Junctions receiving less than their demand: {n}.",
+        "lpn_diag_pda_pressures": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
+        "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back."
     },
     "key_context": {
-        "lpn_graphs_menu": {
+        "lpn_tool_add_chain": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_profile_menu",
-                    "value": "Профіль",
-                    "english": "Profile"
+                    "key": "lpn_tool_add_text",
+                    "value": "Текст",
+                    "english": "Text"
                 },
                 "next_translated": {
-                    "key": "lpn_profile_tip",
-                    "value": "Малює землю та п'єзометричну лінію вздовж шляху через мережу.",
-                    "english": "Draw the ground and the hydraulic grade line along a path through the network."
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершини",
+                    "english": "Vertices"
                 }
             }
         },
-        "lpn_graphs_menu_tip": {
+        "lpn_pane_sort_desc": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_profile_menu",
-                    "value": "Профіль",
-                    "english": "Profile"
+                    "key": "lpn_pane_sort_asc",
+                    "value": "Сортувати за зростанням",
+                    "english": "Sort ascending"
                 },
                 "next_translated": {
-                    "key": "lpn_profile_tip",
-                    "value": "Малює землю та п'єзометричну лінію вздовж шляху через мережу.",
-                    "english": "Draw the ground and the hydraulic grade line along a path through the network."
+                    "key": "lpn_pane_manage_cols",
+                    "value": "Керувати стовпцями…",
+                    "english": "Manage columns…"
                 }
             }
         },
-        "lpn_copy_title": {
+        "lpn_pane_manage_cols_width": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_lock_open_cancelled",
-                    "value": "Цей файл не відкрито, і тут нічого не змінилося. Хтось інший усе ще тримає його відкритим.",
-                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                    "key": "lpn_pane_manage_cols_bottom",
+                    "value": "Перемістити в кінець",
+                    "english": "Move to end"
                 },
                 "next_translated": {
-                    "key": "lpn_lock_requested",
-                    "value": "{name} хоче редагувати цей файл. Коли будете готові, збережіть свою роботу і скористайтеся «Файл, Закрити проєкт», щоб передати його.",
-                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                    "key": "lpn_pane_colmenu_tip",
+                    "value": "Сховати стовпці або керувати ними",
+                    "english": "Hide or manage columns"
                 }
             }
         },
-        "lpn_copy_body": {
+        "lpn_pane_width_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_lock_open_cancelled",
-                    "value": "Цей файл не відкрито, і тут нічого не змінилося. Хтось інший усе ще тримає його відкритим.",
-                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                    "key": "lpn_pane_manage_cols_bottom",
+                    "value": "Перемістити в кінець",
+                    "english": "Move to end"
                 },
                 "next_translated": {
-                    "key": "lpn_lock_requested",
-                    "value": "{name} хоче редагувати цей файл. Коли будете готові, збережіть свою роботу і скористайтеся «Файл, Закрити проєкт», щоб передати його.",
-                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                    "key": "lpn_pane_colmenu_tip",
+                    "value": "Сховати стовпці або керувати ними",
+                    "english": "Hide or manage columns"
                 }
             }
         },
-        "lpn_copy_body_nodate": {
+        "lpn_dock_left": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_lock_open_cancelled",
-                    "value": "Цей файл не відкрито, і тут нічого не змінилося. Хтось інший усе ще тримає його відкритим.",
-                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                    "key": "lpn_close",
+                    "value": "Закрити",
+                    "english": "Close"
                 },
                 "next_translated": {
-                    "key": "lpn_lock_requested",
-                    "value": "{name} хоче редагувати цей файл. Коли будете готові, збережіть свою роботу і скористайтеся «Файл, Закрити проєкт», щоб передати його.",
-                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                    "key": "lpn_popup_boxtitle",
+                    "value": "Властивості",
+                    "english": "Properties"
                 }
             }
         },
-        "lpn_copy_original": {
+        "lpn_dock_right": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_lock_open_cancelled",
-                    "value": "Цей файл не відкрито, і тут нічого не змінилося. Хтось інший усе ще тримає його відкритим.",
-                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                    "key": "lpn_close",
+                    "value": "Закрити",
+                    "english": "Close"
                 },
                 "next_translated": {
-                    "key": "lpn_lock_requested",
-                    "value": "{name} хоче редагувати цей файл. Коли будете готові, збережіть свою роботу і скористайтеся «Файл, Закрити проєкт», щоб передати його.",
-                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                    "key": "lpn_popup_boxtitle",
+                    "value": "Властивості",
+                    "english": "Properties"
                 }
             }
         },
-        "lpn_copy_copy": {
+        "lpn_dock_float": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_lock_open_cancelled",
-                    "value": "Цей файл не відкрито, і тут нічого не змінилося. Хтось інший усе ще тримає його відкритим.",
-                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                    "key": "lpn_close",
+                    "value": "Закрити",
+                    "english": "Close"
                 },
                 "next_translated": {
-                    "key": "lpn_lock_requested",
-                    "value": "{name} хоче редагувати цей файл. Коли будете готові, збережіть свою роботу і скористайтеся «Файл, Закрити проєкт», щоб передати його.",
-                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                    "key": "lpn_popup_boxtitle",
+                    "value": "Властивості",
+                    "english": "Properties"
                 }
             }
         },
-        "lpn_copy_kept_link": {
+        "lpn_dock_autohide": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_lock_open_cancelled",
-                    "value": "Цей файл не відкрито, і тут нічого не змінилося. Хтось інший усе ще тримає його відкритим.",
-                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                    "key": "lpn_close",
+                    "value": "Закрити",
+                    "english": "Close"
                 },
                 "next_translated": {
-                    "key": "lpn_lock_requested",
-                    "value": "{name} хоче редагувати цей файл. Коли будете готові, збережіть свою роботу і скористайтеся «Файл, Закрити проєкт», щоб передати його.",
-                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                    "key": "lpn_popup_boxtitle",
+                    "value": "Властивості",
+                    "english": "Properties"
                 }
             }
         },
-        "lpn_copy_opened": {
+        "lpn_tool_add_chain_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_lock_open_cancelled",
-                    "value": "Цей файл не відкрито, і тут нічого не змінилося. Хтось інший усе ще тримає його відкритим.",
-                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
+                    "key": "lpn_tool_key_hint_two",
+                    "value": "Комбінація клавіш: натисніть {key} або {key2}.",
+                    "english": "Shortcut: {key} or {key2}"
                 },
                 "next_translated": {
-                    "key": "lpn_lock_requested",
-                    "value": "{name} хоче редагувати цей файл. Коли будете готові, збережіть свою роботу і скористайтеся «Файл, Закрити проєкт», щоб передати його.",
-                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
+                    "key": "lpn_tool_area_tip",
+                    "value": "Клацайте по карті, як зазначено, щоб вибрати все всередині фігури. Натисніть цю кнопку ще раз, щоб змінити форму між вікном, ласо й багатокутником. Утримуйте Shift під час вибору, щоб продовжити наявний вибір, додаючи або знімаючи (перемикаючи) те, що ви вибираєте.",
+                    "english": "Follow on-screen wizard. Press again to cycle through window, lasso, and polygon. Hold Shift to keep existing selection set and add or remove (toggle) what you select."
                 }
             }
         },
-        "lpn_scenario_basic": {
+        "lpn_pane_filter_sel_note": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "Кожен сценарій повертається до значення Базового для властивостей, підписи яких зараз показано. Значення, що належать лише цим сценаріям, буде відкинуто.",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                    "key": "lpn_pane_filter_none",
+                    "value": "Жоден рядок цієї таблиці не відповідає фільтру.",
+                    "english": "Nothing in this table matches the filter."
                 },
                 "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "Змусити кожен сценарій використовувати значення Базового для цих властивостей? Значення, що належать лише цим сценаріям, буде відкинуто. Цю дію можна скасувати.",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Наблизити й вибрати",
+                    "english": "Zoom & select"
                 }
             }
         },
-        "lpn_scenario_basic_tip": {
+        "lpn_pane_filter_sel_and": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "Кожен сценарій повертається до значення Базового для властивостей, підписи яких зараз показано. Значення, що належать лише цим сценаріям, буде відкинуто.",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                    "key": "lpn_pane_filter_none",
+                    "value": "Жоден рядок цієї таблиці не відповідає фільтру.",
+                    "english": "Nothing in this table matches the filter."
                 },
                 "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "Змусити кожен сценарій використовувати значення Базового для цих властивостей? Значення, що належать лише цим сценаріям, буде відкинуто. Цю дію можна скасувати.",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Наблизити й вибрати",
+                    "english": "Zoom & select"
                 }
             }
         },
-        "lpn_alt_title": {
+        "lpn_pane_filter_sel_none": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "Кожен сценарій повертається до значення Базового для властивостей, підписи яких зараз показано. Значення, що належать лише цим сценаріям, буде відкинуто.",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                    "key": "lpn_pane_filter_none",
+                    "value": "Жоден рядок цієї таблиці не відповідає фільтру.",
+                    "english": "Nothing in this table matches the filter."
                 },
                 "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "Змусити кожен сценарій використовувати значення Базового для цих властивостей? Значення, що належать лише цим сценаріям, буде відкинуто. Цю дію можна скасувати.",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Наблизити й вибрати",
+                    "english": "Zoom & select"
                 }
             }
         },
-        "lpn_alt_note": {
+        "lpn_pane_sel_only": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "Кожен сценарій повертається до значення Базового для властивостей, підписи яких зараз показано. Значення, що належать лише цим сценаріям, буде відкинуто.",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                    "key": "lpn_pane_filter_none",
+                    "value": "Жоден рядок цієї таблиці не відповідає фільтру.",
+                    "english": "Nothing in this table matches the filter."
                 },
                 "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "Змусити кожен сценарій використовувати значення Базового для цих властивостей? Значення, що належать лише цим сценаріям, буде відкинуто. Цю дію можна скасувати.",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Наблизити й вибрати",
+                    "english": "Zoom & select"
                 }
             }
         },
-        "lpn_alt_cat_physical": {
+        "lpn_pane_sel_only_none": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "Кожен сценарій повертається до значення Базового для властивостей, підписи яких зараз показано. Значення, що належать лише цим сценаріям, буде відкинуто.",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                    "key": "lpn_pane_filter_none",
+                    "value": "Жоден рядок цієї таблиці не відповідає фільтру.",
+                    "english": "Nothing in this table matches the filter."
                 },
                 "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "Змусити кожен сценарій використовувати значення Базового для цих властивостей? Значення, що належать лише цим сценаріям, буде відкинуто. Цю дію можна скасувати.",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Наблизити й вибрати",
+                    "english": "Zoom & select"
                 }
             }
         },
-        "lpn_alt_cat_demand": {
+        "lpn_pgraph_none": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "Кожен сценарій повертається до значення Базового для властивостей, підписи яких зараз показано. Значення, що належать лише цим сценаріям, буде відкинуто.",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                    "key": "lpn_ts_group_links",
+                    "value": "Зв’язки",
+                    "english": "Links"
                 },
                 "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "Змусити кожен сценарій використовувати значення Базового для цих властивостей? Значення, що належать лише цим сценаріям, буде відкинуто. Цю дію можна скасувати.",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                    "key": "lpn_ts_add",
+                    "value": "Додати вибрані",
+                    "english": "Add selected"
                 }
             }
         },
-        "lpn_alt_cat_topology": {
+        "lpn_pgraph_source_share_from": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "Кожен сценарій повертається до значення Базового для властивостей, підписи яких зараз показано. Значення, що належать лише цим сценаріям, буде відкинуто.",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                    "key": "lpn_ts_group_links",
+                    "value": "Зв’язки",
+                    "english": "Links"
                 },
                 "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "Змусити кожен сценарій використовувати значення Базового для цих властивостей? Значення, що належать лише цим сценаріям, буде відкинуто. Цю дію можна скасувати.",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                    "key": "lpn_ts_add",
+                    "value": "Додати вибрані",
+                    "english": "Add selected"
                 }
             }
         },
-        "lpn_alt_cat_initial": {
+        "lpn_result_pump_head": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "Кожен сценарій повертається до значення Базового для властивостей, підписи яких зараз показано. Значення, що належать лише цим сценаріям, буде відкинуто.",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                    "key": "lpn_ts_group_links",
+                    "value": "Зв’язки",
+                    "english": "Links"
                 },
                 "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "Змусити кожен сценарій використовувати значення Базового для цих властивостей? Значення, що належать лише цим сценаріям, буде відкинуто. Цю дію можна скасувати.",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                    "key": "lpn_ts_add",
+                    "value": "Додати вибрані",
+                    "english": "Add selected"
                 }
             }
         },
-        "lpn_alt_cat_constituent": {
+        "lpn_result_pump_head_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "Кожен сценарій повертається до значення Базового для властивостей, підписи яких зараз показано. Значення, що належать лише цим сценаріям, буде відкинуто.",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                    "key": "lpn_ts_group_links",
+                    "value": "Зв’язки",
+                    "english": "Links"
                 },
                 "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "Змусити кожен сценарій використовувати значення Базового для цих властивостей? Значення, що належать лише цим сценаріям, буде відкинуто. Цю дію можна скасувати.",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                    "key": "lpn_ts_add",
+                    "value": "Додати вибрані",
+                    "english": "Add selected"
                 }
             }
         },
-        "lpn_alt_cat_fireflow": {
+        "lpn_report_pump_head": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "Кожен сценарій повертається до значення Базового для властивостей, підписи яких зараз показано. Значення, що належать лише цим сценаріям, буде відкинуто.",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                    "key": "lpn_ts_group_links",
+                    "value": "Зв’язки",
+                    "english": "Links"
                 },
                 "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "Змусити кожен сценарій використовувати значення Базового для цих властивостей? Значення, що належать лише цим сценаріям, буде відкинуто. Цю дію можна скасувати.",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                    "key": "lpn_ts_add",
+                    "value": "Додати вибрані",
+                    "english": "Add selected"
                 }
             }
         },
-        "lpn_alt_cat_energy": {
+        "lpn_contour_show": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "Кожен сценарій повертається до значення Базового для властивостей, підписи яких зараз показано. Значення, що належать лише цим сценаріям, буде відкинуто.",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                    "key": "lpn_contour_plot",
+                    "value": "Карта ізоліній",
+                    "english": "Contour plot"
                 },
                 "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "Змусити кожен сценарій використовувати значення Базового для цих властивостей? Значення, що належать лише цим сценаріям, буде відкинуто. Цю дію можна скасувати.",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                    "key": "lpn_contour_fill",
+                    "value": "Заливка",
+                    "english": "Fill"
                 }
             }
         },
-        "lpn_alt_cat_userdata": {
+        "lpn_contour_show_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "Кожен сценарій повертається до значення Базового для властивостей, підписи яких зараз показано. Значення, що належать лише цим сценаріям, буде відкинуто.",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                    "key": "lpn_contour_plot",
+                    "value": "Карта ізоліній",
+                    "english": "Contour plot"
                 },
                 "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "Змусити кожен сценарій використовувати значення Базового для цих властивостей? Значення, що належать лише цим сценаріям, буде відкинуто. Цю дію можна скасувати.",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                    "key": "lpn_contour_fill",
+                    "value": "Заливка",
+                    "english": "Fill"
                 }
             }
         },
-        "lpn_alt_cat_text": {
+        "lpn_sysflow_title": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "Кожен сценарій повертається до значення Базового для властивостей, підписи яких зараз показано. Значення, що належать лише цим сценаріям, буде відкинуто.",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
+                    "key": "lpn_sysflow_tip",
+                    "value": "Показує на графіку загальну вироблену й загальну спожиту витрату в часі протягом розрахунку розширеного періоду. Ємності не входять до жодної суми, тож де дві лінії розходяться, ємності наповнюються або спорожняються.",
+                    "english": "Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining."
                 },
                 "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "Змусити кожен сценарій використовувати значення Базового для цих властивостей? Значення, що належать лише цим сценаріям, буде відкинуто. Цю дію можна скасувати.",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
+                    "key": "lpn_sysflow_produced",
+                    "value": "Вироблено",
+                    "english": "Produced"
                 }
+            }
+        },
+        "lpn_mode_add_chain": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_mode_add_text",
+                    "value": "Режим: Додавання тексту. Клацніть на карті, щоб розмістити Текст. Клацніть біля вузла, щоб прикріпити Текст до нього. Перейдіть у режим «Вибір», щоб змінювати або пересувати елементи й підписи.",
+                    "english": "Mode: Add Text. Specify a location on the map to place a Text. Specify a location near a node to attach the Text to that node. Switch to Select mode to change or move assets and labels."
+                },
+                "next_translated": {
+                    "key": "lpn_tip_select",
+                    "value": "Використовуйте цей режим, щоб змінювати, пересувати й перетягувати об'єкти на карті. Це режим, до якого сторінка повертається за замовчуванням: вона сама повертається сюди після деяких дій, наприклад відкриття проєкту, а [Esc] повертає сюди з будь-якого іншого режиму.",
+                    "english": "Use this mode to change, move, and drag map elements or pan the map. This is the default mode for the map. Pressing Esc a second time unselects whatever is selected."
+                }
+            }
+        },
+        "lpn_cp_allow_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_cp_restrict_tip",
+                    "value": "Обмежити ці символи: значення може використовувати лише перелічені тут символи, або жодного з них, де «@» означає будь-яку літеру; «#» означає будь-яку цифру, а «-», «.» і «,» потрібно перелічити окремо, якщо вони дозволені; будь-які пробільні символи мають бути між іншими символами.",
+                    "english": "Restrict these characters:"
+                },
+                "next_translated": {
+                    "key": "lpn_cp_restrict_mode",
+                    "value": "Дозволити або обмежити",
+                    "english": "Allow or restrict"
+                }
+            }
+        },
+        "lpn_cp_characters_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_cp_restrict_tip",
+                    "value": "Обмежити ці символи: значення може використовувати лише перелічені тут символи, або жодного з них, де «@» означає будь-яку літеру; «#» означає будь-яку цифру, а «-», «.» і «,» потрібно перелічити окремо, якщо вони дозволені; будь-які пробільні символи мають бути між іншими символами.",
+                    "english": "Restrict these characters:"
+                },
+                "next_translated": {
+                    "key": "lpn_cp_restrict_mode",
+                    "value": "Дозволити або обмежити",
+                    "english": "Allow or restrict"
+                }
+            }
+        },
+        "lpn_alt_calc_options": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_title",
+                    "value": "Попередній перегляд альтернатив",
+                    "english": "Alternatives preview"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "Лише для читання. Базовий сценарій використовує базову альтернативу кожної категорії. Кожен сценарій отримує власну альтернативу для будь-якої зміненої категорії, дочірню до базової. Число — це кількість змінених у ній значень.",
+                    "english": "Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario's own value, or leave it blank to use its parent's. The project's own are in Settings, Calculation, Time."
+                }
+            }
+        },
+        "lpn_scenario_duration_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "Лише для читання. Базовий сценарій використовує базову альтернативу кожної категорії. Кожен сценарій отримує власну альтернативу для будь-якої зміненої категорії, дочірню до базової. Число — це кількість змінених у ній значень.",
+                    "english": "Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario's own value, or leave it blank to use its parent's. The project's own are in Settings, Calculation, Time."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Фізичні",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_scenario_hyd_step_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "Лише для читання. Базовий сценарій використовує базову альтернативу кожної категорії. Кожен сценарій отримує власну альтернативу для будь-якої зміненої категорії, дочірню до базової. Число — це кількість змінених у ній значень.",
+                    "english": "Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario's own value, or leave it blank to use its parent's. The project's own are in Settings, Calculation, Time."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Фізичні",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_time_scn_overrides": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "Лише для читання. Базовий сценарій використовує базову альтернативу кожної категорії. Кожен сценарій отримує власну альтернативу для будь-якої зміненої категорії, дочірню до базової. Число — це кількість змінених у ній значень.",
+                    "english": "Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario's own value, or leave it blank to use its parent's. The project's own are in Settings, Calculation, Time."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Фізичні",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_settings_basemap_style": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "Непрозорість фонового зображення (від 0 до 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "Зовнішній вигляд",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_settings_basemap_style_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "Непрозорість фонового зображення (від 0 до 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "Зовнішній вигляд",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_basemap_style_normal": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "Непрозорість фонового зображення (від 0 до 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "Зовнішній вигляд",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_basemap_style_muted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "Непрозорість фонового зображення (від 0 до 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "Зовнішній вигляд",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_basemap_style_faded": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "Непрозорість фонового зображення (від 0 до 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "Зовнішній вигляд",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_basemap_style_grayscale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "Непрозорість фонового зображення (від 0 до 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "Зовнішній вигляд",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_saved_project": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_page",
+                    "value": "Сторінка",
+                    "english": "Page"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "Гідравліка",
+                    "english": "Hydraulics"
+                }
+            }
+        },
+        "lpn_saved_browser": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_page",
+                    "value": "Сторінка",
+                    "english": "Page"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "Гідравліка",
+                    "english": "Hydraulics"
+                }
+            }
+        },
+        "lpn_saved_session": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_page",
+                    "value": "Сторінка",
+                    "english": "Page"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "Гідравліка",
+                    "english": "Hydraulics"
+                }
+            }
+        },
+        "lpn_scncmp_at_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_at",
+                    "value": "{value} у {id}",
+                    "english": "{value} at {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_scncmp_current",
+                    "value": "(відкрито зараз)",
+                    "english": "(currently open)"
+                }
+            }
+        },
+        "lpn_scncmp_same": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_at",
+                    "value": "{value} у {id}",
+                    "english": "{value} at {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_scncmp_current",
+                    "value": "(відкрито зараз)",
+                    "english": "(currently open)"
+                }
+            }
+        },
+        "lpn_scncmp_period_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_at",
+                    "value": "{value} у {id}",
+                    "english": "{value} at {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_scncmp_current",
+                    "value": "(відкрито зараз)",
+                    "english": "(currently open)"
+                }
+            }
+        },
+        "lpn_choice_default": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_pattern_none",
+                    "value": "Без графіка",
+                    "english": "No pattern"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_default_pattern",
+                    "value": "Графік споживання за замовчуванням",
+                    "english": "Default demand pattern"
+                }
+            }
+        },
+        "lpn_ds_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_intro": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_scope": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_scope_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_scope_all": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_scope_selected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_minpressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_minpressure_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_eps_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_head_scale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_multiplier": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_multiplier_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_run": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_head_search": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_head_search_selected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_outside_below": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_search_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_find": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_holds_max": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_below_zero": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_found": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_found_below": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_search_stopped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_lowest_at": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_nosolve_at": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_scale_ok": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_scale_below": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_scaled_selected": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_head_lowest": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_head_velocity": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_col_link": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_col_scaled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_col_scaled_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_col_unscaled": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_col_unscaled_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_no_junctions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_no_selection": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_skipped": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_bad_multiplier": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_ds_stale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_analyze_at_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_analyze_time_moved": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "Тупикових зʼєднань пропущено: {n}. Кожне відрізає все, що за ним.",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
+                },
+                "next_translated": {
+                    "key": "lpn_file_import_survey",
+                    "value": "Імпортувати геодезичні точки…",
+                    "english": "Import surveyed points…"
+                }
+            }
+        },
+        "lpn_settings_demand_model": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_demand_model_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_demand_model_dda": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_demand_model_pda": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_min_pressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_min_pressure_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_req_pressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_req_pressure_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_pressure_exponent": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_pressure_exponent_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_engine_pda_route": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_diag_pda_needs_epanet": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_delivered_demand": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_delivered_demand_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_demand_deficit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_demand_deficit_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_pda_deficit_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_diag_pda_pressures": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_inp_drop_pressure_unit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
             }
         }
     },
-    "key_syn": [],
+    "key_syn": {
+        "lpn_ds_scope_tip": "Scale the demand at the junctions that you choose. Pressures are checked at the scaled demand.",
+        "lpn_ds_head_search_selected": "What demand can the junctions you choose handle"
+    },
     "key_concepts": []
 }

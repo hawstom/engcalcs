@@ -156,8 +156,8 @@ function curve(group, field) {
 	check(junctions.length === 9 && pipes.length === 12,
 		`Net1: ${junctions.length} junctions, ${pipes.length} pipes (plus a tank, a reservoir and a pump)`);
 	const ids = L.paneTabIds();
-	check(ids.indexOf('frequency') === ids.indexOf('timeseries') + 1 && ids[ids.length - 1] === 'profile',
-		`the tab sits after Time series and Profile is still last: ${ids.slice(-3).join(', ')}`);
+	check(ids.indexOf('frequency') === ids.indexOf('profile') + 1 && ids.indexOf('profile') === ids.indexOf('timeseries') + 1,
+		`the tab sits after Time series and Profile (menu order, 2026-10-04): ${ids.slice(-4).join(', ')}`);
 	const tabBtn = (byId.lpn_pane_tabs.children || []).filter((b) => b.id === 'lpn_pane_tab_frequency')[0];
 	check(!!tabBtn && tabBtn.textContent === PC.lpn_freq_menu && tabBtn.title === PC.lpn_freq_tip,
 		'with a button in the strip, named and tipped from the language file');

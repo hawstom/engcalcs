@@ -56,6 +56,22 @@ async function example(browser, match) {
 	}, match);
 	if (!found) { throw new Error(`no examples card matching "${match}"`); }
 	await a.settle(4000);
+	// **THE XY NET3 EXAMPLE SHIPS WITH "SHOW LABELS WHEN ZOOMED TO 30 OR LESS"** (Tasks 669/705, feat/label-limit,
+	// 2026-09-25), so at zoom-to-fit its labels are hidden and this section would measure none. Blank the
+	// threshold the way a person would, in Settings, so every label is drawn at the fit.
+	const hidden = await a.page.evaluate(() => document.getElementById('lpn_canvas').classList.contains('lpn-labels-hidden'));
+	if (hidden) {
+		await a.toolbarClick('Settings');
+		await a.settle(500);
+		await a.page.evaluate(() => {
+			const i = document.getElementById('lpn_set_label_max_width');
+			i.value = '';
+			i.dispatchEvent(new Event('change', { bubbles: true }));
+		});
+		await a.settle(300);
+		await a.page.evaluate(() => { document.getElementById('lpn_setbox_close').click(); });
+		await a.settle(300);
+	}
 	await a.toolbarClick('Zoom to fit');
 	await a.settle(900);
 	return a;
@@ -78,12 +94,15 @@ async function sweep(a, step = 7) {
 				const el = document.elementFromPoint(x, y);
 				if (!el || !svg.contains(el)) { overlay++; continue; }
 				inSvg++;
-				if (el === svg) { bare++; }
+				// A backdrop picture (an <image> with no class: the XY examples open with one at 0.5 opacity,
+				// 4f7e280f) is the ground, not an object; it answers the pointer where the SVG itself would.
+				const ground = el === svg || (el.tagName.toLowerCase() === 'image' && !el.getAttribute('class'));
+				if (ground) { bare++; }
 				const cu = getComputedStyle(el).cursor;
 				cursor[cu] = (cursor[cu] || 0) + 1;
 				const r = el.getBoundingClientRect();
 				const d = Math.hypot(Math.max(r.left - x, x - r.right, 0), Math.max(r.top - y, y - r.bottom, 0));
-				const k = el === svg ? 'bare canvas' : (el.tagName.toLowerCase() + '.' + (el.getAttribute('class') || ''));
+				const k = ground ? 'bare canvas' : (el.tagName.toLowerCase() + '.' + (el.getAttribute('class') || ''));
 				by[k] = by[k] || { n: 0, max: 0 };
 				by[k].n++;
 				if (d > by[k].max) { by[k].max = d; }

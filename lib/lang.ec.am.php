@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="በIsbash (1936) እና
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="በIsbash (1936) እና Maricopa County, Arizona, US. መሠረት">የሚፈለግ የጎን ቁልቁለት 1 ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="በIsbash (1936) እና Maricopa County, Arizona, US. መሠረት">የሚፈለግ የጎን ቁልቁለት 2 ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='ይህን መረብ በእያንዳንዱ የሃይድሮሊክ ጊዜ ደረጃ ይፈታል።';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="በMaynord, Ruff, and Abt (1989) መሠረት። በመዞሪያ ላይ ድንጋዩ እንደ California Division of Highways (1970) በአማካይ ፍጥነት 4/3 የመዞሪያ ፍጥነት ይለካል፤ የMaynord ራሱ 1.5 ለተፈጥሮ ቻናሎች ይሠራል።">የሚፈለግ ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Maynord, Ruff, and Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='የሚፈለግ ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='ፍጥነቱ ለወጥ ፍሰት ግምቶች ምክንያታዊ ነው።';
@@ -448,7 +449,7 @@ $ec_lang['contact_main_menu']='አግኙን';
 $ec_lang['about_main_title']='ስለ HawsEDC የምህንድስና ካልኩሌተሮች';
 $ec_lang['about_main_desc']='ተልዕኮ፣ ነጻ ሶፍትዌር እና አስተዋጽዖ';
 // Edited by TGH 2026-09-07
-$ec_lang['about_body_html']='<h3>ተልዕኮ</h3><p>የ HawsEDC ምህንድስና ካልኩሌተሮች በዓለም ዙሪያ ላሉ መሐንዲሶችና የሜዳ ሠራተኞች ለማገልገል ናቸው — በተለይ ውሃ እጥረት፣ ሀብት ውስንነት ወይም ዝቅተኛ አገልግሎት ባለበት አካባቢ ለሚሰሩ። እነዚህ መሳሪያዎች ሰፊ ሰብዓዊ ተልዕኮ አካል ናቸው፡ ለእያንዳንዱ ሰው በጣም ተግባራዊ እና ውጤታማ በሆነ መንገድ መናገር — ለዘለዓለም የተወደዱ እና የሚቀሩ መሆናቸውን፣ ምንም ነገር ሊፈሩ አለመሆናቸውን፣ እና ሁሉንም ነገር ሊያበላሹ አለመሆናቸውን።</p><p>ካልኩሌተሮቹ መሳሪያ ናቸው። ዓላማው ስቃይ የሌለው ዓለም ነው።</p><h3>ነጻ ክፍት ምንጭ ፍቃድ</h3><p>ሁሉም ኮድ በ<a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 ወይም ቆይቶ</a> ተለቋል — እንደ ነፃነቱ ነፃ። በተመሳሳይ ሁኔታዎች ኮዱን መጠቀም፣ ማጥናት፣ ማሻሻል እና ማሰራጨት ይችላሉ።</p><p>ይህ ግብዣ እንጂ ዋጋ አይደለም። የሚከፈልበት እርከን የለም፣ ሊነጠቅ የሚችል ነጻ እርከንም የለም፣ ኮዱ የእርስዎ ከመሆኑ በፊት ምንም መዘግየት የለበትም። ዛሬ የሚያዩት ሙሉ ስሪት ለሁሉም ሰው አሁንም ለዘላለምም ለመጠቀምና ለማሻሻል ነጻ ነው።</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>ምንጭ ኮድ</h3><p>ሙሉ ምንጭ ኮድ በ GitHub ላይ ሕዝባዊ ሆኖ ይገኛል፡</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>ኮዱን መቃኘት፣ ጉዳዮችን ሪፖርት ማድረግ፣ ወይም ሪፖዚቶሪውን ፎርክ ማድረግ ይችላሉ።</p><h3>አስተዋጽኦ</h3><p>ሁሉም እርዳታ ተቀባይነት አለው። <a href="contact.php">Tom Haws ን ያግኙ</a>።</p><ul><li><strong>ትርጉሞች፦</strong> የተሻለ አገላለጽ ይጠቁሙ። ቋንቋ ያሻሽሉ ወይም አዲስ ይጨምሩ።</li><li><strong>የስህተት ሪፖርቶች፦</strong> በማንኛውም ካልኩሌተር ገጽ ላይ ያለውን የተጠቃሚ ሀሳብ ቅጽ ይጠቀሙ፣ ወይም በ GitHub ላይ ጉዳይ ያስመዝግቡ።</li><li><strong>አዲስ ካልኩሌተሮች፦</strong> ለሜዳ ሠራተኞችና ለመስኖ ባለሙያዎች የሚያገለግሉ የሃይድሮሊክ ምህንድስና ሃሳቦች በተለይ ተቀባይነት አላቸው።</li><li><strong>ማስተናገጃ፦</strong> ውስን ግንኙነት ላለበት አካባቢ እነዚህን ካልኩሌተሮች ማንጸባረቅ ከቻሉ እባክዎ ያግኙኝ።</li></ul><h3>ያለ ኢንተርኔት አጠቃቀም</h3><p>እነዚህ ካልኩሌተሮች እንደ <strong>Progressive Web App (PWA)</strong> ይሠራሉ። ከኢንተርኔት ጋር ሲገናኙ ማንኛውንም የካልኩሌተር ገጽ ይጎብኙ፣ እና አሳሽዎ ሁሉንም ካልኩሌተሮች በራስ-ሰር ያከማቻል። ከዚያ በኋላ ሁሉም ካልኩሌተሮች ያለ ኢንተርኔት ይሠራሉ — ኢንተርኔት አያስፈልግም።</p><p>ለ Android ወይም iOS፣ EngCalcs እንደ አፕ በመሣሪያዎ ላይ ለመጫን የአሳሽዎን "ወደ መነሻ ማያ ገጽ ጨምር" አማራጭ ይጠቀሙ። ለዴስክቶፕ፣ የጭነት አዶ በአሳሽዎ የአድራሻ አሞሌ ውስጥ ይፈልጉ።</p><p>እንዲሁም ማንኛውንም ካልኩሌተር ወደ አካባቢያዊ መሣሪያዎ ለማስቀመጥ የአሳሽዎን "እንደ… አስቀምጥ" ምናሌ መጠቀም ይችላሉ።</p><h3>ግንኙነት</h3><p>Tom Haws — ሃይድሮሊክ መሐንዲስ እና የእነዚህ ካልኩሌተሮች ደራሲ።<br />በማንኛውም ካልኩሌተር ገጽ ላይ ያለውን ተጠቃሚ ሀሳብ ቅጽ ይጠቀሙ፣ ወይም <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a> ላይ ምንጭ ኮዱን ያስሱ።</p>';
+$ec_lang['about_body_html']='<h3>ተልዕኮ</h3><p>የ HawsEDC ምህንድስና ካልኩሌተሮች ከ2010 ጀምሮ በመስመር ላይ በነጻ ቀርበዋል። በዓለም ዙሪያ ላሉ መሐንዲሶችና የሜዳ ሠራተኞች ለማገልገል ናቸው — በተለይ ውሃ እጥረት፣ ሀብት ውስንነት ወይም ዝቅተኛ አገልግሎት ባለበት አካባቢ ለሚሰሩ። እነዚህ መሳሪያዎች ሰፊ ሰብዓዊ ተልዕኮ አካል ናቸው፡ ለእያንዳንዱ ሰው በጣም ተግባራዊ እና ውጤታማ በሆነ መንገድ መናገር — <a target="_blank" href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html">ለዘለዓለም የተወደዱ እና የሚቀሩ መሆናቸውን፣ ምንም ነገር ሊፈሩ አለመሆናቸውን</a>፣ እና ሁሉንም ነገር ሊያበላሹ አለመሆናቸውን።</p><p>ካልኩሌተሮቹ ተሽከርካሪው ናቸው። ዓላማው ስቃይ የሌለው ዓለም ነው።</p><h3>ነጻ ክፍት ምንጭ ፍቃድ</h3><p>ሁሉም ኮድ በ<a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 ወይም ቆይቶ</a> ተለቋል — እንደ ነፃነቱ ነፃ። በተመሳሳይ ሁኔታዎች ኮዱን መጠቀም፣ ማጥናት፣ ማሻሻል እና ማሰራጨት ይችላሉ።</p><p>ድረ-ገጹ ዛሬም ከ2010 ጀምሮም በነጻ ቀርቧል፤ አንድ ቀን መቅረብ ባይችል እንኳ፣ ሶፍትዌሩ ለማስኬድ የእርስዎ ነው።</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>ምንጭ ኮድ</h3><p>ሙሉ ምንጭ ኮድ በ GitHub ላይ ሕዝባዊ ሆኖ ይገኛል፡</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>ኮዱን መቃኘት፣ ጉዳዮችን ሪፖርት ማድረግ፣ ወይም ሪፖዚቶሪውን ፎርክ ማድረግ ይችላሉ።</p><h3>አስተዋጽኦ</h3><p>ሁሉም እርዳታ ተቀባይነት አለው። <a href="contact.php">Tom Haws ን ያግኙ</a>።</p><ul><li><strong>ትርጉሞች፦</strong> የተሻለ አገላለጽ ይጠቁሙ። ቋንቋ ያሻሽሉ ወይም አዲስ ይጨምሩ።</li><li><strong>የስህተት ሪፖርቶች፦</strong> በማንኛውም ካልኩሌተር ገጽ ላይ ያለውን የተጠቃሚ ሀሳብ ቅጽ ይጠቀሙ፣ ወይም በ GitHub ላይ ጉዳይ ያስመዝግቡ።</li><li><strong>አዲስ ካልኩሌተሮች፦</strong> ለሜዳ ሠራተኞችና ለመስኖ ባለሙያዎች የሚያገለግሉ የሃይድሮሊክ ምህንድስና ሃሳቦች በተለይ ተቀባይነት አላቸው።</li><li><strong>ማስተናገጃ፦</strong> ውስን ግንኙነት ላለበት አካባቢ እነዚህን ካልኩሌተሮች ማንጸባረቅ ከቻሉ እባክዎ ያግኙኝ።</li></ul><h3>ያለ ኢንተርኔት አጠቃቀም</h3><p>ኢንተርኔት ሲኖርዎ ማንኛውንም ካልኩሌተር አንድ ጊዜ ይክፈቱ፣ ከዚያ ኢንተርኔት ባይኖርዎትም ሁሉም መሥራታቸውን ይቀጥላሉ፦ አሳሽዎ ሲሄዱ ሙሉውን ስብስብ ያከማቻል። ስለሱ ማንበብ ከፈለጉ፣ ዘዴው <strong>Progressive Web App (PWA)</strong> ነው። ከዚያ በኋላ ሁሉም ካልኩሌተሮች ያለ ኢንተርኔት ይሠራሉ — ኢንተርኔት አያስፈልግም።</p><p>ለ Android ወይም iOS፣ EngCalcs እንደ አፕ በመሣሪያዎ ላይ ለመጫን የአሳሽዎን "ወደ መነሻ ማያ ገጽ ጨምር" አማራጭ ይጠቀሙ። ለዴስክቶፕ፣ የጭነት አዶ በአሳሽዎ የአድራሻ አሞሌ ውስጥ ይፈልጉ።</p><p>እንዲሁም ማንኛውንም ካልኩሌተር ለአንድ ጊዜ ያለ ኢንተርኔት አጠቃቀም በአሳሽዎ "እንደ… አስቀምጥ" ምናሌ ማስቀመጥ ይችላሉ።</p><h3>ግንኙነት</h3><p>Tom Haws — ሃይድሮሊክ መሐንዲስ እና የእነዚህ ካልኩሌተሮች ደራሲ።<br />በማንኛውም ካልኩሌተር ገጽ ላይ ያለውን ተጠቃሚ ሀሳብ ቅጽ ይጠቀሙ፣ ወይም <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a> ላይ ምንጭ ኮዱን ያስሱ።</p>';
 $ec_lang['contactSendMessage']='Tom Haws ላክ መልዕክት';
 $ec_lang['contactYourName']='ስምህ:';
 $ec_lang['contactYourEmail']='የኢሜይል አድራሻህ:';
@@ -676,9 +677,7 @@ $ec_lang['lpn_customer_heading']='ደንበኛ {id}';
 // strings every node and link already uses. Do not re-add an account key: a utility that wants a
 // field of its own name makes a custom property.
 $ec_lang['lpn_field_meter_demand']='ፍላጎት በእያንዳንዱ አገልግሎት';
-$ec_lang['lpn_field_meter_demand_tip']='በዚህ ደንበኛ ያለው እያንዳንዱ አገልግሎት የሚያስፈልገው መጠን። ፈልግና ተካ ባዶና 0 መካከል ያለውን ልዩነት መጠቀም ይችላል።';
 $ec_lang['lpn_field_meter_count']='የአገልግሎቶች ብዛት';
-$ec_lang['lpn_field_meter_count_tip']='ይህ አንድ ደንበኛ ለስንት ተመሳሳይ አገልግሎቶች እንደሚወክል፣ ስለዚህ በአንድ ዋና ቧንቧ ላይ ያሉ አርባ ሁለት የነጠላ ቤተሰብ ግንኙነቶች በአንድ ቦታ አንድ ምልክት ሊሆኑ ይችላሉ። ከታች ያለው ድምር ከላይ ያለው ፍላጎት በዚህ ብዛት ተባዝቶ ነው።';
 $ec_lang['lpn_field_meter_total']='ጠቅላላ ፍላጎት';
 $ec_lang['lpn_field_meter_total_tip']='ፍላጎት በእያንዳንዱ አገልግሎት በአገልግሎቶች ብዛት ተባዝቶ። ከታች ለተሰየመው መገናኛ የሚታከለው ቁጥር ይህ ነው።';
 $ec_lang['lpn_field_meter_pipe']='የተገናኘ አካል';
@@ -692,7 +691,6 @@ $ec_lang['lpn_meter_pipe_unknown']='በዚህ ፕሮጀክት ውስጥ {id} የ
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='የዚህ ደንበኛ ፍላጎት በሩጫው ውስጥ እንዴት እንደሚነሳና እንደሚወርድ። ጠቅላላ ፍላጎቱን ያባዛል፣ ስለዚህ ይህ ደንበኛ በሚወክላቸው እያንዳንዱ አገልግሎት ላይ ይሰራል። የፕሮጀክቱን ነባሪ የፍላጎት ስርዓት ለመከተል ምንም ስርዓት የለም ብለው ይተውት።';
 $ec_lang['lpn_meter_pattern_unknown']='በዚህ ፕሮጀክት ውስጥ {id} የተባለ ምንም ስርዓት የለም፣ ስለዚህ ደንበኛው በነበረበት ቀርቷል።';
 $ec_lang['lpn_meter_placed']='ደንበኛ {id} ታክሏል። መግለጫውና ፍላጎቱ በደንበኞች ሠንጠረዥ ውስጥ ይተየባሉ፣ ወይም ሳጥኑን ለመክፈት በምረጥ ውስጥ ይጫኑት።';
 $ec_lang['lpn_field_meter_pipe_tip']='ይህ አገልግሎት የሚገናኝበት አካል። ለመቀየር እዚህ ወይም በደንበኞች ሠንጠረዥ ውስጥ ሌላ ይተይቡ፣ ወይም ግንኙነት ነጥቡን ወደ ሌላ አካል ይጎትቱ።';
@@ -798,7 +796,6 @@ $ec_lang['lpn_pane_manage_cols_down']='ወደ ታች አንቀሳቅስ';
 $ec_lang['lpn_pane_manage_cols_top']='ወደ መጀመሪያ አንቀሳቅስ';
 $ec_lang['lpn_pane_manage_cols_bottom']='ወደ መጨረሻ አንቀሳቅስ';
 $ec_lang['lpn_pane_colmenu_tip']='አምዶችን ደብቅ ወይም አስተዳድር';
-$ec_lang['lpn_pane_sortarrow_tip']='ደርድሩን ገልብጥ';
 $ec_lang['lpn_tool_area_window']='መስኮት ምረጥ';
 $ec_lang['lpn_tool_area_lasso']='ነፃ ቅርጽ ምረጥ';
 $ec_lang['lpn_tool_area_polygon']='ፖሊጎን ምረጥ';
@@ -852,7 +849,6 @@ $ec_lang['lpn_field_elev']='ከፍታ';
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
 // protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
 // entry carrying translatable payload nobody on the page can see.
-$ec_lang['lpn_field_elev_tip']='በዚህ ነጥብ ላይ ያለው የመሬት ወይም የቧንቧ ደረጃ። ከፈለጉት ከማንኛውም ዜሮ መነሻ መለካት ይችላሉ፣ ሁሉም ነጥቦች ተመሳሳዩን መነሻ እስከተጠቀሙ ድረስ።';
 // A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
 // at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
 // This USED to read "so it doubles as a tank" (Tom, 2026-07-30), which was true only while there
@@ -1005,7 +1001,6 @@ $ec_lang['lpn_status_converted']='{n} ዋጋዎች ወደ {unit} እንደገና
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_color_tip']='መረቡን በአንድ መጠን ይቀቡት፣ ትልቅ ካርታም በአንድ እይታ እንዲነበብ። ግፊትና ፍጥነት ብዙ ጊዜ አስፈላጊ የሚሆኑት ሁለቱ ናቸው።';
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
 $ec_lang['lpn_units_length']='ርዝመት';
@@ -1174,13 +1169,6 @@ $ec_lang['lpn_tip_join']='{name} — {tip}';
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='አቋራጭ፦ {key}ን ይጫኑ።';
 $ec_lang['lpn_tool_key_hint_two']='አቋራጭ፦ {key} ወይም {key2} ይጫኑ።';
-$ec_lang['lpn_tool_add_junction_tip']='መገናኛ ለመጨመር ካርታውን ይጫኑ፦ ቧንቧዎች የሚገናኙበት ወይም ውሃ የሚወሰድበት ነጥብ።';
-$ec_lang['lpn_tool_add_reservoir_tip']='ማጠራቀሚያ ለመጨመር ካርታውን ይጫኑ፦ ቋሚ የውሃ ደረጃ ያለው ማለቂያ የሌለው ምንጭ።';
-$ec_lang['lpn_tool_add_tank_tip']='ታንክ ለመጨመር ካርታውን ይጫኑ፦ ሲሞላና ሲትፋ ደረጃው የሚነሳ የሚወርድ ማከማቻ።';
-$ec_lang['lpn_tool_add_pipe_tip']='አንድ ነጥብና ከዚያ ሌላ ነጥብ ይጫኑ፣ በመካከላቸውም ቧንቧ ለመሳል።';
-$ec_lang['lpn_tool_add_pump_tip']='አንድ ነጥብና ከዚያ ሌላ ነጥብ ይጫኑ፣ በመካከላቸውም ፓምፕ ለማስቀመጥ።';
-$ec_lang['lpn_tool_add_valve_tip']='አንድ ነጥብና ከዚያ ሌላ ነጥብ ይጫኑ፣ በመካከላቸውም ቫልቭ ለማስቀመጥ።';
-$ec_lang['lpn_tool_add_text_tip']='በስዕሉ ላይ ማስታወሻ ለመጻፍ ካርታውን ይጫኑ።';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='እንደተነገረው በካርታው ላይ ይጫኑና በቅርጹ ውስጥ ያለውን ሁሉ ይምረጡ። ቅርጹን በመስኮት፣ በነፃ ቅርጽ እና በፖሊጎን መካከል ለመቀየር ይህን ቁልፍ እንደገና ይጫኑ። ካለው ምርጫ ጋር ለመቀጠል፣ የመረጡትን ለመጨመር ወይም ለማስወገድ (ተለዋጭ) ሲመርጡ Shift ይያዙ።';
@@ -1189,7 +1177,6 @@ $ec_lang['lpn_area_selected']='{n} ተመርጠዋል።';
 $ec_lang['lpn_area_none']='በዚያ ቦታ ውስጥ ምንም አልተገኘም።';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_vertices_tip']='በካርታው ላይ ቧንቧን የሚቀርጹትን መታጠፊያዎች ጨምር እና አስወግድ። ቧንቧን ይጫኑ መታጠፊያ ለመጨመር፣ መታጠፊያን ይጫኑ ለማስወገድ፣ መታጠፊያንም ይጎትቱ ለማንቀሳቀስ። መታጠፊያ የሚቀይረው የተሳለውን መንገድ ብቻ ነው፣ ሃይድሮሊኩን አይደለም።';
-$ec_lang['lpn_tool_delete_tip']='በካርታው ላይ ማንኛውንም ነገር ለማስወገድ ይጫኑት።';
 $ec_lang['lpn_tool_undo_tip']='የመጨረሻውን ለውጥ ቀልብስ።';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='ጠቅላላውን መረብ በመስኮቱ ውስጥ አስማማ።';
@@ -1198,7 +1185,6 @@ $ec_lang['lpn_tool_zoom_window_tip']='በካርታው ላይ ለማጉላት የ
 $ec_lang['lpn_zoom_in_tip']='አጉላ። አቋራጭ፦ +';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='አሳንስ። አቋራጭ፦ -';
-$ec_lang['lpn_tool_settings_tip']='ለዚህ ፕሮጀክት ቅንብሮችን ክፈት።';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='አካልን በመለያው ፈልግ፣ ወይም ፈተናን የሚያሟሉ ሁሉንም አካሎች ፈልግ፣ ከዚያም ሁሉንም በአንድ ጊዜ ቀይር።';
 // **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
@@ -1210,7 +1196,6 @@ $ec_lang['lpn_find_menu_tip']='አካልን በመለያው ፈልግ፣ ወይ�
 $ec_lang['lpn_help_icons']='የመሳሪያ አሞሌ ምልክቶች ትርጉም';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='ታይነት';
-$ec_lang['lpn_pane_right_toggle_tip']='ከካርታው ቀኝ ያለውን ፓነል አሳይ ወይም ደብቅ። የምልክትና የቀለም ምርጫዎችን ይይዛል።';
 $ec_lang['lpn_color_legend_open_tip']='የታይነት ፓነሉን ለመክፈትና እነዚህን ቀለሞች ለመቀየር ይጫኑ።';
 $ec_lang['lpn_color_node_field']='ነጥብ ቀለም በ';
 $ec_lang['lpn_color_link_field']='ቧንቧ ቀለም በ';
@@ -1270,7 +1255,6 @@ $ec_lang['lpn_goto_menu']='ወደ ኬክሮስና ኬንትሮስ ሂድ…';
 // lat/lon."* The parser accepts `38,122` and `38.122` as a pair on his ruling of the same day; the
 // examples in lpn_goto_bad show all three shapes, which is where somebody whose last attempt failed
 // is actually reading.
-$ec_lang['lpn_goto_tip']='ቀድሞውኑ መጋጠሚያ ወዳላችሁት ቦታ ካርታውን አንቀሳቅሱ። መጀመሪያ ኬክሮስ፣ ከዚያም ኬንትሮስ፣ ካርታ እንደሚሰጣቸው ቅደም ተከተል፣ በመካከላቸውም ክፍተት ኖሮ፦ 38 -122';
 $ec_lang['lpn_goto_prompt']='ኬክሮስና ኬንትሮስ፣ በዚያ ቅደም ተከተል';
 $ec_lang['lpn_goto_bad']='ያ አንድ ኬክሮስና አንድ ኬንትሮስ አይደለም። 38 -122ን ይሞክሩ፣ በመካከላቸውም ክፍተት ይኑር።';
 $ec_lang['lpn_georef_goto']='ሂድ ወደ…';
@@ -1329,7 +1313,6 @@ $ec_lang['lpn_goto_on_map']='በካርታው ላይ አሳይ';
 $ec_lang['lpn_pane_select_on_map']='ካርታ ላይ ምረጥ';
 $ec_lang['lpn_pane_unselect_on_map']='ካርታ ላይ ምርጫ አጥፋ';
 $ec_lang['lpn_pane_print']='ሠንጠረዥ አትም';
-$ec_lang['lpn_pane_print_tip']='እየተመለከቱት ያለውን ሠንጠረዥ ያትማል፣ ከፕሮጀክቱ ስም፣ ከሠንጠረዡ ስምና ከመለኪያ ክፍሎቹ ጋር በራስጌዎቹ ውስጥ። ረድፎች የደረደሩበትን ቅደም ተከተል ይዘው ይታተማሉ።';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1410,7 +1393,7 @@ $ec_lang['lpn_help_walkthroughs']='ደረጃ በደረጃ መመሪያ';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='መረብ ሰርዝ';
-$ec_lang['lpn_confirm_delete_network']='በዚህ ፕሮጀክት ውስጥ ያሉትን ሁሉንም ነጥቦች፣ ቧንቧዎችና የጽሑፍ ምልክቶች ይሰርዙ? የበስተጀርባ ምስሉ፣ የፕሮጀክቱ ስምና ቅንብሮችዎ ይቆያሉ። ይህ ሊቀለበስ አይችልም።';
+$ec_lang['lpn_confirm_delete_network']='በዚህ ፕሮጀክት ውስጥ ያሉትን ሁሉንም ነጥቦች፣ ቧንቧዎችና የጽሑፍ ምልክቶች ይሰርዙ? የበስተጀርባ ምስሉ፣ የፕሮጀክቱ ስምና ቅንብሮችዎ ይቆያሉ።';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -1568,7 +1551,6 @@ $ec_lang['lpn_profile_menu']='መገለጫ';
 // nobody to read. Sprint 459's Wave 0 found them; Tom ruled the move on 2026-08-24 ("these _syns
 // are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
 // permission $ec_lang_syn requires. Same text, correct array.
-$ec_lang['lpn_profile_tip']='በመረቡ ውስጥ በተመረጠ መንገድ ላይ የመሬቱን ገጽታና የሃይድሮሊክ ደረጃ መስመሩን (HGL) ይሳሉ።';
 $ec_lang['lpn_profile_title']='በመንገድ ላይ ያለ መገለጫ';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
@@ -1626,12 +1608,9 @@ $ec_lang['lpn_profile_missing']='{name} የተባለው የተቀመጠ መን�
 $ec_lang['lpn_ts_menu']='የጊዜ ተከታታይ';
 $ec_lang['lpn_ts_tip']='በተራዘመ ጊዜ ማስመሰያ ውስጥ አንድ ወይም ብዙ አካሎችን ከጊዜ ጋር አነጻጽሮ ያሳያል።';
 $ec_lang['lpn_ts_title']='ዋጋዎች በጊዜ';
-$ec_lang['lpn_ts_group_tip']='ግራፉ ነጥቦችን ወይም ግንኙነቶችን ያሳያል ወይ።';
 $ec_lang['lpn_ts_group_nodes']='ነጥቦች';
 $ec_lang['lpn_ts_group_links']='ግንኙነቶች';
-$ec_lang['lpn_ts_quantity_tip']='የትኛው ዋጋ ከጊዜ ጋር እንደሚሳል።';
 $ec_lang['lpn_ts_add']='የተመረጠውን ጨምር';
-$ec_lang['lpn_ts_add_tip']='አሁን በካርታው ላይ የተመረጠውን ሁሉ ወደ ግራፉ ያስገባል።';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
 $ec_lang['lpn_ts_add_none']='ከዚያ ዓይነት በካርታው ላይ ምንም አልተመረጠም።';
 $ec_lang['lpn_ts_clear']='ሁሉንም አስወግድ';
@@ -1646,8 +1625,6 @@ $ec_lang['lpn_ts_axis_time']='ያለፈ ጊዜ';
 $ec_lang['lpn_freq_menu']='ድግግሞሽ';
 $ec_lang['lpn_freq_tip']='በአሁኑ የጊዜ ደረጃ የአንድ ንብረት ድግግሞሽ ስርጭትን በሁሉም መገናኛዎች ወይም በሁሉም ቧንቧዎች ላይ ግራፍ አድርጎ ያሳያል።';
 $ec_lang['lpn_freq_title']='የዋጋዎች ስርጭት';
-$ec_lang['lpn_freq_group_tip']='ግራፉ መገናኛዎችን ወይም ቧንቧዎችን ያሳያል ወይ።';
-$ec_lang['lpn_freq_quantity_tip']='የትኛው ዋጋ እንደሚሳል።';
 $ec_lang['lpn_freq_none']='ለዚህ ዋጋ ገና ውጤት የለም፣ ስለዚህ የሚሳል ነገር የለም።';
 $ec_lang['lpn_freq_summary']='የተሳሉት፦ {n} ከ{total}';
 $ec_lang['lpn_freq_summary_time']='የተሳሉት፦ {n} ከ{total}፣ በ{time}';
@@ -1704,7 +1681,6 @@ $ec_lang['lpn_crs_search']='ፈልግ';
 $ec_lang['lpn_crs_name']='የፕሮጀክሽን ስም ማጣሪያ';
 $ec_lang['lpn_crs_name_tip']='እርስዎ የተየቡትን የያዙ ስም ወይም EPSG ኮድ ያላቸውን ፕሮጀክሽኖች ብቻ ያሳያል። የዞን ቁጥር፣ ወይም UTM፣ ወይም Mercator ይሞክሩ።';
 $ec_lang['lpn_crs_list_tip']='ከላይ ባሉት ሁለት ማጣሪያዎች የቀሩት ፕሮጀክሽኖች ናቸው። አንዱን መርጠው ምረጥ ይጫኑ።';
-$ec_lang['lpn_crs_choose']='ምረጥ';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='እስካሁን ምንም ቦታ አልተፈለገም፣ ስለዚህ ሙሉው ዝርዝር ቀርቧል። ከላይ ቦታ ይፈልጉ ወይም ካርታውን ያጥቡት (ዙም ያድርጉ) ዝርዝሩን ለማጥበብ።';
 $ec_lang['lpn_crs_count']='ከ{total} ፕሮጀክሽኖች {n} ተዘርዝረዋል።';
@@ -1751,7 +1727,6 @@ $ec_lang['lpn_file_revert']='እንደነበር መልስ';
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='የቅርብ ጊዜ ፋይሎች';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_recent_tip']='{file}ን በኮምፒውተርዎ ላይ ፈልገው ሳያገኙ ዳግም ይክፈቱ።';
 $ec_lang['lpn_recent_denied']='ያንን ፋይል ለመክፈት ፈቃድ ስላልተሰጠ አልተከፈተም።';
 $ec_lang['lpn_recent_gone']='{file}ን መክፈት አልተቻለም። ተንቀሳቅሶ፣ ስሙ ተቀይሮ ወይም ተሰርዞ ሊሆን ስለሚችል ከቅርብ ጊዜ ዝርዝሩ ተነስቷል።';
 // The tab strip. These are titles on small controls, so each has to stand alone with no sentence
@@ -1834,7 +1809,6 @@ $ec_lang['lpn_inp_drop_report']='ይህ ፋይል EPANET ለራሱ ለሚያት�
 $ec_lang['lpn_inp_drop_sections']='ይህ ፋይል ይህ ገጽ በጭራሽ የማያነበው ክፍል ይይዛል። እዚህ ጥቅም ላይ አይውልም። ሙሉ በሙሉ ይያዛል፣ የEPANET ፋይል ካስቀመጡም ይመለሳል።';
 $ec_lang['lpn_inp_drop_quality_options']='ይህ ፋይል የEPANET የውሃ ጥራት አማራጮችን ይገልጻል፦ የውሃ ጥራት ትንተናውን ዓይነት የሚሰይመው Quality አማራጭ፣ እና ከኬሚካል ጋር የሚሄዱ ሁለት ቅንብሮች፣ አንጻራዊ ስርጭትና የጥራት ልዩነት ገደብ። ሦስቱም ይያዛሉ፣ ሦስቱም ጥቅም ላይ ይውላሉ። የውሃ እድሜ፣ የምንጭ ፍለጋና ኬሚካል እያንዳንዳቸው እዚህ ይሰላሉ፣ ኬሚካል ሲያስኩም ሁለቱ የኬሚካል ቅንብሮች ለEPANET ፈታች ይሰጣሉ። ሁሉም የEPANET ፋይል ካስቀመጡ ይመለሳሉ።';
 $ec_lang['lpn_inp_drop_file_options']='ይህ ፋይል ተጨማሪ ፋይል ይጠቅሳል፦ መጋጠሚያዎችን የያዘ Map፣ ወይም አስቀድሞ የተሰላ ሃይድሮሊክስ የያዘ Hydraulics። ይህ ገጽ የትኛውንም መክፈት ስለማይችል፣ መስመሮቹ እንዳሉ ይያዛሉ፣ የEPANET ፋይል ካስቀመጡም ይመለሳሉ።';
-$ec_lang['lpn_inp_drop_demand_model']='ይህ ፋይል በግፊት የሚነዳ ትንተና (PDA) ይጠይቃል፣ በዚያም አንድ መገናኛ ግፊቱ ዝቅተኛ ሲሆን ከፍላጎቱ ያነሰ ይቀበላል። ይህ ገጽ በፍላጎት የሚነዳ ስሌት ስለሚፈታ፣ እያንዳንዱ መገናኛ ውጤቱ ምንም ግፊት ይሁን ፋይሉ የገለጸውን ፍላጎት ይቀበላል። መስመሩ ይያዛል፣ የEPANET ፋይል ካስቀመጡም ይመለሳል።';
 $ec_lang['lpn_inp_drop_other_options']='ይህ ፋይል ይህ ገጽ የማያነባቸውን አማራጮች ይገልጻል። እዚህ ጥቅም ላይ አይውሉም። ይያዛሉ፣ የEPANET ፋይል ካስቀመጡም ይመለሳሉ።';
 $ec_lang['lpn_inp_drop_net_options']='ይህ የEPANET .net ፋይል ይህ ገጽ መቆጣጠሪያ የሌለው ቅንብሮችን ይገልጻል፣ ስለዚህ ዋጋዎቻቸው ተላልፈው ከመግባት ይልቅ እዚህ ተዘርዝረዋል። የቀረው ሁሉ ገብቷል። ካስፈለጉዎት፣ ፋይሉን በEPANET ውስጥ ይክፈቱ እና ፋይል፣ ላክ፣ መረብ ተጠቅመው እንደ .inp ፋይል ያስቀምጡት፣ ከዚያም እሱን ያስገቡ።';
 // Edited by TGH 2026-09-07
@@ -1875,11 +1849,8 @@ $ec_lang['lpn_file_upload_explain']='ይህ አሳሽ ከፋይል ጋር መገ
 // The tip on the Open button, which reached the toolbar with Task 246. It exists because that
 // button is icon-only: on a menu row the word carries the whole meaning, and on the strip the tip
 // is where the rest of it lives.
-$ec_lang['lpn_file_open_tip']='ከዚህ ገጽ የተቀመጠ የፕሮጀክት ፋይል ይክፈቱ።';
 // Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
 // cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
-$ec_lang['lpn_file_save_tip']='ከተገናኘው ፋይል ጋር ያስቀምጣል።';
-$ec_lang['lpn_file_saveas_tip']='የሚያስቀምጡበትን ፋይል ይምረጡ። ይህ ፕሮጀክት ከዚያ ፋይል ጋር ይገናኛል፣ ከዚያ በኋላ አስቀምጥ ወደዚያው ይጽፋል።';
 // The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
 // cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
 // is no API for it, and the download attribute cannot override the setting -- but the user can turn
@@ -2185,7 +2156,6 @@ $ec_lang['lpn_field_roughness_tip']='የHazen-Williams C። ከፍ ያለ ቁጥ
 $ec_lang['lpn_field_length']='ርዝመት';
 $ec_lang['lpn_field_from']='ከ';
 $ec_lang['lpn_field_to']='ወደ';
-$ec_lang['lpn_field_length_tip']='የቧንቧው ርዝመት። ራስ-ሰር በርቶ ሳለ ርዝመቱ ከስዕልዎ ይለካል። ከስዕሉ የተለየ ርዝመት ለመተየብ ራስ-ሰርን ያጥፉ።';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2227,7 +2197,6 @@ $ec_lang['lpn_field_valve_setting_loss_tip']='የመቆጣጠሪያ ቫልቩ �
 $ec_lang['lpn_field_valve_diameter_tip']='በቫልቩ ውስጥ ያለው የመተላለፊያ ስፋት። በቫልቩ ውስጥ የሚያልፈው የውሃ ፍጥነት ከዚህ ስፋት ይሰላል፣ ኪሳራውም ከዚያ ፍጥነት ይከተላል።';
 $ec_lang['lpn_field_valve_km_tip']='ቫልቩ ሙሉ በሙሉ ክፍት ሆኖ ሳለ ከቫልቩ አካል የሚመጣ ኪሳራ፣ ከቫልቩ ቅንብር ከሚያስወግደው በተጨማሪ። የፍጥነት ሄድ ብዜት ተደርጎ ይቆጠራል። ችላ ለማለት 0 ይጠቀሙ።';
 $ec_lang['lpn_field_km']='ጥቃቅን (አካባቢያዊ) ኪሳራ ኮፊሸንት፣ k';
-$ec_lang['lpn_field_km_tip']='ከዚህ ቧንቧ ጠማማዎች፣ ቫልቮችና ማያያዣዎች የሚመጣ ኪሳራ፣ የፍጥነት ሄድ ብዜት ተደርጎ የሚቆጠር። ለቀላል ቀጥተኛ ቧንቧ 0 ይጠቀሙ።';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
 // their own key rather than being asked to carry the full popup-field wording -- an on-map legend
@@ -2264,7 +2233,6 @@ $ec_lang['lpn_field_desc']='መግለጫ';
 // description is free text, so the tag's one-word rule does NOT apply to it, but a line break cannot
 // be written as a trailing comment and is turned into a space. The tip says what the field is for
 // first, because that is what a reader of a blank box wants.
-$ec_lang['lpn_field_desc_tip']='ለራስዎ አገልግሎት፣ እንደ የመንገድ ጠርዝ ወይም ቧንቧው ከምን እንደተሠራ። ወደ EPANET ፋይል ውስጥ ይገባል ይወጣልም፣ እዚያም የክፍሉ ረድፍ መጨረሻ ላይ ይቀመጣል። ምንም ስሌት አያነበውም። ፋይሉ የሚያኖርበት ቦታ ስለሌለው የመስመር መቋረጥ ወደ ክፍት ቦታ ይቀየራል።';
 // **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
@@ -2340,7 +2308,6 @@ $ec_lang['lpn_mode_add_text']='ሁነታ፦ ጽሑፍ ጨምር። ጽሑፍ ለ
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='አካሎችን በካርታው ላይ ለመቀየር፣ ለማንቀሳቀስ እና ለመጎተት ይህን ሁነታ ይጠቀሙ። ገጹ በነባሪነት የሚመለስበት ሁነታ ይህ ነው፦ እንደ ፕሮጀክት መክፈት ካሉ አንዳንድ ተግባራት በኋላ ራሱ ወደዚህ ይመለሳል። Esc ን ለሁለተኛ ጊዜ ሲጫኑ የተመረጠው ነገር ሁሉ ከምርጫ ይወጣል።';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tip_labels_draggable']='ምልክትን ለማንቀሳቀስ መጎተት ይችላሉ። ምልክቱ እንደተንቀሳቀሰ ለማሳወቅ ለአጭር ጊዜ ያበራል። ወደ ራስ-ሰር ቦታው ለመመለስ ምልክቱን ሁለቴ ይጫኑ።';
 $ec_lang['lpn_field_auto']='ራስ-ሰር';
 $ec_lang['lpn_method_switch_confirm']='የግጭት ዘዴውን መቀየር በቧንቧዎችዎ ላይ የገቡትን የሻካሪነት ቁጥሮች አይቀይርም፣ ለአንድ ዘዴ የተዘጋጀ ሻካሪነትም ለሌላው ትርጉም የለውም። ከዚህ በኋላ እያንዳንዱን ቧንቧ ያረጋግጡ። ያም ሆኖ ይቀየር?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
@@ -2392,7 +2359,6 @@ $ec_lang['lpn_field_text_all_zoom_tip']='ምንም ያህል ቢያጉሉ ይህ
 $ec_lang['lpn_tool_labels']='ምልክቶች';
 $ec_lang['lpn_labels_heading_node']='የነጥብ ምልክቶች';
 $ec_lang['lpn_labels_heading_link']='የግንኙነት ምልክቶች';
-$ec_lang['lpn_labels_decimals_tip']='ለዚህ ምልክት የሚታዩ የአስርዮሽ ቦታዎች';
 $ec_lang['lpn_labels_mark_extrema']='ከፍተኛውንና ዝቅተኛውን ዋጋዎች ምልክት አድርግ';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
@@ -2408,8 +2374,6 @@ $ec_lang['lpn_settings_apply_to_all']='በሁሉም ላይ ተግብር';
 $ec_lang['lpn_settings_apply_to_all_tip']='ቀድሞ የተሳለ ከዚህ ዓይነት እያንዳንዱ አካል በዚህ ጽሑፍ የሚጀምር መለያ ያገኛል። እያንዳንዱ ቁጥሩን ይይዛል። በቁጥር የማያልቅ መለያ አይነካም።';
 $ec_lang['lpn_confirm_apply_prefix']='{n} አካሎችን መልሰው ይሰይሙ መለያዎቻቸው በ{prefix} እንዲጀምሩ? እያንዳንዱ ቁጥሩን ይይዛል።';
 $ec_lang['lpn_prefix_applied']='{n} አካሎች ተሰይመዋል። {skipped} ሌሎች እንዳሉ ተትተዋል።';
-$ec_lang['lpn_labels_prefix_tip']='በካርታ ምልክቶች ላይ ከዚህ ንብረት በፊት የሚጨመር ጽሑፍ';
-$ec_lang['lpn_labels_suffix_tip']='በካርታ ምልክቶች ላይ ከዚህ ንብረት በኋላ የሚጨመር ጽሑፍ';
 $ec_lang['lpn_labels_suffix_gradient_tip']='በካርታ ምልክቶች ላይ ከሄድ ኪሳራ ቅልመት በኋላ የሚጨመር ጽሑፍ። እዚህ የመቶኛ ምልክት አይተይቡ። መለኪያ ክፍሉ መቶኛ ሲሆን ራሱ ይጨመርልዎታል።';
 $ec_lang['lpn_labels_separator']='በዋጋዎች መካከል ያለ ጽሑፍ';
 $ec_lang['lpn_labels_separator_tip']='ከአንድ ንብረት ወደ ቀጣዩ ባለ ምልክት ላይ ያለ ጽሑፍ። ነባሪው ክፍት ቦታ ነው።';
@@ -2420,7 +2384,6 @@ $ec_lang['lpn_labels_separator_tip']='ከአንድ ንብረት ወደ ቀጣዩ
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='ቅድሚያ';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='ምልክት በማይገባበት ጊዜ ዋጋዎች የሚጣሉበት ቅደም ተከተል። 1 ረዘም ላለ ጊዜ ይቆያል።';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
@@ -2437,7 +2400,6 @@ $ec_lang['lpn_labels_col_decimals']='አስርዮሽ';
 // it heads a box about three characters wide, and its tip carries the whole meaning.
 $ec_lang['lpn_labels_col_show']='አሳይ';
 $ec_lang['lpn_labels_show_tip']='ዋጋዎች በምልክት ላይ የሚታዩበት ቅደም ተከተል። ቁጥር 1 የተባለው ዋጋ መጀመሪያ ይመጣል፦ በተደራረበ ምልክት አናት ላይ፣ በአንድ መስመር ምልክት ደግሞ በመጀመሪያ።';
-$ec_lang['lpn_labels_priority_customer_tip']='ዋጋዎች ከደንበኛ ምልክት የሚወገዱበት ቅደም ተከተል። ቁጥር 1 የተባለው ዋጋ መጀመሪያ ይወገዳል።';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='መለኪያ ክፍል ተጠቀም';
@@ -2566,7 +2528,6 @@ $ec_lang['lpn_backdrop_continue']='ቀጥል';
 $ec_lang['lpn_tool_settings']='ቅንብሮች';
 $ec_lang['lpn_settings_show_titles']='የገጽ ርዕሶችን አሳይ';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_show_titles_tip']='የገጹን ራስጌና ከስዕሉ በላይ ያለውን የእንኳን ደህና መጣችሁ መስመር ይደብቃል፣ በዚህም ካርታው ተጨማሪ ቦታ ያገኛል። ማተም ሁልጊዜ ንጹህ ካርታ ብቻ ያሳያል።';
 // The link that rides on the headings themselves (Tom's 2026-09-08 worklist). It throws the switch AND opens the
 // box at the row that holds it, so the way back is learned in the same gesture.
 $ec_lang['lpn_hide_titles']='እነዚህን ርዕሶች ደብቅ';
@@ -2771,7 +2732,6 @@ $ec_lang['lpn_settings_default_is']='ነባሪው {n} ነው።';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='ፈታቹ ከመቆሙ በፊት ምን ያህል መቃረብ እንዳለበት፣ ፍሰቶቹ ከአንዱ ሙከራ ወደ ቀጣዩ አሁንም በምን ያህል እየተለወጡ እንደሆኑ ተለክቶ። ትንሽ ቁጥር ይበልጥ ትክክለኛ ነው፣ ረዘም ያለ ጊዜም ይወስዳል። ሁለቱም ፈታቾች ይህን አንድ ሳጥን ያነባሉ፣ እያንዳንዱም ለውጡን ከተለያየ ድምር ጋር ይለካል፦ አብሮ የተሰራው ፈታች ከፍላጎቶቹ ድምር ጋር፣ EPANET ደግሞ ከቧንቧ ፍሰቶች ድምር ጋር። ባዶ ከተተወ፣ ይህ ገጽ ከEPANET ራሱ ነባሪ የበለጠ ጥብቅ ትክክለኛነት ይጠቀማል።';
 $ec_lang['lpn_settings_specific_gravity']='ልዩ ስበት';
-$ec_lang['lpn_settings_specific_gravity_tip']='የፈሳሹ ክብደት ከውሃ ጋር ሲነጻጸር። የሚቀይረው መለኪያ የሚያነበውን ግፊት ነው፣ ፍሰቶቹን አይደለም።';
 $ec_lang['lpn_settings_viscosity']='አንጻራዊ ቪስኮሲቲ';
 $ec_lang['lpn_settings_viscosity_tip']='የፈሳሹ ቪስኮሲቲ በ20 ዲግሪ ሴልስየስ ካለው ውሃ ጋር ሲነጻጸር። መልሱን የሚቀይረው በዳርሲ-ዌይስባክ ዘዴ ስር ብቻ ነው።';
 $ec_lang['lpn_settings_trials']='ከፍተኛ ሙከራዎች';
@@ -2868,7 +2828,6 @@ $ec_lang['lpn_settings_mask_labels']='ከምልክቶች በስተጀርባ ጠ�
 // drawing program would expect exactly that from those words.
 $ec_lang['lpn_settings_leader_snap']='የመሪ መስመሮች ወደ ተወሰኑ ማዕዘኖች ይሳቡ';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_leader_snap_tip']='ምልክትን ከሚያመለክተው ርቆ ሲጎትቱ፣ ወደ እሱ የሚመለሰው መስመር ወደ አንዱ ቅርብ ሲጎትቱ ወደ ቅርቡ ተወሰነ ማዕዘን ይሳባል። መጎተቱን ከቀጠሉ መሳቡ ይለቅቃል፣ ስለዚህ ማንኛውም ማዕዘን አሁንም ይገኛል። ማጥፋት ልክ እንደ ገጹ ከመጀመሪያው ጀምሮ ያለ ነፃ መጎተትን ይሰጣል።';
 // **THE LABELING THRESHOLD** (Tasks 669 and 705). The row's name is Tom's own wording from the
 // Task 705 restorations. Its capture button reuses lpn_settings_label_use_view, the customer
 // row's key, because it is the same button doing the same thing. The placeholder is the only place
@@ -3002,7 +2961,6 @@ $ec_lang['lpn_time_tank']='ታንክ';
 $ec_lang['lpn_time_level']='የውሃ መጠን ደረጃ';
 $ec_lang['lpn_time_run']='አስላ';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='ይህን መረብ በእያንዳንዱ የሃይድሮሊክ ጊዜ ደረጃ ይፈታል።';
 // **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
 // `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
 // LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
@@ -3079,7 +3037,6 @@ $ec_lang['lpn_labels_customer_width_tip']='የደንበኛ ምልክቶች የ�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='አሁን ያለውን እይታ ተጠቀም';
 $ec_lang['lpn_settings_page']='ገጽ';
-$ec_lang['lpn_settings_page_note']='በዚህ ካልኩሌተር ውስጥ ተቀምጧል፣ በፕሮጀክቱ ውስጥ አይደለም።';
 $ec_lang['lpn_settings_hydraulics']='ሃይድሮሊክስ';
 $ec_lang['lpn_settings_quality']='የውሃ ጥራት';
 $ec_lang['lpn_settings_quality_track']='የጥራት መለኪያ';
@@ -3226,11 +3183,9 @@ $ec_lang['lpn_settings_energy']='ኃይል';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='ዘገባዎች';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_menu_tip']='መረቡ ከተሰላ በኋላ ይህ ገጽ የሚያዘጋጃቸው የመጨረሻ መልሶች፦ ፓምፖቹ ምን ያህል እንደሚያስወጡ፣ ሁኔታዎቹ እንዴት እንደሚነጻጸሩ፣ እና የEPANET ፈታች ራሱ ያተመው ምን እንደሆነ።';
 $ec_lang['lpn_reports_epanet']='የEPANET ሩጫ';
 $ec_lang['lpn_energy_title']='የፓምፕ ኃይል ዘገባ';
 $ec_lang['lpn_energy_menu']='የፓምፕ ኃይል';
-$ec_lang['lpn_energy_menu_tip']='ባለፈው የተራዘመ ጊዜ ማስመሰያ ውስጥ እያንዳንዱ ፓምፕ ከሩጫው ምን ያህል ድርሻ በርቶ እንደነበር፣ ምን ያህል ኃይል እንደሳበ፣ እና ምን ያህል እንዳስወጣ።';
 $ec_lang['lpn_energy_efficiency']='የፓምፕ ብቃት (በመቶኛ)';
 $ec_lang['lpn_energy_efficiency_tip']='የራሱ የብቃት ኩርባ ለሌለው እያንዳንዱ ፓምፕ ጥቅም ላይ የሚውለው ከሽቦ-እስከ-ውሃ ብቃት። ምንም ካልተገለጸ EPANET 75 በመቶ ይጠቀማል።';
 $ec_lang['lpn_energy_price']='የኃይል ዋጋ';
@@ -3294,12 +3249,12 @@ $ec_lang['lpn_status_title']='የሁኔታ ሪፖርት';
 $ec_lang['lpn_status_needs_run']='የሁኔታ ሪፖርቱ በተራዘመ ጊዜ ማስመሰያ ውስጥ የተለወጠውን ይዘረዝራል። በቅንብሮች፣ ስሌት፣ ጊዜ ውስጥ ጠቅላላ የሩጫ ጊዜ ያዘጋጁ፣ ስላ ይጫኑ፣ ከዚያም ውሃ፣ ሪፖርቶች፣ የሁኔታ ሪፖርት ይክፈቱ።';
 $ec_lang['lpn_status_empty']='በዚህ ሩጫ ውስጥ ምንም ሁኔታ አልተቀየረም።';
 $ec_lang['lpn_status_col_event']='ክስተት';
-$ec_lang['lpn_status_opened']='{type} {id} ተከፍቷል';
-$ec_lang['lpn_status_closed']='{type} {id} ተዘግቷል';
-$ec_lang['lpn_status_filling']='{type} {id} እየሞላ ነው';
-$ec_lang['lpn_status_emptying']='{type} {id} እየተፋ ነው';
-$ec_lang['lpn_status_full']='{type} {id} ሞልቷል';
-$ec_lang['lpn_status_dry']='{type} {id} ባዶ ነው';
+$ec_lang['lpn_status_opened']='{type} {id} አሁን ተከፍቷል';
+$ec_lang['lpn_status_closed']='{type} {id} አሁን ተዘግቷል';
+$ec_lang['lpn_status_filling']='{type} {id} አሁን እየሞላ ነው';
+$ec_lang['lpn_status_emptying']='{type} {id} አሁን ባዶ እየሆነ ነው';
+$ec_lang['lpn_status_full']='{type} {id} አሁን ሞልቷል';
+$ec_lang['lpn_status_dry']='{type} {id} አሁን ባዶ ነው';
 $ec_lang['lpn_status_no_converge']='በዚህ ደረጃ ላይ ያለው የሃይድሮሊክ መፍትሔ ሙሉ ለሙሉ አልተጣጣመም፤ የሚታዩት ቁጥሮች የመጨረሻው ድግግሞሹ ናቸው።';
 $ec_lang['lpn_status_note']='ልክ እንደ ሠንጠረዦች ፓነልና ሙሉ ሪፖርት ከተመሳሳዩ የተራዘመ ጊዜ ሩጫ የተነበበ። የተዘረዘረው ለውጥ ብቻ ነው፣ እያንዳንዱ ደረጃ አይደለም።';
 
@@ -3364,7 +3319,6 @@ $ec_lang['lpn_color_mode_manual']='በእጅ';
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='ቤተመዛግብት';
-$ec_lang['lpn_library_menu_tip']='ለዚህ ፕሮጀክት የፍላጎት ስርዓቶችን፣ የፓምፕ ኩርባዎችንና የመቆጣጠሪያ ደንቦችን ያስተዳድሩ።';
 // The three section names. Each is the word EPANET's own input file uses for the section, because
 // that is the word every water-network user and every tutorial already has -- see the note in
 // dev/scripts/glossary.json about deferring to a discipline's standard term.
@@ -3378,7 +3332,6 @@ $ec_lang['lpn_library_curves_tip']='ኩርባ አንድ ነገር እንዴት �
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_curves_note']='ኩርባዎች ከፓምፖችና ቫልቮች ጋር ተያይዘዋል። ለፓምፕ ሄድ ኩርባ ሩጫው በሚታየው መንገድ በነጥቦቹ ውስጥ የተስማማ ኩርባ ይጠቀማል፤ ለሌላው እያንዳንዱ ዓይነት በሚታየው መንገድ ነጥቦቹን በቀጥተኛ መስመሮች ያገናኛል።';
 $ec_lang['lpn_library_curve_add']='ኩርባ ጨምር';
-$ec_lang['lpn_library_curve_type_tip']='ይህ ኩርባ የሚገልጸው ምን እንደሆነ';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
 // EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
 // and Equation (for pump head) on row/line 2."*). EPANET calls the control "Curve Type", so that is
@@ -3399,7 +3352,6 @@ $ec_lang['lpn_library_curve_values_tip']='በሰንጠረዥ ውስጥ አንድ
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
 $ec_lang['lpn_library_curve_note_label']='መግለጫ';
-$ec_lang['lpn_library_curve_note_tip']='ይህ ኩርባ ምን እንደሆነ፣ በራስዎ ቃላት። በEPANET ፋይል ውስጥ ከኩርባው በላይ ተጽፎ ከዚያ ተነስቶ ይነበባል።';
 $ec_lang['lpn_library_curve_remove_point']='ይህን ነጥብ አስወግድ';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -3582,14 +3534,11 @@ $ec_lang['lpn_field_base_demand']='መሠረታዊ ፍላጎት';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='በሚታየው የጊዜ ደረጃ ይህ ነጥብ የሚወስደው ፍሰት፦ እያንዳንዱ መሠረታዊ ፍላጎት በራሱ ስርዓት ተባዝቶ ተደምሮ። ይሰላል እንጂ አይተየብም፣ ስለዚህ ከሰዓቱ ጋር ይለወጣል፣ ሊታረትም አይችልም።';
 $ec_lang['lpn_field_demand_pattern']='የፍላጎት ስርዓት';
-$ec_lang['lpn_field_demand_pattern_tip']='የዚህ መገናኛ ፍላጎት በስራው ውስጥ እንዴት እንደሚነሳ እንደሚወርድም። ራሱ የፕሮጀክቱ ነባሪ ስርዓት የሆነውን ለመከተል፣ ምንም ስርዓት የለም ብለው ይተውት።';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
 $ec_lang['lpn_field_demand_category']='መግለጫ';
-$ec_lang['lpn_field_demand_category_tip']='የዚህ የፍላጎት ምድብ ስም ወይም መግለጫ።';
 $ec_lang['lpn_demand_add']='የፍላጎት ምድብ ጨምር';
-$ec_lang['lpn_demand_add_tip']='በዚህ መገናኛ ላይ ሌላ የፍላጎት ምድብ ይጨምሩ፣ የራሱ መሠረታዊ ፍላጎት፣ ስርዓትና መግለጫ ይዞ። ምድቦቹ ይደመራሉ።';
 $ec_lang['lpn_demand_remove']='ይህን ፍላጎት አስወግድ';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
@@ -3712,6 +3661,9 @@ $ec_lang['lpn_ff_residual']='የሚያዝ ቀሪ ግፊት';
 $ec_lang['lpn_ff_residual_tip']='የእሳት ፍሰቱን እያደረሰ መገናኛው አሁንም መያዝ ያለበት ግፊት። AWWA M31 እና NFPA 291 20 psi (140 kPa) ይጠቀማሉ።';
 $ec_lang['lpn_ff_design']='የንድፍ ምርመራ (በስርዓቱ ላይ ያለው ተጽዕኖ)';
 $ec_lang['lpn_ff_design_tip']='መገናኛው ፍሰቱን ማድረስ ይችል እንደሆነ ከሚለው የተለየ ጥያቄ፦ ያ ፍሰት እዚያ ሲሳብ፣ ሌላ ማንኛውም ነገር ከዝቅተኛ ግፊቱ በታች ይወርዳል ወይስ የፍጥነት ገደቡን ያልፋል? መፈተኑን መምረጥ ምንም ተጨማሪ ስሌት አያስወጣም።';
+$ec_lang['lpn_ff_design_off']='ምንም';
+$ec_lang['lpn_ff_design_all']='ሁሉም';
+$ec_lang['lpn_ff_design_selected']='የተመረጡት';
 $ec_lang['lpn_ff_design_no_selection']='የንድፍ ምርመራው ወደ የተመረጡት ተቀናብሯል፣ ነገር ግን ምንም አካል አልተመረጠም። አካሎችን ይምረጡ ወይም ሁሉም የሚለውን አማራጭ ይምረጡ።';
 $ec_lang['lpn_ff_minpressure']='በሌላ ቦታ የሚፈቀድ ዝቅተኛ ግፊት';
 $ec_lang['lpn_ff_minpressure_tip']='ሌላ መገናኛ የእሳት ፍሰቱን እየሳበ ሳለ ከዚህ በታች የሚወርድ መገናኛ እንደ ንድፍ ችግር ይነገራል።';
@@ -3810,6 +3762,7 @@ $ec_lang['lpn_ff_more']='እና {n} ተጨማሪ የተነኩ';
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
 // agree with one noun and would have been wrong at the other call site.
 $ec_lang['lpn_ff_rows_more']='{n} ተጨማሪ መገናኛዎች አልታዩም።';
+$ec_lang['lpn_ff_rows_more_links']='ያልታዩ አገናኞች፦ {n}።';
 $ec_lang['lpn_ff_design_none']='ማንኛውም መገናኛ የእሳት ፍሰቱን እየሳበ ሳለ በተመረጠው ስብስብ ውስጥ ካሉት ገደቦቻቸው ውጭ የወጣ ነገር የለም።';
 $ec_lang['lpn_ff_design_off_note']='በዚህ ሩጫ ላይ በስርዓቱ ቀሪ ክፍል ላይ ያለው ተጽዕኖ አልተፈተነም።';
 // **WHY IT IS SAID AND NEVER APPLIED, in Tom's words (2026-09-02), and the reason is the MODEL, not
@@ -3903,3 +3856,127 @@ $ec_lang['lpn_survey_note_blank_rows']='የተዘለሉ ባዶ መስመሮች�
 $ec_lang['lpn_survey_note_id_duplicate']='ስሙ ቀደም ብሎ በዚህ ፋይል ውስጥ ጥቅም ላይ ውሏል፣ አዲስ ስም ተመድቧል።';
 $ec_lang['lpn_survey_note_id_taken']='ስሙ ቀድሞውኑ በፕሮጀክቱ ውስጥ ጥቅም ላይ ውሏል፣ አዲስ ስም ተመድቧል።';
 $ec_lang['lpn_survey_note_id_invalid']='ስሙ እዚህ ጥቅም ላይ ሊውል አይችልም፣ አዲስ ስም ተመድቧል።';
+$ec_lang['lpn_hotkeys_menu_heading']='ምናሌዎች';
+$ec_lang['lpn_hotkeys_menu_term']='የምናሌ የቁልፍ ሰሌዳ አቋራጮች';
+$ec_lang['lpn_hotkeys_menu_def']='<table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+ፊደል</td><td>በዚያ ፊደል የሚጀምረውን ምናሌ ይከፍታል፣ ከዚያ ለመምረጥ የአንድን ረድፍ ፊደል ይጫኑ። የቁልፍ ሰሌዳውን ሲጠቀሙ ፊደላቱ ይታያሉ። በ Mac ላይ Ctrl+Option ይጠቀሙ።</td></tr><tr><td>F10</td><td>ወደ ምናሌ አሞሌው ይሄዳል።</td></tr></tbody></table>';
+$ec_lang['lpn_graphs_menu']='ግራፎች';
+$ec_lang['lpn_contour_menu']='ኮንቱር';
+$ec_lang['lpn_contour_tip']='በካርታው ላይ የኮንቱር ሥዕል ያሳያል፦ የነጥቦቹ ቀለሞች በቧንቧዎቹ ላይና በአጠገባቸው ተሰራጭተው፣ ምልክት ከተደረገባቸው የኮንቱር መስመሮች ጋር። ለማስተካከል ወይም ለማጥፋት ሳጥን ይከፍታል።';
+$ec_lang['lpn_contour_plot']='የኮንቱር ሥዕል';
+$ec_lang['lpn_contour_fill']='መሙያ';
+$ec_lang['lpn_contour_fill_tip']='ለስላሳ ቀለሞቹን ከአንዱ ክልል ወደ ሌላው ያዋህዳል። ባንዶች እያንዳንዱን የቀለም መመሪያ ክልል በአንድ ቀለም ይሞላል።';
+$ec_lang['lpn_contour_fill_smooth']='ለስላሳ';
+$ec_lang['lpn_contour_fill_bands']='ባንዶች';
+$ec_lang['lpn_contour_opacity']='የመሙያ ግልጽነት';
+$ec_lang['lpn_contour_lines']='የኮንቱር መስመሮች';
+$ec_lang['lpn_contour_interval']='ክፍተት';
+$ec_lang['lpn_contour_buffer']='ማቋረጫ ስፋት';
+$ec_lang['lpn_contour_buffer_unit']='× የቧንቧ አማካይ ርዝመት';
+$ec_lang['lpn_contour_buffer_tip']='ቀለሙ ከእያንዳንዱ ቧንቧ ምን ያህል እንደሚደርስ፣ እንደ የቧንቧ አማካይ ርዝመት ብዜት። በውጪው ክፍል ላይ ይደበዝዛል።';
+$ec_lang['lpn_contour_few']='ለኮንቱር በጣም ጥቂት ነጥቦች አሉ።';
+$ec_lang['lpn_contour_support']='የኮንቱር ሥዕል፦ {n} ነጥቦች፣ በ{p} ቧንቧዎች ላይና ከጎናቸው እስከ የቧንቧ አማካይ ርዝመት {k} ጊዜ ድረስ ተጠጋግተው ተሰልተዋል። በፓምፖች፣ በቫልቮችና በተዘጉ አገናኞች ላይ ቀለም የለም።';
+$ec_lang['lpn_contour_support_lines']='የኮንቱር መስመሮች በየ{i} {u}።';
+$ec_lang['lpn_contour_too_many']='በዚህ ክፍተት ብዙ የኮንቱር መስመሮች አሉ፤ ለመሳል ክፍተቱን ያስፉት።';
+$ec_lang['lpn_contour_dem']='በነጥቦች መካከል ያለው መሬት ከ Mapbox DEM';
+$ec_lang['lpn_contour_dem_tip']='በነጥቦች መካከል፣ ግፊቱ የተጠጋጋው ሄድ ሲቀነስ ከ Mapbox DEM የተገኘው የመሬት ከፍታ ይሆናል፣ ስለዚህ መረቡ ምንም ነጥብ በሌለበት ኮረብታ ላይ ከዝቅተኛው የነጥብ ግፊት በታች ሊወርድ ይችላል። መሬቱን እንደ ኮንቱር ካርታ ይቁጠሩት፣ እንደ የመሬት ቅኝት አይደለም።';
+$ec_lang['lpn_contour_support_dem']='በነጥቦች መካከል፣ ግፊቱ የተጠጋጋው ሄድ ሲቀነስ ከ Mapbox DEM የተገኘው የመሬት ከፍታ ነው፣ በየ{m} ሜትር ገደማ ናሙና ተወስዷል።';
+$ec_lang['lpn_contour_dem_failed']='መሬቱ ከ Mapbox DEM ሊነበብ አልቻለም፣ ስለዚህ ግፊቱ በነጥቦች መካከል ብቻ ተጠጋጋ።';
+$ec_lang['lpn_contour_consent_1']='ግፊቱን በመሬቱ ላይ መሳል መረብዎ የሚሸፍነውን አካባቢ፣ እንደ Mapbox የካርታ ንጣፍ ቁጥሮች፣ ወደ api.mapbox.com ይልካል፣ እዚያ ያለውን የመሬት ከፍታ ለማንበብ።';
+$ec_lang['lpn_contour_consent_2']='ይህ ከፕሮጀክትዎ በስተጀርባ ካሉት የካርታ ሥዕሎች የተለየ ጥያቄ ነው። ሥዕሎቹ የሚያሳዩት የት እየተመለከቱ እንዳሉ ብቻ ነው። እነዚህ ንጣፎች መረብዎ የት እንዳለ ይናገራሉ። Mapbox እነዚያን የንጣፍ ቁጥሮችና የእርስዎን IP አድራሻ ይቀበላል። ሌላ ምንም አንልክም፦ ስም የለም፣ ቧንቧዎች የሉም፣ ፕሮጀክት የለም። ምንም መዝገብ አንይዝም፣ ለዚህ ጥያቄ የሰጡት መልስ ብቻ ነው በዚህ መሣሪያ ላይ የሚቀመጠው።';
+$ec_lang['lpn_contour_consent_3']='የመረብዎን አካባቢ የንጣፍ ቁጥሮች ወደ Mapbox እንድንልክ ይፈቅዳሉ?';
+$ec_lang['lpn_contour_consent_4']='አይ ካሉ፣ በዚህ ገጽ ላይ ያለው ሁሉ ነገር አሁን እንደሚሠራው በትክክል መሥራቱን ይቀጥላል፣ የኮንቱር ሥዕሉም በነጥቦች መካከል ብቻ ይሳላል። አዎ ያሉትን እናስታውሰዋለን፣ ደግመን እንዳንጠይቅ። አይ የሚለው ጨርሶ አይቀመጥም።';
+$ec_lang['lpn_sysflow_menu']='የፍሰት ሚዛን';
+$ec_lang['lpn_sysflow_tip']='በተራዘመ ጊዜ ማስመሰያው ጊዜ ሁሉ የተመረተውንና የተበላውን ጠቅላላ ፍሰት ከጊዜ ጋር በግራፍ ያሳያል። ታንኮች በሁለቱም ድምር ውስጥ የሉም፣ ስለዚህ ሁለቱ መስመሮች በሚለያዩበት ታንኮች እየሞሉ ወይም እየተፉ ናቸው።';
+$ec_lang['lpn_sysflow_produced']='የተመረተ';
+$ec_lang['lpn_sysflow_produced_tip']='ከማጠራቀሚያዎችና ከአሉታዊ ፍላጎቶች ወደ መረቡ የሚገባ ጠቅላላ ፍሰት።';
+$ec_lang['lpn_sysflow_consumed']='የተበላ';
+$ec_lang['lpn_sysflow_consumed_tip']='የእያንዳንዱ አዎንታዊ ፍላጎት ድምር፦ በመገናኛዎች ከመረቡ የሚወሰድ ውሃ፣ እና ወደ ማጠራቀሚያ የሚገባ ማንኛውም ፍሰት።';
+$ec_lang['lpn_copy_title']='ፋይሉን እንደ አዲስ ቅጂ ምልክት ላድርግ?';
+$ec_lang['lpn_copy_body']='ይህ ፋይል በ{date} እንደተፈጠረ ይናገራል፣ ይህ አሳሽ ግን አያውቀውም። ይህ ዋናው ፋይል ነው (ተመሳሳዩን ቁልፍ ያቆይ) ወይስ ቅጂ (አዲስ ቁልፍ ይፍጠር)?';
+$ec_lang['lpn_copy_body_nodate']='ይህ አሳሽ ይህን ፋይል አያውቀውም። ይህ ዋናው ፋይል ነው (ተመሳሳዩን ቁልፍ ያቆይ) ወይስ ቅጂ (አዲስ ቁልፍ ይፍጠር)?';
+$ec_lang['lpn_copy_original']='ዋናው፤ ተመሳሳዩን ቁልፍ አቆይ';
+$ec_lang['lpn_copy_copy']='ቅጂ፤ አዲስ ቁልፍ ፍጠር';
+$ec_lang['lpn_copy_kept_link']='{name} እንደ ዋናው ተከፍቷል፣ ወደ አዲስ ቦታ ተወስዷል። አሁን ማስቀመጥ ወደዚህ ፋይል ይጽፋል።';
+$ec_lang['lpn_copy_opened']='{file} እንደ ቅጂ ተከፍቷል፣ በራሱ አዲስ ቁልፍ፣ ይህም በሚቀጥለው ፋይል ማስቀመጥ ጊዜ ይቀመጣል።';
+$ec_lang['lpn_scenario_basic']='መሰረታዊ ሁነታ';
+$ec_lang['lpn_scenario_basic_tip']='ምልክት ሲደረግ፣ ሁኔታ በውስጡ ያዘጋጇቸው ዋጋዎች ብቻ ነው። ምልክቱ ሲነሳ፣ ይህ ምናሌ ዋጋዎቹ በምድብ እንዴት እንደተሰባሰቡ የሚያሳየውንና አስተያየትዎን የሚጋብዘውን የአማራጮች ቅድመ እይታ ሠንጠረዥም ያቀርባል።';
+$ec_lang['lpn_alt_title']='የአማራጮች ቅድመ እይታ';
+$ec_lang['lpn_alt_note']='ለማንበብ ብቻ። መሠረት የእያንዳንዱን ምድብ መሠረት አማራጭ ይጠቀማል። እያንዳንዱ ሁኔታ ለሚለወጥ ማንኛውም ምድብ የራሱ አማራጭ ያገኛል፣ የመሠረቱ ልጅ ሆኖ። ቁጥሩ ምን ያህል የተለወጡ ዋጋዎች እንዳሉት ነው።';
+$ec_lang['lpn_alt_cat_physical']='አካላዊ';
+$ec_lang['lpn_alt_cat_demand']='ፍላጎት';
+$ec_lang['lpn_alt_cat_topology']='የአካል ማንቃት';
+$ec_lang['lpn_alt_cat_initial']='የመጀመሪያ ቅንብሮች';
+$ec_lang['lpn_alt_cat_constituent']='ንጥረ ነገር';
+$ec_lang['lpn_alt_cat_fireflow']='የእሳት ፍሰት';
+$ec_lang['lpn_alt_cat_energy']='የኃይል ወጪ';
+$ec_lang['lpn_alt_cat_userdata']='ብጁ ንብረቶች';
+$ec_lang['lpn_alt_cat_text']='ጽሑፍ';
+$ec_lang['lpn_reports_calib']='ካሊብሬሽን';
+$ec_lang['lpn_reports_calib_tip']='ከካሊብሬሽን ፋይል የተገኘ የመስክ የመለኪያ መረጃን ከመጨረሻው ሩጫ ጋር ያወዳድራል፦ ስታቲስቲክስ፣ የዝምድና ሥዕል፣ እና የአማካይ ንጽጽሮች።';
+$ec_lang['lpn_calib_title']='የካሊብሬሽን ዘገባ';
+$ec_lang['lpn_calib_param']='መለኪያ';
+$ec_lang['lpn_calib_param_tip']='የካሊብሬሽን ፋይሉ የሚለካው መጠን። ለእያንዳንዱ መለኪያ አንድ ፋይል ይያዛል።';
+$ec_lang['lpn_calib_load']='የካሊብሬሽን ፋይል ጫን…';
+$ec_lang['lpn_calib_load_tip']='በእያንዳንዱ መስመር የቦታ መለያ፣ ጊዜ እና የተለካ ዋጋ ያለው የጽሑፍ ፋይል። ጊዜው ከማስመሰያው መጀመሪያ ጀምሮ የሚለካ ነው፣ በአስርዮሽ ሰዓቶች ወይም በሰዓት:ደቂቃ። ሰሚኮሎን አስተያየት ይጀምራል። ጊዜና ዋጋ ብቻ ያለው መስመር ከላዩ ባለው ቦታ ነው።';
+$ec_lang['lpn_calib_none']='ለዚህ መለኪያ ምንም የካሊብሬሽን ፋይል አልተጫነም።';
+$ec_lang['lpn_calib_session']='የካሊብሬሽን ፋይል ለዚህ ክፍለ ጊዜ ብቻ ይያዛል። ከፕሮጀክቱ ጋር ወይም በዚህ መሣሪያ ላይ አይቀመጥም።';
+$ec_lang['lpn_calib_file']='{file}፦ በ{m} ቦታዎች {n} መለኪያዎች።';
+$ec_lang['lpn_calib_units']='የፋይሉ ዋጋዎች በዚህ ፕሮጀክት አሃዶች ይነበባሉ፦ {unit}።';
+$ec_lang['lpn_calib_missing']='በፋይሉ ውስጥ ተጠቅሰዋል ግን በዚህ መረብ ውስጥ የሉም፦ {ids}።';
+$ec_lang['lpn_calib_missing_count']='ቦታቸው በዚህ መረብ ውስጥ ስለሌለ የተዘለሉ መለኪያዎች፦ {n}።';
+$ec_lang['lpn_calib_bad_lines']='ሊነበቡ ያልቻሉና የተዘለሉ መስመሮች፦ {lines}';
+$ec_lang['lpn_calib_outside']='ይህ ሩጫ ከዘገባቸው ጊዜዎች ውጪ ስለሆኑ የተዘለሉ መለኪያዎች፦ {n}።';
+$ec_lang['lpn_calib_no_value']='በጊዜያቸው የተሰላ ዋጋ ስለሌላቸው የተዘለሉ መለኪያዎች፦ {n}።';
+$ec_lang['lpn_calib_single']='ይህ ነጠላ-ጊዜ ሩጫ ነው፣ ስለዚህ ፋይሉ ምንም ጊዜ ቢሰጥ እያንዳንዱ መለኪያ ከአንዱ ውጤቱ ጋር ይነጻጸራል።';
+$ec_lang['lpn_calib_needs_run']='ለማወዳደር ገና ምንም ውጤት የለም። መረቡ ከተሰላ በኋላ ዘገባው ይሞላል።';
+$ec_lang['lpn_calib_no_pairs']='ምንም መለኪያ ሊነጻጸር አልቻለም፣ ስለዚህ የሚሳል ነገር የለም።';
+$ec_lang['lpn_calib_tab_stats']='ስታቲስቲክስ';
+$ec_lang['lpn_calib_tab_corr']='የዝምድና ሥዕል';
+$ec_lang['lpn_calib_tab_means']='የአማካይ ንጽጽሮች';
+$ec_lang['lpn_calib_col_location']='ቦታ';
+$ec_lang['lpn_calib_col_n']='የመለኪያ ብዛት';
+$ec_lang['lpn_calib_col_obs_mean']='የተለካ አማካይ';
+$ec_lang['lpn_calib_col_sim_mean']='የተሰላ አማካይ';
+$ec_lang['lpn_calib_col_mean_err']='አማካይ ስህተት';
+$ec_lang['lpn_calib_col_mean_err_tip']='በእያንዳንዱ የተለካ ዋጋና በተመሳሳይ ጊዜ በተሰላው ዋጋ መካከል ያሉ ፍጹም ልዩነቶች አማካይ።';
+$ec_lang['lpn_calib_col_rms_err']='RMS ስህተት';
+$ec_lang['lpn_calib_col_rms_err_tip']='የካሬዎች አማካይ ሥር ስህተት፦ በተለካውና በተሰላው ዋጋዎች መካከል ያሉ ልዩነቶች ካሬዎች አማካይ ካሬ ሥር።';
+$ec_lang['lpn_calib_network']='መረብ';
+$ec_lang['lpn_calib_corr_means']='በአማካዮች መካከል ያለ ዝምድና፦ {r}';
+$ec_lang['lpn_calib_corr_none']='በአማካዮች መካከል ያለ ዝምድና፦ አማካዮቻቸው የሚለያዩ ቢያንስ ሁለት ቦታዎች ያስፈልጉታል።';
+$ec_lang['lpn_calib_axis_obs']='የተለካ፦ {q}';
+$ec_lang['lpn_calib_axis_sim']='የተሰላ፦ {q}';
+$ec_lang['lpn_calib_observed']='የተለካ';
+$ec_lang['lpn_calib_computed']='የተሰላ';
+$ec_lang['lpn_calib_point']='{id}፣ {time}፦ የተለካ {o}፣ የተሰላ {s}';
+$ec_lang['lpn_calib_corr_note']='እያንዳንዱ ነጥብ አንድ መለኪያ ነው። ነጥቦቹ ወደ ሰያፍ መስመሩ በቀረቡ መጠን፣ የተሰሉት ዋጋዎች ከተለኩት ጋር የበለጠ ይስማማሉ።';
+$ec_lang['lpn_calib_ts_point']='በ{id}፣ {time} የተለካ፦ {v}';
+$ec_lang['lpn_calib_ts_note']='ቀለበቶቹ ከካሊብሬሽን ፋይሉ የተለኩ ዋጋዎች ናቸው።';
+$ec_lang['lpn_analyze_menu']='ተንትን';
+$ec_lang['lpn_analyze_menu_tip']='መረቡን በቅጂ ላይ የሚያሩጡ ትንተናዎች፦ በእያንዳንዱ መገናኛ የእሳት ፍሰት፣ የእያንዳንዱ ቧንቧ፣ ፓምፕና ቫልቭ ኪሳራ፣ እና ወደ ላይ ወይም ወደ ታች የተመጠኑ ፍላጎቶች።';
+$ec_lang['lpn_crit_menu']='የወሳኝነት ትንተና…';
+$ec_lang['lpn_crit_menu_tip']='እያንዳንዱን ቧንቧ፣ ፓምፕና ቫልቭ አንድ በአንድ ከመረቡ አውጥተው ስርዓቱ ምን እንደሚያጣ ይመልከቱ።';
+$ec_lang['lpn_crit_title']='የወሳኝነት ትንተና';
+$ec_lang['lpn_crit_intro']='እያንዳንዱ አካል በተራ ከመረቡ ይወጣል፣ መረቡም በገባሪው ሁኔታ ውስጥ በማያ ገጹ ላይ ባለው የጊዜ ደረጃ ይፈታል። በፕሮጀክትዎ ውስጥ ምንም ነገር አይለወጥም፤ ጠቅላላው ሩጫ በቅጂ ላይ ይደረጋል።';
+$ec_lang['lpn_crit_scope']='የሚሰበሩ አገናኞች';
+$ec_lang['lpn_crit_scope_tip']='ሁሉም ቧንቧዎች፣ ፓምፖችና ቫልቮች፣ ወይም በካርታው ላይ የተመረጡት ብቻ። ከማሩጥዎ በፊት ስብስቡን ይምረጡ።';
+$ec_lang['lpn_crit_scope_all']='ሁሉም አገናኞች';
+$ec_lang['lpn_crit_scope_selected']='የተመረጡ አገናኞች';
+$ec_lang['lpn_crit_minpressure']='የሚፈቀድ ዝቅተኛ ግፊት';
+$ec_lang['lpn_crit_minpressure_tip']='ይህ በእሳት ፍሰት ትንተና ውስጥ በሌላ ቦታ ካለው የሚፈቀድ ዝቅተኛ ግፊት ጋር ተመሳሳይ ቁጥር ነው። እዚህ መቀየር እዚያም ይቀይረዋል።';
+$ec_lang['lpn_crit_col_asset']='አካል';
+$ec_lang['lpn_crit_col_unserved']='ያልተሟላ ፍላጎት';
+$ec_lang['lpn_crit_col_cutoff']='የተቋረጡ መገናኛዎች';
+$ec_lang['lpn_crit_col_below']='ከዝቅተኛው በታች ያሉ መገናኛዎች';
+$ec_lang['lpn_crit_summary']='ከ{total} አካሎች {n}ዎቹ ፍላጎትን ያለተሟላ ይተዋሉ ወይም መገናኛን ከ{pressure} በታች ያወርዳሉ።';
+$ec_lang['lpn_crit_baseline_below']='ምንም ነገር ሳይሰበር አስቀድመው ከእሱ በታች ያሉ መገናኛዎች፦ {n}። አይቆጠሩም።';
+$ec_lang['lpn_crit_working']='በሥራ ላይ፦ ከ{total} አካሎች {done}ዎቹ ተጠናቀዋል።';
+$ec_lang['lpn_crit_stopped']='ከ{total} አካሎች {done}ዎቹ ላይ ቆሟል። ከታች ያሉት ውጤቶች ቀድሞውኑ የተጠናቀቁት ናቸው።';
+$ec_lang['lpn_crit_no_selection']='ምንም አገናኝ አልተመረጠም። አገናኞችን ይምረጡ ወይም ሁሉም አገናኞች የሚለውን ይምረጡ።';
+$ec_lang['lpn_crit_no_links']='ይህ ፕሮጀክት እስካሁን ምንም አገናኝ የለውም፣ ስለዚህ የሚሰበር ነገር የለም።';
+$ec_lang['lpn_crit_busy']='ሌላ ትንተና እየሮጠ ነው። ያቁሙት፣ ወይም እስኪጨርስ ይጠብቁ።';
+$ec_lang['lpn_crit_skipped']='{n} የተመረጡ አካሎች አገናኞች አይደሉም፣ ስለዚህ አልተሰበሩም።';
+$ec_lang['lpn_crit_stale']='ስዕሉ ተለውጧል፣ ስለዚህ የወሳኝነት ውጤቶቹ ተጠርገዋል። እንደገና ያሩጡት።';
+$ec_lang['lpn_crit_skipdead']='የሞቱ ጫፎችን ዝለል';
+$ec_lang['lpn_crit_skipdead_tip']='የሞተ ጫፍ አገናኝ ማለት ሲወጣ ከእሱ በኩል ብቻ ሊደረስባቸው የሚችሉ መገናኛዎችን የሚያቋርጥ፣ ከዚያ ወዲያ ማጠራቀሚያ ወይም ታንክ የሌለው ነው። ኪሳራው ከእሱ ወዲያ ያለው ሁሉ ነው፣ ስለዚህ አይፈታም። ማጠቃለያው ምን ያህል እንደተዘለሉ ይናገራል።';
+$ec_lang['lpn_crit_skipped_dead']='የተዘለሉ የሞቱ ጫፍ አገናኞች፦ {n}። እያንዳንዳቸው ከእነሱ ወዲያ ያለውን ሁሉ ያቋርጣሉ።';

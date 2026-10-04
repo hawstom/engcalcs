@@ -108,7 +108,22 @@
         "feat/demand-scaling",
         "feat/desktop",
         "feat/label-cache",
-        "feat/theme-token"
+        "feat/theme-token",
+        "feat/flow-balance",
+        "feat/contour",
+        "feat/calibration",
+        "feat/profile-file",
+        "feat/dock",
+        "feat/dialog-audit",
+        "feat/table-selection",
+        "feat/setting-scope",
+        "feat/scenario-option",
+        "feat/basemap-style",
+        "feat/tip-verdict",
+        "feat/elev-default",
+        "feat/epanet-pp-brand",
+        "feat/chain-draw",
+        "feat/pda"
     ],
     "feature_freeze": {
         "active": false,

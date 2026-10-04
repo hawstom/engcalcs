@@ -200,7 +200,8 @@ exports.run = async function ({ browser, report }) {
 					.map(k => k + '=' + (+lv[k] * fac).toFixed(2)).join(' ');
 				// A label on the map, so this is what is DRAWN and not what is stored.
 				const labels = [...document.querySelectorAll('#lpn_canvas text')].map(t => t.textContent).join('|');
-				return { clock: out ? out.textContent : '', tanks, labels };
+				const drawn = document.getElementById('lpn_canvas').innerHTML;
+				return { clock: out ? out.textContent : '', tanks, labels, drawn };
 			});
 		}
 		// **THE FRAMES ARRIVE, AND THE OLD DISJUNCTION IS DEAD** (Task 467, re-read by Task 511).
@@ -242,7 +243,9 @@ exports.run = async function ({ browser, report }) {
 		report.ok(t1.clock !== t0.clock, 'choosing another step moves the clock', t0.clock + ' → ' + t1.clock);
 		report.ok(t1.tanks !== t0.tanks, 'and the tanks are at different levels — they filled',
 			t0.tanks + '  →  ' + t1.tanks);
-		report.ok(t1.labels !== t0.labels, 'and the map itself is redrawn, not just the readout');
+		// Compared on everything drawn, not just label text: labels ship ID-only and crowded Net3 labels drop
+		// their values, so the text can be identical at two steps while the map (tank symbols, flow) is not.
+		report.ok(t1.labels !== t0.labels || t1.drawn !== t0.drawn, 'and the map itself is redrawn, not just the readout');
 
 		// **THE DOCUMENT IS NOT TOUCHED BY A RUN.** A tank's stored level is the user's initial
 		// condition; the level at hour 12 is a result. If the run has written one into the other,
@@ -420,16 +423,21 @@ exports.run = async function ({ browser, report }) {
 			frame: !!window.EngCalcs.lpnTimeCurrentFrame(),
 			state: window.EngCalcs.lpnTimeRunState()
 		}));
-		report.eq(edited.runs, 0, 'a hydraulic edit does not run the period as it lands',
+		// **A CHEAP NETWORK'S EDIT RUNS THE PERIOD ONCE, AS IT LANDS** (Task 653, 6850e812, 2026-09-23):
+		// with the switch on the run was coming anyway, so the steady preview is pure cost and the
+		// run takes its place. Net3 is cheap (lastBusyMs is well under EC.LPN_TIME_SLOW_MS). This
+		// used to assert 0 runs and no frames; what must still hold is that it is ONE run, and that
+		// the frames it leaves are those of the edited network, back at the first reporting time.
+		report.eq(edited.runs, 1, 'a hydraulic edit in a cheap project runs the period once, as it lands',
 			String(edited.runs) + ' at ' + JSON.stringify(await a.page.evaluate(() => window.__runAt.map(t => t - window.__editAt))));
-		report.ok(!edited.frame, 'and the frames of the network that no longer exists are gone',
+		report.ok(edited.state.frames > 0, 'and its frames are those of the edited network',
 			JSON.stringify(edited.state));
 		report.eq(edited.state.t, 0,
 			'the transport is back at the first reporting time, which is the one moment that HAS been worked out');
 
 		// ...and it comes back by itself, because this network is cheap enough to be worth running
 		// unasked. That is the measurement talking: see EC.LPN_TIME_AUTO.
-		await a.page.evaluate(() => { window.EngCalcs.LPN_TIME_AUTO.idleMs = 900; });
+		await a.page.evaluate(() => { window.EngCalcs.LPN_TIME_AUTO.idleMs = 900; window.__runs = 0; });
 		await editDuration('11:00');
 		await a.settle(2500);
 		const settled = await a.page.evaluate(() => ({

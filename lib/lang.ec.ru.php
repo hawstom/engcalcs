@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="По Isbash (1936) и M
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="По Isbash (1936) и Maricopa County, Arizona, US.">Требуемый размер угловатого камня, откос 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="По Isbash (1936) и Maricopa County, Arizona, US.">Требуемый размер угловатого камня, откос 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Рассчитывает эту сеть на каждом гидравлическом шаге по времени.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="По Maynord, Ruff и Abt (1989). На повороте камень подбирается по скорости в повороте, равной 4/3 от средней, по California Division of Highways (1970); собственное значение Мейнорда 1,5 применяется к естественным руслам.">Требуемый размер угловатого камня, D<sub>50</sub> (Maynord, Ruff и Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Требуемый размер угловатого камня, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Скорость приемлема для допущений равномерного течения.';
@@ -448,7 +449,7 @@ $ec_lang['contact_main_menu']='Контакт';
 $ec_lang['about_main_title']='Об инженерных калькуляторах HawsEDC';
 $ec_lang['about_main_desc']='Миссия, свободное программное обеспечение и вклад';
 // Edited by TGH 2026-09-07
-$ec_lang['about_body_html']='<h3>Миссия</h3><p>Инженерные Калькуляторы HawsEDC созданы для инженеров и полевых работников по всему миру — особенно тех, кто работает в регионах с дефицитом воды, ограниченными ресурсами или слабым обеспечением. Эти инструменты являются частью более широкой гуманитарной миссии: сказать каждому человеку наиболее практичным и эффективным способом, что он любим и дорог навсегда, что ему нечего бояться и что он не разрушит всё.</p><p>Калькуляторы — это средство. Цель — мир, свободный от страданий.</p><h3>Свободное программное обеспечение с открытым исходным кодом</h3><p>Весь код выпущен под <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">Стандартной Общественной Лицензией GNU v3.0 или более поздней версии</a> — свободный в смысле свободы, а не цены. Вы можете использовать, изучать, изменять и распространять код на тех же условиях.</p><p>Это приглашение, а не цена. Здесь нет платного уровня, нет бесплатного уровня, который могут отозвать, и нет задержки, прежде чем код станет вашим. Полная версия, которую вы видите сегодня, свободна для всех — сейчас и навсегда — для использования и изменения.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Исходный Код</h3><p>Полный исходный код общедоступен на GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>Там можно просматривать код, сообщать о проблемах или форкнуть репозиторий.</p><h3>Вклад</h3><p>Любая помощь приветствуется. <a href="contact.php">Свяжитесь с Tom Haws</a>.</p><ul><li><strong>Переводы:</strong> Предложите более удачную формулировку. Улучшите или добавьте язык.</li><li><strong>Отчёты об ошибках:</strong> Используйте форму обратной связи на любой странице калькулятора или сообщите о проблеме на GitHub.</li><li><strong>Новые калькуляторы:</strong> Особенно приветствуются идеи гидравлических инженерных инструментов для полевых работников и специалистов по орошению.</li><li><strong>Хостинг:</strong> Если вы можете разместить зеркало этих калькуляторов для региона с ограниченным доступом к интернету, пожалуйста, свяжитесь со мной.</li></ul><h3>Работа без интернета</h3><p>Эти калькуляторы работают как <strong>прогрессивное веб-приложение (PWA)</strong>. Откройте любую страницу калькулятора при наличии интернета, и браузер автоматически сохранит все калькуляторы в кэш. После этого все калькуляторы работают офлайн — интернет не нужен.</p><p>На Android или iOS используйте функцию «Добавить на главный экран» в браузере, чтобы установить EngCalcs как приложение на вашем устройстве. На компьютере ищите значок установки в адресной строке браузера.</p><p>Вы также можете сохранить любой отдельный калькулятор через меню «Сохранить как…» в браузере для разового использования офлайн.</p><h3>Контакт</h3><p>Tom Haws — гидравлический инженер и автор этих калькуляторов.<br />Используйте форму обратной связи на любой странице калькулятора или перейдите к исходному коду на <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
+$ec_lang['about_body_html']='<h3>Миссия</h3><p>Инженерные Калькуляторы HawsEDC бесплатно доступны в интернете с 2010 года. Они созданы для инженеров и полевых работников по всему миру — особенно тех, кто работает в регионах с дефицитом воды, ограниченными ресурсами или слабым обеспечением. Эти инструменты являются частью более широкой гуманитарной миссии: сказать каждому человеку наиболее практичным и эффективным способом, <a target="_blank" href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html">что он любим и дорог навсегда, что ему нечего бояться и что он не разрушит всё</a>.</p><p>Калькуляторы — это средство. Цель — мир, свободный от страданий.</p><h3>Свободное программное обеспечение с открытым исходным кодом</h3><p>Весь код выпущен под <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">Стандартной Общественной Лицензией GNU v3.0 или более поздней версии</a> — свободный в смысле свободы, а не цены. Вы можете использовать, изучать, изменять и распространять код на тех же условиях.</p><p>Сайт, который его обслуживает, бесплатен сегодня и с 2010 года; если однажды этого не получится, программа всё равно останется вашей, и вы сможете запускать её сами.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Исходный Код</h3><p>Полный исходный код общедоступен на GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>Там можно просматривать код, сообщать о проблемах или форкнуть репозиторий.</p><h3>Вклад</h3><p>Любая помощь приветствуется. <a href="contact.php">Свяжитесь с Tom Haws</a>.</p><ul><li><strong>Переводы:</strong> Предложите более удачную формулировку. Улучшите или добавьте язык.</li><li><strong>Отчёты об ошибках:</strong> Используйте форму обратной связи на любой странице калькулятора или сообщите о проблеме на GitHub.</li><li><strong>Новые калькуляторы:</strong> Особенно приветствуются идеи гидравлических инженерных инструментов для полевых работников и специалистов по орошению.</li><li><strong>Хостинг:</strong> Если вы можете разместить зеркало этих калькуляторов для региона с ограниченным доступом к интернету, пожалуйста, свяжитесь со мной.</li></ul><h3>Работа без интернета</h3><p>Откройте любой калькулятор один раз, пока вы в сети, и все они продолжат работать, когда сети нет: браузер сохраняет весь набор по ходу работы. Механизм называется <strong>прогрессивное веб-приложение (PWA)</strong>, если захотите о нём почитать. После этого все калькуляторы работают офлайн — интернет не нужен.</p><p>На Android или iOS используйте функцию «Добавить на главный экран» в браузере, чтобы установить EngCalcs как приложение на вашем устройстве. На компьютере ищите значок установки в адресной строке браузера.</p><p>Вы также можете сохранить любой отдельный калькулятор через меню «Сохранить как…» в браузере для разового использования офлайн.</p><h3>Контакт</h3><p>Tom Haws — гидравлический инженер и автор этих калькуляторов.<br />Используйте форму обратной связи на любой странице калькулятора или перейдите к исходному коду на <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
 $ec_lang['contactSendMessage']='Отправить сообщение Tom Haws';
 $ec_lang['contactYourName']='Ваше имя:';
 $ec_lang['contactYourEmail']='Ваш адрес e-mail:';
@@ -676,9 +677,7 @@ $ec_lang['lpn_customer_heading']='Абонент {id}';
 // strings every node and link already uses. Do not re-add an account key: a utility that wants a
 // field of its own name makes a custom property.
 $ec_lang['lpn_field_meter_demand']='Расход отбора на одно подключение';
-$ec_lang['lpn_field_meter_demand_tip']='Что требуется на одно подключение этого абонента. «Найти и заменить» может использовать различие между пустым значением и 0.';
 $ec_lang['lpn_field_meter_count']='Количество подключений';
-$ec_lang['lpn_field_meter_count_tip']='Сколько одинаковых подключений представляет собой этот абонент, чтобы сорок два индивидуальных подключения вдоль одной магистрали можно было показать одним символом в одном месте. Итог ниже — это расход отбора выше, умноженный на это количество.';
 $ec_lang['lpn_field_meter_total']='Суммарный расход отбора';
 $ec_lang['lpn_field_meter_total_tip']='Расход отбора на одно подключение, умноженный на количество подключений. Именно это число добавляется к узлу, указанному ниже.';
 $ec_lang['lpn_field_meter_pipe']='Подключённый элемент';
@@ -692,7 +691,6 @@ $ec_lang['lpn_meter_pipe_unknown']='В этом проекте нет ничег
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Как расход отбора этого абонента растёт и падает в течение расчёта. Он умножает суммарный расход отбора, поэтому действует на каждое подключение, которое представляет этот абонент. Оставьте «Без графика», чтобы следовать графику расхода отбора проекта по умолчанию.';
 $ec_lang['lpn_meter_pattern_unknown']='В этом проекте нет графика с именем {id}, поэтому абонент остался как был.';
 $ec_lang['lpn_meter_placed']='Абонент {id} добавлен. Его описание и расход отбора вводятся в таблице «Абоненты», либо нажмите на него в режиме «Выбор», чтобы открыть его окно.';
 $ec_lang['lpn_field_meter_pipe_tip']='Элемент, к которому подключено это подключение. Введите другой элемент здесь или в таблице «Абоненты», чтобы изменить его, либо перетащите точку подключения на другой элемент.';
@@ -799,7 +797,6 @@ $ec_lang['lpn_pane_manage_cols_down']='Переместить вниз';
 $ec_lang['lpn_pane_manage_cols_top']='Переместить в начало';
 $ec_lang['lpn_pane_manage_cols_bottom']='Переместить в конец';
 $ec_lang['lpn_pane_colmenu_tip']='Скрыть столбцы или управлять ими';
-$ec_lang['lpn_pane_sortarrow_tip']='Изменить порядок сортировки на обратный';
 $ec_lang['lpn_tool_area_window']='Выбрать окном';
 $ec_lang['lpn_tool_area_lasso']='Выбрать лассо';
 $ec_lang['lpn_tool_area_polygon']='Выбрать многоугольником';
@@ -853,7 +850,6 @@ $ec_lang['lpn_field_elev']='Отметка';
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
 // protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
 // entry carrying translatable payload nobody on the page can see.
-$ec_lang['lpn_field_elev_tip']='Отметка земли или трубы в этом узле. Отсчитывайте её от любого нуля, лишь бы все узлы использовали один и тот же.';
 // A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
 // at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
 // This USED to read "so it doubles as a tank" (Tom, 2026-07-30), which was true only while there
@@ -1006,7 +1002,6 @@ $ec_lang['lpn_status_converted']='{n} значений было переписа
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_color_tip']='Раскрасить сеть по одной величине, чтобы большую карту можно было прочитать с первого взгляда. Обычно важнее всего давление и скорость.';
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
 $ec_lang['lpn_units_length']='Длина';
@@ -1175,13 +1170,6 @@ $ec_lang['lpn_tip_join']='{name}: {tip}';
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='Быстрая клавиша: нажмите {key}.';
 $ec_lang['lpn_tool_key_hint_two']='Быстрая клавиша: нажмите {key} или {key2}.';
-$ec_lang['lpn_tool_add_junction_tip']='Щёлкните по карте, чтобы добавить узел: точку, где сходятся трубы или откуда забирается вода.';
-$ec_lang['lpn_tool_add_reservoir_tip']='Щёлкните по карте, чтобы добавить резервуар: источник с одним неизменным уровнем воды.';
-$ec_lang['lpn_tool_add_tank_tip']='Щёлкните по карте, чтобы добавить бак: ёмкость, уровень воды в которой поднимается и опускается по мере наполнения и опорожнения.';
-$ec_lang['lpn_tool_add_pipe_tip']='Щёлкните по одному узлу, затем по другому, чтобы провести между ними трубу.';
-$ec_lang['lpn_tool_add_pump_tip']='Щёлкните по одному узлу, затем по другому, чтобы поставить между ними насос.';
-$ec_lang['lpn_tool_add_valve_tip']='Щёлкните по одному узлу, затем по другому, чтобы поставить между ними клапан.';
-$ec_lang['lpn_tool_add_text_tip']='Щёлкните по карте, чтобы написать заметку на чертеже.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='Щёлкайте по карте, как указано, чтобы выбрать всё внутри фигуры. Нажмите эту кнопку ещё раз, чтобы переключить форму между окном, лассо и многоугольником. Удерживайте Shift во время выбора, чтобы дополнить текущее выделение, добавляя или убирая (переключая) то, что вы выбираете.';
@@ -1190,7 +1178,6 @@ $ec_lang['lpn_area_selected']='Выбрано: {n}.';
 $ec_lang['lpn_area_none']='В этой области ничего не найдено.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_vertices_tip']='Добавляйте и убирайте вершины, которые задают форму трубы на карте. Щёлкните по трубе, чтобы добавить вершину, щёлкните по вершине, чтобы убрать её, и перетащите вершину, чтобы переместить её. Вершина меняет только начертанный путь трубы, а не гидравлику.';
-$ec_lang['lpn_tool_delete_tip']='Щёлкните по любому объекту на карте, чтобы удалить его.';
 $ec_lang['lpn_tool_undo_tip']='Отменить последнее изменение.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='Вписать всю сеть в окно.';
@@ -1199,7 +1186,6 @@ $ec_lang['lpn_tool_zoom_window_tip']='Щёлкните два противопо
 $ec_lang['lpn_zoom_in_tip']='Увеличить. Сочетание клавиш: +';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='Уменьшить. Сочетание клавиш: -';
-$ec_lang['lpn_tool_settings_tip']='Открыть настройки этого проекта.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='Найдите элемент по его ID или найдите все элементы, удовлетворяющие условию, и измените их все сразу.';
 // **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
@@ -1211,7 +1197,6 @@ $ec_lang['lpn_find_menu_tip']='Найдите элемент по его ID ил
 $ec_lang['lpn_help_icons']='Легенда панели инструментов';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Видимость';
-$ec_lang['lpn_pane_right_toggle_tip']='Показать или скрыть панель справа от карты. На ней находятся выбор подписей и цветов.';
 $ec_lang['lpn_color_legend_open_tip']='Щёлкните, чтобы открыть панель «Видимость» и изменить эти цвета.';
 $ec_lang['lpn_color_node_field']='Раскрашивать узлы по';
 $ec_lang['lpn_color_link_field']='Раскрашивать трубы по';
@@ -1271,7 +1256,6 @@ $ec_lang['lpn_goto_menu']='Перейти к широте и долготе…';
 // lat/lon."* The parser accepts `38,122` and `38.122` as a pair on his ruling of the same day; the
 // examples in lpn_goto_bad show all three shapes, which is where somebody whose last attempt failed
 // is actually reading.
-$ec_lang['lpn_goto_tip']='Переместить карту в место, координаты которого у вас уже есть. Сначала широта, затем долгота, как их обычно указывают на картах, через пробел: 38 -122';
 $ec_lang['lpn_goto_prompt']='Широта и долгота, в этом порядке';
 $ec_lang['lpn_goto_bad']='Это не одна широта и одна долгота. Попробуйте, например, 38 -122, через пробел.';
 $ec_lang['lpn_georef_goto']='Перейти к…';
@@ -1330,7 +1314,6 @@ $ec_lang['lpn_goto_on_map']='Показать на карте';
 $ec_lang['lpn_pane_select_on_map']='Выбрать на карте';
 $ec_lang['lpn_pane_unselect_on_map']='Снять выбор на карте';
 $ec_lang['lpn_pane_print']='Печать таблицы';
-$ec_lang['lpn_pane_print_tip']='Печатает таблицу, которую вы сейчас просматриваете, с названием проекта, названием таблицы и единицами измерения в заголовках. Строки печатаются в том порядке, в котором вы их отсортировали.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -1411,7 +1394,7 @@ $ec_lang['lpn_help_walkthroughs']='Пошаговые руководства';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Удалить сеть';
-$ec_lang['lpn_confirm_delete_network']='Удалить все узлы, трубы и текстовые подписи в этом проекте? Фоновое изображение, название проекта и настройки сохранятся. Это действие нельзя отменить.';
+$ec_lang['lpn_confirm_delete_network']='Удалить все узлы, трубы и текстовые подписи в этом проекте? Фоновое изображение, название проекта и настройки сохранятся.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -1569,7 +1552,6 @@ $ec_lang['lpn_profile_menu']='Профиль';
 // nobody to read. Sprint 459's Wave 0 found them; Tom ruled the move on 2026-08-24 ("these _syns
 // are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
 // permission $ec_lang_syn requires. Same text, correct array.
-$ec_lang['lpn_profile_tip']='Построить профиль земли и линии гидравлического уклона вдоль маршрута через сеть.';
 $ec_lang['lpn_profile_title']='Профиль вдоль маршрута';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
@@ -1627,12 +1609,9 @@ $ec_lang['lpn_profile_missing']='Сохранённый путь {name} испо
 $ec_lang['lpn_ts_menu']='Временной ряд';
 $ec_lang['lpn_ts_tip']='Строит диаграмму одного или нескольких элементов по времени за расчёт с продолжённым периодом.';
 $ec_lang['lpn_ts_title']='Значения во времени';
-$ec_lang['lpn_ts_group_tip']='Показывает ли график узлы или связи.';
 $ec_lang['lpn_ts_group_nodes']='Узлы';
 $ec_lang['lpn_ts_group_links']='Связи';
-$ec_lang['lpn_ts_quantity_tip']='Какое значение отображать на диаграмме по времени.';
 $ec_lang['lpn_ts_add']='Добавить выбранное';
-$ec_lang['lpn_ts_add_tip']='Добавить на диаграмму всё, что сейчас выбрано на карте.';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
 $ec_lang['lpn_ts_add_none']='На карте не выбрано ничего такого рода.';
 $ec_lang['lpn_ts_clear']='Удалить все';
@@ -1647,8 +1626,6 @@ $ec_lang['lpn_ts_axis_time']='Прошедшее время';
 $ec_lang['lpn_freq_menu']='Частота';
 $ec_lang['lpn_freq_tip']='Построить график распределения частот одного свойства по всем узлам или по всем трубам на текущем шаге по времени.';
 $ec_lang['lpn_freq_title']='Распределение значений';
-$ec_lang['lpn_freq_group_tip']='Показывает ли график узлы или трубы.';
-$ec_lang['lpn_freq_quantity_tip']='Какое значение отображать на диаграмме.';
 $ec_lang['lpn_freq_none']='Пока нет результатов для этого значения, поэтому строить график не из чего.';
 $ec_lang['lpn_freq_summary']='Построено: {n} из {total}';
 $ec_lang['lpn_freq_summary_time']='Построено: {n} из {total}, на {time}';
@@ -1705,7 +1682,6 @@ $ec_lang['lpn_crs_search']='Поиск';
 $ec_lang['lpn_crs_name']='Фильтр по названию проекции';
 $ec_lang['lpn_crs_name_tip']='Показывает только проекции, в названии или коде EPSG которых есть введённый текст. Попробуйте номер зоны, либо «UTM», либо «Меркатор».';
 $ec_lang['lpn_crs_list_tip']='Проекции, оставшиеся после двух фильтров выше. Выберите одну и нажмите «Выбрать».';
-$ec_lang['lpn_crs_choose']='Выбрать';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='Место ещё не искали, поэтому предлагается весь список. Найдите место выше или измените масштаб карты, чтобы сузить список.';
 $ec_lang['lpn_crs_count']='Показано проекций: {n} из {total}.';
@@ -1752,7 +1728,6 @@ $ec_lang['lpn_file_revert']='Восстановить сохранённое';
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Недавние файлы';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_recent_tip']='Снова открыть {file} без необходимости искать его на компьютере.';
 $ec_lang['lpn_recent_denied']='Разрешение на открытие этого файла не было предоставлено, поэтому он не был открыт.';
 $ec_lang['lpn_recent_gone']='Не удалось открыть {file}. Возможно, он был перемещён, переименован или удалён, поэтому он убран из списка недавних файлов.';
 // The tab strip. These are titles on small controls, so each has to stand alone with no sentence
@@ -1835,7 +1810,6 @@ $ec_lang['lpn_inp_drop_report']='В этом файле хранятся соб�
 $ec_lang['lpn_inp_drop_sections']='В этом файле есть раздел, который эта страница вообще не читает. Здесь он не используется. Он сохраняется целиком и записывается обратно, если вы сохраните файл EPANET.';
 $ec_lang['lpn_inp_drop_quality_options']='В этом файле заданы параметры качества воды EPANET: параметр Quality, называющий вид анализа качества воды, и два параметра, относящихся к химическому веществу, — Relative diffusivity и Quality tolerance. Все три сохраняются и все три используются. Здесь вычисляются возраст воды, трассировка источника и химическое вещество, а оба параметра химического вещества передаются расчётному ядру EPANET при расчёте вещества. Все они записываются обратно, если вы сохраните файл EPANET.';
 $ec_lang['lpn_inp_drop_file_options']='В этом файле есть ссылка на вспомогательный файл: Map — он хранит координаты, или Hydraulics — он хранит уже готовые гидравлические расчёты. Эта страница не может открыть ни один из них, поэтому строки сохраняются как есть и записываются обратно, если вы сохраните файл EPANET.';
-$ec_lang['lpn_inp_drop_demand_model']='Этот файл запрашивает анализ с учётом давления (PDA), при котором узел получает меньше своего расхода отбора, если давление в нём низкое. Эта страница решает по расходу отбора, поэтому каждый узел здесь получает расход отбора, заданный в файле, независимо от полученного давления. Строка сохраняется и записывается обратно, если вы сохраните файл EPANET.';
 $ec_lang['lpn_inp_drop_other_options']='В этом файле заданы параметры, которые эта страница не читает. Здесь они не используются. Они сохраняются и записываются обратно, если вы сохраните файл EPANET.';
 $ec_lang['lpn_inp_drop_net_options']='Этот файл .net EPANET задаёт настройки, для которых на этой странице нет соответствующих элементов управления, поэтому их значения перечислены здесь, а не перенесены в проект. Всё остальное перенесено. Если они вам нужны, откройте файл в EPANET и используйте «Файл» → «Экспорт» → «Сеть», чтобы сохранить его как файл .inp, а затем импортируйте этот файл.';
 // Edited by TGH 2026-09-07
@@ -1876,11 +1850,8 @@ $ec_lang['lpn_file_upload_explain']='Этот браузер не может п�
 // The tip on the Open button, which reached the toolbar with Task 246. It exists because that
 // button is icon-only: on a menu row the word carries the whole meaning, and on the strip the tip
 // is where the rest of it lives.
-$ec_lang['lpn_file_open_tip']='Открыть файл проекта, сохранённый с этой страницы.';
 // Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
 // cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
-$ec_lang['lpn_file_save_tip']='Сохраняет в подключённый файл.';
-$ec_lang['lpn_file_saveas_tip']='Выберите файл для сохранения. Этот проект подключается к этому файлу, и «Сохранить» с этого момента записывает в него.';
 // The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
 // cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
 // is no API for it, and the download attribute cannot override the setting -- but the user can turn
@@ -2186,7 +2157,6 @@ $ec_lang['lpn_field_roughness_tip']='Коэффициент C формулы Х�
 $ec_lang['lpn_field_length']='Длина';
 $ec_lang['lpn_field_from']='От';
 $ec_lang['lpn_field_to']='До';
-$ec_lang['lpn_field_length_tip']='Длина трубы. При включённом «Авто» длина измеряется по нарисованному на карте. Отключите «Авто», чтобы ввести длину, отличающуюся от рисунка.';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2228,7 +2198,6 @@ $ec_lang['lpn_field_valve_setting_loss_tip']='Сколько напора сни
 $ec_lang['lpn_field_valve_diameter_tip']='Ширина отверстия в клапане. По этой ширине вычисляется скорость воды в клапане, а по скорости — потеря напора.';
 $ec_lang['lpn_field_valve_km_tip']='Потеря напора в корпусе клапана при полностью открытом клапане, в дополнение к потере от уставки клапана. Выражается как кратное скоростному напору. Используйте 0, чтобы не учитывать её.';
 $ec_lang['lpn_field_km']='Коэффициент местных потерь, k';
-$ec_lang['lpn_field_km_tip']='Потери на изгибах, клапанах и фитингах этой трубы, выраженные как кратное скоростного напора. Используйте 0 для обычной прямой трубы.';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
 // their own key rather than being asked to carry the full popup-field wording -- an on-map legend
@@ -2265,7 +2234,6 @@ $ec_lang['lpn_field_desc']='Описание';
 // description is free text, so the tag's one-word rule does NOT apply to it, but a line break cannot
 // be written as a trailing comment and is turned into a space. The tip says what the field is for
 // first, because that is what a reader of a blank box wants.
-$ec_lang['lpn_field_desc_tip']='Для собственного использования, например угол улицы или материал трубы. Переносится в файл EPANET и обратно, где помещается в конце собственной строки этого элемента. Ни один расчёт его не читает. Перенос строки становится пробелом, потому что в файле для него нет места.';
 // **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
@@ -2341,7 +2309,6 @@ $ec_lang['lpn_mode_add_text']='Режим: Добавление текста. Щ
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Используйте этот режим, чтобы изменять, перемещать и перетаскивать объекты на карте. Это режим, в который страница возвращается по умолчанию: она сама возвращается сюда после некоторых действий, например открытия проекта. Повторное нажатие [Esc] снимает выделение с того, что было выбрано.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tip_labels_draggable']='Подпись можно перетащить, чтобы переместить её. Подпись ненадолго подсвечивается, чтобы обратить внимание, что она была перемещена. Дважды щёлкните подпись, чтобы вернуть её в автоматическое положение.';
 $ec_lang['lpn_field_auto']='Авто';
 $ec_lang['lpn_method_switch_confirm']='Изменение метода расчёта трения не меняет уже введённые значения шероховатости труб, а шероховатость для одного метода не имеет смысла для другого. Проверьте после этого каждую трубу. Всё равно изменить?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
@@ -2394,7 +2361,6 @@ $ec_lang['lpn_field_text_all_zoom_tip']='Оставлять этот текст 
 $ec_lang['lpn_tool_labels']='Подписи';
 $ec_lang['lpn_labels_heading_node']='Подписи узлов';
 $ec_lang['lpn_labels_heading_link']='Подписи связей';
-$ec_lang['lpn_labels_decimals_tip']='Число десятичных знаков, показываемых для этой подписи';
 $ec_lang['lpn_labels_mark_extrema']='Отмечать наибольшее и наименьшее значения';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
@@ -2410,8 +2376,6 @@ $ec_lang['lpn_settings_apply_to_all']='Применить ко всем';
 $ec_lang['lpn_settings_apply_to_all_tip']='Каждый уже начерченный элемент этого типа получает идентификатор, начинающийся с этого текста. Номер у каждого сохраняется. Идентификатор, не заканчивающийся числом, остаётся без изменений.';
 $ec_lang['lpn_confirm_apply_prefix']='Переименовать {n} элементов так, чтобы их идентификаторы начинались с {prefix}? Номер у каждого сохранится.';
 $ec_lang['lpn_prefix_applied']='Переименовано элементов: {n}. Без изменений оставлено: {skipped}.';
-$ec_lang['lpn_labels_prefix_tip']='Текст, добавляемый перед этим параметром в подписях на карте';
-$ec_lang['lpn_labels_suffix_tip']='Текст, добавляемый после этого параметра в подписях на карте';
 $ec_lang['lpn_labels_suffix_gradient_tip']='Текст, показываемый после уклона потерь напора на карте. Не вводите здесь знак процента — он добавляется автоматически, когда единицы измерения — проценты.';
 $ec_lang['lpn_labels_separator']='Текст между значениями';
 $ec_lang['lpn_labels_separator_tip']='Текст между одним параметром и следующим в подписи. По умолчанию — пробел.';
@@ -2422,7 +2386,6 @@ $ec_lang['lpn_labels_separator_tip']='Текст между одним пара�
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='Приоритет';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='Порядок, в котором значения убираются, если подпись не помещается. Значение с приоритетом 1 сохраняется дольше всех.';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
@@ -2439,7 +2402,6 @@ $ec_lang['lpn_labels_col_decimals']='Дес. знаки';
 // it heads a box about three characters wide, and its tip carries the whole meaning.
 $ec_lang['lpn_labels_col_show']='Показывать';
 $ec_lang['lpn_labels_show_tip']='Порядок, в котором значения появляются на подписи. Значение под номером 1 идёт первым: наверху в многострочной подписи и в начале — в однострочной.';
-$ec_lang['lpn_labels_priority_customer_tip']='Порядок, в котором значения убираются из подписи абонента. Значение под номером 1 убирается первым.';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='Использовать единицы измерения';
@@ -2568,7 +2530,6 @@ $ec_lang['lpn_backdrop_continue']='Продолжить';
 $ec_lang['lpn_tool_settings']='Настройки';
 $ec_lang['lpn_settings_show_titles']='Показывать заголовки страницы';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_show_titles_tip']='Скрывает заголовок страницы и приветственную строку над чертежом, чтобы у карты было больше места для работы. При печати всегда показывается только чистая карта, без прочего.';
 // The link that rides on the headings themselves (Tom's 2026-09-08 worklist). It throws the switch AND opens the
 // box at the row that holds it, so the way back is learned in the same gesture.
 $ec_lang['lpn_hide_titles']='Скрыть эти заголовки';
@@ -2773,7 +2734,6 @@ $ec_lang['lpn_settings_default_is']='Значение по умолчанию �
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Насколько близко должен подойти расчёт, прежде чем он остановится, — измеряется как величина, на которую расходы всё ещё меняются от одной итерации к следующей. Меньшее число точнее, но требует больше времени. Оба расчётных ядра читают это же поле, но каждое измеряет это изменение относительно своей суммы: встроенное — относительно суммы расходов отбора, EPANET — относительно суммы расходов по связям. Если поле оставить пустым, эта страница использует более строгую точность, чем собственное значение по умолчанию EPANET.';
 $ec_lang['lpn_settings_specific_gravity']='Относительная плотность';
-$ec_lang['lpn_settings_specific_gravity_tip']='Вес жидкости относительно воды. Он меняет давления, которые показал бы манометр, но не расходы.';
 $ec_lang['lpn_settings_viscosity']='Относительная вязкость';
 $ec_lang['lpn_settings_viscosity_tip']='Вязкость жидкости относительно воды при 20 градусах Цельсия. Она меняет результат только при использовании метода Дарси-Вейсбаха.';
 $ec_lang['lpn_settings_trials']='Максимум итераций';
@@ -2870,7 +2830,6 @@ $ec_lang['lpn_settings_mask_labels']='Сплошной фон под подпи�
 // drawing program would expect exactly that from those words.
 $ec_lang['lpn_settings_leader_snap']='Прилипание выносных линий к заданным углам';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_leader_snap_tip']='Когда вы отодвигаете подпись от того, что она называет, линия к ней притягивается к ближайшему из заданных углов, если вы тащите её достаточно близко к одному из них. Продолжайте тащить дальше — и прилипание отпустит, так что доступен всё ещё любой угол. При отключении перетаскивание свободное, как эта страница всегда и работала.';
 // **THE LABELING THRESHOLD** (Tasks 669 and 705). The row's name is Tom's own wording from the
 // Task 705 restorations. Its capture button reuses lpn_settings_label_use_view, the customer
 // row's key, because it is the same button doing the same thing. The placeholder is the only place
@@ -3004,7 +2963,6 @@ $ec_lang['lpn_time_tank']='Бак';
 $ec_lang['lpn_time_level']='Уровень воды';
 $ec_lang['lpn_time_run']='Рассчитать';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='Рассчитывает эту сеть на каждом гидравлическом шаге по времени.';
 // **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
 // `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
 // LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
@@ -3081,7 +3039,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Подписи абонентов о�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Использовать текущий вид';
 $ec_lang['lpn_settings_page']='Страница';
-$ec_lang['lpn_settings_page_note']='Сохраняется в этом калькуляторе, а не в проекте.';
 $ec_lang['lpn_settings_hydraulics']='Гидравлика';
 $ec_lang['lpn_settings_quality']='Качество';
 $ec_lang['lpn_settings_quality_track']='Параметр качества';
@@ -3228,11 +3185,9 @@ $ec_lang['lpn_settings_energy']='Энергия';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='Отчёты';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_menu_tip']='Отчёты о стоимости энергии насосов, сравнении сценариев, отчёт расчётного ядра EPANET, а после расчёта с продолжённым периодом — отчёт о состоянии и полный отчёт.';
 $ec_lang['lpn_reports_epanet']='Расчёт EPANET';
 $ec_lang['lpn_energy_title']='Отчёт об энергии насосов';
 $ec_lang['lpn_energy_menu']='Энергия насосов';
-$ec_lang['lpn_energy_menu_tip']='Какую долю расчёта работал каждый насос, какую мощность он потреблял и во что он обошёлся за последний расчёт с продолжённым периодом.';
 $ec_lang['lpn_energy_efficiency']='КПД насоса (проценты)';
 $ec_lang['lpn_energy_efficiency_tip']='Полный КПД «от провода до воды», используемый для каждого насоса, у которого нет собственной кривой КПД. Если ничего не указано, EPANET использует 75 процентов.';
 $ec_lang['lpn_energy_price']='Цена электроэнергии';
@@ -3296,12 +3251,12 @@ $ec_lang['lpn_status_title']='Отчёт о состоянии';
 $ec_lang['lpn_status_needs_run']='Отчёт о состоянии перечисляет, что изменилось во время расчёта с продолжённым периодом. Задайте «Общую продолжительность работы» в разделе «Настройки» → «Расчёт» → «Время», нажмите «Рассчитать», затем откройте «Вода» → «Отчёты» → «Отчёт о состоянии».';
 $ec_lang['lpn_status_empty']='За этот расчёт состояние ничего не изменило.';
 $ec_lang['lpn_status_col_event']='Событие';
-$ec_lang['lpn_status_opened']='{type} {id} открыт(а)';
-$ec_lang['lpn_status_closed']='{type} {id} закрыт(а)';
-$ec_lang['lpn_status_filling']='{type} {id} наполняется';
-$ec_lang['lpn_status_emptying']='{type} {id} опорожняется';
-$ec_lang['lpn_status_full']='{type} {id} полон(на)';
-$ec_lang['lpn_status_dry']='{type} {id} пуст(а)';
+$ec_lang['lpn_status_opened']='{type} {id} теперь открыт(а)';
+$ec_lang['lpn_status_closed']='{type} {id} теперь закрыт(а)';
+$ec_lang['lpn_status_filling']='{type} {id} теперь наполняется';
+$ec_lang['lpn_status_emptying']='{type} {id} теперь опорожняется';
+$ec_lang['lpn_status_full']='{type} {id} теперь полон(на)';
+$ec_lang['lpn_status_dry']='{type} {id} теперь пуст(а)';
 $ec_lang['lpn_status_no_converge']='Гидравлическое решение на этом шаге не полностью сошлось; показанные числа — результат его последней итерации.';
 $ec_lang['lpn_status_note']='Считывается из того же расчёта с продолжённым периодом, что и панель «Таблицы» и «Полный отчёт». Перечисляются только изменения, а не каждый шаг.';
 
@@ -3366,7 +3321,6 @@ $ec_lang['lpn_color_mode_manual']='Вручную';
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='Библиотеки';
-$ec_lang['lpn_library_menu_tip']='Управляйте графиками расхода отбора, кривыми насосов и правилами управления для этого проекта.';
 // The three section names. Each is the word EPANET's own input file uses for the section, because
 // that is the word every water-network user and every tutorial already has -- see the note in
 // dev/scripts/glossary.json about deferring to a discipline's standard term.
@@ -3380,7 +3334,6 @@ $ec_lang['lpn_library_curves_tip']='Кривая — это список точ�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_curves_note']='Кривая принадлежит проекту, а насос или клапан указывает, какую из них использует, в своих собственных свойствах. Несколько элементов могут использовать одну и ту же кривую, и её изменение здесь меняет их все. Для кривой напора насоса расчёт использует кривую, подобранную по точкам, как показано; для всех остальных видов точки соединяются прямыми отрезками, как показано.';
 $ec_lang['lpn_library_curve_add']='Добавить кривую';
-$ec_lang['lpn_library_curve_type_tip']='Что описывает эта кривая';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
 // EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
 // and Equation (for pump head) on row/line 2."*). EPANET calls the control "Curve Type", so that is
@@ -3401,7 +3354,6 @@ $ec_lang['lpn_library_curve_values_tip']='Выделите один или дв�
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
 $ec_lang['lpn_library_curve_note_label']='Описание';
-$ec_lang['lpn_library_curve_note_tip']='Что представляет собой эта кривая, своими словами. Это записывается над кривой в файле EPANET и оттуда же считывается обратно.';
 $ec_lang['lpn_library_curve_remove_point']='Удалить эту точку';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -3584,14 +3536,11 @@ $ec_lang['lpn_field_base_demand']='Базовый расход отбора';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='Расход, который забирает этот узел на показанном шаге времени: каждый базовый расход отбора умножается на свой график и складывается. Это вычисляемое значение, а не введённое, поэтому оно меняется вместе с часами и не может быть изменено вручную.';
 $ec_lang['lpn_field_demand_pattern']='График расхода отбора';
-$ec_lang['lpn_field_demand_pattern_tip']='Как расход отбора этого узла повышается и понижается в течение расчёта. Оставьте значение «Без графика», чтобы узел следовал графику проекта по умолчанию.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
 $ec_lang['lpn_field_demand_category']='Описание';
-$ec_lang['lpn_field_demand_category_tip']='Название или описание этой категории расхода отбора.';
 $ec_lang['lpn_demand_add']='Добавить категорию расхода отбора';
-$ec_lang['lpn_demand_add_tip']='Добавляет ещё одну категорию расхода отбора в этом узле, со своим базовым расходом отбора, графиком и описанием. Категории складываются.';
 $ec_lang['lpn_demand_remove']='Удалить этот расход отбора';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
@@ -3905,3 +3854,131 @@ $ec_lang['lpn_survey_note_blank_rows']='Пропущено пустых стро
 $ec_lang['lpn_survey_note_id_duplicate']='Имя уже использовано ранее в этом файле, присвоено новое имя.';
 $ec_lang['lpn_survey_note_id_taken']='Имя уже используется в проекте, присвоено новое имя.';
 $ec_lang['lpn_survey_note_id_invalid']='Это имя здесь использовать нельзя, присвоено новое имя.';
+$ec_lang['lpn_hotkeys_menu_heading']='Меню';
+$ec_lang['lpn_hotkeys_menu_term']='Горячие клавиши меню';
+$ec_lang['lpn_hotkeys_menu_def']='<table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+буква</td><td>Откройте меню с этой буквой, затем нажмите букву строки, чтобы выбрать её. Пока вы пользуетесь клавиатурой, буквы видны на экране. На Mac используйте Ctrl+Option.</td></tr><tr><td>F10</td><td>Перейти к строке меню.</td></tr></tbody></table>';
+$ec_lang['lpn_graphs_menu']='Графики';
+$ec_lang['lpn_contour_menu']='Изолинии';
+$ec_lang['lpn_contour_tip']='Показать на карте поле изолиний: цвета узлов растекаются вдоль труб и рядом с ними, с подписанными линиями уровня. Открывает окно для настройки или отключения.';
+$ec_lang['lpn_contour_plot']='Карта изолиний';
+$ec_lang['lpn_contour_fill']='Заливка';
+$ec_lang['lpn_contour_fill_tip']='«Плавная» плавно переходит от цвета одного класса к другому. «Полосы» закрашивают каждый класс цветовой шкалы одним цветом.';
+$ec_lang['lpn_contour_fill_smooth']='Плавная';
+$ec_lang['lpn_contour_fill_bands']='Полосы';
+$ec_lang['lpn_contour_opacity']='Непрозрачность заливки';
+$ec_lang['lpn_contour_lines']='Изолинии';
+$ec_lang['lpn_contour_interval']='Интервал';
+$ec_lang['lpn_contour_buffer']='Буфер';
+$ec_lang['lpn_contour_buffer_unit']='× медианная длина трубы';
+$ec_lang['lpn_contour_buffer_tip']='Как далеко цвет простирается от каждой трубы, в долях медианной длины трубы. На внешней части он постепенно исчезает.';
+$ec_lang['lpn_contour_few']='Слишком мало узлов для построения изолиний.';
+$ec_lang['lpn_contour_support']='Карта изолиний: {n} узлов, интерполяция вдоль {p} труб и на расстояние до {k} медианных длин трубы рядом с ними. Через насосы, клапаны и закрытые связи цвет не проводится.';
+$ec_lang['lpn_contour_support_lines']='Изолинии через каждые {i} {u}.';
+$ec_lang['lpn_contour_too_many']='При таком интервале изолиний слишком много; увеличьте интервал, чтобы их нарисовать.';
+$ec_lang['lpn_contour_dem']='Земля между узлами по Mapbox DEM';
+$ec_lang['lpn_contour_dem_tip']='Между узлами давление становится интерполированным напором за вычетом высоты земли по Mapbox DEM, поэтому оно может опускаться ниже наименьшего давления в узлах на холме, где в сети нет ни одного узла. Считайте землю картой изолиний, а не съёмкой.';
+$ec_lang['lpn_contour_support_dem']='Между узлами давление равно интерполированному напору за вычетом отметки земли по Mapbox DEM, взятой примерно через каждые {m} м.';
+$ec_lang['lpn_contour_dem_failed']='Не удалось прочитать землю из Mapbox DEM, поэтому давление интерполируется только между узлами.';
+$ec_lang['lpn_contour_consent_1']='Чтобы показать давление над землёй, на api.mapbox.com отправляется область, которую занимает ваша сеть, в виде номеров тайлов карты Mapbox, чтобы прочитать высоту земли в этом месте.';
+$ec_lang['lpn_contour_consent_2']='Это другой вопрос, чем картинки карты под вашим проектом. Картинки лишь говорят, куда вы смотрите. Эти тайлы говорят, где находится ваша сеть. Mapbox получит эти номера тайлов и ваш IP-адрес. Больше мы ничего не отправляем: ни имени, ни труб, ни проекта. Мы не ведём об этом никаких записей, и на этом устройстве не сохраняется ничего, кроме вашего ответа на этот вопрос.';
+$ec_lang['lpn_contour_consent_3']='Можно ли отправить в Mapbox номера тайлов области вашей сети?';
+$ec_lang['lpn_contour_consent_4']='Если вы ответите «нет», всё остальное на этой странице продолжит работать так же, как сейчас, а карта изолиний будет строиться только между узлами. Ответ «да» мы запоминаем, чтобы не спрашивать снова. Ответ «нет» не сохраняется вообще.';
+$ec_lang['lpn_sysflow_menu']='Баланс расхода';
+$ec_lang['lpn_sysflow_tip']='Построить график общего произведённого и общего потреблённого расхода во времени за весь расчёт с продолжённым периодом. Баки не входят ни в один из итогов, поэтому там, где две линии расходятся, баки наполняются или опорожняются.';
+$ec_lang['lpn_sysflow_produced']='Произведено';
+$ec_lang['lpn_sysflow_produced_tip']='Общий расход, поступающий в сеть из резервуаров и от отрицательных расходов отбора.';
+$ec_lang['lpn_sysflow_consumed']='Потреблено';
+$ec_lang['lpn_sysflow_consumed_tip']='Сумма всех положительных расходов отбора: вода, забираемая из сети в узлах, и любой расход в резервуар.';
+$ec_lang['lpn_copy_title']='Отметить файл как новую копию?';
+$ec_lang['lpn_copy_body']='В этом файле указано, что он создан {date}, а этот браузер его не узнаёт. Это оригинал (оставить ту же блокировку) или копия (создать новую блокировку)?';
+$ec_lang['lpn_copy_body_nodate']='Этот браузер не узнаёт этот файл. Это оригинал (оставить ту же блокировку) или копия (создать новую блокировку)?';
+$ec_lang['lpn_copy_original']='Оригинал; оставить ту же блокировку';
+$ec_lang['lpn_copy_copy']='Копия; создать новую блокировку';
+$ec_lang['lpn_copy_kept_link']='Открыт {name} как оригинал, перемещённый на новое место. «Сохранить» теперь записывает в этот файл.';
+$ec_lang['lpn_copy_opened']='Открыт {file} как копия, с собственной новой блокировкой, которая будет сохранена при следующем сохранении файла.';
+$ec_lang['lpn_scenario_basic']='Базовый режим';
+$ec_lang['lpn_scenario_basic_tip']='Если отмечено, сценарий — это просто заданные в нём значения. Если снято, меню предлагает ещё таблицу предварительного просмотра «Альтернативы», которая показывает, как эти значения сгруппированы по категориям, и приглашает вас оставить отзыв.';
+$ec_lang['lpn_alt_title']='Предварительный просмотр альтернатив';
+$ec_lang['lpn_alt_note']='Только чтение. База использует альтернативу «База» каждой категории. Каждый сценарий получает собственную альтернативу для любой изменённой категории, дочернюю по отношению к базовой. Число — это количество изменённых в ней значений.';
+$ec_lang['lpn_alt_cat_physical']='Физические';
+$ec_lang['lpn_alt_cat_demand']='Расход отбора';
+$ec_lang['lpn_alt_cat_topology']='Включение элементов';
+$ec_lang['lpn_alt_cat_initial']='Начальные настройки';
+$ec_lang['lpn_alt_cat_constituent']='Компонент';
+$ec_lang['lpn_alt_cat_fireflow']='Противопожарный расход';
+$ec_lang['lpn_alt_cat_energy']='Стоимость энергии';
+$ec_lang['lpn_alt_cat_userdata']='Пользовательские свойства';
+$ec_lang['lpn_alt_cat_text']='Текст';
+$ec_lang['lpn_reports_calib']='Калибровка';
+$ec_lang['lpn_reports_calib_tip']='Сравнить измеренные полевые данные из файла калибровки с последним расчётом: статистика, график корреляции и сравнение средних.';
+$ec_lang['lpn_calib_title']='Отчёт о калибровке';
+$ec_lang['lpn_calib_param']='Параметр';
+$ec_lang['lpn_calib_param_tip']='Величина, которую измеряет файл калибровки. Для каждого параметра хранится один файл.';
+$ec_lang['lpn_calib_load']='Загрузить файл калибровки…';
+$ec_lang['lpn_calib_load_tip']='Текстовый файл, в каждой строке которого указаны идентификатор места, время и измеренное значение. Время отсчитывается от начала расчёта в десятичных часах или в формате часы:минуты. Точка с запятой начинает комментарий. Строка только со временем и значением относится к месту выше.';
+$ec_lang['lpn_calib_none']='Для этого параметра файл калибровки не загружен.';
+$ec_lang['lpn_calib_session']='Файл калибровки хранится только в течение этого сеанса. Он не сохраняется ни в проекте, ни на этом устройстве.';
+$ec_lang['lpn_calib_file']='{file}: {n} измерений в {m} местах.';
+$ec_lang['lpn_calib_units']='Значения из файла читаются в единицах этого проекта: {unit}.';
+$ec_lang['lpn_calib_missing']='Указаны в файле, но отсутствуют в этой сети: {ids}.';
+$ec_lang['lpn_calib_missing_count']='Измерений пропущено, потому что их места нет в этой сети: {n}.';
+$ec_lang['lpn_calib_bad_lines']='Строки, которые не удалось прочитать, пропущены: {lines}';
+$ec_lang['lpn_calib_outside']='Измерений вне времён, о которых сообщил этот расчёт, пропущено: {n}.';
+$ec_lang['lpn_calib_no_value']='Измерений без вычисленного значения на их момент пропущено: {n}.';
+$ec_lang['lpn_calib_single']='Это расчёт на один момент, поэтому каждое измерение сравнивается с его единственным результатом, какое бы время ни указано в файле.';
+$ec_lang['lpn_calib_needs_run']='Результатов для сравнения пока нет. Отчёт заполнится после расчёта сети.';
+$ec_lang['lpn_calib_no_pairs']='Ни одно измерение не удалось сравнить, поэтому строить нечего.';
+$ec_lang['lpn_calib_tab_stats']='Статистика';
+$ec_lang['lpn_calib_tab_corr']='График корреляции';
+$ec_lang['lpn_calib_tab_means']='Сравнение средних';
+$ec_lang['lpn_calib_col_location']='Место';
+$ec_lang['lpn_calib_col_n']='Кол-во набл.';
+$ec_lang['lpn_calib_col_obs_mean']='Наблюдаемое среднее';
+$ec_lang['lpn_calib_col_sim_mean']='Вычисленное среднее';
+$ec_lang['lpn_calib_col_mean_err']='Средняя ошибка';
+$ec_lang['lpn_calib_col_mean_err_tip']='Среднее абсолютных разностей между каждым наблюдаемым значением и вычисленным значением на тот же момент.';
+$ec_lang['lpn_calib_col_rms_err']='Ср.кв. ошибка';
+$ec_lang['lpn_calib_col_rms_err_tip']='Среднеквадратичная ошибка: квадратный корень из среднего квадратов разностей между наблюдаемыми и вычисленными значениями.';
+$ec_lang['lpn_calib_network']='Сеть';
+$ec_lang['lpn_calib_corr_means']='Корреляция между средними: {r}';
+$ec_lang['lpn_calib_corr_none']='Корреляция между средними: нужны как минимум два места с различающимися средними.';
+$ec_lang['lpn_calib_axis_obs']='Наблюдаемое: {q}';
+$ec_lang['lpn_calib_axis_sim']='Вычисленное: {q}';
+$ec_lang['lpn_calib_observed']='Наблюдаемое';
+$ec_lang['lpn_calib_computed']='Вычисленное';
+$ec_lang['lpn_calib_point']='{id}, {time}: наблюдаемое {o}, вычисленное {s}';
+$ec_lang['lpn_calib_corr_note']='Каждая точка — одно измерение. Чем ближе точки лежат к диагональной линии, тем ближе вычисленные значения к наблюдаемым.';
+$ec_lang['lpn_calib_ts_point']='Измерено в {id}, {time}: {v}';
+$ec_lang['lpn_calib_ts_note']='Кольцами показаны измеренные значения из файла калибровки.';
+$ec_lang['lpn_analyze_menu']='Анализ';
+$ec_lang['lpn_analyze_menu_tip']='Анализы, которые рассчитывают сеть на копии: противопожарный расход в каждом узле, потери каждой трубы, насоса и клапана, а также расходы отбора, увеличенные или уменьшенные в заданное число раз.';
+$ec_lang['lpn_ff_design_off']='Нет';
+$ec_lang['lpn_ff_design_all']='Все';
+$ec_lang['lpn_ff_design_selected']='Выбранные';
+$ec_lang['lpn_ff_rows_more_links']='Связей не показано: {n}.';
+$ec_lang['lpn_crit_menu']='Анализ критичности…';
+$ec_lang['lpn_crit_menu_tip']='Поочерёдно убирает из сети каждую трубу, насос и клапан и показывает, что теряет система.';
+$ec_lang['lpn_crit_title']='Анализ критичности';
+$ec_lang['lpn_crit_intro']='Каждый элемент по очереди убирается из сети, и сеть рассчитывается на показанный на экране шаг времени в активном сценарии. Ваш проект при этом не меняется; весь расчёт выполняется на копии.';
+$ec_lang['lpn_crit_scope']='Отключаемые связи';
+$ec_lang['lpn_crit_scope_tip']='Все трубы, насосы и клапаны или только выбранные на карте. Выберите набор перед запуском.';
+$ec_lang['lpn_crit_scope_all']='Все связи';
+$ec_lang['lpn_crit_scope_selected']='Выбранные связи';
+$ec_lang['lpn_crit_minpressure']='Наименьшее допустимое давление';
+$ec_lang['lpn_crit_minpressure_tip']='Это то же число, что «Наименьшее допустимое давление в остальной сети» в анализе противопожарного расхода. Изменение здесь меняет его и там.';
+$ec_lang['lpn_crit_col_asset']='Элемент';
+$ec_lang['lpn_crit_col_unserved']='Неудовлетворённый расход';
+$ec_lang['lpn_crit_col_cutoff']='Отрезанные узлы';
+$ec_lang['lpn_crit_col_below']='Узлы ниже минимума';
+$ec_lang['lpn_crit_summary']='{n} из {total} элементов оставляют расход неудовлетворённым или опускают узел ниже {pressure}.';
+$ec_lang['lpn_crit_baseline_below']='Узлов, уже находящихся ниже него при целой сети: {n}. Они не учитываются.';
+$ec_lang['lpn_crit_working']='Выполняется: {done} из {total} элементов.';
+$ec_lang['lpn_crit_stopped']='Остановлено после {done} из {total} элементов. Ниже показаны результаты уже завершённых.';
+$ec_lang['lpn_crit_no_selection']='Связи не выбраны. Выберите связи или выберите вариант «Все связи».';
+$ec_lang['lpn_crit_no_links']='В этом проекте пока нет связей, поэтому отключать нечего.';
+$ec_lang['lpn_crit_busy']='Выполняется другой анализ. Остановите его или дождитесь завершения.';
+$ec_lang['lpn_crit_skipped']='{n} выбранных элементов не являются связями, поэтому они не отключались.';
+$ec_lang['lpn_crit_stale']='Чертёж изменился, поэтому результаты анализа критичности были очищены. Запустите его снова.';
+$ec_lang['lpn_crit_skipdead']='Пропускать тупики';
+$ec_lang['lpn_crit_skipdead_tip']='Тупиковая связь — это связь, удаление которой отрезает узлы, до которых можно добраться только через неё, без резервуара или бака за ней. Её потеря — это всё, что находится за ней, поэтому она не рассчитывается. В сводке указано, сколько связей пропущено.';
+$ec_lang['lpn_crit_skipped_dead']='Тупиковых связей пропущено: {n}. Каждая отрезает всё, что находится за ней.';

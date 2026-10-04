@@ -2583,3 +2583,52 @@ Question (Tom, via the orchestrator): should the Looped Network Time series grap
 - **NOT FOUND.** No OWA-run web viewer/editor surfaced in two searches. EPANET-UI (sites.google.com/view/epanet-ui) surfaced; not opened, so not classified. Hydraulic.app, Tyto, Autodesk Info360, Bentley cloud: not examined this session; no claim.
 - **CITED.** EPANET itself (EPA) is a Windows desktop program; epa.gov/water-research/epanet.
 - **SPECULATION.** Answer: the only live, client-side, .inp-in/.inp-out, build-and-run browser tool I could verify besides ours is epanet-js; HydroBOA is the same job done server-side. So "the browser version of EPANET" is fair for neither as a definite article: there are at least three (epanet-js, HydroBOA, ours), plus a dead 2013 demo. Tom's doubt is an accuracy point for claims of uniqueness or singularity, not pedantry. Our own claim "runs the same EPANET engine in your browser" is true (positioning.md/js/vendor/README.md record OWA-EPANET 2.3.5 via epanet-js 0.9.0; note the earlier answer said 2.2, the vendor README says 2.3.5, re-derive before quoting).
+
+---
+
+## 2026-10-03 — Mary: what to call EPANET's System Flow graph and its two lines
+
+Full note with the table: `dev/flow-balance-terms.md`. Tom chose the title "Flow balance" and leaned toward Inflow/Outflow "only if Mary finds support".
+
+- **CITED.** EPANET GUI source, github.com/OpenWaterAnalytics/epanet-gui epanet2w/Fgraph.pas (HEAD 8818a69): `TXT_SYSTEM_FLOW = ' System Flow Balance'`, `TXT_PRODUCED = 'Produced'`, `TXT_CONSUMED = 'Consumed'`. `GetSysFlow` loops JUNCS and RESERVS only (Uglobals.pas: JUNCS=0, RESERVS=1, TANKS=2), so tanks are in neither line and a reservoir with positive demand (filling) counts as Consumed. Tom's title "Flow balance" is EPANET's own.
+- **CITED.** OWA-EPANET 2.3 `src/flowbalance.c`, `src/report.c`: report block "Hydraulic Flow Balance" with Total Inflow, Consumer Demand, Demand Deficit, Emitter Flow, Leakage Flow, Total Outflow, Storage Flow, Flow Ratio. Total Inflow = the GUI's Produced; Total Outflow is NOT the GUI's Consumed (adds emitters, leakage, reservoir filling; tanks separate as Storage Flow).
+- **CITED.** EPANET 2.2 manual ch.9 (epanet-manual.readthedocs.io/en/latest/9_viewing_results.html): "System Flow: Plots total system production and consumption versus time". OpenEPANET forum "EPANET Water balance" (openepanet.org/Topic/22313/water-balance, 2005): "total produced and total consumed".
+- **CITED (docs page read; definitions from search summary of a Bentley Communities thread, re-verify before quoting).** WaterGEMS/WaterCAD: Flow Supplied, Flow Demanded, Flow Stored (docs.bentley.com .../9005-2.html names flow demanded and flow stored). Info360 Mass Balance (help-innovyze.refined.site/space/info360/15008061/Mass+Balance): Inflow, Outflow, Storage, Usage, per pressure zone.
+- **CITED (summary-level).** AWWA M36 via mass.gov and California DWR audit manual: System Input Volume, Water Supplied, Authorized Consumption, Water Losses. EPA sewer I/I: "inflow" is non-sanitary water entering a sewer.
+- **NOT FOUND.** KYPipe wording (PDF unreadable here, Eng-Tips 403), Walski AWDM text, InfoWater/Synergi/MIKE+ system flow labels, QWater/GHydraulics (they delegate to EPANET), epanet-js app's own labels. "In/Out" and "Flow in & out": no support anywhere.
+- **SPECULATION (re-derive).** Recommendation: keep "Flow balance" and keep Produced/Consumed (EPANET's own labels, our rule is EPANET terminology). Inflow/Outflow has support but for different quantities, and would sit beside the verbatim engine report whose "Total Outflow" differs from our Consumed. If a change is wanted, WaterGEMS's Supplied/Demanded is the nearer professional vocabulary. Put "tanks are in neither line" in the tip.
+
+
+---
+
+## 2026-10-03 — Mary: how do Adobe, Autodesk, Bentley, Apple show help for a menu row
+
+- **CITED.** Microsoft Win32 "Status Bars (Design basics)" learn.microsoft.com/en-us/windows/win32/uxguide/ctrl-status-bars: "Don't use the status bar to explain menu bar items" (not discoverable). Yet the MenuHelp API (learn.microsoft.com/en-us/windows/win32/controls/status-bar-reference) exists to do exactly that, so Microsoft's own platform shipped the pattern Tom describes.
+- **CITED.** Autodesk Community "display popup menu helpstrings in the status bar" forums.autodesk.com/t5/autocad-forum/display-popup-menu-helpstrings-in-the-status-bar/td-p/6797594: through AutoCAD 2014 a highlighted popup-menu item showed its helpstring at left of the status bar; from 2015 it does not (forum answer, not a vendor doc). CUI still stores helpstrings; ribbon uses extended tooltips.
+- **CITED.** Adobe helpx.adobe.com/photoshop/desktop/get-started/set-up-toolbars-panels/show-or-hide-tool-tips.html: standard and rich tooltips on tools, panels, icons (Edit > Preferences > Tools). Status bar holds document info only. NOT FOUND: any Adobe doc of a tip on a menu-bar row.
+- **CITED.** Bentley MicroStation Help docs.bentley.com/LiveContent/web/MicroStation%20Help-v26/en/StatusBar.html: status bar prompt field names the active tool and the next step (tool prompt, not menu-row help). NOT FOUND: WaterGEMS/WaterCAD menu-row help.
+- **CITED.** Apple NSMenuItem.toolTip developer.apple.com/documentation/appkit/nsmenuitem/1514848-tooltip and Apple "Tooltips" (Online Help archive): help tags exist on menu items as an optional property; HIG menu pages (developers.apple.com/design/human-interface-guidelines/macos/menus/menu-anatomy/) say nothing about descriptions. macOS menu items otherwise have none and no status bar.
+- **CITED.** Blender Tooltips guideline developer.blender.org/docs/features/interface/human_interface_guidelines/tooltips/: hover tooltip carries name, description, shortcut, on menu items too. Office: Enhanced ScreenTips (support.microsoft.com/en-us/office/show-or-hide-screentips-72d92d6a-6d2a-40fd-9ac2-fb9413ffce18), ribbon.
+- **NOT FOUND.** A shipped always-visible description line under menu rows in these products; VS Code palette / Windows 11 search descriptions not checked. Do not claim in-menu description is absent in the wild.
+- **SPECULATION.** The industry norm is a hover tooltip on the row; status-bar menu help was real (Win32 MenuHelp, AutoCAD to 2014) and is being retired. Touch has no hover, which favours Ida's in-menu line for phones only.
+
+---
+
+## 2026-10-04 -- Mary: Graphs fly-out order; the term for a scenario's value
+
+- **CITED.** EPANET 2.2 manual ch.9 (epanet-manual.readthedocs.io/en/latest/9_viewing_results.html) table order: Time Series, Profile, Contour, Frequency, System Flow. EPANET GUI source Uglobals.pas (OpenWaterAnalytics/epanet-gui): TIMESERIESPLOT=0, PROFILEPLOT=1, CONTOURPLOT=2, SYSFLOWPLOT=4 (Frequency = 3); Dgraph.pas sets RGGraphType.ItemIndex := TIMESERIESPLOT as default.
+- **OBSERVED.** Our fly-out order: js/looped-network.js:40617-40645 Profile, Time series, Frequency, Contour, Flow balance. Tom's ruling 2026-10-01 (comment at :40603) set Profile, Time series, Frequency.
+- **NOT FOUND.** epanet-js app's own graph menu order (docs/roadmap pages give no order).
+- **CITED.** Bentley WaterGEMS help "Overriding Inheritance" docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20Help%20SS6-v1/en/GUID-2C00D0E23DE543AABE7B9A72E13A69F3.html: "A child can override inherited characteristics by specifying a new value... considered local to the child"; "Local values can also be removed at any time, reverting the characteristic to its inherited state." Editor first-column checkbox marks changed (local) records; unchecked = inherited. Same family: "Base and Child Alternatives", "Minimizing Effort through Attribute Inheritance" (SewerGEMS).
+- **CITED (search summary only).** InfoWater Pro: unique Data Sets per scenario give "unique data in that scenario" (Autodesk learn / help.innovyze.com Scenario Explorer); the word "override" not confirmed there.
+- **OBSERVED.** The exact string "Type a scenario's own value" is not in lib/lang.ec.en.php. Nearest: lpn_scenario_override(_tip) :2975-2977, lpn_scenario_mark_tip :2965, lpn_scenario_overrides_tip :2966, lpn_scenario_push_none :3007, lpn_delete_drops_overrides :3024. :2944-2957 records Tom's 2026-08-14 "custom" ruling and the translation reason against "Own" (eigenvalue calque).
+- **SPECULATION.** "Override" (verb/noun) is the industry word (Bentley); "local" is Bentley's adjective. Keep "Base" and "Custom" labels already ruled; use "override" in tips only.
+
+## 2026-10-04b -- Mary: tip verb mood, Click vs Specify, Tick
+- **CITED.** Microsoft Style Guide, Describing interactions with the UI, learn.microsoft.com/en-us/style-guide/procedures-instructions/describing-interactions-with-ui : "Don't use input-specific verbs, such as click or swipe"; Select for buttons/checkboxes/menu items; Clear for unchecking; Choose for preference; Enter for values.
+- **CITED.** Google developer style guide developers.google.com/style/ui-elements : "Be wary of check and uncheck... use select and clear"; lists Click, Tap, Select as verbs.
+- **CITED (search summary).** GNOME HIG, developer.gnome.org/hig/guidelines/writing-style.html: imperative verb for menu-item tooltips. Apple HIG foundations/writing: verb in base form for action labels. Material tooltips m3.material.io/components/tooltips/guidelines: short, descriptive, no grammatical rule.
+- **CITED (search summary).** AutoCAD LINE prompts: "Specify first point:", "Specify next point or [Undo]:" (peachpit.com/articles/article.aspx?p=3188176&seqNum=5).
+- **NOT FOUND.** Apple help-tag mood rule, Apple select/deselect (not verified), Microsoft tooltip mood page (404), EPANET GUI hints.
+- **OBSERVED.** lib/lang.ec.en.php: 287 lpn *_tip; first word imperative ~50, third-person -s ~24, "The/How/What/A/This" noun-phrase ~100+, "You" 0. Click 51 lpn lines, Specify 0, tick 3/untick 2, uncheck/checked 2-3, "clear the box" 1.
+- **SPECULATION.** Recommendations in the report below.

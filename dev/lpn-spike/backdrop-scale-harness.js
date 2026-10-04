@@ -51,7 +51,9 @@ function saveToStorage() { saves++; }
 // way to notice is to try it in a browser and remember what the picture looked like before.
 function saveUndoSnapshot() { snaps++; }
 function cartesianY(y) { return -y; }              // copied intent, asserted against the real one below
-function alert(m) { alerts.push(m); }
+// Task 710: the refusals are notices now; `alerts` still counts every message the page says.
+function setWarning(m) { alerts.push(m); }
+function setNotice(m) { alerts.push(m); }
 const EngCalcs = { pageConfig: {} };
 // Task 354: a world file states REAL-WORLD coordinates, so applyWorldFile() crosses the local-origin
 // boundary as well as the Y flip. The four converters are EXTRACTED rather than stubbed -- a stub

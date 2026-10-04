@@ -285,7 +285,7 @@ console.log('== modes ==');
 	s2.colorNodeField = 'pressure';
 	s2.colorModes['node.pressure'] = 'pressure';
 	const si = L.computedBreaks('node', 'pressure');
-	ok('under metres of water the SAME criterion reads as 14.06', Math.abs(si[0] - 14.0614) < 0.01, si.join(','));
+	ok('under metres of water the SAME criterion reads as 14.07', Math.abs(si[0] - 14.0688) < 0.01, si.join(','));
 	ok('so a criterion is a fact about the water, not about the preset it was typed under',
 		Math.abs(us[0] - si[0]) > 1);
 }

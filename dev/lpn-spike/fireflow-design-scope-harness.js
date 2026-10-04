@@ -59,6 +59,12 @@ function ok(name, cond, extra) {
 }
 function kids(n) { return (n && (n.childNodes || n.children)) || []; }
 function isTag(n, t) { return String(n && (n.tagName || n._tag)).toLowerCase() === t; }
+function text(n) {
+	if (!n) { return ''; }
+	if (n.nodeType === 3 || n._text !== undefined && !kids(n).length) { return String(n.textContent || n._text || ''); }
+	const k = kids(n);
+	return k.length ? k.map(text).join('') : String(n.textContent || '');
+}
 function rows(el) {
 	const out = [];
 	(function walk(x) {
@@ -122,9 +128,9 @@ function fire(el) { ((el && el._listeners && el._listeners.change) || []).forEac
 	const designScope = ffRowFor(byId.lpn_ff_controls, PC.lpn_ff_design);
 	const designOpts = selectOptions(designScope);
 	ok('(b) the design check offers exactly None, All, Selected, in the page\'s own words',
-		!!designOpts && designOpts[0][0] === 'off' && designOpts[0][1] === PC.lpn_source_type_none &&
-		designOpts[1][0] === 'all' && designOpts[1][1] === PC.lpn_ff_all &&
-		designOpts[2][0] === 'selected' && designOpts[2][1] === PC.lpn_ff_selected, JSON.stringify(designOpts));
+		!!designOpts && designOpts[0][0] === 'off' && designOpts[0][1] === PC.lpn_ff_design_off &&
+		designOpts[1][0] === 'all' && designOpts[1][1] === PC.lpn_ff_design_all &&
+		designOpts[2][0] === 'selected' && designOpts[2][1] === PC.lpn_ff_design_selected, JSON.stringify(designOpts));
 	ok('All by default, since the default ask.design is All', designScope.value === 'all');
 
 	L.setAsk('required', '3000');
@@ -184,10 +190,16 @@ function fire(el) { ((el && el._listeners && el._listeners.change) || []).forEac
 
 	console.log('\n--- 3. Selected with nothing selected refuses ---');
 	L.clearSel();
-	const before = L.run();
+	ok('an earlier answer is on screen', !!L.run() && rows(byId.lpn_ff_report).length > 0);
 	await L.runFireFlowSweep();
-	ok('no run happens', L.run() === before);
+	ok('no run happens, and the earlier answer no longer stands as if it answered it', L.run() === null && rows(byId.lpn_ff_report).length === 0);
 	ok('...and the notice says why', L.notice() === PC.lpn_ff_design_no_selection, L.notice());
+	ok('...and so does the box (Tom, 2026-10-02)', text(byId.lpn_ff_report) === PC.lpn_ff_design_no_selection, text(byId.lpn_ff_report));
+	L.setAsk('design', 'all');
+	L.setAsk('scope', 'selected');
+	await L.runFireFlowSweep();
+	ok('Junctions to test Selected with nothing selected: said in the box too', L.run() === null &&
+		text(byId.lpn_ff_report) === PC.lpn_ff_no_selection, text(byId.lpn_ff_report));
 
 	if (fails) { console.log('\n' + fails + ' design-scope check(s) FAILED'); process.exit(1); }
 	console.log('\nFire-flow design scope harness: all checks passed.');

@@ -98,6 +98,7 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_reportbox` | same | The same record for the EPANET run report box (same ruling) |
 | `lpn_statusbox` | same | The same record for the Status report box (Task 716, same ruling) |
 | `lpn_fullbox` | same | The same record for the Full report box (Task 715, same ruling) |
+| `lpn_contourbox` | same | The same record for the Contour plot box (Task 600, same ruling). Where it sits and whether it is open only; every contour setting is the project's |
 | `lpn_notesbox` | same | Where the Notes box was left, how big it was made, and whether it was open (Tom, 2026-09-28: *"Draggable non-hog box for Help, Notes. I need it open for my spreadsheet editing video."*). It was a centred, click-away-dismissed popover until then; it now keeps the same kind of record as the boxes above it, for the same reason: a panel layout the visitor set deliberately |
 | `lpn_hotkeysbox` | same | Where the new Help > Tables and Hotkeys box was left, how big it was made, and whether it was open (Task 745, 2026-09-29). Same shell, same memory and same category as `lpn_notesbox` immediately above it |
 | `lpn_runbox` | same | Whether the run progress box is shown at all (Tom, 2026-09-12: *"The run report box is, to me, obnoxious. I want to be able to hide it forever and just see the time steps and run time in the banner briefly."*). Written only when it is OFF, so a browser that has never touched it holds nothing. The same category as the two rows below: a reading preference the visitor set deliberately, on this screen |
@@ -107,6 +108,16 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_areahint` | same | Whether the area-selection help bubble is shown over the map (Tom, 2026-09-08: *"I guess we better make the area help bubble dismissable with a 'Show this' checkbox."*). The same category as the row above it: a reading preference the visitor set deliberately, on this screen |
 | `lpn_survey_format` | same | Which column order was last chosen when importing a surveyed point list, so the next file opens on the same answer (Task 592). One of eight names such as `PNEZD`, and nothing from the file itself: the coordinates it described have already become junctions by the time it is written. A preference the visitor set deliberately, on this screen, and a fact about the instrument their files come out of rather than about any network |
 | `bpn_sketch_toggles` | `js/branched-network.js` | Which of the five data fields (length, diameter, flow, elevation, pressure) the Branched-Network topology sketch shows. The checkboxes live outside the form, so the page's own input cookie never captures them |
+
+**Docking rides on the box records above, with no new key (Task 441, 2026-10-03).** `lpn_findbox`,
+`lpn_setbox`, `lpn_libbox`, `lpn_ffbox`, `lpn_energybox`, `lpn_cmpbox`, `lpn_reportbox`,
+`lpn_statusbox`, `lpn_fullbox`, `lpn_contourbox`, `lpn_notesbox` and `lpn_hotkeysbox` may each also
+hold `dock` (`left` or `right`: the box is docked beside the map on that side), `autohide` (`true`:
+it tucks into a tab at the map's edge) and `dockW` (its docked width in pixels). Each field is
+absent while it is the default, so a visitor who never docks a box stores nothing new. Same purpose
+and category as the position and size beside them: a panel layout the visitor set deliberately.
+The Properties, Criticality, Demand scaling, Alternatives and Calibration boxes keep no record, so
+their docking lasts for the page load only.
 
 The first three are **exempt** — they hold the document the user made in order to give it back to
 them. So are the rest, on the second limb of the same test: `lpn_identity` is strictly necessary for

@@ -3690,3 +3690,123 @@ TRAP for method: Session Save as needs answerTrainingPanel() then a second queue
 - CITED: USEPA/EPANET2.2 Delphi_GUI/epanet2w/Dgraph.pas (raw.githubusercontent.com): Save does Insert(0,ProfileID) then SaveToFile; Open does LoadFromFile then Delete(0). Filter '*.PRO'. Format matches the parser: identifier line, one node ID per line (TStringList: CRLF, ANSI, no BOM).
 - OBSERVED (real headless Chrome, php -S, Net3.lwn, file fed to the input via DOM.setFileInputFiles): menu row last, below a separator, 32px like the others, no icon, text aligned with the others; the Profile panel gained no control. Sample draws "Nodes: 5, length: 21490 ft"; notice "5 of 5 nodes found". Mixed file: "2 of 4 ... ZZ9, QQ". One usable: refused, notice names ZZ9. Input value is '' after each pick, so the same file twice re-fires. A link-only ID (112) is reported as not in this network, and the rest still draw.
 - NOT EXERCISED: the native file chooser (headless cannot), the real click on the row, non-ASCII IDs.
+## 2026-10-03 -- pre-review feat/contour c07094a8 (Task 600), Perry
+
+- OBSERVED (headless Chrome, php -S on the worktree, Net3 and Net3-Novato-CA-World): Graphs > Contour turns on filled contours and opens Settings at Node colors; Filled / Line / None all draw and clear; 1 layer under the pipes; legend sentence present. Recalculate off + node drag: plot unchanged until Calculate (snapshot holds, but the old outline stays where the node used to be). Play at 1x, nodal plot: no long tasks, 60 fps, redrawn once per step.
+- OBSERVED: 3x median leaves 39% of Net3's pipe length (40% Novato) outside the fill, whole outer loops bare. 6x gives 95%, unlimited 98% (copy with the factor tunable).
+- OBSERVED: nodal fill puts a low-pressure halo round each tank (tank level used as pressure); gone with the ground option.
+- OBSERVED (Mapbox tiles stubbed in page; the real token answers 401 "Invalid Token" from jasmine): with the ground option on, Play has ~22 long tasks up to ~150 ms in 9 s, and re-reads the ground tiles twice per pass (18 tile requests) because a one-entry cache is keyed on the plot outline, which moves when controls open/close pipes.
+- OBSERVED: the contour consent dialog says "the area ... as tile numbers" in paragraph 1 and then "these positions ... those coordinates" and "May we send your node positions" (paragraphs 2-3 unchanged). privacy.php still lists only "Ground elevations".
+- OBSERVED: a file saved with the ground option ticked opens on a browser with no terrain yes with the box ticked, no question, nodal plot, nothing in the legend.
+- OBSERVED clean: no new host, cookie or localStorage key (ec_terrain only on yes, a no stores nothing); settings ride in the project and survive reload; tab switching leaves one layer; .inp export byte-identical with the settings on or off.
+- OBSERVED (mutation, scratch copy): harness stays green with the 3x edge limit removed, with pumps joined, with closed links joined. Its "gap" case is two unconnected arms, so the zone rule masks it alone.
+- Method: tab order at load is nondeterministic, click the tab by name. My `pkill -f` matched my own shell again (exit 144): never pkill with a pattern on the command line.
+
+## 2026-10-03 -- pre-review feat/contour acb3c811 (contour rework), Perry
+
+- OBSERVED (real headless Chrome via playwright-core Session, Net3, 1400x900 and 390x844): all loops filled at the 2.5x default; soft fade round the corridor ends; contour lines smooth at 1x and 2x zoom; 42 labels at 5 psi, 108 at 1 psi, zero label-label and zero label-over-node-label overlaps; a zoom keeps labels ~15.5 px; 8 colour-by choices draw without error (Head draws the wall at the closed Lake pump too).
+- OBSERVED: wall (black casing) drawn at the River pump 335 only; the closed Lake pump 10 shows no wall under Pressure (its far side is the same zone). No valve in Net3, so the in-zone fault line is verifiable only in the node harness.
+- OBSERVED: storage: one new key lpn_contourbox {left,top,w,h,open}, written on open and on close; toggling interval/opacity/labels/buffer writes nothing else; no cookie, no IndexedDB change. Contour settings ride in the project.
+- OBSERVED: the box opens centred on the map and hides most of the network on a desk; on a phone it fills the screen (like Find), so the map cannot be watched while tuning. Play with contour on: 2 long tasks of ~60 ms in 5 s, none with it off.
+- NOT EXERCISED: Recalculate-off with a pressure-changing edit (only an unconnected node), Mapbox DEM option (needs token), real valve.
+- Method: playwright Session scripts in scratchpad; close the box with #lpn_contour_close.
+
+## 2026-10-03 feat/flow-balance @ 15250325 (Task 600, System flow tab)
+
+- CITED: EPANET 2.2 Delphi_GUI/epanet2w/Fgraph.pas GetSysFlow: loop `for i := JUNCS to RESERVS`, demand > 0 adds to CONSUMED, else subtracted into PRODUCED; tanks excluded. Builder's definition matches exactly.
+- OBSERVED (headless Chromium, this tree): Net1 and Net3 draw 25 points per line; the "now" line follows the step selector; sum of all node demands per step is ~1e-8 m3/s; flow unit change relabels and rescales the axis; no-run message appears on a blank project; mutation (tanks counted) makes the harness fail 4 checks.
+- OBSERVED DEFECT: no CSS for #lpn_sysflow_chart (css/engcalcs.css:2329 lists the other three), so at 1280x800 the chart is 340 px in a 260 px pane and the time axis is below the fold; Time series fits (211 px).
+- OBSERVED: the new tab pushes the strip to a second row at 1280 px in ru, fr, es, pt, tr (en and de fit); the "System flow" label is English in every language until translated. Decays when the tab label is translated.
+## 2026-10-03 -- pre-review feat/keyboard-menu f783fe5f (row mnemonics, hotkeys, Help), Perry
+
+- OBSERVED (real headless Chromium, Net1, focus in a Junctions demand cell): Alt+Shift+W, G, P opens the Profile graph; letters show only after a keyboard open; a mouse-opened menu shows Ctrl+Z / 1 / Delete / 2-9 and no letters. No duplicate or missing letter in any top menu or fly-out in en de ru he zh am fr; letters identical with an empty project and Net1 (disabled rows keep theirs). Hotkey column: no wrap, no taller row, gap >= 40 px in all 27 languages; no row has both an arrow and a hotkey.
+- OBSERVED DEFECTS: (1) Scenarios fly-out letters of the fixed rows move with the number of scenarios (Delete scenario S with 7 scenarios, D with none; Basic mode C vs M). (2) A Latin key with no row of its own falls back to the row at that QWERTY position: keydown key=b code=KeyN (Dvorak b) in Edit fired the Delete network confirm. (3) After W,G,P focus lands on BODY, so a following "5" switched the map to Add Pipe. (4) Branch-level, present at 90ff85d4 too: while the run box is up, the first Enter on a keyboard-focused menu row is eaten by lpn-time.js's document Enter-closes-box listener (menu stays open).
+- OBSERVED by running the page's own menuMnemonics(): a recent file whose name starts with L takes Close's letter (Close becomes 1).
+- OBSERVED: harness mutations (hotkeys off, disabled rows skipped, old Help text) each fail it. Help Menus block is English in all 26 other languages (key only in en).
+- Method: example cards fail to click once a chord+Escape has run; open the example first. ▸ renders as tofu in headless Linux (font), not a defect.
+
+## 2026-10-03 -- pre-review feat/calibration 712bb260 (Task 601), Perry
+
+- CITED (USEPA/EPANET2.2 Delphi_GUI Fcalib.pas, Uutils.pas): mean error = mean |sim-obs|; RMS; r between per-location means (0 when undefined); measured time linearly interpolated between report steps; Nsim=1 compares EVERY measurement to the one value; computed < 0 skipped; flow compared as |Q|; Tokenize splits on space, tab AND COMMA; a location group is a run of consecutive lines (a repeated ID later is a new row); t = duration is skipped (j2 out of range).
+- OBSERVED (real Chrome, php -S, Net3): Water > Reports > Calibration between Status and Full, rows do not overlap; sample loads; stats 15/35/123/247 = 6/5/4/3 obs, r 0.992, J999 listed and counted, 26 h skipped and counted; three tabs draw; 11 rings on Time series; reload clears; no localStorage/cookie/IndexedDB change across the calibration steps.
+- OBSERVED: independent epanet-js solve + EPANET's algorithm gives sim means 49.62/60.14/66.47/53.11; page shows 49.64/60.17/66.51/53.14 -- a uniform +0.05%, the suite's psi factor (0.43353 psi/ft) vs EPANET's 0.4333. Pre-existing, not this branch.
+- OBSERVED DEFECT: the file is page-global. Loaded on Net3, switch tab to Net1: the report compares it against Net1's node 10 and Net1's Time series draws Net3's measured rings on Net1's node 10.
+- OBSERVED DEFECT (parser, node): after an unreadable line ("J1 6:00 n/a") the continuation lines below it are filed under the PREVIOUS location (15), not J1; only the bad line is reported. EPANET files them under J1.
+- OBSERVED: comma-separated lines ("15,0,42.1") are all rejected; EPANET reads them.
+- OBSERVED: single-period run (Net3, duration 0): 18 of 19 measurements "outside the times", only t=0 compared; EPANET would compare all 19.
+- OBSERVED: chart text 10 px at desktop, 7 px at 390 px (fixed viewBox), where the house Time series chart stays 10 px.
+- OBSERVED: harness mutation-tested on a copy: signed mean error, nearest-step, correlation over points, continuation ignored, a localStorage write -- each fails it.
+- Method: Net3.lwn duration -> 0 with sed gives a steady copy; DOM.setFileInputFiles drives the real FileReader path.
+
+## 2026-10-04 Task 757 feat/table-selection (HEAD d2276943), pre-review
+OBSERVED (real headless Chrome via browser-drive.js, Net3, php -S :8731 from worktree parent):
+- Steps 1,2,3,4,5,6,7,9,10,11 pass. Ctrl+Shift+L is not intercepted by Chrome; handler fires from a focused cell.
+- Step 8: drawn junction joins ("3 of 93") but only after a tab bounce; an UNFILTERED table also does not refresh on draw (92 -> 92), so not a regression.
+- Phone 390x844: button on the Print row, hit-testable, strip height 130 with or without it (no extra wrap).
+- Not exercised in real Chrome: paste-as-new (clipboard), project-switch clearing, mutation test of builder harness.
+- Trap for next time: cookie banner covers the pane at 900px tall; click "Refuse all" first. Toolbar buttons carry aria-label, not title.
+
+
+## 2026-10-03 — feat/dialog-audit (Task 710)
+
+- OBSERVED (real Chrome, 1400 and 390 wide): scale-by-picking shows its instruction as a notice that is gone at 8 s. What remains is the generic bar "Adjusting the background image. [Cancel]"; the mode hint underneath is the SELECT-mode hint (not a picking hint), and at 390 wide the hint is display:none. The builder's "the picking mode itself still shows its own hint" is false. The second click still ends in a native prompt, so scaling can be finished, but a user who pauses >8 s has no instruction and no count of clicks made.
+- OBSERVED: with the Libraries box open at 390 wide, a refused import's warning sits at (35,120) and elementFromPoint there is the library box, so it is hidden behind it. At 1400 wide the box is at left 692 and does not cover it. Same for Library "delete in use" refusals (the box is open by definition).
+- OBSERVED: lpn_storage_unreadable was a modal because the status line is wiped by the first solve (code comment); now an 8 s notice. Log keeps it, but the user must know to open the log.
+- OBSERVED: dedupe-on-text only: the newer severity replaces the older row; no hidden second occurrence, a notice/warning pair with identical text collapses to one row.
+- Builder's two harnesses pass. Method note: a notice is invisible-by-position whenever a box covers the map's top-left; check elementFromPoint, not display.
+
+## 2026-10-04 feat/scenario-option (Task 755), SHA 5ca59b4f
+OBSERVED (real headless Chrome, Net1): builder's steps 1-10 all hold. Slider 25 stops on Base, 49 on a 48:00 scenario, frames match; export [TIMES] 48:00 vs 24:00; Ctrl+Z/redo, abc/-1 revert, 0 steady (slider off), save/reopen, narrow window scrolls (tablewrap).
+OBSERVED: master compare of Net1 reads 2.57 ft/s; branch reads 2.76 at 11, 16:00 (whole-run extremes), with an on-screen note.
+OBSERVED: Settings > Time shows 24:00 while a 48:00 scenario runs, no note. Editing it there changes nothing for that scenario.
+OBSERVED: mutations (docTimes reads doc.times; export ignores opts.times) fail the harness.
+TRAP for probes: the page adopts orphan localStorage projects in nondeterministic order; clear all lpn_project_* keys first. Menu text must be matched exactly ("Base" also matches "Apply Base values").
+NOT CHECKED: pixels of the Time Series graph axis after switching back.
+
+# Perry, Task 739 feat/setting-scope 8e493fe5 (2026-10-04)
+OBSERVED: builder harness all ok. My own probe (probe.js, scratchpad) drove ~140 random Settings controls (3 seeds, incl. non-first rows the harness skips) and diffed lpn_* localStorage: 0 genuine mismatches (apparent ones were units dialog needing OK, out-of-range typed value, my own stale-index bug).
+OBSERVED: divider tip absent at 0.7 s, present at 1.3 s; no native title. Search "browser" -> Page + Hydraulics only.
+OBSERVED: Page marker "Saved in this browser" sits over Restore defaults / Start fresh buttons, which reset project settings.
+OBSERVED: no colour inputs present on Net3 default, not driven.
+# Perry 2026-10-04 feat/basemap-style (Task 617)
+OBSERVED: harness basemap-style-harness.js passes; headless Chromium with stubbed OSM tiles: filter computed on .lpn-basemap only (canvas, credit none); survives reload and New Project (geo and local SI); old/unknown values Normal per harness. Satellite, visual look not checked. No new storage keys.
+# Perry, 2026-10-04b, feat/dialog-audit (Task 710)
+OBSERVED (real Chromium, no seam, own server): delete network Esc/Enter/double-Enter OK; new scenario prompt, double-Enter creates one; scenario delete Esc keeps it; friction select shows old value while box open, Esc keeps, Enter applies; search consent Esc = declined, 0 requests, Enter = accept then query prompt; consent buttons styled identically; goto bad input; scale-by-picking end to end; remove-backdrop Esc keeps.
+OBSERVED defect: phone 390px, Scale-by-picking bar is a 195px x 400px column over the map (bar rect 98..293 x 426..828).
+OBSERVED defect: held Enter after keyboard-opening Edit > Delete network auto-repeats into OK and wipes network.
+NOT RUN: georef two-point/Keep placement, Revert/Save as, cascade multi-delete with scenario overrides, terrain consent. Code-read only.
+Seam lpnDialogAnswerer: only lpn-dom-stub.js, lock-ask-browser-drive.js, dev/browser-pass/lib/pickers.js inject it; none in shipped js.
+# Perry 1004c feat/tip-verdict
+OBSERVED: elev_source_tip rewrite+2 requests not applied; mean_err_tip/pane_print_tip/time_run_tip delete verdicts not honoured; style leftovers (Checked/Click in scenario tips, "typed above"). Harnesses tip-verdict, deleted-key, default-pattern, custom-property pass. Headless load: 0 console errors, no empty titles.
+
+## 2026-10-04 -- feat/chain-draw (Task 719), SHA b480ed0b
+OBSERVED (real Chromium, preview :8106; probes in scratchpad/perry/p*.js):
+- Core chain works: nodes/pipes counts exact on every exit (Escape, 2xEsc, right-click, button again, keys 1/2, new project, tab switch). No dangling pipe/orphan found. Snap radius ~12-14 screen px at all zooms.
+- Dbl-click makes one junction, not two. Undo walks chain back correctly; Redo does NOT carry the ring forward.
+- Click on a pipe ends the chain AND drops to Select with Properties open (inherited LINK_CLICK_EXITS_MODE).
+- Phone: mode line is 0x0 (hidden), so "Press Escape" never shown; no on-screen way to end chain except Edit > Select.
+- Toolbar goes 1 row -> 2 rows at window widths ~1201-1300 because of the extra button (measured by hiding it).
+- Stale red rubber band over last pipe until pointer moves; after pan/pinch on touch it persists -- same in Pipe tool (inherited).
+- Harness mutation: 4 mutants all caught (8,8,5,2 FAILs).
+- Agent report said "Insert > Junction and Pipe": true, it is Water > Insert.
+SPECULATION: none left.
+
+# Perry journal, feat/pda ac32b95f, 2026-10-04
+
+OBSERVED (re-verify before citing): Net1 US PDA min20/req150: page delivered demands equal epanet-js on the page's own export (131.24, 129.59, 87.21...). EPS steps show per-step deficits. Recalc OFF keeps snapshot.
+OBSERVED: Convert as US->SI leaves minPressure/reqPressure unconverted (20/150 become 20/150 m H2O); convertUnitValues has no hydraulics branch.
+OBSERVED: import of GPM file with `Pressure KPA` reads Required 400 as psi; EPANET reads kPa. Page delivered J1 81.98 vs EPANET 235.38.
+OBSERVED: Required<=Minimum -> EPANET Error 200 shown with "numbers on screen came from the built-in solver" (false: nothing is shown).
+OBSERVED: leftover Min/Req written to export after switching back to DDA; EPANET rejects Min>=Req even under DDA.
+OBSERVED: EPANET GPM default Required Pressure is 0.1 psi (measured with epanet-js); tip says 0.142 in US.
+OBSERVED: mutation: harness misses a broken Minimum-pressure conversion and a dropped Minimum Pressure line (all its cases use min 0).
+Scripts: scratchpad/perry/p*.js, mutation copy scratchpad/perry/mut.
+
+## Re-review at 6112980a (OBSERVED)
+1 Convert as: fixed (14.07/105.5 m; same 87.5% delivery) but Settings shows 14.068774521117009 unrounded.
+2 Required<=Min: fixed, clear message, also catches blank Required with big Min.
+3 `Pressure KPA`: not honoured, now REPORTED in import dialog; answer still wrong by design.
+4 leftover DDA export: fixed (no lines; epanet-js opens it).
+5 default tip: fixed ("The default is 0.1 psi"; blank now sent as 0.1 psi).
+6 dropdown fits ("Pressure driven"); stale unit labels until Settings reopened: not fixed.
+Mutants: Minimum Pressure line omitted: now caught. Minimum conversion removed: STILL not caught (psi case).

@@ -9,7 +9,7 @@
 // profile": its own localStorage, so its own identity token, so a lock genuinely reads as somebody
 // else's. Two tabs of one context would share the token and see no contention at all.
 
-const { INIT_SCRIPT } = require('./pickers');
+const { INIT_SCRIPT, NATIVE_DIALOG_SEAM } = require('./pickers');
 const { pageUrl } = require('./env');
 
 class Session {
@@ -40,6 +40,7 @@ class Session {
 	static async open(browser, name, extra) {
 		const context = await browser.newContext(Object.assign({ viewport: Session.VIEWPORT }, extra || {}));
 		await context.addInitScript(INIT_SCRIPT);
+		await context.addInitScript(NATIVE_DIALOG_SEAM);
 		const page = await context.newPage();
 		const s = new Session(context, page, name);
 		page.on('pageerror', (e) => s.errors.push(String(e.stack || e)));

@@ -86,7 +86,11 @@ exports.run = async function ({ browser, report }) {
 					sec: (r.closest('section') || {}).id || '',
 					name: (first.textContent || '').trim().slice(0, 30),
 					kind: inner.tagName.toLowerCase() + (inner.type ? ':' + inner.type : ''),
-					numberish: inner.type === 'number' || (inner.classList && inner.classList.contains('lpn-set-num')),
+					// A row that is a SENTENCE with two number boxes in it (Task 705's "Prevent nodes from scaling
+					// larger than [n] times the length of the [p]% percentile pipe") sizes its boxes to the
+					// sentence, 4em, not to the column of lone setting boxes; it is not a "setting number box".
+					numberish: ctl.querySelectorAll('input[type="number"]').length < 2 &&
+						(inner.type === 'number' || (inner.classList && inner.classList.contains('lpn-set-num'))),
 					placeholder: !!inner.placeholder,
 					left: +ir.left.toFixed(1), width: +ir.width.toFixed(1),
 					// Where the control's middle sits against the middle of the name's FIRST line.
@@ -102,10 +106,13 @@ exports.run = async function ({ browser, report }) {
 		const seen = await measure();
 
 		report.ok(seen.rows.length > 30, 'the box is built and full of setting rows', seen.rows.length + ' rows');
-		// **THE SHIPPED WIDTH.** 29rem -> 34rem: at 29 the content pane was 316 px and the labels
-		// lists spend 186 of it on four fixed columns.
-		report.ok(seen.box >= 540 && seen.pane >= 390,
-			'the box ships wide enough to read a name in — 34rem, 396 px of content pane',
+		// **THE SHIPPED WIDTH.** 29rem -> 34rem -> 26.965rem (R-204, 1c9ba402, Tom 2026-09-24: "the main
+		// pane could be 70% of what it now is ... use [the minimum] as the initial default"). 70% of the
+		// old 410 px pane is 287 px, which is above the box's own 25rem floor (266 px), so that is the
+		// shipped pane and it is BELOW the 384 px stack query: the shipped box lays its rows out
+		// stacked, by that ruling. Asserted as the ruling states it, not as the old 34rem.
+		report.ok(seen.box >= 420 && seen.box <= 440 && seen.pane >= 266 && seen.pane <= 300,
+			'the box ships at 26.965rem, with a content pane of about 287 px (R-204)',
 			`box ${seen.box} px, pane ${seen.pane} px`);
 
 		const lefts = [...new Set(seen.rows.map(r => r.left))];
@@ -145,20 +152,28 @@ exports.run = async function ({ browser, report }) {
 		// means. Measured across the range: 33rem -> 394 px pane, two columns, ten names wrapped;
 		// 32rem -> 378 px, stacked. So 33rem is the narrowest two-column width, and the pane is
 		// asserted rather than assumed so this cannot silently slide across the threshold again.
+		// 33rem became 34rem when R-204 widened the index pane to 7.26rem: 33rem now leaves exactly 384 px.
 		const STACK_PX = 384;   // the @container lpnset (max-width: 24rem) rule, in pixels
 		const at = async (w) => {
 			await a.page.evaluate((width) => { document.getElementById('lpn_settings_box').style.width = width; }, w);
 			await a.settle(200);
 			return measure();
 		};
-		const squeezed = await at('33rem');
+		const squeezed = await at('34rem');
 		report.ok(squeezed.pane > STACK_PX,
-			'squeezed to 33rem, the rows still have their two columns — below this the layout stacks',
+			'squeezed to 34rem, the rows still have their two columns — below this the layout stacks',
 			`pane ${squeezed.pane} px against the ${STACK_PX} px container query`);
 		const wrapped = squeezed.rows.filter(r => r.lines > 1);
 		report.ok(wrapped.length > 2, 'and several names really do wrap to a second line',
 			`pane ${squeezed.pane} px: ` + wrapped.map(r => r.name).join('; '));
-		for (const set of [{ what: 'at the shipped width', d: seen }, { what: 'and squeezed to 33rem', d: squeezed }]) {
+		for (const set of [{ what: 'at the shipped width', d: seen }, { what: 'and squeezed to 34rem', d: squeezed }]) {
+			// The shipped pane is below the stack query, so its controls sit on the row UNDER the name by
+			// design; "first line of its name" is only a claim about a two-column layout.
+			if (set.d.pane <= STACK_PX) {
+				report.skip(`every control sits on the FIRST line of its name — ${set.what}`,
+					`${set.d.pane} px pane is stacked (<= ${STACK_PX} px), so a control is under its name by design`);
+				continue;
+			}
 			const worst = set.d.rows.reduce((acc, r) => Math.abs(r.offFirstLine) > Math.abs(acc.offFirstLine) ? r : acc, set.d.rows[0]);
 			report.ok(Math.abs(worst.offFirstLine) < 3,
 				`every control sits on the FIRST line of its name — ${set.what}`,

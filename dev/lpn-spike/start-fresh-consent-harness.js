@@ -90,7 +90,10 @@ async function main() {
 	try {
 		const context = await browser.newContext({ viewport: { width: 1400, height: 1200 } });
 		const page = await context.newPage();
-		page.on('dialog', (d) => d.accept()); // the confirm(); accepting mirrors a real visitor clicking through
+		// Task 710: the question is the page's own box now, not a native confirm(). A native dialog
+		// here is a regression, and is recorded so the check below can say so.
+		const nativeDialogs = [];
+		page.on('dialog', (d) => { nativeDialogs.push(d.type()); d.accept(); });
 
 		async function pc(key) {
 			const v = await page.evaluate((k) => (window.EngCalcs || {}).pageConfig ? window.EngCalcs.pageConfig[k] : undefined, key);
@@ -144,13 +147,19 @@ async function main() {
 		let clicked = false;
 		for (const b of buttons) {
 			const text = (await b.textContent()).trim();
-			if (text === wipeLabel) { await Promise.all([page.waitForLoadState('load'), b.click()]); clicked = true; break; }
+			if (text === wipeLabel) { await b.click(); clicked = true; break; }
 		}
 		ok('found and clicked the "' + wipeLabel + '" button', clicked);
+		// The question box, answered the way a visitor answers it: its OK button.
+		await page.waitForSelector('#lpn_dialog', { state: 'visible', timeout: 5000 });
+		const asked = await page.evaluate(() => document.getElementById('lpn_dialog_body').textContent);
+		const okLabel = await pc('lpn_dialog_ok');
+		await Promise.all([page.waitForLoadState('load'), page.click(`#lpn_dialog_buttons button:text-is("${okLabel}")`)]);
 		await settle(500);
 
 		console.log('\n--- a brand-new visitor again ---');
-		ok('the confirm() was shown', true); // reaching here without hanging IS the proof; dialog handler above accepted it
+		ok('the question was asked in the page\'s own box', asked === await pc('lpn_confirm_wipe'), asked);
+		ok('no native dialog was raised', nativeDialogs.length === 0, nativeDialogs.join(','));
 		ok('the page reloaded on Looped-Network.php', /Looped-Network\.php/.test(page.url()) || page.url().endsWith('/'), page.url());
 		ok('the banner is showing again', await bannerVisible());
 		jar = await context.cookies(env.origin());

@@ -293,6 +293,7 @@ const OWN_ROW = 'a row or field inside a box that is already open';
 // their buttons are NOT here: section 2c names who may write them, which is stricter than a reason.
 const CONDITIONAL_DISPLAY = [
 	[/^updateDataLeader$/, /^holder\.leader$/, 'a label leader line on the map'],
+	[/^propGraphSync$/, /^box$/, 'the Graph section inside the Properties box (lpn_popup_graph): shown when the element has run frames, hidden through hidePanel() otherwise; part of the Properties box, not a panel of its own'],
 	[/^showDrawing$/, /^L$/, 'a map drawing layer of a kept project (Task 680): hidden while its project is not on screen, shown on its return; map layers, not a panel'],
 	[/^twin$/, /^n$/, 'a fresh map drawing layer cloned from a possibly hidden one (Task 680), so it starts visible; a map layer, not a panel'],
 	[/^updateArrow$/, /^le\.arrows\[i\]$/, 'a flow arrow on the map'],
@@ -329,7 +330,8 @@ const CONDITIONAL_DISPLAY = [
 	[/^showNotice$/, /^el$/, 'the one-line map notice (lpn_map_notice): text only, no control'],
 	[/^syncStatusBoxVisibility$/, /^el$/, 'the status line (lpn_status): text only, no control. JUDGEMENT CALL: it is a box, '
 		+ 'but it holds no control, cannot be dragged and cannot be closed by the visitor'],
-	[/^paintEngineBanner$/, /^el$/, 'the engine-wait banner across the top of the map: text only']
+	[/^paintEngineBanner$/, /^el$/, 'the engine-wait banner across the top of the map: text only'],
+	[/^openDialog$/, /^title$/, 'the modal dialog\'s own title band (Task 710): shown when a question names one, inside #lpn_dialog, holding no control']
 ];
 // What section 2c owns instead, as function + element.
 const PANE_SEAM_WRITES = [['applyPaneLayout', 'pane'], ['applyPaneLayout', 'btn'], ['applyRPaneLayout', 'pane']];
@@ -365,6 +367,10 @@ ok('...and no declaration is left unused', condUsed.every(function (n) { return 
 		[/.*/, /^\.hidden\s*=\s*(?:\[|work\.filter)/, 'a list of hidden table columns, not an element'],
 		[/.*/, /^\.style\.cssText\s*=\s*'display:flex;gap:0\.5em/, 'a row built inside a box, with its layout'],
 		[/^wipeEverything$/, /^\.hidden\s*=\s*true/, 'a throwaway download form built and submitted in one breath, never in the page'],
+		[/^(?:dockPlace|dockRelease)$/, /lpn-dock-collapsed/, 'auto-hide tucking a docked box into its tab (Task 441). '
+			+ 'The box stays OPEN (display untouched, so every isOpen() still says so) and is only made '
+			+ 'invisible; dockPlace() sweeps its tips with hideTipsIn() before adding the class, the rule '
+			+ 'hidePanel() keeps, and raises the box when it flies out. dev/lpn-spike/dock-browser-harness.js'],
 	];
 	let om;
 	while ((om = reO.exec(code)) !== null) {

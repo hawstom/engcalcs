@@ -7,42 +7,37 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**105 open tasks.** Next (100): 8 · Soon (75): 19 · Someday (50): 44 · Maybe (25): 15 · Parked (5): 19
+**97 open tasks.** Next (100): 7 · Soon (75): 15 · Someday (50): 41 · Maybe (25): 15 · Parked (5): 19
 
-## 100 — Next (8)
+## 100 — Next (7)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
-- Task 637 — A Graph button on the Properties box.
+- Task 604 — Read an EPANET `.PRO` profile file.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
 - Task 737 — Coined names for interface elements, so every language names each one once.
 - Task 741 — The infinite map: generated networks for the label bench.
-- Task 751 — Criticality analysis: break each asset in turn and report.
-- Task 754 — On-the-fly demand adjustment: an analysis that scales demands on a copy.
+- ! Task 759 — One word for the map selection, another for a menu choice; tips that earn their place.
 
-## 75 — Soon (19)
+## 75 — Soon (15)
 
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
-- Task 441 — Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with autohide.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
-- Task 600 — The three EPANET plots we do not have: contour, frequency, flow balance.
-- Task 601 — Calibration files: measured field data, against the model that predicts it.
-- Task 604 — Read an EPANET `.PRO` profile file.
 - Task 617 — More map view options, the opacity one having shipped.
 - Task 623 — File loss judged only by people whose files are throwaway.
 - Task 639 — Layers: the first heading under Map and page.
 - Task 710 — Audit the 57 raw alert and confirm dialogs.
 - Task 714 — Theming: colour tokens first, then a Light/Dark choice in Settings.
-- Task 739 — Say where each setting is saved: the project or this browser.
-- Task 748 — Keyboard menus: arrow keys, Enter, Escape and the fly-outs.
+- Task 719 — Draw a chain: junction, pipe, junction, pipe, until Escape.
 - Task 749 — Read Bentley WaterCAD/WaterGEMS models.
 - Task 752 — A scenario workbook: the scenario list and its data as spreadsheet tabs.
 - Task 755 — Per-scenario calculation options: run type and duration first.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
-- Task 757 — Filter the Tables pane to the selection.
-- Task 758 — A project switched back to after eviction redraws its labels differently.
+- Task 762 — Pressure-driven analysis (PDA) through the EPANET engine.
+- Task 763 — A searchable help manual, built from the tips Tom cut.
+- Task 764 — One voice for tips and prompts: mood, Click vs Specify, check boxes.
 
-## 50 — Someday (44)
+## 50 — Someday (41)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -74,15 +69,12 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 712 — Tank water depth as a map label field.
 - Task 713 — Say Cmd, not Ctrl, to a Mac reader.
 - Task 717 — EPANET-MSX, multi-species water quality.
-- Task 719 — Draw a chain: junction, pipe, junction, pipe, until Escape.
 - Task 720 — Background layers from a GIS server.
 - Task 721 — Scenarios as layered alternatives, with ready-made scenarios.
 - Task 722 — Change and revision tracking.
 - Task 725 — One wide fire-flow table instead of two reports.
 - Task 726 — Show progress while the EPANET engine downloads, and prefetch it when idle.
-- Task 727 — Hover highlight on the element Select would pick.
 - Task 728 — Import a GIS shapefile or geodatabase as a network.
-- Task 732 — Three browser-pass specs are stale: `tables`, `smallscreen`, `selectall`.
 - Task 733 — Grow the native solver, in phases, to everything EPANET's solves.
 - Task 734 — Where space is open east or west, one label on one line.
 - Task 735 — Honour `[TIMES] Statistic` instead of discarding it.
@@ -133,5 +125,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-98 of 105 titles are within 4–12 words. `!` marks the rest;
+89 of 97 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

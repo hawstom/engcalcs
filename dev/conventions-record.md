@@ -131,8 +131,7 @@ new unique prefix and document it here.
 | `lpn_` | Looped Pipe Network, map interface — see below |
 
 Three prefixes predate the `*_main_menu` convention and name their menu entry `<prefix>_menu`
-instead: `mi`, `mtc`, `wi`. The coverage declaration lists them by exact key for that reason, and
-also still lists `irr`, which owns no keys at all — probably a legacy alias of `ip`.
+instead: `mi`, `mtc`, `wi`. The coverage declaration lists them by exact key for that reason.
 
 ## How to Add a New Calculator
 

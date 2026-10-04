@@ -96,65 +96,99 @@ lines rather than appending corrections.
 - **The browser-pass harness leaks its `php -S` server when killed**; 14 from 09-23 were still
   running on 09-24. `ps -eo pid,ppid,lstart,args | grep 'S 127.0.0.1'`, kill those whose parent is 1/449.
 - **Flaky under load, green alone:** `run-progress-harness.js`; `dev/browser-pass/specs/basemap.js` and `firstproject.js`
-  tile counts at a 900 ms settle. Pre-existing and unrelated: `scale-publish-harness.js` (2 checks),
-  `dev/browser-pass/specs/place.js` (stale "lat/lon project now"; section 17 filechooser order),
-  `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
+  tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-03
+## STATE — 2026-10-04 (night)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged 2026-10-03 on his word: graph-menu (640 closed), drawing-keep (680 closed),
-property-arrow-key, fix/undo-label (Redo), bentley-interop. `feat/bentley-interop` was then RECUT
-from master as the long-lived branch for the rest of 749 (his: "a long-term branch for all the
-bentley-interop things"); its old all-clear is pinned to the old head and has lapsed, as it should.
-New on master: localStorage `lpn_scnbasic` (Basic mode off), exempt category; Tom told.
+Merged 2026-10-04 on his words: dialog-audit, basemap-style, epanet-pp-brand, elev-default,
+tip-verdict, chain-draw (Junction Pipe Chain, his icon), scenario-option ("Calculation options"),
+pda (count also in the bottom map strip). Defect fixes: Show contours, Task 761 specs, phone menus
+hide shortcut keys (`fix/phone-menu-keys`), sitemap leaves the app to epanet-plus-plus.org. The
+parent-site sitemap is committed in `~/webdev/hawsedc.com` (9ddb034); it reaches production on his
+pull there. He phone-tested dialog-audit: "Dialogs are good."
 
-### Awaiting his browser pass (protected; merge on his all-clear, typed in a session)
+### In flight
 
-Each has master merged in and a green suite bar the expected `payload freshness`. Ask with
-AskUserQuestion; the classifier refuses an all-clear lifted from pasted text.
-- 8106 `feat/property-graph` (637): his pass said "Other than that, it looks great"; the Properties
-  box squeeze (R-379) is fixed (box pinned to its free width; only a corner drag counts as a chosen
-  size). "Head"/"Pump head" approved and recorded. Headless never reproduced his ~150 px, only 276 px.
-- 8110 `feat/demand-scaling` (754, contains criticality 751): R-380 fixed — Find/Run judged every
-  junction; now Selected judges only the selected. Two reworded strings need his OK:
-  `lpn_ds_scope_tip` "...Pressures are checked at the junctions scaled." and `lpn_ds_scaled_selected`
-  "Only the selected junctions were scaled and checked. Junctions scaled: {n}." Open question for
-  him: selection-only verdict vs also failing an unselected junction that the extra demand starves.
-  Approved syn entries (`lpn_ff_all/_selected`, three `lpn_ff_design_*`) are written there.
-- 8112 `feat/keyboard-menu` (748): Alt+Shift+F/E/M/W/H/L (Ctrl+Option on Mac), F10, key badges in
-  keyboard mode, pointer-only rows skipped, focus returns after a row runs. Perry passed it after two
-  fixes. New strings to rule: `lpn_hotkeys_menu_heading` "Menus", `lpn_hotkeys_menu_term` "Menu
-  keyboard shortcuts", `lpn_hotkeys_menu_def` rows "Open File, Edit, Map, Water, Help or Language
-  (Ctrl+Option on a Mac)." / "Go to the menu bar." UNTESTED: Windows' Alt+Shift layout switch with
-  two keyboard languages installed — only he can try it. If theme-token merges first, the badge CSS
-  needs `var(--ec-*)` colours.
-- 8108 `feat/label-cache` (681 c/d): per-notch label bank; Perry CONFIRMED no stale labels;
-  Novato revisit settle ~85 -> ~13 ms. Placer seam: feat/label-placer must route its settle through
-  `labelCacheSettle()` and register in `labelBankParts`, or it just runs uncached.
-- 8109 `feat/theme-token` (714 phase 1): 96 `--ec-*` tokens, zero pixel difference on 14 states,
-  new blocking check `chrome_colour_check.php`. After it merges, every branch adding a CSS colour
-  literal fails that check. Phase 1b (R-202 button base) and the 62 by-value tokens are left.
-- `feat/desktop` (756): his R-375/R-384 written in (logs kept, consent at install).
-- `feat/label-placer` (539/741): unchanged; round-5 rulings still his.
+- **`fix/dock-title-buttons` MERGED** on his "is good. Merge": a box's own buttons (Full report,
+  Run report) sit on a sticky row under the title bar; the band holds only title, dock icons and x.
+  Not his "middle": a docked column can be 240 px. `dock-title-band-harness.js` checks all 17 boxes.
+- **`feat/dock-flag-order`** (NOT started; the dock seam is now free, so it can start): drag a hidden
+  box's flag along its bar to reorder; order in the existing layout key in this browser; a click still
+  opens; phone tap works. His words: "I would like a good college try." Protect it in
+  dev/branch-policy.json when made.
+- Still from before: `feat/profile-file`, `feat/desktop`, `feat/label-placer`.
 
-### Found 2026-10-03, not yet a task
+### Next job
 
-- Task 680's keep is incomplete after EVICTION (more than four other tabs visited): returning to
-  Novato redrew 78 of 123 labels differently at the same view (Perry, on master's code). Valid
-  layout, not stale values. Logged as Task 758.
-- The uncached zoom pass gives two different answers at one scale on repeated runs (label-cache
-  builder); the cache hides it on revisits.
+**A translation sprint**: the English has settled with tip-verdict merged (`new-english-keys.md`
+counts ~105 untranslated). Also owed: the 46 lpn keys held before, the Romanian file menu pass, four
+concept terms. Approved-English entries for tip-verdict's reworded and deleted keys may still sit in
+english-key-rulings.json; only the orchestrator edits it, from his words.
 
-### Owed translation work
+### How he wants to be asked (2026-10-04)
 
-Not run 2026-10-03 on purpose: most owed keys sit on the five branches above. Run one sprint after
-they merge: property-graph 4, criticality ~29, demand-scaling ~42 (+2 reworded), keyboard-menu 3,
-plus master's bentley-interop 13, graph-menu 2 and the Redo Help row (approved: "Ctrl+Y or
-Ctrl+Shift+Z | Redo the last undone change."; the markup check needs all 27 at once). Romanian file
-menu noun/verb pass. Concept layer: four new terms untranslated. Glossary write-back owed from echo.
+- **Name work by branch, never by port.** A port only in brackets.
+- **The Branch previews page must show a branch before he is asked to test it**: ports.conf row,
+  `generate.sh`, then grep the generated index for the branch. His tunnel does not carry 8106/8107.
+
+### Traps met 2026-10-04
+
+- **The classifier refused all-clears from his pasted message and reading the wish lists.** He
+  typed the merge words instead, and added an `autoMode.environment` note to ~/.claude/settings.json
+  that pasted messages are his own; untested until a new session.
+- **A dialog button pressed with a bare `el.click()` is ignored** since dialog-audit (`detail: 0`
+  reads as an unarmed keyboard press). Harnesses must dispatch a MouseEvent with `detail: 1`.
+- **A `cmd && git branch -d ... && suite &` line backgrounds the whole chain**, so when one step
+  fails, the suite silently never starts while "started" still prints. Start a suite in its own call.
+- **An agent reported a check_all log that started on its PREVIOUS commit**; its fix landed mid-run.
+  Match the log's start time to the head's commit time before believing it.
+- **`projection-harness.js` can hang 300 s under load** (event loop held open) and pass in 0.3 s
+  alone.
+
+- **His edit of `dev/new-english-keys.md` was made on a copy older than the last regeneration**
+  (header counts 92 vs 67): the harvest still worked because it reads marks by key. Commit his edit
+  on a chore branch first, harvest, then regenerate; never regenerate over it.
+- **A harness that prints ALL PASS can still fail by not exiting** within 300 s under load
+  (label-measure-cache, pane-follows-doc). Read the log before calling it a defect; rerun.
+- **Agents' generated-file conflicts** (`new-english-keys.md`, `english-key-rulings.json`) on every
+  merge: take master's side, union the rulings JSON, regenerate on a chore branch.
+- **A stale copy's marks make the harvest print false "EDIT" lines**: his old copy shows the OLD
+  English, so the harvester reports it as his rewrite. Before applying an EDIT, check the "now" text
+  is not simply an earlier version in `git log -S`.
+- **The roadmap lagged again**: Task 727 had shipped nine days earlier. `git log --all --grep` and a
+  grep of the code before briefing, every time.
+- **Killing a setsid'd check_all with `kill -- -PGID` left run_harnesses.sh and a harness alive**
+  (they sit in the session, not the group). Kill by session: `ps -eo pid,sess,args | awk '$2==SID'`.
+- **A worktree that never had `dev/browser-pass/node_modules` symlinked prints "playwright-core is
+  not installed"**: symlink it when making any worktree, fix branches too.
+- **An agent wrote Tom's approval into `english-key-rulings.json`** for a label it had interpreted
+  ("Above"); it happened to be his literal word. Brief agents: never write a ruling, only the
+  orchestrator does, from his words.
+- **`lang_key_order_normalizer.php` with no flags rewrites all 27 language files**; an agent ran it
+  by accident. Revert with `git checkout -- lib/`.
+- **Two merges that each pass can fail together**: setting-scope's nowrap marker broke the Task 760
+  phone harness only once both were on master. The suite on the merge commit is what caught it.
+- **The pre-reviewer earns his keep on large mechanical conversions**: the dialog conversion was
+  reported finished and green; Perry found held Enter deleting a network and 18 alerts quietly
+  downgraded to fading strips.
+
+### Traps met 2026-10-03
+
+- **Port 8100 shows origin/master only after `sh ~/webdev/worktrees/_panel/generate.sh`.** Run it
+  after every master push; once it was skipped and he saw no fix that was already pushed.
+- **He cannot paste images over ssh/tmux.** He saves the screenshot and runs
+  `scp $HOME\Pictures\x.png haws@192.168.0.234:/tmp/`; read it, then delete it.
+
+- **A harness that flakes only under load can be a real race.** `menu-keyboard-harness.js` failed
+  3 times in check_all: a starved `setTimeout(0)` focus restore from one menu ran after the next
+  menu opened. Fixed in the page (`menuRestoreSeq`); proved with 24 busy loops, 8/10 to 12/12.
+
+- **A `cmd && merge && ...; setsid check_all &` line starts the suite even when the merge
+  conflicts** (the `;` runs on). Start a suite only in its own command, after `git status` is clean.
+- **Ctrl+B in his terminal backgrounds CC's running wait**, not the suite. He meant tmux detach.
 
 ### Traps met 2026-10-02
 

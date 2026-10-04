@@ -16,7 +16,7 @@
 //      Reservoirs has no column for, falls back to "id").
 //   4. Focus lands on the SAME ROW INDEX, clamped to the destination table's row count.
 //   5. **(Task 743) THE STEP NOW WALKS THE WHOLE STRIP** (`paneTabs`, not only `paneTables()`):
-//      from the last table it proceeds onto Time series, then Frequency, then Profile, and back.
+//      from the last table it proceeds onto Time series, then Profile, Frequency, Flow balance, and back.
 //      A graph/profile tab carries no column or row across the boundary in either direction --
 //      there is nothing to carry -- so a table reached FROM a graph opens at its home cell.
 //   6. **A GRAPH OR PROFILE TAB LANDS THE CARET ON ITS OWN FIRST CONTROL** (its group/quantity
@@ -223,11 +223,11 @@ console.log('\n--- 5. focus lands on the SAME ROW INDEX, clamped to the destinat
 
 console.log('\n--- 6. the tab order this harness assumes for stepping onto the graph tabs ---');
 {
-	// Task 743: the strip's visual order is the eight tables, then Time series, then Frequency,
-	// then Profile -- the whole thing is now one walk, not two.
+	// Task 743: the strip's visual order is the eight tables, then the graphs in the Water >
+	// Graphs menu's order (Tom, 2026-10-04): Time series, Profile, Frequency, Flow balance.
 	const tabs = L.tabIds();
-	report(tabs.join(',') === order.join(',') + ',timeseries,frequency,profile',
-		'tables, then Time series, then Frequency, then Profile, in that order', JSON.stringify(tabs));
+	report(tabs.join(',') === order.join(',') + ',timeseries,profile,frequency,sysflow',
+		'tables, then Time series, Profile, Frequency, Flow balance, in that order', JSON.stringify(tabs));
 }
 
 console.log('\n--- 7. mid-edit, the typed value is committed before the switch, never lost ---');
@@ -312,30 +312,40 @@ console.log('\n--- 9. (Task 743) stepping onward from the last TABLE onto the gr
 	report(L.focusedId() === 'lpn_ts_group', 'the caret is inside the group <select>, not on the panel');
 	const claimed2 = pressPageKey('timeseries', 'PageDown', { shift: true });
 	report(claimed2, 'Ctrl+Shift+PageDown FROM Time series is claimed, with focus still inside the <select>');
+	report(L.activeTab() === 'profile', 'the tab moved on to Profile', L.activeTab());
+	report(L.focusedId() === 'lpn_profile_edit_btn',
+		'and landed on Profile\'s own first (and only) control, its Edit button', L.focusedId());
+
+	const claimed3 = pressPageKey('profile', 'PageDown', { shift: true });
+	report(claimed3, 'Ctrl+Shift+PageDown FROM Profile is claimed');
 	report(L.activeTab() === 'frequency', 'the tab moved on to Frequency', L.activeTab());
 	report(L.focusedId() === 'lpn_freq_group',
 		'and landed on Frequency\'s own first control, its group picker', L.focusedId());
 
-	const claimed3 = pressPageKey('frequency', 'PageDown', { shift: true });
-	report(claimed3, 'Ctrl+Shift+PageDown FROM Frequency is claimed');
-	report(L.activeTab() === 'profile', 'the tab moved on to Profile, the LAST tab on the strip', L.activeTab());
-	report(L.focusedId() === 'lpn_profile_edit_btn',
-		'and landed on Profile\'s own first (and only) control, its Edit button', L.focusedId());
+	const claimed3a = pressPageKey('frequency', 'PageDown', { shift: true });
+	report(claimed3a, 'Ctrl+Shift+PageDown FROM Frequency is claimed');
+	report(L.activeTab() === 'sysflow', 'the tab moved on to Flow balance, the LAST tab on the strip', L.activeTab());
+	// System flow has no controls at all, so focus lands on its panel -- which is where the key
+	// listener lives, so the next press still steps.
+	report(L.focusedId() === 'lpn_pane_sysflow',
+		'and, with no control of its own, focus landed on its panel', L.focusedId());
 
-	// Excel's own rule, now against the TRUE last tab: one more PageDown is still claimed, but
+	// Excel's own rule, against the TRUE last tab: one more PageDown is still claimed, but
 	// nothing moves.
-	const claimed4 = pressPageKey('profile', 'PageDown', { shift: true });
-	report(claimed4, 'PageDown on Profile, the true last tab, is still claimed');
-	report(L.activeTab() === 'profile', 'but it does not wrap to Junctions', L.activeTab());
+	const claimed4 = pressPageKey('sysflow', 'PageDown', { shift: true });
+	report(claimed4, 'PageDown on Flow balance, the true last tab, is still claimed');
+	report(L.activeTab() === 'sysflow', 'but it does not wrap to Junctions', L.activeTab());
 
-	// And back, the whole way: Profile -> Frequency -> Time series -> Customers.
-	const back1 = pressPageKey('profile', 'PageUp', { shift: true });
-	report(back1, 'Ctrl+Shift+PageUp FROM Profile is claimed');
-	report(L.activeTab() === 'frequency', 'Profile -> Frequency', L.activeTab());
+	// And back, the whole way: Flow balance -> Frequency -> Profile -> Time series -> Customers.
+	const back1 = pressPageKey('sysflow', 'PageUp', { shift: true });
+	report(back1, 'Ctrl+Shift+PageUp FROM Flow balance is claimed');
+	report(L.activeTab() === 'frequency', 'Flow balance -> Frequency', L.activeTab());
 	report(L.focusedId() === 'lpn_freq_group', 'landing again on Frequency\'s first control', L.focusedId());
 
 	pressPageKey('frequency', 'PageUp', { shift: true });
-	report(L.activeTab() === 'timeseries', 'Frequency -> Time series', L.activeTab());
+	report(L.activeTab() === 'profile', 'Frequency -> Profile', L.activeTab());
+	pressPageKey('profile', 'PageUp', { shift: true });
+	report(L.activeTab() === 'timeseries', 'Profile -> Time series', L.activeTab());
 	report(L.focusedId() === 'lpn_ts_group', 'landing again on Time series\' first control', L.focusedId());
 
 	const back3 = pressPageKey('timeseries', 'PageUp', { shift: true });

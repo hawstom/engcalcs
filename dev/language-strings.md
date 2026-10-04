@@ -134,6 +134,25 @@ the count in shipped English may fall and may not rise.
 
 This governs new calculators from day one, not just retrofits.
 
+### RULED 2026-10-04: mood, device verbs, checkboxes
+
+Mary's three recommendations; Tom: *"Adopt all three style guide recommendations. Very solid. I love them."*
+
+1. **Mood follows the kind of string.** A button or command tip is imperative and matches its
+   label (*Show the legend.*). A field tip is a noun phrase saying what the value is (*Total added
+   demand.*); a How/What opener only for a real question. An instruction during a tool is
+   imperative, one step. A message (result, error, status) is indicative about the system. Never
+   *You can...*.
+2. **Device verbs.** *Specify* a point or location on the map; *Select* an existing object, a
+   button, a menu item or a checkbox; *Choose* from a list or option; *Enter* a typed value. Never
+   *Click* or *tap* for these, and never *Specify* a button. A gesture with no device-neutral
+   equivalent keeps its name (double-click, double-tap, press and hold, Shift+click, right-click).
+3. **Checkboxes.** *Select* and *Clear* for the action, *selected* and *cleared* for the state;
+   never tick, untick, check or uncheck. Suite-wide.
+
+Translators render an English command imperative in their own language's menu-label convention
+(the infinitive in es, pt, fr, it); see `dev/translation-process.md`, standing content rules.
+
 ### RULED 2026-09-23: "Do X and Y happens" — the conversational conditional
 
 **Tom's instruction, in his own words:** *"What I would suggest you write into
@@ -292,6 +311,14 @@ $ec_lang_syn['calc_defaults']='Restore (revert, return) to the original (initial
 permission in that conversation. The pattern is: AI proposes entries as a diff in the conversation;
 the human approves; only then does AI write them. There are **no standing carve-outs.**
 
+**Stale synonyms reach Tom through `dev/new-english-keys.md` ("Synonym entries to approve"), never chat.**
+An entry is stale when its key is gone or its English changed after it was written;
+`dev/syn-baseline.json` records the English and text each was written against. His answer on the flag
+line is harvested into `dev/syn-rulings.json` (keyed on key + English + synonym text). CC proposes a
+replacement in `dev/syn-proposals.json` (`{"proposals": {key: {"on": English, "syn": text}}}`), applies
+what he approves by hand, then runs `php dev/scripts/syn_baseline.php --record <key>` (`--prune` after a
+removal). A script never edits `$ec_lang_syn`.
+
 ### Routing rule: English, intent, or glossary?
 
 One question decides it: **does an English reader also stumble?**
@@ -406,6 +433,10 @@ shorten the English so every language would inherit the cut. All four reasoned c
 constraint that had been false for weeks. `layout_tag_check.php` now verifies the value is in the
 vocabulary, that a `column heading` really is inside a `<th>`, that a `unit token` is named `u_*`,
 and that a `nav item` is not merely a pull-down row.
+
+### A control gets its own key whenever any language needs it
+
+A control never borrows another control's key just because the English word matches. If in any language the borrowed value would fail to agree (gender, number, case) with what the control actually covers, the control gets its own key, and English may carry the same value. Example: the Design check's None/All/Selected (`lpn_ff_design_off`, `_all`, `_selected`) cover pipes and junctions, where `lpn_ff_all` agrees only with junctions.
 
 ### Renaming a key, and finding key debt
 

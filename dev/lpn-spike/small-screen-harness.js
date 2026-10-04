@@ -713,7 +713,7 @@ const TOUCH = true;
 	// since R-326..R-331. A heading that is not the same width as the box under it is the defect this
 	// list has already been fixed for twice, so the assertion is that the two agree -- at every
 	// width, and with and without a spinner.
-	const want = { 2: '2.08rem', 3: '1.6rem', 4: '1.6rem', 5: '2.3rem', 6: '2.3rem', 7: '2.3rem' };
+	const want = { 2: '2.08rem', 3: '1.6rem', 4: '1.6rem', 5: '1.8rem', 6: '1.8rem', 7: '1.8rem' };
 	const wantTouch = { 2: '2.08rem', 3: '1.6rem', 4: '1.6rem', 5: '1.6rem', 6: '1.6rem', 7: '1.6rem' };
 	const wantWide = { 2: '2.2rem', 3: '2.2rem', 4: '1.85rem', 5: '2.6rem', 6: '2.6rem', 7: '2.6rem' };
 	[2, 3, 4, 5, 6, 7].forEach((i) => {
@@ -760,8 +760,8 @@ const TOUCH = true;
 			winning(RULES, b, WIDE, DOC_IDS, TOUCH, 'appearance') === null);
 	});
 	// And the list's own floor comes down, or the box still refuses to narrow.
-	ok(group + ' list floor is 13.5rem on a small screen',
-		winning(RULES, list, SMALL, DOC_IDS, false, 'min-width') === '13.5rem');
+	ok(group + ' list floor is 11.4rem on a small screen',
+		winning(RULES, list, SMALL, DOC_IDS, false, 'min-width') === '11.4rem');
 	ok('...11.4rem when the spinners have gone too',
 		winning(RULES, list, SMALL, DOC_IDS, TOUCH, 'min-width') === '11.4rem');
 	ok('...and 15.3rem on the desktop, whatever the pointer',

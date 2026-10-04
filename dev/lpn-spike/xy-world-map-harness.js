@@ -44,7 +44,7 @@ const L = loadLoopedNetwork(
 	"\t\tserialize: serializeProject,\n" +
 	"\t\tworldMapAttach: worldMapAttach, worldMapDetach: worldMapDetach, crsDisplayName: crsDisplayName,\n" +
 	"\t\tworldMapAttached: worldMapAttached, placeFindable: placeFindable, undo: undo,\n" +
-	"\t\tsetBasemapStyle: setBasemapStyle, recountNextId: recountNextId,\n" +
+	"\t\tsetBasemapSource: setBasemapSource, recountNextId: recountNextId,\n" +
 	"\t\txyGeoref: xyGeoref, xyGeorefOk: xyGeorefOk, xyMapAttachable: xyMapAttachable,\n" +
 	"\t\tbasemapOn: basemapOn, basemapChoosable: basemapChoosable,\n" +
 	"\t\tmapMenuRows: mapMenuRows,\n" +
@@ -642,12 +642,12 @@ ok('ATTACH ON A MAP ALREADY SHOWING LEAVES IT SHOWING', L.worldMapAttached() ===
 	const PCS = global.EngCalcs.pageConfig || {};
 	const tokenWas = PCS.lpn_mapbox_token;
 	PCS.lpn_mapbox_token = 'pk.harness';
-	L.setBasemapStyle('satellite');
+	L.setBasemapSource('satellite');
 	L.worldMapDetach();
 	L.worldMapAttach();
 	ok('Detach then Attach brings back SATELLITE for somebody who was on satellite',
 		L.getProject().basemap === 'satellite', L.getProject().basemap);
-	L.setBasemapStyle('osm');
+	L.setBasemapSource('osm');
 	if (tokenWas === undefined) { delete PCS.lpn_mapbox_token; } else { PCS.lpn_mapbox_token = tokenWas; }
 }
 // An OLDER file: georeferenced, saved with the map hidden (point 4). It must read as detached with

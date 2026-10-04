@@ -32,6 +32,11 @@ the OWA-EPANET engine (also MIT). Full licence text: `epanet-js.LICENSE`. MIT is
 GPL-3-compatible, so EngCalcs remains GPL v3 or later; the licence file must ship with any
 redistribution.
 
+**On any upgrade, re-read the repository's own `LICENSE` before vendoring.** Since 2026-09 the
+epanet-js repository carries a mixed MIT and FSL-1.1-MIT licence (Mary, `dev/agents/market-researcher/wishlist.md`
+item 0), so a newer release may not be MIT. Vendor only a version whose files are MIT, and replace
+`epanet-js.LICENSE` with that version's text.
+
 ### Which EPANET that is (ROADMAP Task 451)
 
 **The engine inside the wrapper is OWA-EPANET 2.3.5, released 2025-02-20.** The run report prints

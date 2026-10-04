@@ -283,32 +283,36 @@ exports.run = async function ({ browser, report }) {
 		await a.close();
 	}
 
-	// ---- (7) R-222: Help > Notes on this page > Table keyboard shortcuts is a list -------------
+	// ---- (7) R-222: Help > Tables and Hotkeys > Table keyboard shortcuts is a list ----------------
+	// The shortcuts left the Notes box for the "Tables and Hotkeys" box (Task 745, 2026-09-29, "moved
+	// rather than duplicated") and their markup is a two-column table (key, then what it does), not a
+	// bulleted list; what R-222 asked for survives: one shortcut a line, the key first, and what each
+	// one does starting in the same column.
 	{
 		const a = await Session.open(browser, 'E');
 		await a.goto('Looped-Network.php');
 		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-		await a.menuClick(await a.lang('lpn_help_notes'), 'help');
+		await a.menuClick(await a.lang('lpn_help_hotkeys'), 'help');
 		await a.settle(200);
 		// Not bridged into pageConfig (the notes are page HTML), so read from the language file.
-		const term = (/\$ec_lang\['lpn_notes_6_term'\]='([^']*)'/.exec(require('fs').readFileSync(require('path').join(REPO, 'lib', 'lang.ec.en.php'), 'utf8')) || [])[1];
+		// Note 6 is "Table columns help" and the shortcuts are note 7 (the keys are numbered, not named).
+		const term = (/\$ec_lang\['lpn_notes_7_term'\]='([^']*)'/.exec(require('fs').readFileSync(require('path').join(REPO, 'lib', 'lang.ec.en.php'), 'utf8')) || [])[1];
 		const got = await a.page.evaluate((term) => {
-			const pop = document.getElementById('lpn_notes_popup');
+			const pop = document.getElementById('lpn_hotkeys_popup');
 			const dt = [...pop.querySelectorAll('dt')].find((d) => d.textContent.trim() === term);
 			const dd = dt && dt.nextElementSibling;
-			const lis = dd ? [...dd.querySelectorAll('li')] : [];
+			const rows = dd ? [...dd.querySelectorAll('tr')] : [];
 			return {
 				shown: getComputedStyle(pop).display !== 'none',
-				n: lis.length,
-				keyFirst: lis.every((li) => li.firstElementChild && li.firstElementChild.tagName === 'STRONG' && li.firstChild === li.firstElementChild),
-				tops: lis.map((li) => Math.round(li.getBoundingClientRect().top)),
-				actionLeft: lis.map((li) => { const r = document.createRange(); r.setStartAfter(li.firstElementChild); r.setEnd(li, li.childNodes.length); return Math.round(r.getBoundingClientRect().left); }),
-				bullets: lis.map((li) => getComputedStyle(li.parentNode).listStyleType)
+				n: rows.length,
+				twoCells: rows.every((r) => r.children.length === 2),
+				tops: rows.map((r) => Math.round(r.getBoundingClientRect().top)),
+				actionLeft: rows.map((r) => Math.round(r.children[1].getBoundingClientRect().left))
 			};
 		}, term);
-		report.ok(got.shown, 'Help > Notes on this page opens the notes');
-		report.ok(got.n >= 10, 'the shortcuts note is a list', got.n + ' items');
-		report.ok(got.keyFirst, '...each item leads with its key or gesture');
+		report.ok(got.shown, 'Help > Tables and Hotkeys opens the box');
+		report.ok(got.n >= 10, 'the shortcuts note is a table with a row each', got.n + ' rows');
+		report.ok(got.twoCells, '...each row is a key or gesture, then what it does');
 		report.ok(new Set(got.tops).size === got.tops.length && got.tops.every((t, i) => i === 0 || t > got.tops[i - 1]),
 			'...one shortcut a line', JSON.stringify(got.tops));
 		report.ok(new Set(got.actionLeft).size === 1, '...and what each one does starts in the same column', JSON.stringify([...new Set(got.actionLeft)]));
@@ -366,7 +370,19 @@ exports.run = async function ({ browser, report }) {
 	// invisible until hovered or focused. -----------------------------------------------------------
 	{
 		const a = await openJunctions(browser, 'G');
-		const widthBefore = 1221.921875;
+		// The baseline is MEASURED, not a literal: the total width of a table is a function of the window,
+		// the columns shown and the font (1,221.92 px was one machine's figure, 770 px is today's at 1400 x
+		// 1200). With the glyph and arrow taken out of the layout entirely, a table that reserved no room for
+		// them is exactly as wide as it was.
+		const widthBefore = await a.page.evaluate(() => {
+			const t = document.querySelector('#lpn_pane_junctions table');
+			const hide = [...t.querySelectorAll('.lpn-pane-colmenu, .lpn-pane-sortarrow')];
+			const was = hide.map((e) => e.style.display);
+			hide.forEach((e) => { e.style.display = 'none'; });
+			const w = t.getBoundingClientRect().width;
+			hide.forEach((e, i) => { e.style.display = was[i]; });
+			return w;
+		});
 		const result = await a.page.evaluate(() => {
 			const t = document.querySelector('#lpn_pane_junctions table');
 			const ths = [...t.querySelectorAll('thead th')];

@@ -132,12 +132,15 @@ foreach ($declared as $page => $o) {
 
 // EC_LWN_ORIGIN and the declaration are two copies of one string, in two files that cannot see
 // each other. This is the whole guard against them drifting.
-if (preg_match("/define\('EC_LWN_ORIGIN',\s*'([^']*)'\)/", $config, $lwn)) {
+if (preg_match("/define\('EC_LWN_ORIGIN',\s*'([^']*)'\)/", $config, $lwn)
+    && preg_match("/define\('EC_EPP_ORIGIN',\s*'([^']*)'\)/", $config, $epp)) {
+    // The map's canonical is EPANET++'s origin since 2026-10-04 (EC_EPP_ORIGIN); EC_LWN_ORIGIN
+    // remains where LibreWaterNet lives and is held to ecAppBrands() below.
     if (!isset($declared['Looped-Network.php'])) {
         bad("lib/config.inc.php defines EC_LWN_ORIGIN but ecCanonicalOrigins() declares no origin\n"
           . "        for Looped-Network.php, so the map application would nominate hawsedc.com.");
-    } elseif ($declared['Looped-Network.php'] !== $lwn[1]) {
-        bad("EC_LWN_ORIGIN is '{$lwn[1]}' but ecCanonicalOrigins() puts Looped-Network.php on\n"
+    } elseif ($declared['Looped-Network.php'] !== $epp[1]) {
+        bad("EC_EPP_ORIGIN is '{$epp[1]}' but ecCanonicalOrigins() puts Looped-Network.php on\n"
           . "        '{$declared['Looped-Network.php']}'. One is where the suite SENDS somebody wanting\n"
           . "        the map and the other is the address that page nominates; they must be one string.");
     }

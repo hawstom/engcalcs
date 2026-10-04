@@ -565,3 +565,12 @@ small spec before Tom is told it's covered.
 **Ranking:** low — a small, low-volume convenience (a handful of scenarios, not hundreds of rows),
 worth a one-line confirmation before being called done, not worth a dedicated build session on its
 own merits.
+
+
+## New wishlist row -- 2026-10-03, Task 757: "Show only selected on map" in the Tables pane
+
+**The ask:** one menu item on the cell and heading menus, plus Ctrl+Shift+L, that freezes the current map selection as the row set of every table (AND-ed with any Find filter), with the banner and the existing Show all as the way out. Snapshot, not live. New rows pasted or drawn while on join the set. Pressing it again with an unchanged selection clears; with a changed selection re-snapshots.
+
+**Why it ranks high for my seat:** it composes with the shipped Ctrl+Enter, fill handle and row paste, which all act on rendered rows, so a map box-select becomes a bulk-edit scope in about 6 gestures total. Edits cannot make a row leave it.
+
+**Ranking:** just below paste-creates-rows confirmation, above polish items.

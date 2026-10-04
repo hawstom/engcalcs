@@ -50,7 +50,7 @@ module.exports = async ({ send, evaluate, logs, sleep }) => {
 		// port comes back `HTTP 403 {"message":"Forbidden"}` -- 23 bytes, which is a non-zero body
 		// and therefore reads as a delivered tile to anything counting bytes. The first run of this
 		// probe reported 100% coverage on a map that was showing nothing at all. OSM needs no token
-		// and no referer, and the code path is identical: basemapStyle() picks a URL and nothing
+		// and no referer, and the code path is identical: basemapSource() picks a URL and nothing
 		// else differs. Set PROBE_SAT=1 to use satellite anyway, from a host the token allows.
 		P.basemap = process.env.PROBE_SAT ? 'satellite' : 'osm';
 		P.georef = {

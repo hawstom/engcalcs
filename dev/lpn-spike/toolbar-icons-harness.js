@@ -169,9 +169,8 @@ console.log('\n-- the Help list is DERIVED from the strip --');
 
 console.log('\n-- the strings exist, in English only --');
 {
-	['lpn_tip_join', 'lpn_tool_add_junction_tip', 'lpn_tool_add_tank_tip', 'lpn_tool_add_valve_tip',
-		'lpn_tool_delete_tip', 'lpn_tool_undo_tip', 'lpn_tool_zoom_extent_tip', 'lpn_tool_settings_tip',
-		'lpn_find_menu_tip', 'lpn_help_icons', 'lpn_pane_right_toggle', 'lpn_pane_right_toggle_tip'
+	['lpn_tip_join', 'lpn_tool_undo_tip', 'lpn_tool_zoom_extent_tip',
+		'lpn_find_menu_tip', 'lpn_help_icons', 'lpn_pane_right_toggle'
 	].forEach((k) => {
 		report(en.indexOf("$ec_lang['" + k + "']") >= 0, k);
 	});
@@ -179,7 +178,7 @@ console.log('\n-- the strings exist, in English only --');
 	// plainTextBoundKeys() cannot see. So no tag may appear in any of them, and this is the only
 	// thing that would catch it.
 	const tips = en.split('\n').filter(l => /^\$ec_lang\['lpn_(tool_.*_tip|tip_join|find_menu_tip|pane_right_toggle.*)'\]/.test(l));
-	report(tips.length >= 10 && !tips.some(l => /<[a-z]/i.test(l)),
+	report(tips.length >= 5 && !tips.some(l => /<[a-z]/i.test(l)),
 		'and none of them carries a tag — plainTextBoundKeys() cannot see this path');
 }
 

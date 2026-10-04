@@ -3,7 +3,7 @@
 What this seat would build next, in its own order. **Expected to disagree with `dev/ROADMAP.md`**;
 that disagreement is most of what a seat is for. No agent edits the roadmap.
 
-1. **A hover colour/weight highlight on the currently-hit `lpn_` object in Select mode, additive to
+1. **SHIPPED 2026-09-27 (25a3cf2a, Task 727 closed 2026-10-04).** A hover colour/weight highlight on the currently-hit `lpn_` object in Select mode, additive to
    the existing cursor.** Small build (one `pointermove`-driven class on the existing hit-test, or
    a `:hover` rule if `:has()` support clears this suite's floor). Buys feedback the cursor
    deliberately cannot give here — `default` is identical over an object and over nothing by
@@ -495,3 +495,42 @@ skeptical it would work. Not proposing it now; no evidence it's needed.)
    increments and can trail the demo without leaving the first change silently wrong.
 
 N. **Key badges in keyboard mode, not underlines** (2026-10-03): a mnemonic shown as a small boxed Latin letter beside each menu name survives all 27 languages and RTL; see journal 2026-10-03.
+
+N+1. **Widen the tooltip: `.tooltip { --bs-tooltip-max-width: 22rem }`** in `css/engcalcs.css`. One
+    line, no strings, no risk. Turns a 92-word tip from ~20 lines to ~7. First move of the tip audit
+    (2026-10-03); see `dev/tip-and-selection-audit.md` section 4.3.
+
+N+2. **Make Fire flow, Criticality and Demand scaling parallel**: one row builder that draws the
+    standard `?` (they show no glyph today, `js/looped-network.js:57318`), and the Demand scaling
+    scope wording ("All junctions / Selected junctions"; "Select junctions or choose All junctions")
+    applied to the other two. Tom's first request, and the smallest change that answers it.
+
+N+3. **Explanations open on click of the `?` (Bootstrap popover, `trigger: focus`), names stay
+    hover-with-delay, and one `?` beside the × of each tool box.** Medium cost, no new strings,
+    one model on desktop and phone, meets WCAG 1.4.13. Needs a harness for box-close sweeping
+    (`dev/lpn-spike/tip-behaviour-harness.js` already guards the tooltip form of that defect).
+
+N+4. **A description line inside an open menu, under the hovered row** — the only honest form of
+    Tom's status-bar instinct. Rejected: a status strip at the window edge (Microsoft's own
+    guideline and Task 616 both argue against it).
+
+N+5. **A check that flags one English string holding both a select word and an option word
+    (option / menu / choose / All).** Would have caught all five Fire flow strings. A visitor-hit
+    defect a person misses, which is the bar CLAUDE.md sets for a new check.
+
+## 2026-10-03 -- tips follow-up (Tom's Q4, Q7)
+
+- **Draw the two-tier line by content and write it into the working guide:** hover tip = what a
+  control does, about 75 characters, no glyph; anything longer or with a source/limit/consequence =
+  `?` tier. Evidence in `dev/tip-followup-2026-10-03.md`. The Fire flow / Criticality / Demand scaling
+  glyphless rows are the tier 2 tips missing their glyph.
+- **Tom's CSV pass (`dev/tip-review.csv`) before any tip is edited**, since 108 are ruled and an edit
+  lapses the ruling. Hold the copy edits until his `tom` column is back.
+- **Shorten the three long menu-item tips** (`lpn_tables_menu_tip`, `lpn_run_menu_tip`,
+  `lpn_reports_menu_tip`); a menu has no room for a glyph.
+
+
+- **Show a reader the Tables pane toggle before building 757.** Two candidate placements (header toggle vs
+  right-click row); one five-minute look at where a first-time user reaches. SPECULATION until then.
+- **Fetch Material 3 tooltips and Spectrum tooltip/contextual-help pages by another route** (both were
+  unreadable on 2026-10-03), so the two-tier claim does not rest on search excerpts.

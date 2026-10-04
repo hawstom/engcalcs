@@ -61,6 +61,7 @@
 		EN_EMITTER = 3,
 		EN_HEAD = 10,
 		EN_PRESSURE = 11,
+		EN_DEMANDDEFICIT = 27,
 		// The node's water-quality value at the moment the quality clock is standing on. What it
 		// MEANS is whatever [OPTIONS] Quality asked for: HOURS for water age, PERCENT for a source
 		// share. EPANET reports both through this one property, which is why the caller has to know
@@ -766,6 +767,16 @@
 			// that can carry it. The same one-or-the-other rule assembleModel() states for the two
 			// demand fields, seen from this end.
 			(eps && hyd.demandMultiplier !== undefined ? '\n Demand Multiplier ' + hyd.demandMultiplier : '') +
+			// **PRESSURE-DRIVEN ANALYSIS** (Task 762), stated only where the project states it.
+			// engineHydraulics() has already put the two pressures in metres, which is what EPANET
+			// reads under `Units LPS`. The three numbers mean something to PDA alone, so they are
+			// written for PDA alone; an unstated one is EPANET's own default (0, 0.1, 0.5).
+			(hyd.demandModel ? '\n Demand Model ' + hyd.demandModel : '') +
+			(String(hyd.demandModel || '').toUpperCase() === 'PDA'
+				? (typeof hyd.minPressure === 'number' ? '\n Minimum Pressure ' + hyd.minPressure : '') +
+					(typeof hyd.reqPressure === 'number' ? '\n Required Pressure ' + hyd.reqPressure : '') +
+					(typeof hyd.pressureExponent === 'number' ? '\n Pressure Exponent ' + hyd.pressureExponent : '')
+				: '') +
 			// **HOW HARD TO TRY, AND THE DEFAULTS HERE ARE OURS, NOT EPANET'S.** 1e-5 / 200 is
 			// tighter than EPANET's own 0.001 / 40, deliberately, so that a disagreement between the
 			// two engines is never just tolerance. A project that STATES a value overrules that --
@@ -1374,13 +1385,22 @@
 				var conv = convergenceOf(p);
 
 				var heads = {}, pressures = {}, flows = {}, headlosses = {}, velocities = {},
+					demands = null, deficits = null, pda = EngCalcs.lpnDemandModelIsPda(model),
 					i, n, k, link, idx;
+				// **UNDER PDA A JUNCTION RECEIVES WHAT ITS PRESSURE ALLOWS** (Task 762). EN_DEMAND is
+				// then the delivered flow and EN_DEMANDDEFICIT the shortfall against the request,
+				// both L/s. Absent under DDA, where every demand is met by definition.
+				if (pda) { demands = {}; deficits = {}; }
 
 				for (i = 0; i < model.nodes.length; i++) {
 					n = model.nodes[i];
 					idx = s.nodeIdx[n.id];
 					heads[n.id] = p.getNodeValue(idx, EN_HEAD);
 					pressures[n.id] = p.getNodeValue(idx, EN_PRESSURE);
+					if (pda && n.type !== 'reservoir' && n.type !== 'tank') {
+						demands[n.id] = p.getNodeValue(idx, EN_DEMAND) / 1000;
+						deficits[n.id] = Math.max(0, p.getNodeValue(idx, EN_DEMANDDEFICIT)) / 1000;
+					}
 				}
 				for (k = 0; k < model.links.length; k++) {
 					link = model.links[k];
@@ -1416,6 +1436,8 @@
 					accuracy: conv.accuracy,
 					heads: heads,
 					pressures: pressures,
+					demands: demands,
+					demandDeficits: deficits,
 					flows: flows,
 					headlosses: headlosses,
 					velocities: velocities
@@ -2080,6 +2102,11 @@
 										f.pressures[n.id] = p.getNodeValue(nodeIdx[n.id], EN_PRESSURE);
 										// L/s -> m3/s, the same scale a [JUNCTIONS] demand is written in.
 										f.demands[n.id] = p.getNodeValue(nodeIdx[n.id], EN_DEMAND) / 1000;
+										// Under PDA only (Task 762): what the junction asked for and did not get.
+										if (EngCalcs.lpnDemandModelIsPda(model) && n.type !== 'reservoir' && n.type !== 'tank') {
+											(f.demandDeficits || (f.demandDeficits = {}))[n.id] =
+												Math.max(0, p.getNodeValue(nodeIdx[n.id], EN_DEMANDDEFICIT)) / 1000;
+										}
 										// **THE TANK LEVEL IS A RESULT, NOT AN INPUT** -- the point of the run.
 										// It is metres above the tank's own bottom under LPS, the same quantity
 										// and the same unit the document's `level` field holds. They must never

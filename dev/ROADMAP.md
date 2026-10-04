@@ -106,17 +106,22 @@ the block.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
-- 100|637| **A Graph button on the Properties box.**
-  **BUILT 2026-09-30 on `feat/property-graph`, port 8141**, awaiting his browser pass.
-  **REVISED BY TOM, 2026-09-29:** *"But what we really want is a time series graph at the bottom of
-  Properties for an EPS project; it should have a selector for all the properties that can be graphed
-  for that asset."*
-  Tom, 2026-09-12. Graphs the time series of the CURRENTLY FOCUSED property of the current element,
-  in a new bottom-pane tab named for what it shows -- his example, `L435 Lake Trace`. The tab
-  carries a selector for the property to graph and an Export as: image PNG, PDF, comma-separated
-  values CSV, spreadsheet ODS. It may carry a time-range selector. Shape and the two unknowns
-  (PDF and ODS are formats this suite has never written): `dev/graphs-scope.md`. Task 640 is the
-  menu this belongs to and Task 599 is the plot itself.
+- 100|604| **Read an EPANET `.PRO` profile file.**
+  **PROMOTED TO 100 BY TOM, 2026-10-03** (*"Promote to 100: 600, 601, 604"*). Building on `feat/profile-file`.
+  It is the only route a profile can arrive by, and it falls out of closing Task 574. **A profile is in NO `.net` and no `.inp`** -- EPANET's Graph
+  Selection dialog writes its node list to a separate `.PRO` text file through an ordinary save
+  dialog, and nothing anywhere records the path, not even an MRU entry. So a user who has built a
+  profile in EPANET cannot bring it here by opening their project, and never will be able to.
+  - The format is small: an identifier line, then one node ID per line. The work is the
+    reconciliation -- what happens when a listed ID is not in this network -- and that answer is
+    already written for the calibration files of Task 601.
+  - Worth far more once Task 603 lands: an imported profile that cannot name its own nodes is a
+    line on an axis.
+  - **IT GETS A MINUSCULE SLICE OF THE INTERFACE, on Tom's ruling of 2026-09-06:** *"Creating a
+    profile is so easy now using the Google paradigm that I don't think there is much value in
+    importing a `.pro` file. If we do it, it needs to take up miniscule space in the UX/UI, hidden
+    deep under some menu or in the profile tab down arrow."* So the acceptance bar is a row in an
+    existing menu, never a control on the profile panel itself.
 - 100|676| **Watch the sites, and send a derived weekly report.**
   Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
   master before proper vetting can no longer be the matter of course."* Plan, the corrected
@@ -156,8 +161,8 @@ the block.
     procedure and the correction of the 2026-09-13 advice that a clean release could not be
     extracted.
 - 100|681| **Economize the label layout: it is half the cost of a project switch.**
-  **(c)/(d) BUILT 2026-10-03 on `feat/label-cache`**, awaiting his pass: a bank per wheel notch, rounded
-  outward, final; revisits run no pass (Novato ~85 -> ~13 ms). (e) already existed (one pass per wheel
+  **(c)/(d) MERGED 2026-10-03** (`feat/label-cache`, Tom: *"I am impressed. This is a major efficiency
+  feature. Done."*): a bank per wheel notch, rounded outward, final; revisits run no pass (Novato ~85 -> ~13 ms). (e) already existed (one pass per wheel
   burst). (b) is still open.
   Tom, 2026-09-16: *"if laying out the labels takes 2 sec, we have to figure out how to economize."*
   - **THE NUMBER IS HIS: the label pass is 56% of `buildDom`**, which is about 1.9 s of his 4.6 s
@@ -211,7 +216,7 @@ the block.
   it with the existing `gloss:` tag.
   **CONCEPT LAYER SHIPPED 2026-09-30** (`chore/term-concept`, `dev/term-concepts.md`): 131 glossary
   terms carry a coined `concept` id and a `definition`; a payload gives the definition as the source
-  and English as one rendering; `concept_check.php` blocks. Open: 67 definitions still empty, the four
+  and English as one rendering; `concept_check.php` blocks. All 131 definitions are filled (7d00bd86, 2026-10-02). Open: the four
   new terms (label-sym-sally, label-user-tessa, label-long-dora, hydraulic-head) untranslated.
   **RULED 2026-09-30: Head and HGL stay split.** And on the coined ids: *"we should say something like
   label-sym-sally, label-user-tessa, label-word-gus, and label-long-dora (assuming those are
@@ -225,18 +230,11 @@ the block.
   Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
-- 100|751| **Criticality analysis: break each asset in turn and report.**
-  Tom, 2026-09-30, on WaterGEMS's Criticality tool: *"This sounds like a fun report to build. Break
-  each asset and report."* Fire flow's sibling: scope All/Selected, each pipe out of the network on
-  a copy, report cut-off junctions, low pressures and demand not served. Building on `feat/criticality`.
-- 75|757| **Filter the Tables pane to the selection.**
-  Tom, 2026-10-03: *"it would be really nice if the tables could filter on the selection. I'm not
-  sure how to work the UI unless it's part of the right-click menu."* Ask Ida and Declan where the
-  switch lives before building.
-- 75|758| **A project switched back to after eviction redraws its labels differently.**
-  Perry, 2026-10-03, on master's code: visit Novato, zoom, visit five other tabs, return: 78 of 123
-  labels differ at the same view. `captureLabelLayout()` keeps no `alignedAlong`, `stationSides`,
-  `hiddenYielded` or customer-label spots. Valid layout, not stale values.
+- 100|759| **One word for the map selection, another for a menu choice; tips that earn their place.**
+  Tom, 2026-10-03: a "studied, considered, carefully adopted, and audited" strategy to tell the map
+  selection set from menu choices (his leading candidate: Highlighted / Chosen), and an audit of tip
+  pollution in lpn (status strip, click-to-open, delays in master styles, tips that talk down).
+  Ida's audit: `dev/tip-and-selection-audit.md` (branch `chore/ida-tip`); decisions go to him as an interview.
 - 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
@@ -248,9 +246,6 @@ the block.
     gone from hypothetical to the common case. The registration half is the valuable half: an
     `[BACKDROP] DIMENSIONS` record places the image in the model's own coordinates exactly, which
     is strictly better than the two-point scale gesture a human would otherwise perform by eye.
-- 75|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
-  autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
-  against it — one element, one placement function.
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
   kept here so they are not lost in a closed block.
@@ -260,51 +255,6 @@ the block.
   - **The Run concept, in Tom's own sketch (2026-08-27):** *"a Run names a scenario among its
     parameters."* A named Run would carry the scenario, the required flow, the residual and the
     frame together, so a report says what it was a report OF.
-- 75|600| **The three EPANET plots we do not have: contour, frequency, flow balance.**
-  Tom, 2026-09-06, surveying EPANET's plot menu: *"time series, profile, contour (very cool),
-  frequency distribution ... and system flow balance."* **We already have PROFILE** (`lpn_profile_*`)
-  and time series is Task 599, so this row is the remaining three.
-  - **CONTOUR is the one he starred and is also the one with a real unknown**: it interpolates a
-    nodal value over the plane between nodes, so it needs a decision about what happens where there
-    are no nodes -- a pressure contour across a river a main crosses is drawn over nothing.
-    **Design: `dev/epanet-js-contour-contribution.md`.** Since 2026-10-01 (§2a there, Luke Butler's
-    proof of concept): contour HEAD, subtract the Terrain-RGB DEM per cell, and let pressure leave
-    the junctions' range where the terrain does. Open: pressure-zone boundaries, hard vs faded edge.
-  - **FREQUENCY SHIPPED 2026-09-30** (`feat/frequency-plot`, merged on his word). Contour and flow
-    balance remain.
-  - **SYSTEM FLOW BALANCE -- AND HIS READING OF IT IS RIGHT, but confirm it against EPANET's own
-    help before writing a word of interface.** He guessed *"produced comes from reservoirs and
-    negative demands and consumed is positive demands"*; that matches how the engine accounts for
-    it, and a tank is the third term, swinging between the two as it fills and drains. Getting the
-    definition wrong here is a number a user would believe.
-- 75|601| **Calibration files: measured field data, against the model that predicts it.**
-  Tom, 2026-09-06: *"EPANET allows calibration files (measured system data) and offers a Calibration
-  Report with three tabbed pages. See EPANET help. Very interesting to be aware of."*
-  - **THIS IS THE FIRST FEATURE THAT BRINGS IN DATA FROM OUTSIDE THE MODEL**, which is why it is
-    filed at 50 rather than as an afterthought to the plots: every number on this page today is
-    either typed or derived, and a calibration file is neither. It has its own format, its own
-    units question, and its own answer to what happens when a measurement names a node that is not
-    in the network.
-  - **READ EPANET'S HELP FIRST AND COPY THE REPORT'S SHAPE.** Three tabbed pages is a design that
-    has been in front of users for twenty years; we have no evidence that beats it, and CLAUDE.md's
-    default-to-EPANET rule applies to the vocabulary as much as to the layout.
-  - Depends on nothing, but it is worth far more once Task 599 exists: a measured series and a
-    computed series belong on one axis, and that axis is the time-series plot.
-- 75|604| **Read an EPANET `.PRO` profile file.**
-  It is the only route a profile can arrive by, and it falls out of closing Task 574. **A profile is in NO `.net` and no `.inp`** -- EPANET's Graph
-  Selection dialog writes its node list to a separate `.PRO` text file through an ordinary save
-  dialog, and nothing anywhere records the path, not even an MRU entry. So a user who has built a
-  profile in EPANET cannot bring it here by opening their project, and never will be able to.
-  - The format is small: an identifier line, then one node ID per line. The work is the
-    reconciliation -- what happens when a listed ID is not in this network -- and that answer is
-    already written for the calibration files of Task 601.
-  - Worth far more once Task 603 lands: an imported profile that cannot name its own nodes is a
-    line on an axis.
-  - **IT GETS A MINUSCULE SLICE OF THE INTERFACE, on Tom's ruling of 2026-09-06:** *"Creating a
-    profile is so easy now using the Google paradigm that I don't think there is much value in
-    importing a `.pro` file. If we do it, it needs to take up miniscule space in the UX/UI, hidden
-    deep under some menu or in the profile tab down arrow."* So the acceptance bar is a row in an
-    existing menu, never a control on the profile panel itself.
 - 75|617| **More map view options, the opacity one having shipped.**
   **RETITLED BY TOM, 2026-09-18: *"Edit and retitle the task to remove 'A basemap the reader can
   tone down'. That is already provided by Settings background opacity. Focus the task on other map
@@ -379,10 +329,12 @@ the block.
   - A layer setting is MODELLING data by CLAUDE.md's project-versus-browser rule and rides in
     `serializeProject()`; it is not window furniture.
 - 75|710| **Audit the 57 raw alert and confirm dialogs.**
+  **BUILT 2026-10-04 on `feat/dialog-audit`, port 8110**: 77 sites, 39 informational ones moved to the notice line and log, 38 still block (`dev/dialog-audit.md`); Perry's three findings fixed. Open: a styled in-page modal for the 38?
   Left from the message log (Task 704, closed 2026-09-23): Ida's third item. Sort which must genuinely
   block and which are only information and belong in the log, which Tom's *"USER MUST HAVE CONTROL
   OVER MESSAGES"* argues for. Keep severity at the two colours the banner already uses.
 - 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
+  **Phase 1b inline colours MERGED 2026-10-04** (`chore/theme-inline`): js/*.js literals on tokens or allow-listed; the check refuses new ones. Left: the button base (R-202), then dark mode.
   Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
   important code discipline."* Ida's phased plan: `dev/theming-plan.md`. Phase 1 declares semantic
   colour tokens, folds the nine separate box styles onto them, and adds a check refusing a new
@@ -390,16 +342,6 @@ the block.
   - **Phase 1 tokens and the check are built on `feat/theme-token` (see the end of the plan).** Phase 1b remains: the button base below, and inline colours in `js/*.js`.
   - **MOD's phone-like buttons (R-202) belong inside phase 1**: one button base for menu items and
     toolbar buttons, one accent colour, previewed on a branch. Retire the menu hint (R-203) once it ships.
-- 75|739| **Say where each setting is saved: the project or this browser.**
-  Tom, 2026-09-28, on learning dragged column widths live in the browser: *"Systematically disclose to users where things are stored. Autodesk does this so well that I, a user can cite by memory that variables are stored in the drawing (project), session, or user profile. Every sysvar listing includes 'Where it's stored.'"* Also *"Maybe include Width in the manage columns box with a tip glyph as a secondary discovery path"*, and a delayed tip on the column dragger (never on a phone). The inventory is `dev/cookie-storage-inventory.md`; CLAUDE.md already splits project vs browser settings.
-
-- 75|748| **Keyboard menus: arrow keys, Enter, Escape and the fly-outs.**
-  Found by Perry on `feat/help-menu`: Tab leaves an open menu for the next thing on the page and the
-  arrows do nothing, in every menu, because the one function that opens them wires only clicks.
-  Predates that branch. Tom set 75 on 2026-09-30.
-  **Tom, 2026-10-03, on `feat/keyboard-menu`:** *"this does nothing for Declan. What Declan really
-  needs are menu mnemonics like Ctrl+Shift+{letter} or as determined with Ida's advice for File,
-  Edit, Map, Water, Help, and Language"*, underlined once in keyboard mode. Building on that branch.
 - 75|749| **Read Bentley WaterCAD/WaterGEMS models.**
   Basic mode and the Alternatives table merged 2026-10-03; `feat/bentley-interop` was recut from
   master as the long-lived branch for the rest (Tom: *"a long-term branch for all the bentley-interop things"*).
@@ -419,14 +361,8 @@ the block.
   account, no upload); a Google Sheets sync is a fifth third-party service, so a `privacy.php`
   paragraph and his call. Mary, Sue and Declan's readings are under Task 721. The layout assumes
   Bentley's model (a scenario tree, alternatives beneath); ours is flat, so the tabs need rethinking.
-- 100|754| **On-the-fly demand adjustment: an analysis that scales demands on a copy.**
-  **Tom, 2026-10-01:** *"let's do it and at the same time put Fire Flow, Criticality, and Demand scaling into a Water, Analyze flyout. I guess while we are at it, we could do some cooler things like 'What demand scale can the system handle with this pressure limit?'"* The Analyze fly-out is built on `feat/criticality`.
-  Tom, 2026-09-30, on WaterGEMS's Active Demand Adjustments: *"This also sounds fun and easy to
-  provide."* Then: *"Their Criticality and 'On-the-fly' are like our 'Fire flow' analysis; they do not
-  touch the network. As such, our demand factors are similar and equivalent, but not the same UX or
-  data state."* Our per-scenario multiplier changes the data; this runs on a copy, like Fire flow.
-  Open: what it reports (a map of the adjusted run, or a table like Fire flow's).
 - 75|755| **Per-scenario calculation options: run type and duration first.**
+  **BUILT 2026-10-04 on `feat/scenario-option`, port 8111**: per-scenario Total run time and Hydraulic time step in the Alternatives preview; Perry clean; awaiting his pass.
   Tom, 2026-09-30: *"A Demand Multiplier column with the alternatives? What about other settings?"*
   Mary: WaterGEMS keeps run type, duration, steps, friction method, demand adjustments, PDD and
   tolerances in per-scenario Calculation Options; InfoWater ties a simulation-options set to each
@@ -442,6 +378,21 @@ the block.
   **Tom, 2026-10-01: stays at 75, with a branch to play on** (`feat/desktop`): *"my main concern is that we
   could get too heavy for the browser or find limitations. Until then, let's just play and plan and see
   what happens."*
+- 75|719| **Draw a chain: junction, pipe, junction, pipe, until Escape.**
+  Tom, 2026-09-25, from WaterCAD: *"a Junction and Pipe toolbar command that adds Junction, Pipe,
+  Junction, Pipe, etc until escape."*
+  **PROMOTED TO 75 BY TOM, 2026-10-04** (*"Ensure that we have a roadmap item for a Junction and Pipe tool and that it's promoted to high priority (at least 75)."*).
+- 75|762| **Pressure-driven analysis (PDA) through the EPANET engine.** EPANET 2.2 solves
+  `[OPTIONS] Demand Model PDA` with Minimum/Required Pressure and Pressure Exponent; we read and
+  carry those lines and report that we solve demand-driven (js/lpn-inp.js ~586). Tom, 2026-10-04:
+  *"Is this (PDA) an EPANET++ gap that we must fill urgently?"* An EPANET feature we lack is a gap in the EPANET++ claim.
+- 75|763| **A searchable help manual, built from the tips Tom cut.** Tom, 2026-10-04: *"Almost all
+  the deletes could be turned into a searchable help manual."* The cut tips' English is kept in
+  `dev/help-manual-source.md` (feat/tip-verdict) as its first material.
+- 75|764| **One voice for tips and prompts: mood, Click vs Specify, check boxes.** Tom, 2026-10-04:
+  *"Are we indicative, imperative, or indecisive?"*; *"'Specify' would be better than 'Click'
+  everywhere"*; *"'Tick'? ... let's audit and discipline this too."* Mary's research first; then a
+  rule in dev/language-strings.md and one English pass.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -989,9 +940,6 @@ the block.
   Tom, 2026-09-26 (R-320): *"This is an extension, not base EPANET. We can provide this, but it's
   not a blocker for EPANET++."* His UI sketch: Settings, Quality holds a short list of parameters
   with toggles plus an open-ended list of reactive species, no scarier than Custom Properties.
-- 50|719| **Draw a chain: junction, pipe, junction, pipe, until Escape.**
-  Tom, 2026-09-25, from WaterCAD: *"a Junction and Pipe toolbar command that adds Junction, Pipe,
-  Junction, Pipe, etc until escape."*
 - 50|720| **Background layers from a GIS server.**
   Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server offering."*
   A fifth third-party service is a new paragraph in `privacy.php` (CLAUDE.md).
@@ -1016,15 +964,9 @@ the block.
 - 50|726| **Show progress while the EPANET engine downloads, and prefetch it when idle.**
   Mary's wishlist §7: a percent-done on the first ~664 KB fetch; prefetch unless the connection
   says slow or metered. For the low-bandwidth audience.
-- 50|727| **Hover highlight on the element Select would pick.**
-  Ida's wishlist §1: a colour or weight change on the hit object, since the cursor stays neutral
-  (Task 618). AutoCAD's selection preview is the precedent.
 - 50|728| **Import a GIS shapefile or geodatabase as a network.**
   Mary's wishlist §0b2: most WaterCAD models are built from a GIS asset layer, so this is a
   migration on-ramp that needs no WaterCAD file. Unsized; read with Task 723.
-- 50|732| **Three browser-pass specs are stale: `tables`, `smallscreen`, `selectall`.** Ten checks fail
-  identically on master (for example expecting 8 table tabs, not 10). Outside check_all, so nothing
-  catches it; bring them current or retire the checks.
 - 50|733| **Grow the native solver, in phases, to everything EPANET's solves.** Tom, 2026-09-26
   (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
   to do everything that the EPANET solver does. This way the math is less of a black box for us."*

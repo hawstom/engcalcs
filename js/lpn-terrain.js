@@ -353,10 +353,9 @@
 	// facts that matter are all in it: WHO receives it, WHAT they receive, why that is a different
 	// question from the map pictures, and that saying no costs them nothing else on the page.
 	//
-	// A NATIVE confirm(), not a styled box, for lpn-search.js's reason: its two buttons cannot be
-	// styled by us at all, so the coloured-Accept-beside-grey-Reject dark pattern lib/Consent.lib.php
-	// spends a paragraph avoiding is not merely avoided here, it is impossible. Cancel and Escape
-	// both mean no.
+	// ASKED IN THE PAGE'S ONE QUESTION BOX (EC.lpnAsk, Task 710), for lpn-search.js's reason: its
+	// two buttons are drawn identically, so the coloured-Accept-beside-grey-Reject dark pattern
+	// lib/Consent.lib.php spends a paragraph avoiding is still avoided. Cancel and Escape both mean no.
 	//
 	// ONE KEY PER PARAGRAPH, joined here (Task 507). A $ec_lang value is a single line by
 	// construction, so the alternative was a line-break placeholder inside one long value; four
@@ -382,17 +381,100 @@
 		].join('\n\n').replace(/\{n\}/g, count);
 	}
 
-	/** The gate. Returns true if we may send. Asks at most once per invocation. */
-	function mayWeSend(count) {
-		if (EC.lpnTerrainConsented()) { return true; }
-		if (!root.confirm || !root.confirm(consentText(count))) {
-			notice(t('lpn_terrain_refused',
-				'Elevations were not filled in, and nothing was sent. You can type them in as ' +
-				'before.'));
-			return false;
-		}
-		recordConsent();
-		return true;
+	/**
+	 * **THE SAME GATE, ASKED FOR THE CONTOUR PLOT** (Task 600). Not a new gate and not a new
+	 * cookie: what is sent is the same kind of thing (where the network is, as tile numbers, to
+	 * read the ground), so the one yes answers both. Only the first and last paragraphs change,
+	 * because "filling in elevations" is not what the person is doing. Returns true for a yes
+	 * given now or before; a no stores nothing.
+	 */
+	EC.lpnTerrainAskForContour = function (done) {
+		done = done || function () { };
+		if (EC.lpnTerrainConsented()) { done(true); return; }
+		// FOUR PARAGRAPHS OF ITS OWN, in the fill's order. What is sent here is TILE NUMBERS for the
+		// area the network covers, not each node's latitude and longitude, so every paragraph that
+		// names what is sent says that -- borrowing the fill's second and third paragraphs made the
+		// question say "tile numbers" and then "your node positions" (pre-review, 2026-10-03).
+		var text = contourConsentParagraphs().join('\n\n');
+		ask({ kind: 'confirm', text: text }, function (yes) {
+			if (yes) { recordConsent(); }
+			done(!!yes);
+		});
+	};
+
+	/**
+	 * **THE GROUND UNDER A GRID, FOR THE CONTOUR PLOT. WRITES NOTHING AND NEVER ASKS** (Task 600).
+	 * `points` is [{id, lon, lat}]; `done(heights, info)` gets [{id, meters}] (empty on failure)
+	 * and {zoom, failed, why}. It refuses (done with null) without a stored yes -- the question is
+	 * asked only by lpnTerrainAskForContour(), from the checkbox a person ticked, never from a
+	 * redraw. Shares the plan, the budget, the decode and the fetch with the fill.
+	 */
+	function contourConsentParagraphs() {
+		return [
+			t('lpn_contour_consent_1',
+				'Drawing pressure over the ground sends the area your network covers, as Mapbox map ' +
+				'tile numbers, to api.mapbox.com, to read the height of the ground there.'),
+			t('lpn_contour_consent_2',
+				'This is a different question from the map pictures behind your project. The pictures ' +
+				'only say where you are looking. These tiles say where your network is. Mapbox will ' +
+				'receive those tile numbers and your IP address. We send nothing else: no name, no ' +
+				'pipes, no project. We keep no record of it, and nothing is stored on this device ' +
+				'except your answer to this question.'),
+			t('lpn_contour_consent_3', 'May we send the tile numbers of your network\'s area to Mapbox?'),
+			t('lpn_contour_consent_4',
+				'If you say no, everything else on this page keeps working exactly as it does now, ' +
+				'and the contour plot is drawn between nodes alone. We remember a yes so that we need ' +
+				'not ask again. A no is not stored at all.')
+		];
+	}
+	EC.lpnTerrainContourConsentText = function () { return contourConsentParagraphs().join('\n\n'); };
+	var gridRunning = false;
+	EC.lpnTerrainGrid = function (points, done) {
+		function finish(h, info) { if (typeof done === 'function') { done(h, info || {}); } }
+		if (!seam || (seam.locatable && !seam.locatable())) { finish(null); return; }
+		var token = seam.token && seam.token();
+		if (!token || !EC.lpnTerrainConsented() || typeof root.fetch !== 'function') { finish(null); return; }
+		if (gridRunning || !points || !points.length) { finish(null, { busy: gridRunning }); return; }
+		var plan = EC.lpnTerrainPlan(points);
+		if (!plan || !plan.tiles.length || plan.tiles.length > HARD_TILES) { finish([], { zoom: plan && plan.zoom, failed: 1 }); return; }
+		gridRunning = true;
+		var heights = [], failed = 0, why = null;
+		Promise.all(plan.tiles.map(function (tile) {
+			return EC.lpnTerrainFetchPixels(tile, token).then(function (pixels) {
+				pixels.forEach(function (p) {
+					var m = EC.lpnTerrainDecode(p.r, p.g, p.b);
+					if (m !== undefined && isFinite(m)) { heights.push({ id: p.id, meters: m }); }
+				});
+			}, function (err) { failed++; why = why || failureOf(err); });
+		})).then(function () {
+			gridRunning = false;
+			finish(heights, { zoom: plan.zoom, failed: failed, why: why });
+		});
+	};
+
+	/**
+	 * The page's question box (js/looped-network.js's askDialog(), Task 710). Absent -- this file
+	 * loaded on its own in a harness -- a harness answerer is used, and with none the answer is no.
+	 */
+	function ask(req, done) {
+		if (typeof EC.lpnAsk === 'function') { EC.lpnAsk(req, done); return; }
+		var a = root.lpnDialogAnswerer;
+		done(typeof a === 'function' ? a(req) : (req.kind === 'confirm' ? false : null));
+	}
+
+	/** The gate. Calls `then` if we may send. Asks at most once per invocation. */
+	function mayWeSend(count, then) {
+		if (EC.lpnTerrainConsented()) { then(); return; }
+		ask({ kind: 'confirm', text: consentText(count) }, function (yes) {
+			if (!yes) {
+				notice(t('lpn_terrain_refused',
+					'Elevations were not filled in, and nothing was sent. You can type them in as ' +
+					'before.'));
+				return;
+			}
+			recordConsent();
+			then();
+		});
 	}
 
 	// The plan, in words, with the two counts and the accuracy sentence. **THE COUNT OF NODES LEFT
@@ -498,11 +580,13 @@
 			canvas.width = bitmap.width; canvas.height = bitmap.height;
 			var ctx = canvas.getContext('2d');
 			ctx.drawImage(bitmap, 0, 0);
-			var out = [], i, p, d;
+			// ONE read of the whole tile, then indexed: the contour plot asks for thousands of
+			// pixels per tile (Task 600), and a 1 x 1 getImageData per pixel costs far more.
+			var out = [], i, p, w = bitmap.width, all = ctx.getImageData(0, 0, w, bitmap.height).data, o;
 			for (i = 0; i < tile.points.length; i++) {
 				p = tile.points[i];
-				d = ctx.getImageData(p.px, p.py, 1, 1).data;
-				out.push({ id: p.id, r: d[0], g: d[1], b: d[2] });
+				o = 4 * (p.py * w + p.px);
+				out.push({ id: p.id, r: all[o], g: all[o + 1], b: all[o + 2] });
 			}
 			if (bitmap.close) { bitmap.close(); }
 			return out;
@@ -666,35 +750,36 @@
 			return;
 		}
 		if (!want || !want.length) { reportNothingToDo(); return; }
-		if (!mayWeSend(want.length)) { return; }
-		var plan = EC.lpnTerrainPlan(want);
-		if (!plan || !plan.tiles.length) {
-			notice(t('lpn_terrain_offmap',
-				'These node positions are not on the terrain map, so nothing was sent.'));
-			return;
-		}
-		if (typeof root.fetch !== 'function') {
-			notice(t('lpn_terrain_nofetch', 'This browser cannot reach the terrain service.'));
-			return;
-		}
-		running = true;
-		lastFailure = null;
-		var heights = [], failed = 0, why = null;
-		Promise.all(plan.tiles.map(function (tile) {
-			return EC.lpnTerrainFetchPixels(tile, token).then(function (pixels) {
-				pixels.forEach(function (p) {
-					var m = EC.lpnTerrainDecode(p.r, p.g, p.b);
-					if (m !== undefined && isFinite(m)) { heights.push({ id: p.id, meters: m }); }
-				});
-			}, function (err) { failed++; why = why || failureOf(err); });
-		})).then(function () {
-			running = false;
-			if (!heights.length) {
-				reportNoHeights(notice, why);
-			} else if (seam.record) {
-				seam.record(heights);
+		mayWeSend(want.length, function () {
+			var plan = EC.lpnTerrainPlan(want);
+			if (!plan || !plan.tiles.length) {
+				notice(t('lpn_terrain_offmap',
+					'These node positions are not on the terrain map, so nothing was sent.'));
+				return;
 			}
-			if (typeof done === 'function') { done(heights, failed); }
+			if (typeof root.fetch !== 'function') {
+				notice(t('lpn_terrain_nofetch', 'This browser cannot reach the terrain service.'));
+				return;
+			}
+			running = true;
+			lastFailure = null;
+			var heights = [], failed = 0, why = null;
+			Promise.all(plan.tiles.map(function (tile) {
+				return EC.lpnTerrainFetchPixels(tile, token).then(function (pixels) {
+					pixels.forEach(function (p) {
+						var m = EC.lpnTerrainDecode(p.r, p.g, p.b);
+						if (m !== undefined && isFinite(m)) { heights.push({ id: p.id, meters: m }); }
+					});
+				}, function (err) { failed++; why = why || failureOf(err); });
+			})).then(function () {
+				running = false;
+				if (!heights.length) {
+					reportNoHeights(notice, why);
+				} else if (seam.record) {
+					seam.record(heights);
+				}
+				if (typeof done === 'function') { done(heights, failed); }
+			});
 		});
 	};
 
@@ -708,33 +793,39 @@
 			return;
 		}
 		if (!want || !want.length) { reportNothingToDo(); return; }
-		if (!mayWeSend(want.length)) { return; }
-		var plan = EC.lpnTerrainPlan(want);
-		if (!plan || !plan.tiles.length) {
-			notice(t('lpn_terrain_offmap',
-				'These node positions are not on the terrain map, so nothing was sent.'));
-			return;
-		}
-		if (plan.tiles.length > HARD_TILES) {
-			notice(t('lpn_terrain_too_wide',
-				'These nodes are spread over too much of the Earth to read in one go ({n} tile ' +
-				'requests). Nothing was sent.').replace('{n}', plan.tiles.length));
-			return;
-		}
-		if (opts.confirm &&
-			(!root.confirm || !root.confirm(EC.lpnTerrainPlanText(want, opts.keep || [], plan.tiles.length, opts.replacing)))) {
-			notice(t('lpn_terrain_cancelled', 'Nothing was changed and nothing was sent.'));
-			return;
-		}
-		if (typeof root.fetch !== 'function') {
-			notice(t('lpn_terrain_nofetch', 'This browser cannot reach the terrain service.'));
-			return;
-		}
-		// **`replaceAny` AND `replacing` ARE DIFFERENT PERMISSIONS AND ONLY ONE OF THEM IS WORDING.**
-		// `replacing` is a NUMBER the plan text names out loud ("still on 0") and is the menu row's
-		// second question. `replaceAny` is Find and replace's blanket permission, which has no
-		// number to name -- passing it as `replacing` would print `true` where a number goes.
-		run(plan, token, want, opts.replaceAny ? true : opts.replacing, opts.quiet);
+		mayWeSend(want.length, function () {
+			var plan = EC.lpnTerrainPlan(want);
+			if (!plan || !plan.tiles.length) {
+				notice(t('lpn_terrain_offmap',
+					'These node positions are not on the terrain map, so nothing was sent.'));
+				return;
+			}
+			if (plan.tiles.length > HARD_TILES) {
+				notice(t('lpn_terrain_too_wide',
+					'These nodes are spread over too much of the Earth to read in one go ({n} tile ' +
+					'requests). Nothing was sent.').replace('{n}', plan.tiles.length));
+				return;
+			}
+			function go() {
+				if (typeof root.fetch !== 'function') {
+					notice(t('lpn_terrain_nofetch', 'This browser cannot reach the terrain service.'));
+					return;
+				}
+				// **`replaceAny` AND `replacing` ARE DIFFERENT PERMISSIONS AND ONLY ONE OF THEM IS WORDING.**
+				// `replacing` is a NUMBER the plan text names out loud ("still on 0") and is the menu row's
+				// second question. `replaceAny` is Find and replace's blanket permission, which has no
+				// number to name -- passing it as `replacing` would print `true` where a number goes.
+				run(plan, token, want, opts.replaceAny ? true : opts.replacing, opts.quiet);
+			}
+			if (!opts.confirm) { go(); return; }
+			ask({ kind: 'confirm', text: EC.lpnTerrainPlanText(want, opts.keep || [], plan.tiles.length, opts.replacing) }, function (yes) {
+				if (!yes) {
+					notice(t('lpn_terrain_cancelled', 'Nothing was changed and nothing was sent.'));
+					return;
+				}
+				go();
+			});
+		});
 	};
 
 	function run(plan, token, want, replacing, quiet) {

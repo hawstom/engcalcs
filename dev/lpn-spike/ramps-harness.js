@@ -168,7 +168,7 @@ ok(R.modesFor().length === 7, 'asking for no field in particular offers them all
 
 // --- the criterion, in SI, and the numbers a US engineer already has in their head.
 {
-	const psi = 0.703069578296302;   // metres of water per psi
+	const psi = 0.3048 / 0.4333;   // metres of water per psi, on EPANET's PSIperFT as the page reads it
 	const b = R.criterionBreaks('pressure');
 	ok(b.length === 4 && R.criterionClasses('pressure') === 5, 'pressure is four breaks, five classes');
 	[20, 40, 60, 80].forEach(function (p, i) {

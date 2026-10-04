@@ -2,7 +2,7 @@
 	"_about": "Allow-list for chrome_colour_check.php. A colour literal may appear in css/engcalcs.css only inside the token block, or inside a rule listed here. Every entry says why it is DATA or PAPER rather than chrome. Add an entry only for that reason; a button, box, border or text colour belongs in the token block.",
 	"css_rules": [
 		{
-			"path": "^\\.lpn-(node|link-halo|lbl|leader|service|meter|custhandle|marquee|rubberband)",
+			"path": "^\\.lpn-(node|link-halo|lbl|leader|service|meter|custhandle|marquee|rubberband|contour-(line|label|break))",
 			"reason": "map symbology: the drawing's own ink, deliberately never themed (dev/theming-plan.md, Phase 2)"
 		},
 		{
@@ -41,17 +41,13 @@
 		}
 	],
 	"inline_ratchet": {
-		"_about": "Colour literals in js/*.js and *.php chrome (inline style writes). Counted per file; a count may fall, never rise. js/lpn-ramps.js is colour-ramp DATA and is exempt. Phase 1b turns these into var(--ec-*).",
+		"_about": "Colour literals in the PHP pages' chrome (inline style writes). Counted per file; a count may fall, never rise. js/*.js is NOT counted here: every literal in it must match a js_literals entry below (file + line pattern + reason). js/lpn-ramps.js is colour-ramp DATA and is exempt.",
 		"exempt_files": [
 			"js/lpn-ramps.js"
 		],
 		"counts": {
 			"Branched-Network.php": 5,
 			"Looped-Network.php": 3,
-			"js/branched-network.js": 11,
-			"js/looped-network.js": 56,
-			"js/micro-hydro-power.js": 14,
-			"js/rock-chute.js": 11,
 			"lib/HeadersFooters.lib.php": 1,
 			"lib/Icons.lib.php": 1,
 			"lib/WebManifest.lib.php": 2
@@ -61,5 +57,60 @@
 			"Branched-Network.php": "legend keys that match the drawn sketch layers (data colours)",
 			"lib/*.php": "web-manifest and meta theme colours, which must be literals"
 		}
+	},
+	"js_literals": {
+		"_about": "A colour literal in js/*.js may appear only on a line matching one of these (file, regex on the line, reason). Everything else, a box, button, banner, table or menu, writes var(--ec-*). Keyed on line content, not number, so a neighbouring branch moving code does not break it.",
+		"entries": [
+			{
+				"file": "js/branched-network.js",
+				"match": "bpnFieldColors|stroke=\"#000\"|rx=\"4\"",
+				"reason": "the branched-network sketch SVG and its field colours: drawing ink, matching the legend keys"
+			},
+			{
+				"file": "js/micro-hydro-power.js",
+				"match": "(fill|stroke)=\"|hlFill|labelColor",
+				"reason": "the head-diagram SVG: drawing ink, the green/amber/red head-loss verdict is data"
+			},
+			{
+				"file": "js/rock-chute.js",
+				"match": "(fill|stroke)=\"",
+				"reason": "the chute section sketch SVG: drawing ink (rock, soil, guide lines)"
+			},
+			{
+				"file": "js/looped-network.js",
+				"match": "rgba\\(0,0,0,\\.82\\)|background:#0f0",
+				"reason": "the developer perf-debug overlay: green on black like a terminal, shown only on request, not part of the product's chrome"
+			},
+			{
+				"file": "js/looped-network.js",
+				"match": "draw\\(.*'#0(a0|0d)'|stroke: '#d00'",
+				"reason": "label-bench debug overlay drawn on the map: rectangles in distinct data colours"
+			},
+			{
+				"file": "js/looped-network.js",
+				"match": "RAMP_FALLBACK",
+				"reason": "colour-by-value ramp fallback: data colours"
+			},
+			{
+				"file": "js/looped-network.js",
+				"match": "stroke: '#05a'",
+				"reason": "georeferencing handles and frame drawn on the map: the drawing's own ink"
+			},
+			{
+				"file": "js/looped-network.js",
+				"match": "#f60|stroke: '#fff', 'stroke-width': 4",
+				"reason": "profile-path highlight drawn on the map: the drawing's own ink"
+			},
+			{
+				"file": "js/looped-network.js",
+				"match": "LPN_TS_COLORS|^\\s*'#66a61e'",
+				"reason": "time-series chart series colours: data colours"
+			},
+			{
+				"file": "js/looped-network.js",
+				"match": "setAttribute\\('(stroke|fill)', '#",
+				"reason": "ink of the small pattern and pump-curve charts on their own white plot: chart data"
+			}
+		]
 	}
 }

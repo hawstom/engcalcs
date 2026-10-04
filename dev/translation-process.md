@@ -286,6 +286,11 @@ read-only watchlist dump and grep-slice are free and can be done any time.
 - **Wrong-sense traps propagate across language families.** When a native reviewer rejects a word
   sense in one language, check the same concept in every cognate/family-mate language in the
   current category before calling the audit done — don't wait for a second complaint.
+- **An English command imperative takes your language's menu-label form** (Tom, 2026-10-04).
+  English button and command tips are imperative (*Show the legend.*); render them the way your
+  language labels a menu command, which in es, pt, fr and it is the infinitive (*Mostrar la
+  leyenda.*), not a second-person imperative. Field tips are noun phrases and messages are
+  indicative in every language. Rules: `dev/language-strings.md`, "mood, device verbs, checkboxes".
 - **Column-heading vs. tooltip width discipline**: shared label's short form goes in the
   column-heading key, long form in the tooltip — never the reverse (width-is-king).
 
@@ -434,6 +439,11 @@ question about paths.
    there is more than one, propose a rewrite."** Falsification, not review. Findings go to
    `dev/english-friction/<sprint>.json` and route through the English/synonym/glossary rule above.
    **`php dev/scripts/friction_check.php --sprint=<id>` must exit 0.**
+   **An open Wave 0 file is committed into `dev/english-friction/` at once, never kept outside the repo
+   (as a `.pending`) to dodge `friction_check.php`.** Its `refer-to-human` entries reach Tom through
+   `dev/new-english-keys.md` ("Questions from the translators"), and his answer is harvested onto the
+   entry as `human_answer`. That blocks a sprint until he rules; the block is the point. Never ask him
+   for a ruling in chat that the file can carry.
    **Assemble the pass set with `php dev/scripts/wave0_keyset.php --new-and-changed --prefix=<p>`**,
    which drops keys already carrying a non-empty `$ec_lang_syn` — that channel has already answered
    this exact question, and re-asking produces a re-flag. Measured against `239-wave0-calcs.json`:

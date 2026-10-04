@@ -356,6 +356,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_labels_customer_fields',
   'lpn_area_hint', 'lpn_labels_options', 'lpn_labels_popup', 'lpn_labels_popup_close', 'lpn_mode_hint', 'lpn_map_notice', 'lpn_map_overlay_tl',
   'lpn_popup', 'lpn_popup_close', 'lpn_popup_fields', 'lpn_popup_title', 'lpn_projects_btn',
+  // The graph at the foot of the Properties box (Task 637, revised).
+  'lpn_popup_graph',
   'lpn_projects_list', 'lpn_projects_popup', 'lpn_projects_popup_close',
   'lpn_settings_popup', 'lpn_settings_popup_close', 'lpn_status', 'lpn_toolbar',
   'lpn_project_file', 'lpn_inp_file', 'lpn_menubar', 'lpn_menu_popup', 'lpn_menu_list', 'lpn_dialog',
@@ -419,6 +421,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_pane_timeseries', 'lpn_ts_form', 'lpn_ts_chart', 'lpn_ts_note',
   // The Frequency tab (ROADMAP Task 600), the same shape.
   'lpn_pane_frequency', 'lpn_freq_form', 'lpn_freq_chart', 'lpn_freq_note',
+  // The System flow tab (Task 600), the same shape.
+  'lpn_pane_sysflow', 'lpn_sysflow_key', 'lpn_sysflow_chart', 'lpn_sysflow_note',
   // The Find panel's two hosts (ROADMAP Tasks 353/420, and the disconnected report of 540). Absent
   // from this list, rebuildFindForm() and renderFindResults() return at their first line and every
   // control on that panel -- the pull-downs, the query line, the result rows -- is invisible to
@@ -468,9 +472,15 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // 2026-08-30). Absent from this list, openFireFlowRunBox() returns before it builds anything and
   // a sweep runs with no progress on screen at all -- which is exactly the state it exists to end.
   'lpn_ff_run_box', 'lpn_ff_run_body',
+  // The criticality box (Tom, 2026-09-30), and the run dialog's title, which that run retitles.
+  'lpn_crit_box', 'lpn_crit_close', 'lpn_crit_controls', 'lpn_crit_report', 'lpn_ffrun_title',
+  // The demand scaling box (Task 754), the third sibling on the same shell.
+  'lpn_ds_box', 'lpn_ds_close', 'lpn_ds_controls', 'lpn_ds_report',
   // The pump energy report box (Task 566). Absent from this list, rebuildEnergyReport() returns at
   // its first line and the report is invisible to every harness.
   'lpn_energy_box', 'lpn_energy_close', 'lpn_energy_report',
+  // The contour box (Task 600): absent, buildContourBox() returns at its first line.
+  'lpn_contour_box', 'lpn_contour_close', 'lpn_contour_body',
   // The EPANET run report's own box (ROADMAP Task 570) -- the sixth of the family.
   'lpn_rptbox', 'lpn_rptbox_title', 'lpn_rptbox_close', 'lpn_rptbox_copy', 'lpn_rptbox_pre',
   // The scenario comparison box (planning engineer's wish-list row 2). Absent from this list,
@@ -857,6 +867,18 @@ function clearResizeObservers() { resizeWatchers.length = 0; }
 global.alert = global.window.alert;
 global.confirm = global.window.confirm;
 global.prompt = global.window.prompt;
+// **THE QUESTION BOX ANSWERS THROUGH THE OLD STUBS** (Task 710). The page's alert/confirm/prompt
+// calls became askDialog(), an in-page box answered by a click. Here it is answered at once by
+// whichever of window.X / global.X the harness last replaced, so every harness that scripts
+// `window.confirm = () => false` still drives the same flow. dialog-modal-browser-harness.js
+// removes this seam and clicks the box itself in a real Chrome.
+const stubDialogDefaults = { alert: global.window.alert, confirm: global.window.confirm, prompt: global.window.prompt };
+global.window.lpnDialogAnswerer = function (req) {
+  const kind = req.kind === 'copy' ? 'prompt' : (req.kind || 'alert');
+  const w = global.window[kind], g = global[kind];
+  const f = (w !== stubDialogDefaults[kind]) ? w : g;
+  return f.call(global.window, req.text, req.value);
+};
 global.navigator = { userAgent: 'node' };
 global.requestAnimationFrame = f => setTimeout(f, 0);
 // iconEl/setLabel come from js/Calculators.lib.js in the browser.
@@ -1025,11 +1047,16 @@ Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-profile.js'));
 // degrade to the five fallback stops and every assertion about a 7-class ramp would pass on the
 // wrong thing.
 require(ROOT + 'js/lpn-ramps.js');
+// The contour plot's pure half (Task 600); installs EngCalcs.lpnContour as its <script> tag does.
+require(ROOT + 'js/lpn-contour.js');
 // The fire flow sweep (ROADMAP Task 530). Same argument as lpn-ramps.js above: it installs itself
 // on globalThis.EngCalcs exactly as its <script> tag does, and without it every fire-flow path in
 // looped-network.js falls through its `EngCalcs.lpnFireFlow*` guards and a harness would pass on a
 // feature that had quietly turned itself off.
 Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-fireflow.js'));
+// Criticality analysis, for the same reason.
+Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-criticality.js'));
+Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-demandscale.js'));
 // The [RULES] grammar (ROADMAP Task 248.03). In the SHARED stub rather than per-harness, because
 // looped-network.js's modelRules() reaches it on EVERY model assembly -- so a harness that merely
 // solves a document holding rules would otherwise send the engine nothing and pass on a page the
