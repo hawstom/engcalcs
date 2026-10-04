@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**18 still to read on master**, of 67 untranslated keys, of 2346 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**37 still to read on master**, of 86 untranslated keys, of 2364 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -254,7 +254,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (67, 18 to read @@ NEEDS RULING)
+## lpn_  (86, 37 to read @@ NEEDS RULING)
 
 - **`lpn_analyze_at_time`**
   > Time step: {time}.
@@ -267,6 +267,12 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_contour_show_tip`**
   > Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.
+  @@ NEEDS RULING
+- **`lpn_diag_pda_needs_epanet`**
+  > The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.
+  @@ NEEDS RULING
+- **`lpn_diag_pda_pressures`**
+  > Required pressure must be greater than Minimum pressure. Change one of them in Settings.
   @@ NEEDS RULING
 - **`lpn_dock_autohide`**
   > Auto-hide
@@ -406,8 +412,14 @@ never edits a synonym.
 - **`lpn_ds_title`**
   > Demand scaling
   _Ruled OK 2026-10-03._
+- **`lpn_engine_pda_route`**
+  > Solved with the EPANET solver, because the demand model is pressure driven.
+  @@ NEEDS RULING
 - **`lpn_graphs_menu_tip`**
   > Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.
+  @@ NEEDS RULING
+- **`lpn_inp_drop_pressure_unit`**
+  > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
   @@ NEEDS RULING
 - **`lpn_pane_filter_sel_and`**
   > Filtered by {q} and selection only. Showing {n} of {all}.
@@ -430,6 +442,9 @@ never edits a synonym.
 - **`lpn_pane_width_tip`**
   > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
   @@ NEEDS RULING
+- **`lpn_pda_deficit_note`**
+  > Junctions receiving less than their demand: {n}.
+  @@ NEEDS RULING
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.
   _Ruled OK 2026-10-01._
@@ -439,6 +454,18 @@ never edits a synonym.
 - **`lpn_report_pump_head`**
   > Pump head
   _Ruled OK 2026-10-03._
+- **`lpn_result_delivered_demand`**
+  > Delivered demand
+  @@ NEEDS RULING
+- **`lpn_result_delivered_demand_tip`**
+  > The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.
+  @@ NEEDS RULING
+- **`lpn_result_demand_deficit`**
+  > Demand deficit
+  @@ NEEDS RULING
+- **`lpn_result_demand_deficit_tip`**
+  > The demand this junction asks for and does not receive, because the pressure is below the required pressure.
+  @@ NEEDS RULING
 - **`lpn_result_pump_head`**
   > Head
   _Ruled OK 2026-10-03._
@@ -454,6 +481,36 @@ never edits a synonym.
 - **`lpn_saved_session`**
   > Not saved
   @@ NEEDS RULING
+- **`lpn_settings_demand_model`**
+  > Demand model
+  @@ NEEDS RULING
+- **`lpn_settings_demand_model_dda`**
+  > Demand driven
+  @@ NEEDS RULING
+- **`lpn_settings_demand_model_pda`**
+  > Pressure driven
+  @@ NEEDS RULING
+- **`lpn_settings_demand_model_tip`**
+  > Choose how junctions receive water. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.
+  @@ NEEDS RULING
+- **`lpn_settings_min_pressure`**
+  > Minimum pressure
+  @@ NEEDS RULING
+- **`lpn_settings_min_pressure_tip`**
+  > Enter the pressure at or below which a junction receives no water. Use this project's pressure unit.
+  @@ NEEDS RULING
+- **`lpn_settings_pressure_exponent`**
+  > Pressure exponent
+  @@ NEEDS RULING
+- **`lpn_settings_pressure_exponent_tip`**
+  > Enter the exponent of the curve that rises from no water at the minimum pressure to the full demand at the required pressure.
+  @@ NEEDS RULING
+- **`lpn_settings_req_pressure`**
+  > Required pressure
+  @@ NEEDS RULING
+- **`lpn_settings_req_pressure_tip`**
+  > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.
+  @@ NEEDS RULING
 - **`lpn_sysflow_title`**
   > Flow balance
   _Ruled OK 2026-10-03._
@@ -462,7 +519,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**35 still to read**, of 43 new keys across 16 unmerged branch(es).
+**18 still to read**, of 26 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -494,7 +551,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.
   @@ NEEDS RULING
 
-### feat/chain-draw (`3cafad01`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/chain-draw (`de6b793e`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_mode_add_chain`**
   > Mode: Add Junction and Pipe. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
@@ -534,59 +591,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/pda (`ac32b95f`) — 17 new, 17 to read @@ NEEDS RULING
-
-- **`lpn_diag_pda_needs_epanet`**
-  > The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.
-  @@ NEEDS RULING
-- **`lpn_engine_pda_route`**
-  > Solved with the EPANET solver, because the demand model is pressure driven.
-  @@ NEEDS RULING
-- **`lpn_pda_deficit_note`**
-  > Junctions receiving less than their demand: {n}.
-  @@ NEEDS RULING
-- **`lpn_result_delivered_demand`**
-  > Delivered demand
-  @@ NEEDS RULING
-- **`lpn_result_delivered_demand_tip`**
-  > The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.
-  @@ NEEDS RULING
-- **`lpn_result_demand_deficit`**
-  > Demand deficit
-  @@ NEEDS RULING
-- **`lpn_result_demand_deficit_tip`**
-  > The demand this junction asks for and does not receive, because the pressure is below the required pressure.
-  @@ NEEDS RULING
-- **`lpn_settings_demand_model`**
-  > Demand model
-  @@ NEEDS RULING
-- **`lpn_settings_demand_model_dda`**
-  > Demand driven (DDA)
-  @@ NEEDS RULING
-- **`lpn_settings_demand_model_pda`**
-  > Pressure driven (PDA)
-  @@ NEEDS RULING
-- **`lpn_settings_demand_model_tip`**
-  > Choose how junctions receive water. Demand driven delivers every demand in full, whatever the pressure. Pressure driven delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.
-  @@ NEEDS RULING
-- **`lpn_settings_min_pressure`**
-  > Minimum pressure
-  @@ NEEDS RULING
-- **`lpn_settings_min_pressure_tip`**
-  > Enter the pressure at or below which a junction receives no water. Use this project's pressure unit.
-  @@ NEEDS RULING
-- **`lpn_settings_pressure_exponent`**
-  > Pressure exponent
-  @@ NEEDS RULING
-- **`lpn_settings_pressure_exponent_tip`**
-  > Enter the exponent of the curve that rises from no water at the minimum pressure to the full demand at the required pressure.
-  @@ NEEDS RULING
-- **`lpn_settings_req_pressure`**
-  > Required pressure
-  @@ NEEDS RULING
-- **`lpn_settings_req_pressure_tip`**
-  > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit.
-  @@ NEEDS RULING
+### feat/pda (`f52a2f51`) — adds no English strings
 
 ### feat/profile-file (`a095faf4`) — 4 new, all ruled
 
@@ -639,4 +644,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sort descending
   _Ruled OK 2026-09-26._
 
-### fix/browser-pass-specs (`32c38dec`) — adds no English strings
+### fix/browser-pass-specs (`849c50bb`) — adds no English strings
