@@ -3812,3 +3812,8 @@ OBSERVED: consequence: no dockOrd stored, `lpn-dock-tab-drag` outline lingers, o
 OBSERVED: at width <=640 docking is off (dockSideOf), so no flags exist on a phone; touch tap works at 700 px.
 SPECULATION: record-less boxes (lpn_popup, crit, ds, alt, calib) sort last on reload (1e9).
 Lesson: a harness with the minimum count of items cannot see an order bug that needs three. Probes deleted after use.
+
+## feat/dock-flag-order re-review at ae1a7f06 (OBSERVED, 2026-10-04)
+OBSERVED: first-pass defect fixed. 3 flags right bar, top flag dragged 300 px: order polled mid-drag walks one slot at a time to the end, ranks 2,0,1 stored, no stuck mark, survives reload, click after reload opens the flag it names. 4 flags left bar (Properties among them), last flag dragged 400 px up: reaches the front, no stuck mark; after reload Properties is gone (by design), others keep order; click opens Libraries. Harnesses: flag-order 31/31, dock-browser 71/71, title-band 156/156.
+OBSERVED defect (minor): a one-event flick whose end point is off the strip (e.g. -150 px from the 2nd flag, strip top is y=116) changes nothing; same flick ending on the strip, or a stepped drag to the same point, reorders. Mouse only; touch flick not tried.
+Probes in scratchpad/probe.js, probe2.js (copy of builder harness head).
