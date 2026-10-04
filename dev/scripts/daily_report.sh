@@ -310,7 +310,7 @@ echo "$out" | grep -oE '[0-9]+ of [0-9]+ open tasks have a conforming[^.]*' | he
 # ---------------------------------------------------------------------------
 hr "USAGE, from the production logs"
 if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ]; then
-    out=$(cd "$PROD" && run 120 "sh log/lang-log-stats.sh")
+    out=$(cd "$PROD" && run 120 "bash log/lang-log-stats.sh")
     if [ -n "$out" ]; then
         # A `head -24` HERE PRINTED TWENTY-FOUR LINES OF DEFINITIONS AND NOT ONE NUMBER, which is
         # the failure a report is most likely to keep making: it looked full. So the sections are

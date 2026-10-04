@@ -871,16 +871,6 @@ the block.
   - **NO THIRD-PARTY REQUEST AND NO VENDORED LIBRARY WITHOUT A DECISION.** The suite makes exactly
     four outside requests, all on this page, all opt-in; `vendor_integrity_check.php` governs anything
     added to `js/vendor/`. Encoding in the browser with no new dependency is the shape to aim for.
-- 50|695| **The daily status mail has columns with no headings.**
-  Tom, 2026-09-18, of the nightly report: *"Headings for this would help"*, quoting a table whose
-  columns he had to guess at -- he wrote them as `??? ????`. The two numbers are almost certainly
-  the two consent buckets, which is exactly the pair CLAUDE.md forbids summing, so a reader guessing
-  at them is the failure this is about.
-  - `log/lang-log-stats.sh` builds it and `dev/host/` holds the deployed copy;
-    `log_format_selftest.php` pins its output shape, so the headings go in with the test.
-  - **NAME WHAT EACH COLUMN COUNTS, NOT JUST WHAT IT IS.** One column counts PEOPLE (consented,
-    deduplicated) and the other counts PAGE LOADS (everyone else, undeduplicated). A heading that
-    says only "visits" would be worse than none.
 - 50|702| **A view window cannot describe a span across the far side of the world.**
   Found 2026-09-19 alongside the mirrored-basemap fix (R-066), and **reported as unsettled rather
   than as a defect, which is the point of the row.**
