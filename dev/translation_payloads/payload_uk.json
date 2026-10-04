@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "uk",
-        "expected_key_count": 2307,
-        "delta_key_count": 76,
+        "expected_key_count": 2335,
+        "delta_key_count": 105,
         "exempt_key_count": 31,
         "exempt_keys": [
             "u_imgd",
@@ -710,6 +710,7 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_tool_add_chain": "Junction Pipe Chain",
         "lpn_pane_sort_desc": "Sort descending",
         "lpn_pane_manage_cols_width": "Width (em)",
         "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
@@ -717,6 +718,7 @@
         "lpn_dock_right": "Dock at the right of the map",
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
+        "lpn_tool_add_chain_tip": "Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.",
         "lpn_pane_filter_sel_note": "Selection only. Showing {n} of {all}.",
         "lpn_pane_filter_sel_and": "Filtered by {q} and selection only. Showing {n} of {all}.",
         "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
@@ -730,8 +732,13 @@
         "lpn_contour_show": "Show contours",
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_mode_add_chain": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
         "lpn_cp_allow_tip": "Allow only these characters:",
         "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
+        "lpn_alt_calc_options": "Calculation options",
+        "lpn_scenario_duration_tip": "Overrides the total run time in this scenario. Leave it blank to use its parent's. A total run time of 0:00 is a steady-state run.",
+        "lpn_scenario_hyd_step_tip": "Overrides the hydraulic time step in this scenario. Leave it blank to use its parent's.",
+        "lpn_time_scn_overrides": "Scenario overrides:",
         "lpn_settings_basemap_style": "Basemap style",
         "lpn_settings_basemap_style_tip": "Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.",
         "lpn_basemap_style_normal": "Normal",
@@ -741,6 +748,9 @@
         "lpn_saved_project": "Saved with the project",
         "lpn_saved_browser": "Saved in this browser",
         "lpn_saved_session": "Not saved",
+        "lpn_scncmp_at_time": "{value} at {id}, {time}",
+        "lpn_scncmp_same": "The same in every scenario",
+        "lpn_scncmp_period_note": "Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.",
         "lpn_choice_default": "Default",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
@@ -785,9 +795,29 @@
         "lpn_ds_bad_multiplier": "Enter a demand scale of zero or more, such as 1.5.",
         "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
         "lpn_analyze_at_time": "Time step: {time}.",
-        "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
+        "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.",
+        "lpn_settings_demand_model": "Demand model",
+        "lpn_settings_demand_model_tip": "Choose how junctions receive water. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.",
+        "lpn_settings_demand_model_dda": "Demand driven",
+        "lpn_settings_demand_model_pda": "Pressure driven",
+        "lpn_settings_min_pressure": "Minimum pressure",
+        "lpn_settings_min_pressure_tip": "Enter the pressure at or below which a junction receives no water. Use this project's pressure unit.",
+        "lpn_settings_req_pressure": "Required pressure",
+        "lpn_settings_req_pressure_tip": "Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.",
+        "lpn_settings_pressure_exponent": "Pressure exponent",
+        "lpn_settings_pressure_exponent_tip": "Enter the exponent of the curve that rises from no water at the minimum pressure to the full demand at the required pressure.",
+        "lpn_engine_pda_route": "Solved with the EPANET solver, because the demand model is pressure driven.",
+        "lpn_diag_pda_needs_epanet": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.",
+        "lpn_result_delivered_demand": "Delivered demand",
+        "lpn_result_delivered_demand_tip": "The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.",
+        "lpn_result_demand_deficit": "Demand deficit",
+        "lpn_result_demand_deficit_tip": "The demand this junction asks for and does not receive, because the pressure is below the required pressure.",
+        "lpn_pda_deficit_note": "Junctions receiving less than their demand: {n}.",
+        "lpn_diag_pda_pressures": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
+        "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back."
     },
     "keys": {
+        "lpn_tool_add_chain": "Junction Pipe Chain",
         "lpn_pane_sort_desc": "Sort descending",
         "lpn_pane_manage_cols_width": "Width (em)",
         "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
@@ -795,6 +825,7 @@
         "lpn_dock_right": "Dock at the right of the map",
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
+        "lpn_tool_add_chain_tip": "Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.",
         "lpn_pane_filter_sel_note": "Selection only. Showing {n} of {all}.",
         "lpn_pane_filter_sel_and": "Filtered by {q} and selection only. Showing {n} of {all}.",
         "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
@@ -808,8 +839,13 @@
         "lpn_contour_show": "Show contours",
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_mode_add_chain": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
         "lpn_cp_allow_tip": "Allow only these characters:",
         "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
+        "lpn_alt_calc_options": "Calculation options",
+        "lpn_scenario_duration_tip": "Overrides the total run time in this scenario. Leave it blank to use its parent's. A total run time of 0:00 is a steady-state run.",
+        "lpn_scenario_hyd_step_tip": "Overrides the hydraulic time step in this scenario. Leave it blank to use its parent's.",
+        "lpn_time_scn_overrides": "Scenario overrides:",
         "lpn_settings_basemap_style": "Basemap style",
         "lpn_settings_basemap_style_tip": "Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.",
         "lpn_basemap_style_normal": "Normal",
@@ -819,6 +855,9 @@
         "lpn_saved_project": "Saved with the project",
         "lpn_saved_browser": "Saved in this browser",
         "lpn_saved_session": "Not saved",
+        "lpn_scncmp_at_time": "{value} at {id}, {time}",
+        "lpn_scncmp_same": "The same in every scenario",
+        "lpn_scncmp_period_note": "Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.",
         "lpn_choice_default": "Default",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
@@ -863,9 +902,44 @@
         "lpn_ds_bad_multiplier": "Enter a demand scale of zero or more, such as 1.5.",
         "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
         "lpn_analyze_at_time": "Time step: {time}.",
-        "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
+        "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.",
+        "lpn_settings_demand_model": "Demand model",
+        "lpn_settings_demand_model_tip": "Choose how junctions receive water. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.",
+        "lpn_settings_demand_model_dda": "Demand driven",
+        "lpn_settings_demand_model_pda": "Pressure driven",
+        "lpn_settings_min_pressure": "Minimum pressure",
+        "lpn_settings_min_pressure_tip": "Enter the pressure at or below which a junction receives no water. Use this project's pressure unit.",
+        "lpn_settings_req_pressure": "Required pressure",
+        "lpn_settings_req_pressure_tip": "Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.",
+        "lpn_settings_pressure_exponent": "Pressure exponent",
+        "lpn_settings_pressure_exponent_tip": "Enter the exponent of the curve that rises from no water at the minimum pressure to the full demand at the required pressure.",
+        "lpn_engine_pda_route": "Solved with the EPANET solver, because the demand model is pressure driven.",
+        "lpn_diag_pda_needs_epanet": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.",
+        "lpn_result_delivered_demand": "Delivered demand",
+        "lpn_result_delivered_demand_tip": "The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.",
+        "lpn_result_demand_deficit": "Demand deficit",
+        "lpn_result_demand_deficit_tip": "The demand this junction asks for and does not receive, because the pressure is below the required pressure.",
+        "lpn_pda_deficit_note": "Junctions receiving less than their demand: {n}.",
+        "lpn_diag_pda_pressures": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
+        "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back."
     },
     "key_context": {
+        "lpn_tool_add_chain": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_add_text",
+                    "value": "Текст",
+                    "english": "Text"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_vertices",
+                    "value": "Вершини",
+                    "english": "Vertices"
+                }
+            }
+        },
         "lpn_pane_sort_desc": {
             "reason": "missing",
             "current_value": null,
@@ -975,6 +1049,22 @@
                     "key": "lpn_popup_boxtitle",
                     "value": "Властивості",
                     "english": "Properties"
+                }
+            }
+        },
+        "lpn_tool_add_chain_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_key_hint_two",
+                    "value": "Комбінація клавіш: натисніть {key} або {key2}.",
+                    "english": "Shortcut: {key} or {key2}"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_area_tip",
+                    "value": "Клацайте по карті, як зазначено, щоб вибрати все всередині фігури. Натисніть цю кнопку ще раз, щоб змінити форму між вікном, ласо й багатокутником. Утримуйте Shift під час вибору, щоб продовжити наявний вибір, додаючи або знімаючи (перемикаючи) те, що ви вибираєте.",
+                    "english": "Follow on-screen wizard. Press again to cycle through window, lasso, and polygon. Hold Shift to keep existing selection set and add or remove (toggle) what you select."
                 }
             }
         },
@@ -1186,6 +1276,22 @@
                 }
             }
         },
+        "lpn_mode_add_chain": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_mode_add_text",
+                    "value": "Режим: Додавання тексту. Клацніть на карті, щоб розмістити Текст. Клацніть біля вузла, щоб прикріпити Текст до нього. Перейдіть у режим «Вибір», щоб змінювати або пересувати елементи й підписи.",
+                    "english": "Mode: Add Text. Specify a location on the map to place a Text. Specify a location near a node to attach the Text to that node. Switch to Select mode to change or move assets and labels."
+                },
+                "next_translated": {
+                    "key": "lpn_tip_select",
+                    "value": "Використовуйте цей режим, щоб змінювати, пересувати й перетягувати об'єкти на карті. Це режим, до якого сторінка повертається за замовчуванням: вона сама повертається сюди після деяких дій, наприклад відкриття проєкту, а [Esc] повертає сюди з будь-якого іншого режиму.",
+                    "english": "Use this mode to change, move, and drag map elements or pan the map. This is the default mode for the map. Pressing Esc a second time unselects whatever is selected."
+                }
+            }
+        },
         "lpn_cp_allow_tip": {
             "reason": "missing",
             "current_value": null,
@@ -1215,6 +1321,70 @@
                     "key": "lpn_cp_restrict_mode",
                     "value": "Дозволити або обмежити",
                     "english": "Allow or restrict"
+                }
+            }
+        },
+        "lpn_alt_calc_options": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_title",
+                    "value": "Попередній перегляд альтернатив",
+                    "english": "Alternatives preview"
+                },
+                "next_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "Лише для читання. Базовий сценарій використовує базову альтернативу кожної категорії. Кожен сценарій отримує власну альтернативу для будь-якої зміненої категорії, дочірню до базової. Число — це кількість змінених у ній значень.",
+                    "english": "Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario's own value, or leave it blank to use its parent's. The project's own are in Settings, Calculation, Time."
+                }
+            }
+        },
+        "lpn_scenario_duration_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "Лише для читання. Базовий сценарій використовує базову альтернативу кожної категорії. Кожен сценарій отримує власну альтернативу для будь-якої зміненої категорії, дочірню до базової. Число — це кількість змінених у ній значень.",
+                    "english": "Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario's own value, or leave it blank to use its parent's. The project's own are in Settings, Calculation, Time."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Фізичні",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_scenario_hyd_step_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "Лише для читання. Базовий сценарій використовує базову альтернативу кожної категорії. Кожен сценарій отримує власну альтернативу для будь-якої зміненої категорії, дочірню до базової. Число — це кількість змінених у ній значень.",
+                    "english": "Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario's own value, or leave it blank to use its parent's. The project's own are in Settings, Calculation, Time."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Фізичні",
+                    "english": "Physical"
+                }
+            }
+        },
+        "lpn_time_scn_overrides": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_alt_note",
+                    "value": "Лише для читання. Базовий сценарій використовує базову альтернативу кожної категорії. Кожен сценарій отримує власну альтернативу для будь-якої зміненої категорії, дочірню до базової. Число — це кількість змінених у ній значень.",
+                    "english": "Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario's own value, or leave it blank to use its parent's. The project's own are in Settings, Calculation, Time."
+                },
+                "next_translated": {
+                    "key": "lpn_alt_cat_physical",
+                    "value": "Фізичні",
+                    "english": "Physical"
                 }
             }
         },
@@ -1359,6 +1529,54 @@
                     "key": "lpn_settings_hydraulics",
                     "value": "Гідравліка",
                     "english": "Hydraulics"
+                }
+            }
+        },
+        "lpn_scncmp_at_time": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_at",
+                    "value": "{value} у {id}",
+                    "english": "{value} at {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_scncmp_current",
+                    "value": "(відкрито зараз)",
+                    "english": "(currently open)"
+                }
+            }
+        },
+        "lpn_scncmp_same": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_at",
+                    "value": "{value} у {id}",
+                    "english": "{value} at {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_scncmp_current",
+                    "value": "(відкрито зараз)",
+                    "english": "(currently open)"
+                }
+            }
+        },
+        "lpn_scncmp_period_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_scncmp_at",
+                    "value": "{value} у {id}",
+                    "english": "{value} at {id}"
+                },
+                "next_translated": {
+                    "key": "lpn_scncmp_current",
+                    "value": "(відкрито зараз)",
+                    "english": "(currently open)"
                 }
             }
         },
@@ -2080,6 +2298,234 @@
                     "value": "Імпортувати геодезичні точки…",
                     "english": "Import surveyed points…"
                 }
+            }
+        },
+        "lpn_settings_demand_model": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_demand_model_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_demand_model_dda": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_demand_model_pda": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_min_pressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_min_pressure_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_req_pressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_req_pressure_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_pressure_exponent": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_pressure_exponent_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_engine_pda_route": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_diag_pda_needs_epanet": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_delivered_demand": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_delivered_demand_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_demand_deficit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_result_demand_deficit_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_pda_deficit_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_diag_pda_pressures": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_inp_drop_pressure_unit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_survey_note_id_invalid",
+                    "value": "Це ім’я тут використати не можна, призначено нове ім’я.",
+                    "english": "Name cannot be used here, new name assigned."
+                },
+                "next_translated": null
             }
         }
     },

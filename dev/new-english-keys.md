@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**49 still to read on master**, of 98 untranslated keys, of 2328 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**56 still to read on master**, of 105 untranslated keys, of 2335 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -294,8 +294,11 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (98, 49 to read @@ NEEDS RULING)
+## lpn_  (105, 56 to read @@ NEEDS RULING)
 
+- **`lpn_alt_calc_options`**
+  > Calculation options
+  @@ NEEDS RULING
 - **`lpn_analyze_at_time`**
   > Time step: {time}.
   _Ruled OK 2026-10-03._
@@ -545,6 +548,21 @@ never edits a synonym.
 - **`lpn_saved_session`**
   > Not saved
   @@ NEEDS RULING
+- **`lpn_scenario_duration_tip`**
+  > Overrides the total run time in this scenario. Leave it blank to use its parent's. A total run time of 0:00 is a steady-state run.
+  @@ NEEDS RULING
+- **`lpn_scenario_hyd_step_tip`**
+  > Overrides the hydraulic time step in this scenario. Leave it blank to use its parent's.
+  @@ NEEDS RULING
+- **`lpn_scncmp_at_time`**
+  > {value} at {id}, {time}
+  @@ NEEDS RULING
+- **`lpn_scncmp_period_note`**
+  > Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.
+  @@ NEEDS RULING
+- **`lpn_scncmp_same`**
+  > The same in every scenario
+  @@ NEEDS RULING
 - **`lpn_settings_basemap_style`**
   > Basemap style
   @@ NEEDS RULING
@@ -584,6 +602,9 @@ never edits a synonym.
 - **`lpn_sysflow_title`**
   > Flow balance
   _Ruled OK 2026-10-03._
+- **`lpn_time_scn_overrides`**
+  > Scenario overrides:
+  @@ NEEDS RULING
 - **`lpn_tool_add_chain`**
   > Junction Pipe Chain
   @@ NEEDS RULING
@@ -595,7 +616,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**7 still to read**, of 14 new keys across 9 unmerged branch(es).
+**0 still to read**, of 7 new keys across 7 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -628,8 +649,6 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/pda (`c32c8d1d`) — adds no English strings
-
 ### feat/profile-file (`a095faf4`) — 4 new, all ruled
 
 - **`lpn_profile_file_done`**
@@ -644,27 +663,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_profile_open`**
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
-
-### feat/scenario-option (`c3f82b7d`) — 7 new, 7 to read @@ NEEDS RULING
-
-- **`lpn_alt_calc_options`**
-  > Calculation options
-  @@ NEEDS RULING
-- **`lpn_scenario_duration_tip`**
-  > Overrides the total run time in this scenario. Leave it blank to use its parent's. A total run time of 0:00 is a steady-state run.
-  @@ NEEDS RULING
-- **`lpn_scenario_hyd_step_tip`**
-  > Overrides the hydraulic time step in this scenario. Leave it blank to use its parent's.
-  @@ NEEDS RULING
-- **`lpn_scncmp_at_time`**
-  > {value} at {id}, {time}
-  @@ NEEDS RULING
-- **`lpn_scncmp_period_note`**
-  > Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.
-  @@ NEEDS RULING
-- **`lpn_scncmp_same`**
-  > The same in every scenario
-  @@ NEEDS RULING
-- **`lpn_time_scn_overrides`**
-  > Scenario overrides:
-  @@ NEEDS RULING
