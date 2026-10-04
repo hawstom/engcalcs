@@ -348,7 +348,7 @@ console.log('\n--- six tabs, one renderer ---');
 		'Profile is the LAST tab — it is a drawing, the six before it are tables',
 		L.paneTabIds().join(','));
 	report(L.paneTabIds()[0] === 'junctions',
-		'...so the strip OPENS on a table, which is what the Print button beside it acts on',
+		'...so the strip OPENS on a table, which is what the Print table menu row acts on',
 		L.paneTabIds()[0]);
 	// **NINE SINCE TASK 599**: Time series joined, the second DRAWING in the strip. It sits with
 	// the profile rather than before the tables, which keeps the shape Tom's ordering rule is about
@@ -675,7 +675,7 @@ console.log('\n--- the write seam ---');
 // silently growing past the share of the window the ceiling reserves for it.
 console.log('\n--- the strip may be two lines ---');
 {
-	// The wrapping row is .lpn-pane-strip, which holds the Print button AND the tablist; the
+	// The wrapping row is .lpn-pane-strip, which holds the tablist; the
 	// tablist itself is `display: contents` so both wrap as one flow (Task 488). Asking
 	// .lpn-pane-tabs for flex-wrap here would pass on a strip that cannot wrap at all.
 	report(/\.lpn-pane-strip \{[^}]*flex-wrap: wrap/.test(css), 'the tab strip wraps rather than overflowing');

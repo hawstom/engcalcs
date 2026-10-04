@@ -1330,7 +1330,6 @@ $ec_lang['lpn_goto_on_map']='在地图上定位';
 $ec_lang['lpn_pane_select_on_map']='在地图上选中';
 $ec_lang['lpn_pane_unselect_on_map']='在地图上取消选中';
 $ec_lang['lpn_pane_print']='打印表格';
-$ec_lang['lpn_pane_print_tip']='打印您正在查看的表格，标题中包含项目名称、表格名称和单位。行按您排序的顺序打印。';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and

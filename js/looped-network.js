@@ -21624,12 +21624,6 @@ var EngCalcs = EngCalcs || {};
 		});
 		btn = document.getElementById('lpn_pane_btn');
 		if (btn) { btn.setAttribute('aria-pressed', paneState.open ? 'true' : 'false'); }
-		// **PRINT BELONGS TO A TABLE, so it is only there on a table.** Profile is a drawing and
-		// prints with the map; a Print button beside it would promise a sheet this code cannot
-		// make. Hidden rather than disabled: a disabled control invites the question of what would
-		// enable it, and the answer here is "a different tab", which the tab strip already says.
-		btn = document.getElementById('lpn_pane_print');
-		if (btn) { btn.style.display = activePaneTableSpec() ? '' : 'none'; }
 		// THE CANVAS IS RE-MEASURED, NEVER TOLD. See the note at the top of this section.
 		applyMapHeight();
 		if (pass < LPN_PANE_SETTLE && paneState.open) {
@@ -21681,7 +21675,7 @@ var EngCalcs = EngCalcs || {};
 		var pane = paneEl(), strip = document.getElementById('lpn_pane_tabs'),
 			grip = document.getElementById('lpn_pane_grip'),
 			x = document.getElementById('lpn_pane_close'), pc = EngCalcs.pageConfig || {},
-			head = null, dragFrom = null;
+			dragFrom = null;
 		if (!pane) { return; }
 		if (strip) {
 			paneTabs.forEach(function (t) {
@@ -21731,32 +21725,9 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		if (x) { x.addEventListener('click', closePane); }
-		// Built here, not in the markup: it carries a tip, and .ec-help written into a page's HTML
-		// is what tip_markup_check.php exists to stop. Same treatment as a tab button.
-		//
-		// **FIRST CHILD OF THE TAB STRIP, at the extreme left edge** (Tom, 2026-08-21: the print
-		// button "is poorly discoverable ... try putting it at extreme left"). It used to sit beside
-		// the X in the top-RIGHT corner, which is where a window's own controls live and therefore
-		// where the eye reads "close", not "do something to this table". The left edge is the first
-		// thing read in an LTR language and the first thing read in an RTL one too, because the flex
-		// row reverses with the document.
-		//
-		// It goes inside #lpn_pane_strip rather than beside it (Task 488): a sibling of the tab
-		// strip holds a column of its own and the tabs can only wrap within what is left. In the
-		// strip it is one wrapping item among the tabs, so a second line starts at the left edge.
-		head = document.getElementById('lpn_pane_strip') || document.getElementById('lpn_pane_head');
-		if (!document.getElementById('lpn_pane_print') && head) {
-			(function () {
-				var b = document.createElement('button');
-				b.type = 'button';
-				b.id = 'lpn_pane_print';
-				b.className = 'lpn-pane-print';
-				b.textContent = pc.lpn_pane_print || 'Print table';
-				if (pc.lpn_pane_print_tip) { b.title = pc.lpn_pane_print_tip; b.className += ' ec-help'; }
-				b.addEventListener('click', function () { printPaneTable(activePaneTableSpec()); });
-				head.insertBefore(b, head.firstChild);
-			}());
-		}
+		// **SELECTION ONLY AND PRINT TABLE ARE NOT BUTTONS HERE** (Tom, 2026-10-04, port 8109: "I
+		// lean toward releasing with a cleaner UI"). Both live on the Tables pane's right-click
+		// menu (Menu key or Shift+F10 on a cell opens it); Selection only is also Ctrl+Shift+L.
 		// **THE TOP EDGE IS THE HANDLE.** Pointer events, not mouse: one code path for mouse, pen
 		// and touch, with pointer capture so a fast drag that leaves the grip keeps resizing
 		// instead of stopping dead -- the pointer slop a real hand needs.
@@ -23859,12 +23830,86 @@ var EngCalcs = EngCalcs || {};
 	// admits everything rather than nothing: hiding every row is the one answer a reader cannot
 	// tell from a network that has none.
 	function paneFilterKeys(spec) {
-		var q = paneFilterQuery(spec), r, keys = {};
-		if (!q) { return null; }
-		r = findSelectByQuery(q);
-		if (!r.ok) { return null; }
-		r.list.forEach(function (c) { keys[c.group + ':' + c.el.id] = true; });
-		return keys;
+		var q = paneFilterQuery(spec), r, keys = null, sk = paneSelFilterKeys(spec), both = {};
+		if (q) {
+			r = findSelectByQuery(q);
+			if (r.ok) {
+				keys = {};
+				r.list.forEach(function (c) { keys[c.group + ':' + c.el.id] = true; });
+			}
+		}
+		if (!sk) { return keys; }
+		if (!keys) { return sk; }
+		Object.keys(keys).forEach(function (k) { if (sk[k] === true) { both[k] = true; } });
+		return both;
+	}
+	// ---- SELECTION ONLY (ROADMAP Task 757; Tom, 2026-10-03: *"it would be really nice if the tables
+	// could filter on the selection. I'm not sure how to work the UI unless it's part of the
+	// right-click menu."*) -------------------------------------------------------------------
+	//
+	// **A SNAPSHOT, NOT A LIVE FOLLOW** (Declan's reason): a stray map click while somebody types
+	// down a column must not reshuffle or empty the table under the keystroke. So `paneSelFilter`
+	// holds the `group:id` of what was selected when the door was pressed, and pressing a door again
+	// with a CHANGED selection re-takes it; with the selection unchanged, it turns the filter off.
+	// Membership is by identity, so an edited row never leaves it.
+	//
+	// **ONE SET FOR EVERY TABLE, ANDed WITH THE QUERY FILTER.** It rides inside paneFilterKeys(), the
+	// one place membership is decided, so the fills, the paste and the copy -- which all read the
+	// rendered rows -- act on exactly the selected elements with no second code path.
+	//
+	// **ROWS CREATED WHILE IT IS ON JOIN THE SET** (Declan's trap): `known` is every element key the
+	// document held at the press, and a key it has not met is new, so it is admitted and remembered.
+	// A pasted row or a newly drawn element would otherwise vanish the moment it was made.
+	//
+	// **STORED NOWHERE**: not the project's (a colleague must not open a file with rows missing) and
+	// not the device's. It lasts as long as the page does.
+	var paneSelFilter = null;   // null, or { keys: {group:id: true}, known: {group:id: true} }
+	function paneSelFilterOn() { return !!paneSelFilter; }
+	function paneAllElementKeys() {
+		var known = {};
+		doc.nodes.forEach(function (x) { known['node:' + x.id] = true; });
+		doc.links.forEach(function (x) { known['link:' + x.id] = true; });
+		(doc.labels || []).forEach(function (x) { known['label:' + x.id] = true; });
+		(doc.customers || []).forEach(function (x) { known['customer:' + x.id] = true; });
+		return known;
+	}
+	function paneSelFilterKeys(spec) {
+		if (!paneSelFilter) { return null; }
+		paneTableAllElements(spec).forEach(function (x) {
+			var k = spec.group + ':' + x.id;
+			if (paneSelFilter.known[k] !== true) { paneSelFilter.known[k] = true; paneSelFilter.keys[k] = true; }
+		});
+		return paneSelFilter.keys;
+	}
+	// Does the map's selection now differ from the snapshot the filter was taken from?
+	function paneSelFilterChanged() {
+		var now = {}, n = 0, same = true;
+		selections.forEach(function (s) { now[s.kind + ':' + s.id] = true; });
+		Object.keys(now).forEach(function (k) { n++; if (!paneSelFilter.taken[k]) { same = false; } });
+		return !same || n !== Object.keys(paneSelFilter.taken).length;
+	}
+	function paneRedrawAllTables() {
+		paneTables().forEach(function (spec) { paneTableReset(spec); });
+		paneFilterForgetEdits();
+		paneTables().forEach(function (spec) { if (document.getElementById(spec.panel)) { renderPaneTable(spec); } });
+	}
+	function paneSelFilterOff() {
+		if (!paneSelFilter) { return; }
+		paneSelFilter = null;
+		paneRedrawAllTables();
+	}
+	// The two doors (right-click row, Ctrl+Shift+L) both come here. True when it acted.
+	function paneSelFilterPress() {
+		var pc = EngCalcs.pageConfig || {}, keys = {};
+		if (paneSelFilter && (!selections.length || !paneSelFilterChanged())) { paneSelFilterOff(); return true; }
+		if (!selections.length) {
+			setNotice(pc.lpn_pane_sel_only_none || 'No elements are selected. Select elements on the map first.');
+			return false;
+		}
+		selections.forEach(function (s) { keys[s.kind + ':' + s.id] = true; });
+		paneSelFilter = { keys: keys, taken: JSON.parse(JSON.stringify(keys)), known: paneAllElementKeys() };
+		paneRedrawAllTables();
+		return true;
 	}
 	// Every element of this type, filter or no filter -- the denominator the banner prints.
 	function paneTableAllElements(spec) {
@@ -25081,7 +25126,7 @@ var EngCalcs = EngCalcs || {};
 		return rows.map(function (el) { return el.id; }).join('|') + '||' +
 			spec.sort.col + '/' + spec.sort.dir + '||' +
 			cols.map(paneHeadingText).join('|') + '||' +
-			paneFilterQuery(spec) + '/' + paneTableAllElements(spec).length + '||' +
+			paneFilterQuery(spec) + '/' + (paneSelFilter ? 'S' : '') + paneTableAllElements(spec).length + '||' +
 			cols.map(function (c) {
 				if (c.result || !c.set) { return ''; }
 				return (c.choices && !c.bool ? c.choices().map(function (o) { return o[0]; }).join(',') : '') +
@@ -25091,8 +25136,12 @@ var EngCalcs = EngCalcs || {};
 	// The line above a filtered table: what it is filtered by, how much of the table is showing,
 	// and the way out. Null where there is no filter, so an unfiltered table gains nothing.
 	function paneFilterNoteText(spec, rows) {
-		var pc = EngCalcs.pageConfig || {}, text;
-		text = String(pc.lpn_pane_filter_note || 'Filtered by {q}. Showing {n} of {all}.')
+		var pc = EngCalcs.pageConfig || {}, text, q = paneFilterQuery(spec), tpl;
+		// Selection only, alone or with a Find filter: the line names both, in the query's own words.
+		tpl = !paneSelFilter ? (pc.lpn_pane_filter_note || 'Filtered by {q}. Showing {n} of {all}.')
+			: q ? (pc.lpn_pane_filter_sel_and || 'Filtered by {q} and selection only. Showing {n} of {all}.')
+			: (pc.lpn_pane_filter_sel_note || 'Selection only. Showing {n} of {all}.');
+		text = String(tpl)
 			.split('{q}').join(paneFilterQuery(spec))
 			.split('{n}').join(String(rows.length))
 			.split('{all}').join(String(paneTableAllElements(spec).length));
@@ -25139,7 +25188,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function paneFilterBanner(spec, rows, withClear) {
 		var pc = EngCalcs.pageConfig || {}, q = paneFilterQuery(spec), wrap, text, btn;
-		if (!q) { return null; }
+		if (!q && !paneSelFilter) { return null; }
 		wrap = document.createElement('div');
 		wrap.className = 'lpn-pane-filter';
 		text = document.createElement('span');
@@ -25153,7 +25202,12 @@ var EngCalcs = EngCalcs || {};
 			btn.type = 'button';
 			btn.className = 'lpn-pane-filter-clear';
 			btn.textContent = pc.lpn_pane_filter_clear || 'Show all';
-			btn.addEventListener('click', function () { paneSetFilter(spec.id, ''); });
+			btn.addEventListener('click', function () {
+				// Show all clears everything holding this table's rows back: its own query and
+				// the selection-only filter, which is one for every table.
+				if (paneSelFilter) { paneSelFilter = null; paneSetFilter(spec.id, ''); paneRedrawAllTables(); return; }
+				paneSetFilter(spec.id, '');
+			});
 			wrap.appendChild(btn);
 		}
 		return wrap;
@@ -25189,7 +25243,9 @@ var EngCalcs = EngCalcs || {};
 			// FALSE**, and dangerously so -- the network may be full of pipes and none of them match
 			// -- so the filtered case has its own sentence.
 			note.textContent = filterNote
-				? (pc.lpn_pane_filter_none || 'Nothing in this table matches the filter.')
+				? ((paneSelFilter && !paneFilterQuery(spec))
+					? (pc.lpn_pane_filter_sel_none || 'None of the selected elements are in this table.')
+					: (pc.lpn_pane_filter_none || 'Nothing in this table matches the filter.'))
 				: (pc.lpn_pane_none || 'This network has none of these yet.');
 			// **THE EMPTY TABLE TAKES A PASTE** (Task 610). With no row there is no cell to stand
 			// on, so the note itself is the target: click it, paste, and the block lands as new
@@ -27279,6 +27335,13 @@ var EngCalcs = EngCalcs || {};
 		// ordinary character. A selection that CANNOT be filled -- From, To, ID, a single row -- is
 		// not a reason to let the browser see the key: paneFillDown() already declines quietly, so
 		// this says so instead, on the same notice line every other "nothing to do" moment here uses.
+		// **CTRL+SHIFT+L IS SELECTION ONLY** (Task 757; Excel's AutoFilter chord). Mid-edit the typed
+		// value is committed first, as the table-switch chord does.
+		if (jump && ext && (key === 'l' || key === 'L')) {
+			if (editing && active) { paneCommitCell(active); }
+			paneSelFilterPress();
+			return true;
+		}
 		if (jump && !editing && (key === 'd' || key === 'D')) {
 			if (!paneFillDown(spec)) {
 				setNotice(pc.lpn_pane_fill_none || 'Nothing in this selection can be filled down.');
@@ -27898,6 +27961,13 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () { selectAndZoomTo(targets); });
+		// **SELECTION ONLY, offered only when the map has a selection** (or the filter is on, so it
+		// can be turned off from here). It acts on the MAP's selection, not on the rows clicked.
+		if (selections.length || paneSelFilter) {
+			mk((paneSelFilter ? '\u2713 ' : '') + (pc.lpn_pane_sel_only || 'Selection only'), paneSelFilterPress, 'Ctrl+Shift+L');
+		}
+		// **PRINT TABLE, THE ONLY DOOR TO IT** (Tom, 2026-10-04: the button left the pane head).
+		mk(pc.lpn_pane_print || 'Print table', function () { printPaneTable(spec); });
 		// **FILL DOWN, ON THE SAME MENU, FOR THE SAME RANGE.** Offered only when the selection
 		// spans more than one row -- a single row has nothing below it to fill, and an item that
 		// does nothing when clicked is worse than an absent one.
@@ -33783,6 +33853,7 @@ var EngCalcs = EngCalcs || {};
 	// keeps is pinned to the bytes just written -- the only thing both sides of the switch can agree
 	// on.
 	function rememberOutgoingProject() {
+		paneSelFilter = null;   // a selection snapshot names another project's elements (Task 757)
 		rememberCurrentView();   // ...and where we were looking in it
 		saveToStorage(); // flush the outgoing project before switching away from it
 		rememberSwitchState();   // ...and what we worked out about it (Task 680)

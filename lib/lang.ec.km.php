@@ -1337,7 +1337,6 @@ $ec_lang['lpn_pane_unselect_on_map']='ដកជ្រើសរើសលើផែ
 
 
 $ec_lang['lpn_pane_print']='បោះពុម្ពតារាង';
-$ec_lang['lpn_pane_print_tip']='បោះពុម្ពតារាងដែលអ្នកកំពុងមើល ជាមួយឈ្មោះគម្រោង ឈ្មោះតារាង និងឯកតានៅក្នុងក្បាលជួរឈរ។ ជួរដេកបោះពុម្ពតាមលំដាប់ដែលអ្នកបានតម្រៀប។';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and

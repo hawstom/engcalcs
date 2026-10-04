@@ -1490,6 +1490,13 @@ $ec_lang['lpn_pane_filter_stale']='Rows that no longer match: {n}.';
 // Not lpn_pane_none: the network may be full of pipes and none of them match the filter, which is a
 // different fact and the one the reader needs.
 $ec_lang['lpn_pane_filter_none']='Nothing in this table matches the filter.';
+// Selection only (Task 757): the Tables pane filtered to what is selected on the map. Parallel to
+// lpn_pane_filter_note. The line names the Find filter too when both are on.
+$ec_lang['lpn_pane_filter_sel_note']='Selection only. Showing {n} of {all}.';
+$ec_lang['lpn_pane_filter_sel_and']='Filtered by {q} and selection only. Showing {n} of {all}.';
+$ec_lang['lpn_pane_filter_sel_none']='None of the selected elements are in this table.';
+$ec_lang['lpn_pane_sel_only']='Selection only';
+$ec_lang['lpn_pane_sel_only_none']='No elements are selected. Select elements on the map first.';
 // The pin beside the ID in the first column. The ID itself was this control until 2026-09-19,
 // underlined and turning link blue; the ID is an ordinary editable cell now and this is the way
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
@@ -1500,7 +1507,6 @@ $ec_lang_syn['lpn_goto_on_map']='Bring this into view on the map, Zoom to this o
 $ec_lang['lpn_pane_select_on_map']='Select on map';
 $ec_lang['lpn_pane_unselect_on_map']='Unselect on map';
 $ec_lang['lpn_pane_print']='Print table';
-$ec_lang['lpn_pane_print_tip']='Print the table you are looking at, with the project name, the table name, and the units in the headings. Rows print in the order you sorted them into.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and

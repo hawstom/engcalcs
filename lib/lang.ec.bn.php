@@ -1339,7 +1339,6 @@ $ec_lang['lpn_pane_unselect_on_map']='মানচিত্রে নির্�
 
 
 $ec_lang['lpn_pane_print']='টেবিল প্রিন্ট করুন';
-$ec_lang['lpn_pane_print_tip']='আপনি এখন যে টেবিলটি দেখছেন তা প্রিন্ট করুন, শিরোনামে প্রকল্পের নাম, টেবিলের নাম ও এককসহ। সারিগুলো আপনি যে ক্রমে সাজিয়েছেন সেই ক্রমেই প্রিন্ট হয়।';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and

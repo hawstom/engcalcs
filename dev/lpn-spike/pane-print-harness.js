@@ -92,6 +92,7 @@ const L = loadLoopedNetwork(
 	// The print path through its own doors: build the sheet, and press the button. Reached by table
 	// ID rather than by six exports, because ONE printer serving six types is the thing under test.
 	"\t\tbuildPrintable: function (id) { return paneBuildPrintable(paneTableById(id)); },\n" +
+	"\t\tprintActive: function () { printPaneTable(activePaneTableSpec()); },\n" +
 	"\t\tactiveSpecId: function () { var s = activePaneTableSpec(); return s ? s.id : null; },\n" +
 	"\t\trenderTable: function (id) { renderPaneTable(paneTableById(id)); },\n" +
 	"\t\tsortTable: function (id, col) { sortPaneTable(paneTableById(id), col); },\n" +
@@ -353,18 +354,14 @@ console.log('\n--- pressing Print ---');
 {
 	// Findable by its id once it is in the page, which is what a real DOM does and what this stub's
 	// fixed id map cannot do for an element the page built.
-	byId.lpn_pane_print = byId.lpn_pane_strip.children.filter((c) => c.id === 'lpn_pane_print')[0] || null;
-	const btn = byId.lpn_pane_print;
-	report(!!btn, 'the pane head carries a Print button');
-	// ---- TASK 488: the button shares the tabs' wrapping flow, it does not own a column ----------
-	// Tom, 2026-08-23: "it monopolises a column in the bottom pane's header row, and the table tabs
-	// cannot wrap past it." The fix is structural and lives in two places at once, so both are
-	// asserted: the button is a CHILD of the wrapping strip, and the tablist inside that strip has
-	// no box of its own, which is what puts its tabs in the same flow as the button.
-	report(byId.lpn_pane_strip.children.indexOf(btn) === 0,
-		'...as the FIRST item of the wrapping strip, at the extreme left edge');
-	report(byId.lpn_pane_head.children.every((c) => c.id !== 'lpn_pane_print'),
-		'...and NOT a sibling of the strip, which is what gave it a column of its own');
+	// **NO BUTTON** (Tom, 2026-10-04: cleaner UI). Print table is a row of the Tables pane's
+	// right-click menu, so a press here is that row's action, and the strip holds no button.
+	const btn = { _listeners: { click: [function () { L.printActive(); }] } };
+	report(byId.lpn_pane_strip.children.every((c) => c.id !== 'lpn_pane_print')
+		&& byId.lpn_pane_head.children.every((c) => c.id !== 'lpn_pane_print'),
+		'the pane head carries no Print button');
+	report(/mk\(pc\.lpn_pane_print \|\| 'Print table', function \(\) \{ printPaneTable\(spec\); \}\);/.test(src),
+		'...and the right-click menu has a Print table row');
 	{
 		const php = fs.readFileSync(path.join(ROOT, 'Looped-Network.php'), 'utf8');
 		report(/id="lpn_pane_strip"[\s\S]{0,200}id="lpn_pane_tabs"/.test(php),
@@ -373,20 +370,13 @@ console.log('\n--- pressing Print ---');
 			'...and leaves the X outside it, so it stays pinned to the top-right corner');
 		report(/\.lpn-pane-strip \{[^}]*flex-wrap: wrap/.test(css), '...the strip is the wrapping row');
 		report(/\.lpn-pane-tabs \{ display: contents; \}/.test(css),
-			'...and the tablist has no box, so its tabs wrap beside the button and not inside it');
+			'...and the tablist has no box, so its tabs wrap');
 	}
-	report(!!btn && btn.textContent === 'Print table', '...labelled from its own lang key', btn && btn.textContent);
-	report(!!btn && /ec-help/.test(btn.className) && !!btn.title,
-		'...with a tip a tap can reveal, like every other control on this page');
-	report(/lpn_pane_print'\]=/.test(en) && /lpn_pane_print_tip'\]=/.test(en),
-		'both strings are English lang keys, translatable');
-	// **PROFILE IS NOT A TABLE.** The button is not there, and the printer cannot be reached for it.
+	report(/lpn_pane_print'\]=/.test(en), 'the row label is an English lang key, translatable');
 	L.openPane('profile');
 	report(L.activeSpecId() === null, 'on the Profile tab there is no table to print');
-	report(btn.style.display === 'none', '...so the button is not shown');
 	L.setPaneTab('valves');
 	report(L.activeSpecId() === 'valves', 'on a table tab the active table IS that tab');
-	report(btn.style.display !== 'none', '...and the button is back');
 
 	// And the press itself. What the browser sees at the moment it prints is the whole of the
 	// contract: the sheet on the body, and the flag that hides everything else.
@@ -421,7 +411,7 @@ console.log('\n--- pressing Print ---');
 // puts the real one back afterwards. Characters a file name cannot carry are replaced first.
 console.log('\n--- the print title, {project}-{table}, restored afterward ---');
 {
-	const btn = byId.lpn_pane_print;
+	const btn = { _listeners: { click: [function () { L.printActive(); }] } };
 	const origTitle = global.document.title;
 	L.setProjectName(PROJECT_NAME);
 	L.setPaneTab('junctions');
@@ -471,7 +461,6 @@ console.log('\n--- what the print stylesheet promises ---');
 		'the heading row repeats on every sheet of a long table');
 	report(/#lpn_print_area \.lpn-print-table thead th \{\s*position: static/.test(css),
 		'...and is not the screen’s sticky row, which has no meaning on paper');
-	report(/\.lpn-pane-print \{/.test(css), 'the button has a style of its own');
 }
 
 // **THE SHEET IS THE SCREEN'S TABLE AT ONE SCALE FACTOR** (Tom, 2026-09-21: *"it's important to

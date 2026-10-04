@@ -1331,7 +1331,6 @@ $ec_lang['lpn_goto_on_map']='Auf der Karte anzeigen';
 $ec_lang['lpn_pane_select_on_map']='Auf der Karte auswählen';
 $ec_lang['lpn_pane_unselect_on_map']='Auswahl auf der Karte aufheben';
 $ec_lang['lpn_pane_print']='Tabelle drucken';
-$ec_lang['lpn_pane_print_tip']='Druckt die Tabelle, die Sie gerade ansehen, mit Projektname, Tabellenname und den Einheiten in den Spaltenüberschriften. Die Zeilen werden in der Reihenfolge gedruckt, in die Sie sie sortiert haben.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and

@@ -1331,7 +1331,6 @@ $ec_lang['lpn_goto_on_map']='Arată pe hartă';
 $ec_lang['lpn_pane_select_on_map']='Selectează pe hartă';
 $ec_lang['lpn_pane_unselect_on_map']='Deselectează pe hartă';
 $ec_lang['lpn_pane_print']='Tipărește tabelul';
-$ec_lang['lpn_pane_print_tip']='Tipărește tabelul pe care îl vedeți, cu numele proiectului, numele tabelului și unitățile de măsură în antete. Rândurile se tipăresc în ordinea în care le-ați sortat.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
