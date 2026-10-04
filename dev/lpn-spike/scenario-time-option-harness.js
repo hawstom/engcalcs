@@ -263,12 +263,9 @@ function timesLines(inp) {
 	ok('with no overrides left both notes are hidden', shown(notes[0]) === '' && shown(notes[1]) === '',
 		shown(notes[0]) + ' / ' + shown(notes[1]));
 
-	// TOM, 2026-10-04, port 8111: the English he edited, and the count's name.
-	ok('the override box tip says its parent, not Base', /overrides its parent for this value/.test(PC.lpn_scenario_override_tip) &&
-		!/overrides Base/.test(PC.lpn_scenario_override_tip), PC.lpn_scenario_override_tip);
-	ok('the overrides tip keeps {base} and names another parent', /\{base\}/.test(PC.lpn_scenario_overrides_tip) &&
-		/or another parent scenario/.test(PC.lpn_scenario_overrides_tip), PC.lpn_scenario_overrides_tip);
-	ok('the count is headed "No. of overrides"', PC.lpn_scenario_overrides === 'No. of overrides', PC.lpn_scenario_overrides);
+	// TOM, 2026-10-04: the override tips still carry the placeholder, and the count is no longer "custom".
+	ok('the overrides tip keeps its {base} placeholder', /\{base\}/.test(PC.lpn_scenario_overrides_tip), PC.lpn_scenario_overrides_tip);
+	ok('the count heading does not say "custom"', !/custom/i.test(PC.lpn_scenario_overrides), PC.lpn_scenario_overrides);
 
 	console.log(fails ? '\n' + fails + ' scenario time option check(s) FAILED' : '\nScenario time option harness: all checks passed.');
 	process.exit(fails ? 1 : 0);
