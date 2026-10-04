@@ -63,7 +63,8 @@ exports.run = async function ({ browser, report }) {
 		await a.toolbarClick('Settings');
 		await a.settle(500);
 		const items = await a.page.evaluate(() =>
-			[...document.querySelectorAll('#lpn_units_strip .lpn-units-item')].map((it) => {
+			// The derived "Map coordinates" line (12101663, 2026-09-23) is an item with no select: not a selector.
+			[...document.querySelectorAll('#lpn_units_strip .lpn-units-item')].filter(it => it.querySelector('select')).map((it) => {
 				const name = it.querySelector('.lpn-units-name').getBoundingClientRect();
 				const sel = it.querySelector('select').getBoundingClientRect();
 				const box = it.getBoundingClientRect();

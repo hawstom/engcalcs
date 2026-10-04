@@ -78,11 +78,11 @@ function assertCase($repoRoot, $check, $label, $xml, $wantExit, $wantText) {
 
 echo "sitemap canonical selftest\n";
 
-$LWN = 'https://librewaternet.org';
+$LWN = 'https://epanet-plus-plus.org'; // the map application's canonical origin
 $HEC = 'https://hawsedc.com';
 
 // 1. HEALTHY. Every URL self-canonical, on both origins: the calculators on hawsedc.com and the map
-//    application at its declared librewaternet.org address. The check must pass, or it fails
+//    application at its declared epanet-plus-plus.org address. The check must pass, or it fails
 //    everything and proves nothing.
 assertCase($repoRoot, $check, 'a clean sitemap passes',
     wrap(["$HEC/engcalcs/About.php?lang=en", "$HEC/engcalcs/About.php?lang=es", "$LWN/app/?lang=en"]),
@@ -138,7 +138,7 @@ assertCase($repoRoot, $check, 'a calculator advertised on the other origin is re
 //    without this leg the check would be a one-way ratchet that only ever defends hawsedc.com.
 assertCase($repoRoot, $check, 'the app advertised on the calculators\' origin is refused',
     wrap(["$HEC/app/?lang=en"]),
-    1, 'the page nominates the origin https://librewaternet.org');
+    1, 'the page nominates the origin https://epanet-plus-plus.org');
 
 echo ($fails ? "\nFAIL: $fails of $ran selftest cases failed.\n" : "\nPASS: all $ran selftest cases.\n");
 exit($fails ? 1 : 0);

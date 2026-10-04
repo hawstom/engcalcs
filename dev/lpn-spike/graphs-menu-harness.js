@@ -34,8 +34,8 @@ async function main() {
 			const top = await rows();
 			ok('Water menu has a Graphs row', top.includes(names.g), top.join('|'));
 			const gTip = await page.$eval('#lpn_menu_popup .lpn-menu-row:has-text("' + names.g + '")', (e) => e.getAttribute('data-bs-original-title') || e.title);
-			const wantTip = await page.evaluate(() => window.EngCalcs.pageConfig.lpn_graphs_menu_tip);
-			ok('Graphs row carries its tip', !!wantTip && gTip === wantTip, gTip);
+			// Tom, 2026-10-04 tip verdicts: the Graphs row's tip was deleted, so it must carry none.
+			ok('Graphs row carries no tip (lpn_graphs_menu_tip deleted)', !gTip, gTip);
 			ok('...and no top-level ' + label + ' row', !top.includes(label), top.join('|'));
 			await page.click('#lpn_menu_popup .lpn-menu-row:has-text("' + names.g + '")');
 			await page.waitForTimeout(250);

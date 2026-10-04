@@ -135,8 +135,6 @@ const EC_HARNESS_WORDING_EXCEPT = [
             '(b) the name of a fixture project in the library, which the status bar must name back.',
     ],
     'dev/lpn-spike/small-screen-harness.js' => [
-        'the welcome line' =>
-            '(b) the harness\'s own name for #ec-page-welcome, in its failure messages.',
         ' on the desktop' =>
             '(b) half of a failure message built by concatenation, not an assertion at all.',
     ],

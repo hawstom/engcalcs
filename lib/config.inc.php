@@ -145,6 +145,12 @@ define('EC_LWN_APP_URL', EC_LWN_ORIGIN . '/app/');
 // application who wants to know what this project is has nowhere to go without it -- Tom:
 // *"No way to get back to LibreWaterNet.org from the map."*
 define('EC_LWN_SITE_URL', EC_LWN_ORIGIN . '/');
+// The EPANET++ front door and its map application (Tom, 2026-10-04: the suite's Hydraulics menu
+// and the map page served from hawsedc.com say and link EPANET++). A brand name is a name, so
+// neither the label nor these URLs are language keys. Same tab, like EC_LWN_APP_URL above.
+define('EC_EPP_ORIGIN', 'https://epanet-plus-plus.org');
+define('EC_EPP_SITE_URL', EC_EPP_ORIGIN . '/');
+define('EC_EPP_APP_URL', EC_EPP_ORIGIN . '/app/');
 
 /**
  * The name the page being served presents itself under, and where that name links (Task 697).
@@ -156,9 +162,13 @@ define('EC_LWN_SITE_URL', EC_LWN_ORIGIN . '/');
  * base.inc.php has loaded Canonical.lib.php.
  */
 function ecAppBrandCurrent() {
-    $script = isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '';
-    $brand = function_exists('ecAppBrand') ? ecAppBrand($script, CANONICAL_ORIGIN, EC_CANONICAL_HOST) : null;
-    return $brand !== null ? $brand : array('name' => 'LibreWaterNet.org', 'site' => EC_LWN_SITE_URL);
+    // LibreWaterNet is librewaternet.org's own name and nobody else's (Tom, 2026-10-04). Any other
+    // host, declared or not, presents EPANET++. The brand keys on the serving host the whitelist
+    // matched, so a spoofed Host header can select no more than one of these two answers.
+    if (EC_CANONICAL_HOST === 'librewaternet.org') {
+        return array('name' => 'LibreWaterNet.org', 'site' => EC_LWN_SITE_URL);
+    }
+    return array('name' => 'EPANET++', 'site' => EC_EPP_SITE_URL);
 }
 function ecAppBrandName() { $b = ecAppBrandCurrent(); return $b['name']; }
 function ecAppSiteUrl()   { $b = ecAppBrandCurrent(); return $b['site']; }

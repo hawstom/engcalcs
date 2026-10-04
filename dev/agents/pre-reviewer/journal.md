@@ -3773,3 +3773,35 @@ NOT RUN: georef two-point/Keep placement, Revert/Save as, cascade multi-delete w
 Seam lpnDialogAnswerer: only lpn-dom-stub.js, lock-ask-browser-drive.js, dev/browser-pass/lib/pickers.js inject it; none in shipped js.
 # Perry 1004c feat/tip-verdict
 OBSERVED: elev_source_tip rewrite+2 requests not applied; mean_err_tip/pane_print_tip/time_run_tip delete verdicts not honoured; style leftovers (Checked/Click in scenario tips, "typed above"). Harnesses tip-verdict, deleted-key, default-pattern, custom-property pass. Headless load: 0 console errors, no empty titles.
+
+## 2026-10-04 -- feat/chain-draw (Task 719), SHA b480ed0b
+OBSERVED (real Chromium, preview :8106; probes in scratchpad/perry/p*.js):
+- Core chain works: nodes/pipes counts exact on every exit (Escape, 2xEsc, right-click, button again, keys 1/2, new project, tab switch). No dangling pipe/orphan found. Snap radius ~12-14 screen px at all zooms.
+- Dbl-click makes one junction, not two. Undo walks chain back correctly; Redo does NOT carry the ring forward.
+- Click on a pipe ends the chain AND drops to Select with Properties open (inherited LINK_CLICK_EXITS_MODE).
+- Phone: mode line is 0x0 (hidden), so "Press Escape" never shown; no on-screen way to end chain except Edit > Select.
+- Toolbar goes 1 row -> 2 rows at window widths ~1201-1300 because of the extra button (measured by hiding it).
+- Stale red rubber band over last pipe until pointer moves; after pan/pinch on touch it persists -- same in Pipe tool (inherited).
+- Harness mutation: 4 mutants all caught (8,8,5,2 FAILs).
+- Agent report said "Insert > Junction and Pipe": true, it is Water > Insert.
+SPECULATION: none left.
+
+# Perry journal, feat/pda ac32b95f, 2026-10-04
+
+OBSERVED (re-verify before citing): Net1 US PDA min20/req150: page delivered demands equal epanet-js on the page's own export (131.24, 129.59, 87.21...). EPS steps show per-step deficits. Recalc OFF keeps snapshot.
+OBSERVED: Convert as US->SI leaves minPressure/reqPressure unconverted (20/150 become 20/150 m H2O); convertUnitValues has no hydraulics branch.
+OBSERVED: import of GPM file with `Pressure KPA` reads Required 400 as psi; EPANET reads kPa. Page delivered J1 81.98 vs EPANET 235.38.
+OBSERVED: Required<=Minimum -> EPANET Error 200 shown with "numbers on screen came from the built-in solver" (false: nothing is shown).
+OBSERVED: leftover Min/Req written to export after switching back to DDA; EPANET rejects Min>=Req even under DDA.
+OBSERVED: EPANET GPM default Required Pressure is 0.1 psi (measured with epanet-js); tip says 0.142 in US.
+OBSERVED: mutation: harness misses a broken Minimum-pressure conversion and a dropped Minimum Pressure line (all its cases use min 0).
+Scripts: scratchpad/perry/p*.js, mutation copy scratchpad/perry/mut.
+
+## Re-review at 6112980a (OBSERVED)
+1 Convert as: fixed (14.07/105.5 m; same 87.5% delivery) but Settings shows 14.068774521117009 unrounded.
+2 Required<=Min: fixed, clear message, also catches blank Required with big Min.
+3 `Pressure KPA`: not honoured, now REPORTED in import dialog; answer still wrong by design.
+4 leftover DDA export: fixed (no lines; epanet-js opens it).
+5 default tip: fixed ("The default is 0.1 psi"; blank now sent as 0.1 psi).
+6 dropdown fits ("Pressure driven"); stale unit labels until Settings reopened: not fixed.
+Mutants: Minimum Pressure line omitted: now caught. Minimum conversion removed: STILL not caught (psi case).

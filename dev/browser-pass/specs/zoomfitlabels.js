@@ -146,9 +146,25 @@ async function dragLabels(a) {
 	return ends.length;
 }
 
+// The XY Net3 example ships with "Show labels when zoomed to 30 or less" (feat/label-limit, 2026-09-25), so
+// at the fit its labels are hidden and every check below would pass over ZERO labels. Blank the
+// threshold, in Settings as a person would, so there is something to be on the map.
+async function showAllLabels(a) {
+	await a.toolbarClick('Settings');
+	await a.settle(500);
+	await a.page.evaluate(() => {
+		const i = document.getElementById('lpn_set_label_max_width');
+		i.value = '';
+		i.dispatchEvent(new Event('change', { bubbles: true }));
+	});
+	await a.settle(300);
+	await a.page.evaluate(() => { document.getElementById('lpn_setbox_close').click(); });
+	await a.settle(300);
+}
+
 exports.run = async function ({ browser, report }) {
 	const list = [['lpn_ex_net1_title'], ['lpn_ex_basic_us_title'], ['lpn_ex_basic_si_title', dragLabels],
-		['lpn_ex_net2_title'], ['lpn_ex_net3_title'], ['lpn_ex_elm_street_title'],
+		['lpn_ex_net2_title'], ['lpn_ex_net3_title', showAllLabels], ['lpn_ex_elm_street_title'],
 		['lpn_ex_net3_world_title', null, false]];
 	for (const [key, prep, strict] of list) {
 		const a = await Session.open(browser, 'zoomfitlbl-' + Date.now());

@@ -39,6 +39,15 @@ exports.run = async function ({ browser, report }) {
 		await a.dismissGallery();
 		await a.newGeoProject();
 		await a.settle(900);
+		// A fixed 900 ms settle was flaky under load (tiles not yet drawn, or not yet placed inside the
+		// canvas); poll for a tile whose corner can be pointed at, up to 8 s, instead.
+		await a.waitFor(() => a.page.evaluate(() => {
+			const c = document.getElementById('lpn_canvas').getBoundingClientRect();
+			return [...document.querySelectorAll('.lpn-basemap image')].some((el) => {
+				const r = el.getBoundingClientRect();
+				return r.x > c.x + 8 && r.y > c.y + 8 && r.x < c.right - 8 && r.y < c.bottom - 8;
+			});
+		}), 'a tile corner inside the canvas', 8000);
 
 		// ---- the tiles are there, and they are the right ones -------------------------------
 		const tiles = await a.page.$$eval('.lpn-basemap image', (els) => els.map(e => ({

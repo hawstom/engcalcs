@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**19 still to read on master**, of 68 untranslated keys, of 2347 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**27 still to read on master**, of 76 untranslated keys, of 2307 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (11 to read @@ NEEDS RULING)
+## Questions from the translators  (10 to read @@ NEEDS RULING)
 
 **These are SHIPPED strings, already translated into 26 languages.** A wave-0
 reading or a translator found each one readable two ways, and no sprint launches while one is
@@ -90,7 +90,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED: 'With each tested junction’s fire flow drawn in turn, nothing in the design check scope went outside its limits.'
   @@ NEEDS RULING
 - **`lpn_new_coordsys_tip`**
-  > Choose the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Convert as…”, and it is approximate.
+  > Choose the coordinate system of your network. This is permanent; the only way to convert a network to different coordinates is with “File, Convert as…”, and it is approximate.
   *The finding:* 'This is permanent' is contradicted by 'the only way ... convert', and 'it is approximate' has no clear referent (the choice, the conversion, or the network)
   1. the choice cannot change, except by a conversion that is approximate
   2. the network can be converted by one route only, and the network's coordinates are approximate
@@ -113,22 +113,46 @@ is the one you meant. "The first one" is a complete answer.
   **What this asks for:** which of the readings above you meant.
   *The proposal:* PROPOSED: 'No new assets of this group are selected on the map.'
   @@ NEEDS RULING
-- **`lpn_ts_add_tip`**
-  > Put everything now selected on the map onto the graph.
-  *The finding:* Says 'everything now selected', but tsAddSelection() (js/looped-network.js:29915) adds only selected assets of the current group (Nodes or Links); 'now' also reads as 'at this moment' vs 'newly'
-  1. every selected asset of any kind goes onto the graph
-  2. only the selected assets of the group shown (Nodes or Links) go onto the graph
-  **What this asks for:** which of the readings above you meant.
-  *The proposal:* PROPOSED: 'Put the selected nodes or links (whichever group is shown) on the map onto the graph.'
-  @@ NEEDS RULING
 
-## Synonym entries to approve  (13, 13 to read @@ NEEDS RULING)
+## Synonym entries to approve  (19, 19 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
 as is, change it (a proposal may follow), or remove it. **Your answer on the flag line is the
 written permission** the rule requires; CC then applies it by hand and re-records it. A script
 never edits a synonym.
+
+- **`calc_set_units_tip`**
+  > Sets the unit of every field at once. Non-destructive: the numbers you entered stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Sets the unit of every field at once. Non-destructive: the numbers you typed stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.
+  *Current synonym:* Changes the unit shown on every field at once (switches the whole page to that unit system). Does not change the input data.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`consent_body`**
+  > May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.
+  *Current synonym:* May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`ip_is_lateral`**
+  > <span class="ec-help" title="Selected: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* <span class="ec-help" title="Checked: this reach is a segment of the test lateral, from which individual emitters withdraw water. Unchecked: this reach is a main, only passing flow along to laterals not on the test path.">Lat. <span class="ec-tip">?</span></span>
+  *Current synonym:* | gloss: lateral, mainline; avoid: "test" read as typical/sample
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
+- **`lpn_backdrop_scale_entry_bad`**
+  > Enter one number for the size of one pixel on the map, or paste all six lines of a world file.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* Type one number for the size of one pixel on the map, or paste all six lines of a world file.
+  *Current synonym:* World (Map Coordinates or Georeference) File for the image | gloss: world file
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
 
 - **`lpn_ds_head_search_selected`**
   > What demand scale can these junctions handle?
@@ -208,6 +232,14 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
+- **`lpn_labels_priority_node_tip`**
+  > The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first. When only one value is left and two labels still overlap, one of them is hidden: the one with the lower demand, with pressure nearer the middle of the range, or with elevation or head more like its neighboring nodes.
+  *Why stale:* the English changed after this synonym was written
+  *Written against:* The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.
+  *Current synonym:* more like neighboring nodes = numerically closer to the neighbors' values | avoid: similar in kind
+  **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
+  @@ NEEDS RULING
+
 - **`lpn_lock_break`**
   > Break lock
   *Why stale:* the English changed after this synonym was written
@@ -216,6 +248,14 @@ never edits a synonym.
   *Proposed synonym:* Break lock, Unlock the file, Take over the file, Override their claim | layout: button
   *Why this proposal:* Dropped the options that only made sense with the old English "Break their lock".
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
+  @@ NEEDS RULING
+
+- **`lpn_profile_tip`**
+  > (this key no longer exists in lib/lang.ec.en.php)
+  *Why stale:* the key no longer exists, so this entry describes nothing
+  *Written against:* Draw the ground and the hydraulic grade line along a path through the network.
+  *Current synonym:* Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.
+  **What this asks for:** WRITTEN PERMISSION to remove this `$ec_lang_syn` entry.
   @@ NEEDS RULING
 
 - **`lpn_settings_map_display`**
@@ -254,7 +294,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (68, 19 to read @@ NEEDS RULING)
+## lpn_  (76, 27 to read @@ NEEDS RULING)
 
 - **`lpn_analyze_at_time`**
   > Time step: {time}.
@@ -262,6 +302,33 @@ never edits a synonym.
 - **`lpn_analyze_time_moved`**
   > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
   _Ruled OK 2026-10-03._
+- **`lpn_basemap_style_faded`**
+  > Faded
+  @@ NEEDS RULING
+- **`lpn_basemap_style_grayscale`**
+  > Grayscale
+  @@ NEEDS RULING
+- **`lpn_basemap_style_muted`**
+  > Muted
+  @@ NEEDS RULING
+- **`lpn_basemap_style_normal`**
+  > Normal
+  @@ NEEDS RULING
+- **`lpn_choice_default`**
+  > Default
+  @@ NEEDS RULING
+- **`lpn_contour_show`**
+  > Show contours
+  @@ NEEDS RULING
+- **`lpn_contour_show_tip`**
+  > Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.
+  @@ NEEDS RULING
+- **`lpn_cp_allow_tip`**
+  > Allow only these characters:
+  @@ NEEDS RULING
+- **`lpn_cp_characters_tip`**
+  > "@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.
+  @@ NEEDS RULING
 - **`lpn_dock_autohide`**
   > Auto-hide
   @@ NEEDS RULING
@@ -275,8 +342,8 @@ never edits a synonym.
   > Dock at the right of the map
   @@ NEEDS RULING
 - **`lpn_ds_bad_multiplier`**
-  > Type a demand scale of zero or more, such as 1.5.
-  _Ruled OK 2026-10-03._
+  > Enter a demand scale of zero or more, such as 1.5.
+  @@ NEEDS RULING
 - **`lpn_ds_below_zero`**
   > ⚠ At least one junction is below {pressure} even with the scaled demands at zero.
   _Ruled OK 2026-10-03._
@@ -400,12 +467,6 @@ never edits a synonym.
 - **`lpn_ds_title`**
   > Demand scaling
   _Ruled OK 2026-10-03._
-- **`lpn_graphs_menu_tip`**
-  > Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.
-  @@ NEEDS RULING
-- **`lpn_mode_add_chain`**
-  > Mode: Add Junction and Pipe. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
-  @@ NEEDS RULING
 - **`lpn_pane_filter_sel_and`**
   > Filtered by {q} and selection only. Showing {n} of {all}.
   @@ NEEDS RULING
@@ -424,6 +485,9 @@ never edits a synonym.
 - **`lpn_pane_sel_only_none`**
   > No elements are selected. Select elements on the map first.
   @@ NEEDS RULING
+- **`lpn_pane_sort_desc`**
+  > Sort descending
+  _Ruled OK 2026-09-26._
 - **`lpn_pane_width_tip`**
   > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
   @@ NEEDS RULING
@@ -451,21 +515,21 @@ never edits a synonym.
 - **`lpn_saved_session`**
   > Not saved
   @@ NEEDS RULING
+- **`lpn_settings_basemap_style`**
+  > Basemap style
+  @@ NEEDS RULING
+- **`lpn_settings_basemap_style_tip`**
+  > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.
+  @@ NEEDS RULING
 - **`lpn_sysflow_title`**
   > Flow balance
   _Ruled OK 2026-10-03._
-- **`lpn_tool_add_chain`**
-  > Junction and Pipe
-  @@ NEEDS RULING
-- **`lpn_tool_add_chain_tip`**
-  > Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
-  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**34 still to read**, of 42 new keys across 16 unmerged branch(es).
+**29 still to read**, of 36 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -476,36 +540,19 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/basemap-style (`0bc4d9bb`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/chain-draw (`de6b793e`) — 3 new, 3 to read @@ NEEDS RULING
 
-- **`lpn_basemap_style_faded`**
-  > Faded
+- **`lpn_mode_add_chain`**
+  > Mode: Add Junction and Pipe. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
   @@ NEEDS RULING
-- **`lpn_basemap_style_grayscale`**
-  > Grayscale
+- **`lpn_tool_add_chain`**
+  > Junction and Pipe
   @@ NEEDS RULING
-- **`lpn_basemap_style_muted`**
-  > Muted
+- **`lpn_tool_add_chain_tip`**
+  > Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
   @@ NEEDS RULING
-- **`lpn_basemap_style_normal`**
-  > Normal
-  @@ NEEDS RULING
-- **`lpn_settings_basemap_style`**
-  > Basemap style
-  @@ NEEDS RULING
-- **`lpn_settings_basemap_style_tip`**
-  > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.
-  @@ NEEDS RULING
-
-### feat/chain-draw (`e0bc5e0f`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
-
-### feat/dialog-audit (`9bdb5559`) — adds no English strings
-
-### feat/elev-default (`90f33841`) — adds no English strings
-
-### feat/epanet-pp-brand (`3655b959`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -527,13 +574,19 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/pda (`d895a470`) — 17 new, 17 to read @@ NEEDS RULING
+### feat/pda (`be8389fb`) — 19 new, 19 to read @@ NEEDS RULING
 
 - **`lpn_diag_pda_needs_epanet`**
   > The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.
   @@ NEEDS RULING
+- **`lpn_diag_pda_pressures`**
+  > Required pressure must be greater than Minimum pressure. Change one of them in Settings.
+  @@ NEEDS RULING
 - **`lpn_engine_pda_route`**
   > Solved with the EPANET solver, because the demand model is pressure driven.
+  @@ NEEDS RULING
+- **`lpn_inp_drop_pressure_unit`**
+  > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
   @@ NEEDS RULING
 - **`lpn_pda_deficit_note`**
   > Junctions receiving less than their demand: {n}.
@@ -554,13 +607,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Demand model
   @@ NEEDS RULING
 - **`lpn_settings_demand_model_dda`**
-  > Demand driven (DDA)
+  > Demand driven
   @@ NEEDS RULING
 - **`lpn_settings_demand_model_pda`**
-  > Pressure driven (PDA)
+  > Pressure driven
   @@ NEEDS RULING
 - **`lpn_settings_demand_model_tip`**
-  > Choose how junctions receive water. Demand driven delivers every demand in full, whatever the pressure. Pressure driven delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.
+  > Choose how junctions receive water. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.
   @@ NEEDS RULING
 - **`lpn_settings_min_pressure`**
   > Minimum pressure
@@ -578,7 +631,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Required pressure
   @@ NEEDS RULING
 - **`lpn_settings_req_pressure_tip`**
-  > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit.
+  > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.
   @@ NEEDS RULING
 
 ### feat/profile-file (`a095faf4`) — 4 new, all ruled
@@ -596,13 +649,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/scenario-option (`af125b8e`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/scenario-option (`f0d9897a`) — 7 new, 7 to read @@ NEEDS RULING
 
+- **`lpn_alt_calc_options`**
+  > Calculation options
+  @@ NEEDS RULING
 - **`lpn_scenario_duration_tip`**
-  > Overrides the project's total run time in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
+  > Overrides the total run time in this scenario. Leave it blank to use its parent's. A total run time of 0:00 is a steady-state run.
   @@ NEEDS RULING
 - **`lpn_scenario_hyd_step_tip`**
-  > Overrides the project's hydraulic time step in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time.
+  > Overrides the hydraulic time step in this scenario. Leave it blank to use its parent's.
   @@ NEEDS RULING
 - **`lpn_scncmp_at_time`**
   > {value} at {id}, {time}
@@ -615,28 +671,4 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_time_scn_overrides`**
   > Scenario overrides:
-  @@ NEEDS RULING
-
-### feat/tip-verdict (`a08acce9`) — 4 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_choice_default`**
-  > Default
-  @@ NEEDS RULING
-- **`lpn_cp_allow_tip`**
-  > Allow only these characters:
-  @@ NEEDS RULING
-- **`lpn_cp_characters_tip`**
-  > "@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.
-  @@ NEEDS RULING
-- **`lpn_pane_sort_desc`**
-  > Sort descending
-  _Ruled OK 2026-09-26._
-
-### fix/contour-off (`f2faac66`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_contour_show`**
-  > Show contours
-  @@ NEEDS RULING
-- **`lpn_contour_show_tip`**
-  > Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.
   @@ NEEDS RULING

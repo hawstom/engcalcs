@@ -314,7 +314,7 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(250);
 		const liveOrder = await keys(a);
 		report.ok(liveOrder.length === before.length - 1, 'OK applies the hide', JSON.stringify(liveOrder));
-		const liveNames = await a.page.evaluate((T) => [...document.querySelectorAll(T + ' thead .lpn-pane-sort')].map((b) => b.textContent), T);
+		const liveNames = await a.page.evaluate((T) => [...document.querySelectorAll(T + ' thead .lpn-pane-sort')].map((b) => b.textContent.replace(/\u00AD/g, '')), T);   // headings carry soft hyphens (U+00AD); the dialog's labels do not
 		report.ok(liveNames[0] === finalLabels[1] && liveNames[1] === finalLabels[3],
 			'...and OK applies the reorder to the live table, the pair in its own relative order', JSON.stringify({ liveNames, finalLabels }));
 		// **PERSISTS ACROSS A REBUILD**: switch tabs away and back, which throws the table's DOM away

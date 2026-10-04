@@ -514,7 +514,7 @@ html[lang="zh"] .ec-welcome {
    dev/browser-pass/specs/cursorflicker.js, and that spec still holds that bare map says the map's
    own cursor everywhere it shows through. What is superseded is the GLYPH twice over: `grab`,
    because this is not a web map, and then `pointer`, because he looked at it. */
-#lpn_canvas { touch-action: none; cursor: default; --lpn-sym: 1; --lpn-symf: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-backdrop-img-opacity: 1; --lpn-map-bg: #fff; }
+#lpn_canvas { touch-action: none; cursor: default; --lpn-sym: 1; --lpn-symf: 1; --lpn-opacity: 1; --lpn-backdrop-opacity: 1; --lpn-backdrop-img-opacity: 1; --lpn-basemap-style: none; --lpn-map-bg: #fff; }
 /* **AND NOTHING CHANGES WHILE THE MAP IS MOVING**, which is why there is no `#lpn_canvas.lpn-panning`
    rule here any more. It was `cursor: grabbing`, the closing half of the open hand, and it goes with
    the hand. `setPanning()` still writes the class on the one frame a pan really translates the map,
@@ -538,7 +538,7 @@ html[lang="zh"] .ec-welcome {
    the cursor, and a tile that could become an event target would sit between the user and every node
    it happens to cover. It shares the backdrop's fade for the same reason the backdrop has one -- a
    dense city map swallows a thin pipe. */
-.lpn-basemap { opacity: var(--lpn-backdrop-opacity, 1); pointer-events: none; }
+.lpn-basemap { opacity: var(--lpn-backdrop-opacity, 1); filter: var(--lpn-basemap-style, none); pointer-events: none; }
 /* Symbol opacity, for laying the network out over a backdrop image: applied to the two whole
    layers that hold symbols, so nodes/pipes/arrows/vertex handles fade together as one drawing
    rather than each fading independently and showing where they overlap. Labels, masks and leaders
@@ -1352,15 +1352,29 @@ html[lang="zh"] .ec-welcome {
    2026-08-16). Fixed to the bottom of the viewport rather than placed near the canvas: while a
    registration sequence runs, every normal interaction on the canvas is suppressed, so the message
    has to be somewhere the eye lands no matter where the user was clicking. High z-index for the same
-   reason -- it must outrank the panels the sequence itself puts on screen. */
+   reason -- it must outrank the panels the sequence itself puts on screen.
+   **DRESSED LIKE EVERY OTHER BOX ON THE PAGE** (Tom, 2026-10-04: *"It is in dark mode unlike
+   everything else."*): the page background, the box ink, the one-pixel ink border and the box
+   shadow #lpn_dialog and the Settings box wear. It was the one dark strip on a light page. */
 .lpn-regmode-bar {
 	position: fixed; left: 50%; transform: translateX(-50%); bottom: 1em;
 	z-index: 3000; display: flex; align-items: center; gap: 0.75em;
-	padding: 0.5em 0.9em; border-radius: 4px;
-	background: var(--ec-ink-strong); color: var(--ec-bg); font-size: 0.95em;
-	box-shadow: 0 2px 8px var(--ec-a-0-0-0-35);
+	padding: 8px 12px;
+	background: var(--ec-bg); color: var(--ec-ink); border: 1px solid var(--ec-ink);
+	box-shadow: 2px 2px 6px var(--ec-a-0-0-0-3);
+	/* max-content, as #lpn_dialog: placed at left: 50%, the bar otherwise shrank to the half of the
+	   window to its right, and on a phone stood as a 195 px column over the map. */
+	width: max-content; max-width: calc(100vw - 2em); box-sizing: border-box;
 }
-.lpn-regmode-bar button { font: inherit; padding: 0.15em 0.7em; cursor: pointer; }
+/* **ON A PHONE IT IS A BAND ALONG THE FOOT OF THE WINDOW** (Perry's review, 2026-10-04): full width
+   less the gutters, small type, so the map above it, where the picking happens, stays clear. */
+@media (max-width: 600px) {
+	.lpn-regmode-bar {
+		left: 8px; right: 8px; bottom: 8px; transform: none; width: auto; max-width: none;
+		padding: 6px 8px; gap: 0.5em; font-size: 0.85em; line-height: 1.3;
+	}
+}
+.lpn-regmode-bar button { cursor: pointer; }
 @media print { .lpn-regmode-bar { display: none; } }
 /* **A THING THE USER CANNOT SEE CANNOT BE GRABBED**, and this one keyword is what makes invisibility
    and un-grabbability the same fact instead of two facts that can disagree (Tom, 2026-09-01: *"a
@@ -1602,6 +1616,21 @@ html[lang="zh"] .ec-welcome {
    exceeded. This is the same rule every other overlay here follows: wide and tall content scrolls
    inside its own container rather than moving the page. */
 #lpn_dialog_body { max-height: 60vh; overflow-y: auto; overscroll-behavior: contain; }
+/* **THE ONE QUESTION BOX** (Task 710, Tom 2026-10-04: *"The browser-style boxes aren't pretty. I
+   think they all should be converted."*). Every former alert/confirm/prompt is askDialog() in
+   js/looped-network.js, drawn in #lpn_dialog. A titled ask wears the same 40 px title band as every
+   other box (.lpn-setbox-title), so the padding makes room for it. Narrower than the window on a
+   phone in tall mode, never wider. The message keeps its own line breaks (consent paragraphs). */
+/* `width: max-content` because a box placed at left: 50% only shrinks to fit the HALF of the window
+   to its right: a long question on a phone was a 195 px column. Capped, it takes the room it needs. */
+/* The padding lives HERE, not in the element's inline style: an inline `padding: 12px` outranked the
+   titled rule below, and the title band lay over the first line of every question (Tom, 2026-10-04,
+   Delete network). */
+#lpn_dialog { width: max-content; max-width: min(34em, calc(100vw - 2em)); box-sizing: border-box; padding: 12px; }
+#lpn_dialog.lpn-dialog-titled { padding-top: 51px; }
+.lpn-dialog-msg { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.lpn-dialog-input { display: block; width: 100%; box-sizing: border-box; margin-top: 8px; padding: 3px 6px; font: inherit; }
+textarea.lpn-dialog-input { min-height: 8em; font-family: monospace; }
 /* **AND THE SUITE NAVBAR'S OWN DROPDOWNS RISE WHILE THEY ARE OPEN** (Tom, 2026-09-02: *"The
    English selector is behind the non-modal (non-hog) boxes."*). Every menu that hangs off that bar -- the language selector among them -- opened behind them. A child cannot climb out
    of its parent's stacking context, so the bar itself has to rise, and it may only do so WHILE a
@@ -1659,6 +1688,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* The colour mark is an <img>, not an inline glyph (Tom chose colour here, 2026-09-11). Sized to
    the heading like its mono predecessor; `flex: none` so a long site name cannot squash it. */
 .lpn-about-name .lpn-about-mark { width: 1.5em; height: 1.5em; flex: none; }
+.lpn-about-dedication a { color: inherit; text-decoration: underline dotted; text-underline-offset: .2em; }
+.lpn-about-dedication a:hover, .lpn-about-dedication a:focus { text-decoration-style: solid; }
 /* .lpn-menubar-item's own hover/open/focus rules moved up next to its base rule, above, when this
    branch (feat/menu-button) gave the menu bar its blue button paint -- kept together so the whole
    state set reads in one place instead of two. */

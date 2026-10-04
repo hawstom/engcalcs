@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sr",
-        "expected_key_count": 2344,
-        "delta_key_count": 65,
+        "expected_key_count": 2307,
+        "delta_key_count": 76,
         "exempt_key_count": 33,
         "exempt_keys": [
             "calc_units_us",
@@ -712,6 +712,7 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_pane_sort_desc": "Sort descending",
         "lpn_pane_manage_cols_width": "Width (em)",
         "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
         "lpn_dock_left": "Dock at the left of the map",
@@ -723,16 +724,26 @@
         "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
         "lpn_pane_sel_only": "Selection only",
         "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
-        "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
         "lpn_result_pump_head": "Head",
         "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
         "lpn_report_pump_head": "Pump head",
+        "lpn_contour_show": "Show contours",
+        "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_cp_allow_tip": "Allow only these characters:",
+        "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
+        "lpn_settings_basemap_style": "Basemap style",
+        "lpn_settings_basemap_style_tip": "Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.",
+        "lpn_basemap_style_normal": "Normal",
+        "lpn_basemap_style_muted": "Muted",
+        "lpn_basemap_style_faded": "Faded",
+        "lpn_basemap_style_grayscale": "Grayscale",
         "lpn_saved_project": "Saved with the project",
         "lpn_saved_browser": "Saved in this browser",
         "lpn_saved_session": "Not saved",
+        "lpn_choice_default": "Default",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
         "lpn_ds_title": "Demand scaling",
@@ -773,12 +784,13 @@
         "lpn_ds_no_junctions": "This project has no junctions yet, so there are no demands to scale.",
         "lpn_ds_no_selection": "No junctions are selected. Select junctions or choose All junctions.",
         "lpn_ds_skipped": "Selected elements that are not junctions, left as they are: {n}.",
-        "lpn_ds_bad_multiplier": "Type a demand scale of zero or more, such as 1.5.",
+        "lpn_ds_bad_multiplier": "Enter a demand scale of zero or more, such as 1.5.",
         "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
         "lpn_analyze_at_time": "Time step: {time}.",
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "keys": {
+        "lpn_pane_sort_desc": "Sort descending",
         "lpn_pane_manage_cols_width": "Width (em)",
         "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
         "lpn_dock_left": "Dock at the left of the map",
@@ -790,16 +802,26 @@
         "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
         "lpn_pane_sel_only": "Selection only",
         "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
-        "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
         "lpn_result_pump_head": "Head",
         "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
         "lpn_report_pump_head": "Pump head",
+        "lpn_contour_show": "Show contours",
+        "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_cp_allow_tip": "Allow only these characters:",
+        "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
+        "lpn_settings_basemap_style": "Basemap style",
+        "lpn_settings_basemap_style_tip": "Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.",
+        "lpn_basemap_style_normal": "Normal",
+        "lpn_basemap_style_muted": "Muted",
+        "lpn_basemap_style_faded": "Faded",
+        "lpn_basemap_style_grayscale": "Grayscale",
         "lpn_saved_project": "Saved with the project",
         "lpn_saved_browser": "Saved in this browser",
         "lpn_saved_session": "Not saved",
+        "lpn_choice_default": "Default",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
         "lpn_ds_title": "Demand scaling",
@@ -840,12 +862,28 @@
         "lpn_ds_no_junctions": "This project has no junctions yet, so there are no demands to scale.",
         "lpn_ds_no_selection": "No junctions are selected. Select junctions or choose All junctions.",
         "lpn_ds_skipped": "Selected elements that are not junctions, left as they are: {n}.",
-        "lpn_ds_bad_multiplier": "Type a demand scale of zero or more, such as 1.5.",
+        "lpn_ds_bad_multiplier": "Enter a demand scale of zero or more, such as 1.5.",
         "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
         "lpn_analyze_at_time": "Time step: {time}.",
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "key_context": {
+        "lpn_pane_sort_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_sort_asc",
+                    "value": "Сортирај растуће",
+                    "english": "Sort ascending"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_manage_cols",
+                    "value": "Управљај колонама…",
+                    "english": "Manage columns…"
+                }
+            }
+        },
         "lpn_pane_manage_cols_width": {
             "reason": "missing",
             "current_value": null,
@@ -1022,30 +1060,14 @@
                 }
             }
         },
-        "lpn_graphs_menu_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_graphs_menu",
-                    "value": "Графикони",
-                    "english": "Graphs"
-                },
-                "next_translated": {
-                    "key": "lpn_profile_tip",
-                    "value": "Исцртај терен и хидрауличну линију напора дуж путање кроз мрежу.",
-                    "english": "Draw the ground and the hydraulic grade line along a path through the network."
-                }
-            }
-        },
         "lpn_pgraph_none": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ts_quantity_tip",
-                    "value": "Која вредност се приказује у зависности од времена.",
-                    "english": "Which value to graph against time."
+                    "key": "lpn_ts_group_links",
+                    "value": "Везе",
+                    "english": "Links"
                 },
                 "next_translated": {
                     "key": "lpn_ts_add",
@@ -1059,9 +1081,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ts_quantity_tip",
-                    "value": "Која вредност се приказује у зависности од времена.",
-                    "english": "Which value to graph against time."
+                    "key": "lpn_ts_group_links",
+                    "value": "Везе",
+                    "english": "Links"
                 },
                 "next_translated": {
                     "key": "lpn_ts_add",
@@ -1075,9 +1097,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ts_quantity_tip",
-                    "value": "Која вредност се приказује у зависности од времена.",
-                    "english": "Which value to graph against time."
+                    "key": "lpn_ts_group_links",
+                    "value": "Везе",
+                    "english": "Links"
                 },
                 "next_translated": {
                     "key": "lpn_ts_add",
@@ -1091,9 +1113,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ts_quantity_tip",
-                    "value": "Која вредност се приказује у зависности од времена.",
-                    "english": "Which value to graph against time."
+                    "key": "lpn_ts_group_links",
+                    "value": "Везе",
+                    "english": "Links"
                 },
                 "next_translated": {
                     "key": "lpn_ts_add",
@@ -1107,14 +1129,46 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ts_quantity_tip",
-                    "value": "Која вредност се приказује у зависности од времена.",
-                    "english": "Which value to graph against time."
+                    "key": "lpn_ts_group_links",
+                    "value": "Везе",
+                    "english": "Links"
                 },
                 "next_translated": {
                     "key": "lpn_ts_add",
                     "value": "Додај изабрано",
                     "english": "Add selected"
+                }
+            }
+        },
+        "lpn_contour_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_contour_plot",
+                    "value": "Контурни приказ",
+                    "english": "Contour plot"
+                },
+                "next_translated": {
+                    "key": "lpn_contour_fill",
+                    "value": "Попуна",
+                    "english": "Fill"
+                }
+            }
+        },
+        "lpn_contour_show_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_contour_plot",
+                    "value": "Контурни приказ",
+                    "english": "Contour plot"
+                },
+                "next_translated": {
+                    "key": "lpn_contour_fill",
+                    "value": "Попуна",
+                    "english": "Fill"
                 }
             }
         },
@@ -1131,6 +1185,134 @@
                     "key": "lpn_sysflow_produced",
                     "value": "Произведено",
                     "english": "Produced"
+                }
+            }
+        },
+        "lpn_cp_allow_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_cp_restrict_tip",
+                    "value": "Ограничи ове карактере: Вредност сме да користи само наведене карактере, или ниједан од њих, где „@“ означава било које слово; „#“ означава било коју цифру, а „-“, „.“ и „,“ морате посебно навести ако су дозвољени; сваки размак мора бити између других карактера.",
+                    "english": "Restrict these characters:"
+                },
+                "next_translated": {
+                    "key": "lpn_cp_restrict_mode",
+                    "value": "Дозволи или ограничи",
+                    "english": "Allow or restrict"
+                }
+            }
+        },
+        "lpn_cp_characters_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_cp_restrict_tip",
+                    "value": "Ограничи ове карактере: Вредност сме да користи само наведене карактере, или ниједан од њих, где „@“ означава било које слово; „#“ означава било коју цифру, а „-“, „.“ и „,“ морате посебно навести ако су дозвољени; сваки размак мора бити између других карактера.",
+                    "english": "Restrict these characters:"
+                },
+                "next_translated": {
+                    "key": "lpn_cp_restrict_mode",
+                    "value": "Дозволи или ограничи",
+                    "english": "Allow or restrict"
+                }
+            }
+        },
+        "lpn_settings_basemap_style": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "Непрозирност позадинске слике (0 до 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "Изглед",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_settings_basemap_style_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "Непрозирност позадинске слике (0 до 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "Изглед",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_basemap_style_normal": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "Непрозирност позадинске слике (0 до 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "Изглед",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_basemap_style_muted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "Непрозирност позадинске слике (0 до 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "Изглед",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_basemap_style_faded": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "Непрозирност позадинске слике (0 до 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "Изглед",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_basemap_style_grayscale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "Непрозирност позадинске слике (0 до 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "Изглед",
+                    "english": "Appearance"
                 }
             }
         },
@@ -1179,6 +1361,22 @@
                     "key": "lpn_settings_hydraulics",
                     "value": "Хидраулика",
                     "english": "Hydraulics"
+                }
+            }
+        },
+        "lpn_choice_default": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_library_pattern_none",
+                    "value": "Нема обрасца",
+                    "english": "No pattern"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_default_pattern",
+                    "value": "Подразумевани образац потрошње",
+                    "english": "Default demand pattern"
                 }
             }
         },

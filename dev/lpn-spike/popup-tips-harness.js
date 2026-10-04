@@ -43,6 +43,7 @@ function mkEl(tag) {
       (function walk(n) {
         (n.children || []).forEach(c => {
           if (sel === '.ec-help' && String(c.className).split(/\s+/).includes('ec-help')) out.push(c);
+          else if (sel === 'a' && String(c.tagName).toUpperCase() === 'A') out.push(c);
           walk(c);
         });
       })(el);
@@ -405,9 +406,10 @@ const PC = EngCalcs.pageConfig;
 ok('link popup: Roughness carries its tip',
    Object.keys(t).some(k => k.startsWith('Roughness') && t[k] === PC.lpn_field_roughness_tip),
    JSON.stringify(Object.keys(t)));
-ok('link popup: Minor loss k carries its tip',
-   Object.values(t).includes(PC.lpn_field_km_tip));
-ok('link popup: Length carries its tip', Object.values(t).includes(PC.lpn_field_length_tip));
+// lpn_field_km_tip and lpn_field_length_tip were deleted on Tom's 2026-10-04 tip verdicts: the
+// rows stay, with no tip, and no tip left anywhere in the popup is empty.
+ok('link popup: no tip is empty (km and Length tips deleted)',
+   !Object.values(t).some(v => !v), JSON.stringify(t));
 ok('link popup calls initTips on its container', global.__initTipsCalls.includes(pf));
 
 // --- 9b. THE REFERENCE TABLES, IN ALL FOUR PLACES A NUMBER IS TYPED -----
@@ -429,9 +431,10 @@ let lk = linksOf(pf);
 const roughKey = Object.keys(lk).find(k => k.startsWith('Roughness') || k === PC.lpn_field_roughness);
 ok('link popup: Roughness links to the table for the method in force',
    lk[roughKey] === ROUGH_URLS[L.frictionMethod()], roughKey + ' -> ' + lk[roughKey]);
-const kmKey = Object.keys(lk).find(k => k === (PC.lpn_field_km || ''));
-ok('link popup: Minor loss k links to the minor-loss table', lk[kmKey] === KM_URL,
-   kmKey + ' -> ' + lk[kmKey]);
+// The km row has no tip since 2026-10-04, so its link is a bare <a> that linksOf() (which walks
+// .ec-help) cannot see; it is found by its href instead.
+const anchorsTo = (c, url) => c.querySelectorAll('a').some(a => a.href === url);
+ok('link popup: Minor loss k links to the minor-loss table', anchorsTo(pf, KM_URL), KM_URL);
 
 // The Settings box's Values group -- the place Tom actually asked for, and a different call chain
 // (defaultRow -> row -> setFieldLabel) from the popup's (numberFieldPlain -> setFieldLabel).
@@ -443,18 +446,18 @@ const sRough = Object.keys(lk).find(k => k.startsWith(String(PC.lpn_field_roughn
 ok('Settings > Values: Roughness links to the table for the method in force',
    lk[sRough] === ROUGH_URLS[L.frictionMethod()], JSON.stringify(lk));
 ok('Settings > Values: Minor loss k links to the minor-loss table',
-   Object.values(lk).includes(KM_URL), JSON.stringify(lk));
+   anchorsTo(df, KM_URL), JSON.stringify(lk));
 // A link with no tip is a plain <a> and needs no .ec-help at all, so every row this section found
 // must ALSO be carrying its tip -- otherwise the wrapper is there for nothing.
 const st = tipsOf(df);
-ok('...and both Settings rows carry their tips as well as their links',
-   st[sRough] === L.roughnessTip() && Object.values(st).includes(PC.lpn_field_km_tip),
+ok('...and Roughness carries its tip as well as its link (the km tip was deleted 2026-10-04)',
+   st[sRough] === L.roughnessTip() && !Object.values(st).some(v => !v),
    JSON.stringify(st));
 
 global.__initTipsCalls.length = 0;
 L.renderNodeFields('J-1');
 t = tipsOf(pf);
-ok('junction popup: Elevation carries its tip', Object.values(t).includes(PC.lpn_field_elev_tip));
+ok('junction popup: no tip is empty (Elevation tip deleted 2026-10-04)', !Object.values(t).some(v => !v), JSON.stringify(t));
 ok('junction popup: Demand carries lpn_demand_tip, not bpn_demand_tip',
    Object.values(t).includes(PC.lpn_demand_tip));
 ok('junction popup calls initTips', global.__initTipsCalls.includes(pf));

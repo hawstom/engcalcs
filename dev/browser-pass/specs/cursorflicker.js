@@ -175,8 +175,16 @@ exports.run = async function ({ browser, report }) {
 		// is that the map and the objects on it do not say the same thing, and every object on this
 		// map says `default` on his own 2026-09-08 ruling.
 		const bare = mapCursor;
-		report.ok(bare !== 'default' && bare !== 'auto',
-			'the bare map carries a cursor of its own, so it does not read as dead space', bare);
+		// **THE MAP IS `default` AGAIN, BY DECISION** (8e503261, 2026-09-13: "Map default, object pointer").
+		// Tom reversed the pan cursor, so "not default" would now fail a page doing what he asked. What
+		// still holds is the relationship: the bare map does not say what an object says.
+		const objectCursor = await a.page.evaluate(() => {
+			const c = document.querySelector('.lpn-node');
+			return c ? getComputedStyle(c).cursor : '(no node)';
+		});
+		report.ok(bare !== objectCursor && objectCursor !== 'default' && objectCursor !== 'auto',
+			'the bare map does not say what an object says, so an object reads as clickable',
+			`map ${bare}, junction ${objectCursor}`);
 
 		// **AND A NODE SAYS `pointer` FOR MORE THAN ITS OWN SEVEN PIXELS** (Tom, 2026-09-08: *"I get
 		// no help from the mouse pointer. It's just a pan cross the entire time."*). Nothing was

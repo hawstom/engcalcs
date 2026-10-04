@@ -105,7 +105,23 @@ async function measurePrint(a, paperW) {
 async function checkTable(browser, report, name, tab, colPrefs) {
 	const a = await openTable(browser, name, tab, colPrefs);
 	const scr = await measureScreen(a, tab);
-	await a.page.evaluate(() => { window.print = function () {}; document.getElementById('lpn_pane_print').click(); });
+	// The Print table button left the pane head (Task 757, d612966d, Tom 2026-10-04: "the only door to it"
+	// is the right-click menu on a cell), so the press is a real right-click row, found by its key's text.
+	const printLabel = await a.lang('lpn_pane_print');
+	await a.page.evaluate(() => { window.print = function () {}; });
+	const pressed = await a.page.evaluate(({ tab, printLabel }) => {
+		const inp = document.querySelector('#lpn_pane_' + tab + ' tbody tr:nth-child(1) td input:not([readonly])') ||
+			document.querySelector('#lpn_pane_' + tab + ' tbody tr:nth-child(1) td input');
+		if (!inp) { return 'no cell to focus'; }
+		inp.focus();
+		const td = inp.closest('td'), r = td.getBoundingClientRect();
+		td.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: r.left + 5, clientY: r.top + 5, button: 2 }));
+		const b = [...document.querySelectorAll('.lpn-pane-ctxmenu button')].find((x) => x.textContent.indexOf(printLabel) === 0);
+		if (!b) { return 'no Print table row in the menu'; }
+		b.click();
+		return 'ok';
+	}, { tab, printLabel });
+	report.eq(pressed, 'ok', `${tab}: the right-click menu carries Print table and it was pressed`);
 	const label = tab + (colPrefs ? ' (a column dragged)' : '');
 	for (const paper of PAPERS) {
 		const pr = await measurePrint(a, paper.w);
@@ -119,10 +135,17 @@ async function checkTable(browser, report, name, tab, colPrefs) {
 		report.ok(open.length === 0, `${at}: every heading cell has a border on all four sides`, open.join(', '));
 
 		// (2) "Widths seem to be trying, but not succeeding"
-		const sScr = scr.th.reduce((s, h) => s + h.w, 0), sPr = pr.th.reduce((s, h) => s + h.w, 0);
-		const k = sPr / sScr;
-		const off = pr.th.map((h, i) => ({ t: h.text, d: h.w - k * scr.th[i].w })).filter((x) => Math.abs(x.d) > 2);
-		report.ok(off.length === 0, `${at}: every printed column is its screen width x ${k.toFixed(3)}, within 2px`,
+		// **ONE COMMON SCALE, PLUS THE DELIBERATE HEADROOM** (R-366, e3a59b3e, 2026-09-28): a column whose
+		// widest unbreakable value runs close to its edge is printed 1.12x wider (PANE_PRINT_HEADROOM, measured
+		// from a real PDF), because Chromium's print pass draws such text about 11% wider than the screen
+		// does. So "screen width x one factor, within 2px" holds for every other column and the factor is
+		// the MEDIAN ratio, not total over total (which the headroom columns would drag); a headroom column
+		// may be wider, up to 1.12x, and never narrower.
+		const ratios = pr.th.map((h, i) => h.w / scr.th[i].w);
+		const k = [...ratios].sort((x, y) => x - y)[Math.floor(ratios.length / 2)];
+		const off = pr.th.map((h, i) => ({ t: h.text, d: h.w - k * scr.th[i].w, hi: k * scr.th[i].w * 1.12 + 2 - h.w }))
+			.filter((x) => x.d < -3 || x.hi < 0);   // 3px below: the median factor sits a hair off the total-based one this used to use
+		report.ok(off.length === 0, `${at}: every printed column is its screen width x ${k.toFixed(3)} (or up to 1.12x for headroom), within 3px`,
 			off.map((x) => x.t + ' ' + x.d.toFixed(1) + 'px').join(', '));
 		report.ok(pr.tableW <= pr.areaW + 1, `${at}: the sheet fits the page`, `${pr.tableW.toFixed(1)} of ${pr.areaW.toFixed(1)}px`);
 
@@ -133,8 +156,11 @@ async function checkTable(browser, report, name, tab, colPrefs) {
 		report.ok(badTd.length === 0, `${at}: every cell is aligned as on screen`, badTd.join('; '));
 
 		// (4) "tighter fit on print than on screen"
-		const wrap = pr.th.map((h, i) => h.lines === scr.th[i].lines ? null : `${h.text}: ${scr.th[i].lines} -> ${h.lines} lines`).filter(Boolean);
-		report.ok(wrap.length === 0, `${at}: every heading wraps as it does on screen`, wrap.join('; '));
+		// A heading must never wrap onto MORE lines than it does on screen. FEWER is allowed: the screen
+		// heading keeps 6px of right padding for its sort arrow and menu glyph (feat/table-selection) and
+		// the headroom above widens some columns, and neither is a tighter fit, which was the complaint.
+		const wrap = pr.th.map((h, i) => h.lines <= scr.th[i].lines ? null : `${h.text}: ${scr.th[i].lines} -> ${h.lines} lines`).filter(Boolean);
+		report.ok(wrap.length === 0, `${at}: no heading wraps onto more lines than it does on screen`, wrap.join('; '));
 	}
 	report.ok(a.errors.length === 0, `${label}: no page error`, a.errors.slice(0, 1).join(''));
 	await a.close();

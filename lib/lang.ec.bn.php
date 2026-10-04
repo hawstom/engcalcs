@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Isbash (1936) এবং
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Isbash (1936) এবং Maricopa County, Arizona, US অনুযায়ী।">পার্শ্ব ঢাল ১-এর জন্য প্রয়োজনীয় কৌণিক পাথরের আকার, D<sub>50</sub> (Isbash ও MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Isbash (1936) এবং Maricopa County, Arizona, US অনুযায়ী।">পার্শ্ব ঢাল ২-এর জন্য প্রয়োজনীয় কৌণিক পাথরের আকার, D<sub>50</sub> (Isbash ও MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='প্রতিটি হাইড্রোলিক সময় ধাপে এই নেটওয়ার্কটি সমাধান করুন।';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Maynord, Ruff, এবং Abt (1989) অনুযায়ী। একটি বাঁকে পাথরকে গড়ের ৪/৩ গুণ বাঁক বেগের জন্য আকার দেওয়া হয়, California Division of Highways (1970) অনুযায়ী; Maynord-এর নিজস্ব ১.৫ প্রাকৃতিক চ্যানেলে প্রযোজ্য।">প্রয়োজনীয় কৌণিক পাথরের আকার, D<sub>50</sub> (Maynord, Ruff, এবং Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='প্রয়োজনীয় কৌণিক পাথরের আকার, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='অভিন্ন-প্রবাহ অনুমানের জন্য বেগ যুক্তিসঙ্গত।';
@@ -676,9 +677,7 @@ $ec_lang['lpn_customer_heading']='গ্রাহক {id}';
 // strings every node and link already uses. Do not re-add an account key: a utility that wants a
 // field of its own name makes a custom property.
 $ec_lang['lpn_field_meter_demand']='প্রতি সংযোগে চাহিদা';
-$ec_lang['lpn_field_meter_demand_tip']='এই গ্রাহকের প্রতিটি সংযোগে যে চাহিদা প্রয়োজন। খুঁজুন ও প্রতিস্থাপন করুন খালি ও 0-এর মধ্যেকার পার্থক্য কাজে লাগাতে পারে।';
 $ec_lang['lpn_field_meter_count']='সংযোগের সংখ্যা';
-$ec_lang['lpn_field_meter_count_tip']='এই একজন গ্রাহক কতগুলো অভিন্ন সংযোগের প্রতিনিধিত্ব করছে, যাতে একটি প্রধান পাইপ ধরে বিয়াল্লিশটি এক-পরিবার সংযোগ একই জায়গায় একটি প্রতীক হতে পারে। নিচের মোট হলো উপরের চাহিদা এই সংখ্যা দিয়ে গুণ করা।';
 $ec_lang['lpn_field_meter_total']='মোট চাহিদা';
 $ec_lang['lpn_field_meter_total_tip']='প্রতি সংযোগে চাহিদা সংযোগের সংখ্যা দিয়ে গুণ করা। নিচে নামকরণ করা জাংশনে যে সংখ্যা যোগ করা হয় সেটিই এটি।';
 $ec_lang['lpn_field_meter_pipe']='সংযুক্ত উপাদান';
@@ -692,7 +691,6 @@ $ec_lang['lpn_meter_pipe_unknown']='এই প্রকল্পে {id} না�
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='রান জুড়ে এই গ্রাহকের চাহিদা কীভাবে বাড়ে ও কমে। এটি মোট চাহিদাকে গুণ করে, তাই এটি এই গ্রাহকের প্রতিনিধিত্ব করা প্রতিটি সংযোগের উপর কাজ করে। প্রকল্পের শুরুর চাহিদার প্যাটার্ন অনুসরণ করতে এটি কোনো প্যাটার্ন নেই-এ রাখুন।';
 $ec_lang['lpn_meter_pattern_unknown']='এই প্রকল্পে {id} নামে কোনো প্যাটার্ন নেই, তাই গ্রাহককে যেমন ছিল তেমনই রাখা হয়েছে।';
 $ec_lang['lpn_meter_placed']='গ্রাহক {id} যোগ করা হয়েছে। এর বিবরণ ও চাহিদা গ্রাহক টেবিলে টাইপ করা হয়, অথবা এর বাক্স খুলতে নির্বাচন মোডে এটি চাপুন।';
 $ec_lang['lpn_field_meter_pipe_tip']='এই সংযোগ যে উপাদানে সংযুক্ত। এটি পরিবর্তন করতে এখানে বা গ্রাহক টেবিলে অন্য একটি টাইপ করুন, অথবা সংযোগ বিন্দুটি অন্য একটি উপাদানে টেনে নিন।';
@@ -805,7 +803,6 @@ $ec_lang['lpn_pane_manage_cols_down']='নিচে সরান';
 $ec_lang['lpn_pane_manage_cols_top']='শুরুতে সরান';
 $ec_lang['lpn_pane_manage_cols_bottom']='শেষে সরান';
 $ec_lang['lpn_pane_colmenu_tip']='কলাম লুকান বা পরিচালনা করুন';
-$ec_lang['lpn_pane_sortarrow_tip']='সাজানোর ক্রম উল্টে দিন';
 $ec_lang['lpn_tool_area_window']='একটি উইন্ডো নির্বাচন করুন';
 $ec_lang['lpn_tool_area_lasso']='একটি লাসো নির্বাচন করুন';
 $ec_lang['lpn_tool_area_polygon']='একটি বহুভুজ নির্বাচন করুন';
@@ -860,7 +857,6 @@ $ec_lang['lpn_field_elev']='উচ্চতা';
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
 // protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
 // entry carrying translatable payload nobody on the page can see.
-$ec_lang['lpn_field_elev_tip']='এই নোডে ভূমি বা পাইপের স্তর। যেকোনো শূন্য বিন্দু থেকে পরিমাপ করুন, যতক্ষণ না প্রতিটি নোড একই শূন্য বিন্দু ব্যবহার করে।';
 // A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
 // at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
 // This USED to read "so it doubles as a tank" (Tom, 2026-07-30), which was true only while there
@@ -1013,7 +1009,6 @@ $ec_lang['lpn_status_converted']='{n}টি মান {unit}-এ নতুন �
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_color_tip']='একটি রাশি অনুযায়ী নেটওয়ার্কে রঙ দিন, যাতে একবার দেখেই একটি বড় মানচিত্র বোঝা যায়। সাধারণত চাপ এবং প্রবাহ বেগ — এই দুটিই গুরুত্বপূর্ণ হয়।';
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
 $ec_lang['lpn_units_length']='দৈর্ঘ্য';
@@ -1182,13 +1177,6 @@ $ec_lang['lpn_tip_join']='{name}: {tip}';
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='শর্টকাট: {key} চাপুন।';
 $ec_lang['lpn_tool_key_hint_two']='শর্টকাট: {key} অথবা {key2} চাপুন।';
-$ec_lang['lpn_tool_add_junction_tip']='একটি জাংশন যোগ করতে মানচিত্রে ক্লিক করুন: এমন একটি বিন্দু যেখানে পাইপ মেলে অথবা পানি ব্যবহার করা হয়।';
-$ec_lang['lpn_tool_add_reservoir_tip']='একটি জলাধার যোগ করতে মানচিত্রে ক্লিক করুন: একটি অসীম উৎস যার একটি স্থির পানির স্তর আছে।';
-$ec_lang['lpn_tool_add_tank_tip']='একটি ট্যাংক যোগ করতে মানচিত্রে ক্লিক করুন: এমন সঞ্চয়স্থান যার পানির স্তর ভরা ও খালি হওয়ার সাথে বাড়ে ও কমে।';
-$ec_lang['lpn_tool_add_pipe_tip']='একটি পাইপ আঁকতে একটি নোডে, তারপর আরেকটিতে ক্লিক করুন।';
-$ec_lang['lpn_tool_add_pump_tip']='একটি পাম্প বসাতে একটি নোডে, তারপর আরেকটিতে ক্লিক করুন।';
-$ec_lang['lpn_tool_add_valve_tip']='একটি ভালভ বসাতে একটি নোডে, তারপর আরেকটিতে ক্লিক করুন।';
-$ec_lang['lpn_tool_add_text_tip']='অঙ্কনে একটি নোট লিখতে মানচিত্রে ক্লিক করুন।';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='আকৃতির ভেতরের সবকিছু নির্বাচন করতে নির্দেশ অনুযায়ী মানচিত্রে ক্লিক করুন। উইন্ডো, লাসো ও বহুভুজের মধ্যে আকৃতি পরিবর্তন করতে এই বোতামটি আবার চাপুন। নির্বাচন করার সময় Shift চেপে ধরে রাখলে আগের নির্বাচন বজায় থাকে, এবং আপনি যা নির্বাচন করেন তা যোগ বা বাদ (টগল) হয়।';
@@ -1197,7 +1185,6 @@ $ec_lang['lpn_area_selected']='{n}টি নির্বাচিত।';
 $ec_lang['lpn_area_none']='সেই এলাকায় কিছুই পাওয়া যায়নি।';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_vertices_tip']='মানচিত্রে একটি পাইপের আকৃতি গঠনকারী শীর্ষবিন্দুগুলো যোগ বা মুছুন। একটি শীর্ষবিন্দু যোগ করতে পাইপে ক্লিক করুন, মুছতে একটি শীর্ষবিন্দুতে ক্লিক করুন, এবং সরাতে একটি শীর্ষবিন্দু টেনে আনুন। একটি শীর্ষবিন্দু শুধু আঁকা পথ পরিবর্তন করে, হাইড্রোলিক্স নয়।';
-$ec_lang['lpn_tool_delete_tip']='মুছে ফেলতে মানচিত্রের যেকোনো কিছুতে ক্লিক করুন।';
 $ec_lang['lpn_tool_undo_tip']='শেষ পরিবর্তনটি পূর্বাবস্থায় ফেরান।';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='পুরো নেটওয়ার্ককে উইন্ডোতে ধরান।';
@@ -1206,7 +1193,6 @@ $ec_lang['lpn_tool_zoom_window_tip']='মানচিত্রে একটি �
 $ec_lang['lpn_zoom_in_tip']='জুম ইন। শর্টকাট: +';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='জুম আউট। শর্টকাট: -';
-$ec_lang['lpn_tool_settings_tip']='এই প্রকল্পের সেটিংস খুলুন।';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='একটি উপাদান তার ID দিয়ে খুঁজুন, অথবা একটি শর্ত পূরণ করে এমন প্রতিটি উপাদান খুঁজুন, এবং সবগুলো একসাথে পরিবর্তন করুন।';
 // **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
@@ -1218,7 +1204,6 @@ $ec_lang['lpn_find_menu_tip']='একটি উপাদান তার ID দ�
 $ec_lang['lpn_help_icons']='টুলবার';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='দৃশ্যমানতা';
-$ec_lang['lpn_pane_right_toggle_tip']='মানচিত্রের ডানদিকের প্যানেলটি দেখান বা লুকান। এতে লেবেল ও রঙের পছন্দগুলো থাকে।';
 $ec_lang['lpn_color_legend_open_tip']='দৃশ্যমানতা প্যানেল খুলে এই রঙগুলো পরিবর্তন করতে ক্লিক করুন।';
 $ec_lang['lpn_color_node_field']='নোডের রঙ';
 $ec_lang['lpn_color_link_field']='পাইপের রঙ';
@@ -1278,7 +1263,6 @@ $ec_lang['lpn_goto_menu']='একটি অক্ষাংশ ও দ্রা�
 // lat/lon."* The parser accepts `38,122` and `38.122` as a pair on his ruling of the same day; the
 // examples in lpn_goto_bad show all three shapes, which is where somebody whose last attempt failed
 // is actually reading.
-$ec_lang['lpn_goto_tip']='যে স্থানের স্থানাঙ্ক আপনার কাছে আগে থেকেই আছে সেখানে মানচিত্রটি সরান। প্রথমে অক্ষাংশ, তারপর দ্রাঘিমাংশ, মানচিত্র যেভাবে দেয় সেভাবে, মাঝে একটি ফাঁকা স্থান দিয়ে: 38 -122';
 $ec_lang['lpn_goto_prompt']='অক্ষাংশ ও দ্রাঘিমাংশ, এই ক্রমে';
 $ec_lang['lpn_goto_bad']='এটি একটি অক্ষাংশ ও একটি দ্রাঘিমাংশ নয়। 38 -122 এর মতো চেষ্টা করুন, মাঝে একটি ফাঁকা স্থান দিয়ে।';
 $ec_lang['lpn_georef_goto']='যান…';
@@ -1419,7 +1403,7 @@ $ec_lang['lpn_help_walkthroughs']='ধাপে ধাপে নির্দে�
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='নেটওয়ার্ক মুছুন';
-$ec_lang['lpn_confirm_delete_network']='এই প্রকল্পের প্রতিটি নোড, পাইপ ও টেক্সট লেবেল মুছে ফেলবেন? পটভূমি চিত্র, প্রকল্পের নাম ও আপনার সেটিংস রাখা থাকবে। এটি পূর্বাবস্থায় ফেরানো যাবে না।';
+$ec_lang['lpn_confirm_delete_network']='এই প্রকল্পের প্রতিটি নোড, পাইপ ও টেক্সট লেবেল মুছে ফেলবেন? পটভূমি চিত্র, প্রকল্পের নাম ও আপনার সেটিংস রাখা থাকবে।';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,
@@ -1578,7 +1562,6 @@ $ec_lang['lpn_profile_menu']='প্রোফাইল';
 // nobody to read. Sprint 459's Wave 0 found them; Tom ruled the move on 2026-08-24 ("these _syns
 // are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
 // permission $ec_lang_syn requires. Same text, correct array.
-$ec_lang['lpn_profile_tip']='নেটওয়ার্কের মধ্য দিয়ে একটি পথ ধরে ভূমি ও হাইড্রোলিক গ্রেড লাইন আঁকুন।';
 $ec_lang['lpn_profile_title']='একটি পথ ধরে প্রোফাইল';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
@@ -1636,12 +1619,9 @@ $ec_lang['lpn_profile_missing']='সংরক্ষিত পথ {name} এম�
 $ec_lang['lpn_ts_menu']='সময় সিরিজ';
 $ec_lang['lpn_ts_tip']='একটি বর্ধিত সময়কাল সিমুলেশন জুড়ে এক বা একাধিক উপাদানকে সময়ের বিপরীতে গ্রাফ করুন।';
 $ec_lang['lpn_ts_title']='মান বনাম সময়';
-$ec_lang['lpn_ts_group_tip']='গ্রাফটি নোড দেখায় নাকি লিংক।';
 $ec_lang['lpn_ts_group_nodes']='নোড';
 $ec_lang['lpn_ts_group_links']='লিংক';
-$ec_lang['lpn_ts_quantity_tip']='সময়ের বিপরীতে কোন মান গ্রাফ করতে হবে।';
 $ec_lang['lpn_ts_add']='নির্বাচিতগুলো যোগ করুন';
-$ec_lang['lpn_ts_add_tip']='মানচিত্রে এখন বেছে নেওয়া সবকিছু গ্রাফে বসান।';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
 $ec_lang['lpn_ts_add_none']='মানচিত্রে সেই ধরনের কিছুই বেছে নেওয়া হয়নি।';
 $ec_lang['lpn_ts_clear']='সব সরিয়ে ফেলুন';
@@ -1656,8 +1636,6 @@ $ec_lang['lpn_ts_axis_time']='অতিবাহিত সময়';
 $ec_lang['lpn_freq_menu']='ফ্রিকোয়েন্সি';
 $ec_lang['lpn_freq_tip']='বর্তমান টাইম স্টেপে সব জাংশন বা সব পাইপের একটি মানের ফ্রিকোয়েন্সি বিতরণ গ্রাফ করুন।';
 $ec_lang['lpn_freq_title']='মানের বিতরণ';
-$ec_lang['lpn_freq_group_tip']='গ্রাফটি জাংশন দেখায় নাকি পাইপ।';
-$ec_lang['lpn_freq_quantity_tip']='কোন মান গ্রাফ করতে হবে।';
 $ec_lang['lpn_freq_none']='এই মানের জন্য এখনও কোনো ফলাফল নেই, তাই গ্রাফ করার মতো কিছু নেই।';
 $ec_lang['lpn_freq_summary']='প্লট করা হয়েছে: {total}-এর মধ্যে {n}';
 $ec_lang['lpn_freq_summary_time']='প্লট করা হয়েছে: {total}-এর মধ্যে {n}, {time}-এ';
@@ -1760,7 +1738,6 @@ $ec_lang['lpn_file_revert']='সংরক্ষিত সংস্করণে �
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='সাম্প্রতিক ফাইল';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_recent_tip']='আপনার কম্পিউটারে খুঁজে বের না করেই {file} আবার খুলুন।';
 $ec_lang['lpn_recent_denied']='সেই ফাইল খোলার অনুমতি দেওয়া হয়নি, তাই এটি খোলা হয়নি।';
 $ec_lang['lpn_recent_gone']='{file} খোলা যায়নি। এটি সরানো, নাম পরিবর্তন বা মুছে ফেলা হয়ে থাকতে পারে, তাই এটি সাম্প্রতিক তালিকা থেকে বাদ দেওয়া হয়েছে।';
 // The tab strip. These are titles on small controls, so each has to stand alone with no sentence
@@ -1884,11 +1861,8 @@ $ec_lang['lpn_file_upload_explain']='এই ব্রাউজার কোন�
 // The tip on the Open button, which reached the toolbar with Task 246. It exists because that
 // button is icon-only: on a menu row the word carries the whole meaning, and on the strip the tip
 // is where the rest of it lives.
-$ec_lang['lpn_file_open_tip']='এই পৃষ্ঠা থেকে সংরক্ষিত একটি প্রকল্প ফাইল খুলুন।';
 // Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
 // cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
-$ec_lang['lpn_file_save_tip']='সংযুক্ত ফাইলে সংরক্ষণ করে।';
-$ec_lang['lpn_file_saveas_tip']='যে ফাইলে সংরক্ষণ করবেন তা বেছে নিন। এই প্রকল্প সেই ফাইলের সাথে সংযুক্ত হয়, এবং তখন থেকে সংরক্ষণ করুন সেখানেই লেখে।';
 // The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
 // cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
 // is no API for it, and the download attribute cannot override the setting -- but the user can turn
@@ -2194,7 +2168,6 @@ $ec_lang['lpn_field_roughness_tip']='হেজেন-উইলিয়ামস
 $ec_lang['lpn_field_length']='দৈর্ঘ্য';
 $ec_lang['lpn_field_from']='থেকে';
 $ec_lang['lpn_field_to']='পর্যন্ত';
-$ec_lang['lpn_field_length_tip']='পাইপের দৈর্ঘ্য। Auto চালু থাকলে দৈর্ঘ্য আপনার আঁকা থেকে মাপা হয়। অঙ্কন থেকে ভিন্ন একটি দৈর্ঘ্য লিখতে Auto বন্ধ করুন।';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2236,7 +2209,6 @@ $ec_lang['lpn_field_valve_setting_loss_tip']='থ্রটল ভালভটি
 $ec_lang['lpn_field_valve_diameter_tip']='ভালভের মধ্য দিয়ে খোলা অংশের প্রস্থ। এই প্রস্থ থেকে ভালভের মধ্য দিয়ে পানির গতি গণনা করা হয়, এবং সেই গতি থেকে ক্ষতি নির্ণয় করা হয়।';
 $ec_lang['lpn_field_valve_km_tip']='ভালভ পুরোপুরি খোলা অবস্থায় ভালভের কাঠামো থেকে হওয়া ক্ষতি, ভালভের সেটিং যা অপসারণ করে তার অতিরিক্ত হিসেবে। এটি বেগ জলশীর্ষের একটি গুণিতক হিসেবে গণনা করা হয়। এটি উপেক্ষা করতে ০ ব্যবহার করুন।';
 $ec_lang['lpn_field_km']='স্থানীয় ক্ষতি সহগ, k';
-$ec_lang['lpn_field_km_tip']='এই পাইপের বাঁক, ভালভ ও ফিটিং থেকে ক্ষতি, বেগ হেডের গুণিতক হিসেবে গণনা করা। একটি সাধারণ সোজা পাইপের জন্য 0 ব্যবহার করুন।';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
 // their own key rather than being asked to carry the full popup-field wording -- an on-map legend
@@ -2273,7 +2245,6 @@ $ec_lang['lpn_field_desc']='বিবরণ';
 // description is free text, so the tag's one-word rule does NOT apply to it, but a line break cannot
 // be written as a trailing comment and is turned into a space. The tip says what the field is for
 // first, because that is what a reader of a blank box wants.
-$ec_lang['lpn_field_desc_tip']='আপনার নিজের ব্যবহারের জন্য, যেমন একটি রাস্তার মোড় বা একটি পাইপ কী দিয়ে তৈরি। এটি EPANET ফাইলে ও থেকে বহন করা হয়, যেখানে এটি অংশটির নিজের সারির শেষে বসে। কোনো হিসাব এটি পড়ে না। একটি লাইন ব্রেক একটি স্পেস হয়ে যায়, কারণ ফাইলে এটি রাখার কোনো জায়গা নেই।';
 // **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
@@ -2349,7 +2320,6 @@ $ec_lang['lpn_mode_add_text']='মোড: টেক্সট যোগ করু
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='মানচিত্রে জিনিস পরিবর্তন, সরানো ও টেনে আনতে এই মোড ব্যবহার করুন। এটিই সেই মোড যেখানে পৃষ্ঠাটি ডিফল্টভাবে ফিরে আসে: একটি প্রকল্প খোলার মতো কিছু কাজের পর এটি নিজে থেকেই এখানে ফিরে আসে। Esc দ্বিতীয়বার চাপলে যা নির্বাচিত আছে তা নির্বাচন-মুক্ত হয়ে যায়।';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tip_labels_draggable']='আপনি একটি লেবেল সরাতে এটি টেনে আনতে পারেন। এটি সরানো হয়েছে তা জানাতে লেবেলটি সংক্ষিপ্তভাবে হাইলাইট হয়। এটিকে তার স্বয়ংক্রিয় অবস্থানে ফেরত পাঠাতে দুইবার ক্লিক করুন।';
 $ec_lang['lpn_field_auto']='স্বয়ংক্রিয়';
 $ec_lang['lpn_method_switch_confirm']='ঘর্ষণ পদ্ধতি পরিবর্তন করলে আপনার পাইপে ইতিমধ্যে লেখা রুক্ষতার সংখ্যাগুলো পরিবর্তন হয় না, এবং একটি পদ্ধতির জন্য রুক্ষতা অন্যটির জন্য অর্থহীন। এরপর প্রতিটি পাইপ পরীক্ষা করুন। তবুও পরিবর্তন করবেন?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
@@ -2402,7 +2372,6 @@ $ec_lang['lpn_field_text_all_zoom_tip']='আপনি যতই জুম আউ
 $ec_lang['lpn_tool_labels']='লেবেল';
 $ec_lang['lpn_labels_heading_node']='নোড লেবেল';
 $ec_lang['lpn_labels_heading_link']='লিংক লেবেল';
-$ec_lang['lpn_labels_decimals_tip']='এই লেবেলের জন্য দেখানো দশমিক স্থান';
 $ec_lang['lpn_labels_mark_extrema']='সর্বোচ্চ ও সর্বনিম্ন মান চিহ্নিত করুন';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
@@ -2418,8 +2387,6 @@ $ec_lang['lpn_settings_apply_to_all']='সব কিছুতে প্রয়
 $ec_lang['lpn_settings_apply_to_all_tip']='ইতিমধ্যে আঁকা এই ধরনের প্রতিটি উপাদান এই টেক্সট দিয়ে শুরু হওয়া একটি ID পায়। প্রতিটি তার নিজের সংখ্যা ধরে রাখে। যে ID কোনো সংখ্যায় শেষ হয় না, তা অপরিবর্তিত থাকে।';
 $ec_lang['lpn_confirm_apply_prefix']='{n}টি উপাদানের নাম পরিবর্তন করে তাদের ID {prefix} দিয়ে শুরু করবেন? প্রতিটি তার নিজের সংখ্যা ধরে রাখবে।';
 $ec_lang['lpn_prefix_applied']='{n}টি উপাদানের নাম পরিবর্তন করা হয়েছে। বাকি {skipped}টি অপরিবর্তিত রাখা হয়েছে।';
-$ec_lang['lpn_labels_prefix_tip']='মানচিত্র লেবেলে এই বৈশিষ্ট্যের আগে যোগ করা টেক্সট';
-$ec_lang['lpn_labels_suffix_tip']='মানচিত্র লেবেলে এই বৈশিষ্ট্যের পরে যোগ করা টেক্সট';
 $ec_lang['lpn_labels_suffix_gradient_tip']='মানচিত্র লেবেলে জলশীর্ষ ক্ষতির ঢালের পরে যোগ করা টেক্সট। এখানে শতাংশ চিহ্ন লিখবেন না। একক শতাংশ হলে এটি আপনার জন্য যোগ করে দেওয়া হয়।';
 $ec_lang['lpn_labels_separator']='মানগুলোর মধ্যে টেক্সট';
 $ec_lang['lpn_labels_separator_tip']='একটি লেবেলে একটি বৈশিষ্ট্য থেকে পরেরটির মধ্যে টেক্সট। ডিফল্টে একটি স্পেস।';
@@ -2430,7 +2397,6 @@ $ec_lang['lpn_labels_separator_tip']='একটি লেবেলে একট�
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='অগ্রাধিকার';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='লেবেল না ধরলে যে ক্রমে মানগুলো বাদ দেওয়া হয়। 1 সবচেয়ে বেশি সময় ধরে রাখা হয়।';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
@@ -2447,7 +2413,6 @@ $ec_lang['lpn_labels_col_decimals']='দশমিক';
 // it heads a box about three characters wide, and its tip carries the whole meaning.
 $ec_lang['lpn_labels_col_show']='দেখান';
 $ec_lang['lpn_labels_show_tip']='লেবেলে মানগুলো যে ক্রমে দেখা যায়। ১ নম্বর মানটি প্রথমে আসে: একটি স্তূপীকৃত লেবেলের উপরে, এবং এক লাইনের লেবেলের শুরুতে।';
-$ec_lang['lpn_labels_priority_customer_tip']='গ্রাহক লেবেল থেকে মানগুলো যে ক্রমে বাদ দেওয়া হয়। ১ নম্বর মানটি প্রথমে বাদ দেওয়া হয়।';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='একক ব্যবহার করুন';
@@ -2576,7 +2541,6 @@ $ec_lang['lpn_backdrop_continue']='চালিয়ে যান';
 $ec_lang['lpn_tool_settings']='সেটিংস';
 $ec_lang['lpn_settings_show_titles']='পৃষ্ঠার শিরোনাম দেখান';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_show_titles_tip']='পৃষ্ঠার শিরোনাম ও অঙ্কনের উপরের স্বাগত লাইনটি লুকিয়ে ফেলে, যাতে কাজ করার জন্য মানচিত্রের বেশি জায়গা থাকে। মুদ্রণে সবসময় শুধু একটি পরিষ্কার মানচিত্র দেখানো হয়।';
 // The link that rides on the headings themselves (Tom's 2026-09-08 worklist). It throws the switch AND opens the
 // box at the row that holds it, so the way back is learned in the same gesture.
 $ec_lang['lpn_hide_titles']='এই শিরোনামগুলো লুকান';
@@ -2781,7 +2745,6 @@ $ec_lang['lpn_settings_default_is']='ডিফল্ট হলো {n}।';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='থামার আগে সমাধানকারীকে কতটা কাছাকাছি পৌঁছাতে হবে, যা এক ট্রায়াল থেকে পরের ট্রায়ালে প্রবাহ কতটা পরিবর্তিত হচ্ছে তা দিয়ে মাপা হয়। ছোট সংখ্যা বেশি নির্ভুল কিন্তু বেশি সময় নেয়। উভয় সমাধানকারীই এই একটি বাক্স পড়ে, এবং প্রতিটি সেই পরিবর্তনকে ভিন্ন একটি মোট মানের বিপরীতে মাপে: বিল্ট-ইন সমাধানকারী চাহিদাগুলোর যোগফলের বিপরীতে, EPANET লিংক প্রবাহগুলোর যোগফলের বিপরীতে। খালি রাখলে, এই পৃষ্ঠা EPANET-এর নিজস্ব ডিফল্টের চেয়ে কঠোর একটি নির্ভুলতা ব্যবহার করে।';
 $ec_lang['lpn_settings_specific_gravity']='আপেক্ষিক ঘনত্ব';
-$ec_lang['lpn_settings_specific_gravity_tip']='পানির তুলনায় তরলের ওজন। এটি একটি গেজ যা চাপ দেখাবে তা পরিবর্তন করে, প্রবাহ নয়।';
 $ec_lang['lpn_settings_viscosity']='আপেক্ষিক সান্দ্রতা';
 $ec_lang['lpn_settings_viscosity_tip']='২০ ডিগ্রি সেলসিয়াসে পানির তুলনায় তরলের সান্দ্রতা। এটি শুধুমাত্র Darcy-Weisbach পদ্ধতিতে উত্তর পরিবর্তন করে।';
 $ec_lang['lpn_settings_trials']='সর্বোচ্চ ট্রায়াল';
@@ -2878,7 +2841,6 @@ $ec_lang['lpn_settings_mask_labels']='লেবেলের পেছনে ন�
 // drawing program would expect exactly that from those words.
 $ec_lang['lpn_settings_leader_snap']='লিডার রেখা নির্ধারিত কোণে স্ন্যাপ করুন';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_leader_snap_tip']='আপনি একটি লেবেলকে সেটি যা নির্দেশ করে তার থেকে দূরে টেনে নিলে, কাছাকাছি একটি নির্ধারিত কোণে টানলে তার দিকের রেখাটি সবচেয়ে কাছের নির্ধারিত কোণে টেনে নেওয়া হয়। টানতে থাকলে স্ন্যাপটি ছেড়ে দেয়, তাই যেকোনো কোণ এখনও ব্যবহার করা যায়। বন্ধ থাকলে স্বাধীনভাবে টানা যায়, যা এই পৃষ্ঠা সবসময় করে এসেছে।';
 // **THE LABELING THRESHOLD** (Tasks 669 and 705). The row's name is Tom's own wording from the
 // Task 705 restorations. Its capture button reuses lpn_settings_label_use_view, the customer
 // row's key, because it is the same button doing the same thing. The placeholder is the only place
@@ -3012,7 +2974,6 @@ $ec_lang['lpn_time_tank']='ট্যাংক';
 $ec_lang['lpn_time_level']='পানির স্তর';
 $ec_lang['lpn_time_run']='চালান';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='প্রতিটি হাইড্রোলিক সময় ধাপে এই নেটওয়ার্কটি সমাধান করুন।';
 // **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
 // `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
 // LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
@@ -3235,11 +3196,9 @@ $ec_lang['lpn_settings_energy']='শক্তি';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='প্রতিবেদন';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_menu_tip']='পাম্প চালানোর শক্তি খরচ, দৃশ্যকল্পের তুলনা, EPANET সমাধানকারীর প্রতিবেদন, পরিমাপ করা ডেটার সাথে ক্যালিব্রেশন, এবং একটি বর্ধিত সময়কাল সিমুলেশনের পর অবস্থা প্রতিবেদন ও পূর্ণাঙ্গ প্রতিবেদন।';
 $ec_lang['lpn_reports_epanet']='EPANET চালানো';
 $ec_lang['lpn_energy_title']='পাম্প শক্তি প্রতিবেদন';
 $ec_lang['lpn_energy_menu']='পাম্প শক্তি';
-$ec_lang['lpn_energy_menu_tip']='শেষ বর্ধিত সময়কাল সিমুলেশনে প্রতিটি পাম্প চালানোর কতটা অংশে চালু ছিল, কতটা শক্তি টেনেছে এবং এর খরচ কত।';
 $ec_lang['lpn_energy_efficiency']='পাম্প দক্ষতা (শতাংশ)';
 $ec_lang['lpn_energy_efficiency_tip']='প্রতিটি পাম্পের জন্য ব্যবহৃত ওয়্যার-টু-ওয়াটার দক্ষতা যার নিজস্ব কোনো দক্ষতার কার্ভ নেই। কিছুই বলা না থাকলে EPANET 75 শতাংশ ব্যবহার করে।';
 $ec_lang['lpn_energy_price']='বিদ্যুতের দাম';
@@ -3373,7 +3332,6 @@ $ec_lang['lpn_color_mode_manual']='নিজে নির্ধারিত';
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='লাইব্রেরি';
-$ec_lang['lpn_library_menu_tip']='এই প্রকল্পের চাহিদার প্যাটার্ন, পাম্প কার্ভ ও নিয়ন্ত্রণ নিয়ম পরিচালনা করুন।';
 // The three section names. Each is the word EPANET's own input file uses for the section, because
 // that is the word every water-network user and every tutorial already has -- see the note in
 // dev/scripts/glossary.json about deferring to a discipline's standard term.
@@ -3387,7 +3345,6 @@ $ec_lang['lpn_library_curves_tip']='একটি কার্ভ হলো ব�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_curves_note']='একটি কার্ভ একটি প্রকল্পের অংশ, এবং একটি পাম্প বা ভালভ তার নিজস্ব বৈশিষ্ট্যে জানায় সে কোনটি ব্যবহার করে। একাধিক উপাদান একই কার্ভ ব্যবহার করতে পারে, এবং এখানে সেটি পরিবর্তন করলে সবগুলোই বদলে যায়। একটি পাম্প জলশীর্ষ কার্ভের জন্য চালানো বিন্দুগুলোর মধ্য দিয়ে মেলানো একটি কার্ভ ব্যবহার করে; অন্য প্রতিটি ধরনের জন্য এটি দেখানো বিন্দুগুলোকে সরলরেখা দিয়ে যুক্ত করে।';
 $ec_lang['lpn_library_curve_add']='একটি কার্ভ যোগ করুন';
-$ec_lang['lpn_library_curve_type_tip']='এই কার্ভটি কী বর্ণনা করে';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
 // EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
 // and Equation (for pump head) on row/line 2."*). EPANET calls the control "Curve Type", so that is
@@ -3408,7 +3365,6 @@ $ec_lang['lpn_library_curve_values_tip']='একটি স্প্রেডশ�
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
 $ec_lang['lpn_library_curve_note_label']='বিবরণ';
-$ec_lang['lpn_library_curve_note_tip']='আপনার নিজের ভাষায়, এই কার্ভটি কী। এটি একটি EPANET ফাইলে কার্ভের উপরে লেখা হয় এবং সেখান থেকে ফিরে পড়া হয়।';
 $ec_lang['lpn_library_curve_remove_point']='এই বিন্দুটি সরিয়ে ফেলুন';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -3591,14 +3547,11 @@ $ec_lang['lpn_field_base_demand']='মূল চাহিদা';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='প্রদর্শিত সময় ধাপে এই নোড যে প্রবাহ টানে: প্রতিটি মূল চাহিদা তার নিজস্ব প্যাটার্ন দিয়ে গুণ করে যোগ করা হয়। এটি হিসাব করা, টাইপ করা নয়, তাই এটি ঘড়ির সাথে পরিবর্তিত হয় এবং সম্পাদনা করা যায় না।';
 $ec_lang['lpn_field_demand_pattern']='চাহিদার প্যাটার্ন';
-$ec_lang['lpn_field_demand_pattern_tip']='এই সংযোগস্থলের চাহিদা রান জুড়ে কীভাবে বাড়ে ও কমে। এটি কোনো প্যাটার্ন নেই-এ রাখলে সংযোগস্থলটি পরিবর্তে প্রকল্পের চাহিদার শুরুর প্যাটার্ন অনুসরণ করে।';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
 $ec_lang['lpn_field_demand_category']='বিবরণ';
-$ec_lang['lpn_field_demand_category_tip']='এই চাহিদা শ্রেণির নাম বা বিবরণ।';
 $ec_lang['lpn_demand_add']='চাহিদা শ্রেণি যোগ করুন';
-$ec_lang['lpn_demand_add_tip']='এই সংযোগস্থলে আরেকটি চাহিদা শ্রেণি যোগ করুন, তার নিজস্ব মূল চাহিদা, প্যাটার্ন ও বিবরণসহ। শ্রেণিগুলো যোগ হয়।';
 $ec_lang['lpn_demand_remove']='এই চাহিদা সরান';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
@@ -3992,7 +3945,6 @@ $ec_lang['lpn_calib_tab_corr']='সম্পর্ক প্লট';
 $ec_lang['lpn_calib_tab_means']='গড়ের তুলনা';
 $ec_lang['lpn_calib_col_location']='স্থান';
 $ec_lang['lpn_calib_col_n']='পর্যবেক্ষণ সংখ্যা';
-$ec_lang['lpn_calib_col_n_tip']='পর্যবেক্ষণের সংখ্যা: এই স্থানে যে পরিমাপগুলোর তুলনা করা হয়েছে।';
 $ec_lang['lpn_calib_col_obs_mean']='পর্যবেক্ষিত গড়';
 $ec_lang['lpn_calib_col_sim_mean']='গণনা করা গড়';
 $ec_lang['lpn_calib_col_mean_err']='গড় ত্রুটি';

@@ -157,7 +157,9 @@ exports.run = async function ({ browser, report }) {
 			'scheme, then how many colours, then the classification method',
 			`ramp ${Math.round(order.nodeRamp)}, count ${Math.round(order.nodeClasses)}, ` +
 			`method ${Math.round(order.nodeMode)}`);
-		report.ok(Math.abs(order.nodeMode - order.nodeRamp) < 100,
+		report.ok(// 100 px became 160: the ramp and count rows carry two-line names in the 360 px pane (03c478f9, Task 760),
+			// so two rows are 125 px; 160 still fails the moment a third row comes between them.
+			Math.abs(order.nodeMode - order.nodeRamp) < 160,
 			'...and the three stay one block, where they can be found together',
 			`ramp at ${order.nodeRamp}, mode at ${order.nodeMode}`);
 		// **A THIRD SUB-HEADING FOR THE TWO CONTROLS THAT ARE ABOUT BOTH KINDS AT ONCE.**

@@ -101,6 +101,8 @@ async function modelWidthPx(a) {
 		let x0 = Infinity, x1 = -Infinity;
 		for (const e of document.querySelectorAll('#lpn_canvas .lpn-symbols > *')) {
 			const r = e.getBoundingClientRect(), cx = r.x + r.width / 2;
+			// After Convert as, the layer also holds undrawn (0 x 0, at 0,0) circles; they are not on the map.
+			if (!r.width && !r.height) { continue; }
 			x0 = Math.min(x0, cx); x1 = Math.max(x1, cx);
 		}
 		return x1 - x0;
@@ -129,6 +131,9 @@ exports.run = async function ({ browser, report }) {
 		// ---- where the row is, and is not -------------------------------------------------------
 		// **GREYED, NOT HIDDEN, SINCE 2026-09-22** (Tom: Go to and Search "can show for unnamed CRS
 		// projects, but disabled when a world map is not attached (no georeference)").
+		// The page boots into a geographic Project1 (R-208), so the XY case is a new local project.
+		await a.newProject();
+		await a.settle(500);
 		let full = await a.menuRows('map');
 		let row = full.find(r => r.label === GOTO_ROW);
 		report.ok(!!row && row.disabled,
@@ -271,6 +276,7 @@ exports.run = async function ({ browser, report }) {
 			let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
 			for (const e of els) {
 				const r = e.getBoundingClientRect();
+				if (!r.width && !r.height) { continue; }   // undrawn leftovers sit at 0,0
 				x0 = Math.min(x0, r.x); y0 = Math.min(y0, r.y);
 				x1 = Math.max(x1, r.x + r.width); y1 = Math.max(y1, r.y + r.height);
 			}
