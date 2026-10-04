@@ -56,6 +56,14 @@ warning strip is gone. A held Enter or Space never answers the box (Perry's revi
 Delete network pressed OK); only a fresh key pressed while it is open does. On a phone the mode bar
 is a short band along the foot of the window.
 
+Tom's browser pass, 2026-10-04: the title band lay over the message's first line, because the box's
+inline `padding: 12px` outranked the titled rule; the padding now lives in the stylesheet. A box
+opened by a press on the map (the two-point pick) lost its field's focus to that press, so the first
+typed character went missing; openDialog() takes the focus back once the press is over. Save as asks
+no question of its own (the file picker is its box). Delete network, which was never undoable, is
+now one undoable step, and its question no longer says it cannot be undone (all 27 languages lost
+that sentence and nothing else).
+
 The map notice line is one amber for every message and always was; only the log row's colour
 follows severity.
 

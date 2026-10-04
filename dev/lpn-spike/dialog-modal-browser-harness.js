@@ -24,8 +24,12 @@
 //       2026-10-04: the auto-repeat deleted all 45 nodes); a fresh Enter still confirms, and
 //       Ctrl+Z, Ctrl+Y and the Undo button take the deletion back and forth;
 //  (10) the title band never lies over the message, for every kind, at three window sizes;
+//  (11) Save as opens the file picker and no box; Revert confirms in the box and reloads the file;
+//  (12) georeferencing's questions (Go to, site width, the two-point pick, Keep this placement)
+//       each take every typed character, the pick's too, though it opens on a press on the map.
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
 
@@ -370,6 +374,116 @@ async function sectionTitleBand(browser) {
 	}
 }
 
+async function sectionSaveAsRevert(browser) {
+	// Tom, 2026-10-04: *"I don't see a dialog on Save as, but Revert also is buggy."* Save as asks
+	// no question of its own: the browser's file picker is its box (after the one-time panel about
+	// that picker). Revert asks its one confirm in the page's box, and OK puts the file back.
+	console.log('\n--- File > Save as, then File > Revert, in the real box ---');
+	const natives = [];
+	const a = await openSession(browser, { width: 1440, height: 900 }, natives);
+	await a.openExampleCard('EPANET Net1 plus rule-based controls');
+	await a.settle(1500);
+	await a.page.evaluate(() => { delete window.lpnDialogAnswerer; });
+	const L = await a.page.evaluate(() => ({ sa: EngCalcs.pageConfig.lpn_file_saveas, rv: EngCalcs.pageConfig.lpn_file_revert, ok: EngCalcs.pageConfig.lpn_dialog_ok }));
+	const before = await a.nodeCount();
+	await a.queuePick('net1-revert.lwn');
+	await a.menuClick(L.sa);
+	await a.settle(600);
+	if (await a.dialog()) { await a.answerTrainingPanel(); await a.settle(1500); }
+	ok('Save as opens the file picker, and the file is written', (await a.pickerCalls()).some((c) => c.kind === 'save') && (await a.listFiles()).indexOf('net1-revert.lwn') >= 0);
+	ok('...with no question box left open', !(await box(a)));
+	await a.makeEdit();
+	ok('an edit makes the tab unsaved', (await a.nodeCount()) === before + 1 && await a.currentTabDirty());
+	await a.menuClick(L.rv);
+	await a.settle(400);
+	const b = await box(a);
+	ok('Revert asks in the page\'s box, naming the file', b && b.text.indexOf('net1-revert.lwn') >= 0 && b.buttons.length === 2, b && b.text);
+	await a.page.click(`#lpn_dialog_buttons button:text-is("${L.ok}")`);
+	await a.settle(1500);
+	ok('OK loads the file again: the edit is gone and the tab is saved', !(await box(a)) && (await a.nodeCount()) === before && !(await a.currentTabDirty()), String(await a.nodeCount()));
+	ok('no native dialog was raised', natives.length === 0, natives.join(' | '));
+	ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	await a.close();
+}
+
+async function sectionGeoref(browser) {
+	// Tom, 2026-10-04: *"...so is georeference."* File > Convert as, Go to (two questions in a row),
+	// the two-point pick, and Keep this placement, every question in the real box. The pick's
+	// question opens on a press on the map, whose own default action took the field's focus, so the
+	// first typed character was lost (34.61 became 4.61).
+	console.log('\n--- georeferencing: Convert as, Go to, two-point pick, Keep this placement ---');
+	const natives = [];
+	const a = await openSession(browser, { width: 1440, height: 900 }, natives);
+	const page = a.page;
+	await page.unroute(/tile\.openstreetmap\.org|api\.mapbox\.com/);
+	await page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (r) => r.fulfill({ status: 200, contentType: 'image/png', body: PNG }));
+	const S = (k) => a.lang(k);
+	const f = JSON.parse(fs.readFileSync(path.join(REPO, 'examples', 'Elm-Street-Center.lwn'), 'utf8'));
+	f.project = Object.assign({}, f.project, { name: 'Elm' });
+	delete f.project.gallery;
+	await a.writeFile('Elm.lwn', JSON.stringify(f));
+	await a.queuePick('Elm.lwn');
+	await a.menuClick(await S('lpn_file_open'));
+	await a.settle(800);
+	if (await a.dialog()) { await a.answerTrainingPanel(); await a.settle(1500); }
+	await a.menuClick(await S('lpn_file_convert_as'));
+	await page.waitForSelector('#lpn_convas_panel', { state: 'visible' });
+	await page.check('#lpn_convas_kind_epsg').catch(() => {});
+	await page.click('#lpn_convas_ok');
+	await a.settle(1500);
+	await page.evaluate(() => { delete window.lpnDialogAnswerer; });
+	const field = () => page.evaluate(() => {
+		const d = document.getElementById('lpn_dialog'), ae = document.activeElement;
+		if (!d || getComputedStyle(d).display === 'none') { return null; }
+		return { text: (document.getElementById('lpn_dialog_body') || {}).textContent || '', inField: !!ae && ae.classList.contains('lpn-dialog-input'), value: ae && ae.value };
+	});
+	// Types the answer and reads it back BEFORE Enter, so a lost keystroke is seen as itself.
+	async function answer(label, text) {
+		const fb = await field();
+		ok(label + ': asked in the page\'s box, with the focus in its field', fb && fb.inField, fb && JSON.stringify(fb));
+		await page.keyboard.type(text);
+		const fa = await field();
+		ok(label + ': every typed character arrives', fa && fa.value === text, fa && fa.value);
+		await page.keyboard.press('Enter');
+		await a.settle(900);
+	}
+	await page.click('#lpn_georef_goto');
+	await a.settle(500);
+	await answer('Go to', '34.61,-112.32');
+	await answer('...then the site width', '300');
+	await page.click('#lpn_georef_drop');
+	await a.settle(800);
+	await page.click('#lpn_georef_twopt');
+	await a.settle(400);
+	const pts = await page.evaluate(() => [...document.querySelectorAll('#lpn_canvas [data-node]')]
+		.map((e) => { const r = e.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; })
+		.filter(([x, y]) => x > 60 && y > 160 && x < innerWidth - 60 && y < innerHeight - 60));
+	ok('nodes on screen to pick', pts.length >= 2, String(pts.length));
+	if (pts.length >= 2) {
+		const p1 = pts[0];
+		const p2 = pts.reduce((b, p) => (Math.hypot(p[0] - p1[0], p[1] - p1[1]) > Math.hypot(b[0] - p1[0], b[1] - p1[1]) ? p : b), p1);
+		await page.mouse.click(p1[0], p1[1]);
+		await a.settle(500);
+		await answer('first picked point', '34.61,-112.32');
+		ok('...and the second point is asked for', await a.notice() === await S('lpn_georef_twopt_pick2'), await a.notice());
+		await page.mouse.click(p2[0], p2[1]);
+		await a.settle(500);
+		await answer('second picked point', '34.62,-112.31');
+		ok('...and the model sits on the two points', await a.notice() === await S('lpn_georef_twopt_done'), await a.notice());
+	}
+	await page.click('#lpn_georef_finish');
+	await a.settle(600);
+	const fin = await box(a);
+	ok('Keep this placement asks in the page\'s box', fin && fin.text === await S('lpn_georef_confirm') && fin.focusInside, fin && fin.text.slice(0, 40));
+	await page.keyboard.press('Enter');
+	await a.settle(1500);
+	ok('...and OK ends the wizard on a lat/lon project', !(await box(a)) && !(await page.$eval('#lpn_georef_bar', (e) => e.style.display !== 'none')) &&
+		await page.evaluate(() => JSON.parse(localStorage.getItem('lpn_project_' + JSON.parse(localStorage.getItem('lpn_index')).openId)).project.coords === 'geo'));
+	ok('no native dialog was raised', natives.length === 0, natives.join(' | '));
+	ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	await a.close();
+}
+
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	({ Session } = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'session.js')));
@@ -389,6 +503,8 @@ async function main() {
 		await sectionScaleByPicking(browser);
 		await sectionPhoneBar(browser);
 		await sectionHeldEnter(browser);
+		await sectionSaveAsRevert(browser);
+		await sectionGeoref(browser);
 	} finally {
 		await browser.close();
 		env.stopServer();

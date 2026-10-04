@@ -41196,6 +41196,19 @@ var EngCalcs = EngCalcs || {};
 		if (first && first.focus) {
 			first.focus();
 			if (want && first.select) { first.select(); }
+			// **A BOX OPENED BY A PRESS ON THE MAP KEEPS ITS FOCUS** (Task 710, georeferencing's
+			// two-point pick). That question opens on pointerdown, and the press's own default
+			// action -- focusing what was pressed -- runs after the handler, so the field lost the
+			// focus it had just been given and the first typed character was spent on taking it back
+			// (34.61 arrived as 4.61). A native prompt held the press; this takes the focus back
+			// once the press is over.
+			if (typeof setTimeout === 'function' && dlg.contains) {
+				setTimeout(function () {
+					if (!dialogIsOpen() || !dlg.contains(first) || dlg.contains(document.activeElement)) { return; }
+					first.focus();
+					if (want && first.select) { first.select(); }
+				}, 0);
+			}
 		}
 	}
 	function closeDialog() {
