@@ -407,10 +407,10 @@ never edits a synonym.
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   _Ruled OK 2026-10-03._
 - **`lpn_scenario_duration_tip`**
-  > Overrides the project's total run time in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
+  > Overrides the total run time in this scenario. Leave it blank to use its parent's. A total run time of 0:00 is a steady-state run.
   @@ NEEDS RULING
 - **`lpn_scenario_hyd_step_tip`**
-  > Overrides the project's hydraulic time step in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time.
+  > Overrides the hydraulic time step in this scenario. Leave it blank to use its parent's.
   @@ NEEDS RULING
 - **`lpn_scncmp_at_time`**
   > {value} at {id}, {time}
@@ -432,7 +432,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**6 still to read**, of 13 new keys across 12 unmerged branch(es).
+**157 still to read**, of 165 new keys across 18 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -443,7 +443,52 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/basemap-style (`ffd4a73a`) — 6 new, 6 to read @@ NEEDS RULING
+### chore/perry-journal-1004 (`7449c134`) — 14 new, 14 to read @@ NEEDS RULING
+
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map first.
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
+
+### feat/basemap-style (`0bc4d9bb`) — 20 new, 20 to read @@ NEEDS RULING
 
 - **`lpn_basemap_style_faded`**
   > Faded
@@ -457,6 +502,48 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_basemap_style_normal`**
   > Normal
   @@ NEEDS RULING
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map first.
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
 - **`lpn_settings_basemap_style`**
   > Basemap style
   @@ NEEDS RULING
@@ -464,11 +551,196 @@ build for that would be a gate nobody keeps. Refresh it with
   > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.
   @@ NEEDS RULING
 
+### feat/chain-draw (`3cafad01`) — 17 new, 17 to read @@ NEEDS RULING
+
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
+- **`lpn_mode_add_chain`**
+  > Mode: Add Junction and Pipe. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map first.
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
+- **`lpn_tool_add_chain`**
+  > Junction and Pipe
+  @@ NEEDS RULING
+- **`lpn_tool_add_chain_tip`**
+  > Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
+  @@ NEEDS RULING
+
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dialog-audit (`4a665186`) — adds no English strings
+### feat/dialog-audit (`9bdb5559`) — 14 new, 14 to read @@ NEEDS RULING
 
-### feat/epanet-pp-brand (`2b3f411b`) — adds no English strings
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map first.
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
+
+### feat/elev-default (`90f33841`) — 14 new, 14 to read @@ NEEDS RULING
+
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map first.
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
+
+### feat/epanet-pp-brand (`3655b959`) — 14 new, 14 to read @@ NEEDS RULING
+
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map first.
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -490,6 +762,102 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
+### feat/pda (`ac32b95f`) — 31 new, 31 to read @@ NEEDS RULING
+
+- **`lpn_diag_pda_needs_epanet`**
+  > The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.
+  @@ NEEDS RULING
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
+- **`lpn_engine_pda_route`**
+  > Solved with the EPANET solver, because the demand model is pressure driven.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map first.
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_pda_deficit_note`**
+  > Junctions receiving less than their demand: {n}.
+  @@ NEEDS RULING
+- **`lpn_result_delivered_demand`**
+  > Delivered demand
+  @@ NEEDS RULING
+- **`lpn_result_delivered_demand_tip`**
+  > The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.
+  @@ NEEDS RULING
+- **`lpn_result_demand_deficit`**
+  > Demand deficit
+  @@ NEEDS RULING
+- **`lpn_result_demand_deficit_tip`**
+  > The demand this junction asks for and does not receive, because the pressure is below the required pressure.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
+- **`lpn_settings_demand_model`**
+  > Demand model
+  @@ NEEDS RULING
+- **`lpn_settings_demand_model_dda`**
+  > Demand driven (DDA)
+  @@ NEEDS RULING
+- **`lpn_settings_demand_model_pda`**
+  > Pressure driven (PDA)
+  @@ NEEDS RULING
+- **`lpn_settings_demand_model_tip`**
+  > Choose how junctions receive water. Demand driven delivers every demand in full, whatever the pressure. Pressure driven delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.
+  @@ NEEDS RULING
+- **`lpn_settings_min_pressure`**
+  > Minimum pressure
+  @@ NEEDS RULING
+- **`lpn_settings_min_pressure_tip`**
+  > Enter the pressure at or below which a junction receives no water. Use this project's pressure unit.
+  @@ NEEDS RULING
+- **`lpn_settings_pressure_exponent`**
+  > Pressure exponent
+  @@ NEEDS RULING
+- **`lpn_settings_pressure_exponent_tip`**
+  > Enter the exponent of the curve that rises from no water at the minimum pressure to the full demand at the required pressure.
+  @@ NEEDS RULING
+- **`lpn_settings_req_pressure`**
+  > Required pressure
+  @@ NEEDS RULING
+- **`lpn_settings_req_pressure_tip`**
+  > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit.
+  @@ NEEDS RULING
+
 ### feat/profile-file (`a095faf4`) — 4 new, all ruled
 
 - **`lpn_profile_file_done`**
@@ -505,6 +873,115 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/scenario-option (`40d49c55`) — adds no English strings
+### feat/scenario-option (`9ab63994`) — adds no English strings
 
-### fix/tip-width (`5aa1cd2d`) — adds no English strings
+### feat/tip-verdict (`a08acce9`) — 4 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_choice_default`**
+  > Default
+  @@ NEEDS RULING
+- **`lpn_cp_allow_tip`**
+  > Allow only these characters:
+  @@ NEEDS RULING
+- **`lpn_cp_characters_tip`**
+  > "@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.
+  @@ NEEDS RULING
+- **`lpn_pane_sort_desc`**
+  > Sort descending
+  _Ruled OK 2026-09-26._
+
+### fix/browser-pass-specs (`32c38dec`) — 14 new, 14 to read @@ NEEDS RULING
+
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map first.
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
+
+### fix/contour-off (`f2faac66`) — 16 new, 16 to read @@ NEEDS RULING
+
+- **`lpn_contour_show`**
+  > Show contours
+  @@ NEEDS RULING
+- **`lpn_contour_show_tip`**
+  > Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.
+  @@ NEEDS RULING
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map first.
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
