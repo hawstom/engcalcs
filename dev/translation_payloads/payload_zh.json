@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 2332,
-        "delta_key_count": 51,
+        "expected_key_count": 2344,
+        "delta_key_count": 65,
         "exempt_key_count": 26,
         "exempt_keys": [
             "calc_units_us",
@@ -705,6 +705,17 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_pane_manage_cols_width": "Width (em)",
+        "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
+        "lpn_dock_left": "Dock at the left of the map",
+        "lpn_dock_right": "Dock at the right of the map",
+        "lpn_dock_float": "Float",
+        "lpn_dock_autohide": "Auto-hide",
+        "lpn_pane_filter_sel_note": "Selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_and": "Filtered by {q} and selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
+        "lpn_pane_sel_only": "Selection only",
+        "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
         "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
@@ -712,6 +723,9 @@
         "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
         "lpn_report_pump_head": "Pump head",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_saved_project": "Saved with the project",
+        "lpn_saved_browser": "Saved in this browser",
+        "lpn_saved_session": "Not saved",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
         "lpn_ds_title": "Demand scaling",
@@ -758,6 +772,17 @@
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "keys": {
+        "lpn_pane_manage_cols_width": "Width (em)",
+        "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
+        "lpn_dock_left": "Dock at the left of the map",
+        "lpn_dock_right": "Dock at the right of the map",
+        "lpn_dock_float": "Float",
+        "lpn_dock_autohide": "Auto-hide",
+        "lpn_pane_filter_sel_note": "Selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_and": "Filtered by {q} and selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
+        "lpn_pane_sel_only": "Selection only",
+        "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
         "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
@@ -765,6 +790,9 @@
         "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
         "lpn_report_pump_head": "Pump head",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_saved_project": "Saved with the project",
+        "lpn_saved_browser": "Saved in this browser",
+        "lpn_saved_session": "Not saved",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
         "lpn_ds_title": "Demand scaling",
@@ -811,6 +839,182 @@
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "key_context": {
+        "lpn_pane_manage_cols_width": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_manage_cols_bottom",
+                    "value": "移到最后",
+                    "english": "Move to end"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_colmenu_tip",
+                    "value": "隐藏或管理列",
+                    "english": "Hide or manage columns"
+                }
+            }
+        },
+        "lpn_pane_width_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_manage_cols_bottom",
+                    "value": "移到最后",
+                    "english": "Move to end"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_colmenu_tip",
+                    "value": "隐藏或管理列",
+                    "english": "Hide or manage columns"
+                }
+            }
+        },
+        "lpn_dock_left": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_close",
+                    "value": "关闭",
+                    "english": "Close"
+                },
+                "next_translated": {
+                    "key": "lpn_popup_boxtitle",
+                    "value": "属性",
+                    "english": "Properties"
+                }
+            }
+        },
+        "lpn_dock_right": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_close",
+                    "value": "关闭",
+                    "english": "Close"
+                },
+                "next_translated": {
+                    "key": "lpn_popup_boxtitle",
+                    "value": "属性",
+                    "english": "Properties"
+                }
+            }
+        },
+        "lpn_dock_float": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_close",
+                    "value": "关闭",
+                    "english": "Close"
+                },
+                "next_translated": {
+                    "key": "lpn_popup_boxtitle",
+                    "value": "属性",
+                    "english": "Properties"
+                }
+            }
+        },
+        "lpn_dock_autohide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_close",
+                    "value": "关闭",
+                    "english": "Close"
+                },
+                "next_translated": {
+                    "key": "lpn_popup_boxtitle",
+                    "value": "属性",
+                    "english": "Properties"
+                }
+            }
+        },
+        "lpn_pane_filter_sel_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "此表中没有与过滤条件匹配的内容。",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "缩放并选中",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_filter_sel_and": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "此表中没有与过滤条件匹配的内容。",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "缩放并选中",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_filter_sel_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "此表中没有与过滤条件匹配的内容。",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "缩放并选中",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_sel_only": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "此表中没有与过滤条件匹配的内容。",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "缩放并选中",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_sel_only_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "此表中没有与过滤条件匹配的内容。",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "缩放并选中",
+                    "english": "Zoom & select"
+                }
+            }
+        },
         "lpn_graphs_menu_tip": {
             "reason": "missing",
             "current_value": null,
@@ -920,6 +1124,54 @@
                     "key": "lpn_sysflow_produced",
                     "value": "产生",
                     "english": "Produced"
+                }
+            }
+        },
+        "lpn_saved_project": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_page",
+                    "value": "页面",
+                    "english": "Page"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "水力计算",
+                    "english": "Hydraulics"
+                }
+            }
+        },
+        "lpn_saved_browser": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_page",
+                    "value": "页面",
+                    "english": "Page"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "水力计算",
+                    "english": "Hydraulics"
+                }
+            }
+        },
+        "lpn_saved_session": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_page",
+                    "value": "页面",
+                    "english": "Page"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "水力计算",
+                    "english": "Hydraulics"
                 }
             }
         },

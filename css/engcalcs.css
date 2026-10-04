@@ -436,6 +436,15 @@ button > .ec-icon, a > .ec-icon, label > .ec-icon { margin-inline-end: 0.4em; }
 	pointer-events: none;
 }
 
+/* **WIDE TIPS, NOT TALL ONES** (Tom, 2026-10-04, on Ida's audit). Bootstrap's 200 px cap turned a
+   long tip into a column taller than half the window: 92 words stood 554 px high in a 900 px one.
+   17rem, the happy medium Tom asked for between the old 200 px and a 22rem trial,
+   makes the same tip under 400 px high. Capped at the viewport less a gutter, so a phone in
+   tall mode never gets a tip wider than its screen. */
+.tooltip {
+	--bs-tooltip-max-width: min(17rem, calc(100vw - 2rem));
+}
+
 /* The welcome line under the page title (template_welcome). Set apart with italics
    rather than the >> ... << that used to be typed into all 27 language strings: those
    are not standard English or typography (Tom, 2026-07-27), they are directional
@@ -3045,17 +3054,6 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
 	padding: 3px 8px; font: inherit; white-space: nowrap;
 }
 .lpn-managecols-btns button:disabled { color: var(--ec-gray-bbb); border-color: var(--ec-gray-eee); cursor: default; }
-/* Print, at the LEADING edge of the pane head, ahead of the tab strip (Tom, 2026-08-21: it was
-   "poorly discoverable" in the top-right corner, where the eye reads window controls rather than
-   an action). flex:0 0 auto keeps it its own width while the tab strip beside it does the
-   wrapping, so a strip that wraps to two rows never moves it. It is a small text button rather
-   than an icon: it is the only control in this row that DOES something to the content. */
-.lpn-pane-print {
-	flex: 0 0 auto; align-self: flex-start; margin: 1px 6px 0 0; padding: 2px 8px; font: inherit;
-	font-size: .85em; background: var(--ec-gray-f6f6f6); border: 1px solid var(--ec-gray-bbb); color: var(--ec-ink); cursor: pointer;
-}
-.lpn-pane-print:hover, .lpn-pane-print:focus { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
-
 /* PRINTING ONE TABLE (Tom, 2026-08-21: "Make a way to print any table").
    The sheet is a STATIC COPY of the active table, built by paneBuildPrintable() and appended
    straight to <body> so that hiding "everything else" is one rule with no ancestor to fight. It
@@ -3285,6 +3283,73 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	border-bottom: 1px solid var(--ec-border-strong); overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
 }
 
+/* ---- THE CORNER BUTTONS AND DOCKING (ROADMAP Task 441) ---------------------------------------
+   Tom, 2026-10-03: *"the conventional docking, hide, autohide, etc icon buttons at the upper right
+   corner of non-hog (non-modal) boxes right before (next to) the exit X"*. One row per standing box,
+   built by wireBoxDocking() in looped-network.js, sitting in the title band immediately left of the
+   40 px X. The row ignores the pointer and its buttons take it, so the gaps between them still drag
+   the box (makePanelDraggable() starts a drag only on the box itself). The title stops short of the
+   row: `--lpn-corner-w` is written by the row's renderer, because how many buttons it shows depends
+   on whether the box is docked. */
+.lpn-box-corner {
+	position: absolute; top: 0; right: 40px; height: 39px;
+	display: flex; align-items: center; pointer-events: none;
+}
+.lpn-box-corner > * { pointer-events: auto; }
+.lpn-has-corner > .lpn-setbox-title { padding-right: calc(40px + var(--lpn-corner-w, 0px)); }
+.lpn-corner-btn {
+	width: 28px; height: 39px; padding: 0; border: 0; background: transparent;
+	color: var(--ec-ink); cursor: pointer;
+	display: inline-flex; align-items: center; justify-content: center;
+}
+.lpn-corner-btn:hover, .lpn-corner-btn:focus-visible { background: var(--ec-gray-eee); color: var(--ec-ink-black); }
+.lpn-corner-btn[aria-pressed="true"] { background: var(--ec-pressed-bg); }
+.lpn-corner-help { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 39px; }
+/* A DOCKED BOX'S PLACE OUTRANKS EVERY INLINE WRITE. The openers, caps and fits on this page all
+   write a box's inline left/top/size; a docked box is placed by four custom properties instead, and
+   `!important` here beats every one of those inline writes without any of them having to know. The
+   floating geometry they go on writing is exactly what Float hands back. */
+.lpn-dragpanel.lpn-docked {
+	left: var(--lpn-dock-x) !important; top: var(--lpn-dock-y) !important;
+	width: var(--lpn-dock-w) !important; height: var(--lpn-dock-h) !important;
+	min-width: 0 !important; min-height: 0 !important; max-width: none !important; max-height: none !important;
+	resize: none !important; box-shadow: none !important;
+}
+.lpn-docked > .lpn-resize-grip { display: none !important; }
+.lpn-docked .lpn-popover-body { max-height: none; }
+/* Auto-hide: a tucked box is still OPEN (its display is untouched, so every isOpen() still says so);
+   it is only invisible and untouchable until its tab brings it out. */
+.lpn-dragpanel.lpn-dock-collapsed { visibility: hidden !important; pointer-events: none !important; }
+.lpn-dragpanel.lpn-dock-out { box-shadow: 2px 2px 8px var(--ec-a-0-0-0-3) !important; }
+/* The strip an auto-hidden box tucks into, one per side, at the map's outer edge. Empty, it is
+   nothing. Each tab is a button reading the box's own title, turned on its side. */
+.lpn-dock-strip {
+	position: fixed; z-index: 7; display: flex; flex-direction: column; gap: 4px;
+	width: 24px; box-sizing: border-box; padding: 4px 0; overflow: hidden;
+	background: var(--ec-gray-f2f2f2); border: 1px solid var(--ec-border-strong);
+}
+.lpn-dock-strip:empty { display: none; }
+.lpn-dock-tab {
+	writing-mode: vertical-rl; flex: 0 1 auto; min-height: 0; max-height: 14em;
+	padding: 8px 2px; margin: 0 1px; border: 1px solid var(--ec-border-strong); border-radius: 3px;
+	background: var(--ec-bg); color: var(--ec-ink); font-size: 12px; line-height: 1.2;
+	white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
+}
+.lpn-dock-tab:hover, .lpn-dock-tab:focus-visible, .lpn-dock-tab[aria-expanded="true"] {
+	background: var(--ec-hover-bg); border-color: var(--ec-hover-border);
+}
+/* The column's inner edge: drag it to make the docked column wider or narrower. */
+.lpn-dock-grip {
+	position: fixed; z-index: 7; width: 8px; margin-left: -4px; cursor: col-resize; touch-action: none;
+	display: none;
+}
+.lpn-dock-grip.lpn-dock-grip-live { display: block; }
+.lpn-dock-grip:hover { background: var(--ec-gray-e8e8e8); }
+/* The map gives up the docked columns as margins on its wrapper; the canvas is `width: 100%`, so it
+   narrows, and every overlay inside the wrapper moves with it. Never on paper. */
+.lpn-map-wrap { margin-left: var(--lpn-dock-ml, 0px); margin-right: var(--lpn-dock-mr, 0px); }
+@media print { .lpn-map-wrap { margin-left: 0; margin-right: 0; } }
+
 /* ---- THE NEW-PROJECT BOX (ROADMAP Task 477) --------------------------------------------------
    Four blocks stacked, each a question. Nothing here sets a width: the box's own max-width in
    Looped-Network.php does that, and the unit strip inside it wraps on its own (.lpn-units-group),
@@ -3463,6 +3528,21 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    the two levels distinguishable only by size. */
 .lpn-set-sub { margin-top: 8px; font-size: 1rem; font-weight: 600; opacity: .8; }
 .lpn-set-subbody { margin-left: 8px; }
+/* **WHERE A SETTING IS KEPT** (Task 739, Tom 2026-09-28: Autodesk's "Where it's stored"). One quiet
+   marker, the same element on a sub-heading and on the odd row whose home differs from its heading's.
+   Ink at low opacity and a smaller size, no colour, so it reads as a label and never as a control or
+   a warning. It sits INSIDE the box body, never in the title bar. */
+.lpn-saved { margin-inline-start: .6em; font-size: .8em; font-weight: 400; opacity: .7; white-space: nowrap; }
+/* **ON A PHONE THE MARKER MAY WRAP.** nowrap kept "Saved in this browser" whole beside its heading,
+   and at 360 px that pushed the Settings pane 23 px wide (settings-phone-width-browser-harness.js,
+   Task 760, caught it when Task 739 merged). An inline-block capped at the line lets it drop under
+   the heading and break inside itself as a last resort. */
+@media (max-width: 600px) {
+	.lpn-saved { display: inline-block; max-width: 100%; white-space: normal; }
+}
+.lpn-saved-row { display: block; margin-inline-start: 0; }
+.lpn-managecols-width { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.lpn-managecols-width input { width: 6em; }
 /* The two scope markers, "Project settings" and "Calculator settings". Quieter than a sub-heading
    because they label a SCOPE rather than name a place you can jump to. */
 .lpn-set-group { margin-top: 10px; font-weight: 600; opacity: .8; text-transform: none; }

@@ -1329,7 +1329,6 @@ $ec_lang['lpn_goto_on_map']='Mostrar no mapa';
 $ec_lang['lpn_pane_select_on_map']='Selecionar no mapa';
 $ec_lang['lpn_pane_unselect_on_map']='Remover seleção no mapa';
 $ec_lang['lpn_pane_print']='Imprimir tabela';
-$ec_lang['lpn_pane_print_tip']='Imprime a tabela que você está vendo, com o nome do projeto, o nome da tabela e as unidades nos cabeçalhos. As linhas são impressas na ordem em que você as ordenou.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -3080,7 +3079,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Os rótulos de cliente são desenhado
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Usar a visualização atual';
 $ec_lang['lpn_settings_page']='Página';
-$ec_lang['lpn_settings_page_note']='Salvo nesta calculadora, não no projeto.';
 $ec_lang['lpn_settings_hydraulics']='Hidráulica';
 $ec_lang['lpn_settings_quality']='Qualidade da água';
 $ec_lang['lpn_settings_quality_track']='Parâmetro de qualidade';

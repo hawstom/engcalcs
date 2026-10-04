@@ -1329,7 +1329,6 @@ $ec_lang['lpn_goto_on_map']='نقشے پر دکھائیں';
 $ec_lang['lpn_pane_select_on_map']='نقشے پر منتخب کریں';
 $ec_lang['lpn_pane_unselect_on_map']='نقشے پر انتخاب ختم کریں';
 $ec_lang['lpn_pane_print']='جدول پرنٹ کریں';
-$ec_lang['lpn_pane_print_tip']='جو جدول آپ دیکھ رہے ہیں اسے پرنٹ کریں، جس میں پراجیکٹ کا نام، جدول کا نام، اور عنوانات میں اکائیاں شامل ہوں گی۔ قطاریں اسی ترتیب میں پرنٹ ہوتی ہیں جس میں آپ نے انہیں ترتیب دیا۔';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -3078,7 +3077,6 @@ $ec_lang['lpn_labels_customer_width_tip']='گاہک لیبلز صرف اس وق�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='موجودہ منظر استعمال کریں';
 $ec_lang['lpn_settings_page']='صفحہ';
-$ec_lang['lpn_settings_page_note']='اس کیلکولیٹر میں محفوظ، پراجیکٹ میں نہیں۔';
 $ec_lang['lpn_settings_hydraulics']='ہائیڈرالکس';
 $ec_lang['lpn_settings_quality']='پانی کا معیار';
 $ec_lang['lpn_settings_quality_track']='معیار پیرامیٹر';

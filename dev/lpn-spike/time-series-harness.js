@@ -405,8 +405,8 @@ const finite = (s) => s.points.filter((p) => p.y !== undefined).map((p) => p.y);
 	head('8. A TAB IN THE STRIP, AND NO NEW STORAGE');
 	const ids = L.paneTabIds();
 	check(ids.indexOf('timeseries') >= 0, `the strip carries the tab: ${ids.join(', ')}`);
-	check(ids[ids.length - 1] === 'profile',
-		'and PROFILE IS STILL LAST -- Tom\'s own ordering, 2026-08-21');
+	check(ids.indexOf('profile') === ids.indexOf('timeseries') + 1,
+		'and Profile follows it, the Graphs menu\'s order (Tom, 2026-10-04)');
 	// Found by walking the strip the page built, NOT through getElementById: the stub answers that
 	// only for the ids it pre-creates, and wirePane() makes its buttons with createElement -- so a
 	// lookup would be null for a button that is genuinely there.

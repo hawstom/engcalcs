@@ -1330,7 +1330,6 @@ $ec_lang['lpn_pane_select_on_map']='Chagua kwenye ramani';
 $ec_lang['lpn_pane_unselect_on_map']='Ondoa uteuzi kwenye ramani';
 
 $ec_lang['lpn_pane_print']='Chapisha jedwali';
-$ec_lang['lpn_pane_print_tip']='Chapisha jedwali unaloliangalia, likiwa na jina la mradi, jina la jedwali, na vitengo kwenye vichwa vya safu. Safu mlalo zinachapishwa kwa mpangilio ulioupanga.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -3079,7 +3078,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Lebo za wateja huchorwa tu wakati mwo
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Tumia mwoneko wa sasa';
 $ec_lang['lpn_settings_page']='Ukurasa';
-$ec_lang['lpn_settings_page_note']='Imehifadhiwa kwenye kikokotoo hiki, si kwenye mradi.';
 $ec_lang['lpn_settings_hydraulics']='Haidroliki';
 $ec_lang['lpn_settings_quality']='Ubora wa maji';
 $ec_lang['lpn_settings_quality_track']='Kigezo cha ubora';
