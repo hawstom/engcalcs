@@ -2983,6 +2983,7 @@ $ec_lang['lpn_scenario_push_tip']='Every scenario goes back to the Base value fo
 $ec_lang['lpn_scenario_basic']='Basic mode';
 $ec_lang['lpn_scenario_basic_tip']='Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category, and lets a scenario carry its own total run time and hydraulic time step. It invites your feedback.';
 $ec_lang['lpn_alt_title']='Alternatives preview';
+$ec_lang['lpn_alt_calc_options']='Calculation options';
 $ec_lang['lpn_alt_note']='Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario\'s own value, or leave it blank to use its parent\'s. The project\'s own are in Settings, Calculation, Time.';
 $ec_lang['lpn_scenario_duration_tip']='Overrides the total run time in this scenario. Leave it blank to use its parent\'s. A total run time of 0:00 is a steady-state run.';
 $ec_lang['lpn_scenario_hyd_step_tip']='Overrides the hydraulic time step in this scenario. Leave it blank to use its parent\'s.';

@@ -3450,6 +3450,7 @@ EngCalcs.pageConfig = {
 	lpn_scenario_basic: <?=json_encode($ec_lang['lpn_scenario_basic'])?>,
 	lpn_scenario_basic_tip: <?=json_encode($ec_lang['lpn_scenario_basic_tip'])?>,
 	lpn_alt_title: <?=json_encode($ec_lang['lpn_alt_title'])?>,
+	lpn_alt_calc_options: <?=json_encode($ec_lang['lpn_alt_calc_options'])?>,
 	lpn_alt_note: <?=json_encode($ec_lang['lpn_alt_note'])?>,
 	lpn_scenario_duration_tip: <?=json_encode($ec_lang['lpn_scenario_duration_tip'])?>,
 	lpn_scenario_hyd_step_tip: <?=json_encode($ec_lang['lpn_scenario_hyd_step_tip'])?>,

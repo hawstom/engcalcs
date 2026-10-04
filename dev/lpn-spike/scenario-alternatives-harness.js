@@ -271,7 +271,9 @@ console.log('\n--- Basic mode ---');
 	ok('...and shows Peak Hour with its own Demand alternative of one value', text.indexOf(pk.name + ' (1)') >= 0);
 	// The Demand multiplier column: a calculation option beside the alternatives, after the categories.
 	{
-		const rowsOf = (function walkRows(el, out) { if (el.tagName === 'TR') { out.push(el); } (el.children || []).forEach(function (c) { walkRows(c, out); }); return out; })(ensure('lpn_alt_report'), []);
+		// The row above the headings that names the calculation options as a group is not a data row.
+		const notGroupRow = (tr) => !(tr.children || []).some((c) => /lpn-alt-group/.test(c.className || ''));
+		const rowsOf = (function walkRows(el, out) { if (el.tagName === 'TR') { out.push(el); } (el.children || []).forEach(function (c) { walkRows(c, out); }); return out; })(ensure('lpn_alt_report'), []).filter(notGroupRow);
 		// A scenario's option is a box it can be typed into (Task 755), so a cell reads as its input.
 		const cellText = (c) => { const inp = (c.children || []).filter((k) => k.tagName === 'INPUT')[0];
 			return inp ? String(inp.value) : (c.textContent || ''); };
@@ -287,12 +289,12 @@ console.log('\n--- Basic mode ---');
 		// createScenario() seeds a new scenario with the project's value, so one that inherits is one
 		// holding none (the ready-made Flow test scenarios).
 		const inheriting = L.createScenario('Inheriting'); delete inheriting.demandMultiplier; L.openAlternativesBox();
-		const rows1 = (function walkRows(el, out) { if (el.tagName === 'TR') { out.push(el); } (el.children || []).forEach(function (c) { walkRows(c, out); }); return out; })(ensure('lpn_alt_report'), []);
+		const rows1 = (function walkRows(el, out) { if (el.tagName === 'TR') { out.push(el); } (el.children || []).forEach(function (c) { walkRows(c, out); }); return out; })(ensure('lpn_alt_report'), []).filter(notGroupRow);
 		rows1.slice(1).forEach(function (tr) { byName[cells(tr)[0]] = cells(tr); });
 		ok('a scenario holding no multiplier of its own the project shows blank', byName['Inheriting'][DM] === '', JSON.stringify(byName['Inheriting']));
 		const ownMult = L.createScenario('Max Day'); ownMult.demandMultiplier = 2;
 		L.openAlternativesBox();
-		const rows2 = (function walkRows(el, out) { if (el.tagName === 'TR') { out.push(el); } (el.children || []).forEach(function (c) { walkRows(c, out); }); return out; })(ensure('lpn_alt_report'), []);
+		const rows2 = (function walkRows(el, out) { if (el.tagName === 'TR') { out.push(el); } (el.children || []).forEach(function (c) { walkRows(c, out); }); return out; })(ensure('lpn_alt_report'), []).filter(notGroupRow);
 		const md = rows2.map(cells).filter((r) => r[0] === 'Max Day')[0];
 		ok('a scenario with its own multiplier shows it', md && md[DM] === '2', JSON.stringify(md));
 		ok('the column is marked as a calculation option, apart from the categories',

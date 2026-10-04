@@ -59191,6 +59191,9 @@ var EngCalcs = EngCalcs || {};
 			// A third member says the tip must be SEEN: the `?` the labels carry, because a `title`
 			// alone never shows on a touch screen and nothing on the heading says it is there.
 			if (tip && shown) {
+				// The tip moves to the `?`: left on the `th` as well, the browser showed its own tooltip
+				// beside ours (Tom, 2026-10-04: "two versions of glyph tips").
+				th.removeAttribute('title');
 				th.textContent = '';
 				help = document.createElement('span');
 				help.className = 'ec-help'; help.title = tip;
@@ -61398,11 +61401,21 @@ var EngCalcs = EngCalcs || {};
 		}
 	}
 	// tbody -> its table -> thead -> the heading row; every heading from `from` on is an option.
+	// **THE OPTION COLUMNS ARE NAMED AS A GROUP** (Tom, 2026-10-04, in the preview with Basic mode off:
+	// he could not find them). A row above the headings spans them with "Calculation options", the
+	// word Settings and the note under the table already use; the alternatives side stays blank.
 	function markHeadingsFrom(tbody, from) {
-		var hr = tbody.parentNode.children[0].children[0], i;
+		var thead = tbody.parentNode.children[0], hr = thead.children[0], i, gr, blank, group;
 		for (i = from; i < hr.children.length; i++) {
 			hr.children[i].className += ' lpn-alt-opt' + (i === from ? ' lpn-alt-calcopt' : '');
 		}
+		gr = document.createElement('tr');
+		blank = document.createElement('th'); blank.colSpan = from;
+		group = document.createElement('th'); group.colSpan = hr.children.length - from;
+		group.className = 'lpn-alt-opt lpn-alt-calcopt lpn-alt-group';
+		group.textContent = (EngCalcs.pageConfig || {}).lpn_alt_calc_options || 'Calculation options';
+		gr.appendChild(blank); gr.appendChild(group);
+		thead.insertBefore(gr, hr);
 	}
 	function altOptionText(s, key) {
 		if (key === 'demandMultiplier') {

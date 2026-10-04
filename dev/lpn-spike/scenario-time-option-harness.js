@@ -230,7 +230,8 @@ function timesLines(inp) {
 	console.log('\n--- the Alternatives preview shows them ---');
 	const altHost = ensure('lpn_alt_report');
 	L.rebuildAlt();
-	const at = rowsOf(altHost), ah = kids(at[0]).map(cellText);
+	// The first row names the calculation options as a group; the column headings are the second.
+	const at0 = rowsOf(altHost), groupRow = at0[0], at = at0.slice(1), ah = kids(at[0]).map(cellText);
 	const col = function (label) { return ah.findIndex(function (h) { return h.indexOf(label) === 0; }); };
 	const aD = col(PC.lpn_time_duration), aH = col(PC.lpn_time_hyd_step), an = {};
 	at.slice(1).forEach(function (tr) { const k = kids(tr); an[cellText(k[0])] = k; });
@@ -246,6 +247,14 @@ function timesLines(inp) {
 	const optTh = [PC.lpn_time_duration, PC.lpn_time_hyd_step].map(function (lab) { return kids(at[0])[col(lab)]; });
 	ok('each calculation-option heading shows a ? for its tip', optTh.every(function (th) {
 		let q = false; walk(th, function (x) { if (/(^|\s)ec-tip(\s|$)/.test(x.className || '')) { q = true; } }); return q; }));
+	// TOM, 2026-10-04 again, in the preview with Basic mode off: still could not find them, and saw
+	// "two versions of glyph tips". Nothing named the three columns as a group, and the heading kept
+	// its own `title` beside the ?'s tip, so the browser showed a second tooltip.
+	ok('a row above the headings names the calculation options as a group',
+		kids(groupRow).length === 2 && cellText(kids(groupRow)[1]) === PC.lpn_alt_calc_options, kids(groupRow).map(cellText).join('|'));
+	ok('...spanning exactly the option columns', kids(groupRow)[1].colSpan === ah.length - col(PC.bpn_demand_mult),
+		kids(groupRow)[1].colSpan + ' of ' + ah.length);
+	ok('an option heading with a ? carries no browser tooltip of its own', optTh.every(function (th) { return !th.title; }));
 	const blank = kids(an.Steady[aH]).filter(function (k) { return k._tag === 'input'; })[0];
 	ok('a blank box shows the Base value it falls back to', blank && blank.placeholder === '1:00', blank && blank.placeholder);
 	const door = kids(an[PC.lpn_scenario_base][aD]).filter(function (k) { return k._tag === 'button'; })[0];

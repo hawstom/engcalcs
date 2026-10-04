@@ -47,7 +47,8 @@ function measureInPage() {
 	const wrap = table.parentNode;
 	const out = { split: [], cols: [], wrapW: wrap.clientWidth, tableW: table.getBoundingClientRect().width,
 		scrolls: wrap.scrollWidth > wrap.clientWidth + 1 };
-	const rows = Array.from(table.rows);
+	// The group row naming the calculation options spans columns, so it is left out of the per-column measure.
+	const rows = Array.from(table.rows).filter((tr) => !tr.querySelector('.lpn-alt-group'));
 	rows.forEach((tr) => Array.from(tr.cells).forEach((c) => {
 		const walker = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
 		let n;
