@@ -210,5 +210,56 @@ console.log('\n--- 7. the shortcut and touch ---');
 	ok('1 returns to Select and abandons the chain', L.getMode() === 'select' && L.pendingFrom() === null);
 }
 
+
+console.log('\n--- 8. Redo carries the chain forward ---');
+{
+	fresh();
+	L.setMode('add-chain');
+	click(100, 100); click(300, 100); click(500, 100); click(700, 100);
+	const ids = L.getDoc().nodes.map(function (n) { return n.id; });
+	L.undo(); L.undo();
+	ok('after two Undos the chain stands on J2', L.pendingFrom() === ids[1], L.pendingFrom());
+	L.redo(); L.redo();
+	ok('after two Redos J4 is back and the chain stands on it', L.getDoc().nodes.length === 4 && L.pendingFrom() === ids[3], L.pendingFrom());
+	click(900, 100);
+	const d = L.getDoc();
+	ok('the next press continues from J4, not from J2', d.links[3].from === ids[3] && d.links.length === 4, JSON.stringify(d.links.map(function (l) { return l.from + '>' + l.to; })));
+	L.undo(); L.undo();
+	click(500, 400);
+	L.redo();
+	ok('a new press after Undo drops the undone steps: Redo then does not resurrect them', L.getDoc().nodes.length === 4 && L.pendingFrom() !== null);
+	esc();
+	// The Pipe tool is not a chain: Undo leaves its from-node alone when that node survives.
+	fresh();
+	const a = L.addNode('junction', 100, 100).id;
+	L.setMode('add-pipe'); click(100, 100);
+	L.undo();
+	ok('the Pipe tool keeps its from-node through an unrelated Undo only if the node survives', L.pendingFrom() === null || L.pendingFrom() === a);
+}
+
+console.log('\n--- 9. the rubber band ---');
+{
+	fresh();
+	L.setMode('add-chain');
+	const rb = L.rubberBand();
+	function at() { return [rb.getAttribute('x1'), rb.getAttribute('y1'), rb.getAttribute('x2'), rb.getAttribute('y2')].map(Number); }
+	click(100, 100);
+	fire('pointermove', { clientX: 300, clientY: 100, pointerType: 'mouse' });
+	click(300, 100);
+	let v = at();
+	ok('after a click the band starts at the new node with zero length', v[0] === 300 && v[1] === 100 && v[2] === 300 && v[3] === 100, v.join(','));
+	fire('pointermove', { clientX: 400, clientY: 250, pointerType: 'mouse' });
+	v = at();
+	ok('and follows the pointer from there', v[0] === 300 && v[2] === 400 && v[3] === 250, v.join(','));
+	fire('pointerup', { pointerId: 9, clientX: 400, clientY: 250, pointerType: 'touch', button: 0 });
+	ok('on touch the band is hidden when a finger lifts (after a pan or pinch)', rb.style.display === 'none');
+	fire('pointermove', { clientX: 410, clientY: 260, pointerType: 'touch' });
+	ok('...and returns on the next pointer move', rb.style.display !== 'none');
+	click(400, 300, { touch: true });
+	v = at();
+	ok('a touch tap that adds a node shows the band at zero length on it', rb.style.display !== 'none' && v[0] === 400 && v[2] === 400 && v[3] === 300, v.join(','));
+	esc();
+}
+
 console.log('\n' + (fails ? fails + ' FAILED' : 'all passed'));
 process.exit(fails ? 1 : 0);

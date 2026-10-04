@@ -17201,7 +17201,17 @@ var EngCalcs = EngCalcs || {};
 		// held here for.
 		pendingLinkVerts = [];
 		if (id && nodeEls[id]) { nodeEls[id].circle.classList.add('lpn-node-pending'); }
-		if (rubberBandEl) { rubberBandEl.style.display = id ? '' : 'none'; }
+		if (rubberBandEl) {
+			rubberBandEl.style.display = id ? '' : 'none';
+			// **THE BAND STARTS AT THE NEW FROM-NODE AND HAS NO LENGTH UNTIL THE POINTER MOVES.**
+			// It was only ever positioned by a pointermove, so after a click it still ran from the
+			// previous node to this one, over the pipe just made (Perry, Task 719).
+			var anchor = id ? nodeById(id) : null;
+			if (anchor) {
+				rubberBandEl.setAttribute('x1', anchor.x); rubberBandEl.setAttribute('y1', anchor.y);
+				rubberBandEl.setAttribute('x2', anchor.x); rubberBandEl.setAttribute('y2', anchor.y);
+			}
+		}
 		drawPendingPath();
 	}
 	// The points already picked, drawn from the from-node through each of them. Between two clicks
@@ -42196,8 +42206,16 @@ var EngCalcs = EngCalcs || {};
 			if (!pendingLinkFrom) { return; }
 			var from = pendingLinkAnchor(), w = screenToWorld(e.clientX, e.clientY);
 			if (!from) { return; }
+			rubberBandEl.style.display = '';
 			rubberBandEl.setAttribute('x1', from.x); rubberBandEl.setAttribute('y1', from.y);
 			rubberBandEl.setAttribute('x2', w.x); rubberBandEl.setAttribute('y2', w.y);
+		});
+		// **ON TOUCH THE BAND HIDES WHEN A FINGER LIFTS** and returns on the next pointer move: a pan
+		// or pinch leaves it pointing at a stale place, and a finger has no hover to correct it. A
+		// tap that commits a node shows it again (setPendingLinkFrom), at zero length. Registered
+		// before the tap handler below, so that handler has the last word.
+		svg.addEventListener('pointerup', function (e) {
+			if (e.pointerType === 'touch' && pendingLinkFrom && rubberBandEl) { rubberBandEl.style.display = 'none'; }
 		});
 		// The half-placed meter's band (Task 247), its own listener for the same reason the ring
 		// below it has one: the shapes both track the pointer between clicks and neither should
@@ -43042,7 +43060,7 @@ var EngCalcs = EngCalcs || {};
 				onNode = addNode('junction', w.x, w.y).id;
 			}
 			setPendingLinkFrom(onNode);
-			chainTrail = [onNode];
+			chainTrail = [{ n: onNode, l: null }];
 			return;
 		}
 		// A second press on the node the chain stands on is neither a leg nor a node: a pipe from a
@@ -43052,8 +43070,12 @@ var EngCalcs = EngCalcs || {};
 		logLpnFirstAction('element');
 		if (onNode) { node = nodeById(onNode); }
 		else { node = addNode('junction', w.x, w.y); }
-		addLink('pipe', pendingLinkFrom, node.id, []);
-		var trail = chainTrail.concat([node.id]);
+		var made = addLink('pipe', pendingLinkFrom, node.id, []);
+		// A step after an Undo branches from where the chain stands, so the steps Undo took back
+		// (which Redo could still return) are dropped here and only here.
+		var at = pendingLinkFrom, cut = chainTrail.length;
+		chainTrail.forEach(function (st, i) { if (st.n === at) { cut = i + 1; } });
+		var trail = chainTrail.slice(0, cut).concat([{ n: node.id, l: made.id }]);
 		setPendingLinkFrom(node.id);
 		chainTrail = trail;
 	}
@@ -43063,10 +43085,18 @@ var EngCalcs = EngCalcs || {};
 	// is over. Called by restoreUndoSnapshot() once the drawing is rebuilt.
 	function chainResyncAfterUndo() {
 		if (!pendingLinkFrom) { return; }
-		var id = pendingLinkFrom, trail = chainTrail.slice();
-		while (id && !nodeById(id)) { id = trail.pop() || null; }
+		// The trail is the whole chain as drawn and is NOT shortened by Undo, so Redo can carry
+		// the chain forward again. Each step is the node and the pipe that reached it; a step
+		// counts as present only if both are, which also covers a loop-closing step whose node
+		// is an older one. The chain stands on the newest step present.
+		var trail = chainTrail, id = null, i;
+		// The Pipe tool keeps no trail: it stands where it was if that node survived, else it ends.
+		if (!trail.length) { setPendingLinkFrom(nodeById(pendingLinkFrom) ? pendingLinkFrom : null); return; }
+		for (i = trail.length - 1; i >= 0; i--) {
+			if (nodeById(trail[i].n) && (!trail[i].l || linkById(trail[i].l))) { id = trail[i].n; break; }
+		}
 		setPendingLinkFrom(id);
-		if (id && trail.length) { chainTrail = trail; }
+		if (id) { chainTrail = trail; }
 	}
 	document.addEventListener('contextmenu', function (e) {
 		if (mode !== 'add-chain' || !pendingLinkFrom || !e.target || !e.target.closest || !e.target.closest('#lpn_canvas')) { return; }
