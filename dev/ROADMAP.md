@@ -880,9 +880,6 @@ the block.
   Convert as has a Label suffix box for depth that is disabled because `level` is not in
   `nodeFieldDefs()`. Measured 2026-09-23 at eight sites, including the dense label priority table
   and both label passes, so it is a label feature, not a wizard fix.
-- 50|713| **Say Cmd, not Ctrl, to a Mac reader.**
-  The tables' right-click accelerators and Help > Notes say Ctrl+C / Ctrl+D on every platform
-  (feat/table-editing). The keys already accept Cmd; only the words are wrong on a Mac.
 - 50|717| **EPANET-MSX, multi-species water quality.**
   Tom, 2026-09-25: *"Multi-species MSX: Add it priority 50. I don't understand it, but we can learn.
   Thank you, Mary!"* From Mary's `dev/agents/market-researcher/epanet-gap-audit.md`.
