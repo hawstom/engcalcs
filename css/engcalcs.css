@@ -3366,6 +3366,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 	background: var(--ec-bg); color: var(--ec-ink); font-size: 12px; line-height: 1.2;
 	white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
 }
+.lpn-dock-tab.lpn-dock-tab-drag { cursor: grabbing; box-shadow: 0 0 0 2px var(--ec-hover-border); }
 .lpn-dock-tab:hover, .lpn-dock-tab:focus-visible, .lpn-dock-tab[aria-expanded="true"] {
 	background: var(--ec-hover-bg); border-color: var(--ec-hover-border);
 }
