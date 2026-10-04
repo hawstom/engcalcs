@@ -134,6 +134,25 @@ the count in shipped English may fall and may not rise.
 
 This governs new calculators from day one, not just retrofits.
 
+### RULED 2026-10-04: mood, device verbs, checkboxes
+
+Mary's three recommendations; Tom: *"Adopt all three style guide recommendations. Very solid. I love them."*
+
+1. **Mood follows the kind of string.** A button or command tip is imperative and matches its
+   label (*Show the legend.*). A field tip is a noun phrase saying what the value is (*Total added
+   demand.*); a How/What opener only for a real question. An instruction during a tool is
+   imperative, one step. A message (result, error, status) is indicative about the system. Never
+   *You can...*.
+2. **Device verbs.** *Specify* a point or location on the map; *Select* an existing object, a
+   button, a menu item or a checkbox; *Choose* from a list or option; *Enter* a typed value. Never
+   *Click* or *tap* for these, and never *Specify* a button. A gesture with no device-neutral
+   equivalent keeps its name (double-click, double-tap, press and hold, Shift+click, right-click).
+3. **Checkboxes.** *Select* and *Clear* for the action, *selected* and *cleared* for the state;
+   never tick, untick, check or uncheck. Suite-wide.
+
+Translators render an English command imperative in their own language's menu-label convention
+(the infinitive in es, pt, fr, it); see `dev/translation-process.md`, standing content rules.
+
 ### RULED 2026-09-23: "Do X and Y happens" — the conversational conditional
 
 **Tom's instruction, in his own words:** *"What I would suggest you write into

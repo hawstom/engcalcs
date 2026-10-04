@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Menurut Isbash (1936) d
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Menurut Isbash (1936) dan Maricopa County, Arizona, AS.">Ukuran batu sudut yang dibutuhkan di tebing 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Menurut Isbash (1936) dan Maricopa County, Arizona, AS.">Ukuran batu sudut yang dibutuhkan di tebing 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Selesaikan jaringan ini pada setiap langkah waktu hidrolik.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Menurut Maynord, Ruff, dan Abt (1989). Di tikungan, batu diukur untuk kecepatan tikungan sebesar 4/3 dari rata-rata, menurut California Division of Highways (1970); nilai 1,5 dari Maynord sendiri berlaku untuk saluran alami.">Ukuran batu sudut yang dibutuhkan, D<sub>50</sub> (Maynord, Ruff, dan Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Ukuran batu sudut yang dibutuhkan, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Kecepatan wajar untuk asumsi aliran seragam.';
@@ -676,9 +677,7 @@ $ec_lang['lpn_customer_heading']='Pelanggan {id}';
 // strings every node and link already uses. Do not re-add an account key: a utility that wants a
 // field of its own name makes a custom property.
 $ec_lang['lpn_field_meter_demand']='Kebutuhan per sambungan';
-$ec_lang['lpn_field_meter_demand_tip']='Apa yang dibutuhkan oleh setiap sambungan pada pelanggan ini. Cari dan ganti dapat memanfaatkan perbedaan antara kosong dan 0.';
 $ec_lang['lpn_field_meter_count']='Jumlah sambungan';
-$ec_lang['lpn_field_meter_count_tip']='Berapa banyak sambungan identik yang diwakili oleh satu pelanggan ini, sehingga empat puluh dua sambungan rumah tunggal di sepanjang satu pipa utama dapat menjadi satu simbol di satu tempat. Total di bawah ini adalah kebutuhan di atas dikalikan jumlah ini.';
 $ec_lang['lpn_field_meter_total']='Total kebutuhan';
 $ec_lang['lpn_field_meter_total_tip']='Kebutuhan per sambungan dikalikan jumlah sambungan. Inilah angka yang ditambahkan ke simpul yang disebutkan di bawah ini.';
 $ec_lang['lpn_field_meter_pipe']='Elemen terhubung';
@@ -692,7 +691,6 @@ $ec_lang['lpn_meter_pipe_unknown']='Tidak ada yang bernama {id} dalam proyek ini
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Bagaimana kebutuhan pelanggan ini naik dan turun sepanjang proses. Pola ini mengalikan total kebutuhan, sehingga berlaku untuk setiap sambungan yang diwakili pelanggan ini. Biarkan pada Tidak ada pola agar mengikuti Pola kebutuhan default milik proyek.';
 $ec_lang['lpn_meter_pattern_unknown']='Tidak ada pola dalam proyek ini yang bernama {id}, sehingga pelanggan dibiarkan seperti semula.';
 $ec_lang['lpn_meter_placed']='Pelanggan {id} ditambahkan. Deskripsi dan kebutuhannya diketik pada tabel Pelanggan, atau tekan pelanggan itu dalam mode Pilih untuk membuka kotaknya.';
 $ec_lang['lpn_field_meter_pipe_tip']='Elemen tempat sambungan ini terhubung. Ketik elemen lain di sini atau pada tabel Pelanggan untuk mengubahnya, atau seret titik sambungan ke elemen lain.';
@@ -798,7 +796,6 @@ $ec_lang['lpn_pane_manage_cols_down']='Pindah ke bawah';
 $ec_lang['lpn_pane_manage_cols_top']='Pindah ke awal';
 $ec_lang['lpn_pane_manage_cols_bottom']='Pindah ke akhir';
 $ec_lang['lpn_pane_colmenu_tip']='Sembunyikan atau kelola kolom';
-$ec_lang['lpn_pane_sortarrow_tip']='Balikkan urutan';
 $ec_lang['lpn_tool_area_window']='Pilih jendela';
 $ec_lang['lpn_tool_area_lasso']='Pilih laso';
 $ec_lang['lpn_tool_area_polygon']='Pilih poligon';
@@ -853,7 +850,6 @@ $ec_lang['lpn_field_elev']='Elevasi';
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
 // protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
 // entry carrying translatable payload nobody on the page can see.
-$ec_lang['lpn_field_elev_tip']='Ketinggian tanah atau pipa di simpul ini. Ukur dari titik nol mana pun yang Anda pilih, asalkan setiap simpul menggunakan titik nol yang sama.';
 // A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
 // at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
 // This USED to read "so it doubles as a tank" (Tom, 2026-07-30), which was true only while there
@@ -1006,7 +1002,6 @@ $ec_lang['lpn_status_converted']='{n} nilai telah ditulis ulang menjadi {unit}.'
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_color_tip']='Warnai jaringan berdasarkan satu besaran, sehingga peta besar dapat dibaca sekilas. Tekanan dan kecepatan adalah dua besaran yang biasanya paling penting.';
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
 $ec_lang['lpn_units_length']='Panjang';
@@ -1175,13 +1170,6 @@ $ec_lang['lpn_tip_join']='{name}: {tip}';
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='Pintasan: tekan {key}.';
 $ec_lang['lpn_tool_key_hint_two']='Pintasan: tekan {key} atau {key2}.';
-$ec_lang['lpn_tool_add_junction_tip']='Klik peta untuk menambahkan simpul: titik tempat pipa-pipa bertemu atau tempat air digunakan.';
-$ec_lang['lpn_tool_add_reservoir_tip']='Klik peta untuk menambahkan reservoir: sumber tak terbatas dengan muka air tetap.';
-$ec_lang['lpn_tool_add_tank_tip']='Klik peta untuk menambahkan tangki: penyimpanan yang muka airnya naik dan turun seiring terisi dan mengosong.';
-$ec_lang['lpn_tool_add_pipe_tip']='Klik satu simpul lalu simpul lainnya untuk menggambar pipa di antara keduanya.';
-$ec_lang['lpn_tool_add_pump_tip']='Klik satu simpul lalu simpul lainnya untuk memasang pompa di antara keduanya.';
-$ec_lang['lpn_tool_add_valve_tip']='Klik satu simpul lalu simpul lainnya untuk memasang katup di antara keduanya.';
-$ec_lang['lpn_tool_add_text_tip']='Klik peta untuk menulis catatan pada gambar.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='Klik pada peta sesuai petunjuk untuk memilih semua yang ada di dalam bentuk tersebut. Tekan tombol ini lagi untuk mengganti bentuk antara jendela, laso, dan poligon. Tahan Shift saat memilih untuk melanjutkan pemilihan yang sudah ada, menambah atau menghapus (mengalihkan) apa yang Anda pilih.';
@@ -1190,7 +1178,6 @@ $ec_lang['lpn_area_selected']='{n} dipilih.';
 $ec_lang['lpn_area_none']='Tidak ada yang ditemukan di area tersebut.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_vertices_tip']='Tambah dan hapus verteks yang membentuk pipa pada peta. Klik pipa untuk menambah verteks, klik verteks untuk menghapusnya, dan seret verteks untuk memindahkannya. Verteks hanya mengubah jalur yang digambar, bukan hidroliknya.';
-$ec_lang['lpn_tool_delete_tip']='Klik apa saja di peta untuk menghapusnya.';
 $ec_lang['lpn_tool_undo_tip']='Batalkan perubahan terakhir.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='Sesuaikan seluruh jaringan ke jendela.';
@@ -1199,7 +1186,6 @@ $ec_lang['lpn_tool_zoom_window_tip']='Klik dua sudut yang berseberangan dari seb
 $ec_lang['lpn_zoom_in_tip']='Perbesar. Pintasan: +';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='Perkecil. Pintasan: -';
-$ec_lang['lpn_tool_settings_tip']='Buka pengaturan untuk proyek ini.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='Cari elemen berdasarkan ID-nya, atau cari semua elemen yang memenuhi suatu kondisi, dan ubah semuanya sekaligus.';
 // **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
@@ -1211,7 +1197,6 @@ $ec_lang['lpn_find_menu_tip']='Cari elemen berdasarkan ID-nya, atau cari semua e
 $ec_lang['lpn_help_icons']='Bilah alat';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Visibilitas';
-$ec_lang['lpn_pane_right_toggle_tip']='Tampilkan atau sembunyikan panel di sebelah kanan peta. Panel ini berisi pilihan label dan warna.';
 $ec_lang['lpn_color_legend_open_tip']='Klik untuk membuka panel Visibilitas dan mengubah warna-warna ini.';
 $ec_lang['lpn_color_node_field']='Warnai simpul berdasarkan';
 $ec_lang['lpn_color_link_field']='Warnai pipa berdasarkan';
@@ -1271,7 +1256,6 @@ $ec_lang['lpn_goto_menu']='Pergi ke garis lintang dan bujur…';
 // lat/lon."* The parser accepts `38,122` and `38.122` as a pair on his ruling of the same day; the
 // examples in lpn_goto_bad show all three shapes, which is where somebody whose last attempt failed
 // is actually reading.
-$ec_lang['lpn_goto_tip']='Pindahkan peta ke tempat yang koordinatnya sudah Anda ketahui. Garis lintang dahulu, lalu garis bujur, seperti cara peta menyajikannya, dengan spasi di antara keduanya: 38 -122';
 $ec_lang['lpn_goto_prompt']='Garis lintang dan garis bujur, dalam urutan itu';
 $ec_lang['lpn_goto_bad']='Itu bukan satu garis lintang dan satu garis bujur. Coba 38 -122, dengan spasi di antara keduanya.';
 $ec_lang['lpn_georef_goto']='Pergi ke…';
@@ -1570,7 +1554,6 @@ $ec_lang['lpn_profile_menu']='Profil';
 // nobody to read. Sprint 459's Wave 0 found them; Tom ruled the move on 2026-08-24 ("these _syns
 // are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
 // permission $ec_lang_syn requires. Same text, correct array.
-$ec_lang['lpn_profile_tip']='Gambarkan permukaan tanah dan garis tinggi tekan hidrolik di sepanjang rute melalui jaringan.';
 $ec_lang['lpn_profile_title']='Profil di sepanjang rute';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
@@ -1628,12 +1611,9 @@ $ec_lang['lpn_profile_missing']='Rute tersimpan {name} menggunakan simpul yang t
 $ec_lang['lpn_ts_menu']='Deret waktu';
 $ec_lang['lpn_ts_tip']='Membuat grafik satu atau beberapa elemen terhadap waktu sepanjang simulasi periode waktu.';
 $ec_lang['lpn_ts_title']='Nilai terhadap waktu';
-$ec_lang['lpn_ts_group_tip']='Apakah grafik menampilkan simpul atau penghubung.';
 $ec_lang['lpn_ts_group_nodes']='Simpul';
 $ec_lang['lpn_ts_group_links']='Penghubung';
-$ec_lang['lpn_ts_quantity_tip']='Nilai mana yang digrafikkan terhadap waktu.';
 $ec_lang['lpn_ts_add']='Tambahkan yang dipilih';
-$ec_lang['lpn_ts_add_tip']='Menempatkan semua yang sedang dipilih pada peta ke dalam grafik.';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
 $ec_lang['lpn_ts_add_none']='Tidak ada elemen jenis itu yang dipilih pada peta.';
 $ec_lang['lpn_ts_clear']='Hapus semua';
@@ -1648,8 +1628,6 @@ $ec_lang['lpn_ts_axis_time']='Waktu berlalu';
 $ec_lang['lpn_freq_menu']='Frekuensi';
 $ec_lang['lpn_freq_tip']='Membuat grafik distribusi frekuensi satu properti pada semua simpul atau semua pipa pada langkah waktu saat ini.';
 $ec_lang['lpn_freq_title']='Distribusi nilai';
-$ec_lang['lpn_freq_group_tip']='Apakah grafik menampilkan simpul atau pipa.';
-$ec_lang['lpn_freq_quantity_tip']='Nilai mana yang digrafikkan.';
 $ec_lang['lpn_freq_none']='Belum ada hasil untuk nilai ini, sehingga tidak ada yang dapat digrafikkan.';
 $ec_lang['lpn_freq_summary']='Digambarkan: {n} dari {total}';
 $ec_lang['lpn_freq_summary_time']='Digambarkan: {n} dari {total}, pada {time}';
@@ -1752,7 +1730,6 @@ $ec_lang['lpn_file_revert']='Kembalikan';
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Berkas terbaru';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_recent_tip']='Buka {file} lagi tanpa perlu mencarinya di komputer Anda.';
 $ec_lang['lpn_recent_denied']='Izin untuk membuka berkas itu tidak diberikan, sehingga berkas tersebut tidak dibuka.';
 $ec_lang['lpn_recent_gone']='Tidak dapat membuka {file}. Berkas ini mungkin telah dipindahkan, diganti namanya, atau dihapus, sehingga dikeluarkan dari daftar terbaru.';
 // The tab strip. These are titles on small controls, so each has to stand alone with no sentence
@@ -1876,11 +1853,8 @@ $ec_lang['lpn_file_upload_explain']='Peramban ini tidak dapat tersambung ke berk
 // The tip on the Open button, which reached the toolbar with Task 246. It exists because that
 // button is icon-only: on a menu row the word carries the whole meaning, and on the strip the tip
 // is where the rest of it lives.
-$ec_lang['lpn_file_open_tip']='Buka berkas proyek yang disimpan dari halaman ini.';
 // Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
 // cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
-$ec_lang['lpn_file_save_tip']='Menyimpan ke berkas yang tersambung.';
-$ec_lang['lpn_file_saveas_tip']='Pilih berkas untuk disimpan. Proyek ini akan tersambung ke berkas itu, dan sejak saat itu Simpan akan menulis ke berkas tersebut.';
 // The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
 // cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
 // is no API for it, and the download attribute cannot override the setting -- but the user can turn
@@ -2186,7 +2160,6 @@ $ec_lang['lpn_field_roughness_tip']='C Hazen-Williams. Angka yang lebih tinggi b
 $ec_lang['lpn_field_length']='Panjang';
 $ec_lang['lpn_field_from']='Dari';
 $ec_lang['lpn_field_to']='Ke';
-$ec_lang['lpn_field_length_tip']='Panjang pipa. Dengan Otomatis diaktifkan, panjang diukur dari apa yang Anda gambar. Nonaktifkan Otomatis untuk mengetik panjang yang berbeda dari gambar.';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2228,7 +2201,6 @@ $ec_lang['lpn_field_valve_setting_loss_tip']='Berapa banyak tinggi tekan yang di
 $ec_lang['lpn_field_valve_diameter_tip']='Lebar bukaan pada katup. Kecepatan air yang melalui katup dihitung dari lebar ini, dan kehilangan mengikuti dari kecepatan tersebut.';
 $ec_lang['lpn_field_valve_km_tip']='Kehilangan dari badan katup saat katup terbuka penuh, di luar kehilangan yang dihasilkan oleh pengaturan katup. Dihitung sebagai kelipatan tinggi kecepatan. Gunakan 0 untuk mengabaikannya.';
 $ec_lang['lpn_field_km']='Koefisien kehilangan lokal, k';
-$ec_lang['lpn_field_km_tip']='Kehilangan dari belokan, katup, dan sambungan pada pipa ini, dihitung sebagai kelipatan tinggi kecepatan. Gunakan 0 untuk pipa lurus biasa.';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
 // their own key rather than being asked to carry the full popup-field wording -- an on-map legend
@@ -2265,7 +2237,6 @@ $ec_lang['lpn_field_desc']='Deskripsi';
 // description is free text, so the tag's one-word rule does NOT apply to it, but a line break cannot
 // be written as a trailing comment and is turned into a space. The tip says what the field is for
 // first, because that is what a reader of a blank box wants.
-$ec_lang['lpn_field_desc_tip']='Untuk keperluan Anda sendiri, misalnya sudut jalan atau bahan pembuat pipa. Ini dibawa masuk dan keluar dari berkas EPANET, tempatnya berada di akhir baris bagian itu sendiri. Tidak ada perhitungan yang membacanya. Ganti baris menjadi spasi, karena berkas tidak memiliki tempat untuk menyimpannya.';
 // **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
@@ -2341,7 +2312,6 @@ $ec_lang['lpn_mode_add_text']='Mode: Tambah Teks. Klik peta untuk menempatkan Te
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Gunakan mode ini untuk mengubah, memindahkan, dan menyeret elemen di peta. Ini adalah mode yang menjadi default halaman ini: halaman kembali ke sini dengan sendirinya setelah tindakan tertentu, seperti membuka proyek. Menekan Esc kedua kalinya akan membatalkan pilihan apa pun yang sedang dipilih.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tip_labels_draggable']='Anda dapat menyeret label untuk memindahkannya. Label akan menyorot sebentar untuk memberi tahu Anda bahwa label telah dipindahkan. Klik dua kali pada label untuk mengembalikannya ke posisi otomatis.';
 $ec_lang['lpn_field_auto']='Otomatis';
 $ec_lang['lpn_method_switch_confirm']='Mengganti metode gesekan tidak mengubah angka kekasaran yang sudah dimasukkan pada pipa Anda, dan kekasaran untuk satu metode tidak bermakna untuk metode lain. Periksa setiap pipa setelah ini. Tetap ganti?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
@@ -2395,7 +2365,6 @@ $ec_lang['lpn_field_text_all_zoom_tip']='Simpan teks ini pada gambar seberapa pu
 $ec_lang['lpn_tool_labels']='Label';
 $ec_lang['lpn_labels_heading_node']='Label simpul';
 $ec_lang['lpn_labels_heading_link']='Label penghubung';
-$ec_lang['lpn_labels_decimals_tip']='Jumlah angka desimal yang ditampilkan untuk label ini';
 $ec_lang['lpn_labels_mark_extrema']='Tandai nilai tertinggi dan terendah';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
@@ -2411,8 +2380,6 @@ $ec_lang['lpn_settings_apply_to_all']='Terapkan ke semua';
 $ec_lang['lpn_settings_apply_to_all_tip']='Setiap elemen sejenis yang sudah digambar mendapat ID yang diawali dengan teks ini. Setiap elemen tetap memiliki nomornya. ID yang tidak diakhiri angka dibiarkan apa adanya.';
 $ec_lang['lpn_confirm_apply_prefix']='Ganti nama {n} elemen agar ID-nya dimulai dengan {prefix}? Setiap elemen tetap memiliki nomornya.';
 $ec_lang['lpn_prefix_applied']='Mengganti nama {n} elemen. {skipped} lainnya dibiarkan apa adanya.';
-$ec_lang['lpn_labels_prefix_tip']='Teks yang ditambahkan sebelum properti ini pada label peta';
-$ec_lang['lpn_labels_suffix_tip']='Teks yang ditambahkan setelah properti ini pada label peta';
 $ec_lang['lpn_labels_suffix_gradient_tip']='Teks yang ditambahkan setelah gradien kehilangan tinggi tekan pada label peta. Jangan ketik tanda persen di sini. Tanda ini ditambahkan secara otomatis saat satuannya persen.';
 $ec_lang['lpn_labels_separator']='Teks di antara nilai';
 $ec_lang['lpn_labels_separator_tip']='Teks di antara satu properti dan properti berikutnya pada label. Secara default berupa spasi.';
@@ -2423,7 +2390,6 @@ $ec_lang['lpn_labels_separator_tip']='Teks di antara satu properti dan properti 
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='Prioritas';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='Urutan nilai yang dihilangkan saat label tidak muat. Angka 1 dipertahankan paling lama.';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
@@ -2440,7 +2406,6 @@ $ec_lang['lpn_labels_col_decimals']='Desimal';
 // it heads a box about three characters wide, and its tip carries the whole meaning.
 $ec_lang['lpn_labels_col_show']='Tampilkan';
 $ec_lang['lpn_labels_show_tip']='Urutan nilai muncul pada sebuah label. Nilai bernomor 1 muncul lebih dulu: di bagian atas label bertumpuk, dan di awal label satu baris.';
-$ec_lang['lpn_labels_priority_customer_tip']='Urutan nilai dihilangkan dari label pelanggan. Nilai bernomor 1 dihilangkan lebih dulu.';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='Gunakan satuan';
@@ -2569,7 +2534,6 @@ $ec_lang['lpn_backdrop_continue']='Lanjutkan';
 $ec_lang['lpn_tool_settings']='Pengaturan';
 $ec_lang['lpn_settings_show_titles']='Tampilkan judul halaman';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_show_titles_tip']='Menyembunyikan judul halaman dan baris sambutan di atas gambar, sehingga peta memiliki lebih banyak ruang untuk bekerja. Pencetakan selalu menampilkan peta yang bersih saja.';
 // The link that rides on the headings themselves (Tom's 2026-09-08 worklist). It throws the switch AND opens the
 // box at the row that holds it, so the way back is learned in the same gesture.
 $ec_lang['lpn_hide_titles']='Sembunyikan judul-judul ini';
@@ -2774,7 +2738,6 @@ $ec_lang['lpn_settings_default_is']='Nilai default adalah {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Seberapa dekat penyelesai harus mencapai sebelum berhenti, diukur sebagai besarnya perubahan debit dari satu percobaan ke percobaan berikutnya. Angka yang lebih kecil lebih tepat dan memerlukan waktu lebih lama. Kedua penyelesai membaca kotak yang sama ini, dan masing-masing mengukur perubahan tersebut terhadap total yang berbeda: penyelesai bawaan terhadap jumlah kebutuhan, EPANET terhadap jumlah debit penghubung. Jika dibiarkan kosong, halaman ini menggunakan akurasi yang lebih ketat daripada default EPANET sendiri.';
 $ec_lang['lpn_settings_specific_gravity']='Berat jenis';
-$ec_lang['lpn_settings_specific_gravity_tip']='Berat fluida dibandingkan dengan air. Ini mengubah tekanan yang akan dibaca oleh alat ukur, bukan debitnya.';
 $ec_lang['lpn_settings_viscosity']='Viskositas relatif';
 $ec_lang['lpn_settings_viscosity_tip']='Viskositas fluida dibandingkan dengan air pada 20 derajat Celsius. Ini hanya mengubah jawaban pada metode Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Percobaan maksimum';
@@ -2871,7 +2834,6 @@ $ec_lang['lpn_settings_mask_labels']='Latar belakang solid di balik label';
 // drawing program would expect exactly that from those words.
 $ec_lang['lpn_settings_leader_snap']='Kunci garis penunjuk label ke sudut tertentu';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_leader_snap_tip']='Saat Anda menyeret label menjauh dari elemen yang dinamainya, garis kembali ke elemen itu akan tertarik ke sudut tertentu terdekat jika Anda menyeret cukup dekat dengannya. Teruskan menyeret dan penguncian akan lepas, sehingga sudut mana pun tetap tersedia. Nonaktif berarti bebas diseret, seperti yang selalu dilakukan halaman ini.';
 // **THE LABELING THRESHOLD** (Tasks 669 and 705). The row's name is Tom's own wording from the
 // Task 705 restorations. Its capture button reuses lpn_settings_label_use_view, the customer
 // row's key, because it is the same button doing the same thing. The placeholder is the only place
@@ -3005,7 +2967,6 @@ $ec_lang['lpn_time_tank']='Tangki';
 $ec_lang['lpn_time_level']='Muka air';
 $ec_lang['lpn_time_run']='Hitung';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='Selesaikan jaringan ini pada setiap langkah waktu hidrolik.';
 // **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
 // `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
 // LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
@@ -3228,11 +3189,9 @@ $ec_lang['lpn_settings_energy']='Energi';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='Laporan';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_menu_tip']='Laporan tentang biaya energi pompa, perbandingan skenario, laporan penyelesai EPANET, kalibrasi terhadap data terukur, dan, setelah simulasi periode waktu, laporan status dan laporan lengkap.';
 $ec_lang['lpn_reports_epanet']='Proses EPANET';
 $ec_lang['lpn_energy_title']='Laporan energi pompa';
 $ec_lang['lpn_energy_menu']='Energi pompa';
-$ec_lang['lpn_energy_menu_tip']='Berapa bagian dari proses masing-masing pompa menyala, berapa daya yang ditariknya, dan berapa biayanya selama simulasi periode waktu terakhir.';
 $ec_lang['lpn_energy_efficiency']='Efisiensi pompa (persen)';
 $ec_lang['lpn_energy_efficiency_tip']='Efisiensi kawat-ke-air yang digunakan untuk setiap pompa yang tidak memiliki kurva efisiensinya sendiri. EPANET menggunakan 75 persen bila tidak ada yang dinyatakan.';
 $ec_lang['lpn_energy_price']='Harga daya';
@@ -3366,7 +3325,6 @@ $ec_lang['lpn_color_mode_manual']='Manual';
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='Pustaka';
-$ec_lang['lpn_library_menu_tip']='Kelola pola kebutuhan, kurva pompa, dan aturan kendali untuk proyek ini.';
 // The three section names. Each is the word EPANET's own input file uses for the section, because
 // that is the word every water-network user and every tutorial already has -- see the note in
 // dev/scripts/glossary.json about deferring to a discipline's standard term.
@@ -3380,7 +3338,6 @@ $ec_lang['lpn_library_curves_tip']='Kurva adalah daftar titik yang menyatakan ki
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_curves_note']='Sebuah kurva dimiliki oleh proyek, dan pompa atau katup menyatakan kurva yang digunakannya pada propertinya sendiri. Beberapa elemen dapat menggunakan kurva yang sama, dan mengubahnya di sini mengubah semuanya. Untuk kurva tinggi tekan pompa, proses menggunakan kurva yang dicocokkan melalui titik-titiknya seperti yang ditampilkan; untuk jenis lainnya, proses menghubungkan titik-titik itu dengan garis lurus seperti yang ditampilkan.';
 $ec_lang['lpn_library_curve_add']='Tambah kurva';
-$ec_lang['lpn_library_curve_type_tip']='Apa yang dideskripsikan kurva ini';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
 // EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
 // and Equation (for pump head) on row/line 2."*). EPANET calls the control "Curve Type", so that is
@@ -3401,7 +3358,6 @@ $ec_lang['lpn_library_curve_values_tip']='Pilih satu atau dua kolom pada lembar 
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
 $ec_lang['lpn_library_curve_note_label']='Deskripsi';
-$ec_lang['lpn_library_curve_note_tip']='Apa kurva ini, dengan kata-kata Anda sendiri. Ini ditulis di atas kurva dalam berkas EPANET dan dibaca kembali dari sana.';
 $ec_lang['lpn_library_curve_remove_point']='Hapus titik ini';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -3584,14 +3540,11 @@ $ec_lang['lpn_field_base_demand']='Kebutuhan dasar';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='Debit yang diambil simpul ini pada langkah waktu yang ditampilkan: setiap kebutuhan dasar dikalikan dengan polanya masing-masing, lalu dijumlahkan. Nilai ini dihitung, bukan diketik, sehingga berubah mengikuti jam dan tidak dapat diedit.';
 $ec_lang['lpn_field_demand_pattern']='Pola kebutuhan';
-$ec_lang['lpn_field_demand_pattern_tip']='Bagaimana kebutuhan simpul ini naik dan turun sepanjang proses. Biarkan pada Tidak ada pola dan simpul akan mengikuti Pola kebutuhan default milik proyek.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
 $ec_lang['lpn_field_demand_category']='Deskripsi';
-$ec_lang['lpn_field_demand_category_tip']='Nama atau deskripsi kategori kebutuhan ini.';
 $ec_lang['lpn_demand_add']='Tambah kategori kebutuhan';
-$ec_lang['lpn_demand_add_tip']='Tambahkan kategori kebutuhan lain pada simpul ini, dengan kebutuhan dasar, pola, dan deskripsinya sendiri. Kategori-kategori ini dijumlahkan.';
 $ec_lang['lpn_demand_remove']='Hapus kebutuhan ini';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
@@ -3985,7 +3938,6 @@ $ec_lang['lpn_calib_tab_corr']='Plot korelasi';
 $ec_lang['lpn_calib_tab_means']='Perbandingan rata-rata';
 $ec_lang['lpn_calib_col_location']='Lokasi';
 $ec_lang['lpn_calib_col_n']='Jml obs';
-$ec_lang['lpn_calib_col_n_tip']='Jumlah observasi: pengukuran pada lokasi ini yang dibandingkan.';
 $ec_lang['lpn_calib_col_obs_mean']='Rata-rata observasi';
 $ec_lang['lpn_calib_col_sim_mean']='Rata-rata hitung';
 $ec_lang['lpn_calib_col_mean_err']='Galat rata-rata';

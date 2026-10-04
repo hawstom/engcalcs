@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="តាមលោក Isba
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="តាមលោក Isbash (1936) និង Maricopa County រដ្ឋ Arizona សហរដ្ឋអាមេរិក។">ទំហំថ្មខ្ចាញ់ជម្រាលចំហៀង 1 ដែលត្រូវការ, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="តាមលោក Isbash (1936) និង Maricopa County រដ្ឋ Arizona សហរដ្ឋអាមេរិក។">ទំហំថ្មខ្ចាញ់ជម្រាលចំហៀង 2 ដែលត្រូវការ, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='ដោះស្រាយបណ្ដាញនេះនៅរាល់ជំហានពេលវេលាធារាសាស្ត្ររបស់វា។';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="តាមលោក Maynord, Ruff, and Abt (1989)។ នៅចំណុចបត់ ថ្មត្រូវបានកំណត់ទំហំសម្រាប់ល្បឿននៅចំណុចបត់ស្មើនឹង 4/3 នៃល្បឿនមធ្យម តាម California Division of Highways (1970); ចំណែកតម្លៃ 1.5 ផ្ទាល់ខ្លួនរបស់ Maynord អនុវត្តចំពោះប្រឡាយធម្មជាតិ។">ទំហំថ្មខ្ចាញ់ដែលត្រូវការ, D<sub>50</sub> (Maynord, Ruff, and Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='ទំហំថ្មខ្ចាញ់ដែលត្រូវការ, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='ល្បឿនសមស្របសម្រាប់សន្មតការហូរឯកសណ្ឋាន។';
@@ -676,9 +677,7 @@ $ec_lang['lpn_customer_heading']='អតិថិជន {id}';
 // strings every node and link already uses. Do not re-add an account key: a utility that wants a
 // field of its own name makes a custom property.
 $ec_lang['lpn_field_meter_demand']='តម្រូវការក្នុងមួយសេវា';
-$ec_lang['lpn_field_meter_demand_tip']='អ្វីដែលសេវានីមួយៗនៅអតិថិជននេះត្រូវការ។ រក និងជំនួស អាចប្រើប្រាស់ភាពខុសគ្នារវាងប្រអប់ទទេ និង 0 បាន។';
 $ec_lang['lpn_field_meter_count']='ចំនួនសេវា';
-$ec_lang['lpn_field_meter_count_tip']='តើអតិថិជននេះតំណាងឲ្យសេវាដូចគ្នាប៉ុន្មាន ដូច្នេះការតភ្ជាប់លំនៅដ្ឋានតែមួយចំនួនសែសិបពីរតាមបណ្ដោយបំពង់មេមួយ អាចជានិមិត្តសញ្ញាតែមួយនៅកន្លែងតែមួយ។ តម្លៃសរុបខាងក្រោមគឺជាតម្រូវការខាងលើគុណនឹងចំនួននេះ។';
 $ec_lang['lpn_field_meter_total']='តម្រូវការសរុប';
 $ec_lang['lpn_field_meter_total_tip']='តម្រូវការក្នុងមួយសេវា គុណនឹងចំនួនសេវា។ នេះជាចំនួនដែលបន្ថែមទៅថ្នាំងដែលមានឈ្មោះខាងក្រោម។';
 $ec_lang['lpn_field_meter_pipe']='ធាតុដែលបានភ្ជាប់';
@@ -692,7 +691,6 @@ $ec_lang['lpn_meter_pipe_unknown']='គ្មានអ្វីនៅក្ន�
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='របៀបដែលតម្រូវការរបស់អតិថិជននេះឡើង និងចុះពេញការដំណើរការ។ វាគុណនឹងតម្រូវការសរុប ដូច្នេះវាប៉ះពាល់ដល់សេវានីមួយៗដែលអតិថិជននេះតំណាងឲ្យ។ ទុកវានៅ គ្មានលំនាំ ដើម្បីតាម លំនាំតម្រូវការលំនាំដើម របស់គម្រោង។';
 $ec_lang['lpn_meter_pattern_unknown']='គ្មានលំនាំណាមួយនៅក្នុងគម្រោងនេះមានឈ្មោះ {id} ទេ ដូច្នេះអតិថិជននេះត្រូវបានទុកដដែល។';
 $ec_lang['lpn_meter_placed']='អតិថិជន {id} ត្រូវបានបន្ថែម។ ការពិពណ៌នា និងតម្រូវការរបស់វាអាចវាយបញ្ចូលនៅក្នុងតារាងអតិថិជន ឬចុចលើវានៅក្នុងរបៀបជ្រើសរើសដើម្បីបើកប្រអប់របស់វា។';
 $ec_lang['lpn_field_meter_pipe_tip']='ធាតុដែលសេវានេះភ្ជាប់ទៅ។ វាយបញ្ចូលមួយផ្សេងទៀតនៅទីនេះ ឬនៅក្នុងតារាងអតិថិជនដើម្បីផ្លាស់ប្ដូរវា ឬអូសចំណុចតភ្ជាប់ទៅធាតុមួយផ្សេងទៀត។';
@@ -800,7 +798,6 @@ $ec_lang['lpn_pane_manage_cols_down']='ផ្លាស់ទីចុះក្�
 $ec_lang['lpn_pane_manage_cols_top']='ផ្លាស់ទីទៅដើម';
 $ec_lang['lpn_pane_manage_cols_bottom']='ផ្លាស់ទីទៅចុង';
 $ec_lang['lpn_pane_colmenu_tip']='លាក់ ឬគ្រប់គ្រងជួរឈរ';
-$ec_lang['lpn_pane_sortarrow_tip']='ត្រឡប់ការតម្រៀប';
 $ec_lang['lpn_tool_area_window']='ជ្រើសរើសបង្អួច';
 $ec_lang['lpn_tool_area_lasso']='ជ្រើសរើសដោយខ្សែរូបភាព';
 $ec_lang['lpn_tool_area_polygon']='ជ្រើសរើសពហុកោណ';
@@ -854,7 +851,6 @@ $ec_lang['lpn_field_elev']='កម្ពស់';
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
 // protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
 // entry carrying translatable payload nobody on the page can see.
-$ec_lang['lpn_field_elev_tip']='កម្រិតដីឬបំពង់នៅថ្នាំងនេះ។ វាស់ពីចំណុចសូន្យណាមួយដែលអ្នកចង់បាន ដរាបណាថ្នាំងទាំងអស់ប្រើចំណុចសូន្យតែមួយ។';
 // A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
 // at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
 // This USED to read "so it doubles as a tank" (Tom, 2026-07-30), which was true only while there
@@ -1010,7 +1006,6 @@ $ec_lang['lpn_status_converted']='{n} តម្លៃត្រូវបានស
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_color_tip']='ដាក់ពណ៌បណ្ដាញតាមបរិមាណមួយ ដូច្នេះផែនទីធំមួយអាចអានបានក្នុងមួយភ្នែក។ សម្ពាធ និងល្បឿន ជាពីរបញ្ហាដែលសំខាន់ជាធម្មតា។';
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
 $ec_lang['lpn_units_length']='ប្រវែង';
@@ -1179,13 +1174,6 @@ $ec_lang['lpn_tip_join']='{name} — {tip}';
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='ផ្លូវកាត់៖ ចុច {key}។';
 $ec_lang['lpn_tool_key_hint_two']='ផ្លូវកាត់៖ ចុច {key} ឬ {key2}។';
-$ec_lang['lpn_tool_add_junction_tip']='ចុចលើផែនទីដើម្បីបន្ថែមថ្នាំង៖ ចំណុចមួយកន្លែងបំពង់ជួបគ្នា ឬកន្លែងប្រើទឹក។';
-$ec_lang['lpn_tool_add_reservoir_tip']='ចុចលើផែនទីដើម្បីបន្ថែមអាងស្តុក៖ ប្រភពមួយដែលរក្សាកម្ពស់ទឹកថេរមួយ។';
-$ec_lang['lpn_tool_add_tank_tip']='ចុចលើផែនទីដើម្បីបន្ថែមធុងទឹក៖ ការស្តុកទុកមួយដែលកម្រិតទឹករបស់វាឡើង និងចុះ ខណៈវាបំពេញ និងបង្ហូរ។';
-$ec_lang['lpn_tool_add_pipe_tip']='ចុចលើថ្នាំងមួយ រួចថ្នាំងមួយទៀត ដើម្បីគូរបំពង់មួយភ្ជាប់ពួកវា។';
-$ec_lang['lpn_tool_add_pump_tip']='ចុចលើថ្នាំងមួយ រួចថ្នាំងមួយទៀត ដើម្បីដាក់ម៉ាស៊ីនបូមមួយភ្ជាប់ពួកវា។';
-$ec_lang['lpn_tool_add_valve_tip']='ចុចលើថ្នាំងមួយ រួចថ្នាំងមួយទៀត ដើម្បីដាក់វ៉ាល់មួយភ្ជាប់ពួកវា។';
-$ec_lang['lpn_tool_add_text_tip']='ចុចលើផែនទីដើម្បីសរសេរកំណត់ចំណាំមួយនៅលើគំនូរ។';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='ចុចលើផែនទីតាមការណែនាំ ដើម្បីជ្រើសរើសអ្វីៗទាំងអស់ខាងក្នុងរាងនោះ។ ចុចប៊ូតុងនេះម្ដងទៀតដើម្បីប្ដូររាងរវាងបង្អួច ខ្សែរូបភាព និងពហុកោណ។ សង្កត់គ្រាប់ចុច Shift ខណៈកំពុងជ្រើសរើស ដើម្បីបន្តជាមួយការជ្រើសរើសដែលមានស្រាប់ ដោយបន្ថែម ឬដកអ្វីដែលអ្នកជ្រើសរើស (ត្រឡប់)។';
@@ -1194,7 +1182,6 @@ $ec_lang['lpn_area_selected']='បានជ្រើសរើស {n}។';
 $ec_lang['lpn_area_none']='រកមិនឃើញអ្វីនៅក្នុងតំបន់នោះទេ។';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_vertices_tip']='បន្ថែម និងលុបចំណុចកំណត់ដែលកំណត់រាងបំពង់នៅលើផែនទី។ ចុចលើបំពង់ដើម្បីបន្ថែមចំណុចកំណត់ ចុចលើចំណុចកំណត់ដើម្បីលុបវា ហើយអូសចំណុចកំណត់ដើម្បីផ្លាស់ទីវា។ ចំណុចកំណត់ផ្លាស់ប្ដូរតែផ្លូវគំនូរប៉ុណ្ណោះ មិនមែនធារាសាស្ត្រទេ។';
-$ec_lang['lpn_tool_delete_tip']='ចុចលើអ្វីមួយនៅលើផែនទីដើម្បីលុបវាចេញ។';
 $ec_lang['lpn_tool_undo_tip']='ត្រឡប់ការផ្លាស់ប្ដូរចុងក្រោយ។';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='ដាក់បណ្ដាញទាំងមូលឲ្យសមនឹងបង្អួច។';
@@ -1203,7 +1190,6 @@ $ec_lang['lpn_tool_zoom_window_tip']='ចុចជ្រុងទល់មុខ
 $ec_lang['lpn_zoom_in_tip']='ពង្រីក។ ផ្លូវកាត់៖ +';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='បង្រួម។ ផ្លូវកាត់៖ -';
-$ec_lang['lpn_tool_settings_tip']='បើកការកំណត់សម្រាប់គម្រោងនេះ។';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='រកធាតុមួយតាមលេខសម្គាល់របស់វា ឬរកគ្រប់ធាតុដែលត្រូវនឹងលក្ខខណ្ឌមួយ ហើយផ្លាស់ប្ដូរពួកវាទាំងអស់ក្នុងពេលតែមួយ។';
 // **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
@@ -1215,7 +1201,6 @@ $ec_lang['lpn_find_menu_tip']='រកធាតុមួយតាមលេខស�
 $ec_lang['lpn_help_icons']='អត្ថន័យរបារឧបករណ៍';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='ភាពមើលឃើញ';
-$ec_lang['lpn_pane_right_toggle_tip']='បង្ហាញ ឬលាក់ផ្ទាំងនៅខាងស្ដាំផែនទី។ វាមានជម្រើសស្លាក និងពណ៌។';
 $ec_lang['lpn_color_legend_open_tip']='ចុចដើម្បីបើកផ្ទាំងភាពមើលឃើញ ហើយប្ដូរពណ៌ទាំងនេះ។';
 $ec_lang['lpn_color_node_field']='ដាក់ពណ៌ថ្នាំងតាម';
 $ec_lang['lpn_color_link_field']='ដាក់ពណ៌បំពង់តាម';
@@ -1275,7 +1260,6 @@ $ec_lang['lpn_goto_menu']='ទៅកាន់ទទឹង និងបណ្ដ�
 // lat/lon."* The parser accepts `38,122` and `38.122` as a pair on his ruling of the same day; the
 // examples in lpn_goto_bad show all three shapes, which is where somebody whose last attempt failed
 // is actually reading.
-$ec_lang['lpn_goto_tip']='ផ្លាស់ផែនទីទៅកន្លែងមួយដែលអ្នកមានកូអរដោនេរួចហើយ។ ទទឹងមុន រួចបណ្ដោយ តាមរបៀបផែនទីផ្ដល់ជូន ដោយមានចន្លោះមួយរវាងពួកវា៖ 38 -122';
 $ec_lang['lpn_goto_prompt']='ទទឹង និងបណ្ដោយ តាមលំដាប់នេះ';
 $ec_lang['lpn_goto_bad']='នេះមិនមែនជាទទឹងមួយ និងបណ្ដោយមួយទេ។ សូមសាកល្បង 38 -122 ដោយមានចន្លោះមួយរវាងពួកវា។';
 $ec_lang['lpn_georef_goto']='ទៅកាន់…';
@@ -1577,7 +1561,6 @@ $ec_lang['lpn_graphs_menu']='ក្រាប';
 // nobody to read. Sprint 459's Wave 0 found them; Tom ruled the move on 2026-08-24 ("these _syns
 // are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
 // permission $ec_lang_syn requires. Same text, correct array.
-$ec_lang['lpn_profile_tip']='គូរផ្ទៃដី និងខ្សែថ្ពល់ធារាសាស្ត្រ តាមផ្លូវមួយឆ្លងកាត់បណ្ដាញ។';
 $ec_lang['lpn_profile_title']='ទម្រង់បណ្ដោយតាមផ្លូវមួយ';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
@@ -1635,12 +1618,9 @@ $ec_lang['lpn_profile_missing']='ផ្លូវដែលបានរក្ស�
 $ec_lang['lpn_ts_menu']='ស៊េរីពេលវេលា';
 $ec_lang['lpn_ts_tip']='គូរក្រាបធាតុមួយ ឬច្រើនតាមពេលវេលា ពេញការក្លែងធ្វើលើរយៈពេលមួយ។';
 $ec_lang['lpn_ts_title']='តម្លៃតាមពេលវេលា';
-$ec_lang['lpn_ts_group_tip']='តើក្រាបបង្ហាញថ្នាំង ឬតំណ។';
 $ec_lang['lpn_ts_group_nodes']='ថ្នាំង';
 $ec_lang['lpn_ts_group_links']='តំណ';
-$ec_lang['lpn_ts_quantity_tip']='តម្លៃមួយណាត្រូវគូរតាមពេលវេលា។';
 $ec_lang['lpn_ts_add']='បន្ថែមអ្វីបានជ្រើស';
-$ec_lang['lpn_ts_add_tip']='ដាក់អ្វីៗគ្រប់យ៉ាងដែលកំពុងជ្រើសរើសនៅលើផែនទីទៅក្រាប។';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
 $ec_lang['lpn_ts_add_none']='គ្មានធាតុប្រភេទនោះត្រូវបានជ្រើសរើសនៅលើផែនទីទេ។';
 $ec_lang['lpn_ts_clear']='លុបទាំងអស់';
@@ -1655,8 +1635,6 @@ $ec_lang['lpn_ts_axis_time']='ពេលវេលាកន្លងផុត';
 $ec_lang['lpn_freq_menu']='ប្រេកង់';
 $ec_lang['lpn_freq_tip']='គូរក្រាបការចែកចាយប្រេកង់នៃលក្ខណៈមួយ លើថ្នាំងទាំងអស់ ឬបំពង់ទាំងអស់ នៅជំហានពេលវេលាបច្ចុប្បន្ន។';
 $ec_lang['lpn_freq_title']='ការចែកចាយតម្លៃ';
-$ec_lang['lpn_freq_group_tip']='តើក្រាបបង្ហាញថ្នាំង ឬបំពង់។';
-$ec_lang['lpn_freq_quantity_tip']='តម្លៃមួយណាត្រូវគូរ។';
 $ec_lang['lpn_freq_none']='មិនទាន់មានលទ្ធផលសម្រាប់តម្លៃនេះនៅឡើយទេ ដូច្នេះគ្មានអ្វីត្រូវគូរទេ។';
 $ec_lang['lpn_freq_summary']='បានគូរ៖ {n} នៃ {total}';
 $ec_lang['lpn_freq_summary_time']='បានគូរ៖ {n} នៃ {total} នៅ {time}';
@@ -1790,7 +1768,6 @@ $ec_lang['lpn_file_revert']='ត្រឡប់មកវិញ';
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='ឯកសារថ្មីៗ';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_recent_tip']='បើក {file} ម្ដងទៀត ដោយមិនចាំបាច់ស្វែងរកវានៅក្នុងកុំព្យូទ័ររបស់អ្នក។';
 $ec_lang['lpn_recent_denied']='សិទ្ធិបើកឯកសារនោះមិនត្រូវបានផ្ដល់ឲ្យទេ ដូច្នេះវាមិនត្រូវបានបើកទេ។';
 $ec_lang['lpn_recent_gone']='មិនអាចបើក {file} បានទេ។ វាប្រហែលជាត្រូវបានផ្លាស់ទី ប្ដូរឈ្មោះ ឬលុប ដូច្នេះវាត្រូវបានដកចេញពីបញ្ជីឯកសារថ្មីៗ។';
 // The tab strip. These are titles on small controls, so each has to stand alone with no sentence
@@ -1914,11 +1891,8 @@ $ec_lang['lpn_file_upload_explain']='កម្មវិធីរុករកន�
 // The tip on the Open button, which reached the toolbar with Task 246. It exists because that
 // button is icon-only: on a menu row the word carries the whole meaning, and on the strip the tip
 // is where the rest of it lives.
-$ec_lang['lpn_file_open_tip']='បើកឯកសារគម្រោងដែលបានរក្សាទុកពីទំព័រនេះ។';
 // Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
 // cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
-$ec_lang['lpn_file_save_tip']='រក្សាទុកទៅឯកសារដែលបានភ្ជាប់។';
-$ec_lang['lpn_file_saveas_tip']='ជ្រើសរើសឯកសារមួយដើម្បីរក្សាទុក។ គម្រោងនេះភ្ជាប់ទៅឯកសារនោះ ហើយរក្សាទុកនឹងសរសេរទៅវាចាប់ពីពេលនោះតទៅ។';
 // The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
 // cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
 // is no API for it, and the download attribute cannot override the setting -- but the user can turn
@@ -2231,7 +2205,6 @@ $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C។ លេខខ្ពស�
 $ec_lang['lpn_field_length']='ប្រវែង';
 $ec_lang['lpn_field_from']='ពី';
 $ec_lang['lpn_field_to']='ទៅ';
-$ec_lang['lpn_field_length_tip']='ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2273,7 +2246,6 @@ $ec_lang['lpn_field_valve_setting_loss_tip']='ថ្ពល់ប៉ុន្ម�
 $ec_lang['lpn_field_valve_diameter_tip']='ទទឹងច្រកបើកកាត់តាមវ៉ាល់។ ល្បឿនទឹកកាត់តាមវ៉ាល់ត្រូវបានគណនាពីទទឹងនេះ ហើយការបាត់បង់កើតឡើងបន្តពីល្បឿននោះ។';
 $ec_lang['lpn_field_valve_km_tip']='ការបាត់បង់ពីខ្លួនវ៉ាល់ខណៈវ៉ាល់ឈរបើកពេញ បន្ថែមលើអ្វីដែលការកំណត់វ៉ាល់ដកចេញ។ វារាប់ជាពហុគុណនៃថ្ពល់ល្បឿន។ ប្រើ ០ ដើម្បីមិនរាប់វា។';
 $ec_lang['lpn_field_km']='មេគុណការបាត់បង់មូលដ្ឋាន, k';
-$ec_lang['lpn_field_km_tip']='ការបាត់បង់ពីកែង វ៉ាល់ និងគ្រឿងបំពាក់នៅលើបំពង់នេះ រាប់ជាចំនួនគុណនៃថ្ពល់ល្បឿន។ ប្រើ ០ សម្រាប់បំពង់ត្រង់ធម្មតា។';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
 // their own key rather than being asked to carry the full popup-field wording -- an on-map legend
@@ -2310,7 +2282,6 @@ $ec_lang['lpn_field_desc']='ការពិពណ៌នា';
 // description is free text, so the tag's one-word rule does NOT apply to it, but a line break cannot
 // be written as a trailing comment and is turned into a space. The tip says what the field is for
 // first, because that is what a reader of a blank box wants.
-$ec_lang['lpn_field_desc_tip']='សម្រាប់ការប្រើប្រាស់ផ្ទាល់ខ្លួនរបស់អ្នក ដូចជាជ្រុងផ្លូវ ឬសម្ភារៈដែលបំពង់មួយផលិតឡើង។ វាចូល និងចេញជាមួយឯកសារ EPANET ជាកន្លែងវានៅចុងជួរដេកផ្ទាល់ខ្លួនរបស់ធាតុនោះ។ គ្មានការគណនាណាមួយអានវាទេ។ ការចុះបន្ទាត់ក្លាយជាដកឃ្លាមួយ ព្រោះឯកសារគ្មានកន្លែងដាក់វាទេ។';
 // **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
@@ -2386,7 +2357,6 @@ $ec_lang['lpn_mode_add_text']='របៀប៖ បន្ថែមអក្សរ
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='ប្រើរបៀបនេះដើម្បីផ្លាស់ប្ដូរ ផ្លាស់ទី និងអូសវត្ថុនៅលើផែនទី។ នេះជារបៀបដែលទំព័រនេះត្រឡប់ទៅដោយលំនាំដើម៖ វាត្រឡប់មកទីនេះដោយខ្លួនឯង បន្ទាប់ពីសកម្មភាពខ្លះ ដូចជាការបើកគម្រោងមួយ។ ការចុច Esc ជាលើកទីពីរ ដកការជ្រើសរើសអ្វីដែលកំពុងត្រូវបានជ្រើសរើស។';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tip_labels_draggable']='អ្នកអាចអូសស្លាកមួយដើម្បីផ្លាស់ទីវា។ ស្លាកនោះនឹងបញ្ចេញពន្លឺបន្តិចមួយភ្លែត ដើម្បីជូនដំណឹងអ្នកថាវាត្រូវបានផ្លាស់ទី។ ចុចទ្វេដងលើស្លាកមួយដើម្បីបញ្ជូនវាត្រឡប់ទៅទីតាំងស្វ័យប្រវត្តិរបស់វា។';
 $ec_lang['lpn_field_auto']='ស្វ័យប្រវត្តិ';
 $ec_lang['lpn_method_switch_confirm']='ការប្ដូរវិធីសាស្ត្រកកិតមិនផ្លាស់ប្ដូរលេខភាពក្រញ៉ោងដែលបានវាយបញ្ចូលរួចលើបំពង់របស់អ្នកទេ ហើយភាពក្រញ៉ោងសម្រាប់វិធីសាស្ត្រមួយគ្មានន័យសម្រាប់វិធីសាស្ត្រមួយទៀតឡើយ។ សូមត្រួតពិនិត្យបំពង់ទាំងអស់បន្ទាប់ពីនេះ។ ប្ដូរវាទោះជាយ៉ាងណា?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
@@ -2439,7 +2409,6 @@ $ec_lang['lpn_field_text_all_zoom_tip']='រក្សាអក្សរនេះ
 $ec_lang['lpn_tool_labels']='ស្លាក';
 $ec_lang['lpn_labels_heading_node']='ស្លាកថ្នាំង';
 $ec_lang['lpn_labels_heading_link']='ស្លាកតំណ';
-$ec_lang['lpn_labels_decimals_tip']='ចំនួនខ្ទង់ទសភាគបង្ហាញសម្រាប់ស្លាកនេះ';
 $ec_lang['lpn_labels_mark_extrema']='សម្គាល់តម្លៃខ្ពស់បំផុត និងទាបបំផុត';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
@@ -2455,8 +2424,6 @@ $ec_lang['lpn_settings_apply_to_all']='អនុវត្តទៅគ្រប�
 $ec_lang['lpn_settings_apply_to_all_tip']='ធាតុគ្រប់មួយប្រភេទនេះដែលបានគូររួចហើយ ទទួលបានលេខសម្គាល់ចាប់ផ្ដើមដោយអត្ថបទនេះ។ នីមួយៗរក្សាលេខរបស់វា។ លេខសម្គាល់ដែលមិនបញ្ចប់ដោយលេខ ត្រូវបានទុកចោលមិនប៉ះពាល់។';
 $ec_lang['lpn_confirm_apply_prefix']='ប្ដូរឈ្មោះធាតុ {n} ដើម្បីឲ្យលេខសម្គាល់របស់វាចាប់ផ្ដើមដោយ {prefix} មែនទេ? នីមួយៗរក្សាលេខរបស់វា។';
 $ec_lang['lpn_prefix_applied']='បានប្ដូរឈ្មោះធាតុ {n}។ ធាតុផ្សេងទៀត {skipped} ត្រូវបានទុកចោលមិនប៉ះពាល់។';
-$ec_lang['lpn_labels_prefix_tip']='អត្ថបទបង្ហាញនៅមុនតម្លៃនេះលើផែនទី';
-$ec_lang['lpn_labels_suffix_tip']='អត្ថបទបង្ហាញនៅក្រោយតម្លៃនេះលើផែនទី';
 $ec_lang['lpn_labels_suffix_gradient_tip']='អត្ថបទបង្ហាញនៅក្រោយជម្រាលនៃការបាត់បង់ថ្ពល់លើផែនទី។ សូមកុំវាយសញ្ញាភាគរយនៅទីនេះ។ វាត្រូវបានបន្ថែមឲ្យដោយស្វ័យប្រវត្តិ នៅពេលឯកតាជាភាគរយ។';
 $ec_lang['lpn_labels_separator']='អត្ថបទរវាងតម្លៃ';
 $ec_lang['lpn_labels_separator_tip']='អត្ថបទរវាងតម្លៃមួយ និងតម្លៃបន្ទាប់នៅលើស្លាកមួយ។ លំនាំដើមជាចន្លោះមួយ។';
@@ -2467,7 +2434,6 @@ $ec_lang['lpn_labels_separator_tip']='អត្ថបទរវាងតម្ល
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='អាទិភាព';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='លំដាប់ដែលតម្លៃត្រូវលុបចោល នៅពេលស្លាកមួយមិនសមទៅនឹងទំហំ។ លេខ 1 ត្រូវរក្សាទុកយូរបំផុត។';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
@@ -2484,7 +2450,6 @@ $ec_lang['lpn_labels_col_decimals']='ខ្ទង់ទសភាគ';
 // it heads a box about three characters wide, and its tip carries the whole meaning.
 $ec_lang['lpn_labels_col_show']='បង្ហាញ';
 $ec_lang['lpn_labels_show_tip']='លំដាប់ដែលតម្លៃលេចឡើងនៅលើស្លាកមួយ។ តម្លៃដែលមានលេខ 1 មកមុនគេ៖ នៅកំពូលនៃស្លាកដែលមានច្រើនជាន់ និងនៅដើមស្លាកមួយបន្ទាត់។';
-$ec_lang['lpn_labels_priority_customer_tip']='លំដាប់ដែលតម្លៃត្រូវបានទម្លាក់ចេញពីស្លាកអតិថិជនមួយ។ តម្លៃដែលមានលេខ 1 ត្រូវបានទម្លាក់ចេញមុនគេ។';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='ប្រើឯកតា';
@@ -2613,7 +2578,6 @@ $ec_lang['lpn_backdrop_continue']='បន្ត';
 $ec_lang['lpn_tool_settings']='ការកំណត់';
 $ec_lang['lpn_settings_show_titles']='បង្ហាញចំណងជើងទំព័រ';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_show_titles_tip']='លាក់ក្បាលទំព័រ និងបន្ទាត់ស្វាគមន៍ខាងលើគំនូរ ដើម្បីឲ្យផែនទីមានកន្លែងច្រើនជាងសម្រាប់ធ្វើការ។ ការបោះពុម្ពតែងតែបង្ហាញតែផែនទីស្អាតមួយប៉ុណ្ណោះ។';
 // The link that rides on the headings themselves (Tom's 2026-09-08 worklist). It throws the switch AND opens the
 // box at the row that holds it, so the way back is learned in the same gesture.
 $ec_lang['lpn_hide_titles']='លាក់ចំណងជើងទាំងនេះ';
@@ -2831,7 +2795,6 @@ $ec_lang['lpn_settings_default_is']='តម្លៃលំនាំដើមគ�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='ថាតើឧបករណ៍ដោះស្រាយត្រូវជិតប៉ុណ្ណាមុននឹងឈប់ វាស់ជាទំហំដែលលំហូរនៅតែផ្លាស់ប្ដូរពីជុំមួយទៅជុំបន្ទាប់។ លេខតូចជាងមានភាពត្រឹមត្រូវជាង ប៉ុន្តែចំណាយពេលច្រើនជាង។ ឧបករណ៍ដោះស្រាយទាំងពីរអានប្រអប់តែមួយនេះ ហើយនីមួយៗវាស់ការផ្លាស់ប្ដូរនោះធៀបនឹងផលបូកខុសគ្នា៖ ឧបករណ៍ដោះស្រាយខាងក្នុងធៀបនឹងផលបូកនៃតម្រូវការ EPANET ធៀបនឹងផលបូកនៃលំហូរតំណ។ ទុកទទេ ទំព័រនេះប្រើភាពត្រឹមត្រូវតឹងជាងលំនាំដើមផ្ទាល់របស់ EPANET។';
 $ec_lang['lpn_settings_specific_gravity']='ទម្ងន់ជាក់លាក់';
-$ec_lang['lpn_settings_specific_gravity_tip']='ទម្ងន់នៃវត្ថុរាវធៀបនឹងទឹក។ វាផ្លាស់ប្ដូរសម្ពាធដែលឧបករណ៍វាស់អាចអាន មិនមែនលំហូរទេ។';
 $ec_lang['lpn_settings_viscosity']='ភាពខាប់ទាក់ទង';
 $ec_lang['lpn_settings_viscosity_tip']='ភាពខាប់នៃវត្ថុរាវធៀបនឹងទឹកនៅ 20 អង្សាសេ។ វាផ្លាស់ប្ដូរចម្លើយតែក្រោមវិធីសាស្ត្រ Darcy-Weisbach ប៉ុណ្ណោះ។';
 $ec_lang['lpn_settings_trials']='ជុំអតិបរមា';
@@ -2928,7 +2891,6 @@ $ec_lang['lpn_settings_mask_labels']='ផ្ទៃខាងក្រោយតា
 // drawing program would expect exactly that from those words.
 $ec_lang['lpn_settings_leader_snap']='ស្អិតបន្ទាត់នាំទៅមុំកំណត់';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_leader_snap_tip']='នៅពេលអ្នកអូសស្លាកចេញឆ្ងាយពីធាតុដែលវាដាក់ឈ្មោះ បន្ទាត់ត្រឡប់ទៅរកវានឹងត្រូវទាញឲ្យទៅជិតមុំកំណត់ដែលនៅជិតបំផុត ប្រសិនបើអ្នកអូសទៅជិតវា។ បន្តអូស ហើយការស្អិតនឹងលែងទាញ ដូច្នេះមុំណាមួយនៅតែអាចប្រើបាន។ បិទ អូសដោយសេរី ដែលជាអ្វីដែលទំព័រនេះធ្លាប់ធ្វើជានិច្ច។';
 // **THE LABELING THRESHOLD** (Tasks 669 and 705). The row's name is Tom's own wording from the
 // Task 705 restorations. Its capture button reuses lpn_settings_label_use_view, the customer
 // row's key, because it is the same button doing the same thing. The placeholder is the only place
@@ -3062,7 +3024,6 @@ $ec_lang['lpn_time_tank']='ធុងទឹក';
 $ec_lang['lpn_time_level']='កម្រិតទឹក';
 $ec_lang['lpn_time_run']='ដំណើរការ';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='ដោះស្រាយបណ្ដាញនេះនៅរាល់ជំហានពេលវេលាធារាសាស្ត្ររបស់វា។';
 // **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
 // `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
 // LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
@@ -3285,11 +3246,9 @@ $ec_lang['lpn_settings_energy']='ថាមពល';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='របាយការណ៍';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_menu_tip']='របាយការណ៍អំពីថ្លៃថាមពលបូម ការប្រៀបធៀបសេណារីយ៉ូ របាយការណ៍ឧបករណ៍ដោះស្រាយ EPANET ការក្រិតតាមទិន្នន័យដែលបានវាស់ ហើយក្រោយការក្លែងធ្វើរយៈពេលបន្ត មានរបាយការណ៍ស្ថានភាព និងរបាយការណ៍ពេញលេញ។';
 $ec_lang['lpn_reports_epanet']='ការដំណើរការ EPANET';
 $ec_lang['lpn_energy_title']='របាយការណ៍ថាមពលម៉ាស៊ីនបូម';
 $ec_lang['lpn_energy_menu']='ថាមពលម៉ាស៊ីនបូម';
-$ec_lang['lpn_energy_menu_tip']='ចំណែកនៃការដំណើរការដែលម៉ាស៊ីនបូមនីមួយៗបានបើក កម្លាំងអគ្គិសនីដែលវាប្រើ និងចំណាយប៉ុន្មានពេញការគណនាឆ្លងកាត់ពេលវេលាចុងក្រោយ។';
 $ec_lang['lpn_energy_efficiency']='ប្រសិទ្ធភាពម៉ាស៊ីនបូម (ភាគរយ)';
 $ec_lang['lpn_energy_efficiency_tip']='ប្រសិទ្ធភាពពីខ្សែភ្លើងទៅទឹក ប្រើសម្រាប់ម៉ាស៊ីនបូមគ្រប់គ្រឿងដែលគ្មានខ្សែកោងប្រសិទ្ធភាពផ្ទាល់ខ្លួន។ EPANET ប្រើ 75 ភាគរយ នៅពេលគ្មានតម្លៃត្រូវបានចែង។';
 $ec_lang['lpn_energy_price']='តម្លៃអគ្គិសនី';
@@ -3399,7 +3358,6 @@ $ec_lang['lpn_calib_tab_corr']='ក្រាបទំនាក់ទំនង';
 $ec_lang['lpn_calib_tab_means']='ការប្រៀបធៀបមធ្យម';
 $ec_lang['lpn_calib_col_location']='ទីតាំង';
 $ec_lang['lpn_calib_col_n']='ចំនួនការសង្កេត';
-$ec_lang['lpn_calib_col_n_tip']='ចំនួនការសង្កេត៖ ការវាស់នៅទីតាំងនេះដែលត្រូវបានប្រៀបធៀប។';
 $ec_lang['lpn_calib_col_obs_mean']='មធ្យមសង្កេត';
 $ec_lang['lpn_calib_col_sim_mean']='មធ្យមគណនា';
 $ec_lang['lpn_calib_col_mean_err']='កំហុសមធ្យម';
@@ -3465,7 +3423,6 @@ $ec_lang['lpn_color_mode_manual']='ដោយដៃ';
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='បណ្ណាល័យ';
-$ec_lang['lpn_library_menu_tip']='គ្រប់គ្រងលំនាំតម្រូវការ ខ្សែកោងម៉ាស៊ីនបូម និងច្បាប់ត្រួតពិនិត្យសម្រាប់គម្រោងនេះ។';
 // The three section names. Each is the word EPANET's own input file uses for the section, because
 // that is the word every water-network user and every tutorial already has -- see the note in
 // dev/scripts/glossary.json about deferring to a discipline's standard term.
@@ -3479,7 +3436,6 @@ $ec_lang['lpn_library_curves_tip']='ខ្សែកោងគឺជាបញ្�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_curves_note']='ខ្សែកោងត្រូវបានភ្ជាប់ទៅនឹងម៉ាស៊ីនបូម និងវ៉ាល់។ សម្រាប់ខ្សែកោងថ្ពល់ម៉ាស៊ីនបូម ការដំណើរការប្រើខ្សែកោងដែលសមតាមចំណុចទាំងនោះ ដូចបានបង្ហាញ; សម្រាប់ប្រភេទផ្សេងទៀតទាំងអស់ វាភ្ជាប់ចំណុចទាំងនោះដោយបន្ទាត់ត្រង់ ដូចបានបង្ហាញ។';
 $ec_lang['lpn_library_curve_add']='បន្ថែមខ្សែកោង';
-$ec_lang['lpn_library_curve_type_tip']='ខ្សែកោងនេះពិពណ៌នាអ្វី';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
 // EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
 // and Equation (for pump head) on row/line 2."*). EPANET calls the control "Curve Type", so that is
@@ -3500,7 +3456,6 @@ $ec_lang['lpn_library_curve_values_tip']='ជ្រើសរើសមួយ ឬ�
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
 $ec_lang['lpn_library_curve_note_label']='ការពិពណ៌នា';
-$ec_lang['lpn_library_curve_note_tip']='ខ្សែកោងនេះជាអ្វី តាមពាក្យផ្ទាល់ខ្លួនរបស់អ្នក។ វាត្រូវបានសរសេរនៅខាងលើខ្សែកោងនៅក្នុងឯកសារ EPANET ហើយត្រូវបានអានត្រឡប់ពីទីនោះ។';
 $ec_lang['lpn_library_curve_remove_point']='លុបចំណុចនេះ';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -3683,14 +3638,11 @@ $ec_lang['lpn_field_base_demand']='តម្រូវការមូលដ្ឋ
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='លំហូរដែលថ្នាំងនេះទាញនៅជំហានពេលវេលាដែលបានបង្ហាញ៖ តម្រូវការមូលដ្ឋាននីមួយៗគុណនឹងលំនាំផ្ទាល់របស់វា ហើយបូកបញ្ចូលគ្នា។ វាត្រូវបានគណនា មិនមែនវាយបញ្ចូលទេ ដូច្នេះវាផ្លាស់ប្ដូរតាមនាឡិកា ហើយមិនអាចកែសម្រួលបានទេ។';
 $ec_lang['lpn_field_demand_pattern']='លំនាំតម្រូវការ';
-$ec_lang['lpn_field_demand_pattern_tip']='របៀបដែលតម្រូវការរបស់ថ្នាំងនេះឡើង និងចុះពេញការដំណើរការ។ ទុកវានៅ គ្មានលំនាំ ដើម្បីតាមលំនាំផ្ទាល់របស់គម្រោង។';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
 $ec_lang['lpn_field_demand_category']='ការពិពណ៌នា';
-$ec_lang['lpn_field_demand_category_tip']='ឈ្មោះ ឬការពិពណ៌នានៃប្រភេទតម្រូវការនេះ។';
 $ec_lang['lpn_demand_add']='បន្ថែមប្រភេទតម្រូវការ';
-$ec_lang['lpn_demand_add_tip']='បន្ថែមប្រភេទតម្រូវការមួយទៀតនៅថ្នាំងនេះ ដោយមានតម្រូវការមូលដ្ឋាន លំនាំ និងការពិពណ៌នាផ្ទាល់ខ្លួន។ ប្រភេទទាំងនេះបូកបញ្ចូលគ្នា។';
 $ec_lang['lpn_demand_remove']='ដកតម្រូវការនេះចេញ';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.

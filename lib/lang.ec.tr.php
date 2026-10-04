@@ -255,6 +255,7 @@ $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Isbash (1936) ve Marico
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Isbash (1936) ve Maricopa County, Arizona, US\'ye göre.">Yan eğim 1 için gerekli köşeli taş boyutu, D<sub>50</sub> (Isbash ve MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Isbash (1936) ve Maricopa County, Arizona, US\'ye göre.">Yan eğim 2 için gerekli köşeli taş boyutu, D<sub>50</sub> (Isbash ve MC) <span class="ec-tip">?</span></span>';
 // Edited by TGH 2026-09-07
+$ec_lang['lpn_time_run_tip']='Bu şebekeyi her hidrolik zaman adımında çözer.';
 $ec_lang['mtc_d50_mra']='<span class="ec-help" title="Maynord, Ruff ve Abt\'a (1989) göre. Bir dönemeçte kaya, California Division of Highways\'e (1970) göre ortalamanın 4/3\'ü olan dönemeç hızına göre boyutlandırılır; Maynord\'un kendi 1,5 katsayısı doğal kanallara uygulanır.">Gerekli köşeli taş boyutu, D<sub>50</sub> (Maynord, Ruff ve Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Gerekli köşeli taş boyutu, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Hız, düzgün akış varsayımları için makul.';
@@ -676,9 +677,7 @@ $ec_lang['lpn_customer_heading']='Müşteri {id}';
 // strings every node and link already uses. Do not re-add an account key: a utility that wants a
 // field of its own name makes a custom property.
 $ec_lang['lpn_field_meter_demand']='Servis başına talep';
-$ec_lang['lpn_field_meter_demand_tip']='Bu müşterideki her bir servisin ihtiyaç duyduğu talep. Bul ve değiştir, boş ile 0 arasındaki farktan yararlanabilir.';
 $ec_lang['lpn_field_meter_count']='Servis sayısı';
-$ec_lang['lpn_field_meter_count_tip']='Bu tek müşterinin kaç özdeş servisi temsil ettiği; böylece bir ana boru boyunca kırk iki tek aileli bağlantı, tek bir yerde tek bir simge olabilir. Aşağıdaki toplam, yukarıdaki talebin bu sayı ile çarpımıdır.';
 $ec_lang['lpn_field_meter_total']='Toplam talep';
 $ec_lang['lpn_field_meter_total_tip']='Servis başına talebin servis sayısıyla çarpımı. Bu, aşağıda adı geçen düğüme eklenen sayıdır.';
 $ec_lang['lpn_field_meter_pipe']='Bağlı varlık';
@@ -692,7 +691,6 @@ $ec_lang['lpn_meter_pipe_unknown']='Bu projede {id} adında hiçbir şey yok, bu
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Bu müşterinin talebinin çalışma boyunca nasıl yükselip alçaldığı. Toplam talebi çarpar, bu yüzden bu müşterinin temsil ettiği her servise etki eder. Projenin Varsayılan talep deseni\'ni izlemesi için Desen yok olarak bırakın.';
 $ec_lang['lpn_meter_pattern_unknown']='Bu projede {id} adında hiçbir desen yok, bu yüzden müşteri olduğu gibi bırakıldı.';
 $ec_lang['lpn_meter_placed']='Müşteri {id} eklendi. Açıklaması ve talebi Müşteriler tablosuna yazılır, ya da kutusunu açmak için Seç modunda üzerine basın.';
 $ec_lang['lpn_field_meter_pipe_tip']='Bu servisin bağlandığı varlık. Değiştirmek için buraya veya Müşteriler tablosuna başka birini yazın, ya da bağlantı noktasını farklı bir varlığa sürükleyin.';
@@ -798,7 +796,6 @@ $ec_lang['lpn_pane_manage_cols_down']='Aşağı taşı';
 $ec_lang['lpn_pane_manage_cols_top']='Başa taşı';
 $ec_lang['lpn_pane_manage_cols_bottom']='Sona taşı';
 $ec_lang['lpn_pane_colmenu_tip']='Sütunları gizle veya yönet';
-$ec_lang['lpn_pane_sortarrow_tip']='Sıralamayı ters çevir';
 $ec_lang['lpn_tool_area_window']='Pencere seç';
 $ec_lang['lpn_tool_area_lasso']='Kement seç';
 $ec_lang['lpn_tool_area_polygon']='Çokgen seç';
@@ -852,7 +849,6 @@ $ec_lang['lpn_field_elev']='Kot';
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
 // protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
 // entry carrying translatable payload nobody on the page can see.
-$ec_lang['lpn_field_elev_tip']='Bu düğümdeki zemin veya boru kotu. İstediğiniz herhangi bir sıfır noktasından ölçebilirsiniz, yeter ki tüm düğümler aynı sıfırı kullansın.';
 // A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
 // at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
 // This USED to read "so it doubles as a tank" (Tom, 2026-07-30), which was true only while there
@@ -1005,7 +1001,6 @@ $ec_lang['lpn_status_converted']='{n} değer {unit} birimine yeniden yazıldı.'
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_color_tip']='Şebekeyi tek bir niceliğe göre renklendirin, böylece büyük bir harita bir bakışta okunabilsin. Genellikle önemli olan iki nicelik basınç ve hızdır.';
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
 $ec_lang['lpn_units_length']='Uzunluk';
@@ -1174,13 +1169,6 @@ $ec_lang['lpn_tip_join']='{name} — {tip}';
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='Kısayol: {key} tuşuna basın.';
 $ec_lang['lpn_tool_key_hint_two']='Kısayol: {key} veya {key2} tuşuna basın.';
-$ec_lang['lpn_tool_add_junction_tip']='Bir düğüm eklemek için haritaya tıklayın: boruların birleştiği ya da suyun kullanıldığı bir nokta.';
-$ec_lang['lpn_tool_add_reservoir_tip']='Bir rezervuar eklemek için haritaya tıklayın: sabit bir su seviyesi olan sonsuz bir kaynak.';
-$ec_lang['lpn_tool_add_tank_tip']='Bir depo eklemek için haritaya tıklayın: dolup boşaldıkça su seviyesi yükselip alçalan depolama.';
-$ec_lang['lpn_tool_add_pipe_tip']='Aralarında bir boru çizmek için önce bir düğüme, sonra başka bir düğüme tıklayın.';
-$ec_lang['lpn_tool_add_pump_tip']='Aralarına bir pompa koymak için önce bir düğüme, sonra başka bir düğüme tıklayın.';
-$ec_lang['lpn_tool_add_valve_tip']='Aralarına bir vana koymak için önce bir düğüme, sonra başka bir düğüme tıklayın.';
-$ec_lang['lpn_tool_add_text_tip']='Çizimin üzerine bir not yazmak için haritaya tıklayın.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='Şeklin içindeki her şeyi seçmek için haritaya, talimat verildiği gibi tıklayın. Şekli pencere, kement ve çokgen arasında değiştirmek için bu düğmeye tekrar basın. Var olan seçime devam etmek ve seçtiğinizi eklemek veya çıkarmak (değiştirmek) için seçim yaparken Shift tuşunu basılı tutun.';
@@ -1189,7 +1177,6 @@ $ec_lang['lpn_area_selected']='{n} seçildi.';
 $ec_lang['lpn_area_none']='O alanda hiçbir şey bulunamadı.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_vertices_tip']='Haritada bir boruyu şekillendiren kırılma noktalarını ekleyin ve kaldırın. Bir kırılma noktası eklemek için boruya tıklayın, kaldırmak için bir kırılma noktasına tıklayın, taşımak için bir kırılma noktasını sürükleyin. Bir kırılma noktası yalnızca çizilen güzergahı değiştirir, hidroliği değiştirmez.';
-$ec_lang['lpn_tool_delete_tip']='Kaldırmak için haritadaki herhangi bir şeye tıklayın.';
 $ec_lang['lpn_tool_undo_tip']='Son değişikliği geri alın.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='Tüm şebekeyi pencereye sığdırın.';
@@ -1198,7 +1185,6 @@ $ec_lang['lpn_tool_zoom_window_tip']='Yakınlaştırmak için haritada bir kutun
 $ec_lang['lpn_zoom_in_tip']='Yakınlaştır. Kısayol: +';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='Uzaklaştır. Kısayol: -';
-$ec_lang['lpn_tool_settings_tip']='Bu proje için ayarları açın.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='Bir öğeyi kimliğine göre bulun, ya da bir koşulu karşılayan tüm öğeleri bulun, ve hepsini aynı anda değiştirin.';
 // **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
@@ -1210,7 +1196,6 @@ $ec_lang['lpn_find_menu_tip']='Bir öğeyi kimliğine göre bulun, ya da bir ko�
 $ec_lang['lpn_help_icons']='Araç çubuğu';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Görünürlük';
-$ec_lang['lpn_pane_right_toggle_tip']='Haritanın sağındaki paneli gösterin ya da gizleyin. Etiket ve renk seçimlerini içerir.';
 $ec_lang['lpn_color_legend_open_tip']='Görünürlük panelini açıp bu renkleri değiştirmek için tıklayın.';
 $ec_lang['lpn_color_node_field']='Düğümleri şuna göre renklendir';
 $ec_lang['lpn_color_link_field']='Boruları şuna göre renklendir';
@@ -1270,7 +1255,6 @@ $ec_lang['lpn_goto_menu']='Bir enlem ve boylama git…';
 // lat/lon."* The parser accepts `38,122` and `38.122` as a pair on his ruling of the same day; the
 // examples in lpn_goto_bad show all three shapes, which is where somebody whose last attempt failed
 // is actually reading.
-$ec_lang['lpn_goto_tip']='Haritayı zaten koordinatlarını bildiğiniz bir yere taşıyın. Bir haritanın verdiği sırayla önce enlem, sonra boylam, aralarında bir boşlukla: 38 -122';
 $ec_lang['lpn_goto_prompt']='Bu sırayla enlem ve boylam';
 $ec_lang['lpn_goto_bad']='Bu bir enlem ve bir boylam değil. Aralarında bir boşlukla 38 -122 deneyin.';
 $ec_lang['lpn_georef_goto']='Git…';
@@ -1567,7 +1551,6 @@ $ec_lang['lpn_profile_menu']='Profil';
 // nobody to read. Sprint 459's Wave 0 found them; Tom ruled the move on 2026-08-24 ("these _syns
 // are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
 // permission $ec_lang_syn requires. Same text, correct array.
-$ec_lang['lpn_profile_tip']='Şebeke boyunca bir yol üzerinde zemini ve hidrolik gradyan çizgisini çizin.';
 $ec_lang['lpn_profile_title']='Bir yol boyunca profil';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
@@ -1625,12 +1608,9 @@ $ec_lang['lpn_profile_missing']='Kaydedilmiş {name} yolu bu projede olmayan dü
 $ec_lang['lpn_ts_menu']='Zaman serisi';
 $ec_lang['lpn_ts_tip']='Bir veya daha fazla varlığı, uzatılmış dönem simülasyonu boyunca zamana karşı çizin.';
 $ec_lang['lpn_ts_title']='Zamana karşı değerler';
-$ec_lang['lpn_ts_group_tip']='Grafiğin düğümleri mi yoksa hatları mı gösterdiği.';
 $ec_lang['lpn_ts_group_nodes']='Düğümler';
 $ec_lang['lpn_ts_group_links']='Hatlar';
-$ec_lang['lpn_ts_quantity_tip']='Zamana karşı hangi değerin çizileceği.';
 $ec_lang['lpn_ts_add']='Seçileni ekle';
-$ec_lang['lpn_ts_add_tip']='Şu anda haritada seçili olan her şeyi grafiğe koyar.';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
 $ec_lang['lpn_ts_add_none']='Haritada o türden hiçbir şey seçili değil.';
 $ec_lang['lpn_ts_clear']='Hepsini kaldır';
@@ -1645,8 +1625,6 @@ $ec_lang['lpn_ts_axis_time']='Geçen süre';
 $ec_lang['lpn_freq_menu']='Frekans';
 $ec_lang['lpn_freq_tip']='Geçerli zaman adımındaki tüm düğümler veya tüm borular üzerinde bir özelliğin frekans dağılımını çizin.';
 $ec_lang['lpn_freq_title']='Değerlerin dağılımı';
-$ec_lang['lpn_freq_group_tip']='Grafiğin düğümleri mi yoksa boruları mı gösterdiği.';
-$ec_lang['lpn_freq_quantity_tip']='Hangi değerin çizileceği.';
 $ec_lang['lpn_freq_none']='Bu değer için henüz sonuç yok, bu yüzden çizilecek bir şey yok.';
 $ec_lang['lpn_freq_summary']='Çizilen: {n} / {total}';
 $ec_lang['lpn_freq_summary_time']='Çizilen: {n} / {total}, {time} zamanında';
@@ -1749,7 +1727,6 @@ $ec_lang['lpn_file_revert']='Eski haline getir';
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Son dosyalar';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_recent_tip']='Bilgisayarınızda aramanıza gerek kalmadan {file} dosyasını tekrar açın.';
 $ec_lang['lpn_recent_denied']='O dosyayı açma izni verilmediği için açılmadı.';
 $ec_lang['lpn_recent_gone']='{file} açılamadı. Taşınmış, yeniden adlandırılmış veya silinmiş olabilir, bu yüzden son dosyalar listesinden çıkarıldı.';
 // The tab strip. These are titles on small controls, so each has to stand alone with no sentence
@@ -1873,11 +1850,8 @@ $ec_lang['lpn_file_upload_explain']='Bu tarayıcı bir dosyaya bağlanamıyor, b
 // The tip on the Open button, which reached the toolbar with Task 246. It exists because that
 // button is icon-only: on a menu row the word carries the whole meaning, and on the strip the tip
 // is where the rest of it lives.
-$ec_lang['lpn_file_open_tip']='Bu sayfadan kaydedilmiş bir proje dosyası açın.';
 // Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
 // cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
-$ec_lang['lpn_file_save_tip']='Bağlı dosyaya kaydeder.';
-$ec_lang['lpn_file_saveas_tip']='Kaydedilecek bir dosya seçin. Bu proje o dosyaya bağlanır ve bundan sonra Kaydet o dosyaya yazar.';
 // The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
 // cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
 // is no API for it, and the download attribute cannot override the setting -- but the user can turn
@@ -2183,7 +2157,6 @@ $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C. Daha yüksek bir sayı da
 $ec_lang['lpn_field_length']='Uzunluk';
 $ec_lang['lpn_field_from']='Başlangıç';
 $ec_lang['lpn_field_to']='Bitiş';
-$ec_lang['lpn_field_length_tip']='Borunun uzunluğu. Otomatik açıkken bu, çizdiğinizi izler. Çizimden farklı bir uzunluk yazmak için Otomatik\'i kapatın.';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2225,7 +2198,6 @@ $ec_lang['lpn_field_valve_setting_loss_tip']='Kısma vanasının, hız yükünü
 $ec_lang['lpn_field_valve_diameter_tip']='Vananın içinden geçen açıklığın genişliği. Suyun vanadan geçiş hızı bu genişlikten hesaplanır, ve kayıp bu hızdan çıkarılır.';
 $ec_lang['lpn_field_valve_km_tip']='Vana ayarının giderdiğinin üzerine, vana tam açık dururken vana gövdesinden kaynaklanan kayıp. Hız yükünün bir katı olarak sayılır. Yoksaymak için 0 kullanın.';
 $ec_lang['lpn_field_km']='Küçük (yerel) kayıp katsayısı, k';
-$ec_lang['lpn_field_km_tip']='Bu borudaki dirsek, vana ve bağlantı parçalarından kaynaklanan kayıp, hız yükünün bir katı olarak sayılır. Düz bir boru için 0 kullanın.';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
 // their own key rather than being asked to carry the full popup-field wording -- an on-map legend
@@ -2262,7 +2234,6 @@ $ec_lang['lpn_field_desc']='Açıklama';
 // description is free text, so the tag's one-word rule does NOT apply to it, but a line break cannot
 // be written as a trailing comment and is turned into a space. The tip says what the field is for
 // first, because that is what a reader of a blank box wants.
-$ec_lang['lpn_field_desc_tip']='Kendi kullanımınız için, bir sokak köşesi veya bir borunun neden yapıldığı gibi. EPANET dosyasına girip çıkar, orada parçanın kendi satırının sonunda durur. Hiçbir hesaplama onu okumaz. Bir satır sonu, boşluğa dönüşür, çünkü dosyanın onu koyacağı bir yer yoktur.';
 // **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
@@ -2338,7 +2309,6 @@ $ec_lang['lpn_mode_add_text']='Mod: Metin Ekle. Bir Metin yerleştirmek için ha
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Haritadaki şeyleri değiştirmek, taşımak ve sürüklemek için bu modu kullanın. Sayfanın varsayılan olarak döndüğü mod budur: bir proje açmak gibi bazı işlemlerden sonra kendiliğinden buraya döner. Esc tuşuna ikinci kez basmak, seçili olan her şeyin seçimini kaldırır.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tip_labels_draggable']='Bir etiketi taşımak için sürükleyebilirsiniz. Taşındığını size bildirmek için etiket kısa süreliğine vurgulanır. Bir etiketi yerine geri koymak için çift tıklayın.';
 $ec_lang['lpn_field_auto']='Otomatik';
 $ec_lang['lpn_method_switch_confirm']='Sürtünme yöntemini değiştirmek, borularınıza zaten yazılmış olan pürüzlülük sayılarını değiştirmez, ve bir yöntem için pürüzlülük diğeri için anlamsızdır. Bundan sonra her boruyu kontrol edin. Yine de değiştirilsin mi?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
@@ -2390,7 +2360,6 @@ $ec_lang['lpn_field_text_all_zoom_tip']='Ne kadar uzaklaşırsanız uzaklaşın,
 $ec_lang['lpn_tool_labels']='Etiketler';
 $ec_lang['lpn_labels_heading_node']='Düğüm etiketleri';
 $ec_lang['lpn_labels_heading_link']='Hat etiketleri';
-$ec_lang['lpn_labels_decimals_tip']='Bu etiket için gösterilen ondalık basamak sayısı';
 $ec_lang['lpn_labels_mark_extrema']='En yüksek ve en düşük değerleri işaretle';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
@@ -2406,8 +2375,6 @@ $ec_lang['lpn_settings_apply_to_all']='Tümüne uygula';
 $ec_lang['lpn_settings_apply_to_all_tip']='Bu türden zaten çizilmiş her öğe, bu metinle başlayan bir kimlik alır. Her biri kendi numarasını korur. Bir sayıyla bitmeyen kimlik olduğu gibi bırakılır.';
 $ec_lang['lpn_confirm_apply_prefix']='{n} öge, kimlikleri {prefix} ile başlayacak şekilde yeniden adlandırılsın mı? Her biri kendi numarasını korur.';
 $ec_lang['lpn_prefix_applied']='{n} öge yeniden adlandırıldı. {skipped} diğeri olduğu gibi bırakıldı.';
-$ec_lang['lpn_labels_prefix_tip']='Harita etiketlerinde bu özellikten önce eklenen metin';
-$ec_lang['lpn_labels_suffix_tip']='Harita etiketlerinde bu özellikten sonra eklenen metin';
 $ec_lang['lpn_labels_suffix_gradient_tip']='Harita etiketlerinde yük kaybı eğiminden sonra eklenen metin. Buraya yüzde işareti yazmayın. Birimler yüzde olduğunda sizin için otomatik eklenir.';
 $ec_lang['lpn_labels_separator']='Değerler arasındaki metin';
 $ec_lang['lpn_labels_separator_tip']='Bir etikette bir özellikle bir sonraki arasındaki metin. Varsayılan olarak bir boşluktur.';
@@ -2418,7 +2385,6 @@ $ec_lang['lpn_labels_separator_tip']='Bir etikette bir özellikle bir sonraki ar
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='Öncelik';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='Bir etiket sığmadığında değerlerin bırakılma sırası. 1 en uzun süre tutulur.';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
@@ -2435,7 +2401,6 @@ $ec_lang['lpn_labels_col_decimals']='Ondalık';
 // it heads a box about three characters wide, and its tip carries the whole meaning.
 $ec_lang['lpn_labels_col_show']='Göster';
 $ec_lang['lpn_labels_show_tip']='Değerlerin bir etikette görünme sırası. 1 numaralı değer önce gelir: yığılmış bir etikette en üstte, tek satırlık bir etikette ise başta.';
-$ec_lang['lpn_labels_priority_customer_tip']='Değerlerin bir müşteri etiketinden bırakılma sırası. 1 numaralı değer önce bırakılır.';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='Birimleri kullan';
@@ -2564,7 +2529,6 @@ $ec_lang['lpn_backdrop_continue']='Devam et';
 $ec_lang['lpn_tool_settings']='Ayarlar';
 $ec_lang['lpn_settings_show_titles']='Sayfa başlıklarını göster';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_show_titles_tip']='Sayfa başlığını ve çizimin üstündeki karşılama satırını gizler, böylece çalışmak için haritaya daha fazla yer kalır. Yazdırmada her zaman yalnızca sade bir harita gösterilir.';
 // The link that rides on the headings themselves (Tom's 2026-09-08 worklist). It throws the switch AND opens the
 // box at the row that holds it, so the way back is learned in the same gesture.
 $ec_lang['lpn_hide_titles']='Bu başlıkları gizle';
@@ -2769,7 +2733,6 @@ $ec_lang['lpn_settings_default_is']='Varsayılan {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Çözücünün durmadan önce ne kadar yaklaşması gerektiği; debilerin bir denemeden diğerine hâlâ ne kadar değiştiğiyle ölçülür. Daha küçük bir sayı daha kesindir ve daha uzun sürer. Her iki çözücü de bu tek kutuyu okur, ancak her biri bu değişimi farklı bir toplama göre ölçer: yerleşik çözücü taleplerin toplamına göre, EPANET hat debilerinin toplamına göre. Boş bırakılırsa bu sayfa, EPANET\'in kendi varsayılanından daha sıkı bir doğruluk kullanır.';
 $ec_lang['lpn_settings_specific_gravity']='Özgül ağırlık';
-$ec_lang['lpn_settings_specific_gravity_tip']='Akışkanın ağırlığının suya göre oranı. Bir göstergenin okuyacağı basınçları değiştirir, debileri değil.';
 $ec_lang['lpn_settings_viscosity']='Bağıl viskozite';
 $ec_lang['lpn_settings_viscosity_tip']='Akışkanın viskozitesinin 20 santigrat derecedeki suya göre oranı. Yalnızca Darcy-Weisbach yönteminde yanıtı değiştirir.';
 $ec_lang['lpn_settings_trials']='Azami deneme sayısı';
@@ -2866,7 +2829,6 @@ $ec_lang['lpn_settings_mask_labels']='Etiketlerin arkasında dolgu arka plan';
 // drawing program would expect exactly that from those words.
 $ec_lang['lpn_settings_leader_snap']='Bağlantı çizgilerini belirli açılara yasla';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_leader_snap_tip']='Bir etiketi adlandırdığı şeyden uzağa sürüklediğinizde, belirli açılardan birine yakın sürüklerseniz ona geri dönen çizgi en yakın açıya çekilir. Sürüklemeye devam ederseniz yaslama bırakır, böylece her açı hâlâ kullanılabilir. Kapalıyken serbestçe sürüklenir, bu sayfanın her zaman yaptığı budur.';
 // **THE LABELING THRESHOLD** (Tasks 669 and 705). The row's name is Tom's own wording from the
 // Task 705 restorations. Its capture button reuses lpn_settings_label_use_view, the customer
 // row's key, because it is the same button doing the same thing. The placeholder is the only place
@@ -3000,7 +2962,6 @@ $ec_lang['lpn_time_tank']='Depo';
 $ec_lang['lpn_time_level']='Su seviyesi';
 $ec_lang['lpn_time_run']='Hesapla';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='Bu şebekeyi her hidrolik zaman adımında çözer.';
 // **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
 // `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
 // LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
@@ -3223,11 +3184,9 @@ $ec_lang['lpn_settings_energy']='Enerji';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='Raporlar';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_menu_tip']='Pompalama enerji maliyeti, senaryo karşılaştırması, EPANET çözücü raporu, ölçülmüş verilere göre kalibrasyon ve bir uzatılmış dönem simülasyonundan sonra durum raporu ile tam rapor.';
 $ec_lang['lpn_reports_epanet']='EPANET çalıştırması';
 $ec_lang['lpn_energy_title']='Pompa enerjisi raporu';
 $ec_lang['lpn_energy_menu']='Pompa enerjisi';
-$ec_lang['lpn_energy_menu_tip']='Son zaman dilimi hesaplaması boyunca her pompanın çalışma payının ne kadar olduğu, çektiği güç ve maliyeti.';
 $ec_lang['lpn_energy_efficiency']='Pompa verimi (yüzde)';
 $ec_lang['lpn_energy_efficiency_tip']='Kendi verim eğrisini taşımayan her pompa için kullanılan, elektrikten suya verim. Hiçbir şey belirtilmediğinde EPANET yüzde 75 kullanır.';
 $ec_lang['lpn_energy_price']='Enerji fiyatı';
@@ -3361,7 +3320,6 @@ $ec_lang['lpn_color_mode_manual']='Elle';
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='Kitaplıklar';
-$ec_lang['lpn_library_menu_tip']='Bu proje için talep desenlerini, pompa eğrilerini ve kontrol kurallarını yönetin.';
 // The three section names. Each is the word EPANET's own input file uses for the section, because
 // that is the word every water-network user and every tutorial already has -- see the note in
 // dev/scripts/glossary.json about deferring to a discipline's standard term.
@@ -3375,7 +3333,6 @@ $ec_lang['lpn_library_curves_tip']='Bir eğri, bir şeyin nasıl performans gös
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_curves_note']='Eğriler pompalara ve vanalara bağlanır. Bir pompa yük eğrisi için çalışma, gösterildiği gibi noktalardan geçirilerek uydurulmuş bir eğriyi kullanır; diğer her tür için noktalar, gösterildiği gibi düz çizgilerle birleştirilir.';
 $ec_lang['lpn_library_curve_add']='Bir eğri ekle';
-$ec_lang['lpn_library_curve_type_tip']='Bu eğrinin neyi tanımladığı';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
 // EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
 // and Equation (for pump head) on row/line 2."*). EPANET calls the control "Curve Type", so that is
@@ -3396,7 +3353,6 @@ $ec_lang['lpn_library_curve_values_tip']='Bir çizelgede bir veya iki sütun se�
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
 $ec_lang['lpn_library_curve_note_label']='Açıklama';
-$ec_lang['lpn_library_curve_note_tip']='Bu eğrinin ne olduğu, kendi sözlerinizle. Bir EPANET dosyasında eğrinin üzerine yazılır ve oradan geri okunur.';
 $ec_lang['lpn_library_curve_remove_point']='Bu noktayı kaldır';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -3579,14 +3535,11 @@ $ec_lang['lpn_field_base_demand']='Baz talep';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='Bu düğümün gösterilen zaman adımında çektiği debi: her baz talebin kendi deseniyle çarpılıp toplanmasıyla bulunur. Hesaplanır, yazılmaz, bu yüzden saatle birlikte değişir ve düzenlenemez.';
 $ec_lang['lpn_field_demand_pattern']='Talep deseni';
-$ec_lang['lpn_field_demand_pattern_tip']='Bu düğümün talebinin çalışma boyunca nasıl yükselip alçaldığı. Desen yok olarak bırakırsanız düğüm, bunun yerine projenin Varsayılan talep deseni\'ni izler.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
 $ec_lang['lpn_field_demand_category']='Açıklama';
-$ec_lang['lpn_field_demand_category_tip']='Bu talep kategorisinin adı veya açıklaması.';
 $ec_lang['lpn_demand_add']='Talep kategorisi ekle';
-$ec_lang['lpn_demand_add_tip']='Bu düğüme, kendi baz talebi, deseni ve açıklaması olan başka bir talep kategorisi ekleyin. Kategoriler toplanır.';
 $ec_lang['lpn_demand_remove']='Bu talebi kaldır';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
@@ -3979,7 +3932,6 @@ $ec_lang['lpn_calib_tab_corr']='Korelasyon grafiği';
 $ec_lang['lpn_calib_tab_means']='Ortalama karşılaştırmaları';
 $ec_lang['lpn_calib_col_location']='Konum';
 $ec_lang['lpn_calib_col_n']='Gözlem sayısı';
-$ec_lang['lpn_calib_col_n_tip']='Gözlem sayısı: bu konumda karşılaştırılan ölçümler.';
 $ec_lang['lpn_calib_col_obs_mean']='Gözlenen ortalama';
 $ec_lang['lpn_calib_col_sim_mean']='Hesaplanan ortalama';
 $ec_lang['lpn_calib_col_mean_err']='Ortalama hata';

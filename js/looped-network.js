@@ -4480,7 +4480,7 @@ var EngCalcs = EngCalcs || {};
 	// promise that nothing was touched.
 	function customPropFlagText(def, problem) {
 		var pc = EngCalcs.pageConfig || {};
-		return String(pc.lpn_cp_flag || '{label}: {reason} The value is kept exactly as you typed it.')
+		return String(pc.lpn_cp_flag || '{label}: {reason} The value is kept exactly as you entered it.')
 			.split('{label}').join(customPropLabel(def))
 			.split('{reason}').join(problem);
 	}
@@ -4999,7 +4999,6 @@ var EngCalcs = EngCalcs || {};
 		return [
 			{
 				icon: 'pump', label: pc.lpn_energy_menu || 'Pump energy',
-				tip: pc.lpn_energy_menu_tip,
 				fn: function () { closeMenu(); openEnergyBox(); }
 			},
 			{
@@ -13995,7 +13994,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
 		reader.onload = function (ev) {
 			var w = parseWorldFile(ev.target.result);
-			if (!w) { setWarning(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.'); return; }
+			if (!w) { setWarning(pc.lpn_backdrop_scale_entry_bad || 'Enter one number for the size of one pixel on the map, or paste all six lines of a world file.'); return; }
 			if (!w.ok) { setWarning(pc.lpn_backdrop_wld_bad || 'This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.'); return; }
 			applyWorldFile(w);
 		};
@@ -14083,7 +14082,7 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {}, clicks = [];
 		setRegMode(true);
-		setRegStep(pc.lpn_backdrop_scale_prompt1 || 'Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.');
+		setRegStep(pc.lpn_backdrop_scale_prompt1 || 'Specify two points on the background image, such as the two ends of a bar scale. Then enter the real distance between them.');
 		var handler = function (e) {
 			clicks.push(worldToImageLocal(screenToWorld(e.clientX, e.clientY)));
 			if (clicks.length === 2) {
@@ -14123,7 +14122,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		setRegMode(true);
 		setRegStep(pc.lpn_backdrop_scale_from_prompt1
-			|| 'Click the point on the background image that should stay where it is.');
+			|| 'Specify the point on the background image that should stay where it is.');
 		var handler = function (e) {
 			svg.removeEventListener('pointerup', handler, true);
 			activeCancel = null; setRegMode(false);
@@ -14180,7 +14179,7 @@ var EngCalcs = EngCalcs || {};
 				return;
 			}
 		}
-		setWarning(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.');
+		setWarning(pc.lpn_backdrop_scale_entry_bad || 'Enter one number for the size of one pixel on the map, or paste all six lines of a world file.');
 	}
 	// WE NEVER ASK FOR A WORLD FILE AS A FILE -- we ask for a paste of its CONTENTS, or for the image
 	// and its sidecar picked together in the one picker (readWorldFile). A sidecar cannot be
@@ -14200,11 +14199,11 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {};
 		setRegMode(true);
-		setRegStep(pc.lpn_backdrop_position_prompt1 || 'Click the base point (on the image) for the move.');
+		setRegStep(pc.lpn_backdrop_position_prompt1 || 'Specify the base point (on the image) for the move.');
 		var handler = function (e) {
 			svg.removeEventListener('pointerup', handler, true);
 			var refWorld = screenToWorld(e.clientX, e.clientY);
-			setRegStep(pc.lpn_backdrop_position_prompt2 || 'Choose the method for the destination point, then click Continue.');
+			setRegStep(pc.lpn_backdrop_position_prompt2 || 'Choose the method for the destination point, then select Continue.');
 			showBackdropTargetPanel(refWorld);
 		};
 		svg.addEventListener('pointerup', handler, true);
@@ -14228,7 +14227,7 @@ var EngCalcs = EngCalcs || {};
 			hidePanel(panel);
 			if (mode === 'coords') {
 				activeCancel = null; setRegMode(false);
-				askDialog({ kind: 'prompt', text: (pc.lpn_backdrop_coords_prompt || 'Type the X,Y that point should move to') + ' (' + unitLabel('lpn_u_length') + '):', value: '' }, function (txt) {
+				askDialog({ kind: 'prompt', text: (pc.lpn_backdrop_coords_prompt || 'Enter the X,Y that point should move to') + ' (' + unitLabel('lpn_u_length') + '):', value: '' }, function (txt) {
 					var parts = (txt || '').split(',').map(Number);
 					// The one ENTRY site (Task 274): what the user types is Cartesian, and positionTo()
 					// works in the internal Y-down frame.
@@ -15221,7 +15220,7 @@ var EngCalcs = EngCalcs || {};
 			: (pc.lpn_georef_step2 || 'Step 2 of 2 — precise');
 		georefBarEl('lpn_georef_hint').textContent = detached
 			? (pc.lpn_georef_step1_hint || 'Your project stays where it is on the screen. Pan and zoom the map underneath it until the ground behind it is roughly the right place and roughly the right size, then press the Put the model here button.')
-			: (pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to rotate it. Or type the ground distance and the rotation angle below.');
+			: (pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to rotate it. Or enter the ground distance and the rotation angle below.');
 		georefBarEl('lpn_georef_drop').style.display = detached ? '' : 'none';
 		georefBarEl('lpn_georef_detach').textContent = pc.lpn_georef_detach || 'Pick it up again';
 		georefBarEl('lpn_georef_detach').style.display = detached ? 'none' : '';
@@ -15964,7 +15963,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (!georef || !georef.t || georef.step !== GEOREF_STEP_ATTACHED) { return; }
 		georef.pick = { pts: [] };
-		setNotice(pc.lpn_georef_twopt_pick1 || 'Click a point on your drawing whose latitude and longitude you know.');
+		setNotice(pc.lpn_georef_twopt_pick1 || 'Specify a point on your drawing whose latitude and longitude you know.');
 	}
 	// Disarming says WHAT THE USER IS BACK TO rather than that something stopped -- the step 2
 	// instructions are the notice that was there before, so putting them back is the whole message.
@@ -15972,7 +15971,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (!georef) { return; }
 		georef.pick = null;
-		setNotice(pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to rotate it. Or type the ground distance and the rotation angle below.');
+		setNotice(pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to rotate it. Or enter the ground distance and the rotation angle below.');
 	}
 	// **AND ESC PUTS THE TOOL DOWN, AT EITHER STEP** (Tom, 2026-09-08: *"Change to 'Press again to
 	// cancel'. Esc might be nice too at any step."*). The button was already a toggle and the tip
@@ -16036,7 +16035,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			pk.pts.push({ i: idx, x: s.x, y: s.y, lon: ll.lon, lat: ll.lat });
 			if (pk.pts.length < 2) {
-				setNotice(pc.lpn_georef_twopt_pick2 || 'Now click a second known point, as far from the first one as you can.');
+				setNotice(pc.lpn_georef_twopt_pick2 || 'Now specify a second known point, as far from the first one as you can.');
 				return;
 			}
 			georef.pick = null;
@@ -16348,7 +16347,7 @@ var EngCalcs = EngCalcs || {};
 		// gone at the next project switch, and never in a file -- and because this is still the
 		// moment a project changes kind. If the wording is ever revisited it is `lpn_georef_confirm`,
 		// and that is Tom's.
-		askDialog({ kind: 'confirm', text: pc.lpn_georef_confirm || 'Place the model here permanently? You can still drag assets one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.' }, function (yes) {
+		askDialog({ kind: 'confirm', text: pc.lpn_georef_confirm || 'Place the model here permanently? Assets can still be dragged one at a time afterwards, but proceeding now converts all the coordinates at once. To get the old coordinates back, return to the original project and close this one without saving.' }, function (yes) {
 			if (!yes) { return; }
 			if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
 			// On File, Convert as's answered steps the attached map's own turn was laid into the copy
@@ -16867,7 +16866,7 @@ var EngCalcs = EngCalcs || {};
 		mapgeoWorldFit(ext);
 		mapgeoSet(project.georef);
 		refreshMapStatus();
-		setNotice(pc.lpn_mapgeo_intro || 'Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.');
+		setNotice(pc.lpn_mapgeo_intro || 'Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or enter a latitude and longitude. The drawing itself does not move.');
 	}
 	/**
 	 * **IS THE WORLD MAP ROW USABLE AT ALL?** True for a plain grid (its own wizard places it), a
@@ -17019,7 +17018,7 @@ var EngCalcs = EngCalcs || {};
 		// one overwrites project.georef with the whole world at 0 N 0 E, because a drawing nobody
 		// has placed honestly sits nowhere. Here the existing placement stays and the map opens on
 		// it; Cancel still restores `prev` exactly as before.
-		setNotice(pc.lpn_mapgeo_readjust_intro || 'Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.');
+		setNotice(pc.lpn_mapgeo_readjust_intro || 'Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or enter a latitude and longitude. The drawing itself does not move.');
 	}
 	/**
 	 * Scale from the current size: a typed factor, applied at once, with no wizard at all.
@@ -17044,7 +17043,7 @@ var EngCalcs = EngCalcs || {};
 			if (answer === null) { return; }
 			f = parseFloat(String(answer).replace(',', '.'));
 			if (!(f > 0) || !isFinite(f)) {
-				setNotice(pc.lpn_map_attach_scale_from_bad || 'Type a single number greater than zero.');
+				setNotice(pc.lpn_map_attach_scale_from_bad || 'Enter a single number greater than zero.');
 				return;
 			}
 			ext = mapgeoExtent();
@@ -17202,14 +17201,14 @@ var EngCalcs = EngCalcs || {};
 			? (pc.lpn_mapgeo_step1 || 'Step 1 of 2: find your place in the world')
 			: (pc.lpn_mapgeo_step2 || 'Step 2 of 2: fit the map behind your drawing');
 		mapgeoBarEl('lpn_mapgeo_hint').textContent = world1
-			? (pc.lpn_mapgeo_hint1 || 'Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.')
+			? (pc.lpn_mapgeo_hint1 || 'Pan and zoom the map behind your drawing, or search for a place, or enter a latitude and longitude. Then press Place approximately.')
 			: (pc.lpn_mapgeo_hint2 || 'Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.');
 		// Step 2 only, both of them: in step 1 the drag and the wheel both spend on the map, so
 		// there is no split to state and a sentence about one would be noise.
 		mapgeoBarEl('lpn_mapgeo_hint_gestures').textContent = world1 ? '' :
-			(pc.lpn_mapgeo_gestures || 'Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.');
+			(pc.lpn_mapgeo_gestures || 'Zoom moves your drawing and the map together, to show how well they line up. Dragging moves the map only.');
 		mapgeoBarEl('lpn_mapgeo_hint_dial').textContent = world1 ? '' :
-			(pc.lpn_mapgeo_dial_help || 'Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change. Arrow keys work on both.');
+			(pc.lpn_mapgeo_dial_help || 'Slide the two bars, or enter numbers in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change. Arrow keys work on both.');
 		mapgeoShow('lpn_mapgeo_search', world1);
 		mapgeoShow('lpn_mapgeo_goto', world1);
 		mapgeoShow('lpn_mapgeo_place', world1);
@@ -17374,7 +17373,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		drawPendingMeter(null);
 		setNotice((EngCalcs.pageConfig || {}).lpn_meter_pick_pipe ||
-			'Now click the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.');
+			'Now select the pipe or the node that serves this customer. The customer stays where you put it. Press Escape to cancel.');
 	}
 	/**
 	 * The preview dot, plus the band from it to the connection the next press would make. `to` is
@@ -20037,7 +20036,7 @@ var EngCalcs = EngCalcs || {};
 		// title and wrapping BOTH the label text and the glyph, so the tap target is the whole
 		// label rather than one character. CLAUDE.md's rule for a label with no link.
 		qLab.appendChild(findHelpLabel(pc.lpn_find_query_label || 'Query',
-			pc.lpn_find_query_tip || 'The same search, written as one line. Changing the controls rewrites this line, and typing in this line updates the controls.'));
+			pc.lpn_find_query_tip || 'The given search as a text query. Changing the query updates the controls above.'));
 		findQueryInput = document.createElement('input');
 		findQueryInput.type = 'text';
 		findQueryInput.className = 'lpn-find-query';
@@ -20244,7 +20243,7 @@ var EngCalcs = EngCalcs || {};
 		// title anywhere else is dead on touch.
 		btn.className = 'ec-help';
 		btn.title = pc.lpn_find_filter_tip ||
-			'Hide rows that do not match this query in the Table(s) that match "What to search" above. Nothing is deleted.';
+			'Filter in Table(s) that match "What to search" above';
 		btn.textContent = pc.lpn_find_filter_btn || 'Filter in table';
 		btn.addEventListener('click', applyTableFilter);
 		row.appendChild(btn);
@@ -20275,7 +20274,7 @@ var EngCalcs = EngCalcs || {};
 				!findOpIsExtreme(findState.op) && !findOpIsValueless(findState.op) &&
 				findState.op !== 'contains') {
 			findResults = [];
-			renderFindResults(pc.lpn_find_no_value || 'Type what to look for.');
+			renderFindResults(pc.lpn_find_no_value || 'Enter what to look for.');
 			return;
 		}
 		findResults = findMatches();
@@ -20395,7 +20394,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		head = document.createElement('div');
 		head.style.margin = '6px 0 2px';
-		head.textContent = String(pc.lpn_find_count || '{n} found. Click one to go to it.')
+		head.textContent = String(pc.lpn_find_count || '{n} found. Select one to go to it.')
 			.replace('{n}', String(findResults.length));
 		box.appendChild(head);
 		// Its own line rather than a second sentence in the count, which is a ruled string.
@@ -20970,7 +20969,7 @@ var EngCalcs = EngCalcs || {};
 		// replaceValueOf() is the one place that difference is decided.
 		if (!replaceIsDem() && replaceValueOf(replaceSpec(replaceState.prop)) === undefined) {
 			replacePending = null;
-			renderReplace(pc.lpn_replace_no_value || 'Type the new value.');
+			renderReplace(pc.lpn_replace_no_value || 'Enter the new value.');
 			return;
 		}
 		// The result list is re-run and redrawn beside the preview, so the rows on screen are the
@@ -21034,7 +21033,7 @@ var EngCalcs = EngCalcs || {};
 		// claim about the map: after "diameter equal to 6, set to 8" that list is correctly empty.
 		findResults = replaceFoundSet();
 		renderFindResults(null);
-		renderReplace(String(pc.lpn_replace_done || '{n} assets changed. You can undo this in one step.').replace('{n}', String(n)));
+		renderReplace(String(pc.lpn_replace_done || '{n} assets changed. This can be undone in one step.').replace('{n}', String(n)));
 		return n;
 	}
 	// The preview line and its two buttons. `message` is a state the write cannot start from -- no
@@ -21516,7 +21515,7 @@ var EngCalcs = EngCalcs || {};
 	// drawings run Time series, Profile, Frequency, Flow balance. This replaces "making Profile the
 	// last tab" (2026-08-21).
 	paneTabs.push({
-		id: 'profile', panel: 'lpn_pane_profile', label: 'lpn_profile_menu', tip: 'lpn_profile_tip',
+		id: 'profile', panel: 'lpn_pane_profile', label: 'lpn_profile_menu',
 		formId: 'lpn_profile_form',
 		// **PRESSING PROFILE AGAIN IS THE COMMAND THAT CHOOSES A PATH** (Task 506). Tom,
 		// 2026-08-24: *"Our button to create a new path can be the Profile button. That removes all
@@ -23055,16 +23054,17 @@ var EngCalcs = EngCalcs || {};
 	// half of that, and a plain write here where the popup writes plainly is deliberate rather than
 	// an oversight (a mixing model and a pump's speed are not overridable, and setProp() would
 	// write a `_mixingModel` nothing reads).
-	function paneChoicesPatterns() {
+	function paneChoicesPatterns(blankLabel) {
 		var pc = EngCalcs.pageConfig || {},
-			out = [['', pc.lpn_library_pattern_none || 'No pattern']];
+			out = [['', blankLabel || pc.lpn_library_pattern_none || 'No pattern']];
 		libPatternsRead().forEach(function (p) { out.push([p.id, p.id]); });
 		return out;
 	}
 	// A pattern REFERENCE as a column. The value is the pattern's id, which is what the document
 	// stores and what a pasted spreadsheet would carry; the list is the project's own.
-	function paneColPattern(key, labelKey, get, set, overridable) {
-		var c = { key: key, label: labelKey, em: 5, choices: paneChoicesPatterns,
+	function paneColPattern(key, labelKey, get, set, overridable, blankIsDefault) {
+		var c = { key: key, label: labelKey, em: 5,
+			choices: blankIsDefault ? function () { return paneChoicesPatterns(lpnBlankIsDefault()); } : function () { return paneChoicesPatterns(); },
 			get: get, set: set };
 		if (overridable) { c.prop = key; }
 		return c;
@@ -23196,11 +23196,11 @@ var EngCalcs = EngCalcs || {};
 	// A CURVE REFERENCE, never its points (Task 586): a curve is a document object and an element
 	// states one by id. The list is filtered to the kind the element can use, exactly as the
 	// popup's chooser is, so a pump cannot be pointed at a volume curve.
-	function paneColCurveRef(key, kind, labelKey) {
+	function paneColCurveRef(key, kind, labelKey, blankIsDefault) {
 		return { key: key, label: labelKey, em: 6, prop: key,
 			choices: function () {
 				var pc = EngCalcs.pageConfig || {},
-					out = [['', pc.lpn_curve_none || 'No curve selected']];
+					out = [['', blankIsDefault ? lpnBlankIsDefault() : (pc.lpn_curve_none || 'No curve selected')]];
 				libCurvesRead().forEach(function (c) { if (c.kind === kind) { out.push([c.id, c.id]); } });
 				return out;
 			},
@@ -23238,7 +23238,7 @@ var EngCalcs = EngCalcs || {};
 	function paneColEnergyPattern() {
 		return paneColPattern('energyPattern', 'lpn_energy_price_pattern',
 			function (l) { return effective(l, 'energyPattern'); },
-			function (l, v) { setProp(l, 'energyPattern', v || null); }, true);
+			function (l, v) { setProp(l, 'energyPattern', v || null); }, true, true);
 	}
 	// **A THROTTLE VALVE'S LOSS IS ITS SETTING ALONE**, which is EPANET's own simplification and
 	// ours: it ignores the [VALVES] minor-loss column for a TCV, so a number typed here would be one
@@ -23342,7 +23342,7 @@ var EngCalcs = EngCalcs || {};
 				hintTip: function (c) {
 					var id = customerLink(c) ? '' : suggestCustomerLink(c);
 					return id ? String(pc.lpn_field_meter_pipe_suggest ||
-						'The nearest asset is {id}. Type it here to serve this customer from it.')
+						'The nearest asset is {id}. Enter it here to serve this customer from it.')
 						.split('{id}').join(id) : '';
 				},
 				get: function (c) { var l = customerLink(c); return (l && !customerAtNodeEnd(c)) ? l.id : ''; },
@@ -23730,7 +23730,7 @@ var EngCalcs = EngCalcs || {};
 				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed()].concat(paneColEnds(), [
 					paneColCurveRef('curveId', 'head', 'lpn_pump_curve_source'),
 					paneColPumpSpeed(), paneColSpeedPattern(),
-					paneColCurveRef('efficCurveId', 'effic', 'lpn_pump_effic_curve'),
+					paneColCurveRef('efficCurveId', 'effic', 'lpn_pump_effic_curve', true),
 					paneColEnergyPrice(), paneColEnergyPattern(),
 					paneColVerts(),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
@@ -25343,7 +25343,7 @@ var EngCalcs = EngCalcs || {};
 			// rows from the first column. Not under a filter, where the rows it made would be
 			// hidden the moment they were made.
 			if (!filterNote && paneCanCreate(spec)) {
-				note.textContent += ' ' + (pc.lpn_pane_paste_here || 'Click here and paste rows from a spreadsheet to add them.');
+				note.textContent += ' ' + (pc.lpn_pane_paste_here || 'Select this area and paste rows from a spreadsheet to add them.');
 				note.className += ' lpn-pane-paste-target';
 				note.addEventListener('paste', function (e) {
 					var text, cells;
@@ -25497,7 +25497,8 @@ var EngCalcs = EngCalcs || {};
 			arrow.className = 'lpn-pane-sortarrow ec-help' +
 				(spec.sort.col === c.key ? ' lpn-pane-sortarrow-active' : '') +
 				(spec.sort.col === c.key && spec.sort.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
-			arrow.title = (spec.sort.col === c.key) ? (pc.lpn_pane_sortarrow_tip || 'Reverse the sort')
+			// The title names what a click does next: the sorted column's arrow reverses its sort.
+			arrow.title = (spec.sort.col === c.key && spec.sort.dir > 0) ? (pc.lpn_pane_sort_desc || 'Sort descending')
 				: (pc.lpn_pane_sort_asc || 'Sort ascending');
 			arrow.setAttribute('aria-label', arrow.title);
 			arrow.addEventListener('click', function (ev) {
@@ -29428,9 +29429,9 @@ var EngCalcs = EngCalcs || {};
 		if (which === 'edit') {
 			txt = profileTouch
 				? (pc.lpn_profile_edit_tap ||
-					'Drag any point on the path to move it. Tap a point you added to take it off.')
+					'Drag any point on the path to move it. Select a point you added to take it off.')
 				: (pc.lpn_profile_edit_click ||
-					'Drag any point on the path to move it. Click a point you added to take it off.');
+					'Drag any point on the path to move it. Select a point you added to take it off.');
 		} else if (which === 'nowhere') {
 			txt = pc.lpn_profile_edit_nowhere || 'A point on the path has to be a node. The path is unchanged.';
 		} else if (which === 'blocked') {
@@ -29440,14 +29441,14 @@ var EngCalcs = EngCalcs || {};
 			txt = pc.lpn_profile_say_idle || 'Press Profile again to choose a new path on the map.';
 		} else if (which === 'start') {
 			txt = profileTouch
-				? (pc.lpn_profile_tap_start || 'Tap the node where the path starts.')
-				: (pc.lpn_profile_draw_start || 'Click the node where the path starts.');
+				? (pc.lpn_profile_tap_start || 'Select the node where the path starts.')
+				: (pc.lpn_profile_draw_start || 'Select the node where the path starts.');
 		} else {
 			txt = profileTouch
 				? (pc.lpn_profile_tap_more ||
-					'Tap a node to see the path. Press and hold to add it. Double-tap to finish. Press Profile again to cancel.')
+					'Select a node to see the path. Press and hold to add it. Double-tap to finish. Press Profile again to cancel.')
 				: (pc.lpn_profile_draw_more ||
-					'Move over the map to see the path. Click a node to add it. Double-click to finish. Esc cancels.');
+					'Move over the map to see the path. Select a node to add it. Double-click to finish. Esc cancels.');
 		}
 		if (d) { d.say = txt; }
 		// Written straight into the line rather than through rebuildProfileForm(): this runs on every
@@ -30074,7 +30075,6 @@ var EngCalcs = EngCalcs || {};
 		groupSel = document.createElement('select');
 		groupSel.id = 'lpn_ts_group';
 		groupSel.className = 'lpn-ts-pick ec-help';
-		groupSel.title = pc.lpn_ts_group_tip || 'Whether the graph shows nodes or links.';
 		[['node', pc.lpn_ts_group_nodes || 'Nodes'], ['link', pc.lpn_ts_group_links || 'Links']]
 			.forEach(function (o) {
 				var op = document.createElement('option');
@@ -30091,7 +30091,6 @@ var EngCalcs = EngCalcs || {};
 		fieldSel = document.createElement('select');
 		fieldSel.id = 'lpn_ts_quantity';
 		fieldSel.className = 'lpn-ts-pick ec-help';
-		fieldSel.title = pc.lpn_ts_quantity_tip || 'Which value to graph against time.';
 		tsFieldOptions(group).forEach(function (o) {
 			var op = document.createElement('option');
 			op.value = o[0]; op.textContent = o[1];
@@ -30109,7 +30108,6 @@ var EngCalcs = EngCalcs || {};
 		btn.id = 'lpn_ts_add';
 		btn.className = 'lpn-profile-edit ec-help';
 		btn.textContent = pc.lpn_ts_add || 'Add selected';
-		btn.title = pc.lpn_ts_add_tip || 'Put everything now selected on the map onto the graph.';
 		btn.addEventListener('click', tsAddSelection);
 		box.appendChild(btn);
 
@@ -30556,7 +30554,6 @@ var EngCalcs = EngCalcs || {};
 		sel = document.createElement('select');
 		sel.id = 'lpn_pgraph_field';
 		sel.className = 'lpn-ts-pick ec-help';
-		sel.title = pc.lpn_ts_quantity_tip || 'Which value to graph against time.';
 		avail.forEach(function (a) {
 			var op = document.createElement('option');
 			op.value = a.field; op.textContent = pgFieldLabel(subj.group, a.field, subj.e);
@@ -30679,7 +30676,6 @@ var EngCalcs = EngCalcs || {};
 		groupSel = document.createElement('select');
 		groupSel.id = 'lpn_freq_group';
 		groupSel.className = 'lpn-ts-pick ec-help';
-		groupSel.title = pc.lpn_freq_group_tip || 'Whether the graph shows junctions or pipes.';
 		[['node', pc.lpn_pane_tab_junctions || 'Junctions'], ['link', pc.lpn_pane_tab_pipes || 'Pipes']]
 			.forEach(function (o) {
 				var op = document.createElement('option');
@@ -30696,7 +30692,6 @@ var EngCalcs = EngCalcs || {};
 		fieldSel = document.createElement('select');
 		fieldSel.id = 'lpn_freq_quantity';
 		fieldSel.className = 'lpn-ts-pick ec-help';
-		fieldSel.title = pc.lpn_freq_quantity_tip || 'Which value to graph.';
 		freqFieldOptions(group).forEach(function (o) {
 			var op = document.createElement('option');
 			op.value = o[0]; op.textContent = o[1];
@@ -33983,7 +33978,7 @@ var EngCalcs = EngCalcs || {};
 		openDialog(function (body) {
 			var p1 = document.createElement('p');
 			p1.style.margin = '0 0 8px';
-			p1.textContent = (pc.lpn_v2_restore_confirm || 'This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? So that you can judge, here are some diameters that would be converted, with their values before and after:');
+			p1.textContent = (pc.lpn_v2_restore_confirm || 'This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? To help you judge, here are some diameters that would be converted, with their values before and after:');
 			body.appendChild(p1);
 			var p2 = document.createElement('p');
 			p2.style.cssText = 'margin:0;font-weight:bold';
@@ -35112,8 +35107,8 @@ var EngCalcs = EngCalcs || {};
 			case 'sources':
 			case 'mixing': return pc.lpn_inp_drop_sources_mixing || 'This file says where a chemical is dosed into the network, and how the water in a tank mixes. A dose shows up on the node it is added at, and a tank says which mixing model it follows. Both the dose and the mixing model are used when the network is run over a total run time.';
 			case 'energy': return pc.lpn_inp_drop_energy || 'This EPANET file includes pumping cost modelling data. This page reads it and uses it. Run the model, then open Water, Reports, Pump energy to see how long each pump ran, the power it drew, the energy it used and what that cost. The lines are kept, and they are written back if you save an EPANET file.';
-			case 'tags': return pc.lpn_inp_drop_tags || 'This file gives tags to some of its junctions, pipes or other assets. Every tag came in whole, and each one sits on its own asset’s properties, where you can read it or change it.';
-			case 'report': return pc.lpn_inp_drop_report || 'This file holds EPANET’s own settings for how it formats the report it prints. You can read the engine’s report here, under Reports, EPANET run, but it comes out in the engine’s standard format rather than the one these settings ask for. The lines are kept, and they are written back if you save an EPANET file.';
+			case 'tags': return pc.lpn_inp_drop_tags || 'This file gives tags to some of its junctions, pipes or other assets. Every tag came in whole, and each one sits on its own asset’s properties, where it can be read or changed.';
+			case 'report': return pc.lpn_inp_drop_report || 'This file holds EPANET’s own settings for how it formats the report it prints. The engine’s report is here, under Reports, EPANET run, but it comes out in the engine’s standard format rather than the one these settings ask for. The lines are kept, and they are written back if you save an EPANET file.';
 			// The ids on this one are the SECTION NAMES, which is the only true thing we can say
 			// about a part of the format nobody here has read.
 			case 'other-sections': return pc.lpn_inp_drop_sections || 'This file holds a section that this page does not read at all. Nothing here uses it. It is kept whole, and it is written back if you save an EPANET file.';
@@ -37865,7 +37860,7 @@ var EngCalcs = EngCalcs || {};
 		readOnly = roProjects.has(id);
 		if (readOnly) {
 			bannerRO = {
-				message: (pc.lpn_lock_readonly_banner || 'Read-only: {name} has this file open. You can change anything you like here, but you cannot save. Use File, Save as to save to a different file.')
+				message: (pc.lpn_lock_readonly_banner || 'Read-only: {name} has this file open. Anything here can be changed, but not saved. Use File, Save as to save to a different file.')
 					.replace('{name}', lockedByName.get(id) || (pc.lpn_lock_somebody || 'Somebody else'))
 			};
 		} else {
@@ -40148,7 +40143,6 @@ var EngCalcs = EngCalcs || {};
 					// The file NAME, not the project name: this list is about files on the disk, and
 					// the project inside one may since have been renamed or may not exist here at all.
 					label: rec.name,
-					tip: (pc.lpn_recent_tip || 'Open {file} again from the same location on your computer.').replace('{file}', rec.name),
 					fn: function () { openRecentFile(rec); }
 				});
 			});
@@ -40160,7 +40154,7 @@ var EngCalcs = EngCalcs || {};
 			// **NO LONGER A SUBMENU.** The fly-out's four rows were the cross of two questions and
 			// could not hold the other two; the box asks all four at once (Task 477).
 			{ icon: 'new', label: pc.lpn_file_new || 'New project…', fn: openNewProjectBox },
-			{ icon: 'open', label: pc.lpn_file_open || 'Open…', tip: pc.lpn_file_open_tip, fn: openFromFile },
+			{ icon: 'open', label: pc.lpn_file_open || 'Open…', fn: openFromFile },
 			// **UNDER OPEN, NOT UNDER NEW** (Tasks 305 and 314). New creates something that did not
 			// exist; Open retrieves something that does, and an example exists. Opening one drops a
 			// COPY into a new tab, which is what keeps the word honest -- see openExample().
@@ -40205,7 +40199,6 @@ var EngCalcs = EngCalcs || {};
 			{
 				icon: 'save',
 				label: pc.lpn_file_save || 'Save',
-				tip: api ? pc.lpn_file_save_tip : null,
 				fn: saveCurrent,
 				disabled: readOnly || !api
 			},
@@ -40215,7 +40208,7 @@ var EngCalcs = EngCalcs || {};
 			{
 				icon: 'saveas',
 				label: pc.lpn_file_saveas || 'Save as…',
-				tip: api ? pc.lpn_file_saveas_tip : pc.lpn_file_saveas_tip_download,
+				tip: api ? null : pc.lpn_file_saveas_tip_download,
 				fn: saveAs
 			},
 			// **DIRECTLY AFTER SAVE AS..., NOT AMONG THE ROWS THAT OPEN A FILE** (Task 696, R-213;
@@ -40369,18 +40362,18 @@ var EngCalcs = EngCalcs || {};
 			// of the two doors: a reader who opens the menu rather than hovering the strip was told
 			// nothing at all, about any of the eight tools. No new key, and the digit still comes
 			// from LPN_TOOL_KEYS rather than from a translator.
-			{ icon: 'junction', pointerOnly: true, label: pc.lpn_tool_add_junction || 'Junction', tip: toolTipWithKey('add-junction', pc.lpn_tool_add_junction_tip), hotkey: toolKeyFor('add-junction'), fn: function () { setMode('add-junction'); } },
-			{ icon: 'reservoir', pointerOnly: true, label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir', pc.lpn_tool_add_reservoir_tip), hotkey: toolKeyFor('add-reservoir'), fn: function () { setMode('add-reservoir'); } },
-			{ icon: 'tank', pointerOnly: true, label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank', pc.lpn_tool_add_tank_tip), hotkey: toolKeyFor('add-tank'), fn: function () { setMode('add-tank'); } },
-			{ icon: 'pipe', pointerOnly: true, label: pc.lpn_tool_add_pipe || 'Pipe', tip: toolTipWithKey('add-pipe', pc.lpn_tool_add_pipe_tip), hotkey: toolKeyFor('add-pipe'), fn: function () { setMode('add-pipe'); } },
-			{ icon: 'pump', pointerOnly: true, label: pc.lpn_tool_add_pump || 'Pump', tip: toolTipWithKey('add-pump', pc.lpn_tool_add_pump_tip), hotkey: toolKeyFor('add-pump'), fn: function () { setMode('add-pump'); } },
-			{ icon: 'valve', pointerOnly: true, label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve', pc.lpn_tool_add_valve_tip), hotkey: toolKeyFor('add-valve'), fn: function () { setMode('add-valve'); } },
+			{ icon: 'junction', pointerOnly: true, label: pc.lpn_tool_add_junction || 'Junction', tip: toolTipWithKey('add-junction'), hotkey: toolKeyFor('add-junction'), fn: function () { setMode('add-junction'); } },
+			{ icon: 'reservoir', pointerOnly: true, label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir'), hotkey: toolKeyFor('add-reservoir'), fn: function () { setMode('add-reservoir'); } },
+			{ icon: 'tank', pointerOnly: true, label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank'), hotkey: toolKeyFor('add-tank'), fn: function () { setMode('add-tank'); } },
+			{ icon: 'pipe', pointerOnly: true, label: pc.lpn_tool_add_pipe || 'Pipe', tip: toolTipWithKey('add-pipe'), hotkey: toolKeyFor('add-pipe'), fn: function () { setMode('add-pipe'); } },
+			{ icon: 'pump', pointerOnly: true, label: pc.lpn_tool_add_pump || 'Pump', tip: toolTipWithKey('add-pump'), hotkey: toolKeyFor('add-pump'), fn: function () { setMode('add-pump'); } },
+			{ icon: 'valve', pointerOnly: true, label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve'), hotkey: toolKeyFor('add-valve'), fn: function () { setMode('add-valve'); } },
 			// **AFTER THE VALVE AND BEFORE THE TEXT** (Task 247). The order is the sentence a
 			// person draws in -- junctions, the sources that feed them, the pipe that joins them,
 			// the two things you put ON a pipe -- and a meter is the third thing you put on a pipe.
 			// Text stays last, being the only tool that adds nothing hydraulic.
 			{ icon: 'customer', pointerOnly: true, label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), hotkey: toolKeyFor('add-meter'), fn: function () { setMode('add-meter'); } },
-			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text', pc.lpn_tool_add_text_tip), hotkey: toolKeyFor('add-text'), fn: function () { setMode('add-text'); } },
+			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text'), hotkey: toolKeyFor('add-text'), fn: function () { setMode('add-text'); } },
 			{ separator: true },
 			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
 			// Deliberately NOT translated: scaffolding for measuring how ~100 links performs, and it
@@ -40762,7 +40755,7 @@ var EngCalcs = EngCalcs || {};
 			{
 				disabled: !placeFindable(), icon: 'globe',
 				label: pc.lpn_goto_menu || 'Go to a latitude and longitude…',
-				tip: pc.lpn_goto_tip, fn: goToLatLon
+				fn: goToLatLon
 			},
 			{
 				hidden: !EngCalcs.lpnSearchOpen, disabled: !placeFindable(), icon: 'find',
@@ -40831,12 +40824,10 @@ var EngCalcs = EngCalcs || {};
 			{ separator: true },
 			{
 				icon: 'settings', label: pc.lpn_tool_settings || 'Settings',
-				tip: pc.lpn_tool_settings_tip,
 				fn: function () { toggleSettingsBox(); }
 			},
 			{
 				icon: 'library', label: pc.lpn_library_menu || 'Libraries',
-				tip: pc.lpn_library_menu_tip,
 				fn: function () { toggleLibraryBox(); }
 			},
 			{ separator: true },
@@ -40853,7 +40844,7 @@ var EngCalcs = EngCalcs || {};
 			// Selection order (Uglobals.pas: time series, profile, contour, frequency, system flow), which
 			// Tom asked be kept unless there was a reason not to (2026-10-04); Mary found none.
 			{
-				icon: 'profile', label: pc.lpn_graphs_menu || 'Graphs', tip: pc.lpn_graphs_menu_tip,
+				icon: 'profile', label: pc.lpn_graphs_menu || 'Graphs',
 				submenu: function () {
 					return [
 						{
@@ -40861,7 +40852,7 @@ var EngCalcs = EngCalcs || {};
 							fn: function () { closeMenu(); openPane('timeseries'); }
 						},
 						{
-							label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
+							label: pc.lpn_profile_menu || 'Profile',
 							fn: function () { closeMenu(); openPane('profile'); }
 						},
 						// THE CONTOUR PLOT IS A MAP LAYER, so this row SHOWS it rather than opening a
@@ -40970,7 +40961,6 @@ var EngCalcs = EngCalcs || {};
 			{ separator: true },
 			{
 				icon: 'info', label: pc.lpn_reports_menu || 'Reports',
-				tip: pc.lpn_reports_menu_tip,
 				submenu: reportMenuRows
 			}
 		]);
@@ -42151,7 +42141,7 @@ var EngCalcs = EngCalcs || {};
 		var fileGroup = group();
 		var openBtn = document.createElement('button');
 		openBtn.type = 'button';
-		setIconLabel(openBtn, 'open', pc.lpn_file_open || 'Open…', pc.lpn_file_open_tip);
+		setIconLabel(openBtn, 'open', pc.lpn_file_open || 'Open…', null);
 		openBtn.addEventListener('click', function () { openFromFile(); });
 		fileGroup.appendChild(openBtn);
 		// Held so the placement lock can fade it, the way the toolbar already holds the area
@@ -42160,7 +42150,7 @@ var EngCalcs = EngCalcs || {};
 		openToolButton = openBtn;
 		var saveBtn = document.createElement('button');
 		saveBtn.type = 'button';
-		setIconLabel(saveBtn, 'save', pc.lpn_file_save || 'Save', pc.lpn_file_save_tip);
+		setIconLabel(saveBtn, 'save', pc.lpn_file_save || 'Save', null);
 		saveBtn.addEventListener('click', function () { saveCurrent(); });
 		// Held for the placement lock, exactly as openToolButton above is: the strip is rebuilt, so
 		// a querySelector at lock time would be reaching into a previous strip's DOM.
@@ -42233,7 +42223,7 @@ var EngCalcs = EngCalcs || {};
 		// Between Select and Delete, because that is what it is: the third thing a press on the map
 		// can mean. See the Edit menu row for why it is a mode rather than a gesture (Task 567).
 		modeButton({ mode: 'vertices', key: 'lpn_tool_vertices', icon: 'vertices', tip: pc.lpn_tool_vertices_tip }, editGroup);
-		modeButton({ mode: 'delete', key: 'lpn_tool_delete', icon: 'del', tip: pc.lpn_tool_delete_tip }, editGroup);
+		modeButton({ mode: 'delete', key: 'lpn_tool_delete', icon: 'del' }, editGroup);
 		var undoBtn = document.createElement('button');
 		undoBtn.type = 'button';
 		setIconLabel(undoBtn, 'undo', pc.lpn_tool_undo || 'Undo', pc.lpn_tool_undo_tip);
@@ -42245,14 +42235,14 @@ var EngCalcs = EngCalcs || {};
 		// Junction, Reservoir, Tank, Pipe, Pump, Valve, Meter, Text -- the same order as the Insert menu and
 		// the ID-prefix rows. See insertAssetRows() for why that order.
 		[
-			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction', tip: pc.lpn_tool_add_junction_tip },
-			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir', tip: pc.lpn_tool_add_reservoir_tip },
-			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank', tip: pc.lpn_tool_add_tank_tip },
-			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe', tip: pc.lpn_tool_add_pipe_tip },
-			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump', tip: pc.lpn_tool_add_pump_tip },
-			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve', tip: pc.lpn_tool_add_valve_tip },
+			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction' },
+			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir' },
+			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank' },
+			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe' },
+			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump' },
+			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve' },
 			{ mode: 'add-meter', key: 'lpn_tool_add_meter', icon: 'customer', tip: pc.lpn_tool_add_meter_tip },
-			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text', tip: pc.lpn_tool_add_text_tip }
+			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text' }
 		].forEach(function (t) { modeButton(t, addGroup); });
 
 		var viewGroup = group();
@@ -42375,7 +42365,7 @@ var EngCalcs = EngCalcs || {};
 		// is that opening it is a menu command (Water > Libraries) rather than a permanent icon.
 		var settingsBtn = document.createElement('button');
 		settingsBtn.type = 'button';
-		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', pc.lpn_tool_settings_tip);
+		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', null);
 		settingsBtn.addEventListener('click', function () { toggleSettingsBox(); });
 		netGroup.appendChild(settingsBtn);
 
@@ -43102,7 +43092,7 @@ var EngCalcs = EngCalcs || {};
 					// so rather than leaving the reader to find it. Selecting a meter still opens
 					// its own box for the one-off case.
 					setNotice(String((EngCalcs.pageConfig || {}).lpn_meter_placed ||
-						'Customer {id} added. Its description and demand are typed in the Customers table, or press it in Select to open its box.')
+						'Customer {id} added. Its description and demand are entered in the Customers table, or press it in Select to open its box.')
 						.split('{id}').join(madeC.id));
 					return;
 				}
@@ -44602,8 +44592,8 @@ var EngCalcs = EngCalcs || {};
 		box.value = spec.value;
 		box.style.width = LPN_LABEL_COL_W; box.style.marginLeft = LPN_LABEL_COL_GAP;
 		box.style.flex = '0 0 auto'; box.style.boxSizing = 'border-box';
-		box.title = spec.title;
-		box.setAttribute('aria-label', spec.title);
+		if (spec.title) { box.title = spec.title; }
+		box.setAttribute('aria-label', spec.title || spec.name || '');
 		box.addEventListener('change', function () {
 			// Clamped rather than rejected: every out-of-range value has an obvious intended meaning.
 			var v = Math.round(+box.value);
@@ -44665,8 +44655,8 @@ var EngCalcs = EngCalcs || {};
 		var box = document.createElement('input');
 		box.type = 'text';
 		box.value = spec.value;
-		box.title = spec.title;
-		box.setAttribute('aria-label', spec.title);
+		if (spec.title) { box.title = spec.title; }
+		box.setAttribute('aria-label', spec.title || spec.name || '');
 		box.style.width = LPN_LABEL_AFFIX_W; box.style.flex = '0 0 auto';
 		box.style.boxSizing = 'border-box';
 		box.addEventListener('input', function () { spec.onChange(box.value); saveToStorage(); requestLabelRefresh(); });
@@ -44822,7 +44812,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		note.className = 'lpn-set-note';
 		note.textContent = pc.lpn_labels_customer_note ||
-			'A customer label shows the values ticked here. It is drawn at the same text size as every other label on the map.';
+			'A customer label shows the values selected here. It is drawn at the same text size as every other label on the map.';
 		host.appendChild(note);
 		// **THE SAME ROW SHAPE AS THE ALL-LABELS ROW BELOW IT IN SETTINGS, BUILT BY THE SAME SHARED
 		// CONTROL** (Tom, 2026-09-23: "Make the Customer labels and All labels zoom limits settings
@@ -44837,7 +44827,7 @@ var EngCalcs = EngCalcs || {};
 		line.className = 'lpn-set-row';
 		setFieldLabel(text, pc.lpn_settings_label_max_width ||
 			'Show labels when zoomed to this map width or less', pc.lpn_labels_customer_width_tip ||
-			'Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
+			'Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Enter 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
 		// **BLANK NOW REACHES labelSettings.customerMaxWidth = null** (Tom, 2026-09-23 pre-review:
 		// the box's own "Always show" placeholder was previously unreachable -- the old change
 		// handler refused an empty entry and put the last number back). saveToStorage() and
@@ -44853,14 +44843,11 @@ var EngCalcs = EngCalcs || {};
 	// The Drop column's tip, which differs by group because the three orders do different jobs: rows
 	// inside one link label, whole node labels against each other, and a customer label's values.
 	function labelDropTip(group) {
+		// **ONE DROP TIP FOR ALL THREE TABLES** (Tom, 2026-10-04 tip verdicts: *"Combine with tips for
+		// all three drops"*). Node, link and customer rows read the same key; `group` is kept so a
+		// caller need not change if the three ever part again.
 		var pc = EngCalcs.pageConfig || {};
-		if (group === 'node') {
-			return pc.lpn_labels_priority_node_tip || 'The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.';
-		}
-		if (group === 'customer') {
-			return pc.lpn_labels_priority_customer_tip || 'The order in which values are dropped from a customer label. The value numbered 1 is dropped first.';
-		}
-		return pc.lpn_labels_priority_link_tip || 'The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first.';
+		return pc.lpn_labels_priority_node_tip || 'The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first. When only one value is left and two labels still overlap, one of them is hidden: the one with the lower demand, with pressure nearer the middle of the range, or with elevation or head more like its neighboring nodes.';
 	}
 	// Turning "Use units" OFF leaves the unit text in the After box as the user's own, ready to edit,
 	// rather than snapping the box back to whatever it held before the tick.
@@ -44892,7 +44879,7 @@ var EngCalcs = EngCalcs || {};
 					var d = labelSettings.decimals[group] || {};
 					return (typeof d[k] === 'number') ? d[k] : d[key];
 				},
-				title: pc.lpn_labels_decimals_tip || 'Decimal places shown for this label',
+				name: pc.lpn_labels_col_decimals || 'Decimals',
 				onChange: function (v) { dec[k] = v; }
 			};
 		} else { out.decimals = null; }
@@ -44917,13 +44904,13 @@ var EngCalcs = EngCalcs || {};
 		out.affix = {
 			prefix: {
 				value: labelPrefixFor(group, key),
-				title: pc.lpn_labels_prefix_tip || 'Text added before this property on map labels',
+				name: pc.lpn_labels_col_before || 'Bef.',
 				onChange: function (v) { setLabelAffix('prefix', group, key, v); }
 			},
 			suffix: {
 				value: labelSuffixFor(group, key),
-				title: (key === 'gradient' && group === 'link' ? pc.lpn_labels_suffix_gradient_tip : pc.lpn_labels_suffix_tip) ||
-					'Text added after this property on map labels',
+				name: pc.lpn_labels_col_after || 'Aft.',
+				title: (key === 'gradient' && group === 'link') ? pc.lpn_labels_suffix_gradient_tip : null,
 				onChange: function (v) { setLabelAffix('suffix', group, key, v); }
 			},
 			units: labelUnitsCapable(group, key) ? {
@@ -44960,12 +44947,11 @@ var EngCalcs = EngCalcs || {};
 			// **A COLUMN HAS ONE ALIGNMENT, AND THE HEADING IS PART OF THE COLUMN** (Task 435): the
 			// numeric columns centre their digit, so their headings centre; the affix boxes hold
 			// WORDS and keep their natural start alignment. `start`, not `left`, for RTL.
-			[[pc.lpn_labels_col_before || 'Bef.', LPN_LABEL_AFFIX_W, pc.lpn_labels_prefix_tip, 'start'],
-				[pc.lpn_labels_col_after || 'Aft.', LPN_LABEL_AFFIX_W, pc.lpn_labels_suffix_tip, 'start'],
+			[[pc.lpn_labels_col_before || 'Bef.', LPN_LABEL_AFFIX_W, null, 'start'],
+				[pc.lpn_labels_col_after || 'Aft.', LPN_LABEL_AFFIX_W, null, 'start'],
 				[pc.lpn_labels_use_units || 'Use units', LPN_LABEL_UNITS_W, pc.lpn_labels_use_units_tip, 'center'],
 				[pc.lpn_labels_col_decimals_example || '0.000', LPN_LABEL_COL_W,
-					(pc.lpn_labels_col_decimals || 'Decimals') + ' — ' +
-						(pc.lpn_labels_decimals_tip || 'Decimal places shown for this label'), 'center'],
+					pc.lpn_labels_col_decimals || 'Decimals', 'center'],
 				[pc.lpn_labels_col_show || 'Show', LPN_LABEL_COL_W, pc.lpn_labels_show_tip, 'center'],
 				[pc.lpn_labels_col_drop || 'Drop', LPN_LABEL_COL_W,
 					(pc.lpn_labels_priority || 'Priority') + ' — ' + (labelDropTip(group) || ''), 'center']
@@ -46608,12 +46594,32 @@ var EngCalcs = EngCalcs || {};
 					for (j = 0; j < mOpts.length; j++) { if (mOpts[j][0] === mode) { return mOpts[j][1]; } }
 					return pc.lpn_cp_restrict || 'Restrict these characters';
 				}
+				// **AND THE TIP FOLLOWS THE MODE TOO** (Tom, 2026-10-04 tip verdicts: *"Bug: Allow
+				// uses restrict and restrict uses nothing"*). The re-caption above wrote the new
+				// words with textContent, which wiped the label's `?` along with them: Allow showed
+				// the Restrict tip, and after a switch to Restrict there was no tip at all. Each
+				// mode now leads with its own caption (the rule section 8 of the harness holds) and
+				// shares one sentence about what may be listed.
+				function restrictTip(mode) {
+					var lead = mode === 'deny' ? (pc.lpn_cp_restrict_tip || 'Restrict these characters:')
+						: (pc.lpn_cp_allow_tip || 'Allow only these characters:');
+					return lead + ' ' + (pc.lpn_cp_characters_tip || '"@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.');
+				}
 				var restrictInput;
 				selectRow('restrictMode', pc.lpn_cp_restrict_mode || 'Allow or restrict', pc.lpn_cp_restrict_mode_tip,
 					mOpts, 'allow', function (mode) {
 						var cap = restrictCaption(mode),
 							lab = restrictInput && restrictInput.lpnRow && restrictInput.lpnRow.firstChild;
-						if (lab) { lab.textContent = cap; }
+						if (lab) {
+							if (window.bootstrap && bootstrap.Tooltip) {
+								Array.prototype.forEach.call(lab.querySelectorAll ? lab.querySelectorAll('.ec-help') : [], function (el) {
+									var t = bootstrap.Tooltip.getInstance(el);
+									if (t) { t.dispose(); }
+								});
+							}
+							setFieldLabel(lab, cap, restrictTip(mode));
+							initTipsIn(lab);
+						}
 						// **BOTH CAPTIONS, OR THE FIX IS HALF DONE.** The visible span and the
 						// input's own aria-label are two statements of the same thing, and a
 						// screen reader hears only the second -- so updating one of them would
@@ -46622,7 +46628,7 @@ var EngCalcs = EngCalcs || {};
 						if (restrictInput) { restrictInput.setAttribute('aria-label', cap); }
 					});
 				restrictInput = textRow('restrict', restrictCaption(def.restrictMode || 'allow'),
-					pc.lpn_cp_restrict_tip);
+					restrictTip(def.restrictMode || 'allow'));
 				textRow('minLength', pc.lpn_cp_minlength || 'Length lower limit', pc.lpn_cp_minlength_tip);
 				textRow('maxLength', pc.lpn_cp_length || 'Length upper limit', pc.lpn_cp_length_tip);
 				textRow('low', pc.lpn_cp_low || 'Low limit', pc.lpn_cp_low_tip);
@@ -46718,7 +46724,7 @@ var EngCalcs = EngCalcs || {};
 		// No Length row, deliberately (Tom, 2026-07-30): lenAuto derives a pipe's length from the
 		// drawn geometry, so any default here would be overwritten the moment the pipe is drawn.
 		defaultRow(defBody, pc.lpn_field_km || 'Minor (local) loss coefficient, k', null, 'k', nonNegative,
-			pc.lpn_field_km_tip, kmTableUrl());
+			null, kmTableUrl());
 		// ---- push defaults to existing elements ----
 		// A HARD push, deliberately. "Update only elements still holding the OLD default" cannot tell
 		// a deliberately-typed 6 from an untouched 6, so it is SILENTLY destructive rather than
@@ -46796,7 +46802,7 @@ var EngCalcs = EngCalcs || {};
 			// something to guess at. Assembled from already-translated label text plus two short
 			// heading keys, with no plural agreement anywhere: "Elements: 17" needs no plural rule,
 			// while "17 pipes and 5 junctions" would need one in every target language.
-			var msg = (pc.lpn_push_confirm || 'Replace these properties on every existing asset with the values now set for new assets? Values you have typed will be overwritten. You can undo this.')
+			var msg = (pc.lpn_push_confirm || 'Replace these properties on every existing asset with the values now set for new assets? Values you have entered will be overwritten. This can be undone.')
 				+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
 				+ '\n' + (pc.lpn_push_assets || 'Nodes and pipes:') + ' ' + targets;
 			askDialog({ kind: 'confirm', text: msg }, function (yes) {
@@ -46928,7 +46934,7 @@ var EngCalcs = EngCalcs || {};
 			saveToStorage();
 		});
 		row(mapBody, pc.lpn_settings_leader_snap || 'Snap leader lines to set angles', snapSelect,
-			pc.lpn_settings_leader_snap_tip);
+			null);
 		// ---- THE LABELING THRESHOLD (Tasks 669 and 705, restored 2026-09-22) ----
 		// It sat at this point until 2026-08-19 and is back on Tom's asking, in his words for the
 		// row. **A NUMBER AND A CAPTURE BUTTON**: no default is meaningful across networks 400 ft
@@ -47390,7 +47396,7 @@ var EngCalcs = EngCalcs || {};
 				// The select shows the old method until the answer: a No leaves nothing to put back.
 				methodSelect.value = was;
 				askDialog({ kind: 'confirm', text: pc.lpn_method_switch_confirm
-					|| 'Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?' }, function (yes) {
+					|| 'Changing the friction method does not change the roughness numbers already entered on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?' }, function (yes) {
 					if (!yes) { return; }
 					methodSelect.value = now;
 					switchMethod();
@@ -47434,7 +47440,7 @@ var EngCalcs = EngCalcs || {};
 				? 1 : settings.hydraulics.demandMultiplier),
 			{ perScenario: true });
 		hydNumberRow('specificGravity', 'lpn_settings_specific_gravity', 'Specific gravity',
-			'lpn_settings_specific_gravity_tip', 1);
+			'', 1);
 		hydNumberRow('viscosity', 'lpn_settings_viscosity', 'Relative viscosity',
 			'lpn_settings_viscosity_tip', 1);
 		hydNumberRow('emitterExponent', 'lpn_settings_emitter_exponent', 'Emitter exponent',
@@ -50766,11 +50772,19 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Shared by settingsDefaultPatternRow() above and by the junction popup's own selector, so the
 	// two lists cannot disagree about what patterns exist or about what the blank one is called.
-	function libFillPatternOptions(sel, value) {
+	// **`blankLabel` NAMES WHAT A BLANK MEANS WHERE IT IS NOT "NONE"** (Tom, 2026-10-04 tip verdicts:
+	// *"Why not change the first (blank value) option in the selector to say 'Default' so that this
+	// tip is not needed?"*). A junction's or a customer's blank pattern follows the project's
+	// Default demand pattern, and a pump's blank price pattern follows the network's, so those
+	// callers pass lpnBlankIsDefault(); everywhere else a blank really is No pattern.
+	function lpnBlankIsDefault() {
+		return (EngCalcs.pageConfig || {}).lpn_choice_default || 'Default';
+	}
+	function libFillPatternOptions(sel, value, blankLabel) {
 		var pc = EngCalcs.pageConfig || {}, none = document.createElement('option');
 		sel.textContent = '';
 		none.value = '';
-		none.textContent = pc.lpn_library_pattern_none || 'No pattern';
+		none.textContent = blankLabel || pc.lpn_library_pattern_none || 'No pattern';
 		sel.appendChild(none);
 		libPatternsRead().forEach(function (p) {
 			var o = document.createElement('option');
@@ -51196,7 +51210,7 @@ var EngCalcs = EngCalcs || {};
 		// **WHERE THE OFFERED COEFFICIENTS COME FROM, SAID ONCE FOR THE SECTION.** An unsourced
 		// number that looks authoritative is worse than none at all, so the source is named on the
 		// screen and not only at the code.
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_fittings_source || 'The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where you can change it. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.'));
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_fittings_source || 'The fittings offered here are the thirteen in Table 3.3 of the EPANET 2.2 user manual. Choosing one copies its coefficient into the row, where it can be changed. A coefficient depends on the size and the make of the fitting, so treat the table as a starting point rather than as an answer.'));
 		host.appendChild(libButton(pc.lpn_library_fittings_add || 'Add a fittings list', function () {
 			saveUndoSnapshot();
 			// EMPTY, for the reason a new curve has no points: a list that arrived with an elbow in
@@ -51406,7 +51420,7 @@ var EngCalcs = EngCalcs || {};
 		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curves_note || 'Curves are attached to pumps and valves. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.'));
 		// **SAID ONCE FOR THE SECTION, NOT ONCE PER CURVE.** It is the same sentence for every
 		// curve in the list, and twenty copies of it is what makes a panel unreadable.
-		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curve_values_tip || 'Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. You can also paste lines copied straight out of an EPANET file, including the curve name.'));
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curve_values_tip || 'Select one or two columns in a spreadsheet, copy them, and paste into the first cell you want them to land in. The rows are added as they are needed. Lines copied straight out of an EPANET file, including the curve name, can also be pasted.'));
 		host.appendChild(libButton(pc.lpn_library_curve_add || 'Add a curve', function () {
 			saveUndoSnapshot();
 			// A NEW CURVE IS A PUMP HEAD CURVE WITH NO POINTS. `head` because that is what a person
@@ -51538,7 +51552,6 @@ var EngCalcs = EngCalcs || {};
 		desc.className = 'lpn-lib-wide';
 		desc.value = c.note || '';
 		desc.setAttribute('aria-label', pc.lpn_library_curve_note_label || 'Description');
-		if (pc.lpn_library_curve_note_tip) { helpTip(desc, pc.lpn_library_curve_note_tip); }
 		desc.addEventListener('change', function () {
 			var t = String(desc.value || '').trim();
 			if (t === (c.note || '')) { return; }
@@ -51578,7 +51591,6 @@ var EngCalcs = EngCalcs || {};
 			kindSel.appendChild(gen);
 		}
 		kindSel.setAttribute('aria-label', pc.lpn_library_curve_type || 'Curve type');
-		if (pc.lpn_library_curve_type_tip) { helpTip(kindSel, pc.lpn_library_curve_type_tip); }
 		kindSel.addEventListener('change', function () {
 			saveUndoSnapshot();
 			c.kind = kindSel.value;
@@ -52937,9 +52949,9 @@ var EngCalcs = EngCalcs || {};
 	// A pattern chooser, in the popup's own row shape. The OPTIONS come from libFillPatternOptions(),
 	// which the Libraries box's own default-pattern row also uses, so the two can never disagree
 	// about what patterns exist or about what the blank entry is called.
-	function patternField(fields, labelText, get, set, tip) {
+	function patternField(fields, labelText, get, set, tip, blankLabel) {
 		var label = document.createElement('label'), sel = document.createElement('select');
-		libFillPatternOptions(sel, get());
+		libFillPatternOptions(sel, get(), blankLabel);
 		sel.addEventListener('change', function () { saveUndoSnapshot(); set(sel.value); });
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(sel);
@@ -53242,8 +53254,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			scheduleSolve();
 		});
-		setFieldLabel(label, (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ')',
-			pc.lpn_field_length_tip);
+		setFieldLabel(label, (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ')');
 		label.appendChild(input);
 		autoLabel.appendChild(auto);
 		autoLabel.appendChild(document.createTextNode(' ' + (pc.lpn_field_auto || 'Auto')));
@@ -54398,8 +54409,7 @@ var EngCalcs = EngCalcs || {};
 		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; },
-				function (v) { n.elev = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_field_elev_tip);
+				function (v) { n.elev = v; updateNode(nodeId, true); refreshPopupIfOpen(); });
 			elevationDemRow(fields, n, nodeId,
 				function (v) { n.elev = v; updateNode(nodeId, true); });
 			// Blank = follow the elevation, which is what the placeholder shows -- so the field reads
@@ -54436,8 +54446,7 @@ var EngCalcs = EngCalcs || {};
 			}
 		} else {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
-				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId, true); },
-				pc.lpn_field_elev_tip);
+				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId, true); });
 			elevationDemRow(fields, n, nodeId,
 				function (v) { n.elev = v; updateNode(nodeId, true); });
 			// **THERE IS NO PLAIN Base demand / Demand pattern FIELD ANY MORE** (Task 553, Tom
@@ -54603,8 +54612,8 @@ var EngCalcs = EngCalcs || {};
 			// the only label a column has, so it is where its `?` belongs -- and it is one `?` per
 			// label, which is the suite's rule.
 			[[(pc.lpn_field_base_demand || 'Base demand') + ' (' + unitLabel('lpn_u_flow') + ')', pc.lpn_demand_tip],
-				[pc.lpn_field_demand_pattern || 'Demand pattern', pc.lpn_field_demand_pattern_tip],
-				[pc.lpn_field_demand_category || 'Description', pc.lpn_field_demand_category_tip],
+				[pc.lpn_field_demand_pattern || 'Demand pattern', null],
+				[pc.lpn_field_demand_category || 'Description', null],
 				['', null]].forEach(function (pair) {
 				var th = document.createElement('th');
 				if (pair[1]) { setFieldLabel(th, pair[0], pair[1]); }
@@ -54665,7 +54674,6 @@ var EngCalcs = EngCalcs || {};
 		addBtn.type = 'button';
 		addBtn.className = 'lpn-demand-add';
 		addBtn.textContent = pc.lpn_demand_add || 'Add demand category';
-		helpTip(addBtn, pc.lpn_demand_add_tip);
 		addBtn.addEventListener('click', function () {
 			saveUndoSnapshot();
 			// ZERO AND BLANK, not a copy of row 0. A new row is a question to the user, and seeding
@@ -54821,7 +54829,7 @@ var EngCalcs = EngCalcs || {};
 			acc.setBase(+bInput.value);
 			afterPropertyEdit(n);
 		});
-		libFillPatternOptions(sel, acc.getPattern());
+		libFillPatternOptions(sel, acc.getPattern(), lpnBlankIsDefault());
 		sel.setAttribute('aria-label', (pc.lpn_field_demand_pattern || 'Demand pattern') + ' ' + (index + 1));
 		sel.addEventListener('change', function () {
 			saveUndoSnapshot();
@@ -54907,14 +54915,14 @@ var EngCalcs = EngCalcs || {};
 	 * at some other curve on their behalf is not acting on it. Same treatment the water-quality
 	 * trace node's missing source gets.
 	 */
-	function curveChooser(fields, l, prop, kind, labelText, tip) {
+	function curveChooser(fields, l, prop, kind, labelText, tip, blankLabel) {
 		var pc = EngCalcs.pageConfig || {},
 			label = document.createElement('label'),
 			sel = document.createElement('select'),
 			cur = effective(l, prop) || '',
 			none = document.createElement('option');
 		none.value = '';
-		none.textContent = pc.lpn_curve_none || 'No curve selected';
+		none.textContent = blankLabel || pc.lpn_curve_none || 'No curve selected';
 		sel.appendChild(none);
 		libCurvesRead().forEach(function (c) {
 			if (c.kind !== kind) { return; }
@@ -55181,7 +55189,7 @@ var EngCalcs = EngCalcs || {};
 		// `change` as well, for the reason the tag's does: a field can lose focus without ever firing
 		// `input` -- a value restored by the browser, or an autofill.
 		input.addEventListener('change', function () { commit(); refreshPopupIfOpen(); });
-		setFieldLabel(label, pc.lpn_field_desc || 'Description', pc.lpn_field_desc_tip);
+		setFieldLabel(label, pc.lpn_field_desc || 'Description');
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
@@ -55277,7 +55285,7 @@ var EngCalcs = EngCalcs || {};
 			globalText = globalPct === null ? (pc.lpn_energy_efficiency || 'Pump efficiency (percent)')
 				: (globalPct + '%');
 		curveChooser(fields, l, 'efficCurveId', 'effic',
-			pc.lpn_pump_effic_curve || 'Pump efficiency curve', pc.lpn_pump_effic_curve_tip);
+			pc.lpn_pump_effic_curve || 'Pump efficiency curve', pc.lpn_pump_effic_curve_tip, lpnBlankIsDefault());
 		if (name && !curve) {
 			pumpEfficNote(fields, (pc.lpn_pump_effic_unstated
 				|| 'This pump refers to an efficiency curve called {name}, which nothing in this project defines, so it runs at the efficiency set for the whole network, {percent}.')
@@ -55352,7 +55360,7 @@ var EngCalcs = EngCalcs || {};
 		patternField(fields, pc.lpn_energy_price_pattern || 'Price pattern',
 			function () { return effective(l, 'energyPattern'); },
 			function (v) { setProp(l, 'energyPattern', v || null); refreshPopupIfOpen(); },
-			pc.lpn_energy_price_pattern_tip);
+			pc.lpn_energy_price_pattern_tip, lpnBlankIsDefault());
 	}
 	// A GPV's own curve. Flow against HEAD LOSS -- the quantity a general purpose valve is defined
 	// by -- and no "pump curve" note, because none of that fitting applies: EPANET reads these
@@ -55421,7 +55429,7 @@ var EngCalcs = EngCalcs || {};
 					pipeK(l), pc.lpn_field_fittings_tip);
 			} else {
 				numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k', effective(l, 'k') || 0,
-					function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, pc.lpn_field_km_tip,
+					function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, null,
 					{ el: l, prop: 'k' }, kmTableUrl());
 			}
 			lengthField(fields, l);
@@ -56099,7 +56107,7 @@ var EngCalcs = EngCalcs || {};
 			refreshPopupIfOpen();
 		});
 		setFieldLabel(demLabel, (pc.lpn_field_meter_demand || 'Demand per service') +
-			' (' + unitLabel('lpn_u_flow') + ')', pc.lpn_field_meter_demand_tip);
+			' (' + unitLabel('lpn_u_flow') + ')');
 		demLabel.appendChild(demInput);
 		fields.appendChild(demLabel);
 		fields.appendChild(document.createElement('br'));
@@ -56122,7 +56130,7 @@ var EngCalcs = EngCalcs || {};
 		 */
 		patLabel = document.createElement('label');
 		patSel = document.createElement('select');
-		libFillPatternOptions(patSel, c.pattern || '');
+		libFillPatternOptions(patSel, c.pattern || '', lpnBlankIsDefault());
 		patSel.addEventListener('change', function () {
 			if ((c.pattern || '') === patSel.value) { return; }
 			saveUndoSnapshot();
@@ -56130,8 +56138,7 @@ var EngCalcs = EngCalcs || {};
 			customerEdited(c);
 			refreshPopupIfOpen();
 		});
-		setFieldLabel(patLabel, pc.lpn_field_demand_pattern || 'Demand pattern',
-			pc.lpn_field_meter_pattern_tip);
+		setFieldLabel(patLabel, pc.lpn_field_demand_pattern || 'Demand pattern');
 		patLabel.appendChild(patSel);
 		fields.appendChild(patLabel);
 		fields.appendChild(document.createElement('br'));
@@ -56156,7 +56163,7 @@ var EngCalcs = EngCalcs || {};
 			customerEdited(c);
 			refreshPopupIfOpen();
 		});
-		setFieldLabel(cntLabel, pc.lpn_field_meter_count || 'Number of services', pc.lpn_field_meter_count_tip);
+		setFieldLabel(cntLabel, pc.lpn_field_meter_count || 'Number of services');
 		cntLabel.appendChild(cntInput);
 		fields.appendChild(cntLabel);
 		fields.appendChild(document.createElement('br'));
@@ -60149,7 +60156,7 @@ var EngCalcs = EngCalcs || {};
 			arrow.type = 'button';
 			arrow.className = 'lpn-pane-sortarrow lpn-ff-sortarrow' + (on ? ' lpn-pane-sortarrow-active' : '') +
 				(on && sortState.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
-			arrow.title = on ? (pc.lpn_pane_sortarrow_tip || 'Reverse the sort') : (pc.lpn_pane_sort_asc || 'Sort ascending');
+			arrow.title = (on && sortState.dir > 0) ? (pc.lpn_pane_sort_desc || 'Sort descending') : (pc.lpn_pane_sort_asc || 'Sort ascending');
 			arrow.setAttribute('aria-label', arrow.title + ': ' + text);
 			arrow._lpnFfSortCol = i;
 			arrow.addEventListener('click', function (ev) {
@@ -61307,7 +61314,7 @@ var EngCalcs = EngCalcs || {};
 		if (dsBusy || !EngCalcs.lpnDemandScaleRun || dsBusyElsewhere()) { return Promise.resolve(null); }
 		m = ffValue(dsAsk.multiplier, null);
 		if (!(m >= 0)) {
-			setNotice(pc.lpn_ds_bad_multiplier || 'Type a demand scale of zero or more, such as 1.5.');
+			setNotice(pc.lpn_ds_bad_multiplier || 'Enter a demand scale of zero or more, such as 1.5.');
 			return Promise.resolve(null);
 		}
 		c = demandScaleCase('scale');
@@ -62728,7 +62735,7 @@ var EngCalcs = EngCalcs || {};
 			table = ffEl('table', 'lpn-ff-table', null, wrap), hr = ffEl('tr', null, null, ffEl('thead', null, null, table)),
 			body = ffEl('tbody', null, null, table), r = res.stats.r;
 		[[pc.lpn_calib_col_location || 'Location'],
-			[pc.lpn_calib_col_n || 'Num obs', pc.lpn_calib_col_n_tip],
+			[pc.lpn_calib_col_n || 'Num obs'],
 			[pc.lpn_calib_col_obs_mean || 'Observed mean'],
 			[pc.lpn_calib_col_sim_mean || 'Computed mean'],
 			[pc.lpn_calib_col_mean_err || 'Mean error', pc.lpn_calib_col_mean_err_tip],
