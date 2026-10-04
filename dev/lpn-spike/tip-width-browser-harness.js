@@ -1,6 +1,6 @@
 // A TIP IS WIDE, NOT TALL (Tom, 2026-10-04, on Ida's tip audit). Bootstrap caps a tooltip at
 // 200 px, so a long tip became a column taller than half the window. css/engcalcs.css raises the
-// cap to 22rem, never wider than the viewport less a gutter. Real headless Chrome, because the
+// cap to 17rem, never wider than the viewport less a gutter. Real headless Chrome, because the
 // width is what the browser lays out, not what the stylesheet says.
 //
 //   node dev/lpn-spike/tip-width-browser-harness.js
@@ -48,8 +48,8 @@ async function main() {
 			const m = await measure(page);
 			ok(vp.name + ': the longest tip (' + m.words + ' words) was drawn', m.w > 0, JSON.stringify(m));
 			if (vp.name === 'desktop') {
-				ok('desktop: wider than the old 200 px cap', m.w > 300, m.w);
-				ok('desktop: no wider than 22rem', m.w <= 352.5, m.w);
+				ok('desktop: wider than the old 200 px cap', m.w > 250, m.w);
+				ok('desktop: no wider than 17rem', m.w <= 272.5, m.w);
 				ok('desktop: no taller than half the window (it stood 554 px at the old cap)', m.h < vp.height / 2, m.h);
 			} else {
 				ok('phone: never wider than the screen less a gutter', m.w <= m.vw - 32 + 0.5, m.w + ' of ' + m.vw);
