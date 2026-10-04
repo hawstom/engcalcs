@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 2344,
-        "delta_key_count": 65,
+        "expected_key_count": 2346,
+        "delta_key_count": 67,
         "exempt_key_count": 40,
         "exempt_keys": [
             "calc_units_us",
@@ -736,6 +736,8 @@
         "lpn_result_pump_head": "Head",
         "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
         "lpn_report_pump_head": "Pump head",
+        "lpn_contour_show": "Show contours",
+        "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
         "lpn_saved_project": "Saved with the project",
         "lpn_saved_browser": "Saved in this browser",
@@ -803,6 +805,8 @@
         "lpn_result_pump_head": "Head",
         "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
         "lpn_report_pump_head": "Pump head",
+        "lpn_contour_show": "Show contours",
+        "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
         "lpn_saved_project": "Saved with the project",
         "lpn_saved_browser": "Saved in this browser",
@@ -1122,6 +1126,38 @@
                     "key": "lpn_ts_add",
                     "value": "Přidat vybrané",
                     "english": "Add selected"
+                }
+            }
+        },
+        "lpn_contour_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_contour_plot",
+                    "value": "Vrstevnicový graf",
+                    "english": "Contour plot"
+                },
+                "next_translated": {
+                    "key": "lpn_contour_fill",
+                    "value": "Výplň",
+                    "english": "Fill"
+                }
+            }
+        },
+        "lpn_contour_show_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_contour_plot",
+                    "value": "Vrstevnicový graf",
+                    "english": "Contour plot"
+                },
+                "next_translated": {
+                    "key": "lpn_contour_fill",
+                    "value": "Výplň",
+                    "english": "Fill"
                 }
             }
         },

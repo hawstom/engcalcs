@@ -1094,6 +1094,8 @@
         "lpn_contour_menu": "Contour",
         "lpn_contour_tip": "Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.",
         "lpn_contour_plot": "Contour plot",
+        "lpn_contour_show": "Show contours",
+        "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_contour_fill": "Fill",
         "lpn_contour_fill_tip": "Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.",
         "lpn_contour_fill_smooth": "Smooth",
@@ -2346,7 +2348,7 @@
         "lpn_survey_note_id_taken": "Name already in project, new name assigned.",
         "lpn_survey_note_id_invalid": "Name cannot be used here, new name assigned."
     },
-    "count": 2344,
+    "count": 2346,
     "active_prefixes": [
         "about",
         "bpn",
