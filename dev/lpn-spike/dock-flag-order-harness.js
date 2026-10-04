@@ -120,8 +120,6 @@ async function threeCase(Session, browser, how) {
 		// A click on the first flag opens the box it names (screen order and internal order agree).
 		await a.page.click(SEL);
 		await a.settle(400);
-		const names = { 'Find and replace': 'lpn_find_popup', 'Settings': 'lpn_settings_box' };
-		const openIds = IDS.filter((_, i) => false);
 		const states = await boxes(a.page, IDS);
 		const wantId = await a.page.evaluate((sel) => document.querySelector(sel).getAttribute('aria-controls'), SEL);
 		ok('...and a click on the first flag opens the box it names', states[IDS.indexOf(wantId)] === true && states.filter(Boolean).length === 1, JSON.stringify({ wantId, states }));
