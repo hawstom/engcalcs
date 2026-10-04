@@ -17178,6 +17178,11 @@ var EngCalcs = EngCalcs || {};
 	// clicks of the same drawing.
 	var pendingLinkVerts = [];
 	var pendingPathEl = null; // built in init(); the dashed polyline through the points already picked
+	// **THE NODES A "JUNCTION AND PIPE" CHAIN HAS STEPPED THROUGH, oldest first** (Task 719). View
+	// state like `pendingLinkFrom`, and it dies with it (setPendingLinkFrom(null) empties it). It
+	// exists for one reason: Undo takes back the newest step, which deletes the node the chain was
+	// standing on, and the chain should then stand on the node before it rather than end.
+	var chainTrail = [];
 
 	// Sets/clears pendingLinkFrom AND its visual feedback together (Tom, 2026-07-30: "otherwise
 	// there's no indication that anything is working" between the first and second click of
@@ -17188,6 +17193,7 @@ var EngCalcs = EngCalcs || {};
 	function setPendingLinkFrom(id) {
 		if (pendingLinkFrom && nodeEls[pendingLinkFrom]) { nodeEls[pendingLinkFrom].circle.classList.remove('lpn-node-pending'); }
 		pendingLinkFrom = id;
+		if (!id) { chainTrail = []; }
 		// **THE PICKED POINTS DIE WITH THE FROM-NODE, AND THEY DIE HERE.** Every way out of a
 		// half-drawn link goes through this one function -- committing it, abandoning it, changing
 		// tool, Escape -- so no exit path can leave a stale bend behind to appear on the NEXT pipe
@@ -17239,7 +17245,7 @@ var EngCalcs = EngCalcs || {};
 	// point of both.
 	var LINK_CLICK_EXITS_MODE = {
 		'add-junction': true, 'add-reservoir': true, 'add-tank': true,
-		'add-pipe': true, 'add-pump': true, 'add-valve': true
+		'add-pipe': true, 'add-pump': true, 'add-valve': true, 'add-chain': true
 	};
 	// The link a press landed on, by the browser's own hit test alone -- a link's own data label
 	// included, because that label IS the link's data and a click on it opens the link in Select.
@@ -30896,7 +30902,7 @@ var EngCalcs = EngCalcs || {};
 		'add-tank': 'lpn_mode_add_tank',
 		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump',
 		'add-valve': 'lpn_mode_add_valve', 'add-meter': 'lpn_mode_add_meter',
-		'add-text': 'lpn_mode_add_text',
+		'add-text': 'lpn_mode_add_text', 'add-chain': 'lpn_mode_add_chain',
 		'vertices': 'lpn_mode_vertices',
 		'zoom-window': 'lpn_mode_zoom_window'
 	};
@@ -40276,6 +40282,7 @@ var EngCalcs = EngCalcs || {};
 			// Text stays last, being the only tool that adds nothing hydraulic.
 			{ icon: 'customer', pointerOnly: true, label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), hotkey: toolKeyFor('add-meter'), fn: function () { setMode('add-meter'); } },
 			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text', pc.lpn_tool_add_text_tip), hotkey: toolKeyFor('add-text'), fn: function () { setMode('add-text'); } },
+			{ icon: 'chain', pointerOnly: true, label: pc.lpn_tool_add_chain || 'Junction and Pipe', tip: toolTipWithKey('add-chain', pc.lpn_tool_add_chain_tip), hotkey: toolKeyFor('add-chain'), fn: function () { setMode('add-chain'); } },
 			{ separator: true },
 			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
 			// Deliberately NOT translated: scaffolding for measuring how ~100 links performs, and it
@@ -41928,7 +41935,8 @@ var EngCalcs = EngCalcs || {};
 			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump', tip: pc.lpn_tool_add_pump_tip },
 			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve', tip: pc.lpn_tool_add_valve_tip },
 			{ mode: 'add-meter', key: 'lpn_tool_add_meter', icon: 'customer', tip: pc.lpn_tool_add_meter_tip },
-			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text', tip: pc.lpn_tool_add_text_tip }
+			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text', tip: pc.lpn_tool_add_text_tip },
+			{ mode: 'add-chain', key: 'lpn_tool_add_chain', icon: 'chain', tip: pc.lpn_tool_add_chain_tip }
 		].forEach(function (t) { modeButton(t, addGroup); });
 
 		var viewGroup = group();
@@ -42823,6 +42831,9 @@ var EngCalcs = EngCalcs || {};
 				// a row is the normal way to use the tool.
 				setMode('select');
 			}
+			else if (mode === 'add-chain') {
+				chainTap(e, w, t);
+			}
 			else if (mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve') {
 				// Same snap: elementFromPoint requires landing exactly on the node's small hit
 				// area, which a real tap on a real screen routinely misses by a few pixels -- that
@@ -42995,6 +43006,73 @@ var EngCalcs = EngCalcs || {};
 			}
 		});
 	}
+
+	// ---- JUNCTION AND PIPE: draw a chain (ROADMAP Task 719) ----
+	//
+	// Tom, from WaterCAD: *"a Junction and Pipe toolbar command that adds Junction, Pipe, Junction,
+	// Pipe, etc until escape."* The first press places a junction (or starts from the node it
+	// landed on); every press after that places a junction and the pipe from the node before it.
+	//
+	// **NOTHING HERE IS A SECOND WAY TO MAKE A JUNCTION OR A PIPE.** It calls addNode() and
+	// addLink(), the two the single tools call, so defaults, ID prefixes, the elevation source,
+	// scenario birth and the solve are the single tools' own. What is new is only the sequencing.
+	//
+	// **THE FROM-NODE, THE RING AND THE RUBBER BAND ARE THE PIPE TOOL'S** (pendingLinkFrom), so the
+	// ways out are its ways out and nothing was added to stop: Escape (the capture handler beside
+	// setPendingLinkFrom, which abandons the chain and leaves the tool selected for the next one), a
+	// second Escape (back to Select), the toolbar button again, another tool, a right-click (below),
+	// and a press on a pipe. The leg being rubber-banded was never written to the document, so
+	// ending a chain discards nothing and leaves nothing.
+	//
+	// **ONE UNDO STEP PER PRESS**, taken just before the press writes: the first junction is one,
+	// and each later junction together with the pipe that reaches it is one. The existing model is
+	// a whole-document snapshot per discrete act, so a step is what Undo can honestly take back;
+	// one step for a whole chain would make a mis-placed seventh junction cost the other six.
+	// A press that only joins an existing node (closing a loop) writes a pipe and nothing else.
+	function chainTap(e, w, t) {
+		// A right-click ends the chain rather than adding to it. The browser's own context menu is
+		// suppressed while a chain is running (see the contextmenu listener) so this is the gesture.
+		if (e.button === 2) { setPendingLinkFrom(null); return; }
+		var onNode = t.dataset.node || (nearestNodeNearScreen(e.clientX, e.clientY, reachPx(e)) || {}).id;
+		var node;
+		if (!pendingLinkFrom) {
+			if (!onNode) {
+				saveUndoSnapshot();
+				logLpnFirstAction('element');
+				onNode = addNode('junction', w.x, w.y).id;
+			}
+			setPendingLinkFrom(onNode);
+			chainTrail = [onNode];
+			return;
+		}
+		// A second press on the node the chain stands on is neither a leg nor a node: a pipe from a
+		// node to itself is not a thing the solver models. Nothing happens, as in the pipe tool.
+		if (onNode && onNode === pendingLinkFrom) { return; }
+		saveUndoSnapshot();
+		logLpnFirstAction('element');
+		if (onNode) { node = nodeById(onNode); }
+		else { node = addNode('junction', w.x, w.y); }
+		addLink('pipe', pendingLinkFrom, node.id, []);
+		var trail = chainTrail.concat([node.id]);
+		setPendingLinkFrom(node.id);
+		chainTrail = trail;
+	}
+	// **UNDO MOVES THE CHAIN BACK WITH THE DRAWING.** Undo rebuilds every node element, so the ring
+	// on the from-node is gone, and the node itself is gone when the step undone was the one that
+	// made it. Stand on the newest node of the trail that still exists; with none left, the chain
+	// is over. Called by restoreUndoSnapshot() once the drawing is rebuilt.
+	function chainResyncAfterUndo() {
+		if (!pendingLinkFrom) { return; }
+		var id = pendingLinkFrom, trail = chainTrail.slice();
+		while (id && !nodeById(id)) { id = trail.pop() || null; }
+		setPendingLinkFrom(id);
+		if (id && trail.length) { chainTrail = trail; }
+	}
+	document.addEventListener('contextmenu', function (e) {
+		if (mode !== 'add-chain' || !pendingLinkFrom || !e.target || !e.target.closest || !e.target.closest('#lpn_canvas')) { return; }
+		e.preventDefault();
+		setPendingLinkFrom(null);
+	});
 
 	// ---- ROADMAP Task 277: a move is undoable ----
 	//
@@ -56262,6 +56340,7 @@ var EngCalcs = EngCalcs || {};
 			if (wasAt[n.id] !== undefined && wasAt[n.id] !== nodeDrawX(n) + ',' + nodeDrawY(n)) { markNodeMoved(n.id); }
 		});
 		updateEmptyHint();
+		chainResyncAfterUndo();
 		refreshScenarioStatus();
 		// **THE LIBRARIES BOX IS PART OF THE DOCUMENT ON SCREEN, AND UNTIL TASK 611 NOTHING PUT IT
 		// BACK.** Tom, 2026-09-17, on the library import: *"Undo doesn't work."* It did -- the
@@ -56397,7 +56476,10 @@ var EngCalcs = EngCalcs || {};
 	 */
 	var LPN_TOOL_KEYS = {
 		'1': 'select', '2': 'add-junction', '3': 'add-reservoir', '4': 'add-tank',
-		'5': 'add-pipe', '6': 'add-pump', '7': 'add-valve', '8': 'add-meter', '9': 'add-text'
+		'5': 'add-pipe', '6': 'add-pump', '7': 'add-valve', '8': 'add-meter', '9': 'add-text',
+		// Junction and Pipe (Task 719) is the tenth tool, so its key is the tenth digit: the key
+		// IS the position, as the nine above are.
+		'0': 'add-chain'
 	};
 	document.addEventListener('keydown', function (e) {
 		if (e.ctrlKey || e.metaKey || e.altKey) { return; }
