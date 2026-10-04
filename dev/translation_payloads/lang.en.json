@@ -1058,6 +1058,11 @@
         "lpn_ts_group_nodes": "Nodes",
         "lpn_ts_group_links": "Links",
         "lpn_ts_quantity_tip": "Which value to graph against time.",
+        "lpn_pgraph_none": "This asset has no results in the current run.",
+        "lpn_pgraph_source_share_from": "Source share from {node}",
+        "lpn_result_pump_head": "Head",
+        "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
+        "lpn_report_pump_head": "Pump head",
         "lpn_ts_add": "Add selected",
         "lpn_ts_add_tip": "Put everything now selected on the map onto the graph.",
         "lpn_ts_add_none": "Nothing of that kind is selected on the map.",
@@ -2329,7 +2334,7 @@
         "lpn_survey_note_id_taken": "Name already in project, new name assigned.",
         "lpn_survey_note_id_invalid": "Name cannot be used here, new name assigned."
     },
-    "count": 2327,
+    "count": 2332,
     "active_prefixes": [
         "about",
         "bpn",

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**5 still to read on master**, of 46 untranslated keys, of 2327 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read on master**, of 51 untranslated keys, of 2332 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -254,7 +254,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (46, 5 to read @@ NEEDS RULING)
+## lpn_  (51, 5 to read @@ NEEDS RULING)
 
 - **`lpn_analyze_at_time`**
   > Time step: {time}.
@@ -391,6 +391,21 @@ never edits a synonym.
 - **`lpn_graphs_menu_tip`**
   > Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.
   @@ NEEDS RULING
+- **`lpn_pgraph_none`**
+  > This asset has no results in the current run.
+  _Ruled OK 2026-10-01._
+- **`lpn_pgraph_source_share_from`**
+  > Source share from {node}
+  _Ruled OK 2026-10-01._
+- **`lpn_report_pump_head`**
+  > Pump head
+  _Ruled OK 2026-10-03._
+- **`lpn_result_pump_head`**
+  > Head
+  _Ruled OK 2026-10-03._
+- **`lpn_result_pump_head_tip`**
+  > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
+  _Ruled OK 2026-10-03._
 - **`lpn_sysflow_title`**
   > Flow balance
   _Ruled OK 2026-10-03._
@@ -399,7 +414,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**20 still to read**, of 32 new keys across 13 unmerged branch(es).
+**20 still to read**, of 27 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -409,6 +424,8 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/harvest-1004b (`5890a8f5`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -464,23 +481,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/property-graph (`3c987393`) — 5 new, all ruled
-
-- **`lpn_pgraph_none`**
-  > This asset has no results in the current run.
-  _Ruled OK 2026-10-01._
-- **`lpn_pgraph_source_share_from`**
-  > Source share from {node}
-  _Ruled OK 2026-10-01._
-- **`lpn_report_pump_head`**
-  > Pump head
-  _Ruled OK 2026-10-03._
-- **`lpn_result_pump_head`**
-  > Head
-  _Ruled OK 2026-10-03._
-- **`lpn_result_pump_head_tip`**
-  > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
-  _Ruled OK 2026-10-03._
+### feat/property-graph (`dddd777e`) — adds no English strings
 
 ### feat/scenario-option (`5ca59b4f`) — 5 new, 5 to read @@ NEEDS RULING
 
