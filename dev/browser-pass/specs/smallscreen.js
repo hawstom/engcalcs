@@ -133,17 +133,12 @@ exports.run = async function ({ browser, report }) {
 		// whose credit lines end in a bare URL, and it is given `overflow-wrap` in the phone block.
 		report.note('the content pane is ' + pane.content + 'px of a ' + pane.boxW +
 			'px box, and the index ' + pane.index + 'px');
-		// **REPORTED, NOT ASSERTED: A REAL DEFECT THIS SPEC CAUGHT (2026-10-04).** Since R-326/R-346
-		// the three label lists carry six columns (Bef., Aft., Use units, 0.000, Show, Drop), and
-		// wrapped as one block under the name they overrun the 201.6px content pane by 22px at
-		// 360px, so the pane scrolls sideways. Every heading still paints inside its own column
-		// (section 2). Tom has not ruled on it; when the layout is fixed, make this an assertion.
-		if (pane.contentSideways) {
-			report.note('KNOWN DEFECT: the Settings content pane scrolls sideways at 360px, overrun by ' +
-				pane.wide.join('; '));
-		} else {
-			report.ok(true, '...and still has no sideways scrollbar, which is what the pane was narrowed twice to avoid');
-		}
+		// **ASSERTED AGAIN (Task 760, 2026-10-04).** Since R-326/R-346 the three label lists carry six
+		// columns and, at the widths the non-touch phone rules gave them, overran the 201.6px pane
+		// by 22px; the number columns are 1.8rem now. dev/lpn-spike/settings-phone-width-browser-
+		// harness.js holds the same line at 320px and at 1440px.
+		report.ok(!pane.contentSideways, 'the Settings content pane has no sideways scrollbar at 360px, which is what the pane was narrowed twice to avoid',
+			pane.wide.join('; '));
 		report.ok(!pane.docSideways, 'the page itself has gained no horizontal scrollbar');
 
 		// ---- 2. THE SYMBOLOGY COLUMN HEADINGS --------------------------------------------------

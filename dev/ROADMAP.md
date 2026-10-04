@@ -396,9 +396,6 @@ the block.
   **Tom, 2026-10-01: stays at 75, with a branch to play on** (`feat/desktop`): *"my main concern is that we
   could get too heavy for the browser or find limitations. Until then, let's just play and plan and see
   what happens."*
-- 75|760| **At 360 px the Settings content pane scrolls sideways.** The three label lists carry six
-  columns since R-326/R-346 and overrun the 201.6 px pane by 22 px (headings still paint inside their
-  columns). Found 2026-10-04 by the Task 732 spec refresh; `dev/browser-pass/specs/smallscreen.js` prints it as a KNOWN DEFECT.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
