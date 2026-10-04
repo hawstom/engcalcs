@@ -4650,6 +4650,12 @@ var EngCalcs = EngCalcs || {};
 		if (!(typeof docDm === 'number' && isFinite(docDm))) { docDm = 1; }
 		if (typeof scn.demandMultiplier === 'number' && isFinite(scn.demandMultiplier)
 			&& scn.demandMultiplier !== docDm) { total += 1; }
+		// **A SCENARIO'S OWN RUN TIME OR TIME STEP COUNTS THE SAME WAY** (Task 755): one each, and
+		// only where it differs from the project's own, for the same reason as the multiplier.
+		LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
+			var v = scenarioTimeValue(scn, key);
+			if (v !== undefined && v !== projectTimes()[key]) { total += 1; }
+		});
 		return total;
 	}
 	// Every scenario's overrides on one element -- what a Base-side deletion is about to destroy,
@@ -4895,6 +4901,8 @@ var EngCalcs = EngCalcs || {};
 		// open would leave that field showing the number belonging to the scenario you just left --
 		// and the next keystroke would write it into the wrong place.
 		perfDebugTime('settings', function () { rebuildSettingsBox(); });
+		// A scenario may run on its own clock (Task 755), so the transport is redrawn for it.
+		if (EngCalcs.lpnTimeTimesChanged) { EngCalcs.lpnTimeTimesChanged(); }
 		scheduleSolve();
 		saveToStorage();
 	}
@@ -29949,7 +29957,7 @@ var EngCalcs = EngCalcs || {};
 	function tsHours(t) { return (t || 0) / 3600; }
 	function tsWaitingText(pc) {
 		var why;
-		if (EngCalcs.lpnTimeIsExtended && !EngCalcs.lpnTimeIsExtended(doc.times)) {
+		if (EngCalcs.lpnTimeIsExtended && !effectiveTimesExtended()) {
 			return pc.lpn_time_no_period || 'This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.';
 		}
 		why = EngCalcs.lpnTimeWaiting ? EngCalcs.lpnTimeWaiting() : 'manual';
@@ -32823,6 +32831,7 @@ var EngCalcs = EngCalcs || {};
 		if (!scenarios.some(function (s) { return s.isBase; })) { scenarios = defaultScenarios().concat(scenarios); }
 		scenarios.forEach(function (s) { if (!s.overrides) { s.overrides = {}; } });
 		baseScenario().overrides = {}; // Base is canon and has no overrides, by definition
+		sanitizeScenarioTimes();
 		if (!scenarios.some(function (s) { return s.id === project.activeScenario; })) { project.activeScenario = baseScenario().id; }
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
 		// The customers (Task 247). A file written before they existed has none, and every
@@ -33393,8 +33402,7 @@ var EngCalcs = EngCalcs || {};
 		// steady answer was kept but whose run was not (it was still in flight when we left) is
 		// owed the run, or the Time series tab waits for one nothing will start.
 		perfDebugTime('scheduleSolve', function () {
-			var owed = !lastSolveResult || (!timeKept && EngCalcs.lpnTimeIsExtended &&
-				EngCalcs.lpnTimeIsExtended(doc.times));
+			var owed = !lastSolveResult || (!timeKept && effectiveTimesExtended());
 			// scheduleArrivalSolve(), not scheduleSolve(): see the note at its definition. With the
 			// switch off it runs nothing at all, which is Tom's ruling and not an inference.
 			if (owed) { scheduleArrivalSolve(); } else { clearFireFlowRun(false); clearCriticalityRun(false); clearDemandScaleRun(false); }
@@ -33743,6 +33751,10 @@ var EngCalcs = EngCalcs || {};
 			// multiplier. Undefined where the scenario inherits, which leaves the document's own
 			// line exactly as it was.
 			demandMultiplier: scenarioDemandMultiplier(),
+			// **AND ITS OWN [TIMES] VALUES** (Task 755), on the same rule: an export from inside a
+			// scenario that states its own total run time writes that run time. Null in Base and in
+			// a scenario that inherits, so the document's own [TIMES] goes out character for character.
+			times: scenarioTimesForExport(),
 			// A label's box, so its centre anchor can be shifted to the upper-left corner EPANET
 			// means by a [LABELS] point. Measured, never assumed: see reanchorImportedLabels().
 			labelSize: function (lb) {
@@ -55236,6 +55248,8 @@ var EngCalcs = EngCalcs || {};
 		// was left in, which reads as a lost drawing. Restored AFTER buildDom() so the scale clamp
 		// is applied against the frame the document is now in.
 		if (coordsChanged && snap.view) { applyView(snap.view); }
+		// An undone run time, the project's or a scenario's own (Task 755), moves the transport.
+		if (EngCalcs.lpnTimeTimesChanged) { EngCalcs.lpnTimeTimesChanged(); }
 		scheduleSolve();
 	}
 	function undoPopupSubjectSurvives() {
@@ -55694,6 +55708,120 @@ var EngCalcs = EngCalcs || {};
 	function scenarioDemandMultiplier() {
 		var m = activeScenario().demandMultiplier;
 		return (typeof m === 'number' && isFinite(m)) ? m : undefined;
+	}
+	// **A SCENARIO MAY CARRY ITS OWN TOTAL RUN TIME AND HYDRAULIC TIME STEP** (Task 755). Tom,
+	// 2026-09-30: *"A Demand Multiplier column with the alternatives? What about other settings?"*
+	// WaterGEMS keeps run type and duration in per-scenario Calculation Options; Sue ranked steady
+	// against 24-hour, and the duration, next. So the same shape as the multiplier above: a sparse
+	// block on the scenario, `times: { duration, hydraulicStep, text: {...} }`, in seconds, with
+	// the typed text kept beside each number exactly as the document's own `times` keeps it. ABSENT
+	// means "inherit the project's [TIMES] value". A duration of 0 is EPANET's steady state.
+	//
+	// **ONLY THESE TWO.** Friction method, units, accuracy and trials never vary between compared
+	// scenarios (Sue): a comparison whose scenarios silently disagree about them compares nothing.
+	var LPN_SCENARIO_TIME_KEYS = ['duration', 'hydraulicStep'];
+	function scenarioTimeValue(s, key) {
+		var t = s && !s.isBase ? s.times : null, v = t ? t[key] : undefined;
+		if (typeof v !== 'number' || !isFinite(v) || v < 0) { return undefined; }
+		if (key === 'hydraulicStep' && !(v > 0)) { return undefined; }
+		return v;
+	}
+	function projectTimes() { return doc.times || EngCalcs.lpnTimesDefaults(); }
+	// The [TIMES] block this scenario runs under. **THE DOCUMENT'S OWN OBJECT WHEN THE SCENARIO
+	// STATES NOTHING**, so Base and every inheriting scenario are exactly what they always were; a
+	// copy otherwise, so nothing that reads the answer can write a scenario's number into the
+	// project's block.
+	function timesForScenario(s) {
+		var own = {}, any = false, out, base, k;
+		LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
+			var v = scenarioTimeValue(s, key);
+			if (v !== undefined) { own[key] = v; any = true; }
+		});
+		if (!any) { return doc.times; }
+		out = {};
+		base = projectTimes();
+		for (k in base) { if (Object.prototype.hasOwnProperty.call(base, k)) { out[k] = base[k]; } }
+		out.text = Object.assign({}, base.text || {});
+		Object.keys(own).forEach(function (key) {
+			var typed = s.times.text && s.times.text[key];
+			out[key] = own[key];
+			if (typeof typed === 'string') { out.text[key] = typed; } else { delete out.text[key]; }
+		});
+		return out;
+	}
+	function effectiveTimes() { return timesForScenario(activeScenario()); }
+	function effectiveTimesExtended() {
+		return !!(EngCalcs.lpnTimeIsExtended && EngCalcs.lpnTimeIsExtended(effectiveTimes()));
+	}
+	// What the export writes for the open scenario: null in Base or where it states nothing, so an
+	// export from Base is the document's own [TIMES], character for character.
+	function scenarioTimesForExport() {
+		var s = activeScenario(), out = null;
+		LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
+			var v = scenarioTimeValue(s, key);
+			if (v === undefined) { return; }
+			out = out || { text: {} };
+			out[key] = v;
+			if (s.times.text && typeof s.times.text[key] === 'string') { out.text[key] = s.times.text[key]; }
+		});
+		return out;
+	}
+	// '' is always usable (it clears); otherwise the text must parse as a time, and a hydraulic
+	// time step must be more than zero.
+	function scenarioTimeTextOk(key, text) {
+		var raw = String(text === undefined || text === null ? '' : text).trim(), sec;
+		if (raw === '') { return true; }
+		if (!EngCalcs.lpnParseTime) { return false; }
+		sec = EngCalcs.lpnParseTime(raw.split(/\s+/), { typed: true });
+		if (sec === null || !isFinite(sec) || sec < 0) { return false; }
+		return !(key === 'hydraulicStep' && !(sec > 0));
+	}
+	// The one writer. '' clears the scenario's own value (inherit). Returns false, writing NOTHING,
+	// on text it cannot use. No snapshot here: the caller decides when a press is an undo step.
+	function setScenarioTime(s, key, text) {
+		var raw = String(text === undefined || text === null ? '' : text).trim();
+		if (!s || s.isBase || LPN_SCENARIO_TIME_KEYS.indexOf(key) < 0) { return false; }
+		if (!scenarioTimeTextOk(key, raw)) { return false; }
+		if (raw === '') {
+			if (s.times) {
+				delete s.times[key];
+				if (s.times.text) { delete s.times.text[key]; }
+				if (!LPN_SCENARIO_TIME_KEYS.some(function (k) { return s.times[k] !== undefined; })) { delete s.times; }
+			}
+			return true;
+		}
+		s.times = s.times || {};
+		s.times[key] = EngCalcs.lpnParseTime(raw.split(/\s+/), { typed: true });
+		s.times.text = s.times.text || {};
+		s.times.text[key] = raw;
+		return true;
+	}
+	// The text a cell shows for one of these on one scenario: its own, or '' when it inherits; for
+	// Base, the project's own value (Base has no other).
+	function scenarioTimeText(s, key) {
+		var pt, v;
+		if (s.isBase) {
+			pt = projectTimes();
+			return EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText(pt, key, pt[key] || 0) : String(pt[key] || 0);
+		}
+		v = scenarioTimeValue(s, key);
+		if (v === undefined) { return ''; }
+		return EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText(s.times, key, v) : String(v);
+	}
+	// A file is read, never trusted: a scenario's block keeps only what this page can run, Base
+	// holds none, and an empty block goes. An older project has none anywhere and is untouched.
+	function sanitizeScenarioTimes() {
+		scenarios.forEach(function (s) {
+			if (!s.times) { return; }
+			if (s.isBase || typeof s.times !== 'object') { delete s.times; return; }
+			LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
+				if (s.times[key] !== undefined && scenarioTimeValue(s, key) === undefined) {
+					delete s.times[key];
+					if (s.times.text) { delete s.times.text[key]; }
+				}
+			});
+			if (!LPN_SCENARIO_TIME_KEYS.some(function (k) { return s.times[k] !== undefined; })) { delete s.times; }
+		});
 	}
 	function docDemandMultiplier() {
 		var m = scenarioDemandMultiplier();
@@ -57819,7 +57947,11 @@ var EngCalcs = EngCalcs || {};
 	// document that states a duration (EngCalcs.lpnTimeIsExtended). This is the one place the page
 	// asks the two together, so the checkbox and the banner cannot come to different answers.
 	function modelNeedsEpanet(model) {
-		if (EngCalcs.lpnTimeIsExtended && EngCalcs.lpnTimeIsExtended(doc.times)) { return true; }
+		// The model's own clock when it carries one (Task 755): the scenario comparison assembles
+		// each scenario's model in turn, and a scenario's run time is its own.
+		if (model && model.time && model.time.times && EngCalcs.lpnTimeIsExtended) {
+			if (EngCalcs.lpnTimeIsExtended(model.time.times)) { return true; }
+		} else if (effectiveTimesExtended()) { return true; }
 		return !!(EngCalcs.lpnEpanetOnlyValves && EngCalcs.lpnEpanetOnlyValves(model).length > 0);
 	}
 	// The same question when no model is to hand -- the settings panel being rebuilt, for instance.
@@ -58373,7 +58505,7 @@ var EngCalcs = EngCalcs || {};
 		ffEl('p', 'lpn-ff-note', pc.lpn_ff_engine_cost, host);
 		// Said only where there is a clock to be confused by. A project with no run schedule has
 		// only ever had one condition, and a sentence about which one would be noise.
-		if (EngCalcs.lpnTimeIsExtended && EngCalcs.lpnTimeIsExtended(doc.times)) {
+		if (effectiveTimesExtended()) {
 			ffEl('p', 'lpn-ff-note', pc.lpn_ff_steady, host);
 		}
 
@@ -59527,7 +59659,7 @@ var EngCalcs = EngCalcs || {};
 			minP, unitLabel('lpn_u_pressure'));
 		engine = engineFor(assembleModel());
 		ffEl('p', 'lpn-ff-note', engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native, host);
-		if (EngCalcs.lpnTimeIsExtended && EngCalcs.lpnTimeIsExtended(doc.times)) {
+		if (effectiveTimesExtended()) {
 			ffEl('p', 'lpn-ff-note', pc.lpn_ds_eps_note, host);
 		}
 		other = fireFlowBusy || critBusy;
@@ -59599,7 +59731,7 @@ var EngCalcs = EngCalcs || {};
 	// project every result names its time step, and once the clock moves away the result says so
 	// rather than passing for the moment on screen. It is not cleared: the siblings keep theirs
 	// across a clock move too, and a number with its time beside it is still a true number.
-	function dsExtended() { return !!(EngCalcs.lpnTimeIsExtended && EngCalcs.lpnTimeIsExtended(doc.times)); }
+	function dsExtended() { return effectiveTimesExtended(); }
 	function dsNow() { return modelTimeSeconds(); }
 	function dsTimeText(t) { return EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(t) : String(t); }
 	function dsTimeLines(host, t) {
@@ -60156,7 +60288,13 @@ var EngCalcs = EngCalcs || {};
 		try {
 			scenariosForDisplay().forEach(function (s) {
 				project.activeScenario = s.id;
-				out.push({ scn: s, model: assembleModel() });
+				// **AND THE OPTIONS IT RAN UNDER, read during the same swap** (Task 755): the
+				// multiplier and the clock are the scenario's own or the project's, and the report
+				// states them per row rather than leaving the reader to look each one up.
+				out.push({ scn: s, model: assembleModel(), opts: {
+					demandMultiplier: docDemandMultiplier(),
+					times: effectiveTimes() || EngCalcs.lpnTimesDefaults()
+				} });
 			});
 		} finally {
 			project.activeScenario = was;
@@ -60168,19 +60306,31 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **A PUMP HAS NO VELOCITY** -- it is a zero-length link and its `velocities` entry is not a
 	// speed through a pipe -- so it is skipped here for the same reason the label machinery skips it.
-	function scenarioCompareExtremes(model, result) {
-		var out = { minPressure: undefined, minAt: '', maxVelocity: undefined, maxAt: '' };
+	//
+	// **A RUN IS SEARCHED WHOLE** (Task 755): handed `into` and a time, the extremes of every frame
+	// accumulate into one record, each remembering the time step it was found at.
+	function scenarioCompareExtremes(model, result, into, t) {
+		var out = into || { minPressure: undefined, minAt: '', maxVelocity: undefined, maxAt: '' };
 		model.nodes.forEach(function (n) {
 			var p = result.pressures ? result.pressures[n.id] : undefined;
 			if (typeof p !== 'number' || !isFinite(p)) { return; }
-			if (out.minPressure === undefined || p < out.minPressure) { out.minPressure = p; out.minAt = n.id; }
+			if (out.minPressure === undefined || p < out.minPressure) { out.minPressure = p; out.minAt = n.id; out.minT = t; }
 		});
 		model.links.forEach(function (l) {
 			var v = result.velocities ? result.velocities[l.id] : undefined;
 			if (l.type === 'pump' || typeof v !== 'number' || !isFinite(v)) { return; }
-			if (out.maxVelocity === undefined || v > out.maxVelocity) { out.maxVelocity = v; out.maxAt = l.id; }
+			if (out.maxVelocity === undefined || v > out.maxVelocity) { out.maxVelocity = v; out.maxAt = l.id; out.maxT = t; }
 		});
 		return out;
+	}
+	// **A SCENARIO WITH A TOTAL RUN TIME IS RUN, NOT SOLVED AT ONE MOMENT** (Task 755). Its own
+	// clock decides: a scenario that states a duration of 0 in a project that runs 24 hours is
+	// solved steady, and one that states 24:00 in a steady project is run for a day. Through the
+	// EPANET engine only, as every run on this page is; with no engine, the one moment is solved
+	// and the row says nothing it cannot back.
+	function scenarioCompareRunsPeriod(model) {
+		return !!(EngCalcs.lpnEpanetRun && EngCalcs.lpnTimeIsExtended &&
+			EngCalcs.lpnTimeIsExtended(model && model.time && model.time.times));
 	}
 	// **THE SCENARIOS ARE SOLVED ONE AFTER ANOTHER, NEVER ALL AT ONCE.** The EPANET bridge is one
 	// engine instance; two solves in flight through it is a race with a shared session. Chained on
@@ -60210,15 +60360,40 @@ var EngCalcs = EngCalcs || {};
 				// with no path to a source -- and that is an ANSWER about that scenario rather than
 				// a failure of the run. The other rows are still solved.
 				if (issues.length > 0) {
-					rows.push({ scn: pair.scn, ok: false, why: issues.map(diagIssueText).join(' ') });
+					rows.push({ scn: pair.scn, opts: pair.opts, ok: false, why: issues.map(diagIssueText).join(' ') });
 					return null;
+				}
+				if (scenarioCompareRunsPeriod(pair.model)) {
+					return EngCalcs.lpnEpanetRun(pair.model).then(function (run) {
+						var ext = null, converged = true;
+						if (!run || !run.ok || !(run.frames || []).length) {
+							rows.push({
+								scn: pair.scn, opts: pair.opts, ok: false,
+								why: (run && run.issues && run.issues.length)
+									? run.issues.map(diagIssueText).join(' ')
+									: (pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.')
+							});
+							return;
+						}
+						run.frames.forEach(function (f) {
+							ext = scenarioCompareExtremes(pair.model, f, ext, f.t);
+							if (f.converged === false) { converged = false; }
+						});
+						rows.push({
+							scn: pair.scn, opts: pair.opts, ok: true, period: true, converged: converged,
+							minPressure: ext.minPressure, minAt: ext.minAt, minT: ext.minT,
+							maxVelocity: ext.maxVelocity, maxAt: ext.maxAt, maxT: ext.maxT
+						});
+					}, function () {
+						rows.push({ scn: pair.scn, opts: pair.opts, ok: false, why: pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.' });
+					});
 				}
 				engine = engineFor(pair.model);
 				return Promise.resolve(engine.solve(pair.model)).then(function (result) {
 					var ext;
 					if (!result || !result.ok) {
 						rows.push({
-							scn: pair.scn, ok: false,
+							scn: pair.scn, opts: pair.opts, ok: false,
 							why: (result && result.issues && result.issues.length)
 								? result.issues.map(diagIssueText).join(' ')
 								: (pc.lpn_diag_not_converged || 'No solution was found. Check for values that are impossible in real life, such as a diameter of zero.')
@@ -60227,7 +60402,7 @@ var EngCalcs = EngCalcs || {};
 					}
 					ext = scenarioCompareExtremes(pair.model, result);
 					rows.push({
-						scn: pair.scn, ok: true,
+						scn: pair.scn, opts: pair.opts, ok: true,
 						// **A RUN THAT DID NOT CONVERGE IS REPORTED AND NOT DISCARDED**, the ruling
 						// Task 565 made for the map: the last iterate is every number in existence
 						// for that scenario, and printing nothing tells the reader less.
@@ -60236,7 +60411,7 @@ var EngCalcs = EngCalcs || {};
 						maxVelocity: ext.maxVelocity, maxAt: ext.maxAt
 					});
 				}, function () {
-					rows.push({ scn: pair.scn, ok: false, why: pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.' });
+					rows.push({ scn: pair.scn, opts: pair.opts, ok: false, why: pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.' });
 				});
 			});
 		});
@@ -60255,16 +60430,46 @@ var EngCalcs = EngCalcs || {};
 	}
 	var scenarioCompareDocGuard = true;
 	// One cell: the number and the element it was found at, in the reader's own units.
-	function scnCmpAt(si, unitId, id, group) {
+	// `t` is the time step a run found it at, and only a run passes one.
+	function scnCmpAt(si, unitId, id, group, t) {
 		var pc = EngCalcs.pageConfig || {};
 		if (typeof si !== 'number' || !isFinite(si)) { return FF_DASH; }
-		return (pc.lpn_scncmp_at || '{value} at {id}')
+		return (t === undefined ? (pc.lpn_scncmp_at || '{value} at {id}')
+			: (pc.lpn_scncmp_at_time || '{value} at {id}, {time}')
+				.replace('{time}', EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(t) : String(t)))
 			.replace('{value}', ffQty(si, unitId))
 			.replace('{id}', labelPrefixFor(group, 'id') + id);
 	}
+	// **WHAT DOES NOT VARY IS STATED ONCE, ABOVE THE TABLE** (Task 755; Sue: friction method, units,
+	// accuracy and trials never vary silently between compared scenarios). They are project
+	// settings with no per-scenario value at all, so the statement is true by construction and is
+	// there so the reader of a printed comparison never has to wonder.
+	function scnCmpSameRows(host) {
+		var pc = EngCalcs.pageConfig || {}, h = settings.hydraulics || {},
+			trials = (typeof h.trials === 'number' && isFinite(h.trials)) ? h.trials : 40;
+		ffEl('p', 'lpn-ff-summary', pc.lpn_scncmp_same || 'The same in every scenario', host);
+		[
+			[pc.bpn_method || 'Friction method', frictionMethodLabel()],
+			[pc.lpn_view_units || 'Units', ['lpn_u_flow', 'lpn_u_pressure', 'lpn_u_velocity'].map(unitLabel).join(', ')],
+			[pc.lpn_settings_accuracy || 'Accuracy', String(solveAccuracy())],
+			[pc.lpn_settings_trials || 'Maximum trials', String(trials)]
+		].forEach(function (pair) {
+			ffRow(host, pair[0], null, ffEl('span', null, pair[1], null), '');
+		});
+	}
+	// The three option cells of one row. A steady run has no time step to state, so it says so
+	// with a dash rather than a number nothing used.
+	function scnCmpOptionCells(tr, o) {
+		var t = (o && o.times) || {}, tt = function (key) {
+			return EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText(t, key, t[key] || 0) : String(t[key] || 0);
+		};
+		ffCell(tr, o ? String(o.demandMultiplier) : FF_DASH);
+		ffCell(tr, o ? tt('duration') : FF_DASH);
+		ffCell(tr, (o && EngCalcs.lpnTimeIsExtended && EngCalcs.lpnTimeIsExtended(t)) ? tt('hydraulicStep') : FF_DASH);
+	}
 	function rebuildScenarioCompareReport() {
 		var pc = EngCalcs.pageConfig || {},
-			host = document.getElementById('lpn_scncmp_report'), body;
+			host = document.getElementById('lpn_scncmp_report'), body, anyPeriod = false;
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (scenarioCompareBusy) {
@@ -60279,9 +60484,15 @@ var EngCalcs = EngCalcs || {};
 				'Nothing has been drawn yet, so there is nothing to solve.', host);
 			return;
 		}
+		scnCmpSameRows(host);
+		// **AND WHAT DOES VARY IS A COLUMN PER OPTION** (Task 755): the multiplier and the clock each
+		// row was solved under, the scenario's own or the project's it inherited.
 		body = ffTable(host, [
 			pc.lpn_scenario_label || 'Scenario',
 			pc.lpn_scenario_overrides || 'No. of custom values',
+			pc.bpn_demand_mult || 'Demand multiplier',
+			pc.lpn_time_duration || 'Total run time',
+			pc.lpn_time_hyd_step || 'Hydraulic time step',
 			pc.bpn_p_min || 'Lowest pressure',
 			pc.lpn_scncmp_col_maxvelocity || 'Highest velocity'
 		]);
@@ -60294,18 +60505,24 @@ var EngCalcs = EngCalcs || {};
 			}
 			ffCell(tr, name);
 			ffCell(tr, String(overrideCount(r.scn)));
+			scnCmpOptionCells(tr, r.opts);
+			if (r.period) { anyPeriod = true; }
 			if (!r.ok) {
 				// One cell across both number columns: the reason is one sentence and splitting it
 				// would print half of it under "Highest velocity".
 				ffCell(tr, r.why).colSpan = 2;
 				return;
 			}
-			ffCell(tr, scnCmpAt(r.minPressure, 'lpn_u_pressure', r.minAt, 'node'));
-			ffCell(tr, scnCmpAt(r.maxVelocity, 'lpn_u_velocity', r.maxAt, 'link'));
+			ffCell(tr, scnCmpAt(r.minPressure, 'lpn_u_pressure', r.minAt, 'node', r.period ? r.minT : undefined));
+			ffCell(tr, scnCmpAt(r.maxVelocity, 'lpn_u_velocity', r.maxAt, 'link', r.period ? r.maxT : undefined));
 			if (!r.converged) {
 				ffCell(tr, pc.lpn_diag_not_converged || 'No solution was found. Check for values that are impossible in real life, such as a diameter of zero.');
 			}
 		});
+		if (anyPeriod) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_period_note ||
+				'Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.', host);
+		}
 		ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_note ||
 			'Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.', host);
 	}
@@ -60736,38 +60953,124 @@ var EngCalcs = EngCalcs || {};
 	}
 	// One row per scenario, one column per category. A cell names the alternative: Base's own word
 	// for a Base alternative, the scenario's name and its count of local values for its own.
-	// tbody -> its table -> thead -> the heading row -> the last heading.
-	function markLastHeading(tbody, cls) {
-		var hr = tbody.parentNode.children[0].children[0], th = hr.children[hr.children.length - 1];
-		th.className += ' ' + cls;
-	}
 	function rebuildAlternativesTable() {
 		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_alt_report'), body,
-			baseWord = pc.lpn_scenario_base || 'Base';
+			baseWord = pc.lpn_scenario_base || 'Base', focusAt = null, act, nCat;
 		if (!host) { return; }
+		// **AN EDIT HERE REBUILDS THIS TABLE** (the badge count changes, and refreshScenarioStatus()
+		// redraws every box that shows one), so the cell being typed in is found again afterwards --
+		// or Tab out of one option would land nowhere.
+		act = document.activeElement;
+		if (act && act.getAttribute && act.getAttribute('data-alt-scn')) {
+			focusAt = { scn: act.getAttribute('data-alt-scn'), key: act.getAttribute('data-alt-key') };
+		}
 		host.innerHTML = '';
-		// **THE DEMAND MULTIPLIER IS A CALCULATION OPTION, NOT AN ALTERNATIVE** (Tom, 2026-09-30:
-		// *"Demand multiplier: OK. A Demand Multiplier column with the alternatives?"*; Mary and Sue
-		// advised it stay a per-scenario option, as Bentley keeps it in Calculation Options). So it
-		// is the last column, after a divider, and its heading carries the option's own tip.
+		// **THE CALCULATION OPTIONS ARE NOT ALTERNATIVES** (Tom, 2026-09-30: *"Demand multiplier:
+		// OK. A Demand Multiplier column with the alternatives? What about other settings?"*; Mary
+		// and Sue advised they stay per-scenario options, as Bentley keeps them in Calculation
+		// Options). So they are the last columns, after a divider, each heading carrying its tip --
+		// and they are plain columns, blank meaning inherits, not named sets (Sue, until scenarios
+		// number in the dozens). Task 755 made them editable here.
+		nCat = LPN_ALT_CATEGORIES.length;
 		body = ffTable(host, [pc.lpn_scenario_label || 'Scenario'].concat(LPN_ALT_CATEGORIES.map(altCategoryLabel),
-			[[pc.bpn_demand_mult || 'Demand multiplier', pc.lpn_settings_demand_multiplier_tip]]));
-		markLastHeading(body, 'lpn-alt-calcopt');
+			[[pc.bpn_demand_mult || 'Demand multiplier', pc.lpn_settings_demand_multiplier_tip],
+				[pc.lpn_time_duration || 'Total run time', pc.lpn_scenario_duration_tip],
+				[pc.lpn_time_hyd_step || 'Hydraulic time step', pc.lpn_scenario_hyd_step_tip]]));
+		markHeadingsFrom(body, nCat + 1);
 		body.parentNode.className += ' lpn-alt-table';
 		scenariosForDisplay().forEach(function (s) {
-			var tr = ffEl('tr', null, null, body), alts = alternativesOf(s);
+			var tr = ffEl('tr', null, null, body), alts = alternativesOf(s), dm;
 			ffCell(tr, scenarioDisplayName(s));
 			LPN_ALT_CATEGORIES.forEach(function (cat) {
 				var a = alts[cat];
 				ffCell(tr, a.isBase ? baseWord : scenarioDisplayName(s) + ' (' + a.count + ')');
 			});
-			// Base shows the project's value (1 when it states none); a scenario shows its own, and
-			// BLANK means it inherits the project's (Sue).
-			var dm = s.isBase ? (settings.hydraulics || {}).demandMultiplier : s.demandMultiplier;
-			if (s.isBase && !(typeof dm === 'number' && isFinite(dm))) { dm = 1; }
-			ffCell(tr, (typeof dm === 'number' && isFinite(dm)) ? String(dm) : '', 'lpn-alt-calcopt');
+			// Base shows the project's values (a multiplier of 1 when it states none) and is not
+			// edited here: Settings is its door. A scenario shows its own, BLANK meaning it inherits
+			// the project's (Sue), in a box it can be typed into.
+			if (s.isBase) {
+				dm = (settings.hydraulics || {}).demandMultiplier;
+				if (!(typeof dm === 'number' && isFinite(dm))) { dm = 1; }
+				ffCell(tr, String(dm), 'lpn-alt-calcopt lpn-alt-opt');
+				LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
+					ffCell(tr, scenarioTimeText(s, key), 'lpn-alt-opt');
+				});
+				return;
+			}
+			altOptionCell(tr, s, 'demandMultiplier', 'lpn-alt-calcopt lpn-alt-opt');
+			LPN_SCENARIO_TIME_KEYS.forEach(function (key) { altOptionCell(tr, s, key, 'lpn-alt-opt'); });
 		});
 		ffEl('p', 'lpn-ff-note', pc.lpn_alt_note, host);
+		if (focusAt) {
+			Array.prototype.forEach.call(host.querySelectorAll ? host.querySelectorAll('input[data-alt-scn]') : [], function (inp) {
+				if (inp.getAttribute('data-alt-scn') === focusAt.scn && inp.getAttribute('data-alt-key') === focusAt.key) {
+					try { inp.focus(); } catch (e) {}
+				}
+			});
+		}
+	}
+	// tbody -> its table -> thead -> the heading row; every heading from `from` on is an option.
+	function markHeadingsFrom(tbody, from) {
+		var hr = tbody.parentNode.children[0].children[0], i;
+		for (i = from; i < hr.children.length; i++) {
+			hr.children[i].className += ' lpn-alt-opt' + (i === from ? ' lpn-alt-calcopt' : '');
+		}
+	}
+	function altOptionText(s, key) {
+		if (key === 'demandMultiplier') {
+			return (typeof s.demandMultiplier === 'number' && isFinite(s.demandMultiplier)) ? String(s.demandMultiplier) : '';
+		}
+		return scenarioTimeText(s, key);
+	}
+	function altOptionLabel(key) {
+		var pc = EngCalcs.pageConfig || {};
+		if (key === 'demandMultiplier') { return pc.bpn_demand_mult || 'Demand multiplier'; }
+		return key === 'duration' ? (pc.lpn_time_duration || 'Total run time') : (pc.lpn_time_hyd_step || 'Hydraulic time step');
+	}
+	// One editable option cell. A change that the page cannot use puts the old text back and
+	// writes nothing; one that changes nothing writes nothing either, so no empty undo step is
+	// pushed. Otherwise: one undo step, the write, and the same follow-through a Settings edit has.
+	function altOptionCell(tr, s, key, cls) {
+		var td = ffCell(tr, null, cls), input = document.createElement('input');
+		input.type = 'text';
+		input.inputMode = key === 'demandMultiplier' ? 'decimal' : 'text';
+		input.className = 'lpn-alt-input';
+		input.value = altOptionText(s, key);
+		input.setAttribute('data-alt-scn', s.id);
+		input.setAttribute('data-alt-key', key);
+		input.setAttribute('aria-label', scenarioDisplayName(s) + ': ' + altOptionLabel(key));
+		input.addEventListener('change', function () { commitAltOption(s, key, input); });
+		td.appendChild(input);
+		return td;
+	}
+	function commitAltOption(s, key, input) {
+		var raw = String(input.value).trim(), was = altOptionText(s, key), num;
+		if (raw === was) { return; }
+		if (key === 'demandMultiplier') {
+			num = +raw;
+			if (raw !== '' && !(isFinite(num) && num > 0)) { input.value = was; return; }
+			saveUndoSnapshot();
+			if (raw === '') { delete s.demandMultiplier; } else { s.demandMultiplier = num; }
+		} else {
+			if (!scenarioTimeTextOk(key, raw)) { input.value = was; return; }
+			saveUndoSnapshot();
+			setScenarioTime(s, key, raw);
+		}
+		afterScenarioOptionEdit(s);
+	}
+	function afterScenarioOptionEdit(s) {
+		var active = s.id === project.activeScenario;
+		refreshScenarioStatus();
+		saveToStorage();
+		if (active) {
+			// The Settings box reads the open scenario's multiplier, and the transport its clock.
+			rebuildSettingsBox();
+			if (EngCalcs.lpnTimeTimesChanged) { EngCalcs.lpnTimeTimesChanged(); }
+			scheduleSolve();
+		} else {
+			// Nothing on the map changed, but a comparison on screen no longer describes the project.
+			dropScenarioCompareRun();
+		}
 	}
 	// Position and size for the life of the page only: remembering them would be a new key in the
 	// browser for a view Tom has not yet decided to keep.
@@ -61724,6 +62027,9 @@ var EngCalcs = EngCalcs || {};
 		EngCalcs.lpnTimeInit({
 			tabs: paneTabs,
 			doc: function () { return doc; },
+			// The [TIMES] block the open scenario runs under (Task 755): the project's own unless the
+			// scenario states its own total run time or hydraulic time step.
+			times: effectiveTimes,
 			apply: applySolveResult, status: setStatus, solve: scheduleSolve,
 			// **AND THE UNDEBOUNCED ONE, which is what asking for a run needs** (Task 248,
 			// 2026-08-19). A period run is provoked by a deliberate act -- the Run button, or a

@@ -2371,6 +2371,7 @@
 	 *         .demandRows(node)     the ACTIVE SCENARIO's own demand list for this junction
 	 *                               ([{base, pattern, category, tok?}]), or null for the document's
 	 *         .demandMultiplier      the active scenario's own, if it has one; the document's otherwise
+	 *         .times                {duration?, hydraulicStep?, text} the ACTIVE SCENARIO states, or null
 	 *         .labelSize(label)     {w, h} of the rendered label IN MAP UNITS, for the corner shift
 	 *         .title                [TITLE] text; default doc.project.name
 	 *
@@ -2908,12 +2909,30 @@
 		(doc.controls || []).forEach(function (ctl) {
 			if (ctl && ctl.raw) { controlRows.push(ctl.raw); }
 		});
-		if (doc.times) {
+		// **THE OPEN SCENARIO'S OWN RUN TIME AND TIME STEP** (Task 755), when it states them, on the
+		// rule the demand multiplier follows: the export writes the scenario the user is looking at.
+		// Laid over the document's block on a COPY, so the document is not written; and where the
+		// document states no [TIMES] at all, only the scenario's own lines go out, rather than seven
+		// defaults the file never said.
+		var expTimes = doc.times, timeKeysOnly = null;
+		if (opts.times) {
+			expTimes = Object.assign({}, doc.times || {});
+			expTimes.text = Object.assign({}, (doc.times && doc.times.text) || {});
+			['duration', 'hydraulicStep'].forEach(function (k) {
+				if (typeof opts.times[k] !== 'number') { return; }
+				expTimes[k] = opts.times[k];
+				if (opts.times.text && typeof opts.times.text[k] === 'string') { expTimes.text[k] = opts.times.text[k]; }
+				else { delete expTimes.text[k]; }
+				if (!doc.times) { (timeKeysOnly = timeKeysOnly || {})[k] = true; }
+			});
+		}
+		if (expTimes) {
 			[['Duration', 'duration'], ['Hydraulic Timestep', 'hydraulicStep'],
 				['Pattern Timestep', 'patternStep'], ['Pattern Start', 'patternStart'],
 				['Report Timestep', 'reportStep'], ['Report Start', 'reportStart'],
 				['Start ClockTime', 'startClock']].forEach(function (pair) {
-				timeRows.push(row([pair[0], EngCalcs.lpnTimeText(doc.times, pair[1], doc.times[pair[1]])]));
+				if (timeKeysOnly && !timeKeysOnly[pair[1]]) { return; }
+				timeRows.push(row([pair[0], EngCalcs.lpnTimeText(expTimes, pair[1], expTimes[pair[1]])]));
 			});
 		}
 

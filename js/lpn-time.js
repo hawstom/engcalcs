@@ -179,8 +179,10 @@
 	 * becomes 17.1 metres -- above that tank's maximum level, so the pump never starts and the run
 	 * is quietly wrong instead of visibly broken.
 	 */
-	EC.lpnTimeModelBlock = function (doc, toSI) {
-		var times = (doc && doc.times) || EC.lpnTimesDefaults(),
+	EC.lpnTimeModelBlock = function (doc, toSI, timesOverride) {
+		// `timesOverride` is the [TIMES] block the open scenario runs under (Task 755), handed in by
+		// the page; absent, the document's own, as it always was.
+		var times = timesOverride || (doc && doc.times) || EC.lpnTimesDefaults(),
 			conv = typeof toSI === 'function' ? toSI : function (v) { return v; },
 			controls = [],
 			// **A SENTENCE NAMING AN ELEMENT THAT NO LONGER EXISTS IS DROPPED HERE TOO** (Task 466).
@@ -491,7 +493,14 @@
 			// lost content is Tom's call, and the tank levels are meant to come back.
 		};
 	}
+	// **THE CLOCK THE OPEN SCENARIO RUNS ON** (Task 755): a scenario may state its own total run
+	// time and hydraulic time step, so the run, the transport and the model block all read this.
+	// The Settings fields do NOT: they edit the project's own block, see projectTimes().
 	function docTimes() {
+		if (host && typeof host.times === 'function') { return host.times() || null; }
+		return projectTimes();
+	}
+	function projectTimes() {
 		var d = host && host.doc();
 		return (d && d.times) || null;
 	}
@@ -538,7 +547,7 @@
 	 */
 	EC.lpnTimeAttach = function (model) {
 		if (!host || !EC.lpnTimesDefaults) { return model; }
-		model.time = EC.lpnTimeModelBlock(host.doc(), host.toSI);
+		model.time = EC.lpnTimeModelBlock(host.doc(), host.toSI, docTimes());
 		EC.lpnTankVolumeAttach(model, host.doc(), host.toSI);
 		return model;
 	};
@@ -1275,7 +1284,7 @@
 	EC.lpnTimeRenderSettings = function () {
 		var panel = document.getElementById('lpn_set_time_fields'), S = strings(), times;
 		if (!panel || !host) { return; }
-		times = docTimes() || EC.lpnTimesDefaults();
+		times = projectTimes() || EC.lpnTimesDefaults();
 		panel.textContent = '';
 		EC.LPN_TIME_FIELDS.forEach(function (pair) {
 			// **DECLARED IN HERE, not shared across the seven.** Hoisted to the function above,
@@ -1875,6 +1884,16 @@
 	 * whatever solve happens next.
 	 */
 	EC.lpnTimeRenderPanel = renderPanel;
+	/**
+	 * **THE CLOCK CHANGED UNDER THE TRANSPORT WITHOUT A SETTINGS EDIT** (Task 755): a scenario
+	 * switch, or a scenario's own run time typed in the Alternatives preview. The same two things
+	 * commitField() does after an edit: a shorter run can leave the transport past its end.
+	 */
+	EC.lpnTimeTimesChanged = function () {
+		if (!host) { return; }
+		clampTime();
+		renderPanel();
+	};
 
 	/**
 	 * The whole seam. js/looped-network.js calls this once, at script scope, and everything this

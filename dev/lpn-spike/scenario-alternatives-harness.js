@@ -272,25 +272,31 @@ console.log('\n--- Basic mode ---');
 	// The Demand multiplier column: a calculation option beside the alternatives, after the categories.
 	{
 		const rowsOf = (function walkRows(el, out) { if (el.tagName === 'TR') { out.push(el); } (el.children || []).forEach(function (c) { walkRows(c, out); }); return out; })(ensure('lpn_alt_report'), []);
-		const cells = (tr) => tr.children.map((c) => (c.textContent || '').replace(/[^\x20-\x7e]/g, '').trim());
+		// A scenario's option is a box it can be typed into (Task 755), so a cell reads as its input.
+		const cellText = (c) => { const inp = (c.children || []).filter((k) => k.tagName === 'INPUT')[0];
+			return inp ? String(inp.value) : (c.textContent || ''); };
+		const cells = (tr) => tr.children.map((c) => cellText(c).replace(/[^\x20-\x7e]/g, '').trim());
 		const head = cells(rowsOf[0]);
-		ok('the last heading is Demand multiplier, after every category',
-			head[head.length - 1].indexOf(PC.bpn_demand_mult) === 0 && head.length === L.CATS.length + 2, JSON.stringify(head));
+		// Demand multiplier, then the two clock options (Task 755), after every category.
+		const DM = L.CATS.length + 1;
+		ok('the calculation options follow every category: Demand multiplier, Total run time, Hydraulic time step',
+			head[DM].indexOf(PC.bpn_demand_mult) === 0 && head[DM + 1].indexOf(PC.lpn_time_duration) === 0 &&
+			head[DM + 2].indexOf(PC.lpn_time_hyd_step) === 0 && head.length === L.CATS.length + 4, JSON.stringify(head));
 		const byName = {}; rowsOf.slice(1).forEach(function (tr) { byName[cells(tr)[0]] = cells(tr); });
-		ok('Base shows the project value (1 when it states none)', byName[PC.lpn_scenario_base][head.length - 1] === '1', JSON.stringify(byName[PC.lpn_scenario_base]));
+		ok('Base shows the project value (1 when it states none)', byName[PC.lpn_scenario_base][DM] === '1', JSON.stringify(byName[PC.lpn_scenario_base]));
 		// createScenario() seeds a new scenario with the project's value, so one that inherits is one
 		// holding none (the ready-made Flow test scenarios).
 		const inheriting = L.createScenario('Inheriting'); delete inheriting.demandMultiplier; L.openAlternativesBox();
 		const rows1 = (function walkRows(el, out) { if (el.tagName === 'TR') { out.push(el); } (el.children || []).forEach(function (c) { walkRows(c, out); }); return out; })(ensure('lpn_alt_report'), []);
 		rows1.slice(1).forEach(function (tr) { byName[cells(tr)[0]] = cells(tr); });
-		ok('a scenario holding no multiplier of its own the project shows blank', byName['Inheriting'][head.length - 1] === '', JSON.stringify(byName['Inheriting']));
+		ok('a scenario holding no multiplier of its own the project shows blank', byName['Inheriting'][DM] === '', JSON.stringify(byName['Inheriting']));
 		const ownMult = L.createScenario('Max Day'); ownMult.demandMultiplier = 2;
 		L.openAlternativesBox();
 		const rows2 = (function walkRows(el, out) { if (el.tagName === 'TR') { out.push(el); } (el.children || []).forEach(function (c) { walkRows(c, out); }); return out; })(ensure('lpn_alt_report'), []);
 		const md = rows2.map(cells).filter((r) => r[0] === 'Max Day')[0];
-		ok('a scenario with its own multiplier shows it', md && md[md.length - 1] === '2', JSON.stringify(md));
+		ok('a scenario with its own multiplier shows it', md && md[DM] === '2', JSON.stringify(md));
 		ok('the column is marked as a calculation option, apart from the categories',
-			rowsOf[0].children[head.length - 1].className.indexOf('lpn-alt-calcopt') >= 0);
+			rowsOf[0].children[DM].className.indexOf('lpn-alt-calcopt') >= 0);
 		L.deleteScenario(ownMult.id); L.deleteScenario(inheriting.id);
 	}
 	basicRow().fn();
