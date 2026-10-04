@@ -4850,8 +4850,10 @@ var EngCalcs = EngCalcs || {};
 			(pc.lpn_scenario_label || 'Scenario') + ': ' + scenarioDisplayName(scn)
 			+ ' | ' + (pc.lpn_scenario_overrides || 'No. of custom values') + ': ' + overrideCount(scn));
 		refreshScenarioTip(btn);
-		// Every override written or cleared lands here, so the Alternatives table follows it.
+		// Every override written or cleared lands here, so the Alternatives table follows it,
+		// and so does the note under Settings > Time that names the scenarios overriding it.
 		refreshAlternativesBoxIfOpen();
+		if (EngCalcs.lpnTimeRenderOverrides) { EngCalcs.lpnTimeRenderOverrides(); }
 		// The scenario name is user-typed and can be long, so the bottom band's width is not knowable
 		// in advance -- a bottom legend re-dodges around whatever it now measures.
 		placeLegends();
@@ -56097,6 +56099,18 @@ var EngCalcs = EngCalcs || {};
 		return out;
 	}
 	function effectiveTimes() { return timesForScenario(activeScenario()); }
+	// [{ id, name, key, text }] in display order, one per scenario per option it states.
+	function scenarioTimeOverrides() {
+		var out = [];
+		scenariosForDisplay().forEach(function (s) {
+			LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
+				if (scenarioTimeValue(s, key) !== undefined) {
+					out.push({ id: s.id, name: scenarioDisplayName(s), key: key, text: scenarioTimeText(s, key) });
+				}
+			});
+		});
+		return out;
+	}
 	function effectiveTimesExtended() {
 		return !!(EngCalcs.lpnTimeIsExtended && EngCalcs.lpnTimeIsExtended(effectiveTimes()));
 	}
@@ -62396,6 +62410,9 @@ var EngCalcs = EngCalcs || {};
 			// The [TIMES] block the open scenario runs under (Task 755): the project's own unless the
 			// scenario states its own total run time or hydraulic time step.
 			times: effectiveTimes,
+			// Which scenarios state their own value of each, for the note under Settings > Time.
+			timeOverrides: scenarioTimeOverrides,
+			openScenarioOptions: function () { openAlternativesBox(); },
 			apply: applySolveResult, status: setStatus, solve: scheduleSolve,
 			// **AND THE UNDEBOUNCED ONE, which is what asking for a run needs** (Task 248,
 			// 2026-08-19). A period run is provoked by a deliberate act -- the Run button, or a

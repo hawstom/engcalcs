@@ -3471,6 +3471,7 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    copying a string; these were three sizes in three places, two of them inline in JS. */
 .lpn-set-note, .lpn-rp-credit { font-size: .85em; opacity: .8; }
 .lpn-set-note { margin: 2px 0 4px; }
+.lpn-time-ovr-btn { background: none; border: 0; padding: 0; font: inherit; text-decoration: underline; cursor: pointer; }
 /* Custom properties (ROADMAP Task 636): the DESIGN under Settings > Assets, as ONE LINE PER
    PROPERTY WITH AN EXPANDER -- Tom's own third option, 2026-09-13.
 

@@ -44,6 +44,7 @@ const L = loadLoopedNetwork(
 	"\t\tcompare: runScenarioCompare, rebuildReport: rebuildScenarioCompareReport,\n" +
 	"\t\topenCmp: function () { document.getElementById('lpn_scncmp_box').style.display = 'flex'; },\n" +
 	"\t\trebuildAlt: rebuildAlternativesTable,\n" +
+	"\t\trefreshStatus: refreshScenarioStatus,\n" +
 	"\t\tsetEngine: function (e) { settings.engine = e; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -237,6 +238,30 @@ function timesLines(inp) {
 		kids(an[PC.lpn_scenario_base][aD]).every(function (k) { return k.tagName !== 'INPUT' && k._tag !== 'input'; }));
 	ok('a scenario shows its own in a box', cellText(an['Two days'][aD]) === '48:00' && cellText(an['Two days'][aH]) === '0:30');
 	ok('...and one that inherits shows a blank box', cellText(an.Steady[aH]) === '');
+
+	console.log('\n--- 8. Settings > Time states which scenarios override it ---');
+	// Two days: 48:00 and 0:30; Steady: duration 0 and no step. Rebuilt from the document each time.
+	EC.lpnTimeRenderSettings();
+	const tf = ensure('lpn_set_time_fields'), notes = [];
+	walk(tf, function (x) { if (/(^|\s)lpn-time-ovr(\s|$)/.test(x.className || (x.getAttribute && x.getAttribute('class')) || '')) { notes.push(x); } });
+	ok('a note sits under each of the two options', notes.length === 2, notes.length);
+	const shown = function (n) { return n.style.display !== 'none' ? String(n.textContent) : ''; };
+	ok('the run time note names both scenarios with their own values',
+		shown(notes[0]).indexOf(PC.lpn_time_scn_overrides) === 0 && shown(notes[0]).indexOf('Two days (48:00)') > 0 &&
+		shown(notes[0]).indexOf('Steady (0)') > 0, shown(notes[0]));
+	ok('the time step note names only the scenario that states one', shown(notes[1]).indexOf('Two days (0:30)') > 0 &&
+		shown(notes[1]).indexOf('Steady') < 0, shown(notes[1]));
+	let btns = []; walk(notes[0], function (x) { if (x.tagName === 'BUTTON' || x._tag === 'button') { btns.push(x); } });
+	ok('each name is a button', btns.map(function (b) { return b.textContent; }).sort().join() === 'Steady,Two days', btns.length);
+	type(steadyId, 'duration', '');
+	L.refreshStatus();
+	ok('clearing an override takes the scenario out of the note, without a rebuild of the fields',
+		shown(notes[0]).indexOf('Steady') < 0 && shown(notes[0]).indexOf('Two days (48:00)') > 0, shown(notes[0]));
+	type(two.id, 'duration', '');
+	type(two.id, 'hydraulicStep', '');
+	L.refreshStatus();
+	ok('with no overrides left both notes are hidden', shown(notes[0]) === '' && shown(notes[1]) === '',
+		shown(notes[0]) + ' / ' + shown(notes[1]));
 
 	console.log(fails ? '\n' + fails + ' scenario time option check(s) FAILED' : '\nScenario time option harness: all checks passed.');
 	process.exit(fails ? 1 : 0);

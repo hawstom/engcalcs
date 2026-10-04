@@ -2991,6 +2991,7 @@ $ec_lang['lpn_alt_title']='Alternatives preview';
 $ec_lang['lpn_alt_note']='Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario\'s own value, or leave it blank to use the project\'s.';
 $ec_lang['lpn_scenario_duration_tip']='This scenario\'s own total run time. Leave it blank to use the project\'s, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.';
 $ec_lang['lpn_scenario_hyd_step_tip']='This scenario\'s own hydraulic time step. Leave it blank to use the project\'s, set in Settings, Calculation, Time.';
+$ec_lang['lpn_time_scn_overrides']='Scenario overrides:';
 $ec_lang['lpn_alt_cat_physical']='Physical';
 $ec_lang['lpn_alt_cat_demand']='Demand';
 $ec_lang['lpn_alt_cat_topology']='Asset activation';

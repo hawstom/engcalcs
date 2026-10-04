@@ -419,6 +419,7 @@
 			speedTip: pageConfig.lpn_time_speed_tip,
 			duration: pageConfig.lpn_time_duration || 'Total run time',
 			hydraulicStep: pageConfig.lpn_time_hyd_step || 'Hydraulic time step',
+			scnOverrides: pageConfig.lpn_time_scn_overrides || 'Scenario overrides:',
 			patternStep: pageConfig.lpn_time_pattern_step || 'Pattern time step',
 			patternStart: pageConfig.lpn_time_pattern_start || 'Pattern start time',
 			reportStep: pageConfig.lpn_time_report_step || 'Report time step',
@@ -1281,11 +1282,13 @@
 	 * Called by js/looped-network.js's rebuildSettingsBox(). Silent when the host section is not on
 	 * the page, so a page without the Settings box still gets the transport.
 	 */
+	var ovrNotes = {};
 	EC.lpnTimeRenderSettings = function () {
 		var panel = document.getElementById('lpn_set_time_fields'), S = strings(), times;
 		if (!panel || !host) { return; }
 		times = projectTimes() || EC.lpnTimesDefaults();
 		panel.textContent = '';
+		ovrNotes = {};
 		EC.LPN_TIME_FIELDS.forEach(function (pair) {
 			// **DECLARED IN HERE, not shared across the seven.** Hoisted to the function above,
 			// every listener would close over the LAST input built, so editing the duration would
@@ -1310,8 +1313,42 @@
 			row.appendChild(label);
 			row.appendChild(input);
 			panel.appendChild(row);
+			// **A QUIET LINE UNDER THE TWO A SCENARIO MAY OVERRIDE** (Task 755; Tom: "Settings > Time.
+			// I think it would be nice for it to state the overrides."). Empty, and so invisible,
+			// until a scenario states its own.
+			if (pair[0] === 'duration' || pair[0] === 'hydraulicStep') {
+				ovrNotes[pair[0]] = el('div', { class: 'lpn-set-note lpn-time-ovr' });
+				panel.appendChild(ovrNotes[pair[0]]);
+			}
 		});
+		EC.lpnTimeRenderOverrides();
 		if (EC.initTips) { EC.initTips(panel); }
+	};
+	/**
+	 * **WHICH SCENARIOS OVERRIDE THIS PROJECT SETTING, under the setting.** Redrawn on its own, never
+	 * by rebuilding the seven inputs, because it follows every scenario edit and a rebuild would take
+	 * the focus from a box being typed in. Each scenario name is a button that opens the Alternatives
+	 * preview, where its own value is edited. The names are the visitor's own text and are set as
+	 * text, never as markup.
+	 */
+	EC.lpnTimeRenderOverrides = function () {
+		var S = strings(), list;
+		if (!host || typeof host.timeOverrides !== 'function') { return; }
+		list = host.timeOverrides() || [];
+		Object.keys(ovrNotes).forEach(function (key) {
+			var note = ovrNotes[key], mine = list.filter(function (o) { return o.key === key; });
+			note.textContent = '';
+			note.style.display = mine.length ? '' : 'none';
+			if (!mine.length) { return; }
+			note.appendChild(document.createTextNode(S.scnOverrides + ' '));
+			mine.forEach(function (o, i) {
+				var b = el('button', { type: 'button', class: 'lpn-time-ovr-btn' }, o.name);
+				b.addEventListener('click', function () { if (host.openScenarioOptions) { host.openScenarioOptions(o.id); } });
+				if (i) { note.appendChild(document.createTextNode(', ')); }
+				note.appendChild(b);
+				note.appendChild(document.createTextNode(' (' + o.text + ')'));
+			});
+		});
 	};
 
 	// ================================================================================================
