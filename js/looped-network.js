@@ -60172,6 +60172,8 @@ var EngCalcs = EngCalcs || {};
 		var out = { minPressure: undefined, minAt: '', maxVelocity: undefined, maxAt: '' };
 		model.nodes.forEach(function (n) {
 			var p = result.pressures ? result.pressures[n.id] : undefined;
+			// A reservoir or tank is a fixed head, not a place with a pressure to judge.
+			if (EngCalcs.lpnIsFixedHead(n)) { return; }
 			if (typeof p !== 'number' || !isFinite(p)) { return; }
 			if (out.minPressure === undefined || p < out.minPressure) { out.minPressure = p; out.minAt = n.id; }
 		});
