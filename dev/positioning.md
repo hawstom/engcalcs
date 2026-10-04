@@ -309,9 +309,13 @@ words, and they overturn nothing above except which EPANET-bearing name he would
   than promised.
 - **AND THE EPANET WORD EARNS ITS PLACE ON REACH, NOT ON BORROWED CREDIT** -- it is how the
   engineers who never bought WaterCAD know what this is.
-- **NOTHING CHANGES BEFORE HIS EWB MEETING (17 September).** His instruction: *"We will worry about
-  this after my EWB meeting."* LibreWaterNet.org remains the front door and the app's own name; do
-  not put EPANET++ on a page, in a string, or in a commit message until he reopens it.
+- **SUPERSEDED: EPANET++ HAS SHIPPED AND IS NOW THE MAP APPLICATION'S CANONICAL (2026-10-04).**
+  The earlier hold ("after my EWB meeting") ended with 196857a8, which put EPANET++ on the app. On
+  2026-10-04 Tom said: *"LWN: I guess the momentum is toward EPANET++. Let's make that canonical. I
+  have a sudden peace and modesty overcome me about evangelism. I don't mind staying under the
+  radar for a few months."* Every host serving the map nominates epanet-plus-plus.org; the suite's
+  Hydraulics menu and related-calcs lines say EPANET++; librewaternet.org keeps LibreWaterNet.org as
+  its own About name. **No outreach or promotion push for the next few months, on his word.**
 
 ### The gate: launch waits on Task 248
 

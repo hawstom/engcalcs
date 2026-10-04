@@ -48,14 +48,16 @@ function hc_render($page, $host, $appEnv = '') {
 
 $cases = array(
     // host as the client sent it        => expected origin,                  expected brand
-    'librewaternet.org'                   => array('https://librewaternet.org',    'LibreWaterNet.org'),
+    // Every host's canonical is epanet-plus-plus.org since 2026-10-04 ("Let's make that
+    // canonical"); the brand NAME stays per host.
+    'librewaternet.org'                   => array('https://epanet-plus-plus.org', 'LibreWaterNet.org'),
     'epanet-plus-plus.org'                => array('https://epanet-plus-plus.org', 'EPANET++'),
     'WWW.Epanet-Plus-Plus.org:443'        => array('https://epanet-plus-plus.org', 'EPANET++'),
     // Canonical stays librewaternet.org on a host with no front door of its own, but the NAME is
     // EPANET++ there (Tom, 2026-10-04): LibreWaterNet.org is librewaternet.org's name alone.
-    'evil.example'                        => array('https://librewaternet.org',    'EPANET++'),
-    'epanet-plus-plus.org.evil.example'   => array('https://librewaternet.org',    'EPANET++'),
-    'hawsedc.com'                         => array('https://librewaternet.org',    'EPANET++'),
+    'evil.example'                        => array('https://epanet-plus-plus.org', 'EPANET++'),
+    'epanet-plus-plus.org.evil.example'   => array('https://epanet-plus-plus.org', 'EPANET++'),
+    'hawsedc.com'                         => array('https://epanet-plus-plus.org', 'EPANET++'),
 );
 
 foreach ($cases as $host => $want) {
@@ -81,6 +83,7 @@ foreach ($cases as $host => $want) {
 
     $about = preg_match('/class="lpn-about-name">.*?<a href="([^"]*)"[^>]*>([^<]*)<\/a>/s', $html, $m) ? $m : array('', '', '');
     hc_ok(html_entity_decode($about[2]) === $brand, "$tag: About box name", "got '{$about[2]}'");
+    // No visitor-facing LibreWaterNet name outside librewaternet.org itself.
     $brandHome = $brand === 'EPANET++' ? 'https://epanet-plus-plus.org/' : 'https://librewaternet.org/';
     hc_ok($about[1] === $brandHome, "$tag: About box name links the brand's own site", "got '{$about[1]}'");
     $site = preg_match('/EngCalcs\.lwnSiteUrl = ("[^"]*")/', $html, $m) ? json_decode($m[1]) : '';
@@ -108,7 +111,7 @@ foreach ($cases as $host => $want) {
     // visitor-facing link anywhere in the page points at librewaternet.org at all -- not just the
     // one row this defect was found on. (`EngCalcs.lwnSiteUrl`'s own JS variable NAME is exempt: it
     // is source code, not a link a visitor can click, and it is asserted by value two lines above.)
-    if ($brand === 'EPANET++' && $origin === 'https://epanet-plus-plus.org') {
+    if ($brand === 'EPANET++') {
         $withoutVarName = str_replace('EngCalcs.lwnSiteUrl', '', $html);
         hc_ok(strpos($withoutVarName, 'librewaternet.org') === false,
             "$tag: no visitor-facing link anywhere on the page names librewaternet.org");
@@ -150,8 +153,8 @@ if (strlen($prodHtml) < 10000) {
         . strlen($prodHtml) . ' bytes)');
 } else {
     $canon = preg_match('/<link rel="canonical" href="([^"]*)"/', $prodHtml, $m) ? $m[1] : '';
-    hc_ok($canon === 'https://librewaternet.org/app/?lang=en',
-        'epanet-plus-plus.localhost (no development): falls through to librewaternet.org', "got '$canon'");
+    hc_ok($canon === 'https://epanet-plus-plus.org/app/?lang=en',
+        'epanet-plus-plus.localhost (no development): falls through to the default canonical', "got '$canon'");
     $about = preg_match('/class="lpn-about-name">.*?<a href="([^"]*)"[^>]*>([^<]*)<\/a>/s', $prodHtml, $m) ? $m : array('', '', '');
     hc_ok(html_entity_decode($about[2]) === 'EPANET++',
         'epanet-plus-plus.localhost (no development): an undeclared host still wears EPANET++', "got '{$about[2]}'");
@@ -166,6 +169,13 @@ foreach (array('hawsedc.com', 'librewaternet.org', 'epanet-plus-plus.org') as $m
     hc_ok(strpos($calcHtml, 'dropdown-item" href="https://librewaternet.org/app/"') === false,
         "Hydraulics menu on $mh: no LibreWaterNet.org menu entry");
 }
+
+// 3e. The related-calcs line on a calculator says EPANET++ and links the app, and never names
+// LibreWaterNet (Tom, 2026-10-04: "Do both").
+$rc = hc_render('Hazen-Williams.php', 'hawsedc.com');
+hc_ok(preg_match('~<a href="https://epanet-plus-plus\.org/app/">EPANET\+\+</a>~', $rc) === 1,
+    'Hazen-Williams.php related calcs: EPANET++ linking epanet-plus-plus.org/app/');
+hc_ok(strpos($rc, 'LibreWaterNet') === false, 'Hazen-Williams.php: no LibreWaterNet name on the calculator page');
 
 // 4. A calculator on the new host is still hawsedc.com's.
 $calc = hc_render('Manning-Pipe-Flow.php', 'epanet-plus-plus.org');
@@ -184,13 +194,13 @@ hc_ok(ecCanonicalRedirectTarget($s, $s, true, 'https://hawsedc.com', 'librewater
 hc_ok(ecCanonicalRedirectTarget($s, $s, false, 'https://hawsedc.com', '') === null,
     'an undeclared host is never moved');
 // And the lookup itself refuses a host key it was not given by the whitelist.
-hc_ok(ecCanonicalOrigin($s, 'https://hawsedc.com', 'evil.example') === 'https://librewaternet.org',
-    'ecCanonicalOrigin() with an unknown host answers librewaternet.org');
+hc_ok(ecCanonicalOrigin($s, 'https://hawsedc.com', 'evil.example') === 'https://epanet-plus-plus.org',
+    'ecCanonicalOrigin() with an unknown host answers epanet-plus-plus.org');
 
 if ($fail) {
     echo "\nFAIL: $fail of " . ($fail + $pass) . " host-canonical assertions\n";
     exit(1);
 }
 echo "PASS: $pass assertions -- the map application nominates and names the declared front door for "
-   . "each host, and a spoofed host gets librewaternet.org.\n";
+   . "each host, and every host nominates epanet-plus-plus.org.\n";
 exit(0);
