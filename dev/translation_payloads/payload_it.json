@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 2336,
-        "delta_key_count": 55,
+        "expected_key_count": 2344,
+        "delta_key_count": 65,
         "exempt_key_count": 43,
         "exempt_keys": [
             "calc_units_us",
@@ -722,10 +722,17 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_pane_manage_cols_width": "Width (em)",
+        "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
         "lpn_dock_left": "Dock at the left of the map",
         "lpn_dock_right": "Dock at the right of the map",
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
+        "lpn_pane_filter_sel_note": "Selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_and": "Filtered by {q} and selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
+        "lpn_pane_sel_only": "Selection only",
+        "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
         "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
@@ -733,6 +740,9 @@
         "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
         "lpn_report_pump_head": "Pump head",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_saved_project": "Saved with the project",
+        "lpn_saved_browser": "Saved in this browser",
+        "lpn_saved_session": "Not saved",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
         "lpn_ds_title": "Demand scaling",
@@ -779,10 +789,17 @@
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "keys": {
+        "lpn_pane_manage_cols_width": "Width (em)",
+        "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
         "lpn_dock_left": "Dock at the left of the map",
         "lpn_dock_right": "Dock at the right of the map",
         "lpn_dock_float": "Float",
         "lpn_dock_autohide": "Auto-hide",
+        "lpn_pane_filter_sel_note": "Selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_and": "Filtered by {q} and selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
+        "lpn_pane_sel_only": "Selection only",
+        "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
         "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
@@ -790,6 +807,9 @@
         "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
         "lpn_report_pump_head": "Pump head",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_saved_project": "Saved with the project",
+        "lpn_saved_browser": "Saved in this browser",
+        "lpn_saved_session": "Not saved",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
         "lpn_ds_title": "Demand scaling",
@@ -836,6 +856,38 @@
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "key_context": {
+        "lpn_pane_manage_cols_width": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_manage_cols_bottom",
+                    "value": "Sposta alla fine",
+                    "english": "Move to end"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_colmenu_tip",
+                    "value": "Nascondi o gestisci le colonne",
+                    "english": "Hide or manage columns"
+                }
+            }
+        },
+        "lpn_pane_width_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_manage_cols_bottom",
+                    "value": "Sposta alla fine",
+                    "english": "Move to end"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_colmenu_tip",
+                    "value": "Nascondi o gestisci le colonne",
+                    "english": "Hide or manage columns"
+                }
+            }
+        },
         "lpn_dock_left": {
             "reason": "missing",
             "current_value": null,
@@ -897,6 +949,86 @@
                     "key": "lpn_popup_boxtitle",
                     "value": "Proprietà",
                     "english": "Properties"
+                }
+            }
+        },
+        "lpn_pane_filter_sel_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Nulla in questa tabella corrisponde al filtro.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Zoom e seleziona",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_filter_sel_and": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Nulla in questa tabella corrisponde al filtro.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Zoom e seleziona",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_filter_sel_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Nulla in questa tabella corrisponde al filtro.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Zoom e seleziona",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_sel_only": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Nulla in questa tabella corrisponde al filtro.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Zoom e seleziona",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_sel_only_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Nulla in questa tabella corrisponde al filtro.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Zoom e seleziona",
+                    "english": "Zoom & select"
                 }
             }
         },
@@ -1009,6 +1141,54 @@
                     "key": "lpn_sysflow_produced",
                     "value": "Prodotta",
                     "english": "Produced"
+                }
+            }
+        },
+        "lpn_saved_project": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_page",
+                    "value": "Pagina",
+                    "english": "Page"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "Idraulica",
+                    "english": "Hydraulics"
+                }
+            }
+        },
+        "lpn_saved_browser": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_page",
+                    "value": "Pagina",
+                    "english": "Page"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "Idraulica",
+                    "english": "Hydraulics"
+                }
+            }
+        },
+        "lpn_saved_session": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_page",
+                    "value": "Pagina",
+                    "english": "Page"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_hydraulics",
+                    "value": "Idraulica",
+                    "english": "Hydraulics"
                 }
             }
         },
