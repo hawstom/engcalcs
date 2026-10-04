@@ -510,6 +510,15 @@
 			// which is worse than the dropping this task exists to stop. The keyword is tested, so
 			// `Demand Model` now falls through to the carry at the end of this chain.
 			else if (key === 'DEMAND' && /^MULT/.test((r[1] || '').toUpperCase()) && r[2]) { demandMultiplier = num(r[2], 1); hydraulics.demandMultiplier = demandMultiplier; }
+			// **PRESSURE-DRIVEN ANALYSIS IS A SETTING, NOT A CARRY** (Task 762). `Demand Model`
+			// and its three companions are read into `hydraulics`, where Settings shows them and
+			// the EPANET engine is handed them. The model's token is kept as written; each number
+			// keeps its own text (`Minimum Pressure 0.0` must not come back as `0`). A line that
+			// lacks its value still falls through to the carry at the end of this chain.
+			else if (key === 'DEMAND' && /^MODEL$/i.test(r[1] || '') && /^(DDA|PDA)$/i.test(r[2] || '')) { hydraulics.demandModel = r[2].toUpperCase(); }
+			else if (key === 'MINIMUM' && /^PRESSURE$/i.test(r[1] || '') && r[2] && isFinite(+r[2])) { hydraulics.minPressure = mergeTok(hydraulics, 'minPressure', r[2], +r[2]); }
+			else if (key === 'REQUIRED' && /^PRESSURE$/i.test(r[1] || '') && r[2] && isFinite(+r[2])) { hydraulics.reqPressure = mergeTok(hydraulics, 'reqPressure', r[2], +r[2]); }
+			else if (key === 'PRESSURE' && /^EXPONENT$/i.test(r[1] || '') && r[2] && isFinite(+r[2])) { hydraulics.pressureExponent = mergeTok(hydraulics, 'pressureExponent', r[2], +r[2]); }
 			// **THE REST OF EPANET'S HYDRAULIC OPTIONS** (Task 553, Tom's own list). Every one was
 			// read past in silence until now -- not even reported as a difference -- so a file
 			// stating `Viscosity 1.3` came back out of the exporter stating nothing, which is the
@@ -583,8 +592,7 @@
 			// exactly the rule INP_SECTIONS_READ states for a section nobody here has heard of.
 			//
 			// What it catches today, all of them EPANET 2.2 options this reader never had a branch
-			// for: `Demand Model DDA|PDA` and its three companions `Minimum Pressure`,
-			// `Required Pressure` and `Pressure Exponent`; `Pressure psi|kPa|m`, which names the
+			// for: `Pressure psi|kPa|m`, which names the
 			// pressure unit; and the obsolete `Segments` and `Verify` EPANET itself now ignores.
 			// What it catches tomorrow is whatever EPANET adds next, with no edit here.
 			//
@@ -592,10 +600,8 @@
 			// nothing on this page solves with any of these, so the file's own characters are the
 			// only form that can round-trip (`Minimum Pressure 0.0` parsed and re-written is `0`).
 			//
-			// **CARRIED, AND NOT YET REPORTED, WHICH IS A REAL GAP AND NOT A DECISION.** A file
-			// asking for pressure-driven analysis is solved here demand-driven, and the user should
-			// be told. The sentence belongs with the others in `js/looped-network.js`'s
-			// `inpDropText()`, and writing one there is the follow-up this note owes.
+			// (The `Demand Model` quartet is read above since Task 762 and no longer lands here; this
+			// paragraph's "demand-driven" caveat is retired with it.)
 			else if (r.length) { fileOptions.other = (fileOptions.other || []).concat([r.slice()]); }
 		}
 		// **CARRYING A THING AND TELLING THE USER ABOUT IT ARE TWO JOBS** (Task 248.03's lesson,
@@ -619,22 +625,10 @@
 		if (namedFiles) {
 			drop('file-options', [], namedFiles);
 		}
-		// **AND THE CARRIED OPTIONS GET THEIR SENTENCE AT LAST, WHICH THE CARRY OWED.** Carrying a
-		// line and telling the user about it are two jobs, and this one has a case where the second
-		// job matters more than anywhere else in this section: `Demand Model PDA` asks for EPANET
-		// 2.2's PRESSURE-DRIVEN analysis, and this page solves demand-driven. That is a difference
-		// in the ANSWERS, not in what the file holds, so it gets a sentence of its own rather than
-		// joining the kept-but-unused list. `DDA` is EPANET's own default and is what this page
-		// does, so a file stating it has nothing to be told.
-		var otherOpts = fileOptions.other || [], demandModel = null, otherCount = 0;
-		otherOpts.forEach(function (r) {
-			if (/^DEMAND$/i.test(r[0] || '') && /^MODEL$/i.test(r[1] || '')) {
-				demandModel = (r[2] || '').toUpperCase();
-				return;
-			}
-			otherCount++;
-		});
-		if (demandModel && demandModel !== 'DDA') { drop('demand-model', [], demandModel); }
+		// **THE DEMAND MODEL NEEDS NO SENTENCE ANY MORE** (Task 762): `Demand Model PDA` is read into
+		// Settings and solved by the EPANET engine, so the file and the page agree. Only the lines
+		// this reader still has no branch for are counted.
+		var otherCount = (fileOptions.other || []).length;
 		if (otherCount) { drop('other-options', [], otherCount); }
 
 		var fu = FLOW_UNITS[flowKey];
@@ -2344,7 +2338,7 @@
 	// the export writes the scenario the user is looking at, which is already what `opts.effective`
 	// does to every element property. Undefined leaves the document's own key exactly as it is,
 	// present or absent, so sparse in stays sparse out.
-	function hydraulicOptionRows(hyd, row, scenarioDM) {
+	function hydraulicOptionRows(hyd, row, scenarioDM, pressNum) {
 		var h = hyd || {}, out = '';
 		if (scenarioDM !== undefined && scenarioDM !== null) {
 			h = Object.assign({}, h, { demandMultiplier: scenarioDM });
@@ -2352,6 +2346,17 @@
 		LPN_OPT_LINES.forEach(function (pair) {
 			if (h[pair[0]] === undefined || h[pair[0]] === null) { return; }
 			out += row([pair[1], String(h[pair[0]])]) + '\n';
+		});
+		// **PRESSURE-DRIVEN ANALYSIS** (Task 762), EPANET's own order, sparse like every line above.
+		// The pressures are stored in the project's pressure unit; `pressNum` writes them in the
+		// file's, and hands the user's own characters back while nothing has changed.
+		if (h.demandModel) { out += row(['Demand', 'Model', String(h.demandModel)]) + '\n'; }
+		[['minPressure', 'Minimum', true], ['reqPressure', 'Required', true],
+			['pressureExponent', 'Pressure', false]].forEach(function (t) {
+			var v = h[t[0]];
+			if (typeof v !== 'number' || !isFinite(v)) { return; }
+			out += row([t[1], t[0] === 'pressureExponent' ? 'Exponent' : 'Pressure',
+				t[2] && pressNum ? pressNum(h, t[0], v) : EngCalcs.lpnNumText(h, t[0], v)]) + '\n';
 		});
 		if (h.unbalanced) {
 			out += row(['Unbalanced', h.unbalanced === 'continue' ? 'Continue' : 'Stop']
@@ -3232,7 +3237,8 @@
 			// list is sparse -- see the importer's own note -- so a key absent here means the file
 			// did not state it and neither do we. That is what keeps a round trip byte-identical:
 			// EPANET's defaults written out explicitly would be eleven lines the source never had.
-			hydraulicOptionRows(settings.hydraulics, row, opts.demandMultiplier) +
+			hydraulicOptionRows(settings.hydraulics, row, opts.demandMultiplier,
+				function (rec, key, v) { return n(cPress, rec, key, v); }) +
 			// **THE WATER-QUALITY OPTIONS GO BACK OUT AS THE TEXT THEY CAME IN AS**, last, which is
 			// where EPANET's own writer puts them. Nothing here computes with them, so the file's
 			// own characters are the only honest form -- see the importer's note. Sparse in, sparse

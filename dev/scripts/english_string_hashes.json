@@ -3680,7 +3680,6 @@
         "lpn_inp_drop_curve_missing": "53bdcd63bbce2a7ae46b7977cd78b749a3dd19f5",
         "lpn_inp_drop_cv": "df7f7635a0fc09f8d0a6124430366e1a19429062",
         "lpn_inp_drop_dangling": "0ad893dffef80c6ad8297058a6c3c5342495ea43",
-        "lpn_inp_drop_demand_model": "ac58ebeafc5644aa913210f0e6a8f2b5f9f0c62b",
         "lpn_inp_drop_demand_pattern": "6751285bc10e6663caac36112df5acdc79637cb8",
         "lpn_inp_drop_demands": "cf2f85eab05344924f34a11ae91613cb99403657",
         "lpn_inp_drop_emitters": "4fb1069313e45975cdd48fc53da979eef670fdd2",
@@ -8962,10 +8961,6 @@
         },
         "lpn_inp_drop_dangling": {
             "words": 16,
-            "ends_sentence": true
-        },
-        "lpn_inp_drop_demand_model": {
-            "words": 56,
             "ends_sentence": true
         },
         "lpn_inp_drop_demand_pattern": {

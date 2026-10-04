@@ -160,7 +160,7 @@
 			linkRates: f.linkRates,
 			// Carried but NOT part of the steady-state contract: only this file's own readouts look
 			// at them, and only a run can produce them.
-			demands: f.demands, levels: f.levels, statuses: f.statuses, t: f.t
+			demands: f.demands, demandDeficits: f.demandDeficits, levels: f.levels, statuses: f.statuses, t: f.t
 		};
 	};
 
