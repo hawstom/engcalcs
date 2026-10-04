@@ -131,7 +131,7 @@ function dsHost(which) {
 	ok('...and the box does not say it', out.indexOf(PC.lpn_ds_below_zero.split('{pressure}')[0]) < 0);
 	const probe = s.failing || s.holding;
 	ok('the lowest junction it names is a selected one', !!probe && !!probe.lowest && sel.indexOf(probe.lowest.id) >= 0, probe && JSON.stringify(probe.lowest));
-	ok('6. the answer names 7:00', out.indexOf(PC.lpn_ds_at_time.replace('{time}', EC.lpnTimeElapsedText(T))) >= 0);
+	ok('6. the answer names 7:00', out.indexOf(PC.lpn_analyze_at_time.replace('{time}', EC.lpnTimeElapsedText(T))) >= 0);
 	ok('it says the selected junctions were scaled and checked', out.indexOf(PC.lpn_ds_scaled_selected.replace('{n}', '3')) >= 0);
 
 	console.log('\n--- 3. The answer, by solves of its own ---');

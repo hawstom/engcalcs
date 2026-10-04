@@ -3732,3 +3732,34 @@ TRAP for method: Session Save as needs answerTrainingPanel() then a second queue
 - OBSERVED: chart text 10 px at desktop, 7 px at 390 px (fixed viewBox), where the house Time series chart stays 10 px.
 - OBSERVED: harness mutation-tested on a copy: signed mean error, nearest-step, correlation over points, continuation ignored, a localStorage write -- each fails it.
 - Method: Net3.lwn duration -> 0 with sed gives a steady copy; DOM.setFileInputFiles drives the real FileReader path.
+
+## 2026-10-04 Task 757 feat/table-selection (HEAD d2276943), pre-review
+OBSERVED (real headless Chrome via browser-drive.js, Net3, php -S :8731 from worktree parent):
+- Steps 1,2,3,4,5,6,7,9,10,11 pass. Ctrl+Shift+L is not intercepted by Chrome; handler fires from a focused cell.
+- Step 8: drawn junction joins ("3 of 93") but only after a tab bounce; an UNFILTERED table also does not refresh on draw (92 -> 92), so not a regression.
+- Phone 390x844: button on the Print row, hit-testable, strip height 130 with or without it (no extra wrap).
+- Not exercised in real Chrome: paste-as-new (clipboard), project-switch clearing, mutation test of builder harness.
+- Trap for next time: cookie banner covers the pane at 900px tall; click "Refuse all" first. Toolbar buttons carry aria-label, not title.
+
+
+## 2026-10-03 — feat/dialog-audit (Task 710)
+
+- OBSERVED (real Chrome, 1400 and 390 wide): scale-by-picking shows its instruction as a notice that is gone at 8 s. What remains is the generic bar "Adjusting the background image. [Cancel]"; the mode hint underneath is the SELECT-mode hint (not a picking hint), and at 390 wide the hint is display:none. The builder's "the picking mode itself still shows its own hint" is false. The second click still ends in a native prompt, so scaling can be finished, but a user who pauses >8 s has no instruction and no count of clicks made.
+- OBSERVED: with the Libraries box open at 390 wide, a refused import's warning sits at (35,120) and elementFromPoint there is the library box, so it is hidden behind it. At 1400 wide the box is at left 692 and does not cover it. Same for Library "delete in use" refusals (the box is open by definition).
+- OBSERVED: lpn_storage_unreadable was a modal because the status line is wiped by the first solve (code comment); now an 8 s notice. Log keeps it, but the user must know to open the log.
+- OBSERVED: dedupe-on-text only: the newer severity replaces the older row; no hidden second occurrence, a notice/warning pair with identical text collapses to one row.
+- Builder's two harnesses pass. Method note: a notice is invisible-by-position whenever a box covers the map's top-left; check elementFromPoint, not display.
+
+## 2026-10-04 feat/scenario-option (Task 755), SHA 5ca59b4f
+OBSERVED (real headless Chrome, Net1): builder's steps 1-10 all hold. Slider 25 stops on Base, 49 on a 48:00 scenario, frames match; export [TIMES] 48:00 vs 24:00; Ctrl+Z/redo, abc/-1 revert, 0 steady (slider off), save/reopen, narrow window scrolls (tablewrap).
+OBSERVED: master compare of Net1 reads 2.57 ft/s; branch reads 2.76 at 11, 16:00 (whole-run extremes), with an on-screen note.
+OBSERVED: Settings > Time shows 24:00 while a 48:00 scenario runs, no note. Editing it there changes nothing for that scenario.
+OBSERVED: mutations (docTimes reads doc.times; export ignores opts.times) fail the harness.
+TRAP for probes: the page adopts orphan localStorage projects in nondeterministic order; clear all lpn_project_* keys first. Menu text must be matched exactly ("Base" also matches "Apply Base values").
+NOT CHECKED: pixels of the Time Series graph axis after switching back.
+
+# Perry, Task 739 feat/setting-scope 8e493fe5 (2026-10-04)
+OBSERVED: builder harness all ok. My own probe (probe.js, scratchpad) drove ~140 random Settings controls (3 seeds, incl. non-first rows the harness skips) and diffed lpn_* localStorage: 0 genuine mismatches (apparent ones were units dialog needing OK, out-of-range typed value, my own stale-index bug).
+OBSERVED: divider tip absent at 0.7 s, present at 1.3 s; no native title. Search "browser" -> Page + Hydraulics only.
+OBSERVED: Page marker "Saved in this browser" sits over Restore defaults / Start fresh buttons, which reset project settings.
+OBSERVED: no colour inputs present on Net3 default, not driven.
