@@ -2591,6 +2591,7 @@
 		"autoRun": true,
 		"nodeElevSource": "value",
 		"defaults": {
+			"nodeElevSource": "dem",
 			"nodeElev": 0,
 			"demand": 0,
 			"diameter": 4,

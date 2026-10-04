@@ -21027,7 +21027,7 @@ var EngCalcs = EngCalcs || {};
 		// rather than being a permanent row: a source select over Diameter would be nonsense.
 		if (replaceState.prop === 'elev' && projectLocatable() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
 			findSelect(box, pc.lpn_replace_source || 'New value source',
-				[['value', pc.lpn_settings_elev_source_typed || 'The elevation typed above'],
+				[['value', pc.lpn_settings_elev_source_typed || 'Above'],
 					['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']],
 				replaceState.source, function (v) {
 					replaceState.source = (v === 'dem') ? 'dem' : 'value';
@@ -30885,6 +30885,9 @@ var EngCalcs = EngCalcs || {};
 	// (`EC_MAPBOX_TOKEN`). A project switched from lat/lon to a grid, or opened on a deployment with
 	// no token, silently goes back to the typed default -- which is the correct answer and not a
 	// failure, so it says nothing.
+	// What a NEW project's Elevation source is: Mapbox DEM where the project can read one (geographic,
+	// or projected with a basemap), the typed number otherwise. Used by newProject() and Restore defaults.
+	function newProjectElevSource() { return projectLocatable() ? 'dem' : 'value'; }
 	function elevSourceIsDem() {
 		return (settings.defaults.nodeElevSource || 'value') === 'dem' &&
 			projectLocatable() && !!mapboxToken() && !!EngCalcs.lpnTerrainFillFor;
@@ -33841,6 +33844,14 @@ var EngCalcs = EngCalcs || {};
 		// file ever written gains a word and nothing migrates.
 		if (coords !== LPN_COORDS_GEO && crs) { assignProjectCrs(crs); }
 		settings = inheritedSettings;
+		// **A NEW GEOREFERENCED PROJECT READS ELEVATIONS FROM MAPBOX DEM** (Tom, 2026-10-04: *"Mapbox
+		// needs to be the default for all new projects and for our georeferenced examples. ... Users
+		// can see the disclosure and answer it."*). Decided here, after `project` is set, because
+		// the answer is the project's own: a local (grid) project cannot read a DEM, so it gets the
+		// typed elevation and never inherits 'dem' from the project it was made beside. No request
+		// is sent by this: the first read asks the ec_terrain question, and declining leaves the
+		// elevations alone.
+		settings.defaults.nodeElevSource = newProjectElevSource();
 		labelSettings = inheritedLabels;
 		// AFTER `settings`, because the flow tests seed the new project's own demand multiplier.
 		// The ready-made list, never the outgoing project's: see LPN_PRESET_SCENARIOS (Task 721).
@@ -46185,7 +46196,7 @@ var EngCalcs = EngCalcs || {};
 		// runs on a project switch, so the row appears and disappears with the project it is about.
 		if (projectLocatable() && mapboxToken() && EngCalcs.lpnTerrainFillFor) {
 			var elevSrc = document.createElement('select');
-			[['value', pc.lpn_settings_elev_source_typed || 'The elevation typed above'],
+			[['value', pc.lpn_settings_elev_source_typed || 'Above'],
 				['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']].forEach(function (o) {
 				var opt = document.createElement('option');
 				opt.value = o[0]; opt.textContent = o[1];
@@ -46960,6 +46971,8 @@ var EngCalcs = EngCalcs || {};
 			// defaultSettings() leaves settings.defaults full of nulls on purpose -- refill them
 			// here, or every default input would come back blank instead of at its starting value.
 			seedDefaultInputs();
+			// Same answer newProject() gives: Mapbox DEM where the project can use one.
+			settings.defaults.nodeElevSource = newProjectElevSource();
 			labelSettings = defaultLabelSettings();
 			roughnessDecimalsAuto = 0;
 			// No applyMapHeight() -- the canvas height stopped being a setting when the Map height
