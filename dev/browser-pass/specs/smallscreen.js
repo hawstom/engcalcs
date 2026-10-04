@@ -36,22 +36,27 @@ const PHONE = { width: 360, height: 740 };
 // Every word of every element the selector reaches, and whether the browser split any of them.
 // `el.textContent` is not enough: the range has to be over the TEXT NODE, because a heading may
 // carry a sort arrow or an icon beside its words.
-async function words(page, sel) {
-	return page.evaluate((s) => [...document.querySelectorAll(s)].map((el) => {
+async function words(page, sel, byPiece) {
+	return page.evaluate(([s, byPiece]) => [...document.querySelectorAll(s)].map((el) => {
 		const node = [...el.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
 		if (!node) { return null; }
 		const text = node.textContent, broken = [];
-		const re = /\S+/g;
+		const re = byPiece ? /[^\s\u00ad]+/g : /\S+/g;
 		let m;
 		while ((m = re.exec(text))) {
 			const r = document.createRange();
 			r.setStart(node, m.index);
 			r.setEnd(node, m.index + m[0].length);
-			if (new Set([...r.getClientRects()].map(x => Math.round(x.top))).size > 1) { broken.push(m[0]); }
+			// Beginning a range just past a soft hyphen also catches the hyphen glyph the previous line
+			// ended on, a rect under 6px wide, which is not this piece's ink; dropped when there is
+			// other ink to judge by.
+			let rects = [...r.getClientRects()].filter(x => x.width > 0.5);
+			if (byPiece && rects.length > 1) { rects = rects.filter(x => x.width >= 6); }
+			if (new Set(rects.map(x => Math.round(x.top))).size > 1) { broken.push(m[0]); }
 		}
 		const box = el.getBoundingClientRect();
 		return { text: text.trim(), broken: broken, top: Math.round(box.top), width: +box.width.toFixed(1) };
-	}).filter(Boolean), sel);
+	}).filter(Boolean), [sel, !!byPiece]);
 }
 
 exports.run = async function ({ browser, report }) {
@@ -113,6 +118,8 @@ exports.run = async function ({ browser, report }) {
 				// The strip carries its own overflow. If it did not, it would widen the box instead.
 				indexScrolls: i.scrollWidth > i.clientWidth + 1,
 				contentSideways: c.scrollWidth > c.clientWidth + 1,
+				wide: [...c.querySelectorAll('*')].filter(e => e.getBoundingClientRect().right > c.getBoundingClientRect().right + 1 && e.offsetParent)
+					.slice(0, 4).map(e => e.tagName + '#' + e.id + '.' + String(e.className).slice(0, 30) + ' ' + Math.round(e.getBoundingClientRect().right - c.getBoundingClientRect().right) + 'px'),
 				docSideways: document.documentElement.scrollWidth > window.innerWidth + 1
 			};
 		});
@@ -126,8 +133,12 @@ exports.run = async function ({ browser, report }) {
 		// whose credit lines end in a bare URL, and it is given `overflow-wrap` in the phone block.
 		report.note('the content pane is ' + pane.content + 'px of a ' + pane.boxW +
 			'px box, and the index ' + pane.index + 'px');
-		report.ok(!pane.contentSideways,
-			'...and still has no sideways scrollbar, which is what the pane was narrowed twice to avoid');
+		// **ASSERTED AGAIN (Task 760, 2026-10-04).** Since R-326/R-346 the three label lists carry six
+		// columns and, at the widths the non-touch phone rules gave them, overran the 201.6px pane
+		// by 22px; the number columns are 1.8rem now. dev/lpn-spike/settings-phone-width-browser-
+		// harness.js holds the same line at 320px and at 1440px.
+		report.ok(!pane.contentSideways, 'the Settings content pane has no sideways scrollbar at 360px, which is what the pane was narrowed twice to avoid',
+			pane.wide.join('; '));
 		report.ok(!pane.docSideways, 'the page itself has gained no horizontal scrollbar');
 
 		// ---- 2. THE SYMBOLOGY COLUMN HEADINGS --------------------------------------------------
@@ -156,7 +167,8 @@ exports.run = async function ({ browser, report }) {
 				};
 			}, list);
 			const shown = cells.head.filter(c => !c.hidden);
-			report.ok(shown.length === 4, `${list}: four headings are painted`, shown.map(c => c.text).join('|'));
+			// Six since R-326..R-331 (Use units beside After, Show beside Drop), as in labelcols.js.
+			report.ok(shown.length === 6, `${list}: six headings are painted`, shown.map(c => c.text).join('|'));
 			// The defect, stated: no heading's ink may reach past its own box, so no heading can
 			// touch the next one. Half a pixel is sub-pixel rounding.
 			const spill = shown.filter(c => c.ink > c.right + 0.5);
@@ -182,13 +194,17 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(700);
 		await a.page.click('#lpn_pane_tab_pipes');
 		await a.settle(500);
-		const th = await words(a.page, '#lpn_pane_pipes thead th .lpn-pane-sort');
-		// **ELEVEN SINCE 2026-09-08, not ten:** `lpn_field_active` ("Part of this network", the
-		// scenario in/out column) joined the Pipes table. The count is deliberately exact rather
+		// A heading word of eight characters or more breaks at a soft hyphen (R-356, PANE_WORD_MAX),
+		// so the mid-word test is run on each PIECE between soft hyphens: a piece that itself wraps
+		// is the defect, a break at a soft hyphen is the rule.
+		const th = await words(a.page, '#lpn_pane_pipes thead th .lpn-pane-sort', true);
+		// **TWENTY SINCE 2026-10-04, not eleven:** `lpn_field_active` ("Part of this network", the
+		// scenario in/out column) made it eleven on 2026-09-08, and the rest of EPANET's pipe fields
+		// and the result columns have joined since. The count is deliberately exact rather
 		// than a floor — this whole section is about what happens to headings when the width is
 		// 360px, so a column arriving is precisely the event that should make somebody re-read the
 		// two checks under it, and ">= 10" would let one arrive unread.
-		report.ok(th.length === 11, 'the Pipes table has its eleven headings', th.map(t => t.text).join('|'));
+		report.ok(th.length === 20, 'the Pipes table has its twenty headings', th.map(t => t.text).join('|'));
 		const thSplit = th.filter(t => t.broken.length);
 		report.ok(thSplit.length === 0, 'no Pipes heading is broken mid-word',
 			thSplit.map(t => t.text + ' (' + t.broken.join(',') + ')').join(', '));
@@ -204,7 +220,8 @@ exports.run = async function ({ browser, report }) {
 		// while the pane gave it 344x115, so preserveAspectRatio fitted the drawing at 0.64 and
 		// every 10px label came out at 6.4px. The floor is gone (one user unit is one CSS pixel at
 		// every size) and a chart with less room now drops labels instead.
-		await a.menuClick(await a.lang('lpn_profile_menu'), 'project');
+		// Profile is a row in the Graphs fly-out now (fix/graphs-order, EPANET's order).
+		await a.menuClickSub(await a.lang('lpn_graphs_menu'), await a.lang('lpn_profile_menu'), 'project');
 		await a.settle(1200);
 		const chart = await a.page.evaluate(() => {
 			const host = document.getElementById('lpn_profile_chart');
@@ -292,7 +309,7 @@ exports.run = async function ({ browser, report }) {
 		// screen the page was OPENED on, and is a first-time default rather than a live response to
 		// the width. Session A above cannot answer it -- it opened at 1400px and was resized, so it
 		// legitimately keeps the desktop corner all the way down.
-		for (const [width, name, corner] of [[360, 'phone', 'left'], [1400, 'desktop', 'right']]) {
+		for (const [width, name, corner] of [[360, 'phone', 'left'], [1400, 'desktop', 'left']]) {
 			const s = await Session.open(browser, corner === 'left' ? 'P' : 'D');
 			try {
 				await s.page.setViewportSize({ width, height: 740 });
@@ -319,7 +336,8 @@ exports.run = async function ({ browser, report }) {
 				});
 				report.ok(!!(g && g.shown), 'the labels legend is drawn on a fresh ' + name + ' profile');
 				if (g && g.shown) {
-					report.ok(g.fromTop < 24, '...at the TOP of the map on a ' + name, g.fromTop + 'px down');
+					// Top-left on EVERY screen since 2026-09-28 (Tom); it sits below the zoom chip, 24-29px down.
+					report.ok(g.fromTop < 40, '...at the TOP of the map on a ' + name, g.fromTop + 'px down');
 					report.ok(corner === 'left' ? g.fromLeft < g.fromRight : g.fromRight < g.fromLeft,
 						'...in the upper ' + corner + ' corner, which is the ' + name + "'s default",
 						g.fromLeft + 'px from the left, ' + g.fromRight + 'px from the right');

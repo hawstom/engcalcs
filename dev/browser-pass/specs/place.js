@@ -61,19 +61,26 @@ async function drawL(a) {
 	}
 	await a.toolbarClick('Select');
 	await a.settle(400);
-	if (await a.nodeCount() < 3) { throw new Error(`${a.name}: the L network did not land`); }
+	if (await shownNodeCount(a) < 3) { throw new Error(`${a.name}: the L network did not land`); }
+}
+// **EVERY READ OF THE DRAWING BELOW KEEPS ONLY WHAT IS ON SCREEN** (Task 680): a project switch keeps
+// the drawing it leaves, hidden with display:none, so a placement's copy has the original's three
+// nodes still in the DOM beside its own. A hidden shape has no client rects and measures as zero.
+async function shownNodeCount(a) {
+	return a.page.evaluate(() => [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *:not(.lpn-node-hit)')]
+		.filter(e => e.getClientRects().length).length);
 }
 // Where each node is DRAWN, as the exact attribute text. Cancel's promise is `===`, so the check
 // has to be a string comparison and not a tolerance.
 async function nodePos(a) {
-	return a.page.evaluate(() => [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')]
+	return a.page.evaluate(() => [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')].filter(e => e.getClientRects().length)
 		.map(e => e.getAttribute('cx') + ',' + e.getAttribute('cy')));
 }
 // Where the drawn model IS, in screen pixels — the only measurement that can answer "did it stay
 // still while the map moved", because its coordinates are re-derived under it every settle.
 async function modelBox(a) {
 	return a.page.evaluate(() => {
-		const els = [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')];
+		const els = [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')].filter(e => e.getClientRects().length);
 		if (!els.length) { return null; }
 		let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
 		for (const e of els) {
@@ -106,7 +113,7 @@ async function modelLatSpan(a) {
 		// circles and no drawn links, and that is exactly why it is worth closing: every derivation
 		// below reads top/bot/mid/span, and the day this fixture gains a link they would all go
 		// wrong together, silently, and look like a defect in the settle. Found by /code-review.
-		const ys = [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')]
+		const ys = [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')].filter(e => e.getClientRects().length)
 			.filter(e => e.hasAttribute('cy')).map(e => +e.getAttribute('cy'));
 		const G = window.EngCalcs.lpnGeom;
 		const top = G.mercLat(-Math.min(...ys)), bot = G.mercLat(-Math.max(...ys));
@@ -164,14 +171,14 @@ async function bar(a) {
 // Where each drawn symbol is, in SCREEN pixels -- what a person aims at when the two-point tool asks
 // them to click a point they know. Same source as nodePos(), read as a position rather than as text.
 async function nodeScreenPts(a) {
-	return a.page.evaluate(() => [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')]
+	return a.page.evaluate(() => [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')].filter(e => e.getClientRects().length)
 		.map((e) => { const r = e.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; }));
 }
 // The longitudes the model is drawn at. doc.origin is {0, 0} for the whole of a placement and
 // Mercator x IS longitude, so a drawn cx is the longitude exactly -- which is what makes "the control
 // point landed on the number the user typed" checkable without asking the transform.
 async function drawnLons(a) {
-	return a.page.evaluate(() => [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')]
+	return a.page.evaluate(() => [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')].filter(e => e.getClientRects().length)
 		.map(e => +e.getAttribute('cx')));
 }
 // window.prompt answered from a QUEUE, the way specs/goto.js does it: the two-point tool asks once
@@ -280,7 +287,13 @@ async function projectJson(a) {
 }
 // The row opens the page's own hidden <input type=file>, so the file arrives through Chromium's real
 // file chooser -- production code the whole way down, with only the OS dialog replaced.
+//
+// **THE ROW OPENS THE FILE CHOOSER ONLY ON AN EMPTY PROJECT** (Task 696): with a network on screen it
+// opens the Convert as box over that project instead. So the file goes in through a new, empty one.
 async function openAsLatLon(a, name, text) {
+	await a.newProject('us');
+	await a.settle(500);
+	await a.dismissGallery();
 	const [chooser] = await Promise.all([
 		a.page.waitForEvent('filechooser'),
 		a.menuClick(ROW)
@@ -294,6 +307,10 @@ async function openAsLatLon(a, name, text) {
 async function placeCurrent(a, name) {
 	await a.menuClick(ROW);
 	await a.settle(300);
+	await chooseLatLonInBox(a);
+}
+// The Convert as box is open: lat/lon (EPSG:3857) is chosen and OK pressed.
+async function chooseLatLonInBox(a) {
 	await a.page.evaluate(() => {
 		const r = document.getElementById('lpn_convas_kind_epsg'), ok = document.getElementById('lpn_convas_ok');
 		if (r && ok) { r.checked = true; ok.click(); }
@@ -326,10 +343,15 @@ exports.run = async function ({ browser, report }) {
 		await a.dismissGallery();   // the refused open still left an empty tab, and an empty tab offers the gallery
 
 		// ---- 3. step 1: detached ---------------------------------------------------------------
+		// **THE FIRST PROJECT IS ON LAT/LON NOW** (Tom, 2026-09-25: OSM tiles behind the first,
+		// empty project), and File, Convert as places only a project with NO coordinate system, so
+		// the L is drawn in a new local (XY) project.
+		await a.newProject('us');
+		await a.settle(800);
 		await drawL(a);
 		const original = await nodePos(a);
 		await placeCurrent(a, 'the-L.json');
-		report.eq(await a.nodeCount(), 3, 'the file opened, with its network in it');
+		report.eq(await shownNodeCount(a), 3, 'the file opened, with its network in it');
 		// **NOTHING ASKS ANY MORE** (Task 447). The confirm used to say "Convert this XY project to a
 		// geographic project?" -- a question already answered by choosing this row, and the only door
 		// into the tool. Its instructions were the useful half, so they are a notice you can read
@@ -356,7 +378,7 @@ exports.run = async function ({ browser, report }) {
 			'...and NOT Finish, Detach or the two numbers — nothing is attached to anything yet');
 		report.eq(await handleCount(a), 0,
 			'NO rectangular controls in step 1: nothing there can move the model');
-		report.eq(await a.nodeCount(), 3, 'the model itself is on the screen, drawn as itself');
+		report.eq(await shownNodeCount(a), 3, 'the model itself is on the screen, drawn as itself');
 		report.ok(await labelsHidden(a),
 			'generated labels are off for the duration — a label got dragged by accident');
 
@@ -516,11 +538,11 @@ exports.run = async function ({ browser, report }) {
 			hands.map(h => h.at).join(' | '));
 
 		// ---- 6. editing is locked while placing --------------------------------------------------
-		const n0 = await a.nodeCount();
+		const n0 = await shownNodeCount(a);
 		await a.toolbarClick('Junction');
 		await a.page.mouse.click(canvas.x + canvas.w * 0.15, canvas.y + canvas.h * 0.82);
 		await a.settle(350);
-		report.eq(await a.nodeCount(), n0,
+		report.eq(await shownNodeCount(a), n0,
 			'editing is locked while placing — the transform re-derives every point BY INDEX');
 		await a.toolbarClick('Select');
 
@@ -701,7 +723,7 @@ exports.run = async function ({ browser, report }) {
 		await wheelIn(a, 12);
 		await a.page.click('#lpn_georef_drop');
 		await a.settle(500);
-		const before = await a.nodeCount();
+		const before = await shownNodeCount(a);
 		await a.page.click('#lpn_georef_finish');
 		await a.settle(1000);
 		report.ok(a.lastDialog() && a.lastDialog().type === 'confirm', 'Finish asks first — it is not undoable');
@@ -710,8 +732,8 @@ exports.run = async function ({ browser, report }) {
 		const read = await readout(a);
 		report.ok(/Longitude/.test(read) && /Latitude/.test(read),
 			'the project is geographic afterwards: the readout speaks in degrees', read);
-		report.eq(await a.nodeCount(), before, '...with the same network still drawn');
-		report.has(await a.notice(), 'lat/lon project now', '...and it says so');
+		report.eq(await shownNodeCount(a), before, '...with the same network still drawn');
+		report.has(await a.notice(), await a.lang('lpn_georef_done'), '...and it says so');
 		report.ok(!(await labelsHidden(a)), '...with the labels back on');
 		const onMap = await fileRow(a, ROW);
 		report.ok(!!onMap, 'a project already on the map still SHOWS the command',
@@ -748,7 +770,7 @@ exports.run = async function ({ browser, report }) {
 			nv && `${nv.s} px per drawing unit`);
 		await drawL(a);
 		const spread = await a.page.evaluate(() => {
-			const xs = [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')].map(e => +e.getAttribute('cx'));
+			const xs = [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')].filter(e => e.getClientRects().length).map(e => +e.getAttribute('cx'));
 			return Math.max(...xs) - Math.min(...xs);
 		});
 		report.ok(spread > 100, '...so junctions clicked across the canvas are hundreds of units apart',
@@ -773,10 +795,11 @@ exports.run = async function ({ browser, report }) {
 			await openAsLatLon(a, 'grid.inp', INP);
 			await a.dialogClick('OK');   // the import report, which every .inp import shows
 			await a.settle(600);
+			await chooseLatLonInBox(a);   // a file with a network opens the Convert as box (Task 696)
 			// nodeCount() counts every drawn symbol, links included, so this is "the network is on the
 			// screen" rather than a node tally: two nodes and a pipe cannot draw fewer than three.
-			report.ok(await a.nodeCount() >= 3, `an EPANET file opens through ${ROW} too`,
-				(await a.nodeCount()) + ' symbols drawn');
+			report.ok(await shownNodeCount(a) >= 3, `an EPANET file opens through ${ROW} too`,
+				(await shownNodeCount(a)) + ' symbols drawn');
 			// **REINTERPRET IS GONE AS A MANUAL DOOR** (R-219; Tom, 2026-09-24, answering R-190).
 			// This spec used to walk a range-test guess into a "These are already lat/lon" button
 			// that armed the model unmoved; Tom dropped the button on the argument that typing 1 into
@@ -800,6 +823,7 @@ exports.run = async function ({ browser, report }) {
 				.replace(' R1  -122.5700  38.1070', ' R1  579900  4218600'));
 			await a.dialogClick('OK');
 			await a.settle(600);
+			await chooseLatLonInBox(a);
 			const b14b = await bar(a);
 			report.has(b14b.step, 'Step 1',
 				'a State Plane drawing opens detached, to be aimed, same as any other XY drawing');
@@ -809,6 +833,7 @@ exports.run = async function ({ browser, report }) {
 			await openAsLatLon(a, 'world.inp', INP.replace(' UNITS  None', ' UNITS  Degrees'));
 			await a.dialogClick('OK');
 			await a.settle(600);
+			await chooseLatLonInBox(a);
 			report.ok(await a.page.evaluate(() => document.getElementById('lpn_georef_bar').style.display === 'none'),
 				'a file that DOES say DEGREES just opens — its coordinates already are lon/lat');
 			report.has(await readout(a), 'Latitude', '...as a lat/lon project, read out of the file');
@@ -889,6 +914,9 @@ exports.run = async function ({ browser, report }) {
 		await b.page.route(/tile\.openstreetmap\.org/, (route) => route.abort());
 		await b.goto();
 		await answerConsent(b);
+		await b.dismissGallery();
+		await b.newProject('us');   // the first project is lat/lon; only an XY one can be placed
+		await b.settle(800);
 		await b.dismissGallery();
 		await b.toolbarClick('Bottom panel');
 		await b.settle(600);
