@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**30 still to read on master**, of 79 untranslated keys, of 2310 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**49 still to read on master**, of 98 untranslated keys, of 2328 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -294,7 +294,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (79, 30 to read @@ NEEDS RULING)
+## lpn_  (98, 49 to read @@ NEEDS RULING)
 
 - **`lpn_analyze_at_time`**
   > Time step: {time}.
@@ -328,6 +328,12 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_cp_characters_tip`**
   > "@" means any letter; "#" means any numeric digit, and you must separately list "-", ".", and "," if they are allowed; and any white space characters must be between other characters.
+  @@ NEEDS RULING
+- **`lpn_diag_pda_needs_epanet`**
+  > The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.
+  @@ NEEDS RULING
+- **`lpn_diag_pda_pressures`**
+  > Required pressure must be greater than Minimum pressure. Change one of them in Settings.
   @@ NEEDS RULING
 - **`lpn_dock_autohide`**
   > Auto-hide
@@ -467,6 +473,12 @@ never edits a synonym.
 - **`lpn_ds_title`**
   > Demand scaling
   _Ruled OK 2026-10-03._
+- **`lpn_engine_pda_route`**
+  > Solved with the EPANET solver, because the demand model is pressure driven.
+  @@ NEEDS RULING
+- **`lpn_inp_drop_pressure_unit`**
+  > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
+  @@ NEEDS RULING
 - **`lpn_mode_add_chain`**
   > Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
   @@ NEEDS RULING
@@ -494,6 +506,9 @@ never edits a synonym.
 - **`lpn_pane_width_tip`**
   > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
   @@ NEEDS RULING
+- **`lpn_pda_deficit_note`**
+  > Junctions receiving less than their demand: {n}.
+  @@ NEEDS RULING
 - **`lpn_pgraph_none`**
   > This asset has no results in the current run.
   _Ruled OK 2026-10-01._
@@ -503,6 +518,18 @@ never edits a synonym.
 - **`lpn_report_pump_head`**
   > Pump head
   _Ruled OK 2026-10-03._
+- **`lpn_result_delivered_demand`**
+  > Delivered demand
+  @@ NEEDS RULING
+- **`lpn_result_delivered_demand_tip`**
+  > The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.
+  @@ NEEDS RULING
+- **`lpn_result_demand_deficit`**
+  > Demand deficit
+  @@ NEEDS RULING
+- **`lpn_result_demand_deficit_tip`**
+  > The demand this junction asks for and does not receive, because the pressure is below the required pressure.
+  @@ NEEDS RULING
 - **`lpn_result_pump_head`**
   > Head
   _Ruled OK 2026-10-03._
@@ -523,84 +550,6 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_settings_basemap_style_tip`**
   > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.
-  @@ NEEDS RULING
-- **`lpn_sysflow_title`**
-  > Flow balance
-  _Ruled OK 2026-10-03._
-- **`lpn_tool_add_chain`**
-  > Junction Pipe Chain
-  @@ NEEDS RULING
-- **`lpn_tool_add_chain_tip`**
-  > Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
-  @@ NEEDS RULING
-
----
-
-# Strings waiting on a branch
-
-**26 still to read**, of 33 new keys across 10 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### feat/chain-draw (`c8cce348`) — adds no English strings
-
-### feat/desktop (`baba0f04`) — adds no English strings
-
-### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
-
-- **`lpn_confirm_labels_restore`**
-  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  _Ruled OK 2026-09-23._
-- **`lpn_labels_restore`**
-  > Restore label defaults
-  _Ruled OK 2026-09-23._
-- **`lpn_labels_restore_tip`**
-  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  _Ruled OK 2026-09-23._
-
-### feat/label-placer-a (`3483bfd6`) — adds no English strings
-
-### feat/label-placer-b (`c5905432`) — adds no English strings
-
-### feat/label-placer-c (`9a790a3e`) — adds no English strings
-
-### feat/label-placer-d (`129b63c4`) — adds no English strings
-
-### feat/pda (`be8389fb`) — 19 new, 19 to read @@ NEEDS RULING
-
-- **`lpn_diag_pda_needs_epanet`**
-  > The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.
-  @@ NEEDS RULING
-- **`lpn_diag_pda_pressures`**
-  > Required pressure must be greater than Minimum pressure. Change one of them in Settings.
-  @@ NEEDS RULING
-- **`lpn_engine_pda_route`**
-  > Solved with the EPANET solver, because the demand model is pressure driven.
-  @@ NEEDS RULING
-- **`lpn_inp_drop_pressure_unit`**
-  > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
-  @@ NEEDS RULING
-- **`lpn_pda_deficit_note`**
-  > Junctions receiving less than their demand: {n}.
-  @@ NEEDS RULING
-- **`lpn_result_delivered_demand`**
-  > Delivered demand
-  @@ NEEDS RULING
-- **`lpn_result_delivered_demand_tip`**
-  > The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.
-  @@ NEEDS RULING
-- **`lpn_result_demand_deficit`**
-  > Demand deficit
-  @@ NEEDS RULING
-- **`lpn_result_demand_deficit_tip`**
-  > The demand this junction asks for and does not receive, because the pressure is below the required pressure.
   @@ NEEDS RULING
 - **`lpn_settings_demand_model`**
   > Demand model
@@ -632,6 +581,54 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_req_pressure_tip`**
   > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.
   @@ NEEDS RULING
+- **`lpn_sysflow_title`**
+  > Flow balance
+  _Ruled OK 2026-10-03._
+- **`lpn_tool_add_chain`**
+  > Junction Pipe Chain
+  @@ NEEDS RULING
+- **`lpn_tool_add_chain_tip`**
+  > Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
+  @@ NEEDS RULING
+
+---
+
+# Strings waiting on a branch
+
+**7 still to read**, of 14 new keys across 9 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
+
+- **`lpn_confirm_labels_restore`**
+  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  _Ruled OK 2026-09-23._
+- **`lpn_labels_restore`**
+  > Restore label defaults
+  _Ruled OK 2026-09-23._
+- **`lpn_labels_restore_tip`**
+  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  _Ruled OK 2026-09-23._
+
+### feat/label-placer-a (`3483bfd6`) — adds no English strings
+
+### feat/label-placer-b (`c5905432`) — adds no English strings
+
+### feat/label-placer-c (`9a790a3e`) — adds no English strings
+
+### feat/label-placer-d (`129b63c4`) — adds no English strings
+
+### feat/pda (`c32c8d1d`) — adds no English strings
 
 ### feat/profile-file (`a095faf4`) — 4 new, all ruled
 
@@ -648,7 +645,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/scenario-option (`f0d9897a`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/scenario-option (`c3f82b7d`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_alt_calc_options`**
   > Calculation options
