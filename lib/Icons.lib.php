@@ -240,9 +240,10 @@ $ec_icons = array(
 	// A run between two nodes — the thing you are actually about to place.
 	'pipe'       => '<path d="M5 12H19" stroke-linecap="butt"/><path d="M5 7.5V16.5M19 7.5V16.5"/>',
 	// **THE JUNCTION YOU ARE ON, AND THE PIPE AND JUNCTION STILL TO COME** (Tom, 2026-10-04, from his
-	// own sketch: the first draft "says Pipe"). A solid junction, then a dashed pipe and a dashed
-	// junction; the dashes are square-ended, because the round caps every icon gets would close them.
-	'chain'      => '<circle cx="6.5" cy="6.5" r="3.25" fill="currentColor"/><path d="M9.2 9.2L14.8 14.8" stroke-dasharray="2.2 1.9" stroke-linecap="butt"/><circle cx="17.5" cy="17.5" r="3.25" stroke-dasharray="2.1 1.7" stroke-linecap="butt"/>',
+	// own sketch: the first draft "says Pipe"). The first junction is the Junction icon's own circle
+	// (r 4.25), as he asked: "as similar as possible in size and weight to the Junction tool icon";
+	// the pipe and the next junction are dashed, square-ended because round caps would close the gaps.
+	'chain'      => '<circle cx="5.75" cy="5.75" r="4.25"/><path d="M8.8 8.8L15.2 15.2" stroke-dasharray="2.2 1.9" stroke-linecap="butt"/><circle cx="18.25" cy="18.25" r="4.25" stroke-dasharray="2.4 2" stroke-linecap="butt"/>',
 	'text'       => '<path d="M5 6h14"/><path d="M12 6v14"/><path d="M9 20h6"/>',
 	// **A HOUSE, IN EIGHT STRAIGHT LINES** (Tom, 2026-09-18: *"Let's go with a very simple 8-line
 	// house icon. Much easier and more recognizeable."*, with his own sketch in
