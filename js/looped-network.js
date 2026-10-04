@@ -41437,8 +41437,17 @@ var EngCalcs = EngCalcs || {};
 	// selection model is single-element. Until multi-select exists, this named command IS that route.
 	function deleteNetwork() {
 		var pc = EngCalcs.pageConfig || {};
-		askDialog({ kind: 'confirm', text: pc.lpn_confirm_delete_network || 'Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.' }, function (yes) {
+		askDialog({ kind: 'confirm', text: pc.lpn_confirm_delete_network || 'Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept.' }, function (yes) {
 			if (!yes) { return; }
+			// **ONE UNDOABLE STEP** (Tom, 2026-10-04: *"Undo key doesn't work for Delete network."*).
+			// It never took a snapshot, on master either. The snapshot carries the whole outgoing
+			// `project` too, because this act also drops the fields no other edit touches (the world
+			// map's placement, the gallery name), and an undo that gave the drawing back without
+			// them would put a lat/lon drawing under no map.
+			var snap = makeUndoSnapshot();
+			snap.project = JSON.parse(JSON.stringify(project));
+			markEdited();
+			pushUndoSnapshot(snap);
 			doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
 			nextId = newNextId();
 			// Empties the PROJECT, so the container resets with the network: scenarios back to Base alone,
@@ -55749,14 +55758,22 @@ var EngCalcs = EngCalcs || {};
 	function undo() {
 		if (undoStack.length === 0) { return; }
 		var snap = undoStack.pop();
-		pushBounded(redoStack, makeUndoSnapshot());
+		pushBounded(redoStack, counterSnapshot(snap));
 		restoreUndoSnapshot(snap);
 	}
 	function redo() {
 		if (redoStack.length === 0) { return; }
 		var snap = redoStack.pop();
-		pushBounded(undoStack, makeUndoSnapshot());
+		pushBounded(undoStack, counterSnapshot(snap));
 		restoreUndoSnapshot(snap);
+	}
+	// The state being left, recorded the same way `snap` was: a snapshot carrying the whole
+	// `project` (Delete network's) is answered by one that carries it too, so Redo drops again
+	// exactly what Undo gave back.
+	function counterSnapshot(snap) {
+		var back = makeUndoSnapshot();
+		if (snap.project) { back.project = JSON.parse(JSON.stringify(project)); }
+		return back;
 	}
 	// Puts the page back to one snapshot, for undo() and redo() alike.
 	function restoreUndoSnapshot(snap) {
@@ -55770,6 +55787,10 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) { wasAt[n.id] = nodeDrawX(n) + ',' + nodeDrawY(n); });
 		doc = snap.state.doc;
 		scenarios = snap.state.scenarios;
+		// The fields only Delete network's snapshot carries (see deleteNetwork()). Assigned before
+		// the comparisons below, which then read the snapshot's own coords and basemap anyway.
+		var prevBasemap = project.basemap, prevCoords = project.coords;
+		if (snap.project) { project = JSON.parse(JSON.stringify(snap.project)); project.coords = prevCoords; project.basemap = prevBasemap; }
 		// **THE FRAME COMES BACK BEFORE ANYTHING READS A COORDINATE** (Task 436). outwardX/outwardY
 		// ask isLatLonProject(), and minScale()/maxScale() do too, so a document restored under the
 		// wrong `coords` is drawn in the wrong frame for the length of this function.

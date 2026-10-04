@@ -1411,7 +1411,7 @@ $ec_lang['lpn_help_walkthroughs']='راهنماهای گام‌به‌گام';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='حذف شبکه';
-$ec_lang['lpn_confirm_delete_network']='هر گره، لوله، و برچسب متنی در این پروژه حذف شود؟ تصویر پس‌زمینه، نام پروژه، و تنظیمات شما نگه داشته می‌شوند. این کار قابل بازگشت نیست.';
+$ec_lang['lpn_confirm_delete_network']='هر گره، لوله، و برچسب متنی در این پروژه حذف شود؟ تصویر پس‌زمینه، نام پروژه، و تنظیمات شما نگه داشته می‌شوند.';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,

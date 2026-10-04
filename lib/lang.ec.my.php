@@ -1413,7 +1413,7 @@ $ec_lang['lpn_help_walkthroughs']='လမ်းညွှန်များ';
 // wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='ကွန်ရက် ဖျက်ရန်';
-$ec_lang['lpn_confirm_delete_network']='ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။';
+$ec_lang['lpn_confirm_delete_network']='ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။';
 // Find and replace (Tasks 420, 353 and 389). One panel does all three jobs: an exact ID lookup,
 // which is what EPANET's Map Finder does; a condition on a value, which nothing else offers; and a
 // write to everything the condition matched. **It is called by the standard name** -- Tom,

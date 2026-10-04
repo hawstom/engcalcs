@@ -414,7 +414,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**20 still to read**, of 27 new keys across 12 unmerged branch(es).
+**12 still to read**, of 19 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -425,24 +425,34 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### feat/basemap-style (`ffd4a73a`) — 6 new, 6 to read @@ NEEDS RULING
+
+- **`lpn_basemap_style_faded`**
+  > Faded
+  @@ NEEDS RULING
+- **`lpn_basemap_style_grayscale`**
+  > Grayscale
+  @@ NEEDS RULING
+- **`lpn_basemap_style_muted`**
+  > Muted
+  @@ NEEDS RULING
+- **`lpn_basemap_style_normal`**
+  > Normal
+  @@ NEEDS RULING
+- **`lpn_settings_basemap_style`**
+  > Basemap style
+  @@ NEEDS RULING
+- **`lpn_settings_basemap_style_tip`**
+  > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.
+  @@ NEEDS RULING
+
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dialog-audit (`8b42bf67`) — adds no English strings
+### feat/dialog-audit (`4a665186`) — adds no English strings
 
-### feat/dock (`1365f0f3`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/elev-default (`a0dde78c`) — adds no English strings
 
-- **`lpn_dock_autohide`**
-  > Auto-hide
-  @@ NEEDS RULING
-- **`lpn_dock_float`**
-  > Float
-  @@ NEEDS RULING
-- **`lpn_dock_left`**
-  > Dock at the left of the map
-  @@ NEEDS RULING
-- **`lpn_dock_right`**
-  > Dock at the right of the map
-  @@ NEEDS RULING
+### feat/epanet-pp-brand (`2b3f411b`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -479,13 +489,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/scenario-option (`5ca59b4f`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/scenario-option (`c4a1e55d`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_scenario_duration_tip`**
-  > This scenario's own total run time. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
+  > Overrides the project's total run time in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
   @@ NEEDS RULING
 - **`lpn_scenario_hyd_step_tip`**
-  > This scenario's own hydraulic time step. Leave it blank to use the project's, set in Settings, Calculation, Time.
+  > Overrides the project's hydraulic time step in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time.
   @@ NEEDS RULING
 - **`lpn_scncmp_at_time`**
   > {value} at {id}, {time}
@@ -496,42 +506,12 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_scncmp_same`**
   > The same in every scenario
   @@ NEEDS RULING
-
-### feat/setting-scope (`8e493fe5`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_pane_manage_cols_width`**
-  > Width (em)
-  @@ NEEDS RULING
-- **`lpn_pane_width_tip`**
-  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
-  @@ NEEDS RULING
-- **`lpn_saved_browser`**
-  > Saved in this browser
-  @@ NEEDS RULING
-- **`lpn_saved_project`**
-  > Saved with the project
-  @@ NEEDS RULING
-- **`lpn_saved_session`**
-  > Not saved
+- **`lpn_time_scn_overrides`**
+  > Scenario overrides:
   @@ NEEDS RULING
 
-### feat/table-selection (`d2276943`) — 6 new, 6 to read @@ NEEDS RULING
+### fix/customer-connect (`6475160d`) — adds no English strings
 
-- **`lpn_pane_filter_sel_and`**
-  > Filtered by {q} and selection only. Showing {n} of {all}.
-  @@ NEEDS RULING
-- **`lpn_pane_filter_sel_none`**
-  > None of the selected elements are in this table.
-  @@ NEEDS RULING
-- **`lpn_pane_filter_sel_note`**
-  > Selection only. Showing {n} of {all}.
-  @@ NEEDS RULING
-- **`lpn_pane_sel_only`**
-  > Selection only
-  @@ NEEDS RULING
-- **`lpn_pane_sel_only_none`**
-  > No elements are selected. Select elements on the map, then press Selection only.
-  @@ NEEDS RULING
-- **`lpn_pane_sel_only_tip`**
-  > Show only the elements selected on the map, in every table. Press again to update it after changing the selection, or to turn it off.
-  @@ NEEDS RULING
+### fix/run-time-message (`476ea1e3`) — adds no English strings
+
+### fix/tip-width (`5aa1cd2d`) — adds no English strings
