@@ -172,6 +172,30 @@ EngCalcs.lpnGeom = (function () {
 		return { f: total > 0 ? bestRun / total : 0, x: bestPt.x, y: bestPt.y, dist: best };
 	}
 
+	// **THE FOOT OF A PERPENDICULAR FROM (px,py), ON THE LEG NEAREST (qx,qy).** Same answer shape
+	// as nearestFractionOnPolyline(). A pointer names WHICH LEG of a bent pipe it pressed; the
+	// point's nearest spot on the whole polyline can be another leg's end, and on a pipe that
+	// turns toward the point it is (a customer above a main that bends up to a junction landed on
+	// that junction, Tom 2026-10-04).
+	function footOnPolylineLegNear(pts, px, py, qx, qy) {
+		var leg = 0, best = Infinity, run = 0, total = 0, i, d, vx, vy, len2, t, segs = [];
+		if (!pts || pts.length < 2) { return nearestFractionOnPolyline(pts, px, py); }
+		for (i = 0; i + 1 < pts.length; i++) {
+			d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
+			segs.push(d); total += d;
+			d = nearestFractionOnPolyline([pts[i], pts[i + 1]], qx, qy).dist;
+			if (d < best) { best = d; leg = i; }
+		}
+		for (i = 0; i < leg; i++) { run += segs[i]; }
+		vx = pts[leg + 1].x - pts[leg].x; vy = pts[leg + 1].y - pts[leg].y;
+		len2 = vx * vx + vy * vy;
+		t = len2 ? ((px - pts[leg].x) * vx + (py - pts[leg].y) * vy) / len2 : 0;
+		t = t < 0 ? 0 : (t > 1 ? 1 : t);
+		return { f: total > 0 ? (run + segs[leg] * t) / total : 0,
+			x: pts[leg].x + vx * t, y: pts[leg].y + vy * t,
+			dist: Math.hypot(px - pts[leg].x - vx * t, py - pts[leg].y - vy * t) };
+	}
+
 	// **WHICH END OF A POLYLINE A STATION IS NEARER, MEASURED ALONG THE LINE** (ROADMAP Task 247).
 	//
 	// `f` is a fraction of the WHOLE arc length -- nearestFractionOnPolyline()'s own answer -- so
@@ -834,6 +858,7 @@ EngCalcs.lpnGeom = (function () {
 		polylinePointsAttr: polylinePointsAttr,
 		pointAlongPolyline: pointAlongPolyline,
 		nearestFractionOnPolyline: nearestFractionOnPolyline,
+		footOnPolylineLegNear: footOnPolylineLegNear,
 		arcEndNearer: arcEndNearer,
 		segmentAtFraction: segmentAtFraction,
 		dodgeAlongPolyline: dodgeAlongPolyline,

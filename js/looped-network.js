@@ -10402,12 +10402,18 @@ var EngCalcs = EngCalcs || {};
 	 * already made once (*"Put the meter where user clicks"*): the pointer names WHICH pipe, and
 	 * the meter's own position names where along it, which is what makes the stub square.
 	 *
+	 * **ON A BENT PIPE THE POINTER ALSO NAMES WHICH LEG** (Tom, 2026-10-04: *"Customer won't
+	 * connect to a pipe under a certain geometry"*). The meter's nearest point on the WHOLE pipe
+	 * was the station, so a main that bends up toward the meter handed back the far end of the
+	 * rising leg -- a node -- for a press square below the meter on the long leg. The foot is now
+	 * dropped on the leg nearest the press. dev/lpn-spike/customer-connect-geometry-harness.js.
+	 *
 	 * A node wins a tie, on the finger-fallback's own argument: every pipe ends at a node, so near
 	 * a junction both are in reach and the node is the more specific thing the user can have meant.
 	 */
 	function customerConnectionAt(clientX, clientY, pt, pxTolerance, target) {
 		var n = nearestNodeNearScreen(clientX, clientY, pxTolerance),
-			a = n ? customerAttachAtNode(n, pt) : null, l, p;
+			a = n ? customerAttachAtNode(n, pt) : null, l, p, w;
 		if (!a) {
 			// The pipe under the press by the browser's own hit test on its wide stroke, falling
 			// back to the same finder every other tool on this page uses.
@@ -10416,8 +10422,9 @@ var EngCalcs = EngCalcs || {};
 				? { link: linkById(target.dataset.link) }
 				: nearestLinkNearScreen(clientX, clientY, pxTolerance);
 			if (!l || !l.link) { return null; }
+			w = screenToWorld(clientX, clientY);
 			a = { link: l.link, t: customerSnapT(l.link,
-				Geom.nearestFractionOnPolyline(linkPointList(l.link), pt.x, pt.y).f) };
+				Geom.footOnPolylineLegNear(linkPointList(l.link), pt.x, pt.y, w.x, w.y).f) };
 		}
 		if (!a.link || !nodeById(a.link.from) || !nodeById(a.link.to)) { return null; }
 		p = Geom.pointAlongPolyline(linkPointList(a.link), a.t);
