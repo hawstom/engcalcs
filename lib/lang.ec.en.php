@@ -1019,6 +1019,13 @@ $ec_lang['lpn_field_tank_diameter_tip']='For a vertical cylinder. Same units as 
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tank_head_tip']='Water surface elevation in the tank: the tank bottom elevation plus the water depth.';
 $ec_lang['lpn_close']='Close';
+// The corner buttons beside every standing box's X (Task 441). Each is an icon-only button, so the
+// value is its name: the hover tip and the screen reader's label at once. Auto-hide is a toggle and
+// says its state through aria-pressed, so one wording serves both states (AutoCAD's own word).
+$ec_lang['lpn_dock_left']='Dock at the left of the map';
+$ec_lang['lpn_dock_right']='Dock at the right of the map';
+$ec_lang['lpn_dock_float']='Float';
+$ec_lang['lpn_dock_autohide']='Auto-hide';
 // The property popup's own name, in its drag bar (Tom, 2026-09-08: *"maybe the right title is
 // 'Properties'"*). It names the BOX, not the element in it: lpn_popup_title below the bar carries
 // the element's id and its rename box, and the two are read one under the other.

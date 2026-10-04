@@ -247,7 +247,8 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // exactly what made the map move (Tom, 2026-08-17: "Does not have to be long to push the map
 	      // down. Anything does it."). It now lives on the canvas with the other live readouts --
 	      // see #lpn_map_overlay_tl below. Nothing between the tabs and the map. ?>
-	<div style="overflow-x:auto;position:relative">
+	<?php // `lpn-map-wrap`: the margins a docked box takes from the map (Task 441, css/engcalcs.css). ?>
+	<div class="lpn-map-wrap" style="overflow-x:auto;position:relative">
 		<?php // **height="10000" IS A CURTAIN, NOT A GUESS, AND THE DIFFERENCE IS THE WHOLE POINT.**
 		      //
 		      // It used to say 500. That is a guess at the answer, and a guess drawn on screen is a
@@ -2303,6 +2304,10 @@ EngCalcs.pageConfig = {
 	lpn_time_run_report_tip: <?=json_encode($ec_lang['lpn_time_run_report_tip'])?>,
 	lpn_time_no_report: <?=json_encode($ec_lang['lpn_time_no_report'])?>,
 	lpn_close: <?=json_encode($ec_lang['lpn_close'])?>,
+	lpn_dock_left: <?=json_encode($ec_lang['lpn_dock_left'])?>,
+	lpn_dock_right: <?=json_encode($ec_lang['lpn_dock_right'])?>,
+	lpn_dock_float: <?=json_encode($ec_lang['lpn_dock_float'])?>,
+	lpn_dock_autohide: <?=json_encode($ec_lang['lpn_dock_autohide'])?>,
 	lpn_time_speed: <?=json_encode($ec_lang['lpn_time_speed'])?>,
 	lpn_time_speed_tip: <?=json_encode($ec_lang['lpn_time_speed_tip'])?>,
 <?php   // The Settings box (Task 441). Four of its five strings are borrowed from controls that
