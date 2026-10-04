@@ -67,6 +67,7 @@ the block.
 ## 100 — Next.
 
 - 100|441| **Dock the non-modal boxes: dock, hide, autohide, at each box's corner.**
+  **BUILT 2026-10-04 on `feat/dock`, port 8107**, Perry clean; awaiting his browser pass. 17 boxes dock left/right, share a column, auto-hide to an edge tab; Q5's `?` on the three Analyze tools.
   **PROMOTED TO 100 BY TOM, 2026-10-03** (*"I can see us headed toward task 441, docking of boxes.
   Maybe we should promote it to 100, since this could be an embarrassment."*). Scope widened from
   the Settings box to every non-modal box (Properties, Find, Settings, Energy, Compare, Report): the
@@ -130,17 +131,6 @@ the block.
     importing a `.pro` file. If we do it, it needs to take up miniscule space in the UX/UI, hidden
     deep under some menu or in the profile tab down arrow."* So the acceptance bar is a row in an
     existing menu, never a control on the profile panel itself.
-- 100|637| **A Graph button on the Properties box.**
-  **BUILT 2026-09-30 on `feat/property-graph`, port 8141**, awaiting his browser pass.
-  **REVISED BY TOM, 2026-09-29:** *"But what we really want is a time series graph at the bottom of
-  Properties for an EPS project; it should have a selector for all the properties that can be graphed
-  for that asset."*
-  Tom, 2026-09-12. Graphs the time series of the CURRENTLY FOCUSED property of the current element,
-  in a new bottom-pane tab named for what it shows -- his example, `L435 Lake Trace`. The tab
-  carries a selector for the property to graph and an Export as: image PNG, PDF, comma-separated
-  values CSV, spreadsheet ODS. It may carry a time-range selector. Shape and the two unknowns
-  (PDF and ODS are formats this suite has never written): `dev/graphs-scope.md`. Task 640 is the
-  menu this belongs to and Task 599 is the plot itself.
 - 100|676| **Watch the sites, and send a derived weekly report.**
   Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
   master before proper vetting can no longer be the matter of course."* Plan, the corrected
@@ -255,6 +245,7 @@ the block.
   pollution in lpn (status strip, click-to-open, delays in master styles, tips that talk down).
   Ida's audit: `dev/tip-and-selection-audit.md` (branch `chore/ida-tip`); decisions go to him as an interview.
 - 75|757| **Filter the Tables pane to the selection.**
+  **BUILT 2026-10-04 on `feat/table-selection`, port 8109** (Ida and Declan consulted; snapshot, three doors), Perry clean; awaiting his browser pass.
   Tom, 2026-10-03: *"it would be really nice if the tables could filter on the selection. I'm not
   sure how to work the UI unless it's part of the right-click menu."* Ask Ida and Declan where the
   switch lives before building.
@@ -352,10 +343,12 @@ the block.
   - A layer setting is MODELLING data by CLAUDE.md's project-versus-browser rule and rides in
     `serializeProject()`; it is not window furniture.
 - 75|710| **Audit the 57 raw alert and confirm dialogs.**
+  **BUILT 2026-10-04 on `feat/dialog-audit`, port 8110**: 77 sites, 39 informational ones moved to the notice line and log, 38 still block (`dev/dialog-audit.md`); Perry's three findings fixed. Open: a styled in-page modal for the 38?
   Left from the message log (Task 704, closed 2026-09-23): Ida's third item. Sort which must genuinely
   block and which are only information and belong in the log, which Tom's *"USER MUST HAVE CONTROL
   OVER MESSAGES"* argues for. Keep severity at the two colours the banner already uses.
 - 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
+  **Phase 1b inline colours MERGED 2026-10-04** (`chore/theme-inline`): js/*.js literals on tokens or allow-listed; the check refuses new ones. Left: the button base (R-202), then dark mode.
   Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
   important code discipline."* Ida's phased plan: `dev/theming-plan.md`. Phase 1 declares semantic
   colour tokens, folds the nine separate box styles onto them, and adds a check refusing a new
@@ -364,6 +357,7 @@ the block.
   - **MOD's phone-like buttons (R-202) belong inside phase 1**: one button base for menu items and
     toolbar buttons, one accent colour, previewed on a branch. Retire the menu hint (R-203) once it ships.
 - 75|739| **Say where each setting is saved: the project or this browser.**
+  **BUILT 2026-10-04 on `feat/setting-scope`, port 8112**: a quiet "Saved with the project" / "Saved in this browser" line on each Settings group; a Width entry in Manage columns; awaiting his pass.
   Tom, 2026-09-28, on learning dragged column widths live in the browser: *"Systematically disclose to users where things are stored. Autodesk does this so well that I, a user can cite by memory that variables are stored in the drawing (project), session, or user profile. Every sysvar listing includes 'Where it's stored.'"* Also *"Maybe include Width in the manage columns box with a tip glyph as a secondary discovery path"*, and a delayed tip on the column dragger (never on a phone). The inventory is `dev/cookie-storage-inventory.md`; CLAUDE.md already splits project vs browser settings.
 
 - 75|749| **Read Bentley WaterCAD/WaterGEMS models.**
@@ -386,6 +380,7 @@ the block.
   paragraph and his call. Mary, Sue and Declan's readings are under Task 721. The layout assumes
   Bentley's model (a scenario tree, alternatives beneath); ours is flat, so the tabs need rethinking.
 - 75|755| **Per-scenario calculation options: run type and duration first.**
+  **BUILT 2026-10-04 on `feat/scenario-option`, port 8111**: per-scenario Total run time and Hydraulic time step in the Alternatives preview; Perry clean; awaiting his pass.
   Tom, 2026-09-30: *"A Demand Multiplier column with the alternatives? What about other settings?"*
   Mary: WaterGEMS keeps run type, duration, steps, friction method, demand adjustments, PDD and
   tolerances in per-scenario Calculation Options; InfoWater ties a simulation-options set to each
@@ -975,15 +970,9 @@ the block.
 - 50|726| **Show progress while the EPANET engine downloads, and prefetch it when idle.**
   Mary's wishlist §7: a percent-done on the first ~664 KB fetch; prefetch unless the connection
   says slow or metered. For the low-bandwidth audience.
-- 50|727| **Hover highlight on the element Select would pick.**
-  Ida's wishlist §1: a colour or weight change on the hit object, since the cursor stays neutral
-  (Task 618). AutoCAD's selection preview is the precedent.
 - 50|728| **Import a GIS shapefile or geodatabase as a network.**
   Mary's wishlist §0b2: most WaterCAD models are built from a GIS asset layer, so this is a
   migration on-ramp that needs no WaterCAD file. Unsized; read with Task 723.
-- 50|732| **Three browser-pass specs are stale: `tables`, `smallscreen`, `selectall`.** Ten checks fail
-  identically on master (for example expecting 8 table tabs, not 10). Outside check_all, so nothing
-  catches it; bring them current or retire the checks.
 - 50|733| **Grow the native solver, in phases, to everything EPANET's solves.** Tom, 2026-09-26
   (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
   to do everything that the EPANET solver does. This way the math is less of a black box for us."*
@@ -1004,6 +993,9 @@ the block.
   lpn_settings_symbol_cap + _mid + _post around two number inputs in their word order. One key with
   {n} and {p} placeholders, split into inputs at render time.
 
+- 50|761| **Four more browser-pass specs throw: units, profile, cleanmap, notesbox.** The full
+  `node dev/browser-pass/run.js` gave 1703/1769 on 2026-10-04 with those four throwing and stale
+  menu-row, table-tab, print and cursor checks elsewhere; outside check_all, so nothing catches it. Task 732 fixed five.
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary

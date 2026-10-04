@@ -1801,6 +1801,17 @@ $ec_lang['lpn_ts_group_tip']='Whether the graph shows nodes or links.';
 $ec_lang['lpn_ts_group_nodes']='Nodes';
 $ec_lang['lpn_ts_group_links']='Links';
 $ec_lang['lpn_ts_quantity_tip']='Which value to graph against time.';
+$ec_lang['lpn_pgraph_none']='This asset has no results in the current run.';
+// The Properties graph's own selector entry for a source share (Tom, 2026-09-30: "In selector, use
+// 'Source share from {trace node}'"). Distinct from the shared lpn_result_source_share, which still
+// labels the bare quantity everywhere else -- the Tables column, Find's property list, the Labels
+// popover and the colour legend -- where naming the trace node in every heading would be clutter.
+$ec_lang['lpn_pgraph_source_share_from']='Source share from {node}';
+$ec_lang['lpn_result_pump_head']='Head';
+$ec_lang['lpn_result_pump_head_tip']='The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.';
+// The Full report puts every node and link in one table, where a node's Head column already sits, so a
+// pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
+$ec_lang['lpn_report_pump_head']='Pump head';
 $ec_lang['lpn_ts_add']='Add selected';
 $ec_lang['lpn_ts_add_tip']='Put everything now selected on the map onto the graph.';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.

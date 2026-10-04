@@ -370,8 +370,12 @@ Rules, stated as rules because each is silently wrong when broken:
   default design point — a pump does exactly what the curve you entered says, and nothing until you
   enter one (`recomputePumpCurve()` sets `h0 = a = 0`, and the solver's pump branch has an explicit
   no-curve case using the same `gradMin` floor the pipe branch uses, so a curveless pump solves as a
-  lossless connection). There is no separate "head gain" quantity anywhere: a pump reports a
-  NEGATIVE head loss. The equation and the 1/2/3-point cases are documented in the page's own Notes
+  lossless connection). The solver and every `.inp` carry a pump's result as a NEGATIVE head
+  loss; every display shows it positive as the pump's **Head**, label prefix `H=` (Tom, 2026-10-02:
+  *"the industry term is pump 'Head', not 'Head gain'"*; `shownHeadloss()`), and the Full report's
+  column is "Pump head" because a node's Head shares that table. **Pumps are left out of the
+  highest/lowest head-loss marks** (Tom, 2026-10-02: *"Yes, pumps left out of highest head
+  loss."*). The equation and the 1/2/3-point cases are documented in the page's own Notes
   list (`lpn_notes_5`), with a one-line pointer under the popup's curve table.
   **The FIT reads at most three points and is derived, never stored** (`pumpFitPoints()` samples a
   longer curve at its ends and its middle). EPANET is handed the curve's REAL points once there are

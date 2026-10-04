@@ -4677,7 +4677,12 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(6),
 	html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(7),
 	html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(7),
-	html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(7) { width: 2.3rem !important; }
+	html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(7) { width: 1.8rem !important; }
+	/* **1.8rem, NOT 2.3** (Task 760). With the spinner a number box wants 2.3rem, but the six boxes and
+	   their five 4px gaps then came to 215 px, plus the list's 8px indent, against the 201.6px content
+	   pane a 360px window leaves, so the pane scrolled sideways on every non-touch narrow window (a
+	   touch phone takes the 1.6rem rule below and never did). 2.08 + 1.6 + 1.6 + 3 x 1.8 = 10.68rem
+	   and 20px of gaps is 191px, 199 with the indent. */
 	/* 7a. **AND A HEADING THAT DOES NOT FIT ITS COLUMN MUST WRAP INSIDE IT, NOT SPILL OUT OF IT**
 	   (ROADMAP Task 527). Tom, 2026-08-25, from a phone: the four headings read "BeforeAfter 0.000
 	   Drop", touching each other and out of line with the boxes beneath them. The widths above were
@@ -4699,11 +4704,11 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	html:has(#lpn_canvas) #lpn_labels_customer_fields > div:first-child > span { overflow-wrap: anywhere; }
 
 	/* The list's own floor comes down with them, or the box would still refuse to narrow past a
-	   width the rows no longer need. 13.5rem is the six boxes (2.08 + 1.6 + 1.6 + 3 x 2.3 = 12.18rem)
+	   width the rows no longer need. 11.4rem is the six boxes (2.08 + 1.6 + 1.6 + 3 x 1.8 = 10.68rem)
 	   plus their five 4px gaps; the name above them wraps between words. */
 	html:has(#lpn_canvas) #lpn_labels_node_fields,
 	html:has(#lpn_canvas) #lpn_labels_link_fields,
-	html:has(#lpn_canvas) #lpn_labels_customer_fields { min-width: 13.5rem; }
+	html:has(#lpn_canvas) #lpn_labels_customer_fields { min-width: 11.4rem; }
 
 	/* 7b. **AND THE NAME ON THAT FIRST LINE NEVER BREAKS MID-WORD** (Tom, 2026-08-23, drawing three
 	   panels: the roomy desktop row, then the cramped one reading `Dem/and`, `Hea/d`, `Pres/sure`,
@@ -4775,6 +4780,33 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 		html:has(#lpn_canvas) #lpn_labels_link_fields,
 		html:has(#lpn_canvas) #lpn_labels_customer_fields { min-width: 11.4rem; }
 
+	}
+
+	/* **AND BELOW 340px THE COLUMNS NARROW AGAIN** (Task 760): at 320px the pane is 170px, and 11.4rem
+	   of columns is 182. Before 1.6, Use units and After 1.2, the three numbers 1.6 = 8.8rem and 20px of
+	   gaps, 161px, 169 with the list's indent, for every pointer type. */
+	@media (max-width: 340px) {
+		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(2),
+		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(2),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(2) { width: 1.6rem !important; }
+		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(3),
+		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(3),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(3),
+		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(4),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(4) { width: 1.2rem !important; }
+		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(5),
+		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(6),
+		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(6),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(6),
+		html:has(#lpn_canvas) #lpn_labels_node_fields > div > :nth-child(7),
+		html:has(#lpn_canvas) #lpn_labels_link_fields > div > :nth-child(7),
+		html:has(#lpn_canvas) #lpn_labels_customer_fields > div > :nth-child(7) { width: 1.6rem !important; }
+		html:has(#lpn_canvas) #lpn_labels_node_fields,
+		html:has(#lpn_canvas) #lpn_labels_link_fields,
+		html:has(#lpn_canvas) #lpn_labels_customer_fields { min-width: 9.6rem; }
 	}
 
 	/* 5. THE TWO MAP OVERLAYS DO NOT GET TO EAT THE DRAWING (ROADMAP Task 524). Tom, 2026-08-25,
@@ -4920,6 +4952,15 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	display: inline-block; width: 1.1em; height: 0; margin-right: .35em;
 	border-top: 2px solid currentColor; vertical-align: middle;
 }
+/* ---- The graph at the foot of the Properties box (Task 637, revised) -------------------------
+   Drawn by the same renderer as the Time series tab, so every mark above applies unchanged. The
+   host has a FIXED, modest height and a fluid width: the box is narrow and on a phone it is most of
+   the screen, so the chart takes the box's width and never more than about a third of a tall
+   phone's height. The row above it is one label and one pull-down that may wrap. */
+.lpn-pgraph { margin-top: .5em; padding-top: .4em; border-top: 1px solid var(--ec-border); }
+.lpn-pgraph-row { display: flex; flex-wrap: wrap; align-items: center; gap: .25em .5em; }
+.lpn-pgraph-row .lpn-ts-pick { max-width: 100%; }
+.lpn-pgraph-chart { width: 100%; height: 150px; }
 /* ---- The Calibration report (Task 601) -----------------------------------------------------------
    Built from the time-series chart's own pieces (.lpn-profile-svg and friends, the series colors,
    the chip-as-key) plus the pane's tab look for EPANET's three pages. A chart inside a box has no

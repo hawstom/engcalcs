@@ -3749,3 +3749,25 @@ OBSERVED (real headless Chrome via browser-drive.js, Net3, php -S :8731 from wor
 - OBSERVED: lpn_storage_unreadable was a modal because the status line is wiped by the first solve (code comment); now an 8 s notice. Log keeps it, but the user must know to open the log.
 - OBSERVED: dedupe-on-text only: the newer severity replaces the older row; no hidden second occurrence, a notice/warning pair with identical text collapses to one row.
 - Builder's two harnesses pass. Method note: a notice is invisible-by-position whenever a box covers the map's top-left; check elementFromPoint, not display.
+
+## 2026-10-04 feat/scenario-option (Task 755), SHA 5ca59b4f
+OBSERVED (real headless Chrome, Net1): builder's steps 1-10 all hold. Slider 25 stops on Base, 49 on a 48:00 scenario, frames match; export [TIMES] 48:00 vs 24:00; Ctrl+Z/redo, abc/-1 revert, 0 steady (slider off), save/reopen, narrow window scrolls (tablewrap).
+OBSERVED: master compare of Net1 reads 2.57 ft/s; branch reads 2.76 at 11, 16:00 (whole-run extremes), with an on-screen note.
+OBSERVED: Settings > Time shows 24:00 while a 48:00 scenario runs, no note. Editing it there changes nothing for that scenario.
+OBSERVED: mutations (docTimes reads doc.times; export ignores opts.times) fail the harness.
+TRAP for probes: the page adopts orphan localStorage projects in nondeterministic order; clear all lpn_project_* keys first. Menu text must be matched exactly ("Base" also matches "Apply Base values").
+NOT CHECKED: pixels of the Time Series graph axis after switching back.
+
+# Perry, Task 739 feat/setting-scope 8e493fe5 (2026-10-04)
+OBSERVED: builder harness all ok. My own probe (probe.js, scratchpad) drove ~140 random Settings controls (3 seeds, incl. non-first rows the harness skips) and diffed lpn_* localStorage: 0 genuine mismatches (apparent ones were units dialog needing OK, out-of-range typed value, my own stale-index bug).
+OBSERVED: divider tip absent at 0.7 s, present at 1.3 s; no native title. Search "browser" -> Page + Hydraulics only.
+OBSERVED: Page marker "Saved in this browser" sits over Restore defaults / Start fresh buttons, which reset project settings.
+OBSERVED: no colour inputs present on Net3 default, not driven.
+# Perry 2026-10-04 feat/basemap-style (Task 617)
+OBSERVED: harness basemap-style-harness.js passes; headless Chromium with stubbed OSM tiles: filter computed on .lpn-basemap only (canvas, credit none); survives reload and New Project (geo and local SI); old/unknown values Normal per harness. Satellite, visual look not checked. No new storage keys.
+# Perry, 2026-10-04b, feat/dialog-audit (Task 710)
+OBSERVED (real Chromium, no seam, own server): delete network Esc/Enter/double-Enter OK; new scenario prompt, double-Enter creates one; scenario delete Esc keeps it; friction select shows old value while box open, Esc keeps, Enter applies; search consent Esc = declined, 0 requests, Enter = accept then query prompt; consent buttons styled identically; goto bad input; scale-by-picking end to end; remove-backdrop Esc keeps.
+OBSERVED defect: phone 390px, Scale-by-picking bar is a 195px x 400px column over the map (bar rect 98..293 x 426..828).
+OBSERVED defect: held Enter after keyboard-opening Edit > Delete network auto-repeats into OK and wipes network.
+NOT RUN: georef two-point/Keep placement, Revert/Save as, cascade multi-delete with scenario overrides, terrain consent. Code-read only.
+Seam lpnDialogAnswerer: only lpn-dom-stub.js, lock-ask-browser-drive.js, dev/browser-pass/lib/pickers.js inject it; none in shipped js.

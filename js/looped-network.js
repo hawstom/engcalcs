@@ -6127,8 +6127,8 @@ var EngCalcs = EngCalcs || {};
 	// budget, saved for MEANING (Task 327's colour-by-value view), not spent on identity; a prefix
 	// also survives greyscale, a printed sheet and a colour-blind reader.
 	//
-	// There is no separate head-GAIN field: a pump reports a negative head loss, under the same
-	// label, prefix and extrema bucket as every other link.
+	// There is no separate pump-head FIELD: a pump's result is the headloss field, shown positive
+	// as "Head" with the prefix "H=" (shownHeadloss(), affix()), and kept out of the head-loss extrema.
 
 	function el(tag, attrs, parent) {
 		var e = document.createElementNS(NS, tag), k;
@@ -9758,10 +9758,21 @@ var EngCalcs = EngCalcs || {};
 	// The SOLVE keeps the sign: it is the model's truth and EPANET reports it the same way. This is
 	// a display rule and lives only here.
 	function shownFlow(q) { return typeof q === 'number' ? Math.abs(q) : q; }
-	// Head loss is a LOSS, so it is a magnitude on a pipe or a valve for the same reason -- except
-	// on a PUMP, where the negative sign is not an accident of drawing order but the whole way this
-	// page expresses a head GAIN. The type decides, and a pump keeps its sign.
-	function shownHeadloss(l, h) { return (l && l.type === 'pump') || typeof h !== 'number' ? h : Math.abs(h); }
+	// Head loss is a LOSS, so it is a magnitude on a pipe or a valve for the same reason. A PUMP's is
+	// the head it ADDS, and it is shown as one, POSITIVE, under the name "Head" (Tom, 2026-10-02:
+	// "the industry term is pump 'Head', not 'Head gain'"; the negative number is only the solver's
+	// signed convention, which stays in lastSolveResult and in every .inp). Every display of a
+	// head loss reads this function, so a pump reads the same in the Tables, Properties, a map
+	// label, the colour ramps, Find and the Time series graph. headlossLabelFor() names it.
+	function shownHeadloss(l, h) {
+		if (typeof h !== 'number') { return h; }
+		if (l && l.type === 'pump') { return h === 0 ? 0 : -h; }
+		return Math.abs(h);
+	}
+	function headlossLabelFor(l) {
+		var pc = EngCalcs.pageConfig || {};
+		return l && l.type === 'pump' ? (pc.lpn_result_pump_head || 'Head') : (pc.lpn_result_headloss || 'Head loss');
+	}
 	// ---- A TEXT LABEL'S ATTACHMENT POINT (ROADMAP Task 332) --------------------------------
 	// `lb.x`/`lb.y` is a POINT; `lb.align`/`lb.valign` say which corner or edge of the text that
 	// point is -- AutoCAD's MTEXT attachment point. EPANET anchors a [LABELS] point at the text's
@@ -11912,7 +11923,7 @@ var EngCalcs = EngCalcs || {};
 			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
 				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), null, ld.flow))); }
 				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], resultUnit('velocity'), null, ld.velocity))); }
-				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), null, ld.headloss))); }
+				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), null, ld.headloss), l)); }
 				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(affix('link', 'gradient', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), resultUnit('gradient'), null, ld.gradient, gradientSuffix()))); }
 				var fricVal = linkFrictionFactor(l);
 				if (ls.link.friction && fricVal !== undefined) { lines.push(affix('link', 'friction', rawLine(fricVal, null, ld.friction))); }
@@ -18388,6 +18399,7 @@ var EngCalcs = EngCalcs || {};
 				// share one word, the same split linkFieldDefs()/nodeFieldDefs() already keep.
 				var label = key === 'quality' ? (d.group === 'link' ? linkQualityLabel() : qualityLabel())
 					: key === 'roughness' ? roughnessLabel()
+					: (key === 'headloss' && d.group === 'link' && d.type === 'pump') ? headlossLabelFor({ type: 'pump' })
 					: (f[1] && pc[f[1]]) || f[2];
 				out.push([key, label, f[2]]);
 			});
@@ -21281,10 +21293,16 @@ var EngCalcs = EngCalcs || {};
 		// **AND NOTHING MEASURED ON A PHONE IS REMEMBERED**, the ruling the fill path already
 		// carries: at that width the box fills the window, so every number here is the window's and
 		// not the user's.
+		popup.addEventListener('pointerdown', function (e) { if (e.target === popup) { popupSizing = true; } });
+		['pointerup', 'pointercancel'].forEach(function (t) {
+			window.addEventListener(t, function () { setTimeout(function () { popupSizing = false; }, 120); }, true);
+		});
 		if (window.ResizeObserver) {
 			new window.ResizeObserver(function () {
 				var r;
 				if (popup.style.display === 'none' || smallScreen()) { return; }
+				// Only a corner drag counts as chosen, not the box's own fits and the width pin.
+				if (!popupSizing) { return; }
 				r = popup.getBoundingClientRect();
 				if (!(r.width > 0) || !(r.height > 0)) { return; }
 				findUserSize = { w: Math.round(r.width), h: Math.round(r.height) };
@@ -22554,8 +22572,8 @@ var EngCalcs = EngCalcs || {};
 	// thing and is read-only, because a number the user supplied and a number we computed must
 	// never occupy the same field (CLAUDE.md). Results come through the same accessors the map
 	// labels and the colour ramp use, so a table cell and the label beside the symbol can never
-	// disagree -- which is also why a pump's head GAIN reads here as a negative head LOSS, the one
-	// way this page has ever expressed it.
+	// disagree -- which is also why a pump's column reads its positive Head through the same
+	// shownHeadloss() the label uses.
 	//
 	// **EACH TYPE KEEPS ITS OWN SORT**, on the spec itself, so sorting Pipes by velocity cannot
 	// re-order Junctions under the hand of somebody typing in them. Each keeps its own SCROLL
@@ -23638,9 +23656,9 @@ var EngCalcs = EngCalcs || {};
 				// points. It did not follow that the rest was unfit for a table: a relative speed, a
 				// speed pattern, a price of power and its pattern are ordinary numbers and names,
 				// and a person entering forty pumps wants them in rows like everything else.
-				// Head loss, not head gain: lpn-solver.js reports a pump's contribution as a
-				// NEGATIVE head loss, and this reads the same accessor the map label does, so the
-				// cell and the label beside the symbol cannot disagree.
+				// The pump's Head, positive: lpn-solver.js reports a pump's contribution as a
+				// NEGATIVE head loss, and this reads the same accessor (shownHeadloss()) the map
+				// label does, so the cell and the label beside the symbol cannot disagree.
 				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed()].concat(paneColEnds(), [
 					paneColCurveRef('curveId', 'head', 'lpn_pump_curve_source'),
 					paneColPumpSpeed(), paneColSpeedPattern(),
@@ -23648,7 +23666,7 @@ var EngCalcs = EngCalcs || {};
 					paneColEnergyPrice(), paneColEnergyPattern(),
 					paneColVerts(),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
-					paneColLinkResult('headloss', 'lpn_result_headloss', paneUnitHead),
+					paneColLinkResult('headloss', 'lpn_result_pump_head', paneUnitHead),
 					paneColLinkStatus(),
 					paneColLinkQuality()
 				])
@@ -30008,8 +30026,7 @@ var EngCalcs = EngCalcs || {};
 	function renderTimeSeries() {
 		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_ts_chart'),
 			note = document.getElementById('lpn_ts_note'),
-			frames, series, values = [], lay, xB, yB, box, svg, group, field, unit, now, dots,
-			measured, tFirst, tLast, nMeasured = 0;
+			frames, series, lay, group, field, measured, tFirst, tLast, nMeasured = 0;
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (note) { note.textContent = ''; }
@@ -30037,9 +30054,6 @@ var EngCalcs = EngCalcs || {};
 			}
 			return;
 		}
-		series.forEach(function (s) {
-			s.points.forEach(function (p) { if (p.y !== undefined) { values.push(p.y); } });
-		});
 		// **MEASURED VALUES FROM A CALIBRATION FILE, ON THE SAME AXES** (Task 601), for the plotted
 		// assets the file names and only inside the reported span -- a measurement at an hour the
 		// run did not report has no line to be read against. They join the vertical bounds, so a
@@ -30050,7 +30064,6 @@ var EngCalcs = EngCalcs || {};
 			s.measured = (measured[s.id] || []).filter(function (m) {
 				return m.t >= tFirst - 1e-6 && m.t <= tLast + 1e-6;
 			});
-			s.measured.forEach(function (m) { values.push(m.v); });
 			nMeasured += s.measured.length;
 		});
 		// **SAID BEFORE THE CHART IS MEASURED**, which is load-bearing and is Task 527's lesson
@@ -30065,6 +30078,58 @@ var EngCalcs = EngCalcs || {};
 		}
 		lay = tsLayout(host);
 		tsLastSize = { w: lay.w, h: lay.h };
+		tsDraw(host, lay, frames, series, group, field);
+	}
+	// **A HELD VALUE IS DRAWN AS STEPS, AN EVOLVING ONE AS SLOPES** (Tom, 2026-10-02, asked
+	// sloping or stepped: "Do both, each as the situation requires."). The market researcher's
+	// reading of the EPANET 2.2 manual (dev/agents/market-researcher/journal.md on feat/desktop,
+	// "Time series graph: sloping or stepped?"): a demand, a reservoir's head and whatever a pattern
+	// or a control sets is HELD from one hydraulic event to the next, so a straight segment between
+	// two report times would draw values that never existed; a tank level is INTEGRATED and a
+	// pressure, a head or a pipe flow drifts with the tanks, so a straight segment is the truthful
+	// one. A step HOLDS FORWARD from its report time: the number reported at t is the solution for
+	// the period beginning at t. One flag per property, with a per-type exception where one name
+	// means a held value on one kind of asset and an evolving one on another. A typed constant
+	// (elevation, base demand, diameter, roughness) is held, so it is listed; its line is flat
+	// either way. The status is held on every link. Everything not listed slopes.
+	var TS_STEPPED = {
+		node: { elev: 1, demand: 1, demandActual: 1 },
+		link: { diameter: 1, roughness: 1, status: 1 }
+	};
+	var TS_STEPPED_BY_TYPE = {
+		// Every reading of a reservoir is its pattern-held head, or follows from it.
+		reservoir: { head: 1, pressure: 1, quality: 1 },
+		// A pump's flow and speed are held between events, and its head is read off its curve at
+		// that held flow, so it is held too.
+		pump: { flow: 1, headloss: 1 }
+	};
+	function tsStepped(group, e, field) {
+		var byType = (e && TS_STEPPED_BY_TYPE[e.type]) || {};
+		return !!((TS_STEPPED[group] || {})[field] || byType[field]);
+	}
+	// A run of plotted {x, y} as the polyline's corners. Stepped: each value runs flat to the next
+	// report time and then rises or falls there, and the last one ends at its own report time,
+	// because it has no following interval to hold over.
+	function tsRunCorners(run, stepped) {
+		var out = [], i;
+		for (i = 0; i < run.length; i++) {
+			if (stepped && i > 0) { out.push({ x: run[i].x, y: run[i - 1].y }); }
+			out.push(run[i]);
+		}
+		return out;
+	}
+	// **THE ONE TIME-SERIES RENDERER** (Task 637, revised by Tom 2026-09-29). The bottom pane's
+	// tab and the graph at the foot of the Properties box both draw through this, so a second
+	// plotting idiom never enters the page: the axes, the `now` line, the breaks at a missing
+	// value and the hover numbers are one piece of code whichever box the chart sits in. Everything
+	// a caller decides -- which frames, which assets, which field, how big -- arrives as arguments;
+	// nothing here reads tsState.
+	function tsDraw(host, lay, frames, series, group, field, labelOverride) {
+		var pc = EngCalcs.pageConfig || {}, values = [], xB, yB, box, svg, unit, now, dots;
+		series.forEach(function (s) {
+			s.points.forEach(function (p) { if (p.y !== undefined) { values.push(p.y); } });
+			(s.measured || []).forEach(function (m) { values.push(m.v); });
+		});
 		box = lay.box;
 		// The horizontal axis is TRUNCATED for the same reason the profile's vertical one is: a run
 		// may report only its later part (js/lpn-time.js's reportStart), and an axis anchored at
@@ -30112,12 +30177,12 @@ var EngCalcs = EngCalcs || {};
 
 		dots = frames.length <= LPN_TS_DOT_MAX;
 		series.forEach(function (s) {
-			var run = [], i, p;
+			var run = [], i, p, stepped = tsStepped(group, tsElementById(group, s.id), field);
 			function flush() {
 				if (run.length > 1) {
 					el('polyline', {
-						points: run.map(function (q) { return q.x + ',' + q.y; }).join(' '),
-						class: 'lpn-ts-line', stroke: s.color
+						points: tsRunCorners(run, stepped).map(function (q) { return q.x + ',' + q.y; }).join(' '),
+						class: 'lpn-ts-line' + (stepped ? ' lpn-ts-stepped' : ''), stroke: s.color
 					}, svg);
 				} else if (run.length === 1) {
 					// A single reporting step with its neighbours missing is still a reading, and a
@@ -30167,7 +30232,7 @@ var EngCalcs = EngCalcs || {};
 		// above came through colorValueOf(), which converts a solved number into whatever the units
 		// strip currently says, and colorFieldUnitText() is that strip read for this one field.
 		unit = colorFieldUnitText(group, field);
-		tsText(svg, 0, 0, colorFieldLabel(group, field) + (unit ? ' (' + unit + ')' : ''),
+		tsText(svg, 0, 0, (labelOverride || colorFieldLabel(group, field)) + (unit ? ' (' + unit + ')' : ''),
 			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
 			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
 		if (lay.axisTitle) {
@@ -30175,6 +30240,189 @@ var EngCalcs = EngCalcs || {};
 				pc.lpn_ts_axis_time || 'Elapsed time',
 				{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
 		}
+	}
+
+	// ---- THE GRAPH AT THE FOOT OF THE PROPERTIES BOX (Task 637, revised) ------------------------
+	//
+	// Tom, 2026-09-29: *"But what we really want is a time series graph at the bottom of Properties
+	// for an EPS project; it should have a selector for all the properties that can be graphed for
+	// that asset."* One element, one line, drawn by tsDraw() -- the Time series tab's own renderer,
+	// so the two charts cannot come to disagree about an axis, a unit or the `now` line.
+	//
+	// **ONLY WHEN THERE IS A RUN, AND OTHERWISE NOTHING AT ALL.** The frames are
+	// EngCalcs.lpnTimeRunFrames(), the same list the tab reads, so a steady-state project, or an
+	// extended one not yet calculated, leaves the Properties box exactly as it always was: no
+	// heading, no empty frame, no sentence. And because the list is the run's, Recalculate OFF is
+	// honoured for free: the run is kept until a Calculate replaces it, so the graph is the same
+	// snapshot the map is showing.
+	//
+	// **ONE ELEMENT ONLY.** The multi-element Properties box carries no graph, although the Time
+	// series tab does draw one line per asset: that tab already takes the map selection through
+	// its Add selected button, and a selection of mixed kinds has no one property list to offer.
+	//
+	// **WHAT IS OFFERED IS WHAT THE RUN HAS FOR THIS ELEMENT, AND NOTHING ELSE.** The candidates
+	// are the fields that are RESULTS (a value per reporting step), in the map's own order; the
+	// typed inputs -- elevation, base demand, diameter, roughness, initial quality -- are not,
+	// because across a run they are a flat line that says nothing a reader did not type. Each
+	// candidate is then kept only if the run has at least one number for it on THIS element: a
+	// pump has no velocity, a reservoir no demand, and quality exists only when the analysis ran.
+	//
+	// A TANK'S PRESSURE IS LEFT OFF by name: colorNodeValue() deliberately reads it from the stored
+	// starting level (see its `pressure` branch), so over a run it is a flat line while the head
+	// above it moves. The head is the tank's moving reading, and it is offered.
+	var PG_FIELDS = {
+		node: ['pressure', 'head', 'demandActual', 'quality'],
+		link: ['velocity', 'flow', 'headloss', 'gradient', 'friction', 'status', 'quality', 'rate']
+	};
+	var PG_SKIP_BY_TYPE = { tank: { pressure: 1 } };
+	// **THE SELECTOR'S OWN WORDING FOR A SOURCE SHARE** (Tom, 2026-09-30: "In selector, use
+	// 'Source share from {trace node}'"). Everywhere else a source share is named -- the Tables
+	// column, Find's property list, the Labels popover, the colour legend -- it stays the bare
+	// lpn_result_source_share, because those headings repeat on every row and column and naming
+	// the trace node in each would be clutter; the selector says it once, so it can afford to.
+	// Falls back to colorFieldLabel()'s own "Source share" if somehow no trace node is set, which
+	// should not happen: pgAvailable() only offers 'quality' where the run already has numbers for
+	// it, and a trace run has none without a trace node chosen.
+	// **A PUMP'S HEAD LOSS IS GRAPHED AS ITS HEAD, POSITIVE** (Tom, 2026-09-30, asking whether the
+	// industry really states pump head as a negative head loss; Mary's finding: it does not -- the
+	// EPANET manual and WaterGEMS both state it positive, and the negative number is only the solver's
+	// signed convention; Tom, 2026-10-02, named it pump "Head"). Since 2026-10-01 every display reads it:
+	// shownHeadloss() does the sign and pgIsPumpHead() only names the field here.
+	function pgIsPumpHead(group, e, field) {
+		return group === 'link' && field === 'headloss' && !!e && e.type === 'pump';
+	}
+	function pgFieldLabel(group, field, e) {
+		var pc = EngCalcs.pageConfig || {}, node;
+		if (pgIsPumpHead(group, e, field)) { return pc.lpn_result_pump_head || 'Head'; }
+		if (field === 'quality' && qualityMode() === 'trace') {
+			node = (settings.quality || {}).traceNode;
+			if (node) {
+				return (pc.lpn_pgraph_source_share_from || 'Source share from {node}').replace('{node}', node);
+			}
+		}
+		return colorFieldLabel(group, field);
+	}
+	// **THE CHOSEN PROPERTY, PER ELEMENT TYPE, FOR THIS SESSION ONLY** -- tsState's standing: a
+	// reader's question, not a project setting and not a preference, so nothing is stored.
+	var pgFieldByType = {};
+	var pgLastWidth = null, pgWatching = false;
+	function pgSubject() {
+		var e;
+		if (!currentPopup) { return null; }
+		if (currentPopup.kind === 'node') {
+			e = nodeById(currentPopup.id);
+			return e ? { group: 'node', e: e } : null;
+		}
+		if (currentPopup.kind === 'link') {
+			e = linkById(currentPopup.id);
+			return e ? { group: 'link', e: e } : null;
+		}
+		return null;
+	}
+	// Every candidate field with its points over the run, keeping only those with a number in them.
+	function pgAvailable(group, e, frames) {
+		var skip = PG_SKIP_BY_TYPE[e.type] || {}, out = [];
+		(PG_FIELDS[group] || []).forEach(function (f) {
+			var any = false, pts;
+			if (skip[f]) { return; }
+			pts = frames.map(function (fr) {
+				var v = tsAsOfFrame(fr, function () { return colorValueOf(group, e, f); });
+				var ok = typeof v === 'number' && isFinite(v);
+				if (ok) { any = true; }
+				return { t: fr.t, y: ok ? v : undefined };
+			});
+			if (any) { out.push({ field: f, points: pts }); }
+		});
+		return out;
+	}
+	// The box redraws on a width change only: the chart host's height is fixed in CSS, and an
+	// observer firing on its own output is a loop (tsResizeWatch()'s guard, for the same reason).
+	function pgWatch(box) {
+		if (pgWatching || !window.ResizeObserver) { return; }
+		pgWatching = true;
+		new window.ResizeObserver(function () {
+			var w = box.getBoundingClientRect().width;
+			if (!(w > 0) || (pgLastWidth !== null && Math.abs(pgLastWidth - w) < 1)) { return; }
+			propGraphSync();
+		}).observe(box);
+	}
+	function propGraphSync() {
+		var box = document.getElementById('lpn_popup_graph'), pc = EngCalcs.pageConfig || {},
+			subj, frames, avail, field, pick, row, lab, sel, host, note, lay, i, appearing;
+		if (!box) { return; }
+		pgWatch(box);
+		clearFields(box);
+		subj = pgSubject();
+		frames = subj && EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
+		if (!subj || !frames.length) { hidePanel(box); pgLastWidth = null; return; }
+		appearing = box.style.display === 'none';
+		box.style.display = '';
+		avail = pgAvailable(subj.group, subj.e, frames);
+
+		row = document.createElement('div');
+		row.className = 'lpn-pgraph-row';
+		lab = document.createElement('label');
+		lab.htmlFor = 'lpn_pgraph_field';
+		// "Time series", the tab's own name: this is that graph, for one asset.
+		lab.textContent = pc.lpn_ts_menu || 'Time series';
+		row.appendChild(lab);
+		box.appendChild(row);
+		if (!avail.length) {
+			// A run exists and holds nothing for this element -- one added or renamed since the run,
+			// with Recalculate off. Said, never drawn as empty axes (renderTimeSeries()'s rule).
+			note = document.createElement('div');
+			note.className = 'lpn-profile-say';
+			note.id = 'lpn_pgraph_note';
+			note.textContent = pc.lpn_pgraph_none || 'This asset has no results in the current run.';
+			box.appendChild(note);
+			pgLastWidth = box.getBoundingClientRect().width;
+			return;
+		}
+		field = pgFieldByType[subj.e.type];
+		pick = avail[0];
+		for (i = 0; i < avail.length; i++) { if (avail[i].field === field) { pick = avail[i]; } }
+
+		sel = document.createElement('select');
+		sel.id = 'lpn_pgraph_field';
+		sel.className = 'lpn-ts-pick ec-help';
+		sel.title = pc.lpn_ts_quantity_tip || 'Which value to graph against time.';
+		avail.forEach(function (a) {
+			var op = document.createElement('option');
+			op.value = a.field; op.textContent = pgFieldLabel(subj.group, a.field, subj.e);
+			sel.appendChild(op);
+		});
+		sel.value = pick.field;
+		if (pgIsPumpHead(subj.group, subj.e, pick.field)) {
+			sel.title = pc.lpn_result_pump_head_tip ||
+				'The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.';
+		}
+		sel.addEventListener('change', function () {
+			pgFieldByType[subj.e.type] = sel.value;
+			propGraphSync();
+		});
+		row.appendChild(sel);
+
+		host = document.createElement('div');
+		host.id = 'lpn_pgraph_chart';
+		host.className = 'lpn-pgraph-chart';
+		box.appendChild(host);
+		lay = tsLayout(host);
+		pgLastWidth = box.getBoundingClientRect().width;
+		tsDraw(host, lay, frames, [{ id: subj.e.id, color: LPN_TS_COLORS[0], points: pick.points }],
+			subj.group, pick.field, pgFieldLabel(subj.group, pick.field, subj.e));
+		initTipsIn(box);
+		if (appearing) { pgRefit(); }
+	}
+	// **A GRAPH THAT ARRIVES IN AN OPEN BOX MAKES IT TALLER**, which is the one case openPopupAt()'s
+	// fit never sees: the run finishing while the box stands open. So the box is capped to the room
+	// below where it stands, as openPopupAt() does, and the overflow scrolls inside the body rather
+	// than hanging off the bottom of a phone. Only on the graph's appearance, never on an ordinary
+	// refresh, and never over a size the reader dragged.
+	function pgRefit() {
+		var popup = document.getElementById('lpn_popup'), r;
+		if (!popup || !panelIsOpen(popup) || popupUserSize) { return; }
+		r = popup.getBoundingClientRect();
+		if (r.bottom > window.innerHeight - POPUP_EDGE) { capPanelToRoomBelow(popup, r.top); }
 	}
 
 	// ---- FREQUENCY PLOT (ROADMAP Task 600, first slice) --------------------------------------------
@@ -40404,22 +40652,20 @@ var EngCalcs = EngCalcs || {};
 			// bottom-pane tab, as the Profile row did. System flow is not built, so there is no
 			// placeholder row. Contour is the exception: a map layer, so its row shows it on the map.
 			// The Profile row has no icon of its own (Tom, 2026-10-02: *"We can remove the graph icon
-			// from the Profile command now."*); the Graphs row keeps it.
+			// from the Profile command now."*); the Graphs row keeps it. Row order is EPANET's Graph
+			// Selection order (Uglobals.pas: time series, profile, contour, frequency, system flow), which
+			// Tom asked be kept unless there was a reason not to (2026-10-04); Mary found none.
 			{
 				icon: 'profile', label: pc.lpn_graphs_menu || 'Graphs', tip: pc.lpn_graphs_menu_tip,
 				submenu: function () {
 					return [
 						{
-							label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
-							fn: function () { closeMenu(); openPane('profile'); }
-						},
-						{
 							label: pc.lpn_ts_menu || 'Time series', tip: pc.lpn_ts_tip,
 							fn: function () { closeMenu(); openPane('timeseries'); }
 						},
 						{
-							label: pc.lpn_freq_menu || 'Frequency', tip: pc.lpn_freq_tip,
-							fn: function () { closeMenu(); openPane('frequency'); }
+							label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
+							fn: function () { closeMenu(); openPane('profile'); }
 						},
 						// THE CONTOUR PLOT IS A MAP LAYER, so this row SHOWS it rather than opening a
 						// tab: a smooth fill of the node colouring with labelled lines (pressure, if
@@ -40428,6 +40674,10 @@ var EngCalcs = EngCalcs || {};
 						{
 							label: pc.lpn_contour_menu || 'Contour', tip: pc.lpn_contour_tip,
 							fn: function () { closeMenu(); showContour(); }
+						},
+						{
+							label: pc.lpn_freq_menu || 'Frequency', tip: pc.lpn_freq_tip,
+							fn: function () { closeMenu(); openPane('frequency'); }
 						},
 						{
 							label: pc.lpn_sysflow_menu || 'Flow balance', tip: pc.lpn_sysflow_tip,
@@ -52447,7 +52697,7 @@ var EngCalcs = EngCalcs || {};
 	var popupUserPos = null;
 	// The size a drag gave the properties box, in the same session-only standing as the
 	// position above. Written by the observer in wirePopupDrag().
-	var popupUserSize = null;
+	var popupUserSize = null, popupSizing = false;
 	// **A BOX THAT OPENS UNDER A FINGER MUST NOT ANSWER THAT FINGER'S OWN CLICK** (Tom, 2026-08-31:
 	// *"the node editor open with the pattern selector open"*).
 	//
@@ -52498,14 +52748,77 @@ var EngCalcs = EngCalcs || {};
 			panel.style.pointerEvents = '';
 		}, left);
 	}
+	var popupAutoW = 0;
+	// The width at which at most 5% of the Properties rows wrap: each row's one-line width (label
+	// and control, measured with the box as wide as the window allows), the (n - max(1, floor(0.05 n)))-th
+	// smallest, plus the box's own padding, border and a scrollbar's worth. Never below the box's
+	// CSS minimum. A row is what lies between two <br>, or a block child on its own.
+	function popupFitWidth(popup) {
+		var fields = document.getElementById('lpn_popup_fields'), widths = [], cur = [], i, k, n,
+			left, cs, minW, chrome, w;
+		if (!fields) { return popup.getBoundingClientRect().width; }
+		left = fields.getBoundingClientRect().left;
+		function flush() {
+			var right = 0, j, el, rr, rg;
+			for (j = 0; j < cur.length; j++) {
+				el = cur[j];
+				if (el.nodeType === 3) {
+					if (!/\S/.test(el.nodeValue)) { continue; }
+					rg = document.createRange(); rg.selectNodeContents(el); rr = rg.getBoundingClientRect();
+				} else { rr = el.getBoundingClientRect(); }
+				if (rr.width > 0) { right = Math.max(right, rr.right); }
+			}
+			if (right > 0) { widths.push(right - left); }
+			cur = [];
+		}
+		for (i = 0; i < fields.childNodes.length; i++) {
+			k = fields.childNodes[i];
+			if (k.nodeName === 'BR') { flush(); } else if (k.nodeType === 1 && /^(DIV|TABLE|FIELDSET|P|H\d)$/.test(k.nodeName)) {
+				flush(); cur.push(k); flush();
+			} else { cur.push(k); }
+		}
+		flush();
+		if (!widths.length) { return popup.getBoundingClientRect().width; }
+		widths.sort(function (a, b) { return a - b; });
+		n = widths.length;
+		// 5% of the rows may wrap, and at least one: a box of fewer than 20 rows would otherwise
+		// be sized to its widest row, usually a sentence that is meant to wrap.
+		w = widths[n - 1 - Math.min(n - 1, Math.max(1, Math.floor(0.05 * n)))];
+		cs = window.getComputedStyle(popup);
+		chrome = popup.getBoundingClientRect().width - fields.getBoundingClientRect().width;
+		minW = parseFloat(cs.minWidth) || 0;
+		// A scrollbar's width only where the box is already as tall as the window lets it be.
+		return Math.max(minW, Math.ceil(w + chrome + 2 +
+			(popup.getBoundingClientRect().height > window.innerHeight - 80 ? 16 : 0)));
+	}
+	function popupFillMapHeight(popup) {
+		var g = document.getElementById('lpn_popup_graph'), top, map = svg && svg.getBoundingClientRect();
+		if (popupUserSize || popupUserPos || !g || g.style.display === 'none') { return; }
+		top = Math.max(map ? map.top : 0, chromeFloor() - POPUP_EDGE);
+		// The caps above were for a box hanging off where it landed; this one is placed instead.
+		resetPanelHeight(popup, panelBody(popup));
+		popup.style.top = top + 'px';
+		popup.style.height = Math.max(0, window.innerHeight - top) + 'px';
+	}
 	function openPopupAt(sx, sy) {
 		var popup = document.getElementById('lpn_popup'), r, h, at;
+		var wasOpen = popup.style.display !== 'none' && popup.style.display !== '';
 		if (popupUserPos) { sx = popupUserPos.left; sy = popupUserPos.top; }
 		popup.style.left = sx + 'px'; popup.style.top = sy + 'px';
 		// `flex`, not `block`: the box is a column now -- title band, then body -- so the body can
 		// take the height a drag gave the box and scroll inside it. Same reason the Find box is a
 		// flex column, and it is what makes `resize: both` mean anything here.
 		popup.style.display = 'flex';
+		// **A BOX WITH NO CHOSEN WIDTH IS MEASURED AT THE LEFT EDGE AND PINNED** (Tom, 2026-10-03: a
+		// pipe's or pump's Properties opened about 150 px wide and the full height of the map, and
+		// widened and narrowed itself as he moved it). It is `position: fixed` with `width: auto`, so
+		// the browser sizes it to fit the room between its left edge and the window's right edge:
+		// opened or dragged toward the right it squeezed, its fields wrapped, and it grew tall. A pipe
+		// and a pump are wider than a junction, so they met it first. The width is now measured with
+		// the whole window to spread in, then written, so where the box stands never decides it.
+		if (!popupUserSize && !smallScreen()) {
+			popup.style.width = ''; popup.style.left = '0px';
+		}
 		// **A SIZE THE USER DRAGGED IS RE-APPLIED ON EVERY OPEN, and it is a SESSION choice like
 		// popupUserPos beside it** -- neither is written to storage. That is the existing ruling
 		// for this box and it is left alone: the properties popup opens per element, dozens of
@@ -52515,6 +52828,18 @@ var EngCalcs = EngCalcs || {};
 		if (popupUserSize) {
 			popup.style.width = popupUserSize.w + 'px';
 			popup.style.height = popupUserSize.h + 'px';
+		}
+		// The graph at the foot (Task 637) is built once the box has a width to lay it out in, and
+		// before the fit below measures the box's height with it inside.
+		propGraphSync();
+		if (!popupUserSize && !smallScreen()) {
+			// **THE WIDTH IS THE SMALLEST AT WHICH AT MOST 5% OF THE ROWS WRAP, chosen once when the
+			// box opens** (Tom, 2026-10-03: *"initially no wider than needed to avoid all but the
+			// 5%-ile (1 line in 20 ...) wrapping"*). Selecting another element while it is open
+			// keeps the width it had, so it does not jump as he clicks around.
+			if (!(wasOpen && popupAutoW)) { popupAutoW = popupFitWidth(popup); }
+			popup.style.width = Math.min(popupAutoW, window.innerWidth - 2 * POPUP_EDGE) + 'px';
+			popup.style.left = sx + 'px';
 		}
 		// **RAISED HERE, WHERE IT BECOMES VISIBLE** (Tom, 2026-09-05: *"When an asset is clicked and
 		// its properties box opens, it is hidden under Libraries... It needs to win at the moment the
@@ -52536,6 +52861,22 @@ var EngCalcs = EngCalcs || {};
 		r = popup.getBoundingClientRect();
 		at = clampPanel(sx, sy, r.width, h, window.innerWidth, window.innerHeight, chromeFloor());
 		popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
+		// **AND CAPPED TO THE ROOM BELOW WHERE IT LANDED** (Task 637). The fit above caps to the
+		// whole window, and the clamp then puts the top under the chrome floor, so a box as tall as
+		// the window hung off the bottom by the height of the chrome: measured on a 390 x 844 phone,
+		// 44 px of a Net3 junction's box before the graph, 77 px with it, and the graph is the foot.
+		// capPanelToRoomBelow() is the existing fix for this shape; the overflow scrolls inside the
+		// body instead. Not when the reader dragged a size: that is theirs.
+		if (!popupUserSize && at.top + h > window.innerHeight - POPUP_EDGE) {
+			capPanelToRoomBelow(popup, at.top);
+		}
+		// **WITH THE GRAPH AT ITS FOOT, THE BOX RUNS THE FULL HEIGHT OF THE MAP** (Tom, 2026-10-03,
+		// browser pass on Task 637: *"put the top of Properties at the top of the map and its bottom
+		// at the bottom of the screen."*). Its top is the map canvas's top and its bottom is the
+		// window's, so the graph gets all the room there is and the fields scroll above it. Only a
+		// box that carries the graph: one with nothing at its foot keeps its natural, shorter
+		// height. A position or size the reader dragged is theirs (both are session-only).
+		popupFillMapHeight(popup);
 		ghostClickShield(popup);
 		initTipsIn(popup);
 	}
@@ -52697,6 +53038,7 @@ var EngCalcs = EngCalcs || {};
 	function renameNode(oldId, newId) {
 		applyNodeRename(oldId, newId);   // currentPopup is kept in step inside it -- see above
 		renderNodeFields(newId);
+		propGraphSync();
 		// lastSolveResult's pressures are keyed by the OLD id -- without a fresh solve, the
 		// pressure label would silently vanish for this node until the next unrelated edit.
 		scheduleSolve();
@@ -52745,6 +53087,7 @@ var EngCalcs = EngCalcs || {};
 	function renameLink(oldId, newId) {
 		applyLinkRename(oldId, newId);   // currentPopup is kept in step inside it -- see above
 		renderLinkFields(newId);
+		propGraphSync();
 		scheduleSolve();
 	}
 	// ---- "Apply to all": re-prefix every element of one kind ----
@@ -54113,9 +54456,12 @@ var EngCalcs = EngCalcs || {};
 			if (l.type !== 'pump') {
 				readonlyUnitField(fields, pc.lpn_result_velocity || 'Velocity', resultUnit('velocity'), lastSolveResult.velocities[linkId]);
 			}
-			// Head loss, for a pump too: lpn-solver.js reports a pump's contribution as a NEGATIVE
-			// head loss, which is the whole of how a head gain is expressed on this page.
-			readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]));
+			// Head loss, for a pump too, where it is shown as the pump's positive Head (shownHeadloss()).
+			if (l.type === 'pump') {
+				readonlyUnitField(fields, pc.lpn_result_pump_head || 'Head', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]));
+			} else {
+				readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]));
+			}
 			// Gradient is per unit of pipe LENGTH, so it is a pipe-only result -- a pump has no
 			// length to spread its head over. linkLengthSI(), not the declared length: see Task 255.
 			if (l.type !== 'pump' && linkLengthSI(l)) {
@@ -55118,6 +55464,9 @@ var EngCalcs = EngCalcs || {};
 		else if (currentPopup.kind === 'multi') { if (selectionCount()) { openMultiProperties(); } else { closePopup(); } }
 		else if (currentPopup.kind === 'customer') { renderCustomerFields(currentPopup.id); }
 		else { renderLabelFields(currentPopup.id); }
+		// Every refresh, which includes every step of the transport: that is what moves the `now`
+		// line on the Properties graph (Task 637), exactly as the Time series tab's refresh does.
+		propGraphSync();
 	}
 
 	// Multi-step undo, in memory only (not localStorage) -- ROADMAP Task 146 Phase 1's own listed
@@ -56910,8 +57259,13 @@ var EngCalcs = EngCalcs || {};
 	// `line.text` is still the whole thing, because that is what a reader of the code (and every
 	// harness) means by "what does this label say".
 
-	function affix(group, field, line) {
+	function affix(group, field, line, l) {
 		var p = labelPrefixFor(group, field), s = labelSuffixFor(group, field);
+		// A pump's number is its head (Tom, 2026-10-02: "'Hg' can be just 'H'"), so the stock "Hl="
+		// prefix would call it a loss. A node's "H=" is its hydraulic head; a pump's sits on a link,
+		// so the two never label the same symbol. Only the
+		// untouched default is swapped; a prefix the user typed is theirs.
+		if (l && l.type === 'pump' && field === 'headloss' && p === labelDefaultPrefix(group, field) && p === 'Hl=') { p = 'H='; }
 		// The field NAME rides along (Task 399). Everything downstream that has to rank a line --
 		// the shed cascade -- needs to know which quantity it is, and by the time the lines reach
 		// composeRows() they are indistinguishable strings.
@@ -57161,11 +57515,11 @@ var EngCalcs = EngCalcs || {};
 			km: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(pipeK(l), ld.km) : undefined; })),
 			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), ld.flow) : undefined; })),
 			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], resultUnit('velocity'), ld.velocity) : undefined; })),
-			// One head-loss bucket for every link type, pumps included: a pump reports a negative
-			// head loss (Tom, 2026-07-30), so it lands at the min end of this same range rather
-			// than needing a field of its own.
+			// Pipes and valves only: a pump's number is the head it adds, a different quantity, and
+			// would otherwise win the "highest head loss" badge (Tom, 2026-10-02: "Yes, pumps left
+			// out of highest head loss").
 			headloss: fieldExtrema(doc.links.map(function (l) {
-				if (!lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
+				if (l.type === 'pump' || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
 				return displayRound(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), ld.headloss);
 			})),
 			// Head loss GRADIENT (Task 177): headloss/length as a dimensionless ratio, reusing
@@ -57325,7 +57679,7 @@ var EngCalcs = EngCalcs || {};
 				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), extrema.flow, ld.flow))); }
 				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
 				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], resultUnit('velocity'), extrema.velocity, ld.velocity))); }
-				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), extrema.headloss, ld.headloss))); }
+				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), extrema.headloss, ld.headloss), l)); }
 				// The '%' is read from the SELECT, not assumed: this family offers rise/run too, and
 				// a "%" on a ratio would be a lie rather than a redundancy. Blank in that form --
 				// there is no token for a bare ratio that is shorter than the ambiguity it fixes.
@@ -60233,6 +60587,8 @@ var EngCalcs = EngCalcs || {};
 		var out = { minPressure: undefined, minAt: '', maxVelocity: undefined, maxAt: '' };
 		model.nodes.forEach(function (n) {
 			var p = result.pressures ? result.pressures[n.id] : undefined;
+			// A reservoir or tank is a fixed head, not a place with a pressure to judge.
+			if (EngCalcs.lpnIsFixedHead(n)) { return; }
 			if (typeof p !== 'number' || !isFinite(p)) { return; }
 			if (out.minPressure === undefined || p < out.minPressure) { out.minPressure = p; out.minAt = n.id; }
 		});
@@ -60869,14 +61225,20 @@ var EngCalcs = EngCalcs || {};
 		{ key: 'quality', group: 'node', field: 'quality' },
 		{ key: 'flow', group: 'link', field: 'flow' },
 		{ key: 'velocity', group: 'link', field: 'velocity' },
+		// **ONE COLUMN CANNOT BE BOTH A LOSS AND A GAIN.** Pipes and valves fill Head loss; a pump
+		// fills its head, positive, in a column of its own, and each is blank on the other's rows.
+		// Put under a single "Head loss" heading, a pump's positive number would read as a loss.
+		// That column says "Pump head", not the bare "Head" a pump reads elsewhere, because this
+		// one table also carries a node's hydraulic Head and two columns must never share a name.
 		{ key: 'headloss', group: 'link', field: 'headloss' },
+		{ key: 'pumphead', group: 'link', field: 'headloss', pump: true },
 		{ key: 'status', group: 'link', field: 'status' }
 	];
 	function fullReportColHeading(col) {
 		var pc = EngCalcs.pageConfig || {};
 		if (col.field === 'status') { return pc.lpn_result_status || 'Status'; }
 		var unit = colorFieldUnitText(col.group, col.field);
-		return colorFieldLabel(col.group, col.field) + (unit ? ' (' + unit + ')' : '');
+		return (col.pump ? (pc.lpn_report_pump_head || 'Pump head') : colorFieldLabel(col.group, col.field)) + (unit ? ' (' + unit + ')' : '');
 	}
 	/**
 	 * **THE SAME ACCESSORS THE MAP AND THE TABLES PANE READ, ASKED ONCE PER FRAME.** tsAsOfFrame()
@@ -60903,7 +61265,8 @@ var EngCalcs = EngCalcs || {};
 						t: t, group: 'link', type: reportTypeNoun('link', l.type), id: l.id,
 						flow: colorLinkValue(l, 'flow'),
 						velocity: colorLinkValue(l, 'velocity'),
-						headloss: colorLinkValue(l, 'headloss'),
+						headloss: l.type === 'pump' ? undefined : colorLinkValue(l, 'headloss'),
+						pumphead: l.type === 'pump' ? colorLinkValue(l, 'headloss') : undefined,
 						status: linkStatusText(l)
 					});
 				});

@@ -115,7 +115,10 @@
         "feat/profile-file",
         "feat/dock",
         "feat/dialog-audit",
-        "feat/table-selection"
+        "feat/table-selection",
+        "feat/setting-scope",
+        "feat/scenario-option",
+        "feat/basemap-style"
     ],
     "feature_freeze": {
         "active": false,
