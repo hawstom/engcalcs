@@ -760,8 +760,8 @@
         "lpn_ds_skipped": "Selected elements that are not junctions, left as they are: {n}.",
         "lpn_ds_bad_multiplier": "Type a demand scale of zero or more, such as 1.5.",
         "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
-        "lpn_ds_at_time": "Time step: {time}.",
-        "lpn_ds_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
+        "lpn_analyze_at_time": "Time step: {time}.",
+        "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "keys": {
         "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
@@ -808,8 +808,8 @@
         "lpn_ds_skipped": "Selected elements that are not junctions, left as they are: {n}.",
         "lpn_ds_bad_multiplier": "Type a demand scale of zero or more, such as 1.5.",
         "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
-        "lpn_ds_at_time": "Time step: {time}.",
-        "lpn_ds_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
+        "lpn_analyze_at_time": "Time step: {time}.",
+        "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "key_context": {
         "lpn_graphs_menu_tip": {
@@ -1516,7 +1516,7 @@
                 }
             }
         },
-        "lpn_ds_at_time": {
+        "lpn_analyze_at_time": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -1532,7 +1532,7 @@
                 }
             }
         },
-        "lpn_ds_time_moved": {
+        "lpn_analyze_time_moved": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
