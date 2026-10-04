@@ -3,7 +3,7 @@
 What this seat would build next, in its own order. **Expected to disagree with `dev/ROADMAP.md`**;
 that disagreement is most of what a seat is for. No agent edits the roadmap.
 
-1. **A hover colour/weight highlight on the currently-hit `lpn_` object in Select mode, additive to
+1. **SHIPPED 2026-09-27 (25a3cf2a, Task 727 closed 2026-10-04).** A hover colour/weight highlight on the currently-hit `lpn_` object in Select mode, additive to
    the existing cursor.** Small build (one `pointermove`-driven class on the existing hit-test, or
    a `:hover` rule if `:has()` support clears this suite's floor). Buys feedback the cursor
    deliberately cannot give here — `default` is identical over an object and over nothing by

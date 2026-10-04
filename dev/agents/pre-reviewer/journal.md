@@ -3763,3 +3763,11 @@ OBSERVED: builder harness all ok. My own probe (probe.js, scratchpad) drove ~140
 OBSERVED: divider tip absent at 0.7 s, present at 1.3 s; no native title. Search "browser" -> Page + Hydraulics only.
 OBSERVED: Page marker "Saved in this browser" sits over Restore defaults / Start fresh buttons, which reset project settings.
 OBSERVED: no colour inputs present on Net3 default, not driven.
+# Perry 2026-10-04 feat/basemap-style (Task 617)
+OBSERVED: harness basemap-style-harness.js passes; headless Chromium with stubbed OSM tiles: filter computed on .lpn-basemap only (canvas, credit none); survives reload and New Project (geo and local SI); old/unknown values Normal per harness. Satellite, visual look not checked. No new storage keys.
+# Perry, 2026-10-04b, feat/dialog-audit (Task 710)
+OBSERVED (real Chromium, no seam, own server): delete network Esc/Enter/double-Enter OK; new scenario prompt, double-Enter creates one; scenario delete Esc keeps it; friction select shows old value while box open, Esc keeps, Enter applies; search consent Esc = declined, 0 requests, Enter = accept then query prompt; consent buttons styled identically; goto bad input; scale-by-picking end to end; remove-backdrop Esc keeps.
+OBSERVED defect: phone 390px, Scale-by-picking bar is a 195px x 400px column over the map (bar rect 98..293 x 426..828).
+OBSERVED defect: held Enter after keyboard-opening Edit > Delete network auto-repeats into OK and wipes network.
+NOT RUN: georef two-point/Keep placement, Revert/Save as, cascade multi-delete with scenario overrides, terrain consent. Code-read only.
+Seam lpnDialogAnswerer: only lpn-dom-stub.js, lock-ask-browser-drive.js, dev/browser-pass/lib/pickers.js inject it; none in shipped js.

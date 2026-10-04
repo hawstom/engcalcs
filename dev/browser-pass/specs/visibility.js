@@ -112,13 +112,15 @@ exports.run = async function ({ browser, report }) {
 		// shared "All" group — a customer label answers a different question ("whose is this and
 		// how much does it draw") than a junction's, so it is a group of its own rather than folded
 		// into Node.
+		// **NODE COLORS and LINK COLORS** are their own sub-headings now, each after its symbols.
 		// **CUSTOM PROPERTIES (Task 636)** joined New elements after Defaults — a field the user
 		// invents belongs beside the other things that decide what the next element looks like.
 		// Energy and Quality joined the calculation category after this list was written; Quality is
 		// deliberately LAST, because it is the section fewest readers want and putting it mid-list
 		// makes everyone scroll past a chemistry question to reach the clock.
 		report.eq(subs.join(','),
-			'lpn_set_sub_nodeSym,lpn_set_sub_linkSym,lpn_set_sub_custLbl,lpn_set_sub_nodeLink,' +
+			'lpn_set_sub_nodeSym,lpn_set_sub_nodeColors,lpn_set_sub_linkSym,lpn_set_sub_linkColors,' +
+			'lpn_set_sub_custLbl,lpn_set_sub_nodeLink,' +
 			'lpn_set_sub_mapDisplay,lpn_set_sub_page,lpn_set_sub_idPrefixes,lpn_set_sub_defaults,' +
 			'lpn_set_sub_customProps,lpn_set_sub_units,lpn_set_sub_time,lpn_set_sub_hydraulics,' +
 			'lpn_set_sub_energy,lpn_set_sub_quality',

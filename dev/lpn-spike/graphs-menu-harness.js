@@ -1,5 +1,5 @@
-// Task 640 (Tom, 2026-10-01): Water menu holds a Graphs fly-out with Profile, Time series,
-// Frequency and (Task 600) Flow balance, in that order, each opening its own bottom-pane tab. The old top-level Profile row is
+// Task 640 (Tom, 2026-10-01): Water menu holds a Graphs fly-out with Time series, Profile,
+// Contour, Frequency and (Task 600) Flow balance, in EPANET's order (Tom, 2026-10-04), each opening its own bottom-pane tab. The old top-level Profile row is
 // gone. Real headless Chrome, because a fly-out is hover/tap behaviour.
 //
 //   flock /tmp/engcalcs-browser.lock node dev/lpn-spike/graphs-menu-harness.js
@@ -41,11 +41,11 @@ async function main() {
 			await page.waitForTimeout(250);
 			const all = await page.$$eval('#lpn_menu_popup2 .lpn-menu-row',
 				(els) => els.map((e) => e.textContent.replace('▸', '').trim()));
-			const i = all.indexOf(names.p);
+			const i = all.indexOf(names.t);
 			// Contour joined them (Task 600): a map layer, so its row shows the plot rather than a tab.
 			const contourName = await page.evaluate(() => window.EngCalcs.pageConfig.lpn_contour_menu);
-			ok('fly-out lists Profile, Time series, Frequency, Contour, Flow balance in order, and nothing else after them',
-				i >= 0 && all[i + 1] === names.t && all[i + 2] === names.f && all[i + 3] === contourName &&
+			ok('fly-out lists Time series, Profile, Contour, Frequency, Flow balance in order (EPANET\'s), and nothing else after them',
+				i >= 0 && all[i + 1] === names.p && all[i + 2] === contourName && all[i + 3] === names.f &&
 				all[i + 4] === names.s &&
 				all[i + 5] === undefined, all.join('|'));
 			// Tom, 2026-10-02: no graph icon on the Profile row; the Graphs row keeps it.
