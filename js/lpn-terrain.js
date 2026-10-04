@@ -507,7 +507,7 @@
 				+ ' ' + named('lpn_terrain_keep_ids', 'They are: {ids}', keep);
 		}
 		s += '\n\n' + accuracy();
-		s += '\n\n' + t('lpn_terrain_undo', 'One Undo (Ctrl-Z) puts every one of them back.');
+		s += '\n\n' + (window.EngCalcs && EngCalcs.macWords ? EngCalcs.macWords : String)(t('lpn_terrain_undo', 'One Undo (Ctrl-Z) puts every one of them back.'));
 		// **THE COUNT IS SUBSTITUTED, NOT CONCATENATED** -- Turkish filed this against sprint 459's
 		// English and was right: `count + ' ' + string` fixes the number to the FRONT of the sentence,
 		// and Turkish grammar wants it after the noun phrase. CLAUDE.md forbids composing a

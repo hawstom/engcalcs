@@ -26758,8 +26758,8 @@ var EngCalcs = EngCalcs || {};
 		// The keystroke has to reach this table, so the caret goes back to its current cell.
 		if (box) { paneFocusCell(spec, rows[box.fr].id, cols[box.fc].key); }
 		else if (rows.length && cols.length) { paneFocusCell(spec, rows[0].id, cols[0].key); }
-		setNotice(pc.lpn_pane_paste_armed ||
-			'Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.');
+		setNotice(kbdWords(pc.lpn_pane_paste_armed ||
+			'Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.'));
 		return true;
 	}
 	function paneDisarmAppend(spec, said) {
@@ -28075,7 +28075,7 @@ var EngCalcs = EngCalcs || {};
 			if (accel) {
 				acc = document.createElement('span');
 				acc.className = 'lpn-pane-ctxmenu-accel';
-				acc.textContent = accel;
+				acc.textContent = kbdWords(accel);
 				b.appendChild(acc);
 			}
 			b.addEventListener('click', function () { paneCloseContextMenu(); fn(); });
@@ -39125,6 +39125,11 @@ var EngCalcs = EngCalcs || {};
 		KeyW: 'lpn_menu_project', KeyH: 'lpn_menu_help', KeyL: 'lpn_menu_lang'
 	};
 	var kbdModeReturn = null;
+	// Shortcut words for this reader (EngCalcs.macWords, Calculators.lib.js); a headless stub that
+	// loads this file without that library gets the text unchanged.
+	function kbdWords(text) {
+		return (EngCalcs && EngCalcs.macWords) ? EngCalcs.macWords(text) : text;
+	}
 	function isMacPlatform() {
 		var p = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
 		return /mac|iphone|ipad/i.test(p);
