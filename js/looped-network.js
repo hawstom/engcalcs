@@ -8699,6 +8699,18 @@ var EngCalcs = EngCalcs || {};
 		if (typeof v !== 'number' || !isFinite(v)) { return ''; }
 		return String(tidyBreak(v));
 	}
+	// **A CATEGORICAL FIELD DECLARES ITS STATES HERE** (Task 664): the number colorValueOf() hands the
+	// ramp for each state, its language key and its English fallback, in the order a legend reads
+	// top to bottom. The MAP is untouched -- a state still enters the same break-based ramp as its
+	// number -- only the legend swaps the numeric bands for these words, each swatch taken from the
+	// band its number lands in. A future categorical field adds one entry and nothing else.
+	var COLOR_CATEGORIES = {
+		node: {},
+		link: { status: [
+			{ value: 1, key: 'lpn_result_status_open', text: 'Open' },
+			{ value: 0, key: 'lpn_result_status_closed', text: 'Closed' }
+		] }
+	};
 	function renderColorLegend() {
 		var box = colorLegendEl(); if (!box) { return; }
 		var pc = EngCalcs.pageConfig || {}, any = false;
@@ -8715,8 +8727,20 @@ var EngCalcs = EngCalcs || {};
 			box.appendChild(h);
 			// TOP BAND FIRST. A legend reads high-at-the-top the way a thermometer does, and the
 			// map's own high values are the ones a reviewer is scanning for.
-			var i;
-			for (i = breaks.length; i >= 0; i--) {
+			var i, cats = COLOR_CATEGORIES[group][field], R = ramps();
+			if (cats && R) {
+				cats.forEach(function (c) {
+					var crow = document.createElement('div'), csw = document.createElement('span'),
+						ctxt = document.createElement('span'), ci = R.classIndex(c.value, breaks);
+					crow.style.cssText = 'display:flex;gap:0.5em;align-items:center';
+					csw.className = 'lpn-color-swatch';
+					csw.style.background = bandColor(group, ci === null ? 0 : ci, breaks.length + 1);
+					ctxt.textContent = pc[c.key] || c.text;
+					crow.appendChild(csw); crow.appendChild(ctxt);
+					box.appendChild(crow);
+				});
+			}
+			for (i = cats && R ? -1 : breaks.length; i >= 0; i--) {
 				var row = document.createElement('div'), sw = document.createElement('span'),
 					txt = document.createElement('span');
 				row.style.cssText = 'display:flex;gap:0.5em;align-items:center';

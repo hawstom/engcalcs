@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**90 open tasks.** Next (100): 7 · Soon (75): 10 · Someday (50): 39 · Maybe (25): 15 · Parked (5): 19
+**89 open tasks.** Next (100): 7 · Soon (75): 10 · Someday (50): 38 · Maybe (25): 15 · Parked (5): 19
 
 ## 100 — Next (7)
 
@@ -32,7 +32,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 763 — A searchable help manual, built from the tips Tom cut.
 
-## 50 — Someday (39)
+## 50 — Someday (38)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -53,7 +53,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 636 — A custom properties UI, designed in a table.
 - Task 643 — The camel behind grid-to-ground: slope distance and a length adjustment.
 - Task 649 — Retire the nested repository: serve the suite by Alias at both mounts.
-- Task 664 — A link's status colours correctly and its legend prints numbers.
 - Task 667 — Tom's reflections on saving, locking and who can see your work.
 - Task 675 — A labelled grid, with the significant digits picked out.
 - Task 683 — The wheel zoom increment, snapping having been ruled out.
@@ -118,5 +117,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-82 of 90 titles are within 4–12 words. `!` marks the rest;
+81 of 89 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
