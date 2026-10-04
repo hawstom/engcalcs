@@ -121,7 +121,9 @@
         "feat/basemap-style",
         "feat/tip-verdict",
         "feat/elev-default",
-        "feat/epanet-pp-brand"
+        "feat/epanet-pp-brand",
+        "feat/chain-draw",
+        "feat/pda"
     ],
     "feature_freeze": {
         "active": false,
