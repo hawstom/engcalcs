@@ -462,7 +462,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**35 still to read**, of 43 new keys across 15 unmerged branch(es).
+**35 still to read**, of 43 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -494,7 +494,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.
   @@ NEEDS RULING
 
-### feat/chain-draw (`e0bc5e0f`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/chain-draw (`3cafad01`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_mode_add_chain`**
   > Mode: Add Junction and Pipe. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
@@ -534,7 +534,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/pda (`d895a470`) — 17 new, 17 to read @@ NEEDS RULING
+### feat/pda (`ac32b95f`) — 17 new, 17 to read @@ NEEDS RULING
 
 - **`lpn_diag_pda_needs_epanet`**
   > The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.
@@ -603,13 +603,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/scenario-option (`af125b8e`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/scenario-option (`5c8c454e`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_scenario_duration_tip`**
-  > Overrides the project's total run time in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
+  > Overrides the total run time in this scenario. Leave it blank to use its parent's. A total run time of 0:00 is a steady-state run.
   @@ NEEDS RULING
 - **`lpn_scenario_hyd_step_tip`**
-  > Overrides the project's hydraulic time step in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time.
+  > Overrides the hydraulic time step in this scenario. Leave it blank to use its parent's.
   @@ NEEDS RULING
 - **`lpn_scncmp_at_time`**
   > {value} at {id}, {time}
@@ -638,3 +638,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_sort_desc`**
   > Sort descending
   _Ruled OK 2026-09-26._
+
+### fix/browser-pass-specs (`32c38dec`) — adds no English strings
