@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 2346,
-        "delta_key_count": 67,
+        "expected_key_count": 2352,
+        "delta_key_count": 73,
         "exempt_key_count": 36,
         "exempt_keys": [
             "u_imgd",
@@ -735,6 +735,12 @@
         "lpn_contour_show": "Show contours",
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_settings_basemap_style": "Basemap style",
+        "lpn_settings_basemap_style_tip": "Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.",
+        "lpn_basemap_style_normal": "Normal",
+        "lpn_basemap_style_muted": "Muted",
+        "lpn_basemap_style_faded": "Faded",
+        "lpn_basemap_style_grayscale": "Grayscale",
         "lpn_saved_project": "Saved with the project",
         "lpn_saved_browser": "Saved in this browser",
         "lpn_saved_session": "Not saved",
@@ -804,6 +810,12 @@
         "lpn_contour_show": "Show contours",
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_settings_basemap_style": "Basemap style",
+        "lpn_settings_basemap_style_tip": "Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.",
+        "lpn_basemap_style_normal": "Normal",
+        "lpn_basemap_style_muted": "Muted",
+        "lpn_basemap_style_faded": "Faded",
+        "lpn_basemap_style_grayscale": "Grayscale",
         "lpn_saved_project": "Saved with the project",
         "lpn_saved_browser": "Saved in this browser",
         "lpn_saved_session": "Not saved",
@@ -1170,6 +1182,102 @@
                     "key": "lpn_sysflow_produced",
                     "value": "የተመረተ",
                     "english": "Produced"
+                }
+            }
+        },
+        "lpn_settings_basemap_style": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "የበስተጀርባ ምስል ግልጽነት (0 እስከ 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "ገጽታ",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_settings_basemap_style_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "የበስተጀርባ ምስል ግልጽነት (0 እስከ 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "ገጽታ",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_basemap_style_normal": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "የበስተጀርባ ምስል ግልጽነት (0 እስከ 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "ገጽታ",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_basemap_style_muted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "የበስተጀርባ ምስል ግልጽነት (0 እስከ 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "ገጽታ",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_basemap_style_faded": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "የበስተጀርባ ምስል ግልጽነት (0 እስከ 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "ገጽታ",
+                    "english": "Appearance"
+                }
+            }
+        },
+        "lpn_basemap_style_grayscale": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_backdrop_opacity",
+                    "value": "የበስተጀርባ ምስል ግልጽነት (0 እስከ 1)",
+                    "english": "Background image opacity (0 to 1)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_map_display",
+                    "value": "ገጽታ",
+                    "english": "Appearance"
                 }
             }
         },
