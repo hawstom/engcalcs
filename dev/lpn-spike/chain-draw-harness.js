@@ -252,12 +252,12 @@ console.log('\n--- 9. the rubber band ---');
 	v = at();
 	ok('and follows the pointer from there', v[0] === 300 && v[2] === 400 && v[3] === 250, v.join(','));
 	fire('pointerup', { pointerId: 9, clientX: 400, clientY: 250, pointerType: 'touch', button: 0 });
-	ok('on touch the band is hidden when a finger lifts (after a pan or pinch)', rb.style.display === 'none');
+	ok('on touch the band is hidden when a finger lifts (after a pan or pinch)', rb.getAttribute('visibility') === 'hidden');
 	fire('pointermove', { clientX: 410, clientY: 260, pointerType: 'touch' });
-	ok('...and returns on the next pointer move', rb.style.display !== 'none');
+	ok('...and returns on the next pointer move', rb.getAttribute('visibility') !== 'hidden');
 	click(400, 300, { touch: true });
 	v = at();
-	ok('a touch tap that adds a node shows the band at zero length on it', rb.style.display !== 'none' && v[0] === 400 && v[2] === 400 && v[3] === 300, v.join(','));
+	ok('a touch tap that adds a node shows the band at zero length on it', rb.getAttribute('visibility') !== 'hidden' && v[0] === 400 && v[2] === 400 && v[3] === 300, v.join(','));
 	esc();
 }
 

@@ -17203,6 +17203,7 @@ var EngCalcs = EngCalcs || {};
 		if (id && nodeEls[id]) { nodeEls[id].circle.classList.add('lpn-node-pending'); }
 		if (rubberBandEl) {
 			rubberBandEl.style.display = id ? '' : 'none';
+			rubberBandEl.removeAttribute('visibility');   // the touch-hide below is an attribute, so display stays the tool's own
 			// **THE BAND STARTS AT THE NEW FROM-NODE AND HAS NO LENGTH UNTIL THE POINTER MOVES.**
 			// It was only ever positioned by a pointermove, so after a click it still ran from the
 			// previous node to this one, over the pipe just made (Perry, Task 719).
@@ -42206,7 +42207,7 @@ var EngCalcs = EngCalcs || {};
 			if (!pendingLinkFrom) { return; }
 			var from = pendingLinkAnchor(), w = screenToWorld(e.clientX, e.clientY);
 			if (!from) { return; }
-			rubberBandEl.style.display = '';
+			rubberBandEl.removeAttribute('visibility');
 			rubberBandEl.setAttribute('x1', from.x); rubberBandEl.setAttribute('y1', from.y);
 			rubberBandEl.setAttribute('x2', w.x); rubberBandEl.setAttribute('y2', w.y);
 		});
@@ -42215,7 +42216,7 @@ var EngCalcs = EngCalcs || {};
 		// tap that commits a node shows it again (setPendingLinkFrom), at zero length. Registered
 		// before the tap handler below, so that handler has the last word.
 		svg.addEventListener('pointerup', function (e) {
-			if (e.pointerType === 'touch' && pendingLinkFrom && rubberBandEl) { rubberBandEl.style.display = 'none'; }
+			if (e.pointerType === 'touch' && pendingLinkFrom && rubberBandEl) { rubberBandEl.setAttribute('visibility', 'hidden'); }
 		});
 		// The half-placed meter's band (Task 247), its own listener for the same reason the ring
 		// below it has one: the shapes both track the pointer between clicks and neither should
