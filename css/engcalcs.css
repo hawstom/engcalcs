@@ -1688,6 +1688,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 /* The colour mark is an <img>, not an inline glyph (Tom chose colour here, 2026-09-11). Sized to
    the heading like its mono predecessor; `flex: none` so a long site name cannot squash it. */
 .lpn-about-name .lpn-about-mark { width: 1.5em; height: 1.5em; flex: none; }
+.lpn-about-dedication a { color: inherit; text-decoration: underline dotted; text-underline-offset: .2em; }
+.lpn-about-dedication a:hover, .lpn-about-dedication a:focus { text-decoration-style: solid; }
 /* .lpn-menubar-item's own hover/open/focus rules moved up next to its base rule, above, when this
    branch (feat/menu-button) gave the menu bar its blue button paint -- kept together so the whole
    state set reads in one place instead of two. */

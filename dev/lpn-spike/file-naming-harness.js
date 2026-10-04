@@ -144,12 +144,12 @@ report(/^https:\/\//.test(APP), 'the app value is an https URL', APP);
 //
 // The marker is baked into a saved FILE, which outlives the request that wrote it and has no Host
 // header of its own, so it must name the app's own indexed address rather than whichever domain the
-// author happened to be on. That address is EC_LWN_ORIGIN, not CANONICAL_ORIGIN_DEFAULT: as of
+// author happened to be on. That address is EC_EPP_ORIGIN, not CANONICAL_ORIGIN_DEFAULT: as of
 // 2026-09-17 the two differ, because the calculators nominate hawsedc.com again and the map
-// application alone stays on librewaternet.org (ecCanonicalOrigins() in lib/Canonical.lib.php).
+// application alone is on epanet-plus-plus.org since 2026-10-04 (ecCanonicalOrigins() in lib/Canonical.lib.php).
 const config = fs.readFileSync(path.join(__dirname, '../../lib/config.inc.php'), 'utf8');
-const origin = (config.match(/define\('EC_LWN_ORIGIN',\s*'([^']+)'\)/) || [])[1];
-report(!!origin && APP.indexOf(origin + '/') === 0, 'the app URL is under EC_LWN_ORIGIN', `${APP} vs ${origin}`);
+const origin = (config.match(/define\('EC_EPP_ORIGIN',\s*'([^']+)'\)/) || [])[1];
+report(!!origin && APP.indexOf(origin + '/') === 0, 'the app URL is under EC_EPP_ORIGIN', `${APP} vs ${origin}`);
 
 console.log('\n-- the pickers: write one extension, read both --');
 {

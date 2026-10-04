@@ -1829,7 +1829,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
         // work. New tab, `rel="noopener"`: About is a side-trip, and a reader who opened it to
         // find out what this is should not lose an open project to read more. ?>
 		<h2 class="lpn-about-name"><img class="lpn-about-mark" src="/engcalcs/icons/favicon.svg" alt="" width="24" height="24" /><a href="<?=htmlspecialchars(ecAppSiteUrl(), ENT_QUOTES, 'UTF-8')?>" target="_blank" rel="noopener"><?=htmlspecialchars(ecAppBrandName(), ENT_QUOTES, 'UTF-8')?></a></h2>
-		<p class="lpn-about-dedication" lang="en">You are loved and cherished forever, you have nothing to fear, and you are not ruining everything.</p>
+		<p class="lpn-about-dedication" lang="en"><a href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html" target="_blank" rel="noopener">You are loved and cherished forever, you have nothing to fear, and you are not ruining everything.</a></p>
 		<p><?=$ec_lang['lpn_about_license']?><br />Copyright &copy; 2009&ndash;2026 Thomas Gail Haws</p>
 <?php   // Credits, which an About box conventionally carries (MAH's own observation) and which
         // this one can finally honour: credits.html is the About-EPANET page that survived

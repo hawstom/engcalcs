@@ -32171,17 +32171,17 @@ var EngCalcs = EngCalcs || {};
 	// `app` is a URL rather than a product name: the product name is unsettled, and a URL stays
 	// useful to somebody who finds this file knowing nothing. Old readers ignore unknown keys.
 	var LPN_FILE_FORMAT = 'hawsedc-lpn';
-	// The CANONICAL address of this page: EC_LWN_ORIGIN in lib/config.inc.php plus the pretty URL
-	// lib/Canonical.lib.php declares for it (no `www`). **EC_LWN_ORIGIN and NOT
+	// The CANONICAL address of this page: EC_EPP_ORIGIN in lib/config.inc.php plus the pretty URL
+	// lib/Canonical.lib.php declares for it (no `www`). **EC_EPP_ORIGIN and NOT
 	// CANONICAL_ORIGIN_DEFAULT: the two stopped being the same string on 2026-09-17**, when the
-	// calculators went back to nominating hawsedc.com and this page alone stayed on
-	// librewaternet.org (ecCanonicalOrigins()). HARDCODED, not derived from
+	// calculators went back to nominating hawsedc.com and this page alone stayed apart; on
+	// 2026-10-04 that origin became epanet-plus-plus.org (ecCanonicalOrigins()). HARDCODED, not derived from
 	// location.origin: a file saved from a dev host would record the dev host forever, and this key
 	// says where the format lives, not where one save happened. It must be the INDEXED address for
 	// the same reason -- the marker outlives the request that wrote it and has no Host header of its
 	// own, so it names the one address the suite asks to be found at (Task 479.01, 2026-09-06).
 	// dev/lpn-spike/file-naming-harness.js holds it against the config.
-	var LPN_FILE_APP = 'https://librewaternet.org/app/';
+	var LPN_FILE_APP = 'https://epanet-plus-plus.org/app/';
 	function serializeProject() {
 		var out = {
 			format: LPN_FILE_FORMAT, app: LPN_FILE_APP,

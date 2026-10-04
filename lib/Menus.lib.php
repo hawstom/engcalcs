@@ -145,8 +145,12 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
       // means a translation sprint is invited to translate a domain. `lpn_main_menu` still holds
       // "Water Supply Network" and is now read by nothing; that is Tom's call to delete.
       //
-      // Same tab: Back is the way back, and EC_LWN_APP_URL's own note says why. ?>
-					<a class="dropdown-item" href="<?=EC_LWN_APP_URL?>" title="<?=htmlspecialchars($ec_lang['lpn_main_desc'])?>">LibreWaterNet.org</a>
+      // Same tab: Back is the way back, and EC_LWN_APP_URL's own note says why.
+      //
+      // **NOW EPANET++, LINKING THE MAP ITSELF** (Tom, 2026-10-04). Every other entry here opens
+      // a calculator, so this one opens the application (EC_EPP_APP_URL), not the brand's landing
+      // page, the same door the LibreWaterNet entry used. ?>
+					<a class="dropdown-item" href="<?=EC_EPP_APP_URL?>" title="<?=htmlspecialchars($ec_lang['lpn_main_desc'])?>">EPANET++</a>
 					<div class="dropdown-divider"></div>
 					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Trap.php" title="<?=htmlspecialchars($ec_lang['mtc_main_desc'])?>"><?=$ec_lang['mtc_menu']?></a>
 					<a class="dropdown-item" href="<?=EC_SW_BASE?>Manning-Irregular.php" title="<?=htmlspecialchars($ec_lang['mi_main_desc'])?>"><?=$ec_lang['mi_menu']?></a>
