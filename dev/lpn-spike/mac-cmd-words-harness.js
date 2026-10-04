@@ -63,7 +63,7 @@ async function probe(browser, Session, platform, tag) {
 		td.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: r.left + 2, clientY: r.top + 2 }));
 		return Array.from(document.querySelectorAll('.lpn-pane-ctxmenu-accel')).map((s) => s.textContent);
 	});
-	const terrain = await a.page.evaluate(() => EngCalcs.macWords('One Undo (Ctrl-Z) puts every one of them back.'));
+	const terrain = await a.page.evaluate(() => EngCalcs.macWords('Press Ctrl-Z to undo; Ctrl+Option stays.'));
 	await a.page.close().catch(() => {});
 	return { boxes, menu, terrain };
 }
@@ -84,12 +84,12 @@ async function main() {
 		ok('Mac: Ctrl+Option chord kept', /Ctrl\+Option/.test(mac.boxes));
 		ok('Mac: right-click menu opened', !!mac.menu && mac.menu.length > 0, JSON.stringify(mac.menu));
 		ok('Mac: menu accelerators say Cmd', !!mac.menu && mac.menu.length > 0 && mac.menu.every((t) => /^Cmd\+/.test(t)), JSON.stringify(mac.menu));
-		ok('Mac: terrain Undo sentence', mac.terrain === 'One Undo (Cmd-Z) puts every one of them back.', mac.terrain);
+		ok('Mac: terrain Undo sentence', mac.terrain === 'Press Cmd-Z to undo; Ctrl+Option stays.', mac.terrain);
 
 		const win = await probe(browser, Session, 'Win32', 'win');
 		ok('Windows: boxes still say Ctrl', /Ctrl\+C/.test(win.boxes) && !/Cmd/.test(win.boxes));
 		ok('Windows: menu accelerators say Ctrl', !!win.menu && win.menu.length > 0 && win.menu.every((t) => /^Ctrl\+/.test(t)), JSON.stringify(win.menu));
-		ok('Windows: terrain sentence unchanged', win.terrain === 'One Undo (Ctrl-Z) puts every one of them back.');
+		ok('Windows: terrain sentence unchanged', win.terrain === 'Press Ctrl-Z to undo; Ctrl+Option stays.');
 	} finally {
 		await browser.close();
 		env.stopServer();
