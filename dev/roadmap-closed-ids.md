@@ -671,3 +671,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|754| CLOSED 2026-10-03: `feat/demand-scaling` merged on Tom's "Good. Done. Close, merge, and delete branch."; Water > Analyze > Demand scaling, on a copy, with a find-the-limit search. `demand-scaling-harness.js`.
 - 0|637| CLOSED 2026-10-04: time-series graph at the foot of Properties (`feat/property-graph`), merged on Tom's "Done. Close, merge, and delete branch." `property-graph-harness.js`.
 - 0|727| CLOSED 2026-10-04: found already shipped (25a3cf2a, 2026-09-27, Select-mode hover preview); the roadmap had lagged. `selection-preview-harness.js`.
+- 0|732| CLOSED 2026-10-04: browser-pass tables, smallscreen, place, visibility brought to today's page (soft-hyphen headings, Graphs fly-out, Convert as box, kept drawings); selectall already green. One real defect left reported in smallscreen.js: Settings label lists overrun the 360px pane by 22px.
