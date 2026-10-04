@@ -5955,8 +5955,8 @@ var EngCalcs = EngCalcs || {};
 			symbolCapMultiple: 0.5,
 			symbolCapPercentile: 20,
 			// Task 617: a CSS look (grayscale etc.) on the TILE LAYER only (LPN_BASEMAP_STYLES). Project data on the
-			// precedent of backdropOpacity beside it; an old file merges onto this and opens Normal.
-			basemapStyle: 'normal',
+			// precedent of backdropOpacity beside it; a new project opens Muted; a file saved without the field opens Normal (see the load path).
+			basemapStyle: 'muted',
 			backdropOpacity: 0.5, // 0-1, applied to the backdrop image -- the other half of the same control (R-205: new-project default, matched by every shipped example)
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
 			// (ROADMAP Task 329).
@@ -7557,7 +7557,6 @@ var EngCalcs = EngCalcs || {};
 	};
 	function basemapStyleName() {
 		var f = settings.basemapStyle;
-		if ((f === undefined || f === 'normal') && settings.basemapFilter) { f = settings.basemapFilter; } // pre-release field name
 		return (typeof f === 'string' && LPN_BASEMAP_STYLES.hasOwnProperty(f)) ? f : 'normal';
 	}
 	function refreshBackdropOpacity() {
@@ -33273,6 +33272,10 @@ var EngCalcs = EngCalcs || {};
 		// element with no prefix at all rather than with its default.
 		var savedPrefixes = savedSettings.idPrefixes || {};
 		delete savedSettings.defaults; delete savedSettings.sectionsOpen; delete savedSettings.idPrefixes;
+		// Task 617: a file saved without a basemap style was saved Normal; only a NEW project is Muted.
+		// basemapFilter is the pre-release name of the field.
+		if (savedSettings.basemapStyle === undefined) { savedSettings.basemapStyle = savedSettings.basemapFilter || 'normal'; }
+		delete savedSettings.basemapFilter;
 		settings = Object.assign(defaultSettings(), savedSettings);
 		// **A PROJECT SAVED BEFORE `Quality` WAS INTERPRETED STILL CARRIES ONLY THE TOKEN**, and it
 		// must not come back as "no analysis": it would then export a file missing a line its source

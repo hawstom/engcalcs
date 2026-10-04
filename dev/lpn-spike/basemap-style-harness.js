@@ -33,6 +33,7 @@ const L = loadLoopedNetwork(
 	"\t\tsetView: function (v) { return applyView(v); }, geoHome: geoHomeView,\n" +
 	"\t\trebuildSettings: function () { rebuildSettingsBox(); },\n" +
 	"\t\tsettings: function () { return settings; }, serialize: serializeProject,\n" +
+	"\t\tdefaults: function () { return defaultSettings(); },\n" +
 	"\t\tstyles: function () { return LPN_BASEMAP_STYLES; }"
 );
 L.buildLayers();
@@ -68,6 +69,15 @@ console.log('\n--- a pre-release file with basemapFilter keeps its choice ---');
 	delete pre.settings.basemapStyle; pre.settings.basemapFilter = 'faded';
 	open(pre);
 	ok('basemapFilter field read as fallback', canvasFilter() === F.faded, String(canvasFilter()));
+}
+
+console.log('\n--- a NEW project is Muted; the gallery world example too ---');
+ok('defaultSettings (new project, first empty project) is Muted', L.defaults().basemapStyle === 'muted', String(L.defaults().basemapStyle));
+{
+	const ex = NET3W();
+	ok('the Novato world example stores muted', ex.settings.basemapStyle === 'muted');
+	open(ex);
+	ok('...and opens Muted on the canvas', canvasFilter() === F.muted, String(canvasFilter()));
 }
 
 console.log('\n--- an old project opens Normal ---');
