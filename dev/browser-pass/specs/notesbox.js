@@ -42,6 +42,9 @@ function overlaps(a, b) {
 	return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 }
 async function openPane(page) {
+	// The consent banner lies over the bottom of the window and now covers the Tables pane's first row, so a
+	// click on a cell is intercepted; other table specs remove it the same way.
+	await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
 	await page.evaluate(() => {
 		const b = document.getElementById('lpn_pane_btn');
 		if (b && b.getAttribute('aria-pressed') !== 'true') { b.click(); }
