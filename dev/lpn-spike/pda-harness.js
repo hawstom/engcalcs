@@ -243,6 +243,22 @@ console.log('\n=== 5c. a Minimum pressure above zero, the order check, Convert a
 	ok('Convert as rewrites Minimum and Required pressure', hh.minPressure === 10 && hh.reqPressure === 40, JSON.stringify(hh));
 	ok('...and Head error limit and Flow change limit', hh.headError === 1.5 && hh.flowChange === 8, JSON.stringify(hh));
 
+	L.settings().hydraulics.minPressure = 20 * 1.4215879265;
+	L.convert('lpn_u_pressure', 1 / 1.4215879265);
+	ok('a converted number is held to six significant figures', L.settings().hydraulics.minPressure === 20, L.settings().hydraulics.minPressure);
+
+	// A Minimum pressure typed in PSI crosses to metres at the solver (a mutant that drops the
+	// Minimum conversion fails here).
+	{
+		const sel = unitSelects.lpn_u_pressure;
+		sel.selectedIndex = sel.options.findIndex((o) => o.value === 'psi');
+		L.settings().hydraulics = { demandModel: 'PDA', minPressure: 10, reqPressure: 30 };
+		const mh = L.assembleModel().hydraulics, f = EngCalcs.unitFactors.psi;
+		ok('Minimum pressure typed in psi reaches the solver in metres',
+			Math.abs(mh.minPressure - 10 / f) < 1e-9 && Math.abs(mh.reqPressure - 30 / f) < 1e-9, JSON.stringify(mh));
+		sel.selectedIndex = sel.options.findIndex((o) => o.value === 'mh2o');
+	}
+
 	// Back to demand driven: the numbers left behind are not exported, unless the file stated them.
 	L.settings().hydraulics = { minPressure: 5, reqPressure: 20, pressureExponent: 0.5 };
 	let got = optionLines(L.exportInp().inp);

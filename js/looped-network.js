@@ -43587,6 +43587,15 @@ var EngCalcs = EngCalcs || {};
 		// this walks the library rather than the elements -- a curve two pumps share must be
 		// reinterpreted once, not twice, and a curve nothing references is still the user's numbers
 		// and still means what its column heading says.
+		// The Settings numbers (Task 762 pass): converted, then held to six significant figures,
+		// because conv() rounds nothing and a box showing 14.068774521117009 is not a number anyone
+		// typed. Demands and elevations are rounded for display elsewhere; these are shown raw.
+		function convSetting(key) {
+			var h = settings.hydraulics;
+			if (!h || typeof h[key] !== 'number') { return; }
+			h[key] = +(h[key] * k).toPrecision(6);
+			n++;
+		}
 		function convCurveAxis(axis, kinds, factor) {
 			var moved = 0;
 			docCurvesRead().forEach(function (c) {
@@ -43638,7 +43647,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			convOverrides('level'); convOverrides('head');
 			// Head error limit is a head typed in this unit (Task 762 pass: it was missed here).
-			conv(settings.hydraulics, 'headError');
+			convSetting('headError');
 			// A curve point is [flow, value]; this unit owns the second, for the two kinds whose
 			// second column IS a head (Task 586). An efficiency curve's is a percent.
 			n += convCurveAxis(1, ['head', 'headloss'], k);
@@ -43646,7 +43655,7 @@ var EngCalcs = EngCalcs || {};
 			// The pressure-driven limits are typed in this unit (Task 762). conv() leaves a stale
 			// text token behind, and lpnNumText() drops it by itself because it no longer parses
 			// to the new value.
-			conv(settings.hydraulics, 'minPressure'); conv(settings.hydraulics, 'reqPressure');
+			convSetting('minPressure'); convSetting('reqPressure');
 			doc.links.forEach(function (l) {
 				if (l.type !== 'valve') { return; }
 				var t = String(l.valveType || 'TCV').toUpperCase();
@@ -43663,7 +43672,7 @@ var EngCalcs = EngCalcs || {};
 				});
 			});
 		} else if (name === 'lpn_u_flow') {
-			conv(settings.hydraulics, 'flowChange');   // a flow typed in this unit
+			convSetting('flowChange');   // a flow typed in this unit
 			doc.nodes.forEach(function (nd) { conv(nd, '_demand'); });
 			// A junction's further demand categories (Task 468) and a customer's own demand (Task
 			// 247) are flows in the same unit, and were missed until File, Convert as needed them.
