@@ -2551,11 +2551,9 @@ EngCalcs.pageConfig = {
       // one-letter alias `pc`, so every one of the 838 keys here is invisible to it. That gap is
       // ROADMAP Task 322's survey material, and it is the reason this was found by hand. ?>
 	lpn_labels_col_drop: <?=json_encode($ec_lang['lpn_labels_col_drop'])?>,
-	lpn_labels_priority_link_tip: <?=json_encode($ec_lang['lpn_labels_priority_link_tip'])?>,
 	// R-326..R-334: the Show column, the Use units tick, the customer Drop tip, the Initial status row.
 	lpn_labels_col_show: <?=json_encode($ec_lang['lpn_labels_col_show'])?>,
 	lpn_labels_show_tip: <?=json_encode($ec_lang['lpn_labels_show_tip'])?>,
-	lpn_labels_priority_customer_tip: <?=json_encode($ec_lang['lpn_labels_priority_customer_tip'])?>,
 	lpn_labels_use_units: <?=json_encode($ec_lang['lpn_labels_use_units'])?>,
 	lpn_labels_use_units_tip: <?=json_encode($ec_lang['lpn_labels_use_units_tip'])?>,
 	lpn_labels_init_status: <?=json_encode($ec_lang['lpn_labels_init_status'])?>,

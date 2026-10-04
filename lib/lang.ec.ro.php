@@ -2388,7 +2388,6 @@ $ec_lang['lpn_labels_separator_tip']='Text între o proprietate și următoarea 
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='Prioritate';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='Ordinea în care valorile sunt eliminate atunci când o etichetă nu încape. 1 este păstrată cel mai mult timp.';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
@@ -2405,7 +2404,6 @@ $ec_lang['lpn_labels_col_decimals']='Zecimale';
 // it heads a box about three characters wide, and its tip carries the whole meaning.
 $ec_lang['lpn_labels_col_show']='Arată';
 $ec_lang['lpn_labels_show_tip']='Ordinea în care apar valorile pe o etichetă. Valoarea numerotată 1 vine prima: în partea de sus a unei etichete stivuite, și la începutul unei etichete pe o singură linie.';
-$ec_lang['lpn_labels_priority_customer_tip']='Ordinea în care valorile sunt omise de pe eticheta unui abonat. Valoarea numerotată 1 este omisă prima.';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='Folosește unități';

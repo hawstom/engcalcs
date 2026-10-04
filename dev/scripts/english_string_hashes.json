@@ -3721,8 +3721,6 @@
         "lpn_labels_mark_extrema": "abe635279c0b23438dfed87917ef216db40e72ca",
         "lpn_labels_mark_extrema_tip": "d7474cc61785797d238e93a85f397e658aaae9bc",
         "lpn_labels_priority": "886cbff9d9df761ec642945e519631a23ed173a2",
-        "lpn_labels_priority_customer_tip": "d8fb53e5bca0983bd04c9193b4ced091e6d85f09",
-        "lpn_labels_priority_link_tip": "4d6b32a932bdc7ed82e56d26c769d26522d67812",
         "lpn_labels_priority_node_tip": "323965b82652c85bec0214996eda546a3bf9c9e1",
         "lpn_labels_separator": "be7b78f8fc63d418df83bb3a26c45db2f93829a2",
         "lpn_labels_separator_tip": "552be4e7fd006639dcc9222cd204d2307a83b1d8",
@@ -9084,14 +9082,6 @@
         "lpn_labels_priority": {
             "words": 1,
             "ends_sentence": false
-        },
-        "lpn_labels_priority_customer_tip": {
-            "words": 18,
-            "ends_sentence": true
-        },
-        "lpn_labels_priority_link_tip": {
-            "words": 20,
-            "ends_sentence": true
         },
         "lpn_labels_priority_node_tip": {
             "words": 59,

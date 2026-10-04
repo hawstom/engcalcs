@@ -2387,7 +2387,6 @@ $ec_lang['lpn_labels_separator_tip']='Testo tra una proprietà e la successiva s
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='Priorità';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='L\'ordine in cui i valori vengono eliminati quando un\'etichetta non entra nello spazio disponibile. 1 viene mantenuto più a lungo.';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
@@ -2404,7 +2403,6 @@ $ec_lang['lpn_labels_col_decimals']='Decimali';
 // it heads a box about three characters wide, and its tip carries the whole meaning.
 $ec_lang['lpn_labels_col_show']='Mostra';
 $ec_lang['lpn_labels_show_tip']='L\'ordine in cui i valori compaiono su un\'etichetta. Il valore numerato 1 viene per primo: in cima a un\'etichetta impilata, e all\'inizio di un\'etichetta su una riga sola.';
-$ec_lang['lpn_labels_priority_customer_tip']='L\'ordine in cui i valori vengono tolti da un\'etichetta cliente. Il valore numerato 1 viene tolto per primo.';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='Usa unità';

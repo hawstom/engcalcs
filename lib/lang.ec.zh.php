@@ -2387,7 +2387,6 @@ $ec_lang['lpn_labels_separator_tip']='一个属性与下一个属性之间的分
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='优先级';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='标签放不下时数值被舍弃的顺序。1 保留得最久。';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
@@ -2404,7 +2403,6 @@ $ec_lang['lpn_labels_col_decimals']='小数位';
 // it heads a box about three characters wide, and its tip carries the whole meaning.
 $ec_lang['lpn_labels_col_show']='显示';
 $ec_lang['lpn_labels_show_tip']='数值在标签上出现的顺序。编号为 1 的数值排在最前：在堆叠式标签中位于最上方，在单行标签中位于最前面。';
-$ec_lang['lpn_labels_priority_customer_tip']='数值从用户标签中被省略的顺序。编号为 1 的数值最先被省略。';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='使用单位';

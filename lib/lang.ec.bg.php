@@ -2430,7 +2430,6 @@ $ec_lang['lpn_labels_separator_tip']='Текст между едно свойс�
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='Приоритет';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='Редът, в който стойностите отпадат, когато етикетът не се побира. 1 се запазва най-дълго.';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
@@ -2447,7 +2446,6 @@ $ec_lang['lpn_labels_col_decimals']='Десетични';
 // it heads a box about three characters wide, and its tip carries the whole meaning.
 $ec_lang['lpn_labels_col_show']='Показвай';
 $ec_lang['lpn_labels_show_tip']='Редът, в който стойностите се появяват в етикет. Стойността с номер 1 идва първа: най-отгоре в подреден на редове етикет, и в началото на етикет на един ред.';
-$ec_lang['lpn_labels_priority_customer_tip']='Редът, в който стойностите отпадат от етикет на абонат. Стойността с номер 1 отпада първа.';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='Използвай мерни единици';

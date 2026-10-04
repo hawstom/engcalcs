@@ -2389,7 +2389,6 @@ $ec_lang['lpn_labels_separator_tip']='लेबल पर एक गुण औ�
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='प्राथमिकता';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='जब लेबल फ़िट नहीं होता तो मान किस क्रम में हटाए जाते हैं। 1 सबसे अंत तक रखा जाता है।';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
@@ -2406,7 +2405,6 @@ $ec_lang['lpn_labels_col_decimals']='दशमलव';
 // it heads a box about three characters wide, and its tip carries the whole meaning.
 $ec_lang['lpn_labels_col_show']='दिखाएँ';
 $ec_lang['lpn_labels_show_tip']='वह क्रम जिसमें मान किसी लेबल पर दिखाई देते हैं। संख्या 1 वाला मान पहले आता है: एक स्तरित लेबल के शीर्ष पर, और एक पंक्ति वाले लेबल के आरंभ में।';
-$ec_lang['lpn_labels_priority_customer_tip']='वह क्रम जिसमें मान ग्राहक लेबल से हटाए जाते हैं। संख्या 1 वाला मान पहले हटाया जाता है।';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='इकाइयाँ उपयोग करें';

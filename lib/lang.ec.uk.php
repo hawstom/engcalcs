@@ -2430,7 +2430,6 @@ $ec_lang['lpn_labels_separator_tip']='Текст між однією власт�
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='Пріоритет';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='Порядок, у якому значення прибирають, коли підпис не вміщується. Значення з пріоритетом 1 лишається найдовше.';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
@@ -2447,7 +2446,6 @@ $ec_lang['lpn_labels_col_decimals']='Десяткові';
 // it heads a box about three characters wide, and its tip carries the whole meaning.
 $ec_lang['lpn_labels_col_show']='Показати';
 $ec_lang['lpn_labels_show_tip']='Порядок, у якому значення з’являються в підписі. Значення під номером 1 іде першим: угорі підпису в кілька рядків і на початку підпису в один рядок.';
-$ec_lang['lpn_labels_priority_customer_tip']='Порядок, у якому значення прибирають з підпису абонента. Значення під номером 1 прибирають першим.';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='Використовувати одиниці';

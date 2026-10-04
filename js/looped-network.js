@@ -19945,7 +19945,7 @@ var EngCalcs = EngCalcs || {};
 		// title and wrapping BOTH the label text and the glyph, so the tap target is the whole
 		// label rather than one character. CLAUDE.md's rule for a label with no link.
 		qLab.appendChild(findHelpLabel(pc.lpn_find_query_label || 'Query',
-			pc.lpn_find_query_tip || 'The same search, written as one line. Changing the controls rewrites this line, and typing in this line updates the controls.'));
+			pc.lpn_find_query_tip || 'The given search as a text query. Changing the query updates the controls above.'));
 		findQueryInput = document.createElement('input');
 		findQueryInput.type = 'text';
 		findQueryInput.className = 'lpn-find-query';
@@ -20152,7 +20152,7 @@ var EngCalcs = EngCalcs || {};
 		// title anywhere else is dead on touch.
 		btn.className = 'ec-help';
 		btn.title = pc.lpn_find_filter_tip ||
-			'Hide rows that do not match this query in the Table(s) that match "What to search" above. Nothing is deleted.';
+			'Filter in Table(s) that match "What to search" above';
 		btn.textContent = pc.lpn_find_filter_btn || 'Filter in table';
 		btn.addEventListener('click', applyTableFilter);
 		row.appendChild(btn);
@@ -44358,7 +44358,7 @@ var EngCalcs = EngCalcs || {};
 		line.className = 'lpn-set-row';
 		setFieldLabel(text, pc.lpn_settings_label_max_width ||
 			'Show labels when zoomed to this map width or less', pc.lpn_labels_customer_width_tip ||
-			'Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Type 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
+			'Customer labels are drawn only while the map view is this wide or narrower. Leave the box blank to draw them at every zoom. Enter 0 to never draw a customer label, at any zoom. This has no effect if it is larger than the similar setting for all labels.');
 		// **BLANK NOW REACHES labelSettings.customerMaxWidth = null** (Tom, 2026-09-23 pre-review:
 		// the box's own "Always show" placeholder was previously unreachable -- the old change
 		// handler refused an empty entry and put the last number back). saveToStorage() and
@@ -44374,14 +44374,11 @@ var EngCalcs = EngCalcs || {};
 	// The Drop column's tip, which differs by group because the three orders do different jobs: rows
 	// inside one link label, whole node labels against each other, and a customer label's values.
 	function labelDropTip(group) {
+		// **ONE DROP TIP FOR ALL THREE TABLES** (Tom, 2026-10-04 tip verdicts: *"Combine with tips for
+		// all three drops"*). Node, link and customer rows read the same key; `group` is kept so a
+		// caller need not change if the three ever part again.
 		var pc = EngCalcs.pageConfig || {};
-		if (group === 'node') {
-			return pc.lpn_labels_priority_node_tip || 'The order in which values are dropped when two node labels would overlap. The value numbered 1 is dropped first. When only one value is left and the labels still overlap, one whole label is hidden: the one with the lower demand, the pressure nearer the middle of the range, or the elevation or head more like neighboring nodes.';
-		}
-		if (group === 'customer') {
-			return pc.lpn_labels_priority_customer_tip || 'The order in which values are dropped from a customer label. The value numbered 1 is dropped first.';
-		}
-		return pc.lpn_labels_priority_link_tip || 'The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first.';
+		return pc.lpn_labels_priority_node_tip || 'The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first. When only one value is left and two labels still overlap, one of them is hidden: the one with the lower demand, with pressure nearer the middle of the range, or with elevation or head more like its neighboring nodes.';
 	}
 	// Turning "Use units" OFF leaves the unit text in the After box as the user's own, ready to edit,
 	// rather than snapping the box back to whatever it held before the tick.

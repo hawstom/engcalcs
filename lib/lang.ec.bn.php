@@ -2398,7 +2398,6 @@ $ec_lang['lpn_labels_separator_tip']='একটি লেবেলে একট�
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='অগ্রাধিকার';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_labels_priority_link_tip']='লেবেল না ধরলে যে ক্রমে মানগুলো বাদ দেওয়া হয়। 1 সবচেয়ে বেশি সময় ধরে রাখা হয়।';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
@@ -2415,7 +2414,6 @@ $ec_lang['lpn_labels_col_decimals']='দশমিক';
 // it heads a box about three characters wide, and its tip carries the whole meaning.
 $ec_lang['lpn_labels_col_show']='দেখান';
 $ec_lang['lpn_labels_show_tip']='লেবেলে মানগুলো যে ক্রমে দেখা যায়। ১ নম্বর মানটি প্রথমে আসে: একটি স্তূপীকৃত লেবেলের উপরে, এবং এক লাইনের লেবেলের শুরুতে।';
-$ec_lang['lpn_labels_priority_customer_tip']='গ্রাহক লেবেল থেকে মানগুলো যে ক্রমে বাদ দেওয়া হয়। ১ নম্বর মানটি প্রথমে বাদ দেওয়া হয়।';
 // Tom's own words for the control (R-331: "a code or a toggle to 'Use units' for the After string").
 // It heads a narrow column and names each row's tick box.
 $ec_lang['lpn_labels_use_units']='একক ব্যবহার করুন';

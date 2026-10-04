@@ -2763,11 +2763,6 @@
             "ruled": "2026-09-28",
             "answer": "OK."
         },
-        "lpn_labels_priority_customer_tip": {
-            "on": "The order in which values are dropped from a customer label. The value numbered 1 is dropped first.",
-            "ruled": "2026-09-28",
-            "answer": "OK."
-        },
         "lpn_labels_restore": {
             "on": "Restore label defaults",
             "ruled": "2026-09-23",
