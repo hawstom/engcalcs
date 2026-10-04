@@ -399,7 +399,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**12 still to read**, of 24 new keys across 13 unmerged branch(es).
+**12 still to read**, of 24 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -418,8 +418,6 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_analyze_time_moved`**
   > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
   @@ NEEDS RULING
-
-### chore/wave0-1003b (`85644f61`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
