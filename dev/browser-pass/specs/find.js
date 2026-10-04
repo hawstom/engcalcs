@@ -295,7 +295,8 @@ exports.run = async function ({ browser, report }) {
 			// the ordering is pinned against a controlled fixture in dev/lpn-spike/find-harness.js
 			// instead. What a browser is needed for is that each row PRINTS the value it was
 			// ranked by, which is what makes a top-n list readable at all.
-			const nums = listed.rows.map(t => parseFloat(t.split(/\s+/)[1]));
+			// The row reads "Pipe L31  7302636.8481": the ID now carries its prefix, so the ranked value is the LAST token, not the second.
+			const nums = listed.rows.map(t => parseFloat(t.trim().split(/\s+/).pop()));
 			report.ok(nums.every(v => isFinite(v)),
 				'...each row shows the value it was ranked by', listed.rows.join(' | ').slice(0, 90));
 			report.ok(listed.props.indexOf('gradient') >= 0,
