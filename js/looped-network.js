@@ -4848,7 +4848,7 @@ var EngCalcs = EngCalcs || {};
 		// scenario switch and on every override, and a plain textContent assignment would wipe it.
 		setLabel(btn, 'scenarios',
 			(pc.lpn_scenario_label || 'Scenario') + ': ' + scenarioDisplayName(scn)
-			+ ' | ' + (pc.lpn_scenario_overrides || 'No. of custom values') + ': ' + overrideCount(scn));
+			+ ' | ' + (pc.lpn_scenario_overrides || 'No. of overrides') + ': ' + overrideCount(scn));
 		refreshScenarioTip(btn);
 		// Every override written or cleared lands here, so the Alternatives table follows it,
 		// and so does the note under Settings > Time that names the scenarios overriding it.
@@ -60859,7 +60859,7 @@ var EngCalcs = EngCalcs || {};
 		// row was solved under, the scenario's own or the project's it inherited.
 		body = ffTable(host, [
 			pc.lpn_scenario_label || 'Scenario',
-			pc.lpn_scenario_overrides || 'No. of custom values',
+			pc.lpn_scenario_overrides || 'No. of overrides',
 			pc.bpn_demand_mult || 'Demand multiplier',
 			pc.lpn_time_duration || 'Total run time',
 			pc.lpn_time_hyd_step || 'Hydraulic time step',

@@ -2956,14 +2956,14 @@ $ec_lang_syn['lpn_scenario_base']='Base case, Baseline, Canonical, Source, Root,
 // routed around, and it says ownership without implying difference. Seven languages had already
 // chosen exactly this family unprompted (fr personnalisees, it personalizzati, es exclusivos,
 // pt individuais, ar mukhassasa, fa ekhtesasi, ro specifice).
-$ec_lang['lpn_scenario_overrides']='No. of custom values';
+$ec_lang['lpn_scenario_overrides']='No. of overrides';
 // ROADMAP Task 512. The amber ring was designed, correct, and silent: two independent users read it
 // as a stuck highlight they could not turn off. These two strings are the ring's own explanation and
 // the readout's, so neither requires clicking the element to find out what is going on.
 // {name} is the active scenario's display name -- the ring is a fact about WHICH SCENARIO is
 // showing, not a state of the element, and naming the scenario is what makes that recoverable.
 $ec_lang['lpn_scenario_mark_tip']='The amber ring means this asset has an override in the scenario {name}.';
-$ec_lang['lpn_scenario_overrides_tip']='Each override is marked on the map with an amber ring. Switch to {base} to see the drawing without them.';
+$ec_lang['lpn_scenario_overrides_tip']='Each override is marked on the map with an amber ring. Switch to {base} or another parent scenario to see the drawing without them.';
 $ec_lang['lpn_scenario_menu']='Scenarios';
 $ec_lang['lpn_scenario_tip']='The set of values the drawing is showing and the page is solving right now. Click to switch scenarios, or to add, rename, or delete one.';
 $ec_lang['lpn_scenario_new']='New scenario…';
@@ -2974,7 +2974,7 @@ $ec_lang['lpn_scenario_delete']='Delete scenario';
 $ec_lang['lpn_scenario_delete_confirm']='Delete the scenario {name}, and its {n} overrides? The drawing itself is not changed.';
 $ec_lang['lpn_scenario_override']='Override in this scenario';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_scenario_override_tip']='Checked means this scenario overrides Base for this value, even when the number is the same. Clear the box to use the Base value again.';
+$ec_lang['lpn_scenario_override_tip']='Checked means this scenario overrides its parent for this value, even when the number is the same. Clear the box to use the Base value again.';
 // "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
 // place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
 // scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".

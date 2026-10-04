@@ -141,6 +141,24 @@ async function main() {
 		ok('...and the table needs no scrolling at that width', !wide.scrolls, `${wide.tableW.toFixed(0)} in ${wide.wrapW}`);
 		if (shot) { await a.page.locator('#lpn_alt_box').screenshot({ path: shot }); }
 
+		// TOM, 2026-10-04: "The box needs to be wider (like 1500 px) on PC." Opened fresh at each
+		// window size: about 1500 px on a 1920 window, and 94% of the window (not wider) on a phone.
+		const openedWidth = async (w, h) => {
+			await a.page.evaluate(() => { document.getElementById('lpn_alt_close').click(); });
+			await a.page.setViewportSize({ width: w, height: h });
+			await a.settle(300);
+			await a.page.click('#lpn_scenario_btn');
+			await a.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+			await a._clickRow('#lpn_menu_list', await a.lang('lpn_alt_title'));
+			await a.settle(500);
+			return a.page.evaluate(() => document.getElementById('lpn_alt_box').getBoundingClientRect().width);
+		};
+		const pcW = await openedWidth(1920, 1080);
+		ok('at 1920x1080 the box is about 1500 px wide', pcW >= 1450 && pcW <= 1510, pcW.toFixed(0));
+		const phW = await openedWidth(390, 800);
+		ok('at 390 px the box fits the window with a gutter', phW <= 390 && phW >= 390 * 0.9, phW.toFixed(0));
+		await openedWidth(1280, 800);
+
 		// Narrower than the table: it must scroll, not squeeze.
 		await a.page.evaluate(() => { const b = document.getElementById('lpn_alt_box'); b.style.width = '420px'; });
 		await a.settle(300);
