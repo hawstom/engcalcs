@@ -3531,6 +3531,13 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    Ink at low opacity and a smaller size, no colour, so it reads as a label and never as a control or
    a warning. It sits INSIDE the box body, never in the title bar. */
 .lpn-saved { margin-inline-start: .6em; font-size: .8em; font-weight: 400; opacity: .7; white-space: nowrap; }
+/* **ON A PHONE THE MARKER MAY WRAP.** nowrap kept "Saved in this browser" whole beside its heading,
+   and at 360 px that pushed the Settings pane 23 px wide (settings-phone-width-browser-harness.js,
+   Task 760, caught it when Task 739 merged). An inline-block capped at the line lets it drop under
+   the heading and break inside itself as a last resort. */
+@media (max-width: 600px) {
+	.lpn-saved { display: inline-block; max-width: 100%; white-space: normal; }
+}
 .lpn-saved-row { display: block; margin-inline-start: 0; }
 .lpn-managecols-width { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
 .lpn-managecols-width input { width: 6em; }
