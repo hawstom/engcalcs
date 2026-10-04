@@ -365,8 +365,9 @@ Full record: `dev/deploying.md`.
   pushed. Tom does the pulling. The About box's build line reports what is deployed.
 - **`Options -Indexes` needs `AllowOverride Options`**, or Apache 500s the whole suite. Test it first
   on any new host.
-- **`../sitemap.xml` lives in the parent-site repo** (`hawstom/hawsedc.com`); adding or removing a
-  page owes a regenerate (`dev/scripts/generate_sitemap.php`), a commit and push there, and his pull.
+- **`../sitemap.xml` lives in the parent-site repository one level up**, not in this one; adding or
+  removing a page owes a regenerate (`dev/scripts/generate_sitemap.php`), a commit and push there,
+  and his pull.
 - **`git pull` does not preserve mtimes**, which is why the service worker is generated per request.
 - **Every host serving the suite runs the same PHP version** (currently `ea-php85`, every domain on the account since 2026-10-03); new cPanel
   domains default to `ea-php56` and 500 on every page.
