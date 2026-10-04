@@ -723,6 +723,10 @@
         "lpn_field_tank_diameter_tip": "For a vertical cylinder. Same units as elevation, not pipe diameter. It sets how much water a given depth holds.",
         "lpn_tank_head_tip": "Water surface elevation in the tank: the tank bottom elevation plus the water depth.",
         "lpn_close": "Close",
+        "lpn_dock_left": "Dock at the left of the map",
+        "lpn_dock_right": "Dock at the right of the map",
+        "lpn_dock_float": "Float",
+        "lpn_dock_autohide": "Auto-hide",
         "lpn_popup_boxtitle": "Properties",
         "lpn_empty_hint": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar.",
         "lpn_offscreen_intact": "Your network is intact.",
@@ -2334,7 +2338,7 @@
         "lpn_survey_note_id_taken": "Name already in project, new name assigned.",
         "lpn_survey_note_id_invalid": "Name cannot be used here, new name assigned."
     },
-    "count": 2332,
+    "count": 2336,
     "active_prefixes": [
         "about",
         "bpn",

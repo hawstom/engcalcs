@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 2332,
-        "delta_key_count": 51,
+        "expected_key_count": 2336,
+        "delta_key_count": 55,
         "exempt_key_count": 52,
         "exempt_keys": [
             "u_imgd",
@@ -731,6 +731,10 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_dock_left": "Dock at the left of the map",
+        "lpn_dock_right": "Dock at the right of the map",
+        "lpn_dock_float": "Float",
+        "lpn_dock_autohide": "Auto-hide",
         "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
@@ -784,6 +788,10 @@
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "keys": {
+        "lpn_dock_left": "Dock at the left of the map",
+        "lpn_dock_right": "Dock at the right of the map",
+        "lpn_dock_float": "Float",
+        "lpn_dock_autohide": "Auto-hide",
         "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
@@ -837,6 +845,70 @@
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "key_context": {
+        "lpn_dock_left": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_close",
+                    "value": "Fechar",
+                    "english": "Close"
+                },
+                "next_translated": {
+                    "key": "lpn_popup_boxtitle",
+                    "value": "Propriedades",
+                    "english": "Properties"
+                }
+            }
+        },
+        "lpn_dock_right": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_close",
+                    "value": "Fechar",
+                    "english": "Close"
+                },
+                "next_translated": {
+                    "key": "lpn_popup_boxtitle",
+                    "value": "Propriedades",
+                    "english": "Properties"
+                }
+            }
+        },
+        "lpn_dock_float": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_close",
+                    "value": "Fechar",
+                    "english": "Close"
+                },
+                "next_translated": {
+                    "key": "lpn_popup_boxtitle",
+                    "value": "Propriedades",
+                    "english": "Properties"
+                }
+            }
+        },
+        "lpn_dock_autohide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_close",
+                    "value": "Fechar",
+                    "english": "Close"
+                },
+                "next_translated": {
+                    "key": "lpn_popup_boxtitle",
+                    "value": "Propriedades",
+                    "english": "Properties"
+                }
+            }
+        },
         "lpn_graphs_menu_tip": {
             "reason": "missing",
             "current_value": null,

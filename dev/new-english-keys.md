@@ -426,7 +426,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**16 still to read**, of 23 new keys across 13 unmerged branch(es).
+**22 still to read**, of 29 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -437,13 +437,32 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/protect-1004 (`4e47365a`) — adds no English strings
+### feat/basemap-style (`c4da18dc`) — 6 new, 6 to read @@ NEEDS RULING
+
+- **`lpn_basemap_filter_faded`**
+  > Faded
+  @@ NEEDS RULING
+- **`lpn_basemap_filter_grayscale`**
+  > Grayscale
+  @@ NEEDS RULING
+- **`lpn_basemap_filter_muted`**
+  > Muted
+  @@ NEEDS RULING
+- **`lpn_basemap_filter_normal`**
+  > Normal
+  @@ NEEDS RULING
+- **`lpn_settings_basemap_filter`**
+  > Basemap filter
+  @@ NEEDS RULING
+- **`lpn_settings_basemap_filter_tip`**
+  > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen; the drawing, labels and credit are not filtered.
+  @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dialog-audit (`4ad58f1e`) — adds no English strings
+### feat/dialog-audit (`4a665186`) — adds no English strings
 
-### feat/dock (`1365f0f3`) — adds no English strings
+### feat/dock (`1431a927`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -480,13 +499,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/scenario-option (`5ca59b4f`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/scenario-option (`ea54507d`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_scenario_duration_tip`**
-  > This scenario's own total run time. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
+  > Overrides the project's total run time in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
   @@ NEEDS RULING
 - **`lpn_scenario_hyd_step_tip`**
-  > This scenario's own hydraulic time step. Leave it blank to use the project's, set in Settings, Calculation, Time.
+  > Overrides the project's hydraulic time step in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time.
   @@ NEEDS RULING
 - **`lpn_scncmp_at_time`**
   > {value} at {id}, {time}
@@ -496,6 +515,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_scncmp_same`**
   > The same in every scenario
+  @@ NEEDS RULING
+- **`lpn_time_scn_overrides`**
+  > Scenario overrides:
   @@ NEEDS RULING
 
 ### feat/setting-scope (`8e493fe5`) — 5 new, 5 to read @@ NEEDS RULING
@@ -516,7 +538,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not saved
   @@ NEEDS RULING
 
-### feat/table-selection (`66d09eb7`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/table-selection (`bb09b75b`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_pane_filter_sel_and`**
   > Filtered by {q} and selection only. Showing {n} of {all}.
@@ -531,8 +553,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Selection only
   @@ NEEDS RULING
 - **`lpn_pane_sel_only_none`**
-  > No elements are selected. Select elements on the map, then press Selection only.
+  > No elements are selected. Select elements on the map first.
   @@ NEEDS RULING
-- **`lpn_pane_sel_only_tip`**
-  > Show only the elements selected on the map, in every table. Press again to update it after changing the selection, or to turn it off.
-  @@ NEEDS RULING
+
+### fix/tip-width (`5aa1cd2d`) — adds no English strings
