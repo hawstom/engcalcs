@@ -196,6 +196,32 @@ EngCalcs.lpnGeom = (function () {
 			dist: Math.hypot(px - pts[leg].x - vx * t, py - pts[leg].y - vy * t) };
 	}
 
+	// **THE FOOT OF A PERPENDICULAR FROM (px,py) THAT A DRAG MAY MOVE TO** (Tom, 2026-10-04).
+	// It stays on the leg nearest the reference (rx,ry) -- the current foot -- and moves to another
+	// leg only where its perpendicular foot falls INSIDE that leg and is shorter. Never to an end
+	// merely because the end is nearer. No reference (a pipe newly named): the shortest interior
+	// foot, else the nearest point.
+	function footOnPolylineKeepingLeg(pts, px, py, rx, ry) {
+		var base = null, best = null, i, vx, vy, len2, t, d;
+		if (!pts || pts.length < 2) { return nearestFractionOnPolyline(pts, px, py); }
+		if (typeof rx === 'number' && typeof ry === 'number') {
+			base = footOnPolylineLegNear(pts, px, py, rx, ry);
+		}
+		for (i = 0; i + 1 < pts.length; i++) {
+			vx = pts[i + 1].x - pts[i].x; vy = pts[i + 1].y - pts[i].y;
+			len2 = vx * vx + vy * vy;
+			if (!len2) { continue; }
+			t = ((px - pts[i].x) * vx + (py - pts[i].y) * vy) / len2;
+			if (!(t > 0 && t < 1)) { continue; }
+			d = Math.hypot(px - pts[i].x - vx * t, py - pts[i].y - vy * t);
+			if (!best || d < best.dist) {
+				best = footOnPolylineLegNear(pts, px, py, pts[i].x + vx * t, pts[i].y + vy * t);
+			}
+		}
+		if (base && (!best || base.dist <= best.dist)) { return base; }
+		return best || nearestFractionOnPolyline(pts, px, py);
+	}
+
 	// **WHICH END OF A POLYLINE A STATION IS NEARER, MEASURED ALONG THE LINE** (ROADMAP Task 247).
 	//
 	// `f` is a fraction of the WHOLE arc length -- nearestFractionOnPolyline()'s own answer -- so
@@ -859,6 +885,7 @@ EngCalcs.lpnGeom = (function () {
 		pointAlongPolyline: pointAlongPolyline,
 		nearestFractionOnPolyline: nearestFractionOnPolyline,
 		footOnPolylineLegNear: footOnPolylineLegNear,
+		footOnPolylineKeepingLeg: footOnPolylineKeepingLeg,
 		arcEndNearer: arcEndNearer,
 		segmentAtFraction: segmentAtFraction,
 		dodgeAlongPolyline: dodgeAlongPolyline,

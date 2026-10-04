@@ -24,7 +24,10 @@ const L = loadLoopedNetwork(
 	"\t\tdocOrigin: docOrigin, nodeAt: nodeAt, linkById: linkById, linkPointList: linkPointList,\n" +
 	"\t\tcustomerAttachPoint: customerAttachPoint, customerPoint: customerPoint,\n" +
 	"\t\tcustomerT: customerT, customerLink: customerLink,\n" +
-	"\t\tsetPendingMeter: setPendingMeter,\n" +
+	"\t\tsetPendingMeter: setPendingMeter, setSelection: setSelection,\n" +
+	"\t\tcustBox: function (id) { return custEls[id] && custEls[id].box; },\n" +
+	"\t\tdragNow: function () { return drag ? { type: drag.type, id: drag.id } : null; },\n" +
+	"\t\tapplyDrag: function () { if (drag && dragDirty) { applyDrag(); dragDirty = false; } },\n" +
 	"\t\twirePointerEvents: wirePointerEvents, setMode: setMode,\n" +
 	"\t\tworldToScreen: worldToScreen,\n" +
 	"\t\tsetScale: function (s) { state.s = s; state.tx = 0; state.ty = 0; },\n" +
@@ -50,9 +53,23 @@ function ok(name, cond, extra) {
 }
 function near(a, b, tol) { return Math.abs(a - b) <= tol; }
 const svg = byId.lpn_canvas;
-function fire(type, ev) {
-	setHitTarget(null);
-	(svg._listeners[type] || []).forEach(function (fn) { fn(Object.assign({ target: svg }, ev)); });
+function fire(type, ev, target) {
+	setHitTarget(target || null);
+	(svg._listeners[type] || []).forEach(function (fn) { fn(Object.assign({ target: target || svg }, ev)); });
+}
+// Drag a customer's own dot from where it is to world point `to`, through the real handlers.
+function dragCustomer(c, to) {
+	const from = L.customerPoint(c), box = L.custBox(c.id);
+	const ev = (x, y) => ({ pointerId: 4, clientX: x, clientY: y, pointerType: 'mouse', button: 0 });
+	L.setMode('select');
+	fire('pointerdown', ev(from.x, from.y), box);
+	const dg = L.dragNow();
+	fire('pointermove', ev((from.x + to.x) / 2, (from.y + to.y) / 2), box);
+	L.applyDrag();
+	fire('pointermove', ev(to.x, to.y), box);
+	L.applyDrag();
+	fire('pointerup', ev(to.x, to.y), box);
+	return dg;
 }
 function click(p) {
 	const ev = { pointerId: 3, clientX: p.x, clientY: p.y, pointerType: 'mouse', button: 0 };
@@ -150,7 +167,41 @@ console.log('\n--- 3. a straight pipe is unchanged ---');
 		near(L.customerAttachPoint(c).y, 400, 1e-6), c && JSON.stringify(L.customerAttachPoint(c)));
 }
 
-console.log('\n--- 4. a geographic (lon/lat) project, the satellite case ---');
+console.log('\n--- 4. dragging a customer on a bent pipe keeps it on its leg ---');
+{
+	freshXY();
+	L.setScale(1);
+	const a = L.addNode('junction', 0, 290);
+	const jtf = L.addNode('junction', 252, 242);
+	const main = L.addLink('pipe', a.id, jtf.id, [{ x: 233, y: 327 }]);
+	L.buildDom();
+	const A = { x: 0, y: 290 }, V = { x: 233, y: 327 }, T = { x: 252, y: 242 };
+	const c = place(M, { x: 137, y: 290 + 37 * 137 / 233 });
+	ok('4.0 the customer starts on the long leg', !!c && L.customerT(c) > 0 && L.customerT(c) < 1);
+	// Along the long leg, still above it: J-TF is nearer (186) than the foot (about 240).
+	const to1 = { x: 180, y: 70 }, f1 = foot(to1, A, V);
+	ok('4.0b ...and at the drag end J-TF is nearer than the foot on the long leg',
+		Math.hypot(T.x - to1.x, T.y - to1.y) < Math.hypot(f1.x - to1.x, f1.y - to1.y));
+	const dg = dragCustomer(c, to1);
+	ok('4.1 pressing the customer begins a customer drag', !!dg && dg.type === 'customer', dg && dg.type);
+	const at1 = L.customerAttachPoint(c);
+	ok('4.2 a drag along the long leg keeps the service on that leg, NOT at J-TF',
+		L.customerT(c) !== 1 && near(at1.x, f1.x, 1e-6) && near(at1.y, f1.y, 1e-6),
+		L.customerT(c) + ' ' + JSON.stringify(at1) + ' want ' + JSON.stringify(f1));
+	ok('4.3 ...and the customer is where it was dragged',
+		near(L.customerPoint(c).x, to1.x, 1e-6) && near(L.customerPoint(c).y, to1.y, 1e-6),
+		JSON.stringify(L.customerPoint(c)));
+	// Clearly beside the rising leg, its foot inside that leg and shorter: it may move there.
+	const to2 = { x: 300, y: 285 }, f2 = foot(to2, V, T);
+	const dg2 = dragCustomer(c, to2);
+	const at2 = L.customerAttachPoint(c);
+	ok('4.4 dragged clearly beside the rising leg, the service moves to that leg, square',
+		!!dg2 && f2.t > 0 && f2.t < 1 && L.customerLink(c).id === main.id &&
+		near(at2.x, f2.x, 1e-6) && near(at2.y, f2.y, 1e-6),
+		JSON.stringify(at2) + ' want ' + JSON.stringify(f2));
+}
+
+console.log('\n--- 5. a geographic (lon/lat) project, the satellite case ---');
 {
 	const LAT = 38.1, LON = -122.56, D = 0.001;   // about 90 m per D east-west
 	// His shape, scaled: a thousandth of a degree per 250 px.
@@ -163,10 +214,10 @@ console.log('\n--- 4. a geographic (lon/lat) project, the satellite case ---');
 		links: [{ id: '8', type: 'pipe', from: 'A', to: 'JTF', verts: [{ x: V.x, y: V.y }] }],
 		customers: [], view: null
 	});
-	ok('4.0 the fixture installed as geographic', L.isLatLonProject());
+	ok('5.0 the fixture installed as geographic', L.isLatLonProject());
 	L.setScale(250 / D);   // the world origin sits at the network, so the screen is a plain scale of it
 	const pts = L.linkPointList(L.linkById('8'));
-	ok('4.0b the pipe has its bend', pts.length === 3, String(pts.length));
+	ok('5.0b the pipe has its bend', pts.length === 3, String(pts.length));
 	// The customer straight above the long leg, in world units, at his proportions.
 	const w0 = pts[0], w1 = pts[1], w2 = pts[2];
 	const mWorld = { x: w0.x + (w1.x - w0.x) * 137 / 233, y: w2.y - (w0.y - w2.y) * 172 / 48 };
@@ -175,12 +226,12 @@ console.log('\n--- 4. a geographic (lon/lat) project, the satellite case ---');
 	const c = place(mWorld, L.worldToScreen(clickWorld.x, clickWorld.y));
 	const at = c ? L.customerAttachPoint(c) : null;
 	const tol = Math.abs(w1.x - w0.x) * 1e-6;
-	ok('4.1 a click on the main connects to the main at the perpendicular foot, not J-TF',
+	ok('5.1 a click on the main connects to the main at the perpendicular foot, not J-TF',
 		!!c && L.customerT(c) !== 1 && near(at.x, f.x, tol) && near(at.y, f.y, tol),
 		at ? L.customerT(c) + ' ' + JSON.stringify(at) + ' want ' + JSON.stringify(f) : 'none');
 	const sT = L.worldToScreen(w2.x, w2.y);
 	const c2 = place(mWorld, { x: sT.x + 2, y: sT.y + 2 });
-	ok('4.2 a click on J-TF connects to J-TF', !!c2 && L.customerT(c2) === 1,
+	ok('5.2 a click on J-TF connects to J-TF', !!c2 && L.customerT(c2) === 1,
 		c2 && String(L.customerT(c2)));
 }
 

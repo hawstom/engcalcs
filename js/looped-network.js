@@ -10514,13 +10514,21 @@ var EngCalcs = EngCalcs || {};
 		n = linkNormalAt(l, c.t);
 		return setCustomerPerp(c, c.t, (x - an.x) * n.x + (y - an.y) * n.y);
 	}
-	// The same thing with the station DERIVED as well: the nearest point on this pipe to where the
-	// meter is, snapped onto an end within reach of it (customerSnapT()). This is what a drag, a
-	// typed location, a typed pipe and the second press of the placement gesture all want.
-	function setCustomerAt(c, l, x, y) {
+	// The same thing with the station DERIVED as well: the foot of the perpendicular on this pipe
+	// from where the meter is, snapped onto an end within reach of it (customerSnapT()). This is
+	// what a drag, a typed location and a typed pipe all want.
+	//
+	// **A METER ALREADY ON THIS PIPE STAYS ON ITS LEG** (Tom, 2026-10-04): the nearest point on a
+	// bent pipe can be the far end of another leg, so a drag along the long leg jumped the service
+	// to a node. It moves to another leg only where its foot falls inside that leg and is shorter
+	// (Geom.footOnPolylineKeepingLeg()). dev/lpn-spike/customer-connect-geometry-harness.js.
+	// `newPipe` says the pipe was just named, so the meter's old station means nothing on it.
+	function setCustomerAt(c, l, x, y, newPipe) {
+		var ref;
 		if (!l) { return false; }
-		return setCustomerOffsetTo(c, l,
-			customerSnapT(l, Geom.nearestFractionOnPolyline(linkPointList(l), x, y).f), x, y);
+		ref = (!newPipe && c.link === l.id && customerLink(c)) ? customerAttachPoint(c) : null;
+		return setCustomerOffsetTo(c, l, customerSnapT(l, Geom.footOnPolylineKeepingLeg(
+			linkPointList(l), x, y, ref ? ref.x : undefined, ref ? ref.y : undefined).f), x, y);
 	}
 	// Where the METER sits. `c.x`/`c.y` is an OFFSET from the attachment point while the
 	// customer is attached and an absolute position while it is not -- the same dual meaning a Text
@@ -11244,7 +11252,7 @@ var EngCalcs = EngCalcs || {};
 		delete c.node;   // a live pipe is always the fresh answer -- see setCustomerConnection()
 		if (!customersByLink[l.id]) { customersByLink[l.id] = []; }
 		customersByLink[l.id].push(c.id);
-		setCustomerAt(c, l, pt.x, pt.y);
+		setCustomerAt(c, l, pt.x, pt.y, true);
 		return true;
 	}
 	// **THE PIPE THIS METER MOST LIKELY BELONGS TO, AS A SUGGESTION AND NOT AS A WRITE.** The
