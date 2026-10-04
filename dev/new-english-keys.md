@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**27 still to read on master**, of 76 untranslated keys, of 2307 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**34 still to read on master**, of 83 untranslated keys, of 2314 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -294,8 +294,11 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (76, 27 to read @@ NEEDS RULING)
+## lpn_  (83, 34 to read @@ NEEDS RULING)
 
+- **`lpn_alt_calc_options`**
+  > Calculation options
+  @@ NEEDS RULING
 - **`lpn_analyze_at_time`**
   > Time step: {time}.
   _Ruled OK 2026-10-03._
@@ -515,6 +518,21 @@ never edits a synonym.
 - **`lpn_saved_session`**
   > Not saved
   @@ NEEDS RULING
+- **`lpn_scenario_duration_tip`**
+  > Overrides the total run time in this scenario. Leave it blank to use its parent's. A total run time of 0:00 is a steady-state run.
+  @@ NEEDS RULING
+- **`lpn_scenario_hyd_step_tip`**
+  > Overrides the hydraulic time step in this scenario. Leave it blank to use its parent's.
+  @@ NEEDS RULING
+- **`lpn_scncmp_at_time`**
+  > {value} at {id}, {time}
+  @@ NEEDS RULING
+- **`lpn_scncmp_period_note`**
+  > Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.
+  @@ NEEDS RULING
+- **`lpn_scncmp_same`**
+  > The same in every scenario
+  @@ NEEDS RULING
 - **`lpn_settings_basemap_style`**
   > Basemap style
   @@ NEEDS RULING
@@ -524,12 +542,15 @@ never edits a synonym.
 - **`lpn_sysflow_title`**
   > Flow balance
   _Ruled OK 2026-10-03._
+- **`lpn_time_scn_overrides`**
+  > Scenario overrides:
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**29 still to read**, of 36 new keys across 10 unmerged branch(es).
+**22 still to read**, of 29 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -540,16 +561,16 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/chain-draw (`de6b793e`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/chain-draw (`42b5df39`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_mode_add_chain`**
-  > Mode: Add Junction and Pipe. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
+  > Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
   @@ NEEDS RULING
 - **`lpn_tool_add_chain`**
-  > Junction and Pipe
+  > Junction Pipe Chain
   @@ NEEDS RULING
 - **`lpn_tool_add_chain_tip`**
-  > Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
+  > Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
   @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04`) — adds no English strings
@@ -649,26 +670,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/scenario-option (`f0d9897a`) — 7 new, 7 to read @@ NEEDS RULING
-
-- **`lpn_alt_calc_options`**
-  > Calculation options
-  @@ NEEDS RULING
-- **`lpn_scenario_duration_tip`**
-  > Overrides the total run time in this scenario. Leave it blank to use its parent's. A total run time of 0:00 is a steady-state run.
-  @@ NEEDS RULING
-- **`lpn_scenario_hyd_step_tip`**
-  > Overrides the hydraulic time step in this scenario. Leave it blank to use its parent's.
-  @@ NEEDS RULING
-- **`lpn_scncmp_at_time`**
-  > {value} at {id}, {time}
-  @@ NEEDS RULING
-- **`lpn_scncmp_period_note`**
-  > Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.
-  @@ NEEDS RULING
-- **`lpn_scncmp_same`**
-  > The same in every scenario
-  @@ NEEDS RULING
-- **`lpn_time_scn_overrides`**
-  > Scenario overrides:
-  @@ NEEDS RULING
+### feat/scenario-option (`25e19dc8`) — adds no English strings
