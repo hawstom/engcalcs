@@ -616,7 +616,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**0 still to read**, of 7 new keys across 7 unmerged branch(es).
+**0 still to read**, of 7 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -626,6 +626,8 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
+
+### chore/roadmap-1005 (`fe4730ab`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -649,7 +651,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/profile-file (`a095faf4`) — 4 new, all ruled
+### feat/profile-file (`4e0309e6`) — 4 new, all ruled
 
 - **`lpn_profile_file_done`**
   > Profile read from the file: {used} of {total} nodes found in this network.
@@ -663,3 +665,7 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_profile_open`**
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
+
+### fix/status-legend (`3de51a47`) — adds no English strings
+
+### fix/status-mail-headings (`4196c9b0`) — adds no English strings

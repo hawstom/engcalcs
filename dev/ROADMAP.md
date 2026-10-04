@@ -367,10 +367,6 @@ the block.
 - 75|763| **A searchable help manual, built from the tips Tom cut.** Tom, 2026-10-04: *"Almost all
   the deletes could be turned into a searchable help manual."* The cut tips' English is kept in
   `dev/help-manual-source.md` (feat/tip-verdict) as its first material.
-- 75|764| **One voice for tips and prompts: mood, Click vs Specify, check boxes.** Tom, 2026-10-04:
-  *"Are we indicative, imperative, or indecisive?"*; *"'Specify' would be better than 'Click'
-  everywhere"*; *"'Tick'? ... let's audit and discipline this too."* Mary's research first; then a
-  rule in dev/language-strings.md and one English pass.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted

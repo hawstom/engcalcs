@@ -681,3 +681,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|719| CLOSED 2026-10-04: the Junction Pipe Chain tool draws junction, pipe, junction until Escape (`feat/chain-draw`, his icon), merged on his word.
 - 0|755| CLOSED 2026-10-04: per-scenario Total run time and Hydraulic time step in the Alternatives preview (`feat/scenario-option`), merged on his word; quality mode per scenario left for later.
 - 0|762| CLOSED 2026-10-04: pressure-driven analysis through the EPANET engine (`feat/pda`), the bottom strip names the model and counts short junctions, merged on his word.
+- 0|764| CLOSED 2026-10-04: one voice for tips (mood by string kind; Specify a point, Select an object, Choose, Enter; Select/Clear a checkbox), Tom: "Adopt all three ... I love them." Rule in `dev/language-strings.md`; the last two Checked/Unchecked tips fixed 2026-10-05.
