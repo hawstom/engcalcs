@@ -4999,7 +4999,6 @@ var EngCalcs = EngCalcs || {};
 		return [
 			{
 				icon: 'pump', label: pc.lpn_energy_menu || 'Pump energy',
-				tip: pc.lpn_energy_menu_tip,
 				fn: function () { closeMenu(); openEnergyBox(); }
 			},
 			{
@@ -21437,7 +21436,7 @@ var EngCalcs = EngCalcs || {};
 	// that are alike. Putting it last is also what lets the Print button hold the leading edge:
 	// print acts on a TABLE, and the tabs it applies to are now the ones next to it.
 	paneTabs.push({
-		id: 'profile', panel: 'lpn_pane_profile', label: 'lpn_profile_menu', tip: 'lpn_profile_tip',
+		id: 'profile', panel: 'lpn_pane_profile', label: 'lpn_profile_menu',
 		formId: 'lpn_profile_form',
 		// **PRESSING PROFILE AGAIN IS THE COMMAND THAT CHOOSES A PATH** (Task 506). Tom,
 		// 2026-08-24: *"Our button to create a new path can be the Profile button. That removes all
@@ -25335,7 +25334,8 @@ var EngCalcs = EngCalcs || {};
 			arrow.className = 'lpn-pane-sortarrow ec-help' +
 				(spec.sort.col === c.key ? ' lpn-pane-sortarrow-active' : '') +
 				(spec.sort.col === c.key && spec.sort.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
-			arrow.title = (spec.sort.col === c.key) ? (pc.lpn_pane_sortarrow_tip || 'Reverse the sort')
+			// The title names what a click does next: the sorted column's arrow reverses its sort.
+			arrow.title = (spec.sort.col === c.key && spec.sort.dir > 0) ? (pc.lpn_pane_sort_desc || 'Sort descending')
 				: (pc.lpn_pane_sort_asc || 'Sort ascending');
 			arrow.setAttribute('aria-label', arrow.title);
 			arrow.addEventListener('click', function (ev) {
@@ -29859,7 +29859,6 @@ var EngCalcs = EngCalcs || {};
 		groupSel = document.createElement('select');
 		groupSel.id = 'lpn_ts_group';
 		groupSel.className = 'lpn-ts-pick ec-help';
-		groupSel.title = pc.lpn_ts_group_tip || 'Whether the graph shows nodes or links.';
 		[['node', pc.lpn_ts_group_nodes || 'Nodes'], ['link', pc.lpn_ts_group_links || 'Links']]
 			.forEach(function (o) {
 				var op = document.createElement('option');
@@ -29876,7 +29875,6 @@ var EngCalcs = EngCalcs || {};
 		fieldSel = document.createElement('select');
 		fieldSel.id = 'lpn_ts_quantity';
 		fieldSel.className = 'lpn-ts-pick ec-help';
-		fieldSel.title = pc.lpn_ts_quantity_tip || 'Which value to graph against time.';
 		tsFieldOptions(group).forEach(function (o) {
 			var op = document.createElement('option');
 			op.value = o[0]; op.textContent = o[1];
@@ -29894,7 +29892,6 @@ var EngCalcs = EngCalcs || {};
 		btn.id = 'lpn_ts_add';
 		btn.className = 'lpn-profile-edit ec-help';
 		btn.textContent = pc.lpn_ts_add || 'Add selected';
-		btn.title = pc.lpn_ts_add_tip || 'Put everything now selected on the map onto the graph.';
 		btn.addEventListener('click', tsAddSelection);
 		box.appendChild(btn);
 
@@ -30341,7 +30338,6 @@ var EngCalcs = EngCalcs || {};
 		sel = document.createElement('select');
 		sel.id = 'lpn_pgraph_field';
 		sel.className = 'lpn-ts-pick ec-help';
-		sel.title = pc.lpn_ts_quantity_tip || 'Which value to graph against time.';
 		avail.forEach(function (a) {
 			var op = document.createElement('option');
 			op.value = a.field; op.textContent = pgFieldLabel(subj.group, a.field, subj.e);
@@ -30464,7 +30460,6 @@ var EngCalcs = EngCalcs || {};
 		groupSel = document.createElement('select');
 		groupSel.id = 'lpn_freq_group';
 		groupSel.className = 'lpn-ts-pick ec-help';
-		groupSel.title = pc.lpn_freq_group_tip || 'Whether the graph shows junctions or pipes.';
 		[['node', pc.lpn_pane_tab_junctions || 'Junctions'], ['link', pc.lpn_pane_tab_pipes || 'Pipes']]
 			.forEach(function (o) {
 				var op = document.createElement('option');
@@ -30481,7 +30476,6 @@ var EngCalcs = EngCalcs || {};
 		fieldSel = document.createElement('select');
 		fieldSel.id = 'lpn_freq_quantity';
 		fieldSel.className = 'lpn-ts-pick ec-help';
-		fieldSel.title = pc.lpn_freq_quantity_tip || 'Which value to graph.';
 		freqFieldOptions(group).forEach(function (o) {
 			var op = document.createElement('option');
 			op.value = o[0]; op.textContent = o[1];
@@ -39907,7 +39901,6 @@ var EngCalcs = EngCalcs || {};
 					// The file NAME, not the project name: this list is about files on the disk, and
 					// the project inside one may since have been renamed or may not exist here at all.
 					label: rec.name,
-					tip: (pc.lpn_recent_tip || 'Open {file} again from the same location on your computer.').replace('{file}', rec.name),
 					fn: function () { openRecentFile(rec); }
 				});
 			});
@@ -39919,7 +39912,7 @@ var EngCalcs = EngCalcs || {};
 			// **NO LONGER A SUBMENU.** The fly-out's four rows were the cross of two questions and
 			// could not hold the other two; the box asks all four at once (Task 477).
 			{ icon: 'new', label: pc.lpn_file_new || 'New project…', fn: openNewProjectBox },
-			{ icon: 'open', label: pc.lpn_file_open || 'Open…', tip: pc.lpn_file_open_tip, fn: openFromFile },
+			{ icon: 'open', label: pc.lpn_file_open || 'Open…', fn: openFromFile },
 			// **UNDER OPEN, NOT UNDER NEW** (Tasks 305 and 314). New creates something that did not
 			// exist; Open retrieves something that does, and an example exists. Opening one drops a
 			// COPY into a new tab, which is what keeps the word honest -- see openExample().
@@ -39964,7 +39957,6 @@ var EngCalcs = EngCalcs || {};
 			{
 				icon: 'save',
 				label: pc.lpn_file_save || 'Save',
-				tip: api ? pc.lpn_file_save_tip : null,
 				fn: saveCurrent,
 				disabled: readOnly || !api
 			},
@@ -39974,7 +39966,7 @@ var EngCalcs = EngCalcs || {};
 			{
 				icon: 'saveas',
 				label: pc.lpn_file_saveas || 'Save as…',
-				tip: api ? pc.lpn_file_saveas_tip : pc.lpn_file_saveas_tip_download,
+				tip: api ? null : pc.lpn_file_saveas_tip_download,
 				fn: saveAs
 			},
 			// **DIRECTLY AFTER SAVE AS..., NOT AMONG THE ROWS THAT OPEN A FILE** (Task 696, R-213;
@@ -40128,18 +40120,18 @@ var EngCalcs = EngCalcs || {};
 			// of the two doors: a reader who opens the menu rather than hovering the strip was told
 			// nothing at all, about any of the eight tools. No new key, and the digit still comes
 			// from LPN_TOOL_KEYS rather than from a translator.
-			{ icon: 'junction', pointerOnly: true, label: pc.lpn_tool_add_junction || 'Junction', tip: toolTipWithKey('add-junction', pc.lpn_tool_add_junction_tip), hotkey: toolKeyFor('add-junction'), fn: function () { setMode('add-junction'); } },
-			{ icon: 'reservoir', pointerOnly: true, label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir', pc.lpn_tool_add_reservoir_tip), hotkey: toolKeyFor('add-reservoir'), fn: function () { setMode('add-reservoir'); } },
-			{ icon: 'tank', pointerOnly: true, label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank', pc.lpn_tool_add_tank_tip), hotkey: toolKeyFor('add-tank'), fn: function () { setMode('add-tank'); } },
-			{ icon: 'pipe', pointerOnly: true, label: pc.lpn_tool_add_pipe || 'Pipe', tip: toolTipWithKey('add-pipe', pc.lpn_tool_add_pipe_tip), hotkey: toolKeyFor('add-pipe'), fn: function () { setMode('add-pipe'); } },
-			{ icon: 'pump', pointerOnly: true, label: pc.lpn_tool_add_pump || 'Pump', tip: toolTipWithKey('add-pump', pc.lpn_tool_add_pump_tip), hotkey: toolKeyFor('add-pump'), fn: function () { setMode('add-pump'); } },
-			{ icon: 'valve', pointerOnly: true, label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve', pc.lpn_tool_add_valve_tip), hotkey: toolKeyFor('add-valve'), fn: function () { setMode('add-valve'); } },
+			{ icon: 'junction', pointerOnly: true, label: pc.lpn_tool_add_junction || 'Junction', tip: toolTipWithKey('add-junction'), hotkey: toolKeyFor('add-junction'), fn: function () { setMode('add-junction'); } },
+			{ icon: 'reservoir', pointerOnly: true, label: pc.lpn_tool_add_reservoir || 'Reservoir', tip: toolTipWithKey('add-reservoir'), hotkey: toolKeyFor('add-reservoir'), fn: function () { setMode('add-reservoir'); } },
+			{ icon: 'tank', pointerOnly: true, label: pc.lpn_tool_add_tank || 'Tank', tip: toolTipWithKey('add-tank'), hotkey: toolKeyFor('add-tank'), fn: function () { setMode('add-tank'); } },
+			{ icon: 'pipe', pointerOnly: true, label: pc.lpn_tool_add_pipe || 'Pipe', tip: toolTipWithKey('add-pipe'), hotkey: toolKeyFor('add-pipe'), fn: function () { setMode('add-pipe'); } },
+			{ icon: 'pump', pointerOnly: true, label: pc.lpn_tool_add_pump || 'Pump', tip: toolTipWithKey('add-pump'), hotkey: toolKeyFor('add-pump'), fn: function () { setMode('add-pump'); } },
+			{ icon: 'valve', pointerOnly: true, label: pc.lpn_tool_add_valve || 'Valve', tip: toolTipWithKey('add-valve'), hotkey: toolKeyFor('add-valve'), fn: function () { setMode('add-valve'); } },
 			// **AFTER THE VALVE AND BEFORE THE TEXT** (Task 247). The order is the sentence a
 			// person draws in -- junctions, the sources that feed them, the pipe that joins them,
 			// the two things you put ON a pipe -- and a meter is the third thing you put on a pipe.
 			// Text stays last, being the only tool that adds nothing hydraulic.
 			{ icon: 'customer', pointerOnly: true, label: pc.lpn_tool_add_meter || 'Customer', tip: toolTipWithKey('add-meter', pc.lpn_tool_add_meter_tip), hotkey: toolKeyFor('add-meter'), fn: function () { setMode('add-meter'); } },
-			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text', pc.lpn_tool_add_text_tip), hotkey: toolKeyFor('add-text'), fn: function () { setMode('add-text'); } },
+			{ icon: 'text', pointerOnly: true, label: pc.lpn_tool_add_text || 'Text', tip: toolTipWithKey('add-text'), hotkey: toolKeyFor('add-text'), fn: function () { setMode('add-text'); } },
 			{ separator: true },
 			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
 			// Deliberately NOT translated: scaffolding for measuring how ~100 links performs, and it
@@ -40521,7 +40513,7 @@ var EngCalcs = EngCalcs || {};
 			{
 				disabled: !placeFindable(), icon: 'globe',
 				label: pc.lpn_goto_menu || 'Go to a latitude and longitude…',
-				tip: pc.lpn_goto_tip, fn: goToLatLon
+				fn: goToLatLon
 			},
 			{
 				hidden: !EngCalcs.lpnSearchOpen, disabled: !placeFindable(), icon: 'find',
@@ -40590,12 +40582,10 @@ var EngCalcs = EngCalcs || {};
 			{ separator: true },
 			{
 				icon: 'settings', label: pc.lpn_tool_settings || 'Settings',
-				tip: pc.lpn_tool_settings_tip,
 				fn: function () { toggleSettingsBox(); }
 			},
 			{
 				icon: 'library', label: pc.lpn_library_menu || 'Libraries',
-				tip: pc.lpn_library_menu_tip,
 				fn: function () { toggleLibraryBox(); }
 			},
 			{ separator: true },
@@ -40612,7 +40602,7 @@ var EngCalcs = EngCalcs || {};
 			// Selection order (Uglobals.pas: time series, profile, contour, frequency, system flow), which
 			// Tom asked be kept unless there was a reason not to (2026-10-04); Mary found none.
 			{
-				icon: 'profile', label: pc.lpn_graphs_menu || 'Graphs', tip: pc.lpn_graphs_menu_tip,
+				icon: 'profile', label: pc.lpn_graphs_menu || 'Graphs',
 				submenu: function () {
 					return [
 						{
@@ -40620,7 +40610,7 @@ var EngCalcs = EngCalcs || {};
 							fn: function () { closeMenu(); openPane('timeseries'); }
 						},
 						{
-							label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
+							label: pc.lpn_profile_menu || 'Profile',
 							fn: function () { closeMenu(); openPane('profile'); }
 						},
 						// THE CONTOUR PLOT IS A MAP LAYER, so this row SHOWS it rather than opening a
@@ -40729,7 +40719,6 @@ var EngCalcs = EngCalcs || {};
 			{ separator: true },
 			{
 				icon: 'info', label: pc.lpn_reports_menu || 'Reports',
-				tip: pc.lpn_reports_menu_tip,
 				submenu: reportMenuRows
 			}
 		]);
@@ -41687,7 +41676,7 @@ var EngCalcs = EngCalcs || {};
 		var fileGroup = group();
 		var openBtn = document.createElement('button');
 		openBtn.type = 'button';
-		setIconLabel(openBtn, 'open', pc.lpn_file_open || 'Open…', pc.lpn_file_open_tip);
+		setIconLabel(openBtn, 'open', pc.lpn_file_open || 'Open…', null);
 		openBtn.addEventListener('click', function () { openFromFile(); });
 		fileGroup.appendChild(openBtn);
 		// Held so the placement lock can fade it, the way the toolbar already holds the area
@@ -41696,7 +41685,7 @@ var EngCalcs = EngCalcs || {};
 		openToolButton = openBtn;
 		var saveBtn = document.createElement('button');
 		saveBtn.type = 'button';
-		setIconLabel(saveBtn, 'save', pc.lpn_file_save || 'Save', pc.lpn_file_save_tip);
+		setIconLabel(saveBtn, 'save', pc.lpn_file_save || 'Save', null);
 		saveBtn.addEventListener('click', function () { saveCurrent(); });
 		// Held for the placement lock, exactly as openToolButton above is: the strip is rebuilt, so
 		// a querySelector at lock time would be reaching into a previous strip's DOM.
@@ -41769,7 +41758,7 @@ var EngCalcs = EngCalcs || {};
 		// Between Select and Delete, because that is what it is: the third thing a press on the map
 		// can mean. See the Edit menu row for why it is a mode rather than a gesture (Task 567).
 		modeButton({ mode: 'vertices', key: 'lpn_tool_vertices', icon: 'vertices', tip: pc.lpn_tool_vertices_tip }, editGroup);
-		modeButton({ mode: 'delete', key: 'lpn_tool_delete', icon: 'del', tip: pc.lpn_tool_delete_tip }, editGroup);
+		modeButton({ mode: 'delete', key: 'lpn_tool_delete', icon: 'del' }, editGroup);
 		var undoBtn = document.createElement('button');
 		undoBtn.type = 'button';
 		setIconLabel(undoBtn, 'undo', pc.lpn_tool_undo || 'Undo', pc.lpn_tool_undo_tip);
@@ -41781,14 +41770,14 @@ var EngCalcs = EngCalcs || {};
 		// Junction, Reservoir, Tank, Pipe, Pump, Valve, Meter, Text -- the same order as the Insert menu and
 		// the ID-prefix rows. See insertAssetRows() for why that order.
 		[
-			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction', tip: pc.lpn_tool_add_junction_tip },
-			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir', tip: pc.lpn_tool_add_reservoir_tip },
-			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank', tip: pc.lpn_tool_add_tank_tip },
-			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe', tip: pc.lpn_tool_add_pipe_tip },
-			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump', tip: pc.lpn_tool_add_pump_tip },
-			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve', tip: pc.lpn_tool_add_valve_tip },
+			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction' },
+			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir' },
+			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank' },
+			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe' },
+			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump' },
+			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve' },
 			{ mode: 'add-meter', key: 'lpn_tool_add_meter', icon: 'customer', tip: pc.lpn_tool_add_meter_tip },
-			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text', tip: pc.lpn_tool_add_text_tip }
+			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text' }
 		].forEach(function (t) { modeButton(t, addGroup); });
 
 		var viewGroup = group();
@@ -41911,7 +41900,7 @@ var EngCalcs = EngCalcs || {};
 		// is that opening it is a menu command (Water > Libraries) rather than a permanent icon.
 		var settingsBtn = document.createElement('button');
 		settingsBtn.type = 'button';
-		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', pc.lpn_tool_settings_tip);
+		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', null);
 		settingsBtn.addEventListener('click', function () { toggleSettingsBox(); });
 		netGroup.appendChild(settingsBtn);
 
@@ -44134,8 +44123,8 @@ var EngCalcs = EngCalcs || {};
 		box.value = spec.value;
 		box.style.width = LPN_LABEL_COL_W; box.style.marginLeft = LPN_LABEL_COL_GAP;
 		box.style.flex = '0 0 auto'; box.style.boxSizing = 'border-box';
-		box.title = spec.title;
-		box.setAttribute('aria-label', spec.title);
+		if (spec.title) { box.title = spec.title; }
+		box.setAttribute('aria-label', spec.title || spec.name || '');
 		box.addEventListener('change', function () {
 			// Clamped rather than rejected: every out-of-range value has an obvious intended meaning.
 			var v = Math.round(+box.value);
@@ -44197,8 +44186,8 @@ var EngCalcs = EngCalcs || {};
 		var box = document.createElement('input');
 		box.type = 'text';
 		box.value = spec.value;
-		box.title = spec.title;
-		box.setAttribute('aria-label', spec.title);
+		if (spec.title) { box.title = spec.title; }
+		box.setAttribute('aria-label', spec.title || spec.name || '');
 		box.style.width = LPN_LABEL_AFFIX_W; box.style.flex = '0 0 auto';
 		box.style.boxSizing = 'border-box';
 		box.addEventListener('input', function () { spec.onChange(box.value); saveToStorage(); requestLabelRefresh(); });
@@ -44424,7 +44413,7 @@ var EngCalcs = EngCalcs || {};
 					var d = labelSettings.decimals[group] || {};
 					return (typeof d[k] === 'number') ? d[k] : d[key];
 				},
-				title: pc.lpn_labels_decimals_tip || 'Decimal places shown for this label',
+				name: pc.lpn_labels_col_decimals || 'Decimals',
 				onChange: function (v) { dec[k] = v; }
 			};
 		} else { out.decimals = null; }
@@ -44449,13 +44438,13 @@ var EngCalcs = EngCalcs || {};
 		out.affix = {
 			prefix: {
 				value: labelPrefixFor(group, key),
-				title: pc.lpn_labels_prefix_tip || 'Text added before this property on map labels',
+				name: pc.lpn_labels_col_before || 'Bef.',
 				onChange: function (v) { setLabelAffix('prefix', group, key, v); }
 			},
 			suffix: {
 				value: labelSuffixFor(group, key),
-				title: (key === 'gradient' && group === 'link' ? pc.lpn_labels_suffix_gradient_tip : pc.lpn_labels_suffix_tip) ||
-					'Text added after this property on map labels',
+				name: pc.lpn_labels_col_after || 'Aft.',
+				title: (key === 'gradient' && group === 'link') ? pc.lpn_labels_suffix_gradient_tip : null,
 				onChange: function (v) { setLabelAffix('suffix', group, key, v); }
 			},
 			units: labelUnitsCapable(group, key) ? {
@@ -44492,12 +44481,11 @@ var EngCalcs = EngCalcs || {};
 			// **A COLUMN HAS ONE ALIGNMENT, AND THE HEADING IS PART OF THE COLUMN** (Task 435): the
 			// numeric columns centre their digit, so their headings centre; the affix boxes hold
 			// WORDS and keep their natural start alignment. `start`, not `left`, for RTL.
-			[[pc.lpn_labels_col_before || 'Bef.', LPN_LABEL_AFFIX_W, pc.lpn_labels_prefix_tip, 'start'],
-				[pc.lpn_labels_col_after || 'Aft.', LPN_LABEL_AFFIX_W, pc.lpn_labels_suffix_tip, 'start'],
+			[[pc.lpn_labels_col_before || 'Bef.', LPN_LABEL_AFFIX_W, null, 'start'],
+				[pc.lpn_labels_col_after || 'Aft.', LPN_LABEL_AFFIX_W, null, 'start'],
 				[pc.lpn_labels_use_units || 'Use units', LPN_LABEL_UNITS_W, pc.lpn_labels_use_units_tip, 'center'],
 				[pc.lpn_labels_col_decimals_example || '0.000', LPN_LABEL_COL_W,
-					(pc.lpn_labels_col_decimals || 'Decimals') + ' — ' +
-						(pc.lpn_labels_decimals_tip || 'Decimal places shown for this label'), 'center'],
+					pc.lpn_labels_col_decimals || 'Decimals', 'center'],
 				[pc.lpn_labels_col_show || 'Show', LPN_LABEL_COL_W, pc.lpn_labels_show_tip, 'center'],
 				[pc.lpn_labels_col_drop || 'Drop', LPN_LABEL_COL_W,
 					(pc.lpn_labels_priority || 'Priority') + ' — ' + (labelDropTip(group) || ''), 'center']
@@ -46233,7 +46221,7 @@ var EngCalcs = EngCalcs || {};
 		// No Length row, deliberately (Tom, 2026-07-30): lenAuto derives a pipe's length from the
 		// drawn geometry, so any default here would be overwritten the moment the pipe is drawn.
 		defaultRow(defBody, pc.lpn_field_km || 'Minor (local) loss coefficient, k', null, 'k', nonNegative,
-			pc.lpn_field_km_tip, kmTableUrl());
+			null, kmTableUrl());
 		// ---- push defaults to existing elements ----
 		// A HARD push, deliberately. "Update only elements still holding the OLD default" cannot tell
 		// a deliberately-typed 6 from an untouched 6, so it is SILENTLY destructive rather than
@@ -46441,7 +46429,7 @@ var EngCalcs = EngCalcs || {};
 			saveToStorage();
 		});
 		row(mapBody, pc.lpn_settings_leader_snap || 'Snap leader lines to set angles', snapSelect,
-			pc.lpn_settings_leader_snap_tip);
+			null);
 		// ---- THE LABELING THRESHOLD (Tasks 669 and 705, restored 2026-09-22) ----
 		// It sat at this point until 2026-08-19 and is back on Tom's asking, in his words for the
 		// row. **A NUMBER AND A CAPTURE BUTTON**: no default is meaningful across networks 400 ft
@@ -50487,7 +50475,6 @@ var EngCalcs = EngCalcs || {};
 		desc.className = 'lpn-lib-wide';
 		desc.value = c.note || '';
 		desc.setAttribute('aria-label', pc.lpn_library_curve_note_label || 'Description');
-		if (pc.lpn_library_curve_note_tip) { helpTip(desc, pc.lpn_library_curve_note_tip); }
 		desc.addEventListener('change', function () {
 			var t = String(desc.value || '').trim();
 			if (t === (c.note || '')) { return; }
@@ -50527,7 +50514,6 @@ var EngCalcs = EngCalcs || {};
 			kindSel.appendChild(gen);
 		}
 		kindSel.setAttribute('aria-label', pc.lpn_library_curve_type || 'Curve type');
-		if (pc.lpn_library_curve_type_tip) { helpTip(kindSel, pc.lpn_library_curve_type_tip); }
 		kindSel.addEventListener('change', function () {
 			saveUndoSnapshot();
 			c.kind = kindSel.value;
@@ -52183,8 +52169,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			scheduleSolve();
 		});
-		setFieldLabel(label, (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ')',
-			pc.lpn_field_length_tip);
+		setFieldLabel(label, (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ')');
 		label.appendChild(input);
 		autoLabel.appendChild(auto);
 		autoLabel.appendChild(document.createTextNode(' ' + (pc.lpn_field_auto || 'Auto')));
@@ -53334,8 +53319,7 @@ var EngCalcs = EngCalcs || {};
 		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; },
-				function (v) { n.elev = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_field_elev_tip);
+				function (v) { n.elev = v; updateNode(nodeId, true); refreshPopupIfOpen(); });
 			elevationDemRow(fields, n, nodeId,
 				function (v) { n.elev = v; updateNode(nodeId, true); });
 			// Blank = follow the elevation, which is what the placeholder shows -- so the field reads
@@ -53372,8 +53356,7 @@ var EngCalcs = EngCalcs || {};
 			}
 		} else {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
-				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId, true); },
-				pc.lpn_field_elev_tip);
+				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId, true); });
 			elevationDemRow(fields, n, nodeId,
 				function (v) { n.elev = v; updateNode(nodeId, true); });
 			// **THERE IS NO PLAIN Base demand / Demand pattern FIELD ANY MORE** (Task 553, Tom
@@ -53540,7 +53523,7 @@ var EngCalcs = EngCalcs || {};
 			// label, which is the suite's rule.
 			[[(pc.lpn_field_base_demand || 'Base demand') + ' (' + unitLabel('lpn_u_flow') + ')', pc.lpn_demand_tip],
 				[pc.lpn_field_demand_pattern || 'Demand pattern', pc.lpn_field_demand_pattern_tip],
-				[pc.lpn_field_demand_category || 'Description', pc.lpn_field_demand_category_tip],
+				[pc.lpn_field_demand_category || 'Description', null],
 				['', null]].forEach(function (pair) {
 				var th = document.createElement('th');
 				if (pair[1]) { setFieldLabel(th, pair[0], pair[1]); }
@@ -53601,7 +53584,6 @@ var EngCalcs = EngCalcs || {};
 		addBtn.type = 'button';
 		addBtn.className = 'lpn-demand-add';
 		addBtn.textContent = pc.lpn_demand_add || 'Add demand category';
-		helpTip(addBtn, pc.lpn_demand_add_tip);
 		addBtn.addEventListener('click', function () {
 			saveUndoSnapshot();
 			// ZERO AND BLANK, not a copy of row 0. A new row is a question to the user, and seeding
@@ -54117,7 +54099,7 @@ var EngCalcs = EngCalcs || {};
 		// `change` as well, for the reason the tag's does: a field can lose focus without ever firing
 		// `input` -- a value restored by the browser, or an autofill.
 		input.addEventListener('change', function () { commit(); refreshPopupIfOpen(); });
-		setFieldLabel(label, pc.lpn_field_desc || 'Description', pc.lpn_field_desc_tip);
+		setFieldLabel(label, pc.lpn_field_desc || 'Description');
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
@@ -54357,7 +54339,7 @@ var EngCalcs = EngCalcs || {};
 					pipeK(l), pc.lpn_field_fittings_tip);
 			} else {
 				numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k', effective(l, 'k') || 0,
-					function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, pc.lpn_field_km_tip,
+					function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, null,
 					{ el: l, prop: 'k' }, kmTableUrl());
 			}
 			lengthField(fields, l);
@@ -55035,7 +55017,7 @@ var EngCalcs = EngCalcs || {};
 			refreshPopupIfOpen();
 		});
 		setFieldLabel(demLabel, (pc.lpn_field_meter_demand || 'Demand per service') +
-			' (' + unitLabel('lpn_u_flow') + ')', pc.lpn_field_meter_demand_tip);
+			' (' + unitLabel('lpn_u_flow') + ')');
 		demLabel.appendChild(demInput);
 		fields.appendChild(demLabel);
 		fields.appendChild(document.createElement('br'));
@@ -55092,7 +55074,7 @@ var EngCalcs = EngCalcs || {};
 			customerEdited(c);
 			refreshPopupIfOpen();
 		});
-		setFieldLabel(cntLabel, pc.lpn_field_meter_count || 'Number of services', pc.lpn_field_meter_count_tip);
+		setFieldLabel(cntLabel, pc.lpn_field_meter_count || 'Number of services');
 		cntLabel.appendChild(cntInput);
 		fields.appendChild(cntLabel);
 		fields.appendChild(document.createElement('br'));
@@ -59048,7 +59030,7 @@ var EngCalcs = EngCalcs || {};
 			arrow.type = 'button';
 			arrow.className = 'lpn-pane-sortarrow lpn-ff-sortarrow' + (on ? ' lpn-pane-sortarrow-active' : '') +
 				(on && sortState.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
-			arrow.title = on ? (pc.lpn_pane_sortarrow_tip || 'Reverse the sort') : (pc.lpn_pane_sort_asc || 'Sort ascending');
+			arrow.title = (on && sortState.dir > 0) ? (pc.lpn_pane_sort_desc || 'Sort descending') : (pc.lpn_pane_sort_asc || 'Sort ascending');
 			arrow.setAttribute('aria-label', arrow.title + ': ' + text);
 			arrow._lpnFfSortCol = i;
 			arrow.addEventListener('click', function (ev) {
@@ -61627,7 +61609,7 @@ var EngCalcs = EngCalcs || {};
 			table = ffEl('table', 'lpn-ff-table', null, wrap), hr = ffEl('tr', null, null, ffEl('thead', null, null, table)),
 			body = ffEl('tbody', null, null, table), r = res.stats.r;
 		[[pc.lpn_calib_col_location || 'Location'],
-			[pc.lpn_calib_col_n || 'Num obs', pc.lpn_calib_col_n_tip],
+			[pc.lpn_calib_col_n || 'Num obs'],
 			[pc.lpn_calib_col_obs_mean || 'Observed mean'],
 			[pc.lpn_calib_col_sim_mean || 'Computed mean'],
 			[pc.lpn_calib_col_mean_err || 'Mean error', pc.lpn_calib_col_mean_err_tip],

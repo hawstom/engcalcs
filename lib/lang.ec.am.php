@@ -676,9 +676,7 @@ $ec_lang['lpn_customer_heading']='ደንበኛ {id}';
 // strings every node and link already uses. Do not re-add an account key: a utility that wants a
 // field of its own name makes a custom property.
 $ec_lang['lpn_field_meter_demand']='ፍላጎት በእያንዳንዱ አገልግሎት';
-$ec_lang['lpn_field_meter_demand_tip']='በዚህ ደንበኛ ያለው እያንዳንዱ አገልግሎት የሚያስፈልገው መጠን። ፈልግና ተካ ባዶና 0 መካከል ያለውን ልዩነት መጠቀም ይችላል።';
 $ec_lang['lpn_field_meter_count']='የአገልግሎቶች ብዛት';
-$ec_lang['lpn_field_meter_count_tip']='ይህ አንድ ደንበኛ ለስንት ተመሳሳይ አገልግሎቶች እንደሚወክል፣ ስለዚህ በአንድ ዋና ቧንቧ ላይ ያሉ አርባ ሁለት የነጠላ ቤተሰብ ግንኙነቶች በአንድ ቦታ አንድ ምልክት ሊሆኑ ይችላሉ። ከታች ያለው ድምር ከላይ ያለው ፍላጎት በዚህ ብዛት ተባዝቶ ነው።';
 $ec_lang['lpn_field_meter_total']='ጠቅላላ ፍላጎት';
 $ec_lang['lpn_field_meter_total_tip']='ፍላጎት በእያንዳንዱ አገልግሎት በአገልግሎቶች ብዛት ተባዝቶ። ከታች ለተሰየመው መገናኛ የሚታከለው ቁጥር ይህ ነው።';
 $ec_lang['lpn_field_meter_pipe']='የተገናኘ አካል';
@@ -798,7 +796,6 @@ $ec_lang['lpn_pane_manage_cols_down']='ወደ ታች አንቀሳቅስ';
 $ec_lang['lpn_pane_manage_cols_top']='ወደ መጀመሪያ አንቀሳቅስ';
 $ec_lang['lpn_pane_manage_cols_bottom']='ወደ መጨረሻ አንቀሳቅስ';
 $ec_lang['lpn_pane_colmenu_tip']='አምዶችን ደብቅ ወይም አስተዳድር';
-$ec_lang['lpn_pane_sortarrow_tip']='ደርድሩን ገልብጥ';
 $ec_lang['lpn_tool_area_window']='መስኮት ምረጥ';
 $ec_lang['lpn_tool_area_lasso']='ነፃ ቅርጽ ምረጥ';
 $ec_lang['lpn_tool_area_polygon']='ፖሊጎን ምረጥ';
@@ -852,7 +849,6 @@ $ec_lang['lpn_field_elev']='ከፍታ';
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
 // protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
 // entry carrying translatable payload nobody on the page can see.
-$ec_lang['lpn_field_elev_tip']='በዚህ ነጥብ ላይ ያለው የመሬት ወይም የቧንቧ ደረጃ። ከፈለጉት ከማንኛውም ዜሮ መነሻ መለካት ይችላሉ፣ ሁሉም ነጥቦች ተመሳሳዩን መነሻ እስከተጠቀሙ ድረስ።';
 // A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
 // at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
 // This USED to read "so it doubles as a tank" (Tom, 2026-07-30), which was true only while there
@@ -1005,7 +1001,6 @@ $ec_lang['lpn_status_converted']='{n} ዋጋዎች ወደ {unit} እንደገና
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_color_tip']='መረቡን በአንድ መጠን ይቀቡት፣ ትልቅ ካርታም በአንድ እይታ እንዲነበብ። ግፊትና ፍጥነት ብዙ ጊዜ አስፈላጊ የሚሆኑት ሁለቱ ናቸው።';
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
 $ec_lang['lpn_units_length']='ርዝመት';
@@ -1174,13 +1169,6 @@ $ec_lang['lpn_tip_join']='{name} — {tip}';
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='አቋራጭ፦ {key}ን ይጫኑ።';
 $ec_lang['lpn_tool_key_hint_two']='አቋራጭ፦ {key} ወይም {key2} ይጫኑ።';
-$ec_lang['lpn_tool_add_junction_tip']='መገናኛ ለመጨመር ካርታውን ይጫኑ፦ ቧንቧዎች የሚገናኙበት ወይም ውሃ የሚወሰድበት ነጥብ።';
-$ec_lang['lpn_tool_add_reservoir_tip']='ማጠራቀሚያ ለመጨመር ካርታውን ይጫኑ፦ ቋሚ የውሃ ደረጃ ያለው ማለቂያ የሌለው ምንጭ።';
-$ec_lang['lpn_tool_add_tank_tip']='ታንክ ለመጨመር ካርታውን ይጫኑ፦ ሲሞላና ሲትፋ ደረጃው የሚነሳ የሚወርድ ማከማቻ።';
-$ec_lang['lpn_tool_add_pipe_tip']='አንድ ነጥብና ከዚያ ሌላ ነጥብ ይጫኑ፣ በመካከላቸውም ቧንቧ ለመሳል።';
-$ec_lang['lpn_tool_add_pump_tip']='አንድ ነጥብና ከዚያ ሌላ ነጥብ ይጫኑ፣ በመካከላቸውም ፓምፕ ለማስቀመጥ።';
-$ec_lang['lpn_tool_add_valve_tip']='አንድ ነጥብና ከዚያ ሌላ ነጥብ ይጫኑ፣ በመካከላቸውም ቫልቭ ለማስቀመጥ።';
-$ec_lang['lpn_tool_add_text_tip']='በስዕሉ ላይ ማስታወሻ ለመጻፍ ካርታውን ይጫኑ።';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='እንደተነገረው በካርታው ላይ ይጫኑና በቅርጹ ውስጥ ያለውን ሁሉ ይምረጡ። ቅርጹን በመስኮት፣ በነፃ ቅርጽ እና በፖሊጎን መካከል ለመቀየር ይህን ቁልፍ እንደገና ይጫኑ። ካለው ምርጫ ጋር ለመቀጠል፣ የመረጡትን ለመጨመር ወይም ለማስወገድ (ተለዋጭ) ሲመርጡ Shift ይያዙ።';
@@ -1189,7 +1177,6 @@ $ec_lang['lpn_area_selected']='{n} ተመርጠዋል።';
 $ec_lang['lpn_area_none']='በዚያ ቦታ ውስጥ ምንም አልተገኘም።';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_vertices_tip']='በካርታው ላይ ቧንቧን የሚቀርጹትን መታጠፊያዎች ጨምር እና አስወግድ። ቧንቧን ይጫኑ መታጠፊያ ለመጨመር፣ መታጠፊያን ይጫኑ ለማስወገድ፣ መታጠፊያንም ይጎትቱ ለማንቀሳቀስ። መታጠፊያ የሚቀይረው የተሳለውን መንገድ ብቻ ነው፣ ሃይድሮሊኩን አይደለም።';
-$ec_lang['lpn_tool_delete_tip']='በካርታው ላይ ማንኛውንም ነገር ለማስወገድ ይጫኑት።';
 $ec_lang['lpn_tool_undo_tip']='የመጨረሻውን ለውጥ ቀልብስ።';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='ጠቅላላውን መረብ በመስኮቱ ውስጥ አስማማ።';
@@ -1198,7 +1185,6 @@ $ec_lang['lpn_tool_zoom_window_tip']='በካርታው ላይ ለማጉላት የ
 $ec_lang['lpn_zoom_in_tip']='አጉላ። አቋራጭ፦ +';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='አሳንስ። አቋራጭ፦ -';
-$ec_lang['lpn_tool_settings_tip']='ለዚህ ፕሮጀክት ቅንብሮችን ክፈት።';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='አካልን በመለያው ፈልግ፣ ወይም ፈተናን የሚያሟሉ ሁሉንም አካሎች ፈልግ፣ ከዚያም ሁሉንም በአንድ ጊዜ ቀይር።';
 // **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
@@ -1210,7 +1196,6 @@ $ec_lang['lpn_find_menu_tip']='አካልን በመለያው ፈልግ፣ ወይ�
 $ec_lang['lpn_help_icons']='የመሳሪያ አሞሌ ምልክቶች ትርጉም';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='ታይነት';
-$ec_lang['lpn_pane_right_toggle_tip']='ከካርታው ቀኝ ያለውን ፓነል አሳይ ወይም ደብቅ። የምልክትና የቀለም ምርጫዎችን ይይዛል።';
 $ec_lang['lpn_color_legend_open_tip']='የታይነት ፓነሉን ለመክፈትና እነዚህን ቀለሞች ለመቀየር ይጫኑ።';
 $ec_lang['lpn_color_node_field']='ነጥብ ቀለም በ';
 $ec_lang['lpn_color_link_field']='ቧንቧ ቀለም በ';
@@ -1270,7 +1255,6 @@ $ec_lang['lpn_goto_menu']='ወደ ኬክሮስና ኬንትሮስ ሂድ…';
 // lat/lon."* The parser accepts `38,122` and `38.122` as a pair on his ruling of the same day; the
 // examples in lpn_goto_bad show all three shapes, which is where somebody whose last attempt failed
 // is actually reading.
-$ec_lang['lpn_goto_tip']='ቀድሞውኑ መጋጠሚያ ወዳላችሁት ቦታ ካርታውን አንቀሳቅሱ። መጀመሪያ ኬክሮስ፣ ከዚያም ኬንትሮስ፣ ካርታ እንደሚሰጣቸው ቅደም ተከተል፣ በመካከላቸውም ክፍተት ኖሮ፦ 38 -122';
 $ec_lang['lpn_goto_prompt']='ኬክሮስና ኬንትሮስ፣ በዚያ ቅደም ተከተል';
 $ec_lang['lpn_goto_bad']='ያ አንድ ኬክሮስና አንድ ኬንትሮስ አይደለም። 38 -122ን ይሞክሩ፣ በመካከላቸውም ክፍተት ይኑር።';
 $ec_lang['lpn_georef_goto']='ሂድ ወደ…';
@@ -1568,7 +1552,6 @@ $ec_lang['lpn_profile_menu']='መገለጫ';
 // nobody to read. Sprint 459's Wave 0 found them; Tom ruled the move on 2026-08-24 ("these _syns
 // are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
 // permission $ec_lang_syn requires. Same text, correct array.
-$ec_lang['lpn_profile_tip']='በመረቡ ውስጥ በተመረጠ መንገድ ላይ የመሬቱን ገጽታና የሃይድሮሊክ ደረጃ መስመሩን (HGL) ይሳሉ።';
 $ec_lang['lpn_profile_title']='በመንገድ ላይ ያለ መገለጫ';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
@@ -1626,12 +1609,9 @@ $ec_lang['lpn_profile_missing']='{name} የተባለው የተቀመጠ መን�
 $ec_lang['lpn_ts_menu']='የጊዜ ተከታታይ';
 $ec_lang['lpn_ts_tip']='በተራዘመ ጊዜ ማስመሰያ ውስጥ አንድ ወይም ብዙ አካሎችን ከጊዜ ጋር አነጻጽሮ ያሳያል።';
 $ec_lang['lpn_ts_title']='ዋጋዎች በጊዜ';
-$ec_lang['lpn_ts_group_tip']='ግራፉ ነጥቦችን ወይም ግንኙነቶችን ያሳያል ወይ።';
 $ec_lang['lpn_ts_group_nodes']='ነጥቦች';
 $ec_lang['lpn_ts_group_links']='ግንኙነቶች';
-$ec_lang['lpn_ts_quantity_tip']='የትኛው ዋጋ ከጊዜ ጋር እንደሚሳል።';
 $ec_lang['lpn_ts_add']='የተመረጠውን ጨምር';
-$ec_lang['lpn_ts_add_tip']='አሁን በካርታው ላይ የተመረጠውን ሁሉ ወደ ግራፉ ያስገባል።';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
 $ec_lang['lpn_ts_add_none']='ከዚያ ዓይነት በካርታው ላይ ምንም አልተመረጠም።';
 $ec_lang['lpn_ts_clear']='ሁሉንም አስወግድ';
@@ -1646,8 +1626,6 @@ $ec_lang['lpn_ts_axis_time']='ያለፈ ጊዜ';
 $ec_lang['lpn_freq_menu']='ድግግሞሽ';
 $ec_lang['lpn_freq_tip']='በአሁኑ የጊዜ ደረጃ የአንድ ንብረት ድግግሞሽ ስርጭትን በሁሉም መገናኛዎች ወይም በሁሉም ቧንቧዎች ላይ ግራፍ አድርጎ ያሳያል።';
 $ec_lang['lpn_freq_title']='የዋጋዎች ስርጭት';
-$ec_lang['lpn_freq_group_tip']='ግራፉ መገናኛዎችን ወይም ቧንቧዎችን ያሳያል ወይ።';
-$ec_lang['lpn_freq_quantity_tip']='የትኛው ዋጋ እንደሚሳል።';
 $ec_lang['lpn_freq_none']='ለዚህ ዋጋ ገና ውጤት የለም፣ ስለዚህ የሚሳል ነገር የለም።';
 $ec_lang['lpn_freq_summary']='የተሳሉት፦ {n} ከ{total}';
 $ec_lang['lpn_freq_summary_time']='የተሳሉት፦ {n} ከ{total}፣ በ{time}';
@@ -1750,7 +1728,6 @@ $ec_lang['lpn_file_revert']='እንደነበር መልስ';
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='የቅርብ ጊዜ ፋይሎች';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_recent_tip']='{file}ን በኮምፒውተርዎ ላይ ፈልገው ሳያገኙ ዳግም ይክፈቱ።';
 $ec_lang['lpn_recent_denied']='ያንን ፋይል ለመክፈት ፈቃድ ስላልተሰጠ አልተከፈተም።';
 $ec_lang['lpn_recent_gone']='{file}ን መክፈት አልተቻለም። ተንቀሳቅሶ፣ ስሙ ተቀይሮ ወይም ተሰርዞ ሊሆን ስለሚችል ከቅርብ ጊዜ ዝርዝሩ ተነስቷል።';
 // The tab strip. These are titles on small controls, so each has to stand alone with no sentence
@@ -1874,11 +1851,8 @@ $ec_lang['lpn_file_upload_explain']='ይህ አሳሽ ከፋይል ጋር መገ
 // The tip on the Open button, which reached the toolbar with Task 246. It exists because that
 // button is icon-only: on a menu row the word carries the whole meaning, and on the strip the tip
 // is where the rest of it lives.
-$ec_lang['lpn_file_open_tip']='ከዚህ ገጽ የተቀመጠ የፕሮጀክት ፋይል ይክፈቱ።';
 // Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
 // cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
-$ec_lang['lpn_file_save_tip']='ከተገናኘው ፋይል ጋር ያስቀምጣል።';
-$ec_lang['lpn_file_saveas_tip']='የሚያስቀምጡበትን ፋይል ይምረጡ። ይህ ፕሮጀክት ከዚያ ፋይል ጋር ይገናኛል፣ ከዚያ በኋላ አስቀምጥ ወደዚያው ይጽፋል።';
 // The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
 // cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
 // is no API for it, and the download attribute cannot override the setting -- but the user can turn
@@ -2184,7 +2158,6 @@ $ec_lang['lpn_field_roughness_tip']='የHazen-Williams C። ከፍ ያለ ቁጥ
 $ec_lang['lpn_field_length']='ርዝመት';
 $ec_lang['lpn_field_from']='ከ';
 $ec_lang['lpn_field_to']='ወደ';
-$ec_lang['lpn_field_length_tip']='የቧንቧው ርዝመት። ራስ-ሰር በርቶ ሳለ ርዝመቱ ከስዕልዎ ይለካል። ከስዕሉ የተለየ ርዝመት ለመተየብ ራስ-ሰርን ያጥፉ።';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2226,7 +2199,6 @@ $ec_lang['lpn_field_valve_setting_loss_tip']='የመቆጣጠሪያ ቫልቩ �
 $ec_lang['lpn_field_valve_diameter_tip']='በቫልቩ ውስጥ ያለው የመተላለፊያ ስፋት። በቫልቩ ውስጥ የሚያልፈው የውሃ ፍጥነት ከዚህ ስፋት ይሰላል፣ ኪሳራውም ከዚያ ፍጥነት ይከተላል።';
 $ec_lang['lpn_field_valve_km_tip']='ቫልቩ ሙሉ በሙሉ ክፍት ሆኖ ሳለ ከቫልቩ አካል የሚመጣ ኪሳራ፣ ከቫልቩ ቅንብር ከሚያስወግደው በተጨማሪ። የፍጥነት ሄድ ብዜት ተደርጎ ይቆጠራል። ችላ ለማለት 0 ይጠቀሙ።';
 $ec_lang['lpn_field_km']='ጥቃቅን (አካባቢያዊ) ኪሳራ ኮፊሸንት፣ k';
-$ec_lang['lpn_field_km_tip']='ከዚህ ቧንቧ ጠማማዎች፣ ቫልቮችና ማያያዣዎች የሚመጣ ኪሳራ፣ የፍጥነት ሄድ ብዜት ተደርጎ የሚቆጠር። ለቀላል ቀጥተኛ ቧንቧ 0 ይጠቀሙ።';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
 // their own key rather than being asked to carry the full popup-field wording -- an on-map legend
@@ -2263,7 +2235,6 @@ $ec_lang['lpn_field_desc']='መግለጫ';
 // description is free text, so the tag's one-word rule does NOT apply to it, but a line break cannot
 // be written as a trailing comment and is turned into a space. The tip says what the field is for
 // first, because that is what a reader of a blank box wants.
-$ec_lang['lpn_field_desc_tip']='ለራስዎ አገልግሎት፣ እንደ የመንገድ ጠርዝ ወይም ቧንቧው ከምን እንደተሠራ። ወደ EPANET ፋይል ውስጥ ይገባል ይወጣልም፣ እዚያም የክፍሉ ረድፍ መጨረሻ ላይ ይቀመጣል። ምንም ስሌት አያነበውም። ፋይሉ የሚያኖርበት ቦታ ስለሌለው የመስመር መቋረጥ ወደ ክፍት ቦታ ይቀየራል።';
 // **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
@@ -2339,7 +2310,6 @@ $ec_lang['lpn_mode_add_text']='ሁነታ፦ ጽሑፍ ጨምር። ጽሑፍ ለ
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='አካሎችን በካርታው ላይ ለመቀየር፣ ለማንቀሳቀስ እና ለመጎተት ይህን ሁነታ ይጠቀሙ። ገጹ በነባሪነት የሚመለስበት ሁነታ ይህ ነው፦ እንደ ፕሮጀክት መክፈት ካሉ አንዳንድ ተግባራት በኋላ ራሱ ወደዚህ ይመለሳል። Esc ን ለሁለተኛ ጊዜ ሲጫኑ የተመረጠው ነገር ሁሉ ከምርጫ ይወጣል።';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tip_labels_draggable']='ምልክትን ለማንቀሳቀስ መጎተት ይችላሉ። ምልክቱ እንደተንቀሳቀሰ ለማሳወቅ ለአጭር ጊዜ ያበራል። ወደ ራስ-ሰር ቦታው ለመመለስ ምልክቱን ሁለቴ ይጫኑ።';
 $ec_lang['lpn_field_auto']='ራስ-ሰር';
 $ec_lang['lpn_method_switch_confirm']='የግጭት ዘዴውን መቀየር በቧንቧዎችዎ ላይ የገቡትን የሻካሪነት ቁጥሮች አይቀይርም፣ ለአንድ ዘዴ የተዘጋጀ ሻካሪነትም ለሌላው ትርጉም የለውም። ከዚህ በኋላ እያንዳንዱን ቧንቧ ያረጋግጡ። ያም ሆኖ ይቀየር?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
@@ -2391,7 +2361,6 @@ $ec_lang['lpn_field_text_all_zoom_tip']='ምንም ያህል ቢያጉሉ ይህ
 $ec_lang['lpn_tool_labels']='ምልክቶች';
 $ec_lang['lpn_labels_heading_node']='የነጥብ ምልክቶች';
 $ec_lang['lpn_labels_heading_link']='የግንኙነት ምልክቶች';
-$ec_lang['lpn_labels_decimals_tip']='ለዚህ ምልክት የሚታዩ የአስርዮሽ ቦታዎች';
 $ec_lang['lpn_labels_mark_extrema']='ከፍተኛውንና ዝቅተኛውን ዋጋዎች ምልክት አድርግ';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
@@ -2407,8 +2376,6 @@ $ec_lang['lpn_settings_apply_to_all']='በሁሉም ላይ ተግብር';
 $ec_lang['lpn_settings_apply_to_all_tip']='ቀድሞ የተሳለ ከዚህ ዓይነት እያንዳንዱ አካል በዚህ ጽሑፍ የሚጀምር መለያ ያገኛል። እያንዳንዱ ቁጥሩን ይይዛል። በቁጥር የማያልቅ መለያ አይነካም።';
 $ec_lang['lpn_confirm_apply_prefix']='{n} አካሎችን መልሰው ይሰይሙ መለያዎቻቸው በ{prefix} እንዲጀምሩ? እያንዳንዱ ቁጥሩን ይይዛል።';
 $ec_lang['lpn_prefix_applied']='{n} አካሎች ተሰይመዋል። {skipped} ሌሎች እንዳሉ ተትተዋል።';
-$ec_lang['lpn_labels_prefix_tip']='በካርታ ምልክቶች ላይ ከዚህ ንብረት በፊት የሚጨመር ጽሑፍ';
-$ec_lang['lpn_labels_suffix_tip']='በካርታ ምልክቶች ላይ ከዚህ ንብረት በኋላ የሚጨመር ጽሑፍ';
 $ec_lang['lpn_labels_suffix_gradient_tip']='በካርታ ምልክቶች ላይ ከሄድ ኪሳራ ቅልመት በኋላ የሚጨመር ጽሑፍ። እዚህ የመቶኛ ምልክት አይተይቡ። መለኪያ ክፍሉ መቶኛ ሲሆን ራሱ ይጨመርልዎታል።';
 $ec_lang['lpn_labels_separator']='በዋጋዎች መካከል ያለ ጽሑፍ';
 $ec_lang['lpn_labels_separator_tip']='ከአንድ ንብረት ወደ ቀጣዩ ባለ ምልክት ላይ ያለ ጽሑፍ። ነባሪው ክፍት ቦታ ነው።';
@@ -2565,7 +2532,6 @@ $ec_lang['lpn_backdrop_continue']='ቀጥል';
 $ec_lang['lpn_tool_settings']='ቅንብሮች';
 $ec_lang['lpn_settings_show_titles']='የገጽ ርዕሶችን አሳይ';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_show_titles_tip']='የገጹን ራስጌና ከስዕሉ በላይ ያለውን የእንኳን ደህና መጣችሁ መስመር ይደብቃል፣ በዚህም ካርታው ተጨማሪ ቦታ ያገኛል። ማተም ሁልጊዜ ንጹህ ካርታ ብቻ ያሳያል።';
 // The link that rides on the headings themselves (Tom's 2026-09-08 worklist). It throws the switch AND opens the
 // box at the row that holds it, so the way back is learned in the same gesture.
 $ec_lang['lpn_hide_titles']='እነዚህን ርዕሶች ደብቅ';
@@ -2867,7 +2833,6 @@ $ec_lang['lpn_settings_mask_labels']='ከምልክቶች በስተጀርባ ጠ�
 // drawing program would expect exactly that from those words.
 $ec_lang['lpn_settings_leader_snap']='የመሪ መስመሮች ወደ ተወሰኑ ማዕዘኖች ይሳቡ';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_leader_snap_tip']='ምልክትን ከሚያመለክተው ርቆ ሲጎትቱ፣ ወደ እሱ የሚመለሰው መስመር ወደ አንዱ ቅርብ ሲጎትቱ ወደ ቅርቡ ተወሰነ ማዕዘን ይሳባል። መጎተቱን ከቀጠሉ መሳቡ ይለቅቃል፣ ስለዚህ ማንኛውም ማዕዘን አሁንም ይገኛል። ማጥፋት ልክ እንደ ገጹ ከመጀመሪያው ጀምሮ ያለ ነፃ መጎተትን ይሰጣል።';
 // **THE LABELING THRESHOLD** (Tasks 669 and 705). The row's name is Tom's own wording from the
 // Task 705 restorations. Its capture button reuses lpn_settings_label_use_view, the customer
 // row's key, because it is the same button doing the same thing. The placeholder is the only place
@@ -3001,7 +2966,6 @@ $ec_lang['lpn_time_tank']='ታንክ';
 $ec_lang['lpn_time_level']='የውሃ መጠን ደረጃ';
 $ec_lang['lpn_time_run']='አስላ';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='ይህን መረብ በእያንዳንዱ የሃይድሮሊክ ጊዜ ደረጃ ይፈታል።';
 // **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
 // `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
 // LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
@@ -3225,11 +3189,9 @@ $ec_lang['lpn_settings_energy']='ኃይል';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='ዘገባዎች';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_menu_tip']='ስለ ፓምፕ ኃይል ወጪ፣ ስለ ሁኔታዎች ንጽጽር፣ ስለ EPANET ፈታች ዘገባ፣ ከተለኩ መረጃዎች ጋር ስለ ካሊብሬሽን፣ እንዲሁም ከተራዘመ ጊዜ ማስመሰያ በኋላ ስለ ሁኔታ ዘገባውና ስለ ሙሉ ዘገባው የሚያቀርቡ ዘገባዎች።';
 $ec_lang['lpn_reports_epanet']='የEPANET ሩጫ';
 $ec_lang['lpn_energy_title']='የፓምፕ ኃይል ዘገባ';
 $ec_lang['lpn_energy_menu']='የፓምፕ ኃይል';
-$ec_lang['lpn_energy_menu_tip']='ባለፈው የተራዘመ ጊዜ ማስመሰያ ውስጥ እያንዳንዱ ፓምፕ ከሩጫው ምን ያህል ድርሻ በርቶ እንደነበር፣ ምን ያህል ኃይል እንደሳበ፣ እና ምን ያህል እንዳስወጣ።';
 $ec_lang['lpn_energy_efficiency']='የፓምፕ ብቃት (በመቶኛ)';
 $ec_lang['lpn_energy_efficiency_tip']='የራሱ የብቃት ኩርባ ለሌለው እያንዳንዱ ፓምፕ ጥቅም ላይ የሚውለው ከሽቦ-እስከ-ውሃ ብቃት። ምንም ካልተገለጸ EPANET 75 በመቶ ይጠቀማል።';
 $ec_lang['lpn_energy_price']='የኃይል ዋጋ';
@@ -3363,7 +3325,6 @@ $ec_lang['lpn_color_mode_manual']='በእጅ';
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='ቤተመዛግብት';
-$ec_lang['lpn_library_menu_tip']='ለዚህ ፕሮጀክት የፍላጎት ስርዓቶችን፣ የፓምፕ ኩርባዎችንና የመቆጣጠሪያ ደንቦችን ያስተዳድሩ።';
 // The three section names. Each is the word EPANET's own input file uses for the section, because
 // that is the word every water-network user and every tutorial already has -- see the note in
 // dev/scripts/glossary.json about deferring to a discipline's standard term.
@@ -3377,7 +3338,6 @@ $ec_lang['lpn_library_curves_tip']='ኩርባ አንድ ነገር እንዴት �
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_curves_note']='ኩርባዎች ከፓምፖችና ቫልቮች ጋር ተያይዘዋል። ለፓምፕ ሄድ ኩርባ ሩጫው በሚታየው መንገድ በነጥቦቹ ውስጥ የተስማማ ኩርባ ይጠቀማል፤ ለሌላው እያንዳንዱ ዓይነት በሚታየው መንገድ ነጥቦቹን በቀጥተኛ መስመሮች ያገናኛል።';
 $ec_lang['lpn_library_curve_add']='ኩርባ ጨምር';
-$ec_lang['lpn_library_curve_type_tip']='ይህ ኩርባ የሚገልጸው ምን እንደሆነ';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
 // EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
 // and Equation (for pump head) on row/line 2."*). EPANET calls the control "Curve Type", so that is
@@ -3398,7 +3358,6 @@ $ec_lang['lpn_library_curve_values_tip']='በሰንጠረዥ ውስጥ አንድ
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
 $ec_lang['lpn_library_curve_note_label']='መግለጫ';
-$ec_lang['lpn_library_curve_note_tip']='ይህ ኩርባ ምን እንደሆነ፣ በራስዎ ቃላት። በEPANET ፋይል ውስጥ ከኩርባው በላይ ተጽፎ ከዚያ ተነስቶ ይነበባል።';
 $ec_lang['lpn_library_curve_remove_point']='ይህን ነጥብ አስወግድ';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -3586,9 +3545,7 @@ $ec_lang['lpn_field_demand_pattern_tip']='የዚህ መገናኛ ፍላጎት �
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
 $ec_lang['lpn_field_demand_category']='መግለጫ';
-$ec_lang['lpn_field_demand_category_tip']='የዚህ የፍላጎት ምድብ ስም ወይም መግለጫ።';
 $ec_lang['lpn_demand_add']='የፍላጎት ምድብ ጨምር';
-$ec_lang['lpn_demand_add_tip']='በዚህ መገናኛ ላይ ሌላ የፍላጎት ምድብ ይጨምሩ፣ የራሱ መሠረታዊ ፍላጎት፣ ስርዓትና መግለጫ ይዞ። ምድቦቹ ይደመራሉ።';
 $ec_lang['lpn_demand_remove']='ይህን ፍላጎት አስወግድ';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
@@ -3985,7 +3942,6 @@ $ec_lang['lpn_calib_tab_corr']='የዝምድና ሥዕል';
 $ec_lang['lpn_calib_tab_means']='የአማካይ ንጽጽሮች';
 $ec_lang['lpn_calib_col_location']='ቦታ';
 $ec_lang['lpn_calib_col_n']='የመለኪያ ብዛት';
-$ec_lang['lpn_calib_col_n_tip']='የመለኪያዎች ብዛት፦ በዚህ ቦታ የተነጻጸሩ መለኪያዎች።';
 $ec_lang['lpn_calib_col_obs_mean']='የተለካ አማካይ';
 $ec_lang['lpn_calib_col_sim_mean']='የተሰላ አማካይ';
 $ec_lang['lpn_calib_col_mean_err']='አማካይ ስህተት';

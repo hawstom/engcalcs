@@ -676,9 +676,7 @@ $ec_lang['lpn_customer_heading']='Абонат {id}';
 // strings every node and link already uses. Do not re-add an account key: a utility that wants a
 // field of its own name makes a custom property.
 $ec_lang['lpn_field_meter_demand']='Потребност на отклонение';
-$ec_lang['lpn_field_meter_demand_tip']='Какво изисква всяко отклонение при този абонат. Търсене и замяна може да използва разликата между празно поле и 0.';
 $ec_lang['lpn_field_meter_count']='Брой отклонения';
-$ec_lang['lpn_field_meter_count_tip']='Колко еднакви отклонения представлява този един абонат, така че четиридесет и две еднофамилни връзки по един магистрален водопровод да бъдат един символ на едно място. Общата стойност по-долу е потребността по-горе, умножена по този брой.';
 $ec_lang['lpn_field_meter_total']='Обща потребност';
 $ec_lang['lpn_field_meter_total_tip']='Потребността на отклонение, умножена по броя на отклоненията. Това е числото, добавено към възела, посочен по-долу.';
 $ec_lang['lpn_field_meter_pipe']='Свързан обект';
@@ -800,7 +798,6 @@ $ec_lang['lpn_pane_manage_cols_down']='Премести надолу';
 $ec_lang['lpn_pane_manage_cols_top']='Премести в началото';
 $ec_lang['lpn_pane_manage_cols_bottom']='Премести в края';
 $ec_lang['lpn_pane_colmenu_tip']='Скриване или управление на колони';
-$ec_lang['lpn_pane_sortarrow_tip']='Обърни сортирането';
 $ec_lang['lpn_tool_area_window']='Избор на прозорец';
 $ec_lang['lpn_tool_area_lasso']='Избор с ласо';
 $ec_lang['lpn_tool_area_polygon']='Избор на многоъгълник';
@@ -854,7 +851,6 @@ $ec_lang['lpn_field_elev']='Кота';
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
 // protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
 // entry carrying translatable payload nobody on the page can see.
-$ec_lang['lpn_field_elev_tip']='Кота на терена или тръбата в този възел. Измерете я от произволна нулева точка, стига всички възли да използват една и съща.';
 // A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
 // at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
 // This USED to read "so it doubles as a tank" (Tom, 2026-07-30), which was true only while there
@@ -1010,7 +1006,6 @@ $ec_lang['lpn_status_converted']='{n} стойности бяха пренапи
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_color_tip']='Оцветете мрежата по една величина, така че голяма карта да може да се прочете с един поглед. Обикновено най-важни са налягането и скоростта.';
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
 $ec_lang['lpn_units_length']='Дължина';
@@ -1179,13 +1174,6 @@ $ec_lang['lpn_tip_join']='{name}: {tip}';
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='Пряк път: натиснете {key}.';
 $ec_lang['lpn_tool_key_hint_two']='Пряк път: натиснете {key} или {key2}.';
-$ec_lang['lpn_tool_add_junction_tip']='Щракнете върху картата, за да добавите възел: точка, където тръбите се срещат или където се използва вода.';
-$ec_lang['lpn_tool_add_reservoir_tip']='Щракнете върху картата, за да добавите резервоар: безкраен източник с фиксирано ниво на водата.';
-$ec_lang['lpn_tool_add_tank_tip']='Щракнете върху картата, за да добавите цистерна: съоръжение за съхранение, чието ниво на водата се покачва и спада, докато се пълни и изпразва.';
-$ec_lang['lpn_tool_add_pipe_tip']='Щракнете върху един възел, а после върху друг, за да начертаете тръба между тях.';
-$ec_lang['lpn_tool_add_pump_tip']='Щракнете върху един възел, а после върху друг, за да поставите помпа между тях.';
-$ec_lang['lpn_tool_add_valve_tip']='Щракнете върху един възел, а после върху друг, за да поставите вентил между тях.';
-$ec_lang['lpn_tool_add_text_tip']='Щракнете върху картата, за да напишете бележка на чертежа.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='Щракнете върху картата, както е указано, за да изберете всичко вътре във фигурата. Натиснете отново този бутон, за да смените фигурата между прозорец, ласо и многоъгълник. Задръжте Shift по време на избора, за да продължите със съществуващия избор, добавяйки или премахвайки (превключвайки) избраното.';
@@ -1194,7 +1182,6 @@ $ec_lang['lpn_area_selected']='{n} избрани.';
 $ec_lang['lpn_area_none']='В тази област не е намерено нищо.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_vertices_tip']='Добавяне и премахване на пречупните точки, които оформят тръбата на картата. Щракнете върху тръба, за да добавите пречупна точка, щракнете върху пречупна точка, за да я премахнете, и я плъзнете, за да я преместите. Пречупната точка променя само начертания път, не хидравликата.';
-$ec_lang['lpn_tool_delete_tip']='Щракнете върху каквото и да е на картата, за да го премахнете.';
 $ec_lang['lpn_tool_undo_tip']='Отмени последната промяна.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='Показва цялата мрежа в прозореца на картата. Натиснете този бутон отново за Мащаб в прозорец, който увеличава кутия, чиито два противоположни ъгъла щраквате или изтегляте на картата. Или натиснете + или -, за да увеличите или намалите мащаба около средата на картата.';
@@ -1203,7 +1190,6 @@ $ec_lang['lpn_tool_zoom_window_tip']='Щракнете два противопо
 $ec_lang['lpn_zoom_in_tip']='Увеличи. Клавишна комбинация: +';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='Намали. Клавишна комбинация: -';
-$ec_lang['lpn_tool_settings_tip']='Отваря настройките на този проект.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='Намерете елемент по неговото ID или намерете всеки елемент, отговарящ на просто или потребителско условие, и ги променете всички наведнъж.';
 // **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
@@ -1215,7 +1201,6 @@ $ec_lang['lpn_find_menu_tip']='Намерете елемент по негово
 $ec_lang['lpn_help_icons']='Легенда на лентата';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Видимост';
-$ec_lang['lpn_pane_right_toggle_tip']='Показва или скрива панела вдясно от картата. В него са изборите за етикети и цветове.';
 $ec_lang['lpn_color_legend_open_tip']='Щракнете, за да отворите панела Видимост и промените тези цветове.';
 $ec_lang['lpn_color_node_field']='Оцвети възлите по';
 $ec_lang['lpn_color_link_field']='Оцвети тръбите по';
@@ -1275,7 +1260,6 @@ $ec_lang['lpn_goto_menu']='Отиди до географска ширина и 
 // lat/lon."* The parser accepts `38,122` and `38.122` as a pair on his ruling of the same day; the
 // examples in lpn_goto_bad show all three shapes, which is where somebody whose last attempt failed
 // is actually reading.
-$ec_lang['lpn_goto_tip']='Премества картата до координати, въведени като географска ширина дължина или географска ширина,дължина.';
 $ec_lang['lpn_goto_prompt']='Географска ширина и дължина, в този ред, разделени със запетая или интервал';
 $ec_lang['lpn_goto_bad']='Не могат да се разчетат координатите. Опитайте отново. Примери: 38,-122 или 38.122 или 38 -122';
 $ec_lang['lpn_georef_goto']='Отиди до…';
@@ -1574,7 +1558,6 @@ $ec_lang['lpn_graphs_menu']='Графики';
 // nobody to read. Sprint 459's Wave 0 found them; Tom ruled the move on 2026-08-24 ("these _syns
 // are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
 // permission $ec_lang_syn requires. Same text, correct array.
-$ec_lang['lpn_profile_tip']='Начертава терена и хидравличната линия на напора по маршрут през мрежата.';
 $ec_lang['lpn_profile_title']='Профил по маршрут';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
@@ -1632,12 +1615,9 @@ $ec_lang['lpn_profile_missing']='Запазеният маршрут {name} из
 $ec_lang['lpn_ts_menu']='Времеви редове';
 $ec_lang['lpn_ts_tip']='Начертава графика на един или повече обекти спрямо времето през изчислен период от време.';
 $ec_lang['lpn_ts_title']='Стойности спрямо времето';
-$ec_lang['lpn_ts_group_tip']='Дали графиката показва възли или връзки.';
 $ec_lang['lpn_ts_group_nodes']='Възли';
 $ec_lang['lpn_ts_group_links']='Връзки';
-$ec_lang['lpn_ts_quantity_tip']='Коя стойност да се начертае спрямо времето.';
 $ec_lang['lpn_ts_add']='Добави избраните';
-$ec_lang['lpn_ts_add_tip']='Поставя на графиката всичко, избрано в момента на картата.';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
 $ec_lang['lpn_ts_add_none']='На картата не е избрано нищо от този вид.';
 $ec_lang['lpn_ts_clear']='Премахни всички';
@@ -1652,8 +1632,6 @@ $ec_lang['lpn_ts_axis_time']='Изминало време';
 $ec_lang['lpn_freq_menu']='Честота';
 $ec_lang['lpn_freq_tip']='Начертава честотното разпределение на едно свойство за всички възли или всички тръби в текущия момент от времето.';
 $ec_lang['lpn_freq_title']='Разпределение на стойностите';
-$ec_lang['lpn_freq_group_tip']='Дали графиката показва възли или тръби.';
-$ec_lang['lpn_freq_quantity_tip']='Коя стойност да се начертае.';
 $ec_lang['lpn_freq_none']='Все още няма резултати за тази стойност, затова няма какво да се начертае.';
 $ec_lang['lpn_freq_summary']='Начертани: {n} от {total}';
 $ec_lang['lpn_freq_summary_time']='Начертани: {n} от {total}, в {time}';
@@ -1787,7 +1765,6 @@ $ec_lang['lpn_file_revert']='Върни записаното';
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Последни файлове';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_recent_tip']='Отворете отново {file} от същото място на компютъра си.';
 $ec_lang['lpn_recent_denied']='Не бе дадено разрешение за отваряне на този файл, затова той не бе отворен.';
 $ec_lang['lpn_recent_gone']='Файлът {file} не можа да бъде отворен. Възможно е да е преместен, преименуван или изтрит, затова бе премахнат от списъка с последни файлове.';
 // The tab strip. These are titles on small controls, so each has to stand alone with no sentence
@@ -1911,11 +1888,8 @@ $ec_lang['lpn_file_upload_explain']='Този браузър не може да 
 // The tip on the Open button, which reached the toolbar with Task 246. It exists because that
 // button is icon-only: on a menu row the word carries the whole meaning, and on the strip the tip
 // is where the rest of it lives.
-$ec_lang['lpn_file_open_tip']='Отвори файл с проект, запазен от тази страница.';
 // Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
 // cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
-$ec_lang['lpn_file_save_tip']='Записва в свързания файл.';
-$ec_lang['lpn_file_saveas_tip']='Изберете файл, в който да запишете. Проектът се свързва с този файл и оттогава Запиши записва в него.';
 // The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
 // cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
 // is no API for it, and the download attribute cannot override the setting -- but the user can turn
@@ -2228,7 +2202,6 @@ $ec_lang['lpn_field_roughness_tip']='Коефициент C на Хейзън-У
 $ec_lang['lpn_field_length']='Дължина';
 $ec_lang['lpn_field_from']='От';
 $ec_lang['lpn_field_to']='До';
-$ec_lang['lpn_field_length_tip']='Дължина на тръбата. Когато Автоматично е включено, дължината се измерва от начертаното от вас. Изключете Автоматично, за да въведете дължина, различна от чертежа.';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2270,7 +2243,6 @@ $ec_lang['lpn_field_valve_setting_loss_tip']='Колко напор отнема
 $ec_lang['lpn_field_valve_diameter_tip']='Ширина на отвора през вентила. Скоростта на водата през вентила се изчислява от тази ширина, а загубата следва от тази скорост.';
 $ec_lang['lpn_field_valve_km_tip']='Загуба от тялото на вентила, докато той стои напълно отворен, в допълнение на всичко, което отнема настройката на вентила. Изразява се като кратно на скоростния напор. Използвайте 0, за да я пренебрегнете.';
 $ec_lang['lpn_field_km']='Коефициент на местна загуба, k';
-$ec_lang['lpn_field_km_tip']='Загуба от чупките, вентилите и фитингите на тази тръба, изразена като кратно на скоростния напор. Използвайте 0 за обикновена права тръба.';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
 // their own key rather than being asked to carry the full popup-field wording -- an on-map legend
@@ -2307,7 +2279,6 @@ $ec_lang['lpn_field_desc']='Описание';
 // description is free text, so the tag's one-word rule does NOT apply to it, but a line break cannot
 // be written as a trailing comment and is turned into a space. The tip says what the field is for
 // first, because that is what a reader of a blank box wants.
-$ec_lang['lpn_field_desc_tip']='За ваша собствена употреба, например ъгъл на улица или от какво е направена тръбата. Пренася се във и от EPANET файла, където стои в края на собствения ред на елемента. Никое изчисление не го чете. Нов ред се превръща в интервал, защото файлът няма къде да го постави.';
 // **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
@@ -2383,7 +2354,6 @@ $ec_lang['lpn_mode_add_text']='Режим: Добавяне на текст. Щ�
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Използвайте този режим, за да променяте, премествате и плъзгате неща на картата. Това е режимът, в който страницата се връща по подразбиране: тя се връща тук сама след някои действия, например отваряне на проект. Натискането на Esc за втори път премахва селекцията на каквото е избрано.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tip_labels_draggable']='Можете да плъзнете етикет, за да го преместите. Етикетът се откроява за кратко, за да ви извести, че е преместен. Щракнете двукратно върху етикет, за да го върнете в автоматичната му позиция.';
 $ec_lang['lpn_field_auto']='Автоматично';
 $ec_lang['lpn_method_switch_confirm']='Смяната на метода за триене не променя числата за грапавост, вече въведени за вашите тръби, а грапавост за един метод е безсмислена за друг. Проверете всяка тръба след това. Да продължи ли смяната?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
@@ -2435,7 +2405,6 @@ $ec_lang['lpn_field_text_all_zoom_tip']='Запазва този текст въ
 $ec_lang['lpn_tool_labels']='Етикети';
 $ec_lang['lpn_labels_heading_node']='Етикети на възлите';
 $ec_lang['lpn_labels_heading_link']='Етикети на участъците';
-$ec_lang['lpn_labels_decimals_tip']='Брой десетични знаци, показани за този етикет';
 $ec_lang['lpn_labels_mark_extrema']='Отбележи най-високата и най-ниската стойност';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
@@ -2451,8 +2420,6 @@ $ec_lang['lpn_settings_apply_to_all']='Приложи към всички';
 $ec_lang['lpn_settings_apply_to_all_tip']='Всеки вече начертан елемент от този вид получава ID, започващо с този текст. Всеки запазва номера си. ID, което не завършва на число, се оставя непроменено.';
 $ec_lang['lpn_confirm_apply_prefix']='Да се преименуват ли {n} елемента, така че техните ID да започват с {prefix}? Всеки запазва номера си.';
 $ec_lang['lpn_prefix_applied']='Преименувани {n} елемента. {skipped} други бяха оставени непроменени.';
-$ec_lang['lpn_labels_prefix_tip']='Текст, добавян преди това свойство в етикетите на картата';
-$ec_lang['lpn_labels_suffix_tip']='Текст, добавян след това свойство в етикетите на картата';
 $ec_lang['lpn_labels_suffix_gradient_tip']='Текст, добавян след градиента на загубата на напор в етикетите на картата. Не въвеждайте тук знак за процент. Той се добавя автоматично, когато мерните единици са проценти.';
 $ec_lang['lpn_labels_separator']='Текст между стойностите';
 $ec_lang['lpn_labels_separator_tip']='Текст между едно свойство и следващото в етикет. По подразбиране е интервал.';
@@ -2609,7 +2576,6 @@ $ec_lang['lpn_backdrop_continue']='Продължи';
 $ec_lang['lpn_tool_settings']='Настройки';
 $ec_lang['lpn_settings_show_titles']='Показвай заглавията на страницата';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_show_titles_tip']='Скрива заглавието на страницата и приветствения ред над чертежа, за да има картата повече място за работа. Печатането винаги показва само чиста карта.';
 // The link that rides on the headings themselves (Tom's 2026-09-08 worklist). It throws the switch AND opens the
 // box at the row that holds it, so the way back is learned in the same gesture.
 $ec_lang['lpn_hide_titles']='Скриване на тези заглавия';
@@ -2924,7 +2890,6 @@ $ec_lang['lpn_settings_mask_labels']='Плътен фон зад етикети�
 // drawing program would expect exactly that from those words.
 $ec_lang['lpn_settings_leader_snap']='Прилепвай водещите линии към зададени ъгли';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_leader_snap_tip']='Когато плъзнете етикет далеч от това, което назовава, линията обратно към него се придърпва към най-близкия от зададените ъгли, ако я плъзнете близо до такъв. Продължете да плъзгате и прилепването се отпуска, така че всеки ъгъл остава достъпен. Изключено плъзга свободно, което е поведението на тази страница досега.';
 // **THE LABELING THRESHOLD** (Tasks 669 and 705). The row's name is Tom's own wording from the
 // Task 705 restorations. Its capture button reuses lpn_settings_label_use_view, the customer
 // row's key, because it is the same button doing the same thing. The placeholder is the only place
@@ -3058,7 +3023,6 @@ $ec_lang['lpn_time_tank']='Цистерна';
 $ec_lang['lpn_time_level']='Водно ниво';
 $ec_lang['lpn_time_run']='Изчисли';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='Решава тази мрежа при всяка хидравлична времева стъпка.';
 // **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
 // `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
 // LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
@@ -3282,11 +3246,9 @@ $ec_lang['lpn_settings_energy']='Енергия';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='Отчети';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_menu_tip']='Отчети за цената на енергията на помпите, сравнение на сценарии, отчета на решаващия модул на EPANET, калибриране спрямо измерени данни и, след изчисление за период от време, отчета за състоянието и пълния отчет.';
 $ec_lang['lpn_reports_epanet']='Изпълнение на EPANET';
 $ec_lang['lpn_energy_title']='Отчет за енергията на помпите';
 $ec_lang['lpn_energy_menu']='Енергия на помпите';
-$ec_lang['lpn_energy_menu_tip']='Какъв дял от изчислението е работила всяка помпа, каква мощност е потребявала и колко е струвало това за последния изчислен период от време.';
 $ec_lang['lpn_energy_efficiency']='Ефективност на помпата (процент)';
 $ec_lang['lpn_energy_efficiency_tip']='Ефективността от контакта до водата, използвана за всяка помпа, която не пази своя собствена крива на ефективност. EPANET използва 75 процента, когато нищо не е зададено.';
 $ec_lang['lpn_energy_price']='Цена на енергията';
@@ -3389,7 +3351,6 @@ $ec_lang['lpn_calib_col_mean_err_tip']='Средната стойност на �
 $ec_lang['lpn_calib_col_mean_err']='Средна грешка';
 $ec_lang['lpn_calib_col_sim_mean']='Средно изчислено';
 $ec_lang['lpn_calib_col_obs_mean']='Средно наблюдавано';
-$ec_lang['lpn_calib_col_n_tip']='Брой наблюдения: измерванията на това място, които бяха сравнени.';
 $ec_lang['lpn_calib_col_n']='Брой набл.';
 $ec_lang['lpn_calib_col_location']='Място';
 $ec_lang['lpn_calib_tab_means']='Сравнения на средните';
@@ -3462,7 +3423,6 @@ $ec_lang['lpn_color_mode_manual']='Ръчно';
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='Библиотеки';
-$ec_lang['lpn_library_menu_tip']='Управлявайте графиците на потребността, кривите на помпите и правилата за управление на този проект.';
 // The three section names. Each is the word EPANET's own input file uses for the section, because
 // that is the word every water-network user and every tutorial already has -- see the note in
 // dev/scripts/glossary.json about deferring to a discipline's standard term.
@@ -3476,7 +3436,6 @@ $ec_lang['lpn_library_curves_tip']='Кривата е списък от точк
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_curves_note']='Кривите са прикачени към помпи и вентили. За крива на напора на помпа изчислението използва крива, прекарана през точките, както е показано; за всеки друг вид то свързва точките с прави отсечки, както е показано.';
 $ec_lang['lpn_library_curve_add']='Добави крива';
-$ec_lang['lpn_library_curve_type_tip']='Какво описва тази крива';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
 // EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
 // and Equation (for pump head) on row/line 2."*). EPANET calls the control "Curve Type", so that is
@@ -3497,7 +3456,6 @@ $ec_lang['lpn_library_curve_values_tip']='Изберете една или дв�
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
 $ec_lang['lpn_library_curve_note_label']='Описание';
-$ec_lang['lpn_library_curve_note_tip']='Какво представлява тази крива, с ваши думи. Записва се над кривата в EPANET файл и се прочита обратно оттам.';
 $ec_lang['lpn_library_curve_remove_point']='Премахни тази точка';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -3685,9 +3643,7 @@ $ec_lang['lpn_field_demand_pattern_tip']='Как се покачва и спад
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
 $ec_lang['lpn_field_demand_category']='Описание';
-$ec_lang['lpn_field_demand_category_tip']='Име или описание на тази категория потребност.';
 $ec_lang['lpn_demand_add']='Добави категория потребност';
-$ec_lang['lpn_demand_add_tip']='Добавя друга категория потребност в този възел, със своя основна потребност, график и описание. Категориите се сборуват.';
 $ec_lang['lpn_demand_remove']='Премахни тази потребност';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.

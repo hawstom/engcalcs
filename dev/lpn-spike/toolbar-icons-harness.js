@@ -113,12 +113,13 @@ console.log('\n-- the time transport on the strip --');
 	// everything else on the strip -- and it carries a TIP, which no other button in this group
 	// does, because "Run" alone does not say what is run or how far.
 	report(/ui\.run = btn\('run'/.test(mount), 'the Run button is built through the same helper');
-	report(/S\.runTip/.test(mount), '...and is the one control here that carries a tip');
+	// Tom's 2026-10-04 tip verdicts deleted lpn_time_run_tip, so Run now carries its name only.
+	report(!/S\.runTip/.test(mount), '...and carries no tip of its own (lpn_time_run_tip deleted)');
 	report(/'run'\s*=>/.test(icons), 'run is in lib/Icons.lib.php');
 	// `lpn_time_run_note` was in this list until 2026-09-19 and is deliberately gone: it named the
 	// half-fresh state that "Recalculate automatically" used to leave behind, and off means off now,
 	// so there is no such state and no such key. See scheduleSolve() in js/looped-network.js.
-	['lpn_time_run', 'lpn_time_run_tip'].forEach(function (k) {
+	['lpn_time_run'].forEach(function (k) {
 		report(en.indexOf("$ec_lang['" + k + "']") >= 0, k + ' is in lib/lang.ec.en.php');
 	});
 	// A select gets no .ec-help (a tip in front of a dropdown is a tip in the way of it), so its
@@ -169,9 +170,8 @@ console.log('\n-- the Help list is DERIVED from the strip --');
 
 console.log('\n-- the strings exist, in English only --');
 {
-	['lpn_tip_join', 'lpn_tool_add_junction_tip', 'lpn_tool_add_tank_tip', 'lpn_tool_add_valve_tip',
-		'lpn_tool_delete_tip', 'lpn_tool_undo_tip', 'lpn_tool_zoom_extent_tip', 'lpn_tool_settings_tip',
-		'lpn_find_menu_tip', 'lpn_help_icons', 'lpn_pane_right_toggle', 'lpn_pane_right_toggle_tip'
+	['lpn_tip_join', 'lpn_tool_undo_tip', 'lpn_tool_zoom_extent_tip',
+		'lpn_find_menu_tip', 'lpn_help_icons', 'lpn_pane_right_toggle'
 	].forEach((k) => {
 		report(en.indexOf("$ec_lang['" + k + "']") >= 0, k);
 	});
@@ -179,7 +179,7 @@ console.log('\n-- the strings exist, in English only --');
 	// plainTextBoundKeys() cannot see. So no tag may appear in any of them, and this is the only
 	// thing that would catch it.
 	const tips = en.split('\n').filter(l => /^\$ec_lang\['lpn_(tool_.*_tip|tip_join|find_menu_tip|pane_right_toggle.*)'\]/.test(l));
-	report(tips.length >= 10 && !tips.some(l => /<[a-z]/i.test(l)),
+	report(tips.length >= 5 && !tips.some(l => /<[a-z]/i.test(l)),
 		'and none of them carries a tag — plainTextBoundKeys() cannot see this path');
 }
 

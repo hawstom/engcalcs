@@ -804,9 +804,7 @@ $ec_lang['lpn_customer_heading']='Customer {id}';
 // strings every node and link already uses. Do not re-add an account key: a utility that wants a
 // field of its own name makes a custom property.
 $ec_lang['lpn_field_meter_demand']='Demand per service';
-$ec_lang['lpn_field_meter_demand_tip']='What each service at this customer requires. Find and replace can leverage the distinction between blank and 0.';
 $ec_lang['lpn_field_meter_count']='Number of services';
-$ec_lang['lpn_field_meter_count_tip']='How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.';
 $ec_lang['lpn_field_meter_total']='Total demand';
 $ec_lang['lpn_field_meter_total_tip']='The demand per service times the number of services. This is the number added to the junction named below.';
 $ec_lang['lpn_field_meter_pipe']='Connected asset';
@@ -918,6 +916,7 @@ $ec_lang['lpn_pane_hide_col']='Hide this column';
 $ec_lang['lpn_pane_hide_cols']='Hide these columns';
 $ec_lang['lpn_pane_show_all_cols']='Show all columns';
 $ec_lang['lpn_pane_sort_asc']='Sort ascending';
+$ec_lang['lpn_pane_sort_desc']='Sort descending';
 $ec_lang['lpn_pane_manage_cols']='Manage columns…';
 $ec_lang['lpn_pane_manage_cols_title']='Manage columns';
 $ec_lang['lpn_pane_manage_cols_show']='Show';
@@ -926,7 +925,6 @@ $ec_lang['lpn_pane_manage_cols_down']='Move down';
 $ec_lang['lpn_pane_manage_cols_top']='Move to beginning';
 $ec_lang['lpn_pane_manage_cols_bottom']='Move to end';
 $ec_lang['lpn_pane_colmenu_tip']='Hide or manage columns';
-$ec_lang['lpn_pane_sortarrow_tip']='Reverse the sort';
 $ec_lang['lpn_tool_area_window']='Select a window';
 $ec_lang['lpn_tool_area_lasso']='Select a lasso';
 $ec_lang['lpn_tool_area_polygon']='Select a polygon';
@@ -982,7 +980,6 @@ $ec_lang['lpn_field_elev']='Elevation';
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
 // protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
 // entry carrying translatable payload nobody on the page can see.
-$ec_lang['lpn_field_elev_tip']='Ground or pipe level at this node. Measure it from any zero you like, as long as every node uses the same one.';
 // A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
 // at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
 // This USED to read "so it doubles as a tank" (Tom, 2026-07-30), which was true only while there
@@ -1156,7 +1153,6 @@ $ec_lang['lpn_status_converted']='{n} values were rewritten into {unit}.';
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_color_tip']='Color the network by one quantity, so a large map can be read at a glance. Pressure and velocity are the two that usually matter.';
 // **THE NATURAL ENGLISH GOES ON THE CONTROL; the ultra-simple rendering goes to the translator**
 // (Tom, 2026-08-18: *"'Input units' and 'Results units'... both more natural than the ultra simple
 // English you used. While I like that you are thinking simple for translators, this should go in
@@ -1335,13 +1331,6 @@ $ec_lang['lpn_tip_join']='{name} — {tip}';
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='Shortcut: {key}';
 $ec_lang['lpn_tool_key_hint_two']='Shortcut: {key} or {key2}';
-$ec_lang['lpn_tool_add_junction_tip']='Click the map to add a junction: a point where pipes meet or where water is used.';
-$ec_lang['lpn_tool_add_reservoir_tip']='Click the map to add a reservoir: an infinite source with a fixed water level.';
-$ec_lang['lpn_tool_add_tank_tip']='Click the map to add a tank: storage whose water level rises and falls as it fills and empties.';
-$ec_lang['lpn_tool_add_pipe_tip']='Click one node and then another to draw a pipe between them.';
-$ec_lang['lpn_tool_add_pump_tip']='Click one node and then another to put a pump between them.';
-$ec_lang['lpn_tool_add_valve_tip']='Click one node and then another to put a valve between them.';
-$ec_lang['lpn_tool_add_text_tip']='Click the map to write a note on the drawing.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='Click on the map as instructed to select everything inside the shape. Press this button again to change the shape between a window, a lasso and a polygon. Hold Shift while selecting to continue with the existing selection, adding or removing (toggle) what you select.';
@@ -1350,7 +1339,6 @@ $ec_lang['lpn_area_selected']='{n} selected.';
 $ec_lang['lpn_area_none']='Nothing found in that area.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_vertices_tip']='Add and remove pipe vertices. Click a pipe to add a vertex, click a vertex to remove it, and drag a vertex to move it. A vertex changes automatic length, but doesn’t add or change minor (local) losses.';
-$ec_lang['lpn_tool_delete_tip']='Click anything on the map to remove it.';
 $ec_lang['lpn_tool_undo_tip']='Undo the last change.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. Press this button again for Zoom Window, which zooms in on a box you click two opposite corners of, or drag, on the map. Or press + or - to zoom in or out about the middle of the map.';
@@ -1359,7 +1347,6 @@ $ec_lang['lpn_tool_zoom_window_tip']='Click two opposite corners of a box, or dr
 $ec_lang['lpn_zoom_in_tip']='Zoom in. Shortcut: +';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='Zoom out. Shortcut: -';
-$ec_lang['lpn_tool_settings_tip']='Open the settings for this project.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='Find an asset by its ID, or find every asset matching a simple or custom condition, and change them all at once.';
 // **"Toolbar"** (Tom renamed it from "Toolbar key" to "Toolbar" on 2026-09-30).
@@ -1369,7 +1356,6 @@ $ec_lang['lpn_find_menu_tip']='Find an asset by its ID, or find every asset matc
 $ec_lang['lpn_help_icons']='Toolbar';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='Visibility';
-$ec_lang['lpn_pane_right_toggle_tip']='Show or hide the panel at the right of the map. It holds the label and color choices.';
 $ec_lang['lpn_color_legend_open_tip']='Click to open the Visibility panel and change these colors.';
 $ec_lang['lpn_color_node_field']='Color nodes by';
 $ec_lang['lpn_color_link_field']='Color links by';
@@ -1430,7 +1416,6 @@ $ec_lang['lpn_goto_menu']='Go to a latitude and longitude…';
 // lat/lon."* The parser accepts `38,122` and `38.122` as a pair on his ruling of the same day; the
 // examples in lpn_goto_bad show all three shapes, which is where somebody whose last attempt failed
 // is actually reading.
-$ec_lang['lpn_goto_tip']='Pan the map to coordinates entered as lat lon or lat,lon.';
 $ec_lang['lpn_goto_prompt']='Latitude and longitude, in that order, separated by a comma or a space';
 $ec_lang['lpn_goto_bad']='Can\'t read coordinates. Try again. Examples: 38,-122 or 38.122 or 38 -122';
 $ec_lang['lpn_georef_goto']='Go to…';
@@ -1728,15 +1713,12 @@ $ec_lang['lpn_replace_scope']='Choose one kind of asset above to change values o
 // language that puts the unit somewhere else can.
 $ec_lang['lpn_profile_menu']='Profile';
 $ec_lang['lpn_graphs_menu']='Graphs';
-$ec_lang['lpn_graphs_menu_tip']='Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.';
 // **THE SYNONYMS ARE IN THE SYNONYM CHANNEL, WHICH IS WHERE THEY WERE ALWAYS MEANT TO BE.** They
 // shipped as `lpn_profile_tip_syn` / `lpn_profile_title_syn` -- ordinary $ec_lang keys with no call
 // site, which nothing rendered and which a sprint would have translated into 26 languages for
 // nobody to read. Sprint 459's Wave 0 found them; Tom ruled the move on 2026-08-24 ("these _syns
 // are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
 // permission $ec_lang_syn requires. Same text, correct array.
-$ec_lang['lpn_profile_tip']='Draw the ground and the hydraulic grade line along a path through the network.';
-$ec_lang_syn['lpn_profile_tip']='Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.';
 $ec_lang['lpn_profile_title']='Profile along a path';
 $ec_lang_syn['lpn_profile_title']='Profile or cross section along a path, route, or way';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
@@ -1795,10 +1777,8 @@ $ec_lang['lpn_profile_missing']='The saved path {name} uses nodes that are not i
 $ec_lang['lpn_ts_menu']='Time series';
 $ec_lang['lpn_ts_tip']='Graph one or more assets against time across an extended period simulation.';
 $ec_lang['lpn_ts_title']='Values versus time';
-$ec_lang['lpn_ts_group_tip']='Whether the graph shows nodes or links.';
 $ec_lang['lpn_ts_group_nodes']='Nodes';
 $ec_lang['lpn_ts_group_links']='Links';
-$ec_lang['lpn_ts_quantity_tip']='Which value to graph against time.';
 $ec_lang['lpn_pgraph_none']='This asset has no results in the current run.';
 // The Properties graph's own selector entry for a source share (Tom, 2026-09-30: "In selector, use
 // 'Source share from {trace node}'"). Distinct from the shared lpn_result_source_share, which still
@@ -1811,7 +1791,6 @@ $ec_lang['lpn_result_pump_head_tip']='The head the pump adds from suction to dis
 // pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
 $ec_lang['lpn_report_pump_head']='Pump head';
 $ec_lang['lpn_ts_add']='Add selected';
-$ec_lang['lpn_ts_add_tip']='Put everything now selected on the map onto the graph.';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
 $ec_lang['lpn_ts_add_none']='Nothing of that kind is selected on the map.';
 $ec_lang['lpn_ts_clear']='Remove all';
@@ -1830,8 +1809,6 @@ $ec_lang['lpn_ts_axis_time']='Elapsed time';
 $ec_lang['lpn_freq_menu']='Frequency';
 $ec_lang['lpn_freq_tip']='Graph the frequency distribution of one property over all junctions or all pipes at the current time step.';
 $ec_lang['lpn_freq_title']='Distribution of values';
-$ec_lang['lpn_freq_group_tip']='Whether the graph shows junctions or pipes.';
-$ec_lang['lpn_freq_quantity_tip']='Which value to graph.';
 $ec_lang['lpn_freq_none']='No results for this value yet, so there is nothing to graph.';
 $ec_lang['lpn_freq_summary']='Plotted: {n} of {total}';
 $ec_lang['lpn_freq_summary_time']='Plotted: {n} of {total}, at {time}';
@@ -1977,7 +1954,6 @@ $ec_lang_syn['lpn_file_revert']='Throw away (discard) my changes by reloading th
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Recent files';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_recent_tip']='Open {file} again from the same location on your computer.';
 $ec_lang['lpn_recent_denied']='Permission to open that file was not given, so it was not opened.';
 $ec_lang['lpn_recent_gone']='Could not open {file}. It may have been moved, renamed, or deleted, so it was taken off the recent list.';
 // The tab strip. These are titles on small controls, so each has to stand alone with no sentence
@@ -2106,11 +2082,8 @@ $ec_lang['lpn_file_upload_explain']='This browser cannot connect to a file, so o
 // The tip on the Open button, which reached the toolbar with Task 246. It exists because that
 // button is icon-only: on a menu row the word carries the whole meaning, and on the strip the tip
 // is where the rest of it lives.
-$ec_lang['lpn_file_open_tip']='Open a project file saved from this page.';
 // Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
 // cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
-$ec_lang['lpn_file_save_tip']='Saves to the connected file.';
-$ec_lang['lpn_file_saveas_tip']='Choose a file to save to. This project connects to that file, and Save writes to it from then on.';
 // The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
 // cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
 // is no API for it, and the download attribute cannot override the setting -- but the user can turn
@@ -2430,7 +2403,6 @@ $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C. A higher number means a s
 $ec_lang['lpn_field_length']='Length';
 $ec_lang['lpn_field_from']='From';
 $ec_lang['lpn_field_to']='To';
-$ec_lang['lpn_field_length_tip']='Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing.';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2476,7 +2448,6 @@ $ec_lang['lpn_field_valve_setting_loss_tip']='How much head the throttle valve r
 $ec_lang['lpn_field_valve_diameter_tip']='Width of the opening through the valve. The speed of the water through the valve is computed from this width, and the loss follows from that speed.';
 $ec_lang['lpn_field_valve_km_tip']='Loss from the valve body while the valve stands fully open, on top of anything the valve setting removes. It is counted as a multiple of the velocity head. Use 0 to ignore it.';
 $ec_lang['lpn_field_km']='Minor (local) loss coefficient, k';
-$ec_lang['lpn_field_km_tip']='Loss from the bends, valves, and fittings on this pipe, counted as a multiple of the velocity head. Use 0 for a plain straight pipe.';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
 // their own key rather than being asked to carry the full popup-field wording -- an on-map legend
@@ -2513,7 +2484,6 @@ $ec_lang['lpn_field_desc']='Description';
 // description is free text, so the tag's one-word rule does NOT apply to it, but a line break cannot
 // be written as a trailing comment and is turned into a space. The tip says what the field is for
 // first, because that is what a reader of a blank box wants.
-$ec_lang['lpn_field_desc_tip']='For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part\'s own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.';
 // **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
@@ -2601,7 +2571,6 @@ $ec_lang['lpn_mode_add_text']='Mode: Add Text. Click the map to place a Text. Cl
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map. This is the mode the page returns to by default: it comes back here by itself after some actions, such as opening a project. Pressing Esc a second time unselects whatever is selected.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tip_labels_draggable']='You can drag a label to move it. The label highlights briefly to alert you that it was moved. Double-click a label to send it back to its automatic position.';
 $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_method_switch_confirm']='Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
@@ -2655,7 +2624,6 @@ $ec_lang['lpn_field_text_all_zoom_tip']='Keep this text on the drawing however f
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
 $ec_lang['lpn_labels_heading_link']='Link labels';
-$ec_lang['lpn_labels_decimals_tip']='Decimal places shown for this label';
 $ec_lang['lpn_labels_mark_extrema']='Mark highest and lowest values';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
@@ -2671,8 +2639,6 @@ $ec_lang['lpn_settings_apply_to_all']='Apply to all';
 $ec_lang['lpn_settings_apply_to_all_tip']='Every asset of this kind that is already drawn gets an ID starting with this text. Each one keeps its number. An ID that does not end in a number is left alone.';
 $ec_lang['lpn_confirm_apply_prefix']='Rename {n} assets so their IDs start with {prefix}? Each one keeps its number.';
 $ec_lang['lpn_prefix_applied']='Renamed {n} assets. {skipped} others were left alone.';
-$ec_lang['lpn_labels_prefix_tip']='Text added before this property on map labels';
-$ec_lang['lpn_labels_suffix_tip']='Text added after this property on map labels';
 $ec_lang['lpn_labels_suffix_gradient_tip']='Text added after the head loss gradient on map labels. Do not type a percent sign here. It is added for you when the units are percent.';
 $ec_lang['lpn_labels_separator']='Text between values';
 $ec_lang['lpn_labels_separator_tip']='Text between one property and the next on a label. A space by default.';
@@ -2838,7 +2804,6 @@ $ec_lang['lpn_backdrop_continue']='Continue';
 $ec_lang['lpn_tool_settings']='Settings';
 $ec_lang['lpn_settings_show_titles']='Show page titles';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_show_titles_tip']='Hides the page heading and the welcome line above the drawing, so the map has more room for working. Printing always shows nothing but a clean map.';
 // The link that rides on the headings themselves (Tom's 2026-09-08 worklist). It throws the switch AND opens the
 // box at the row that holds it, so the way back is learned in the same gesture.
 $ec_lang['lpn_hide_titles']='Hide these titles';
@@ -3172,7 +3137,6 @@ $ec_lang['lpn_settings_mask_labels']='Solid background behind labels';
 // drawing program would expect exactly that from those words.
 $ec_lang['lpn_settings_leader_snap']='Snap leader lines to set angles';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_leader_snap_tip']='Snap angle used when you drag a label away from its asset.';
 // **THE LABELING THRESHOLD** (Tasks 669 and 705). The row's name is Tom's own wording from the
 // Task 705 restorations. Its capture button reuses lpn_settings_label_use_view, the customer
 // row's key, because it is the same button doing the same thing. The placeholder is the only place
@@ -3309,7 +3273,6 @@ $ec_lang['lpn_time_level']='Water level';
 $ec_lang['lpn_time_run']='Calculate';
 $ec_lang_syn['lpn_time_run']='Simulate, calculate, execute, or compute';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='Solve this network at every hydraulic time step.';
 // **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
 // `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
 // LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
@@ -3535,11 +3498,9 @@ $ec_lang['lpn_settings_energy']='Energy';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='Reports';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_menu_tip']='Reports on pumping energy cost, scenario comparison, the EPANET solver report, calibration against measured data, and, after an extended period simulation, the status report and the full report.';
 $ec_lang['lpn_reports_epanet']='EPANET run';
 $ec_lang['lpn_energy_title']='Pump energy report';
 $ec_lang['lpn_energy_menu']='Pump energy';
-$ec_lang['lpn_energy_menu_tip']='What share of the run each pump was on, what power it drew and what it cost over the last extended period simulation.';
 $ec_lang['lpn_energy_efficiency']='Pump efficiency (percent)';
 $ec_lang['lpn_energy_efficiency_tip']='The wire-to-water efficiency used for every pump that does not carry an efficiency curve of its own. EPANET uses 75 percent when nothing is stated.';
 $ec_lang['lpn_energy_price']='Price of power';
@@ -3655,7 +3616,6 @@ $ec_lang['lpn_calib_tab_corr']='Correlation plot';
 $ec_lang['lpn_calib_tab_means']='Mean comparisons';
 $ec_lang['lpn_calib_col_location']='Location';
 $ec_lang['lpn_calib_col_n']='Num obs';
-$ec_lang['lpn_calib_col_n_tip']='Number of observations: the measurements at this location that were compared.';
 $ec_lang['lpn_calib_col_obs_mean']='Observed mean';
 $ec_lang['lpn_calib_col_sim_mean']='Computed mean';
 $ec_lang['lpn_calib_col_mean_err']='Mean error';
@@ -3722,7 +3682,6 @@ $ec_lang['lpn_color_mode_manual']='Manual';
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='Libraries';
-$ec_lang['lpn_library_menu_tip']='Manage the demand patterns, pump curves and control rules for this project.';
 // The three section names. Each is the word EPANET's own input file uses for the section, because
 // that is the word every water-network user and every tutorial already has -- see the note in
 // dev/scripts/glossary.json about deferring to a discipline's standard term.
@@ -3744,7 +3703,6 @@ $ec_lang['lpn_library_curves_tip']='A curve is a list of points that says how so
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_curves_note']='Curves are attached to pumps and valves. For a pump head curve the run uses a curve fitted through the points as shown; for every other kind it connects the points with straight lines as shown.';
 $ec_lang['lpn_library_curve_add']='Add a curve';
-$ec_lang['lpn_library_curve_type_tip']='What this curve describes';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
 // EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
 // and Equation (for pump head) on row/line 2."*). EPANET calls the control "Curve Type", so that is
@@ -3765,7 +3723,6 @@ $ec_lang['lpn_library_curve_values_tip']='Select one or two columns in a spreads
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
 $ec_lang['lpn_library_curve_note_label']='Description';
-$ec_lang['lpn_library_curve_note_tip']='What this curve is, in your own words.';
 $ec_lang['lpn_library_curve_remove_point']='Remove this point';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -3969,9 +3926,7 @@ $ec_lang['lpn_field_demand_pattern_tip']='How this junction’s demand rises and
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
 $ec_lang['lpn_field_demand_category']='Description';
-$ec_lang['lpn_field_demand_category_tip']='Name or description of this demand category.';
 $ec_lang['lpn_demand_add']='Add demand category';
-$ec_lang['lpn_demand_add_tip']='Add another demand category at this junction, with its own base demand, pattern and description. The categories add up.';
 $ec_lang['lpn_demand_remove']='Remove this demand';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.

@@ -676,9 +676,7 @@ $ec_lang['lpn_customer_heading']='用户 {id}';
 // strings every node and link already uses. Do not re-add an account key: a utility that wants a
 // field of its own name makes a custom property.
 $ec_lang['lpn_field_meter_demand']='每户需水量';
-$ec_lang['lpn_field_meter_demand_tip']='该用户名下每户所需的水量。“查找和替换”可利用空白与 0 之间的区别。';
 $ec_lang['lpn_field_meter_count']='户数';
-$ec_lang['lpn_field_meter_count_tip']='该用户代表的相同用户数量，这样干管沿线的四十二户独立住宅接管就可以在一处用一个符号表示。下方的合计等于上方的需水量乘以该户数。';
 $ec_lang['lpn_field_meter_total']='合计需水量';
 $ec_lang['lpn_field_meter_total_tip']='每户需水量乘以户数。这就是加到下方所列节点上的数值。';
 $ec_lang['lpn_field_meter_pipe']='连接元件';
@@ -799,7 +797,6 @@ $ec_lang['lpn_pane_manage_cols_down']='下移';
 $ec_lang['lpn_pane_manage_cols_top']='移到最前';
 $ec_lang['lpn_pane_manage_cols_bottom']='移到最后';
 $ec_lang['lpn_pane_colmenu_tip']='隐藏或管理列';
-$ec_lang['lpn_pane_sortarrow_tip']='反转排序顺序';
 $ec_lang['lpn_tool_area_window']='选择窗口';
 $ec_lang['lpn_tool_area_lasso']='选择套索';
 $ec_lang['lpn_tool_area_polygon']='选择多边形';
@@ -853,7 +850,6 @@ $ec_lang['lpn_field_elev']='高程';
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
 // protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
 // entry carrying translatable payload nobody on the page can see.
-$ec_lang['lpn_field_elev_tip']='该节点的地面或管道标高。基准面可任意选取，只要所有节点使用同一基准即可。';
 // A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
 // at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
 // This USED to read "so it doubles as a tank" (Tom, 2026-07-30), which was true only while there
@@ -1006,7 +1002,6 @@ $ec_lang['lpn_status_converted']='{n} 个数值已被改写为 {unit}。';
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tool_color_tip']='按某一数量为管网着色，便于在大型地图上一眼看清全局。压力和流速通常是最重要的两项。';
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
 $ec_lang['lpn_units_length']='长度';
@@ -1175,13 +1170,6 @@ $ec_lang['lpn_tip_join']='{name}：{tip}';
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='快捷键：按 {key}。';
 $ec_lang['lpn_tool_key_hint_two']='快捷键：按 {key} 或 {key2}。';
-$ec_lang['lpn_tool_add_junction_tip']='点击地图以添加节点：管道相汇或用水的位置。';
-$ec_lang['lpn_tool_add_reservoir_tip']='点击地图以添加水库：水位固定不变的无限水源。';
-$ec_lang['lpn_tool_add_tank_tip']='点击地图以添加水箱：随充放水而水位升降的蓄水设施。';
-$ec_lang['lpn_tool_add_pipe_tip']='依次点击一个节点和另一个节点，在两者之间绘制一条管道。';
-$ec_lang['lpn_tool_add_pump_tip']='依次点击一个节点和另一个节点，在两者之间放置一台水泵。';
-$ec_lang['lpn_tool_add_valve_tip']='依次点击一个节点和另一个节点，在两者之间放置一个阀门。';
-$ec_lang['lpn_tool_add_text_tip']='点击地图以在图上写一条注记。';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='按照提示在地图上点击，以选中形状内的所有内容。再次点击此按钮可在窗口、套索和多边形之间切换选择形状。选择时按住 Shift 键可在现有选择基础上继续操作，将所选内容加入或移出（切换）选择集。';
@@ -1190,7 +1178,6 @@ $ec_lang['lpn_area_selected']='已选择 {n} 个。';
 $ec_lang['lpn_area_none']='该区域内未找到任何内容。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_vertices_tip']='添加或删除塑造管道形状的折点。点击管道可添加折点，点击折点可删除它，拖动折点可移动它。折点只改变绘制的路径，不改变水力计算结果。';
-$ec_lang['lpn_tool_delete_tip']='点击地图上的任意元件即可将其删除。';
 $ec_lang['lpn_tool_undo_tip']='撤销上一次更改。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='将整个管网缩放至窗口大小。';
@@ -1199,7 +1186,6 @@ $ec_lang['lpn_tool_zoom_window_tip']='在地图上点击一个方框的两个对
 $ec_lang['lpn_zoom_in_tip']='放大。快捷键：+';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_out_tip']='缩小。快捷键：-';
-$ec_lang['lpn_tool_settings_tip']='打开本项目的设置。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_find_menu_tip']='按 ID 查找元件，或查找所有满足条件的元件，并一次性全部更改。';
 // **"Toolbar key", NOT "Toolbar"** (Tom's own name, 2026-09-10; Ida ranked the rename first).
@@ -1211,7 +1197,6 @@ $ec_lang['lpn_find_menu_tip']='按 ID 查找元件，或查找所有满足条件
 $ec_lang['lpn_help_icons']='工具栏';
 // ---- The right panel: Visibility ----
 $ec_lang['lpn_pane_right_toggle']='可见性';
-$ec_lang['lpn_pane_right_toggle_tip']='显示或隐藏地图右侧的面板。其中包含标签和颜色的选项。';
 $ec_lang['lpn_color_legend_open_tip']='点击可打开"可见性"面板并更改这些颜色。';
 $ec_lang['lpn_color_node_field']='节点着色依据';
 $ec_lang['lpn_color_link_field']='管道着色依据';
@@ -1271,7 +1256,6 @@ $ec_lang['lpn_goto_menu']='前往某一经纬度…';
 // lat/lon."* The parser accepts `38,122` and `38.122` as a pair on his ruling of the same day; the
 // examples in lpn_goto_bad show all three shapes, which is where somebody whose last attempt failed
 // is actually reading.
-$ec_lang['lpn_goto_tip']='将地图移动到您已知坐标的位置。先纬度、后经度，与地图标注顺序一致，两者之间以空格分隔：38 -122';
 $ec_lang['lpn_goto_prompt']='纬度和经度，按此顺序';
 $ec_lang['lpn_goto_bad']='这不是一组有效的纬度和经度。请尝试 38 -122，两者之间以空格分隔。';
 $ec_lang['lpn_georef_goto']='前往…';
@@ -1569,7 +1553,6 @@ $ec_lang['lpn_profile_menu']='剖面图';
 // nobody to read. Sprint 459's Wave 0 found them; Tom ruled the move on 2026-08-24 ("these _syns
 // are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
 // permission $ec_lang_syn requires. Same text, correct array.
-$ec_lang['lpn_profile_tip']='沿贯穿管网的一条路线，绘制地面和水力坡降线。';
 $ec_lang['lpn_profile_title']='沿路线的剖面图';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
@@ -1627,12 +1610,9 @@ $ec_lang['lpn_profile_missing']='已保存的路线“{name}”使用了本项�
 $ec_lang['lpn_ts_menu']='时间序列';
 $ec_lang['lpn_ts_tip']='在一次延时模拟中，绘制一个或多个元件随时间变化的图形。';
 $ec_lang['lpn_ts_title']='数值随时间变化';
-$ec_lang['lpn_ts_group_tip']='图中显示的是节点还是连接线。';
 $ec_lang['lpn_ts_group_nodes']='节点';
 $ec_lang['lpn_ts_group_links']='连接线';
-$ec_lang['lpn_ts_quantity_tip']='要绘制哪个数值随时间变化的图形。';
 $ec_lang['lpn_ts_add']='添加所选';
-$ec_lang['lpn_ts_add_tip']='将地图上当前所选的全部内容都加入图中。';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
 $ec_lang['lpn_ts_add_none']='地图上未选中该类元件。';
 $ec_lang['lpn_ts_clear']='全部移除';
@@ -1647,8 +1627,6 @@ $ec_lang['lpn_ts_axis_time']='经过时间';
 $ec_lang['lpn_freq_menu']='频率';
 $ec_lang['lpn_freq_tip']='绘制某一属性在当前时间步下，所有节点或所有管道上的频率分布图。';
 $ec_lang['lpn_freq_title']='数值分布';
-$ec_lang['lpn_freq_group_tip']='图中显示的是节点还是管道。';
-$ec_lang['lpn_freq_quantity_tip']='要绘制哪个数值的图形。';
 $ec_lang['lpn_freq_none']='该数值尚无结果，因此无内容可绘制。';
 $ec_lang['lpn_freq_summary']='已绘制：{n}（共 {total}）';
 $ec_lang['lpn_freq_summary_time']='已绘制：{n}（共 {total}），时刻：{time}';
@@ -1751,7 +1729,6 @@ $ec_lang['lpn_file_revert']='还原';
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='最近使用的文件';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_recent_tip']='再次打开 {file}，无需在电脑中查找该文件。';
 $ec_lang['lpn_recent_denied']='未获得打开该文件的权限，因此未能打开。';
 $ec_lang['lpn_recent_gone']='无法打开 {file}。它可能已被移动、重命名或删除，因此已从最近列表中移除。';
 // The tab strip. These are titles on small controls, so each has to stand alone with no sentence
@@ -1875,11 +1852,8 @@ $ec_lang['lpn_file_upload_explain']='本浏览器无法连接到文件，因此�
 // The tip on the Open button, which reached the toolbar with Task 246. It exists because that
 // button is icon-only: on a menu row the word carries the whole meaning, and on the strip the tip
 // is where the rest of it lives.
-$ec_lang['lpn_file_open_tip']='打开从本页面保存的项目文件。';
 // Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
 // cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
-$ec_lang['lpn_file_save_tip']='保存到已连接的文件。';
-$ec_lang['lpn_file_saveas_tip']='选择要保存到的文件。此项目将连接到该文件，此后"保存"会写入该文件。';
 // The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
 // cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
 // is no API for it, and the download attribute cannot override the setting -- but the user can turn
@@ -2185,7 +2159,6 @@ $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C 值。数值越大表示�
 $ec_lang['lpn_field_length']='长度';
 $ec_lang['lpn_field_from']='起点';
 $ec_lang['lpn_field_to']='终点';
-$ec_lang['lpn_field_length_tip']='管道的长度。开启"自动"时，长度按您绘制的图形测量得出。关闭"自动"可输入与图形不同的长度。';
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
@@ -2227,7 +2200,6 @@ $ec_lang['lpn_field_valve_setting_loss_tip']='节流阀（TCV）消除的水头�
 $ec_lang['lpn_field_valve_diameter_tip']='阀门通道开口的宽度。水流经过阀门的速度由此宽度算出，损失则由该流速决定。';
 $ec_lang['lpn_field_valve_km_tip']='阀门全开时阀体本身造成的损失，叠加在阀门设定值所消除的损失之上，以流速水头的倍数计。忽略该项时取 0。';
 $ec_lang['lpn_field_km']='局部损失系数，k';
-$ec_lang['lpn_field_km_tip']='该管道上弯头、阀门和管件造成的损失，以流速水头的倍数计。直管无附件时取 0。';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
 // legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
 // their own key rather than being asked to carry the full popup-field wording -- an on-map legend
@@ -2264,7 +2236,6 @@ $ec_lang['lpn_field_desc']='说明';
 // description is free text, so the tag's one-word rule does NOT apply to it, but a line break cannot
 // be written as a trailing comment and is turned into a space. The tip says what the field is for
 // first, because that is what a reader of a blank box wants.
-$ec_lang['lpn_field_desc_tip']='供您自己使用，例如街角位置或管道材质。它会随 EPANET 文件一同导入和导出，位于该部件所在行的末尾。任何计算都不会读取它。换行会变成空格，因为文件中没有地方可以保存换行符。';
 // **THE ELEMENT'S TAG** (Task 579, EPANET's `[TAGS]`). Deliberately not called a "label": on this
 // page a Label is our own annotation and a Text is EPANET's label, and a third word in that
 // neighbourhood is the collision CLAUDE.md's vocabulary rule exists to stop. Tag is EPANET's own
@@ -2340,7 +2311,6 @@ $ec_lang['lpn_mode_add_text']='模式：添加文字。点击地图以放置一�
 // glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='使用此模式可在地图上更改、移动和拖动内容。这是本页面默认返回的模式：在打开项目等某些操作之后，会自动回到此模式；在任何其他模式下按 [Esc] 键也会返回此模式。';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_tip_labels_draggable']='您可以拖动标签以移动它。双击标签可使其回到自动位置。';
 $ec_lang['lpn_field_auto']='自动';
 $ec_lang['lpn_method_switch_confirm']='更改摩擦计算方法不会改变您已在管道中输入的糙率数值，而某一方法下的糙率对另一方法而言没有意义。更改后请检查每条管道。仍要更改吗？';
 // "Closed", not "Shut" (R-224, Tom, 2026-09-24: "we are using different words Shut and Closed.
@@ -2392,7 +2362,6 @@ $ec_lang['lpn_field_text_all_zoom_tip']='无论缩小到多远，都在图上保
 $ec_lang['lpn_tool_labels']='标签';
 $ec_lang['lpn_labels_heading_node']='节点标签';
 $ec_lang['lpn_labels_heading_link']='连接线标签';
-$ec_lang['lpn_labels_decimals_tip']='该标签显示的小数位数';
 $ec_lang['lpn_labels_mark_extrema']='标出最高值和最低值';
 // THE TIP NAMES OVERLINE AND UNDERLINE ON PURPOSE (ROADMAP Task 457). Tom asked 2026-08-19 that this
 // row be findable by those two words; a Wave 0 pass then rewrote the tip to "a line above / a line
@@ -2408,8 +2377,6 @@ $ec_lang['lpn_settings_apply_to_all']='应用到全部';
 $ec_lang['lpn_settings_apply_to_all_tip']='已绘制的每一个此类元件的 ID 都会改为以此文字开头。每个元件都会保留其编号。ID 不以数字结尾的元件将保持不变。';
 $ec_lang['lpn_confirm_apply_prefix']='将 {n} 个元件重命名，使其 ID 以 {prefix} 开头？每个元件都会保留其编号。';
 $ec_lang['lpn_prefix_applied']='已重命名 {n} 个元件。另有 {skipped} 个未作更改。';
-$ec_lang['lpn_labels_prefix_tip']='添加在该属性前面的地图标签文字';
-$ec_lang['lpn_labels_suffix_tip']='添加在该属性后面的地图标签文字';
 $ec_lang['lpn_labels_suffix_gradient_tip']='添加在地图标签中水力坡降后面的文字。请勿在此输入百分号，当单位为百分比时会自动为您添加。';
 $ec_lang['lpn_labels_separator']='数值之间的文字';
 $ec_lang['lpn_labels_separator_tip']='一个属性与下一个属性之间的分隔文字。默认为一个空格。';
@@ -2566,7 +2533,6 @@ $ec_lang['lpn_backdrop_continue']='继续';
 $ec_lang['lpn_tool_settings']='设置';
 $ec_lang['lpn_settings_show_titles']='显示页面标题';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_show_titles_tip']='隐藏页面标题和绘图上方的欢迎语，为地图的操作留出更多空间。打印时始终只显示简洁的地图。';
 // The link that rides on the headings themselves (Tom's 2026-09-08 worklist). It throws the switch AND opens the
 // box at the row that holds it, so the way back is learned in the same gesture.
 $ec_lang['lpn_hide_titles']='隐藏这些标题';
@@ -2868,7 +2834,6 @@ $ec_lang['lpn_settings_mask_labels']='标签背后加不透明背景';
 // drawing program would expect exactly that from those words.
 $ec_lang['lpn_settings_leader_snap']='引出线吸附到固定角度';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_settings_leader_snap_tip']='当您将标签拖离其所指的对象时，若拖动方向接近某个固定角度，回指的引出线会被吸附到最近的那个固定角度上。继续拖动即可脱离吸附，因此任何角度仍然可用。关闭此项则自由拖动，这是本页面一直以来的方式。';
 // **THE LABELING THRESHOLD** (Tasks 669 and 705). The row's name is Tom's own wording from the
 // Task 705 restorations. Its capture button reuses lpn_settings_label_use_view, the customer
 // row's key, because it is the same button doing the same thing. The placeholder is the only place
@@ -3002,7 +2967,6 @@ $ec_lang['lpn_time_tank']='水箱';
 $ec_lang['lpn_time_level']='水位';
 $ec_lang['lpn_time_run']='计算';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_time_run_tip']='按管网的每个水力时间步，从运行开始一直计算到运行结束。';
 // **THE NOTE THAT USED TO STAND HERE IS GONE, AND SO IS THE STATE IT DESCRIBED** (2026-09-19).
 // `lpn_time_run_note` told the reader they were seeing the first reporting time and that only the
 // LATER times were going stale. That was true while "Recalculate automatically" suppressed nothing
@@ -3226,11 +3190,9 @@ $ec_lang['lpn_settings_energy']='能耗';
 // lpn_time_run_report keep the word and lpn_energy_menu and lpn_reports_epanet do not.
 $ec_lang['lpn_reports_menu']='报告';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_reports_menu_tip']='有关水泵能耗费用、方案比较、EPANET 求解器报告、与实测数据的率定，以及在延时模拟之后的状态报告和完整报告的报告。';
 $ec_lang['lpn_reports_epanet']='EPANET 运行';
 $ec_lang['lpn_energy_title']='水泵能耗报告';
 $ec_lang['lpn_energy_menu']='水泵能耗';
-$ec_lang['lpn_energy_menu_tip']='在最近一次延时模拟中，各水泵开启的时长比例、所耗功率及花费。';
 $ec_lang['lpn_energy_efficiency']='水泵效率（百分比）';
 $ec_lang['lpn_energy_efficiency_tip']='用于所有未自带效率曲线的水泵的线到水效率。若未设置，EPANET 使用 75%。';
 $ec_lang['lpn_energy_price']='电价';
@@ -3364,7 +3326,6 @@ $ec_lang['lpn_color_mode_manual']='手动';
 // Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
 // "the library".
 $ec_lang['lpn_library_menu']='库';
-$ec_lang['lpn_library_menu_tip']='管理此项目的需水模式、水泵曲线和控制规则。';
 // The three section names. Each is the word EPANET's own input file uses for the section, because
 // that is the word every water-network user and every tutorial already has -- see the note in
 // dev/scripts/glossary.json about deferring to a discipline's standard term.
@@ -3378,7 +3339,6 @@ $ec_lang['lpn_library_curves_tip']='曲线是一组说明某项性能的数据�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_library_curves_note']='曲线附加于水泵和阀门。对于水泵水头曲线，运行时使用的是按各数据点拟合出的曲线，如图所示；对于其他类型，则用直线依次连接各数据点，如图所示。';
 $ec_lang['lpn_library_curve_add']='添加曲线';
-$ec_lang['lpn_library_curve_type_tip']='此曲线所描述的内容';
 // **THE HEADER READS LIKE EPANET'S OWN CURVE EDITOR** (Tom, 2026-09-05: *"Just to be parallel with
 // EPANET, put pump ID (with new ID label above it) and Description on row/line 1 and Type selector
 // and Equation (for pump head) on row/line 2."*). EPANET calls the control "Curve Type", so that is
@@ -3399,7 +3359,6 @@ $ec_lang['lpn_library_curve_values_tip']='在电子表格中选择一列或两�
 // EPANET states a curve's description in the comment above its rows, and this page has read it and
 // written it back since Task 586 without showing it to anybody.
 $ec_lang['lpn_library_curve_note_label']='说明';
-$ec_lang['lpn_library_curve_note_tip']='用您自己的话说明这条曲线是什么。它会写在 EPANET 文件中该曲线上方，并从那里读回。';
 $ec_lang['lpn_library_curve_remove_point']='删除此点';
 // The OUT direction of ROADMAP Task 186: two columns, tab separated, ready to paste into a
 // spreadsheet. The prompt is what a browser that refuses the clipboard gets instead.
@@ -3587,9 +3546,7 @@ $ec_lang['lpn_field_demand_pattern_tip']='此节点的需水量在运行期间�
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
 $ec_lang['lpn_field_demand_category']='说明';
-$ec_lang['lpn_field_demand_category_tip']='该需水类别的名称或说明。';
 $ec_lang['lpn_demand_add']='添加需水类别';
-$ec_lang['lpn_demand_add_tip']='为该节点添加另一个需水类别，各自拥有自己的基本需水量、模式和说明。各类别的需水量会相加。';
 $ec_lang['lpn_demand_remove']='删除此项需水量';
 // A RESERVOIR AND A PUMP TAKE A PATTERN TOO, on the same rule: whole-project settings live in the
 // Libraries box, one asset’s own choice lives in its property popup.
@@ -3982,7 +3939,6 @@ $ec_lang['lpn_calib_tab_corr']='相关图';
 $ec_lang['lpn_calib_tab_means']='均值比较';
 $ec_lang['lpn_calib_col_location']='位置';
 $ec_lang['lpn_calib_col_n']='观测数';
-$ec_lang['lpn_calib_col_n_tip']='观测数：在此位置上参与比较的测量值个数。';
 $ec_lang['lpn_calib_col_obs_mean']='观测均值';
 $ec_lang['lpn_calib_col_sim_mean']='计算均值';
 $ec_lang['lpn_calib_col_mean_err']='平均误差';
