@@ -970,15 +970,9 @@ the block.
 - 50|726| **Show progress while the EPANET engine downloads, and prefetch it when idle.**
   Mary's wishlist §7: a percent-done on the first ~664 KB fetch; prefetch unless the connection
   says slow or metered. For the low-bandwidth audience.
-- 50|727| **Hover highlight on the element Select would pick.**
-  Ida's wishlist §1: a colour or weight change on the hit object, since the cursor stays neutral
-  (Task 618). AutoCAD's selection preview is the precedent.
 - 50|728| **Import a GIS shapefile or geodatabase as a network.**
   Mary's wishlist §0b2: most WaterCAD models are built from a GIS asset layer, so this is a
   migration on-ramp that needs no WaterCAD file. Unsized; read with Task 723.
-- 50|732| **Three browser-pass specs are stale: `tables`, `smallscreen`, `selectall`.** Ten checks fail
-  identically on master (for example expecting 8 table tabs, not 10). Outside check_all, so nothing
-  catches it; bring them current or retire the checks.
 - 50|733| **Grow the native solver, in phases, to everything EPANET's solves.** Tom, 2026-09-26
   (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
   to do everything that the EPANET solver does. This way the math is less of a black box for us."*
@@ -999,6 +993,9 @@ the block.
   lpn_settings_symbol_cap + _mid + _post around two number inputs in their word order. One key with
   {n} and {p} placeholders, split into inputs at render time.
 
+- 50|761| **Four more browser-pass specs throw: units, profile, cleanmap, notesbox.** The full
+  `node dev/browser-pass/run.js` gave 1703/1769 on 2026-10-04 with those four throwing and stale
+  menu-row, table-tab, print and cursor checks elsewhere; outside check_all, so nothing catches it. Task 732 fixed five.
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary

@@ -205,7 +205,12 @@ ec_ur_expect('it emits no PHP warning, notice or fatal',
 // header() is a no-op under the CLI SAPI (headers_list() stays empty there too), so the only way
 // to see the ACTUAL response header is a real HTTP request against PHP's built-in server -- the
 // same reason render_page.php exists for a page that must be rendered outside a web request.
-$port = 8000 + (getmypid() % 1000);
+// **ASK THE KERNEL FOR A FREE PORT.** This used 8000 + pid % 1000, and on jasmine Apache serves the
+// branch previews on 8080 and 8100-8139: one run in about 25 landed on one and read Apache's 403 as
+// a missing header (2026-10-04).
+$probe = stream_socket_server('tcp://127.0.0.1:0');
+$port = (int) substr(strrchr(stream_socket_get_name($probe, false), ':'), 1);
+fclose($probe);
 $srvCmd = sprintf('%s -S 127.0.0.1:%d -t %s %s > %s/spock-server.log 2>&1 & echo $!',
     escapeshellarg(PHP_BINARY), $port, escapeshellarg($root), escapeshellarg($boot), escapeshellarg($dir));
 $pid = (int) trim(shell_exec($srvCmd));
