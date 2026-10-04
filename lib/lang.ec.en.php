@@ -1807,13 +1807,24 @@ $ec_lang['lpn_ts_group_tip']='Whether the graph shows nodes or links.';
 $ec_lang['lpn_ts_group_nodes']='Nodes';
 $ec_lang['lpn_ts_group_links']='Links';
 $ec_lang['lpn_ts_quantity_tip']='Which value to graph against time.';
+$ec_lang['lpn_pgraph_none']='This asset has no results in the current run.';
+// The Properties graph's own selector entry for a source share (Tom, 2026-09-30: "In selector, use
+// 'Source share from {trace node}'"). Distinct from the shared lpn_result_source_share, which still
+// labels the bare quantity everywhere else -- the Tables column, Find's property list, the Labels
+// popover and the colour legend -- where naming the trace node in every heading would be clutter.
+$ec_lang['lpn_pgraph_source_share_from']='Source share from {node}';
+$ec_lang['lpn_result_pump_head']='Head';
+$ec_lang['lpn_result_pump_head_tip']='The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.';
+// The Full report puts every node and link in one table, where a node's Head column already sits, so a
+// pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
+$ec_lang['lpn_report_pump_head']='Pump head';
 $ec_lang['lpn_ts_add']='Add selected';
-$ec_lang['lpn_ts_add_tip']='Put everything now chosen on the map onto the graph.';
+$ec_lang['lpn_ts_add_tip']='Put everything now selected on the map onto the graph.';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
-$ec_lang['lpn_ts_add_none']='Nothing of that kind is chosen on the map.';
+$ec_lang['lpn_ts_add_none']='Nothing of that kind is selected on the map.';
 $ec_lang['lpn_ts_clear']='Remove all';
 $ec_lang['lpn_ts_chip_tip']='Take {id} off the graph';
-$ec_lang['lpn_ts_none']='Nothing to graph yet. Choose assets on the map and press Add selected.';
+$ec_lang['lpn_ts_none']='Nothing to graph yet. Select assets on the map and press Add selected.';
 // The run belongs to EPANET alone, so this is also what a page whose engine is unreachable lands
 // on; the status bar says why in that case, and lpn_time_no_period covers the project that has set
 // no run time at all.
@@ -1899,7 +1910,7 @@ $ec_lang['lpn_new_title']='New project';
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
 // its five siblings) are gone; Tom called the last of them obsolete on 2026-09-16.
 $ec_lang['lpn_new_coordsys']='Coordinate system';
-$ec_lang['lpn_new_coordsys_tip']='Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Convert as…”, and it is approximate.';
+$ec_lang['lpn_new_coordsys_tip']='Choose the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Convert as…”, and it is approximate.';
 // **DELETED 2026-09-25: lpn_new_coordsys_geo / lpn_new_coordsys_geo_tip.** Don't expose the word
 // "projection" (dev/session-handoff.md RULINGS); once reworded, both were the identical string
 // lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
@@ -1926,8 +1937,7 @@ $ec_lang['lpn_crs_place_tip']='Type a town, an address, or a landmark, and the m
 $ec_lang['lpn_crs_search']='Search';
 $ec_lang['lpn_crs_name']='Coordinate system name filter';
 $ec_lang['lpn_crs_name_tip']='Shows only the coordinate systems whose name or EPSG code contains what you type.';
-$ec_lang['lpn_crs_list_tip']='The coordinate systems left by the two filters above. Choose one and press Select.';
-$ec_lang['lpn_crs_choose']='Select';
+$ec_lang['lpn_crs_list_tip']='The coordinate systems left by the two filters above. Choose one, then press OK.';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.';
 $ec_lang['lpn_crs_count']='{n} of {total} coordinate systems listed.';
@@ -2350,7 +2360,7 @@ $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the he
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
 $ec_lang['lpn_notes_4_term']='Also on this page';
-$ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set.';
+$ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.';
 $ec_lang['lpn_notes_6_term']='Table columns help';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one
@@ -4097,7 +4107,7 @@ $ec_lang['lpn_ff_design_tip']='A separate question from whether the junction can
 $ec_lang['lpn_ff_design_off']='None';
 $ec_lang['lpn_ff_design_all']='All';
 $ec_lang['lpn_ff_design_selected']='Selected';
-$ec_lang['lpn_ff_design_no_selection']='The design check scope is set to Selected, but no assets are selected. Select assets or select the All option.';
+$ec_lang['lpn_ff_design_no_selection']='The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All.';
 $ec_lang['lpn_ff_minpressure']='Lowest pressure allowed elsewhere';
 $ec_lang['lpn_ff_minpressure_tip']='A junction that falls below this while another one is drawing its fire flow is reported as a design issue.';
 $ec_lang['lpn_ff_maxvelocity']='Highest velocity allowed';
@@ -4196,7 +4206,7 @@ $ec_lang['lpn_ff_more']='and {n} more affected';
 // agree with one noun and would have been wrong at the other call site.
 $ec_lang['lpn_ff_rows_more']='Junctions not shown: {n}.';
 $ec_lang['lpn_ff_rows_more_links']='Links not shown: {n}.';
-$ec_lang['lpn_ff_design_none']='Nothing in the chosen set went outside its limits while any junction drew its fire flow.';
+$ec_lang['lpn_ff_design_none']='Nothing in the scope you chose went outside its limits while any junction drew its fire flow.';
 $ec_lang['lpn_ff_design_off_note']='The effect on the rest of the system was not checked in this run.';
 // **WHY IT IS SAID AND NEVER APPLIED, in Tom's words (2026-09-02), and the reason is the MODEL, not
 // the arithmetic:** *"These models are not always fine-grained. They don't represent every pipe,
@@ -4283,9 +4293,8 @@ $ec_lang['lpn_ds_multiplier_tip']='The number each demand is multiplied by: 1.5 
 $ec_lang['lpn_ds_run']='Run';
 $ec_lang['lpn_ds_head_search']='What demand scale can the system handle?';
 $ec_lang['lpn_ds_head_search_selected']='What demand scale can these junctions handle?';
-$ec_lang['lpn_ds_search_note_selected']='Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.';
 $ec_lang['lpn_ds_outside_below']='At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.';
-$ec_lang['lpn_ds_search_note']='Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.';
+$ec_lang['lpn_ds_search_note']='Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.';
 $ec_lang['lpn_ds_find']='Find';
 $ec_lang['lpn_ds_holds_max']='✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.';
 $ec_lang['lpn_ds_below_zero']='⚠ At least one junction is below {pressure} even with the scaled demands at zero.';
@@ -4309,8 +4318,8 @@ $ec_lang['lpn_ds_no_selection']='No junctions are selected. Select junctions or 
 $ec_lang['lpn_ds_skipped']='Selected elements that are not junctions, left as they are: {n}.';
 $ec_lang['lpn_ds_bad_multiplier']='Type a demand scale of zero or more, such as 1.5.';
 $ec_lang['lpn_ds_stale']='The drawing changed, so the demand scaling results were cleared. Run it again.';
-$ec_lang['lpn_ds_at_time']='Time step: {time}.';
-$ec_lang['lpn_ds_time_moved']='⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.';
+$ec_lang['lpn_analyze_at_time']='Time step: {time}.';
+$ec_lang['lpn_analyze_time_moved']='⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.';
 
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //

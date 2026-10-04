@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 2329,
-        "delta_key_count": 176,
+        "expected_key_count": 2332,
+        "delta_key_count": 51,
         "exempt_key_count": 26,
         "exempt_keys": [
             "calc_units_us",
@@ -705,137 +705,13 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_hotkeys_menu_heading": "Menus",
-        "lpn_hotkeys_menu_term": "Menu keyboard shortcuts",
-        "lpn_hotkeys_menu_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Alt+Shift+letter<\/td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.<\/td><\/tr><tr><td>F10<\/td><td>Go to the menu bar.<\/td><\/tr><\/tbody><\/table>",
-        "lpn_graphs_menu": "Graphs",
         "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
-        "lpn_contour_menu": "Contour",
-        "lpn_contour_tip": "Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.",
-        "lpn_contour_plot": "Contour plot",
-        "lpn_contour_fill": "Fill",
-        "lpn_contour_fill_tip": "Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.",
-        "lpn_contour_fill_smooth": "Smooth",
-        "lpn_contour_fill_bands": "Bands",
-        "lpn_contour_opacity": "Fill opacity",
-        "lpn_contour_lines": "Contour lines",
-        "lpn_contour_interval": "Interval",
-        "lpn_contour_buffer": "Buffer",
-        "lpn_contour_buffer_unit": "× median pipe length",
-        "lpn_contour_buffer_tip": "How far the color reaches from each pipe, as a multiple of the median pipe length. It fades out over the outer part.",
-        "lpn_contour_few": "Too few nodes to contour.",
-        "lpn_contour_support": "Contour plot: {n} nodes, interpolated along {p} pipes and up to {k} times the median pipe length beside them. No color across pumps, valves, or closed links.",
-        "lpn_contour_support_lines": "Contour lines every {i} {u}.",
-        "lpn_contour_too_many": "Too many contour lines at this interval; widen it to draw them.",
-        "lpn_contour_dem": "Ground between nodes from Mapbox DEM",
-        "lpn_contour_dem_tip": "Between nodes, pressure becomes the interpolated head minus the height of the ground from Mapbox DEM, so it can fall below the lowest node pressure on a hill the network has no node on. Treat the ground as a contour map, not a survey.",
-        "lpn_contour_support_dem": "Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.",
-        "lpn_contour_dem_failed": "The ground could not be read from Mapbox DEM, so pressure is interpolated between nodes alone.",
-        "lpn_contour_consent_1": "Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.",
-        "lpn_contour_consent_2": "This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.",
-        "lpn_contour_consent_3": "May we send the tile numbers of your network's area to Mapbox?",
-        "lpn_contour_consent_4": "If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.",
-        "lpn_sysflow_menu": "Flow balance",
-        "lpn_sysflow_tip": "Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.",
+        "lpn_pgraph_none": "This asset has no results in the current run.",
+        "lpn_pgraph_source_share_from": "Source share from {node}",
+        "lpn_result_pump_head": "Head",
+        "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
+        "lpn_report_pump_head": "Pump head",
         "lpn_sysflow_title": "Flow balance",
-        "lpn_sysflow_produced": "Produced",
-        "lpn_sysflow_produced_tip": "Total flow into the network from reservoirs and from negative demands.",
-        "lpn_sysflow_consumed": "Consumed",
-        "lpn_sysflow_consumed_tip": "Total of every positive demand: water drawn from the network at junctions, and any flow into a reservoir.",
-        "lpn_copy_title": "Mark file as new copy?",
-        "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
-        "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
-        "lpn_copy_original": "Original; keep same lock",
-        "lpn_copy_copy": "A copy; make new lock",
-        "lpn_copy_kept_link": "Opened {name} as the original, moved to a new place. Save now writes to this file.",
-        "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
-        "lpn_scenario_basic": "Basic mode",
-        "lpn_scenario_basic_tip": "Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.",
-        "lpn_alt_title": "Alternatives preview",
-        "lpn_alt_note": "Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.",
-        "lpn_alt_cat_physical": "Physical",
-        "lpn_alt_cat_demand": "Demand",
-        "lpn_alt_cat_topology": "Asset activation",
-        "lpn_alt_cat_initial": "Initial settings",
-        "lpn_alt_cat_constituent": "Constituent",
-        "lpn_alt_cat_fireflow": "Fire flow",
-        "lpn_alt_cat_energy": "Energy cost",
-        "lpn_alt_cat_userdata": "Custom properties",
-        "lpn_alt_cat_text": "Text",
-        "lpn_reports_calib": "Calibration",
-        "lpn_reports_calib_tip": "Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.",
-        "lpn_calib_title": "Calibration report",
-        "lpn_calib_param": "Parameter",
-        "lpn_calib_param_tip": "The quantity the calibration file measures. One file is held for each parameter.",
-        "lpn_calib_load": "Load calibration file…",
-        "lpn_calib_load_tip": "A text file with a location ID, a time, and a measured value on each line. The time is measured from the start of the simulation, in decimal hours or hours:minutes. A semicolon starts a comment. A line with only a time and a value belongs to the location above it.",
-        "lpn_calib_none": "No calibration file is loaded for this parameter.",
-        "lpn_calib_session": "A calibration file is held for this session only. It is not saved with the project or on this device.",
-        "lpn_calib_file": "{file}: {n} measurements at {m} locations.",
-        "lpn_calib_units": "The file's values are read in this project's units: {unit}.",
-        "lpn_calib_missing": "Named in the file but not in this network: {ids}.",
-        "lpn_calib_missing_count": "Measurements skipped because their location is not in this network: {n}.",
-        "lpn_calib_bad_lines": "Lines that could not be read, skipped: {lines}",
-        "lpn_calib_outside": "Measurements outside the times this run reported, skipped: {n}.",
-        "lpn_calib_no_value": "Measurements with no computed value at their time, skipped: {n}.",
-        "lpn_calib_single": "This is a single-period run, so every measurement is compared with its one result, whatever time the file gives.",
-        "lpn_calib_needs_run": "There are no results to compare with yet. The report fills in once the network has been calculated.",
-        "lpn_calib_no_pairs": "No measurement could be compared, so there is nothing to plot.",
-        "lpn_calib_tab_stats": "Statistics",
-        "lpn_calib_tab_corr": "Correlation plot",
-        "lpn_calib_tab_means": "Mean comparisons",
-        "lpn_calib_col_location": "Location",
-        "lpn_calib_col_n": "Num obs",
-        "lpn_calib_col_n_tip": "Number of observations: the measurements at this location that were compared.",
-        "lpn_calib_col_obs_mean": "Observed mean",
-        "lpn_calib_col_sim_mean": "Computed mean",
-        "lpn_calib_col_mean_err": "Mean error",
-        "lpn_calib_col_mean_err_tip": "The mean of the absolute differences between each observed value and the computed value at the same time.",
-        "lpn_calib_col_rms_err": "RMS error",
-        "lpn_calib_col_rms_err_tip": "Root mean square error: the square root of the mean of the squared differences between observed and computed values.",
-        "lpn_calib_network": "Network",
-        "lpn_calib_corr_means": "Correlation between means: {r}",
-        "lpn_calib_corr_none": "Correlation between means: it needs at least two locations whose means differ.",
-        "lpn_calib_axis_obs": "Observed: {q}",
-        "lpn_calib_axis_sim": "Computed: {q}",
-        "lpn_calib_observed": "Observed",
-        "lpn_calib_computed": "Computed",
-        "lpn_calib_point": "{id}, {time}: observed {o}, computed {s}",
-        "lpn_calib_corr_note": "Each point is one measurement. The closer the points lie to the diagonal line, the closer the computed values match the observed ones.",
-        "lpn_calib_ts_point": "Measured at {id}, {time}: {v}",
-        "lpn_calib_ts_note": "Rings are measured values from the calibration file.",
-        "lpn_analyze_menu": "Analyze",
-        "lpn_analyze_menu_tip": "Analyses that run the network on a copy: fire flow at each junction, the loss of each pipe, pump, and valve, and the demands scaled up or down.",
-        "lpn_ff_design_off": "None",
-        "lpn_ff_design_all": "All",
-        "lpn_ff_design_selected": "Selected",
-        "lpn_ff_rows_more_links": "Links not shown: {n}.",
-        "lpn_crit_menu": "Criticality analysis…",
-        "lpn_crit_menu_tip": "Take each pipe, pump, and valve out of the network in turn and see what the system loses.",
-        "lpn_crit_title": "Criticality analysis",
-        "lpn_crit_intro": "Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in your project is changed; the whole run is made on a copy.",
-        "lpn_crit_scope": "Links to break",
-        "lpn_crit_scope_tip": "All pipes, pumps, and valves, or only those selected on the map. Choose the set before you run.",
-        "lpn_crit_scope_all": "All links",
-        "lpn_crit_scope_selected": "Selected links",
-        "lpn_crit_minpressure": "Lowest pressure allowed",
-        "lpn_crit_minpressure_tip": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
-        "lpn_crit_col_asset": "Asset",
-        "lpn_crit_col_unserved": "Demand not served",
-        "lpn_crit_col_cutoff": "Junctions cut off",
-        "lpn_crit_col_below": "Junctions below minimum",
-        "lpn_crit_summary": "{n} of {total} assets leave demand unserved or drop a junction below {pressure}.",
-        "lpn_crit_baseline_below": "Junctions already below it with nothing broken: {n}. They are not counted.",
-        "lpn_crit_working": "Working: {done} of {total} assets.",
-        "lpn_crit_stopped": "Stopped after {done} of {total} assets. The results below are the ones already finished.",
-        "lpn_crit_no_selection": "No links are selected. Select links or choose All links.",
-        "lpn_crit_no_links": "This project has no links yet, so there is nothing to break.",
-        "lpn_crit_busy": "Another analysis is running. Stop it, or wait for it to finish.",
-        "lpn_crit_skipped": "{n} selected elements are not links, so they were not broken.",
-        "lpn_crit_stale": "The drawing changed, so the criticality results were cleared. Run it again.",
-        "lpn_crit_skipdead": "Skip dead ends",
-        "lpn_crit_skipdead_tip": "A dead-end link is one whose removal cuts off junctions that can be reached only through it, with no reservoir or tank beyond. Its loss is everything beyond it, so it is not solved. The summary says how many were skipped.",
-        "lpn_crit_skipped_dead": "Dead-end links skipped: {n}. Each one cuts off everything beyond it.",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
         "lpn_ds_title": "Demand scaling",
@@ -853,9 +729,8 @@
         "lpn_ds_run": "Run",
         "lpn_ds_head_search": "What demand scale can the system handle?",
         "lpn_ds_head_search_selected": "What demand scale can these junctions handle?",
-        "lpn_ds_search_note_selected": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.",
         "lpn_ds_outside_below": "At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.",
-        "lpn_ds_search_note": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
+        "lpn_ds_search_note": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
         "lpn_ds_find": "Find",
         "lpn_ds_holds_max": "✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.",
         "lpn_ds_below_zero": "⚠ At least one junction is below {pressure} even with the scaled demands at zero.",
@@ -879,141 +754,17 @@
         "lpn_ds_skipped": "Selected elements that are not junctions, left as they are: {n}.",
         "lpn_ds_bad_multiplier": "Type a demand scale of zero or more, such as 1.5.",
         "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
-        "lpn_ds_at_time": "Time step: {time}.",
-        "lpn_ds_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
+        "lpn_analyze_at_time": "Time step: {time}.",
+        "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "keys": {
-        "lpn_hotkeys_menu_heading": "Menus",
-        "lpn_hotkeys_menu_term": "Menu keyboard shortcuts",
-        "lpn_hotkeys_menu_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Alt+Shift+letter<\/td><td>Open the menu with that letter, then press a row's letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.<\/td><\/tr><tr><td>F10<\/td><td>Go to the menu bar.<\/td><\/tr><\/tbody><\/table>",
-        "lpn_graphs_menu": "Graphs",
         "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
-        "lpn_contour_menu": "Contour",
-        "lpn_contour_tip": "Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.",
-        "lpn_contour_plot": "Contour plot",
-        "lpn_contour_fill": "Fill",
-        "lpn_contour_fill_tip": "Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.",
-        "lpn_contour_fill_smooth": "Smooth",
-        "lpn_contour_fill_bands": "Bands",
-        "lpn_contour_opacity": "Fill opacity",
-        "lpn_contour_lines": "Contour lines",
-        "lpn_contour_interval": "Interval",
-        "lpn_contour_buffer": "Buffer",
-        "lpn_contour_buffer_unit": "× median pipe length",
-        "lpn_contour_buffer_tip": "How far the color reaches from each pipe, as a multiple of the median pipe length. It fades out over the outer part.",
-        "lpn_contour_few": "Too few nodes to contour.",
-        "lpn_contour_support": "Contour plot: {n} nodes, interpolated along {p} pipes and up to {k} times the median pipe length beside them. No color across pumps, valves, or closed links.",
-        "lpn_contour_support_lines": "Contour lines every {i} {u}.",
-        "lpn_contour_too_many": "Too many contour lines at this interval; widen it to draw them.",
-        "lpn_contour_dem": "Ground between nodes from Mapbox DEM",
-        "lpn_contour_dem_tip": "Between nodes, pressure becomes the interpolated head minus the height of the ground from Mapbox DEM, so it can fall below the lowest node pressure on a hill the network has no node on. Treat the ground as a contour map, not a survey.",
-        "lpn_contour_support_dem": "Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.",
-        "lpn_contour_dem_failed": "The ground could not be read from Mapbox DEM, so pressure is interpolated between nodes alone.",
-        "lpn_contour_consent_1": "Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.",
-        "lpn_contour_consent_2": "This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.",
-        "lpn_contour_consent_3": "May we send the tile numbers of your network's area to Mapbox?",
-        "lpn_contour_consent_4": "If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.",
-        "lpn_sysflow_menu": "Flow balance",
-        "lpn_sysflow_tip": "Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.",
+        "lpn_pgraph_none": "This asset has no results in the current run.",
+        "lpn_pgraph_source_share_from": "Source share from {node}",
+        "lpn_result_pump_head": "Head",
+        "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
+        "lpn_report_pump_head": "Pump head",
         "lpn_sysflow_title": "Flow balance",
-        "lpn_sysflow_produced": "Produced",
-        "lpn_sysflow_produced_tip": "Total flow into the network from reservoirs and from negative demands.",
-        "lpn_sysflow_consumed": "Consumed",
-        "lpn_sysflow_consumed_tip": "Total of every positive demand: water drawn from the network at junctions, and any flow into a reservoir.",
-        "lpn_copy_title": "Mark file as new copy?",
-        "lpn_copy_body": "This file says it was created on {date}, and this browser doesn't recognize it. Is this the Original file (keep same lock) or a Copy (make new lock)?",
-        "lpn_copy_body_nodate": "This browser doesn't recognize this file. Is this the Original file (keep same lock) or a Copy (make new lock)?",
-        "lpn_copy_original": "Original; keep same lock",
-        "lpn_copy_copy": "A copy; make new lock",
-        "lpn_copy_kept_link": "Opened {name} as the original, moved to a new place. Save now writes to this file.",
-        "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
-        "lpn_scenario_basic": "Basic mode",
-        "lpn_scenario_basic_tip": "Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.",
-        "lpn_alt_title": "Alternatives preview",
-        "lpn_alt_note": "Read only. Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has.",
-        "lpn_alt_cat_physical": "Physical",
-        "lpn_alt_cat_demand": "Demand",
-        "lpn_alt_cat_topology": "Asset activation",
-        "lpn_alt_cat_initial": "Initial settings",
-        "lpn_alt_cat_constituent": "Constituent",
-        "lpn_alt_cat_fireflow": "Fire flow",
-        "lpn_alt_cat_energy": "Energy cost",
-        "lpn_alt_cat_userdata": "Custom properties",
-        "lpn_alt_cat_text": "Text",
-        "lpn_reports_calib": "Calibration",
-        "lpn_reports_calib_tip": "Compare measured field data from a calibration file with the last run: statistics, a correlation plot, and mean comparisons.",
-        "lpn_calib_title": "Calibration report",
-        "lpn_calib_param": "Parameter",
-        "lpn_calib_param_tip": "The quantity the calibration file measures. One file is held for each parameter.",
-        "lpn_calib_load": "Load calibration file…",
-        "lpn_calib_load_tip": "A text file with a location ID, a time, and a measured value on each line. The time is measured from the start of the simulation, in decimal hours or hours:minutes. A semicolon starts a comment. A line with only a time and a value belongs to the location above it.",
-        "lpn_calib_none": "No calibration file is loaded for this parameter.",
-        "lpn_calib_session": "A calibration file is held for this session only. It is not saved with the project or on this device.",
-        "lpn_calib_file": "{file}: {n} measurements at {m} locations.",
-        "lpn_calib_units": "The file's values are read in this project's units: {unit}.",
-        "lpn_calib_missing": "Named in the file but not in this network: {ids}.",
-        "lpn_calib_missing_count": "Measurements skipped because their location is not in this network: {n}.",
-        "lpn_calib_bad_lines": "Lines that could not be read, skipped: {lines}",
-        "lpn_calib_outside": "Measurements outside the times this run reported, skipped: {n}.",
-        "lpn_calib_no_value": "Measurements with no computed value at their time, skipped: {n}.",
-        "lpn_calib_single": "This is a single-period run, so every measurement is compared with its one result, whatever time the file gives.",
-        "lpn_calib_needs_run": "There are no results to compare with yet. The report fills in once the network has been calculated.",
-        "lpn_calib_no_pairs": "No measurement could be compared, so there is nothing to plot.",
-        "lpn_calib_tab_stats": "Statistics",
-        "lpn_calib_tab_corr": "Correlation plot",
-        "lpn_calib_tab_means": "Mean comparisons",
-        "lpn_calib_col_location": "Location",
-        "lpn_calib_col_n": "Num obs",
-        "lpn_calib_col_n_tip": "Number of observations: the measurements at this location that were compared.",
-        "lpn_calib_col_obs_mean": "Observed mean",
-        "lpn_calib_col_sim_mean": "Computed mean",
-        "lpn_calib_col_mean_err": "Mean error",
-        "lpn_calib_col_mean_err_tip": "The mean of the absolute differences between each observed value and the computed value at the same time.",
-        "lpn_calib_col_rms_err": "RMS error",
-        "lpn_calib_col_rms_err_tip": "Root mean square error: the square root of the mean of the squared differences between observed and computed values.",
-        "lpn_calib_network": "Network",
-        "lpn_calib_corr_means": "Correlation between means: {r}",
-        "lpn_calib_corr_none": "Correlation between means: it needs at least two locations whose means differ.",
-        "lpn_calib_axis_obs": "Observed: {q}",
-        "lpn_calib_axis_sim": "Computed: {q}",
-        "lpn_calib_observed": "Observed",
-        "lpn_calib_computed": "Computed",
-        "lpn_calib_point": "{id}, {time}: observed {o}, computed {s}",
-        "lpn_calib_corr_note": "Each point is one measurement. The closer the points lie to the diagonal line, the closer the computed values match the observed ones.",
-        "lpn_calib_ts_point": "Measured at {id}, {time}: {v}",
-        "lpn_calib_ts_note": "Rings are measured values from the calibration file.",
-        "lpn_analyze_menu": "Analyze",
-        "lpn_analyze_menu_tip": "Analyses that run the network on a copy: fire flow at each junction, the loss of each pipe, pump, and valve, and the demands scaled up or down.",
-        "lpn_ff_design_off": "None",
-        "lpn_ff_design_all": "All",
-        "lpn_ff_design_selected": "Selected",
-        "lpn_ff_rows_more_links": "Links not shown: {n}.",
-        "lpn_crit_menu": "Criticality analysis…",
-        "lpn_crit_menu_tip": "Take each pipe, pump, and valve out of the network in turn and see what the system loses.",
-        "lpn_crit_title": "Criticality analysis",
-        "lpn_crit_intro": "Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in your project is changed; the whole run is made on a copy.",
-        "lpn_crit_scope": "Links to break",
-        "lpn_crit_scope_tip": "All pipes, pumps, and valves, or only those selected on the map. Choose the set before you run.",
-        "lpn_crit_scope_all": "All links",
-        "lpn_crit_scope_selected": "Selected links",
-        "lpn_crit_minpressure": "Lowest pressure allowed",
-        "lpn_crit_minpressure_tip": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
-        "lpn_crit_col_asset": "Asset",
-        "lpn_crit_col_unserved": "Demand not served",
-        "lpn_crit_col_cutoff": "Junctions cut off",
-        "lpn_crit_col_below": "Junctions below minimum",
-        "lpn_crit_summary": "{n} of {total} assets leave demand unserved or drop a junction below {pressure}.",
-        "lpn_crit_baseline_below": "Junctions already below it with nothing broken: {n}. They are not counted.",
-        "lpn_crit_working": "Working: {done} of {total} assets.",
-        "lpn_crit_stopped": "Stopped after {done} of {total} assets. The results below are the ones already finished.",
-        "lpn_crit_no_selection": "No links are selected. Select links or choose All links.",
-        "lpn_crit_no_links": "This project has no links yet, so there is nothing to break.",
-        "lpn_crit_busy": "Another analysis is running. Stop it, or wait for it to finish.",
-        "lpn_crit_skipped": "{n} selected elements are not links, so they were not broken.",
-        "lpn_crit_stale": "The drawing changed, so the criticality results were cleared. Run it again.",
-        "lpn_crit_skipdead": "Skip dead ends",
-        "lpn_crit_skipdead_tip": "A dead-end link is one whose removal cuts off junctions that can be reached only through it, with no reservoir or tank beyond. Its loss is everything beyond it, so it is not solved. The summary says how many were skipped.",
-        "lpn_crit_skipped_dead": "Dead-end links skipped: {n}. Each one cuts off everything beyond it.",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
         "lpn_ds_title": "Demand scaling",
@@ -1031,9 +782,8 @@
         "lpn_ds_run": "Run",
         "lpn_ds_head_search": "What demand scale can the system handle?",
         "lpn_ds_head_search_selected": "What demand scale can these junctions handle?",
-        "lpn_ds_search_note_selected": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.",
         "lpn_ds_outside_below": "At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.",
-        "lpn_ds_search_note": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
+        "lpn_ds_search_note": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
         "lpn_ds_find": "Find",
         "lpn_ds_holds_max": "✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.",
         "lpn_ds_below_zero": "⚠ At least one junction is below {pressure} even with the scaled demands at zero.",
@@ -1057,82 +807,18 @@
         "lpn_ds_skipped": "Selected elements that are not junctions, left as they are: {n}.",
         "lpn_ds_bad_multiplier": "Type a demand scale of zero or more, such as 1.5.",
         "lpn_ds_stale": "The drawing changed, so the demand scaling results were cleared. Run it again.",
-        "lpn_ds_at_time": "Time step: {time}.",
-        "lpn_ds_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
+        "lpn_analyze_at_time": "Time step: {time}.",
+        "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "key_context": {
-        "lpn_hotkeys_menu_heading": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_hotkeys_map_def",
-                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 或 Esc<\/td><td>选择。<\/td><\/tr><tr><td>2<\/td><td>添加节点。<\/td><\/tr><tr><td>3<\/td><td>添加水库。<\/td><\/tr><tr><td>4<\/td><td>添加水池。<\/td><\/tr><tr><td>5<\/td><td>添加管道。<\/td><\/tr><tr><td>6<\/td><td>添加水泵。<\/td><\/tr><tr><td>7<\/td><td>添加阀门。<\/td><\/tr><tr><td>8<\/td><td>添加用户。<\/td><\/tr><tr><td>9<\/td><td>添加文字。<\/td><\/tr><tr><td>Delete<\/td><td>删除所选内容。<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>撤销上一次更改。<\/td><\/tr><tr><td>+ 或 =<\/td><td>放大。<\/td><\/tr><tr><td>-<\/td><td>缩小。<\/td><\/tr><\/tbody><\/table>",
-                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 or Esc<\/td><td>Select.<\/td><\/tr><tr><td>2<\/td><td>Add a junction.<\/td><\/tr><tr><td>3<\/td><td>Add a reservoir.<\/td><\/tr><tr><td>4<\/td><td>Add a tank.<\/td><\/tr><tr><td>5<\/td><td>Add a pipe.<\/td><\/tr><tr><td>6<\/td><td>Add a pump.<\/td><\/tr><tr><td>7<\/td><td>Add a valve.<\/td><\/tr><tr><td>8<\/td><td>Add a customer.<\/td><\/tr><tr><td>9<\/td><td>Add text.<\/td><\/tr><tr><td>Delete<\/td><td>Delete the selection.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Undo the last change.<\/td><\/tr><tr><td>+ or =<\/td><td>Zoom in.<\/td><\/tr><tr><td>-<\/td><td>Zoom out.<\/td><\/tr><\/tbody><\/table>"
-                },
-                "next_translated": {
-                    "key": "lpn_wrong_btn",
-                    "value": "这里有问题吗？",
-                    "english": "Something wrong here?"
-                }
-            }
-        },
-        "lpn_hotkeys_menu_term": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_hotkeys_map_def",
-                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 或 Esc<\/td><td>选择。<\/td><\/tr><tr><td>2<\/td><td>添加节点。<\/td><\/tr><tr><td>3<\/td><td>添加水库。<\/td><\/tr><tr><td>4<\/td><td>添加水池。<\/td><\/tr><tr><td>5<\/td><td>添加管道。<\/td><\/tr><tr><td>6<\/td><td>添加水泵。<\/td><\/tr><tr><td>7<\/td><td>添加阀门。<\/td><\/tr><tr><td>8<\/td><td>添加用户。<\/td><\/tr><tr><td>9<\/td><td>添加文字。<\/td><\/tr><tr><td>Delete<\/td><td>删除所选内容。<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>撤销上一次更改。<\/td><\/tr><tr><td>+ 或 =<\/td><td>放大。<\/td><\/tr><tr><td>-<\/td><td>缩小。<\/td><\/tr><\/tbody><\/table>",
-                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 or Esc<\/td><td>Select.<\/td><\/tr><tr><td>2<\/td><td>Add a junction.<\/td><\/tr><tr><td>3<\/td><td>Add a reservoir.<\/td><\/tr><tr><td>4<\/td><td>Add a tank.<\/td><\/tr><tr><td>5<\/td><td>Add a pipe.<\/td><\/tr><tr><td>6<\/td><td>Add a pump.<\/td><\/tr><tr><td>7<\/td><td>Add a valve.<\/td><\/tr><tr><td>8<\/td><td>Add a customer.<\/td><\/tr><tr><td>9<\/td><td>Add text.<\/td><\/tr><tr><td>Delete<\/td><td>Delete the selection.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Undo the last change.<\/td><\/tr><tr><td>+ or =<\/td><td>Zoom in.<\/td><\/tr><tr><td>-<\/td><td>Zoom out.<\/td><\/tr><\/tbody><\/table>"
-                },
-                "next_translated": {
-                    "key": "lpn_wrong_btn",
-                    "value": "这里有问题吗？",
-                    "english": "Something wrong here?"
-                }
-            }
-        },
-        "lpn_hotkeys_menu_def": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_hotkeys_map_def",
-                    "value": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 或 Esc<\/td><td>选择。<\/td><\/tr><tr><td>2<\/td><td>添加节点。<\/td><\/tr><tr><td>3<\/td><td>添加水库。<\/td><\/tr><tr><td>4<\/td><td>添加水池。<\/td><\/tr><tr><td>5<\/td><td>添加管道。<\/td><\/tr><tr><td>6<\/td><td>添加水泵。<\/td><\/tr><tr><td>7<\/td><td>添加阀门。<\/td><\/tr><tr><td>8<\/td><td>添加用户。<\/td><\/tr><tr><td>9<\/td><td>添加文字。<\/td><\/tr><tr><td>Delete<\/td><td>删除所选内容。<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>撤销上一次更改。<\/td><\/tr><tr><td>+ 或 =<\/td><td>放大。<\/td><\/tr><tr><td>-<\/td><td>缩小。<\/td><\/tr><\/tbody><\/table>",
-                    "english": "<table class=\"lpn-notes-table\"><tbody><tr><td>1 or Esc<\/td><td>Select.<\/td><\/tr><tr><td>2<\/td><td>Add a junction.<\/td><\/tr><tr><td>3<\/td><td>Add a reservoir.<\/td><\/tr><tr><td>4<\/td><td>Add a tank.<\/td><\/tr><tr><td>5<\/td><td>Add a pipe.<\/td><\/tr><tr><td>6<\/td><td>Add a pump.<\/td><\/tr><tr><td>7<\/td><td>Add a valve.<\/td><\/tr><tr><td>8<\/td><td>Add a customer.<\/td><\/tr><tr><td>9<\/td><td>Add text.<\/td><\/tr><tr><td>Delete<\/td><td>Delete the selection.<\/td><\/tr><tr><td>Ctrl+Z<\/td><td>Undo the last change.<\/td><\/tr><tr><td>+ or =<\/td><td>Zoom in.<\/td><\/tr><tr><td>-<\/td><td>Zoom out.<\/td><\/tr><\/tbody><\/table>"
-                },
-                "next_translated": {
-                    "key": "lpn_wrong_btn",
-                    "value": "这里有问题吗？",
-                    "english": "Something wrong here?"
-                }
-            }
-        },
-        "lpn_graphs_menu": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_profile_menu",
-                    "value": "剖面图",
-                    "english": "Profile"
-                },
-                "next_translated": {
-                    "key": "lpn_profile_tip",
-                    "value": "沿贯穿管网的一条路线，绘制地面和水力坡降线。",
-                    "english": "Draw the ground and the hydraulic grade line along a path through the network."
-                }
-            }
-        },
         "lpn_graphs_menu_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_profile_menu",
-                    "value": "剖面图",
-                    "english": "Profile"
+                    "key": "lpn_graphs_menu",
+                    "value": "图形",
+                    "english": "Graphs"
                 },
                 "next_translated": {
                     "key": "lpn_profile_tip",
@@ -1141,435 +827,83 @@
                 }
             }
         },
-        "lpn_contour_menu": {
+        "lpn_pgraph_none": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
+                    "key": "lpn_ts_quantity_tip",
+                    "value": "要绘制哪个数值随时间变化的图形。",
+                    "english": "Which value to graph against time."
                 },
                 "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
+                    "key": "lpn_ts_add",
+                    "value": "添加所选",
+                    "english": "Add selected"
                 }
             }
         },
-        "lpn_contour_tip": {
+        "lpn_pgraph_source_share_from": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
+                    "key": "lpn_ts_quantity_tip",
+                    "value": "要绘制哪个数值随时间变化的图形。",
+                    "english": "Which value to graph against time."
                 },
                 "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
+                    "key": "lpn_ts_add",
+                    "value": "添加所选",
+                    "english": "Add selected"
                 }
             }
         },
-        "lpn_contour_plot": {
+        "lpn_result_pump_head": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
+                    "key": "lpn_ts_quantity_tip",
+                    "value": "要绘制哪个数值随时间变化的图形。",
+                    "english": "Which value to graph against time."
                 },
                 "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
+                    "key": "lpn_ts_add",
+                    "value": "添加所选",
+                    "english": "Add selected"
                 }
             }
         },
-        "lpn_contour_fill": {
+        "lpn_result_pump_head_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
+                    "key": "lpn_ts_quantity_tip",
+                    "value": "要绘制哪个数值随时间变化的图形。",
+                    "english": "Which value to graph against time."
                 },
                 "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
+                    "key": "lpn_ts_add",
+                    "value": "添加所选",
+                    "english": "Add selected"
                 }
             }
         },
-        "lpn_contour_fill_tip": {
+        "lpn_report_pump_head": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
+                    "key": "lpn_ts_quantity_tip",
+                    "value": "要绘制哪个数值随时间变化的图形。",
+                    "english": "Which value to graph against time."
                 },
                 "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_fill_smooth": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_fill_bands": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_opacity": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_lines": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_interval": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_buffer": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_buffer_unit": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_buffer_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_few": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_support": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_support_lines": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_too_many": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_dem": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_dem_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_support_dem": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_dem_failed": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_consent_1": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_consent_2": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_consent_3": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_contour_consent_4": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_sysflow_menu": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_sysflow_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
+                    "key": "lpn_ts_add",
+                    "value": "添加所选",
+                    "english": "Add selected"
                 }
             }
         },
@@ -1578,1582 +912,14 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
+                    "key": "lpn_sysflow_tip",
+                    "value": "在延时模拟期间，绘制产生的总流量和消耗的总流量随时间变化的图形。水池不计入任一总量，因此两条线分开的地方，就是水池正在充水或放水。",
+                    "english": "Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining."
                 },
                 "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_sysflow_produced": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_sysflow_produced_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_sysflow_consumed": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_sysflow_consumed_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_freq_axis_percent",
-                    "value": "低于该值的百分比",
-                    "english": "Percent less than"
-                },
-                "next_translated": {
-                    "key": "lpn_view_units",
-                    "value": "单位",
-                    "english": "Units"
-                }
-            }
-        },
-        "lpn_copy_title": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_lock_open_cancelled",
-                    "value": "该文件未被打开，此处也未发生任何改变。其他人仍在打开它。",
-                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
-                },
-                "next_translated": {
-                    "key": "lpn_lock_requested",
-                    "value": "{name} 想要编辑此文件。请在准备好后保存您的工作，并使用“文件”、“关闭项目”将其移交。",
-                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
-                }
-            }
-        },
-        "lpn_copy_body": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_lock_open_cancelled",
-                    "value": "该文件未被打开，此处也未发生任何改变。其他人仍在打开它。",
-                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
-                },
-                "next_translated": {
-                    "key": "lpn_lock_requested",
-                    "value": "{name} 想要编辑此文件。请在准备好后保存您的工作，并使用“文件”、“关闭项目”将其移交。",
-                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
-                }
-            }
-        },
-        "lpn_copy_body_nodate": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_lock_open_cancelled",
-                    "value": "该文件未被打开，此处也未发生任何改变。其他人仍在打开它。",
-                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
-                },
-                "next_translated": {
-                    "key": "lpn_lock_requested",
-                    "value": "{name} 想要编辑此文件。请在准备好后保存您的工作，并使用“文件”、“关闭项目”将其移交。",
-                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
-                }
-            }
-        },
-        "lpn_copy_original": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_lock_open_cancelled",
-                    "value": "该文件未被打开，此处也未发生任何改变。其他人仍在打开它。",
-                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
-                },
-                "next_translated": {
-                    "key": "lpn_lock_requested",
-                    "value": "{name} 想要编辑此文件。请在准备好后保存您的工作，并使用“文件”、“关闭项目”将其移交。",
-                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
-                }
-            }
-        },
-        "lpn_copy_copy": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_lock_open_cancelled",
-                    "value": "该文件未被打开，此处也未发生任何改变。其他人仍在打开它。",
-                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
-                },
-                "next_translated": {
-                    "key": "lpn_lock_requested",
-                    "value": "{name} 想要编辑此文件。请在准备好后保存您的工作，并使用“文件”、“关闭项目”将其移交。",
-                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
-                }
-            }
-        },
-        "lpn_copy_kept_link": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_lock_open_cancelled",
-                    "value": "该文件未被打开，此处也未发生任何改变。其他人仍在打开它。",
-                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
-                },
-                "next_translated": {
-                    "key": "lpn_lock_requested",
-                    "value": "{name} 想要编辑此文件。请在准备好后保存您的工作，并使用“文件”、“关闭项目”将其移交。",
-                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
-                }
-            }
-        },
-        "lpn_copy_opened": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_lock_open_cancelled",
-                    "value": "该文件未被打开，此处也未发生任何改变。其他人仍在打开它。",
-                    "english": "That file was not opened, and nothing here changed. Somebody else still has it open."
-                },
-                "next_translated": {
-                    "key": "lpn_lock_requested",
-                    "value": "{name} 想要编辑此文件。请在准备好后保存您的工作，并使用“文件”、“关闭项目”将其移交。",
-                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
-                }
-            }
-        },
-        "lpn_scenario_basic": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
-                }
-            }
-        },
-        "lpn_scenario_basic_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
-                }
-            }
-        },
-        "lpn_alt_title": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
-                }
-            }
-        },
-        "lpn_alt_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
-                }
-            }
-        },
-        "lpn_alt_cat_physical": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
-                }
-            }
-        },
-        "lpn_alt_cat_demand": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
-                }
-            }
-        },
-        "lpn_alt_cat_topology": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
-                }
-            }
-        },
-        "lpn_alt_cat_initial": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
-                }
-            }
-        },
-        "lpn_alt_cat_constituent": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
-                }
-            }
-        },
-        "lpn_alt_cat_fireflow": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
-                }
-            }
-        },
-        "lpn_alt_cat_energy": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
-                }
-            }
-        },
-        "lpn_alt_cat_userdata": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
-                }
-            }
-        },
-        "lpn_alt_cat_text": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_scenario_push_tip",
-                    "value": "所有方案中当前显示标签的属性都将恢复为基础方案的数值，各方案专属的数值将被舍弃。",
-                    "english": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values entered for them in any scenario are discarded."
-                },
-                "next_translated": {
-                    "key": "lpn_scenario_push_confirm",
-                    "value": "使所有方案对这些属性都采用基础方案的数值？各方案专属的数值将被舍弃。此操作可撤销。",
-                    "english": "Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this."
-                }
-            }
-        },
-        "lpn_reports_calib": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_reports_calib_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_title": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_param": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_param_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_load": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_load_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_none": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_session": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_file": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_units": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_missing": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_missing_count": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_bad_lines": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_outside": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_no_value": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_single": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_needs_run": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_no_pairs": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_tab_stats": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_tab_corr": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_tab_means": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_col_location": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_col_n": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_col_n_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_col_obs_mean": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_col_sim_mean": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_col_mean_err": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_col_mean_err_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_col_rms_err": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_col_rms_err_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_network": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_corr_means": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_corr_none": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_axis_obs": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_axis_sim": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_observed": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_computed": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_point": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_corr_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_ts_point": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_calib_ts_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_full_row_count",
-                    "value": "{n} 行。",
-                    "english": "{n} rows."
-                },
-                "next_translated": {
-                    "key": "lpn_energy_no_price",
-                    "value": "未设置电价，因此此处所有费用均为零。请在“设置”、“能耗”中设置电价。",
-                    "english": "No price of power is stated, so every cost here is zero. Set one under Settings, Energy."
-                }
-            }
-        },
-        "lpn_analyze_menu": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_terrain_ids_more",
-                    "value": "{ids}，以及另外 {n} 个",
-                    "english": "{ids}, and {n} more"
-                },
-                "next_translated": {
-                    "key": "lpn_ff_menu",
-                    "value": "消防流量分析…",
-                    "english": "Fire flow analysis…"
-                }
-            }
-        },
-        "lpn_analyze_menu_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_terrain_ids_more",
-                    "value": "{ids}，以及另外 {n} 个",
-                    "english": "{ids}, and {n} more"
-                },
-                "next_translated": {
-                    "key": "lpn_ff_menu",
-                    "value": "消防流量分析…",
-                    "english": "Fire flow analysis…"
-                }
-            }
-        },
-        "lpn_ff_design_off": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_design_tip",
-                    "value": "这是一个独立的问题：抽取该流量后，是否有其他部位的压力低于其下限，或流速超过其限值？勾选此项不会增加额外的计算量。",
-                    "english": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation."
-                },
-                "next_translated": {
-                    "key": "lpn_ff_design_no_selection",
-                    "value": "设计校核范围已设置为“所选”，但目前未选中任何元件。请选择元件，或选择“全部”选项。",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
-                }
-            }
-        },
-        "lpn_ff_design_all": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_design_tip",
-                    "value": "这是一个独立的问题：抽取该流量后，是否有其他部位的压力低于其下限，或流速超过其限值？勾选此项不会增加额外的计算量。",
-                    "english": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation."
-                },
-                "next_translated": {
-                    "key": "lpn_ff_design_no_selection",
-                    "value": "设计校核范围已设置为“所选”，但目前未选中任何元件。请选择元件，或选择“全部”选项。",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
-                }
-            }
-        },
-        "lpn_ff_design_selected": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_design_tip",
-                    "value": "这是一个独立的问题：抽取该流量后，是否有其他部位的压力低于其下限，或流速超过其限值？勾选此项不会增加额外的计算量。",
-                    "english": "A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation."
-                },
-                "next_translated": {
-                    "key": "lpn_ff_design_no_selection",
-                    "value": "设计校核范围已设置为“所选”，但目前未选中任何元件。请选择元件，或选择“全部”选项。",
-                    "english": "The design check scope is set to Selected, but no assets are selected. Select assets or select the All option."
-                }
-            }
-        },
-        "lpn_ff_rows_more_links": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_rows_more",
-                    "value": "还有 {n} 个节点未显示。",
-                    "english": "Junctions not shown: {n}."
-                },
-                "next_translated": {
-                    "key": "lpn_ff_design_none",
-                    "value": "在任何节点抽取其消防流量期间，所选范围内没有任何部位超出限值。",
-                    "english": "Nothing in the chosen set went outside its limits while any junction drew its fire flow."
-                }
-            }
-        },
-        "lpn_crit_menu": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_menu_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_title": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_intro": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_scope": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_scope_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_scope_all": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_scope_selected": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_minpressure": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_minpressure_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_col_asset": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_col_unserved": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_col_cutoff": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_col_below": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_summary": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_baseline_below": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_working": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_stopped": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_no_selection": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_no_links": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_busy": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_skipped": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_stale": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_skipdead": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_skipdead_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_crit_skipped_dead": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
+                    "key": "lpn_sysflow_produced",
+                    "value": "产生",
+                    "english": "Produced"
                 }
             }
         },
@@ -3162,9 +928,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3178,9 +944,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3194,9 +960,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3210,9 +976,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3226,9 +992,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3242,9 +1008,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3258,9 +1024,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3274,9 +1040,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3290,9 +1056,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3306,9 +1072,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3322,9 +1088,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3338,9 +1104,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3354,9 +1120,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3370,9 +1136,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3386,9 +1152,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3402,9 +1168,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3418,25 +1184,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "导入测量点…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_ds_search_note_selected": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3450,9 +1200,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3466,9 +1216,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3482,9 +1232,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3498,9 +1248,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3514,9 +1264,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3530,9 +1280,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3546,9 +1296,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3562,9 +1312,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3578,9 +1328,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3594,9 +1344,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3610,9 +1360,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3626,9 +1376,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3642,9 +1392,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3658,9 +1408,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3674,9 +1424,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3690,9 +1440,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3706,9 +1456,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3722,9 +1472,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3738,9 +1488,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3754,9 +1504,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3770,9 +1520,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3786,9 +1536,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3802,9 +1552,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3818,9 +1568,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3834,9 +1584,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3845,14 +1595,14 @@
                 }
             }
         },
-        "lpn_ds_at_time": {
+        "lpn_analyze_at_time": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3861,14 +1611,14 @@
                 }
             }
         },
-        "lpn_ds_time_moved": {
+        "lpn_analyze_time_moved": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_ff_err_unknown",
-                    "value": "没有结果。返回的代码为 {code}。",
-                    "english": "No answer. The code reported was {code}."
+                    "key": "lpn_crit_skipped_dead",
+                    "value": "已跳过的死端连接线：{n}。每一条都会切断其后的一切。",
+                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
                 },
                 "next_translated": {
                     "key": "lpn_file_import_survey",
@@ -3879,12 +1629,8 @@
         }
     },
     "key_syn": {
-        "lpn_ff_design_off": "No design check",
-        "lpn_ff_design_all": "All other junctions and all pipes",
-        "lpn_ff_design_selected": "The selected junctions and their pipes",
         "lpn_ds_scope_tip": "Scale the demand at the junctions that you choose. Pressures are checked at the scaled demand.",
-        "lpn_ds_head_search_selected": "What demand can the junctions you choose handle",
-        "lpn_ds_search_note_selected": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the junctions that you choose keep the given lowest pressure allowed."
+        "lpn_ds_head_search_selected": "What demand can the junctions you choose handle"
     },
     "key_concepts": []
 }

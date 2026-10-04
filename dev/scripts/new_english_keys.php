@@ -36,6 +36,7 @@
  */
 
 $root = dirname(__DIR__, 2);
+require_once __DIR__ . '/syn_staleness.inc.php';
 $argvAll = $argv;
 $namesOnly = in_array('--names', $argvAll, true);
 $write = in_array('--write', $argvAll, true);
@@ -136,6 +137,7 @@ files — which is, by construction, every string that has been written and not 
         . "Write your answer on the flag's own line. Anything is fine; \"OK\" is enough.
 ";
     $out .= ecFrictionSection($root, $langCount);
+    $out .= ecSynSection($root, EC_RULING_FLAG);
     if (!$new) {
         return $out . "
 None on master. Every English key here is present in at least one other language.
@@ -557,7 +559,10 @@ function ecFrictionSection(string $root, int $langCount): string
             // been removed from all 27 files. The finding outlived the string it was about, which
             // is the friction log's own version of a stale claim. Dropped here rather than pruned
             // by hand, because the next one will happen the same way.
-            if (ecLangValueOf($root, (string)$e['key']) === null) { continue; }
+            // **BUT A KEY THAT LIVES ON AN UNMERGED BRANCH IS NOT GONE.** A Wave 0 filed on a branch's
+            // new keys is a question about English Tom has not seen anywhere else; dropping it left
+            // `friction_check.php` blocking a sprint on a question this file never showed him.
+            if (ecLangValueOf($root, (string)$e['key']) === null && ecBranchValueOf($root, (string)$e['key']) === null) { continue; }
             $e['_sprint'] = $sprint;
             $open[] = $e;
         }
@@ -583,6 +588,7 @@ function ecFrictionSection(string $root, int $langCount): string
         }
         $out .= "- **`" . $e['key'] . "`**\n";
         $val = ecLangValueOf($root, (string)$e['key']);
+        if ($val === null) { $val = ecBranchValueOf($root, (string)$e['key']); }
         if ($val !== null) {
             $out .= "  > " . str_replace("\n", "\n  > ", $val) . "\n";
         }
@@ -595,7 +601,15 @@ function ecFrictionSection(string $root, int $langCount): string
             }
         }
         $out .= ecAskLine($e);
-        $out .= "  " . EC_RULING_FLAG . "\n";
+        /* An answered finding that nobody has dispositioned yet still blocks the sprint, but the
+         * work left is CC's, so it is not put in front of him again with a flag. */
+        $answered = isset($e['human_answer']) ? trim((string) $e['human_answer']) : '';
+        if ($answered !== '') {
+            $out .= "  _Ruled " . (isset($e['human_answered']) ? $e['human_answered'] : '') . ": "
+                . str_replace("\n", ' ', $answered) . "_\n";
+        } else {
+            $out .= "  " . EC_RULING_FLAG . "\n";
+        }
     }
     return $out;
 }
@@ -653,6 +667,19 @@ function ecAskLine(array $e): string
     return $out;
 }
 
+/** English for a key that exists only on an unmerged branch, or null. Cached per process. */
+function ecBranchValueOf(string $root, string $key): ?string
+{
+    static $all = null;
+    if ($all === null) {
+        $all = array();
+        foreach (ecBranchNewKeys($root) as $info) {
+            foreach ($info['keys'] as $k => $v) { if (!isset($all[$k])) { $all[$k] = $v; } }
+        }
+    }
+    return isset($all[$key]) ? $all[$key] : null;
+}
+
 /** The current English for a key, or null. Read fresh so a finding can never quote a stale string. */
 function ecLangValueOf(string $root, string $key): ?string
 {
@@ -660,7 +687,7 @@ function ecLangValueOf(string $root, string $key): ?string
     if ($lang === null) {
         $lang = array();
         $src = (string)file_get_contents($root . '/lib/lang.ec.en.php');
-        if (preg_match_all("/\\\$ec_lang\\['([a-z0-9_]+)'\\]='((?:[^'\\\\]|\\\\.)*)';/", $src, $m, PREG_SET_ORDER)) {
+        if (preg_match_all("/\\\$ec_lang\\['([a-z0-9_]+)'\\]\\s*=\\s*'((?:[^'\\\\]|\\\\.)*)';/", $src, $m, PREG_SET_ORDER)) {
             foreach ($m as $hit) {
                 $lang[$hit[1]] = str_replace(array("\\'", '\\\\'), array("'", '\\'), $hit[2]);
             }

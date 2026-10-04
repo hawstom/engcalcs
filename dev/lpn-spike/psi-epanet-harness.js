@@ -1,4 +1,4 @@
-// PSI ON THE LOOPED NETWORK PAGE IS EPANET'S PSI (Tom, 2026-10-03). Run: node dev/lpn-spike/psi-epanet-harness.js
+// PSI, KPA AND BAR ON THE LOOPED NETWORK PAGE ARE EPANET'S (Tom, 2026-10-03). Run: node dev/lpn-spike/psi-epanet-harness.js
 //
 // EPANET's PSIperFT is 0.4333; the exact value is 0.4335275. validate.js proves Net1/2/3 junction
 // pressures match EPANET's report through EngCalcs.EPANET_PSI_PER_M. THIS file proves the page and
@@ -36,8 +36,18 @@ ok('one foot of head reads 0.4333 psi on the page',
 ok('lib/Units.lib.php still holds the exact psi for the other calculators',
 	Math.abs(exactPsi - 1.4223343307119563) < 1e-15 && Math.abs(exactPsi * FT - 0.4335275) < 1e-6, String(exactPsi));
 ok('metres of water are untouched', EngCalcs.unitFactor('mh2o') === 1);
-ok('kPa and bar are untouched (EPANET reports metres in SI)',
-	EngCalcs.unitFactor('kpa') === stubTable.kpa && stubTable.kpa === 9.80665);
+const KPA = EPA * 6.895 / FT;
+ok('the page\'s kPa factor is EPANET\'s: 0.4333 * 6.895 / 0.3048 = 9.80185',
+	Math.abs(EngCalcs.unitFactor('kpa') - KPA) < 1e-12 && Math.abs(KPA - 9.80185) < 1e-5, String(EngCalcs.unitFactor('kpa')));
+ok('one psi reads 6.895 kPa on the page',
+	Math.abs(EngCalcs.unitFactor('kpa') / EngCalcs.unitFactor('psi') - 6.895) < 1e-12);
+ok('lib/Units.lib.php still holds the exact kPa for the other calculators', stubTable.kpa === 9.80665);
+const BAR = EPA * 0.068948 / FT;
+ok('the page\'s bar factor is EPANET\'s: 0.4333 * 0.068948 / 0.3048',
+	Math.abs(EngCalcs.unitFactor('bar') - BAR) < 1e-12 && Math.abs(BAR - 0.098018) < 1e-5, String(EngCalcs.unitFactor('bar')));
+ok('one psi reads 0.068948 bar on the page',
+	Math.abs(EngCalcs.unitFactor('bar') / EngCalcs.unitFactor('psi') - 0.068948) < 1e-12);
+ok('lib/Units.lib.php still holds the exact bar for the other calculators', stubTable.bar === 0.0980665);
 
 // 3. the neighbours
 const toHead = EngCalcs.lpnFireFlowPsiToHead;

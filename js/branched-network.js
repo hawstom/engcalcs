@@ -694,7 +694,7 @@ EngCalcs.addBranchedNetworkLine = function (id, upstream, length, diameter, roug
 		var trs = document.getElementById('CalcsBody').getElementsByTagName('tr'),
 			cell = trs[trs.length - 1].querySelector('td[name="bpn_up"]');
 		if (cell) {
-			cell.innerHTML = '<span style="color:#888">' + this.bpnEscapeSvg(EngCalcs.pageConfig.bpn_source_label || 'Source') + '</span>';
+			cell.innerHTML = '<span style="color:var(--ec-gray-888)">' + this.bpnEscapeSvg(EngCalcs.pageConfig.bpn_source_label || 'Source') + '</span>';
 		}
 	}
 };

@@ -528,3 +528,9 @@ N+5. **A check that flags one English string holding both a select word and an o
   lapses the ruling. Hold the copy edits until his `tom` column is back.
 - **Shorten the three long menu-item tips** (`lpn_tables_menu_tip`, `lpn_run_menu_tip`,
   `lpn_reports_menu_tip`); a menu has no room for a glyph.
+
+
+- **Show a reader the Tables pane toggle before building 757.** Two candidate placements (header toggle vs
+  right-click row); one five-minute look at where a first-time user reaches. SPECULATION until then.
+- **Fetch Material 3 tooltips and Spectrum tooltip/contextual-help pages by another route** (both were
+  unreadable on 2026-10-03), so the two-tier claim does not rest on search excerpts.
