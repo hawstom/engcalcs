@@ -436,6 +436,15 @@ button > .ec-icon, a > .ec-icon, label > .ec-icon { margin-inline-end: 0.4em; }
 	pointer-events: none;
 }
 
+/* **WIDE TIPS, NOT TALL ONES** (Tom, 2026-10-04, on Ida's audit). Bootstrap's 200 px cap turned a
+   long tip into a column taller than half the window: 92 words stood 554 px high in a 900 px one.
+   17rem, the happy medium Tom asked for between the old 200 px and a 22rem trial,
+   makes the same tip under 400 px high. Capped at the viewport less a gutter, so a phone in
+   tall mode never gets a tip wider than its screen. */
+.tooltip {
+	--bs-tooltip-max-width: min(17rem, calc(100vw - 2rem));
+}
+
 /* The welcome line under the page title (template_welcome). Set apart with italics
    rather than the >> ... << that used to be typed into all 27 language strings: those
    are not standard English or typography (Tom, 2026-07-27), they are directional
