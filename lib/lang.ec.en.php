@@ -3223,6 +3223,13 @@ $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Background image opacity (0 to 1)';
+// Task 617: a display-time filter on the street or satellite tiles only; the drawing and the credit are untouched.
+$ec_lang['lpn_settings_basemap_style']='Basemap style';
+$ec_lang['lpn_settings_basemap_style_tip']='Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.';
+$ec_lang['lpn_basemap_style_normal']='Normal';
+$ec_lang['lpn_basemap_style_muted']='Muted';
+$ec_lang['lpn_basemap_style_faded']='Faded';
+$ec_lang['lpn_basemap_style_grayscale']='Grayscale';
 $ec_lang['lpn_settings_map_display']='Appearance';
 $ec_lang_syn['lpn_settings_map_display']='How the map looks (appearance, style, the way it is drawn) — sizes, opacity, position.';
 // PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned

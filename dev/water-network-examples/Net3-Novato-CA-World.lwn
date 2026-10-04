@@ -2614,6 +2614,7 @@
 		"linkWidth": 4,
 		"symbolOpacity": 1,
 		"backdropOpacity": 0.5,
+		"basemapStyle": "muted",
 		"labelMaxWidth": 65000,
 		"alignPipeLabels": true,
 		"labelFlipLeftOfVertical": 20,

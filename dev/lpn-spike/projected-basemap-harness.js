@@ -66,7 +66,7 @@ const L = loadLoopedNetwork(
 	"\t\tapplyView: applyView, currentView: currentView,\n" +
 	"\t\tassignCrs: assignProjectCrs, crsCode: projectCrsCode,\n" +
 	"\t\tisGeo: isLatLonProject, isProjected: isProjectedProject,\n" +
-	"\t\tbasemapOn: basemapOn, setBasemapStyle: setBasemapStyle,\n" +
+	"\t\tbasemapOn: basemapOn, setBasemapSource: setBasemapSource,\n" +
 	"\t\trefreshBasemap: refreshBasemap,\n" +
 	// **THE WANTED SET, NOT THE LAYER'S CHILDREN, SINCE 2026-09-19.** The layer now also holds the
 	// PREVIOUS view's tiles while the new ones load, so that a zoom does not blank the map (Tom's
@@ -611,7 +611,7 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			L.worldMapAttach();
 			ok('**Attach on a map already showing LEAVES IT SHOWING**', L.worldMapAttached() === true
 				&& L.basemapOn() === true);
-			L.setBasemapStyle('satellite');
+			L.setBasemapSource('satellite');
 			L.worldMapDetach();
 			ok('Detach hides it', L.worldMapAttached() === false);
 			ok('...then Attach is live and Detach greyed', sub()[0].disabled !== true
@@ -619,7 +619,7 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 			L.worldMapAttach();
 			ok('...and Attach brings back SATELLITE, the style that was showing', L.basemapOn()
 				&& L.getProject().basemap === 'satellite', L.getProject().basemap);
-			L.setBasemapStyle('osm');
+			L.setBasemapSource('osm');
 		}
 
 		L.newProject(null, ZONE12N);
@@ -642,7 +642,7 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		ok('...and Attach turns the tiles on with no wizard', (function () {
 			const q = global.EngCalcs.lpnCrsForward(ZONE12N, PHOENIX);
 			L.applyView({ cx: L.inwardX(q.x), cy: L.inwardY(q.y), s: 0.2 });
-			L.setBasemapStyle('off');
+			L.setBasemapSource('off');
 			L.worldMapAttach();
 			return L.worldMapAttached() === true && L.tiles().length > 0;
 		}()), L.tiles().length + ' tiles');
@@ -653,7 +653,7 @@ function ready() { return new Promise((res) => global.EngCalcs.lpnCrsLoad(res));
 		ok('...while pressing it actually paints satellite tiles once switched', (function () {
 			const q = global.EngCalcs.lpnCrsForward(ZONE12N, PHOENIX);
 			L.applyView({ cx: L.inwardX(q.x), cy: L.inwardY(q.y), s: 0.2 });
-			L.setBasemapStyle('satellite');
+			L.setBasemapSource('satellite');
 			return L.tiles().length > 0
 				&& L.tiles().every((t) => /mapbox/.test(String(t.href)));
 		}()), L.tiles().length + ' tiles');
