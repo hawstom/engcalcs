@@ -29413,7 +29413,7 @@ var EngCalcs = EngCalcs || {};
 		reader.onload = function (ev) { loadProfileFileText(String(ev.target.result)); };
 		reader.onerror = function () {
 			var pc = EngCalcs.pageConfig || {};
-			alert(pc.lpn_survey_read_error || 'That file could not be read from your disk.');
+			setWarning(pc.lpn_survey_read_error || 'That file could not be read from your disk.');
 		};
 		reader.readAsText(file);
 	}
