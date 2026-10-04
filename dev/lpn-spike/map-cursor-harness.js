@@ -215,7 +215,7 @@ function classOn() { return svg.classList.contains('lpn-placemode'); }
 // `zoom-window` joins them for Task 682's own reason: its whole output IS a coordinate ring too,
 // the drag-a-box that answers "zoom to here" rather than "place a junction here".
 const CROSSHAIR = ['add-junction', 'add-reservoir', 'add-tank', 'add-pipe', 'add-pump',
-	'add-valve', 'add-meter', 'add-text', 'select-area', 'zoom-window'];
+	'add-valve', 'add-meter', 'add-text', 'add-chain', 'select-area', 'zoom-window'];
 // NOT crosshair, each for its own stated reason: `select` acts on the object under the pointer,
 // `delete` does too (so `pointer` is the true thing to say), and `vertices` already states its own
 // rule per element in the stylesheet.

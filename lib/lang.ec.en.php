@@ -782,6 +782,8 @@ $ec_lang['lpn_tool_add_pump']='Pump';
 // alone teach nobody and the words alone are longer than a modeller wants to read every time.
 $ec_lang['lpn_tool_add_valve']='Valve';
 $ec_lang['lpn_tool_add_text']='Text';
+// Junction and Pipe (Task 719): Tom's WaterCAD command, a junction, a pipe, a junction, a pipe, until Escape.
+$ec_lang['lpn_tool_add_chain']='Junction Pipe Chain';
 $ec_lang['lpn_tool_vertices']='Vertices';
 // ---- CUSTOMERS: metered demands, lumped at the nearest node (ROADMAP Task 247) ----
 // **THE FEATURE IS CALLED CUSTOMER AND NOTHING A PERSON READS SAYS METER** (Tom, 2026-09-18:
@@ -1340,6 +1342,7 @@ $ec_lang['lpn_tip_join']='{name} — {tip}';
 // with a keyboard handler. It is appended to each tool's own tip rather than written into it.
 $ec_lang['lpn_tool_key_hint']='Shortcut: {key}';
 $ec_lang['lpn_tool_key_hint_two']='Shortcut: {key} or {key2}';
+$ec_lang['lpn_tool_add_chain_tip']='Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.';
 // Edited by TGH 2026-09-07; the Shift sentence rewritten 2026-09-08 on his ruling that Shift keeps
 // the selection and toggles what the shape catches (it used to say "add").
 $ec_lang['lpn_tool_area_tip']='Follow on-screen wizard. Press again to cycle through window, lasso, and polygon. Hold Shift to keep existing selection set and add or remove (toggle) what you select.';
@@ -2582,6 +2585,7 @@ $ec_lang['lpn_mode_add_valve']='Mode: Add Valve. Select a start node and then an
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='Mode: Add Text. Specify a location on the map to place a Text. Specify a location near a node to attach the Text to that node. Switch to Select mode to change or move assets and labels.';
+$ec_lang['lpn_mode_add_chain']='Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.';
 // Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
 // most likely to miss the point of -- that Select is what you use to edit/move things, and that a
 // label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
