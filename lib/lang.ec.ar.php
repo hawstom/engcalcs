@@ -1402,7 +1402,6 @@ $ec_lang['lpn_goto_on_map']='عرض على الخريطة';
 $ec_lang['lpn_pane_select_on_map']='تحديد على الخريطة';
 $ec_lang['lpn_pane_unselect_on_map']='إلغاء التحديد على الخريطة';
 $ec_lang['lpn_pane_print']='طباعة الجدول';
-$ec_lang['lpn_pane_print_tip']='يطبع الجدول الذي تنظر إليه، مع اسم المشروع واسم الجدول والوحدات في العناوين. تُطبع الصفوف بالترتيب الذي فرزتها إليه.';
 
 // **HIDE MAP READOUTS IS RETIRED, 2026-09-22** (Tom: "Hide map readouts was a print prep command.
 // But it isn't very useful any more. Let's remove it."). lpn_clean_map, lpn_clean_map_off and
@@ -3151,7 +3150,6 @@ $ec_lang['lpn_labels_customer_width_tip']='تُرسم تسميات المشتر�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='استخدام المنظور الحالي';
 $ec_lang['lpn_settings_page']='الصفحة';
-$ec_lang['lpn_settings_page_note']='محفوظ في هذه الحاسبة، لا في المشروع.';
 $ec_lang['lpn_settings_hydraulics']='الهيدروليكا';
 $ec_lang['lpn_settings_quality']='جودة المياه';
 $ec_lang['lpn_settings_quality_track']='نوع تحليل الجودة';
