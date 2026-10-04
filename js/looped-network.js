@@ -9330,7 +9330,15 @@ var EngCalcs = EngCalcs || {};
 			row(pc.lpn_contour_dem || 'Ground between nodes from Mapbox DEM', check('lpn_contour_dem', contourTerrainWanted(), function (on, c) {
 				// THE QUESTION IS ASKED HERE AND NOWHERE ELSE: a redraw never asks, so a no is never
 				// asked again on the next solve. A no unticks the box and stores nothing.
-				if (on && EngCalcs.lpnTerrainAskForContour && !EngCalcs.lpnTerrainAskForContour()) { c.checked = false; on = false; }
+				if (on && EngCalcs.lpnTerrainAskForContour) {
+					// Unticked until the answer, so a No has nothing to take back.
+					c.checked = false;
+					EngCalcs.lpnTerrainAskForContour(function (yes) {
+						c.checked = !!yes;
+						settings.contourTerrain = !!yes; contourChanged();
+					});
+					return;
+				}
 				settings.contourTerrain = on; contourChanged();
 			}), pc.lpn_contour_dem_tip);
 		}
@@ -31128,12 +31136,20 @@ var EngCalcs = EngCalcs || {};
 		}
 		var lost = 0;
 		keys.forEach(function (k) { lost += overrideCountForElement(k); });
-		if (lost && !window.confirm((pc.lpn_delete_drops_overrides || 'Deleting this asset also throws away {n} values that your scenarios hold for it. Continue?').replace('{n}', lost))) { return; }
-		saveUndoSnapshot();
-		if (kind === 'node') { deleteNode(id); }
-		else if (kind === 'label') { deleteLabelById(id); }
-		else { deleteLink(id); }
-		refreshScenarioStatus();
+		function proceed() {
+			// Asked in the page's box (Task 710), so a multi-delete's later cascade may have taken this
+			// one while the question was open.
+			if (!(kind === 'node' ? nodeById(id) : kind === 'label' ? labelById(id) : linkById(id))) { return; }
+			saveUndoSnapshot();
+			if (kind === 'node') { deleteNode(id); }
+			else if (kind === 'label') { deleteLabelById(id); }
+			else { deleteLink(id); }
+			refreshScenarioStatus();
+		}
+		if (!lost) { proceed(); return; }
+		askDialog({ kind: 'confirm', text: (pc.lpn_delete_drops_overrides || 'Deleting this asset also throws away {n} values that your scenarios hold for it. Continue?').replace('{n}', lost) }, function (yes) {
+			if (yes) { proceed(); }
+		});
 	}
 	function deleteNode(id) {
 		var links = incidentLinks[id].slice(), i, orphaned = 0;
@@ -31850,7 +31866,7 @@ var EngCalcs = EngCalcs || {};
 			// answers a document that cannot be opened the same way, and this is that plus a refusal
 			// to write. The quota message keeps the status line alone: there the work is still on
 			// screen and still editable, so a modal per failed autosave would be unusable.
-			if (!unreadableTold) { unreadableTold = true; alert(said); }
+			if (!unreadableTold) { unreadableTold = true; askDialog({ kind: 'alert', text: said }); }
 			return;
 		}
 		setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.');
@@ -31941,32 +31957,34 @@ var EngCalcs = EngCalcs || {};
 	// is the rule for every command that appears in both a menu and a control.
 	function wipeEverything() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!window.confirm(pc.lpn_confirm_wipe || 'Start fresh, and delete EVERYTHING saved for this page: every project, every background image, all settings, and your unit choices? The page reloads exactly as a brand-new visitor would see it. This cannot be undone.')) { return; }
-		wipeAllStorage();
-		// **AND THE CONSENT RECORD ITSELF, PLUS WHAT IT GATES.** A brand-new visitor has never
-		// answered the banner, so ec_consent has to go, not just be set to refused -- and
-		// ec_consent's own JS mirror only ever WRITES an answer (Consent.lib.php), never erases
-		// one, while ec_blang and ec_seen are HttpOnly by design (config.inc.php) and JS cannot
-		// reach them at all. consent.php's `ec_wipe` is the one door for this (ecConsentForget(),
-		// which reuses ecForgetAnalyticsStorage() rather than a second cookie list) -- and that
-		// request's own redirect back to this page IS the reload the confirm promised, so there
-		// is no separate window.location.reload() to race it.
-		var form = document.createElement('form');
-		form.method = 'post';
-		// Through suiteUrl(), the one door every suite page addressed from JS goes through.
-		form.action = suiteUrl('consent.php');
-		// `hidden`, not `style.display = 'none'` -- this is a throwaway navigation carrier, not a
-		// panel, and panel-touch-harness.js polices that exact string as "nothing hides a panel
-		// except hidePanel()".
-		form.hidden = true;
-		[['ec_wipe', '1'], ['return', window.location.pathname + window.location.search]].forEach(function (pair) {
-			var field = document.createElement('input');
-			field.name = pair[0];
-			field.value = pair[1];
-			form.appendChild(field);
+		askDialog({ kind: 'confirm', text: pc.lpn_confirm_wipe || 'Start fresh, and delete EVERYTHING saved for this page: every project, every background image, all settings, and your unit choices? The page reloads exactly as a brand-new visitor would see it. This cannot be undone.' }, function (yes) {
+			if (!yes) { return; }
+			wipeAllStorage();
+			// **AND THE CONSENT RECORD ITSELF, PLUS WHAT IT GATES.** A brand-new visitor has never
+			// answered the banner, so ec_consent has to go, not just be set to refused -- and
+			// ec_consent's own JS mirror only ever WRITES an answer (Consent.lib.php), never erases
+			// one, while ec_blang and ec_seen are HttpOnly by design (config.inc.php) and JS cannot
+			// reach them at all. consent.php's `ec_wipe` is the one door for this (ecConsentForget(),
+			// which reuses ecForgetAnalyticsStorage() rather than a second cookie list) -- and that
+			// request's own redirect back to this page IS the reload the confirm promised, so there
+			// is no separate window.location.reload() to race it.
+			var form = document.createElement('form');
+			form.method = 'post';
+			// Through suiteUrl(), the one door every suite page addressed from JS goes through.
+			form.action = suiteUrl('consent.php');
+			// `hidden`, not `style.display = 'none'` -- this is a throwaway navigation carrier, not a
+			// panel, and panel-touch-harness.js polices that exact string as "nothing hides a panel
+			// except hidePanel()".
+			form.hidden = true;
+			[['ec_wipe', '1'], ['return', window.location.pathname + window.location.search]].forEach(function (pair) {
+				var field = document.createElement('input');
+				field.name = pair[0];
+				field.value = pair[1];
+				form.appendChild(field);
+			});
+			document.body.appendChild(form);
+			form.submit();
 		});
-		document.body.appendChild(form);
-		form.submit();
 	}
 	// Time-ordered prefix plus randomness: sortable for debugging, and collision-free even when two
 	// projects are created in the same millisecond in two tabs.
@@ -36870,7 +36888,7 @@ var EngCalcs = EngCalcs || {};
 		if (target.stale) {
 			var warnStale = (pc.lpn_saveas_overwrites_newer || 'That file has changed since you last saw it, so somebody else has almost certainly saved to it. Saving here replaces their version with yours. Continue?')
 				.replace('{name}', target.name || (pc.lpn_lock_somebody || 'Somebody else'));
-			if (!window.confirm(warnStale)) { return; }
+			if (!(await askDialogP({ kind: 'confirm', text: warnStale }))) { return; }
 		}
 		if (target.foreign) {
 			// Nobody has it open -- or nobody we can ASK, which from here is the same thing. Still a
@@ -36878,7 +36896,7 @@ var EngCalcs = EngCalcs || {};
 			// works with the broker down, which is the entire point.
 			var warn = (pc.lpn_saveas_overwrites_project || 'That file already holds a different project, {name}. Saving here replaces it completely. Continue?')
 				.replace('{name}', target.name || (pc.lpn_lock_somebody || 'Somebody else'));
-			if (!window.confirm(warn)) { return; }
+			if (!(await askDialogP({ kind: 'confirm', text: warn }))) { return; }
 		}
 		// Writing somewhere new makes this a DIFFERENT document, so it needs its own lock key: a copy
 		// and its original must never contend over one lock, and a copy must never be able to abort
@@ -36930,7 +36948,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, id = library.openId;
 		var entry = indexEntry(id), handle = handleFor(id);
 		if (!entry || !handle) { return; }
-		if (!window.confirm((pc.lpn_revert_confirm || 'Throw away the changes you have made and load {file} again from the disk?').replace('{file}', entry.fileName))) { return; }
+		if (!(await askDialogP({ kind: 'confirm', text: (pc.lpn_revert_confirm || 'Throw away the changes you have made and load {file} again from the disk?').replace('{file}', entry.fileName) }))) { return; }
 		var text;
 		try { text = await (await handle.getFile()).text(); }
 		catch (err) { setFileError(true); return; }
@@ -37146,7 +37164,7 @@ var EngCalcs = EngCalcs || {};
 	async function askForLockedFile(saved) {
 		var pc = EngCalcs.pageConfig || {};
 		var docId = saved.project && saved.project.docId;
-		var initials = window.prompt(pc.lpn_lock_ask_prompt || 'Who should we say is asking? Your initials are ideal. They are kept with this file\'s lock on our server, for whoever has it open, and deleted within 30 days.', '');
+		var initials = await askDialogP({ kind: 'prompt', text: pc.lpn_lock_ask_prompt || 'Who should we say is asking? Your initials are ideal. They are kept with this file\'s lock on our server, for whoever has it open, and deleted within 30 days.', value: '' });
 		// Backed out: nothing sent, and nothing opened -- and it says so, for the same reason the
 		// Cancel button below does (Task 704). A dialog closing on its own is not an answer.
 		if (initials === null) {
@@ -40927,13 +40945,14 @@ var EngCalcs = EngCalcs || {};
 				label: renameLabel,
 				fn: function () {
 					if (isFileProject(entry)) { saveAs(); return; }
-					var v = window.prompt(pc.lpn_prompt_project_name || 'Name for this project', entry.name || '');
-					if (v === null) { return; }
-					renameProject(id, v.trim());
-					// Here rather than inside renameProject(), which a future caller could reach
-					// programmatically: what this records is a PERSON deciding on a name.
-					if (EngCalcs.logNamingEvent) { EngCalcs.logNamingEvent('rename'); }
-					renderTabs();
+					askDialog({ kind: 'prompt', text: pc.lpn_prompt_project_name || 'Name for this project', value: entry.name || '' }, function (v) {
+						if (v === null) { return; }
+						renameProject(id, v.trim());
+						// Here rather than inside renameProject(), which a future caller could reach
+						// programmatically: what this records is a PERSON deciding on a name.
+						if (EngCalcs.logNamingEvent) { EngCalcs.logNamingEvent('rename'); }
+						renderTabs();
+					});
 				}
 			},
 			{
@@ -40941,11 +40960,12 @@ var EngCalcs = EngCalcs || {};
 				label: pc.lpn_tab_duplicate || 'Duplicate',
 				fn: function () {
 					var suggested = projectDisplayName(entry) + ' ' + (pc.lpn_project_copy_suffix || '(copy)');
-					var v = window.prompt(pc.lpn_prompt_project_name || 'Name for this project', suggested);
-					if (v === null) { return; }
-					if (id !== library.openId) { openProject(id); }
-					saveProjectAs(v.trim());
-					renderTabs();
+					askDialog({ kind: 'prompt', text: pc.lpn_prompt_project_name || 'Name for this project', value: suggested }, function (v) {
+						if (v === null) { return; }
+						if (id !== library.openId) { openProject(id); }
+						saveProjectAs(v.trim());
+						renderTabs();
+					});
 				}
 			},
 			{ separator: true },
@@ -41224,6 +41244,11 @@ var EngCalcs = EngCalcs || {};
 			focus: function () { return field; }
 		});
 	}
+	// The same question as a Promise, for the async file commands, so `await` holds the command
+	// exactly where the native confirm() used to.
+	function askDialogP(req) {
+		return new Promise(function (resolve) { askDialog(req, resolve); });
+	}
 	EngCalcs.lpnAsk = askDialog;
 	function wireTabs() {
 		// Dismiss the menu, and the view popovers, on any click that is not inside them. The dialog is
@@ -41388,38 +41413,40 @@ var EngCalcs = EngCalcs || {};
 	// selection model is single-element. Until multi-select exists, this named command IS that route.
 	function deleteNetwork() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!window.confirm(pc.lpn_confirm_delete_network || 'Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.')) { return; }
-		doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
-		nextId = newNextId();
-		// Empties the PROJECT, so the container resets with the network: scenarios back to Base alone,
-		// since their overrides key element IDs that no longer exist. Preferences survive.
-		//
-		// **The NAME and the docId survive too** (Task 211). Wiping them leaves the tab you are
-		// looking at nameless, and makes a file project a different document to the lock broker.
-		// Clearing the canvas is not the same act as throwing the project away -- that is Close.
-		scenarios = defaultScenarios();
-		// **`coords` SURVIVES, like the name and the docId.** Emptying the drawing is not a change of
-		// what kind of document this is -- and it is the one property that cannot be re-chosen later.
-		project = { name: project.name, docId: project.docId, coords: project.coords,
-			// **AND SO DOES `crs`, on exactly the same argument** (Task 641): emptying the drawing
-			// does not change what plane it was drawn in, and it is the other property that can
-			// never be re-chosen.
-			crs: project.crs, activeScenario: 'base' };
-		// The backdrop is deliberately NOT removed -- see the note above the function.
-		// saveToStorage(), NOT removeItem(): labelSettings/settings are preferences, not network
-		// content, and must survive "New / Clear". removeItem() wipes them out of localStorage too,
-		// leaving them intact only in memory until some later unrelated mutation saves again.
-		saveToStorage();
-		lastSolveResult = null;
-		closePopup();
-		buildDom();
-		updateEmptyHint();
-		setStatus('');
-		setMode('select');
-		refreshScenarioStatus();
-		// **NO FIT HERE.** An empty drawing has no extent, so bbox() falls back to a 0-10 square and
-		// the "fit" is a zoom to an invented ten-unit box. The reader keeps the view they were
-		// looking at: there is nothing to look at, and where they were is where they will draw.
+		askDialog({ kind: 'confirm', text: pc.lpn_confirm_delete_network || 'Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.' }, function (yes) {
+			if (!yes) { return; }
+			doc = { nodes: [], links: [], labels: [], customers: [], origin: { x: 0, y: 0 } };
+			nextId = newNextId();
+			// Empties the PROJECT, so the container resets with the network: scenarios back to Base alone,
+			// since their overrides key element IDs that no longer exist. Preferences survive.
+			//
+			// **The NAME and the docId survive too** (Task 211). Wiping them leaves the tab you are
+			// looking at nameless, and makes a file project a different document to the lock broker.
+			// Clearing the canvas is not the same act as throwing the project away -- that is Close.
+			scenarios = defaultScenarios();
+			// **`coords` SURVIVES, like the name and the docId.** Emptying the drawing is not a change of
+			// what kind of document this is -- and it is the one property that cannot be re-chosen later.
+			project = { name: project.name, docId: project.docId, coords: project.coords,
+				// **AND SO DOES `crs`, on exactly the same argument** (Task 641): emptying the drawing
+				// does not change what plane it was drawn in, and it is the other property that can
+				// never be re-chosen.
+				crs: project.crs, activeScenario: 'base' };
+			// The backdrop is deliberately NOT removed -- see the note above the function.
+			// saveToStorage(), NOT removeItem(): labelSettings/settings are preferences, not network
+			// content, and must survive "New / Clear". removeItem() wipes them out of localStorage too,
+			// leaving them intact only in memory until some later unrelated mutation saves again.
+			saveToStorage();
+			lastSolveResult = null;
+			closePopup();
+			buildDom();
+			updateEmptyHint();
+			setStatus('');
+			setMode('select');
+			refreshScenarioStatus();
+			// **NO FIT HERE.** An empty drawing has no extent, so bbox() falls back to a 0-10 square and
+			// the "fit" is a zoom to an invented ten-unit box. The reader keeps the view they were
+			// looking at: there is nothing to look at, and where they were is where they will draw.
+		});
 	}
 
 	function init() {
@@ -42192,8 +42219,12 @@ var EngCalcs = EngCalcs || {};
 	// this function and its toolbar button once satisfied with how the debounce/solve holds up.
 	function drawTestGrid() {
 		if (doc.nodes.length > 0) {
-			if (!window.confirm('This will add to the existing network. Continue?')) { return; }
+			askDialog({ kind: 'confirm', text: 'This will add to the existing network. Continue?' }, function (yes) { if (yes) { drawTestGridNow(); } });
+			return;
 		}
+		drawTestGridNow();
+	}
+	function drawTestGridNow() {
 		saveUndoSnapshot();
 		var SIZE = 8, SPACING = 20, grid = [], row, col, n, demand = niceDefault('lpn_u_flow', 'gpm', 5, 0.0003);
 		for (row = 0; row < SIZE; row++) {
@@ -46516,20 +46547,22 @@ var EngCalcs = EngCalcs || {};
 			var msg = (pc.lpn_push_confirm || 'Replace these properties on every existing asset with the values now set for new assets? Values you have typed will be overwritten. You can undo this.')
 				+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
 				+ '\n' + (pc.lpn_push_assets || 'Nodes and pipes:') + ' ' + targets;
-			if (!window.confirm(msg)) { return; }
-			saveUndoSnapshot();
-			doc.nodes.forEach(function (n) {
-				active.forEach(function (s) { if (s.group === 'node' && s.applies(n)) { s.set(n, settings.defaults[s.key]); } });
+			askDialog({ kind: 'confirm', text: msg }, function (yes) {
+				if (!yes) { return; }
+				saveUndoSnapshot();
+				doc.nodes.forEach(function (n) {
+					active.forEach(function (s) { if (s.group === 'node' && s.applies(n)) { s.set(n, settings.defaults[s.key]); } });
+				});
+				doc.links.forEach(function (l) {
+					active.forEach(function (s) { if (s.group === 'link' && s.applies(l)) { s.set(l, settings.defaults[s.key]); } });
+				});
+				// refreshPopupIfOpen() because an open element popup is now showing stale numbers for
+				// the very element that just changed under it.
+				refreshPopupIfOpen();
+				requestLabelRefresh();
+				scheduleSolve();
+				saveToStorage();
 			});
-			doc.links.forEach(function (l) {
-				active.forEach(function (s) { if (s.group === 'link' && s.applies(l)) { s.set(l, settings.defaults[s.key]); } });
-			});
-			// refreshPopupIfOpen() because an open element popup is now showing stale numbers for
-			// the very element that just changed under it.
-			refreshPopupIfOpen();
-			requestLabelRefresh();
-			scheduleSolve();
-			saveToStorage();
 		});
 		defBody.appendChild(pushBtn);
 		defBody.appendChild(document.createElement('br'));
@@ -47086,27 +47119,34 @@ var EngCalcs = EngCalcs || {};
 			// the stored number is what the user typed -- except that here we ASK first, because
 			// there is no unit strip to make the change self-evident afterwards.
 			if (doc.links.some(function (l) { return l.type !== 'pump'; })) {
-				if (!confirm(pc.lpn_method_switch_confirm
-					|| 'Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?')) {
-					methodSelect.value = was;
-					return;
-				}
+				// The select shows the old method until the answer: a No leaves nothing to put back.
+				methodSelect.value = was;
+				askDialog({ kind: 'confirm', text: pc.lpn_method_switch_confirm
+					|| 'Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?' }, function (yes) {
+					if (!yes) { return; }
+					methodSelect.value = now;
+					switchMethod();
+				});
+				return;
 			}
-			settings.method = now;
-			// The DEFAULT follows the method -- future elements only, never existing ones, per the
-			// Default inputs section's own stated rule. Without this, a user who switches to Manning
-			// and draws a pipe gets C = 130 as an n.
-			settings.defaults.roughness = defaultRoughnessFor(now);
-			applyMethodUI();
-			saveToStorage();
-			// Rebuild rather than patch: the roughness row's LABEL and its unit both changed, and so
-			// did this select's own read of frictionMethod(). THE WHOLE BOX, not just this section
-			// -- roughnessLabel() also names a Labels checkbox and a Coloring field, and those two
-			// carried the old method's symbol until the box was next opened from scratch.
-			rebuildSettingsBox();
-			refreshPopupIfOpen();
-			refreshMapStatus();
-			scheduleSolve();
+			switchMethod();
+			function switchMethod() {
+				settings.method = now;
+				// The DEFAULT follows the method -- future elements only, never existing ones, per the
+				// Default inputs section's own stated rule. Without this, a user who switches to Manning
+				// and draws a pipe gets C = 130 as an n.
+				settings.defaults.roughness = defaultRoughnessFor(now);
+				applyMethodUI();
+				saveToStorage();
+				// Rebuild rather than patch: the roughness row's LABEL and its unit both changed, and so
+				// did this select's own read of frictionMethod(). THE WHOLE BOX, not just this section
+				// -- roughnessLabel() also names a Labels checkbox and a Coloring field, and those two
+				// carried the old method's symbol until the box was next opened from scratch.
+				rebuildSettingsBox();
+				refreshPopupIfOpen();
+				refreshMapStatus();
+				scheduleSolve();
+			}
 		});
 		row(compBody, pc.bpn_method || 'Friction method', methodSelect, pc.bpn_roughness_tip);
 		hydNumberRow('accuracy', 'lpn_settings_accuracy', 'Accuracy',
@@ -47157,28 +47197,30 @@ var EngCalcs = EngCalcs || {};
 		restoreBtn.textContent = pc.calc_defaults || 'Restore defaults';
 		helpTip(restoreBtn, pc.lpn_settings_restore_tip);
 		restoreBtn.addEventListener('click', function () {
-			if (!window.confirm(pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own.')) { return; }
-			settings = defaultSettings();
-			// defaultSettings() leaves settings.defaults full of nulls on purpose -- refill them
-			// here, or every default input would come back blank instead of at its starting value.
-			seedDefaultInputs();
-			labelSettings = defaultLabelSettings();
-			roughnessDecimalsAuto = 0;
-			// No applyMapHeight() -- the canvas height stopped being a setting when the Map height
-			// row was retired, and it is a fact about the ENVIRONMENT (Tom, 2026-08-15: *"Map bottom
-			// has nothing to do with the model at all. It's the environment."*). Restoring defaults
-			// cannot change how much room the window has.
-			applyLegendPosition();
-			refreshFontSizes();
-			// refreshLabelText(), not renderLabelsLegend(): resetting labelSettings changes which
-			// fields are printed and what prefix each carries, so the labels themselves have to be
-			// rebuilt -- and that call renders the legend on its way through. Restoring defaults
-			// used to redraw only the legend, which left the map showing the old label set.
-			requestLabelRefresh();
-			// The whole box: defaultSettings() resets the colour field, the ramp and the legend
-			// positions too, and the colour controls were showing the old ones.
-			rebuildSettingsBox();
-			saveToStorage();
+			askDialog({ kind: 'confirm', text: pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own.' }, function (yes) {
+				if (!yes) { return; }
+				settings = defaultSettings();
+				// defaultSettings() leaves settings.defaults full of nulls on purpose -- refill them
+				// here, or every default input would come back blank instead of at its starting value.
+				seedDefaultInputs();
+				labelSettings = defaultLabelSettings();
+				roughnessDecimalsAuto = 0;
+				// No applyMapHeight() -- the canvas height stopped being a setting when the Map height
+				// row was retired, and it is a fact about the ENVIRONMENT (Tom, 2026-08-15: *"Map bottom
+				// has nothing to do with the model at all. It's the environment."*). Restoring defaults
+				// cannot change how much room the window has.
+				applyLegendPosition();
+				refreshFontSizes();
+				// refreshLabelText(), not renderLabelsLegend(): resetting labelSettings changes which
+				// fields are printed and what prefix each carries, so the labels themselves have to be
+				// rebuilt -- and that call renders the legend on its way through. Restoring defaults
+				// used to redraw only the legend, which left the map showing the old label set.
+				requestLabelRefresh();
+				// The whole box: defaultSettings() resets the colour field, the ramp and the legend
+				// positions too, and the colour controls were showing the old ones.
+				rebuildSettingsBox();
+				saveToStorage();
+			});
 		});
 		tail.appendChild(restoreBtn);
 		// "Wipe memory" (Tom, 2026-07-30, temporary): the full reset above the URL-param path
@@ -50893,9 +50935,9 @@ var EngCalcs = EngCalcs || {};
 	function libCurveTsv(pts) {
 		return (pts || []).map(function (p) { return String(p[0]) + '\t' + String(p[1]); }).join('\n');
 	}
-	// **THE PROMPT IS NOT A FALLBACK NOBODY NEEDS.** navigator.clipboard is absent on a page served
+	// **THE COPY BOX IS NOT A FALLBACK NOBODY NEEDS.** navigator.clipboard is absent on a page served
 	// over plain http and refused where the gesture is not trusted, and a Copy button that silently
-	// does nothing is worse than no button. The prompt hands over the same text, selectable.
+	// does nothing is worse than no button. The question box hands over the same text, selected.
 	function libCopyOut(text) {
 		var pc = EngCalcs.pageConfig || {};
 		try {
@@ -50904,9 +50946,7 @@ var EngCalcs = EngCalcs || {};
 				return true;
 			}
 		} catch (e) { /* fall through to the prompt */ }
-		if (typeof window !== 'undefined' && window.prompt) {
-			window.prompt(pc.lpn_library_curve_copy_manual || 'Copy these points', text);
-		}
+		askDialog({ kind: 'copy', text: pc.lpn_library_curve_copy_manual || 'Copy these points', value: text });
 		return false;
 	}
 	/**
@@ -53293,26 +53333,28 @@ var EngCalcs = EngCalcs || {};
 				.replace('{n}', '0').replace('{skipped}', String(skipped)));
 			return;
 		}
-		if (!window.confirm((pc.lpn_confirm_apply_prefix || 'Rename {n} assets so their IDs start with {prefix}? Each one keeps its number.')
-			.replace('{n}', String(plan.length)).replace('{prefix}', prefix))) { return; }
-		saveUndoSnapshot();
-		// Phase 1 parks every one of them on an id nothing can answer to: '#' is rejected by
-		// validateNewId()'s rules for a typed id, so no user-authored id can be sitting on one.
-		plan.forEach(function (step, i) {
-			step.tmp = '#tmp' + i;
-			if (step.isNode) { applyNodeRename(step.id, step.tmp); } else { applyLinkRename(step.id, step.tmp); }
+		askDialog({ kind: 'confirm', text: (pc.lpn_confirm_apply_prefix || 'Rename {n} assets so their IDs start with {prefix}? Each one keeps its number.')
+			.replace('{n}', String(plan.length)).replace('{prefix}', prefix) }, function (yes) {
+			if (!yes) { return; }
+			saveUndoSnapshot();
+			// Phase 1 parks every one of them on an id nothing can answer to: '#' is rejected by
+			// validateNewId()'s rules for a typed id, so no user-authored id can be sitting on one.
+			plan.forEach(function (step, i) {
+				step.tmp = '#tmp' + i;
+				if (step.isNode) { applyNodeRename(step.id, step.tmp); } else { applyLinkRename(step.id, step.tmp); }
+			});
+			plan.forEach(function (step) {
+				if (step.isNode) { applyNodeRename(step.tmp, step.want); } else { applyLinkRename(step.tmp, step.want); }
+			});
+			// The next element drawn must not land on a number now in use.
+			if (nextId[key] === undefined || nextId[key] <= highest) { nextId[key] = highest + 1; }
+			if (currentPopup) { closePopup(); }   // it names an id that may no longer exist
+			requestLabelRefresh();
+			scheduleSolve();
+			saveToStorage();
+			setNotice((pc.lpn_prefix_applied || 'Renamed {n} assets. {skipped} others were left alone.')
+				.replace('{n}', String(plan.length)).replace('{skipped}', String(skipped)));
 		});
-		plan.forEach(function (step) {
-			if (step.isNode) { applyNodeRename(step.tmp, step.want); } else { applyLinkRename(step.tmp, step.want); }
-		});
-		// The next element drawn must not land on a number now in use.
-		if (nextId[key] === undefined || nextId[key] <= highest) { nextId[key] = highest + 1; }
-		if (currentPopup) { closePopup(); }   // it names an id that may no longer exist
-		requestLabelRefresh();
-		scheduleSolve();
-		saveToStorage();
-		setNotice((pc.lpn_prefix_applied || 'Renamed {n} assets. {skipped} others were left alone.')
-			.replace('{n}', String(plan.length)).replace('{skipped}', String(skipped)));
 	}
 	/**
 	 * The read-only water-quality row.
