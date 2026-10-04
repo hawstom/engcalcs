@@ -48487,6 +48487,9 @@ var EngCalcs = EngCalcs || {};
 		el.lpnDockList = list;
 		el.classList.toggle('lpn-dock-grip-live', x !== null);
 		if (x === null) { return; }
+		// In front of a flown-out box, whose own stacking number is above the strip's.
+		el.style.zIndex = String((list.length === 1 && list[0].box.classList.contains('lpn-dock-out'))
+			? (Number(list[0].box.style.zIndex) || 0) + 1 : '');
 		el.style.left = Math.round(x) + 'px';
 		el.style.top = Math.round(y) + 'px';
 		el.style.height = Math.round(h) + 'px';
@@ -48494,10 +48497,13 @@ var EngCalcs = EngCalcs || {};
 	// Dragging the column's inner edge sets the width of every box docked in it, together.
 	function wireDockGrip(el, side) {
 		var from = null;
+		el.addEventListener('pointerenter', function () { if (dockFlyout) { clearTimeout(dockTimer); } });
+		el.addEventListener('pointerleave', function () { if (dockFlyout && !el.lpnDragging) { dockTuckLater(dockFlyout); } });
 		el.addEventListener('pointerdown', function (e) {
 			var list = el.lpnDockList || [];
 			if (!list.length) { return; }
 			from = { x: e.clientX, w: list[0].box.getBoundingClientRect().width, list: list };
+			el.lpnDragging = true;
 			try { if (el.setPointerCapture) { el.setPointerCapture(e.pointerId); } } catch (err) { /* resize without capture */ }
 			e.preventDefault();
 		});
@@ -48514,6 +48520,8 @@ var EngCalcs = EngCalcs || {};
 				if (!from) { return; }
 				from.list.forEach(function (d) { if (d.save) { d.save(); } });
 				from = null;
+				el.lpnDragging = false;
+				if (dockFlyout) { dockTuckLater(dockFlyout); }
 			});
 		});
 	}
@@ -48579,7 +48587,7 @@ var EngCalcs = EngCalcs || {};
 		room = (outerR - outerL) - LPN_DOCK_MAP_MIN - col.left.strip - col.right.strip;
 		n = (col.left.w ? 1 : 0) + (col.right.w ? 1 : 0);
 		['left', 'right'].forEach(function (s) {
-			var S = sides[s], c = col[s], x, each;
+			var S = sides[s], c = col[s], x, each, w;
 			if (c.w) { c.w = clampDockW(c.w, Math.floor(room / n)); }
 			want[s] = c.strip + c.w;
 			x = s === 'left' ? outerL + c.strip : outerR - c.strip - c.w;
@@ -48594,7 +48602,14 @@ var EngCalcs = EngCalcs || {};
 				dockPlace(d, ax, top, w, h, d === dockFlyout ? 'out' : 'tucked');
 			});
 			renderDockStrip(s, S.auto, s === 'left' ? outerL : outerR - c.strip, top, h);
-			placeDockGrip(s, c.w ? (s === 'left' ? outerL + c.strip + c.w : outerR - c.strip - c.w) : null, top, h, S.pinned);
+			// A box flown out of its tab is the frontmost thing on its side, so its edge is the one a
+			// reader reaches for; otherwise the pinned column's. The flown-out box is alone in its list.
+			if (dockFlyout && S.auto.indexOf(dockFlyout) >= 0) {
+				w = clampDockW(dockFlyout.rec.dockW, Math.floor(outerR - outerL - c.strip - LPN_DOCK_STRIP_W));
+				placeDockGrip(s, s === 'left' ? outerL + c.strip + w : outerR - c.strip - w, top, h, [dockFlyout]);
+			} else {
+				placeDockGrip(s, c.w ? (s === 'left' ? outerL + c.strip + c.w : outerR - c.strip - c.w) : null, top, h, S.pinned);
+			}
 		});
 		if (want.left !== dockMargins.left || want.right !== dockMargins.right) {
 			dockMargins = want;
@@ -48604,8 +48619,14 @@ var EngCalcs = EngCalcs || {};
 		}
 	}
 	// ---- the flyout ----
+	// The width grip of a flown-out box: pointer on it, or a drag of it under way.
+	function dockGripHeld(d) {
+		var g = d.box.classList.contains('lpn-dock-out') ? dockGripEl(dockSideOf(d)) : null;
+		if (!g || g.lpnDockList !== undefined && g.lpnDockList[0] !== d) { return false; }
+		return !!g.lpnDragging || g.matches(':hover');
+	}
 	function dockPointerOver(d) {
-		try { return d.box.matches(':hover') || (!!d.tab && d.tab.matches(':hover')); } catch (e) { return false; }
+		try { return d.box.matches(':hover') || (!!d.tab && d.tab.matches(':hover')) || dockGripHeld(d); } catch (e) { return false; }
 	}
 	function dockFlyOut(d, focusIn) {
 		var f;
@@ -48637,10 +48658,25 @@ var EngCalcs = EngCalcs || {};
 	}
 	function dockOutsidePress(e) {
 		var d = dockFlyout, t = e.target;
-		if (!d || !t || d.box.contains(t) || (d.tab && d.tab.contains(t))) { return; }
+		if (!d || !t || d.box.contains(t) || (d.tab && d.tab.contains(t)) || (t.classList && t.classList.contains('lpn-dock-grip'))) { return; }
 		// A press inside a tip that box raised is still the box's.
 		if (t.closest && t.closest('.tooltip, .popover')) { return; }
 		dockTuck(d);
+	}
+	// **A PRESS ANYWHERE ELSE CLOSES A BOX'S `?` TIP** (Tom, 2026-10-04: *"It doesn't close when I
+	// click the box title bar."*). The glyph takes keyboard focus, and the tip's `focus` trigger
+	// holds it open until the focus leaves -- but a press on a box's title band is a drag handle
+	// that cancels the press's default, so the browser never moves the focus and the tip stays.
+	// Judged on the press, in the capture phase, so no handler that stops the event can hide it.
+	function dockCloseHelpTips(e) {
+		var t = e.target;
+		dockBoxes.forEach(function (d) {
+			var tip;
+			if (!d.help || (t && d.help.contains && d.help.contains(t))) { return; }
+			tip = (window.bootstrap && bootstrap.Tooltip && bootstrap.Tooltip.getInstance) ? bootstrap.Tooltip.getInstance(d.help) : null;
+			if (tip) { tip.hide(); }
+			if (document.activeElement === d.help && d.help.blur) { d.help.blur(); }
+		});
 	}
 	function wireDockTab(d) {
 		var tab = document.createElement('button');
@@ -48710,6 +48746,7 @@ var EngCalcs = EngCalcs || {};
 			['lpn_notes_popup', notesboxLayout, saveNotesboxLayout, LPN_NOTESBOX_KEY],
 			['lpn_hotkeys_popup', hotkeysboxLayout, saveHotkeysboxLayout, LPN_HOTKEYSBOX_KEY]
 		].forEach(function (r) { registerDockBox(r[0], r[1], r[2], r[3], r[4]); });
+		document.addEventListener('pointerdown', dockCloseHelpTips, true);
 		dockWasSmall = smallScreen();
 		window.addEventListener('resize', function () {
 			var small = smallScreen();

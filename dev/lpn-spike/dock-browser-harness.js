@@ -309,6 +309,25 @@ async function sectionAutohide(Session, browser) {
 		await a.page.mouse.move(g.box.l + 60, g.box.t + 200, { steps: 4 });
 		await a.settle(600);
 		ok('...it stays out while the pointer is on it', (await geom(a.page, 'lpn_settings_box')).visible);
+		const gripBox = async () => a.page.evaluate(() => {
+			const e = document.getElementById('lpn_dock_grip_right'), r = e ? e.getBoundingClientRect() : null;
+			return { live: !!e && e.classList.contains('lpn-dock-grip-live') && getComputedStyle(e).display !== 'none',
+				x: r && r.left + r.width / 2, y: r && r.top + r.height / 2, w: r && r.width };
+		});
+		const gb = await gripBox();
+		const wBefore = (await geom(a.page, 'lpn_settings_box')).box.r - (await geom(a.page, 'lpn_settings_box')).box.l;
+		const hit = await a.page.evaluate((p) => { const e = document.elementFromPoint(p.x, p.y); return e && e.id; }, gb);
+		ok('a flown-out box shows its width grip, in front, on its inner edge', gb.live && hit === 'lpn_dock_grip_right', JSON.stringify({ gb, hit }));
+		await a.page.mouse.move(gb.x, gb.y, { steps: 3 });
+		await a.page.mouse.down();
+		await a.page.mouse.move(gb.x - 80, gb.y, { steps: 5 });
+		await a.settle(700);
+		ok('...a drag on it widens the box and the box stays out', (await geom(a.page, 'lpn_settings_box')).visible);
+		await a.page.mouse.up();
+		await a.settle(200);
+		g = await geom(a.page, 'lpn_settings_box');
+		ok('...by the distance dragged', Math.abs((g.box.r - g.box.l) - (wBefore + 80)) <= 4, String(g.box.r - g.box.l) + ' from ' + wBefore);
+		ok('...and the width is recorded', (await stored(a.page, 'lpn_setbox')).dockW === Math.round(g.box.r - g.box.l));
 		await a.page.mouse.move(200, 400, { steps: 4 });
 		await a.settle(800);
 		ok('...and tucks away once the pointer has left it', !(await geom(a.page, 'lpn_settings_box')).visible);
@@ -379,6 +398,11 @@ async function sectionHelp(Session, browser) {
 			return t ? t.textContent : null;
 		});
 		await shot(a.page, 'q5-help');
+		const tb = await a.page.evaluate(() => { const r = document.querySelector('#lpn_ff_box .lpn-setbox-title').getBoundingClientRect(); return { x: r.left + 8, y: r.top + r.height / 2 }; });
+		await a.page.mouse.click(tb.x, tb.y);
+		await a.settle(400);
+		const still = await a.page.evaluate(() => { const h = document.querySelector('#lpn_ff_box .lpn-corner-help'); return !!h.getAttribute('aria-describedby') && !!document.getElementById(h.getAttribute('aria-describedby')); });
+		ok('a click on the box title bar closes the ? tip', !still);
 		ok('the keyboard reaching the ? shows the tip', !!shown && shown.indexOf((await a.lang('lpn_ff_menu_tip')).slice(0, 20)) >= 0, String(shown).slice(0, 60));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally {
