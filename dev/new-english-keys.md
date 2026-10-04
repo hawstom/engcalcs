@@ -256,8 +256,11 @@ never edits a synonym.
 
 ## lpn_  (46, 5 to read @@ NEEDS RULING)
 
-- **`lpn_ds_at_time`**
+- **`lpn_analyze_at_time`**
   > Time step: {time}.
+  _Ruled OK 2026-10-03._
+- **`lpn_analyze_time_moved`**
+  > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
   _Ruled OK 2026-10-03._
 - **`lpn_ds_bad_multiplier`**
   > Type a demand scale of zero or more, such as 1.5.
@@ -382,9 +385,6 @@ never edits a synonym.
 - **`lpn_ds_stale`**
   > The drawing changed, so the demand scaling results were cleared. Run it again.
   _Ruled OK 2026-10-03._
-- **`lpn_ds_time_moved`**
-  > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
-  _Ruled OK 2026-10-03._
 - **`lpn_ds_title`**
   > Demand scaling
   _Ruled OK 2026-10-03._
@@ -399,7 +399,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**12 still to read**, of 24 new keys across 12 unmerged branch(es).
+**10 still to read**, of 22 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -410,18 +410,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/analyze-clock-spec (`9ff4ac0a`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_analyze_at_time`**
-  > Time step: {time}.
-  @@ NEEDS RULING
-- **`lpn_analyze_time_moved`**
-  > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
-  @@ NEEDS RULING
-
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dialog-audit (`6e1a76a2`) — adds no English strings
+### feat/dialog-audit (`8b42bf67`) — adds no English strings
 
 ### feat/dock (`1365f0f3`) — 4 new, 4 to read @@ NEEDS RULING
 
