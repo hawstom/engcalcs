@@ -485,11 +485,11 @@
    "pin_note": "He tested the head that serves the preview, 42b5df39, which already includes a merge of master."
   },
   "feat/scenario-option": {
-   "head": "c3f82b7df06e2e97718e33c489c15d191a7edc59",
+   "head": "c70083bd79ccfc1b902d2db2d4cdddbfa8801a2e",
    "date": "2026-10-04",
    "words": "8111 the \"Calculation options\" heading and the fixed double tip:  Done. Close, merge, and delete branch.",
    "context": "His own pasted message, 2026-10-04 late evening, after his browser pass.",
-   "pin_note": "He tested f0d9897a; the pin adds only a merge of master (conflicts resolved as master code with the branch override wording) and a regenerated keys list."
+   "pin_note": "He tested f0d9897a; the pin adds only a merge of master (conflicts resolved as master code with the branch override wording) and a regenerated keys list. Re-pinned one commit later: c70083bd changes only dev/lpn-spike/solve-time-message-harness.js (the harness hands the page its own run times), stated here rather than glossed."
   },
   "feat/pda": {
    "head": "eced4030f12df0f205e16fb958fa08f5c34fc1ab",
