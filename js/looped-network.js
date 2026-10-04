@@ -4480,7 +4480,7 @@ var EngCalcs = EngCalcs || {};
 	// promise that nothing was touched.
 	function customPropFlagText(def, problem) {
 		var pc = EngCalcs.pageConfig || {};
-		return String(pc.lpn_cp_flag || '{label}: {reason} The value is kept exactly as you typed it.')
+		return String(pc.lpn_cp_flag || '{label}: {reason} The value is kept exactly as you entered it.')
 			.split('{label}').join(customPropLabel(def))
 			.split('{reason}').join(problem);
 	}
@@ -13931,7 +13931,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
 		reader.onload = function (ev) {
 			var w = parseWorldFile(ev.target.result);
-			if (!w) { alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.'); return; }
+			if (!w) { alert(pc.lpn_backdrop_scale_entry_bad || 'Enter one number for the size of one pixel on the map, or paste all six lines of a world file.'); return; }
 			if (!w.ok) { alert(pc.lpn_backdrop_wld_bad || 'This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.'); return; }
 			applyWorldFile(w);
 		};
@@ -14011,7 +14011,7 @@ var EngCalcs = EngCalcs || {};
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {}, clicks = [];
 		setRegMode(true);
-		alert(pc.lpn_backdrop_scale_prompt1 || 'Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.');
+		alert(pc.lpn_backdrop_scale_prompt1 || 'Click two points on the background image, such as the two ends of a bar scale. Then enter the real distance between them.');
 		var handler = function (e) {
 			clicks.push(worldToImageLocal(screenToWorld(e.clientX, e.clientY)));
 			if (clicks.length === 2) {
@@ -14105,7 +14105,7 @@ var EngCalcs = EngCalcs || {};
 				return;
 			}
 		}
-		alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.');
+		alert(pc.lpn_backdrop_scale_entry_bad || 'Enter one number for the size of one pixel on the map, or paste all six lines of a world file.');
 	}
 	// WE NEVER ASK FOR A WORLD FILE AS A FILE -- we ask for a paste of its CONTENTS, or for the image
 	// and its sidecar picked together in the one picker (readWorldFile). A sidecar cannot be
@@ -14153,7 +14153,7 @@ var EngCalcs = EngCalcs || {};
 			hidePanel(panel);
 			if (mode === 'coords') {
 				activeCancel = null; setRegMode(false);
-				var txt = prompt((pc.lpn_backdrop_coords_prompt || 'Type the X,Y that point should move to') + ' (' + unitLabel('lpn_u_length') + '):', '');
+				var txt = prompt((pc.lpn_backdrop_coords_prompt || 'Enter the X,Y that point should move to') + ' (' + unitLabel('lpn_u_length') + '):', '');
 				var parts = (txt || '').split(',').map(Number);
 				// The one ENTRY site (Task 274): what the user types is Cartesian, and positionTo()
 				// works in the internal Y-down frame.
@@ -15145,7 +15145,7 @@ var EngCalcs = EngCalcs || {};
 			: (pc.lpn_georef_step2 || 'Step 2 of 2 — precise');
 		georefBarEl('lpn_georef_hint').textContent = detached
 			? (pc.lpn_georef_step1_hint || 'Your project stays where it is on the screen. Pan and zoom the map underneath it until the ground behind it is roughly the right place and roughly the right size, then press the Put the model here button.')
-			: (pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to rotate it. Or type the ground distance and the rotation angle below.');
+			: (pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to rotate it. Or enter the ground distance and the rotation angle below.');
 		georefBarEl('lpn_georef_drop').style.display = detached ? '' : 'none';
 		georefBarEl('lpn_georef_detach').textContent = pc.lpn_georef_detach || 'Pick it up again';
 		georefBarEl('lpn_georef_detach').style.display = detached ? 'none' : '';
@@ -15885,7 +15885,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (!georef) { return; }
 		georef.pick = null;
-		setNotice(pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to rotate it. Or type the ground distance and the rotation angle below.');
+		setNotice(pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, drag a corner to resize it, drag the round handle above the model to rotate it. Or enter the ground distance and the rotation angle below.');
 	}
 	// **AND ESC PUTS THE TOOL DOWN, AT EITHER STEP** (Tom, 2026-09-08: *"Change to 'Press again to
 	// cancel'. Esc might be nice too at any step."*). The button was already a toggle and the tip
@@ -16776,7 +16776,7 @@ var EngCalcs = EngCalcs || {};
 		mapgeoWorldFit(ext);
 		mapgeoSet(project.georef);
 		refreshMapStatus();
-		setNotice(pc.lpn_mapgeo_intro || 'Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.');
+		setNotice(pc.lpn_mapgeo_intro || 'Your drawing is on a map of the whole world, in the ocean at zero latitude and zero longitude. Find your own place first: pan and zoom the map behind the drawing, search for a place name, or enter a latitude and longitude. The drawing itself does not move.');
 	}
 	/**
 	 * **IS THE WORLD MAP ROW USABLE AT ALL?** True for a plain grid (its own wizard places it), a
@@ -16928,7 +16928,7 @@ var EngCalcs = EngCalcs || {};
 		// one overwrites project.georef with the whole world at 0 N 0 E, because a drawing nobody
 		// has placed honestly sits nowhere. Here the existing placement stays and the map opens on
 		// it; Cancel still restores `prev` exactly as before.
-		setNotice(pc.lpn_mapgeo_readjust_intro || 'Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or type a latitude and longitude. The drawing itself does not move.');
+		setNotice(pc.lpn_mapgeo_readjust_intro || 'Your drawing is where you last placed it. To move it somewhere else, pan and zoom the map behind the drawing, search for a place name, or enter a latitude and longitude. The drawing itself does not move.');
 	}
 	/**
 	 * Scale from the current size: a typed factor, applied at once, with no wizard at all.
@@ -16953,7 +16953,7 @@ var EngCalcs = EngCalcs || {};
 		if (answer === null) { return; }
 		f = parseFloat(String(answer).replace(',', '.'));
 		if (!(f > 0) || !isFinite(f)) {
-			setNotice(pc.lpn_map_attach_scale_from_bad || 'Type a single number greater than zero.');
+			setNotice(pc.lpn_map_attach_scale_from_bad || 'Enter a single number greater than zero.');
 			return;
 		}
 		ext = mapgeoExtent();
@@ -17110,14 +17110,14 @@ var EngCalcs = EngCalcs || {};
 			? (pc.lpn_mapgeo_step1 || 'Step 1 of 2: find your place in the world')
 			: (pc.lpn_mapgeo_step2 || 'Step 2 of 2: fit the map behind your drawing');
 		mapgeoBarEl('lpn_mapgeo_hint').textContent = world1
-			? (pc.lpn_mapgeo_hint1 || 'Pan and zoom the map behind your drawing, or search for a place, or type a latitude and longitude. Then press Place approximately.')
+			? (pc.lpn_mapgeo_hint1 || 'Pan and zoom the map behind your drawing, or search for a place, or enter a latitude and longitude. Then press Place approximately.')
 			: (pc.lpn_mapgeo_hint2 || 'Drag anywhere to slide the map under your drawing. Your drawing and every coordinate in it stay exactly where they are. Press Georeference here when the map is right.');
 		// Step 2 only, both of them: in step 1 the drag and the wheel both spend on the map, so
 		// there is no split to state and a sentence about one would be noise.
 		mapgeoBarEl('lpn_mapgeo_hint_gestures').textContent = world1 ? '' :
 			(pc.lpn_mapgeo_gestures || 'Zoom moves your drawing and the map together, so you can see how well they line up. Dragging moves the map only.');
 		mapgeoBarEl('lpn_mapgeo_hint_dial').textContent = world1 ? '' :
-			(pc.lpn_mapgeo_dial_help || 'Slide the two bars, or type in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change. Arrow keys work on both.');
+			(pc.lpn_mapgeo_dial_help || 'Slide the two bars, or enter numbers in the boxes above them, to make the map bigger or smaller and to rotate it. The middle of each bar keeps the fit from step 1, so 1 and 0 mean no change. Arrow keys work on both.');
 		mapgeoShow('lpn_mapgeo_search', world1);
 		mapgeoShow('lpn_mapgeo_goto', world1);
 		mapgeoShow('lpn_mapgeo_place', world1);
@@ -20183,7 +20183,7 @@ var EngCalcs = EngCalcs || {};
 				!findOpIsExtreme(findState.op) && !findOpIsValueless(findState.op) &&
 				findState.op !== 'contains') {
 			findResults = [];
-			renderFindResults(pc.lpn_find_no_value || 'Type what to look for.');
+			renderFindResults(pc.lpn_find_no_value || 'Enter what to look for.');
 			return;
 		}
 		findResults = findMatches();
@@ -20878,7 +20878,7 @@ var EngCalcs = EngCalcs || {};
 		// replaceValueOf() is the one place that difference is decided.
 		if (!replaceIsDem() && replaceValueOf(replaceSpec(replaceState.prop)) === undefined) {
 			replacePending = null;
-			renderReplace(pc.lpn_replace_no_value || 'Type the new value.');
+			renderReplace(pc.lpn_replace_no_value || 'Enter the new value.');
 			return;
 		}
 		// The result list is re-run and redrawn beside the preview, so the rows on screen are the
@@ -23274,7 +23274,7 @@ var EngCalcs = EngCalcs || {};
 				hintTip: function (c) {
 					var id = customerLink(c) ? '' : suggestCustomerLink(c);
 					return id ? String(pc.lpn_field_meter_pipe_suggest ||
-						'The nearest asset is {id}. Type it here to serve this customer from it.')
+						'The nearest asset is {id}. Enter it here to serve this customer from it.')
 						.split('{id}').join(id) : '';
 				},
 				get: function (c) { var l = customerLink(c); return (l && !customerAtNodeEnd(c)) ? l.id : ''; },
@@ -42624,7 +42624,7 @@ var EngCalcs = EngCalcs || {};
 					// so rather than leaving the reader to find it. Selecting a meter still opens
 					// its own box for the one-off case.
 					setNotice(String((EngCalcs.pageConfig || {}).lpn_meter_placed ||
-						'Customer {id} added. Its description and demand are typed in the Customers table, or press it in Select to open its box.')
+						'Customer {id} added. Its description and demand are entered in the Customers table, or press it in Select to open its box.')
 						.split('{id}').join(madeC.id));
 					return;
 				}
@@ -46317,7 +46317,7 @@ var EngCalcs = EngCalcs || {};
 			// something to guess at. Assembled from already-translated label text plus two short
 			// heading keys, with no plural agreement anywhere: "Elements: 17" needs no plural rule,
 			// while "17 pipes and 5 junctions" would need one in every target language.
-			var msg = (pc.lpn_push_confirm || 'Replace these properties on every existing asset with the values now set for new assets? Values you have typed will be overwritten. You can undo this.')
+			var msg = (pc.lpn_push_confirm || 'Replace these properties on every existing asset with the values now set for new assets? Values you have entered will be overwritten. You can undo this.')
 				+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
 				+ '\n' + (pc.lpn_push_assets || 'Nodes and pipes:') + ' ' + targets;
 			if (!window.confirm(msg)) { return; }
@@ -46891,7 +46891,7 @@ var EngCalcs = EngCalcs || {};
 			// there is no unit strip to make the change self-evident afterwards.
 			if (doc.links.some(function (l) { return l.type !== 'pump'; })) {
 				if (!confirm(pc.lpn_method_switch_confirm
-					|| 'Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?')) {
+					|| 'Changing the friction method does not change the roughness numbers already entered on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?')) {
 					methodSelect.value = was;
 					return;
 				}
@@ -60213,7 +60213,7 @@ var EngCalcs = EngCalcs || {};
 		if (dsBusy || !EngCalcs.lpnDemandScaleRun || dsBusyElsewhere()) { return Promise.resolve(null); }
 		m = ffValue(dsAsk.multiplier, null);
 		if (!(m >= 0)) {
-			setNotice(pc.lpn_ds_bad_multiplier || 'Type a demand scale of zero or more, such as 1.5.');
+			setNotice(pc.lpn_ds_bad_multiplier || 'Enter a demand scale of zero or more, such as 1.5.');
 			return Promise.resolve(null);
 		}
 		c = demandScaleCase('scale');

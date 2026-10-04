@@ -489,7 +489,7 @@
 		}
 		var query = String(text == null ? '' : text).trim();
 		if (!query) {
-			notice(t('lpn_search_empty', 'Type a place name to search for.'));
+			notice(t('lpn_search_empty', 'Enter a place name to search for.'));
 			return;
 		}
 		if (!gated && !mayWeSend()) { return; }
