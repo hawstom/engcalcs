@@ -972,6 +972,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<div class="lpn-popover-body">
 	<div id="lpn_popup_title"></div>
 	<div id="lpn_popup_fields"></div>
+	<?php // The time series of one property of this element over the run (Task 637, revised by Tom
+	      // 2026-09-29). Built by propGraphSync(), and hidden whenever there is no run to draw. ?>
+	<div id="lpn_popup_graph" class="lpn-pgraph" style="display:none"></div>
 	</div>
 	<button type="button" id="lpn_popup_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">×</button>
 </div>
@@ -2192,6 +2195,11 @@ EngCalcs.pageConfig = {
 	lpn_ts_no_frames: <?=json_encode($ec_lang['lpn_ts_no_frames'])?>,
 	lpn_ts_summary: <?=json_encode($ec_lang['lpn_ts_summary'])?>,
 	lpn_ts_axis_time: <?=json_encode($ec_lang['lpn_ts_axis_time'])?>,
+	lpn_pgraph_none: <?=json_encode($ec_lang['lpn_pgraph_none'])?>,
+	lpn_pgraph_source_share_from: <?=json_encode($ec_lang['lpn_pgraph_source_share_from'])?>,
+	lpn_result_pump_head: <?=json_encode($ec_lang['lpn_result_pump_head'])?>,
+	lpn_result_pump_head_tip: <?=json_encode($ec_lang['lpn_result_pump_head_tip'])?>,
+	lpn_report_pump_head: <?=json_encode($ec_lang['lpn_report_pump_head'])?>,
 	lpn_freq_menu: <?=json_encode($ec_lang['lpn_freq_menu'])?>,
 	lpn_freq_tip: <?=json_encode($ec_lang['lpn_freq_tip'])?>,
 	lpn_freq_group_tip: <?=json_encode($ec_lang['lpn_freq_group_tip'])?>,

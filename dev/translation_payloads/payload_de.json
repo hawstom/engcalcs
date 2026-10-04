@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 2327,
-        "delta_key_count": 46,
+        "expected_key_count": 2332,
+        "delta_key_count": 51,
         "exempt_key_count": 51,
         "exempt_keys": [
             "calc_units_us",
@@ -731,6 +731,11 @@
     },
     "keys_to_translate": {
         "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
+        "lpn_pgraph_none": "This asset has no results in the current run.",
+        "lpn_pgraph_source_share_from": "Source share from {node}",
+        "lpn_result_pump_head": "Head",
+        "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
+        "lpn_report_pump_head": "Pump head",
         "lpn_sysflow_title": "Flow balance",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
@@ -779,6 +784,11 @@
     },
     "keys": {
         "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
+        "lpn_pgraph_none": "This asset has no results in the current run.",
+        "lpn_pgraph_source_share_from": "Source share from {node}",
+        "lpn_result_pump_head": "Head",
+        "lpn_result_pump_head_tip": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
+        "lpn_report_pump_head": "Pump head",
         "lpn_sysflow_title": "Flow balance",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
@@ -839,6 +849,86 @@
                     "key": "lpn_profile_tip",
                     "value": "Zeichnet das Gelände und die Druckhöhenlinie entlang eines Wegs durch das Netz.",
                     "english": "Draw the ground and the hydraulic grade line along a path through the network."
+                }
+            }
+        },
+        "lpn_pgraph_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ts_quantity_tip",
+                    "value": "Welcher Wert über die Zeit aufgezeichnet wird.",
+                    "english": "Which value to graph against time."
+                },
+                "next_translated": {
+                    "key": "lpn_ts_add",
+                    "value": "Auswahl hinzufügen",
+                    "english": "Add selected"
+                }
+            }
+        },
+        "lpn_pgraph_source_share_from": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ts_quantity_tip",
+                    "value": "Welcher Wert über die Zeit aufgezeichnet wird.",
+                    "english": "Which value to graph against time."
+                },
+                "next_translated": {
+                    "key": "lpn_ts_add",
+                    "value": "Auswahl hinzufügen",
+                    "english": "Add selected"
+                }
+            }
+        },
+        "lpn_result_pump_head": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ts_quantity_tip",
+                    "value": "Welcher Wert über die Zeit aufgezeichnet wird.",
+                    "english": "Which value to graph against time."
+                },
+                "next_translated": {
+                    "key": "lpn_ts_add",
+                    "value": "Auswahl hinzufügen",
+                    "english": "Add selected"
+                }
+            }
+        },
+        "lpn_result_pump_head_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ts_quantity_tip",
+                    "value": "Welcher Wert über die Zeit aufgezeichnet wird.",
+                    "english": "Which value to graph against time."
+                },
+                "next_translated": {
+                    "key": "lpn_ts_add",
+                    "value": "Auswahl hinzufügen",
+                    "english": "Add selected"
+                }
+            }
+        },
+        "lpn_report_pump_head": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ts_quantity_tip",
+                    "value": "Welcher Wert über die Zeit aufgezeichnet wird.",
+                    "english": "Which value to graph against time."
+                },
+                "next_translated": {
+                    "key": "lpn_ts_add",
+                    "value": "Auswahl hinzufügen",
+                    "english": "Add selected"
                 }
             }
         },
