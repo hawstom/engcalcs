@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 2332,
-        "delta_key_count": 51,
+        "expected_key_count": 2336,
+        "delta_key_count": 56,
         "exempt_key_count": 52,
         "exempt_keys": [
             "u_imgd",
@@ -731,6 +731,11 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_pane_filter_sel_note": "Selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_and": "Filtered by {q} and selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
+        "lpn_pane_sel_only": "Selection only",
+        "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
         "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
@@ -784,6 +789,11 @@
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "keys": {
+        "lpn_pane_filter_sel_note": "Selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_and": "Filtered by {q} and selection only. Showing {n} of {all}.",
+        "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
+        "lpn_pane_sel_only": "Selection only",
+        "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
         "lpn_graphs_menu_tip": "Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
@@ -837,6 +847,86 @@
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen."
     },
     "key_context": {
+        "lpn_pane_filter_sel_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Nada nesta tabela corresponde ao filtro.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Ampliar e selecionar",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_filter_sel_and": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Nada nesta tabela corresponde ao filtro.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Ampliar e selecionar",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_filter_sel_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Nada nesta tabela corresponde ao filtro.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Ampliar e selecionar",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_sel_only": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Nada nesta tabela corresponde ao filtro.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Ampliar e selecionar",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_sel_only_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Nada nesta tabela corresponde ao filtro.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Ampliar e selecionar",
+                    "english": "Zoom & select"
+                }
+            }
+        },
         "lpn_graphs_menu_tip": {
             "reason": "missing",
             "current_value": null,

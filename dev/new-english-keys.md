@@ -429,7 +429,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**21 still to read**, of 28 new keys across 15 unmerged branch(es).
+**21 still to read**, of 28 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -440,9 +440,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/journals-1004 (`c8c3d6b2`) — adds no English strings
-
-### feat/basemap-style (`1233fc70`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/basemap-style (`c4da18dc`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_basemap_filter_faded`**
   > Faded
@@ -465,9 +463,9 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dialog-audit (`4ad58f1e`) — adds no English strings
+### feat/dialog-audit (`4a665186`) — adds no English strings
 
-### feat/dock (`6cafde0f`) — 4 new, 4 to read @@ NEEDS RULING
+### feat/dock (`6eed29b6`) — 4 new, 4 to read @@ NEEDS RULING
 
 - **`lpn_dock_autohide`**
   > Auto-hide
@@ -517,7 +515,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
 
-### feat/scenario-option (`5ef7821e`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/scenario-option (`ea54507d`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_scenario_duration_tip`**
   > Overrides the project's total run time in this scenario. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
@@ -556,6 +554,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Not saved
   @@ NEEDS RULING
 
-### feat/table-selection (`66d09eb7`) — adds no English strings
+### feat/table-selection (`3d2488be`) — adds no English strings
 
-### fix/graphs-order (`81cb05a6`) — adds no English strings
+### fix/tip-width (`5aa1cd2d`) — adds no English strings
