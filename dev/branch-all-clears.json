@@ -490,6 +490,13 @@
    "words": "8111 the \"Calculation options\" heading and the fixed double tip:  Done. Close, merge, and delete branch.",
    "context": "His own pasted message, 2026-10-04 late evening, after his browser pass.",
    "pin_note": "He tested f0d9897a; the pin adds only a merge of master (conflicts resolved as master code with the branch override wording) and a regenerated keys list."
+  },
+  "feat/pda": {
+   "head": "eced4030f12df0f205e16fb958fa08f5c34fc1ab",
+   "date": "2026-10-04",
+   "words": "feat/pda is good. Merge.",
+   "context": "Typed in the session, 2026-10-04 late evening, after his retest of the short-junction count in the bottom map strip. Earlier the same evening: \"Yes. Pressure goes up slightly on PDA as expected.\"",
+   "pin_note": "The head he tested."
   }
  }
 }
