@@ -33,7 +33,6 @@ let pageHost = null;
 const realInit = EC.lpnTimeInit;
 EC.lpnTimeInit = function (h) { pageHost = h; return realInit.apply(this, arguments); };
 EC.pageConfig = EC.pageConfig || {};
-EC.pageConfig.lpn_time_run_slow = 'This network took {secs} s to calculate, and it is set to recalculate after every change.';
 
 const lpn = loadLoopedNetwork(
 	"\t\tnoticeLog: function () { return noticeLog.slice(); },\n" +
@@ -42,7 +41,14 @@ const lpn = loadLoopedNetwork(
 	"\t\tstatusText: function () { return document.getElementById('lpn_status_text').textContent || ''; },\n" +
 	"\t\tnoticeText: function () { return document.getElementById('lpn_map_notice').textContent || ''; }\n");
 
-const WARN = 'The solver did not converge after 100 trials.';
+const WARN = 'TEST DIAGNOSTIC: stands for a non-converged result';
+// The page's own sentence, read from the real language file the stub loads, never restated here.
+const TIME_RE = () => {
+	const t = String(global.EngCalcs.pageConfig.lpn_time_run_slow || '');
+	if (t.indexOf('{secs}') < 0) { throw new Error('lpn_time_run_slow has no {secs}'); }
+	const head = t.split('{secs}')[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	return new RegExp(head + '\\d+\\.\\d');
+};
 (async function () {
 	ok('the page handed lpn-time.js a host', !!pageHost);
 	ok('and that host has a notice door', typeof pageHost.notice === 'function');
@@ -68,19 +74,19 @@ const WARN = 'The solver did not converge after 100 trials.';
 	await wait(1500);
 
 	const log = lpn.noticeLog();
-	const row = log.find((r) => /took \d+\.\d s to calculate/.test(r.text));
+	const row = log.find((r) => TIME_RE().test(r.text));
 	ok('the solve time is in the message log', !!row, JSON.stringify(log.map((r) => r.text)));
-	ok('logged once, as an ordinary notice', log.filter((r) => /took/.test(r.text)).length === 1 && row && row.severity === 'notice');
-	ok('it is a transient notice on the map', /took \d+\.\d s/.test(lpn.noticeText()), lpn.noticeText());
-	ok('and NOT a standing status line', !/took/.test(lpn.statusText()), lpn.statusText());
+	ok('logged once, as an ordinary notice', log.filter((r) => TIME_RE().test(r.text)).length === 1 && row && row.severity === 'notice');
+	ok('it is a transient notice on the map', TIME_RE().test(lpn.noticeText()), lpn.noticeText());
+	ok('and NOT a standing status line', !TIME_RE().test(lpn.statusText()), lpn.statusText());
 	ok('a non-converged warning still stands on the status line', lpn.statusText() === WARN, lpn.statusText());
-	ok('the warning is in the log too, and not folded into the info row', log.some((r) => r.text === WARN) && !/did not converge/.test(row ? row.text : ''));
+	ok('the warning is in the log too, and not folded into the info row', log.some((r) => r.text === WARN) && row.text !== WARN);
 	ok('the log grew by the run and the warning only', log.length >= before + 1);
 
 	// Switching the checkbox off takes the advice back.
 	lpn.clearSlowAdvice();
-	ok('turning Recalculate off takes the notice back', !/took/.test(lpn.noticeText()), lpn.noticeText());
-	ok('and it is still readable in the log', lpn.noticeLog().some((r) => /took/.test(r.text)));
+	ok('turning Recalculate off takes the notice back', !TIME_RE().test(lpn.noticeText()), lpn.noticeText());
+	ok('and it is still readable in the log', lpn.noticeLog().some((r) => TIME_RE().test(r.text)));
 
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall ok');
 	process.exit(fails ? 1 : 0);
