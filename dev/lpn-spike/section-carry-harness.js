@@ -411,14 +411,11 @@ console.log('\n10. a carried option has a sentence a person can read');
 		' Minimum Pressure\t0.0', ' Required Pressure\t20', '',
 		'[COORDINATES]', ' J1\t10.0\t10.0', ' R1\t0.0\t0.0', '', '[END]', ''
 	].join('\n');
+	// Task 762: pressure-driven analysis is read into Settings and solved by the EPANET engine, so
+	// the file and the page agree and there is nothing to report (see pda-harness.js).
 	const parsed = EngCalcs.lpnInpParse(inp);
 	const codes = (parsed.dropped || []).map((d) => d.code);
-	ok('a pressure-driven file is reported at all', codes.indexOf('demand-model') >= 0,
-		JSON.stringify(codes));
-	const said = L.dropText('demand-model');
-	ok('...with a sentence, not the bare code', said !== 'demand-model' && said.length > 40,
-		JSON.stringify(String(said).slice(0, 60)));
-	ok('...that names what changes for the answers', /demand-driven/i.test(said), JSON.stringify(said));
+	ok('a pressure-driven file is not reported as a loss', codes.indexOf('demand-model') < 0, JSON.stringify(codes));
 	const other = L.dropText('other-options');
 	ok('the remaining unread options say so too',
 		other !== 'other-options' && other.length > 20, JSON.stringify(String(other).slice(0, 60)));

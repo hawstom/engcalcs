@@ -1810,7 +1810,6 @@ $ec_lang['lpn_inp_drop_report']='此文件包含 EPANET 自身用于设置其打
 $ec_lang['lpn_inp_drop_sections']='此文件包含一个本页面完全不读取的部分。这里不会用到它。它会被完整保留，如果您保存为 EPANET 文件，会被写回。';
 $ec_lang['lpn_inp_drop_quality_options']='此文件设置了 EPANET 的水质选项：Quality 选项（指定水质分析的种类），以及两项与化学物质相关的设置——相对扩散系数和水质容差。这三项均会被保留并被使用。水龄、来源追踪和化学物质均在本页面计算，其中两项化学物质设置会在您运行化学物质分析时交给 EPANET 引擎。如果您保存为 EPANET 文件，全部内容都会被写回。';
 $ec_lang['lpn_inp_drop_file_options']='此文件引用了一个辅助文件：Map（保存坐标），或 Hydraulics（保存已经算好的水力结果）。本页面无法打开这两种文件，因此这些行会保持原样，并在您保存为 EPANET 文件时被写回。';
-$ec_lang['lpn_inp_drop_demand_model']='此文件要求进行压力驱动分析（PDA），即节点在压力较低时获得的水量会少于其需水量。本页面采用需水量驱动的方式求解，因此这里的每个节点都会获得文件中写明的全部需水量，无论最终压力是多少。该行会被保留，如果您保存为 EPANET 文件，会被写回。';
 $ec_lang['lpn_inp_drop_other_options']='此文件设置了本页面不读取的选项。这里不会用到它们。它们会被保留，并在您保存为 EPANET 文件时被写回。';
 $ec_lang['lpn_inp_drop_net_options']='此 EPANET .net 文件设置了本页面没有对应控件的选项，因此它们的数值列在此处，而不会被本页面采用。其余内容均已导入。如果您需要这些设置，请在 EPANET 中打开该文件，使用“文件”、“导出”、“网络”将其另存为 .inp 文件，然后导入该文件。';
 // Edited by TGH 2026-09-07

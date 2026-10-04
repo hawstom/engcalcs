@@ -22932,6 +22932,17 @@ var EngCalcs = EngCalcs || {};
 		return { key: key, label: label, result: true, unit: unit,
 			get: function (n) { return colorNodeValue(n, key); } };
 	}
+	// **WHAT A JUNCTION RECEIVES UNDER PRESSURE-DRIVEN ANALYSIS** (Task 762), as two result
+	// columns that exist only while the Demand model is PDA, the way the quality columns exist only
+	// while a chemical is tracked. Read off the solve result in SI and shown in the result flow unit.
+	function paneColPdaResult(key, label, field) {
+		return { key: key, label: label, result: true, unit: paneUnitFlow, em: 3.5,
+			when: function () { return String((settings.hydraulics || {}).demandModel || '').toUpperCase() === 'PDA'; },
+			get: function (n) {
+				var r = lastSolveResult, v = r && r[field] ? r[field][n.id] : undefined;
+				return typeof v === 'number' ? toDisplay(v, resultUnit('flow')) : undefined;
+			} };
+	}
 	function paneUnitFlow() { return resultUnit('flow'); }
 	function paneUnitHead() { return resultUnit('elevhead'); }
 	function paneUnitPressure() { return resultUnit('pressure'); }
@@ -23601,6 +23612,8 @@ var EngCalcs = EngCalcs || {};
 						plainFor: function (n) { return demandRowsOf(n, effective(n, 'demand')).length > 1; },
 						set: function (n, v) { setProp(n, 'demand', v); } },
 					paneColNodeResult('demandActual', 'bpn_demand', paneUnitFlow),
+					paneColPdaResult('demandDelivered', 'lpn_result_delivered_demand', 'demands'),
+					paneColPdaResult('demandDeficit', 'lpn_result_demand_deficit', 'demandDeficits'),
 					// **AN INPUT, AND AN EMPTY CELL IS NOT A ZERO** (Task 530): a junction that
 					// states no fire flow of its own is tested against the number in the Fire flow
 					// box. A pane cell hands back `+'' === 0` for a blank, which fireFlowStore()
@@ -35146,12 +35159,7 @@ var EngCalcs = EngCalcs || {};
 			// Kept AND reported, the same pairing [RULES] has: the three lines survive the round
 			// trip, and nothing on this page acts on them.
 			case 'quality-options': return pc.lpn_inp_drop_quality_options || 'This file states EPANET water quality options: the Quality option, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. All three are kept and all three are used. Water age, source trace and a chemical are each worked out here, and the two chemical settings are used when you run a chemical. All of them are written back if you save an EPANET file.';
-			// **A DIFFERENCE IN THE ANSWERS, NOT IN WHAT THE FILE HOLDS**, which is why it is not on
-			// the kept-but-unused limb below it. EPANET 2.2's pressure-driven analysis gives a
-			// junction less water when the pressure is low; this page solves demand-driven, so the
-			// same file answers differently here and the user is entitled to know before reading a
-			// pressure off the map.
-			case 'demand-model': return pc.lpn_inp_drop_demand_model || 'This file asks for a pressure-driven analysis (PDA), in which a junction receives less than its demand when the pressure there is low. This page solves demand-driven, so every junction here receives the demand the file states, no matter what pressure results. The line is kept and is written back if you save an EPANET file.';
+			case 'pressure-unit': return pc.lpn_inp_drop_pressure_unit || 'This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.';
 			case 'other-options': return pc.lpn_inp_drop_other_options || 'This file states options this page does not read. Nothing here uses them. They are kept and are written back if you save an EPANET file.';
 			// **THE ONE LOSS ON THE `.net` PATH THAT CANNOT BE CARRIED**, so it is told instead. A
 			// `.net` stores its options as an indexed array with no keywords, so a slot this page
@@ -43960,13 +43968,18 @@ var EngCalcs = EngCalcs || {};
 		if (name === 'lpn_u_roughness') { return [roughnessLabel()]; }
 		if (name === 'lpn_u_elevhead') {
 			return [pc.lpn_field_elev || 'Elevation', pc.lpn_field_head || 'Head',
-				pc.lpn_field_tank_level || 'Water depth',
+				pc.lpn_field_tank_level || 'Water depth', pc.lpn_settings_head_error || 'Head error limit',
 				(pc.lpn_result_head || 'Head') + ' (pump curve)'];
 		}
-		if (name === 'lpn_u_pressure') { return [pc.lpn_field_valve_setting_pressure || 'Pressure setting']; }
+		if (name === 'lpn_u_pressure') {
+			return [pc.lpn_field_valve_setting_pressure || 'Pressure setting',
+				pc.lpn_settings_min_pressure || 'Minimum pressure',
+				pc.lpn_settings_req_pressure || 'Required pressure'];
+		}
 		if (name === 'lpn_u_flow') {
 			return [pc.lpn_field_base_demand || 'Base demand', pc.lpn_field_valve_setting_flow || 'Flow setting',
-				(pc.lpn_result_flow || 'Flow') + ' (pump curve)'];
+				(pc.lpn_result_flow || 'Flow') + ' (pump curve)',
+				pc.lpn_settings_flow_change || 'Flow change limit'];
 		}
 		return [];
 	}
@@ -43998,6 +44011,15 @@ var EngCalcs = EngCalcs || {};
 		// this walks the library rather than the elements -- a curve two pumps share must be
 		// reinterpreted once, not twice, and a curve nothing references is still the user's numbers
 		// and still means what its column heading says.
+		// The Settings numbers (Task 762 pass): converted, then held to six significant figures,
+		// because conv() rounds nothing and a box showing 14.068774521117009 is not a number anyone
+		// typed. Demands and elevations are rounded for display elsewhere; these are shown raw.
+		function convSetting(key) {
+			var h = settings.hydraulics;
+			if (!h || typeof h[key] !== 'number') { return; }
+			h[key] = +(h[key] * k).toPrecision(6);
+			n++;
+		}
 		function convCurveAxis(axis, kinds, factor) {
 			var moved = 0;
 			docCurvesRead().forEach(function (c) {
@@ -44048,10 +44070,16 @@ var EngCalcs = EngCalcs || {};
 				conv(nd, 'maxLevel'); conv(nd, '_head');
 			});
 			convOverrides('level'); convOverrides('head');
+			// Head error limit is a head typed in this unit (Task 762 pass: it was missed here).
+			convSetting('headError');
 			// A curve point is [flow, value]; this unit owns the second, for the two kinds whose
 			// second column IS a head (Task 586). An efficiency curve's is a percent.
 			n += convCurveAxis(1, ['head', 'headloss'], k);
 		} else if (name === 'lpn_u_pressure') {
+			// The pressure-driven limits are typed in this unit (Task 762). conv() leaves a stale
+			// text token behind, and lpnNumText() drops it by itself because it no longer parses
+			// to the new value.
+			convSetting('minPressure'); convSetting('reqPressure');
 			doc.links.forEach(function (l) {
 				if (l.type !== 'valve') { return; }
 				var t = String(l.valveType || 'TCV').toUpperCase();
@@ -44068,6 +44096,7 @@ var EngCalcs = EngCalcs || {};
 				});
 			});
 		} else if (name === 'lpn_u_flow') {
+			convSetting('flowChange');   // a flow typed in this unit
 			doc.nodes.forEach(function (nd) { conv(nd, '_demand'); });
 			// A junction's further demand categories (Task 468) and a customer's own demand (Task
 			// 247) are flows in the same unit, and were missed until File, Convert as needed them.
@@ -44487,6 +44516,14 @@ var EngCalcs = EngCalcs || {};
 		var el = document.getElementById('lpn_u_mapcoords');
 		if (el) { el.textContent = mapCoordsUnitText(); }
 	}
+	// How many junctions the latest pressure-driven solve left short of their demand.
+	function pdaShortCount(result) {
+		var n = 0;
+		if (result && result.demandDeficits) {
+			Object.keys(result.demandDeficits).forEach(function (id) { if (result.demandDeficits[id] > 1e-9) { n++; } });
+		}
+		return n;
+	}
 	function refreshMapStatus() {
 		var el = document.getElementById('lpn_map_status'), pc = EngCalcs.pageConfig || {};
 		ensureCrsForProject();
@@ -44499,11 +44536,21 @@ var EngCalcs = EngCalcs || {};
 		// SYMMETRIC, so it needs no mirrored counterpart and renders identically whichever direction
 		// the run takes -- the three pairs reorder in Arabic or Hebrew and the dividers stay between
 		// them. That caution IS right for a DIRECTIONAL glyph (an arrow, a guillemet, U+25B8).
-		el.textContent = [
+		var parts = [
 			(pc.lpn_result_flow || 'Flow') + ': ' + unitLabel('lpn_u_flow'),
 			(pc.lpn_result_pressure || 'Pressure') + ': ' + unitLabel('lpn_u_pressure'),
 			(pc.bpn_method || 'Friction method') + ': ' + frictionMethodLabel()
-		].join(' | ');
+		], short;
+		// **PRESSURE-DRIVEN ANALYSIS IS A STANDING FACT OF THE MODEL, SO THE STRIP SAYS IT** (Task 762,
+		// Tom: *"The status bar counts the junctions that are short. [If the status bar is at the
+		// bottom, this is missing.]"*). The count follows the latest solve and is dropped when there
+		// is none; it is the same sentence the message box above the map carries.
+		if (String((settings.hydraulics || {}).demandModel || '').toUpperCase() === 'PDA') {
+			parts.push((pc.lpn_settings_demand_model || 'Demand model') + ': ' + (pc.lpn_settings_demand_model_pda || 'Pressure driven'));
+			short = pdaShortCount(lastSolveResult);
+			if (short > 0) { parts.push((pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(short)).replace(/\.$/, '')); }
+		}
+		el.textContent = parts.join(' | ');
 		refreshCoordsReadout();
 		placeLegends();
 	}
@@ -47562,6 +47609,44 @@ var EngCalcs = EngCalcs || {};
 			inBaseScenario() ? 1 : ((settings.hydraulics || {}).demandMultiplier === undefined
 				? 1 : settings.hydraulics.demandMultiplier),
 			{ perScenario: true });
+		// **PRESSURE-DRIVEN ANALYSIS** (Task 762), EPANET's own `[OPTIONS] Demand Model` and its three
+		// companions, in EPANET's own words. The three numbers appear only while PDA is chosen,
+		// because they mean nothing to a demand-driven run. Pressures are typed in the project's
+		// pressure unit and cross to metres in engineHydraulics(), at the solver handoff only.
+		// Choosing PDA routes the solve to EPANET by itself (modelNeedsEpanet()) and never rewrites
+		// `settings.engine`, the same rule an active PRV follows.
+		var demandModelSel = document.createElement('select'), isPda;
+		[['DDA', pc.lpn_settings_demand_model_dda || 'Demand driven'],
+			['PDA', pc.lpn_settings_demand_model_pda || 'Pressure driven']].forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1];
+			demandModelSel.appendChild(opt);
+		});
+		demandModelSel.value = String(settings.hydraulics.demandModel || 'DDA').toUpperCase() === 'PDA' ? 'PDA' : 'DDA';
+		demandModelSel.addEventListener('change', function () {
+			if (demandModelSel.value !== 'PDA') { delete settings.hydraulics.pdaSrc; }
+			// Back to demand driven removes the line: DDA is EPANET's own default, and the numbers
+			// stay in the document so that choosing PDA again finds them where they were left.
+			if (demandModelSel.value === 'PDA') { settings.hydraulics.demandModel = 'PDA'; }
+			else { delete settings.hydraulics.demandModel; }
+			refreshMapStatus();
+			saveToStorage();
+			rebuildSettingsBox();
+			if (demandModelSel.value === 'PDA') { warmEpanetIfNeeded(); }
+			scheduleSolve();
+		});
+		row(compBody, pc.lpn_settings_demand_model || 'Demand model', demandModelSel, pc.lpn_settings_demand_model_tip);
+		isPda = demandModelSel.value === 'PDA';
+		if (isPda) {
+			hydNumberRow('minPressure', 'lpn_settings_min_pressure', 'Minimum pressure',
+				'lpn_settings_min_pressure_tip', 0, { allowZero: true, unitOf: 'lpn_u_pressure' });
+			hydNumberRow('reqPressure', 'lpn_settings_req_pressure', 'Required pressure',
+				'lpn_settings_req_pressure_tip',
+				'0.1 ' + unitLabelFor(unitEl('lpn_u_pressure'), pdaFilePressureUnit()),
+				{ unitOf: 'lpn_u_pressure' });
+			hydNumberRow('pressureExponent', 'lpn_settings_pressure_exponent', 'Pressure exponent',
+				'lpn_settings_pressure_exponent_tip', 0.5);
+		}
 		hydNumberRow('specificGravity', 'lpn_settings_specific_gravity', 'Specific gravity',
 			'', 1);
 		hydNumberRow('viscosity', 'lpn_settings_viscosity', 'Relative viscosity',
@@ -54647,6 +54732,16 @@ var EngCalcs = EngCalcs || {};
 				readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'), lastSolveResult.heads[nodeId],
 					pc.lpn_result_head_tip);
 				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'), lastSolveResult.pressures[nodeId]);
+				// **WHAT THIS JUNCTION RECEIVES, UNDER PRESSURE-DRIVEN ANALYSIS** (Task 762). The
+				// demand above is what it asks for; these two are what the engine delivered and
+				// what it withheld. Present only for a PDA run, where the engine states them.
+				if (lastSolveResult.demandDeficits && lastSolveResult.demandDeficits[nodeId] !== undefined
+					&& lastSolveResult.demands && lastSolveResult.demands[nodeId] !== undefined) {
+					readonlyUnitField(fields, pc.lpn_result_delivered_demand || 'Delivered demand', 'lpn_u_flow',
+						lastSolveResult.demands[nodeId], pc.lpn_result_delivered_demand_tip);
+					readonlyUnitField(fields, pc.lpn_result_demand_deficit || 'Demand deficit', 'lpn_u_flow',
+						lastSolveResult.demandDeficits[nodeId], pc.lpn_result_demand_deficit_tip);
+				}
 			}
 		}
 		// **THE WATER-QUALITY ANSWER, FOR EVERY KIND OF NODE, IN ONE PLACE.** A junction, a
@@ -57222,6 +57317,15 @@ var EngCalcs = EngCalcs || {};
 			? { model: n.mixingModel, fraction: n.mixingFraction }
 			: { model: n.mixingModel };
 	}
+	// **BLANK REQUIRED PRESSURE MEANS WHAT EPANET MEANS** (Task 762): 0.1 in the pressure unit the
+	// exported file is read in, psi for a US flow unit and metres otherwise, whatever the project's
+	// own pressure unit shows. Returned in metres, for the solver.
+	function pdaFilePressureUnit() {
+		return EngCalcs.lpnFilePressureUnit(unitKey('lpn_u_flow'), unitKey('lpn_u_length'), unitKey('lpn_u_diameter'));
+	}
+	function pdaDefaultRequiredMetres() {
+		return 0.1 / (EngCalcs.unitFactors[pdaFilePressureUnit()] || 1);
+	}
 	function engineHydraulics(hyd, scenarioDM) {
 		var out = {}, k;
 		for (k in hyd) { if (Object.prototype.hasOwnProperty.call(hyd, k)) { out[k] = hyd[k]; } }
@@ -57230,6 +57334,11 @@ var EngCalcs = EngCalcs || {};
 		if (scenarioDM !== undefined) { out.demandMultiplier = scenarioDM; }
 		if (typeof out.headError === 'number') { out.headError = toSI(out.headError, 'lpn_u_elevhead'); }
 		if (typeof out.flowChange === 'number') { out.flowChange = toSI(out.flowChange, 'lpn_u_flow'); }
+		// **PRESSURE-DRIVEN ANALYSIS** (Task 762): the two pressures are typed in the project's
+		// pressure unit and cross to metres of water here, at the solver handoff, and nowhere else.
+		if (typeof out.minPressure === 'number') { out.minPressure = toSI(out.minPressure, 'lpn_u_pressure'); }
+		if (typeof out.reqPressure === 'number') { out.reqPressure = toSI(out.reqPressure, 'lpn_u_pressure'); }
+		else if (String(out.demandModel || '').toUpperCase() === 'PDA') { out.reqPressure = pdaDefaultRequiredMetres(); }
 		return out;
 	}
 	// **A SCENARIO MAY CARRY ITS OWN DEMAND MULTIPLIER** (the utility planning engineer's wish list,
@@ -57820,6 +57929,8 @@ var EngCalcs = EngCalcs || {};
 		// NAMES THE VALVES, which is the entire reason this page keeps its own diagnostics instead
 		// of surfacing EPANET's numeric error codes. A user staring at a drawing can act on "V3".
 		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'pda-pressures') { return pc.lpn_diag_pda_pressures || 'Required pressure must be greater than Minimum pressure. Change one of them in Settings.'; }
+		if (issue.code === 'pda-needs-epanet') { return pc.lpn_diag_pda_needs_epanet || 'The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.'; }
 		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:') + ' ' + issue.ids.join(', '); }
 		return issue.code;
 	}
@@ -59326,13 +59437,18 @@ var EngCalcs = EngCalcs || {};
 		// network this page has had until now.
 		if (EngCalcs.lpnTimeRun && EngCalcs.lpnTimeRun(model)) { return; }
 
-		var epanetOnly = EngCalcs.lpnEpanetOnlyValves ? EngCalcs.lpnEpanetOnlyValves(model) : [];
+		var epanetOnly = EngCalcs.lpnEpanetOnlyValves ? EngCalcs.lpnEpanetOnlyValves(model) : [],
+			pdaRoute = !!(EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model));
 		valveRouteNote = '';
-		if ((settings.engine === 'epanet' || epanetOnly.length > 0) && EngCalcs.lpnSolveEpanet) {
+		if ((settings.engine === 'epanet' || epanetOnly.length > 0 || pdaRoute) && EngCalcs.lpnSolveEpanet) {
 			if (epanetOnly.length > 0 && settings.engine !== 'epanet') {
 				valveRouteNote = ((EngCalcs.pageConfig || {}).lpn_engine_valve_route ||
 					'Solved with the EPANET solver, because these valves open and close on their own:') +
 					' ' + epanetOnly.join(', ');
+			} else if (pdaRoute && settings.engine !== 'epanet') {
+				// Task 762: the second thing that routes a network to EPANET by its own contents.
+				valveRouteNote = (EngCalcs.pageConfig || {}).lpn_engine_pda_route ||
+					'Solved with the EPANET solver, because the demand model is pressure driven.';
 			}
 			runSolveEpanet(model);
 			return;
@@ -59525,7 +59641,7 @@ var EngCalcs = EngCalcs || {};
 			// before any solve has run: opening a file with a PRV in it is exactly the moment the
 			// built-in solver stops being available for it.
 			syncEpanetNeed(model);
-			if (EngCalcs.lpnEpanetOnlyValves(model).length > 0) { warmEpanetEngine('valve'); }
+			if (EngCalcs.lpnEpanetOnlyValves(model).length > 0 || EngCalcs.lpnDemandModelIsPda(model)) { warmEpanetEngine('valve'); }
 		} catch (e) { /* a half-built document is not a reason to shout */ }
 	}
 
@@ -59541,6 +59657,7 @@ var EngCalcs = EngCalcs || {};
 		if (model && model.time && model.time.times && EngCalcs.lpnTimeIsExtended) {
 			if (EngCalcs.lpnTimeIsExtended(model.time.times)) { return true; }
 		} else if (effectiveTimesExtended()) { return true; }
+		if (EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model)) { return true; }
 		return !!(EngCalcs.lpnEpanetOnlyValves && EngCalcs.lpnEpanetOnlyValves(model).length > 0);
 	}
 	// The same question when no model is to hand -- the settings panel being rebuilt, for instance.
@@ -59863,7 +59980,8 @@ var EngCalcs = EngCalcs || {};
 	// an engine is two answers to "which engine solves this network" waiting to disagree.
 	function engineFor(model) {
 		var only = EngCalcs.lpnEpanetOnlyValves ? EngCalcs.lpnEpanetOnlyValves(model) : [],
-			useEpanet = (settings.engine === 'epanet' || only.length > 0) && !!EngCalcs.lpnSolveEpanet;
+			useEpanet = (settings.engine === 'epanet' || only.length > 0
+				|| (EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model))) && !!EngCalcs.lpnSolveEpanet;
 		return {
 			epanet: useEpanet,
 			solve: useEpanet
@@ -63419,6 +63537,7 @@ var EngCalcs = EngCalcs || {};
 		// (Tom, 2026-09-25: results arriving after a Zoom to fit leave it exactly where it was).
 		if (!result.ok) {
 			lastSolveResult = null;
+			refreshMapStatus();
 			// A REFUSAL AND A FAILURE TO CONVERGE ARE DIFFERENT THINGS. The native solver can refuse
 			// a perfectly sound network (an active valve, when EPANET could not be loaded), and
 			// telling that user their network did not converge sends them to look for a zero
@@ -63458,6 +63577,7 @@ var EngCalcs = EngCalcs || {};
 		// both Settings rows, and neither makes the engine refuse: it hands back the last iterate.
 		var notConverged = result.converged === false;
 		lastSolveResult = result;
+		refreshMapStatus();
 		// The only case where the two engines knowingly disagree, so say so rather than let a
 		// user discover a 0.6% shift by switching the checkbox. See js/lpn-epanet.js.
 		function warned(code) {
@@ -63547,7 +63667,13 @@ var EngCalcs = EngCalcs || {};
 						: ''))
 			].filter(function (t) { return !!t; }).join(' ');
 		}
-		setStatus([notConvergedNote, valveRouteNote,
+		// **PRESSURE-DRIVEN ANALYSIS SAYS WHEN IT WITHHELD WATER** (Task 762): how many junctions got
+		// less than they asked for. Nothing is said when every junction was served in full.
+		var pdaShort = pdaShortCount(result);
+		var pdaNote = pdaShort > 0
+			? (pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(pdaShort))
+			: '';
+		setStatus([notConvergedNote, valveRouteNote, pdaNote,
 			droppedNote('control-dangling', 'lpn_control_dangling_note',
 				'These controls name an element that is no longer in this project, so they were left out: {ids}'),
 			droppedNote('control-unreadable', 'lpn_control_unreadable_note',

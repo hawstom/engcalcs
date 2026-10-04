@@ -417,6 +417,14 @@ EngCalcs.lpnValveIsNative = function (link) {
 	return link.type !== 'valve' || (link.valveType || 'TCV').toUpperCase() === 'TCV';
 };
 
+// **PRESSURE-DRIVEN ANALYSIS IS EPANET'S ALONE** (Task 762), the second thing, after an active
+// PRV/PSV/FCV, that draws the line between the engines. The built-in solver fixes every demand
+// and never claims to solve PDA; a model asking for it routes to EPANET and is refused here.
+EngCalcs.lpnDemandModelIsPda = function (model) {
+	var h = model && model.hydraulics;
+	return !!(h && String(h.demandModel || '').toUpperCase() === 'PDA');
+};
+
 // Ids of every valve in the model that only the EPANET engine can solve. Exported because the UI
 // needs the same answer BEFORE it picks an engine, and two copies of this rule would drift.
 EngCalcs.lpnEpanetOnlyValves = function (model) {
@@ -522,6 +530,16 @@ EngCalcs.lpnDiagnose = function (model, options) {
 		if (epanetOnlyValves.length > 0) {
 			issues.push({ code: 'valve-needs-epanet', ids: epanetOnlyValves });
 		}
+	}
+
+	if (EngCalcs.lpnDemandModelIsPda(model)) {
+		var hy = model.hydraulics, mn = typeof hy.minPressure === 'number' ? hy.minPressure : 0;
+		if (typeof hy.reqPressure === 'number' && hy.reqPressure <= mn) {
+			issues.push({ code: 'pda-pressures', ids: [] });
+		}
+	}
+	if (opts.engine === 'native' && EngCalcs.lpnDemandModelIsPda(model)) {
+		issues.push({ code: 'pda-needs-epanet', ids: [] });
 	}
 
 	if (fixed.length === 0) {

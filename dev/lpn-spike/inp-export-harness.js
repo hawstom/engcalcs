@@ -669,13 +669,16 @@ console.log('\n8. Map, Hydraulics USE/SAVE and every unread option are carried, 
 		JSON.stringify((parsed.dropped || []).map((d) => d.code)));
 	ok('Demand Model is NOT read as a multiplier',
 		parsed.hydraulics.demandMultiplier === undefined, JSON.stringify(parsed.hydraulics.demandMultiplier));
-	ok('the six unread options are all carried', (parsed.fileOptions.other || []).length === 6,
+	// Task 762: the four pressure-driven lines are READ now (see pda-harness.js), so only
+	// `Pressure psi` and `Segments` are left to carry.
+	ok('the two unread options are carried', (parsed.fileOptions.other || []).length === 2,
 		JSON.stringify(parsed.fileOptions.other));
 	// **CARRYING IS NOT TELLING.** `Demand Model PDA` is the one carried option that changes the
 	// ANSWERS -- pressure-driven where this page is demand-driven -- so it gets its own report code
 	// rather than joining the kept-but-unused list, and the rest get theirs.
 	const codes = (parsed.dropped || []).map((d) => d.code);
-	ok('a pressure-driven file says so', codes.indexOf('demand-model') >= 0, JSON.stringify(codes));
+	ok('a pressure-driven file is not reported as a loss: Settings holds it and EPANET solves it',
+		codes.indexOf('demand-model') < 0, JSON.stringify(codes));
 	ok('and the remaining unread options are reported once',
 		codes.filter((c) => c === 'other-options').length === 1, JSON.stringify(codes));
 	const dda = EngCalcs.lpnInpParse(build([' Units\tGPM', ' Headloss\tH-W', ' Demand Model\tDDA']));
@@ -769,7 +772,9 @@ console.log('\n9. the engine\'s own writer emits only the options it chose');
 	const ALLOWED = {
 		UNITS: 1, HEADLOSS: 1, EMITTER: 1, QUALITY: 1, VISCOSITY: 1, SPECIFIC: 1,
 		DEMAND: 1, TRIALS: 1, ACCURACY: 1, HEADERROR: 1, FLOWCHANGE: 1, DAMPLIMIT: 1,
-		CHECKFREQ: 1, MAXCHECK: 1, UNBALANCED: 1, PATTERN: 1, TOLERANCE: 1, DIFFUSIVITY: 1
+		CHECKFREQ: 1, MAXCHECK: 1, UNBALANCED: 1, PATTERN: 1, TOLERANCE: 1, DIFFUSIVITY: 1,
+		// Task 762: pressure-driven analysis is handed to the engine, which solves it.
+		MINIMUM: 1, REQUIRED: 1, PRESSURE: 1
 	};
 	engineOpts.forEach((r) => {
 		ok('the engine writer knows this keyword: ' + r[0], ALLOWED[(r[0] || '').toUpperCase()] === 1,
