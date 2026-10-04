@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**18 still to read on master**, of 67 untranslated keys, of 2346 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**24 still to read on master**, of 73 untranslated keys, of 2352 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -254,7 +254,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (67, 18 to read @@ NEEDS RULING)
+## lpn_  (73, 24 to read @@ NEEDS RULING)
 
 - **`lpn_analyze_at_time`**
   > Time step: {time}.
@@ -262,6 +262,18 @@ never edits a synonym.
 - **`lpn_analyze_time_moved`**
   > ⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.
   _Ruled OK 2026-10-03._
+- **`lpn_basemap_style_faded`**
+  > Faded
+  @@ NEEDS RULING
+- **`lpn_basemap_style_grayscale`**
+  > Grayscale
+  @@ NEEDS RULING
+- **`lpn_basemap_style_muted`**
+  > Muted
+  @@ NEEDS RULING
+- **`lpn_basemap_style_normal`**
+  > Normal
+  @@ NEEDS RULING
 - **`lpn_contour_show`**
   > Show contours
   @@ NEEDS RULING
@@ -454,6 +466,12 @@ never edits a synonym.
 - **`lpn_saved_session`**
   > Not saved
   @@ NEEDS RULING
+- **`lpn_settings_basemap_style`**
+  > Basemap style
+  @@ NEEDS RULING
+- **`lpn_settings_basemap_style_tip`**
+  > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.
+  @@ NEEDS RULING
 - **`lpn_sysflow_title`**
   > Flow balance
   _Ruled OK 2026-10-03._
@@ -462,7 +480,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**35 still to read**, of 43 new keys across 16 unmerged branch(es).
+**31 still to read**, of 39 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -473,28 +491,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/basemap-style (`0bc4d9bb`) — 6 new, 6 to read @@ NEEDS RULING
-
-- **`lpn_basemap_style_faded`**
-  > Faded
-  @@ NEEDS RULING
-- **`lpn_basemap_style_grayscale`**
-  > Grayscale
-  @@ NEEDS RULING
-- **`lpn_basemap_style_muted`**
-  > Muted
-  @@ NEEDS RULING
-- **`lpn_basemap_style_normal`**
-  > Normal
-  @@ NEEDS RULING
-- **`lpn_settings_basemap_style`**
-  > Basemap style
-  @@ NEEDS RULING
-- **`lpn_settings_basemap_style_tip`**
-  > Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.
-  @@ NEEDS RULING
-
-### feat/chain-draw (`3cafad01`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/chain-draw (`de6b793e`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_mode_add_chain`**
   > Mode: Add Junction and Pipe. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
@@ -507,12 +504,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04`) — adds no English strings
-
-### feat/dialog-audit (`9bdb5559`) — adds no English strings
-
-### feat/elev-default (`90f33841`) — adds no English strings
-
-### feat/epanet-pp-brand (`3655b959`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -534,13 +525,19 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/pda (`ac32b95f`) — 17 new, 17 to read @@ NEEDS RULING
+### feat/pda (`be8389fb`) — 19 new, 19 to read @@ NEEDS RULING
 
 - **`lpn_diag_pda_needs_epanet`**
   > The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.
   @@ NEEDS RULING
+- **`lpn_diag_pda_pressures`**
+  > Required pressure must be greater than Minimum pressure. Change one of them in Settings.
+  @@ NEEDS RULING
 - **`lpn_engine_pda_route`**
   > Solved with the EPANET solver, because the demand model is pressure driven.
+  @@ NEEDS RULING
+- **`lpn_inp_drop_pressure_unit`**
+  > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
   @@ NEEDS RULING
 - **`lpn_pda_deficit_note`**
   > Junctions receiving less than their demand: {n}.
@@ -561,13 +558,13 @@ build for that would be a gate nobody keeps. Refresh it with
   > Demand model
   @@ NEEDS RULING
 - **`lpn_settings_demand_model_dda`**
-  > Demand driven (DDA)
+  > Demand driven
   @@ NEEDS RULING
 - **`lpn_settings_demand_model_pda`**
-  > Pressure driven (PDA)
+  > Pressure driven
   @@ NEEDS RULING
 - **`lpn_settings_demand_model_tip`**
-  > Choose how junctions receive water. Demand driven delivers every demand in full, whatever the pressure. Pressure driven delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.
+  > Choose how junctions receive water. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.
   @@ NEEDS RULING
 - **`lpn_settings_min_pressure`**
   > Minimum pressure
@@ -585,7 +582,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Required pressure
   @@ NEEDS RULING
 - **`lpn_settings_req_pressure_tip`**
-  > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit.
+  > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.
   @@ NEEDS RULING
 
 ### feat/profile-file (`a095faf4`) — 4 new, all ruled
@@ -638,5 +635,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_sort_desc`**
   > Sort descending
   _Ruled OK 2026-09-26._
-
-### fix/browser-pass-specs (`32c38dec`) — adds no English strings
