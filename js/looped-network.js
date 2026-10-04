@@ -47107,8 +47107,8 @@ var EngCalcs = EngCalcs || {};
 		// Choosing PDA routes the solve to EPANET by itself (modelNeedsEpanet()) and never rewrites
 		// `settings.engine`, the same rule an active PRV follows.
 		var demandModelSel = document.createElement('select'), isPda;
-		[['DDA', pc.lpn_settings_demand_model_dda || 'Demand driven (DDA)'],
-			['PDA', pc.lpn_settings_demand_model_pda || 'Pressure driven (PDA)']].forEach(function (o) {
+		[['DDA', pc.lpn_settings_demand_model_dda || 'Demand driven'],
+			['PDA', pc.lpn_settings_demand_model_pda || 'Pressure driven']].forEach(function (o) {
 			var opt = document.createElement('option');
 			opt.value = o[0]; opt.textContent = o[1];
 			demandModelSel.appendChild(opt);
