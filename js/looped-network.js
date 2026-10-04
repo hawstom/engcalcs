@@ -22830,6 +22830,17 @@ var EngCalcs = EngCalcs || {};
 		return { key: key, label: label, result: true, unit: unit,
 			get: function (n) { return colorNodeValue(n, key); } };
 	}
+	// **WHAT A JUNCTION RECEIVES UNDER PRESSURE-DRIVEN ANALYSIS** (Task 762), as two result
+	// columns that exist only while the Demand model is PDA, the way the quality columns exist only
+	// while a chemical is tracked. Read off the solve result in SI and shown in the result flow unit.
+	function paneColPdaResult(key, label, field) {
+		return { key: key, label: label, result: true, unit: paneUnitFlow, em: 3.5,
+			when: function () { return String((settings.hydraulics || {}).demandModel || '').toUpperCase() === 'PDA'; },
+			get: function (n) {
+				var r = lastSolveResult, v = r && r[field] ? r[field][n.id] : undefined;
+				return typeof v === 'number' ? toDisplay(v, resultUnit('flow')) : undefined;
+			} };
+	}
 	function paneUnitFlow() { return resultUnit('flow'); }
 	function paneUnitHead() { return resultUnit('elevhead'); }
 	function paneUnitPressure() { return resultUnit('pressure'); }
@@ -23498,6 +23509,8 @@ var EngCalcs = EngCalcs || {};
 						plainFor: function (n) { return demandRowsOf(n, effective(n, 'demand')).length > 1; },
 						set: function (n, v) { setProp(n, 'demand', v); } },
 					paneColNodeResult('demandActual', 'bpn_demand', paneUnitFlow),
+					paneColPdaResult('demandDelivered', 'lpn_result_delivered_demand', 'demands'),
+					paneColPdaResult('demandDeficit', 'lpn_result_demand_deficit', 'demandDeficits'),
 					// **AN INPUT, AND AN EMPTY CELL IS NOT A ZERO** (Task 530): a junction that
 					// states no fire flow of its own is tested against the number in the Fire flow
 					// box. A pane cell hands back `+'' === 0` for a blank, which fireFlowStore()
