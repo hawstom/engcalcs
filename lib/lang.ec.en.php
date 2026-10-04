@@ -3063,8 +3063,8 @@ $ec_lang['lpn_elev_dem_use_tip']='Puts the elevation of the DEM at this node int
 $ec_lang['lpn_elev_dem_none']='The DEM has no elevation for this node.';
 $ec_lang['lpn_elev_dem_said']='Mapbox DEM says {v} {u}.';
 $ec_lang['lpn_settings_elev_source']='Elevation source';
-$ec_lang['lpn_settings_elev_source_tip']='Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.';
-$ec_lang['lpn_settings_elev_source_typed']='The elevation typed above';
+$ec_lang['lpn_settings_elev_source_tip']='2026 Mapbox DEM horizontal and vertical accuracy ranges through 1–10 m and <1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and >16 m at the poles.';
+$ec_lang['lpn_settings_elev_source_typed']='Above';
 $ec_lang['lpn_settings_elev_source_dem']='Mapbox DEM';
 $ec_lang['lpn_settings_accuracy']='Accuracy';
 // **APPENDED TO EVERY HYDRAULICS TIP, because the box no longer shows the default** (Tom,

@@ -234,8 +234,12 @@ PUBLISHED.filter((f) => SOURCE_OF[f]).forEach((file) => {
 	// -- settings, key by key, with curation declared ----------------------------------------------
 	Object.keys(fresh.settings || {}).forEach((k) => {
 		if (CURATED_SETTING[k]) { return; }
+		// **`defaults.nodeElevSource` IS CURATION, NOT MODEL** (Tom, 2026-10-04: Mapbox DEM for the
+		// georeferenced examples): no `.inp` states where a future node's elevation comes from, so
+		// the one key is set aside and the rest of `defaults` is still compared.
+		const noSrc = (v) => { if (k !== 'defaults' || !v) { return v; } const c = Object.assign({}, v); delete c.nodeElevSource; return c; };
 		ok(file + ' carries settings.' + k,
-			dump(fresh.settings[k]) === dump((open.settings || {})[k]),
+			dump(noSrc(fresh.settings[k])) === dump(noSrc((open.settings || {})[k])),
 			'source ' + String(dump(fresh.settings[k])).slice(0, 200)
 			+ ' vs shipped ' + String(dump((open.settings || {})[k])).slice(0, 200));
 	});
