@@ -69,10 +69,10 @@ console.log('1. THE MAPPING IS epanet-js\'s, DIGIT FOR DIGIT');
 	L.setMode('select');
 	press('8');
 	ok('"8" selects the Meter tool, which is epanet-js\'s Customer', L.getMode() === 'add-meter', L.getMode());
-	// A digit we never claimed must not do anything either.
+	// **0 IS THE TENTH TOOL, Junction and Pipe (Task 719)**, the key being the position.
 	L.setMode('select');
 	press('0');
-	ok('"0" does nothing', L.getMode() === 'select', L.getMode());
+	ok('"0" selects the Junction and Pipe tool', L.getMode() === 'add-chain', L.getMode());
 }
 
 console.log('\n2. A DIGIT NEVER FIRES WHILE SOMEBODY IS TYPING');
@@ -145,9 +145,11 @@ console.log('\n5. THE STRIP READS LEFT TO RIGHT IN THE SAME ORDER THE DIGITS DO'
 	ok('every keyed mode has a button on the strip', placed.length === Object.keys(keys).length,
 		placed.length + ' of ' + Object.keys(keys).length);
 	placed.sort(function (a, b) { return a.at - b.at; });
+	// 0 is the tenth key, after 9, as on a keyboard row.
+	function tenth(k) { return k === '0' ? 10 : Number(k); }
 	const order = placed.map(function (p) { return p.key; }).join(' ');
 	ok('the keyed buttons are in ascending digit order: ' + order,
-		placed.every(function (p, n) { return n === 0 || Number(p.key) > Number(placed[n - 1].key); }), order);
+		placed.every(function (p, n) { return n === 0 || tenth(p.key) > tenth(placed[n - 1].key); }), order);
 	// The one that regressed: Select is the lowest digit, so it is the first keyed button.
 	ok('Select (digit 1) is the first keyed button on the strip', placed[0] && placed[0].mode === 'select',
 		placed[0] && placed[0].mode);

@@ -34,7 +34,7 @@ const L = loadLoopedNetwork(
 	"\t\tlonToTileX: lonToTileX, latToTileY: latToTileY,\n" +
 	"\t\tBUDGET: LPN_TILE_BUDGET, MAXZ: tileSource().maxZ,\n" +
 	// Task 452: two sources now, so the ceiling and the URL are read off the ACTIVE one.
-	"\t\tstyle: basemapStyle, setStyle: setBasemapStyle, satAvailable: satelliteAvailable,\n" +
+	"\t\tstyle: basemapSource, setStyle: setBasemapSource, satAvailable: satelliteAvailable,\n" +
 	// Task 452's corner teaser: the same two predicates and the same seam as the View row.
 	"\t\trefreshTeaser: refreshBasemapTeaser, wireTeaser: wireBasemapTeaser,\n" +
 	"\t\tisGeo: isLatLonProject,\n" +

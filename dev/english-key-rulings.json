@@ -219,11 +219,6 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
-        "lpn_calib_col_n_tip": {
-            "on": "Number of observations: the measurements at this location that were compared.",
-            "ruled": "2026-10-03",
-            "answer": "OK."
-        },
         "lpn_calib_col_obs_mean": {
             "on": "Observed mean",
             "ruled": "2026-10-03",
@@ -1210,10 +1205,6 @@
             "on": "Add demand category",
             "ruled": "2026-08-29"
         },
-        "lpn_demand_add_tip": {
-            "on": "Add another demand at this junction, with its own base demand, pattern and description. The demands add up.",
-            "ruled": "2026-08-29"
-        },
         "lpn_demand_remove": {
             "on": "Remove this demand",
             "ruled": "2026-08-29"
@@ -1556,11 +1547,6 @@
         "lpn_energy_menu": {
             "on": "Pump energy",
             "ruled": "2026-09-04"
-        },
-        "lpn_energy_menu_tip": {
-            "on": "What share of the run each pump was on, what power it drew and what it cost over the last extended period simulation.",
-            "ruled": "2026-09-06",
-            "answer": "OK."
         },
         "lpn_energy_needs_run": {
             "on": "Pump energy is power integrated over the run, so it needs an extended period simulation: the EPANET engine and a total run time. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.",
@@ -2015,19 +2001,10 @@
             "on": "Description",
             "ruled": "2026-08-29"
         },
-        "lpn_field_demand_category_tip": {
-            "on": "Name or description of the category.",
-            "ruled": "2026-08-29"
-        },
         "lpn_field_desc": {
             "on": "Description",
             "ruled": "2026-09-17",
             "answer": "OK."
-        },
-        "lpn_field_desc_tip": {
-            "on": "For your own use, such as a street corner or what a pipe is made of. It is carried into and out of the EPANET file, where it sits at the end of the part's own row. No calculation reads it. A line break becomes a space, because the file has nowhere to put one.",
-            "ruled": "2026-09-17",
-            "answer": "Edited."
         },
         "lpn_field_easting": {
             "on": "Easting",
@@ -2074,20 +2051,10 @@
             "ruled": "2026-09-23",
             "answer": "OK."
         },
-        "lpn_field_meter_count_tip": {
-            "on": "How many identical services this one customer stands for, so that forty-two single-family connections along one main can be one symbol in one place. The total below is the demand above times this count.",
-            "ruled": "2026-09-23",
-            "answer": "OK."
-        },
         "lpn_field_meter_demand": {
             "on": "Demand per service",
             "ruled": "2026-09-17",
             "answer": "OK."
-        },
-        "lpn_field_meter_demand_tip": {
-            "on": "What each service at this customer requires. Find and replace can leverage the distinction between blank and 0.",
-            "ruled": "2026-09-23",
-            "answer": "Edited. You make the pedantic point in multiple locations that blank is not the same as zero, but this is not a helpful thing to say; it's a truth without information. Instead, say what blank would be used for. I am making an attempt, but I want you to edit my wording if I misunderstood. Please make this a general point learned once we achieve mutual understanding about this."
         },
         "lpn_field_meter_lumped": {
             "on": "Added to node",
@@ -2118,11 +2085,6 @@
             "on": "Positive is to the right of the pipe looking from its first node toward its second. Typing a value here can move the customer to the other side of the main, and it always squares the service line to the main.",
             "ruled": "2026-09-23",
             "answer": "Edited."
-        },
-        "lpn_field_meter_pattern_tip": {
-            "on": "How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern to follow the project’s Default demand pattern.",
-            "ruled": "2026-09-23",
-            "answer": "Edited. Note that I removed your habitual \"and it\" construction where you mean \"If this, then that.\""
         },
         "lpn_field_meter_pipe": {
             "on": "Connected asset",
@@ -2496,11 +2458,6 @@
             "ruled": "2026-09-30",
             "answer": "OK."
         },
-        "lpn_freq_group_tip": {
-            "on": "Whether the graph shows junctions or pipes.",
-            "ruled": "2026-09-30",
-            "answer": "OK."
-        },
         "lpn_freq_menu": {
             "on": "Frequency",
             "ruled": "2026-09-30",
@@ -2508,11 +2465,6 @@
         },
         "lpn_freq_none": {
             "on": "No results for this value yet, so there is nothing to graph.",
-            "ruled": "2026-09-30",
-            "answer": "OK."
-        },
-        "lpn_freq_quantity_tip": {
-            "on": "Which value to graph.",
             "ruled": "2026-09-30",
             "answer": "OK."
         },
@@ -2652,11 +2604,6 @@
             "on": "Graphs",
             "ruled": "2026-10-03",
             "answer": "OK."
-        },
-        "lpn_graphs_menu_tip": {
-            "on": "Plot a profile along a path, a time series at one element, or the frequency distribution of results.",
-            "ruled": "2026-10-03",
-            "answer": "OK. (Tom, answering the Wave 0 proposal in his session message)"
         },
         "lpn_help_hotkeys": {
             "on": "Tables and Hotkeys",
@@ -2811,11 +2758,6 @@
             "ruled": "2026-09-28",
             "answer": "OK."
         },
-        "lpn_labels_priority_customer_tip": {
-            "on": "The order in which values are dropped from a customer label. The value numbered 1 is dropped first.",
-            "ruled": "2026-09-28",
-            "answer": "OK."
-        },
         "lpn_labels_restore": {
             "on": "Restore label defaults",
             "ruled": "2026-09-23",
@@ -2879,20 +2821,12 @@
             "on": "Description",
             "ruled": "2026-09-05"
         },
-        "lpn_library_curve_note_tip": {
-            "on": "What this curve is, in your own words. It is written above the curve in an EPANET file and read back from there.",
-            "ruled": "2026-09-05"
-        },
         "lpn_library_curve_remove_point": {
             "on": "Remove this point",
             "ruled": "2026-09-05"
         },
         "lpn_library_curve_type": {
             "on": "Curve type",
-            "ruled": "2026-09-05"
-        },
-        "lpn_library_curve_type_tip": {
-            "on": "What this curve describes",
             "ruled": "2026-09-05"
         },
         "lpn_library_curve_unused": {
@@ -3813,11 +3747,6 @@
             "ruled": "2026-09-26",
             "answer": "OK."
         },
-        "lpn_pane_sortarrow_tip": {
-            "on": "Reverse the sort",
-            "ruled": "2026-09-26",
-            "answer": "OK."
-        },
         "lpn_pane_tab_customers": {
             "on": "Customers",
             "ruled": "2026-09-17",
@@ -3836,16 +3765,16 @@
         "lpn_result_pump_head": {
             "on": "Head",
             "ruled": "2026-10-03",
-            "answer": "Approved."
+            "answer": "OK."
         },
         "lpn_report_pump_head": {
             "on": "Pump head",
             "ruled": "2026-10-03",
-            "answer": "Approved."
+            "answer": "OK."
         },
         "lpn_result_pump_head_tip": {
-            "on": "The pump's head gain from suction to discharge, plotted positive. EPANET reports it as a negative head loss, as do the Tables and the map label.",
-            "ruled": "2026-10-01",
+            "on": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
+            "ruled": "2026-10-03",
             "answer": "OK."
         },
         "lpn_pgraph_none": {
@@ -4134,11 +4063,6 @@
             "on": "New value from",
             "ruled": "2026-08-29"
         },
-        "lpn_report_pump_head": {
-            "on": "Pump head",
-            "ruled": "2026-10-03",
-            "answer": "OK."
-        },
         "lpn_reports_calib": {
             "on": "Calibration",
             "ruled": "2026-10-03",
@@ -4165,10 +4089,6 @@
         },
         "lpn_reports_menu": {
             "on": "Reports",
-            "ruled": "2026-09-04"
-        },
-        "lpn_reports_menu_tip": {
-            "on": "The finished answers this page produces once a network has been calculated: what the pumps cost, how the scenarios compare, and what the EPANET solver itself printed.",
             "ruled": "2026-09-04"
         },
         "lpn_reports_status": {
@@ -4216,16 +4136,6 @@
         "lpn_result_pressure": {
             "on": "Pressure",
             "ruled": "2026-09-01"
-        },
-        "lpn_result_pump_head": {
-            "on": "Head",
-            "ruled": "2026-10-03",
-            "answer": "OK."
-        },
-        "lpn_result_pump_head_tip": {
-            "on": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
-            "ruled": "2026-10-03",
-            "answer": "OK."
         },
         "lpn_result_reaction_rate": {
             "on": "Reaction rate",
@@ -4462,12 +4372,12 @@
             "ruled": "2026-08-29"
         },
         "lpn_settings_elev_source_tip": {
-            "on": "Where a new node gets its elevation. The land surface is read from Mapbox DEM, which is about 30 m across on most of the Earth and finer where better data exists.",
-            "ruled": "2026-08-29"
+            "on": "2026 Mapbox DEM horizontal and vertical accuracy ranges through 1–10 m and <1 m in the US, 2–10 m and 1–3 m in Europe and Japan, 30 m and 10–16 m globally, and 90 m and >16 m at the poles.",
+            "ruled": "2026-10-04"
         },
         "lpn_settings_elev_source_typed": {
-            "on": "The number above",
-            "ruled": "2026-08-29"
+            "on": "Above",
+            "ruled": "2026-10-04"
         },
         "lpn_settings_emitter_exponent_tip": {
             "on": "The power in the sprinkler and leak law, flow = coefficient x pressure to this power. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
@@ -4520,10 +4430,6 @@
         },
         "lpn_settings_leader_snap": {
             "on": "Snap leader lines to angle",
-            "ruled": "2026-08-29"
-        },
-        "lpn_settings_leader_snap_tip": {
-            "on": "When you drag a label away from what it names, the line back to it is pulled onto the nearest round angle if you drag close to one. Keep dragging and it lets go, so any angle is still available. Off drags freely, which is what this page has always done.",
             "ruled": "2026-08-29"
         },
         "lpn_settings_legend_off": {
@@ -5275,11 +5181,6 @@
             "ruled": "2026-09-17",
             "answer": "OK."
         },
-        "lpn_ts_add_tip": {
-            "on": "Put everything now chosen on the map onto the graph.",
-            "ruled": "2026-09-17",
-            "answer": "OK."
-        },
         "lpn_ts_axis_time": {
             "on": "Elapsed time",
             "ruled": "2026-09-17",
@@ -5305,11 +5206,6 @@
             "ruled": "2026-09-17",
             "answer": "OK."
         },
-        "lpn_ts_group_tip": {
-            "on": "Whether the graph shows nodes or links.",
-            "ruled": "2026-09-17",
-            "answer": "OK."
-        },
         "lpn_ts_menu": {
             "on": "Time series",
             "ruled": "2026-09-17",
@@ -5322,11 +5218,6 @@
         },
         "lpn_ts_none": {
             "on": "Nothing to graph yet. Choose assets on the map and press Add selected.",
-            "ruled": "2026-09-17",
-            "answer": "OK."
-        },
-        "lpn_ts_quantity_tip": {
-            "on": "Which value to graph against time.",
             "ruled": "2026-09-17",
             "answer": "OK."
         },

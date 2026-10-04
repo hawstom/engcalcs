@@ -222,8 +222,10 @@ console.log('\n--- a toolbar button repainted after initTips() keeps one tip ---
 	ok('...the selection bubble appends it to every instruction',
 		/pc\.lpn_area_hint_shift \|\|/.test(SRC));
 	const areaTip = /\$ec_lang\['lpn_tool_area_tip'\]='([^']*)'/.exec(lang0);
-	ok('...and the toolbar button\'s own tip states it too, word for word',
-		!!areaTip && !!shift && areaTip[1].indexOf(shift[1]) >= 0, areaTip && areaTip[1]);
+	// Tom rewrote the button's tip on 2026-10-04 in his own words, so it states the Shift rule
+	// rather than repeating the bubble's sentence word for word.
+	ok('...and the toolbar button\'s own tip states it too',
+		!!areaTip && /Shift/.test(areaTip[1]), areaTip && areaTip[1]);
 
 	global.bootstrap = global.window.bootstrap = priorBootstrap;
 	global.EngCalcs.initTips = priorInit;

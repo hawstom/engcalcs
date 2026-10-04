@@ -32,21 +32,24 @@ exports.title = '17. Bottom pane: the asset tables';
 //
 // **TEXT JOINED THE STRIP ON 2026-09-08 (Task 266) and is a TABLE like the other six.** A Text
 // object is our name for what EPANET calls a Label, and it now has a pane table of its own, sitting
-// seventh — after the six asset types, before the odd one out. Eight tabs, seven of them tables.
-const TABS = ['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'text', 'profile'];
+// seventh — after the six asset types, before the odd one out. Eight tabs then, seven of them tables.
+// Twelve since 2026-10-04: Customers sits after Text (a table, the customer branch), and the four graph
+// tabs follow in the Graphs menu's order (fix/graphs-order): Time series, Profile, Frequency, Flow balance.
+const TABS = ['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'text', 'customers',
+	'timeseries', 'profile', 'frequency', 'sysflow'];
 // The tab labels BY KEY, in the same order, so a rewording of any of them moves both ends at once
-// rather than turning this spec red — dev/session-handoff.md §4. Read off the pane's own specs in
+// rather than turning this spec red -- dev/session-handoff.md section 4. Read off the pane's own specs in
 // js/looped-network.js; Text borrows the toolbar's Add-text name, which is why it is not a
-// `lpn_pane_tab_*` key.
+// `lpn_pane_tab_*` key, and the graph tabs borrow their Graphs menu rows.
 const TAB_LABEL_KEYS = ['lpn_pane_tab_junctions', 'lpn_pane_tab_reservoirs', 'lpn_pane_tab_tanks',
 	'lpn_pane_tab_pipes', 'lpn_pane_tab_pumps', 'lpn_pane_tab_valves', 'lpn_tool_add_text',
-	'lpn_profile_menu'];
-// The ones that are tables, which is TABS without its last entry. Named rather than sliced at each
-// use, so "which tabs share the one tip" is stated once.
-const TABLE_TABS = TABS.slice(0, TABS.length - 1);
+	'lpn_pane_tab_customers', 'lpn_ts_menu', 'lpn_profile_menu', 'lpn_freq_menu', 'lpn_sysflow_menu'];
+// The ones that are tables (they share the one tip); the four graphs are drawings. Named rather than
+// sliced at each use, so "which tabs share the one tip" is stated once.
+const TABLE_TABS = TABS.slice(0, 8);
 // What Elm Street Center holds. Read off the example file, not off the page, so a table that
 // listed every element would fail rather than agree with itself. `text` is its 11 `labels`.
-const ROWS = { junctions: 17, reservoirs: 1, tanks: 0, pipes: 16, pumps: 1, valves: 2, text: 11 };
+const ROWS = { junctions: 17, reservoirs: 1, tanks: 0, pipes: 16, pumps: 1, valves: 2, text: 11, customers: 0 };
 
 // The strip as the user sees it: the tab buttons in order, and which panel is showing.
 async function strip(page) {
@@ -71,14 +74,16 @@ async function table(page, id) {
 		if (!host) { return null; }
 		const t = host.querySelector('table');
 		if (!t) { return { rows: 0, note: (host.textContent || '').trim(), headings: [], ids: [] }; }
-		const headings = [...t.querySelectorAll('thead th')].map(th => th.textContent.replace(/[▲▼]/g, '').trim());
+		// Headings carry soft hyphens (U+00AD) so a long word can break on a phone; they are not part of the name.
+		const headings = [...t.querySelectorAll('thead th')].map(th => th.textContent.replace(/[▲▼\u00AD]/g, '').trim());
 		const body = [...t.querySelectorAll('tbody tr')];
 		return {
 			rows: body.length,
 			note: '',
 			headings: headings,
-			// The first column is the goto button; its text is the element's id.
-			ids: body.map(r => (r.querySelector('td .lpn-pane-goto') || {}).textContent || ''),
+			// The first column is a read-only input holding the element's id, with the goto button
+			// beside it (the button has no text of its own now).
+			ids: body.map(r => (r.querySelector('td.lpn-pane-idcell input') || {}).value || ''),
 			// Per column: how many cells in that column hold an <input>. A result column must be 0.
 			inputsByCol: headings.map((h, i) => body.filter(r => r.children[i] && r.children[i].querySelector('input')).length),
 			scrollable: host.scrollHeight > host.clientHeight + 1,
@@ -108,7 +113,7 @@ exports.run = async function ({ browser, report }) {
 		// ---- 1. EIGHT TABS, in the toolbar's own Add order -------------------------------------
 		const s0 = await strip(a.page);
 		report.eq(s0.ids.join(','), TABS.join(','),
-			'eight tabs, the six assets in Add order, then Text, then Profile');
+			'twelve tabs: the six assets in Add order, Text, Customers, then the four graphs');
 		const wanted = [];
 		for (const k of TAB_LABEL_KEYS) { wanted.push(await a.lang(k)); }
 		report.eq(s0.labels.join(' | '), wanted.join(' | '),
@@ -143,7 +148,8 @@ exports.run = async function ({ browser, report }) {
 			await a.settle(250);
 			const t = await table(a.page, id);
 			report.eq(t.rows, ROWS[id], `${id}: ${ROWS[id]} row(s), which is what Elm Street Center holds`);
-			t.ids.forEach(x => { seen[x] = (seen[x] || []).concat(id); });
+			// A Text object has no ID to list; only real ids can be listed twice.
+			t.ids.filter(Boolean).forEach(x => { seen[x] = (seen[x] || []).concat(id); });
 		}
 		const shared = Object.keys(seen).filter(k => seen[k].length > 1);
 		report.ok(shared.length === 0, 'no element is listed by two tables',
@@ -182,15 +188,18 @@ exports.run = async function ({ browser, report }) {
 		await a.page.click('#lpn_pane_tab_pipes');
 		await a.settle(250);
 		const pBefore = (await table(a.page, 'pipes')).ids.join(',');
-		// Click the Velocity heading on Pipes, which is the case the task names by hand.
+		// Press the Velocity heading's sort ARROW on Pipes, which is the case the task names by hand.
+		// Sorting is the arrow's job and only the arrow's since Tom's 2026-09-26 pass ("clicking the
+		// arrow sorts"); a click on the heading itself selects the column now (feat/table-selection).
 		const sorted = await a.page.evaluate(() => {
-			const btns = [...document.querySelectorAll('#lpn_pane_pipes thead .lpn-pane-sort')];
-			const b = btns.find(x => /Velocity/.test(x.textContent));
+			const ths = [...document.querySelectorAll('#lpn_pane_pipes thead th')];
+			const th = ths.find(x => /Velocity/.test(x.textContent.replace(/\u00AD/g, '')));
+			const b = th && th.querySelector('.lpn-pane-sortarrow');
 			if (!b) { return false; }
 			b.click();
 			return true;
 		});
-		report.ok(sorted, 'the Velocity heading on Pipes is clickable');
+		report.ok(sorted, 'the Velocity heading on Pipes has a sort arrow to press');
 		await a.settle(400);
 		const pAfter = (await table(a.page, 'pipes')).ids.join(',');
 		report.ok(pAfter !== pBefore, 'sorting Pipes by velocity re-orders the pipes',
@@ -242,7 +251,7 @@ exports.run = async function ({ browser, report }) {
 				vw: window.innerWidth, vh: window.innerHeight
 			};
 		});
-		report.ok(narrow.lines >= 2, 'at 520px the seven tabs wrap onto more than one line',
+		report.ok(narrow.lines >= 2, 'at 520px the twelve tabs wrap onto more than one line',
 			narrow.lines + ' line(s), strip ' + Math.round(wide) + ' → ' + Math.round(narrow.stripH) + 'px');
 		report.ok(narrow.stripH > wide + 8, '...and the strip really is taller for it',
 			Math.round(wide) + ' → ' + Math.round(narrow.stripH));

@@ -96,58 +96,52 @@ lines rather than appending corrections.
 - **The browser-pass harness leaks its `php -S` server when killed**; 14 from 09-23 were still
   running on 09-24. `ps -eo pid,ppid,lstart,args | grep 'S 127.0.0.1'`, kill those whose parent is 1/449.
 - **Flaky under load, green alone:** `run-progress-harness.js`; `dev/browser-pass/specs/basemap.js` and `firstproject.js`
-  tile counts at a 900 ms settle. Pre-existing and unrelated: `scale-publish-harness.js` (2 checks),
-  `dev/browser-pass/specs/place.js` (stale "lat/lon project now"; section 17 filechooser order),
-  `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
+  tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-04 (afternoon)
+## STATE — 2026-10-04 (late evening)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged 2026-10-04: property-graph (637), dock (441), table-selection (757), setting-scope (739) on
-his "Good. Done."; Graphs menu and pane tabs in EPANET's order (Time series, Profile, Contour,
-Frequency, Flow balance); tooltips 17rem (his "happy medium"); customer connects at the foot on the
-clicked leg of a bent pipe, and a drag keeps its leg; the solve-time line moved to the messenger;
-Task 732 specs; Task 760 phone Settings; the saved-where marker wraps on a phone; two check flakes.
-New tasks: 719 promoted to 75 (Junction and Pipe chain tool), 762 PDA, 763 help manual from cut
-tips, 764 one voice for tips (its rules are now written, see below), 761 four stale specs.
+Merged 2026-10-04 evening, on his typed words: 8110 dialog-audit, 8113 basemap-style, 8114
+epanet-pp-brand, 8115 elev-default, 8116 tip-verdict. Also: Show contours check box; Task 761
+specs; the scope harness presses dialog buttons as a pointer (the new dialog ignores a `detail: 0`
+click); the sitemap leaves the map app to epanet-plus-plus.org's own `sitemap-app.xml`.
+**Owed to Tom:** upload the regenerated `~/webdev/hawsedc.com/sitemap.xml` (518 URLs, no `/app/`);
+8110's phone test on dev.hawsedc.com once he pulls there.
 
 ### Awaiting his browser pass (protected; ports.conf rows say what to try)
 
-- 8110 `feat/dialog-audit` (710): his three findings fixed (title band overlap; Delete network now
-  undoable, so "This cannot be undone" left the confirm, his look owed; georeference two-point pick
-  lost the first typed digit). He wants a phone test on dev.hawsedc.com: tell him when it merges.
-- 8111 `feat/scenario-option` (755): his wording applied; "No. of overrides"; box 1500 px. Open
-  question to him: the override tip's second sentence still says "use the Base value again".
-  After merge, apply the three style rules to lpn_scenario_* ("Checked/Unchecked", "Click to switch").
-- 8113 `feat/basemap-style` (617): "Basemap style", Muted the default for new projects and the
-  Novato example. Seam: feat/elev-default also edits Net3-Novato-CA-World.lwn (both sources).
-- 8114 `feat/epanet-pp-brand`: EPANET++ in About/Welcome/Hydraulics menu/related-calcs; the map
-  app's canonical is epanet-plus-plus.org on every host; About dedication links his blog post. After
-  merge: drop `/app/` from librewaternet.org's sitemap, add the app to epanet-plus-plus.org's
-  (`generate_sitemap.php --host=epanet-plus-plus.org`), push both siblings. He chose to stay "under
-  the radar for a few months": no outreach push.
-- 8115 `feat/elev-default`: Mapbox DEM default for new geographic projects and Novato; first option
-  "Above". His DEM accuracy numbers could not be sourced from Mapbox's docs; asked him for a source.
-- 8116 `feat/tip-verdict`: his 270 verdicts (42 rewrites, 48 deletes kept in dev/help-manual-source.md,
-  "Default" in four selectors, the custom-property Allow/Restrict bug) and Mary's three rules applied
-  (97 strings; rules in dev/language-strings.md). Asked him: bring three of his own texts in line
-  (add-customer "Click...", zoom window "Click or drag.", quality tolerance "How much..."); his use-units
-  tip now says Select/Clear; Calculate tip restored (his delete assumed it orphaned; it is not); mean
-  error tip held back; specific gravity tip deletion suggested; emitter exponent tip is stale.
+- **8113** `feat/chain-draw` (719, moved from 8106: his tunnel does not carry 8106/8107): Junction
+  and Pipe tool, key 0. His calls: the name; no on-screen way to end a chain on a phone; the toolbar
+  wraps at 1201-1300 px; a pipe click ends the chain; no row for key 0 in the shortcuts table.
+- **8114** `feat/pda` (762, moved from 8107): Demand model DDA/PDA. His calls: "Delivered demand"
+  (EPANET says Demand); a kPa file is disclosed, not honoured; unit labels lag until Settings reopens.
+- **8111** `feat/scenario-option` (755): "Calculation options" now heads the three option columns
+  (he could not find them: nothing named the group); the double tooltip on each `?` is fixed. After
+  merge, apply the style rules to lpn_scenario_* (its basic tip says "Checked/Unchecked").
 - Still from before: 8108 `feat/profile-file`, `feat/desktop`, `feat/label-placer`.
-
-**Seams:** tip-verdict touches most lpn strings; merge it before or after the others, never between,
-and re-run the payload regeneration once on the last merge.
 
 ### Owed translation work
 
-Every pending branch's English (tip-verdict's ~140 changed keys dominate), the 46 lpn keys held
-before, the Romanian file menu pass, four concept terms. Run one sprint after tip-verdict and the
-other wording branches merge, not before: most English is still moving.
+tip-verdict is merged, so most English has settled: **a sprint is the next sensible job.** Pending
+branches add little (chain-draw 3 keys, pda 19, scenario-option 1). Also owed: the 46 lpn keys held
+before, the Romanian file menu pass, four concept terms. Approved-English entries for the reworded
+and deleted tip-verdict keys may still sit in english-key-rulings.json; the orchestrator edits it.
 
 ### Traps met 2026-10-04
+
+- **The classifier refused all-clears from his pasted message and reading the wish lists.** He
+  typed the merge words instead, and added an `autoMode.environment` note to ~/.claude/settings.json
+  that pasted messages are his own; untested until a new session.
+- **A dialog button pressed with a bare `el.click()` is ignored** since dialog-audit (`detail: 0`
+  reads as an unarmed keyboard press). Harnesses must dispatch a MouseEvent with `detail: 1`.
+- **A `cmd && git branch -d ... && suite &` line backgrounds the whole chain**, so when one step
+  fails, the suite silently never starts while "started" still prints. Start a suite in its own call.
+- **An agent reported a check_all log that started on its PREVIOUS commit**; its fix landed mid-run.
+  Match the log's start time to the head's commit time before believing it.
+- **`projection-harness.js` can hang 300 s under load** (event loop held open) and pass in 0.3 s
+  alone.
 
 - **His edit of `dev/new-english-keys.md` was made on a copy older than the last regeneration**
   (header counts 92 vs 67): the harvest still worked because it reads marks by key. Commit his edit

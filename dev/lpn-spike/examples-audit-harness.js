@@ -120,6 +120,7 @@ const CURATED_SETTING = {
 	linkWidth: 'line weight',
 	textSize: 'label size', symbolSize: 'symbol size', mapHeight: 'pane height',
 	backdropOpacity: 'how strongly the site plan shows through',
+	basemapStyle: 'how the map tiles are styled (Task 617); a display choice, not the model',
 	// **CURATED ON Net3.lwn, 2026-09-22** (Tom, asked whether it should get a threshold back:
 	// *"Yes. 30."*; the "Zoom in to see labels" note it was chosen for went 2026-09-28). EPA's
 	// Net3.inp has no notion of this setting at all, so a raw import carries none -- this is a
@@ -233,8 +234,12 @@ PUBLISHED.filter((f) => SOURCE_OF[f]).forEach((file) => {
 	// -- settings, key by key, with curation declared ----------------------------------------------
 	Object.keys(fresh.settings || {}).forEach((k) => {
 		if (CURATED_SETTING[k]) { return; }
+		// **`defaults.nodeElevSource` IS CURATION, NOT MODEL** (Tom, 2026-10-04: Mapbox DEM for the
+		// georeferenced examples): no `.inp` states where a future node's elevation comes from, so
+		// the one key is set aside and the rest of `defaults` is still compared.
+		const noSrc = (v) => { if (k !== 'defaults' || !v) { return v; } const c = Object.assign({}, v); delete c.nodeElevSource; return c; };
 		ok(file + ' carries settings.' + k,
-			dump(fresh.settings[k]) === dump((open.settings || {})[k]),
+			dump(noSrc(fresh.settings[k])) === dump(noSrc((open.settings || {})[k])),
 			'source ' + String(dump(fresh.settings[k])).slice(0, 200)
 			+ ' vs shipped ' + String(dump((open.settings || {})[k])).slice(0, 200));
 	});
