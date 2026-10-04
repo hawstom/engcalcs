@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='Ništa u ovom projektu nije nazvano {id}, pa
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Kako potražnja ovog korisnika raste i pada tijekom pokretanja. Množi ukupnu potražnju, pa djeluje na svaki priključak koji ovaj korisnik predstavlja. Ostavite na Bez obrasca da slijedi Zadani obrazac potražnje projekta.';
 $ec_lang['lpn_meter_pattern_unknown']='Nijedan obrazac u ovom projektu nije nazvan {id}, pa je korisnik ostavljen kakav je bio.';
 $ec_lang['lpn_meter_placed']='Korisnik {id} dodan. Njegov opis i potražnja upisuju se u tablici Korisnici, ili ga pritisnite u načinu Odabir da otvorite njegov okvir.';
 $ec_lang['lpn_field_meter_pipe_tip']='Element na koji se ovaj priključak povezuje. Upišite drugi ovdje ili u tablici Korisnici da ga promijenite, ili povucite točku povezivanja na drugi element.';
@@ -3540,7 +3539,6 @@ $ec_lang['lpn_field_base_demand']='Osnovna potražnja';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='Protok koji ovaj čvor troši u prikazanom vremenskom koraku: svaka osnovna potražnja pomnožena svojim obrascem, zbrojena. Izračunava se, a ne upisuje, pa se mijenja sa satom i ne može se uređivati.';
 $ec_lang['lpn_field_demand_pattern']='Obrazac potražnje';
-$ec_lang['lpn_field_demand_pattern_tip']='Kako potražnja ovog čvora raste i pada tijekom pokretanja. Ostavite na Bez obrasca i čvor će umjesto toga slijediti Zadani obrazac potražnje.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

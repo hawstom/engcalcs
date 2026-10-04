@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='پدې پروژه کې هیڅ شی {id} نو
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='دا چې د دې مشتري غوښتنه د چلولو په اوږدو کې څنګه ورپورته او ښکته کیږي. دا ټوله غوښتنه ضرب کوي، نو پر هرې خدمت اغیزه کوي چې دا مشتری یې استازیتوب کوي. یې پر هیڅ نمونه پرېږدئ ترڅو د پروژې تلواله غوښتنې نمونه تعقیب کړي.';
 $ec_lang['lpn_meter_pattern_unknown']='پدې پروژه کې هیڅ نمونه {id} نومول شوې نه ده، نو مشتری هماغسې پرېښودل شو لکه چې و.';
 $ec_lang['lpn_meter_placed']='مشتری {id} اضافه شو. د هغه تشریح او غوښتنه د مشتریانو جدول کې لیکل کیږي، یا یې په ټاکل حالت کې فشار ورکړئ ترڅو خپل بکس پرانیزئ.';
 $ec_lang['lpn_field_meter_pipe_tip']='هغه شتمنۍ چې دا خدمت ورسره نښلي. دا بدلولو لپاره دلته یا د مشتریانو جدول کې بله ولیکئ، یا د نښلون ټکی بلې شتمنۍ ته راکاږئ.';
@@ -3540,7 +3539,6 @@ $ec_lang['lpn_field_base_demand']='بنسټیزه غوښتنه';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='هغه بهاو چې دا نقطه یې د ښودل شوي وخت پړاو کې راباسي: هره بنسټیزه غوښتنه پخپله نمونه ضرب شوې، سره یوځای شوې. دا محاسبه کیږي، نه لیکل کیږي، نو د ساعت سره بدلیږي او سمول نشي کیدی.';
 $ec_lang['lpn_field_demand_pattern']='د غوښتنې نمونه';
-$ec_lang['lpn_field_demand_pattern_tip']='دا چې د دې جنکشن غوښتنه د چلولو په اوږدو کې څنګه ورپورته او ښکته کیږي. یې پر هیڅ نمونه نشته پرېږدئ او جنکشن به پدې ځای د پروژې تلواله نمونه تعقیبوي.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='គ្មានអ្វីនៅក្ន�
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='របៀបដែលតម្រូវការរបស់អតិថិជននេះឡើង និងចុះពេញការដំណើរការ។ វាគុណនឹងតម្រូវការសរុប ដូច្នេះវាប៉ះពាល់ដល់សេវានីមួយៗដែលអតិថិជននេះតំណាងឲ្យ។ ទុកវានៅ គ្មានលំនាំ ដើម្បីតាម លំនាំតម្រូវការលំនាំដើម របស់គម្រោង។';
 $ec_lang['lpn_meter_pattern_unknown']='គ្មានលំនាំណាមួយនៅក្នុងគម្រោងនេះមានឈ្មោះ {id} ទេ ដូច្នេះអតិថិជននេះត្រូវបានទុកដដែល។';
 $ec_lang['lpn_meter_placed']='អតិថិជន {id} ត្រូវបានបន្ថែម។ ការពិពណ៌នា និងតម្រូវការរបស់វាអាចវាយបញ្ចូលនៅក្នុងតារាងអតិថិជន ឬចុចលើវានៅក្នុងរបៀបជ្រើសរើសដើម្បីបើកប្រអប់របស់វា។';
 $ec_lang['lpn_field_meter_pipe_tip']='ធាតុដែលសេវានេះភ្ជាប់ទៅ។ វាយបញ្ចូលមួយផ្សេងទៀតនៅទីនេះ ឬនៅក្នុងតារាងអតិថិជនដើម្បីផ្លាស់ប្ដូរវា ឬអូសចំណុចតភ្ជាប់ទៅធាតុមួយផ្សេងទៀត។';
@@ -3641,7 +3640,6 @@ $ec_lang['lpn_field_base_demand']='តម្រូវការមូលដ្ឋ
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='លំហូរដែលថ្នាំងនេះទាញនៅជំហានពេលវេលាដែលបានបង្ហាញ៖ តម្រូវការមូលដ្ឋាននីមួយៗគុណនឹងលំនាំផ្ទាល់របស់វា ហើយបូកបញ្ចូលគ្នា។ វាត្រូវបានគណនា មិនមែនវាយបញ្ចូលទេ ដូច្នេះវាផ្លាស់ប្ដូរតាមនាឡិកា ហើយមិនអាចកែសម្រួលបានទេ។';
 $ec_lang['lpn_field_demand_pattern']='លំនាំតម្រូវការ';
-$ec_lang['lpn_field_demand_pattern_tip']='របៀបដែលតម្រូវការរបស់ថ្នាំងនេះឡើង និងចុះពេញការដំណើរការ។ ទុកវានៅ គ្មានលំនាំ ដើម្បីតាមលំនាំផ្ទាល់របស់គម្រោង។';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

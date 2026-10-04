@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='Nimic din acest proiect nu se numește {id},
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Cum crește și scade cerința acestui abonat pe parcursul rulării. Multiplică cerința totală, deci acționează asupra fiecărui branșament pe care îl reprezintă acest abonat. Lăsați-l la Niciun model pentru a urma Modelul implicit de cerință al proiectului.';
 $ec_lang['lpn_meter_pattern_unknown']='Niciun model din acest proiect nu se numește {id}, deci abonatul a fost lăsat cum era.';
 $ec_lang['lpn_meter_placed']='Abonatul {id} a fost adăugat. Descrierea și cerința sa se tastează în tabelul Abonați, sau apăsați-l în Selectare pentru a-i deschide caseta.';
 $ec_lang['lpn_field_meter_pipe_tip']='Elementul la care se conectează acest branșament. Tastați altul aici sau în tabelul Abonați pentru a-l schimba, sau trageți punctul de conectare la un alt element.';
@@ -3540,7 +3539,6 @@ $ec_lang['lpn_field_base_demand']='Cerință de bază';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='Debitul pe care îl preia acest nod la pasul de timp afișat: fiecare cerință de bază înmulțită cu propriul ei model, adunate. Este calculat, nu introdus, deci se schimbă odată cu ceasul și nu poate fi editat.';
 $ec_lang['lpn_field_demand_pattern']='Model de cerință';
-$ec_lang['lpn_field_demand_pattern_tip']='Cum crește și scade cerința acestei joncțiuni pe parcursul rulării. Lăsați-l la Niciun model și joncțiunea urmează în schimb Modelul implicit al proiectului.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

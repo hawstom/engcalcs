@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='اس پراجیکٹ میں کوئی چیز {
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='رن کے دوران اس گاہک کی طلب کیسے بڑھتی اور گھٹتی ہے۔ یہ کل طلب کو ضرب دیتا ہے، اس لیے یہ ہر اس سروس پر لاگو ہوتا ہے جس کی یہ گاہک نمائندگی کرتا ہے۔ اسے کوئی پیٹرن نہیں پر چھوڑ دیں اور یہ پراجیکٹ کے پہلے سے مقررہ طلب پیٹرن کی پیروی کرے گا۔';
 $ec_lang['lpn_meter_pattern_unknown']='اس پراجیکٹ میں کوئی پیٹرن {id} نام کا نہیں، اس لیے گاہک ویسے ہی رہنے دیا گیا جیسا تھا۔';
 $ec_lang['lpn_meter_placed']='گاہک {id} شامل ہو گیا۔ اس کی تفصیل اور طلب گاہک جدول میں ٹائپ کی جاتی ہے، یا اس کا خانہ کھولنے کے لیے منتخب کریں میں اسے دبائیں۔';
 $ec_lang['lpn_field_meter_pipe_tip']='وہ اثاثہ جس سے یہ سروس منسلک ہے۔ اسے بدلنے کے لیے یہاں یا گاہک جدول میں کوئی اور ٹائپ کریں، یا رابطے کے نقطے کو کسی مختلف اثاثے پر گھسیٹیں۔';
@@ -3538,7 +3537,6 @@ $ec_lang['lpn_field_base_demand']='بنیادی طلب';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='دکھائے گئے وقتی مرحلے پر یہ نوڈ جو بہاؤ کھینچتا ہے: ہر بنیادی طلب کو اس کے اپنے پیٹرن سے ضرب دے کر، سب کو جمع کر کے۔ یہ حساب سے نکالا جاتا ہے، لکھا نہیں جاتا، اس لیے یہ گھڑی کے ساتھ بدلتا ہے اور اسے ترمیم نہیں کیا جا سکتا۔';
 $ec_lang['lpn_field_demand_pattern']='طلب پیٹرن';
-$ec_lang['lpn_field_demand_pattern_tip']='اس جنکشن کی طلب پورے رن میں کیسے بڑھتی اور گھٹتی ہے۔ اسے کوئی پیٹرن نہیں پر چھوڑ دیں اور جنکشن اس کے بجائے پراجیکٹ کے پہلے سے مقررہ طلب پیٹرن کی پیروی کرے گا۔';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

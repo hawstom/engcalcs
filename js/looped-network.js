@@ -22986,16 +22986,17 @@ var EngCalcs = EngCalcs || {};
 	// half of that, and a plain write here where the popup writes plainly is deliberate rather than
 	// an oversight (a mixing model and a pump's speed are not overridable, and setProp() would
 	// write a `_mixingModel` nothing reads).
-	function paneChoicesPatterns() {
+	function paneChoicesPatterns(blankLabel) {
 		var pc = EngCalcs.pageConfig || {},
-			out = [['', pc.lpn_library_pattern_none || 'No pattern']];
+			out = [['', blankLabel || pc.lpn_library_pattern_none || 'No pattern']];
 		libPatternsRead().forEach(function (p) { out.push([p.id, p.id]); });
 		return out;
 	}
 	// A pattern REFERENCE as a column. The value is the pattern's id, which is what the document
 	// stores and what a pasted spreadsheet would carry; the list is the project's own.
-	function paneColPattern(key, labelKey, get, set, overridable) {
-		var c = { key: key, label: labelKey, em: 5, choices: paneChoicesPatterns,
+	function paneColPattern(key, labelKey, get, set, overridable, blankIsDefault) {
+		var c = { key: key, label: labelKey, em: 5,
+			choices: blankIsDefault ? function () { return paneChoicesPatterns(lpnBlankIsDefault()); } : function () { return paneChoicesPatterns(); },
 			get: get, set: set };
 		if (overridable) { c.prop = key; }
 		return c;
@@ -23127,11 +23128,11 @@ var EngCalcs = EngCalcs || {};
 	// A CURVE REFERENCE, never its points (Task 586): a curve is a document object and an element
 	// states one by id. The list is filtered to the kind the element can use, exactly as the
 	// popup's chooser is, so a pump cannot be pointed at a volume curve.
-	function paneColCurveRef(key, kind, labelKey) {
+	function paneColCurveRef(key, kind, labelKey, blankIsDefault) {
 		return { key: key, label: labelKey, em: 6, prop: key,
 			choices: function () {
 				var pc = EngCalcs.pageConfig || {},
-					out = [['', pc.lpn_curve_none || 'No curve selected']];
+					out = [['', blankIsDefault ? lpnBlankIsDefault() : (pc.lpn_curve_none || 'No curve selected')]];
 				libCurvesRead().forEach(function (c) { if (c.kind === kind) { out.push([c.id, c.id]); } });
 				return out;
 			},
@@ -23169,7 +23170,7 @@ var EngCalcs = EngCalcs || {};
 	function paneColEnergyPattern() {
 		return paneColPattern('energyPattern', 'lpn_energy_price_pattern',
 			function (l) { return effective(l, 'energyPattern'); },
-			function (l, v) { setProp(l, 'energyPattern', v || null); }, true);
+			function (l, v) { setProp(l, 'energyPattern', v || null); }, true, true);
 	}
 	// **A THROTTLE VALVE'S LOSS IS ITS SETTING ALONE**, which is EPANET's own simplification and
 	// ours: it ignores the [VALVES] minor-loss column for a TCV, so a number typed here would be one
@@ -23661,7 +23662,7 @@ var EngCalcs = EngCalcs || {};
 				cols: [paneColId(), paneColDesc(), paneColTag(), paneColActive(), paneColClosed()].concat(paneColEnds(), [
 					paneColCurveRef('curveId', 'head', 'lpn_pump_curve_source'),
 					paneColPumpSpeed(), paneColSpeedPattern(),
-					paneColCurveRef('efficCurveId', 'effic', 'lpn_pump_effic_curve'),
+					paneColCurveRef('efficCurveId', 'effic', 'lpn_pump_effic_curve', true),
 					paneColEnergyPrice(), paneColEnergyPattern(),
 					paneColVerts(),
 					paneColLinkResult('flow', 'lpn_result_flow', paneUnitFlow),
@@ -49720,11 +49721,19 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Shared by settingsDefaultPatternRow() above and by the junction popup's own selector, so the
 	// two lists cannot disagree about what patterns exist or about what the blank one is called.
-	function libFillPatternOptions(sel, value) {
+	// **`blankLabel` NAMES WHAT A BLANK MEANS WHERE IT IS NOT "NONE"** (Tom, 2026-10-04 tip verdicts:
+	// *"Why not change the first (blank value) option in the selector to say 'Default' so that this
+	// tip is not needed?"*). A junction's or a customer's blank pattern follows the project's
+	// Default demand pattern, and a pump's blank price pattern follows the network's, so those
+	// callers pass lpnBlankIsDefault(); everywhere else a blank really is No pattern.
+	function lpnBlankIsDefault() {
+		return (EngCalcs.pageConfig || {}).lpn_choice_default || 'Default';
+	}
+	function libFillPatternOptions(sel, value, blankLabel) {
 		var pc = EngCalcs.pageConfig || {}, none = document.createElement('option');
 		sel.textContent = '';
 		none.value = '';
-		none.textContent = pc.lpn_library_pattern_none || 'No pattern';
+		none.textContent = blankLabel || pc.lpn_library_pattern_none || 'No pattern';
 		sel.appendChild(none);
 		libPatternsRead().forEach(function (p) {
 			var o = document.createElement('option');
@@ -51881,9 +51890,9 @@ var EngCalcs = EngCalcs || {};
 	// A pattern chooser, in the popup's own row shape. The OPTIONS come from libFillPatternOptions(),
 	// which the Libraries box's own default-pattern row also uses, so the two can never disagree
 	// about what patterns exist or about what the blank entry is called.
-	function patternField(fields, labelText, get, set, tip) {
+	function patternField(fields, labelText, get, set, tip, blankLabel) {
 		var label = document.createElement('label'), sel = document.createElement('select');
-		libFillPatternOptions(sel, get());
+		libFillPatternOptions(sel, get(), blankLabel);
 		sel.addEventListener('change', function () { saveUndoSnapshot(); set(sel.value); });
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(sel);
@@ -53539,7 +53548,7 @@ var EngCalcs = EngCalcs || {};
 			// the only label a column has, so it is where its `?` belongs -- and it is one `?` per
 			// label, which is the suite's rule.
 			[[(pc.lpn_field_base_demand || 'Base demand') + ' (' + unitLabel('lpn_u_flow') + ')', pc.lpn_demand_tip],
-				[pc.lpn_field_demand_pattern || 'Demand pattern', pc.lpn_field_demand_pattern_tip],
+				[pc.lpn_field_demand_pattern || 'Demand pattern', null],
 				[pc.lpn_field_demand_category || 'Description', null],
 				['', null]].forEach(function (pair) {
 				var th = document.createElement('th');
@@ -53756,7 +53765,7 @@ var EngCalcs = EngCalcs || {};
 			acc.setBase(+bInput.value);
 			afterPropertyEdit(n);
 		});
-		libFillPatternOptions(sel, acc.getPattern());
+		libFillPatternOptions(sel, acc.getPattern(), lpnBlankIsDefault());
 		sel.setAttribute('aria-label', (pc.lpn_field_demand_pattern || 'Demand pattern') + ' ' + (index + 1));
 		sel.addEventListener('change', function () {
 			saveUndoSnapshot();
@@ -53842,14 +53851,14 @@ var EngCalcs = EngCalcs || {};
 	 * at some other curve on their behalf is not acting on it. Same treatment the water-quality
 	 * trace node's missing source gets.
 	 */
-	function curveChooser(fields, l, prop, kind, labelText, tip) {
+	function curveChooser(fields, l, prop, kind, labelText, tip, blankLabel) {
 		var pc = EngCalcs.pageConfig || {},
 			label = document.createElement('label'),
 			sel = document.createElement('select'),
 			cur = effective(l, prop) || '',
 			none = document.createElement('option');
 		none.value = '';
-		none.textContent = pc.lpn_curve_none || 'No curve selected';
+		none.textContent = blankLabel || pc.lpn_curve_none || 'No curve selected';
 		sel.appendChild(none);
 		libCurvesRead().forEach(function (c) {
 			if (c.kind !== kind) { return; }
@@ -54212,7 +54221,7 @@ var EngCalcs = EngCalcs || {};
 			globalText = globalPct === null ? (pc.lpn_energy_efficiency || 'Pump efficiency (percent)')
 				: (globalPct + '%');
 		curveChooser(fields, l, 'efficCurveId', 'effic',
-			pc.lpn_pump_effic_curve || 'Pump efficiency curve', pc.lpn_pump_effic_curve_tip);
+			pc.lpn_pump_effic_curve || 'Pump efficiency curve', pc.lpn_pump_effic_curve_tip, lpnBlankIsDefault());
 		if (name && !curve) {
 			pumpEfficNote(fields, (pc.lpn_pump_effic_unstated
 				|| 'This pump refers to an efficiency curve called {name}, which nothing in this project defines, so it runs at the efficiency set for the whole network, {percent}.')
@@ -54287,7 +54296,7 @@ var EngCalcs = EngCalcs || {};
 		patternField(fields, pc.lpn_energy_price_pattern || 'Price pattern',
 			function () { return effective(l, 'energyPattern'); },
 			function (v) { setProp(l, 'energyPattern', v || null); refreshPopupIfOpen(); },
-			pc.lpn_energy_price_pattern_tip);
+			pc.lpn_energy_price_pattern_tip, lpnBlankIsDefault());
 	}
 	// A GPV's own curve. Flow against HEAD LOSS -- the quantity a general purpose valve is defined
 	// by -- and no "pump curve" note, because none of that fitting applies: EPANET reads these
@@ -55057,7 +55066,7 @@ var EngCalcs = EngCalcs || {};
 		 */
 		patLabel = document.createElement('label');
 		patSel = document.createElement('select');
-		libFillPatternOptions(patSel, c.pattern || '');
+		libFillPatternOptions(patSel, c.pattern || '', lpnBlankIsDefault());
 		patSel.addEventListener('change', function () {
 			if ((c.pattern || '') === patSel.value) { return; }
 			saveUndoSnapshot();
@@ -55065,8 +55074,7 @@ var EngCalcs = EngCalcs || {};
 			customerEdited(c);
 			refreshPopupIfOpen();
 		});
-		setFieldLabel(patLabel, pc.lpn_field_demand_pattern || 'Demand pattern',
-			pc.lpn_field_meter_pattern_tip);
+		setFieldLabel(patLabel, pc.lpn_field_demand_pattern || 'Demand pattern');
 		patLabel.appendChild(patSel);
 		fields.appendChild(patLabel);
 		fields.appendChild(document.createElement('br'));

@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='لا شيء في هذا المشروع اس�
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='كيف يرتفع طلب هذا المشترك وينخفض خلال التشغيل. يُضرب في إجمالي الطلب، فيؤثر في كل توصيلة يمثّلها هذا المشترك. اتركه عند لا يوجد نمط ليتبع نمط الطلب الافتراضي للمشروع.';
 $ec_lang['lpn_meter_pattern_unknown']='لا يوجد في هذا المشروع نمط اسمه {id}، فتُرك المشترك كما كان.';
 $ec_lang['lpn_meter_placed']='أُضيف المشترك {id}. يُكتب وصفه وطلبه في جدول المشتركين، أو اضغط عليه في وضع التحديد لفتح مربعه.';
 $ec_lang['lpn_field_meter_pipe_tip']='العنصر الذي تتصل به هذه التوصيلة. اكتب عنصراً آخر هنا أو في جدول المشتركين لتغييره، أو اسحب نقطة الاتصال إلى عنصر مختلف.';
@@ -3668,7 +3667,6 @@ $ec_lang['lpn_field_base_demand']='الطلب الأساسي';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='التدفق الذي تسحبه هذه العقدة عند الخطوة الزمنية المعروضة: كل طلب أساسي مضروباً في نمطه الخاص، مجموعة معاً. إنه محسوب لا مكتوب، فيتغيّر مع الساعة ولا يمكن تحريره.';
 $ec_lang['lpn_field_demand_pattern']='نمط الطلب';
-$ec_lang['lpn_field_demand_pattern_tip']='كيف يرتفع طلب هذا الملتقى وينخفض خلال التشغيل. اتركه عند لا يوجد نمط ليتبع الملتقى نمط الطلب الافتراضي للمشروع بدلاً منه.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

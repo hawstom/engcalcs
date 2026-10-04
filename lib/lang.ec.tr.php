@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='Bu projede {id} adında hiçbir şey yok, bu
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Bu müşterinin talebinin çalışma boyunca nasıl yükselip alçaldığı. Toplam talebi çarpar, bu yüzden bu müşterinin temsil ettiği her servise etki eder. Projenin Varsayılan talep deseni\'ni izlemesi için Desen yok olarak bırakın.';
 $ec_lang['lpn_meter_pattern_unknown']='Bu projede {id} adında hiçbir desen yok, bu yüzden müşteri olduğu gibi bırakıldı.';
 $ec_lang['lpn_meter_placed']='Müşteri {id} eklendi. Açıklaması ve talebi Müşteriler tablosuna yazılır, ya da kutusunu açmak için Seç modunda üzerine basın.';
 $ec_lang['lpn_field_meter_pipe_tip']='Bu servisin bağlandığı varlık. Değiştirmek için buraya veya Müşteriler tablosuna başka birini yazın, ya da bağlantı noktasını farklı bir varlığa sürükleyin.';
@@ -3538,7 +3537,6 @@ $ec_lang['lpn_field_base_demand']='Baz talep';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='Bu düğümün gösterilen zaman adımında çektiği debi: her baz talebin kendi deseniyle çarpılıp toplanmasıyla bulunur. Hesaplanır, yazılmaz, bu yüzden saatle birlikte değişir ve düzenlenemez.';
 $ec_lang['lpn_field_demand_pattern']='Talep deseni';
-$ec_lang['lpn_field_demand_pattern_tip']='Bu düğümün talebinin çalışma boyunca nasıl yükselip alçaldığı. Desen yok olarak bırakırsanız düğüm, bunun yerine projenin Varsayılan talep deseni\'ni izler.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

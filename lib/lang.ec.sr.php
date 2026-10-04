@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='Ништа у овом пројекту се
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Како се потрошња овог потрошача повећава и смањује током прорачуна. Множи укупну потрошњу, па делује на сваку услугу коју овај потрошач представља. Оставите на Нема обрасца да бисте пратили Подразумевани образац потрошње пројекта.';
 $ec_lang['lpn_meter_pattern_unknown']='Ниједан образац у овом пројекту се не зове {id}, па је потрошач остављен какав је био.';
 $ec_lang['lpn_meter_placed']='Потрошач {id} додат. Његов опис и потрошња се уписују у табели Потрошачи, или га притисните у режиму Избор да отворите његов оквир.';
 $ec_lang['lpn_field_meter_pipe_tip']='Елемент на који се ова услуга прикључује. Упишите други овде или у табели Потрошачи да бисте га променили, или превуците прикључну тачку на други елемент.';
@@ -3539,7 +3538,6 @@ $ec_lang['lpn_field_base_demand']='Основна потрошња';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='Проток који овај чвор узима у приказаном временском кораку: свака основна потрошња помножена сопственим обрасцем, све сабрано. Ово се израчунава, не уписује, па се мења са временом и не може се уређивати.';
 $ec_lang['lpn_field_demand_pattern']='Образац потрошње';
-$ec_lang['lpn_field_demand_pattern_tip']='Како се потрошња овог чвора повећава и смањује током прорачуна. Оставите на Нема обрасца и чвор ће уместо тога пратити Подразумевани образац потрошње пројекта.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='本项目中没有名为 {id} 的对象，�
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='该用户的需水量在运行过程中如何升降。它作用于合计需水量，因此会影响该用户所代表的每一户。保持为“无模式”即可跟随项目的默认需水模式。';
 $ec_lang['lpn_meter_pattern_unknown']='本项目中没有名为 {id} 的模式，因此该用户保持原样不变。';
 $ec_lang['lpn_meter_placed']='已添加用户 {id}。可在“用户”表格中填写其说明和需水量，或在“选择”模式下点击它以打开其属性框。';
 $ec_lang['lpn_field_meter_pipe_tip']='该用户所连接的元件。在此处或“用户”表格中输入另一个元件即可更改，也可将连接点拖到另一个元件上。';
@@ -3539,7 +3538,6 @@ $ec_lang['lpn_field_base_demand']='基本需水量';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='此节点在当前时间步的取水流量：每个基本需水量乘以其各自的模式值后相加得出。该数值是计算得出的，不能手动输入，因此会随时钟变化，也无法编辑。';
 $ec_lang['lpn_field_demand_pattern']='需水模式';
-$ec_lang['lpn_field_demand_pattern_tip']='此节点的需水量在运行期间如何升降变化。保留为“无模式”则改为跟随项目的“默认需水模式”。';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

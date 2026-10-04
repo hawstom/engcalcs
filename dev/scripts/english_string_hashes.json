@@ -3389,7 +3389,6 @@
         "lpn_field_coord_tip": "8ea2d7ddd624bc1a940f6576bc5f9fd2a578edc6",
         "lpn_field_demand_category": "55f8ebc805e65b5b71ddafdae390e3be2bcd69af",
         "lpn_field_demand_pattern": "6462eca1e16244ec2bf0210e3fffb44b7d8e5bdc",
-        "lpn_field_demand_pattern_tip": "f2595a7ed5f27b4d93f0805ce9e20bb39473a54f",
         "lpn_field_desc": "55f8ebc805e65b5b71ddafdae390e3be2bcd69af",
         "lpn_field_diameter": "8314fd7f3668393803a7ab4d1434731a5b296c40",
         "lpn_field_easting": "d731b3611b09d7fb8fb477903fdc8b040bc7b281",
@@ -3420,7 +3419,6 @@
         "lpn_field_meter_node_tip": "0a41537caf8067aad1794ca5ce6feb2b592948c1",
         "lpn_field_meter_offset": "adee21c0f0d771bdf609689b19f149f25fca12de",
         "lpn_field_meter_offset_tip": "1a3b9bfed0522e0f5643b85d37c458a1f3725c65",
-        "lpn_field_meter_pattern_tip": "56c95c19a90b05b94e53d0d41e7bb6455aca6c7b",
         "lpn_field_meter_pipe": "0cfccb8c10a65457d1ef3de890c6e2d63dbff700",
         "lpn_field_meter_pipe_suggest": "2efa4074ab65d1d8cd805e441a1a9664be16bf27",
         "lpn_field_meter_pipe_tip": "5e7a0dfb02a258a61ec190c9efc7b870c21e5d74",
@@ -7755,10 +7753,6 @@
             "words": 2,
             "ends_sentence": false
         },
-        "lpn_field_demand_pattern_tip": {
-            "words": 25,
-            "ends_sentence": true
-        },
         "lpn_field_desc": {
             "words": 1,
             "ends_sentence": false
@@ -7877,10 +7871,6 @@
         },
         "lpn_field_meter_offset_tip": {
             "words": 41,
-            "ends_sentence": true
-        },
-        "lpn_field_meter_pattern_tip": {
-            "words": 37,
             "ends_sentence": true
         },
         "lpn_field_meter_pipe": {

@@ -818,7 +818,6 @@ $ec_lang['lpn_meter_pipe_unknown']='Nothing in this project is named {id}, so th
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='How this customer’s demand rises and falls through the run. It multiplies the total demand, so it acts on every service this customer stands for. Leave it at No pattern to follow the project’s Default demand pattern.';
 $ec_lang['lpn_meter_pattern_unknown']='No pattern in this project is named {id}, so the customer was left as it was.';
 $ec_lang['lpn_meter_placed']='Customer {id} added. Its description and demand are typed in the Customers table, or press it in Select to open its box.';
 $ec_lang['lpn_field_meter_pipe_tip']='The asset that this service connects to. Type another one here or in the Customers table to change it, or drag the connection point to a different asset.';
@@ -3885,6 +3884,9 @@ $ec_lang['lpn_library_pattern_values_tip']='The multipliers, separated by spaces
 // (Task 193): the order of the three differs by language and a sandwich cannot express that.
 $ec_lang['lpn_library_pattern_span']='{n} multipliers, {step} apart, covering {span}';
 $ec_lang['lpn_library_pattern_none']='No pattern';
+// The blank first option of a selector whose blank follows a project-wide default (a junction's or
+// customer's demand pattern, a pump's price pattern and efficiency curve). Tom, 2026-10-04.
+$ec_lang['lpn_choice_default']='Default';
 $ec_lang['lpn_settings_default_pattern']='Default demand pattern';
 $ec_lang['lpn_settings_default_pattern_tip']='Every junction with no pattern uses this one.';
 $ec_lang['lpn_library_control_add']='Add a control';
@@ -3921,7 +3923,6 @@ $ec_lang['lpn_field_base_demand']='Base demand';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='The flow this node draws at the time step shown: each base demand multiplied by its own pattern, added together. It is a result, not an input.';
 $ec_lang['lpn_field_demand_pattern']='Demand pattern';
-$ec_lang['lpn_field_demand_pattern_tip']='How this junction’s demand rises and falls through the run. Leave it at No pattern and the junction follows the project’s Default demand pattern instead.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

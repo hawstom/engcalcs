@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='Hakuna kitu katika mradi huu kilichoitwa {id
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Jinsi mahitaji ya mteja huyu yanavyopanda na kushuka wakati wa uendeshaji. Huzidisha jumla ya mahitaji, hivyo huathiri kila huduma anayowakilisha mteja huyu. Iache kwenye Hakuna muundo ili kufuata Muundo wa mahitaji wa Msingi wa mradi.';
 $ec_lang['lpn_meter_pattern_unknown']='Hakuna muundo katika mradi huu ulioitwa {id}, hivyo mteja ameachwa kama alivyokuwa.';
 $ec_lang['lpn_meter_placed']='Mteja {id} ameongezwa. Maelezo yake na mahitaji yake yanaandikwa kwenye jedwali la Wateja, au mbonyeze katika Chagua ili kufungua kisanduku chake.';
 $ec_lang['lpn_field_meter_pipe_tip']='Kipengele ambacho huduma hii imeunganishwa nacho. Andika kingine hapa au kwenye jedwali la Wateja ili kukibadilisha, au buruta kidoti cha muunganisho kwenda kwenye kipengele kingine.';
@@ -3539,7 +3538,6 @@ $ec_lang['lpn_field_base_demand']='Mahitaji ya msingi';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='Mtiririko ambao kifundo hiki kinachukua kwenye hatua ya muda inayoonyeshwa: kila mahitaji ya msingi yakizidishwa na muundo wake, kisha kujumlishwa. Inakokotolewa, haiandikwi, hivyo hubadilika kulingana na saa na haiwezi kuhaririwa.';
 $ec_lang['lpn_field_demand_pattern']='Muundo wa mahitaji';
-$ec_lang['lpn_field_demand_pattern_tip']='Jinsi mahitaji ya muunganiko huu yanavyopanda na kushuka wakati wa uendeshaji. Kiache kwenye Hakuna muundo ili kifuate Muundo wa chaguo-msingi wa mahitaji wa mradi badala yake.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

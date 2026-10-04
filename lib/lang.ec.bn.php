@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='এই প্রকল্পে {id} না�
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='রান জুড়ে এই গ্রাহকের চাহিদা কীভাবে বাড়ে ও কমে। এটি মোট চাহিদাকে গুণ করে, তাই এটি এই গ্রাহকের প্রতিনিধিত্ব করা প্রতিটি সংযোগের উপর কাজ করে। প্রকল্পের শুরুর চাহিদার প্যাটার্ন অনুসরণ করতে এটি কোনো প্যাটার্ন নেই-এ রাখুন।';
 $ec_lang['lpn_meter_pattern_unknown']='এই প্রকল্পে {id} নামে কোনো প্যাটার্ন নেই, তাই গ্রাহককে যেমন ছিল তেমনই রাখা হয়েছে।';
 $ec_lang['lpn_meter_placed']='গ্রাহক {id} যোগ করা হয়েছে। এর বিবরণ ও চাহিদা গ্রাহক টেবিলে টাইপ করা হয়, অথবা এর বাক্স খুলতে নির্বাচন মোডে এটি চাপুন।';
 $ec_lang['lpn_field_meter_pipe_tip']='এই সংযোগ যে উপাদানে সংযুক্ত। এটি পরিবর্তন করতে এখানে বা গ্রাহক টেবিলে অন্য একটি টাইপ করুন, অথবা সংযোগ বিন্দুটি অন্য একটি উপাদানে টেনে নিন।';
@@ -3550,7 +3549,6 @@ $ec_lang['lpn_field_base_demand']='মূল চাহিদা';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='প্রদর্শিত সময় ধাপে এই নোড যে প্রবাহ টানে: প্রতিটি মূল চাহিদা তার নিজস্ব প্যাটার্ন দিয়ে গুণ করে যোগ করা হয়। এটি হিসাব করা, টাইপ করা নয়, তাই এটি ঘড়ির সাথে পরিবর্তিত হয় এবং সম্পাদনা করা যায় না।';
 $ec_lang['lpn_field_demand_pattern']='চাহিদার প্যাটার্ন';
-$ec_lang['lpn_field_demand_pattern_tip']='এই সংযোগস্থলের চাহিদা রান জুড়ে কীভাবে বাড়ে ও কমে। এটি কোনো প্যাটার্ন নেই-এ রাখলে সংযোগস্থলটি পরিবর্তে প্রকল্পের চাহিদার শুরুর প্যাটার্ন অনুসরণ করে।';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

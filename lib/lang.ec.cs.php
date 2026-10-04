@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='V tomto projektu nic nemá název {id}, tak�
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Jak se odběr tohoto odběratele v průběhu výpočtu zvyšuje a snižuje. Násobí celkový odběr, takže působí na každou přípojku, kterou tento odběratel zastupuje. Ponechte na Žádný vzorec, chcete-li se řídit Výchozím vzorcem odběru projektu.';
 $ec_lang['lpn_meter_pattern_unknown']='V tomto projektu nemá žádný vzorec název {id}, takže odběratel zůstal beze změny.';
 $ec_lang['lpn_meter_placed']='Odběratel {id} byl přidán. Jeho popis a odběr se zadávají v tabulce Odběratelé, nebo jej stiskněte v režimu Výběr a otevřete jeho okno.';
 $ec_lang['lpn_field_meter_pipe_tip']='Prvek, ke kterému je tato přípojka připojena. Změňte jej zadáním jiného zde nebo v tabulce Odběratelé, nebo přetáhněte bod připojení na jiný prvek.';
@@ -3541,7 +3540,6 @@ $ec_lang['lpn_field_base_demand']='Základní odběr';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='Průtok, který tento uzel odebírá v zobrazeném časovém kroku: každý základní odběr vynásobený vlastním vzorcem a sečtené dohromady. Je vypočtený, ne zadaný, takže se mění s časem a nelze jej upravit.';
 $ec_lang['lpn_field_demand_pattern']='Vzorec odběru';
-$ec_lang['lpn_field_demand_pattern_tip']='Jak se odběr tohoto uzlu v průběhu výpočtu zvyšuje a snižuje. Ponechte na Žádný vzorec, chcete-li se místo toho řídit Výchozím vzorcem projektu.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

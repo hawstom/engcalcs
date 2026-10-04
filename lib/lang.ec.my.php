@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='ဤပရောဂျက်တွင် {id}
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='ဤဖောက်သည်\'၏ လိုအင်သည် run တစ်လျှောက် မည်သို့ မြင့်တက်ကျဆင်းသည်။ ၎င်းသည် စုစုပေါင်း လိုအင်ကို မြှောက်ပေးသောကြောင့်၊ ဤဖောက်သည် ကိုယ်စားပြုသော ဝန်ဆောင်မှုတိုင်းအပေါ် သက်ရောက်သည်။ ပရောဂျက်၏ မူလ လိုအင် ပုံစံ ကို လိုက်နာစေလိုပါက ပုံစံ မရှိပါ တွင် ထားခဲ့ပါ။';
 $ec_lang['lpn_meter_pattern_unknown']='ဤပရောဂျက်တွင် {id} ဟု အမည်ပေးထားသော ပုံစံ မရှိသောကြောင့်၊ ဖောက်သည်ကို ရှိနေသည့်အတိုင်းပင် ထားခဲ့သည်။';
 $ec_lang['lpn_meter_placed']='ဖောက်သည် {id} ကို ထည့်သွင်းပြီးပါပြီ။ ၎င်း၏ ဖော်ပြချက်နှင့် လိုအင်ကို ဖောက်သည်များ ဇယားတွင် ရိုက်ထည့်နိုင်သည်၊ (သို့) ၎င်း၏ ဘောက်စ်ကို ဖွင့်ရန် ရွေးချယ်ရန်တွင် ၎င်းကို နှိပ်ပါ။';
 $ec_lang['lpn_field_meter_pipe_tip']='ဤဝန်ဆောင်မှု ချိတ်ဆက်ထားသည့် အစိတ်အပိုင်း။ ပြောင်းလဲလိုပါက ဤနေရာတွင် (သို့) ဖောက်သည်များ ဇယားတွင် အခြားတစ်ခုကို ရိုက်ထည့်ပါ၊ (သို့) ချိတ်ဆက်မှတ်ကို အခြားအစိတ်အပိုင်းသို့ ဖိဆွဲပါ။';
@@ -3634,7 +3633,6 @@ $ec_lang['lpn_field_base_demand']='အခြေခံ လိုအင်';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='ပြသထားသော အချိန်အဆင့်တွင် ဤဆက်စပ်နေရာ ထုတ်ယူသော ရေစီးနှုန်း - အခြေခံ လိုအင်တစ်ခုစီကို ၎င်း၏ ကိုယ်ပိုင် ပုံစံနှင့် မြှောက်ပြီး ပေါင်းထားသည်။ ၎င်းကို တွက်ချက်ထားခြင်းဖြစ်ပြီး ရိုက်ထည့်ထားခြင်း မဟုတ်သောကြောင့်၊ နာရီနှင့်အမျှ ပြောင်းလဲပြီး ပြင်ဆင်၍ မရပါ။';
 $ec_lang['lpn_field_demand_pattern']='လိုအင် ပုံစံ';
-$ec_lang['lpn_field_demand_pattern_tip']='ဤဆက်စပ်နေရာ၏ လိုအင်သည် run တစ်လျှောက် မည်သို့ မြင့်တက်ကျဆင်းသည်။ ပုံစံ မရှိပါ တွင် ထားခဲ့ပါက ဆက်စပ်နေရာသည် ပရောဂျက်၏ မူလ လိုအင် ပုံစံ ကို အစား လိုက်နာမည်။';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

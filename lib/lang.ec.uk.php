@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='У цьому проєкті немає ні
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Як витрата цього абонента зростає й спадає протягом розрахунку. Він множить загальну витрату, тож діє на кожне приєднання, яке представляє цей абонент. Залиште «Без графіка», щоб використовувався «Графік споживання за замовчуванням» проєкту.';
 $ec_lang['lpn_meter_pattern_unknown']='У цьому проєкті немає графіка з іменем {id}, тож абонента залишено як був.';
 $ec_lang['lpn_meter_placed']='Абонента {id} додано. Його опис і витрату вводять у таблиці «Абоненти», або натисніть на нього в режимі «Вибрати», щоб відкрити його вікно.';
 $ec_lang['lpn_field_meter_pipe_tip']='Елемент, до якого під’єднано це приєднання. Введіть інший тут або в таблиці «Абоненти», щоб змінити його, або перетягніть точку під’єднання на інший елемент.';
@@ -3636,7 +3635,6 @@ $ec_lang['lpn_field_base_demand']='Базова витрата споживан�
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='Витрата, яку цей вузол забирає на показаному часовому кроці: кожна базова витрата споживання, помножена на свій графік, підсумована разом. Це обчислюється, а не вводиться, тож змінюється з часом і не може бути відредаговано.';
 $ec_lang['lpn_field_demand_pattern']='Графік споживання';
-$ec_lang['lpn_field_demand_pattern_tip']='Як зростає й спадає витрата споживання цього вузла протягом розрахунку. Лишіть «Без графіка», і вузол використовуватиме «Графік споживання за замовчуванням» проєкту.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

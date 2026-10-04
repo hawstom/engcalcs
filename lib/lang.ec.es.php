@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='Nada en este proyecto se llama {id}, así qu
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Cómo sube y baja la demanda de este cliente durante la simulación. Multiplica la demanda total, así que actúa sobre cada servicio que representa este cliente. Déjelo en Sin patrón para seguir el Patrón de demanda predeterminado del proyecto.';
 $ec_lang['lpn_meter_pattern_unknown']='Ningún patrón de este proyecto se llama {id}, así que el cliente se dejó como estaba.';
 $ec_lang['lpn_meter_placed']='Se agregó el cliente {id}. Su descripción y demanda se escriben en la tabla Clientes, o presiónelo en Seleccionar para abrir su cuadro.';
 $ec_lang['lpn_field_meter_pipe_tip']='El elemento al que se conecta este servicio. Escriba otro aquí o en la tabla Clientes para cambiarlo, o arrastre el punto de conexión a otro elemento.';
@@ -3636,7 +3635,6 @@ $ec_lang['lpn_field_base_demand']='Demanda base';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='El caudal que este nodo extrae en el paso de tiempo mostrado: cada demanda base multiplicada por su propio patrón, sumadas entre sí. Se calcula, no se escribe, así que cambia con el reloj y no se puede editar.';
 $ec_lang['lpn_field_demand_pattern']='Patrón de demanda';
-$ec_lang['lpn_field_demand_pattern_tip']='Cómo sube y baja la demanda de este nudo durante la ejecución. Déjelo en Sin patrón para que el nudo siga el patrón predeterminado del proyecto.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

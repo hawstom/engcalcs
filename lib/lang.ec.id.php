@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='Tidak ada yang bernama {id} dalam proyek ini
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Bagaimana kebutuhan pelanggan ini naik dan turun sepanjang proses. Pola ini mengalikan total kebutuhan, sehingga berlaku untuk setiap sambungan yang diwakili pelanggan ini. Biarkan pada Tidak ada pola agar mengikuti Pola kebutuhan default milik proyek.';
 $ec_lang['lpn_meter_pattern_unknown']='Tidak ada pola dalam proyek ini yang bernama {id}, sehingga pelanggan dibiarkan seperti semula.';
 $ec_lang['lpn_meter_placed']='Pelanggan {id} ditambahkan. Deskripsi dan kebutuhannya diketik pada tabel Pelanggan, atau tekan pelanggan itu dalam mode Pilih untuk membuka kotaknya.';
 $ec_lang['lpn_field_meter_pipe_tip']='Elemen tempat sambungan ini terhubung. Ketik elemen lain di sini atau pada tabel Pelanggan untuk mengubahnya, atau seret titik sambungan ke elemen lain.';
@@ -3543,7 +3542,6 @@ $ec_lang['lpn_field_base_demand']='Kebutuhan dasar';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='Debit yang diambil simpul ini pada langkah waktu yang ditampilkan: setiap kebutuhan dasar dikalikan dengan polanya masing-masing, lalu dijumlahkan. Nilai ini dihitung, bukan diketik, sehingga berubah mengikuti jam dan tidak dapat diedit.';
 $ec_lang['lpn_field_demand_pattern']='Pola kebutuhan';
-$ec_lang['lpn_field_demand_pattern_tip']='Bagaimana kebutuhan simpul ini naik dan turun sepanjang proses. Biarkan pada Tidak ada pola dan simpul akan mengikuti Pola kebutuhan default milik proyek.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

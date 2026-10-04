@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='Nichts in diesem Projekt heißt {id}, daher 
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Wie die Entnahme dieses Kunden im Lauf steigt und sinkt. Es vervielfacht die Gesamtentnahme und wirkt daher auf jeden Anschluss, den dieser Kunde vertritt. Belassen Sie es bei Kein Muster, damit der Kunde dem Standard-Entnahmemuster des Projekts folgt.';
 $ec_lang['lpn_meter_pattern_unknown']='Kein Muster in diesem Projekt heißt {id}, daher wurde der Kunde unverändert belassen.';
 $ec_lang['lpn_meter_placed']='Kunde {id} hinzugefügt. Seine Beschreibung und Entnahme werden in der Tabelle Kunden eingegeben, oder klicken Sie ihn im Modus Auswählen an, um sein Feld zu öffnen.';
 $ec_lang['lpn_field_meter_pipe_tip']='Das Element, mit dem dieser Anschluss verbunden ist. Geben Sie hier oder in der Tabelle Kunden ein anderes ein, um es zu ändern, oder ziehen Sie den Anschlusspunkt auf ein anderes Element.';
@@ -3541,7 +3540,6 @@ $ec_lang['lpn_field_base_demand']='Basisentnahme';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='Der Durchfluss, den dieser Knoten zum angezeigten Zeitschritt entnimmt: jede Basisentnahme multipliziert mit ihrem eigenen Muster, aufsummiert. Er wird berechnet, nicht eingegeben, ändert sich also mit der Uhr und kann nicht bearbeitet werden.';
 $ec_lang['lpn_field_demand_pattern']='Entnahmemuster';
-$ec_lang['lpn_field_demand_pattern_tip']='Wie die Entnahme dieses Entnahmeknotens im Lauf steigt und sinkt. Belassen Sie es bei Kein Muster, damit der Entnahmeknoten stattdessen dem Standard-Entnahmemuster des Projekts folgt.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

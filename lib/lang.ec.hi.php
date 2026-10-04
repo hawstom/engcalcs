@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='इस प्रोजेक्ट में
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='यह ग्राहक की माँग रन के दौरान कैसे ऊपर-नीचे होती है। यह कुल माँग को गुणा करता है, इसलिए यह उन सभी सेवाओं पर लागू होता है जिनका यह ग्राहक प्रतिनिधित्व करता है। इसे कोई पैटर्न नहीं पर छोड़ें और यह प्रोजेक्ट के डिफ़ॉल्ट डिमांड पैटर्न का पालन करेगा।';
 $ec_lang['lpn_meter_pattern_unknown']='इस प्रोजेक्ट में {id} नाम का कोई पैटर्न नहीं है, इसलिए ग्राहक वैसा ही छोड़ दिया गया जैसा वह था।';
 $ec_lang['lpn_meter_placed']='ग्राहक {id} जोड़ा गया। इसका विवरण और माँग Customers तालिका में टाइप करें, या इसका बॉक्स खोलने के लिए Select में इसे दबाएँ।';
 $ec_lang['lpn_field_meter_pipe_tip']='वह तत्व जिससे यह सेवा जुड़ी है। इसे बदलने के लिए यहाँ या Customers तालिका में कोई और टाइप करें, या कनेक्शन बिंदु को किसी अन्य तत्व पर खींचें।';
@@ -3541,7 +3540,6 @@ $ec_lang['lpn_field_base_demand']='आधार माँग';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='दिखाए गए समय-चरण पर यह नोड जो प्रवाह खींचता है: हर आधार माँग को अपने पैटर्न से गुणा करके, सबको जोड़ा गया। यह परिकलित है, टाइप नहीं किया गया, इसलिए यह घड़ी के साथ बदलता है और इसे संपादित नहीं किया जा सकता।';
 $ec_lang['lpn_field_demand_pattern']='डिमांड पैटर्न';
-$ec_lang['lpn_field_demand_pattern_tip']='यह जंक्शन की माँग रन के दौरान कैसे ऊपर-नीचे होती है। इसे कोई पैटर्न नहीं पर छोड़ें और जंक्शन इसके बजाय प्रोजेक्ट के Default Pattern का पालन करेगा।';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

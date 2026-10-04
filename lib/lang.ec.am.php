@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='በዚህ ፕሮጀክት ውስጥ {id} የ
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='የዚህ ደንበኛ ፍላጎት በሩጫው ውስጥ እንዴት እንደሚነሳና እንደሚወርድ። ጠቅላላ ፍላጎቱን ያባዛል፣ ስለዚህ ይህ ደንበኛ በሚወክላቸው እያንዳንዱ አገልግሎት ላይ ይሰራል። የፕሮጀክቱን ነባሪ የፍላጎት ስርዓት ለመከተል ምንም ስርዓት የለም ብለው ይተውት።';
 $ec_lang['lpn_meter_pattern_unknown']='በዚህ ፕሮጀክት ውስጥ {id} የተባለ ምንም ስርዓት የለም፣ ስለዚህ ደንበኛው በነበረበት ቀርቷል።';
 $ec_lang['lpn_meter_placed']='ደንበኛ {id} ታክሏል። መግለጫውና ፍላጎቱ በደንበኞች ሠንጠረዥ ውስጥ ይተየባሉ፣ ወይም ሳጥኑን ለመክፈት በምረጥ ውስጥ ይጫኑት።';
 $ec_lang['lpn_field_meter_pipe_tip']='ይህ አገልግሎት የሚገናኝበት አካል። ለመቀየር እዚህ ወይም በደንበኞች ሠንጠረዥ ውስጥ ሌላ ይተይቡ፣ ወይም ግንኙነት ነጥቡን ወደ ሌላ አካል ይጎትቱ።';
@@ -3538,7 +3537,6 @@ $ec_lang['lpn_field_base_demand']='መሠረታዊ ፍላጎት';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='በሚታየው የጊዜ ደረጃ ይህ ነጥብ የሚወስደው ፍሰት፦ እያንዳንዱ መሠረታዊ ፍላጎት በራሱ ስርዓት ተባዝቶ ተደምሮ። ይሰላል እንጂ አይተየብም፣ ስለዚህ ከሰዓቱ ጋር ይለወጣል፣ ሊታረትም አይችልም።';
 $ec_lang['lpn_field_demand_pattern']='የፍላጎት ስርዓት';
-$ec_lang['lpn_field_demand_pattern_tip']='የዚህ መገናኛ ፍላጎት በስራው ውስጥ እንዴት እንደሚነሳ እንደሚወርድም። ራሱ የፕሮጀክቱ ነባሪ ስርዓት የሆነውን ለመከተል፣ ምንም ስርዓት የለም ብለው ይተውት።';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

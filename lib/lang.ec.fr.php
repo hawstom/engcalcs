@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='Rien dans ce projet ne s\'appelle {id}, le c
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Comment la demande de ce client monte et descend pendant le calcul. Elle multiplie la demande totale, elle agit donc sur chaque branchement que ce client représente. Laissez-la sur Aucune courbe de modulation pour que le client suive alors la courbe de modulation de la demande par défaut du projet.';
 $ec_lang['lpn_meter_pattern_unknown']='Aucune courbe de modulation de ce projet ne s\'appelle {id}, le client a donc été laissé tel qu\'il était.';
 $ec_lang['lpn_meter_placed']='Client {id} ajouté. Sa description et sa demande se saisissent dans le tableau Clients, ou appuyez dessus en mode Sélectionner pour ouvrir sa boîte de propriétés.';
 $ec_lang['lpn_field_meter_pipe_tip']='L\'élément auquel ce branchement se connecte. Saisissez-en un autre ici ou dans le tableau Clients pour le modifier, ou faites glisser le point de raccordement vers un autre élément.';
@@ -3551,7 +3550,6 @@ $ec_lang['lpn_field_base_demand']='Demande de base';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='Le débit que ce nœud prélève au pas de temps affiché : chaque demande de base multipliée par sa propre courbe de modulation, le tout additionné. Il est calculé, non saisi ; il change donc avec l\'horloge et ne peut pas être modifié.';
 $ec_lang['lpn_field_demand_pattern']='Courbe de modulation de la demande';
-$ec_lang['lpn_field_demand_pattern_tip']='Comment la demande de cette jonction monte et descend pendant le calcul. Laissez-la sur Aucune courbe de modulation pour que la jonction suive alors la courbe de modulation de la demande par défaut du projet.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

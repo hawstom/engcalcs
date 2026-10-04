@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='В този проект няма нищо �
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='Как потребността на този абонат се покачва и спада през изпълнението. Умножава общата потребност, затова действа върху всяко отклонение, което този абонат представлява. Оставете Без график, за да следва графика по подразбиране на проекта.';
 $ec_lang['lpn_meter_pattern_unknown']='В този проект няма график на име {id}, затова абонатът беше оставен, както си беше.';
 $ec_lang['lpn_meter_placed']='Абонат {id} добавен. Описанието и потребността му се въвеждат в таблицата Абонати, или го натиснете в режим Избор, за да отворите неговата кутия.';
 $ec_lang['lpn_field_meter_pipe_tip']='Обектът, към който се свързва това отклонение. Въведете друг тук или в таблицата Абонати, за да го промените, или плъзнете точката на свързване към друг обект.';
@@ -3636,7 +3635,6 @@ $ec_lang['lpn_field_base_demand']='Основна потребност';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='Водното количество, което този възел черпи в показаната времева стъпка: всяка основна потребност, умножена по своя собствен график, сборувани заедно. Изчислява се, не се въвежда, затова се променя с часовника и не може да се редактира.';
 $ec_lang['lpn_field_demand_pattern']='График на потребността';
-$ec_lang['lpn_field_demand_pattern_tip']='Как се покачва и спада потребността на този възел през изчислението. Оставете „Без график“ и възелът вместо това следва Графика на потребността по подразбиране на проекта.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

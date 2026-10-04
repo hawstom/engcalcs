@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='שום דבר בפרויקט זה אינו �
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='כיצד הדרישה של לקוח זה עולה ויורדת במהלך ההרצה. היא מכפילה את הדרישה הכוללת, ולכן פועלת על כל חיבור שלקוח זה מייצג. השאירו על אין תבנית כדי לעקוב אחר תבנית דרישה ברירת מחדל של הפרויקט.';
 $ec_lang['lpn_meter_pattern_unknown']='שום תבנית בפרויקט זה אינה נקראת {id}, כך שהלקוח נשאר כפי שהיה.';
 $ec_lang['lpn_meter_placed']='לקוח {id} נוסף. התיאור והדרישה שלו מוקלדים בטבלת הלקוחות, או לחצו עליו בבחירה כדי לפתוח את תיבתו.';
 $ec_lang['lpn_field_meter_pipe_tip']='הנכס שאליו חיבור זה מתחבר. הקלידו נכס אחר כאן או בטבלת הלקוחות כדי לשנות אותו, או גררו את נקודת החיבור אל נכס אחר.';
@@ -3540,7 +3539,6 @@ $ec_lang['lpn_field_base_demand']='דרישת בסיס';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='הספיקה שצומת זה שואב בצעד הזמן המוצג: כל דרישת בסיס מוכפלת בתבנית שלה, מחוברות יחד. היא מחושבת, לא מוקלדת, כך שהיא משתנה עם השעון ולא ניתן לערוך אותה.';
 $ec_lang['lpn_field_demand_pattern']='תבנית דרישה';
-$ec_lang['lpn_field_demand_pattern_tip']='כיצד הדרישה של צומת זה עולה ויורדת במהלך ההרצה. השאירו על אין תבנית והצומת יעקוב אחר תבנית דרישה ברירת מחדל של הפרויקט במקום.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.

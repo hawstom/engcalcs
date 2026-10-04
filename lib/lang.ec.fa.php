@@ -690,7 +690,6 @@ $ec_lang['lpn_meter_pipe_unknown']='هیچ‌چیز در این پروژه {id} 
 // ROADMAP Task 247. A customer's demand follows a pattern exactly as a junction's does, so the
 // heading is the junction's own whole label reused and only the tip is new: what it says that the
 // junction's does not is that the number the pattern multiplies is the TOTAL, count included.
-$ec_lang['lpn_field_meter_pattern_tip']='مصرف این مشترک در طول اجرا چگونه بالا و پایین می‌رود. این در مجموع مصرف ضرب می‌شود، پس روی هر انشعابی که این مشترک نمایندهٔ آن است اثر می‌گذارد. آن را روی «بدون الگو» بگذارید تا از الگوی مصرف پیش‌فرض پروژه پیروی کند.';
 $ec_lang['lpn_meter_pattern_unknown']='هیچ الگویی در این پروژه {id} نام ندارد، پس مشترک همان‌طور که بود باقی ماند.';
 $ec_lang['lpn_meter_placed']='مشترک {id} افزوده شد. توضیح و مصرف آن در جدول مشترک‌ها تایپ می‌شود، یا در حالت انتخاب روی آن بزنید تا جعبه‌اش باز شود.';
 $ec_lang['lpn_field_meter_pipe_tip']='المانی که این انشعاب به آن وصل است. برای تغییر آن، المان دیگری را اینجا یا در جدول مشترک‌ها تایپ کنید، یا نقطهٔ اتصال را به المان دیگری بکشید.';
@@ -3539,7 +3538,6 @@ $ec_lang['lpn_field_base_demand']='مصرف پایه';
 // is a RESULT and not a field. The key has never been translated, so the reword cost nothing.
 $ec_lang['lpn_result_demand_tip']='دبی‌ای که این گره در گام زمانی نشان‌داده‌شده برمی‌دارد: هر مصرف پایه ضرب‌شده در الگوی خودش، با هم جمع می‌شوند. این محاسبه می‌شود، نه تایپ، پس با ساعت تغییر می‌کند و قابل ویرایش نیست.';
 $ec_lang['lpn_field_demand_pattern']='الگوی مصرف';
-$ec_lang['lpn_field_demand_pattern_tip']='مصرف این گره در طول اجرا چگونه بالا و پایین می‌رود. آن را روی «بدون الگو» بگذارید تا گره در عوض از الگوی مصرف پیش‌فرض پروژه پیروی کند.';
 // A JUNCTION’S DEMAND IS A LIST (Task 468). The PATTERN says what KIND of user this is
 // (“residential”); the CATEGORY says WHO it is (“Elm Acres”). Nothing validates a category and there
 // is no list to choose one from, which is why the tip describes it rather than instructing.
