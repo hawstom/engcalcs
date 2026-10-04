@@ -101,66 +101,67 @@ lines rather than appending corrections.
   `dev/browser-pass/specs/visibility.js` (stale sub-heading list; "Escape closes it"). Browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-03 (evening)
+## STATE — 2026-10-04 (early morning)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged 2026-10-03: graph-menu (640), drawing-keep (680), property-arrow-key, fix/undo-label,
-bentley-interop (recut as the long-lived 749 branch), then on his word label-cache (681 c/d) and
-theme-token (714 phase 1; every CSS colour is now a `var(--ec-*)` token or `chrome_colour_check`
-fails). Defect tracks merged on green: fix/status-now (Status report "Tank 1 now filling", his
-wording), fix/flow-decimals (Qb/Q 1 decimal US, 2 SI; R-328 reversed by him), fix/label-eviction
-(758 closed: zoom pass deterministic, tab keep complete). 600/601/604 promoted to 100 by him.
+Merged 2026-10-03/04: demand-scaling (with criticality) and flow-balance on his "Good. Done. Close,
+merge, and delete branch." (Tasks 600, 751, 754 closed); his 143 rulings harvested from his edit of
+`dev/new-english-keys.md`; selection-word (CRS button now OK, ff/ds/crit under the rule);
+review-file (Wave 0 entries and stale synonyms now reach him in `new-english-keys.md`, with
+proposals in `dev/syn-proposals.json`); kPa and bar on EPANET's factors (types.h, input1.c);
+theme-inline (714 phase 1b); ds-wording (lpn_ds_search_note_selected deleted); the Analyze clock
+fix (Fire flow and Criticality name their time step; lpn_ds_at_time / lpn_ds_time_moved renamed
+lpn_analyze_*); scncmp-reservoir (comparison's lowest pressure judges junctions only); sprint
+1004-lpn (130 ruled keys + 14 resyncs, 26 languages, five glossary terms incl. "edit lock").
 
-### Awaiting his browser pass (protected; merge on his all-clear, typed in a session)
+### Awaiting him
 
-Each has a green suite bar the expected `payload freshness`, and is pushed to GitHub. Ask with
-AskUserQuestion; the classifier refuses an all-clear lifted from pasted text. Rows in ports.conf say
-what to test.
-- 8106 `feat/property-graph` (637): box opens at the width where max(1, 5%) rows wrap (his "1 line
-  in 20"): pipe ~375, pump ~402 px. No keys changed.
-- 8110 `feat/demand-scaling` (754 + criticality 751): his wording and three syn entries written;
-  unselected junctions below the minimum are disclosed, never limit the answer. To rule:
-  `lpn_ds_outside_below` (CC's wording) and whether his selected heading takes a "?".
-- 8112 `feat/keyboard-menu` (748): his four notes built; Perry round 2 found four defects, all
-  fixed. A row whose label comes from the project needs `variable: true` (keeps fixed letters
-  stable). Other branches' menu rows get letters automatically; a hotkey is `hotkey: 'Mod+Z'`.
-- 8108 `feat/profile-file` (604): one row in the Profile tab's down-arrow menu. Perry clean; format
-  confirmed against EPANET's Dgraph.pas.
-- 8109 `feat/flow-balance` (600): System flow graph, EPANET's Fgraph.pas definition (tanks in
-  neither line). Perry's two fixes done. Bottom tab strip wraps to two rows at 1280 px in fr/es/pt/
-  tr/ru; 9 px tab padding would fit all (his/Ida's call, not built).
-- 8111 `feat/calibration` (601): EPANET's three-page report, per-project, session-only, 42 keys.
-  Perry's six fixes done. Changed `lpn_reports_menu_tip` (26 translations now stale).
-- 8113 `feat/contour` (600): map layer, Delaunay-linear, reuses node colouring; DEM ground under
-  the existing `ec_terrain` gate. Perry's fixes done. Fill limit is `CONTOUR_EDGE_FACTOR = 3`
-  (39% of Net3 pipe length bare; 6 covers 95%) — his call.
-- `feat/desktop` (756), `feat/label-placer` (539/741): unchanged.
+- **Browser pass (protected), each Perry-reviewed:** 8107 `feat/dock` (441, clean; judge the icons);
+  8109 `feat/table-selection` (757, clean); 8110 `feat/dialog-audit` (710, three findings fixed);
+  8111 `feat/scenario-option` (755, clean; open: a note in Settings > Time when a scenario runs its own run time); 8112 `feat/setting-scope` (739, clean). Still from before: 8106
+  `feat/property-graph` (he wrote "I can't think of any [box] that wouldn't have a graph"; no merge
+  word yet), 8108 `feat/profile-file`, `feat/desktop`, `feat/label-placer`.
+- **`dev/new-english-keys.md` is the one place he rules English** (his question, asked twice). Open
+  there: 10 Wave 0 rewrites (1003b-wave0), lpn_ds_found_below (two rewordings, 1003-ds), 13 synonym
+  entries with proposals, the reworded Graphs tip and lpn_ds_search_note, the branch keys.
+- **Tip review** (https://claude.ai/artifact/V6DRoU2z8sCZgMHGV92XLx) waits on him; hold tip edits.
+  Interview answers read 2026-10-04: Q4 he questioned (Ida's reply: click door for `?` glyphs only,
+  control tips stay hover plus Esc); Q7 Mary found none of Adobe/Autodesk/Bentley/Apple put a line
+  inside the menu, hover tip is the common practice; Q8 he wants a CSV (key, where, text) to re-rate,
+  and says tip length is not high on the list.
+- **Open questions:** a styled modal for the 38 blocking dialogs; privacy.php's "Ground elevations"
+  row vs contour's tile-number wording.
 
-**Merge order and seams:** keyboard-menu first is cheapest (the others' menu rows then just get
-letters). flow-balance, contour and calibration each touched the Graphs/Reports menu definition
-and `lpn_graphs_menu_tip`; expect small conflicts there and in `dev/new-english-keys.md`
-(regenerate, never hand-merge). Regenerate payloads once per merge batch.
-
-### Found 2026-10-03, not yet a task
-
-- **privacy.php's "Ground elevations" row overstates what is sent**: Terrain-RGB requests carry tile
-  numbers and the token, not node latitude/longitude; the elevation-fill consent paragraphs 1 and 3
-  say the same. Public text: his ruling. Proposed row (contour builder): "The numbers of the map
-  tiles that cover your nodes or, for a contour plot over the ground, the area your network covers
-  (which says roughly where it is), and your IP address".
-- **The suite's psi factor is 0.43353 per ft; EPANET's is 0.4333**, so every pressure reads 0.05%
-  above EPANET's report (Perry, calibration review). His call whether to adopt EPANET's.
+**Seams:** feat/dock and feat/property-graph both size the Properties box; dock's column wins while
+docked. feat/scenario-option and the merged reservoir fix both touch scenarioCompareExtremes.
 
 ### Owed translation work
 
-Not run 2026-10-03 on purpose: the owed keys sit mostly on the seven branches above (~100+ keys).
-Run one sprint after they merge. Master already owes bentley-interop 13, graph-menu 2, the Redo
-Help row (approved: "Ctrl+Y or Ctrl+Shift+Z | Redo the last undone change."; the markup check needs
-all 27 at once) and the six Status report "now" strings. Romanian file menu noun/verb pass. Concept
-layer: four new terms untranslated. Glossary write-back owed from echo.
+46 lpn keys held back from sprint 1004 until he rules (every lpn_ds_*, the Graphs tip, sysflow
+title, the 10 Wave 0 keys, the stale-syn keys); plus each pending branch's keys. Romanian file menu
+noun/verb pass; four concept terms.
+
+### Traps met 2026-10-04
+
+- **His edit of `dev/new-english-keys.md` was made on a copy older than the last regeneration**
+  (header counts 92 vs 67): the harvest still worked because it reads marks by key. Commit his edit
+  on a chore branch first, harvest, then regenerate; never regenerate over it.
+- **A harness that prints ALL PASS can still fail by not exiting** within 300 s under load
+  (label-measure-cache, pane-follows-doc). Read the log before calling it a defect; rerun.
+- **Agents' generated-file conflicts** (`new-english-keys.md`, `english-key-rulings.json`) on every
+  merge: take master's side, union the rulings JSON, regenerate on a chore branch.
 
 ### Traps met 2026-10-03
+
+- **Port 8100 shows origin/master only after `sh ~/webdev/worktrees/_panel/generate.sh`.** Run it
+  after every master push; once it was skipped and he saw no fix that was already pushed.
+- **He cannot paste images over ssh/tmux.** He saves the screenshot and runs
+  `scp $HOME\Pictures\x.png haws@192.168.0.234:/tmp/`; read it, then delete it.
+
+- **A harness that flakes only under load can be a real race.** `menu-keyboard-harness.js` failed
+  3 times in check_all: a starved `setTimeout(0)` focus restore from one menu ran after the next
+  menu opened. Fixed in the page (`menuRestoreSeq`); proved with 24 busy loops, 8/10 to 12/12.
 
 - **A `cmd && merge && ...; setsid check_all &` line starts the suite even when the merge
   conflicts** (the `;` runs on). Start a suite only in its own command, after `git status` is clean.

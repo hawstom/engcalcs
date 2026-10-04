@@ -157,7 +157,6 @@ new unique prefix and document it here.
 | `lpn_` | Looped Pipe Network, map interface — see below |
 
 `mi`, `mtc`, `wi` predate the `*_main_menu` convention and name their menu entry `<prefix>_menu`.
-The coverage declaration also lists `irr`, which owns no keys — probably a legacy alias of `ip`.
 
 ### `lpn_` in particular
 
@@ -330,7 +329,7 @@ Full record: `dev/unit-rulings.md` and `dev/unit-families.md`.
 - **`lpn_` settings belong to the PROJECT or the BROWSER, never both.** Modelling data (units,
   friction method, defaults, prefixes, colouring, labels) rides in `serializeProject()`; window
   furniture (`lpn_pane`, `lpn_rpane`, `lpn_setbox`, `lpn_findbox`, `lpn_ffbox`, `lpn_energybox`,
-  `lpn_cmpbox`, `lpn_reportbox`) is `localStorage` only. **A new project follows the one it was
+  `lpn_cmpbox`, `lpn_reportbox`, `lpn_contourbox`) is `localStorage` only. **A new project follows the one it was
   opened from as much as it can** (R-342): if the New Project wizard's units match the open
   project's, the new one copies its whole modelling settings, labels included; if a unit differs,
   only what is calibrated to that changed unit (a "Use units" tick, a typed `defaults` number, the

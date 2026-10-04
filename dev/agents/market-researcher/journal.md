@@ -2583,3 +2583,31 @@ Question (Tom, via the orchestrator): should the Looped Network Time series grap
 - **NOT FOUND.** No OWA-run web viewer/editor surfaced in two searches. EPANET-UI (sites.google.com/view/epanet-ui) surfaced; not opened, so not classified. Hydraulic.app, Tyto, Autodesk Info360, Bentley cloud: not examined this session; no claim.
 - **CITED.** EPANET itself (EPA) is a Windows desktop program; epa.gov/water-research/epanet.
 - **SPECULATION.** Answer: the only live, client-side, .inp-in/.inp-out, build-and-run browser tool I could verify besides ours is epanet-js; HydroBOA is the same job done server-side. So "the browser version of EPANET" is fair for neither as a definite article: there are at least three (epanet-js, HydroBOA, ours), plus a dead 2013 demo. Tom's doubt is an accuracy point for claims of uniqueness or singularity, not pedantry. Our own claim "runs the same EPANET engine in your browser" is true (positioning.md/js/vendor/README.md record OWA-EPANET 2.3.5 via epanet-js 0.9.0; note the earlier answer said 2.2, the vendor README says 2.3.5, re-derive before quoting).
+
+---
+
+## 2026-10-03 — Mary: what to call EPANET's System Flow graph and its two lines
+
+Full note with the table: `dev/flow-balance-terms.md`. Tom chose the title "Flow balance" and leaned toward Inflow/Outflow "only if Mary finds support".
+
+- **CITED.** EPANET GUI source, github.com/OpenWaterAnalytics/epanet-gui epanet2w/Fgraph.pas (HEAD 8818a69): `TXT_SYSTEM_FLOW = ' System Flow Balance'`, `TXT_PRODUCED = 'Produced'`, `TXT_CONSUMED = 'Consumed'`. `GetSysFlow` loops JUNCS and RESERVS only (Uglobals.pas: JUNCS=0, RESERVS=1, TANKS=2), so tanks are in neither line and a reservoir with positive demand (filling) counts as Consumed. Tom's title "Flow balance" is EPANET's own.
+- **CITED.** OWA-EPANET 2.3 `src/flowbalance.c`, `src/report.c`: report block "Hydraulic Flow Balance" with Total Inflow, Consumer Demand, Demand Deficit, Emitter Flow, Leakage Flow, Total Outflow, Storage Flow, Flow Ratio. Total Inflow = the GUI's Produced; Total Outflow is NOT the GUI's Consumed (adds emitters, leakage, reservoir filling; tanks separate as Storage Flow).
+- **CITED.** EPANET 2.2 manual ch.9 (epanet-manual.readthedocs.io/en/latest/9_viewing_results.html): "System Flow: Plots total system production and consumption versus time". OpenEPANET forum "EPANET Water balance" (openepanet.org/Topic/22313/water-balance, 2005): "total produced and total consumed".
+- **CITED (docs page read; definitions from search summary of a Bentley Communities thread, re-verify before quoting).** WaterGEMS/WaterCAD: Flow Supplied, Flow Demanded, Flow Stored (docs.bentley.com .../9005-2.html names flow demanded and flow stored). Info360 Mass Balance (help-innovyze.refined.site/space/info360/15008061/Mass+Balance): Inflow, Outflow, Storage, Usage, per pressure zone.
+- **CITED (summary-level).** AWWA M36 via mass.gov and California DWR audit manual: System Input Volume, Water Supplied, Authorized Consumption, Water Losses. EPA sewer I/I: "inflow" is non-sanitary water entering a sewer.
+- **NOT FOUND.** KYPipe wording (PDF unreadable here, Eng-Tips 403), Walski AWDM text, InfoWater/Synergi/MIKE+ system flow labels, QWater/GHydraulics (they delegate to EPANET), epanet-js app's own labels. "In/Out" and "Flow in & out": no support anywhere.
+- **SPECULATION (re-derive).** Recommendation: keep "Flow balance" and keep Produced/Consumed (EPANET's own labels, our rule is EPANET terminology). Inflow/Outflow has support but for different quantities, and would sit beside the verbatim engine report whose "Total Outflow" differs from our Consumed. If a change is wanted, WaterGEMS's Supplied/Demanded is the nearer professional vocabulary. Put "tanks are in neither line" in the tip.
+
+
+---
+
+## 2026-10-03 — Mary: how do Adobe, Autodesk, Bentley, Apple show help for a menu row
+
+- **CITED.** Microsoft Win32 "Status Bars (Design basics)" learn.microsoft.com/en-us/windows/win32/uxguide/ctrl-status-bars: "Don't use the status bar to explain menu bar items" (not discoverable). Yet the MenuHelp API (learn.microsoft.com/en-us/windows/win32/controls/status-bar-reference) exists to do exactly that, so Microsoft's own platform shipped the pattern Tom describes.
+- **CITED.** Autodesk Community "display popup menu helpstrings in the status bar" forums.autodesk.com/t5/autocad-forum/display-popup-menu-helpstrings-in-the-status-bar/td-p/6797594: through AutoCAD 2014 a highlighted popup-menu item showed its helpstring at left of the status bar; from 2015 it does not (forum answer, not a vendor doc). CUI still stores helpstrings; ribbon uses extended tooltips.
+- **CITED.** Adobe helpx.adobe.com/photoshop/desktop/get-started/set-up-toolbars-panels/show-or-hide-tool-tips.html: standard and rich tooltips on tools, panels, icons (Edit > Preferences > Tools). Status bar holds document info only. NOT FOUND: any Adobe doc of a tip on a menu-bar row.
+- **CITED.** Bentley MicroStation Help docs.bentley.com/LiveContent/web/MicroStation%20Help-v26/en/StatusBar.html: status bar prompt field names the active tool and the next step (tool prompt, not menu-row help). NOT FOUND: WaterGEMS/WaterCAD menu-row help.
+- **CITED.** Apple NSMenuItem.toolTip developer.apple.com/documentation/appkit/nsmenuitem/1514848-tooltip and Apple "Tooltips" (Online Help archive): help tags exist on menu items as an optional property; HIG menu pages (developers.apple.com/design/human-interface-guidelines/macos/menus/menu-anatomy/) say nothing about descriptions. macOS menu items otherwise have none and no status bar.
+- **CITED.** Blender Tooltips guideline developer.blender.org/docs/features/interface/human_interface_guidelines/tooltips/: hover tooltip carries name, description, shortcut, on menu items too. Office: Enhanced ScreenTips (support.microsoft.com/en-us/office/show-or-hide-screentips-72d92d6a-6d2a-40fd-9ac2-fb9413ffce18), ribbon.
+- **NOT FOUND.** A shipped always-visible description line under menu rows in these products; VS Code palette / Windows 11 search descriptions not checked. Do not claim in-menu description is absent in the wild.
+- **SPECULATION.** The industry norm is a hover tooltip on the row; status-bar menu help was real (Win32 MenuHelp, AutoCAD to 2014) and is being retired. Touch has no hover, which favours Ida's in-menu line for phones only.

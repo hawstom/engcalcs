@@ -903,8 +903,9 @@
 			// 20 / 40 / 60 / 80 psi -- the four numbers a US water engineer already has in their
 			// head: below 20 is a fire-flow failure, 40 is the usual minimum service pressure, 60
 			// is comfortable, above 80 asks for a pressure-reducing valve at the service.
-			// In metres of water: psi x 0.70307.
-			siBreaks: [14.0614, 28.1228, 42.1842, 56.2456],
+			// In metres of water: psi x 0.3048 / 0.4333 (EPANET's psi,
+			// EngCalcs.EPANET_PSI_PER_FT), 0.70343 to five figures.
+			siBreaks: [14.0688, 28.1375, 42.2063, 56.2751],
 			label: 'pressure'
 		}
 	};

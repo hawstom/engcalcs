@@ -17,10 +17,11 @@
  *      the print sheet and the pre-existing dark rule are DATA or PAPER, not chrome.
  *   2. Every `var(--ec-...)` anywhere must be DECLARED in the token block. An undeclared token is
  *      not an error to a browser: the property silently drops, and the control loses its colour.
- *   3. Inline colour literals in js/*.js and the PHP pages (style="" and style writes) may not rise
- *      above the per-file count recorded in the allow-list. They are chrome debt for Phase 1b, and
- *      a ratchet is the honest way to hold a debt: it may fall, never rise. js/lpn-ramps.js is
- *      colour-ramp DATA and is exempt; spock.php is a private page with its own stylesheet.
+ *   3. Inline colour literals in js/*.js: none, except on a line matching a `js_literals` entry in
+ *      the allow-list (file + line pattern + reason: drawing ink and data colours, never a box,
+ *      button, banner, table or menu). js/lpn-ramps.js is colour-ramp DATA and is exempt. Comment
+ *      lines are ignored. The PHP pages (style="" and style writes) keep a per-file ceiling that may
+ *      fall, never rise; spock.php is a private page with its own stylesheet.
  *
  *   php dev/scripts/chrome_colour_check.php            check
  *   php dev/scripts/chrome_colour_check.php --baseline print the inline counts, for the allow-list
@@ -33,6 +34,7 @@ if (!$allow) { fwrite(STDERR, "chrome_colour_allow.json does not parse\n"); exit
 
 const COLOUR_RE = '/#[0-9a-fA-F]{3,8}\b|\brgba?\([^)]*\)|(?<![-\w.])(?:white|black|red|blue|green|gray|grey|orange|yellow|silver|navy|maroon|purple|teal|lime|aqua|fuchsia|olive)(?![-\w])/i';
 const INLINE_RE = '/([\'"(:\s=])(#[0-9a-fA-F]{3,8}\b|rgba?\()/';
+const JS_NAMED_RE = '/\b(?:color|background|border[\w-]*|outline)\s*[:=]\s*[\'"]?(?:white|black|red|blue|green|gray|grey|orange|yellow|silver|navy)\b/i';
 const SKIP_INLINE = ['spock.php'];
 
 function blankComments(string $s): string {
@@ -99,7 +101,7 @@ $files = array_merge(['css/engcalcs.css'], array_map(fn($f) => 'js/' . basename(
     array_map('basename', glob($root . '/*.php')),
     array_map(fn($f) => 'lib/' . basename($f), array_filter(glob($root . '/lib/*.php'), fn($f) => strpos(basename($f), 'lang.ec.') !== 0)));
 $exempt = $allow['inline_ratchet']['exempt_files'];
-$counts = [];
+$counts = []; $jsAllowed = 0;
 foreach ($files as $rel) {
     if (in_array($rel, $exempt, true)) { continue; }
     $path = ($rel[0] === '/' ? '' : $root . '/') . $rel;
@@ -112,6 +114,19 @@ foreach ($files as $rel) {
         }
     }
     if ($rel === 'css/engcalcs.css' || in_array($rel, SKIP_INLINE, true)) { continue; }
+    if (substr($rel, -3) === '.js') {
+        foreach (explode("\n", $src) as $i => $line) {
+            if (preg_match('~^\s*(//|\*|/\*)~', $line)) { continue; }
+            if (!preg_match(INLINE_RE, $line) && !preg_match(JS_NAMED_RE, $line)) { continue; }
+            $ok = false;
+            foreach ($allow['js_literals']['entries'] as $e) {
+                if ($e['file'] === $rel && preg_match('~' . $e['match'] . '~', $line)) { $ok = true; break; }
+            }
+            if ($ok) { $jsAllowed++; continue; }
+            $problems[] = sprintf("%s:%d  a hard-coded colour in chrome: %s\n    Write var(--ec-...) (a token works inside style strings and element.style writes), or, if this is the\n    map's or a chart's own ink, add a js_literals entry to dev/scripts/chrome_colour_allow.json with the reason.", $rel, $i + 1, trim(substr($line, 0, 110)));
+        }
+        continue;
+    }
     $n = preg_match_all(INLINE_RE, $src);
     if ($n) { $counts[$rel] = $n; }
 }
@@ -136,5 +151,5 @@ if ($problems) {
     echo "Why: a dark theme is only \"write the dark values once\" while every chrome colour is a token\n(dev/theming-plan.md, Task 714).\n";
     exit(1);
 }
-printf("chrome colour check OK -- %d token(s) declared, 0 literals outside the block, %d literal(s) in allow-listed map/print rules, inline ceilings held in %d file(s)%s.\n",
-    count($declared), $allowedHits, count($counts), $slack ? ' (ceilings can fall: ' . implode(', ', $slack) . ')' : '');
+printf("chrome colour check OK -- %d token(s) declared, 0 literals outside the block, %d literal(s) in allow-listed map/print rules, %d allow-listed js line(s), PHP ceilings held in %d file(s)%s.\n",
+    count($declared), $allowedHits, $jsAllowed, count($counts), $slack ? ' (ceilings can fall: ' . implode(', ', $slack) . ')' : '');

@@ -15,6 +15,17 @@ var EngCalcs = EngCalcs || {};
 	// Looped-Network.php; the harnesses in dev/lpn-spike/ require them directly.
 	var Geom = EngCalcs.lpnGeom, Collide = EngCalcs.lpnCollide;
 
+	// **PSI, KPA AND BAR ON THIS PAGE ARE EPANET'S** (Tom, 2026-10-03). Head becomes pressure through
+	// EngCalcs.unitFactors, so this page's own copy of the psi and kPa factors carries EPANET's
+	// PSIperFT (0.4333), KPAperPSI (6.895) and BARperPSI (0.068948), js/PipeHydraulics.lib.js, and
+	// every pressure here reads as EPANET reports it. The shared $ec_units table stays exact for the
+	// other calculators; this one is per page load. Metres match EPANET's already.
+	if (EngCalcs.unitFactors && typeof EngCalcs.EPANET_PSI_PER_M === 'number') {
+		EngCalcs.unitFactors.psi = EngCalcs.EPANET_PSI_PER_M;
+		EngCalcs.unitFactors.kpa = EngCalcs.EPANET_KPA_PER_M;
+		EngCalcs.unitFactors.bar = EngCalcs.EPANET_BAR_PER_M;
+	}
+
 	var NS = 'http://www.w3.org/2000/svg';
 	var svg, world, modelLayer, backdropLayer, gridLayer, customersLayer, linksLayer, linkSymbolLayer, nodesLayer, labelsLayer, debugBoxLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
@@ -2151,8 +2162,8 @@ var EngCalcs = EngCalcs || {};
 		// widest child, and a monospace report line has no wrap opportunities a browser will take, so
 		// an unbounded panel takes most of the window. Hence a max-width plus
 		// `overflow-wrap:anywhere` on the readout, which breaks the long token instead.
-		box.setAttribute('style', 'position:fixed;left:8px;bottom:8px;z-index:35;background:#fff;'
-			+ 'border:1px solid #333;padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px rgba(0,0,0,.3);'
+		box.setAttribute('style', 'position:fixed;left:8px;bottom:8px;z-index:35;background:var(--ec-bg);'
+			+ 'border:1px solid var(--ec-ink);padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3);'
 			+ 'max-height:70vh;max-width:min(26em,45vw);overflow:auto');
 		function row(label, get, set, step, hint) {
 			var l = document.createElement('label'), i = document.createElement('input');
@@ -2204,7 +2215,7 @@ var EngCalcs = EngCalcs || {};
 		row('zoom-to-fit room (text heights)', function () { return t.fitRoom; },
 			function (v) { t.fitRoom = v; }, 1, 'Extra room left on Zoom to fit\u2019s FIRST pass, before labels are placed. Bigger = the first pass sits further out, so labels land more comfortably at the final zoom. Press Zoom to fit to see it.');
 		var g = document.createElement('div');
-		g.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
+		g.setAttribute('style', 'margin-top:6px;border-top:1px solid var(--ec-border-strong);padding-top:4px');
 		g.textContent = 'rank weights';
 		box.appendChild(g);
 		Object.keys(Collide.GOAL_WEIGHT).forEach(function (key) {
@@ -2220,7 +2231,7 @@ var EngCalcs = EngCalcs || {};
 		// only by looking at a real map at several values. Generic over the table, like the rank
 		// weights: a knob added in lpn-collide.js appears here untouched.
 		var at = document.createElement('div');
-		at.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
+		at.setAttribute('style', 'margin-top:6px;border-top:1px solid var(--ec-border-strong);padding-top:4px');
 		at.textContent = 'corner angles (degrees)';
 		box.appendChild(at);
 		Object.keys(Collide.ANGLE_TUNING).forEach(function (key) {
@@ -2232,7 +2243,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		var out = document.createElement('div');
 		out.id = 'lpn_label_bench_out';
-		out.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px;'
+		out.setAttribute('style', 'margin-top:6px;border-top:1px solid var(--ec-border-strong);padding-top:4px;'
 			+ 'overflow-wrap:anywhere;white-space:normal');
 		box.appendChild(out);
 		var btns = document.createElement('div');
@@ -4946,6 +4957,29 @@ var EngCalcs = EngCalcs || {};
 	 * Both doors read this one list -- the fly-out and the map's bottom status strip -- so the two
 	 * cannot drift.
 	 */
+	// THE ANALYZE FLY-OUT (Task 754). Each row names its criteria in a dialog and then solves a
+	// copy of the network many times over. Fire flow and Criticality share the one run dialog and
+	// the one engine, one analysis at a time. Another analysis is another entry in this list.
+	function analyzeMenuRows() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{
+				icon: 'hydrant', label: pc.lpn_ff_menu || 'Fire flow analysis…',
+				tip: pc.lpn_ff_menu_tip,
+				fn: function () { closeMenu(); openFireFlowBox(); }
+			},
+			{
+				icon: 'pipe', label: pc.lpn_crit_menu || 'Criticality analysis…',
+				tip: pc.lpn_crit_menu_tip,
+				fn: function () { closeMenu(); openCriticalityBox(); }
+			},
+			{
+				icon: 'customer', label: pc.lpn_ds_menu || 'Demand scaling…',
+				tip: pc.lpn_ds_menu_tip,
+				fn: function () { closeMenu(); openDemandScaleBox(); }
+			}
+		];
+	}
 	// THE REPORTS FLY-OUT (Tom, 2026-09-04; the Status and Full rows added for ROADMAP Tasks 716
 	// and 715). Five finished answers, each of which opens and is simply there -- no criteria to
 	// set, nothing to press.
@@ -6001,6 +6035,20 @@ var EngCalcs = EngCalcs || {};
 			colorClassesLink: 7,
 			colorReverseNode: false,
 			colorReverseLink: false,
+			// THE CONTOUR PLOT (Task 600). It spreads the NODE colouring over the plane, so it has
+			// no field, breaks or ramp of its own; see refreshContour(). The fill is '' (none),
+			// 'smooth' or 'bands'; the plot is on while the fill or the lines are. The interval is
+			// stored per field AND unit ('pressure|psi'), so a unit change falls back to the default
+			// for the new unit rather than reading 5 psi as 5 kPa. `contourBuffer` is the corridor's
+			// reach as a multiple of the median pipe length. `contourTerrain` asks for the ground
+			// between nodes from Mapbox DEM, used only for pressure and only once the gate says yes.
+			contourFill: '',
+			contourLines: false,
+			contourLabels: true,
+			contourOpacity: 0.6,
+			contourInterval: {},
+			contourBuffer: 2.5,
+			contourTerrain: false,
 			// The colour key's own corner, separate from the labels legend's so the two do not
 			// stack on top of each other. Opposite default corner for the same reason.
 			//
@@ -6129,6 +6177,9 @@ var EngCalcs = EngCalcs || {};
 		// setTransform(), so the basemap has exactly one place to learn that the visible window
 		// changed -- rather than six call sites that each have to remember. Debounced inside.
 		scheduleBasemapRefresh();
+		// The contour labels keep their size and spacing on screen and are laid out only where the
+		// view is, so a zoom or a pan re-places them once it settles (Task 600).
+		scheduleContourRelabel();
 		// The bar is a fact about the current zoom, so it belongs on the same seam as the basemap:
 		// every pan and every zoom in this file arrives here and nowhere else.
 		refreshScaleBar();
@@ -8256,6 +8307,8 @@ var EngCalcs = EngCalcs || {};
 	function syncColorControls() {
 		// Through the keeper: the select that changed is one of the controls this rebuilds (Task 653).
 		keepSetboxControl(buildColoringSection);
+		// ...and the contour box, the second view of the node colouring (Task 600).
+		refreshContourBoxIfOpen();
 	}
 	function colorValueOf(group, elem, field) {
 		return group === 'node' ? colorNodeValue(elem, field) : colorLinkValue(elem, field);
@@ -8561,6 +8614,7 @@ var EngCalcs = EngCalcs || {};
 		var nb = nf ? effectiveBreaks('node', nf) : [], lb = lf ? effectiveBreaks('link', lf) : [];
 		doc.nodes.forEach(function (n) { paintNodeColor(n.id, nb); });
 		doc.links.forEach(function (l) { paintLinkColor(l.id, lb); paintLinkStatus(l); });
+		refreshContour();
 		renderColorLegend();
 	}
 	// **THE DASH FOLLOWS THE STATUS AT THE TIME STEP ON SCREEN**, not only the status the file
@@ -8650,6 +8704,13 @@ var EngCalcs = EngCalcs || {};
 			// a criterion method's come from a design standard and every other set is sitting in
 			// the boxes where anybody can read it. A note saying otherwise would be the only
 			// untrue thing on the key.
+			// THE CONTOUR PLOT'S SUPPORT LINE, under the node block it spreads over the map.
+			if (group === 'node' && contourStats) {
+				var note = document.createElement('div');
+				note.className = 'lpn-contour-note';
+				note.textContent = contourNoteText();
+				box.appendChild(note);
+			}
 		});
 		box.style.display = (any && !galleryIsUp() && !legendIsOff(settings.colorLegendPosition)) ? '' : 'none';
 		applyColorLegendPosition();
@@ -8657,6 +8718,625 @@ var EngCalcs = EngCalcs || {};
 	// Both legends are placed by one function, so neither can be positioned without the other's
 	// box being taken into account -- see placeLegends().
 	function applyColorLegendPosition() { placeLegends(); }
+	// ---- THE CONTOUR PLOT (ROADMAP Task 600) ----------------------------------------------------
+	//
+	// **A MAP LAYER UNDER THE DRAWING, NOT A GRAPH IN THE BOTTOM PANE.** EPANET opens its Contour
+	// Plot in a window of its own with the network drawn over it; here the map already IS that
+	// window, so the plot is a layer under the pipes, in the same coordinates, panning and zooming
+	// with them. It spreads the NODE COLOURING over the plane -- the same field, the same breaks,
+	// the same ramp, the same legend -- so there is one key on the map and the dots on top of the
+	// fill are in its colours (dev/epanet-js-contour-contribution.md, "The honesty problem").
+	//
+	// **THE GEOMETRY IS js/lpn-contour.js**, and the rules are its header's: the value runs along
+	// every open pipe; a point beside the network averages the pipes round it; colour reaches
+	// contourBuffer times the median pipe length from a pipe and fades out over the outer part;
+	// every pump, every valve but a TCV, and every closed link is a wall the colour does not cross,
+	// drawn as a break line across the corridor.
+	//
+	// THREE LAYERS, ONE GROUP: the fill is one raster (an offscreen canvas handed to an <image>, so
+	// it pans and zooms with the drawing and the browser smooths it), the contour lines and break
+	// lines are vector paths, and the labels are text re-placed at every zoom so they keep a
+	// constant size and spacing on screen. The raster and the lines are CACHED on everything they
+	// are computed from, so a colour, opacity or label change does not recompute the field.
+	//
+	// **IT READS WHAT THE COLOURS READ, SO RECALCULATE OFF IS A SNAPSHOT FOR FREE.** It is redrawn
+	// only from refreshValueColors(), which runs on a solve, a frame of a run, a colour setting and
+	// an arrival -- never on an edit while Recalculate is off -- so a stale plot stays on screen
+	// exactly as the stale dots do, and goes when they go.
+	//
+	// The corridor's default reach, as a multiple of the median pipe length. Tom asked for "very
+	// generous ... 2 or 3 * the median pipe length" on Net3; contour-harness.js measures how much of
+	// Net3's loops each multiple fills, and 2.5 is the least that fills them all.
+	var CONTOUR_BUFFER_DEFAULT = 2.5;
+	// The outer part of the corridor over which the colour fades to nothing (Tom: "Soft fade is
+	// good."), as a fraction of the reach.
+	var CONTOUR_FADE = 0.4;
+	// The raster: cells about a sixth of the reach, so the fade is drawn over several cells, between
+	// 256 and 768 on the longer side (Esri's default raster is the extent over 250; Luke Butler's
+	// proof of concept ran 256 x 256).
+	var CONTOUR_CELLS_MIN = 256, CONTOUR_CELLS_MAX = 768, CONTOUR_CELLS_PER_REACH = 6;
+	// The ground is read on a coarser grid of its own and sampled between: the fill grid can be
+	// ten times the cells, and every one of them would be a pixel asked of Mapbox.
+	var CONTOUR_DEM_CELLS = 200;
+	var CONTOUR_OPACITY_DEFAULT = 0.6;
+	// Labels: their size and spacing on SCREEN, re-placed whenever the zoom settles.
+	var CONTOUR_LABEL_PX = 11, CONTOUR_LABEL_SPACING_PX = 280;
+	// More lines than this at one interval is a solid ink smear, not a plot; the box says so.
+	var CONTOUR_MAX_LEVELS = 150;
+	// Every fifth level is an index contour, drawn heavier -- the topographic map's convention.
+	var CONTOUR_INDEX_EVERY = 5;
+	// The fields for which a tank or a reservoir is a vertex of the plot -- see refreshContour().
+	var CONTOUR_FIXED_HEAD_FIELDS = ['head', 'quality'];
+	var contourLayer = null, contourStats = null, contourDem = null;
+	// What was last computed, keyed on what it was computed from: {key, grid, field, lo, hi},
+	// {key, href} for the fill, {key, lines, levels, step} for the lines.
+	var contourField = null, contourFillCache = null, contourLinesCache = null, contourFaults = [], contourWalls = [], contourReach = 0;
+	function contourLayerEl() {
+		var host = modelLayer || world;
+		if (!host) { return null; }
+		if (contourLayer && contourLayer.parentNode === host) { return contourLayer; }
+		// FIRST CHILD OF THE DRAWING'S GROUP: under the customers, the pipes and the nodes, and
+		// above the basemap, the grid and the background image, which sit outside that group.
+		contourLayer = el('g', { 'class': 'lpn-contour', 'pointer-events': 'none' });
+		host.insertBefore(contourLayer, host.firstChild || null);
+		return contourLayer;
+	}
+	function contourFillMode() {
+		var f = settings.contourFill;
+		return (f === 'smooth' || f === 'bands') ? f : '';
+	}
+	function contourIsOn() { return !!(contourFillMode() || settings.contourLines); }
+	function contourBufferOf() {
+		var b = Number(settings.contourBuffer);
+		return (isFinite(b) && b > 0) ? Math.min(20, b) : CONTOUR_BUFFER_DEFAULT;
+	}
+	function contourOpacityOf() {
+		var o = Number(settings.contourOpacity);
+		return (isFinite(o) && o >= 0) ? Math.min(1, o) : CONTOUR_OPACITY_DEFAULT;
+	}
+	// THE INTERVAL, per field and unit. Tom asked for 5 psi or 5 m to start; the other units of a
+	// pressure or a length get the step a contour map in that unit would use, and every other field
+	// a round step giving about ten lines over the values on the map.
+	var CONTOUR_UNIT_STEP = { psi: 5, m: 5, ft: 10, kPa: 50, bar: 0.5 };
+	function contourIntervalKey(field) { return field + '|' + colorFieldUnitText('node', field); }
+	function contourDefaultInterval(field, lo, hi) {
+		var u = colorFieldUnitText('node', field);
+		if ((field === 'pressure' || field === 'head' || field === 'elev') && CONTOUR_UNIT_STEP[u]) { return CONTOUR_UNIT_STEP[u]; }
+		return EngCalcs.lpnContour.niceStep(lo, hi, 10);
+	}
+	function contourIntervalOf(field, lo, hi) {
+		var v = Number((settings.contourInterval || {})[contourIntervalKey(field)]);
+		return (isFinite(v) && v > 0) ? v : contourDefaultInterval(field, lo, hi);
+	}
+	// Where on the Earth a DRAWING point is -- viewLonLat()'s question asked of a grid cell, through
+	// the same one crossing outward. Only reached once contourTerrainOffered() has required a
+	// project that projectLocatable() places, so the grid-with-world-map case never sends.
+	function drawLonLat(x, y) { return viewLonLat({ cx: x, cy: y }); }
+	// Whether the ground can be subtracted at all: pressure, a project placed on the Earth, a token,
+	// and the terrain module present. The consent is asked by the checkbox, never here.
+	function contourTerrainOffered() {
+		return colorFieldOf('node') === 'pressure' && !!EngCalcs.lpnTerrainGrid &&
+			projectLocatable() && !!mapboxToken();
+	}
+	function contourTerrainWanted() {
+		return !!settings.contourTerrain && contourTerrainOffered() &&
+			!!(EngCalcs.lpnTerrainConsented && EngCalcs.lpnTerrainConsented());
+	}
+	// A node's head in SI metres, for the ground-subtracted surface: the solve's own number for a
+	// junction (and for a tank inside a run), the stated water surface for a fixed head otherwise --
+	// colorNodeValue()'s `head` branch, without the conversion to the display unit.
+	function contourHeadSI(n) {
+		var R = lastSolveResult;
+		if (isFixedHeadNode(n) && !(R && typeof R.t === 'number')) { return toSI(nodeFixedHead(n), 'lpn_u_elevhead'); }
+		return (R && R.heads && typeof R.heads[n.id] === 'number') ? R.heads[n.id] : undefined;
+	}
+	function hexRgb(c) {
+		var m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i.exec(String(c || ''));
+		return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : [0, 0, 0];
+	}
+	function clearContour() {
+		if (contourLayer) { while (contourLayer.firstChild) { contourLayer.removeChild(contourLayer.firstChild); } }
+	}
+	function contourNow() { return (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now(); }
+	// A short, order-sensitive fingerprint of a list of numbers -- the cache key of the field, so a
+	// moved node or a new solve is a new field and nothing else is.
+	function contourHash(nums) {
+		var h1 = 0x811c9dc5, h2 = 0x01000193, i;
+		for (i = 0; i < nums.length; i++) {
+			var s = String(nums[i]), k;
+			for (k = 0; k < s.length; k++) {
+				h1 = Math.imul(h1 ^ s.charCodeAt(k), 16777619);
+				h2 = Math.imul(h2 ^ s.charCodeAt(k), 2246822519);
+			}
+			h1 = Math.imul(h1 ^ 44, 16777619);
+		}
+		return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36) + ':' + nums.length;
+	}
+	// ---- THE NETWORK, AS THE CONTOUR SEES IT ----
+	// Pieces of every open pipe carrying the value, the walls, the zones, the median pipe length,
+	// and the grid. Cheap (one pass over the links), so it runs on every redraw and is the key.
+	function contourNetwork(field, useHeads) {
+		var C = EngCalcs.lpnContour, all = [], allIdx = {}, ax = [], ay = [];
+		doc.nodes.forEach(function (n) {
+			if (!isActive(n)) { return; }
+			var x = nodeDrawX(n), y = nodeDrawY(n);
+			if (!isFinite(x) || !isFinite(y)) { return; }
+			allIdx[n.id] = all.length; all.push(n); ax.push(x); ay.push(y);
+		});
+		// **A TANK OR A RESERVOIR CARRIES THE VALUE ONLY WHERE IT MEANS WHAT A JUNCTION'S DOES.**
+		// Under pressure a tank's value is its water depth and a reservoir's is about zero, so as
+		// data they paint a false low-pressure halo round every one (pre-review, 2026-10-03). They
+		// count for CONTOUR_FIXED_HEAD_FIELDS only -- head, where their water surface is the grade
+		// line the pipes leave at, and water quality, where the source is the most telling value
+		// on the map -- and still join zones either way.
+		var withFixed = CONTOUR_FIXED_HEAD_FIELDS.indexOf(field) >= 0, val = {}, nVal = 0;
+		all.forEach(function (n) {
+			if (isFixedHeadNode(n) && !withFixed) { return; }
+			var v = useHeads ? contourHeadSI(n) : colorNodeValue(n, field);
+			if (typeof v !== 'number' || !isFinite(v)) { return; }
+			val[n.id] = v; nVal++;
+		});
+		// WHICH LINKS JOIN, AND WHICH ARE WALLS. An open pipe (a check valve is a pipe, closed when it
+		// is shut) and an open throttle control valve, which is a loss like a pipe's, join. A pump,
+		// every other valve and anything closed is a wall: head jumps across it.
+		var joins = [], lens = [], dataLinks = [], walls = [], geomPts = [];
+		doc.links.forEach(function (l) {
+			if (!isActive(l)) { return; }
+			var a = allIdx[l.from], b = allIdx[l.to];
+			if (a === undefined || b === undefined) { return; }
+			var pts = linkPointList(l).filter(function (p) { return p && isFinite(p.x) && isFinite(p.y); });
+			if (pts.length < 2) { return; }
+			var len = 0, i;
+			for (i = 0; i + 1 < pts.length; i++) { len += Math.sqrt(Math.pow(pts[i + 1].x - pts[i].x, 2) + Math.pow(pts[i + 1].y - pts[i].y, 2)); }
+			pts.forEach(function (p) { geomPts.push(p.x, p.y); });
+			// The reach's scale is every pipe as drawn, open or closed: how far apart the network's
+			// nodes are does not change when a valve shuts.
+			if (l.type === 'pipe') { lens.push(len); }
+			var tcv = l.type === 'valve' && String(l.valveType || 'TCV').toUpperCase() === 'TCV';
+			if (linkStatusOf(l) === 'closed' || (l.type !== 'pipe' && !tcv)) { walls.push({ pts: pts, from: l.from, to: l.to }); return; }
+			joins.push([a, b]);
+			if (val[l.from] !== undefined && val[l.to] !== undefined) { dataLinks.push({ l: l, pts: pts, len: len }); }
+		});
+		var zoneOf = C.zones(all.length, joins), med = C.median(lens);
+		var segs = [], withData = {};
+		dataLinks.forEach(function (d) {
+			var v0 = val[d.l.from], v1 = val[d.l.to], run = 0, z = zoneOf[allIdx[d.l.from]], i;
+			withData[d.l.from] = 1; withData[d.l.to] = 1;
+			for (i = 0; i + 1 < d.pts.length; i++) {
+				var p = d.pts[i], q = d.pts[i + 1], sl = Math.sqrt(Math.pow(q.x - p.x, 2) + Math.pow(q.y - p.y, 2));
+				var f0 = d.len > 0 ? run / d.len : 0, f1 = d.len > 0 ? (run + sl) / d.len : 1;
+				segs.push({ x0: p.x, y0: p.y, x1: q.x, y1: q.y, v0: v0 + f0 * (v1 - v0), v1: v0 + f1 * (v1 - v0), zone: z });
+				run += sl;
+			}
+		});
+		// A node with a value and no open pipe carrying it still colours its own surroundings.
+		all.forEach(function (n, i) {
+			if (val[n.id] === undefined || withData[n.id]) { return; }
+			segs.push({ x0: ax[i], y0: ay[i], x1: ax[i], y1: ay[i], v0: val[n.id], v1: val[n.id], zone: zoneOf[i] });
+		});
+		// A network with no pipe at all still needs a length to reach: a tenth of its extent.
+		if (!(med > 0) && all.length > 1) {
+			var ex = Math.max(Math.max.apply(null, ax) - Math.min.apply(null, ax), Math.max.apply(null, ay) - Math.min.apply(null, ay));
+			med = ex / 10;
+		}
+		var R = med * contourBufferOf();
+		// The grid covers EVERY node and link, open or closed, valued or not: closing a pipe during
+		// a run must not move the grid, or the ground under it would be read again (pre-review,
+		// 2026-10-03).
+		ax.forEach(function (x, i) { geomPts.push(x, ay[i]); });
+		var gsegs = [];
+		for (var g = 0; g + 1 < geomPts.length; g += 2) { gsegs.push({ x0: geomPts[g], y0: geomPts[g + 1], x1: geomPts[g], y1: geomPts[g + 1], v0: 0, v1: 0, zone: 0 }); }
+		var G = C.segmentSet(gsegs), grid = null;
+		if (R > 0 && G.n) {
+			var w0 = Infinity, w1 = -Infinity, h0 = Infinity, h1 = -Infinity;
+			for (g = 0; g < G.n; g++) { w0 = Math.min(w0, G.x0[g]); w1 = Math.max(w1, G.x0[g]); h0 = Math.min(h0, G.y0[g]); h1 = Math.max(h1, G.y0[g]); }
+			var span = Math.max(w1 - w0, h1 - h0) + 2 * R;
+			var cells = Math.max(CONTOUR_CELLS_MIN, Math.min(CONTOUR_CELLS_MAX, Math.ceil(span / (R / CONTOUR_CELLS_PER_REACH))));
+			grid = C.gridAround(G, R, cells);
+		}
+		// A WALL BETWEEN TWO ZONES NEEDS NO FAULT: the zones are never averaged, and the line where
+		// the colour jumps is traced from the field (contourWallLines()). A fault is only for a
+		// barrier both of whose ends are still one zone -- a booster pump inside a loop -- where
+		// nothing else would stop the colour running across it. A fault on every barrier sliced a
+		// pump station's short links into wedges with no pipe visible in them (Net3's pump 335, its
+		// bypass 330 and pipe 333: a bare hole in the one loop they make).
+		var faults = walls.filter(function (w) { return zoneOf[allIdx[w.from]] === zoneOf[allIdx[w.to]]; })
+			.map(function (w) { return C.faultAcross(w.pts, R); }).filter(Boolean);
+		return { nodes: nVal, pipes: dataLinks.length, segs: segs, faults: faults, R: R, med: med, grid: grid,
+			walls: walls.map(function (w) { return w.pts; }) };
+	}
+	function refreshContour() {
+		var C = EngCalcs.lpnContour, field = colorFieldOf('node');
+		contourStats = null;
+		if (!C || !contourIsOn() || !field || !svg) { clearContour(); contourField = null; return; }
+		var layer = contourLayerEl();
+		if (!layer) { return; }
+		var t0 = contourNow(), dem = contourTerrainWanted();
+		var net = contourNetwork(field, dem);
+		contourStats = { n: net.nodes, pipes: net.pipes, k: contourBufferOf(), few: !net.segs.length || !net.grid, dem: null };
+		if (contourStats.few) { clearContour(); contourField = null; return; }
+		var grid = net.grid, ground = null;
+		// ---- PRESSURE OVER THE GROUND: head interpolated, ground subtracted per cell ----
+		if (dem) {
+			var demGrid = contourDemGrid(grid), demKey = [project && project.docId, demGrid.x0, demGrid.y0, demGrid.dx, demGrid.nx, demGrid.ny].join('|');
+			if (!contourDem || contourDem.key !== demKey) { requestContourDem(demKey, demGrid); }
+			if (contourDem && contourDem.key === demKey && contourDem.elev) { ground = contourDem; }
+			else if (contourDem && contourDem.key === demKey && contourDem.failed) { contourStats.demFailed = true; }
+			// While the ground is being read, or if it could not be, the plot between nodes stands:
+			// the same network, by the field's own values.
+			if (!ground) { net = contourNetwork(field, false); }
+		}
+		var key = [field, ground ? 'g' + ground.key : '', net.R, CONTOUR_FADE, grid.x0, grid.y0, grid.dx, grid.nx, grid.ny,
+			contourHash([].concat.apply([], net.segs.map(function (s) { return [s.x0, s.y0, s.x1, s.y1, s.v0, s.v1, s.zone]; }))),
+			contourHash([].concat.apply([], net.faults.map(function (f) { return [f.x0, f.y0, f.x1, f.y1]; })))].join('|');
+		if (!contourField || contourField.key !== key) {
+			var S = C.segmentSet(net.segs), F = C.corridorField(S, net.faults, grid, net.R, { fade: CONTOUR_FADE });
+			if (ground) { contourSubtractGround(F, grid, ground); }
+			var lo = Infinity, hi = -Infinity, i;
+			for (i = 0; i < F.val.length; i++) { if (F.alpha[i] > 0 && isFinite(F.val[i])) { lo = Math.min(lo, F.val[i]); hi = Math.max(hi, F.val[i]); } }
+			contourField = { key: key, grid: grid, field: F, lo: lo, hi: hi, ms: contourNow() - t0 };
+			contourFillCache = null; contourLinesCache = null;
+		}
+		contourFaults = net.faults; contourWalls = net.walls; contourReach = net.R;
+		if (ground) { contourStats.dem = ground.metres; contourStats.demRange = isFinite(contourField.lo) ? [contourField.lo, contourField.hi] : null; }
+		contourStats.cells = grid.nx * grid.ny;
+		contourStats.fieldMs = contourField.ms;
+		drawContourLayers(layer, field);
+		contourStats.ms = contourNow() - t0;
+	}
+	// The ground grid: the fill grid's extent at a coarser cell, so it changes only when the network
+	// does.
+	function contourDemGrid(grid) {
+		var w = grid.nx * grid.dx, h = grid.ny * grid.dy, cell = Math.max(w, h) / CONTOUR_DEM_CELLS;
+		return { x0: grid.x0, y0: grid.y0, dx: cell, dy: cell, nx: Math.max(2, Math.ceil(w / cell)), ny: Math.max(2, Math.ceil(h / cell)) };
+	}
+	// The pressure in the display unit at every cell, from head interpolated and ground subtracted.
+	function contourSubtractGround(F, grid, ground) {
+		var C = EngCalcs.lpnContour, i, j,
+			sg = (settings.hydraulics && typeof settings.hydraulics.specificGravity === 'number' &&
+				isFinite(settings.hydraulics.specificGravity)) ? settings.hydraulics.specificGravity : 1,
+			f = toDisplay(1, resultUnit('pressure'));
+		for (j = 0; j < grid.ny; j++) {
+			for (i = 0; i < grid.nx; i++) {
+				var c = j * grid.nx + i;
+				if (!isFinite(F.val[c])) { continue; }
+				var e = C.sampleField(ground.elev, ground.grid, grid.x0 + (i + 0.5) * grid.dx, grid.y0 + (j + 0.5) * grid.dy);
+				if (!isFinite(e)) { var cc = C.cellAt(ground.grid, grid.x0 + (i + 0.5) * grid.dx, grid.y0 + (j + 0.5) * grid.dy); e = cc >= 0 ? ground.elev[cc] : NaN; }
+				F.val[c] = isFinite(e) ? (F.val[c] - e) * sg * f : NaN;
+				if (!isFinite(F.val[c])) { F.alpha[c] = 0; }
+			}
+		}
+	}
+	// ---- DRAWING: fill, lines, walls, labels -------------------------------------------------------
+	function drawContourLayers(layer, field) {
+		var C = EngCalcs.lpnContour, cf = contourField, grid = cf.grid, mode = contourFillMode();
+		clearContour();
+		var breaks = effectiveBreaks('node', field), nb = breaks.length + 1, k;
+		// THE FILL. One raster, rebuilt only when the field, the colours or the mode change.
+		if (mode) {
+			var cols = [];
+			for (k = 0; k < nb; k++) { cols.push(hexRgb(bandColor('node', k, nb))); }
+			var fkey = [cf.key, mode, breaks.join(','), cols.join(';')].join('|');
+			if (!contourFillCache || contourFillCache.key !== fkey) {
+				var rgba = C.fillRGBA(cf.field, grid, breaks, cols, mode);
+				contourFillCache = { key: fkey, rgba: rgba, href: contourRasterHref(rgba, grid) };
+			}
+			var img = el('image', { x: grid.x0, y: grid.y0, width: grid.nx * grid.dx, height: grid.ny * grid.dy,
+				preserveAspectRatio: 'none', opacity: String(contourOpacityOf()), 'class': 'lpn-contour-fill' }, layer);
+			if (contourFillCache.href) { img.setAttribute('href', contourFillCache.href); }
+		}
+		var span = Math.max(grid.nx * grid.dx, grid.ny * grid.dy), digits = C.digitsFor(span);
+		// THE WALLS: a break line across the corridor at every pump, valve and closed link, cut to the
+		// stretch of it that lies over colour -- a retaining wall on a grading plan.
+		var walls = contourWallLines(grid, cf.field);
+		if (walls.length) {
+			var wd = C.pathOf(walls, digits, false);
+			el('path', { d: wd, 'class': 'lpn-contour-break-casing' }, layer);
+			el('path', { d: wd, 'class': 'lpn-contour-break' }, layer);
+		}
+		contourStats.walls = walls.length;
+		// THE LINES, at every multiple of the interval.
+		contourStats.levels = 0; contourStats.tooMany = false;
+		if (settings.contourLines && isFinite(cf.lo)) {
+			var step = contourIntervalOf(field, cf.lo, cf.hi);
+			contourStats.interval = step;
+			contourStats.unit = colorFieldUnitText('node', field);
+			var lkey = cf.key + '|' + step;
+			if (!contourLinesCache || contourLinesCache.key !== lkey) {
+				var levels = C.levelsFor(cf.lo, cf.hi, step, CONTOUR_MAX_LEVELS);
+				contourLinesCache = { key: lkey, step: step, levels: levels || [], tooMany: levels === null,
+					lines: levels ? C.contourLines(cf.field, grid, levels, { minAlpha: 0.35, smooth: 2 }) : [] };
+			}
+			var LC = contourLinesCache;
+			contourStats.tooMany = LC.tooMany;
+			var g = el('g', { 'class': 'lpn-contour-lines' }, layer);
+			LC.levels.forEach(function (lv, i) {
+				if (!LC.lines[i] || !LC.lines[i].length) { return; }
+				contourStats.levels++;
+				var index = Math.abs(Math.round(lv / LC.step)) % CONTOUR_INDEX_EVERY === 0;
+				el('path', { d: C.pathOf(LC.lines[i], digits, false), 'data-level': String(lv),
+					'class': 'lpn-contour-line' + (index ? ' lpn-contour-index' : '') }, g);
+			});
+			el('g', { 'class': 'lpn-contour-labels' }, layer);
+			drawContourLabels();
+		}
+	}
+	// The raster as an image the <image> element can show, or '' where there is no canvas (Node).
+	function contourRasterHref(rgba, grid) {
+		var canvas = (typeof document.createElement === 'function') ? document.createElement('canvas') : null;
+		var ctx = canvas && canvas.getContext ? canvas.getContext('2d') : null;
+		if (!ctx || !ctx.createImageData) { return ''; }
+		canvas.width = grid.nx; canvas.height = grid.ny;
+		var img = ctx.createImageData(grid.nx, grid.ny);
+		img.data.set(rgba);
+		ctx.putImageData(img, 0, 0);
+		return canvas.toDataURL('image/png');
+	}
+	// The break lines: every boundary between two coloured zones, traced from the field, and each
+	// fault cut to the run of it round the link's midpoint that lies over colour.
+	function contourWallLines(grid, F) {
+		// A zone boundary is drawn only within the reach of the pump, valve or closed link that makes
+		// it, so it crosses the corridor there and never runs on across open land.
+		var C = EngCalcs.lpnContour, out = C.clipNear(C.zoneBreaks(F, grid, { minAlpha: 0.2, smooth: 2 }), contourWalls, contourReach);
+		contourFaults.forEach(function (f) {
+			var n = 40, s;
+			// From the middle outward in both directions, while the colour lasts.
+			function covered(t) {
+				var x = f.x0 + t * (f.x1 - f.x0), y = f.y0 + t * (f.y1 - f.y0), c = C.cellAt(grid, x, y);
+				return c >= 0 && F.alpha[c] >= 0.2;
+			}
+			var lo = 0.5, hi = 0.5;
+			for (s = 1; s <= n / 2; s++) { if (covered(0.5 - s / n)) { lo = 0.5 - s / n; } else { break; } }
+			for (s = 1; s <= n / 2; s++) { if (covered(0.5 + s / n)) { hi = 0.5 + s / n; } else { break; } }
+			if (hi - lo < 2 / n) { return; }
+			out.push([f.x0 + lo * (f.x1 - f.x0), f.y0 + lo * (f.y1 - f.y0), f.x0 + hi * (f.x1 - f.x0), f.y0 + hi * (f.y1 - f.y0)]);
+		});
+		return out;
+	}
+	// THE LABELS, placed for the zoom on screen now: a constant size and spacing in pixels, upright,
+	// along the straight stretches of each line. Called by every redraw and by a settled zoom.
+	function drawContourLabels() {
+		var C = EngCalcs.lpnContour, host = null, LC = contourLinesCache, i;
+		if (!contourLayer) { return; }
+		for (i = 0; i < (contourLayer.children || contourLayer.childNodes || []).length; i++) {
+			var ch = (contourLayer.children || contourLayer.childNodes)[i];
+			if (String(ch.getAttribute && ch.getAttribute('class')) === 'lpn-contour-labels') { host = ch; }
+		}
+		if (!host) { return; }
+		while (host.firstChild) { host.removeChild(host.firstChild); }
+		if (!settings.contourLabels || !settings.contourLines || !LC || !LC.lines.length || !(state.s > 0)) { return; }
+		var px = CONTOUR_LABEL_PX, lines = [];
+		LC.levels.forEach(function (lv, k) { (LC.lines[k] || []).forEach(function (pl) { lines.push({ level: lv, pts: pl.pts, closed: pl.closed }); }); });
+		// ONLY WHERE SOMEBODY CAN SEE THEM, plus a margin: a big network zoomed in would otherwise
+		// lay out tens of thousands of labels off screen. A pan re-places them (setTransform()).
+		var clip = null, r = svg && svg.getBoundingClientRect ? svg.getBoundingClientRect() : null;
+		if (r && r.width > 0 && r.height > 0) {
+			var mx = 0.25 * r.width, my = 0.25 * r.height;
+			clip = { x0: (-mx - state.tx) / state.s, y0: (-my - state.ty) / state.s,
+				x1: (r.width + mx - state.tx) / state.s, y1: (r.height + my - state.ty) / state.s };
+		}
+		var placed = C.placeLabels(lines, {
+			scale: state.s, height: px, spacing: CONTOUR_LABEL_SPACING_PX, pad: px, clip: clip,
+			width: function (lv) { return 0.62 * px * C.levelText(lv, LC.step).length; }
+		});
+		var fs = px / state.s, halo = 3 / state.s;
+		placed.forEach(function (q) {
+			var t = el('text', { x: q.x, y: q.y, 'font-size': fs, 'stroke-width': halo, 'data-level': String(q.level),
+				'text-anchor': 'middle', 'dominant-baseline': 'central', 'class': 'lpn-contour-label',
+				transform: 'rotate(' + q.angle.toFixed(2) + ' ' + q.x + ' ' + q.y + ')' }, host);
+			t.textContent = C.levelText(q.level, LC.step);
+		});
+		if (contourStats) { contourStats.labels = placed.length; }
+	}
+	var contourRelabelTimer = null;
+	function scheduleContourRelabel() {
+		if (!contourLinesCache || !settings.contourLines) { return; }
+		if (contourRelabelTimer) { clearTimeout(contourRelabelTimer); }
+		contourRelabelTimer = setTimeout(function () { contourRelabelTimer = null; drawContourLabels(); }, 150);
+	}
+	// Read the ground under the grid, once per grid. Kept in memory for this page only, never on the
+	// device (js/lpn-terrain.js's rule), and redrawn by the contour alone when it arrives.
+	function requestContourDem(key, grid) {
+		var pts = [], i, j;
+		contourDem = { key: key, grid: grid, elev: null, failed: false, metres: 0 };
+		for (j = 0; j < grid.ny; j++) {
+			for (i = 0; i < grid.nx; i++) {
+				var ll = drawLonLat(grid.x0 + (i + 0.5) * grid.dx, grid.y0 + (j + 0.5) * grid.dy);
+				if (ll && isFinite(ll.lon) && isFinite(ll.lat)) { pts.push({ id: j * grid.nx + i, lon: ll.lon, lat: ll.lat }); }
+			}
+		}
+		var mid = pts.length ? pts[pts.length >> 1] : null;
+		EngCalcs.lpnTerrainGrid(pts, function (heights, info) {
+			if (!contourDem || contourDem.key !== key) { return; }
+			// Refused for being busy, or with no yes: forget the request so a later redraw asks again.
+			if (!heights) { contourDem = null; return; }
+			if (!heights.length) { contourDem.failed = true; refreshContourOnly(); return; }
+			var elev = new Float64Array(grid.nx * grid.ny), m;
+			for (m = 0; m < elev.length; m++) { elev[m] = NaN; }
+			heights.forEach(function (h) { elev[h.id] = h.meters; });
+			contourDem.elev = elev;
+			// What the legend says the surface stands on: the coarser of the grid cell and the DEM
+			// pixel, in metres on the ground.
+			var a = drawLonLat(grid.x0, grid.y0), b = drawLonLat(grid.x0 + grid.dx, grid.y0), cell = 0, px = 0;
+			if (a && b && Geom && Geom.geodesicMeters) { cell = Geom.geodesicMeters(a.lon, a.lat, b.lon, b.lat); }
+			if (mid && EngCalcs.lpnTerrainGroundResolution && info && typeof info.zoom === 'number') {
+				px = EngCalcs.lpnTerrainGroundResolution(info.zoom, mid.lat);
+			}
+			contourDem.metres = Math.max(cell, px);
+			refreshContourOnly();
+		});
+	}
+	function refreshContourOnly() { refreshContour(); renderColorLegend(); }
+	// The support line under the colour key: what the colour between the nodes stands on.
+	function contourNoteText() {
+		var pc = EngCalcs.pageConfig || {}, s = contourStats;
+		if (!s) { return ''; }
+		if (s.few) { return pc.lpn_contour_few || 'Too few nodes to contour.'; }
+		var out = (pc.lpn_contour_support ||
+			'Contour plot: {n} nodes, interpolated along {p} pipes and up to {k} times the median pipe length beside them. No color across pumps, valves, or closed links.')
+			.replace('{n}', String(s.n)).replace('{p}', String(s.pipes)).replace('{k}', String(s.k));
+		if (s.dem) {
+			out += ' ' + (pc.lpn_contour_support_dem ||
+				'Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.')
+				.replace('{m}', String(Math.max(1, Math.round(s.dem))));
+		} else if (s.demFailed) {
+			out += ' ' + (pc.lpn_contour_dem_failed ||
+				'The ground could not be read from Mapbox DEM, so pressure is interpolated between nodes alone.');
+		}
+		if (s.tooMany) {
+			out += ' ' + (pc.lpn_contour_too_many || 'Too many contour lines at this interval; widen it to draw them.');
+		} else if (s.interval) {
+			out += ' ' + (pc.lpn_contour_support_lines || 'Contour lines every {i} {u}.')
+				.replace('{i}', String(s.interval)).replace(' {u}', s.unit ? ' ' + s.unit : '');
+		}
+		return out;
+	}
+	// ---- THE CONTOUR BOX ------------------------------------------------------------------------
+	//
+	// Tom, 2026-10-03: *"we may want the Contour graph command open a control box for this with color
+	// and contour controls."* A small non-modal box on the standing-box shell (drag band, resize
+	// grip, remembered corner), labels only. Everything it sets is the PROJECT's (it rides in
+	// serializeProject()); only where the box sits and whether it is open is the browser's, as
+	// `lpn_contourbox`. The value and the colour scheme are the node colouring's own two settings,
+	// so the Settings box and this one can never disagree with each other or with the dots.
+	function contourBoxEl() { return document.getElementById('lpn_contour_box'); }
+	function contourBoxIsOpen() {
+		var box = contourBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	// THE MENU ROW: turns the plot on if it is off (a smooth fill with labelled lines, of pressure
+	// if the nodes are not coloured yet), then opens the box where it is tuned or turned off.
+	function showContour() {
+		if (!colorFieldOf('node')) { settings.colorNodeField = 'pressure'; }
+		if (!contourIsOn()) { settings.contourFill = 'smooth'; settings.contourLines = true; }
+		refreshValueColors(); saveToStorage(); syncColorControls();
+		openContourBox();
+	}
+	function openContourBox() {
+		var box = contourBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		buildContourBox();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, contourboxLayout, true); });
+		initTipsIn(box);
+		rememberBoxOpen(contourboxLayout, saveContourboxLayout, true);
+	}
+	function closeContourBox() {
+		hidePanel(contourBoxEl());
+		rememberBoxOpen(contourboxLayout, saveContourboxLayout, false);
+	}
+	var LPN_CONTOURBOX_KEY = 'lpn_contourbox';
+	var contourboxLayout = newBoxLayout();
+	contourboxLayout.userSized = false;
+	function saveContourboxLayout() {
+		try { localStorage.setItem(LPN_CONTOURBOX_KEY, JSON.stringify(contourboxLayout)); } catch (e) {}
+	}
+	function wireContourBox() {
+		var box = contourBoxEl(), x = document.getElementById('lpn_contour_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeContourBox); }
+		wireBoxMemory(box, LPN_CONTOURBOX_KEY, contourboxLayout, saveContourboxLayout, contourBoxIsOpen);
+	}
+	function refreshContourBoxIfOpen() { if (contourBoxIsOpen()) { buildContourBox(); } }
+	function contourChanged() { refreshValueColors(); saveToStorage(); syncColorControls(); }
+	function buildContourBox() {
+		var pc = EngCalcs.pageConfig || {}, body = document.getElementById('lpn_contour_body');
+		if (!body) { return; }
+		var focusedId = document.activeElement && body.contains && body.contains(document.activeElement) ? document.activeElement.id : '';
+		body.innerHTML = '';
+		function row(label, control, tip, suffix) {
+			var r = document.createElement('div'), lab = document.createElement('span'), cell = document.createElement('span');
+			r.className = 'lpn-set-row';
+			lab.textContent = label;
+			if (tip) { lab.title = tip; lab.className = 'ec-help'; }
+			cell.className = 'lpn-contour-ctl';
+			cell.appendChild(control);
+			if (suffix) { var u = document.createElement('span'); u.className = 'lpn-contour-unit'; u.textContent = suffix; cell.appendChild(u); }
+			r.appendChild(lab); r.appendChild(cell);
+			body.appendChild(r);
+			return r;
+		}
+		function select(id, opts, cur, onPick) {
+			var sel = document.createElement('select');
+			sel.id = id;
+			opts.forEach(function (o) {
+				var opt = document.createElement('option');
+				opt.value = o[0]; opt.textContent = o[1];
+				if (o[0] === cur) { opt.selected = true; }
+				sel.appendChild(opt);
+			});
+			sel.addEventListener('change', function () { onPick(sel.value); });
+			return sel;
+		}
+		function check(id, on, onPick) {
+			var c = document.createElement('input');
+			c.type = 'checkbox'; c.id = id; c.checked = !!on;
+			c.addEventListener('change', function () { onPick(c.checked, c); });
+			return c;
+		}
+		function number(id, v, min, step, onPick) {
+			var n = document.createElement('input');
+			n.type = 'number'; n.id = id; n.value = String(v); n.min = String(min); n.step = String(step);
+			n.className = 'lpn-contour-num';
+			n.addEventListener('change', function () {
+				var x = parseFloat(n.value);
+				if (isFinite(x) && x > 0) { onPick(x); } else { n.value = String(v); }
+			});
+			return n;
+		}
+		var field = colorFieldOf('node');
+		row(pc.lpn_color_node_field || 'Color nodes by',
+			select('lpn_contour_field', [['', pc.lpn_color_none || 'No color']].concat(colorFieldOptions('node')), field || '', function (v) {
+				settings.colorNodeField = v; contourChanged();
+			}));
+		row(pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, 'node', '_contour'));
+		row(pc.lpn_contour_fill || 'Fill', select('lpn_contour_fill', [
+			['', pc.lpn_settings_legend_off || 'None'],
+			['smooth', pc.lpn_contour_fill_smooth || 'Smooth'],
+			['bands', pc.lpn_contour_fill_bands || 'Bands']], contourFillMode(), function (v) {
+			settings.contourFill = v; contourChanged();
+		}), pc.lpn_contour_fill_tip);
+		row(pc.lpn_contour_opacity || 'Fill opacity', number('lpn_contour_opacity', Math.round(100 * contourOpacityOf()), 1, 5, function (v) {
+			settings.contourOpacity = Math.max(0.01, Math.min(1, v / 100)); contourChanged();
+		}), null, '%');
+		row(pc.lpn_contour_lines || 'Contour lines', check('lpn_contour_lines', settings.contourLines, function (on) {
+			settings.contourLines = on; contourChanged();
+		}));
+		var cf = contourField, lo = cf ? cf.lo : 0, hi = cf ? cf.hi : 1;
+		row(pc.lpn_contour_interval || 'Interval', number('lpn_contour_interval', field ? contourIntervalOf(field, lo, hi) : 5, 0, 'any', function (v) {
+			if (!field) { return; }
+			settings.contourInterval = settings.contourInterval || {};
+			settings.contourInterval[contourIntervalKey(field)] = v; contourChanged();
+		}), null, field ? colorFieldUnitText('node', field) : '');
+		row(pc.lpn_tool_labels || 'Labels', check('lpn_contour_labels', settings.contourLabels !== false, function (on) {
+			settings.contourLabels = on; contourChanged();
+		}));
+		row(pc.lpn_contour_buffer || 'Buffer', number('lpn_contour_buffer', contourBufferOf(), 0.1, 0.5, function (v) {
+			settings.contourBuffer = Math.min(20, v); contourChanged();
+		}), pc.lpn_contour_buffer_tip, pc.lpn_contour_buffer_unit || '× median pipe length');
+		if (contourTerrainOffered()) {
+			// **TICKED ONLY WHEN IT WILL DRAW.** A project saved with the box ticked, opened in a
+			// browser that never said yes, would otherwise show a ticked box drawing the plain plot
+			// (pre-review, 2026-10-03). Unticked here, the project's own setting kept: ticking it
+			// asks the question, as on any first use.
+			row(pc.lpn_contour_dem || 'Ground between nodes from Mapbox DEM', check('lpn_contour_dem', contourTerrainWanted(), function (on, c) {
+				// THE QUESTION IS ASKED HERE AND NOWHERE ELSE: a redraw never asks, so a no is never
+				// asked again on the next solve. A no unticks the box and stores nothing.
+				if (on && EngCalcs.lpnTerrainAskForContour && !EngCalcs.lpnTerrainAskForContour()) { c.checked = false; on = false; }
+				settings.contourTerrain = on; contourChanged();
+			}), pc.lpn_contour_dem_tip);
+		}
+		// Every control waits on a coloured field but the field itself.
+		if (!field) {
+			Array.prototype.forEach.call(body.querySelectorAll ? body.querySelectorAll('input, select, button') : [], function (c) {
+				if (c.id !== 'lpn_contour_field') { c.disabled = true; }
+			});
+		}
+		if (focusedId) { var f = document.getElementById(focusedId); if (f && f.focus) { f.focus(); } }
+		initTipsIn(body);
+	}
 	function buildNodeEls(n) {
 		// **THE GRAB BAND FIRST, so the drawn disc paints over it** -- see LPN_NODE_HIT_PX. It
 		// carries the same `data-node`, so selectFromHit(), nodeOutranks() and every other reader of
@@ -12429,8 +13109,8 @@ var EngCalcs = EngCalcs || {};
 		// LOWER RIGHT: the label bench already owns the lower left, and Settings and Labels are
 		// top-right. The width is capped for the reason the label bench states -- a fixed box with
 		// no width sizes to its widest child, and a tile key has no wrap opportunity.
-		box.setAttribute('style', 'position:fixed;right:8px;bottom:8px;z-index:35;background:#fff;'
-			+ 'border:1px solid #333;padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px rgba(0,0,0,.3);'
+		box.setAttribute('style', 'position:fixed;right:8px;bottom:8px;z-index:35;background:var(--ec-bg);'
+			+ 'border:1px solid var(--ec-ink);padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3);'
 			+ 'max-height:70vh;max-width:min(30em,45vw);overflow:auto;white-space:pre-wrap;'
 			+ 'overflow-wrap:anywhere');
 		var h = document.createElement('div');
@@ -20743,6 +21423,14 @@ var EngCalcs = EngCalcs || {};
 		// map's own moment.
 		refresh: function () { freqTabShow(); }
 	});
+	// **SYSTEM FLOW AFTER FREQUENCY, PROFILE STILL LAST** (Task 600) -- the same argument again. No
+	// formId: the tab has no controls, so paneFocusTabFirstControl() lands on the panel itself.
+	paneTabs.push({
+		id: 'sysflow', panel: 'lpn_pane_sysflow', label: 'lpn_sysflow_menu', tip: 'lpn_sysflow_tip',
+		show: function () { sysflowTabShow(); },
+		// Every solve and every step of the transport, which keeps the `now` line under the scrubber.
+		refresh: function () { sysflowTabShow(); }
+	});
 	// **PROFILE IS LAST** (Tom, 2026-08-21: "making Profile the last tab"). It is still the odd one
 	// out -- a drawing where the other six are tables -- and the end of the strip is where an odd
 	// one out belongs, rather than the front, where it stood between the reader and the six things
@@ -21001,8 +21689,16 @@ var EngCalcs = EngCalcs || {};
 				// .ec-help so a tap reveals it (EngCalcs.initTips()).
 				if (t.tip && pc[t.tip]) { b.title = pc[t.tip]; b.className += ' ec-help'; }
 				b.addEventListener('click', function () { setPaneTab(t.id); });
-				strip.appendChild(b);
-				if (!t.menu) { return; }
+				if (!t.menu) { strip.appendChild(b); return; }
+				// **A TAB AND ITS ARROW WRAP AS ONE** (Task 600 pre-review): as two separate items in
+				// the wrapping strip, a long-language row could break between them and leave the ▾
+				// alone on the second line, belonging to nothing. One unbreakable pair instead;
+				// role="none" so the tablist still owns the tab and the wrapper says nothing.
+				var pair = document.createElement('span');
+				pair.className = 'lpn-pane-tab-pair';
+				pair.setAttribute('role', 'none');
+				pair.appendChild(b);
+				strip.appendChild(pair);
 				// **THE ARROW NEVER GOES THROUGH THE TAB'S OWN show() WHEN THE TAB IS ALREADY ON
 				// SHOW**, and that is the whole care this button needs: on the profile, a second
 				// show() is the command that starts drawing a new path (Task 506), so an arrow that
@@ -21024,7 +21720,7 @@ var EngCalcs = EngCalcs || {};
 						if (!paneState.open || paneState.tab !== t.id) { openPane(t.id); }
 						t.menu(m);
 					});
-					strip.appendChild(m);
+					pair.appendChild(m);
 				}());
 			});
 		}
@@ -21386,21 +22082,22 @@ var EngCalcs = EngCalcs || {};
 	 * Keyboard: the button opens on Enter, Space or Down; inside the list Up/Down/Home/End move,
 	 * Enter or Space chooses, Escape closes and gives the button back the focus.
 	 */
-	function buildRampPicker(pc, group) {
+	// `idSuffix` lets a second view of the same picker (the contour box, Task 600) carry ids of its own.
+	function buildRampPicker(pc, group, idSuffix) {
 		var R = ramps(), wrap = document.createElement('div'), btn = document.createElement('button'),
 			pop = document.createElement('div'), opts = [], open = false, active = 0, name,
 			cur = colorRampKey(group), n = colorClassCount(group);
 		wrap.className = 'lpn-ramp-picker';
 		name = ((R && R.RAMPS[cur]) || { name: cur }).name;
 		btn.type = 'button';
-		btn.id = 'lpn_set_ramp_' + group;
+		btn.id = 'lpn_set_ramp_' + group + (idSuffix || '');
 		btn.className = 'lpn-ramp-btn';
 		btn.setAttribute('aria-haspopup', 'listbox');
 		btn.setAttribute('aria-expanded', 'false');
 		btn.setAttribute('aria-label', (pc.lpn_settings_color_ramp || 'Color scheme') + ': ' + name);
 		btn.title = name;
 		btn.appendChild(swatchBarEl(group, cur, n));
-		pop.id = 'lpn_set_ramp_list_' + group;
+		pop.id = 'lpn_set_ramp_list_' + group + (idSuffix || '');
 		pop.className = 'lpn-ramp-pop';
 		pop.setAttribute('role', 'listbox');
 		pop.setAttribute('aria-label', pc.lpn_settings_color_ramp || 'Color scheme');
@@ -27863,6 +28560,8 @@ var EngCalcs = EngCalcs || {};
 		else if (paneIsOpen() && t && t.id === 'timeseries' && t.show) { t.show(); }
 		// The Frequency tab draws from the map's values, which a document can bring with no solve.
 		else if (paneIsOpen() && t && t.id === 'frequency' && t.show) { t.show(); }
+		// System flow draws from the run, as Time series does.
+		else if (paneIsOpen() && t && t.id === 'sysflow' && t.show) { t.show(); }
 	}
 	function refreshPaneIfOpen() {
 		var t = activePaneTab();
@@ -29195,7 +29894,7 @@ var EngCalcs = EngCalcs || {};
 		btn.id = 'lpn_ts_add';
 		btn.className = 'lpn-profile-edit ec-help';
 		btn.textContent = pc.lpn_ts_add || 'Add selected';
-		btn.title = pc.lpn_ts_add_tip || 'Put everything now chosen on the map onto the graph.';
+		btn.title = pc.lpn_ts_add_tip || 'Put everything now selected on the map onto the graph.';
 		btn.addEventListener('click', tsAddSelection);
 		box.appendChild(btn);
 
@@ -29246,7 +29945,7 @@ var EngCalcs = EngCalcs || {};
 		if (added) { return; }
 		note = document.getElementById('lpn_ts_note');
 		if (note) {
-			note.textContent = pc.lpn_ts_add_none || 'Nothing of that kind is chosen on the map.';
+			note.textContent = pc.lpn_ts_add_none || 'Nothing of that kind is selected on the map.';
 		}
 	}
 	function tsRemove(id) {
@@ -29307,7 +30006,7 @@ var EngCalcs = EngCalcs || {};
 		if (!series.length) {
 			if (note) {
 				note.textContent = pc.lpn_ts_none ||
-					'Nothing to graph yet. Choose assets on the map and press Add selected.';
+					'Nothing to graph yet. Select assets on the map and press Add selected.';
 			}
 			return;
 		}
@@ -29889,6 +30588,169 @@ var EngCalcs = EngCalcs || {};
 		tsText(svg, 0, 0, pc.lpn_freq_axis_percent || 'Percent less than',
 			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
 			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
+	}
+
+	// ---- SYSTEM FLOW BALANCE (ROADMAP Task 600, last chart slice) ---------------------------------
+	//
+	// EPANET's System Flow plot: the total flow PRODUCED and the total flow CONSUMED against time,
+	// across the run. **THE DEFINITION IS EPANET'S OWN CODE, NOT A GUESS AT IT.** The 2.2 manual says
+	// only *"Plots total system production and consumption versus time ... Water demand for all nodes
+	// over all time periods"* (Table 9.1), so the authority is its Graph window, Fgraph.pas
+	// GetSysFlow(), which for each reporting period reads every node's DEMAND from the output file
+	// and loops over JUNCTIONS and RESERVOIRS ONLY (`for i := JUNCS to RESERVS`, and TANKS is the
+	// next list): a positive demand is added to Consumed, a negative one is subtracted into Produced.
+	// So a reservoir that supplies water (demand < 0) and a negative junction demand both produce; a
+	// positive junction demand, emitter flow included, consumes; and a reservoir being filled
+	// consumes too. **A TANK IS IN NEITHER TOTAL**, and because every node's demands sum to zero at
+	// every step, Produced minus Consumed is exactly the net flow into the tanks -- the gap between
+	// the two lines is the storage swinging. dev/lpn-spike/system-flow-harness.js holds that.
+	// Window title "System Flow Balance", series "Produced" and "Consumed", axis "Flow (units)":
+	// all EPANET's.
+	//
+	// **NO OPTIONS AT ALL** (dev/graphs-scope.md): nothing is chosen, so there is no form, and the
+	// key is two fixed names. **A READER OF THE RUN AND NOTHING ELSE**, like Time series: the frames
+	// js/lpn-time.js already holds carry EN_DEMAND per node (js/lpn-epanet.js), in m3/s, and this
+	// converts their sums into the project's flow unit through toDisplay() -- the seam every other
+	// flow on the page crosses. Nothing is solved, stored or written.
+	var SYSFLOW_COLORS = { produced: LPN_TS_COLORS[0], consumed: LPN_TS_COLORS[1] };
+	// One reporting step summed the way GetSysFlow() sums it, in SI (m3/s). `storage` is the tanks'
+	// own net inflow, kept beside the two totals so the balance can be checked against it; it is not
+	// drawn, because EPANET does not draw it.
+	function sysflowStep(frame) {
+		var out = { produced: 0, consumed: 0, storage: 0 }, d = (frame && frame.demands) || {};
+		Object.keys(d).forEach(function (id) {
+			var n = nodeById(id), q = d[id];
+			if (typeof q !== 'number' || !isFinite(q)) { return; }
+			if (n && n.type === 'tank') { out.storage += q; return; }
+			if (q > 0) { out.consumed += q; } else { out.produced -= q; }
+		});
+		return out;
+	}
+	// Both series in the PROJECT's flow unit, one point per reporting step: {t, produced, consumed,
+	// storage}. Empty with no run.
+	function sysflowSeries(frames) {
+		var u = resultUnit('flow');
+		return (frames || []).map(function (f) {
+			var s = sysflowStep(f);
+			return { t: f.t, produced: toDisplay(s.produced, u), consumed: toDisplay(s.consumed, u),
+				storage: toDisplay(s.storage, u) };
+		});
+	}
+	var sysflowLastSize = null;
+	function sysflowResizeWatch() {
+		var host = document.getElementById('lpn_sysflow_chart');
+		if (!host || !window.ResizeObserver) { return; }
+		new window.ResizeObserver(function () {
+			var r = host.getBoundingClientRect();
+			if (!(r.width > 0) || !(r.height > 0)) { return; }
+			if (sysflowLastSize && Math.abs(sysflowLastSize.w - r.width) < 1 &&
+				Math.abs(sysflowLastSize.h - r.height) < 1) { return; }
+			sysflowLastSize = { w: r.width, h: r.height };
+			renderSysflow();
+		}).observe(host);
+	}
+	function sysflowTabShow() { renderSysflowKey(); renderSysflow(); }
+	// The key: two fixed names, each wearing its line's color and carrying what it sums as its tip.
+	// Built here rather than in the page because the colors are the charts' own (LPN_TS_COLORS).
+	function renderSysflowKey() {
+		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_sysflow_key');
+		if (!box) { return; }
+		box.innerHTML = '';
+		[['produced', pc.lpn_sysflow_produced || 'Produced', pc.lpn_sysflow_produced_tip],
+			['consumed', pc.lpn_sysflow_consumed || 'Consumed', pc.lpn_sysflow_consumed_tip]]
+			.forEach(function (o) {
+				var s = document.createElement('span'), sw = document.createElement('i');
+				s.className = 'ec-help';
+				s.title = o[2] || '';
+				sw.className = 'lpn-ts-swatch';
+				sw.style.color = SYSFLOW_COLORS[o[0]];
+				s.appendChild(sw);
+				s.appendChild(document.createTextNode(o[1]));
+				box.appendChild(s);
+			});
+		initTipsIn(box);
+	}
+	function renderSysflow() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_sysflow_chart'),
+			note = document.getElementById('lpn_sysflow_note'),
+			frames, pts, values = [], lay, xB, yB, box, svg, unit, now, dots, ttlName;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (note) { note.textContent = ''; }
+		frames = EngCalcs.lpnTimeRunFrames ? EngCalcs.lpnTimeRunFrames() : [];
+		// **NOTHING TO GRAPH IS SAID IN WORDS** -- Time series' own sentences, because the ways of
+		// having no run are the same ways and the same things to do about them.
+		if (!frames.length) {
+			if (note) { note.textContent = tsWaitingText(pc); }
+			return;
+		}
+		pts = sysflowSeries(frames);
+		pts.forEach(function (p) { values.push(p.produced, p.consumed); });
+		lay = tsLayout(host);
+		sysflowLastSize = { w: lay.w, h: lay.h };
+		box = lay.box;
+		xB = EngCalcs.lpnProfile.axisBounds(
+			frames.map(function (f) { return tsHours(f.t); }), { ticks: 5, maxTicks: 8, minSpan: 1 });
+		// **ANCHORED AT ZERO**, unlike Time series: a total flow is a quantity, and "produced fell to
+		// nothing while the pump was off" is the reading this chart exists for (EPANET's own example,
+		// Net1, shows exactly that). A truncated axis would draw a low total as an empty system.
+		yB = EngCalcs.lpnProfile.axisBounds(values.concat([0]), lay.y);
+		svg = el('svg', { viewBox: '0 0 ' + lay.w + ' ' + lay.h, class: 'lpn-profile-svg' }, host);
+		function X(v) { return EngCalcs.lpnProfile.plotX(v, xB, box); }
+		function Y(v) { return EngCalcs.lpnProfile.plotY(v, yB, box); }
+		EngCalcs.lpnProfile.ticks(yB).forEach(function (v) {
+			el('line', { x1: box.left, y1: Y(v), x2: box.left + box.width, y2: Y(v),
+				class: 'lpn-profile-grid' }, svg);
+			tsText(svg, box.left - 5, Y(v) + 3, String(plainRound(v, 2)),
+				{ class: 'lpn-profile-tick', 'text-anchor': 'end' });
+		});
+		var xTicks = EngCalcs.lpnProfile.ticks(xB), xKeep = {};
+		EngCalcs.lpnProfile.labelStride(xTicks.map(X), LPN_TS_X_LABEL_PX)
+			.forEach(function (k) { xKeep[k] = true; });
+		xTicks.forEach(function (v, k) {
+			el('line', { x1: X(v), y1: box.top + box.height, x2: X(v), y2: box.top + box.height + 4,
+				class: 'lpn-profile-axis' }, svg);
+			if (!xKeep[k]) { return; }
+			tsText(svg, X(v), box.top + box.height + 14,
+				EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(v * 3600) : String(plainRound(v, 2)),
+				{ class: 'lpn-profile-tick', 'text-anchor': 'middle' });
+		});
+		el('rect', { x: box.left, y: box.top, width: box.width, height: box.height,
+			class: 'lpn-profile-frame' }, svg);
+		// Where the transport is parked, as on Time series.
+		now = tsHours(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0);
+		if (now >= xB.min && now <= xB.max) {
+			el('line', { x1: X(now), y1: box.top, x2: X(now), y2: box.top + box.height,
+				class: 'lpn-ts-now' }, svg);
+		}
+		dots = frames.length <= LPN_TS_DOT_MAX;
+		ttlName = { produced: pc.lpn_sysflow_produced || 'Produced', consumed: pc.lpn_sysflow_consumed || 'Consumed' };
+		['produced', 'consumed'].forEach(function (key) {
+			var color = SYSFLOW_COLORS[key];
+			if (pts.length > 1) {
+				el('polyline', {
+					points: pts.map(function (p) { return X(tsHours(p.t)) + ',' + Y(p[key]); }).join(' '),
+					class: 'lpn-ts-line lpn-sysflow-' + key, stroke: color
+				}, svg);
+			}
+			if (!dots && pts.length > 1) { return; }
+			pts.forEach(function (p) {
+				var c = el('circle', { cx: X(tsHours(p.t)), cy: Y(p[key]), r: 2, class: 'lpn-ts-dot', fill: color }, svg),
+					ttl = el('title', {}, c);
+				ttl.appendChild(document.createTextNode(ttlName[key] + '   ' +
+					(EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(p.t) : p.t) + '   ' + plainRound(p[key], 2)));
+			});
+		});
+		// Axis titles: EPANET's "Flow (units)", built from the page's own Flow label and the units
+		// strip, the way the map key and Time series build theirs.
+		unit = unitLabel(resultUnit('flow'));
+		tsText(svg, 0, 0, (pc.lpn_result_flow || 'Flow') + (unit ? ' (' + unit + ')' : ''),
+			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
+			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
+		if (lay.axisTitle) {
+			tsText(svg, box.left + box.width / 2, lay.titleY, pc.lpn_ts_axis_time || 'Elapsed time',
+				{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
+		}
 	}
 
 	// Maps a tool mode to its pageConfig mode-hint key -- see the lang keys' own comment for why
@@ -30974,7 +31836,7 @@ var EngCalcs = EngCalcs || {};
 		// same reason.
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
 			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, LPN_FINDBOX_KEY, LPN_LIBBOX_KEY,
-			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY,
+			LPN_FFBOX_KEY, LPN_ENERGYBOX_KEY, LPN_CMPBOX_KEY, LPN_RPTBOX_KEY, LPN_CONTOURBOX_KEY,
 			// 'lpn_notesbox' and 'lpn_hotkeysbox' join the list here rather than a day later, for the
 			// same reason every entry above states its own miss: window furniture left out of this
 			// list makes "exactly as a brand-new visitor would see it" false for that one key. Named
@@ -32783,7 +33645,7 @@ var EngCalcs = EngCalcs || {};
 				EngCalcs.lpnTimeIsExtended(doc.times));
 			// scheduleArrivalSolve(), not scheduleSolve(): see the note at its definition. With the
 			// switch off it runs nothing at all, which is Tom's ruling and not an inference.
-			if (owed) { scheduleArrivalSolve(); } else { clearFireFlowRun(false); }
+			if (owed) { scheduleArrivalSolve(); } else { clearFireFlowRun(false); clearCriticalityRun(false); clearDemandScaleRun(false); }
 		});
 		paneDocumentArrived();   // R-109: see its definition
 		perfDebugTime('tabs', function () { renderTabs(); });
@@ -36684,8 +37546,8 @@ var EngCalcs = EngCalcs || {};
 		// row per distinct message, so a repaint on every tab switch does not fill the log.
 		logMessage(state.message, 'warning');
 		// Amber for a warning you may work through, red for a state that has taken editing away.
-		banner.style.borderColor = bannerRO ? '#a00' : '#a80';
-		banner.style.background = bannerRO ? '#fff0f0' : '#fffbe6';
+		banner.style.borderColor = bannerRO ? 'var(--ec-error-ink)' : 'var(--ec-warn-border)';
+		banner.style.background = bannerRO ? 'var(--ec-error-bg-soft)' : 'var(--ec-warn-bg)';
 		var text = document.createElement('span');
 		text.textContent = state.message || '';
 		banner.appendChild(text);
@@ -37544,6 +38406,7 @@ var EngCalcs = EngCalcs || {};
 		if (p.el && !p.el.title) { p.el.title = p.title; }
 	}
 	function openMenu(anchor, rows, level) {
+		menuRestoreSeq++;
 		var els = menuEls(level), popup = els.popup, list = els.list;
 		if (!popup || !list) { return; }
 		if (!level) {
@@ -37576,7 +38439,7 @@ var EngCalcs = EngCalcs || {};
 			if (r.separator) {
 				var hr = document.createElement('hr');
 				hr.setAttribute('role', 'separator');
-				hr.style.cssText = 'margin:3px 0;border:0;border-top:1px solid #ccc';
+				hr.style.cssText = 'margin:3px 0;border:0;border-top:1px solid var(--ec-border-strong)';
 				list.appendChild(hr);
 				return;
 			}
@@ -37710,6 +38573,10 @@ var EngCalcs = EngCalcs || {};
 	// Tab closes the menu and goes on, Enter/Space are the buttons' own click.
 	var subOpener = null;
 	var menuKbIntent = false;
+	// Counts menu interactions. The deferred focus restore below runs from a timer, which a busy page
+	// can delay past the person's next keystrokes (input outranks timers); a restore whose number is
+	// no longer current is stale and must not move focus.
+	var menuRestoreSeq = 0;
 	function menuRowsOf(list) {
 		return Array.prototype.slice.call(list.querySelectorAll('button.lpn-menu-row:not(:disabled):not([data-pointer-only])'));
 	}
@@ -37732,11 +38599,13 @@ var EngCalcs = EngCalcs || {};
 	// or a mnemonic about to click), so it sees which boxes were open before the command.
 	function menuFocusAfterRow(t) {
 		var opener = openMenuAnchor;
+		var seq = ++menuRestoreSeq;
 		var ret = kbdModeReturn;   // the element that had focus before a chord or F10 (cleared by the click handler below)
 		var boxVisible = function (id) { var b = document.getElementById(id); return !!b && b.getClientRects().length > 0; };
 		var boxesBefore = ESCAPE_SCOPED_BOXES.filter(boxVisible);
 		if (t && t.closest && t.closest('#lpn_menu_popup, #lpn_menu_popup2') && opener) {
 			setTimeout(function () {
+				if (seq !== menuRestoreSeq) { return; }   // a later menu interaction owns focus
 				// The closed menu's row still holds focus until the browser's next focus fix-up, so
 				// "dropped" means body, or a control inside either closed menu panel.
 				var a = document.activeElement;
@@ -39736,8 +40605,8 @@ var EngCalcs = EngCalcs || {};
 			// lib/Icons.lib.php, a jagged ground line closed down to a datum.
 			// **PROFILE NOW HANGS UNDER GRAPHS** (Tom, 2026-10-01: *"Replace Profile with Graphs
 			// flyout containing Profile, Time series, Frequency."*, Task 640). Each row opens its
-			// bottom-pane tab, as the Profile row did. Contour and System flow are not built, so
-			// there are no placeholder rows.
+			// bottom-pane tab, as the Profile row did. System flow is not built, so there is no
+			// placeholder row. Contour is the exception: a map layer, so its row shows it on the map.
 			// The Profile row has no icon of its own (Tom, 2026-10-02: *"We can remove the graph icon
 			// from the Profile command now."*); the Graphs row keeps it.
 			{
@@ -39755,6 +40624,18 @@ var EngCalcs = EngCalcs || {};
 						{
 							label: pc.lpn_freq_menu || 'Frequency', tip: pc.lpn_freq_tip,
 							fn: function () { closeMenu(); openPane('frequency'); }
+						},
+						// THE CONTOUR PLOT IS A MAP LAYER, so this row SHOWS it rather than opening a
+						// tab: a smooth fill of the node colouring with labelled lines (pressure, if
+						// nodes are not coloured yet), then its own box, where it is tuned and turned
+						// off. See refreshContour() and showContour().
+						{
+							label: pc.lpn_contour_menu || 'Contour', tip: pc.lpn_contour_tip,
+							fn: function () { closeMenu(); showContour(); }
+						},
+						{
+							label: pc.lpn_sysflow_menu || 'Flow balance', tip: pc.lpn_sysflow_tip,
+							fn: function () { closeMenu(); openPane('sysflow'); }
 						}
 					];
 				}
@@ -39822,13 +40703,14 @@ var EngCalcs = EngCalcs || {};
 					else { runSolve(); }
 				}
 			},
-			// **FIRE FLOW SITS WITH CALCULATE**, between Run and the run report, wearing the
-			// hydrant glyph (lib/Icons.lib.php). It is a kind of run: it names the criteria and
-			// solves the network, many times over. ROADMAP Task 530.
+			// **FIRE FLOW AND CRITICALITY SIT IN AN ANALYZE FLY-OUT, WITH CALCULATE** (Task 754;
+			// Tom, 2026-09-30). Each is a kind of run: criteria first, then the network solved many
+			// times over on a copy. The rows live in analyzeMenuRows(), a list, so the next analysis
+			// is one more entry there and no change to this menu.
 			{
-				icon: 'hydrant', label: pc.lpn_ff_menu || 'Fire flow analysis…',
-				tip: pc.lpn_ff_menu_tip,
-				fn: function () { closeMenu(); openFireFlowBox(); }
+				icon: 'hydrant', label: pc.lpn_analyze_menu || 'Analyze',
+				tip: pc.lpn_analyze_menu_tip,
+				submenu: analyzeMenuRows
 			},
 			// **A DIVIDER, AND ONE ROW UNDER IT THAT IS THE REPORTS** (Tom, 2026-09-04: *"We can
 			// put a divider before the reports"*, and then, having seen them: *"It's strange and
@@ -40433,6 +41315,7 @@ var EngCalcs = EngCalcs || {};
 		profileResizeWatch();
 		tsResizeWatch();
 		freqResizeWatch();
+		sysflowResizeWatch();
 		wireUnitSelects();
 		var opening = initLibrary(), bornClean = false;
 		// **THREE STATES, NOT TWO** (Task 627): a document that opened, a document that is there and
@@ -40552,7 +41435,10 @@ var EngCalcs = EngCalcs || {};
 		wireAreaHint();
 		wireWizardBars();
 		wireFireFlowBox();
+		wireCriticalityBox();
+		wireDemandScaleBox();
 		wireEnergyBox();
+		wireContourBox();
 		wireScenarioCompareBox();
 		wireRunReportBox();
 		wireStatusReportBox();
@@ -46855,6 +47741,7 @@ var EngCalcs = EngCalcs || {};
 		// no .rpt yet opens the box with its "no report yet" sentence inside rather than a notice.
 		if (ffboxLayout.open) { openFireFlowBox(); }
 		if (energyboxLayout.open) { openEnergyBox(); }
+		if (contourboxLayout.open) { openContourBox(); }
 		if (cmpboxLayout.open) { openScenarioCompareBox(); }
 		if (rptboxLayout.open) { openRunReportBox(true); }
 		// The Notes box (Tom, 2026-09-28), after the reports and before Find for the same stacking
@@ -47202,11 +48089,16 @@ var EngCalcs = EngCalcs || {};
 			// `open` is the one boolean among four numbers -- see loadLibboxLayout() for the defect
 			// a loader that types every field as a number produced.
 			if (k === 'open') { layout.open = !!v.open; }
+			else if (k === 'userSized') { layout.userSized = v.userSized === true; }
 			else if (typeof v[k] === 'number' && isFinite(v[k])) { layout[k] = v[k]; }
 		}
 	}
 	// A remembered size is a wish: applied, then left to the stylesheet's own min/max.
+	// **A BOX THAT CARRIES `userSized` APPLIES A SIZE ONLY IF A DRAG PUT IT THERE** (Tom, 2026-10-03:
+	// the contour box was too small for its contents). The observer used to store whatever size the
+	// box happened to open at, so an old, too-small default was remembered as if he had chosen it.
 	function applyBoxSize(box, layout) {
+		if (layout.hasOwnProperty('userSized') && !layout.userSized) { return; }
 		if (layout.w) { box.style.width = layout.w + 'px'; }
 		if (layout.h) { box.style.height = layout.h + 'px'; }
 	}
@@ -47215,11 +48107,12 @@ var EngCalcs = EngCalcs || {};
 	// chosen", not zero. Either way the result goes through clampPanel(), so a corner left on a
 	// 32-inch monitor cannot open off the edge of a laptop. Runs inside placePanelForScreen(), so on
 	// a phone it never runs at all and the box fills the window.
-	function placeBoxRemembered(box, layout) {
+	function placeBoxRemembered(box, layout, dockTopRight) {
 		var floor = chromeFloor(), h, r, top, at;
 		applyBoxSize(box, layout);
 		h = fitPanelToViewport(box);
 		r = box.getBoundingClientRect();
+		if ((layout.left === null || layout.top === null) && dockTopRight && dockBoxTopRight(box, r)) { return; }
 		if (layout.left === null || layout.top === null) {
 			box.style.left = Math.max(0, (window.innerWidth - r.width) / 2) + 'px';
 			top = Math.max(floor, (window.innerHeight - h) / 2);
@@ -47248,6 +48141,26 @@ var EngCalcs = EngCalcs || {};
 		box.style.left = at.left + 'px';
 		box.style.top = at.top + 'px';
 	}
+	// **A PLOT'S CONTROL BOX OPENS DOCKED AT THE MAP'S TOP-RIGHT, NOT CENTRED** (Tom, 2026-10-03:
+	// centred, it hid the plot it controls). Right edge a gap inside the map's, top under the zoom
+	// buttons. Height capped only at the window's bottom, NEVER at the colour legend: a tall legend
+	// squashed the box to a scrolling strip (Tom, 2026-10-03), so the box sits over the legend instead. First open only;
+	// a dragged position is remembered and wins. False when the map has no box yet.
+	function dockBoxTopRight(box, r) {
+		var wrap = svg && svg.parentNode, wr, zc, gap = 8, top, left, bottom;
+		if (!wrap || !wrap.getBoundingClientRect) { return false; }
+		wr = wrap.getBoundingClientRect();
+		if (!(wr.width > 0) || !(wr.height > 0)) { return false; }
+		top = Math.max(chromeFloor(), wr.top + gap);
+		zc = document.getElementById('lpn_zoom_control');
+		if (zc && zc.getBoundingClientRect().width > 0) { top = Math.max(top, zc.getBoundingClientRect().bottom + gap); }
+		left = Math.max(wr.left, wr.right - r.width - gap);
+		bottom = Math.min(window.innerHeight - POPUP_EDGE, wr.bottom - gap);
+		capPanelToRoomBelow(box, window.innerHeight - Math.max(80, bottom - top) - POPUP_EDGE);
+		box.style.left = left + 'px';
+		box.style.top = top + 'px';
+		return true;
+	}
 	// The flag, written only when it changes: Escape and the closers run whether or not the box is
 	// showing, and an unguarded write would create the key for a visitor who never opened the box.
 	function rememberBoxOpen(layout, save, open) {
@@ -47266,12 +48179,34 @@ var EngCalcs = EngCalcs || {};
 			layout.top = pos.top;
 			save();
 		});
-		addPanelResizeGrip(box);
+		// A drag of the grip or of the browser's own corner is the one thing that makes a size the
+		// user's. Recorded in the same record, never a second key.
+		function userResized() {
+			var r = box.getBoundingClientRect();
+			if (smallScreen() || !layout.hasOwnProperty('userSized') || !(r.width > 0) || !(r.height > 0)) { return; }
+			layout.userSized = true;
+			layout.w = Math.round(r.width);
+			layout.h = Math.round(r.height);
+			save();
+		}
+		addPanelResizeGrip(box, userResized);
+		if (layout.hasOwnProperty('userSized')) {
+			var down = null;
+			box.addEventListener('mousedown', function () { var r = box.getBoundingClientRect(); down = { w: r.width, h: r.height }; });
+			window.addEventListener('mouseup', function () {
+				var r;
+				if (!down) { return; }
+				r = box.getBoundingClientRect();
+				if (Math.abs(r.width - down.w) > 1 || Math.abs(r.height - down.h) > 1) { userResized(); }
+				down = null;
+			});
+		}
 		loadBoxLayout(key, layout);
 		if (window.ResizeObserver) {
 			new window.ResizeObserver(function () {
 				var r, capped;
 				if (!isOpen() || smallScreen()) { return; }
+				if (layout.hasOwnProperty('userSized') && !layout.userSized) { return; }
 				r = box.getBoundingClientRect();
 				if (!(r.width > 0) || !(r.height > 0)) { return; }
 				layout.w = Math.round(r.width);
@@ -50355,9 +51290,9 @@ var EngCalcs = EngCalcs || {};
 	// inline width exactly as they clamp the CSS one, so the floors measured for this box hold
 	// without being restated -- and the ResizeObserver in wireSettingsBox() stores what resulted and
 	// slides the box back on screen, exactly as it does after a mouse resize.
-	function addPanelResizeGrip(box) {
+	function addPanelResizeGrip(box, onResized) {
 		if (!box || (box.querySelector && box.querySelector('.lpn-resize-grip'))) { return; }
-		var grip = document.createElement('div'), from = null;
+		var grip = document.createElement('div'), from = null, moved = false;
 		grip.className = 'lpn-resize-grip';
 		// Decoration to a screen reader: it performs no command and carries no name, which also
 		// keeps it out of the 26 languages a labelled control would cost.
@@ -50375,6 +51310,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		grip.addEventListener('pointermove', function (e) {
 			if (!from) { return; }
+			moved = true;
 			box.style.width = Math.round(e.clientX + from.dx - from.left) + 'px';
 			box.style.height = Math.round(e.clientY + from.dy - from.top) + 'px';
 		});
@@ -50382,6 +51318,8 @@ var EngCalcs = EngCalcs || {};
 			grip.addEventListener(evt, function (e) {
 				if (!from) { return; }
 				from = null;
+				if (moved && onResized) { onResized(); }
+				moved = false;
 				if (grip.hasPointerCapture && grip.hasPointerCapture(e.pointerId)) {
 					grip.releasePointerCapture(e.pointerId);
 				}
@@ -57445,6 +58383,8 @@ var EngCalcs = EngCalcs || {};
 	// ring on each tested junction and writes no property either.
 	var fireFlowAsk = null;      // what is in the boxes, for this page load only
 	var fireFlowRun = null;      // the last run's result set, or null
+	var fireFlowRunT = null;     // the time step it was computed at (seconds)
+	var ffShownAt = null;
 	var fireFlowBusy = false;    // a run is in progress
 	var fireFlowStop = false;    // the Stop button was pressed
 
@@ -57665,6 +58605,18 @@ var EngCalcs = EngCalcs || {};
 		if (parent) { parent.appendChild(e); }
 		return e;
 	}
+	// **A REFUSED PRESS IS ANSWERED IN THE BOX, WHERE THE PRESS WAS** -- every analysis box's
+	// All/Selected scope, not demand scaling's alone (Tom, 2026-10-02: *"It appears that Find doesn't
+	// respect "Selected junctions"."*). "Selected" with nothing selected refused on the map's notice
+	// line only and left the last answer -- an All answer -- standing in the box, where it read as
+	// the button having ignored the scope. The caller clears its own run first; this says why there
+	// is no answer, in the answer's place. Demand scaling keeps the same rule in dsRefused.
+	function analysisRefused(host, text) {
+		setNotice(text);
+		if (!host) { return; }
+		host.innerHTML = '';
+		ffEl('p', 'lpn-ff-summary', text, host);
+	}
 	// One labelled row. The whole label text is the tip's target and not a one-character glyph --
 	// CLAUDE.md's tip-only nesting rule.
 	function ffRow(parent, labelText, tip, control, unitText) {
@@ -57715,8 +58667,8 @@ var EngCalcs = EngCalcs || {};
 		ffEl('p', 'lpn-ff-note', pc.lpn_ff_intro, host);
 
 		boxes.scope = ffSelect([
-			['all', pc.lpn_ff_all || 'All'],
-			['selected', pc.lpn_ff_selected || 'Selected']
+			['all', pc.lpn_ff_all || 'All junctions'],
+			['selected', pc.lpn_ff_selected || 'Selected junctions']
 		], ask.scope);
 		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', pc.lpn_ff_scope_tip, boxes.scope, '');
 
@@ -57746,9 +58698,9 @@ var EngCalcs = EngCalcs || {};
 		// underneath the checkbox, and runFireFlowSweep()/ffDesignScope() never changed, so only the
 		// control built here changes back.
 		boxes.design = ffSelect([
-			['off', pc.lpn_source_type_none || 'None'],
-			['all', pc.lpn_ff_all || 'All'],
-			['selected', pc.lpn_ff_selected || 'Selected']
+			['off', pc.lpn_ff_design_off || 'None'],
+			['all', pc.lpn_ff_design_all || 'All'],
+			['selected', pc.lpn_ff_design_selected || 'Selected']
 		], ffDesignScope(ask.design));
 		ffRow(host, pc.lpn_ff_design || 'Design check (effect on system)', pc.lpn_ff_design_tip,
 			boxes.design, '');
@@ -57780,7 +58732,10 @@ var EngCalcs = EngCalcs || {};
 		var buttons = ffEl('div', 'lpn-ff-buttons', null, host);
 		run = ffEl('button', 'lpn-ff-run', pc.lpn_ff_calculate || 'Run', buttons);
 		run.type = 'button';
-		run.disabled = fireFlowBusy;
+		run.disabled = fireFlowBusy || critBusy || dsBusy;
+		// **ONE ANALYSIS AT A TIME.** Fire flow and criticality share the one run dialog and the one
+		// engine; while the other is running, this Run waits, and says why.
+		if (critBusy || dsBusy) { run.title = pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.'; }
 		run.addEventListener('click', function () {
 			Object.keys(boxes).forEach(function (k) { ask[k] = boxes[k].value; });
 			runFireFlowSweep();
@@ -58064,7 +59019,10 @@ var EngCalcs = EngCalcs || {};
 		}(host));
 		if (btn && btn.focus) { try { btn.focus({ preventScroll: true }); } catch (e) { btn.focus(); } }
 	}
-	function ffTable(parent, headings) {
+	// `sorter` is { state: {col, dir}, by: function (col) } for a table that is not fire flow's own
+	// (the criticality report); omitted, the headings sort the fire flow table as they always did.
+	function ffTable(parent, headings, sorter) {
+		var sortState = sorter ? sorter.state : ffSortState, sortBy = sorter ? sorter.by : ffSortBy;
 		// **THE WIDE TABLE SCROLLS SIDEWAYS INSIDE ITS OWN BOX**, so ten columns can never push the
 		// dialog's own edges off the screen (CLAUDE.md: wide content scrolls in its own container).
 		var wrap = ffEl('div', 'lpn-ff-tablewrap', null, parent),
@@ -58078,7 +59036,7 @@ var EngCalcs = EngCalcs || {};
 		// Zero flow from this hydrant? Zero flow in the system?"* The answer is the first, and a
 		// column heading that does not say so leaves the reader to pick.
 		headings.forEach(function (h, i) {
-			var text = h, tip = null, th, arrow, pc = EngCalcs.pageConfig || {}, on = ffSortState.col === i;
+			var text = h, tip = null, th, arrow, pc = EngCalcs.pageConfig || {}, on = sortState.col === i;
 			if (h && h.length === 2 && typeof h !== 'string') { text = h[0]; tip = h[1]; }
 			th = ffEl('th', 'lpn-ff-sortable', text, hr);
 			if (tip) { th.title = tip; }
@@ -58087,17 +59045,17 @@ var EngCalcs = EngCalcs || {};
 			arrow = document.createElement('button');
 			arrow.type = 'button';
 			arrow.className = 'lpn-pane-sortarrow lpn-ff-sortarrow' + (on ? ' lpn-pane-sortarrow-active' : '') +
-				(on && ffSortState.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
+				(on && sortState.dir < 0 ? ' lpn-pane-sortarrow-desc' : '');
 			arrow.title = on ? (pc.lpn_pane_sortarrow_tip || 'Reverse the sort') : (pc.lpn_pane_sort_asc || 'Sort ascending');
 			arrow.setAttribute('aria-label', arrow.title + ': ' + text);
 			arrow._lpnFfSortCol = i;
 			arrow.addEventListener('click', function (ev) {
 				if (ev && ev.stopPropagation) { ev.stopPropagation(); }
-				ffSortBy(i);
+				sortBy(i);
 			});
 			th.appendChild(arrow);
-			th.setAttribute('aria-sort', on ? (ffSortState.dir < 0 ? 'descending' : 'ascending') : 'none');
-			th.addEventListener('click', function () { ffSortBy(i); });
+			th.setAttribute('aria-sort', on ? (sortState.dir < 0 ? 'descending' : 'ascending') : 'none');
+			th.addEventListener('click', function () { sortBy(i); });
 		});
 		return ffEl('tbody', null, null, table);
 	}
@@ -58115,13 +59073,19 @@ var EngCalcs = EngCalcs || {};
 				(b.available === undefined ? -1 : b.available);
 		});
 	}
-	function ffMoreLine(parent, hidden) {
+	// `links`: the hidden rows are links (criticality, demand scaling's velocities), not junctions.
+	function ffMoreLine(parent, hidden, links) {
 		var pc = EngCalcs.pageConfig || {};
 		if (hidden <= 0) { return; }
 		// **ITS OWN KEY, NOT the Worst-effect cell's.** One string counted two different nouns
 		// (affected assets there, undisplayed junctions here), which a gendered language cannot
 		// agree with twice. Split 2026-09-02, Task 573 Wave 0.
-		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_rows_more || '{n} more junctions are not shown.')
+		// **{n} AFTER A COLON, SO NO PLURAL HAS TO AGREE WITH IT** -- "1 more junctions are not
+		// shown" was the sentence form's answer for one row. And a links noun of its own, since
+		// criticality's hidden rows were being counted as junctions.
+		ffEl('p', 'lpn-ff-note', (links
+			? (pc.lpn_ff_rows_more_links || 'Links not shown: {n}.')
+			: (pc.lpn_ff_rows_more || 'Junctions not shown: {n}.'))
 			.replace('{n}', String(hidden)), parent);
 	}
 	function rebuildFireFlowReport() {
@@ -58140,7 +59104,9 @@ var EngCalcs = EngCalcs || {};
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_stopped || 'Stopped after {done} of {total} junctions. The results below are the ones already finished.')
 				.replace('{done}', String(set.results.length)).replace('{total}', String(set.requested)), host);
 		}
+		ffShownAt = dsNow();
 		ffEl('p', 'lpn-ff-summary', ffSummaryText(set), host);
+		dsTimeLines(host, fireFlowRunT);
 		if (set.counts.error) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_summary_error || '{n} junctions could not be answered.')
 				.replace('{n}', String(set.counts.error)), host);
@@ -58164,7 +59130,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			if (!anyEffect) {
 				ffEl('p', 'lpn-ff-note', pc.lpn_ff_design_none ||
-					'Nothing in the chosen set went outside its limits while any junction drew its fire flow.', host);
+					'Nothing in the scope you chose went outside its limits while any junction drew its fire flow.', host);
 			}
 		}
 
@@ -58244,18 +59210,25 @@ var EngCalcs = EngCalcs || {};
 	// it is.
 	var ffRunUi = null;
 	function ffRunBoxEl() { return document.getElementById('lpn_ff_run_box'); }
-	function openFireFlowRunBox(total) {
+	// **SHARED WITH THE CRITICALITY RUN** (Tom, 2026-09-30), which is the same kind of act: a known
+	// number of cases, solved one at a time, stoppable. `opts` names the title, what Stop sets and
+	// the first paint; omitted, it is the fire flow run exactly as it always was.
+	function openFireFlowRunBox(total, opts) {
 		var pc = EngCalcs.pageConfig || {},
+			o = opts || {},
+			title = o.title || pc.lpn_ff_run_title || 'Fire flow run',
+			titleEl = document.getElementById('lpn_ffrun_title'),
 			box = ffRunBoxEl(), host, track, buttons, h, r, top;
 		if (!box) { return; }
 		host = document.getElementById('lpn_ff_run_body');
 		if (!host) { return; }
 		host.innerHTML = '';
+		if (titleEl) { titleEl.textContent = title; }
 		track = ffEl('div', 'lpn-ff-bar', null, host);
 		track.setAttribute('role', 'progressbar');
 		track.setAttribute('aria-valuemin', '0');
 		track.setAttribute('aria-valuemax', String(total));
-		track.setAttribute('aria-label', pc.lpn_ff_run_title || 'Fire flow run');
+		track.setAttribute('aria-label', title);
 		ffRunUi = {
 			total: total,
 			track: track,
@@ -58267,8 +59240,9 @@ var EngCalcs = EngCalcs || {};
 		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
 		ffRunUi.stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', buttons);
 		ffRunUi.stop.type = 'button';
-		ffRunUi.stop.addEventListener('click', function () { fireFlowStop = true; });
-		updateFireFlowRunBox(0, { pass: 0, fail: 0, design: 0, error: 0 }, { fire: 0, design: 0, clean: 0 });
+		ffRunUi.stop.addEventListener('click', o.onStop || function () { fireFlowStop = true; });
+		if (o.update) { o.update(0); }
+		else { updateFireFlowRunBox(0, { pass: 0, fail: 0, design: 0, error: 0 }, { fire: 0, design: 0, clean: 0 }); }
 		box.style.display = 'block';
 		// **RAISED HERE, AT OPEN, AND NOT WHERE IT IS WIRED** (Tom, 2026-09-02: *"Run box: still
 		// invisible"*, twice). The first attempt raised it inside wireFireFlowBox(), which runs once
@@ -58362,6 +59336,10 @@ var EngCalcs = EngCalcs || {};
 			tally,
 			before;
 		if (fireFlowBusy) { return; }
+		if (critBusy || dsBusy) {
+			setNotice(pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.');
+			return;
+		}
 		if (!junctions.length) {
 			setNotice(pc.lpn_ff_no_junctions || 'This project has no junctions yet, so there is nothing to test.');
 			return;
@@ -58385,8 +59363,9 @@ var EngCalcs = EngCalcs || {};
 				}
 			});
 			if (!ids.length) {
-				setNotice(pc.lpn_ff_no_selection ||
-					'No junctions are selected. Select junctions or select the All option.');
+				clearFireFlowRun(true);
+				analysisRefused(document.getElementById('lpn_ff_report'), pc.lpn_ff_no_selection ||
+					'No junctions are selected. Select junctions or choose All junctions.');
 				return;
 			}
 		} else {
@@ -58402,8 +59381,9 @@ var EngCalcs = EngCalcs || {};
 		if (ffDesignScope(ask.design) === 'selected') {
 			design = ffDesignSelectedSet(model);
 			if (!design.nodes.length && !design.links.length) {
-				setNotice(pc.lpn_ff_design_no_selection ||
-					'The design check scope is set to Selected, but no assets are selected. Select assets or select the All option.');
+				clearFireFlowRun(true);
+				analysisRefused(document.getElementById('lpn_ff_report'), pc.lpn_ff_design_no_selection ||
+					'The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All.');
 				return;
 			}
 			design.minPressure = minPressure > 0 ? minPressure : 0;
@@ -58421,9 +59401,12 @@ var EngCalcs = EngCalcs || {};
 		// belt-and-braces assertion rather than a repair, and if it ever fires the fix is in
 		// whatever wrote to `doc`, not here.
 		before = JSON.stringify(doc);
+		fireFlowRunT = modelTimeSeconds();
 		fireFlowBusy = true;
 		fireFlowStop = false;
 		fireFlowRun = null;
+		if (critBoxIsOpen()) { buildCriticalityControls(); }
+		if (dsBoxIsOpen()) { buildDemandScaleControls(); }
 		tally = { pass: 0, fail: 0, design: 0, error: 0 };
 		refreshFireFlowMarks();
 		rebuildFireFlowReport();
@@ -58459,6 +59442,8 @@ var EngCalcs = EngCalcs || {};
 		}).then(function (set) {
 			fireFlowBusy = false;
 			fireFlowRun = set;
+			if (critBoxIsOpen()) { buildCriticalityControls(); }
+			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
 			fireFlowDocGuard = (JSON.stringify(doc) === before);
 			closeFireFlowRunBox();
 			refreshFireFlowMarks();
@@ -58467,6 +59452,8 @@ var EngCalcs = EngCalcs || {};
 			return set;
 		}, function (err) {
 			fireFlowBusy = false;
+			if (critBoxIsOpen()) { buildCriticalityControls(); }
+			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
 			closeFireFlowRunBox();
 			buildFireFlowControls();
 			setStatus(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
@@ -58521,6 +59508,791 @@ var EngCalcs = EngCalcs || {};
 		// aside is one they cannot see the map through.
 		run = document.getElementById('lpn_ff_run_box');
 		if (run) { makePanelDraggable(run, null); }
+	}
+
+	// ================================================================================================
+	// CRITICALITY ANALYSIS -- break each asset in turn and report what the system loses
+	// ================================================================================================
+	//
+	// Tom, 2026-09-30, reading about WaterGEMS: *"Criticality analysis: This sounds like a fun report
+	// to build. Break each asset and report."* The arithmetic is js/lpn-criticality.js. What is here
+	// is fire flow's sibling, on fire flow's own parts: the same box shell, the same scope idiom (All
+	// or Selected, picked before the run), the same run dialog with its bar and Stop, the same table
+	// with its go-to links, the same engine choice, and the same time step -- assembleModel() plus
+	// fireFlowAtFrame(), so what is broken is the network on screen.
+	//
+	// **THE MINIMUM PRESSURE IS FIRE FLOW'S "LOWEST PRESSURE ALLOWED ELSEWHERE", NOT A SECOND ONE.**
+	// Two boxes holding one fact about the utility would disagree the first time somebody edited one
+	// (the scenario comparison declined a threshold of its own for the same reason). The box here
+	// edits `fireFlowAsk.minPressure` itself, and its tip says so.
+	//
+	// **NO BOX MEMORY ACROSS PAGE LOADS YET.** The report boxes remember where they were left in
+	// localStorage; this one remembers only until the page is reloaded, so this feature stores
+	// nothing on a visitor's device. Adding the memory is a new `lpn_critbox` key and a line in
+	// dev/cookie-storage-inventory.md.
+	var critAsk = { scope: 'all', skipDeadEnds: false };
+	var critRun = null;
+	var critRunT = null;
+	var critShownAt = null;
+	var critBusy = false;
+	var critStop = false;
+	var critSortState = { col: null, dir: 1 };
+	function critBoxEl() { return document.getElementById('lpn_crit_box'); }
+	function critBoxIsOpen() {
+		var box = critBoxEl();
+		return !!box && box.style.display !== 'none';
+	}
+	// The shared criterion, created on first use exactly as opening the fire flow box creates it.
+	function critFireFlowAsk() {
+		if (!fireFlowAsk && EngCalcs.lpnFireFlowDefaults) { fireFlowAsk = fireFlowDefaults(); }
+		return fireFlowAsk || { minPressure: '' };
+	}
+	function buildCriticalityControls() {
+		var pc = EngCalcs.pageConfig || {},
+			host = document.getElementById('lpn_crit_controls'),
+			scope, minP, skip, buttons, run, stop, engine;
+		if (!host) { return; }
+		host.innerHTML = '';
+		ffEl('p', 'lpn-ff-note', pc.lpn_crit_intro, host);
+		scope = ffSelect([
+			['all', pc.lpn_crit_scope_all || 'All links'],
+			['selected', pc.lpn_crit_scope_selected || 'Selected links']
+		], critAsk.scope);
+		scope.addEventListener('change', function () { critAsk.scope = scope.value; });
+		ffRow(host, pc.lpn_crit_scope || 'Links to break', pc.lpn_crit_scope_tip, scope, '');
+		skip = document.createElement('input');
+		skip.type = 'checkbox';
+		skip.checked = !!critAsk.skipDeadEnds;
+		skip.addEventListener('change', function () { critAsk.skipDeadEnds = skip.checked; });
+		ffRow(host, pc.lpn_crit_skipdead || 'Skip dead ends', pc.lpn_crit_skipdead_tip, skip, '');
+		minP = ffInput(critFireFlowAsk().minPressure);
+		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
+		ffRow(host, pc.lpn_crit_minpressure || 'Lowest pressure allowed', pc.lpn_crit_minpressure_tip,
+			minP, unitLabel('lpn_u_pressure'));
+		engine = engineFor(assembleModel());
+		ffEl('p', 'lpn-ff-note', engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native, host);
+		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
+		run = ffEl('button', 'lpn-ff-run', pc.lpn_ff_calculate || 'Run', buttons);
+		run.type = 'button';
+		run.disabled = critBusy || fireFlowBusy || dsBusy;
+		if (fireFlowBusy || dsBusy) { run.title = pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.'; }
+		run.addEventListener('click', function () {
+			critAsk.scope = scope.value;
+			critAsk.skipDeadEnds = skip.checked;
+			critFireFlowAsk().minPressure = minP.value;
+			runCriticality();
+		});
+		stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', buttons);
+		stop.type = 'button';
+		stop.disabled = !critBusy;
+		stop.addEventListener('click', function () { critStop = true; });
+		initTipsIn(host);
+	}
+	// A list of junction ids as go-to links: the first few, then how many more. The count is the
+	// cell's number; the links are where the reader goes next.
+	var CRIT_MAX_IDS = 5;
+	function critIdsCell(tr, ids) {
+		var pc = EngCalcs.pageConfig || {}, td = ffCell(tr, String(ids.length) + (ids.length ? ': ' : ''));
+		ids.slice(0, CRIT_MAX_IDS).forEach(function (id, i) {
+			if (i) { td.appendChild(document.createTextNode(', ')); }
+			ffGotoLink(td, 'node', id, labelPrefixFor('node', 'id') + id);
+		});
+		if (ids.length > CRIT_MAX_IDS) {
+			td.appendChild(document.createTextNode(' ' + (pc.lpn_ff_more || 'and {n} more affected')
+				.replace('{n}', String(ids.length - CRIT_MAX_IDS))));
+		}
+		return td;
+	}
+	function critSortKey(rec, col) {
+		switch (col) {
+		case 0: return rec.id;
+		case 1: return rec.unserved;
+		case 2: return rec.cutOff ? rec.cutOff.length : undefined;
+		case 3: return rec.below ? rec.below.length : undefined;
+		}
+		return undefined;
+	}
+	function critSorted(results) {
+		var base = EngCalcs.lpnCriticalityOrder(results), col = critSortState.col, dir = critSortState.dir;
+		if (col === null) { return base; }
+		return base.map(function (r, i) { return { r: r, i: i, k: critSortKey(r, col) }; }).sort(function (a, b) {
+			var ab = ffBlank(a.k), bb = ffBlank(b.k), c;
+			if (ab || bb) { return ab === bb ? a.i - b.i : (ab ? 1 : -1); }
+			c = (typeof a.k === 'number' && typeof b.k === 'number') ? a.k - b.k
+				: String(a.k).localeCompare(String(b.k), undefined, { numeric: true });
+			return c ? dir * c : a.i - b.i;
+		}).map(function (x) { return x.r; });
+	}
+	function critSortBy(col) {
+		critSortState = { col: col, dir: critSortState.col === col ? -critSortState.dir : 1 };
+		rebuildCriticalityReport();
+	}
+	function rebuildCriticalityReport() {
+		var pc = EngCalcs.pageConfig || {},
+			host = document.getElementById('lpn_crit_report'),
+			set = critRun, body, sorted, shown, hit;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (!set) { return; }
+		critShownAt = dsNow();
+		if (set.stopped) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_stopped || 'Stopped after {done} of {total} assets. The results below are the ones already finished.')
+				.replace('{done}', String(set.processed)).replace('{total}', String(set.requested)), host);
+		}
+		// Counted as the sentence reads: demand actually left unserved, or a junction actually below
+		// the minimum. A link that cuts off only zero-demand junctions shows them in its row, but it
+		// cut off no demand, so it is not counted here.
+		hit = set.results.filter(function (r) { return r.unserved > 0 || (r.below && r.below.length > 0); }).length;
+		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || '{n} of {total} assets leave demand unserved or drop a junction below {pressure}.')
+			.replace('{n}', String(hit)).replace('{total}', String(set.results.length))
+			.replace('{pressure}', ffQty(set.minPressure, 'lpn_u_pressure')), host);
+		dsTimeLines(host, critRunT);
+		if (set.skippedDeadEnds && set.skippedDeadEnds.length) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_skipped_dead || 'Dead-end links skipped: {n}. Each one cuts off everything beyond it.')
+				.replace('{n}', String(set.skippedDeadEnds.length)), host);
+		}
+		if (set.baselineBelow) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_baseline_below || 'Junctions already below it with nothing broken: {n}. They are not counted.')
+				.replace('{n}', String(set.baselineBelow)), host);
+		}
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
+			.replace('{solves}', String(set.solves)), host);
+		sorted = critSorted(set.results);
+		shown = sorted.slice(0, FF_MAX_ROWS);
+		body = ffTable(host, [
+			pc.lpn_crit_col_asset || 'Asset',
+			pc.lpn_crit_col_unserved || 'Demand not served',
+			pc.lpn_crit_col_cutoff || 'Junctions cut off',
+			pc.lpn_crit_col_below || 'Junctions below minimum'
+		], { state: critSortState, by: critSortBy });
+		// Four columns, not ten: the headings wrap between words, never inside one (css/engcalcs.css).
+		if (body.parentNode && body.parentNode.classList) { body.parentNode.classList.add('lpn-crit-table'); }
+		shown.forEach(function (rec) {
+			// Fire flow's own row tints, by the same four tiers (js/lpn-criticality.js), so a red
+			// row means "the system failed to deliver" in both reports. 'none' is untinted, as a pass.
+			var tr = ffEl('tr', 'lpn-ff-' + EngCalcs.lpnCriticalitySeverity(rec), null, body);
+			ffGotoLink(ffCell(tr, ''), 'link', rec.id, labelPrefixFor('link', 'id') + rec.id);
+			ffCell(tr, typeof rec.unserved === 'number' ? ffQty(rec.unserved, 'lpn_u_flow') : FF_DASH);
+			if (rec.cutOff) { critIdsCell(tr, rec.cutOff); } else { ffCell(tr, FF_DASH); }
+			// **A CASE THAT DID NOT SOLVE IS A ROW SAYING SO, NEVER AN ABORT.** What was cut off is
+			// known without a solve and is still printed; only the pressures are missing, so the
+			// reason stands in the pressure column.
+			if (rec.below) { critIdsCell(tr, rec.below.map(function (b) { return b.id; })); }
+			else { ffCell(tr, ffReasonText(rec)); }
+		});
+		ffMoreLine(host, sorted.length - shown.length, true);
+	}
+	function updateCriticalityRunBox(done) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!ffRunUi) { return; }
+		ffRunUi.fill.style.width = (ffRunUi.total > 0 ? Math.round(1000 * done / ffRunUi.total) / 10 : 0) + '%';
+		ffRunUi.track.setAttribute('aria-valuenow', String(done));
+		ffRunUi.count.textContent = (pc.lpn_crit_working || 'Working: {done} of {total} assets.')
+			.replace('{done}', String(done)).replace('{total}', String(ffRunUi.total));
+	}
+	// The links to break. All: every link in the model this run solves -- pipes, pumps and valves,
+	// because Tom asked to "break each asset" -- so an inactive one (already out) is not broken
+	// twice. Selected: every selected link, and whatever else is selected is counted and said.
+	function criticalityLinks(model) {
+		var inModel = {}, ids = [], skipped = 0;
+		model.links.forEach(function (l) { inModel[l.id] = l; });
+		if (critAsk.scope !== 'selected') {
+			return { ids: model.links.map(function (l) { return l.id; }), skipped: 0 };
+		}
+		selections.forEach(function (s) {
+			if (s.kind === 'link' && inModel[s.id] && ids.indexOf(s.id) < 0) { ids.push(s.id); } else { skipped++; }
+		});
+		return { ids: ids, skipped: skipped };
+	}
+	function runCriticality() {
+		var pc = EngCalcs.pageConfig || {}, model, engine, pick, minPressure, before;
+		if (critBusy || !EngCalcs.lpnCriticalitySweep) { return Promise.resolve(null); }
+		if (fireFlowBusy || dsBusy) {
+			setNotice(pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.');
+			return Promise.resolve(null);
+		}
+		model = assembleModel();
+		fireFlowAtFrame(model);
+		pick = criticalityLinks(model);
+		if (!pick.ids.length) {
+			clearCriticalityRun(true);
+			analysisRefused(document.getElementById('lpn_crit_report'), critAsk.scope === 'selected'
+				? (pc.lpn_crit_no_selection || 'No links are selected. Select links or choose All links.')
+				: (pc.lpn_crit_no_links || 'This project has no links yet, so there is nothing to break.'));
+			return Promise.resolve(null);
+		}
+		minPressure = ffValue(critFireFlowAsk().minPressure, 'lpn_u_pressure');
+		engine = engineFor(model);
+		before = JSON.stringify(doc);
+		critRunT = modelTimeSeconds();
+		critBusy = true;
+		critStop = false;
+		critRun = null;
+		rebuildCriticalityReport();
+		buildCriticalityControls();
+		if (ffBoxIsOpen()) { buildFireFlowControls(); }
+		if (dsBoxIsOpen()) { buildDemandScaleControls(); }
+		openFireFlowRunBox(pick.ids.length, {
+			title: pc.lpn_crit_title || 'Criticality analysis',
+			onStop: function () { critStop = true; },
+			update: updateCriticalityRunBox
+		});
+		if (pick.skipped) {
+			setNotice((pc.lpn_crit_skipped || '{n} selected elements are not links, so they were not broken.')
+				.replace('{n}', String(pick.skipped)));
+		}
+		return EngCalcs.lpnCriticalitySweep(model, {
+			solve: engine.solve,
+			links: pick.ids,
+			skipDeadEnds: !!critAsk.skipDeadEnds,
+			minPressure: minPressure > 0 ? minPressure : 0,
+			onProgress: function (p) { updateCriticalityRunBox(p.done); },
+			shouldStop: function () { return critStop; }
+		}).then(function (set) {
+			critBusy = false;
+			if (ffBoxIsOpen()) { buildFireFlowControls(); }
+			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
+			closeFireFlowRunBox();
+			critDocGuard = (JSON.stringify(doc) === before);
+			if (!set.ok) {
+				critRun = null;
+				setNotice(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
+			} else {
+				critRun = set;
+			}
+			rebuildCriticalityReport();
+			buildCriticalityControls();
+			return set;
+		}, function (err) {
+			critBusy = false;
+			if (ffBoxIsOpen()) { buildFireFlowControls(); }
+			if (dsBoxIsOpen()) { buildDemandScaleControls(); }
+			closeFireFlowRunBox();
+			buildCriticalityControls();
+			setNotice(pc.lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
+			if (window.console && console.warn) { console.warn('criticality run failed:', err); }
+			return null;
+		});
+	}
+	// Read by the harness. Set by the run, never by a user action.
+	var critDocGuard = true;
+	// **A RESULT SET DESCRIBES THE NETWORK IT WAS RUN ON**, so it is cleared at the same moments fire
+	// flow's results are (both calls sit side by side at each one) -- and ONLY then. Fire flow's
+	// "Clear rings" is that box's own act and leaves this report standing.
+	function clearCriticalityRun(quiet) {
+		if (!critRun) { return; }
+		critRun = null;
+		if (critBoxIsOpen()) { rebuildCriticalityReport(); }
+		if (!quiet) {
+			setNotice((EngCalcs.pageConfig || {}).lpn_crit_stale ||
+				'The drawing changed, so the criticality results were cleared. Run it again.');
+		}
+	}
+	var critLayout = newBoxLayout();
+	function openCriticalityBox() {
+		var box = critBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		buildCriticalityControls();
+		rebuildCriticalityReport();
+		// Centred the first time, then where it was left -- for this page load only (see above).
+		placePanelForScreen(box, function () { placeBoxRemembered(box, critLayout); });
+		initTipsIn(box);
+	}
+	function closeCriticalityBox() {
+		hidePanel(critBoxEl());
+		if (critBusy) { critStop = true; }
+	}
+	function wireCriticalityBox() {
+		var box = critBoxEl(), x = document.getElementById('lpn_crit_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeCriticalityBox); }
+		makePanelDraggable(box, function (pos) {
+			if (smallScreen()) { return; }
+			critLayout.left = pos.left;
+			critLayout.top = pos.top;
+		});
+		addPanelResizeGrip(box);
+	}
+
+	// ================================================================================================
+	// DEMAND SCALING -- the demands multiplied on a copy, and the largest multiplier the system holds
+	// ================================================================================================
+	//
+	// Tom, 2026-09-30, on WaterGEMS's Active Demand Adjustments: *"This also sounds fun and easy to
+	// provide."* And 2026-10-01: *"This is absurdly simple, but let's do it ... we could do some
+	// cooler things like 'What demand scale can the system handle with this pressure limit?'"* The
+	// arithmetic is js/lpn-demandscale.js; this is the third sibling on fire flow's box shell, with
+	// fire flow's engine choice and fire flow's time step (assembleModel() plus fireFlowAtFrame()).
+	//
+	// **NOT THE SCENARIO'S DEMAND MULTIPLIER, AND IT NEVER WRITES ONE.** That one is data and rides in
+	// the project; this one is a question asked of the network on screen, on a copy, and lives for the
+	// page load. It multiplies on top of the scenario's, and the box's tip says so.
+	//
+	// **ONE INSTANT, THE ONE ON SCREEN**, for an extended-period project as for the siblings: its
+	// demands at that time, its tank levels and its link statuses from the run. A peak step chosen
+	// for the user would need a run to know the tank levels at it, and would be a second idea of
+	// "the condition tested" beside fire flow's and criticality's. Move the clock to the peak first.
+	//
+	// **THE MINIMUM PRESSURE IS FIRE FLOW'S "LOWEST PRESSURE ALLOWED ELSEWHERE"**, shared exactly as
+	// criticality shares it: one fact about the utility, one box value.
+	//
+	// **NO BOX MEMORY ACROSS PAGE LOADS**, like criticality: nothing is stored on a visitor's device.
+	var dsAsk = { scope: 'all', multiplier: '2' };
+	var dsRun = null;      // the last Run at a scale, or null
+	var dsSearch = null;   // the last search, or null
+	// **A REFUSED PRESS IS ANSWERED IN THE BOX, WHERE THE PRESS WAS** (Tom, 2026-10-02: *"It appears
+	// that Find doesn't respect "Selected junctions"."*). "Selected junctions" with nothing selected
+	// used to refuse on the map's notice line alone, and leave the last answer -- an All answer --
+	// standing under the button, where it read as Find having ignored the scope. Now the refusal
+	// takes that part's place: { which: 'scale' | 'search', text }, or null.
+	var dsRefused = null;
+	var dsBusy = false;
+	var dsStop = false;
+	var DS_ROWS = 10;
+	function dsBoxEl() { return document.getElementById('lpn_ds_box'); }
+	function dsBoxIsOpen() {
+		var box = dsBoxEl();
+		return !!box && box.style.display !== 'none';
+	}
+	// A multiplier as a person reads it: to the search's own step, never more.
+	function dsMult(m) { return String(+(+m).toFixed(2)); }
+	function buildDemandScaleControls() {
+		var pc = EngCalcs.pageConfig || {},
+			host = document.getElementById('lpn_ds_controls'),
+			D = EngCalcs.lpnDemandScaleDefaults || { max: 20, step: 0.01 },
+			scope, minP, mult, buttons, run, find, stop, engine, other;
+		if (!host) { return; }
+		host.innerHTML = '';
+		ffEl('p', 'lpn-ff-note', pc.lpn_ds_intro, host);
+		scope = ffSelect([
+			['all', pc.lpn_ds_scope_all || 'All junctions'],
+			['selected', pc.lpn_ds_scope_selected || 'Selected junctions']
+		], dsAsk.scope);
+		scope.addEventListener('change', function () { dsAsk.scope = scope.value; buildDemandScaleControls(); });
+		ffRow(host, pc.lpn_ds_scope || 'Junctions to scale', pc.lpn_ds_scope_tip, scope, '');
+		minP = ffInput(critFireFlowAsk().minPressure);
+		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
+		ffRow(host, pc.lpn_ds_minpressure || 'Lowest pressure allowed', pc.lpn_ds_minpressure_tip,
+			minP, unitLabel('lpn_u_pressure'));
+		engine = engineFor(assembleModel());
+		ffEl('p', 'lpn-ff-note', engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native, host);
+		if (EngCalcs.lpnTimeIsExtended && EngCalcs.lpnTimeIsExtended(doc.times)) {
+			ffEl('p', 'lpn-ff-note', pc.lpn_ds_eps_note, host);
+		}
+		other = fireFlowBusy || critBusy;
+		function take() {
+			dsAsk.scope = scope.value;
+			dsAsk.multiplier = mult.value;
+			critFireFlowAsk().minPressure = minP.value;
+		}
+
+		// 1. At a scale.
+		ffEl('div', 'lpn-ff-head', pc.lpn_ds_head_scale || 'Scale the demands', host);
+		mult = ffInput(dsAsk.multiplier);
+		mult.addEventListener('change', function () { dsAsk.multiplier = mult.value; });
+		ffRow(host, pc.lpn_ds_multiplier || 'Demand scale', pc.lpn_ds_multiplier_tip, mult, '');
+		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
+		run = ffEl('button', 'lpn-ff-run', pc.lpn_ds_run || 'Run', buttons);
+		run.type = 'button';
+		run.disabled = dsBusy || other;
+		if (other) { run.title = pc.lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.'; }
+		run.addEventListener('click', function () { take(); runDemandScale(); });
+		ffEl('div', 'lpn-ds-result', null, host).setAttribute('data-ds', 'scale');
+
+		// 2. The largest scale that holds the limit.
+		// Tom, 2026-10-03: under Selected junctions the question is the selection's.
+		ffEl('div', 'lpn-ff-head', dsAsk.scope === 'selected'
+			? (pc.lpn_ds_head_search_selected || 'What demand scale can these junctions handle?')
+			: (pc.lpn_ds_head_search || 'What demand scale can the system handle?'), host);
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_search_note ||
+			'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.')
+			.replace('{max}', dsMult(D.max)).replace('{step}', String(D.step)), host);
+		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
+		find = ffEl('button', 'lpn-ff-run', pc.lpn_ds_find || 'Find', buttons);
+		find.type = 'button';
+		find.disabled = dsBusy || other;
+		if (other) { find.title = run.title; }
+		find.addEventListener('click', function () { take(); runDemandScaleSearch(); });
+		stop = ffEl('button', 'lpn-ff-stopbtn', pc.lpn_ff_stop || 'Stop', buttons);
+		stop.type = 'button';
+		stop.disabled = !dsBusy;
+		stop.addEventListener('click', function () { dsStop = true; });
+		ffEl('div', 'lpn-ds-result', null, host).setAttribute('data-ds', 'search');
+		initTipsIn(host);
+		rebuildDemandScaleReport();
+	}
+	// Where each answer goes: directly under the part of the box that asked for it, so the Find
+	// answer is beside the Find button and not under the Run tables. Rebuilt with the controls;
+	// `#lpn_ds_report` is only the fallback for a page without them.
+	function dsReportHost(which) {
+		var c = document.getElementById('lpn_ds_controls'), found = null;
+		(function walk(n) {
+			Array.prototype.slice.call((n && n.children) || []).forEach(function (k) {
+				if (found) { return; }
+				if (k.getAttribute && k.getAttribute('data-ds') === which) { found = k; } else { walk(k); }
+			});
+		}(c));
+		return found || document.getElementById('lpn_ds_report');
+	}
+	// **AN ANSWER THAT ARRIVES BELOW THE FOLD IS BROUGHT INTO VIEW** (Perry, 2026-10-01: on a
+	// 390 x 844 phone the Find verdict landed off screen). The nearest scroll, so on a desktop where
+	// it is already visible nothing moves.
+	function dsScrollTo(which) {
+		var h = dsReportHost(which), first = h && h.firstChild;
+		if (first && first.scrollIntoView) {
+			try { first.scrollIntoView({ block: 'nearest' }); } catch (e) { first.scrollIntoView(false); }
+		}
+	}
+	// **WHICH INSTANT A RESULT DESCRIBES** (Perry's pre-review, 2026-10-01: on Net3 a search made
+	// at 0:00 still read 0.51 with the clock at 6:00, where the truth was 3.10). On an extended-period
+	// project every result names its time step, and once the clock moves away the result says so
+	// rather than passing for the moment on screen. It is not cleared: the siblings keep theirs
+	// across a clock move too, and a number with its time beside it is still a true number.
+	function dsExtended() { return !!(EngCalcs.lpnTimeIsExtended && EngCalcs.lpnTimeIsExtended(doc.times)); }
+	function dsNow() { return modelTimeSeconds(); }
+	function dsTimeText(t) { return EngCalcs.lpnTimeElapsedText ? EngCalcs.lpnTimeElapsedText(t) : String(t); }
+	function dsTimeLines(host, t) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!dsExtended() || typeof t !== 'number') { return; }
+		ffEl('p', 'lpn-ff-note', (pc.lpn_analyze_at_time || 'Time step: {time}.').replace('{time}', dsTimeText(t)), host);
+		if (dsNow() !== t) {
+			ffEl('p', 'lpn-ff-summary lpn-ds-stale', (pc.lpn_analyze_time_moved ||
+				'⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.')
+				.replace('{time}', dsTimeText(t)).replace('{now}', dsTimeText(dsNow())), host);
+		}
+	}
+	var dsShownAt = null;
+	function demandScaleClockMoved() {
+		var now = dsNow();
+		if (fireFlowRun && ffBoxIsOpen() && now !== ffShownAt) { rebuildFireFlowReport(); }
+		if (critRun && critBoxIsOpen() && now !== critShownAt) { rebuildCriticalityReport(); }
+		if (!(dsRun || dsSearch) || !dsBoxIsOpen()) { return; }
+		if (now === dsShownAt) { return; }
+		rebuildDemandScaleReport();
+	}
+	// A sentence with one go-to link in it: the template is split at `{id}`, so the id is a button
+	// and the words around it stay one translated string.
+	function dsSentence(parent, cls, tpl, group, id, values) {
+		var p = ffEl('p', cls, null, parent), parts, k;
+		for (k in values) {
+			if (Object.prototype.hasOwnProperty.call(values, k)) { tpl = tpl.split('{' + k + '}').join(values[k]); }
+		}
+		parts = tpl.split('{id}');
+		parts.forEach(function (s, i) {
+			if (i) { ffGotoLink(p, group, id, labelPrefixFor(group, 'id') + id); }
+			if (s) { p.appendChild(document.createTextNode(s)); }
+		});
+		return p;
+	}
+	// One probe of the search, in a sentence: the lowest junction and its pressure, or the reason the
+	// network gave no answer at that scale.
+	// **WHICH JUNCTIONS WERE SCALED, UNDER EVERY ANSWER THAT SCALED ONLY SOME** -- Find's as well as
+	// Run's. Find's verdict is one number, and "Every junction keeps 20 psi up to a demand scale of
+	// 20" with nothing beside it reads as every demand having been scaled (Tom, 2026-10-02).
+	function dsScopeLine(host, rec) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!rec || rec.scaledCount === undefined) { return; }
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_scaled_selected || 'Junctions scaled and checked: {n}.')
+			.replace('{n}', String(rec.scaledCount)), host);
+	}
+	// **UNSELECTED JUNCTIONS BELOW THE LIMIT ARE DISCLOSED, NEVER JUDGED** (Tom, 2026-10-03: "Unselected
+	// fails should be allowed and disclosed."). The verdict above is the selection's; this line says
+	// which other junctions the scaled demand leaves below the lowest pressure allowed.
+	function dsOutsideLine(host, list, m, minPressure) {
+		var pc = EngCalcs.pageConfig || {}, p, parts;
+		if (!list || !list.length) { return; }
+		p = ffEl('p', 'lpn-ff-note', null, host);
+		parts = (pc.lpn_ds_outside_below || 'At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.')
+			.replace('{m}', dsMult(m)).replace('{pressure}', ffQty(minPressure, 'lpn_u_pressure'))
+			.replace('{n}', String(list.length)).split('{ids}');
+		p.appendChild(document.createTextNode(parts[0]));
+		list.forEach(function (x, i) {
+			if (i) { p.appendChild(document.createTextNode(', ')); }
+			ffGotoLink(p, 'node', x.id, labelPrefixFor('node', 'id') + x.id);
+		});
+		if (parts[1]) { p.appendChild(document.createTextNode(parts[1])); }
+	}
+	function dsProbeLine(host, rec) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!rec) { return; }
+		if (!rec.ok) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ds_nosolve_at || 'At a demand scale of {m}, the network gave no answer. {reason}')
+				.replace('{m}', dsMult(rec.multiplier)).replace('{reason}', ffReasonText(rec)), host);
+			return;
+		}
+		if (!rec.lowest) { return; }
+		dsSentence(host, 'lpn-ff-note', pc.lpn_ds_lowest_at || 'At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.',
+			'node', rec.lowest.id, { m: dsMult(rec.multiplier), pressure: ffQty(rec.lowest.pressure, 'lpn_u_pressure') });
+	}
+	function rebuildDemandScaleReport() {
+		var pc = EngCalcs.pageConfig || {},
+			host = document.getElementById('lpn_ds_report'),
+			O = EngCalcs.lpnDemandScaleOutcomes || {},
+			set, s, body, pressure, verdict;
+		if (!host) { return; }
+		host.innerHTML = '';
+		['scale', 'search'].forEach(function (w) { var h = dsReportHost(w); if (h) { h.innerHTML = ''; } });
+		dsShownAt = dsNow();
+		if (dsRefused) { ffEl('p', 'lpn-ff-summary', dsRefused.text, dsReportHost(dsRefused.which)); }
+		s = dsSearch;
+		// **NO HEADING OF ITS OWN.** Each answer sits in its own part of the box, directly under
+		// that part's heading (dsReportHost()), so a second copy of the heading would only repeat it.
+		if (s) {
+			host = dsReportHost('search');
+			pressure = ffQty(s.minPressure, 'lpn_u_pressure');
+			if (s.stopped) {
+				ffEl('p', 'lpn-ff-summary', pc.lpn_ds_search_stopped || 'The search was stopped before it found an answer.', host);
+			} else if (s.outcome === O.HOLDS_TO_MAX) {
+				verdict = pc.lpn_ds_holds_max || '✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.';
+				ffEl('p', 'lpn-ff-summary', verdict.replace('{pressure}', pressure).replace('{max}', dsMult(s.max)), host);
+				dsProbeLine(host, s.holding);
+			} else if (s.outcome === O.BELOW_AT_ZERO) {
+				ffEl('p', 'lpn-ff-summary', (pc.lpn_ds_below_zero || '⚠ At least one junction is below {pressure} even with the scaled demands at zero.')
+					.replace('{pressure}', pressure), host);
+				dsProbeLine(host, s.failing);
+			} else {
+				verdict = s.belowAtOne
+					? (pc.lpn_ds_found_below || '⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.')
+					: (pc.lpn_ds_found || '✓ Every junction keeps {pressure} up to a demand scale of {m}.');
+				ffEl('p', 'lpn-ff-summary', verdict.replace('{pressure}', pressure).replace('{m}', dsMult(s.multiplier)), host);
+				dsProbeLine(host, s.holding);
+				dsProbeLine(host, s.failing);
+			}
+			dsTimeLines(host, s.time);
+			dsScopeLine(host, s);
+			if (s.holding) { dsOutsideLine(host, s.holding.outside, s.holding.multiplier, s.minPressure); }
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
+				.replace('{solves}', String(s.solves)), host);
+		}
+		set = dsRun;
+		if (!set) { return; }
+		host = dsReportHost('scale');
+		if (!set.ok) {
+			ffEl('p', 'lpn-ff-summary', (pc.lpn_ds_nosolve_at || 'At a demand scale of {m}, the network gave no answer. {reason}')
+				.replace('{m}', dsMult(set.multiplier)).replace('{reason}', ffReasonText(set)), host);
+			dsTimeLines(host, set.time);
+			return;
+		}
+		pressure = ffQty(set.minPressure, 'lpn_u_pressure');
+		verdict = set.below.length
+			? (pc.lpn_ds_scale_below || '⚠ At a demand scale of {m}, junctions below {pressure}: {n}.')
+				.replace('{n}', String(set.below.length))
+			: (pc.lpn_ds_scale_ok || '✓ At a demand scale of {m}, every junction keeps {pressure}.');
+		ffEl('p', 'lpn-ff-summary', verdict.replace('{m}', dsMult(set.multiplier)).replace('{pressure}', pressure), host);
+		dsTimeLines(host, set.time);
+		dsScopeLine(host, set);
+		dsOutsideLine(host, set.outside, set.multiplier, set.minPressure);
+		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
+			.replace('{solves}', String(set.solves)), host);
+		// THE TWO TABLES ARE THE TWO READINGS A DESIGNER TAKES OF A HEAVIER DAY: where the pressure
+		// is lowest, and where the water moves fastest. The worst ten of each, worst first, with the
+		// same element unscaled beside it. A heading re-sorts those ten and never chooses another ten:
+		// which rows are here is the answer, and only their order is the reader's.
+		ffEl('div', 'lpn-ff-head', pc.lpn_ds_head_lowest || 'Lowest pressures', host);
+		body = ffTable(host, [
+			pc.lpn_ff_col_junction || 'Junction',
+			[pc.lpn_ds_col_scaled || 'Scaled', pc.lpn_ds_col_scaled_tip],
+			[pc.lpn_ds_col_unscaled || 'Unscaled', pc.lpn_ds_col_unscaled_tip]
+		], { state: dsSortState.p, by: function (col) { dsSortBy('p', col); } });
+		dsSortRows(set.pressures.slice(0, DS_ROWS), dsSortState.p, 'pressure').forEach(function (x) {
+			var tr = ffEl('tr', x.pressure < set.minPressure ? 'lpn-crit-impact' : null, null, body);
+			ffGotoLink(ffCell(tr, ''), 'node', x.id, labelPrefixFor('node', 'id') + x.id);
+			ffCell(tr, ffMaybeQty(x.pressure, 'lpn_u_pressure'));
+			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_pressure'));
+		});
+		ffMoreLine(host, set.pressures.length - Math.min(DS_ROWS, set.pressures.length));
+		ffEl('div', 'lpn-ff-head', pc.lpn_ds_head_velocity || 'Highest velocities', host);
+		body = ffTable(host, [
+			pc.lpn_ds_col_link || 'Link',
+			[pc.lpn_ds_col_scaled || 'Scaled', pc.lpn_ds_col_scaled_tip],
+			[pc.lpn_ds_col_unscaled || 'Unscaled', pc.lpn_ds_col_unscaled_tip]
+		], { state: dsSortState.v, by: function (col) { dsSortBy('v', col); } });
+		dsSortRows(set.velocities.slice(0, DS_ROWS), dsSortState.v, 'velocity').forEach(function (x) {
+			var tr = ffEl('tr', null, null, body);
+			ffGotoLink(ffCell(tr, ''), 'link', x.id, labelPrefixFor('link', 'id') + x.id);
+			ffCell(tr, ffMaybeQty(x.velocity, 'lpn_u_velocity'));
+			ffCell(tr, ffMaybeQty(x.unscaled, 'lpn_u_velocity'));
+		});
+		ffMoreLine(host, set.velocities.length - Math.min(DS_ROWS, set.velocities.length), true);
+	}
+	// The two tables' sort, fire flow's rule: the same column flips, a new one starts ascending, and
+	// `col: null` is the worst-first order the run gave.
+	var dsSortState = { p: { col: null, dir: 1 }, v: { col: null, dir: 1 } };
+	function dsSortBy(which, col) {
+		var st = dsSortState[which];
+		dsSortState[which] = { col: col, dir: st.col === col ? -st.dir : 1 };
+		rebuildDemandScaleReport();
+	}
+	function dsSortRows(list, st, field) {
+		if (st.col === null) { return list; }
+		return list.map(function (r, i) { return { r: r, i: i }; }).sort(function (a, b) {
+			var ka = st.col === 0 ? a.r.id : (st.col === 1 ? a.r[field] : a.r.unscaled),
+				kb = st.col === 0 ? b.r.id : (st.col === 1 ? b.r[field] : b.r.unscaled),
+				ab = ffBlank(ka), bb = ffBlank(kb), c;
+			if (ab || bb) { return ab === bb ? a.i - b.i : (ab ? 1 : -1); }
+			c = (typeof ka === 'number' && typeof kb === 'number') ? ka - kb
+				: String(ka).localeCompare(String(kb), undefined, { numeric: true });
+			return c ? st.dir * c : a.i - b.i;
+		}).map(function (x) { return x.r; });
+	}
+	// The case both buttons solve: the network on screen, and which junctions' demands are scaled.
+	// Null `ids` scales every junction. Says so and returns null where there is nothing to scale,
+	// and the refusal replaces that part's last answer (`which`), which no longer answers the
+	// question now on screen. See dsRefused.
+	function demandScaleCase(which) {
+		var pc = EngCalcs.pageConfig || {}, model, ids = null, isJ = {}, skipped = 0;
+		function refuse(text) {
+			setNotice(text);
+			dsRefused = { which: which, text: text };
+			if (which === 'scale') { dsRun = null; } else { dsSearch = null; }
+			if (dsBoxIsOpen()) { rebuildDemandScaleReport(); }
+			return null;
+		}
+		if (dsRefused && dsRefused.which === which) { dsRefused = null; }
+		model = assembleModel();
+		fireFlowAtFrame(model);
+		model.nodes.forEach(function (n) { if (n.type === 'junction') { isJ[n.id] = true; } });
+		if (!Object.keys(isJ).length) {
+			return refuse(pc.lpn_ds_no_junctions || 'This project has no junctions yet, so there are no demands to scale.');
+		}
+		if (dsAsk.scope === 'selected') {
+			ids = [];
+			selections.forEach(function (s) {
+				if (s.kind === 'node' && isJ[s.id] && ids.indexOf(s.id) < 0) { ids.push(s.id); } else { skipped++; }
+			});
+			if (!ids.length) {
+				return refuse(pc.lpn_ds_no_selection || 'No junctions are selected. Select junctions or choose All junctions.');
+			}
+			if (skipped) {
+				setNotice((pc.lpn_ds_skipped || 'Selected elements that are not junctions, left as they are: {n}.')
+					.replace('{n}', String(skipped)));
+			}
+		}
+		return { model: model, ids: ids, engine: engineFor(model), time: dsNow() };
+	}
+	function dsBegin() {
+		dsBusy = true;
+		dsStop = false;
+		buildDemandScaleControls();
+		if (ffBoxIsOpen()) { buildFireFlowControls(); }
+		if (critBoxIsOpen()) { buildCriticalityControls(); }
+	}
+	function dsEnd(before) {
+		dsBusy = false;
+		dsDocGuard = (JSON.stringify(doc) === before);
+		if (ffBoxIsOpen()) { buildFireFlowControls(); }
+		if (critBoxIsOpen()) { buildCriticalityControls(); }
+		rebuildDemandScaleReport();
+		buildDemandScaleControls();
+	}
+	function dsFailed(before, err) {
+		dsEnd(before);
+		setNotice((EngCalcs.pageConfig || {}).lpn_ff_err_solve || 'The solver reported an error and gave no answer.');
+		if (window.console && console.warn) { console.warn('demand scaling failed:', err); }
+		return null;
+	}
+	function dsBusyElsewhere() {
+		if (!(fireFlowBusy || critBusy)) { return false; }
+		setNotice((EngCalcs.pageConfig || {}).lpn_crit_busy || 'Another analysis is running. Stop it, or wait for it to finish.');
+		return true;
+	}
+	function runDemandScale() {
+		var pc = EngCalcs.pageConfig || {}, c, m, minPressure, before;
+		if (dsBusy || !EngCalcs.lpnDemandScaleRun || dsBusyElsewhere()) { return Promise.resolve(null); }
+		m = ffValue(dsAsk.multiplier, null);
+		if (!(m >= 0)) {
+			setNotice(pc.lpn_ds_bad_multiplier || 'Type a demand scale of zero or more, such as 1.5.');
+			return Promise.resolve(null);
+		}
+		c = demandScaleCase('scale');
+		if (!c) { return Promise.resolve(null); }
+		minPressure = ffValue(critFireFlowAsk().minPressure, 'lpn_u_pressure');
+		before = JSON.stringify(doc);
+		dsRun = null;
+		dsBegin();
+		return EngCalcs.lpnDemandScaleRun(c.model, {
+			solve: c.engine.solve,
+			multiplier: m,
+			junctions: c.ids,
+			minPressure: minPressure > 0 ? minPressure : 0
+		}).then(function (set) {
+			if (c.ids) { set.scaledCount = c.ids.length; }
+			set.time = c.time;
+			dsRun = set;
+			dsEnd(before);
+			dsScrollTo('scale');
+			return set;
+		}, function (err) { return dsFailed(before, err); });
+	}
+	function runDemandScaleSearch() {
+		var c, minPressure, before;
+		if (dsBusy || !EngCalcs.lpnDemandScaleSearch || dsBusyElsewhere()) { return Promise.resolve(null); }
+		c = demandScaleCase('search');
+		if (!c) { return Promise.resolve(null); }
+		minPressure = ffValue(critFireFlowAsk().minPressure, 'lpn_u_pressure');
+		before = JSON.stringify(doc);
+		dsSearch = null;
+		dsBegin();
+		return EngCalcs.lpnDemandScaleSearch(c.model, {
+			solve: c.engine.solve,
+			junctions: c.ids,
+			minPressure: minPressure > 0 ? minPressure : 0,
+			shouldStop: function () { return dsStop; }
+		}).then(function (s) {
+			if (c.ids) { s.scaledCount = c.ids.length; }
+			s.time = c.time;
+			dsSearch = s;
+			dsEnd(before);
+			dsScrollTo('search');
+			return s;
+		}, function (err) { return dsFailed(before, err); });
+	}
+	// Read by the harness. Set by a run, never by a user action.
+	var dsDocGuard = true;
+	// Cleared at the moments the siblings' results are, and only then.
+	function clearDemandScaleRun(quiet) {
+		if (dsRefused) {
+			dsRefused = null;
+			if (!dsRun && !dsSearch && dsBoxIsOpen()) { rebuildDemandScaleReport(); }
+		}
+		if (!dsRun && !dsSearch) { return; }
+		dsRun = null;
+		dsSearch = null;
+		if (dsBoxIsOpen()) { rebuildDemandScaleReport(); }
+		if (!quiet) {
+			setNotice((EngCalcs.pageConfig || {}).lpn_ds_stale ||
+				'The drawing changed, so the demand scaling results were cleared. Run it again.');
+		}
+	}
+	var dsLayout = newBoxLayout();
+	function openDemandScaleBox() {
+		var box = dsBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		buildDemandScaleControls();
+		rebuildDemandScaleReport();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, dsLayout); });
+		initTipsIn(box);
+	}
+	function closeDemandScaleBox() {
+		hidePanel(dsBoxEl());
+		if (dsBusy) { dsStop = true; }
+	}
+	function wireDemandScaleBox() {
+		var box = dsBoxEl(), x = document.getElementById('lpn_ds_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeDemandScaleBox); }
+		makePanelDraggable(box, function (pos) {
+			if (smallScreen()) { return; }
+			dsLayout.left = pos.left;
+			dsLayout.top = pos.top;
+		});
+		addPanelResizeGrip(box);
 	}
 
 	// ================================================================================================
@@ -58752,6 +60524,8 @@ var EngCalcs = EngCalcs || {};
 		var out = { minPressure: undefined, minAt: '', maxVelocity: undefined, maxAt: '' };
 		model.nodes.forEach(function (n) {
 			var p = result.pressures ? result.pressures[n.id] : undefined;
+			// A reservoir or tank is a fixed head, not a place with a pressure to judge.
+			if (EngCalcs.lpnIsFixedHead(n)) { return; }
 			if (typeof p !== 'number' || !isFinite(p)) { return; }
 			if (out.minPressure === undefined || p < out.minPressure) { out.minPressure = p; out.minAt = n.id; }
 		});
@@ -59616,7 +61390,7 @@ var EngCalcs = EngCalcs || {};
 			.concat(FULL_REPORT_COLS.map(fullReportColHeading)));
 		stepRows.forEach(function (r) {
 			var tr = ffEl('tr', null, null, body);
-			ffCell(tr, r.type);
+			ffCell(tr, r.type, 'lpn-ff-fit');
 			ffCell(tr, r.id);
 			FULL_REPORT_COLS.forEach(function (c) { ffCell(tr, fullReportCellText(r, c.key)); });
 		});
@@ -60060,6 +61834,9 @@ var EngCalcs = EngCalcs || {};
 
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
+		// The demand scaling report names the time step it was computed at, and says when the clock
+		// has left it; every frame the transport shows arrives here, so this is where it re-reads.
+		demandScaleClockMoved();
 		// A solve landing here never touches the view -- see the note at the end of zoomExtent()
 		// (Tom, 2026-09-25: results arriving after a Zoom to fit leave it exactly where it was).
 		if (!result.ok) {
@@ -60435,6 +62212,8 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function scheduleArrivalSolve() {
 		clearFireFlowRun(false);
+		clearCriticalityRun(false);
+		clearDemandScaleRun(false);
 		if (solveTimer) { clearTimeout(solveTimer); }
 		solveTimer = null;
 		if (settings.autoRun === false) {
@@ -60499,6 +62278,8 @@ var EngCalcs = EngCalcs || {};
 	// file draws it, so the dependency runs one way: lpn-time.js owns the text, looped-network.js
 	// owns the boxes, and neither reaches into the other's state.
 	EngCalcs.lpnOpenRunReportBox = function () { return openRunReportBox(); };
+	// The Full report's Type column harness opens the box through this, not through the menu.
+	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };
 
 	EngCalcs.pageCalculatorInitialize = function (objForm) {};
 	EngCalcs.pageCalculator = function (objForm) {

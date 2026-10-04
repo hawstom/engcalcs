@@ -1,0 +1,319 @@
+// lpn-criticality.js -- criticality analysis: break each asset in turn and report what the system
+// loses. Computation only.
+//
+// THE QUESTION, in Tom's words, 2026-09-30, reading about WaterGEMS: *"Criticality analysis: This
+// sounds like a fun report to build. Break each asset and report."* WaterGEMS's Criticality tool
+// loops through the segments it is given, turning each off in turn. EPANET has no such tool and no
+// term for it, so the industry's name is the one used.
+//
+// **ONE ASSET OUT AT A TIME, THE SAME STATE AS UNCHECKING "PART OF THIS NETWORK".** An inactive
+// element is not in the model assembleModel() builds, so breaking a link here means the case model
+// simply does not have it. Then, for that case:
+//
+//   CUT OFF       every junction left with no path, through open links, to a reservoir or a tank.
+//                 Found by walking the graph, never by watching a solve fail: a junction with no
+//                 source is not a small pressure, it is a question with no answer.
+//   NOT SERVED    the sum of the cut-off junctions' demands at this time step.
+//   BELOW MINIMUM every junction still connected whose pressure falls below the caller's minimum
+//                 -- and that was NOT already below it with nothing broken. A junction that fails
+//                 with the whole network intact would otherwise appear on every row, which says
+//                 nothing about any one asset; the caller is told how many there were instead.
+//
+// The cut-off junctions are REMOVED from the case model before it is solved, with every link that
+// touches them. Both engines would refuse, or invent pressures for, a junction with no source; the
+// connected remainder is a well-posed network and its answer is the one the report wants.
+//
+// PURE, like js/lpn-fireflow.js: values in, values out. No DOM, no `doc`, no strings, no engine of
+// its own (options.solve is injected, because a network holding a PRV/PSV/FCV goes to EPANET
+// whatever the preference says). It never touches the caller's model: every case is a new object
+// whose node and link lists are new arrays, and nothing here writes a field on a node or a link.
+
+var EngCalcs = (typeof require === 'function' && typeof module !== 'undefined')
+	? require('./PipeHydraulics.lib.js')
+	: (EngCalcs || {});
+
+(function () {
+	'use strict';
+
+	var STATES = {
+		IMPACT: 'impact',   // something was cut off or fell below the minimum
+		NONE: 'none',       // nothing was lost
+		ERROR: 'error'      // the connected remainder did not solve
+	};
+	// The two solve codes are fire flow's own values, on purpose: one page function turns either
+	// sweep's code into words, and two spellings of "did not converge" would be two keys.
+	var CODES = {
+		OK: 'ok',
+		UNKNOWN_LINK: 'link-not-found',
+		NO_CONVERGENCE: 'solve-did-not-converge',
+		SOLVE_FAILED: 'solve-reported-issues',
+		BASELINE_FAILED: 'baseline-did-not-solve'
+	};
+
+	function isFixed(n) {
+		return EngCalcs.lpnIsFixedHead ? EngCalcs.lpnIsFixedHead(n) : (n.type === 'reservoir' || n.type === 'tank');
+	}
+
+	// Which nodes can reach a reservoir or a tank through links that are not closed. The same walk
+	// EngCalcs.lpnDiagnose makes for its 'unreachable' check, so the two agree on what "no path"
+	// means: a closed link carries nothing, and every other link carries in both directions.
+	function reachable(nodes, links) {
+		var adj = {}, seen = {}, queue = [], i, id, l;
+		for (i = 0; i < nodes.length; i++) { adj[nodes[i].id] = []; }
+		for (i = 0; i < links.length; i++) {
+			l = links[i];
+			if (l.status === 'closed' || !adj[l.from] || !adj[l.to]) { continue; }
+			adj[l.from].push(l.to);
+			adj[l.to].push(l.from);
+		}
+		for (i = 0; i < nodes.length; i++) {
+			if (isFixed(nodes[i])) { seen[nodes[i].id] = true; queue.push(nodes[i].id); }
+		}
+		while (queue.length) {
+			id = queue.shift();
+			for (i = 0; i < adj[id].length; i++) {
+				if (!seen[adj[id][i]]) { seen[adj[id][i]] = true; queue.push(adj[id][i]); }
+			}
+		}
+		return seen;
+	}
+
+	// The case model: the caller's model with `links` in place of its own, and without the nodes in
+	// `drop` or any link touching them. A rule naming a dropped element is dropped too, because
+	// EPANET rejects the whole input over one (assembleModel()'s modelRules() says so), and a rule
+	// cannot change a single-instant answer anyway.
+	function caseModel(model, links, drop) {
+		var out = {}, k;
+		for (k in model) {
+			if (Object.prototype.hasOwnProperty.call(model, k)) { out[k] = model[k]; }
+		}
+		out.nodes = model.nodes.filter(function (n) { return !drop[n.id]; });
+		out.links = links.filter(function (l) { return !drop[l.from] && !drop[l.to]; });
+		if (Array.isArray(model.rules) && model.rules.length) {
+			var gone = {};
+			model.links.forEach(function (l) { gone[l.id] = true; });
+			out.links.forEach(function (l) { delete gone[l.id]; });
+			out.rules = model.rules.filter(function (r) {
+				return !(r.nodes || []).some(function (id) { return drop[id]; }) &&
+					!(r.links || []).some(function (id) { return gone[id]; });
+			});
+		}
+		return out;
+	}
+
+	function solveOnce(solve, m) {
+		return Promise.resolve().then(function () { return solve(m); });
+	}
+	function badResult(r) {
+		if (!r || !r.ok) { return { code: CODES.SOLVE_FAILED, issues: (r && r.issues) || [] }; }
+		if (r.converged === false) { return { code: CODES.NO_CONVERGENCE, issues: [] }; }
+		return null;
+	}
+	function defaultYield() {
+		if (typeof setTimeout === 'function') {
+			return new Promise(function (resolve) { setTimeout(resolve, 0); });
+		}
+		return Promise.resolve();
+	}
+
+	/**
+	 * EngCalcs.lpnCriticalitySweep(model, options) -> Promise<resultSet>
+	 *
+	 * options:
+	 *   solve        REQUIRED function(model) -> result | Promise<result>, in lpnSolve's shape
+	 *   links        REQUIRED array of link ids to break, one at a time. THE CALLER CHOOSES THE SET.
+	 *   minPressure  metres of head; a connected junction below it is counted. 0 when omitted.
+	 *   onProgress   function({ done, total, id, result }) after every asset.
+	 *   skipDeadEnds true: a link whose removal cuts off any junction (or other node) that the intact
+	 *                network reaches is NOT solved and is not in `results`. That is a bridge with no
+	 *                source on its far side, found by the same walk the case already makes, so a
+	 *                skipped link costs no solve. The ids come back in `skippedDeadEnds`.
+	 *   shouldStop   function() -> true to stop between assets; what is done is kept.
+	 *   yield        function() -> Promise, between assets, so a long run paints and can be stopped.
+	 *
+	 * Resolves to { ok, results, byId, requested, processed, skippedDeadEnds, minPressure, baselineBelow, baselineCutOff,
+	 * solves, stopped } -- or { ok: false, code, issues } when the intact network itself did not
+	 * solve, because every row would then be measured against nothing.
+	 */
+	function sweep(model, options) {
+		var opts = options || {},
+			ids = opts.links || [],
+			minPressure = (typeof opts.minPressure === 'number' && isFinite(opts.minPressure)) ? opts.minPressure : 0,
+			yieldTo = opts.yield || defaultYield,
+			results = [],
+			solves = 0,
+			processed = 0,
+			skippedDeadEnds = [],
+			stopped = false,
+			linkById = {},
+			demandOf = {},
+			isJunction = {},
+			reach0,
+			drop0 = {},
+			baseBelow = {},
+			baseCut = 0;
+
+		if (typeof opts.solve !== 'function') {
+			throw new TypeError('lpnCriticalitySweep: options.solve must be a function(model).');
+		}
+		model.links.forEach(function (l) { linkById[l.id] = l; });
+		model.nodes.forEach(function (n) {
+			if (n.type === 'junction') {
+				isJunction[n.id] = true;
+				demandOf[n.id] = (typeof n.demand === 'number' && isFinite(n.demand)) ? n.demand : 0;
+			}
+		});
+
+		// THE INTACT NETWORK, ONCE. Its unreachable junctions are nobody's fault in this report, and
+		// its low-pressure junctions are said once above the table rather than on every row.
+		reach0 = reachable(model.nodes, model.links);
+		model.nodes.forEach(function (n) {
+			if (!reach0[n.id]) { drop0[n.id] = true; if (isJunction[n.id]) { baseCut++; } }
+		});
+
+		function belowIn(result, m) {
+			var out = [];
+			m.nodes.forEach(function (n) {
+				var p = result.pressures ? result.pressures[n.id] : undefined;
+				if (isJunction[n.id] && typeof p === 'number' && isFinite(p) && p < minPressure) {
+					out.push({ id: n.id, pressure: p });
+				}
+			});
+			return out;
+		}
+
+		function breakOne(id) {
+			var links, reach, drop = {}, cut = [], unserved = 0, m, rec;
+			rec = { id: id };
+			if (!linkById[id]) {
+				rec.state = STATES.ERROR;
+				rec.code = CODES.UNKNOWN_LINK;
+				return Promise.resolve(rec);
+			}
+			rec.type = linkById[id].type;
+			links = model.links.filter(function (l) { return l.id !== id; });
+			reach = reachable(model.nodes, links);
+			if (opts.skipDeadEnds && model.nodes.some(function (n) { return reach0[n.id] && !reach[n.id]; })) {
+				rec.skipped = true;
+				return Promise.resolve(rec);
+			}
+			model.nodes.forEach(function (n) {
+				if (reach[n.id]) { return; }
+				drop[n.id] = true;
+				if (isJunction[n.id] && reach0[n.id]) { cut.push(n.id); unserved += demandOf[n.id]; }
+			});
+			rec.cutOff = cut;
+			rec.unserved = unserved;
+			m = caseModel(model, links, drop);
+			if (!m.nodes.some(function (n) { return isJunction[n.id]; })) {
+				rec.below = [];
+				rec.state = cut.length ? STATES.IMPACT : STATES.NONE;
+				rec.code = CODES.OK;
+				return Promise.resolve(rec);
+			}
+			solves++;
+			return solveOnce(opts.solve, m).then(function (r) {
+				var bad = badResult(r);
+				if (bad) {
+					rec.state = STATES.ERROR;
+					rec.code = bad.code;
+					rec.issues = bad.issues;
+					return rec;
+				}
+				rec.below = belowIn(r, m).filter(function (b) { return !baseBelow[b.id]; });
+				rec.code = CODES.OK;
+				rec.state = (cut.length || rec.below.length) ? STATES.IMPACT : STATES.NONE;
+				return rec;
+			}, function (err) {
+				rec.state = STATES.ERROR;
+				rec.code = CODES.SOLVE_FAILED;
+				rec.issues = [];
+				rec.thrown = String(err && err.message || err);
+				return rec;
+			});
+		}
+
+		function next(k) {
+			if (k >= ids.length) { return Promise.resolve(); }
+			if (opts.shouldStop && opts.shouldStop()) { stopped = true; return Promise.resolve(); }
+			return breakOne(ids[k]).then(function (rec) {
+				processed++;
+				if (rec.skipped) { skippedDeadEnds.push(rec.id); } else { results.push(rec); }
+				if (opts.onProgress) {
+					opts.onProgress({ done: processed, total: ids.length, id: rec.id, result: rec });
+				}
+				return yieldTo().then(function () { return next(k + 1); });
+			});
+		}
+
+		var base = caseModel(model, model.links, drop0);
+		solves++;
+		return solveOnce(opts.solve, base).then(function (r) {
+			var bad = badResult(r);
+			if (bad) { return { ok: false, code: CODES.BASELINE_FAILED, cause: bad.code, issues: bad.issues }; }
+			belowIn(r, base).forEach(function (b) { baseBelow[b.id] = true; });
+			return next(0).then(function () {
+				var byId = {};
+				results.forEach(function (rec) { byId[rec.id] = rec; });
+				return {
+					ok: true,
+					results: results,
+					byId: byId,
+					requested: ids.length,
+					processed: processed,
+					skippedDeadEnds: skippedDeadEnds,
+					minPressure: minPressure,
+					baselineBelow: Object.keys(baseBelow).length,
+					baselineCutOff: baseCut,
+					solves: solves,
+					stopped: stopped
+				};
+			});
+		}, function (err) {
+			return { ok: false, code: CODES.BASELINE_FAILED, cause: CODES.SOLVE_FAILED, issues: [],
+				thrown: String(err && err.message || err) };
+		});
+	}
+
+	// HOW BAD ONE ROW IS, in fire flow's own four tiers so the two reports tint and read alike (Tom,
+	// 2026-10-02: "It's of course critical that we have consistent styles throughout the app."):
+	//   'fail'    demand left unserved -- the system failed to deliver, as a fire-flow FAIL does. This
+	//             holds even when the remainder did not solve, because the loss is known by the walk.
+	//   'design'  nothing unserved, but a junction fell below the minimum or a zero-demand junction
+	//             was cut off -- fire flow's "pushes something else out of limits".
+	//   'error'   the remainder did not solve and no demand is known lost.
+	//   'none'    nothing was lost.
+	var TIERS = ['fail', 'design', 'error', 'none'];
+	function severity(r) {
+		if (r.unserved > 0) { return 'fail'; }
+		if (r.state === STATES.ERROR) { return 'error'; }
+		if (r.state === STATES.IMPACT) { return 'design'; }
+		return 'none';
+	}
+
+	// The reading order: what the system loses most first. The tier, then demand not served, then
+	// junctions pushed below the minimum, then junctions cut off; ties keep the order they ran in.
+	function severityOrder(results) {
+		function count(a) { return a ? a.length : -1; }
+		return results.map(function (r, i) { return { r: r, i: i, t: TIERS.indexOf(severity(r)) }; }).sort(function (a, b) {
+			var da, db;
+			if (a.t !== b.t) { return a.t - b.t; }
+			da = a.r.unserved || 0; db = b.r.unserved || 0;
+			if (da !== db) { return db - da; }
+			if (count(a.r.below) !== count(b.r.below)) { return count(b.r.below) - count(a.r.below); }
+			if (count(a.r.cutOff) !== count(b.r.cutOff)) { return count(b.r.cutOff) - count(a.r.cutOff); }
+			return a.i - b.i;
+		}).map(function (x) { return x.r; });
+	}
+
+	EngCalcs.lpnCriticalitySweep = sweep;
+	EngCalcs.lpnCriticalityStates = STATES;
+	EngCalcs.lpnCriticalityCodes = CODES;
+	EngCalcs.lpnCriticalityOrder = severityOrder;
+	EngCalcs.lpnCriticalitySeverity = severity;
+	EngCalcs.lpnCriticalityReachable = reachable;
+}());
+
+if (typeof module !== 'undefined' && module.exports) {
+	module.exports = EngCalcs;
+}

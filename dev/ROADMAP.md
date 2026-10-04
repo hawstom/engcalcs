@@ -66,6 +66,15 @@ the block.
 
 ## 100 — Next.
 
+- 100|441| **Dock the non-modal boxes: dock, hide, autohide, at each box's corner.**
+  **BUILT 2026-10-04 on `feat/dock`, port 8107**, Perry clean; awaiting his browser pass. 17 boxes dock left/right, share a column, auto-hide to an edge tab; Q5's `?` on the three Analyze tools.
+  **PROMOTED TO 100 BY TOM, 2026-10-03** (*"I can see us headed toward task 441, docking of boxes.
+  Maybe we should promote it to 100, since this could be an embarrassment."*). Scope widened from
+  the Settings box to every non-modal box (Properties, Find, Settings, Energy, Compare, Report): the
+  conventional icon buttons at a box's upper right, beside its X (*"implementing the conventional
+  docking, hide, autohide, etc icon buttons at the upper right corner of non-hog (non-modal)
+  boxes right before (next to) the exit X"*). Docking left or right, and an AutoCAD-style
+  anchor-and-flyout with autohide (raised 2026-08-18). Positions are window furniture: localStorage.
 - 100|539| **Gang the neighbour labels so their leaders stop crossing.**
   **REBUILD FROM RULES, 2026-09-28:** rules reviewed (`dev/label-placement-rules.md`), bench and
   seam built, two clean-room placers done and both fail R-075; state in the handoff.
@@ -106,38 +115,6 @@ the block.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
-- 100|600| **The three EPANET plots we do not have: contour, frequency, flow balance.**
-  **PROMOTED TO 100 BY TOM, 2026-10-03** (*"Promote to 100: 600, 601, 604"*). Building on `feat/flow-balance` and `feat/contour`.
-  Tom, 2026-09-06, surveying EPANET's plot menu: *"time series, profile, contour (very cool),
-  frequency distribution ... and system flow balance."* **We already have PROFILE** (`lpn_profile_*`)
-  and time series is Task 599, so this row is the remaining three.
-  - **CONTOUR is the one he starred and is also the one with a real unknown**: it interpolates a
-    nodal value over the plane between nodes, so it needs a decision about what happens where there
-    are no nodes -- a pressure contour across a river a main crosses is drawn over nothing.
-    **Design: `dev/epanet-js-contour-contribution.md`.** Since 2026-10-01 (§2a there, Luke Butler's
-    proof of concept): contour HEAD, subtract the Terrain-RGB DEM per cell, and let pressure leave
-    the junctions' range where the terrain does. Open: pressure-zone boundaries, hard vs faded edge.
-  - **FREQUENCY SHIPPED 2026-09-30** (`feat/frequency-plot`, merged on his word). Contour and flow
-    balance remain.
-  - **SYSTEM FLOW BALANCE -- AND HIS READING OF IT IS RIGHT, but confirm it against EPANET's own
-    help before writing a word of interface.** He guessed *"produced comes from reservoirs and
-    negative demands and consumed is positive demands"*; that matches how the engine accounts for
-    it, and a tank is the third term, swinging between the two as it fills and drains. Getting the
-    definition wrong here is a number a user would believe.
-- 100|601| **Calibration files: measured field data, against the model that predicts it.**
-  **PROMOTED TO 100 BY TOM, 2026-10-03** (*"Promote to 100: 600, 601, 604"*). Building on `feat/calibration`.
-  Tom, 2026-09-06: *"EPANET allows calibration files (measured system data) and offers a Calibration
-  Report with three tabbed pages. See EPANET help. Very interesting to be aware of."*
-  - **THIS IS THE FIRST FEATURE THAT BRINGS IN DATA FROM OUTSIDE THE MODEL**, which is why it is
-    filed at 50 rather than as an afterthought to the plots: every number on this page today is
-    either typed or derived, and a calibration file is neither. It has its own format, its own
-    units question, and its own answer to what happens when a measurement names a node that is not
-    in the network.
-  - **READ EPANET'S HELP FIRST AND COPY THE REPORT'S SHAPE.** Three tabbed pages is a design that
-    has been in front of users for twenty years; we have no evidence that beats it, and CLAUDE.md's
-    default-to-EPANET rule applies to the vocabulary as much as to the layout.
-  - Depends on nothing, but it is worth far more once Task 599 exists: a measured series and a
-    computed series belong on one axis, and that axis is the time-series plot.
 - 100|604| **Read an EPANET `.PRO` profile file.**
   **PROMOTED TO 100 BY TOM, 2026-10-03** (*"Promote to 100: 600, 601, 604"*). Building on `feat/profile-file`.
   It is the only route a profile can arrive by, and it falls out of closing Task 574. **A profile is in NO `.net` and no `.inp`** -- EPANET's Graph
@@ -259,7 +236,7 @@ the block.
   it with the existing `gloss:` tag.
   **CONCEPT LAYER SHIPPED 2026-09-30** (`chore/term-concept`, `dev/term-concepts.md`): 131 glossary
   terms carry a coined `concept` id and a `definition`; a payload gives the definition as the source
-  and English as one rendering; `concept_check.php` blocks. Open: 67 definitions still empty, the four
+  and English as one rendering; `concept_check.php` blocks. All 131 definitions are filled (7d00bd86, 2026-10-02). Open: the four
   new terms (label-sym-sally, label-user-tessa, label-long-dora, hydraulic-head) untranslated.
   **RULED 2026-09-30: Head and HGL stay split.** And on the coined ids: *"we should say something like
   label-sym-sally, label-user-tessa, label-word-gus, and label-long-dora (assuming those are
@@ -273,11 +250,13 @@ the block.
   Tom, 2026-09-28, on threats to validity: *"It's all Net3. Where's the infinite map?"* A generator of
   networks at any size and density (grid, radial, branched), a fresh seed each round, plus published
   utility-scale networks. Notes: dev/paper-notes-label-placement.md.
-- 100|751| **Criticality analysis: break each asset in turn and report.**
-  Tom, 2026-09-30, on WaterGEMS's Criticality tool: *"This sounds like a fun report to build. Break
-  each asset and report."* Fire flow's sibling: scope All/Selected, each pipe out of the network on
-  a copy, report cut-off junctions, low pressures and demand not served. Building on `feat/criticality`.
+- 100|759| **One word for the map selection, another for a menu choice; tips that earn their place.**
+  Tom, 2026-10-03: a "studied, considered, carefully adopted, and audited" strategy to tell the map
+  selection set from menu choices (his leading candidate: Highlighted / Chosen), and an audit of tip
+  pollution in lpn (status strip, click-to-open, delays in master styles, tips that talk down).
+  Ida's audit: `dev/tip-and-selection-audit.md` (branch `chore/ida-tip`); decisions go to him as an interview.
 - 75|757| **Filter the Tables pane to the selection.**
+  **BUILT 2026-10-04 on `feat/table-selection`, port 8109** (Ida and Declan consulted; snapshot, three doors), Perry clean; awaiting his browser pass.
   Tom, 2026-10-03: *"it would be really nice if the tables could filter on the selection. I'm not
   sure how to work the UI unless it's part of the right-click menu."* Ask Ida and Declan where the
   switch lives before building.
@@ -292,9 +271,6 @@ the block.
     gone from hypothetical to the common case. The registration half is the valuable half: an
     `[BACKDROP] DIMENSIONS` record places the image in the model's own coordinates exactly, which
     is strictly better than the two-point scale gesture a human would otherwise perform by eye.
-- 75|441| **Settings box: docking left or right, and an AutoCAD-style anchor-and-flyout with
-  autohide.** Tom raised it 2026-08-18 without asking for it yet. Nothing in the box is designed
-  against it — one element, one placement function.
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
   kept here so they are not lost in a closed block.
@@ -378,10 +354,12 @@ the block.
   - A layer setting is MODELLING data by CLAUDE.md's project-versus-browser rule and rides in
     `serializeProject()`; it is not window furniture.
 - 75|710| **Audit the 57 raw alert and confirm dialogs.**
+  **BUILT 2026-10-04 on `feat/dialog-audit`, port 8110**: 77 sites, 39 informational ones moved to the notice line and log, 38 still block (`dev/dialog-audit.md`); Perry's three findings fixed. Open: a styled in-page modal for the 38?
   Left from the message log (Task 704, closed 2026-09-23): Ida's third item. Sort which must genuinely
   block and which are only information and belong in the log, which Tom's *"USER MUST HAVE CONTROL
   OVER MESSAGES"* argues for. Keep severity at the two colours the banner already uses.
 - 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
+  **Phase 1b inline colours MERGED 2026-10-04** (`chore/theme-inline`): js/*.js literals on tokens or allow-listed; the check refuses new ones. Left: the button base (R-202), then dark mode.
   Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
   important code discipline."* Ida's phased plan: `dev/theming-plan.md`. Phase 1 declares semantic
   colour tokens, folds the nine separate box styles onto them, and adds a check refusing a new
@@ -390,15 +368,9 @@ the block.
   - **MOD's phone-like buttons (R-202) belong inside phase 1**: one button base for menu items and
     toolbar buttons, one accent colour, previewed on a branch. Retire the menu hint (R-203) once it ships.
 - 75|739| **Say where each setting is saved: the project or this browser.**
+  **BUILT 2026-10-04 on `feat/setting-scope`, port 8112**: a quiet "Saved with the project" / "Saved in this browser" line on each Settings group; a Width entry in Manage columns; awaiting his pass.
   Tom, 2026-09-28, on learning dragged column widths live in the browser: *"Systematically disclose to users where things are stored. Autodesk does this so well that I, a user can cite by memory that variables are stored in the drawing (project), session, or user profile. Every sysvar listing includes 'Where it's stored.'"* Also *"Maybe include Width in the manage columns box with a tip glyph as a secondary discovery path"*, and a delayed tip on the column dragger (never on a phone). The inventory is `dev/cookie-storage-inventory.md`; CLAUDE.md already splits project vs browser settings.
 
-- 75|748| **Keyboard menus: arrow keys, Enter, Escape and the fly-outs.**
-  Found by Perry on `feat/help-menu`: Tab leaves an open menu for the next thing on the page and the
-  arrows do nothing, in every menu, because the one function that opens them wires only clicks.
-  Predates that branch. Tom set 75 on 2026-09-30.
-  **Tom, 2026-10-03, on `feat/keyboard-menu`:** *"this does nothing for Declan. What Declan really
-  needs are menu mnemonics like Ctrl+Shift+{letter} or as determined with Ida's advice for File,
-  Edit, Map, Water, Help, and Language"*, underlined once in keyboard mode. Building on that branch.
 - 75|749| **Read Bentley WaterCAD/WaterGEMS models.**
   Basic mode and the Alternatives table merged 2026-10-03; `feat/bentley-interop` was recut from
   master as the long-lived branch for the rest (Tom: *"a long-term branch for all the bentley-interop things"*).
@@ -418,14 +390,8 @@ the block.
   account, no upload); a Google Sheets sync is a fifth third-party service, so a `privacy.php`
   paragraph and his call. Mary, Sue and Declan's readings are under Task 721. The layout assumes
   Bentley's model (a scenario tree, alternatives beneath); ours is flat, so the tabs need rethinking.
-- 100|754| **On-the-fly demand adjustment: an analysis that scales demands on a copy.**
-  **Tom, 2026-10-01:** *"let's do it and at the same time put Fire Flow, Criticality, and Demand scaling into a Water, Analyze flyout. I guess while we are at it, we could do some cooler things like 'What demand scale can the system handle with this pressure limit?'"* The Analyze fly-out is built on `feat/criticality`.
-  Tom, 2026-09-30, on WaterGEMS's Active Demand Adjustments: *"This also sounds fun and easy to
-  provide."* Then: *"Their Criticality and 'On-the-fly' are like our 'Fire flow' analysis; they do not
-  touch the network. As such, our demand factors are similar and equivalent, but not the same UX or
-  data state."* Our per-scenario multiplier changes the data; this runs on a copy, like Fire flow.
-  Open: what it reports (a map of the adjusted run, or a table like Fire flow's).
 - 75|755| **Per-scenario calculation options: run type and duration first.**
+  **BUILT 2026-10-04 on `feat/scenario-option`, port 8111**: per-scenario Total run time and Hydraulic time step in the Alternatives preview; Perry clean; awaiting his pass.
   Tom, 2026-09-30: *"A Demand Multiplier column with the alternatives? What about other settings?"*
   Mary: WaterGEMS keeps run type, duration, steps, friction method, demand adjustments, PDD and
   tolerances in per-scenario Calculation Options; InfoWater ties a simulation-options set to each

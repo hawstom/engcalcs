@@ -1,0 +1,60 @@
+{
+    "_note": "CC proposals for stale $ec_lang_syn entries, shown beside the current text in dev/new-english-keys.md only while on equals the current English. Proposals only; nothing here is applied until Tom approves.",
+    "proposals": {
+        "lpn_ff_all": {
+            "on": "All junctions",
+            "syn": "Every junction, All the junctions | a pull-down option under Junctions to test; agrees with junctions, plural",
+            "note": "Both would fit the pull-down; the English now says junctions, plural, which the commentary already required."
+        },
+        "lpn_ff_selected": {
+            "on": "Selected junctions",
+            "syn": "Only the selected junctions, The junctions selected on the map | a pull-down option under Junctions to test; agrees with junctions, plural",
+            "note": "Each could stand in the pull-down row; the old text only repeated the English."
+        },
+        "lpn_ds_head_search_selected": {
+            "on": "What demand scale can these junctions handle?",
+            "syn": "What demand scale can these junctions carry?, How far can the demand at these junctions be scaled?",
+            "note": "The heading is now a question about a demand scale at these junctions; both rephrasings could head the same box."
+        },
+        "lpn_ds_scope_tip": {
+            "on": "All junctions, or only those selected on the map. Pressures are checked at the scaled demand.",
+            "syn": "Every junction, or just the junctions selected on the map. Pressures are checked at the scaled demand.",
+            "note": "Whole-string rephrasing of the new two-option sentence; the old text described only the selection."
+        },
+        "lpn_ds_search_note_selected": {
+            "on": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.",
+            "syn": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which every one of these junctions keeps the lowest pressure allowed.",
+            "note": "Same sentence, tokens kept; \"all these junctions\" rephrased. If fix/ds-wording deletes this key, the entry becomes a removal."
+        },
+        "lpn_help_icons": {
+            "on": "Toolbar",
+            "syn": "Toolbar legend, Toolbar icon key, Toolbar help | avoid: a keyboard key or shortcut",
+            "note": "The English dropped the word key; each could stand in the menu row."
+        },
+        "lpn_labels_col_before": {
+            "on": "Bef.",
+            "syn": "Bef. (Before, Prefix, Leading text) | layout: column heading; avoid: before in the sense of earlier in time",
+            "note": "The English is now the short heading; the full words are the alternates."
+        },
+        "lpn_labels_col_after": {
+            "on": "Aft.",
+            "syn": "Aft. (After, Suffix, Trailing text) | layout: column heading; avoid: after in the sense of later in time",
+            "note": "The English is now the short heading; the full words are the alternates."
+        },
+        "lpn_lock_break": {
+            "on": "Break lock",
+            "syn": "Break lock, Unlock the file, Take over the file, Override their claim | layout: button",
+            "note": "Dropped the options that only made sense with the old English \"Break their lock\"."
+        },
+        "lpn_settings_map_display": {
+            "on": "Appearance",
+            "syn": "Appearance, Look, Style, How the map is drawn",
+            "note": "The old text was a description; each of these could be the heading."
+        },
+        "mtc_note_1": {
+            "on": "<dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.</dd><dt>Basic calculator (no iteration)</dt><dd>Enter your desired roughness value. Ignore the design rock size input area.</dd></dl>",
+            "syn": " | avoid: compressing \"Blodgett–Bathurst\" to an initialism like \"BB\" — recurred independently across 8+ languages (it/ru/bg/es/uk/sr/hr/cs/tr/ps/my, corrected 2026-07-08) since nothing else in this string defines what the initials stand for; spell the full name out in every language, matching mtc_blodgett_v_bathurst",
+            "note": "No change proposed: the note is about the initialism, not the reworded step 2, and still holds."
+        }
+    }
+}

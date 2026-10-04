@@ -1,0 +1,610 @@
+{
+ "sprint": "1003-wave0",
+ "description": "Adversarial Wave 0 on 54 new-and-changed lpn_ keys (calibration report, graphs and reports menu tips, EPS status events, copy-kept notice, menu hotkeys). Each key checked against its call site. No English or $ec_lang_syn changed.",
+ "entries": [
+  {
+   "key": "lpn_copy_kept_link",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'moved to a new place' leaves the subject open, and 'this file' in the second sentence has no clear referent",
+   "readings": [
+    "the file on disk was moved, so this tab is the original opened at its new location and Save overwrites it",
+    "the project was moved into a new place (tab, folder) and Save writes to a different file than before"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Kept as written: Tom ruled 'OK.' on this exact text in dev/new-english-keys.md, 2026-10-03; the proposed rewording is withdrawn.",
+   "human_answer": "OK.",
+   "human_answered": "2026-10-03"
+  },
+  {
+   "key": "lpn_calib_network",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "Row heading in the statistics table whose other rows are location IDs; 'Network' reads as the object (the pipe network) rather than the pooled row",
+   "readings": [
+    "the row of statistics pooled over all locations",
+    "the network as a drawing/object, e.g. a statistic about the network itself"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Kept: 'Network' is EPANET's own word for the pooled row (Tom: OK, 2026-10-03).",
+   "human_answer": "OK.",
+   "human_answered": "2026-10-03"
+  },
+  {
+   "key": "lpn_graphs_menu_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "The tip only repeats the label and lists the items; it explains nothing. Capitalization is inconsistent ('Time Series' vs 'Frequency distribution'). Reading of the colon: 'Graphs' as the heading of the list, or 'Graphs' as a graph type",
+   "readings": [
+    "a list of the three graph kinds this menu opens",
+    "a statement that Graphs: is one of the graph types, with Profile ... as its subtypes"
+   ],
+   "disposition": "english",
+   "resolution": "English changed to 'Plot a profile along a path, a time series at one element, or the frequency distribution of results.' (Tom: OK, 2026-10-03).",
+   "human_answer": "OK.",
+   "human_answered": "2026-10-03"
+  },
+  {
+   "key": "lpn_hotkeys_menu_heading",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "one word",
+   "readings": [
+    "menus (the menu bar)"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Single reading: heading of the keyboard-shortcuts section on the Menus topic, see Looped-Network.php line 1847."
+  },
+  {
+   "key": "lpn_hotkeys_menu_term",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "keyboard shortcuts that operate menus"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Only one reading; the definition table that follows is explicit."
+  },
+  {
+   "key": "lpn_hotkeys_menu_def",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'a row's letter' could be unclear",
+   "readings": [
+    "a row in the open menu, identified by its underlined letter"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The sentence says the letters show while the keyboard is used; one reading."
+  },
+  {
+   "key": "lpn_graphs_menu",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "single word",
+   "readings": [
+    "graphs menu"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Menu bar entry; its icon is the profile; one reading."
+  },
+  {
+   "key": "lpn_alt_title",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Alternatives' and 'preview' could be generic",
+   "readings": [
+    "the Alternatives preview table in the scenario menu"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The call site (scenario menu row and dialog title) and the scenario_basic tip name it as a table that shows scenario values grouped by category; one reading survives, and 'preview' is the feature-preview sense stated by the tip."
+  },
+  {
+   "key": "lpn_reports_menu_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "long list",
+   "readings": [
+    "list of the reports in the menu; the last two appear after an extended period simulation"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The comma list is parsed by the 'after an extended period simulation' clause; no second reading."
+  },
+  {
+   "key": "lpn_status_opened",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'now open' could be read as an opened file",
+   "readings": [
+    "link (pipe, valve, pump) status changed to open"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Rendered in the extended period simulation status report (js line 58824) beside lpn_status_closed with {type} a pipe or valve noun; one reading."
+  },
+  {
+   "key": "lpn_status_emptying",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'emptying' could be an action done by someone",
+   "readings": [
+    "tank level is now falling"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Rendered only for tanks beside lpn_status_filling; one reading."
+  },
+  {
+   "key": "lpn_status_full",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "tank reached its maximum level"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Tank event beside emptying; one reading."
+  },
+  {
+   "key": "lpn_status_dry",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "key says dry, value says empty",
+   "readings": [
+    "tank reached its minimum level"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Tank event; value 'empty' is deliberate and the minimum-level meaning is clear beside the others."
+  },
+  {
+   "key": "lpn_reports_calib",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Calibration' could be instrument calibration",
+   "readings": [
+    "calibration of the model against measured field data"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Menu entry; its tip and the report title say compare measured field data with the last run; EPANET's own term."
+  },
+  {
+   "key": "lpn_reports_calib_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "compare measured data with the run"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_title",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "title of the calibration report"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_param",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Parameter' could be a model parameter such as roughness",
+   "readings": [
+    "the measured quantity (pressure, flow, ...) selected for the calibration file"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Call site is a select of measured quantities and the tip says 'The quantity the calibration file measures'; also EPANET's Calibration Report term."
+  },
+  {
+   "key": "lpn_calib_param_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "one file per measured quantity"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_load",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "open a file chooser"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Standard command with ellipsis; one reading."
+  },
+  {
+   "key": "lpn_calib_load_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "format description is dense",
+   "readings": [
+    "format of the file"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Each sentence has one reading; 'above it' means the preceding line's location."
+  },
+  {
+   "key": "lpn_calib_none",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "no file for this quantity"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_session",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'held' and 'not saved on this device'",
+   "readings": [
+    "file is kept in memory only and is not persisted"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading; stated as a privacy statement."
+  },
+  {
+   "key": "lpn_calib_file",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "summary of the loaded file"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_units",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "numbers are interpreted in the project units"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading; {unit} is the unit."
+  },
+  {
+   "key": "lpn_calib_missing",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "IDs in the file that are not in the network"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_missing_count",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "count of skipped measurements"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_bad_lines",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'could not be read, skipped' elliptical",
+   "readings": [
+    "unreadable lines, which were skipped"
+   ],
+   "disposition": "dismissed",
+   "resolution": "The only reading is that unreadable lines were skipped."
+  },
+  {
+   "key": "lpn_calib_outside",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "measurement times outside the reported run times"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_no_value",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "no computed value at that time"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_single",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'whatever time the file gives' elliptical",
+   "readings": [
+    "with a one-period run every measurement is paired with the single result regardless of time"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading at the call site (note shown for a single-period run)."
+  },
+  {
+   "key": "lpn_calib_needs_run",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "run Calculate first"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_no_pairs",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "no comparable measurements"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_tab_stats",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "statistics tab"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_tab_corr",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "correlation plot tab"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_tab_means",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Mean' could be an adjective",
+   "readings": [
+    "comparison of the mean values"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Sits beside Correlation plot and Observed mean columns; EPANET's own tab name, one reading."
+  },
+  {
+   "key": "lpn_calib_col_location",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "ID of the node or link measured"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_col_n",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Num obs' is terse",
+   "readings": [
+    "number of observations"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Column heading kept narrow on purpose (width is king) and its tip expands it."
+  },
+  {
+   "key": "lpn_calib_col_n_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "count of compared measurements"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_col_obs_mean",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "mean of observed values"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_col_sim_mean",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "mean of computed values"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading; the key's 'sim' is not shown."
+  },
+  {
+   "key": "lpn_calib_col_mean_err",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "could mean signed bias",
+   "readings": [
+    "mean of absolute differences",
+    "mean of signed differences"
+   ],
+   "disposition": "dismissed",
+   "resolution": "EPANET's own heading, and its tip says the mean of absolute differences; the tip is the disambiguation."
+  },
+  {
+   "key": "lpn_calib_col_mean_err_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "mean absolute error"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_col_rms_err",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "root mean square error"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Standard abbreviation, tip expands it."
+  },
+  {
+   "key": "lpn_calib_col_rms_err_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "restates label",
+   "readings": [
+    "definition of RMS error"
+   ],
+   "disposition": "dismissed",
+   "resolution": "It expands the abbreviation and gives the formula; this is the tip's job."
+  },
+  {
+   "key": "lpn_calib_corr_means",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "correlation coefficient of means"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_corr_none",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "not computable"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_axis_obs",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "axis title, {q} is the quantity"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_axis_sim",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "axis title"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_observed",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "measured"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_computed",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "model result"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_point",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "hover text for a point"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_corr_note",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'diagonal line' unspecified",
+   "readings": [
+    "the 1:1 line"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Only one diagonal appears in the plot."
+  },
+  {
+   "key": "lpn_calib_ts_point",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "none",
+   "readings": [
+    "hover text for a measured point"
+   ],
+   "disposition": "dismissed",
+   "resolution": "One reading."
+  },
+  {
+   "key": "lpn_calib_ts_note",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "'Rings' could be jewelry or a ring shape",
+   "readings": [
+    "hollow circle markers on the time-series graph"
+   ],
+   "disposition": "dismissed",
+   "resolution": "Appended under a graph that draws hollow circle markers; one reading."
+  }
+ ]
+}

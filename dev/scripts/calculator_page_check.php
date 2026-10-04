@@ -37,8 +37,7 @@
  * `*_main_menu` convention and name their menu entry `<prefix>_menu`. They are listed by exact
  * prefix below, so a NEW calculator cannot quietly join them — renaming the three would touch 27
  * language files to buy nothing, and pretending both spellings are equally correct would let the
- * convention decay. `irr` is not here and is not a calculator: it owns no keys at all and survives
- * only in `translation_coverage.json`, probably as a legacy alias of `ip`.
+ * convention decay.
  *
  * Usage:
  *   php dev/scripts/calculator_page_check.php

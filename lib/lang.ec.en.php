@@ -540,7 +540,7 @@ $ec_lang['contact_main_menu']='Contact';
 $ec_lang['about_main_title']='About HawsEDC Engineering Calculators';
 $ec_lang['about_main_desc']='Mission, Libre Software, and Contributing';
 // Edited by TGH 2026-09-07
-$ec_lang['about_body_html']='<h3>Mission</h3><p>HawsEDC Engineering Calculators have been offered freely online since 2010. They exist to serve engineers and field workers around the world — especially those working in water-scarce, low-resource, or underserved regions. These tools are part of a broader humanitarian mission: to tell every human being in the most practical and effective way possible that they are loved and cherished forever, that they have nothing to fear, and that they are not going to ruin everything.</p><p>The calculators are the vehicle. The destination is a world free of suffering.</p><h3>Free Libre Open Source License</h3><p>All code is released under the <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 or later</a> — free as in freedom. You may use, study, modify, and redistribute the code under the same terms.</p><p>The website that serves it is offered freely today and since 2010; if one day it cannot be, the software is still yours to run.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Source Code</h3><p>The full source code is publicly available on GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>You can browse the code, file issues, or fork the repository there.</p><h3>Contributing</h3><p>All help is welcome. <a href="contact.php">Contact Tom Haws</a>.</p><ul><li><strong>Translations:</strong> Suggest better wording. Improve or add a language.</li><li><strong>Bug reports:</strong> Use the feedback form on any calculator page, or file an issue on GitHub.</li><li><strong>New calculators:</strong> Ideas for hydraulic engineering tools that serve field workers and irrigation practitioners are especially welcome.</li><li><strong>Hosting:</strong> If you can mirror these calculators for a region with limited connectivity, please contact me.</li></ul><h3>Offline Use</h3><p>Open any calculator once while you are online and all of them keep working when you are not: your browser stores the whole suite as you go. The mechanism is a <strong>Progressive Web App (PWA)</strong>, if you want to read about it. After that, all calculators work offline — no internet required.</p><p>On Android or iOS, use your browser’s "Add to Home Screen" option to install EngCalcs as an app on your device. On desktop, look for the install icon in your browser’s address bar.</p><p>You can also save any individual calculator using your browser’s "Save as…" menu for one-off offline use.</p><h3>Contact</h3><p>Tom Haws, hydraulic engineer and founder of these calculators.<br />Use the feedback form on any calculator page, or reach the source code at <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
+$ec_lang['about_body_html']='<h3>Mission</h3><p>HawsEDC Engineering Calculators have been offered freely online since 2010. They exist to serve engineers and field workers around the world — especially those working in water-scarce, low-resource, or underserved regions. These tools are part of a broader humanitarian mission: to tell every human being in the most practical and effective way possible <a target="_blank" href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html">that they are loved and cherished forever, that they have nothing to fear, and that they are not going to ruin everything</a>.</p><p>The calculators are the vehicle. The destination is a world free of suffering.</p><h3>Free Libre Open Source License</h3><p>All code is released under the <a target="_blank" href="https://www.gnu.org/licenses/gpl-3.0.html">GNU General Public License v3.0 or later</a> — free as in freedom. You may use, study, modify, and redistribute the code under the same terms.</p><p>The website that serves it is offered freely today and since 2010; if one day it cannot be, the software is still yours to run.</p><p>Copyright © 2009–2026 Thomas Gail Haws.</p><h3>Source Code</h3><p>The full source code is publicly available on GitHub:</p><p><a target="_blank" href="https://github.com/hawstom/engcalcs">github.com/hawstom/engcalcs</a></p><p>You can browse the code, file issues, or fork the repository there.</p><h3>Contributing</h3><p>All help is welcome. <a href="contact.php">Contact Tom Haws</a>.</p><ul><li><strong>Translations:</strong> Suggest better wording. Improve or add a language.</li><li><strong>Bug reports:</strong> Use the feedback form on any calculator page, or file an issue on GitHub.</li><li><strong>New calculators:</strong> Ideas for hydraulic engineering tools that serve field workers and irrigation practitioners are especially welcome.</li><li><strong>Hosting:</strong> If you can mirror these calculators for a region with limited connectivity, please contact me.</li></ul><h3>Offline Use</h3><p>Open any calculator once while you are online and all of them keep working when you are not: your browser stores the whole suite as you go. The mechanism is a <strong>Progressive Web App (PWA)</strong>, if you want to read about it. After that, all calculators work offline — no internet required.</p><p>On Android or iOS, use your browser’s "Add to Home Screen" option to install EngCalcs as an app on your device. On desktop, look for the install icon in your browser’s address bar.</p><p>You can also save any individual calculator using your browser’s "Save as…" menu for one-off offline use.</p><h3>Contact</h3><p>Tom Haws, hydraulic engineer and founder of these calculators.<br />Use the feedback form on any calculator page, or reach the source code at <a target="_blank" href="https://github.com/hawstom/engcalcs">GitHub</a>.</p>';
 $ec_lang['contactSendMessage']='Send Tom Haws a message';
 $ec_lang['contactYourName']='Your name:';
 $ec_lang['contactYourEmail']='Your e-mail address:';
@@ -1728,7 +1728,7 @@ $ec_lang['lpn_replace_scope']='Choose one kind of asset above to change values o
 // language that puts the unit somewhere else can.
 $ec_lang['lpn_profile_menu']='Profile';
 $ec_lang['lpn_graphs_menu']='Graphs';
-$ec_lang['lpn_graphs_menu_tip']='Graphs: Profile, Time Series, and Frequency distribution';
+$ec_lang['lpn_graphs_menu_tip']='Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.';
 // **THE SYNONYMS ARE IN THE SYNONYM CHANNEL, WHICH IS WHERE THEY WERE ALWAYS MEANT TO BE.** They
 // shipped as `lpn_profile_tip_syn` / `lpn_profile_title_syn` -- ordinary $ec_lang keys with no call
 // site, which nothing rendered and which a sprint would have translated into 26 languages for
@@ -1811,12 +1811,12 @@ $ec_lang['lpn_result_pump_head_tip']='The head the pump adds from suction to dis
 // pump's column there says whose head it is. Elsewhere the pump's own row or tab says so, and lpn_result_pump_head is enough.
 $ec_lang['lpn_report_pump_head']='Pump head';
 $ec_lang['lpn_ts_add']='Add selected';
-$ec_lang['lpn_ts_add_tip']='Put everything now chosen on the map onto the graph.';
+$ec_lang['lpn_ts_add_tip']='Put everything now selected on the map onto the graph.';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
-$ec_lang['lpn_ts_add_none']='Nothing of that kind is chosen on the map.';
+$ec_lang['lpn_ts_add_none']='Nothing of that kind is selected on the map.';
 $ec_lang['lpn_ts_clear']='Remove all';
 $ec_lang['lpn_ts_chip_tip']='Take {id} off the graph';
-$ec_lang['lpn_ts_none']='Nothing to graph yet. Choose assets on the map and press Add selected.';
+$ec_lang['lpn_ts_none']='Nothing to graph yet. Select assets on the map and press Add selected.';
 // The run belongs to EPANET alone, so this is also what a page whose engine is unreachable lands
 // on; the status bar says why in that case, and lpn_time_no_period covers the project that has set
 // no run time at all.
@@ -1836,6 +1836,47 @@ $ec_lang['lpn_freq_none']='No results for this value yet, so there is nothing to
 $ec_lang['lpn_freq_summary']='Plotted: {n} of {total}';
 $ec_lang['lpn_freq_summary_time']='Plotted: {n} of {total}, at {time}';
 $ec_lang['lpn_freq_axis_percent']='Percent less than';
+// EPANET's Contour Plot (Task 600), drawn as a layer under the map rather than in a window of its
+// own, from the pipes outward. {n} and {p} are counts, {k} and {i} numbers, {u} a unit symbol, {m} a
+// distance in metres; all substituted. lpn_contour_buffer_unit follows the Buffer number box.
+// lpn_contour_consent_1..4 are the terrain question's four paragraphs, reworded for what the contour
+// plot sends: tile numbers for the network's area, not each node's latitude and longitude.
+$ec_lang['lpn_contour_menu']='Contour';
+$ec_lang['lpn_contour_tip']='Show a contour plot on the map: the node colors spread along and beside the pipes, with labeled contour lines. Opens a box to tune it or turn it off.';
+$ec_lang['lpn_contour_plot']='Contour plot';
+$ec_lang['lpn_contour_fill']='Fill';
+$ec_lang['lpn_contour_fill_tip']='Smooth blends the colors from one class to the next. Bands paints each class of the color key flat.';
+$ec_lang['lpn_contour_fill_smooth']='Smooth';
+$ec_lang['lpn_contour_fill_bands']='Bands';
+$ec_lang['lpn_contour_opacity']='Fill opacity';
+$ec_lang['lpn_contour_lines']='Contour lines';
+$ec_lang['lpn_contour_interval']='Interval';
+$ec_lang['lpn_contour_buffer']='Buffer';
+$ec_lang['lpn_contour_buffer_unit']='× median pipe length';
+$ec_lang['lpn_contour_buffer_tip']='How far the color reaches from each pipe, as a multiple of the median pipe length. It fades out over the outer part.';
+$ec_lang['lpn_contour_few']='Too few nodes to contour.';
+$ec_lang['lpn_contour_support']='Contour plot: {n} nodes, interpolated along {p} pipes and up to {k} times the median pipe length beside them. No color across pumps, valves, or closed links.';
+$ec_lang['lpn_contour_support_lines']='Contour lines every {i} {u}.';
+$ec_lang['lpn_contour_too_many']='Too many contour lines at this interval; widen it to draw them.';
+$ec_lang['lpn_contour_dem']='Ground between nodes from Mapbox DEM';
+$ec_lang['lpn_contour_dem_tip']='Between nodes, pressure becomes the interpolated head minus the height of the ground from Mapbox DEM, so it can fall below the lowest node pressure on a hill the network has no node on. Treat the ground as a contour map, not a survey.';
+$ec_lang['lpn_contour_support_dem']='Between nodes, pressure is the interpolated head minus the ground elevation from Mapbox DEM, sampled about every {m} m.';
+$ec_lang['lpn_contour_dem_failed']='The ground could not be read from Mapbox DEM, so pressure is interpolated between nodes alone.';
+$ec_lang['lpn_contour_consent_1']='Drawing pressure over the ground sends the area your network covers, as Mapbox map tile numbers, to api.mapbox.com, to read the height of the ground there.';
+$ec_lang['lpn_contour_consent_2']='This is a different question from the map pictures behind your project. The pictures only say where you are looking. These tiles say where your network is. Mapbox will receive those tile numbers and your IP address. We send nothing else: no name, no pipes, no project. We keep no record of it, and nothing is stored on this device except your answer to this question.';
+$ec_lang['lpn_contour_consent_3']='May we send the tile numbers of your network\'s area to Mapbox?';
+$ec_lang['lpn_contour_consent_4']='If you say no, everything else on this page keeps working exactly as it does now, and the contour plot is drawn between nodes alone. We remember a yes so that we need not ask again. A no is not stored at all.';
+// EPANET's System Flow plot (Task 600). "System flow" is its Graph Selection name, "System flow
+// balance" its window title, "Produced" and "Consumed" its series. The definition is its own code
+// (Fgraph.pas GetSysFlow): junction and reservoir demands only, split by sign; tanks in neither.
+// The axis reuses lpn_result_flow and lpn_ts_axis_time.
+$ec_lang['lpn_sysflow_menu']='Flow balance';
+$ec_lang['lpn_sysflow_tip']='Graph the total flow produced and the total flow consumed against time, across the extended period simulation. Tanks are in neither total, so where the two lines part, the tanks are filling or draining.';
+$ec_lang['lpn_sysflow_title']='Flow balance';
+$ec_lang['lpn_sysflow_produced']='Produced';
+$ec_lang['lpn_sysflow_produced_tip']='Total flow into the network from reservoirs and from negative demands.';
+$ec_lang['lpn_sysflow_consumed']='Consumed';
+$ec_lang['lpn_sysflow_consumed_tip']='Total of every positive demand: water drawn from the network at junctions, and any flow into a reservoir.';
 $ec_lang['lpn_view_units']='Units';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Save all';
@@ -1861,7 +1902,7 @@ $ec_lang['lpn_new_title']='New project';
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
 // its five siblings) are gone; Tom called the last of them obsolete on 2026-09-16.
 $ec_lang['lpn_new_coordsys']='Coordinate system';
-$ec_lang['lpn_new_coordsys_tip']='Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Convert as…”, and it is approximate.';
+$ec_lang['lpn_new_coordsys_tip']='Choose the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Convert as…”, and it is approximate.';
 // **DELETED 2026-09-25: lpn_new_coordsys_geo / lpn_new_coordsys_geo_tip.** Don't expose the word
 // "projection" (dev/session-handoff.md RULINGS); once reworded, both were the identical string
 // lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
@@ -1888,8 +1929,7 @@ $ec_lang['lpn_crs_place_tip']='Type a town, an address, or a landmark, and the m
 $ec_lang['lpn_crs_search']='Search';
 $ec_lang['lpn_crs_name']='Coordinate system name filter';
 $ec_lang['lpn_crs_name_tip']='Shows only the coordinate systems whose name or EPSG code contains what you type.';
-$ec_lang['lpn_crs_list_tip']='The coordinate systems left by the two filters above. Choose one and press Select.';
-$ec_lang['lpn_crs_choose']='Select';
+$ec_lang['lpn_crs_list_tip']='The coordinate systems left by the two filters above. Choose one, then press OK.';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.';
 $ec_lang['lpn_crs_count']='{n} of {total} coordinate systems listed.';
@@ -2312,7 +2352,7 @@ $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the he
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
 $ec_lang['lpn_notes_4_term']='Also on this page';
-$ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find picks out every asset that matches a condition you set.';
+$ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.';
 $ec_lang['lpn_notes_6_term']='Table columns help';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one
@@ -3854,8 +3894,14 @@ $ec_lang_syn['lpn_labels_priority_node_tip']='more like neighboring nodes = nume
 $ec_lang_syn['lpn_find_op_gt']='greater than, more than, exceeding | avoid: spatially above, higher on the map';
 $ec_lang_syn['lpn_find_op_lt']='less than | avoid: spatially below, lower on the map';
 // Tom, 2026-09-30, ruling sprint 2026-09-30-golf item 1: _syn = "All junctions" / "Selected junctions".
-$ec_lang_syn['lpn_ff_all']='All junctions | a pull-down option under Junctions to test; agrees with junctions, plural. The Design check pull-down reuses it, where it means all pipes and other junctions';
-$ec_lang_syn['lpn_ff_selected']='Selected junctions | a pull-down option under Junctions to test; agrees with junctions, plural. The Design check pull-down reuses it, where it means the selected pipes and junctions';
+$ec_lang_syn['lpn_ff_all']='All junctions | a pull-down option under Junctions to test; agrees with junctions, plural';
+$ec_lang_syn['lpn_ff_selected']='Selected junctions | a pull-down option under Junctions to test; agrees with junctions, plural';
+$ec_lang_syn['lpn_ds_head_search_selected']='What demand can the junctions you choose handle';
+$ec_lang_syn['lpn_ds_scope_tip']='Scale the demand at the junctions that you choose. Pressures are checked at the scaled demand.';
+$ec_lang_syn['lpn_ds_search_note_selected']='Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the junctions that you choose keep the given lowest pressure allowed.';
+$ec_lang_syn['lpn_ff_design_off']='No design check | a pull-down option under Design check (effect on system); avoid: switched off, power off';
+$ec_lang_syn['lpn_ff_design_all']='All other junctions and all pipes | a pull-down option under Design check (effect on system); agrees with pipes and junctions together, plural';
+$ec_lang_syn['lpn_ff_design_selected']='The selected junctions and their pipes | a pull-down option under Design check (effect on system); agrees with pipes and junctions together, plural';
 $ec_lang['lpn_fitting_exit']='Exit';
 // THE ONE ROW THAT IS NOT THE MANUAL\'S: a fitting the table does not carry, whose coefficient the
 // user states. Without it the picker would quietly refuse every fitting nobody could source.
@@ -4029,16 +4075,18 @@ $ec_lang['lpn_terrain_ids_more']='{ids}, and {n} more';
 // {flow} and {velocity} are quantities with their units, {pressure} a pressure with its unit,
 // {id} a junction or pipe name, and {done}, {total}, {n}, {pass}, {fail}, {design} and {solves}
 // are whole numbers. Every one is substituted, never concatenated.
+$ec_lang['lpn_analyze_menu']='Analyze';
+$ec_lang['lpn_analyze_menu_tip']='Analyses that run the network on a copy: fire flow at each junction, the loss of each pipe, pump, and valve, and the demands scaled up or down.';
 $ec_lang['lpn_ff_menu']='Fire flow analysis…';
 $ec_lang['lpn_ff_menu_tip']='Test junctions one at a time: how much can each deliver while still holding the residual pressure you set, and does drawing the required flow there push anything else out of limits?';
 $ec_lang['lpn_ff_title']='Fire flow analysis';
 $ec_lang['lpn_ff_intro']='Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.';
 $ec_lang['lpn_ff_scope']='Junctions to test';
 $ec_lang['lpn_ff_scope_tip']='Choose the set before you run. Testing every junction in a large system can take minutes.';
-$ec_lang['lpn_ff_all']='All';
-$ec_lang['lpn_ff_selected']='Selected';
+$ec_lang['lpn_ff_all']='All junctions';
+$ec_lang['lpn_ff_selected']='Selected junctions';
 $ec_lang['lpn_ff_no_junctions']='This project has no junctions yet, so there is nothing to test.';
-$ec_lang['lpn_ff_no_selection']='No junctions are selected. Select junctions or select the All option.';
+$ec_lang['lpn_ff_no_selection']='No junctions are selected. Select junctions or choose All junctions.';
 $ec_lang['lpn_ff_skipped']='{n} selected elements are not junctions, so they were not tested.';
 $ec_lang['lpn_ff_required']='Required fire flow';
 $ec_lang['lpn_ff_required_tip']='The flow your fire code or your fire authority requires at a hydrant. Each junction is tested against this number unless it carries a required fire flow of its own.';
@@ -4048,7 +4096,10 @@ $ec_lang['lpn_ff_residual']='Residual pressure to hold';
 $ec_lang['lpn_ff_residual_tip']='The pressure the junction must still hold while delivering the fire flow. AWWA M31 and NFPA 291 use 20 psi (140 kPa).';
 $ec_lang['lpn_ff_design']='Design check (effect on system)';
 $ec_lang['lpn_ff_design_tip']='A separate question from whether the junction can deliver the flow: with that flow drawn there, does anything else fall below its minimum pressure or exceed its velocity limit? Choosing to check it costs no extra calculation.';
-$ec_lang['lpn_ff_design_no_selection']='The design check scope is set to Selected, but no assets are selected. Select assets or select the All option.';
+$ec_lang['lpn_ff_design_off']='None';
+$ec_lang['lpn_ff_design_all']='All';
+$ec_lang['lpn_ff_design_selected']='Selected';
+$ec_lang['lpn_ff_design_no_selection']='The design check scope is set to Selected, but no assets are selected. Select assets on the map or choose All.';
 $ec_lang['lpn_ff_minpressure']='Lowest pressure allowed elsewhere';
 $ec_lang['lpn_ff_minpressure_tip']='A junction that falls below this while another one is drawing its fire flow is reported as a design issue.';
 $ec_lang['lpn_ff_maxvelocity']='Highest velocity allowed';
@@ -4145,8 +4196,9 @@ $ec_lang['lpn_ff_more']='and {n} more affected';
 // Split from `lpn_ff_more` 2026-09-02 (Task 573 Wave 0). One string counted affected assets in
 // the Worst effect cell and undisplayed junctions under the table; a gendered language must
 // agree with one noun and would have been wrong at the other call site.
-$ec_lang['lpn_ff_rows_more']='{n} more junctions are not shown.';
-$ec_lang['lpn_ff_design_none']='Nothing in the chosen set went outside its limits while any junction drew its fire flow.';
+$ec_lang['lpn_ff_rows_more']='Junctions not shown: {n}.';
+$ec_lang['lpn_ff_rows_more_links']='Links not shown: {n}.';
+$ec_lang['lpn_ff_design_none']='Nothing in the scope you chose went outside its limits while any junction drew its fire flow.';
 $ec_lang['lpn_ff_design_off_note']='The effect on the rest of the system was not checked in this run.';
 // **WHY IT IS SAID AND NEVER APPLIED, in Tom's words (2026-09-02), and the reason is the MODEL, not
 // the arithmetic:** *"These models are not always fine-grained. They don't represent every pipe,
@@ -4171,6 +4223,95 @@ $ec_lang['lpn_ff_err_converge']='The network did not converge.';
 $ec_lang['lpn_ff_err_solve']='The solver reported an error and gave no answer.';
 $ec_lang['lpn_ff_err_not_junction']='Not a junction';
 $ec_lang['lpn_ff_err_unknown']='No answer. The code reported was {code}.';
+
+// ---- Water > Criticality analysis (Tom, 2026-09-30) -------------------------------------------
+//
+// Break each asset in turn, on a copy, and report what the system loses. "Criticality analysis" is
+// the industry's term (WaterGEMS, InfoWater); EPANET has no such tool and no word for it. The run
+// dialog, Run, Stop, the engine sentence and the cost line are fire flow's own keys.
+//
+// {n}, {done} and {total} are whole numbers; {pressure} is a pressure with its unit.
+$ec_lang['lpn_crit_menu']='Criticality analysis…';
+$ec_lang['lpn_crit_menu_tip']='Take each pipe, pump, and valve out of the network in turn and see what the system loses.';
+$ec_lang['lpn_crit_title']='Criticality analysis';
+$ec_lang['lpn_crit_intro']='Each asset is taken out of the network in turn, and the network is solved at the time step on screen in the active scenario. Nothing in your project is changed; the whole run is made on a copy.';
+$ec_lang['lpn_crit_scope']='Links to break';
+$ec_lang['lpn_crit_scope_tip']='All pipes, pumps, and valves, or only those selected on the map. Choose the set before you run.';
+$ec_lang['lpn_crit_scope_all']='All links';
+$ec_lang['lpn_crit_scope_selected']='Selected links';
+$ec_lang['lpn_crit_minpressure']='Lowest pressure allowed';
+$ec_lang['lpn_crit_minpressure_tip']='This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.';
+$ec_lang['lpn_crit_col_asset']='Asset';
+$ec_lang['lpn_crit_col_unserved']='Demand not served';
+$ec_lang['lpn_crit_col_cutoff']='Junctions cut off';
+$ec_lang['lpn_crit_col_below']='Junctions below minimum';
+$ec_lang['lpn_crit_summary']='{n} of {total} assets leave demand unserved or drop a junction below {pressure}.';
+$ec_lang['lpn_crit_baseline_below']='Junctions already below it with nothing broken: {n}. They are not counted.';
+$ec_lang['lpn_crit_working']='Working: {done} of {total} assets.';
+$ec_lang['lpn_crit_stopped']='Stopped after {done} of {total} assets. The results below are the ones already finished.';
+$ec_lang['lpn_crit_no_selection']='No links are selected. Select links or choose All links.';
+$ec_lang['lpn_crit_no_links']='This project has no links yet, so there is nothing to break.';
+$ec_lang['lpn_crit_busy']='Another analysis is running. Stop it, or wait for it to finish.';
+$ec_lang['lpn_crit_skipped']='{n} selected elements are not links, so they were not broken.';
+$ec_lang['lpn_crit_stale']='The drawing changed, so the criticality results were cleared. Run it again.';
+$ec_lang['lpn_crit_skipdead']='Skip dead ends';
+$ec_lang['lpn_crit_skipdead_tip']='A dead-end link is one whose removal cuts off junctions that can be reached only through it, with no reservoir or tank beyond. Its loss is everything beyond it, so it is not solved. The summary says how many were skipped.';
+$ec_lang['lpn_crit_skipped_dead']='Dead-end links skipped: {n}. Each one cuts off everything beyond it.';
+
+// ---- Water > Analyze > Demand scaling (ROADMAP Task 754) ----------------------------------------
+//
+// Tom, 2026-09-30 and 2026-10-01: the demands multiplied on a copy, like Fire flow, and "What demand
+// scale can the system handle with this pressure limit?" The run dialog's Stop, the engine sentence,
+// the cost line, the Junction heading and the solver's reasons are fire flow's own keys.
+//
+// {m} and {max} are demand scales printed as numbers (1.37); {step} is the search's tolerance
+// (0.01); {n} is a whole number, always after a colon so no plural has to agree with it; {time} and
+// {now} are elapsed times (6:00); {pressure} is a pressure with its unit; {id} becomes a link to the
+// junction on the map; {reason} is a whole sentence saying why the solver gave no answer.
+$ec_lang['lpn_ds_menu']='Demand scaling…';
+$ec_lang['lpn_ds_menu_tip']='Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.';
+$ec_lang['lpn_ds_title']='Demand scaling';
+$ec_lang['lpn_ds_intro']='The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.';
+$ec_lang['lpn_ds_scope']='Junctions to scale';
+$ec_lang['lpn_ds_scope_tip']='All junctions, or only those selected on the map. Pressures are checked at the scaled demand.';
+$ec_lang['lpn_ds_scope_all']='All junctions';
+$ec_lang['lpn_ds_scope_selected']='Selected junctions';
+$ec_lang['lpn_ds_minpressure']='Lowest pressure allowed';
+$ec_lang['lpn_ds_minpressure_tip']='This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.';
+$ec_lang['lpn_ds_eps_note']='Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.';
+$ec_lang['lpn_ds_head_scale']='Scale the demands';
+$ec_lang['lpn_ds_multiplier']='Demand scale';
+$ec_lang['lpn_ds_multiplier_tip']='The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario\'s own demand multiplier, which is already in the demands, and it is never saved in your project.';
+$ec_lang['lpn_ds_run']='Run';
+$ec_lang['lpn_ds_head_search']='What demand scale can the system handle?';
+$ec_lang['lpn_ds_head_search_selected']='What demand scale can these junctions handle?';
+$ec_lang['lpn_ds_outside_below']='At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.';
+$ec_lang['lpn_ds_search_note']='Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.';
+$ec_lang['lpn_ds_find']='Find';
+$ec_lang['lpn_ds_holds_max']='✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.';
+$ec_lang['lpn_ds_below_zero']='⚠ At least one junction is below {pressure} even with the scaled demands at zero.';
+$ec_lang['lpn_ds_found']='✓ Every junction keeps {pressure} up to a demand scale of {m}.';
+$ec_lang['lpn_ds_found_below']='⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.';
+$ec_lang['lpn_ds_search_stopped']='The search was stopped before it found an answer.';
+$ec_lang['lpn_ds_lowest_at']='At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.';
+$ec_lang['lpn_ds_nosolve_at']='At a demand scale of {m}, the network gave no answer. {reason}';
+$ec_lang['lpn_ds_scale_ok']='✓ At a demand scale of {m}, every junction keeps {pressure}.';
+$ec_lang['lpn_ds_scale_below']='⚠ At a demand scale of {m}, junctions below {pressure}: {n}.';
+$ec_lang['lpn_ds_scaled_selected']='Junctions scaled and checked: {n}.';
+$ec_lang['lpn_ds_head_lowest']='Lowest pressures';
+$ec_lang['lpn_ds_head_velocity']='Highest velocities';
+$ec_lang['lpn_ds_col_link']='Link';
+$ec_lang['lpn_ds_col_scaled']='Scaled';
+$ec_lang['lpn_ds_col_scaled_tip']='With the demands multiplied by the demand scale.';
+$ec_lang['lpn_ds_col_unscaled']='Unscaled';
+$ec_lang['lpn_ds_col_unscaled_tip']='With the demands as they are in the active scenario at this time step, the same value the map shows.';
+$ec_lang['lpn_ds_no_junctions']='This project has no junctions yet, so there are no demands to scale.';
+$ec_lang['lpn_ds_no_selection']='No junctions are selected. Select junctions or choose All junctions.';
+$ec_lang['lpn_ds_skipped']='Selected elements that are not junctions, left as they are: {n}.';
+$ec_lang['lpn_ds_bad_multiplier']='Type a demand scale of zero or more, such as 1.5.';
+$ec_lang['lpn_ds_stale']='The drawing changed, so the demand scaling results were cleared. Run it again.';
+$ec_lang['lpn_analyze_at_time']='Time step: {time}.';
+$ec_lang['lpn_analyze_time_moved']='⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.';
 
 // ---- Settings > New assets > Import surveyed points: CSV and GPX (ROADMAP Task 592) -----------
 //
