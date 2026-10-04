@@ -26734,8 +26734,8 @@ var EngCalcs = EngCalcs || {};
 		// The keystroke has to reach this table, so the caret goes back to its current cell.
 		if (box) { paneFocusCell(spec, rows[box.fr].id, cols[box.fc].key); }
 		else if (rows.length && cols.length) { paneFocusCell(spec, rows[0].id, cols[0].key); }
-		setNotice(pc.lpn_pane_paste_armed ||
-			'Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.');
+		setNotice(EngCalcs.macWords(pc.lpn_pane_paste_armed ||
+			'Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.'));
 		return true;
 	}
 	function paneDisarmAppend(spec, said) {
@@ -28051,7 +28051,7 @@ var EngCalcs = EngCalcs || {};
 			if (accel) {
 				acc = document.createElement('span');
 				acc.className = 'lpn-pane-ctxmenu-accel';
-				acc.textContent = accel;
+				acc.textContent = EngCalcs.macWords(accel);
 				b.appendChild(acc);
 			}
 			b.addEventListener('click', function () { paneCloseContextMenu(); fn(); });
