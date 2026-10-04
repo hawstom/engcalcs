@@ -131,17 +131,6 @@ the block.
     importing a `.pro` file. If we do it, it needs to take up miniscule space in the UX/UI, hidden
     deep under some menu or in the profile tab down arrow."* So the acceptance bar is a row in an
     existing menu, never a control on the profile panel itself.
-- 100|637| **A Graph button on the Properties box.**
-  **BUILT 2026-09-30 on `feat/property-graph`, port 8141**, awaiting his browser pass.
-  **REVISED BY TOM, 2026-09-29:** *"But what we really want is a time series graph at the bottom of
-  Properties for an EPS project; it should have a selector for all the properties that can be graphed
-  for that asset."*
-  Tom, 2026-09-12. Graphs the time series of the CURRENTLY FOCUSED property of the current element,
-  in a new bottom-pane tab named for what it shows -- his example, `L435 Lake Trace`. The tab
-  carries a selector for the property to graph and an Export as: image PNG, PDF, comma-separated
-  values CSV, spreadsheet ODS. It may carry a time-range selector. Shape and the two unknowns
-  (PDF and ODS are formats this suite has never written): `dev/graphs-scope.md`. Task 640 is the
-  menu this belongs to and Task 599 is the plot itself.
 - 100|676| **Watch the sites, and send a derived weekly report.**
   Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
   master before proper vetting can no longer be the matter of course."* Plan, the corrected
