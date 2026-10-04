@@ -3080,7 +3080,6 @@ $ec_lang['lpn_labels_customer_width_tip']='ग्राहक लेबल क�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='वर्तमान दृश्य उपयोग करें';
 $ec_lang['lpn_settings_page']='पृष्ठ';
-$ec_lang['lpn_settings_page_note']='इस कैलकुलेटर में सहेजा गया, प्रोजेक्ट में नहीं।';
 $ec_lang['lpn_settings_hydraulics']='हाइड्रॉलिक्स';
 $ec_lang['lpn_settings_quality']='जल गुणवत्ता';
 $ec_lang['lpn_settings_quality_track']='गुणवत्ता पैरामीटर';

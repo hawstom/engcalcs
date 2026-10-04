@@ -3150,7 +3150,6 @@ $ec_lang['lpn_labels_customer_width_tip']='تُرسم تسميات المشتر�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='استخدام المنظور الحالي';
 $ec_lang['lpn_settings_page']='الصفحة';
-$ec_lang['lpn_settings_page_note']='محفوظ في هذه الحاسبة، لا في المشروع.';
 $ec_lang['lpn_settings_hydraulics']='الهيدروليكا';
 $ec_lang['lpn_settings_quality']='جودة المياه';
 $ec_lang['lpn_settings_quality_track']='نوع تحليل الجودة';

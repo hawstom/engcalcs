@@ -3077,7 +3077,6 @@ $ec_lang['lpn_labels_customer_width_tip']='گاہک لیبلز صرف اس وق�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='موجودہ منظر استعمال کریں';
 $ec_lang['lpn_settings_page']='صفحہ';
-$ec_lang['lpn_settings_page_note']='اس کیلکولیٹر میں محفوظ، پراجیکٹ میں نہیں۔';
 $ec_lang['lpn_settings_hydraulics']='ہائیڈرالکس';
 $ec_lang['lpn_settings_quality']='پانی کا معیار';
 $ec_lang['lpn_settings_quality_track']='معیار پیرامیٹر';

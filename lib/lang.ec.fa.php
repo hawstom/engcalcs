@@ -3078,7 +3078,6 @@ $ec_lang['lpn_labels_customer_width_tip']='برچسب‌های مشترک فقط
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='استفاده از نمای کنونی';
 $ec_lang['lpn_settings_page']='صفحه';
-$ec_lang['lpn_settings_page_note']='در این ماشین‌حساب ذخیره می‌شود، نه در پروژه.';
 $ec_lang['lpn_settings_hydraulics']='هیدرولیک';
 $ec_lang['lpn_settings_quality']='کیفیت آب';
 $ec_lang['lpn_settings_quality_track']='پارامتر کیفیت';

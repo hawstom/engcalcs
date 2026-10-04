@@ -3077,7 +3077,6 @@ $ec_lang['lpn_labels_customer_width_tip']='የደንበኛ ምልክቶች የ�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='አሁን ያለውን እይታ ተጠቀም';
 $ec_lang['lpn_settings_page']='ገጽ';
-$ec_lang['lpn_settings_page_note']='በዚህ ካልኩሌተር ውስጥ ተቀምጧል፣ በፕሮጀክቱ ውስጥ አይደለም።';
 $ec_lang['lpn_settings_hydraulics']='ሃይድሮሊክስ';
 $ec_lang['lpn_settings_quality']='የውሃ ጥራት';
 $ec_lang['lpn_settings_quality_track']='የጥራት መለኪያ';

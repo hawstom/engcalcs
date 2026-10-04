@@ -3078,7 +3078,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Lebo za wateja huchorwa tu wakati mwo
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Tumia mwoneko wa sasa';
 $ec_lang['lpn_settings_page']='Ukurasa';
-$ec_lang['lpn_settings_page_note']='Imehifadhiwa kwenye kikokotoo hiki, si kwenye mradi.';
 $ec_lang['lpn_settings_hydraulics']='Haidroliki';
 $ec_lang['lpn_settings_quality']='Ubora wa maji';
 $ec_lang['lpn_settings_quality_track']='Kigezo cha ubora';

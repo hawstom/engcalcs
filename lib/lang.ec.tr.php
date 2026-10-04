@@ -3077,7 +3077,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Müşteri etiketleri yalnızca harita
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Şimdiki görünümü kullan';
 $ec_lang['lpn_settings_page']='Sayfa';
-$ec_lang['lpn_settings_page_note']='Projede değil, bu hesaplayıcıda kaydedilir.';
 $ec_lang['lpn_settings_hydraulics']='Hidrolik';
 $ec_lang['lpn_settings_quality']='Su kalitesi';
 $ec_lang['lpn_settings_quality_track']='Kalite parametresi';

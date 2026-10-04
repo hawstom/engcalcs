@@ -3134,7 +3134,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Las etiquetas de cliente se dibujan s
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Usar la vista actual';
 $ec_lang['lpn_settings_page']='Página';
-$ec_lang['lpn_settings_page_note']='Se guarda en esta calculadora, no en el proyecto.';
 $ec_lang['lpn_settings_hydraulics']='Hidráulica';
 $ec_lang['lpn_settings_quality']='Calidad';
 $ec_lang['lpn_settings_quality_track']='Parámetro de calidad';

@@ -3090,7 +3090,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Les étiquettes de client ne sont des
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Utiliser la vue actuelle';
 $ec_lang['lpn_settings_page']='Page';
-$ec_lang['lpn_settings_page_note']='Enregistré dans ce calculateur, pas dans le projet.';
 $ec_lang['lpn_settings_hydraulics']='Hydraulique';
 $ec_lang['lpn_settings_quality']='Qualité de l\'eau';
 $ec_lang['lpn_settings_quality_track']='Paramètre de qualité';

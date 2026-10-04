@@ -3080,7 +3080,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Popisky odběratelů se kreslí pouze
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Použít aktuální pohled';
 $ec_lang['lpn_settings_page']='Stránka';
-$ec_lang['lpn_settings_page_note']='Uloženo v této kalkulačce, ne v projektu.';
 $ec_lang['lpn_settings_hydraulics']='Hydraulika';
 $ec_lang['lpn_settings_quality']='Kvalita vody';
 $ec_lang['lpn_settings_quality_track']='Sledovaný parametr kvality';

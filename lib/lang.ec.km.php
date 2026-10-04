@@ -3139,7 +3139,6 @@ $ec_lang['lpn_labels_customer_width_tip']='ស្លាកអតិថិជន�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='ប្រើទិដ្ឋភាពបច្ចុប្បន្ន';
 $ec_lang['lpn_settings_page']='ទំព័រ';
-$ec_lang['lpn_settings_page_note']='រក្សាទុកនៅក្នុងម៉ាស៊ីនគណនានេះ មិនមែននៅក្នុងគម្រោងទេ។';
 $ec_lang['lpn_settings_hydraulics']='ធារាសាស្ត្រ';
 $ec_lang['lpn_settings_quality']='គុណភាពទឹក';
 $ec_lang['lpn_settings_quality_track']='ប៉ារ៉ាម៉ែត្រគុណភាព';

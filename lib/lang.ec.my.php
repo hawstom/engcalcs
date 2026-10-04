@@ -3132,7 +3132,6 @@ $ec_lang['lpn_labels_customer_width_tip']='ဖောက်သည် အညွှ
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='လက်ရှိ ကြည့်ရှုမှုကို သုံးရန်';
 $ec_lang['lpn_settings_page']='စာမျက်နှာ';
-$ec_lang['lpn_settings_page_note']='ဤတွက်ချက်စက်တွင်သာ သိမ်းထားပြီး ပရောဂျက်ထဲတွင် မသိမ်းပါ။';
 $ec_lang['lpn_settings_hydraulics']='ဟိုက်ဒရောလစ်';
 $ec_lang['lpn_settings_quality']='ရေအရည်အသွေး';
 $ec_lang['lpn_settings_quality_track']='အရည်အသွေး ကန့်သတ်ချက်';
