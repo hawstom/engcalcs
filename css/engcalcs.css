@@ -1343,13 +1343,16 @@ html[lang="zh"] .ec-welcome {
    2026-08-16). Fixed to the bottom of the viewport rather than placed near the canvas: while a
    registration sequence runs, every normal interaction on the canvas is suppressed, so the message
    has to be somewhere the eye lands no matter where the user was clicking. High z-index for the same
-   reason -- it must outrank the panels the sequence itself puts on screen. */
+   reason -- it must outrank the panels the sequence itself puts on screen.
+   **DRESSED LIKE EVERY OTHER BOX ON THE PAGE** (Tom, 2026-10-04: *"It is in dark mode unlike
+   everything else."*): the page background, the box ink, the one-pixel ink border and the box
+   shadow #lpn_dialog and the Settings box wear. It was the one dark strip on a light page. */
 .lpn-regmode-bar {
 	position: fixed; left: 50%; transform: translateX(-50%); bottom: 1em;
 	z-index: 3000; display: flex; align-items: center; gap: 0.75em;
-	padding: 0.5em 0.9em; border-radius: 4px;
-	background: var(--ec-ink-strong); color: var(--ec-bg); font-size: 0.95em;
-	box-shadow: 0 2px 8px var(--ec-a-0-0-0-35);
+	padding: 8px 12px;
+	background: var(--ec-bg); color: var(--ec-ink); border: 1px solid var(--ec-ink);
+	box-shadow: 2px 2px 6px var(--ec-a-0-0-0-3);
 	max-width: calc(100vw - 2em); box-sizing: border-box;
 }
 .lpn-warn-strip {
@@ -1361,7 +1364,7 @@ html[lang="zh"] .ec-welcome {
 }
 @media print { .lpn-warn-strip { display: none; } }
 .lpn-warn-strip.lpn-warn-strip-off { display: none; }
-.lpn-regmode-bar button { font: inherit; padding: 0.15em 0.7em; cursor: pointer; }
+.lpn-regmode-bar button { cursor: pointer; }
 @media print { .lpn-regmode-bar { display: none; } }
 /* **A THING THE USER CANNOT SEE CANNOT BE GRABBED**, and this one keyword is what makes invisibility
    and un-grabbability the same fact instead of two facts that can disagree (Tom, 2026-09-01: *"a
@@ -1608,7 +1611,9 @@ html[lang="zh"] .ec-welcome {
    js/looped-network.js, drawn in #lpn_dialog. A titled ask wears the same 40 px title band as every
    other box (.lpn-setbox-title), so the padding makes room for it. Narrower than the window on a
    phone in tall mode, never wider. The message keeps its own line breaks (consent paragraphs). */
-#lpn_dialog { max-width: min(34em, calc(100vw - 2em)); box-sizing: border-box; }
+/* `width: max-content` because a box placed at left: 50% only shrinks to fit the HALF of the window
+   to its right: a long question on a phone was a 195 px column. Capped, it takes the room it needs. */
+#lpn_dialog { width: max-content; max-width: min(34em, calc(100vw - 2em)); box-sizing: border-box; }
 #lpn_dialog.lpn-dialog-titled { padding-top: 51px; }
 .lpn-dialog-msg { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .lpn-dialog-input { display: block; width: 100%; box-sizing: border-box; margin-top: 8px; padding: 3px 6px; font: inherit; }
