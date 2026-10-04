@@ -1353,17 +1353,18 @@ html[lang="zh"] .ec-welcome {
 	padding: 8px 12px;
 	background: var(--ec-bg); color: var(--ec-ink); border: 1px solid var(--ec-ink);
 	box-shadow: 2px 2px 6px var(--ec-a-0-0-0-3);
-	max-width: calc(100vw - 2em); box-sizing: border-box;
+	/* max-content, as #lpn_dialog: placed at left: 50%, the bar otherwise shrank to the half of the
+	   window to its right, and on a phone stood as a 195 px column over the map. */
+	width: max-content; max-width: calc(100vw - 2em); box-sizing: border-box;
 }
-.lpn-warn-strip {
-	position: fixed; top: 0.5em; left: 50%; transform: translateX(-50%); z-index: 3001;
-	max-width: calc(100vw - 2em); box-sizing: border-box; pointer-events: none;
-	padding: 0.4em 0.8em; border-radius: 4px; font-size: 0.9em;
-	background: var(--ec-warn-bg); border: 1px solid var(--ec-warn-border);
-	box-shadow: 0 2px 8px var(--ec-a-0-0-0-35);
+/* **ON A PHONE IT IS A BAND ALONG THE FOOT OF THE WINDOW** (Perry's review, 2026-10-04): full width
+   less the gutters, small type, so the map above it, where the picking happens, stays clear. */
+@media (max-width: 600px) {
+	.lpn-regmode-bar {
+		left: 8px; right: 8px; bottom: 8px; transform: none; width: auto; max-width: none;
+		padding: 6px 8px; gap: 0.5em; font-size: 0.85em; line-height: 1.3;
+	}
 }
-@media print { .lpn-warn-strip { display: none; } }
-.lpn-warn-strip.lpn-warn-strip-off { display: none; }
 .lpn-regmode-bar button { cursor: pointer; }
 @media print { .lpn-regmode-bar { display: none; } }
 /* **A THING THE USER CANNOT SEE CANNOT BE GRABBED**, and this one keyword is what makes invisibility

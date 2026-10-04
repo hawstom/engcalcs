@@ -318,7 +318,6 @@ function mkEl(tag, svgNS) {
     set(v) {
       this.children.length = 0;
       this._text = v === undefined || v === null ? '' : String(v);
-      if (this._onText && this._text) { this._onText(this._text); }
     }
   });
   // **className IS THE SAME STORE AS classList AND THE `class` ATTRIBUTE** (Task 486), for the
@@ -1217,9 +1216,6 @@ function loadLoopedNetwork(injectSource, preludeSource, mutate) {
 	return global.__LPN;
 }
 
-// Task 710: what the page used to say with alert() it now says as a notice. A harness that asserted
-// "the user is told" through its alert stub routes the notice line to that same stub with this.
-function captureNotices(fn) { ensure('lpn_map_notice')._onText = fn; }
-module.exports = { ROOT, mkEl, byId, ensure, captureNotices, unitSelects, newCoordsRadios, setUnitSet, setHitTarget, loadLoopedNetwork, LPN_UNIT_PRESETS, GPM, FT, IN,
+module.exports = { ROOT, mkEl, byId, ensure, unitSelects, newCoordsRadios, setUnitSet, setHitTarget, loadLoopedNetwork, LPN_UNIT_PRESETS, GPM, FT, IN,
 	NODE_ENGINE_URL, epanetSolves, warmEpanet, settleEpanet, flushResizeObservers, clearResizeObservers,
 	visibleTip };

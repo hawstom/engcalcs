@@ -18,7 +18,10 @@
 //   (6) a real call site -- Background image > Scale by picking -- asks its distance in the box,
 //       and the "Adjusting the background image" bar wears the same light dress as every other box
 //       (Tom: *"It is in dark mode unlike everything else."*);
-//   (7) no native dialog is raised anywhere in it.
+//   (7) no native dialog is raised anywhere in it;
+//   (8) on a phone the registration bar is a short band along the foot, not a column over the map;
+//   (9) a HELD Enter on Edit > Delete network opens the box and never presses its OK (Perry,
+//       2026-10-04: the auto-repeat deleted all 45 nodes); a fresh Enter still confirms.
 'use strict';
 
 const path = require('path');
@@ -249,6 +252,79 @@ async function sectionScaleByPicking(browser) {
 	await a.close();
 }
 
+async function sectionPhoneBar(browser) {
+	console.log('\n--- the registration bar on a phone (390 x 844) ---');
+	const natives = [];
+	const a = await openSession(browser, { width: 390, height: 844 }, natives);
+	const names = await a.page.evaluate(() => ({ b: EngCalcs.pageConfig.lpn_backdrop_menu, s: EngCalcs.pageConfig.lpn_backdrop_scale }));
+	await a.page.setInputFiles('#lpn_backdrop_file', { name: 'pic.png', mimeType: 'image/png', buffer: PNG });
+	await a.settle(1500);
+	await a.page.click('#lpn_menu_map');
+	await a.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+	ok('Map > Background image', await menuRow(a, '#lpn_menu_list', names.b));
+	await a.page.waitForSelector('#lpn_menu_popup2', { state: 'visible' });
+	ok('> Scale by picking', await menuRow(a, '#lpn_menu_list2', names.s));
+	await a.settle(400);
+	const r = await a.page.evaluate(() => {
+		const bar = document.getElementById('lpn_regmode_bar'), map = document.getElementById('lpn_canvas');
+		if (!bar) { return null; }
+		const b = bar.getBoundingClientRect(), m = map.getBoundingClientRect();
+		const visTop = Math.max(m.top, 0), visBottom = Math.min(m.bottom, window.innerHeight);
+		const overlap = Math.max(0, Math.min(b.bottom, visBottom) - Math.max(b.top, visTop));
+		return { left: b.left, right: b.right, top: b.top, bottom: b.bottom, w: b.width, h: b.height,
+			vw: window.innerWidth, vh: window.innerHeight, share: overlap / (visBottom - visTop) };
+	});
+	ok('the bar is up', !!r);
+	ok('it spans the phone, less gutters (>= 340 px of 390)', r && r.w >= 340 && r.left >= 0 && r.right <= r.vw, r && JSON.stringify(r));
+	ok('it sits along the foot of the window', r && r.vh - r.bottom <= 16, r && String(r.vh - r.bottom));
+	ok('it covers no more than a fifth of the visible map', r && r.share <= 0.2, r && r.share.toFixed(3) + ' (' + Math.round(r.h) + ' px tall)');
+	ok('no native dialog was raised', natives.length === 0, natives.join(' | '));
+	await a.close();
+}
+
+async function sectionHeldEnter(browser) {
+	console.log('\n--- holding Enter on Edit > Delete network ---');
+	const natives = [];
+	const a = await openSession(browser, { width: 1400, height: 900 }, natives);
+	await a.page.evaluate(() => {
+		const cards = [...document.querySelectorAll('#lpn_examples_pane .lpn-example-card')];
+		const card = cards.find((c) => /Net1/.test(c.textContent || '')) || cards[0];
+		card.click();
+	});
+	await a.settle(2000);
+	await a.page.evaluate(() => { delete window.lpnDialogAnswerer; });
+	const nodes = () => a.page.evaluate(() => document.querySelectorAll('#lpn_canvas [data-node]').length);
+	const before = await nodes();
+	ok('an example network is open', before > 0, before + ' node elements');
+	const label = await a.page.evaluate(() => EngCalcs.pageConfig.lpn_edit_delete_network);
+	await a.page.click('#lpn_menu_edit');
+	await a.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+	const focused = await a.page.evaluate((l) => {
+		const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).find((x) => x.textContent.indexOf(l) >= 0);
+		if (r) { r.focus(); }
+		return !!r && document.activeElement === r;
+	}, label);
+	ok('the Delete network row has the focus', focused);
+	// Held: one press, then the auto-repeat (Playwright sends repeat=true for a key already down).
+	for (let i = 0; i < 12; i++) { await a.page.keyboard.down('Enter'); await a.page.waitForTimeout(35); }
+	await a.page.keyboard.up('Enter');
+	await a.settle(300);
+	const b = await box(a);
+	ok('the held Enter opened the question', !!b, b && b.text.slice(0, 40));
+	ok('...and did not answer it: every node is still there', (await nodes()) === before, String(await nodes()));
+	// The button's own keyboard activation is a click with detail 0; before a fresh key inside the
+	// box, one is ignored.
+	await a.page.evaluate(() => document.querySelector('#lpn_dialog_buttons button').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 })));
+	await a.settle(300);
+	ok('a keyboard click on OK before any fresh key does not answer it either', !!(await box(a)) && (await nodes()) === before);
+	await a.page.keyboard.press('Enter');
+	await a.settle(800);
+	ok('a fresh Enter confirms: the network is deleted', !(await box(a)) && (await nodes()) === 0, String(await nodes()));
+	ok('no native dialog was raised', natives.length === 0, natives.join(' | '));
+	ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	await a.close();
+}
+
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	({ Session } = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'session.js')));
@@ -265,6 +341,8 @@ async function main() {
 		await sectionComponent(browser);
 		await sectionPhone(browser);
 		await sectionScaleByPicking(browser);
+		await sectionPhoneBar(browser);
+		await sectionHeldEnter(browser);
 	} finally {
 		await browser.close();
 		env.stopServer();

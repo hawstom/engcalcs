@@ -2,16 +2,19 @@
 //
 //   flock /tmp/engcalcs-browser.lock node dev/lpn-spike/dialog-audit-browser-harness.js
 //
-// THEN THE TWO PERRY FINDINGS (review of feat/dialog-audit). (1) The background image's click
+// A FORMER alert() IS STILL A MODAL, NOW THE PAGE'S OWN BOX, AND IS KEPT IN THE LOG (Task 710).
+// A real Chrome. Convert, do not downgrade: a failure message must not vanish unread.
+//
+// THEN TWO PERRY FINDINGS (review of feat/dialog-audit). (1) The background image's click
 // instructions were alerts; the "Adjusting the background image" bar must still carry the step's
 // words at 10 s, on a desk and at 390 px wide. (2) At 390 px a warning raised inside an open box
-// (Libraries) used to sit under it; the viewport strip must show it, on screen.
+// (Libraries) must show in front of that box, on screen.
 //
-// Two converted alert()s, reached the way a visitor reaches them: choose a file that is not a
+// Two former alert()s, reached the way a visitor reaches them: choose a file that is not a
 // project (lpn_import_bad_file), and choose a file that is not an EPANET network
-// (lpn_inp_bad_file). Each must (1) show on the map's notice line, (2) be in the message log at the
-// warning severity, and (3) never raise a browser dialog. Playwright auto-dismisses a dialog, so
-// the page handler counts them instead; a count above zero is the defect.
+// (lpn_inp_bad_file). Each must (1) wait in the page's question box for OK, (2) be in the message
+// log at the warning severity, and (3) never raise a browser dialog. The harness seam that routes
+// the box to native dialogs is removed, so any native dialog counted here is the defect.
 'use strict';
 
 const path = require('path');
@@ -62,7 +65,7 @@ async function openSession(browser, viewport, dialogs) {
 	await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 	await a.goto('Looped-Network.php');
 	await a.answerTrainingPanel().catch(() => {});
-	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+	await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
 	await a.settle(1500);
 	return a;
 }
@@ -110,15 +113,17 @@ async function sectionBoxWarning(browser) {
 	await a.page.setInputFiles('#lpn_library_file', { name: 'junk.json', mimeType: 'text/plain', buffer: Buffer.from('{ not libraries') });
 	await a.settle(800);
 	const w = await a.page.evaluate(() => {
-		const e = document.getElementById('lpn_warn_strip'), box = document.getElementById('lpn_library_box');
+		const e = document.getElementById('lpn_dialog'), box = document.getElementById('lpn_library_box');
 		if (!e || getComputedStyle(e).display === 'none') { return null; }
 		const r = e.getBoundingClientRect();
 		const z = (x) => parseInt(getComputedStyle(x).zIndex, 10) || 0;
-		return { text: e.textContent, inside: r.left >= 0 && r.right <= window.innerWidth + 0.5 && r.top >= 0 && r.bottom <= window.innerHeight,
+		return { text: document.getElementById('lpn_dialog_body').textContent, inside: r.left >= 0 && r.right <= window.innerWidth + 0.5 && r.top >= 0 && r.bottom <= window.innerHeight,
 			above: z(e) > z(box), fixed: getComputedStyle(e).position === 'fixed' };
 	});
-	ok('a strip shows the warning', w && w.text === names.said, w && w.text);
-	ok('it is on screen, fixed to the viewport and above the box', w && w.inside && w.fixed && w.above, JSON.stringify(w));
+	ok('the question box shows the warning', w && w.text === names.said, w && w.text);
+	ok('it is on screen, fixed to the viewport and in front of the box', w && w.inside && w.fixed && w.above, JSON.stringify(w));
+	await a.page.keyboard.press('Enter');
+	await a.settle(200);
 	ok('no blocking dialog', dialogs.length === 0, dialogs.join(' | '));
 	await a.close();
 }
@@ -142,7 +147,7 @@ async function main() {
 		await a.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
 		await a.goto('Looped-Network.php');
 		await a.answerTrainingPanel().catch(() => {});
-		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
 		await a.settle(1500);
 
 		const pc = await a.page.evaluate(() => ({ p: EngCalcs.pageConfig.lpn_import_bad_file, i: EngCalcs.pageConfig.lpn_inp_bad_file }));
@@ -156,10 +161,15 @@ async function main() {
 			await a.page.setInputFiles(sel, { name, mimeType: 'text/plain', buffer: Buffer.from(body) });
 			await a.settle(800);
 			const got = await a.page.evaluate(() => {
-				const n = document.getElementById('lpn_map_notice');
-				return { notice: n ? n.textContent : '', shown: !!n && getComputedStyle(n).display !== 'none' };
+				const d = document.getElementById('lpn_dialog');
+				return { text: document.getElementById('lpn_dialog_body').textContent, shown: !!d && getComputedStyle(d).display !== 'none' };
 			});
-			ok('it shows on the map notice line', got.shown && got.notice === said, got.notice);
+			ok('it waits in the page\'s question box', got.shown && got.text === said, got.text);
+			await a.settle(9000);
+			ok('and is still there after nine seconds, unread', await a.page.evaluate(() => getComputedStyle(document.getElementById('lpn_dialog')).display !== 'none'));
+			await a.page.keyboard.press('Enter');
+			await a.settle(200);
+			ok('OK dismisses it', await a.page.evaluate(() => getComputedStyle(document.getElementById('lpn_dialog')).display === 'none'));
 			// Open the log through its own glyph: that is the proof it is READABLE, not just kept.
 			await a.page.click('#lpn_msglog_btn');
 			await a.settle(300);

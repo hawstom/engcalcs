@@ -58,7 +58,6 @@ global.FileReader = function () {
 	};
 };
 global.alert = global.window.alert = function (m) { lastAlert = m; };
-require('./lpn-dom-stub.js').captureNotices(global.alert);   // Task 710: the message is a notice now
 // Keep this placement asks before it commits, and the wizard section below presses it.
 global.confirm = global.window.confirm = function () { return true; };
 
@@ -635,7 +634,7 @@ const INP_STRANGE = probeInp(['[BACKDROP]', ' UNITS  Furlongs', '']);
 
 	importText(INP_NONE, 'grid.inp');
 	ok('a NONE file opens an XY project, with no prompt in the way',
-		L.getProject().coords !== 'geo' && lastAlert !== (global.EngCalcs.pageConfig || {}).lpn_inp_bad_file, String(L.getProject().coords));
+		L.getProject().coords !== 'geo' && lastAlert === null, String(L.getProject().coords));
 	importText(INP_SILENT, 'quiet.inp');
 	ok('...and so does a file that never mentions its map units',
 		L.getProject().coords !== 'geo', String(L.getProject().coords));

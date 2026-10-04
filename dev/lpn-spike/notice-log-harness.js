@@ -637,7 +637,7 @@ console.log('  8f. every element this branch\'s own top-left column writes user-
 console.log('9. THE LIVE MUTATION: take the log line out of setNotice() and group 1 must go red');
 {
 	const M = load(src => {
-		const mark = "\t\tlogMessage(text, severity);\n";
+		const mark = "\t\tlogMessage(text, 'notice');\n";
 		if (src.indexOf(mark) < 0) { throw new Error("setNotice()'s logMessage() call has moved"); }
 		return src.replace(mark, '');
 	});

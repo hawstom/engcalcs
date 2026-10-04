@@ -5384,7 +5384,7 @@ var EngCalcs = EngCalcs || {};
 			return s.prop && pushFieldShown(s) && (!group || s.group === group);
 		});
 		if (!active.length) {
-			setNotice(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
+			tellNotice(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
 			return;
 		}
 		// Counted, not estimated: how many overrides would actually be discarded. Zero says so in
@@ -5408,7 +5408,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			if (any) { touched++; }
 		});
-		if (!hits) { setNotice(pc.lpn_scenario_push_none || 'No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.'); return; }
+		if (!hits) { tellNotice(pc.lpn_scenario_push_none || 'No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.'); return; }
 		// NAMES the properties as well as counting them, and NAMES THE ELEMENT when scoped to one --
 		// reusing lpn_field_id ("ID") rather than minting a key, per the whole-label reuse rule.
 		var msg = (pc.lpn_scenario_push_confirm || 'Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this.')
@@ -41049,7 +41049,13 @@ var EngCalcs = EngCalcs || {};
 	// focus goes back to whatever had it when the box opened. `opts.title` draws the same title band
 	// as every other box; `opts.alert` makes the role alertdialog; `opts.focus` names the control
 	// that takes focus first (a prompt's field).
+	// **A HELD KEY NEVER ANSWERS** (Perry's review, 2026-10-04: hold Enter on Edit > Delete network
+	// and the auto-repeat opened the box, then pressed its focused OK, deleting every node; the
+	// browser's own box ignored the held key). `dialogKeyArmed` is set only by a FRESH keydown made
+	// while the box is open: a repeat, or a press that began before it opened, arms nothing, and a
+	// keyboard click (detail 0) on one of its buttons is ignored until it is armed.
 	var dialogOpener = null, dialogButtons = [], dialogQueue = [], dialogKeysWired = false;
+	var dialogKeyArmed = false, dialogOpenedAt = 0;
 	function dialogEl() { return document.getElementById('lpn_dialog'); }
 	function dialogIsOpen() { var d = dialogEl(); return !!(d && d.style.display === 'block'); }
 	function dialogFocusables() {
@@ -41086,6 +41092,16 @@ var EngCalcs = EngCalcs || {};
 			if (!dialogIsOpen()) { return; }
 			var d = dialogEl(), inside = !!(d && e.target && d.contains && d.contains(e.target));
 			var key = e.key;
+			if (e.repeat || (e.timeStamp && dialogOpenedAt && e.timeStamp < dialogOpenedAt)) {
+				// Held over from before the box, or auto-repeat: it neither answers nor reaches a
+				// button's default activation.
+				if (key === 'Enter' || key === ' ' || key === 'Spacebar' || key === 'Escape' || key === 'Esc') {
+					e.preventDefault();
+					e.stopPropagation();
+				}
+				return;
+			}
+			dialogKeyArmed = true;
 			if (key === 'Escape' || key === 'Esc') {
 				var cw = (EngCalcs.pageConfig || {}).lpn_cancel || 'Cancel';
 				var c = dialogButtons.filter(function (b) { return b.cancel || b.label === cw; })[0] ||
@@ -41133,6 +41149,8 @@ var EngCalcs = EngCalcs || {};
 		if (!dlg || !body || !bar) { return; }
 		wireDialogKeys();
 		if (!dialogIsOpen()) { dialogOpener = document.activeElement || null; }
+		dialogKeyArmed = false;
+		dialogOpenedAt = (typeof performance !== 'undefined' && performance.now) ? performance.now() : 0;
 		body.innerHTML = '';
 		bar.innerHTML = '';
 		if (title) {
@@ -41155,7 +41173,11 @@ var EngCalcs = EngCalcs || {};
 			// consent answer is distance from the hand that was reaching for Cancel.
 			btn.style.marginLeft = b.gapBefore ? '28px' : '6px';
 			btn.textContent = b.label;
-			btn.addEventListener('click', function () { pressDialogButton(b); });
+			btn.addEventListener('click', function (e) {
+				// A keyboard activation (detail 0) counts only after a fresh key inside the box.
+				if (e && e.detail === 0 && !dialogKeyArmed) { return; }
+				pressDialogButton(b);
+			});
 			bar.appendChild(btn);
 			if (b.isDefault && !firstFocus) { firstFocus = btn; }
 		});
@@ -46507,7 +46529,7 @@ var EngCalcs = EngCalcs || {};
 			// displayed this button would otherwise look broken, and the reason is off-screen in
 			// another panel. Naming that panel is the whole value of the message.
 			if (!active.length) {
-				setNotice(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
+				tellNotice(pc.lpn_push_none_displayed || 'None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
 				return;
 			}
 			// TWO different counts, because "nothing to do" has two causes needing different
@@ -46534,11 +46556,11 @@ var EngCalcs = EngCalcs || {};
 			var nodeCounts = counts(doc.nodes, 'node'), linkCounts = counts(doc.links, 'link');
 			var carriers = nodeCounts.carriers + linkCounts.carriers;
 			var targets = nodeCounts.changing + linkCounts.changing;
-			if (!carriers) { setNotice(pc.lpn_push_nothing || 'No existing asset has any of the properties being applied.'); return; }
+			if (!carriers) { tellNotice(pc.lpn_push_nothing || 'No existing asset has any of the properties being applied.'); return; }
 			// Distinct from the message above on purpose: "nothing carries these properties" and
 			// "everything already has these values" are opposite situations, and telling a user the
 			// first when the second is true would send them hunting for a problem that isn't there.
-			if (!targets) { setNotice(pc.lpn_push_no_change || 'Every asset already has these values, so nothing would change.'); return; }
+			if (!targets) { tellNotice(pc.lpn_push_no_change || 'Every asset already has these values, so nothing would change.'); return; }
 			// The confirm NAMES the properties, it does not merely count them -- a count alone
 			// ("push 2 properties?") leaves the user guessing which two, and this action is not
 			// something to guess at. Assembled from already-translated label text plus two short
@@ -56794,7 +56816,7 @@ var EngCalcs = EngCalcs || {};
 		if (!t) { return; }
 		kind = severity === 'warning' ? 'warning' : 'notice';
 		for (i = 0; i < noticeLog.length; i++) {
-			if (noticeLog[i].text === t) { noticeLog.splice(i, 1); break; }
+			if (noticeLog[i].text === t && noticeLog[i].severity === kind) { noticeLog.splice(i, 1); break; }
 		}
 		noticeLog.unshift({ text: t, severity: kind, at: Date.now() });
 		while (noticeLog.length > NOTICE_LOG_MAX) { noticeLog.pop(); }
@@ -57045,40 +57067,27 @@ var EngCalcs = EngCalcs || {};
 		if (el && el.textContent === words) { return; }
 		showNotice(words);
 	}
-	// Task 710: what used to be a blocking alert() is a notice, and a failure or refusal is the
-	// banner's second severity. Same door, same log; not a new message system.
-	function setWarning(text) { setNotice(text, 'warning'); }
-	// Task 710: a refusal raised by an action inside an open box (Libraries, Settings, the survey
-	// dialog) landed in the map's top-left corner, UNDER the box, so on a phone nothing visible
-	// happened. A warning is therefore also shown in this strip, fixed to the viewport above every
-	// box and click-through, for the same eight seconds. One element serves every box, which is the
-	// smaller change than a status line inside each. The log and the map notice still carry it.
-	function showWarnStrip(text) {
-		var el = document.getElementById('lpn_warn_strip');
-		if (!text) { if (el) { el.classList.add('lpn-warn-strip-off'); } return; }
-		if (!el) {
-			el = document.createElement('div');
-			el.id = 'lpn_warn_strip';
-			el.className = 'lpn-warn-strip d-print-none';
-			el.setAttribute('role', 'alert');
-			document.body.appendChild(el);
-		}
-		el.textContent = text;
-		el.classList.remove('lpn-warn-strip-off');
+	// **A FORMER alert() IS STILL A MODAL, IN THE PAGE'S OWN BOX** (Task 710; coordinator relaying
+	// Tom, 2026-10-04: convert, do not downgrade). A failure or refusal must not vanish unread, so it
+	// waits for OK in askDialog(), and it is kept in the message log at its own severity as well.
+	function tellDialog(text, severity) {
+		if (!text) { return; }
+		logMessage(text, severity === 'warning' ? 'warning' : 'notice');
+		askDialog({ kind: 'alert', text: text });
 	}
-	function setNotice(text, severity) {
+	function setWarning(text) { tellDialog(text, 'warning'); }
+	function tellNotice(text) { tellDialog(text, 'notice'); }
+	function setNotice(text) {
 		if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }
 		// **EVERY NOTICE IS KEPT BEFORE IT IS SHOWN** (Task 704). This is the one door 66 call
 		// sites already go through, which is why the log needed no second seam: teaching the door
 		// teaches all of them at once.
-		logMessage(text, severity);
+		logMessage(text, 'notice');
 		showNotice(text);
-		showWarnStrip(severity === 'warning' ? text : '');
 		if (text) {
 			statusNoticeTimer = setTimeout(function () {
 				statusNoticeTimer = null;
 				showNotice('');
-				showWarnStrip('');
 			}, STATUS_NOTICE_MS);
 		}
 	}

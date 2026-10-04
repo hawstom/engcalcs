@@ -69,7 +69,6 @@ function fire(el, type) {
 }
 const alerts = [];
 global.alert = global.window.alert = function (m) { alerts.push(String(m)); };
-require('./lpn-dom-stub.js').captureNotices(global.alert);   // Task 710: the message is a notice now
 
 setUnitSet('us');
 L.buildLayers();
