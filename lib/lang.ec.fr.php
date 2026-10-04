@@ -2747,7 +2747,6 @@ $ec_lang['lpn_settings_default_is']='La valeur par défaut est {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='À quel point le solveur doit s\'approcher avant de s\'arrêter, mesuré par l\'ampleur du changement des débits d\'un essai à l\'autre. Un nombre plus petit est plus exact et prend plus de temps. Les deux solveurs lisent cette même case, mais chacun mesure ce changement par rapport à un total différent : le solveur intégré par rapport à la somme des demandes, EPANET par rapport à la somme des débits des liaisons. Laissée vide, cette page utilise une précision plus stricte que celle par défaut d\'EPANET.';
 $ec_lang['lpn_settings_specific_gravity']='Densité';
-$ec_lang['lpn_settings_specific_gravity_tip']='Le poids du fluide comparé à celui de l\'eau. Cela change les pressions qu\'un manomètre lirait, pas les débits.';
 $ec_lang['lpn_settings_viscosity']='Viscosité relative';
 $ec_lang['lpn_settings_viscosity_tip']='La viscosité du fluide comparée à celle de l\'eau à 20 degrés Celsius. Elle ne change le résultat qu\'avec la méthode de Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Essais maximum';

@@ -2734,7 +2734,6 @@ $ec_lang['lpn_settings_default_is']='ነባሪው {n} ነው።';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='ፈታቹ ከመቆሙ በፊት ምን ያህል መቃረብ እንዳለበት፣ ፍሰቶቹ ከአንዱ ሙከራ ወደ ቀጣዩ አሁንም በምን ያህል እየተለወጡ እንደሆኑ ተለክቶ። ትንሽ ቁጥር ይበልጥ ትክክለኛ ነው፣ ረዘም ያለ ጊዜም ይወስዳል። ሁለቱም ፈታቾች ይህን አንድ ሳጥን ያነባሉ፣ እያንዳንዱም ለውጡን ከተለያየ ድምር ጋር ይለካል፦ አብሮ የተሰራው ፈታች ከፍላጎቶቹ ድምር ጋር፣ EPANET ደግሞ ከቧንቧ ፍሰቶች ድምር ጋር። ባዶ ከተተወ፣ ይህ ገጽ ከEPANET ራሱ ነባሪ የበለጠ ጥብቅ ትክክለኛነት ይጠቀማል።';
 $ec_lang['lpn_settings_specific_gravity']='ልዩ ስበት';
-$ec_lang['lpn_settings_specific_gravity_tip']='የፈሳሹ ክብደት ከውሃ ጋር ሲነጻጸር። የሚቀይረው መለኪያ የሚያነበውን ግፊት ነው፣ ፍሰቶቹን አይደለም።';
 $ec_lang['lpn_settings_viscosity']='አንጻራዊ ቪስኮሲቲ';
 $ec_lang['lpn_settings_viscosity_tip']='የፈሳሹ ቪስኮሲቲ በ20 ዲግሪ ሴልስየስ ካለው ውሃ ጋር ሲነጻጸር። መልሱን የሚቀይረው በዳርሲ-ዌይስባክ ዘዴ ስር ብቻ ነው።';
 $ec_lang['lpn_settings_trials']='ከፍተኛ ሙከራዎች';

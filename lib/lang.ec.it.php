@@ -2735,7 +2735,6 @@ $ec_lang['lpn_settings_default_is']='Il valore predefinito è {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Quanto vicino deve arrivare il risolutore prima di fermarsi, misurato come la quantità di cui le portate stanno ancora cambiando da un tentativo al successivo. Un numero più piccolo è più preciso e richiede più tempo. Entrambi i risolutori leggono questo stesso campo, e ciascuno misura quel cambiamento rispetto a un totale diverso: il risolutore integrato rispetto alla somma delle richieste, EPANET rispetto alla somma delle portate nelle tubazioni. Lasciato vuoto, questa pagina usa una precisione più severa di quella predefinita di EPANET.';
 $ec_lang['lpn_settings_specific_gravity']='Densità relativa';
-$ec_lang['lpn_settings_specific_gravity_tip']='Il peso del fluido rispetto a quello dell\'acqua. Cambia le pressioni che un manometro leggerebbe, non le portate.';
 $ec_lang['lpn_settings_viscosity']='Viscosità relativa';
 $ec_lang['lpn_settings_viscosity_tip']='La viscosità del fluido rispetto a quella dell\'acqua a 20 gradi Celsius. Cambia la risposta solo con il metodo Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Tentativi massimi';

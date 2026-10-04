@@ -2735,7 +2735,6 @@ $ec_lang['lpn_settings_default_is']='默认值为 {n}。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='求解器必须达到多接近才会停止，以流量在相邻两次试算之间仍在变化的幅度衡量。数值越小越精确，耗时也越长。两种求解器都读取同一个框，但各自用不同的总量来衡量这个变化：内置求解器用需水量之和，EPANET 用管道流量之和。留空时，本页面使用比 EPANET 自身默认值更严格的精度。';
 $ec_lang['lpn_settings_specific_gravity']='比重';
-$ec_lang['lpn_settings_specific_gravity_tip']='流体相对于水的重量比。它会改变压力表读数，但不会改变流量。';
 $ec_lang['lpn_settings_viscosity']='相对粘度';
 $ec_lang['lpn_settings_viscosity_tip']='流体相对于 20 摄氏度水的粘度。只有在使用达西-韦斯巴赫方法时才会影响结果。';
 $ec_lang['lpn_settings_trials']='最大试算次数';

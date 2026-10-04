@@ -3448,7 +3448,6 @@ EngCalcs.pageConfig = {
 	lpn_settings_accuracy: <?=json_encode($ec_lang['lpn_settings_accuracy'])?>,
 	lpn_settings_accuracy_tip: <?=json_encode($ec_lang['lpn_settings_accuracy_tip'])?>,
 	lpn_settings_specific_gravity: <?=json_encode($ec_lang['lpn_settings_specific_gravity'])?>,
-	lpn_settings_specific_gravity_tip: <?=json_encode($ec_lang['lpn_settings_specific_gravity_tip'])?>,
 	lpn_settings_viscosity: <?=json_encode($ec_lang['lpn_settings_viscosity'])?>,
 	lpn_settings_viscosity_tip: <?=json_encode($ec_lang['lpn_settings_viscosity_tip'])?>,
 	lpn_settings_trials: <?=json_encode($ec_lang['lpn_settings_trials'])?>,

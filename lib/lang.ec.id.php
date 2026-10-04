@@ -2739,7 +2739,6 @@ $ec_lang['lpn_settings_default_is']='Nilai default adalah {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Seberapa dekat penyelesai harus mencapai sebelum berhenti, diukur sebagai besarnya perubahan debit dari satu percobaan ke percobaan berikutnya. Angka yang lebih kecil lebih tepat dan memerlukan waktu lebih lama. Kedua penyelesai membaca kotak yang sama ini, dan masing-masing mengukur perubahan tersebut terhadap total yang berbeda: penyelesai bawaan terhadap jumlah kebutuhan, EPANET terhadap jumlah debit penghubung. Jika dibiarkan kosong, halaman ini menggunakan akurasi yang lebih ketat daripada default EPANET sendiri.';
 $ec_lang['lpn_settings_specific_gravity']='Berat jenis';
-$ec_lang['lpn_settings_specific_gravity_tip']='Berat fluida dibandingkan dengan air. Ini mengubah tekanan yang akan dibaca oleh alat ukur, bukan debitnya.';
 $ec_lang['lpn_settings_viscosity']='Viskositas relatif';
 $ec_lang['lpn_settings_viscosity_tip']='Viskositas fluida dibandingkan dengan air pada 20 derajat Celsius. Ini hanya mengubah jawaban pada metode Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Percobaan maksimum';

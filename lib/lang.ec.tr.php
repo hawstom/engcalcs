@@ -2734,7 +2734,6 @@ $ec_lang['lpn_settings_default_is']='Varsayılan {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Çözücünün durmadan önce ne kadar yaklaşması gerektiği; debilerin bir denemeden diğerine hâlâ ne kadar değiştiğiyle ölçülür. Daha küçük bir sayı daha kesindir ve daha uzun sürer. Her iki çözücü de bu tek kutuyu okur, ancak her biri bu değişimi farklı bir toplama göre ölçer: yerleşik çözücü taleplerin toplamına göre, EPANET hat debilerinin toplamına göre. Boş bırakılırsa bu sayfa, EPANET\'in kendi varsayılanından daha sıkı bir doğruluk kullanır.';
 $ec_lang['lpn_settings_specific_gravity']='Özgül ağırlık';
-$ec_lang['lpn_settings_specific_gravity_tip']='Akışkanın ağırlığının suya göre oranı. Bir göstergenin okuyacağı basınçları değiştirir, debileri değil.';
 $ec_lang['lpn_settings_viscosity']='Bağıl viskozite';
 $ec_lang['lpn_settings_viscosity_tip']='Akışkanın viskozitesinin 20 santigrat derecedeki suya göre oranı. Yalnızca Darcy-Weisbach yönteminde yanıtı değiştirir.';
 $ec_lang['lpn_settings_trials']='Azami deneme sayısı';

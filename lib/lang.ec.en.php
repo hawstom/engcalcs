@@ -793,7 +793,7 @@ $ec_lang['lpn_tool_vertices']='Vertices';
 // has been struck here three times. "Station along the pipe" is the survey word for a distance
 // measured along a route, which is what it is.
 $ec_lang['lpn_tool_add_meter']='Customer';
-$ec_lang['lpn_tool_add_meter_tip']='Click customer location then a link or node. The demand you give the customer is added to the node at the nearest end of that link.';
+$ec_lang['lpn_tool_add_meter_tip']='Specify the customer point, then its connection: a link or node. The demand you give the customer is added to the node at the nearest end of that link.';
 $ec_lang['lpn_mode_add_meter']='Customer: specify where the customer is, then select the pipe or the node that serves it. Or use Esc to cancel.';
 $ec_lang['lpn_pane_tab_customers']='Customers';
 $ec_lang['lpn_customer_heading']='Customer {id}';
@@ -1342,7 +1342,7 @@ $ec_lang['lpn_tool_vertices_tip']='Add and remove pipe vertices. Specify a point
 $ec_lang['lpn_tool_undo_tip']='Undo history length = 20 actions';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network to the map window. Press again for Zoom Window. See also upper right map zoom controls.';
-$ec_lang['lpn_tool_zoom_window_tip']='Click or drag. Press again for Zoom to fit.';
+$ec_lang['lpn_tool_zoom_window_tip']='Specify corners or drag a rectangle. Press again for Zoom to fit.';
 // Tom's wording, 2026-09-25.
 $ec_lang['lpn_zoom_in_tip']='Zoom in. Shortcut: +';
 // Tom's wording, 2026-09-25.
@@ -3032,7 +3032,6 @@ $ec_lang['lpn_settings_default_is']='The default is {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Convergence limit the solver must reach before it stops, measured as the total change in flow from one trial to the next, divided by the total flow in the links. A smaller number is more exact and takes longer.';
 $ec_lang['lpn_settings_specific_gravity']='Specific gravity';
-$ec_lang['lpn_settings_specific_gravity_tip']='The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows.';
 $ec_lang['lpn_settings_viscosity']='Relative viscosity';
 // **THE PASHTO COLLISION THIS ANSWERS IS REAL AND IS INSIDE PASHTO** (sprint 584-wave1). ps renders
 // this key with the word غلظت, which carries BOTH viscosity/thickness AND concentration -- so it
@@ -3381,7 +3380,7 @@ $ec_lang['lpn_quality_unit_ug']='µg/L';
 // and handed to the engine with no box to read or change them from; EPANET's own names and its own
 // defaults (0.01 and 1.0), shown only for a chemical, which is all either one means anything to.
 $ec_lang['lpn_quality_tolerance']='Quality tolerance';
-$ec_lang['lpn_quality_tolerance_tip']='How much two adjoining parcels of water may differ in concentration before EPANET stops treating them as one. Blank uses EPANET\'s own default of 0.01.';
+$ec_lang['lpn_quality_tolerance_tip']='Concentration difference below which EPANET treats two adjoining parcels of water as one. Blank uses EPANET\'s own default of 0.01.';
 $ec_lang['lpn_quality_diffusivity']='Relative diffusivity';
 $ec_lang['lpn_quality_diffusivity_tip']='Diffusivity of the chemical in water, relative to chlorine. Blank uses EPANET\'s own default of 1.0.';
 // R-323: "We could put it in Properties, Find, and Tables as '{chemical} concentration', and that

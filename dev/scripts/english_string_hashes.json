@@ -1288,7 +1288,6 @@
                 "lpn_settings_show_arrows_tip",
                 "lpn_settings_snap_off",
                 "lpn_settings_specific_gravity",
-                "lpn_settings_specific_gravity_tip",
                 "lpn_settings_trials",
                 "lpn_settings_trials_tip",
                 "lpn_settings_unbalanced",
@@ -4312,7 +4311,6 @@
         "lpn_settings_show_titles": "35992d6f38a21a851fe018bde1467dc3a8a875ad",
         "lpn_settings_snap_off": "e3de5ab0ca4c69dbf00e86d2558843e8d806bb49",
         "lpn_settings_specific_gravity": "55d91fad4e0bb56a733c123f2eeb0e51bb09ce62",
-        "lpn_settings_specific_gravity_tip": "eed6ab7932184cf594fc0a57d0601fe27b9fe2fd",
         "lpn_settings_sym_all": "6a72085653e4c5be8c7640c868ef787cbcf063d1",
         "lpn_settings_sym_customer": "0e85749a6f40d4614b87411e141fe8109099bc4f",
         "lpn_settings_sym_link_colors": "294d99a6f45168b8c7c4b2b07fa9cf07ebc3a37e",
@@ -11445,10 +11443,6 @@
         "lpn_settings_specific_gravity": {
             "words": 2,
             "ends_sentence": false
-        },
-        "lpn_settings_specific_gravity_tip": {
-            "words": 19,
-            "ends_sentence": true
         },
         "lpn_settings_sym_all": {
             "words": 1,

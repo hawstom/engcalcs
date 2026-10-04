@@ -2735,7 +2735,6 @@ $ec_lang['lpn_settings_default_is']='Chaguo-msingi ni {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Ni kwa kiasi gani kitatuzi kinatakiwa kukaribia kabla ya kusimama, kikipimwa kama kiasi ambacho mtiririko bado unabadilika kutoka jaribio moja hadi lingine. Namba ndogo zaidi ni sahihi zaidi na huchukua muda mrefu zaidi. Vitatuzi vyote viwili husoma kisanduku hiki kimoja, na kila kimoja hupima mabadiliko hayo dhidi ya jumla tofauti: kitatuzi kilichojengwa ndani dhidi ya jumla ya mahitaji, EPANET dhidi ya jumla ya mtiririko wa viungo. Kikiachwa tupu, ukurasa huu hutumia usahihi mkali zaidi kuliko chaguo-msingi la EPANET lenyewe.';
 $ec_lang['lpn_settings_specific_gravity']='Uzito maalum';
-$ec_lang['lpn_settings_specific_gravity_tip']='Uzito wa maji maji ukilinganishwa na maji. Hubadilisha shinikizo ambalo kipimo kingesoma, si mtiririko.';
 $ec_lang['lpn_settings_viscosity']='Unato wa uwiano';
 $ec_lang['lpn_settings_viscosity_tip']='Unato wa maji maji ukilinganishwa na maji kwenye nyuzi 20 Selsiasi. Hubadilisha jibu tu chini ya mbinu ya Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Idadi ya juu ya marudio';

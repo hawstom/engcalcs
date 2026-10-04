@@ -46930,7 +46930,7 @@ var EngCalcs = EngCalcs || {};
 				? 1 : settings.hydraulics.demandMultiplier),
 			{ perScenario: true });
 		hydNumberRow('specificGravity', 'lpn_settings_specific_gravity', 'Specific gravity',
-			'lpn_settings_specific_gravity_tip', 1);
+			'', 1);
 		hydNumberRow('viscosity', 'lpn_settings_viscosity', 'Relative viscosity',
 			'lpn_settings_viscosity_tip', 1);
 		hydNumberRow('emitterExponent', 'lpn_settings_emitter_exponent', 'Emitter exponent',

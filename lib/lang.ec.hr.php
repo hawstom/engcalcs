@@ -2736,7 +2736,6 @@ $ec_lang['lpn_settings_default_is']='Zadana vrijednost je {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Koliko blizu rješavač mora doći prije nego što stane, mjereno iznosom za koji se protoci još uvijek mijenjaju od jedne iteracije do sljedeće. Manji broj je precizniji i traje dulje. Oba rješavača čitaju ovo isto polje, a svaki tu promjenu mjeri prema drugačijem ukupnom iznosu: ugrađeni rješavač prema zbroju potražnji, EPANET prema zbroju protoka u vodovima. Ostavljeno prazno, ova stranica koristi stroži uvjet točnosti od EPANET-ove vlastite zadane vrijednosti.';
 $ec_lang['lpn_settings_specific_gravity']='Specifična težina';
-$ec_lang['lpn_settings_specific_gravity_tip']='Težina tekućine u odnosu na vodu. Mijenja tlakove koje bi pokazao manometar, ne i protoke.';
 $ec_lang['lpn_settings_viscosity']='Relativna viskoznost';
 $ec_lang['lpn_settings_viscosity_tip']='Viskoznost tekućine u odnosu na vodu pri 20 stupnjeva Celzijevih. Mijenja rezultat samo pri metodi Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Najveći broj iteracija';

@@ -82,6 +82,7 @@ const DELETED = [
 	{ key: 'lpn_field_demand_pattern_tip', ruling: 'Tom, 2026-10-04: the blank option says Default instead' },
 	{ key: 'lpn_field_meter_pattern_tip', ruling: 'Tom, 2026-10-04: the blank option says Default instead' },
 	{ key: 'lpn_labels_priority_link_tip', ruling: 'Tom, 2026-10-04: one drop tip for all three label tables' },
+	{ key: 'lpn_settings_specific_gravity_tip', ruling: 'Tom, 2026-10-04: "SG, yes, delete."' },
 	{ key: 'lpn_labels_priority_customer_tip', ruling: 'Tom, 2026-10-04: one drop tip for all three label tables' }
 ];
 

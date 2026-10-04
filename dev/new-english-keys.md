@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**5 still to read on master**, of 54 untranslated keys, of 2288 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**5 still to read on master**, of 54 untranslated keys, of 2287 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -463,7 +463,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**12 still to read**, of 19 new keys across 15 unmerged branch(es).
+**68 still to read**, of 75 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -474,7 +474,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/basemap-style (`e1e05de5`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/basemap-style (`0bc4d9bb`) — 20 new, 20 to read @@ NEEDS RULING
 
 - **`lpn_basemap_style_faded`**
   > Faded
@@ -488,6 +488,48 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_basemap_style_normal`**
   > Normal
   @@ NEEDS RULING
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map first.
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
 - **`lpn_settings_basemap_style`**
   > Basemap style
   @@ NEEDS RULING
@@ -497,11 +539,140 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dialog-audit (`343c3783`) — adds no English strings
+### feat/dialog-audit (`9bdb5559`) — 14 new, 14 to read @@ NEEDS RULING
 
-### feat/elev-default (`af1d7176`) — adds no English strings
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map first.
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
 
-### feat/epanet-pp-brand (`15efa631`) — adds no English strings
+### feat/elev-default (`90f33841`) — 14 new, 14 to read @@ NEEDS RULING
+
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map first.
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
+
+### feat/epanet-pp-brand (`3655b959`) — 14 new, 14 to read @@ NEEDS RULING
+
+- **`lpn_dock_autohide`**
+  > Auto-hide
+  @@ NEEDS RULING
+- **`lpn_dock_float`**
+  > Float
+  @@ NEEDS RULING
+- **`lpn_dock_left`**
+  > Dock at the left of the map
+  @@ NEEDS RULING
+- **`lpn_dock_right`**
+  > Dock at the right of the map
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_and`**
+  > Filtered by {q} and selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_none`**
+  > None of the selected elements are in this table.
+  @@ NEEDS RULING
+- **`lpn_pane_filter_sel_note`**
+  > Selection only. Showing {n} of {all}.
+  @@ NEEDS RULING
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only`**
+  > Selection only
+  @@ NEEDS RULING
+- **`lpn_pane_sel_only_none`**
+  > No elements are selected. Select elements on the map first.
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -559,8 +730,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Scenario overrides:
   @@ NEEDS RULING
 
-### feat/tip-verdict (`78d9cf5f`) — adds no English strings
-
-### fix/graph-tab-order (`c3848af5`) — adds no English strings
-
-### fix/run-time-message (`a38b91dd`) — adds no English strings
+### feat/tip-verdict (`32466a74`) — adds no English strings

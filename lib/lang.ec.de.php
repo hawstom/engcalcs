@@ -2737,7 +2737,6 @@ $ec_lang['lpn_settings_default_is']='Der Standard ist {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Wie nahe der Löser kommen muss, bevor er stoppt, gemessen als der Betrag, um den sich die Durchflüsse von einem Versuch zum nächsten noch ändern. Eine kleinere Zahl ist genauer und dauert länger. Beide Löser lesen dieses eine Feld, messen diese Änderung aber jeweils an einer anderen Gesamtsumme: der eingebaute Löser an der Summe der Entnahmen, EPANET an der Summe der Rohrdurchflüsse. Bleibt das Feld leer, verwendet diese Seite eine strengere Genauigkeit als EPANETs eigener Standard.';
 $ec_lang['lpn_settings_specific_gravity']='Spezifisches Gewicht';
-$ec_lang['lpn_settings_specific_gravity_tip']='Das Gewicht der Flüssigkeit im Vergleich zu Wasser. Es ändert die Drücke, die ein Manometer anzeigen würde, nicht die Durchflüsse.';
 $ec_lang['lpn_settings_viscosity']='Relative Viskosität';
 $ec_lang['lpn_settings_viscosity_tip']='Die Viskosität der Flüssigkeit im Vergleich zu Wasser bei 20 Grad Celsius. Sie ändert das Ergebnis nur bei der Methode Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Maximale Versuche';

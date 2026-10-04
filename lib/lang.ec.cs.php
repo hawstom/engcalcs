@@ -2737,7 +2737,6 @@ $ec_lang['lpn_settings_default_is']='Výchozí hodnota je {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Jak blízko se musí řešič dostat, než se zastaví, měřeno jako míra, o kterou se průtoky mezi jednou a další zkouškou stále mění. Menší číslo je přesnější a trvá déle. Oba řešiče čtou totéž pole, ale každý ho porovnává s jiným celkem: vestavěný řešič se součtem odběrů, EPANET se součtem průtoků v potrubích. Ponecháte-li pole prázdné, tato stránka použije přísnější přesnost, než je vlastní výchozí hodnota EPANET.';
 $ec_lang['lpn_settings_specific_gravity']='Měrná hmotnost';
-$ec_lang['lpn_settings_specific_gravity_tip']='Hmotnost kapaliny ve srovnání s vodou. Mění tlaky, které by ukázal manometr, ne průtoky.';
 $ec_lang['lpn_settings_viscosity']='Poměrná viskozita';
 $ec_lang['lpn_settings_viscosity_tip']='Viskozita kapaliny ve srovnání s vodou při 20 stupních Celsia. Mění výsledek jen podle metody Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Maximální počet zkoušek';

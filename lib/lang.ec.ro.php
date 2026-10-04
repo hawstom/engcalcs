@@ -2736,7 +2736,6 @@ $ec_lang['lpn_settings_default_is']='Valoarea implicită este {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Cât de aproape trebuie să ajungă rezolvitorul înainte de a se opri, măsurat ca mărimea cu care debitele încă se schimbă de la o încercare la următoarea. Un număr mai mic este mai exact și durează mai mult. Ambele rezolvitoare citesc această singură casetă, dar fiecare măsoară acea schimbare față de un total diferit: rezolvitorul intern față de suma cerințelor, EPANET față de suma debitelor din legături. Lăsată goală, această pagină folosește o precizie mai strictă decât valoarea implicită a EPANET.';
 $ec_lang['lpn_settings_specific_gravity']='Densitate relativă';
-$ec_lang['lpn_settings_specific_gravity_tip']='Greutatea fluidului comparată cu a apei. Schimbă presiunile pe care le-ar citi un manometru, nu debitele.';
 $ec_lang['lpn_settings_viscosity']='Vâscozitate relativă';
 $ec_lang['lpn_settings_viscosity_tip']='Vâscozitatea fluidului comparată cu a apei la 20 de grade Celsius. Schimbă răspunsul doar la metoda Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Încercări maxime';

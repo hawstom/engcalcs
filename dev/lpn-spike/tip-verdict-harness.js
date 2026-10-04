@@ -127,5 +127,17 @@ console.log('\n--- 4. a blank that follows a default says Default ---');
 	ok('neither deleted pattern tip is read', !/pc\.lpn_field_(demand|meter)_pattern_tip/.test(js));
 }
 
+console.log('\n--- 5. Toms follow-up wording, 2026-10-04 ---');
+{
+	ok('customer tip opens "Specify the customer point, then its connection: a link or node."',
+		val('lpn_tool_add_meter_tip').indexOf('Specify the customer point, then its connection: a link or node.') === 0);
+	ok('zoom window tip opens "Specify corners or drag a rectangle."',
+		val('lpn_tool_zoom_window_tip').indexOf('Specify corners or drag a rectangle.') === 0);
+	ok('quality tolerance tip says concentration difference below which parcels are one',
+		/^Concentration difference below which EPANET treats two adjoining parcels of water as one\./.test(val('lpn_quality_tolerance_tip')));
+	ok('the specific gravity tip is gone but its Settings row still takes a label',
+		val('lpn_settings_specific_gravity_tip') === null && /hydNumberRow\('specificGravity', 'lpn_settings_specific_gravity', 'Specific gravity',\s*'', 1\)/.test(js));
+}
+
 console.log(fails ? '\n' + fails + ' FAILURE(S)' : '\nall checks passed');
 process.exit(fails ? 1 : 0);

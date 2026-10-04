@@ -128,6 +128,10 @@ Tip text removed from the Looped Network page on Tom's 2026-10-04 tip verdicts, 
 
 - Text added before this property on map labels (`lpn_labels_prefix_tip`)
 
+## Settings dialog: specific gravity field
+
+- The weight of the fluid compared with water. It changes the pressures a gauge would read, not the flows. (`lpn_settings_specific_gravity_tip`)
+
 ## Settings dialog: suffix field
 
 - Text added after this property on map labels (`lpn_labels_suffix_tip`)

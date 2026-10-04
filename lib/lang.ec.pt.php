@@ -2736,7 +2736,6 @@ $ec_lang['lpn_settings_default_is']='O padrão é {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Quão próximo o solucionador precisa chegar antes de parar, medido pela variação total na vazão de uma tentativa para a próxima, dividida pela vazão total nos trechos. Um número menor é mais exato e demora mais.';
 $ec_lang['lpn_settings_specific_gravity']='Densidade relativa';
-$ec_lang['lpn_settings_specific_gravity_tip']='O peso do fluido em comparação com a água. Isso altera as pressões que um manômetro leria, não as vazões.';
 $ec_lang['lpn_settings_viscosity']='Viscosidade relativa';
 $ec_lang['lpn_settings_viscosity_tip']='A viscosidade do fluido em comparação com a água a 20 graus Celsius. Isso só altera a resposta no método de Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Máximo de tentativas';

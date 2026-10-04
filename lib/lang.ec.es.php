@@ -2791,7 +2791,6 @@ $ec_lang['lpn_settings_default_is']='El valor predeterminado es {n}.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_settings_accuracy_tip']='Qué tan cerca debe llegar el solucionador antes de detenerse, medido como la cantidad en que los caudales todavía cambian de una prueba a la siguiente. Un número más pequeño es más exacto y tarda más. Ambos solucionadores leen este mismo cuadro, y cada uno mide ese cambio contra un total distinto: el solucionador incorporado contra la suma de las demandas, EPANET contra la suma de los caudales de las líneas. Si se deja vacío, esta página usa una precisión más estricta que el valor predeterminado propio de EPANET.';
 $ec_lang['lpn_settings_specific_gravity']='Gravedad específica';
-$ec_lang['lpn_settings_specific_gravity_tip']='El peso del fluido en comparación con el agua. Cambia las presiones que marcaría un manómetro, no los caudales.';
 $ec_lang['lpn_settings_viscosity']='Viscosidad relativa';
 $ec_lang['lpn_settings_viscosity_tip']='La viscosidad del fluido en comparación con el agua a 20 grados Celsius. Solo cambia el resultado con el método de Darcy-Weisbach.';
 $ec_lang['lpn_settings_trials']='Máximo de pruebas';
