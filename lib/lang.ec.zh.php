@@ -2852,9 +2852,7 @@ $ec_lang['lpn_settings_label_always']='始终显示';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='限制节点放大不超过';
-$ec_lang['lpn_settings_symbol_cap_mid']='倍的';
-$ec_lang['lpn_settings_symbol_cap_post']='百分位管道长度';
+$ec_lang['lpn_settings_symbol_cap_sentence']='限制节点放大不超过 {n} 倍的 {p} 百分位管道长度';
 $ec_lang['lpn_settings_symbol_cap_tip']='一旦节点的地面直径达到本管网中该百分位管道长度的这么多倍，该节点就停止在地面尺度上继续放大。超过这一点后，节点、管道及其他符号会随着缩小地图而在屏幕上变小，而不再按地面尺度放大。水库和水箱是例外，它们在任何缩放级别下都保持相同的屏幕尺寸。';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

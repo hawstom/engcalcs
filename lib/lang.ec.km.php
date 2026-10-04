@@ -2913,9 +2913,7 @@ $ec_lang['lpn_settings_label_always']='បង្ហាញជានិច្ច';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='ការពារថ្នាំងមិនឲ្យពង្រីកលើសពី';
-$ec_lang['lpn_settings_symbol_cap_mid']='ដង នៃប្រវែងនៃ';
-$ec_lang['lpn_settings_symbol_cap_post']='បំពង់ភាគរយទី';
+$ec_lang['lpn_settings_symbol_cap_sentence']='ការពារថ្នាំងមិនឲ្យពង្រីកលើសពី {n} ដង នៃប្រវែងនៃ {p} បំពង់ភាគរយទី';
 $ec_lang['lpn_settings_symbol_cap_tip']='ថ្នាំងមួយឈប់ធំឡើងនៅលើដីនៅពេលអង្កត់ផ្ចិតរបស់វាស្មើនឹងចំនួនដងនេះនៃប្រវែងបំពង់នៅភាគរយនេះនៃប្រវែងបំពង់ទាំងអស់នៅក្នុងបណ្ដាញ។ លើសពីចំណុចនោះនៅលើផែនទី ថ្នាំង បំពង់ និងនិមិត្តសញ្ញាផ្សេងទៀតតូចចុះនៅលើអេក្រង់ ខណៈអ្នកបង្រួម ជំនួសឲ្យការធំឡើងនៅលើដី។ អាងស្តុក និងធុងទឹកជាករណីលើកលែង ហើយរក្សាទំហំអេក្រង់របស់ពួកវានៅគ្រប់កម្រិតពង្រីក។';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

@@ -2908,9 +2908,7 @@ $ec_lang['lpn_settings_label_always']='Mostrar siempre';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='Evitar que los nudos escalen más grandes que';
-$ec_lang['lpn_settings_symbol_cap_mid']='veces la longitud de la';
-$ec_lang['lpn_settings_symbol_cap_post']='tubería del percentil';
+$ec_lang['lpn_settings_symbol_cap_sentence']='Evitar que los nudos escalen más grandes que {n} veces la longitud de la {p} tubería del percentil';
 $ec_lang['lpn_settings_symbol_cap_tip']='Un nudo deja de crecer sobre el terreno cuando su diámetro llegaría a ser tantas veces la longitud de la tubería en este percentil de todas las longitudes de tubería de la red. Más allá de ese punto en el mapa, los nudos, tuberías y otros símbolos se encogen en la pantalla al alejar el zoom en lugar de crecer sobre el terreno. Los embalses y depósitos son la excepción y mantienen su tamaño en pantalla en cualquier zoom.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

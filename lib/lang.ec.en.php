@@ -3179,9 +3179,7 @@ $ec_lang['lpn_settings_label_always']='Always show';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='Prevent nodes from scaling larger than';
-$ec_lang['lpn_settings_symbol_cap_mid']='times the length of the';
-$ec_lang['lpn_settings_symbol_cap_post']='percentile pipe';
+$ec_lang['lpn_settings_symbol_cap_sentence']='Prevent nodes from scaling larger than {n} times the length of the {p} percentile pipe';
 $ec_lang['lpn_settings_symbol_cap_tip']='Junctions stop holding their screen size once their map diameter would be this many times the length of the pipe at this percentile of all pipe lengths in the network. Past that point on the map, junctions, pipes and other symbols shrink on the screen as you zoom out. Reservoirs and tanks are the exception and keep their screen size at every zoom.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

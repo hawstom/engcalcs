@@ -2851,9 +2851,7 @@ $ec_lang['lpn_settings_label_always']='ሁልጊዜ አሳይ';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='ነጥቦች ከዚህ የሚበልጥ መጠን እንዳያድጉ ገድብ፦';
-$ec_lang['lpn_settings_symbol_cap_mid']='እጥፍ የ';
-$ec_lang['lpn_settings_symbol_cap_post']='ኛ ፐርሰንታይል ቧንቧ ርዝመት';
+$ec_lang['lpn_settings_symbol_cap_sentence']='ነጥቦች ከዚህ የሚበልጥ መጠን እንዳያድጉ ገድብ፦ {n} እጥፍ የ {p} ኛ ፐርሰንታይል ቧንቧ ርዝመት';
 $ec_lang['lpn_settings_symbol_cap_tip']='ዲያሜትሩ በመረቡ ውስጥ ካሉት ሁሉም የቧንቧ ርዝመቶች በዚህ መቶኛ ደረጃ ካለው ቧንቧ ርዝመት ይህን ያህል እጥፍ ሲደርስ አንድ መገናኛ በመሬት ላይ ማደጉን ያቆማል። ከዚያ ነጥብ በኋላ በካርታው ላይ፣ መገናኛዎች፣ ቧንቧዎችና ሌሎች ምልክቶች ሲያጉሉ በመሬት ላይ ከማደግ ይልቅ በስክሪኑ ላይ ያሳንሳሉ። ማጠራቀሚያዎችና ታንኮች ልዩ ናቸው፣ በእያንዳንዱ ማጉላት ደረጃ የስክሪን መጠናቸውን ይይዛሉ።';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
