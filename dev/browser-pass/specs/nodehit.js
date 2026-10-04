@@ -344,6 +344,10 @@ async function clickSymbols(a) {
 	const out = [];
 	for (const p of spots) {
 		await a.page.keyboard.press('Escape');
+		// The Properties box is a docked panel now (feat/dock, 7e646684, 2026-10-04) and Escape reaches a
+		// box only when it has focus (bdf0b552), so the previous click's box stays open, 402 px wide,
+		// over the next symbol. Closed by its own button, as a person would.
+		await a.page.evaluate(() => { const c = document.getElementById('lpn_popup_close'); if (c) { c.click(); } });
 		await a.settle(120);
 		// **IT AIMS AT INK THE LABELS ARE NOT COVERING, AND THAT IS NOT A DODGE.** Every label lives
 		// in the topmost layer and keeps its own grab shape (Tom, 2026-09-10: *"Slop for labels"*),
