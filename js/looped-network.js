@@ -49166,6 +49166,7 @@ var EngCalcs = EngCalcs || {};
 			el.className = 'd-print-none lpn-dock-strip';
 			el.setAttribute('role', 'toolbar');
 			el.setAttribute('aria-orientation', 'vertical');
+			wireDockStripOrder(el);
 			document.body.appendChild(el);
 		}
 		return el;
@@ -49424,45 +49425,59 @@ var EngCalcs = EngCalcs || {};
 		});
 		seen.forEach(function (d) { if (d.save) { d.save(); } });
 	}
-	function wireDockTabOrder(d, tab) {
-		var from = null;
-		tab.style.touchAction = 'none';
-		tab.addEventListener('pointerdown', function (e) {
-			if (e.button !== undefined && e.button !== 0) { return; }
-			tab.lpnDragged = false;
-			from = { y: e.clientY, id: e.pointerId, live: false };
-		});
-		tab.addEventListener('pointermove', function (e) {
-			var strip = tab.parentNode, kids, i, r, before = null;
-			if (!from || !strip) { return; }
-			if (!from.live) {
-				if (Math.abs(e.clientY - from.y) < LPN_FLAG_SLOP) { return; }
-				from.live = true;
-				tab.lpnDragged = true;
+	// The press is remembered here and the rest of the drag is judged on the STRIP, which holds the
+	// pointer capture: moving the flag's own node along the bar drops a capture held on that node, and
+	// every later move and the release then never arrive.
+	var dockFlagDrag = null;
+	function dockFlagEnd(strip) {
+		var was = dockFlagDrag, tab = was && was.tab;
+		dockFlagDrag = null;
+		if (!was) { return; }
+		try { if (strip.releasePointerCapture && was.live) { strip.releasePointerCapture(was.id); } } catch (err) { /* already released */ }
+		if (!was.live) { return; }
+		tab.classList.remove('lpn-dock-tab-drag');
+		dockCommitOrder(strip);
+		layoutDocks();
+		// Where the browser sends no click after a drag, the mark must not linger and swallow the
+		// next real one.
+		setTimeout(function () { tab.lpnDragged = false; }, 0);
+	}
+	function wireDockStripOrder(strip) {
+		strip.addEventListener('pointermove', function (e) {
+			var g = dockFlagDrag, kids, i, r, before = null;
+			if (!g || e.pointerId !== g.id) { return; }
+			if (!g.live) {
+				if (Math.abs(e.clientY - g.y) < LPN_FLAG_SLOP) { return; }
+				g.live = true;
+				g.tab.lpnDragged = true;
 				clearTimeout(dockTimer);
-				if (dockFlyout === d) { dockTuck(d); }
-				try { if (tab.setPointerCapture) { tab.setPointerCapture(from.id); } } catch (err) { /* drag without capture */ }
-				tab.classList.add('lpn-dock-tab-drag');
+				if (dockFlyout === g.d) { dockTuck(g.d); }
+				try { if (strip.setPointerCapture) { strip.setPointerCapture(g.id); } } catch (err) { /* drag without capture */ }
+				g.tab.classList.add('lpn-dock-tab-drag');
 			}
-			kids = Array.prototype.filter.call(strip.children, function (k) { return k !== tab; });
+			kids = Array.prototype.filter.call(strip.children, function (k) { return k !== g.tab; });
 			for (i = 0; i < kids.length; i++) {
 				r = kids[i].getBoundingClientRect();
 				if (e.clientY < r.top + r.height / 2) { before = kids[i]; break; }
 			}
-			if (before ? before.previousSibling !== tab : tab !== strip.lastChild) { strip.insertBefore(tab, before); }
+			if (before ? before.previousSibling !== g.tab : g.tab !== strip.lastChild) { strip.insertBefore(g.tab, before); }
 			e.preventDefault();
 		});
-		['pointerup', 'pointercancel'].forEach(function (evt) {
-			tab.addEventListener(evt, function () {
-				var was = from && from.live;
-				from = null;
-				if (!was) { return; }
-				tab.classList.remove('lpn-dock-tab-drag');
-				if (tab.parentNode) { dockCommitOrder(tab.parentNode); }
-				// Where the browser sends no click after a drag, the mark must not linger and
-				// swallow the next real one.
-				setTimeout(function () { tab.lpnDragged = false; }, 0);
+		['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (evt) {
+			strip.addEventListener(evt, function (e) {
+				// A touch press is captured by its flag at first; handing the capture to the strip makes
+				// the flag report a loss, which is not the end of the drag.
+				if (evt === 'lostpointercapture' && e.target !== strip) { return; }
+				if (dockFlagDrag && e.pointerId === dockFlagDrag.id) { dockFlagEnd(strip); }
 			});
+		});
+	}
+	function wireDockTabOrder(d, tab) {
+		tab.style.touchAction = 'none';
+		tab.addEventListener('pointerdown', function (e) {
+			if (e.button !== undefined && e.button !== 0) { return; }
+			tab.lpnDragged = false;
+			dockFlagDrag = { d: d, tab: tab, y: e.clientY, id: e.pointerId, live: false };
 		});
 		tab.addEventListener('keydown', function (e) {
 			var strip = tab.parentNode, kids, i, other;
