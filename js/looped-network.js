@@ -21413,29 +21413,11 @@ var EngCalcs = EngCalcs || {};
 		// (The profile's hide() exists because its route highlight would otherwise outlive the
 		// panel that explains it.)
 	});
-	// **FREQUENCY BESIDE TIME SERIES, AND PROFILE STILL LAST** (Task 600) -- the same argument that
-	// placed Time series: a new drawing joins the drawings, inside their stretch of the strip.
-	paneTabs.push({
-		id: 'frequency', panel: 'lpn_pane_frequency', label: 'lpn_freq_menu', tip: 'lpn_freq_tip',
-		formId: 'lpn_freq_form',
-		show: function () { freqTabShow(); },
-		// Every solve, every edit and every step of the transport, so the curve is always the
-		// map's own moment.
-		refresh: function () { freqTabShow(); }
-	});
-	// **SYSTEM FLOW AFTER FREQUENCY, PROFILE STILL LAST** (Task 600) -- the same argument again. No
-	// formId: the tab has no controls, so paneFocusTabFirstControl() lands on the panel itself.
-	paneTabs.push({
-		id: 'sysflow', panel: 'lpn_pane_sysflow', label: 'lpn_sysflow_menu', tip: 'lpn_sysflow_tip',
-		show: function () { sysflowTabShow(); },
-		// Every solve and every step of the transport, which keeps the `now` line under the scrubber.
-		refresh: function () { sysflowTabShow(); }
-	});
-	// **PROFILE IS LAST** (Tom, 2026-08-21: "making Profile the last tab"). It is still the odd one
-	// out -- a drawing where the other six are tables -- and the end of the strip is where an odd
-	// one out belongs, rather than the front, where it stood between the reader and the six things
-	// that are alike. Putting it last is also what lets the Print button hold the leading edge:
-	// print acts on a TABLE, and the tabs it applies to are now the ones next to it.
+	// **PROFILE SECOND, AS IN THE GRAPHS MENU** (Tom, 2026-10-04: *"Order of bottom pane graph tabs
+	// should match menu."*). The menu follows EPANET's Graph Selection order -- Time series, Profile,
+	// Contour, Frequency, Flow balance -- and Contour is a map layer with no tab, so the strip's
+	// drawings run Time series, Profile, Frequency, Flow balance. This replaces "making Profile the
+	// last tab" (2026-08-21).
 	paneTabs.push({
 		id: 'profile', panel: 'lpn_pane_profile', label: 'lpn_profile_menu', tip: 'lpn_profile_tip',
 		formId: 'lpn_profile_form',
@@ -21464,6 +21446,24 @@ var EngCalcs = EngCalcs || {};
 			profileState.editing = false; profileState.editDrag = null;
 			profileDrawCancel(); drawProfilePath(null);
 		}
+	});
+	// **FREQUENCY AFTER PROFILE** (Task 600) -- the same argument that
+	// placed Time series: a new drawing joins the drawings, inside their stretch of the strip.
+	paneTabs.push({
+		id: 'frequency', panel: 'lpn_pane_frequency', label: 'lpn_freq_menu', tip: 'lpn_freq_tip',
+		formId: 'lpn_freq_form',
+		show: function () { freqTabShow(); },
+		// Every solve, every edit and every step of the transport, so the curve is always the
+		// map's own moment.
+		refresh: function () { freqTabShow(); }
+	});
+	// **SYSTEM FLOW AFTER FREQUENCY, LAST** (Task 600) -- the same argument again. No
+	// formId: the tab has no controls, so paneFocusTabFirstControl() lands on the panel itself.
+	paneTabs.push({
+		id: 'sysflow', panel: 'lpn_pane_sysflow', label: 'lpn_sysflow_menu', tip: 'lpn_sysflow_tip',
+		show: function () { sysflowTabShow(); },
+		// Every solve and every step of the transport, which keeps the `now` line under the scrubber.
+		refresh: function () { sysflowTabShow(); }
 	});
 	// The hover seam itself, wired once on the PANEL rather than on the chart: the reader's pointer
 	// is over "the profile" when it is anywhere in that panel, including its commentary line, and
