@@ -99,35 +99,42 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-04 (late evening)
+## STATE — 2026-10-04 (night)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged 2026-10-04 evening, on his typed words: 8110 dialog-audit, 8113 basemap-style, 8114
-epanet-pp-brand, 8115 elev-default, 8116 tip-verdict. Also: Show contours check box; Task 761
-specs; the scope harness presses dialog buttons as a pointer (the new dialog ignores a `detail: 0`
-click); the sitemap leaves the map app to epanet-plus-plus.org's own `sitemap-app.xml`.
-**Owed to Tom:** upload the regenerated `~/webdev/hawsedc.com/sitemap.xml` (518 URLs, no `/app/`);
-8110's phone test on dev.hawsedc.com once he pulls there.
+Merged 2026-10-04 on his words: dialog-audit, basemap-style, epanet-pp-brand, elev-default,
+tip-verdict, chain-draw (Junction Pipe Chain, his icon), scenario-option ("Calculation options"),
+pda (count also in the bottom map strip). Defect fixes: Show contours, Task 761 specs, phone menus
+hide shortcut keys (`fix/phone-menu-keys`), sitemap leaves the app to epanet-plus-plus.org. The
+parent-site sitemap is committed in `~/webdev/hawsedc.com` (9ddb034); it reaches production on his
+pull there. He phone-tested dialog-audit: "Dialogs are good."
 
-### Awaiting his browser pass (protected; ports.conf rows say what to try)
+### In flight
 
-- **8113** `feat/chain-draw` (719, moved from 8106: his tunnel does not carry 8106/8107): Junction
-  and Pipe tool, key 0. His calls: the name; no on-screen way to end a chain on a phone; the toolbar
-  wraps at 1201-1300 px; a pipe click ends the chain; no row for key 0 in the shortcuts table.
-- **8114** `feat/pda` (762, moved from 8107): Demand model DDA/PDA. His calls: "Delivered demand"
-  (EPANET says Demand); a kPa file is disclosed, not honoured; unit labels lag until Settings reopens.
-- **8111** `feat/scenario-option` (755): "Calculation options" now heads the three option columns
-  (he could not find them: nothing named the group); the double tooltip on each `?` is fixed. After
-  merge, apply the style rules to lpn_scenario_* (its basic tip says "Checked/Unchecked").
-- Still from before: 8108 `feat/profile-file`, `feat/desktop`, `feat/label-placer`.
+- **`fix/dock-title-buttons`** (agent running at /clear time; worktree
+  `~/webdev/worktrees/fix-dock-title-buttons`, on Branch previews): Full Report's Download and Print
+  collide with the dock icons; audit every dockable box, one rule, try his "middle". `git log` and
+  `git status` there first; relaunch from its commits if the agent died. A defect track: merges on
+  green, but show him the before/after.
+- **`feat/dock-flag-order`** (NOT started; queued behind the above, same dock code): drag a hidden
+  box's flag along its bar to reorder; order in the existing layout key in this browser; a click still
+  opens; phone tap works. His words: "I would like a good college try." Protect it in
+  dev/branch-policy.json when made.
+- Still from before: `feat/profile-file`, `feat/desktop`, `feat/label-placer`.
 
-### Owed translation work
+### Next job
 
-tip-verdict is merged, so most English has settled: **a sprint is the next sensible job.** Pending
-branches add little (chain-draw 3 keys, pda 19, scenario-option 1). Also owed: the 46 lpn keys held
-before, the Romanian file menu pass, four concept terms. Approved-English entries for the reworded
-and deleted tip-verdict keys may still sit in english-key-rulings.json; the orchestrator edits it.
+**A translation sprint**: the English has settled with tip-verdict merged (`new-english-keys.md`
+counts ~105 untranslated). Also owed: the 46 lpn keys held before, the Romanian file menu pass, four
+concept terms. Approved-English entries for tip-verdict's reworded and deleted keys may still sit in
+english-key-rulings.json; only the orchestrator edits it, from his words.
+
+### How he wants to be asked (2026-10-04)
+
+- **Name work by branch, never by port.** A port only in brackets.
+- **The Branch previews page must show a branch before he is asked to test it**: ports.conf row,
+  `generate.sh`, then grep the generated index for the branch. His tunnel does not carry 8106/8107.
 
 ### Traps met 2026-10-04
 
