@@ -44502,6 +44502,14 @@ var EngCalcs = EngCalcs || {};
 		var el = document.getElementById('lpn_u_mapcoords');
 		if (el) { el.textContent = mapCoordsUnitText(); }
 	}
+	// How many junctions the latest pressure-driven solve left short of their demand.
+	function pdaShortCount(result) {
+		var n = 0;
+		if (result && result.demandDeficits) {
+			Object.keys(result.demandDeficits).forEach(function (id) { if (result.demandDeficits[id] > 1e-9) { n++; } });
+		}
+		return n;
+	}
 	function refreshMapStatus() {
 		var el = document.getElementById('lpn_map_status'), pc = EngCalcs.pageConfig || {};
 		ensureCrsForProject();
@@ -44514,11 +44522,21 @@ var EngCalcs = EngCalcs || {};
 		// SYMMETRIC, so it needs no mirrored counterpart and renders identically whichever direction
 		// the run takes -- the three pairs reorder in Arabic or Hebrew and the dividers stay between
 		// them. That caution IS right for a DIRECTIONAL glyph (an arrow, a guillemet, U+25B8).
-		el.textContent = [
+		var parts = [
 			(pc.lpn_result_flow || 'Flow') + ': ' + unitLabel('lpn_u_flow'),
 			(pc.lpn_result_pressure || 'Pressure') + ': ' + unitLabel('lpn_u_pressure'),
 			(pc.bpn_method || 'Friction method') + ': ' + frictionMethodLabel()
-		].join(' | ');
+		], short;
+		// **PRESSURE-DRIVEN ANALYSIS IS A STANDING FACT OF THE MODEL, SO THE STRIP SAYS IT** (Task 762,
+		// Tom: *"The status bar counts the junctions that are short. [If the status bar is at the
+		// bottom, this is missing.]"*). The count follows the latest solve and is dropped when there
+		// is none; it is the same sentence the message box above the map carries.
+		if (String((settings.hydraulics || {}).demandModel || '').toUpperCase() === 'PDA') {
+			parts.push((pc.lpn_settings_demand_model || 'Demand model') + ': ' + (pc.lpn_settings_demand_model_pda || 'Pressure driven'));
+			short = pdaShortCount(lastSolveResult);
+			if (short > 0) { parts.push((pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(short)).replace(/\.$/, '')); }
+		}
+		el.textContent = parts.join(' | ');
 		refreshCoordsReadout();
 		placeLegends();
 	}
@@ -47597,6 +47615,7 @@ var EngCalcs = EngCalcs || {};
 			// stay in the document so that choosing PDA again finds them where they were left.
 			if (demandModelSel.value === 'PDA') { settings.hydraulics.demandModel = 'PDA'; }
 			else { delete settings.hydraulics.demandModel; }
+			refreshMapStatus();
 			saveToStorage();
 			rebuildSettingsBox();
 			if (demandModelSel.value === 'PDA') { warmEpanetIfNeeded(); }
@@ -63163,6 +63182,7 @@ var EngCalcs = EngCalcs || {};
 		// (Tom, 2026-09-25: results arriving after a Zoom to fit leave it exactly where it was).
 		if (!result.ok) {
 			lastSolveResult = null;
+			refreshMapStatus();
 			// A REFUSAL AND A FAILURE TO CONVERGE ARE DIFFERENT THINGS. The native solver can refuse
 			// a perfectly sound network (an active valve, when EPANET could not be loaded), and
 			// telling that user their network did not converge sends them to look for a zero
@@ -63202,6 +63222,7 @@ var EngCalcs = EngCalcs || {};
 		// both Settings rows, and neither makes the engine refuse: it hands back the last iterate.
 		var notConverged = result.converged === false;
 		lastSolveResult = result;
+		refreshMapStatus();
 		// The only case where the two engines knowingly disagree, so say so rather than let a
 		// user discover a 0.6% shift by switching the checkbox. See js/lpn-epanet.js.
 		function warned(code) {
@@ -63293,12 +63314,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		// **PRESSURE-DRIVEN ANALYSIS SAYS WHEN IT WITHHELD WATER** (Task 762): how many junctions got
 		// less than they asked for. Nothing is said when every junction was served in full.
-		var pdaShort = 0;
-		if (result.demandDeficits) {
-			Object.keys(result.demandDeficits).forEach(function (id) {
-				if (result.demandDeficits[id] > 1e-9) { pdaShort++; }
-			});
-		}
+		var pdaShort = pdaShortCount(result);
 		var pdaNote = pdaShort > 0
 			? (pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(pdaShort))
 			: '';
