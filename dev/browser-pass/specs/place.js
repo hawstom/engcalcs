@@ -61,11 +61,15 @@ async function drawL(a) {
 	}
 	await a.toolbarClick('Select');
 	await a.settle(400);
-	if (await a.nodeCount() < 3) { throw new Error(`${a.name}: the L network did not land`); }
+	if (await shownNodeCount(a) < 3) { throw new Error(`${a.name}: the L network did not land`); }
 }
 // **EVERY READ OF THE DRAWING BELOW KEEPS ONLY WHAT IS ON SCREEN** (Task 680): a project switch keeps
 // the drawing it leaves, hidden with display:none, so a placement's copy has the original's three
 // nodes still in the DOM beside its own. A hidden shape has no client rects and measures as zero.
+async function shownNodeCount(a) {
+	return a.page.evaluate(() => [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *:not(.lpn-node-hit)')]
+		.filter(e => e.getClientRects().length).length);
+}
 // Where each node is DRAWN, as the exact attribute text. Cancel's promise is `===`, so the check
 // has to be a string comparison and not a tolerance.
 async function nodePos(a) {
@@ -347,7 +351,7 @@ exports.run = async function ({ browser, report }) {
 		await drawL(a);
 		const original = await nodePos(a);
 		await placeCurrent(a, 'the-L.json');
-		report.eq(await a.nodeCount(), 3, 'the file opened, with its network in it');
+		report.eq(await shownNodeCount(a), 3, 'the file opened, with its network in it');
 		// **NOTHING ASKS ANY MORE** (Task 447). The confirm used to say "Convert this XY project to a
 		// geographic project?" -- a question already answered by choosing this row, and the only door
 		// into the tool. Its instructions were the useful half, so they are a notice you can read
@@ -374,7 +378,7 @@ exports.run = async function ({ browser, report }) {
 			'...and NOT Finish, Detach or the two numbers — nothing is attached to anything yet');
 		report.eq(await handleCount(a), 0,
 			'NO rectangular controls in step 1: nothing there can move the model');
-		report.eq(await a.nodeCount(), 3, 'the model itself is on the screen, drawn as itself');
+		report.eq(await shownNodeCount(a), 3, 'the model itself is on the screen, drawn as itself');
 		report.ok(await labelsHidden(a),
 			'generated labels are off for the duration — a label got dragged by accident');
 
@@ -534,11 +538,11 @@ exports.run = async function ({ browser, report }) {
 			hands.map(h => h.at).join(' | '));
 
 		// ---- 6. editing is locked while placing --------------------------------------------------
-		const n0 = await a.nodeCount();
+		const n0 = await shownNodeCount(a);
 		await a.toolbarClick('Junction');
 		await a.page.mouse.click(canvas.x + canvas.w * 0.15, canvas.y + canvas.h * 0.82);
 		await a.settle(350);
-		report.eq(await a.nodeCount(), n0,
+		report.eq(await shownNodeCount(a), n0,
 			'editing is locked while placing — the transform re-derives every point BY INDEX');
 		await a.toolbarClick('Select');
 
@@ -719,7 +723,7 @@ exports.run = async function ({ browser, report }) {
 		await wheelIn(a, 12);
 		await a.page.click('#lpn_georef_drop');
 		await a.settle(500);
-		const before = await a.nodeCount();
+		const before = await shownNodeCount(a);
 		await a.page.click('#lpn_georef_finish');
 		await a.settle(1000);
 		report.ok(a.lastDialog() && a.lastDialog().type === 'confirm', 'Finish asks first — it is not undoable');
@@ -728,7 +732,7 @@ exports.run = async function ({ browser, report }) {
 		const read = await readout(a);
 		report.ok(/Longitude/.test(read) && /Latitude/.test(read),
 			'the project is geographic afterwards: the readout speaks in degrees', read);
-		report.eq(await a.nodeCount(), before, '...with the same network still drawn');
+		report.eq(await shownNodeCount(a), before, '...with the same network still drawn');
 		report.has(await a.notice(), 'new coordinate system', '...and it says so');
 		report.ok(!(await labelsHidden(a)), '...with the labels back on');
 		const onMap = await fileRow(a, ROW);
@@ -794,8 +798,8 @@ exports.run = async function ({ browser, report }) {
 			await chooseLatLonInBox(a);   // a file with a network opens the Convert as box (Task 696)
 			// nodeCount() counts every drawn symbol, links included, so this is "the network is on the
 			// screen" rather than a node tally: two nodes and a pipe cannot draw fewer than three.
-			report.ok(await a.nodeCount() >= 3, `an EPANET file opens through ${ROW} too`,
-				(await a.nodeCount()) + ' symbols drawn');
+			report.ok(await shownNodeCount(a) >= 3, `an EPANET file opens through ${ROW} too`,
+				(await shownNodeCount(a)) + ' symbols drawn');
 			// **REINTERPRET IS GONE AS A MANUAL DOOR** (R-219; Tom, 2026-09-24, answering R-190).
 			// This spec used to walk a range-test guess into a "These are already lat/lon" button
 			// that armed the model unmoved; Tom dropped the button on the argument that typing 1 into

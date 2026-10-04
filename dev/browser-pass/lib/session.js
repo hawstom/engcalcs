@@ -377,10 +377,9 @@ class Session {
 	// "at least N", including drawL()'s own. A link's halo and hit band have been in linksLayer
 	// since long before this number was first written down, so they stay counted: this restores the
 	// figure the specs were anchored on rather than inventing a new one.
-	// Only what is on screen: a project switch keeps the drawing it leaves, hidden (Task 680).
 	async nodeCount() {
-		return this.page.evaluate(() => [...document.querySelectorAll(
-			'#lpn_canvas .lpn-symbols > *:not(.lpn-node-hit)')].filter(e => e.getClientRects().length).length);
+		return this.page.evaluate(() => document.querySelectorAll(
+			'#lpn_canvas .lpn-symbols > *:not(.lpn-node-hit)').length);
 	}
 	// **BY ACCESSIBLE NAME, NOT BY TEXT.** The toolbar has been icons only since 2026-08-18
 	// (dev/toolbar-icons.md); the word is still on every button, as its aria-label, which is exactly
