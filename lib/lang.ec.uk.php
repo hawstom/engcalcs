@@ -2908,9 +2908,7 @@ $ec_lang['lpn_settings_label_always']='Показувати завжди';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='Не давати вузлам масштабуватися більше, ніж';
-$ec_lang['lpn_settings_symbol_cap_mid']='разів довжини';
-$ec_lang['lpn_settings_symbol_cap_post']='труби цього процентиля';
+$ec_lang['lpn_settings_symbol_cap_sentence']='Не давати вузлам масштабуватися більше, ніж {n} разів довжини {p} труби цього процентиля';
 $ec_lang['lpn_settings_symbol_cap_tip']='Вузол перестає рости на місцевості, щойно його діаметр стає в стільки разів більшим за довжину труби цього процентиля серед усіх довжин труб мережі. Після цієї межі на карті вузли, труби та інші символи зменшуються на екрані при віддаленні замість того, щоб рости на місцевості. Виняток становлять резервуари й ємності, які зберігають свій розмір на екрані за будь-якого масштабу.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

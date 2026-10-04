@@ -2854,9 +2854,7 @@ $ec_lang['lpn_settings_label_always']='Immer anzeigen';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='Knoten daran hindern, größer zu werden als';
-$ec_lang['lpn_settings_symbol_cap_mid']='mal die Länge des';
-$ec_lang['lpn_settings_symbol_cap_post']='Perzentil-Rohrs';
+$ec_lang['lpn_settings_symbol_cap_sentence']='Knoten daran hindern, größer zu werden als {n} mal die Länge des {p} Perzentil-Rohrs';
 $ec_lang['lpn_settings_symbol_cap_tip']='Ein Entnahmeknoten hört auf, am Boden mitzuwachsen, sobald sein Durchmesser so viele Male die Länge des Rohrs bei diesem Perzentil aller Rohrlängen im Netz erreichen würde. Jenseits dieses Punkts schrumpfen Entnahmeknoten, Rohre und andere Symbole auf der Karte auf dem Bildschirm, statt am Boden weiterzuwachsen, wenn Sie herauszoomen. Reservoire und Tanks sind die Ausnahme und behalten bei jedem Zoom ihre Bildschirmgröße.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

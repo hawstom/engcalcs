@@ -2853,9 +2853,7 @@ $ec_lang['lpn_settings_label_always']='تل ښودل';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='نقطې د دومره اندازې نه ډیرې مه لویوئ:';
-$ec_lang['lpn_settings_symbol_cap_mid']='چنده د';
-$ec_lang['lpn_settings_symbol_cap_post']='پرسنټایل پایپ اوږدوالي';
+$ec_lang['lpn_settings_symbol_cap_sentence']='نقطې د دومره اندازې نه ډیرې مه لویوئ: {n} چنده د {p} پرسنټایل پایپ اوږدوالي';
 $ec_lang['lpn_settings_symbol_cap_tip']='یو جنکشن پر ځمکه د لویولو نه ودریږي یوځل چې د هغه قطر د شبکې کې د ټولو پایپونو اوږدوالو د دې پرسنټایل پر پایپ اوږدوالي دومره چنده شي. له هغه ټکي وروسته پر نقشه، جنکشنونه، پایپونه او نور نښانونه پرده کې کوچني کیږي کله چې تاسو زوم لرې کوئ، پرځای لدې چې پر ځمکه لوی شي. ذخیرې او ټانکونه استثنا دي او پر هر زوم خپله د پردې اندازه ساتي.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

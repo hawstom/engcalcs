@@ -8699,6 +8699,18 @@ var EngCalcs = EngCalcs || {};
 		if (typeof v !== 'number' || !isFinite(v)) { return ''; }
 		return String(tidyBreak(v));
 	}
+	// **A CATEGORICAL FIELD DECLARES ITS STATES HERE** (Task 664): the number colorValueOf() hands the
+	// ramp for each state, its language key and its English fallback, in the order a legend reads
+	// top to bottom. The MAP is untouched -- a state still enters the same break-based ramp as its
+	// number -- only the legend swaps the numeric bands for these words, each swatch taken from the
+	// band its number lands in. A future categorical field adds one entry and nothing else.
+	var COLOR_CATEGORIES = {
+		node: {},
+		link: { status: [
+			{ value: 1, key: 'lpn_result_status_open', text: 'Open' },
+			{ value: 0, key: 'lpn_result_status_closed', text: 'Closed' }
+		] }
+	};
 	function renderColorLegend() {
 		var box = colorLegendEl(); if (!box) { return; }
 		var pc = EngCalcs.pageConfig || {}, any = false;
@@ -8715,8 +8727,20 @@ var EngCalcs = EngCalcs || {};
 			box.appendChild(h);
 			// TOP BAND FIRST. A legend reads high-at-the-top the way a thermometer does, and the
 			// map's own high values are the ones a reviewer is scanning for.
-			var i;
-			for (i = breaks.length; i >= 0; i--) {
+			var i, cats = COLOR_CATEGORIES[group][field], R = ramps();
+			if (cats && R) {
+				cats.forEach(function (c) {
+					var crow = document.createElement('div'), csw = document.createElement('span'),
+						ctxt = document.createElement('span'), ci = R.classIndex(c.value, breaks);
+					crow.style.cssText = 'display:flex;gap:0.5em;align-items:center';
+					csw.className = 'lpn-color-swatch';
+					csw.style.background = bandColor(group, ci === null ? 0 : ci, breaks.length + 1);
+					ctxt.textContent = pc[c.key] || c.text;
+					crow.appendChild(csw); crow.appendChild(ctxt);
+					box.appendChild(crow);
+				});
+			}
+			for (i = cats && R ? -1 : breaks.length; i >= 0; i--) {
 				var row = document.createElement('div'), sw = document.createElement('span'),
 					txt = document.createElement('span');
 				row.style.cssText = 'display:flex;gap:0.5em;align-items:center';
@@ -26734,8 +26758,8 @@ var EngCalcs = EngCalcs || {};
 		// The keystroke has to reach this table, so the caret goes back to its current cell.
 		if (box) { paneFocusCell(spec, rows[box.fr].id, cols[box.fc].key); }
 		else if (rows.length && cols.length) { paneFocusCell(spec, rows[0].id, cols[0].key); }
-		setNotice(pc.lpn_pane_paste_armed ||
-			'Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.');
+		setNotice(kbdWords(pc.lpn_pane_paste_armed ||
+			'Press Ctrl+V to add the copied rows at the bottom of this table. Press Esc to cancel.'));
 		return true;
 	}
 	function paneDisarmAppend(spec, said) {
@@ -28051,7 +28075,7 @@ var EngCalcs = EngCalcs || {};
 			if (accel) {
 				acc = document.createElement('span');
 				acc.className = 'lpn-pane-ctxmenu-accel';
-				acc.textContent = accel;
+				acc.textContent = kbdWords(accel);
 				b.appendChild(acc);
 			}
 			b.addEventListener('click', function () { paneCloseContextMenu(); fn(); });
@@ -39101,6 +39125,11 @@ var EngCalcs = EngCalcs || {};
 		KeyW: 'lpn_menu_project', KeyH: 'lpn_menu_help', KeyL: 'lpn_menu_lang'
 	};
 	var kbdModeReturn = null;
+	// Shortcut words for this reader (EngCalcs.macWords, Calculators.lib.js); a headless stub that
+	// loads this file without that library gets the text unchanged.
+	function kbdWords(text) {
+		return (EngCalcs && EngCalcs.macWords) ? EngCalcs.macWords(text) : text;
+	}
 	function isMacPlatform() {
 		var p = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
 		return /mac|iphone|ipad/i.test(p);
@@ -47143,8 +47172,7 @@ var EngCalcs = EngCalcs || {};
 		// ratio and a percentage), so there is no unit to show and neither is reinterpreted on a
 		// unit change.
 		var capWrap = document.createElement('span'), capMultInput = document.createElement('input'),
-			capMid = document.createElement('span'), capPctInput = document.createElement('input'),
-			capPctSign = document.createElement('span'), capPost = document.createElement('span');
+			capPctInput = document.createElement('input'), capPctSign = document.createElement('span');
 		capWrap.className = 'lpn-set-ctlgroup';
 		capMultInput.type = 'number'; capMultInput.step = 'any'; capMultInput.min = '0';
 		capMultInput.id = 'lpn_set_symbol_cap_mult';
@@ -47158,8 +47186,6 @@ var EngCalcs = EngCalcs || {};
 				capMultInput.value = trimNum(symbolCapMultiple());
 			}
 		});
-		capMid.className = 'lpn-set-note';
-		capMid.textContent = pc.lpn_settings_symbol_cap_mid || 'times the length of the';
 		capPctInput.type = 'number'; capPctInput.step = 'any'; capPctInput.min = '0'; capPctInput.max = '100';
 		capPctInput.id = 'lpn_set_symbol_cap_pct';
 		capPctInput.style.width = '4em';
@@ -47173,12 +47199,23 @@ var EngCalcs = EngCalcs || {};
 			}
 		});
 		capPctSign.className = 'lpn-set-note'; capPctSign.textContent = '%';
-		capPost.className = 'lpn-set-note';
-		capPost.textContent = pc.lpn_settings_symbol_cap_post || 'percentile pipe';
-		capWrap.appendChild(capMultInput); capWrap.appendChild(capMid); capWrap.appendChild(capPctInput);
-		capWrap.appendChild(capPctSign); capWrap.appendChild(capPost);
-		row(mapBody, pc.lpn_settings_symbol_cap || 'Prevent nodes from scaling larger than', capWrap,
-			pc.lpn_settings_symbol_cap_tip);
+		// ONE sentence, {n} and {p} where the two boxes go (Task 740), so a language can order it as
+		// it needs to. Whatever precedes the first box is the row's label (and carries the tip); the
+		// rest is note text and the boxes, in the order the sentence states them.
+		var capPieces = (pc.lpn_settings_symbol_cap_sentence ||
+			'Prevent nodes from scaling larger than {n} times the length of the {p} percentile pipe')
+			.split(/(\{n\}|\{p\})/), capLabel = capPieces[0].trim();
+		for (var cpi = 1; cpi < capPieces.length; cpi++) {
+			var cp = capPieces[cpi];
+			if (cp === '{n}') { capWrap.appendChild(capMultInput); }
+			else if (cp === '{p}') { capWrap.appendChild(capPctInput); capWrap.appendChild(capPctSign); }
+			else if (cp.trim() !== '') {
+				var capNote = document.createElement('span');
+				capNote.className = 'lpn-set-note'; capNote.textContent = cp.trim();
+				capWrap.appendChild(capNote);
+			}
+		}
+		row(mapBody, capLabel || '\u00a0', capWrap, pc.lpn_settings_symbol_cap_tip);
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;

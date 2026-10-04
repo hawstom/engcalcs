@@ -2864,9 +2864,7 @@ $ec_lang['lpn_settings_label_always']='Toujours afficher';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='Empêcher les nœuds de s\'agrandir à plus de';
-$ec_lang['lpn_settings_symbol_cap_mid']='fois la longueur de la conduite au';
-$ec_lang['lpn_settings_symbol_cap_post']='e centile';
+$ec_lang['lpn_settings_symbol_cap_sentence']='Empêcher les nœuds de s\'agrandir à plus de {n} fois la longueur de la conduite au {p} e centile';
 $ec_lang['lpn_settings_symbol_cap_tip']='Une jonction cesse de grandir sur le terrain dès que son diamètre atteindrait ce nombre de fois la longueur de la conduite à ce centile de toutes les longueurs de conduites du réseau. Au-delà de ce point sur la carte, les jonctions, les conduites et les autres symboles rétrécissent à l\'écran quand vous dézoomez, au lieu de grandir sur le terrain. Les réservoirs et les bâches font exception et conservent leur taille à l\'écran à tout niveau de zoom.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

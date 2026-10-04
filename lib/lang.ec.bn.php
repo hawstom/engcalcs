@@ -2863,9 +2863,7 @@ $ec_lang['lpn_settings_label_always']='সবসময় দেখান';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='নোডকে এর চেয়ে বড় স্কেল হতে বাধা দিন';
-$ec_lang['lpn_settings_symbol_cap_mid']='এর দৈর্ঘ্যের গুণ';
-$ec_lang['lpn_settings_symbol_cap_post']='পার্সেন্টাইল পাইপ';
+$ec_lang['lpn_settings_symbol_cap_sentence']='নোডকে এর চেয়ে বড় স্কেল হতে বাধা দিন {n} এর দৈর্ঘ্যের গুণ {p} পার্সেন্টাইল পাইপ';
 $ec_lang['lpn_settings_symbol_cap_tip']='একটি জাংশনের ব্যাস নেটওয়ার্কের সব পাইপ দৈর্ঘ্যের এই পার্সেন্টাইলের পাইপের দৈর্ঘ্যের এতগুণ হয়ে গেলে এটি মাটিতে বড় হওয়া বন্ধ করে দেয়। মানচিত্রে সেই বিন্দুর পরে, জাংশন, পাইপ ও অন্যান্য প্রতীক মাটিতে বড় হওয়ার বদলে আপনি জুম আউট করার সাথে সাথে স্ক্রিনে ছোট হতে থাকে। জলাধার ও ট্যাংক ব্যতিক্রম এবং প্রতিটি জুমে তাদের স্ক্রিন আকার ধরে রাখে।';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

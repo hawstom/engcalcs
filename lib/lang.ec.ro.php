@@ -2853,9 +2853,7 @@ $ec_lang['lpn_settings_label_always']='Arată întotdeauna';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='Împiedică nodurile să se scaleze mai mari decât';
-$ec_lang['lpn_settings_symbol_cap_mid']='ori lungimea';
-$ec_lang['lpn_settings_symbol_cap_post']='conductei de percentila';
+$ec_lang['lpn_settings_symbol_cap_sentence']='Împiedică nodurile să se scaleze mai mari decât {n} ori lungimea {p} conductei de percentila';
 $ec_lang['lpn_settings_symbol_cap_tip']='O joncțiune încetează să crească pe teren odată ce diametrul ei ar ajunge de atâtea ori lungimea conductei la această percentilă a tuturor lungimilor de conductă din rețea. Dincolo de acel punct pe hartă, joncțiunile, conductele și celelalte simboluri se micșorează pe ecran pe măsură ce micșorați, în loc să crească pe teren. Rezervoarele și bazinele fac excepție și își păstrează dimensiunea pe ecran la orice nivel de zoom.';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

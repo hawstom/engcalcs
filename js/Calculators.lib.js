@@ -186,6 +186,35 @@ EngCalcs.initTips = function (root) {
 };
 document.addEventListener('DOMContentLoaded', function () { EngCalcs.initTips(document); });
 
+/**
+ * Shortcut words in the reader's platform: a Mac reader is told "Cmd", not "Ctrl". The key
+ * handlers already take either modifier; only the printed word was wrong. Render-time only, so the
+ * language files keep one spelling ("Ctrl" is Latin in all 27). "Ctrl+Option" is left alone: that
+ * chord really is the Control key on a Mac. Alt is left alone too: "Alt+Shift+letter" is explained
+ * beside its Mac chord, and a bare "Option" would orphan that sentence.
+ */
+EngCalcs.isMac = function () {
+	var p = (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || '';
+	return /mac|iphone|ipad/i.test(p);
+};
+EngCalcs.macWords = function (text) {
+	if (typeof text !== 'string' || !EngCalcs.isMac()) { return text; }
+	return text.replace(/\bCtrl(?=[+\-])(?!\+Option)/g, 'Cmd');
+};
+EngCalcs.macWordsIn = function (root) {
+	var w, n, list = [], i, t;
+	if (!EngCalcs.isMac() || !root) { return; }
+	w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+	while ((n = w.nextNode())) {
+		if (n.nodeValue.indexOf('Ctrl') >= 0 && !(n.parentNode && /^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentNode.nodeName))) { list.push(n); }
+	}
+	for (i = 0; i < list.length; i++) {
+		t = EngCalcs.macWords(list[i].nodeValue);
+		if (t !== list[i].nodeValue) { list[i].nodeValue = t; }
+	}
+};
+document.addEventListener('DOMContentLoaded', function () { EngCalcs.macWordsIn(document.body); });
+
 // PWA install prompt
 EngCalcs._deferredInstallPrompt = null;
 window.addEventListener('beforeinstallprompt', function (e) {

@@ -2851,9 +2851,7 @@ $ec_lang['lpn_settings_label_always']='ہمیشہ دکھائیں';
 // because the row holds two number boxes; the row label is the leading fragment, `_mid` sits
 // between the boxes and `_post` follows the second one (which is shown as a percentage, so "20"
 // reads as "20% percentile pipe").
-$ec_lang['lpn_settings_symbol_cap']='نوڈز کو اس سے بڑا ہونے سے روکیں';
-$ec_lang['lpn_settings_symbol_cap_mid']='کی لمبائی کے گنا';
-$ec_lang['lpn_settings_symbol_cap_post']='پرسنٹائل پائپ';
+$ec_lang['lpn_settings_symbol_cap_sentence']='نوڈز کو اس سے بڑا ہونے سے روکیں {n} کی لمبائی کے گنا {p} پرسنٹائل پائپ';
 $ec_lang['lpn_settings_symbol_cap_tip']='ایک جنکشن زمین پر بڑھنا اس وقت روک دیتا ہے جب اس کا قطر نیٹ ورک میں تمام پائپ کی لمبائیوں کے اس پرسنٹائل پر پائپ کی لمبائی کے اتنے گنا ہو جائے۔ نقشے پر اس نقطے کے بعد، جنکشن، پائپ اور دیگر علامتیں زمین پر بڑھنے کی بجائے آپ کے باہر زوم کرنے پر سکرین پر سکڑ جاتی ہیں۔ ریزروائرز اور ٹینک اس سے مستثنیٰ ہیں اور ہر زوم پر اپنا سکرین سائز برقرار رکھتے ہیں۔';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).

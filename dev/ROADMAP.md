@@ -328,11 +328,6 @@ the block.
     layer never renumbers the others, which is the whole reason it is not an index.
   - A layer setting is MODELLING data by CLAUDE.md's project-versus-browser rule and rides in
     `serializeProject()`; it is not window furniture.
-- 75|710| **Audit the 57 raw alert and confirm dialogs.**
-  **BUILT 2026-10-04 on `feat/dialog-audit`, port 8110**: 77 sites, 39 informational ones moved to the notice line and log, 38 still block (`dev/dialog-audit.md`); Perry's three findings fixed. Open: a styled in-page modal for the 38?
-  Left from the message log (Task 704, closed 2026-09-23): Ida's third item. Sort which must genuinely
-  block and which are only information and belong in the log, which Tom's *"USER MUST HAVE CONTROL
-  OVER MESSAGES"* argues for. Keep severity at the two colours the banner already uses.
 - 75|714| **Theming: colour tokens first, then a Light/Dark choice in Settings.**
   **Phase 1b inline colours MERGED 2026-10-04** (`chore/theme-inline`): js/*.js literals on tokens or allow-listed; the check refuses new ones. Left: the button base (R-202), then dark mode.
   Tom, 2026-09-24 (R-211): *"preparing for this and implementing it will force us into some
@@ -361,15 +356,6 @@ the block.
   account, no upload); a Google Sheets sync is a fifth third-party service, so a `privacy.php`
   paragraph and his call. Mary, Sue and Declan's readings are under Task 721. The layout assumes
   Bentley's model (a scenario tree, alternatives beneath); ours is flat, so the tabs need rethinking.
-- 75|755| **Per-scenario calculation options: run type and duration first.**
-  **BUILT 2026-10-04 on `feat/scenario-option`, port 8111**: per-scenario Total run time and Hydraulic time step in the Alternatives preview; Perry clean; awaiting his pass.
-  Tom, 2026-09-30: *"A Demand Multiplier column with the alternatives? What about other settings?"*
-  Mary: WaterGEMS keeps run type, duration, steps, friction method, demand adjustments, PDD and
-  tolerances in per-scenario Calculation Options; InfoWater ties a simulation-options set to each
-  scenario. Ours: only the demand multiplier is per scenario. Sue's ranking: steady vs 24-hour run and
-  duration next, quality mode later; friction method, units, accuracy and trials never vary silently
-  between compared scenarios (state them once in the report header). Show as plain columns in the
-  Alternatives preview, blank meaning inherits, not named sets, until scenarios number in the dozens.
 - 75|756| **Cross-platform: the suite as a desktop application, beyond the web folder.**
   Tom, 2026-09-30: *"Put a cross platform project on our roadmap priority 75. Plan where/how to move
   the project to transcend the web-centric hawsedc.com/engcalcs folder. Windows or Linux? Plan what
@@ -378,21 +364,9 @@ the block.
   **Tom, 2026-10-01: stays at 75, with a branch to play on** (`feat/desktop`): *"my main concern is that we
   could get too heavy for the browser or find limitations. Until then, let's just play and plan and see
   what happens."*
-- 75|719| **Draw a chain: junction, pipe, junction, pipe, until Escape.**
-  Tom, 2026-09-25, from WaterCAD: *"a Junction and Pipe toolbar command that adds Junction, Pipe,
-  Junction, Pipe, etc until escape."*
-  **PROMOTED TO 75 BY TOM, 2026-10-04** (*"Ensure that we have a roadmap item for a Junction and Pipe tool and that it's promoted to high priority (at least 75)."*).
-- 75|762| **Pressure-driven analysis (PDA) through the EPANET engine.** EPANET 2.2 solves
-  `[OPTIONS] Demand Model PDA` with Minimum/Required Pressure and Pressure Exponent; we read and
-  carry those lines and report that we solve demand-driven (js/lpn-inp.js ~586). Tom, 2026-10-04:
-  *"Is this (PDA) an EPANET++ gap that we must fill urgently?"* An EPANET feature we lack is a gap in the EPANET++ claim.
 - 75|763| **A searchable help manual, built from the tips Tom cut.** Tom, 2026-10-04: *"Almost all
   the deletes could be turned into a searchable help manual."* The cut tips' English is kept in
   `dev/help-manual-source.md` (feat/tip-verdict) as its first material.
-- 75|764| **One voice for tips and prompts: mood, Click vs Specify, check boxes.** Tom, 2026-10-04:
-  *"Are we indicative, imperative, or indecisive?"*; *"'Specify' would be better than 'Click'
-  everywhere"*; *"'Tick'? ... let's audit and discipline this too."* Mary's research first; then a
-  rule in dev/language-strings.md and one English pass.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -743,21 +717,6 @@ the block.
   - Meanwhile `nested_repo_boundary_check.php` (advisory) holds the line, and the worktree layout
     simplifies as a side effect: `worktrees/<branch>` Aliased, with no stand-in parent directory
     whose only job is to make `/engcalcs/...` resolve.
-- 50|664| **A link's status colours correctly and its legend prints numbers.**
-  Left open when Task 638 closed 2026-09-13. `status` is CATEGORICAL and this page's colour system
-  is a break-based numeric ramp, so status enters as 1 open / 0 closed. **The map reads correctly**
-  -- closed links land in the bottom band, as EPANET's own Status view draws them -- and the words
-  are one tick away as a label. **The LEGEND is what is wrong**: it prints numeric bands where it
-  should print the two words.
-  - **THE FIX MEANS CHANGING THE FIELD-DEFINITION SHAPE**, which is why it was not done: Task 636
-    was in flight beside it feeding the same structures, and changing the shape under a concurrent
-    track is the seam collision this project has already paid five defects for. That constraint is
-    gone now; both have landed.
-  - The shape question is real and worth answering once: a field definition is `[key, label]` and a
-    colour map is `{key: unitId}`, neither of which can say "this quantity is a small set of named
-    states". Whatever carries that will also serve any future categorical field.
-  - Weigh against doing nothing: a legend reading 0 and 1 beside a map that is visibly right is a
-    blemish, not a wrong answer, and this page has wrong answers to fix first.
 - 50|667| **Tom's reflections on saving, locking and who can see your work.**
   **DROPPED TO 50 BY TOM, 2026-09-18.** Its urgent leg shipped -- (b), asking for initials only when
   a colleague wants in, is built on `feat/lock-initials-later` -- and (f) was extracted to Task 696
@@ -897,16 +856,6 @@ the block.
   - **NO THIRD-PARTY REQUEST AND NO VENDORED LIBRARY WITHOUT A DECISION.** The suite makes exactly
     four outside requests, all on this page, all opt-in; `vendor_integrity_check.php` governs anything
     added to `js/vendor/`. Encoding in the browser with no new dependency is the shape to aim for.
-- 50|695| **The daily status mail has columns with no headings.**
-  Tom, 2026-09-18, of the nightly report: *"Headings for this would help"*, quoting a table whose
-  columns he had to guess at -- he wrote them as `??? ????`. The two numbers are almost certainly
-  the two consent buckets, which is exactly the pair CLAUDE.md forbids summing, so a reader guessing
-  at them is the failure this is about.
-  - `log/lang-log-stats.sh` builds it and `dev/host/` holds the deployed copy;
-    `log_format_selftest.php` pins its output shape, so the headings go in with the test.
-  - **NAME WHAT EACH COLUMN COUNTS, NOT JUST WHAT IT IS.** One column counts PEOPLE (consented,
-    deduplicated) and the other counts PAGE LOADS (everyone else, undeduplicated). A heading that
-    says only "visits" would be worse than none.
 - 50|702| **A view window cannot describe a span across the far side of the world.**
   Found 2026-09-19 alongside the mirrored-basemap fix (R-066), and **reported as unsettled rather
   than as a defect, which is the point of the row.**
@@ -931,9 +880,6 @@ the block.
   Convert as has a Label suffix box for depth that is disabled because `level` is not in
   `nodeFieldDefs()`. Measured 2026-09-23 at eight sites, including the dense label priority table
   and both label passes, so it is a label feature, not a wizard fix.
-- 50|713| **Say Cmd, not Ctrl, to a Mac reader.**
-  The tables' right-click accelerators and Help > Notes say Ctrl+C / Ctrl+D on every platform
-  (feat/table-editing). The keys already accept Cmd; only the words are wrong on a Mac.
 - 50|717| **EPANET-MSX, multi-species water quality.**
   Tom, 2026-09-25: *"Multi-species MSX: Add it priority 50. I don't understand it, but we can learn.
   Thank you, Mary!"* From Mary's `dev/agents/market-researcher/epanet-gap-audit.md`.
@@ -961,9 +907,9 @@ the block.
 - 50|725| **One wide fire-flow table instead of two reports.**
   Sue's wishlist §6: available flow and design flow side by side, InfoWater's "Design Fireflow
   Report" shape. Presentation only; one run already computes both.
-- 50|726| **Show progress while the EPANET engine downloads, and prefetch it when idle.**
-  Mary's wishlist §7: a percent-done on the first ~664 KB fetch; prefetch unless the connection
-  says slow or metered. For the low-bandwidth audience.
+- 50|726| **Prefetch the EPANET engine when idle.**
+  Mary's wishlist §7: prefetch unless the connection says slow or metered. For the low-bandwidth
+  audience. The percent-done half shipped as Task 608. Changes what is stored on a device: Tom's call.
 - 50|728| **Import a GIS shapefile or geodatabase as a network.**
   Mary's wishlist §0b2: most WaterCAD models are built from a GIS asset layer, so this is a
   migration on-ramp that needs no WaterCAD file. Unsized; read with Task 723.
@@ -982,11 +928,6 @@ the block.
   *"Do we have a way of knowing whether people are installing?"* No: `appinstalled` only hides the
   button (`js/Calculators.lib.js:195`). One install event plus an app/tab field on view rows would
   answer it; it is a new logged fact about visitors, so it goes past `consent_body` and him first.
-- 50|740| **One sentence for the node-size cap, not three fragments.**
-  Sprint 2026-09-28-delta: five languages (it, he, ur, my, am) could not assemble
-  lpn_settings_symbol_cap + _mid + _post around two number inputs in their word order. One key with
-  {n} and {p} placeholders, split into inputs at render time.
-
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary
