@@ -179,8 +179,10 @@
 	 * becomes 17.1 metres -- above that tank's maximum level, so the pump never starts and the run
 	 * is quietly wrong instead of visibly broken.
 	 */
-	EC.lpnTimeModelBlock = function (doc, toSI) {
-		var times = (doc && doc.times) || EC.lpnTimesDefaults(),
+	EC.lpnTimeModelBlock = function (doc, toSI, timesOverride) {
+		// `timesOverride` is the [TIMES] block the open scenario runs under (Task 755), handed in by
+		// the page; absent, the document's own, as it always was.
+		var times = timesOverride || (doc && doc.times) || EC.lpnTimesDefaults(),
 			conv = typeof toSI === 'function' ? toSI : function (v) { return v; },
 			controls = [],
 			// **A SENTENCE NAMING AN ELEMENT THAT NO LONGER EXISTS IS DROPPED HERE TOO** (Task 466).
@@ -417,6 +419,7 @@
 			speedTip: pageConfig.lpn_time_speed_tip,
 			duration: pageConfig.lpn_time_duration || 'Total run time',
 			hydraulicStep: pageConfig.lpn_time_hyd_step || 'Hydraulic time step',
+			scnOverrides: pageConfig.lpn_time_scn_overrides || 'Scenario overrides:',
 			patternStep: pageConfig.lpn_time_pattern_step || 'Pattern time step',
 			patternStart: pageConfig.lpn_time_pattern_start || 'Pattern start time',
 			reportStep: pageConfig.lpn_time_report_step || 'Report time step',
@@ -491,7 +494,14 @@
 			// lost content is Tom's call, and the tank levels are meant to come back.
 		};
 	}
+	// **THE CLOCK THE OPEN SCENARIO RUNS ON** (Task 755): a scenario may state its own total run
+	// time and hydraulic time step, so the run, the transport and the model block all read this.
+	// The Settings fields do NOT: they edit the project's own block, see projectTimes().
 	function docTimes() {
+		if (host && typeof host.times === 'function') { return host.times() || null; }
+		return projectTimes();
+	}
+	function projectTimes() {
 		var d = host && host.doc();
 		return (d && d.times) || null;
 	}
@@ -538,7 +548,7 @@
 	 */
 	EC.lpnTimeAttach = function (model) {
 		if (!host || !EC.lpnTimesDefaults) { return model; }
-		model.time = EC.lpnTimeModelBlock(host.doc(), host.toSI);
+		model.time = EC.lpnTimeModelBlock(host.doc(), host.toSI, docTimes());
 		EC.lpnTankVolumeAttach(model, host.doc(), host.toSI);
 		return model;
 	};
@@ -1276,11 +1286,13 @@
 	 * Called by js/looped-network.js's rebuildSettingsBox(). Silent when the host section is not on
 	 * the page, so a page without the Settings box still gets the transport.
 	 */
+	var ovrNotes = {};
 	EC.lpnTimeRenderSettings = function () {
 		var panel = document.getElementById('lpn_set_time_fields'), S = strings(), times;
 		if (!panel || !host) { return; }
-		times = docTimes() || EC.lpnTimesDefaults();
+		times = projectTimes() || EC.lpnTimesDefaults();
 		panel.textContent = '';
+		ovrNotes = {};
 		EC.LPN_TIME_FIELDS.forEach(function (pair) {
 			// **DECLARED IN HERE, not shared across the seven.** Hoisted to the function above,
 			// every listener would close over the LAST input built, so editing the duration would
@@ -1305,8 +1317,42 @@
 			row.appendChild(label);
 			row.appendChild(input);
 			panel.appendChild(row);
+			// **A QUIET LINE UNDER THE TWO A SCENARIO MAY OVERRIDE** (Task 755; Tom: "Settings > Time.
+			// I think it would be nice for it to state the overrides."). Empty, and so invisible,
+			// until a scenario states its own.
+			if (pair[0] === 'duration' || pair[0] === 'hydraulicStep') {
+				ovrNotes[pair[0]] = el('div', { class: 'lpn-set-note lpn-time-ovr' });
+				panel.appendChild(ovrNotes[pair[0]]);
+			}
 		});
+		EC.lpnTimeRenderOverrides();
 		if (EC.initTips) { EC.initTips(panel); }
+	};
+	/**
+	 * **WHICH SCENARIOS OVERRIDE THIS PROJECT SETTING, under the setting.** Redrawn on its own, never
+	 * by rebuilding the seven inputs, because it follows every scenario edit and a rebuild would take
+	 * the focus from a box being typed in. Each scenario name is a button that opens the Alternatives
+	 * preview, where its own value is edited. The names are the visitor's own text and are set as
+	 * text, never as markup.
+	 */
+	EC.lpnTimeRenderOverrides = function () {
+		var S = strings(), list;
+		if (!host || typeof host.timeOverrides !== 'function') { return; }
+		list = host.timeOverrides() || [];
+		Object.keys(ovrNotes).forEach(function (key) {
+			var note = ovrNotes[key], mine = list.filter(function (o) { return o.key === key; });
+			note.textContent = '';
+			note.style.display = mine.length ? '' : 'none';
+			if (!mine.length) { return; }
+			note.appendChild(document.createTextNode(S.scnOverrides + ' '));
+			mine.forEach(function (o, i) {
+				var b = el('button', { type: 'button', class: 'lpn-time-ovr-btn' }, o.name);
+				b.addEventListener('click', function () { if (host.openScenarioOptions) { host.openScenarioOptions(o.id); } });
+				if (i) { note.appendChild(document.createTextNode(', ')); }
+				note.appendChild(b);
+				note.appendChild(document.createTextNode(' (' + o.text + ')'));
+			});
+		});
 	};
 
 	// ================================================================================================
@@ -1881,6 +1927,16 @@
 	 * whatever solve happens next.
 	 */
 	EC.lpnTimeRenderPanel = renderPanel;
+	/**
+	 * **THE CLOCK CHANGED UNDER THE TRANSPORT WITHOUT A SETTINGS EDIT** (Task 755): a scenario
+	 * switch, or a scenario's own run time typed in the Alternatives preview. The same two things
+	 * commitField() does after an edit: a shorter run can leave the transport past its end.
+	 */
+	EC.lpnTimeTimesChanged = function () {
+		if (!host) { return; }
+		clampTime();
+		renderPanel();
+	};
 
 	/**
 	 * The whole seam. js/looped-network.js calls this once, at script scope, and everything this

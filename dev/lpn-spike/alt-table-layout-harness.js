@@ -47,7 +47,8 @@ function measureInPage() {
 	const wrap = table.parentNode;
 	const out = { split: [], cols: [], wrapW: wrap.clientWidth, tableW: table.getBoundingClientRect().width,
 		scrolls: wrap.scrollWidth > wrap.clientWidth + 1 };
-	const rows = Array.from(table.rows);
+	// The group row naming the calculation options spans columns, so it is left out of the per-column measure.
+	const rows = Array.from(table.rows).filter((tr) => !tr.querySelector('.lpn-alt-group'));
 	rows.forEach((tr) => Array.from(tr.cells).forEach((c) => {
 		const walker = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
 		let n;
@@ -76,6 +77,9 @@ function measureInPage() {
 			let w = 0;
 			pieces.forEach((p) => { probe.textContent = p; w = Math.max(w, probe.getBoundingClientRect().width); });
 			probe.remove();
+			// A scenario's calculation option is a box it is typed into (Task 755): the box is the content.
+			const box = !isHead && c.querySelector('input');
+			if (box) { w = box.getBoundingClientRect().width; }
 			widest = Math.max(widest, w + pad);
 		});
 		out.cols.push({ name, colW, widest, slack: colW - widest });
@@ -138,6 +142,24 @@ async function main() {
 		ok('...and the table needs no scrolling at that width', !wide.scrolls, `${wide.tableW.toFixed(0)} in ${wide.wrapW}`);
 		if (shot) { await a.page.locator('#lpn_alt_box').screenshot({ path: shot }); }
 
+		// TOM, 2026-10-04: "The box needs to be wider (like 1500 px) on PC." Opened fresh at each
+		// window size: about 1500 px on a 1920 window, and 94% of the window (not wider) on a phone.
+		const openedWidth = async (w, h) => {
+			await a.page.evaluate(() => { document.getElementById('lpn_alt_close').click(); });
+			await a.page.setViewportSize({ width: w, height: h });
+			await a.settle(300);
+			await a.page.click('#lpn_scenario_btn');
+			await a.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
+			await a._clickRow('#lpn_menu_list', await a.lang('lpn_alt_title'));
+			await a.settle(500);
+			return a.page.evaluate(() => document.getElementById('lpn_alt_box').getBoundingClientRect().width);
+		};
+		const pcW = await openedWidth(1920, 1080);
+		ok('at 1920x1080 the box is about 1500 px wide', pcW >= 1450 && pcW <= 1510, pcW.toFixed(0));
+		const phW = await openedWidth(390, 800);
+		ok('at 390 px the box fits the window with a gutter', phW <= 390 && phW >= 390 * 0.9, phW.toFixed(0));
+		await openedWidth(1280, 800);
+
 		// Narrower than the table: it must scroll, not squeeze.
 		await a.page.evaluate(() => { const b = document.getElementById('lpn_alt_box'); b.style.width = '420px'; });
 		await a.settle(300);
@@ -145,6 +167,29 @@ async function main() {
 		check('in a 420 px box', narrow);
 		ok('...the table scrolls sideways inside its box', narrow.scrolls, `${narrow.tableW.toFixed(0)} in ${narrow.wrapW}`);
 		if (shot) { await a.page.locator('#lpn_alt_box').screenshot({ path: shot.replace(/\.png$/, '') + '-narrow.png' }); }
+
+		// TASK 755: a scenario's own Total run time, typed into its box. Tab commits it and the next
+		// option box keeps the focus through the table's rebuild; the open scenario then runs 48 hours;
+		// and Ctrl+Z, pressed outside the box, takes it back.
+		await a.page.evaluate(() => { document.getElementById('lpn_alt_box').style.width = ''; });
+		const sel = (key) => '#lpn_alt_report input[data-alt-key="' + key + '"]';
+		await a.page.click(sel('duration'));
+		await a.page.keyboard.type('48:00');
+		await a.page.keyboard.press('Tab');
+		await a.settle(400);
+		const after = await a.page.evaluate((s) => ({
+			value: document.querySelector(s).value,
+			focus: document.activeElement && document.activeElement.getAttribute('data-alt-key'),
+			button: document.getElementById('lpn_scenario_btn').textContent
+		}), sel('duration'));
+		ok('a typed Total run time stays in its box after Tab', after.value === '48:00', JSON.stringify(after));
+		ok('...and the focus moved on to the Hydraulic time step box', after.focus === 'hydraulicStep', after.focus);
+		ok('...and the scenario badge counts it beside the demand edit', /: 2\s*$/.test(after.button), after.button);
+		await a.page.evaluate(() => { if (document.activeElement) { document.activeElement.blur(); } });
+		await a.page.keyboard.press('Control+z');
+		await a.settle(400);
+		const undone = await a.page.evaluate((s) => document.querySelector(s).value, sel('duration'));
+		ok('Ctrl+Z takes it back', undone === '', JSON.stringify(undone));
 	} finally { await browser.close(); env.stopServer(); }
 	console.log(fails ? `\n${fails} FAILED` : '\nall ok');
 	process.exit(fails ? 1 : 0);
