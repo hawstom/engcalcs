@@ -970,9 +970,6 @@ the block.
 - 50|726| **Show progress while the EPANET engine downloads, and prefetch it when idle.**
   Mary's wishlist §7: a percent-done on the first ~664 KB fetch; prefetch unless the connection
   says slow or metered. For the low-bandwidth audience.
-- 50|727| **Hover highlight on the element Select would pick.**
-  Ida's wishlist §1: a colour or weight change on the hit object, since the cursor stays neutral
-  (Task 618). AutoCAD's selection preview is the precedent.
 - 50|728| **Import a GIS shapefile or geodatabase as a network.**
   Mary's wishlist §0b2: most WaterCAD models are built from a GIS asset layer, so this is a
   migration on-ramp that needs no WaterCAD file. Unsized; read with Task 723.

@@ -117,7 +117,8 @@
         "feat/dialog-audit",
         "feat/table-selection",
         "feat/setting-scope",
-        "feat/scenario-option"
+        "feat/scenario-option",
+        "feat/basemap-style"
     ],
     "feature_freeze": {
         "active": false,
