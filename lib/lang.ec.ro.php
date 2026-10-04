@@ -3080,7 +3080,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Etichetele de abonat sunt desenate do
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Folosește vizualizarea curentă';
 $ec_lang['lpn_settings_page']='Pagină';
-$ec_lang['lpn_settings_page_note']='Salvat în acest calculator, nu în proiect.';
 $ec_lang['lpn_settings_hydraulics']='Hidraulică';
 $ec_lang['lpn_settings_quality']='Calitatea apei';
 $ec_lang['lpn_settings_quality_track']='Parametru de calitate';

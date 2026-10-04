@@ -104,7 +104,9 @@ EngCalcs.initTips = function (root) {
 			//
 			// Applies to the long-press path too and does no harm there: `manual` ignores the show
 			// delay, since nothing auto-triggers it.
-			delay: { show: 500, hide: 100 }
+			// A control may ask for a longer wait before its tip (data-ec-tip-delay, ms): the column
+			// divider in the Looped-Network tables, which the pointer crosses on its way elsewhere.
+			delay: { show: parseInt(el.getAttribute('data-ec-tip-delay'), 10) || 500, hide: 100 }
 		});
 		// A control also hides its tip on click: hide() clears every active trigger at once, so
 		// the tip cannot hang over the panel the button just opened. Kept for the long-press case

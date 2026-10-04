@@ -3080,7 +3080,6 @@ $ec_lang['lpn_labels_customer_width_tip']='د مشتریانو لیبلونه ی
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='اوسنی لید کارول';
 $ec_lang['lpn_settings_page']='پاڼه';
-$ec_lang['lpn_settings_page_note']='په دې محاسبګر کې ساتل کیږي، نه په پروژه کې.';
 $ec_lang['lpn_settings_hydraulics']='هایدرولیکس';
 $ec_lang['lpn_settings_quality']='د اوبو کیفیت';
 $ec_lang['lpn_settings_quality_track']='د کیفیت پارامیټر';

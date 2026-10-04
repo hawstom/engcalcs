@@ -3079,7 +3079,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Ознаке потрошача се 
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Користи тренутни приказ';
 $ec_lang['lpn_settings_page']='Страница';
-$ec_lang['lpn_settings_page_note']='Сачувано у овом калкулатору, не у пројекту.';
 $ec_lang['lpn_settings_hydraulics']='Хидраулика';
 $ec_lang['lpn_settings_quality']='Квалитет воде';
 $ec_lang['lpn_settings_quality_track']='Параметар квалитета';

@@ -3080,7 +3080,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Oznake korisnika crtaju se samo dok j
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Koristi trenutačni prikaz';
 $ec_lang['lpn_settings_page']='Stranica';
-$ec_lang['lpn_settings_page_note']='Spremljeno u ovom kalkulatoru, a ne u projektu.';
 $ec_lang['lpn_settings_hydraulics']='Hidraulika';
 $ec_lang['lpn_settings_quality']='Kvaliteta vode';
 $ec_lang['lpn_settings_quality_track']='Parametar kvalitete';

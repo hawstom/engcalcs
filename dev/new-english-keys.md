@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**5 still to read on master**, of 46 untranslated keys, of 2327 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**10 still to read on master**, of 51 untranslated keys, of 2331 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -254,7 +254,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (46, 5 to read @@ NEEDS RULING)
+## lpn_  (51, 10 to read @@ NEEDS RULING)
 
 - **`lpn_analyze_at_time`**
   > Time step: {time}.
@@ -391,6 +391,21 @@ never edits a synonym.
 - **`lpn_graphs_menu_tip`**
   > Plot a profile along a path, a time series at one element, the frequency distribution of results, a contour plot on the map, or the flow balance over time.
   @@ NEEDS RULING
+- **`lpn_pane_manage_cols_width`**
+  > Width (em)
+  @@ NEEDS RULING
+- **`lpn_pane_width_tip`**
+  > Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.
+  @@ NEEDS RULING
+- **`lpn_saved_browser`**
+  > Saved in this browser
+  @@ NEEDS RULING
+- **`lpn_saved_project`**
+  > Saved with the project
+  @@ NEEDS RULING
+- **`lpn_saved_session`**
+  > Not saved
+  @@ NEEDS RULING
 - **`lpn_sysflow_title`**
   > Flow balance
   _Ruled OK 2026-10-03._
@@ -399,7 +414,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**10 still to read**, of 22 new keys across 11 unmerged branch(es).
+**15 still to read**, of 27 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -481,6 +496,24 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_result_pump_head_tip`**
   > The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.
   _Ruled OK 2026-10-03._
+
+### feat/scenario-option (`e39f531e`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_scenario_duration_tip`**
+  > This scenario's own total run time. Leave it blank to use the project's, set in Settings, Calculation, Time. A total run time of 0:00 is a steady-state run.
+  @@ NEEDS RULING
+- **`lpn_scenario_hyd_step_tip`**
+  > This scenario's own hydraulic time step. Leave it blank to use the project's, set in Settings, Calculation, Time.
+  @@ NEEDS RULING
+- **`lpn_scncmp_at_time`**
+  > {value} at {id}, {time}
+  @@ NEEDS RULING
+- **`lpn_scncmp_period_note`**
+  > Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.
+  @@ NEEDS RULING
+- **`lpn_scncmp_same`**
+  > The same in every scenario
+  @@ NEEDS RULING
 
 ### feat/table-selection (`d2276943`) — 6 new, 6 to read @@ NEEDS RULING
 

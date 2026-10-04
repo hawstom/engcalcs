@@ -3079,7 +3079,6 @@ $ec_lang['lpn_labels_customer_width_tip']='只有当地图视图宽度等于或�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='使用当前视图';
 $ec_lang['lpn_settings_page']='页面';
-$ec_lang['lpn_settings_page_note']='保存在本计算器中，而非项目中。';
 $ec_lang['lpn_settings_hydraulics']='水力计算';
 $ec_lang['lpn_settings_quality']='水质';
 $ec_lang['lpn_settings_quality_track']='水质参数';

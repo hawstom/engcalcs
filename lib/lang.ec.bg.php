@@ -3135,7 +3135,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Етикетите на абонат�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Използвай текущия изглед';
 $ec_lang['lpn_settings_page']='Страница';
-$ec_lang['lpn_settings_page_note']='Записва се в този калкулатор, не в проекта.';
 $ec_lang['lpn_settings_hydraulics']='Хидравлика';
 $ec_lang['lpn_settings_quality']='Качество на водата';
 $ec_lang['lpn_settings_quality_track']='Параметър на качеството';

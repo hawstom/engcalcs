@@ -3461,6 +3461,14 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    the two levels distinguishable only by size. */
 .lpn-set-sub { margin-top: 8px; font-size: 1rem; font-weight: 600; opacity: .8; }
 .lpn-set-subbody { margin-left: 8px; }
+/* **WHERE A SETTING IS KEPT** (Task 739, Tom 2026-09-28: Autodesk's "Where it's stored"). One quiet
+   marker, the same element on a sub-heading and on the odd row whose home differs from its heading's.
+   Ink at low opacity and a smaller size, no colour, so it reads as a label and never as a control or
+   a warning. It sits INSIDE the box body, never in the title bar. */
+.lpn-saved { margin-inline-start: .6em; font-size: .8em; font-weight: 400; opacity: .7; white-space: nowrap; }
+.lpn-saved-row { display: block; margin-inline-start: 0; }
+.lpn-managecols-width { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.lpn-managecols-width input { width: 6em; }
 /* The two scope markers, "Project settings" and "Calculator settings". Quieter than a sub-heading
    because they label a SCOPE rather than name a place you can jump to. */
 .lpn-set-group { margin-top: 10px; font-weight: 600; opacity: .8; text-transform: none; }

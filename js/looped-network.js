@@ -25261,6 +25261,15 @@ var EngCalcs = EngCalcs || {};
 			// every separator and a gray line running past the last column.
 			grip.className = 'lpn-pane-colgrip';
 			grip.setAttribute('aria-hidden', 'true');
+			// **A TIP THAT SAYS WHERE THE WIDTH IS KEPT, AFTER A FULL SECOND OF HOVER, AND NEVER ON
+			// TOUCH** (Task 739, Tom 2026-09-28). The divider is crossed on the way to everything
+			// else in the heading, so the usual 500 ms would fire on transit; a finger has no hover
+			// and the Manage columns box carries the same sentence for it.
+			if (typeof ecCanHover !== 'function' || ecCanHover()) {
+				grip.title = pc.lpn_pane_width_tip || 'Column widths are saved in this browser, not in the project.';
+				grip.className += ' ec-help';
+				grip.setAttribute('data-ec-tip-delay', '1000');
+			}
 			grip.addEventListener('mousedown', function (ev) { paneStartColResize(spec, c.key, ev); });
 			// ...and a double-click on the same divider gives the column its default width back.
 			grip.addEventListener('dblclick', function (ev) { paneResetColOnDouble(spec, c.key, ev); });
@@ -27986,7 +27995,10 @@ var EngCalcs = EngCalcs || {};
 			work = paneColsAll(spec).map(function (c) {
 				return { key: c.key, label: paneHeadingText(c), show: !paneColHidden(spec.id, c.key), fixed: c.key === 'id' };
 			}),
-			sel = [], anchor = 0, focusIdx = 0;
+			sel = [], anchor = 0, focusIdx = 0,
+			// **WIDTHS ARE STAGED LIKE EVERYTHING ELSE HERE** (Task 739): `undefined` is untouched,
+			// `null` is back to the default width, a number is the width typed, in em. Applied on OK.
+			widths = {};
 		// **THE BLOCK MOVE, ONE STEP AT A TIME** -- moving the selection past its nearest unselected
 		// neighbour, ascending for a move down and descending for a move up, so a non-contiguous
 		// selection (Ctrl+click can make one) still moves as a coherent block instead of each row
@@ -28021,7 +28033,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		openDialog(function (body) {
 			var h = document.createElement('p'), wrap, list, btnCol, redraw,
-				mkBtn, btnUp, btnDown, btnTop, btnBottom, rowClick;
+				mkBtn, btnUp, btnDown, btnTop, btnBottom, rowClick, wLine, wText, wInput, wShown;
 			h.style.margin = '0 0 8px';
 			h.style.fontWeight = 'bold';
 			h.textContent = pc.lpn_pane_manage_cols_title || 'Manage columns';
@@ -28049,6 +28061,27 @@ var EngCalcs = EngCalcs || {};
 			wrap.appendChild(list);
 			wrap.appendChild(btnCol);
 			body.appendChild(wrap);
+			// **WIDTH, THE SECOND DOOR TO A WIDTH THAT IS OTHERWISE FOUND BY DRAGGING A DIVIDER**
+			// (Tom, 2026-09-28: *"Maybe include Width in the manage columns box with a tip glyph as
+			// a secondary discovery path"*). The tip is the point: it says the width is this
+			// browser's and not the project's. Acts on the selected column(s); blank restores the
+			// default, which is what double-clicking the divider does.
+			wLine = document.createElement('label');
+			wLine.className = 'lpn-managecols-width';
+			wText = document.createElement('span');
+			setFieldLabel(wText, pc.lpn_pane_manage_cols_width || 'Width (em)', pc.lpn_pane_width_tip);
+			wInput = document.createElement('input');
+			wInput.type = 'number'; wInput.step = 'any'; wInput.min = '0';
+			wInput.addEventListener('change', function () {
+				var v = wInput.value === '' ? null : +wInput.value;
+				if (v !== null && !(isFinite(v) && v > 0)) { redraw(); return; }
+				sel.forEach(function (i2) { widths[work[i2].key] = v; });
+				redraw();
+			});
+			wLine.appendChild(wText);
+			wLine.appendChild(wInput);
+			body.appendChild(wLine);
+			initTipsIn(wLine);
 			rowClick = function (i, ev) {
 				if (ev && ev.shiftKey) {
 					sel = []; (function () { var lo = Math.min(anchor, i), hi = Math.max(anchor, i), k;
@@ -28069,6 +28102,14 @@ var EngCalcs = EngCalcs || {};
 			redraw = function () {
 				list.innerHTML = '';
 				btnUp.disabled = btnDown.disabled = btnTop.disabled = btnBottom.disabled = !sel.length;
+				wInput.disabled = !sel.length;
+				wShown = '';
+				if (sel.length === 1) {
+					var wk = work[sel[0]].key, wc = paneColsAll(spec).filter(function (c3) { return c3.key === wk; })[0], wt = spec.colGroup && spec.colGroup.parentNode;
+					if (widths[wk] !== undefined) { wShown = widths[wk] === null ? '' : String(widths[wk]); }
+					else if (wc) { wShown = String(paneColDrawnEm(spec, wc, paneEmPx(wt)) || ''); }
+				}
+				wInput.value = wShown;
 				work.forEach(function (c, i) {
 					var row = document.createElement('div'), cb = document.createElement('input'),
 						lab = document.createElement('span');
@@ -28111,6 +28152,9 @@ var EngCalcs = EngCalcs || {};
 				pref.order = work.map(function (c) { return c.key; });
 				pref.hidden = work.filter(function (c) { return !c.show; }).map(function (c) { return c.key; });
 				savePaneColPrefs();
+				Object.keys(widths).forEach(function (k) {
+					if (widths[k] === null) { paneResetColWidth(spec, k); } else { paneSetColWidth(spec, k, widths[k]); }
+				});
 				paneTableReset(spec);
 				renderPaneTable(spec);
 			} },
@@ -45466,6 +45510,16 @@ var EngCalcs = EngCalcs || {};
 	// ID-prefix validation, same illegal-character set as validateNewId() (no spaces/quotes) plus
 	// non-empty -- a prefix becomes the leading substring of every future auto-generated ID for that
 	// element type, so the same rules that keep a renamed ID EPANET-legal apply here too.
+	// **THE ONE MARKER FOR WHERE A SETTING IS KEPT** (Task 739). Same element Looped-Network.php's
+	// lpnSavedMark() writes for a sub-heading, so a row-level marker and a heading-level one are
+	// the same words in the same class.
+	function savedMarker(cls) {
+		var pc = EngCalcs.pageConfig || {}, m = document.createElement('span');
+		m.className = 'lpn-saved lpn-saved-row';
+		m.setAttribute('data-saved-class', cls);
+		m.textContent = pc['lpn_saved_' + cls] || '';
+		return m;
+	}
 	function validatePrefix(p) { return !!p && !/[\s'"]/.test(p); }
 	// Fills SIX of the Settings box's hosts (Task 441, restructured): ID prefixes and starting values
 	// under New elements, map appearance and the page under Map and page, units and hydraulics under
@@ -45579,10 +45633,17 @@ var EngCalcs = EngCalcs || {};
 		// column, and a long name two lines instead of a wider box.
 		// RETURNS THE LINE, so a caller that has to point at one row later can hold it rather than
 		// guess at lastChild. Every other caller ignores the value.
-		function row(target, labelText, input, tip, href) {
+		// `saved` is a class ('project', 'browser', 'session') ONLY for a row whose home differs
+		// from the sub-heading it stands under; the heading's own marker answers for every other
+		// row (Task 739, dev/setting-scope.md).
+		function row(target, labelText, input, tip, href, saved) {
 			var line = document.createElement('label'), text = document.createElement('span');
 			line.className = 'lpn-set-row';
 			setFieldLabel(text, labelText, tip, href);
+			if (saved) {
+				line.setAttribute('data-saved', saved);
+				text.appendChild(savedMarker(saved));
+			}
 			line.appendChild(text);
 			line.appendChild(input);
 			target.appendChild(line);
@@ -46327,13 +46388,12 @@ var EngCalcs = EngCalcs || {};
 
 		// ---- PAGE (Task 289, renamed by Tom 2026-08-18: "Change Calculator to Page and make it a
 		// heading") ----
-		// THE ONE SUB-HEADING IN THE BOX THAT IS NOT CARRIED IN THE PROJECT FILE, and the note says
-		// so rather than a scope marker standing over it: whether the heading above the drawing is
-		// showing is a fact about the window you are sitting in front of.
+		// THE ONE SUB-HEADING IN THE BOX THAT IS NOT CARRIED IN THE PROJECT FILE, and its marker
+		// (data-saved="browser" in Looped-Network.php) says so: whether the heading above the
+		// drawing is showing is a fact about the window you are sitting in front of.
 		// The two reset buttons are here because they are the calculator's own commands -- one puts
 		// every setting back, the other empties the calculator entirely -- and a foot of actions
 		// under no heading at all was the last thing in the box with no answer to "where am I".
-		note(pageBody, pc.lpn_settings_page_note || 'Saved in this calculator, not in the project.');
 		// **THE WAY BACK FOR THE SELECTION BUBBLE** (Tom's 2026-09-08 worklist, which asked for a
 		// 'Show this' checkbox on the bubble itself). A checkbox that hides the box it lives in
 		// cannot undo itself, so the switch needs a second home that is still there afterwards --
@@ -46547,7 +46607,8 @@ var EngCalcs = EngCalcs || {};
 		runBoxInput.type = 'checkbox';
 		runBoxInput.checked = !runBoxHidden;
 		runBoxInput.addEventListener('change', function () { setRunBoxHidden(!runBoxInput.checked); });
-		row(compBody, pc.lpn_settings_runbox || 'Show the run progress box', runBoxInput, pc.lpn_settings_runbox_tip);
+		row(compBody, pc.lpn_settings_runbox || 'Show the run progress box', runBoxInput, pc.lpn_settings_runbox_tip,
+			undefined, 'browser');
 		// ---- engine choice (ROADMAP Task 243) ----
 		// A checkbox rather than a two-option select: there is a plain default and one opt-in,
 		// and a select would imply the two are peers when EPANET is simply what solves.
@@ -47035,7 +47096,7 @@ var EngCalcs = EngCalcs || {};
 			var kids = node.children ? [].slice.call(node.children) : [], i, k;
 			for (i = 0; i < kids.length; i++) {
 				k = kids[i];
-				if (k.classList && k.classList.contains('ec-tip')) {
+				if (k.classList && (k.classList.contains('ec-tip') || k.classList.contains('lpn-saved'))) {
 					found = true;
 					if (k.parentNode) { k.parentNode.removeChild(k); }
 				} else { strip(k); }

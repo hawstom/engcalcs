@@ -3080,7 +3080,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Os rótulos de cliente são desenhado
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Usar a visualização atual';
 $ec_lang['lpn_settings_page']='Página';
-$ec_lang['lpn_settings_page_note']='Salvo nesta calculadora, não no projeto.';
 $ec_lang['lpn_settings_hydraulics']='Hidráulica';
 $ec_lang['lpn_settings_quality']='Qualidade da água';
 $ec_lang['lpn_settings_quality_track']='Parâmetro de qualidade';

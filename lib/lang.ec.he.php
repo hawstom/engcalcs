@@ -3080,7 +3080,6 @@ $ec_lang['lpn_labels_customer_width_tip']='תוויות לקוחות מצויר�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='שימוש בתצוגה הנוכחית';
 $ec_lang['lpn_settings_page']='עמוד';
-$ec_lang['lpn_settings_page_note']='נשמר במחשבון זה, לא בפרויקט.';
 $ec_lang['lpn_settings_hydraulics']='הידראוליקה';
 $ec_lang['lpn_settings_quality']='איכות מים';
 $ec_lang['lpn_settings_quality_track']='פרמטר איכות';

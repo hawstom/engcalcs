@@ -3083,7 +3083,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Label pelanggan hanya digambar selama
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Gunakan tampilan saat ini';
 $ec_lang['lpn_settings_page']='Halaman';
-$ec_lang['lpn_settings_page_note']='Disimpan di kalkulator ini, bukan di dalam proyek.';
 $ec_lang['lpn_settings_hydraulics']='Hidraulika';
 $ec_lang['lpn_settings_quality']='Kualitas air';
 $ec_lang['lpn_settings_quality_track']='Parameter kualitas';

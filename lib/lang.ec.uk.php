@@ -3135,7 +3135,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Підписи абонентів м�
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Використати поточний вигляд';
 $ec_lang['lpn_settings_page']='Сторінка';
-$ec_lang['lpn_settings_page_note']='Зберігається в цьому калькуляторі, а не в проєкті.';
 $ec_lang['lpn_settings_hydraulics']='Гідравліка';
 $ec_lang['lpn_settings_quality']='Якість води';
 $ec_lang['lpn_settings_quality_track']='Параметр якості';

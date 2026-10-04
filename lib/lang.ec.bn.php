@@ -3090,7 +3090,6 @@ $ec_lang['lpn_labels_customer_width_tip']='গ্রাহক লেবেলগ
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='বর্তমান দৃশ্য ব্যবহার করুন';
 $ec_lang['lpn_settings_page']='পৃষ্ঠা';
-$ec_lang['lpn_settings_page_note']='এই ক্যালকুলেটরে সংরক্ষিত, প্রকল্পে নয়।';
 $ec_lang['lpn_settings_hydraulics']='হাইড্রোলিক্স';
 $ec_lang['lpn_settings_quality']='পানির গুণমান';
 $ec_lang['lpn_settings_quality_track']='গুণমান প্যারামিটার';

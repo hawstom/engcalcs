@@ -26,6 +26,15 @@ $html_desc = $ec_lang['lpn_main_desc'];
 // page has its own menu bar, toolbar and tab strip; the suite's navbar made a fourth, carried a
 // SECOND Help menu, and its Install and language picker are the two doors that moved rather than
 // went (Help > Install app, and the Language menu, both built in js/looped-network.js).
+// **THE ONE MARKER FOR WHERE A SETTING IS KEPT** (Task 739, Tom 2026-09-28: *"Systematically
+// disclose to users where things are stored."*). `project` is the file, `browser` is this device,
+// `session` is forgotten on reload. One key per class, reused by every sub-heading and row;
+// dev/setting-scope.md is the inventory and setting-scope-check.php holds it true.
+function lpnSavedMark($class) {
+	global $ec_lang;
+	return '<span class="lpn-saved" data-saved-class="' . $class . '">'
+		. htmlspecialchars($ec_lang['lpn_saved_' . $class]) . '</span>';
+}
 echoHeader("EngCalcsApp", $html_title, "", false);
 ?>
 <?php // **NO PAGE TITLES HERE ANY MORE** (Task 625). The h2 description, the "Hide these titles"
@@ -1113,19 +1122,19 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // jump. The label entries reuse the Labels headings' own keys. Each kind's
 						      // colours still follow its labels (Tom, 2026-08-19: "put a colour-ramp picker
 						      // at the bottom of this group"), now as the next entry rather than the same one. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_labels_heading_node']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym" data-saved="project"><?=$ec_lang['lpn_labels_heading_node']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_node_fields" class="lpn-set-part"></div>
 						</div>
-						<div class="lpn-set-sub" id="lpn_set_sub_nodeColors"><?=$ec_lang['lpn_settings_sym_node_colors']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_nodeColors" data-saved="project"><?=$ec_lang['lpn_settings_sym_node_colors']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_set_colors_node" class="lpn-set-part"></div>
 						</div>
-						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_labels_heading_link']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_linkSym" data-saved="project"><?=$ec_lang['lpn_labels_heading_link']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_link_fields" class="lpn-set-part"></div>
 						</div>
-						<div class="lpn-set-sub" id="lpn_set_sub_linkColors"><?=$ec_lang['lpn_settings_sym_link_colors']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_linkColors" data-saved="project"><?=$ec_lang['lpn_settings_sym_link_colors']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_set_colors_link" class="lpn-set-part"></div>
 						</div>
@@ -1141,11 +1150,11 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // "whose is this and how much does it draw". It also carries the one
 						      // question those rows cannot, namely how close the view has to be
 						      // before a service is worth lettering. rebuildLabelsFields() fills it. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_custLbl"><?=$ec_lang['lpn_settings_sym_customer']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_custLbl" data-saved="project"><?=$ec_lang['lpn_settings_sym_customer']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_customer_fields" class="lpn-set-part"></div>
 						</div>
-						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink"><?=$ec_lang['lpn_settings_sym_all']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink" data-saved="project"><?=$ec_lang['lpn_settings_sym_all']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_options" class="lpn-set-part"></div>
 							<?php // Thematic map (Tom, 2026-08-19: "Move Thematic map to the Node and link
@@ -1170,14 +1179,14 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // licence fixes its own wording, so it is never retyped here where it could
 						      // drift. Untranslated on purpose, exactly like the OpenStreetMap credit on
 						      // the map. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_mapDisplay"><?=$ec_lang['lpn_settings_map_display']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_mapDisplay" data-saved="project"><?=$ec_lang['lpn_settings_map_display']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_set_map_fields" class="lpn-set-part"></div>
 							<div id="lpn_set_colors_shared" class="lpn-set-part"></div>
 						</div>
 						<?php // Tom: "Change Calculator to Page and make it a heading." The one group in the
 						      // box that is NOT carried in the project file, which its note says out loud. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_page"><?=$ec_lang['lpn_settings_page']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_page" data-saved="browser"><?=$ec_lang['lpn_settings_page']?><?=lpnSavedMark('browser')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_page_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
@@ -1189,15 +1198,15 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 				<section id="lpn_set_sec_elements" class="lpn-set-sec" data-set-sec="elements">
 					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_assets']?></h3>
 					<div class="lpn-set-secbody">
-						<div class="lpn-set-sub" id="lpn_set_sub_idPrefixes"><?=$ec_lang['lpn_settings_id_prefixes']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_idPrefixes" data-saved="project"><?=$ec_lang['lpn_settings_id_prefixes']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_id_fields" class="lpn-set-part"></div></div>
-						<div class="lpn-set-sub" id="lpn_set_sub_defaults"><?=$ec_lang['lpn_settings_defaults']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_defaults" data-saved="project"><?=$ec_lang['lpn_settings_defaults']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_default_fields" class="lpn-set-part"></div></div>
 						<?php // ---- Custom properties (ROADMAP Task 636) ----
 						      // A field the user invents. The body is one abbreviated DESIGN TABLE, a row per
 						      // property, built by js/looped-network.js; the heading lives here with every other
 						      // sub-heading so that where a control sits is readable in one place. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_customProps"><?=ecTipLabel($ec_lang['lpn_settings_custom_props'], $ec_lang['lpn_settings_custom_props_note'])?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_customProps" data-saved="project"><?=ecTipLabel($ec_lang['lpn_settings_custom_props'], $ec_lang['lpn_settings_custom_props_note'])?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_custom_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
@@ -1214,16 +1223,16 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 				<section id="lpn_set_sec_calc" class="lpn-set-sec" data-set-sec="calc">
 					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_calculation']?></h3>
 					<div class="lpn-set-secbody">
-						<div class="lpn-set-sub" id="lpn_set_sub_units"><?=$ec_lang['lpn_view_units']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_units" data-saved="project"><?=$ec_lang['lpn_view_units']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_units_fields" class="lpn-set-part"></div></div>
-						<div class="lpn-set-sub" id="lpn_set_sub_time"><?=$ec_lang['lpn_time_menu']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_time" data-saved="project"><?=$ec_lang['lpn_time_menu']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_time_fields" class="lpn-set-part"></div></div>
-						<div class="lpn-set-sub" id="lpn_set_sub_hydraulics"><?=$ec_lang['lpn_settings_hydraulics']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_hydraulics" data-saved="project"><?=$ec_lang['lpn_settings_hydraulics']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_hydraulics_fields" class="lpn-set-part"></div></div>
 						<?php // Energy after Hydraulics: it is the one section here whose answer is money,
 						      // and it is read on the extended-period run, so it sits after the clock and
 						      // after the analysis that needs one (ROADMAP Task 566). ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_energy"><?=$ec_lang['lpn_settings_energy']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_energy" data-saved="project"><?=$ec_lang['lpn_settings_energy']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_energy_fields" class="lpn-set-part"></div></div>
 						<?php // **WATER QUALITY LAST, AND THIS REVERSES EPANET'S OWN ORDER ON PURPOSE**
 						      // (Tom, 2026-09-04: *"Put the Water Quality stuff at the bottom of the options
@@ -1235,7 +1244,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 						      // the section fewest readers want, and putting it mid-list makes everyone
 						      // scroll past a chemistry question to reach the clock. Depth, not EPANET's
 						      // sequence, decides the order of a list a beginner reads top to bottom. ?>
-						<div class="lpn-set-sub" id="lpn_set_sub_quality"><?=$ec_lang['lpn_settings_quality']?></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_quality" data-saved="project"><?=$ec_lang['lpn_settings_quality']?><?=lpnSavedMark('project')?></div>
 						<div class="lpn-set-subbody"><div id="lpn_set_quality_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
@@ -3520,7 +3529,11 @@ EngCalcs.pageConfig = {
 	lpn_settings_elev_source_typed: <?=json_encode($ec_lang['lpn_settings_elev_source_typed'])?>,
 	lpn_settings_elev_source_dem: <?=json_encode($ec_lang['lpn_settings_elev_source_dem'])?>,
 
-	lpn_settings_page_note: <?=json_encode($ec_lang['lpn_settings_page_note'])?>,
+	lpn_saved_project: <?=json_encode($ec_lang['lpn_saved_project'])?>,
+	lpn_saved_browser: <?=json_encode($ec_lang['lpn_saved_browser'])?>,
+	lpn_saved_session: <?=json_encode($ec_lang['lpn_saved_session'])?>,
+	lpn_pane_manage_cols_width: <?=json_encode($ec_lang['lpn_pane_manage_cols_width'])?>,
+	lpn_pane_width_tip: <?=json_encode($ec_lang['lpn_pane_width_tip'])?>,
 	lpn_settings_show_titles: <?=json_encode($ec_lang['lpn_settings_show_titles'])?>,
 	lpn_settings_show_titles_tip: <?=json_encode($ec_lang['lpn_settings_show_titles_tip'])?>,
 	lpn_settings_area_hint: <?=json_encode($ec_lang['lpn_settings_area_hint'])?>,

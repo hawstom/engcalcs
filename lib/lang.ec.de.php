@@ -3081,7 +3081,6 @@ $ec_lang['lpn_labels_customer_width_tip']='Kundenbeschriftungen werden nur gezei
 // once must not have to learn a second wording for it.
 $ec_lang['lpn_settings_label_use_view']='Aktuelle Ansicht verwenden';
 $ec_lang['lpn_settings_page']='Seite';
-$ec_lang['lpn_settings_page_note']='Wird in diesem Rechner gespeichert, nicht im Projekt.';
 $ec_lang['lpn_settings_hydraulics']='Hydraulik';
 $ec_lang['lpn_settings_quality']='Wasserqualität';
 $ec_lang['lpn_settings_quality_track']='Qualitätsparameter';
