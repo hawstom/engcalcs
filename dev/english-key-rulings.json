@@ -84,6 +84,11 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
+        "lpn_analyze_at_time": {
+            "on": "Time step: {time}.",
+            "ruled": "2026-10-03",
+            "answer": "OK."
+        },
         "lpn_analyze_menu": {
             "on": "Analyze",
             "ruled": "2026-10-03",
@@ -91,6 +96,11 @@
         },
         "lpn_analyze_menu_tip": {
             "on": "Analyses that run the network on a copy: fire flow at each junction, the loss of each pipe, pump, and valve, and the demands scaled up or down.",
+            "ruled": "2026-10-03",
+            "answer": "OK."
+        },
+        "lpn_analyze_time_moved": {
+            "on": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.",
             "ruled": "2026-10-03",
             "answer": "OK."
         },
@@ -1220,9 +1230,9 @@
             "on": "It stopped after {iterations} iterations.",
             "ruled": "2026-09-02"
         },
-        "lpn_analyze_at_time": {
+        "lpn_ds_at_time": {
             "on": "Time step: {time}.",
-            "ruled": "2026-10-03",
+            "ruled": "2026-10-04",
             "answer": "OK."
         },
         "lpn_ds_bad_multiplier": {
@@ -1258,6 +1268,21 @@
         "lpn_ds_col_unscaled_tip": {
             "on": "With the demands as they are in the active scenario at this time step, the same value the map shows.",
             "ruled": "2026-10-03",
+            "answer": "OK."
+        },
+        "lpn_ds_eps_note": {
+            "on": "Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.",
+            "ruled": "2026-10-04",
+            "answer": "OK."
+        },
+        "lpn_ds_find": {
+            "on": "Find",
+            "ruled": "2026-10-04",
+            "answer": "OK."
+        },
+        "lpn_ds_found": {
+            "on": "✓ Every junction keeps {pressure} up to a demand scale of {m}.",
+            "ruled": "2026-10-04",
             "answer": "OK."
         },
         "lpn_ds_found_below": {
@@ -1420,9 +1445,9 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
-        "lpn_analyze_time_moved": {
+        "lpn_ds_time_moved": {
             "on": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.",
-            "ruled": "2026-10-03",
+            "ruled": "2026-10-04",
             "answer": "OK."
         },
         "lpn_ds_title": {
@@ -1874,6 +1899,11 @@
         "lpn_ff_residual_tip": {
             "on": "20 psi is the AWWA M31 and NFPA 291 convention for available fire flow.",
             "ruled": "2026-09-01"
+        },
+        "lpn_ff_rows_more": {
+            "on": "Junctions not shown: {n}.",
+            "ruled": "2026-10-03",
+            "answer": "Approved."
         },
         "lpn_ff_rows_more_links": {
             "on": "Links not shown: {n}.",
@@ -5380,11 +5410,6 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
-        },
-        "lpn_ff_rows_more": {
-            "on": "Junctions not shown: {n}.",
-            "ruled": "2026-10-03",
-            "answer": "Approved."
         }
     }
 }
