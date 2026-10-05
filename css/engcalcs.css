@@ -422,8 +422,8 @@ button > .ec-icon, a > .ec-icon, label > .ec-icon { margin-inline-end: 0.4em; }
 	font-weight: normal;
 }
 
-/* Whole-label wrapper: makes the entire label (not just the ? icon) the hover/tap
-   target for the tip carried in .ec-tip's title attribute. */
+/* Label wrapper carrying a tip's text in its title. Behind a "?" it is an explanation that only
+   the glyph opens (.ec-explain-host, below); without one it is a name tip opened by hover. */
 .ec-help {
 	cursor: help;
 }
