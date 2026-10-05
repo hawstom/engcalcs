@@ -3685,6 +3685,11 @@ TRAP for method: Session Save as needs answerTrainingPanel() then a second queue
 - NOT EXERCISED: Settings changes, recalc-off edits, hover/select, pinch, real customers, georeference change.
 - Method: snapshots must exclude other tabs' kept (display:none) layers; tab order at load is nondeterministic, so verify the current tab by name. Never pkill -f with a pattern that matches your own shell command.
 
+## 2026-10-03 -- pre-review feat/profile-file 0c7d728e (Task 604), Perry
+
+- CITED: USEPA/EPANET2.2 Delphi_GUI/epanet2w/Dgraph.pas (raw.githubusercontent.com): Save does Insert(0,ProfileID) then SaveToFile; Open does LoadFromFile then Delete(0). Filter '*.PRO'. Format matches the parser: identifier line, one node ID per line (TStringList: CRLF, ANSI, no BOM).
+- OBSERVED (real headless Chrome, php -S, Net3.lwn, file fed to the input via DOM.setFileInputFiles): menu row last, below a separator, 32px like the others, no icon, text aligned with the others; the Profile panel gained no control. Sample draws "Nodes: 5, length: 21490 ft"; notice "5 of 5 nodes found". Mixed file: "2 of 4 ... ZZ9, QQ". One usable: refused, notice names ZZ9. Input value is '' after each pick, so the same file twice re-fires. A link-only ID (112) is reported as not in this network, and the rest still draw.
+- NOT EXERCISED: the native file chooser (headless cannot), the real click on the row, non-ASCII IDs.
 ## 2026-10-03 -- pre-review feat/contour c07094a8 (Task 600), Perry
 
 - OBSERVED (headless Chrome, php -S on the worktree, Net3 and Net3-Novato-CA-World): Graphs > Contour turns on filled contours and opens Settings at Node colors; Filled / Line / None all draw and clear; 1 layer under the pipes; legend sentence present. Recalculate off + node drag: plot unchanged until Calculate (snapshot holds, but the old outline stays where the node used to be). Play at 1x, nodal plot: no long tasks, 60 fps, redrawn once per step.

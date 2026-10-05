@@ -29387,7 +29387,60 @@ var EngCalcs = EngCalcs || {};
 		// nothing for them to name.
 		rows.push({ icon: 'edit', label: pc.lpn_profile_rename || 'Rename path…', disabled: !active, fn: renameSavedProfile });
 		rows.push({ icon: 'close', label: pc.lpn_profile_delete || 'Delete path', disabled: !active, fn: deleteSavedProfile });
+		// **THE ONE ROW FOR AN EPANET .PRO FILE** (Task 604; Tom, 2026-09-06: it "needs to take up
+		// miniscule space in the UX/UI, hidden deep under some menu or in the profile tab down
+		// arrow"). Last in the menu, below a separator, and never a control on the panel.
+		rows.push({ separator: true });
+		rows.push({ label: pc.lpn_profile_open || 'Open EPANET profile file…', fn: pickProfileFile });
 		openMenu(anchor, rows, 0);
+	}
+	// **AN EPANET .PRO FILE BECOMES THE STOPS OF A PROFILE** (Task 604). A profile here is a list of
+	// stops with the shortest route between consecutive ones (pathThrough), so the listed nodes ARE
+	// the stops, in file order. EPANET lists every node along the path, so each leg is normally one
+	// link; between two nodes joined by parallel pipes the shortest one is drawn. An ID this network
+	// does not have (or an inactive node) is REPORTED and left out, never dropped silently; the
+	// route then bridges the gap by shortest path. The file is not stored: it sets the path on show
+	// and does not become a saved path.
+	function pickProfileFile() {
+		var input = document.getElementById('lpn_profile_file');
+		if (input) { input.click(); }
+	}
+	function loadProfileFileText(text) {
+		var pc = EngCalcs.pageConfig || {}, parsed = EngCalcs.lpnProfile.parseProfileFile(text),
+			usable = [], missing = [], msg;
+		parsed.ids.forEach(function (id) {
+			var n = nodeById(id);
+			if (n && profileNodeUsable(n)) { usable.push(id); } else if (missing.indexOf(id) < 0) { missing.push(id); }
+		});
+		if (usable.length < 2) {
+			msg = pc.lpn_profile_file_short || 'The file names fewer than two nodes in this network, so there is no profile to draw.';
+			if (missing.length) {
+				msg += ' ' + (pc.lpn_profile_file_missing || 'Named in the file but not in this network: {ids}.').replace('{ids}', missing.join(', '));
+			}
+			setNotice(msg);
+			return false;
+		}
+		profileSetStops(usable);
+		profileState.activeId = '';
+		profileState.draw = null;
+		msg = (pc.lpn_profile_file_done || 'Profile read from the file: {used} of {total} nodes found in this network.')
+			.replace('{used}', String(usable.length)).replace('{total}', String(parsed.ids.length));
+		if (missing.length) {
+			msg += ' ' + (pc.lpn_profile_file_missing || 'Named in the file but not in this network: {ids}.').replace('{ids}', missing.join(', '));
+		}
+		setNotice(msg);
+		rebuildProfileForm();
+		renderProfile();
+		return true;
+	}
+	function importProfileFromFile(file) {
+		var reader = new FileReader();
+		reader.onload = function (ev) { loadProfileFileText(String(ev.target.result)); };
+		reader.onerror = function () {
+			var pc = EngCalcs.pageConfig || {};
+			setWarning(pc.lpn_survey_read_error || 'That file could not be read from your disk.');
+		};
+		reader.readAsText(file);
 	}
 	// ---- THE PATH CHOOSER (ROADMAP Task 433) -----------------------------------------------------
 	//
@@ -41671,6 +41724,14 @@ var EngCalcs = EngCalcs || {};
 		// A FOURTH picker (Task 592). Its own, for the reason the three above are their own: a
 		// surveyed point list lands in the OPEN project rather than making a new tab, so one input
 		// serving both would have to guess which act was meant from the file's extension.
+		var profileInput = document.getElementById('lpn_profile_file');
+		if (profileInput) {
+			profileInput.addEventListener('change', function () {
+				var f = profileInput.files[0];
+				profileInput.value = '';
+				if (f) { importProfileFromFile(f); }
+			});
+		}
 		var surveyInput = document.getElementById('lpn_survey_file');
 		if (!surveyInput) { return; }
 		surveyInput.addEventListener('change', function () {
