@@ -2992,6 +2992,8 @@ $ec_lang['lpn_alt_cat_fireflow']='Fire flow';
 $ec_lang['lpn_alt_cat_energy']='Energy cost';
 $ec_lang['lpn_alt_cat_userdata']='Custom properties';
 $ec_lang['lpn_alt_cat_text']='Text';
+$ec_lang['lpn_alt_cat_presentation']='Presentation';
+$ec_lang['lpn_alt_cat_calculation']='Calculation';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_push_confirm']='Make every scenario use the Base values for these properties? Values entered for them in any scenario are discarded. You can undo this.';
 $ec_lang['lpn_scenario_push_scenarios']='Scenarios affected:';

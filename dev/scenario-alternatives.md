@@ -248,7 +248,7 @@ properties already in a category.
 | `project.activeScenario` | Which scenario is open. Cannot depend on the scenario. |
 | `scenarios`, `nodes`, `links`, `labels`, `customers` | The model itself; element properties are categorised in the table above this section. |
 | `settings.sources`, `settings.mixing`, `settings.tags`, `settings.reactions.tank`, `settings.energy.effic` | Markers and staging the `.inp` readers leave behind: "this section was read", or a value already moved onto its element. |
-| `settings.sectionsOpen`, `mapHeight`, `fileAutosaveSeconds`, `colorRamp`, `colorClasses`, `colorReverse`, `colorThematic`, `colorFrozenBreaks`, `basemapFilter`, `kmDefault` | Stale or migrated on open: nothing reads them, or `applySaved()` converts and deletes them. |
+| `settings.sectionsOpen`, `mapHeight`, `fileAutosaveSeconds`, `colorRamp`, `colorClasses`, `colorReverse`, `colorThematic`, `colorFrozenBreaks`, `basemapFilter`, `kmDefault`, `labelReadabilityBias` (superseded by `labelFlipLeftOfVertical`; every shipped example still carries it) | Stale or migrated on open: nothing reads them, or `applySaved()` converts and deletes them. |
 
 ### The data layer: still choice A
 
@@ -324,9 +324,9 @@ the read-only Alternatives table gains their two columns before the calculation-
   first read. In a scenario that fill would land in the project's object; it must land wherever an
   edit would.
 - **Caches keyed on the document**: the label-layout keep and the kept solve are keyed on
-  `modelSignature()`, which hashes the serialized project. A scenario switch that changes a
-  Presentation value must miss the label keep, and one that changes a Calculation value must miss
-  the solve keep; including `project.activeScenario` and the scenario's block in the hash does both.
+  `modelSignature()`, which hashes the serialized project. That already includes
+  `project.activeScenario` and every scenario's block, so a switch of scenario misses both keeps
+  with no change; listed so nobody narrows the hash later.
 - **`applyScenarioChange()`**: a switch already re-solves and relabels; it must also repaint the
   symbology, the basemap and the contours when the two scenarios' Presentation differs.
 
@@ -365,6 +365,10 @@ group)`, `alternativesOf(scenario)`, `alternativeFor(scenario, category)`, `reso
 `effective()` is NOT rewired through it: it runs per property per element per render and per solve,
 and in Basic mode its one override lookup already IS the one-hop chain. The harness holds the two
 equal instead.
+
+Settings in scenarios: same file, section "SETTINGS IN SCENARIOS": `LPN_SETTING_CATEGORY_OF`,
+`categoryOfSetting()` (also `categoryOf(path, 'setting')`), `settingFor(scn, path)`,
+`effectiveSetting(path)`, `setScenarioSetting()`, `sanitizeScenarioSettings()`.
 
 Basic mode and the table: same file, section "SCENARIOS > BASIC MODE" (`setScenarioBasicMode()`,
 `rebuildAlternativesTable()`); the box is `#lpn_alt_box` in `Looped-Network.php`. The box's

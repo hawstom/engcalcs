@@ -204,8 +204,9 @@ console.log('\n--- the alternatives rebuild every override map exactly ---');
 	ok('the topology-only scenario has one child, in Asset activation',
 		L.allAlternatives().filter(function (a) { return a.scenario === s3.id; }).map(function (a) { return a.category; }).join() === 'topology');
 	const cats = L.allAlternatives().filter(function (a) { return a.scenario === s2.id; }).map(function (a) { return a.category; }).sort();
-	ok('the everything scenario has a child in every category but User data',
-		cats.join() === L.CATS.filter(function (c) { return c !== 'userdata'; }).sort().join(), cats.join());
+	// Presentation and Calculation hold settings, not element properties (section 7).
+	ok('the everything scenario has a child in every element category but User data',
+		cats.join() === L.CATS.filter(function (c) { return ['userdata', 'presentation', 'calculation'].indexOf(c) < 0; }).sort().join(), cats.join());
 	L.deleteScenario(s2.id);
 	ok('deleting a scenario takes its alternatives with it',
 		!L.allAlternatives().some(function (a) { return a.scenario === s2.id; }));

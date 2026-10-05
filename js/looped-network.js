@@ -4656,6 +4656,9 @@ var EngCalcs = EngCalcs || {};
 			var v = scenarioTimeValue(scn, key);
 			if (v !== undefined && v !== projectTimes()[key]) { total += 1; }
 		});
+		// **AND EACH SETTING IT HOLDS OF ITS OWN** (Tom, 2026-10-05), one per value, by presence
+		// as an element override counts: nothing seeds a scenario's settings block.
+		total += scenarioSettingLeaves(scn).length;
 		return total;
 	}
 	// Every scenario's overrides on one element -- what a Base-side deletion is about to destroy,
@@ -4695,7 +4698,9 @@ var EngCalcs = EngCalcs || {};
 	// LPN_OVERRIDABLE that is missing here. A custom property (Task 636), and any stray name an old
 	// file carries, is User data -- so "exactly one" holds for every key a file can contain.
 	// The demand multiplier is NOT here: it is a scenario's calculation option, as in Bentley.
-	var LPN_ALT_CATEGORIES = ['physical', 'demand', 'topology', 'initial', 'constituent', 'fireflow', 'energy', 'userdata', 'text'];
+	var LPN_ALT_CATEGORIES = ['physical', 'demand', 'topology', 'initial', 'constituent', 'fireflow', 'energy', 'userdata', 'text',
+		// Settings, not element properties (Tom, 2026-10-05): see "SETTINGS IN SCENARIOS" below.
+		'presentation', 'calculation'];
 	var LPN_ALT_CATEGORY_OF = {
 		node: { x: 'physical', y: 'physical', emitter: 'physical', head: 'physical',
 			demand: 'demand', demands: 'demand',
@@ -4714,7 +4719,10 @@ var EngCalcs = EngCalcs || {};
 		// annotation outside the model altogether.
 		label: { text: 'text', active: 'text' }
 	};
+	// group 'setting': `prop` is a setting's path, answered by categoryOfSetting() -- null for one
+	// that may never vary by scenario, undefined for one no table names.
 	function categoryOf(prop, group) {
+		if (group === 'setting') { return categoryOfSetting(prop); }
 		var g = LPN_ALT_CATEGORY_OF[group || 'node'] || {};
 		return Object.prototype.hasOwnProperty.call(g, prop) ? g[prop] : 'userdata';
 	}
@@ -4730,30 +4738,40 @@ var EngCalcs = EngCalcs || {};
 	function altCopy(v) { return (v && typeof v === 'object') ? JSON.parse(JSON.stringify(v)) : v; }
 	function altBase(cat) {
 		var b = baseScenario();
-		return { id: b.id + ':' + cat, category: cat, parent: null, scenario: b.id, isBase: true, values: {}, count: 0 };
+		return { id: b.id + ':' + cat, category: cat, parent: null, scenario: b.id, isBase: true, values: {}, settings: [], count: 0 };
 	}
 	/**
 	 * **ONE ALTERNATIVE PER CATEGORY, FOR ONE SCENARIO**, as {category: alternative}. An alternative
-	 * is {id, category, parent, scenario, isBase, values, count}: `values` is {ovKey: {prop: value}}
-	 * holding only its LOCAL values (copies, so no reader can edit an override by holding them),
-	 * and a Base alternative's are empty because its values are the elements' own.
+	 * is {id, category, parent, scenario, isBase, values, settings, count}: `values` is {ovKey:
+	 * {prop: value}} holding only its LOCAL element values (copies, so no reader can edit an
+	 * override by holding them), `settings` is [{path, value}] holding its local SETTING values
+	 * (scenario.settings), and a Base alternative's are empty because its values are the elements'
+	 * and the project's own. `count` is both together.
 	 */
 	function alternativesOf(scn) {
 		var out = {}, own = {};
 		LPN_ALT_CATEGORIES.forEach(function (cat) { out[cat] = altBase(cat); });
 		if (!scn || scn.isBase) { return out; }
+		function child(cat) {
+			if (!own[cat]) {
+				own[cat] = { id: scn.id + ':' + cat, category: cat, parent: baseScenario().id + ':' + cat,
+					scenario: scn.id, isBase: false, values: {}, settings: [], count: 0 };
+			}
+			return own[cat];
+		}
 		Object.keys(scn.overrides || {}).forEach(function (key) {
 			var group = ovKeyGroup(key), ov = scn.overrides[key];
 			Object.keys(ov || {}).forEach(function (prop) {
-				var cat = categoryOf(prop, group), a = own[cat];
-				if (!a) {
-					a = own[cat] = { id: scn.id + ':' + cat, category: cat, parent: baseScenario().id + ':' + cat,
-						scenario: scn.id, isBase: false, values: {}, count: 0 };
-				}
+				var a = child(categoryOf(prop, group));
 				if (!a.values[key]) { a.values[key] = {}; }
 				a.values[key][prop] = altCopy(ov[prop]);
 				a.count++;
 			});
+		});
+		scenarioSettingLeaves(scn).forEach(function (leaf) {
+			var a = child(categoryOfSetting(leaf.path));
+			a.settings.push({ path: leaf.path, value: altCopy(leaf.value) });
+			a.count++;
 		});
 		Object.keys(own).forEach(function (cat) { out[cat] = own[cat]; });
 		return out;
@@ -4807,6 +4825,247 @@ var EngCalcs = EngCalcs || {};
 			if (v) { Object.keys(v).forEach(function (p) { out[p] = v[p]; }); }
 		});
 		return Object.keys(out).length ? out : undefined;
+	}
+
+	// ---- SETTINGS IN SCENARIOS: PRESENTATION AND CALCULATION (dev/scenario-alternatives.md) ----
+	//
+	// Tom, 2026-10-05: *"any Setting that is stored in the project should be subject to scenario
+	// overrides under some alternatives category, probably Presentation or Calculation."* So every
+	// path serializeProject() writes is named below, with its category, or with `null` and the
+	// reason it may never vary by scenario. The longest named path wins; a path naming an object
+	// covers everything under it. dev/lpn-spike/scenario-alternatives-harness.js fails a key a saved
+	// project carries that this table does not name.
+	//
+	// **THE STORE IS `scenario.settings`, A SPARSE MIRROR OF THE PROJECT'S OWN OBJECTS**, keyed by
+	// root (`settings`, `labelSettings`, `project`, `times`, `defaultPattern`), written only when it
+	// holds something and never on Base -- so every file written before it is byte-identical. A
+	// mirror and not flat dotted keys, because members already hold the separator
+	// (`colorBreaks['node.pressure']`). Its alternatives are DERIVED from it exactly as element
+	// overrides' are (choice A): nothing about the tree is stored.
+	//
+	// **NOTHING IN THE INTERFACE WRITES ONE YET, AND NO READER IS ROUTED THROUGH THE SEAM YET.**
+	// Whether changing Settings inside a scenario creates an override is Tom's call (the doc's
+	// questions); until then the page reads the project's own objects exactly as it always has.
+	var LPN_SETTING_CATEGORY_OF = {
+		// -- the model and the file's own bookkeeping
+		format: null, app: null, v: null, nextId: null,
+		scenarios: null, nodes: null, links: null, labels: null, customers: null,
+		// -- what stored numbers MEAN: a scenario of its own would reinterpret them
+		units: null, origin: null,
+		'project.coords': null, 'project.crs': null, 'project.georef': null,
+		// -- identity, and which scenario is open
+		'project.name': null, 'project.docId': null, 'project.gallery': null,
+		'project.activeScenario': null,
+		// -- document objects: an element's reference varies, the object does not (CLAUDE.md)
+		patterns: null, curves: null, pipeTypes: null, fittingSets: null, profiles: null,
+		controls: null, rules: null, inpSections: null,
+		// -- coordinate-bearing, and megabytes; the camera is question 2
+		backdrop: null, view: null,
+		// -- Presentation
+		'project.basemap': 'presentation', 'project.basemapLast': 'presentation',
+		labelSettings: 'presentation',
+		'settings.textSize': 'presentation', 'settings.symbolSize': 'presentation',
+		'settings.linkWidth': 'presentation', 'settings.symbolOpacity': 'presentation',
+		'settings.symbolCapMultiple': 'presentation', 'settings.symbolCapPercentile': 'presentation',
+		'settings.labelMaxWidth': 'presentation', 'settings.alignPipeLabels': 'presentation',
+		'settings.labelFlipLeftOfVertical': 'presentation', 'settings.maskLabels': 'presentation',
+		'settings.showArrows': 'presentation', 'settings.leaderSnapDeg': 'presentation',
+		'settings.legendPosition': 'presentation', 'settings.basemapStyle': 'presentation',
+		'settings.backdropOpacity': 'presentation',
+		'settings.colorNodeField': 'presentation', 'settings.colorLinkField': 'presentation',
+		'settings.colorRampNode': 'presentation', 'settings.colorRampLink': 'presentation',
+		'settings.colorClassesNode': 'presentation', 'settings.colorClassesLink': 'presentation',
+		'settings.colorReverseNode': 'presentation', 'settings.colorReverseLink': 'presentation',
+		'settings.colorBreaks': 'presentation', 'settings.colorModes': 'presentation',
+		'settings.colorLegendPosition': 'presentation',
+		'settings.contourFill': 'presentation', 'settings.contourLines': 'presentation',
+		'settings.contourLabels': 'presentation', 'settings.contourOpacity': 'presentation',
+		'settings.contourInterval': 'presentation', 'settings.contourBuffer': 'presentation',
+		'settings.contourTerrain': 'presentation',
+		// -- Calculation (Bentley's Calculation Options)
+		'settings.engine': 'calculation', 'settings.autoRun': 'calculation',
+		'settings.hydraulics': 'calculation', 'settings.emitterExponent': 'calculation',
+		'settings.tolerance': 'calculation', 'settings.quality': 'calculation',
+		'settings.qualityOptions': 'calculation', times: 'calculation',
+		// -- document-wide values that belong with element properties already in a category
+		'settings.reactions': 'constituent', defaultPattern: 'demand', 'settings.energy': 'energy',
+		// -- settings that are not a scenario's: friction method reinterprets every roughness;
+		// new-asset settings write Base data (question 3); a custom property's design is schema
+		'settings.method': null,
+		'settings.idPrefixes': null, 'settings.defaults': null, 'settings.nodeElevSource': null,
+		'settings.customProps': null, 'settings.fileOptions': null,
+		// -- import markers and staging the .inp readers leave behind
+		'settings.sources': null, 'settings.mixing': null, 'settings.tags': null,
+		'settings.reactions.tank': null, 'settings.energy.effic': null,
+		// -- stale, or migrated and deleted by applySaved()
+		'settings.sectionsOpen': null, 'settings.mapHeight': null, 'settings.fileAutosaveSeconds': null,
+		'settings.colorRamp': null, 'settings.colorClasses': null, 'settings.colorReverse': null,
+		'settings.colorThematic': null, 'settings.colorFrozenBreaks': null,
+		'settings.basemapFilter': null, 'settings.kmDefault': null, 'settings.labelReadabilityBias': null
+	};
+	// An object overridden whole rather than member by member: mode and trace node are one choice.
+	var LPN_SETTING_ATOMIC = { 'settings.quality': true };
+	// Calculation options that already vary by scenario and KEEP THE HOMES THEY HAVE (Tasks 721,
+	// 755): `scenario.demandMultiplier` and `scenario.times`. scenario.settings refuses them, so a
+	// fact never has two homes; settingFor() reads them where they are.
+	var LPN_SETTING_ELSEWHERE = { 'settings.hydraulics.demandMultiplier': true,
+		'times.duration': true, 'times.hydraulicStep': true,
+		'times.text.duration': true, 'times.text.hydraulicStep': true };
+	var LPN_SETTING_ROOTS = ['settings', 'labelSettings', 'project', 'times', 'defaultPattern'];
+	function settingPath(path) { return Array.isArray(path) ? path.slice() : String(path).split('.'); }
+	function plainObject(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
+	/**
+	 * A path's category id, `null` for a path that may never vary by scenario, `undefined` for one
+	 * no table names. Read through categoryOf(path, 'setting').
+	 */
+	function categoryOfSetting(path) {
+		var p = settingPath(path), i, key;
+		for (i = p.length; i > 0; i--) {
+			key = p.slice(0, i).join('.');
+			if (Object.prototype.hasOwnProperty.call(LPN_SETTING_CATEGORY_OF, key)) { return LPN_SETTING_CATEGORY_OF[key]; }
+		}
+		return undefined;
+	}
+	function settingHasOtherHome(path) { return !!LPN_SETTING_ELSEWHERE[settingPath(path).join('.')]; }
+	function settingIsAtomic(path) { return !!LPN_SETTING_ATOMIC[settingPath(path).join('.')]; }
+	// The project's own value at a root -- what Base reads, and what a scenario inherits.
+	function settingRootValue(root) {
+		switch (root) {
+			case 'settings': return settings;
+			case 'labelSettings': return labelSettings;
+			case 'project': return project;
+			case 'times': return projectTimes();
+			case 'defaultPattern': return doc.defaultPattern || null;
+		}
+		return undefined;
+	}
+	function settingGet(obj, keys) {
+		var o = obj, i;
+		for (i = 0; i < keys.length; i++) {
+			if (!plainObject(o) || !Object.prototype.hasOwnProperty.call(o, keys[i])) { return undefined; }
+			o = o[keys[i]];
+		}
+		return o;
+	}
+	// Every LEAF a scenario's block holds, as [{path, value}], descending into plain objects except
+	// an atomic one.
+	function settingLeaves(block) {
+		var out = [];
+		(function walk(o, prefix) {
+			Object.keys(o).forEach(function (k) {
+				var p = prefix.concat(k), v = o[k];
+				if (plainObject(v) && !settingIsAtomic(p)) { walk(v, p); }
+				else { out.push({ path: p, value: v }); }
+			});
+		}(plainObject(block) ? block : {}, []));
+		return out;
+	}
+	// The scenario's own values as one mirror: its `settings` block plus the two calculation
+	// options stored elsewhere. Copies, so nothing that reads the answer edits the scenario.
+	function scenarioSettingTree(scn) {
+		var tree;
+		if (!scn || scn.isBase) { return {}; }
+		tree = plainObject(scn.settings) ? altCopy(scn.settings) : {};
+		if (typeof scn.demandMultiplier === 'number' && isFinite(scn.demandMultiplier)) {
+			tree.settings = tree.settings || {};
+			tree.settings.hydraulics = tree.settings.hydraulics || {};
+			tree.settings.hydraulics.demandMultiplier = scn.demandMultiplier;
+		}
+		LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
+			var v = scenarioTimeValue(scn, key), typed = scn.times && scn.times.text && scn.times.text[key];
+			if (v === undefined) { return; }
+			tree.times = tree.times || {};
+			tree.times[key] = v;
+			if (typeof typed === 'string') { tree.times.text = tree.times.text || {}; tree.times.text[key] = typed; }
+		});
+		return tree;
+	}
+	// Plain objects merge member by member; anything else, and an atomic object, replaces.
+	function settingOverlay(base, own, path) {
+		var out;
+		if (!plainObject(own) || settingIsAtomic(path)) { return altCopy(own); }
+		out = plainObject(base) ? altCopy(base) : {};
+		Object.keys(own).forEach(function (k) { out[k] = settingOverlay(out[k], own[k], path.concat(k)); });
+		return out;
+	}
+	/**
+	 * **THE ONE READ SEAM FOR A SETTING**, the twin of effective(el, prop): the scenario's own value
+	 * where it holds one, else the project's. **IN BASE, AND WHEREVER THE SCENARIO HOLDS NOTHING AT
+	 * OR UNDER THE PATH, IT RETURNS THE PROJECT'S OWN OBJECT** -- not a copy -- so a reader moved
+	 * onto it behaves exactly as before. Where the scenario holds part of an object, a merged COPY,
+	 * so no reader can write a scenario's value into the project's.
+	 */
+	function settingFor(scn, path) {
+		var p = settingPath(path), live = settingGet({ r: settingRootValue(p[0]) }, ['r'].concat(p.slice(1))),
+			node = scenarioSettingTree(scn), i;
+		for (i = 0; i < p.length; i++) {
+			if (!plainObject(node) || !Object.prototype.hasOwnProperty.call(node, p[i])) { return live; }
+			node = node[p[i]];
+			// An atomic object is the scenario's whole: a member under it comes from it, not Base.
+			if (i < p.length - 1 && settingIsAtomic(p.slice(0, i + 1))) {
+				return altCopy(settingGet({ r: node }, ['r'].concat(p.slice(i + 1))));
+			}
+		}
+		return settingOverlay(live, node, p);
+	}
+	function effectiveSetting(path) { return settingFor(activeScenario(), path); }
+	// Deletes one path from a scenario's block and prunes every container it emptied, down to the
+	// block itself. Raw: it asks no table, which is what lets the load-time sanitizer remove what
+	// setScenarioSetting() would refuse to touch.
+	function settingDelete(scn, p) {
+		var node = scn.settings, stack = [], i;
+		for (i = 0; i < p.length - 1; i++) {
+			if (!plainObject(node) || !plainObject(node[p[i]])) { return; }
+			stack.push([node, p[i]]);
+			node = node[p[i]];
+		}
+		if (plainObject(node)) { delete node[p[p.length - 1]]; }
+		for (i = stack.length - 1; i >= 0; i--) {
+			if (!Object.keys(stack[i][0][stack[i][1]]).length) { delete stack[i][0][stack[i][1]]; }
+		}
+		if (plainObject(scn.settings) && !Object.keys(scn.settings).length) { delete scn.settings; }
+	}
+	/**
+	 * **THE ONE WRITE SEAM FOR A SCENARIO'S SETTING.** `undefined` clears it, pruning what it
+	 * emptied. Returns false, writing nothing, on Base, on a path that may never vary by scenario or
+	 * that no table names, and on one stored elsewhere (the demand multiplier and the two times keep
+	 * their own writers). No snapshot and no refresh: the caller decides when a press is an undo
+	 * step. **NOTHING IN THE INTERFACE CALLS IT YET** -- that is Tom's question 4.
+	 */
+	function setScenarioSetting(scn, path, value) {
+		var p = settingPath(path), node, i;
+		if (!scn || scn.isBase || LPN_SETTING_ROOTS.indexOf(p[0]) < 0) { return false; }
+		if (!categoryOfSetting(p) || settingHasOtherHome(p)) { return false; }
+		if (value === undefined) { settingDelete(scn, p); return true; }
+		scn.settings = plainObject(scn.settings) ? scn.settings : {};
+		node = scn.settings;
+		for (i = 0; i < p.length - 1; i++) {
+			if (!plainObject(node[p[i]])) { node[p[i]] = {}; }
+			node = node[p[i]];
+		}
+		node[p[p.length - 1]] = altCopy(value);
+		return true;
+	}
+	// A file is read, never trusted: Base holds no block, and a value at a path that may never vary
+	// by scenario, or that has another home, goes. A path no table names is KEPT VERBATIM and
+	// counted in no alternative, so a file from a later version loses nothing. An older project
+	// has no block anywhere and is untouched.
+	function sanitizeScenarioSettings() {
+		scenarios.forEach(function (s) {
+			if (s.settings === undefined) { return; }
+			if (s.isBase || !plainObject(s.settings)) { delete s.settings; return; }
+			settingLeaves(s.settings).forEach(function (leaf) {
+				if (categoryOfSetting(leaf.path) === null || settingHasOtherHome(leaf.path)) { settingDelete(s, leaf.path); }
+			});
+			if (plainObject(s.settings) && !Object.keys(s.settings).length) { delete s.settings; }
+		});
+	}
+	// One scenario's setting leaves that belong to a category, for alternativesOf() and the count.
+	function scenarioSettingLeaves(scn) {
+		if (!scn || scn.isBase) { return []; }
+		return settingLeaves(scn.settings).filter(function (leaf) {
+			return !!categoryOfSetting(leaf.path) && !settingHasOtherHome(leaf.path);
+		});
 	}
 
 	// ---- the scenario selector, and its "what am I working on right now" readout ----
@@ -33481,6 +33740,7 @@ var EngCalcs = EngCalcs || {};
 		scenarios.forEach(function (s) { if (!s.overrides) { s.overrides = {}; } });
 		baseScenario().overrides = {}; // Base is canon and has no overrides, by definition
 		sanitizeScenarioTimes();
+		sanitizeScenarioSettings();
 		if (!scenarios.some(function (s) { return s.id === project.activeScenario; })) { project.activeScenario = baseScenario().id; }
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
 		// The customers (Task 247). A file written before they existed has none, and every
@@ -57673,8 +57933,10 @@ var EngCalcs = EngCalcs || {};
 	// the typed text kept beside each number exactly as the document's own `times` keeps it. ABSENT
 	// means "inherit the project's [TIMES] value". A duration of 0 is EPANET's steady state.
 	//
-	// **ONLY THESE TWO.** Friction method, units, accuracy and trials never vary between compared
-	// scenarios (Sue): a comparison whose scenarios silently disagree about them compares nothing.
+	// **THESE TWO KEEP THIS HOME; EVERY OTHER CALCULATION SETTING MAY VARY TOO** (Tom, 2026-10-05:
+	// *"any Setting that is stored in the project should be subject to scenario overrides"*), in
+	// `scenario.settings` -- see "SETTINGS IN SCENARIOS". Friction method and units still never
+	// vary: each changes what a stored number means (dev/scenario-alternatives.md).
 	var LPN_SCENARIO_TIME_KEYS = ['duration', 'hydraulicStep'];
 	function scenarioTimeValue(s, key) {
 		var t = s && !s.isBase ? s.times : null, v = t ? t[key] : undefined;
@@ -62981,7 +63243,9 @@ var EngCalcs = EngCalcs || {};
 			fireflow: pc.lpn_alt_cat_fireflow || 'Fire flow',
 			energy: pc.lpn_alt_cat_energy || 'Energy cost',
 			userdata: pc.lpn_alt_cat_userdata || 'Custom properties',
-			text: pc.lpn_alt_cat_text || 'Text'
+			text: pc.lpn_alt_cat_text || 'Text',
+			presentation: pc.lpn_alt_cat_presentation || 'Presentation',
+			calculation: pc.lpn_alt_cat_calculation || 'Calculation'
 		}[cat] || cat;
 	}
 	function altBoxEl() { return document.getElementById('lpn_alt_box'); }
