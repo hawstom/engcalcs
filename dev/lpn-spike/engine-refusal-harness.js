@@ -244,7 +244,10 @@ async function pageSection() {
 
 	// ---- AN ABSENT ENGINE, which must still say the other thing ----
 	EngCalcs.lpnTimeRunBoxHide();
-	EngCalcs.lpnEpanetRun = () => wait(5).then(() => { throw new Error('module not found'); });
+	EngCalcs.lpnEpanetRun = () => wait(5).then(() => { const e = new Error('module not found'); e.lpnStage = 'fetch'; throw e; });
+	// The tagged fetch failure reads as offline only when the browser says so (navigator.onLine);
+	// engine-failure-wording-harness.js covers the other causes.
+	Object.defineProperty(globalThis, 'navigator', { value: { onLine: false }, configurable: true, writable: true });
 	status = '';
 	EngCalcs.lpnTimeRunNow();
 	await wait(80);

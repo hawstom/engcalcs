@@ -2393,6 +2393,9 @@ $ec_lang['lpn_engine_ready']='The EPANET solver is on this device now, and works
 $ec_lang['lpn_engine_fetching_valve']='Getting the EPANET solver, so this valve can be solved now and offline later.';
 $ec_lang['lpn_engine_ready_valve']='The EPANET solver is on this device now. Valves that open and close on their own will work offline.';
 $ec_lang['lpn_engine_unavailable']='Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.';
+// The cause-specific sibling, for a download that failed while the browser reports a network: only the fetch
+// stage can reach this notice. Offline keeps the sentence above.
+$ec_lang['lpn_engine_unavailable_fetch']='The download of the EPANET solver failed, so valves that open and close on their own cannot be solved. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.';
 $ec_lang['lpn_engine_needed_loading']='Loading EPANET solver while you build. Results will be available when completely loaded.';
 // **THE WAIT, SAID OUT LOUD, WITH A NUMBER ON IT** (ROADMAP Task 608). The first sentence is Tom's
 // own, 2026-09-08, and "Continue working" is the half that matters: it says the page is not frozen.
@@ -3286,6 +3289,12 @@ $ec_lang['lpn_time_clock_day']='Day {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).';
 $ec_lang['lpn_time_running']='Working out the extended period simulation.';
 $ec_lang['lpn_time_no_engine']='The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.';
+// lpn_time_no_engine says "connect to the internet", which is true only offline. For the other causes
+// of a failed extended period run the same note ends in {reason}, one of the three sentences below.
+$ec_lang['lpn_time_no_engine_why']='The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}';
+$ec_lang['lpn_time_engine_fetch_failed']='The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.';
+$ec_lang['lpn_time_engine_start_failed']='The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.';
+$ec_lang['lpn_time_engine_run_failed']='The EPANET run failed. That is a defect in this page; use the Something wrong here? link to report it';
 $ec_lang['lpn_time_slider']='Elapsed simulation time';
 $ec_lang['lpn_time_no_period']='This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.';
 $ec_lang['lpn_time_first']='Go to the start';

@@ -30305,6 +30305,7 @@ var EngCalcs = EngCalcs || {};
 		if (why === 'running') { return pc.lpn_time_running || 'Working out the extended period simulation.'; }
 		if (why === 'failed') { return pc.lpn_time_run_failed || 'The run did not finish, so there are no results for the later times.'; }
 		if (why === 'engine') {
+			if (EngCalcs.lpnTimeNoEngineText) { return EngCalcs.lpnTimeNoEngineText(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0); }
 			return String(pc.lpn_time_no_engine || 'The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.')
 				.replace('{time}', EngCalcs.lpnTimeElapsedText(EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0));
 		}
@@ -59822,9 +59823,17 @@ var EngCalcs = EngCalcs || {};
 			epanetWarmState = 'ready';
 			if (!quiet) { setNotice(pc['lpn_engine_ready' + suffix] || 'The EPANET solver is on this device now, and works offline.'); }
 			refreshEpanetBanner();
-		}, function () {
+		}, function (err) {
 			epanetWarmState = 'unavailable';
-			if (!quiet) { setNotice(pc.lpn_engine_unavailable || 'Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.'); }
+			// This leg only downloads the module, so the cause is offline or a blocked download; a
+			// browser that refuses WebAssembly shows up in the run itself (lpn-time.js).
+			var offline = !EngCalcs.lpnEngineFailWhy || EngCalcs.lpnEngineFailWhy({ lpnStage: 'fetch' }) === 'offline';
+			if (!quiet) {
+				setNotice(offline
+					? (pc.lpn_engine_unavailable || 'Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.')
+					: (pc.lpn_engine_unavailable_fetch || 'The download of the EPANET solver failed, so valves that open and close on their own cannot be solved. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.'));
+			}
+			if (window.console && console.warn) { console.warn('EPANET solver download failed:', err); }
 			refreshEpanetBanner();
 		});
 	}

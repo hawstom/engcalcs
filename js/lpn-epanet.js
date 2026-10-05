@@ -1171,13 +1171,34 @@
 
 	function workspaceFor(mod, moduleUrl) {
 		if (workspace && workspaceUrl === moduleUrl) { return Promise.resolve(workspace); }
-		var ws = new mod.Workspace();
-		return Promise.resolve(ws.loadModule()).then(function () {
-			workspace = ws;
-			workspaceUrl = moduleUrl;
-			return ws;
-		});
+		return Promise.resolve().then(function () {
+			var ws = new mod.Workspace();
+			return Promise.resolve(ws.loadModule()).then(function () {
+				workspace = ws;
+				workspaceUrl = moduleUrl;
+				return ws;
+			});
+		}).then(null, function (err) { throw lpnStage(err, 'engine'); });
 	}
+
+	// **A FAILED RUN SAYS WHICH STAGE FAILED**, because the three have three different remedies and
+	// the banner used to give the first one for all of them. 'fetch': the module never arrived.
+	// 'engine': it arrived and the browser would not start it (WebAssembly refused). 'run': it
+	// started and the run itself threw, which is a defect in this page. The first stage to tag an
+	// error keeps it.
+	function lpnStage(err, stage) {
+		var e = (err && typeof err === 'object') ? err : new Error(String(err));
+		if (!e.lpnStage) { e.lpnStage = stage; }
+		return e;
+	}
+	function stageOf(p, stage) { return p.then(null, function (err) { throw lpnStage(err, stage); }); }
+	// Which message a failed run earns. Offline is only ever a fetch that failed with the browser
+	// reporting no network; an engine or run failure while offline is still an engine or run failure.
+	EngCalcs.lpnEngineFailWhy = function (err) {
+		var stage = (err && err.lpnStage) || 'run';
+		if (stage === 'fetch' && typeof navigator !== 'undefined' && navigator.onLine === false) { return 'offline'; }
+		return stage;
+	};
 
 	function openSession(mod, model, sig, moduleUrl) {
 		closeSession();
@@ -1705,7 +1726,7 @@
 	 * setStatusReport(1) tells the engine to write it, and it is read back off the engine's own
 	 * in-memory filesystem after the Project closes. Empty string if the build cannot produce one.
 	 */
-	EngCalcs.lpnEpanetRun = function (model, options) {
+	function epanetRunInner(model, options) {
 		var opts = options || {}, url = opts.moduleUrl || null;
 		var issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
@@ -1719,7 +1740,7 @@
 			onProgress = typeof opts.onProgress === 'function' ? opts.onProgress : null,
 			sliceMs = opts.sliceMs > 0 ? opts.sliceMs : EngCalcs.LPN_EPANET_SLICE_MS;
 
-		return EngCalcs.lpnEpanetLoad(url).then(function (mod) {
+		return stageOf(EngCalcs.lpnEpanetLoad(url), 'fetch').then(function (mod) {
 			return workspaceFor(mod, url).then(function (ws) {
 				var p = new mod.Project(ws), frames = [], nodeIdx = {}, linkIdx = {},
 					i, n, l, t = 0, tstep, guard = 0, seen = 0, closed = false,
@@ -2178,6 +2199,11 @@
 				});
 			});
 		});
+	}
+	EngCalcs.lpnEpanetRun = function (model, options) {
+		var p;
+		try { p = epanetRunInner(model, options); } catch (e) { p = Promise.reject(e); }
+		return stageOf(p, 'run');
 	};
 
 }(typeof globalThis !== 'undefined' ? globalThis : this));

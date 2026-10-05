@@ -435,6 +435,11 @@
 			// are seeing one instant" is a fact about this session that the user acts on.)
 			running: pageConfig.lpn_time_running || 'Working out the extended period simulation.',
 			noEngine: pageConfig.lpn_time_no_engine || 'The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.',
+			// The same note for a failure that is NOT a missing network: {reason} is one of the three below.
+			noEngineWhy: pageConfig.lpn_time_no_engine_why || 'The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}',
+			whyFetch: pageConfig.lpn_time_engine_fetch_failed || 'The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.',
+			whyEngine: pageConfig.lpn_time_engine_start_failed || 'The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.',
+			whyRun: pageConfig.lpn_time_engine_run_failed || 'The EPANET run failed. That is a defect in this page; use the Something wrong here? link to report it',
 			slider: pageConfig.lpn_time_slider || 'Elapsed simulation time',
 			noPeriod: pageConfig.lpn_time_no_period || 'This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.',
 			first: pageConfig.lpn_time_first || 'Go to the start',
@@ -841,6 +846,7 @@
 		cancelIdleRun();
 		state.busy = true;
 		state.failed = null;
+		state.failedWhy = null;
 		state.wantedByUser = false;
 		host.status(strings().running);
 		if (shown) { boxStart(token); }
@@ -909,7 +915,7 @@
 			}
 			lastReport = ''; lastReportMs = 0; lastReportFrames = 0;
 			boxFailed(token);
-			noEngine(model);
+			noEngine(model, EC.lpnEngineFailWhy ? EC.lpnEngineFailWhy(err) : 'offline');
 			if (root.console && console.warn) { console.warn('EPANET extended-period run failed:', err); }
 		});
 	}
@@ -1007,6 +1013,7 @@
 		state.t = 0;
 		state.wanted = true;
 		state.failed = null;
+		state.failedWhy = null;
 		renderPanel();
 		return false;
 	};
@@ -1097,6 +1104,15 @@
 		};
 	};
 
+	// The banner for the cause on record: 'offline' (and an unrecorded cause) keeps the original
+	// sentence; 'fetch', 'engine' and 'run' say what actually went wrong and what to do about it.
+	function noEngineText(t) {
+		var S = strings(), why = state.failedWhy,
+			reason = why === 'fetch' ? S.whyFetch : why === 'engine' ? S.whyEngine : why === 'run' ? S.whyRun : null;
+		return (reason ? S.noEngineWhy.replace('{reason}', reason) : S.noEngine).replace('{time}', EC.lpnTimeElapsedText(t));
+	}
+	EC.lpnTimeNoEngineText = function (t) { return noEngineText(t); };
+
 	/**
 	 * **THE HONEST ANSWER WHEN THE ENGINE IS NOT THERE.** js/lpn-solver.js has no time dimension at
 	 * all -- it solves one steady state -- so the only truthful thing to show is ONE INSTANT, said
@@ -1106,11 +1122,12 @@
 	 * the tempting alternative and it is the one thing this must never do; every tank would be flat
 	 * across the whole day and nothing on screen would say so.
 	 */
-	function noEngine(model) {
+	function noEngine(model, why) {
 		state.run = null;
 		state.failed = 'engine';
+		state.failedWhy = why || 'offline';
 		host.apply(host.native(model));
-		host.status(strings().noEngine.replace('{time}', EC.lpnTimeElapsedText(state.t)));
+		host.status(noEngineText(state.t));
 		renderPanel();
 		return true;
 	}
