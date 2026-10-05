@@ -106,8 +106,8 @@
         "mtc_note_1": {
             "on": "<dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.</dd><dt>Basic calculator (no iteration)</dt><dd>Enter your desired roughness value. Ignore the design rock size input area.</dd></dl>",
             "syn": "| avoid: compressing \"Blodgett–Bathurst\" to an initialism like \"BB\" — recurred independently across 8+ languages (it/ru/bg/es/uk/sr/hr/cs/tr/ps/my, corrected 2026-07-08) since nothing else in this string defines what the initials stand for; spell the full name out in every language, matching mtc_blodgett_v_bathurst",
-            "ruled": "2026-10-05",
-            "answer": "Justify. This is all very taxing on me. Is there an easier way to transcend English?"
+            "ruled": "2026-10-06",
+            "answer": "I don't feel comfortable approving when I don't understand and I know that your team doesn't have a good history with_syn. But keep."
         }
     }
 }

@@ -99,52 +99,60 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-05 (evening)
+## STATE — 2026-10-06
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged 2026-10-05 evening: `feat/dock-flag-order` and `feat/profile-file` (his all-clears; Task 604
-closed); his 89 marks on `new-english-keys.md` harvested and applied (13 English edits, 5 synonyms
-deleted, `lpn_ds_find` and `lpn_settings_basemap_style_tip` deleted); Tables menu "Select on map" /
-"Zoom and select" open Properties and a new "Delete element(s)" row; Text table follows a deleted
-Text (and a deleted Text is now actually saved); Text detach and a Text Description; the time-step
-select fits "9:59"; "A copy; make new lock" writes the file at once; the no-engine banners name the
-real cause (offline / download blocked / WebAssembly refused / page defect) instead of always
-saying "connect to the internet" (DDN hit it online); Task 765 (saved views, `dev/saved-views.md`).
+Merged 2026-10-06: `feat/times-statistic` and `feat/find-source` (his all-clears; Task 735 closed;
+he wonders whether Range should be called Spread and is not sure, so it stays Range); his two string
+edits (`lpn_ds_found_below` his wording, `lpn_new_coordsys_tip` "to a new project"); every
+`{pressure}` in Analyze messages is filled, not only the first; the time-step box keeps its 10:00
+minimum (the Statistic merge had erased it); the daily email names each usage table's window (last
+24 hours, and the whole log, which was 13.6 days, not a day). **The email changes only once he pulls.**
 
-### Awaiting him (all on the Branch previews page unless noted)
+### Awaiting him (all on the Branch previews page)
 
-- **`feat/times-statistic`** (Task 735, 8109): now Avg / Min / Max / Range in English, his ask.
-- **`feat/find-source`** (8108): a virtual "Source" scope in Find (Mary's advice); Perry passed it twice.
-- **`feat/transport-ends`** (8110): Restart |◀◀ and End ▶▶| (Ida's spec); player controls hide in
-  steady state, Calculate keeps its own rule. Perry passed it. Restart while playing keeps playing.
-- **`feat/engine-prefetch`** (Task 726, no preview: nothing visible): needs only his word. Perry's
-  two holes fixed. Storage: ~680 KB of our own engine lands in the HTTP and service-worker caches on
-  the LPN page for visitors who never run EPANET; no cookie or identifier. privacy.php's device table
-  never listed the service-worker cache at all (older gap): ask whether to add a row.
-- Still from before: `feat/desktop`, `feat/label-placer`.
+- **`feat/tip-door`** (Task 759): explanation tips open by clicking the ?, Perry passed it; his
+  two findings fixed (80e7e1a5). Intros of the three Analyze boxes now sit behind the corner ?.
+- **`feat/scenario-table`** (Task 766): Show scenarios, one Scenario column, override tips "Demand
+  alt.: Peak Hour"; sorting is now stable in EVERY table (a suite-wide change). Perry passed it.
+- **`feat/transport-ends`**: plus Ida's joined player strip (40ef582f), answering his "largest thing
+  on the chrome". Her three questions are in his report (joined strip, flat style, Restart/End use).
+- **`feat/notes-trim`** (not protected): Notes box trimmed and two sections moved to About, as he
+  approved; a privacy.php row for the offline copy, wording his to approve. privacy.php is hard-coded
+  English (no keys). When `feat/engine-prefetch` merges, the row's last sentence changes (in the
+  branch's commit message trail and the inventory).
+- **`feat/engine-prefetch`**: needs only his word (the privacy row question is answered: yes).
+- Still from before: `feat/desktop`, `feat/label-placer` (his round-5 answers recorded in
+  `dev/label-placement-rules.md` there; the R1 "dropped for lack of room" proposal is owed back to
+  him reworded).
+
+### The long burn: `feat/bentley-interop` (long-lived, never merges without him)
+
+Tom wants Bentley's scenario tree over alternatives, every project setting in a category, built in
+stages; it was never declined (the "Bentley is not ours" note that read as a refusal is renamed and
+corrected). Stages 2 and 3 are built (beedec3f): the data layer, and ~110 setting readers routed
+through the scenario seam, proven byte-identical on 42 example cases with no override; the map view
+is a Presentation setting; friction method and new-asset defaults are overridable, only units and
+the coordinate frame are not (his 2026-10-06 answers). Next: the settings table and the Settings-box
+writes (specified in the doc), after his answers to the five stage-3 questions in his report. Doc:
+`dev/scenario-alternatives.md` ("The long burn", "His answers, 2026-10-06").
 
 ### Next job
 
-**The translation sprint, blocked on two answers**: `friction_check` fails only on
-`lpn_ds_found_below` (1003-ds, proposals A/B) and `lpn_notes_4_def` (his question about the Notes
-box; recommendation: delete "Also on this page", move "How it is solved" and "What it does not do"
-to the About rewrite, keep the four advisories; six harnesses and `notesbox.js` open the box).
-Then launch: everything in `new-english-keys.md` plus the owed list (it/he/ur/my/am symbol-cap
-reorder, Selected/Cleared drift, the 46 held lpn keys, Romanian file menu, four concept terms).
-Merging the four branches above first lets one sprint carry their keys.
+- Owed to him: the R1 label proposal reworded; the Calculation-options question re-asked
+  consistently (his b5); the `lpn_labels_priority_node_tip` synonym explained (he asked what problem
+  it solves; answer in his report: it tells translators "more like neighbouring nodes" means
+  numerically closer, keep it, no English change).
+- The translation sprint is unblocked (`friction_check` passes) but he is "not eager": run it when
+  enough has merged to make it worth a wave.
 
 ### Decisions waiting on him
 
-- DMARC phase 3: CC read all 29 reports (6 Sep to 3 Oct) over `ssh jconstru`; every message came
-  from 74.81.90.154 and passed DKIM. Gate met. Needs his go and his not-epanet.org choice.
-- Three _syn questions he asked back (ip_is_lateral, lpn_labels_priority_node_tip, mtc_note_1).
-- Task 765: the name (View, Figure, Snapshot) and its priority (filed at 50).
-- `lpn_new_coordsys_tip` reads "to new project" verbatim from him; possibly "to a new project".
+- DMARC phase 3: gate met; needs his go and his not-epanet.org choice.
 - On a phone (<=640 px) the Calculate bolt is hidden by an older CSS rule even with auto-recalculate
-  off (Perry); Project/Water menu still has the row. Not filed yet.
-- A mixed-scope typed Filter in table ("Junction... OR Pipe...") answers "applies to no table" and
-  keeps the old filter (Perry; pre-existing, generic).
+  off (Perry); not filed yet.
+- A mixed-scope typed Filter in table answers "applies to no table" (Perry; pre-existing, generic).
 
 ### Traps met 2026-10-05
 
@@ -258,8 +266,6 @@ Merging the four branches above first lets one sprint carry their keys.
   its own tree and the stash list survived. The rule is in every brief and still broke.
 - **A forced `new_english_keys.php --write --force` is safe only when the file equals master's generated
   copy** (`git diff master -- dev/new-english-keys.md` empty). Check that first, every time.
-- **Bentley is not ours** (Tom): their scenarios are a tree over alternatives; their criticality and
-  on-the-fly analyses run on a copy. He has no WaterCAD.
 
 ### Traps met 2026-09-30
 

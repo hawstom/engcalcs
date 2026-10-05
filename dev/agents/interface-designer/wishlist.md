@@ -534,3 +534,6 @@ N+5. **A check that flags one English string holding both a select word and an o
   right-click row); one five-minute look at where a first-time user reaches. SPECULATION until then.
 - **Fetch Material 3 tooltips and Spectrum tooltip/contextual-help pages by another route** (both were
   unreadable on 2026-10-03), so the two-tier claim does not rest on search excerpts.
+
+- Instrument nothing, but ask Tom/testers: do you ever press Restart or End instead of the step selector? (decides whether they stay)
+- Consider the menu bar's bordered pills in the same hierarchy review (same "boxed" problem as the transport; Task 616 lineage).

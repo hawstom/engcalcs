@@ -2079,8 +2079,6 @@ $ec_lang['lpn_notes_5_def']='משאבה עוקבת אחר H = H₀ − aQ^b, כ�
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='גם בעמוד זה';
-$ec_lang['lpn_notes_4_def']='פרויקט יכול לשבת על קרקע אמיתית עם מפת רחובות מאחוריו. ניתן לקרוא ולכתוב קובצי EPANET‏ ‎.inp. הלוח התחתון מצייר פרופיל לאורך מסלול ומפרט את הצמתים. ניתן לצבוע אלמנטים לפי תוצאותיהם, וחיפוש בוחר כל אלמנט העונה על תנאי שתגדירו.';
 $ec_lang['lpn_notes_6_term']='עזרה בעמודות הטבלה';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

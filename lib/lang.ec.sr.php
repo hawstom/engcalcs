@@ -2078,8 +2078,6 @@ $ec_lang['lpn_notes_5_def']='Пумпа прати H = H₀ − aQ^b, где ј�
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='Такође на овој страници';
-$ec_lang['lpn_notes_4_def']='Пројекат може стајати на стварном терену са уличним планом иза себе. EPANET .inp датотеке се могу учитавати и извозити. Доњи панел исцртава профил дуж путање и наводи чворове. Елементи могу бити обојени према својим резултатима, а Пронађи издваја сваки елемент који испуњава услов који поставите.';
 $ec_lang['lpn_notes_6_term']='Помоћ за колоне табеле';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

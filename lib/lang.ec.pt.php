@@ -2077,8 +2077,6 @@ $ec_lang['lpn_notes_5_def']='Uma bomba segue H = H₀ − aQ^b, em que H é a ca
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='Também nesta página';
-$ec_lang['lpn_notes_4_def']='Um projeto pode ficar sobre o terreno real com um mapa de ruas atrás dele. Arquivos EPANET .inp podem ser lidos e gravados. O painel inferior desenha um perfil ao longo de um caminho e lista as junções. Os elementos podem ser coloridos pelos seus resultados, e a ferramenta Localizar e substituir identifica cada elemento que atende a uma condição que você define.';
 $ec_lang['lpn_notes_6_term']='Ajuda das colunas da tabela';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

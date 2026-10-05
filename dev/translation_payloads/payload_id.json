@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 2345,
-        "delta_key_count": 117,
+        "expected_key_count": 2351,
+        "delta_key_count": 125,
         "exempt_key_count": 49,
         "exempt_keys": [
             "u_imgd",
@@ -744,6 +744,8 @@
         "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
         "lpn_pane_sel_only": "Selection only",
         "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
+        "lpn_find_scope_source": "Source",
+        "lpn_find_source_no_chemical": "No chemical is being tracked, so no node has a source.",
         "lpn_profile_open": "Open EPANET profile file…",
         "lpn_profile_file_done": "Profile read from the file: {used} of {total} nodes found in this network.",
         "lpn_profile_file_missing": "Named in the file but not in this network: {ids}.",
@@ -772,6 +774,12 @@
         "lpn_basemap_style_muted": "Muted",
         "lpn_basemap_style_faded": "Faded",
         "lpn_basemap_style_grayscale": "Grayscale",
+        "lpn_time_statistic": "Statistic",
+        "lpn_time_stat_none": "None",
+        "lpn_time_stat_averaged": "Avg",
+        "lpn_time_stat_minimum": "Min",
+        "lpn_time_stat_maximum": "Max",
+        "lpn_time_stat_range": "Range",
         "lpn_time_no_engine_why": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}",
         "lpn_time_engine_fetch_failed": "The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.",
         "lpn_time_engine_start_failed": "The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.",
@@ -805,7 +813,7 @@
         "lpn_ds_holds_max": "✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.",
         "lpn_ds_below_zero": "⚠ At least one junction is below {pressure} even with the scaled demands at zero.",
         "lpn_ds_found": "✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.",
-        "lpn_ds_found_below": "⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.",
+        "lpn_ds_found_below": "⚠ At least one junction is below {pressure} with no demand scaling. The largest demand scale that keeps every junction at {pressure} or above is {m}.",
         "lpn_ds_search_stopped": "The search was stopped before it found an answer.",
         "lpn_ds_lowest_at": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.",
         "lpn_ds_nosolve_at": "At a demand scale of {m}, the network gave no answer. {reason}",
@@ -863,6 +871,8 @@
         "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
         "lpn_pane_sel_only": "Selection only",
         "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
+        "lpn_find_scope_source": "Source",
+        "lpn_find_source_no_chemical": "No chemical is being tracked, so no node has a source.",
         "lpn_profile_open": "Open EPANET profile file…",
         "lpn_profile_file_done": "Profile read from the file: {used} of {total} nodes found in this network.",
         "lpn_profile_file_missing": "Named in the file but not in this network: {ids}.",
@@ -891,6 +901,12 @@
         "lpn_basemap_style_muted": "Muted",
         "lpn_basemap_style_faded": "Faded",
         "lpn_basemap_style_grayscale": "Grayscale",
+        "lpn_time_statistic": "Statistic",
+        "lpn_time_stat_none": "None",
+        "lpn_time_stat_averaged": "Avg",
+        "lpn_time_stat_minimum": "Min",
+        "lpn_time_stat_maximum": "Max",
+        "lpn_time_stat_range": "Range",
         "lpn_time_no_engine_why": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}",
         "lpn_time_engine_fetch_failed": "The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.",
         "lpn_time_engine_start_failed": "The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.",
@@ -924,7 +940,7 @@
         "lpn_ds_holds_max": "✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.",
         "lpn_ds_below_zero": "⚠ At least one junction is below {pressure} even with the scaled demands at zero.",
         "lpn_ds_found": "✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.",
-        "lpn_ds_found_below": "⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.",
+        "lpn_ds_found_below": "⚠ At least one junction is below {pressure} with no demand scaling. The largest demand scale that keeps every junction at {pressure} or above is {m}.",
         "lpn_ds_search_stopped": "The search was stopped before it found an answer.",
         "lpn_ds_lowest_at": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.",
         "lpn_ds_nosolve_at": "At a demand scale of {m}, the network gave no answer. {reason}",
@@ -1219,6 +1235,38 @@
                     "key": "lpn_pane_goto_tip",
                     "value": "Perbesar & pilih",
                     "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_find_scope_source": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_scope_all",
+                    "value": "Semuanya",
+                    "english": "Everything"
+                },
+                "next_translated": {
+                    "key": "lpn_find_property",
+                    "value": "Properti",
+                    "english": "Property"
+                }
+            }
+        },
+        "lpn_find_source_no_chemical": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_find_scope_all",
+                    "value": "Semuanya",
+                    "english": "Everything"
+                },
+                "next_translated": {
+                    "key": "lpn_find_property",
+                    "value": "Properti",
+                    "english": "Property"
                 }
             }
         },
@@ -1667,6 +1715,102 @@
                     "key": "lpn_settings_map_display",
                     "value": "Tampilan peta",
                     "english": "Appearance"
+                }
+            }
+        },
+        "lpn_time_statistic": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_clock_start",
+                    "value": "Waktu jam pada awal",
+                    "english": "Clock time at the start"
+                },
+                "next_translated": {
+                    "key": "lpn_time_clock_day",
+                    "value": "Hari {day}, {clock}",
+                    "english": "Day {day}, {clock}"
+                }
+            }
+        },
+        "lpn_time_stat_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_clock_start",
+                    "value": "Waktu jam pada awal",
+                    "english": "Clock time at the start"
+                },
+                "next_translated": {
+                    "key": "lpn_time_clock_day",
+                    "value": "Hari {day}, {clock}",
+                    "english": "Day {day}, {clock}"
+                }
+            }
+        },
+        "lpn_time_stat_averaged": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_clock_start",
+                    "value": "Waktu jam pada awal",
+                    "english": "Clock time at the start"
+                },
+                "next_translated": {
+                    "key": "lpn_time_clock_day",
+                    "value": "Hari {day}, {clock}",
+                    "english": "Day {day}, {clock}"
+                }
+            }
+        },
+        "lpn_time_stat_minimum": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_clock_start",
+                    "value": "Waktu jam pada awal",
+                    "english": "Clock time at the start"
+                },
+                "next_translated": {
+                    "key": "lpn_time_clock_day",
+                    "value": "Hari {day}, {clock}",
+                    "english": "Day {day}, {clock}"
+                }
+            }
+        },
+        "lpn_time_stat_maximum": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_clock_start",
+                    "value": "Waktu jam pada awal",
+                    "english": "Clock time at the start"
+                },
+                "next_translated": {
+                    "key": "lpn_time_clock_day",
+                    "value": "Hari {day}, {clock}",
+                    "english": "Day {day}, {clock}"
+                }
+            }
+        },
+        "lpn_time_stat_range": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_clock_start",
+                    "value": "Waktu jam pada awal",
+                    "english": "Clock time at the start"
+                },
+                "next_translated": {
+                    "key": "lpn_time_clock_day",
+                    "value": "Hari {day}, {clock}",
+                    "english": "Day {day}, {clock}"
                 }
             }
         },

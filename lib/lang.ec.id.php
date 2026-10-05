@@ -2080,8 +2080,6 @@ $ec_lang['lpn_notes_5_def']='Pompa mengikuti H = H₀ − aQ^b, dengan H adalah 
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='Juga di halaman ini';
-$ec_lang['lpn_notes_4_def']='Proyek dapat ditempatkan di atas tanah sebenarnya dengan peta jalan di belakangnya. Berkas EPANET .inp dapat dibaca dan ditulis. Panel bawah menggambar profil di sepanjang rute dan mendaftar simpul-simpulnya. Elemen dapat diwarnai berdasarkan hasilnya, dan Cari dan ganti memilih setiap elemen yang memenuhi kondisi yang Anda tetapkan.';
 $ec_lang['lpn_notes_6_term']='Bantuan kolom tabel';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

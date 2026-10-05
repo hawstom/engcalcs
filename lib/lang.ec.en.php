@@ -1589,6 +1589,8 @@ $ec_lang['lpn_find_menu']='Find and replace';
 $ec_lang['lpn_find_title']='Find and replace';
 $ec_lang['lpn_find_scope']='What to search';
 $ec_lang['lpn_find_scope_all']='Everything';
+$ec_lang['lpn_find_scope_source']='Source';
+$ec_lang['lpn_find_source_no_chemical']='No chemical is being tracked, so no node has a source.';
 $ec_lang['lpn_find_property']='Property';
 $ec_lang['lpn_find_condition']='Condition';
 $ec_lang['lpn_find_value']='Value';
@@ -1903,7 +1905,7 @@ $ec_lang['lpn_new_title']='New project';
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
 // its five siblings) are gone; Tom called the last of them obsolete on 2026-09-16.
 $ec_lang['lpn_new_coordsys']='Coordinate system';
-$ec_lang['lpn_new_coordsys_tip']='Choose the coordinate system of your network. The only way to change this choice is with “File, Convert as…” to new project, and that conversion is approximate.';
+$ec_lang['lpn_new_coordsys_tip']='Choose the coordinate system of your network. The only way to change this choice is with “File, Convert as…” to a new project, and that conversion is approximate.';
 // **DELETED 2026-09-25: lpn_new_coordsys_geo / lpn_new_coordsys_geo_tip.** Don't expose the word
 // "projection" (dev/session-handoff.md RULINGS); once reworded, both were the identical string
 // lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
@@ -2350,8 +2352,6 @@ $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the he
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='Also on this page';
-$ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.';
 $ec_lang['lpn_notes_6_term']='Table columns help';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one
@@ -3287,6 +3287,12 @@ $ec_lang['lpn_time_pattern_start']='Pattern start time';
 $ec_lang['lpn_time_report_step']='Report time step';
 $ec_lang['lpn_time_report_start']='Report start time';
 $ec_lang['lpn_time_clock_start']='Clock time at the start';
+$ec_lang['lpn_time_statistic']='Statistic';
+$ec_lang['lpn_time_stat_none']='None';
+$ec_lang['lpn_time_stat_averaged']='Avg';
+$ec_lang['lpn_time_stat_minimum']='Min';
+$ec_lang['lpn_time_stat_maximum']='Max';
+$ec_lang['lpn_time_stat_range']='Range';
 $ec_lang['lpn_time_clock_day']='Day {day}, {clock}';
 $ec_lang['lpn_time_format_tip']='Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).';
 $ec_lang['lpn_time_running']='Working out the extended period simulation.';
@@ -4284,7 +4290,7 @@ $ec_lang['lpn_ds_outside_below']='At a demand scale of {m}, junctions not select
 $ec_lang['lpn_ds_holds_max']='✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.';
 $ec_lang['lpn_ds_below_zero']='⚠ At least one junction is below {pressure} even with the scaled demands at zero.';
 $ec_lang['lpn_ds_found']='✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.';
-$ec_lang['lpn_ds_found_below']='⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.';
+$ec_lang['lpn_ds_found_below']='⚠ At least one junction is below {pressure} with no demand scaling. The largest demand scale that keeps every junction at {pressure} or above is {m}.';
 $ec_lang['lpn_ds_search_stopped']='The search was stopped before it found an answer.';
 $ec_lang['lpn_ds_lowest_at']='At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.';
 $ec_lang['lpn_ds_nosolve_at']='At a demand scale of {m}, the network gave no answer. {reason}';

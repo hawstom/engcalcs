@@ -2079,8 +2079,6 @@ $ec_lang['lpn_notes_5_def']='Eine Pumpe folgt H = H₀ − aQ^b, wobei H die von
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='Außerdem auf dieser Seite';
-$ec_lang['lpn_notes_4_def']='Ein Projekt kann auf echtem Boden liegen, mit einer Straßenkarte im Hintergrund. EPANET-.inp-Dateien können eingelesen und geschrieben werden. Das untere Feld zeichnet ein Profil entlang einer Route und listet die Entnahmeknoten auf. Elemente können nach ihren Ergebnissen eingefärbt werden, und Suchen findet jedes Element, das eine von Ihnen festgelegte Bedingung erfüllt.';
 $ec_lang['lpn_notes_6_term']='Hilfe zu Tabellenspalten';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

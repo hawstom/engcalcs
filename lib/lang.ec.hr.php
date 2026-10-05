@@ -2079,8 +2079,6 @@ $ec_lang['lpn_notes_5_def']='Pumpa slijedi H = H₀ − aQ^b, gdje je H tlačna 
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='Također na ovoj stranici';
-$ec_lang['lpn_notes_4_def']='Projekt može biti postavljen na stvarni teren s kartom ulica iza sebe. EPANET .inp datoteke mogu se učitavati i zapisivati. Donja ploča crta profil duž rute i popisuje čvorove. Elementi se mogu obojiti prema svojim rezultatima, a Pronađi izdvaja svaki element koji zadovoljava uvjet koji zadate.';
 $ec_lang['lpn_notes_6_term']='Pomoć za stupce tablice';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

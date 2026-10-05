@@ -2078,8 +2078,6 @@ $ec_lang['lpn_notes_5_def']='Насос подчиняется формуле H 
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='Также на этой странице';
-$ec_lang['lpn_notes_4_def']='Проект может находиться на реальной местности, с картой улиц под ним. Файлы EPANET .inp можно считывать и записывать. Нижняя панель строит профиль вдоль маршрута и перечисляет узлы. Элементы можно раскрашивать по их результатам, а «Найти» выбирает каждый элемент, соответствующий заданному вами условию.';
 $ec_lang['lpn_notes_6_term']='Справка по столбцам таблицы';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

@@ -165,6 +165,56 @@
 	};
 
 	/**
+	 * **THE RUN'S `[TIMES] Statistic`, AS ONE FRAME** (Task 735) -- what EPANET reports instead of a
+	 * series when Statistic is AVERAGED, MINIMUM, MAXIMUM or RANGE. Computed here, over the
+	 * reporting frames the run already holds, for every per-node and per-link number a frame has,
+	 * in the shape lpnTimeFrameResult returns so every reader swallows it. AVERAGED is the plain
+	 * mean of the reporting-period values (each reporting period weighs the same, as EPANET's
+	 * report does), RANGE is maximum minus minimum.
+	 *
+	 * **LINK FLOW IS STATISTICED ON ITS ABSOLUTE VALUE, AND NOTHING ELSE IS.** Measured against the
+	 * vendored EPANET 2.3 on Net1 (dev/lpn-spike/times-statistic-harness.js section 5): link 110,
+	 * which reverses, reports Averaged 575.06 gpm, where the signed mean is 5.74. This matches
+	 * OWA-EPANET's output code, which takes |Q| for the flow statistic; I could not read that
+	 * source here, so the measurement, not a line number, is the citation. Pressure, head, demand
+	 * and PUMP headloss stay signed (pump 9 Averaged headloss is -126.05); a pipe's headloss and a
+	 * velocity are already non-negative as the engine hands them over. A value missing from a frame is skipped; a
+	 * status (open/closed) is not a number and is carried from the last frame.
+	 * null for NONE, an unknown name, or a run with no frames.
+	 */
+	var STAT_FIELDS = ['heads', 'pressures', 'flows', 'headlosses', 'velocities', 'qualities',
+		'linkQualities', 'linkRates', 'demands', 'demandDeficits', 'levels'];
+	EC.lpnTimeStatisticFrame = function (run, statistic) {
+		var frames, base, out, k, f, ids, id, j, vals, v, sum, lo, hi;
+		if (!run || !run.frames || !run.frames.length || !statistic || statistic === 'NONE') { return null; }
+		if (EC.LPN_STATISTICS && EC.LPN_STATISTICS.indexOf(statistic) < 0) { return null; }
+		frames = run.frames.map(function (fr) { return EC.lpnTimeFrameResult(run, fr.t); });
+		base = frames[frames.length - 1];
+		out = Object.assign({}, base);
+		out.statistic = statistic;
+		for (k = 0; k < STAT_FIELDS.length; k++) {
+			f = STAT_FIELDS[k];
+			if (!base[f] || typeof base[f] !== 'object') { continue; }
+			out[f] = {};
+			ids = Object.keys(base[f]);
+			for (j = 0; j < ids.length; j++) {
+				id = ids[j];
+				vals = [];
+				frames.forEach(function (fr) {
+					v = fr[f] && fr[f][id];
+					if (typeof v === 'number' && isFinite(v)) { vals.push(f === 'flows' ? Math.abs(v) : v); }
+				});
+				if (!vals.length) { continue; }
+				sum = 0; lo = Infinity; hi = -Infinity;
+				vals.forEach(function (x) { sum += x; if (x < lo) { lo = x; } if (x > hi) { hi = x; } });
+				out[f][id] = statistic === 'AVERAGED' ? sum / vals.length :
+					statistic === 'MINIMUM' ? lo : statistic === 'MAXIMUM' ? hi : hi - lo;
+			}
+		}
+		return out;
+	};
+
+	/**
 	 * The document's clock as the solver-side model wants it: seconds and SI, with a pattern table
 	 * and controls whose numbers have been converted out of the display units the document states
 	 * them in.
@@ -321,6 +371,8 @@
 	// a result, so it is not a setting and is not stored. 1 is the shipped 400 ms a frame.
 	var state = {
 		t: 0, run: null, token: 0, playing: false, timer: null, speed: 1,
+		// `statView`: the transport is showing the run's [TIMES] Statistic, not one instant (Task 735).
+		statView: false,
 		// ---- the four fields that make a period run cheap enough to leave automatic (2026-08-19) ----
 		// `lastRunMs` is how long the LAST run of THIS network took, measured on the wall clock; it
 		// is what the slow-run advice quotes (see EC.LPN_TIME_SLOW_MS).
@@ -425,6 +477,12 @@
 			reportStep: pageConfig.lpn_time_report_step || 'Report time step',
 			reportStart: pageConfig.lpn_time_report_start || 'Report start time',
 			startClock: pageConfig.lpn_time_clock_start || 'Clock time at the start',
+			statistic: pageConfig.lpn_time_statistic || 'Statistic',
+			statNone: pageConfig.lpn_time_stat_none || 'None',
+			statAveraged: pageConfig.lpn_time_stat_averaged || 'Avg',
+			statMinimum: pageConfig.lpn_time_stat_minimum || 'Min',
+			statMaximum: pageConfig.lpn_time_stat_maximum || 'Max',
+			statRange: pageConfig.lpn_time_stat_range || 'Range',
 			formatTip: pageConfig.lpn_time_format_tip || 'Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).',
 			// **THERE IS NO STEADY-STATE MESSAGE.** Tom, 2026-08-18, on the sentence that used to be
 			// here: "'This network is worked out at one moment' is the very string I told you I don't
@@ -520,7 +578,7 @@
 	 * check that a tank really fills now that nothing on the page draws it.
 	 */
 	EC.lpnTimeCurrentFrame = function () {
-		return state.run ? EC.lpnTimeFrameResult(state.run, state.t) : null;
+		return state.run ? currentResult() : null;
 	};
 
 	/**
@@ -670,7 +728,7 @@
 			state.lastBusyMs = null;
 			state.runSig = null;
 			state.wantedByUser = false;
-			if (state.run) { state.run = null; state.t = 0; renderPanel(); }
+			if (state.run) { state.run = null; state.t = 0; state.statView = false; renderPanel(); }
 			return false;
 		}
 		// The engine is unreachable: one instant, said out loud. Unchanged, and it is not an edit
@@ -813,7 +871,7 @@
 		if (!state.run && state.t === stops[0] && !state.playing) { return; }
 		state.run = null;
 		state.runSig = null;
-		state.t = stops[0];
+		state.t = stops[0]; state.statView = false;
 		if (state.playing) { pause(); }
 		renderPanel();
 	}
@@ -1007,7 +1065,7 @@
 		state.lastBusyMs = null;
 		state.run = null;
 		state.runSig = null;
-		state.t = 0;
+		state.t = 0; state.statView = false;
 		state.wanted = true;
 		state.failed = null;
 		state.failedWhy = null;
@@ -1158,6 +1216,28 @@
 		return why ? S.runRefused + ' ' + S.runRefusedWhy.replace('{message}', why) : S.runRefused;
 	}
 
+	// The statistic the project asks for, or null (Task 735).
+	function statName() {
+		var t = docTimes(), n = t && t.statistic;
+		return (n && n !== 'NONE' && EC.LPN_STATISTICS && EC.LPN_STATISTICS.indexOf(n) > 0) ? n : null;
+	}
+	// What the transport is showing: the statistic frame, or the frame at state.t.
+	function currentResult() {
+		var r = state.statView && statName() ? EC.lpnTimeStatisticFrame(state.run, statName()) : null;
+		state.statView = !!r;
+		return r || EC.lpnTimeFrameResult(state.run, state.t);
+	}
+	// The statistic the transport is showing, as the visitor's word for it ("Averaged"), or null on
+	// an ordinary time step. The map legend names it so an average never reads as an instant.
+	EC.lpnTimeStatisticLabel = function () {
+		return (state.statView && state.run && statName()) ? statLabelOf(statName()) : null;
+	};
+	function showStatistic() {
+		pause();
+		state.statView = !!(state.run && statName());
+		showFrame();
+	}
+
 	function clampTime() {
 		var stops = EC.lpnReportTimes(docTimes()), i, best = stops[0];
 		for (i = 0; i < stops.length; i++) { if (stops[i] <= state.t) { best = stops[i]; } }
@@ -1167,7 +1247,7 @@
 	// Repaint the map at the moment the transport is on. NO SOLVE -- the frames are already
 	// computed, so scrubbing the slider is a redraw and not 25 round trips through WASM.
 	function showFrame() {
-		var r = state.run ? EC.lpnTimeFrameResult(state.run, state.t) : null;
+		var r = state.run ? currentResult() : null;
 		if (r) { host.apply(r); }
 		renderPanel();
 	}
@@ -1176,6 +1256,7 @@
 
 	function setTime(t) {
 		state.t = t;
+		state.statView = false;
 		if (state.run) { showFrame(); return; }
 		renderPanel();
 		// **NO FRAMES, AND THE USER HAS ASKED TO SEE ANOTHER MOMENT.** That gesture is the same
@@ -1243,6 +1324,22 @@
 		var d = host.doc();
 		if (!d.times) { d.times = EC.lpnTimesDefaults(); d.times.text = {}; }
 		return d.times;
+	}
+	function commitStatistic(name) {
+		var times = host.doc().times, cur = (times && times.statistic) || 'NONE';
+		if (EC.LPN_STATISTICS.indexOf(name) < 0 || name === cur) { return; }
+		host.snapshot();
+		times = ensureTimes();
+		// A file that said NONE keeps saying it; one that never said anything and is set back to
+		// NONE stops saying anything (absent is EPANET's NONE).
+		if (name === 'NONE' && !(times.text && times.text.statistic)) { delete times.statistic; }
+		else { times.statistic = name; }
+		if (times.text) { delete times.text.statistic; }
+		if (name === 'NONE') { state.statView = false; }
+		host.save();
+		if (state.run) { showFrame(); }
+		EC.lpnTimeRenderSettings();
+		renderPanel();
 	}
 	function commitField(key, text) {
 		// **BOTH HALVES REDRAW, because the fields and the transport are in different boxes now.**
@@ -1339,6 +1436,18 @@
 				panel.appendChild(ovrNotes[pair[0]]);
 			}
 		});
+		// **STATISTIC, the eighth [TIMES] line EPANET has** (Task 735): a choice, not a time, so a
+		// select. NONE removes nothing from a file that never stated one -- see commitStatistic().
+		var srow = el('label', { class: 'lpn-set-row lpn-time-row' }),
+			ssel = el('select', { class: 'lpn-set-num', id: 'lpn_set_time_statistic' });
+		EC.LPN_STATISTICS.forEach(function (n) {
+			ssel.appendChild(el('option', { value: n }, statLabelOf(n)));
+		});
+		ssel.value = times.statistic || 'NONE';
+		ssel.addEventListener('change', function () { commitStatistic(ssel.value); });
+		srow.appendChild(el('span', {}, S.statistic));
+		srow.appendChild(ssel);
+		panel.appendChild(srow);
 		EC.lpnTimeRenderOverrides();
 		if (EC.initTips) { EC.initTips(panel); }
 	};
@@ -1726,6 +1835,10 @@
 	// re-sets a `title` Bootstrap has already moved to data-bs-original-title.
 	var ui = null;
 
+	function statLabelOf(n) {
+		var S = strings();
+		return { AVERAGED: S.statAveraged, MINIMUM: S.statMinimum, MAXIMUM: S.statMaximum, RANGE: S.statRange, NONE: S.statNone }[n] || n;
+	}
 	function stepTimes() { return EC.lpnReportTimes(docTimes()); }
 	// **THE LABEL IS ONE INSTANT, NEVER A RANGE.** `EC.lpnReportTimes()` is a flat list of discrete
 	// reporting INSTANTS; it was never a list of intervals, so pairing one with the next one to
@@ -1846,19 +1959,26 @@
 		// visible, and this strip has no room for one.
 		//
 		// **THE MENU ROW IS NOT HIDDEN WITH IT**, and that is the whole reason the row exists: a
-		// user who wonders where Run went finds it in Project > Run, whose tip says which setting
+		// user who wonders where Calculate went finds it in Project > Calculate, whose tip says which setting
 		// took the button away. A row that vanished too would leave the question unanswerable.
 		// display, not removal, so renderPanel() can put it back without rebuilding the strip.
 		syncRunButton();
+		// **RESTART AND END** (a tester; Tom, 2026-10-05: "tight real estate on the toolbar. But it's
+		// important. Maybe the buttons can be smaller"). First and last reporting time, through
+		// setTime() like every other move, so a project with no frames asks for its run the same way.
+		// Their names are the lpn_time_first / lpn_time_last strings, which existed unused.
+		ui.first = btn('restart', S.first, function () { var st = stepTimes(); setTime(st[0]); }, null, true);
 		ui.prev = btn('step-back', S.prev, function () { stepBy(-1); }, null, true);
 		ui.play = btn('play', S.play, function () { if (state.playing) { pause(); } else { play(); } }, S.playTip, true);
 		ui.next = btn('step-fwd', S.next, function () { stepBy(1); }, null, true);
+		ui.last = btn('end', S.last, function () { var st = stepTimes(); setTime(st[st.length - 1]); }, null, true);
 		// **THE STEP SELECTOR IS THE ONLY CONTROL THAT SAYS WHICH MOMENT IS SHOWING.** The slider in
 		// the pane is gone rather than mirrored here: two controls for one current step are two
 		// controls that can disagree, and only one of them is on screen when the pane is shut.
 		ui.step = picker('lpn_time_step', S.slider, S.slider, '8.5rem', 5);
 		ui.step.addEventListener('change', function () {
 			var stops = stepTimes(), i = parseInt(ui.step.value, 10) || 0;
+			if (ui.step.value === 'stat') { showStatistic(); return; }
 			setTime(stops[Math.min(stops.length - 1, Math.max(0, i))]);
 		});
 		// Playback speed only, and it is not stored anywhere: how fast you like to watch is a fact
@@ -1873,7 +1993,7 @@
 	};
 
 	function renderTransport() {
-		var stops, labels, clocks, sig, i;
+		var stops, labels, clocks, sig, i, statLabel;
 		if (!ui || !ui.step) { return; }
 		stops = stepTimes();
 		labels = stops.map(function (t) { return stepText(t); });
@@ -1886,19 +2006,26 @@
 		// the project before it, which is a wrong number rather than a missing one. **THE CLOCKS
 		// ARE IN THE KEY EVEN THOUGH THEY ARE NO LONGER IN THE LABEL** -- they are in the tip, and
 		// a stale tip is the same defect one surface further in.
-		sig = labels.join('|') + '\u0001' + clocks.join('|');
+		statLabel = state.run && statName() ? statLabelOf(statName()) : null;
+		sig = labels.join('|') + '\u0001' + clocks.join('|') + '\u0001' + (statLabel || '');
 		if (ui.sig !== sig) {
 			ui.sig = sig;
 			ui.step.textContent = '';
 			labels.forEach(function (text, k) {
 				ui.step.appendChild(el('option', { value: String(k), title: clocks[k] }, text));
 			});
+			if (statLabel) { ui.step.appendChild(el('option', { value: 'stat' }, statLabel)); }
 		}
 		i = stops.indexOf(state.t);
 		if (i < 0) {
 			i = EC.lpnTimeFrameIndexAt(stops.map(function (t) { return { t: t }; }), state.t);
 		}
-		ui.step.value = String(i < 0 ? 0 : i);
+		// Wide enough for the statistic's own word, which the 8.5rem cap sized for `24:00` clips.
+		// Without one it goes back to picker()'s own "10:00" minimum, never to none: '' here once
+		// erased it, and a 9:59 box ran under its arrow again (step-select-width harness).
+		if (ui.step.dataset.minWidth === undefined) { ui.step.dataset.minWidth = ui.step.style.minWidth; }
+		ui.step.style.minWidth = statLabel ? '7rem' : ui.step.dataset.minWidth;
+		ui.step.value = (state.statView && statLabel) ? 'stat' : String(i < 0 ? 0 : i);
 		ui.play.setAttribute('aria-pressed', state.playing ? 'true' : 'false');
 		swapIcon(ui.play, state.playing ? 'pause' : 'play');
 		// **THE TIP FOLLOWS THE ICON**: while a run is playing this control is Pause, and a tip
@@ -1906,31 +2033,24 @@
 		// than to `title`, because the loop below is the one writer of the visible tip and it
 		// restores from exactly this field when the control is re-enabled.
 		ui.play.dataset.tipWhenLive = state.playing ? strings().pauseTip : strings().playTip;
-		// **ONE STOP MEANS THE TRANSPORT IS INERT BY DESIGN, AND IT HAS TO SAY SO.** Tom, 2026-08-19,
-		// on Net3-World -- a file that carries no [TIMES] block at all: "No time steps are
-		// available. It is not running or something is wrong with the play controls and the time
-		// step selector." Nothing was wrong; the project's duration is 0, so there is exactly one
-		// moment and Play has nowhere to go. Three live controls that quietly do nothing are
-		// indistinguishable from three broken ones, so they are DISABLED -- which is the visible
-		// signal that this is by design -- and every one of them carries the reason and the cure.
-		// Run stays enabled: on a network with no duration it is an ordinary recalculate, which is
-		// a true thing for a button called Run to do (see the note where it is built).
-		var inert = stops.length < 2, why = inert ? strings().noPeriod : null;
-		[ui.prev, ui.play, ui.next, ui.step].forEach(function (c) {
+		// **ONE STOP MEANS THERE IS NO PLAYER, SO THE PLAYER IS NOT DRAWN** (Tom, 2026-10-05: "Maybe
+		// the EPS controls can disappear for steady state. Many users never do EPS."). It used to be
+		// five disabled controls carrying the no-period sentence as their tip (Tom, 2026-08-19, on
+		// Net3-World: "It is not running or something is wrong with the play controls"), which spent
+		// the strip's width on controls that cannot work. Run is NOT a player control and keeps its
+		// own rule (syncRunButton). The cure the disabled tips carried -- set a Total run time -- now
+		// rides the tip of the Project > Calculate menu row (js/looped-network.js), the one place left
+		// that is always there.
+		var inert = stops.length < 2;
+		[ui.first, ui.prev, ui.play, ui.next, ui.last, ui.step, ui.speed].forEach(function (c) {
 			if (!c) { return; }
 			c.disabled = inert;
-			// The tip a control carries when it WORKS is its own; only the reason for being
-			// switched off is shared. Restoring rather than clearing, so a re-enabled control does
-			// not come back mute.
-			if (!c.dataset.tipWhenLive) { c.dataset.tipWhenLive = c.title || ''; }
-			// **THROUGH setTipText(), NEVER A BARE `title` WRITE.** These three buttons are born
-			// over the empty startup document, so they are born carrying the no-period sentence;
-			// initTips() caches it into data-bs-original-title and blanks the attribute, and a
-			// plain `c.title = 'Play'` then changes nothing the reader can see. That is the defect
-			// Tom reported as "It's always there. I have never seen any other tip."
-			if (EC.setTipText) { EC.setTipText(c, why || c.dataset.tipWhenLive); }
-			else { c.title = why || c.dataset.tipWhenLive; }
+			c.style.display = inert ? 'none' : '';
 		});
+		// The group wears a divider; with nothing visible in it the divider would mark nothing.
+		if (ui.run && ui.run.parentNode) {
+			ui.run.parentNode.style.display = (inert && ui.run.style.display === 'none') ? 'none' : '';
+		}
 	}
 
 	// The one thing a solve or a clock edit still has to repaint: the transport on the toolbar.

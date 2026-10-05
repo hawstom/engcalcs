@@ -1567,7 +1567,22 @@ html[lang="zh"] .ec-welcome {
 .lpn-toolbar-group + .lpn-toolbar-group:not(.lpn-toolbar-end) {
 	border-left: 1px solid var(--ec-gray-d6d6d6); padding-left: 12px;
 }
-.lpn-transport-btn { font: inherit; cursor: pointer; }
+.lpn-transport-btn { font: inherit; cursor: pointer; padding: 2px 4px; }
+/* **ONE PLAYER, NOT FIVE BOXES** (Ida, 2026-10-06, after Tom: "These controls are the largest thing on
+   the chrome"). Measured: the player was the only set of boxed, filled controls on a strip of bare
+   icons, so five boxes read as five objects. Joined edge to edge they read as one, 25 px narrower,
+   still buttons ("buttons are its paradigm"). Siblings that are not transport buttons keep the
+   group's ordinary 6 px spacing. */
+#lpn_toolbar_run { gap: 0; }
+#lpn_toolbar_run > * + * { margin-inline-start: 6px; }
+#lpn_toolbar_run > .lpn-transport-btn { border-radius: 0; }
+#lpn_toolbar_run > .lpn-transport-btn + .lpn-transport-btn { margin-inline-start: -1px; }
+/* An icon-only button has no text for the icon's end margin to separate from; it only widens it. */
+.lpn-transport-btn > .ec-icon { margin-inline-end: 0; }
+/* Direction glyphs point along time, and time runs right to left in a right-to-left page, where the
+   flex row has already put Restart at the right edge. Play and Pause are not direction-of-time marks. */
+html[dir="rtl"] .lpn-transport-btn[data-icon="restart"] svg, html[dir="rtl"] .lpn-transport-btn[data-icon="step-back"] svg,
+html[dir="rtl"] .lpn-transport-btn[data-icon="step-fwd"] svg, html[dir="rtl"] .lpn-transport-btn[data-icon="end"] svg { transform: scaleX(-1); }
 /* The right-hand end of the strip: Find and the bottom-pane toggle (Task 434). Pushed there by an
    auto margin rather than placed at a fixed offset, so it stays at the edge at every window width
    and drops to its own line with the rest when the strip wraps. */
@@ -4573,6 +4588,9 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	html:has(#lpn_canvas) #lpn_toolbar > .lpn-toolbar-group:not(#lpn_toolbar_run) { display: none; }
 	html:has(#lpn_canvas) #lpn_toolbar_run button:not(.lpn-transport-btn) { display: none; }
 	html:has(#lpn_canvas) #lpn_toolbar_run { border-left: 0; padding-left: 0; margin-right: 0; }
+	/* Five buttons and two selectors are 333 px at the default gap; a 320 px window needs 15 back. */
+	html:has(#lpn_canvas) #lpn_toolbar_run { gap: 2px; }
+	html:has(#lpn_canvas) #lpn_toolbar_run .lpn-transport-btn { padding: 2px 3px; }
 
 	/* 4. THE MENU BAR DROPS TO ICONS. The word is a <span class="lpn-menubar-word"> that
 	   buildMenuBar() builds for this rule to reach; the accessible name is on the button as an

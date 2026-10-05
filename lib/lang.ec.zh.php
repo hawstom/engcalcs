@@ -2078,8 +2078,6 @@ $ec_lang['lpn_notes_5_def']='水泵遵循 H = H₀ − aQ^b，其中 H 是水泵
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='本页面还提供';
-$ec_lang['lpn_notes_4_def']='项目可以放置在真实地面上，背后绘有街道地图。EPANET .inp 文件既可以读入，也可以写出。底部面板可沿一条路线绘制剖面图，并列出沿线的节点。元件可以按其计算结果着色，“查找”功能可以找出所有满足您设定条件的元件。';
 $ec_lang['lpn_notes_6_term']='表格列帮助';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one
