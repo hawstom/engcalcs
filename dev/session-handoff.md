@@ -110,7 +110,7 @@ deleted, `lpn_ds_find` and `lpn_settings_basemap_style_tip` deleted); Tables men
 Text (and a deleted Text is now actually saved); Text detach and a Text Description; the time-step
 select fits "9:59"; "A copy; make new lock" writes the file at once; the no-engine banners name the
 real cause (offline / download blocked / WebAssembly refused / page defect) instead of always
-saying "connect to the internet" (DDN hit it online); Task 765 (saved views, `dev/saved-views.md`).
+saying "connect to the internet" (DDN hit it online); Task 765 (now Presentation alternatives, his text).
 
 ### Awaiting him (all on the Branch previews page unless noted)
 
@@ -258,8 +258,6 @@ Merging the four branches above first lets one sprint carry their keys.
   its own tree and the stash list survived. The rule is in every brief and still broke.
 - **A forced `new_english_keys.php --write --force` is safe only when the file equals master's generated
   copy** (`git diff master -- dev/new-english-keys.md` empty). Check that first, every time.
-- **Bentley is not ours** (Tom): their scenarios are a tree over alternatives; their criticality and
-  on-the-fly analyses run on a copy. He has no WaterCAD.
 
 ### Traps met 2026-09-30
 
