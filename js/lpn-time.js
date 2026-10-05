@@ -479,9 +479,9 @@
 			startClock: pageConfig.lpn_time_clock_start || 'Clock time at the start',
 			statistic: pageConfig.lpn_time_statistic || 'Statistic',
 			statNone: pageConfig.lpn_time_stat_none || 'None',
-			statAveraged: pageConfig.lpn_time_stat_averaged || 'Averaged',
-			statMinimum: pageConfig.lpn_time_stat_minimum || 'Minimum',
-			statMaximum: pageConfig.lpn_time_stat_maximum || 'Maximum',
+			statAveraged: pageConfig.lpn_time_stat_averaged || 'Avg',
+			statMinimum: pageConfig.lpn_time_stat_minimum || 'Min',
+			statMaximum: pageConfig.lpn_time_stat_maximum || 'Max',
 			statRange: pageConfig.lpn_time_stat_range || 'Range',
 			formatTip: pageConfig.lpn_time_format_tip || 'Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).',
 			// **THERE IS NO STEADY-STATE MESSAGE.** Tom, 2026-08-18, on the sentence that used to be
