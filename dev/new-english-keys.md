@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**18 still to read on master**, of 128 untranslated keys, of 2354 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**15 still to read on master**, of 125 untranslated keys, of 2351 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (128, 18 to read @@ NEEDS RULING)
+## lpn_  (125, 15 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -279,9 +279,6 @@ never edits a synonym.
 - **`lpn_mode_add_chain`**
   > Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
   _Ruled OK 2026-10-05._
-- **`lpn_pane_clear_override`**
-  > Clear override
-  @@ NEEDS RULING
 - **`lpn_pane_delete_element`**
   > Delete element
   @@ NEEDS RULING
@@ -300,12 +297,6 @@ never edits a synonym.
 - **`lpn_pane_manage_cols_width`**
   > Width (em)
   _Ruled OK 2026-10-05._
-- **`lpn_pane_scn_alt_tip`**
-  > {category} alt.: {alternative}
-  @@ NEEDS RULING
-- **`lpn_pane_scn_show`**
-  > Show scenarios
-  @@ NEEDS RULING
 - **`lpn_pane_sel_only`**
   > Selection only
   _Ruled OK 2026-10-05._
@@ -464,7 +455,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**2 still to read**, of 5 new keys across 10 unmerged branch(es).
+**5 still to read**, of 8 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -508,6 +499,16 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/scenario-table (`1a54f65f`) — adds no English strings
+### feat/scenario-table (`8bdc2945`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_pane_clear_override`**
+  > Clear override
+  @@ NEEDS RULING
+- **`lpn_pane_scn_alt_tip`**
+  > {category} alt.: {alternative}
+  @@ NEEDS RULING
+- **`lpn_pane_scn_show`**
+  > Show scenarios
+  @@ NEEDS RULING
 
 ### feat/tip-door (`80e7e1a5`) — adds no English strings

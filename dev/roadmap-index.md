@@ -7,13 +7,14 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**88 open tasks.** Next (100): 6 · Soon (75): 11 · Someday (50): 37 · Maybe (25): 15 · Parked (5): 19
+**86 open tasks.** Next (100): 7 · Soon (75): 11 · Someday (50): 34 · Maybe (25): 15 · Parked (5): 19
 
-## 100 — Next (6)
+## 100 — Next (7)
 
 - Task 539 — Gang the neighbour labels so their leaders stop crossing.
 - Task 676 — Watch the sites, and send a derived weekly report.
 - ! Task 681 — Economize the label layout: it is half the cost of a project switch.
+- Task 721 — The scenario and alternatives model: Bentley's tree, plus Presentation and Calculation.
 - Task 737 — Coined names for interface elements, so every language names each one once.
 - Task 741 — The infinite map: generated networks for the label bench.
 - ! Task 759 — One word for the map selection, another for a menu choice; tips that earn their place.
@@ -26,13 +27,13 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 623 — File loss judged only by people whose files are throwaway.
 - Task 639 — Layers: the first heading under Map and page.
 - Task 714 — Theming: colour tokens first, then a Light/Dark choice in Settings.
-- Task 749 — Read Bentley WaterCAD/WaterGEMS models.
-- Task 752 — A scenario workbook: the scenario list and its data as spreadsheet tabs.
+- Task 749 — Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.
+- Task 752 — Google Sheets: sync the scenarios and their alternatives out and in.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 763 — A searchable help manual, built from the tips Tom cut.
 - Task 766 — Show scenarios in the Tables pane: one row per asset per scenario.
 
-## 50 — Someday (37)
+## 50 — Someday (34)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -62,15 +63,12 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 712 — Tank water depth as a map label field.
 - Task 717 — EPANET-MSX, multi-species water quality.
 - Task 720 — Background layers from a GIS server.
-- Task 721 — Scenarios as layered alternatives, with ready-made scenarios.
 - Task 722 — Change and revision tracking.
 - Task 725 — One wide fire-flow table instead of two reports.
-- Task 726 — Prefetch the EPANET engine when idle.
 - Task 728 — Import a GIS shapefile or geodatabase as a network.
 - Task 733 — Grow the native solver, in phases, to everything EPANET's solves.
 - Task 734 — Where space is open east or west, one label on one line.
 - Task 736 — [H] · Count installs and app launches, if the consent text allows it.
-- ! Task 765 — Presentation alternatives: a scenario may include settings and a saved view associated with a Presentation alternative.
 
 ## 25 — Maybe (15)
 
@@ -116,5 +114,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-79 of 88 titles are within 4–12 words. `!` marks the rest;
+78 of 86 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
