@@ -135,7 +135,7 @@ async function desktop(Session, browser) {
 		await page.mouse.down();
 		await page.mouse.move(r.x + r.w / 2, r.y + r.h / 2, { steps: 4 });
 		await page.mouse.move(r.x + r.w, r.y + r.h, { steps: 4 });
-		const rect = await page.$eval('.lpn-snip-rect', (e) => ({ w: e.offsetWidth, h: e.offsetHeight, shown: e.style.display !== 'none' }));
+		const rect = await page.$eval('.lpn-snip-rect', (e) => ({ w: e.offsetWidth, h: e.offsetHeight, shown: !!e.parentNode }));
 		ok('dragging draws the rectangle', rect.shown && rect.w === r.w && rect.h === r.h, JSON.stringify(rect));
 		await page.mouse.up();
 		await waitBlobs(page, 2);

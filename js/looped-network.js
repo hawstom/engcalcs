@@ -41123,9 +41123,7 @@ var EngCalcs = EngCalcs || {};
 		veil.className = 'lpn-snip-veil';
 		veil.style.left = map.x + 'px'; veil.style.top = map.y + 'px';
 		veil.style.width = map.w + 'px'; veil.style.height = map.h + 'px';
-		box.className = 'lpn-snip-rect';
-		box.style.display = 'none';
-		veil.appendChild(box);
+		box.className = 'lpn-snip-rect';   // joins the veil on the first move, so a click never shows it
 		document.body.appendChild(veil);
 		snipVeil = { el: veil, onKey: null };
 		function at(e) {
@@ -41143,7 +41141,7 @@ var EngCalcs = EngCalcs || {};
 		veil.addEventListener('pointermove', function (e) {
 			if (!start) { return; }
 			var r = rectOf(start, at(e));
-			box.style.display = '';
+			if (!box.parentNode) { veil.appendChild(box); }
 			box.style.left = (r.x - map.x) + 'px'; box.style.top = (r.y - map.y) + 'px';
 			box.style.width = r.w + 'px'; box.style.height = r.h + 'px';
 		});
@@ -41156,7 +41154,7 @@ var EngCalcs = EngCalcs || {};
 			// A plain click (or a tap) takes the whole visible map, as a snipping tool's does.
 			takeScreenshot(r.w < SNIP_DRAG_PX || r.h < SNIP_DRAG_PX ? map : r);
 		});
-		veil.addEventListener('pointercancel', function () { start = null; box.style.display = 'none'; });
+		veil.addEventListener('pointercancel', function () { start = null; if (box.parentNode) { veil.removeChild(box); } });
 		snipVeil.onKey = function (e) {
 			if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); cancelScreenshot(); setNotice(''); }
 		};

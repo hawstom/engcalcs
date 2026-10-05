@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**15 still to read on master**, of 125 untranslated keys, of 2353 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**22 still to read on master**, of 132 untranslated keys, of 2360 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -84,7 +84,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (125, 15 to read @@ NEEDS RULING)
+## lpn_  (132, 22 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -386,6 +386,27 @@ never edits a synonym.
 - **`lpn_scncmp_same`**
   > The same in every scenario
   _Ruled OK 2026-10-05._
+- **`lpn_screenshot_copied`**
+  > Screenshot copied.
+  @@ NEEDS RULING
+- **`lpn_screenshot_failed`**
+  > The screenshot could not be made.
+  @@ NEEDS RULING
+- **`lpn_screenshot_hint`**
+  > Drag a rectangle over the map, or click for the whole map. Esc cancels.
+  @@ NEEDS RULING
+- **`lpn_screenshot_menu`**
+  > Screenshot
+  @@ NEEDS RULING
+- **`lpn_screenshot_no_basemap`**
+  > The street map or satellite image could not be included.
+  @@ NEEDS RULING
+- **`lpn_screenshot_saved`**
+  > The clipboard is not available here, so the screenshot was downloaded as a PNG file.
+  @@ NEEDS RULING
+- **`lpn_screenshot_tip`**
+  > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
+  @@ NEEDS RULING
 - **`lpn_settings_basemap_style`**
   > Basemap style
   _Ruled OK 2026-10-05._
@@ -466,7 +487,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**4 still to read**, of 7 new keys across 14 unmerged branch(es).
+**5 still to read**, of 8 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -477,9 +498,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/handoff-1006 (`3d88b981`) — adds no English strings
-
-### feat/bentley-interop (`beedec3f`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/bentley-interop (`0c9eef46`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -489,8 +508,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04`) — adds no English strings
-
-### feat/engine-prefetch (`3194c30d`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -514,10 +531,11 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/notes-trim (`53d149d2`) — adds no English strings
+### feat/scenario-table (`1eaee4e1`) — 3 new, 3 to read @@ NEEDS RULING
 
-### feat/scenario-table (`4a5cf9fd`) — 2 new, 2 to read @@ NEEDS RULING
-
+- **`lpn_pane_clear_override`**
+  > Clear override
+  @@ NEEDS RULING
 - **`lpn_pane_scn_alt_tip`**
   > {category} alt.: {alternative}
   @@ NEEDS RULING
@@ -525,6 +543,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show scenarios
   @@ NEEDS RULING
 
-### feat/tip-door (`80e7e1a5`) — adds no English strings
+### feat/screenshot (`e7255634`) — adds no English strings
 
-### feat/transport-ends (`40ef582f`) — adds no English strings
+### feat/tip-door (`8c5c01dc`) — adds no English strings
