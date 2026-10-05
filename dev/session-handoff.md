@@ -121,8 +121,7 @@ umbrella at 100 (the model); 749 is the `.sqlite` file only; 752 is Sheets sync;
 - **`feat/screenshot`** (new, port 8108): Map > Screenshot, snip at 3x to the clipboard, tile
   credit drawn when tiles are in the picture.
 - **`feat/backdrop-attach`** (Task 282, port 8109): attach the picture an `.inp` names, placed by
-  DIMENSIONS with EPANET's own OFFSET sign and fit rule (Umap.pas). Merge master into it first: the
-  geo export hunk is already on master.
+  DIMENSIONS with EPANET's own OFFSET sign and fit rule (Umap.pas).
 - Still from before: `feat/desktop`; `feat/label-placer` waits on ONE answer from him, the R1
   rule reworded: *"Hide a label only because there is no room for it on screen. Never hide it
   because of how many labels are already showing."* Yes or no.
@@ -163,7 +162,7 @@ cell differs from the resolved value.
   semantics, never guess a sign.
 - **Uncommitted adviser journals in a worktree block `git merge master`** when master touches the
   same journal. Commit advisers' files before a build agent merges.
-- **A master defect found on a feature branch** (geo DIMENSIONS): split the hunk onto a `fix/`
+- **A master defect found on a feature branch** (geo DIMENSIONS): split the hunk onto a fix
   branch from master with its own harness, rather than waiting on his all-clear.
 
 ### Traps met 2026-10-05
