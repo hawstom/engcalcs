@@ -405,7 +405,7 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 	const d0 = L.undoDepth();
 	openMenuOn(ids[3], 'tag');
 	menu = menuEl();
-	fire(menu.children[menu.children.length - 1], 'click', {});
+	fire(menu.children[menu.children.length - 2], 'click', {});
 	report(L.cellText('junctions', ids[3], 'tag') === '', 'Delete clears the cell’s value',
 		L.cellText('junctions', ids[3], 'tag'));
 	report(L.undoDepth() === d0 + 1, '...as one undoable edit', d0 + ' -> ' + L.undoDepth());
@@ -420,7 +420,7 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 	const d1 = L.undoDepth();
 	openMenuOn(ids[0], 'tag');
 	menu = menuEl();
-	if (menu) { fire(menu.children[menu.children.length - 1], 'click', {}); }
+	if (menu) { fire(menu.children[menu.children.length - 2], 'click', {}); }
 	report(L.undoDepth() === d1, 'Delete on an already-blank cell takes no snapshot', d1 + ' -> ' + L.undoDepth());
 }
 
