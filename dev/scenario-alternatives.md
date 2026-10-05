@@ -177,8 +177,9 @@ Tom, 2026-10-05:
 **This replaces** the earlier line that only the demand multiplier, the total run time and the
 hydraulic time step may vary by scenario ("Friction method, units, accuracy and trials never vary
 between compared scenarios", Sue's advice, recorded beside `LPN_SCENARIO_TIME_KEYS`). Accuracy and
-trials now vary like any other calculation option. Friction method and units still do not, for the
-reason below: they change what stored numbers mean.
+trials now vary like any other calculation option, and so, since Tom's answer of 2026-10-06, does
+friction method. Only units and the coordinate frame never vary: they change what stored numbers
+and positions mean.
 
 **Bentley has no Presentation category.** **CITED** (`dev/bentley-interop.md`, KB0013701,
 KB0057843): Bentley keeps symbology, colour coding, annotation and named views in the `.wtg`,
@@ -196,7 +197,8 @@ code's table is `LPN_SETTING_CATEGORY_OF`, and the harness fails a key a saved p
 the table does not name. A path naming an object covers everything under it; the longest named
 path wins.
 
-**Presentation (`presentation`), 47 paths.** Everything about how the drawing looks.
+**Presentation (`presentation`), 48 paths.** Everything about how the drawing looks, and where the
+map is looking.
 
 | Where it lives | Paths | Read by |
 |---|---|---|
@@ -206,12 +208,14 @@ path wins.
 | `settings`, map appearance | `basemapStyle`, `backdropOpacity` | `basemapStyleName()`, `backdropImageOpacity()` |
 | `settings`, colour by value | `colorNodeField`, `colorLinkField`, `colorRampNode`, `colorRampLink`, `colorClassesNode`, `colorClassesLink`, `colorReverseNode`, `colorReverseLink`, `colorBreaks`, `colorModes`, `colorLegendPosition` | `colorFieldOf()`, `colorRampKey()`, `colorClassCount()`, `colorReverseOf()`, `storedBreaks()`, `effectiveBreaks()`, `colorModeOf()`, `renderColorLegend()` |
 | `settings`, contours | `contourFill`, `contourLines`, `contourLabels`, `contourOpacity`, `contourInterval`, `contourBuffer`, `contourTerrain` | `contourFillMode()`, `contourIsOn()`, `drawContourLabels()`, `contourOpacityOf()`, `contourIntervalOf()`, `contourBufferOf()`, `contourTerrainWanted()` |
+| `view` (Tom, 2026-10-06, Q2) | the window: centre and scale, one atomic value | `followScenarioView()` on a switch. **Stored outward**, as a node's position override is (longitude and latitude, or the grid's absolute x and y), so the Y flip, the origin shift and the projection never touch it. Written only when a scenario deliberately holds one (`setScenarioView()`; no button calls it yet). |
 
-**Calculation (`calculation`), 8 paths, two of them whole groups.** What the solver is told, other
+**Calculation (`calculation`), 9 paths, two of them whole groups.** What the solver is told, other
 than the network itself.
 
 | Path | Read by | Note |
 |---|---|---|
+| `settings.method` (Tom, 2026-10-06) | `frictionMethod()`, the exporter's `[OPTIONS] Headloss` | Hazen-Williams, Darcy-Weisbach or Manning. **A scenario's method REINTERPRETS each pipe's roughness number; it never converts it**, the rule CLAUDE.md states for units (*"Changing a unit reinterprets the typed number; it never converts it"*). A pipe holds one roughness, so a Darcy-Weisbach scenario of a Hazen-Williams project reads a C of 130 as a roughness of 130 in the DW unit. That is the user's to set right, with a Physical override of the roughness in that scenario, exactly as a unit change is. WaterGEMS keeps friction method in its Calculation Options too. |
 | `settings.engine` | `engineFor()`, `runSolve()` | EPANET or the built-in solver. |
 | `settings.autoRun` | `scheduleSolve()`, `runSolveEpanet()` | Recalculate automatically. |
 | `settings.hydraulics` (all of it: `accuracy`, `trials`, `unbalanced`, `unbalancedTrials`, `headError`, `flowChange`, `dampLimit`, `checkFreq`, `maxCheck`, `demandModel`, `pdaSrc`, `minPressure`, `reqPressure`, `pressureExponent`, `specificGravity`, `viscosity`, `emitterExponent`, `statusReport`, `demandMultiplier`) | `assembleModel()`, `solveAccuracy()`, `convSetting()`, `contourSubtractGround()`, `paneColPdaResult()` | **`demandMultiplier` already varies by scenario**, stored as `scenario.demandMultiplier` (Task 721), and stays there. `demandModel` and `pdaSrc` travel together. |
@@ -221,7 +225,7 @@ than the network itself.
 | `settings.qualityOptions` | `qualitySetting()`, the exporter | The file's own Quality, Diffusivity and Tolerance text. Travels with `settings.quality`. |
 | `times` (all of it: `duration`, `hydraulicStep`, `patternStep`, `patternStart`, `reportStep`, `reportStart`, `startClock`, `qualityStep`, and the typed `text`) | `effectiveTimes()`, the exporter | **`duration` and `hydraulicStep` already vary by scenario**, stored as `scenario.times` (Task 755), and stay there. |
 
-**Existing element categories, 13 paths.** A document-wide value that belongs with element
+**Existing element categories, 16 paths.** A document-wide value that belongs with element
 properties already in a category.
 
 | Path | Category | Why |
@@ -229,24 +233,27 @@ properties already in a category.
 | `settings.reactions.globalBulk`, `globalWall`, `orderBulk`, `orderWall`, `orderTank`, `limitingPotential`, `roughnessCorrelation` | Constituent | The global rates and orders the per-pipe `bulkCoeff`/`wallCoeff` (already Constituent) fall back to. |
 | `settings.energy.globalEfficiency`, `globalPrice`, `globalPattern`, `demandCharge`, `currency` | Energy cost | The global price and pattern the per-pump `energyPrice`/`energyPattern` (already Energy cost) fall back to. |
 | `defaultPattern` | Demand | The pattern a demand with no pattern of its own follows. **SPECULATION** that Bentley would call it Demand. |
+| `settings.defaults` (default diameter, roughness, minor loss, elevation, tank levels and size, and its `nodeElevSource`), `settings.idPrefixes`, `settings.nodeElevSource` | Physical | **New-asset settings** (Tom, 2026-10-06, Q3: *"Leave the creativity to the users. Give them freedom. And be perfectly consistent in the design."*). The value a new element is born with sits in the category of the property it seeds. Bentley keeps these as Prototypes, outside scenarios, so this is ours alone. An ID prefix seeds an element's name, which has no category; Physical is its nearest home and is question 8 below. Read by `addNode()`, `addLink()`, `mintId()`, `elevSourceIsDem()` and the push-defaults tool. |
+| `settings.defaults.demand` | Demand | The one new-asset value that seeds a Demand property. |
 
-**Excluded: stored in the project, never varied by a scenario.** Each with its reason.
+**Excluded: stored in the project, never varied by a scenario.** Revisited against Tom's
+2026-10-06 rule: *"The one thing we refuse to do in the same project is let equations push physical
+dimensions around (units and coordinates conversion)."* and *"be perfectly consistent in the
+design."* So two exclusions are on principle, and every other one is something a scenario
+genuinely cannot hold: identity, the open scenario itself, and document objects referenced by id.
 
 | Path | Why not |
 |---|---|
-| `units` | **Changing a unit reinterprets the typed number** (CLAUDE.md). A scenario with its own units would read every stored number in the project differently. |
-| `settings.method` (friction method) | **Same defect as units**: a pipe holds one roughness number, and the method says whether it is a C, an e or an n. A Darcy-Weisbach scenario would read a C of 130 as 130 mm of roughness. Bentley keeps a separate attribute per method; we do not. |
-| `origin`, `project.coords`, `project.crs`, `project.georef` | The coordinate frame. Every position in the file is measured from it, and a scenario's own frame would move every element. |
-| `backdrop` | The image and its registration. The image is megabytes, so a copy per scenario multiplies the file; the registration is coordinates in the document's frame. Its opacity (`settings.backdropOpacity`) is Presentation. |
-| `view` | **Excluded for now, Tom's call (question 2 below).** It is a camera position, and a scenario holding one would move the map on every switch of scenario, which the page's rule against automatic zooms forbids. It also carries coordinates through the Y flip, the origin shift and the geographic projection. |
-| `settings.idPrefixes`, `settings.defaults`, `settings.nodeElevSource` | **New-asset settings write Base data** (question 3). They seed a new element's id and its own values, which are Base-owned even when the element is drawn inside a scenario. Bentley keeps the same thing as Prototypes, outside scenarios. |
-| `settings.customProps` | The design of each custom property. A stored value means nothing without its design, so two scenarios disagreeing about the design would read the same value two ways. The values themselves are already User data. |
-| `settings.fileOptions`, `inpSections` | Text carried verbatim from an `.inp` that this page does not act on. |
-| `patterns`, `curves`, `pipeTypes`, `fittingSets`, `profiles` | **Document objects** (CLAUDE.md: *"A curve is a document object; an element holds only a reference. The reference is scenario-overridable, the points are not."*). The same rule for every library. |
-| `controls`, `rules` | Model content, not settings. Bentley's home for them is the Operational alternative, which we do not have yet. |
-| `project.name`, `project.docId`, `project.gallery`, `format`, `app`, `v`, `nextId` | What the document is and how it counts ids. |
-| `project.activeScenario` | Which scenario is open. Cannot depend on the scenario. |
-| `scenarios`, `nodes`, `links`, `labels`, `customers` | The model itself; element properties are categorised in the table above this section. |
+| `units` | **On principle.** Changing a unit reinterprets every typed number (CLAUDE.md). A scenario with its own units would read every stored number in the project differently. |
+| `origin`, `project.coords`, `project.crs`, `project.georef` | **On principle: the coordinate frame.** Every position in the file is measured from it, and a scenario's own frame would move every element. A scenario's moved node and its own view are both stored outward, so neither needs a frame of its own. |
+| `project.name`, `project.docId`, `project.gallery`, `format`, `app`, `v`, `nextId` | **Identity**: what the document is and how it counts ids. |
+| `project.activeScenario` | **The open scenario itself.** Cannot depend on the scenario. |
+| `scenarios`, `nodes`, `links`, `labels`, `customers` | **The model itself**; element properties are categorised in the table above this section. |
+| `patterns`, `curves`, `pipeTypes`, `fittingSets`, `profiles` | **Document objects referenced by id** (CLAUDE.md: *"A curve is a document object; an element holds only a reference. The reference is scenario-overridable, the points are not."*). The same rule for every library. A scenario that wants a different curve references a different one. |
+| `settings.customProps` | **A document object**: the design of each custom property, which its values are read through. Two scenarios disagreeing about the design would read the same value two ways. The values themselves are User data. |
+| `backdrop` | **A document object** (the image, megabytes, which a copy per scenario would multiply) **placed in the coordinate frame** (its registration). Its opacity (`settings.backdropOpacity`) is Presentation. |
+| `controls`, `rules` | **Not yet.** Bentley's home for them is the Operational alternative, which we will take when we take it; today they are model content, edited as one list. Listed so the gap is visible, not as a principle. |
+| `settings.fileOptions`, `inpSections` | Text carried verbatim from an `.inp` that nothing on this page reads or edits. A scenario has no way to hold a different one and nothing would act on it if it did. |
 | `settings.sources`, `settings.mixing`, `settings.tags`, `settings.reactions.tank`, `settings.energy.effic` | Markers and staging the `.inp` readers leave behind: "this section was read", or a value already moved onto its element. |
 | `settings.sectionsOpen`, `mapHeight`, `fileAutosaveSeconds`, `colorRamp`, `colorClasses`, `colorReverse`, `colorThematic`, `colorFrozenBreaks`, `basemapFilter`, `kmDefault`, `labelReadabilityBias` (superseded by `labelFlipLeftOfVertical`; every shipped example still carries it) | Stale or migrated on open: nothing reads them, or `applySaved()` converts and deletes them. |
 
@@ -279,9 +286,12 @@ project keeps the value:
 - **Two calculation options keep the homes they already have**: `scenario.demandMultiplier` and
   `scenario.times.duration`/`hydraulicStep`. `scenario.settings` refuses those paths, so a fact never
   has two homes; the read seam reads them where they are.
-- **No coordinate is storable.** `view` and `backdrop` are excluded, so nothing in the store needs
+- **No coordinate is stored in the drawing frame.** The one coordinate in the store, a scenario's
+  `view`, is stored outward, as a node's position override already is, so nothing in the store needs
   the Y flip, the origin shift or the geographic projection that `serializeProject()` applies to
-  the document's own coordinates. Two Presentation values are lengths (`labelMaxWidth`,
+  the document's own coordinates. Its scale is pixels per drawing unit; a project turned from a
+  grid to geographic leaves a view that `viewShowsModel()` refuses, and a refused view moves
+  nothing. Two Presentation values are lengths (`labelMaxWidth`,
   `labelSettings.customerMaxWidth`), typed in the project's display unit; units are one per
   project, so they mean the same thing in every scenario.
 - **A file is read, never trusted** (`sanitizeScenarioSettings()`, beside
@@ -330,11 +340,89 @@ the read-only Alternatives table gains their two columns before the calculation-
 - **`applyScenarioChange()`**: a switch already re-solves and relabels; it must also repaint the
   symbology, the basemap and the contours when the two scenarios' Presentation differs.
 
-**Not done in this build: routing those readers.** The seam, the store, the round-trip, the
-categories and the table exist; the hundred-odd reads above still read the project's own objects.
-So a setting override that a hand-edited file carries shows in the Alternatives table but does not
-yet change the map or the solve. That is deliberate: nothing in the interface can make one, and
-routing the readers is what changes what a person sees, which waits on the questions below.
+### Stage 3: every reader routed (2026-10-06)
+
+**Done.** About 110 read sites in some 75 functions now read the open scenario's value through
+`settingFor()`, by four shorthands: `scnSetting(member)`, `scnLabels(path)`, `scnProject(member)`
+and `scnDefaultPattern()`. A reader that runs per element asks for a leaf (a number, a flag), which
+is never copied; a pass that wants a whole map (`refreshLabelTextPass()`, `customerLabelLines()`)
+asks once and hands it down. `settingFor()` builds nothing in Base or in a scenario that holds no
+setting: it is one walk of the project's own object. Beside the readers:
+
+- **The `.inp` export** is handed `inpExportDocument()`: the serialized project with the open
+  scenario's settings block laid over a copy of `settings` and `defaultPattern`; and
+  `inpExportOptions().times` now carries every `[TIMES]` value the scenario holds, not only the run
+  time and time step (`js/lpn-inp.js` reads all seven).
+- **The run's clock**: `timesForScenario()` lays the scenario's held `[TIMES]` values under the two
+  with their own home; `patternMultiplier()` reads the pattern step and start through
+  `scnPatternClock()` without building the block, because it runs per element per solve.
+- **Scenario compare** assembles each scenario under its own settings (it already switched the open
+  scenario per row). Its "The same in every scenario" list now asks friction method, accuracy and
+  trials of every scenario and states each only when all agree, since none is the same by
+  construction any more. A row that differs is left out; showing it per scenario is a new column
+  and waits for the settings table.
+- **The label-layout keep** is keyed on the open scenario's settings block where it holds one;
+  nothing is added to the key in a project that holds none.
+- **A scenario's own view**: switching INTO a scenario that holds a view goes there and remembers
+  where you were; switching out of it into one that holds none goes back. Between two scenarios
+  that hold none, nothing moves.
+
+**Deliberately left reading the project's own objects**, each with its reason:
+
+- **Every editor in the Settings box** (Symbology, Labels, Colour, Contours, Hydraulics, Quality,
+  Energy, reactions, the new-asset rows, the ID prefixes) and the transport's Recalculate toggle.
+  They read to show the value they then write, and they still write the project. Moving the read
+  without the write would show a scenario's value in a box whose edit lands somewhere else. Both
+  halves move together in the editing stage. **Until then, in a scenario that holds a setting,
+  the Settings box shows and edits the project's value while the map shows the scenario's.** Only a
+  hand-written file can make one today.
+- **The writes from a render path** (`fillBreaks()`, `fillFromMethod()`, `showContour()`) still
+  write the project, where an edit lands today.
+- **Opening and converting a file** (`applySaved()`, `migrateSaved()`, the `.inp` readers, the
+  Convert-as and unit-change rewrites, `syncRoughnessLabelDecimals()`): they act on the project's
+  own data.
+- **The places that want Base's demand multiplier by name** (`createScenario()`'s seed,
+  `overrideCount()`, the ready-made scenarios, the Alternatives table's Base row,
+  `docDemandMultiplier()`'s fallback): they mean the project's value, not the open scenario's.
+- **Tools that write Base only** (`applyIdPrefixToAll()`, the `.inp` import's id minting).
+
+**The evidence that nothing moved for a project with no setting override**
+(`dev/lpn-spike/scenario-settings-routing-harness.js`): every shipped example, plain and with
+colouring, contours and labels turned on, in Base, in a fresh scenario, and in a scenario holding
+element overrides, a demand multiplier and its own run time, is drawn, coloured, labelled, solved
+and exported by the real page and by the same page with the seam blinded, and the SVG of the map,
+the legends, the solver's model and answer and the `.inp` text are byte-identical (42 cases). The
+blinded run is checked to see a held setting NOT take effect, so the comparison is real. Measured
+once more by hand against the commit before any reader moved (3d4f2c27): the same 42 cases, 14 MB
+of output, identical. The same harness holds a Presentation value (text size, a head label), a
+Calculation value (accuracy, viscosity, friction method) and values that ride into the `.inp`
+(viscosity, global bulk rate, pattern step) changing their scenario and not Base.
+
+### Next stage: the editing half and the settings table
+
+Tom, 2026-10-06: *"Scenarios must be added to tables so we can audit these things. And by
+extension, there will have to be a settings Table."* Not built yet. What it must be:
+
+- **One row per setting path a scenario may hold** (every path whose `categoryOf(path, 'setting')`
+  is a category): the leaves of `settings`, `labelSettings`, `project.basemap`/`basemapLast`,
+  `times`, `defaultPattern` and `view`, by the rule `settingLeaves()` already walks with (a map
+  member by member; `settings.quality` and `view` whole). Map-valued settings expand to one row
+  per member the project or any scenario states (`colorBreaks['node.pressure']`,
+  `labelSettings.node.pressure`, `contourInterval['pressure|psi']`), so a scenario's single label
+  toggle is one row, not a copy of the label map.
+- **Columns: the setting's name in the visitor's language, its category, Base's value, then one
+  column per scenario under Show scenarios** (Task 766), blank where the scenario inherits, its own
+  value where it holds one, marked the way an element override is. The demand multiplier, the run
+  time and the time step are three more rows here, read from their own homes.
+- **A row maps to a path by the same array `settingFor()` takes**; an edit in a scenario's column is
+  `setScenarioSetting(scn, path, value)`, a clear is the same with `undefined`, and an edit in
+  Base's column writes the project. The demand multiplier and the two times keep their own writers.
+- **The Settings box writes through the same door**: in a scenario, an edit goes to
+  `setScenarioSetting()`, every editor reads `settingFor()`, and a scenario-held value is marked as
+  an element override is. That is the step that makes "a setting changed in Peak Hour changes Peak
+  Hour only" true from the keyboard.
+- **The view gets its one deliberate door** ("Hold this view in this scenario" / "Forget it"), and
+  nothing else ever writes one.
 
 ### Questions for Tom
 
@@ -371,7 +459,60 @@ routing the readers is what changes what a person sees, which waits on the quest
   normally they won't. Only a scenario named something like "Figure 6-1: Elm and Main contours"
   would do that."* So the view (window extent) is NOT excluded: it belongs in Presentation, and is
   written only when a scenario deliberately holds one. Revisit the exclusion list above.
-- Q1, Q3, Q5, Q6: not yet answered.
+- **Q3, new-asset settings by scenario:** yes. *"Leave the creativity to the users. Give them
+  freedom. And be perfectly consistent in the design."* Moved into Physical (and the default demand
+  into Demand); see the inventory.
+- **Q5, friction method:** may vary by scenario. *"I see it indefensible to require somebody to have
+  to save a project for something like friction method. The one thing we refuse to do in the same
+  project is let equations push physical dimensions around (units and coordinates conversion)."*
+  So the only exclusions on principle are units and the coordinate frame; every other exclusion was
+  revisited against "perfectly consistent" (the Excluded table above says why each remains).
+  Friction method is a Calculation option, and it reinterprets a pipe's roughness, never converts it.
+- **The categories:** *"You are asking for the alternatives categories. We use the Bentley
+  categories as much as we can (with things like SCADA left for the future), and we add
+  Presentation, if I am not mistaken."* See "Calculation: a set, not an alternative" below.
+- **Q1, does the Calculation column count the demand multiplier, run time and time step:** *"Rethink
+  this, make it consistent, and bring it again. I think I know what you are saying. But the answer
+  may be obvious once you look at what we are doing."* Brought again as question 7 below.
+- Q6 (the two headings): not yet answered.
+
+### Calculation: a set, not an alternative
+
+Bentley's Calculation Options are not an alternative category: a scenario names one set of
+calculation options beside its alternatives, and a set has no parent and holds every option, not
+only the ones that differ. **Ours is honestly the same thing under Basic mode, and a column is its
+truthful picture.** In Basic mode a scenario either uses Base's options entirely or holds its own
+values for some of them; "uses Base's set" and "uses its own set, which differs from Base's in
+these N options" are the same statement, and the column says it the second way, as every other
+category column does. Nothing about it is stored as an alternative: like everything else here, it
+is derived from `scenario.settings`.
+
+**Where the Bentley shape will matter is stage 4, the stored tree.** There a calculation-options
+set must be stored as a set a scenario names, not as an alternative with a parent, so that a
+WaterGEMS model's "Calculation Options: Peak" imports as one named set two scenarios can share,
+and exports back as one. The code keeps `calculation` in `LPN_ALT_CATEGORIES` today because the
+read-only table and the count read that list; when the tree is stored, it becomes the scenario's
+named set and stops pretending to have a parent. Recommendation: keep the column, headed
+"Calculation options" if you prefer Bentley's words, and model it as a set from stage 4 on.
+
+### Questions for Tom (second round)
+
+7. **The demand multiplier, run time and time step are calculation options, exactly like accuracy
+   and friction method.** The consistent answer, now that every calculation option may vary by
+   scenario, is that they are three of them and nothing more: counted in the Calculation column
+   like the rest, and shown as rows of the settings table like the rest. Their three columns in the
+   Alternatives table exist only because they were the first three options a scenario could hold,
+   and they were the only place to type them. Recommendation: count them in the Calculation column
+   now; when the settings table exists, retire the three columns, since the table is where every
+   option, these three included, is typed and audited. Their storage stays where it is (it is
+   invisible, and moving it buys nothing). Not changed yet.
+8. **An ID prefix by scenario sits in Physical**, beside the default diameter and roughness, because
+   it seeds a new element and has no category of its own (an element's name is identity, in no
+   category). Agree, or would you rather it stood in its own place?
+9. **A scenario's own view: switching out of it goes back to where you were looking before you
+   switched in.** The other reading is that the map stays put when you leave. Recommendation: go
+   back, so a "Figure 6-1" scenario is a place you visit, not a place you are left in.
+
 
 ## The long burn: from Basic mode to the full model (2026-10-06)
 
@@ -388,9 +529,10 @@ The road, each stage shippable alone, each hidden from Basic mode until the Adva
    alternatives table.
 2. **Built on this branch (2026-10-05):** every project setting has a category or a stated
    exclusion; `scenario.settings`; the read and write seams; the table counts settings.
-3. **Next: route every setting reader through `effectiveSetting()`** (about 100 sites, listed
-   above), so a setting override changes the map and the solve. A harness must hold "no override,
-   byte-identical behaviour" at every site moved.
+3. **Done (2026-10-06): every setting reader routed through `effectiveSetting()`**, so a setting
+   override changes the map and the solve; a scenario may hold its own view. Byte-identical
+   behaviour with no override is held by `scenario-settings-routing-harness.js`. **Next, 3b: the
+   editing half and the settings table** (see "Next stage" above).
 4. **Store the tree (choice B), additively:** `alternatives` and `scenario.alternatives` written only
    when the tree is not the derived one. Unlocks two scenarios sharing one alternative, alternatives
    of depth two or more, and named alternatives with no scenario.
@@ -407,10 +549,9 @@ Bentley import brings none, and an export carries none. Bentley's Calculation Op
 alternative but a set the scenario names; our Calculation category should stay mappable to that one
 set per scenario, so an import can place it without guessing.
 
-**A saved view lives in a Presentation alternative** (Task 765, Tom 2026-10-06), restored by one
-click. Whether switching scenario also moves the map is a separate question (interview, b2); the
-cheap reading that satisfies both is that the view is stored with the alternative and restored on
-request, never on a scenario switch.
+**A saved view lives in a Presentation alternative** (Task 765, Tom 2026-10-06). Built in stage 3:
+a scenario that holds a view is moved to on a switch, and only such a scenario; question 9 asks
+which way the map goes when you leave it.
 
 ## The code
 
@@ -422,7 +563,11 @@ equal instead.
 
 Settings in scenarios: same file, section "SETTINGS IN SCENARIOS": `LPN_SETTING_CATEGORY_OF`,
 `categoryOfSetting()` (also `categoryOf(path, 'setting')`), `settingFor(scn, path)`,
-`effectiveSetting(path)`, `setScenarioSetting()`, `sanitizeScenarioSettings()`.
+`effectiveSetting(path)`, `setScenarioSetting()`, `sanitizeScenarioSettings()`; the reader
+shorthands `scnSetting()`, `scnLabels()`, `scnProject()`, `scnDefaultPattern()`; the one switch
+a harness blinds, `scenarioSettingsBlock()`; the view, `outwardViewOf()`, `scenarioOwnView()`,
+`setScenarioView()`, `followScenarioView()`; the export, `inpExportDocument()`.
+Harness: `dev/lpn-spike/scenario-settings-routing-harness.js`.
 
 Basic mode and the table: same file, section "SCENARIOS > BASIC MODE" (`setScenarioBasicMode()`,
 `rebuildAlternativesTable()`); the box is `#lpn_alt_box` in `Looped-Network.php`. The box's

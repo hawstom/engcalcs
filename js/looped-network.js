@@ -58049,8 +58049,8 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **THESE TWO KEEP THIS HOME; EVERY OTHER CALCULATION SETTING MAY VARY TOO** (Tom, 2026-10-05:
 	// *"any Setting that is stored in the project should be subject to scenario overrides"*), in
-	// `scenario.settings` -- see "SETTINGS IN SCENARIOS". Friction method and units still never
-	// vary: each changes what a stored number means (dev/scenario-alternatives.md).
+	// `scenario.settings` -- see "SETTINGS IN SCENARIOS". Friction method included (Tom,
+	// 2026-10-06); only units and the coordinate frame never vary (dev/scenario-alternatives.md).
 	var LPN_SCENARIO_TIME_KEYS = ['duration', 'hydraulicStep'];
 	function scenarioTimeValue(s, key) {
 		var t = s && !s.isBase ? s.times : null, v = t ? t[key] : undefined;
@@ -62895,12 +62895,13 @@ var EngCalcs = EngCalcs || {};
 	// settings with no per-scenario value at all, so the statement is true by construction and is
 	// there so the reader of a printed comparison never has to wonder.
 	//
-	// **ACCURACY AND TRIALS ARE NO LONGER THE SAME BY CONSTRUCTION** (Tom, 2026-10-05: every stored
-	// setting may vary by scenario; only friction method and units never do). So each is asked of
-	// every scenario, and stated here only when every scenario answers the same; a row that differs
-	// is left out rather than stated falsely under this heading.
+	// **FRICTION METHOD, ACCURACY AND TRIALS ARE NO LONGER THE SAME BY CONSTRUCTION** (Tom,
+	// 2026-10-05 and 2026-10-06: every stored setting may vary by scenario; only units and the
+	// coordinate frame never do). So each is asked of every scenario, and stated here only when
+	// every scenario answers the same; a row that differs is left out rather than stated falsely
+	// under this heading.
 	function scnCmpSameRows(host) {
-		var pc = EngCalcs.pageConfig || {}, was = project.activeScenario, acc = [], tri = [];
+		var pc = EngCalcs.pageConfig || {}, was = project.activeScenario, acc = [], tri = [], fm = [];
 		function trialsNow() {
 			var t = (scnSetting('hydraulics') || {}).trials;
 			return (typeof t === 'number' && isFinite(t)) ? t : 40;
@@ -62909,6 +62910,7 @@ var EngCalcs = EngCalcs || {};
 			scenariosForDisplay().forEach(function (s) {
 				project.activeScenario = s.id;
 				acc.push(String(solveAccuracy()));
+				fm.push(frictionMethod());
 				tri.push(String(trialsNow()));
 			});
 		} finally {
@@ -62917,7 +62919,7 @@ var EngCalcs = EngCalcs || {};
 		function same(list) { return list.every(function (v) { return v === list[0]; }); }
 		ffEl('p', 'lpn-ff-summary', pc.lpn_scncmp_same || 'The same in every scenario', host);
 		[
-			[pc.bpn_method || 'Friction method', frictionMethodLabel()],
+			same(fm) ? [pc.bpn_method || 'Friction method', frictionMethodLabel()] : null,
 			[pc.lpn_view_units || 'Units', ['lpn_u_flow', 'lpn_u_pressure', 'lpn_u_velocity'].map(unitLabel).join(', ')],
 			same(acc) ? [pc.lpn_settings_accuracy || 'Accuracy', String(solveAccuracy())] : null,
 			same(tri) ? [pc.lpn_settings_trials || 'Maximum trials', String(trialsNow())] : null
