@@ -2125,8 +2125,6 @@ $ec_lang['lpn_notes_5_def']='ម៉ាស៊ីនបូមមួយធ្វើ
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='ក៏មាននៅលើទំព័រនេះដែរ';
-$ec_lang['lpn_notes_4_def']='គម្រោងមួយអាចដាក់នៅលើដីពិត ដោយមានផែនទីផ្លូវនៅពីក្រោយវា។ ឯកសារ EPANET .inp អាចត្រូវបានអាន និងសរសេរចេញ។ ផ្ទាំងខាងក្រោមគូរទម្រង់បណ្ដោយតាមផ្លូវមួយ ហើយរាយបញ្ជីថ្នាំង។ ធាតុអាចត្រូវបានលាបពណ៌តាមលទ្ធផលរបស់ពួកវា ហើយ រក រកមើលរាល់ធាតុដែលត្រូវនឹងលក្ខខណ្ឌដែលអ្នកបានកំណត់។';
 $ec_lang['lpn_notes_6_term']='ជំនួយជួរឈរតារាង';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

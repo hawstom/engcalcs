@@ -189,6 +189,17 @@ the block.
     burst actually costs before adding a second timer.
   - Read with `dev/label-placement-algorithms.md` section 12 and `?debug=perf`, which now prints
     `labelPass` inside `buildDom` and a label-measurement count.
+- 100|721| **The scenario and alternatives model: Bentley's tree, plus Presentation and Calculation.**
+  Tom, 2026-09-25: *"I like the layered scenario alternatives paradigm."* The destination is
+  Bentley's model (a scenario tree; each scenario picks one alternative per category; alternatives
+  inherit from parents), extended with a Presentation category (view, map appearance, symbology),
+  which Bentley does not have, and Calculation options. Tom, 2026-10-06: the two categories should
+  free users from Save As for what-iffing, under one rule: no equation-driven change to stored
+  dimensions (units, coordinate frame) without a Save As; friction method varies, roughness is the
+  user's to edit. **First item: the full alternatives and inheritance model under the hood** (stages
+  4 and 5), after advice from every angle (*"Order matters... we are likely to make mistakes"*).
+  Stages, answers and code: `dev/scenario-alternatives.md` on `feat/bentley-interop`. Basic mode
+  hides it until the Advanced UX is designed. Task 765 (Presentation) is folded in here.
 - 100|737| **Coined names for interface elements, so every language names each one once.**
   Tom, 2026-09-28: *"The key here is for every language to invent unique words for each interface
   element and to use them consistently... it might be handy to literally make up unique, but memorable
@@ -321,33 +332,27 @@ the block.
   - **Phase 1 tokens and the check are built on `feat/theme-token` (see the end of the plan).** Phase 1b remains: the button base below, and inline colours in `js/*.js`.
   - **MOD's phone-like buttons (R-202) belong inside phase 1**: one button base for menu items and
     toolbar buttons, one accent colour, previewed on a branch. Retire the menu hint (R-203) once it ships.
-- 75|749| **Read Bentley WaterCAD/WaterGEMS models.**
-  Basic mode and the Alternatives table merged 2026-10-03; `feat/bentley-interop` was recut from
-  master as the long-lived branch for the rest (Tom: *"a long-term branch for all the bentley-interop things"*).
-  Tom, 2026-09-30: *"We can see how far we get reading and writing the Bentley .sqlite file also."*
-  Phase 1 (`feat/bentley-interop`, `dev/bentley-interop.md`): the `.wtg.sqlite` schema is unpublished,
-  no public sample exists, the EULA's reverse-engineering clause is his to read; writing is a no-go.
-  **THE REAL DIFFICULTY IS THE MODEL, NOT THE FILE** (Tom, 2026-09-30): *"The difficulty is in
-  providing/forcing inheritance and alternatives on the user. ... it's a huge burden on the user unless
-  we succeed in hiding it from 'basic mode' users."* A faithful reader needs a scenario tree and an
-  alternatives layer we do not have; flattening one loses what makes it Bentley's (Task 721).
-  **Tom has no WaterCAD** (last used 1997; a friend might help), so the deciding test -- a small
-  model with a child scenario saved as `.sqlite` and as `.inp` -- waits on finding one.
-- 75|752| **A scenario workbook: the scenario list and its data as spreadsheet tabs.**
-  Tom, 2026-09-30, on Gemini's master-spreadsheet layout (a Scenarios tab naming each scenario's
+- 75|749| **Bentley interop: read and write the WaterCAD/WaterGEMS `.wtg.sqlite` file.**
+  Tom, 2026-10-06: *"As far as bentley-interop goes, the goal is to engage with the .sqlite file and
+  connect to Google Sheets for Sync in and Sync out"* (the Sheets half is Task 752). The model it
+  needs is Task 721. Phase 1 (`dev/bentley-interop.md`): the schema is unpublished, no public sample
+  exists, the EULA's reverse-engineering clause is his to read. **Tom has no WaterCAD** (a friend
+  might help), so the deciding test, a small model with a child scenario saved as `.sqlite` and as
+  `.inp`, waits on finding one. Presentation never travels through a Bentley file (Bentley keeps
+  display in the `.wtg`); the project file is its only home.
+- 75|752| **Google Sheets: sync the scenarios and their alternatives out and in.**
+  Tom, 2026-09-30, on a master-spreadsheet layout (a Scenarios tab naming each scenario's
   alternatives, then one tab per data kind keyed by element ID): *"Spreadsheet structure: I love
-  this."* and *"Sync in/out: Could we do this with GSheets?"* Export/import as a file first (no
-  account, no upload); a Google Sheets sync is a fifth third-party service, so a `privacy.php`
-  paragraph and his call. Mary, Sue and Declan's readings are under Task 721. The layout assumes
-  Bentley's model (a scenario tree, alternatives beneath); ours is flat, so the tabs need rethinking.
+  this."* and *"Sync in/out: Could we do this with GSheets?"*; 2026-10-06, it is half of the interop
+  goal. The tabs read the tree Task 721 builds. Export/import as a file first (no account, no
+  upload); a Sheets sync is a fifth third-party service, so a `privacy.php` paragraph and his call.
+  Mary, Sue and Declan advised against Sheets as the live store (2026-09-30); a sync is not that.
 - 75|766| **Show scenarios in the Tables pane: one row per asset per scenario.**
-  Tom, 2026-10-05: right-click "Show scenarios" adds Scenario, Parent, Alternative, Parent and
-  Scenario override columns; initial order ID, then Scenario, then Alternative; every user sort keeps
-  ties in their previous order (Google Sheets). First cut on `feat/scenario-table`.
-- 75|767| **A Presentation category: every project setting is scenario-overridable.**
-  Tom, 2026-10-05: *"any Setting that is stored in the project should be subject to scenario
-  overrides under some alternatives category, probably Presentation or Calculation"* (view, map
-  appearance, symbology). Long-lived on `feat/bentley-interop`; `dev/scenario-alternatives.md`.
+  Tom, 2026-10-05/06: right-click "Show scenarios" adds ONE column, Scenario (*"My mistake. Scenario
+  column only"*); an override cell's tip names its alternative ("Demand alt.: Max day"); ties keep
+  their previous order in every sort (Google Sheets). *"Scenarios must be added to tables so we can
+  audit these things. And by extension, there will have to be a settings Table."* Built on
+  `feat/scenario-table`; the settings table is next, after the setting readers (Task 721).
 - 75|756| **Cross-platform: the suite as a desktop application, beyond the web folder.**
   Tom, 2026-09-30: *"Put a cross platform project on our roadmap priority 75. Plan where/how to move
   the project to transcend the web-centric hawsedc.com/engcalcs folder. Windows or Linux? Plan what
@@ -881,27 +886,11 @@ the block.
 - 50|720| **Background layers from a GIS server.**
   Tom, 2026-09-25, on WaterCAD's background layers: *"This seems like a GIS REST server offering."*
   A fifth third-party service is a new paragraph in `privacy.php` (CLAUDE.md).
-- 50|721| **Scenarios as layered alternatives, with ready-made scenarios.**
-  Tom, 2026-09-25: *"I like the layered scenario alternatives paradigm. I am comfortable with it from
-  HEC-RAS, but it could be threatening to new users. What seems very welcoming is the set of
-  pre-configured scenarios and the ironclad rule that you are always editing only the specific data
-  layers (Alternatives) mapped to that Active Scenario."* Read against our scenario model first.
-  **Sheets as the scenario store, asked 2026-09-30; Mary, Sue and Declan all advise against.** No tool
-  they found keeps scenarios in a live spreadsheet; a sync breaks "nothing you draw is uploaded";
-  topology does not fit rows. Cheaper: CSV/xlsx import-export of override tables, and an "Apply
-  scenario X to this one" command. Scenario lists sort by name since `fix/scenario-sort`.
-  **Ours is flat; Bentley's is a tree with alternatives beneath** (Tom, 2026-09-30): every scenario,
-  not just Base, can have children, and each scenario picks one alternative per category.
-  Adopting that model is the price of Bentley interop (Task 749), and a burden unless a basic mode
-  hides it.
 - 50|722| **Change and revision tracking.**
   Tom, 2026-09-25, from WaterCAD: *"I like change/revision tracking very cool."*
 - 50|725| **One wide fire-flow table instead of two reports.**
   Sue's wishlist §6: available flow and design flow side by side, InfoWater's "Design Fireflow
   Report" shape. Presentation only; one run already computes both.
-- 50|726| **Prefetch the EPANET engine when idle.**
-  Mary's wishlist §7: prefetch unless the connection says slow or metered. For the low-bandwidth
-  audience. The percent-done half shipped as Task 608. Changes what is stored on a device: Tom's call.
 - 50|728| **Import a GIS shapefile or geodatabase as a network.**
   Mary's wishlist §0b2: most WaterCAD models are built from a GIS asset layer, so this is a
   migration on-ramp that needs no WaterCAD file. Unsized; read with Task 723.
@@ -913,14 +902,10 @@ the block.
 - 50|734| **Where space is open east or west, one label on one line.** Tom, 2026-09-26 (R-319):
   *"where there is infinite space east or west, we might want to recognize that infinity and
   leverage it by using single-line concatenation of properties."* After Task 539's current round.
-- 50|735| **Honour `[TIMES] Statistic` instead of discarding it.** Mary, 2026-09-27: AVERAGED,
-  MINIMUM, MAXIMUM and RANGE are read and dropped (`js/lpn-inp.js:726`, `js/lpn-patterns.js:136`); a
-  file that sets one reports differently in EPANET. Her journal 2026-09-27; not a site-honesty defect.
 - 50|736| **[H] Count installs and app launches, if the consent text allows it.** Tom, 2026-09-28:
   *"Do we have a way of knowing whether people are installing?"* No: `appinstalled` only hides the
   button (`js/Calculators.lib.js:195`). One install event plus an app/tab field on view rows would
   answer it; it is a new logged fact about visitors, so it goes past `consent_body` and him first.
-- 50|765| **Saved views: one click restores a figure for a report.** Tom, 2026-10-05: *"I am less interested in this Report Builder than I am in making it easy to reproduce screenshots."* Window, appearance, scenario and time by reference, and which Text layers show (needs Task 639); then Copy image at 2x-3x. Never text stored in a scenario. `dev/saved-views.md`.
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary

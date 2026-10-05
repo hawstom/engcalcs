@@ -727,8 +727,17 @@
 					field = twoWord ? EngCalcs.lpnTimesKeys[tk2] : EngCalcs.lpnTimesKeys[tk1],
 					vals = twoWord ? r.slice(2) : r.slice(1),
 					secs;
-				// Quality Timestep, Report Start's siblings and Statistic all land here and are
-				// skipped: nothing on this page reads them (see lpnTimesDefaults).
+				// Statistic is a word, not a time: carried as `times.statistic`, with the file's own
+				// spelling beside it, and written back by the exporter (Task 735). A word that is
+				// none of the five is kept verbatim in `text` and written back as it came.
+				if (tk1 === 'STATISTIC') {
+					if (r[1]) {
+						var sv = EngCalcs.lpnParseStatistic(r[1]);
+						if (sv) { times.statistic = sv; }
+						times.text.statistic = r[1];
+					}
+					continue;
+				}
 				if (!field) { continue; }
 				secs = EngCalcs.lpnParseTime(vals);
 				if (secs === null) { continue; }
@@ -2972,6 +2981,10 @@
 				if (timeKeysOnly && !timeKeysOnly[pair[1]]) { return; }
 				timeRows.push(row([pair[0], EngCalcs.lpnTimeText(expTimes, pair[1], expTimes[pair[1]])]));
 			});
+			// Statistic goes out only when the project states one (Task 735): the file's own word
+			// while it still means the stored value.
+			var statText = !timeKeysOnly && EngCalcs.lpnStatisticText ? EngCalcs.lpnStatisticText(expTimes) : null;
+			if (statText) { timeRows.push(row(['Statistic', statText])); }
 		}
 
 		// ---- assembly ----

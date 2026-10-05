@@ -2121,8 +2121,6 @@ $ec_lang['lpn_notes_5_def']='Помпата следва H = H₀ − aQ^b, къ
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='Също на тази страница';
-$ec_lang['lpn_notes_4_def']='Проект може да седи върху истински терен с улична карта зад него. EPANET .inp файлове могат да се прочитат и записват. Долният панел чертае профил по маршрут и изброява възлите. Елементите могат да се оцветяват по резултатите си, а Търсене открива всеки елемент, отговарящ на зададено от вас условие.';
 $ec_lang['lpn_notes_6_term']='Помощ за колоните на таблицата';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

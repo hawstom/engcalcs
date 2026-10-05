@@ -2078,8 +2078,6 @@ $ec_lang['lpn_notes_5_def']='Pampu hufuata H = H₀ − aQ^b, ambapo H ni kimo a
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='Pia kwenye ukurasa huu';
-$ec_lang['lpn_notes_4_def']='Mradi unaweza kukaa juu ya ardhi halisi ukiwa na ramani ya barabara nyuma yake. Faili za EPANET .inp zinaweza kusomwa na kuandikwa. Kidirisha cha chini huchora wasifu kwa njia na kuorodhesha miunganiko. Vipengele vinaweza kupakwa rangi kulingana na matokeo yao, na Tafuta huchagua kila kipengele kinachokidhi sharti uliloweka.';
 $ec_lang['lpn_notes_6_term']='Msaada wa safu za jedwali';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

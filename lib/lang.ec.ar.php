@@ -2150,8 +2150,6 @@ $ec_lang['lpn_notes_5_def']='تتبع المضخة العلاقة H = H₀ − a
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='أيضاً في هذه الصفحة';
-$ec_lang['lpn_notes_4_def']='يمكن أن يقوم المشروع على أرض حقيقية بخريطة شوارع خلفه. يمكن قراءة ملفات EPANET .inp وكتابتها. تُرسم اللوحة السفلية مقطعاً طولياً على طول مسار وتسرد الملتقيات. يمكن تلوين العناصر حسب نتائجها، ويحدد البحث كل عنصر يطابق شرطاً تضبطه.';
 $ec_lang['lpn_notes_6_term']='مساعدة أعمدة الجدول';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

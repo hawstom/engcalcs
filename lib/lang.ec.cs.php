@@ -2079,8 +2079,6 @@ $ec_lang['lpn_notes_5_def']='Čerpadlo se řídí vztahem H = H₀ − aQ^b, kde
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='Také na této stránce';
-$ec_lang['lpn_notes_4_def']='Projekt může ležet na skutečném terénu s mapou ulic v pozadí. Soubory EPANET .inp lze načítat i zapisovat. Spodní panel kreslí profil podél trasy a vypisuje uzly. Prvky lze obarvit podle výsledků a Najít vybere každý prvek, který splňuje vámi zadanou podmínku.';
 $ec_lang['lpn_notes_6_term']='Nápověda ke sloupcům tabulky';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

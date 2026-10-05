@@ -63,6 +63,12 @@ async function main() {
 				const s = await Session.open(browser, 'A', { viewport: { width: vp.width, height: vp.height } });
 				await s.goto('Looped-Network.php');
 				await s.settle(1200);
+				// The player is not drawn for a steady-state project, so open one with an extended period.
+				await s.page.evaluate(() => {
+					const cards = [...document.querySelectorAll('#lpn_examples_pane .lpn-example-card')];
+					(cards.find((c) => /Net1/.test(c.textContent || '')) || cards[0]).click();
+				});
+				await s.settle(2500);
 				const tag = vp.name + (fontPx ? ' at a larger font' : '') + ': ';
 				const short = await measure(s.page, ['0:00', '3:00', '9:59'], fontPx);
 				const longer = await measure(s.page, ['0:00', '9:59', '10:00'], fontPx);

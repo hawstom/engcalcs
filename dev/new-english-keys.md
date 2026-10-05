@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**12 still to read on master**, of 119 untranslated keys, of 2347 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**17 still to read on master**, of 127 untranslated keys, of 2353 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (2 to read @@ NEEDS RULING)
+## Questions from the translators  (1 to read @@ NEEDS RULING)
 
 **These are SHIPPED strings, already translated into 26 languages.** A wave-0
 reading or a translator found each one readable two ways, and no sprint launches while one is
@@ -31,7 +31,7 @@ is the one you meant. "The first one" is a complete answer.
 ### from sprint 1003-ds
 
 - **`lpn_ds_found_below`**
-  > ⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.
+  > ⚠ At least one junction is below {pressure} with no demand scaling. The largest demand scale that keeps every junction at {pressure} or above is {m}.
   *The finding:* Tom: 'I think I need explanation, and this need clarification.' It appears after Find when the demands as entered (a demand scale of 1) leave at least one junction below the limit; {m} is the largest scale, always under 1, at which every judged junction keeps the limit (0.62 means demands cut to 62 percent). 'it' in 'keeps it' is vague, 'demands as they are' never says scale 1, and {m} reads as headroom when it is a cut.
   1. the system can take up to {m} times today's demand (wrong)
   2. demands must be cut to {m} times what is entered for every junction to keep the pressure (right)
@@ -39,18 +39,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
   @@ NEEDS RULING
 
-### from sprint 1003b-wave0
-
-- **`lpn_notes_4_def`**
-  > A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.
-  *The finding:* 'lists the junctions' says neither where nor what; 'route' where the Graphs tip says 'path'; 'sit on real ground' is idiom; the bottom panel is called a pane elsewhere (Looped-Network.php:1855 renders it as one About-box paragraph)
-  1. the bottom panel lists every junction with its results
-  2. the bottom panel lists only the junctions along the profile route
-  **What this asks for:** which of the readings above you meant.
-  *The proposal:* PROPOSED: 'A project can be placed on real ground with a street map behind it. EPANET .inp files can be read and written. The bottom pane plots a profile along a path and tabulates the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.'
-  _Ruled 2026-10-05: For the record, I find this "Notes" box, and this section in particular, to be embarrassing. What's it's purpose? Maybe I need to edit lang.ec.en.php. Is there a compelling reason why we can't remove this section or the entire box? If it matters, every section should be an important advisory, not fluff like this._
-
-## Synonym entries to approve  (4, 2 to read @@ NEEDS RULING)
+## Synonym entries to approve  (3, 1 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
@@ -84,17 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-- **`mtc_note_1`**
-  > <dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.</dd><dt>Basic calculator (no iteration)</dt><dd>Enter your desired roughness value. Ignore the design rock size input area.</dd></dl>
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* <dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The r...
-  *Current synonym:* | avoid: compressing "Blodgett–Bathurst" to an initialism like "BB" — recurred independently across 8+ languages (it/ru/bg/es/uk/sr/hr/cs/tr/ps/my, corrected 2026-07-08) since nothing else in this string defines what the initials stand for; spell the full name out in every language, matching mtc_blodgett_v_bathurst
-  *Proposed synonym:* | avoid: compressing "Blodgett–Bathurst" to an initialism like "BB" — recurred independently across 8+ languages (it/ru/bg/es/uk/sr/hr/cs/tr/ps/my, corrected 2026-07-08) since nothing else in this string defines what the initials stand for; spell the full name out in every language, matching mtc_blodgett_v_bathurst
-  *Why this proposal:* No change proposed: the note is about the initialism, not the reworded step 2, and still holds.
-  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
-  @@ NEEDS RULING
-
-## lpn_  (119, 12 to read @@ NEEDS RULING)
+## lpn_  (127, 17 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -187,8 +166,8 @@ never edits a synonym.
   > ✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.
   _Ruled 2026-10-05: Proposal approved._
 - **`lpn_ds_found_below`**
-  > ⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.
-  _Ruled 2026-10-03: I think I need explanation, and this need clarification._
+  > ⚠ At least one junction is below {pressure} with no demand scaling. The largest demand scale that keeps every junction at {pressure} or above is {m}.
+  _Ruled 2026-10-06: His own wording: "Use this."_
 - **`lpn_ds_head_lowest`**
   > Lowest pressures
   _Ruled OK 2026-10-03._
@@ -293,6 +272,12 @@ never edits a synonym.
   _Ruled OK 2026-10-05._
 - **`lpn_engine_unavailable_why`**
   > Valves that open and close on their own cannot be solved without the EPANET solver. {reason}
+  @@ NEEDS RULING
+- **`lpn_find_scope_source`**
+  > Source
+  @@ NEEDS RULING
+- **`lpn_find_source_no_chemical`**
+  > No chemical is being tracked, so no node has a source.
   @@ NEEDS RULING
 - **`lpn_inp_drop_pressure_unit`**
   > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
@@ -447,65 +432,6 @@ never edits a synonym.
 - **`lpn_time_scn_overrides`**
   > Scenario overrides:
   _Ruled OK 2026-10-05._
-- **`lpn_tool_add_chain`**
-  > Junction Pipe Chain
-  _Ruled OK 2026-10-05._
-- **`lpn_tool_add_chain_tip`**
-  > Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
-  _Ruled OK 2026-10-05._
-
----
-
-# Strings waiting on a branch
-
-**5 still to read**, of 11 new keys across 12 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### feat/bentley-interop (`88c43361`) — adds no English strings
-
-### feat/desktop (`baba0f04`) — adds no English strings
-
-### feat/engine-prefetch (`3194c30d`) — adds no English strings
-
-### feat/find-source (`e999a378`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_find_scope_source`**
-  > Source
-  @@ NEEDS RULING
-- **`lpn_find_source_no_chemical`**
-  > No chemical is being tracked, so no node has a source.
-  @@ NEEDS RULING
-
-### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
-
-- **`lpn_confirm_labels_restore`**
-  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  _Ruled OK 2026-09-23._
-- **`lpn_labels_restore`**
-  > Restore label defaults
-  _Ruled OK 2026-09-23._
-- **`lpn_labels_restore_tip`**
-  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  _Ruled OK 2026-09-23._
-
-### feat/label-placer-a (`3483bfd6`) — adds no English strings
-
-### feat/label-placer-b (`c5905432`) — adds no English strings
-
-### feat/label-placer-c (`9a790a3e`) — adds no English strings
-
-### feat/label-placer-d (`129b63c4`) — adds no English strings
-
-### feat/times-statistic (`70959325`) — 6 new, 3 to read @@ NEEDS RULING
-
 - **`lpn_time_stat_averaged`**
   > Avg
   @@ NEEDS RULING
@@ -524,7 +450,103 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_time_statistic`**
   > Statistic
   _Ruled OK 2026-10-05._
+- **`lpn_tool_add_chain`**
+  > Junction Pipe Chain
+  _Ruled OK 2026-10-05._
+- **`lpn_tool_add_chain_tip`**
+  > Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
+  _Ruled OK 2026-10-05._
 
-### feat/tip-door (`e2fd6cc4`) — adds no English strings
+---
 
-### feat/transport-ends (`50fcf6f2`) — adds no English strings
+# Strings waiting on a branch
+
+**14 still to read**, of 17 new keys across 12 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/backdrop-attach (`0a663e24`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_inp_backdrop_attach`**
+  > Attach {file}…
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attach_tip`**
+  > A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attached`**
+  > Attached {file}, placed where the file says it belongs.
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attached_other`**
+  > Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.
+  @@ NEEDS RULING
+
+### feat/bentley-interop (`4d89f62e`) — adds no English strings
+
+### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
+
+- **`lpn_confirm_labels_restore`**
+  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  _Ruled OK 2026-09-23._
+- **`lpn_labels_restore`**
+  > Restore label defaults
+  _Ruled OK 2026-09-23._
+- **`lpn_labels_restore_tip`**
+  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  _Ruled OK 2026-09-23._
+
+### feat/label-placer (`3f3c5792`) — adds no English strings
+
+### feat/label-placer-a (`3483bfd6`) — adds no English strings
+
+### feat/label-placer-b (`c5905432`) — adds no English strings
+
+### feat/label-placer-c (`9a790a3e`) — adds no English strings
+
+### feat/label-placer-d (`129b63c4`) — adds no English strings
+
+### feat/scenario-table (`1eaee4e1`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_pane_clear_override`**
+  > Clear override
+  @@ NEEDS RULING
+- **`lpn_pane_scn_alt_tip`**
+  > {category} alt.: {alternative}
+  @@ NEEDS RULING
+- **`lpn_pane_scn_show`**
+  > Show scenarios
+  @@ NEEDS RULING
+
+### feat/screenshot (`1f590b13`) — 7 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_screenshot_copied`**
+  > Screenshot copied.
+  @@ NEEDS RULING
+- **`lpn_screenshot_failed`**
+  > The screenshot could not be made.
+  @@ NEEDS RULING
+- **`lpn_screenshot_hint`**
+  > Drag a rectangle over the map, or click for the whole map. Esc cancels.
+  @@ NEEDS RULING
+- **`lpn_screenshot_menu`**
+  > Screenshot
+  @@ NEEDS RULING
+- **`lpn_screenshot_no_basemap`**
+  > The street map or satellite image could not be included.
+  @@ NEEDS RULING
+- **`lpn_screenshot_saved`**
+  > The clipboard is not available here, so the screenshot was downloaded as a PNG file.
+  @@ NEEDS RULING
+- **`lpn_screenshot_tip`**
+  > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
+  @@ NEEDS RULING
+
+### feat/tip-door (`2002354c`) — adds no English strings
