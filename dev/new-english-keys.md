@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**15 still to read on master**, of 125 untranslated keys, of 2351 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**22 still to read on master**, of 132 untranslated keys, of 2358 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (125, 15 to read @@ NEEDS RULING)
+## lpn_  (132, 22 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -450,12 +450,33 @@ never edits a synonym.
 - **`lpn_tool_add_chain_tip`**
   > Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
   _Ruled OK 2026-10-05._
+- **`lpn_valwarn_diameter`**
+  > A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.
+  @@ NEEDS RULING
+- **`lpn_valwarn_dw`**
+  > A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.
+  @@ NEEDS RULING
+- **`lpn_valwarn_hw`**
+  > A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
+  @@ NEEDS RULING
+- **`lpn_valwarn_manning`**
+  > A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
+  @@ NEEDS RULING
+- **`lpn_valwarn_negative`**
+  > EPANET refuses a negative number here.
+  @@ NEEDS RULING
+- **`lpn_valwarn_positive`**
+  > EPANET refuses zero or a negative number here.
+  @@ NEEDS RULING
+- **`lpn_valwarn_tank_levels`**
+  > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**5 still to read**, of 8 new keys across 10 unmerged branch(es).
+**36 still to read**, of 39 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -466,7 +487,54 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`beedec3f`) — 2 new, 2 to read @@ NEEDS RULING
+### chore/adviser-notes (`85a5ab98`) — adds no English strings
+
+### feat/asset-type (`1bb93e5c`) — 8 new, 8 to read @@ NEEDS RULING
+
+- **`lpn_change_type_line`**
+  > {id}: {property} {value}
+  @@ NEEDS RULING
+- **`lpn_change_type_line_scenario`**
+  > {id}, in scenario {scenario}: {property} {value}
+  @@ NEEDS RULING
+- **`lpn_change_type_lost`**
+  > These values will be lost:
+  @@ NEEDS RULING
+- **`lpn_change_type_meaning`**
+  > These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.
+  @@ NEEDS RULING
+- **`lpn_change_type_menu`**
+  > Change type
+  @@ NEEDS RULING
+- **`lpn_change_type_more`**
+  > And {n} more.
+  @@ NEEDS RULING
+- **`lpn_change_type_ok`**
+  > Change
+  @@ NEEDS RULING
+- **`lpn_change_type_tip`**
+  > Change the selected nodes into junctions, reservoirs, or tanks. Each keeps its ID, its place, its pipes, and every value the new type also has. If anything would be lost, you are asked first.
+  @@ NEEDS RULING
+
+### feat/backdrop-attach (`50ebd9a7`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_inp_backdrop_attach`**
+  > Attach {file}…
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attach_tip`**
+  > A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attached`**
+  > Attached {file}, placed where the file says it belongs.
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attached_other`**
+  > Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.
+  @@ NEEDS RULING
+- **`lpn_status_inp_exported_picture`**
+  > Exported {file}, the background picture {picture} and its world file {world}. Keep the three in one folder.
+  @@ NEEDS RULING
+
+### feat/bentley-interop (`0eb355c8`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -474,8 +542,38 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_alt_cat_presentation`**
   > Presentation
   @@ NEEDS RULING
+- **`lpn_scenario_delete_has_children`**
+  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
+  @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/feedback (`dd5b2b0f`) — 8 new, 8 to read @@ NEEDS RULING
+
+- **`contactCategory`**
+  > What is this about?
+  @@ NEEDS RULING
+- **`contactCategoryIdea`**
+  > An idea
+  @@ NEEDS RULING
+- **`contactCategoryOther`**
+  > Other
+  @@ NEEDS RULING
+- **`contactCategoryWording`**
+  > Wrong wording or translation
+  @@ NEEDS RULING
+- **`contactCategoryWrong`**
+  > Something is wrong
+  @@ NEEDS RULING
+- **`contactContextNote`**
+  > This message will also say which page you came from, your language, and the error code if there was one. It never includes anything from your drawing.
+  @@ NEEDS RULING
+- **`contactYourEmailOptional`**
+  > Email (only if you want a reply)
+  @@ NEEDS RULING
+- **`lpn_tell_more`**
+  > Tell us more
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -489,7 +587,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/label-placer (`3f3c5792`) — adds no English strings
+### feat/label-placer (`e1ea6e54`) — adds no English strings
 
 ### feat/label-placer-a (`3483bfd6`) — adds no English strings
 
@@ -499,7 +597,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/scenario-table (`8bdc2945`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/scenario-table (`8113d32d`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_pane_clear_override`**
   > Clear override
@@ -511,4 +609,38 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show scenarios
   @@ NEEDS RULING
 
-### feat/tip-door (`80e7e1a5`) — adds no English strings
+### feat/screenshot (`aec41fe1`) — 9 new, 9 to read @@ NEEDS RULING
+
+- **`lpn_screenshot_copied`**
+  > Screenshot copied.
+  @@ NEEDS RULING
+- **`lpn_screenshot_failed`**
+  > The screenshot could not be made.
+  @@ NEEDS RULING
+- **`lpn_screenshot_hint`**
+  > Drag a rectangle over the map, or click for the whole map. Esc cancels.
+  @@ NEEDS RULING
+- **`lpn_screenshot_menu`**
+  > Screenshot
+  @@ NEEDS RULING
+- **`lpn_screenshot_no_basemap`**
+  > The street map or satellite image could not be included.
+  @@ NEEDS RULING
+- **`lpn_screenshot_saved`**
+  > The clipboard is not available here, so the screenshot was downloaded as a PNG file.
+  @@ NEEDS RULING
+- **`lpn_screenshot_scale`**
+  > Magnification
+  @@ NEEDS RULING
+- **`lpn_screenshot_scale_tip`**
+  > The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.
+  @@ NEEDS RULING
+- **`lpn_screenshot_tip`**
+  > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
+  @@ NEEDS RULING
+
+### feat/tip-door (`9a9cd3a1`) — adds no English strings
+
+### feat/value-warning (`36cdb584`) — adds no English strings
+
+### fix/phone-bolt (`1ab79ee4`) — adds no English strings

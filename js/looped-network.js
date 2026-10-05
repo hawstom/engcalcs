@@ -44824,7 +44824,7 @@ var EngCalcs = EngCalcs || {};
 	 * The whole glyph is the tip target, through the page's own `.ec-help` machinery. Returns the
 	 * mark, or null.
 	 */
-	function valueWarnPaint(host, text) {
+	function valueWarnPaint(host, text, inset) {
 		var mark = null, i, kids;
 		if (!host) { return null; }
 		kids = host.children || [];
@@ -44834,22 +44834,22 @@ var EngCalcs = EngCalcs || {};
 		if (!text) {
 			if (mark) {
 				host.removeChild(mark);
-				host.className = String(host.className || '').replace(/(^|\s)lpn-valwarn-host(?=\s|$)/g, '').trim();
 				sweepOrphanTips();
 			}
 			return null;
 		}
 		if (!mark) {
 			mark = document.createElement('span');
-			mark.className = 'lpn-valwarn ec-help';
+			// `inset`: a Tables cell, where the glyph takes no width (see the CSS), so the first one
+			// to appear neither widens its column nor shifts the table. No class goes on the cell.
+			mark.className = 'lpn-valwarn ec-help' + (inset ? ' lpn-valwarn-inset' : '');
 			mark.textContent = '⚠';
 			mark.title = text;
 			mark.setAttribute('aria-label', text);
 			host.appendChild(mark);
-			if (!/(^|\s)lpn-valwarn-host(\s|$)/.test(host.className || '')) {
-				host.className = (host.className ? host.className + ' ' : '') + 'lpn-valwarn-host';
-			}
-			if (host.isConnected && EngCalcs.initTips && typeof bootstrap !== 'undefined') { EngCalcs.initTips(host); }
+			// A cell built fresh is wired by renderPaneTable()'s own sweep; one gaining a mark on a
+			// refill is already in the page and is wired here, through the same seam.
+			if (host.isConnected && typeof bootstrap !== 'undefined') { initTipsIn(host); }
 		} else {
 			if (EngCalcs.setTipText) { EngCalcs.setTipText(mark, text); } else { mark.title = text; }
 			mark.setAttribute('aria-label', text);
@@ -44860,7 +44860,7 @@ var EngCalcs = EngCalcs || {};
 	function paneValueWarn(spec, td, c, el) {
 		var field = c.prop || c.key;
 		if (!td || c.result || !LPN_VALUE_RULES[field] || (spec.group !== 'node' && spec.group !== 'link')) { return; }
-		valueWarnPaint(td, valueWarnText(field, el, c.get(el)));
+		valueWarnPaint(td, valueWarnText(field, el, c.get(el)), true);
 	}
 	// **HOW MANY DECIMAL PLACES A ROUGHNESS LABEL NEEDS, WHICH THE METHOD AND THE UNIT DECIDE**
 	// (Task 491). A Hazen-Williams C is a dimensionless integer and 0 places is right for it -- but
