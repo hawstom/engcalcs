@@ -18258,7 +18258,15 @@ var EngCalcs = EngCalcs || {};
 			// `type` matches the Customers table's own spec so paneTableForScope() can find it: a
 			// customer object carries no `type` field of its own, and findCandidates() ignores this
 			// one for that reason -- it is here to name the TAB, not to filter the collection.
-			{ key: 'customer', label: pc.lpn_tool_add_meter || 'Customer', group: 'customer', type: 'customer', en: 'Customer' }
+			{ key: 'customer', label: pc.lpn_tool_add_meter || 'Customer', group: 'customer', type: 'customer', en: 'Customer' },
+			// **A SOURCE IS A SCOPE, NOT A KIND OF NODE** (Tom, 2026-10-05: in EPANET a junction
+			// becomes a Source when a Source Quality is entered, and a Source has properties other
+			// junctions do not). It is the nodes of any type that nodeSource() says dose a chemical,
+			// the same question the solver and the [SOURCES] export ask, so it has no `type` and
+			// holds the very node objects the Junction, Reservoir and Tank scopes hold. It is a
+			// Find scope only: no Insert tool, toolbar, Settings or Tables entry names it.
+			// `source: true` is what findCandidates() tests.
+			{ key: 'source', label: pc.lpn_find_scope_source || 'Source', group: 'node', source: true, en: 'Source' }
 		];
 	}
 	function findScopeDef(key) {
@@ -18281,6 +18289,12 @@ var EngCalcs = EngCalcs || {};
 			// question about the drawing with half the drawing left out -- which is the standing
 			// honesty rule of this panel read from the other side.
 			take('customer', doc.customers);
+			return out;
+		}
+		if (d.source) {
+			(doc.nodes || []).forEach(function (n) {
+				if (nodeSource(n) !== undefined) { out.push({ group: 'node', el: n }); }
+			});
 			return out;
 		}
 		if (d.group === 'node') { take('node', doc.nodes, d.type); return out; }
@@ -18454,6 +18468,12 @@ var EngCalcs = EngCalcs || {};
 			// feeds is `quality`, in RESULT_NODE, which is the same split the popup and the
 			// Tables pane both make.
 			['initQuality', 'lpn_quality_initial', 'Initial quality'],
+			// **THE SOURCE'S OWN THREE, OFFERED UNDER THE SOURCE SCOPE ONLY**: under Junction they
+			// would match the few junctions that happen to carry a dose and read as a property of
+			// every junction. The labels are the popup's own whole labels.
+			['sourceType', 'lpn_source_type', 'Source type'],
+			['sourceQuality', 'lpn_source_quality', 'Source quality'],
+			['sourcePattern', 'lpn_source_pattern', 'Source pattern'],
 			// **THE SIX TANK-ONLY INPUTS THAT HAD NO FIND OR REPLACE ROW AT ALL** (Task 708, gap
 			// #4). A tank is the one node type with several scalar inputs of its own; gated to
 			// `d.type === 'tank'` below exactly as the fire flow pair is gated to a junction.
@@ -18518,6 +18538,8 @@ var EngCalcs = EngCalcs || {};
 					// Every node kind carries one: a junction and a tank start with it, and a
 					// reservoir keeps supplying it for the whole run.
 					if (d.group !== 'node' || qualityMode() !== 'chemical') { return; }
+				} else if (key === 'sourceType' || key === 'sourceQuality' || key === 'sourcePattern') {
+					if (!d.source) { return; }
 				} else if (key === 'bulkCoeff' || key === 'wallCoeff') {
 					if (d.group !== 'link' || (d.type && d.type !== 'pipe') || !reactionFieldsShown()) { return; }
 				} else if (key === 'emitter') {
@@ -18777,7 +18799,8 @@ var EngCalcs = EngCalcs || {};
 		return prop === 'id' || prop === 'text' || prop === 'demandCategory' ||
 			prop === 'tag' || prop === 'desc' ||
 			prop === 'link' || prop === 'atNode' ||
-			prop === 'status' || prop === 'mixingModel' || prop === 'energyPattern';
+			prop === 'status' || prop === 'mixingModel' || prop === 'energyPattern' ||
+			prop === 'sourceType' || prop === 'sourcePattern';
 	}
 	/**
 	 * **A CHOICE PROPERTY'S CODES AND THEIR TRANSLATED WORDS, IN EXACTLY ONE PLACE** (pre-review
@@ -18806,6 +18829,9 @@ var EngCalcs = EngCalcs || {};
 				['closed', pc.lpn_result_status_closed || 'Closed']];
 		}
 		if (prop === 'mixingModel') { return paneColMixingModel().choices(); }
+		// The four dose types, from the one list the popup and the table draw (called with no node,
+		// which is the form that omits the disabled "None" row: a search is for a type that exists).
+		if (prop === 'sourceType') { return paneColSourceType().choices(); }
 		return null;
 	}
 	function findPropIsChoice(prop) { return findChoiceDefs(prop) !== null; }
@@ -19108,6 +19134,15 @@ var EngCalcs = EngCalcs || {};
 		if (prop === 'allZoom') { return cand.el.allZoom === true ? 1 : 0; }
 		if (prop === 'connection') {
 			return cand.group === 'node' ? findConnStateOf(cand.el.id) : undefined;
+		}
+		// **THE DOSE, READ THROUGH nodeSource()** -- the question the solver and the [SOURCES]
+		// export ask, so a node is a Source here exactly when it is one there, and a scenario's own
+		// dose is what a search inside that scenario finds. Undefined where the node has none.
+		if (prop === 'sourceType' || prop === 'sourceQuality' || prop === 'sourcePattern') {
+			var srcNs = cand.group === 'node' ? nodeSource(cand.el) : undefined;
+			if (!srcNs) { return undefined; }
+			return prop === 'sourceType' ? srcNs.type : prop === 'sourceQuality' ? srcNs.quality
+				: (srcNs.pattern || undefined);
 		}
 		if (cand.group === 'label') { return undefined; }
 		// Read as typed, through effective(), like every other input here -- and undefined where the

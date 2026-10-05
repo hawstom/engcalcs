@@ -2101,6 +2101,7 @@ EngCalcs.pageConfig = {
 	lpn_find_menu: <?=json_encode($ec_lang['lpn_find_menu'])?>,
 	lpn_find_scope: <?=json_encode($ec_lang['lpn_find_scope'])?>,
 	lpn_find_scope_all: <?=json_encode($ec_lang['lpn_find_scope_all'])?>,
+	lpn_find_scope_source: <?=json_encode($ec_lang['lpn_find_scope_source'])?>,
 	lpn_find_property: <?=json_encode($ec_lang['lpn_find_property'])?>,
 	lpn_find_condition: <?=json_encode($ec_lang['lpn_find_condition'])?>,
 	lpn_find_value: <?=json_encode($ec_lang['lpn_find_value'])?>,
