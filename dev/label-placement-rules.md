@@ -40,9 +40,10 @@ A layout that breaks one of these is wrong, however good its other numbers.
 **Costs, worst first:** leader on leader is very high cost; label on leader is high cost; label on
 pipe is medium-low cost; leader on pipe is very low cost. A label on a customer is free.
 
-- **R1. When space runs out, give up in this order:** (1) nearness to home if there is convenient
-  available space; (2) wholeness; (3) properties that won't fit, by drop order; (4) the label
-  itself.
+- **R1. Hide a label only because there is no room for it on screen. Never hide it because of how
+  many labels are already showing.** When space runs out, give up in this order: (1) nearness to
+  home if there is convenient available space; (2) wholeness; (3) properties that won't fit, by drop
+  order; (4) the label itself.
 - **R2. If there is convenient available space, use it if that saves a neighbour's properties.**
 - **R5. Basic leader conventions:** label text is justified to the leader side, never to centre or
   to the far side.
@@ -317,7 +318,8 @@ is not only human, it is biological; it is real."*
   But I don't know what it's saying."*
   **Reworded and brought back; Tom, 2026-10-05: yes.** The rule: *"Hide a label only because there
   is no room for it on screen. Never hide it because of how many labels are already showing."*
-  Tom: *"Yes. This seems so obvious as to be trivial."*
+  Tom: *"Yes. This seems so obvious as to be trivial."* It now heads R1 in Part A, word for word;
+  the judges test it (`judges/README.md`, "R1").
 - **Bench: bent pipes, valves, large networks, fresh secret scenes every round:** yes.
 - **At dense zooms, bare IDs or no labels:** *"We can't hard-code a rule like this. In the current
   default settings, ID is the first thing to drop. Since the user decides drop order (meaning they
