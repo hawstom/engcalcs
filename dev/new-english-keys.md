@@ -449,7 +449,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**12 still to read**, of 15 new keys across 11 unmerged branch(es).
+**16 still to read**, of 19 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -460,7 +460,22 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`40b809cd`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/backdrop-attach (`0a663e24`) — 4 new, 4 to read @@ NEEDS RULING
+
+- **`lpn_inp_backdrop_attach`**
+  > Attach {file}…
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attach_tip`**
+  > A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attached`**
+  > Attached {file}, placed where the file says it belongs.
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attached_other`**
+  > Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.
+  @@ NEEDS RULING
+
+### feat/bentley-interop (`cb120830`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -505,7 +520,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show scenarios
   @@ NEEDS RULING
 
-### feat/screenshot (`e7255634`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/screenshot (`1f590b13`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_screenshot_copied`**
   > Screenshot copied.
@@ -529,4 +544,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
   @@ NEEDS RULING
 
-### feat/tip-door (`c76e9f2d`) — adds no English strings
+### feat/tip-door (`46c965ee`) — adds no English strings

@@ -4086,7 +4086,7 @@ $ec_lang['lpn_analyze_menu_tip']='Analyses that run the network on a copy: fire 
 $ec_lang['lpn_ff_menu']='Fire flow analysis…';
 $ec_lang['lpn_ff_menu_tip']='Selection-wide check with collateral effect check';
 $ec_lang['lpn_ff_title']='Fire flow analysis';
-$ec_lang['lpn_ff_intro']='Each junction in turn is asked to draw a fire flow on top of the demand it already has. The run is made on a copy of the network at the time step on screen, so nothing in your project is changed. Fire flow is normally tested on top of maximum day demand; set the network to that condition before you run. Available fire flow is found by a search that solves the whole network about 16 times for every junction tested, so a large system takes minutes: choose the junctions to test before you run, and stop at any time to keep the results already finished.';
+$ec_lang['lpn_ff_intro']='Each junction in turn draws a fire flow on top of its existing demand. The run uses a copy of the network at the time step on screen, so nothing in your project is changed. Fire flow is normally tested at maximum day demand, so set the network to that condition first. Each junction tested takes about 16 solves of the whole network, so a large system takes minutes: choose the junctions before you run, and stop at any time to keep the finished results.';
 $ec_lang['lpn_ff_scope']='Junctions to test';
 $ec_lang['lpn_ff_all']='All junctions';
 $ec_lang['lpn_ff_selected']='Selected junctions';
@@ -4114,7 +4114,7 @@ $ec_lang['lpn_ff_maxvelocity_tip']='A pipe running above this while a fire flow 
 // for hydrant losses beyond the node."). IT LEADS WITH THE METHOD, NOT WITH THE ABSENCE: Tom read
 // the first wording as "no losses are accounted for at the raw node", which is a hole in the tool
 // rather than the deliberate and standard choice it actually is.
-$ec_lang['lpn_ff_accounting']='Fire flow is drawn at the junction itself, which is the usual method. The hydrant, its lateral, and its nozzle are not modeled, so a real hydrant delivers less than the flow shown.';
+$ec_lang['lpn_ff_accounting']='The flow is drawn at the junction itself, the usual method. The hydrant, its lateral, and its nozzle are not modeled, so a real hydrant delivers less than the flow shown.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_native']='Built-in solver is used.';
 // Edited by TGH 2026-09-07
