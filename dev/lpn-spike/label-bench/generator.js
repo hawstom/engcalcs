@@ -327,7 +327,8 @@ function makeIds(n, style, rng, prefix, used) {
 		if (style === 'short') {
 			id = uniq(function (k) { return String(i + 1 + k * 100000); });
 		} else if (style === 'epanet') {
-			id = uniq(function () { return String(rng.int(10, n < 900 ? 999 : 9999)); });
+			// Up to 9999 while that many exist (every round-5 network); past it, five digits.
+			id = uniq(function () { return String(rng.int(10, n < 900 ? 999 : n <= 9990 ? 9999 : 99999)); });
 		} else if (style === 'long') {
 			id = uniq(function () { return prefix + '-' + String(rng.int(10000, 99999)) + (rng.u() < 0.5 ? '-' + 'ABCDEFGH'.charAt(rng.int(0, 7)) : ''); });
 		} else {
