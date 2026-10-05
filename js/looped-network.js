@@ -34572,7 +34572,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	// **A 24-BIT WINDOWS BMP, BECAUSE THAT IS WHAT EPANET OPENS** (dev/backdrop-export.md). EPANET
 	// 2.2's backdrop is a Delphi TPicture loaded from the named file (Umap.pas GetBackdrop), its
-	// picker offers *.bmp, *.emf and *.wmf only (Fmain.dfm OpenPictureDialog), and none of its 53
+	// picker offers *.bmp, *.emf and *.wmf only (Fmain.dfm OpenPictureDialog), and none of its
 	// units links a PNG or JPEG reader, so a PNG named in FILE is "could not read backdrop" there.
 	// Bottom-up rows padded to four bytes, BGR, 72 dpi. A transparent pixel is laid on white, the
 	// colour of EPANET's map behind it, because BMP has no transparency EPANET draws.
