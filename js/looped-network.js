@@ -4590,7 +4590,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	function setOverride(el, prop, value) {
 		if (!el || !isOverridable(el, prop) || inBaseScenario()) { return; }
-		var scn = activeScenario(), key = ovKey(el);
+		var scn = activeScenario(), key = ovKey(el), t = writeTargetFor(scn, categoryOf(prop, elGroup(el)));
+		// A stored alternative the scenario names takes the write (one source of truth: a scenario
+		// that names one holds no local value in its category).
+		if (t.kind === 'alt') { scn = { overrides: plainObject(t.obj.values) ? t.obj.values : (t.obj.values = {}) }; }
 		if (!scn.overrides[key]) { scn.overrides[key] = {}; }
 		// UNDEFINED BECOMES NULL. In Base `undefined` says "no head typed"; in an override map
 		// absence means "inherit Base", so a blank-capable field stored as undefined says "inherit"
@@ -4601,12 +4604,14 @@ var EngCalcs = EngCalcs || {};
 		touchTree('setOverride');
 	}
 	function clearOverride(el, prop) {
-		var scn = activeScenario(), key = ovKey(el), ov = scn.overrides[key];
+		var scn = activeScenario(), key = ovKey(el), t = writeTargetFor(scn, categoryOf(prop, elGroup(el))),
+			map = !t ? scn.overrides : (t.kind === 'alt' ? t.obj.values : scn.overrides), ov = map ? map[key] : null;
 		if (!ov) { return; }
 		delete ov[prop];
 		// An empty map is dropped rather than left behind: an element with an empty object still in
 		// the map reads as "this element is touched here", the claim the marker exists to make.
-		if (!Object.keys(ov).length) { delete scn.overrides[key]; }
+		if (!Object.keys(ov).length) { delete map[key]; }
+		if (t && t.kind === 'alt' && !Object.keys(map).length) { delete t.obj.values; }
 		touchTree('clearOverride');
 	}
 	// THE ONE WRITE SEAM every property editor goes through. In Base it writes the element (which
@@ -4998,8 +5003,30 @@ var EngCalcs = EngCalcs || {};
 		}
 		return any ? out : null;
 	}
-	// The override map an edit of this category lands in, for this scenario: its own.
-	function localOverrideMap(scn, cat) { return (scn && scn.overrides) || {}; }
+	/**
+	 * **WHERE AN EDIT IN THIS SCENARIO LANDS, FOR ONE CATEGORY**: the stored alternative the
+	 * scenario names for it (its calculation set, for Calculation), else the scenario itself -- its
+	 * implicit alternative. {kind: 'alt' | 'calc' | 'scn', obj}, or null for Base, which writes the
+	 * elements and the project. **EDITING A SHARED ALTERNATIVE CHANGES EVERY SCENARIO THAT USES IT**,
+	 * as in Bentley; that is what sharing is.
+	 */
+	function writeTargetFor(scn, cat) {
+		var id, r;
+		if (!scn || scn.isBase) { return null; }
+		if (cat === 'calculation') {
+			r = scn.calc !== undefined ? calcSetById(scn.calc) : null;
+			return r ? { kind: 'calc', obj: r } : { kind: 'scn', obj: scn };
+		}
+		id = scn.alternatives ? scn.alternatives[cat] : undefined;
+		r = id !== undefined ? altById(id) : null;
+		return (r && r.category === cat) ? { kind: 'alt', obj: r } : { kind: 'scn', obj: scn };
+	}
+	// The override map an edit of this category lands in, for this scenario. Read-only here.
+	function localOverrideMap(scn, cat) {
+		var t = writeTargetFor(scn, cat);
+		if (!t) { return (scn && scn.overrides) || {}; }
+		return (t.kind === 'alt' ? t.obj.values : t.obj.overrides) || {};
+	}
 	function storedById(list, id) {
 		var i;
 		for (i = 0; i < (list || []).length; i++) { if (list[i].id === id) { return list[i]; } }
@@ -5016,6 +5043,16 @@ var EngCalcs = EngCalcs || {};
 			if (seen[cur]) { return true; }
 			seen[cur] = true;
 			cur = (storedById(list, cur) || { parent: null }).parent;
+		}
+		return false;
+	}
+	// True when `ancestorId` is up the parent chain of `id`.
+	function storedDescends(list, id, ancestorId) {
+		var seen = {}, r = storedById(list, id);
+		while (r && r.parent !== null && r.parent !== undefined && !seen[r.id]) {
+			seen[r.id] = true;
+			if (r.parent === ancestorId) { return true; }
+			r = storedById(list, r.parent);
 		}
 		return false;
 	}
@@ -5104,6 +5141,232 @@ var EngCalcs = EngCalcs || {};
 			if (!LPN_SCENARIO_TIME_KEYS.some(function (key) { return r.times[key] !== undefined; })) { delete r.times; }
 		}
 	}
+	// ---- the mutations (stage 4). Like setScenarioSetting(): no snapshot and no refresh, the
+	// caller decides when a press is an undo step. Each answers the record, true, or
+	// {refused: reason}; nothing is written on a refusal. Emptied lists and maps are deleted, so a
+	// project that undoes every act is the file it was.
+	function treeRefuse(reason, extra) { return Object.assign({ refused: reason }, extra || {}); }
+	function treeNewId(list, stem) {
+		var n = 1;
+		while (storedById(list, stem + n)) { n++; }
+		return stem + n;
+	}
+	function treeDropEmpty() {
+		if (doc.alternatives && !doc.alternatives.length) { delete doc.alternatives; }
+		if (doc.calcSets && !doc.calcSets.length) { delete doc.calcSets; }
+		scenarios.forEach(function (s) { if (s.alternatives && !Object.keys(s.alternatives).length) { delete s.alternatives; } });
+	}
+	function storedCategoryOk(cat) { return LPN_ALT_CATEGORIES.indexOf(cat) >= 0 && cat !== 'calculation'; }
+	// Kind 'alt' or 'calc': the list, and whether `parentId` may parent `id` (null always may).
+	function storedList(kind) { return kind === 'calc' ? doc.calcSets : doc.alternatives; }
+	function storedParentOk(kind, id, parentId, cat) {
+		var p;
+		if (parentId === null || parentId === undefined) { return true; }
+		p = storedById(storedList(kind), parentId);
+		return !!p && (kind === 'calc' || p.category === cat) && !storedParentLoops(storedList(kind), id, parentId);
+	}
+	function createStored(kind, cat, name, parentId) {
+		var r, list;
+		if (kind === 'alt' && !storedCategoryOk(cat)) { return treeRefuse('category'); }
+		if (!storedParentOk(kind, '', parentId, cat)) { return treeRefuse('parent'); }
+		list = kind === 'calc' ? (doc.calcSets = doc.calcSets || []) : (doc.alternatives = doc.alternatives || []);
+		r = { id: treeNewId(list, kind === 'calc' ? 'c' : 'a') };
+		if (kind === 'alt') { r.category = cat; }
+		r.name = String(name === undefined || name === null ? '' : name);
+		r.parent = (parentId === undefined || parentId === null) ? null : parentId;
+		list.push(r);
+		touchTree('createStored');
+		return r;
+	}
+	function createAlternative(cat, name, parentId) { return createStored('alt', cat, name, parentId); }
+	function createCalcSet(name, parentId) { return createStored('calc', null, name, parentId); }
+	function renameStored(kind, id, name) {
+		var r = storedById(storedList(kind), id);
+		if (!r) { return false; }
+		r.name = String(name === undefined || name === null ? '' : name);
+		return true;
+	}
+	function renameAlternative(id, name) { return renameStored('alt', id, name); }
+	function renameCalcSet(id, name) { return renameStored('calc', id, name); }
+	// **REPARENTING KEEPS THE RECORD'S OWN VALUES**; what it inherits may change, as in Bentley.
+	function reparentStored(kind, id, parentId) {
+		var r = storedById(storedList(kind), id);
+		if (!r) { return treeRefuse('missing'); }
+		if (!storedParentOk(kind, id, parentId, r.category)) { return treeRefuse('parent'); }
+		r.parent = (parentId === undefined || parentId === null) ? null : parentId;
+		touchTree('reparentStored');
+		return true;
+	}
+	function reparentAlternative(id, parentId) { return reparentStored('alt', id, parentId); }
+	function reparentCalcSet(id, parentId) { return reparentStored('calc', id, parentId); }
+	// Who uses a record: the scenarios naming it, and the records whose parent it is.
+	function storedUsers(kind, id) {
+		return {
+			scenarios: scenarios.filter(function (s) {
+				return kind === 'calc' ? s.calc === id : !!(s.alternatives && Object.keys(s.alternatives).some(function (c) { return s.alternatives[c] === id; }));
+			}).map(function (s) { return s.id; }),
+			children: (storedList(kind) || []).filter(function (r) { return r.parent === id; }).map(function (r) { return r.id; })
+		};
+	}
+	// **REFUSED WHILE ANYTHING USES IT**, and the refusal names who (mergeAlternativeInto() is the
+	// way to retire one that is in use).
+	function deleteStored(kind, id) {
+		var list = storedList(kind), u = storedUsers(kind, id);
+		if (!storedById(list, id)) { return treeRefuse('missing'); }
+		if (u.scenarios.length || u.children.length) { return treeRefuse('in use', u); }
+		list.splice(list.indexOf(storedById(list, id)), 1);
+		treeDropEmpty();
+		touchTree('deleteStored');
+		return true;
+	}
+	function deleteAlternative(id) { return deleteStored('alt', id); }
+	function deleteCalcSet(id) { return deleteStored('calc', id); }
+	/**
+	 * **MERGE ONE ALTERNATIVE INTO ANOTHER OF THE SAME CATEGORY** and delete it: its values win over
+	 * the target's (they were the more particular), the scenarios naming it name the target, and its
+	 * children become the target's. Refused across categories, into itself, and into one of its own
+	 * descendants (that would make a loop).
+	 */
+	function mergeAlternativeInto(id, targetId) {
+		var a = altById(id), t = altById(targetId), u;
+		if (!a || !t || a === t) { return treeRefuse('missing'); }
+		if (a.category !== t.category) { return treeRefuse('category'); }
+		if (storedDescends(doc.alternatives, t.id, a.id)) { return treeRefuse('parent'); }
+		Object.keys(plainObject(a.values) ? a.values : {}).forEach(function (key) {
+			t.values = plainObject(t.values) ? t.values : {};
+			t.values[key] = Object.assign(t.values[key] || {}, a.values[key]);
+		});
+		settingLeaves(a.settings).forEach(function (leaf) {
+			var node, i;
+			t.settings = plainObject(t.settings) ? t.settings : {};
+			node = t.settings;
+			for (i = 0; i < leaf.path.length - 1; i++) { if (!plainObject(node[leaf.path[i]])) { node[leaf.path[i]] = {}; } node = node[leaf.path[i]]; }
+			node[leaf.path[leaf.path.length - 1]] = leaf.value;
+		});
+		u = storedUsers('alt', a.id);
+		u.scenarios.forEach(function (sid) { var s = scenarioById(sid); s.alternatives[a.category] = t.id; });
+		u.children.forEach(function (cid) { altById(cid).parent = t.id; });
+		doc.alternatives.splice(doc.alternatives.indexOf(a), 1);
+		treeDropEmpty();
+		touchTree('mergeAlternativeInto');
+		return true;
+	}
+	// Does this scenario hold a local value in this category (an element value or a setting)?
+	function scenarioHoldsLocal(s, cat) {
+		var ovs = s.overrides || {};
+		if (cat === 'calculation') {
+			if (heldOwnCalcOption(s)) { return true; }
+		} else if (Object.keys(ovs).some(function (k) {
+			return Object.keys(ovs[k]).some(function (p) { return categoryOf(p, ovKeyGroup(k)) === cat; });
+		})) { return true; }
+		return settingLeaves(s.settings).some(function (leaf) { return categoryOfSetting(leaf.path) === cat; });
+	}
+	function heldOwnCalcOption(s) {
+		return (typeof s.demandMultiplier === 'number' && isFinite(s.demandMultiplier)) ||
+			LPN_SCENARIO_TIME_KEYS.some(function (k) { return scenarioTimeValue(s, k) !== undefined; });
+	}
+	// Removes the scenario's local values in one category; answers {values, settings} it removed,
+	// with the multiplier and the times among the settings for Calculation.
+	function takeScenarioLocals(s, cat) {
+		var out = { values: {}, settings: {} }, ovs = s.overrides || {};
+		if (cat !== 'calculation') {
+			Object.keys(ovs).forEach(function (k) {
+				Object.keys(ovs[k]).forEach(function (p) {
+					if (categoryOf(p, ovKeyGroup(k)) !== cat) { return; }
+					(out.values[k] = out.values[k] || {})[p] = ovs[k][p];
+					delete ovs[k][p];
+				});
+				if (!Object.keys(ovs[k]).length) { delete ovs[k]; }
+			});
+		} else {
+			if (s.demandMultiplier !== undefined) { out.demandMultiplier = s.demandMultiplier; delete s.demandMultiplier; }
+			if (s.times !== undefined) { out.times = s.times; delete s.times; }
+		}
+		settingLeaves(s.settings).forEach(function (leaf) {
+			var node = out.settings, i;
+			if (categoryOfSetting(leaf.path) !== cat) { return; }
+			for (i = 0; i < leaf.path.length - 1; i++) { node = node[leaf.path[i]] = node[leaf.path[i]] || {}; }
+			node[leaf.path[leaf.path.length - 1]] = leaf.value;
+			settingDelete(s, leaf.path);
+		});
+		return out;
+	}
+	/**
+	 * **A SCENARIO NAMES A STORED ALTERNATIVE (or, with null, inherits again).** Refused while it
+	 * holds local values in that category -- they would silently stop counting -- unless
+	 * {discard: true}, or unless promoteImplicitAlternative() moved them out first.
+	 */
+	function assignStored(kind, scnId, cat, id, opts) {
+		var s = scenarioById(scnId), r;
+		if (kind === 'calc') { cat = 'calculation'; }
+		if (!s || s.isBase) { return treeRefuse('base'); }
+		if (kind === 'alt' && !storedCategoryOk(cat)) { return treeRefuse('category'); }
+		if (id !== null && id !== undefined) {
+			r = storedById(storedList(kind), id);
+			if (!r || (kind === 'alt' && r.category !== cat)) { return treeRefuse('missing'); }
+		}
+		if (scenarioHoldsLocal(s, cat)) {
+			if (!(opts && opts.discard)) { return treeRefuse('local values'); }
+			takeScenarioLocals(s, cat);
+		}
+		if (kind === 'calc') {
+			if (r) { s.calc = r.id; } else { delete s.calc; }
+		} else if (r) {
+			(s.alternatives = s.alternatives || {})[cat] = r.id;
+		} else if (s.alternatives) {
+			delete s.alternatives[cat];
+		}
+		treeDropEmpty();
+		touchTree('assignStored');
+		return true;
+	}
+	function assignAlternative(scnId, cat, altId, opts) { return assignStored('alt', scnId, cat, altId, opts); }
+	function assignCalcSet(scnId, setId, opts) { return assignStored('calc', scnId, 'calculation', setId, opts); }
+	// What a scenario would use for a category if it held nothing of its own there, as a stored
+	// record id or null (Base's). An ancestor holding local values there is promoted first, under
+	// its own name, so the stored chain can say what the implicit one said.
+	function inheritedStoredChoice(s, cat) {
+		var p = s, seen = {}, named, r;
+		seen[s.id] = true;
+		if ((named = storedChoiceOf(s, cat)) !== undefined) { return named; }
+		for (p = parentScenarioOf(s); p && !p.isBase && !seen[p.id]; p = parentScenarioOf(p)) {
+			seen[p.id] = true;
+			if (scenarioHoldsLocal(p, cat)) {
+				r = promoteStored(p.id, cat, p.name);
+				return r && r.id ? r.id : null;
+			}
+			if ((named = storedChoiceOf(p, cat)) !== undefined) { return named; }
+		}
+		return null;
+	}
+	function storedChoiceOf(s, cat) {
+		if (cat === 'calculation') { return s.calc !== undefined && calcSetById(s.calc) ? s.calc : undefined; }
+		return s.alternatives && s.alternatives[cat] !== undefined && altById(s.alternatives[cat]) ? s.alternatives[cat] : undefined;
+	}
+	/**
+	 * **PROMOTE: A SCENARIO'S IMPLICIT ALTERNATIVE BECOMES A STORED, NAMED ONE** -- the act that lets
+	 * a second scenario share it. Its local values in the category move into a new record whose
+	 * parent is what the scenario inherited, and the scenario names it. Nothing resolves differently
+	 * (the harness holds every value equal before and after). For Calculation the record is a
+	 * calculation set, and the multiplier and the two times move with it.
+	 */
+	function promoteStored(scnId, cat, name) {
+		var s = scenarioById(scnId), kind = cat === 'calculation' ? 'calc' : 'alt', parentId, r, moved;
+		if (!s || s.isBase) { return treeRefuse('base'); }
+		if (kind === 'alt' && !storedCategoryOk(cat)) { return treeRefuse('category'); }
+		parentId = inheritedStoredChoice(s, cat);
+		r = createStored(kind, cat, name, parentId);
+		if (r.refused) { return r; }
+		moved = takeScenarioLocals(s, cat);
+		if (Object.keys(moved.values).length) { r.values = moved.values; }
+		if (Object.keys(moved.settings).length) { r.settings = moved.settings; }
+		if (moved.demandMultiplier !== undefined) { r.demandMultiplier = moved.demandMultiplier; }
+		if (moved.times !== undefined) { r.times = moved.times; }
+		if (kind === 'calc') { s.calc = r.id; } else { (s.alternatives = s.alternatives || {})[cat] = r.id; }
+		touchTree('promoteStored');
+		return r;
+	}
+	function promoteImplicitAlternative(scnId, cat, name) { return promoteStored(scnId, cat, name); }
 	/**
 	 * **EVERY OVERRIDE MAP IN THE DOCUMENT**, for the maintenance that must reach all of them: an
 	 * element renamed or deleted, a unit converted, a pattern, curve, type or fittings list renamed,
@@ -5382,6 +5645,8 @@ var EngCalcs = EngCalcs || {};
 		if (!scn || scn.isBase || LPN_SETTING_ROOTS.indexOf(p[0]) < 0) { return false; }
 		if (!categoryOfSetting(p) || settingHasOtherHome(p)) { return false; }
 		touchTree('setScenarioSetting');
+		// A stored alternative or calculation set the scenario names takes the write.
+		scn = writeTargetFor(scn, categoryOfSetting(p)).obj;
 		if (value === undefined) { settingDelete(scn, p); return true; }
 		scn.settings = plainObject(scn.settings) ? scn.settings : {};
 		node = scn.settings;
@@ -58399,7 +58664,7 @@ var EngCalcs = EngCalcs || {};
 			: (s.times && s.times.text ? s.times.text[key] : undefined);
 		return typeof t === 'string' ? t : undefined;
 	}
-	function calcTargetOf(s) { return s; }
+	function calcTargetOf(s) { var t = writeTargetFor(s, 'calculation'); return t ? t.obj : s; }
 	// One [TIMES] value the pattern clock reads, for the open scenario, without building the block:
 	// patternMultiplier() runs per element per solve. Neither key has a home of its own on the
 	// scenario, so the settings block and the project are the only two places it can be.

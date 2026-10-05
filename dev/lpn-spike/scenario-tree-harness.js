@@ -40,7 +40,14 @@ const L = loadLoopedNetwork(
 	"\t\tisExplicitTree: isExplicitTree, touchTree: touchTree,\n" +
 	"\t\tsetTouchSkip: function (site) { treeTouchSkip = site; },\n" +
 	"\t\tassembleModel: assembleModel, inpExportDocument: inpExportDocument, inpExportOptions: inpExportOptions,\n" +
-	"\t\teffectiveTimes: effectiveTimes,\n" +
+	"\t\teffectiveTimes: effectiveTimes, setScenarioTime: setScenarioTime, calcTargetOf: calcTargetOf,\n" +
+	"\t\tcreateAlternative: createAlternative, renameAlternative: renameAlternative, reparentAlternative: reparentAlternative,\n" +
+	"\t\tdeleteAlternative: deleteAlternative, mergeAlternativeInto: mergeAlternativeInto, assignAlternative: assignAlternative,\n" +
+	"\t\tpromoteImplicitAlternative: promoteImplicitAlternative, createCalcSet: createCalcSet, renameCalcSet: renameCalcSet,\n" +
+	"\t\treparentCalcSet: reparentCalcSet, deleteCalcSet: deleteCalcSet, assignCalcSet: assignCalcSet,\n" +
+	"\t\tsaveUndoSnapshot: saveUndoSnapshot, undo: undo, redo: redo,\n" +
+	"\t\tapplyNodeRename: applyNodeRename, deleteNode: deleteNode, convertUnitValues: convertUnitValues,\n" +
+	"\t\tlibRepointPattern: libRepointPattern,\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -398,6 +405,218 @@ console.log('\n--- 3. files ---');
 	ok('...a missing parent, a mismatched choice and a missing set go; a good choice stays',
 		s9.parent === undefined && J(s9.alternatives) === '{"demand":"a1"}' && s9.calc === undefined);
 	ok('...and the cleaned tree breaks no invariant', !invariants().length, invariants().join(', '));
+}
+
+// ---------------------------------------------------------------------------
+// 4. Random mutations through the API, compared after every one
+// ---------------------------------------------------------------------------
+const CATS_STORED = ELEMENT_CATS.concat(['presentation']);
+function randomMutation() {
+	const d = L.getDoc(), scns = L.getScenarios().filter((x) => !x.isBase), s = pick(scns), alts = d.alternatives || [], sets = d.calcSets || [];
+	const cat = pick(CATS_STORED), ofCat = alts.filter((a) => a.category === cat);
+	const r = Math.floor(R() * 15);
+	let what;
+	switch (r) {
+		case 0: case 1: {
+			const pv = propsOf(cat);
+			if (!pv.length) { return 'none'; }
+			const [el, p] = pick(pv);
+			L.getProject().activeScenario = s.id;
+			L.setProp(el, p, propValue(p));
+			return 'setProp ' + s.id + ' ' + el.id + '.' + p;
+		}
+		case 2: {
+			const pool = SETTING_POOL[cat] || SETTING_POOL.calculation, p = pick(pool);
+			what = L.setScenarioSetting(s, p, chance(0.2) ? undefined : settingValue(p));
+			return 'setting ' + s.id + ' ' + p.join('.') + ' ' + what;
+		}
+		case 3: return 'create ' + J(L.createAlternative(cat, 'new', ofCat.length && chance(0.5) ? pick(ofCat).id : null).id);
+		case 4: return ofCat.length ? 'reparent ' + J(L.reparentAlternative(pick(ofCat).id, chance(0.3) ? null : pick(ofCat).id)) : 'none';
+		case 5: return ofCat.length ? 'delete ' + J(L.deleteAlternative(pick(ofCat).id)) : 'none';
+		case 6: return ofCat.length ? 'assign ' + J(L.assignAlternative(s.id, cat, chance(0.2) ? null : pick(ofCat).id, { discard: chance(0.3) })) : 'none';
+		case 7: return 'promote ' + J((L.promoteImplicitAlternative(s.id, cat, 'P') || {}).id);
+		case 8: return ofCat.length > 1 ? 'merge ' + J(L.mergeAlternativeInto(ofCat[0].id, pick(ofCat).id)) : 'none';
+		case 9: return 'calc create ' + J(L.createCalcSet('C', sets.length && chance(0.5) ? pick(sets).id : null).id);
+		case 10: return sets.length ? 'calc assign ' + J(L.assignCalcSet(s.id, chance(0.2) ? null : pick(sets).id, { discard: chance(0.4) })) : 'none';
+		case 11: return sets.length ? 'calc reparent/delete ' + J(chance(0.5) ? L.reparentCalcSet(pick(sets).id, pick(sets).id) : L.deleteCalcSet(pick(sets).id)) : 'none';
+		case 12: return 'calc promote ' + J((L.promoteImplicitAlternative(s.id, 'calculation', 'CP') || {}).id);
+		case 13: {
+			const t = L.calcTargetOf(s);
+			if (chance(0.5)) { t.demandMultiplier = num(); L.touchTree(); return 'multiplier'; }
+			return 'time ' + L.setScenarioTime(t, 'duration', chance(0.3) ? '' : String(Math.floor(1 + R() * 48)) + ':00');
+		}
+		default: {
+			const pv = propsOf(cat);
+			if (!pv.length) { return 'none'; }
+			const [el, p] = pick(pv);
+			L.getProject().activeScenario = s.id;
+			if (L.hasOverride(el, p)) { L.setProp(el, p, propValue(p)); }
+			return 'touch ' + p;
+		}
+	}
+}
+console.log('\n--- 4. random mutations (seed ' + SEED + ') ---');
+{
+	let steps = 0, good = 0, cached = 0, inv = 0, firstBad = '';
+	QUIET = true;
+	for (let t = 0; t < 12; t++) {
+		randomTree(pick(['Net1.lwn', 'Net2.lwn']));
+		for (let m = 0; m < 25; m++) {
+			const what = randomMutation();
+			steps++;
+			const before = fails;
+			if (checkAll('step ' + t + '.' + m + ' (' + what + ')')) { good++; }
+			if (cacheFresh()) { cached++; } else if (!firstBad) { firstBad = 'cache after ' + what; }
+			const iv = invariants();
+			if (!iv.length) { inv++; } else if (!firstBad) { firstBad = what + ': ' + iv.join(', '); }
+			if (fails > before && !firstBad) { firstBad = what; }
+		}
+	}
+	QUIET = false;
+	ok('every mutation leaves every value as the uncached walk says (' + good + '/' + steps + ')', good === steps, firstBad);
+	ok('...the cache equals a fresh rebuild after every one', cached === steps, firstBad);
+	ok('...and no mutation breaks an invariant', inv === steps, firstBad);
+}
+
+// ---------------------------------------------------------------------------
+// 5. The cache goes stale without its touch, and the harness sees it
+// ---------------------------------------------------------------------------
+// A mutation test of the epoch itself: one write site's bump skipped by a flag (the page is not
+// edited), and the comparison must then FAIL. If it passed, sections 1 and 4 would prove nothing
+// about the cache.
+console.log('\n--- 5. a missing touchTree() is caught ---');
+{
+	open('Net1.lwn');
+	elements = L.getDoc().nodes.slice(0, 6);
+	const s = L.createScenario('Stale');
+	s.parent = L.baseScenario().id;
+	L.touchTree();
+	const j = L.getDoc().nodes.filter((n) => n.type === 'junction')[0];
+	L.getProject().activeScenario = s.id;
+	L.effective(j, 'demand');
+	L.setTouchSkip('setOverride');
+	L.setProp(j, 'demand', 4321);
+	const before = fails, log = console.log;
+	console.log = function () {};
+	const caught = !checkAll('stale') || !cacheFresh();
+	console.log = log;
+	fails = before;
+	L.setTouchSkip(null);
+	L.touchTree();
+	ok('with setOverride()\'s bump skipped, the stale cache is caught', caught);
+	ok('...and with it restored the same read is right', L.effective(j, 'demand') === 4321);
+}
+
+// ---------------------------------------------------------------------------
+// 6. Promote changes nothing anybody can see; undo and redo are whole
+// ---------------------------------------------------------------------------
+function everyValue() {
+	const out = [], keep = L.getProject().activeScenario;
+	L.getScenarios().forEach((s) => {
+		L.getProject().activeScenario = s.id;
+		elements.forEach((el) => Object.keys(L.OVERRIDABLE[L.ovKeyGroup(L.ovKey(el))] || {}).forEach((p) => out.push(J(L.effective(el, p)))));
+		settingPaths.forEach((p) => out.push(J(L.settingFor(s, p))));
+		['demandMultiplier', 'duration', 'hydraulicStep'].forEach((k) => out.push(J(L.heldCalcOption(s, k))));
+	});
+	L.getProject().activeScenario = keep;
+	return out.join('|');
+}
+// The saved project without `nextId`: undo recounts the id counters from the elements
+// (recountNextId()), which an opened file states its own way. Nothing about the tree is in them.
+function fileText() { const o = JSON.parse(L.projectFileText()); delete o.nextId; return JSON.stringify(o); }
+console.log('\n--- 6. promote, and undo ---');
+{
+	let same = 0, n = 0, undone = 0, redone = 0, un = 0;
+	for (let t = 0; t < 10; t++) {
+		randomTree('Net1.lwn');
+		L.getScenarios().filter((x) => !x.isBase).forEach((s) => {
+			CATS_STORED.concat(['calculation']).forEach((cat) => {
+				const was = everyValue();
+				L.promoteImplicitAlternative(s.id, cat, s.name + ' ' + cat);
+				n++;
+				if (everyValue() === was) { same++; }
+			});
+		});
+		for (let m = 0; m < 8; m++) {
+			L.saveUndoSnapshot();
+			const t0 = fileText();
+			randomMutation();
+			const t1 = fileText();
+			if (t0 === t1) { continue; }
+			un++;
+			L.undo();
+			if (fileText() === t0 && cacheFresh()) { undone++; }
+			L.redo();
+			if (fileText() === t1 && cacheFresh()) { redone++; }
+		}
+	}
+	ok('promoting every category of every scenario changes no resolved value (' + same + '/' + n + ')', same === n);
+	ok('...and leaves no scenario holding a local value in a category it names', !invariants().length, invariants().join(', '));
+	ok('undo of a tree mutation gives back the saved project byte for byte (' + undone + '/' + un + ')', undone === un && un > 20);
+	ok('...and redo gives back the mutated one (' + redone + '/' + un + ')', redone === un);
+}
+
+// ---------------------------------------------------------------------------
+// 7. The API's refusals, and Peak Hour shared by a second scenario
+// ---------------------------------------------------------------------------
+console.log('\n--- 7. the API ---');
+{
+	open('Net1.lwn');
+	const j = L.getDoc().nodes.filter((n) => n.type === 'junction')[0];
+	elements = [j];
+	const peak = L.createScenario('Peak Hour');
+	L.setProp(j, 'demand', 300);
+	const fire = L.createScenario('Fire at Peak Hour');
+	ok('a scenario holding a local demand cannot just name an alternative', !!L.assignAlternative(peak.id, 'demand', L.createAlternative('demand', 'x', null).id).refused);
+	L.deleteAlternative(L.getDoc().alternatives[0].id);
+	const pd = L.promoteImplicitAlternative(peak.id, 'demand', 'Peak Demand');
+	ok('promote stores Peak Hour\'s demand as a child of Base Demand, and names it', pd.parent === null && peak.alternatives.demand === pd.id && !peak.overrides[L.ovKey(j)]);
+	ok('...a second scenario can now share it', L.assignAlternative(fire.id, 'demand', pd.id) === true);
+	L.getProject().activeScenario = fire.id;
+	ok('...and reads Peak Hour\'s demand', L.effective(j, 'demand') === 300);
+	L.setProp(j, 'demand', 450);
+	L.getProject().activeScenario = peak.id;
+	ok('an edit in either changes both: the shared alternative took it', L.effective(j, 'demand') === 450 && pd.values[L.ovKey(j)].demand === 450);
+	ok('...and the edit marker is on, in both', L.hasOverride(j, 'demand'));
+	const del = L.deleteAlternative(pd.id);
+	ok('deleting an alternative in use is refused, naming its users', del.refused && J(del.scenarios) === J([peak.id, fire.id]));
+	ok('an alternative of another category cannot parent it', !!L.reparentAlternative(pd.id, L.createAlternative('physical', 'p', null).id).refused);
+	const child = L.createAlternative('demand', 'Child', pd.id);
+	ok('...nor can its own child (no loops)', !!L.reparentAlternative(pd.id, child.id).refused);
+	ok('Calculation is not an alternative', !!L.createAlternative('calculation', 'c', null).refused);
+	ok('a merge across categories is refused', !!L.mergeAlternativeInto(child.id, L.getDoc().alternatives.filter((a) => a.category === 'physical')[0].id).refused);
+	ok('...a merge into its parent moves its users and children, and deletes it', L.mergeAlternativeInto(child.id, pd.id) === true && !L.getDoc().alternatives.some((a) => a.id === child.id));
+	const cs = L.createCalcSet('Peak options', null);
+	ok('a calculation set is named by a scenario', L.assignCalcSet(peak.id, cs.id, { discard: true }) === true);
+	L.getProject().activeScenario = peak.id;
+	L.calcTargetOf(peak).demandMultiplier = 2.5; L.touchTree();
+	ok('...and its multiplier is the scenario\'s held one', L.heldCalcOption(peak, 'demandMultiplier') === 2.5 && peak.demandMultiplier === undefined);
+	const cs2 = L.createCalcSet('Child options', cs.id);
+	L.assignCalcSet(fire.id, cs2.id, { discard: true });
+	ok('...a child set inherits what it does not state (a Base change would flow too)', L.heldCalcOption(fire, 'demandMultiplier') === 2.5);
+	ok('...and deleting a set in use is refused', !!L.deleteCalcSet(cs.id).refused);
+}
+
+// ---------------------------------------------------------------------------
+// 8. Maintenance reaches a stored alternative's values
+// ---------------------------------------------------------------------------
+console.log('\n--- 8. maintenance ---');
+{
+	open('Net1.lwn');
+	const d = L.getDoc(), j = d.nodes.filter((n) => n.type === 'junction')[1], pipe = d.links.filter((l) => l.type === 'pipe')[0];
+	const a = L.createAlternative('demand', 'Shared', null), ph = L.createAlternative('physical', 'Big pipes', null);
+	a.values = {}; a.values[L.ovKey(j)] = { demand: 10, demands: [{ base: 10, pattern: '1', category: null }] };
+	ph.values = {}; ph.values[L.ovKey(pipe)] = { diameter: 12 };
+	L.touchTree();
+	const oldId = j.id;
+	L.applyNodeRename(oldId, 'RENAMED');
+	ok('a node rename moves its key in a stored alternative', !!a.values[L.ovKey(j)] && !a.values['n:' + oldId] === true && j.id === 'RENAMED');
+	L.libRepointPattern('1', 'P9');
+	ok('a pattern rename reaches a stored alternative\'s demand list', a.values[L.ovKey(j)].demands[0].pattern === 'P9');
+	L.convertUnitValues('lpn_u_diameter', 2);
+	ok('a unit change converts a stored alternative\'s value', ph.values[L.ovKey(pipe)].diameter === 24);
+	L.deleteNode(j.id);
+	ok('a deletion purges the element from a stored alternative', !a.values || !Object.keys(a.values).some((k) => k.indexOf('RENAMED') >= 0));
 }
 
 console.log('\n' + (fails ? fails + ' FAILED, ' : 'ALL PASS, ') + passes + ' passed');
