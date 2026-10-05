@@ -98,8 +98,7 @@ ok('the speed selector is on the toolbar', !!speed);
 ok('one moment, so the step selector holds one row', step.children.length === 1,
 	step.children.length + ' rows');
 ok('...and the player controls are disabled, which is the honest state here', step.disabled);
-ok('...and they say why, in the words lang.ec.en.php states', step.title === PC.lpn_time_no_period,
-	JSON.stringify(String(step.title).slice(0, 40)));
+ok('...and they are not drawn at all (the cure rides the Calculate menu row instead)', step.style.display === 'none');
 
 // ============================================================================================
 // 2. NET3 ARRIVES -- the gallery, File > Open, a tab switch: all one seam
@@ -125,7 +124,7 @@ ok('...and the tip no longer says the project has no extended period simulation'
 
 // The three transport buttons, by the class css/engcalcs.css exempts from the icon-only styling.
 const players = buttons(toolbar).filter((b) => String(b['class'] || '').indexOf('lpn-transport-btn') >= 0);
-ok('all three player buttons are on the strip', players.length === 3, players.length + ' buttons');
+ok('all five player buttons are on the strip', players.length === 5, players.length + ' buttons');
 ok('...and none of them is disabled on a 24-hour project', players.every((b) => !b.disabled));
 ok('...and none of them carries the no-period sentence',
 	players.every((b) => b.title !== PC.lpn_time_no_period));
@@ -144,8 +143,7 @@ L.applySaved(still);
 L.refreshAllFromDocument();
 ok('one row again', step.children.length === 1, step.children.length + ' rows');
 ok('...disabled again', step.disabled);
-ok('...and the no-period sentence is back, which is TRUE of this project',
-	step.title === PC.lpn_time_no_period);
+ok('...and the player is hidden again', step.style.display === 'none');
 
 // ============================================================================================
 // 4. THE CLOCK ON THE ROWS FOLLOWS THE ARRIVING PROJECT
@@ -255,8 +253,8 @@ console.log('\n--- 7. the tip the READER gets, after tips were armed on the iner
 	global.EngCalcs.initTips(toolbar);
 
 	const armed = players.map((b) => stub.visibleTip(b));
-	ok('with no project, the reader is told there is no extended period simulation',
-		armed.every((t) => t === PC.lpn_time_no_period), JSON.stringify(armed[1] || '').slice(0, 50));
+	ok('with no project, the player is not drawn, so no tip can be wrong',
+		players.every((b) => b.style.display === 'none'));
 
 	L.applySaved(net3());
 	L.refreshAllFromDocument();

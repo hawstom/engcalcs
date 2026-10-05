@@ -1352,9 +1352,9 @@
             "answer": "Proposal approved."
         },
         "lpn_ds_found_below": {
-            "on": "⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.",
-            "ruled": "2026-10-03",
-            "answer": "I think I need explanation, and this need clarification."
+            "on": "⚠ At least one junction is below {pressure} with no demand scaling. The largest demand scale that keeps every junction at {pressure} or above is {m}.",
+            "ruled": "2026-10-06",
+            "answer": "His own wording: \"Use this.\""
         },
         "lpn_ds_head_lowest": {
             "on": "Lowest pressures",
@@ -3507,9 +3507,9 @@
             "answer": "Edited"
         },
         "lpn_new_coordsys_tip": {
-            "on": "Select the coordinate system of your network. This is permanent; the only way you can convert a network to different coordinates is with “File, Open to new coordinates”, and it is approximate.",
-            "ruled": "2026-09-14",
-            "answer": "OK"
+            "on": "Choose the coordinate system of your network. The only way to change this choice is with “File, Convert as…” to a new project, and that conversion is approximate.",
+            "ruled": "2026-10-06",
+            "answer": "\"You want to add the article 'a'? I consent.\""
         },
         "lpn_new_create": {
             "on": "Create",

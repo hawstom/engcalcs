@@ -1837,6 +1837,15 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		<h2 class="lpn-about-name"><img class="lpn-about-mark" src="/engcalcs/icons/favicon.svg" alt="" width="24" height="24" /><a href="<?=htmlspecialchars(ecAppSiteUrl(), ENT_QUOTES, 'UTF-8')?>" target="_blank" rel="noopener"><?=htmlspecialchars(ecAppBrandName(), ENT_QUOTES, 'UTF-8')?></a></h2>
 		<p class="lpn-about-dedication" lang="en"><a href="https://tomsthird.blogspot.com/2026/10/why-engineering-calculator-needs-to.html" target="_blank" rel="noopener">You are loved and cherished forever, you have nothing to fear, and you are not ruining everything.</a></p>
 		<p><?=$ec_lang['lpn_about_license']?><br />Copyright &copy; 2009&ndash;2026 Thomas Gail Haws</p>
+<?php   // HOW IT IS SOLVED and WHAT IT DOES NOT DO live here, not in the Notes box (Tom,
+        // 2026-10-06: "Move 'How it is solved' and 'What it does not do' into the About rewrite,
+        // as Ida's wish list proposes"). They are statements of what the application is, which is
+        // About's genre; the Notes box keeps task-context advisories. Keys kept as lpn_notes_1/2
+        // so the translations carry. ?>
+		<dl class="lpn-about-scope" id="lpn_about_scope">
+			<dt><?=$ec_lang['lpn_notes_1_term']?></dt><dd><?=$ec_lang['lpn_notes_1_def']?></dd>
+			<dt><?=$ec_lang['lpn_notes_2_term']?></dt><dd><?=$ec_lang['lpn_notes_2_def']?></dd>
+		</dl>
 <?php   // Credits, which an About box conventionally carries (MAH's own observation) and which
         // this one can finally honour: credits.html is the About-EPANET page that survived
         // not-epanet.org, and naming what this is built on belongs here.
@@ -1870,11 +1879,8 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<div class="lpn-popover-body lpn-setbox-body">
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
-	<dt><?=$ec_lang['lpn_notes_1_term']?></dt><dd><?=$ec_lang['lpn_notes_1_def']?></dd>
-	<dt><?=$ec_lang['lpn_notes_2_term']?></dt><dd><?=$ec_lang['lpn_notes_2_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_3_term']?></dt><dd><?=$ec_lang['lpn_notes_3_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_5_term']?></dt><dd><?=$ec_lang['lpn_notes_5_def']?></dd>
-	<dt><?=$ec_lang['lpn_notes_4_term']?></dt><dd><?=$ec_lang['lpn_notes_4_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_color_term']?></dt><dd><?=$ec_lang['lpn_notes_color_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_epanet_term']?></dt><dd><?=$ec_lang['lpn_notes_epanet_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_engine_term']?></dt><dd><?=$ec_lang['lpn_notes_engine_def']?></dd>
@@ -2103,6 +2109,8 @@ EngCalcs.pageConfig = {
 	lpn_find_menu: <?=json_encode($ec_lang['lpn_find_menu'])?>,
 	lpn_find_scope: <?=json_encode($ec_lang['lpn_find_scope'])?>,
 	lpn_find_scope_all: <?=json_encode($ec_lang['lpn_find_scope_all'])?>,
+	lpn_find_scope_source: <?=json_encode($ec_lang['lpn_find_scope_source'])?>,
+	lpn_find_source_no_chemical: <?=json_encode($ec_lang['lpn_find_source_no_chemical'])?>,
 	lpn_find_property: <?=json_encode($ec_lang['lpn_find_property'])?>,
 	lpn_find_condition: <?=json_encode($ec_lang['lpn_find_condition'])?>,
 	lpn_find_value: <?=json_encode($ec_lang['lpn_find_value'])?>,
@@ -2297,6 +2305,12 @@ EngCalcs.pageConfig = {
 	lpn_time_report_step: <?=json_encode($ec_lang['lpn_time_report_step'])?>,
 	lpn_time_report_start: <?=json_encode($ec_lang['lpn_time_report_start'])?>,
 	lpn_time_clock_start: <?=json_encode($ec_lang['lpn_time_clock_start'])?>,
+	lpn_time_statistic: <?=json_encode($ec_lang['lpn_time_statistic'])?>,
+	lpn_time_stat_none: <?=json_encode($ec_lang['lpn_time_stat_none'])?>,
+	lpn_time_stat_averaged: <?=json_encode($ec_lang['lpn_time_stat_averaged'])?>,
+	lpn_time_stat_minimum: <?=json_encode($ec_lang['lpn_time_stat_minimum'])?>,
+	lpn_time_stat_maximum: <?=json_encode($ec_lang['lpn_time_stat_maximum'])?>,
+	lpn_time_stat_range: <?=json_encode($ec_lang['lpn_time_stat_range'])?>,
 	lpn_time_clock_day: <?=json_encode($ec_lang['lpn_time_clock_day'])?>,
 	lpn_time_format_tip: <?=json_encode($ec_lang['lpn_time_format_tip'])?>,
 	lpn_time_running: <?=json_encode($ec_lang['lpn_time_running'])?>,

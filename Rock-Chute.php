@@ -56,7 +56,7 @@ echoCalculatorForm(
 // rc_notes_7_term did not exist in ANY language: note 7 had a body and no heading, which is why
 // only half the pair showed up as unreferenced. Written 2026-08-12.
 //
-// Content re-checked against the code before restoring, on the lpn_notes_4_def lesson that a
+// Content re-checked against the code before restoring, on the lesson of a retired Looped Network note that a
 // sprint will faithfully translate a stale claim: the 0.45 porosity default matches rc_np in this
 // file, and note 1's 0.02-0.40 slope validity range matches the guard in js/rock-chute.js.
 ?>

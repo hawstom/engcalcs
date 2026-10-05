@@ -109,6 +109,15 @@ ec_dr_expect('the mail states what "page loads" means (everyone else, one row pe
 ec_dr_expect('the mail gives the true, checked answer on robots (excluded by the dwell gate, '
     . 'not by a robot list)', strpos($usage, 'robots are') !== false, $usage);
 
+// ---- Tom, 2026-10-05: the table read as one day's usage and was the whole log. Each table names
+// its window in its own heading, and the reach-rows diagnostic is not printed as if it were a total.
+ec_dr_expect('a LAST 24 HOURS table is headed as such',
+    strpos($usage, 'LAST 24 HOURS') !== false, $usage);
+ec_dr_expect('the whole-log table says it is not one day, with its duration and dates',
+    (bool) preg_match('/WHOLE LOG, not one day \(1\.0 days, 2026-01-01 to 2026-01-02\)/', $usage), $usage);
+ec_dr_expect('a zero old-format count prints no reach-rows line',
+    strpos($usage, 'reach rows') === false, $usage);
+
 // cleanup
 @unlink($tmp . '/log/lang-log-stats.sh');
 @rmdir($tmp . '/log');

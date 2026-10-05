@@ -2557,7 +2557,7 @@
 			"demandMultiplier": 1,
 			"emitterExponent": 0.5
 		},
-		"tolerance": 1e-9,
+		"tolerance": 1e-09,
 		"engine": "epanet",
 		"defaults": {
 			"nodeElev": 0,
@@ -2882,9 +2882,11 @@
 			"reportStep": "1:00",
 			"reportStart": "0:00",
 			"startClock": "12 am",
-			"qualityStep": "0:05"
+			"qualityStep": "0:05",
+			"statistic": "None"
 		},
-		"qualityStep": 300
+		"qualityStep": 300,
+		"statistic": "NONE"
 	},
 	"controls": [
 		{

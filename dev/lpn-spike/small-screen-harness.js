@@ -429,7 +429,7 @@ console.log('\n--- 3. the toolbar keeps the transport and nothing else ---');
 	(function walk(n) { if (n.tag === 'button') { buttons.push(n); } n.children.forEach(walk); }(toolbar));
 	ok('the real toolbar was built and has its whole strip', buttons.length >= 20, buttons.length + ' buttons');
 	const transport = buttons.filter((b) => b.cls.indexOf('lpn-transport-btn') >= 0);
-	ok('...including exactly the three player controls', transport.length === 3,
+	ok('...including exactly the five player controls', transport.length === 5,
 		transport.map((b) => b.el.getAttribute('aria-label')).join(', '));
 	transport.forEach((b) => {
 		const nm = b.el.getAttribute('aria-label');

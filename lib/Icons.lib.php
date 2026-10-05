@@ -415,6 +415,14 @@ $ec_icons = array(
 	              . '<rect x="14" y="5" width="4" height="14" fill="currentColor" stroke="none"/>',
 	'step-back'  => '<rect x="3.2" y="5" width="3.6" height="14" fill="currentColor" stroke="none"/>'
 	              . '<path d="M20.8 5v14l-12-7z" fill="currentColor" stroke="none"/>',
+	// restart and end: the bar with a DOUBLE triangle, in the same 24-unit box and bar geometry as the
+	// step pair, so the five read as one family. Apexes at 7.5 and 14, bases at 14 and 20.8; end is
+	// the exact mirror through x = 12. Each triangle is 6.5 wide against the step mark's 12, which is
+	// what lets two of them fit in the room one had.
+	'restart'    => '<rect x="3.2" y="5" width="3.6" height="14" fill="currentColor" stroke="none"/>'
+	              . '<path d="M14 5v14l-6.5-7zM20.8 5v14L14 12z" fill="currentColor" stroke="none"/>',
+	'end'        => '<path d="M10 5v14l6.5-7zM3.2 5v14L10 12z" fill="currentColor" stroke="none"/>'
+	              . '<rect x="17.2" y="5" width="3.6" height="14" fill="currentColor" stroke="none"/>',
 	'step-fwd'   => '<path d="M3.2 5v14l12-7z" fill="currentColor" stroke="none"/>'
 	              . '<rect x="17.2" y="5" width="3.6" height="14" fill="currentColor" stroke="none"/>',
 
