@@ -4405,7 +4405,7 @@ $ec_lang['lpn_pda_deficit_note']='Junctions receiving less than their demand: {n
 $ec_lang['lpn_diag_pda_pressures']='Required pressure must be greater than Minimum pressure. Change one of them in Settings.';
 $ec_lang['lpn_inp_drop_pressure_unit']='This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.';
 
-// Map > Screenshot (Tom, 2026-10-05): a snipping tool that re-draws the dragged map area at three times its screen size.
+// Map > Screenshot (Tom, 2026-10-05): a snipping tool that re-draws the dragged map area larger than its screen size (3x unless the Screenshot box says otherwise).
 $ec_lang['lpn_screenshot_menu']='Screenshot';
 $ec_lang['lpn_screenshot_tip']='Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.';
 $ec_lang['lpn_screenshot_hint']='Drag a rectangle over the map, or click for the whole map. Esc cancels.';
@@ -4413,3 +4413,5 @@ $ec_lang['lpn_screenshot_copied']='Screenshot copied.';
 $ec_lang['lpn_screenshot_saved']='The clipboard is not available here, so the screenshot was downloaded as a PNG file.';
 $ec_lang['lpn_screenshot_no_basemap']='The street map or satellite image could not be included.';
 $ec_lang['lpn_screenshot_failed']='The screenshot could not be made.';
+$ec_lang['lpn_screenshot_scale']='Magnification';
+$ec_lang['lpn_screenshot_scale_tip']='The picture\'s size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.';

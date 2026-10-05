@@ -32330,6 +32330,8 @@ var EngCalcs = EngCalcs || {};
 			// as literals because LPN_NOTESBOX_KEY and LPN_HOTKEYSBOX_KEY are declared later in this
 			// file, the same reason 'lpn_show_titles' below is a literal.
 			'lpn_notesbox', 'lpn_hotkeysbox',
+			// 'lpn_snipbox' (the Screenshot box and its magnification) joined the day it was written.
+			'lpn_snipbox',
 			// AREA_HINT_KEY joined 2026-09-09, having been missed on the day it was written.
 			// dev/cookie-storage-inventory.md already filed it beside PAGE_TITLES_KEY as a reading
 			// preference set deliberately on this screen, so the document and the code disagreed
@@ -41082,7 +41084,8 @@ var EngCalcs = EngCalcs || {};
 	// it's not about Water."*
 	//
 	// **THE POINT IS THAT IT RE-DRAWS, NOT THAT IT GRABS.** The network is vector SVG, so the
-	// rectangle the visitor drags is drawn again at SNIP_SCALE times its CSS size -- lines and
+	// rectangle the visitor drags is drawn again at the Screenshot box's magnification (3x unless
+	// changed) times its CSS size -- lines and
 	// labels come out sharper than any screen grab of the same area. Basemap tiles are rasters and
 	// are only scaled into place; that is the honest limit.
 	//
@@ -41092,8 +41095,15 @@ var EngCalcs = EngCalcs || {};
 	// were loaded with (OSM and Mapbox both answer Access-Control-Allow-Origin: *). A tile that
 	// would still taint the canvas is left out and the confirmation says so.
 	//
-	// dev/lpn-spike/screenshot-browser-harness.js proves the size, the content, Esc and the fallback.
-	var SNIP_SCALE = 3, SNIP_SCALE_SAFE = 2, SNIP_MAX_SIDE = 16384, SNIP_MAX_AREA = 120e6, SNIP_DRAG_PX = 4;
+	// **THE PICTURE IS EXACTLY WHAT WAS SNIPPED, AND NOTHING IS ADDED TO IT** (Tom, 2026-10-05:
+	// *"Give the user exactly what they snip. Don't add anything including the Mapbox credits. This
+	// is their freedom that we must give them. We complied with our duty by showing it on our screen
+	// so that they can cite in their report."*). The tile credit stays on the screen in
+	// #lpn_basemap_credit; it is never painted into the image.
+	//
+	// dev/lpn-spike/screenshot-browser-harness.js proves the size, the content, Esc, the fallback,
+	// the box and its magnification, and that no credit is drawn.
+	var SNIP_SCALES = [1, 2, 3, 4], SNIP_SCALE = 3, SNIP_SCALE_SAFE = 2, SNIP_MAX_SIDE = 16384, SNIP_MAX_AREA = 120e6, SNIP_DRAG_PX = 4;
 	// What a snapshot keeps of each element's computed style. The SVG is drawn as an image, where
 	// the page's stylesheet does not reach, so whatever the stylesheet decided is written onto the
 	// element itself.
@@ -41104,9 +41114,13 @@ var EngCalcs = EngCalcs || {};
 		'text-anchor', 'dominant-baseline', 'alignment-baseline', 'baseline-shift', 'direction', 'unicode-bidi',
 		'marker-start', 'marker-mid', 'marker-end', 'shape-rendering', 'text-rendering', 'image-rendering', 'color'];
 	var snipVeil = null;
+	// The magnification the Screenshot box shows, 3 until the visitor chooses another.
+	function snipScaleChosen() {
+		return SNIP_SCALES.indexOf(snipboxLayout.scale) >= 0 ? snipboxLayout.scale : SNIP_SCALE;
+	}
 	function snipScaleFor(w, h) {
-		var s = SNIP_SCALE;
-		if (w * s > SNIP_MAX_SIDE || h * s > SNIP_MAX_SIDE || w * s * h * s > SNIP_MAX_AREA) { s = SNIP_SCALE_SAFE; }
+		var s = snipScaleChosen();
+		if (w * s > SNIP_MAX_SIDE || h * s > SNIP_MAX_SIDE || w * s * h * s > SNIP_MAX_AREA) { s = Math.min(s, SNIP_SCALE_SAFE); }
 		if (w * s > SNIP_MAX_SIDE || h * s > SNIP_MAX_SIDE || w * s * h * s > SNIP_MAX_AREA) {
 			s = Math.min(SNIP_MAX_SIDE / w, SNIP_MAX_SIDE / h, Math.sqrt(SNIP_MAX_AREA / (w * h)));
 		}
@@ -41122,8 +41136,83 @@ var EngCalcs = EngCalcs || {};
 		right = Math.min(right, window.innerWidth); bottom = Math.min(bottom, window.innerHeight);
 		return { x: left, y: top, w: Math.max(0, right - left), h: Math.max(0, bottom - top) };
 	}
+	// ---- THE SCREENSHOT BOX --------------------------------------------------------------------
+	// Tom, 2026-10-05: *"I hoped that there would be a box, possibly non-modal and dockable, with the
+	// magnification amount and any other possible future settings for the snip."* The Contour box's
+	// shell and memory (wireBoxMemory(), registerDockBox(), placeBoxRemembered()), opened by the
+	// menu row with the snip and left standing after it, so a docked box does not take its column
+	// from the map and give it back on every snip. Its x ends a snip in progress.
+	//
+	// **THE MAGNIFICATION IS THE BROWSER'S, NOT THE PROJECT'S** (Task 584's line): how sharp a
+	// picture somebody pastes into their report is a fact about that person's report, not about the
+	// network, and a colleague opening the file must not inherit it. So it rides in `lpn_snipbox`
+	// beside where the box sits. The box's openness is NOT recorded: it opens with the snip, never
+	// with the page.
+	function snipBoxEl() { return document.getElementById('lpn_snip_box'); }
+	function snipBoxIsOpen() {
+		var box = snipBoxEl();
+		return !!box && box.style.display !== 'none' && box.style.display !== '';
+	}
+	function openSnipBox() {
+		var box = snipBoxEl();
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		if (snipBoxIsOpen()) { placePanelForScreen(box, function () {}); return; }
+		box.style.display = 'flex';
+		buildSnipBox();
+		placePanelForScreen(box, function () { placeBoxRemembered(box, snipboxLayout, true); });
+		initTipsIn(box);
+	}
+	function closeSnipBox() {
+		cancelScreenshot();
+		hidePanel(snipBoxEl());
+	}
+	var LPN_SNIPBOX_KEY = 'lpn_snipbox';
+	var snipboxLayout = newBoxLayout();
+	snipboxLayout.userSized = false;
+	snipboxLayout.scale = SNIP_SCALE;
+	function saveSnipboxLayout() {
+		try { localStorage.setItem(LPN_SNIPBOX_KEY, JSON.stringify(snipboxLayout)); } catch (e) {}
+	}
+	function wireSnipBox() {
+		var box = snipBoxEl(), x = document.getElementById('lpn_snip_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeSnipBox); }
+		wireBoxMemory(box, LPN_SNIPBOX_KEY, snipboxLayout, saveSnipboxLayout, snipBoxIsOpen);
+	}
+	function buildSnipBox() {
+		var pc = EngCalcs.pageConfig || {}, body = document.getElementById('lpn_snip_body');
+		if (!body) { return; }
+		body.innerHTML = '';
+		var r = document.createElement('div'), lab = document.createElement('label'), sel = document.createElement('select');
+		r.className = 'lpn-set-row';
+		lab.textContent = pc.lpn_screenshot_scale || 'Magnification';
+		lab.htmlFor = 'lpn_snip_scale';
+		if (pc.lpn_screenshot_scale_tip) { lab.title = pc.lpn_screenshot_scale_tip; lab.className = 'ec-help'; }
+		sel.id = 'lpn_snip_scale';
+		SNIP_SCALES.forEach(function (n) {
+			var o = document.createElement('option');
+			o.value = String(n); o.textContent = n + '\u00d7';
+			if (n === snipScaleChosen()) { o.selected = true; }
+			sel.appendChild(o);
+		});
+		sel.addEventListener('change', function () {
+			var n = parseInt(sel.value, 10);
+			if (SNIP_SCALES.indexOf(n) < 0) { return; }
+			snipboxLayout.scale = n;
+			saveSnipboxLayout();
+		});
+		r.appendChild(lab); r.appendChild(sel);
+		body.appendChild(r);
+	}
 	function startScreenshot() {
 		cancelScreenshot();
+		// The box first: docked, it takes its column from the map, and the veil is laid over the
+		// map as it is after that. **NOT ON A PHONE**, where every standing box fills the window
+		// (placePanelForScreen()) and would cover the very map the finger has to drag over; the
+		// magnification last chosen still applies there.
+		if (!smallScreen()) { openSnipBox(); }
 		var pc = EngCalcs.pageConfig || {}, map = snipMapRect();
 		if (map.w < 1 || map.h < 1) { return; }
 		var veil = document.createElement('div'), box = document.createElement('div'), start = null;
@@ -41213,7 +41302,6 @@ var EngCalcs = EngCalcs || {};
 				var href = o.getAttribute('href') || o.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || '';
 				var isTile = o.classList.contains('lpn-basemap-tile');
 				pending.push(snipInlineImage(href).then(function (data) {
-					if (data && isTile) { out.tilesDrawn = true; }
 					if (data) { c.setAttribute('href', data); c.removeAttributeNS('http://www.w3.org/1999/xlink', 'href'); }
 					else {
 						if (isTile) { out.droppedBasemap = true; }
@@ -41273,46 +41361,9 @@ var EngCalcs = EngCalcs || {};
 			return e && e.isConnected && window.getComputedStyle(e).display !== 'none';
 		});
 	}
-	// **A PICTURE WITH TILES IN IT CARRIES THEIR CREDIT** (pre-review, 2026-10-05: Net3 pasted with
-	// no "© OpenStreetMap contributors"). The attribution is a licence term, not furniture, so it
-	// travels with the image -- the same words the on-screen #lpn_basemap_credit shows for the
-	// source in use, read from that element so there is one copy of them. "Improve this map" is a
-	// link to a feedback form and means nothing on paper; the Mapbox wordmark is written as its name.
-	function snipCreditText() {
-		var c = document.getElementById('lpn_basemap_credit'), set, parts = [];
-		if (!c) { return ''; }
-		set = c.querySelector('[data-basemap-credit="' + (basemapSource() === 'satellite' ? 'satellite' : 'osm') + '"]');
-		(function walk(n) {
-			Array.prototype.forEach.call(n.childNodes, function (k) {
-				if (k.nodeType === 3) { parts.push(k.nodeValue); return; }
-				if (k.nodeType !== 1) { return; }
-				if (/\/feedback\//.test(k.getAttribute('href') || '')) { return; }
-				if (k.classList.contains('lpn-mapbox-logo')) { parts.push(k.getAttribute('aria-label') || ''); return; }
-				walk(k);
-			});
-		})(set || c);
-		return parts.join(' ').replace(/\s+/g, ' ').trim();
-	}
-	function snipPaintCredit(ctx, W, H, s) {
-		var text = snipCreditText(), c = document.getElementById('lpn_basemap_credit');
-		if (!text || !c) { return; }
-		var cs = window.getComputedStyle(c), a = c.querySelector('a'), ink = window.getComputedStyle(a || c).color;
-		var px = 10 * s, padX = 5 * s, padY = 1 * s, margin = 4 * s, tw, bw, bh;
-		ctx.save();
-		ctx.font = px + 'px ' + cs.fontFamily;
-		ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-		tw = ctx.measureText(text).width;
-		bw = tw + 2 * padX; bh = px * 1.4 + 2 * padY;
-		ctx.fillStyle = cs.backgroundColor && !/rgba\([^)]*,\s*0\)$|transparent/.test(cs.backgroundColor) ?
-			cs.backgroundColor : window.getComputedStyle(c).getPropertyValue('--ec-a-255-255-255-85').trim();
-		ctx.fillRect(W - margin - bw, H - margin - bh, bw, bh);
-		ctx.fillStyle = ink;
-		ctx.fillText(text, W - margin - bw + padX, H - margin - bh / 2);
-		ctx.restore();
-	}
 	// Render the client-pixel rectangle `r` of the map. Resolves to { blob, droppedBasemap, scale }.
 	function renderScreenshot(r) {
-		var out = { droppedBasemap: false, tilesDrawn: false, scale: snipScaleFor(r.w, r.h) };
+		var out = { droppedBasemap: false, scale: snipScaleFor(r.w, r.h) };
 		var s = out.scale, W = Math.max(1, Math.round(r.w * s)), H = Math.max(1, Math.round(r.h * s));
 		var sr = svg.getBoundingClientRect(), ox = sr.left + svg.clientLeft, oy = sr.top + svg.clientTop;
 		return snipCloneSvg(out).then(function (clone) {
@@ -41340,7 +41391,6 @@ var EngCalcs = EngCalcs || {};
 					if (lr.right > r.x && lr.left < r.x + r.w && lr.bottom > r.y && lr.top < r.y + r.h) { snipPaintHtml(ctx, lg); }
 				});
 				ctx.restore();
-				if (out.tilesDrawn) { snipPaintCredit(ctx, W, H, s); }
 				return new Promise(function (resolve, reject) {
 					c.toBlob(function (b) { if (b) { out.blob = b; resolve(out); } else { reject(new Error('toBlob')); } }, 'image/png');
 				});
@@ -42507,6 +42557,7 @@ var EngCalcs = EngCalcs || {};
 		wireDemandScaleBox();
 		wireEnergyBox();
 		wireContourBox();
+		wireSnipBox();
 		wireScenarioCompareBox();
 		wireRunReportBox();
 		wireStatusReportBox();
@@ -50162,6 +50213,7 @@ var EngCalcs = EngCalcs || {};
 			['lpn_ds_box', dsLayout, null, null, 'lpn_ds_menu_tip'],
 			['lpn_energy_box', energyboxLayout, saveEnergyboxLayout, LPN_ENERGYBOX_KEY],
 			['lpn_contour_box', contourboxLayout, saveContourboxLayout, LPN_CONTOURBOX_KEY],
+			['lpn_snip_box', snipboxLayout, saveSnipboxLayout, LPN_SNIPBOX_KEY, 'lpn_screenshot_tip'],
 			['lpn_scncmp_box', cmpboxLayout, saveCmpboxLayout, LPN_CMPBOX_KEY],
 			['lpn_rptbox', rptboxLayout, saveRptboxLayout, LPN_RPTBOX_KEY],
 			['lpn_status_box', statusboxLayout, saveStatusboxLayout, LPN_STATUSBOX_KEY],

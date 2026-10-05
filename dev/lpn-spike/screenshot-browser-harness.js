@@ -8,7 +8,12 @@
 //   3. a dragged rectangle gives a PNG three times that rectangle, and it is not blank;
 //   4. Esc cancels: the veil goes and nothing is captured;
 //   5. with no clipboard, the PNG is offered as a download instead, and the notice says so;
-//   6. on a phone, a tap takes the whole map.
+//   6. on a phone, a tap takes the whole map;
+//   7. the dragged rectangle is half opaque (Tom, 2026-10-05: "Try 50%.");
+//   8. the Screenshot box opens with the snip, stays usable above the veil, and its magnification
+//      sets the picture's pixel size, remembered in this browser as `lpn_snipbox`;
+//   9. nothing is added to the picture: no tile credit, even with tiles in it (Tom, 2026-10-05:
+//      "Give the user exactly what they snip. Don't add anything including the Mapbox credits.").
 // The clipboard is replaced by a recorder, because a headless clipboard is the browser's to refuse
 // and this is about what the page HANDS it.
 //
@@ -49,6 +54,10 @@ function ok(label, cond, detail) {
 // The clipboard, replaced by a recorder of what the page hands it.
 const RECORDER = () => {
 	window.__snipBlobs = [];
+	// Every string any canvas paints, so a credit drawn in as text is caught by its words.
+	window.__snipTexts = [];
+	const ft = CanvasRenderingContext2D.prototype.fillText;
+	CanvasRenderingContext2D.prototype.fillText = function (t) { window.__snipTexts.push(String(t)); return ft.apply(this, arguments); };
 	Object.defineProperty(navigator, 'clipboard', { configurable: true, value: {
 		write: async (items) => { window.__snipBlobs.push(await items[0].getType('image/png')); }
 	} });
@@ -125,6 +134,18 @@ async function desktop(Session, browser) {
 		// 2. A plain click: the whole map at three times its CSS size.
 		await startSnip(a, LABEL);
 		ok('choosing it shows the hint', (await a.notice()) === await a.lang('lpn_screenshot_hint'), await a.notice());
+		// 8a. The box opens with the mode, at 3x, and stays usable above the veil.
+		const sbox = await page.evaluate(() => {
+			const b = document.getElementById('lpn_snip_box'), sel = document.getElementById('lpn_snip_scale');
+			if (!b || getComputedStyle(b).display === 'none') { return null; }
+			const r = sel.getBoundingClientRect(), hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+			return { scale: sel.value, options: Array.from(sel.options).map((o) => o.value).join(','), onTop: b.contains(hit),
+				title: document.getElementById('lpn_snip_title').textContent.trim() };
+		});
+		ok('the Screenshot box opens with the snip', !!sbox, JSON.stringify(sbox));
+		ok('...titled Screenshot, offering 1x to 4x, at 3x', !!sbox && sbox.title === LABEL && sbox.options === '1,2,3,4' && sbox.scale === '3', JSON.stringify(sbox));
+		ok('...and its control is above the veil, so it can be used during the snip', !!sbox && sbox.onTop, JSON.stringify(sbox));
+		ok('nothing is written to this browser just by opening it', (await page.evaluate(() => localStorage.getItem('lpn_snipbox'))) === null);
 		await page.mouse.click(map.x + map.w / 2, map.y + map.h / 2);
 		await waitBlobs(page, 1);
 		let png = await page.evaluate(LAST_PNG);
@@ -151,6 +172,8 @@ async function desktop(Session, browser) {
 		await page.mouse.move(r.x + r.w, r.y + r.h, { steps: 4 });
 		const rect = await page.$eval('.lpn-snip-rect', (e) => ({ w: e.offsetWidth, h: e.offsetHeight, shown: !!e.parentNode }));
 		ok('dragging draws the rectangle', rect.shown && rect.w === r.w && rect.h === r.h, JSON.stringify(rect));
+		const opacity = await page.$eval('.lpn-snip-rect', (e) => getComputedStyle(e).opacity);
+		ok('the dragged rectangle is half opaque (0.5)', opacity === '0.5', opacity);
 		await page.mouse.up();
 		await waitBlobs(page, 2);
 		png = await page.evaluate(LAST_PNG);
@@ -165,9 +188,10 @@ async function desktop(Session, browser) {
 		await a.settle(1500);
 		ok('...and captures nothing', (await page.evaluate(() => window.__snipBlobs.length)) === 2);
 
-		// 4b. Tiles in the picture carry their credit (pre-review, 2026-10-05: Net3 pasted with no
-		// "© OpenStreetMap contributors"). Net1 is a grid drawing, so one light tile is laid under the
-		// whole map in the basemap layer, exactly where real tiles live, and the credit's own set is shown.
+		// 4b. Tiles in the picture carry NO credit (Tom, 2026-10-05: "Give the user exactly what they
+		// snip. Don't add anything including the Mapbox credits."). Net1 is a grid drawing, so one
+		// light tile is laid under the whole map in the basemap layer, exactly where real tiles live,
+		// and the credit's own set is shown on screen, where it stays.
 		const credit = await page.evaluate(() => {
 			const c = document.createElement('canvas'); c.width = c.height = 16;
 			const g = c.getContext('2d'); g.fillStyle = 'rgb(200,230,200)'; g.fillRect(0, 0, 16, 16);
@@ -182,17 +206,47 @@ async function desktop(Session, browser) {
 			return cr ? cr.querySelector('[data-basemap-credit="osm"]').textContent.trim() : '';
 		});
 		ok('the street-map credit the screen shows is the OpenStreetMap one', /OpenStreetMap/.test(credit), credit);
+		await page.evaluate(() => { window.__snipTexts = []; });
 		await startSnip(a, LABEL);
 		await page.mouse.click(map.x + map.w / 2, map.y + map.h / 2);
 		await waitBlobs(page, 3);
 		png = await page.evaluate(LAST_PNG);
-		ok('with tiles drawn the picture carries the tile credit in its bottom-right corner', !!png && png.cornerDark > 100,
+		ok('with tiles drawn the picture carries them', !!png && png.ink > 1000, png && png.ink + ' pixels off the background');
+		ok('...and nothing is painted into its bottom-right corner, where a credit would go', !!png && png.cornerDark === 0,
 			png && png.cornerDark + ' dark pixels');
+		const texts = await page.evaluate(() => window.__snipTexts);
+		ok('...and no credit text is drawn into it', !texts.some((t) => /OpenStreetMap|Mapbox|\u00a9|Maxar/i.test(t)),
+			JSON.stringify(texts.filter((t) => /OpenStreetMap|Mapbox|\u00a9|Maxar/i.test(t))));
 		if (process.env.SNIP_SHOTS) {
 			const b64 = await page.evaluate(async () => { const b = window.__snipBlobs[window.__snipBlobs.length - 1]; const u = new Uint8Array(await b.arrayBuffer()); let s = ''; for (let i = 0; i < u.length; i += 8192) { s += String.fromCharCode.apply(null, u.subarray(i, i + 8192)); } return btoa(s); });
-			require('fs').writeFileSync(path.join(process.env.SNIP_SHOTS, 'screenshot-credit.png'), Buffer.from(b64, 'base64'));
+			require('fs').writeFileSync(path.join(process.env.SNIP_SHOTS, 'screenshot-tiles.png'), Buffer.from(b64, 'base64'));
 		}
 		await page.evaluate(() => document.getElementById('snip_fake_tile').remove());
+
+		// 8b. The box's magnification sets the picture's size: 2x for the whole map, 4x for a drag.
+		await startSnip(a, LABEL);
+		await page.selectOption('#lpn_snip_scale', '2');
+		await page.mouse.click(map.x + map.w / 2, map.y + map.h / 2);
+		await waitBlobs(page, 4);
+		png = await page.evaluate(LAST_PNG);
+		ok('at 2x a click gives the whole map at 2x (' + Math.round(map.w * 2) + ' x ' + Math.round(map.h * 2) + ')',
+			!!png && png.w === Math.round(map.w * 2) && png.h === Math.round(map.h * 2), png && (png.w + ' x ' + png.h));
+		const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('lpn_snipbox') || 'null'));
+		ok('...and the choice is remembered in this browser as lpn_snipbox', !!stored && stored.scale === 2 && !('open' in stored && stored.open), JSON.stringify(stored));
+		await startSnip(a, LABEL);
+		await page.selectOption('#lpn_snip_scale', '4');
+		const r4 = { x: Math.round(map.x + map.w * 0.3), y: Math.round(map.y + map.h * 0.3), w: 200, h: 150 };
+		await page.mouse.move(r4.x, r4.y);
+		await page.mouse.down();
+		await page.mouse.move(r4.x + r4.w, r4.y + r4.h, { steps: 6 });
+		await page.mouse.up();
+		await waitBlobs(page, 5);
+		png = await page.evaluate(LAST_PNG);
+		ok('at 4x a drag gives 4x the rectangle (800 x 600)', !!png && png.w === 800 && png.h === 600, png && (png.w + ' x ' + png.h));
+		const keptOpen = await page.evaluate(() => getComputedStyle(document.getElementById('lpn_snip_box')).display !== 'none');
+		ok('the box stays open after the snip', keptOpen);
+		await page.click('#lpn_snip_close');
+		ok('its x closes it', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_snip_box')).display === 'none'));
 
 		// 5. No clipboard: a download, and a notice that says so.
 		await page.evaluate(() => { delete navigator.clipboard; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined }); });
@@ -220,6 +274,8 @@ async function phone(Session, browser) {
 		await page.evaluate(RECORDER);
 		const map = await page.evaluate(MAP_RECT);
 		await startSnip(a, await a.lang('lpn_screenshot_menu'));
+		ok('on a phone the box does not open over the map it would cover',
+			await page.evaluate(() => getComputedStyle(document.getElementById('lpn_snip_box')).display === 'none'));
 		await page.touchscreen.tap(map.x + map.w / 2, map.y + map.h / 2);
 		await waitBlobs(page, 1);
 		const png = await page.evaluate(LAST_PNG);

@@ -1790,9 +1790,13 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    every object cursor's (0,1,0), which is what the regmode rule above predates. */
 #lpn_canvas.lpn-placemode, #lpn_canvas.lpn-placemode * { cursor: crosshair; }
 /* Map > Screenshot: the one-shot snipping veil over the map and the rectangle dragged on it
-   (startScreenshot() in js/looped-network.js). Transparent, so the map stays readable under it. */
-.lpn-snip-veil { position: fixed; z-index: 2500; cursor: crosshair; touch-action: none; }
-.lpn-snip-rect { position: absolute; box-sizing: border-box; border: 1px dashed var(--ec-accent); background: var(--ec-select-bg); pointer-events: none; }
+   (startScreenshot() in js/looped-network.js). Transparent, so the map stays readable under it.
+   The veil sits just UNDER the movable boxes (1200), so the Screenshot box that opens with it,
+   and any other box over the map, can still be used while it is up. The rectangle is half
+   opaque (Tom, 2026-10-05: "The screenshot drag needs to be less than 100% opaque. Try 50%."),
+   so what is being snipped shows through it. */
+.lpn-snip-veil { position: fixed; z-index: 1190; cursor: crosshair; touch-action: none; }
+.lpn-snip-rect { position: absolute; box-sizing: border-box; border: 1px dashed var(--ec-accent); background: var(--ec-select-bg); opacity: 0.5; pointer-events: none; }
 @media print { .lpn-snip-veil { display: none; } }
 /* Node-mode target step: nodes ARE the valid click target here, so forcing crosshair over them
    removes the one affordance that actually matters. More specific than the rule above (extra
@@ -2277,6 +2281,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    unit. */
 .lpn-contourbox { width: min(24rem, calc(100vw - 8px)); --lpn-set-name: 8.5rem; --lpn-set-col: 13rem; }
 .lpn-contourbox .lpn-set-row { margin: 7px 0; }
+.lpn-snipbox { width: min(18rem, calc(100vw - 8px)); min-width: min(14rem, 94vw); --lpn-set-name: 8.5rem; --lpn-set-col: 6rem; }
+.lpn-snipbox .lpn-set-row { margin: 7px 0; }
 .lpn-contour-ctl { display: flex; gap: 4px; align-items: baseline; flex-wrap: wrap; min-width: 0; }
 /* The colour scheme button draws its swatches absolutely, so as a flex item it has no width of its
    own to offer: it takes the row. */
