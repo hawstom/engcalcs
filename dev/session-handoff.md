@@ -131,10 +131,11 @@ minimum (the Statistic merge had erased it); the daily email names each usage ta
 
 Tom wants Bentley's scenario tree over alternatives, every project setting in a category, built in
 stages; it was never declined (the "Bentley is not ours" note that read as a refusal is renamed and
-corrected). Stage 2 (data layer) is built; stage 3 (route ~100 setting readers through
-`effectiveSetting()`, the map view into Presentation, his 2026-10-06 answers: friction method and
-new-asset defaults are overridable, only units and coordinates are not) was running at handoff time;
-check `git log feat/bentley-interop` and the agent's report in the next STATE. Doc:
+corrected). Stages 2 and 3 are built (beedec3f): the data layer, and ~110 setting readers routed
+through the scenario seam, proven byte-identical on 42 example cases with no override; the map view
+is a Presentation setting; friction method and new-asset defaults are overridable, only units and
+the coordinate frame are not (his 2026-10-06 answers). Next: the settings table and the Settings-box
+writes (specified in the doc), after his answers to the five stage-3 questions in his report. Doc:
 `dev/scenario-alternatives.md` ("The long burn", "His answers, 2026-10-06").
 
 ### Next job
