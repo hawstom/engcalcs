@@ -2079,8 +2079,6 @@ $ec_lang['lpn_notes_5_def']='O pompă respectă H = H₀ − aQ^b, unde H este s
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='De asemenea, pe această pagină';
-$ec_lang['lpn_notes_4_def']='Un proiect poate fi așezat pe teren real, cu o hartă stradală în spatele lui. Fișierele EPANET .inp pot fi citite și scrise. Panoul de jos desenează un profil de-a lungul unui traseu și listează joncțiunile. Elementele pot fi colorate după rezultatele lor, iar Găsire identifică fiecare element care îndeplinește o condiție pe care o stabiliți.';
 $ec_lang['lpn_notes_6_term']='Ajutor pentru coloanele tabelului';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one
