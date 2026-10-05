@@ -369,7 +369,7 @@ the block.
   email address, and some selectors or canned phrases."* Ida's ranking (journal 2026-10-05): the
   error toast carries its own link with the code, and contact.php gains a category and an optional
   email label (building on `feat/feedback`); the in-page Send feedback dialog is the larger build.
-- 75|769| **Change type: turn a junction into a tank, a pipe into a valve.**
+- 75|769| **Change type: a junction becomes a tank, a pipe a valve.**
   Tom, 2026-10-05: *"a tool under Water or Tables to Change node type for any asset, where if it has
   information that can't be ported to the new type, we alert and ask."* Building on
   `feat/asset-type`; the seam with `feat/bentley-interop` is alternatives keyed by element id.

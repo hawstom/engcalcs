@@ -33,7 +33,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 763 — A searchable help manual, built from the tips Tom cut.
 - Task 766 — Show scenarios in the Tables pane: one row per asset per scenario.
 - Task 768 — Report a problem: more information and freedom than one anonymous click.
-- ! Task 769 — Change type: turn a junction into a tank, a pipe into a valve.
+- Task 769 — Change type: a junction becomes a tank, a pipe a valve.
 - Task 770 — A warning glyph on every unreasonable value.
 - Task 771 — Survey points as a script: the Description names the asset or vertex.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
@@ -120,5 +120,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-83 of 92 titles are within 4–12 words. `!` marks the rest;
+84 of 92 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
