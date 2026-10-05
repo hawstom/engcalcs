@@ -10111,6 +10111,35 @@ var EngCalcs = EngCalcs || {};
 		var an = textAnchorPoint(lb);
 		return an ? { x: an.x + lb.x, y: an.y + lb.y } : { x: lb.x, y: lb.y };
 	}
+	// **DETACHING A TEXT** (Tom, 2026-10-05: *"Text that is attached to an asset needs to be able to
+	// be detached, at least by deleting the attachment in Table or Properties."*). The words stay
+	// where they are drawn: x/y stop being an offset and become the position the words already
+	// occupy (textLabelPoint(), read BEFORE the anchor is dropped), the leader goes, and the two
+	// anchor indexes forget the Text so the asset no longer drags it. Base-owned, like the
+	// attachment itself. The CALLER takes the undo snapshot, as every property write does.
+	function detachText(lb) {
+		var pt, le;
+		if (!lb || !textIsAnchored(lb)) { return false; }
+		le = labelEls[lb.id];
+		pt = textLabelPoint(lb);
+		if (lb.anchorNode && labelsByAnchor[lb.anchorNode]) {
+			labelsByAnchor[lb.anchorNode] = labelsByAnchor[lb.anchorNode].filter(function (x) { return x !== lb.id; });
+		}
+		if (lb.anchorLink && labelsByLinkAnchor[lb.anchorLink]) {
+			labelsByLinkAnchor[lb.anchorLink] = labelsByLinkAnchor[lb.anchorLink].filter(function (x) { return x !== lb.id; });
+		}
+		lb.x = pt.x; lb.y = pt.y;   // base-write: attachment and position are Base-owned, exactly as size is
+		lb.anchorNode = null; delete lb.anchorLink; delete lb.anchorT;
+		if (le && le.leader) { le.leader.remove(); le.leader = null; }
+		if (le) {
+			applyTextLabelJustification(lb, le);
+			updateLabelGeometry(lb.id);
+			textLabelRelayout(lb.id);
+		} else { saveToStorage(); }
+		relayoutLabels();
+		refreshPaneIfOpen();
+		return true;
+	}
 	function buildLabelEls(lb) {
 		var an = textAnchorPoint(lb), pt = textLabelPoint(lb),
 			px = pt.x, py = pt.y,
@@ -23539,14 +23568,21 @@ var EngCalcs = EngCalcs || {};
 			// Read-only here (attaching and detaching are map gestures, not a typed rename), but its own
 			// value is a node or link ID exactly as From/To name one on a Pipe, so panePlanCreates()
 			// reads it the same way.
-			{ key: 'anchor', label: 'lpn_field_text_anchor', str: true, em: 5,
-				get: function (lb) { return lb.anchorNode || lb.anchorLink || ''; } },
+			// Clearing the cell DETACHES the Text (Tom, 2026-10-05); anything typed other than the
+			// current value is refused, because attaching is a map gesture. `reread` shows what stuck.
+			{ key: 'anchor', label: 'lpn_field_text_anchor', str: true, em: 5, reread: true,
+				get: function (lb) { return lb.anchorNode || lb.anchorLink || ''; },
+				set: function (lb, v) {
+					if (String(v === null || v === undefined ? '' : v).trim() === '') { detachText(lb); }
+				} },
 			paneColActive(),
 			// The words and the presence are the label's two OVERRIDABLE properties (Task 407) and
 			// go through setProp(); everything below is Base-owned, as the popup's own rows say.
 			{ key: 'text', label: 'lpn_tool_add_text', str: true, em: 9, prop: 'text',
 				get: function (lb) { return effective(lb, 'text'); },
 				set: function (lb, v) { setProp(lb, 'text', v); refreshLabelContent(lb.id); } },
+			// Not overridable, like every other element's Description (see descField()).
+			paneColDesc(),
 			{ key: 'sizeMult', label: 'lpn_field_text_size', em: 2.5,
 				get: function (lb) { return lb.sizeMult || 1; },
 				set: function (lb, v) {
@@ -31798,6 +31834,14 @@ var EngCalcs = EngCalcs || {};
 		doc.labels = doc.labels.filter(function (x) { return x.id !== id; });
 		purgeOverrides(ovKeyFor('label', id));   // see deleteNode(): a real deletion takes them with it
 		if (currentPopup && currentPopup.kind === 'label' && currentPopup.id === id) { closePopup(); }
+		// **A DELETED TEXT LEFT THE TABLE AND THE FILE BEHIND** (Tom, 2026-10-05: *"Text table doesn't
+		// update when a text element is deleted."*). Every other delete reaches the open pane and the
+		// store through scheduleSolve(); a Text schedules no solve (see addText(), which hand-calls
+		// the same two lines), so its row stayed on screen and the removal was never saved. A node's
+		// or pipe's cascade also lands here and then schedules its own solve, which repeats both
+		// harmlessly.
+		refreshPaneIfOpen();
+		scheduleSave();
 	}
 
 	// ---- Project library storage (Task 146.08 step 3) ----
@@ -53583,6 +53627,27 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
+	// An attached Text's "Attached asset" row. A box rather than a read-only line: CLEARING it detaches
+	// the Text (Tom, 2026-10-05), which then draws exactly where it was and gets its alignment rows
+	// back. Typing any other id is refused and the box restored, because attaching is a map gesture.
+	function attachedTextField(fields, lb) {
+		var pc = EngCalcs.pageConfig || {},
+			label = document.createElement('label'), input = document.createElement('input');
+		input.type = 'text';
+		input.value = lb.anchorNode || lb.anchorLink || '';
+		input.addEventListener('change', function () {
+			if (input.value.trim() !== '') { input.value = lb.anchorNode || lb.anchorLink || ''; return; }
+			saveUndoSnapshot();
+			detachText(lb);
+			refreshPopupIfOpen();
+		});
+		setFieldLabel(label, pc.lpn_field_text_attached || 'Attached asset',
+			pc.lpn_field_text_attached_tip ||
+				'This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.');
+		label.appendChild(input);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
 	// ---- what the import could not keep about THIS element (ROADMAP Task 483) ----
 	//
 	// The last block in every property popup, and only for an element that has one. Read-only and
@@ -56302,6 +56367,8 @@ var EngCalcs = EngCalcs || {};
 		// It sits directly under the text so the popup's TWO scenario properties are together, above
 		// everything that belongs to the drawing.
 		activeField(fields, lb);
+		// The Text's Description: free text, Base-owned and NOT overridable, as on every element.
+		descField(fields, lb);
 		// Task 146.03: per-label size multiplier, stacked on top of the shared settings.textSize
 		// (effectiveFontSize(lb.sizeMult) in buildLabelEls/refreshFontSizes above).
 		var sizeLabel = document.createElement('label'), sizeInput = document.createElement('input');
@@ -56480,10 +56547,7 @@ var EngCalcs = EngCalcs || {};
 		// only thing to compare was two Texts that looked identical and offered different
 		// controls. The fact is on the row that already states the attachment.
 		if (textIsAnchored(lb)) {
-			readonlyField(fields, pc.lpn_field_text_attached || 'Attached asset',
-				lb.anchorNode || lb.anchorLink,
-				pc.lpn_field_text_attached_tip ||
-					'This text was placed close enough to an asset to follow it, so it moves with that asset and has a leader. A text on a leader takes its horizontal and vertical alignment from the side it sits on, which is why those two rows are not offered while it is attached.');
+			attachedTextField(fields, lb);
 		}
 		customPropFields(fields, lb);
 		importNotesField(fields, lb);
