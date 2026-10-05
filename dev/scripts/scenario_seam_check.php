@@ -182,7 +182,9 @@ foreach ($lines as $i => $line) {
 // here; everything else goes through eachOverrideMap() or the resolved readers.
 $ovAllowed = [
     // the walk, and the resolver that every hot reader goes through
-    'eachOverrideMap', 'resolvedOverrides', 'buildResolvedOverrides', 'localOverrideMap',
+    'eachOverrideMap', 'resolvedOverrides', 'buildResolvedOverrides', 'localOverrideMap', 'layerValuesByCategory',
+    // the stored tree's own load-time cleaning
+    'sanitizeScenarioTree',
     // the one write seam, and the scenario's own count beside its name
     'setOverride', 'clearOverride', 'overrideCount',
     // the derived (Basic mode) alternatives, read off each scenario's own map
