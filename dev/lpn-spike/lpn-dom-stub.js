@@ -392,7 +392,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // matters as much as the buttons: without it setStatus() falls back to the <p>, and the fallback
   // is the shape that deletes the button on every solve -- so a stub missing it would have made
   // the regression this feature can cause untestable.
-  'lpn_status_text', 'lpn_status_notes', 'lpn_wrong_btn', 'lpn_wrong_status_btn',
+  'lpn_status_text', 'lpn_status_notes', 'lpn_wrong_btn', 'lpn_wrong_status_btn', 'lpn_tell_status', 'lpn_tell_btn',
   // The engine-wait banner (ROADMAP Task 608), a third row of the same top-left column. Absent
   // from this list, refreshEpanetBanner() returns at its first line and the whole of Part 2 --
   // the sentence Tom wrote and the failure that replaces it -- is invisible to every harness.

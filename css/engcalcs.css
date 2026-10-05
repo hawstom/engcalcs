@@ -3962,6 +3962,14 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 /* Once tapped it is no longer a control, and it must not keep looking like one: the label is the
    thank-you, so a hover border on it would invite a second press that posts nothing. */
 .lpn-wrong-btn[disabled] { color: var(--ec-ink-muted); cursor: default; border-color: transparent; opacity: 1; }
+.lpn-tell-link {
+	pointer-events: auto;
+	font-size: 11px;
+	padding: 0 4px;
+	color: var(--ec-ink-muted);
+	text-decoration: underline;
+}
+.lpn-tell-link:hover, .lpn-tell-link:focus { color: var(--ec-ink-strong); }
 /* ---- The message log button and list (ROADMAP Task 704) ----
    Moved 2026-09-21 into #lpn_map_overlay_tl, beside the mode hint it recalls (Tom: "the
    button/glyph must be where the messages appear"). **OPAQUE, not the translucent pill paint the

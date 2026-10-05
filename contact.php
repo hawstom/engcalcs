@@ -1,5 +1,6 @@
 <?php
 require_once('lib/base.inc.php');
+require_once(__DIR__ . '/lib/ContactMail.lib.php');
 $html_title = $ec_lang['contact_main_menu'];
 echoHeader("EngCalcs", $html_title, "", false);
 // Task 206: this page has no calculator form, so nothing else names it for the human-view beacon.
@@ -45,12 +46,25 @@ within a few days.</p>
       name="name"
     />
   </p>
-  <p><?php echo $ec_lang['contactYourEmail'];?><br>
+  <p><?php echo $ec_lang['contactYourEmailOptional'];?><br>
     <input
       type="text"
       size="35"
       name="email"
     />
+  </p>
+<?php // WHAT IS THIS ABOUT (Ida, 2026-10-05). Values are fixed slugs; ?cat= preselects one (the
+      // error link on the map sends cat=wrong), anything else leaves "Other". ?>
+<?php $ecCat = ecContactCategory(isset($_GET['cat']) ? $_GET['cat'] : '');
+      if ($ecCat === '') { $ecCat = 'other'; }
+      $ecCatKeys = array('wrong' => 'contactCategoryWrong', 'wording' => 'contactCategoryWording',
+                         'idea' => 'contactCategoryIdea', 'other' => 'contactCategoryOther'); ?>
+  <p><label for="ec_contact_category"><?php echo $ec_lang['contactCategory'];?></label><br>
+    <select id="ec_contact_category" name="category">
+<?php foreach ($ecCatKeys as $v => $k) : ?>
+      <option value="<?=$v?>"<?=$v === $ecCat ? ' selected' : ''?>><?=htmlspecialchars($ec_lang[$k])?></option>
+<?php endforeach; ?>
+    </select>
   </p>
   <p><?php echo $ec_lang['contactSubject'];?><br>
     <input
@@ -82,8 +96,21 @@ within a few days.</p>
 <?php $ecFrom = isset($_GET['from']) && is_string($_GET['from']) ? $_GET['from'] : '';
       if ($ecFrom !== '' && preg_match('/^[A-Za-z0-9._-]{1,64}$/', $ecFrom)) : ?>
     <input type="hidden" name="origin" value="<?=htmlspecialchars($ecFrom, ENT_QUOTES, 'UTF-8')?>">
+<?php endif;
+      // The context the "Tell us more" link on the map carries: the language and an error code, both
+      // slugs. Shown to the sender in words so nothing is attached silently. Never anything from a drawing.
+      $ecCode = ecContactSlug(isset($_GET['code']) ? $_GET['code'] : '');
+      $ecLang = preg_replace('/[^A-Za-z-]/', '', substr(isset($_GET['lang']) && is_string($_GET['lang']) ? $_GET['lang'] : '', 0, 12));
+      if ($ecCode !== '') : ?>
+    <input type="hidden" name="code" value="<?=htmlspecialchars($ecCode, ENT_QUOTES, 'UTF-8')?>">
+<?php endif;
+      if ($ecLang !== '') : ?>
+    <input type="hidden" name="ctxlang" value="<?=htmlspecialchars($ecLang, ENT_QUOTES, 'UTF-8')?>">
 <?php endif; ?>
   </p>
+<?php if ($ecFrom !== '' || $ecCode !== '' || $ecLang !== '') : ?>
+  <p class="ec-note"><?=htmlspecialchars($ec_lang['contactContextNote'])?></p>
+<?php endif; ?>
 </form>
 
 </div>

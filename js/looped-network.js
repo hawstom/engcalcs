@@ -58699,6 +58699,19 @@ var EngCalcs = EngCalcs || {};
 	// the text -- diagIssueText() already turned the code into the sentence. A caller with no code
 	// gets 'status', which is honest: something was said, and it was not one of the diagnoses.
 	var statusWrongCode = '';
+	// "TELL US MORE": the written route beside the anonymous button. It opens contact.php with the page,
+	// the language and the code of the message on screen in the URL, and sends nothing itself. Only a
+	// slug and two names ride along; never anything out of the drawing.
+	function contactUrl(code) {
+		var q = 'from=Looped-Network&cat=wrong&lang=' + encodeURIComponent(document.documentElement.lang || '');
+		if (code && code !== 'none') { q += '&code=' + encodeURIComponent(String(code).replace(/[^A-Za-z0-9._:\/-]/g, '').slice(0, 80)); }
+		return suiteUrl('contact.php?' + q);
+	}
+	function syncTellLinks() {
+		var s = document.getElementById('lpn_tell_status'), b = document.getElementById('lpn_tell_btn');
+		if (s) { s.href = contactUrl(statusWrongCode || 'status'); }
+		if (b) { b.href = contactUrl('none'); }
+	}
 	function setStatus(text, code) {
 		var el = document.getElementById('lpn_status');
 		var textEl = document.getElementById('lpn_status_text');
@@ -58721,6 +58734,7 @@ var EngCalcs = EngCalcs || {};
 		// sentence, and refusing to hear about that one would be the instrument measuring itself.
 		if (next !== statusWrongCode) { resetWrongButton('lpn_wrong_status_btn'); }
 		statusWrongCode = next;
+		syncTellLinks();
 		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
 		// overlay now, so this changes what is COVERED, never what is laid out.
 		syncStatusBoxVisibility();
@@ -58894,6 +58908,7 @@ var EngCalcs = EngCalcs || {};
 		// 'none' rather than an empty slug: the endpoint strips the detail to a charset and an
 		// empty one would be indistinguishable in the log from a row whose detail was dropped.
 		wireWrongButton('lpn_wrong_btn', 'none');
+		syncTellLinks();
 		wireWrongButton('lpn_wrong_status_btn', function () { return statusWrongCode || 'status'; });
 	}
 	// Rounds to the same number of decimals the label actually displays, in the DISPLAY unit --
@@ -64212,7 +64227,7 @@ var EngCalcs = EngCalcs || {};
 			var failWhy = EngCalcs.lpnEngineFailWhy ? EngCalcs.lpnEngineFailWhy(err) : 'offline';
 			setStatus(failWhy === 'offline'
 				? (pc.lpn_engine_failed || 'The EPANET solver could not be loaded. Showing the built-in solver instead.')
-				: (pc.lpn_engine_failed_why || '{reason} Showing the built-in solver instead.').replace('{reason}', EngCalcs.lpnEngineReason(failWhy)));
+				: (pc.lpn_engine_failed_why || '{reason} Showing the built-in solver instead.').replace('{reason}', EngCalcs.lpnEngineReason(failWhy)), 'engine-' + failWhy);
 			if (window.console && console.warn) { console.warn('EPANET engine load/solve failed:', err); }
 		});
 	}
