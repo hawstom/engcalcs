@@ -230,6 +230,8 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	      // three above are their own: this one lands points in the OPEN project instead of making a
 	      // new tab, so an input shared with them would have to guess which act was meant. A text
 	      // point list; the accept list only tidies the picker, as it does for the three above. ?>
+	<?php // The Profile tab menu's EPANET .PRO picker (Task 604). Its own input: it sets the profile path, not a project. ?>
+	<input type="file" id="lpn_profile_file" accept=".pro,.txt,text/plain" style="display:none">
 	<input type="file" id="lpn_survey_file" accept=".csv,.txt,.pnt,.pts,text/csv,text/plain" style="display:none">
 	<?php // Library import (Task 611). A picker of its own, and it takes the same two extensions
 	      // #lpn_project_file does because it reads the same kind of file -- but it lands somewhere
@@ -2187,6 +2189,10 @@ EngCalcs.pageConfig = {
 	lpn_profile_new_name: <?=json_encode($ec_lang['lpn_profile_new_name'])?>,
 	lpn_profile_rename: <?=json_encode($ec_lang['lpn_profile_rename'])?>,
 	lpn_profile_delete: <?=json_encode($ec_lang['lpn_profile_delete'])?>,
+	lpn_profile_open: <?=json_encode($ec_lang['lpn_profile_open'])?>,
+	lpn_profile_file_done: <?=json_encode($ec_lang['lpn_profile_file_done'])?>,
+	lpn_profile_file_missing: <?=json_encode($ec_lang['lpn_profile_file_missing'])?>,
+	lpn_profile_file_short: <?=json_encode($ec_lang['lpn_profile_file_short'])?>,
 	lpn_profile_prompt_name: <?=json_encode($ec_lang['lpn_profile_prompt_name'])?>,
 	lpn_profile_delete_confirm: <?=json_encode($ec_lang['lpn_profile_delete_confirm'])?>,
 	lpn_profile_none_saved: <?=json_encode($ec_lang['lpn_profile_none_saved'])?>,

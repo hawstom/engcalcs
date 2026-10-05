@@ -3685,6 +3685,11 @@ TRAP for method: Session Save as needs answerTrainingPanel() then a second queue
 - NOT EXERCISED: Settings changes, recalc-off edits, hover/select, pinch, real customers, georeference change.
 - Method: snapshots must exclude other tabs' kept (display:none) layers; tab order at load is nondeterministic, so verify the current tab by name. Never pkill -f with a pattern that matches your own shell command.
 
+## 2026-10-03 -- pre-review feat/profile-file 0c7d728e (Task 604), Perry
+
+- CITED: USEPA/EPANET2.2 Delphi_GUI/epanet2w/Dgraph.pas (raw.githubusercontent.com): Save does Insert(0,ProfileID) then SaveToFile; Open does LoadFromFile then Delete(0). Filter '*.PRO'. Format matches the parser: identifier line, one node ID per line (TStringList: CRLF, ANSI, no BOM).
+- OBSERVED (real headless Chrome, php -S, Net3.lwn, file fed to the input via DOM.setFileInputFiles): menu row last, below a separator, 32px like the others, no icon, text aligned with the others; the Profile panel gained no control. Sample draws "Nodes: 5, length: 21490 ft"; notice "5 of 5 nodes found". Mixed file: "2 of 4 ... ZZ9, QQ". One usable: refused, notice names ZZ9. Input value is '' after each pick, so the same file twice re-fires. A link-only ID (112) is reported as not in this network, and the rest still draw.
+- NOT EXERCISED: the native file chooser (headless cannot), the real click on the row, non-ASCII IDs.
 ## 2026-10-03 -- pre-review feat/contour c07094a8 (Task 600), Perry
 
 - OBSERVED (headless Chrome, php -S on the worktree, Net3 and Net3-Novato-CA-World): Graphs > Contour turns on filled contours and opens Settings at Node colors; Filled / Line / None all draw and clear; 1 layer under the pipes; legend sentence present. Recalculate off + node drag: plot unchanged until Calculate (snapshot holds, but the old outline stays where the node used to be). Play at 1x, nodal plot: no long tasks, 60 fps, redrawn once per step.
@@ -3805,3 +3810,15 @@ Scripts: scratchpad/perry/p*.js, mutation copy scratchpad/perry/mut.
 5 default tip: fixed ("The default is 0.1 psi"; blank now sent as 0.1 psi).
 6 dropdown fits ("Pressure driven"); stale unit labels until Settings reopened: not fixed.
 Mutants: Minimum Pressure line omitted: now caught. Minimum conversion removed: STILL not caught (psi case).
+
+## feat/dock-flag-order at 8fa3fea5, flag drag reorder (OBSERVED, 2026-10-04)
+OBSERVED: with 3 flags on one bar, a drag moves the flag exactly one slot then stops. Chrome releases pointer capture when insertBefore moves the tab (lostpointercapture fires mid-drag), so later moves and the pointerup never reach it. Mouse and CDP touch alike.
+OBSERVED: consequence: no dockOrd stored, `lpn-dock-tab-drag` outline lingers, order reverts on next layout/reload. The builder's harness has only 2 flags so one slot is all it can test.
+OBSERVED: at width <=640 docking is off (dockSideOf), so no flags exist on a phone; touch tap works at 700 px.
+SPECULATION: record-less boxes (lpn_popup, crit, ds, alt, calib) sort last on reload (1e9).
+Lesson: a harness with the minimum count of items cannot see an order bug that needs three. Probes deleted after use.
+
+## feat/dock-flag-order re-review at ae1a7f06 (OBSERVED, 2026-10-04)
+OBSERVED: first-pass defect fixed. 3 flags right bar, top flag dragged 300 px: order polled mid-drag walks one slot at a time to the end, ranks 2,0,1 stored, no stuck mark, survives reload, click after reload opens the flag it names. 4 flags left bar (Properties among them), last flag dragged 400 px up: reaches the front, no stuck mark; after reload Properties is gone (by design), others keep order; click opens Libraries. Harnesses: flag-order 31/31, dock-browser 71/71, title-band 156/156.
+OBSERVED defect (minor): a one-event flick whose end point is off the strip (e.g. -150 px from the 2nd flag, strip top is y=116) changes nothing; same flick ending on the strip, or a stepped drag to the same point, reorders. Mouse only; touch flick not tried.
+Probes in scratchpad/probe.js, probe2.js (copy of builder harness head).

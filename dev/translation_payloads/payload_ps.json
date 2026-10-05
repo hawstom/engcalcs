@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ps",
-        "expected_key_count": 2333,
-        "delta_key_count": 105,
+        "expected_key_count": 2335,
+        "delta_key_count": 107,
         "exempt_key_count": 35,
         "exempt_keys": [
             "u_imgd",
@@ -728,6 +728,10 @@
         "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
         "lpn_pane_sel_only": "Selection only",
         "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
+        "lpn_profile_open": "Open EPANET profile file…",
+        "lpn_profile_file_done": "Profile read from the file: {used} of {total} nodes found in this network.",
+        "lpn_profile_file_missing": "Named in the file but not in this network: {ids}.",
+        "lpn_profile_file_short": "The file names fewer than two nodes in this network, so there is no profile to draw.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
         "lpn_result_pump_head": "Head",
@@ -740,11 +744,10 @@
         "lpn_cp_allow_tip": "Allow only these characters:",
         "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
         "lpn_alt_calc_options": "Calculation options",
-        "lpn_scenario_duration_tip": "Overrides the total run time in this scenario. Leave it blank to use its parent's. A total run time of 0:00 is a steady-state run.",
-        "lpn_scenario_hyd_step_tip": "Overrides the hydraulic time step in this scenario. Leave it blank to use its parent's.",
+        "lpn_scenario_duration_tip": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
+        "lpn_scenario_hyd_step_tip": "Leave blank to inherit from parent.",
         "lpn_time_scn_overrides": "Scenario overrides:",
         "lpn_settings_basemap_style": "Basemap style",
-        "lpn_settings_basemap_style_tip": "Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.",
         "lpn_basemap_style_normal": "Normal",
         "lpn_basemap_style_muted": "Muted",
         "lpn_basemap_style_faded": "Faded",
@@ -754,7 +757,7 @@
         "lpn_saved_session": "Not saved",
         "lpn_scncmp_at_time": "{value} at {id}, {time}",
         "lpn_scncmp_same": "The same in every scenario",
-        "lpn_scncmp_period_note": "Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.",
+        "lpn_scncmp_period_note": "Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole network, at the time shown.",
         "lpn_choice_default": "Default",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
@@ -766,7 +769,7 @@
         "lpn_ds_scope_selected": "Selected junctions",
         "lpn_ds_minpressure": "Lowest pressure allowed",
         "lpn_ds_minpressure_tip": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
-        "lpn_ds_eps_note": "Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.",
+        "lpn_ds_eps_note": "Only the time step now on screen is scaled; levels and statuses are taken from this step. To test the peak, move the clock to the peak demand before you run.",
         "lpn_ds_head_scale": "Scale the demands",
         "lpn_ds_multiplier": "Demand scale",
         "lpn_ds_multiplier_tip": "The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.",
@@ -774,11 +777,10 @@
         "lpn_ds_head_search": "What demand scale can the system handle?",
         "lpn_ds_head_search_selected": "What demand scale can these junctions handle?",
         "lpn_ds_outside_below": "At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.",
-        "lpn_ds_search_note": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
-        "lpn_ds_find": "Find",
+        "lpn_ds_search_note": "Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.",
         "lpn_ds_holds_max": "✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.",
         "lpn_ds_below_zero": "⚠ At least one junction is below {pressure} even with the scaled demands at zero.",
-        "lpn_ds_found": "✓ Every junction keeps {pressure} up to a demand scale of {m}.",
+        "lpn_ds_found": "✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.",
         "lpn_ds_found_below": "⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.",
         "lpn_ds_search_stopped": "The search was stopped before it found an answer.",
         "lpn_ds_lowest_at": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.",
@@ -801,15 +803,15 @@
         "lpn_analyze_at_time": "Time step: {time}.",
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.",
         "lpn_settings_demand_model": "Demand model",
-        "lpn_settings_demand_model_tip": "Choose how junctions receive water. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.",
+        "lpn_settings_demand_model_tip": "Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.",
         "lpn_settings_demand_model_dda": "Demand driven",
         "lpn_settings_demand_model_pda": "Pressure driven",
         "lpn_settings_min_pressure": "Minimum pressure",
-        "lpn_settings_min_pressure_tip": "Enter the pressure at or below which a junction receives no water. Use this project's pressure unit.",
+        "lpn_settings_min_pressure_tip": "Enter the pressure at or below which a junction receives no flow. Use this project's pressure unit.",
         "lpn_settings_req_pressure": "Required pressure",
         "lpn_settings_req_pressure_tip": "Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.",
         "lpn_settings_pressure_exponent": "Pressure exponent",
-        "lpn_settings_pressure_exponent_tip": "Enter the exponent of the curve that rises from no water at the minimum pressure to the full demand at the required pressure.",
+        "lpn_settings_pressure_exponent_tip": "Enter the exponent of the curve that rises from no flow at the minimum pressure to the full demand at the required pressure.",
         "lpn_engine_pda_route": "Solved with the EPANET solver, because the demand model is pressure driven.",
         "lpn_diag_pda_needs_epanet": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.",
         "lpn_result_delivered_demand": "Delivered demand",
@@ -835,6 +837,10 @@
         "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
         "lpn_pane_sel_only": "Selection only",
         "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
+        "lpn_profile_open": "Open EPANET profile file…",
+        "lpn_profile_file_done": "Profile read from the file: {used} of {total} nodes found in this network.",
+        "lpn_profile_file_missing": "Named in the file but not in this network: {ids}.",
+        "lpn_profile_file_short": "The file names fewer than two nodes in this network, so there is no profile to draw.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
         "lpn_result_pump_head": "Head",
@@ -847,11 +853,10 @@
         "lpn_cp_allow_tip": "Allow only these characters:",
         "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
         "lpn_alt_calc_options": "Calculation options",
-        "lpn_scenario_duration_tip": "Overrides the total run time in this scenario. Leave it blank to use its parent's. A total run time of 0:00 is a steady-state run.",
-        "lpn_scenario_hyd_step_tip": "Overrides the hydraulic time step in this scenario. Leave it blank to use its parent's.",
+        "lpn_scenario_duration_tip": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
+        "lpn_scenario_hyd_step_tip": "Leave blank to inherit from parent.",
         "lpn_time_scn_overrides": "Scenario overrides:",
         "lpn_settings_basemap_style": "Basemap style",
-        "lpn_settings_basemap_style_tip": "Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.",
         "lpn_basemap_style_normal": "Normal",
         "lpn_basemap_style_muted": "Muted",
         "lpn_basemap_style_faded": "Faded",
@@ -861,7 +866,7 @@
         "lpn_saved_session": "Not saved",
         "lpn_scncmp_at_time": "{value} at {id}, {time}",
         "lpn_scncmp_same": "The same in every scenario",
-        "lpn_scncmp_period_note": "Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.",
+        "lpn_scncmp_period_note": "Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole network, at the time shown.",
         "lpn_choice_default": "Default",
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
@@ -873,7 +878,7 @@
         "lpn_ds_scope_selected": "Selected junctions",
         "lpn_ds_minpressure": "Lowest pressure allowed",
         "lpn_ds_minpressure_tip": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
-        "lpn_ds_eps_note": "Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.",
+        "lpn_ds_eps_note": "Only the time step now on screen is scaled; levels and statuses are taken from this step. To test the peak, move the clock to the peak demand before you run.",
         "lpn_ds_head_scale": "Scale the demands",
         "lpn_ds_multiplier": "Demand scale",
         "lpn_ds_multiplier_tip": "The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.",
@@ -881,11 +886,10 @@
         "lpn_ds_head_search": "What demand scale can the system handle?",
         "lpn_ds_head_search_selected": "What demand scale can these junctions handle?",
         "lpn_ds_outside_below": "At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.",
-        "lpn_ds_search_note": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
-        "lpn_ds_find": "Find",
+        "lpn_ds_search_note": "Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.",
         "lpn_ds_holds_max": "✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.",
         "lpn_ds_below_zero": "⚠ At least one junction is below {pressure} even with the scaled demands at zero.",
-        "lpn_ds_found": "✓ Every junction keeps {pressure} up to a demand scale of {m}.",
+        "lpn_ds_found": "✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.",
         "lpn_ds_found_below": "⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.",
         "lpn_ds_search_stopped": "The search was stopped before it found an answer.",
         "lpn_ds_lowest_at": "At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.",
@@ -908,15 +912,15 @@
         "lpn_analyze_at_time": "Time step: {time}.",
         "lpn_analyze_time_moved": "⚠ This was computed at {time}, and the clock is now at {now}. Run it again for the time step on screen.",
         "lpn_settings_demand_model": "Demand model",
-        "lpn_settings_demand_model_tip": "Choose how junctions receive water. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.",
+        "lpn_settings_demand_model_tip": "Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.",
         "lpn_settings_demand_model_dda": "Demand driven",
         "lpn_settings_demand_model_pda": "Pressure driven",
         "lpn_settings_min_pressure": "Minimum pressure",
-        "lpn_settings_min_pressure_tip": "Enter the pressure at or below which a junction receives no water. Use this project's pressure unit.",
+        "lpn_settings_min_pressure_tip": "Enter the pressure at or below which a junction receives no flow. Use this project's pressure unit.",
         "lpn_settings_req_pressure": "Required pressure",
         "lpn_settings_req_pressure_tip": "Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.",
         "lpn_settings_pressure_exponent": "Pressure exponent",
-        "lpn_settings_pressure_exponent_tip": "Enter the exponent of the curve that rises from no water at the minimum pressure to the full demand at the required pressure.",
+        "lpn_settings_pressure_exponent_tip": "Enter the exponent of the curve that rises from no flow at the minimum pressure to the full demand at the required pressure.",
         "lpn_engine_pda_route": "Solved with the EPANET solver, because the demand model is pressure driven.",
         "lpn_diag_pda_needs_epanet": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.",
         "lpn_result_delivered_demand": "Delivered demand",
@@ -1149,6 +1153,70 @@
                     "key": "lpn_pane_goto_tip",
                     "value": "زوم او ټاکل",
                     "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_profile_open": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_delete",
+                    "value": "لار ړنګول",
+                    "english": "Delete path"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_prompt_name",
+                    "value": "د دې لارې لپاره نوم",
+                    "english": "Name for this path"
+                }
+            }
+        },
+        "lpn_profile_file_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_delete",
+                    "value": "لار ړنګول",
+                    "english": "Delete path"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_prompt_name",
+                    "value": "د دې لارې لپاره نوم",
+                    "english": "Name for this path"
+                }
+            }
+        },
+        "lpn_profile_file_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_delete",
+                    "value": "لار ړنګول",
+                    "english": "Delete path"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_prompt_name",
+                    "value": "د دې لارې لپاره نوم",
+                    "english": "Name for this path"
+                }
+            }
+        },
+        "lpn_profile_file_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_delete",
+                    "value": "لار ړنګول",
+                    "english": "Delete path"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_prompt_name",
+                    "value": "د دې لارې لپاره نوم",
+                    "english": "Name for this path"
                 }
             }
         },
@@ -1393,22 +1461,6 @@
             }
         },
         "lpn_settings_basemap_style": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_settings_backdrop_opacity",
-                    "value": "د شاليد انځور روڼوالی (0 نه 1)",
-                    "english": "Background image opacity (0 to 1)"
-                },
-                "next_translated": {
-                    "key": "lpn_settings_map_display",
-                    "value": "بڼه",
-                    "english": "Appearance"
-                }
-            }
-        },
-        "lpn_settings_basemap_style_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -1889,22 +1941,6 @@
             }
         },
         "lpn_ds_search_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_crit_skipped_dead",
-                    "value": "بند پای تړاوونه پرېښودل شوي: {n}. هر یو هر هغه څه پرې کوي چې له هغه وروسته دي.",
-                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "سروی شوي ټکي دننه کول…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_ds_find": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

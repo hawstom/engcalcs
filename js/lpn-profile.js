@@ -477,7 +477,22 @@ EngCalcs.lpnProfile = (function () {
 		return v.map(function (x, k) { return { x: x, y: 100 * k / n }; });
 	}
 
+	// An EPANET .PRO profile file (the Graph Selection dialog's Save): line 1 is an identifier, then
+	// one node ID per line. Tolerates a BOM, CRLF, and blank lines or stray spaces. The first line is
+	// ALWAYS the identifier, even if it happens to spell a node, because EPANET always writes one.
+	// Returns {identifier, ids}; it knows nothing about any network.
+	function parseProfileFile(text) {
+		var lines = String(text === undefined || text === null ? '' : text).replace(/^\uFEFF/, '').split(/\r\n|\r|\n/),
+			ids = [], i, t;
+		for (i = 1; i < lines.length; i++) {
+			t = lines[i].trim();
+			if (t) { ids.push(t); }
+		}
+		return { identifier: (lines[0] || '').trim(), ids: ids };
+	}
+
 	return {
+		parseProfileFile: parseProfileFile,
 		frequencySeries: frequencySeries,
 		buildGraph: buildGraph,
 		shortestPath: shortestPath,

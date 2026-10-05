@@ -21294,6 +21294,7 @@ var EngCalcs = EngCalcs || {};
 		if (findDockRec.dock) { v.dock = findDockRec.dock; }
 		if (findDockRec.autohide) { v.autohide = true; }
 		if (findDockRec.dockW) { v.dockW = findDockRec.dockW; }
+		if (findDockRec.dockOrd !== undefined) { v.dockOrd = findDockRec.dockOrd; }
 		try { localStorage.setItem(LPN_FINDBOX_KEY, JSON.stringify(v)); } catch (e) {}
 	}
 	function loadFindLayout() {
@@ -29386,7 +29387,60 @@ var EngCalcs = EngCalcs || {};
 		// nothing for them to name.
 		rows.push({ icon: 'edit', label: pc.lpn_profile_rename || 'Rename path…', disabled: !active, fn: renameSavedProfile });
 		rows.push({ icon: 'close', label: pc.lpn_profile_delete || 'Delete path', disabled: !active, fn: deleteSavedProfile });
+		// **THE ONE ROW FOR AN EPANET .PRO FILE** (Task 604; Tom, 2026-09-06: it "needs to take up
+		// miniscule space in the UX/UI, hidden deep under some menu or in the profile tab down
+		// arrow"). Last in the menu, below a separator, and never a control on the panel.
+		rows.push({ separator: true });
+		rows.push({ label: pc.lpn_profile_open || 'Open EPANET profile file…', fn: pickProfileFile });
 		openMenu(anchor, rows, 0);
+	}
+	// **AN EPANET .PRO FILE BECOMES THE STOPS OF A PROFILE** (Task 604). A profile here is a list of
+	// stops with the shortest route between consecutive ones (pathThrough), so the listed nodes ARE
+	// the stops, in file order. EPANET lists every node along the path, so each leg is normally one
+	// link; between two nodes joined by parallel pipes the shortest one is drawn. An ID this network
+	// does not have (or an inactive node) is REPORTED and left out, never dropped silently; the
+	// route then bridges the gap by shortest path. The file is not stored: it sets the path on show
+	// and does not become a saved path.
+	function pickProfileFile() {
+		var input = document.getElementById('lpn_profile_file');
+		if (input) { input.click(); }
+	}
+	function loadProfileFileText(text) {
+		var pc = EngCalcs.pageConfig || {}, parsed = EngCalcs.lpnProfile.parseProfileFile(text),
+			usable = [], missing = [], msg;
+		parsed.ids.forEach(function (id) {
+			var n = nodeById(id);
+			if (n && profileNodeUsable(n)) { usable.push(id); } else if (missing.indexOf(id) < 0) { missing.push(id); }
+		});
+		if (usable.length < 2) {
+			msg = pc.lpn_profile_file_short || 'The file names fewer than two nodes in this network, so there is no profile to draw.';
+			if (missing.length) {
+				msg += ' ' + (pc.lpn_profile_file_missing || 'Named in the file but not in this network: {ids}.').replace('{ids}', missing.join(', '));
+			}
+			setNotice(msg);
+			return false;
+		}
+		profileSetStops(usable);
+		profileState.activeId = '';
+		profileState.draw = null;
+		msg = (pc.lpn_profile_file_done || 'Profile read from the file: {used} of {total} nodes found in this network.')
+			.replace('{used}', String(usable.length)).replace('{total}', String(parsed.ids.length));
+		if (missing.length) {
+			msg += ' ' + (pc.lpn_profile_file_missing || 'Named in the file but not in this network: {ids}.').replace('{ids}', missing.join(', '));
+		}
+		setNotice(msg);
+		rebuildProfileForm();
+		renderProfile();
+		return true;
+	}
+	function importProfileFromFile(file) {
+		var reader = new FileReader();
+		reader.onload = function (ev) { loadProfileFileText(String(ev.target.result)); };
+		reader.onerror = function () {
+			var pc = EngCalcs.pageConfig || {};
+			setWarning(pc.lpn_survey_read_error || 'That file could not be read from your disk.');
+		};
+		reader.readAsText(file);
 	}
 	// ---- THE PATH CHOOSER (ROADMAP Task 433) -----------------------------------------------------
 	//
@@ -41670,6 +41724,14 @@ var EngCalcs = EngCalcs || {};
 		// A FOURTH picker (Task 592). Its own, for the reason the three above are their own: a
 		// surveyed point list lands in the OPEN project rather than making a new tab, so one input
 		// serving both would have to guess which act was meant from the file's extension.
+		var profileInput = document.getElementById('lpn_profile_file');
+		if (profileInput) {
+			profileInput.addEventListener('change', function () {
+				var f = profileInput.files[0];
+				profileInput.value = '';
+				if (f) { importProfileFromFile(f); }
+			});
+		}
 		var surveyInput = document.getElementById('lpn_survey_file');
 		if (!surveyInput) { return; }
 		surveyInput.addEventListener('change', function () {
@@ -49054,6 +49116,8 @@ var EngCalcs = EngCalcs || {};
 		if (v.dock === 'left' || v.dock === 'right') { rec.dock = v.dock; }
 		if (v.autohide === true) { rec.autohide = true; }
 		if (typeof v.dockW === 'number' && isFinite(v.dockW) && v.dockW > 0) { rec.dockW = Math.round(v.dockW); }
+		// Where its flag sits along the bar: a rank among the flags, set by dragging one (or Alt+Arrow).
+		if (typeof v.dockOrd === 'number' && isFinite(v.dockOrd) && v.dockOrd >= 0) { rec.dockOrd = Math.round(v.dockOrd); }
 	}
 	function clampDockW(w, room) {
 		var max = Math.max(LPN_DOCK_MIN_W, Math.floor((window.innerWidth || 1000) * LPN_DOCK_MAX_FRAC));
@@ -49199,6 +49263,7 @@ var EngCalcs = EngCalcs || {};
 			el.className = 'd-print-none lpn-dock-strip';
 			el.setAttribute('role', 'toolbar');
 			el.setAttribute('aria-orientation', 'vertical');
+			wireDockStripOrder(el);
 			document.body.appendChild(el);
 		}
 		return el;
@@ -49326,6 +49391,14 @@ var EngCalcs = EngCalcs || {};
 		if (dockFlyout && !(dockFlyout.rec.autohide && dockSideOf(dockFlyout) && dockBoxShown(dockFlyout))) {
 			dockFlyout = null;
 		}
+		// Flags lie along the bar in the order the visitor dragged them to (`dockOrd`); a box never
+		// dragged has none and follows, in the order the boxes were registered.
+		['left', 'right'].forEach(function (s) {
+			sides[s].auto.sort(function (a, b) {
+				var x = a.rec.dockOrd === undefined ? 1e9 : a.rec.dockOrd, y = b.rec.dockOrd === undefined ? 1e9 : b.rec.dockOrd;
+				return (x - y) || (dockBoxes.indexOf(a) - dockBoxes.indexOf(b));
+			});
+		});
 		wr = wrap.getBoundingClientRect();
 		sr = svg.getBoundingClientRect();
 		// Not laid out (a hidden tab, the boot curtain not yet measured): nothing true to place from.
@@ -49434,6 +49507,88 @@ var EngCalcs = EngCalcs || {};
 			if (document.activeElement === d.help && d.help.blur) { d.help.blur(); }
 		});
 	}
+	// **REORDERING THE FLAGS** (Tom: "a good college try"). A press on a flag that then moves past
+	// LPN_FLAG_SLOP along the bar is a drag; one that does not is the click it always was. The rank
+	// of each flag rides on its box's own record as `dockOrd` (no new key). Alt+Arrow does the same
+	// from the keyboard.
+	var LPN_FLAG_SLOP = 6;
+	function dockCommitOrder(strip) {
+		var seen = [];
+		Array.prototype.forEach.call(strip.children, function (t, i) {
+			var d = t.lpnDock;
+			if (!d) { return; }
+			d.rec.dockOrd = i;
+			seen.push(d);
+		});
+		seen.forEach(function (d) { if (d.save) { d.save(); } });
+	}
+	// The press is remembered here and the rest of the drag is judged on the STRIP, which holds the
+	// pointer capture: moving the flag's own node along the bar drops a capture held on that node, and
+	// every later move and the release then never arrive.
+	var dockFlagDrag = null;
+	function dockFlagEnd(strip) {
+		var was = dockFlagDrag, tab = was && was.tab;
+		dockFlagDrag = null;
+		if (!was) { return; }
+		try { if (strip.releasePointerCapture && was.live) { strip.releasePointerCapture(was.id); } } catch (err) { /* already released */ }
+		if (!was.live) { return; }
+		tab.classList.remove('lpn-dock-tab-drag');
+		dockCommitOrder(strip);
+		layoutDocks();
+		// Where the browser sends no click after a drag, the mark must not linger and swallow the
+		// next real one.
+		setTimeout(function () { tab.lpnDragged = false; }, 0);
+	}
+	function wireDockStripOrder(strip) {
+		strip.addEventListener('pointermove', function (e) {
+			var g = dockFlagDrag, kids, i, r, before = null;
+			if (!g || e.pointerId !== g.id) { return; }
+			if (!g.live) {
+				if (Math.abs(e.clientY - g.y) < LPN_FLAG_SLOP) { return; }
+				g.live = true;
+				g.tab.lpnDragged = true;
+				clearTimeout(dockTimer);
+				if (dockFlyout === g.d) { dockTuck(g.d); }
+				try { if (strip.setPointerCapture) { strip.setPointerCapture(g.id); } } catch (err) { /* drag without capture */ }
+				g.tab.classList.add('lpn-dock-tab-drag');
+			}
+			kids = Array.prototype.filter.call(strip.children, function (k) { return k !== g.tab; });
+			for (i = 0; i < kids.length; i++) {
+				r = kids[i].getBoundingClientRect();
+				if (e.clientY < r.top + r.height / 2) { before = kids[i]; break; }
+			}
+			if (before ? before.previousSibling !== g.tab : g.tab !== strip.lastChild) { strip.insertBefore(g.tab, before); }
+			e.preventDefault();
+		});
+		['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (evt) {
+			strip.addEventListener(evt, function (e) {
+				// A touch press is captured by its flag at first; handing the capture to the strip makes
+				// the flag report a loss, which is not the end of the drag.
+				if (evt === 'lostpointercapture' && e.target !== strip) { return; }
+				if (dockFlagDrag && e.pointerId === dockFlagDrag.id) { dockFlagEnd(strip); }
+			});
+		});
+	}
+	function wireDockTabOrder(d, tab) {
+		tab.style.touchAction = 'none';
+		tab.addEventListener('pointerdown', function (e) {
+			if (e.button !== undefined && e.button !== 0) { return; }
+			tab.lpnDragged = false;
+			dockFlagDrag = { d: d, tab: tab, y: e.clientY, id: e.pointerId, live: false };
+		});
+		tab.addEventListener('keydown', function (e) {
+			var strip = tab.parentNode, kids, i, other;
+			if (!e.altKey || (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') || !strip) { return; }
+			kids = Array.prototype.slice.call(strip.children);
+			i = kids.indexOf(tab);
+			other = kids[i + (e.key === 'ArrowUp' ? -1 : 1)];
+			e.preventDefault();
+			if (!other) { return; }
+			if (e.key === 'ArrowUp') { strip.insertBefore(tab, other); } else { strip.insertBefore(other, tab); }
+			dockCommitOrder(strip);
+			tab.focus();
+		});
+	}
 	function wireDockTab(d) {
 		var tab = document.createElement('button');
 		tab.type = 'button';
@@ -49447,7 +49602,13 @@ var EngCalcs = EngCalcs || {};
 		tab.addEventListener('pointerleave', function () {
 			if (dockFlyout === d) { dockTuckLater(d); } else { clearTimeout(dockTimer); }
 		});
-		tab.addEventListener('click', function () { dockFlyOut(d, true); });
+		tab.addEventListener('click', function () {
+			// The click that ends a reordering drag is not a request to open the box.
+			if (tab.lpnDragged) { tab.lpnDragged = false; return; }
+			dockFlyOut(d, true);
+		});
+		tab.lpnDock = d;
+		wireDockTabOrder(d, tab);
 		d.tab = tab;
 	}
 	function registerDockBox(id, rec, save, key, tipKey) {

@@ -106,22 +106,6 @@ the block.
   - `dev/lpn-spike/label-stability-harness.js` asserts the LAYOUT and the shed's victims rather than
     the count, so a model change that oscillates is caught instead of averaged away -- which is how
     the A B A B A flicker got through the first time. §9b is `spot_prime`; §10c and §11e are his.
-- 100|604| **Read an EPANET `.PRO` profile file.**
-  **PROMOTED TO 100 BY TOM, 2026-10-03** (*"Promote to 100: 600, 601, 604"*). Building on `feat/profile-file`.
-  It is the only route a profile can arrive by, and it falls out of closing Task 574. **A profile is in NO `.net` and no `.inp`** -- EPANET's Graph
-  Selection dialog writes its node list to a separate `.PRO` text file through an ordinary save
-  dialog, and nothing anywhere records the path, not even an MRU entry. So a user who has built a
-  profile in EPANET cannot bring it here by opening their project, and never will be able to.
-  - The format is small: an identifier line, then one node ID per line. The work is the
-    reconciliation -- what happens when a listed ID is not in this network -- and that answer is
-    already written for the calibration files of Task 601.
-  - Worth far more once Task 603 lands: an imported profile that cannot name its own nodes is a
-    line on an axis.
-  - **IT GETS A MINUSCULE SLICE OF THE INTERFACE, on Tom's ruling of 2026-09-06:** *"Creating a
-    profile is so easy now using the Google paradigm that I don't think there is much value in
-    importing a `.pro` file. If we do it, it needs to take up miniscule space in the UX/UI, hidden
-    deep under some menu or in the profile tab down arrow."* So the acceptance bar is a row in an
-    existing menu, never a control on the profile panel itself.
 - 100|676| **Watch the sites, and send a derived weekly report.**
   Tom, 2026-09-15: *"mistakes like the site outages and merging difficult development branches to
   master before proper vetting can no longer be the matter of course."* Plan, the corrected

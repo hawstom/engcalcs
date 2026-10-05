@@ -497,6 +497,20 @@
    "words": "feat/pda is good. Merge.",
    "context": "Typed in the session, 2026-10-04 late evening, after his retest of the short-junction count in the bottom map strip. Earlier the same evening: \"Yes. Pressure goes up slightly on PDA as expected.\"",
    "pin_note": "The head he tested."
+  },
+  "feat/dock-flag-order": {
+   "head": "f368aed8a857935652a6e729cb814ff747ab05df",
+   "date": "2026-10-05",
+   "words": "(1) I thought I saw the grab cursor once. But maybe I was mistaken. (2) It works. Close, merge, and delete branch.",
+   "context": "Pasted message of 2026-10-05, after testing the branch preview.",
+   "pin_note": "Pinned to the head the preview served when he tested it."
+  },
+  "feat/profile-file": {
+   "head": "5a6152f168415b3bcda4313d8a5ae9fa4b529b94",
+   "date": "2026-10-05",
+   "words": "feat/profile-file: lose, merge, and delete branch.",
+   "context": "Pasted message of 2026-10-05; 'lose' is his typo for 'Close', the same words he used for dock-flag-order in the line above it.",
+   "pin_note": "Pinned to the head the preview served when he tested it."
   }
  }
 }

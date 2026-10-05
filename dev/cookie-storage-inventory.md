@@ -113,7 +113,8 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 `lpn_setbox`, `lpn_libbox`, `lpn_ffbox`, `lpn_energybox`, `lpn_cmpbox`, `lpn_reportbox`,
 `lpn_statusbox`, `lpn_fullbox`, `lpn_contourbox`, `lpn_notesbox` and `lpn_hotkeysbox` may each also
 hold `dock` (`left` or `right`: the box is docked beside the map on that side), `autohide` (`true`:
-it tucks into a tab at the map's edge) and `dockW` (its docked width in pixels). Each field is
+it tucks into a tab at the map's edge), `dockW` (its docked width in pixels) and `dockOrd` (its
+tab's rank along the bar, set when the visitor drags the tab or presses Alt+Arrow on it). Each field is
 absent while it is the default, so a visitor who never docks a box stores nothing new. Same purpose
 and category as the position and size beside them: a panel layout the visitor set deliberately.
 The Properties, Criticality, Demand scaling, Alternatives and Calibration boxes keep no record, so
