@@ -1,6 +1,6 @@
 // ROUND 6: SCORE EVERY CELL OF THE DESIGN (score-one.js per cell, in a child process).
 //
-//   node dev/label-trials/round-6-2026-10-05/score-all.js <work dir> [--workers 6] [--placers A,B]
+//   node dev/label-trials/round-6-2026-10-05/score-all.js <work dir> [--workers 6] [--placers A,B] [--exp E2]
 //
 // Cells: E4 (every placer, the full request, no probe: round 5's D-break sets with real vertices), E1 (every placer, the full request, the R1 probe for the builders), E2 (the builders, the
 // full request, the probe), E3 (the builders, the 'two' and 'one' arms on E1's 'both' sets), and
@@ -42,7 +42,9 @@ function main() {
 		fs.readFileSync(f, 'utf8').split('\n').filter(Boolean).forEach(function (l) { const o = JSON.parse(l); done[p + '|' + o.set + '|' + (o.arm || 'full')] = true; });
 	});
 	const cells = [];
-	function add(c) { if (names.indexOf(c.placer) >= 0 && !done[c.placer + '|' + c.set + '|' + c.arm]) { cells.push(c); } }
+	// --exp E2: only those experiments' cells (a second runner beside a first, on disjoint cells).
+	const exps = a.indexOf('--exp') >= 0 ? a[a.indexOf('--exp') + 1].split(',') : null;
+	function add(c) { if (names.indexOf(c.placer) >= 0 && (!exps || exps.indexOf(c.exp) >= 0) && !done[c.placer + '|' + c.set + '|' + c.arm]) { cells.push(c); } }
 	M.jobs().forEach(function (j) {
 		setIds(j.spec).forEach(function (id) {
 			const sf = path.join(work, 'scenes', id + '.json'), mf = path.join(work, 'master', id + '.json');
