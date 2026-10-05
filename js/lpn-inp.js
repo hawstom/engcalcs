@@ -1382,7 +1382,7 @@
 		// something we did not. The `extended-period` case stays in inpDropText() for reports saved
 		// before today.
 
-		var backdrop = null, mapUnits = null, mapUnitsRaw = null;
+		var backdrop = null, mapUnits = null, mapUnitsRaw = null, backdropDims = null, backdropOffset = null;
 		rows = rawSections.BACKDROP || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
@@ -1392,6 +1392,21 @@
 				// name and the user attaches the picture themselves through Map, Backdrop.
 				backdrop = { file: r.slice(1).join(' ') };
 				drop('backdrop-not-embedded', [], backdrop.file);
+			}
+			// **DIMENSIONS AND OFFSET ARE READ AS NUMBERS AND ARE NEVER WRITTEN BACK FROM HERE** (Task
+			// 282). They go to the page only so an image the user hands over can be placed where the
+			// file says; the export writes [BACKDROP] from the attached image, not from these.
+			// EPANET 2.2 manual, [BACKDROP]: DIMENSIONS is "the X and Y coordinates of the lower-left
+			// and upper-right corners of the map's bounding rectangle" (LLx LLy URx URy); OFFSET is
+			// "the X and Y distance that the upper-left corner of the backdrop image is offset from
+			// the upper-left corner of the map's bounding rectangle", default zero.
+			if ((r[0] || '').toUpperCase() === 'DIMENSIONS' && r.length >= 5) {
+				var dn = [Number(r[1]), Number(r[2]), Number(r[3]), Number(r[4])];
+				if (dn.every(isFinite)) { backdropDims = dn; }
+			}
+			if ((r[0] || '').toUpperCase() === 'OFFSET' && r.length >= 3) {
+				var on = [Number(r[1]), Number(r[2])];
+				if (on.every(isFinite)) { backdropOffset = on; }
 			}
 			// **ABSENT AND `NONE` ARE DIFFERENT FACTS, AND THEY STAY DIFFERENT HERE.** Both open an
 			// XY project today, but only one of them is a file that never said anything -- EPA's own
@@ -1403,6 +1418,11 @@
 				mapUnitsRaw = r[1];
 				mapUnits = LPN_INP_MAP_UNITS[r[1].toUpperCase()] || null;
 			}
+		}
+
+		if (backdrop && backdropDims) {
+			backdrop.dimensions = backdropDims;
+			backdrop.offset = backdropOffset || [0, 0];
 		}
 
 		var title = '';

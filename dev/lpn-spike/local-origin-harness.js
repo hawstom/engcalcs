@@ -398,8 +398,10 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE FEWER EACH FOR viewLonLat()** (2026-09-26): its two branches, lat/lon and projected,
 	// each crossed outward on their own; they now cross once and hand the point to placeLonLatAt(),
 	// which also answers for a grid with the world map attached (the Convert as chooser's filter).
-	ok('outwardX has one definition and 36 call sites', count(/outwardX\(/g) === 37, count(/outwardX\(/g));
-	ok('outwardY has one definition and 36 call sites', count(/outwardY\(/g) === 37, count(/outwardY\(/g));
+	// **TASK 282 ADDED TWO OUTWARD SITES PER AXIS** (the backdrop probe reads the picture's corners out) **AND TWO
+	// INWARD** (placeBackdropByDimensions() brings the file's DIMENSIONS into the local frame).
+	ok('outwardX has one definition and 38 call sites', count(/outwardX\(/g) === 39, count(/outwardX\(/g));
+	ok('outwardY has one definition and 38 call sites', count(/outwardY\(/g) === 39, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -485,8 +487,8 @@ console.log('\n--- one home for the concept ---');
 	// paneCreateFromPlan()'s label and customer branches convert a pasted row's typed position
 	// through this door exactly as a node's own does, and the customer branch's node-attachment
 	// lookup (customerAttachAtNode()) needs the same inward point to find the nearest pipe.
-	ok('inwardX has one definition and 41 call sites', count(/inwardX\(/g) === 42, count(/inwardX\(/g));
-	ok('inwardY has one definition and 42 call sites', count(/inwardY\(/g) === 43, count(/inwardY\(/g));
+	ok('inwardX has one definition and 43 call sites', count(/inwardX\(/g) === 44, count(/inwardX\(/g));
+	ok('inwardY has one definition and 44 call sites', count(/inwardY\(/g) === 45, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

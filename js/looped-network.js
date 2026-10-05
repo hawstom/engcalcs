@@ -14007,6 +14007,60 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 
+	// ---- placing an attached image by the file's own [BACKDROP] DIMENSIONS (Task 282) ----
+	//
+	// EPANET 2.2 manual, [BACKDROP]: DIMENSIONS is the lower-left and upper-right corners (LLx LLy
+	// URx URy) of the map's bounding rectangle, and OFFSET is the X and Y distance the backdrop
+	// image's upper-left corner sits from the map rectangle's upper-left corner (default zero). So
+	// the picture's upper-left is the rectangle's upper-left shifted by OFFSET, and its width is the
+	// rectangle's. The manual states no sign for OFFSET's Y; it is read in map coordinates (X to
+	// the right, Y up), the same Cartesian frame DIMENSIONS is in. Real files all carry 0 0.
+	// Our backdrop is translate + ONE uniform scale, so the picture takes the rectangle's WIDTH and
+	// a picture of another shape comes out taller or shorter than the rectangle; says so (return).
+	// Returns null when there is no usable rectangle, else { shapeOk }.
+	function placeBackdropByDimensions(dims, offset) {
+		if (!backdrop || !backdrop.width || !dims || dims.length !== 4) { return null; }
+		var ox = offset ? offset[0] : 0, oy = offset ? offset[1] : 0,
+			x0 = inwardX(dims[0] + ox), x1 = inwardX(dims[2] + ox),
+			yTop = inwardY(dims[3] + oy), yBot = inwardY(dims[1] + oy),
+			W = x1 - x0, H = yBot - yTop;
+		if (!(W > 0) || !(H > 0) || !isFinite(W) || !isFinite(H)) { return null; }
+		backdrop.s = W / backdrop.width;
+		backdrop.tx = x0 - backdrop.x * backdrop.s;
+		backdrop.ty = yTop - backdrop.y * backdrop.s;
+		applyBackdropTransform();
+		saveToStorage();
+		return { shapeOk: Math.abs(backdrop.height * backdrop.s - H) <= 0.01 * H };
+	}
+	// The picture an imported .inp names, handed over by the user. The SAME door Add uses
+	// (addBackdropFromDataUrl), then the file's rectangle. Reports through `say`.
+	function attachNamedBackdrop(bd, file, say) {
+		var pc = EngCalcs.pageConfig || {}, reader = new FileReader(),
+			named = String(bd.file).split(/[\\\/]/).pop();
+		reader.onload = function (ev) {
+			addBackdropFromDataUrl(ev.target.result, function () {
+				var placed = placeBackdropByDimensions(bd.dimensions, bd.offset), msg;
+				msg = (file.name.toLowerCase() === named.toLowerCase()
+					? (pc.lpn_inp_backdrop_attached || 'Attached {file}, placed where the file says it belongs.')
+					: (pc.lpn_inp_backdrop_attached_other || 'Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.'))
+					.replace('{picked}', file.name).replace('{file}', named);
+				if (placed && !placed.shapeOk) {
+					msg += ' ' + (pc.lpn_inp_backdrop_shape || 'The picture is not the same shape as the area the file gives, so it matches the width and not the height.');
+				}
+				say(msg);
+			});
+		};
+		reader.readAsDataURL(file);
+	}
+	EngCalcs.lpnBackdropProbe = function () {
+		var inp = EngCalcs.lpnExportInp(serializeProject(), inpExportOptions()).inp, m = /\[BACKDROP\]([^\[]*)/.exec(inp);
+		return {
+			corners: backdrop ? [outwardX(backdrop.tx), outwardY(backdrop.ty + backdrop.height * backdrop.s),
+				outwardX(backdrop.tx + backdrop.width * backdrop.s), outwardY(backdrop.ty)] : null,
+			section: m ? m[1] : null
+		};
+	};
+
 	// ---- pixel size, typed rather than picked (Task 276) ----
 	// Picking is the coarse step; this is the correction. `backdrop.s` scales the PLACEMENT BOX, not
 	// the image's own pixels, so the number a user thinks in -- ground distance per ORIGINAL image
@@ -35464,6 +35518,30 @@ var EngCalcs = EngCalcs || {};
 				anchorNote.textContent = pc.lpn_inp_report_label_anchor
 					|| 'Text labels are placed as EPANET places them, from their top left corner.';
 				body.appendChild(anchorNote);
+			}
+			// **THE FILE NAMES A PICTURE AND SAYS WHERE IT GOES, SO OFFER TO ATTACH IT** (Task 282). A
+			// browser cannot open a file by path, so this is a picker and the name is only said. A file
+			// with no DIMENSIONS keeps today's route: the sentence below and Map, Background image.
+			if (parsed.backdrop && parsed.backdrop.dimensions) {
+				var bdFile = String(parsed.backdrop.file).split(/[\\\/]/).pop(),
+					bdRow = document.createElement('p'), bdBtn = document.createElement('button'),
+					bdStatus = document.createElement('div'), bdTip = document.createElement('div');
+				bdRow.style.margin = '0 0 8px';
+				bdBtn.type = 'button';
+				bdBtn.textContent = (pc.lpn_inp_backdrop_attach || 'Attach {file}…').replace('{file}', bdFile);
+				bdTip.textContent = pc.lpn_inp_backdrop_attach_tip || 'A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.';
+				bdStatus.setAttribute('role', 'status');
+				bdBtn.addEventListener('click', function () {
+					var pick = document.createElement('input');
+					pick.type = 'file'; pick.accept = 'image/*';
+					pick.addEventListener('change', function () {
+						var f = pick.files && pick.files[0];
+						if (f) { attachNamedBackdrop(parsed.backdrop, f, function (m) { bdStatus.textContent = m; }); }
+					});
+					pick.click();
+				});
+				bdRow.appendChild(bdBtn); bdRow.appendChild(bdTip); bdRow.appendChild(bdStatus);
+				body.appendChild(bdRow);
 			}
 			if (!byText.length) {
 				var ok = document.createElement('p');
