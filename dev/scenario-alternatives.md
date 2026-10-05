@@ -75,10 +75,11 @@ here. Each property is in exactly one category. The category id is what the code
 | User data (`userdata`) | User Data Extensions | every custom property (`custom_*`, Task 636) | Bentley lets a user field be placed in an alternative; ours are all overridable, so they are one category. Also the home of any stray property name an old file carries that no category claims, so "exactly one" holds for every key a file can contain. |
 | Text (`text`) | none | Text label `text`, `active` | **Ours only.** Bentley keeps annotation in the `.wtg`, outside the model (`dev/bentley-interop.md`). A label's `active` is not topology: it takes nothing out of the solve. |
 
-**Not an alternative: the demand multiplier.** `scenario.demandMultiplier` is a per-scenario
+**The demand multiplier is a calculation option.** `scenario.demandMultiplier` is a per-scenario
 number, not an element property. Its Bentley counterpart is a **Calculation Option** (a scenario
-names one set of calculation options beside its alternatives), so it stays on the scenario and
-creates no alternative.
+names one set of calculation options beside its alternatives), so it stays stored on the scenario.
+It belongs to the Calculation category of "Settings in scenarios" below; whether the table counts
+it there or keeps it in its own column is question 1 at the end of that section.
 
 **Bentley categories we have nothing for:** Operational (controls; our `[RULES]` are the
 document's, not a scenario's), Age, Trace (the trace node is a document setting), Capital Cost,
@@ -162,6 +163,92 @@ keeps demand adjustments in Calculation Options, not alternatives). It is the la
 divider, so it reads as set apart from the categories. Base shows the project's value; a scenario
 shows its own, and blank means it inherits the project's. Task 755 covers more per-scenario options
 later. No editing, no Bentley import or export, no Google Sheets: the Advanced UX is not designed.
+
+## Settings in scenarios: Presentation and Calculation (2026-10-05)
+
+Tom, 2026-10-05:
+
+> "based on recent insights, we will add a presentation alternative category that contains
+> Window/View and Settings, Map appearance and Settings, Symbology overrides (essentially all
+> Settings that are not covered in another alternative). The main principle is that any Setting
+> that is stored in the project should be subject to scenario overrides under some alternatives
+> category, probably Presentation or Calculation."
+
+**This replaces** the earlier line that only the demand multiplier, the total run time and the
+hydraulic time step may vary by scenario ("Friction method, units, accuracy and trials never vary
+between compared scenarios", Sue's advice, recorded beside `LPN_SCENARIO_TIME_KEYS`). Accuracy and
+trials now vary like any other calculation option. Friction method and units still do not, for the
+reason below: they change what stored numbers mean.
+
+**Bentley has no Presentation category.** **CITED** (`dev/bentley-interop.md`, KB0013701,
+KB0057843): Bentley keeps symbology, colour coding, annotation and named views in the `.wtg`,
+outside the scenario model, so a scenario cannot change them. A Presentation alternative is ours
+alone and has no Bentley translation, as position already is. **Bentley's Calculation Options are
+not an alternative either**: a scenario names one set of calculation options beside its
+alternatives. Our Calculation category is that set, shown as one more column.
+
+### The inventory
+
+Enumerated from `serializeProject()`, `defaultSettings()`, `defaultLabelSettings()`,
+`applySaved()` and the `.inp` readers that write onto `settings` (`readQualitySections()`,
+`readEnergySection()`, `readSourceMixingSections()`, `readTagsSection()`), not from memory. The
+code's table is `LPN_SETTING_CATEGORY_OF`, and the harness fails a key a saved project carries that
+the table does not name. A path naming an object covers everything under it; the longest named
+path wins.
+
+**Presentation (`presentation`), 47 paths.** Everything about how the drawing looks.
+
+| Where it lives | Paths | Read by |
+|---|---|---|
+| `project` | `basemap`, `basemapLast` (the street map, satellite or none; what to go back to) | `basemapSource()`, `setBasemapOn()`, `paintBasemapTiles()` |
+| `labelSettings` | `node`, `link`, `customer` (which values a label shows), `decimals`, `prefix`, `suffix`, `useUnits`, `separator`, `show`, `priority`, `markExtrema`, `customerMaxWidth` | `labelRowSpecs()`, `labelPrefixFor()`, `labelSuffixFor()`, `labelUsesUnits()`, `labelSeparator()`, `nodeShedMaxRungs()`, `decorationFor()`, `customerLabelWidthLimitSI()`, the Symbology box |
+| `settings`, symbols and labels | `textSize`, `symbolSize`, `linkWidth`, `symbolOpacity`, `symbolCapMultiple`, `symbolCapPercentile`, `labelMaxWidth`, `alignPipeLabels`, `labelFlipLeftOfVertical`, `maskLabels`, `showArrows`, `leaderSnapDeg`, `legendPosition` | `effectiveFontSize()`, `symbolFactor()`, `linkStrokeWidth()`, `refreshSymbolSizes()`, `symbolCapMultiple()`, `labelWidthLimitSI()`, `linkLabelAligned()`, `labelFlipLeftOfVertical()`, `applyMaskLabels()`, `showArrows()`, `leaderSnapDeg()`, `placeLegends()` |
+| `settings`, map appearance | `basemapStyle`, `backdropOpacity` | `basemapStyleName()`, `backdropImageOpacity()` |
+| `settings`, colour by value | `colorNodeField`, `colorLinkField`, `colorRampNode`, `colorRampLink`, `colorClassesNode`, `colorClassesLink`, `colorReverseNode`, `colorReverseLink`, `colorBreaks`, `colorModes`, `colorLegendPosition` | `colorFieldOf()`, `colorRampKey()`, `colorClassCount()`, `colorReverseOf()`, `storedBreaks()`, `effectiveBreaks()`, `colorModeOf()`, `renderColorLegend()` |
+| `settings`, contours | `contourFill`, `contourLines`, `contourLabels`, `contourOpacity`, `contourInterval`, `contourBuffer`, `contourTerrain` | `contourFillMode()`, `contourIsOn()`, `drawContourLabels()`, `contourOpacityOf()`, `contourIntervalOf()`, `contourBufferOf()`, `contourTerrainWanted()` |
+
+**Calculation (`calculation`), 8 paths, two of them whole groups.** What the solver is told, other
+than the network itself.
+
+| Path | Read by | Note |
+|---|---|---|
+| `settings.engine` | `engineFor()`, `runSolve()` | EPANET or the built-in solver. |
+| `settings.autoRun` | `scheduleSolve()`, `runSolveEpanet()` | Recalculate automatically. |
+| `settings.hydraulics` (all of it: `accuracy`, `trials`, `unbalanced`, `unbalancedTrials`, `headError`, `flowChange`, `dampLimit`, `checkFreq`, `maxCheck`, `demandModel`, `pdaSrc`, `minPressure`, `reqPressure`, `pressureExponent`, `specificGravity`, `viscosity`, `emitterExponent`, `statusReport`, `demandMultiplier`) | `assembleModel()`, `solveAccuracy()`, `convSetting()`, `contourSubtractGround()`, `paneColPdaResult()` | **`demandMultiplier` already varies by scenario**, stored as `scenario.demandMultiplier` (Task 721), and stays there. `demandModel` and `pdaSrc` travel together. |
+| `settings.emitterExponent` | `emitterGamma()`, `assembleModel()` | The older mirror of `hydraulics.emitterExponent`. |
+| `settings.tolerance` | `solveAccuracy()` | Deprecated, still read from old files. |
+| `settings.quality` | `qualitySetting()`, the solve | Mode (age, trace, chemical) and trace node, one object. **SPECULATION**: Bentley's trace node sits in a Trace alternative; we have none, so it rides with the mode. |
+| `settings.qualityOptions` | `qualitySetting()`, the exporter | The file's own Quality, Diffusivity and Tolerance text. Travels with `settings.quality`. |
+| `times` (all of it: `duration`, `hydraulicStep`, `patternStep`, `patternStart`, `reportStep`, `reportStart`, `startClock`, `qualityStep`, and the typed `text`) | `effectiveTimes()`, the exporter | **`duration` and `hydraulicStep` already vary by scenario**, stored as `scenario.times` (Task 755), and stay there. |
+
+**Existing element categories, 13 paths.** A document-wide value that belongs with element
+properties already in a category.
+
+| Path | Category | Why |
+|---|---|---|
+| `settings.reactions.globalBulk`, `globalWall`, `orderBulk`, `orderWall`, `orderTank`, `limitingPotential`, `roughnessCorrelation` | Constituent | The global rates and orders the per-pipe `bulkCoeff`/`wallCoeff` (already Constituent) fall back to. |
+| `settings.energy.globalEfficiency`, `globalPrice`, `globalPattern`, `demandCharge`, `currency` | Energy cost | The global price and pattern the per-pump `energyPrice`/`energyPattern` (already Energy cost) fall back to. |
+| `defaultPattern` | Demand | The pattern a demand with no pattern of its own follows. **SPECULATION** that Bentley would call it Demand. |
+
+**Excluded: stored in the project, never varied by a scenario.** Each with its reason.
+
+| Path | Why not |
+|---|---|
+| `units` | **Changing a unit reinterprets the typed number** (CLAUDE.md). A scenario with its own units would read every stored number in the project differently. |
+| `settings.method` (friction method) | **Same defect as units**: a pipe holds one roughness number, and the method says whether it is a C, an e or an n. A Darcy-Weisbach scenario would read a C of 130 as 130 mm of roughness. Bentley keeps a separate attribute per method; we do not. |
+| `origin`, `project.coords`, `project.crs`, `project.georef` | The coordinate frame. Every position in the file is measured from it, and a scenario's own frame would move every element. |
+| `backdrop` | The image and its registration. The image is megabytes, so a copy per scenario multiplies the file; the registration is coordinates in the document's frame. Its opacity (`settings.backdropOpacity`) is Presentation. |
+| `view` | **Excluded for now, Tom's call (question 2 below).** It is a camera position, and a scenario holding one would move the map on every switch of scenario, which the page's rule against automatic zooms forbids. It also carries coordinates through the Y flip, the origin shift and the geographic projection. |
+| `settings.idPrefixes`, `settings.defaults`, `settings.nodeElevSource` | **New-asset settings write Base data** (question 3). They seed a new element's id and its own values, which are Base-owned even when the element is drawn inside a scenario. Bentley keeps the same thing as Prototypes, outside scenarios. |
+| `settings.customProps` | The design of each custom property. A stored value means nothing without its design, so two scenarios disagreeing about the design would read the same value two ways. The values themselves are already User data. |
+| `settings.fileOptions`, `inpSections` | Text carried verbatim from an `.inp` that this page does not act on. |
+| `patterns`, `curves`, `pipeTypes`, `fittingSets`, `profiles` | **Document objects** (CLAUDE.md: *"A curve is a document object; an element holds only a reference. The reference is scenario-overridable, the points are not."*). The same rule for every library. |
+| `controls`, `rules` | Model content, not settings. Bentley's home for them is the Operational alternative, which we do not have yet. |
+| `project.name`, `project.docId`, `project.gallery`, `format`, `app`, `v`, `nextId` | What the document is and how it counts ids. |
+| `project.activeScenario` | Which scenario is open. Cannot depend on the scenario. |
+| `scenarios`, `nodes`, `links`, `labels`, `customers` | The model itself; element properties are categorised in the table above this section. |
+| `settings.sources`, `settings.mixing`, `settings.tags`, `settings.reactions.tank`, `settings.energy.effic` | Markers and staging the `.inp` readers leave behind: "this section was read", or a value already moved onto its element. |
+| `settings.sectionsOpen`, `mapHeight`, `fileAutosaveSeconds`, `colorRamp`, `colorClasses`, `colorReverse`, `colorThematic`, `colorFrozenBreaks`, `basemapFilter`, `kmDefault` | Stale or migrated on open: nothing reads them, or `applySaved()` converts and deletes them. |
 
 ## The code
 
