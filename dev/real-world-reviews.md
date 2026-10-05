@@ -4,6 +4,21 @@ What people outside this project said and did when they used the looped network 
 session, newest first. Record what the tester did and said; Tom's reading of it goes in quotes and is
 marked as his. The actions it produced live in `dev/tom-review-queue.md` under the R-numbers given.
 
+## 2026-10-04 -- DDN, Italian engineer, weekend test
+
+Reported by Tom 2026-10-05, DDN's words quoted. Tested production (9c71d54f).
+- Online, with satellite tiles drawing, he saw the `lpn_time_no_engine` banner telling him to
+  "Connect to the internet one time to fetch the EPANET solver": *"it's not clear why it asks me to
+  connect to the internet."* Diagnosis under way the same day.
+- *"After clicking on start a model now, there is a landing page with active projects, templates,
+  etc. When I start a project and close it, the landing page is not shown anymore. Perhaps you can
+  create 'Start' or 'Home' button."* Tom asked back whether he means the empty first project should
+  close silently when he opens an example.
+- *"It would be good to show map tips when hovering the mouse on a feature."* Tom asked back whether
+  he means asset properties on hover.
+- *"On the animation buttons, it would be good to insert a button for restart (<<). Maybe also for
+  end (>>) too?"* Tom: *"Yes ... it's important. Maybe the buttons can be smaller."*
+
 ## 2026-09-25 -- IOD, senior civil engineer
 
 Reported by Tom.
