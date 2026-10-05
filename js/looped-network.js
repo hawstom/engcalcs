@@ -40982,6 +40982,9 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return [
 			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', tip: pc.lpn_tool_zoom_extent_tip, fn: zoomExtent },
+			// **A SNIPPING TOOL, IN THE MAP MENU BECAUSE IT IS NOT ABOUT WATER** (Tom, 2026-10-05). Beside
+			// Zoom to fit: both are about the view of the drawing, and the one frames what the other takes.
+			{ icon: 'image', pointerOnly: true, label: pc.lpn_screenshot_menu || 'Screenshot', tip: pc.lpn_screenshot_tip, fn: startScreenshot },
 			// **THE BACKGROUND IMAGE CAME HERE FROM INSERT** (Tom, 2026-08-27). A picture behind the
 			// drawing is not a water asset; it is the same kind of thing as the street map two rows
 			// down, and EPANET files its own Backdrop under this menu for the same reason. A
@@ -41064,6 +41067,279 @@ var EngCalcs = EngCalcs || {};
 			// sentences only it could say were being translated into 27 languages for a state no
 			// visitor could reach. See dev/geographic-projects.md for what went with it.
 		];
+	}
+	// ---- SCREENSHOT: A SNIPPING TOOL FOR THE MAP ------------------------------------------------
+	// Tom, 2026-10-05, on a proposed "Copy image at 2x-3x": *"Good if presented as a snipping tool.
+	// 'Sharper screenshot' or 'Screenshot' (with tip) may work; I can make a video about sharper
+	// screenshots and Figure scenarios. But where does it live? Map menu seems right to me since
+	// it's not about Water."*
+	//
+	// **THE POINT IS THAT IT RE-DRAWS, NOT THAT IT GRABS.** The network is vector SVG, so the
+	// rectangle the visitor drags is drawn again at SNIP_SCALE times its CSS size -- lines and
+	// labels come out sharper than any screen grab of the same area. Basemap tiles are rasters and
+	// are only scaled into place; that is the honest limit.
+	//
+	// **NOTHING IS STORED AND NOTHING NEW IS FETCHED.** The picture goes to the clipboard, or, where
+	// the clipboard refuses, to a file the visitor saves. The tiles drawn are the <image> elements
+	// already on the map, re-read from the browser's cache with the same crossorigin=anonymous they
+	// were loaded with (OSM and Mapbox both answer Access-Control-Allow-Origin: *). A tile that
+	// would still taint the canvas is left out and the confirmation says so.
+	//
+	// dev/lpn-spike/screenshot-browser-harness.js proves the size, the content, Esc and the fallback.
+	var SNIP_SCALE = 3, SNIP_SCALE_SAFE = 2, SNIP_MAX_SIDE = 16384, SNIP_MAX_AREA = 120e6, SNIP_DRAG_PX = 4;
+	// What a snapshot keeps of each element's computed style. The SVG is drawn as an image, where
+	// the page's stylesheet does not reach, so whatever the stylesheet decided is written onto the
+	// element itself.
+	var SNIP_STYLE_PROPS = ['fill', 'fill-opacity', 'fill-rule', 'stroke', 'stroke-width', 'stroke-opacity',
+		'stroke-dasharray', 'stroke-dashoffset', 'stroke-linecap', 'stroke-linejoin', 'stroke-miterlimit',
+		'opacity', 'visibility', 'filter', 'paint-order', 'vector-effect', 'mix-blend-mode',
+		'font-family', 'font-size', 'font-weight', 'font-style', 'letter-spacing',
+		'text-anchor', 'dominant-baseline', 'alignment-baseline', 'baseline-shift', 'direction', 'unicode-bidi',
+		'marker-start', 'marker-mid', 'marker-end', 'shape-rendering', 'text-rendering', 'image-rendering', 'color'];
+	var snipVeil = null;
+	function snipScaleFor(w, h) {
+		var s = SNIP_SCALE;
+		if (w * s > SNIP_MAX_SIDE || h * s > SNIP_MAX_SIDE || w * s * h * s > SNIP_MAX_AREA) { s = SNIP_SCALE_SAFE; }
+		if (w * s > SNIP_MAX_SIDE || h * s > SNIP_MAX_SIDE || w * s * h * s > SNIP_MAX_AREA) {
+			s = Math.min(SNIP_MAX_SIDE / w, SNIP_MAX_SIDE / h, Math.sqrt(SNIP_MAX_AREA / (w * h)));
+		}
+		return s;
+	}
+	// The visible map, in client pixels: the canvas's content box (inside its 1px border), cut to
+	// the window, since the canvas is laid out taller than the screen until it is sized.
+	function snipMapRect() {
+		var r = svg.getBoundingClientRect(),
+			left = r.left + svg.clientLeft, top = r.top + svg.clientTop,
+			right = left + svg.clientWidth, bottom = top + svg.clientHeight;
+		left = Math.max(left, 0); top = Math.max(top, 0);
+		right = Math.min(right, window.innerWidth); bottom = Math.min(bottom, window.innerHeight);
+		return { x: left, y: top, w: Math.max(0, right - left), h: Math.max(0, bottom - top) };
+	}
+	function startScreenshot() {
+		cancelScreenshot();
+		var pc = EngCalcs.pageConfig || {}, map = snipMapRect();
+		if (map.w < 1 || map.h < 1) { return; }
+		var veil = document.createElement('div'), box = document.createElement('div'), start = null;
+		veil.className = 'lpn-snip-veil';
+		veil.style.left = map.x + 'px'; veil.style.top = map.y + 'px';
+		veil.style.width = map.w + 'px'; veil.style.height = map.h + 'px';
+		box.className = 'lpn-snip-rect';
+		box.style.display = 'none';
+		veil.appendChild(box);
+		document.body.appendChild(veil);
+		snipVeil = { el: veil, onKey: null };
+		function at(e) {
+			return { x: Math.min(Math.max(e.clientX, map.x), map.x + map.w), y: Math.min(Math.max(e.clientY, map.y), map.y + map.h) };
+		}
+		function rectOf(a, b) {
+			return { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), w: Math.abs(a.x - b.x), h: Math.abs(a.y - b.y) };
+		}
+		veil.addEventListener('pointerdown', function (e) {
+			if (e.button !== undefined && e.button !== 0) { return; }
+			e.preventDefault(); e.stopPropagation();
+			start = at(e);
+			try { veil.setPointerCapture(e.pointerId); } catch (err) { /* capture is a nicety */ }
+		});
+		veil.addEventListener('pointermove', function (e) {
+			if (!start) { return; }
+			var r = rectOf(start, at(e));
+			box.style.display = '';
+			box.style.left = (r.x - map.x) + 'px'; box.style.top = (r.y - map.y) + 'px';
+			box.style.width = r.w + 'px'; box.style.height = r.h + 'px';
+		});
+		veil.addEventListener('pointerup', function (e) {
+			if (!start) { return; }
+			e.preventDefault(); e.stopPropagation();
+			var r = rectOf(start, at(e));
+			start = null;
+			cancelScreenshot();
+			// A plain click (or a tap) takes the whole visible map, as a snipping tool's does.
+			takeScreenshot(r.w < SNIP_DRAG_PX || r.h < SNIP_DRAG_PX ? map : r);
+		});
+		veil.addEventListener('pointercancel', function () { start = null; box.style.display = 'none'; });
+		snipVeil.onKey = function (e) {
+			if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); cancelScreenshot(); setNotice(''); }
+		};
+		document.addEventListener('keydown', snipVeil.onKey, true);
+		setNotice(pc.lpn_screenshot_hint || 'Drag a rectangle over the map, or click for the whole map. Esc cancels.');
+	}
+	function cancelScreenshot() {
+		if (!snipVeil) { return; }
+		document.removeEventListener('keydown', snipVeil.onKey, true);
+		if (snipVeil.el.parentNode) { snipVeil.el.parentNode.removeChild(snipVeil.el); }
+		snipVeil = null;
+	}
+	function snipLoadImage(src, cors) {
+		return new Promise(function (resolve, reject) {
+			var im = new Image();
+			if (cors) { im.crossOrigin = 'anonymous'; }
+			im.onload = function () { resolve(im); };
+			im.onerror = function () { reject(new Error('image')); };
+			im.src = src;
+		});
+	}
+	// One raster <image> made self-contained. Resolves to a data: URL, or to null when the picture
+	// cannot be read back (a tile whose server sent no CORS header taints the canvas).
+	function snipInlineImage(href) {
+		if (/^data:/i.test(href)) { return Promise.resolve(href); }
+		var sameOrigin = /^blob:/i.test(href);
+		try { sameOrigin = sameOrigin || new URL(href, location.href).origin === location.origin; } catch (err) { /* keep */ }
+		return snipLoadImage(href, !sameOrigin).then(function (im) {
+			var c = document.createElement('canvas');
+			c.width = im.naturalWidth || 1; c.height = im.naturalHeight || 1;
+			c.getContext('2d').drawImage(im, 0, 0);
+			return c.toDataURL('image/png');   // throws SecurityError on a tainted canvas
+		}).catch(function () { return null; });
+	}
+	// A deep copy of the map's SVG with every computed style written onto its element, hidden
+	// elements dropped, and every raster inlined. `out.droppedBasemap` reports a tile left out.
+	function snipCloneSvg(out) {
+		var clone = svg.cloneNode(true), pending = [];
+		function walk(o, c) {
+			var cs = window.getComputedStyle(o);
+			if (cs.display === 'none') { c.parentNode.removeChild(c); return; }
+			var st = [];
+			SNIP_STYLE_PROPS.forEach(function (p) {
+				var v = cs.getPropertyValue(p);
+				if (v !== '' && v !== null) { st.push(p + ':' + v); }
+			});
+			c.setAttribute('style', st.join(';'));
+			if (o.tagName === 'image') {
+				var href = o.getAttribute('href') || o.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || '';
+				var isTile = o.classList.contains('lpn-basemap-tile');
+				pending.push(snipInlineImage(href).then(function (data) {
+					if (data) { c.setAttribute('href', data); c.removeAttributeNS('http://www.w3.org/1999/xlink', 'href'); }
+					else {
+						if (isTile) { out.droppedBasemap = true; }
+						if (c.parentNode) { c.parentNode.removeChild(c); }
+					}
+				}));
+			}
+			var oc = o.children, cc = Array.prototype.slice.call(c.children), i;
+			for (i = 0; i < oc.length; i++) { if (cc[i]) { walk(oc[i], cc[i]); } }
+		}
+		var rs = window.getComputedStyle(svg), kids = Array.prototype.slice.call(clone.children), oks = svg.children, i;
+		for (i = 0; i < oks.length; i++) { if (kids[i]) { walk(oks[i], kids[i]); } }
+		clone.setAttribute('style', 'font-family:' + rs.fontFamily + ';font-size:' + rs.fontSize);
+		return Promise.all(pending).then(function () { return clone; });
+	}
+	// The HTML legends are drawn by hand, box by box and word by word, so they too are re-drawn at
+	// the snapshot's scale rather than copied off the screen. Backgrounds, borders and text are the
+	// whole of what a legend is (see renderColorLegend(), renderLabelsLegend()).
+	function snipPaintHtml(ctx, root) {
+		function paintBox(e) {
+			var cs = window.getComputedStyle(e);
+			if (cs.display === 'none' || cs.visibility === 'hidden') { return; }
+			var r = e.getBoundingClientRect();
+			if (cs.backgroundColor && !/rgba\([^)]*,\s*0\)$|transparent/.test(cs.backgroundColor)) {
+				ctx.fillStyle = cs.backgroundColor; ctx.fillRect(r.left, r.top, r.width, r.height);
+			}
+			[['Top', r.left, r.top, r.width, 0], ['Bottom', r.left, r.bottom, r.width, 0],
+				['Left', r.left, r.top, 0, r.height], ['Right', r.right, r.top, 0, r.height]].forEach(function (b) {
+				var w = parseFloat(cs['border' + b[0] + 'Width']) || 0;
+				if (!w || cs['border' + b[0] + 'Style'] === 'none') { return; }
+				ctx.fillStyle = cs['border' + b[0] + 'Color'];
+				var x = b[1] - (b[0] === 'Right' ? w : 0), y = b[2] - (b[0] === 'Bottom' ? w : 0);
+				ctx.fillRect(x, y, b[3] || w, b[4] || w);
+			});
+			Array.prototype.forEach.call(e.childNodes, function (n) {
+				if (n.nodeType === 1) { paintBox(n); }
+				else if (n.nodeType === 3 && /\S/.test(n.nodeValue)) { paintText(n, cs); }
+			});
+		}
+		function paintText(n, cs) {
+			ctx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+			ctx.fillStyle = cs.color;
+			ctx.textBaseline = 'middle';
+			ctx.textAlign = 'left';
+			try { ctx.direction = cs.direction; } catch (err) { /* older canvas */ }
+			var text = n.nodeValue, re = /\S+/g, m, range = document.createRange();
+			while ((m = re.exec(text))) {
+				range.setStart(n, m.index); range.setEnd(n, m.index + m[0].length);
+				var rr = range.getClientRects()[0];
+				if (rr) { ctx.fillText(m[0], rr.left, rr.top + rr.height / 2); }
+			}
+		}
+		paintBox(root);
+	}
+	function snipLegends() {
+		return [document.getElementById('lpn_labels_legend'), colorLegendBox].filter(function (e) {
+			return e && e.isConnected && window.getComputedStyle(e).display !== 'none';
+		});
+	}
+	// Render the client-pixel rectangle `r` of the map. Resolves to { blob, droppedBasemap, scale }.
+	function renderScreenshot(r) {
+		var out = { droppedBasemap: false, scale: snipScaleFor(r.w, r.h) };
+		var s = out.scale, W = Math.max(1, Math.round(r.w * s)), H = Math.max(1, Math.round(r.h * s));
+		var sr = svg.getBoundingClientRect(), ox = sr.left + svg.clientLeft, oy = sr.top + svg.clientTop;
+		return snipCloneSvg(out).then(function (clone) {
+			clone.setAttribute('xmlns', NS);
+			clone.setAttribute('width', W); clone.setAttribute('height', H);
+			clone.setAttribute('viewBox', [r.x - ox, r.y - oy, r.w, r.h].join(' '));
+			clone.setAttribute('preserveAspectRatio', 'none');
+			clone.removeAttribute('id');
+			var xml = new XMLSerializer().serializeToString(clone),
+				url = URL.createObjectURL(new Blob([xml], { type: 'image/svg+xml;charset=utf-8' }));
+			return snipLoadImage(url, false).then(function (im) {
+				URL.revokeObjectURL(url);
+				var c = document.createElement('canvas'), ctx;
+				c.width = W; c.height = H;
+				ctx = c.getContext('2d');
+				ctx.fillStyle = window.getComputedStyle(svg).backgroundColor || 'white';
+				ctx.fillRect(0, 0, W, H);
+				ctx.drawImage(im, 0, 0, W, H);
+				ctx.save();
+				ctx.scale(W / r.w, H / r.h);
+				ctx.translate(-r.x, -r.y);
+				ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip();
+				snipLegends().forEach(function (lg) {
+					var lr = lg.getBoundingClientRect();
+					if (lr.right > r.x && lr.left < r.x + r.w && lr.bottom > r.y && lr.top < r.y + r.h) { snipPaintHtml(ctx, lg); }
+				});
+				ctx.restore();
+				return new Promise(function (resolve, reject) {
+					c.toBlob(function (b) { if (b) { out.blob = b; resolve(out); } else { reject(new Error('toBlob')); } }, 'image/png');
+				});
+			}, function (err) { URL.revokeObjectURL(url); throw err; });
+		});
+	}
+	function snipDownload(blob) {
+		var a = document.createElement('a'), url = URL.createObjectURL(blob);
+		a.href = url;
+		a.download = safeFileName((project && project.name) || 'map') + '-screenshot.png';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+	}
+	// Called from the pointerup, so the clipboard write starts INSIDE the gesture -- Safari refuses
+	// one that starts later -- with the picture still being drawn as the ClipboardItem's promise.
+	function takeScreenshot(r) {
+		var pc = EngCalcs.pageConfig || {}, job = renderScreenshot(r), wrote;
+		function say(key, fallback, out) {
+			var t = pc[key] || fallback;
+			if (out && out.droppedBasemap) { t += ' ' + (pc.lpn_screenshot_no_basemap || 'The street map or satellite image could not be included.'); }
+			setNotice(t);
+		}
+		function fallback() {
+			return job.then(function (out) {
+				snipDownload(out.blob);
+				say('lpn_screenshot_saved', 'The clipboard is not available here, so the screenshot was downloaded as a PNG file.', out);
+			});
+		}
+		try {
+			if (!navigator.clipboard || !navigator.clipboard.write || typeof window.ClipboardItem !== 'function') { throw new Error('no clipboard'); }
+			wrote = navigator.clipboard.write([new window.ClipboardItem({
+				'image/png': job.then(function (out) { return out.blob; })
+			})]).then(function () {
+				return job.then(function (out) { say('lpn_screenshot_copied', 'Screenshot copied.', out); });
+			}, fallback);
+		} catch (err) {
+			wrote = fallback();
+		}
+		return wrote.catch(function () {
+			setNotice(pc.lpn_screenshot_failed || 'The screenshot could not be made.');
+		});
 	}
 	// **THE PROJECT MENU** (ROADMAP Task 467). Tom, 2026-08-20: *"Maybe we can have a Project menu
 	// with Settings, Library, and Report under it?"*, and his own row order of 2026-08-21:

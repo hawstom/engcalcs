@@ -1774,6 +1774,11 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    same argument .lpn-vertexmode already makes over links. No `!important` needed: (1,1,0) beats
    every object cursor's (0,1,0), which is what the regmode rule above predates. */
 #lpn_canvas.lpn-placemode, #lpn_canvas.lpn-placemode * { cursor: crosshair; }
+/* Map > Screenshot: the one-shot snipping veil over the map and the rectangle dragged on it
+   (startScreenshot() in js/looped-network.js). Transparent, so the map stays readable under it. */
+.lpn-snip-veil { position: fixed; z-index: 2500; cursor: crosshair; touch-action: none; }
+.lpn-snip-rect { position: absolute; box-sizing: border-box; border: 1px dashed var(--ec-accent); background: var(--ec-select-bg); pointer-events: none; }
+@media print { .lpn-snip-veil { display: none; } }
 /* Node-mode target step: nodes ARE the valid click target here, so forcing crosshair over them
    removes the one affordance that actually matters. More specific than the rule above (extra
    class), so it wins the !important tie on specificity. */
