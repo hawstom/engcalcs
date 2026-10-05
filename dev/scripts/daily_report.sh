@@ -310,54 +310,53 @@ echo "$out" | grep -oE '[0-9]+ of [0-9]+ open tasks have a conforming[^.]*' | he
 # ---------------------------------------------------------------------------
 hr "USAGE, from the production logs"
 if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ]; then
+    # TWO WINDOWS, EACH NAMED IN ITS OWN HEADING. Tom, 2026-10-05, on a table printed under a bare
+    # "DURATION 13.6 days": "It looks like the day's usage. But it's not labeled that way." It was
+    # the whole log. So the last day and the whole log are two tables, and each heading says which.
+    # The "reach rows" line that followed was a log-format diagnostic, not a total of the table; it
+    # appears now only when old-format rows exist, and says what it is.
+    rank_table() {  # $1 = lang-log-stats.sh output, $2 = heading prefix
+        dur=$(printf '%s\n' "$1" | awk '/^ +DURATION /{print $2; exit}')
+        win=$(printf '%s\n' "$1" | awk '/^ +WINDOW /{print substr($2,1,10) " to " substr($4,1,10); exit}')
+        echo ""
+        echo " $2 (${dur:-?} days, $win):"
+        printf '%s\n' "$1" | awk '
+            /RANK BY SHOPPING/         {r=1; next}
+            r && /^ *rank[[:space:]]/  {print; next}
+            r && /^ *[0-9]+ +[A-Za-z]/ {if (++k<=6) print; next}
+            r && k>0 && /^ *$/         {exit}
+        '
+    }
+    day=$(cd "$PROD" && run 120 "bash log/lang-log-stats.sh --days=1")
     out=$(cd "$PROD" && run 120 "bash log/lang-log-stats.sh")
     if [ -n "$out" ]; then
-        # A `head -24` HERE PRINTED TWENTY-FOUR LINES OF DEFINITIONS AND NOT ONE NUMBER, which is
-        # the failure a report is most likely to keep making: it looked full. So the sections are
-        # named. The WINDOW and FINGERPRINT lines come first and are not decoration -- that script
-        # says to quote them with any number taken from it, because two snapshots with different
-        # fingerprints describe different populations, and dev/usage-data-log.md records a 40x
-        # scale break that happened when a window went unstated.
         picked=$(
-            # `awk '!seen'` because lang-log-stats.sh prints WINDOW and FINGERPRINT twice, once in
-            # its header and once beside the consent share. Two identical lines in a report that is
-            # meant to be identical in shape every day is a thing a reader stops to check.
-            printf '%s\n' "$out" | grep -E '^ +(WINDOW|DURATION|FINGERPRINT) ' | awk '!seen[$0]++'
-            # R-121/122/123: Tom read this table with no headings and could not tell what the
-            # numbers were, then guessed "page loads" includes robots and "people" means
-            # long-dwell. Neither guess is right -- checked against log/lang-log-stats.sh and
-            # lib/UsageReport.lib.php: "people" is the CONSENTED bucket (one row per person per
-            # page, by cookie, nothing to do with dwell time); "page loads" is everybody else, one
-            # row per page view. This table is built from the >=10s-dwell "shopping" beacon for
-            # BOTH columns, so it already excludes nearly all robots by behaviour -- there is no
-            # user-agent or robot list anywhere in this codebase. So the headings say what is true
-            # rather than what he guessed.
+            [ -n "$day" ] && rank_table "$day" "Top pages, LAST 24 HOURS"
+            rank_table "$out" "Top pages, WHOLE LOG, not one day"
+            echo ""
+            # R-121/122/123: "people" is the CONSENTED bucket (one row per person per page, by
+            # cookie, nothing to do with dwell time); "page loads" is everybody else, one row per
+            # page view. Both columns come from the >=10s-dwell "shopping" beacon, so robots are
+            # nearly all excluded by behaviour; there is no robot list in this codebase.
+            echo " The two counts are different units; never add them:"
+            echo "   people      visitors who accepted the consent banner, counted"
+            echo "               once per person per page"
+            echo "   page loads  everyone else, one row per page view"
+            echo "   Both count only after 10+ seconds on the page, so robots are"
+            echo "   nearly all excluded."
             printf '%s\n' "$out" | awk '
-                /RANK BY SHOPPING/ {
-                    r=1
-                    print ""
-                    print " rank by shopping (top pages; two counts, never summed):"
-                    print "   people      visitors who accepted the consent banner, counted"
-                    print "               once per person per page"
-                    print "   page loads  everyone else, one row per page view"
-                    print "   Both count only after 10+ seconds on the page, so robots are"
-                    print "   nearly all excluded."
-                    next
-                }
-                r && /^ *rank[[:space:]]/  {print; next}
-                r && /^ *[0-9]+ +[A-Za-z]/ {if (++k<=6) print; next}
-                r && k>0 && /^ *$/         {r=0}
-                /reach rows:/              {print}
-            '
+                /reach rows:/ && $NF+0 > 0 {
+                    print "   Log check: " $NF " rows of the reach log are in the old format and"
+                    print "   could not be classified by language served."
+                }'
+            printf '%s\n' "$out" | grep -E '^ +FINGERPRINT ' | head -1 | sed 's/^ *FINGERPRINT */ For comparing two reports only: /'
         )
-        # AN EXTRACTION THAT MATCHES NOTHING MUST SAY SO. The first version of this section printed
-        # a heading and then nothing at all, on a checkout with no logs -- which is the one shape
-        # this report may never have, because an empty section reads as "no news" and it means "I
-        # did not look". If the shape of lang-log-stats.sh changes, this is what will tell you.
-        if [ -n "$(printf '%s' "$picked" | tr -d '[:space:]')" ]; then
+        # AN EXTRACTION THAT MATCHES NOTHING MUST SAY SO: an empty section reads as "no news" and
+        # it means "I did not look". If the shape of lang-log-stats.sh changes, this tells you.
+        if printf '%s\n' "$picked" | grep -qE '^ *[0-9]+ +[A-Za-z]'; then
             printf '%s\n' "$picked" | sed 's/^/   /'
         else
-            miss "lang-log-stats.sh ran and printed $(printf '%s\n' "$out" | wc -l | tr -d ' ') lines, but none matched the WINDOW, rank or reach-row shapes this section reads. Read it by hand: cd $PROD && sh log/lang-log-stats.sh"
+            miss "lang-log-stats.sh ran and printed $(printf '%s\n' "$out" | wc -l | tr -d ' ') lines, but no rank rows matched. Read it by hand: cd $PROD && sh log/lang-log-stats.sh"
         fi
     else
         miss "lang-log-stats.sh printed nothing"

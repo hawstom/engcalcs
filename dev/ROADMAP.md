@@ -340,6 +340,14 @@ the block.
   account, no upload); a Google Sheets sync is a fifth third-party service, so a `privacy.php`
   paragraph and his call. Mary, Sue and Declan's readings are under Task 721. The layout assumes
   Bentley's model (a scenario tree, alternatives beneath); ours is flat, so the tabs need rethinking.
+- 75|766| **Show scenarios in the Tables pane: one row per asset per scenario.**
+  Tom, 2026-10-05: right-click "Show scenarios" adds Scenario, Parent, Alternative, Parent and
+  Scenario override columns; initial order ID, then Scenario, then Alternative; every user sort keeps
+  ties in their previous order (Google Sheets). First cut on `feat/scenario-table`.
+- 75|767| **A Presentation category: every project setting is scenario-overridable.**
+  Tom, 2026-10-05: *"any Setting that is stored in the project should be subject to scenario
+  overrides under some alternatives category, probably Presentation or Calculation"* (view, map
+  appearance, symbology). Long-lived on `feat/bentley-interop`; `dev/scenario-alternatives.md`.
 - 75|756| **Cross-platform: the suite as a desktop application, beyond the web folder.**
   Tom, 2026-09-30: *"Put a cross platform project on our roadmap priority 75. Plan where/how to move
   the project to transcend the web-centric hawsedc.com/engcalcs folder. Windows or Linux? Plan what
