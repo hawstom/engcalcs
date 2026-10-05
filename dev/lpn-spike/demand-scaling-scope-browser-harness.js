@@ -91,7 +91,7 @@ async function main() {
 			await inp.dispatchEvent('change');
 		};
 		const pressFind = async () => {
-			const findLabel = await a.lang('lpn_ds_find');
+			const findLabel = await a.lang('lpn_find_btn');
 			const btns = await a.page.$$('#lpn_ds_controls button.lpn-ff-run');
 			for (const b of btns) {
 				if (((await b.textContent()) || '').trim() === findLabel) { await b.click(); break; }
@@ -178,7 +178,7 @@ async function main() {
 		await setScope('all');
 		await pressFind();
 		await setScope('selected');
-		const findLabel = await a.lang('lpn_ds_find');
+		const findLabel = await a.lang('lpn_find_btn');
 		for (const bt of await a.page.$$('#lpn_ds_controls button.lpn-ff-run')) {
 			if (((await bt.textContent()) || '').trim() === findLabel) { await bt.click(); break; }
 		}

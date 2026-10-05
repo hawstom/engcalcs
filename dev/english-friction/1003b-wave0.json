@@ -34,8 +34,8 @@
                 "no asset of the shown group (Nodes or Links) is selected",
                 "the selected assets are already on the graph, so none was added"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED: 'No new assets of this group are selected on the map.'",
+            "disposition": "english",
+            "resolution": "Tom's edited proposal applied verbatim, 2026-10-05.",
             "human_answer": "Edited proposal.",
             "human_answered": "2026-10-05"
         },
@@ -59,8 +59,8 @@
                 "the choice cannot change, except by a conversion that is approximate",
                 "the network can be converted by one route only, and the network's coordinates are approximate"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED: 'Choose the coordinate system of your network. The choice is permanent, except that “File, Convert as…” can convert the network to other coordinates, and that conversion is approximate.'",
+            "disposition": "english",
+            "resolution": "Tom's edited proposal applied verbatim, 2026-10-05.",
             "human_answer": "Proposal edited.",
             "human_answered": "2026-10-05"
         },
@@ -73,8 +73,8 @@
                 "map-view checkbox and name filter",
                 "place search and name filter"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED: 'The coordinate systems that pass the map view filter and the name filter above. Choose one, then press OK.'",
+            "disposition": "english",
+            "resolution": "Tom's edit applied verbatim, 2026-10-05.",
             "human_answer": "Edited",
             "human_answered": "2026-10-05"
         },
@@ -178,8 +178,8 @@
                 "no limit was exceeded during any tested junction's fire flow, within the design check scope",
                 "no limit was exceeded in the junctions-to-test scope"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED: 'With each tested junction’s fire flow drawn in turn, nothing in the design check scope went outside its limits.'",
+            "disposition": "english",
+            "resolution": "Tom's edited proposal applied verbatim, 2026-10-05.",
             "human_answer": "Proposal edited.",
             "human_answered": "2026-10-05"
         },
@@ -192,8 +192,8 @@
                 "the time step's demands, tank levels and link statuses are all scaled",
                 "only the demands are scaled; levels and statuses are taken from that step"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED: 'The demands of the time step now on screen are scaled, and the network is solved with that step’s tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.'",
+            "disposition": "english",
+            "resolution": "Tom's edit applied verbatim, 2026-10-05.",
             "human_answer": "Edited",
             "human_answered": "2026-10-05"
         },
@@ -206,8 +206,8 @@
                 "search from 0 up to the maximum, rounding to the step",
                 "search from 0 to the maximum, and keep the pressure at exactly the minimum"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED: 'Finds the largest demand scale at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}, to the nearest {step}, and assumes that more demand never raises the lowest pressure.'",
+            "disposition": "english",
+            "resolution": "Tom's edited proposal applied verbatim, 2026-10-05.",
             "human_answer": "Edited proposal.",
             "human_answered": "2026-10-05"
         },
@@ -220,8 +220,8 @@
                 "find assets matching a condition",
                 "find the largest demand scale (the button at js/looped-network.js:59552)"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED: 'Find largest scale'",
+            "disposition": "english",
+            "resolution": "Tom: 'Merge. Find is find.' The button now uses the suite's existing Find key; lpn_ds_find deleted, 2026-10-05.",
             "human_answer": "Merge. Find is find.",
             "human_answered": "2026-10-05"
         },
@@ -234,8 +234,8 @@
                 "the whole system holds the pressure",
                 "only the checked junctions hold at least the pressure"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED: '✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.'",
+            "disposition": "english",
+            "resolution": "Tom approved the proposal, 2026-10-05; applied verbatim.",
             "human_answer": "Proposal approved.",
             "human_answered": "2026-10-05"
         }

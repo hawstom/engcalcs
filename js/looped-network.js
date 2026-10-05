@@ -47249,8 +47249,7 @@ var EngCalcs = EngCalcs || {};
 		basemapStyleSelect.addEventListener('change', function () {
 			settings.basemapStyle = basemapStyleSelect.value; delete settings.basemapFilter; refreshBackdropOpacity(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_basemap_style || 'Basemap style', basemapStyleSelect,
-			pc.lpn_settings_basemap_style_tip);
+		row(mapBody, pc.lpn_settings_basemap_style || 'Basemap style', basemapStyleSelect);
 		var legendSelect = document.createElement('select');
 		legendPositionOptions(pc).forEach(function (o) {
 			var opt = document.createElement('option');
@@ -61450,7 +61449,7 @@ var EngCalcs = EngCalcs || {};
 			'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.')
 			.replace('{max}', dsMult(D.max)).replace('{step}', String(D.step)), host);
 		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
-		find = ffEl('button', 'lpn-ff-run', pc.lpn_ds_find || 'Find', buttons);
+		find = ffEl('button', 'lpn-ff-run', pc.lpn_find_btn || 'Find', buttons);
 		find.type = 'button';
 		find.disabled = dsBusy || other;
 		if (other) { find.title = run.title; }

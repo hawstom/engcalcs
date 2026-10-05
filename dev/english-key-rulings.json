@@ -1346,11 +1346,6 @@
             "ruled": "2026-10-04",
             "answer": "OK."
         },
-        "lpn_ds_find": {
-            "on": "Find",
-            "ruled": "2026-10-04",
-            "answer": "OK."
-        },
         "lpn_ds_found": {
             "on": "✓ Every junction keeps {pressure} up to a demand scale of {m}.",
             "ruled": "2026-10-04",
@@ -4536,11 +4531,6 @@
             "on": "Basemap style",
             "ruled": "2026-10-05",
             "answer": "OK."
-        },
-        "lpn_settings_basemap_style_tip": {
-            "on": "Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.",
-            "ruled": "2026-10-05",
-            "answer": "Delete key"
         },
         "lpn_settings_custom_props": {
             "on": "Custom properties",
