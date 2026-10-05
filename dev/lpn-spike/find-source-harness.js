@@ -246,12 +246,12 @@ L.setQuality('none');
 L.buildForm();
 L.type('Source.Elevation above 0');
 L.pressFind();
-ok('no sources and no chemical: the reason is given', /No chemical is being tracked/.test(L.resultsText()), L.resultsText());
+ok('no sources and no chemical: the reason is given', L.resultsText().indexOf(EngCalcs.pageConfig.lpn_find_source_no_chemical) >= 0, L.resultsText());
 L.setQuality('chemical');
 L.buildForm();
 L.type('Source.Elevation above 0');
 L.pressFind();
-ok('chemical tracked: just "Nothing matched"', !/No chemical/.test(L.resultsText()), L.resultsText());
+ok('chemical tracked: just "Nothing matched"', L.resultsText().indexOf(EngCalcs.pageConfig.lpn_find_source_no_chemical) < 0, L.resultsText());
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
 process.exit(fails ? 1 : 0);
