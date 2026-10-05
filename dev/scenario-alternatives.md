@@ -599,8 +599,13 @@ nearest), and promote moves it out.
 **Speed.** The hot readers read `resolvedOverrides(scn)` and `scenarioSettingsBlock(scn)`. Derived,
 they are the scenario's own objects. Explicit, they are read-only merged maps cached per scenario
 and rebuilt lazily when `touchTree()` bumps the epoch (every write site calls it), or when `doc` or
-`scenarios` is a different object. Measured on Net3: no measurable cost (about 0.2 µs per
-`effective()` read either way).
+`scenarios` is a different object. An element write (`setOverride()`, `clearOverride()`) does
+not empty the cache: `touchTreeKey()` regroups that one key in its holder and re-resolves it only
+in the scenarios whose chain runs through that holder. Measured on Net3: no measurable cost (about
+0.2 µs per `effective()` read either way). A demand set on every junction of a synthetic chain
+network, in a scenario of a stored tree (2026-10-05, jasmine): 2,000 elements 108 ms before
+per-key mending, 3.6 ms after (1.0 ms with no tree); 8,000 elements 2,028 ms before, 11.1 ms
+after (3.1 ms with no tree). Perry measured 465 ms and 8.3 s before, on his own network.
 
 **Maintenance** walks every map through `eachOverrideMap()`; `scenario_seam_check.php` refuses a
 `.overrides`/`.values` access outside a named list of functions.

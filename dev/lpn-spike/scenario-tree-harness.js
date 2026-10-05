@@ -178,9 +178,15 @@ function checkAll(label) {
 	return bad.length === 0;
 }
 // The cache against a rebuild from nothing, for every scenario.
+// Key order is not meaning: a key mended in place lands last in its map.
+function C(v) {
+	if (Array.isArray(v)) { return '[' + v.map(C).join(',') + ']'; }
+	if (v && typeof v === 'object') { return '{' + Object.keys(v).sort().map((k) => JSON.stringify(k) + ':' + C(v[k])).join(',') + '}'; }
+	return J(v);
+}
 function cacheFresh() {
-	return L.getScenarios().every((s) => J(L.resolvedOverrides(s)) === J(s.isBase || !L.isExplicitTree() ? s.overrides : L.buildResolvedOverrides(s)) &&
-		(s.isBase || !L.isExplicitTree() || J(L.resolvedSettingsBlock(s)) === J(L.buildResolvedSettings(s))));
+	return L.getScenarios().every((s) => C(L.resolvedOverrides(s)) === C(s.isBase || !L.isExplicitTree() ? s.overrides : L.buildResolvedOverrides(s)) &&
+		(s.isBase || !L.isExplicitTree() || C(L.resolvedSettingsBlock(s)) === C(L.buildResolvedSettings(s))));
 }
 // The four structural invariants of a stored tree.
 function invariants() {

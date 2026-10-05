@@ -4595,13 +4595,14 @@ var EngCalcs = EngCalcs || {};
 		// that names one holds no local value in its category).
 		if (t.kind === 'alt') { scn = { overrides: plainObject(t.obj.values) ? t.obj.values : (t.obj.values = {}) }; }
 		if (!scn.overrides[key]) { scn.overrides[key] = {}; }
+		var layerId = (t.kind === 'alt' ? 'alt' : 'scn') + '\u0000' + t.obj.id, holderMap = scn.overrides;
 		// UNDEFINED BECOMES NULL. In Base `undefined` says "no head typed"; in an override map
 		// absence means "inherit Base", so a blank-capable field stored as undefined says "inherit"
 		// rather than "deliberately blank" -- and JSON.stringify DROPS an undefined value, so the
 		// override evaporates on the next save, undo snapshot or file write. At the SEAM rather than
 		// the call site, so every future blank-capable field is covered without anyone remembering.
 		scn.overrides[key][prop] = (value === undefined) ? null : value;
-		touchTree('setOverride');
+		touchTreeKey('setOverride', layerId, holderMap, key);
 	}
 	function clearOverride(el, prop) {
 		var scn = activeScenario(), key = ovKey(el), t = writeTargetFor(scn, categoryOf(prop, elGroup(el))),
@@ -4612,7 +4613,7 @@ var EngCalcs = EngCalcs || {};
 		// the map reads as "this element is touched here", the claim the marker exists to make.
 		if (!Object.keys(ov).length) { delete map[key]; }
 		if (t && t.kind === 'alt' && !Object.keys(map).length) { delete t.obj.values; }
-		touchTree('clearOverride');
+		touchTreeKey('clearOverride', (t && t.kind === 'alt' ? 'alt' : 'scn') + '\u0000' + (t ? t.obj.id : scn.id), map, key);
 	}
 	// THE ONE WRITE SEAM every property editor goes through. In Base it writes the element (which
 	// IS the propagation -- there is no push upward in the delta model); in a scenario it records
@@ -4854,12 +4855,37 @@ var EngCalcs = EngCalcs || {};
 		if (site !== undefined && site === treeTouchSkip) { return; }
 		treeEpoch++;
 	}
+	/**
+	 * **ONE ELEMENT'S VALUES CHANGED IN ONE HOLDER** (setOverride(), clearOverride()): the cache is
+	 * mended in place rather than thrown away, so a bulk write -- a demand on every junction -- costs
+	 * what it costs with no tree. The holder's grouping is regrouped for that key alone, and only
+	 * the scenarios whose chain runs through the holder have that key re-resolved. Settings are not
+	 * touched by an element write. With no stored tree there is nothing cached to mend.
+	 */
+	function touchTreeKey(site, layerId, map, key) {
+		var c = treeCache, g;
+		if (site !== undefined && site === treeTouchSkip) { return; }
+		if (!c || c.epoch !== treeEpoch || c.doc !== doc || c.scenarios !== scenarios || !c.explicit) { return; }
+		g = c.grp[layerId];
+		if (g) { groupKeyInto(g, map, key); }
+		Object.keys(c.ov).forEach(function (sid) {
+			var out = c.ov[sid], layers = c.layers[sid];
+			if (!layers || !c.holders[sid][layerId]) { return; }
+			delete out[key];
+			LPN_ALT_CATEGORIES.forEach(function (cat) {
+				layers[cat].forEach(function (layer) {
+					(((layerValuesByCategory(layer)[cat]) || {})[key] || []).forEach(function (pv) { putResolvedOverride(out, key, pv[0], pv[1]); });
+				});
+			});
+			if (out[key] && !Object.keys(out[key]).length) { delete out[key]; }
+		});
+	}
 	// The cache, rebuilt whole when the epoch or either object identity moved. Read-only: nothing
 	// that reads an answer from it may write into it.
 	var treeCache = null;
 	function treeState() {
 		if (!treeCache || treeCache.epoch !== treeEpoch || treeCache.doc !== doc || treeCache.scenarios !== scenarios) {
-			treeCache = { epoch: treeEpoch, doc: doc, scenarios: scenarios, explicit: treeIsStored(), ov: {}, st: {}, grp: {} };
+			treeCache = { epoch: treeEpoch, doc: doc, scenarios: scenarios, explicit: treeIsStored(), ov: {}, st: {}, grp: {}, layers: {}, holders: {} };
 		}
 		return treeCache;
 	}
@@ -4927,23 +4953,27 @@ var EngCalcs = EngCalcs || {};
 		}
 		return out;
 	}
-	// One layer's element values grouped by category, {cat: [[key, prop, value]]}, once per epoch.
+	// One layer's element values grouped by category, then key: {cat: {ovKey: [[prop, value]]}},
+	// once per epoch (and mended a key at a time by touchTreeKey()).
 	function layerValuesByCategory(layer) {
 		var c = treeState(), id = layer.kind + '\u0000' + layer.obj.id, map, out;
 		if (c.grp[id]) { return c.grp[id]; }
 		out = {};
 		map = layer.kind === 'scn' ? layer.obj.overrides : (layer.kind === 'alt' ? layer.obj.values : null);
-		Object.keys(plainObject(map) ? map : {}).forEach(function (key) {
-			var group = ovKeyGroup(key), ov = map[key];
-			Object.keys(plainObject(ov) ? ov : {}).forEach(function (prop) {
-				var cat = categoryOf(prop, group);
-				(out[cat] = out[cat] || []).push([key, prop, ov[prop]]);
-			});
-		});
-		// Within one holder a whole list wins over its own row-0 `demand`, as effective() reads it.
-		if (out.demand) { out.demand.sort(function (x, y) { return (x[1] === 'demands' ? 0 : 1) - (y[1] === 'demands' ? 0 : 1); }); }
+		Object.keys(plainObject(map) ? map : {}).forEach(function (key) { groupKeyInto(out, map, key); });
 		c.grp[id] = out;
 		return out;
+	}
+	function groupKeyInto(out, map, key) {
+		var group = ovKeyGroup(key), ov = plainObject(map) ? map[key] : null;
+		Object.keys(out).forEach(function (cat) { delete out[cat][key]; });
+		Object.keys(plainObject(ov) ? ov : {})
+			// Within one holder a whole list wins over its own row-0 `demand`, as effective() reads it.
+			.sort(function (x, y) { return (x === 'demands' ? 0 : 1) - (y === 'demands' ? 0 : 1); })
+			.forEach(function (prop) {
+				var cat = categoryOf(prop, group), byKey = out[cat] || (out[cat] = {});
+				(byKey[key] = byKey[key] || []).push([prop, ov[prop]]);
+			});
 	}
 	// Nearest wins, per element and property. **THE DEMAND PAIR RESOLVES AS effective() READS IT**
 	// (R-369): a nearer whole list shadows a farther row-0 `demand`, and a nearer `demand` lays its
@@ -4959,13 +4989,20 @@ var EngCalcs = EngCalcs || {};
 		o[prop] = v;
 	}
 	function buildResolvedOverrides(scn) {
-		var out = {};
+		var out = {}, c = treeState(), layers = {}, holders = {};
 		if (scn.isBase) { return scn.overrides || {}; }
 		LPN_ALT_CATEGORIES.forEach(function (cat) {
-			treeLayers(scn, cat).forEach(function (layer) {
-				(layerValuesByCategory(layer)[cat] || []).forEach(function (t) { putResolvedOverride(out, t[0], t[1], t[2]); });
+			layers[cat] = treeLayers(scn, cat);
+			layers[cat].forEach(function (layer) {
+				var byKey = layerValuesByCategory(layer)[cat] || {};
+				holders[layer.kind + '\u0000' + layer.obj.id] = true;
+				Object.keys(byKey).forEach(function (key) {
+					byKey[key].forEach(function (pv) { putResolvedOverride(out, key, pv[0], pv[1]); });
+				});
 			});
 		});
+		// What touchTreeKey() needs to mend this answer in place. Recorded only for the cached one.
+		if (c.ov[scn.id] === undefined) { c.layers[scn.id] = layers; c.holders[scn.id] = holders; }
 		return out;
 	}
 	// Nearest wins, per leaf; a leaf under one already set, or under an atomic object, is shadowed.
