@@ -1171,13 +1171,46 @@
 
 	function workspaceFor(mod, moduleUrl) {
 		if (workspace && workspaceUrl === moduleUrl) { return Promise.resolve(workspace); }
-		var ws = new mod.Workspace();
-		return Promise.resolve(ws.loadModule()).then(function () {
-			workspace = ws;
-			workspaceUrl = moduleUrl;
-			return ws;
-		});
+		return Promise.resolve().then(function () {
+			var ws = new mod.Workspace();
+			return Promise.resolve(ws.loadModule()).then(function () {
+				workspace = ws;
+				workspaceUrl = moduleUrl;
+				return ws;
+			});
+		}).then(null, function (err) { throw lpnStage(err, 'engine'); });
 	}
+
+	// **A FAILED RUN SAYS WHICH STAGE FAILED**, because the three have three different remedies and
+	// the banner used to give the first one for all of them. 'fetch': the module never arrived.
+	// 'engine': it arrived and the browser would not start it (WebAssembly refused). 'run': it
+	// started and the run itself threw, which is a defect in this page. The first stage to tag an
+	// error keeps it.
+	function lpnStage(err, stage) {
+		var e = (err && typeof err === 'object') ? err : new Error(String(err));
+		if (!e.lpnStage) { e.lpnStage = stage; }
+		return e;
+	}
+	function stageOf(p, stage) { return p.then(null, function (err) { throw lpnStage(err, stage); }); }
+	// Which message a failed run earns. Offline is only ever a fetch that failed with the browser
+	// reporting no network; an engine or run failure while offline is still an engine or run failure.
+	// The sentence for a cause other than 'offline', from pageConfig. {wrong} in the run sentence is
+	// this language's own label of the one-tap report link, so every language names its own link.
+	EngCalcs.lpnEngineReason = function (why) {
+		var pc = EngCalcs.pageConfig || {};
+		if (why === 'fetch') { return pc.lpn_time_engine_fetch_failed || 'The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.'; }
+		if (why === 'engine') { return pc.lpn_time_engine_start_failed || 'The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.'; }
+		if (why === 'run') {
+			return (pc.lpn_time_engine_run_failed || 'The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.')
+				.replace('{wrong}', pc.lpn_wrong_btn || 'Something wrong here?');
+		}
+		return '';
+	};
+	EngCalcs.lpnEngineFailWhy = function (err) {
+		var stage = (err && err.lpnStage) || 'run';
+		if (stage === 'fetch' && typeof navigator !== 'undefined' && navigator.onLine === false) { return 'offline'; }
+		return stage;
+	};
 
 	function openSession(mod, model, sig, moduleUrl) {
 		closeSession();
@@ -1351,7 +1384,7 @@
 	 * worse for a user staring at a drawing -- "node J7 is isolated behind a closed link" beats
 	 * "error 110" every time.
 	 */
-	EngCalcs.lpnSolveEpanet = function (model, options) {
+	function solveEpanetInner(model, options) {
 		var opts = options || {};
 		var issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
@@ -1364,7 +1397,7 @@
 		// **ONLY THIS CALL MAY REJECT**, and its rejection means the module could not be fetched or
 		// instantiated -- no engine. Everything after it is EPANET reading OUR network, and a throw
 		// there is a REFUSAL, which resolves instead. See engineRefusal().
-		return EngCalcs.lpnEpanetLoad(opts.moduleUrl).then(function (mod) {
+		return stageOf(EngCalcs.lpnEpanetLoad(opts.moduleUrl), 'fetch').then(function (mod) {
 			// Reuse the open Project when the model is still the same SHAPE; otherwise rebuild.
 			// getting this wrong in the reuse direction is the silent-stale-answer failure the
 			// section comment above is about, so the test is on the derived signature and on
@@ -1455,6 +1488,11 @@
 			closeSession();
 			return engineRefusal(e, {});
 		});
+	}
+	EngCalcs.lpnSolveEpanet = function (model, options) {
+		var p;
+		try { p = solveEpanetInner(model, options); } catch (e) { p = Promise.reject(e); }
+		return stageOf(p, 'run');
 	};
 
 
@@ -1705,7 +1743,7 @@
 	 * setStatusReport(1) tells the engine to write it, and it is read back off the engine's own
 	 * in-memory filesystem after the Project closes. Empty string if the build cannot produce one.
 	 */
-	EngCalcs.lpnEpanetRun = function (model, options) {
+	function epanetRunInner(model, options) {
 		var opts = options || {}, url = opts.moduleUrl || null;
 		var issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
@@ -1719,7 +1757,7 @@
 			onProgress = typeof opts.onProgress === 'function' ? opts.onProgress : null,
 			sliceMs = opts.sliceMs > 0 ? opts.sliceMs : EngCalcs.LPN_EPANET_SLICE_MS;
 
-		return EngCalcs.lpnEpanetLoad(url).then(function (mod) {
+		return stageOf(EngCalcs.lpnEpanetLoad(url), 'fetch').then(function (mod) {
 			return workspaceFor(mod, url).then(function (ws) {
 				var p = new mod.Project(ws), frames = [], nodeIdx = {}, linkIdx = {},
 					i, n, l, t = 0, tstep, guard = 0, seen = 0, closed = false,
@@ -2178,6 +2216,11 @@
 				});
 			});
 		});
+	}
+	EngCalcs.lpnEpanetRun = function (model, options) {
+		var p;
+		try { p = epanetRunInner(model, options); } catch (e) { p = Promise.reject(e); }
+		return stageOf(p, 'run');
 	};
 
 }(typeof globalThis !== 'undefined' ? globalThis : this));

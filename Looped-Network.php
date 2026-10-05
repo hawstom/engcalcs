@@ -2298,6 +2298,11 @@ EngCalcs.pageConfig = {
 	lpn_time_format_tip: <?=json_encode($ec_lang['lpn_time_format_tip'])?>,
 	lpn_time_running: <?=json_encode($ec_lang['lpn_time_running'])?>,
 	lpn_time_no_engine: <?=json_encode($ec_lang['lpn_time_no_engine'])?>,
+	lpn_time_no_engine_why: <?=json_encode($ec_lang['lpn_time_no_engine_why'])?>,
+	lpn_time_engine_fetch_failed: <?=json_encode($ec_lang['lpn_time_engine_fetch_failed'])?>,
+	lpn_time_engine_start_failed: <?=json_encode($ec_lang['lpn_time_engine_start_failed'])?>,
+	lpn_time_engine_run_failed: <?=json_encode($ec_lang['lpn_time_engine_run_failed'])?>,
+	lpn_wrong_btn: <?=json_encode($ec_lang['lpn_wrong_btn'])?>,
 	lpn_time_slider: <?=json_encode($ec_lang['lpn_time_slider'])?>,
 	lpn_time_no_period: <?=json_encode($ec_lang['lpn_time_no_period'])?>,
 	lpn_time_first: <?=json_encode($ec_lang['lpn_time_first'])?>,
@@ -2658,10 +2663,12 @@ EngCalcs.pageConfig = {
 	lpn_engine_fetching_valve: <?=json_encode($ec_lang['lpn_engine_fetching_valve'])?>,
 	lpn_engine_ready_valve: <?=json_encode($ec_lang['lpn_engine_ready_valve'])?>,
 	lpn_engine_unavailable: <?=json_encode($ec_lang['lpn_engine_unavailable'])?>,
+	lpn_engine_unavailable_why: <?=json_encode($ec_lang['lpn_engine_unavailable_why'])?>,
 <?php   // The Task 608 pair: the wait a reader is currently in, and the one failure a background
         // fetch is entitled to report, because without the engine this network has no answers. ?>
 	lpn_engine_needed_loading: <?=json_encode($ec_lang['lpn_engine_needed_loading'])?>,
 	lpn_engine_needed_failed: <?=json_encode($ec_lang['lpn_engine_needed_failed'])?>,
+	lpn_engine_needed_failed_why: <?=json_encode($ec_lang['lpn_engine_needed_failed_why'])?>,
 	lpn_engine_wait: <?=json_encode($ec_lang['lpn_engine_wait'])?>,
 	lpn_engine_wait_pct: <?=json_encode($ec_lang['lpn_engine_wait_pct'])?>,
 	lpn_engine_wait_bytes: <?=json_encode($ec_lang['lpn_engine_wait_bytes'])?>,
@@ -3560,6 +3567,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_engine_native_tip: <?=json_encode($ec_lang['lpn_settings_engine_native_tip'])?>,
 	lpn_engine_loading: <?=json_encode($ec_lang['lpn_engine_loading'])?>,
 	lpn_engine_failed: <?=json_encode($ec_lang['lpn_engine_failed'])?>,
+	lpn_engine_failed_why: <?=json_encode($ec_lang['lpn_engine_failed_why'])?>,
 	lpn_engine_valve_route: <?=json_encode($ec_lang['lpn_engine_valve_route'])?>,
 	lpn_engine_manning_note: <?=json_encode($ec_lang['lpn_engine_manning_note'])?>,
 <?php   // EPANET said no (Task 471), and the controls it would have said no over (Task 466). ?>

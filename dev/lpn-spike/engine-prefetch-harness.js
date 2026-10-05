@@ -26,6 +26,8 @@
 'use strict';
 
 const { setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// These scenarios simulate an OFFLINE visitor: the failure wording is chosen by navigator.onLine (engine-failure-wording-harness.js).
+Object.defineProperty(globalThis, 'navigator', { value: { onLine: false }, configurable: true, writable: true });
 
 const INJECT =
 	"\t\trunSolve: runSolve, assembleModel: assembleModel,\n" +
