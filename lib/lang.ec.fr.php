@@ -3658,7 +3658,6 @@ $ec_lang['lpn_ff_menu_tip']='Testez les jonctions une par une : combien chacune 
 $ec_lang['lpn_ff_title']='Débit d\'incendie';
 $ec_lang['lpn_ff_intro']='Chaque jonction est tour à tour appelée à prélever un débit d\'incendie en plus de la demande qu\'elle a déjà. Rien n\'est modifié dans votre projet ; tout le calcul se fait sur une copie.';
 $ec_lang['lpn_ff_scope']='Jonctions à tester';
-$ec_lang['lpn_ff_scope_tip']='Choisissez l\'ensemble avant de lancer le calcul. Tester toutes les jonctions d\'un grand réseau peut prendre plusieurs minutes.';
 $ec_lang['lpn_ff_all']='Toutes';
 $ec_lang['lpn_ff_selected']='Sélectionnées';
 $ec_lang['lpn_ff_no_junctions']='Ce projet n\'a pas encore de jonctions ; il n\'y a donc rien à tester.';
@@ -3666,7 +3665,6 @@ $ec_lang['lpn_ff_no_selection']='Aucune jonction n\'est sélectionnée. Sélecti
 $ec_lang['lpn_ff_skipped']='{n} éléments sélectionnés ne sont pas des jonctions, ils n\'ont donc pas été testés.';
 $ec_lang['lpn_ff_required']='Débit d\'incendie requis';
 $ec_lang['lpn_ff_required_tip']='Le débit que votre réglementation incendie ou votre service de sécurité incendie exige à une bouche d\'incendie. Chaque jonction est testée par rapport à ce nombre, sauf si elle porte son propre débit d\'incendie requis.';
-$ec_lang['lpn_ff_required_own']='Les jonctions portant leur propre débit d\'incendie requis sont testées par rapport à celui-ci à la place. Nombre d\'entre elles : {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Le débit d\'incendie requis à cette jonction en particulier, selon votre réglementation incendie ou votre service de sécurité incendie, pour l\'usage du sol qu\'elle dessert. Laissez-le vide et la jonction est testée par rapport au nombre indiqué dans la case Débit d\'incendie.';
 $ec_lang['lpn_ff_residual']='Pression résiduelle à maintenir';
 $ec_lang['lpn_ff_residual_tip']='La pression que la jonction doit encore maintenir tout en fournissant le débit d\'incendie. AWWA M31 et NFPA 291 utilisent 20 psi (140 kPa).';
@@ -3689,7 +3687,6 @@ $ec_lang['lpn_ff_engine_native']='Le solveur intégré est utilisé.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='Le moteur EPANET est utilisé.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='Le débit d\'incendie disponible est une recherche : tout le réseau est donc résolu environ seize fois pour chaque jonction testée. Un grand réseau prend plusieurs minutes. Vous pouvez l\'arrêter à tout moment et conserver ce qui a déjà été calculé.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3697,7 +3694,6 @@ $ec_lang['lpn_ff_engine_cost']='Le débit d\'incendie disponible est une recherc
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Seul le pas de temps actuellement affiché à l\'écran est testé. Le débit d\'incendie se teste normalement en plus de la demande du jour de pointe ; réglez donc le réseau sur cette condition avant de lancer le calcul.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

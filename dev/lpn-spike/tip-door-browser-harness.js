@@ -208,7 +208,7 @@ async function sectionLpnDesktop(Session, browser) {
 		await a.settle(350);
 		const cs = await tipState(page, '#lpn_ff_box .lpn-corner-help');
 		ok('a click on it opens the box\'s whole explanation', cs.shown &&
-			cs.text.indexOf(await a.lang('lpn_ff_intro')) === 0 && cs.text.indexOf(await a.lang('lpn_ff_scope_tip')) > 0, String(cs.text).slice(0, 50));
+			cs.text.indexOf(await a.lang('lpn_ff_intro')) === 0 && cs.text.indexOf(await a.lang('lpn_ff_accounting')) > 0, String(cs.text).slice(0, 50));
 		await page.keyboard.press('Escape');
 		await a.settle(300);
 

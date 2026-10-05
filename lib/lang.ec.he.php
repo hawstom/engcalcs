@@ -3647,7 +3647,6 @@ $ec_lang['lpn_ff_menu_tip']='בדקו צמתים אחד בכל פעם: כמה כ
 $ec_lang['lpn_ff_title']='ניתוח ספיקת כיבוי אש';
 $ec_lang['lpn_ff_intro']='מכל צומת בתורו מתבקש לשאוב ספיקת כיבוי אש בנוסף לדרישה שכבר יש לו. שום דבר בפרויקט שלכם אינו משתנה; כל ההרצה נעשית על עותק.';
 $ec_lang['lpn_ff_scope']='צמתים לבדיקה';
-$ec_lang['lpn_ff_scope_tip']='בחרו את הקבוצה לפני ההרצה. בדיקת כל צומת במערכת גדולה יכולה לקחת דקות.';
 $ec_lang['lpn_ff_all']='כולם';
 $ec_lang['lpn_ff_selected']='הנבחרים';
 $ec_lang['lpn_ff_no_junctions']='לפרויקט זה אין עדיין צמתים, כך שאין מה לבדוק.';
@@ -3655,7 +3654,6 @@ $ec_lang['lpn_ff_no_selection']='אין צמתים נבחרים. בחרו צמת
 $ec_lang['lpn_ff_skipped']='{n} האלמנטים הנבחרים אינם צמתים, כך שהם לא נבדקו.';
 $ec_lang['lpn_ff_required']='ספיקת כיבוי אש נדרשת';
 $ec_lang['lpn_ff_required_tip']='הספיקה שתקן הכיבוי או רשות הכיבוי שלכם דורשים בברז שריפה. כל צומת נבדק כנגד מספר זה, אלא אם יש לו ספיקת כיבוי אש נדרשת משלו.';
-$ec_lang['lpn_ff_required_own']='צמתים המחזיקים ספיקת כיבוי אש נדרשת משלהם נבדקים כנגד זו במקום. מספרם: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='ספיקת כיבוי האש הנדרשת בצומת מסוים זה עבור השימוש בקרקע שהוא משרת, מתקן הכיבוי או מרשות הכיבוי שלכם. השאירו ריק והצומת ייבדק כנגד המספר בתיבת ניתוח ספיקת כיבוי אש.';
 $ec_lang['lpn_ff_residual']='לחץ שארי לשמירה';
 $ec_lang['lpn_ff_residual_tip']='הלחץ שהצומת חייב עדיין להחזיק בעוד הוא מספק את ספיקת כיבוי האש. AWWA M31 ו-NFPA 291 משתמשים ב-20 psi (140 kPa).';
@@ -3677,7 +3675,6 @@ $ec_lang['lpn_ff_engine_native']='נעשה שימוש בפותר המובנה.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='נעשה שימוש במנוע EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='ספיקת כיבוי אש זמינה היא חיפוש, כך שכל הרשת נפתרת כשש עשרה פעמים עבור כל צומת נבדק. מערכת גדולה לוקחת דקות. ניתן לעצור אותה בכל עת ולשמור את מה שכבר בוצע.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3685,7 +3682,6 @@ $ec_lang['lpn_ff_engine_cost']='ספיקת כיבוי אש זמינה היא ח�
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='רק צעד הזמן המוצג כרגע נבדק. ספיקת כיבוי אש נבדקת בדרך כלל בנוסף לדרישת יום מרבי, כך שקבעו את הרשת למצב זה לפני ההרצה.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

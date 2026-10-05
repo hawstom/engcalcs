@@ -3647,7 +3647,6 @@ $ec_lang['lpn_ff_menu_tip']='Testați joncțiunile pe rând: cât poate livra fi
 $ec_lang['lpn_ff_title']='Analiza debitului de incendiu';
 $ec_lang['lpn_ff_intro']='Fiecărei joncțiuni, pe rând, i se cere să preia un debit de incendiu peste cerința pe care o are deja. Nimic din proiectul dvs. nu este schimbat; toată rularea se face pe o copie.';
 $ec_lang['lpn_ff_scope']='Joncțiuni de testat';
-$ec_lang['lpn_ff_scope_tip']='Alegeți setul înainte de a rula. Testarea fiecărei joncțiuni dintr-un sistem mare poate dura minute.';
 $ec_lang['lpn_ff_all']='Toate';
 $ec_lang['lpn_ff_selected']='Selectate';
 $ec_lang['lpn_ff_no_junctions']='Acest proiect nu are încă nicio joncțiune, deci nu este nimic de testat.';
@@ -3655,7 +3654,6 @@ $ec_lang['lpn_ff_no_selection']='Nicio joncțiune nu este selectată. Selectați
 $ec_lang['lpn_ff_skipped']='{n} elemente selectate nu sunt joncțiuni, deci nu au fost testate.';
 $ec_lang['lpn_ff_required']='Debit de incendiu necesar';
 $ec_lang['lpn_ff_required_tip']='Debitul pe care codul dvs. de incendiu sau autoritatea dvs. pentru incendii îl cere la un hidrant. Fiecare joncțiune este testată față de acest număr, dacă nu are propriul ei debit de incendiu necesar.';
-$ec_lang['lpn_ff_required_own']='Joncțiunile care au propriul lor debit de incendiu necesar sunt testate față de acela în schimb. Numărul lor: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Debitul de incendiu necesar la această joncțiune anume, pentru destinația terenului pe care îl deservește, conform normativului dvs. de incendiu sau autorității competente. Lăsați-l gol și joncțiunea este testată față de numărul din caseta Analiza debitului de incendiu.';
 $ec_lang['lpn_ff_residual']='Presiune reziduală de menținut';
 $ec_lang['lpn_ff_residual_tip']='Presiunea pe care joncțiunea trebuie să o mențină în continuare în timp ce livrează debitul de incendiu. AWWA M31 și NFPA 291 folosesc 20 psi (140 kPa).';
@@ -3677,7 +3675,6 @@ $ec_lang['lpn_ff_engine_native']='Este folosit rezolvitorul intern.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='Este folosit motorul EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='Debitul de incendiu disponibil este o căutare, deci întreaga rețea este rezolvată de circa șaisprezece ori pentru fiecare joncțiune testată. Un sistem mare durează minute. Îl puteți opri oricând și păstra ce a fost deja calculat.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3685,7 +3682,6 @@ $ec_lang['lpn_ff_engine_cost']='Debitul de incendiu disponibil este o căutare, 
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Este testat doar pasul de timp aflat acum pe ecran. Debitul de incendiu se testează în mod normal peste cerința zilei maxime, deci stabiliți rețeaua în acea condiție înainte de a rula.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

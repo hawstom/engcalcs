@@ -3648,7 +3648,6 @@ $ec_lang['lpn_ff_menu_tip']='Testuje uzly jeden po druhém: kolik dokáže každ
 $ec_lang['lpn_ff_title']='Analýza požárního průtoku';
 $ec_lang['lpn_ff_intro']='Každý uzel je postupně požádán, aby odebral požární průtok navíc k odběru, který už má. Nic ve vašem projektu se nemění; celý výpočet probíhá na kopii.';
 $ec_lang['lpn_ff_scope']='Uzly k otestování';
-$ec_lang['lpn_ff_scope_tip']='Zvolte množinu před spuštěním. Testování každého uzlu ve velké síti může trvat minuty.';
 $ec_lang['lpn_ff_all']='Všechny';
 $ec_lang['lpn_ff_selected']='Vybrané';
 $ec_lang['lpn_ff_no_junctions']='Tento projekt zatím nemá žádné uzly, takže není co testovat.';
@@ -3656,7 +3655,6 @@ $ec_lang['lpn_ff_no_selection']='Nejsou vybrány žádné uzly. Vyberte uzly, ne
 $ec_lang['lpn_ff_skipped']='{n} vybraných prvků nejsou uzly, takže nebyly testovány.';
 $ec_lang['lpn_ff_required']='Požadovaný požární průtok';
 $ec_lang['lpn_ff_required_tip']='Průtok, který vyžaduje váš požární předpis nebo hasičský sbor u hydrantu. Každý uzel je proti tomuto číslu testován, pokud nemá vlastní požadovaný požární průtok.';
-$ec_lang['lpn_ff_required_own']='Uzly s vlastním požadovaným požárním průtokem jsou testovány proti němu místo toho. Počet takových uzlů: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Požární průtok požadovaný přímo u tohoto uzlu, podle vašeho požárního předpisu nebo hasičského sboru pro využití území, které obsluhuje. Ponechte prázdné a uzel bude testován proti číslu v poli Analýza požárního průtoku.';
 $ec_lang['lpn_ff_residual']='Zbytkový tlak k udržení';
 $ec_lang['lpn_ff_residual_tip']='Tlak, který musí uzel stále držet při odběru požárního průtoku. AWWA M31 a NFPA 291 používají 20 psi (140 kPa).';
@@ -3678,7 +3676,6 @@ $ec_lang['lpn_ff_engine_native']='Používá se vestavěný řešič.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='Používá se řešič EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='Dostupný požární průtok je hledání, takže se celá síť řeší asi šestnáctkrát pro každý testovaný uzel. Velká síť trvá minuty. Kdykoli ji můžete zastavit a ponechat si to, co už bylo vypočteno.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3686,7 +3683,6 @@ $ec_lang['lpn_ff_engine_cost']='Dostupný požární průtok je hledání, takž
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Testuje se pouze časový krok právě zobrazený na obrazovce. Požární průtok se obvykle testuje navíc k maximálnímu dennímu odběru, proto před spuštěním nastavte síť na tento stav.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

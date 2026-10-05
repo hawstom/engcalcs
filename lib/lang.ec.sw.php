@@ -3646,7 +3646,6 @@ $ec_lang['lpn_ff_menu_tip']='Jaribu miunganiko mmoja mmoja: kila mmoja unaweza k
 $ec_lang['lpn_ff_title']='Uchambuzi wa mtiririko wa moto';
 $ec_lang['lpn_ff_intro']='Kila muunganiko kwa zamu huulizwa kuchota mtiririko wa moto juu ya mahitaji aliyokwisha nayo. Hakuna kinachobadilika kwenye mradi wako; utendeshaji wote unafanywa kwenye nakala.';
 $ec_lang['lpn_ff_scope']='Miunganiko ya kujaribu';
-$ec_lang['lpn_ff_scope_tip']='Chagua kundi kabla ya kuendesha. Kujaribu kila muunganiko kwenye mfumo mkubwa kunaweza kuchukua dakika.';
 $ec_lang['lpn_ff_all']='Yote';
 $ec_lang['lpn_ff_selected']='Iliyochaguliwa';
 $ec_lang['lpn_ff_no_junctions']='Mradi huu bado hauna miunganiko, hivyo hakuna cha kujaribu.';
@@ -3654,7 +3653,6 @@ $ec_lang['lpn_ff_no_selection']='Hakuna miunganiko iliyochaguliwa. Chagua miunga
 $ec_lang['lpn_ff_skipped']='Vipengele {n} vilivyoteuliwa si miunganiko, hivyo havikujaribiwa.';
 $ec_lang['lpn_ff_required']='Mtiririko wa moto unaohitajika';
 $ec_lang['lpn_ff_required_tip']='Mtiririko unaohitajika na kanuni yako ya moto au mamlaka yako ya zimamoto kwenye hydranti. Kila muunganiko hujaribiwa dhidi ya namba hii isipokuwa una mtiririko wa moto unaohitajika wake mwenyewe.';
-$ec_lang['lpn_ff_required_own']='Miunganiko yenye mtiririko wa moto unaohitajika wake mwenyewe hujaribiwa dhidi ya huo badala yake. Idadi yao: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Mtiririko wa moto unaohitajika kwenye muunganiko huu hasa, kwa matumizi ya ardhi anayohudumia, kutoka kanuni yako ya moto au mamlaka yako ya zimamoto. Kiache tupu na muunganiko utajaribiwa dhidi ya namba iliyo kwenye kisanduku cha Uchambuzi wa mtiririko wa moto.';
 $ec_lang['lpn_ff_residual']='Shinikizo linalobaki la kushikilia';
 $ec_lang['lpn_ff_residual_tip']='Shinikizo ambalo muunganiko lazima liendelee kushikilia wakati unatoa mtiririko wa moto. AWWA M31 na NFPA 291 hutumia psi 20 (kPa 140).';
@@ -3676,7 +3674,6 @@ $ec_lang['lpn_ff_engine_native']='Kitatuzi kilichojengwa ndani kinatumika.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='Injini ya EPANET inatumika.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='Mtiririko wa moto unaopatikana ni utafutaji, hivyo mtandao wote unatatuliwa mara kumi na sita hivi kwa kila muunganiko unaojaribiwa. Mfumo mkubwa unachukua dakika. Unaweza kuusimamisha wakati wowote na kubaki na kile ambacho tayari umekifanya.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3684,7 +3681,6 @@ $ec_lang['lpn_ff_engine_cost']='Mtiririko wa moto unaopatikana ni utafutaji, hiv
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Ni hatua ya muda iliyo kwenye skrini sasa pekee inayojaribiwa. Mtiririko wa moto kwa kawaida hujaribiwa juu ya mahitaji ya siku ya juu kabisa, hivyo weka mtandao kwenye hali hiyo kabla ya kuendesha.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

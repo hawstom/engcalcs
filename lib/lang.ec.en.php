@@ -4080,9 +4080,8 @@ $ec_lang['lpn_analyze_menu_tip']='Analyses that run the network on a copy: fire 
 $ec_lang['lpn_ff_menu']='Fire flow analysis…';
 $ec_lang['lpn_ff_menu_tip']='Selection-wide check with collateral effect check';
 $ec_lang['lpn_ff_title']='Fire flow analysis';
-$ec_lang['lpn_ff_intro']='Each junction in turn is asked to draw a fire flow on top of the demand it already has. Nothing in your project is changed; the whole run is made on a copy.';
+$ec_lang['lpn_ff_intro']='Each junction in turn is asked to draw a fire flow on top of the demand it already has. The run is made on a copy of the network at the time step on screen, so nothing in your project is changed. Fire flow is normally tested on top of maximum day demand; set the network to that condition before you run. Available fire flow is found by a search that solves the whole network about 16 times for every junction tested, so a large system takes minutes: choose the junctions to test before you run, and stop at any time to keep the results already finished.';
 $ec_lang['lpn_ff_scope']='Junctions to test';
-$ec_lang['lpn_ff_scope_tip']='Choose the set before you run. Testing every junction in a large system can take minutes.';
 $ec_lang['lpn_ff_all']='All junctions';
 $ec_lang['lpn_ff_selected']='Selected junctions';
 $ec_lang['lpn_ff_no_junctions']='This project has no junctions yet, so there is nothing to test.';
@@ -4090,7 +4089,6 @@ $ec_lang['lpn_ff_no_selection']='No junctions are selected. Select junctions or 
 $ec_lang['lpn_ff_skipped']='{n} selected elements are not junctions, so they were not tested.';
 $ec_lang['lpn_ff_required']='Required fire flow';
 $ec_lang['lpn_ff_required_tip']='The flow your fire code or your fire authority requires at a hydrant. Each junction is tested against this number unless it carries a required fire flow of its own.';
-$ec_lang['lpn_ff_required_own']='Junctions carrying a required fire flow of their own are tested against that instead. Number of them: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='The fire flow required at this particular junction for the land use it serves, from your fire code or your fire authority. Leave it blank to test the junction against the number in the Fire flow analysis box.';
 $ec_lang['lpn_ff_residual']='Residual pressure to hold';
 $ec_lang['lpn_ff_residual_tip']='The pressure the junction must still hold while delivering the fire flow. AWWA M31 and NFPA 291 use 20 psi (140 kPa).';
@@ -4109,13 +4107,12 @@ $ec_lang['lpn_ff_maxvelocity_tip']='A pipe running above this while a fire flow 
 // for hydrant losses beyond the node."). IT LEADS WITH THE METHOD, NOT WITH THE ABSENCE: Tom read
 // the first wording as "no losses are accounted for at the raw node", which is a hole in the tool
 // rather than the deliberate and standard choice it actually is.
-$ec_lang['lpn_ff_accounting']='Fire flow is drawn at the junction itself. That is the method used here, and it is the usual one. The hydrant, its lateral pipe and its nozzle are not modelled, so a real hydrant delivers less than the flow shown here.';
+$ec_lang['lpn_ff_accounting']='Fire flow is drawn at the junction itself, which is the usual method. The hydrant, its lateral, and its nozzle are not modeled, so a real hydrant delivers less than the flow shown.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_native']='Built-in solver is used.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='EPANET engine is used.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='Available fire flow is a search, so the whole network is solved about sixteen times for every junction tested. A large system takes minutes. It can be stopped at any time, keeping what it has already done.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -4123,7 +4120,6 @@ $ec_lang['lpn_ff_engine_cost']='Available fire flow is a search, so the whole ne
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Only the time step now on screen is tested. Fire flow is normally tested on top of maximum day demand, so set the network to that condition before you run.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost
@@ -4214,7 +4210,7 @@ $ec_lang['lpn_ff_design_off_note']='The effect on the rest of the system was not
 // ISO credits a single hydrant with at most 1,500 gpm whatever the hydraulics say. Said beside the
 // numbers and never applied to them: a number quietly cut down to a credit limit is a lie with a
 // tidy face.
-$ec_lang['lpn_ff_iso']='The Insurance Services Office (ISO) credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.';
+$ec_lang['lpn_ff_iso']='The Insurance Services Office (ISO) credits a single hydrant with at most {flow}. That limit is not applied here, because a junction may stand for more than one hydrant.';
 // Every way a junction can fail to produce a number is named. None of them is ever shown as a flow
 // of zero: "there is no available fire flow" and "the available fire flow is zero" are different
 // facts, and only the first one is ever true.
@@ -4271,14 +4267,13 @@ $ec_lang['lpn_crit_skipped_dead']='Dead-end links skipped: {n}. Each one cuts of
 $ec_lang['lpn_ds_menu']='Demand scaling…';
 $ec_lang['lpn_ds_menu_tip']='Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.';
 $ec_lang['lpn_ds_title']='Demand scaling';
-$ec_lang['lpn_ds_intro']='The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.';
+$ec_lang['lpn_ds_intro']='Select the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities. Select the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}. Both work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. Only that time step is scaled, and levels and statuses are taken from it; to test the peak, move the clock to the peak demand before you run.';
 $ec_lang['lpn_ds_scope']='Junctions to scale';
 $ec_lang['lpn_ds_scope_tip']='All junctions, or only those selected on the map. Pressures are checked at the scaled demand.';
 $ec_lang['lpn_ds_scope_all']='All junctions';
 $ec_lang['lpn_ds_scope_selected']='Selected junctions';
 $ec_lang['lpn_ds_minpressure']='Lowest pressure allowed';
 $ec_lang['lpn_ds_minpressure_tip']='This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.';
-$ec_lang['lpn_ds_eps_note']='Only the time step now on screen is scaled; levels and statuses are taken from this step. To test the peak, move the clock to the peak demand before you run.';
 $ec_lang['lpn_ds_head_scale']='Scale the demands';
 $ec_lang['lpn_ds_multiplier']='Demand scale';
 $ec_lang['lpn_ds_multiplier_tip']='The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario\'s own demand multiplier, which is already in the demands, and it is never saved in your project.';
@@ -4286,7 +4281,6 @@ $ec_lang['lpn_ds_run']='Run';
 $ec_lang['lpn_ds_head_search']='What demand scale can the system handle?';
 $ec_lang['lpn_ds_head_search_selected']='What demand scale can these junctions handle?';
 $ec_lang['lpn_ds_outside_below']='At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.';
-$ec_lang['lpn_ds_search_note']='Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.';
 $ec_lang['lpn_ds_holds_max']='✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.';
 $ec_lang['lpn_ds_below_zero']='⚠ At least one junction is below {pressure} even with the scaled demands at zero.';
 $ec_lang['lpn_ds_found']='✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.';

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**10 still to read on master**, of 117 untranslated keys, of 2345 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**11 still to read on master**, of 115 untranslated keys, of 2339 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -94,7 +94,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (117, 10 to read @@ NEEDS RULING)
+## lpn_  (115, 11 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -174,9 +174,6 @@ never edits a synonym.
 - **`lpn_ds_col_unscaled_tip`**
   > With the demands as they are in the active scenario at this time step, the same value the map shows.
   _Ruled OK 2026-10-03._
-- **`lpn_ds_eps_note`**
-  > Only the time step now on screen is scaled; levels and statuses are taken from this step. To test the peak, move the clock to the peak demand before you run.
-  _Ruled OK 2026-10-05._
 - **`lpn_ds_found`**
   > ✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.
   _Ruled 2026-10-05: Proposal approved._
@@ -202,8 +199,8 @@ never edits a synonym.
   > ✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.
   _Ruled OK 2026-10-03._
 - **`lpn_ds_intro`**
-  > The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.
-  _Ruled OK 2026-10-03._
+  > Select the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities. Select the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}. Both work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. Only that time step is scaled, and levels and statuses are taken from it; to test the peak, move the clock to the peak demand before you run.
+  @@ NEEDS RULING
 - **`lpn_ds_lowest_at`**
   > At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.
   _Ruled OK 2026-10-03._
@@ -261,9 +258,6 @@ never edits a synonym.
 - **`lpn_ds_scope_tip`**
   > All junctions, or only those selected on the map. Pressures are checked at the scaled demand.
   _Ruled OK 2026-10-03._
-- **`lpn_ds_search_note`**
-  > Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.
-  _Ruled 2026-10-05: Edited proposal._
 - **`lpn_ds_search_stopped`**
   > The search was stopped before it found an answer.
   _Ruled 2026-10-03: OK. Are we sure this isn't already provided by a different key?_
@@ -452,7 +446,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**5 still to read**, of 11 new keys across 10 unmerged branch(es).
+**10 still to read**, of 16 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -463,18 +457,16 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### feat/bentley-interop (`beedec3f`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_alt_cat_calculation`**
+  > Calculation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_presentation`**
+  > Presentation
+  @@ NEEDS RULING
+
 ### feat/desktop (`baba0f04`) — adds no English strings
-
-### feat/engine-prefetch (`3194c30d`) — adds no English strings
-
-### feat/find-source (`e999a378`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_find_scope_source`**
-  > Source
-  @@ NEEDS RULING
-- **`lpn_find_source_no_chemical`**
-  > No chemical is being tracked, so no node has a source.
-  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -488,6 +480,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
+### feat/label-placer (`3f3c5792`) — adds no English strings
+
 ### feat/label-placer-a (`3483bfd6`) — adds no English strings
 
 ### feat/label-placer-b (`c5905432`) — adds no English strings
@@ -496,8 +490,23 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/times-statistic (`70959325`) — 6 new, 3 to read @@ NEEDS RULING
+### feat/scenario-table (`1eaee4e1`) — 11 new, 8 to read @@ NEEDS RULING
 
+- **`lpn_find_scope_source`**
+  > Source
+  @@ NEEDS RULING
+- **`lpn_find_source_no_chemical`**
+  > No chemical is being tracked, so no node has a source.
+  @@ NEEDS RULING
+- **`lpn_pane_clear_override`**
+  > Clear override
+  @@ NEEDS RULING
+- **`lpn_pane_scn_alt_tip`**
+  > {category} alt.: {alternative}
+  @@ NEEDS RULING
+- **`lpn_pane_scn_show`**
+  > Show scenarios
+  @@ NEEDS RULING
 - **`lpn_time_stat_averaged`**
   > Avg
   @@ NEEDS RULING
@@ -517,4 +526,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Statistic
   _Ruled OK 2026-10-05._
 
-### feat/transport-ends (`af371047`) — adds no English strings
+### feat/tip-door (`80e7e1a5`) — adds no English strings

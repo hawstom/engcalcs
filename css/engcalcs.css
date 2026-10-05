@@ -459,6 +459,10 @@ button > .ec-icon, a > .ec-icon, label > .ec-icon { margin-inline-end: 0.4em; }
 	pointer-events: auto;
 }
 .tooltip.ec-explain .tooltip-inner { text-align: start; }
+/* A box's whole explanation can run to 150 words (the Fire flow box's `?`, Tom 2026-10-05), taller
+   than what lies below its glyph on a short phone. Capped at 60% of the screen's height, the rest
+   scrolls inside the tip, which takes the pointer and the finger for exactly that. */
+.tooltip.ec-explain .tooltip-inner { max-height: 60vh; overflow-y: auto; }
 /* The label words no longer open anything; only the glyph does, so only the glyph says so. */
 .ec-help.ec-explain-host { cursor: inherit; }
 .ec-explain-host .ec-tip, .ec-tip.ec-explain-host { cursor: pointer; }

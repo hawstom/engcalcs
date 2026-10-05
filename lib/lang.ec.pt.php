@@ -3647,7 +3647,6 @@ $ec_lang['lpn_ff_menu_tip']='Testa as junções uma de cada vez: quanto cada uma
 $ec_lang['lpn_ff_title']='Análise de vazão de incêndio';
 $ec_lang['lpn_ff_intro']='Cada junção, por sua vez, é solicitada a fornecer uma vazão de incêndio além da demanda que já tem. Nada no seu projeto é alterado; todo o cálculo é feito em uma cópia.';
 $ec_lang['lpn_ff_scope']='Junções a testar';
-$ec_lang['lpn_ff_scope_tip']='Escolha o conjunto antes de calcular. Testar todas as junções em um sistema grande pode levar minutos.';
 $ec_lang['lpn_ff_all']='Todas';
 $ec_lang['lpn_ff_selected']='Selecionadas';
 $ec_lang['lpn_ff_no_junctions']='Este projeto ainda não tem junções, então não há nada para testar.';
@@ -3655,7 +3654,6 @@ $ec_lang['lpn_ff_no_selection']='Nenhuma junção está selecionada. Selecione j
 $ec_lang['lpn_ff_skipped']='{n} elementos selecionados não são junções, então não foram testados.';
 $ec_lang['lpn_ff_required']='Vazão de incêndio exigida';
 $ec_lang['lpn_ff_required_tip']='A vazão que seu código de incêndio ou sua autoridade de incêndio exige em um hidrante. Cada junção é testada contra este número, a menos que tenha sua própria vazão de incêndio exigida.';
-$ec_lang['lpn_ff_required_own']='Junções com sua própria vazão de incêndio exigida são testadas contra ela. Número delas: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='A vazão de incêndio exigida nesta junção em particular, conforme seu código de incêndio ou sua autoridade de incêndio para o uso do solo que ela atende. Deixe em branco e a junção é testada contra o número na caixa Análise de vazão de incêndio.';
 $ec_lang['lpn_ff_residual']='Pressão residual a manter';
 $ec_lang['lpn_ff_residual_tip']='A pressão que a junção precisa manter enquanto fornece a vazão de incêndio. A AWWA M31 e a NFPA 291 usam 20 psi (140 kPa).';
@@ -3679,7 +3677,6 @@ $ec_lang['lpn_ff_engine_native']='Isto é calculado com o solucionador interno.'
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='Isto é calculado com o motor EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='Vazão de incêndio disponível é uma busca, então a rede inteira é calculada cerca de dezesseis vezes para cada junção testada. Um sistema grande leva minutos. Você pode pará-lo a qualquer momento e manter o que já foi calculado.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3687,7 +3684,6 @@ $ec_lang['lpn_ff_engine_cost']='Vazão de incêndio disponível é uma busca, en
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Somente o horário agora na tela é testado. A vazão de incêndio normalmente é testada sobre a demanda de dia máximo, então configure a rede para essa condição antes de calcular.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

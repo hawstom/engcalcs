@@ -3646,7 +3646,6 @@ $ec_lang['lpn_ff_menu_tip']='Verifica i nodi uno alla volta: quanto può erogare
 $ec_lang['lpn_ff_title']='Analisi della portata antincendio';
 $ec_lang['lpn_ff_intro']='A ogni nodo, a turno, viene chiesto di prelevare una portata antincendio in aggiunta alla richiesta che ha già. Nulla nel tuo progetto viene cambiato; l\'intero calcolo è eseguito su una copia.';
 $ec_lang['lpn_ff_scope']='Nodi da verificare';
-$ec_lang['lpn_ff_scope_tip']='Scegli l\'insieme prima di calcolare. Verificare ogni nodo in un sistema grande può richiedere minuti.';
 $ec_lang['lpn_ff_all']='Tutti';
 $ec_lang['lpn_ff_selected']='Selezionati';
 $ec_lang['lpn_ff_no_junctions']='Questo progetto non ha ancora nodi, quindi non c\'è nulla da verificare.';
@@ -3654,7 +3653,6 @@ $ec_lang['lpn_ff_no_selection']='Nessun nodo è selezionato. Seleziona dei nodi 
 $ec_lang['lpn_ff_skipped']='{n} elementi selezionati non sono nodi, quindi non sono stati verificati.';
 $ec_lang['lpn_ff_required']='Portata antincendio richiesta';
 $ec_lang['lpn_ff_required_tip']='La portata che il tuo codice antincendio o la tua autorità antincendio richiede a un idrante. Ogni nodo è verificato rispetto a questo numero, a meno che non ne porti uno proprio.';
-$ec_lang['lpn_ff_required_own']='I nodi che portano una propria portata antincendio richiesta sono verificati rispetto a quella. Numero di essi: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='La portata antincendio richiesta in questo nodo per l\'uso del suolo che serve, secondo il tuo codice antincendio o la tua autorità antincendio. Lascialo vuoto e il nodo viene verificato rispetto al numero nel riquadro Analisi della portata antincendio.';
 $ec_lang['lpn_ff_residual']='Pressione residua da mantenere';
 $ec_lang['lpn_ff_residual_tip']='La pressione che il nodo deve ancora mantenere mentre eroga la portata antincendio. AWWA M31 e NFPA 291 usano 20 psi (140 kPa).';
@@ -3676,7 +3674,6 @@ $ec_lang['lpn_ff_engine_native']='Viene usato il risolutore integrato.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='Viene usato il motore EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='La portata antincendio disponibile è una ricerca, quindi l\'intera rete viene risolta circa sedici volte per ogni nodo verificato. Un sistema grande richiede minuti. Puoi fermarlo in qualsiasi momento e conservare ciò che è già stato calcolato.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3684,7 +3681,6 @@ $ec_lang['lpn_ff_engine_cost']='La portata antincendio disponibile è una ricerc
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Viene verificato solo l\'istante ora a schermo. La portata antincendio viene normalmente verificata sopra la richiesta del giorno di massimo consumo, quindi porta la rete a quella condizione prima di calcolare.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

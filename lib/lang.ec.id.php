@@ -3650,7 +3650,6 @@ $ec_lang['lpn_ff_menu_tip']='Uji simpul satu per satu: berapa banyak yang dapat 
 $ec_lang['lpn_ff_title']='Analisis debit kebakaran';
 $ec_lang['lpn_ff_intro']='Setiap simpul secara bergiliran diminta untuk mengambil debit kebakaran di atas kebutuhan yang sudah dimilikinya. Tidak ada yang berubah pada proyek Anda; seluruh proses dijalankan pada salinan.';
 $ec_lang['lpn_ff_scope']='Simpul yang akan diuji';
-$ec_lang['lpn_ff_scope_tip']='Pilih kelompok simpul sebelum menjalankan. Menguji setiap simpul pada sistem besar dapat memakan waktu beberapa menit.';
 $ec_lang['lpn_ff_all']='Semua';
 $ec_lang['lpn_ff_selected']='Terpilih';
 $ec_lang['lpn_ff_no_junctions']='Proyek ini belum memiliki simpul, sehingga tidak ada yang dapat diuji.';
@@ -3658,7 +3657,6 @@ $ec_lang['lpn_ff_no_selection']='Tidak ada simpul yang dipilih. Pilih simpul ata
 $ec_lang['lpn_ff_skipped']='{n} elemen yang dipilih bukan simpul, sehingga tidak diuji.';
 $ec_lang['lpn_ff_required']='Debit kebakaran yang diperlukan';
 $ec_lang['lpn_ff_required_tip']='Debit yang disyaratkan oleh kode kebakaran atau otoritas pemadam kebakaran Anda pada hidran. Setiap simpul diuji terhadap angka ini kecuali simpul tersebut memiliki debit kebakaran yang disyaratkan sendiri.';
-$ec_lang['lpn_ff_required_own']='Simpul yang memiliki debit kebakaran yang disyaratkan sendiri diuji terhadap angka itu sebagai gantinya. Jumlahnya: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Debit kebakaran yang disyaratkan pada simpul ini secara khusus, dari kode kebakaran atau otoritas pemadam kebakaran Anda, untuk peruntukan lahan yang dilayaninya. Biarkan kosong dan simpul ini diuji terhadap angka pada kotak Analisis debit kebakaran.';
 $ec_lang['lpn_ff_residual']='Tekanan sisa yang dipertahankan';
 $ec_lang['lpn_ff_residual_tip']='Tekanan yang harus tetap dipertahankan simpul saat menyalurkan debit kebakaran. AWWA M31 dan NFPA 291 menggunakan 20 psi (140 kPa).';
@@ -3681,7 +3679,6 @@ $ec_lang['lpn_ff_engine_native']='Penyelesai bawaan digunakan.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='Penyelesai EPANET digunakan.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='Debit kebakaran yang tersedia adalah hasil pencarian, sehingga seluruh jaringan diselesaikan sekitar enam belas kali untuk setiap simpul yang diuji. Sistem besar dapat memakan waktu beberapa menit. Anda dapat menghentikannya kapan saja dan tetap menyimpan apa yang telah dikerjakan.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3689,7 +3686,6 @@ $ec_lang['lpn_ff_engine_cost']='Debit kebakaran yang tersedia adalah hasil penca
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Hanya langkah waktu yang sedang ditampilkan di layar yang diuji. Debit kebakaran biasanya diuji di atas kebutuhan hari maksimum, jadi atur jaringan ke kondisi tersebut sebelum menjalankan.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

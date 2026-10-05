@@ -3745,7 +3745,6 @@ $ec_lang['lpn_ff_menu_tip']='Перевіряє вузли по одному: с
 $ec_lang['lpn_ff_title']='Аналіз витрати на пожежогасіння';
 $ec_lang['lpn_ff_intro']='У кожного вузла по черзі запитують відбір витрати на пожежогасіння понад те споживання, яке він уже має. У вашому проєкті нічого не змінюється; весь розрахунок виконується на копії.';
 $ec_lang['lpn_ff_scope']='Вузли для перевірки';
-$ec_lang['lpn_ff_scope_tip']='Оберіть набір перед запуском. Перевірка кожного вузла у великій системі може тривати хвилини.';
 $ec_lang['lpn_ff_all']='Усі';
 $ec_lang['lpn_ff_selected']='Вибрані';
 $ec_lang['lpn_ff_no_junctions']='У цьому проєкті ще немає вузлів, тож перевіряти нічого.';
@@ -3753,7 +3752,6 @@ $ec_lang['lpn_ff_no_selection']='Жодного вузла не вибрано. 
 $ec_lang['lpn_ff_skipped']='{n} вибраних елементів не є вузлами, тож їх не перевірено.';
 $ec_lang['lpn_ff_required']='Потрібна витрата на пожежогасіння';
 $ec_lang['lpn_ff_required_tip']='Витрата, яку ваш протипожежний норматив або пожежна служба вимагає на гідранті. Кожен вузол перевіряють за цим числом, якщо тільки він не має власної потрібної витрати на пожежогасіння.';
-$ec_lang['lpn_ff_required_own']='Вузли з власною потрібною витратою на пожежогасіння перевіряють за нею замість цього. Їх кількість: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Витрата на пожежогасіння, потрібна саме в цьому вузлі для типу забудови, яку він обслуговує, — за вашим протипожежним нормативом або пожежною службою. Залиште поле порожнім, і вузол перевірять за числом у полі «Аналіз витрати на пожежогасіння».';
 $ec_lang['lpn_ff_residual']='Залишковий тиск для утримання';
 $ec_lang['lpn_ff_residual_tip']='Тиск, який вузол має утримувати, подаючи витрату на пожежогасіння. AWWA M31 і NFPA 291 використовують 20 psi (140 кПа).';
@@ -3778,7 +3776,6 @@ $ec_lang['lpn_ff_engine_native']='Використано вбудований р
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='Використано розв\'язувач EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='Доступна витрата на пожежогасіння — це пошук, тож усю мережу розраховують приблизно шістнадцять разів для кожного перевіреного вузла. Велика система триває хвилини. Ви можете зупинити це в будь-який момент і зберегти те, що вже зроблено.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3786,7 +3783,6 @@ $ec_lang['lpn_ff_engine_cost']='Доступна витрата на пожеж�
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Перевіряється лише той часовий крок, який зараз на екрані. Витрату на пожежогасіння зазвичай перевіряють понад споживання в максимальну добу, тож перед запуском встановіть мережу в такий стан.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

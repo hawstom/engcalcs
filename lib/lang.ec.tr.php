@@ -3645,7 +3645,6 @@ $ec_lang['lpn_ff_menu_tip']='Düğümleri tek tek sınayın: her biri, belirledi
 $ec_lang['lpn_ff_title']='Yangın debisi analizi';
 $ec_lang['lpn_ff_intro']='Her düğümden sırayla, zaten sahip olduğu talebin üzerine bir yangın debisi çekmesi istenir. Projenizde hiçbir şey değişmez; tüm çalışma bir kopya üzerinde yapılır.';
 $ec_lang['lpn_ff_scope']='Sınanacak düğümler';
-$ec_lang['lpn_ff_scope_tip']='Çalıştırmadan önce kümeyi seçin. Büyük bir sistemde her düğümü sınamak dakikalar sürebilir.';
 $ec_lang['lpn_ff_all']='Tümü';
 $ec_lang['lpn_ff_selected']='Seçili';
 $ec_lang['lpn_ff_no_junctions']='Bu projede henüz düğüm yok, bu yüzden sınanacak bir şey yok.';
@@ -3653,7 +3652,6 @@ $ec_lang['lpn_ff_no_selection']='Hiçbir düğüm seçili değil. Düğümleri s
 $ec_lang['lpn_ff_skipped']='{n} seçili öğe düğüm değil, bu yüzden test edilmedi.';
 $ec_lang['lpn_ff_required']='Gereken yangın debisi';
 $ec_lang['lpn_ff_required_tip']='Yangın yönetmeliğinizin veya itfaiye teşkilatınızın bir yangın musluğunda istediği debi. Her düğüm, kendi gereken yangın debisini taşımadığı sürece bu sayıya karşı sınanır.';
-$ec_lang['lpn_ff_required_own']='Kendi gereken yangın debisini taşıyan düğümler, onun yerine ona karşı sınanır. Sayıları: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Bu düğümün hizmet ettiği arazi kullanımı için yangın yönetmeliğinizin veya itfaiye teşkilatınızın istediği yangın debisi. Boş bırakırsanız düğüm, Yangın debisi analizi kutusundaki sayıya karşı sınanır.';
 $ec_lang['lpn_ff_residual']='Korunacak kalıntı basınç';
 $ec_lang['lpn_ff_residual_tip']='Düğümün, yangın debisini sağlarken hâlâ koruması gereken basınç. AWWA M31 ve NFPA 291, 20 psi (140 kPa) kullanır.';
@@ -3675,7 +3673,6 @@ $ec_lang['lpn_ff_engine_native']='Bu, yerleşik çözücüyle hesaplanır.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='Bu, EPANET motoruyla hesaplanır.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='Mevcut yangın debisi bir arama olduğundan, sınanan her düğüm için tüm şebeke yaklaşık on altı kez çözülür. Büyük bir sistem dakikalar sürer. İstediğiniz zaman durdurabilir ve şimdiye kadar hesaplananları saklayabilirsiniz.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3683,7 +3680,6 @@ $ec_lang['lpn_ff_engine_cost']='Mevcut yangın debisi bir arama olduğundan, sı
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Yalnızca şu anda ekranda olan zaman adımı sınanır. Yangın debisi normalde azami gün talebinin üzerinde sınanır, bu yüzden çalıştırmadan önce şebekeyi o duruma ayarlayın.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

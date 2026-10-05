@@ -3743,7 +3743,6 @@ $ec_lang['lpn_ff_menu_tip']='ဆက်စပ်နေရာများကို
 $ec_lang['lpn_ff_title']='မီးငြိမ်းသတ်ရေးစီးနှုန်း ခွဲခြမ်းစိတ်ဖြာမှု';
 $ec_lang['lpn_ff_intro']='ဆက်စပ်နေရာတစ်ခုစီအား ၎င်းတွင် ရှိပြီးသား လိုအင်အပေါ် ထပ်ပေါင်း၍ မီးငြိမ်းသတ်ရေးစီးနှုန်းတစ်ခု ဆွဲယူရန် အလှည့်ကျ တောင်းဆိုသည်။ သင့်ပရောဂျက်ထဲရှိ မည်သည့်အရာမျှ မပြောင်းလဲပါ။ run တစ်ခုလုံးကို မိတ္တူတစ်စောင်ပေါ်တွင် ပြုလုပ်သည်။';
 $ec_lang['lpn_ff_scope']='စစ်ဆေးမည့် ဆက်စပ်နေရာများ';
-$ec_lang['lpn_ff_scope_tip']='run မလုပ်မီ အစုအဝေးကို ရွေးပါ။ ကြီးမားသော စနစ်တစ်ခုရှိ ဆက်စပ်နေရာအားလုံးကို စစ်ဆေးခြင်းသည် မိနစ်များ ကြာနိုင်သည်။';
 $ec_lang['lpn_ff_all']='အားလုံး';
 $ec_lang['lpn_ff_selected']='ရွေးထားသည်များ';
 $ec_lang['lpn_ff_no_junctions']='ဤပရောဂျက်တွင် ဆက်စပ်နေရာ မရှိသေးသောကြောင့်၊ စစ်ဆေးစရာ မရှိပါ။';
@@ -3751,7 +3750,6 @@ $ec_lang['lpn_ff_no_selection']='ဆက်စပ်နေရာ မည်သည�
 $ec_lang['lpn_ff_skipped']='ရွေးထားသော အစိတ်အပိုင်း {n} ခုသည် ဆက်စပ်နေရာများ မဟုတ်သောကြောင့်၊ ၎င်းတို့ကို မစမ်းသပ်ခဲ့ပါ။';
 $ec_lang['lpn_ff_required']='လိုအပ်သော မီးငြိမ်းသတ်ရေးစီးနှုန်း';
 $ec_lang['lpn_ff_required_tip']='သင်၏ မီးဘေးကာကွယ်ရေး ဥပဒေ (သို့) မီးသတ်ဌာနက ဟိုက်ဒရင့်တစ်ခုတွင် တောင်းဆိုသော ရေစီးနှုန်း။ ဆက်စပ်နေရာတစ်ခုသည် ၎င်း၏ကိုယ်ပိုင် လိုအပ်သော မီးငြိမ်းသတ်ရေးစီးနှုန်း မရှိလျှင်၊ ဤဂဏန်းနှင့် စစ်ဆေးမည်။';
-$ec_lang['lpn_ff_required_own']='ကိုယ်ပိုင် လိုအပ်သော မီးငြိမ်းသတ်ရေးစီးနှုန်း ကိုင်ဆောင်ထားသော ဆက်စပ်နေရာများကို ၎င်းတန်ဖိုးနှင့် အစား စစ်ဆေးမည်။ ၎င်းတို့၏ အရေအတွက် - {n}။';
 $ec_lang['lpn_ff_required_node_tip']='ဤဆက်စပ်နေရာက ဝန်ဆောင်မှုပေးနေသော မြေအသုံးချမှုအတွက်၊ သင်၏ မီးဘေးကာကွယ်ရေး ဥပဒေ (သို့) မီးသတ်ဌာနအရ လိုအပ်သော မီးငြိမ်းသတ်ရေးစီးနှုန်း။ ဗလာထားလိုက်ပါက ဆက်စပ်နေရာကို မီးငြိမ်းသတ်ရေးစီးနှုန်း ခွဲခြမ်းစိတ်ဖြာမှု ဘောက်စ်ရှိ ဂဏန်းနှင့် စစ်ဆေးမည်။';
 $ec_lang['lpn_ff_residual']='ဆက်ထိန်းထားရမည့် ကျန်ရှိဖိအား';
 $ec_lang['lpn_ff_residual_tip']='မီးငြိမ်းသတ်ရေးစီးနှုန်း ပေးဆောင်နေစဉ် ဆက်စပ်နေရာက ဆက်ထိန်းထားရမည့် ဖိအား။ AWWA M31 နှင့် NFPA 291 တို့သည် 20 psi (140 kPa) ကို သုံးသည်။';
@@ -3776,7 +3774,6 @@ $ec_lang['lpn_ff_engine_native']='တွင်ပါ ဖြေရှင်းစ
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='EPANET အင်ဂျင်ကို အသုံးပြုထားသည်။';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='ရရှိနိုင်သော မီးငြိမ်းသတ်ရေးစီးနှုန်းသည် ရှာဖွေမှုတစ်ခုဖြစ်သောကြောင့်၊ စစ်ဆေးသော ဆက်စပ်နေရာတစ်ခုစီအတွက် ကွန်ရက်တစ်ခုလုံးကို ခန့်မှန်း ၁၆ ကြိမ် ဖြေရှင်းသည်။ ကြီးမားသော စနစ်တစ်ခုသည် မိနစ်များ ကြာနိုင်သည်။ မည်သည့်အချိန်တွင်မဆို ရပ်တန့်နိုင်ပြီး၊ ရှိပြီးသား တွက်ချက်ထားသည့်အရာကို ဆက်ထားနိုင်သည်။';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3784,7 +3781,6 @@ $ec_lang['lpn_ff_engine_cost']='ရရှိနိုင်သော မီး�
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='စခရင်ပေါ်တွင် ယခုပြသနေသော အချိန်အဆင့်ကိုသာ စစ်ဆေးသည်။ မီးငြိမ်းသတ်ရေးစီးနှုန်းကို ပုံမှန်အားဖြင့် အများဆုံးနေ့စဉ် လိုအင်အပေါ် ထပ်ပေါင်း၍ စစ်ဆေးသောကြောင့်၊ run မလုပ်မီ ကွန်ရက်ကို ထိုအခြေအနေသို့ သတ်မှတ်ပါ။';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

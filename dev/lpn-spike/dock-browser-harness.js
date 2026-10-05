@@ -64,8 +64,8 @@ async function shot(page, name) {
 const BOXES = ['lpn_popup', 'lpn_find_popup', 'lpn_settings_box', 'lpn_library_box', 'lpn_ff_box', 'lpn_crit_box',
 	'lpn_ds_box', 'lpn_energy_box', 'lpn_contour_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_alt_box',
 	'lpn_full_box', 'lpn_calib_box', 'lpn_notes_popup', 'lpn_hotkeys_popup'];
-const HELP = { lpn_ff_box: ['lpn_ff_intro', 'lpn_ff_scope_tip'], lpn_crit_box: ['lpn_crit_intro', 'lpn_crit_scope_tip'],
-	lpn_ds_box: ['lpn_ds_intro', 'lpn_ds_scope_tip'] };
+const HELP = { lpn_ff_box: ['lpn_ff_intro'], lpn_crit_box: ['lpn_crit_intro', 'lpn_crit_scope_tip'],
+	lpn_ds_box: ['lpn_ds_intro'] };
 
 async function openNet3(Session, browser, viewport, before) {
 	const a = await Session.open(browser, NAME, { viewport: viewport || { width: 1400, height: 900 } });
@@ -389,7 +389,10 @@ async function sectionHelp(Session, browser) {
 			ok(id + ': exactly one ?, the last thing before the X, focusable', f.glyphs === 1 && f.last && f.focusable, JSON.stringify(f));
 			const want = [];
 			for (const k of HELP[id]) { want.push(await a.lang(k)); }
-			ok(id + ': ...its tip is the tool\'s intro and then its scope tip', f.tip === want.join(' '), String(f.tip).slice(0, 60));
+			// Fire flow and Demand scaling fold the box's former paragraphs in after the intro.
+			const whole = want.join(' ');
+			ok(id + ': ...its tip opens with the tool\'s intro', id === 'lpn_crit_box' ? f.tip === whole :
+				String(f.tip).indexOf(whole.split('{')[0]) === 0, String(f.tip).slice(0, 60));
 		}
 		ok('no other box carries a ? in its corner', facts.filter((f) => !HELP[f.id]).every((f) => f.glyphs === 0));
 		await a.menuClickSub(await a.lang('lpn_analyze_menu'), await a.lang('lpn_ff_menu'), 'project');
