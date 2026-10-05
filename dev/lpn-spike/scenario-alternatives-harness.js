@@ -36,6 +36,9 @@ const L = loadLoopedNetwork(
 	"\t\tcategoryOf: categoryOf, alternativesOf: alternativesOf, alternativeFor: alternativeFor,\n" +
 	"\t\tallAlternatives: allAlternatives, resolveThroughAlternatives: resolveThroughAlternatives,\n" +
 	"\t\talternativeOverrides: alternativeOverrides,\n" +
+	"\t\tSETTING_CATEGORY_OF: LPN_SETTING_CATEGORY_OF, settingFor: settingFor, effectiveSetting: effectiveSetting,\n" +
+	"\t\tsetScenarioSetting: setScenarioSetting, overrideCount: overrideCount,\n" +
+	"\t\tgetSettings: function () { return settings; }, getProject: function () { return project; },\n" +
 	"\t\tscenarioMenuRows: scenarioMenuRows, openAlternativesBox: openAlternativesBox,\n" +
 	"\t\taltBoxIsOpen: altBoxIsOpen, wireAlternativesBox: wireAlternativesBox,\n" +
 	"\t\tbasicMode: function () { return scenarioBasicMode; },\n" +
@@ -305,6 +308,152 @@ console.log('\n--- Basic mode ---');
 	basicRow().fn();
 	ok('ticking it again removes the stored key and closes the box',
 		L.basicMode() && global.localStorage.getItem('lpn_scnbasic') === null && !L.altBoxIsOpen());
+}
+
+// ---------------------------------------------------------------------------
+// 7. Settings in scenarios: Presentation and Calculation (Tom, 2026-10-05)
+// ---------------------------------------------------------------------------
+// "any Setting that is stored in the project should be subject to scenario overrides under some
+// alternatives category". What can go wrong silently: a key the project stores that no table names
+// (it would vary by nothing, or by accident); a file changing because the store exists; a
+// scenario's setting leaking into Base, or Base's object being written through the seam.
+console.log('\n--- settings: every stored setting is named, once ---');
+const fileOf = (name) => L.acceptImportedText(fs.readFileSync(ROOT + 'examples/' + name, 'utf8'));
+const exampleFiles = fs.readdirSync(ROOT + 'examples/').filter(function (f) { return /\.lwn$/.test(f); });
+{
+	const CONTAINERS = ['settings', 'labelSettings', 'project', 'times'];
+	const unnamed = new Set(), badCat = [];
+	function walk(v, path) {
+		if (v && typeof v === 'object' && !Array.isArray(v) && Object.keys(v).length) {
+			Object.keys(v).forEach(function (k) { walk(v[k], path.concat(k)); });
+			return;
+		}
+		if (L.categoryOf(path, 'setting') === undefined) { unnamed.add(path.join('.')); }
+	}
+	function audit() {
+		const snap = L.serializeProject();
+		Object.keys(snap).forEach(function (k) {
+			if (CONTAINERS.indexOf(k) >= 0) { walk(snap[k], [k]); }
+			else if (L.categoryOf([k], 'setting') === undefined) { unnamed.add(k); }
+		});
+	}
+	audit();
+	exampleFiles.forEach(function (f) { L.applySaved(fileOf(f)); L.buildDom(); audit(); });
+	Object.keys(L.SETTING_CATEGORY_OF).forEach(function (k) {
+		const c = L.SETTING_CATEGORY_OF[k];
+		if (c !== null && L.CATS.indexOf(c) < 0) { badCat.push(k + '=' + c); }
+	});
+	ok('every key a saved project carries has a category or an explicit exclusion (' + exampleFiles.length + ' examples and a fresh project)',
+		!unnamed.size, [...unnamed].join(', '));
+	ok('...and every category named is a declared category', !badCat.length, badCat.join(', '));
+	ok('Presentation and Calculation each hold settings',
+		['presentation', 'calculation'].every(function (c) { return Object.keys(L.SETTING_CATEGORY_OF).some(function (k) { return L.SETTING_CATEGORY_OF[k] === c; }); }));
+	ok('units and friction method may never vary by scenario',
+		L.categoryOf('units', 'setting') === null && L.categoryOf('units.lpn_u_flow', 'setting') === null &&
+		L.categoryOf('settings.method', 'setting') === null);
+	ok('the longest named path wins: label values are Presentation, a reaction rate Constituent, tank staging excluded',
+		L.categoryOf(['labelSettings', 'node', 'pressure'], 'setting') === 'presentation' &&
+		L.categoryOf('settings.reactions.globalBulk', 'setting') === 'constituent' &&
+		L.categoryOf('settings.reactions.tank', 'setting') === null &&
+		L.categoryOf('settings.hydraulics.accuracy', 'setting') === 'calculation');
+	ok('an element property\'s category is unchanged by the new group', L.categoryOf('demand', 'node') === 'demand');
+}
+
+console.log('\n--- settings: no file changes while no scenario holds one ---');
+{
+	exampleFiles.forEach(function (f) {
+		L.applySaved(fileOf(f));
+		L.buildDom();
+		const once = L.projectFileText();
+		// Read every setting through the seam in every scenario: reading must write nothing.
+		L.getScenarios().forEach(function (sc) {
+			['settings', 'labelSettings', 'project', 'times', 'defaultPattern'].forEach(function (root) { L.settingFor(sc, [root]); });
+			L.settingFor(sc, 'settings.hydraulics.demandMultiplier');
+			L.alternativesOf(sc);
+		});
+		const snap = L.serializeProject();
+		const s2 = L.acceptImportedText(once);
+		L.applySaved(s2);
+		L.buildDom();
+		ok(f + ': no scenario carries a settings block, reading through the seam writes nothing, and it round-trips unchanged',
+			snap.scenarios.every(function (sc) { return !has(sc, 'settings'); }) && L.projectFileText() === once);
+	});
+}
+
+console.log('\n--- settings: an override resolves in its scenario and not in Base ---');
+{
+	L.applySaved(fileOf('Net1.lwn'));
+	L.buildDom();
+	L.switchScenario('base');
+	const S = L.getSettings(), baseText = S.textSize, baseBreaks = JSON.stringify(S.colorBreaks);
+	const before = L.projectFileText();
+	ok('the write seam refuses Base', L.setScenarioSetting(L.baseScenario(), 'settings.textSize', 20) === false);
+	const pk = L.createScenario('Peak Hour');
+	ok('...and refuses units, friction method and new-asset defaults',
+		L.setScenarioSetting(pk, 'units', {}) === false && L.setScenarioSetting(pk, 'settings.method', 'dw') === false &&
+		L.setScenarioSetting(pk, 'settings.defaults.diameter', 8) === false);
+	ok('...and the demand multiplier and run time, which keep their own homes',
+		L.setScenarioSetting(pk, 'settings.hydraulics.demandMultiplier', 3) === false &&
+		L.setScenarioSetting(pk, 'times.duration', 3600) === false);
+	ok('a fresh scenario has no settings block', !has(pk, 'settings'));
+
+	L.setScenarioSetting(pk, 'settings.textSize', baseText + 9);
+	L.setScenarioSetting(pk, ['settings', 'colorBreaks', 'node.pressure'], [10, 20, 30]);
+	L.setScenarioSetting(pk, 'settings.hydraulics.accuracy', 0.0001);
+	L.setScenarioSetting(pk, 'settings.quality', { mode: 'age', traceNode: '' });
+	ok('in Peak Hour the seam answers Peak Hour\'s own text size', L.effectiveSetting('settings.textSize') === baseText + 9);
+	ok('...a member of a map it holds part of, merged over the project\'s',
+		JSON.stringify(L.effectiveSetting(['settings', 'colorBreaks'])['node.pressure']) === '[10,20,30]');
+	ok('...a calculation option', L.effectiveSetting('settings.hydraulics.accuracy') === 0.0001);
+	ok('...a member of an atomic object, from the scenario\'s whole', L.effectiveSetting('settings.quality.mode') === 'age');
+	pk.demandMultiplier = 2.5;
+	ok('...and the demand multiplier from where it has always been stored',
+		L.effectiveSetting('settings.hydraulics.demandMultiplier') === 2.5 && L.effectiveSetting('settings.hydraulics').demandMultiplier === 2.5);
+	ok('an untouched setting in Peak Hour is the project\'s own object, not a copy',
+		L.effectiveSetting(['labelSettings']) !== undefined && L.settingFor(pk, ['labelSettings']) === L.settingFor(L.baseScenario(), ['labelSettings']));
+	L.switchScenario('base');
+	ok('in Base the seam answers the project\'s own values', L.effectiveSetting('settings.textSize') === baseText &&
+		L.effectiveSetting('settings.hydraulics.accuracy') === S.hydraulics.accuracy &&
+		L.effectiveSetting('settings.hydraulics') === S.hydraulics);
+	ok('...and the project\'s own objects were never written through the seam',
+		S.textSize === baseText && JSON.stringify(S.colorBreaks) === baseBreaks && S.hydraulics.accuracy !== 0.0001);
+
+	const pres = L.alternativeFor(pk, 'presentation'), calc = L.alternativeFor(pk, 'calculation');
+	ok('Peak Hour now uses its own Presentation alternative, a child of Base Presentation, of two values',
+		!pres.isBase && pres.parent === L.alternativeFor(L.baseScenario(), 'presentation').id && pres.count === 2 && pres.settings.length === 2);
+	ok('...and its own Calculation alternative, of two values (the multiplier keeps its own column)',
+		!calc.isBase && calc.count === 2, JSON.stringify(calc.settings));
+	ok('...and every element category is still Base\'s',
+		L.CATS.filter(function (c) { return c !== 'presentation' && c !== 'calculation'; }).every(function (c) { return L.alternativeFor(pk, c).isBase; }));
+	ok('the scenario\'s count includes its four setting values', L.overrideCount(pk) === 5, String(L.overrideCount(pk)));
+
+	const text = L.projectFileText();
+	L.applySaved(L.acceptImportedText(text));
+	L.buildDom();
+	const pk2 = L.getScenarios().filter(function (s) { return s.name === 'Peak Hour'; })[0];
+	ok('a scenario\'s settings block survives a save and reopen byte-identical',
+		L.projectFileText() === text && pk2.settings && pk2.settings.settings.textSize === baseText + 9);
+
+	['settings.textSize', ['settings', 'colorBreaks', 'node.pressure'], 'settings.hydraulics.accuracy', 'settings.quality'].forEach(function (p) {
+		L.setScenarioSetting(pk2, p, undefined);
+	});
+	ok('clearing every value removes the block, and Peak Hour uses the Base alternatives again',
+		!has(pk2, 'settings') && L.alternativeFor(pk2, 'presentation').isBase && L.alternativeFor(pk2, 'calculation').isBase);
+	L.deleteScenario(pk2.id);
+	L.switchScenario('base');
+	ok('...and with the scenario gone the file is what it was', L.projectFileText() === before);
+
+	// A file is read, never trusted.
+	const hand = JSON.parse(before);
+	hand.scenarios[0].settings = { settings: { textSize: 30 } };
+	hand.scenarios.push({ id: 'hand', name: 'Hand', overrides: {},
+		settings: { units: { lpn_u_flow: 'gpm' }, settings: { method: 'dw', textSize: 9, laterKey: 1 } } });
+	L.applySaved(L.acceptImportedText(JSON.stringify(hand)));
+	const hs = L.getScenarios().filter(function (s) { return s.id === 'hand'; })[0];
+	ok('on open, Base\'s block goes, and so do units and friction method, which may never vary',
+		!has(L.baseScenario(), 'settings') && !has(hs.settings, 'units') && !has(hs.settings.settings, 'method'));
+	ok('...a Presentation value stays, and a key from a later version is kept verbatim but counted in no alternative',
+		hs.settings.settings.textSize === 9 && hs.settings.settings.laterKey === 1 && L.alternativeFor(hs, 'presentation').count === 1);
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'ALL PASS'));
