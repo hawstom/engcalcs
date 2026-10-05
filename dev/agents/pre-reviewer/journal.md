@@ -3861,3 +3861,11 @@ OBSERVED real Chrome (Net1, Net3): Show scenarios works on Junctions/Pipes/Pumps
 OBSERVED defects (minor): new scenario while shown appends its rows at the bottom, not beside each asset; rename leaves old name in Scenario column until switch; fill down makes overrides equal to parent.
 OBSERVED: stable sort changes ordinary tables vs master (tie rows keep previous order instead of ID) - intended.
 Lesson: pane toggle button toggles; sort lives on the arrow button; dialogs routed to native by seam (answerPromptWith).
+
+## 2026-10-05 feat/feedback (36dc08eb)
+- OBSERVED: ecContactCompose resists CRLF in code/lang/cat/email; empty email sends, replyto ''. Harness passes.
+- OBSERVED: privacy.php line 74 still lists only "name, email address and message" -- page, language, category, error code undisclosed.
+- OBSERVED: contactYourEmail deleted from all 26 lang files; non-English pages now show English "Email (only if you want a reply)".
+- OBSERVED: uppercase email (A@B.com) rejected by old lowercase-only regex; empty-message refusal is a bare die() text.
+- OBSERVED: with empty email, mail headers end in a trailing CRLF (unverified effect).
+- SPECULATION: render in php -S needs a parent dir with an /engcalcs symlink (base path).
