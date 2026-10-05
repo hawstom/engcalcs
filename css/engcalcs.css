@@ -1552,6 +1552,11 @@ html[lang="zh"] .ec-welcome {
 .lpn-transport-btn > .ec-icon { margin-inline-end: 0; }
 /* Direction glyphs point along time, and time runs right to left in a right-to-left page, where the
    flex row has already put Restart at the right edge. Play and Pause are not direction-of-time marks. */
+/* Five buttons and two selectors are 333 px at the default gap; a 320 px window needs 15 back. */
+@media (max-width: 360px) {
+	#lpn_toolbar_run { gap: 2px; }
+	#lpn_toolbar_run .lpn-transport-btn { padding: 2px 3px; }
+}
 html[dir="rtl"] .lpn-transport-btn[data-icon="restart"] svg, html[dir="rtl"] .lpn-transport-btn[data-icon="step-back"] svg,
 html[dir="rtl"] .lpn-transport-btn[data-icon="step-fwd"] svg, html[dir="rtl"] .lpn-transport-btn[data-icon="end"] svg { transform: scaleX(-1); }
 /* The right-hand end of the strip: Find and the bottom-pane toggle (Task 434). Pushed there by an

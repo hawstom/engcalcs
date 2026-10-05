@@ -1832,7 +1832,7 @@
 		// visible, and this strip has no room for one.
 		//
 		// **THE MENU ROW IS NOT HIDDEN WITH IT**, and that is the whole reason the row exists: a
-		// user who wonders where Run went finds it in Project > Run, whose tip says which setting
+		// user who wonders where Calculate went finds it in Project > Calculate, whose tip says which setting
 		// took the button away. A row that vanished too would leave the question unanswerable.
 		// display, not removal, so renderPanel() can put it back without rebuilding the strip.
 		syncRunButton();
@@ -1904,7 +1904,7 @@
 		// Net3-World: "It is not running or something is wrong with the play controls"), which spent
 		// the strip's width on controls that cannot work. Run is NOT a player control and keeps its
 		// own rule (syncRunButton). The cure the disabled tips carried -- set a Total run time -- now
-		// rides the tip of the Project > Run menu row (js/looped-network.js), the one place left
+		// rides the tip of the Project > Calculate menu row (js/looped-network.js), the one place left
 		// that is always there.
 		var inert = stops.length < 2;
 		[ui.first, ui.prev, ui.play, ui.next, ui.last, ui.step, ui.speed].forEach(function (c) {
@@ -1914,7 +1914,7 @@
 		});
 		// The group wears a divider; with nothing visible in it the divider would mark nothing.
 		if (ui.run && ui.run.parentNode) {
-			ui.run.parentNode.style.display = (inert && getComputedStyle(ui.run).display === 'none') ? 'none' : '';
+			ui.run.parentNode.style.display = (inert && ui.run.style.display === 'none') ? 'none' : '';
 		}
 	}
 
