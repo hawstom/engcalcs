@@ -369,7 +369,7 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 	// Paste as new rows at end of table (Task 610) sits after Paste on a table that can create rows.
 	// Tom, 2026-09-28: Select on map / Unselect on map join it, each offered only when it would do
 	// something. Nothing is selected yet, so this cell's menu has Select on map and not Unselect.
-	report(labels.length === 7, 'exactly seven rows', labels.join(' | '));
+	report(labels.length === 8, 'exactly eight rows', labels.join(' | '));
 	report(labels[0] === (PC.points_data_copy || 'Copy'), 'Copy is the row-table grid’s own word', labels[0]);
 	report(labels[1] === (PC.points_data_paste || 'Paste'), 'Paste is the row-table grid’s own word', labels[1]);
 	report(labels[2] === PC.lpn_pane_paste_append, 'Paste as new rows at end of table follows Paste', labels[2]);
@@ -378,6 +378,7 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 		'Zoom & select keeps its ruled words (R-115)', labels[4]);
 	report(labels[5] === PC.lpn_pane_print, 'Print table follows Zoom & select (the button left the pane head)', labels[5]);
 	report(labels[6] === (PC.lpn_tool_delete || 'Delete'), 'Delete reuses the Delete tool’s word', labels[6]);
+	report(labels[7] === PC.lpn_pane_delete_element, 'Delete element follows Delete', labels[7]);
 
 	// Copy: writes the cell to the clipboard, the same as Ctrl+C.
 	clipboard = null;
