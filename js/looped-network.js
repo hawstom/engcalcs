@@ -5368,6 +5368,21 @@ var EngCalcs = EngCalcs || {};
 	}
 	function promoteImplicitAlternative(scnId, cat, name) { return promoteStored(scnId, cat, name); }
 	/**
+	 * **STAGE 5: A SCENARIO'S PARENT.** null (or Base) makes it Base's child again, which is stored as
+	 * no parent at all. Base takes none; a loop is refused. **ITS OWN VALUES ARE KEPT**; what it
+	 * inherits follows the new parent, as in Bentley.
+	 */
+	function setScenarioParent(scnId, parentId) {
+		var s = scenarioById(scnId), p = (parentId === null || parentId === undefined) ? null : scenarioById(parentId);
+		if (!s || s.isBase) { return treeRefuse('base'); }
+		if (parentId !== null && parentId !== undefined && !p) { return treeRefuse('missing'); }
+		if (!p || p.isBase) { delete s.parent; touchTree('setScenarioParent'); return true; }
+		if (p === s || scenarioParentLoops(s.id, p.id)) { return treeRefuse('parent'); }
+		s.parent = p.id;
+		touchTree('setScenarioParent');
+		return true;
+	}
+	/**
 	 * **EVERY OVERRIDE MAP IN THE DOCUMENT**, for the maintenance that must reach all of them: an
 	 * element renamed or deleted, a unit converted, a pattern, curve, type or fittings list renamed,
 	 * a valve type changed. Calls fn(map, owner) for every scenario's own `overrides` and every
@@ -5856,19 +5871,27 @@ var EngCalcs = EngCalcs || {};
 	// A document that states no multiplier seeds nothing, so Base blank stays scenario blank; and
 	// the seed comes from the DOCUMENT rather than from whichever scenario happened to be active,
 	// because a new scenario copies no overrides from its predecessor either.
-	function createScenario(name) {
+	//
+	// **A CHILD OF ANOTHER SCENARIO (stage 5) IS SEEDED WITH NOTHING**: it inherits its parent's
+	// multiplier, so a copy here would cut that inheritance at birth.
+	function createScenario(name, parentId) {
 		var s = { id: newScenarioId(), name: name, overrides: {} },
-			dm = (settings.hydraulics || {}).demandMultiplier;
-		if (typeof dm === 'number' && isFinite(dm)) { s.demandMultiplier = dm; }
+			dm = (settings.hydraulics || {}).demandMultiplier, p = parentId !== undefined ? scenarioById(parentId) : null;
+		if (p && !p.isBase) { s.parent = p.id; }
+		else if (typeof dm === 'number' && isFinite(dm)) { s.demandMultiplier = dm; }
 		scenarios.push(s);
 		touchTree('createScenario');
 		project.activeScenario = s.id;
 		applyScenarioChange();
 		return s;
 	}
+	// **REFUSED WHILE IT HAS CHILD SCENARIOS** (stage 5), naming them; the stored alternatives it
+	// names are the document's and survive it.
 	function deleteScenario(id) {
-		var s = scenarioById(id), from = activeScenario();
+		var s = scenarioById(id), from = activeScenario(), kids;
 		if (!s || s.isBase) { return; }
+		kids = scenarios.filter(function (x) { return x.parent === id; }).map(function (x) { return x.id; });
+		if (kids.length) { return treeRefuse('children', { children: kids }); }
 		scenarios = scenarios.filter(function (x) { return x.id !== id; });
 		touchTree('deleteScenario');
 		if (project.activeScenario === id) { project.activeScenario = baseScenario().id; }

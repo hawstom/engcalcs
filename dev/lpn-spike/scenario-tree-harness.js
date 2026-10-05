@@ -47,7 +47,8 @@ const L = loadLoopedNetwork(
 	"\t\treparentCalcSet: reparentCalcSet, deleteCalcSet: deleteCalcSet, assignCalcSet: assignCalcSet,\n" +
 	"\t\tsaveUndoSnapshot: saveUndoSnapshot, undo: undo, redo: redo,\n" +
 	"\t\tapplyNodeRename: applyNodeRename, deleteNode: deleteNode, convertUnitValues: convertUnitValues,\n" +
-	"\t\tlibRepointPattern: libRepointPattern,\n" +
+	"\t\tlibRepointPattern: libRepointPattern, setScenarioParent: setScenarioParent,\n" +
+	"\t\tsetScenarioView: setScenarioView, currentView: currentView, applyView: applyView,\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -414,7 +415,7 @@ const CATS_STORED = ELEMENT_CATS.concat(['presentation']);
 function randomMutation() {
 	const d = L.getDoc(), scns = L.getScenarios().filter((x) => !x.isBase), s = pick(scns), alts = d.alternatives || [], sets = d.calcSets || [];
 	const cat = pick(CATS_STORED), ofCat = alts.filter((a) => a.category === cat);
-	const r = Math.floor(R() * 15);
+	const r = Math.floor(R() * 18);
 	let what;
 	switch (r) {
 		case 0: case 1: {
@@ -445,6 +446,9 @@ function randomMutation() {
 			if (chance(0.5)) { t.demandMultiplier = num(); L.touchTree(); return 'multiplier'; }
 			return 'time ' + L.setScenarioTime(t, 'duration', chance(0.3) ? '' : String(Math.floor(1 + R() * 48)) + ':00');
 		}
+		case 15: return 'parent ' + J(L.setScenarioParent(s.id, chance(0.3) ? null : pick(L.getScenarios()).id));
+		case 16: { const c = L.createScenario('Child', pick(L.getScenarios()).id); return 'child ' + c.id + ' of ' + J(c.parent); }
+		case 17: return scns.length > 2 ? 'delete scenario ' + J(L.deleteScenario(pick(scns).id)) : 'none';
 		default: {
 			const pv = propsOf(cat);
 			if (!pv.length) { return 'none'; }
@@ -617,6 +621,57 @@ console.log('\n--- 8. maintenance ---');
 	ok('a unit change converts a stored alternative\'s value', ph.values[L.ovKey(pipe)].diameter === 24);
 	L.deleteNode(j.id);
 	ok('a deletion purges the element from a stored alternative', !a.values || !Object.keys(a.values).some((k) => k.indexOf('RENAMED') >= 0));
+}
+
+// ---------------------------------------------------------------------------
+// 9. Stage 5: a scenario of a scenario, and the view it inherits
+// ---------------------------------------------------------------------------
+// Tom, 2026-10-05: "Leaving doesn't do anything. Entering does everything." A scenario that holds
+// or inherits a view moves the map there; one that holds none shows Base's live view.
+console.log('\n--- 9. scenario parents and the held view ---');
+{
+	open('Net1.lwn');
+	const d = L.getDoc(), j = d.nodes.filter((n) => n.type === 'junction')[0], pipe = d.links.filter((l) => l.type === 'pipe')[0];
+	elements = [j, pipe];
+	const base = L.baseScenario();
+	L.switchScenario(base.id);
+	const peak = L.createScenario('Peak Hour');
+	L.setProp(j, 'demand', 500);
+	peak.demandMultiplier = 3; L.touchTree();
+	const fire = L.createScenario('Fire at Peak Hour', peak.id);
+	ok('a child scenario is born with no multiplier of its own, so it inherits its parent\'s',
+		fire.parent === peak.id && fire.demandMultiplier === undefined && L.heldCalcOption(fire, 'demandMultiplier') === 3);
+	L.switchScenario(fire.id);
+	ok('...and its parent\'s demand', L.effective(j, 'demand') === 500 && !L.hasOverride(j, 'demand'));
+	L.setProp(j, 'demand', 900);
+	ok('a local demand in the child is its own, and the parent keeps its', L.effective(j, 'demand') === 900 &&
+		(L.switchScenario(peak.id), L.effective(j, 'demand') === 500));
+	L.switchScenario(fire.id);
+	ok('a loop of parents is refused', !!L.setScenarioParent(peak.id, fire.id).refused);
+	ok('Base takes no parent', !!L.setScenarioParent(base.id, peak.id).refused);
+	ok('deleting a scenario with a child is refused, naming it', J((L.deleteScenario(peak.id) || {}).children) === J([fire.id]));
+	ok('...and a reparent to Base keeps its own values', L.setScenarioParent(fire.id, null) === true && fire.parent === undefined &&
+		(L.switchScenario(fire.id), L.effective(j, 'demand') === 900) && L.heldCalcOption(fire, 'demandMultiplier') === undefined);
+	L.setScenarioParent(fire.id, peak.id);
+	ok('every value still agrees with the uncached walk', checkAll('stage 5'));
+
+	// The view.
+	L.switchScenario(base.id);
+	const live = { cx: 10, cy: 20, s: 3 }, fig = { cx: 400, cy: -300, s: 0.5 };
+	L.applyView(live);
+	const near = (a, b) => !!a && !!b && Math.abs(a.cx - b.cx) < 1e-6 && Math.abs(a.cy - b.cy) < 1e-6 && Math.abs(a.s - b.s) < 1e-9;
+	ok('a scenario can hold a view', L.setScenarioView(peak, fig) === true && near(L.heldView(peak), fig));
+	ok('...which its child inherits', near(L.heldView(fire), fig));
+	L.switchScenario(fire.id);
+	ok('entering the child that inherits a held view goes there', near(L.currentView(), fig), J(L.currentView()));
+	L.switchScenario(peak.id);
+	ok('...entering its parent, which holds the same view, stays there', near(L.currentView(), fig));
+	L.switchScenario(base.id);
+	ok('...and entering Base shows Base\'s live view again', near(L.currentView(), live), J(L.currentView()));
+	const plain = L.createScenario('Plain');
+	L.switchScenario(fire.id);
+	L.switchScenario(plain.id);
+	ok('entering a scenario that holds no view shows Base\'s live view', near(L.currentView(), live), J(L.currentView()));
 }
 
 console.log('\n' + (fails ? fails + ' FAILED, ' : 'ALL PASS, ') + passes + ' passed');
