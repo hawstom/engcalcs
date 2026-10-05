@@ -24752,9 +24752,13 @@ var EngCalcs = EngCalcs || {};
 	// into a hidden column falls into the same "dropped and COUNTED" bucket paneCols() already
 	// gives a paste that runs off the table's right edge, with no second rule needed. Only the
 	// hide/unhide menu itself needs the unfiltered list, to offer a hidden column back.
-	function paneColsAll(spec) {
+	function paneColsBase(spec) {
 		return paneApplyColOrder(spec,
 			spec.cols.filter(function (c) { return !c.when || c.when(); }).concat(paneCustomCols(spec)));
+	}
+	function paneColsAll(spec) {
+		var cols = paneColsBase(spec);
+		return spec.scnRows ? paneScnColsAll(spec, cols) : cols;
 	}
 	function paneCols(spec) {
 		return paneColsAll(spec).filter(function (c) { return !paneColHidden(spec.id, c.key); });
@@ -24807,32 +24811,242 @@ var EngCalcs = EngCalcs || {};
 	// **A BLANK IS LAST IN BOTH DIRECTIONS.** Sorting descending to find the biggest demand must not
 	// hand back a screenful of junctions that have no demand at all -- an empty cell is the absence
 	// of a value, not the smallest one, so it is ranked outside the direction rather than inside it.
+	//
+	// **EVERY SORT IS STABLE, THE GOOGLE SHEETS WAY** (Tom, 2026-10-05: *"every column sort preserves
+	// strictly the previous order of its rows with ties (equal values)"*). Rows that tie -- two
+	// blanks included -- keep the order they arrived in, which paneTableRowsInOrder() makes the order
+	// the reader last saw, so sorting by Scenario and then by ID leaves each asset's rows in scenario
+	// order. Ties used to be broken by ID, and by an object's key order before that, which threw the
+	// previous sort away. The column is looked up once and each row's value read once, not per
+	// comparison.
 	function paneTableSorted(spec, rows) {
-		var col = spec.sort.col, dir = spec.sort.dir;
-		return rows.slice().sort(function (a, b) {
-			var va = paneCellValue(spec, a, col), vb = paneCellValue(spec, b, col),
-				pa = panePresent(va), pb = panePresent(vb);
+		var dir = spec.sort.dir, c = paneColByKey(spec, spec.sort.col);
+		return rows.map(function (r, i) {
+			return { r: r, i: i, v: c ? (c.sortKey ? c.sortKey(r) : c.get(r)) : undefined };
+		}).sort(function (a, b) {
+			var pa = panePresent(a.v), pb = panePresent(b.v), d;
 			if (pa !== pb) { return pa ? -1 : 1; }
-			if (!pa) { return String(a.id).localeCompare(String(b.id), undefined, { numeric: true }); }
-			if (typeof va === 'number' && typeof vb === 'number') { return (va - vb) * dir; }
-			return String(va).localeCompare(String(vb), undefined, { numeric: true }) * dir;
-		});
+			if (!pa) { return a.i - b.i; }
+			if (typeof a.v === 'number' && typeof b.v === 'number') { d = (a.v - b.v) * dir; }
+			else { d = String(a.v).localeCompare(String(b.v), undefined, { numeric: true }) * dir; }
+			return d || (a.i - b.i);
+		}).map(function (x) { return x.r; });
 	}
 	// **A SORT IS A GESTURE, NOT A LIVE RULE.** The order is fixed when a heading is clicked and
 	// then held: an edit that changes a demand must not make its row jump somewhere else in the
 	// table, and a solve lands 300 ms after every keystroke, so a live re-sort would move rows out
 	// from under the hand that is typing in them. New parts join in the current sort, deleted ones
 	// drop out, and everything else stays where the reader last saw it.
+	//
+	// **WHAT IS LEFT TO SORT ARRIVES IN THE ORDER LAST SHOWN** (`lastOrderIds`), then in document
+	// order, so the stable sort above has a previous order to keep. A heading click, a tab switch
+	// and a filter all clear `orderIds`; none of them clears this.
 	function paneTableRowsInOrder(spec) {
-		var pool = {}, out = [];
-		paneTableElements(spec).forEach(function (el) { pool[el.id] = el; });
+		var list = paneTableRowList(spec), pool = {}, out = [], rest = [];
+		list.forEach(function (el) { pool[el.id] = el; });
 		(spec.orderIds || []).forEach(function (id) {
 			if (pool[id]) { out.push(pool[id]); delete pool[id]; }
 		});
-		paneTableSorted(spec, Object.keys(pool).map(function (id) { return pool[id]; }))
-			.forEach(function (el) { out.push(el); });
+		(spec.lastOrderIds || []).forEach(function (id) {
+			if (pool[id]) { rest.push(pool[id]); delete pool[id]; }
+		});
+		list.forEach(function (el) { if (pool[el.id]) { rest.push(el); delete pool[el.id]; } });
+		paneTableSorted(spec, rest).forEach(function (el) { out.push(el); });
 		spec.orderIds = out.map(function (el) { return el.id; });
+		spec.lastOrderIds = spec.orderIds;
 		return out;
+	}
+	// ---- SHOW SCENARIOS: ONE ROW PER ASSET PER SCENARIO ----------------------------------------
+	//
+	// Tom, 2026-10-05: *"'Show scenarios' would add columns for Scenario, Parent, Alternative, Parent,
+	// and Scenario override and would show all the scenarios for every asset in the table."* A switch
+	// on the cell menu, per table (`spec.scnRows`), off when the page opens and **STORED NOWHERE**:
+	// it is a way of looking at this table now, like Selection only, and not worth a visitor's next
+	// visit.
+	//
+	// **A ROW IS THEN {id: <element id> + U+0001 + <scenario id>, _lpnScn: {el, scn, info}}**, not
+	// the element. Everything the table keys by `row.id` (cells, selection, order) keeps working on
+	// the longer key; the few places that need the ELEMENT ask paneRowEl()/paneRowElId(). An element
+	// id cannot hold U+0001, so the key splits back unambiguously.
+	//
+	// **EVERY COLUMN IS WRAPPED, NOT REWRITTEN** (paneScnWrapCol()). A wrapped column reads and
+	// writes its row's element WITH THAT ROW'S SCENARIO MADE ACTIVE for the length of the call, the
+	// synchronous swap scenarioCompareModels() already makes, restored in a `finally`. So a cell
+	// shows effective() in its own scenario, and a typed cell goes through the column's own setter
+	// and so through setProp(), which records the override in that row's scenario. The map is
+	// redrawn afterwards for the scenario actually showing (paneCommitCell() -> completeEdit()). An
+	// element passed instead of a row goes straight through, so the multi-properties box, which
+	// borrows these columns, is untouched.
+	//
+	// **WHAT A SCENARIO ROW WILL NOT EDIT:** the ID (a rename is Base's, and would re-key every row of
+	// the asset at once), and in a non-Base row any column that is not an overridable property --
+	// elevation, say -- because setProp() writes those to the element, which is Base, from inside any
+	// scenario. **RESULTS SHOW ONLY ON THE ACTIVE SCENARIO'S ROW**, since only that scenario was solved.
+	var PANE_SCN_SEP = String.fromCharCode(1);
+	function paneScnRowKey(elId, scnId) { return elId + PANE_SCN_SEP + scnId; }
+	function paneRowEl(row) { return (row && row._lpnScn) ? row._lpnScn.el : row; }
+	function paneRowElId(key) {
+		var k = String(key), i = k.indexOf(PANE_SCN_SEP);
+		return i < 0 ? k : k.slice(0, i);
+	}
+	function paneRowLabel(row) {
+		var x = row && row._lpnScn;
+		return x ? x.el.id + ' ' + scenarioDisplayName(x.scn) : (row ? row.id : '');
+	}
+	// A customer carries nothing a scenario can change (Task 247), so its table has no such view.
+	function paneScnAvailable(spec) { return spec.group !== 'customer'; }
+	function paneInScenario(scn, fn) {
+		var was = project.activeScenario;
+		if (!scn || scn.id === was) { return fn(); }
+		project.activeScenario = scn.id;
+		try { return fn(); } finally { project.activeScenario = was; }
+	}
+	// What every row of one render shares: the scenarios in display order (Base first), each one's
+	// alternatives (asked once per scenario, not once per cell), the categories this table's columns
+	// belong to, and each property's column heading for the Scenario override column.
+	function paneScnInfo(spec) {
+		var order = scenariosForDisplay(), idx = {}, cats = [], seen = {}, labels = {};
+		order.forEach(function (sc, i) { idx[sc.id] = i; });
+		paneColsBase(spec).forEach(function (c) {
+			var p = paneColProp(c), cat;
+			// Only a property a scenario can hold: an elevation names no category at all.
+			if (!p || !((LPN_OVERRIDABLE[spec.group] || {})[p] || customPropDefByKey(p))) { return; }
+			cat = categoryOf(p, spec.group);
+			if (!seen[cat]) { seen[cat] = true; cats.push(cat); }
+			if (!labels[p]) { labels[p] = paneHeadingLabelOnly(c); }
+			if (p === 'demand' && !labels.demands) { labels.demands = labels[p]; }
+		});
+		cats = LPN_ALT_CATEGORIES.filter(function (cat) { return seen[cat]; });
+		return { order: order, idx: idx, cats: cats, labels: labels, alts: {} };
+	}
+	// The table's rows: its elements, or each element once per scenario, element by element.
+	function paneTableRowList(spec) {
+		var els = paneTableElements(spec), info, list = [];
+		if (!spec.scnRows) { return els; }
+		info = paneScnInfo(spec);
+		els.forEach(function (el) {
+			info.order.forEach(function (sc) {
+				list.push({ id: paneScnRowKey(el.id, sc.id), _lpnScn: { el: el, scn: sc, info: info } });
+			});
+		});
+		return list;
+	}
+	// The non-Base alternatives a row's scenario uses, among this table's categories.
+	function paneScnAltCats(x) {
+		var a = x.info.alts[x.scn.id] || (x.info.alts[x.scn.id] = alternativesOf(x.scn));
+		return x.info.cats.filter(function (cat) { return a[cat] && !a[cat].isBase; });
+	}
+	function paneScnAltName(scnName, cat) {
+		var pc = EngCalcs.pageConfig || {};
+		return String(pc.lpn_pane_scn_alt_name || '{scenario} {category}')
+			.split('{scenario}').join(scnName).split('{category}').join(altCategoryLabel(cat));
+	}
+	function paneScnBaseWord() { return (EngCalcs.pageConfig || {}).lpn_scenario_base || 'Base'; }
+	// The five columns inserted after ID. Read-only: they describe the row, they hold nothing.
+	function paneScnCols() {
+		function x(r) { return r && r._lpnScn; }
+		return [
+			{ key: 'scn_name', label: 'lpn_scenario_label', str: true, em: 7,
+				get: function (r) { return x(r) ? scenarioDisplayName(x(r).scn) : undefined; },
+				// Base first, then the scenario menu's own order -- the "natural" order Tom named.
+				sortKey: function (r) { return x(r) ? x(r).info.idx[x(r).scn.id] : undefined; } },
+			{ key: 'scn_parent', label: 'lpn_pane_scn_parent', str: true, em: 5,
+				get: function (r) { return x(r) ? (x(r).scn.isBase ? '' : paneScnBaseWord()) : undefined; } },
+			{ key: 'scn_alt', label: 'lpn_pane_scn_alt', str: true, em: 9,
+				get: function (r) {
+					var cats;
+					if (!x(r)) { return undefined; }
+					cats = paneScnAltCats(x(r));
+					return cats.length
+						? cats.map(function (cat) { return paneScnAltName(scenarioDisplayName(x(r).scn), cat); }).join(', ')
+						: paneScnBaseWord();
+				} },
+			{ key: 'scn_altparent', label: 'lpn_pane_scn_parent', str: true, em: 9,
+				get: function (r) {
+					if (!x(r)) { return undefined; }
+					return paneScnAltCats(x(r)).map(function (cat) { return paneScnAltName(paneScnBaseWord(), cat); }).join(', ');
+				} },
+			{ key: 'scn_ov', label: 'lpn_pane_scn_override', str: true, em: 9,
+				get: function (r) {
+					var ov, names = [], seen = {};
+					if (!x(r)) { return undefined; }
+					if (x(r).scn.isBase) { return ''; }
+					ov = (x(r).scn.overrides || {})[ovKey(x(r).el)];
+					Object.keys(ov || {}).forEach(function (p) {
+						var n = x(r).info.labels[p] || p;
+						if (!seen[n]) { seen[n] = true; names.push(n); }
+					});
+					return names.join(', ');
+				} }
+		];
+	}
+	var PANE_SCN_EL_FNS = ['plainFor', 'choices', 'disabledFor', 'hint', 'hintTip', 'refTo'];
+	function paneScnWrapCol(c) {
+		var w = Object.create(c);
+		function run(r, fn) {
+			var x = r && r._lpnScn;
+			if (!x) { return fn(r); }
+			return paneInScenario(x.scn, function () { return fn(x.el); });
+		}
+		w.get = function (r) {
+			var x = r && r._lpnScn;
+			if (x && c.result && x.scn.id !== activeScenario().id) { return undefined; }
+			return run(r, function (el) { return c.get(el); });
+		};
+		if (c.set) { w.set = function (r, v) { return run(r, function (el) { return c.set(el, v); }); }; }
+		PANE_SCN_EL_FNS.forEach(function (m) {
+			if (typeof c[m] === 'function') { w[m] = function (r) { return run(r, function (el) { return c[m](el); }); }; }
+		});
+		w.roFor = function (r) {
+			var x = r && r._lpnScn, p;
+			if (!x) { return !!(c.roFor && c.roFor(r)); }
+			if (c.key === 'id') { return true; }
+			if (x.scn.isBase) { return false; }
+			p = paneColProp(c);
+			return !(p && isOverridable(x.el, p));
+		};
+		return w;
+	}
+	// Wrapped columns, with the five inserted right after ID -- unless the reader has dragged one of
+	// them, in which case the remembered order places them like any other column.
+	function paneScnColsAll(spec, cols) {
+		var wrapped = cols.map(paneScnWrapCol), extra = paneScnCols(), at = 0,
+			pref = paneColPrefs[spec.id] && paneColPrefs[spec.id].order;
+		if (pref && extra.some(function (c) { return pref.indexOf(c.key) !== -1; })) {
+			return paneApplyColOrder(spec, wrapped.concat(extra));
+		}
+		wrapped.forEach(function (c, i) { if (c.key === 'id') { at = i + 1; } });
+		return wrapped.slice(0, at).concat(extra, wrapped.slice(at));
+	}
+	// **A VALUE SET IN THIS ROW'S SCENARIO WEARS THE OVERRIDE'S AMBER**, the map's own colour for
+	// an override (`.lpn-override`), as a wash on the cell. Base holds no overrides, so its rows
+	// never wear it.
+	function paneScnCellIsLocal(c, row) {
+		var x = row && row._lpnScn, ov, p, has = Object.prototype.hasOwnProperty;
+		if (!x || x.scn.isBase) { return false; }
+		p = paneColProp(c);
+		ov = p ? (x.scn.overrides || {})[ovKey(x.el)] : null;
+		if (!ov) { return false; }
+		return has.call(ov, p) || (p === 'demand' && has.call(ov, 'demands'));
+	}
+	function paneScnMarkCell(td, c, row) {
+		var on;
+		if (!td || !td.classList) { return; }
+		on = paneScnCellIsLocal(c, row);
+		if (td.classList.contains('lpn-pane-ovcell') !== on) { td.classList.toggle('lpn-pane-ovcell', on); }
+	}
+	// The switch. The table opens in Tom's natural order -- ID, then Scenario -- and the cell the
+	// reader was standing on follows its element across (to the Base row, or back from any row).
+	function paneScnToggle(spec) {
+		var on = !spec.scnRows, base = baseScenario().id, map = function (id) {
+			return on ? paneScnRowKey(paneRowElId(id), base) : paneRowElId(id);
+		};
+		spec.scnRows = on;
+		spec.sort = { col: 'id', dir: 1 };
+		spec.lastOrderIds = null;
+		if (spec.sel) { spec.sel.aId = map(spec.sel.aId); spec.sel.fId = map(spec.sel.fId); }
+		paneTableReset(spec);
+		renderPaneTable(spec);
 	}
 	function paneNumText(v) {
 		return (typeof v === 'number' && isFinite(v)) ? String(+v.toFixed(6)) : '';
@@ -24845,7 +25059,7 @@ var EngCalcs = EngCalcs || {};
 	// Asked in BOTH places a cell is written (built once, refilled on every solve), because a cell
 	// built as a value and refilled as a box would throw the user's input away on the next tick.
 	function paneCellIsPlain(c, el) {
-		return !!(c.result || !c.set || (c.plainFor && c.plainFor(el)));
+		return !!(c.result || !c.set || (c.plainFor && c.plainFor(el)) || (c.roFor && c.roFor(el)));
 	}
 	// **ONE FUNCTION DECIDES WHAT A CELL SAYS**, and the screen and the printed sheet both read it.
 	// A result rounds to 2 decimals; a typed number reads back exactly as it is stored; an
@@ -25352,7 +25566,7 @@ var EngCalcs = EngCalcs || {};
 		var stale = spec.filterStale || {};
 		rows.forEach(function (el) {
 			var tds = spec.tds && spec.tds[el.id], idTd = tds && tds.id, anyTd, tr,
-				on = stale[el.id] === true, mark, i;
+				on = stale[paneRowEl(el).id] === true, mark, i;
 			if (!tds) { return; }
 			// The row is dimmed even with the ID column hidden; only the sign needs that column.
 			anyTd = idTd || tds[Object.keys(tds)[0]];
@@ -25742,7 +25956,7 @@ var EngCalcs = EngCalcs || {};
 					if (c.disabledFor && c.disabledFor(el)) { input.disabled = true; }
 				}
 				paneApplyColWidth(input, c, spec);
-				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
+				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + paneRowLabel(el));
 				input._lpnCell = { spec: spec, c: c, el: el };
 				input.addEventListener('change', function () { paneCommitCell(input); });
 				td.appendChild(input);
@@ -25775,7 +25989,7 @@ var EngCalcs = EngCalcs || {};
 				input.readOnly = true;
 				paneApplyColWidth(input, c, spec);
 				input.value = paneCellText(c, el);
-				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + el.id);
+				input.setAttribute('aria-label', paneHeadingText(c) + ' ' + paneRowLabel(el));
 				input._lpnCell = { spec: spec, c: c, el: el };
 				input.addEventListener('change', function () { paneCommitCell(input); });
 				// A DOUBLE-CLICK IS THE OTHER DOOR INTO EDIT MODE, and it is the one a person finds
@@ -25831,11 +26045,12 @@ var EngCalcs = EngCalcs || {};
 				// never replaces the map's selection (findGoTo()); selecting is the right-click
 				// menu's Select on map and Zoom & select, so the pin's tip no longer claims it.
 				btn.title = pc.lpn_goto_on_map || 'Go to on map';
-				btn.setAttribute('aria-label', btn.title + ' ' + el.id);
+				btn.setAttribute('aria-label', btn.title + ' ' + paneRowLabel(el));
 				if (EngCalcs.iconEl) { btn.appendChild(EngCalcs.iconEl('pin')); }
-				btn.addEventListener('click', function () { findGoTo(spec.group, el.id); });
+				btn.addEventListener('click', function () { findGoTo(spec.group, paneRowEl(el).id); });
 				td.appendChild(btn);
 			}
+			if (spec.scnRows) { paneScnMarkCell(td, c, el); }
 			tr.appendChild(td);
 		});
 		spec.cells[el.id] = cells;
@@ -25861,12 +26076,13 @@ var EngCalcs = EngCalcs || {};
 	// one fix that cannot go stale again: it is the same rows/ids refillPaneTable already walks.
 	function refillPaneTable(spec, rows) {
 		rows.forEach(function (el) {
-			var cells = spec.cells[el.id];
+			var cells = spec.cells[el.id], tds = spec.tds && spec.tds[el.id];
 			if (!cells) { return; }
 			paneCols(spec).forEach(function (c) {
 				var target = cells[c.key], text;
 				if (!target) { return; }
 				if (target._lpnCell) { target._lpnCell.el = el; }
+				if (spec.scnRows && tds) { paneScnMarkCell(tds[c.key], c, el); }
 				// **A CELL IS WRITTEN ONLY WHEN WHAT IT SAYS HAS CHANGED** (R-111). Assigning
 				// `textContent` replaces the text node even when the words are identical, and that
 				// alone marks the cell for layout -- so a refill of a table in which nothing had
@@ -26493,6 +26709,8 @@ var EngCalcs = EngCalcs || {};
 		// otherwise disagree until the next solve, with the box showing the version that was not
 		// kept -- which is the reading a person would act on.
 		if (c.reread) { input.value = paneCellText(c, el); paneApplyHint(input, c, el); }
+		// A Show scenarios row ends on its ELEMENT, redrawn for the scenario actually showing.
+		el = paneRowEl(el);
 		completeEdit(paneColProp(c) ? { el: el, prop: paneColProp(c) } : null);
 		refreshPopupIfOpen();
 		} finally { endMapBoxHold(); }
@@ -26560,7 +26778,7 @@ var EngCalcs = EngCalcs || {};
 	// (a node or a link) by ID in its own `anchor` column, exactly as a Pipe names its two nodes; a
 	// Customer names its serving pipe or node exactly the same way. Each refuses a row only when
 	// what it needs is not there yet, never because the TABLE cannot make the kind of thing at all.
-	function paneCanCreate(spec) { return spec.group === 'node' || spec.group === 'link' || spec.group === 'label' || spec.group === 'customer'; }
+	function paneCanCreate(spec) { return !spec.scnRows && (spec.group === 'node' || spec.group === 'link' || spec.group === 'label' || spec.group === 'customer'); }
 	// **A HEADING ROW IS NOT A ROW.** Copying a whole table puts its headings on the clipboard
 	// (paneCopyTsv()), and a spreadsheet kept for this purpose has them too -- so a first line
 	// whose every filled cell is the heading of the column it lands on, with or without its unit,
@@ -27945,7 +28163,7 @@ var EngCalcs = EngCalcs || {};
 			for (k in tds) { if (Object.prototype.hasOwnProperty.call(tds, k)) { td = tds[k]; break; } }
 			tr = td && td.parentNode;
 			if (!tr || !tr.classList) { return; }
-			want = !!on[spec.group + '\u0000' + id];
+			want = !!on[spec.group + '\u0000' + paneRowElId(id)];
 			if (tr.classList.contains('lpn-mapsel') !== want) { tr.classList.toggle('lpn-mapsel', want); }
 		});
 	}
@@ -28043,7 +28261,7 @@ var EngCalcs = EngCalcs || {};
 		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
 			box = paneSelBox(spec, rows, cols), list;
 		if (!box) { return; }
-		list = rows.slice(box.r0, box.r1 + 1).map(function (el) { return { kind: spec.group, id: el.id }; });
+		list = rows.slice(box.r0, box.r1 + 1).map(function (el) { return { kind: spec.group, id: paneRowEl(el).id }; });
 		list.filter(function (s) { return s.kind !== 'node'; }).forEach(function (s) { deleteElement(s.kind, s.id); });
 		list.filter(function (s) { return s.kind === 'node'; }).forEach(function (s) { deleteElement(s.kind, s.id); });
 		refreshPopupIfOpen();
@@ -28102,7 +28320,7 @@ var EngCalcs = EngCalcs || {};
 				if (ref && ref.id !== undefined && ref.id !== null && ref.id !== '') { return ref; }
 			}
 		}
-		return { group: spec.group, id: rows[box.ar].id };
+		return { group: spec.group, id: paneRowEl(rows[box.ar]).id };
 	}
 	function paneOpenContextMenu(spec, x, y, td) {
 		var pc = EngCalcs.pageConfig || {}, rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
@@ -28164,7 +28382,8 @@ var EngCalcs = EngCalcs || {};
 		// of his selection-set complaint. Select and Unselect are offered only when they would do
 		// something, the same rule Fill down follows.
 		targets = box.r1 > box.r0
-			? rows.slice(box.r0, box.r1 + 1).map(function (el) { return { group: spec.group, id: el.id }; })
+			? rows.slice(box.r0, box.r1 + 1).map(function (el) { return { group: spec.group, id: paneRowEl(el).id }; })
+				.filter(function (t, i, all) { return !all.slice(0, i).some(function (u) { return u.id === t.id; }); })
 			: [aim];
 		if (targets.some(function (t) { return !isSelected(t.group, t.id); })) {
 			mk(pc.lpn_pane_select_on_map || 'Select on map', function () {
@@ -28185,6 +28404,11 @@ var EngCalcs = EngCalcs || {};
 		if (selections.length || paneSelFilter) {
 			mk((paneSelFilter ? '\u2713 ' : '') + (pc.lpn_pane_sel_only || 'Selection only'), paneSelFilterPress, 'Ctrl+Shift+L');
 		}
+		// **SHOW SCENARIOS** (Tom, 2026-10-05): every asset once per scenario; see paneScnToggle().
+		// Offered once there is a scenario besides Base, or while it is on so it can be turned off.
+		if (paneScnAvailable(spec) && (spec.scnRows || scenarios.length > 1)) {
+			mk((spec.scnRows ? '\u2713 ' : '') + (pc.lpn_pane_scn_show || 'Show scenarios'), function () { paneScnToggle(spec); });
+		}
 		// **PRINT TABLE, THE ONLY DOOR TO IT** (Tom, 2026-10-04: the button left the pane head).
 		mk(pc.lpn_pane_print || 'Print table', function () { printPaneTable(spec); });
 		// **FILL DOWN, ON THE SAME MENU, FOR THE SAME RANGE.** Offered only when the selection
@@ -28198,8 +28422,11 @@ var EngCalcs = EngCalcs || {};
 		// needs to delete the element if you are on the ID cell or there needs to be a separate
 		// Delete element menu item."*). Delete clears values, as a spreadsheet's does; this removes
 		// the rows' own elements through the map's path.
-		mk(box.r1 > box.r0 ? (pc.lpn_pane_delete_elements || 'Delete elements') : (pc.lpn_pane_delete_element || 'Delete element'),
-			function () { paneDeleteElements(spec); });
+		// Not while scenarios are shown: the map's delete acts in the scenario SHOWING, not the row's.
+		if (!spec.scnRows) {
+			mk(box.r1 > box.r0 ? (pc.lpn_pane_delete_elements || 'Delete elements') : (pc.lpn_pane_delete_element || 'Delete element'),
+				function () { paneDeleteElements(spec); });
+		}
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
 		// Measured AFTER it is in the document, because a menu that is not laid out has no size.

@@ -1487,6 +1487,15 @@ $ec_lang['lpn_pane_filter_sel_and']='Filtered by {q} and selection only. Showing
 $ec_lang['lpn_pane_filter_sel_none']='None of the selected elements are in this table.';
 $ec_lang['lpn_pane_sel_only']='Selection only';
 $ec_lang['lpn_pane_sel_only_none']='No elements are selected. Select elements on the map first.';
+// Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
+// scenario, with five columns after ID. Both Parent headings are one key: the first names the
+// row's scenario's parent, the second its alternative's parent. The alternative name joins a
+// scenario name and a category name (lpn_alt_cat_*), e.g. "Peak Hour Demand"; reorder freely.
+$ec_lang['lpn_pane_scn_show']='Show scenarios';
+$ec_lang['lpn_pane_scn_parent']='Parent';
+$ec_lang['lpn_pane_scn_alt']='Alternative';
+$ec_lang['lpn_pane_scn_override']='Scenario override';
+$ec_lang['lpn_pane_scn_alt_name']='{scenario} {category}';
 // The pin beside the ID in the first column. The ID itself was this control until 2026-09-19,
 // underlined and turning link blue; the ID is an ordinary editable cell now and this is the way
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
