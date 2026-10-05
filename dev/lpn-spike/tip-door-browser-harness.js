@@ -11,6 +11,12 @@
 //      it without raising the keyboard; a tap elsewhere closes it.
 //   4. MANNING PIPE FLOW, desktop and phone: the same door on a calculator that is not lpn_, and
 //      the label's WORDS still put the cursor in the field.
+//   5. A TIP THAT GOES WITHOUT A CLICK (Perry's pre-review, 2026-10-05): its box rebuilt by a
+//      keyboard change, or closed by its x from the keyboard. The next Esc must reach the page, not
+//      be spent closing a tip that is no longer there.
+//   6. A "?" INSIDE A LINK (Darcy-Weisbach's kinematic viscosity) and INSIDE A BUTTON (Looped
+//      Network's "Something wrong here?"): the "?" opens on a click and neither follows the link nor
+//      presses the button; hover opens nothing; the link's words still open the link.
 //
 //   node dev/lpn-spike/tip-door-browser-harness.js        (takes the browser lock itself)
 //
@@ -329,6 +335,170 @@ async function sectionMpf(Session, browser) {
 	}
 }
 
+// ---------------------------------------------------------------------------------------------
+// Count the Escapes that reach the page's own (bubbling) listeners, i.e. that were NOT spent on a tip.
+function armEscCounter(page) {
+	return page.evaluate(() => {
+		window.__tipdoorEsc = 0;
+		if (!window.__tipdoorEscWired) {
+			window.__tipdoorEscWired = true;
+			document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { window.__tipdoorEsc++; } });
+		}
+	});
+}
+const escSeen = (page) => page.evaluate(() => window.__tipdoorEsc);
+const boxOpen = (page, id) => page.evaluate((i) => getComputedStyle(document.getElementById(i)).display !== 'none', id);
+
+async function sectionStale(Session, browser) {
+	console.log('\n--- 5. Looped Network: a tip that goes without a click does not swallow the next Esc ---');
+	const a = await openLpn(Session, browser, DESKTOP, 'stale');
+	const page = a.page;
+	try {
+		await a.menuClickSub(await a.lang('lpn_analyze_menu'), await a.lang('lpn_ds_menu'), 'project');
+		await a.settle(500);
+		ok('the Demand scaling box is open', await boxOpen(page, 'lpn_ds_box'));
+		await armEscCounter(page);
+		ok('a `?` in a Demand scaling row', await tagGlyph(page, '#lpn_ds_controls', 0, 's'));
+		await page.click('[data-tipdoor="s"]');
+		await a.settle(350);
+		ok('...it opens on a click', (await tipState(page, '[data-tipdoor-host="s"]')).shown);
+		await page.keyboard.press('Escape');
+		await a.settle(300);
+		ok('control: Esc on a LIVE tip is spent on the tip and reaches nothing else', (await escSeen(page)) === 0);
+
+		await page.click('[data-tipdoor="s"]');
+		await a.settle(350);
+		ok('opened again', (await anyExplanationShown(page)) === 1);
+		// The scope selector changes while focus stays on the "?": the box rebuilds and the "?" is
+		// replaced. (Moving focus to the selector first would close the tip honestly, by focus-out;
+		// the case that went wrong is a disappearance nothing told the tip about.)
+		const sel = await page.evaluate(() => {
+			const s = document.querySelector('#lpn_ds_controls select');
+			if (!s) { return false; }
+			s.setAttribute('data-tipdoor-sel', '1');
+			return true;
+		});
+		ok('the scope selector', sel);
+		await page.evaluate(() => {
+			const s = document.querySelector('[data-tipdoor-sel]');
+			s.selectedIndex = (s.selectedIndex + 1) % s.options.length;
+			s.dispatchEvent(new Event('change', { bubbles: true }));
+		});
+		await a.settle(500);
+		ok('...the change rebuilt the box: the tagged `?` is gone', !(await page.$('[data-tipdoor="s"]')));
+		await armEscCounter(page);
+		await page.keyboard.press('Escape');
+		await a.settle(300);
+		ok('the FIRST Esc after that reaches the page, not a vanished tip', (await escSeen(page)) === 1, String(await escSeen(page)));
+
+		// Closed by its x, without the focus leaving the "?" (a script's click, as a keyboard
+		// shortcut or another command would close it).
+		await tagGlyph(page, '#lpn_ds_controls', 0, 't');
+		await page.click('[data-tipdoor="t"]');
+		await a.settle(350);
+		ok('a `?` open again', (await anyExplanationShown(page)) === 1);
+		await page.evaluate(() => document.getElementById('lpn_ds_close').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+		await a.settle(400);
+		ok('the x closes the box', !(await boxOpen(page, 'lpn_ds_box')));
+		ok('...and takes its tip with it', (await anyExplanationShown(page)) === 0);
+		await armEscCounter(page);
+		await page.keyboard.press('Escape');
+		await a.settle(300);
+		ok('the FIRST Esc after that reaches the page', (await escSeen(page)) === 1, String(await escSeen(page)));
+		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	} finally {
+		await a.close();
+	}
+}
+
+async function sectionInControl(Session, browser) {
+	console.log('\n--- 6a. Darcy-Weisbach: a `?` inside a link ---');
+	let a = await Session.open(browser, NAME + ':dw', DESKTOP);
+	let page = a.page;
+	try {
+		await a.goto('Darcy-Weisbach.php?ec_nolog=1');
+		await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+		await a.settle(300);
+		const found = await page.evaluate(() => {
+			const g = Array.from(document.querySelectorAll('a .ec-explain-host .ec-tip'))
+				.filter((e) => e.getClientRects().length && e.getBoundingClientRect().width > 0)[0];
+			if (!g) { return false; }
+			g.setAttribute('data-tipdoor', 'l');
+			g.closest('.ec-help').setAttribute('data-tipdoor-host', 'l');
+			g.closest('a').setAttribute('data-tipdoor-link', 'l');
+			return true;
+		});
+		ok('a `?` inside a link', found);
+		if (found) {
+			const G = '[data-tipdoor="l"]', H = '[data-tipdoor-host="l"]';
+			const before = page.url();
+			const g = await centre(page, G);
+			await page.mouse.move(g.x, g.y);
+			await page.waitForTimeout(1200);
+			ok('hovering the `?` opens nothing', !(await tipState(page, H)).shown);
+			const pages0 = a.context.pages().length;
+			await page.mouse.click(g.x, g.y);
+			await a.settle(600);
+			ok('a click on the `?` opens the explanation', (await tipState(page, H)).shown);
+			ok('...and does not follow the link', page.url() === before && a.context.pages().length === pages0,
+				a.context.pages().length + ' pages');
+			await page.keyboard.press('Escape');
+			await a.settle(300);
+			ok('Esc closes it', !(await tipState(page, H)).shown);
+			await page.focus(G);
+			await page.keyboard.press('Enter');
+			await a.settle(350);
+			ok('Enter on the focused `?` opens it, without following the link',
+				(await tipState(page, H)).shown && a.context.pages().length === pages0);
+			await page.keyboard.press('Escape');
+			await a.settle(300);
+			const w = await page.evaluate((s) => { const r = document.querySelector(s).getBoundingClientRect(); return { x: r.left + 4, y: r.top + r.height / 2 }; }, '[data-tipdoor-link="l"]');
+			const popup = a.context.waitForEvent('page', { timeout: 5000 }).catch(() => null);
+			await page.mouse.click(w.x, w.y);
+			const opened = await popup;
+			ok('a click on the link\'s WORDS still opens the link', !!opened);
+			if (opened) { await opened.close(); }
+		}
+		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	} finally {
+		await a.close();
+	}
+
+	console.log('\n--- 6b. Looped Network: a `?` inside a button ---');
+	a = await openLpn(Session, browser, DESKTOP, 'button');
+	page = a.page;
+	try {
+		const B = await page.evaluate(() => {
+			const b = ['lpn_wrong_btn', 'lpn_wrong_status_btn'].map((i) => document.getElementById(i))
+				.filter((e) => e && e.getClientRects().length && e.querySelector('.ec-tip'))[0];
+			if (!b) { return null; }
+			b.querySelector('.ec-tip').setAttribute('data-tipdoor', 'w');
+			return '#' + b.id;
+		});
+		ok('the "Something wrong here?" button, with its `?`', !!B);
+		if (B) {
+			const G = '[data-tipdoor="w"]', H = B + ' .ec-help';
+			const label0 = await page.evaluate((s) => document.querySelector(s).textContent, B);
+			const g = await centre(page, G);
+			await page.mouse.move(g.x, g.y);
+			await page.waitForTimeout(1200);
+			ok('hovering its `?` opens nothing', !(await tipState(page, H)).shown);
+			await page.mouse.click(g.x, g.y);
+			await a.settle(400);
+			ok('a click on its `?` opens the explanation', (await tipState(page, H)).shown);
+			const after = await page.evaluate((s) => { const b = document.querySelector(s); return { t: b.textContent, d: b.disabled }; }, B);
+			ok('...and does not press the button', after.t === label0 && !after.d, JSON.stringify(after).slice(0, 80));
+			ok('...the `?` is not a tab stop inside the button: the button is', (await page.getAttribute(G, 'tabindex')) === null);
+			await page.mouse.click(5, 450);
+			await a.settle(350);
+			ok('a click elsewhere closes it', !(await tipState(page, H)).shown);
+		}
+		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
+	} finally {
+		await a.close();
+	}
+}
+
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	const { Session } = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'session.js'));
@@ -345,6 +515,8 @@ async function main() {
 		await sectionLpnDesktop(Session, browser);
 		await sectionLpnPhone(Session, browser);
 		await sectionMpf(Session, browser);
+		await sectionStale(Session, browser);
+		await sectionInControl(Session, browser);
 	} finally {
 		await browser.close();
 		env.stopServer();

@@ -60,10 +60,31 @@ EngCalcs.closeExplanation = function () {
 	g = ecTipGlyph(el);
 	if (g && g.setAttribute) { g.setAttribute('aria-expanded', 'false'); }
 };
+// **THE "OPEN" RECORD FOLLOWS THE TIP, NOT THE OTHER WAY ROUND.** A tip can go without a click:
+// its box closed from the keyboard or by script (hidePanel() sweeps its tips), or its box rebuilt,
+// detaching the "?" and orphaning the drawn tip. Believed open after that, the next Esc was spent
+// closing nothing and the box's own Esc needed a second press (Perry's pre-review, 2026-10-05).
+// So every reader of the record asks first whether the tip is really still up.
+function ecExplainLive() {
+	var el = EngCalcs._explainOpen, t, drawn;
+	if (!el) { return false; }
+	if (el.isConnected === false) { return false; }
+	if (el.getClientRects && !el.getClientRects().length) { return false; }
+	t = window.bootstrap && bootstrap.Tooltip.getInstance(el);
+	if (!t) { return false; }
+	drawn = t.tip;
+	// Bootstrap sets `tip` to null once a hide completes; a DOM stub has no `tip` at all.
+	if (drawn === null) { return false; }
+	if (drawn) { return drawn.isConnected !== false && !!(drawn.classList && drawn.classList.contains('show')); }
+	return !!(el.getAttribute && el.getAttribute('aria-describedby'));
+}
+function ecSyncExplanation() {
+	if (EngCalcs._explainOpen && !ecExplainLive()) { EngCalcs.closeExplanation(); }
+}
 EngCalcs.toggleExplanation = function (el) {
-	var was = EngCalcs._explainOpen, t, g;
-	// A box that closed, or a sweep, may have hidden it behind our back: then a click OPENS it.
-	if (was === el && !(el.getAttribute && el.getAttribute('aria-describedby'))) { was = null; }
+	var was, t, g;
+	ecSyncExplanation();
+	was = EngCalcs._explainOpen;
 	EngCalcs.closeExplanation();
 	if (was === el) { return; }
 	t = window.bootstrap && bootstrap.Tooltip.getInstance(el);
@@ -90,21 +111,34 @@ function ecWireExplanationDocument() {
 	if (EngCalcs._explainDocWired || !document.addEventListener) { return; }
 	EngCalcs._explainDocWired = true;
 	document.addEventListener('pointerdown', function (e) {
+		ecSyncExplanation();
 		if (EngCalcs._explainOpen && !ecInsideExplanation(e.target)) { EngCalcs.closeExplanation(); }
 	}, true);
 	document.addEventListener('keydown', function (e) {
-		if (e.key !== 'Escape' || !EngCalcs._explainOpen) { return; }
+		if (e.key !== 'Escape') { return; }
+		ecSyncExplanation();
+		if (!EngCalcs._explainOpen) { return; }
 		EngCalcs.closeExplanation();
 		if (e.stopPropagation) { e.stopPropagation(); }
 		if (e.preventDefault) { e.preventDefault(); }
 	}, true);
 }
 function ecWireExplanationGlyph(el, glyph) {
-	if (glyph.dataset.ecExplainWired) { return; }
-	glyph.dataset.ecExplainWired = '1';
+	// An expando, not a data- attribute: markup copied by innerHTML and put back (the grievance
+	// button restores its label so) must not arrive believing it is already wired.
+	if (glyph.__ecExplainWired) { return; }
+	glyph.__ecExplainWired = true;
+	// **A "?" INSIDE A LINK OR A BUTTON** (Darcy-Weisbach's "Kinematic viscosity, v ?" is all one
+	// link; Looped Network's "Something wrong here? ?" is all one button). The same door: a click on
+	// the "?" opens the explanation and does NOT follow the link or press the button; a click on the
+	// words still does. Inside a link the "?" is its own tab stop. Inside a BUTTON it is not: a
+	// focusable thing inside a button is invalid and browsers disagree about it, so there the
+	// keyboard reaches the button's action and the explanation is a pointer's and a finger's only.
+	var host = glyph.parentNode && glyph.parentNode.closest ? glyph.parentNode.closest('a, button, [role="button"]') : null;
+	var inButton = !!host && !(host.tagName && host.tagName.toUpperCase() === 'A');
 	// The keyboard's door: the glyph is a button in all but tag (a <button> inside a <label> would
 	// become the label's control). tabindex on the glyph alone, so a label is one tab stop.
-	if (glyph.setAttribute) {
+	if (glyph.setAttribute && !inButton) {
 		glyph.setAttribute('tabindex', '0');
 		glyph.setAttribute('role', 'button');
 		glyph.setAttribute('aria-expanded', 'false');
@@ -114,6 +148,7 @@ function ecWireExplanationGlyph(el, glyph) {
 	// 2026-08-29). Now the same on a mouse, since a click is the one door there too.
 	glyph.addEventListener('click', function (e) {
 		if (e.preventDefault) { e.preventDefault(); }
+		if (host && e.stopPropagation) { e.stopPropagation(); }
 		EngCalcs.toggleExplanation(el);
 	});
 	glyph.addEventListener('keydown', function (e) {
@@ -171,7 +206,7 @@ EngCalcs.initTips = function (root) {
 	var canHover = ecCanHover();
 	(root || document).querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(function (el) {
 		var control = ecTipIsControl(el);
-		var explainGlyph = control ? null : ecTipGlyph(el);
+		var explainGlyph = ecTipGlyph(el);
 		if (explainGlyph) {
 			bootstrap.Tooltip.getOrCreateInstance(el, { trigger: 'manual', customClass: 'ec-explain' });
 			if (el.classList && el.classList.add) { el.classList.add('ec-explain-host'); }
