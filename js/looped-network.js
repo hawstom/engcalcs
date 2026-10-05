@@ -60816,7 +60816,7 @@ var EngCalcs = EngCalcs || {};
 		// exactly the words the plain text has, in whatever order the language puts them.
 		tpl = kind === 'node'
 			? String(pc.lpn_ff_affect_node || '{id} drops to {pressure}')
-				.replace('{pressure}', ffQty(worst.pressure, 'lpn_u_pressure'))
+				.split('{pressure}').join(ffQty(worst.pressure, 'lpn_u_pressure'))
 			: String(pc.lpn_ff_affect_link || '{id} reaches {velocity}')
 				.replace('{velocity}', ffQty(worst.velocity, 'lpn_u_velocity'));
 		value = labelPrefixFor(kind, 'id') + worst.id;
@@ -61541,7 +61541,7 @@ var EngCalcs = EngCalcs || {};
 		hit = set.results.filter(function (r) { return r.unserved > 0 || (r.below && r.below.length > 0); }).length;
 		ffEl('p', 'lpn-ff-summary', (pc.lpn_crit_summary || '{n} of {total} assets leave demand unserved or drop a junction below {pressure}.')
 			.replace('{n}', String(hit)).replace('{total}', String(set.results.length))
-			.replace('{pressure}', ffQty(set.minPressure, 'lpn_u_pressure')), host);
+			.split('{pressure}').join(ffQty(set.minPressure, 'lpn_u_pressure')), host);
 		dsTimeLines(host, critRunT);
 		if (set.skippedDeadEnds && set.skippedDeadEnds.length) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_crit_skipped_dead || 'Dead-end links skipped: {n}. Each one cuts off everything beyond it.')
@@ -61902,7 +61902,7 @@ var EngCalcs = EngCalcs || {};
 		if (!list || !list.length) { return; }
 		p = ffEl('p', 'lpn-ff-note', null, host);
 		parts = (pc.lpn_ds_outside_below || 'At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.')
-			.replace('{m}', dsMult(m)).replace('{pressure}', ffQty(minPressure, 'lpn_u_pressure'))
+			.replace('{m}', dsMult(m)).split('{pressure}').join(ffQty(minPressure, 'lpn_u_pressure'))
 			.replace('{n}', String(list.length)).split('{ids}');
 		p.appendChild(document.createTextNode(parts[0]));
 		list.forEach(function (x, i) {
@@ -61943,17 +61943,17 @@ var EngCalcs = EngCalcs || {};
 				ffEl('p', 'lpn-ff-summary', pc.lpn_ds_search_stopped || 'The search was stopped before it found an answer.', host);
 			} else if (s.outcome === O.HOLDS_TO_MAX) {
 				verdict = pc.lpn_ds_holds_max || '✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.';
-				ffEl('p', 'lpn-ff-summary', verdict.replace('{pressure}', pressure).replace('{max}', dsMult(s.max)), host);
+				ffEl('p', 'lpn-ff-summary', verdict.split('{pressure}').join(pressure).replace('{max}', dsMult(s.max)), host);
 				dsProbeLine(host, s.holding);
 			} else if (s.outcome === O.BELOW_AT_ZERO) {
 				ffEl('p', 'lpn-ff-summary', (pc.lpn_ds_below_zero || '⚠ At least one junction is below {pressure} even with the scaled demands at zero.')
-					.replace('{pressure}', pressure), host);
+					.split('{pressure}').join(pressure), host);
 				dsProbeLine(host, s.failing);
 			} else {
 				verdict = s.belowAtOne
-					? (pc.lpn_ds_found_below || '⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.')
+					? (pc.lpn_ds_found_below || '⚠ At least one junction is below {pressure} with no demand scaling. The largest demand scale that keeps every junction at {pressure} or above is {m}.')
 					: (pc.lpn_ds_found || '✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.');
-				ffEl('p', 'lpn-ff-summary', verdict.replace('{pressure}', pressure).replace('{m}', dsMult(s.multiplier)), host);
+				ffEl('p', 'lpn-ff-summary', verdict.split('{pressure}').join(pressure).replace('{m}', dsMult(s.multiplier)), host);
 				dsProbeLine(host, s.holding);
 				dsProbeLine(host, s.failing);
 			}
@@ -61977,7 +61977,7 @@ var EngCalcs = EngCalcs || {};
 			? (pc.lpn_ds_scale_below || '⚠ At a demand scale of {m}, junctions below {pressure}: {n}.')
 				.replace('{n}', String(set.below.length))
 			: (pc.lpn_ds_scale_ok || '✓ At a demand scale of {m}, every junction keeps {pressure}.');
-		ffEl('p', 'lpn-ff-summary', verdict.replace('{m}', dsMult(set.multiplier)).replace('{pressure}', pressure), host);
+		ffEl('p', 'lpn-ff-summary', verdict.replace('{m}', dsMult(set.multiplier)).split('{pressure}').join(pressure), host);
 		dsTimeLines(host, set.time);
 		dsScopeLine(host, set);
 		dsOutsideLine(host, set.outside, set.multiplier, set.minPressure);
