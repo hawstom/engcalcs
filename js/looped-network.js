@@ -6129,6 +6129,14 @@ var EngCalcs = EngCalcs || {};
 				// question, and one holding forty values is worth a specific one.
 				var msg = (pc.lpn_scenario_delete_confirm || 'Delete the scenario {name}, and its {n} overrides? The drawing itself is not changed.')
 					.replace('{name}', scenarioDisplayName(scn)).replace('{n}', overrideCount(scn));
+				// **A SCENARIO OTHERS INHERIT FROM IS NOT DELETED** (stage 5): say which, before asking.
+				var kids = scenarios.filter(function (x) { return x.parent === scn.id; });
+				if (kids.length) {
+					tellNotice((pc.lpn_scenario_delete_has_children || 'The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.')
+						.replace('{name}', scenarioDisplayName(scn))
+						.replace('{list}', kids.map(scenarioDisplayName).join(', ')));
+					return;
+				}
 				askDialog({ kind: 'confirm', text: msg }, function (yes) {
 					if (!yes) { return; }
 					saveUndoSnapshot();

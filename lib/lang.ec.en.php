@@ -2962,6 +2962,7 @@ $ec_lang['lpn_scenario_prompt_name']='Name for this scenario';
 $ec_lang['lpn_scenario_rename']='Rename scenario…';
 $ec_lang['lpn_scenario_delete']='Delete scenario';
 $ec_lang['lpn_scenario_delete_confirm']='Delete the scenario {name}, and its {n} overrides? The drawing itself is not changed.';
+$ec_lang['lpn_scenario_delete_has_children']='The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.';
 $ec_lang['lpn_scenario_override']='Override in this scenario';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_scenario_override_tip']='Selected means this scenario overrides its parent for this value, even when the number is the same. Clear the box to use its parent\'s.';

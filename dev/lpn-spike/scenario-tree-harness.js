@@ -50,7 +50,8 @@ const L = loadLoopedNetwork(
 	"\t\tapplyNodeRename: applyNodeRename, deleteNode: deleteNode, convertUnitValues: convertUnitValues,\n" +
 	"\t\tlibRepointPattern: libRepointPattern, setScenarioParent: setScenarioParent, treeLayers: treeLayers,\n" +
 	"\t\tsetScenarioView: setScenarioView, currentView: currentView, applyView: applyView,\n" +
-	"\t\tclearOverride: clearOverride, commitAltOption: commitAltOption,\n" +
+	"\t\tclearOverride: clearOverride, commitAltOption: commitAltOption, scenarioMenuRows: scenarioMenuRows,\n" +
+	"\t\tlastNotice: function () { return noticeLog[0]; },\n" +
 	"\t\tgeorefBegin: function () { var was = georef; georef = { ovs: georefCaptureCoordOverrides() }; return was; },\n" +
 	"\t\tgeorefMove: function (t) { georefWriteCoordOverrides(t); }, georefEnd: function (was) { georef = was; },\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
@@ -809,6 +810,15 @@ console.log('\n--- 9. scenario parents and the held view ---');
 	ok('a loop of parents is refused', !!L.setScenarioParent(peak.id, fire.id).refused);
 	ok('Base takes no parent', !!L.setScenarioParent(base.id, peak.id).refused);
 	ok('deleting a scenario with a child is refused, naming it', J((L.deleteScenario(peak.id) || {}).children) === J([fire.id]));
+	{
+		L.switchScenario(peak.id);
+		const row = L.scenarioMenuRows().filter((r) => r.label === global.EngCalcs.pageConfig.lpn_scenario_delete)[0];
+		let said = '';
+		const before = L.getScenarios().length;
+		row.fn();
+		said = (L.lastNotice() || {}).text || '';
+		ok('...and the menu\'s Delete row says so instead of asking', L.getScenarios().length === before && said.indexOf(fire.name) >= 0 && said.indexOf('inherit') >= 0);
+	}
 	ok('...and a reparent to Base keeps its own values', L.setScenarioParent(fire.id, null) === true && fire.parent === undefined &&
 		(L.switchScenario(fire.id), L.effective(j, 'demand') === 900) && L.heldCalcOption(fire, 'demandMultiplier') === undefined);
 	L.setScenarioParent(fire.id, peak.id);

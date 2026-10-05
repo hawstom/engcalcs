@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**17 still to read on master**, of 127 untranslated keys, of 2353 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**18 still to read on master**, of 128 untranslated keys, of 2354 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (127, 17 to read @@ NEEDS RULING)
+## lpn_  (128, 18 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -366,6 +366,9 @@ never edits a synonym.
 - **`lpn_saved_session`**
   > Not saved
   _Ruled OK 2026-10-05._
+- **`lpn_scenario_delete_has_children`**
+  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
+  @@ NEEDS RULING
 - **`lpn_scenario_duration_tip`**
   > Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.
   _Ruled OK 2026-10-05._
@@ -461,7 +464,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**14 still to read**, of 17 new keys across 12 unmerged branch(es).
+**14 still to read**, of 17 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -487,7 +490,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`4d89f62e`) — adds no English strings
+### feat/bentley-interop (`96040967`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
@@ -550,3 +553,5 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### feat/tip-door (`2002354c`) — adds no English strings
+
+### fix/backdrop-geo-export (`0981fbc8`) — adds no English strings

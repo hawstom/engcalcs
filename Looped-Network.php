@@ -3459,6 +3459,7 @@ EngCalcs.pageConfig = {
 	lpn_scenario_rename: <?=json_encode($ec_lang['lpn_scenario_rename'])?>,
 	lpn_scenario_delete: <?=json_encode($ec_lang['lpn_scenario_delete'])?>,
 	lpn_scenario_delete_confirm: <?=json_encode($ec_lang['lpn_scenario_delete_confirm'])?>,
+	lpn_scenario_delete_has_children: <?=json_encode($ec_lang['lpn_scenario_delete_has_children'])?>,
 	lpn_scenario_override: <?=json_encode($ec_lang['lpn_scenario_override'])?>,
 	lpn_scenario_override_tip: <?=json_encode($ec_lang['lpn_scenario_override_tip'])?>,
 	lpn_scenario_base_value: <?=json_encode($ec_lang['lpn_scenario_base_value'])?>,

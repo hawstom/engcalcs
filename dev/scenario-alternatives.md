@@ -620,11 +620,20 @@ that holds none shows Base's live view.
 - Editing a shared alternative changes every scenario that uses it, as in Bentley.
 - Reparenting an alternative or a scenario keeps its own values; what it inherits may change.
 - Deleting an alternative, a calculation set or a scenario is refused while anything uses it, and
-  the refusal names who; merging into another of the same category is the way to retire one.
+  the refusal names who (the Scenarios menu's Delete row says so in a notice); merging is the way
+  to retire one.
+- **A merge moves no value any user of the merged alternative reads** (Perry's review): the target
+  must be its ancestor (the alternatives between are folded in) or its sibling whose own values
+  would not reach those users; anything else is refused, saying why. Values combine by the rule
+  they resolve by, the demand pair included. The target's other users do gain the merged values.
 - No automatic demotion: a stored alternative that becomes empty or unshared stays stored.
 - Calculation sets are sparse with a parent, not Bentley's full set.
 - The edit marker means "local in the alternative this scenario writes to"; an inherited value is
   not marked.
+
+**UI obligation:** a new scenario is seeded with the project's demand multiplier, which is a local
+Calculation value, so assigning it a calculation set is refused until that value is promoted or
+discarded. The screen that assigns a set must offer one or the other.
 
 **Not yet:** no screen for any of it; the Alternatives table and the override count still show
 each scenario's own values; a unit change converts element values in stored alternatives but, as
