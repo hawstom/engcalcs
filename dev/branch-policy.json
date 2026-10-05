@@ -128,7 +128,9 @@
         "feat/times-statistic",
         "feat/find-source",
         "feat/transport-ends",
-        "feat/engine-prefetch"
+        "feat/engine-prefetch",
+        "feat/tip-door",
+        "feat/scenario-table"
     ],
     "feature_freeze": {
         "active": false,
