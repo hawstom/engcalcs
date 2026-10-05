@@ -289,7 +289,15 @@ async function preReviewSuite(browser, open) {
 	// (1) A fixed row's letter does not depend on the project's scenario names.
 	const fixedLetters = async () => {
 		await page.keyboard.press('Alt+Shift+W');
-		await page.keyboard.press('c');   // Scenarios
+		// Scenarios, by ITS OWN letter as the menu now assigns it, read off the row rather than
+		// typed in here: a row added above it (Water > Change type, 2026-10-05) moves the letter,
+		// and what this section tests is the fly-out's rows, not which letter opens it.
+		const scnKey = await page.evaluate((label) => {
+			const b = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row'))
+				.find((x) => x.textContent.replace(/[▸\s]+$/, '').trim().endsWith(label));
+			return b ? b.getAttribute('data-mnemonic') : 'c';
+		}, pc.lpn_scenario_menu);
+		await page.keyboard.press(scnKey);
 		const rs = await sub2();
 		const want = [pc.lpn_scenario_new, pc.lpn_scenario_rename, pc.lpn_scenario_delete, pc.lpn_scenario_basic];
 		const got = want.map((w) => (rs.find((r) => r.t === w || r.t.endsWith(w)) || { m: '?' }).m);

@@ -31325,18 +31325,8 @@ var EngCalcs = EngCalcs || {};
 		// Blank is also the honest interim state: between the node appearing and the tile answering
 		// we genuinely do not know its elevation, and 0 is sea level, which is a claim.
 		var fromDem = elevSourceIsDem();
-		var n;
-		if (type === 'reservoir') {
-			n = { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev };
-		} else if (type === 'tank') {
-			n = { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev,
-				_level: settings.defaults.tankLevel,
-				minLevel: settings.defaults.tankMinLevel,
-				maxLevel: settings.defaults.tankMaxLevel,
-				tankDiameter: settings.defaults.tankDiameter };
-		} else {
-			n = { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev, _demand: settings.defaults.demand };
-		}
+		var n = { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev }, birth = nodeBirthFields(type), k;
+		for (k in birth) { if (Object.prototype.hasOwnProperty.call(birth, k)) { n[k] = birth[k]; } }
 		if (fromDem) { delete n.elev; }
 		bornInScenario(n);
 		doc.nodes.push(n);
@@ -31346,6 +31336,21 @@ var EngCalcs = EngCalcs || {};
 		scheduleSolve();
 		if (fromDem) { queueTerrainForNewNode(id); }
 		return n;
+	}
+	// **WHAT A NEWLY DRAWN NODE OF THIS TYPE IS BORN WITH, BEYOND ITS ID, PLACE AND ELEVATION** --
+	// the New assets settings, read at the moment of asking. ONE answer for two callers: addNode()
+	// and changeAssetType(), so a junction turned into a tank gets exactly the tank a click would
+	// have drawn (Tom, 2026-10-05; dev/asset-type.md). A reservoir needs nothing more: its head is
+	// absent, which means "follow the elevation".
+	function nodeBirthFields(type) {
+		if (type === 'reservoir') { return {}; }
+		if (type === 'tank') {
+			return { _level: settings.defaults.tankLevel,
+				minLevel: settings.defaults.tankMinLevel,
+				maxLevel: settings.defaults.tankMaxLevel,
+				tankDiameter: settings.defaults.tankDiameter };
+		}
+		return { _demand: settings.defaults.demand };
 	}
 	// **WHETHER A NEW NODE READS THE LAND SURFACE.** Three conditions, and every one of them can
 	// change under a project's feet, so this is asked at the moment a node is made rather than
@@ -31616,6 +31621,267 @@ var EngCalcs = EngCalcs || {};
 		if (currentPopup && currentPopup.kind === 'node' && currentPopup.id === id) { closePopup(); }
 		updateEmptyHint();
 		scheduleSolve();
+	}
+	// ---- CHANGE TYPE (Tom, 2026-10-05; dev/asset-type.md) ---------------------------------------
+	//
+	// *"It would be nice to provide a tool under Water or Tables to Change node type for any asset,
+	// where if it has information that can't be ported to the new type, we alert and ask."*
+	//
+	// **THE NODE KEEPS ITS ID, ITS PLACE, ITS PIPES, ITS DESCRIPTION, TAG AND LABEL, AND EVERY VALUE
+	// THE NEW TYPE ALSO HAS.** What only the old type has is listed first -- Base's value and every
+	// scenario's override of it -- and nothing changes until the reader presses Change. What only
+	// the new type has comes from nodeBirthFields(), the New assets settings a click on the map would
+	// have used, so a converted tank and a drawn tank cannot come to differ.
+	//
+	// **ONE UNDO.** One snapshot before the first node changes, however many are selected.
+	//
+	// **NODES ONLY.** Links were weighed and left out; dev/asset-type.md says why.
+	//
+	// **THE TYPE IS BASE-OWNED**, like a valve's type (renderValveFields()): it is not in
+	// LPN_OVERRIDABLE, so a change made while a scenario is showing changes the node in every
+	// scenario, and the scenario overrides of what the old type alone had go with it.
+	var LPN_NODE_TYPES = ['junction', 'reservoir', 'tank'];
+	/**
+	 * Every node property that belongs to SOME node types and not to others. A key named in no row
+	 * here is common to every node -- elevation, position, description, tag, active, the water
+	 * quality inputs, where its map label sits -- and is carried across untouched.
+	 *
+	 * `keys` is what the element stores; `props` is what a scenario overrides it by; `none` lists
+	 * stored values that say nothing, so losing one is not worth a question. `custom` marks a custom
+	 * property (Task 636), whose types come from its own "Applies to" design rather than from here.
+	 */
+	function typeOwnedNodeSpecs() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			// A junction's demand is ONE thing however it is stored (R-369): row 0 on the element,
+			// the rest in extraDemands, a category name beside it. It goes, or stays, whole.
+			{ types: ['junction'], keys: ['_demand', 'demandCategory', 'extraDemands', 'demandItemized'],
+				props: ['demand', 'demands'], label: pc.lpn_field_base_demand || 'Base demand', unit: 'lpn_u_flow',
+				value: function (n) {
+					var rows = [n._demand].concat((n.extraDemands || []).map(function (d) { return d && d.base; }));
+					if (rows.length === 1 && !n.demandCategory && !changeTypeSays({ none: [0] }, rows[0])) { return undefined; }
+					return rows;
+				} },
+			{ types: ['junction'], keys: ['demandPattern'], props: [], label: pc.lpn_field_demand_pattern || 'Demand pattern' },
+			// Stored in the solver's SI terms; shown as the popup shows it.
+			{ types: ['junction'], keys: ['_emitter'], props: ['emitter'], none: [0],
+				label: pc.lpn_field_emitter || 'Emitter coefficient', show: emitterToDisplay },
+			{ types: ['junction'], keys: ['_fireFlow'], props: ['fireFlow'], unit: 'lpn_u_flow',
+				label: pc.lpn_ff_required || 'Required fire flow' },
+			{ types: ['reservoir'], keys: ['_head'], props: ['head'], unit: 'lpn_u_elevhead',
+				label: pc.lpn_field_head || 'Head' },
+			{ types: ['reservoir'], keys: ['headPattern'], props: [], label: pc.lpn_field_head_pattern || 'Head pattern' },
+			{ types: ['tank'], keys: ['_level'], props: ['level'], unit: 'lpn_u_elevhead',
+				label: pc.lpn_field_tank_level || 'Water depth' },
+			{ types: ['tank'], keys: ['minLevel'], props: [], unit: 'lpn_u_elevhead',
+				label: pc.lpn_field_tank_minlevel || 'Lowest water depth' },
+			{ types: ['tank'], keys: ['maxLevel'], props: [], unit: 'lpn_u_elevhead',
+				label: pc.lpn_field_tank_maxlevel || 'Highest water depth' },
+			{ types: ['tank'], keys: ['tankDiameter'], props: [], unit: 'lpn_u_length',
+				label: pc.lpn_field_tank_diameter || 'Tank diameter' },
+			{ types: ['tank'], keys: ['volCurve'], props: [], label: pc.lpn_curve_kind_volume || 'Tank volume' },
+			{ types: ['tank'], keys: ['mixingModel'], props: [], none: ['MIXED'], label: pc.lpn_mixing_model || 'Mixing model' },
+			{ types: ['tank'], keys: ['mixingFraction'], props: [], label: pc.lpn_mixing_fraction || 'Mixing fraction' },
+			{ types: ['tank'], keys: ['_tankCoeff'], props: ['tankCoeff'], label: pc.lpn_reaction_tank || 'Reaction coefficient' }
+		].concat(customPropDefs().filter(function (d) { return !!d.key; }).map(function (d) {
+			return { custom: true, keys: ['_' + d.key], props: [d.key], label: customPropLabel(d),
+				types: LPN_NODE_TYPES.filter(function (t) { return customPropAppliesToType(d, 'node', t); }) };
+		}));
+	}
+	// Does this stored value say anything? Blank, null, an empty list and a row's own `none` do not.
+	function changeTypeSays(spec, v) {
+		if (v === undefined || v === null || v === '') { return false; }
+		if (Array.isArray(v) && !v.length) { return false; }
+		return (spec.none || []).indexOf(v) < 0;
+	}
+	// The value as the reader typed it, in the unit the strip is showing (CLAUDE.md: a number is
+	// stored in the displayed unit, so nothing is converted here except the emitter, which the
+	// popup converts too).
+	function changeTypeValueText(spec, v) {
+		var t;
+		if (Array.isArray(v)) {
+			t = v.map(function (x) { return (x && typeof x === 'object') ? x.base : x; }).join(' + ');
+		} else {
+			t = spec.show ? spec.show(v) : v;
+			if (typeof t === 'number' && isFinite(t)) { t = plainRound(t, 6); }
+		}
+		t = String(t === undefined ? v : t);
+		return spec.unit ? t + ' ' + unitSymbol(spec.unit) : t;
+	}
+	// One line of the list. Each value is handed over by a function so that a `$` in a description
+	// or a scenario name is never read as a replacement pattern.
+	function changeTypeLine(template, id, property, value, scenario) {
+		return String(template)
+			.replace('{id}', function () { return String(id); })
+			.replace('{scenario}', function () { return String(scenario); })
+			.replace('{property}', function () { return String(property); })
+			.replace('{value}', function () { return String(value); });
+	}
+	// Is this row discarded by the change? A built-in row is kept only where BOTH types have it --
+	// anything else on the element is a stale value from some earlier type, and the new type's own
+	// comes from nodeBirthFields(). A custom property is the user's own data wherever it sits, so it
+	// is discarded only where its design does not apply to the new type.
+	function changeTypeDrops(spec, from, to) {
+		var toHas = spec.types.indexOf(to) >= 0;
+		return spec.custom ? !toHas : !(toHas && spec.types.indexOf(from) >= 0);
+	}
+	/**
+	 * **WHAT CHANGING NODE `n` TO `to` WOULD COST**, before anything is touched: `lost` is one line
+	 * per value the old type had and the new one cannot hold, Base first, then each scenario's
+	 * override of it; `meaning` is every control and rule that tests this node and would read its
+	 * number differently afterwards.
+	 */
+	function nodeTypeChangeReport(n, to) {
+		var pc = EngCalcs.pageConfig || {}, from = n.type, key = ovKey(n), lost = [], meaning = [];
+		typeOwnedNodeSpecs().forEach(function (spec) {
+			var v;
+			if (!changeTypeDrops(spec, from, to)) { return; }
+			// A stale built-in value is dropped quietly: it belonged to no type this node is.
+			if (!spec.custom && spec.types.indexOf(from) < 0) { return; }
+			v = spec.value ? spec.value(n) : n[spec.keys[0]];
+			if (changeTypeSays(spec, v)) {
+				lost.push(changeTypeLine(pc.lpn_change_type_line || '{id}: {property} {value}',
+					n.id, spec.label, changeTypeValueText(spec, v)));
+			}
+			scenarios.forEach(function (s) {
+				var ov = s.isBase ? null : s.overrides[key];
+				if (!ov) { return; }
+				spec.props.forEach(function (p) {
+					if (!Object.prototype.hasOwnProperty.call(ov, p) || ov[p] === undefined) { return; }
+					lost.push(changeTypeLine(pc.lpn_change_type_line_scenario || '{id}, in scenario {scenario}: {property} {value}',
+						n.id, spec.label, changeTypeValueText(spec, ov[p]), scenarioDisplayName(s)));
+				});
+			});
+		});
+		// **A CUSTOMER'S DEMAND LANDS ON A JUNCTION AND NOWHERE ELSE** (Task 247): demandRowsOf()
+		// adds it to a junction's own rows, and a tank or reservoir has none. The customer stays on
+		// the map and on its pipe; what is lost is its demand from every answer, so it is listed.
+		if (from === 'junction' && to !== 'junction') {
+			customerRowsOf(n.id).forEach(function (r) {
+				lost.push(changeTypeLine(pc.lpn_change_type_line || '{id}: {property} {value}',
+					n.id, pc.lpn_tool_add_meter || 'Customer', r.customer.id));
+			});
+		}
+		// **A CONTROL'S NUMBER IS A PRESSURE AT A JUNCTION AND A WATER LEVEL AT A TANK OR RESERVOIR**
+		// -- the line libAnnotateControl() draws, after EPANET (Net3's `LINK 335 OPEN IF NODE 1 BELOW
+		// 17.1`). Crossing that line leaves the sentence as written and changes what it says.
+		var crosses = (from === 'junction') !== (to === 'junction');
+		if (crosses) {
+			libControlsRead().forEach(function (c) {
+				if (c && c.condition && c.condition.kind === 'node' && c.condition.node === n.id) {
+					meaning.push(libControlText(c));
+				}
+			});
+		}
+		// A RULE names its object by kind (EPANET's [RULES] grammar, js/lpn-rules.js): a clause that
+		// says TANK about what is now a junction, or NODE across the pressure/level line, is listed.
+		var kw = { junction: 'JUNCTION', reservoir: 'RESERVOIR', tank: 'TANK' }[to];
+		(doc.rules || []).forEach(function (line) {
+			var t = String(line).replace(/;.*$/, '').trim().split(/\s+/), i, w;
+			for (i = 0; i + 1 < t.length; i++) {
+				if (t[i + 1] !== n.id) { continue; }
+				w = t[i].toUpperCase();
+				if ((w === 'NODE' && crosses) ||
+						((w === 'JUNCTION' || w === 'RESERVOIR' || w === 'TANK') && w !== kw)) {
+					meaning.push(String(line).trim());
+					return;
+				}
+			}
+		});
+		return { lost: lost, meaning: meaning };
+	}
+	// The change itself, on one node, in Base and in every scenario's overrides. No snapshot and no
+	// redraw: changeSelectedNodeType() takes one of each for the whole selection.
+	function applyNodeTypeChange(n, to) {
+		var from = n.type, key = ovKey(n), birth = nodeBirthFields(to), k;
+		typeOwnedNodeSpecs().forEach(function (spec) {
+			if (!changeTypeDrops(spec, from, to)) { return; }
+			spec.keys.forEach(function (sk) {
+				delete n[sk];   // base-write: the type is Base-owned, so what only the old type had goes from Base
+				if (n.tok) { delete n.tok[sk]; }
+			});
+			scenarios.forEach(function (s) {
+				var ov = s.isBase ? null : s.overrides[key];
+				if (!ov) { return; }
+				spec.props.forEach(function (p) { delete ov[p]; });
+				if (!Object.keys(ov).length) { delete s.overrides[key]; }
+			});
+		});
+		if (n.tok && !Object.keys(n.tok).length) { delete n.tok; }
+		n.type = to;
+		for (k in birth) {
+			if (Object.prototype.hasOwnProperty.call(birth, k) && n[k] === undefined) {
+				n[k] = birth[k];   // base-write: the new type's own values are born in Base, as addNode() writes them
+			}
+		}
+		// An imported reservoir states a head and no ground (Task 390). A junction or tank needs one,
+		// and gets it the way a drawn node does: the land surface where Settings says so, else the
+		// typed default.
+		if (n.elev === undefined && to !== 'reservoir') {
+			if (elevSourceIsDem()) { queueTerrainForNewNode(n.id); }
+			else { n.elev = settings.defaults.nodeElev; }
+		}
+	}
+	/**
+	 * **THE COMMAND**: every selected node that is not already `to` becomes one. Asks first, in the
+	 * page's own box, only when something would be lost or would change its meaning; Cancel leaves
+	 * the document exactly as it was, because nothing has been written before the answer.
+	 */
+	function changeSelectedNodeType(to) {
+		var pc = EngCalcs.pageConfig || {}, targets, lost = [], meaning = [], text, MAX = 20;
+		if (LPN_NODE_TYPES.indexOf(to) < 0) { return; }
+		targets = selectedRefs().filter(function (s) { return s.kind === 'node'; })
+			.map(function (s) { return nodeById(s.id); })
+			.filter(function (n) { return n && n.type !== to; });
+		if (!targets.length) { return; }
+		targets.forEach(function (n) {
+			var r = nodeTypeChangeReport(n, to);
+			lost = lost.concat(r.lost);
+			meaning = meaning.concat(r.meaning);
+		});
+		function capped(lines) {
+			if (lines.length <= MAX) { return lines; }
+			return lines.slice(0, MAX).concat([String(pc.lpn_change_type_more || 'And {n} more.')
+				.replace('{n}', String(lines.length - MAX))]);
+		}
+		function proceed() {
+			saveUndoSnapshot();
+			targets.forEach(function (n) { if (nodeById(n.id) === n) { applyNodeTypeChange(n, to); } });
+			// The symbol is the type, so the drawing is rebuilt; buildDom() puts the selection back.
+			buildDom();
+			refreshScenarioMarks();
+			refreshScenarioStatus();
+			refreshPaneIfOpen();
+			refreshPopupIfOpen();
+			scheduleSolve();
+			scheduleSave();
+		}
+		if (!lost.length && !meaning.length) { proceed(); return; }
+		text = [];
+		if (lost.length) { text.push([pc.lpn_change_type_lost || 'These values will be lost:'].concat(capped(lost)).join('\n')); }
+		if (meaning.length) {
+			text.push([pc.lpn_change_type_meaning || 'These controls and rules test this node, and will now read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.']
+				.concat(capped(meaning)).join('\n'));
+		}
+		askDialog({ kind: 'confirm', title: pc.lpn_change_type_menu || 'Change type',
+			ok: pc.lpn_change_type_ok || 'Change', text: text.join('\n\n') }, function (yes) {
+			if (yes) { proceed(); }
+		});
+	}
+	// The fly-out under Water: the three node types in the Insert order, each disabled where every
+	// selected node already is one. Empty-handed it still lists them, disabled, so the command can be
+	// found before it can be used.
+	function changeTypeRows() {
+		var pc = EngCalcs.pageConfig || {},
+			nodes = selectedRefs().filter(function (s) { return s.kind === 'node'; })
+				.map(function (s) { return nodeById(s.id); }).filter(Boolean),
+			names = { junction: pc.lpn_tool_add_junction || 'Junction',
+				reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank' };
+		return LPN_NODE_TYPES.map(function (t) {
+			return { icon: t, label: names[t],
+				disabled: !nodes.some(function (n) { return n.type !== t; }),
+				fn: function () { closeMenu(); changeSelectedNodeType(t); } };
+		});
 	}
 	// ---- The examples gallery (ROADMAP Task 314) ---------------------------------------------
 	//
@@ -41112,6 +41378,16 @@ var EngCalcs = EngCalcs || {};
 			{
 				icon: 'insert', label: pc.lpn_menu_insert || 'Insert',
 				submenu: insertAssetRows
+			},
+			// **CHANGE TYPE SITS UNDER INSERT** (Tom, 2026-10-05: *"a tool under Water or Tables to
+			// Change node type for any asset"*). Water, because the fly-out is the same list of asset
+			// types Insert offers, in the same order, and Water is where those types live. Not the
+			// Tables right-click: that menu is a spreadsheet's four (Tom, 2026-09-21), and a type
+			// change is not a cell operation. Not Edit either, which he did not name.
+			{
+				icon: 'retype', label: pc.lpn_change_type_menu || 'Change type',
+				tip: pc.lpn_change_type_tip,
+				submenu: changeTypeRows
 			},
 			{ separator: true },
 			{

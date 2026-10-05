@@ -1528,6 +1528,20 @@ $ec_lang['lpn_menu_project']='Water';
 // one exception, and it is exempt because it is a position in a run rather than a command.
 $ec_lang['lpn_menu_project_tip']='Everything specific to water network modeling (except the animation play controls)';
 $ec_lang['lpn_tables_menu']='Tables';
+// Water > Change type (Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables
+// to Change node type for any asset, where if it has information that can't be ported to the new
+// type, we alert and ask."*). The fly-out reuses lpn_tool_add_junction/_reservoir/_tank. The box it
+// asks in lists one line per value lost: {id} is the asset's ID, {property} a field label the
+// popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
+// dev/asset-type.md.
+$ec_lang['lpn_change_type_menu']='Change type';
+$ec_lang['lpn_change_type_tip']='Change the selected nodes into junctions, reservoirs, or tanks. Each keeps its ID, its place, its pipes, and every value the new type also has. If anything would be lost, you are asked first.';
+$ec_lang['lpn_change_type_ok']='Change';
+$ec_lang['lpn_change_type_lost']='These values will be lost:';
+$ec_lang['lpn_change_type_line']='{id}: {property} {value}';
+$ec_lang['lpn_change_type_line_scenario']='{id}, in scenario {scenario}: {property} {value}';
+$ec_lang['lpn_change_type_more']='And {n} more.';
+$ec_lang['lpn_change_type_meaning']='These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.';
 $ec_lang['lpn_tables_menu_tip']='View and edit assets in tables in bottom panel.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the
