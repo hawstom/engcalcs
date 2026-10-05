@@ -14,7 +14,7 @@
             "syn": "Restore (revert, return) to the original (initial, as-shipped, factory) values (state)."
         },
         "calc_set_units_tip": {
-            "english": "Sets the unit of every field at once. Non-destructive: the numbers you typed stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.",
+            "english": "Sets the unit of every field at once. Non-destructive: the numbers you entered stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.",
             "syn": "Changes the unit shown on every field at once (switches the whole page to that unit system). Does not change the input data."
         },
         "consent_accept": {
@@ -26,8 +26,8 @@
             "syn": "Allow (permit, accept) this and any later ask; do not ask (question) me again"
         },
         "consent_body": {
-            "english": "May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.",
-            "syn": "May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first."
+            "english": "May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.",
+            "syn": "May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first."
         },
         "consent_current_denied": {
             "english": "You refused this. We store nothing to limit logging for this browser profile.",
@@ -209,10 +209,6 @@
             "english": "Scale by world file or by the size of one pixel on the map",
             "syn": "World (Map Coordinates or Georeference) File for the image | gloss: world file"
         },
-        "lpn_backdrop_scale_entry_bad": {
-            "english": "Type one number for the size of one pixel on the map, or paste all six lines of a world file.",
-            "syn": "World (Map Coordinates or Georeference) File for the image | gloss: world file"
-        },
         "lpn_backdrop_scale_entry_prompt": {
             "english": "Enter the size of one pixel on the map, or paste the complete contents of the world file for the image",
             "syn": "World (Map Coordinates or Georeference) File for the image | gloss: world file; runtime: units appended"
@@ -230,23 +226,19 @@
             "syn": "Equal intervals rounded for a pretty legend or Pretty legend (rounded equal intervals)"
         },
         "lpn_ds_head_search_selected": {
-            "english": "What demand can the selection handle",
+            "english": "What demand scale can these junctions handle?",
             "syn": "What demand can the junctions you choose handle"
         },
         "lpn_ds_scope_tip": {
-            "english": "Scale the demand of the selection. Pressures are checked at the scaled demand.",
+            "english": "All junctions, or only those selected on the map. Pressures are checked at the scaled demand.",
             "syn": "Scale the demand at the junctions that you choose. Pressures are checked at the scaled demand."
-        },
-        "lpn_ds_search_note_selected": {
-            "english": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the selection keeps the given lowest pressure allowed.",
-            "syn": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the junctions that you choose keep the given lowest pressure allowed."
         },
         "lpn_examples_open": {
             "english": "Open",
             "syn": "Open, Open this example, Load, Load this example, Start with this one | layout: button; avoid: open as an adjective/state (something already open), not the imperative verb"
         },
         "lpn_ff_all": {
-            "english": "All",
+            "english": "All junctions",
             "syn": "All junctions | a pull-down option under Junctions to test; agrees with junctions, plural"
         },
         "lpn_ff_design_all": {
@@ -310,7 +302,7 @@
             "syn": "Fix something, Report a mistake, Tell us what is wrong, Send a correction, Suggest a fix | avoid: fix as fasten or attach; avoid: fix as prepare"
         },
         "lpn_help_icons": {
-            "english": "Toolbar key",
+            "english": "Toolbar",
             "syn": "Toolbar legend, Key to the toolbar icons, What each toolbar icon means, Toolbar help, Toolbar | avoid: a keyboard key or shortcut"
         },
         "lpn_help_walkthroughs": {
@@ -318,11 +310,11 @@
             "syn": "Walkthroughs, Guided tours, Step-by-step guides, Worked examples, or Tutorials"
         },
         "lpn_labels_col_after": {
-            "english": "After",
+            "english": "Aft.",
             "syn": "After, Suffix, Trailing text, Postfix | avoid: after in the sense of later in time"
         },
         "lpn_labels_col_before": {
-            "english": "Before",
+            "english": "Bef.",
             "syn": "Before, In front, In front of the value, Prefix, Leading text | avoid: before in the sense of earlier in time"
         },
         "lpn_labels_priority_node_tip": {
@@ -334,7 +326,7 @@
             "syn": "Data series, Sequence, Time series, Progression, Schedule, Variation profile"
         },
         "lpn_lock_break": {
-            "english": "Break their lock",
+            "english": "Break lock",
             "syn": "Break their lock, unlock the file, take over the file, release their hold on it, claim the file, override their claim | layout: button"
         },
         "lpn_menu_help": {
@@ -344,10 +336,6 @@
         "lpn_new_text": {
             "english": "Text",
             "syn": "Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words"
-        },
-        "lpn_profile_tip": {
-            "english": "Draw the ground and the hydraulic grade line along a path through the network.",
-            "syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network."
         },
         "lpn_profile_title": {
             "english": "Profile along a path",
@@ -382,7 +370,7 @@
             "syn": "The position where the key table (legend, map key — the box explaining the symbols) for node and link labels sits on the map. | avoid: legend as a myth or folk tale"
         },
         "lpn_settings_map_display": {
-            "english": "Map appearance",
+            "english": "Appearance",
             "syn": "How the map looks (appearance, style, the way it is drawn) — sizes, opacity, position."
         },
         "lpn_settings_sym_all": {
@@ -408,14 +396,6 @@
         "lpn_tool_zoom_extent": {
             "english": "Zoom to fit",
             "syn": "Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount"
-        },
-        "lpn_units_group_inputs": {
-            "english": "Input units",
-            "syn": "Units of inputs, or Units of what you enter"
-        },
-        "lpn_units_group_results": {
-            "english": "Results units",
-            "syn": "Units of results, or Units of the answers"
         },
         "lpn_units_length": {
             "english": "Length",

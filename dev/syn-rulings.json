@@ -8,8 +8,8 @@
             "answer": "OK."
         },
         "consent_body": {
-            "on": "May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.",
-            "syn": "",
+            "on": "May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.",
+            "syn": "May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.",
             "ruled": "2026-10-05",
             "answer": "Edited proposal."
         },

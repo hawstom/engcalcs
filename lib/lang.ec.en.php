@@ -100,7 +100,7 @@ $ec_lang['template_printable_subtitle']='Printable Subtitle';
 $ec_lang['consent_body']='May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_time_run_tip']='Solve this network at every hydraulic time step.';
-$ec_lang_syn['consent_body']='May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.';
+$ec_lang_syn['consent_body']='May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.';
 $ec_lang['consent_accept']='Allow this';
 $ec_lang_syn['consent_accept']='Allow (permit, accept) this ask (this request, this question)';
 $ec_lang['consent_accept_all']='Allow all';
@@ -1169,8 +1169,6 @@ $ec_lang['lpn_status_converted']='{n} values were rewritten into {unit}.';
 // English you used. While I like that you are thinking simple for translators, this should go in
 // _syn and the more natural in English."*). That is the routing rule stated on a real case: simple
 // English is for when an English reader would stumble, and here one would not.
-$ec_lang_syn['lpn_units_group_inputs']='Units of inputs, or Units of what you enter';
-$ec_lang_syn['lpn_units_group_results']='Units of results, or Units of the answers';
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
 $ec_lang['lpn_units_length']='Length';
@@ -1738,7 +1736,6 @@ $ec_lang['lpn_graphs_menu']='Graphs';
 // are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
 // permission $ec_lang_syn requires. Same text, correct array.
 $ec_lang['lpn_profile_title']='Profile along a path';
-$ec_lang_syn['lpn_profile_tip']='Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.';
 $ec_lang_syn['lpn_profile_title']='Profile or cross section along a path, route, or way';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
@@ -2737,7 +2734,6 @@ $ec_lang_syn['lpn_backdrop_scale_entry']='World (Map Coordinates or Georeference
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Enter the size of one pixel on the map, or paste the complete contents of the world file for the image';
 $ec_lang_syn['lpn_backdrop_scale_entry_prompt']='World (Map Coordinates or Georeference) File for the image | gloss: world file; runtime: units appended';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Enter one number for the size of one pixel on the map, or paste all six lines of a world file.';
-$ec_lang_syn['lpn_backdrop_scale_entry_bad']='World (Map Coordinates or Georeference) File for the image | gloss: world file';
 $ec_lang['lpn_backdrop_wld_bad']='This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.';
 $ec_lang_syn['lpn_backdrop_wld_bad']='World (Map Coordinates or Georeference) File for the image | gloss: world file';
 $ec_lang['lpn_backdrop_unreadable']='This picture cannot be shown by your web browser. Save it as a PNG or JPEG picture and add it again.';
@@ -3883,7 +3879,6 @@ $ec_lang_syn['lpn_ff_all']='All junctions | a pull-down option under Junctions t
 $ec_lang_syn['lpn_ff_selected']='Selected junctions | a pull-down option under Junctions to test; agrees with junctions, plural';
 $ec_lang_syn['lpn_ds_head_search_selected']='What demand can the junctions you choose handle';
 $ec_lang_syn['lpn_ds_scope_tip']='Scale the demand at the junctions that you choose. Pressures are checked at the scaled demand.';
-$ec_lang_syn['lpn_ds_search_note_selected']='Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the junctions that you choose keep the given lowest pressure allowed.';
 $ec_lang_syn['lpn_ff_design_off']='No design check | a pull-down option under Design check (effect on system); avoid: switched off, power off';
 $ec_lang_syn['lpn_ff_design_all']='All other junctions and all pipes | a pull-down option under Design check (effect on system); agrees with pipes and junctions together, plural';
 $ec_lang_syn['lpn_ff_design_selected']='The selected junctions and their pipes | a pull-down option under Design check (effect on system); agrees with pipes and junctions together, plural';
