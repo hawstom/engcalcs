@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 2338,
-        "delta_key_count": 110,
+        "expected_key_count": 2345,
+        "delta_key_count": 117,
         "exempt_key_count": 34,
         "exempt_keys": [
             "u_imgd",
@@ -742,6 +742,8 @@
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
         "lpn_copy_opened_unsaved": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
+        "lpn_engine_unavailable_why": "Valves that open and close on their own cannot be solved without the EPANET solver. {reason}",
+        "lpn_engine_needed_failed_why": "This network can only be solved by the EPANET solver. {reason}",
         "lpn_mode_add_chain": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
         "lpn_cp_allow_tip": "Allow only these characters:",
         "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
@@ -749,11 +751,16 @@
         "lpn_scenario_duration_tip": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
         "lpn_scenario_hyd_step_tip": "Leave blank to inherit from parent.",
         "lpn_time_scn_overrides": "Scenario overrides:",
+        "lpn_engine_failed_why": "{reason} Showing the built-in solver instead.",
         "lpn_settings_basemap_style": "Basemap style",
         "lpn_basemap_style_normal": "Normal",
         "lpn_basemap_style_muted": "Muted",
         "lpn_basemap_style_faded": "Faded",
         "lpn_basemap_style_grayscale": "Grayscale",
+        "lpn_time_no_engine_why": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}",
+        "lpn_time_engine_fetch_failed": "The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.",
+        "lpn_time_engine_start_failed": "The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.",
+        "lpn_time_engine_run_failed": "The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.",
         "lpn_saved_project": "Saved with the project",
         "lpn_saved_browser": "Saved in this browser",
         "lpn_saved_session": "Not saved",
@@ -854,6 +861,8 @@
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
         "lpn_copy_opened_unsaved": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
+        "lpn_engine_unavailable_why": "Valves that open and close on their own cannot be solved without the EPANET solver. {reason}",
+        "lpn_engine_needed_failed_why": "This network can only be solved by the EPANET solver. {reason}",
         "lpn_mode_add_chain": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
         "lpn_cp_allow_tip": "Allow only these characters:",
         "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
@@ -861,11 +870,16 @@
         "lpn_scenario_duration_tip": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
         "lpn_scenario_hyd_step_tip": "Leave blank to inherit from parent.",
         "lpn_time_scn_overrides": "Scenario overrides:",
+        "lpn_engine_failed_why": "{reason} Showing the built-in solver instead.",
         "lpn_settings_basemap_style": "Basemap style",
         "lpn_basemap_style_normal": "Normal",
         "lpn_basemap_style_muted": "Muted",
         "lpn_basemap_style_faded": "Faded",
         "lpn_basemap_style_grayscale": "Grayscale",
+        "lpn_time_no_engine_why": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}",
+        "lpn_time_engine_fetch_failed": "The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.",
+        "lpn_time_engine_start_failed": "The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.",
+        "lpn_time_engine_run_failed": "The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.",
         "lpn_saved_project": "Saved with the project",
         "lpn_saved_browser": "Saved in this browser",
         "lpn_saved_session": "Not saved",
@@ -1401,6 +1415,38 @@
                 }
             }
         },
+        "lpn_engine_unavailable_why": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "EPANET حل کار حاصل نہیں ہو سکا، جو خود بخود کھلنے اور بند ہونے والے والوز کو حل کرتا ہے۔ ایک بار انٹرنیٹ سے جڑیں اور یہ اس کے بعد اس آلے پر محفوظ رہتا ہے۔",
+                    "english": "Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "آپ کے بناتے وقت EPANET حل کار لوڈ ہو رہا ہے۔ مکمل لوڈ ہونے پر نتائج دستیاب ہوں گے۔",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                }
+            }
+        },
+        "lpn_engine_needed_failed_why": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_needed_failed",
+                    "value": "EPANET حل کار ابھی تک لوڈ نہیں ہوا، لوڈ نہیں ہو سکتا، اور یہ نیٹ ورک صرف اسی سے حل ہو سکتا ہے۔ جب آپ انٹرنیٹ سے جڑیں گے تو یہ لوڈ ہو جائے گا۔",
+                    "english": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_needs_epanet",
+                    "value": "یہ والوز خود بخود کھلتے اور بند ہوتے ہیں، اور صرف EPANET حل کار ہی انہیں شمار کر سکتا ہے۔ EPANET حل کار لوڈ نہیں ہو سکا، اس لیے یہ نتائج غائب ہیں:",
+                    "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
         "lpn_mode_add_chain": {
             "reason": "missing",
             "current_value": null,
@@ -1513,6 +1559,22 @@
                 }
             }
         },
+        "lpn_engine_failed_why": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_failed",
+                    "value": "EPANET حل کار لوڈ نہیں ہو سکا۔ اس کی بجائے بلٹ ان حل کار دکھایا جا رہا ہے۔",
+                    "english": "The EPANET solver could not be loaded. Showing the built-in solver instead."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_valve_route",
+                    "value": "EPANET حل کار سے حل کیا گیا، کیونکہ یہ والوز خود بخود کھلتے اور بند ہوتے ہیں:",
+                    "english": "Solved with the EPANET solver, because these valves open and close on their own:"
+                }
+            }
+        },
         "lpn_settings_basemap_style": {
             "reason": "missing",
             "current_value": null,
@@ -1590,6 +1652,70 @@
                     "key": "lpn_settings_map_display",
                     "value": "ظاہری شکل",
                     "english": "Appearance"
+                }
+            }
+        },
+        "lpn_time_no_engine_why": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_no_engine",
+                    "value": "بلٹ اِن حل کار ایک وقت میں ایک لمحہ نکالتا ہے، اس لیے یہ صرف {time} پر نیٹ ورک ہے: ہر پیٹرن اسی لمحے پر پڑھا جاتا ہے، اور ہر ٹینک بھرنے اور خالی ہونے کے بجائے اب بھی اپنی ابتدائی سطح پر بیٹھا ہے۔ EPANET حل کار حاصل کرنے کے لیے ایک بار انٹرنیٹ سے جڑیں، جو وقتی دورانیے کی سمولیشن چلاتا ہے۔",
+                    "english": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation."
+                },
+                "next_translated": {
+                    "key": "lpn_time_slider",
+                    "value": "سمیولیشن کا گزرا ہوا وقت",
+                    "english": "Elapsed simulation time"
+                }
+            }
+        },
+        "lpn_time_engine_fetch_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_no_engine",
+                    "value": "بلٹ اِن حل کار ایک وقت میں ایک لمحہ نکالتا ہے، اس لیے یہ صرف {time} پر نیٹ ورک ہے: ہر پیٹرن اسی لمحے پر پڑھا جاتا ہے، اور ہر ٹینک بھرنے اور خالی ہونے کے بجائے اب بھی اپنی ابتدائی سطح پر بیٹھا ہے۔ EPANET حل کار حاصل کرنے کے لیے ایک بار انٹرنیٹ سے جڑیں، جو وقتی دورانیے کی سمولیشن چلاتا ہے۔",
+                    "english": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation."
+                },
+                "next_translated": {
+                    "key": "lpn_time_slider",
+                    "value": "سمیولیشن کا گزرا ہوا وقت",
+                    "english": "Elapsed simulation time"
+                }
+            }
+        },
+        "lpn_time_engine_start_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_no_engine",
+                    "value": "بلٹ اِن حل کار ایک وقت میں ایک لمحہ نکالتا ہے، اس لیے یہ صرف {time} پر نیٹ ورک ہے: ہر پیٹرن اسی لمحے پر پڑھا جاتا ہے، اور ہر ٹینک بھرنے اور خالی ہونے کے بجائے اب بھی اپنی ابتدائی سطح پر بیٹھا ہے۔ EPANET حل کار حاصل کرنے کے لیے ایک بار انٹرنیٹ سے جڑیں، جو وقتی دورانیے کی سمولیشن چلاتا ہے۔",
+                    "english": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation."
+                },
+                "next_translated": {
+                    "key": "lpn_time_slider",
+                    "value": "سمیولیشن کا گزرا ہوا وقت",
+                    "english": "Elapsed simulation time"
+                }
+            }
+        },
+        "lpn_time_engine_run_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_no_engine",
+                    "value": "بلٹ اِن حل کار ایک وقت میں ایک لمحہ نکالتا ہے، اس لیے یہ صرف {time} پر نیٹ ورک ہے: ہر پیٹرن اسی لمحے پر پڑھا جاتا ہے، اور ہر ٹینک بھرنے اور خالی ہونے کے بجائے اب بھی اپنی ابتدائی سطح پر بیٹھا ہے۔ EPANET حل کار حاصل کرنے کے لیے ایک بار انٹرنیٹ سے جڑیں، جو وقتی دورانیے کی سمولیشن چلاتا ہے۔",
+                    "english": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation."
+                },
+                "next_translated": {
+                    "key": "lpn_time_slider",
+                    "value": "سمیولیشن کا گزرا ہوا وقت",
+                    "english": "Elapsed simulation time"
                 }
             }
         },

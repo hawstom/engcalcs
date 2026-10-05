@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**3 still to read on master**, of 110 untranslated keys, of 2338 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**10 still to read on master**, of 117 untranslated keys, of 2345 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -94,7 +94,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (110, 3 to read @@ NEEDS RULING)
+## lpn_  (117, 10 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -276,9 +276,18 @@ never edits a synonym.
 - **`lpn_ds_title`**
   > Demand scaling
   _Ruled OK 2026-10-03._
+- **`lpn_engine_failed_why`**
+  > {reason} Showing the built-in solver instead.
+  @@ NEEDS RULING
+- **`lpn_engine_needed_failed_why`**
+  > This network can only be solved by the EPANET solver. {reason}
+  @@ NEEDS RULING
 - **`lpn_engine_pda_route`**
   > Solved with the EPANET solver, because the demand model is pressure driven.
   _Ruled OK 2026-10-05._
+- **`lpn_engine_unavailable_why`**
+  > Valves that open and close on their own cannot be solved without the EPANET solver. {reason}
+  @@ NEEDS RULING
 - **`lpn_inp_drop_pressure_unit`**
   > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
   _Ruled OK 2026-10-05._
@@ -417,6 +426,18 @@ never edits a synonym.
 - **`lpn_sysflow_title`**
   > Flow balance
   _Ruled OK 2026-10-03._
+- **`lpn_time_engine_fetch_failed`**
+  > The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.
+  @@ NEEDS RULING
+- **`lpn_time_engine_run_failed`**
+  > The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.
+  @@ NEEDS RULING
+- **`lpn_time_engine_start_failed`**
+  > The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.
+  @@ NEEDS RULING
+- **`lpn_time_no_engine_why`**
+  > The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}
+  @@ NEEDS RULING
 - **`lpn_time_scn_overrides`**
   > Scenario overrides:
   _Ruled OK 2026-10-05._
@@ -431,7 +452,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**10 still to read**, of 16 new keys across 10 unmerged branch(es).
+**5 still to read**, of 11 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -446,7 +467,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/engine-prefetch (`3194c30d`) — adds no English strings
 
-### feat/find-source (`8433832d`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/find-source (`e999a378`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_find_scope_source`**
   > Source
@@ -496,20 +517,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Statistic
   _Ruled OK 2026-10-05._
 
-### fix/engine-failed (`1eb1d2bc`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_engine_unavailable_fetch`**
-  > The download of the EPANET solver failed, so valves that open and close on their own cannot be solved. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.
-  @@ NEEDS RULING
-- **`lpn_time_engine_fetch_failed`**
-  > The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.
-  @@ NEEDS RULING
-- **`lpn_time_engine_run_failed`**
-  > The EPANET run failed. That is a defect in this page; use the Something wrong here? link to report it
-  @@ NEEDS RULING
-- **`lpn_time_engine_start_failed`**
-  > The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.
-  @@ NEEDS RULING
-- **`lpn_time_no_engine_why`**
-  > The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}
-  @@ NEEDS RULING
+### feat/transport-ends (`af371047`) — adds no English strings
