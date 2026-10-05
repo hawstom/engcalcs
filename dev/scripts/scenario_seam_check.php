@@ -180,11 +180,15 @@ foreach ($lines as $i => $line) {
 // holds, and nothing on screen says so until that alternative is used. So a read or write of
 // `.overrides` / `.values` (not the `Object.values(` call) is refused outside the functions named
 // here; everything else goes through eachOverrideMap() or the resolved readers.
-$ovAllowed = ['eachOverrideMap', 'setOverride', 'clearOverride', 'overrideCount', 'alternativesOf',
-    'resolveThroughAlternatives', 'alternativeOverrides', 'migrateOverrideKeys', 'applySaved',
-    // The hot readers, until they read resolvedOverrides() (stage 4).
-    'coordOverridesOf', 'linkEndIsMoved', 'effective', 'hasOverride', 'paneFilterOverride',
-    'demandOverrideRows', 'hasDisplayedOverride'];
+$ovAllowed = [
+    // the walk, and the resolver that every hot reader goes through
+    'eachOverrideMap', 'resolvedOverrides', 'buildResolvedOverrides', 'localOverrideMap',
+    // the one write seam, and the scenario's own count beside its name
+    'setOverride', 'clearOverride', 'overrideCount',
+    // the derived (Basic mode) alternatives, read off each scenario's own map
+    'alternativesOf', 'resolveThroughAlternatives', 'alternativeOverrides',
+    // opening a file: the old key migration, and the guarantee that every scenario has a map
+    'migrateOverrideKeys', 'applySaved'];
 $ovBad = [];
 $fn = '';
 foreach ($lines as $i => $line) {

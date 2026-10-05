@@ -3823,7 +3823,7 @@ var EngCalcs = EngCalcs || {};
 	 * which changes what every coordinate in the document MEANS -- so georefWrite() maps the
 	 * overrides through the same transform, and georefCancel() puts them back.
 	 */
-	function coordOverridesOf(n) { return (n && activeScenario().overrides[ovKey(n)]) || null; }
+	function coordOverridesOf(n) { return (n && resolvedOverrides(activeScenario())[ovKey(n)]) || null; }
 	function nodeDrawX(n) {
 		var ov = coordOverridesOf(n);
 		return (ov && typeof ov.x === 'number') ? inwardX(ov.x) : (n ? n.x : undefined);
@@ -3846,7 +3846,7 @@ var EngCalcs = EngCalcs || {};
 	// Auto length differs from the one Base stores. Keyed through ovKeyFor(), never by spelling the
 	// prefix (Task 324).
 	function linkEndIsMoved(l) {
-		var ovs = activeScenario().overrides;
+		var ovs = resolvedOverrides(activeScenario());
 		function moved(id) {
 			var ov = ovs[ovKeyFor('node', id)];
 			return !!(ov && (typeof ov.x === 'number' || typeof ov.y === 'number'));
@@ -4177,7 +4177,7 @@ var EngCalcs = EngCalcs || {};
 		// lines, so no other property pays for it; the drawing does not come through here at all,
 		// it reads nodeDrawX/nodeDrawY, which skip the outward conversion entirely.
 		if (LPN_COORD_PROP[prop]) {
-			var oc = activeScenario().overrides[ovKey(el)];
+			var oc = resolvedOverrides(activeScenario())[ovKey(el)];
 			if (oc && typeof oc[prop] === 'number') { return oc[prop]; }
 			return prop === 'y' ? outwardY(el.y) : outwardX(el.x);
 		}
@@ -4185,7 +4185,7 @@ var EngCalcs = EngCalcs || {};
 		// fresh copy of the effective rows, never the stored array, so no reader can edit an
 		// override by holding what it was handed.
 		if (prop === 'demands') { return ownDemandRows(el); }
-		var ov = activeScenario().overrides[ovKey(el)], tid, t;
+		var ov = resolvedOverrides(activeScenario())[ovKey(el)], tid, t;
 		// Row 0's base IS the breakdown's first row once the scenario owns the whole list.
 		if (prop === 'demand' && ov && Array.isArray(ov.demands) && ov.demands.length) { return ov.demands[0].base; }
 		if (ov && Object.prototype.hasOwnProperty.call(ov, prop)) { return ov[prop]; }
@@ -4573,8 +4573,10 @@ var EngCalcs = EngCalcs || {};
 		return !!(LPN_OVERRIDABLE[elGroup(el)] || {})[prop];
 	}
 	function inBaseScenario() { return !!activeScenario().isBase; }
+	// **THE MARKER IS "LOCAL WHERE THIS SCENARIO WRITES"**: in its own values, or in the stored
+	// alternative it names for the property's category. An inherited value is not marked.
 	function hasOverride(el, prop) {
-		var ov = activeScenario().overrides[ovKey(el)];
+		var ov = localOverrideMap(activeScenario(), categoryOf(prop, elGroup(el)))[ovKey(el)];
 		return !!(ov && Object.prototype.hasOwnProperty.call(ov, prop));
 	}
 	// Base's OWN value for a property, ignoring whatever the active scenario says -- what the
@@ -4596,6 +4598,7 @@ var EngCalcs = EngCalcs || {};
 		// override evaporates on the next save, undo snapshot or file write. At the SEAM rather than
 		// the call site, so every future blank-capable field is covered without anyone remembering.
 		scn.overrides[key][prop] = (value === undefined) ? null : value;
+		touchTree('setOverride');
 	}
 	function clearOverride(el, prop) {
 		var scn = activeScenario(), key = ovKey(el), ov = scn.overrides[key];
@@ -4604,6 +4607,7 @@ var EngCalcs = EngCalcs || {};
 		// An empty map is dropped rather than left behind: an element with an empty object still in
 		// the map reads as "this element is touched here", the claim the marker exists to make.
 		if (!Object.keys(ov).length) { delete scn.overrides[key]; }
+		touchTree('clearOverride');
 	}
 	// THE ONE WRITE SEAM every property editor goes through. In Base it writes the element (which
 	// IS the propagation -- there is no push upward in the delta model); in a scenario it records
@@ -4845,6 +4849,48 @@ var EngCalcs = EngCalcs || {};
 		if (site !== undefined && site === treeTouchSkip) { return; }
 		treeEpoch++;
 	}
+	// The cache, rebuilt whole when the epoch or either object identity moved. Read-only: nothing
+	// that reads an answer from it may write into it.
+	var treeCache = null;
+	function treeState() {
+		if (!treeCache || treeCache.epoch !== treeEpoch || treeCache.doc !== doc || treeCache.scenarios !== scenarios) {
+			treeCache = { epoch: treeEpoch, doc: doc, scenarios: scenarios, explicit: treeIsStored(), ov: {}, st: {} };
+		}
+		return treeCache;
+	}
+	// Whether anything about the tree is stored: a shared alternative, a calculation set, or a
+	// scenario naming one or naming a parent. Measured, never remembered.
+	function treeIsStored() {
+		if ((doc.alternatives || []).length || (doc.calcSets || []).length) { return true; }
+		return scenarios.some(function (s) { return s.parent !== undefined || s.alternatives !== undefined || s.calc !== undefined; });
+	}
+	function isExplicitTree() { return treeState().explicit; }
+	/**
+	 * **THE OVERRIDES A SCENARIO SHOWS**, as one {ovKey: {prop: value}} map: its own, then what it
+	 * inherits through each category's chain. **IN A PROJECT WITH NO STORED TREE IT IS THE
+	 * SCENARIO'S OWN `overrides` OBJECT**, so every hot reader moved onto it pays one comparison and
+	 * reads exactly what it read before. Read-only, always.
+	 */
+	function resolvedOverrides(scn) {
+		var c;
+		if (!scn) { return {}; }
+		c = treeState();
+		if (!c.explicit) { return scn.overrides || {}; }
+		if (!c.ov[scn.id]) { c.ov[scn.id] = buildResolvedOverrides(scn); }
+		return c.ov[scn.id];
+	}
+	// The settings a scenario holds and inherits, as one sparse mirror with the demand multiplier
+	// and the two times folded into their mirror paths, or null. Asked only when the tree is stored.
+	function resolvedSettingsBlock(scn) {
+		var c = treeState();
+		if (!scn || scn.isBase) { return null; }
+		if (!Object.prototype.hasOwnProperty.call(c.st, scn.id)) { c.st[scn.id] = buildResolvedSettings(scn); }
+		return c.st[scn.id];
+	}
+	function buildResolvedOverrides(scn) { return scn.overrides || {}; }
+	function buildResolvedSettings(scn) { return plainObject(scn.settings) ? scn.settings : null; }
+	// The override map an edit of this category lands in, for this scenario: its own.
+	function localOverrideMap(scn, cat) { return (scn && scn.overrides) || {}; }
 	/**
 	 * **EVERY OVERRIDE MAP IN THE DOCUMENT**, for the maintenance that must reach all of them: an
 	 * element renamed or deleted, a unit converted, a pattern, curve, type or fittings list renamed,
@@ -5066,6 +5112,7 @@ var EngCalcs = EngCalcs || {};
 	// view -- asks this, so a harness that blinds it (dev/lpn-spike/scenario-settings-routing-harness.js)
 	// gets back the page exactly as it was before any reader was routed.
 	function scenarioSettingsBlock(scn) {
+		if (scn && !scn.isBase && isExplicitTree()) { return resolvedSettingsBlock(scn); }
 		return (scn && !scn.isBase && plainObject(scn.settings)) ? scn.settings : null;
 	}
 	function scenarioHasElsewhereSetting(scn) {
@@ -5077,6 +5124,8 @@ var EngCalcs = EngCalcs || {};
 	function scenarioSettingSource(scn, p) {
 		var block = scenarioSettingsBlock(scn);
 		if (!scn || scn.isBase) { return null; }
+		// The resolved block already holds the multiplier and the two times, folded in.
+		if (isExplicitTree()) { return block; }
 		if (((p[0] === 'settings' && (p.length === 1 || p[1] === 'hydraulics')) || p[0] === 'times') &&
 			scenarioHasElsewhereSetting(scn)) { return scenarioSettingTree(scn); }
 		return block;
@@ -5116,6 +5165,7 @@ var EngCalcs = EngCalcs || {};
 		var p = settingPath(path), node, i;
 		if (!scn || scn.isBase || LPN_SETTING_ROOTS.indexOf(p[0]) < 0) { return false; }
 		if (!categoryOfSetting(p) || settingHasOtherHome(p)) { return false; }
+		touchTree('setScenarioSetting');
 		if (value === undefined) { settingDelete(scn, p); return true; }
 		scn.settings = plainObject(scn.settings) ? scn.settings : {};
 		node = scn.settings;
@@ -5328,6 +5378,7 @@ var EngCalcs = EngCalcs || {};
 			dm = (settings.hydraulics || {}).demandMultiplier;
 		if (typeof dm === 'number' && isFinite(dm)) { s.demandMultiplier = dm; }
 		scenarios.push(s);
+		touchTree('createScenario');
 		project.activeScenario = s.id;
 		applyScenarioChange();
 		return s;
@@ -5336,6 +5387,7 @@ var EngCalcs = EngCalcs || {};
 		var s = scenarioById(id), from = activeScenario();
 		if (!s || s.isBase) { return; }
 		scenarios = scenarios.filter(function (x) { return x.id !== id; });
+		touchTree('deleteScenario');
 		if (project.activeScenario === id) { project.activeScenario = baseScenario().id; }
 		applyScenarioChange();
 		followScenarioView(from, activeScenario());
@@ -24364,7 +24416,7 @@ var EngCalcs = EngCalcs || {};
 	// not met is compared against "no override", so an override written into a new scenario IS an
 	// edit; a scenario that has gone is simply not asked about.
 	function paneFilterOverride(s, key) {
-		return JSON.stringify((s.overrides && s.overrides[key]) || null);
+		return JSON.stringify(resolvedOverrides(s)[key] || null);
 	}
 	function paneFilterFingerprint(el) {
 		var key = ovKey(el), ov = {};
@@ -33875,6 +33927,7 @@ var EngCalcs = EngCalcs || {};
 		baseScenario().overrides = {}; // Base is canon and has no overrides, by definition
 		sanitizeScenarioTimes();
 		sanitizeScenarioSettings();
+		touchTree('applySaved');
 		if (!scenarios.some(function (s) { return s.id === project.activeScenario; })) { project.activeScenario = baseScenario().id; }
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
 		// The customers (Task 247). A file written before they existed has none, and every
@@ -47995,6 +48048,7 @@ var EngCalcs = EngCalcs || {};
 				// these three rows unable to express their own default.
 				else if (isFinite(+t) && (o.allowZero ? +t >= 0 : +t > 0)) { h[key] = +t; }
 				else { input.value = h[key] === undefined ? '' : String(h[key]); return; }
+				if (o.perScenario) { touchTree('demandMultiplier'); }
 				if (key === 'emitterExponent') { settings.emitterExponent = settings.hydraulics[key] === undefined ? 0.5 : settings.hydraulics[key]; }
 				// The scenario menu shows an override COUNT beside every name, and this row can now
 				// change it. Refreshed here rather than left to the next scenario switch, so the
@@ -57514,6 +57568,7 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) { wasAt[n.id] = nodeDrawX(n) + ',' + nodeDrawY(n); });
 		doc = snap.state.doc;
 		scenarios = snap.state.scenarios;
+		touchTree('restoreUndoSnapshot');
 		// The fields only Delete network's snapshot carries (see deleteNetwork()). Assigned before
 		// the comparisons below, which then read the snapshot's own coords and basemap anyway.
 		var prevBasemap = project.basemap, prevCoords = project.coords;
@@ -57827,7 +57882,7 @@ var EngCalcs = EngCalcs || {};
 	// The stored override rows, or null. The live array: callers that hand rows onward copy them.
 	function demandOverrideRows(n) {
 		if (!n || inBaseScenario()) { return null; }
-		var ov = activeScenario().overrides[ovKey(n)];
+		var ov = resolvedOverrides(activeScenario())[ovKey(n)];
 		return (ov && Array.isArray(ov.demands) && ov.demands.length) ? ov.demands : null;
 	}
 	// A row copied key for key, its token bag included, so a Base row copied into a scenario and
@@ -58219,6 +58274,7 @@ var EngCalcs = EngCalcs || {};
 		var raw = String(text === undefined || text === null ? '' : text).trim();
 		if (!s || s.isBase || LPN_SCENARIO_TIME_KEYS.indexOf(key) < 0) { return false; }
 		if (!scenarioTimeTextOk(key, raw)) { return false; }
+		touchTree('setScenarioTime');
 		if (raw === '') {
 			if (s.times) {
 				delete s.times[key];
@@ -60004,7 +60060,7 @@ var EngCalcs = EngCalcs || {};
 		return fields.some(function (f) { return !!shown[f]; });
 	}
 	function hasDisplayedOverride(el) {
-		var ov = activeScenario().overrides[ovKey(el)];
+		var ov = resolvedOverrides(activeScenario())[ovKey(el)];
 		if (!ov) { return false; }
 		return Object.keys(ov).some(function (p) { return overrideIsDisplayed(el, p); });
 	}
@@ -63604,6 +63660,7 @@ var EngCalcs = EngCalcs || {};
 			if (raw !== '' && !(isFinite(num) && num > 0)) { input.value = was; return; }
 			saveUndoSnapshot();
 			if (raw === '') { delete calcTargetOf(s).demandMultiplier; } else { calcTargetOf(s).demandMultiplier = num; }
+			touchTree('demandMultiplier');
 		} else {
 			if (!scenarioTimeTextOk(key, raw)) { input.value = was; return; }
 			saveUndoSnapshot();
