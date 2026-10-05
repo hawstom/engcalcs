@@ -172,6 +172,38 @@ foreach ($lines as $i => $line) {
     foreach ($found as $f) { $bad[] = ['line' => $i + 1, 'expr' => trim($f), 'text' => trim($line)]; }
 }
 
+// ---- 2c. Override maps are walked by a named few, and maintenance goes through eachOverrideMap() ---
+//
+// Since the scenario tree is stored (dev/scenario-alternatives.md, stage 4), an override lives in
+// two kinds of map: a scenario's own `overrides` and a stored alternative's `values`. A rename, a
+// purge or a unit conversion that walks `scenarios` alone strands every value a shared alternative
+// holds, and nothing on screen says so until that alternative is used. So a read or write of
+// `.overrides` / `.values` (not the `Object.values(` call) is refused outside the functions named
+// here; everything else goes through eachOverrideMap() or the resolved readers.
+$ovAllowed = ['eachOverrideMap', 'setOverride', 'clearOverride', 'overrideCount', 'alternativesOf',
+    'resolveThroughAlternatives', 'alternativeOverrides', 'migrateOverrideKeys', 'applySaved',
+    // The hot readers, until they read resolvedOverrides() (stage 4).
+    'coordOverridesOf', 'linkEndIsMoved', 'effective', 'hasOverride', 'paneFilterOverride',
+    'demandOverrideRows', 'hasDisplayedOverride'];
+$ovBad = [];
+$fn = '';
+foreach ($lines as $i => $line) {
+    if (preg_match('/^\tfunction (\w+)\(/', $line, $fm)) { $fn = $fm[1]; }
+    if (preg_match('/^\s*(\/\/|\*|\/\*)/', $line)) { continue; }
+    $code = preg_replace('/\s\/\/.*$/', '', $line);
+    if (!preg_match('/\.(overrides|values)\b(?!\s*\()/', $code)) { continue; }
+    if (in_array($fn, $ovAllowed, true)) { continue; }
+    $ovBad[] = ($i + 1) . ' (in ' . ($fn === '' ? 'top level' : $fn . '()') . '): ' . trim($line);
+}
+if ($ovBad) {
+    fwrite(STDERR, "FAIL: an override map is walked outside the named functions:\n");
+    foreach ($ovBad as $b) { fwrite(STDERR, "  js/looped-network.js:$b\n"); }
+    fwrite(STDERR, "\nA walk of `scenarios` alone misses every stored alternative's values. Walk every map\n");
+    fwrite(STDERR, "with eachOverrideMap(fn), or read one scenario's with resolvedOverrides(scn). If a new\n");
+    fwrite(STDERR, "function genuinely owns a map, add it to \$ovAllowed in this script with its reason.\n");
+    exit(1);
+}
+
 printf("Scenario write seam — %d group(s) (%s) and %d overridable propert(ies) parsed from LPN_OVERRIDABLE: %s\n",
     count($groups), implode(', ', $groups), count($props), implode(', ', $props));
 printf("  demand list stored as %s (LPN_DEMANDS_STORAGE)\n", implode(', ', $dfields));

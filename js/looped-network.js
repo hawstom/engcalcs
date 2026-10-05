@@ -4668,14 +4668,11 @@ var EngCalcs = EngCalcs || {};
 
 	function overrideCountForElement(key) {
 		var total = 0;
-		scenarios.forEach(function (s) {
-			if (s.isBase || !s.overrides[key]) { return; }
-			total += Object.keys(s.overrides[key]).length;
-		});
+		eachOverrideMap(function (map) { if (map[key]) { total += Object.keys(map[key]).length; } }, null, true);
 		return total;
 	}
 	function purgeOverrides(key) {
-		scenarios.forEach(function (s) { delete s.overrides[key]; });
+		eachOverrideMap(function (map) { delete map[key]; });
 	}
 
 	// ---- SCENARIO ALTERNATIVES: BENTLEY'S LAYER, DERIVED (dev/scenario-alternatives.md) --------
@@ -4825,6 +4822,46 @@ var EngCalcs = EngCalcs || {};
 			if (v) { Object.keys(v).forEach(function (p) { out[p] = v[p]; }); }
 		});
 		return Object.keys(out).length ? out : undefined;
+	}
+
+	// ---- SCENARIO TREE: STORED ALTERNATIVES, CALCULATION SETS, SCENARIO PARENTS -----------------
+	//
+	// Stages 4 and 5 of dev/scenario-alternatives.md. **NOTHING HERE IS WRITTEN EXCEPT BY AN
+	// EXPLICIT ACT** (share, name, reparent, set a scenario's parent), and a project that holds no
+	// such act is read exactly as before: isExplicitTree() false sends every reader down today's
+	// code. The stored shape:
+	//   scenario: {..., parent?: scenario id (absent = Base), alternatives?: {category: id}, calc?: id}
+	//   doc.alternatives: [{id, category, name, parent: null | id, values: {ovKey: {prop: v}}, settings: {mirror}}]
+	//   doc.calcSets: [{id, name, parent: null | id, settings: {mirror}, demandMultiplier?, times?}]
+	// A stored id never holds ':' (the derived ones are 's1:demand', 'base:demand').
+	//
+	// **THE EPOCH.** Every write to anything the resolver reads bumps it (touchTree()), and the
+	// read-only caches below are rebuilt lazily when it moves -- or when `doc` or `scenarios` is a
+	// different object from the one they were built from, which is the guard for the two places
+	// that swap the whole document (open and undo). `site` names the caller so a harness can skip
+	// exactly one bump and prove the cache then goes stale (treeTouchSkip).
+	var treeEpoch = 0, treeTouchSkip = null;
+	function touchTree(site) {
+		if (site !== undefined && site === treeTouchSkip) { return; }
+		treeEpoch++;
+	}
+	/**
+	 * **EVERY OVERRIDE MAP IN THE DOCUMENT**, for the maintenance that must reach all of them: an
+	 * element renamed or deleted, a unit converted, a pattern, curve, type or fittings list renamed,
+	 * a valve type changed. Calls fn(map, owner) for every scenario's own `overrides` and every
+	 * stored alternative's `values` -- one shape, {ovKey: {prop: value}}. `src` walks a serialized
+	 * project instead of the live one (File, Convert as). `readOnly` says the walk changes nothing,
+	 * so the resolver's cache survives it; otherwise it is bumped. dev/scripts/scenario_seam_check.php
+	 * refuses `.overrides` / `.values` outside a named list of functions, so a new walk comes here.
+	 */
+	function eachOverrideMap(fn, src, readOnly) {
+		var scns = src ? (src.scenarios || []) : scenarios,
+			alts = src ? (src.alternatives || []) : (doc.alternatives || []);
+		// Base included: it holds none by definition, and a walk that skipped it would be a second
+		// rule about Base to keep in step with applySaved()'s.
+		scns.forEach(function (s) { if (s && plainObject(s.overrides)) { fn(s.overrides, s); } });
+		alts.forEach(function (a) { if (a && plainObject(a.values)) { fn(a.values, a); } });
+		if (!src && !readOnly) { touchTree('eachOverrideMap'); }
 	}
 
 	// ---- SETTINGS IN SCENARIOS: PRESENTATION AND CALCULATION (dev/scenario-alternatives.md) ----
@@ -5754,22 +5791,21 @@ var EngCalcs = EngCalcs || {};
 		var hits = 0, touched = 0;
 		// The one place the scope is applied, to both the count and the delete -- so a confirm can
 		// never promise a different blast radius from the one that happens.
-		function scopedKeys(s) { return key ? (s.overrides[key] ? [key] : []) : Object.keys(s.overrides); }
-		scenarios.forEach(function (s) {
-			if (s.isBase) { return; }
+		function scopedKeys(map) { return key ? (map[key] ? [key] : []) : Object.keys(map); }
+		eachOverrideMap(function (map) {
 			var any = false;
 			// Walks the map by KEY and matches on the property NAME only -- deliberately group-blind,
 			// because no property in pushSpecList() exists on both groups (`active` is the only name
 			// LPN_OVERRIDABLE shares, and it is not pushable). Task 324.
-			scopedKeys(s).forEach(function (k) {
+			scopedKeys(map).forEach(function (k) {
 				active.forEach(function (spec) {
 					(spec.ovProps || [spec.prop]).forEach(function (p) {
-						if (Object.prototype.hasOwnProperty.call(s.overrides[k], p)) { hits++; any = true; }
+						if (Object.prototype.hasOwnProperty.call(map[k], p)) { hits++; any = true; }
 					});
 				});
 			});
 			if (any) { touched++; }
-		});
+		}, null, true);
 		if (!hits) { tellNotice(pc.lpn_scenario_push_none || 'No scenario overrides Base for any of these properties, so nothing would change. Nothing is thrown away.'); return; }
 		// NAMES the properties as well as counting them, and NAMES THE ELEMENT when scoped to one --
 		// reusing lpn_field_id ("ID") rather than minting a key, per the whole-label reuse rule.
@@ -5781,13 +5817,12 @@ var EngCalcs = EngCalcs || {};
 		askDialog({ kind: 'confirm', text: msg }, function (yes) {
 			if (!yes) { return; }
 			saveUndoSnapshot();
-			scenarios.forEach(function (s) {
-				if (s.isBase) { return; }
-				scopedKeys(s).forEach(function (k) {
+			eachOverrideMap(function (map) {
+				scopedKeys(map).forEach(function (k) {
 					active.forEach(function (spec) {
-						(spec.ovProps || [spec.prop]).forEach(function (p) { delete s.overrides[k][p]; });
+						(spec.ovProps || [spec.prop]).forEach(function (p) { delete map[k][p]; });
 					});
-					if (!Object.keys(s.overrides[k]).length) { delete s.overrides[k]; }
+					if (!Object.keys(map[k]).length) { delete map[k]; }
 				});
 			});
 			applyScenarioChange();
@@ -7376,8 +7411,8 @@ var EngCalcs = EngCalcs || {};
 			if (!pipeTypeStates(t, d.prop)) { return; }
 			if (inBase) {
 				setProp(l, d.prop, undefined);
-				scenarios.forEach(function (sc) {
-					var ov = sc.overrides[ovKey(l)];
+				eachOverrideMap(function (map) {
+					var ov = map[ovKey(l)];
 					if (ov) { delete ov[d.prop]; }
 				});
 			} else {
@@ -15084,10 +15119,9 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function georefCaptureCoordOverrides() {
 		var out = [];
-		scenarios.forEach(function (scn) {
-			if (scn.isBase) { return; }
-			Object.keys(scn.overrides || {}).forEach(function (key) {
-				var ov = scn.overrides[key], n;
+		eachOverrideMap(function (map) {
+			Object.keys(map).forEach(function (key) {
+				var ov = map[key], n;
 				if (!ov || (typeof ov.x !== 'number' && typeof ov.y !== 'number')) { return; }
 				n = doc.nodes.filter(function (nd) { return ovKey(nd) === key; })[0];
 				if (!n) { return; }
@@ -15112,6 +15146,7 @@ var EngCalcs = EngCalcs || {};
 			if (o.hasX) { o.ov.x = ll.lon; }
 			if (o.hasY) { o.ov.y = ll.lat; }
 		});
+		touchTree('georef');
 	}
 	// **THE BACKGROUND IMAGE COMES ALONG, AND eachStoredPoint() CANNOT REACH IT HERE.** Tom,
 	// 2026-08-24: *"it didn't occur to me that anybody would use a backdrop for a geographic
@@ -36707,10 +36742,9 @@ var EngCalcs = EngCalcs || {};
 		(saved.customers || []).forEach(function (c) { if (c.link) { offset(c, 'x', 'y', linkAnchor(c.link)); } });
 		// A SCENARIO'S OWN POSITIONS are absolute and may hold one axis only; the missing half comes
 		// from the node, as georefCaptureCoordOverrides() completes it, and only held axes are written.
-		(saved.scenarios || []).forEach(function (sc) {
-			if (sc.isBase) { return; }
-			Object.keys(sc.overrides || {}).forEach(function (key) {
-				var ov = sc.overrides[key], n = nodeByOvKey[key] || null, a, q;
+		eachOverrideMap(function (map) {
+			Object.keys(map).forEach(function (key) {
+				var ov = map[key], n = nodeByOvKey[key] || null, a, q;
 				if (!ov || !n || (typeof ov.x !== 'number' && typeof ov.y !== 'number')) { return; }
 				a = absPos(n);
 				q = mapPos({ x: typeof ov.x === 'number' ? ov.x : a.x, y: typeof ov.y === 'number' ? ov.y : a.y });
@@ -36720,7 +36754,7 @@ var EngCalcs = EngCalcs || {};
 					if (typeof ov.y === 'number') { ov.y = q.y; }
 				});
 			});
-		});
+		}, saved);
 		// The background image: its centre moves, its scale follows the map's east-west derivative.
 		var bd = saved.backdrop;
 		if (bd && isFinite(bd.tx) && isFinite(bd.ty) && bd.s > 0) {
@@ -36799,8 +36833,8 @@ var EngCalcs = EngCalcs || {};
 		function step(k) { var s = parseFloat(rounding[k]); return (isFinite(s) && s > 0) ? s : 0; }
 		function rnd(obj, prop, s) { if (obj && typeof obj[prop] === 'number') { obj[prop] = roundToStep(obj[prop], s); } }
 		function ovs(prop, s) {
-			scenarios.forEach(function (sc) {
-				Object.keys(sc.overrides || {}).forEach(function (k) { rnd(sc.overrides[k], prop, s); });
+			eachOverrideMap(function (map) {
+				Object.keys(map).forEach(function (k) { rnd(map[k], prop, s); });
 			});
 		}
 		var s = step('diameter');
@@ -36825,9 +36859,9 @@ var EngCalcs = EngCalcs || {};
 				(n.extraDemands || []).forEach(function (d) { rnd(d, 'base', s); });
 			});
 			(doc.customers || []).forEach(function (c) { rnd(c, 'demand', s); });
-			scenarios.forEach(function (sc) {
-				Object.keys(sc.overrides || {}).forEach(function (k) {
-					(sc.overrides[k].demands || []).forEach(function (d) { rnd(d, 'base', s); });
+			eachOverrideMap(function (map) {
+				Object.keys(map).forEach(function (k) {
+					(map[k].demands || []).forEach(function (d) { rnd(d, 'base', s); });
 				});
 			});
 			doc.links.forEach(function (l) {
@@ -44585,11 +44619,11 @@ var EngCalcs = EngCalcs || {};
 			return moved;
 		}
 		function convOverrides(prop) {
-			scenarios.forEach(function (sc) {
+			eachOverrideMap(function (map) {
 				var key;
-				for (key in sc.overrides) {
-					if (!Object.prototype.hasOwnProperty.call(sc.overrides, key)) { continue; }
-					conv(sc.overrides[key], prop);
+				for (key in map) {
+					if (!Object.prototype.hasOwnProperty.call(map, key)) { continue; }
+					conv(map[key], prop);
 				}
 			});
 		}
@@ -44638,11 +44672,11 @@ var EngCalcs = EngCalcs || {};
 			});
 			// An override on `setting` belongs to whichever valve carries it, and only a pressure
 			// valve's is a pressure -- so the element decides, not the property name.
-			scenarios.forEach(function (sc) {
+			eachOverrideMap(function (map) {
 				doc.links.forEach(function (l) {
 					var t = String(l.valveType || 'TCV').toUpperCase(), ov;
 					if (l.type !== 'valve' || (t !== 'PRV' && t !== 'PSV' && t !== 'PBV')) { return; }
-					ov = sc.overrides[ovKey(l)];
+					ov = map[ovKey(l)];
 					conv(ov, 'setting');
 				});
 			});
@@ -44655,19 +44689,19 @@ var EngCalcs = EngCalcs || {};
 			(doc.customers || []).forEach(function (c) { conv(c, 'demand'); });
 			convOverrides('demand');
 			// A scenario's own demand list (R-369) is flows in the same unit, row by row.
-			scenarios.forEach(function (sc) {
-				Object.keys(sc.overrides || {}).forEach(function (key) {
-					(sc.overrides[key].demands || []).forEach(function (d) { conv(d, 'base'); });
+			eachOverrideMap(function (map) {
+				Object.keys(map).forEach(function (key) {
+					(map[key].demands || []).forEach(function (d) { conv(d, 'base'); });
 				});
 			});
 			doc.links.forEach(function (l) {
 				if (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'FCV') { conv(l, '_setting'); }
 			});
 			n += convCurveAxis(0, ['head', 'effic', 'headloss'], k);
-			scenarios.forEach(function (sc) {
+			eachOverrideMap(function (map) {
 				doc.links.forEach(function (l) {
 					if (l.type !== 'valve' || String(l.valveType || '').toUpperCase() !== 'FCV') { return; }
-					conv(sc.overrides[ovKey(l)], 'setting');
+					conv(map[ovKey(l)], 'setting');
 				});
 			});
 		}
@@ -50173,10 +50207,10 @@ var EngCalcs = EngCalcs || {};
 		(doc.links || []).forEach(function (l) {
 			var used = l._curveId === id || l._efficCurveId === id;
 			if (!used) {
-				used = scenarios.some(function (sc) {
-					var ov = sc.overrides[ovKey(l)];
-					return !!ov && (ov.curveId === id || ov.efficCurveId === id);
-				});
+				eachOverrideMap(function (map) {
+					var ov = map[ovKey(l)];
+					if (ov && (ov.curveId === id || ov.efficCurveId === id)) { used = true; }
+				}, null, true);
 			}
 			if (used) { out.push(l.id); }
 		});
@@ -50197,10 +50231,10 @@ var EngCalcs = EngCalcs || {};
 		(doc.links || []).forEach(function (l) {
 			var used = l._typeId === id;
 			if (!used) {
-				used = scenarios.some(function (sc) {
-					var ov = sc.overrides[ovKey(l)];
-					return !!ov && ov.typeId === id;
-				});
+				eachOverrideMap(function (map) {
+					var ov = map[ovKey(l)];
+					if (ov && ov.typeId === id) { used = true; }
+				}, null, true);
 			}
 			if (used) { out.push(l.id); }
 		});
@@ -50229,8 +50263,8 @@ var EngCalcs = EngCalcs || {};
 			if (l._typeId === was) {
 				if (now) { l._typeId = now; } else { delete l._typeId; }   // base-write: a rename is not an edit to this scenario's value -- the reference has not changed, only the name of the thing it names, so it must move in Base and in every override alike
 			}
-			scenarios.forEach(function (sc) {
-				var ov = sc.overrides[ovKey(l)];
+			eachOverrideMap(function (map) {
+				var ov = map[ovKey(l)];
 				if (!ov || ov.typeId !== was) { return; }
 				if (now) { ov.typeId = now; } else { delete ov.typeId; }
 			});
@@ -50253,19 +50287,19 @@ var EngCalcs = EngCalcs || {};
 		(doc.links || []).forEach(function (l) {
 			var used = l._fittingsId === id;
 			if (!used) {
-				used = scenarios.some(function (sc) {
-					var ov = sc.overrides[ovKey(l)];
-					return !!ov && ov.fittingsId === id;
-				});
+				eachOverrideMap(function (map) {
+					var ov = map[ovKey(l)];
+					if (ov && ov.fittingsId === id) { used = true; }
+				}, null, true);
 			}
 			// Through the type, in Base and in every scenario alike -- effective() would answer only
 			// for the scenario on screen, and the Library is a view of the DOCUMENT.
 			if (!used && typed[l._typeId]) { used = true; }
 			if (!used) {
-				used = scenarios.some(function (sc) {
-					var ov = sc.overrides[ovKey(l)];
-					return !!ov && !!typed[ov.typeId];
-				});
+				eachOverrideMap(function (map) {
+					var ov = map[ovKey(l)];
+					if (ov && typed[ov.typeId]) { used = true; }
+				}, null, true);
 			}
 			if (used) { out.push(l.id); }
 		});
@@ -50295,8 +50329,8 @@ var EngCalcs = EngCalcs || {};
 			if (l._fittingsId === was) {
 				if (now) { l._fittingsId = now; } else { delete l._fittingsId; }   // base-write: a rename is not an edit to this scenario's value -- the reference has not changed, only the name of the thing it refers to, so it must move in Base and in every override alike
 			}
-			scenarios.forEach(function (sc) {
-				var ov = sc.overrides[ovKey(l)];
+			eachOverrideMap(function (map) {
+				var ov = map[ovKey(l)];
 				if (!ov || ov.fittingsId !== was) { return; }
 				if (now) { ov.fittingsId = now; } else { delete ov.fittingsId; }
 			});
@@ -50399,8 +50433,8 @@ var EngCalcs = EngCalcs || {};
 			if (l._efficCurveId === was) {
 				if (now) { l._efficCurveId = now; } else { delete l._efficCurveId; }   // base-write: see above
 			}
-			scenarios.forEach(function (sc) {
-				var ov = sc.overrides[ovKey(l)];
+			eachOverrideMap(function (map) {
+				var ov = map[ovKey(l)];
 				if (!ov) { return; }
 				['curveId', 'efficCurveId'].forEach(function (k) {
 					if (ov[k] !== was) { return; }
@@ -51006,9 +51040,9 @@ var EngCalcs = EngCalcs || {};
 		});
 		// **AND A SCENARIO'S OWN DEMAND LIST** (R-369), which names patterns exactly as Base's rows
 		// do. The pattern is the document's, so a rename reaches every scenario at once.
-		scenarios.forEach(function (sc) {
-			Object.keys(sc.overrides || {}).forEach(function (k) {
-				(sc.overrides[k].demands || []).forEach(function (d) { if (d.pattern === was) { d.pattern = to; } });
+		eachOverrideMap(function (map) {
+			Object.keys(map).forEach(function (k) {
+				(map[k].demands || []).forEach(function (d) { if (d.pattern === was) { d.pattern = to; } });
 			});
 		});
 		doc.links.forEach(function (l) { if (l.speedPattern === was) { l.speedPattern = to; } });
@@ -54838,10 +54872,10 @@ var EngCalcs = EngCalcs || {};
 	// key AND hands them to whatever element of the other group answers to the new id.
 	function renameOverrides(group, oldId, newId) {
 		var oldKey = ovKeyFor(group, oldId), newKey = ovKeyFor(group, newId);
-		scenarios.forEach(function (s) {
-			if (!s.overrides[oldKey]) { return; }
-			s.overrides[newKey] = s.overrides[oldKey];
-			delete s.overrides[oldKey];
+		eachOverrideMap(function (map) {
+			if (!map[oldKey]) { return; }
+			map[newKey] = map[oldKey];
+			delete map[oldKey];
 		});
 	}
 	// The rename itself, with nothing about the popup in it -- so a BULK rename (applyIdPrefixToAll()
@@ -56444,8 +56478,8 @@ var EngCalcs = EngCalcs || {};
 			// read as a loss coefficient of 60 is as wrong in a scenario as in Base, and an override
 			// would SURVIVE silently as a stale pressure under a valve that now wants a flow.
 			l._setting = defaultValveSetting(v);   // base-write: valveType is Base-owned, so the setting that belongs to it is too
-			scenarios.forEach(function (sc) {
-				var ovv = sc.overrides[ovKey(l)];
+			eachOverrideMap(function (map) {
+				var ovv = map[ovKey(l)];
 				if (ovv) { delete ovv.setting; }
 			});
 			refreshPopupIfOpen();
