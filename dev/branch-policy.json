@@ -125,7 +125,10 @@
         "feat/chain-draw",
         "feat/pda",
         "feat/dock-flag-order",
-        "feat/times-statistic"
+        "feat/times-statistic",
+        "feat/find-source",
+        "feat/transport-ends",
+        "feat/engine-prefetch"
     ],
     "feature_freeze": {
         "active": false,
