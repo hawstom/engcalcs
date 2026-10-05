@@ -2015,7 +2015,10 @@
 			i = EC.lpnTimeFrameIndexAt(stops.map(function (t) { return { t: t }; }), state.t);
 		}
 		// Wide enough for the statistic's own word, which the 8.5rem cap sized for `24:00` clips.
-		ui.step.style.minWidth = statLabel ? '7rem' : '';
+		// Without one it goes back to picker()'s own "10:00" minimum, never to none: '' here once
+		// erased it, and a 9:59 box ran under its arrow again (step-select-width harness).
+		if (ui.step.dataset.minWidth === undefined) { ui.step.dataset.minWidth = ui.step.style.minWidth; }
+		ui.step.style.minWidth = statLabel ? '7rem' : ui.step.dataset.minWidth;
 		ui.step.value = (state.statView && statLabel) ? 'stat' : String(i < 0 ? 0 : i);
 		ui.play.setAttribute('aria-pressed', state.playing ? 'true' : 'false');
 		swapIcon(ui.play, state.playing ? 'pause' : 'play');
