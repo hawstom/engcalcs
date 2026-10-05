@@ -3844,3 +3844,20 @@ OBSERVED: Source scope found exactly the four nodes carrying a source quality on
 OBSERVED: node-only filter, trimmed list, Replace list and no-chemical hint all held in real Chrome on Net3.
 Method: Quality and sources set by editing the project file, then Find driven by real clicks.
 Open, pre-existing and generic: a mixed-scope compound Filter in table answers "applies to no table" and leaves the old filter.
+
+## 2026-10-05 Perry: feat/tip-door pre-review (tip 02c0e67d)
+
+OBSERVED (headless Chromium, desktop 1400 and phone 390x844 touch, this tree; re-verify before citing):
+- 15 calculators (all but Looped Network): clicking a ? opens, hover opens nothing, Esc / outside click / second click / Tab-away close; label words still focus the field; touch tap works, no keyboard raised. Harness 47/47, and the same harness FAILS on a master extract (so it is not decoration).
+- Looped Network: all 37 desktop / 35 phone glyphs in Settings+Find+Fire flow etc. open on click; Properties pane glyphs (10/10) open; tip follows its ? when the Settings box scrolls; three Analyze boxes each have a corner ? with intro + scope tip joined, rows with a tip each show a ?.
+- DEFECT (low): EngCalcs._explainOpen is not cleared when the box is rebuilt/hidden by a route that makes no pointer event; the next Esc is swallowed (does nothing visible). Repro: open a row ? in Demand scaling, change scope programmatically, press Esc once: _explainOpen still true until that Esc.
+- Remaining hover-only ?: a ? inside a link or button (Darcy-Weisbach "Kinematic viscosity, v ?", Looped "Something wrong here? ?"). Hover shows tip (desktop); click follows the link. Pre-existing path, but not "one door".
+- Phone: 22rem tip is flush with the right screen edge (left 38, right 390 of 390).
+- Parity with master (not regressions): glyphless titled labels in Settings (Total run time, Use units...) show no tip on tap on either tree.
+SPECULATION: looks (colour/focus ring on the ? when tabbed) not checked.
+
+## feat/scenario-table at 0b973478 (OBSERVED, 2026-10-05; re-verify before citing)
+OBSERVED real Chrome (Net1, Net3): Show scenarios works on Junctions/Pipes/Pumps; override wash, writes to the row's scenario only, undo/redo lands right, active scenario unchanged, bad input rejected with dialog, copy TSV ok, phone scrolls, Net3 368 rows toggle ~0.85 s.
+OBSERVED defects (minor): new scenario while shown appends its rows at the bottom, not beside each asset; rename leaves old name in Scenario column until switch; fill down makes overrides equal to parent.
+OBSERVED: stable sort changes ordinary tables vs master (tie rows keep previous order instead of ID) - intended.
+Lesson: pane toggle button toggles; sort lives on the arrow button; dialogs routed to native by seam (answerPromptWith).

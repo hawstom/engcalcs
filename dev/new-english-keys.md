@@ -50,7 +50,7 @@ is the one you meant. "The first one" is a complete answer.
   *The proposal:* PROPOSED: 'A project can be placed on real ground with a street map behind it. EPANET .inp files can be read and written. The bottom pane plots a profile along a path and tabulates the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.'
   _Ruled 2026-10-05: For the record, I find this "Notes" box, and this section in particular, to be embarrassing. What's it's purpose? Maybe I need to edit lang.ec.en.php. Is there a compelling reason why we can't remove this section or the entire box? If it matters, every section should be an important advisory, not fluff like this._
 
-## Synonym entries to approve  (4, 2 to read @@ NEEDS RULING)
+## Synonym entries to approve  (3, 1 to read @@ NEEDS RULING)
 
 **These are translator notes (`$ec_lang_syn`), not visitor wording.** Each was written against an
 English string that has since changed, or against a key that no longer exists. Say which: keep it
@@ -83,16 +83,6 @@ never edits a synonym.
   *Current synonym:* more like neighboring nodes = numerically closer to the neighbors' values | avoid: similar in kind
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
-
-- **`mtc_note_1`**
-  > <dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.</dd><dt>Basic calculator (no iteration)</dt><dd>Enter your desired roughness value. Ignore the design rock size input area.</dd></dl>
-  *Why stale:* the English changed after this synonym was written
-  *Written against:* <dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The r...
-  *Current synonym:* | avoid: compressing "Blodgett–Bathurst" to an initialism like "BB" — recurred independently across 8+ languages (it/ru/bg/es/uk/sr/hr/cs/tr/ps/my, corrected 2026-07-08) since nothing else in this string defines what the initials stand for; spell the full name out in every language, matching mtc_blodgett_v_bathurst
-  *Proposed synonym:* | avoid: compressing "Blodgett–Bathurst" to an initialism like "BB" — recurred independently across 8+ languages (it/ru/bg/es/uk/sr/hr/cs/tr/ps/my, corrected 2026-07-08) since nothing else in this string defines what the initials stand for; spell the full name out in every language, matching mtc_blodgett_v_bathurst
-  *Why this proposal:* No change proposed: the note is about the initialism, not the reworded step 2, and still holds.
-  **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
-  @@ NEEDS RULING
 
 ## lpn_  (125, 15 to read @@ NEEDS RULING)
 
@@ -476,7 +466,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**7 still to read**, of 10 new keys across 11 unmerged branch(es).
+**4 still to read**, of 7 new keys across 14 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -487,7 +477,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`456619f8`) — 2 new, 2 to read @@ NEEDS RULING
+### chore/handoff-1006 (`3d88b981`) — adds no English strings
+
+### feat/bentley-interop (`beedec3f`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -512,6 +504,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
+### feat/label-placer (`3f3c5792`) — adds no English strings
+
 ### feat/label-placer-a (`3483bfd6`) — adds no English strings
 
 ### feat/label-placer-b (`c5905432`) — adds no English strings
@@ -520,24 +514,17 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/scenario-table (`0b973478`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/notes-trim (`53d149d2`) — adds no English strings
 
-- **`lpn_pane_scn_alt`**
-  > Alternative
-  @@ NEEDS RULING
-- **`lpn_pane_scn_alt_name`**
-  > {scenario} {category}
-  @@ NEEDS RULING
-- **`lpn_pane_scn_override`**
-  > Scenario override
-  @@ NEEDS RULING
-- **`lpn_pane_scn_parent`**
-  > Parent
+### feat/scenario-table (`4a5cf9fd`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_pane_scn_alt_tip`**
+  > {category} alt.: {alternative}
   @@ NEEDS RULING
 - **`lpn_pane_scn_show`**
   > Show scenarios
   @@ NEEDS RULING
 
-### feat/tip-door (`02c0e67d`) — adds no English strings
+### feat/tip-door (`80e7e1a5`) — adds no English strings
 
-### feat/transport-ends (`50fcf6f2`) — adds no English strings
+### feat/transport-ends (`40ef582f`) — adds no English strings

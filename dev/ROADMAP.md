@@ -341,9 +341,11 @@ the block.
   paragraph and his call. Mary, Sue and Declan's readings are under Task 721. The layout assumes
   Bentley's model (a scenario tree, alternatives beneath); ours is flat, so the tabs need rethinking.
 - 75|766| **Show scenarios in the Tables pane: one row per asset per scenario.**
-  Tom, 2026-10-05: right-click "Show scenarios" adds Scenario, Parent, Alternative, Parent and
-  Scenario override columns; initial order ID, then Scenario, then Alternative; every user sort keeps
-  ties in their previous order (Google Sheets). First cut on `feat/scenario-table`.
+  Tom, 2026-10-05/06: right-click "Show scenarios" adds ONE column, Scenario (*"My mistake. Scenario
+  column only"*); an override cell's tip names its alternative ("Demand alt.: Max day"); ties keep
+  their previous order in every sort (Google Sheets). *"Scenarios must be added to tables so we can
+  audit these things. And by extension, there will have to be a settings Table."* Built on
+  `feat/scenario-table`; the settings table is next, after Task 765's setting readers.
 - 75|756| **Cross-platform: the suite as a desktop application, beyond the web folder.**
   Tom, 2026-09-30: *"Put a cross platform project on our roadmap priority 75. Plan where/how to move
   the project to transcend the web-centric hawsedc.com/engcalcs folder. Windows or Linux? Plan what
@@ -913,7 +915,7 @@ the block.
   *"Do we have a way of knowing whether people are installing?"* No: `appinstalled` only hides the
   button (`js/Calculators.lib.js:195`). One install event plus an app/tab field on view rows would
   answer it; it is a new logged fact about visitors, so it goes past `consent_body` and him first.
-- 50|765| **Presentation alternatives: a scenario may include settings and a saved view associated with a Presentation alternative.** Tom, 2026-10-05: *"I am less interested in the Bentley Report Builder than I am in making it easy to reproduce screenshots."* Presentation alternatives store overrides for Window and Settings for Map appearance and Symbology. All project settings are included in an override alternative category. And really this should be part of the Advanced (Bentley) scenarios task, not its own task.
+- 50|765| **Presentation alternatives: a scenario may include settings and a saved view associated with a Presentation alternative.** Tom, 2026-10-05: *"I am less interested in the Bentley Report Builder than I am in making it easy to reproduce screenshots."* Presentation alternatives store overrides for Window and Settings for Map appearance and Symbology. All project settings are included in an override alternative category. And really this should be part of the Advanced (Bentley) scenarios task, not its own task. On a separate "Figure" feature, 2026-10-06: *"No. This duplicates the "Fig. 8-2" scenario. If we are building the Bentley model, let's embrace and extend. The only thing we may want in the Map menu is a simple save/restore View."* Built in stages on `feat/bentley-interop`; `dev/scenario-alternatives.md` "The long burn".
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary

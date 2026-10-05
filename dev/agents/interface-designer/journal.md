@@ -3727,3 +3727,21 @@ recommendation of one click door is documented for the `?` glyph only.
 # Ida, 2026-10-05: transport Restart/End
 OBSERVED js/lpn-time.js:1777-1860, lib/Icons.lib.php:416-419, css/engcalcs.css:1515-1550,4553-4555: group order run(hidden when auto-run), step-back, play, step-fwd, step select, speed select. Measured in Chromium: buttons 44x31 each (UA padding), selects 69 and 58 wide; group 296 at 1400, 283 at 390 (bar 388). step-back/step-fwd icons are ALREADY |< and >| (bar+triangle).
 SPECULATION: two more 44px buttons = ~396 > 388, wraps on a 390 phone. 5 buttons at 32px = ~323, fits.
+
+## 2026-10-05 (Ida) -- feat/transport-ends: is the player the largest thing on the chrome?
+
+[OBSERVED] css/engcalcs.css:1515-1521 -- every toolbar button except `.lpn-transport-btn` is borderless, no fill, until hover; css:1550 the transport keeps its box. js/lpn-time.js:1829-1833 builds Restart, Back, Play, Forward, End as transport buttons; js/lpn-time.js:1920-1927 hides all seven player controls when stops < 2.
+
+[OBSERVED] Measured on :8100 (master) and :8110 (feat/transport-ends), Chromium, example opened. Run group (player+selectors): master 296x31, branch 344x33 (+48 px wide, +2 px tall; toolbar 36 -> 38 px). Buttons 44 -> 34 px wide each. Largest group by width is Insert tools, 421x30. Run group = 27% of summed group width (branch) vs 24% (master); 24.6% of the 1400 px toolbar; 76.5% of the 390 px toolbar on a phone. Toolbar wraps to two rows at/below 1300 px window width on master, 1350 px on branch (10 px steps). Chrome height above the drawing 118 px (branch, single row) vs 116; 151 vs 149 at 1280x720 (two rows). Canvas share of window height: 87.1% at 1400x900, 89.3% at 1920x1080, 83.9% at 1280x720, 89.8% at 390x844. Screenshots: /tmp/claude-1000/ida-{master,branch}-*.png.
+
+[OBSERVED] Only boxed, grey-filled, solid-black-glyph controls on the strip; every other icon is outline on bare ground. Menu bar items are also bordered pills, so the page has two "boxed" rows.
+
+[OBSERVED] Prototype by injected CSS on the branch, 1400 px: joined segmented (gap 0, shared borders) 344 -> 319 px; flat toolbar-style 344 -> 310 px and toolbar 38 -> 36 px; Restart and End removed 344 -> 265 px. Shots: /tmp/claude-1000/ida-proto-*.png.
+
+[CITED] EPANET 2.2 Map Browser has a four-button VCR set (rewind, animate back, stop, animate forward) plus a time scrollbar; no step buttons, no go-to-end. https://usepa.github.io/EPANET2.2/4_EPANET_workspace.html (via search summary; manual not opened in full).
+
+[SPECULATION] Native <select> handles Home/End keys, so Restart/End are keyboard-free on the step selector; untested here.
+[SPECULATION] Media players (video sites) rarely carry Restart/End on the bar; seek bar does that. Not verified against a named product.
+[SPECULATION] Usage frequency: Restart/End rarely used since the step selector's first/last entries do the same in two clicks; no usage data exists (no analytics on this).
+
+Verdict: right about weight, wrong about width. Fix is to make the five boxes one object.
