@@ -250,6 +250,114 @@ properties already in a category.
 | `settings.sources`, `settings.mixing`, `settings.tags`, `settings.reactions.tank`, `settings.energy.effic` | Markers and staging the `.inp` readers leave behind: "this section was read", or a value already moved onto its element. |
 | `settings.sectionsOpen`, `mapHeight`, `fileAutosaveSeconds`, `colorRamp`, `colorClasses`, `colorReverse`, `colorThematic`, `colorFrozenBreaks`, `basemapFilter`, `kmDefault` | Stale or migrated on open: nothing reads them, or `applySaved()` converts and deletes them. |
 
+### The data layer: still choice A
+
+**A setting override is stored once, on its scenario, and its alternative is derived from it**,
+exactly as an element override is. Nothing about the tree is stored, for the reasons choice A was
+chosen: under Basic mode the alternative is a pure function of the overrides, and a second record
+of the same fact would drift.
+
+**The store: `scenario.settings`, a sparse mirror of the project's own objects**, keyed by where the
+project keeps the value:
+
+    { settings: { textSize: 14, hydraulics: { accuracy: 0.0001 } },
+      labelSettings: { node: { pressure: false } },
+      project: { basemap: 'satellite' },
+      times: { patternStep: 900, text: { patternStep: '0:15' } },
+      defaultPattern: '2' }
+
+- **Written only when non-empty, and never on Base.** No file written before this has the key, and
+  nothing writes it yet, so every saved project, autosave and example round-trips byte-identical.
+  No version bump or migration is owed. The harness holds this on every shipped example.
+- **A mirror, not flat `'settings.textSize'` keys**, because the members of some maps already hold
+  the separator: `colorBreaks['node.pressure']`, `contourInterval['pressure|psi']`,
+  `decimals.node['quality:trace']`.
+- **A leaf is a value that is not a plain object, or the whole of an atomic object.** The one
+  atomic object is `settings.quality` (mode and trace node are one choice). Everything else is
+  overridden member by member, so a scenario that turns one label value off holds one value, not a
+  copy of the whole label map.
+- **Two calculation options keep the homes they already have**: `scenario.demandMultiplier` and
+  `scenario.times.duration`/`hydraulicStep`. `scenario.settings` refuses those paths, so a fact never
+  has two homes; the read seam reads them where they are.
+- **No coordinate is storable.** `view` and `backdrop` are excluded, so nothing in the store needs
+  the Y flip, the origin shift or the geographic projection that `serializeProject()` applies to
+  the document's own coordinates. Two Presentation values are lengths (`labelMaxWidth`,
+  `labelSettings.customerMaxWidth`), typed in the project's display unit; units are one per
+  project, so they mean the same thing in every scenario.
+- **A file is read, never trusted** (`sanitizeScenarioSettings()`, beside
+  `sanitizeScenarioTimes()`): Base's block goes, and so does any value at an excluded path or a
+  path with another home. A value at a path no table names is kept verbatim and counted in no
+  alternative, so a file from a later version loses nothing.
+
+**The one read seam: `settingFor(scn, path)`, and `effectiveSetting(path)` for the open
+scenario**, the settings twin of `effective(el, prop)`. `path` is an array (`['settings',
+'textSize']`, `['settings', 'colorBreaks', 'node.pressure']`) or a dotted string where no member
+holds a dot. It answers the scenario's own value where it holds one, else the project's.
+**In Base, and wherever a scenario holds nothing at or under the path, it returns the project's own
+object**, not a copy, so a reader moved onto it behaves exactly as before. Where a scenario holds
+part of an object it returns a merged copy, so no reader can write a scenario's value into the
+project's object. **The one write seam: `setScenarioSetting(scn, path, value)`**, `undefined`
+clearing it (and pruning emptied containers), refusing Base, excluded paths and paths with another
+home. Nothing in the interface calls it yet.
+
+**Category of a setting: `categoryOf(path, 'setting')`**, the existing function with one more
+group, so callers of `categoryOf(prop, group)` see no change. It answers a category id, `null` for
+an excluded path, and `undefined` for a path no table names (the harness fails on that).
+`alternativesOf()` gives every alternative a `settings` list of `{path, value}` beside its element
+`values`; the count includes both. `LPN_ALT_CATEGORIES` gains `presentation` and `calculation`, so
+the read-only Alternatives table gains their two columns before the calculation-option columns.
+`overrideCount()`, the number beside a scenario's name, counts setting overrides too.
+
+**Every read site that would route through the seam** (the inventory's "Read by" column, plus):
+
+- **The `.inp` exporter**: `lpnExportInp(serializeProject(), inpExportOptions())` reads options,
+  times, reactions, energy and the default pattern out of the serialized project, which is Base's.
+  Exporting from a scenario must hand it the scenario's own, as `inpExportOptions()` already does
+  for the demand multiplier and the two times.
+- **Scenario compare** (`scenarioCompareModels()`): it assembles each scenario's model, so each
+  must be assembled with that scenario's calculation settings, not the open one's.
+- **The Settings box rows** (`hydNumberRow()`, `settingsUnbalancedRows()`, `settingsQualityRows()`,
+  `coeffRow()`, `settingsEnergyRows()`, the Symbology and Colour groups, the generic
+  `counts`/`number` rows that read `settings[key]`): they read to display, and where they write is
+  the UX question below.
+- **Writes from a render path**: `effectiveBreaks()`/`fillBreaks()` fill empty colour breaks on the
+  first read. In a scenario that fill would land in the project's object; it must land wherever an
+  edit would.
+- **Caches keyed on the document**: the label-layout keep and the kept solve are keyed on
+  `modelSignature()`, which hashes the serialized project. A scenario switch that changes a
+  Presentation value must miss the label keep, and one that changes a Calculation value must miss
+  the solve keep; including `project.activeScenario` and the scenario's block in the hash does both.
+- **`applyScenarioChange()`**: a switch already re-solves and relabels; it must also repaint the
+  symbology, the basemap and the contours when the two scenarios' Presentation differs.
+
+**Not done in this build: routing those readers.** The seam, the store, the round-trip, the
+categories and the table exist; the hundred-odd reads above still read the project's own objects.
+So a setting override that a hand-edited file carries shows in the Alternatives table but does not
+yet change the map or the solve. That is deliberate: nothing in the interface can make one, and
+routing the readers is what changes what a person sees, which waits on the questions below.
+
+### Questions for Tom
+
+1. **Does the Calculation column count the demand multiplier, run time and time step?** They are
+   calculation options already, with their own three columns. Recommendation: yes, count them in
+   the Calculation column too, and keep the three columns as the place they are typed.
+2. **Should a scenario remember its own place on the map?** If yes, switching scenario moves the
+   map, which is the automatic zoom the page otherwise never does. Recommendation: no; the view
+   stays one per project, and "Window/View" means the view settings (labels, legends, symbols).
+3. **Should new-asset settings (ID prefixes, default diameter, elevation source) vary by
+   scenario?** Bentley keeps them outside scenarios, as Prototypes. Recommendation: no.
+4. **In scenario Peak Hour, you change something in Settings. Does it change Peak Hour only, or
+   the project?** Today the demand multiplier row already changes Peak Hour only. Recommendation:
+   **Calculation settings change Peak Hour only**, like the multiplier and like element properties
+   ("you are always editing only the specific data" of your scenario). **Presentation settings
+   change the project**, every scenario that has not chosen its own, with a separate deliberate
+   "only in this scenario" act; otherwise turning contours on in Peak Hour and switching to Base
+   would look like the contours broke. The honest cost: that is two rules where there was one.
+5. **Friction method stays one per project, like units.** Each pipe holds one roughness number,
+   and the method says what it means. Agree?
+6. **The two new column headings are "Presentation" and "Calculation".** They are listed in
+   `dev/new-english-keys.md` for your word.
+
 ## The code
 
 `js/looped-network.js`, section "SCENARIO ALTERNATIVES": `LPN_ALT_CATEGORIES`, `categoryOf(prop,
