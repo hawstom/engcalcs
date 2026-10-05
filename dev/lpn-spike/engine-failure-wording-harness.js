@@ -130,8 +130,10 @@ async function main() {
 		const w = L.tsWaitingText(PC);
 		ok('time-series note says the same ' + name + ' sentence', w === exp[name], JSON.stringify(w));
 	}
-	ok('only the offline note tells the reader to connect',
-		exp.offline.indexOf('Connect to the internet') >= 0 && ['fetch', 'engine', 'run'].every((k) => exp[k].indexOf('Connect to the internet') < 0));
+	// The offline note's own closing sentence, taken from its key: the other causes must not carry it.
+	const offlineTail = PC.lpn_time_no_engine.slice(PC.lpn_time_no_engine.lastIndexOf('. ', PC.lpn_time_no_engine.length - 2) + 2);
+	ok('only the offline note tells the reader to go online',
+		exp.offline.indexOf(offlineTail) >= 0 && ['fetch', 'engine', 'run'].every((k) => exp[k].indexOf(offlineTail) < 0));
 	ok('the run sentence names the report link', PC.lpn_time_engine_run_failed.indexOf(PC.lpn_wrong_btn) >= 0);
 
 	console.log('\n--- banner 2: lpn_engine_unavailable (valve network, download fails) ---');
@@ -150,7 +152,8 @@ async function main() {
 	ok('offline keeps today\'s sentence', n === PC.lpn_engine_unavailable, JSON.stringify(n));
 	n = await warm(true);
 	ok('online, a blocked download says so', n === PC.lpn_engine_unavailable_fetch, JSON.stringify(n));
-	ok('...and does not tell the reader to connect', n.indexOf('Connect to the internet') < 0);
+	const tail2 = PC.lpn_engine_unavailable.slice(PC.lpn_engine_unavailable.lastIndexOf('. ', PC.lpn_engine_unavailable.length - 2) + 2);
+	ok('...and does not tell the reader to go online', n.indexOf(tail2) < 0);
 
 	console.log(fails ? '\n' + fails + ' failure(s)' : '\nall checks passed');
 	process.exit(fails ? 1 : 0);

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**56 still to read on master**, of 109 untranslated keys, of 2337 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**61 still to read on master**, of 114 untranslated keys, of 2342 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -294,7 +294,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (109, 56 to read @@ NEEDS RULING)
+## lpn_  (114, 61 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -479,6 +479,9 @@ never edits a synonym.
 - **`lpn_engine_pda_route`**
   > Solved with the EPANET solver, because the demand model is pressure driven.
   @@ NEEDS RULING
+- **`lpn_engine_unavailable_fetch`**
+  > The download of the EPANET solver failed, so valves that open and close on their own cannot be solved. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_pressure_unit`**
   > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
   @@ NEEDS RULING
@@ -614,6 +617,18 @@ never edits a synonym.
 - **`lpn_sysflow_title`**
   > Flow balance
   _Ruled OK 2026-10-03._
+- **`lpn_time_engine_fetch_failed`**
+  > The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.
+  @@ NEEDS RULING
+- **`lpn_time_engine_run_failed`**
+  > The EPANET run failed. That is a defect in this page; use the Something wrong here? link to report it
+  @@ NEEDS RULING
+- **`lpn_time_engine_start_failed`**
+  > The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.
+  @@ NEEDS RULING
+- **`lpn_time_no_engine_why`**
+  > The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}
+  @@ NEEDS RULING
 - **`lpn_time_scn_overrides`**
   > Scenario overrides:
   @@ NEEDS RULING
@@ -628,7 +643,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**6 still to read**, of 9 new keys across 8 unmerged branch(es).
+**11 still to read**, of 14 new keys across 11 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -639,9 +654,18 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/harvest-1005 (`fa7adeda`) — adds no English strings
-
 ### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/engine-prefetch (`3194c30d`) — adds no English strings
+
+### feat/find-source (`8433832d`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_find_scope_source`**
+  > Source
+  @@ NEEDS RULING
+- **`lpn_find_source_no_chemical`**
+  > No chemical is being tracked, so no node has a source.
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -663,16 +687,16 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/times-statistic (`4f33310a`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/times-statistic (`70959325`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_time_stat_averaged`**
-  > Averaged
+  > Avg
   @@ NEEDS RULING
 - **`lpn_time_stat_maximum`**
-  > Maximum
+  > Max
   @@ NEEDS RULING
 - **`lpn_time_stat_minimum`**
-  > Minimum
+  > Min
   @@ NEEDS RULING
 - **`lpn_time_stat_none`**
   > None
@@ -683,3 +707,17 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_time_statistic`**
   > Statistic
   @@ NEEDS RULING
+
+### feat/transport-ends (`a6dc6011`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_copy_opened_unsaved`**
+  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  @@ NEEDS RULING
+- **`lpn_pane_delete_element`**
+  > Delete element
+  @@ NEEDS RULING
+- **`lpn_pane_delete_elements`**
+  > Delete elements
+  @@ NEEDS RULING
+
+### fix/engine-failed (`1eb1d2bc`) — adds no English strings
