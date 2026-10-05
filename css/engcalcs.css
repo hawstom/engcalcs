@@ -1552,11 +1552,6 @@ html[lang="zh"] .ec-welcome {
 .lpn-transport-btn > .ec-icon { margin-inline-end: 0; }
 /* Direction glyphs point along time, and time runs right to left in a right-to-left page, where the
    flex row has already put Restart at the right edge. Play and Pause are not direction-of-time marks. */
-/* Five buttons and two selectors are 333 px at the default gap; a 320 px window needs 15 back. */
-@media (max-width: 360px) {
-	#lpn_toolbar_run { gap: 2px; }
-	#lpn_toolbar_run .lpn-transport-btn { padding: 2px 3px; }
-}
 html[dir="rtl"] .lpn-transport-btn[data-icon="restart"] svg, html[dir="rtl"] .lpn-transport-btn[data-icon="step-back"] svg,
 html[dir="rtl"] .lpn-transport-btn[data-icon="step-fwd"] svg, html[dir="rtl"] .lpn-transport-btn[data-icon="end"] svg { transform: scaleX(-1); }
 /* The right-hand end of the strip: Find and the bottom-pane toggle (Task 434). Pushed there by an
@@ -4564,6 +4559,9 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	html:has(#lpn_canvas) #lpn_toolbar > .lpn-toolbar-group:not(#lpn_toolbar_run) { display: none; }
 	html:has(#lpn_canvas) #lpn_toolbar_run button:not(.lpn-transport-btn) { display: none; }
 	html:has(#lpn_canvas) #lpn_toolbar_run { border-left: 0; padding-left: 0; margin-right: 0; }
+	/* Five buttons and two selectors are 333 px at the default gap; a 320 px window needs 15 back. */
+	html:has(#lpn_canvas) #lpn_toolbar_run { gap: 2px; }
+	html:has(#lpn_canvas) #lpn_toolbar_run .lpn-transport-btn { padding: 2px 3px; }
 
 	/* 4. THE MENU BAR DROPS TO ICONS. The word is a <span class="lpn-menubar-word"> that
 	   buildMenuBar() builds for this rule to reach; the accessible name is on the button as an
