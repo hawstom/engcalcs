@@ -28,6 +28,13 @@
 //              flow, velocity: what the Novato scenes show), 'full' (node ID, Z, Qb, H, P; pipe ID,
 //              D, L, flow, velocity)
 //   jitter     grid only: node jitter as a fraction of d (default 0.2)
+//   bends      'family' (default: round 5's, 15% of suburban pipes and 5% of downtown ones carry one
+//              bend, the others none), 'none', or 'many' (round 6 on: in every family, 60% of the
+//              pipes longer than half a block curve through 1 to 3 vertices)
+//   valves     'few' (default: a TCV on one link in 150), 'none', or 'many' (one link in 12)
+//              Both come from streams of their own, drawn for every link whatever is decided, so
+//              the same seed with and without bends, or valves, is the same network otherwise: a
+//              bent pipe has the same bend whether or not other links became valves.
 //   seed       any integer (default 1)
 //
 // Copyright 2009 Thomas Gail Haws
@@ -55,8 +62,12 @@ function normSpec(spec) {
 		ids: spec.ids || 'epanet',
 		fields: spec.fields || 'novato',
 		jitter: spec.jitter === undefined ? 0.2 : +spec.jitter,
-		seed: spec.seed === undefined ? 1 : Math.round(+spec.seed)
+		seed: spec.seed === undefined ? 1 : Math.round(+spec.seed),
+		bends: spec.bends || 'family',
+		valves: spec.valves || 'few'
 	};
+	if (['family', 'none', 'many'].indexOf(s.bends) < 0) { throw new Error('bends must be family, none or many'); }
+	if (['few', 'none', 'many'].indexOf(s.valves) < 0) { throw new Error('valves must be few, none or many'); }
 	if (FAMILIES.indexOf(s.family) < 0) { throw new Error('family must be one of ' + FAMILIES.join(', ')); }
 	if (!(s.n >= 20 && s.n <= 20000)) { throw new Error('n out of range: ' + s.n); }
 	if (ID_STYLES.indexOf(s.ids) < 0) { throw new Error('ids must be one of ' + ID_STYLES.join(', ')); }
@@ -66,7 +77,9 @@ function normSpec(spec) {
 // The name a generated set goes by: every parameter, in a fixed order.
 function specKey(spec) {
 	const s = normSpec(spec);
-	return ['gen', s.family, 'n' + s.n, 's' + s.spacingPx, s.ids, s.fields, 'j' + s.jitter, 'seed' + s.seed].join('-');
+	// Round 5's names are kept: the bends and valves parts appear only when not the default.
+	return ['gen', s.family, 'n' + s.n, 's' + s.spacingPx, s.ids, s.fields, 'j' + s.jitter, 'seed' + s.seed]
+		.concat(s.bends !== 'family' ? ['b' + s.bends] : [], s.valves !== 'few' ? ['v' + s.valves] : []).join('-');
 }
 function hashStr(str) {
 	let h = 2166136261 >>> 0;
@@ -339,6 +352,8 @@ function generate(specIn) {
 	const s = normSpec(specIn), key = specKey(s);
 	const rng = makeRng(['net', s.family, s.n, s.jitter, s.seed].join('|'));
 	const rngId = makeRng(['ids', s.ids, s.n, s.seed].join('|'));
+	const rngB = makeRng(['bends', s.family, s.n, s.jitter, s.seed].join('|'));
+	const rngV = makeRng(['valves', s.family, s.n, s.jitter, s.seed].join('|'));
 	const g = s.family === 'grid' ? famGrid(s, rng) : s.family === 'tree' ? famTree(s, rng)
 		: s.family === 'suburban' ? famSuburban(s, rng) : famDowntown(s, rng);
 	const pts = g.pts, n = pts.length;
@@ -394,20 +409,38 @@ function generate(specIn) {
 		const a = pts[e[0]], b = pts[e[1]];
 		const u = rng.u(), v = rng.u(), off = rng.range(-0.25, 0.25);
 		const L = Math.hypot(b.x - a.x, b.y - a.y);
-		// A valve on one link in 150 (a TCV, open: a symbol on the map, no hydraulic effect).
-		if (u < 1 / 150 && L > 0.5 * D) {
+		// The bend and valve streams: the same number of draws for every link, whatever is decided.
+		const ub = rngB.u(), kb = 1 + Math.floor(rngB.u() * 3), amp = rngB.range(-0.3, 0.3), jb = [rngB.range(-0.06, 0.06), rngB.range(-0.06, 0.06), rngB.range(-0.06, 0.06)];
+		const uv = rngV.u();
+		// A valve on one link in 150 (a TCV, open: a symbol on the map, no hydraulic effect), or one
+		// in 12 with valves 'many'.
+		const valve = L > 0.5 * D && (s.valves === 'few' ? u < 1 / 150 : s.valves === 'many' ? uv < 1 / 12 : false);
+		if (valve) {
 			links.push({ id: linkIds[k], type: 'valve', from: nodeIds[e[0]], to: nodeIds[e[1]], verts: [], _diameter: diam[k],
 				_roughness: 130, _length: 0, lenAuto: false, _status: 'open', _k: 0, valveType: 'TCV', _setting: 0 });
 			return;
 		}
 		const verts = [];
-		if (g.curvy && v < g.curvy && L > 0.8 * D) {
+		if (s.bends === 'many') {
+			// A street that curves: 1 to 3 vertices on a sine arc off the chord, a little jittered.
+			if (ub < 0.6 && L > 0.5 * D) {
+				const nx = -(b.y - a.y) / L, ny = (b.x - a.x) / L;
+				for (let i = 1; i <= kb; i++) {
+					const t = i / (kb + 1), o = (amp * Math.sin(Math.PI * t) + jb[i - 1]) * L;
+					verts.push([r2(a.x + (b.x - a.x) * t + nx * o), r2(a.y + (b.y - a.y) * t + ny * o)]);
+				}
+			}
+		} else if (s.bends === 'family' && g.curvy && v < g.curvy && L > 0.8 * D) {
 			// One bend, a quarter of the length off the straight line at most.
 			const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, nx = -(b.y - a.y) / L, ny = (b.x - a.x) / L;
 			verts.push([r2(mx + nx * off * L), r2(my + ny * off * L)]);
 		}
 		let len = L;
-		if (verts.length) { len = Math.hypot(verts[0][0] - a.x, verts[0][1] - a.y) + Math.hypot(b.x - verts[0][0], b.y - verts[0][1]); }
+		if (verts.length) {
+			const path = [[a.x, a.y]].concat(verts, [[b.x, b.y]]);
+			len = 0;
+			for (let i = 1; i < path.length; i++) { len += Math.hypot(path[i][0] - path[i - 1][0], path[i][1] - path[i - 1][1]); }
+		}
 		links.push({ id: linkIds[k], type: 'pipe', from: nodeIds[e[0]], to: nodeIds[e[1]], verts: verts,
 			_diameter: diam[k], _roughness: 130, _length: r1(len), lenAuto: false, _status: 'open', _k: 0 });
 	});
@@ -461,7 +494,7 @@ if (require.main === module) {
 	const a = process.argv.slice(2);
 	function opt(k) { const i = a.indexOf(k); return i >= 0 ? a[i + 1] : undefined; }
 	const spec = opt('--spec') ? JSON.parse(opt('--spec')) : { family: opt('--family'), n: opt('--n'),
-		spacingPx: opt('--spacing'), ids: opt('--ids'), fields: opt('--fields'), seed: opt('--seed') };
+		spacingPx: opt('--spacing'), ids: opt('--ids'), fields: opt('--fields'), seed: opt('--seed'), bends: opt('--bends'), valves: opt('--valves') };
 	Object.keys(spec).forEach(function (k) { if (spec[k] === undefined) { delete spec[k]; } });
 	const doc = generate(spec);
 	if (a.indexOf('--stats') >= 0) {
@@ -472,6 +505,7 @@ if (require.main === module) {
 			loops: doc.links.length - doc.nodes.length + 1, medianNN: +medianNN(doc).toFixed(1),
 			meanDegree: +(dg.reduce(function (x, y) { return x + y; }, 0) / dg.length).toFixed(2),
 			valves: doc.links.filter(function (l) { return l.type === 'valve'; }).length,
+			bent: doc.links.filter(function (l) { return l.verts && l.verts.length; }).length,
 			tanks: doc.nodes.filter(function (x) { return x.type === 'tank'; }).length,
 			idSample: doc.nodes.slice(0, 6).map(function (x) { return x.id; }) }));
 	} else {
