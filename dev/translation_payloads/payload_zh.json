@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 2338,
-        "delta_key_count": 110,
+        "expected_key_count": 2345,
+        "delta_key_count": 117,
         "exempt_key_count": 26,
         "exempt_keys": [
             "calc_units_us",
@@ -734,6 +734,8 @@
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
         "lpn_copy_opened_unsaved": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
+        "lpn_engine_unavailable_why": "Valves that open and close on their own cannot be solved without the EPANET solver. {reason}",
+        "lpn_engine_needed_failed_why": "This network can only be solved by the EPANET solver. {reason}",
         "lpn_mode_add_chain": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
         "lpn_cp_allow_tip": "Allow only these characters:",
         "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
@@ -741,11 +743,16 @@
         "lpn_scenario_duration_tip": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
         "lpn_scenario_hyd_step_tip": "Leave blank to inherit from parent.",
         "lpn_time_scn_overrides": "Scenario overrides:",
+        "lpn_engine_failed_why": "{reason} Showing the built-in solver instead.",
         "lpn_settings_basemap_style": "Basemap style",
         "lpn_basemap_style_normal": "Normal",
         "lpn_basemap_style_muted": "Muted",
         "lpn_basemap_style_faded": "Faded",
         "lpn_basemap_style_grayscale": "Grayscale",
+        "lpn_time_no_engine_why": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}",
+        "lpn_time_engine_fetch_failed": "The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.",
+        "lpn_time_engine_start_failed": "The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.",
+        "lpn_time_engine_run_failed": "The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.",
         "lpn_saved_project": "Saved with the project",
         "lpn_saved_browser": "Saved in this browser",
         "lpn_saved_session": "Not saved",
@@ -846,6 +853,8 @@
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
         "lpn_copy_opened_unsaved": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
+        "lpn_engine_unavailable_why": "Valves that open and close on their own cannot be solved without the EPANET solver. {reason}",
+        "lpn_engine_needed_failed_why": "This network can only be solved by the EPANET solver. {reason}",
         "lpn_mode_add_chain": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
         "lpn_cp_allow_tip": "Allow only these characters:",
         "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
@@ -853,11 +862,16 @@
         "lpn_scenario_duration_tip": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
         "lpn_scenario_hyd_step_tip": "Leave blank to inherit from parent.",
         "lpn_time_scn_overrides": "Scenario overrides:",
+        "lpn_engine_failed_why": "{reason} Showing the built-in solver instead.",
         "lpn_settings_basemap_style": "Basemap style",
         "lpn_basemap_style_normal": "Normal",
         "lpn_basemap_style_muted": "Muted",
         "lpn_basemap_style_faded": "Faded",
         "lpn_basemap_style_grayscale": "Grayscale",
+        "lpn_time_no_engine_why": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}",
+        "lpn_time_engine_fetch_failed": "The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.",
+        "lpn_time_engine_start_failed": "The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.",
+        "lpn_time_engine_run_failed": "The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.",
         "lpn_saved_project": "Saved with the project",
         "lpn_saved_browser": "Saved in this browser",
         "lpn_saved_session": "Not saved",
@@ -1393,6 +1407,38 @@
                 }
             }
         },
+        "lpn_engine_unavailable_why": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_unavailable",
+                    "value": "无法获取 EPANET 求解器，而它正是用于求解能够自动开闭的阀门。请连接一次互联网，此后它就会保存在本设备上。",
+                    "english": "Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_needed_loading",
+                    "value": "正在加载 EPANET 求解器，您可以继续绘制。加载完成后即可获得结果。",
+                    "english": "Loading EPANET solver while you build. Results will be available when completely loaded."
+                }
+            }
+        },
+        "lpn_engine_needed_failed_why": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_needed_failed",
+                    "value": "EPANET 求解器尚未加载，目前也无法加载，而此管网只能由它求解。连接互联网后即可加载。",
+                    "english": "The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet."
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_needs_epanet",
+                    "value": "以下阀门会自行开闭，只有 EPANET 求解器才能计算它们。由于无法加载 EPANET 求解器，缺少这些结果：",
+                    "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
         "lpn_mode_add_chain": {
             "reason": "missing",
             "current_value": null,
@@ -1505,6 +1551,22 @@
                 }
             }
         },
+        "lpn_engine_failed_why": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_failed",
+                    "value": "无法加载 EPANET 求解器，改用内置求解器。",
+                    "english": "The EPANET solver could not be loaded. Showing the built-in solver instead."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_valve_route",
+                    "value": "因以下阀门会自行开闭，本次求解使用了 EPANET 求解器：",
+                    "english": "Solved with the EPANET solver, because these valves open and close on their own:"
+                }
+            }
+        },
         "lpn_settings_basemap_style": {
             "reason": "missing",
             "current_value": null,
@@ -1582,6 +1644,70 @@
                     "key": "lpn_settings_map_display",
                     "value": "外观",
                     "english": "Appearance"
+                }
+            }
+        },
+        "lpn_time_no_engine_why": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_no_engine",
+                    "value": "内置求解器一次只能算出一个时刻，因此这里显示的仅是 {time} 时刻的管网状态：每个模式都按该时刻取值，每个水箱仍处于起始水位，而不会随时间充放水。请连接一次互联网以获取 EPANET 求解器，它可以运行延时模拟。",
+                    "english": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation."
+                },
+                "next_translated": {
+                    "key": "lpn_time_slider",
+                    "value": "已用模拟时间",
+                    "english": "Elapsed simulation time"
+                }
+            }
+        },
+        "lpn_time_engine_fetch_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_no_engine",
+                    "value": "内置求解器一次只能算出一个时刻，因此这里显示的仅是 {time} 时刻的管网状态：每个模式都按该时刻取值，每个水箱仍处于起始水位，而不会随时间充放水。请连接一次互联网以获取 EPANET 求解器，它可以运行延时模拟。",
+                    "english": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation."
+                },
+                "next_translated": {
+                    "key": "lpn_time_slider",
+                    "value": "已用模拟时间",
+                    "english": "Elapsed simulation time"
+                }
+            }
+        },
+        "lpn_time_engine_start_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_no_engine",
+                    "value": "内置求解器一次只能算出一个时刻，因此这里显示的仅是 {time} 时刻的管网状态：每个模式都按该时刻取值，每个水箱仍处于起始水位，而不会随时间充放水。请连接一次互联网以获取 EPANET 求解器，它可以运行延时模拟。",
+                    "english": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation."
+                },
+                "next_translated": {
+                    "key": "lpn_time_slider",
+                    "value": "已用模拟时间",
+                    "english": "Elapsed simulation time"
+                }
+            }
+        },
+        "lpn_time_engine_run_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_no_engine",
+                    "value": "内置求解器一次只能算出一个时刻，因此这里显示的仅是 {time} 时刻的管网状态：每个模式都按该时刻取值，每个水箱仍处于起始水位，而不会随时间充放水。请连接一次互联网以获取 EPANET 求解器，它可以运行延时模拟。",
+                    "english": "The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation."
+                },
+                "next_translated": {
+                    "key": "lpn_time_slider",
+                    "value": "已用模拟时间",
+                    "english": "Elapsed simulation time"
                 }
             }
         },

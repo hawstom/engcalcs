@@ -3723,3 +3723,7 @@ recommendation of one click door is documented for the `?` glyph only.
 - CITED: Nielsen Norman Group, progressive disclosure (more than two disclosure levels typically fail usability). Mackay 1991 "Triggers and barriers to customizing software" (CHI): ~5% of users changed any default.
 - SPECULATION: a 0-2 "level" setting would be touched by few; an early message adds a fourth thing to a crowded first screen next to the consent banner.
 - Recommendation: no three-tier now. Fix tip quality via verdicts, widen tooltip; if a switch is wanted, one binary "Show explanations" in Settings, localStorage window-furniture (counts as a stored-item change; tell Tom). No early message; surface via Help.
+
+# Ida, 2026-10-05: transport Restart/End
+OBSERVED js/lpn-time.js:1777-1860, lib/Icons.lib.php:416-419, css/engcalcs.css:1515-1550,4553-4555: group order run(hidden when auto-run), step-back, play, step-fwd, step select, speed select. Measured in Chromium: buttons 44x31 each (UA padding), selects 69 and 58 wide; group 296 at 1400, 283 at 390 (bar 388). step-back/step-fwd icons are ALREADY |< and >| (bar+triangle).
+SPECULATION: two more 44px buttons = ~396 > 388, wraps on a 390 phone. 5 buttons at 32px = ~323, fits.

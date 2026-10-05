@@ -3822,3 +3822,17 @@ Lesson: a harness with the minimum count of items cannot see an order bug that n
 OBSERVED: first-pass defect fixed. 3 flags right bar, top flag dragged 300 px: order polled mid-drag walks one slot at a time to the end, ranks 2,0,1 stored, no stuck mark, survives reload, click after reload opens the flag it names. 4 flags left bar (Properties among them), last flag dragged 400 px up: reaches the front, no stuck mark; after reload Properties is gone (by design), others keep order; click opens Libraries. Harnesses: flag-order 31/31, dock-browser 71/71, title-band 156/156.
 OBSERVED defect (minor): a one-event flick whose end point is off the strip (e.g. -150 px from the 2nd flag, strip top is y=116) changes nothing; same flick ending on the strip, or a stepped drag to the same point, reorders. Mouse only; touch flick not tried.
 Probes in scratchpad/probe.js, probe2.js (copy of builder harness head).
+
+## 2026-10-05 feat/engine-prefetch (Task 726), 65476269
+OBSERVED: harness passes; mutations: savedata gate removed -> caught; idle removed -> caught; Run awaiting in-flight prefetch removed -> NOT caught; enginePromise guard removed -> NOT caught (harness counts server 200s, HTTP cache hides repeats).
+OBSERVED: gating is main-thread idle only, not network idle; 3g not refused. prefetchPromise has no timeout; Run awaits it at low priority.
+OBSERVED: only looped-network.js init schedules it; no other page. consent_body/privacy sentences unaffected; lpn_engine_fetching still true.
+SPECULATION: two tabs both fetch if race before first put.
+
+## feat/find-source review at e184bf40 (OBSERVED, 2026-10-05)
+OBSERVED: Source scope found exactly the four nodes carrying a source quality on Net3 (Tank 1, J15, J40, Reservoir Lake); guard mutation bit (4 failures). MISSED by builder and harness: Filter in table under Source answered "applies to no table" for the source properties, left a stale Junctions filter, and Source > ID emptied Pipes. Also: three meanings of "source" in one menu (scope, dose properties, Connectivity wording) and junction-only/tank-only properties offered under Source. All fixed at e999a378 per the builder; not re-reviewed.
+
+## feat/find-source re-review at e999a378 (OBSERVED, 2026-10-05; re-verify before citing)
+OBSERVED: node-only filter, trimmed list, Replace list and no-chemical hint all held in real Chrome on Net3.
+Method: Quality and sources set by editing the project file, then Find driven by real clicks.
+Open, pre-existing and generic: a mixed-scope compound Filter in table answers "applies to no table" and leaves the old filter.
