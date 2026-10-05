@@ -358,6 +358,45 @@ routing the readers is what changes what a person sees, which waits on the quest
 6. **The two new column headings are "Presentation" and "Calculation".** They are listed in
    `dev/new-english-keys.md` for your word.
 
+## The long burn: from Basic mode to the full model (2026-10-06)
+
+**The destination is Bentley's model, and it was never declined.** Tom, 2026-10-06, on finding a
+document that said otherwise: *"I am dismayed to find myself arguing for the restoration of a project
+that should never have been hijacked or shortened or redefined in the first place."* The misreading
+came from a session note titled "Bentley is not ours", which recorded his 2026-09-30 correction (ours
+is flat, theirs is a tree over alternatives, and that model is the price of interop) and read as a
+refusal. It is renamed and corrected. **A design that closes a door on the tree is a defect.**
+
+The road, each stage shippable alone, each hidden from Basic mode until the Advanced UX exists:
+
+1. **Done (2026-09-30):** Basic mode; alternatives derived from overrides (choice A); the read-only
+   alternatives table.
+2. **Built on this branch (2026-10-05):** every project setting has a category or a stated
+   exclusion; `scenario.settings`; the read and write seams; the table counts settings.
+3. **Next: route every setting reader through `effectiveSetting()`** (about 100 sites, listed
+   above), so a setting override changes the map and the solve. A harness must hold "no override,
+   byte-identical behaviour" at every site moved.
+4. **Store the tree (choice B), additively:** `alternatives` and `scenario.alternatives` written only
+   when the tree is not the derived one. Unlocks two scenarios sharing one alternative, alternatives
+   of depth two or more, and named alternatives with no scenario.
+5. **The scenario tree:** a scenario whose parent is not Base, inheriting its parent's alternative
+   choices.
+6. **The Advanced UX:** a scenario manager and an alternative manager (create, rename, re-parent,
+   assign, merge), behind the Basic mode row. Design first (Ida, Sue, Declan), then Tom's interview.
+7. **Interchange:** the scenario workbook (Task 752) and the Show-scenarios table (Task 766) read the
+   stored tree rather than the derived one.
+
+**Where we diverge from Bentley on purpose, and the cost.** Bentley keeps symbology, colour coding
+and named views outside the scenario model (`.wtg`), so a Presentation alternative is ours alone: a
+Bentley import brings none, and an export carries none. Bentley's Calculation Options are not an
+alternative but a set the scenario names; our Calculation category should stay mappable to that one
+set per scenario, so an import can place it without guessing.
+
+**A saved view lives in a Presentation alternative** (Task 765, Tom 2026-10-06), restored by one
+click. Whether switching scenario also moves the map is a separate question (interview, b2); the
+cheap reading that satisfies both is that the view is stored with the alternative and restored on
+request, never on a scenario switch.
+
 ## The code
 
 `js/looped-network.js`, section "SCENARIO ALTERNATIVES": `LPN_ALT_CATEGORIES`, `categoryOf(prop,
