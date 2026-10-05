@@ -912,6 +912,7 @@ the block.
   *"Do we have a way of knowing whether people are installing?"* No: `appinstalled` only hides the
   button (`js/Calculators.lib.js:195`). One install event plus an app/tab field on view rows would
   answer it; it is a new logged fact about visitors, so it goes past `consent_body` and him first.
+- 50|765| **Saved views: one click restores a figure for a report.** Tom, 2026-10-05: *"I am less interested in this Report Builder than I am in making it easy to reproduce screenshots."* Window, appearance, scenario and time by reference, and which Text layers show (needs Task 639); then Copy image at 2x-3x. Never text stored in a scenario. `dev/saved-views.md`.
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary
