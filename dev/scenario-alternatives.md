@@ -470,7 +470,8 @@ extension, there will have to be a settings Table."* Not built yet. What it must
 - **Q1, does the Calculation column count the demand multiplier, run time and time step:** *"Rethink
   this, make it consistent, and bring it again. I think I know what you are saying. But the answer
   may be obvious once you look at what we are doing."* Brought again as question 7 below.
-- Q6 (the two headings): not yet answered.
+- Q6 (the two headings): not yet answered. 2026-10-05 he asked for context (*"Where? If I am
+  guessing right, I think my answer is 'Value'"*): re-asked with the place named, see the handoff.
 
 ### His answers, 2026-10-05 (second round)
 
@@ -614,14 +615,16 @@ after (3.1 ms with no tree). Perry measured 465 ms and 8.3 s before, on his own 
 view is the live one. Entering a scenario that holds or inherits a view goes there; entering one
 that holds none shows Base's live view.
 
-**Decided by CC, his to overturn:**
+**Decided by CC; Tom confirmed the first four on 2026-10-05, the rest stand until he overturns them:**
 
-- A local value equal to its parent's is kept (the key's presence is the intent); nothing prunes it.
-- Editing a shared alternative changes every scenario that uses it, as in Bentley.
+- **An override equal to its parent's value is still an override** (the key's presence is the
+  intent); nothing prunes it. Tom: *"It's still an override? Yes. (Use the word override. It's the
+  technical term.)"* Say "override", never "local value", in docs and visitor strings.
+- Editing a shared alternative changes every scenario that uses it, as in Bentley. Tom: *"Yes!"*
 - Reparenting an alternative or a scenario keeps its own values; what it inherits may change.
 - Deleting an alternative, a calculation set or a scenario is refused while anything uses it, and
   the refusal names who (the Scenarios menu's Delete row says so in a notice); merging is the way
-  to retire one.
+  to retire one. Tom: *"Yes."*
 - **A merge moves no value any user of the merged alternative reads** (Perry's review): the target
   must be its ancestor (the alternatives between are folded in) or its sibling whose own values
   would not reach those users; anything else is refused, saying why. Values combine by the rule
@@ -643,7 +646,13 @@ in stage 3, not unit-bearing values held in any settings block.
 
 - **Declan:** store the view as centre plus scale, scale in ground metres per CSS pixel (1/96 in),
   with 1:N derived. Corners depend on the window size, so they are shown, not stored.
-- **Ida and Declan:** Major and Minor headings as group rows.
+- **Ida and Declan:** Major and Minor headings as group rows. **Tom, 2026-10-05: *"No. Let's keep
+  the table paradigm."*** Major and Minor stay columns.
+- **Sue:** a scenario that switches friction method with no roughness override reads C=130 as a
+  Darcy-Weisbach roughness of 130 and solves with garbage. **Tom, 2026-10-05: *"Yes. Add the glyph
+  to every unreasonable value"*** (diameters, roughness by method, and so on). Built suite-wide on
+  `feat/value-warning` as a pure function of (field, value, method in effect); this branch calls it
+  with the scenario's resolved method when the two meet.
 - **Declan:** scenarios as rows in the Settings table, matching Task 766.
 - **Ida:** a held field marked by an amber edge plus "Base: {value}" and a Reset link, with no
   per-field checkbox.
