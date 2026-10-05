@@ -22,8 +22,8 @@
                 "every selected asset of any kind goes onto the graph",
                 "only the selected assets of the group shown (Nodes or Links) go onto the graph"
             ],
-            "disposition": "refer-to-human",
-            "resolution": "PROPOSED: 'Put the selected nodes or links (whichever group is shown) on the map onto the graph.'"
+            "disposition": "english",
+            "resolution": "Moot: the key was deleted in eccbd119 (\"Delete 45 tips Tom ruled out\"); nothing renders it, so there is nothing to translate."
         },
         {
             "key": "lpn_ts_add_none",
