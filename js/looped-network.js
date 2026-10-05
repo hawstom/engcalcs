@@ -5202,7 +5202,8 @@ var EngCalcs = EngCalcs || {};
 		p = storedById(storedList(kind), parentId);
 		return !!p && (kind === 'calc' || p.category === cat) && !storedParentLoops(storedList(kind), id, parentId);
 	}
-	function createStored(kind, cat, name, parentId) {
+	// `quiet`: the caller (promote) bumps the epoch itself, once, when the whole act is done.
+	function createStored(kind, cat, name, parentId, quiet) {
 		var r, list;
 		if (kind === 'alt' && !storedCategoryOk(cat)) { return treeRefuse('category'); }
 		if (!storedParentOk(kind, '', parentId, cat)) { return treeRefuse('parent'); }
@@ -5212,7 +5213,7 @@ var EngCalcs = EngCalcs || {};
 		r.name = String(name === undefined || name === null ? '' : name);
 		r.parent = (parentId === undefined || parentId === null) ? null : parentId;
 		list.push(r);
-		touchTree('createStored');
+		if (!quiet) { touchTree('createStored'); }
 		return r;
 	}
 	function createAlternative(cat, name, parentId) { return createStored('alt', cat, name, parentId); }
@@ -5423,7 +5424,7 @@ var EngCalcs = EngCalcs || {};
 		if (!s || s.isBase) { return treeRefuse('base'); }
 		if (kind === 'alt' && !storedCategoryOk(cat)) { return treeRefuse('category'); }
 		parentId = inheritedStoredChoice(s, cat);
-		r = createStored(kind, cat, name, parentId);
+		r = createStored(kind, cat, name, parentId, true);
 		if (r.refused) { return r; }
 		moved = takeScenarioLocals(s, cat);
 		if (Object.keys(moved.values).length) { r.values = moved.values; }
@@ -5960,7 +5961,9 @@ var EngCalcs = EngCalcs || {};
 		if (!s || s.isBase) { return; }
 		kids = scenarios.filter(function (x) { return x.parent === id; }).map(function (x) { return x.id; });
 		if (kids.length) { return treeRefuse('children', { children: kids }); }
-		scenarios = scenarios.filter(function (x) { return x.id !== id; });
+		// In place, so the list keeps its identity and the epoch bump below is what the resolver's
+		// cache answers to (not the identity guard, which is for a whole document swapped in).
+		scenarios.splice(scenarios.indexOf(s), 1);
 		touchTree('deleteScenario');
 		if (project.activeScenario === id) { project.activeScenario = baseScenario().id; }
 		applyScenarioChange();
@@ -15770,7 +15773,9 @@ var EngCalcs = EngCalcs || {};
 						y: typeof ov.y === 'number' ? ov.y : outwardY(n.y) }
 				});
 			});
-		});
+		// Read-only: the positions are written later, by georefWriteCoordOverrides() and the two
+		// restores, each of which bumps the epoch as 'georef'.
+		}, null, true);
 		return out;
 	}
 	// Re-derived from the capture on every transform, exactly as georefWrite() re-derives every
@@ -17308,6 +17313,7 @@ var EngCalcs = EngCalcs || {};
 			if (o.hasX) { o.ov.x = o.was.x; }
 			if (o.hasY) { o.ov.y = o.was.y; }
 		});
+		touchTree('georef');
 		// **THE OFFSETS COME BACK TOO** (label offsets, anchored Text, attached customers). The same
 		// opening transform had scaled them to the size of a continent, which left every label that
 		// far from its node until the first settle -- and, with the labels drawn, made the fit below
@@ -17507,6 +17513,7 @@ var EngCalcs = EngCalcs || {};
 			if (o.hasX) { o.ov.x = o.was.x; }
 			if (o.hasY) { o.ov.y = o.was.y; }
 		});
+		touchTree('georef');
 		// The picture goes back to the numbers it had, not to a number derived back through the
 		// transform: `prev` is the three it arrived with, so Cancel is `===` for the backdrop on the
 		// same terms it is for every coordinate.

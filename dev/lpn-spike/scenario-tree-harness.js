@@ -23,6 +23,7 @@ global.prompt = global.window.prompt = function () { return 'Scenario'; };
 
 require(ROOT + 'js/lpn-patterns.js');
 require(ROOT + 'js/lpn-time.js');
+if (!global.EngCalcs.lpnGeorefToLonLat) { require(ROOT + 'js/lpn-georef.js'); }
 
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getScenarios: function () { return scenarios; },\n" +
@@ -49,6 +50,9 @@ const L = loadLoopedNetwork(
 	"\t\tapplyNodeRename: applyNodeRename, deleteNode: deleteNode, convertUnitValues: convertUnitValues,\n" +
 	"\t\tlibRepointPattern: libRepointPattern, setScenarioParent: setScenarioParent, treeLayers: treeLayers,\n" +
 	"\t\tsetScenarioView: setScenarioView, currentView: currentView, applyView: applyView,\n" +
+	"\t\tclearOverride: clearOverride, commitAltOption: commitAltOption,\n" +
+	"\t\tgeorefBegin: function () { var was = georef; georef = { ovs: georefCaptureCoordOverrides() }; return was; },\n" +
+	"\t\tgeorefMove: function (t) { georefWriteCoordOverrides(t); }, georefEnd: function (was) { georef = was; },\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -61,6 +65,9 @@ setUnitSet('us');
 L.buildLayers();
 L.setCanvas(1000, 700);
 L.seedDefaultInputs();
+// The mutation sweep: TREE_SKIP=<site> skips that one touchTree() for the whole run, and the run
+// must then FAIL somewhere. dev/lpn-spike's sweep is `for s in <sites>; do TREE_SKIP=$s node ...`.
+if (process.env.TREE_SKIP) { L.setTouchSkip(process.env.TREE_SKIP); }
 
 let fails = 0, passes = 0;
 function ok(name, cond, extra) {
@@ -142,7 +149,8 @@ function naiveSetting(s, p) {
 // ---------------------------------------------------------------------------
 // Properties whose "not held anywhere" answer has a layer of its own (the pipe type, the derived
 // auto length, the outward position, the demand list) are compared only where a holder has them.
-const SPECIAL = new Set(['length', 'x', 'y', 'demand', 'demands', 'typeId']);
+// (A demand, a position and a type reference fall back to exactly Base's own, so they ARE compared.)
+const SPECIAL = new Set(['length']);
 let elements = [];
 let settingPaths = [];
 function checkAll(label) {
@@ -184,8 +192,23 @@ function C(v) {
 	if (v && typeof v === 'object') { return '{' + Object.keys(v).sort().map((k) => JSON.stringify(k) + ':' + C(v[k])).join(',') + '}'; }
 	return J(v);
 }
+// Whether anything about the tree is stored, measured here independently of the page.
+function naiveStored() {
+	const d = L.getDoc();
+	return !!((d.alternatives || []).length || (d.calcSets || []).length ||
+		L.getScenarios().some((s) => s.parent !== undefined || s.alternatives !== undefined || s.calc !== undefined));
+}
+// The cache as it stands, against one rebuilt from nothing: every cached answer is read first, then
+// the epoch is bumped and every answer read again. Bumping is the point -- a "fresh" rebuild that
+// reused the cache's own per-holder grouping would agree with a stale one.
+function cacheTruthful() {
+	const snap = () => C([L.isExplicitTree()].concat(L.getScenarios().map((s) => [L.resolvedOverrides(s), s.isBase ? null : L.resolvedSettingsBlock(s)])));
+	const cached = snap();
+	L.touchTree();
+	return cached === snap();
+}
 function cacheFresh() {
-	return L.getScenarios().every((s) => C(L.resolvedOverrides(s)) === C(s.isBase || !L.isExplicitTree() ? s.overrides : L.buildResolvedOverrides(s)) &&
+	return L.isExplicitTree() === naiveStored() && L.getScenarios().every((s) => C(L.resolvedOverrides(s)) === C(s.isBase || !L.isExplicitTree() ? s.overrides : L.buildResolvedOverrides(s)) &&
 		(s.isBase || !L.isExplicitTree() || C(L.resolvedSettingsBlock(s)) === C(L.buildResolvedSettings(s))));
 }
 // The four structural invariants of a stored tree.
@@ -491,31 +514,89 @@ console.log('\n--- 4. random mutations (seed ' + SEED + ') ---');
 // ---------------------------------------------------------------------------
 // 5. The cache goes stale without its touch, and the harness sees it
 // ---------------------------------------------------------------------------
-// A mutation test of the epoch itself: one write site's bump skipped by a flag (the page is not
-// edited), and the comparison must then FAIL. If it passed, sections 1 and 4 would prove nothing
-// about the cache.
-console.log('\n--- 5. a missing touchTree() is caught ---');
-{
-	open('Net1.lwn');
-	elements = L.getDoc().nodes.slice(0, 6);
-	const s = L.createScenario('Stale');
-	s.parent = L.baseScenario().id;
-	L.touchTree();
-	const j = L.getDoc().nodes.filter((n) => n.type === 'junction')[0];
-	L.getProject().activeScenario = s.id;
-	L.effective(j, 'demand');
-	L.setTouchSkip('setOverride');
-	L.setProp(j, 'demand', 4321);
+// A mutation test of the epoch itself, one case per write site: the site's bump is skipped by name
+// (treeTouchSkip; the page is not edited) and the comparison must then FAIL -- and pass with it.
+// If a case passed both ways, sections 1 and 4 would prove nothing about that site.
+console.log('\n--- 5. a missing touchTree() is caught, site by site ---');
+function quietCheck() {
 	const before = fails, log = console.log;
 	console.log = function () {};
-	const caught = !checkAll('stale') || !cacheFresh();
+	const good = checkAll('stale') && cacheFresh();
 	console.log = log;
 	fails = before;
-	L.setTouchSkip(null);
-	L.touchTree();
-	ok('with setOverride()\'s bump skipped, the stale cache is caught', caught);
-	ok('...and with it restored the same read is right', L.effective(j, 'demand') === 4321);
+	return good;
 }
+// Read everything, so every cache is full.
+function warm() { quietCheck(); }
+// Detect: wrong values, a cache disagreeing with a rebuild, or a cache disagreeing with one built
+// from nothing.
+function stale() { return !quietCheck() || !cacheTruthful(); }
+function siteCase(site, what, build) {
+	const seen = [], sweep = process.env.TREE_SKIP;
+	// In the sweep the site named by TREE_SKIP is skipped for the whole run, so only the "with its
+	// bump" leg runs, under that skip -- and fails for exactly that site.
+	(sweep ? [false] : [false, true]).forEach((skip) => {
+		const act = build();
+		warm();
+		L.setTouchSkip(skip ? site : (sweep || null));
+		act();
+		L.setTouchSkip(sweep || null);
+		seen.push(stale());
+		L.touchTree();
+	});
+	if (sweep) { ok(site + ' (' + what + '): fresh', !seen[0]); return; }
+	ok(site + ' (' + what + '): fresh with its bump, caught without it', !seen[0] && seen[1], J(seen));
+}
+// A fresh Net1 with the elements the cases use, and a scenario Peak with a local demand.
+function fixture(explicit) {
+	open('Net1.lwn');
+	const d = L.getDoc(), j = d.nodes.filter((n) => n.type === 'junction')[0], pipe = d.links.filter((l) => l.type === 'pipe')[0];
+	elements = [j, pipe];
+	settingPaths = [['settings', 'hydraulics', 'demandMultiplier']];
+	L.switchScenario(L.baseScenario().id);
+	const peak = L.createScenario('Peak');
+	L.setProp(j, 'demand', 500);
+	const kid = explicit ? L.createScenario('Kid', peak.id) : null;
+	L.switchScenario(L.baseScenario().id);
+	return { d, j, pipe, peak, kid };
+}
+siteCase('setOverride', 'a demand typed in a child', () => { const f = fixture(true); return () => { L.getProject().activeScenario = f.kid.id; L.setProp(f.j, 'demand', 4321); }; });
+siteCase('clearOverride', 'a demand cleared in a parent', () => { const f = fixture(true); return () => { L.getProject().activeScenario = f.peak.id; L.clearOverride(f.j, 'demand'); }; });
+siteCase('createStored', 'the first alternative makes the tree stored', () => { fixture(false); return () => { L.createAlternative('physical', 'x', null); }; });
+siteCase('deleteStored', 'the last alternative goes', () => { fixture(false); const a = L.createAlternative('physical', 'x', null); return () => { L.deleteAlternative(a.id); }; });
+siteCase('mergeAlternativeInto', 'a child merged into the parent another scenario uses', () => {
+	const f = fixture(true), t = L.createAlternative('physical', 't', null), a = L.createAlternative('physical', 'a', t.id);
+	a.values = {}; a.values[L.ovKey(f.pipe)] = { diameter: 77 };
+	L.assignAlternative(f.peak.id, 'physical', t.id);
+	L.assignAlternative(L.createScenario('Uses a').id, 'physical', a.id);
+	L.touchTree();
+	return () => { L.mergeAlternativeInto(a.id, t.id); };
+});
+siteCase('promoteStored', 'a derived project\'s first promote', () => { const f = fixture(false); return () => { L.promoteImplicitAlternative(f.peak.id, 'demand', 'Peak demand'); }; });
+siteCase('eachOverrideMap', 'a unit change reaching a stored alternative', () => {
+	const f = fixture(true), ph = L.createAlternative('physical', 'Big', null);
+	ph.values = {}; ph.values[L.ovKey(f.pipe)] = { diameter: 12 };
+	L.assignAlternative(f.peak.id, 'physical', ph.id);
+	L.touchTree();
+	return () => { L.convertUnitValues('lpn_u_diameter', 2); };
+});
+siteCase('eachOverrideMap', 'a node rename moving its key', () => { const f = fixture(true); return () => { L.applyNodeRename(f.j.id, 'RENAMED'); }; });
+siteCase('createScenario', 'a child scenario makes the tree stored', () => { const f = fixture(false); return () => { L.createScenario('Kid', f.peak.id); }; });
+siteCase('deleteScenario', 'the only stored parent goes with its scenario', () => { const f = fixture(true); return () => { L.deleteScenario(f.kid.id); }; });
+siteCase('demandMultiplier', 'a parent\'s multiplier typed in the Alternatives table', () => {
+	const f = fixture(true);
+	return () => { L.commitAltOption(f.peak, 'demandMultiplier', { value: '4' }); };
+});
+siteCase('georef', 'a scenario\'s own position moved by the georeferencing wizard', () => {
+	const f = fixture(true);
+	L.getProject().activeScenario = f.peak.id;
+	L.setProp(f.j, 'x', 1234);
+	L.getProject().activeScenario = L.baseScenario().id;
+	const n0 = f.d.nodes.filter((n) => n !== f.j)[0];
+	elements = [f.j, n0];
+	let was;
+	return () => { was = L.georefBegin(); warm(); L.georefMove({ rotDeg: 0, anchor: { x: 0, y: 0 }, metersPerUnit: 1, origin: { lon: 10, lat: 10 } }); L.georefEnd(was); };
+});
 
 // ---------------------------------------------------------------------------
 // 6. Promote changes nothing anybody can see; undo and redo are whole
