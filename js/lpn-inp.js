@@ -2953,7 +2953,10 @@
 		if (opts.times) {
 			expTimes = Object.assign({}, doc.times || {});
 			expTimes.text = Object.assign({}, (doc.times && doc.times.text) || {});
-			['duration', 'hydraulicStep'].forEach(function (k) {
+			// The run time and time step first (Task 755); any other [TIMES] value the scenario
+			// holds in its settings block rides the same way (dev/scenario-alternatives.md).
+			['duration', 'hydraulicStep', 'patternStep', 'patternStart', 'reportStep', 'reportStart',
+				'startClock'].forEach(function (k) {
 				if (typeof opts.times[k] !== 'number') { return; }
 				expTimes[k] = opts.times[k];
 				if (opts.times.text && typeof opts.times.text[k] === 'string') { expTimes.text[k] = opts.times.text[k]; }

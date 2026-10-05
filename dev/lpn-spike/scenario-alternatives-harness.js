@@ -348,9 +348,17 @@ const exampleFiles = fs.readdirSync(ROOT + 'examples/').filter(function (f) { re
 	ok('...and every category named is a declared category', !badCat.length, badCat.join(', '));
 	ok('Presentation and Calculation each hold settings',
 		['presentation', 'calculation'].every(function (c) { return Object.keys(L.SETTING_CATEGORY_OF).some(function (k) { return L.SETTING_CATEGORY_OF[k] === c; }); }));
-	ok('units and friction method may never vary by scenario',
+	// Tom, 2026-10-06: "The one thing we refuse to do in the same project is let equations push
+	// physical dimensions around (units and coordinates conversion)."
+	ok('units and the coordinate frame may never vary by scenario; friction method may (a Calculation option)',
 		L.categoryOf('units', 'setting') === null && L.categoryOf('units.lpn_u_flow', 'setting') === null &&
-		L.categoryOf('settings.method', 'setting') === null);
+		L.categoryOf('origin', 'setting') === null && L.categoryOf('project.crs', 'setting') === null &&
+		L.categoryOf('settings.method', 'setting') === 'calculation');
+	ok('new-asset settings vary too, in the category of the property they seed',
+		L.categoryOf('settings.defaults.diameter', 'setting') === 'physical' &&
+		L.categoryOf('settings.defaults.demand', 'setting') === 'demand' &&
+		L.categoryOf('settings.idPrefixes.J', 'setting') === 'physical');
+	ok('a scenario\'s view is Presentation', L.categoryOf('view', 'setting') === 'presentation');
 	ok('the longest named path wins: label values are Presentation, a reaction rate Constituent, tank staging excluded',
 		L.categoryOf(['labelSettings', 'node', 'pressure'], 'setting') === 'presentation' &&
 		L.categoryOf('settings.reactions.globalBulk', 'setting') === 'constituent' &&
@@ -389,9 +397,9 @@ console.log('\n--- settings: an override resolves in its scenario and not in Bas
 	const before = L.projectFileText();
 	ok('the write seam refuses Base', L.setScenarioSetting(L.baseScenario(), 'settings.textSize', 20) === false);
 	const pk = L.createScenario('Peak Hour');
-	ok('...and refuses units, friction method and new-asset defaults',
-		L.setScenarioSetting(pk, 'units', {}) === false && L.setScenarioSetting(pk, 'settings.method', 'dw') === false &&
-		L.setScenarioSetting(pk, 'settings.defaults.diameter', 8) === false);
+	ok('...and refuses units and the coordinate frame',
+		L.setScenarioSetting(pk, 'units', {}) === false && L.setScenarioSetting(pk, 'origin', { x: 1, y: 1 }) === false &&
+		L.setScenarioSetting(pk, 'project.coords', 'geo') === false);
 	ok('...and the demand multiplier and run time, which keep their own homes',
 		L.setScenarioSetting(pk, 'settings.hydraulics.demandMultiplier', 3) === false &&
 		L.setScenarioSetting(pk, 'times.duration', 3600) === false);
@@ -447,13 +455,14 @@ console.log('\n--- settings: an override resolves in its scenario and not in Bas
 	const hand = JSON.parse(before);
 	hand.scenarios[0].settings = { settings: { textSize: 30 } };
 	hand.scenarios.push({ id: 'hand', name: 'Hand', overrides: {},
-		settings: { units: { lpn_u_flow: 'gpm' }, settings: { method: 'dw', textSize: 9, laterKey: 1 } } });
+		settings: { units: { lpn_u_flow: 'gpm' }, origin: { x: 5, y: 5 }, settings: { method: 'dw', textSize: 9, laterKey: 1 } } });
 	L.applySaved(L.acceptImportedText(JSON.stringify(hand)));
 	const hs = L.getScenarios().filter(function (s) { return s.id === 'hand'; })[0];
-	ok('on open, Base\'s block goes, and so do units and friction method, which may never vary',
-		!has(L.baseScenario(), 'settings') && !has(hs.settings, 'units') && !has(hs.settings.settings, 'method'));
+	ok('on open, Base\'s block goes, and so do units and the origin, which may never vary',
+		!has(L.baseScenario(), 'settings') && !has(hs.settings, 'units') && !has(hs.settings, 'origin'));
 	ok('...a Presentation value stays, and a key from a later version is kept verbatim but counted in no alternative',
 		hs.settings.settings.textSize === 9 && hs.settings.settings.laterKey === 1 && L.alternativeFor(hs, 'presentation').count === 1);
+	ok('...and a friction method stays, counted in Calculation', hs.settings.settings.method === 'dw' && L.alternativeFor(hs, 'calculation').count === 1);
 }
 
 console.log('\n' + (fails ? fails + ' FAILED' : 'ALL PASS'));

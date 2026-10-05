@@ -43,7 +43,7 @@ var EngCalcs = EngCalcs || {};
 	// shared settings.textSize -- node/link labels never pass one.
 
 	function effectiveFontSize(mult) {
-		return (settings.textSize / (state.s || 1)) * (mult || 1);
+		return (scnSetting('textSize') / (state.s || 1)) * (mult || 1);
 	}
 	function effectiveLineHeight() { return effectiveFontSize() * 1.2; }
 	// Everything on the map drawn at a fixed world size relative to the LETTERING was drawn against
@@ -421,7 +421,7 @@ var EngCalcs = EngCalcs || {};
 	// edit still draws something readable rather than upside-down text.
 	var LPN_FLIP_LEFT_MIN = 0, LPN_FLIP_LEFT_MAX = 45;
 	function labelFlipLeftOfVertical() {
-		var d = +settings.labelFlipLeftOfVertical;
+		var d = +scnSetting('labelFlipLeftOfVertical');
 		if (!isFinite(d)) { return 20; }
 		return Math.max(LPN_FLIP_LEFT_MIN, Math.min(LPN_FLIP_LEFT_MAX, d));
 	}
@@ -444,7 +444,7 @@ var EngCalcs = EngCalcs || {};
 	// page cannot name in its own control.
 	var LEADER_SNAP_STEPS = [0, 15, 30, 45];
 	function leaderSnapDeg() {
-		var d = +settings.leaderSnapDeg;
+		var d = +scnSetting('leaderSnapDeg');
 		return LEADER_SNAP_STEPS.indexOf(d) > 0 ? d : 0;
 	}
 	// (dx, dy) -> the offset to store. Pass-through when the snap is off, which is the default.
@@ -452,7 +452,7 @@ var EngCalcs = EngCalcs || {};
 		return Geom.snapLeaderOffset(dx, dy, leaderSnapDeg());
 	}
 	function linkLabelAligned(l) {
-		return !!settings.alignPipeLabels && l.lx === undefined && l.ly === undefined;
+		return !!scnSetting('alignPipeLabels') && l.lx === undefined && l.ly === undefined;
 	}
 	// ---- THE NEAREST OTHER PIPE IS ASKED FOR ONCE PER PASS, NOT ONCE PER LABEL -------------------
 	//
@@ -1318,7 +1318,7 @@ var EngCalcs = EngCalcs || {};
 				// is in fractions of the font size and has to stay true at every text size. So the
 				// near edge clears the pipe's half-width exactly when gap > halfWidth + 0.35 x
 				// fontSize, and 0.5 leaves a sixth of a font size of air.
-				frac: 0, gap: settings.linkWidth / (2 * (state.s || 1)) + effectiveFontSize() * 0.5,
+				frac: 0, gap: scnSetting('linkWidth') / (2 * (state.s || 1)) + effectiveFontSize() * 0.5,
 				fontSize: effectiveFontSize(), lineHeight: effectiveLineHeight(),
 				nLines: le.lineCount || 1,
 				// Where the 180-degree readability flip happens (Task 351), converted from the
@@ -2320,7 +2320,7 @@ var EngCalcs = EngCalcs || {};
 	// NOT a weighted sum -- a sum lets a large elevation difference outvote a demand, which is not
 	// what "in this order" means.
 	function nodeDropKey(n) {
-		var ctx = nodeContextFor(n.id), ls = labelSettings, out = [];
+		var ctx = nodeContextFor(n.id), ls = scnLabels(), out = [];
 		if (!ctx) { return [0]; }
 		Object.keys(LPN_NODE_DROP_RULE)
 			.filter(function (f) { return ls.node[f] && typeof ls.priority.node[f] === 'number'; })
@@ -2399,7 +2399,7 @@ var EngCalcs = EngCalcs || {};
 	// reaches its last value and a node label did not. Nothing else about the two orders differs --
 	// both drop the value numbered 1 first.
 	function nodeShedMaxRungs() {
-		return Math.max(1, Object.keys(labelSettings.priority.node).length - 1);
+		return Math.max(1, Object.keys(scnLabels(['priority', 'node'])).length - 1);
 	}
 	// Back to full content, for the labels that are not already there. Cheap in the ordinary case:
 	// on a drawing where nothing shed last pass this is one scan and no DOM work at all.
@@ -3154,7 +3154,7 @@ var EngCalcs = EngCalcs || {};
 		// Task 190's global toggle is enforced HERE, not by suppressing the extrema themselves: the
 		// extrema objects stay computed and correct, so turning the marks back on needs no recompute
 		// and nothing else that reads them can go stale while they are hidden.
-		if (!labelSettings.markExtrema) { return undefined; }
+		if (!scnLabels(['markExtrema'])) { return undefined; }
 		if (!extrema || typeof value !== 'number') { return undefined; }
 		if (value === extrema.max && value === extrema.min) { return undefined; }
 		if (value === extrema.max) { return 'high'; }
@@ -3203,7 +3203,7 @@ var EngCalcs = EngCalcs || {};
 	// same text by a user who is entitled to do that. So the id is checked against every id in the
 	// document and the counter walks forward until it is free.
 	function mintId(key) {
-		var prefix = settings.idPrefixes[key] || key, used = {}, id;
+		var prefix = (scnSetting('idPrefixes') || {})[key] || key, used = {}, id;
 		allIds().forEach(function (x) { used[x] = 1; });
 		if (nextId[key] === undefined) { nextId[key] = 1; }
 		do { id = prefix + (nextId[key]++); } while (used[id]);
@@ -4843,9 +4843,12 @@ var EngCalcs = EngCalcs || {};
 	// (`colorBreaks['node.pressure']`). Its alternatives are DERIVED from it exactly as element
 	// overrides' are (choice A): nothing about the tree is stored.
 	//
-	// **NOTHING IN THE INTERFACE WRITES ONE YET, AND NO READER IS ROUTED THROUGH THE SEAM YET.**
-	// Whether changing Settings inside a scenario creates an override is Tom's call (the doc's
-	// questions); until then the page reads the project's own objects exactly as it always has.
+	// **EVERY READER IS ROUTED THROUGH THE SEAM; NOTHING IN THE INTERFACE WRITES ONE YET** (stage 3
+	// of the doc's long burn). Tom, 2026-10-06: a setting changed in a scenario changes that scenario
+	// only, Presentation included -- *"We can't treat any value overrides differently."* The editing
+	// half (the Settings box writing through setScenarioSetting(), and the settings table that
+	// audits it) is the next stage. Until then a hand-written block changes the map and the solve
+	// in its own scenario, and the Settings box still shows and edits the project's own values.
 	var LPN_SETTING_CATEGORY_OF = {
 		// -- the model and the file's own bookkeeping
 		format: null, app: null, v: null, nextId: null,
@@ -4859,8 +4862,13 @@ var EngCalcs = EngCalcs || {};
 		// -- document objects: an element's reference varies, the object does not (CLAUDE.md)
 		patterns: null, curves: null, pipeTypes: null, fittingSets: null, profiles: null,
 		controls: null, rules: null, inpSections: null,
-		// -- coordinate-bearing, and megabytes; the camera is question 2
-		backdrop: null, view: null,
+		// -- coordinate-bearing, and megabytes
+		backdrop: null,
+		// **A SCENARIO MAY HOLD ITS OWN VIEW** (Tom, 2026-10-06: *"A scenario may have map overrides,
+		// though normally they won't. Only a scenario named something like 'Figure 6-1: Elm and Main
+		// contours' would do that."*). Stored OUTWARD, as a node's position override is, so no Y flip,
+		// origin shift or projection ever touches it: see outwardViewOf().
+		view: 'presentation',
 		'project.basemap': 'presentation', 'project.basemapLast': 'presentation',
 		labelSettings: 'presentation', times: 'calculation', defaultPattern: 'demand'
 	};
@@ -4874,30 +4882,41 @@ var EngCalcs = EngCalcs || {};
 		'colorClassesLink', 'colorReverseNode', 'colorReverseLink', 'colorBreaks', 'colorModes',
 		'colorLegendPosition', 'contourFill', 'contourLines', 'contourLabels', 'contourOpacity',
 		'contourInterval', 'contourBuffer', 'contourTerrain']],
-	// Calculation: Bentley's Calculation Options.
+	// Calculation: Bentley's Calculation Options. **FRICTION METHOD INCLUDED** (Tom, 2026-10-06:
+	// *"I see it indefensible to require somebody to have to save a project for something like
+	// friction method."*). A pipe still holds one roughness number; a scenario's method
+	// REINTERPRETS it and never converts it, the rule a unit change already follows.
 	['calculation', ['engine', 'autoRun', 'hydraulics', 'emitterExponent', 'tolerance', 'quality',
-		'qualityOptions']],
+		'qualityOptions', 'method']],
 	// Document-wide values that belong with element properties already in a category.
 	['constituent', ['reactions']], ['energy', ['energy']],
-	// Never a scenario's: friction method reinterprets every roughness; new-asset settings write
-	// Base data (question 3); a custom property's design is schema; then the .inp readers' import
-	// markers and staging; then keys that are stale, or migrated and deleted by applySaved().
-	[null, ['method', 'idPrefixes', 'defaults', 'nodeElevSource', 'customProps', 'fileOptions',
+	// **NEW-ASSET SETTINGS** (Tom, 2026-10-06: *"Leave the creativity to the users. Give them
+	// freedom. And be perfectly consistent in the design."*): the values a new element is born
+	// with sit in the category of the property they seed. Bentley keeps these as Prototypes,
+	// outside scenarios, so this is ours alone.
+	['physical', ['idPrefixes', 'defaults', 'nodeElevSource']],
+	// Never a scenario's: a custom property's design is schema (the values are User data); then
+	// the .inp readers' carried text, import markers and staging; then keys that are stale, or
+	// migrated and deleted by applySaved().
+	[null, ['customProps', 'fileOptions',
 		'sources', 'mixing', 'tags', 'reactions.tank', 'energy.effic',
 		'sectionsOpen', 'mapHeight', 'fileAutosaveSeconds', 'colorRamp', 'colorClasses', 'colorReverse',
 		'colorThematic', 'colorFrozenBreaks', 'basemapFilter', 'kmDefault', 'labelReadabilityBias']]
 	].forEach(function (g) {
 		g[1].forEach(function (m) { LPN_SETTING_CATEGORY_OF['settings.' + m] = g[0]; });
 	});
+	// The one new-asset value that seeds a Demand property rather than a Physical one.
+	LPN_SETTING_CATEGORY_OF['settings.defaults.demand'] = 'demand';
 	// An object overridden whole rather than member by member: mode and trace node are one choice.
-	var LPN_SETTING_ATOMIC = { 'settings.quality': true };
+	// So is a view: a centre without its scale is no place to look.
+	var LPN_SETTING_ATOMIC = { 'settings.quality': true, view: true };
 	// Calculation options that already vary by scenario and KEEP THE HOMES THEY HAVE (Tasks 721,
 	// 755): `scenario.demandMultiplier` and `scenario.times`. scenario.settings refuses them, so a
 	// fact never has two homes; settingFor() reads them where they are.
 	var LPN_SETTING_ELSEWHERE = { 'settings.hydraulics.demandMultiplier': true,
 		'times.duration': true, 'times.hydraulicStep': true,
 		'times.text.duration': true, 'times.text.hydraulicStep': true };
-	var LPN_SETTING_ROOTS = ['settings', 'labelSettings', 'project', 'times', 'defaultPattern'];
+	var LPN_SETTING_ROOTS = ['settings', 'labelSettings', 'project', 'times', 'defaultPattern', 'view'];
 	function settingPath(path) { return Array.isArray(path) ? path.slice() : String(path).split('.'); }
 	function plainObject(v) { return !!v && typeof v === 'object' && !Array.isArray(v); }
 	/**
@@ -4922,6 +4941,8 @@ var EngCalcs = EngCalcs || {};
 			case 'project': return project;
 			case 'times': return projectTimes();
 			case 'defaultPattern': return doc.defaultPattern || null;
+			// Where the reader is looking, in the frame a scenario's own view is stored in.
+			case 'view': return outwardViewOf(currentView());
 		}
 		return undefined;
 	}
@@ -4981,9 +5002,17 @@ var EngCalcs = EngCalcs || {};
 	 * onto it behaves exactly as before. Where the scenario holds part of an object, a merged COPY,
 	 * so no reader can write a scenario's value into the project's.
 	 */
+	//
+	// **CHEAP ON PURPOSE, BECAUSE IT RUNS PER ELEMENT** (stage 3: every reader goes through it). In
+	// Base, and in a scenario that holds no setting at all, it is one walk of the project's own
+	// object and nothing is built. A scenario's block is walked in place, not copied; the one copy
+	// made is the answer itself, and only when that answer is an object the scenario holds part of.
+	// The mirror with the two calculation options stored elsewhere (scenarioSettingTree()) is built
+	// only for a path that can reach them.
 	function settingFor(scn, path) {
 		var p = settingPath(path), live = settingGet({ r: settingRootValue(p[0]) }, ['r'].concat(p.slice(1))),
-			node = scenarioSettingTree(scn), i;
+			node = scenarioSettingSource(scn, p), i;
+		if (!node) { return live; }
 		for (i = 0; i < p.length; i++) {
 			if (!plainObject(node) || !Object.prototype.hasOwnProperty.call(node, p[i])) { return live; }
 			node = node[p[i]];
@@ -4995,6 +5024,34 @@ var EngCalcs = EngCalcs || {};
 		return settingOverlay(live, node, p);
 	}
 	function effectiveSetting(path) { return settingFor(activeScenario(), path); }
+	// **THE ONE PLACE A READER LEARNS WHETHER A SCENARIO HOLDS ANY SETTING OF ITS OWN.** Everything
+	// that routes a setting -- settingFor(), the [TIMES] block, the `.inp` export, the scenario's
+	// view -- asks this, so a harness that blinds it (dev/lpn-spike/scenario-settings-routing-harness.js)
+	// gets back the page exactly as it was before any reader was routed.
+	function scenarioSettingsBlock(scn) {
+		return (scn && !scn.isBase && plainObject(scn.settings)) ? scn.settings : null;
+	}
+	function scenarioHasElsewhereSetting(scn) {
+		return !!scn && !scn.isBase && ((typeof scn.demandMultiplier === 'number' && isFinite(scn.demandMultiplier)) ||
+			LPN_SCENARIO_TIME_KEYS.some(function (key) { return scenarioTimeValue(scn, key) !== undefined; }));
+	}
+	// What settingFor() walks for this scenario and path: the block itself, the mirror with the
+	// demand multiplier and the two times in it for a path that can reach them, or null.
+	function scenarioSettingSource(scn, p) {
+		var block = scenarioSettingsBlock(scn);
+		if (!scn || scn.isBase) { return null; }
+		if (((p[0] === 'settings' && (p.length === 1 || p[1] === 'hydraulics')) || p[0] === 'times') &&
+			scenarioHasElsewhereSetting(scn)) { return scenarioSettingTree(scn); }
+		return block;
+	}
+	// **THE READER SHORTHANDS.** One member of `settings`, one path under `labelSettings`, one
+	// member of `project`, for the open scenario. A reader that runs per element per frame asks for
+	// a LEAF (a number, a flag), which is never copied; one that wants a whole map asks once per pass
+	// and hands the answer down.
+	function scnSetting(member) { return settingFor(activeScenario(), ['settings', member]); }
+	function scnLabels(path) { return settingFor(activeScenario(), ['labelSettings'].concat(path || [])); }
+	function scnProject(member) { return settingFor(activeScenario(), ['project', member]); }
+	function scnDefaultPattern() { return settingFor(activeScenario(), ['defaultPattern']) || null; }
 	// Deletes one path from a scenario's block and prunes every container it emptied, down to the
 	// block itself. Raw: it asks no table, which is what lets the load-time sanitizer remove what
 	// setScenarioSetting() would refuse to touch.
@@ -5043,9 +5100,57 @@ var EngCalcs = EngCalcs || {};
 			settingLeaves(s.settings).forEach(function (leaf) {
 				if (categoryOfSetting(leaf.path) === null || settingHasOtherHome(leaf.path)) { settingDelete(s, leaf.path); }
 			});
+			// A view that is no place to look goes, on the rule a file's own view is read by.
+			if (plainObject(s.settings) && s.settings.view !== undefined && !inwardViewOf(s.settings.view)) { settingDelete(s, ['view']); }
 			if (plainObject(s.settings) && !Object.keys(s.settings).length) { delete s.settings; }
 		});
 	}
+	// ---- A scenario's own view (Tom, 2026-10-06) ----
+	//
+	// **STORED OUTWARD, THE WAY A SCENARIO'S NODE POSITION IS** (coordOverridesOf(), nodeDrawX()):
+	// the centre in the numbers a person reads -- longitude and latitude, or the grid's own absolute
+	// Cartesian x and y -- and the scale in pixels per drawing unit. So serializeProject()'s Y flip,
+	// the origin shift and the geographic projection never touch it, and it means the same place
+	// after any of them. A frame change that the scale cannot survive (a grid project turned
+	// geographic) leaves a view that viewShowsModel() refuses, and a refused view moves nothing.
+	function outwardViewOf(v) {
+		if (!v || !isFinite(v.cx) || !isFinite(v.cy) || !(v.s > 0)) { return null; }
+		return { cx: outwardX(v.cx), cy: outwardY(v.cy), s: v.s };
+	}
+	function inwardViewOf(o) {
+		if (!plainObject(o) || typeof o.cx !== 'number' || typeof o.cy !== 'number' || typeof o.s !== 'number' ||
+			!isFinite(o.cx) || !isFinite(o.cy) || !(o.s > 0) || !isFinite(o.s)) { return null; }
+		return { cx: inwardX(o.cx), cy: inwardY(o.cy), s: o.s };
+	}
+	// The view this scenario holds, in the drawing frame, or null. Base never holds one: its view is
+	// wherever the reader left it, which is what the file's own `view` records.
+	function scenarioOwnView(scn) {
+		var block = scenarioSettingsBlock(scn);
+		return block && block.view !== undefined ? inwardViewOf(block.view) : null;
+	}
+	// **WRITTEN ONLY WHEN DELIBERATELY SET.** Nothing in the interface calls this yet (the editing
+	// stage); a scenario holding a view is a deliberate act, never a side effect of looking.
+	function setScenarioView(scn, v) {
+		return setScenarioSetting(scn, ['view'], v === undefined ? undefined : outwardViewOf(v) || undefined);
+	}
+	// **A SWITCH MOVES THE MAP ONLY WHEN A SCENARIO HOLDS A VIEW.** Into one that holds a view, the
+	// map goes there, and the place you were looking is remembered; out of it into one that holds
+	// none, the map goes back to that remembered place. Between two scenarios that hold none,
+	// nothing moves, which is every project there has ever been. In memory only: where you were
+	// looking a moment ago is not a fact about the project.
+	var viewBeforeScenarioView = null;
+	function followScenarioView(from, to) {
+		var own = scenarioOwnView(to), had = scenarioOwnView(from);
+		if (from === to) { return; }
+		if (own) {
+			if (!had) { viewBeforeScenarioView = currentView(); }
+			if (viewShowsModel(own)) { applyView(own); }
+			return;
+		}
+		if (had && viewBeforeScenarioView) { applyView(viewBeforeScenarioView); }
+		viewBeforeScenarioView = null;
+	}
+
 	// One scenario's setting leaves that belong to a category, for alternativesOf() and the count.
 	function scenarioSettingLeaves(scn) {
 		if (!scn || scn.isBase) { return []; }
@@ -5154,9 +5259,11 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 	}
 	function switchScenario(id) {
+		var from = activeScenario();
 		if (project.activeScenario === id) { return; }
 		project.activeScenario = id;
 		applyScenarioChange();
+		followScenarioView(from, activeScenario());
 	}
 	function newScenarioId() {
 		var n = 1, used = {};
@@ -5189,11 +5296,12 @@ var EngCalcs = EngCalcs || {};
 		return s;
 	}
 	function deleteScenario(id) {
-		var s = scenarioById(id);
+		var s = scenarioById(id), from = activeScenario();
 		if (!s || s.isBase) { return; }
 		scenarios = scenarios.filter(function (x) { return x.id !== id; });
 		if (project.activeScenario === id) { project.activeScenario = baseScenario().id; }
 		applyScenarioChange();
+		followScenarioView(from, activeScenario());
 	}
 	function scenarioById(id) {
 		for (var i = 0; i < scenarios.length; i++) { if (scenarios[i].id === id) { return scenarios[i]; } }
@@ -5610,7 +5718,7 @@ var EngCalcs = EngCalcs || {};
 		// properties (Task 636) and nothing else. They carry no map label, so BOTH pushes skip
 		// them, which is the same standing a required fire flow and the two reaction coefficients
 		// already have in this list: they are here so Find and replace can write them.
-		var m = labelSettings[s.group];
+		var m = scnLabels([s.group]);
 		if (!m) { return false; }
 		return !!(m[s.field] || (s.altField && m[s.altField]));
 	}
@@ -5930,7 +6038,7 @@ var EngCalcs = EngCalcs || {};
 	 * entry second -- the flat one being what a project saved before R-329 carries.
 	 */
 	function labelRank(kind, group, field) {
-		var map = (labelSettings[kind] || {})[group] || {}, k;
+		var map = scnLabels([kind, group]) || {}, k;
 		if (!field) { return undefined; }
 		if (field === 'quality') {
 			k = 'quality:' + qualityMode();
@@ -7449,11 +7557,11 @@ var EngCalcs = EngCalcs || {};
 	// they change only when the drawing does, while the cap also moves with the settings.
 	function invalidateLinkLengths() { pctLinkLengthCache = null; pctLinkLengthPctCache = null; symbolCapCache = null; }
 	function symbolCapMultiple() {
-		var v = settings.symbolCapMultiple;
+		var v = scnSetting('symbolCapMultiple');
 		return (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0.5;
 	}
 	function symbolCapPercentile() {
-		var v = settings.symbolCapPercentile;
+		var v = scnSetting('symbolCapPercentile');
 		return (typeof v === 'number' && isFinite(v) && v >= 0 && v <= 100) ? v : 20;
 	}
 	// **STRIDE-SAMPLED TO AT MOST 512 LINKS, DETERMINISTICALLY.** A percentile wants a sort, and
@@ -7485,7 +7593,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	function computeSymbolCapScale() {
 		var lp = pLinkLengthWorld(symbolCapPercentile()), capLen = symbolCapMultiple() * lp;
-		return (capLen > 0 && settings.symbolSize > 0) ? settings.symbolSize / capLen : 0;
+		var sz = scnSetting('symbolSize');
+		return (capLen > 0 && sz > 0) ? sz / capLen : 0;
 	}
 	function symbolCapScale() {
 		pLinkLengthWorld(symbolCapPercentile());   // cheap when nothing moved; clears the cap when the document did
@@ -7501,7 +7610,7 @@ var EngCalcs = EngCalcs || {};
 	// **THE ONE DOOR, AND IT IS THE CAPPED ONE.** Every symbol this map draws goes through here, so
 	// the cap is the default and an exception has to ask for it by name.
 	function symbolFactor() {
-		return (settings.symbolSize / 2) / JUNCTION_R / symbolScaleAt();
+		return (scnSetting('symbolSize') / 2) / JUNCTION_R / symbolScaleAt();
 	}
 	// **THE DECLARED EXCEPTIONS: A RESERVOIR AND A TANK** (Tom, 2026-09-21, naming both, and
 	// confirmed 2026-09-22 while widening the rule to pipes: *"Yes. Everything shrinks except
@@ -7515,7 +7624,7 @@ var EngCalcs = EngCalcs || {};
 	// person holding the mouse, not the drawing, and a grip that shrinks to nothing is a grip nobody
 	// can take hold of. Published to CSS as --lpn-symf beside --lpn-sym.
 	function symbolFactorFull() {
-		return (settings.symbolSize / 2) / JUNCTION_R / (state.s || 1);
+		return (scnSetting('symbolSize') / 2) / JUNCTION_R / (state.s || 1);
 	}
 	// Pipe stroke width in world units, from `settings.linkWidth` screen pixels. Published to CSS as
 	// --lpn-lw (refreshSymbolSizes()), which is why the .lpn-link rules read that rather than
@@ -7526,7 +7635,7 @@ var EngCalcs = EngCalcs || {};
 	// except reservoirs and tanks."*). A pipe is not one of the two declared exceptions, so past the
 	// cap its stroke stops growing on the ground exactly as a junction's does.
 	function linkStrokeWidth() {
-		return settings.linkWidth / symbolScaleAt();
+		return scnSetting('linkWidth') / symbolScaleAt();
 	}
 	// Junction radius. **HALF THE OTHER NODES SINCE 2026-09-02** (Tom, of the sketch the symbol set
 	// came from: *"The Junction in my rough sketch was 1/2 the size of a reservoir or tank. Make the
@@ -7783,7 +7892,7 @@ var EngCalcs = EngCalcs || {};
 		// extra on each side of a 1-px link) might be appreciated."*). `settings.linkWidth` ships at
 		// 2, so a mouse now aims at 3 px where it had 12 -- which is the whole point: what you can
 		// click is what you can see. The stylesheet picks which of these two the device gets.
-		svg.style.setProperty('--lpn-hit', Math.max(settings.linkWidth, LPN_LINK_HIT_FLOOR_PX) / s);
+		svg.style.setProperty('--lpn-hit', Math.max(scnSetting('linkWidth'), LPN_LINK_HIT_FLOOR_PX) / s);
 		svg.style.setProperty('--lpn-hit-coarse', LPN_LINK_HIT_PX / s);
 		// ONE SCREEN PIXEL, in world units. A leader is a rule pointing at something, not a symbol,
 		// so it must NOT scale off the symbol size: at the shipped 7px symbol that worked out at
@@ -7802,7 +7911,7 @@ var EngCalcs = EngCalcs || {};
 	// open, step change and close. dev/lpn-spike/convert-as-browser-harness.js section 7.
 	var LPN_WIZARD_BACKDROP_MAX = 0.5;
 	function backdropImageOpacity() {
-		var bop = settings.backdropOpacity;
+		var bop = scnSetting('backdropOpacity');
 		bop = (bop === undefined || bop === null || !isFinite(bop)) ? 1 : bop;
 		return (georefActive() || mapgeoActive()) ? Math.min(bop, LPN_WIZARD_BACKDROP_MAX) : bop;
 	}
@@ -7816,18 +7925,18 @@ var EngCalcs = EngCalcs || {};
 		grayscale: 'grayscale(100%)'
 	};
 	function basemapStyleName() {
-		var f = settings.basemapStyle;
+		var f = scnSetting('basemapStyle');
 		return (typeof f === 'string' && LPN_BASEMAP_STYLES.hasOwnProperty(f)) ? f : 'normal';
 	}
 	function refreshBackdropOpacity() {
 		if (!svg) { return; }
 		svg.style.setProperty('--lpn-basemap-style', LPN_BASEMAP_STYLES[basemapStyleName()]);
-		var bop = settings.backdropOpacity;
+		var bop = scnSetting('backdropOpacity');
 		svg.style.setProperty('--lpn-backdrop-opacity', (bop === undefined || bop === null) ? 1 : bop);
 		svg.style.setProperty('--lpn-backdrop-img-opacity', backdropImageOpacity());
 	}
 	function refreshSymbolSizes() {
-		var k = symbolFactor(), op = settings.symbolOpacity;
+		var k = symbolFactor(), op = scnSetting('symbolOpacity');
 		publishScaleSizes(true);
 		// Symbols only, never labels: the point is to see the backdrop THROUGH the network while
 		// placing it against an aerial or a plan, and fading the numbers at the same time defeats
@@ -7936,10 +8045,10 @@ var EngCalcs = EngCalcs || {};
 	// through these three functions, so the settings could be renamed or nested without a hunt --
 	// and, more to the point, no drawing code can accidentally read the OTHER group's scheme.
 	function colorRampKey(group) {
-		return group === 'link' ? settings.colorRampLink : settings.colorRampNode;
+		return scnSetting(group === 'link' ? 'colorRampLink' : 'colorRampNode');
 	}
 	function colorReverseOf(group) {
-		return group === 'link' ? !!settings.colorReverseLink : !!settings.colorReverseNode;
+		return !!scnSetting(group === 'link' ? 'colorReverseLink' : 'colorReverseNode');
 	}
 	// **HOW MANY CLASSES THIS GROUP IS DRAWN IN -- 3 to 7, and the user's choice.** One number per
 	// group rather than one per field, because the swatch in that group's picker shows THIS many
@@ -7951,7 +8060,7 @@ var EngCalcs = EngCalcs || {};
 	// rather than silently disagreeing with the map.
 	function colorClassCount(group) {
 		var R = ramps(), c = criterionClassCount(group),
-			stored = group === 'link' ? settings.colorClassesLink : settings.colorClassesNode;
+			stored = scnSetting(group === 'link' ? 'colorClassesLink' : 'colorClassesNode');
 		if (c) { return c; }
 		return R ? R.clampClasses(stored) : RAMP_FALLBACK.length;
 	}
@@ -7996,7 +8105,7 @@ var EngCalcs = EngCalcs || {};
 	// So this reports the number and stops. No verdict glyph, no threshold, no colour band the page
 	// picked for the user.
 	function qualitySetting() {
-		var q = settings.quality || {}, qo = settings.qualityOptions || {},
+		var q = scnSetting('quality') || {}, qo = scnSetting('qualityOptions') || {},
 			out = { mode: q.mode || 'none', traceNode: q.traceNode || '', src: q.src };
 		if (out.mode === 'chemical') {
 			// **THE CHEMICAL'S NAME AND UNIT LABEL, AS TEXT, AND NEVER AS A UNIT WE CONVERT.**
@@ -8060,7 +8169,7 @@ var EngCalcs = EngCalcs || {};
 	 * the tanks, all three THROUGH `effective()` so a scenario's own coefficient is the one solved.
 	 */
 	function docReactions() {
-		var r = settings.reactions || {}, out = { bulk: {}, wall: {}, tank: {} };
+		var r = scnSetting('reactions') || {}, out = { bulk: {}, wall: {}, tank: {} };
 		['orderBulk', 'orderTank', 'orderWall', 'globalBulk', 'globalWall',
 			'limitingPotential', 'roughnessCorrelation'].forEach(function (k) {
 			if (typeof r[k] === 'number' && isFinite(r[k])) { out[k] = r[k]; }
@@ -8091,7 +8200,7 @@ var EngCalcs = EngCalcs || {};
 	 * quantity in pump energy is the HEAD, and it is SI on the model long before it gets here.
 	 */
 	function docEnergy() {
-		var e = settings.energy || {}, out = { effic: {}, price: {}, pattern: {} };
+		var e = scnSetting('energy') || {}, out = { effic: {}, price: {}, pattern: {} };
 		['globalEfficiency', 'globalPrice', 'demandCharge'].forEach(function (k) {
 			if (typeof e[k] === 'number' && isFinite(e[k])) { out[k] = e[k]; }
 		});
@@ -8127,7 +8236,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	/** The currency the prices are typed in, as the document states it: a label, shown, never applied. */
 	function currencyLabel() {
-		var t = (settings.energy || {}).currency;
+		var t = (scnSetting('energy') || {}).currency;
 		return t === undefined || t === null ? '' : String(t).trim();
 	}
 	function qualityMode() { return qualitySetting().mode; }
@@ -8202,7 +8311,7 @@ var EngCalcs = EngCalcs || {};
 	 * the Settings box, the pipe type Library and the Tables column can never disagree about it.
 	 */
 	function wallCoeffUnitText() {
-		var pc = EngCalcs.pageConfig || {}, order = (settings.reactions || {}).orderWall;
+		var pc = EngCalcs.pageConfig || {}, order = (scnSetting('reactions') || {}).orderWall;
 		if (order === 0) {
 			return qualityMassUnitText() + '/' + unitLabel('lpn_u_length') + '²/'
 				+ (pc.lpn_reaction_day || 'day');
@@ -8384,7 +8493,7 @@ var EngCalcs = EngCalcs || {};
 	// (`settings.reactions.globalBulk` / `globalWall`), in the document's own units -- the pair
 	// docReactions() hands the engine. Undefined where neither is stated.
 	function linkReactionCoeff(l, prop) {
-		var v = effective(l, prop), r = settings.reactions || {},
+		var v = effective(l, prop), r = scnSetting('reactions') || {},
 			g = prop === 'bulkCoeff' ? r.globalBulk : r.globalWall;
 		if (typeof v === 'number' && isFinite(v)) { return v; }
 		return (typeof g === 'number' && isFinite(g)) ? g : undefined;
@@ -8549,7 +8658,7 @@ var EngCalcs = EngCalcs || {};
 		if (field === 'rate') { return linkReactionRate(l); }
 		return undefined;
 	}
-	function colorFieldOf(group) { return group === 'node' ? settings.colorNodeField : settings.colorLinkField; }
+	function colorFieldOf(group) { return scnSetting(group === 'node' ? 'colorNodeField' : 'colorLinkField'); }
 	// WHICH FIELDS ARE OFFERED, AND IN WHAT ORDER -- one list, read by every control that offers a
 	// colour field, so the same question is never asked two different ways in two places.
 	//
@@ -8614,7 +8723,7 @@ var EngCalcs = EngCalcs || {};
 	// wrong map.
 	function colorBreakKey(group, field) { return group + '.' + field; }
 	function colorModeOf(group, field) {
-		var R = ramps(), stored = (settings.colorModes || {})[colorBreakKey(group, field)], list, i;
+		var R = ramps(), stored = (scnSetting('colorModes') || {})[colorBreakKey(group, field)], list, i;
 		if (!R) { return 'equal'; }
 		// **MANUAL IS STORABLE THOUGH IT IS NEVER OFFERED.** modesFor() lists what a user may
 		// choose, and Manual is not a choice -- it is what the picker reads once they have typed a
@@ -8722,7 +8831,7 @@ var EngCalcs = EngCalcs || {};
 	// A stored set that no longer fits the class count is IGNORED, not deleted: the numbers come
 	// back if the count comes back, so raising the count and lowering it again is not destructive.
 	function storedBreaks(group, field) {
-		var R = ramps(), stored = (settings.colorBreaks || {})[colorBreakKey(group, field)], v;
+		var R = ramps(), stored = (scnSetting('colorBreaks') || {})[colorBreakKey(group, field)], v;
 		if (!R || !stored || !stored.length) { return []; }
 		v = R.validateBreaks(stored, colorClassCount(group));
 		return v.ok ? v.breaks : [];
@@ -8797,7 +8906,7 @@ var EngCalcs = EngCalcs || {};
 	function effectiveBreaks(group, field) {
 		var raw, stored;
 		if (!field || breaksAreFromCriterion(group, field)) { return computedBreaks(group, field); }
-		raw = (settings.colorBreaks || {})[colorBreakKey(group, field)];
+		raw = (scnSetting('colorBreaks') || {})[colorBreakKey(group, field)];
 		if (raw && raw.length) {
 			stored = storedBreaks(group, field);
 			return stored.length ? stored : computedBreaks(group, field);
@@ -9013,7 +9122,7 @@ var EngCalcs = EngCalcs || {};
 				box.appendChild(note);
 			}
 		});
-		box.style.display = (any && !galleryIsUp() && !legendIsOff(settings.colorLegendPosition)) ? '' : 'none';
+		box.style.display = (any && !galleryIsUp() && !legendIsOff(scnSetting('colorLegendPosition'))) ? '' : 'none';
 		applyColorLegendPosition();
 	}
 	// Both legends are placed by one function, so neither can be positioned without the other's
@@ -9083,16 +9192,16 @@ var EngCalcs = EngCalcs || {};
 		return contourLayer;
 	}
 	function contourFillMode() {
-		var f = settings.contourFill;
+		var f = scnSetting('contourFill');
 		return (f === 'smooth' || f === 'bands') ? f : '';
 	}
-	function contourIsOn() { return !!(contourFillMode() || settings.contourLines); }
+	function contourIsOn() { return !!(contourFillMode() || scnSetting('contourLines')); }
 	function contourBufferOf() {
-		var b = Number(settings.contourBuffer);
+		var b = Number(scnSetting('contourBuffer'));
 		return (isFinite(b) && b > 0) ? Math.min(20, b) : CONTOUR_BUFFER_DEFAULT;
 	}
 	function contourOpacityOf() {
-		var o = Number(settings.contourOpacity);
+		var o = Number(scnSetting('contourOpacity'));
 		return (isFinite(o) && o >= 0) ? Math.min(1, o) : CONTOUR_OPACITY_DEFAULT;
 	}
 	// THE INTERVAL, per field and unit. Tom asked for 5 psi or 5 m to start; the other units of a
@@ -9106,7 +9215,7 @@ var EngCalcs = EngCalcs || {};
 		return EngCalcs.lpnContour.niceStep(lo, hi, 10);
 	}
 	function contourIntervalOf(field, lo, hi) {
-		var v = Number((settings.contourInterval || {})[contourIntervalKey(field)]);
+		var v = Number((scnSetting('contourInterval') || {})[contourIntervalKey(field)]);
 		return (isFinite(v) && v > 0) ? v : contourDefaultInterval(field, lo, hi);
 	}
 	// Where on the Earth a DRAWING point is -- viewLonLat()'s question asked of a grid cell, through
@@ -9120,7 +9229,7 @@ var EngCalcs = EngCalcs || {};
 			projectLocatable() && !!mapboxToken();
 	}
 	function contourTerrainWanted() {
-		return !!settings.contourTerrain && contourTerrainOffered() &&
+		return !!scnSetting('contourTerrain') && contourTerrainOffered() &&
 			!!(EngCalcs.lpnTerrainConsented && EngCalcs.lpnTerrainConsented());
 	}
 	// A node's head in SI metres, for the ground-subtracted surface: the solve's own number for a
@@ -9294,8 +9403,8 @@ var EngCalcs = EngCalcs || {};
 	// The pressure in the display unit at every cell, from head interpolated and ground subtracted.
 	function contourSubtractGround(F, grid, ground) {
 		var C = EngCalcs.lpnContour, i, j,
-			sg = (settings.hydraulics && typeof settings.hydraulics.specificGravity === 'number' &&
-				isFinite(settings.hydraulics.specificGravity)) ? settings.hydraulics.specificGravity : 1,
+			sgv = scnSetting('hydraulics') ? scnSetting('hydraulics').specificGravity : undefined,
+			sg = (typeof sgv === 'number' && isFinite(sgv)) ? sgv : 1,
 			f = toDisplay(1, resultUnit('pressure'));
 		for (j = 0; j < grid.ny; j++) {
 			for (i = 0; i < grid.nx; i++) {
@@ -9338,7 +9447,7 @@ var EngCalcs = EngCalcs || {};
 		contourStats.walls = walls.length;
 		// THE LINES, at every multiple of the interval.
 		contourStats.levels = 0; contourStats.tooMany = false;
-		if (settings.contourLines && isFinite(cf.lo)) {
+		if (scnSetting('contourLines') && isFinite(cf.lo)) {
 			var step = contourIntervalOf(field, cf.lo, cf.hi);
 			contourStats.interval = step;
 			contourStats.unit = colorFieldUnitText('node', field);
@@ -9405,7 +9514,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (!host) { return; }
 		while (host.firstChild) { host.removeChild(host.firstChild); }
-		if (!settings.contourLabels || !settings.contourLines || !LC || !LC.lines.length || !(state.s > 0)) { return; }
+		if (!scnSetting('contourLabels') || !scnSetting('contourLines') || !LC || !LC.lines.length || !(state.s > 0)) { return; }
 		var px = CONTOUR_LABEL_PX, lines = [];
 		LC.levels.forEach(function (lv, k) { (LC.lines[k] || []).forEach(function (pl) { lines.push({ level: lv, pts: pl.pts, closed: pl.closed }); }); });
 		// ONLY WHERE SOMEBODY CAN SEE THEM, plus a margin: a big network zoomed in would otherwise
@@ -9431,7 +9540,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	var contourRelabelTimer = null;
 	function scheduleContourRelabel() {
-		if (!contourLinesCache || !settings.contourLines) { return; }
+		if (!contourLinesCache || !scnSetting('contourLines')) { return; }
 		if (contourRelabelTimer) { clearTimeout(contourRelabelTimer); }
 		contourRelabelTimer = setTimeout(function () { contourRelabelTimer = null; drawContourLabels(); }, 150);
 	}
@@ -10044,7 +10153,7 @@ var EngCalcs = EngCalcs || {};
 	// after every solve.
 	// Arrows drawn at all? `!== false` rather than truthiness, for the same reason maskLabels reads
 	// that way: a project saved before the key existed has no key, and its arrows were on.
-	function showArrows() { return settings.showArrows !== false; }
+	function showArrows() { return scnSetting('showArrows') !== false; }
 	function updateArrow(id) {
 		var le = linkEls[id]; if (!le || !le.arrows) { return; }
 		var mids = segmentMidpoints(linkById(id)), flow = lastSolveResult ? lastSolveResult.flows[id] : undefined,
@@ -10553,7 +10662,7 @@ var EngCalcs = EngCalcs || {};
 	// view is further out than the symbol cap, a service keeps its width on the ground with the
 	// meter it runs to, and so goes below a pixel on the screen.
 	function serviceStrokeWorld(x, y) {
-		var lw = settings.linkWidth;
+		var lw = scnSetting('linkWidth');
 		return Math.min(LPN_SERVICE_MAX_FRAC * lw,
 			Math.max(LPN_SERVICE_STROKE_FRAC * lw, LPN_SERVICE_MIN_PX)) / symbolScaleAt();
 	}
@@ -11042,7 +11151,7 @@ var EngCalcs = EngCalcs || {};
 	function customerResolvedFlow(c) {
 		var b = customerFlow(c);
 		if (typeof b !== 'number' || !isFinite(b)) { return b; }
-		return b * patternMultiplier(c.pattern || doc.defaultPattern, modelTimeSeconds()) *
+		return b * patternMultiplier(c.pattern || scnDefaultPattern(), modelTimeSeconds()) *
 			docDemandMultiplier();
 	}
 	// **READ OUT OF THE CUSTOMER GROUP, NOT THE NODE GROUP** (Tom, 2026-09-19 -- see
@@ -11050,7 +11159,7 @@ var EngCalcs = EngCalcs || {};
 	// customerFieldDefs(), which is the order the checkboxes are drawn in, so what a reader ticks
 	// top to bottom is what they get left to right.
 	function customerLabelLines(c) {
-		var ls = labelSettings, cd = ls.decimals.customer, lines = [];
+		var ls = scnLabels(), cd = ls.decimals.customer, lines = [];
 		if (ls.customer.id) { lines.push(affix('customer', 'id', { text: c.id })); }
 		// Demand over Base demand, which is refreshLabelTextPass()'s own order for a junction.
 		// rawLine() for both: a customer's numbers are already in the displayed flow unit, because
@@ -11110,8 +11219,8 @@ var EngCalcs = EngCalcs || {};
 		var lim = viewWidthLimitSI(v);
 		return lim > 0 ? lim : null;
 	}
-	function labelWidthLimitSI() { return labelMaxWidthLimitSI(settings.labelMaxWidth); }
-	function customerLabelWidthLimitSI() { return labelMaxWidthLimitSI(labelSettings.customerMaxWidth); }
+	function labelWidthLimitSI() { return labelMaxWidthLimitSI(scnSetting('labelMaxWidth')); }
+	function customerLabelWidthLimitSI() { return labelMaxWidthLimitSI(scnLabels(['customerMaxWidth'])); }
 	// **THE WIDTH OF THE VIEW, ON THE GROUND.** On an XY grid a world unit IS the display length
 	// unit, so this is `visibleMapWidth()` in metres and nothing more. On a geographic project a
 	// world unit is a DEGREE, and a threshold compared against degrees is five orders of magnitude
@@ -11221,7 +11330,7 @@ var EngCalcs = EngCalcs || {};
 		var le = link && linkEls[link.id], fs;
 		if (!le || le.empty || !le.lineCount || !linkLabelAligned(link)) { return 0; }
 		fs = effectiveFontSize();
-		return settings.linkWidth / (2 * (state.s || 1)) + fs * 0.5 + dataLabelBoxHeight(le.lineCount) +
+		return scnSetting('linkWidth') / (2 * (state.s || 1)) + fs * 0.5 + dataLabelBoxHeight(le.lineCount) +
 			fs * LPN_ALIGNED_PAD_FRAC;
 	}
 	function layoutCustomerLabels(obs) {
@@ -12236,7 +12345,7 @@ var EngCalcs = EngCalcs || {};
 		// that are where the owed pass puts them. It is the pass somebody else asked for, not one
 		// this edit triggers: with nothing owed this is a no-op.
 		flushLabelRefresh();
-		var group = elGroup(el), ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
+		var group = elGroup(el), ls = scnLabels(), nd = ls.decimals.node, ld = ls.decimals.link,
 			fsNow = effectiveFontSize() + 'px', lines;
 		if (group === 'node') {
 			var n = el, ne = nodeEls[n.id];
@@ -13044,7 +13153,7 @@ var EngCalcs = EngCalcs || {};
 		// press from the fitted view retraces the same steps to the same place.
 		items = fitItems(state.s, true);
 		var modelItems = items;
-		s = solve(labelTuning().fitRoom * settings.textSize);
+		s = solve(labelTuning().fitRoom * scnSetting('textSize'));
 		// **STEP 1'S ANSWER IS KEPT AS THE FALLBACK, and it is the only one that cannot be absurd.**
 		// It is the MODEL alone -- nodes, vertices and pipes -- so it is a statement about the
 		// drawing, where step 2's answer is a statement about the drawing plus its lettering.
@@ -13548,7 +13657,7 @@ var EngCalcs = EngCalcs || {};
 		}
 	};
 	function basemapSource() {
-		var st = project.basemap;
+		var st = scnProject('basemap');
 		if (st === 'satellite' && !satelliteAvailable()) { return 'osm'; }
 		return LPN_TILE_SOURCES[st] ? st : 'osm';
 	}
@@ -13730,7 +13839,7 @@ var EngCalcs = EngCalcs || {};
 	// more than a transform and nobody has built it; a row that is offered and does nothing is the
 	// defect 692 closed, and widening these three would re-open it from the other side.
 	// dev/lpn-spike/xy-world-map-harness.js asserts both halves.
-	function basemapOn() { return basemapChoosable() && project.basemap !== 'off'; }
+	function basemapOn() { return basemapChoosable() && scnProject('basemap') !== 'off'; }
 	// One setter for both sources, and 'off'. **IT SETS; IT NO LONGER TOGGLES** (2026-09-22). It used
 	// to turn the basemap OFF when asked for the style already showing, which was right for the
 	// retired Hide/Show street map and satellite rows and nothing else: once World map, Attach went
@@ -13850,7 +13959,7 @@ var EngCalcs = EngCalcs || {};
 		// path restoring a tab, or by a pan -- and all four repaint. Asking at each of them
 		// instead would be four things to keep in step, and the boot path is the one that gets
 		// forgotten (see the credit note below, which is the same lesson).
-		if (isProjectedProject() && project.basemap !== 'off' && EngCalcs.lpnCrsLoad
+		if (isProjectedProject() && scnProject('basemap') !== 'off' && EngCalcs.lpnCrsLoad
 				&& EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) {
 			EngCalcs.lpnCrsLoad(function () { refreshBasemap(); });
 			return;
@@ -16085,7 +16194,7 @@ var EngCalcs = EngCalcs || {};
 	 * Ctrl-Z puts it back either way.
 	 */
 	function terrainNodesAtDefaultElevation() {
-		var d = settings.defaults.nodeElev, out = [];
+		var d = (scnSetting('defaults') || {}).nodeElev, out = [];
 		if (!projectLocatable() || typeof d !== 'number' || !isFinite(d)) { return { value: d, points: out }; }
 		doc.nodes.forEach(function (n) {
 			if (n.elev !== d) { return; }
@@ -23236,7 +23345,7 @@ var EngCalcs = EngCalcs || {};
 	// while a chemical is tracked. Read off the solve result in SI and shown in the result flow unit.
 	function paneColPdaResult(key, label, field) {
 		return { key: key, label: label, result: true, unit: paneUnitFlow, em: 3.5,
-			when: function () { return String((settings.hydraulics || {}).demandModel || '').toUpperCase() === 'PDA'; },
+			when: function () { return String((scnSetting('hydraulics') || {}).demandModel || '').toUpperCase() === 'PDA'; },
 			get: function (n) {
 				var r = lastSolveResult, v = r && r[field] ? r[field][n.id] : undefined;
 				return typeof v === 'number' ? toDisplay(v, resultUnit('flow')) : undefined;
@@ -30887,7 +30996,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, node;
 		if (pgIsPumpHead(group, e, field)) { return pc.lpn_result_pump_head || 'Head'; }
 		if (field === 'quality' && qualityMode() === 'trace') {
-			node = (settings.quality || {}).traceNode;
+			node = (scnSetting('quality') || {}).traceNode;
 			if (node) {
 				return (pc.lpn_pgraph_source_share_from || 'Source share from {node}').replace('{node}', node);
 			}
@@ -31489,18 +31598,18 @@ var EngCalcs = EngCalcs || {};
 		//
 		// Blank is also the honest interim state: between the node appearing and the tile answering
 		// we genuinely do not know its elevation, and 0 is sea level, which is a claim.
-		var fromDem = elevSourceIsDem();
+		var fromDem = elevSourceIsDem(), dfl = scnSetting('defaults') || {};
 		var n;
 		if (type === 'reservoir') {
-			n = { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev };
+			n = { id: id, type: type, x: x, y: y, elev: dfl.nodeElev };
 		} else if (type === 'tank') {
-			n = { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev,
-				_level: settings.defaults.tankLevel,
-				minLevel: settings.defaults.tankMinLevel,
-				maxLevel: settings.defaults.tankMaxLevel,
-				tankDiameter: settings.defaults.tankDiameter };
+			n = { id: id, type: type, x: x, y: y, elev: dfl.nodeElev,
+				_level: dfl.tankLevel,
+				minLevel: dfl.tankMinLevel,
+				maxLevel: dfl.tankMaxLevel,
+				tankDiameter: dfl.tankDiameter };
 		} else {
-			n = { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev, _demand: settings.defaults.demand };
+			n = { id: id, type: type, x: x, y: y, elev: dfl.nodeElev, _demand: dfl.demand };
 		}
 		if (fromDem) { delete n.elev; }
 		bornInScenario(n);
@@ -31522,7 +31631,7 @@ var EngCalcs = EngCalcs || {};
 	// or projected with a basemap), the typed number otherwise. Used by newProject() and Restore defaults.
 	function newProjectElevSource() { return projectLocatable() ? 'dem' : 'value'; }
 	function elevSourceIsDem() {
-		return (settings.defaults.nodeElevSource || 'value') === 'dem' &&
+		return ((scnSetting('defaults') || {}).nodeElevSource || 'value') === 'dem' &&
 			projectLocatable() && !!mapboxToken() && !!EngCalcs.lpnTerrainFillFor;
 	}
 	// **ONE BATCH PER BURST OF DRAWING, NOT ONE REQUEST PER NODE** (Task 542). Drawing a run of ten
@@ -31569,15 +31678,15 @@ var EngCalcs = EngCalcs || {};
 	// would lose its own bends. A link born any other way still gets a fresh empty array.
 	// `wantId` as for addNode(): a pasted row's own, already validated (Task 610).
 	function addLink(type, fromId, toId, verts, wantId) {
-		var id = wantId || mintId(LPN_ID_KEY[type] || 'L');
+		var id = wantId || mintId(LPN_ID_KEY[type] || 'L'), dfl = scnSetting('defaults') || {};
 		var l = {
 			id: id, type: type, from: fromId, to: toId,
 			verts: (verts || []).map(function (p) { return { x: p.x, y: p.y }; }),
-			_diameter: settings.defaults.diameter,
+			_diameter: dfl.diameter,
 			// No `length` default, deliberately (Tom, 2026-07-30): lenAuto derives length from the
 			// drawn geometry, so a default would be overwritten by linkGeomLength() on the next line.
-			_roughness: settings.defaults.roughness, _length: 0, lenAuto: true, _status: 'open',
-			_k: settings.defaults.k // pump ignores k -- only the pipe friction branch reads it
+			_roughness: dfl.roughness, _length: 0, lenAuto: true, _status: 'open',
+			_k: dfl.k // pump ignores k -- only the pipe friction branch reads it
 		};
 		l._length = linkGeomLength(l);   // base-write: construction: a link is born in Base before any scenario can override it
 		if (type === 'valve') {
@@ -34637,6 +34746,22 @@ var EngCalcs = EngCalcs || {};
 	// the writer -- which scenario's numbers, which positions, how big a label is -- can be asserted
 	// without a download; dev/lpn-spike/node-coord-entry-harness.js drives it. A writer handed
 	// options it did not get from here would be right only by accident.
+	// **THE DOCUMENT THE EXPORT IS HANDED: THE SERIALIZED PROJECT, WITH THE OPEN SCENARIO'S OWN
+	// SETTINGS LAID OVER IT** (stage 3). The writer reads [OPTIONS], [REACTIONS], [ENERGY],
+	// [QUALITY] and the default pattern straight off `settings` and `defaultPattern`, so an export
+	// from a scenario that holds its own accuracy, bulk rate or price must be handed that scenario's.
+	// A COPY of the two roots it changes, so the project is never written; and in Base, or in a
+	// scenario holding no setting, the very object serializeProject() made, so that export is what
+	// it always was, character for character. [TIMES] goes by inpExportOptions().times instead,
+	// beside the run time and time step that were there first.
+	function inpExportDocument() {
+		var snap = serializeProject(), block = scenarioSettingsBlock(activeScenario()), out;
+		if (!block || (!plainObject(block.settings) && block.defaultPattern === undefined)) { return snap; }
+		out = Object.assign({}, snap);
+		if (plainObject(block.settings)) { out.settings = settingOverlay(snap.settings, block.settings, ['settings']); }
+		if (block.defaultPattern !== undefined) { out.defaultPattern = block.defaultPattern; }
+		return out;
+	}
 	function inpExportOptions() {
 		return {
 			// The scenario the user is looking at, through the one resolver -- so an export from
@@ -34674,7 +34799,7 @@ var EngCalcs = EngCalcs || {};
 	function exportInpFile() {
 		var pcX = EngCalcs.pageConfig || {}, out;
 		saveToStorage();   // export what is on screen, including edits not yet saved
-		out = EngCalcs.lpnExportInp(serializeProject(), inpExportOptions());
+		out = EngCalcs.lpnExportInp(inpExportDocument(), inpExportOptions());
 		if (!out || !out.ok) {
 			setNotice((pcX.lpn_inp_export_refused || 'This project cannot be written as an EPANET file: {detail}')
 				.replace('{detail}', (out && out.detail) || '?'));
@@ -44234,7 +44359,7 @@ var EngCalcs = EngCalcs || {};
 	// ordinary junction says, and EPANET treats a zero coefficient as no emitter at all, so there
 	// is nothing to distinguish and nothing to store.
 	function emitterGamma() {
-		var g = settings.emitterExponent;
+		var g = scnSetting('emitterExponent');
 		return (typeof g === 'number' && isFinite(g)) ? g : 0.5;
 	}
 	function emitterToDisplay(si) {
@@ -44766,7 +44891,7 @@ var EngCalcs = EngCalcs || {};
 	// because js/lpn-solver.js already implements all three (hw, dw, manning) and the control is
 	// ROADMAP Task 271. When it lands, assembleModel() and this readout both already ask the right
 	// question.
-	function frictionMethod() { return settings.method || 'hw'; }
+	function frictionMethod() { return scnSetting('method') || 'hw'; }
 	function frictionMethodLabel() {
 		var pc = EngCalcs.pageConfig || {};
 		var m = frictionMethod();
@@ -44964,7 +45089,7 @@ var EngCalcs = EngCalcs || {};
 		// Tom: *"The status bar counts the junctions that are short. [If the status bar is at the
 		// bottom, this is missing.]"*). The count follows the latest solve and is dropped when there
 		// is none; it is the same sentence the message box above the map carries.
-		if (String((settings.hydraulics || {}).demandModel || '').toUpperCase() === 'PDA') {
+		if (String((scnSetting('hydraulics') || {}).demandModel || '').toUpperCase() === 'PDA') {
 			parts.push((pc.lpn_settings_demand_model || 'Demand model') + ': ' + (pc.lpn_settings_demand_model_pda || 'Pressure driven'));
 			short = pdaShortCount(lastSolveResult);
 			if (short > 0) { parts.push((pc.lpn_pda_deficit_note || 'Junctions receiving less than their demand: {n}.').replace('{n}', String(short)).replace(/\.$/, '')); }
@@ -45621,8 +45746,8 @@ var EngCalcs = EngCalcs || {};
 		// Nodes/Links headings, the same two the Labels popover carries: without them several field
 		// names (ID, Head, Flow/Demand) read plausibly as either kind of element. Emitted only when
 		// that group has a visible field, so a nodes-only legend does not grow a heading over nothing.
-		function addGroup(defs, fieldSettings, headingText) {
-			var group = fieldSettings === labelSettings.node ? 'node' : 'link',
+		function addGroup(defs, group, headingText) {
+			var fieldSettings = scnLabels([group]) || {},
 				shown = defs.filter(function (f) { return fieldSettings[f[0]]; });
 			if (shown.length === 0) { return; }
 			// **IN SHOW ORDER** (R-329), so the key reads down in the order the label reads.
@@ -45647,8 +45772,8 @@ var EngCalcs = EngCalcs || {};
 				box.appendChild(div);
 			});
 		}
-		addGroup(nodeFieldDefs(pc), labelSettings.node, pc.lpn_labels_heading_node || 'Node labels');
-		addGroup(linkFieldDefs(pc), labelSettings.link, pc.lpn_labels_heading_link || 'Link labels');
+		addGroup(nodeFieldDefs(pc), 'node', pc.lpn_labels_heading_node || 'Node labels');
+		addGroup(linkFieldDefs(pc), 'link', pc.lpn_labels_heading_link || 'Link labels');
 		// **THE LABELING THRESHOLD HIDES THIS LEGEND WHEN IT HIDES EVERY LABEL** (Tom, 2026-08-20,
 		// on the retired "Thematic map" checkbox; folded into the threshold on 2026-09-23). A
 		// threshold of 0, or any view wider than it, already switches the data labels off, so a key
@@ -45659,7 +45784,7 @@ var EngCalcs = EngCalcs || {};
 		// chrome the placement never touches. `labelsFullyHidden()`, not `dataLabelsHidden`, is
 		// the read that keeps that exclusion true.
 		box.style.display = (any && !galleryIsUp() && !labelsFullyHidden(state.s) &&
-			!legendIsOff(settings.legendPosition)) ? '' : 'none';
+			!legendIsOff(scnSetting('legendPosition'))) ? '' : 'none';
 		applyLegendPosition();
 	}
 	// There is no toggleLabelsPopup() any more. Labels moved to the Visibility panel (Task 427) and
@@ -46077,8 +46202,8 @@ var EngCalcs = EngCalcs || {};
 		if (!wrap || !wrap.getBoundingClientRect) { return; }
 		wr = wrap.getBoundingClientRect();
 		boxes = [
-			{ el: document.getElementById('lpn_labels_legend'), pos: settings.legendPosition },
-			{ el: colorLegendBox, pos: settings.colorLegendPosition }
+			{ el: document.getElementById('lpn_labels_legend'), pos: scnSetting('legendPosition') },
+			{ el: colorLegendBox, pos: scnSetting('colorLegendPosition') }
 		];
 		// Before first layout the wrapper has no box, and a dodge computed from a zero-height map
 		// would be arithmetic on nothing. The corners are still applied; only the dodge waits.
@@ -46222,7 +46347,7 @@ var EngCalcs = EngCalcs || {};
 	// "Show at all zoom levels" off would disappear too, which is the one thing Tom's ruling did
 	// not ask for and the old checkbox never did either.
 	function labelsFullyHidden(atScale) {
-		return settings.labelMaxWidth === 0 || labelsPastThreshold(atScale);
+		return scnSetting('labelMaxWidth') === 0 || labelsPastThreshold(atScale);
 	}
 	// GENERATED ANNOTATION only -- the right line is annotation, not "labels", and the flow arrow is
 	// what shows it. An arrow is a symbol by construction and an annotation by purpose: nobody drew
@@ -46371,7 +46496,7 @@ var EngCalcs = EngCalcs || {};
 		relayoutLabels();
 	}
 	function applyMaskLabels() {
-		if (svg) { svg.classList.toggle('lpn-masks-off', settings.maskLabels === false); }
+		if (svg) { svg.classList.toggle('lpn-masks-off', scnSetting('maskLabels') === false); }
 	}
 	// **A ZOOM STEP DOES NOT REBUILD LABELS NOBODY CAN SEE.** The full path is refreshFontSizes() ->
 	// refreshLabelText(), which recomposes every node's and link's text, re-measures each with
@@ -46536,13 +46661,16 @@ var EngCalcs = EngCalcs || {};
 	// What feeds placement without passing through a label writer. Cheap: two small objects as
 	// JSON, the canvas box and a handful of counts, once per settle.
 	function labelCacheInputs() {
-		var b = mapBox();
+		var b = mapBox(), own = scenarioSettingsBlock(activeScenario());
 		return [b.w, b.h, JSON.stringify(settings), JSON.stringify(labelSettings), library.openId,
 			doc.nodes.length, doc.links.length, doc.labels.length,
 			// A meter moved by hand re-draws its own geometry, which is per notch too and so cannot
 			// carry the taint; its position is read here instead.
 			JSON.stringify(doc.customers || []),
-			georef ? 1 : 0, georefActive() ? 1 : 0].join('|');
+			georef ? 1 : 0, georefActive() ? 1 : 0].join('|') +
+			// The open scenario's own settings, where it holds any (stage 3): nothing at all in a
+			// project that has none, so this key is the one it always was.
+			(own ? '|' + JSON.stringify(own) : '');
 	}
 	function labelCacheCheckInputs() {
 		var inputs = labelCacheInputs(), C = labelCache;
@@ -47348,7 +47476,7 @@ var EngCalcs = EngCalcs || {};
 			// and never given one for `status`). Without this second test, turning the Length or
 			// Status label on and pressing this button would push `undefined` onto every pipe.
 			var active = pushSpecs.filter(function (s) {
-				return pushFieldShown(s) && Object.prototype.hasOwnProperty.call(settings.defaults, s.key);
+				return pushFieldShown(s) && Object.prototype.hasOwnProperty.call(scnSetting('defaults') || {}, s.key);
 			});
 			// An empty intersection SAYS SO rather than silently doing nothing: with no input labels
 			// displayed this button would otherwise look broken, and the reason is off-screen in
@@ -47371,7 +47499,7 @@ var EngCalcs = EngCalcs || {};
 					active.forEach(function (s) {
 						if (s.group !== group || !s.applies(el)) { return; }
 						applied = true;
-						if (s.get(el) !== settings.defaults[s.key]) { differs = true; }
+						if (s.get(el) !== (scnSetting('defaults') || {})[s.key]) { differs = true; }
 					});
 					if (applied) { carriers++; }
 					if (differs) { changing++; }
@@ -47398,10 +47526,10 @@ var EngCalcs = EngCalcs || {};
 				if (!yes) { return; }
 				saveUndoSnapshot();
 				doc.nodes.forEach(function (n) {
-					active.forEach(function (s) { if (s.group === 'node' && s.applies(n)) { s.set(n, settings.defaults[s.key]); } });
+					active.forEach(function (s) { if (s.group === 'node' && s.applies(n)) { s.set(n, (scnSetting('defaults') || {})[s.key]); } });
 				});
 				doc.links.forEach(function (l) {
-					active.forEach(function (s) { if (s.group === 'link' && s.applies(l)) { s.set(l, settings.defaults[s.key]); } });
+					active.forEach(function (s) { if (s.group === 'link' && s.applies(l)) { s.set(l, (scnSetting('defaults') || {})[s.key]); } });
 				});
 				// refreshPopupIfOpen() because an open element popup is now showing stale numbers for
 				// the very element that just changed under it.
@@ -50845,7 +50973,7 @@ var EngCalcs = EngCalcs || {};
 	// read from the document's own clock, so it follows a change to the pattern time step.
 	function libSpanText(n) {
 		var pc = EngCalcs.pageConfig || {},
-			times = doc.times || (EngCalcs.lpnTimesDefaults ? EngCalcs.lpnTimesDefaults() : { patternStep: 3600 }),
+			times = effectiveTimes() || (EngCalcs.lpnTimesDefaults ? EngCalcs.lpnTimesDefaults() : { patternStep: 3600 }),
 			step = times.patternStep > 0 ? times.patternStep : 3600,
 			fmt = EngCalcs.lpnFormatTime || function (s) { return String(s); };
 		return (pc.lpn_library_pattern_span || '{n} multipliers, {step} apart, covering {span}')
@@ -51088,7 +51216,7 @@ var EngCalcs = EngCalcs || {};
 	// that run lays them out itself. Measured before this: one full label pass of the three a
 	// Quality change cost, spent redrawing identical text.
 	function qualityFieldsLabelled() {
-		var n = labelSettings.node || {}, l = labelSettings.link || {};
+		var n = scnLabels(['node']) || {}, l = scnLabels(['link']) || {};
 		return !!(n.quality || n.initQuality || l.quality || l.rate);
 	}
 	// **ORDER: None, Chemical, Trace, Age** (Tom, R-321: "Quality parameter order must be:
@@ -56038,7 +56166,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function renderPumpEfficiencyFields(fields, l) {
 		var pc = EngCalcs.pageConfig || {},
-			e = settings.energy || {},
+			e = scnSetting('energy') || {},
 			name = effective(l, 'efficCurveId') || '',
 			curve = name ? curveById(name) : null,
 			globalPct = (typeof e.globalEfficiency === 'number' && isFinite(e.globalEfficiency))
@@ -57637,7 +57765,7 @@ var EngCalcs = EngCalcs || {};
 	// Returns 1 for every way of having no answer, so a hand-drawn network, a pre-Task-423 saved
 	// file and a page whose js/lpn-patterns.js failed to load all behave exactly as they did before.
 	function demandMultiplier(n, t) {
-		return patternMultiplier(ownDemandPattern(n) || doc.defaultPattern, t);
+		return patternMultiplier(ownDemandPattern(n) || scnDefaultPattern(), t);
 	}
 	// **A JUNCTION'S DEMANDS ARE A LIST** (Task 468), and this is the page's one door to it.
 	// EngCalcs.lpnDemandRows() owns the Base shape -- row 0 is `_demand`/`demandPattern`/
@@ -57808,10 +57936,10 @@ var EngCalcs = EngCalcs || {};
 	 * see js/lpn-solver.js's note beside `tol`.
 	 */
 	function solveAccuracy() {
-		var a = (settings.hydraulics || {}).accuracy;
+		var a = (scnSetting('hydraulics') || {}).accuracy, tol = scnSetting('tolerance');
 		if (typeof a === 'number' && isFinite(a) && a > 0) { return a; }
-		if (typeof settings.tolerance === 'number' && isFinite(settings.tolerance) && settings.tolerance > 0) {
-			return settings.tolerance;
+		if (typeof tol === 'number' && isFinite(tol) && tol > 0) {
+			return tol;
 		}
 		return 1e-9;
 	}
@@ -57931,21 +58059,42 @@ var EngCalcs = EngCalcs || {};
 		return v;
 	}
 	function projectTimes() { return doc.times || EngCalcs.lpnTimesDefaults(); }
+	// One [TIMES] value the pattern clock reads, for the open scenario, without building the block:
+	// patternMultiplier() runs per element per solve. Neither key has a home of its own on the
+	// scenario, so the settings block and the project are the only two places it can be.
+	function scnPatternClock(key) {
+		var block = scenarioSettingsBlock(activeScenario()), held = block && plainObject(block.times) ? block.times : null;
+		if (held && typeof held[key] === 'number') { return held[key]; }
+		return (doc.times || EngCalcs.lpnTimesDefaults())[key];
+	}
 	// The [TIMES] block this scenario runs under. **THE DOCUMENT'S OWN OBJECT WHEN THE SCENARIO
 	// STATES NOTHING**, so Base and every inheriting scenario are exactly what they always were; a
 	// copy otherwise, so nothing that reads the answer can write a scenario's number into the
 	// project's block.
+	//
+	// **AND EVERY OTHER [TIMES] VALUE THE SCENARIO HOLDS IN ITS SETTINGS BLOCK** (stage 3: the
+	// pattern step, the report step, the start clock...), laid on first, so the two with their own
+	// home still win. A number held without its typed text drops the project's text for that key,
+	// as the two above do, so the text never states a number the run is not using.
 	function timesForScenario(s) {
-		var own = {}, any = false, out, base, k;
+		var own = {}, any = false, out, base, k, block = scenarioSettingsBlock(s),
+			held = block && plainObject(block.times) ? block.times : null;
 		LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
 			var v = scenarioTimeValue(s, key);
 			if (v !== undefined) { own[key] = v; any = true; }
 		});
-		if (!any) { return doc.times; }
+		if (!any && !held) { return doc.times; }
 		out = {};
 		base = projectTimes();
 		for (k in base) { if (Object.prototype.hasOwnProperty.call(base, k)) { out[k] = base[k]; } }
 		out.text = Object.assign({}, base.text || {});
+		if (held) {
+			Object.keys(held).forEach(function (key) {
+				if (key === 'text') { return; }
+				out[key] = altCopy(held[key]);
+				if (held.text && typeof held.text[key] === 'string') { out.text[key] = held.text[key]; } else { delete out.text[key]; }
+			});
+		}
 		Object.keys(own).forEach(function (key) {
 			var typed = s.times.text && s.times.text[key];
 			out[key] = own[key];
@@ -57971,8 +58120,19 @@ var EngCalcs = EngCalcs || {};
 	}
 	// What the export writes for the open scenario: null in Base or where it states nothing, so an
 	// export from Base is the document's own [TIMES], character for character.
+	//
+	// **AND EVERY OTHER [TIMES] VALUE ITS SETTINGS BLOCK HOLDS** (stage 3), on the same rule.
 	function scenarioTimesForExport() {
-		var s = activeScenario(), out = null;
+		var s = activeScenario(), out = null, block = scenarioSettingsBlock(s),
+			held = block && plainObject(block.times) ? block.times : null;
+		if (held) {
+			Object.keys(held).forEach(function (key) {
+				if (key === 'text' || typeof held[key] !== 'number') { return; }
+				out = out || { text: {} };
+				out[key] = held[key];
+				if (held.text && typeof held.text[key] === 'string') { out.text[key] = held.text[key]; }
+			});
+		}
 		LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
 			var v = scenarioTimeValue(s, key);
 			if (v === undefined) { return; }
@@ -58045,15 +58205,16 @@ var EngCalcs = EngCalcs || {};
 		return (typeof m === 'number' && isFinite(m)) ? m : 1;
 	}
 	function resolvedDemand(n) {
-		var rows = demandRowsOf(n, effective(n, 'demand')), t, total, i, b, dm = docDemandMultiplier();
+		var rows = demandRowsOf(n, effective(n, 'demand')), t, total, i, b, dm = docDemandMultiplier(), dp;
 		if (typeof rows[0].base !== 'number' || !isFinite(rows[0].base)) { return rows[0].base; }
 		t = modelTimeSeconds();
 		if (rows.length === 1) { return rows[0].base * demandMultiplier(n, t) * dm; }
 		total = 0;
+		dp = scnDefaultPattern();
 		for (i = 0; i < rows.length; i++) {
 			b = rows[i].base;
 			if (typeof b !== 'number' || !isFinite(b)) { continue; }
-			total += b * patternMultiplier(rows[i].pattern || doc.defaultPattern, t);
+			total += b * patternMultiplier(rows[i].pattern || dp, t);
 		}
 		return total * dm;
 	}
@@ -58062,13 +58223,14 @@ var EngCalcs = EngCalcs || {};
 	// junction is the shape it has always been" from "this junction has categories" without
 	// counting, and an empty-handed caller then behaves exactly as it did before Task 468.
 	function demandModelRows(n) {
-		var rows = demandRowsOf(n, effective(n, 'demand')), i, out;
+		var rows = demandRowsOf(n, effective(n, 'demand')), i, out, dp;
 		if (rows.length < 2) { return null; }
 		out = [];
+		dp = scnDefaultPattern();
 		for (i = 0; i < rows.length; i++) {
 			out.push({
 				base: toSI(rows[i].base || 0, 'lpn_u_flow'),
-				pattern: rows[i].pattern || doc.defaultPattern || null
+				pattern: rows[i].pattern || dp || null
 			});
 		}
 		return out;
@@ -58084,7 +58246,7 @@ var EngCalcs = EngCalcs || {};
 	// and Task 468's categories work will want it: a junction with categories resolves through the
 	// same door. Delete it if that turns out not to be true, but do not re-wire the popup to it.
 	function demandPatternActs(n) {
-		return !isFixedHeadNode(n) && !!(ownDemandPattern(n) || doc.defaultPattern);
+		return !isFixedHeadNode(n) && !!(ownDemandPattern(n) || scnDefaultPattern());
 	}
 	// **THE SAME ARITHMETIC FOR EVERY ATTACHMENT POINT** (Task 248.02). A pattern does not know what
 	// it is for -- js/lpn-patterns.js says so in its own header -- so a demand, a reservoir head and
@@ -58098,8 +58260,7 @@ var EngCalcs = EngCalcs || {};
 		if (!EngCalcs.lpnPatternById || !doc.patterns || !doc.patterns.length) { return 1; }
 		var pat = EngCalcs.lpnPatternById(doc.patterns, id);
 		if (!pat) { return 1; }
-		var times = doc.times || EngCalcs.lpnTimesDefaults();
-		return EngCalcs.lpnPatternValue(pat, t, times.patternStep, times.patternStart);
+		return EngCalcs.lpnPatternValue(pat, t, scnPatternClock('patternStep'), scnPatternClock('patternStart'));
 	}
 	// A pump's relative speed at `t`.
 	//
@@ -58179,7 +58340,7 @@ var EngCalcs = EngCalcs || {};
 					// above is still what every one-instant solve reads; js/lpn-epanet.js takes one or
 					// the other and never both, or the multiplier would be applied twice.
 					demandBase: toSI(effective(n, 'demand') || 0, 'lpn_u_flow'),
-					demandPattern: ownDemandPattern(n) || doc.defaultPattern || null,
+					demandPattern: ownDemandPattern(n) || scnDefaultPattern() || null,
 					// **AND THE WHOLE BREAKDOWN RIDES ALONG WITH THEM, for the same reason and only
 					// when there is one** (Task 468). An extended-period run has EPANET doing the
 					// multiplying, and two categories on two patterns are two daily shapes that
@@ -58327,10 +58488,10 @@ var EngCalcs = EngCalcs || {};
 		// `Viscosity 1.3` means 1.3 times water at 20 degC, which is the 1.007e-6 m2/s that has been
 		// hard-coded here since the solver was written. Multiplying is the whole conversion, and an
 		// absent option leaves the number exactly as it was.
-		var hyd = settings.hydraulics || {};
+		var hyd = scnSetting('hydraulics') || {};
 		var model = { nodes: nodes, links: links, method: frictionMethod(),
 			visc: 1.007e-6 * (hyd.viscosity || 1),
-			emitterExponent: settings.emitterExponent,
+			emitterExponent: scnSetting('emitterExponent'),
 			// Carried whole so js/lpn-epanet.js can write the ones only EPANET acts on -- accuracy,
 			// unbalanced, the head-error limit -- without a second copy of the list.
 			//
@@ -59126,7 +59287,7 @@ var EngCalcs = EngCalcs || {};
 		return field === 'quality' ? 'quality:' + qualityMode() : field;
 	}
 	function labelPrefixFor(group, field) {
-		var m = (labelSettings.prefix || {})[group] || {}, k = labelAffixKey(field);
+		var m = scnLabels(['prefix', group]) || {}, k = labelAffixKey(field);
 		if (typeof m[k] === 'string') { return m[k]; }
 		if (k !== field && typeof m[field] === 'string') { return m[field]; }
 		return labelDefaultPrefix(group, field);
@@ -59172,12 +59333,12 @@ var EngCalcs = EngCalcs || {};
 		return ' ' + unitLabel(sel);
 	}
 	function labelUsesUnits(group, field) {
-		var m = (labelSettings.useUnits || {})[group];
+		var m = scnLabels(['useUnits', group]);
 		return !!(m && m[field]) && labelUnitsCapable(group, field);
 	}
 	function labelSuffixFor(group, field) {
 		if (labelUsesUnits(group, field)) { return labelUnitSuffix(group, field); }
-		var m = (labelSettings.suffix || {})[group] || {}, k = labelAffixKey(field);
+		var m = scnLabels(['suffix', group]) || {}, k = labelAffixKey(field);
 		if (typeof m[k] === 'string') { return m[k]; }
 		if (k !== field && typeof m[field] === 'string') { return m[field]; }
 		return labelDefaultSuffix(group, field);
@@ -59206,7 +59367,8 @@ var EngCalcs = EngCalcs || {};
 	// (', ', ' ', '|')"). Not the prefix from its number -- that gap, if wanted, is typed into the
 	// prefix itself.
 	function labelSeparator() {
-		return typeof labelSettings.separator === 'string' ? labelSettings.separator : ' ';
+		var sep = scnLabels(['separator']);
+		return typeof sep === 'string' ? sep : ' ';
 	}
 	// Wraps a built line's text in its field's prefix/suffix. Applied HERE, to the finished line,
 	// and never inside numLine()/rawLine(): the extrema comparison upstream of both works on the
@@ -59385,7 +59547,7 @@ var EngCalcs = EngCalcs || {};
 		refreshScenarioMarks();
 	}
 	function refreshLabelTextPass() {
-		var ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
+		var ls = scnLabels(), nd = ls.decimals.node, ld = ls.decimals.link,
 			// One string, computed once for the whole pass -- see the measurement comment below.
 			fsNow = effectiveFontSize() + 'px';
 		// Every field below is rounded through the same displayRound()/per-field-decimals rule the
@@ -59776,7 +59938,8 @@ var EngCalcs = EngCalcs || {};
 	function overrideIsDisplayed(el, prop) {
 		var group = elGroup(el), fields = (LPN_OVERRIDE_LABEL_FIELD[group] || {})[prop];
 		if (!fields) { return true; }
-		return fields.some(function (f) { return !!labelSettings[group][f]; });
+		var shown = scnLabels([group]) || {};
+		return fields.some(function (f) { return !!shown[f]; });
 	}
 	function hasDisplayedOverride(el) {
 		var ov = activeScenario().overrides[ovKey(el)];
@@ -59988,12 +60151,13 @@ var EngCalcs = EngCalcs || {};
 		var epanetOnly = EngCalcs.lpnEpanetOnlyValves ? EngCalcs.lpnEpanetOnlyValves(model) : [],
 			pdaRoute = !!(EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model));
 		valveRouteNote = '';
-		if ((settings.engine === 'epanet' || epanetOnly.length > 0 || pdaRoute) && EngCalcs.lpnSolveEpanet) {
-			if (epanetOnly.length > 0 && settings.engine !== 'epanet') {
+		var engine = scnSetting('engine');
+		if ((engine === 'epanet' || epanetOnly.length > 0 || pdaRoute) && EngCalcs.lpnSolveEpanet) {
+			if (epanetOnly.length > 0 && engine !== 'epanet') {
 				valveRouteNote = ((EngCalcs.pageConfig || {}).lpn_engine_valve_route ||
 					'Solved with the EPANET solver, because these valves open and close on their own:') +
 					' ' + epanetOnly.join(', ');
-			} else if (pdaRoute && settings.engine !== 'epanet') {
+			} else if (pdaRoute && engine !== 'epanet') {
 				// Task 762: the second thing that routes a network to EPANET by its own contents.
 				valveRouteNote = (EngCalcs.pageConfig || {}).lpn_engine_pda_route ||
 					'Solved with the EPANET solver, because the demand model is pressure driven.';
@@ -60308,7 +60472,7 @@ var EngCalcs = EngCalcs || {};
 		// frozen, which is the thing a bare spinner cannot say. Keeping that true is the whole
 		// reason the fetch is asynchronous and the banner is a <p role="status"> rather than
 		// anything modal.
-		if (epanetWarmState === 'warming' && !networkNeedsEpanet() && settings.engine === 'epanet') {
+		if (epanetWarmState === 'warming' && !networkNeedsEpanet() && scnSetting('engine') === 'epanet') {
 			base = pc.lpn_engine_wait || 'Loading solver. Results delayed momentarily. Continue working.';
 		}
 		if (networkNeedsEpanet()) {
@@ -60542,7 +60706,7 @@ var EngCalcs = EngCalcs || {};
 	// an engine is two answers to "which engine solves this network" waiting to disagree.
 	function engineFor(model) {
 		var only = EngCalcs.lpnEpanetOnlyValves ? EngCalcs.lpnEpanetOnlyValves(model) : [],
-			useEpanet = (settings.engine === 'epanet' || only.length > 0
+			useEpanet = (scnSetting('engine') === 'epanet' || only.length > 0
 				|| (EngCalcs.lpnDemandModelIsPda && EngCalcs.lpnDemandModelIsPda(model))) && !!EngCalcs.lpnSolveEpanet;
 		return {
 			epanet: useEpanet,
@@ -62730,16 +62894,34 @@ var EngCalcs = EngCalcs || {};
 	// accuracy and trials never vary silently between compared scenarios). They are project
 	// settings with no per-scenario value at all, so the statement is true by construction and is
 	// there so the reader of a printed comparison never has to wonder.
+	//
+	// **ACCURACY AND TRIALS ARE NO LONGER THE SAME BY CONSTRUCTION** (Tom, 2026-10-05: every stored
+	// setting may vary by scenario; only friction method and units never do). So each is asked of
+	// every scenario, and stated here only when every scenario answers the same; a row that differs
+	// is left out rather than stated falsely under this heading.
 	function scnCmpSameRows(host) {
-		var pc = EngCalcs.pageConfig || {}, h = settings.hydraulics || {},
-			trials = (typeof h.trials === 'number' && isFinite(h.trials)) ? h.trials : 40;
+		var pc = EngCalcs.pageConfig || {}, was = project.activeScenario, acc = [], tri = [];
+		function trialsNow() {
+			var t = (scnSetting('hydraulics') || {}).trials;
+			return (typeof t === 'number' && isFinite(t)) ? t : 40;
+		}
+		try {
+			scenariosForDisplay().forEach(function (s) {
+				project.activeScenario = s.id;
+				acc.push(String(solveAccuracy()));
+				tri.push(String(trialsNow()));
+			});
+		} finally {
+			project.activeScenario = was;
+		}
+		function same(list) { return list.every(function (v) { return v === list[0]; }); }
 		ffEl('p', 'lpn-ff-summary', pc.lpn_scncmp_same || 'The same in every scenario', host);
 		[
 			[pc.bpn_method || 'Friction method', frictionMethodLabel()],
 			[pc.lpn_view_units || 'Units', ['lpn_u_flow', 'lpn_u_pressure', 'lpn_u_velocity'].map(unitLabel).join(', ')],
-			[pc.lpn_settings_accuracy || 'Accuracy', String(solveAccuracy())],
-			[pc.lpn_settings_trials || 'Maximum trials', String(trials)]
-		].forEach(function (pair) {
+			same(acc) ? [pc.lpn_settings_accuracy || 'Accuracy', String(solveAccuracy())] : null,
+			same(tri) ? [pc.lpn_settings_trials || 'Maximum trials', String(trialsNow())] : null
+		].filter(Boolean).forEach(function (pair) {
 			ffRow(host, pair[0], null, ffEl('span', null, pair[1], null), '');
 		});
 	}
@@ -64382,7 +64564,7 @@ var EngCalcs = EngCalcs || {};
 			// rather than reached for, like every other line of this seam: that file knows nothing
 			// about `settings` and must not learn. `!== false` rather than a truth test, so a
 			// project saved before this setting existed reads as ON -- which is what it did.
-			autoRun: function () { return settings.autoRun !== false; },
+			autoRun: function () { return scnSetting('autoRun') !== false; },
 			// The run box's own preference, handed over like every other line of this seam.
 			// js/lpn-time.js builds the box and knows nothing about where the answer is kept.
 			runBoxHidden: function () { return runBoxHidden; },
@@ -64466,7 +64648,7 @@ var EngCalcs = EngCalcs || {};
 		//
 		// So the gate belongs HERE, at the one door every edit goes through, rather than one layer
 		// further in where only half the edits could ever reach it.
-		if (settings.autoRun === false) { afterManualEdit(); return; }
+		if (scnSetting('autoRun') === false) { afterManualEdit(); return; }
 		solveTimer = setTimeout(runSolve, 300);
 	}
 	/**
@@ -64495,7 +64677,7 @@ var EngCalcs = EngCalcs || {};
 		clearDemandScaleRun(false);
 		if (solveTimer) { clearTimeout(solveTimer); }
 		solveTimer = null;
-		if (settings.autoRun === false) {
+		if (scnSetting('autoRun') === false) {
 			if (EngCalcs.lpnTimeStandDown) { EngCalcs.lpnTimeStandDown(); }
 			return;
 		}

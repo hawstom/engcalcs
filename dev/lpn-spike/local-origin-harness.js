@@ -398,8 +398,11 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE FEWER EACH FOR viewLonLat()** (2026-09-26): its two branches, lat/lon and projected,
 	// each crossed outward on their own; they now cross once and hand the point to placeLonLatAt(),
 	// which also answers for a grid with the world map attached (the Convert as chooser's filter).
-	ok('outwardX has one definition and 36 call sites', count(/outwardX\(/g) === 37, count(/outwardX\(/g));
-	ok('outwardY has one definition and 36 call sites', count(/outwardY\(/g) === 37, count(/outwardY\(/g));
+	// **AND ONE MORE EACH FOR A SCENARIO'S OWN VIEW** (dev/scenario-alternatives.md, Tom
+	// 2026-10-06): outwardViewOf() stores the view outward, as a node's position override is, so no
+	// flip, origin shift or projection ever has to visit it.
+	ok('outwardX has one definition and 37 call sites', count(/outwardX\(/g) === 38, count(/outwardX\(/g));
+	ok('outwardY has one definition and 37 call sites', count(/outwardY\(/g) === 38, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -485,8 +488,9 @@ console.log('\n--- one home for the concept ---');
 	// paneCreateFromPlan()'s label and customer branches convert a pasted row's typed position
 	// through this door exactly as a node's own does, and the customer branch's node-attachment
 	// lookup (customerAttachAtNode()) needs the same inward point to find the nearest pipe.
-	ok('inwardX has one definition and 41 call sites', count(/inwardX\(/g) === 42, count(/inwardX\(/g));
-	ok('inwardY has one definition and 42 call sites', count(/inwardY\(/g) === 43, count(/inwardY\(/g));
+	// **AND ONE MORE EACH FOR A SCENARIO'S OWN VIEW COMING BACK IN** (inwardViewOf()).
+	ok('inwardX has one definition and 42 call sites', count(/inwardX\(/g) === 43, count(/inwardX\(/g));
+	ok('inwardY has one definition and 43 call sites', count(/inwardY\(/g) === 44, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

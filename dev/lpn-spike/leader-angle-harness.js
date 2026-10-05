@@ -168,9 +168,11 @@ CASES.forEach(function (c) {
 			body ? 'branch found, no call' : 'branch not found at all');
 	});
 	// ONE reader of the setting, so "what step is in force?" has one answer.
+	// Read through the scenario seam (dev/scenario-alternatives.md, stage 3), written by the picker.
 	ok('there is exactly one place the setting is read',
-		(src.match(/settings\.leaderSnapDeg/g) || []).length === 2,   // the reader, and the picker writing it
-		JSON.stringify((src.match(/.{0,30}settings\.leaderSnapDeg.{0,20}/g) || [])));
+		(src.match(/scnSetting\('leaderSnapDeg'\)/g) || []).length === 1 &&
+		(src.match(/settings\.leaderSnapDeg/g) || []).length === 1,   // the picker writing it
+		JSON.stringify((src.match(/.{0,30}(settings\.leaderSnapDeg|scnSetting\('leaderSnapDeg'\)).{0,20}/g) || [])));
 	// **OFF BY DEFAULT.** A snap that arrives switched on has made the user's choice for them, and
 	// Tom's ruling was that free dragging must stay available.
 	ok('a new project drags freely until somebody asks otherwise',

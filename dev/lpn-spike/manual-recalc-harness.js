@@ -64,10 +64,10 @@ const INJECT =
 // The gate, as one line of the shipped source. The mutation below deletes exactly this, which puts
 // the page back on the behaviour Tom reported -- and loadLoopedNetwork() throws if it matches
 // nothing, so a rewording of the gate cannot quietly turn the mutation into a no-op.
-const GATE = "\t\tif (settings.autoRun === false) { afterManualEdit(); return; }\n";
+const GATE = "\t\tif (scnSetting('autoRun') === false) { afterManualEdit(); return; }\n";
 // The ARRIVAL gate, the same line of reasoning at the other door. Removing it puts the page back
 // on the behaviour Tom rejected: a project that calculates itself the moment it opens.
-const ARRIVAL_GATE = "\t\tif (settings.autoRun === false) {\n" +
+const ARRIVAL_GATE = "\t\tif (scnSetting('autoRun') === false) {\n" +
 	"\t\t\tif (EngCalcs.lpnTimeStandDown) { EngCalcs.lpnTimeStandDown(); }\n" +
 	"\t\t\treturn;\n" +
 	"\t\t}\n";
