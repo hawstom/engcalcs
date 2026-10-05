@@ -162,9 +162,22 @@ the reload the confirm promises, so there is no separate one racing it.
 and `engcalcs-pages`: this site's own scripts, styles, icons and calculator pages, so the suite opens
 offline. **Exempt** (strictly necessary for a service the visitor requested, the offline suite): it
 holds no identifier and nothing the visitor entered, only responses to same-origin GETs with the query
-string stripped, and it is sent nowhere. `js/vendor/epanet-js.js` (the engine) is not precached; it
-enters `engcalcs-assets` the first time the visitor turns the EPANET solver on. Erase everything does
+string stripped, and it is sent nowhere. Erase everything does
 NOT clear it (it is not a visitor's data); clearing site data does. `privacy.php` lists it.
+
+**The EPANET engine (Task 726, Tom, 2026-10-05: *"EPANET pre-fetch slowly: Yes."*).**
+`js/vendor/epanet-js.js` (664 KB) and the 1.3 KB `js/vendor/slim/index.js` it imports were
+deliberately outside the precache, so they reached a device only if the visitor ran EPANET. Now,
+on the Looped-Network page only, they are fetched once per page when the browser is idle, and are
+kept in `engcalcs-assets` (by the cache-first route in `sw.php`) and in the HTTP cache, **whether or
+not that visitor ever runs EPANET**. The fetch is low priority, starts after the window has loaded
+and the first project has drawn, and does not happen when the visitor's browser reports Save-Data,
+a 2g or slow-2g connection, a copy already in Cache Storage, or an engine already loaded. Nothing
+is parsed or run. Same category as the precache above (this site's own code); no cookie, no
+identifier, nothing analytic, so **no `consent_body` sentence changes and no `EC_CONSENT_VERSION`
+bump.** What does change on a device: about 680 KB more in Cache Storage for a visitor who never
+used EPANET. A visitor erasing everything with `wipeAllStorage()` is unaffected by this (it does not
+touch Cache Storage, as before). Harness: `dev/lpn-spike/engine-idle-prefetch-harness.js`.
 
 ### Place-name search stores nothing but the answer
 

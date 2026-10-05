@@ -42332,6 +42332,29 @@ var EngCalcs = EngCalcs || {};
 			if (/[?&]lpn_examples=1(&|$)/.test(window.location.search)) { showExamplesOverlay(); }
 		} catch (err) { /* location can throw in an exotic host; the page is fine without the overlay */ }
 		requestAnimationFrame(tick);
+		scheduleEnginePrefetch();
+	}
+
+	// **THE IDLE PREFETCH OF THE EPANET ENGINE** (Task 726; the rules are at EngCalcs.lpnEpanetPrefetch
+	// in js/lpn-epanet.js). Starts only once the window has loaded and the first project has drawn
+	// (this runs at the very end of init(), after the first frame is queued), and then waits for
+	// the browser to report idle, with a timeout so a page that is never idle still gets it. Once per
+	// page; the load path owns every other case.
+	var ENGINE_PREFETCH_TIMEOUT_MS = 10000, ENGINE_PREFETCH_FALLBACK_MS = 6000;
+	function scheduleEnginePrefetch() {
+		if (!EngCalcs.lpnEpanetPrefetch) { return; }
+		function go() {
+			var run = function () { EngCalcs.lpnEpanetPrefetch(); };
+			if (typeof window.requestIdleCallback === 'function') {
+				window.requestIdleCallback(run, { timeout: ENGINE_PREFETCH_TIMEOUT_MS });
+			} else {
+				setTimeout(run, ENGINE_PREFETCH_FALLBACK_MS);
+			}
+		}
+		try {
+			if (document.readyState === 'complete') { go(); }
+			else { window.addEventListener('load', go, { once: true }); }
+		} catch (err) { /* a host without these is not worth a fetch */ }
 	}
 
 	// Three visually separated groups (Tom, 2026-07-30): Add (the five element types), Edit
@@ -59844,6 +59867,8 @@ var EngCalcs = EngCalcs || {};
 
 	// ---- Warming the EPANET engine ----
 	//
+	// (Task 726 adds an idle prefetch of the same file for a visitor who has not asked for it; see
+	// scheduleEnginePrefetch() at the end of init().)
 	// js/vendor/epanet-js.js is 664 KB and is deliberately NOT precached by the service worker: it
 	// loads only for a visitor who needs it, because precaching multiplies the install cost for
 	// exactly the low-bandwidth audience this suite exists for (Task 318). The gap that leaves is
