@@ -1548,6 +1548,15 @@ html[lang="zh"] .ec-welcome {
 	border-left: 1px solid var(--ec-gray-d6d6d6); padding-left: 12px;
 }
 .lpn-transport-btn { font: inherit; cursor: pointer; padding: 2px 4px; }
+/* **ONE PLAYER, NOT FIVE BOXES** (Ida, 2026-10-06, after Tom: "These controls are the largest thing on
+   the chrome"). Measured: the player was the only set of boxed, filled controls on a strip of bare
+   icons, so five boxes read as five objects. Joined edge to edge they read as one, 25 px narrower,
+   still buttons ("buttons are its paradigm"). Siblings that are not transport buttons keep the
+   group's ordinary 6 px spacing. */
+#lpn_toolbar_run { gap: 0; }
+#lpn_toolbar_run > * + * { margin-inline-start: 6px; }
+#lpn_toolbar_run > .lpn-transport-btn { border-radius: 0; }
+#lpn_toolbar_run > .lpn-transport-btn + .lpn-transport-btn { margin-inline-start: -1px; }
 /* An icon-only button has no text for the icon's end margin to separate from; it only widens it. */
 .lpn-transport-btn > .ec-icon { margin-inline-end: 0; }
 /* Direction glyphs point along time, and time runs right to left in a right-to-left page, where the
