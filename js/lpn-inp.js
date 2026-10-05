@@ -2918,7 +2918,14 @@
 			var bx = (backdrop.tx || 0) + origin.x, by = (backdrop.ty || 0) + origin.y,
 				bw = (backdrop.width || 0) * (backdrop.s || 1),
 				bh = (backdrop.height || 0) * (backdrop.s || 1);
-			backdropRows.push(row(['DIMENSIONS', String(bx), String(by - bh), String(bx + bw), String(by)]));
+			// **A GEOGRAPHIC DOCUMENT'S backdrop.ty IS A MERCATOR Y, NOT A LATITUDE.** serializeProject()
+			// unprojects every node, vertex and label but only adds the origin back to the picture
+			// (it is ours, stored in the drawing frame), so without this a picture over latitude 33
+			// was written as 34.99 -- the Mercator y of 33. The rectangle's edges are the file's
+			// latitudes, so each goes back through the inverse projection. x is longitude already.
+			var geoBd = doc.project && doc.project.coords === 'geo' && EngCalcs.lpnGeom && EngCalcs.lpnGeom.mercLat,
+				latOf = function (y) { return geoBd ? EngCalcs.lpnGeom.mercLat(y) : y; };
+			backdropRows.push(row(['DIMENSIONS', String(bx), String(latOf(by - bh)), String(bx + bw), String(latOf(by))]));
 			diff('backdrop-image-not-named', []);
 		} else if (backdrop) {
 			diff('backdrop-not-a-file', [], backdrop.type || 'backdrop');
