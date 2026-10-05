@@ -99,42 +99,61 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-05
+## STATE — 2026-10-05 (evening)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged 2026-10-05 (defect and tooling tracks, on green): the status legend prints Open/Closed (664,
-`COLOR_CATEGORIES` is the categorical-field shape), the node-size cap is one sentence (740), Cmd
-not Ctrl on a Mac (713), the Analyze browser-pass spec, `examples-vs-epanet-harness.js` (the four
-EPA examples against raw EPANET every hour), `daily_report.sh` runs the stats script under bash.
-Closed as already shipped: 710, 719, 755, 762, 764, 695. Task 726 is now prefetch only.
+Merged 2026-10-05 evening: `feat/dock-flag-order` and `feat/profile-file` (his all-clears; Task 604
+closed); his 89 marks on `new-english-keys.md` harvested and applied (13 English edits, 5 synonyms
+deleted, `lpn_ds_find` and `lpn_settings_basemap_style_tip` deleted); Tables menu "Select on map" /
+"Zoom and select" open Properties and a new "Delete element(s)" row; Text table follows a deleted
+Text (and a deleted Text is now actually saved); Text detach and a Text Description; the time-step
+select fits "9:59"; "A copy; make new lock" writes the file at once; the no-engine banners name the
+real cause (offline / download blocked / WebAssembly refused / page defect) instead of always
+saying "connect to the internet" (DDN hit it online); Task 765 (saved views, `dev/saved-views.md`).
 
-### Awaiting his browser pass (all protected, all on the Branch previews page)
+### Awaiting him (all on the Branch previews page unless noted)
 
-- **`feat/profile-file`** (Task 604): master merged in, a raw alert() fixed; green but payloads.
-- **`feat/times-statistic`** (Task 735): `[TIMES] Statistic` kept, a Settings > Time box, a last
-  time-step entry showing the statistic; link flow is absolute as EPANET's report is (Perry measured
-  the vendored engine: Net1 link 110 Averaged 575.06 gpm); the legend says "Pressure (Averaged, psi)".
-- **`feat/dock-flag-order`**: drag or Alt+Arrow a hidden box's flag; `dockOrd` on the existing
-  layout records (no new key). Perry's first pass found multi-slot drags dead (capture lost when the
-  node moved); fixed, capture on the strip. No flags on a phone at all (docking off at 640 px).
+- **`feat/times-statistic`** (Task 735, 8109): now Avg / Min / Max / Range in English, his ask.
+- **`feat/find-source`** (8108): a virtual "Source" scope in Find (Mary's advice); Perry passed it twice.
+- **`feat/transport-ends`** (8110): Restart |◀◀ and End ▶▶| (Ida's spec); player controls hide in
+  steady state, Calculate keeps its own rule. Perry passed it. Restart while playing keeps playing.
+- **`feat/engine-prefetch`** (Task 726, no preview: nothing visible): needs only his word. Perry's
+  two holes fixed. Storage: ~680 KB of our own engine lands in the HTTP and service-worker caches on
+  the LPN page for visitors who never run EPANET; no cookie or identifier. privacy.php's device table
+  never listed the service-worker cache at all (older gap): ask whether to add a row.
 - Still from before: `feat/desktop`, `feat/label-placer`.
 
 ### Next job
 
-**A translation sprint, blocked on him**: `friction_check` fails on 11 open questions (10 in
-`1003b-wave0`, 1 in `1003-ds`) and 56 English strings are unread in `new-english-keys.md`. Once he
-answers: also owed are it, he, ur, my, am's mechanically joined `lpn_settings_symbol_cap_sentence`
-(reorder), the two tips now saying Selected/Cleared (drift), times-statistic's six keys if merged,
-the 46 lpn keys held before, the Romanian file menu pass, four concept terms.
+**The translation sprint, blocked on two answers**: `friction_check` fails only on
+`lpn_ds_found_below` (1003-ds, proposals A/B) and `lpn_notes_4_def` (his question about the Notes
+box; recommendation: delete "Also on this page", move "How it is solved" and "What it does not do"
+to the About rewrite, keep the four advisories; six harnesses and `notesbox.js` open the box).
+Then launch: everything in `new-english-keys.md` plus the owed list (it/he/ur/my/am symbol-cap
+reorder, Selected/Cleared drift, the 46 held lpn keys, Romanian file menu, four concept terms).
+Merging the four branches above first lets one sprint carry their keys.
 
 ### Decisions waiting on him
 
-- Task 726: prefetch the EPANET engine when idle. The service worker caches it, so prefetch puts
-  ~664 KB on a device the visitor never asked for; that is a storage question.
-- Times-statistic: should the Statistic row's tip say the view appears only after a run?
+- DMARC phase 3: CC read all 29 reports (6 Sep to 3 Oct) over `ssh jconstru`; every message came
+  from 74.81.90.154 and passed DKIM. Gate met. Needs his go and his not-epanet.org choice.
+- Three _syn questions he asked back (ip_is_lateral, lpn_labels_priority_node_tip, mtc_note_1).
+- Task 765: the name (View, Figure, Snapshot) and its priority (filed at 50).
+- `lpn_new_coordsys_tip` reads "to new project" verbatim from him; possibly "to a new project".
+- On a phone (<=640 px) the Calculate bolt is hidden by an older CSS rule even with auto-recalculate
+  off (Perry); Project/Water menu still has the row. Not filed yet.
+- A mixed-scope typed Filter in table ("Junction... OR Pipe...") answers "applies to no table" and
+  keeps the old filter (Perry; pre-existing, generic).
 
 ### Traps met 2026-10-05
+
+- **The DMARC mailbox is readable from here**: `ssh jconstru`, `~/mail/constructionnotesmanager.com/dmarc/{new,cur}`;
+  tar it down and parse the gz/zip XML locally. The reports are not in his Gmail.
+- **The harvester mis-filed one synonym ruling** (consent_body): it stored his edited synonym as the
+  English. Check `syn-rulings.json` by eye after any harvest with an edited synonym.
+- **He wrote two different edits of one key** (lpn_ds_search_note) in two sections of the file; the
+  questions-section edit was applied. Expect it when a key is both new and questioned.
 
 - **The roadmap lagged FOUR more times in one session** (764, 726/608, 695, plus 710/719/755/762
   never closed on merge). Close a task in the merge that ships it.
