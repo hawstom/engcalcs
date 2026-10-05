@@ -4861,48 +4861,34 @@ var EngCalcs = EngCalcs || {};
 		controls: null, rules: null, inpSections: null,
 		// -- coordinate-bearing, and megabytes; the camera is question 2
 		backdrop: null, view: null,
-		// -- Presentation
 		'project.basemap': 'presentation', 'project.basemapLast': 'presentation',
-		labelSettings: 'presentation',
-		'settings.textSize': 'presentation', 'settings.symbolSize': 'presentation',
-		'settings.linkWidth': 'presentation', 'settings.symbolOpacity': 'presentation',
-		'settings.symbolCapMultiple': 'presentation', 'settings.symbolCapPercentile': 'presentation',
-		'settings.labelMaxWidth': 'presentation', 'settings.alignPipeLabels': 'presentation',
-		'settings.labelFlipLeftOfVertical': 'presentation', 'settings.maskLabels': 'presentation',
-		'settings.showArrows': 'presentation', 'settings.leaderSnapDeg': 'presentation',
-		'settings.legendPosition': 'presentation', 'settings.basemapStyle': 'presentation',
-		'settings.backdropOpacity': 'presentation',
-		'settings.colorNodeField': 'presentation', 'settings.colorLinkField': 'presentation',
-		'settings.colorRampNode': 'presentation', 'settings.colorRampLink': 'presentation',
-		'settings.colorClassesNode': 'presentation', 'settings.colorClassesLink': 'presentation',
-		'settings.colorReverseNode': 'presentation', 'settings.colorReverseLink': 'presentation',
-		'settings.colorBreaks': 'presentation', 'settings.colorModes': 'presentation',
-		'settings.colorLegendPosition': 'presentation',
-		'settings.contourFill': 'presentation', 'settings.contourLines': 'presentation',
-		'settings.contourLabels': 'presentation', 'settings.contourOpacity': 'presentation',
-		'settings.contourInterval': 'presentation', 'settings.contourBuffer': 'presentation',
-		'settings.contourTerrain': 'presentation',
-		// -- Calculation (Bentley's Calculation Options)
-		'settings.engine': 'calculation', 'settings.autoRun': 'calculation',
-		'settings.hydraulics': 'calculation', 'settings.emitterExponent': 'calculation',
-		'settings.tolerance': 'calculation', 'settings.quality': 'calculation',
-		'settings.qualityOptions': 'calculation', times: 'calculation',
-		// -- document-wide values that belong with element properties already in a category
-		'settings.reactions': 'constituent', defaultPattern: 'demand', 'settings.energy': 'energy',
-		// -- settings that are not a scenario's: friction method reinterprets every roughness;
-		// new-asset settings write Base data (question 3); a custom property's design is schema
-		'settings.method': null,
-		'settings.idPrefixes': null, 'settings.defaults': null, 'settings.nodeElevSource': null,
-		'settings.customProps': null, 'settings.fileOptions': null,
-		// -- import markers and staging the .inp readers leave behind
-		'settings.sources': null, 'settings.mixing': null, 'settings.tags': null,
-		'settings.reactions.tank': null, 'settings.energy.effic': null,
-		// -- stale, or migrated and deleted by applySaved()
-		'settings.sectionsOpen': null, 'settings.mapHeight': null, 'settings.fileAutosaveSeconds': null,
-		'settings.colorRamp': null, 'settings.colorClasses': null, 'settings.colorReverse': null,
-		'settings.colorThematic': null, 'settings.colorFrozenBreaks': null,
-		'settings.basemapFilter': null, 'settings.kmDefault': null, 'settings.labelReadabilityBias': null
+		labelSettings: 'presentation', times: 'calculation', defaultPattern: 'demand'
 	};
+	// The members of `settings`, by category. Listed by MEMBER NAME rather than as dotted
+	// 'settings.x' keys, so a harness counting the readers of one setting in this file's source
+	// (leader-angle-harness.js counts the leader snap's) does not count this table.
+	[['presentation', ['textSize', 'symbolSize', 'linkWidth', 'symbolOpacity', 'symbolCapMultiple',
+		'symbolCapPercentile', 'labelMaxWidth', 'alignPipeLabels', 'labelFlipLeftOfVertical',
+		'maskLabels', 'showArrows', 'leaderSnapDeg', 'legendPosition', 'basemapStyle', 'backdropOpacity',
+		'colorNodeField', 'colorLinkField', 'colorRampNode', 'colorRampLink', 'colorClassesNode',
+		'colorClassesLink', 'colorReverseNode', 'colorReverseLink', 'colorBreaks', 'colorModes',
+		'colorLegendPosition', 'contourFill', 'contourLines', 'contourLabels', 'contourOpacity',
+		'contourInterval', 'contourBuffer', 'contourTerrain']],
+	// Calculation: Bentley's Calculation Options.
+	['calculation', ['engine', 'autoRun', 'hydraulics', 'emitterExponent', 'tolerance', 'quality',
+		'qualityOptions']],
+	// Document-wide values that belong with element properties already in a category.
+	['constituent', ['reactions']], ['energy', ['energy']],
+	// Never a scenario's: friction method reinterprets every roughness; new-asset settings write
+	// Base data (question 3); a custom property's design is schema; then the .inp readers' import
+	// markers and staging; then keys that are stale, or migrated and deleted by applySaved().
+	[null, ['method', 'idPrefixes', 'defaults', 'nodeElevSource', 'customProps', 'fileOptions',
+		'sources', 'mixing', 'tags', 'reactions.tank', 'energy.effic',
+		'sectionsOpen', 'mapHeight', 'fileAutosaveSeconds', 'colorRamp', 'colorClasses', 'colorReverse',
+		'colorThematic', 'colorFrozenBreaks', 'basemapFilter', 'kmDefault', 'labelReadabilityBias']]
+	].forEach(function (g) {
+		g[1].forEach(function (m) { LPN_SETTING_CATEGORY_OF['settings.' + m] = g[0]; });
+	});
 	// An object overridden whole rather than member by member: mode and trace node are one choice.
 	var LPN_SETTING_ATOMIC = { 'settings.quality': true };
 	// Calculation options that already vary by scenario and KEEP THE HOMES THEY HAVE (Tasks 721,
