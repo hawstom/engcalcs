@@ -3663,6 +3663,7 @@ $ec_lang['lpn_ff_no_selection']='Aucune jonction n\'est sélectionnée. Sélecti
 $ec_lang['lpn_ff_skipped']='{n} éléments sélectionnés ne sont pas des jonctions, ils n\'ont donc pas été testés.';
 $ec_lang['lpn_ff_required']='Débit d\'incendie requis';
 $ec_lang['lpn_ff_required_tip']='Le débit que votre réglementation incendie ou votre service de sécurité incendie exige à une bouche d\'incendie. Chaque jonction est testée par rapport à ce nombre, sauf si elle porte son propre débit d\'incendie requis.';
+$ec_lang['lpn_ff_required_own']='Les jonctions portant leur propre débit d\'incendie requis sont testées par rapport à celui-ci à la place. Nombre d\'entre elles : {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Le débit d\'incendie requis à cette jonction en particulier, selon votre réglementation incendie ou votre service de sécurité incendie, pour l\'usage du sol qu\'elle dessert. Laissez-le vide et la jonction est testée par rapport au nombre indiqué dans la case Débit d\'incendie.';
 $ec_lang['lpn_ff_residual']='Pression résiduelle à maintenir';
 $ec_lang['lpn_ff_residual_tip']='La pression que la jonction doit encore maintenir tout en fournissant le débit d\'incendie. AWWA M31 et NFPA 291 utilisent 20 psi (140 kPa).';

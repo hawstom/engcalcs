@@ -3356,6 +3356,7 @@
         "lpn_ff_report_all": "52b28d6b1306346b3aef71fd2b808af7eaab735d",
         "lpn_ff_required": "85549ea8f73e12ebd964956baf76765b113ccf6b",
         "lpn_ff_required_node_tip": "6981b9976d304e65d6150293b8f016067b8da22b",
+        "lpn_ff_required_own": "7d13036ec61f5c20e0dadcacfd88d450803088eb",
         "lpn_ff_required_tip": "4b1582b5cb52f9c68b7c0c37451d775bf1311345",
         "lpn_ff_residual": "a507618ef00e010279e4b229638df38c09010945",
         "lpn_ff_residual_tip": "0d5a9b310595eef38301f4934a8fd7a5bbe84a0b",
@@ -7614,6 +7615,10 @@
         },
         "lpn_ff_required_node_tip": {
             "words": 39,
+            "ends_sentence": true
+        },
+        "lpn_ff_required_own": {
+            "words": 18,
             "ends_sentence": true
         },
         "lpn_ff_required_tip": {

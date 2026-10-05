@@ -3651,6 +3651,7 @@ $ec_lang['lpn_ff_no_selection']='Hakuna miunganiko iliyochaguliwa. Chagua miunga
 $ec_lang['lpn_ff_skipped']='Vipengele {n} vilivyoteuliwa si miunganiko, hivyo havikujaribiwa.';
 $ec_lang['lpn_ff_required']='Mtiririko wa moto unaohitajika';
 $ec_lang['lpn_ff_required_tip']='Mtiririko unaohitajika na kanuni yako ya moto au mamlaka yako ya zimamoto kwenye hydranti. Kila muunganiko hujaribiwa dhidi ya namba hii isipokuwa una mtiririko wa moto unaohitajika wake mwenyewe.';
+$ec_lang['lpn_ff_required_own']='Miunganiko yenye mtiririko wa moto unaohitajika wake mwenyewe hujaribiwa dhidi ya huo badala yake. Idadi yao: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Mtiririko wa moto unaohitajika kwenye muunganiko huu hasa, kwa matumizi ya ardhi anayohudumia, kutoka kanuni yako ya moto au mamlaka yako ya zimamoto. Kiache tupu na muunganiko utajaribiwa dhidi ya namba iliyo kwenye kisanduku cha Uchambuzi wa mtiririko wa moto.';
 $ec_lang['lpn_ff_residual']='Shinikizo linalobaki la kushikilia';
 $ec_lang['lpn_ff_residual_tip']='Shinikizo ambalo muunganiko lazima liendelee kushikilia wakati unatoa mtiririko wa moto. AWWA M31 na NFPA 291 hutumia psi 20 (kPa 140).';

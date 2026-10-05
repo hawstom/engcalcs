@@ -3021,6 +3021,7 @@ EngCalcs.pageConfig = {
 	lpn_ff_skipped: <?=json_encode($ec_lang['lpn_ff_skipped'])?>,
 	lpn_ff_required: <?=json_encode($ec_lang['lpn_ff_required'])?>,
 	lpn_ff_required_tip: <?=json_encode($ec_lang['lpn_ff_required_tip'])?>,
+	lpn_ff_required_own: <?=json_encode($ec_lang['lpn_ff_required_own'])?>,
 	lpn_ff_required_node_tip: <?=json_encode($ec_lang['lpn_ff_required_node_tip'])?>,
 	lpn_ff_residual: <?=json_encode($ec_lang['lpn_ff_residual'])?>,
 	lpn_ff_residual_tip: <?=json_encode($ec_lang['lpn_ff_residual_tip'])?>,

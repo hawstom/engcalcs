@@ -3655,6 +3655,7 @@ $ec_lang['lpn_ff_no_selection']='Tidak ada simpul yang dipilih. Pilih simpul ata
 $ec_lang['lpn_ff_skipped']='{n} elemen yang dipilih bukan simpul, sehingga tidak diuji.';
 $ec_lang['lpn_ff_required']='Debit kebakaran yang diperlukan';
 $ec_lang['lpn_ff_required_tip']='Debit yang disyaratkan oleh kode kebakaran atau otoritas pemadam kebakaran Anda pada hidran. Setiap simpul diuji terhadap angka ini kecuali simpul tersebut memiliki debit kebakaran yang disyaratkan sendiri.';
+$ec_lang['lpn_ff_required_own']='Simpul yang memiliki debit kebakaran yang disyaratkan sendiri diuji terhadap angka itu sebagai gantinya. Jumlahnya: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Debit kebakaran yang disyaratkan pada simpul ini secara khusus, dari kode kebakaran atau otoritas pemadam kebakaran Anda, untuk peruntukan lahan yang dilayaninya. Biarkan kosong dan simpul ini diuji terhadap angka pada kotak Analisis debit kebakaran.';
 $ec_lang['lpn_ff_residual']='Tekanan sisa yang dipertahankan';
 $ec_lang['lpn_ff_residual_tip']='Tekanan yang harus tetap dipertahankan simpul saat menyalurkan debit kebakaran. AWWA M31 dan NFPA 291 menggunakan 20 psi (140 kPa).';

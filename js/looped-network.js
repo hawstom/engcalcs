@@ -60371,6 +60371,11 @@ var EngCalcs = EngCalcs || {};
 	// This junction's own requirement, as typed, or undefined. Through effective(), so a scenario's
 	// override is what is read -- the same seam the solver, the labels and the popups read.
 	function fireFlowOwn(n) { return fireFlowStore(effective(n, 'fireFlow')); }
+	// How many of the junctions about to be tested state one. Said in the box, because a criterion
+	// the run does NOT apply everywhere has to say so where the criterion is typed.
+	function fireFlowOwnCount() {
+		return fireFlowJunctions().filter(function (n) { return fireFlowOwn(n) !== undefined; }).length;
+	}
 	// The run's single number as it stands in the box right now, in DISPLAY units -- the placeholder
 	// a blank junction field shows, so an empty box reads as "already answered, by that number"
 	// rather than as a missing input.
@@ -60611,8 +60616,15 @@ var EngCalcs = EngCalcs || {};
 		boxes.required = ffInput(ask.required);
 		ffRow(host, pc.lpn_ff_required || 'Required fire flow', pc.lpn_ff_required_tip,
 			boxes.required, unitLabel('lpn_u_flow'));
-		// A junction's own required fire flow overrides this one; the row's tip says so, and the
-		// report's Required column shows which number each junction was tested against.
+		// **A CRITERION THAT DOES NOT APPLY EVERYWHERE SAYS SO WHERE IT IS TYPED.** Only when some
+		// junction actually states its own: a sentence about an exception nobody has made is noise,
+		// and the count is the useful half of it. It stays in the box when the explanations went
+		// behind its `?` (Tom, 2026-10-05): it reports this network, which a fixed tip cannot.
+		if (fireFlowOwnCount() > 0) {
+			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_required_own ||
+				'Junctions carrying a required fire flow of their own are tested against that instead. Number of them: {n}.')
+				.replace('{n}', String(fireFlowOwnCount())), host);
+		}
 
 		boxes.residual = ffInput(ask.residual);
 		ffRow(host, pc.lpn_ff_residual || 'Residual pressure to hold', pc.lpn_ff_residual_tip,

@@ -3653,6 +3653,7 @@ $ec_lang['lpn_ff_no_selection']='Kein Entnahmeknoten ist ausgewählt. Wählen Si
 $ec_lang['lpn_ff_skipped']='{n} ausgewählte Elemente sind keine Entnahmeknoten, daher wurden sie nicht geprüft.';
 $ec_lang['lpn_ff_required']='Löschwasserbedarf';
 $ec_lang['lpn_ff_required_tip']='Der Durchfluss, den Ihre Feuerschutzvorschrift oder Ihre Feuerwehrbehörde an einem Hydranten verlangt. Jeder Entnahmeknoten wird gegen diese Zahl getestet, sofern er nicht einen eigenen Löschwasserbedarf trägt.';
+$ec_lang['lpn_ff_required_own']='Entnahmeknoten mit einem eigenen Löschwasserbedarf werden stattdessen gegen diesen getestet. Anzahl davon: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Der für diesen bestimmten Entnahmeknoten erforderliche Löschwasserbedarf für die von ihm versorgte Landnutzung, laut Ihrer Feuerschutzvorschrift oder Ihrer Feuerwehrbehörde. Bleibt es leer, wird der Entnahmeknoten gegen die Zahl im Feld Löschwasserprüfung getestet.';
 $ec_lang['lpn_ff_residual']='Zu haltender Restdruck';
 $ec_lang['lpn_ff_residual_tip']='Der Druck, den der Entnahmeknoten noch halten muss, während er die Löschwassermenge liefert. AWWA M31 und NFPA 291 verwenden 20 psi (140 kPa).';

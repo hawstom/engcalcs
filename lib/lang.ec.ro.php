@@ -3652,6 +3652,7 @@ $ec_lang['lpn_ff_no_selection']='Nicio joncțiune nu este selectată. Selectați
 $ec_lang['lpn_ff_skipped']='{n} elemente selectate nu sunt joncțiuni, deci nu au fost testate.';
 $ec_lang['lpn_ff_required']='Debit de incendiu necesar';
 $ec_lang['lpn_ff_required_tip']='Debitul pe care codul dvs. de incendiu sau autoritatea dvs. pentru incendii îl cere la un hidrant. Fiecare joncțiune este testată față de acest număr, dacă nu are propriul ei debit de incendiu necesar.';
+$ec_lang['lpn_ff_required_own']='Joncțiunile care au propriul lor debit de incendiu necesar sunt testate față de acela în schimb. Numărul lor: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Debitul de incendiu necesar la această joncțiune anume, pentru destinația terenului pe care îl deservește, conform normativului dvs. de incendiu sau autorității competente. Lăsați-l gol și joncțiunea este testată față de numărul din caseta Analiza debitului de incendiu.';
 $ec_lang['lpn_ff_residual']='Presiune reziduală de menținut';
 $ec_lang['lpn_ff_residual_tip']='Presiunea pe care joncțiunea trebuie să o mențină în continuare în timp ce livrează debitul de incendiu. AWWA M31 și NFPA 291 folosesc 20 psi (140 kPa).';

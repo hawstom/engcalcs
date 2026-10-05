@@ -3652,6 +3652,7 @@ $ec_lang['lpn_ff_no_selection']='Nenhuma junção está selecionada. Selecione j
 $ec_lang['lpn_ff_skipped']='{n} elementos selecionados não são junções, então não foram testados.';
 $ec_lang['lpn_ff_required']='Vazão de incêndio exigida';
 $ec_lang['lpn_ff_required_tip']='A vazão que seu código de incêndio ou sua autoridade de incêndio exige em um hidrante. Cada junção é testada contra este número, a menos que tenha sua própria vazão de incêndio exigida.';
+$ec_lang['lpn_ff_required_own']='Junções com sua própria vazão de incêndio exigida são testadas contra ela. Número delas: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='A vazão de incêndio exigida nesta junção em particular, conforme seu código de incêndio ou sua autoridade de incêndio para o uso do solo que ela atende. Deixe em branco e a junção é testada contra o número na caixa Análise de vazão de incêndio.';
 $ec_lang['lpn_ff_residual']='Pressão residual a manter';
 $ec_lang['lpn_ff_residual_tip']='A pressão que a junção precisa manter enquanto fornece a vazão de incêndio. A AWWA M31 e a NFPA 291 usam 20 psi (140 kPa).';

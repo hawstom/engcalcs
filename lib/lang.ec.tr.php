@@ -3650,6 +3650,7 @@ $ec_lang['lpn_ff_no_selection']='Hiçbir düğüm seçili değil. Düğümleri s
 $ec_lang['lpn_ff_skipped']='{n} seçili öğe düğüm değil, bu yüzden test edilmedi.';
 $ec_lang['lpn_ff_required']='Gereken yangın debisi';
 $ec_lang['lpn_ff_required_tip']='Yangın yönetmeliğinizin veya itfaiye teşkilatınızın bir yangın musluğunda istediği debi. Her düğüm, kendi gereken yangın debisini taşımadığı sürece bu sayıya karşı sınanır.';
+$ec_lang['lpn_ff_required_own']='Kendi gereken yangın debisini taşıyan düğümler, onun yerine ona karşı sınanır. Sayıları: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Bu düğümün hizmet ettiği arazi kullanımı için yangın yönetmeliğinizin veya itfaiye teşkilatınızın istediği yangın debisi. Boş bırakırsanız düğüm, Yangın debisi analizi kutusundaki sayıya karşı sınanır.';
 $ec_lang['lpn_ff_residual']='Korunacak kalıntı basınç';
 $ec_lang['lpn_ff_residual_tip']='Düğümün, yangın debisini sağlarken hâlâ koruması gereken basınç. AWWA M31 ve NFPA 291, 20 psi (140 kPa) kullanır.';

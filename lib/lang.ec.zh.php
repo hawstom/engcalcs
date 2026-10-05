@@ -3651,6 +3651,7 @@ $ec_lang['lpn_ff_no_selection']='未选中任何节点。请选择节点，或�
 $ec_lang['lpn_ff_skipped']='所选元素中有 {n} 个不是节点，因此未进行测试。';
 $ec_lang['lpn_ff_required']='所需消防流量';
 $ec_lang['lpn_ff_required_tip']='您的消防规范或消防部门要求消火栓提供的流量。除非某节点自带所需消防流量，否则都按此数值进行测试。';
+$ec_lang['lpn_ff_required_own']='有 {n} 个节点自带所需消防流量，将按其自身数值进行测试。';
 $ec_lang['lpn_ff_required_node_tip']='该特定节点根据其所服务用地性质，按您的消防规范或消防部门要求所需的消防流量。留空则按“消防流量分析”框中的数值对该节点进行测试。';
 $ec_lang['lpn_ff_residual']='需维持的余压';
 $ec_lang['lpn_ff_residual_tip']='节点在提供消防流量的同时必须维持的压力。AWWA M31 和 NFPA 291 采用 20 psi（140 kPa）。';

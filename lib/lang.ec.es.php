@@ -3750,6 +3750,7 @@ $ec_lang['lpn_ff_no_selection']='No hay ningún nudo seleccionado. Seleccione nu
 $ec_lang['lpn_ff_skipped']='{n} elementos seleccionados no son nudos, así que no se probaron.';
 $ec_lang['lpn_ff_required']='Caudal contra incendios requerido';
 $ec_lang['lpn_ff_required_tip']='El caudal que su código de incendios o su autoridad de bomberos exige en un hidrante. Cada nudo se prueba contra este número, a menos que tenga su propio caudal contra incendios requerido.';
+$ec_lang['lpn_ff_required_own']='Los nudos que tienen su propio caudal contra incendios requerido se prueban contra ese en su lugar. Cantidad de ellos: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='El caudal contra incendios requerido en este nudo en particular, según el uso del suelo que atiende, tomado de su código de incendios o de su autoridad de bomberos. Déjelo en blanco y el nudo se prueba contra el número del cuadro Caudal contra incendios.';
 $ec_lang['lpn_ff_residual']='Presión residual a mantener';
 $ec_lang['lpn_ff_residual_tip']='La presión que el nudo debe seguir manteniendo mientras entrega el caudal contra incendios. AWWA M31 y NFPA 291 usan 20 psi (140 kPa).';

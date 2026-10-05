@@ -3653,6 +3653,7 @@ $ec_lang['lpn_ff_no_selection']='Nejsou vybrány žádné uzly. Vyberte uzly, ne
 $ec_lang['lpn_ff_skipped']='{n} vybraných prvků nejsou uzly, takže nebyly testovány.';
 $ec_lang['lpn_ff_required']='Požadovaný požární průtok';
 $ec_lang['lpn_ff_required_tip']='Průtok, který vyžaduje váš požární předpis nebo hasičský sbor u hydrantu. Každý uzel je proti tomuto číslu testován, pokud nemá vlastní požadovaný požární průtok.';
+$ec_lang['lpn_ff_required_own']='Uzly s vlastním požadovaným požárním průtokem jsou testovány proti němu místo toho. Počet takových uzlů: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Požární průtok požadovaný přímo u tohoto uzlu, podle vašeho požárního předpisu nebo hasičského sboru pro využití území, které obsluhuje. Ponechte prázdné a uzel bude testován proti číslu v poli Analýza požárního průtoku.';
 $ec_lang['lpn_ff_residual']='Zbytkový tlak k udržení';
 $ec_lang['lpn_ff_residual_tip']='Tlak, který musí uzel stále držet při odběru požárního průtoku. AWWA M31 a NFPA 291 používají 20 psi (140 kPa).';

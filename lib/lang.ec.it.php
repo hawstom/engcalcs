@@ -3651,6 +3651,7 @@ $ec_lang['lpn_ff_no_selection']='Nessun nodo è selezionato. Seleziona dei nodi 
 $ec_lang['lpn_ff_skipped']='{n} elementi selezionati non sono nodi, quindi non sono stati verificati.';
 $ec_lang['lpn_ff_required']='Portata antincendio richiesta';
 $ec_lang['lpn_ff_required_tip']='La portata che il tuo codice antincendio o la tua autorità antincendio richiede a un idrante. Ogni nodo è verificato rispetto a questo numero, a meno che non ne porti uno proprio.';
+$ec_lang['lpn_ff_required_own']='I nodi che portano una propria portata antincendio richiesta sono verificati rispetto a quella. Numero di essi: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='La portata antincendio richiesta in questo nodo per l\'uso del suolo che serve, secondo il tuo codice antincendio o la tua autorità antincendio. Lascialo vuoto e il nodo viene verificato rispetto al numero nel riquadro Analisi della portata antincendio.';
 $ec_lang['lpn_ff_residual']='Pressione residua da mantenere';
 $ec_lang['lpn_ff_residual_tip']='La pressione che il nodo deve ancora mantenere mentre eroga la portata antincendio. AWWA M31 e NFPA 291 usano 20 psi (140 kPa).';

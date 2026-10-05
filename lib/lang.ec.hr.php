@@ -3652,6 +3652,7 @@ $ec_lang['lpn_ff_no_selection']='Nijedan čvor nije odabran. Odaberite čvorove 
 $ec_lang['lpn_ff_skipped']='{n} odabranih elemenata nisu čvorovi, pa nisu testirani.';
 $ec_lang['lpn_ff_required']='Potrebni protupožarni protok';
 $ec_lang['lpn_ff_required_tip']='Protok koji vaš protupožarni propis ili vatrogasno tijelo zahtijeva na hidrantu. Svaki se čvor testira prema ovom broju, osim ako ima vlastiti potrebni protupožarni protok.';
+$ec_lang['lpn_ff_required_own']='Čvorovi koji imaju vlastiti potrebni protupožarni protok umjesto toga se testiraju prema njemu. Broj njih: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='Protupožarni protok potreban na ovom određenom čvoru, prema vašem protupožarnom propisu ili vatrogasnom tijelu, za namjenu površine koju opslužuje. Ostavite prazno i čvor se testira prema broju u okviru Analiza protupožarnog protoka.';
 $ec_lang['lpn_ff_residual']='Preostali tlak koji treba održati';
 $ec_lang['lpn_ff_residual_tip']='Tlak koji čvor mora i dalje održavati dok isporučuje protupožarni protok. AWWA M31 i NFPA 291 koriste 20 psi (140 kPa).';

@@ -4095,6 +4095,7 @@ $ec_lang['lpn_ff_no_selection']='No junctions are selected. Select junctions or 
 $ec_lang['lpn_ff_skipped']='{n} selected elements are not junctions, so they were not tested.';
 $ec_lang['lpn_ff_required']='Required fire flow';
 $ec_lang['lpn_ff_required_tip']='The flow your fire code or your fire authority requires at a hydrant. Each junction is tested against this number unless it carries a required fire flow of its own.';
+$ec_lang['lpn_ff_required_own']='Junctions carrying a required fire flow of their own are tested against that instead. Number of them: {n}.';
 $ec_lang['lpn_ff_required_node_tip']='The fire flow required at this particular junction for the land use it serves, from your fire code or your fire authority. Leave it blank to test the junction against the number in the Fire flow analysis box.';
 $ec_lang['lpn_ff_residual']='Residual pressure to hold';
 $ec_lang['lpn_ff_residual_tip']='The pressure the junction must still hold while delivering the fire flow. AWWA M31 and NFPA 291 use 20 psi (140 kPa).';
