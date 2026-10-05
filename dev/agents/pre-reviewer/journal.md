@@ -3831,3 +3831,8 @@ SPECULATION: two tabs both fetch if race before first put.
 
 ## feat/find-source review at e184bf40 (OBSERVED, 2026-10-05)
 OBSERVED: Source scope found exactly the four nodes carrying a source quality on Net3 (Tank 1, J15, J40, Reservoir Lake); guard mutation bit (4 failures). MISSED by builder and harness: Filter in table under Source answered "applies to no table" for the source properties, left a stale Junctions filter, and Source > ID emptied Pipes. Also: three meanings of "source" in one menu (scope, dose properties, Connectivity wording) and junction-only/tank-only properties offered under Source. All fixed at e999a378 per the builder; not re-reviewed.
+
+## feat/find-source re-review at e999a378 (OBSERVED, 2026-10-05; re-verify before citing)
+OBSERVED: node-only filter, trimmed list, Replace list and no-chemical hint all held in real Chrome on Net3.
+Method: Quality and sources set by editing the project file, then Find driven by real clicks.
+Open, pre-existing and generic: a mixed-scope compound Filter in table answers "applies to no table" and leaves the old filter.
