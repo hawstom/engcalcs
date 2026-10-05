@@ -446,7 +446,7 @@ console.log('\n--- a mixed-scope query filters the tables it reaches ---');
 	L.buildPanel();
 	L.type(q);
 	L.pressFilter();
-	ok('it does not answer "applies to any table"', L.resultsText().indexOf('apply to any table') < 0, L.resultsText());
+	ok('it does not answer "applies to any table"', L.resultsText().indexOf(EngCalcs.pageConfig.lpn_find_filter_none) < 0, L.resultsText());
 	ok('the Pipes table is filtered', L.filterQuery('pipes') === q, L.filterQuery('pipes'));
 	ok('the Junctions table is filtered', L.filterQuery('junctions') === q, L.filterQuery('junctions'));
 	ok('the Text table is left alone (no condition names a text property)',
