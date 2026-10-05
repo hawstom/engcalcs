@@ -27953,8 +27953,8 @@ var EngCalcs = EngCalcs || {};
 	 * a spreadsheet's Delete key has never once meant "remove the record" in Excel, Sheets or
 	 * Calc -- the table's own KEYBOARD Delete already set that precedent (paneHandleKey, "DELETE
 	 * EMPTIES A CELL IN NAVIGATION MODE"), and this is the same rule applied to a whole range
-	 * instead of only the active cell. Removing the junction itself stays one click away on the
-	 * map, through the Delete TOOL this menu item borrows its word from and nothing else of.
+	 * instead of only the active cell. Removing the element itself is the separate Delete element
+	 * item beside it (paneDeleteElements()), which this menu item shares only its first word with.
 	 *
 	 * **UNDOABLE, LIKE EVERY OTHER EDIT.** One snapshot for the whole range, taken only if the
 	 * range actually holds something to clear -- an empty-selection Delete must not fill the undo
@@ -27994,6 +27994,22 @@ var EngCalcs = EngCalcs || {};
 		completeEdit(null);
 		refreshPopupIfOpen();
 		renderPaneTable(spec);
+	}
+	/**
+	 * **DELETE ELEMENT: THE MAP'S OWN DELETE, FOR THE ROWS OF THE RANGE.** Goes through
+	 * deleteElement() one element at a time, so the undo snapshot, the scenario deactivation, the
+	 * override-count confirmation and the attachment cleanup are exactly the map's. Links go before
+	 * nodes for the reason deleteSelection() gives. The row's OWN element, never the one a support
+	 * column names (paneCtxTarget()). The tables refresh through the same paths a map delete uses.
+	 */
+	function paneDeleteElements(spec) {
+		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
+			box = paneSelBox(spec, rows, cols), list;
+		if (!box) { return; }
+		list = rows.slice(box.r0, box.r1 + 1).map(function (el) { return { kind: spec.group, id: el.id }; });
+		list.filter(function (s) { return s.kind !== 'node'; }).forEach(function (s) { deleteElement(s.kind, s.id); });
+		list.filter(function (s) { return s.kind === 'node'; }).forEach(function (s) { deleteElement(s.kind, s.id); });
+		refreshPopupIfOpen();
 	}
 	/**
 	 * **EVERY WORD ON THE MENU IS BORROWED, NOT COINED.** Copy and Paste are
@@ -28116,6 +28132,7 @@ var EngCalcs = EngCalcs || {};
 		if (targets.some(function (t) { return !isSelected(t.group, t.id); })) {
 			mk(pc.lpn_pane_select_on_map || 'Select on map', function () {
 				addToSelection(targets.map(function (t) { return { kind: t.group, id: t.id }; }));
+				openMultiProperties();
 			});
 		}
 		if (targets.some(function (t) { return isSelected(t.group, t.id); })) {
@@ -28125,7 +28142,7 @@ var EngCalcs = EngCalcs || {};
 				}));
 			});
 		}
-		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () { selectAndZoomTo(targets); });
+		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () { selectAndZoomTo(targets); openMultiProperties(); });
 		// **SELECTION ONLY, offered only when the map has a selection** (or the filter is on, so it
 		// can be turned off from here). It acts on the MAP's selection, not on the rows clicked.
 		if (selections.length || paneSelFilter) {
@@ -28140,6 +28157,12 @@ var EngCalcs = EngCalcs || {};
 			mk(pc.lpn_pane_filldown || 'Fill down', function () { paneFillDown(spec); }, 'Ctrl+D');
 		}
 		mk(pc.lpn_tool_delete || 'Delete', function () { paneDeleteSelection(spec); });
+		// **DELETE ELEMENT IS SEPARATE FROM DELETE, ON PURPOSE** (Tom, 2026-10-05: *"Table delete
+		// needs to delete the element if you are on the ID cell or there needs to be a separate
+		// Delete element menu item."*). Delete clears values, as a spreadsheet's does; this removes
+		// the rows' own elements through the map's path.
+		mk(box.r1 > box.r0 ? (pc.lpn_pane_delete_elements || 'Delete elements') : (pc.lpn_pane_delete_element || 'Delete element'),
+			function () { paneDeleteElements(spec); });
 		document.body.appendChild(menu);
 		paneCtxMenuEl = menu;
 		// Measured AFTER it is in the document, because a menu that is not laid out has no size.
@@ -56030,6 +56053,7 @@ var EngCalcs = EngCalcs || {};
 		if (selectionCount() === 1 && sel) {
 			if (sel.kind === 'node') { openPopup(sel.id); }
 			else if (sel.kind === 'link') { openLinkPopup(sel.id); }
+			else if (sel.kind === 'customer') { openCustomerPopup(sel.id); }
 			else { openLabelPopup(sel.id); }
 			return true;
 		}
