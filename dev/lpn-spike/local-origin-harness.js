@@ -400,8 +400,10 @@ console.log('\n--- one home for the concept ---');
 	// which also answers for a grid with the world map attached (the Convert as chooser's filter).
 	// **TASK 282 ADDED TWO OUTWARD SITES PER AXIS** (the backdrop probe reads the picture's corners out) **AND TWO
 	// INWARD** (placeBackdropByDimensions() brings the file's DIMENSIONS into the local frame).
-	ok('outwardX has one definition and 38 call sites', count(/outwardX\(/g) === 39, count(/outwardX\(/g));
-	ok('outwardY has one definition and 38 call sites', count(/outwardY\(/g) === 39, count(/outwardY\(/g));
+	// **AND TWO MORE PER AXIS FOR THE EXPORTED PICTURE'S WORLD FILE** (backdropExportPicture(): its
+	// left/right and top/bottom edges in the frame the .inp is written in).
+	ok('outwardX has one definition and 40 call sites', count(/outwardX\(/g) === 41, count(/outwardX\(/g));
+	ok('outwardY has one definition and 40 call sites', count(/outwardY\(/g) === 41, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.

@@ -2946,7 +2946,20 @@
 			var geoBd = doc.project && doc.project.coords === 'geo' && EngCalcs.lpnGeom && EngCalcs.lpnGeom.mercLat,
 				latOf = function (y) { return geoBd ? EngCalcs.lpnGeom.mercLat(y) : y; };
 			backdropRows.push(row(['DIMENSIONS', String(bx), String(latOf(by - bh)), String(bx + bw), String(latOf(by))]));
-			diff('backdrop-image-not-named', []);
+			// **THE PICTURE IS NAMED WHEN THE PAGE SAVES IT BESIDE THE FILE** (Tom, 2026-10-05: "it
+			// should save .INP, .PNG, and .PGW"). opts.backdropFile is that saved picture's bare name.
+			// EPANET opens an .inp by first making its folder the current one (Fmain.pas OpenFile:
+			// SetCurrentDir(ExtractFileDir(Fname))), so a bare name finds the picture beside it, and
+			// its reader takes FILE's first token only (Uimport.pas ReadBackdropData), so the name has
+			// no spaces (safeFileName). OFFSET 0 0 with DIMENSIONS equal to the picture's own corners
+			// is the one pair GetBackdropBounds (Umap.pas) turns back into exactly those corners: the
+			// picture's own aspect leaves its fitted size unchanged. dev/backdrop-export.md.
+			if (opts.backdropFile) {
+				backdropRows.push(row(['FILE', String(opts.backdropFile)]));
+				backdropRows.push(row(['OFFSET', '0', '0']));
+			} else {
+				diff('backdrop-image-not-named', []);
+			}
 		} else if (backdrop) {
 			diff('backdrop-not-a-file', [], backdrop.type || 'backdrop');
 		}

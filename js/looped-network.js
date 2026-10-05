@@ -34570,32 +34570,106 @@ var EngCalcs = EngCalcs || {};
 			}
 		};
 	}
-	function exportInpFile() {
-		var pcX = EngCalcs.pageConfig || {}, out;
-		saveToStorage();   // export what is on screen, including edits not yet saved
-		out = EngCalcs.lpnExportInp(serializeProject(), inpExportOptions());
-		if (!out || !out.ok) {
-			setNotice((pcX.lpn_inp_export_refused || 'This project cannot be written as an EPANET file: {detail}')
-				.replace('{detail}', (out && out.detail) || '?'));
-			return;
+	// **A 24-BIT WINDOWS BMP, BECAUSE THAT IS WHAT EPANET OPENS** (dev/backdrop-export.md). EPANET
+	// 2.2's backdrop is a Delphi TPicture loaded from the named file (Umap.pas GetBackdrop), its
+	// picker offers *.bmp, *.emf and *.wmf only (Fmain.dfm OpenPictureDialog), and none of its 53
+	// units links a PNG or JPEG reader, so a PNG named in FILE is "could not read backdrop" there.
+	// Bottom-up rows padded to four bytes, BGR, 72 dpi. A transparent pixel is laid on white, the
+	// colour of EPANET's map behind it, because BMP has no transparency EPANET draws.
+	function encodeBmp24(imageData) {
+		var w = imageData.width, h = imageData.height, src = imageData.data,
+			rowSize = Math.ceil(w * 3 / 4) * 4, size = 54 + rowSize * h,
+			buf = new ArrayBuffer(size), dv = new DataView(buf), out = new Uint8Array(buf), x, y, i, o, a;
+		out[0] = 0x42; out[1] = 0x4d;
+		dv.setUint32(2, size, true); dv.setUint32(10, 54, true); dv.setUint32(14, 40, true);
+		dv.setInt32(18, w, true); dv.setInt32(22, h, true); dv.setUint16(26, 1, true); dv.setUint16(28, 24, true);
+		dv.setUint32(34, rowSize * h, true); dv.setInt32(38, 2835, true); dv.setInt32(42, 2835, true);
+		for (y = 0; y < h; y++) {
+			o = 54 + (h - 1 - y) * rowSize;
+			for (x = 0; x < w; x++) {
+				i = (y * w + x) * 4; a = src[i + 3] / 255;
+				out[o++] = Math.round(src[i + 2] * a + 255 * (1 - a));
+				out[o++] = Math.round(src[i + 1] * a + 255 * (1 - a));
+				out[o++] = Math.round(src[i] * a + 255 * (1 - a));
+			}
 		}
-		var blob = new Blob([out.inp], { type: 'text/plain' }),
-			url = URL.createObjectURL(blob), a = document.createElement('a');
+		return out;
+	}
+	// **THE PICTURE AND ITS WORLD FILE, FOR THE .inp BESIDE THEM.** Calls back with
+	// { bmp: Uint8Array, world: text } or null when there is no picture or it cannot be decoded.
+	// The picture goes out at its own stored pixels with nothing drawn in (Tom's rule for a
+	// screenshot: exactly what was there, no credit added), at full strength: the map's backdrop
+	// opacity is a display setting, not part of the picture.
+	//
+	// The world file (six lines A, D, B, E, C, F; C and F are the CENTRE of the upper-left pixel,
+	// Esri, "World files for raster datasets") is in the frame the .inp writes. In a grid project
+	// E is exactly -A, the one uniform scale this page draws a picture at, so Background image's
+	// own reader (worldFileRepresentable) takes it back. In a geographic project it is degrees per
+	// pixel along each axis, which is what a GIS reading longitude and latitude expects; the picture
+	// is drawn in Mercator, so that is a straight-line approximation of its latitudes.
+	function backdropExportPicture(done) {
+		if (!backdrop || !backdrop.href) { done(null); return; }
+		var img = new Image();
+		img.onload = function () {
+			var pw = img.naturalWidth, ph = img.naturalHeight;
+			if (!(pw > 0) || !(ph > 0)) { done(null); return; }
+			var cv = document.createElement('canvas'), ctx;
+			cv.width = pw; cv.height = ph;
+			ctx = cv.getContext('2d');
+			ctx.drawImage(img, 0, 0, pw, ph);
+			var s = backdrop.s || 1, left = backdrop.tx + (backdrop.x || 0) * s, top = backdrop.ty + (backdrop.y || 0) * s,
+				L = outwardX(left), R = outwardX(left + backdrop.width * s),
+				T = outwardY(top), B = outwardY(top + backdrop.height * s),
+				A = (R - L) / pw, E = isLatLonProject() ? -(T - B) / ph : -A;
+			done({ bmp: encodeBmp24(ctx.getImageData(0, 0, pw, ph)),
+				world: [A, 0, 0, E, L + A / 2, T + E / 2].map(String).join('\r\n') + '\r\n' });
+		};
+		img.onerror = function () { done(null); };
+		img.src = backdrop.href;
+	}
+	function downloadBlob(blob, name) {
+		var url = URL.createObjectURL(blob), a = document.createElement('a');
 		a.href = url;
-		a.download = safeFileName(projectDisplayName(project)) + '.inp';
+		a.download = name;
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
 		setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
-		// EXPORTING IS NOT SAVING. No stampProjectSaved() here, deliberately: an `.inp` cannot hold
-		// this document (scenarios, text sizes, a backdrop image), so a project that has only been
-		// exported still has unsaved changes and must keep saying so.
-		setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) +
-			(out.differences && out.differences.length
-				? ' ' + (pcX.lpn_inp_export_differences || '{n} things the .inp format cannot hold.')
-					.replace('{n}', String(out.differences.length))
-				: ''));
-		showInpExportFlattening(out.differences, a.download);
+	}
+	function exportInpFile() {
+		var pcX = EngCalcs.pageConfig || {}, base = safeFileName(projectDisplayName(project));
+		saveToStorage();   // export what is on screen, including edits not yet saved
+		backdropExportPicture(function (pic) {
+			var opts = inpExportOptions(), out, inpName = base + '.inp',
+				picName = base + '.bmp', worldName = base + '.bpw';
+			if (pic) { opts.backdropFile = picName; }
+			out = EngCalcs.lpnExportInp(serializeProject(), opts);
+			if (!out || !out.ok) {
+				setNotice((pcX.lpn_inp_export_refused || 'This project cannot be written as an EPANET file: {detail}')
+					.replace('{detail}', (out && out.detail) || '?'));
+				return;
+			}
+			// **THREE DOWNLOADS, ONE AFTER ANOTHER.** A browser saves each into the same downloads
+			// folder, which is what the bare FILE name needs. Chrome asks once whether this site may
+			// download several files; spaced out so none is dropped as a burst.
+			downloadBlob(new Blob([out.inp], { type: 'text/plain' }), inpName);
+			if (pic) {
+				setTimeout(function () { downloadBlob(new Blob([pic.bmp], { type: 'image/bmp' }), picName); }, 300);
+				setTimeout(function () { downloadBlob(new Blob([pic.world], { type: 'text/plain' }), worldName); }, 600);
+			}
+			// EXPORTING IS NOT SAVING. No stampProjectSaved() here, deliberately: an `.inp` cannot hold
+			// this document (scenarios, text sizes, a backdrop image), so a project that has only been
+			// exported still has unsaved changes and must keep saying so.
+			setNotice((pic
+				? (pcX.lpn_status_inp_exported_picture || 'Exported {file}, the background picture {picture} and its world file {world}. Keep the three in one folder.')
+					.replace('{picture}', picName).replace('{world}', worldName)
+				: (pcX.lpn_status_inp_exported || 'Exported {file}.')).replace('{file}', inpName) +
+				(out.differences && out.differences.length
+					? ' ' + (pcX.lpn_inp_export_differences || '{n} things the .inp format cannot hold.')
+						.replace('{n}', String(out.differences.length))
+					: ''));
+			showInpExportFlattening(out.differences, inpName);
+		});
 	}
 	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being

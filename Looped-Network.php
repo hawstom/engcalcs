@@ -2104,6 +2104,7 @@ EngCalcs.pageConfig = {
 	lpn_file_export_inp: <?=json_encode($ec_lang['lpn_file_export_inp'])?>,
 	lpn_file_export_inp_tip: <?=json_encode($ec_lang['lpn_file_export_inp_tip'])?>,
 	lpn_status_inp_exported: <?=json_encode($ec_lang['lpn_status_inp_exported'])?>,
+	lpn_status_inp_exported_picture: <?=json_encode($ec_lang['lpn_status_inp_exported_picture'])?>,
 	lpn_inp_export_differences: <?=json_encode($ec_lang['lpn_inp_export_differences'])?>,
 	lpn_inp_export_refused: <?=json_encode($ec_lang['lpn_inp_export_refused'])?>,
 	lpn_find_menu: <?=json_encode($ec_lang['lpn_find_menu'])?>,
