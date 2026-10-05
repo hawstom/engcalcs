@@ -1042,6 +1042,10 @@
         "lpn_profile_new_name": "Path {n}",
         "lpn_profile_rename": "Rename path…",
         "lpn_profile_delete": "Delete path",
+        "lpn_profile_open": "Open EPANET profile file…",
+        "lpn_profile_file_done": "Profile read from the file: {used} of {total} nodes found in this network.",
+        "lpn_profile_file_missing": "Named in the file but not in this network: {ids}.",
+        "lpn_profile_file_short": "The file names fewer than two nodes in this network, so there is no profile to draw.",
         "lpn_profile_prompt_name": "Name for this path",
         "lpn_profile_delete_confirm": "Delete the saved path {name}? The drawing itself is not changed.",
         "lpn_profile_none_saved": "No saved paths yet",
@@ -2335,7 +2339,7 @@
         "lpn_diag_pda_pressures": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
         "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back."
     },
-    "count": 2333,
+    "count": 2337,
     "active_prefixes": [
         "about",
         "bpn",

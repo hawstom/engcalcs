@@ -99,34 +99,49 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-04 (night)
+## STATE — 2026-10-05
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged 2026-10-04 on his words: dialog-audit, basemap-style, epanet-pp-brand, elev-default,
-tip-verdict, chain-draw (Junction Pipe Chain, his icon), scenario-option ("Calculation options"),
-pda (count also in the bottom map strip). Defect fixes: Show contours, Task 761 specs, phone menus
-hide shortcut keys (`fix/phone-menu-keys`), sitemap leaves the app to epanet-plus-plus.org. The
-parent-site sitemap is committed in `~/webdev/hawsedc.com` (9ddb034); it reaches production on his
-pull there. He phone-tested dialog-audit: "Dialogs are good."
+Merged 2026-10-05 (defect and tooling tracks, on green): the status legend prints Open/Closed (664,
+`COLOR_CATEGORIES` is the categorical-field shape), the node-size cap is one sentence (740), Cmd
+not Ctrl on a Mac (713), the Analyze browser-pass spec, `examples-vs-epanet-harness.js` (the four
+EPA examples against raw EPANET every hour), `daily_report.sh` runs the stats script under bash.
+Closed as already shipped: 710, 719, 755, 762, 764, 695. Task 726 is now prefetch only.
 
-### In flight
+### Awaiting his browser pass (all protected, all on the Branch previews page)
 
-- **`fix/dock-title-buttons` MERGED** on his "is good. Merge": a box's own buttons (Full report,
-  Run report) sit on a sticky row under the title bar; the band holds only title, dock icons and x.
-  Not his "middle": a docked column can be 240 px. `dock-title-band-harness.js` checks all 17 boxes.
-- **`feat/dock-flag-order`** (NOT started; the dock seam is now free, so it can start): drag a hidden
-  box's flag along its bar to reorder; order in the existing layout key in this browser; a click still
-  opens; phone tap works. His words: "I would like a good college try." Protect it in
-  dev/branch-policy.json when made.
-- Still from before: `feat/profile-file`, `feat/desktop`, `feat/label-placer`.
+- **`feat/profile-file`** (Task 604): master merged in, a raw alert() fixed; green but payloads.
+- **`feat/times-statistic`** (Task 735): `[TIMES] Statistic` kept, a Settings > Time box, a last
+  time-step entry showing the statistic; link flow is absolute as EPANET's report is (Perry measured
+  the vendored engine: Net1 link 110 Averaged 575.06 gpm); the legend says "Pressure (Averaged, psi)".
+- **`feat/dock-flag-order`**: drag or Alt+Arrow a hidden box's flag; `dockOrd` on the existing
+  layout records (no new key). Perry's first pass found multi-slot drags dead (capture lost when the
+  node moved); fixed, capture on the strip. No flags on a phone at all (docking off at 640 px).
+- Still from before: `feat/desktop`, `feat/label-placer`.
 
 ### Next job
 
-**A translation sprint**: the English has settled with tip-verdict merged (`new-english-keys.md`
-counts ~105 untranslated). Also owed: the 46 lpn keys held before, the Romanian file menu pass, four
-concept terms. Approved-English entries for tip-verdict's reworded and deleted keys may still sit in
-english-key-rulings.json; only the orchestrator edits it, from his words.
+**A translation sprint, blocked on him**: `friction_check` fails on 11 open questions (10 in
+`1003b-wave0`, 1 in `1003-ds`) and 56 English strings are unread in `new-english-keys.md`. Once he
+answers: also owed are it, he, ur, my, am's mechanically joined `lpn_settings_symbol_cap_sentence`
+(reorder), the two tips now saying Selected/Cleared (drift), times-statistic's six keys if merged,
+the 46 lpn keys held before, the Romanian file menu pass, four concept terms.
+
+### Decisions waiting on him
+
+- Task 726: prefetch the EPANET engine when idle. The service worker caches it, so prefetch puts
+  ~664 KB on a device the visitor never asked for; that is a storage question.
+- Times-statistic: should the Statistic row's tip say the view appears only after a run?
+
+### Traps met 2026-10-05
+
+- **The roadmap lagged FOUR more times in one session** (764, 726/608, 695, plus 710/719/755/762
+  never closed on merge). Close a task in the merge that ships it.
+- **Perry wrote his journal into the MAIN checkout** while reviewing a worktree, mid master suite.
+  Brief reviewers: `cd` to the worktree and check the branch name before any write.
+- **The shipped Net1 example departs from EPA's Net1 from 10 AM by design** (his two rules,
+  2026-09-08). Compare it against Net1.inp WITH those rules; a bare comparison looks like a defect.
 
 ### How he wants to be asked (2026-10-04)
 
