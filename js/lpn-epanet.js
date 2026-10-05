@@ -954,9 +954,11 @@
 	//   'slow'     the connection reports slow-2g or 2g (Mary's wish: "unless the connection says
 	//              slow or metered")
 	// NEVER REJECTS, and a failure is not retried: the load path still decides whether the engine
-	// can be had, exactly as before. lpnEpanetLoad() waits for a prefetch in flight so the same
-	// bytes are not requested twice.
-	var prefetchPromise = null;
+	// can be had, exactly as before. **A RUN NEVER WAITS BEHIND THE PREFETCH**: lpnEpanetLoad()
+	// aborts a prefetch still in flight and starts its own ordinary-priority load at once (Perry,
+	// 2026-10-05). An aborted fetch leaves nothing half-written: a Cache Storage entry is only put
+	// from a complete response, and a body that errors mid-put rejects the put.
+	var prefetchPromise = null, prefetchAbort = null;
 	function prefetchRefusal() {
 		var c = (typeof navigator !== 'undefined') ? navigator.connection : null;
 		if (c && c.saveData) { return 'savedata'; }
@@ -970,8 +972,10 @@
 		if (why) { return Promise.resolve(why); }
 		if (typeof fetch !== 'function') { return Promise.resolve('unsupported'); }
 		var slim = href.replace(/[^\/]*$/, 'slim/index.js');
+		prefetchAbort = (typeof AbortController === 'function') ? new AbortController() : null;
+		var signal = prefetchAbort ? prefetchAbort.signal : undefined;
 		function one(u) {
-			return fetch(u, { credentials: 'same-origin', priority: 'low' }).then(function (res) {
+			return fetch(u, { credentials: 'same-origin', priority: 'low', signal: signal }).then(function (res) {
 				return res.ok ? res.arrayBuffer() : null;
 			});
 		}
@@ -981,16 +985,15 @@
 		prefetchPromise = cached.then(function (hit) {
 			if (hit) { return 'cached'; }
 			return Promise.all([one(href), one(slim)]).then(function () { return 'fetched'; });
-		}).catch(function () { return 'failed'; });
+		}).catch(function () { return 'failed'; }).then(function (r) { prefetchAbort = null; return r; });
 		return prefetchPromise;
 	};
 
 	EngCalcs.lpnEpanetLoad = function (url, onProgress) {
 		if (enginePromise === null) {
 			var href = url || '/engcalcs/js/vendor/epanet-js.js';
-			enginePromise = (prefetchPromise || Promise.resolve()).then(function () {
-				return watchFetch(href, onProgress);
-			}).then(function () {
+			if (prefetchAbort) { prefetchAbort.abort(); prefetchAbort = null; }
+			enginePromise = watchFetch(href, onProgress).then(function () {
 				return import(href);
 			}).catch(function (err) {
 				enginePromise = null;   // let the next caller try again
