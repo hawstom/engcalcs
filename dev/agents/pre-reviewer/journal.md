@@ -3861,3 +3861,12 @@ OBSERVED real Chrome (Net1, Net3): Show scenarios works on Junctions/Pipes/Pumps
 OBSERVED defects (minor): new scenario while shown appends its rows at the bottom, not beside each asset; rename leaves old name in Scenario column until switch; fill down makes overrides equal to parent.
 OBSERVED: stable sort changes ordinary tables vs master (tie rows keep previous order instead of ID) - intended.
 Lesson: pane toggle button toggles; sort lives on the arrow button; dialogs routed to native by seam (answerPromptWith).
+
+## 2026-10-05 Perry: pre-review of scenario model stages 4 and 5 (feat/bentley-interop @ 9b924f90)
+- OBSERVED: harness passes (466). My own adversarial cases: shared alt across branches, child of alt-naming scenario, promote with ancestors, calc sets with parents, delete refusals all CONFIRMED.
+- OBSERVED: mergeAlternativeInto() loses a nearer `demand` when the target holds a `demands` list (9 -> 100). Repro in scratchpad perry1.js.
+- OBSERVED: merging an alternative into one that is not its ancestor silently drops what the first inherited from ITS parent (123 -> Base's 18).
+- OBSERVED: with a stored tree, N setProp calls are quadratic (2000: 0.47 s, 8000: 8.3 s; derived: 9 ms) -- touchTree() empties the whole cache per write, and setProp reads between writes.
+- OBSERVED: mutating out touchTree for clearOverride, createStored, deleteStored, merge, promote, eachOverrideMap, createScenario, deleteScenario, demandMultiplier, georef, applySaved, restoreUndoSnapshot leaves the harness green; the real code does touch at each.
+- OBSERVED: no-tree examples re-save byte-identical to the pre-stage-4 code (md5, 13 files). Tree survives Save As, autosave, round trip; .inp from Base unchanged by a tree.
+- Not checked: how anything LOOKS (nothing in the UI); paste / find-and-replace headless through the real UI.
