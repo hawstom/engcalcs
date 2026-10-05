@@ -93,6 +93,7 @@ async function openCornerTip(a, boxId) {
 			scrolls: inner.scrollHeight > inner.clientHeight + 1, overflowY: getComputedStyle(inner).overflowY };
 	}, sel);
 }
+function sentences(text) { return text.split(/(?<=[.;:])\s+/).map((x) => x.trim()).filter((x) => x.length > 8); }
 async function closeTip(a) { await a.page.keyboard.press('Escape'); await a.settle(300); }
 
 async function sectionFireFlow(a, lang) {
@@ -105,11 +106,12 @@ async function sectionFireFlow(a, lang) {
 	ok('no paragraph above Run: the box shows controls only', s.paras.length === 0, JSON.stringify(s.paras).slice(0, 160));
 	ok('...the six criteria rows are still there, in order', JSON.stringify(s.rows) === JSON.stringify(lang.ffRows), JSON.stringify(s.rows));
 	ok('...and Run, Stop and Clear rings', JSON.stringify(s.buttons) === JSON.stringify(lang.ffButtons), JSON.stringify(s.buttons));
-	for (const [what, k] of [['the engine cost', 'cost'], ['the hydrant accounting', 'accounting'], ['the time-step note', 'steady'], ['the engine', 'engine']]) {
-		ok('...' + what + ' is not printed in the box', s.text.indexOf(lang.ffGone[k]) < 0);
-	}
 	const t = await openCornerTip(a, 'lpn_ff_box');
 	ok('the corner `?` opens one tip', t.shown);
+	// Every sentence the tip holds (the engine cost, maximum day, the hydrant accounting, the ISO
+	// limit, the engine) is one the box no longer prints.
+	const printed = sentences(t.text).filter((x) => s.text.indexOf(x) >= 0);
+	ok('...and not one of its sentences is also printed in the box', sentences(t.text).length >= 8 && printed.length === 0, JSON.stringify(printed).slice(0, 120));
 	ok('...that opens with the intro (who is tested, on a copy, maximum day, the search cost)', t.text.indexOf(lang.ffIntro) === 0, t.text.slice(0, 80));
 	ok('...says where the fire flow is drawn, in full', t.text.indexOf(lang.ffAccounting) > 0);
 	ok('...carries the ISO credit limit with a number in this project\'s flow unit', /credits a single hydrant with at most [\d.,]+ \S+\./.test(t.text) && t.text.indexOf('{flow}') < 0,
@@ -208,9 +210,6 @@ async function main() {
 			dsIntro: (await L('lpn_ds_intro')).split('{')[0],
 			engineNative: await L('lpn_ff_engine_native'), engineEpanet: await L('lpn_ff_engine_epanet'),
 			ffTableHead: await L('lpn_ff_report_all'),
-			// Phrases of the paragraphs the box used to print; their keys are gone, so their words are here.
-			ffGone: { cost: 'about 16 times', accounting: 'drawn at the junction itself', steady: 'maximum day demand',
-				engine: (await L('lpn_ff_engine_native')).slice(0, 12) },
 			ffRows: [await L('lpn_ff_scope'), await L('lpn_ff_required'), await L('lpn_ff_residual'), await L('lpn_ff_design'),
 				await L('lpn_ff_minpressure'), await L('lpn_ff_maxvelocity')],
 			ffButtons: [await L('lpn_ff_calculate'), await L('lpn_ff_stop'), await L('lpn_ff_clear')],

@@ -60578,8 +60578,8 @@ var EngCalcs = EngCalcs || {};
 		return [
 			pc.lpn_ff_intro,
 			EngCalcs.lpnFireFlowLossAccounting === 'raw-node' ? pc.lpn_ff_accounting : '',
-			EngCalcs.lpnFireFlowIsoCap ? (pc.lpn_ff_iso || '')
-				.replace('{flow}', ffQty(EngCalcs.lpnFireFlowIsoCap, 'lpn_u_flow')) : '',
+			EngCalcs.lpnFireFlowIsoCap && pc.lpn_ff_iso ?
+				pc.lpn_ff_iso.replace('{flow}', ffQty(EngCalcs.lpnFireFlowIsoCap, 'lpn_u_flow')) : '',
 			engine ? (engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native) : ''
 		].filter(Boolean).join(' ');
 	}
@@ -60587,7 +60587,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {},
 			D = EngCalcs.lpnDemandScaleDefaults || { max: 20, step: 0.01 };
 		return [
-			(pc.lpn_ds_intro || '').replace('{max}', dsMult(D.max)).replace('{step}', String(D.step)),
+			pc.lpn_ds_intro ? pc.lpn_ds_intro.replace('{max}', dsMult(D.max)).replace('{step}', String(D.step)) : '',
 			engine ? (engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native) : ''
 		].filter(Boolean).join(' ');
 	}
