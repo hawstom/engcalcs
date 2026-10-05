@@ -47948,7 +47948,7 @@ var EngCalcs = EngCalcs || {};
 			// same box, differing only by which scenario you are in, is how a user ends up typing
 			// max-day into the document.
 			var home = function () {
-				return (o.perScenario && !inBaseScenario()) ? activeScenario() : settings.hydraulics;
+				return (o.perScenario && !inBaseScenario()) ? calcTargetOf(activeScenario()) : settings.hydraulics;
 			};
 			input.value = home()[key] === undefined ? '' : String(home()[key]);
 			input.addEventListener('change', function () {
@@ -58042,10 +58042,7 @@ var EngCalcs = EngCalcs || {};
 	// **AND AN OVERRIDDEN NODE DEMAND IS NOT AN ESCAPE FROM IT** -- it is multiplied exactly like a
 	// Base one. That is EPANET's own behaviour and WNTR's, and it is already what this function's
 	// caller does to the document-wide multiplier; no third convention was found.
-	function scenarioDemandMultiplier() {
-		var m = activeScenario().demandMultiplier;
-		return (typeof m === 'number' && isFinite(m)) ? m : undefined;
-	}
+	function scenarioDemandMultiplier() { return heldCalcOption(activeScenario(), 'demandMultiplier'); }
 	// **A SCENARIO MAY CARRY ITS OWN TOTAL RUN TIME AND HYDRAULIC TIME STEP** (Task 755). Tom,
 	// 2026-09-30: *"A Demand Multiplier column with the alternatives? What about other settings?"*
 	// WaterGEMS keeps run type and duration in per-scenario Calculation Options; Sue ranked steady
@@ -58066,6 +58063,27 @@ var EngCalcs = EngCalcs || {};
 		return v;
 	}
 	function projectTimes() { return doc.times || EngCalcs.lpnTimesDefaults(); }
+	// **THE CALCULATION-OPTION SEAM** (dev/scenario-alternatives.md, stage 4). The demand
+	// multiplier and the two times a scenario HOLDS -- its own, or (once the tree is stored) what it
+	// inherits from its calculation set or its parent scenario -- are read here and nowhere else;
+	// undefined means "the project's own". calcTargetOf() is where an edit of one lands.
+	function heldCalcOption(s, key) {
+		var m;
+		if (!s || s.isBase) { return undefined; }
+		if (key === 'demandMultiplier') {
+			m = s.demandMultiplier;
+			return (typeof m === 'number' && isFinite(m)) ? m : undefined;
+		}
+		return scenarioTimeValue(s, key);
+	}
+	// The typed text beside a held time, or undefined.
+	function heldCalcOptionText(s, key) {
+		var t;
+		if (heldCalcOption(s, key) === undefined) { return undefined; }
+		t = s.times && s.times.text ? s.times.text[key] : undefined;
+		return typeof t === 'string' ? t : undefined;
+	}
+	function calcTargetOf(s) { return s; }
 	// One [TIMES] value the pattern clock reads, for the open scenario, without building the block:
 	// patternMultiplier() runs per element per solve. Neither key has a home of its own on the
 	// scenario, so the settings block and the project are the only two places it can be.
@@ -58087,7 +58105,7 @@ var EngCalcs = EngCalcs || {};
 		var own = {}, any = false, out, base, k, block = scenarioSettingsBlock(s),
 			held = block && plainObject(block.times) ? block.times : null;
 		LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
-			var v = scenarioTimeValue(s, key);
+			var v = heldCalcOption(s, key);
 			if (v !== undefined) { own[key] = v; any = true; }
 		});
 		if (!any && !held) { return doc.times; }
@@ -58103,7 +58121,7 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		Object.keys(own).forEach(function (key) {
-			var typed = s.times.text && s.times.text[key];
+			var typed = heldCalcOptionText(s, key);
 			out[key] = own[key];
 			if (typeof typed === 'string') { out.text[key] = typed; } else { delete out.text[key]; }
 		});
@@ -58115,9 +58133,11 @@ var EngCalcs = EngCalcs || {};
 		var out = [];
 		scenariosForDisplay().forEach(function (s) {
 			LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
-				if (scenarioTimeValue(s, key) !== undefined) {
-					out.push({ id: s.id, name: scenarioDisplayName(s), key: key, text: scenarioTimeText(s, key) });
-				}
+				var v = heldCalcOption(s, key), bag = { text: {} };
+				if (v === undefined) { return; }
+				bag.text[key] = heldCalcOptionText(s, key);
+				out.push({ id: s.id, name: scenarioDisplayName(s), key: key,
+					text: EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText(bag, key, v) : String(v) });
 			});
 		});
 		return out;
@@ -58141,11 +58161,11 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
-			var v = scenarioTimeValue(s, key);
+			var v = heldCalcOption(s, key), typed = heldCalcOptionText(s, key);
 			if (v === undefined) { return; }
 			out = out || { text: {} };
 			out[key] = v;
-			if (s.times.text && typeof s.times.text[key] === 'string') { out.text[key] = s.times.text[key]; }
+			if (typed !== undefined) { out.text[key] = typed; }
 		});
 		return out;
 	}
@@ -58187,6 +58207,7 @@ var EngCalcs = EngCalcs || {};
 			pt = projectTimes();
 			return EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText(pt, key, pt[key] || 0) : String(pt[key] || 0);
 		}
+		s = calcTargetOf(s);
 		v = scenarioTimeValue(s, key);
 		if (v === undefined) { return ''; }
 		return EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText(s.times, key, v) : String(v);
@@ -63512,8 +63533,9 @@ var EngCalcs = EngCalcs || {};
 		thead.insertBefore(gr, hr);
 	}
 	function altOptionText(s, key) {
+		var t = calcTargetOf(s);
 		if (key === 'demandMultiplier') {
-			return (typeof s.demandMultiplier === 'number' && isFinite(s.demandMultiplier)) ? String(s.demandMultiplier) : '';
+			return (typeof t.demandMultiplier === 'number' && isFinite(t.demandMultiplier)) ? String(t.demandMultiplier) : '';
 		}
 		return scenarioTimeText(s, key);
 	}
@@ -63547,11 +63569,11 @@ var EngCalcs = EngCalcs || {};
 			num = +raw;
 			if (raw !== '' && !(isFinite(num) && num > 0)) { input.value = was; return; }
 			saveUndoSnapshot();
-			if (raw === '') { delete s.demandMultiplier; } else { s.demandMultiplier = num; }
+			if (raw === '') { delete calcTargetOf(s).demandMultiplier; } else { calcTargetOf(s).demandMultiplier = num; }
 		} else {
 			if (!scenarioTimeTextOk(key, raw)) { input.value = was; return; }
 			saveUndoSnapshot();
-			setScenarioTime(s, key, raw);
+			setScenarioTime(calcTargetOf(s), key, raw);
 		}
 		afterScenarioOptionEdit(s);
 	}
