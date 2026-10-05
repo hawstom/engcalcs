@@ -28135,7 +28135,7 @@ var EngCalcs = EngCalcs || {};
 	// Up/Down/Home/End walk the menu's items; Escape closes it (the document handler) and puts the
 	// caret back where the keyboard opened it from.
 	function paneCtxMenuKey(e) {
-		var items = paneCtxMenuEl ? Array.prototype.slice.call(paneCtxMenuEl.children || []) : [],
+		var items = paneCtxMenuEl ? Array.prototype.slice.call(paneCtxMenuEl.children || []).filter(function (b) { return !b.disabled; }) : [],
 			i = items.indexOf(activeElementSafe()), key = e && e.key, n = items.length, back;
 		if (!n) { return; }
 		if (key === 'ArrowDown' || key === 'Down') { i = (i + 1) % n; }
@@ -28235,6 +28235,48 @@ var EngCalcs = EngCalcs || {};
 	 * is the one settable column where "clear it" was never a sensible request in the first
 	 * place, so it is skipped by name rather than by a property nothing else needs.
 	 */
+	// **THE SELECTED CELLS THAT HOLD A SCENARIO OVERRIDE**, each as {el, scn, props}: the element
+	// itself, the scenario its row shows (the table's own while Show scenarios is off), and the
+	// override keys that hold the cell's value. Base holds none.
+	function paneOverrideCells(spec, rows, cols, box) {
+		var out = [], r, c, row, col, x, scn, el, p, ov, props, has = Object.prototype.hasOwnProperty;
+		for (r = box.r0; r <= box.r1; r++) {
+			row = rows[r];
+			x = row && row._lpnScn;
+			scn = x ? x.scn : activeScenario();
+			el = paneRowEl(row);
+			if (!el || scn.isBase) { continue; }
+			ov = (scn.overrides || {})[ovKey(el)];
+			if (!ov) { continue; }
+			for (c = box.c0; c <= box.c1; c++) {
+				col = cols[c];
+				p = col && paneColProp(col);
+				if (!p) { continue; }
+				props = [p].concat(p === 'demand' ? ['demands'] : []).filter(function (k) { return has.call(ov, k); });
+				if (props.length) { out.push({ el: el, scn: scn, props: props }); }
+			}
+		}
+		return out;
+	}
+	// Clear the override of every selected cell that holds one, so the cell reads the value its
+	// scenario inherits. One undo step, and the same clearOverride() the Properties box's "Override
+	// in this scenario" box calls, run in the row's own scenario.
+	function paneClearOverrides(spec) {
+		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
+			box = paneSelBox(spec, rows, cols), hits, touched = {};
+		if (!box) { return false; }
+		hits = paneOverrideCells(spec, rows, cols, box);
+		if (!hits.length) { return false; }
+		saveUndoSnapshot();
+		hits.forEach(function (h) {
+			paneInScenario(h.scn, function () { h.props.forEach(function (k) { clearOverride(h.el, k); }); });
+			touched[elGroup(h.el) + '\u0000' + h.el.id] = h.el;
+		});
+		Object.keys(touched).forEach(function (k) { afterPropertyEdit(touched[k]); });
+		refreshPopupIfOpen();
+		renderPaneTable(spec);
+		return true;
+	}
 	function paneDeleteSelection(spec) {
 		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
 			box = paneSelBox(spec, rows, cols), r, c, el, col, any = false;
@@ -28417,6 +28459,16 @@ var EngCalcs = EngCalcs || {};
 		// Offered once there is a scenario besides Base, or while it is on so it can be turned off.
 		if (paneScnAvailable(spec) && (spec.scnRows || scenarios.length > 1)) {
 			mk((spec.scnRows ? '\u2713 ' : '') + (pc.lpn_pane_scn_show || 'Show scenarios'), function () { paneScnToggle(spec); });
+		}
+		// **CLEAR OVERRIDE** (Tom, 2026-10-06: *"Would it be good UI design to add a 'Clear override'
+		// item to the right-click menu in Tables? I think I would love that."*). Shown, and greyed
+		// when no selected cell holds an override, wherever there is a scenario to hold one -- so it
+		// can be found in Base as well as read there. Acts on every selected cell, the way Delete does.
+		if (paneScnAvailable(spec) && (spec.scnRows || scenarios.length > 1)) {
+			(function (hits) {
+				var b = mk(pc.lpn_pane_clear_override || 'Clear override', function () { paneClearOverrides(spec); });
+				if (!hits.length) { b.disabled = true; b.setAttribute('aria-disabled', 'true'); }
+			})(paneOverrideCells(spec, rows, cols, box));
 		}
 		// **PRINT TABLE, THE ONLY DOOR TO IT** (Tom, 2026-10-04: the button left the pane head).
 		mk(pc.lpn_pane_print || 'Print table', function () { printPaneTable(spec); });

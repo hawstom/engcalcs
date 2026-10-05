@@ -2278,6 +2278,7 @@ EngCalcs.pageConfig = {
 	lpn_pane_sel_only: <?=json_encode($ec_lang['lpn_pane_sel_only'])?>,
 	lpn_pane_sel_only_none: <?=json_encode($ec_lang['lpn_pane_sel_only_none'])?>,
 	lpn_pane_scn_show: <?=json_encode($ec_lang['lpn_pane_scn_show'])?>,
+	lpn_pane_clear_override: <?=json_encode($ec_lang['lpn_pane_clear_override'])?>,
 	lpn_pane_scn_alt_tip: <?=json_encode($ec_lang['lpn_pane_scn_alt_tip'])?>,
 	lpn_pane_goto_tip: <?=json_encode($ec_lang['lpn_pane_goto_tip'])?>,
 	lpn_goto_on_map: <?=json_encode($ec_lang['lpn_goto_on_map'])?>,

@@ -2893,6 +2893,7 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    about Ctrl+D"). Quieter than the label, so the row still reads as one action first. */
 .lpn-pane-ctxmenu-accel { color: var(--ec-gray-888); font-size: .85em; white-space: nowrap; }
 .lpn-pane-ctxmenu button:hover, .lpn-pane-ctxmenu button:focus-visible { background: var(--ec-hue-eef1f4); outline: 0; }
+.lpn-pane-ctxmenu button:disabled { color: var(--ec-gray-888); cursor: default; background: none; }
 /* THE DIVIDER BETWEEN TWO HEADINGS, which is where a spreadsheet user aims to resize a column
    (Tom's point (d), 2026-09-18). It sits on the trailing edge of its own heading, is as tall as the
    heading row, and is the ONLY thing there that takes a col-resize cursor -- so the gesture
