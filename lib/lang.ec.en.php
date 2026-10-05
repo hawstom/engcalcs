@@ -2916,6 +2916,13 @@ $ec_lang['lpn_cp_val_hyphen']='hyphen-case';
 // is a way of asking a question about the data, so nothing is ever cleared or refused: the value
 // stays exactly as it was typed and says what is wrong with it.
 $ec_lang['lpn_cp_flag']='{label}: {reason} The value is kept exactly as you entered it.';
+$ec_lang['lpn_valwarn_diameter']='A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.';
+$ec_lang['lpn_valwarn_hw']='A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.';
+$ec_lang['lpn_valwarn_manning']='A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.';
+$ec_lang['lpn_valwarn_dw']='A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.';
+$ec_lang['lpn_valwarn_positive']='EPANET refuses zero or a negative number here.';
+$ec_lang['lpn_valwarn_negative']='EPANET refuses a negative number here.';
+$ec_lang['lpn_valwarn_tank_levels']='EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.';
 $ec_lang['lpn_cp_bad_number']='This value is not a number as required for this property.';
 $ec_lang['lpn_cp_bad_integer']='This value is not a whole number as required for this property.';
 $ec_lang['lpn_cp_bad_case']='This value is not ALL CAPS as required for this property.';

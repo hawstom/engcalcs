@@ -25876,6 +25876,8 @@ var EngCalcs = EngCalcs || {};
 				td.appendChild(input);
 				cells[c.key] = input;
 			}
+			// **AN UNREASONABLE VALUE CARRIES A ⚠, AND KEEPS ITS NUMBER** (dev/value-warning.md).
+			paneValueWarn(spec, td, c, el);
 			/**
 			 * **THE ID CELL IS TWO THINGS, AND IT USED TO BE ONE** (Tom, 2026-09-19: *"At column A
 			 * there is a strange highlighting around the ID. And the ID is not editable, though
@@ -25969,6 +25971,8 @@ var EngCalcs = EngCalcs || {};
 					if (target.value !== text) { target.value = text; }
 					if (c.cp) { customPropPaintFlag(target, c.cp, target.value); }
 				}
+				// After the write: a plain cell's textContent just took its children with it.
+				paneValueWarn(spec, spec.tds && spec.tds[el.id] && spec.tds[el.id][c.key], c, el);
 			});
 		});
 		// Task 738's marks and count, which a refill changes as surely as it changes a value.
@@ -44704,6 +44708,160 @@ var EngCalcs = EngCalcs || {};
 		if (method === 'dw') { return +(0.0015 * unitFactor('lpn_u_roughness')).toPrecision(3); }
 		return 130;
 	}
+	// ---- A ⚠ BESIDE AN UNREASONABLE STORED VALUE (dev/value-warning.md) -----------------------
+	//
+	// Sue, the utility adviser: a scenario that switches the friction method without its own
+	// roughness values reads C = 130 as a Darcy-Weisbach roughness of 130, and it solves, with
+	// garbage. Tom, 2026-10-05: *"Yes. Add the glyph to every unreasonable value like a diameter
+	// over 150 inches or under 12 mm; a roughness under 10 for C, over 1 or under 0.001 for n or
+	// over 0.001 for e; etc."*
+	//
+	// **THE VALUE IS NEVER CHANGED** (CLAUDE.md: only the user touches a file's numbers). The glyph
+	// asks a question; it refuses nothing and rewrites nothing.
+	//
+	// **EVERY THRESHOLD LIVES IN THIS ONE TABLE, IN SI** (metres where the field is a length), so
+	// the glyph and the tip that quotes the range cannot disagree. Keyed by field (the stored
+	// property's name), then by friction method where the method changes the quantity, else `all`.
+	// `min`/`max` flag a value below/above them; `above` flags a value at or below it.
+	//
+	// **e IS THE ONE NUMBER THAT IS NOT TOM'S LITERAL ONE.** "Over 0.001 for e" names no unit, and
+	// in millimetres or millifeet it would flag nearly every real pipe; even in metres (1 mm) it
+	// flags old concrete and riveted steel. So the ceiling is 10 mm, just above the top of the
+	// roughest published ranges -- Moody (1944): riveted steel 0.9 to 9 mm, concrete 0.3 to 3 mm.
+	// Tom has been asked to make the call; change this constant and nothing else.
+	var LPN_DW_ROUGHNESS_MAX_M = 0.010;
+	var LPN_VALUE_RULES = {
+		// Tom's numbers: over 150 in (3.81 m) or under 12 mm. Also catches zero and negative.
+		diameter: { all: { min: 0.012, max: 3.810, key: 'lpn_valwarn_diameter', unit: true } },
+		roughness: {
+			// Tom's floor of 10. The ceiling of 200 is a margin above the highest C in EPANET 2.2
+			// Users Manual Table 3.2 (plastic and steel, 140 to 150).
+			hw: { min: 10, max: 200, key: 'lpn_valwarn_hw' },
+			// Tom's literal numbers.
+			manning: { min: 0.001, max: 1, key: 'lpn_valwarn_manning' },
+			// See LPN_DW_ROUGHNESS_MAX_M above. Zero or less: EPANET refuses it (input3.c, pipedata(),
+			// error 202 on a roughness <= 0), for every method -- the hw and manning floors cover it.
+			dw: { above: 0, max: LPN_DW_ROUGHNESS_MAX_M, key: 'lpn_valwarn_dw', unit: true }
+		},
+		// EPANET input3.c pipedata(): error 202 on a length <= 0, and on a minor loss < 0 (valvedata()
+		// the same for a valve's).
+		length: { all: { above: 0, key: 'lpn_valwarn_positive' } },
+		k: { all: { min: 0, key: 'lpn_valwarn_negative' } },
+		// EPANET input3.c emitterdata(): error 209 on a coefficient < 0.
+		emitter: { all: { min: 0, key: 'lpn_valwarn_negative' } },
+		// EPANET validate.c tanklevels(): error 225 when the initial level is above the maximum or
+		// below the minimum, or the minimum is above the maximum. A rule between three fields, so it
+		// reads `ctx` rather than `value`.
+		level: { order: true, key: 'lpn_valwarn_tank_levels' },
+		minLevel: { order: true, key: 'lpn_valwarn_tank_levels' },
+		maxLevel: { order: true, key: 'lpn_valwarn_tank_levels' }
+	};
+	/**
+	 * **THE PURE CHECK: (field, value in SI, friction method, ctx) -> the broken rule, or null.**
+	 * No DOM, no document, no units: the caller converts. `ctx` is read only by the tank-level rule,
+	 * `{ level, minLevel, maxLevel }` in any one unit. Exposed as EngCalcs.lpnValueWarning so a
+	 * scenario row (feat/scenario-table) or a scenario-resolved value (feat/bentley-interop) can ask
+	 * the same question of its own number and its own method.
+	 */
+	function valueWarningRule(field, si, method, ctx) {
+		var set = LPN_VALUE_RULES[field], r, lo, hi, lv,
+			num = function (x) { return typeof x === 'number' && isFinite(x); };
+		if (!set) { return null; }
+		if (set.order) {
+			if (!ctx) { return null; }
+			lo = num(ctx.minLevel) ? ctx.minLevel : 0;   // EPANET's own default for a blank minimum
+			hi = ctx.maxLevel; lv = ctx.level;
+			if (field !== 'level' && num(hi) && lo > hi) { return set; }
+			if (field !== 'maxLevel' && num(lv) && lv < lo) { return set; }
+			if (field !== 'minLevel' && num(lv) && num(hi) && lv > hi) { return set; }
+			return null;
+		}
+		r = set[method || 'hw'] || set.all;
+		if (!r || !num(si)) { return null; }
+		// A hair of tolerance, so 150 in -- exactly 3.81 m, but 3.8100000000000005 after the unit
+		// division -- is not over its own limit.
+		if (r.above !== undefined && si <= r.above) { return r; }
+		if (r.min !== undefined && si < r.min * (1 - 1e-9)) { return r; }
+		if (r.max !== undefined && si > r.max * (1 + 1e-9)) { return r; }
+		return null;
+	}
+	EngCalcs.lpnValueWarning = valueWarningRule;
+	// **THE METHOD IN EFFECT FOR THE VALUE SHOWN.** Today the project's; a scenario that carries its
+	// own method answers here, and the roughness glyph follows it with no other change.
+	function valueWarnMethod(el) { return frictionMethod(); }
+	// The unit each field is displayed in, which is the unit its typed number is stored in.
+	function valueWarnUnit(field) {
+		if (field === 'diameter') { return 'lpn_u_diameter'; }
+		if (field === 'length') { return 'lpn_u_length'; }
+		if (field === 'roughness') { return frictionMethod() === 'dw' ? 'lpn_u_roughness' : ''; }
+		if (field === 'level' || field === 'minLevel' || field === 'maxLevel') { return 'lpn_u_elevhead'; }
+		return '';
+	}
+	/**
+	 * **THE HOOK: the tip for this element's shown value, or '' when it is plausible.** `shown` is the
+	 * number as displayed (the unit valueWarnUnit() names); this converts to SI, asks the pure check
+	 * and words the answer with the rule's own limits, read back into the displayed unit.
+	 */
+	function valueWarnText(field, el, shown) {
+		var pc = EngCalcs.pageConfig || {}, unit, f, r, fmt, ctx = null;
+		if (!LPN_VALUE_RULES[field] || shown === '' || shown === null || shown === undefined) { return ''; }
+		unit = valueWarnUnit(field);
+		f = unit ? unitFactor(unit) : 1;
+		if (LPN_VALUE_RULES[field].order) {
+			if (!el || el.type !== 'tank') { return ''; }
+			ctx = { level: effective(el, 'level'), minLevel: el.minLevel, maxLevel: el.maxLevel };
+		}
+		r = valueWarningRule(field, +shown / f, valueWarnMethod(el), ctx);
+		if (!r) { return ''; }
+		fmt = function (si) { return String(+(si * (r.unit ? f : 1)).toPrecision(3)); };
+		return String(pc[r.key] || '')
+			.replace('{min}', r.min !== undefined ? fmt(r.min) : '')
+			.replace('{max}', r.max !== undefined ? fmt(r.max) : '')
+			.replace('{unit}', r.unit ? unitLabel(unit) : '');
+	}
+	/**
+	 * Puts the ⚠ in `host` (a Tables cell or a Properties row), takes it out, or rewords its tip.
+	 * The whole glyph is the tip target, through the page's own `.ec-help` machinery. Returns the
+	 * mark, or null.
+	 */
+	function valueWarnPaint(host, text) {
+		var mark = null, i, kids;
+		if (!host) { return null; }
+		kids = host.children || [];
+		for (i = 0; i < kids.length; i++) {
+			if (/(^|\s)lpn-valwarn(\s|$)/.test(kids[i].className || '')) { mark = kids[i]; }
+		}
+		if (!text) {
+			if (mark) {
+				host.removeChild(mark);
+				host.className = String(host.className || '').replace(/(^|\s)lpn-valwarn-host(?=\s|$)/g, '').trim();
+				sweepOrphanTips();
+			}
+			return null;
+		}
+		if (!mark) {
+			mark = document.createElement('span');
+			mark.className = 'lpn-valwarn ec-help';
+			mark.textContent = '⚠';
+			mark.title = text;
+			mark.setAttribute('aria-label', text);
+			host.appendChild(mark);
+			if (!/(^|\s)lpn-valwarn-host(\s|$)/.test(host.className || '')) {
+				host.className = (host.className ? host.className + ' ' : '') + 'lpn-valwarn-host';
+			}
+			if (host.isConnected && EngCalcs.initTips && typeof bootstrap !== 'undefined') { EngCalcs.initTips(host); }
+		} else {
+			if (EngCalcs.setTipText) { EngCalcs.setTipText(mark, text); } else { mark.title = text; }
+			mark.setAttribute('aria-label', text);
+		}
+		return mark;
+	}
+	// The Tables pane's door: one cell, one column, one row element. Asset tables only.
+	function paneValueWarn(spec, td, c, el) {
+		var field = c.prop || c.key;
+		if (!td || c.result || !LPN_VALUE_RULES[field] || (spec.group !== 'node' && spec.group !== 'link')) { return; }
+		valueWarnPaint(td, valueWarnText(field, el, c.get(el)));
+	}
 	// **HOW MANY DECIMAL PLACES A ROUGHNESS LABEL NEEDS, WHICH THE METHOD AND THE UNIT DECIDE**
 	// (Task 491). A Hazen-Williams C is a dimensionless integer and 0 places is right for it -- but
 	// the method is selectable (Task 271) and the roughness unit is too, so 0 is right for exactly
@@ -53468,9 +53626,12 @@ var EngCalcs = EngCalcs || {};
 		input.addEventListener('change', function () { saveUndoSnapshot(); set(+input.value); completeEdit(ov); });
 		setFieldLabel(label, labelText + ' (' + unitLabel(unitId) + ')', tip);
 		label.appendChild(input);
+		// The ⚠ for an unreasonable value (dev/value-warning.md), keyed on the property this row edits.
+		if (ov) { valueWarnPaint(label, valueWarnText(ov.prop, ov.el, v0)); }
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 		if (ov) { overrideMarker(fields, ov.el, ov.prop); }   // and see completeEdit() on the setter
+		return label;
 	}
 	// Same as unitNumberField(), but the value may be BLANK, meaning "follow whatever this field
 	// defaults to" -- currently a reservoir's head following its elevation (Tom, 2026-07-30).
@@ -53877,6 +54038,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		setFieldLabel(label, (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ')');
 		label.appendChild(input);
+		valueWarnPaint(label, valueWarnText('length', l, effective(l, 'length')));   // dev/value-warning.md
 		autoLabel.appendChild(auto);
 		autoLabel.appendChild(document.createTextNode(' ' + (pc.lpn_field_auto || 'Auto')));
 		fields.appendChild(label); fields.appendChild(autoLabel);
@@ -54991,14 +55153,15 @@ var EngCalcs = EngCalcs || {};
 				function () { return effective(n, 'level'); },
 				function (v) { setProp(n, 'level', v); updateNode(nodeId, true); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_level_tip, { el: n, prop: 'level' });
-			unitNumberField(fields, pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead',
+			// Not overridable, so no `ov` to key the ⚠ on: these two name their field themselves.
+			valueWarnPaint(unitNumberField(fields, pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead',
 				function () { return n.minLevel; },
 				function (v) { n.minLevel = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_field_tank_minlevel_tip);
-			unitNumberField(fields, pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead',
+				pc.lpn_field_tank_minlevel_tip), valueWarnText('minLevel', n, n.minLevel));
+			valueWarnPaint(unitNumberField(fields, pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead',
 				function () { return n.maxLevel; },
 				function (v) { n.maxLevel = v; updateNode(nodeId, true); refreshPopupIfOpen(); },
-				pc.lpn_field_tank_maxlevel_tip);
+				pc.lpn_field_tank_maxlevel_tip), valueWarnText('maxLevel', n, n.maxLevel));
 			// **THE LENGTH UNIT** (CLAUDE.md), NOT the Elevation/Head unit this box used to read it
 			// in -- a fix caught in review printing "ft H2O" beside a distance across the vessel --
 			// and NOT the pipe-diameter unit either, or inches/millimetres would put a 15 m tank on
@@ -55616,6 +55779,7 @@ var EngCalcs = EngCalcs || {};
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
+		return label;
 	}
 	/**
 	 * **THE LIBRARY PIPE SELECTOR, IMMEDIATELY AFTER ID** (Tom's own placement, 2026-09-05). The
@@ -56025,8 +56189,8 @@ var EngCalcs = EngCalcs || {};
 			// deviates without forking the definition.
 			pipeTypeChooser(fields, l);
 			if (pipeTypeOwns(l, 'diameter')) {
-				inheritedField(fields, (pc.lpn_field_diameter || 'Diameter') + ' (' + unitLabel('lpn_u_diameter') + ')',
-					effective(l, 'diameter'), pc.lpn_field_pipetype_tip);
+				valueWarnPaint(inheritedField(fields, (pc.lpn_field_diameter || 'Diameter') + ' (' + unitLabel('lpn_u_diameter') + ')',
+					effective(l, 'diameter'), pc.lpn_field_pipetype_tip), valueWarnText('diameter', l, effective(l, 'diameter')));
 			} else {
 				unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
 					function () { return effective(l, 'diameter'); },
@@ -56036,8 +56200,8 @@ var EngCalcs = EngCalcs || {};
 			// Label, symbol and tip all follow settings.method (Task 271). Under Darcy-Weisbach the
 			// unit is named too, because e is a length and the bare number would be ambiguous.
 			if (pipeTypeOwns(l, 'roughness')) {
-				inheritedField(fields, pipeTypePropLabel('roughness'), effective(l, 'roughness'),
-					pc.lpn_field_pipetype_tip);
+				valueWarnPaint(inheritedField(fields, pipeTypePropLabel('roughness'), effective(l, 'roughness'),
+					pc.lpn_field_pipetype_tip), valueWarnText('roughness', l, effective(l, 'roughness')));
 			} else {
 				numberFieldPlain(fields,
 					roughnessLabel() + (frictionMethod() === 'dw' ? ' (' + unitLabel('lpn_u_roughness') + ')' : ''),
@@ -57010,6 +57174,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(input);
+		if (ov) { valueWarnPaint(label, valueWarnText(ov.prop, ov.el, value)); }   // dev/value-warning.md
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 		if (ov) { overrideMarker(fields, ov.el, ov.prop); }
@@ -57020,6 +57185,7 @@ var EngCalcs = EngCalcs || {};
 		input.addEventListener('change', function () { saveUndoSnapshot(); onChange(+input.value); completeEdit(ov); });
 		setFieldLabel(label, labelText, tip, href);
 		label.appendChild(input);
+		if (ov) { valueWarnPaint(label, valueWarnText(ov.prop, ov.el, value)); }   // dev/value-warning.md
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 		if (ov) { overrideMarker(fields, ov.el, ov.prop); }   // and see completeEdit() on the setter
