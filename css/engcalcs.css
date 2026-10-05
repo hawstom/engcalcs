@@ -447,6 +447,22 @@ button > .ec-icon, a > .ec-icon, label > .ec-icon { margin-inline-end: 0.4em; }
 	--bs-tooltip-max-width: min(17rem, calc(100vw - 2rem));
 }
 
+/* **AN EXPLANATION IS OPENED ON PURPOSE, SO IT MAY BE READ, NOT GLIMPSED** (ROADMAP Task 759, Tom
+   2026-10-03: "Click the ?, closed by a click elsewhere or Esc"). The tip behind a "?" opens only
+   on a click of the glyph (js/Calculators.lib.js, ecTipGlyph()), so it is wider than a name tip
+   (22rem, Ida's measured width: the 92-word tip at 352 x 302 px), left-aligned like prose, and it
+   takes the pointer: a reader may rest on it. The 'no click' rule above is for a name tip still up
+   from hover over the next thing clicked; an explanation is never up by hover. Nothing in it is a
+   control. */
+.tooltip.ec-explain {
+	--bs-tooltip-max-width: min(22rem, calc(100vw - 2rem));
+	pointer-events: auto;
+}
+.tooltip.ec-explain .tooltip-inner { text-align: start; }
+/* The label words no longer open anything; only the glyph does, so only the glyph says so. */
+.ec-help.ec-explain-host { cursor: inherit; }
+.ec-explain-host .ec-tip, .ec-tip.ec-explain-host { cursor: pointer; }
+
 /* The welcome line under the page title (template_welcome). Set apart with italics
    rather than the >> ... << that used to be typed into all 27 language strings: those
    are not standard English or typography (Tom, 2026-07-27), they are directional

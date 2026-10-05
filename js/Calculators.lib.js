@@ -16,7 +16,8 @@ var EngCalcs = EngCalcs || {};
 // mouse away only clears hover -- so the tip stays pinned open until a second click toggles it back
 // off, and it visibly cycles. 'focus' sticks the same way, since a clicked button keeps focus.
 //
-// So pick ONE opening gesture per DEVICE:
+// So pick ONE opening gesture per DEVICE for a NAME tip (an EXPLANATION, behind a "?", has one
+// gesture on every device; see ecTipGlyph() below):
 //   - pointer can hover (mouse/trackpad): 'hover focus'. A <span> is not focusable without
 //     tabindex, so for a plain label this is effectively hover-only -- nothing to get stuck on.
 //   - pointer cannot hover (touch): 'click' for a plain label, which is the only way to reach its
@@ -31,6 +32,102 @@ function ecTipIsControl(el) {
 // device as it is now, and matchMedia is cheap.
 function ecCanHover() {
 	return !window.matchMedia || window.matchMedia('(hover: hover)').matches;
+}
+// **TWO KINDS OF TIP, AND THE "?" IS WHAT TELLS THEM APART** (ROADMAP Task 759, Tom's answer to
+// Ida's interview, 2026-10-03: *"Click the ?, closed by a click elsewhere or Esc; one door on
+// desktop and phone."*). dev/tip-followup-2026-10-03.md draws the line:
+//   - a NAME tip says what a control is (icon-only toolbar buttons, transport, the x, sort arrows,
+//     a table heading). It keeps hover/focus with the 500 ms delay below. No glyph.
+//   - an EXPLANATION tip is the one behind a "?" glyph (ecTipLabel(), ecLinkTipLabel(), their JS
+//     twins). It has ONE door on every device: a click or tap on the "?", or Enter/Space on it from
+//     the keyboard. It stays until a click elsewhere, Esc, or focus leaving for something else; the
+//     pointer can rest on it (css/engcalcs.css, .ec-explain) and it is wider than a name tip.
+// One door is also what keeps THE RULE above: an explanation is `manual`, so Bootstrap holds no
+// trigger of its own on it and there is nothing left active to pin it open.
+function ecTipGlyph(el) {
+	if (!el || !el.classList) { return null; }
+	if (el.classList.contains('ec-tip')) { return el; }
+	return el.querySelector ? el.querySelector('.ec-tip') : null;
+}
+// The one explanation on screen: opening another closes it, as a second question replaces the first.
+EngCalcs._explainOpen = null;
+EngCalcs.closeExplanation = function () {
+	var el = EngCalcs._explainOpen, t, g;
+	EngCalcs._explainOpen = null;
+	if (!el) { return; }
+	t = window.bootstrap && bootstrap.Tooltip.getInstance(el);
+	if (t) { t.hide(); }
+	g = ecTipGlyph(el);
+	if (g && g.setAttribute) { g.setAttribute('aria-expanded', 'false'); }
+};
+EngCalcs.toggleExplanation = function (el) {
+	var was = EngCalcs._explainOpen, t, g;
+	// A box that closed, or a sweep, may have hidden it behind our back: then a click OPENS it.
+	if (was === el && !(el.getAttribute && el.getAttribute('aria-describedby'))) { was = null; }
+	EngCalcs.closeExplanation();
+	if (was === el) { return; }
+	t = window.bootstrap && bootstrap.Tooltip.getInstance(el);
+	if (!t) { return; }
+	t.show();
+	EngCalcs._explainOpen = el;
+	g = ecTipGlyph(el);
+	if (g && g.setAttribute) { g.setAttribute('aria-expanded', 'true'); }
+};
+// Is this node inside the open explanation, its glyph or the tip Bootstrap drew in the body?
+function ecInsideExplanation(node) {
+	var el = EngCalcs._explainOpen, g, t, drawn;
+	if (!el || !node) { return false; }
+	g = ecTipGlyph(el);
+	if (g && (g === node || (g.contains && g.contains(node)))) { return true; }
+	t = window.bootstrap && bootstrap.Tooltip.getInstance(el);
+	drawn = t && t.tip;
+	return !!(drawn && (drawn === node || (drawn.contains && drawn.contains(node))));
+}
+// Wired once per document. CAPTURE phase on both: a box or a map that stops a pointer event from
+// bubbling must still let it count as "a click elsewhere", and an Esc that closes the open
+// explanation must not ALSO close the box the reader is in -- the box's own Esc runs later.
+function ecWireExplanationDocument() {
+	if (EngCalcs._explainDocWired || !document.addEventListener) { return; }
+	EngCalcs._explainDocWired = true;
+	document.addEventListener('pointerdown', function (e) {
+		if (EngCalcs._explainOpen && !ecInsideExplanation(e.target)) { EngCalcs.closeExplanation(); }
+	}, true);
+	document.addEventListener('keydown', function (e) {
+		if (e.key !== 'Escape' || !EngCalcs._explainOpen) { return; }
+		EngCalcs.closeExplanation();
+		if (e.stopPropagation) { e.stopPropagation(); }
+		if (e.preventDefault) { e.preventDefault(); }
+	}, true);
+}
+function ecWireExplanationGlyph(el, glyph) {
+	if (glyph.dataset.ecExplainWired) { return; }
+	glyph.dataset.ecExplainWired = '1';
+	// The keyboard's door: the glyph is a button in all but tag (a <button> inside a <label> would
+	// become the label's control). tabindex on the glyph alone, so a label is one tab stop.
+	if (glyph.setAttribute) {
+		glyph.setAttribute('tabindex', '0');
+		glyph.setAttribute('role', 'button');
+		glyph.setAttribute('aria-expanded', 'false');
+	}
+	// preventDefault(): the glyph sits inside a <label>, whose activation focuses the field it names,
+	// and the tap that asks a question must not open a phone's keyboard over the answer (Tom,
+	// 2026-08-29). Now the same on a mouse, since a click is the one door there too.
+	glyph.addEventListener('click', function (e) {
+		if (e.preventDefault) { e.preventDefault(); }
+		EngCalcs.toggleExplanation(el);
+	});
+	glyph.addEventListener('keydown', function (e) {
+		if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') { return; }
+		if (e.preventDefault) { e.preventDefault(); }
+		EngCalcs.toggleExplanation(el);
+	});
+	// Focus leaving for some OTHER element (Tab, Shift+Tab) closes it. A click on the tip itself
+	// moves focus to nothing (relatedTarget null) and must leave it open to be read.
+	glyph.addEventListener('focusout', function (e) {
+		if (EngCalcs._explainOpen === el && e.relatedTarget && !ecInsideExplanation(e.relatedTarget)) {
+			EngCalcs.closeExplanation();
+		}
+	});
 }
 /**
  * Change a tip that is ALREADY ON SCREEN, and have the reader see the new one.
@@ -74,6 +171,14 @@ EngCalcs.initTips = function (root) {
 	var canHover = ecCanHover();
 	(root || document).querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(function (el) {
 		var control = ecTipIsControl(el);
+		var explainGlyph = control ? null : ecTipGlyph(el);
+		if (explainGlyph) {
+			bootstrap.Tooltip.getOrCreateInstance(el, { trigger: 'manual', customClass: 'ec-explain' });
+			if (el.classList && el.classList.add) { el.classList.add('ec-explain-host'); }
+			ecWireExplanationGlyph(el, explainGlyph);
+			ecWireExplanationDocument();
+			return;
+		}
 		// **A CONTROL ON A HOVER-LESS DEVICE GETS PRESS-AND-HOLD, and nothing else can work.**
 		// 'hover focus' on a touch screen means a tap focuses the button (showing the tip) and the
 		// same tap's click hides it again, so the tip is unreadable -- invisible while a word was on
@@ -137,32 +242,8 @@ EngCalcs.initTips = function (root) {
 				if (!keyboard) { tip.hide(); }
 			});
 		}
-		// **A TAP ON THE "?" ASKS A QUESTION; IT DOES NOT START TYPING** (Tom, 2026-08-29, from a
-		// phone: *"The only problem is that it puts me in the input field, bringing up my input
-		// keyboard when I am not ready for any input."*). The glyph sits inside a <label>, and a
-		// label's activation behaviour is to focus the control it names -- so the tap that opened
-		// the tip also opened the keyboard, over the tip.
-		//
-		// CANCELLED ON THE GLYPH ALONE, never on `.ec-help`. The two nestings are opposite
-		// (lib/Calculators.lib.php): with a link `.ec-help` wraps the glyph, without one it wraps
-		// the label TEXT and the glyph. Cancelling on `.ec-help` would therefore take the label
-		// text's own tap with it in the second case, and a tap on a field's name is meant to reach
-		// the field. `.ec-tip` is the glyph in both nestings and in the ones js/looped-network.js
-		// builds by hand, so it is the one honest handle.
-		//
-		// preventDefault() only: the click still bubbles, so Bootstrap's own 'click' trigger -- the
-		// only way a tip opens on a device that cannot hover -- still sees it and shows the tip.
-		//
-		// TOUCH ONLY. A mouse reaches the tip by hovering and never taps the glyph to read it, so
-		// the pointer behaviour is left exactly as it was.
-		if (!canHover && !control) {
-			var glyph = (el.classList && el.classList.contains('ec-tip')) ? el :
-				(el.querySelector ? el.querySelector('.ec-tip') : null);
-			if (glyph && !glyph.dataset.ecTipNoFocus) {
-				glyph.dataset.ecTipNoFocus = '1';
-				glyph.addEventListener('click', function (e) { e.preventDefault(); });
-			}
-		}
+		// The "?" glyph's own tap handling lives in ecWireExplanationGlyph(): every tip with a glyph
+		// returned above, so what reaches here is a name tip on a control or a glyph-less label.
 		if (longPress && !el.dataset.ecTipHoldWired) {
 			el.dataset.ecTipHoldWired = '1';
 			var timer = null;

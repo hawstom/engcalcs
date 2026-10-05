@@ -49250,12 +49250,12 @@ var EngCalcs = EngCalcs || {};
 		return b;
 	}
 	// The box's one `?` (Q5): the JS twin of ecTipLabel() with no label text, so the glyph IS the
-	// whole tip target, and focusable so a keyboard reaches the explanation as a pointer does.
+	// whole tip target. EngCalcs.initTips() makes the glyph the tab stop and the one door, as on
+	// every other `?` (Task 759), so the wrapper is not focusable itself: one `?`, one tab stop.
 	function cornerHelp(tip) {
 		var help = document.createElement('span'), glyph = document.createElement('span');
 		help.className = 'ec-help lpn-corner-help';
 		help.title = tip;
-		help.tabIndex = 0;
 		glyph.className = 'ec-tip';
 		glyph.textContent = '?';
 		help.appendChild(glyph);
@@ -49694,7 +49694,7 @@ var EngCalcs = EngCalcs || {};
 		d.tab = tab;
 	}
 	function registerDockBox(id, rec, save, key, tipKey) {
-		var box = document.getElementById(id), pc = EngCalcs.pageConfig || {}, x, row, d;
+		var box = document.getElementById(id), pc = EngCalcs.pageConfig || {}, x, row, d, tip;
 		if (!box || box.__lpnDock) { return; }
 		d = { box: box, rec: rec || {}, save: save || null, help: null, tab: null };
 		readDockRecord(key, d.rec);
@@ -49704,7 +49704,8 @@ var EngCalcs = EngCalcs || {};
 		box.insertBefore(row, x || box.firstChild);
 		box.classList.add('lpn-has-corner');
 		d.corner = row;
-		if (tipKey && pc[tipKey]) { d.help = cornerHelp(pc[tipKey]); }
+		tip = [].concat(tipKey || []).map(function (k) { return pc[k]; }).filter(Boolean).join(' ');
+		if (tip) { d.help = cornerHelp(tip); }
 		wireDockTab(d);
 		box.addEventListener('pointerenter', function () { if (dockFlyout === d) { clearTimeout(dockTimer); } });
 		box.addEventListener('pointerleave', function () { if (dockFlyout === d) { dockTuckLater(d); } });
@@ -49723,17 +49724,18 @@ var EngCalcs = EngCalcs || {};
 		initTipsIn(row);
 	}
 	// **EVERY NON-MODAL BOX ON THE PAGE**, by the furniture record it already keeps (null: none, so
-	// it docks for this page load only). The last column is the `?` its corner carries (Q5), the
-	// tool's own menu tip until it has words of its own.
+	// it docks for this page load only). The last column is the `?` its corner carries (Q5): the
+	// tool's whole explanation, its intro and the scope tip that only restated the tool's purpose,
+	// whole strings joined in order (Task 759, Tom 2026-10-03: one `?` by the x of each Analyze box).
 	function wireBoxDocking() {
 		[
 			['lpn_popup', {}, null, null],
 			['lpn_find_popup', findDockRec, saveFindLayout, LPN_FINDBOX_KEY],
 			['lpn_settings_box', setboxLayout, saveSetboxLayout, LPN_SETBOX_KEY],
 			['lpn_library_box', libboxLayout, saveLibboxLayout, LPN_LIBBOX_KEY],
-			['lpn_ff_box', ffboxLayout, saveFfboxLayout, LPN_FFBOX_KEY, 'lpn_ff_menu_tip'],
-			['lpn_crit_box', critLayout, null, null, 'lpn_crit_menu_tip'],
-			['lpn_ds_box', dsLayout, null, null, 'lpn_ds_menu_tip'],
+			['lpn_ff_box', ffboxLayout, saveFfboxLayout, LPN_FFBOX_KEY, ['lpn_ff_intro', 'lpn_ff_scope_tip']],
+			['lpn_crit_box', critLayout, null, null, ['lpn_crit_intro', 'lpn_crit_scope_tip']],
+			['lpn_ds_box', dsLayout, null, null, ['lpn_ds_intro', 'lpn_ds_scope_tip']],
 			['lpn_energy_box', energyboxLayout, saveEnergyboxLayout, LPN_ENERGYBOX_KEY],
 			['lpn_contour_box', contourboxLayout, saveContourboxLayout, LPN_CONTOURBOX_KEY],
 			['lpn_scncmp_box', cmpboxLayout, saveCmpboxLayout, LPN_CMPBOX_KEY],
@@ -60418,12 +60420,12 @@ var EngCalcs = EngCalcs || {};
 		host.innerHTML = '';
 		ffEl('p', 'lpn-ff-summary', text, host);
 	}
-	// One labelled row. The whole label text is the tip's target and not a one-character glyph --
-	// CLAUDE.md's tip-only nesting rule.
+	// One labelled row. A tip is an explanation, so it carries the `?` that every explanation does
+	// and opens from that glyph (Task 759: a tip with no glyph was the one-?-per-label defect).
 	function ffRow(parent, labelText, tip, control, unitText) {
-		var row = ffEl('div', 'lpn-ff-row', null, parent),
-			name = ffEl('span', null, labelText || '', row);
-		if (tip) { name.title = tip; name.className = 'ec-help'; }
+		var row = ffEl('div', 'lpn-ff-row', null, parent), name;
+		if (tip) { name = findHelpLabel(labelText || '', tip); row.appendChild(name); }
+		else { ffEl('span', null, labelText || '', row); }
 		row.appendChild(control);
 		ffEl('span', 'lpn-ff-unit', unitText || '', row);
 		return row;
@@ -60465,13 +60467,12 @@ var EngCalcs = EngCalcs || {};
 			clear;
 		if (!host) { return; }
 		host.innerHTML = '';
-		ffEl('p', 'lpn-ff-note', pc.lpn_ff_intro, host);
 
 		boxes.scope = ffSelect([
 			['all', pc.lpn_ff_all || 'All junctions'],
 			['selected', pc.lpn_ff_selected || 'Selected junctions']
 		], ask.scope);
-		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', pc.lpn_ff_scope_tip, boxes.scope, '');
+		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', null, boxes.scope, '');
 
 		boxes.required = ffInput(ask.required);
 		ffRow(host, pc.lpn_ff_required || 'Required fire flow', pc.lpn_ff_required_tip,
@@ -61369,13 +61370,12 @@ var EngCalcs = EngCalcs || {};
 			scope, minP, skip, buttons, run, stop, engine;
 		if (!host) { return; }
 		host.innerHTML = '';
-		ffEl('p', 'lpn-ff-note', pc.lpn_crit_intro, host);
 		scope = ffSelect([
 			['all', pc.lpn_crit_scope_all || 'All links'],
 			['selected', pc.lpn_crit_scope_selected || 'Selected links']
 		], critAsk.scope);
 		scope.addEventListener('change', function () { critAsk.scope = scope.value; });
-		ffRow(host, pc.lpn_crit_scope || 'Links to break', pc.lpn_crit_scope_tip, scope, '');
+		ffRow(host, pc.lpn_crit_scope || 'Links to break', null, scope, '');
 		skip = document.createElement('input');
 		skip.type = 'checkbox';
 		skip.checked = !!critAsk.skipDeadEnds;
@@ -61682,13 +61682,12 @@ var EngCalcs = EngCalcs || {};
 			scope, minP, mult, buttons, run, find, stop, engine, other;
 		if (!host) { return; }
 		host.innerHTML = '';
-		ffEl('p', 'lpn-ff-note', pc.lpn_ds_intro, host);
 		scope = ffSelect([
 			['all', pc.lpn_ds_scope_all || 'All junctions'],
 			['selected', pc.lpn_ds_scope_selected || 'Selected junctions']
 		], dsAsk.scope);
 		scope.addEventListener('change', function () { dsAsk.scope = scope.value; buildDemandScaleControls(); });
-		ffRow(host, pc.lpn_ds_scope || 'Junctions to scale', pc.lpn_ds_scope_tip, scope, '');
+		ffRow(host, pc.lpn_ds_scope || 'Junctions to scale', null, scope, '');
 		minP = ffInput(critFireFlowAsk().minPressure);
 		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
 		ffRow(host, pc.lpn_ds_minpressure || 'Lowest pressure allowed', pc.lpn_ds_minpressure_tip,
