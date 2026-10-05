@@ -511,6 +511,20 @@
    "words": "feat/profile-file: lose, merge, and delete branch.",
    "context": "Pasted message of 2026-10-05; 'lose' is his typo for 'Close', the same words he used for dock-flag-order in the line above it.",
    "pin_note": "Pinned to the head the preview served when he tested it."
+  },
+  "feat/times-statistic": {
+   "head": "709593254a766c2a495f056a37f6c2990065d525",
+   "date": "2026-10-06",
+   "words": "feat/times-statistic: Everything works. Range should have been called Spread, I think. But I am not sure, and I don't know what to do about it. Close, merge, and delete branch.",
+   "context": "Pasted message, answering the 2026-10-05 handoff's list of branches awaiting him.",
+   "pin_note": "Pinned to the head the preview served when he tested it."
+  },
+  "feat/find-source": {
+   "head": "e999a37841008beb90d2b0ac682140036221e7a6",
+   "date": "2026-10-06",
+   "words": "feat/find-source: Close, merge, and delete branch.",
+   "context": "Same pasted message.",
+   "pin_note": "Pinned to the head the preview served when he tested it."
   }
  }
 }
