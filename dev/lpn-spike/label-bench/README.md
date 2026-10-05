@@ -150,7 +150,8 @@ Every scene here shares one fixed 1400x900 canvas, so this is one number (675) f
 ## Generated and published networks (round 5 on)
 
 - `generator.js` makes a network of any size and shape on demand (families grid, tree, suburban,
-  downtown; 50 to 5,000+ nodes; ID styles short, epanet, long, mixed; field sets id, novato, full),
+  downtown; 50 to 20,000 nodes; ID styles short, epanet, long, mixed; field sets id, novato, full;
+  bent pipes and valves as factors, `bends` and `valves`),
   exactly reproducible from (family, parameters, seed). `node generator.js --family grid --n 500
   --seed 1 --stats` describes one.
 - `networks/` holds published utility-scale networks with open licences (L-Town, C-Town; licences
