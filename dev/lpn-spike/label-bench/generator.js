@@ -421,6 +421,9 @@ function generate(specIn) {
 				_roughness: 130, _length: 0, lenAuto: false, _status: 'open', _k: 0, valveType: 'TCV', _setting: 0 });
 			return;
 		}
+		// **A VERTEX IS {x, y}**, as the app stores it (linkPointList() in js/looped-network.js reads
+		// `.x` and `.y`). Until round 6 this wrote [x, y] pairs, which the app read as NaN: every
+		// "bent" pipe of round 5 ran through a vertex at no position (null in the scene files).
 		const verts = [];
 		if (s.bends === 'many') {
 			// A street that curves: 1 to 3 vertices on a sine arc off the chord, a little jittered.
@@ -428,17 +431,17 @@ function generate(specIn) {
 				const nx = -(b.y - a.y) / L, ny = (b.x - a.x) / L;
 				for (let i = 1; i <= kb; i++) {
 					const t = i / (kb + 1), o = (amp * Math.sin(Math.PI * t) + jb[i - 1]) * L;
-					verts.push([r2(a.x + (b.x - a.x) * t + nx * o), r2(a.y + (b.y - a.y) * t + ny * o)]);
+					verts.push({ x: r2(a.x + (b.x - a.x) * t + nx * o), y: r2(a.y + (b.y - a.y) * t + ny * o) });
 				}
 			}
 		} else if (s.bends === 'family' && g.curvy && v < g.curvy && L > 0.8 * D) {
 			// One bend, a quarter of the length off the straight line at most.
 			const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, nx = -(b.y - a.y) / L, ny = (b.x - a.x) / L;
-			verts.push([r2(mx + nx * off * L), r2(my + ny * off * L)]);
+			verts.push({ x: r2(mx + nx * off * L), y: r2(my + ny * off * L) });
 		}
 		let len = L;
 		if (verts.length) {
-			const path = [[a.x, a.y]].concat(verts, [[b.x, b.y]]);
+			const path = [[a.x, a.y]].concat(verts.map(function (q) { return [q.x, q.y]; }), [[b.x, b.y]]);
 			len = 0;
 			for (let i = 1; i < path.length; i++) { len += Math.hypot(path[i][0] - path[i - 1][0], path[i][1] - path[i - 1][1]); }
 		}
