@@ -18524,9 +18524,17 @@ var EngCalcs = EngCalcs || {};
 		];
 		// A row is offered only where it can match, which is the standing honesty rule: a property
 		// that silently matches nothing does not go in the menu.
+		// **THE SOURCE SCOPE OFFERS WHAT EVERY KIND OF NODE SHARES, PLUS ITS THREE** (Perry's
+		// review, 2026-10-05): a source is a junction, a reservoir or a tank, so a junction-only or
+		// tank-only property would be offered where it can silently match nothing. Water age under
+		// trace mode is read as "Source share", a second meaning of the word in one menu, so it is
+		// left out there too; so is Connectivity, whose conditions say "path to a source".
+		var SOURCE_SCOPE_KEYS = { elev: 1, initQuality: 1, sourceType: 1, sourceQuality: 1, sourcePattern: 1,
+			demandActual: 1, head: 1, pressure: 1, quality: 1 };
 		function offer(list) {
 			list.forEach(function (f) {
 				var key = f[0];
+				if (d.source && (!SOURCE_SCOPE_KEYS[key] || (key === 'quality' && qualityMode() === 'trace'))) { return; }
 				if (key === 'demandCategory' || key === 'fireFlow') {
 					if (d.group !== 'node' || (d.type && d.type !== 'junction')) { return; }
 				} else if (key === 'initQuality') {
@@ -18603,7 +18611,7 @@ var EngCalcs = EngCalcs || {};
 			out.push(['axis1', axn.first, null]);
 			out.push(['axis2', axn.second, null]);
 		}
-		if (d.key === 'all' || d.group === 'node') {
+		if (d.key === 'all' || (d.group === 'node' && !d.source)) {
 			out.push(['connection', pc.lpn_find_prop_connection || 'Connectivity', 'Connection']);
 		}
 		return out;
@@ -20256,6 +20264,12 @@ var EngCalcs = EngCalcs || {};
 		findAstLeafProps(ast.a, out); findAstLeafProps(ast.b, out);
 		return out;
 	}
+	// Is every condition in this query on the one scope `key`?
+	function findAstAllScope(ast, key) {
+		if (!ast) { return false; }
+		if (ast.t === 'cond') { return ast.scope === key; }
+		return findAstAllScope(ast.a, key) && findAstAllScope(ast.b, key);
+	}
 	function findQueryProps() {
 		if (findQueryAst) { return findAstLeafProps(findQueryAst, {}); }
 		var out = {};
@@ -20285,7 +20299,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {},
 			text = findQueryInput ? findQueryInput.value : findQueryString(),
 			single = findQueryAst ? null : paneTableForScope(findState.scope),
-			run, props, firstId = null, rows = [];
+			run, props, firstId = null, rows = [], srcOnly;
 		run = findSelectByQuery(text);
 		// An unreadable line filters NOTHING and says why. Hiding every row on a query we could not
 		// read would be a wrong answer wearing a confident face -- findRunQuery()'s own rule.
@@ -20299,8 +20313,13 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		props = findQueryProps();
+		srcOnly = findQueryAst ? findAstAllScope(findQueryAst, 'source') : findState.scope === 'source';
 		paneTables().forEach(function (spec) {
-			if (!findQueryAppliesToTable(props, spec)) { return; }
+			// **A SOURCE-SCOPE FILTER IS FOR THE NODE TABLES ALONE** (Perry's review): the Junction,
+			// Reservoir and Tank tables each show the members of the scope that are their own
+			// nodes, and every other table is left exactly as it was. No table's own scope offers
+			// the source properties, so the usual applicability test is not asked of it.
+			if (srcOnly ? spec.group !== 'node' : !findQueryAppliesToTable(props, spec)) { return; }
 			paneSetFilter(spec.id, String(text).trim());
 			if (!firstId) { firstId = spec.id; }
 			rows.push(findFilterRowText(spec));
@@ -20474,6 +20493,13 @@ var EngCalcs = EngCalcs || {};
 				head.textContent = !findResultsCompound && findPropIsConnection(findState.prop)
 					? (pc.lpn_find_conn_none || 'Every node is connected.')
 					: (pc.lpn_find_none || 'Nothing matched.');
+				// **A SOURCE SCOPE THAT IS EMPTY BECAUSE NO CHEMICAL IS TRACKED SAYS SO**: the doses
+				// are still stored and exported, but only a chemical run uses them.
+				if ((findQueryAst ? findAstAllScope(findQueryAst, 'source') : findScopeDef(findState.scope).source)
+						&& qualityMode() !== 'chemical' && !(doc.nodes || []).some(function (n) { return nodeSource(n) !== undefined; })) {
+					head.textContent += ' ' + (pc.lpn_find_source_no_chemical
+						|| 'No chemical is being tracked, so no node has a source.');
+				}
 				box.appendChild(head);
 			}
 			return;
@@ -20875,8 +20901,16 @@ var EngCalcs = EngCalcs || {};
 			cands = findCandidates();
 		}
 		if (!cands.length) { return []; }
+		// Under the Source scope the form offers only the properties Find offers there, so the two
+		// menus agree (a typed compound query is not a Source scope and is left as it was).
+		var srcKeys = null;
+		if (!findQueryAst && findScopeDef(findState.scope).source) {
+			srcKeys = {};
+			findPropDefs().forEach(function (pd) { srcKeys[pd[0]] = true; });
+		}
 		return pushSpecList().concat(replaceExtraSpecs()).concat(customerReplaceSpecs())
 			.concat(labelReplaceSpecs()).concat(nodeCoordReplaceSpecs()).filter(function (s) {
+			if (srcKeys && !srcKeys[s.field]) { return false; }
 			return cands.some(function (c) { return replaceSpecGroupOk(s, c.group) && s.applies(c.el); });
 		});
 	}

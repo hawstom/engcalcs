@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**57 still to read on master**, of 110 untranslated keys, of 2338 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**58 still to read on master**, of 111 untranslated keys, of 2339 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -294,7 +294,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (110, 57 to read @@ NEEDS RULING)
+## lpn_  (111, 58 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -482,6 +482,9 @@ never edits a synonym.
 - **`lpn_find_scope_source`**
   > Source
   @@ NEEDS RULING
+- **`lpn_find_source_no_chemical`**
+  > No chemical is being tracked, so no node has a source.
+  @@ NEEDS RULING
 - **`lpn_inp_drop_pressure_unit`**
   > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
   @@ NEEDS RULING
@@ -650,7 +653,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/engine-prefetch (`3194c30d`) — adds no English strings
 
-### feat/find-source (`2f2ea398`) — adds no English strings
+### feat/find-source (`e184bf40`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 

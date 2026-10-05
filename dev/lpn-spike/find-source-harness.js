@@ -66,6 +66,19 @@ const L = loadLoopedNetwork(
 	"\t\tselectResults: function () { selectAndZoomTo(findResults.map(function (c) { return { group: c.group, id: c.el.id }; })); },\n" +
 	"\t\tclearSel: function () { setSelectionList([]); },\n" +
 	"\t\tsetProp: setProp, scopeKeys: function () { return findScopeDefs().map(function (d) { return d.key; }); },\n" +
+	"\t\topenPane: openPane, renderTable: function (id) { renderPaneTable(paneTableById(id)); },\n" +
+	"\t\ttableOrder: function (id) { return paneTableRowsInOrder(paneTableById(id)).map(function (e) { return e.id; }); },\n" +
+	"\t\tfilterQuery: function (id) { return paneFilterQuery(paneTableById(id)); },\n" +
+	"\t\tsetFilter: function (id, q) { paneSetFilter(id, q); },\n" +
+	"\t\tpressFilter: function () { var b = null;\n" +
+	"\t\t\t(function walk(e) { if (e.id === 'lpn_find_filter_go') { b = e; }\n" +
+	"\t\t\t\t(e.children || []).forEach(walk); })(document.getElementById('lpn_find_form'));\n" +
+	"\t\t\tif (!b) { throw new Error('no filter button'); }\n" +
+	"\t\t\t(b._listeners.click || []).forEach(function (f) { f({}); }); },\n" +
+	"\t\tresultsText: function () { var t = '';\n" +
+	"\t\t\t(function walk(e) { t += (e.textContent || '') + ' '; (e.children || []).forEach(walk); })(document.getElementById('lpn_find_results'));\n" +
+	"\t\t\treturn t; },\n" +
+	"\t\tsetQuality: function (m) { settings.quality = { mode: m }; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -137,6 +150,7 @@ const FIXTURE = [
 	'[END]', ''
 ].join('\n');
 L.importInp({ name: 'src.inp', _text: FIXTURE });
+function load2() { L.importInp({ name: 'src.inp', _text: FIXTURE }); }
 function sortq(a) { return a.slice().sort(); }
 
 head('1. THE SCOPE EXISTS IN FIND ONLY');
@@ -152,6 +166,11 @@ ok('Junction scope is unchanged (3 junctions)', same(L.query('junction', 'id', '
 
 head('3. ITS PROPERTIES');
 const keys = L.propKeys('source');
+ok('trimmed to what every node shares plus the three',
+	keys.join(',') === 'id,desc,tag,elev,initQuality,sourceType,sourceQuality,sourcePattern,demandActual,head,pressure,quality,axis1,axis2',
+	JSON.stringify(keys));
+ok('no Connectivity, no junction-only or tank-only property',
+	!keys.some(function (k) { return /connection|emitter|fireFlow|demandCategory|level|mixing|tankDiameter|^demand$/i.test(k); }));
 ['sourceType', 'sourceQuality', 'sourcePattern', 'id', 'elev'].forEach(function (k) {
 	ok(k + ' offered under Source', keys.indexOf(k) >= 0, JSON.stringify(keys));
 });
@@ -199,6 +218,40 @@ L.buildForm();
 ok('no replace spec writes source type, quality or pattern',
 	!L.specFields().some(function (f) { return /^source/.test(f); }), JSON.stringify(L.specFields()));
 ok('it does offer node properties', L.specFields().indexOf('desc') >= 0, JSON.stringify(L.specFields()));
+
+head('8. FILTER IN TABLE UNDER SOURCE: node tables only, every other table untouched');
+load2();
+L.openPane('pipes'); L.openPane('junctions'); L.openPane('reservoirs'); L.openPane('tanks');
+L.setFilter('pipes', "Pipe.ID contains 'P'");
+const pipesBefore = L.tableOrder('pipes');
+L.setFilter('junctions', "Junction.ID contains 'zzz'");
+L.buildForm();
+L.type('Source.Source quality above 1');
+L.pressFilter();
+ok('Junctions shows J2 only', same(L.tableOrder('junctions'), ['J2']), JSON.stringify(L.tableOrder('junctions')));
+ok('Tanks shows T1', same(L.tableOrder('tanks'), ['T1']), JSON.stringify(L.tableOrder('tanks')));
+ok('Reservoirs shows none (R1 is below 1)', L.tableOrder('reservoirs').length === 0, JSON.stringify(L.tableOrder('reservoirs')));
+ok('the stale Junctions filter was replaced', /Source/.test(L.filterQuery('junctions')), L.filterQuery('junctions'));
+ok('Pipes is untouched', L.filterQuery('pipes') === "Pipe.ID contains 'P'" && same(L.tableOrder('pipes'), pipesBefore));
+L.type('Source.Source quality above 0');
+L.pressFilter();
+ok('Source quality above 0: J2 / R1 / T1 only in their tables ' + JSON.stringify([L.tableOrder('junctions'), L.tableOrder('reservoirs'), L.tableOrder('tanks')]),
+	same(L.tableOrder('junctions'), ['J2']) && same(L.tableOrder('reservoirs'), ['R1']) && same(L.tableOrder('tanks'), ['T1']));
+ok('Pipes still untouched after Source.ID', L.filterQuery('pipes') === "Pipe.ID contains 'P'" && same(L.tableOrder('pipes'), pipesBefore));
+ok('Valves and Customers carry no filter', L.filterQuery('valves') === '' && L.filterQuery('customers') === '');
+
+head('9. THE EMPTY RESULT SAYS WHY WHEN NO CHEMICAL IS TRACKED');
+L.importInp({ name: 'plain.inp', _text: FIXTURE.replace(/\[SOURCES\][\s\S]*?\[QUALITY\]/, '[QUALITY]') });
+L.setQuality('none');
+L.buildForm();
+L.type('Source.Elevation above 0');
+L.pressFind();
+ok('no sources and no chemical: the reason is given', /No chemical is being tracked/.test(L.resultsText()), L.resultsText());
+L.setQuality('chemical');
+L.buildForm();
+L.type('Source.Elevation above 0');
+L.pressFind();
+ok('chemical tracked: just "Nothing matched"', !/No chemical/.test(L.resultsText()), L.resultsText());
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
 process.exit(fails ? 1 : 0);
