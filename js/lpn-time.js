@@ -437,9 +437,6 @@
 			noEngine: pageConfig.lpn_time_no_engine || 'The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. Connect to the internet one time to fetch the EPANET solver, which runs an extended period simulation.',
 			// The same note for a failure that is NOT a missing network: {reason} is one of the three below.
 			noEngineWhy: pageConfig.lpn_time_no_engine_why || 'The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}',
-			whyFetch: pageConfig.lpn_time_engine_fetch_failed || 'The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.',
-			whyEngine: pageConfig.lpn_time_engine_start_failed || 'The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.',
-			whyRun: pageConfig.lpn_time_engine_run_failed || 'The EPANET run failed. That is a defect in this page; use the Something wrong here? link to report it',
 			slider: pageConfig.lpn_time_slider || 'Elapsed simulation time',
 			noPeriod: pageConfig.lpn_time_no_period || 'This project has no extended period simulation set, so there is only one moment to show. Set a Total run time in Settings, Calculation, Time to run an extended period simulation.',
 			first: pageConfig.lpn_time_first || 'Go to the start',
@@ -1108,7 +1105,7 @@
 	// sentence; 'fetch', 'engine' and 'run' say what actually went wrong and what to do about it.
 	function noEngineText(t) {
 		var S = strings(), why = state.failedWhy,
-			reason = why === 'fetch' ? S.whyFetch : why === 'engine' ? S.whyEngine : why === 'run' ? S.whyRun : null;
+			reason = (why && why !== 'offline' && EC.lpnEngineReason) ? EC.lpnEngineReason(why) : null;
 		return (reason ? S.noEngineWhy.replace('{reason}', reason) : S.noEngine).replace('{time}', EC.lpnTimeElapsedText(t));
 	}
 	EC.lpnTimeNoEngineText = function (t) { return noEngineText(t); };

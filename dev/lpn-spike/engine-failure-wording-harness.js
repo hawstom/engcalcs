@@ -26,7 +26,10 @@ const INJECT =
 	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
 	"\t\t\trubberBandEl = el('line', {}, world); },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, runSolve: runSolve,\n" +
-	"\t\twarmEpanetEngine: warmEpanetEngine, tsWaitingText: tsWaitingText,\n";
+	"\t\twarmEpanetEngine: warmEpanetEngine, tsWaitingText: tsWaitingText,\n" +
+	"\t\trefreshEpanetBanner: refreshEpanetBanner, runSolveEpanet: runSolveEpanet, assembleModel: assembleModel,\n" +
+	"\t\tsetEngineBannerTiming: function (a, b) {\n" +
+	"\t\t\tENGINE_BANNER_SHOW_DELAY_MS = a; ENGINE_BANNER_MIN_SHOWN_MS = b; },\n";
 
 let fails = 0;
 function ok(name, cond, extra) {
@@ -112,7 +115,7 @@ async function main() {
 		offline: sub(PC.lpn_time_no_engine, NOW),
 		fetch: sub(PC.lpn_time_no_engine_why.replace('{reason}', PC.lpn_time_engine_fetch_failed), NOW),
 		engine: sub(PC.lpn_time_no_engine_why.replace('{reason}', PC.lpn_time_engine_start_failed), NOW),
-		run: sub(PC.lpn_time_no_engine_why.replace('{reason}', PC.lpn_time_engine_run_failed), NOW)
+		run: sub(PC.lpn_time_no_engine_why.replace('{reason}', PC.lpn_time_engine_run_failed.replace('{wrong}', PC.lpn_wrong_btn)), NOW)
 	};
 	async function drive(err, onLine) {
 		setOnLine(onLine);
@@ -134,7 +137,11 @@ async function main() {
 	const offlineTail = PC.lpn_time_no_engine.slice(PC.lpn_time_no_engine.lastIndexOf('. ', PC.lpn_time_no_engine.length - 2) + 2);
 	ok('only the offline note tells the reader to go online',
 		exp.offline.indexOf(offlineTail) >= 0 && ['fetch', 'engine', 'run'].every((k) => exp[k].indexOf(offlineTail) < 0));
-	ok('the run sentence names the report link', PC.lpn_time_engine_run_failed.indexOf(PC.lpn_wrong_btn) >= 0);
+	ok('the run sentence carries a {wrong} placeholder, filled with this language\'s own link label',
+		PC.lpn_time_engine_run_failed.indexOf('{wrong}') >= 0 && exp.run.indexOf(PC.lpn_wrong_btn) >= 0 && exp.run.indexOf('{') < 0);
+	const savedBtn = PC.lpn_wrong_btn; PC.lpn_wrong_btn = 'Algo anda mal?';
+	ok('...and another language\'s label is the one named', EC.lpnEngineReason('run').indexOf('Algo anda mal?') >= 0);
+	PC.lpn_wrong_btn = savedBtn;
 
 	console.log('\n--- banner 2: lpn_engine_unavailable (valve network, download fails) ---');
 	const notice = global.document.getElementById('lpn_map_notice');
@@ -151,9 +158,62 @@ async function main() {
 	let n = await warm(false);
 	ok('offline keeps today\'s sentence', n === PC.lpn_engine_unavailable, JSON.stringify(n));
 	n = await warm(true);
-	ok('online, a blocked download says so', n === PC.lpn_engine_unavailable_fetch, JSON.stringify(n));
+	ok('online, a blocked download says so', n === PC.lpn_engine_unavailable_why.replace('{reason}', EC.lpnEngineReason('fetch')), JSON.stringify(n));
 	const tail2 = PC.lpn_engine_unavailable.slice(PC.lpn_engine_unavailable.lastIndexOf('. ', PC.lpn_engine_unavailable.length - 2) + 2);
 	ok('...and does not tell the reader to go online', n.indexOf(tail2) < 0);
+
+	console.log('\n--- lpn_engine_needed_failed and lpn_engine_failed ---');
+	const banner = global.document.getElementById('lpn_engine_banner');
+	const statusEl = global.document.getElementById('lpn_status_text') || global.document.getElementById('lpn_status');
+	async function needed(onLine) {
+		setOnLine(onLine);
+		const L3 = loadLoopedNetwork(INJECT);
+		L3.buildLayers(); L3.seedDefaultInputs(); L3.setEngineBannerTiming(0, 0);
+		const d = L3.getDoc();
+		d.nodes.push({ id: 'R1', type: 'reservoir', x: 0, y: 0, elev: 100 });
+		d.nodes.push({ id: 'J1', type: 'junction', x: 500, y: 0, elev: 0, _demand: 30 });
+		d.nodes.push({ id: 'J2', type: 'junction', x: 900, y: 0, elev: 0, _demand: 0 });
+		d.links.push({ id: 'L1', type: 'pipe', from: 'R1', to: 'J1', verts: [], _diameter: 200, _roughness: 130, _length: 1000, _k: 0, _status: 'open' });
+		d.links.push({ id: 'V1', type: 'valve', valveType: 'PRV', from: 'J1', to: 'J2', verts: [], _diameter: 200, _setting: 40, _k: 0, _status: 'open' });
+		EC.lpnEpanetLoad = () => Promise.reject(new Error('Failed to fetch dynamically imported module'));
+		banner.textContent = '';
+		L3.warmEpanetEngine('background');
+		await wait(20);
+		L3.refreshEpanetBanner();
+		return banner.textContent;
+	}
+	let b = await needed(false);
+	ok('offline, the PRV network banner keeps today\'s sentence', b === PC.lpn_engine_needed_failed, JSON.stringify(b));
+	b = await needed(true);
+	ok('online, it names the failed download instead', b === PC.lpn_engine_needed_failed_why.replace('{reason}', EC.lpnEngineReason('fetch')), JSON.stringify(b));
+	const offTail = PC.lpn_engine_needed_failed.slice(PC.lpn_engine_needed_failed.lastIndexOf('. ', PC.lpn_engine_needed_failed.length - 2) + 2);
+	ok('...and never tells an online visitor to connect', b.indexOf(offTail) < 0);
+
+	async function solveFail(err, onLine) {
+		setOnLine(onLine);
+		const L4 = loadLoopedNetwork(INJECT);
+		L4.buildLayers(); L4.seedDefaultInputs();
+		const d = L4.getDoc();
+		d.nodes.push({ id: 'R1', type: 'reservoir', x: 0, y: 0, elev: 100 });
+		d.nodes.push({ id: 'J1', type: 'junction', x: 500, y: 0, elev: 0, _demand: 30 });
+		d.links.push({ id: 'L1', type: 'pipe', from: 'R1', to: 'J1', verts: [], _diameter: 200, _roughness: 130, _length: 1000, _k: 0, _status: 'open' });
+		L4.settings().engine = 'epanet';
+		EC.lpnEpanetLoad = () => Promise.resolve({});
+		EC.lpnSolveEpanet = () => Promise.reject(err);
+		statusEl.textContent = '';
+		L4.runSolveEpanet(L4.assembleModel());
+		await wait(30);
+		return statusEl.textContent;
+	}
+	const fa = (k) => PC[k];
+	let st = await solveFail(errs.fetch, false);
+	ok('solve: offline keeps lpn_engine_failed', st === fa('lpn_engine_failed'), JSON.stringify(st));
+	for (const k of ['fetch', 'engine', 'run']) {
+		st = await solveFail(errs[k], true);
+		ok('solve: ' + k + ' failure says its own reason', st === fa('lpn_engine_failed_why').replace('{reason}', EC.lpnEngineReason(k)), JSON.stringify(st));
+	}
+	ok('...and no online variant tells the reader to connect',
+		['fetch', 'engine', 'run'].every((k) => fa('lpn_engine_failed_why').replace('{reason}', EC.lpnEngineReason(k)).indexOf('Connect') < 0));
 
 	console.log(fails ? '\n' + fails + ' failure(s)' : '\nall checks passed');
 	process.exit(fails ? 1 : 0);

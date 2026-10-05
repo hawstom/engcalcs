@@ -1194,6 +1194,18 @@
 	function stageOf(p, stage) { return p.then(null, function (err) { throw lpnStage(err, stage); }); }
 	// Which message a failed run earns. Offline is only ever a fetch that failed with the browser
 	// reporting no network; an engine or run failure while offline is still an engine or run failure.
+	// The sentence for a cause other than 'offline', from pageConfig. {wrong} in the run sentence is
+	// this language's own label of the one-tap report link, so every language names its own link.
+	EngCalcs.lpnEngineReason = function (why) {
+		var pc = EngCalcs.pageConfig || {};
+		if (why === 'fetch') { return pc.lpn_time_engine_fetch_failed || 'The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.'; }
+		if (why === 'engine') { return pc.lpn_time_engine_start_failed || 'The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.'; }
+		if (why === 'run') {
+			return (pc.lpn_time_engine_run_failed || 'The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.')
+				.replace('{wrong}', pc.lpn_wrong_btn || 'Something wrong here?');
+		}
+		return '';
+	};
 	EngCalcs.lpnEngineFailWhy = function (err) {
 		var stage = (err && err.lpnStage) || 'run';
 		if (stage === 'fetch' && typeof navigator !== 'undefined' && navigator.onLine === false) { return 'offline'; }
@@ -1372,7 +1384,7 @@
 	 * worse for a user staring at a drawing -- "node J7 is isolated behind a closed link" beats
 	 * "error 110" every time.
 	 */
-	EngCalcs.lpnSolveEpanet = function (model, options) {
+	function solveEpanetInner(model, options) {
 		var opts = options || {};
 		var issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
@@ -1385,7 +1397,7 @@
 		// **ONLY THIS CALL MAY REJECT**, and its rejection means the module could not be fetched or
 		// instantiated -- no engine. Everything after it is EPANET reading OUR network, and a throw
 		// there is a REFUSAL, which resolves instead. See engineRefusal().
-		return EngCalcs.lpnEpanetLoad(opts.moduleUrl).then(function (mod) {
+		return stageOf(EngCalcs.lpnEpanetLoad(opts.moduleUrl), 'fetch').then(function (mod) {
 			// Reuse the open Project when the model is still the same SHAPE; otherwise rebuild.
 			// getting this wrong in the reuse direction is the silent-stale-answer failure the
 			// section comment above is about, so the test is on the derived signature and on
@@ -1476,6 +1488,11 @@
 			closeSession();
 			return engineRefusal(e, {});
 		});
+	}
+	EngCalcs.lpnSolveEpanet = function (model, options) {
+		var p;
+		try { p = solveEpanetInner(model, options); } catch (e) { p = Promise.reject(e); }
+		return stageOf(p, 'run');
 	};
 
 

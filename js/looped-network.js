@@ -59803,6 +59803,9 @@ var EngCalcs = EngCalcs || {};
 	// keep every word they had. What the background fetch may still put on screen is the Part 2
 	// banner, and only for a network that cannot be solved without it; refreshEpanetBanner() owns
 	// that and asks the network, not the reason.
+	function warmFailedOffline() {
+		return !EngCalcs.lpnEngineFailWhy || EngCalcs.lpnEngineFailWhy({ lpnStage: 'fetch' }) === 'offline';
+	}
 	function warmEpanetEngine(why) {
 		var pc = EngCalcs.pageConfig || {},
 			quiet = (why === 'background'),
@@ -59827,11 +59830,11 @@ var EngCalcs = EngCalcs || {};
 			epanetWarmState = 'unavailable';
 			// This leg only downloads the module, so the cause is offline or a blocked download; a
 			// browser that refuses WebAssembly shows up in the run itself (lpn-time.js).
-			var offline = !EngCalcs.lpnEngineFailWhy || EngCalcs.lpnEngineFailWhy({ lpnStage: 'fetch' }) === 'offline';
+			var offline = warmFailedOffline();
 			if (!quiet) {
 				setNotice(offline
 					? (pc.lpn_engine_unavailable || 'Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.')
-					: (pc.lpn_engine_unavailable_fetch || 'The download of the EPANET solver failed, so valves that open and close on their own cannot be solved. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.'));
+					: (pc.lpn_engine_unavailable_why || 'Valves that open and close on their own cannot be solved without the EPANET solver. {reason}').replace('{reason}', EngCalcs.lpnEngineReason('fetch')));
 			}
 			if (window.console && console.warn) { console.warn('EPANET solver download failed:', err); }
 			refreshEpanetBanner();
@@ -59966,7 +59969,10 @@ var EngCalcs = EngCalcs || {};
 				// The one case where a failed background fetch IS the user's business: without the
 				// engine this network has no answers at all, so silence would be a blank page with
 				// no reason given.
-				base = pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.';
+				// The warm leg only downloads, so the cause is offline or a blocked download.
+				base = warmFailedOffline()
+					? (pc.lpn_engine_needed_failed || 'The EPANET solver has not yet been loaded, cannot be loaded, and this network can only be solved by it. It will be loaded when you are connected to the internet.')
+					: (pc.lpn_engine_needed_failed_why || 'This network can only be solved by the EPANET solver. {reason}').replace('{reason}', EngCalcs.lpnEngineReason('fetch'));
 			}
 		}
 		full = base;
@@ -63984,8 +63990,13 @@ var EngCalcs = EngCalcs || {};
 			// import can fail for reasons that have nothing to do with the network -- offline on
 			// a first use, a blocked module request -- and the native answer is just as correct.
 			lastSolveResult = null;
-			setStatus(pc.lpn_engine_failed || 'The EPANET solver could not be loaded. Showing the built-in solver instead.');
+			// The native answer is drawn FIRST: applySolveResult() owns the status bar, so a message
+			// written before it is overwritten by it (as in the refusal branch above).
 			applySolveResult(EngCalcs.lpnSolve(model, { tol: solveAccuracy() }));
+			var failWhy = EngCalcs.lpnEngineFailWhy ? EngCalcs.lpnEngineFailWhy(err) : 'offline';
+			setStatus(failWhy === 'offline'
+				? (pc.lpn_engine_failed || 'The EPANET solver could not be loaded. Showing the built-in solver instead.')
+				: (pc.lpn_engine_failed_why || '{reason} Showing the built-in solver instead.').replace('{reason}', EngCalcs.lpnEngineReason(failWhy)));
 			if (window.console && console.warn) { console.warn('EPANET engine load/solve failed:', err); }
 		});
 	}
