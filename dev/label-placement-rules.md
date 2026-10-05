@@ -60,13 +60,16 @@ pipe is medium-low cost; leader on pipe is very low cost. A label on a customer 
 #### Time and change
 
 - **R10. Placement never slows a pan or zoom while it's under way. A layout's cost depends on what is
-  on the screen, not on how big the network is.** (Second sentence added 2026-09-30 from round 5.)
+  on the screen, not on how big the network is. After a zoom settles, labels are back within about
+  one second on a network of any size; if the layout is not finished by then, show what is placed
+  and keep improving it.** (Second sentence from round 5, confirmed by Tom 2026-10-06; the bound is
+  his number, chosen 2026-10-06.)
 - **R11. When zooming in frees room, dropped properties and hidden labels come back.**
 - **R13. The layout always reflects the current network, text and settings.**
 - **R15. Avoid showing the user drastic shifts.** For example, when jumping into an untested
   (unfamiliar) view, hide the labels immediately while you calculate positions instead of showing
   them in unconfirmed positions while you calculate placements. This is to avoid showing the user
-  a drastic shift once you finish calculation.
+  a drastic shift once you finish calculation. The hiding lasts no longer than R10's one second.
 
 ### 4. Hints (may use or ignore)
 
@@ -300,3 +303,21 @@ you to write the rules for the new builds starting with (a) Hang the same column
 shared east edge and every ID grows west, into the empty ground you pointed at. No row is held and
 no gap is needed. Both rules then pass. (b) Treat free space as fundamental; Use space well. That
 is not only human, it is biological; it is real."*
+
+### Round 5 proposals, his answers, 2026-10-06
+
+- **R10 scale sentence:** yes, as written. **The bound after a zoom settles:** one second.
+- **R11 tightened to "zooming in never hides a row that was showing":** no.
+- **A definition of "convenient available space":** no. *"No. This is micromanagement. This is what
+  we are running this experiment for. If they all converge on a rule like this, let's stand amazed.
+  If not, let's hold our peace."*
+- **R1 "dropped for lack of room, never by a count or a rank":** to be reworked and brought back.
+  *"Rethink this, reword this, refine this, and bring it back to me. I can see that it is
+  fundamental (discretionary environmental constraint, not a control knob), not to be discovered.
+  But I don't know what it's saying."*
+- **Bench: bent pipes, valves, large networks, fresh secret scenes every round:** yes.
+- **At dense zooms, bare IDs or no labels:** *"We can't hard-code a rule like this. In the current
+  default settings, ID is the first thing to drop. Since the user decides drop order (meaning they
+  really want to see what they asked for), it might be best to prioritize more labels with a single
+  value left than less labels with more values left."* Not yet a rule; round 6 should test it.
+
