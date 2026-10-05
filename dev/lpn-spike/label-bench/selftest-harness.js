@@ -253,5 +253,28 @@ if (sets.length) {
 		JSON.stringify(mast.r14));
 }
 
+// ---- a scene with a missing or non-numeric coordinate is refused ------------------------------------
+// (Round 5's generated pipes had vertices that were NaN in the page and null in the file; arithmetic
+// read them as 0 and nobody saw it for a whole round.)
+{
+	const fs = require('fs'), os = require('os');
+	const all = loadSets(path.join(__dirname, 'scenes'));
+	report(all.length >= 6, 'every committed scene set loads, so every committed coordinate is a finite number', all.map(function (x) { return x.id; }).join(', '));
+	const raw = JSON.parse(fs.readFileSync(path.join(__dirname, 'scenes', 'net1.json'), 'utf8'));
+	const bent = JSON.parse(JSON.stringify(raw));
+	const L = bent.steps[0].links[0];
+	L.points.splice(1, 0, [null, null]);   // what JSON makes of a NaN vertex
+	const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bench-refuse-'));
+	fs.writeFileSync(path.join(dir, 'bad.json'), JSON.stringify(bent));
+	let refused = '';
+	try { loadSets(dir); } catch (e) { refused = e.message; }
+	fs.rmSync(dir, { recursive: true, force: true });
+	report(/refused/.test(refused) && refused.indexOf('link ' + L.id) >= 0, 'a scene with a null pipe vertex is refused, naming the link', refused);
+	const noAnchor = JSON.parse(JSON.stringify(raw)).steps[0];
+	noAnchor.labels[0].anchor = { x: NaN, y: 10 };
+	const why = require('./contract.js').sceneProblem(noAnchor);
+	report(!!why && why.indexOf(noAnchor.labels[0].id) >= 0, 'a label anchor that is not a number is refused', why);
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed.`);
 process.exit(failures ? 1 : 0);

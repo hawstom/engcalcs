@@ -22,6 +22,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { scoreView, stability, zoomRowChange } = require('./score.js');
+const C = require('./contract.js');
 
 // The crossing costs, worst to least (dev/label-placement-rules.md §3, "Costs, worst first").
 // Builders get the order only (Tom's ruling of 2026-09-28): score.js counts each crossing by its
@@ -49,7 +50,14 @@ function loadSets(dir, only) {
 	return fs.readdirSync(dir).filter(function (f) { return /\.json$/.test(f); }).sort()
 		.map(function (f) { return JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8')); })
 		.filter(function (s) { return !only || only.indexOf(s.id) >= 0; })
-		.map(function (s) { s.steps.forEach(withRepeatSpacing); return s; });
+		.map(function (s) {
+			s.steps.forEach(function (sc) {
+				const bad = C.sceneProblem(sc);
+				if (bad) { throw new Error('scene refused (missing or non-numeric coordinate): ' + bad); }
+			});
+			s.steps.forEach(withRepeatSpacing);
+			return s;
+		});
 }
 function loadPlacer(p) {
 	const mod = typeof p === 'string' ? require(path.resolve(p)) : p;

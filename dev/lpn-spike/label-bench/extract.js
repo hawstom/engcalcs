@@ -302,6 +302,12 @@ async function extractSet(set) {
 }
 
 function writeJson(file, obj) {
+	// A scene set is refused before it is written if any coordinate is missing or not a number.
+	(obj.steps || []).forEach(function (st) {
+		if (!st.nodes) { return; }
+		const bad = require('./contract.js').sceneProblem(st);
+		if (bad) { throw new Error('scene refused (missing or non-numeric coordinate): ' + bad); }
+	});
 	fs.writeFileSync(file, JSON.stringify(obj, null, 0).replace(/\},\{"id"/g, '},\n{"id"') + '\n');
 }
 

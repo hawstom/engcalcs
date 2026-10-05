@@ -251,5 +251,45 @@ function polylineLength(pts) {
 	return d;
 }
 
-module.exports = { EPS, blockSize, placementBoxes, invalidReason, corners, rectToOBox, boxesOverlap,
+// **A SCENE WITH A MISSING OR NON-NUMERIC COORDINATE IS REFUSED.** Round 5 ran a whole round on
+// generated pipes whose vertices were NaN in the page and null in the scene file; arithmetic read
+// them as 0, so those pipes ran to the corner of the screen and nobody saw it. Returns the first
+// problem found, as a sentence, or null when every coordinate is a finite number.
+function sceneProblem(scene) {
+	function num(v) { return typeof v === 'number' && isFinite(v); }
+	function rect(r, what) { return r && num(r.x) && num(r.y) && num(r.w) && num(r.h) ? null : what + ' is not four finite numbers'; }
+	function obox(b, what) { return b && num(b.cx) && num(b.cy) && num(b.w) && num(b.h) && num(b.angle || 0) ? null : what + ' is not a finite box'; }
+	function pts(a, what) {
+		if (!Array.isArray(a) || !a.length) { return what + ' has no points'; }
+		for (let i = 0; i < a.length; i++) { if (!a[i] || !num(a[i][0]) || !num(a[i][1])) { return what + ' point ' + i + ' is ' + JSON.stringify(a[i]); } }
+		return null;
+	}
+	const id = (scene && scene.id) || '?';
+	let p = rect(scene && scene.viewport, id + ': viewport');
+	if (p) { return p; }
+	const v = scene.view;
+	if (!v || !num(v.s) || !num(v.tx) || !num(v.ty)) { return id + ': view is not finite'; }
+	for (const n of scene.nodes || []) {
+		if (!num(n.x) || !num(n.y)) { return id + ': node ' + n.id + ' is at ' + JSON.stringify([n.x, n.y]); }
+		if ((p = rect(n.symbol, id + ': node ' + n.id + ' symbol'))) { return p; }
+	}
+	for (const l of scene.links || []) {
+		if ((p = pts(l.points, id + ': link ' + l.id))) { return p; }
+		for (const b of (l.symbols || []).concat(l.arrows || [])) { if ((p = obox(b, id + ': link ' + l.id + ' symbol or arrow'))) { return p; } }
+	}
+	for (const t of scene.texts || []) {
+		if ((p = obox(t.box, id + ': text ' + t.id))) { return p; }
+		if (t.leader && (p = pts(t.leader, id + ': text ' + t.id + ' leader'))) { return p; }
+	}
+	for (const c of scene.customers || []) { if ((p = rect(c.box, id + ': customer ' + c.id))) { return p; } }
+	for (const f of scene.furniture || []) { if ((p = rect(f, id + ': furniture'))) { return p; } }
+	for (const r of scene.labels || []) {
+		if (!r.anchor || !num(r.anchor.x) || !num(r.anchor.y)) { return id + ': label ' + r.id + ' anchor is ' + JSON.stringify(r.anchor); }
+		if (r.hand && (!num(r.hand.x) || !num(r.hand.y))) { return id + ': label ' + r.id + ' hand point is ' + JSON.stringify(r.hand); }
+		for (const row of r.rows || []) { if (!num(row.w) || !num(row.h)) { return id + ': label ' + r.id + ' row ' + row.field + ' has no measured size'; } }
+	}
+	return null;
+}
+
+module.exports = { sceneProblem, EPS, blockSize, placementBoxes, invalidReason, corners, rectToOBox, boxesOverlap,
 	segsCross, segHitsBox, distToSeg, distToPolyline, distToOBox, polylineLength, pointInOBox };
