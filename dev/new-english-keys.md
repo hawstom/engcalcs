@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**15 still to read on master**, of 125 untranslated keys, of 2353 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**15 still to read on master**, of 125 untranslated keys, of 2351 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (2 to read @@ NEEDS RULING)
+## Questions from the translators  (1 to read @@ NEEDS RULING)
 
 **These are SHIPPED strings, already translated into 26 languages.** A wave-0
 reading or a translator found each one readable two ways, and no sprint launches while one is
@@ -38,17 +38,6 @@ is the one you meant. "The first one" is a complete answer.
   **What this asks for:** which of the readings above you meant.
   *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
   @@ NEEDS RULING
-
-### from sprint 1003b-wave0
-
-- **`lpn_notes_4_def`**
-  > A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.
-  *The finding:* 'lists the junctions' says neither where nor what; 'route' where the Graphs tip says 'path'; 'sit on real ground' is idiom; the bottom panel is called a pane elsewhere (Looped-Network.php:1855 renders it as one About-box paragraph)
-  1. the bottom panel lists every junction with its results
-  2. the bottom panel lists only the junctions along the profile route
-  **What this asks for:** which of the readings above you meant.
-  *The proposal:* PROPOSED: 'A project can be placed on real ground with a street map behind it. EPANET .inp files can be read and written. The bottom pane plots a profile along a path and tabulates the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.'
-  _Ruled 2026-10-05: For the record, I find this "Notes" box, and this section in particular, to be embarrassing. What's it's purpose? Maybe I need to edit lang.ec.en.php. Is there a compelling reason why we can't remove this section or the entire box? If it matters, every section should be an important advisory, not fluff like this._
 
 ## Synonym entries to approve  (3, 1 to read @@ NEEDS RULING)
 
@@ -466,7 +455,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**4 still to read**, of 7 new keys across 14 unmerged branch(es).
+**5 still to read**, of 8 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -476,8 +465,6 @@ Each branch carries the commit it was read at. This part is a SNAPSHOT and is no
 fresh by the build — a branch moves whenever anybody commits on it, and failing master's
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
-
-### chore/handoff-1006 (`3d88b981`) — adds no English strings
 
 ### feat/bentley-interop (`beedec3f`) — 2 new, 2 to read @@ NEEDS RULING
 
@@ -489,8 +476,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04`) — adds no English strings
-
-### feat/engine-prefetch (`3194c30d`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -514,10 +499,11 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/notes-trim (`53d149d2`) — adds no English strings
+### feat/scenario-table (`8bdc2945`) — 3 new, 3 to read @@ NEEDS RULING
 
-### feat/scenario-table (`4a5cf9fd`) — 2 new, 2 to read @@ NEEDS RULING
-
+- **`lpn_pane_clear_override`**
+  > Clear override
+  @@ NEEDS RULING
 - **`lpn_pane_scn_alt_tip`**
   > {category} alt.: {alternative}
   @@ NEEDS RULING
@@ -526,5 +512,3 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### feat/tip-door (`80e7e1a5`) — adds no English strings
-
-### feat/transport-ends (`40ef582f`) — adds no English strings
