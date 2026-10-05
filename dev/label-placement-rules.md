@@ -315,6 +315,9 @@ is not only human, it is biological; it is real."*
   *"Rethink this, reword this, refine this, and bring it back to me. I can see that it is
   fundamental (discretionary environmental constraint, not a control knob), not to be discovered.
   But I don't know what it's saying."*
+  **Reworded and brought back; Tom, 2026-10-05: yes.** The rule: *"Hide a label only because there
+  is no room for it on screen. Never hide it because of how many labels are already showing."*
+  Tom: *"Yes. This seems so obvious as to be trivial."*
 - **Bench: bent pipes, valves, large networks, fresh secret scenes every round:** yes.
 - **At dense zooms, bare IDs or no labels:** *"We can't hard-code a rule like this. In the current
   default settings, ID is the first thing to drop. Since the user decides drop order (meaning they
