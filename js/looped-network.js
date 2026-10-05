@@ -4854,7 +4854,7 @@ var EngCalcs = EngCalcs || {};
 	var treeCache = null;
 	function treeState() {
 		if (!treeCache || treeCache.epoch !== treeEpoch || treeCache.doc !== doc || treeCache.scenarios !== scenarios) {
-			treeCache = { epoch: treeEpoch, doc: doc, scenarios: scenarios, explicit: treeIsStored(), ov: {}, st: {} };
+			treeCache = { epoch: treeEpoch, doc: doc, scenarios: scenarios, explicit: treeIsStored(), ov: {}, st: {}, grp: {} };
 		}
 		return treeCache;
 	}
@@ -4887,8 +4887,117 @@ var EngCalcs = EngCalcs || {};
 		if (!Object.prototype.hasOwnProperty.call(c.st, scn.id)) { c.st[scn.id] = buildResolvedSettings(scn); }
 		return c.st[scn.id];
 	}
-	function buildResolvedOverrides(scn) { return scn.overrides || {}; }
-	function buildResolvedSettings(scn) { return plainObject(scn.settings) ? scn.settings : null; }
+	// A scenario's parent: the one it names, else Base. Base has none.
+	function parentScenarioOf(s) {
+		var p;
+		if (!s || s.isBase) { return null; }
+		p = s.parent !== undefined ? scenarioById(s.parent) : null;
+		return (p && p !== s) ? p : baseScenario();
+	}
+	/**
+	 * **THE CHAIN ONE CATEGORY RESOLVES THROUGH, NEAREST FIRST**, Base excluded (its values are the
+	 * elements' and the project's own): the scenario itself (its implicit alternative, `s1:demand`),
+	 * then -- if it names a stored alternative (a calculation set, for Calculation) -- that record
+	 * and its parents; otherwise its parent scenario's chain, so a child of Peak Hour that holds a
+	 * local demand is a child of Peak Hour's RESOLVED demand alternative, not of Base's. Each entry
+	 * is {kind: 'scn' | 'alt' | 'calc', obj}. Loop-proof, for a file that was hand-edited.
+	 */
+	function treeLayers(s, cat) {
+		var out = [], seen = {}, named, isCalc = cat === 'calculation';
+		while (s && !s.isBase && !seen[s.id]) {
+			seen[s.id] = true;
+			out.push({ kind: 'scn', obj: s });
+			named = isCalc ? s.calc : (s.alternatives ? s.alternatives[cat] : undefined);
+			if (named !== undefined) { return out.concat(storedChain(isCalc ? 'calc' : 'alt', named, cat)); }
+			s = parentScenarioOf(s);
+		}
+		return out;
+	}
+	function storedChain(kind, id, cat) {
+		var list = kind === 'calc' ? doc.calcSets : doc.alternatives, out = [], seen = {}, r = storedById(list, id);
+		while (r && !seen[r.id] && (kind === 'calc' || r.category === cat)) {
+			seen[r.id] = true;
+			out.push({ kind: kind, obj: r });
+			r = (r.parent === null || r.parent === undefined) ? null : storedById(list, r.parent);
+		}
+		return out;
+	}
+	// One layer's element values grouped by category, {cat: [[key, prop, value]]}, once per epoch.
+	function layerValuesByCategory(layer) {
+		var c = treeState(), id = layer.kind + '\u0000' + layer.obj.id, map, out;
+		if (c.grp[id]) { return c.grp[id]; }
+		out = {};
+		map = layer.kind === 'scn' ? layer.obj.overrides : (layer.kind === 'alt' ? layer.obj.values : null);
+		Object.keys(plainObject(map) ? map : {}).forEach(function (key) {
+			var group = ovKeyGroup(key), ov = map[key];
+			Object.keys(plainObject(ov) ? ov : {}).forEach(function (prop) {
+				var cat = categoryOf(prop, group);
+				(out[cat] = out[cat] || []).push([key, prop, ov[prop]]);
+			});
+		});
+		// Within one holder a whole list wins over its own row-0 `demand`, as effective() reads it.
+		if (out.demand) { out.demand.sort(function (x, y) { return (x[1] === 'demands' ? 0 : 1) - (y[1] === 'demands' ? 0 : 1); }); }
+		c.grp[id] = out;
+		return out;
+	}
+	// Nearest wins, per element and property. **THE DEMAND PAIR RESOLVES AS effective() READS IT**
+	// (R-369): a nearer whole list shadows a farther row-0 `demand`, and a nearer `demand` lays its
+	// base onto a farther list's row 0.
+	function putResolvedOverride(out, key, prop, v) {
+		var o = out[key] || (out[key] = {}), has = Object.prototype.hasOwnProperty;
+		if (has.call(o, prop)) { return; }
+		if (prop === 'demand' && has.call(o, 'demands')) { return; }
+		if (prop === 'demands' && has.call(o, 'demand') && Array.isArray(v) && v.length) {
+			v = altCopy(v);
+			v[0].base = o.demand;
+		}
+		o[prop] = v;
+	}
+	function buildResolvedOverrides(scn) {
+		var out = {};
+		if (scn.isBase) { return scn.overrides || {}; }
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			treeLayers(scn, cat).forEach(function (layer) {
+				(layerValuesByCategory(layer)[cat] || []).forEach(function (t) { putResolvedOverride(out, t[0], t[1], t[2]); });
+			});
+		});
+		return out;
+	}
+	// Nearest wins, per leaf; a leaf under one already set, or under an atomic object, is shadowed.
+	function putResolvedLeaf(out, p, v) {
+		var node = out, i, has = Object.prototype.hasOwnProperty;
+		for (i = 0; i < p.length - 1; i++) {
+			if (has.call(node, p[i])) { if (!plainObject(node[p[i]]) || settingIsAtomic(p.slice(0, i + 1))) { return false; } }
+			else { node[p[i]] = {}; }
+			node = node[p[i]];
+		}
+		if (has.call(node, p[p.length - 1])) { return false; }
+		node[p[p.length - 1]] = v;
+		return true;
+	}
+	// A layer's setting leaves: a scenario's and a calculation set's with the multiplier and the two
+	// times folded into their mirror paths, a stored alternative's as stored.
+	function layerSettingLeaves(layer) {
+		return settingLeaves(layer.kind === 'alt' ? layer.obj.settings : scenarioSettingTree(layer.obj));
+	}
+	function buildResolvedSettings(scn) {
+		var out = {}, any = false, seen = {}, s;
+		LPN_ALT_CATEGORIES.forEach(function (cat) {
+			treeLayers(scn, cat).forEach(function (layer) {
+				layerSettingLeaves(layer).forEach(function (leaf) {
+					if (categoryOfSetting(leaf.path) === cat && putResolvedLeaf(out, leaf.path, leaf.value)) { any = true; }
+				});
+			});
+		});
+		// A path no table names (a later version's) is carried, and inherited down the scenarios.
+		for (s = scn; s && !s.isBase && !seen[s.id]; s = parentScenarioOf(s)) {
+			seen[s.id] = true;
+			settingLeaves(s.settings).forEach(function (leaf) {
+				if (categoryOfSetting(leaf.path) === undefined && putResolvedLeaf(out, leaf.path, leaf.value)) { any = true; }
+			});
+		}
+		return any ? out : null;
+	}
 	// The override map an edit of this category lands in, for this scenario: its own.
 	function localOverrideMap(scn, cat) { return (scn && scn.overrides) || {}; }
 	function storedById(list, id) {
@@ -5158,6 +5267,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The scenario's own values as one mirror: its `settings` block plus the two calculation
 	// options stored elsewhere. Copies, so nothing that reads the answer edits the scenario.
+	// Also a calculation set's, which has the same three homes.
 	function scenarioSettingTree(scn) {
 		var tree;
 		if (!scn || scn.isBase) { return {}; }
@@ -5317,7 +5427,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The view this scenario holds, in the drawing frame, or null. Base never holds one: its view is
 	// wherever the reader left it, which is what the file's own `view` records.
-	function scenarioOwnView(scn) {
+	// **HELD, NOT OWN**: once the tree is stored, a view inherited through the Presentation chain
+	// (a parent scenario's, a shared alternative's) counts; Base's live view never does.
+	function heldView(scn) {
 		var block = scenarioSettingsBlock(scn);
 		return block && block.view !== undefined ? inwardViewOf(block.view) : null;
 	}
@@ -5333,7 +5445,7 @@ var EngCalcs = EngCalcs || {};
 	// looking a moment ago is not a fact about the project.
 	var viewBeforeScenarioView = null;
 	function followScenarioView(from, to) {
-		var own = scenarioOwnView(to), had = scenarioOwnView(from);
+		var own = heldView(to), had = heldView(from);
 		if (from === to) { return; }
 		if (own) {
 			if (!had) { viewBeforeScenarioView = currentView(); }
@@ -58266,6 +58378,13 @@ var EngCalcs = EngCalcs || {};
 	function heldCalcOption(s, key) {
 		var m;
 		if (!s || s.isBase) { return undefined; }
+		if (isExplicitTree()) {
+			m = settingGet({ r: resolvedSettingsBlock(s) }, key === 'demandMultiplier'
+				? ['r', 'settings', 'hydraulics', 'demandMultiplier'] : ['r', 'times', key]);
+			if (typeof m !== 'number' || !isFinite(m)) { return undefined; }
+			if (key !== 'demandMultiplier' && (m < 0 || (key === 'hydraulicStep' && !(m > 0)))) { return undefined; }
+			return m;
+		}
 		if (key === 'demandMultiplier') {
 			m = s.demandMultiplier;
 			return (typeof m === 'number' && isFinite(m)) ? m : undefined;
@@ -58276,7 +58395,8 @@ var EngCalcs = EngCalcs || {};
 	function heldCalcOptionText(s, key) {
 		var t;
 		if (heldCalcOption(s, key) === undefined) { return undefined; }
-		t = s.times && s.times.text ? s.times.text[key] : undefined;
+		t = isExplicitTree() ? settingGet({ r: resolvedSettingsBlock(s) }, ['r', 'times', 'text', key])
+			: (s.times && s.times.text ? s.times.text[key] : undefined);
 		return typeof t === 'string' ? t : undefined;
 	}
 	function calcTargetOf(s) { return s; }
