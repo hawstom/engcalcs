@@ -41213,7 +41213,10 @@ var EngCalcs = EngCalcs || {};
 				submenu: scenarioMenuRows
 			},
 			{
-				icon: 'run', label: pc.lpn_time_run || 'Calculate', tip: pc.lpn_run_menu_tip,
+				icon: 'run', label: pc.lpn_time_run || 'Calculate',
+				// A steady-state project has no player on the toolbar, so how to get one is said here.
+				tip: (EngCalcs.lpnTimeIsExtended && !effectiveTimesExtended() && pc.lpn_time_no_period)
+					? pc.lpn_run_menu_tip + ' ' + pc.lpn_time_no_period : pc.lpn_run_menu_tip,
 				fn: function () {
 					closeMenu();
 					// runSolve(), not solveNow(): solveNow is only the NAME this is exported
