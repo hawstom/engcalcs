@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**56 still to read on master**, of 105 untranslated keys, of 2333 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**57 still to read on master**, of 106 untranslated keys, of 2334 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -294,7 +294,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (105, 56 to read @@ NEEDS RULING)
+## lpn_  (106, 57 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -325,6 +325,9 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_contour_show_tip`**
   > Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.
+  @@ NEEDS RULING
+- **`lpn_copy_opened_unsaved`**
+  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
   @@ NEEDS RULING
 - **`lpn_cp_allow_tip`**
   > Allow only these characters:
@@ -616,7 +619,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**6 still to read**, of 13 new keys across 11 unmerged branch(es).
+**9 still to read**, of 24 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -627,9 +630,44 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
+### chore/harvest-1005 (`ae12fa56`) — adds no English strings
+
+### chore/saved-views (`28222d38`) — 4 new, all ruled
+
+- **`lpn_profile_file_done`**
+  > Profile read from the file: {used} of {total} nodes found in this network.
+  _Ruled OK 2026-10-03._
+- **`lpn_profile_file_missing`**
+  > Named in the file but not in this network: {ids}.
+  _Ruled OK 2026-10-03._
+- **`lpn_profile_file_short`**
+  > The file names fewer than two nodes in this network, so there is no profile to draw.
+  _Ruled OK 2026-10-03._
+- **`lpn_profile_open`**
+  > Open EPANET profile file…
+  _Ruled OK 2026-10-03._
+
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dock-flag-order (`8fa3fea5`) — adds no English strings
+### feat/engine-prefetch (`3194c30d`) — adds no English strings
+
+### feat/find-source (`2f2ea398`) — 5 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_find_scope_source`**
+  > Source
+  @@ NEEDS RULING
+- **`lpn_profile_file_done`**
+  > Profile read from the file: {used} of {total} nodes found in this network.
+  _Ruled OK 2026-10-03._
+- **`lpn_profile_file_missing`**
+  > Named in the file but not in this network: {ids}.
+  _Ruled OK 2026-10-03._
+- **`lpn_profile_file_short`**
+  > The file names fewer than two nodes in this network, so there is no profile to draw.
+  _Ruled OK 2026-10-03._
+- **`lpn_profile_open`**
+  > Open EPANET profile file…
+  _Ruled OK 2026-10-03._
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -651,7 +689,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/profile-file (`5a6152f1`) — 4 new, all ruled
+### feat/times-statistic (`70959325`) — 10 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_profile_file_done`**
   > Profile read from the file: {used} of {total} nodes found in this network.
@@ -665,17 +703,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_profile_open`**
   > Open EPANET profile file…
   _Ruled OK 2026-10-03._
-
-### feat/times-statistic (`a18d28ac`) — 6 new, 6 to read @@ NEEDS RULING
-
 - **`lpn_time_stat_averaged`**
-  > Averaged
+  > Avg
   @@ NEEDS RULING
 - **`lpn_time_stat_maximum`**
-  > Maximum
+  > Max
   @@ NEEDS RULING
 - **`lpn_time_stat_minimum`**
-  > Minimum
+  > Min
   @@ NEEDS RULING
 - **`lpn_time_stat_none`**
   > None
@@ -687,6 +722,17 @@ build for that would be a gate nobody keeps. Refresh it with
   > Statistic
   @@ NEEDS RULING
 
-### fix/mac-cmd-words (`90b781f2`) — adds no English strings
+### fix/copy-now (`7cad0fae`) — adds no English strings
 
-### fix/status-legend (`4cf853c6`) — adds no English strings
+### fix/step-select-width (`f0ec94d6`) — adds no English strings
+
+### fix/table-actions (`8f9f89f4`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_pane_delete_element`**
+  > Delete element
+  @@ NEEDS RULING
+- **`lpn_pane_delete_elements`**
+  > Delete elements
+  @@ NEEDS RULING
+
+### fix/text-object (`4a1adda1`) — adds no English strings

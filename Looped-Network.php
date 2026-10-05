@@ -3251,6 +3251,7 @@ EngCalcs.pageConfig = {
 	lpn_copy_original: <?=json_encode($ec_lang['lpn_copy_original'])?>,
 	lpn_copy_copy: <?=json_encode($ec_lang['lpn_copy_copy'])?>,
 	lpn_copy_opened: <?=json_encode($ec_lang['lpn_copy_opened'])?>,
+	lpn_copy_opened_unsaved: <?=json_encode($ec_lang['lpn_copy_opened_unsaved'])?>,
 	lpn_copy_kept_link: <?=json_encode($ec_lang['lpn_copy_kept_link'])?>,
 	lpn_lock_requested: <?=json_encode($ec_lang['lpn_lock_requested'])?>,
 	lpn_ago_seconds: <?=json_encode($ec_lang['lpn_ago_seconds'])?>,
