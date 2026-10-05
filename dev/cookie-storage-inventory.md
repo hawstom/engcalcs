@@ -155,6 +155,29 @@ the reload the confirm promises, so there is no separate one racing it.
 | `engcalcs-offline-queue` | `js/Calculators.lib.js`, `sw.php` | Beacon rows that could not be sent while offline. **Analytics, and the one piece of client-side storage here that is NOT exempt** — written only with consent, emptied by `EngCalcs.flushQueue()` on withdrawal |
 | `engcalcs-lpn` | `js/looped-network.js` | Two stores: `handles`, a `FileSystemFileHandle` per open project so a reload can reconnect to the file the user chose (Task 212), and `recent`, the recent-files list (Task 258). **Exempt** — a handle is the document the user linked, kept so it can be given back; it is structured-cloneable, where `localStorage` holds strings alone, which is why this is a second store rather than more rows in `lpn_index`. The browser re-grants PERMISSION separately, so a returning visitor is asked again by the browser itself. **Cleared by `wipeAllStorage()` since 2026-08-31**, with `deleteDatabase` rather than a store-by-store clear: the confirm promises "as a brand-new visitor would see it", and a brand-new visitor has no database at all. It had been outside that button's reach — the fourth thing that function has been found not to keep its word about, and the one `storage_inventory_check.php` found by noticing this store was undocumented. Fire-and-forget, because the caller reloads immediately and a delete blocked by another tab would hang the reload behind a window we do not own |
 
+### Cache Storage: the service worker's copy of the suite, and the idle engine prefetch
+
+`sw.php` keeps two caches in the browser's Cache Storage, `engcalcs-assets` and `engcalcs-pages`.
+They hold copies of this site's own scripts, styles, icons and pages (the precache list from
+`lib/ServiceWorker.lib.php`), so the suite works offline. **Exempt**: they are this site's code and
+pages, kept so a service the visitor requested works without a connection; they hold nothing the
+visitor typed, carry no identifier and feed no statistic. `privacy.php`'s device table does not
+list them (an older gap, not made by Task 726); say so if the table is ever rewritten.
+
+**The EPANET engine (Task 726, Tom, 2026-10-05: *"EPANET pre-fetch slowly: Yes."*).**
+`js/vendor/epanet-js.js` (664 KB) and the 1.3 KB `js/vendor/slim/index.js` it imports were
+deliberately outside the precache, so they reached a device only if the visitor ran EPANET. Now,
+on the Looped-Network page only, they are fetched once per page when the browser is idle, and are
+kept in `engcalcs-assets` (by the cache-first route in `sw.php`) and in the HTTP cache, **whether or
+not that visitor ever runs EPANET**. The fetch is low priority, starts after the window has loaded
+and the first project has drawn, and does not happen when the visitor's browser reports Save-Data,
+a 2g or slow-2g connection, a copy already in Cache Storage, or an engine already loaded. Nothing
+is parsed or run. Same category as the precache above (this site's own code); no cookie, no
+identifier, nothing analytic, so **no `consent_body` sentence changes and no `EC_CONSENT_VERSION`
+bump.** What does change on a device: about 680 KB more in Cache Storage for a visitor who never
+used EPANET. A visitor erasing everything with `wipeAllStorage()` is unaffected by this (it does not
+touch Cache Storage, as before). Harness: `dev/lpn-spike/engine-idle-prefetch-harness.js`.
+
 ### Place-name search stores nothing but the answer
 
 The map's Search for a place by name (Task 437, `js/lpn-search.js`) is the one feature here that

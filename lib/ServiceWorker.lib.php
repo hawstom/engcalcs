@@ -111,6 +111,9 @@ function ecSwAssetExclusions() {
         // turns the EPANET solver on. Precaching it would multiply the install cost of the PWA
         // for every visitor, and this suite's stated audience is low-bandwidth. It is imported
         // with no query string, so the plain cache-first path serves it correctly once fetched.
+        // Task 726: the Looped-Network page fetches it (and slim/index.js) once when idle, so on that
+        // page's visitors it is runtime-cached whether or not EPANET is ever run. Still not precached:
+        // the install does not carry it for the calculators' visitors.
         'js/vendor/epanet-js.js'  => 'opt-in 664 KB engine; runtime-cached on first use',
         // Referenced by no page (verified 2026-08-14). Precaching an unreferenced file would
         // paper over the fact that it is unreferenced.

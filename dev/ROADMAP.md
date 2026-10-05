@@ -907,9 +907,6 @@ the block.
 - 50|725| **One wide fire-flow table instead of two reports.**
   Sue's wishlist §6: available flow and design flow side by side, InfoWater's "Design Fireflow
   Report" shape. Presentation only; one run already computes both.
-- 50|726| **Prefetch the EPANET engine when idle.**
-  Mary's wishlist §7: prefetch unless the connection says slow or metered. For the low-bandwidth
-  audience. The percent-done half shipped as Task 608. Changes what is stored on a device: Tom's call.
 - 50|728| **Import a GIS shapefile or geodatabase as a network.**
   Mary's wishlist §0b2: most WaterCAD models are built from a GIS asset layer, so this is a
   migration on-ramp that needs no WaterCAD file. Unsized; read with Task 723.
