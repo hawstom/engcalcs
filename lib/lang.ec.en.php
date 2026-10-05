@@ -1905,7 +1905,7 @@ $ec_lang['lpn_new_title']='New project';
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
 // its five siblings) are gone; Tom called the last of them obsolete on 2026-09-16.
 $ec_lang['lpn_new_coordsys']='Coordinate system';
-$ec_lang['lpn_new_coordsys_tip']='Choose the coordinate system of your network. The only way to change this choice is with “File, Convert as…” to new project, and that conversion is approximate.';
+$ec_lang['lpn_new_coordsys_tip']='Choose the coordinate system of your network. The only way to change this choice is with “File, Convert as…” to a new project, and that conversion is approximate.';
 // **DELETED 2026-09-25: lpn_new_coordsys_geo / lpn_new_coordsys_geo_tip.** Don't expose the word
 // "projection" (dev/session-handoff.md RULINGS); once reworded, both were the identical string
 // lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
@@ -4298,7 +4298,7 @@ $ec_lang['lpn_ds_search_note']='Finds the largest demand scale, to the nearest {
 $ec_lang['lpn_ds_holds_max']='✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.';
 $ec_lang['lpn_ds_below_zero']='⚠ At least one junction is below {pressure} even with the scaled demands at zero.';
 $ec_lang['lpn_ds_found']='✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.';
-$ec_lang['lpn_ds_found_below']='⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.';
+$ec_lang['lpn_ds_found_below']='⚠ At least one junction is below {pressure} with no demand scaling. The largest demand scale that keeps every junction at {pressure} or above is {m}.';
 $ec_lang['lpn_ds_search_stopped']='The search was stopped before it found an answer.';
 $ec_lang['lpn_ds_lowest_at']='At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.';
 $ec_lang['lpn_ds_nosolve_at']='At a demand scale of {m}, the network gave no answer. {reason}';

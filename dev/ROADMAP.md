@@ -344,10 +344,6 @@ the block.
   Tom, 2026-10-05: right-click "Show scenarios" adds Scenario, Parent, Alternative, Parent and
   Scenario override columns; initial order ID, then Scenario, then Alternative; every user sort keeps
   ties in their previous order (Google Sheets). First cut on `feat/scenario-table`.
-- 75|767| **A Presentation category: every project setting is scenario-overridable.**
-  Tom, 2026-10-05: *"any Setting that is stored in the project should be subject to scenario
-  overrides under some alternatives category, probably Presentation or Calculation"* (view, map
-  appearance, symbology). Long-lived on `feat/bentley-interop`; `dev/scenario-alternatives.md`.
 - 75|756| **Cross-platform: the suite as a desktop application, beyond the web folder.**
   Tom, 2026-09-30: *"Put a cross platform project on our roadmap priority 75. Plan where/how to move
   the project to transcend the web-centric hawsedc.com/engcalcs folder. Windows or Linux? Plan what
@@ -913,14 +909,11 @@ the block.
 - 50|734| **Where space is open east or west, one label on one line.** Tom, 2026-09-26 (R-319):
   *"where there is infinite space east or west, we might want to recognize that infinity and
   leverage it by using single-line concatenation of properties."* After Task 539's current round.
-- 50|735| **Honour `[TIMES] Statistic` instead of discarding it.** Mary, 2026-09-27: AVERAGED,
-  MINIMUM, MAXIMUM and RANGE are read and dropped (`js/lpn-inp.js:726`, `js/lpn-patterns.js:136`); a
-  file that sets one reports differently in EPANET. Her journal 2026-09-27; not a site-honesty defect.
 - 50|736| **[H] Count installs and app launches, if the consent text allows it.** Tom, 2026-09-28:
   *"Do we have a way of knowing whether people are installing?"* No: `appinstalled` only hides the
   button (`js/Calculators.lib.js:195`). One install event plus an app/tab field on view rows would
   answer it; it is a new logged fact about visitors, so it goes past `consent_body` and him first.
-- 50|765| **Saved views: one click restores a figure for a report.** Tom, 2026-10-05: *"I am less interested in this Report Builder than I am in making it easy to reproduce screenshots."* Window, appearance, scenario and time by reference, and which Text layers show (needs Task 639); then Copy image at 2x-3x. Never text stored in a scenario. `dev/saved-views.md`.
+- 50|765| **Presentation alternatives: a scenario may include settings and a saved view associated with a Presentation alternative.** Tom, 2026-10-05: *"I am less interested in the Bentley Report Builder than I am in making it easy to reproduce screenshots."* Presentation alternatives store overrides for Window and Settings for Map appearance and Symbology. All project settings are included in an override alternative category. And really this should be part of the Advanced (Bentley) scenarios task, not its own task.
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary
