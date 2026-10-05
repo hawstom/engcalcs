@@ -114,11 +114,11 @@ function fileAt(path, docId, perm) {
 	const doc = L.serialize();
 	doc.project = Object.assign({}, doc.project, { name: path.replace(/^.*\//, '').replace(/\.lwn$/, '') });
 	if (docId) { doc.project.docId = docId; } else { delete doc.project.docId; }
-	const text = JSON.stringify(doc);
+	let text = JSON.stringify(doc);
 	return {
 		kind: 'file', name: path.replace(/^.*\//, ''), path: path, writes: 0,
-		async getFile() { return { lastModified: 1, size: text.length, async text() { return text; }, slice() { return { async arrayBuffer() { return new ArrayBuffer(1); } }; } }; },
-		async createWritable() { this.writes++; return { async write() {}, async close() {} }; },
+		async getFile() { const t = text; return { lastModified: 1 + this.writes, size: Buffer.byteLength(t), async text() { return t; }, slice() { return { async arrayBuffer() { return new ArrayBuffer(1); } }; } }; },
+		async createWritable() { const h = this; h.writes++; let buf = ''; return { async write(t) { buf += t; }, async close() { text = buf; } }; },
 		async queryPermission() { return perm || 'prompt'; },
 		async requestPermission() { return 'granted'; },
 		async isSameEntry(o) { return !!o && o.path === this.path; }
@@ -170,9 +170,25 @@ console.log('\n--- 2. the Copy answer ---');
 		JSON.stringify(posted.map(p => p.action + ':' + p.id)));
 	ok('the old ID is not touched at all', !posted.some(p => p.id === COPIED),
 		JSON.stringify(posted.map(p => p.action + ':' + p.id)));
-	ok('the file on disk was not written', copyHandle.writes === 0);
-	ok('the tab says it is unsaved, because its identity now differs from the file', !!(L.entry() && L.entry().dirty));
+	// Tom, 2026-10-05: choosing the copy makes it at once -- the new ID is written into the file by
+	// the same click, so nobody has to remember to save it before leaving the project.
+	ok('the new ID was written into the file at once, by the click itself', copyHandle.writes === 1, 'writes=' + copyHandle.writes);
+	ok('the tab is saved, not marked unsaved', !!(L.entry() && !L.entry().dirty));
 	ok('the file is now in the recent list, so it is known next time', L.inRecent(copyHandle));
+	L.close(L.openId());
+}
+
+console.log('\n--- 2b. the Copy answer when the browser refuses to write ---');
+{
+	const refused = fileAt('C:/Mail/Pine Street.lwn', idAt(T0 + 30000));
+	refused.requestPermission = async function () { return 'denied'; };
+	await L.openHandle(refused);
+	await settle();
+	ok('the question is asked', asked());
+	press(COPY_BTN);
+	await settle();
+	ok('nothing was written', refused.writes === 0);
+	ok('...and the tab stays marked unsaved, as it always did', !!(L.entry() && L.entry().dirty));
 	L.close(L.openId());
 }
 

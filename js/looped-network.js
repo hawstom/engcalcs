@@ -37589,9 +37589,15 @@ var EngCalcs = EngCalcs || {};
 	}
 	// "A copy; make new lock". The copy gets a NEW docId BEFORE it lands, so the lock it takes is its
 	// own and the original's lock is never touched -- not released, not stolen, not even acquired.
-	// **The file on disk is not written**: the tab is marked unsaved instead, because its identity
-	// now differs from the file's, and the next Save writes the new id into it.
-	function openAsNewCopy(saved, handle) {
+	// **THE NEW ID IS WRITTEN INTO THE FILE AT ONCE** (Tom, 2026-10-05: "When a user chooses to Save a
+	// copy of a duplicate file, I don't think we should make them save before the copy is made. We
+	// should immediately make the copy. If we don't they are likely to forget the matter before they
+	// leave the project."). The file is the copy the visitor made outside this page, so the ordinary
+	// write to its own handle is the whole of "make the copy": no picker, and no file is created. It
+	// is called inside the button's click, so a permission prompt still has its user activation. If
+	// the write does not happen (permission refused, file gone) the tab stays marked unsaved, as it
+	// was before, and the notice says so.
+	async function openAsNewCopy(saved, handle) {
 		var pc = EngCalcs.pageConfig || {};
 		var fresh = newDocId();
 		saved.project = Object.assign({}, saved.project, { docId: fresh });
@@ -37599,8 +37605,16 @@ var EngCalcs = EngCalcs || {};
 		if (!(project && project.docId === fresh)) { return; }   // it did not land (storage full)
 		var entry = indexEntry(library.openId);
 		if (entry) { entry.savedSig = ''; entry.dirty = true; saveIndex(); renderTabs(); }
-		setNotice((pc.lpn_copy_opened || 'Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.')
-			.replace('{file}', (handle && handle.name) || projectDisplayName(project)));
+		var name = (handle && handle.name) || projectDisplayName(project);
+		var wrote = false;
+		if (handle) {
+			try {
+				if ((await handlePermission(handle, true)) === 'granted') { wrote = await writeOpenProjectToFile(); }
+			} catch (err) { wrote = false; }
+		}
+		setNotice(wrote
+			? (pc.lpn_copy_opened || 'Opened {file} as a copy and saved it, with a new lock of its own.').replace('{file}', name)
+			: (pc.lpn_copy_opened_unsaved || 'Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.').replace('{file}', name));
 	}
 	// Opening a file this browser already has open: come forward, and take the connection with you.
 	// **Re-opening the file is a legitimate way to reconnect** -- the fallback the needs-reopen banner
