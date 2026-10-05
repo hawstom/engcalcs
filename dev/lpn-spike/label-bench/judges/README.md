@@ -42,6 +42,18 @@ node dev/lpn-spike/label-bench/judges/judge.js --placer dev/lpn-spike/label-benc
     every stacked one west of its node right-aligned (rule S2).
 
   The thresholds are constants at the top of `judge.js`; a judge who changes one says so.
+- **R1, Tom's sentence of 2026-10-05** (*"Hide a label only because there is no room for it on
+  screen. Never hide it because of how many labels are already showing."*), `r1.js`, over every view
+  of the Novato sets. **No room:** labels hidden although free ground within 3 rows (`room.js`) could
+  hold their ID row; reported. **Not by count:** the same view laid out again with the labels of
+  one half of the screen not asked for (nodes and pipes all still there), each half in turn; a label
+  more than a quarter of the screen beyond the cut has exactly the room it had, so one hidden in the
+  full layout and shown in the half one was hidden by count. Asserted: at most 5% come back, beyond
+  the flips of a control run that changes nothing. The selftest proves it: a greedy placer that
+  hides only where there is no room passes, the same placer capped at 60 labels fails both halves.
+  Master's replay cannot place a scene it was not recorded on, so only the first half is measured
+  for it; round 5's ID-length result (the same share shown for 3- and 9-character IDs) is the
+  evidence there.
 - `master/` holds the shipped page's layouts of the prefixed scenes, for `placers/master-replay.js`.
 - `selftest-harness.js` (in `check_all.sh`) proves the three measure what they say, and that no
   file a builder reads states Tom's numeric weights.

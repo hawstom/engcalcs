@@ -9,6 +9,9 @@
 //   2. R14: master's recorded layouts pass the judges' assertion on every public scene, and a layout
 //      that draws every pipe label level fails it.
 //   3. Tom's numeric crossing weights live here and nowhere a builder reads.
+//   4. R1 (Tom, 2026-10-05: "Hide a label only because there is no room for it on screen. Never hide
+//      it because of how many labels are already showing."): a placer that hides only where no
+//      ground is free passes the count probe, and the same placer capped at a count fails it.
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
@@ -16,7 +19,9 @@
 
 const fs = require('fs');
 const path = require('path');
-const { r075View, R14_MAX_MISSED } = require('./judge.js');
+const { r075View, R14_MAX_MISSED, R1_MAX_REVIVED } = require('./judge.js');
+const R1 = require('./r1.js');
+const { roomWithinReach } = require('./room.js');
 const { runBench, loadSets } = require('../run.js');
 const TOM = require('./weights.js');
 
@@ -106,6 +111,54 @@ const rules = fs.readFileSync(path.join(bench, '../../label-placement-rules.md')
 const partA = rules.slice(rules.indexOf('## Part A'), rules.indexOf('## Part B'));
 if (LEAK.test(partA)) { leaks.push('dev/label-placement-rules.md Part A'); }
 report(!leaks.length, 'no file a builder reads states Tom\'s numeric crossing weights (they get the order only)', leaks.map(function (f) { return path.relative(bench, f); }).join(', '));
+
+// ---- 4. R1: hidden for lack of room, never by count ----------------------------------------------
+// A plain greedy placer, labels in id order, each at the first free ground room.js finds for its ID
+// row, hidden only when there is none: it hides for lack of room and for nothing else. `cap` turns
+// it into the placer R1 forbids: the same, but it stops showing labels once `cap` are up.
+function greedy(cap) {
+	return { create: function () { return { name: 'greedy' + (cap ? '-cap' + cap : ''), place: function (scene) {
+		const out = {};
+		let n = 0;
+		scene.labels.slice().sort(function (a, b) { return a.id < b.id ? -1 : a.id > b.id ? 1 : 0; }).forEach(function (req) {
+			if (cap && n >= cap) { out[req.id] = { shown: false }; return; }
+			const pl = roomWithinReach(scene, { labels: Object.assign({}, out) }, req, R1.smallestRows(req), { reachRows: 3 });
+			if (pl) { pl.shown = true; out[req.id] = pl; n++; } else { out[req.id] = { shown: false }; }
+		});
+		return { labels: out };
+	} }; } };
+}
+// Two scenes: Novato at fit, and a field of 240 nodes spread evenly over a 1400 x 900 screen, ids
+// scattered so id order is no spatial order (so a count cap falls everywhere, far side included).
+function field() {
+	const nodes = [], labels = [];
+	for (let i = 0; i < 20; i++) {
+		for (let j = 0; j < 12; j++) {
+			const k = i * 12 + j, id = String((k * 7919) % 1000 + 1000), x = 35 + i * 70, y = 37 + j * 75;
+			nodes.push({ id: id, type: 'junction', x: x, y: y, symbol: { x: x - 4, y: y - 4, w: 8, h: 8 } });
+			labels.push({ id: 'n:' + id, owner: id, kind: 'node', anchor: { x: x, y: y }, rows: [row(id), row('Z=5', 'elev')], layout: 'stack', hand: null });
+		}
+	}
+	return { id: 'r1-field', set: 'r1', step: 0, viewport: { x: 0, y: 0, w: 1400, h: 900 }, view: { s: 1, tx: 0, ty: 0 },
+		text: { sizePx: 10, rowHeightPx: 10, separator: ' ', separatorW: 5, hookMaxPx: 10 },
+		dropOrder: { node: ['elev'], link: [], customer: [] }, nodes: nodes, links: [], texts: [], customers: [], labels: labels };
+}
+const r1Scenes = [loadSets(path.join(bench, 'scenes'), ['novato-zoom'])[0].steps[0], field()];
+function probeAll(pl) {
+	const t = { farHidden: 0, revived: 0, controlFlips: 0, withRoom: 0, hidden: 0 };
+	r1Scenes.forEach(function (sc) {
+		const c = R1.countProbe(pl, sc, { idleMs: 0 });
+		t.farHidden += c.farHidden; t.revived += c.revived; t.controlFlips += c.controlFlips;
+		const h = R1.hiddenWithRoom(sc, { labels: (typeof pl.create === 'function' ? pl.create() : pl).place(sc, { prev: null }).labels });
+		t.withRoom += h.withRoom; t.hidden += h.hidden;
+	});
+	return t;
+}
+const honest = probeAll(greedy(0)), capped = probeAll(greedy(60));
+report(honest.withRoom === 0 && honest.revived <= R1_MAX_REVIVED * honest.farHidden,
+	'R1: a placer that hides only where no ground is free hides none with room and revives none far from the cut', JSON.stringify(honest));
+report(capped.farHidden > 0 && capped.revived - capped.controlFlips > R1_MAX_REVIVED * capped.farHidden && capped.withRoom > 0,
+	'R1: the same placer capped at 60 labels fails both halves (hid with room; far labels come back when half the screen asks for none)', JSON.stringify(capped));
 
 console.log(`\n${checks - failures}/${checks} checks passed.`);
 process.exit(failures ? 1 : 0);

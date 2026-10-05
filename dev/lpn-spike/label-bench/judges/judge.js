@@ -26,6 +26,12 @@
 //      pre-reviewer found both round-3 placers keeping them on the real page (2026-09-28).
 //   4. TOM'S CROSSING WEIGHTS (weights.js), the cost the bench reports by rank, weighted with his
 //      numbers. Reported.
+//   5. R1, TOM'S SENTENCE OF 2026-10-05 (r1.js): "Hide a label only because there is no room for
+//      it on screen. Never hide it because of how many labels are already showing." Over every view
+//      of the Novato sets: labels hidden although free ground within reach could hold their ID row
+//      (reported), and labels a long way from the cut that were hidden with every label asked for
+//      and shown when the far half of the screen asked for none (asserted: at most R1_MAX_REVIVED
+//      of the far hidden labels, beyond the flips of a control run that changes nothing).
 //
 // Exit 1 if any named assertion fails.
 //
@@ -38,6 +44,7 @@ const C = require('../contract.js');
 const { runBench, loadSets, machine, settingsToggle, CLOSE_ZOOM } = require('../run.js');
 const { roomWithinReach } = require('./room.js');
 const TOM_WEIGHTS = require('./weights.js');
+const R1 = require('./r1.js');
 
 const BENCH = path.join(__dirname, '..');
 const SCREEN_STEPS = ['novato-seq@2x', 'novato-seq@2.5x'];
@@ -57,6 +64,10 @@ const R14_MAX_MISSED = 0.05;
 // CLOSE_ZOOM x or closer, at most this share may have had room to lie along their pipe with the
 // same rows. "It should be near zero."
 const R14_CLOSE_MAX = 0.05;
+// R1, not by count: at most this share of the far labels a full layout hid may come back when only
+// the other half of the screen's labels are asked for. A placer that hides by a count or a rank
+// brings most of them back (judges/selftest-harness.js); one that hides for lack of room, none.
+const R1_MAX_REVIVED = 0.05;
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
@@ -200,6 +211,32 @@ function screenshots(placer) {
 	});
 }
 
+function r1(placer) {
+	console.log('--- R1: hide a label only for lack of room, never by how many are showing (Novato sets) ---');
+	const sets = loadSets(path.join(BENCH, 'scenes'), ['novato-zoom', 'novato-seq']);
+	const res = runBench(placer, sets);
+	const T = { hidden: 0, withRoom: 0, farHidden: 0, revived: 0, controlFlips: 0, controlLabels: 0, farShown: 0, lostFar: 0 }, ids = [];
+	let probed = true;
+	sets.forEach(function (set, si) {
+		set.steps.forEach(function (scene, k) {
+			const h = R1.hiddenWithRoom(scene, res[si].steps[k].layout);
+			T.hidden += h.hidden; T.withRoom += h.withRoom;
+			let c;
+			try { c = R1.countProbe(placer, scene); } catch (e) { probed = false; return; }
+			['farHidden', 'revived', 'controlFlips', 'controlLabels', 'farShown', 'lostFar'].forEach(function (x) { T[x] += c[x]; });
+			c.ids.forEach(function (id) { ids.push(scene.id + ' ' + id); });
+		});
+	});
+	console.log('  hidden although free ground within ' + R1.REACH_ROWS + ' rows could hold the ID row: ' + T.withRoom + '/' + T.hidden
+		+ (T.hidden ? ' (' + (100 * T.withRoom / T.hidden).toFixed(1) + '%)' : '') + ' (reported)');
+	if (!probed) { console.log('  ..   R1 not by count: not measurable (this placer cannot place a scene it has not seen)'); return T; }
+	const beyond = Math.max(0, T.revived - T.controlFlips);
+	report(beyond <= R1_MAX_REVIVED * T.farHidden, 'R1: a label far from the cut, hidden with every label asked for, stays hidden when the far half asks for none (at most '
+		+ (100 * R1_MAX_REVIVED) + '% come back)', T.revived + '/' + T.farHidden + ' came back; control run flipped ' + T.controlFlips + '/' + T.controlLabels
+		+ '; far shown ' + T.farShown + ', of which ' + T.lostFar + ' hid' + (ids.length ? ': ' + ids.slice(0, 5).join(', ') : ''));
+	return T;
+}
+
 function main() {
 	if (require.main !== module) { return; }
 	const a = process.argv.slice(2), i = a.indexOf('--placer');
@@ -209,8 +246,9 @@ function main() {
 	r075(placer);
 	screenshots(placer);
 	r14(placer);
+	r1(placer);
 	console.log(`\n${checks - failures}/${checks} named assertions passed.`);
 	process.exit(failures ? 1 : 0);
 }
 main();
-module.exports = { r075View, R075_REACH_ROWS, R14_MAX_MISSED };
+module.exports = { r075View, R075_REACH_ROWS, R14_MAX_MISSED, R1_MAX_REVIVED };
