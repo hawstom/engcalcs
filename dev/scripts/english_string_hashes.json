@@ -2758,7 +2758,6 @@
         "contactSpamPrefix": "2c025e7b8bda6f5b203981cafc9c05a23dcce39a",
         "contactSubject": "cdcae857019184dd9748799d920aa18a96162611",
         "contactSubmitButton": "a9b7b02dc7dd70a4e05b64d3f6a72421ca15b1dd",
-        "contactYourEmail": "b01fe933cc6df22b2dc2ba425de5c626934bbd29",
         "contactYourName": "35340d539c389edbbb75c647540dd23f30639e13",
         "contact_main_menu": "b37456c4530be810dc040f50da72eda09addfb0a",
         "contact_message": "9e029599e5e3e5ac627919862ae7244f5cb694b1",
@@ -5227,10 +5226,6 @@
         "contactSubmitButton": {
             "words": 2,
             "ends_sentence": false
-        },
-        "contactYourEmail": {
-            "words": 3,
-            "ends_sentence": true
         },
         "contactYourName": {
             "words": 2,
