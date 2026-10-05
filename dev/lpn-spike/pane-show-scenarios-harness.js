@@ -67,6 +67,7 @@ function openMenu(id, rowId, key) {
 	fire(tableEl(id), 'contextmenu', { target: td, clientX: 10, clientY: 20, preventDefault: function () {} });
 	return menuEl();
 }
+const PC = () => global.EngCalcs.pageConfig;
 function menuItem(menu, word) { return menu ? menu.children.filter((b) => b.textContent.indexOf(word) >= 0)[0] : null; }
 const SEP = String.fromCharCode(1);
 function hasClass(td, cls) { return !!td && String(td.className || '').split(/\s+/).indexOf(cls) >= 0; }
@@ -84,7 +85,7 @@ L.renderTable('junctions');
 
 console.log('\n--- 1. the cell menu offers Show scenarios, and it inserts five columns after ID ---');
 let menu = openMenu('junctions', J[0].id, 'demand');
-const showItem = menuItem(menu, 'Show scenarios');
+const showItem = menuItem(menu, PC().lpn_pane_scn_show);
 report(!!showItem, 'the cell menu has a Show scenarios row', menu && JSON.stringify(menu.children.map((b) => b.textContent)));
 report(showItem && showItem.textContent.indexOf('✓') < 0, '...unticked while it is off');
 fire(showItem, 'click', {});
@@ -93,8 +94,8 @@ report(keys.indexOf('id') === 0 &&
 	keys.slice(1, 6).join(',') === 'scn_name,scn_parent,scn_alt,scn_altparent,scn_ov',
 	'Scenario, Parent, Alternative, Parent, Scenario override sit right after ID', keys.slice(0, 7).join(','));
 menu = openMenu('junctions', J[0].id + SEP + L.baseId(), 'demand');
-report(!!menuItem(menu, '✓ Show scenarios'), 'the menu row is ticked while it is on');
-report(!menuItem(menu, 'Paste as new rows') && !menuItem(menu, 'Delete element'),
+report(!!menuItem(menu, '\u2713 ' + PC().lpn_pane_scn_show), 'the menu row is ticked while it is on');
+report(!menuItem(menu, PC().lpn_pane_paste_append) && !menuItem(menu, PC().lpn_pane_delete_element),
 	'no Paste as new rows and no Delete element while scenarios are shown');
 
 console.log('\n--- 2. one row per asset per scenario, ID first and Base first ---');
@@ -188,7 +189,7 @@ console.log('\n--- 6. every sort is stable: ties keep the previous order ---');
 console.log('\n--- 7. pressing it again restores the ordinary table ---');
 {
 	menu = openMenu('junctions', L.rows('junctions')[0].id, 'demand');
-	fire(menuItem(menu, 'Show scenarios'), 'click', {});
+	fire(menuItem(menu, PC().lpn_pane_scn_show), 'click', {});
 	const k2 = L.colKeys('junctions');
 	report(!k2.some((k) => /^scn_/.test(k)), 'the five columns are gone', k2.join(','));
 	rows = L.rows('junctions');
