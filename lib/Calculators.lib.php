@@ -64,6 +64,16 @@ function ecDefaultValue($default)
 }
 
 /**
+ * A tip's plain text: markup stripped, and the paragraph marker (a LITERAL backslash-n written
+ * twice in a single-quoted language value) turned into a real blank line, so a native title shows
+ * paragraphs and never the raw marker. js/Calculators.lib.js (EngCalcs.tipHtml) draws the real ones.
+ */
+function ecTipPlain($tip)
+{
+    return str_replace('\\n\\n', "\n\n", strip_tags($tip));
+}
+
+/**
  * Builds a label carrying an explanation behind a "?", and (optionally) an external link.
  *
  * The explanation opens ONLY on a click or tap of the "?" glyph, or Enter/Space on it, and closes
@@ -100,7 +110,7 @@ function ecDefaultValue($default)
  */
 function ecTipLabel($text, $tip)
 {
-    return '<span class="ec-help" title="'.htmlspecialchars(strip_tags($tip)).'">'
+    return '<span class="ec-help" title="'.htmlspecialchars(ecTipPlain($tip)).'">'
          . $text.' <span class="ec-tip">?</span></span>';
 }
 
@@ -133,7 +143,7 @@ function ecPlainLabelText($html)
 function ecLinkTipLabel($href, $text, $tip)
 {
     return '<a target="_blank" rel="noopener" href="'.htmlspecialchars($href, ENT_QUOTES, 'UTF-8').'">'.$text.'</a>'
-         . '<span class="ec-help" title="'.htmlspecialchars(strip_tags($tip)).'">'
+         . '<span class="ec-help" title="'.htmlspecialchars(ecTipPlain($tip)).'">'
          . '<span class="ec-tip">?</span></span>';
 }
 

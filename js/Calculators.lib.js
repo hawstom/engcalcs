@@ -123,6 +123,30 @@ function ecWireExplanationDocument() {
 		if (e.preventDefault) { e.preventDefault(); }
 	}, true);
 }
+// **A TIP MAY HAVE PARAGRAPHS** (Tom, 2026-10-05: "It would be really good for tips to have
+// paragraphs, possibly with poor-boy headings"). The marker is the two-character sequence
+// backslash-n written twice, as a LITERAL in a single-quoted language value (rule D means PHP
+// never turns it into a newline); PHP's ecTipPlain() turns it into real newlines for the native
+// title, so both spellings are the break. A paragraph that is one short line in capitals and is
+// followed by more text is a heading ("FIRE FLOW"); "Heading. Rest" on one line needs nothing.
+// Tips stay plain text: every character is escaped here, and the only tags are the two this builds.
+EngCalcs.tipHtml = function (text) {
+	var parts = String(text == null ? '' : text).split(/\\n\\n|\r?\n\r?\n/), out = [], i, t;
+	for (i = 0; i < parts.length; i++) {
+		t = parts[i].replace(/^\s+|\s+$/g, '');
+		if (!t) { continue; }
+		if (i < parts.length - 1 && t.length <= 60 && t.indexOf('\n') < 0 && t === t.toUpperCase() && t !== t.toLowerCase()) {
+			out.push('<p class="ec-tip-head">' + EngCalcs.escapeAttr(t) + '</p>');
+		} else {
+			out.push('<p class="ec-tip-p">' + EngCalcs.escapeAttr(t) + '</p>');
+		}
+	}
+	return out.join('');
+};
+// The same text as one plain string, for a place that cannot show paragraphs (a native title).
+EngCalcs.tipPlain = function (text) {
+	return String(text == null ? '' : text).replace(/\\n\\n/g, '\n\n');
+};
 function ecWireExplanationGlyph(el, glyph) {
 	// An expando, not a data- attribute: markup copied by innerHTML and put back (the grievance
 	// button restores its label so) must not arrive believing it is already wired.
@@ -208,7 +232,15 @@ EngCalcs.initTips = function (root) {
 		var control = ecTipIsControl(el);
 		var explainGlyph = ecTipGlyph(el);
 		if (explainGlyph) {
-			bootstrap.Tooltip.getOrCreateInstance(el, { trigger: 'manual', customClass: 'ec-explain' });
+			bootstrap.Tooltip.getOrCreateInstance(el, {
+				trigger: 'manual', customClass: 'ec-explain', html: true,
+				// Read at show time, so EngCalcs.setTipText() still changes what is shown.
+				title: function () {
+					var t = el.getAttribute ? el.getAttribute('data-bs-original-title') : null;
+					if (t == null) { t = el.title || ''; }
+					return EngCalcs.tipHtml(t);
+				}
+			});
 			if (el.classList && el.classList.add) { el.classList.add('ec-explain-host'); }
 			ecWireExplanationGlyph(el, explainGlyph);
 			ecWireExplanationDocument();

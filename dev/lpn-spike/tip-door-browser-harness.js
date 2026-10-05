@@ -67,7 +67,7 @@ function tipState(page, host) {
 		const r = t.getBoundingClientRect(), inner = t.querySelector('.tooltip-inner');
 		return {
 			shown: t.classList.contains('show'), explain: t.classList.contains('ec-explain'),
-			text: t.textContent, w: r.width, maxW: inner ? parseFloat(getComputedStyle(inner).maxWidth) : 0,
+			text: Array.from(t.querySelectorAll('p')).map((p) => p.textContent).join(' ') || t.textContent, w: r.width, maxW: inner ? parseFloat(getComputedStyle(inner).maxWidth) : 0,
 			pe: getComputedStyle(t).pointerEvents, cx: r.left + r.width / 2, cy: r.top + r.height / 2,
 			rem: parseFloat(getComputedStyle(document.documentElement).fontSize)
 		};
@@ -208,7 +208,7 @@ async function sectionLpnDesktop(Session, browser) {
 		await a.settle(350);
 		const cs = await tipState(page, '#lpn_ff_box .lpn-corner-help');
 		ok('a click on it opens the box\'s whole explanation', cs.shown &&
-			cs.text.indexOf(await a.lang('lpn_ff_intro')) === 0 && cs.text.indexOf(await a.lang('lpn_ff_accounting')) > 0, String(cs.text).slice(0, 50));
+			cs.text.indexOf((await a.lang('lpn_ff_intro')).split('\\n\\n').join(' ')) === 0 && cs.text.indexOf(await a.lang('lpn_ff_accounting')) > 0, String(cs.text).slice(0, 50));
 		await page.keyboard.press('Escape');
 		await a.settle(300);
 

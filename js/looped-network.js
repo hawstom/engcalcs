@@ -48388,7 +48388,7 @@ var EngCalcs = EngCalcs || {};
 				parts.push(k.getAttribute(attr));
 			});
 		});
-		var text = parts.join(' ').toLowerCase();
+		var text = parts.join(' ').replace(/\\n\\n/g, ' ').toLowerCase();
 		if (setboxTextCache) { setboxTextCache.set(el, text); }
 		return text;
 	}
@@ -60581,7 +60581,7 @@ var EngCalcs = EngCalcs || {};
 			EngCalcs.lpnFireFlowIsoCap && pc.lpn_ff_iso ?
 				pc.lpn_ff_iso.replace('{flow}', ffQty(EngCalcs.lpnFireFlowIsoCap, 'lpn_u_flow')) : '',
 			engine ? (engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native) : ''
-		].filter(Boolean).join(' ');
+		].filter(Boolean).join('\\n\\n');
 	}
 	function dsBoxTip(engine) {
 		var pc = EngCalcs.pageConfig || {},
@@ -60589,7 +60589,7 @@ var EngCalcs = EngCalcs || {};
 		return [
 			pc.lpn_ds_intro ? pc.lpn_ds_intro.replace('{max}', dsMult(D.max)).replace('{step}', String(D.step)) : '',
 			engine ? (engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native) : ''
-		].filter(Boolean).join(' ');
+		].filter(Boolean).join('\\n\\n');
 	}
 	function refreshBoxTip(id, text) {
 		var box = document.getElementById(id), d = box && box.__lpnDock;

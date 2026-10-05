@@ -88,7 +88,7 @@ async function openCornerTip(a, boxId) {
 		const t = id && document.getElementById(id);
 		if (!t) { return { shown: false }; }
 		const r = t.getBoundingClientRect(), inner = t.querySelector('.tooltip-inner');
-		return { shown: t.classList.contains('show'), text: t.textContent, left: r.left, right: r.right, top: r.top, bottom: r.bottom,
+		return { shown: t.classList.contains('show'), text: Array.from(t.querySelectorAll('p')).map((p) => p.textContent).join(' ') || t.textContent, left: r.left, right: r.right, top: r.top, bottom: r.bottom,
 			vw: window.innerWidth, vh: window.innerHeight,
 			scrolls: inner.scrollHeight > inner.clientHeight + 1, overflowY: getComputedStyle(inner).overflowY };
 	}, sel);
@@ -206,8 +206,8 @@ async function main() {
 		const L = (k) => a.lang(k);
 		const lang = {
 			analyze: await L('lpn_analyze_menu'), ffMenu: await L('lpn_ff_menu'), dsMenu: await L('lpn_ds_menu'),
-			ffIntro: await L('lpn_ff_intro'), ffAccounting: await L('lpn_ff_accounting'),
-			dsIntro: (await L('lpn_ds_intro')).split('{')[0],
+			ffIntro: (await L('lpn_ff_intro')).split('\\n\\n').join(' '), ffAccounting: await L('lpn_ff_accounting'),
+			dsIntro: (await L('lpn_ds_intro')).split('{')[0].split('\\n\\n').join(' '),
 			engineNative: await L('lpn_ff_engine_native'), engineEpanet: await L('lpn_ff_engine_epanet'),
 			ffTableHead: await L('lpn_ff_report_all'),
 			ffRows: [await L('lpn_ff_scope'), await L('lpn_ff_required'), await L('lpn_ff_residual'), await L('lpn_ff_design'),

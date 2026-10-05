@@ -3078,7 +3078,6 @@ EngCalcs.pageConfig = {
 	lpn_ds_title: <?=json_encode($ec_lang['lpn_ds_title'])?>,
 	lpn_ds_intro: <?=json_encode($ec_lang['lpn_ds_intro'])?>,
 	lpn_ds_scope: <?=json_encode($ec_lang['lpn_ds_scope'])?>,
-	lpn_ds_scope_tip: <?=json_encode($ec_lang['lpn_ds_scope_tip'])?>,
 	lpn_ds_scope_all: <?=json_encode($ec_lang['lpn_ds_scope_all'])?>,
 	lpn_ds_scope_selected: <?=json_encode($ec_lang['lpn_ds_scope_selected'])?>,
 	lpn_ds_minpressure: <?=json_encode($ec_lang['lpn_ds_minpressure'])?>,
