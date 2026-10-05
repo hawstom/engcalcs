@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "cs",
-        "expected_key_count": 2333,
-        "delta_key_count": 105,
+        "expected_key_count": 2337,
+        "delta_key_count": 109,
         "exempt_key_count": 40,
         "exempt_keys": [
             "calc_units_us",
@@ -733,6 +733,10 @@
         "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
         "lpn_pane_sel_only": "Selection only",
         "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
+        "lpn_profile_open": "Open EPANET profile file…",
+        "lpn_profile_file_done": "Profile read from the file: {used} of {total} nodes found in this network.",
+        "lpn_profile_file_missing": "Named in the file but not in this network: {ids}.",
+        "lpn_profile_file_short": "The file names fewer than two nodes in this network, so there is no profile to draw.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
         "lpn_result_pump_head": "Head",
@@ -840,6 +844,10 @@
         "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
         "lpn_pane_sel_only": "Selection only",
         "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
+        "lpn_profile_open": "Open EPANET profile file…",
+        "lpn_profile_file_done": "Profile read from the file: {used} of {total} nodes found in this network.",
+        "lpn_profile_file_missing": "Named in the file but not in this network: {ids}.",
+        "lpn_profile_file_short": "The file names fewer than two nodes in this network, so there is no profile to draw.",
         "lpn_pgraph_none": "This asset has no results in the current run.",
         "lpn_pgraph_source_share_from": "Source share from {node}",
         "lpn_result_pump_head": "Head",
@@ -1154,6 +1162,70 @@
                     "key": "lpn_pane_goto_tip",
                     "value": "Přiblížit a vybrat",
                     "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_profile_open": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_delete",
+                    "value": "Smazat trasu",
+                    "english": "Delete path"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_prompt_name",
+                    "value": "Název této trasy",
+                    "english": "Name for this path"
+                }
+            }
+        },
+        "lpn_profile_file_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_delete",
+                    "value": "Smazat trasu",
+                    "english": "Delete path"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_prompt_name",
+                    "value": "Název této trasy",
+                    "english": "Name for this path"
+                }
+            }
+        },
+        "lpn_profile_file_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_delete",
+                    "value": "Smazat trasu",
+                    "english": "Delete path"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_prompt_name",
+                    "value": "Název této trasy",
+                    "english": "Name for this path"
+                }
+            }
+        },
+        "lpn_profile_file_short": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_profile_delete",
+                    "value": "Smazat trasu",
+                    "english": "Delete path"
+                },
+                "next_translated": {
+                    "key": "lpn_profile_prompt_name",
+                    "value": "Název této trasy",
+                    "english": "Name for this path"
                 }
             }
         },
