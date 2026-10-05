@@ -2077,8 +2077,6 @@ $ec_lang['lpn_notes_5_def']='ایک پمپ H = H₀ − aQ^b کی پیروی ک�
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='اس صفحے پر یہ بھی';
-$ec_lang['lpn_notes_4_def']='کوئی پراجیکٹ اصل زمین پر، اس کے پیچھے سڑکوں کے نقشے کے ساتھ، رکھا جا سکتا ہے۔ EPANET .inp فائلیں پڑھی اور لکھی جا سکتی ہیں۔ نیچے کا پینل کسی راستے کے ساتھ پروفائل کھینچتا ہے اور جنکشنز کی فہرست دیتا ہے۔ عناصر کو ان کے نتائج کے مطابق رنگ دیا جا سکتا ہے، اور تلاش ہر اس عنصر کو چن لیتی ہے جو آپ کی مقرر کردہ شرط پر پورا اترتا ہو۔';
 $ec_lang['lpn_notes_6_term']='جدول کے کالمز کی مدد';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

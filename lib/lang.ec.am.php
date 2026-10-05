@@ -2077,8 +2077,6 @@ $ec_lang['lpn_notes_5_def']='ፓምፕ H = H₀ − aQ^b ይከተላል፣ H �
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='እንዲሁም በዚህ ገጽ ላይ';
-$ec_lang['lpn_notes_4_def']='አንድ ፕሮጀክት ከጀርባው የመንገድ ካርታ ይዞ በእውነተኛ መሬት ላይ ሊቀመጥ ይችላል። የEPANET .inp ፋይሎች ሊነበቡና ሊጻፉ ይችላሉ። የታችኛው ፓነል በአንድ መንገድ ላይ መገለጫ ይስላል፣ መገናኛዎቹንም ይዘረዝራል። አካሎች በውጤቶቻቸው ሊቀለሙ ይችላሉ፣ ፈልግም እርስዎ ባስቀመጡት ፈተና የሚስማማ እያንዳንዱን አካል ይመርጣል።';
 $ec_lang['lpn_notes_6_term']='የሠንጠረዥ አምዶች እርዳታ';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

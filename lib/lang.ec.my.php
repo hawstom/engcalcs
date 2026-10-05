@@ -2119,8 +2119,6 @@ $ec_lang['lpn_notes_5_def']='ရေတင်စက်တစ်ခုသည် H 
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='ဤစာမျက်နှာပေါ်တွင် ရှိသေးသည်များ';
-$ec_lang['lpn_notes_4_def']='ပရောဂျက်တစ်ခုသည် နောက်ခံတွင် လမ်းမြေပုံပါသော တကယ့်မြေပြင်ပေါ်တွင် ရှိနိုင်သည်။ EPANET .inp ဖိုင်များကို ဖတ်ယူနိုင်ပြီး ရေးသားထုတ်နိုင်သည်။ အောက်ခြေ panel သည် လမ်းကြောင်းတစ်လျှောက် profile တစ်ခု ဆွဲပြီး ဆက်စပ်နေရာများကို စာရင်းပြုစုသည်။ အစိတ်အပိုင်းများကို ၎င်းတို့၏ အဖြေများအလိုက် အရောင်ခြယ်နိုင်ပြီး၊ Find က သင်သတ်မှတ်ထားသော အခြေအနေနှင့် ကိုက်ညီသော အစိတ်အပိုင်း အားလုံးကို ရွေးထုတ်ပေးသည်။';
 $ec_lang['lpn_notes_6_term']='ဇယား ကော်လံများ အကူအညီ';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one

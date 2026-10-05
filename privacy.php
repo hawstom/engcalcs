@@ -120,6 +120,7 @@ did agree, because they are a different kind of number.</p>
 	<tr><td><code>ec_seen</code></td><td>One digit per page: which counts we have already made. No identifier</td><td>Until you close your browser</td><td><strong>Yes</strong></td></tr>
 	<tr><td>Saved networks (browser storage)</td><td>The pipe networks you draw</td><td>Until you delete them</td><td>No</td></tr>
 	<tr><td>Lock token and page layout (browser storage)</td><td>A random code that tells the lock server which locks are yours, and how you left the panels</td><td>Until you delete them</td><td>No</td></tr>
+	<tr><td>Offline copy of the suite (browser cache)</td><td>This site&rsquo;s own pages, scripts, styles, and icons, kept so the calculators open without a connection. It holds no identifier and nothing you entered, and it is sent nowhere. On the Looped Pipe Network page it also keeps our own EPANET engine, once you first turn that solver on. To remove it, clear this site&rsquo;s data in your browser; the next visit rebuilds it</td><td>Until you clear it. Files are replaced when we publish a new version</td><td>No</td></tr>
 	<tr><td>Queue of unsent counts (browser storage)</td><td>Lets a count recorded offline reach us later</td><td>Until it is sent</td><td><strong>Yes</strong></td></tr>
 </table>
 

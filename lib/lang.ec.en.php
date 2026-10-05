@@ -2352,8 +2352,6 @@ $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the he
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='Also on this page';
-$ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.';
 $ec_lang['lpn_notes_6_term']='Table columns help';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one
