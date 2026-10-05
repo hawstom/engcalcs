@@ -41206,6 +41206,7 @@ var EngCalcs = EngCalcs || {};
 				var href = o.getAttribute('href') || o.getAttributeNS('http://www.w3.org/1999/xlink', 'href') || '';
 				var isTile = o.classList.contains('lpn-basemap-tile');
 				pending.push(snipInlineImage(href).then(function (data) {
+					if (data && isTile) { out.tilesDrawn = true; }
 					if (data) { c.setAttribute('href', data); c.removeAttributeNS('http://www.w3.org/1999/xlink', 'href'); }
 					else {
 						if (isTile) { out.droppedBasemap = true; }
@@ -41265,9 +41266,46 @@ var EngCalcs = EngCalcs || {};
 			return e && e.isConnected && window.getComputedStyle(e).display !== 'none';
 		});
 	}
+	// **A PICTURE WITH TILES IN IT CARRIES THEIR CREDIT** (pre-review, 2026-10-05: Net3 pasted with
+	// no "© OpenStreetMap contributors"). The attribution is a licence term, not furniture, so it
+	// travels with the image -- the same words the on-screen #lpn_basemap_credit shows for the
+	// source in use, read from that element so there is one copy of them. "Improve this map" is a
+	// link to a feedback form and means nothing on paper; the Mapbox wordmark is written as its name.
+	function snipCreditText() {
+		var c = document.getElementById('lpn_basemap_credit'), set, parts = [];
+		if (!c) { return ''; }
+		set = c.querySelector('[data-basemap-credit="' + (basemapSource() === 'satellite' ? 'satellite' : 'osm') + '"]');
+		(function walk(n) {
+			Array.prototype.forEach.call(n.childNodes, function (k) {
+				if (k.nodeType === 3) { parts.push(k.nodeValue); return; }
+				if (k.nodeType !== 1) { return; }
+				if (/\/feedback\//.test(k.getAttribute('href') || '')) { return; }
+				if (k.classList.contains('lpn-mapbox-logo')) { parts.push(k.getAttribute('aria-label') || ''); return; }
+				walk(k);
+			});
+		})(set || c);
+		return parts.join(' ').replace(/\s+/g, ' ').trim();
+	}
+	function snipPaintCredit(ctx, W, H, s) {
+		var text = snipCreditText(), c = document.getElementById('lpn_basemap_credit');
+		if (!text || !c) { return; }
+		var cs = window.getComputedStyle(c), a = c.querySelector('a'), ink = window.getComputedStyle(a || c).color;
+		var px = 10 * s, padX = 5 * s, padY = 1 * s, margin = 4 * s, tw, bw, bh;
+		ctx.save();
+		ctx.font = px + 'px ' + cs.fontFamily;
+		ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+		tw = ctx.measureText(text).width;
+		bw = tw + 2 * padX; bh = px * 1.4 + 2 * padY;
+		ctx.fillStyle = cs.backgroundColor && !/rgba\([^)]*,\s*0\)$|transparent/.test(cs.backgroundColor) ?
+			cs.backgroundColor : window.getComputedStyle(c).getPropertyValue('--ec-a-255-255-255-85').trim();
+		ctx.fillRect(W - margin - bw, H - margin - bh, bw, bh);
+		ctx.fillStyle = ink;
+		ctx.fillText(text, W - margin - bw + padX, H - margin - bh / 2);
+		ctx.restore();
+	}
 	// Render the client-pixel rectangle `r` of the map. Resolves to { blob, droppedBasemap, scale }.
 	function renderScreenshot(r) {
-		var out = { droppedBasemap: false, scale: snipScaleFor(r.w, r.h) };
+		var out = { droppedBasemap: false, tilesDrawn: false, scale: snipScaleFor(r.w, r.h) };
 		var s = out.scale, W = Math.max(1, Math.round(r.w * s)), H = Math.max(1, Math.round(r.h * s));
 		var sr = svg.getBoundingClientRect(), ox = sr.left + svg.clientLeft, oy = sr.top + svg.clientTop;
 		return snipCloneSvg(out).then(function (clone) {
@@ -41295,6 +41333,7 @@ var EngCalcs = EngCalcs || {};
 					if (lr.right > r.x && lr.left < r.x + r.w && lr.bottom > r.y && lr.top < r.y + r.h) { snipPaintHtml(ctx, lg); }
 				});
 				ctx.restore();
+				if (out.tilesDrawn) { snipPaintCredit(ctx, W, H, s); }
 				return new Promise(function (resolve, reject) {
 					c.toBlob(function (b) { if (b) { out.blob = b; resolve(out); } else { reject(new Error('toBlob')); } }, 'image/png');
 				});

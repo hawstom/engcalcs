@@ -74,7 +74,20 @@ const LAST_PNG = async () => {
 	for (let i = 0; i < d.length; i += 4) {
 		if (Math.abs(d[i] - bg[0]) + Math.abs(d[i + 1] - bg[1]) + Math.abs(d[i + 2] - bg[2]) > 60) { ink++; }
 	}
-	return { type: b.type, w: bm.width, h: bm.height, ink: ink, total: bm.width * bm.height };
+	// The bottom-right corner, where the tile credit goes: inked (text) pixels in the last 240 x 24
+	// CSS pixels, at the picture's 3x.
+	let cornerDark = 0;
+	for (let y = Math.max(0, bm.height - 72); y < bm.height; y++) {
+		for (let x = Math.max(0, bm.width - 720); x < bm.width; x++) {
+			const i = (y * bm.width + x) * 4;
+			// Text, in whatever colour the credit's link is: far from white AND far from the
+			// light test tile (200, 230, 200) that section 4b lays under the map.
+			const fromWhite = (255 - d[i]) + (255 - d[i + 1]) + (255 - d[i + 2]);
+			const fromTile = Math.abs(d[i] - 200) + Math.abs(d[i + 1] - 230) + Math.abs(d[i + 2] - 200);
+			if (fromWhite > 100 && fromTile > 100) { cornerDark++; }
+		}
+	}
+	return { type: b.type, w: bm.width, h: bm.height, ink: ink, total: bm.width * bm.height, cornerDark: cornerDark };
 };
 async function waitBlobs(page, n) {
 	await page.waitForFunction((k) => (window.__snipBlobs || []).length >= k, n, { timeout: 15000 });
@@ -127,6 +140,7 @@ async function desktop(Session, browser) {
 		await a.settle(200);
 		ok('the notice says it was copied', (await a.notice()).indexOf(await a.lang('lpn_screenshot_copied')) === 0, await a.notice());
 		ok('the veil is gone', !(await page.$('.lpn-snip-veil')));
+		ok('with no tiles drawn there is no tile credit in the corner', !!png && png.cornerDark === 0, png && png.cornerDark + ' dark pixels');
 
 		// 3. A dragged rectangle in the middle of the fitted network.
 		const r = { x: Math.round(map.x + map.w * 0.3), y: Math.round(map.y + map.h * 0.3), w: 300, h: 220 };
@@ -150,6 +164,35 @@ async function desktop(Session, browser) {
 		ok('Esc takes the veil away', !(await page.$('.lpn-snip-veil')));
 		await a.settle(1500);
 		ok('...and captures nothing', (await page.evaluate(() => window.__snipBlobs.length)) === 2);
+
+		// 4b. Tiles in the picture carry their credit (pre-review, 2026-10-05: Net3 pasted with no
+		// "© OpenStreetMap contributors"). Net1 is a grid drawing, so one light tile is laid under the
+		// whole map in the basemap layer, exactly where real tiles live, and the credit's own set is shown.
+		const credit = await page.evaluate(() => {
+			const c = document.createElement('canvas'); c.width = c.height = 16;
+			const g = c.getContext('2d'); g.fillStyle = 'rgb(200,230,200)'; g.fillRect(0, 0, 16, 16);
+			const im = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+			im.setAttribute('href', c.toDataURL()); im.setAttribute('class', 'lpn-basemap-tile');
+			im.setAttribute('preserveAspectRatio', 'none');
+			['x', 'y'].forEach((k) => im.setAttribute(k, '-100000'));
+			['width', 'height'].forEach((k) => im.setAttribute(k, '200000'));
+			im.id = 'snip_fake_tile';
+			document.querySelector('#lpn_canvas g.lpn-basemap').appendChild(im);
+			const cr = document.getElementById('lpn_basemap_credit');
+			return cr ? cr.querySelector('[data-basemap-credit="osm"]').textContent.trim() : '';
+		});
+		ok('the street-map credit the screen shows is the OpenStreetMap one', /OpenStreetMap/.test(credit), credit);
+		await startSnip(a, LABEL);
+		await page.mouse.click(map.x + map.w / 2, map.y + map.h / 2);
+		await waitBlobs(page, 3);
+		png = await page.evaluate(LAST_PNG);
+		ok('with tiles drawn the picture carries the tile credit in its bottom-right corner', !!png && png.cornerDark > 100,
+			png && png.cornerDark + ' dark pixels');
+		if (process.env.SNIP_SHOTS) {
+			const b64 = await page.evaluate(async () => { const b = window.__snipBlobs[window.__snipBlobs.length - 1]; const u = new Uint8Array(await b.arrayBuffer()); let s = ''; for (let i = 0; i < u.length; i += 8192) { s += String.fromCharCode.apply(null, u.subarray(i, i + 8192)); } return btoa(s); });
+			require('fs').writeFileSync(path.join(process.env.SNIP_SHOTS, 'screenshot-credit.png'), Buffer.from(b64, 'base64'));
+		}
+		await page.evaluate(() => document.getElementById('snip_fake_tile').remove());
 
 		// 5. No clipboard: a download, and a notice that says so.
 		await page.evaluate(() => { delete navigator.clipboard; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined }); });
