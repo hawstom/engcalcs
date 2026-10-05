@@ -527,7 +527,8 @@ console.log('\n--- a box that fills the screen has to be scrollable by finger --
 	ok('...and blank still means "the file did not say"',
 		/input\.value = home\(\)\[key\] === undefined \? '' :/.test(body('hydNumberRow')));
 	ok('...in whichever of the row\'s two homes the value lives',
-		/\(o\.perScenario && !inBaseScenario\(\)\) \? activeScenario\(\) : settings\.hydraulics/
+		// The scenario's home is where an edit in it lands: itself, or the calculation set it names.
+		/\(o\.perScenario && !inBaseScenario\(\)\) \? calcTargetOf\(activeScenario\(\)\) : settings\.hydraulics/
 			.test(body('hydNumberRow')));
 	ok('an unset hydraulics row shows NO number: no placeholder is set',
 		!/input\.placeholder\s*=/.test(body('hydNumberRow')));
