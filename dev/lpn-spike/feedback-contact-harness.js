@@ -16,6 +16,12 @@ function ok(name, cond, extra) {
 	if (cond) { console.log('  ok   ' + name); return; }
 	fails++; console.log('  FAIL ' + name + (extra === undefined ? '' : '  -- ' + extra));
 }
+const enSrc = fs.readFileSync(path.join(ROOT, 'lib/lang.ec.en.php'), 'utf8');
+function val(k) {
+	const m = new RegExp("\\$ec_lang\\['" + k + "'\\]='((?:[^'\\\\]|\\\\.)*)';").exec(enSrc);
+	return m ? m[1].replace(/\\'/g, "'") : '';
+}
+const has = (html, k) => val(k) !== '' && html.indexOf(val(k)) >= 0;
 function render(page, get) {
 	const a = [path.join(ROOT, 'dev/scripts/render_page.php'), page];
 	if (get) { a.push('--get=' + get); }
@@ -27,16 +33,16 @@ const plain = render('contact.php');
 ok('has the category select', /<select[^>]*name="category"/.test(plain));
 const opts = (plain.match(/<option value="[a-z]+"/g) || []).map((s) => s.slice(15, -1));
 ok('offers the four categories, in order', opts.join(',') === 'wrong,wording,idea,other', opts.join(','));
-ok('the select is labelled "What is this about?"', /What is this about\?/.test(plain));
-ok('the e-mail field says it is optional', /Email \(only if you want a reply\)/.test(plain));
-ok('...and the old demanding label is gone', plain.indexOf('Your e-mail address:') < 0);
+ok('the select is labelled "What is this about?"', has(plain, 'contactCategory'));
+ok('the e-mail field says it is optional', has(plain, 'contactYourEmailOptional'));
+ok('...and the old demanding label is gone', !has(plain, 'contactYourEmail'));
 ok('no preset: "Other" is selected', /<option value="other" selected>/.test(plain));
 const pre = render('contact.php', 'from=Looped-Network&cat=wrong&code=engine-run&lang=en');
 ok('?cat=wrong presets "Something is wrong"', /<option value="wrong" selected>/.test(pre));
 ok('?from= is still carried', /name="origin" value="Looped-Network"/.test(pre));
 ok('?code= and ?lang= are carried as hidden fields',
 	/name="code" value="engine-run"/.test(pre) && /name="ctxlang" value="en"/.test(pre));
-ok('...and the sender is told what rides along, in words', /never includes anything from your drawing/.test(pre));
+ok('...and the sender is told what rides along, in words', has(pre, 'contactContextNote'));
 ok('a bogus ?cat= falls back to Other', /<option value="other" selected>/.test(render('contact.php', 'cat=%3Cscript%3E')));
 ok('a hostile ?code= is stripped to the slug charset',
 	/name="code" value="scriptalert1script"/.test(render('contact.php', 'code=%3Cscript%3Ealert(1)%3C/script%3E')) === false &&
@@ -88,11 +94,11 @@ L.wireWrongButtons();
 const hrefOf = (id) => String((byId[id] || {}).href || '');
 ok('the standing link carries the page and language, and no code',
 	/contact\.php\?from=Looped-Network&cat=wrong&lang=es$/.test(hrefOf('lpn_tell_btn')), hrefOf('lpn_tell_btn'));
-L.setStatus('The EPANET run failed.', 'engine-run');
+L.setStatus('x', 'engine-run');
 ok('after an engine failure, the status link carries the error code',
 	/code=engine-run/.test(hrefOf('lpn_tell_status')) && /from=Looped-Network/.test(hrefOf('lpn_tell_status')) &&
 	/cat=wrong/.test(hrefOf('lpn_tell_status')) && /lang=es/.test(hrefOf('lpn_tell_status')), hrefOf('lpn_tell_status'));
-L.setStatus('These nodes have no path to a reservoir', 'unreachable');
+L.setStatus('y', 'unreachable');
 ok('a different message rewrites the code', /code=unreachable/.test(hrefOf('lpn_tell_status')) && !/engine-run/.test(hrefOf('lpn_tell_status')));
 ok('nothing out of the drawing: only from, cat, lang and code appear',
 	hrefOf('lpn_tell_status').split('?')[1].split('&').every((kv) => /^(from|cat|lang|code)=/.test(kv)));

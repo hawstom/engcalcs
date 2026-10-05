@@ -209,7 +209,7 @@ exports.run = async function ({ browser, report }) {
 			i.dispatchEvent(new Event('input', { bubbles: true }));
 			return (document.querySelector('#lpn_libbox_content .lpn-lib-verdict') || {}).textContent || '';
 		}, sentence);
-		report.has(await verdictFor('WHAT IS THIS'), '⚠ Not understood',
+		report.has(await verdictFor('GIBBERISH TEXT'), '⚠ Not understood',
 			'a sentence the parser cannot read says so');
 		report.has(await verdictFor('LINK NOPE OPEN AT TIME 1'), 'NOPE',
 			'a well-formed sentence naming nothing here names the id it could not find');
