@@ -487,8 +487,8 @@ console.log('\n--- one home for the concept ---');
 	// paneCreateFromPlan()'s label and customer branches convert a pasted row's typed position
 	// through this door exactly as a node's own does, and the customer branch's node-attachment
 	// lookup (customerAttachAtNode()) needs the same inward point to find the nearest pipe.
-	ok('inwardX has one definition and 43 call sites', count(/inwardX\(/g) === 44, count(/inwardX\(/g));
-	ok('inwardY has one definition and 44 call sites', count(/inwardY\(/g) === 45, count(/inwardY\(/g));
+	ok('inwardX has one definition and 44 call sites', count(/inwardX\(/g) === 45, count(/inwardX\(/g));
+	ok('inwardY has one definition and 45 call sites', count(/inwardY\(/g) === 46, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

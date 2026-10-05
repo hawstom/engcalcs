@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**20 still to read on master**, of 130 untranslated keys, of 2356 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**19 still to read on master**, of 129 untranslated keys, of 2355 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (130, 20 to read @@ NEEDS RULING)
+## lpn_  (129, 19 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -285,9 +285,6 @@ never edits a synonym.
 - **`lpn_inp_backdrop_attached_other`**
   > Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.
   @@ NEEDS RULING
-- **`lpn_inp_backdrop_shape`**
-  > The picture is not the same shape as the area the file gives, so it matches the width and not the height.
-  @@ NEEDS RULING
 - **`lpn_inp_drop_pressure_unit`**
   > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
   _Ruled OK 2026-10-05._
@@ -470,7 +467,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**12 still to read**, of 15 new keys across 11 unmerged branch(es).
+**12 still to read**, of 15 new keys across 12 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -481,7 +478,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`57009cdf`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/backdrop-attach (`dea249c4`) — adds no English strings
+
+### feat/bentley-interop (`cb120830`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -526,7 +525,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show scenarios
   @@ NEEDS RULING
 
-### feat/screenshot (`627612b2`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/screenshot (`1f590b13`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_screenshot_copied`**
   > Screenshot copied.
@@ -550,4 +549,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
   @@ NEEDS RULING
 
-### feat/tip-door (`8c5c01dc`) — adds no English strings
+### feat/tip-door (`46c965ee`) — adds no English strings

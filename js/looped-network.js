@@ -14010,27 +14010,34 @@ var EngCalcs = EngCalcs || {};
 	// ---- placing an attached image by the file's own [BACKDROP] DIMENSIONS (Task 282) ----
 	//
 	// EPANET 2.2 manual, [BACKDROP]: DIMENSIONS is the lower-left and upper-right corners (LLx LLy
-	// URx URy) of the map's bounding rectangle, and OFFSET is the X and Y distance the backdrop
-	// image's upper-left corner sits from the map rectangle's upper-left corner (default zero). So
-	// the picture's upper-left is the rectangle's upper-left shifted by OFFSET, and its width is the
-	// rectangle's. The manual states no sign for OFFSET's Y; it is read in map coordinates (X to
-	// the right, Y up), the same Cartesian frame DIMENSIONS is in. Real files all carry 0 0.
-	// Our backdrop is translate + ONE uniform scale, so the picture takes the rectangle's WIDTH and
-	// a picture of another shape comes out taller or shorter than the rectangle; says so (return).
-	// Returns null when there is no usable rectangle, else { shapeOk }.
+	// URx URy) of the map's bounding rectangle, and OFFSET is the X and Y distance of the image's
+	// upper-left corner from the rectangle's upper-left corner. The EXACT rule is EPANET's own source,
+	// Delphi_GUI/epanet2w/Umap.pas, TMap.GetBackdropBounds (https://github.com/USEPA/EPANET2.2):
+	//     x0 := LowerLeft.X + Offset.X;   y0 := UpperRight.Y - Offset.Y;
+	//     w := UpperRight.X - LowerLeft.X;  h := UpperRight.Y - LowerLeft.Y;
+	//     if AspectRatio > 1 then h := w/AspectRatio else w := h*AspectRatio;
+	// with AspectRatio = picture width / picture height (TMap.DrawBackdrop), and the picture is drawn
+	// from (x0, y0) rightward by w and DOWNWARD by h. So the Y offset is SUBTRACTED from the top edge
+	// (Fmap.pas EndPanning: "Y-offset is measured relative to upper right corner"), a landscape
+	// picture fills the rectangle's width and a portrait or square one fills its height, aspect kept.
+	// Followed literally, including that a picture wider than 1:1 but narrower than the rectangle runs
+	// past its bottom edge: that is where EPANET draws it. Returns false when there is no usable
+	// rectangle.
 	function placeBackdropByDimensions(dims, offset) {
-		if (!backdrop || !backdrop.width || !dims || dims.length !== 4) { return null; }
-		var ox = offset ? offset[0] : 0, oy = offset ? offset[1] : 0,
-			x0 = inwardX(dims[0] + ox), x1 = inwardX(dims[2] + ox),
-			yTop = inwardY(dims[3] + oy), yBot = inwardY(dims[1] + oy),
-			W = x1 - x0, H = yBot - yTop;
-		if (!(W > 0) || !(H > 0) || !isFinite(W) || !isFinite(H)) { return null; }
-		backdrop.s = W / backdrop.width;
+		if (!backdrop || !backdrop.width || !backdrop.height || !dims || dims.length !== 4) { return false; }
+		var ox = offset ? offset[0] : 0, oy = offset ? offset[1] : 0, ar = backdrop.width / backdrop.height,
+			x0 = inwardX(dims[0] + ox), yTop = inwardY(dims[3] - oy),
+			// The rectangle's size is taken in the DRAWING frame (a geographic project draws in
+			// Mercator, so a degree of latitude is not a degree of longitude on the screen).
+			w = inwardX(dims[2]) - inwardX(dims[0]), h = inwardY(dims[1]) - inwardY(dims[3]);
+		if (!(w > 0) || !(h > 0) || !isFinite(w) || !isFinite(h)) { return false; }
+		if (ar > 1) { h = w / ar; } else { w = h * ar; }
+		backdrop.s = w / backdrop.width;
 		backdrop.tx = x0 - backdrop.x * backdrop.s;
 		backdrop.ty = yTop - backdrop.y * backdrop.s;
 		applyBackdropTransform();
 		saveToStorage();
-		return { shapeOk: Math.abs(backdrop.height * backdrop.s - H) <= 0.01 * H };
+		return true;
 	}
 	// The picture an imported .inp names, handed over by the user. The SAME door Add uses
 	// (addBackdropFromDataUrl), then the file's rectangle. Reports through `say`.
@@ -14039,14 +14046,11 @@ var EngCalcs = EngCalcs || {};
 			named = String(bd.file).split(/[\\\/]/).pop();
 		reader.onload = function (ev) {
 			addBackdropFromDataUrl(ev.target.result, function () {
-				var placed = placeBackdropByDimensions(bd.dimensions, bd.offset), msg;
-				msg = (file.name.toLowerCase() === named.toLowerCase()
+				placeBackdropByDimensions(bd.dimensions, bd.offset);
+				var msg = (file.name.toLowerCase() === named.toLowerCase()
 					? (pc.lpn_inp_backdrop_attached || 'Attached {file}, placed where the file says it belongs.')
 					: (pc.lpn_inp_backdrop_attached_other || 'Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.'))
 					.replace('{picked}', file.name).replace('{file}', named);
-				if (placed && !placed.shapeOk) {
-					msg += ' ' + (pc.lpn_inp_backdrop_shape || 'The picture is not the same shape as the area the file gives, so it matches the width and not the height.');
-				}
 				say(msg);
 			});
 		};
@@ -35522,26 +35526,36 @@ var EngCalcs = EngCalcs || {};
 			// **THE FILE NAMES A PICTURE AND SAYS WHERE IT GOES, SO OFFER TO ATTACH IT** (Task 282). A
 			// browser cannot open a file by path, so this is a picker and the name is only said. A file
 			// with no DIMENSIONS keeps today's route: the sentence below and Map, Background image.
+			var bdLi = null, lead, ul;
 			if (parsed.backdrop && parsed.backdrop.dimensions) {
 				var bdFile = String(parsed.backdrop.file).split(/[\\\/]/).pop(),
 					bdRow = document.createElement('p'), bdBtn = document.createElement('button'),
-					bdStatus = document.createElement('div'), bdTip = document.createElement('div');
+					bdStatus = document.createElement('div');
 				bdRow.style.margin = '0 0 8px';
 				bdBtn.type = 'button';
 				bdBtn.textContent = (pc.lpn_inp_backdrop_attach || 'Attach {file}…').replace('{file}', bdFile);
-				bdTip.textContent = pc.lpn_inp_backdrop_attach_tip || 'A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.';
+				// The tip is on `.ec-help` wrapping the button, as the Filter in table button does,
+				// and initTipsIn() arms it (EngCalcs.initTips() wires `.ec-help[title]` and nothing else).
+				bdBtn.className = 'ec-help';
+				bdBtn.title = pc.lpn_inp_backdrop_attach_tip || 'A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.';
 				bdStatus.setAttribute('role', 'status');
 				bdBtn.addEventListener('click', function () {
 					var pick = document.createElement('input');
 					pick.type = 'file'; pick.accept = 'image/*';
 					pick.addEventListener('change', function () {
 						var f = pick.files && pick.files[0];
-						if (f) { attachNamedBackdrop(parsed.backdrop, f, function (m) { bdStatus.textContent = m; }); }
+						if (f) { attachNamedBackdrop(parsed.backdrop, f, function (m) {
+								bdStatus.textContent = m;
+								// The file's own sentence says to add the picture by hand, which is now untrue.
+								if (bdLi && bdLi.parentNode) { bdLi.parentNode.removeChild(bdLi); }
+								if (ul && !ul.children.length) { if (ul.parentNode) { ul.parentNode.removeChild(ul); } if (lead.parentNode) { lead.parentNode.removeChild(lead); } }
+							}); }
 					});
 					pick.click();
 				});
-				bdRow.appendChild(bdBtn); bdRow.appendChild(bdTip); bdRow.appendChild(bdStatus);
+				bdRow.appendChild(bdBtn); bdRow.appendChild(bdStatus);
 				body.appendChild(bdRow);
+				initTipsIn(bdRow);
 			}
 			if (!byText.length) {
 				var ok = document.createElement('p');
@@ -35550,15 +35564,16 @@ var EngCalcs = EngCalcs || {};
 				body.appendChild(ok);
 				return;
 			}
-			var lead = document.createElement('p');
+			lead = document.createElement('p');
 			lead.style.margin = '0 0 6px';
 			lead.textContent = pc.lpn_inp_report_lead || 'This page does not use everything EPANET does, but nothing in your file is thrown away. Below is what your file holds that this page keeps without using, and what was changed when the file was read in:';
 			body.appendChild(lead);
-			var ul = document.createElement('ul');
+			ul = document.createElement('ul');
 			ul.style.margin = '0';
 			ul.style.paddingLeft = '20px';
 			byText.forEach(function (row) {
 				var li = document.createElement('li');
+				if (row.text === inpDropText('backdrop-not-embedded')) { bdLi = li; }
 				li.style.marginBottom = '4px';
 				li.textContent = row.ids.length ? row.text + ' (' + row.ids.join(', ') + ')' : row.text;
 				ul.appendChild(li);

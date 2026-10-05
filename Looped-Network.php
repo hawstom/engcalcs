@@ -3240,7 +3240,6 @@ EngCalcs.pageConfig = {
 	lpn_inp_backdrop_attach_tip: <?=json_encode($ec_lang['lpn_inp_backdrop_attach_tip'])?>,
 	lpn_inp_backdrop_attached: <?=json_encode($ec_lang['lpn_inp_backdrop_attached'])?>,
 	lpn_inp_backdrop_attached_other: <?=json_encode($ec_lang['lpn_inp_backdrop_attached_other'])?>,
-	lpn_inp_backdrop_shape: <?=json_encode($ec_lang['lpn_inp_backdrop_shape'])?>,
 	lpn_inp_drop_dangling: <?=json_encode($ec_lang['lpn_inp_drop_dangling'])?>,
 	lpn_inp_drop_units: <?=json_encode($ec_lang['lpn_inp_drop_units'])?>,
 	lpn_inp_drop_anchor_missing: <?=json_encode($ec_lang['lpn_inp_drop_anchor_missing'])?>,

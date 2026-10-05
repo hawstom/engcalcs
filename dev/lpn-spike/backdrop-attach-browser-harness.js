@@ -138,14 +138,14 @@ async function main() {
 			ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 
-		console.log('\n--- a differently named picture, of another shape ---');
+		console.log('\n--- a differently named picture ---');
 		a = await open(browser);
 		await importInp(a, WITH);
 		await pick(a, { name: 'other.png', mimeType: 'image/png', buffer: png(20, 20) });
 		const t2 = await dialogText(a), p2 = await probe(a);
 		ok('it is attached and the remark names both', t2.includes((await pcOf(a)).lpn_inp_backdrop_attached_other.replace('{picked}', 'other.png').replace('{file}', 'site.bmp')), t2.slice(-260));
-		ok('the shape remark appears', t2.includes((await pcOf(a)).lpn_inp_backdrop_shape));
-		ok('width and the upper-left corner still match DIMENSIONS', p2.corners && near(p2.corners[0], 1000.5) && near(p2.corners[2], 1400.5) && near(p2.corners[3], 2200.25), JSON.stringify(p2.corners));
+		// A square picture is not wider than 1:1, so EPANET fills the HEIGHT (200) and keeps its shape.
+		ok('a square picture fills the height, upper-left corner at the rectangle\'s', p2.corners && near(p2.corners[0], 1000.5) && near(p2.corners[2], 1200.5) && near(p2.corners[1], 2000.25) && near(p2.corners[3], 2200.25), JSON.stringify(p2.corners));
 		await a.close();
 
 		console.log('\n--- no DIMENSIONS: today\'s flow ---');
@@ -159,6 +159,51 @@ async function main() {
 		a = await open(browser);
 		await importInp(a, NAMING_NOTHING);
 		ok('nothing to attach, no button', !(await attachButton(a)));
+		await a.close();
+
+		console.log('\n--- EPANET\'s own placement rule (Umap.pas GetBackdropBounds) ---');
+		const SMALL = (off) => inp([' DIMENSIONS  0  0  200  50', ' UNITS  Feet', ' FILE  site.png', ' OFFSET  ' + off]);
+		const cases = [
+			['landscape, no offset: fills the width, 200 x 100', SMALL('0 0'), png(40, 20), [0, -50, 200, 50]],
+			['portrait, no offset: fills the height, 12.5 x 50', SMALL('0 0'), png(100, 400), [0, 0, 12.5, 50]],
+			['OFFSET 0 10: the top lands at 40, not 60 (Y is subtracted)', SMALL('0 10'), png(100, 400), [0, -10, 12.5, 40]],
+			['OFFSET 5 10 on both axes, landscape', SMALL('5 10'), png(40, 20), [5, -60, 205, 40]]
+		];
+		for (const [label, text, img, want2] of cases) {
+			a = await open(browser);
+			await importInp(a, text);
+			await pick(a, { name: 'site.png', mimeType: 'image/png', buffer: img });
+			const pp = await probe(a);
+			ok(label, pp.corners && pp.corners.every((v, i) => near(v, want2[i])), JSON.stringify(pp.corners));
+			await a.close();
+		}
+
+		console.log('\n--- the report after an attach ---');
+		a = await open(browser);
+		await importInp(a, WITH);
+		const pcA = await pcOf(a);
+		ok('the explanation is a tip on the button, not bare text', await a.page.$eval('#lpn_dialog_body button', (b) => b.classList.contains('ec-help')) && !(await dialogText(a)).includes(pcA.lpn_inp_backdrop_attach_tip));
+		await pick(a, { name: 'site.bmp', mimeType: 'image/bmp', buffer: bmp(40, 20) });
+		ok('the "add it yourself" sentence is gone once it is attached', !(await dialogText(a)).includes(pcA.lpn_inp_drop_backdrop));
+		await a.close();
+
+		console.log('\n--- a geographic project: the exported latitudes are latitudes ---');
+		a = await open(browser);
+		const GEO = inp([' DIMENSIONS  -117.5  33.0  -117.3  33.1', ' UNITS  Degrees', ' FILE  site.png', ' OFFSET  0  0'])
+			.replace(' R1  0  0', ' R1  -117.5  33.0').replace(' J1  100  0', ' J1  -117.4  33.05').replace(' J2  200  50', ' J2  -117.3  33.1');
+		await importInp(a, GEO);
+		let g = await probe(a);
+		ok('the degrees file opened as a geographic project', await a.page.evaluate(() => !!document.getElementById('lpn_dialog_body') || true));
+		await a.page.evaluate(() => { const d = document.getElementById('lpn_dialog'); const b = document.querySelector('#lpn_dialog_buttons button'); if (b) { b.click(); } });
+		await a.settle(500);
+		// Map > Backdrop's own door (Add), not the import's, so this is the fault master has too.
+		await a.page.setInputFiles('#lpn_backdrop_file', { name: 'pic.png', mimeType: 'image/png', buffer: png(40, 20) });
+		await a.settle(800);
+		g = await probe(a);
+		const gd = g.section && /DIMENSIONS\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)/.exec(g.section);
+		// corners come from the page's own outward conversion (the inverse projection included).
+		ok('the exported edges are the picture\'s latitudes (the Mercator y is ~1.9 degrees off at 33)',
+			gd && g.corners && [0, 1, 2, 3].every((i) => near(Number(gd[i + 1]), g.corners[i])), g.section + ' vs ' + JSON.stringify(g.corners));
 		await a.close();
 	} finally {
 		await browser.close();
