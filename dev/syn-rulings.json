@@ -1,4 +1,113 @@
 {
     "_note": "Tom's answers on stale $ec_lang_syn entries, keyed on key + exact English + exact synonym text so a ruling lapses when either changes. Written by harvest_english_rulings.php; CC applies them by hand.",
-    "rulings": []
+    "rulings": {
+        "calc_set_units_tip": {
+            "on": "Sets the unit of every field at once. Non-destructive: the numbers you entered stay exactly as they are, and each one is now read in the new unit. A 6 stays a 6, but it now means 6 inches instead of 6 millimetres.",
+            "syn": "Changes the unit shown on every field at once (switches the whole page to that unit system). Does not change the input data.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "consent_body": {
+            "on": "May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.",
+            "syn": "",
+            "ruled": "2026-10-05",
+            "answer": "Edited proposal."
+        },
+        "ip_is_lateral": {
+            "on": "<span class=\"ec-help\" title=\"Selected: this reach is a segment of the test lateral, from which individual emitters withdraw water. Cleared: this reach is a main, only passing flow along to laterals not on the test path.\">Lat. <span class=\"ec-tip\">?</span></span>",
+            "syn": "| gloss: lateral, mainline; avoid: \"test\" read as typical/sample",
+            "ruled": "2026-10-05",
+            "answer": "What's wrong with the way it is? I am confused on this on about what's happening and why a _syn is needed."
+        },
+        "lpn_backdrop_scale_entry_bad": {
+            "on": "Enter one number for the size of one pixel on the map, or paste all six lines of a world file.",
+            "syn": "World (Map Coordinates or Georeference) File for the image | gloss: world file",
+            "ruled": "2026-10-05",
+            "answer": "It sounds like we should empty the _syn."
+        },
+        "lpn_ds_head_search_selected": {
+            "on": "What demand scale can these junctions handle?",
+            "syn": "What demand scale can these junctions carry?, How far can the demand at these junctions be scaled?",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_ds_scope_tip": {
+            "on": "All junctions, or only those selected on the map. Pressures are checked at the scaled demand.",
+            "syn": "Every junction, or just the junctions selected on the map. Pressures are checked at the scaled demand.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_ds_search_note_selected": {
+            "on": "(this key no longer exists in lib/lang.ec.en.php)",
+            "syn": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the junctions that you choose keep the given lowest pressure allowed.",
+            "ruled": "2026-10-05",
+            "answer": "Delete."
+        },
+        "lpn_ff_all": {
+            "on": "All junctions",
+            "syn": "Every junction, All the junctions | a pull-down option under Junctions to test; agrees with junctions, plural",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_help_icons": {
+            "on": "Toolbar",
+            "syn": "Toolbar legend, Toolbar icon key, Toolbar help | avoid: a keyboard key or shortcut",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_labels_col_after": {
+            "on": "Aft.",
+            "syn": "Aft. (After, Suffix, Trailing text) | layout: column heading; avoid: after in the sense of later in time",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_labels_col_before": {
+            "on": "Bef.",
+            "syn": "Bef. (Before, Prefix, Leading text) | layout: column heading; avoid: before in the sense of earlier in time",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_labels_priority_node_tip": {
+            "on": "The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first. When only one value is left and two labels still overlap, one of them is hidden: the one with the lower demand, with pressure nearer the middle of the range, or with elevation or head more like its neighboring nodes.",
+            "syn": "more like neighboring nodes = numerically closer to the neighbors' values | avoid: similar in kind",
+            "ruled": "2026-10-05",
+            "answer": "Is this _syn needed?"
+        },
+        "lpn_lock_break": {
+            "on": "Break lock",
+            "syn": "Break lock, Unlock the file, Take over the file, Override their claim | layout: button",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_profile_tip": {
+            "on": "(this key no longer exists in lib/lang.ec.en.php)",
+            "syn": "Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.",
+            "ruled": "2026-10-05",
+            "answer": "Delete"
+        },
+        "lpn_settings_map_display": {
+            "on": "Appearance",
+            "syn": "Appearance, Look, Style, How the map is drawn",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_units_group_inputs": {
+            "on": "(this key no longer exists in lib/lang.ec.en.php)",
+            "syn": "Units of inputs, or Units of what you enter",
+            "ruled": "2026-10-05",
+            "answer": "Delete."
+        },
+        "lpn_units_group_results": {
+            "on": "(this key no longer exists in lib/lang.ec.en.php)",
+            "syn": "Units of results, or Units of the answers",
+            "ruled": "2026-10-05",
+            "answer": "Delete."
+        },
+        "mtc_note_1": {
+            "on": "<dl><dt>Automated rock size and roughness design iteration</dt><dd>Choose a roughness option (Blodgett–Bathurst recommended) and a design rock size option (Isbash recommended). Adjust depth and rock size safety factor to reach your target flow with a uniform rock size. Each time you change an input, the calculator repeats these steps: 1. Roughness is calculated from design rock size. 2. The roughness value from the method you chose is copied into the roughness input. 3. Channel flow and required rock size are calculated. 4. Design rock size is adjusted. 5. Repeat until error in the design rock size is very small.</dd><dt>Basic calculator (no iteration)</dt><dd>Enter your desired roughness value. Ignore the design rock size input area.</dd></dl>",
+            "syn": "| avoid: compressing \"Blodgett–Bathurst\" to an initialism like \"BB\" — recurred independently across 8+ languages (it/ru/bg/es/uk/sr/hr/cs/tr/ps/my, corrected 2026-07-08) since nothing else in this string defines what the initials stand for; spell the full name out in every language, matching mtc_blodgett_v_bathurst",
+            "ruled": "2026-10-05",
+            "answer": "Justify. This is all very taxing on me. Is there an easier way to transcend English?"
+        }
+    }
 }
