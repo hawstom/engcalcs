@@ -4891,6 +4891,110 @@ var EngCalcs = EngCalcs || {};
 	function buildResolvedSettings(scn) { return plainObject(scn.settings) ? scn.settings : null; }
 	// The override map an edit of this category lands in, for this scenario: its own.
 	function localOverrideMap(scn, cat) { return (scn && scn.overrides) || {}; }
+	function storedById(list, id) {
+		var i;
+		for (i = 0; i < (list || []).length; i++) { if (list[i].id === id) { return list[i]; } }
+		return null;
+	}
+	function altById(id) { return storedById(doc.alternatives, id); }
+	function calcSetById(id) { return storedById(doc.calcSets, id); }
+	function storedIdOk(id) { return typeof id === 'string' && id !== '' && id.indexOf(':') < 0; }
+	// True when following `parent` from `id` comes back to `id` (or runs off a broken record).
+	function storedParentLoops(list, id, parent) {
+		var seen = {}, cur = parent;
+		seen[id] = true;
+		while (cur !== null && cur !== undefined) {
+			if (seen[cur]) { return true; }
+			seen[cur] = true;
+			cur = (storedById(list, cur) || { parent: null }).parent;
+		}
+		return false;
+	}
+	function scenarioParentLoops(id, parent) {
+		var seen = {}, cur = parent, s;
+		seen[id] = true;
+		while (cur !== undefined) {
+			if (seen[cur]) { return true; }
+			seen[cur] = true;
+			s = scenarioById(cur);
+			cur = s && !s.isBase ? s.parent : undefined;
+		}
+		return false;
+	}
+	/**
+	 * **A FILE'S TREE IS READ, NEVER TRUSTED**, on the rule sanitizeScenarioSettings() follows: what
+	 * the page cannot resolve goes, and nothing it can is touched, so a well-formed file round-trips
+	 * byte-identical. A record with no usable id or category goes; a parent that is missing, of
+	 * another category, or makes a loop becomes "child of Base"; a scenario's choice of a record
+	 * that is not there, or not of that category, goes (it inherits again). Empty lists and maps go.
+	 * A calculation set's options are cleaned exactly as a scenario's are.
+	 */
+	function sanitizeScenarioTree() {
+		['alternatives', 'calcSets'].forEach(function (k) {
+			var seen = {}, list = doc[k];
+			if (list === undefined) { return; }
+			if (!Array.isArray(list)) { delete doc[k]; return; }
+			list = list.filter(function (r) {
+				var ok = plainObject(r) && storedIdOk(r.id) && !seen[r.id] &&
+					(k === 'calcSets' || (LPN_ALT_CATEGORIES.indexOf(r.category) >= 0 && r.category !== 'calculation'));
+				if (ok) { seen[r.id] = true; }
+				return ok;
+			});
+			list.forEach(function (r) {
+				var p = r.parent === undefined ? null : r.parent, pr = p === null ? null : storedById(list, p);
+				if (p !== null && (!pr || (k === 'alternatives' && pr.category !== r.category) || storedParentLoops(list, r.id, p))) { r.parent = null; }
+				if (k === 'alternatives') {
+					if (r.values !== undefined && !plainObject(r.values)) { delete r.values; }
+					if (r.settings !== undefined && !plainObject(r.settings)) { delete r.settings; }
+					settingLeaves(r.settings).forEach(function (leaf) {
+						var cat = categoryOfSetting(leaf.path);
+						if (cat === null || (cat !== undefined && cat !== r.category) || settingHasOtherHome(leaf.path)) { settingDelete(r, leaf.path); }
+					});
+				} else {
+					sanitizeCalcHolder(r);
+				}
+			});
+			if (list.length) { doc[k] = list; } else { delete doc[k]; }
+		});
+		scenarios.forEach(function (s) {
+			if (s.isBase) { delete s.parent; delete s.alternatives; delete s.calc; return; }
+			if (s.parent !== undefined) {
+				var ps = scenarioById(s.parent);
+				if (!ps || ps === s || scenarioParentLoops(s.id, s.parent)) { delete s.parent; }
+			}
+			if (s.alternatives !== undefined) {
+				if (!plainObject(s.alternatives)) { delete s.alternatives; }
+				else {
+					Object.keys(s.alternatives).forEach(function (cat) {
+						var a = altById(s.alternatives[cat]);
+						if (!a || a.category !== cat) { delete s.alternatives[cat]; }
+					});
+					if (!Object.keys(s.alternatives).length) { delete s.alternatives; }
+				}
+			}
+			if (s.calc !== undefined && !calcSetById(s.calc)) { delete s.calc; }
+		});
+	}
+	// A calculation set's own options, cleaned as a scenario's are: only calculation paths in its
+	// block, and a multiplier or time it can run.
+	function sanitizeCalcHolder(r) {
+		if (r.settings !== undefined && !plainObject(r.settings)) { delete r.settings; }
+		settingLeaves(r.settings).forEach(function (leaf) {
+			var cat = categoryOfSetting(leaf.path);
+			if (cat === null || (cat !== undefined && cat !== 'calculation') || settingHasOtherHome(leaf.path)) { settingDelete(r, leaf.path); }
+		});
+		if (r.demandMultiplier !== undefined && !(typeof r.demandMultiplier === 'number' && isFinite(r.demandMultiplier))) { delete r.demandMultiplier; }
+		if (r.times !== undefined) {
+			if (!plainObject(r.times)) { delete r.times; return; }
+			LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
+				if (r.times[key] !== undefined && scenarioTimeValue(r, key) === undefined) {
+					delete r.times[key];
+					if (r.times.text) { delete r.times.text[key]; }
+				}
+			});
+			if (!LPN_SCENARIO_TIME_KEYS.some(function (key) { return r.times[key] !== undefined; })) { delete r.times; }
+		}
+	}
 	/**
 	 * **EVERY OVERRIDE MAP IN THE DOCUMENT**, for the maintenance that must reach all of them: an
 	 * element renamed or deleted, a unit converted, a pattern, curve, type or fittings list renamed,
@@ -4936,6 +5040,8 @@ var EngCalcs = EngCalcs || {};
 		// -- the model and the file's own bookkeeping
 		format: null, app: null, v: null, nextId: null,
 		scenarios: null, nodes: null, links: null, labels: null, customers: null,
+		// The stored scenario tree (stage 4) is the model's structure, not a value a scenario holds.
+		alternatives: null, calcSets: null,
 		// -- what stored numbers MEAN: a scenario of its own would reinterpret them
 		units: null, origin: null,
 		'project.coords': null, 'project.crs': null, 'project.georef': null,
@@ -33927,7 +34033,6 @@ var EngCalcs = EngCalcs || {};
 		baseScenario().overrides = {}; // Base is canon and has no overrides, by definition
 		sanitizeScenarioTimes();
 		sanitizeScenarioSettings();
-		touchTree('applySaved');
 		if (!scenarios.some(function (s) { return s.id === project.activeScenario; })) { project.activeScenario = baseScenario().id; }
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
 		// The customers (Task 247). A file written before they existed has none, and every
@@ -33984,6 +34089,8 @@ var EngCalcs = EngCalcs || {};
 		// A scenario tree from a later reader (shared alternatives, calculation sets) rides through
 		// verbatim; a scenario's own tree keys already do, on the scenario object.
 		LPN_TREE_KEYS.forEach(function (k) { if (saved[k] !== undefined) { doc[k] = saved[k]; } else { delete doc[k]; } });
+		sanitizeScenarioTree();
+		touchTree('applySaved');
 		// Task 510's saved paths, taken VERBATIM. An id naming a node this document does not have
 		// is the user's data and is reported where it is used, never pruned here -- see
 		// profileMissingStops(). A file written before this existed simply has none.
