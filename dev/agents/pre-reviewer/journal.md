@@ -3861,3 +3861,8 @@ OBSERVED real Chrome (Net1, Net3): Show scenarios works on Junctions/Pipes/Pumps
 OBSERVED defects (minor): new scenario while shown appends its rows at the bottom, not beside each asset; rename leaves old name in Scenario column until switch; fill down makes overrides equal to parent.
 OBSERVED: stable sort changes ordinary tables vs master (tie rows keep previous order instead of ID) - intended.
 Lesson: pane toggle button toggles; sort lives on the arrow button; dialogs routed to native by seam (answerPromptWith).
+
+## 2026-10-05 feat/backdrop-attach (Task 282)
+- CITED: EPANET 2.2 Delphi GUI, USEPA/EPANET2.2 Delphi_GUI/epanet2w/Umap.pas GetBackdropBounds: x0 = LL.X + Offset.X; y0 = UR.Y - Offset.Y (Y offset is DOWN-positive; Fmap.pas EndPanning comment agrees); picture keeps its aspect: if AR>1 h=w/AR else w=h*AR.
+- OBSERVED: branch moves picture UP for positive OFFSET Y (OFFSET 0 10 on rect 0 0 200 50 -> top 60, EPANET 40). Portrait 100x400 picture in 200x50 rect lands 800 tall, EPANET 50 tall.
+- OBSERVED: undo/redo is one step, re-import clears, no new localStorage keys. Tip is a visible div, not ec-help glyph (findHelpLabel exists). Geo export DIMENSIONS lat off by ~2 deg (code untouched by branch, not checked on master).
