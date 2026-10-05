@@ -3866,3 +3866,9 @@ Lesson: pane toggle button toggles; sort lives on the arrow button; dialogs rout
 - CITED: EPANET 2.2 Delphi GUI, USEPA/EPANET2.2 Delphi_GUI/epanet2w/Umap.pas GetBackdropBounds: x0 = LL.X + Offset.X; y0 = UR.Y - Offset.Y (Y offset is DOWN-positive; Fmap.pas EndPanning comment agrees); picture keeps its aspect: if AR>1 h=w/AR else w=h*AR.
 - OBSERVED: branch moves picture UP for positive OFFSET Y (OFFSET 0 10 on rect 0 0 200 50 -> top 60, EPANET 40). Portrait 100x400 picture in 200x50 rect lands 800 tall, EPANET 50 tall.
 - OBSERVED: undo/redo is one step, re-import clears, no new localStorage keys. Tip is a visible div, not ec-help glyph (findHelpLabel exists). Geo export DIMENSIONS lat off by ~2 deg (code untouched by branch, not checked on master).
+
+## 2026-10-05 feat/backdrop-attach, Export EPANET file saves BMP + .bpw (commits after 1117771d)
+- CITED: EPANET2.2 Fmain.dfm picture filter is *.bmp;*.emf;*.wmf only; Umap.pas GetBackdrop is TPicture.LoadFromFile; no png/jpeg unit in Fmain/Umap/dpr. Builder's citation holds. Uimport.pas uses DIMENSIONS verbatim as map extent when present.
+- OBSERVED (Chromium, flock): builder harness 61/61. My own run: Elm Street moved/scaled via world file -> DIMENSIONS, C/F, BMP all agree; RGBA PNG exported on white (alpha 0 -> 255,255,255; alpha 128 red -> 255,127,127); 4000x3000 PNG ends as 1600x1200 BMP 5.7 MB (existing 1600 px store cap), ~5 s.
+- OBSERVED: Elm Street 3 of 18 nodes lie outside the picture rectangle that becomes EPANET DIMENSIONS. Unverifiable without EPANET desktop whether they draw. Decays: re-check against tree.
+- Nothing stored on device in the diff.
