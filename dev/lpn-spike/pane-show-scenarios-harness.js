@@ -1,15 +1,17 @@
 // SHOW SCENARIOS IN THE TABLES (Tom, 2026-10-05). Run with:
 //   node dev/lpn-spike/pane-show-scenarios-harness.js
 //
-// Tom: *"'Show scenarios' would add columns for Scenario, Parent, Alternative, Parent, and Scenario
-// override and would show all the scenarios for every asset in the table."* and *"every column
+// Tom: *"'Show scenarios' would ... show all the scenarios for every asset in the table."*, and on
+// 2026-10-06: *"Scenario column only. Maybe a tip on each override can state the name of the
+// alternative that holds that override: 'Demand alt.: Max day'"*. and *"every column
 // sort preserves strictly the previous order of its rows with ties."* Asserted here:
 //
-//   1. The cell menu offers Show scenarios; pressing it inserts the five columns right after ID.
+//   1. The cell menu offers Show scenarios; pressing it inserts one column, Scenario, after ID.
 //   2. Rows = assets x scenarios, in ID order, Base first within each asset.
 //   3. Every property cell shows the value EFFECTIVE in its row's scenario, and a value set in that
 //      scenario wears the override wash; Base rows never do.
-//   4. The Alternative, Parent and Scenario override columns say what the row's scenario uses.
+//   4. An override cell's tip names the alternative holding it, "<Category> alt.: <name>".
+//   8. A scenario added while shown puts the table back in natural order; 9. a rename shows at once.
 //   5. A typed cell in a scenario row that is NOT the active one writes an override into THAT row's
 //      scenario through setProp(), leaves Base and the active scenario alone, and a Base-owned
 //      column (elevation) is read-only in a non-Base row.
@@ -33,7 +35,8 @@ function report(ok, label, detail) {
 setUnitSet('us');
 
 const L = loadLoopedNetwork(
-	"\t\tgetDoc: function () { return doc; }, addNode: addNode,\n" +
+	"\t\tgetDoc: function () { return doc; }, addNode: addNode, addLink: addLink,\n" +
+	"\t\tscenarioMenuRows: scenarioMenuRows,\n" +
 	"\t\tpaneTableById: paneTableById, openPane: openPane,\n" +
 	"\t\trenderTable: function (id) { renderPaneTable(paneTableById(id)); },\n" +
 	"\t\tcolKeys: function (id) { return paneCols(paneTableById(id)).map(function (c) { return c.key; }); },\n" +
@@ -83,7 +86,7 @@ L.switchScenario(L.baseId());
 L.openPane('junctions');
 L.renderTable('junctions');
 
-console.log('\n--- 1. the cell menu offers Show scenarios, and it inserts five columns after ID ---');
+console.log('\n--- 1. the cell menu offers Show scenarios, and it inserts Scenario after ID ---');
 let menu = openMenu('junctions', J[0].id, 'demand');
 const showItem = menuItem(menu, PC().lpn_pane_scn_show);
 report(!!showItem, 'the cell menu has a Show scenarios row', menu && JSON.stringify(menu.children.map((b) => b.textContent)));
@@ -91,8 +94,8 @@ report(showItem && showItem.textContent.indexOf('✓') < 0, '...unticked while i
 fire(showItem, 'click', {});
 const keys = L.colKeys('junctions');
 report(keys.indexOf('id') === 0 &&
-	keys.slice(1, 6).join(',') === 'scn_name,scn_parent,scn_alt,scn_altparent,scn_ov',
-	'Scenario, Parent, Alternative, Parent, Scenario override sit right after ID', keys.slice(0, 7).join(','));
+	keys[1] === 'scn_name' && keys.filter((k) => /^scn_/.test(k)).length === 1,
+	'one column, Scenario, sits right after ID', keys.slice(0, 4).join(','));
 menu = openMenu('junctions', J[0].id + SEP + L.baseId(), 'demand');
 report(!!menuItem(menu, '\u2713 ' + PC().lpn_pane_scn_show), 'the menu row is ticked while it is on');
 report(!menuItem(menu, PC().lpn_pane_paste_append) && !menuItem(menu, PC().lpn_pane_delete_element),
@@ -124,22 +127,22 @@ report(!hasClass(L.td('junctions', J[1].id + SEP + L.baseId(), 'demand'), 'lpn-p
 report(!hasClass(L.td('junctions', J[0].id + SEP + peak.id, 'demand'), 'lpn-pane-ovcell'),
 	'J1 Peak Hour demand, inherited, is not');
 
-console.log('\n--- 4. Scenario, Parent, Alternative, Parent, Scenario override ---');
-const r2p = rowOf(J[1], peak.id), r1p = rowOf(J[0], peak.id), r1b = rowOf(J[0], L.baseId()), r1f = rowOf(J[0], fire1.id);
-report(L.text('junctions', r2p, 'scn_parent') === 'Base' && L.text('junctions', r1b, 'scn_parent') === '',
-	'a scenario\'s parent is Base; Base has none');
-report(L.text('junctions', r1p, 'scn_alt') === 'Peak Hour Demand',
-	'every Peak Hour row uses the Peak Hour Demand alternative, even an asset it did not change',
-	L.text('junctions', r1p, 'scn_alt'));
-report(L.text('junctions', r1p, 'scn_altparent') === 'Base Demand', '...whose parent is Base Demand',
-	L.text('junctions', r1p, 'scn_altparent'));
-report(L.text('junctions', r1b, 'scn_alt') === 'Base' && L.text('junctions', r1b, 'scn_altparent') === '',
-	'a Base row names Base and no parent');
-report(L.text('junctions', r1f, 'scn_alt') === 'Fire Fire flow', 'the Fire rows use the Fire Fire flow alternative',
-	L.text('junctions', r1f, 'scn_alt'));
-report(L.text('junctions', r2p, 'scn_ov') === 'Base demand' && L.text('junctions', r1p, 'scn_ov') === '',
-	'Scenario override names the column of the property set in that scenario (Base demand, EPANET\'s heading), and only on its own asset',
-	JSON.stringify([L.text('junctions', r2p, 'scn_ov'), L.text('junctions', r1p, 'scn_ov')]));
+console.log('\n--- 4. an override cell\'s tip names the alternative that holds it ---');
+// A wired tip keeps its words in data-bs-original-title, as Bootstrap does.
+function tipOf(td) { return td ? (td.getAttribute('data-bs-original-title') || td.title || '') : ''; }
+function altTip(cat, name) {
+	return PC().lpn_pane_scn_alt_tip.split('{category}').join(PC()['lpn_alt_cat_' + cat]).split('{alternative}').join(name);
+}
+{
+	const td4 = L.td('junctions', J[1].id + SEP + peak.id, 'demand');
+	report(!!td4 && tipOf(td4) === altTip('demand', 'Peak Hour') && hasClass(td4, 'ec-help'),
+		'J2\'s Peak Hour demand says Demand alt.: Peak Hour', tipOf(td4));
+	const td4f = L.td('junctions', J[0].id + SEP + fire1.id, 'fireFlow');
+	report(!!td4f && tipOf(td4f) === altTip('fireflow', 'Fire'), 'J1\'s Fire fire flow names the Fire flow alternative',
+		tipOf(td4f));
+	const td4b = L.td('junctions', J[1].id + SEP + L.baseId(), 'demand'), td4i = L.td('junctions', J[0].id + SEP + peak.id, 'demand');
+	report(!tipOf(td4b) && !tipOf(td4i), 'a Base cell and an inherited cell carry no such tip');
+}
 
 console.log('\n--- 5. a typed cell writes into ITS row\'s scenario, through setProp() ---');
 {
@@ -191,7 +194,7 @@ console.log('\n--- 7. pressing it again restores the ordinary table ---');
 	menu = openMenu('junctions', L.rows('junctions')[0].id, 'demand');
 	fire(menuItem(menu, PC().lpn_pane_scn_show), 'click', {});
 	const k2 = L.colKeys('junctions');
-	report(!k2.some((k) => /^scn_/.test(k)), 'the five columns are gone', k2.join(','));
+	report(!k2.some((k) => /^scn_/.test(k)), 'the Scenario column is gone', k2.join(','));
 	rows = L.rows('junctions');
 	report(rows.length === 3 && rows.every((r) => !r._lpnScn), 'one row per junction again, each the element itself',
 		String(rows.length));
@@ -207,6 +210,60 @@ console.log('\n--- the ordinary table sorts stably too ---');
 	L.sort('junctions', 'elev');  // all 100: ties keep the descending-ID order, not ID ascending
 	report(L.rows('junctions').map((r) => r.id).join('|') === desc,
 		'sorting a tied column keeps the previous (descending ID) order', L.rows('junctions').map((r) => r.id).join('|'));
+}
+
+console.log('\n--- 8. a scenario added while shown puts the table back in natural order ---');
+{
+	menu = openMenu('junctions', J[0].id, 'demand');
+	fire(menuItem(menu, PC().lpn_pane_scn_show), 'click', {});
+	L.sort('junctions', 'demand');   // a user order: by demand, not by ID
+	L.sort('junctions', 'demand');   // descending
+	L.createScenario('Average');
+	L.switchScenario(L.baseId());
+	L.renderTable('junctions');
+	rows = L.rows('junctions');
+	const got8 = rows.map((r) => L.text('junctions', r, 'id') + '/' + L.text('junctions', r, 'scn_name'));
+	const want8 = [];
+	J.map((n) => n.id).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).forEach((id) => {
+		['Base', 'Average', 'Fire', 'Peak Hour'].forEach((sc) => want8.push(id + '/' + sc));
+	});
+	report(rows.length === 12, 'rows = 3 junctions x 4 scenarios', String(rows.length));
+	report(got8.join('|') === want8.join('|'),
+		'the new scenario\'s rows sit with their assets, in ID then Scenario order, not at the bottom', got8.join(' | '));
+}
+
+console.log('\n--- 9. renaming a scenario while shown renames its rows at once ---');
+{
+	L.switchScenario(peak.id);
+	L.renderTable('junctions');
+	const rename = L.scenarioMenuRows().filter((r) => r.icon === 'edit')[0];
+	global.window.lpnDialogAnswerer = function (req) { return req.kind === 'prompt' ? 'Max Hour' : true; };
+	try { rename.fn(); } finally { delete global.window.lpnDialogAnswerer; }
+	const td9 = L.td('junctions', J[0].id + SEP + peak.id, 'scn_name');
+	report(!!td9 && td9.textContent === 'Max Hour', 'the Scenario column reads the new name with no switch or solve',
+		td9 && td9.textContent);
+	const tip9 = L.td('junctions', J[1].id + SEP + peak.id, 'demand');
+	report(!!tip9 && tipOf(tip9) === altTip('demand', 'Max Hour'), '...and so does the alternative its overrides name',
+		tipOf(tip9));
+	L.switchScenario(L.baseId());
+}
+
+console.log('\n--- a Base-owned choice reads like its Base pull-down in a scenario row ---');
+{
+	const a = L.addNode('junction', 0, 50), b = L.addNode('junction', 10, 50), pump = L.addLink('pump', a.id, b.id, []);
+	L.openPane('pumps');
+	const sp = L.paneTableById('pumps');
+	if (!sp.scnRows) {
+		L.renderTable('pumps');
+		menu = openMenu('pumps', pump.id, 'speedPattern');
+		fire(menuItem(menu, PC().lpn_pane_scn_show), 'click', {});
+	}
+	const baseSel = L.cell('pumps', pump.id + SEP + L.baseId(), 'speedPattern');
+	const peakTd = L.td('pumps', pump.id + SEP + peak.id, 'speedPattern');
+	const baseWord = baseSel && baseSel.children.filter((o) => o.value === baseSel.value)[0];
+	report(!!peakTd && !!baseWord && peakTd.textContent === baseWord.textContent && peakTd.textContent !== '',
+		'the read-only Speed pattern in a scenario row says what Base\'s pull-down says',
+		JSON.stringify([peakTd && peakTd.textContent, baseWord && baseWord.textContent]));
 }
 
 console.log(`\n${failures ? 'FAILURES' : 'all pass'}: ${checks - failures}/${checks}`);

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**15 still to read on master**, of 122 untranslated keys, of 2350 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**12 still to read on master**, of 119 untranslated keys, of 2347 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -94,7 +94,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (122, 15 to read @@ NEEDS RULING)
+## lpn_  (119, 12 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -312,17 +312,8 @@ never edits a synonym.
 - **`lpn_pane_manage_cols_width`**
   > Width (em)
   _Ruled OK 2026-10-05._
-- **`lpn_pane_scn_alt`**
-  > Alternative
-  @@ NEEDS RULING
-- **`lpn_pane_scn_alt_name`**
-  > {scenario} {category}
-  @@ NEEDS RULING
-- **`lpn_pane_scn_override`**
-  > Scenario override
-  @@ NEEDS RULING
-- **`lpn_pane_scn_parent`**
-  > Parent
+- **`lpn_pane_scn_alt_tip`**
+  > {category} alt.: {alternative}
   @@ NEEDS RULING
 - **`lpn_pane_scn_show`**
   > Show scenarios
@@ -478,7 +469,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`3cb067bd`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/bentley-interop (`3d4f2c27`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -490,15 +481,6 @@ build for that would be a gate nobody keeps. Refresh it with
 ### feat/desktop (`baba0f04`) — adds no English strings
 
 ### feat/engine-prefetch (`3194c30d`) — adds no English strings
-
-### feat/find-source (`e999a378`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_find_scope_source`**
-  > Source
-  @@ NEEDS RULING
-- **`lpn_find_source_no_chemical`**
-  > No chemical is being tracked, so no node has a source.
-  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -512,6 +494,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
+### feat/label-placer (`3f3c5792`) — adds no English strings
+
 ### feat/label-placer-a (`3483bfd6`) — adds no English strings
 
 ### feat/label-placer-b (`c5905432`) — adds no English strings
@@ -520,10 +504,14 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/scenario-table (`9abebdb3`) — adds no English strings
+### feat/notes-trim (`c8580393`) — 8 new, 5 to read @@ NEEDS RULING
 
-### feat/times-statistic (`70959325`) — 6 new, 3 to read @@ NEEDS RULING
-
+- **`lpn_find_scope_source`**
+  > Source
+  @@ NEEDS RULING
+- **`lpn_find_source_no_chemical`**
+  > No chemical is being tracked, so no node has a source.
+  @@ NEEDS RULING
 - **`lpn_time_stat_averaged`**
   > Avg
   @@ NEEDS RULING
@@ -543,6 +531,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > Statistic
   _Ruled OK 2026-10-05._
 
+### feat/scenario-table (`0b973478`) — adds no English strings
+
 ### feat/tip-door (`02c0e67d`) — adds no English strings
 
-### feat/transport-ends (`50fcf6f2`) — adds no English strings
+### feat/transport-ends (`40ef582f`) — adds no English strings
