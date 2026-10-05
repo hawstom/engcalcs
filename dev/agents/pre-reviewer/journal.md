@@ -3811,6 +3811,14 @@ Scripts: scratchpad/perry/p*.js, mutation copy scratchpad/perry/mut.
 6 dropdown fits ("Pressure driven"); stale unit labels until Settings reopened: not fixed.
 Mutants: Minimum Pressure line omitted: now caught. Minimum conversion removed: STILL not caught (psi case).
 
+# Perry journal, feat/times-statistic a18d28ac, 2026-10-04
+
+OBSERVED (re-verify before citing): vendored EPANET (2.3.05) writes AVERAGE/MINIMUM/MAXIMUM/RANGE report blocks; link FLOW statistics use ABSOLUTE values (Net1 link 110: Averaged 575.06, Min 51.87, Max 1100, Range 1048.13 gpm; signed from the same 25 hourly values would be 5.74 / -1029.42 / 1100 / 2129.4). Pressure, demand and pump headloss are signed; the branch computes flow signed -> MISSED for any reversing link.
+OBSERVED: EPANET averages the reporting periods from Report Start only (Report Start 6:00: node 10 = 121.77 psi = mean of 6..24h, not 123.60). Branch's frames already start at Report Start, so that part is right.
+OBSERVED: the Settings select, the extra last entry, return to normal steps on goTo, NONE removing the entry: all work in a browser. Map labels carry no sign they are an average (legend still "P=Pressure").
+OBSERVED (outside branch): app's Net1 EPS diverges from raw EPANET on reference Net1.inp from 10:00 (pump 9 control, example stores "unit":"head" for value 110); not investigated.
+Harnesses: inp-export, net3 roundtrip, passthrough, import, times-statistic all pass. Branch is 18 commits behind master (diff vs master shows reversals; three-dot diff is clean).
+Scripts: scratchpad stat.js, step.js, rs.js, br.js.
 ## feat/dock-flag-order at 8fa3fea5, flag drag reorder (OBSERVED, 2026-10-04)
 OBSERVED: with 3 flags on one bar, a drag moves the flag exactly one slot then stops. Chrome releases pointer capture when insertBefore moves the tab (lostpointercapture fires mid-drag), so later moves and the pointerup never reach it. Mouse and CDP touch alike.
 OBSERVED: consequence: no dockOrd stored, `lpn-dock-tab-drag` outline lingers, order reverts on next layout/reload. The builder's harness has only 2 flags so one slot is all it can test.

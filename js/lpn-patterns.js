@@ -133,8 +133,8 @@
 	//
 	// EPANET's [TIMES] section is the authority for every default below, and each is named with the
 	// keyword it comes from so a reader can check it against the manual rather than against us.
-	// Water-quality timestep and the reporting statistic are NOT here: nothing on this page reads
-	// them, and a field nobody reads is a field that goes stale.
+	// Water-quality timestep and the reporting statistic are NOT here: both are optional and absent
+	// means EPANET's own default (see TIMES_KEYS and LPN_STATISTICS below).
 
 	/**
 	 * EPANET's own [TIMES] defaults, in seconds.
@@ -184,6 +184,39 @@
 		QUALITYTIMESTEP: 'qualityStep'
 	};
 	EC.lpnTimesKeys = TIMES_KEYS;
+
+	// **[TIMES] Statistic** (Task 735). EPANET's five values, in its own order. Not in
+	// lpnTimesDefaults(): absent means NONE, and writing a line stating the default into a file
+	// that never had one is the round-trip damage the sparseness rule exists to prevent. It is a
+	// word, not a duration, so it is carried as `times.statistic` (upper case, one of these) and
+	// the file's own spelling as `times.text.statistic`.
+	EC.LPN_STATISTICS = ['NONE', 'AVERAGED', 'MINIMUM', 'MAXIMUM', 'RANGE'];
+	/**
+	 * Read one Statistic word the way EPANET does: any prefix of the keyword matches, case-blind.
+	 * Returns the canonical upper-case name, or null when the word is not one of the five.
+	 */
+	EC.lpnParseStatistic = function (word) {
+		var w = String(word === undefined || word === null ? '' : word).trim().toUpperCase(), i;
+		if (!w) { return null; }
+		for (i = 0; i < EC.LPN_STATISTICS.length; i++) {
+			if (EC.LPN_STATISTICS[i].indexOf(w) === 0) { return EC.LPN_STATISTICS[i]; }
+		}
+		return null;
+	};
+	/**
+	 * The text a Statistic line is written with: the file's own spelling while it still means the
+	 * stored value (or, for a word we could not place, verbatim), else a composed one
+	 * (`Averaged`). null when there is nothing to write.
+	 */
+	EC.lpnStatisticText = function (times) {
+		var s = times && times.statistic, t = times && times.text && times.text.statistic;
+		if (typeof t === 'string' && t && (!s || EC.lpnParseStatistic(t) === s || !EC.lpnParseStatistic(t))) {
+			if (s && EC.lpnParseStatistic(t) !== s) { return s.charAt(0) + s.slice(1).toLowerCase(); }
+			return t;
+		}
+		if (!s) { return null; }
+		return s.charAt(0) + s.slice(1).toLowerCase();
+	};
 
 	var TIME_UNITS = {
 		SEC: 1, SECOND: 1, SECONDS: 1,

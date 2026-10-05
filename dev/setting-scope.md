@@ -82,11 +82,11 @@ rows) are counted only when present. Regenerate with
 | `lpn_set_sub_idPrefixes` | 7 | 7 | 0 | 0 |
 | `lpn_set_sub_defaults` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_units` | 8 | 8 | 0 | 0 |
-| `lpn_set_sub_time` | 7 | 7 | 0 | 0 |
+| `lpn_set_sub_time` | 8 | 8 | 0 | 0 |
 | `lpn_set_sub_hydraulics` | 17 | 16 | 1 | 0 |
 | `lpn_set_sub_energy` | 5 | 5 | 0 | 0 |
 | `lpn_set_sub_quality` | 2 | 2 | 0 | 0 |
-| **Total** | 114 | 112 | 2 | 0 |
+| **Total** | 115 | 113 | 2 | 0 |
 
 Controls whose home is not their heading's default, as observed:
 
