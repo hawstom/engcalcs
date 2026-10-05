@@ -47,7 +47,7 @@ const L = loadLoopedNetwork(
 	"\t\treparentCalcSet: reparentCalcSet, deleteCalcSet: deleteCalcSet, assignCalcSet: assignCalcSet,\n" +
 	"\t\tsaveUndoSnapshot: saveUndoSnapshot, undo: undo, redo: redo,\n" +
 	"\t\tapplyNodeRename: applyNodeRename, deleteNode: deleteNode, convertUnitValues: convertUnitValues,\n" +
-	"\t\tlibRepointPattern: libRepointPattern, setScenarioParent: setScenarioParent,\n" +
+	"\t\tlibRepointPattern: libRepointPattern, setScenarioParent: setScenarioParent, treeLayers: treeLayers,\n" +
 	"\t\tsetScenarioView: setScenarioView, currentView: currentView, applyView: applyView,\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -588,7 +588,7 @@ console.log('\n--- 7. the API ---');
 	const child = L.createAlternative('demand', 'Child', pd.id);
 	ok('...nor can its own child (no loops)', !!L.reparentAlternative(pd.id, child.id).refused);
 	ok('Calculation is not an alternative', !!L.createAlternative('calculation', 'c', null).refused);
-	ok('a merge across categories is refused', !!L.mergeAlternativeInto(child.id, L.getDoc().alternatives.filter((a) => a.category === 'physical')[0].id).refused);
+	ok('a merge across categories is refused', L.mergeAlternativeInto(child.id, L.getDoc().alternatives.filter((a) => a.category === 'physical')[0].id).refused === 'category');
 	ok('...a merge into its parent moves its users and children, and deletes it', L.mergeAlternativeInto(child.id, pd.id) === true && !L.getDoc().alternatives.some((a) => a.id === child.id));
 	const cs = L.createCalcSet('Peak options', null);
 	ok('a calculation set is named by a scenario', L.assignCalcSet(peak.id, cs.id, { discard: true }) === true);
@@ -599,6 +599,78 @@ console.log('\n--- 7. the API ---');
 	L.assignCalcSet(fire.id, cs2.id, { discard: true });
 	ok('...a child set inherits what it does not state (a Base change would flow too)', L.heldCalcOption(fire, 'demandMultiplier') === 2.5);
 	ok('...and deleting a set in use is refused', !!L.deleteCalcSet(cs.id).refused);
+}
+
+// ---------------------------------------------------------------------------
+// 7b. A merge moves no value any user of the merged alternative reads
+// ---------------------------------------------------------------------------
+// Perry's two repros first, then every same-category pair of every random tree: an allowed merge
+// leaves every scenario that used the source (directly, through a child alternative, or through a
+// parent scenario) reading exactly what it read; a refused one changes nothing at all.
+console.log('\n--- 7b. merge ---');
+{
+	function valuesOf(s) {
+		const keep = L.getProject().activeScenario, out = [];
+		L.getProject().activeScenario = s.id;
+		elements.forEach((el) => Object.keys(L.OVERRIDABLE[L.ovKeyGroup(L.ovKey(el))] || {}).forEach((p) => out.push(J(L.effective(el, p)))));
+		settingPaths.forEach((p) => out.push(J(L.settingFor(s, p))));
+		L.getProject().activeScenario = keep;
+		return out.join('|');
+	}
+	function usersOf(a) {
+		return L.getScenarios().filter((s) => !s.isBase && L.treeLayers(s, a.category).some((l) => l.obj === a));
+	}
+	// Repro 1: a holds demand 9, t holds a demands list; same parent (Base).
+	open('Net1.lwn');
+	const j = L.getDoc().nodes.filter((n) => n.type === 'junction')[0], pipe = L.getDoc().links.filter((l) => l.type === 'pipe')[0];
+	elements = [j, pipe];
+	const s1 = L.createScenario('Uses a');
+	const a = L.createAlternative('demand', 'a', null), t = L.createAlternative('demand', 't', null);
+	a.values = {}; a.values[L.ovKey(j)] = { demand: 9 };
+	t.values = {}; t.values[L.ovKey(j)] = { demands: [{ base: 100, pattern: null, category: 'x' }] };
+	L.assignAlternative(s1.id, 'demand', a.id, { discard: true });
+	L.touchTree();
+	L.getProject().activeScenario = s1.id;
+	const was = L.effective(j, 'demand');
+	const r1 = L.mergeAlternativeInto(a.id, t.id);
+	ok('a merge that would hand a demand list to its users is refused, saying why', was === 9 && r1.refused === 'values' && /start reading/.test(r1.why) && L.effective(j, 'demand') === 9);
+	// The same pair as child and parent: allowed, and 9 stays 9 (the list takes row 0's base).
+	L.reparentAlternative(a.id, t.id);
+	ok('...as child and parent it is allowed, and the demand still reads 9',
+		L.mergeAlternativeInto(a.id, t.id) === true && L.effective(j, 'demand') === 9 && s1.alternatives.demand === t.id);
+	// Repro 2: aa, a child of p0 (diameter 123), into an unrelated tt.
+	const s2 = L.createScenario('Uses aa');
+	const p0 = L.createAlternative('physical', 'p0', null), aa = L.createAlternative('physical', 'aa', p0.id), tt = L.createAlternative('physical', 'tt', null);
+	p0.values = {}; p0.values[L.ovKey(pipe)] = { diameter: 123 };
+	L.assignAlternative(s2.id, 'physical', aa.id, { discard: true });
+	L.touchTree();
+	L.getProject().activeScenario = s2.id;
+	const r2 = L.mergeAlternativeInto(aa.id, tt.id);
+	ok('a merge into an unrelated alternative is refused, saying why', r2.refused === 'unrelated' && /ancestor/.test(r2.why) && L.effective(pipe, 'diameter') === 123);
+	ok('...into its parent it is allowed, and 123 stays', L.mergeAlternativeInto(aa.id, p0.id) === true && L.effective(pipe, 'diameter') === 123);
+
+	let tried = 0, allowed = 0, kept = 0, refusedClean = 0, refused = 0;
+	for (let n = 0; n < 25; n++) {
+		randomTree(pick(['Net1.lwn', 'Net2.lwn']));
+		const alts = (L.getDoc().alternatives || []).slice();
+		for (let i = 0; i < 6 && alts.length > 1; i++) {
+			const src = pick(alts), tgt = pick(alts.filter((x) => x.category === src.category && x !== src));
+			if (!tgt || !L.getDoc().alternatives.includes(src) || !L.getDoc().alternatives.includes(tgt)) { continue; }
+			tried++;
+			const users = usersOf(src), before = users.map(valuesOf), file = L.projectFileText();
+			const r = L.mergeAlternativeInto(src.id, tgt.id);
+			if (r === true) {
+				allowed++;
+				if (J(users.map(valuesOf)) === J(before)) { kept++; } else if (process.env.TREE_DEBUG) { console.log('MOVED', src.id, '->', tgt.id); }
+			} else {
+				refused++;
+				if (L.projectFileText() === file) { refusedClean++; }
+			}
+		}
+	}
+	ok('every allowed merge leaves every user of the source reading what it read (' + kept + '/' + allowed + ' of ' + tried + ' tried)', kept === allowed && allowed > 10);
+	ok('...and every refused one changes nothing (' + refusedClean + '/' + refused + ')', refusedClean === refused);
+	ok('...and the merges break no invariant', !invariants().length, invariants().join(', '));
 }
 
 // ---------------------------------------------------------------------------

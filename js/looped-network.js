@@ -5222,27 +5222,36 @@ var EngCalcs = EngCalcs || {};
 	function deleteAlternative(id) { return deleteStored('alt', id); }
 	function deleteCalcSet(id) { return deleteStored('calc', id); }
 	/**
-	 * **MERGE ONE ALTERNATIVE INTO ANOTHER OF THE SAME CATEGORY** and delete it: its values win over
-	 * the target's (they were the more particular), the scenarios naming it name the target, and its
-	 * children become the target's. Refused across categories, into itself, and into one of its own
-	 * descendants (that would make a loop).
+	 * **MERGE ONE ALTERNATIVE INTO ANOTHER OF THE SAME CATEGORY** and delete it. The scenarios naming
+	 * it name the target, and its children become the target's.
+	 *
+	 * **NO SCENARIO THAT USED IT MAY SEE A VALUE MOVE.** So the target must be an ANCESTOR of it (the
+	 * values of every alternative between them are folded in, nearest first, so its users read what
+	 * they read through that chain), or a SIBLING (the same parent, so what they inherit is the same)
+	 * whose own values the merged one would not bring to them. Anything else is refused with `why`.
+	 * The values are combined by exactly the rule they resolve by (combineHolders()), the demand pair
+	 * included. The target's OTHER users do gain the merged values: that is what a merge is for.
 	 */
 	function mergeAlternativeInto(id, targetId) {
-		var a = altById(id), t = altById(targetId), u;
+		var a = altById(id), t = altById(targetId), u, chain, merged, sibling;
 		if (!a || !t || a === t) { return treeRefuse('missing'); }
-		if (a.category !== t.category) { return treeRefuse('category'); }
-		if (storedDescends(doc.alternatives, t.id, a.id)) { return treeRefuse('parent'); }
-		Object.keys(plainObject(a.values) ? a.values : {}).forEach(function (key) {
-			t.values = plainObject(t.values) ? t.values : {};
-			t.values[key] = Object.assign(t.values[key] || {}, a.values[key]);
-		});
-		settingLeaves(a.settings).forEach(function (leaf) {
-			var node, i;
-			t.settings = plainObject(t.settings) ? t.settings : {};
-			node = t.settings;
-			for (i = 0; i < leaf.path.length - 1; i++) { if (!plainObject(node[leaf.path[i]])) { node[leaf.path[i]] = {}; } node = node[leaf.path[i]]; }
-			node[leaf.path[leaf.path.length - 1]] = leaf.value;
-		});
+		if (a.category !== t.category) { return treeRefuse('category', { why: 'An alternative merges only into one of the same category.' }); }
+		sibling = (a.parent === null || a.parent === undefined ? null : a.parent) === (t.parent === null || t.parent === undefined ? null : t.parent);
+		if (storedDescends(doc.alternatives, a.id, t.id)) {
+			chain = [];
+			for (var r = a; r && r !== t; r = altById(r.parent)) { chain.push(r); }
+			chain.push(t);
+		} else if (sibling) {
+			chain = [a, t];
+			if (canonJSON(combineHolders(chain)) !== canonJSON(combineHolders([a]))) {
+				return treeRefuse('values', { why: 'The target holds values of its own that the scenarios using this alternative would start reading.' });
+			}
+		} else {
+			return treeRefuse('unrelated', { why: 'The target must be an ancestor of this alternative, or share its parent; otherwise what its scenarios inherit would change.' });
+		}
+		merged = combineHolders(chain);
+		if (Object.keys(merged.values).length) { t.values = merged.values; } else { delete t.values; }
+		if (Object.keys(merged.settings).length) { t.settings = merged.settings; } else { delete t.settings; }
 		u = storedUsers('alt', a.id);
 		u.scenarios.forEach(function (sid) { var s = scenarioById(sid); s.alternatives[a.category] = t.id; });
 		u.children.forEach(function (cid) { altById(cid).parent = t.id; });
@@ -5250,6 +5259,28 @@ var EngCalcs = EngCalcs || {};
 		treeDropEmpty();
 		touchTree('mergeAlternativeInto');
 		return true;
+	}
+	// Stored alternatives, nearest first, folded into one holder's {values, settings} by the rule
+	// they resolve by: within a holder a whole demand list beats its own row-0 `demand`; across
+	// holders a nearer `demand` is laid onto a farther list's row 0 (putResolvedOverride()).
+	function combineHolders(list) {
+		var values = {}, settings = {};
+		list.forEach(function (h) {
+			var vals = plainObject(h.values) ? h.values : {};
+			Object.keys(vals).forEach(function (key) {
+				Object.keys(plainObject(vals[key]) ? vals[key] : {})
+					.sort(function (x, y) { return (x === 'demands' ? 0 : 1) - (y === 'demands' ? 0 : 1); })
+					.forEach(function (prop) { putResolvedOverride(values, key, prop, altCopy(vals[key][prop])); });
+				if (!Object.keys(values[key] || {}).length) { delete values[key]; }
+			});
+			settingLeaves(h.settings).forEach(function (leaf) { putResolvedLeaf(settings, leaf.path, altCopy(leaf.value)); });
+		});
+		return { values: values, settings: settings };
+	}
+	function canonJSON(v) {
+		if (Array.isArray(v)) { return '[' + v.map(canonJSON).join(',') + ']'; }
+		if (plainObject(v)) { return '{' + Object.keys(v).sort().map(function (k) { return JSON.stringify(k) + ':' + canonJSON(v[k]); }).join(',') + '}'; }
+		return JSON.stringify(v === undefined ? null : v);
 	}
 	// Does this scenario hold a local value in this category (an element value or a setting)?
 	function scenarioHoldsLocal(s, cat) {
