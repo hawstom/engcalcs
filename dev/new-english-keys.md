@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**23 still to read on master**, of 133 untranslated keys, of 2358 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**23 still to read on master**, of 133 untranslated keys, of 2359 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -511,7 +511,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/adviser-notes (`85a5ab98`) — adds no English strings
+### chore/adviser-notes (`dab4198d`) — adds no English strings
 
 ### feat/asset-type (`1bb93e5c`) — 8 new, 8 to read @@ NEEDS RULING
 
@@ -540,7 +540,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Change the selected nodes into junctions, reservoirs, or tanks. Each keeps its ID, its place, its pipes, and every value the new type also has. If anything would be lost, you are asked first.
   @@ NEEDS RULING
 
-### feat/backdrop-attach (`aa8853ca`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/backdrop-attach (`50ebd9a7`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_inp_backdrop_attach`**
   > Attach {file}…
@@ -572,7 +572,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/feedback (`dd5b2b0f`) — adds no English strings
+### feat/feedback (`7e9b2ea7`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -586,7 +586,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/label-placer (`e1ea6e54`) — adds no English strings
+### feat/label-placer (`fa50a9bc`) — adds no English strings
 
 ### feat/label-placer-a (`3483bfd6`) — adds no English strings
 
@@ -608,7 +608,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show scenarios
   @@ NEEDS RULING
 
-### feat/screenshot (`aec41fe1`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/screenshot (`3489e5ac`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_screenshot_copied`**
   > Screenshot copied.
@@ -638,9 +638,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
   @@ NEEDS RULING
 
-### feat/tip-door (`9a9cd3a1`) — adds no English strings
+### feat/tip-door (`cf4791aa`) — adds no English strings
 
-### feat/value-warning (`424b278e`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/value-warning (`36cdb584`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_valwarn_diameter`**
   > A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.
@@ -664,4 +664,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
   @@ NEEDS RULING
 
-### fix/phone-bolt (`22f2d88a`) — adds no English strings
+### fix/phone-bolt (`1ab79ee4`) — adds no English strings
