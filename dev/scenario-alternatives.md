@@ -628,7 +628,7 @@ that holds none shows Base's live view.
 - **A merge moves no value any user of the merged alternative reads** (Perry's review): the target
   must be its ancestor (the alternatives between are folded in) or its sibling whose own values
   would not reach those users; anything else is refused, saying why. Values combine by the rule
-  they resolve by, the demand pair included. The target's other users do gain the merged values.
+  they resolve by, the demand pair included. The target's other users do gain the merged values. Tom: *"Yes."*
 - No automatic demotion: a stored alternative that becomes empty or unshared stays stored.
 - Calculation sets are sparse with a parent, not Bentley's full set.
 - The edit marker means "local in the alternative this scenario writes to"; an inherited value is
