@@ -134,6 +134,7 @@ hides every label at these views).
 | `net3` | 1 | EPA Net3, likewise; one hand-placed label |
 | `novato-zoom` | 4 | Net3 on the world map at Novato: fit, 2x, 4x, 8x about the node centroid; node labels ID, P, Qb, Z |
 | `novato-seq` | 8 | The same, zoomed about node 179 in steps 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4x: the stability sequence |
+| `bent-valves` | 5 | A generated suburban network (`generator.js`, 600 nodes, seed 7, `bends: 'many'`, `valves: 'many'`): most pipes curve through 1 to 3 vertices and one link in 12 is a valve. The views put nodes 44 px apart, then 1.5x, 2x, 3x, 4x. The other sets have no bent pipe and no valve. Master breaks N1 on its valve symbols here |
 
 **Text widths** are the app's own headless measure, the DOM stub's nominal advance: 6 px per
 character at 11 px text, scaled with the text size (12 px here, so 6.55 px per character). It is

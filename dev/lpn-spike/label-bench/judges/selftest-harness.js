@@ -67,7 +67,9 @@ report(walled.hidden.length === 1 && !walled.hiddenRoom.length, 'a label hidden 
 
 // ---- 2. R14 on the public scenes -----------------------------------------------------------------
 const bench = path.join(__dirname, '..');
-const sets = loadSets(path.join(bench, 'scenes'));
+// The five straight-piped sets: on `bent-valves` (round 6) master's own layouts leave 41 of 534 pipe
+// labels level with room to lie along their bent pipes, which is master's fault, not the judge's.
+const sets = loadSets(path.join(bench, 'scenes'), ['net1', 'net2', 'net3', 'novato-zoom', 'novato-seq']);
 function r14Total(res) {
 	const t = { asked: 0, along: 0, missed: 0, closeLevel: 0, closeRoom: 0 };
 	res.forEach(function (s) { s.steps.forEach(function (st) {
@@ -78,7 +80,7 @@ function r14Total(res) {
 	return t;
 }
 const mast = r14Total(runBench(path.join(bench, 'placers/master-replay.js'), sets));
-report(mast.asked > 100 && mast.missed <= R14_MAX_MISSED * mast.asked, 'master\'s recorded layouts pass R14 on every public scene', JSON.stringify(mast));
+report(mast.asked > 100 && mast.missed <= R14_MAX_MISSED * mast.asked, 'master\'s recorded layouts pass R14 on every straight-piped public scene', JSON.stringify(mast));
 // Master's layouts with every pipe label turned level: the same positions, so there is room.
 const level = {
 	name: 'master-level',
