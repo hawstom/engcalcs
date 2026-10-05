@@ -133,13 +133,9 @@ which is Advanced mode.
 3. **An alternative that exists with no scenario using it, or with no local values**, or whose name
    differs from its scenario's. All three arrive the moment a Bentley model is read faithfully.
 
-**How B is introduced without breaking A's files.** Additively, and only when a document needs it:
-a stored `alternatives` list and a per-scenario `alternatives` map are written **only when the tree
-is not the one A derives** (an explicit tree). A file without them is read as A reads it today, so
-every file written before B, and every Basic-mode file written after it, stays byte-identical and
-opens unchanged. The resolver already walks a parent chain, so B changes where the chain is read
-from, not how it is walked. A Basic-mode reader facing a file with an explicit tree must say so
-rather than flatten it; that is the Advanced UX's problem and is not designed.
+**B is now built, additively (stages 4 and 5, below).** A is still what every Basic-mode project
+is: nothing about the tree is stored until an explicit act stores it, so every such file stays
+byte-identical.
 
 ## The "Basic mode" row: a browser setting
 
@@ -160,8 +156,8 @@ it.**
 **The Demand multiplier is a calculation option, shown beside the alternatives** (Tom, 2026-09-30:
 *"Demand multiplier: OK. A Demand Multiplier column with the alternatives?"*; Mary and Sue: Bentley
 keeps demand adjustments in Calculation Options, not alternatives). It is the last column, after a
-divider, so it reads as set apart from the categories. Base shows the project's value; a scenario
-shows its own, and blank means it inherits the project's. Task 755 covers more per-scenario options
+divider, so it reads as set apart from the categories. Base shows the Base Calculation
+alternative's value; a scenario shows its own, and blank means it inherits. Task 755 covers more per-scenario options
 later. No editing, no Bentley import or export, no Google Sheets: the Advanced UX is not designed.
 
 ## Settings in scenarios: Presentation and Calculation (2026-10-05)
@@ -302,7 +298,9 @@ project keeps the value:
 **The one read seam: `settingFor(scn, path)`, and `effectiveSetting(path)` for the open
 scenario**, the settings twin of `effective(el, prop)`. `path` is an array (`['settings',
 'textSize']`, `['settings', 'colorBreaks', 'node.pressure']`) or a dotted string where no member
-holds a dot. It answers the scenario's own value where it holds one, else the project's.
+holds a dot. It answers the scenario's own value where it holds one (or, once the tree is
+stored, the nearest one it inherits), else the Base Presentation or Calculation alternative's
+values, which are the project's own objects.
 **In Base, and wherever a scenario holds nothing at or under the path, it returns the project's own
 object**, not a copy, so a reader moved onto it behaves exactly as before. Where a scenario holds
 part of an object it returns a merged copy, so no reader can write a scenario's value into the
@@ -363,9 +361,7 @@ setting: it is one walk of the project's own object. Beside the readers:
   and waits for the settings table.
 - **The label-layout keep** is keyed on the open scenario's settings block where it holds one;
   nothing is added to the key in a project that holds none.
-- **A scenario's own view**: switching INTO a scenario that holds a view goes there and remembers
-  where you were; switching out of it into one that holds none goes back. Between two scenarios
-  that hold none, nothing moves.
+- **A scenario's view**: see "The view" under stages 4 and 5.
 
 **Deliberately left reading the project's own objects**, each with its reason:
 
@@ -410,10 +406,10 @@ extension, there will have to be a settings Table."* Not built yet. What it must
   per member the project or any scenario states (`colorBreaks['node.pressure']`,
   `labelSettings.node.pressure`, `contourInterval['pressure|psi']`), so a scenario's single label
   toggle is one row, not a copy of the label map.
-- **Columns: the setting's name in the visitor's language, its category, Base's value, then one
-  column per scenario under Show scenarios** (Task 766), blank where the scenario inherits, its own
-  value where it holds one, marked the way an element override is. The demand multiplier, the run
-  time and the time step are three more rows here, read from their own homes.
+- **Columns (Tom, 2026-10-05): Major Heading, Minor Heading, Category, Setting, Value**, with the
+  scenarios shown as Task 766 shows them; blank where a scenario inherits, its own value where it
+  holds one, marked the way an element override is. The demand multiplier, the run time and the
+  time step are three more rows here, read from their own homes (Q7).
 - **A row maps to a path by the same array `settingFor()` takes**; an edit in a scenario's column is
   `setScenarioSetting(scn, path, value)`, a clear is the same with `undefined`, and an edit in
   Base's column writes the project. The demand multiplier and the two times keep their own writers.
@@ -421,8 +417,8 @@ extension, there will have to be a settings Table."* Not built yet. What it must
   `setScenarioSetting()`, every editor reads `settingFor()`, and a scenario-held value is marked as
   an element override is. That is the step that makes "a setting changed in Peak Hour changes Peak
   Hour only" true from the keyboard.
-- **The view gets its one deliberate door** ("Hold this view in this scenario" / "Forget it"), and
-  nothing else ever writes one.
+- **The view's settings are editable in the Settings box** (Tom, 2026-10-05: not read-only), beside
+  a deliberate "Hold this view in this scenario" / "Forget it"; looking around never writes one.
 
 ### Questions for Tom
 
@@ -476,6 +472,23 @@ extension, there will have to be a settings Table."* Not built yet. What it must
   may be obvious once you look at what we are doing."* Brought again as question 7 below.
 - Q6 (the two headings): not yet answered.
 
+### His answers, 2026-10-05 (second round)
+
+- **Q7, yes.** The demand multiplier, run time and time step are calculation options, counted in
+  the Calculation column; their three Alternatives-table columns retire once the settings table
+  exists. Storage stays where it is.
+- **Q8, yes.** An ID prefix by scenario sits in Physical.
+- **Q9, the view, answered by a different rule:** *"Leaving doesn't do anything. Entering does
+  everything."* View is a setting, and Base has a View property: the live view. Entering a
+  scenario that holds or inherits a held view moves the map there; one that holds none shows what
+  it inherits, Base's live view. So leaving into Base, or into any scenario holding none, shows
+  Base's view.
+- **Wording:** *"'Project's value' becomes 'Base Presentation or Calculation alternative's
+  values'"*, in this doc and in every visitor string that says it.
+- **View settings are editable in the Settings box, not read-only:** *"I am still getting used to
+  the (correct!) philosophy of 'Give the user the information **and** the freedom.'"*
+- **The settings table's columns:** Major Heading, Minor Heading, Category, Setting, Value.
+
 ### Calculation: a set, not an alternative
 
 Bentley's Calculation Options are not an alternative category: a scenario names one set of
@@ -509,9 +522,7 @@ named set and stops pretending to have a parent. Recommendation: keep the column
 8. **An ID prefix by scenario sits in Physical**, beside the default diameter and roughness, because
    it seeds a new element and has no category of its own (an element's name is identity, in no
    category). Agree, or would you rather it stood in its own place?
-9. **A scenario's own view: switching out of it goes back to where you were looking before you
-   switched in.** The other reading is that the map stays put when you leave. Recommendation: go
-   back, so a "Figure 6-1" scenario is a place you visit, not a place you are left in.
+9. **A scenario's own view: where does the map go when you leave it?** Answered above.
 
 
 ## The long burn: from Basic mode to the full model (2026-10-06)
@@ -533,11 +544,10 @@ The road, each stage shippable alone, each hidden from Basic mode until the Adva
    override changes the map and the solve; a scenario may hold its own view. Byte-identical
    behaviour with no override is held by `scenario-settings-routing-harness.js`. **Next, 3b: the
    editing half and the settings table** (see "Next stage" above).
-4. **Store the tree (choice B), additively:** `alternatives` and `scenario.alternatives` written only
-   when the tree is not the derived one. Unlocks two scenarios sharing one alternative, alternatives
-   of depth two or more, and named alternatives with no scenario.
-5. **The scenario tree:** a scenario whose parent is not Base, inheriting its parent's alternative
-   choices.
+4. **Built (2026-10-05): the stored tree (choice B), additively.** Shared and named alternatives,
+   alternatives of any depth, calculation sets. See below.
+5. **Built (2026-10-05): the scenario tree.** A scenario whose parent is not Base inherits its
+   parent's choices. See below. Neither stage has a screen; nothing in Basic mode changed.
 6. **The Advanced UX:** a scenario manager and an alternative manager (create, rename, re-parent,
    assign, merge), behind the Basic mode row. Design first (Ida, Sue, Declan), then Tom's interview.
 7. **Interchange:** the scenario workbook (Task 752) and the Show-scenarios table (Task 766) read the
@@ -549,9 +559,80 @@ Bentley import brings none, and an export carries none. Bentley's Calculation Op
 alternative but a set the scenario names; our Calculation category should stay mappable to that one
 set per scenario, so an import can place it without guessing.
 
-**A saved view lives in a Presentation alternative** (Task 765, Tom 2026-10-06). Built in stage 3:
-a scenario that holds a view is moved to on a switch, and only such a scenario; question 9 asks
-which way the map goes when you leave it.
+**A saved view lives in a Presentation alternative** (Task 765, Tom 2026-10-06). See "The view"
+below.
+
+## Stages 4 and 5: the stored tree (built 2026-10-05)
+
+Tom, 2026-10-05: *"our first item of business is to get the full alternatives and inheritance
+model built under the hood."* Built to an independent architecture review's plan.
+
+**Stored only on an explicit act** (share, name, reparent, set a scenario's parent), under `doc`
+so undo covers it, appended to the file last and only when non-empty:
+
+    scenario:          {..., parent?: "s1" (absent = Base), alternatives?: {category: "a1"}, calc?: "c1"}
+    doc.alternatives:  [{id: "a1", category, name, parent: null | "a2", values: {ovKey: {prop: v}}, settings: {mirror}}]
+    doc.calcSets:      [{id: "c1", name, parent: null | "c2", settings: {mirror}, demandMultiplier?, times?}]
+
+A stored id never holds `:`; the derived ones do (`s1:demand`, `base:demand`). `isExplicitTree()`
+false sends every reader down the stage-3 code, so a project with no stored tree is byte-identical
+by construction (the 42-case sweep measured identical against the commit before stage 4, and every
+example and fixture re-saves unchanged). A file is read, never trusted (`sanitizeScenarioTree()`).
+A reader from before stage 4 carries all of it through a save verbatim (`LPN_TREE_KEYS`).
+
+**Resolution.** A category resolves through `treeLayers(scn, cat)`, nearest first, Base excluded:
+the scenario's own values (its implicit alternative), then, if it names a stored alternative (a
+calculation set, for Calculation), that record and its parents; otherwise its parent scenario's
+chain. So a child of Peak Hour that sets a local demand is a child of Peak Hour's RESOLVED demand
+alternative, not of Base's. Calculation is a set, as in Bentley, but sparse with a parent, so a
+change to the Base Calculation alternative's values flows down; an export will resolve it to a full
+set.
+
+**One source of truth.** `scenario.overrides`, `.settings`, `.demandMultiplier` and `.times` are
+the scenario's implicit alternatives; `alternatives[].values`/`.settings` and `calcSets[]` are the
+stored ones. A scenario that names a stored record for a category holds no local value in it:
+edits go to the record (`writeTargetFor()`), and `promoteImplicitAlternative()` moves a scenario's
+values into a new record whose parent is what it inherited, then names it, with nothing resolving
+differently. A local value written by an older reader into a named category still resolves (it is
+nearest), and promote moves it out.
+
+**Speed.** The hot readers read `resolvedOverrides(scn)` and `scenarioSettingsBlock(scn)`. Derived,
+they are the scenario's own objects. Explicit, they are read-only merged maps cached per scenario
+and rebuilt lazily when `touchTree()` bumps the epoch (every write site calls it), or when `doc` or
+`scenarios` is a different object. Measured on Net3: no measurable cost (about 0.2 µs per
+`effective()` read either way).
+
+**Maintenance** walks every map through `eachOverrideMap()`; `scenario_seam_check.php` refuses a
+`.overrides`/`.values` access outside a named list of functions.
+
+**The view.** `heldView(scn)` resolves through the Presentation chain, stopping before Base, whose
+view is the live one. Entering a scenario that holds or inherits a view goes there; entering one
+that holds none shows Base's live view.
+
+**Decided by CC, his to overturn:**
+
+- A local value equal to its parent's is kept (the key's presence is the intent); nothing prunes it.
+- Editing a shared alternative changes every scenario that uses it, as in Bentley.
+- Reparenting an alternative or a scenario keeps its own values; what it inherits may change.
+- Deleting an alternative, a calculation set or a scenario is refused while anything uses it, and
+  the refusal names who; merging into another of the same category is the way to retire one.
+- No automatic demotion: a stored alternative that becomes empty or unshared stays stored.
+- Calculation sets are sparse with a parent, not Bentley's full set.
+- The edit marker means "local in the alternative this scenario writes to"; an inherited value is
+  not marked.
+
+**Not yet:** no screen for any of it; the Alternatives table and the override count still show
+each scenario's own values; a unit change converts element values in stored alternatives but, as
+in stage 3, not unit-bearing values held in any settings block.
+
+### Next stage: what the advisers said (recorded, not built)
+
+- **Declan:** store the view as centre plus scale, scale in ground metres per CSS pixel (1/96 in),
+  with 1:N derived. Corners depend on the window size, so they are shown, not stored.
+- **Ida and Declan:** Major and Minor headings as group rows.
+- **Declan:** scenarios as rows in the Settings table, matching Task 766.
+- **Ida:** a held field marked by an amber edge plus "Base: {value}" and a Reset link, with no
+  per-field checkbox.
 
 ## The code
 
@@ -565,8 +646,16 @@ Settings in scenarios: same file, section "SETTINGS IN SCENARIOS": `LPN_SETTING_
 `categoryOfSetting()` (also `categoryOf(path, 'setting')`), `settingFor(scn, path)`,
 `effectiveSetting(path)`, `setScenarioSetting()`, `sanitizeScenarioSettings()`; the reader
 shorthands `scnSetting()`, `scnLabels()`, `scnProject()`, `scnDefaultPattern()`; the one switch
-a harness blinds, `scenarioSettingsBlock()`; the view, `outwardViewOf()`, `scenarioOwnView()`,
+a harness blinds, `scenarioSettingsBlock()`; the view, `outwardViewOf()`, `heldView()`,
 `setScenarioView()`, `followScenarioView()`; the export, `inpExportDocument()`.
+
+The stored tree: same file, section "SCENARIO TREE": `touchTree()`, `isExplicitTree()`,
+`resolvedOverrides()`, `resolvedSettingsBlock()`, `treeLayers()`, `writeTargetFor()`,
+`eachOverrideMap()`, `sanitizeScenarioTree()`, and the mutations `createAlternative()`,
+`renameAlternative()`, `reparentAlternative()`, `deleteAlternative()`, `mergeAlternativeInto()`,
+`assignAlternative()`, `promoteImplicitAlternative()`, the same five for calculation sets, and
+`setScenarioParent()`; `heldCalcOption()` is the calculation-option seam. Harness:
+`dev/lpn-spike/scenario-tree-harness.js` (seeded; `node ... <seed>` reproduces one).
 Harness: `dev/lpn-spike/scenario-settings-routing-harness.js`.
 
 Basic mode and the table: same file, section "SCENARIOS > BASIC MODE" (`setScenarioBasicMode()`,
