@@ -160,7 +160,15 @@ $composed = ecContactCompose(array(
   'code' => isset($_POST['code']) ? $_POST['code'] : '',
   'lang' => isset($_POST['ctxlang']) ? $_POST['ctxlang'] : '',
 ), ecContactOriginPage());
-if (isset($composed['error'])) { die($composed['error']); }
+if (isset($composed['error'])) {
+  // Show the form again, filled in, with the refusal above it. contact.php reads these two.
+  $ecContactError = $composed['error'];
+  $ecContactPrefill = array('name' => $postName, 'email' => $postEmail, 'subject' => $postSubject, 'message' => $postMessage,
+    'category' => isset($_POST['category']) ? $_POST['category'] : '', 'code' => isset($_POST['code']) ? $_POST['code'] : '',
+    'ctxlang' => isset($_POST['ctxlang']) ? $_POST['ctxlang'] : '', 'origin' => ecContactOriginPage());
+  require __DIR__ . '/contact.php';
+  exit;
+}
 $subject = $composed['subject'];
 $message = $composed['message'];
 $replyto = $composed['replyto'];
@@ -174,7 +182,7 @@ $from = 'From: HawsEDC Support <support@hawsedc.com>';
 
 // Assemble the From and Reply-to into additional headers for the
 // PHP mail() function.
-$moreheaders = $from."\r\n".$replyto;
+$moreheaders = ecContactHeaders($from, $replyto);
 
 // Send the message. If send was successful, show the success page.
 if (mail($to, $subject, $message, $moreheaders)) {

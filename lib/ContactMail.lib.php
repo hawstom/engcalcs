@@ -41,7 +41,7 @@ function ecContactCompose(array $in, $originPage) {
   if (preg_match("/(\r|\n)/", $name) or preg_match("/@/", $name)) {
     return array('error' => "Are you trying to spam this form?  Please don't do that.");
   }
-  if ($email !== '' && (preg_match("/(\r|\n)/", $email) or !preg_match("/^[a-z0-9]+([_\\.-][a-z0-9]+)*@([a-z0-9]+([\.-][a-z0-9]+)*)+\\.[a-z]{2,}$/", $email))) {
+  if ($email !== '' && (preg_match("/(\r|\n)/", $email) or !preg_match("/^[a-z0-9]+([_\\.-][a-z0-9]+)*@([a-z0-9]+([\.-][a-z0-9]+)*)+\\.[a-z]{2,}$/i", $email))) {
     return array('error' => 'Invalid e-mail address.');
   }
   if (preg_match("/(\r|\n)/", $subject) or preg_match("/@/", $subject)) {
@@ -63,4 +63,9 @@ function ecContactCompose(array $in, $originPage) {
   if ($cat !== '') { $subject = '[' . $cats[$cat] . '] ' . $subject; }
   $replyto = ($email !== '') ? 'Reply-to: ' . $name . ' <' . $email . '>' : '';
   return array('subject' => $subject, 'message' => $message, 'replyto' => $replyto);
+}
+
+/** The additional mail headers: From, then Reply-to only when there is one, joined with no empty or trailing line. */
+function ecContactHeaders($from, $replyto) {
+  return $from . ($replyto !== '' ? "\r\n" . $replyto : '');
 }

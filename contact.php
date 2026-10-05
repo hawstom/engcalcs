@@ -1,4 +1,6 @@
 <?php
+// formmail.php includes this page again when it refuses a post, having set $ecContactError (the
+// refusal) and $ecContactPrefill (what the visitor typed), so nothing typed is lost.
 require_once('lib/base.inc.php');
 require_once(__DIR__ . '/lib/ContactMail.lib.php');
 $html_title = $ec_lang['contact_main_menu'];
@@ -35,6 +37,19 @@ Mesa, AZ  85201<br />
 <p>I created this form around 2013. Many years later, I still reply to it myself, usually
 within a few days.</p>
 
+<?php // The optional-email label is new and untranslated in 26 languages. Show it where the visitor's
+      // language file defines it; otherwise keep the old translated (demanding) label rather than
+      // drop to English. THIS FALLBACK ENDS when a translation sprint adds contactYourEmailOptional
+      // to the language files: the check below then picks the new key by itself. Language.php loads
+      // English first, so $ec_lang alone cannot tell the two cases apart; the file is searched. ?>
+<?php $ecLangSrc = @file_get_contents(__DIR__ . '/lib/lang.ec.' . $clanguage . '.php');
+      $ecEmailLabel = ($clanguage === 'en' || ($ecLangSrc !== false && strpos($ecLangSrc, "\$ec_lang['contactYourEmailOptional']") !== false))
+        ? $ec_lang['contactYourEmailOptional'] : $ec_lang['contactYourEmail']; ?>
+<?php $ecPre = (isset($ecContactPrefill) && is_array($ecContactPrefill)) ? $ecContactPrefill : array();
+      $ecPv = function ($k) use ($ecPre) { return htmlspecialchars(isset($ecPre[$k]) && is_string($ecPre[$k]) ? $ecPre[$k] : '', ENT_QUOTES, 'UTF-8'); };
+      if (isset($ecContactError)) : ?>
+<p class="ec-error" role="alert"><strong><?=htmlspecialchars($ecContactError)?></strong></p>
+<?php endif; ?>
 <div>
 <form class="blue"
   action="formmail.php"
@@ -44,18 +59,20 @@ within a few days.</p>
       type="text"
       size="35"
       name="name"
+      value="<?=$ecPv('name')?>"
     />
   </p>
-  <p><?php echo $ec_lang['contactYourEmailOptional'];?><br>
+  <p><?php echo $ecEmailLabel;?><br>
     <input
       type="text"
       size="35"
       name="email"
+      value="<?=$ecPv('email')?>"
     />
   </p>
 <?php // WHAT IS THIS ABOUT (Ida, 2026-10-05). Values are fixed slugs; ?cat= preselects one (the
       // error link on the map sends cat=wrong), anything else leaves "Other". ?>
-<?php $ecCat = ecContactCategory(isset($_GET['cat']) ? $_GET['cat'] : '');
+<?php $ecCat = ecContactCategory(isset($ecPre['category']) ? $ecPre['category'] : (isset($_GET['cat']) ? $_GET['cat'] : ''));
       if ($ecCat === '') { $ecCat = 'other'; }
       $ecCatKeys = array('wrong' => 'contactCategoryWrong', 'wording' => 'contactCategoryWording',
                          'idea' => 'contactCategoryIdea', 'other' => 'contactCategoryOther'); ?>
@@ -71,10 +88,11 @@ within a few days.</p>
       type="text"
       size="35"
       name="subject"
+      value="<?=$ecPv('subject')?>"
     >
   </p>
   <p><?php echo $ec_lang['contact_message'];?><br>
-     <textarea name="message" rows="12" cols="50"></textarea>
+     <textarea name="message" rows="12" cols="50"><?=$ecPv('message')?></textarea>
   </p>
   <!-- <p><?php echo $ec_lang['contactSpamPrefix'];?> <input type="text" size="4" name="test" /> <?php echo $ec_lang['contactSpamPostfix'];?>
   </p>  -->
@@ -93,14 +111,14 @@ within a few days.</p>
       // by the menu or by typing the URL posts nothing and the e-mail says "not recorded", which
       // is the honest answer. formmail.php checks the value against the real page list again --
       // this is a convenience for the reader, never a trusted input. ?>
-<?php $ecFrom = isset($_GET['from']) && is_string($_GET['from']) ? $_GET['from'] : '';
+<?php $ecFrom = isset($ecPre['origin']) && is_string($ecPre['origin']) ? $ecPre['origin'] : (isset($_GET['from']) && is_string($_GET['from']) ? $_GET['from'] : '');
       if ($ecFrom !== '' && preg_match('/^[A-Za-z0-9._-]{1,64}$/', $ecFrom)) : ?>
     <input type="hidden" name="origin" value="<?=htmlspecialchars($ecFrom, ENT_QUOTES, 'UTF-8')?>">
 <?php endif;
       // The context the "Tell us more" link on the map carries: the language and an error code, both
       // slugs. Shown to the sender in words so nothing is attached silently. Never anything from a drawing.
-      $ecCode = ecContactSlug(isset($_GET['code']) ? $_GET['code'] : '');
-      $ecLang = preg_replace('/[^A-Za-z-]/', '', substr(isset($_GET['lang']) && is_string($_GET['lang']) ? $_GET['lang'] : '', 0, 12));
+      $ecCode = ecContactSlug(isset($ecPre['code']) ? $ecPre['code'] : (isset($_GET['code']) ? $_GET['code'] : ''));
+      $ecLang = preg_replace('/[^A-Za-z-]/', '', substr(isset($ecPre['ctxlang']) && is_string($ecPre['ctxlang']) ? $ecPre['ctxlang'] : (isset($_GET['lang']) && is_string($_GET['lang']) ? $_GET['lang'] : ''), 0, 12));
       if ($ecCode !== '') : ?>
     <input type="hidden" name="code" value="<?=htmlspecialchars($ecCode, ENT_QUOTES, 'UTF-8')?>">
 <?php endif;

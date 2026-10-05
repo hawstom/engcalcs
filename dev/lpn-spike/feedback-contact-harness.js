@@ -22,8 +22,9 @@ function val(k) {
 	return m ? m[1].replace(/\\'/g, "'") : '';
 }
 const has = (html, k) => val(k) !== '' && html.indexOf(val(k)) >= 0;
-function render(page, get) {
+function render(page, get, lang) {
 	const a = [path.join(ROOT, 'dev/scripts/render_page.php'), page];
+	if (lang) { a.push('--lang=' + lang); }
 	if (get) { a.push('--get=' + get); }
 	return execFileSync('php', a, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
 }
@@ -35,7 +36,12 @@ const opts = (plain.match(/<option value="[a-z]+"/g) || []).map((s) => s.slice(1
 ok('offers the four categories, in order', opts.join(',') === 'wrong,wording,idea,other', opts.join(','));
 ok('the select is labelled "What is this about?"', has(plain, 'contactCategory'));
 ok('the e-mail field says it is optional', has(plain, 'contactYourEmailOptional'));
-ok('...and the old demanding label is gone', !has(plain, 'contactYourEmail'));
+ok('...and English no longer shows the old demanding label', !has(plain, 'contactYourEmail'));
+const frSrc = fs.readFileSync(path.join(ROOT, 'lib/lang.ec.fr.php'), 'utf8');
+const frOld = /\$ec_lang\['contactYourEmail'\]='((?:[^'\\]|\\.)*)';/.exec(frSrc)[1].replace(/\\'/g, "'");
+const frPage = render('contact.php', null, 'fr');
+ok('a language without the new key keeps its translated email label (fallback until the sprint)',
+	!/\$ec_lang\['contactYourEmailOptional'\]/.test(frSrc) ? frPage.indexOf(frOld) >= 0 && frPage.indexOf(val('contactYourEmailOptional')) < 0 : true, frOld);
 ok('no preset: "Other" is selected', /<option value="other" selected>/.test(plain));
 const pre = render('contact.php', 'from=Looped-Network&cat=wrong&code=engine-run&lang=en');
 ok('?cat=wrong presets "Something is wrong"', /<option value="wrong" selected>/.test(pre));
@@ -75,6 +81,23 @@ ok('a malformed address is still refused', post({ name: 'a', email: 'nope', subj
 ok('a header-injection attempt in the address is still refused',
 	post({ name: 'a', email: 'a@b.com\nBcc: x@y.com', subject: 's', message: 'm' }).mail === null);
 ok('an "@" in the subject is still refused', post({ name: 'a', email: '', subject: 'x@y.com', message: 'm' }).mail === null);
+ok('an upper-case address is accepted (A@B.com)', post({ name: 'a', email: 'A@B.com', subject: 's', message: 'm' }).mail !== null);
+const hdr = good.mail === null ? '' : good.mail.split(/\r?\n\r?\n/)[0];
+ok('with no e-mail the headers carry no empty or trailing header line',
+	good.mail !== null && !/(^|\n)\r?\n/.test(hdr) && !/\r?\n$/.test(hdr) && /From: HawsEDC/.test(hdr), JSON.stringify(hdr.slice(-60)));
+const hdrOf = (r) => execFileSync('php', ['-r', 'require ' + JSON.stringify(path.join(ROOT, 'lib/ContactMail.lib.php')) + '; echo ecContactHeaders("From: x", ' + JSON.stringify(r) + ');'], { encoding: 'utf8' });
+ok('ecContactHeaders: no Reply-to leaves no trailing CRLF', hdrOf('') === 'From: x', JSON.stringify(hdrOf('')));
+ok('ecContactHeaders: a Reply-to is joined by one CRLF', hdrOf('Reply-to: a <b@c.de>') === 'From: x\r\nReply-to: a <b@c.de>');
+ok('formmail.php builds its headers with it', /ecContactHeaders\(\$from, \$replyto\)/.test(fs.readFileSync(path.join(ROOT, 'formmail.php'), 'utf8')));
+const rej = post({ name: 'Pat <b>', email: 'bad', subject: 'Sub "q"', message: 'Keep <this> text', category: 'idea', code: 'engine-run', ctxlang: 'es', origin: 'Looped-Network' });
+ok('a refused post sends nothing but re-shows the form with the error above it',
+	rej.mail === null && /Invalid e-mail address\./.test(rej.stdout) && rej.stdout.indexOf('Invalid e-mail') < rej.stdout.indexOf('<form'));
+ok('...with what was typed still in the fields, escaped',
+	/name="name"\s+value="Pat &lt;b&gt;"/.test(rej.stdout) && /value="bad"/.test(rej.stdout) && /value="Sub &quot;q&quot;"/.test(rej.stdout) &&
+	/>Keep &lt;this&gt; text<\/textarea>/.test(rej.stdout));
+ok('...and the category, code, language and page it came from still ride along',
+	/<option value="idea" selected>/.test(rej.stdout) && /name="code" value="engine-run"/.test(rej.stdout) &&
+	/name="ctxlang" value="es"/.test(rej.stdout) && /name="origin" value="Looped-Network"/.test(rej.stdout));
 ok('an empty message is refused', post({ name: 'a', email: '', subject: 's', message: '  ' }).mail === null);
 const bogus = post({ name: 'a', email: '', subject: 's', message: 'm', category: 'x\nBcc: a@b.com', code: 'a b\nc' });
 ok('an unknown category is not echoed', bogus.mail !== null && !/Bcc/.test(bogus.mail) && /About: not stated/.test(bogus.mail));
