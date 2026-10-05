@@ -31763,8 +31763,8 @@ var EngCalcs = EngCalcs || {};
 		// the same two lines), so its row stayed on screen and the removal was never saved. A node's
 		// or pipe's cascade also lands here and then schedules its own solve, which repeats both
 		// harmlessly.
-		scheduleSave();
 		refreshPaneIfOpen();
+		scheduleSave();
 	}
 
 	// ---- Project library storage (Task 146.08 step 3) ----
