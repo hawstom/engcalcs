@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**3 still to read on master**, of 103 untranslated keys, of 2331 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**0 still to read on master**, of 103 untranslated keys, of 2331 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -94,7 +94,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (103, 3 to read @@ NEEDS RULING)
+## lpn_  (103, all ruled)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -173,10 +173,10 @@ never edits a synonym.
   _Ruled OK 2026-10-03._
 - **`lpn_ds_eps_note`**
   > Only the time step now on screen is scaled; levels and statuses are taken from this step. To test the peak, move the clock to the peak demand before you run.
-  @@ NEEDS RULING
+  _Ruled OK 2026-10-05._
 - **`lpn_ds_found`**
   > ✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.
-  @@ NEEDS RULING
+  _Ruled 2026-10-05: Proposal approved._
 - **`lpn_ds_found_below`**
   > ⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.
   _Ruled 2026-10-03: I think I need explanation, and this need clarification._
@@ -260,7 +260,7 @@ never edits a synonym.
   _Ruled OK 2026-10-03._
 - **`lpn_ds_search_note`**
   > Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.
-  @@ NEEDS RULING
+  _Ruled 2026-10-05: Edited proposal._
 - **`lpn_ds_search_stopped`**
   > The search was stopped before it found an answer.
   _Ruled 2026-10-03: OK. Are we sure this isn't already provided by a different key?_
@@ -410,7 +410,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**5 still to read**, of 15 new keys across 10 unmerged branch(es).
+**7 still to read**, of 25 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -421,9 +421,44 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/harvest-1005 (`0c2e5d8f`) — adds no English strings
+### chore/harvest-1005 (`ae12fa56`) — adds no English strings
+
+### chore/saved-views (`28222d38`) — 4 new, all ruled
+
+- **`lpn_profile_file_done`**
+  > Profile read from the file: {used} of {total} nodes found in this network.
+  _Ruled OK 2026-10-03._
+- **`lpn_profile_file_missing`**
+  > Named in the file but not in this network: {ids}.
+  _Ruled OK 2026-10-03._
+- **`lpn_profile_file_short`**
+  > The file names fewer than two nodes in this network, so there is no profile to draw.
+  _Ruled OK 2026-10-03._
+- **`lpn_profile_open`**
+  > Open EPANET profile file…
+  _Ruled OK 2026-10-03._
 
 ### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/engine-prefetch (`3194c30d`) — adds no English strings
+
+### feat/find-source (`2f2ea398`) — 5 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_find_scope_source`**
+  > Source
+  @@ NEEDS RULING
+- **`lpn_profile_file_done`**
+  > Profile read from the file: {used} of {total} nodes found in this network.
+  _Ruled OK 2026-10-03._
+- **`lpn_profile_file_missing`**
+  > Named in the file but not in this network: {ids}.
+  _Ruled OK 2026-10-03._
+- **`lpn_profile_file_short`**
+  > The file names fewer than two nodes in this network, so there is no profile to draw.
+  _Ruled OK 2026-10-03._
+- **`lpn_profile_open`**
+  > Open EPANET profile file…
+  _Ruled OK 2026-10-03._
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -478,9 +513,15 @@ build for that would be a gate nobody keeps. Refresh it with
   > Statistic
   _Ruled OK 2026-10-05._
 
+### fix/copy-now (`1cbe9332`) — 1 new, 1 to read @@ NEEDS RULING
+
+- **`lpn_copy_opened_unsaved`**
+  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  @@ NEEDS RULING
+
 ### fix/step-select-width (`f0ec94d6`) — adds no English strings
 
-### fix/table-actions (`4b02fd85`) — 2 new, 2 to read @@ NEEDS RULING
+### fix/table-actions (`8f9f89f4`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_pane_delete_element`**
   > Delete element
@@ -488,3 +529,5 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_pane_delete_elements`**
   > Delete elements
   @@ NEEDS RULING
+
+### fix/text-object (`4a1adda1`) — adds no English strings
