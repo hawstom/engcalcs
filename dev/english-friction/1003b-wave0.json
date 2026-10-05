@@ -1,225 +1,243 @@
 {
- "sprint": "1003b-wave0",
- "description": "Adversarial Wave 0 on 19 new-and-changed lpn_ keys (graphs and reports menu tips, time series add, coordinate system tips, About note, EPS status events, fire flow and demand scaling notes). Each key checked against its call site. No English or $ec_lang_syn changed.",
- "entries": [
-  {
-   "key": "lpn_graphs_menu_tip",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "Long list of five graph kinds; checked whether the list reads as one flat series",
-   "readings": [
-    "five graph kinds the menu opens"
-   ],
-   "disposition": "dismissed",
-   "resolution": "One reading: a flat list matching the five menu items built at js/looped-network.js:40365; Tom ruled the earlier wording OK on 2026-10-03 and the additions follow it."
-  },
-  {
-   "key": "lpn_ts_add_tip",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "Says 'everything now selected', but tsAddSelection() (js/looped-network.js:29915) adds only selected assets of the current group (Nodes or Links); 'now' also reads as 'at this moment' vs 'newly'",
-   "readings": [
-    "every selected asset of any kind goes onto the graph",
-    "only the selected assets of the group shown (Nodes or Links) go onto the graph"
-   ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED: 'Put the selected nodes or links (whichever group is shown) on the map onto the graph.'"
-  },
-  {
-   "key": "lpn_ts_add_none",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "'Nothing of that kind' has no antecedent in the note, and the note also appears when the selected assets are already on the graph (added === 0), where 'not selected' is false",
-   "readings": [
-    "no asset of the shown group (Nodes or Links) is selected",
-    "the selected assets are already on the graph, so none was added"
-   ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED: 'No new assets of this group are selected on the map.'"
-  },
-  {
-   "key": "lpn_ts_none",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "Tells the reader to select assets and press the button",
-   "readings": [
-    "select on the map, then press the Add selected button"
-   ],
-   "disposition": "dismissed",
-   "resolution": "One reading: shown at js/looped-network.js:29991 when no series exist, and 'Add selected' is the exact label of lpn_ts_add; the group detail is carried by lpn_ts_add_none."
-  },
-  {
-   "key": "lpn_new_coordsys_tip",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "'This is permanent' is contradicted by 'the only way ... convert', and 'it is approximate' has no clear referent (the choice, the conversion, or the network)",
-   "readings": [
-    "the choice cannot change, except by a conversion that is approximate",
-    "the network can be converted by one route only, and the network's coordinates are approximate"
-   ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED: 'Choose the coordinate system of your network. The choice is permanent, except that “File, Convert as…” can convert the network to other coordinates, and that conversion is approximate.'"
-  },
-  {
-   "key": "lpn_crs_list_tip",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "'The two filters above' is not countable on the page (Looped-Network.php:1738-1750 shows a map-view checkbox, a place search, and a name filter)",
-   "readings": [
-    "map-view checkbox and name filter",
-    "place search and name filter"
-   ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED: 'The coordinate systems that pass the map view filter and the name filter above. Choose one, then press OK.'"
-  },
-  {
-   "key": "lpn_notes_4_def",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "'lists the junctions' says neither where nor what; 'route' where the Graphs tip says 'path'; 'sit on real ground' is idiom; the bottom panel is called a pane elsewhere (Looped-Network.php:1855 renders it as one About-box paragraph)",
-   "readings": [
-    "the bottom panel lists every junction with its results",
-    "the bottom panel lists only the junctions along the profile route"
-   ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED: 'A project can be placed on real ground with a street map behind it. EPANET .inp files can be read and written. The bottom pane plots a profile along a path and tabulates the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.'"
-  },
-  {
-   "key": "lpn_reports_menu_tip",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "Checked whether 'the full report' collides with 'the EPANET solver report'",
-   "readings": [
-    "six reports the menu offers, the last two EPANET's Status Report and Full Report"
-   ],
-   "disposition": "dismissed",
-   "resolution": "One reading: a list matching the menu entries at js/looped-network.js:40482, and 'status report' and 'full report' are EPANET's own report names."
-  },
-  {
-   "key": "lpn_status_opened",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "'now open' could be adjective or event",
-   "readings": [
-    "the link changed to open at this reporting time"
-   ],
-   "disposition": "dismissed",
-   "resolution": "One reading: an event line built at js/looped-network.js:60576 only when a link's status changes; pairs with lpn_status_closed."
-  },
-  {
-   "key": "lpn_status_emptying",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "Near-collision with lpn_status_dry 'now empty'",
-   "readings": [
-    "the tank's level began to fall at this time"
-   ],
-   "disposition": "dismissed",
-   "resolution": "One reading: event line at js/looped-network.js:60595, emitted when the level direction turns downward; distinct from 'now empty' by tense."
-  },
-  {
-   "key": "lpn_status_full",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "none beyond lpn_status_filling pairing",
-   "readings": [
-    "the tank reached its maximum level"
-   ],
-   "disposition": "dismissed",
-   "resolution": "One reading: event line at js/looped-network.js:60605, emitted when level reaches the maximum."
-  },
-  {
-   "key": "lpn_status_dry",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "Key says dry, text says empty; checked for collision with emptying",
-   "readings": [
-    "the tank reached its minimum level"
-   ],
-   "disposition": "dismissed",
-   "resolution": "One reading: event line at js/looped-network.js:60615, emitted at the minimum level; 'empty' is the visitor word for a tank."
-  },
-  {
-   "key": "lpn_ff_no_selection",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "'Select' vs 'choose' and the scope names",
-   "readings": [
-    "no junction is in the map selection; select some or set the scope to All junctions"
-   ],
-   "disposition": "dismissed",
-   "resolution": "One reading: shown by analysisRefused at js/looped-network.js:59011; 'Select' is the map selection and 'choose All junctions' matches the scope option label lpn_ds_scope_all."
-  },
-  {
-   "key": "lpn_ff_design_no_selection",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "'design check scope', 'Selected' and 'All' must match the control",
-   "readings": [
-    "the Design check control is set to Selected with an empty map selection"
-   ],
-   "disposition": "dismissed",
-   "resolution": "One reading: refused at js/looped-network.js:59029; 'Selected' and 'All' are the option labels lpn_ff_design_selected and lpn_ff_design_all of the Design check control."
-  },
-  {
-   "key": "lpn_ff_design_none",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "Two scopes exist on this page (Junctions to test, and the Design check All/Selected), and 'the scope you chose' does not say which; 'any junction drew' can read as 'whenever one did' or 'if some junction did'",
-   "readings": [
-    "no limit was exceeded during any tested junction's fire flow, within the design check scope",
-    "no limit was exceeded in the junctions-to-test scope"
-   ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED: 'With each tested junction’s fire flow drawn in turn, nothing in the design check scope went outside its limits.'"
-  },
-  {
-   "key": "lpn_ds_eps_note",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "'Only the time step now on screen is scaled, with its tank levels and link statuses' reads as if the levels and statuses are scaled too; 'run' can mean the Run button or the EPANET simulation",
-   "readings": [
-    "the time step's demands, tank levels and link statuses are all scaled",
-    "only the demands are scaled; levels and statuses are taken from that step"
-   ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED: 'The demands of the time step now on screen are scaled, and the network is solved with that step’s tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.'"
-  },
-  {
-   "key": "lpn_ds_search_note",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "'from 0 to {max} to the nearest {step}' stacks two 'to's; 'maintain the lowest pressure allowed' reads as maintaining a pressure setpoint rather than staying at or above it",
-   "readings": [
-    "search from 0 up to the maximum, rounding to the step",
-    "search from 0 to the maximum, and keep the pressure at exactly the minimum"
-   ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED: 'Finds the largest demand scale at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}, to the nearest {step}, and assumes that more demand never raises the lowest pressure.'"
-  },
-  {
-   "key": "lpn_ds_find",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "A bare 'Find' collides with the Find feature that selects assets by condition (lpn_notes_4_def), and a translator cannot tell which; Run sits beside it with the same bare style",
-   "readings": [
-    "find assets matching a condition",
-    "find the largest demand scale (the button at js/looped-network.js:59552)"
-   ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED: 'Find largest scale'"
-  },
-  {
-   "key": "lpn_ds_found",
-   "source": "wave0",
-   "lang": null,
-   "complaint": "'Every junction' is false under the Selected scope, where only the chosen junctions are checked; 'keeps {pressure}' is elliptical for 'at least'",
-   "readings": [
-    "the whole system holds the pressure",
-    "only the checked junctions hold at least the pressure"
-   ],
-   "disposition": "refer-to-human",
-   "resolution": "PROPOSED: '✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.'"
-  }
- ]
+    "sprint": "1003b-wave0",
+    "description": "Adversarial Wave 0 on 19 new-and-changed lpn_ keys (graphs and reports menu tips, time series add, coordinate system tips, About note, EPS status events, fire flow and demand scaling notes). Each key checked against its call site. No English or $ec_lang_syn changed.",
+    "entries": [
+        {
+            "key": "lpn_graphs_menu_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Long list of five graph kinds; checked whether the list reads as one flat series",
+            "readings": [
+                "five graph kinds the menu opens"
+            ],
+            "disposition": "dismissed",
+            "resolution": "One reading: a flat list matching the five menu items built at js/looped-network.js:40365; Tom ruled the earlier wording OK on 2026-10-03 and the additions follow it."
+        },
+        {
+            "key": "lpn_ts_add_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Says 'everything now selected', but tsAddSelection() (js/looped-network.js:29915) adds only selected assets of the current group (Nodes or Links); 'now' also reads as 'at this moment' vs 'newly'",
+            "readings": [
+                "every selected asset of any kind goes onto the graph",
+                "only the selected assets of the group shown (Nodes or Links) go onto the graph"
+            ],
+            "disposition": "refer-to-human",
+            "resolution": "PROPOSED: 'Put the selected nodes or links (whichever group is shown) on the map onto the graph.'"
+        },
+        {
+            "key": "lpn_ts_add_none",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "'Nothing of that kind' has no antecedent in the note, and the note also appears when the selected assets are already on the graph (added === 0), where 'not selected' is false",
+            "readings": [
+                "no asset of the shown group (Nodes or Links) is selected",
+                "the selected assets are already on the graph, so none was added"
+            ],
+            "disposition": "english",
+            "resolution": "Tom's edited proposal applied verbatim, 2026-10-05.",
+            "human_answer": "Edited proposal.",
+            "human_answered": "2026-10-05"
+        },
+        {
+            "key": "lpn_ts_none",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Tells the reader to select assets and press the button",
+            "readings": [
+                "select on the map, then press the Add selected button"
+            ],
+            "disposition": "dismissed",
+            "resolution": "One reading: shown at js/looped-network.js:29991 when no series exist, and 'Add selected' is the exact label of lpn_ts_add; the group detail is carried by lpn_ts_add_none."
+        },
+        {
+            "key": "lpn_new_coordsys_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "'This is permanent' is contradicted by 'the only way ... convert', and 'it is approximate' has no clear referent (the choice, the conversion, or the network)",
+            "readings": [
+                "the choice cannot change, except by a conversion that is approximate",
+                "the network can be converted by one route only, and the network's coordinates are approximate"
+            ],
+            "disposition": "english",
+            "resolution": "Tom's edited proposal applied verbatim, 2026-10-05.",
+            "human_answer": "Proposal edited.",
+            "human_answered": "2026-10-05"
+        },
+        {
+            "key": "lpn_crs_list_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "'The two filters above' is not countable on the page (Looped-Network.php:1738-1750 shows a map-view checkbox, a place search, and a name filter)",
+            "readings": [
+                "map-view checkbox and name filter",
+                "place search and name filter"
+            ],
+            "disposition": "english",
+            "resolution": "Tom's edit applied verbatim, 2026-10-05.",
+            "human_answer": "Edited",
+            "human_answered": "2026-10-05"
+        },
+        {
+            "key": "lpn_notes_4_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "'lists the junctions' says neither where nor what; 'route' where the Graphs tip says 'path'; 'sit on real ground' is idiom; the bottom panel is called a pane elsewhere (Looped-Network.php:1855 renders it as one About-box paragraph)",
+            "readings": [
+                "the bottom panel lists every junction with its results",
+                "the bottom panel lists only the junctions along the profile route"
+            ],
+            "disposition": "refer-to-human",
+            "resolution": "PROPOSED: 'A project can be placed on real ground with a street map behind it. EPANET .inp files can be read and written. The bottom pane plots a profile along a path and tabulates the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.'",
+            "human_answer": "For the record, I find this \"Notes\" box, and this section in particular, to be embarrassing. What's it's purpose? Maybe I need to edit lang.ec.en.php. Is there a compelling reason why we can't remove this section or the entire box? If it matters, every section should be an important advisory, not fluff like this.",
+            "human_answered": "2026-10-05"
+        },
+        {
+            "key": "lpn_reports_menu_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Checked whether 'the full report' collides with 'the EPANET solver report'",
+            "readings": [
+                "six reports the menu offers, the last two EPANET's Status Report and Full Report"
+            ],
+            "disposition": "dismissed",
+            "resolution": "One reading: a list matching the menu entries at js/looped-network.js:40482, and 'status report' and 'full report' are EPANET's own report names."
+        },
+        {
+            "key": "lpn_status_opened",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "'now open' could be adjective or event",
+            "readings": [
+                "the link changed to open at this reporting time"
+            ],
+            "disposition": "dismissed",
+            "resolution": "One reading: an event line built at js/looped-network.js:60576 only when a link's status changes; pairs with lpn_status_closed."
+        },
+        {
+            "key": "lpn_status_emptying",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Near-collision with lpn_status_dry 'now empty'",
+            "readings": [
+                "the tank's level began to fall at this time"
+            ],
+            "disposition": "dismissed",
+            "resolution": "One reading: event line at js/looped-network.js:60595, emitted when the level direction turns downward; distinct from 'now empty' by tense."
+        },
+        {
+            "key": "lpn_status_full",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "none beyond lpn_status_filling pairing",
+            "readings": [
+                "the tank reached its maximum level"
+            ],
+            "disposition": "dismissed",
+            "resolution": "One reading: event line at js/looped-network.js:60605, emitted when level reaches the maximum."
+        },
+        {
+            "key": "lpn_status_dry",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Key says dry, text says empty; checked for collision with emptying",
+            "readings": [
+                "the tank reached its minimum level"
+            ],
+            "disposition": "dismissed",
+            "resolution": "One reading: event line at js/looped-network.js:60615, emitted at the minimum level; 'empty' is the visitor word for a tank."
+        },
+        {
+            "key": "lpn_ff_no_selection",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "'Select' vs 'choose' and the scope names",
+            "readings": [
+                "no junction is in the map selection; select some or set the scope to All junctions"
+            ],
+            "disposition": "dismissed",
+            "resolution": "One reading: shown by analysisRefused at js/looped-network.js:59011; 'Select' is the map selection and 'choose All junctions' matches the scope option label lpn_ds_scope_all."
+        },
+        {
+            "key": "lpn_ff_design_no_selection",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "'design check scope', 'Selected' and 'All' must match the control",
+            "readings": [
+                "the Design check control is set to Selected with an empty map selection"
+            ],
+            "disposition": "dismissed",
+            "resolution": "One reading: refused at js/looped-network.js:59029; 'Selected' and 'All' are the option labels lpn_ff_design_selected and lpn_ff_design_all of the Design check control."
+        },
+        {
+            "key": "lpn_ff_design_none",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Two scopes exist on this page (Junctions to test, and the Design check All/Selected), and 'the scope you chose' does not say which; 'any junction drew' can read as 'whenever one did' or 'if some junction did'",
+            "readings": [
+                "no limit was exceeded during any tested junction's fire flow, within the design check scope",
+                "no limit was exceeded in the junctions-to-test scope"
+            ],
+            "disposition": "english",
+            "resolution": "Tom's edited proposal applied verbatim, 2026-10-05.",
+            "human_answer": "Proposal edited.",
+            "human_answered": "2026-10-05"
+        },
+        {
+            "key": "lpn_ds_eps_note",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "'Only the time step now on screen is scaled, with its tank levels and link statuses' reads as if the levels and statuses are scaled too; 'run' can mean the Run button or the EPANET simulation",
+            "readings": [
+                "the time step's demands, tank levels and link statuses are all scaled",
+                "only the demands are scaled; levels and statuses are taken from that step"
+            ],
+            "disposition": "english",
+            "resolution": "Tom's edit applied verbatim, 2026-10-05.",
+            "human_answer": "Edited",
+            "human_answered": "2026-10-05"
+        },
+        {
+            "key": "lpn_ds_search_note",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "'from 0 to {max} to the nearest {step}' stacks two 'to's; 'maintain the lowest pressure allowed' reads as maintaining a pressure setpoint rather than staying at or above it",
+            "readings": [
+                "search from 0 up to the maximum, rounding to the step",
+                "search from 0 to the maximum, and keep the pressure at exactly the minimum"
+            ],
+            "disposition": "english",
+            "resolution": "Tom's edited proposal applied verbatim, 2026-10-05.",
+            "human_answer": "Edited proposal.",
+            "human_answered": "2026-10-05"
+        },
+        {
+            "key": "lpn_ds_find",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "A bare 'Find' collides with the Find feature that selects assets by condition (lpn_notes_4_def), and a translator cannot tell which; Run sits beside it with the same bare style",
+            "readings": [
+                "find assets matching a condition",
+                "find the largest demand scale (the button at js/looped-network.js:59552)"
+            ],
+            "disposition": "english",
+            "resolution": "Tom: 'Merge. Find is find.' The button now uses the suite's existing Find key; lpn_ds_find deleted, 2026-10-05.",
+            "human_answer": "Merge. Find is find.",
+            "human_answered": "2026-10-05"
+        },
+        {
+            "key": "lpn_ds_found",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "'Every junction' is false under the Selected scope, where only the chosen junctions are checked; 'keeps {pressure}' is elliptical for 'at least'",
+            "readings": [
+                "the whole system holds the pressure",
+                "only the checked junctions hold at least the pressure"
+            ],
+            "disposition": "english",
+            "resolution": "Tom approved the proposal, 2026-10-05; applied verbatim.",
+            "human_answer": "Proposal approved.",
+            "human_answered": "2026-10-05"
+        }
+    ]
 }

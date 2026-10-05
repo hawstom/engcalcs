@@ -100,7 +100,7 @@ $ec_lang['template_printable_subtitle']='Printable Subtitle';
 $ec_lang['consent_body']='May we save a one-digit cookie in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_time_run_tip']='Solve this network at every hydraulic time step.';
-$ec_lang_syn['consent_body']='May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you type. Without it we cannot tell your second visit from somebody else’s first.';
+$ec_lang_syn['consent_body']='May we save (store, keep, put) a one-digit cookie (a tiny stored marker) in this browser to remember that we have already counted this page? It records nothing about you and nothing you enter. Without it we cannot tell your second visit from somebody else’s first.';
 $ec_lang['consent_accept']='Allow this';
 $ec_lang_syn['consent_accept']='Allow (permit, accept) this ask (this request, this question)';
 $ec_lang['consent_accept_all']='Allow all';
@@ -1169,8 +1169,6 @@ $ec_lang['lpn_status_converted']='{n} values were rewritten into {unit}.';
 // English you used. While I like that you are thinking simple for translators, this should go in
 // _syn and the more natural in English."*). That is the routing rule stated on a real case: simple
 // English is for when an English reader would stumble, and here one would not.
-$ec_lang_syn['lpn_units_group_inputs']='Units of inputs, or Units of what you enter';
-$ec_lang_syn['lpn_units_group_results']='Units of results, or Units of the answers';
 // **LENGTH ONLY** (Task 693, folded into 696; Tom 2026-09-18: *"when the map unit is lat/lon, this
 // unit label is a lie"*). What the coordinates are in is a separate, derived, read-only line below.
 $ec_lang['lpn_units_length']='Length';
@@ -1738,7 +1736,6 @@ $ec_lang['lpn_graphs_menu']='Graphs';
 // are really needed. Are they simply keyed wrong? I guess 1. My mistake."), which is the written
 // permission $ec_lang_syn requires. Same text, correct array.
 $ec_lang['lpn_profile_title']='Profile along a path';
-$ec_lang_syn['lpn_profile_tip']='Draw the ground or grade and the hydraulic grade line along a path, route, or way through the network.';
 $ec_lang_syn['lpn_profile_title']='Profile or cross section along a path, route, or way';
 // Task 433 -- the path chooser. The gesture is Google Directions': click the start node, move over
 // the map to see the path, click to add a stop, double-click to finish.
@@ -1815,7 +1812,7 @@ $ec_lang['lpn_result_pump_head_tip']='The head the pump adds from suction to dis
 $ec_lang['lpn_report_pump_head']='Pump head';
 $ec_lang['lpn_ts_add']='Add selected';
 // Said out loud rather than ignored: a button that does nothing cannot be told from a broken one.
-$ec_lang['lpn_ts_add_none']='Nothing of that kind is selected on the map.';
+$ec_lang['lpn_ts_add_none']='Nothing found to add.';
 $ec_lang['lpn_ts_clear']='Remove all';
 $ec_lang['lpn_ts_chip_tip']='Take {id} off the graph';
 $ec_lang['lpn_ts_none']='Nothing to graph yet. Select assets on the map and press Add selected.';
@@ -1904,7 +1901,7 @@ $ec_lang['lpn_new_title']='New project';
 // them), or local and not georeferenced. The keys of the older three-radio box (lpn_new_coords and
 // its five siblings) are gone; Tom called the last of them obsolete on 2026-09-16.
 $ec_lang['lpn_new_coordsys']='Coordinate system';
-$ec_lang['lpn_new_coordsys_tip']='Choose the coordinate system of your network. This is permanent; the only way to convert a network to different coordinates is with “File, Convert as…”, and it is approximate.';
+$ec_lang['lpn_new_coordsys_tip']='Choose the coordinate system of your network. The only way to change this choice is with “File, Convert as…” to new project, and that conversion is approximate.';
 // **DELETED 2026-09-25: lpn_new_coordsys_geo / lpn_new_coordsys_geo_tip.** Don't expose the word
 // "projection" (dev/session-handoff.md RULINGS); once reworded, both were the identical string
 // lpn_convas_epsg / lpn_convas_epsg_tip already carries, so the radio reuses those keys rather than
@@ -1931,7 +1928,7 @@ $ec_lang['lpn_crs_place_tip']='Your search goes to OpenStreetMap’s place-name 
 $ec_lang['lpn_crs_search']='Search';
 $ec_lang['lpn_crs_name']='Coordinate system name filter';
 $ec_lang['lpn_crs_name_tip']='Text that filters the list: only the coordinate systems whose name or EPSG code contains it are shown.';
-$ec_lang['lpn_crs_list_tip']='The coordinate systems left by the two filters above. Choose one, then press OK.';
+$ec_lang['lpn_crs_list_tip']='The coordinate systems that pass the filters above. Choose one, then press OK.';
 // Said rather than left blank: a filter that is on and filtering nothing looks broken.
 $ec_lang['lpn_crs_noview']='No place has been searched for yet, so the whole list is offered. Search for a place above or zoom the map to narrow it.';
 $ec_lang['lpn_crs_count']='{n} of {total} coordinate systems listed.';
@@ -2741,7 +2738,6 @@ $ec_lang_syn['lpn_backdrop_scale_entry']='World (Map Coordinates or Georeference
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Enter the size of one pixel on the map, or paste the complete contents of the world file for the image';
 $ec_lang_syn['lpn_backdrop_scale_entry_prompt']='World (Map Coordinates or Georeference) File for the image | gloss: world file; runtime: units appended';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Enter one number for the size of one pixel on the map, or paste all six lines of a world file.';
-$ec_lang_syn['lpn_backdrop_scale_entry_bad']='World (Map Coordinates or Georeference) File for the image | gloss: world file';
 $ec_lang['lpn_backdrop_wld_bad']='This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.';
 $ec_lang_syn['lpn_backdrop_wld_bad']='World (Map Coordinates or Georeference) File for the image | gloss: world file';
 $ec_lang['lpn_backdrop_unreadable']='This picture cannot be shown by your web browser. Save it as a PNG or JPEG picture and add it again.';
@@ -2975,8 +2971,8 @@ $ec_lang['lpn_scenario_basic_tip']='Selected, a scenario is simply the values yo
 $ec_lang['lpn_alt_title']='Alternatives preview';
 $ec_lang['lpn_alt_calc_options']='Calculation options';
 $ec_lang['lpn_alt_note']='Base uses the Base alternative of every category. Each scenario gets its own alternative for any category that is changed, a child of the Base one. The number is how many changed values it has. The last three columns are calculation options: type a scenario\'s own value, or leave it blank to use its parent\'s. The project\'s own are in Settings, Calculation, Time.';
-$ec_lang['lpn_scenario_duration_tip']='Overrides the total run time in this scenario. Leave it blank to use its parent\'s. A total run time of 0:00 is a steady-state run.';
-$ec_lang['lpn_scenario_hyd_step_tip']='Overrides the hydraulic time step in this scenario. Leave it blank to use its parent\'s.';
+$ec_lang['lpn_scenario_duration_tip']='Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.';
+$ec_lang['lpn_scenario_hyd_step_tip']='Leave blank to inherit from parent.';
 $ec_lang['lpn_time_scn_overrides']='Scenario overrides:';
 $ec_lang['lpn_alt_cat_physical']='Physical';
 $ec_lang['lpn_alt_cat_demand']='Demand';
@@ -3193,7 +3189,6 @@ $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';
 $ec_lang['lpn_settings_backdrop_opacity']='Background image opacity (0 to 1)';
 // Task 617: a display-time filter on the street or satellite tiles only; the drawing and the credit are untouched.
 $ec_lang['lpn_settings_basemap_style']='Basemap style';
-$ec_lang['lpn_settings_basemap_style_tip']='Tones down the street or satellite tiles so the network stands out. It changes only how the tiles look on your screen, not the drawing, labels or credit.';
 $ec_lang['lpn_basemap_style_normal']='Normal';
 $ec_lang['lpn_basemap_style_muted']='Muted';
 $ec_lang['lpn_basemap_style_faded']='Faded';
@@ -3565,7 +3560,7 @@ $ec_lang['lpn_scncmp_col_maxvelocity']='Highest velocity';
 $ec_lang['lpn_scncmp_at']='{value} at {id}';
 $ec_lang['lpn_scncmp_at_time']='{value} at {id}, {time}';
 $ec_lang['lpn_scncmp_same']='The same in every scenario';
-$ec_lang['lpn_scncmp_period_note']='Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.';
+$ec_lang['lpn_scncmp_period_note']='Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole network, at the time shown.';
 $ec_lang['lpn_scncmp_current']='(currently open)';
 $ec_lang['lpn_scncmp_note']='Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.';
 $ec_lang['lpn_energy_over']='For extended period simulation of {time}';
@@ -3888,7 +3883,6 @@ $ec_lang_syn['lpn_ff_all']='All junctions | a pull-down option under Junctions t
 $ec_lang_syn['lpn_ff_selected']='Selected junctions | a pull-down option under Junctions to test; agrees with junctions, plural';
 $ec_lang_syn['lpn_ds_head_search_selected']='What demand can the junctions you choose handle';
 $ec_lang_syn['lpn_ds_scope_tip']='Scale the demand at the junctions that you choose. Pressures are checked at the scaled demand.';
-$ec_lang_syn['lpn_ds_search_note_selected']='Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which the junctions that you choose keep the given lowest pressure allowed.';
 $ec_lang_syn['lpn_ff_design_off']='No design check | a pull-down option under Design check (effect on system); avoid: switched off, power off';
 $ec_lang_syn['lpn_ff_design_all']='All other junctions and all pipes | a pull-down option under Design check (effect on system); agrees with pipes and junctions together, plural';
 $ec_lang_syn['lpn_ff_design_selected']='The selected junctions and their pipes | a pull-down option under Design check (effect on system); agrees with pipes and junctions together, plural';
@@ -4188,7 +4182,7 @@ $ec_lang['lpn_ff_more']='and {n} more affected';
 // agree with one noun and would have been wrong at the other call site.
 $ec_lang['lpn_ff_rows_more']='Junctions not shown: {n}.';
 $ec_lang['lpn_ff_rows_more_links']='Links not shown: {n}.';
-$ec_lang['lpn_ff_design_none']='Nothing in the scope you chose went outside its limits while any junction drew its fire flow.';
+$ec_lang['lpn_ff_design_none']='With each tested junction’s fire flow drawn in turn, nothing in the design check scope failed its limits.';
 $ec_lang['lpn_ff_design_off_note']='The effect on the rest of the system was not checked in this run.';
 // **WHY IT IS SAID AND NEVER APPLIED, in Tom's words (2026-09-02), and the reason is the MODEL, not
 // the arithmetic:** *"These models are not always fine-grained. They don't represent every pipe,
@@ -4268,7 +4262,7 @@ $ec_lang['lpn_ds_scope_all']='All junctions';
 $ec_lang['lpn_ds_scope_selected']='Selected junctions';
 $ec_lang['lpn_ds_minpressure']='Lowest pressure allowed';
 $ec_lang['lpn_ds_minpressure_tip']='This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.';
-$ec_lang['lpn_ds_eps_note']='Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.';
+$ec_lang['lpn_ds_eps_note']='Only the time step now on screen is scaled; levels and statuses are taken from this step. To test the peak, move the clock to the peak demand before you run.';
 $ec_lang['lpn_ds_head_scale']='Scale the demands';
 $ec_lang['lpn_ds_multiplier']='Demand scale';
 $ec_lang['lpn_ds_multiplier_tip']='The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario\'s own demand multiplier, which is already in the demands, and it is never saved in your project.';
@@ -4276,11 +4270,10 @@ $ec_lang['lpn_ds_run']='Run';
 $ec_lang['lpn_ds_head_search']='What demand scale can the system handle?';
 $ec_lang['lpn_ds_head_search_selected']='What demand scale can these junctions handle?';
 $ec_lang['lpn_ds_outside_below']='At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.';
-$ec_lang['lpn_ds_search_note']='Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.';
-$ec_lang['lpn_ds_find']='Find';
+$ec_lang['lpn_ds_search_note']='Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.';
 $ec_lang['lpn_ds_holds_max']='✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.';
 $ec_lang['lpn_ds_below_zero']='⚠ At least one junction is below {pressure} even with the scaled demands at zero.';
-$ec_lang['lpn_ds_found']='✓ Every junction keeps {pressure} up to a demand scale of {m}.';
+$ec_lang['lpn_ds_found']='✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.';
 $ec_lang['lpn_ds_found_below']='⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.';
 $ec_lang['lpn_ds_search_stopped']='The search was stopped before it found an answer.';
 $ec_lang['lpn_ds_lowest_at']='At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.';
@@ -4371,15 +4364,15 @@ $ec_lang['lpn_survey_note_id_duplicate']='Name already used earlier in this file
 $ec_lang['lpn_survey_note_id_taken']='Name already in project, new name assigned.';
 $ec_lang['lpn_survey_note_id_invalid']='Name cannot be used here, new name assigned.';
 $ec_lang['lpn_settings_demand_model']='Demand model';
-$ec_lang['lpn_settings_demand_model_tip']='Choose how junctions receive water. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.';
+$ec_lang['lpn_settings_demand_model_tip']='Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.';
 $ec_lang['lpn_settings_demand_model_dda']='Demand driven';
 $ec_lang['lpn_settings_demand_model_pda']='Pressure driven';
 $ec_lang['lpn_settings_min_pressure']='Minimum pressure';
-$ec_lang['lpn_settings_min_pressure_tip']='Enter the pressure at or below which a junction receives no water. Use this project\'s pressure unit.';
+$ec_lang['lpn_settings_min_pressure_tip']='Enter the pressure at or below which a junction receives no flow. Use this project\'s pressure unit.';
 $ec_lang['lpn_settings_req_pressure']='Required pressure';
 $ec_lang['lpn_settings_req_pressure_tip']='Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project\'s pressure unit. Leave it blank to use EPANET\'s default, which is in psi for US flow units and meters otherwise.';
 $ec_lang['lpn_settings_pressure_exponent']='Pressure exponent';
-$ec_lang['lpn_settings_pressure_exponent_tip']='Enter the exponent of the curve that rises from no water at the minimum pressure to the full demand at the required pressure.';
+$ec_lang['lpn_settings_pressure_exponent_tip']='Enter the exponent of the curve that rises from no flow at the minimum pressure to the full demand at the required pressure.';
 $ec_lang['lpn_engine_pda_route']='Solved with the EPANET solver, because the demand model is pressure driven.';
 $ec_lang['lpn_diag_pda_needs_epanet']='The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.';
 $ec_lang['lpn_result_delivered_demand']='Delivered demand';

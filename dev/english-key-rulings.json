@@ -29,6 +29,11 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
+        "lpn_alt_calc_options": {
+            "on": "Calculation options",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
         "lpn_alt_cat_constituent": {
             "on": "Constituent",
             "ruled": "2026-10-01",
@@ -178,6 +183,26 @@
             "on": "Photographs of the earth from Mapbox.",
             "ruled": "2026-09-25",
             "answer": "Edited."
+        },
+        "lpn_basemap_style_faded": {
+            "on": "Faded",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_basemap_style_grayscale": {
+            "on": "Grayscale",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_basemap_style_muted": {
+            "on": "Muted",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_basemap_style_normal": {
+            "on": "Normal",
+            "ruled": "2026-10-05",
+            "answer": "OK."
         },
         "lpn_basemap_tip": {
             "on": "Street map images from OpenStreetMap.",
@@ -379,6 +404,11 @@
             "ruled": "2026-10-03",
             "answer": "OK."
         },
+        "lpn_choice_default": {
+            "on": "Default",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
         "lpn_clean_map": {
             "on": "Hide map readouts",
             "ruled": "2026-09-25",
@@ -497,6 +527,16 @@
         "lpn_contour_plot": {
             "on": "Contour plot",
             "ruled": "2026-10-03",
+            "answer": "OK."
+        },
+        "lpn_contour_show": {
+            "on": "Show contours",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_contour_show_tip": {
+            "on": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
+            "ruled": "2026-10-05",
             "answer": "OK."
         },
         "lpn_contour_support": {
@@ -679,6 +719,11 @@
             "ruled": "2026-09-14",
             "answer": "Edited"
         },
+        "lpn_cp_allow_tip": {
+            "on": "Allow only these characters:",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
         "lpn_cp_applies": {
             "on": "Applies to",
             "ruled": "2026-09-14",
@@ -733,6 +778,11 @@
             "on": "White space is allowed only between other characters.",
             "ruled": "2026-09-14",
             "answer": "OK"
+        },
+        "lpn_cp_characters_tip": {
+            "on": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
         },
         "lpn_cp_design": {
             "on": "Design",
@@ -1221,14 +1271,44 @@
             "on": "It stopped after {iterations} iterations.",
             "ruled": "2026-09-02"
         },
+        "lpn_diag_pda_needs_epanet": {
+            "on": "The demand model is pressure driven, and only the EPANET solver can compute it. The EPANET solver could not be loaded, so these results are missing.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_diag_pda_pressures": {
+            "on": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_dock_autohide": {
+            "on": "Auto-hide",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_dock_float": {
+            "on": "Float",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_dock_left": {
+            "on": "Dock at the left of the map",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_dock_right": {
+            "on": "Dock at the right of the map",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
         "lpn_ds_at_time": {
             "on": "Time step: {time}.",
             "ruled": "2026-10-04",
             "answer": "OK."
         },
         "lpn_ds_bad_multiplier": {
-            "on": "Type a demand scale of zero or more, such as 1.5.",
-            "ruled": "2026-10-03",
+            "on": "Enter a demand scale of zero or more, such as 1.5.",
+            "ruled": "2026-10-05",
             "answer": "OK."
         },
         "lpn_ds_below_zero": {
@@ -1262,19 +1342,14 @@
             "answer": "OK."
         },
         "lpn_ds_eps_note": {
-            "on": "Only the time step now on screen is scaled, with its tank levels and link statuses. To test the peak, move the clock to the peak demand before you run.",
-            "ruled": "2026-10-04",
-            "answer": "OK."
-        },
-        "lpn_ds_find": {
-            "on": "Find",
-            "ruled": "2026-10-04",
-            "answer": "OK."
+            "on": "Only the time step now on screen is scaled; levels and statuses are taken from this step. To test the peak, move the clock to the peak demand before you run.",
+            "ruled": "2026-10-05",
+            "answer": "Edited"
         },
         "lpn_ds_found": {
-            "on": "✓ Every junction keeps {pressure} up to a demand scale of {m}.",
-            "ruled": "2026-10-04",
-            "answer": "OK."
+            "on": "✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.",
+            "ruled": "2026-10-05",
+            "answer": "Proposal approved."
         },
         "lpn_ds_found_below": {
             "on": "⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.",
@@ -1412,9 +1487,9 @@
             "answer": "OK."
         },
         "lpn_ds_search_note": {
-            "on": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.",
-            "ruled": "2026-10-03",
-            "answer": "OK."
+            "on": "Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.",
+            "ruled": "2026-10-05",
+            "answer": "Edited proposal."
         },
         "lpn_ds_search_note_selected": {
             "on": "Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed.",
@@ -1634,6 +1709,11 @@
             "on": "Loading EPANET solver while you build. Results will be available when completely loaded.",
             "ruled": "2026-09-06",
             "answer": "Tom's own sentence, written by him in the instruction that commissioned the feature: \"we show a banner 'Loading EPANET solver while you build. Results will be available when completely loaded.' while it fetches\". Recorded because the words are his, not because anybody approved ours."
+        },
+        "lpn_engine_pda_route": {
+            "on": "Solved with the EPANET solver, because the demand model is pressure driven.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
         },
         "lpn_engine_wait": {
             "on": "Loading solver. Results delayed momentarily. Continue working.",
@@ -2673,6 +2753,11 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
+        "lpn_inp_drop_pressure_unit": {
+            "on": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
         "lpn_inp_drop_quality_options": {
             "on": "This file states EPANET water quality options: Quality, which names the kind of water quality analysis, and two settings that go with a chemical, Relative diffusivity and Quality tolerance. Water age and source trace are worked out here; a chemical is not, so those two settings are kept without being used. All of them are written back if you save an EPANET file.",
             "ruled": "2026-09-02"
@@ -3336,6 +3421,11 @@
             "ruled": "2026-09-06",
             "answer": "OK."
         },
+        "lpn_mode_add_chain": {
+            "on": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
         "lpn_mode_add_meter": {
             "on": "Customer: click where the customer is, then click the pipe or the node that serves it. Or use Esc to cancel.",
             "ruled": "2026-09-23",
@@ -3517,6 +3607,21 @@
             "ruled": "2026-09-07",
             "answer": "OK."
         },
+        "lpn_pane_filter_sel_and": {
+            "on": "Filtered by {q} and selection only. Showing {n} of {all}.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_pane_filter_sel_none": {
+            "on": "None of the selected elements are in this table.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_pane_filter_sel_note": {
+            "on": "Selection only. Showing {n} of {all}.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
         "lpn_pane_filter_stale": {
             "on": "Rows that no longer match: {n}.",
             "ruled": "2026-10-01",
@@ -3570,6 +3675,11 @@
         "lpn_pane_manage_cols_up": {
             "on": "Move up",
             "ruled": "2026-09-26",
+            "answer": "OK."
+        },
+        "lpn_pane_manage_cols_width": {
+            "on": "Width (em)",
+            "ruled": "2026-10-05",
             "answer": "OK."
         },
         "lpn_pane_not_used": {
@@ -3727,6 +3837,16 @@
             "ruled": "2026-09-28",
             "answer": "OK."
         },
+        "lpn_pane_sel_only": {
+            "on": "Selection only",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_pane_sel_only_none": {
+            "on": "No elements are selected. Select elements on the map first.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
         "lpn_pane_select_on_map": {
             "on": "Select on map",
             "ruled": "2026-09-29",
@@ -3762,19 +3882,14 @@
             "ruled": "2026-09-29",
             "answer": "OK."
         },
-        "lpn_result_pump_head": {
-            "on": "Head",
-            "ruled": "2026-10-03",
+        "lpn_pane_width_tip": {
+            "on": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
+            "ruled": "2026-10-05",
             "answer": "OK."
         },
-        "lpn_report_pump_head": {
-            "on": "Pump head",
-            "ruled": "2026-10-03",
-            "answer": "OK."
-        },
-        "lpn_result_pump_head_tip": {
-            "on": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
-            "ruled": "2026-10-03",
+        "lpn_pda_deficit_note": {
+            "on": "Junctions receiving less than their demand: {n}.",
+            "ruled": "2026-10-05",
             "answer": "OK."
         },
         "lpn_pgraph_none": {
@@ -4063,6 +4178,11 @@
             "on": "New value from",
             "ruled": "2026-08-29"
         },
+        "lpn_report_pump_head": {
+            "on": "Pump head",
+            "ruled": "2026-10-03",
+            "answer": "OK."
+        },
         "lpn_reports_calib": {
             "on": "Calibration",
             "ruled": "2026-10-03",
@@ -4124,6 +4244,26 @@
             "on": "How much of the chemical is left at this point after it has travelled and reacted. The units are the ones named beside the chemical under Settings, Water quality.",
             "ruled": "2026-09-04"
         },
+        "lpn_result_delivered_demand": {
+            "on": "Delivered demand",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_result_delivered_demand_tip": {
+            "on": "The flow this junction actually receives under the pressure driven demand model. It is less than the demand when the pressure is below the required pressure.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_result_demand_deficit": {
+            "on": "Demand deficit",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_result_demand_deficit_tip": {
+            "on": "The demand this junction asks for and does not receive, because the pressure is below the required pressure.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
         "lpn_result_demand_tip": {
             "on": "The flow this node draws at the time step shown: the total of base demands multiplied by their patterns. Worked out, not typed, so it changes with the clock and cannot be edited.",
             "ruled": "2026-08-29"
@@ -4136,6 +4276,16 @@
         "lpn_result_pressure": {
             "on": "Pressure",
             "ruled": "2026-09-01"
+        },
+        "lpn_result_pump_head": {
+            "on": "Head",
+            "ruled": "2026-10-03",
+            "answer": "OK."
+        },
+        "lpn_result_pump_head_tip": {
+            "on": "The head the pump adds from suction to discharge, shown as a positive number. The solver and EPANET files carry it as a negative head loss.",
+            "ruled": "2026-10-03",
+            "answer": "OK."
         },
         "lpn_result_reaction_rate": {
             "on": "Reaction rate",
@@ -4186,6 +4336,21 @@
             "on": "These rules could not be read, so they were ignored in this run: {ids}",
             "ruled": "2026-09-05"
         },
+        "lpn_saved_browser": {
+            "on": "Saved in this browser",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_saved_project": {
+            "on": "Saved with the project",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_saved_session": {
+            "on": "Not saved",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
         "lpn_scenario_basic": {
             "on": "Basic mode",
             "ruled": "2026-10-01",
@@ -4195,6 +4360,16 @@
             "on": "Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.",
             "ruled": "2026-10-01",
             "answer": "Edited."
+        },
+        "lpn_scenario_duration_tip": {
+            "on": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
+            "ruled": "2026-10-05",
+            "answer": "Edited"
+        },
+        "lpn_scenario_hyd_step_tip": {
+            "on": "Leave blank to inherit from parent.",
+            "ruled": "2026-10-05",
+            "answer": "Edited"
         },
         "lpn_scenario_mark_tip": {
             "on": "Ringed: this element holds a value that belongs to the scenario {name} alone.",
@@ -4281,6 +4456,11 @@
             "on": "{value} at {id}",
             "ruled": "2026-09-04"
         },
+        "lpn_scncmp_at_time": {
+            "on": "{value} at {id}, {time}",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
         "lpn_scncmp_col_maxvelocity": {
             "on": "Highest velocity",
             "ruled": "2026-09-04"
@@ -4306,9 +4486,19 @@
             "on": "Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.",
             "ruled": "2026-09-04"
         },
+        "lpn_scncmp_period_note": {
+            "on": "Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole network, at the time shown.",
+            "ruled": "2026-10-05",
+            "answer": "Edited"
+        },
         "lpn_scncmp_running": {
             "on": "Solving every scenario…",
             "ruled": "2026-09-04"
+        },
+        "lpn_scncmp_same": {
+            "on": "The same in every scenario",
+            "ruled": "2026-10-05",
+            "answer": "OK."
         },
         "lpn_scncmp_title": {
             "on": "Scenario comparison",
@@ -4337,6 +4527,11 @@
             "ruled": "2026-09-09",
             "answer": "OK"
         },
+        "lpn_settings_basemap_style": {
+            "on": "Basemap style",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
         "lpn_settings_custom_props": {
             "on": "Custom properties",
             "ruled": "2026-09-14",
@@ -4358,6 +4553,26 @@
         "lpn_settings_default_is": {
             "on": "The default is {n}.",
             "ruled": "2026-09-02"
+        },
+        "lpn_settings_demand_model": {
+            "on": "Demand model",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_settings_demand_model_dda": {
+            "on": "Demand driven",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_settings_demand_model_pda": {
+            "on": "Pressure driven",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_settings_demand_model_tip": {
+            "on": "Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.",
+            "ruled": "2026-10-05",
+            "answer": "Edited"
         },
         "lpn_settings_demand_multiplier_tip": {
             "on": "One scale on every demand in the network at once. Use it to ask what the system does at more or less than today's use. It does not change the numbers you typed.",
@@ -4436,9 +4651,29 @@
             "on": "Off",
             "ruled": "2026-08-29"
         },
+        "lpn_settings_min_pressure": {
+            "on": "Minimum pressure",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_settings_min_pressure_tip": {
+            "on": "Enter the pressure at or below which a junction receives no flow. Use this project's pressure unit.",
+            "ruled": "2026-10-05",
+            "answer": "Edited. Water would have been embarrassing. Why is your team persisting in inventing colloquialisms instead of sticking to technical terms? This app should not sound like a lay person. Sound like a civil enginer."
+        },
         "lpn_settings_option_unset": {
             "on": "Not stated",
             "ruled": "2026-09-01"
+        },
+        "lpn_settings_pressure_exponent": {
+            "on": "Pressure exponent",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_settings_pressure_exponent_tip": {
+            "on": "Enter the exponent of the curve that rises from no flow at the minimum pressure to the full demand at the required pressure.",
+            "ruled": "2026-10-05",
+            "answer": "Edited."
         },
         "lpn_settings_quality": {
             "on": "Water quality",
@@ -4459,6 +4694,16 @@
         "lpn_settings_quality_track_tip": {
             "on": "Choose what the run should follow through the pipes: how long the water has been in the system, or where it came from. Neither one asks you for any other number.",
             "ruled": "2026-09-01"
+        },
+        "lpn_settings_req_pressure": {
+            "on": "Required pressure",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_settings_req_pressure_tip": {
+            "on": "Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
         },
         "lpn_settings_runbox": {
             "on": "Show the run progress box",
@@ -5120,6 +5365,51 @@
             "on": "Do not show this box again",
             "ruled": "2026-09-14",
             "answer": "OK"
+        },
+        "lpn_time_scn_overrides": {
+            "on": "Scenario overrides:",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_time_stat_averaged": {
+            "on": "Averaged",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_time_stat_maximum": {
+            "on": "Maximum",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_time_stat_minimum": {
+            "on": "Minimum",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_time_stat_none": {
+            "on": "None",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_time_stat_range": {
+            "on": "Range",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_time_statistic": {
+            "on": "Statistic",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_tool_add_chain": {
+            "on": "Junction Pipe Chain",
+            "ruled": "2026-10-05",
+            "answer": "OK."
+        },
+        "lpn_tool_add_chain_tip": {
+            "on": "Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.",
+            "ruled": "2026-10-05",
+            "answer": "OK."
         },
         "lpn_tool_add_meter": {
             "on": "Customer",

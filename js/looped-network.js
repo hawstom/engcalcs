@@ -30276,7 +30276,7 @@ var EngCalcs = EngCalcs || {};
 		if (added) { return; }
 		note = document.getElementById('lpn_ts_note');
 		if (note) {
-			note.textContent = pc.lpn_ts_add_none || 'Nothing of that kind is selected on the map.';
+			note.textContent = pc.lpn_ts_add_none || 'Nothing found to add.';
 		}
 	}
 	function tsRemove(id) {
@@ -47311,8 +47311,7 @@ var EngCalcs = EngCalcs || {};
 		basemapStyleSelect.addEventListener('change', function () {
 			settings.basemapStyle = basemapStyleSelect.value; delete settings.basemapFilter; refreshBackdropOpacity(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_basemap_style || 'Basemap style', basemapStyleSelect,
-			pc.lpn_settings_basemap_style_tip);
+		row(mapBody, pc.lpn_settings_basemap_style || 'Basemap style', basemapStyleSelect);
 		var legendSelect = document.createElement('select');
 		legendPositionOptions(pc).forEach(function (o) {
 			var opt = document.createElement('option');
@@ -60830,7 +60829,7 @@ var EngCalcs = EngCalcs || {};
 			});
 			if (!anyEffect) {
 				ffEl('p', 'lpn-ff-note', pc.lpn_ff_design_none ||
-					'Nothing in the scope you chose went outside its limits while any junction drew its fire flow.', host);
+					'With each tested junction’s fire flow drawn in turn, nothing in the design check scope failed its limits.', host);
 			}
 		}
 
@@ -61608,10 +61607,10 @@ var EngCalcs = EngCalcs || {};
 			? (pc.lpn_ds_head_search_selected || 'What demand scale can these junctions handle?')
 			: (pc.lpn_ds_head_search || 'What demand scale can the system handle?'), host);
 		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_search_note ||
-			'Finds the largest demand scale, from 0 to {max} to the nearest {step}, at which all these junctions maintain the lowest pressure allowed. It assumes that more demand never raises the lowest pressure.')
+			'Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.')
 			.replace('{max}', dsMult(D.max)).replace('{step}', String(D.step)), host);
 		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
-		find = ffEl('button', 'lpn-ff-run', pc.lpn_ds_find || 'Find', buttons);
+		find = ffEl('button', 'lpn-ff-run', pc.lpn_find_btn || 'Find', buttons);
 		find.type = 'button';
 		find.disabled = dsBusy || other;
 		if (other) { find.title = run.title; }
@@ -61756,7 +61755,7 @@ var EngCalcs = EngCalcs || {};
 			} else {
 				verdict = s.belowAtOne
 					? (pc.lpn_ds_found_below || '⚠ At least one junction is already below {pressure} at the demands as they are. The system keeps it up to a demand scale of {m}.')
-					: (pc.lpn_ds_found || '✓ Every junction keeps {pressure} up to a demand scale of {m}.');
+					: (pc.lpn_ds_found || '✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.');
 				ffEl('p', 'lpn-ff-summary', verdict.replace('{pressure}', pressure).replace('{m}', dsMult(s.multiplier)), host);
 				dsProbeLine(host, s.holding);
 				dsProbeLine(host, s.failing);
@@ -62443,7 +62442,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		if (anyPeriod) {
 			ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_period_note ||
-				'Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole run, at the time shown.', host);
+				'Where a scenario has a total run time, its lowest pressure and highest velocity are the extremes of the whole network, at the time shown.', host);
 		}
 		ffEl('p', 'lpn-ff-note', pc.lpn_scncmp_note ||
 			'Every scenario is solved from a copy of the drawing. Nothing here changes the project, and the scenario you are working in is left as it was.', host);

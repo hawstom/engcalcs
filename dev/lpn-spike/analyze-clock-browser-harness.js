@@ -124,7 +124,7 @@ async function main() {
 		await openTool('lpn_ds_menu', 'lpn_ds_box');
 		await pressRun('#lpn_ds_controls', await a.lang('lpn_ds_run'));
 		await waitDone('#lpn_ds_controls [data-ds="scale"]', 'the Demand scaling Run answer');
-		await pressRun('#lpn_ds_controls', await a.lang('lpn_ds_find'));
+		await pressRun('#lpn_ds_controls', await a.lang('lpn_find_btn'));
 		await waitDone('#lpn_ds_controls [data-ds="search"]', 'the Demand scaling Find answer');
 		const dsAt = at0;
 		ok('Run names 0:00', (await txt('#lpn_ds_controls [data-ds="scale"]')).indexOf(dsAt) >= 0);
