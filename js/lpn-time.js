@@ -1804,11 +1804,15 @@
 		// dropdown, and it was removed for being wide (Task 427). A step reads as two elapsed times
 		// at its longest and a speed reads "0.5x", so 8.5rem and 4.5rem hold them with nothing to
 		// spare -- and a max-width means a long translation shrinks the control rather than the map.
-		function picker(id, label, tip, w) {
+		function picker(id, label, tip, w, minCh) {
 			var sel = document.createElement('select');
 			sel.id = id;
 			sel.className = 'form-select form-select-sm lpn-time-picker';
-			sel.style.cssText = 'width:auto;max-width:' + w + ';font-size:.8rem;padding:.1rem 1.3rem .1rem .35rem';
+			// min-width is what "10:00" needs: five digit-widths plus both paddings and the border,
+			// in ch/rem so it follows font size and zoom. Bootstrap's arrow occupies 1.5rem at the
+			// right, so the right padding is 1.6rem; at 1.3rem a "9:59" ran under the arrow
+			// (Tom, 2026-10-05).
+			sel.style.cssText = 'width:auto;min-width:calc(' + minCh + 'ch + 1.95rem + 2px);max-width:' + w + ';font-size:.8rem;padding:.1rem 1.6rem .1rem .35rem';
 			sel.setAttribute('aria-label', label);
 			if (tip) { sel.title = tip; }
 			container.appendChild(sel);
@@ -1838,14 +1842,14 @@
 		// **THE STEP SELECTOR IS THE ONLY CONTROL THAT SAYS WHICH MOMENT IS SHOWING.** The slider in
 		// the pane is gone rather than mirrored here: two controls for one current step are two
 		// controls that can disagree, and only one of them is on screen when the pane is shut.
-		ui.step = picker('lpn_time_step', S.slider, S.slider, '8.5rem');
+		ui.step = picker('lpn_time_step', S.slider, S.slider, '8.5rem', 5);
 		ui.step.addEventListener('change', function () {
 			var stops = stepTimes(), i = parseInt(ui.step.value, 10) || 0;
 			setTime(stops[Math.min(stops.length - 1, Math.max(0, i))]);
 		});
 		// Playback speed only, and it is not stored anywhere: how fast you like to watch is a fact
 		// about this minute, not about the project.
-		ui.speed = picker('lpn_time_speed', S.speed, S.speedTip, '4.5rem');
+		ui.speed = picker('lpn_time_speed', S.speed, S.speedTip, '4.5rem', 3);
 		[[0.5, '0.5x'], [1, '1x'], [2, '2x'], [4, '4x']].forEach(function (o) {
 			ui.speed.appendChild(el('option', { value: String(o[0]) }, o[1]));
 		});
