@@ -1836,9 +1836,15 @@
 		// took the button away. A row that vanished too would leave the question unanswerable.
 		// display, not removal, so renderPanel() can put it back without rebuilding the strip.
 		syncRunButton();
+		// **RESTART AND END** (a tester; Tom, 2026-10-05: "tight real estate on the toolbar. But it's
+		// important. Maybe the buttons can be smaller"). First and last reporting time, through
+		// setTime() like every other move, so a project with no frames asks for its run the same way.
+		// Their names are the lpn_time_first / lpn_time_last strings, which existed unused.
+		ui.first = btn('restart', S.first, function () { var st = stepTimes(); setTime(st[0]); }, null, true);
 		ui.prev = btn('step-back', S.prev, function () { stepBy(-1); }, null, true);
 		ui.play = btn('play', S.play, function () { if (state.playing) { pause(); } else { play(); } }, S.playTip, true);
 		ui.next = btn('step-fwd', S.next, function () { stepBy(1); }, null, true);
+		ui.last = btn('end', S.last, function () { var st = stepTimes(); setTime(st[st.length - 1]); }, null, true);
 		// **THE STEP SELECTOR IS THE ONLY CONTROL THAT SAYS WHICH MOMENT IS SHOWING.** The slider in
 		// the pane is gone rather than mirrored here: two controls for one current step are two
 		// controls that can disagree, and only one of them is on screen when the pane is shut.
@@ -1892,31 +1898,24 @@
 		// than to `title`, because the loop below is the one writer of the visible tip and it
 		// restores from exactly this field when the control is re-enabled.
 		ui.play.dataset.tipWhenLive = state.playing ? strings().pauseTip : strings().playTip;
-		// **ONE STOP MEANS THE TRANSPORT IS INERT BY DESIGN, AND IT HAS TO SAY SO.** Tom, 2026-08-19,
-		// on Net3-World -- a file that carries no [TIMES] block at all: "No time steps are
-		// available. It is not running or something is wrong with the play controls and the time
-		// step selector." Nothing was wrong; the project's duration is 0, so there is exactly one
-		// moment and Play has nowhere to go. Three live controls that quietly do nothing are
-		// indistinguishable from three broken ones, so they are DISABLED -- which is the visible
-		// signal that this is by design -- and every one of them carries the reason and the cure.
-		// Run stays enabled: on a network with no duration it is an ordinary recalculate, which is
-		// a true thing for a button called Run to do (see the note where it is built).
-		var inert = stops.length < 2, why = inert ? strings().noPeriod : null;
-		[ui.prev, ui.play, ui.next, ui.step].forEach(function (c) {
+		// **ONE STOP MEANS THERE IS NO PLAYER, SO THE PLAYER IS NOT DRAWN** (Tom, 2026-10-05: "Maybe
+		// the EPS controls can disappear for steady state. Many users never do EPS."). It used to be
+		// five disabled controls carrying the no-period sentence as their tip (Tom, 2026-08-19, on
+		// Net3-World: "It is not running or something is wrong with the play controls"), which spent
+		// the strip's width on controls that cannot work. Run is NOT a player control and keeps its
+		// own rule (syncRunButton). The cure the disabled tips carried -- set a Total run time -- now
+		// rides the tip of the Project > Run menu row (js/looped-network.js), the one place left
+		// that is always there.
+		var inert = stops.length < 2;
+		[ui.first, ui.prev, ui.play, ui.next, ui.last, ui.step, ui.speed].forEach(function (c) {
 			if (!c) { return; }
 			c.disabled = inert;
-			// The tip a control carries when it WORKS is its own; only the reason for being
-			// switched off is shared. Restoring rather than clearing, so a re-enabled control does
-			// not come back mute.
-			if (!c.dataset.tipWhenLive) { c.dataset.tipWhenLive = c.title || ''; }
-			// **THROUGH setTipText(), NEVER A BARE `title` WRITE.** These three buttons are born
-			// over the empty startup document, so they are born carrying the no-period sentence;
-			// initTips() caches it into data-bs-original-title and blanks the attribute, and a
-			// plain `c.title = 'Play'` then changes nothing the reader can see. That is the defect
-			// Tom reported as "It's always there. I have never seen any other tip."
-			if (EC.setTipText) { EC.setTipText(c, why || c.dataset.tipWhenLive); }
-			else { c.title = why || c.dataset.tipWhenLive; }
+			c.style.display = inert ? 'none' : '';
 		});
+		// The group wears a divider; with nothing visible in it the divider would mark nothing.
+		if (ui.run && ui.run.parentNode) {
+			ui.run.parentNode.style.display = (inert && getComputedStyle(ui.run).display === 'none') ? 'none' : '';
+		}
 	}
 
 	// The one thing a solve or a clock edit still has to repaint: the transport on the toolbar.

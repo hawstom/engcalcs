@@ -1547,7 +1547,13 @@ html[lang="zh"] .ec-welcome {
 .lpn-toolbar-group + .lpn-toolbar-group:not(.lpn-toolbar-end) {
 	border-left: 1px solid var(--ec-gray-d6d6d6); padding-left: 12px;
 }
-.lpn-transport-btn { font: inherit; cursor: pointer; }
+.lpn-transport-btn { font: inherit; cursor: pointer; padding: 2px 4px; }
+/* An icon-only button has no text for the icon's end margin to separate from; it only widens it. */
+.lpn-transport-btn > .ec-icon { margin-inline-end: 0; }
+/* Direction glyphs point along time, and time runs right to left in a right-to-left page, where the
+   flex row has already put Restart at the right edge. Play and Pause are not direction-of-time marks. */
+html[dir="rtl"] .lpn-transport-btn[data-icon="restart"] svg, html[dir="rtl"] .lpn-transport-btn[data-icon="step-back"] svg,
+html[dir="rtl"] .lpn-transport-btn[data-icon="step-fwd"] svg, html[dir="rtl"] .lpn-transport-btn[data-icon="end"] svg { transform: scaleX(-1); }
 /* The right-hand end of the strip: Find and the bottom-pane toggle (Task 434). Pushed there by an
    auto margin rather than placed at a fixed offset, so it stays at the edge at every window width
    and drops to its own line with the rest when the strip wraps. */
