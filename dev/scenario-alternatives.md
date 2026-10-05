@@ -358,6 +358,21 @@ routing the readers is what changes what a person sees, which waits on the quest
 6. **The two new column headings are "Presentation" and "Calculation".** They are listed in
    `dev/new-english-keys.md` for your word.
 
+### His answers, 2026-10-06
+
+- **Q4, a setting changed while in Peak Hour:** Peak Hour only, for every setting, Presentation
+  included. *"As I said, for this to be successful, Scenarios must be added to tables so we can audit
+  these things. And by extension, there will have to be a settings Table. I hate to say it, but it's
+  true. We can't treat any value overrides differently. This must be a careful and long burn."* So
+  one rule, not two: a setting override behaves exactly like an element override. Two things follow:
+  a **settings table** in the Tables pane (one row per setting, Show scenarios like the others), and
+  the Show-scenarios view (Task 766) as the audit of every override.
+- **Q2, a scenario's own place on the map:** allowed. *"A scenario may have map overrides, though
+  normally they won't. Only a scenario named something like "Figure 6-1: Elm and Main contours"
+  would do that."* So the view (window extent) is NOT excluded: it belongs in Presentation, and is
+  written only when a scenario deliberately holds one. Revisit the exclusion list above.
+- Q1, Q3, Q5, Q6: not yet answered.
+
 ## The long burn: from Basic mode to the full model (2026-10-06)
 
 **The destination is Bentley's model, and it was never declined.** Tom, 2026-10-06, on finding a
