@@ -143,6 +143,53 @@ it is a `dev/*.md` and the entry is one line pointing at it.
 
 ---
 
+## 2026-10-05 — Sue: build order and inheritance semantics for the full alternatives model (branch `feat/bentley-interop`)
+
+Tom asked for my seat on stages 4 and 5 of `dev/scenario-alternatives.md` against stage 3b. I have never run a
+scenario manager; every Bentley statement below is from Bentley's help pages, and where a page was silent I say
+"I do not know".
+
+- **CITED. Inherited values are dynamic.** Bentley: "If the record is changed in the parent, the change is
+  reflected in the child"; local is an explicit checkbox; unchecking it "the local values are replace with the
+  current parent values". <https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/GUID-876CBE8593864275AD0DFA610CF83984.html>
+  Overriding: "Local values can also be removed at any time, reverting the characteristic to its inherited
+  state"; the page does not say what a local value equal to the parent's does.
+  <https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20Help%20SS6-v1/en/GUID-2C00D0E23DE543AABE7B9A72E13A69F3.html>
+- **CITED. A different product makes the opposite choice on "local equal to parent".** AFT Impulse: "If a child
+  scenario's data ... is changed back to the same value as the parent, the inheritance link is re-established."
+  <https://docs.aft.com/impulse/ScenarioInheritance.html> Bentley's is an explicit flag (stays local, by the
+  checkbox design); ours already keeps the key (`dev/scenario-alternatives.md:30`). Both are defensible; the
+  point is that the audit table must show it, and Sheets Sync In must not set it by accident (see report).
+- **CITED. Deleting a scenario never deletes data.** "scenarios never actually hold calculation data records
+  (alternatives do). The alternatives and data records referenced by that scenario exist until you explicitly
+  delete them." <https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/35002.html> Hence
+  named-unused alternatives are normal in Bentley, and stage 4 must hold them. Alternatives Manager has Delete,
+  Rename, New and **Merge Alternative: "Moves all records from one alternative to another."**
+  <https://docs.bentley.com/LiveContent/web/Bentley%20WaterGEMS%20SS6-v1/en/35003.html>
+- **I DO NOT KNOW (searched, not found):** what Bentley does when you delete an alternative a scenario still
+  uses, or one that has children. Not in the help pages I could open. Do not write "Bentley refuses" anywhere.
+- **CITED, at search-summary level only (I could not open the thread; it redirects to a login):** Bentley forum,
+  2017, "How to make my scenario child convert it into base scenario": no automated way; one makes a new base
+  scenario and assigns alternatives by hand; merging works for alternatives, not scenarios.
+  <https://communities.bentley.com/products/hydraulics___hydrology/f/haestad-hydraulics-and-hydrology-forum/138694/how-to-make-my-scenario-child-convert-it-into-base-scenario>
+  So Bentley has no re-parent for scenarios. I found no re-parent for alternatives either.
+- **CITED. Autodesk's scenario docs name the equivalent hazard** as a "common mistake": not knowing which
+  parameters sit in which dataset. (Search summary of Autodesk's scenario-management lesson; not opened.)
+- **OBSERVED.** Tom's Q5 case, friction method, reinterprets a number: `dev/scenario-alternatives.md:218`. I do
+  not know whether WaterGEMS stores a separate roughness field per friction method; I could not confirm it.
+- **SPECULATION (re-derive before relying):** the Sheets Sync In hazard. A sheet exports every cell. If Sync In
+  writes a cell back as a local value whenever the cell is present, one round trip makes every scenario fully
+  local and kills inheritance, silently. Sync In must set local only where the cell differs from the resolved
+  inherited value or the key was already local.
+- **SPECULATION:** Calculation as sparse alternative with a parent (resolve to a full set on export; import a
+  Bentley set as differences from Base) loses nothing and keeps Tom's one rule; a stored "set with no parent"
+  breaks it, because a later Base change to accuracy would not flow into a set that copied the whole thing.
+  This disagrees mildly with `dev/scenario-alternatives.md:490-496` and is for Tom to weigh.
+- **SPECULATION:** order: read-only Settings table first (the audit tool, and cheap), then stored tree (4) and
+  scenario parents (5) designed as ONE schema pass, then the 3b write door last, so there is one write seam
+  migration, not two.
+
+
 ## 2026-09-17 — Sue: perpendicular service connections, answered (Task 247, branch `feat/customer-demands`)
 
 Tom, having tested the branch: the initial connection should be perpendicular by default, only an

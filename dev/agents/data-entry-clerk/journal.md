@@ -1939,3 +1939,24 @@ Tom: *"it would be really nice if the tables could filter on the selection. I'm 
 **SPECULATION** Gesture count, common case (box-select pipes on map, set one value on all): drag on map (1), Ctrl+Shift+L with focus in table (1) or right-click + menu click (2), click first cell (1), type value + Ctrl+Enter after selecting column (about 3). About 6, versus today's per-row popup route of roughly 6 per element.
 
 -- Declan
+
+
+## Invocation, 2026-10-06 -- the Settings table, audited and edited at volume
+
+Tom: Settings table "very narrow", maybe Major Heading, Minor Heading, Category, Setting, Value; the View shown "as numbers ... along with a rigorous definition of scale"; a "Clear override" item joins the Tables right-click menu.
+
+**OBSERVED** (`dev/scenario-alternatives.md`, "Next stage" and "His answers, 2026-10-06") The doc's plan is one row per setting path, Base value, then one column per scenario; Tom's answer is that an override behaves exactly like an element override, and Task 766 puts scenarios in the element tables as rows. Those two shapes disagree; a row-per-scenario Settings table is the one consistent with the element tables.
+
+**OBSERVED** (this journal, 2026-10-03, citing `js/looped-network.js` Tables code) Fill handle, Ctrl+Enter, Ctrl+D, row paste and the query filter all read the rendered rows, so any new table inherits column fill and filtering free if it is built from the same spec.
+
+**SPECULATION** (re-derive before relying) Arithmetic: ~200 settings x ~10 scenarios is 2,000 rows if every cell exists, but overrides are rare ("normally they won't"), so rows exist only for HELD overrides: 200 Base rows plus perhaps 20 to 60 scenario rows. Row per scenario beats a column per scenario: ten extra columns is horizontal scrolling and loses the filter-by-column the pane already does; a Scenario column filters "everything Peak Hour holds" in one query.
+
+**SPECULATION** Recommended shape: columns Scenario | Major | Minor | Category | Setting | Value (unit as a non-focusable suffix, so Tab goes Value to Value down the column, the tab order the element tables already have by accident). Value is the only editable cell. Scenario rows sit directly under their Base row, only where held. Value cell by type: number = number input; choice = typed text matched to the choice name with Enter to commit (a native select swallows keys in a table); on/off = Space toggles, paste accepts on/off/yes/no/1/0; colour = hex text with a non-focusable swatch; breaks/maps expand to one row per member, per the doc.
+
+**SPECULATION** Paste/fill of a column into Value: the existing range paste, validated per cell with the failing row named, one undo step. Pasting into a scenario row writes an override; pasting a blank NEVER clears (a stray blank must not delete an override); Clear override is the only deletion, plus Delete key on a scenario row. Clearing a Base row is not offered.
+
+**SPECULATION** Not editable in the table: units and the coordinate frame (Tom's stated exclusion); an element's ID or name; anything derived (the view's corners, the three-point curve fit, results); Category/Major/Minor/Setting text; the Scenario cell. The View is written as ONE atomic value (centre x, centre y, scale together), through the deliberate "Hold this view" door, so a half-edited view never exists.
+
+**SPECULATION** View as numbers: three rows, centre (lon,lat or x,y per the lonLat rule) and scale, editable together; the corners are shown read-only and flagged "depends on window size". Reason: corners change with the pane's pixel size, so a view held on a laptop would not reproduce on a big monitor; centre plus scale does. Scale definition recommended: **ground metres per CSS pixel** is the stored, rigorous number (the CSS pixel is defined as 1/96 inch, independent of devicePixelRatio and of the actual monitor); display "1:N" as a derived convenience, N = (m per px) / (0.0254/96), stated as "at 96 CSS px per inch, which a real screen only approximates". For a geographic project say the metres are ground metres at the view's centre latitude (Web Mercator stretches by 1/cos(lat)). I did not check how the code currently stores zoom; re-derive.
+
+**SPECULATION** Filtering: Major and Category are plain-text columns, so the existing query filter should already match them; a Category value list in the filter box would save typing. Sort order must be the fixed doc order, not alphabetical, so row positions are memorizable.

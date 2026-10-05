@@ -574,3 +574,9 @@ own merits.
 **Why it ranks high for my seat:** it composes with the shipped Ctrl+Enter, fill handle and row paste, which all act on rendered rows, so a map box-select becomes a bulk-edit scope in about 6 gestures total. Edits cannot make a row leave it.
 
 **Ranking:** just below paste-creates-rows confirmation, above polish items.
+
+## 2026-10-06 additions (Settings table; tag SPECULATION, see journal)
+
+- **S1. Settings table: row per HELD override, Value the only focusable cell, one atomic View value.** Size: medium if built from the existing pane spec (fill, paste, filter inherited). Ask: blank paste never clears; Delete key and "Clear override" are the only clears.
+- **S2. Scale stored and shown as ground metres per CSS pixel; 1:N derived at 96 px/in; corners read-only.** Size: small, but a definition Tom must approve.
+- **S3. Fixed (non-alphabetical) row order and a Category value list in the filter.** Size: small.

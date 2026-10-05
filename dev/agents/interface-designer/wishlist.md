@@ -534,3 +534,6 @@ N+5. **A check that flags one English string holding both a select word and an o
   right-click row); one five-minute look at where a first-time user reaches. SPECULATION until then.
 - **Fetch Material 3 tooltips and Spectrum tooltip/contextual-help pages by another route** (both were
   unreadable on 2026-10-03), so the two-tier claim does not rest on search excerpts.
+
+- **Show one reader the amber-edge field plus "Base: x / Reset" before the Settings box is built**, against the per-field checkbox, to see whether the border alone is read as "this differs". SPECULATION until then.
+- **Ask Tom whether the Settings table's Category must be sortable** (it decides heading-as-columns vs group rows).
