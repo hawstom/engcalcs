@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-09-30",
-    "count": 2233,
+    "count": 2231,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -3913,8 +3913,6 @@
         "lpn_notes_2_term": "d073d0a4dfb9e14e58e569f4cad0ce8bb997818c",
         "lpn_notes_3_def": "92c38e93fc98e6246163b279aedaeaff02ff8ab7",
         "lpn_notes_3_term": "c6bf37fe1cd4249e4de2da6de2a9ba4ee14b45e3",
-        "lpn_notes_4_def": "f486a894d1fcdc67f440e0ad8e383c361bc0d6c4",
-        "lpn_notes_4_term": "907b9f085d2512f3954096d64badbb072c887061",
         "lpn_notes_5_def": "0cf16cb1b992df37397f4beead63ef471a22806d",
         "lpn_notes_5_term": "04433f7fe8fbf41ae2e5d2354f718f4330e9c5ac",
         "lpn_notes_6_def": "7a690fe4507dd6a8016cbb6d1ee1ca3f620f396c",
@@ -9848,14 +9846,6 @@
         },
         "lpn_notes_3_term": {
             "words": 2,
-            "ends_sentence": false
-        },
-        "lpn_notes_4_def": {
-            "words": 55,
-            "ends_sentence": true
-        },
-        "lpn_notes_4_term": {
-            "words": 4,
             "ends_sentence": false
         },
         "lpn_notes_5_def": {

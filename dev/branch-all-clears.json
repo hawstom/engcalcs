@@ -525,6 +525,20 @@
    "words": "feat/find-source: Close, merge, and delete branch.",
    "context": "Same pasted message.",
    "pin_note": "Pinned to the head the preview served when he tested it."
+  },
+  "feat/transport-ends": {
+   "head": "40ef582fdd65ec23c8cecc4bb8e3260b35099491",
+   "date": "2026-10-06",
+   "words": "feat/transport-ends: They now look less loud. Merge.",
+   "context": "Pasted message answering the 2026-10-06 handoff report.",
+   "pin_note": "Pinned to the head the preview served when he tested it."
+  },
+  "feat/engine-prefetch": {
+   "head": "3194c30d8c156bc7a267b4427fbbea4e3a2336f6",
+   "date": "2026-10-06",
+   "words": "feat/engine-prefetch: Merge.",
+   "context": "Pasted message answering the 2026-10-06 handoff report.",
+   "pin_note": "Pinned to the head the preview served when he tested it."
   }
  }
 }

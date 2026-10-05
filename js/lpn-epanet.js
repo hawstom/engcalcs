@@ -934,9 +934,65 @@
 		}).catch(function () { return null; });
 	}
 
+	// ------------------------------------------------------------------------------------------
+	// **FETCHING THE ENGINE WHEN THE PAGE IS IDLE, FOR A VISITOR WHO HAS NOT ASKED FOR IT** (Task 726,
+	// Tom, 2026-10-05: *"EPANET pre-fetch slowly: Yes."*). Task 608's background warm waits for a
+	// network that can be solved; this one is for the visitor still looking at an empty map, so
+	// that their first Run does not wait on 664 KB. "Slowly" is read as: last in line, and never
+	// against a visitor who has said bandwidth matters.
+	//
+	// It only FETCHES. The bytes land where the next real load finds them (the browser's HTTP cache
+	// and, through sw.php's cache-first route, the service worker's `engcalcs-assets` cache) and
+	// nothing is parsed or run, so an idle visitor pays no CPU for a solver they may never use.
+	// BOTH files are fetched, because the engine opens with a static import of ./slim/index.js: the
+	// 664 KB alone would leave an offline first Run one 1.3 KB file short.
+	//
+	// Refused, each answered by a different string so the harness can tell them apart:
+	//   'loaded'   the engine is already loading or loaded (enginePromise), or a prefetch ran
+	//   'cached'   Cache Storage already holds it (a previous visit, or a previous Run)
+	//   'savedata' the browser's Save-Data preference is on
+	//   'slow'     the connection reports slow-2g or 2g (Mary's wish: "unless the connection says
+	//              slow or metered")
+	// NEVER REJECTS, and a failure is not retried: the load path still decides whether the engine
+	// can be had, exactly as before. **A RUN NEVER WAITS BEHIND THE PREFETCH**: lpnEpanetLoad()
+	// aborts a prefetch still in flight and starts its own ordinary-priority load at once (Perry,
+	// 2026-10-05). An aborted fetch leaves nothing half-written: a Cache Storage entry is only put
+	// from a complete response, and a body that errors mid-put rejects the put.
+	var prefetchPromise = null, prefetchAbort = null;
+	function prefetchRefusal() {
+		var c = (typeof navigator !== 'undefined') ? navigator.connection : null;
+		if (c && c.saveData) { return 'savedata'; }
+		if (c && /(^|-)2g$/.test(String(c.effectiveType || ''))) { return 'slow'; }
+		return '';
+	}
+	EngCalcs.lpnEpanetPrefetch = function (url) {
+		var href = url || '/engcalcs/js/vendor/epanet-js.js',
+			why = prefetchRefusal();
+		if (enginePromise !== null || prefetchPromise !== null) { return Promise.resolve('loaded'); }
+		if (why) { return Promise.resolve(why); }
+		if (typeof fetch !== 'function') { return Promise.resolve('unsupported'); }
+		var slim = href.replace(/[^\/]*$/, 'slim/index.js');
+		prefetchAbort = (typeof AbortController === 'function') ? new AbortController() : null;
+		var signal = prefetchAbort ? prefetchAbort.signal : undefined;
+		function one(u) {
+			return fetch(u, { credentials: 'same-origin', priority: 'low', signal: signal }).then(function (res) {
+				return res.ok ? res.arrayBuffer() : null;
+			});
+		}
+		var cached = (typeof caches !== 'undefined' && caches.match)
+			? caches.match(href).catch(function () { return null; })
+			: Promise.resolve(null);
+		prefetchPromise = cached.then(function (hit) {
+			if (hit) { return 'cached'; }
+			return Promise.all([one(href), one(slim)]).then(function () { return 'fetched'; });
+		}).catch(function () { return 'failed'; }).then(function (r) { prefetchAbort = null; return r; });
+		return prefetchPromise;
+	};
+
 	EngCalcs.lpnEpanetLoad = function (url, onProgress) {
 		if (enginePromise === null) {
 			var href = url || '/engcalcs/js/vendor/epanet-js.js';
+			if (prefetchAbort) { prefetchAbort.abort(); prefetchAbort = null; }
 			enginePromise = watchFetch(href, onProgress).then(function () {
 				return import(href);
 			}).catch(function (err) {

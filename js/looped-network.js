@@ -32443,6 +32443,7 @@ var EngCalcs = EngCalcs || {};
 	// own, so it names the one address the suite asks to be found at (Task 479.01, 2026-09-06).
 	// dev/lpn-spike/file-naming-harness.js holds it against the config.
 	var LPN_FILE_APP = 'https://epanet-plus-plus.org/app/';
+	var LPN_TREE_KEYS = ['alternatives', 'calcSets'];
 	function serializeProject() {
 		var out = {
 			format: LPN_FILE_FORMAT, app: LPN_FILE_APP,
@@ -32491,6 +32492,9 @@ var EngCalcs = EngCalcs || {};
 			// not say what it means, and a 400 mm main would open as a 400 inch main (Tom).
 			units: readUnitSelections()
 		};
+		// **A STORED SCENARIO TREE IS CARRIED, NEVER DROPPED** (dev/scenario-alternatives.md):
+		// written last, and only when the file brought one or an explicit act made one.
+		LPN_TREE_KEYS.forEach(function (k) { if (doc[k] !== undefined) { out[k] = doc[k]; } });
 		// From v4 the file is Cartesian. CLONED FIRST -- flipStoredY() mutates, and the object above
 		// holds live references to doc.nodes/links/labels, so flipping in place would turn the
 		// drawing upside down on screen every time it was saved.
@@ -33614,6 +33618,9 @@ var EngCalcs = EngCalcs || {};
 		doc.controls = saved.controls || [];
 		doc.rules = saved.rules || [];
 		doc.inpSections = saved.inpSections || {};
+		// A scenario tree from a later reader (shared alternatives, calculation sets) rides through
+		// verbatim; a scenario's own tree keys already do, on the scenario object.
+		LPN_TREE_KEYS.forEach(function (k) { if (saved[k] !== undefined) { doc[k] = saved[k]; } else { delete doc[k]; } });
 		// Task 510's saved paths, taken VERBATIM. An id naming a node this document does not have
 		// is the user's data and is reported where it is used, never pruned here -- see
 		// profileMissingStops(). A file written before this existed simply has none.
@@ -41526,7 +41533,10 @@ var EngCalcs = EngCalcs || {};
 				submenu: scenarioMenuRows
 			},
 			{
-				icon: 'run', label: pc.lpn_time_run || 'Calculate', tip: pc.lpn_run_menu_tip,
+				icon: 'run', label: pc.lpn_time_run || 'Calculate',
+				// A steady-state project has no player on the toolbar, so how to get one is said here.
+				tip: (EngCalcs.lpnTimeIsExtended && !effectiveTimesExtended() && pc.lpn_time_no_period)
+					? pc.lpn_run_menu_tip + ' ' + pc.lpn_time_no_period : pc.lpn_run_menu_tip,
 				fn: function () {
 					closeMenu();
 					// runSolve(), not solveNow(): solveNow is only the NAME this is exported
@@ -42642,6 +42652,29 @@ var EngCalcs = EngCalcs || {};
 			if (/[?&]lpn_examples=1(&|$)/.test(window.location.search)) { showExamplesOverlay(); }
 		} catch (err) { /* location can throw in an exotic host; the page is fine without the overlay */ }
 		requestAnimationFrame(tick);
+		scheduleEnginePrefetch();
+	}
+
+	// **THE IDLE PREFETCH OF THE EPANET ENGINE** (Task 726; the rules are at EngCalcs.lpnEpanetPrefetch
+	// in js/lpn-epanet.js). Starts only once the window has loaded and the first project has drawn
+	// (this runs at the very end of init(), after the first frame is queued), and then waits for
+	// the browser to report idle, with a timeout so a page that is never idle still gets it. Once per
+	// page; the load path owns every other case.
+	var ENGINE_PREFETCH_TIMEOUT_MS = 10000, ENGINE_PREFETCH_FALLBACK_MS = 6000;
+	function scheduleEnginePrefetch() {
+		if (!EngCalcs.lpnEpanetPrefetch) { return; }
+		function go() {
+			var run = function () { EngCalcs.lpnEpanetPrefetch(); };
+			if (typeof window.requestIdleCallback === 'function') {
+				window.requestIdleCallback(run, { timeout: ENGINE_PREFETCH_TIMEOUT_MS });
+			} else {
+				setTimeout(run, ENGINE_PREFETCH_FALLBACK_MS);
+			}
+		}
+		try {
+			if (document.readyState === 'complete') { go(); }
+			else { window.addEventListener('load', go, { once: true }); }
+		} catch (err) { /* a host without these is not worth a fetch */ }
 	}
 
 	// Three visually separated groups (Tom, 2026-07-30): Add (the five element types), Edit
@@ -60154,6 +60187,8 @@ var EngCalcs = EngCalcs || {};
 
 	// ---- Warming the EPANET engine ----
 	//
+	// (Task 726 adds an idle prefetch of the same file for a visitor who has not asked for it; see
+	// scheduleEnginePrefetch() at the end of init().)
 	// js/vendor/epanet-js.js is 664 KB and is deliberately NOT precached by the service worker: it
 	// loads only for a visitor who needs it, because precaching multiplies the install cost for
 	// exactly the low-bandwidth audience this suite exists for (Task 318). The gap that leaves is

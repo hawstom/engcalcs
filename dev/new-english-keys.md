@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**22 still to read on master**, of 132 untranslated keys, of 2360 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**15 still to read on master**, of 125 untranslated keys, of 2351 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -21,7 +21,7 @@ hit takes you to a section and the rest walk its keys. A key already ruled does 
 it, and a fully ruled group says `all ruled` and can be skipped whole.
 Write your answer on the flag's own line. Anything is fine; "OK" is enough.
 
-## Questions from the translators  (2 to read @@ NEEDS RULING)
+## Questions from the translators  (1 to read @@ NEEDS RULING)
 
 **These are SHIPPED strings, already translated into 26 languages.** A wave-0
 reading or a translator found each one readable two ways, and no sprint launches while one is
@@ -38,17 +38,6 @@ is the one you meant. "The first one" is a complete answer.
   **What this asks for:** which of the readings above you meant.
   *The proposal:* PROPOSED A: '⚠ At least one junction is below {pressure} at the demands as entered (a demand scale of 1). All junctions keep {pressure} only if demands are cut to a demand scale of {m} or less.' PROPOSED B: '⚠ The demands as entered (a demand scale of 1) leave at least one junction below {pressure}. The largest demand scale that keeps every junction at {pressure} or above is {m}.' B paralle...
   @@ NEEDS RULING
-
-### from sprint 1003b-wave0
-
-- **`lpn_notes_4_def`**
-  > A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.
-  *The finding:* 'lists the junctions' says neither where nor what; 'route' where the Graphs tip says 'path'; 'sit on real ground' is idiom; the bottom panel is called a pane elsewhere (Looped-Network.php:1855 renders it as one About-box paragraph)
-  1. the bottom panel lists every junction with its results
-  2. the bottom panel lists only the junctions along the profile route
-  **What this asks for:** which of the readings above you meant.
-  *The proposal:* PROPOSED: 'A project can be placed on real ground with a street map behind it. EPANET .inp files can be read and written. The bottom pane plots a profile along a path and tabulates the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.'
-  _Ruled 2026-10-05: For the record, I find this "Notes" box, and this section in particular, to be embarrassing. What's it's purpose? Maybe I need to edit lang.ec.en.php. Is there a compelling reason why we can't remove this section or the entire box? If it matters, every section should be an important advisory, not fluff like this._
 
 ## Synonym entries to approve  (3, 1 to read @@ NEEDS RULING)
 
@@ -84,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (132, 22 to read @@ NEEDS RULING)
+## lpn_  (125, 15 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -386,27 +375,6 @@ never edits a synonym.
 - **`lpn_scncmp_same`**
   > The same in every scenario
   _Ruled OK 2026-10-05._
-- **`lpn_screenshot_copied`**
-  > Screenshot copied.
-  @@ NEEDS RULING
-- **`lpn_screenshot_failed`**
-  > The screenshot could not be made.
-  @@ NEEDS RULING
-- **`lpn_screenshot_hint`**
-  > Drag a rectangle over the map, or click for the whole map. Esc cancels.
-  @@ NEEDS RULING
-- **`lpn_screenshot_menu`**
-  > Screenshot
-  @@ NEEDS RULING
-- **`lpn_screenshot_no_basemap`**
-  > The street map or satellite image could not be included.
-  @@ NEEDS RULING
-- **`lpn_screenshot_saved`**
-  > The clipboard is not available here, so the screenshot was downloaded as a PNG file.
-  @@ NEEDS RULING
-- **`lpn_screenshot_tip`**
-  > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
-  @@ NEEDS RULING
 - **`lpn_settings_basemap_style`**
   > Basemap style
   _Ruled OK 2026-10-05._
@@ -487,7 +455,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**5 still to read**, of 8 new keys across 11 unmerged branch(es).
+**5 still to read**, of 8 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -498,7 +466,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/bentley-interop (`0c9eef46`) — 2 new, 2 to read @@ NEEDS RULING
+### feat/bentley-interop (`beedec3f`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -531,7 +499,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/scenario-table (`1eaee4e1`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/scenario-table (`8bdc2945`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_pane_clear_override`**
   > Clear override
@@ -543,6 +511,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show scenarios
   @@ NEEDS RULING
 
-### feat/screenshot (`e7255634`) — adds no English strings
-
-### feat/tip-door (`8c5c01dc`) — adds no English strings
+### feat/tip-door (`80e7e1a5`) — adds no English strings

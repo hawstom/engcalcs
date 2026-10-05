@@ -1297,8 +1297,6 @@
         "lpn_notes_3_def": "Every project is a tab, and every tab is saved in this browser as you work. Clearing your browser data deletes them all, so keep your work in a file: File, Save as. An asterisk on a tab means it holds changes that are not in a file. Nothing is ever written to a file unless you ask. In some browsers a project connects to the file you save it to, and File, Save writes back to that same file from then on; in others no connection is possible, so Save is disabled and only Save as is available. When a project file is kept on a shared drive, this page tells you if a colleague already has it open, so that two people do not write over each other.",
         "lpn_notes_5_term": "Pump curve",
         "lpn_notes_5_def": "A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer’s curve. Three points, the head at zero flow, the normal working point, and the point of highest flow, fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not cut off where the head reaches zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit. A curve can hold more than three points, and every point you gave it is read.",
-        "lpn_notes_4_term": "Also on this page",
-        "lpn_notes_4_def": "A project can sit on real ground with a street map behind it. EPANET .inp files can be read in and written out. The bottom panel draws a profile along a route and lists the junctions. Assets can be colored by their results, and Find selects every asset that matches a condition you set.",
         "lpn_notes_6_term": "Table columns help",
         "lpn_notes_6_def": "<table class=\"lpn-notes-table\"><tbody><tr><td>Select column<\/td><td>Click heading<\/td><\/tr><tr><td>Add or extend column selection<\/td><td>Ctrl+click or Shift+click another heading<\/td><\/tr><tr><td>Move (reorder) selected column(s)<\/td><td>Drag or use Manage columns… in right-click or ⋮ menu<\/td><\/tr><tr><td>Menu ⋮ and sort arrow.<\/td><td>Hover a heading's top corner, or select or Tab into a heading<\/td><\/tr><tr><td>Hide, Show all, or Manage visibility and order<\/td><td>Right-click heading or ⋮ menu in heading top right corner<\/td><\/tr><tr><td>Sort by column<\/td><td>Arrow icon in heading top right corner<\/td><\/tr><tr><td>Paste as new rows at end of table<\/td><td>Right-click, ⋮ menu in heading top right corner, or Ctrl+Shift+V<\/td><\/tr><\/tbody><\/table>",
         "lpn_notes_7_term": "Table keyboard shortcuts",
@@ -2355,7 +2353,7 @@
         "lpn_diag_pda_pressures": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
         "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back."
     },
-    "count": 2353,
+    "count": 2351,
     "active_prefixes": [
         "about",
         "bpn",

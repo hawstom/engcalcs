@@ -99,53 +99,53 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-06
+## STATE — 2026-10-06 (second session)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged 2026-10-06: `feat/times-statistic` and `feat/find-source` (his all-clears; Task 735 closed;
-he wonders whether Range should be called Spread and is not sure, so it stays Range); his two string
-edits (`lpn_ds_found_below` his wording, `lpn_new_coordsys_tip` "to a new project"); every
-`{pressure}` in Analyze messages is filled, not only the first; the time-step box keeps its 10:00
-minimum (the Statistic merge had erased it); the daily email names each usage table's window (last
-24 hours, and the whole log, which was 13.6 days, not a day). **The email changes only once he pulls.**
+Merged this session on his word: `feat/transport-ends`, `feat/notes-trim`, `feat/engine-prefetch`
+(privacy row's last sentence now says the engine is fetched in advance). Also on master: the
+scenario-tree reader guard (a page carries `alternatives`/`calcSets` through save, so a deployed
+page never drops a stored tree), and the geographic backdrop export fix (DIMENSIONS was written in
+Mercator y, not latitude; `backdrop-geo-export-browser-harness.js`). Roadmap: Task 721 is the
+umbrella at 100 (the model); 749 is the `.sqlite` file only; 752 is Sheets sync; 765 folded into 721.
 
-### Awaiting him (all on the Branch previews page)
+### Awaiting him (all on the Branch previews page; each passed Perry)
 
-- **`feat/tip-door`** (Task 759): explanation tips open by clicking the ?, Perry passed it; his
-  two findings fixed (80e7e1a5). Intros of the three Analyze boxes now sit behind the corner ?.
-- **`feat/scenario-table`** (Task 766): Show scenarios, one Scenario column, override tips "Demand
-  alt.: Peak Hour"; sorting is now stable in EVERY table (a suite-wide change). Perry passed it.
-- **`feat/transport-ends`**: plus Ida's joined player strip (40ef582f), answering his "largest thing
-  on the chrome". Her three questions are in his report (joined strip, flat style, Restart/End use).
-- **`feat/notes-trim`** (not protected): Notes box trimmed and two sections moved to About, as he
-  approved; a privacy.php row for the offline copy, wording his to approve. privacy.php is hard-coded
-  English (no keys). When `feat/engine-prefetch` merges, the row's last sentence changes (in the
-  branch's commit message trail and the inventory).
-- **`feat/engine-prefetch`**: needs only his word (the privacy row question is answered: yes).
-- Still from before: `feat/desktop`, `feat/label-placer` (his round-5 answers recorded in
-  `dev/label-placement-rules.md` there; the R1 "dropped for lack of room" proposal is owed back to
-  him reworded).
+- **`feat/tip-door`** (Task 759): plus the Fire flow and Demand scaling paragraphs folded into each
+  box's corner ? (his "edit masterfully"); `lpn_ds_intro` and the three `lpn_ff_` English need his
+  word. `lpn_ds_scope_tip` now renders nowhere but has a synonym entry: his call to delete. **He
+  deferred the phone check to the merge: remind him then.**
+- **`feat/scenario-table`** (Task 766): plus Clear override on the Tables right-click menu. Greyed
+  (not hidden) when nothing selected holds an override: the menu's other items hide instead. Ask.
+- **`feat/screenshot`** (new, port 8108): Map > Screenshot, snip at 3x to the clipboard, tile
+  credit drawn when tiles are in the picture.
+- **`feat/backdrop-attach`** (Task 282, port 8109): attach the picture an `.inp` names, placed by
+  DIMENSIONS with EPANET's own OFFSET sign and fit rule (Umap.pas).
+- Still from before: `feat/desktop`; `feat/label-placer` waits on ONE answer from him, the R1
+  rule reworded: *"Hide a label only because there is no room for it on screen. Never hide it
+  because of how many labels are already showing."* Yes or no.
 
 ### The long burn: `feat/bentley-interop` (long-lived, never merges without him)
 
-Tom wants Bentley's scenario tree over alternatives, every project setting in a category, built in
-stages; it was never declined (the "Bentley is not ours" note that read as a refusal is renamed and
-corrected). Stages 2 and 3 are built (beedec3f): the data layer, and ~110 setting readers routed
-through the scenario seam, proven byte-identical on 42 example cases with no override; the map view
-is a Presentation setting; friction method and new-asset defaults are overridable, only units and
-the coordinate frame are not (his 2026-10-06 answers). Next: the settings table and the Settings-box
-writes (specified in the doc), after his answers to the five stage-3 questions in his report. Doc:
-`dev/scenario-alternatives.md` ("The long burn", "His answers, 2026-10-06").
+Stages 4 and 5 are built: stored alternatives (shared, deep, named, unused), calculation sets,
+scenario parents, the inherited view, merge and promote; a property harness against a naive walk
+(525 passes, 16 of 18 touch sites mutation-proven), byte-identical with no tree, and Perry's review
+fixed (merge rules, per-holder cache mending: 8,000 writes 2 s to 11 ms). His 2026-10-06 answers
+(a-d, and "View settings in the Settings box are NOT read-only") and the "decided by CC, his to
+overturn" list are in `dev/scenario-alternatives.md`. **Next: the Settings table, after
+`feat/scenario-table` merges** (it needs Show scenarios; they share the Tables pane). Advisers:
+scenarios as rows (Declan), Major/Minor as group rows and Category a column (Ida: ask him whether
+Category must sort), view stored as centre plus scale in ground metres per CSS pixel, held field
+marked by an amber edge plus "Base: x" and Reset, no per-field checkbox. Sue: warn when a scenario
+switches friction method with no roughness override; Sheets sync-in must mark local only where a
+cell differs from the resolved value.
 
 ### Next job
 
-- Owed to him: the R1 label proposal reworded; the Calculation-options question re-asked
-  consistently (his b5); the `lpn_labels_priority_node_tip` synonym explained (he asked what problem
-  it solves; answer in his report: it tells translators "more like neighbouring nodes" means
-  numerically closer, keep it, no English change).
-- The translation sprint is unblocked (`friction_check` passes) but he is "not eager": run it when
-  enough has merged to make it worth a wave.
+- The translation sprint: master has ~127 untranslated keys, but tip-door and scenario-table
+  change keys in the same area; run the wave after those merge.
+- Q6 of the stage-3 questions (headings "Presentation" / "Calculation options") is still unanswered.
 
 ### Decisions waiting on him
 
@@ -153,6 +153,17 @@ writes (specified in the doc), after his answers to the five stage-3 questions i
 - On a phone (<=640 px) the Calculate bolt is hidden by an older CSS rule even with auto-recalculate
   off (Perry); not filed yet.
 - A mixed-scope typed Filter in table answers "applies to no table" (Perry; pre-existing, generic).
+
+### Traps met 2026-10-06 (second session)
+
+- **A harness written by the builder shared the builder's blind spot**: backdrop-attach's 14 checks
+  all used OFFSET 0 and a same-shape picture, so the wrong OFFSET sign and fit rule passed. Perry
+  found both from EPANET's Delphi source. Brief builders to cite the source for any file-format
+  semantics, never guess a sign.
+- **Uncommitted adviser journals in a worktree block `git merge master`** when master touches the
+  same journal. Commit advisers' files before a build agent merges.
+- **A master defect found on a feature branch** (geo DIMENSIONS): split the hunk onto a fix
+  branch from master with its own harness, rather than waiting on his all-clear.
 
 ### Traps met 2026-10-05
 

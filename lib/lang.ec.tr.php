@@ -2077,8 +2077,6 @@ $ec_lang['lpn_notes_5_def']='Bir pompa H = H₀ − aQ^b denklemini izler; burad
 // export). A planned-additions list is stale the moment it is right, and it tells a returning
 // user the tool is less capable than it is, so this slot now points at what is here instead.
 // The invitation it used to carry lives in Help > Fix something.
-$ec_lang['lpn_notes_4_term']='Bu sayfada ayrıca';
-$ec_lang['lpn_notes_4_def']='Bir proje, arkasında bir sokak haritası olan gerçek bir zemin üzerinde durabilir. EPANET .inp dosyaları okunabilir ve yazılabilir. Alt panel bir güzergah boyunca profil çizer ve düğümleri listeler. Öğeler sonuçlarına göre renklendirilebilir, ve Bul, belirlediğiniz bir koşulu karşılayan her öğeyi seçer.';
 $ec_lang['lpn_notes_6_term']='Tablo sütunları yardımı';
 // R-312, Tom's own row, verbatim: "Paste as new rows at end of table | Right-click, ⋮ menu in
 // heading top right corner, or Ctrl+Shift+V". It rides on this table rather than the shortcuts one
