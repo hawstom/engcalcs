@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 2335,
-        "delta_key_count": 107,
+        "expected_key_count": 2338,
+        "delta_key_count": 110,
         "exempt_key_count": 26,
         "exempt_keys": [
             "calc_units_us",
@@ -706,6 +706,8 @@
     },
     "keys_to_translate": {
         "lpn_tool_add_chain": "Junction Pipe Chain",
+        "lpn_pane_delete_element": "Delete element",
+        "lpn_pane_delete_elements": "Delete elements",
         "lpn_pane_sort_desc": "Sort descending",
         "lpn_pane_manage_cols_width": "Width (em)",
         "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
@@ -731,6 +733,7 @@
         "lpn_contour_show": "Show contours",
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_copy_opened_unsaved": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
         "lpn_mode_add_chain": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
         "lpn_cp_allow_tip": "Allow only these characters:",
         "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
@@ -815,6 +818,8 @@
     },
     "keys": {
         "lpn_tool_add_chain": "Junction Pipe Chain",
+        "lpn_pane_delete_element": "Delete element",
+        "lpn_pane_delete_elements": "Delete elements",
         "lpn_pane_sort_desc": "Sort descending",
         "lpn_pane_manage_cols_width": "Width (em)",
         "lpn_pane_width_tip": "Column widths are saved in this browser, not in the project. Double-click a column divider to restore the default width.",
@@ -840,6 +845,7 @@
         "lpn_contour_show": "Show contours",
         "lpn_contour_show_tip": "Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.",
         "lpn_sysflow_title": "Flow balance",
+        "lpn_copy_opened_unsaved": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
         "lpn_mode_add_chain": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
         "lpn_cp_allow_tip": "Allow only these characters:",
         "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
@@ -936,6 +942,38 @@
                     "key": "lpn_tool_vertices",
                     "value": "折点",
                     "english": "Vertices"
+                }
+            }
+        },
+        "lpn_pane_delete_element": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filldown",
+                    "value": "向下填充",
+                    "english": "Fill down"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_fill_none",
+                    "value": "此选区内没有可向下填充的内容。",
+                    "english": "Nothing in this selection can be filled down."
+                }
+            }
+        },
+        "lpn_pane_delete_elements": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filldown",
+                    "value": "向下填充",
+                    "english": "Fill down"
+                },
+                "next_translated": {
+                    "key": "lpn_pane_fill_none",
+                    "value": "此选区内没有可向下填充的内容。",
+                    "english": "Nothing in this selection can be filled down."
                 }
             }
         },
@@ -1336,6 +1374,22 @@
                     "key": "lpn_sysflow_produced",
                     "value": "产生",
                     "english": "Produced"
+                }
+            }
+        },
+        "lpn_copy_opened_unsaved": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_copy_opened",
+                    "value": "已将 {file} 作为副本打开，它带有自己的新锁，将在下次保存文件时一并保存。",
+                    "english": "Opened {file} as a copy and saved it, with a new lock of its own."
+                },
+                "next_translated": {
+                    "key": "lpn_lock_requested",
+                    "value": "{name} 想要编辑此文件。请在准备好后保存您的工作，并使用“文件”、“关闭项目”将其移交。",
+                    "english": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over."
                 }
             }
         },

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**0 still to read on master**, of 107 untranslated keys, of 2335 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**3 still to read on master**, of 110 untranslated keys, of 2338 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -94,7 +94,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to replace the current `$ec_lang_syn` entry with the proposed one (if they are identical, keep it as is).
   @@ NEEDS RULING
 
-## lpn_  (107, all ruled)
+## lpn_  (110, 3 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -126,6 +126,9 @@ never edits a synonym.
 - **`lpn_contour_show_tip`**
   > Clear to hide the fill and the contour lines; select to bring them back as they were. Node colors stay.
   _Ruled OK 2026-10-05._
+- **`lpn_copy_opened_unsaved`**
+  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+  @@ NEEDS RULING
 - **`lpn_cp_allow_tip`**
   > Allow only these characters:
   _Ruled OK 2026-10-05._
@@ -282,6 +285,12 @@ never edits a synonym.
 - **`lpn_mode_add_chain`**
   > Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
   _Ruled OK 2026-10-05._
+- **`lpn_pane_delete_element`**
+  > Delete element
+  @@ NEEDS RULING
+- **`lpn_pane_delete_elements`**
+  > Delete elements
+  @@ NEEDS RULING
 - **`lpn_pane_filter_sel_and`**
   > Filtered by {q} and selection only. Showing {n} of {all}.
   _Ruled OK 2026-10-05._
@@ -422,7 +431,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**7 still to read**, of 13 new keys across 15 unmerged branch(es).
+**10 still to read**, of 16 new keys across 10 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -433,18 +442,17 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/harvest-1005 (`af3d6582`) — adds no English strings
-
-### chore/saved-views (`28222d38`) — adds no English strings
-
 ### feat/desktop (`baba0f04`) — adds no English strings
 
 ### feat/engine-prefetch (`3194c30d`) — adds no English strings
 
-### feat/find-source (`2f2ea398`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/find-source (`8433832d`) — 2 new, 2 to read @@ NEEDS RULING
 
 - **`lpn_find_scope_source`**
   > Source
+  @@ NEEDS RULING
+- **`lpn_find_source_no_chemical`**
+  > No chemical is being tracked, so no node has a source.
   @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
@@ -488,21 +496,20 @@ build for that would be a gate nobody keeps. Refresh it with
   > Statistic
   _Ruled OK 2026-10-05._
 
-### fix/copy-now (`1cbe9332`) — 1 new, 1 to read @@ NEEDS RULING
+### fix/engine-failed (`1eb1d2bc`) — 5 new, 5 to read @@ NEEDS RULING
 
-- **`lpn_copy_opened_unsaved`**
-  > Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.
+- **`lpn_engine_unavailable_fetch`**
+  > The download of the EPANET solver failed, so valves that open and close on their own cannot be solved. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.
   @@ NEEDS RULING
-
-### fix/step-select-width (`f0ec94d6`) — adds no English strings
-
-### fix/table-actions (`8f9f89f4`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`lpn_pane_delete_element`**
-  > Delete element
+- **`lpn_time_engine_fetch_failed`**
+  > The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.
   @@ NEEDS RULING
-- **`lpn_pane_delete_elements`**
-  > Delete elements
+- **`lpn_time_engine_run_failed`**
+  > The EPANET run failed. That is a defect in this page; use the Something wrong here? link to report it
   @@ NEEDS RULING
-
-### fix/text-object (`4a1adda1`) — adds no English strings
+- **`lpn_time_engine_start_failed`**
+  > The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.
+  @@ NEEDS RULING
+- **`lpn_time_no_engine_why`**
+  > The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}
+  @@ NEEDS RULING

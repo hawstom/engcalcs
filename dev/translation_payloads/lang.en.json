@@ -666,6 +666,8 @@
         "lpn_pane_paste_customer_node_no_pipe": "Row {row}: node {id} has no pipe for a Customer to attach to.",
         "lpn_pane_filled": "Filled down {n} cells. {skipped} were not changed.",
         "lpn_pane_filldown": "Fill down",
+        "lpn_pane_delete_element": "Delete element",
+        "lpn_pane_delete_elements": "Delete elements",
         "lpn_pane_fill_none": "Nothing in this selection can be filled down.",
         "lpn_pane_ctrlenter_filled": "Filled {n} cells. {skipped} were not changed.",
         "lpn_pane_hide_col": "Hide this column",
@@ -1247,7 +1249,8 @@
         "lpn_copy_original": "Original; keep same lock",
         "lpn_copy_copy": "A copy; make new lock",
         "lpn_copy_kept_link": "Opened {name} as the original, moved to a new place. Save now writes to this file.",
-        "lpn_copy_opened": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
+        "lpn_copy_opened": "Opened {file} as a copy and saved it, with a new lock of its own.",
+        "lpn_copy_opened_unsaved": "Opened {file} as a copy, with a new lock of its own that will be saved with the next file save.",
         "lpn_lock_requested": "{name} would like to edit this file. When you are ready, save your work and use File, Close to hand it over.",
         "lpn_ago_seconds": "{n} seconds",
         "lpn_ago_minutes": "{n} minutes",
@@ -2337,7 +2340,7 @@
         "lpn_diag_pda_pressures": "Required pressure must be greater than Minimum pressure. Change one of them in Settings.",
         "lpn_inp_drop_pressure_unit": "This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back."
     },
-    "count": 2335,
+    "count": 2338,
     "active_prefixes": [
         "about",
         "bpn",
