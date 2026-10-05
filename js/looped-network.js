@@ -32443,6 +32443,7 @@ var EngCalcs = EngCalcs || {};
 	// own, so it names the one address the suite asks to be found at (Task 479.01, 2026-09-06).
 	// dev/lpn-spike/file-naming-harness.js holds it against the config.
 	var LPN_FILE_APP = 'https://epanet-plus-plus.org/app/';
+	var LPN_TREE_KEYS = ['alternatives', 'calcSets'];
 	function serializeProject() {
 		var out = {
 			format: LPN_FILE_FORMAT, app: LPN_FILE_APP,
@@ -32491,6 +32492,9 @@ var EngCalcs = EngCalcs || {};
 			// not say what it means, and a 400 mm main would open as a 400 inch main (Tom).
 			units: readUnitSelections()
 		};
+		// **A STORED SCENARIO TREE IS CARRIED, NEVER DROPPED** (dev/scenario-alternatives.md):
+		// written last, and only when the file brought one or an explicit act made one.
+		LPN_TREE_KEYS.forEach(function (k) { if (doc[k] !== undefined) { out[k] = doc[k]; } });
 		// From v4 the file is Cartesian. CLONED FIRST -- flipStoredY() mutates, and the object above
 		// holds live references to doc.nodes/links/labels, so flipping in place would turn the
 		// drawing upside down on screen every time it was saved.
@@ -33614,6 +33618,9 @@ var EngCalcs = EngCalcs || {};
 		doc.controls = saved.controls || [];
 		doc.rules = saved.rules || [];
 		doc.inpSections = saved.inpSections || {};
+		// A scenario tree from a later reader (shared alternatives, calculation sets) rides through
+		// verbatim; a scenario's own tree keys already do, on the scenario object.
+		LPN_TREE_KEYS.forEach(function (k) { if (saved[k] !== undefined) { doc[k] = saved[k]; } else { delete doc[k]; } });
 		// Task 510's saved paths, taken VERBATIM. An id naming a node this document does not have
 		// is the user's data and is reported where it is used, never pruned here -- see
 		// profileMissingStops(). A file written before this existed simply has none.
