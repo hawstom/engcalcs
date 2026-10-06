@@ -1538,8 +1538,10 @@ $ec_lang['lpn_change_type_menu']='Change type';
 $ec_lang['lpn_change_type_tip']='Change the selected nodes into junctions, reservoirs, or tanks. Each keeps its ID, its place, its pipes, and every value the new type also has. If anything would be lost, you are asked first.';
 $ec_lang['lpn_change_type_ok']='Change';
 $ec_lang['lpn_change_type_lost']='These values will be lost:';
+// The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
+$ec_lang['lpn_change_type_key']='ID: Lost entry';
 $ec_lang['lpn_change_type_line']='{id}: {property} {value}';
-$ec_lang['lpn_change_type_line_scenario']='{id}, in scenario {scenario}: {property} {value}';
+$ec_lang['lpn_change_type_line_scenario']='{id}: {property} {value}, in scenario {scenario}';
 $ec_lang['lpn_change_type_more']='And {n} more.';
 // Heads the lines a tank-to-reservoir or reservoir-to-tank change states rather than loses: the
 // water surface is carried, so the new head or water depth is listed with its value.

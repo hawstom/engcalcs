@@ -164,7 +164,10 @@ function run(mutate, quiet) {
 		const q = change(J, 'junction', false);
 		ok('3.1 the box was shown', q.length === 1);
 		const text = q[0] || '';
-		ok('3.2 it opens with the "values will be lost" sentence', text.indexOf(PC.lpn_change_type_lost) === 0, text.split('\n')[0]);
+		ok('3.2 it opens with the key line, exactly "ID: Lost entry"', PC.lpn_change_type_key === 'ID: Lost entry' && text.split('\n')[0] === 'ID: Lost entry', text.split('\n')[0]);
+		ok('3.2b the "values will be lost" sentence follows, and every line under it is "ID: entry"',
+			text.indexOf(PC.lpn_change_type_lost) > 0 && text.split(PC.lpn_change_type_lost + '\n')[1].split('\n\n')[0].split('\n').every(l => l.indexOf(J + ': ') === 0),
+			text);
 		ok('3.3 it names the water depth and the tank diameter, with the ID',
 			text.indexOf(J + ': ' + PC.lpn_field_tank_level) >= 0 && text.indexOf(PC.lpn_field_tank_diameter) >= 0, text);
 		ok('3.4 Cancel leaves the document byte-identical', snap() === before);
@@ -195,7 +198,7 @@ function run(mutate, quiet) {
 		const q = change(J, 'tank', false);
 		const text = q[0] || '';
 		ok('4.1 the box lists Base\'s demand', text.indexOf(J + ': ' + PC.lpn_field_base_demand + ' 10') >= 0, text);
-		ok('4.2 ...and the scenario\'s own, by name', text.indexOf('Max day') >= 0 && text.indexOf(' 25') >= 0, text);
+		ok('4.2 ...and the scenario\'s own, by name, led by the ID and a colon', text.split('\n').some(l => l.indexOf(J + ': ') === 0 && l.indexOf('Max day') > 0 && l.indexOf(' 25') > 0), text);
 		ok('4.3 Cancel: byte-identical, scenarios included', snap() === before);
 		change(J, 'tank', true);
 		const ov = (L.getScenarios().filter(s => s.id === scn.id)[0] || {}).overrides || {};
@@ -235,7 +238,7 @@ function run(mutate, quiet) {
 		ok('6.1 tank -> reservoir does not name the control (a level both sides)',
 			q.length === 1 && q[0].indexOf(PC.lpn_change_type_meaning) < 0, q[0]);
 		ok('6.1b ...and its head is the tank\'s water surface, said in the box',
-			L.effective(L.nodeById(J), 'head') === surfaceWas && q[0].indexOf(PC.lpn_change_type_surface) === 0 &&
+			L.effective(L.nodeById(J), 'head') === surfaceWas && q[0].indexOf(PC.lpn_change_type_surface) === PC.lpn_change_type_key.length + 2 &&
 			q[0].indexOf(J + ': ' + PC.lpn_field_head + ' ' + surfaceWas) >= 0, surfaceWas + ' | ' + q[0]);
 		// Back to a junction below needs the head gone first, so the box is about the control only.
 		delete L.nodeById(J)._head;
@@ -256,7 +259,7 @@ function run(mutate, quiet) {
 		L.changeSelectedNodeType('junction');
 		const text = asked[0] || '';
 		ok('6b.1 one question for the whole selection', asked.length === 1, asked.length);
-		ok('6b.2 the list is capped, and says how many more', (text.match(/\n/g) || []).length === 21 &&
+		ok('6b.2 the list is capped, and says how many more', (text.match(/\n/g) || []).length === 23 &&
 			text.indexOf(String(PC.lpn_change_type_more).replace('{n}', '4')) >= 0, text.split('\n').slice(-2).join(' | '));
 		ok('6b.3 all six changed', tanks.every(id => L.nodeById(id).type === 'junction'));
 		L.undo();
@@ -361,6 +364,8 @@ const MUTATIONS = [
 		"delete n[sk];   // base-write: the type is Base-owned", "void n[sk];   // base-write: the type is Base-owned")],
 	['the box is never shown', src => src.replace(
 		"if (!lost.length && !meaning.length && !surface.length) { proceed(); return; }", "{ proceed(); return; }")],
+	['the key line is dropped', src => src.replace(
+		"if (lost.length) { text.push(String(pc.lpn_change_type_key", "if (false) { text.push(String(pc.lpn_change_type_key")],
 	['no undo snapshot', src => src.replace(
 		"\t\tfunction proceed() {\n\t\t\tsaveUndoSnapshot();\n", "\t\tfunction proceed() {\n")],
 	['the new type gets no New assets defaults', src => src.replace(

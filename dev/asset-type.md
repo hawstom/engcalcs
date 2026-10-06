@@ -34,6 +34,7 @@ Every selected node that is not already the chosen type becomes one: Junction, R
 - **Born:** what only the new type has comes from `nodeBirthFields()`, the same New assets
   defaults `addNode()` uses, so a converted tank and a drawn tank cannot differ. A node with no
   elevation (an imported reservoir) gets one the way a drawn node does.
+- **The box opens with a key line, "ID: Lost entry" (`lpn_change_type_key`), and every lost line follows it: the asset ID, a colon, the entry (a scenario override ends ", in scenario NAME").**
 - **Asked first, only when something is lost or changes meaning.** One box for the whole
   selection, in the page's own `askDialog()`, Change or Cancel. The list is capped at 20 lines plus
   "And N more." Cancel writes nothing: the box is asked before any write.

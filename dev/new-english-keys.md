@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**24 still to read on master**, of 134 untranslated keys, of 2360 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**25 still to read on master**, of 135 untranslated keys, of 2361 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (134, 24 to read @@ NEEDS RULING)
+## lpn_  (135, 25 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -96,11 +96,14 @@ never edits a synonym.
 - **`lpn_basemap_style_normal`**
   > Normal
   _Ruled OK 2026-10-05._
+- **`lpn_change_type_key`**
+  > ID: Lost entry
+  @@ NEEDS RULING
 - **`lpn_change_type_line`**
   > {id}: {property} {value}
   @@ NEEDS RULING
 - **`lpn_change_type_line_scenario`**
-  > {id}, in scenario {scenario}: {property} {value}
+  > {id}: {property} {value}, in scenario {scenario}
   @@ NEEDS RULING
 - **`lpn_change_type_lost`**
   > These values will be lost:
@@ -482,7 +485,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**35 still to read**, of 38 new keys across 16 unmerged branch(es).
+**27 still to read**, of 30 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -493,9 +496,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/asset-type (`4ca39acf`) — adds no English strings
+### feat/asset-type (`e06cebac`) — adds no English strings
 
-### feat/backdrop-attach (`aa8853ca`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/backdrop-attach (`7f582c54`) — 5 new, 5 to read @@ NEEDS RULING
 
 - **`lpn_inp_backdrop_attach`**
   > Attach {file}…
@@ -527,32 +530,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/feedback (`4a30c0de`) — 8 new, 8 to read @@ NEEDS RULING
-
-- **`contactCategory`**
-  > What is this about?
-  @@ NEEDS RULING
-- **`contactCategoryIdea`**
-  > An idea
-  @@ NEEDS RULING
-- **`contactCategoryOther`**
-  > Other
-  @@ NEEDS RULING
-- **`contactCategoryWording`**
-  > Wrong wording or translation
-  @@ NEEDS RULING
-- **`contactCategoryWrong`**
-  > Something is wrong
-  @@ NEEDS RULING
-- **`contactContextNote`**
-  > This message will also say which page you came from, your language, and the error code if there was one. It never includes anything from your drawing.
-  @@ NEEDS RULING
-- **`contactYourEmailOptional`**
-  > Email (only if you want a reply)
-  @@ NEEDS RULING
-- **`lpn_tell_more`**
-  > Tell us more
-  @@ NEEDS RULING
+### feat/feedback (`d5b7aece`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -576,7 +554,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/scenario-table (`8113d32d`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/scenario-table (`896b1259`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_pane_clear_override`**
   > Clear override
@@ -588,7 +566,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show scenarios
   @@ NEEDS RULING
 
-### feat/screenshot (`b09c68a8`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/screenshot (`8a583e22`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_screenshot_copied`**
   > Screenshot copied.
@@ -618,9 +596,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
   @@ NEEDS RULING
 
-### feat/tip-door (`9a9cd3a1`) — adds no English strings
+### feat/tip-door (`fbf7a6c4`) — adds no English strings
 
-### feat/value-warning (`f5395ed4`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/value-warning (`0a6d4c19`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_valwarn_diameter`**
   > A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.
@@ -643,5 +621,3 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_valwarn_tank_levels`**
   > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
   @@ NEEDS RULING
-
-### fix/valve-label (`9ce21702`) — adds no English strings

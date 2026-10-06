@@ -31858,7 +31858,7 @@ var EngCalcs = EngCalcs || {};
 				n.id, newSpec.label, changeTypeValueText(newSpec, carry.base.value)));
 		}
 		carry.ovs.forEach(function (c) {
-			surface.push(changeTypeLine(pc.lpn_change_type_line_scenario || '{id}, in scenario {scenario}: {property} {value}',
+			surface.push(changeTypeLine(pc.lpn_change_type_line_scenario || '{id}: {property} {value}, in scenario {scenario}',
 				n.id, newSpec.label, changeTypeValueText(newSpec, c.value), scenarioDisplayName(c.s)));
 		});
 		typeOwnedNodeSpecs().forEach(function (spec) {
@@ -31877,7 +31877,7 @@ var EngCalcs = EngCalcs || {};
 				spec.props.forEach(function (p) {
 					if (!Object.prototype.hasOwnProperty.call(ov, p) || ov[p] === undefined) { return; }
 					if (carried && carriedIn[s.id]) { return; }
-					lost.push(changeTypeLine(pc.lpn_change_type_line_scenario || '{id}, in scenario {scenario}: {property} {value}',
+					lost.push(changeTypeLine(pc.lpn_change_type_line_scenario || '{id}: {property} {value}, in scenario {scenario}',
 						n.id, spec.label, changeTypeValueText(spec, ov[p]), scenarioDisplayName(s)));
 				});
 			});
@@ -32018,6 +32018,8 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (!lost.length && !meaning.length && !surface.length) { proceed(); return; }
 		text = [];
+		// The key to the lost lines, first in the box: each is the asset ID, a colon, the entry lost.
+		if (lost.length) { text.push(String(pc.lpn_change_type_key || 'ID: Lost entry')); }
 		if (surface.length) {
 			text.push([pc.lpn_change_type_surface || 'These keep the water surface where it was. A reservoir\'s head is the tank\'s elevation plus its water depth, and a tank\'s water depth is the reservoir\'s head minus its elevation:']
 				.concat(capped(surface)).join('\n'));
