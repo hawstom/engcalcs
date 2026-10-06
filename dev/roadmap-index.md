@@ -18,7 +18,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 737 — Coined names for interface elements, so every language names each one once.
 - Task 741 — The infinite map: generated networks for the label bench.
 - ! Task 759 — One word for the map selection, another for a menu choice; tips that earn their place.
-- Task 775 — File, Convert as: five defects from one session in Fotobi, Ghana.
+- Task 775 — File, Convert as: what is left of the Fotobi, Ghana session.
 
 ## 75 — Soon (16)
 
