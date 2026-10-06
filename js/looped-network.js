@@ -34636,7 +34636,8 @@ var EngCalcs = EngCalcs || {};
 		return out;
 	}
 	// **THE PICTURE AND ITS WORLD FILE, FOR THE .inp BESIDE THEM.** Calls back with
-	// { bmp: Uint8Array, world: text } or null when there is no picture or it cannot be decoded.
+	// { bmp: Uint8Array, world: text }, null when there is no picture, or false when there is one
+	// this page cannot read back (undecodable, or a canvas the browser will not let us read).
 	// The picture goes out at its own stored pixels with nothing drawn in (Tom's rule for a
 	// screenshot: exactly what was there, no credit added), at full strength: the map's backdrop
 	// opacity is a display setting, not part of the picture.
@@ -34652,20 +34653,86 @@ var EngCalcs = EngCalcs || {};
 		var img = new Image();
 		img.onload = function () {
 			var pw = img.naturalWidth, ph = img.naturalHeight;
-			if (!(pw > 0) || !(ph > 0)) { done(null); return; }
-			var cv = document.createElement('canvas'), ctx;
+			if (!(pw > 0) || !(ph > 0)) { done(false); return; }
+			var cv = document.createElement('canvas'), ctx, pixels;
 			cv.width = pw; cv.height = ph;
 			ctx = cv.getContext('2d');
-			ctx.drawImage(img, 0, 0, pw, ph);
+			// A picture the browser will draw but not let us read back (a cross-origin one taints the
+			// canvas) throws here. That is "could not be saved", said on screen, never a dead export.
+			try {
+				ctx.drawImage(img, 0, 0, pw, ph);
+				pixels = ctx.getImageData(0, 0, pw, ph);
+			} catch (e) { done(false); return; }
 			var s = backdrop.s || 1, left = backdrop.tx + (backdrop.x || 0) * s, top = backdrop.ty + (backdrop.y || 0) * s,
 				L = outwardX(left), R = outwardX(left + backdrop.width * s),
 				T = outwardY(top), B = outwardY(top + backdrop.height * s),
 				A = (R - L) / pw, E = isLatLonProject() ? -(T - B) / ph : -A;
-			done({ bmp: encodeBmp24(ctx.getImageData(0, 0, pw, ph)),
+			done({ bmp: encodeBmp24(pixels),
 				world: [A, 0, 0, E, L + A / 2, T + E / 2].map(String).join('\r\n') + '\r\n' });
 		};
-		img.onerror = function () { done(null); };
+		img.onerror = function () { done(false); };
 		img.src = backdrop.href;
+	}
+	// **ONE .zip, BECAUSE CHROME LETS A CLICK DOWNLOAD ONE FILE** (dev/backdrop-export.md). Chrome
+	// allows a site one download per user gesture; a second, even in the same click handler, waits
+	// on a "download multiple files" permission that is easy to miss and, once refused, drops the
+	// file without a word: in Chrome's default setting only the .inp arrived. So the three files travel in one archive.
+	// PKWARE APPNOTE 6.3.x: local headers, a central directory and its end record; deflated where
+	// the browser has CompressionStream('deflate-raw'), stored otherwise. Names flagged UTF-8 (bit
+	// 11), since safeFileName() keeps a non-Latin project name.
+	var zipCrcTable = null;
+	function zipCrc32(bytes) {
+		var c, n, k, crc = 0xffffffff;
+		if (!zipCrcTable) {
+			zipCrcTable = new Uint32Array(256);
+			for (n = 0; n < 256; n++) {
+				c = n;
+				for (k = 0; k < 8; k++) { c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; }
+				zipCrcTable[n] = c >>> 0;
+			}
+		}
+		for (n = 0; n < bytes.length; n++) { crc = zipCrcTable[(crc ^ bytes[n]) & 0xff] ^ (crc >>> 8); }
+		return (crc ^ 0xffffffff) >>> 0;
+	}
+	function zipDeflate(bytes) {
+		if (typeof CompressionStream !== 'function') { return Promise.resolve(null); }
+		try {
+			return new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw')))
+				.arrayBuffer().then(function (b) { return new Uint8Array(b); }, function () { return null; });
+		} catch (e) { return Promise.resolve(null); }
+	}
+	// files: [{ name, data: Uint8Array | string }]. Resolves to a Blob of type application/zip.
+	function buildZip(files) {
+		var enc = new TextEncoder(), now = new Date(),
+			dosTime = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1),
+			dosDate = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+		var items = files.map(function (f) {
+			var raw = typeof f.data === 'string' ? enc.encode(f.data) : f.data;
+			return { name: enc.encode(f.name), raw: raw, crc: zipCrc32(raw) };
+		});
+		return Promise.all(items.map(function (it) { return zipDeflate(it.raw); })).then(function (packed) {
+			var parts = [], central = [], offset = 0, cdSize = 0;
+			items.forEach(function (it, i) {
+				var deflated = packed[i] && packed[i].length < it.raw.length, body = deflated ? packed[i] : it.raw,
+					head = new DataView(new ArrayBuffer(30)), cd = new DataView(new ArrayBuffer(46));
+				head.setUint32(0, 0x04034b50, true); head.setUint16(4, 20, true); head.setUint16(6, 0x0800, true);
+				head.setUint16(8, deflated ? 8 : 0, true); head.setUint16(10, dosTime, true); head.setUint16(12, dosDate, true);
+				head.setUint32(14, it.crc, true); head.setUint32(18, body.length, true); head.setUint32(22, it.raw.length, true);
+				head.setUint16(26, it.name.length, true); head.setUint16(28, 0, true);
+				cd.setUint32(0, 0x02014b50, true); cd.setUint16(4, 20, true); cd.setUint16(6, 20, true); cd.setUint16(8, 0x0800, true);
+				cd.setUint16(10, deflated ? 8 : 0, true); cd.setUint16(12, dosTime, true); cd.setUint16(14, dosDate, true);
+				cd.setUint32(16, it.crc, true); cd.setUint32(20, body.length, true); cd.setUint32(24, it.raw.length, true);
+				cd.setUint16(28, it.name.length, true); cd.setUint32(42, offset, true);
+				parts.push(head.buffer, it.name, body);
+				central.push(cd.buffer, it.name);
+				offset += 30 + it.name.length + body.length;
+				cdSize += 46 + it.name.length;
+			});
+			var end = new DataView(new ArrayBuffer(22));
+			end.setUint32(0, 0x06054b50, true); end.setUint16(8, items.length, true); end.setUint16(10, items.length, true);
+			end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
+			return new Blob(parts.concat(central, [end.buffer]), { type: 'application/zip' });
+		});
 	}
 	function downloadBlob(blob, name) {
 		var url = URL.createObjectURL(blob), a = document.createElement('a');
@@ -34679,9 +34746,11 @@ var EngCalcs = EngCalcs || {};
 	function exportInpFile() {
 		var pcX = EngCalcs.pageConfig || {}, base = safeFileName(projectDisplayName(project));
 		saveToStorage();   // export what is on screen, including edits not yet saved
+		// pic: an object (the picture, saved), null (no picture to save), false (a picture this
+		// page could not read back, so it is said, and the .inp names none).
 		backdropExportPicture(function (pic) {
 			var opts = inpExportOptions(), out, inpName = base + '.inp',
-				picName = base + '.bmp', worldName = base + '.bpw';
+				picName = base + '.bmp', worldName = base + '.bpw', zipName = base + '.zip';
 			if (pic) { opts.backdropFile = picName; }
 			out = EngCalcs.lpnExportInp(serializeProject(), opts);
 			if (!out || !out.ok) {
@@ -34689,26 +34758,29 @@ var EngCalcs = EngCalcs || {};
 					.replace('{detail}', (out && out.detail) || '?'));
 				return;
 			}
-			// **THREE DOWNLOADS, ONE AFTER ANOTHER.** A browser saves each into the same downloads
-			// folder, which is what the bare FILE name needs. Chrome asks once whether this site may
-			// download several files; spaced out so none is dropped as a burst.
-			downloadBlob(new Blob([out.inp], { type: 'text/plain' }), inpName);
-			if (pic) {
-				setTimeout(function () { downloadBlob(new Blob([pic.bmp], { type: 'image/bmp' }), picName); }, 300);
-				setTimeout(function () { downloadBlob(new Blob([pic.world], { type: 'text/plain' }), worldName); }, 600);
-			}
+			var tail = out.differences && out.differences.length
+				? ' ' + (pcX.lpn_inp_export_differences || '{n} things the .inp format cannot hold.')
+					.replace('{n}', String(out.differences.length))
+				: '';
 			// EXPORTING IS NOT SAVING. No stampProjectSaved() here, deliberately: an `.inp` cannot hold
 			// this document (scenarios, text sizes, a backdrop image), so a project that has only been
 			// exported still has unsaved changes and must keep saying so.
-			setNotice((pic
-				? (pcX.lpn_status_inp_exported_picture || 'Exported {file}, the background picture {picture} and its world file {world}. Keep the three in one folder.')
-					.replace('{picture}', picName).replace('{world}', worldName)
-				: (pcX.lpn_status_inp_exported || 'Exported {file}.')).replace('{file}', inpName) +
-				(out.differences && out.differences.length
-					? ' ' + (pcX.lpn_inp_export_differences || '{n} things the .inp format cannot hold.')
-						.replace('{n}', String(out.differences.length))
-					: ''));
-			showInpExportFlattening(out.differences, inpName);
+			if (!pic) {
+				downloadBlob(new Blob([out.inp], { type: 'text/plain' }), inpName);
+				setNotice((pic === false
+					? (pcX.lpn_status_inp_exported_no_picture || 'Exported {file}. The background picture could not be saved, so {file} names none; in EPANET, add it with View > Backdrop > Load.')
+					: (pcX.lpn_status_inp_exported || 'Exported {file}.')).replace(/\{file\}/g, inpName) + tail);
+				showInpExportFlattening(out.differences, inpName);
+				return;
+			}
+			buildZip([{ name: inpName, data: out.inp }, { name: picName, data: pic.bmp }, { name: worldName, data: pic.world }])
+				.then(function (zip) {
+					downloadBlob(zip, zipName);
+					setNotice((pcX.lpn_status_inp_exported_picture || 'Exported {zip}, holding {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open {file} in EPANET; the picture comes with it.')
+						.replace('{zip}', zipName).replace('{picture}', picName).replace('{world}', worldName)
+						.replace(/\{file\}/g, inpName) + tail);
+					showInpExportFlattening(out.differences, inpName);
+				});
 		});
 	}
 	/**

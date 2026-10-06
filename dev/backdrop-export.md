@@ -1,6 +1,7 @@
 # Exporting the background picture with the EPANET file
 
-Why File > Export EPANET file also saves a `.bmp` and a `.bpw`, and what each one holds. Harness:
+Why File > Export EPANET file, on a project with a background picture, saves one `.zip` holding the
+`.inp`, a `.bmp` and a `.bpw`, and what each one holds. Harness:
 `dev/lpn-spike/backdrop-export-roundtrip-browser-harness.js`.
 
 ## What Elm Street Center's backdrop is
@@ -28,7 +29,7 @@ compositing is needed for it, and none was built. A tile basemap is `project.bas
 **So the export saves a 24-bit BMP, not the PNG Tom named.** It is the one picture format that
 EPANET desktop, this page and a GIS can all read. A PNG would have opened here and in a GIS, but
 EPANET would report it could not read the backdrop. The cost is size: Elm Street's picture is
-about 7.6 MB as a BMP.
+about 7.6 MB as a BMP, but it deflates to 89 KB inside the `.zip` (the whole archive is 91 KB).
 
 How EPANET finds the file: `Fmain.pas` opens an `.inp` with `SetCurrentDir(ExtractFileDir(Fname))`
 before reading it, so a **bare file name** in FILE finds the picture in the same folder.
@@ -63,15 +64,36 @@ own Background image > Add when the BMP and `.bpw` are picked together.
   re-import goes through DIMENSIONS and lands within a pixel. Background image > Add with that
   `.bpw` refuses it, because the two pixel sizes differ.
 
-## What the user sees
+## What the user sees: one .zip, not three downloads
 
-Three downloads named after the project: `Name.inp`, `Name.bmp`, `Name.bpw`, a third of a second
-apart. Chrome asks once, "This site is trying to download multiple files", Allow or Block. Firefox
-saves them, or asks for each, depending on its own download setting. The status line says
-"Exported Name.inp, the background picture Name.bmp and its world file Name.bpw. Keep the three in
-one folder." The picture goes out at its own stored pixels, full strength, with nothing drawn in.
+`Name.zip`, holding `Name.inp`, `Name.bmp` and `Name.bpw`, and the status line: "Exported Name.zip,
+holding Name.inp, its background picture Name.bmp, and the world file Name.bpw. Extract all three
+into one folder, then open Name.inp in EPANET; the picture comes with it." A project with no picture
+still downloads its bare `.inp`. A picture the page cannot read back (undecodable, or a canvas the
+browser will not let it read) gives the bare `.inp` with no FILE line, and the status line says the
+picture could not be saved and to add it in EPANET with View > Backdrop > Load.
 
-A browser that renames a repeated download (`Name (1).inp`) leaves that `.inp` naming `Name.bmp`.
-This page's import offers the picker anyway and says when the chosen name differs. The File System
-Access folder picker would avoid the renaming but needs Chrome or Edge and a second path; it was
-not built.
+**Why not three separate downloads.** The first build sent three, and in Tom's Chrome only the `.inp`
+arrived. Chrome allows a site one download per user gesture; a second, even fired synchronously in
+the same click handler, is held for its "Download multiple files" permission, and with that setting
+at its default (ask) or at Block it never lands. Measured 2026-10-06 in Chrome 154 and in the
+harness's Chromium, driven by raw CDP so Chrome's own download path is used, on the branch's
+three-download code: default setting, `.inp` only; Block, `.inp` only; Allow, all three. Three
+blob downloads fired synchronously in one click handler: one. The original harness had passed with
+three files only because Playwright routes downloads through `Browser.setDownloadBehavior`, which
+skips that limit (measured: three files even with Block). The harness's last section now drives
+Chrome the raw way and checks the downloads folder.
+
+**Rejected:** the File System Access folder picker (writes the three files with no renaming, but
+Chrome and Edge only, and a second path for every other browser). The `.zip` works in every browser
+with one gesture. Windows opens a `.zip` like a folder, but EPANET started from inside it sees only
+the `.inp`, which is why the status line says to extract all three first. If the `.inp` is opened
+without the picture beside it, EPANET asks for it (`Fmain.pas FindBackdropFile`).
+
+The archive is written in the page (PKWARE APPNOTE: local headers, central directory, end record;
+deflate through `CompressionStream('deflate-raw')`, stored when the browser lacks it; names flagged
+UTF-8). The harness reads it back with node's zlib and checks every CRC; Info-ZIP `unzip -t` and
+Python's `zipfile` accept it.
+
+This page's own import does not open the `.zip`: re-importing means extracting it, importing the
+`.inp`, and attaching the `.bmp` when the report offers it.

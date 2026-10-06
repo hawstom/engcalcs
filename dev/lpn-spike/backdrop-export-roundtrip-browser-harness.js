@@ -3,8 +3,11 @@
 //
 //   node dev/lpn-spike/backdrop-export-roundtrip-browser-harness.js   (takes the browser lock itself)
 //
-// File > Export EPANET file on a project with a background picture downloads three files: the .inp,
-// a 24-bit BMP (the format EPANET 2.2 opens; dev/backdrop-export.md) and its .bpw world file. The
+// File > Export EPANET file on a project with a background picture downloads ONE .zip holding three
+// files: the .inp, a 24-bit BMP (the format EPANET 2.2 opens; dev/backdrop-export.md) and its .bpw
+// world file. One, because Chrome lets a click download one file; a second waits on a permission
+// that drops it unseen. The last section proves that in Chrome's OWN download path (raw CDP, never
+// Playwright's, which bypasses the multiple-download limit and so passed three loose files). The
 // .inp's [BACKDROP] names the BMP and gives DIMENSIONS equal to the picture's corners with OFFSET 0 0.
 // Re-importing that .inp in a fresh browser and attaching the downloaded BMP puts the picture back
 // within one pixel of where it was; so does Background image's own door with the BMP and the world
@@ -85,6 +88,30 @@ function readBmp(buf) {
 		len: buf.length, firstStored: [buf[off + 2], buf[off + 1], buf[off]] };
 }
 
+// A .zip read back by its central directory, each entry inflated by node's zlib and its CRC checked
+// against node's own crc32, so nothing here shares code with the page's writer.
+function unzip(buf) {
+	const out = {};
+	let e = buf.length - 22;
+	while (e >= 0 && buf.readUInt32LE(e) !== 0x06054b50) { e--; }
+	if (e < 0) { return null; }
+	const n = buf.readUInt16LE(e + 10);
+	let p = buf.readUInt32LE(e + 16);
+	for (let i = 0; i < n; i++) {
+		if (buf.readUInt32LE(p) !== 0x02014b50) { return null; }
+		const method = buf.readUInt16LE(p + 10), crc = buf.readUInt32LE(p + 16), csize = buf.readUInt32LE(p + 20),
+			usize = buf.readUInt32LE(p + 24), nlen = buf.readUInt16LE(p + 28), xlen = buf.readUInt16LE(p + 30),
+			clen = buf.readUInt16LE(p + 32), loc = buf.readUInt32LE(p + 42), name = buf.toString('utf8', p + 46, p + 46 + nlen);
+		if (buf.readUInt32LE(loc) !== 0x04034b50) { return null; }
+		const start = loc + 30 + buf.readUInt16LE(loc + 26) + buf.readUInt16LE(loc + 28), body = buf.subarray(start, start + csize);
+		const data = method === 8 ? zlib.inflateRawSync(body) : method === 0 ? Buffer.from(body) : null;
+		if (!data || data.length !== usize || zlib.crc32(data) !== crc) { return null; }
+		out[name] = data;
+		p += 46 + nlen + xlen + clen;
+	}
+	return out;
+}
+
 function inp(backdropLines) {
 	return ['[TITLE]', 'export round trip', '', '[JUNCTIONS]', ' J1  10  100', ' J2  10  100', '',
 		'[RESERVOIRS]', ' R1  50', '', '[PIPES]', ' P1  R1  J1  1000  12  100  0  Open', ' P2  J1  J2  1000  8  100  0  Open', '',
@@ -140,13 +167,20 @@ async function exportAll(a) {
 		const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0);
 		if (r) { r.click(); }
 	}, label);
-	for (let i = 0; i < 40 && got.length < 3; i++) { await a.page.waitForTimeout(100); }
-	await a.page.waitForTimeout(400);
+	for (let i = 0; i < 60 && got.length < 1; i++) { await a.page.waitForTimeout(100); }
+	await a.page.waitForTimeout(1200);   // long enough for a second download, if one were sent
 	a.page.off('download', onDl);
 	a.lastNotice = await a.page.evaluate(() => (document.getElementById('lpn_map_notice') || {}).textContent || '');
 	const files = {};
 	for (const d of got) { files[d.suggestedFilename()] = fs.readFileSync(await d.path()); }
+	a.downloads = Object.keys(files);
 	return files;
+}
+// What the export put inside its one .zip, or null when it sent anything but exactly one .zip.
+async function exportZip(a) {
+	const dl = await exportAll(a), names = Object.keys(dl);
+	a.zipName = names.length === 1 && /\.zip$/i.test(names[0]) ? names[0] : null;
+	return a.zipName ? unzip(dl[a.zipName]) : null;
 }
 const pick = (files, ext) => Object.keys(files).find((n) => n.toLowerCase().endsWith(ext));
 const bdRow = (text, key) => { const m = new RegExp('\\[BACKDROP\\][\\s\\S]*?^\\s*' + key + '\\s+(.*)$', 'mi').exec(text); return m ? m[1].trim().split(/\s+/) : null; };
@@ -155,9 +189,11 @@ const near = (x, y, tol) => Math.abs(x - y) <= tol;
 // Export from the open page, re-import into fresh pages, and compare. `label` names the case.
 async function roundTrip(browser, a, label, geo) {
 	const before = await corners(a);
-	const files = await exportAll(a);
+	const files = (await exportZip(a)) || {};
+	ok(label + ': ONE download, a .zip', !!a.zipName, (a.downloads || []).join(', '));
 	const names = Object.keys(files), inpN = pick(files, '.inp'), bmpN = pick(files, '.bmp'), bpwN = pick(files, '.bpw');
-	ok(label + ': three files are downloaded, .inp, .bmp and .bpw', names.length === 3 && inpN && bmpN && bpwN, names.join(', '));
+	ok(label + ': the .zip holds three files, .inp, .bmp and .bpw, each intact (CRC)', names.length === 3 && inpN && bmpN && bpwN, names.join(', '));
+	ok(label + ': the .zip is named as the files are', !!a.zipName && !!inpN && a.zipName.replace(/\.zip$/i, '') === inpN.replace(/\.inp$/i, ''), a.zipName + ' / ' + inpN);
 	if (!inpN || !bmpN || !bpwN || !before) { return; }
 	const text = files[inpN].toString('utf8'), bmp = readBmp(files[bmpN]);
 	const stem = (n) => n.replace(/\.[^.]+$/, '');
@@ -202,6 +238,75 @@ async function roundTrip(browser, a, label, geo) {
 	return { bmp, files };
 }
 
+// **CHROME'S OWN DOWNLOAD PATH, NOT PLAYWRIGHT'S.** Playwright routes every download through
+// Browser.setDownloadBehavior, which skips Chrome's one-download-per-gesture limit, so the first
+// version of this harness passed three loose files that a visitor's Chrome dropped to one. Here the
+// browser is driven by raw CDP that never touches download behaviour, with a fresh profile whose
+// download folder is a temp dir and whose "automatic downloads" setting is Chrome's default (ask).
+// The export click is a real mouse event. What lands in the folder is what a visitor gets.
+async function realChromeExport(exe, url) {
+	const os = require('os'), http = require('http');
+	const base = fs.mkdtempSync(path.join(os.tmpdir(), 'ec-real-dl-')), prof = path.join(base, 'profile'), dl = path.join(base, 'downloads');
+	fs.mkdirSync(path.join(prof, 'Default'), { recursive: true }); fs.mkdirSync(dl);
+	fs.writeFileSync(path.join(prof, 'Default', 'Preferences'), JSON.stringify({ download: { default_directory: dl, prompt_for_download: false, directory_upgrade: true } }));
+	const port = await require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js')).freePort();
+	const chrome = require('child_process').spawn(exe, ['--headless=new', '--no-sandbox', '--no-first-run', '--no-default-browser-check', '--user-data-dir=' + prof,
+		'--remote-debugging-port=' + port, '--window-size=1400,900', 'about:blank'], { stdio: 'ignore' });
+	const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+	const getJson = (p) => new Promise((res, rej) => http.get('http://127.0.0.1:' + port + p, (r) => {
+		let t = ''; r.on('data', (d) => { t += d; }); r.on('end', () => { try { res(JSON.parse(t)); } catch (e) { rej(e); } });
+	}).on('error', rej));
+	let ws;
+	try {
+		let targets = null;
+		for (let i = 0; i < 75 && !targets; i++) { try { targets = await getJson('/json'); } catch (e) { await sleep(200); } }
+		const t = targets && targets.find((x) => x.type === 'page');
+		if (!t) { ok('real Chrome: a page to drive', false, 'no CDP page target'); return; }
+		ws = new WebSocket(t.webSocketDebuggerUrl);
+		await new Promise((r, j) => { ws.onopen = r; ws.onerror = j; });
+		let id = 0; const pending = {};
+		ws.onmessage = (m) => { const d = JSON.parse(m.data); if (d.id && pending[d.id]) { pending[d.id](d); delete pending[d.id]; } };
+		const send = (method, params) => new Promise((r) => { const i = ++id; pending[i] = r; ws.send(JSON.stringify({ id: i, method, params: params || {} })); });
+		const ev = async (expr) => { const r = await send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true }); return r.result && r.result.result && r.result.result.value; };
+		const waitFor = async (expr, ms) => { for (let i = 0; i < ms / 100; i++) { if (await ev(expr)) { return true; } await sleep(100); } return false; };
+		const closeDialogs = `(async () => { for (let k = 0; k < 6; k++) { const bd = document.getElementById('lpn_dialog_backdrop'); if (!bd || getComputedStyle(bd).display === 'none') break;
+			const b = Array.from(document.querySelectorAll('#lpn_dialog_buttons button')).find((x) => x.offsetParent); if (!b) break; b.click(); await new Promise((r) => setTimeout(r, 400)); }
+			const c = document.getElementById('ec-consent'); if (c) c.remove(); })()`;
+		const click = async (expr) => {
+			const r = await ev(`(() => { const e = ${expr}; if (!e) return null; const b = e.getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2]; })()`);
+			if (!r) { return false; }
+			for (const type of ['mousePressed', 'mouseReleased']) { await send('Input.dispatchMouseEvent', { type, x: r[0], y: r[1], button: 'left', clickCount: 1 }); }
+			return true;
+		};
+		await send('Page.enable'); await send('Runtime.enable');
+		await send('Page.navigate', { url });
+		await waitFor(`!!(window.EngCalcs && EngCalcs.pageConfig && document.querySelector('#lpn_examples_pane .lpn-example-card'))`, 20000);
+		await sleep(800); await ev(closeDialogs);
+		await ev(`(() => { const t = EngCalcs.pageConfig.lpn_ex_elm_street_title; const c = Array.from(document.querySelectorAll('#lpn_examples_pane .lpn-example-card'))
+			.find((c) => c.querySelector('.lpn-example-title').textContent.trim() === t); if (c) c.click(); })()`);
+		await waitFor(`!!(EngCalcs.lpnBackdropProbe && EngCalcs.lpnBackdropProbe() && EngCalcs.lpnBackdropProbe().corners)`, 15000);
+		await sleep(1500); await ev(closeDialogs);
+		await click(`document.getElementById('lpn_menu_file')`); await sleep(500);
+		const clicked = await click(`Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(EngCalcs.pageConfig.lpn_file_export_inp) === 0)`);
+		ok('real Chrome: File > Export EPANET file was clicked with a real mouse event', clicked);
+		for (let i = 0; i < 100; i++) { const f = fs.readdirSync(dl); if (f.length && !f.some((n) => /crdownload$/.test(n))) { break; } await sleep(100); }
+		await sleep(2500);   // room for any further download to arrive, or to be held by the limit
+		const got = fs.readdirSync(dl);
+		ok('real Chrome, default settings: the downloads folder holds exactly Elm-Street-Center.zip', got.length === 1 && got[0] === 'Elm-Street-Center.zip', JSON.stringify(got));
+		const z = got[0] === 'Elm-Street-Center.zip' ? unzip(fs.readFileSync(path.join(dl, got[0]))) : null;
+		ok('real Chrome: and the .zip holds the .inp, the .bmp and the .bpw', !!z && ['Elm-Street-Center.inp', 'Elm-Street-Center.bmp', 'Elm-Street-Center.bpw'].every((n) => z[n] && z[n].length),
+			JSON.stringify(z && Object.keys(z)));
+		ok('real Chrome: the .inp in it names the .bmp beside it', !!z && /^\s*FILE\s+Elm-Street-Center\.bmp\s*$/mi.test(String(z['Elm-Street-Center.inp'])));
+		const bmp = z && readBmp(z['Elm-Street-Center.bmp']);
+		ok('real Chrome: the .bmp is the 1590 x 1599 site plan, 24-bit', !!bmp && bmp.w === 1590 && bmp.h === 1599 && bmp.bpp === 24, JSON.stringify(bmp && { w: bmp.w, h: bmp.h, bpp: bmp.bpp }));
+	} finally {
+		try { if (ws) { ws.close(); } } catch (e) { /* closed */ }
+		chrome.kill();
+		await sleep(300);
+		fs.rmSync(base, { recursive: true, force: true });
+	}
+}
+
 async function main() {
 	const env = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'env.js'));
 	({ Session } = require(path.join(REPO, 'dev', 'browser-pass', 'lib', 'session.js')));
@@ -218,8 +323,9 @@ async function main() {
 		const pc = await a.page.evaluate(() => EngCalcs.pageConfig);
 		await roundTrip(browser, a, 'Elm Street');
 		const notice = a.lastNotice || '';
-		ok('Elm Street: the notice names all three files', notice.includes(pc.lpn_status_inp_exported_picture
-			.replace('{file}', 'Elm-Street-Center.inp').replace('{picture}', 'Elm-Street-Center.bmp').replace('{world}', 'Elm-Street-Center.bpw')), notice.slice(0, 300));
+		ok('Elm Street: the notice names the .zip and all three files, and says how to open them in EPANET', notice.includes(pc.lpn_status_inp_exported_picture
+			.replace('{zip}', 'Elm-Street-Center.zip').replace('{picture}', 'Elm-Street-Center.bmp').replace('{world}', 'Elm-Street-Center.bpw')
+			.replace(/\{file\}/g, 'Elm-Street-Center.inp')) && /EPANET/.test(notice), notice.slice(0, 300));
 		ok('Elm Street: no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 
@@ -261,11 +367,28 @@ async function main() {
 		a = await open(browser);
 		await importInp(a, 'plain.inp', inp([' UNITS  Feet']));
 		const plain = await exportAll(a);
-		ok('a project with no picture downloads only its .inp', Object.keys(plain).length === 1 && !!pick(plain, '.inp'), Object.keys(plain).join(', '));
+		ok('a project with no picture downloads only its .inp, no .zip', Object.keys(plain).length === 1 && !!pick(plain, '.inp'), Object.keys(plain).join(', '));
 		ok('and its [BACKDROP] names no file', !/^\s*FILE/mi.test(String(plain[pick(plain, '.inp')] || '')));
 		await a.close();
-	} finally {
+
+		console.log('\n--- a picture the page cannot read back: said on screen, and the .inp names none ---');
+		a = await open(browser);
+		const elm = JSON.parse(fs.readFileSync(path.join(REPO, 'examples', 'Elm-Street-Center.lwn'), 'utf8'));
+		elm.backdrop.href = 'data:image/png;base64,AAAAAAAA';
+		await a.page.setInputFiles('#lpn_project_file', { name: 'Broken-Picture.lwn', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(elm)) });
+		await a.settle(1500);
+		const broken = await exportAll(a), pcB = await a.page.evaluate(() => EngCalcs.pageConfig);
+		const bInp = pick(broken, '.inp');
+		ok('an unreadable picture: the .inp alone is downloaded', Object.keys(broken).length === 1 && !!bInp, Object.keys(broken).join(', '));
+		ok('and its [BACKDROP] names no file', !!bInp && !/^\s*FILE/mi.test(String(broken[bInp])));
+		ok('and the notice says the picture could not be saved', !!bInp && a.lastNotice.includes(pcB.lpn_status_inp_exported_no_picture.replace(/\{file\}/g, bInp)), a.lastNotice.slice(0, 300));
+		await a.close();
 		await browser.close();
+
+		console.log('\n--- Chrome\'s own download path, default settings, as a visitor has it ---');
+		await realChromeExport(executablePath, env.pageUrl());
+	} finally {
+		await browser.close().catch(() => {});
 		env.stopServer();
 	}
 	console.log('\n' + NAME + ': ' + (checks - failures) + '/' + checks + ' checks passed');
