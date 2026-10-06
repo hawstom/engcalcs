@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**67 still to read on master**, of 174 untranslated keys, of 2400 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**69 still to read on master**, of 176 untranslated keys, of 2402 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (174, 67 to read @@ NEEDS RULING)
+## lpn_  (176, 69 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -417,6 +417,9 @@ never edits a synonym.
 - **`lpn_settings_req_pressure_tip`**
   > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.
   _Ruled OK 2026-10-05._
+- **`lpn_settings_restore_base_only`**
+  > Switch to Base to restore the defaults.
+  @@ NEEDS RULING
 - **`lpn_settings_row_basemap`**
   > Basemap
   @@ NEEDS RULING
@@ -534,6 +537,9 @@ never edits a synonym.
 - **`lpn_settings_table_yes`**
   > Yes
   @@ NEEDS RULING
+- **`lpn_settings_units_one_project`**
+  > Units are the same in every scenario.
+  @@ NEEDS RULING
 - **`lpn_sysflow_title`**
   > Flow balance
   _Ruled OK 2026-10-03._
@@ -602,7 +608,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**81 still to read**, of 84 new keys across 16 unmerged branch(es).
+**83 still to read**, of 86 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -688,12 +694,15 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`dda7730c`) — adds no English strings
+### feat/bentley-interop (`31a1eca2`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`b8dbd129`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/dxf (`56f052a3`) — 9 new, 9 to read @@ NEEDS RULING
 
+- **`lpn_dxf_export_no_utm`**
+  > The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.
+  @@ NEEDS RULING
 - **`lpn_dxf_export_refused`**
   > The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.
   @@ NEEDS RULING
@@ -707,7 +716,10 @@ build for that would be a gate nobody keeps. Refresh it with
   > Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.
   @@ NEEDS RULING
 - **`lpn_dxf_note_scale`**
-  > Text and symbols are drawn at the size the map showed them when this file was exported.
+  > Text and symbols are sized as the map draws them at Zoom to fit: text {h} {unit} high, on a network {w} {unit} across.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_shortened`**
+  > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in “…”.
   @@ NEEDS RULING
 - **`lpn_file_export_dxf`**
   > Export DXF file…

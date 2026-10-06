@@ -104,12 +104,14 @@ console.log('\n--- a scenario carries its own ---');
 {
 	const maxDay = L.createScenario('Maximum day');
 	// **TOM'S DEFECT, 2026-09-02:** *"Creating a Scenario blanks the demand multiplier. It should
-	// preserve it until you change it as with all other settings."* It is SEEDED rather than left
-	// blank-and-inheriting, because the Settings row draws what the scenario actually holds and an
-	// empty box beside nine filled ones reads as a setting that was lost. Both halves are asserted:
-	// the number the user sees, and the badge that must not claim a change nobody made.
-	ok('a new scenario is born with the document\'s multiplier', L.scenarioDM() === 1.2, L.scenarioDM());
-	ok('...so it resolves unchanged', L.docDM() === 1.2, L.docDM());
+	// preserve it until you change it as with all other settings."* Preserved by INHERITANCE now
+	// (Perry's review, 2026-10-06: a seeded copy wore the override mark and stopped following
+	// Base): the scenario holds none, resolves the document's, and the Settings box shows that.
+	ok('a new scenario holds no multiplier of its own', maxDay.demandMultiplier === undefined, maxDay.demandMultiplier);
+	ok('...and resolves the document\'s', L.docDM() === 1.2, L.docDM());
+	L.getSettings().hydraulics.demandMultiplier = 1.3;
+	ok('...following Base when Base changes', L.docDM() === 1.3, L.docDM());
+	L.getSettings().hydraulics.demandMultiplier = 1.2;
 	ok('...and the badge says nothing was overridden', L.overrideCount(maxDay) === 0,
 		L.overrideCount(maxDay));
 

@@ -186,6 +186,22 @@ async function main() {
 		const keys = rows.map((r) => JSON.parse(r.key)[0] + (JSON.parse(r.key)[1] ? '.' + JSON.parse(r.key)[1] : ''));
 		ok('units and the coordinate frame are not rows', !keys.some((k) => /^(units|origin|project\.(coords|crs|georef))/.test(k)), JSON.stringify(keys.filter((k) => /^(units|origin|project)/.test(k))));
 		ok('no Value cell wears the override wash with no scenario', rows.every((r) => !r.local));
+		const ACC = await L('lpn_settings_accuracy'), TRI = await L('lpn_settings_trials'), await0n = { he: await L('lpn_settings_head_error') };
+		ok('every setting is a row, stated or not: Accuracy and Maximum trials are rows', rows.some((r) => r.cells.st_setting === ACC) &&
+			rows.some((r) => r.cells.st_setting === TRI));
+		// Net1 states no head error limit: the row shows the 0 the page uses, with its unit, as the default.
+		const tri = rows.filter((r) => r.cells.st_setting === await0n.he)[0];
+		const dTpl = (await L('lpn_settings_row_default')).split('{value}');
+		ok('...an unstated one shows the default the page uses, with its unit, marked as the default', tri &&
+			tri.cells.st_value.indexOf(dTpl[0] + '0 ') === 0 && tri.cells.st_value.slice(-dTpl[1].length) === dTpl[1], tri && tri.cells.st_value);
+		ok('a choice is a select showing the Settings box\'s words', fm.cells.select && fm.cells.st_value === await L('bpn_method_hw'));
+		ok('...and its screen-reader label is the setting\'s name, not its stored path', /Friction method/.test(fm.cells.aria || '') && !/settings/.test(fm.cells.aria || ''), fm.cells.aria);
+		const mv = rows.filter((r) => r.key === '["view"]')[0];
+		ok('Map view reads as a summary, read-only', mv && !/[{}"]/.test(mv.cells.st_value) && mv.cells.select === false &&
+			await page.evaluate(() => !Array.from(document.querySelectorAll('#lpn_pane_settings td.lpn-pane-col-st_value')).filter((t) => t._lpnPaneId === '["view"]')[0].querySelector('input')),
+			mv && mv.cells.st_value);
+		const widthRow = rows.filter((r) => r.key === '["settings","labelMaxWidth"]')[0];
+		ok('a length setting carries its unit or reads Always show', widthRow && (/ ft$/.test(widthRow.cells.st_value) || widthRow.cells.st_value === await L('lpn_settings_label_always')), widthRow && widthRow.cells.st_value);
 		const CODE = /[a-z][A-Z]|\w\.\w|\u203a|_|\w:\w|\w\|\w/;
 		ok('Net1: every Setting cell is words, none a stored name', rows.every((r) => !CODE.test(r.cells.st_setting)),
 			JSON.stringify(rows.filter((r) => CODE.test(r.cells.st_setting)).map((r) => r.cells.st_setting).slice(0, 10)));
@@ -226,8 +242,9 @@ async function main() {
 		await H.tab('settings');
 		let menu = await H.cellMenu((await H.findRow(FM)).key);
 		ok('the cell menu offers Show scenarios', menu.indexOf(await L('lpn_pane_scn_show')) >= 0, JSON.stringify(menu));
-		ok('...and nothing about the map or about deleting an element', menu.indexOf(await L('lpn_pane_goto_tip')) < 0 &&
-			menu.indexOf(await L('lpn_pane_select_on_map')) < 0 && menu.indexOf(await L('lpn_pane_delete_element')) < 0, JSON.stringify(menu));
+		ok('...and nothing about the map, deleting an element, or Delete', menu.indexOf(await L('lpn_pane_goto_tip')) < 0 &&
+			menu.indexOf(await L('lpn_pane_select_on_map')) < 0 && menu.indexOf(await L('lpn_pane_delete_element')) < 0 &&
+			menu.indexOf(await L('lpn_tool_delete')) < 0, JSON.stringify(menu));
 		await H.menuPick(await L('lpn_pane_scn_show'));
 		await a.settle(800);
 		const heads2 = await H.headings();
@@ -237,6 +254,9 @@ async function main() {
 		ok('every setting is shown once per scenario, Base first', rows.filter((r) => r.cells.st_setting === FM).map((r) => r.cells.scn_name).join() === base + ',Peak',
 			rows.filter((r) => r.cells.st_setting === FM).map((r) => r.cells.scn_name).join());
 
+		const dmNew = await H.findRow(DM, 'Peak');
+		ok('a new scenario inherits the demand multiplier: Peak shows Base\'s, unmarked', dmNew && !dmNew.local &&
+			dmNew.cells.st_value === (await H.findRow(DM, base)).cells.st_value, JSON.stringify(dmNew && dmNew.cells));
 		console.log('\n--- 4. a friction method override in Peak ---');
 		const pBase = await H.pressure('22');
 		// A choice is a select of the Settings box's own options; picking Darcy-Weisbach.
@@ -325,6 +345,67 @@ async function main() {
 		await H.scenarioMenu('  ' + await L('lpn_scenario_basic')).catch(() => {});
 		await page.evaluate(() => { try { localStorage.removeItem('lpn_scnbasic'); } catch (e) {} });
 
+		console.log('\n--- 7. the Settings box writes the open scenario (Tom, Q4) ---');
+		// The session answers a confirm with OK (dev/browser-pass/lib/session.js), so the friction
+		// method's warning is accepted as a person would accept it.
+		const openBox = async () => {
+			const open = await page.evaluate(() => { const b = document.getElementById('lpn_settings_box'); return b && b.style.display !== 'none' && b.style.display !== ''; });
+			if (!open) { await a.toolbarClick(await L('lpn_tool_settings')); await page.waitForSelector('#lpn_settings_box', { state: 'visible' }); await a.settle(500); }
+		};
+		const boxMethod = () => page.evaluateHandle(() => Array.from(document.querySelectorAll('#lpn_settings_box select'))
+			.filter((s) => Array.from(s.options).some((o) => o.value === 'dw') && Array.from(s.options).some((o) => o.value === 'manning'))[0]);
+		const pickMethod = async (m) => { await (await boxMethod()).asElement().selectOption(m); await a.settle(1500); };
+		await openBox();
+		const unitsNote = await page.evaluate(() => { const n = document.getElementById('lpn_set_units_scn_note'); return n ? n.textContent : null; });
+		ok('in Peak the box says units are the same in every scenario', unitsNote === await L('lpn_settings_units_one_project'), unitsNote);
+		await pickMethod('manning');
+		let fmP = await H.findRow(FM, 'Peak'), fmB = await H.findRow(FM, base);
+		ok('friction method picked in the box in Peak: Peak holds Manning, marked', fmP.cells.st_value === await L('bpn_method_manning') && fmP.local, JSON.stringify(fmP.cells));
+		ok('...and Base is untouched', fmB.cells.st_value === await L('bpn_method_hw') && !fmB.local, JSON.stringify(fmB.cells));
+		ok('...and the box shows Peak\'s method', await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box select'))
+			.filter((s) => Array.from(s.options).some((o) => o.value === 'manning'))[0].value) === 'manning');
+		const CAP = await L('lpn_settings_row_symbol_cap_multiple');
+		const capBase0 = (await H.findRow(CAP, base)).cells.st_value;
+		await page.evaluate(() => { const i = document.getElementById('lpn_set_symbol_cap_mult'); i.value = '0.7'; i.dispatchEvent(new Event('change', { bubbles: true })); });
+		await a.settle(1200);
+		const capP = await H.findRow(CAP, 'Peak');
+		ok('a Presentation value typed in the box in Peak (largest symbol): Peak holds 0.7, marked', capP.cells.st_value === '0.7' && capP.local, JSON.stringify(capP.cells));
+		ok('...and Base keeps its own', (await H.findRow(CAP, base)).cells.st_value === capBase0, (await H.findRow(CAP, base)).cells.st_value);
+		await page.evaluate(() => { const s = document.getElementById('lpn_set_basemap_style'); s.value = 'faded'; s.dispatchEvent(new Event('change', { bubbles: true })); });
+		await a.settle(1000);
+		const BMS = await L('lpn_settings_basemap_style');
+		ok('basemap style picked in the box in Peak: Peak holds Faded, Base does not', (await H.findRow(BMS, 'Peak')).local &&
+			(await H.findRow(BMS, 'Peak')).cells.st_value === await L('lpn_basemap_style_faded') && !(await H.findRow(BMS, base)).local);
+		// Undo of a box edit in a scenario.
+		await page.evaluate(() => { if (document.activeElement) { document.activeElement.blur(); } });
+		await page.keyboard.press('Control+z');
+		await a.settle(1200);
+		ok('Ctrl+Z takes the basemap style edit back off Peak', !(await H.findRow(BMS, 'Peak')).local);
+
+		console.log('\n--- 8. undo restores only what an edit changed (Perry\'s repro) ---');
+		await H.scenarioMenu(base);
+		await a.settle(800);
+		ok('back in Base the box shows Base\'s method', await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_settings_box select'))
+			.filter((s) => Array.from(s.options).some((o) => o.value === 'manning'))[0].value) === 'hw');
+		const dmB = (await H.findRow(DM, base)).key;
+		const dmBase0 = (await H.findRow(DM, base)).cells.st_value;
+		await H.typeValue(dmB, '1.5');
+		await pickMethod('dw');
+		ok('Base now: multiplier 1.5 from the table, Darcy-Weisbach from the box', (await H.findRow(DM, base)).cells.st_value === '1.5' &&
+			(await H.findRow(FM, base)).cells.st_value === await L('bpn_method_dw'));
+		await page.evaluate(() => { if (document.activeElement) { document.activeElement.blur(); } });
+		await page.keyboard.press('Control+z');
+		await a.settle(1500);
+		ok('one Ctrl+Z undoes the box edit only: Hazen-Williams again, multiplier still 1.5',
+			(await H.findRow(FM, base)).cells.st_value === await L('bpn_method_hw') && (await H.findRow(DM, base)).cells.st_value === '1.5',
+			(await H.findRow(FM, base)).cells.st_value + ' / ' + (await H.findRow(DM, base)).cells.st_value);
+		await page.keyboard.press('Control+z');
+		await a.settle(1500);
+		ok('the next Ctrl+Z undoes the table edit only: multiplier back, method still Hazen-Williams',
+			(await H.findRow(DM, base)).cells.st_value === dmBase0 && (await H.findRow(FM, base)).cells.st_value === await L('bpn_method_hw'),
+			(await H.findRow(DM, base)).cells.st_value);
+		await page.evaluate(() => { const x = document.getElementById('lpn_setbox_close'); if (x) { x.click(); } });
+
 		console.log('\n--- geographic: Net3 lat/lon ---');
 		const b = await Session.open(browser, 'B');
 		const G = helpers(b);
@@ -336,10 +417,13 @@ async function main() {
 		await b.settle(500);
 		await G.tab('settings');
 		const grows = await G.settingRows();
+		const await0 = { dflt: await b.lang('lpn_settings_row_default'), hw: await b.lang('bpn_method_hw') };
 		const gkeys = grows.map((r) => JSON.parse(r.key).join('.'));
 		ok('Net3 lat/lon: the coordinate frame and units are not rows', gkeys.length > 50 &&
 			!gkeys.some((k) => /^(units|origin|project\.(coords|crs|georef))/.test(k)), gkeys.length);
 		ok('...and the view is a Presentation row', grows.some((r) => r.key === '["view"]' && r.cells.st_category === PRES));
+		ok('Net3 lat/lon, which states no friction method, still has the row, reading Hazen-Williams (default)',
+			grows.some((r) => r.cells.st_setting === FM && r.cells.st_value === (await0.dflt).replace('{value}', await0.hw)), JSON.stringify(grows.filter((r) => r.cells.st_setting === FM).map((r) => r.cells.st_value)));
 		ok('Net3 lat/lon: every Setting cell is words, none a stored name',
 			grows.every((r) => !/[a-z][A-Z]|\w\.\w|\u203a|_|\w:\w|\w\|\w/.test(r.cells.st_setting)),
 			JSON.stringify(grows.filter((r) => /[a-z][A-Z]|\w\.\w|\u203a|_|\w:\w|\w\|\w/.test(r.cells.st_setting)).map((r) => r.cells.st_setting).slice(0, 10)));

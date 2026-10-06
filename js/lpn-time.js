@@ -1321,12 +1321,13 @@
 	// ---- the time settings, edited ----
 
 	function ensureTimes() {
+		if (host.editTimes) { return host.editTimes(); }
 		var d = host.doc();
 		if (!d.times) { d.times = EC.lpnTimesDefaults(); d.times.text = {}; }
 		return d.times;
 	}
 	function commitStatistic(name) {
-		var times = host.doc().times, cur = (times && times.statistic) || 'NONE';
+		var times = host.editTimes ? host.editTimes() : host.doc().times, cur = (times && times.statistic) || 'NONE';
 		if (EC.LPN_STATISTICS.indexOf(name) < 0 || name === cur) { return; }
 		host.snapshot();
 		times = ensureTimes();
@@ -1401,7 +1402,7 @@
 	EC.lpnTimeRenderSettings = function () {
 		var panel = document.getElementById('lpn_set_time_fields'), S = strings(), times;
 		if (!panel || !host) { return; }
-		times = projectTimes() || EC.lpnTimesDefaults();
+		times = (host.editTimes ? host.editTimes() : projectTimes()) || EC.lpnTimesDefaults();
 		panel.textContent = '';
 		ovrNotes = {};
 		EC.LPN_TIME_FIELDS.forEach(function (pair) {

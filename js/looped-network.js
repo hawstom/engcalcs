@@ -5971,29 +5971,18 @@ var EngCalcs = EngCalcs || {};
 		while (used['s' + n]) { n++; }
 		return 's' + n;
 	}
-	// **A NEW SCENARIO IS BORN WITH THE DEMAND MULTIPLIER THE PROJECT ALREADY HAS** (Tom,
-	// 2026-09-02: *"Creating a Scenario blanks the demand multiplier. It should preserve it until
-	// you change it as with all other settings."*). Every other row in Settings > Hydraulics reads
-	// the document in Base and in a scenario alike, so only this one -- the single per-scenario
-	// option -- went blank on the way in, and a blank box beside nine filled ones reads as a
-	// setting that was lost rather than one that is inherited.
-	//
-	// **SEEDED, NOT DISPLAYED-AS-INHERITED.** Drawing the document's number in an empty box is the
-	// placeholder Tom struck on 2026-09-01: a number in the box is a number in the document, and
-	// nothing else. So the value is really written onto the scenario, which is also what makes it
-	// survive a save and a reopen unchanged.
-	//
-	// A document that states no multiplier seeds nothing, so Base blank stays scenario blank; and
-	// the seed comes from the DOCUMENT rather than from whichever scenario happened to be active,
-	// because a new scenario copies no overrides from its predecessor either.
-	//
-	// **A CHILD OF ANOTHER SCENARIO (stage 5) IS SEEDED WITH NOTHING**: it inherits its parent's
-	// multiplier, so a copy here would cut that inheritance at birth.
+	// **A NEW SCENARIO INHERITS EVERYTHING, THE DEMAND MULTIPLIER INCLUDED** (Perry's review,
+	// 2026-10-06: a seeded copy wore the override mark, counted nothing, and stopped following
+	// Base). Tom's 2026-09-02 complaint the seed answered (*"Creating a Scenario blanks the demand
+	// multiplier. It should preserve it until you change it"*) came from the Settings box reading
+	// only the scenario's own value; the box now shows the value the scenario uses
+	// (withSetboxView()), so an inherited multiplier reads as the number it is and follows Base until
+	// the scenario is given its own. With nothing seeded, the stored tree's "assign a calculation
+	// set" no longer meets a local value it must refuse.
 	function createScenario(name, parentId) {
 		var s = { id: newScenarioId(), name: name, overrides: {} },
-			dm = (settings.hydraulics || {}).demandMultiplier, p = parentId !== undefined ? scenarioById(parentId) : null;
+			p = parentId !== undefined ? scenarioById(parentId) : null;
 		if (p && !p.isBase) { s.parent = p.id; }
-		else if (typeof dm === 'number' && isFinite(dm)) { s.demandMultiplier = dm; }
 		scenarios.push(s);
 		touchTree('createScenario');
 		project.activeScenario = s.id;
@@ -10376,13 +10365,15 @@ var EngCalcs = EngCalcs || {};
 	function wireContourBox() {
 		var box = contourBoxEl(), x = document.getElementById('lpn_contour_close');
 		if (!box) { return; }
+		wireSetboxScenarioSeam(box);
 		if (x) { x.addEventListener('click', closeContourBox); }
 		wireBoxMemory(box, LPN_CONTOURBOX_KEY, contourboxLayout, saveContourboxLayout, contourBoxIsOpen);
 	}
 	function refreshContourBoxIfOpen() { if (contourBoxIsOpen()) { buildContourBox(); } }
 	var contourShownBefore = null;   // fill and lines as they were when Show contours was last cleared
 	function contourChanged() { refreshValueColors(); saveToStorage(); syncColorControls(); }
-	function buildContourBox() {
+	function buildContourBox() { return withSetboxView(buildContourBoxNow); }
+	function buildContourBoxNow() {
 		var pc = EngCalcs.pageConfig || {}, body = document.getElementById('lpn_contour_body');
 		if (!body) { return; }
 		var focusedId = document.activeElement && body.contains && body.contains(document.activeElement) ? document.activeElement.id : '';
@@ -23505,7 +23496,8 @@ var EngCalcs = EngCalcs || {};
 		return pc.lpn_color_break_number ||
 			'A boundary must be a number. The map is unchanged.';
 	}
-	function buildColoringSection() {
+	function buildColoringSection() { return withSetboxView(buildColoringSectionNow); }
+	function buildColoringSectionNow() {
 		var pc = EngCalcs.pageConfig || {},
 			R = ramps(),
 			nodeHost = document.getElementById('lpn_set_colors_node'),
@@ -35076,6 +35068,8 @@ var EngCalcs = EngCalcs || {};
 	// document write fails on quota, the index still describes the last state that actually made it
 	// to disk, rather than advertising a project whose content never landed.
 	function saveToStorage() {
+		// Never while a Settings box builder runs against a scenario's view: that is not the project.
+		if (setboxViewDepth) { setboxSavePending = true; return; }
 		// **EVERY DELIBERATE SAVE IS A FLUSH, and this one line is what makes that true without
 		// touching a hundred call sites.** A pending debounced write is owed to the same document
 		// this call is about to write whole, so it is discharged by this write and must not fire
@@ -43789,6 +43783,13 @@ var EngCalcs = EngCalcs || {};
 	function askDialog(req, done) {
 		req = req || {};
 		done = done || function () { };
+		// A question a Settings box editor asks (the friction method's confirm) is answered after
+		// its event has ended, so the answer's edit is bracketed by the box's seam of its own.
+		if (setboxEdit) {
+			done = (function (inner) {
+				return function (v) { setboxEditBegin(); try { inner(v); } finally { setboxEditEnd(); } };
+			}(done));
+		}
 		var pcd = EngCalcs.pageConfig || {};
 		var answerer = (typeof window !== 'undefined') ? window.lpnDialogAnswerer : null;
 		if (typeof answerer === 'function') { done(answerer(req)); return; }
@@ -47619,7 +47620,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Extracted from wireLabelsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the checkbox
 	// list can be rebuilt in place after labelSettings is reset, without re-wiring the close button.
-	function rebuildLabelsFields() {
+	function rebuildLabelsFields() { return withSetboxView(rebuildLabelsFieldsNow); }
+	function rebuildLabelsFieldsNow() {
 		var pc = EngCalcs.pageConfig || {}, nodeBox = document.getElementById('lpn_labels_node_fields'),
 			linkBox = document.getElementById('lpn_labels_link_fields'),
 			custBox = document.getElementById('lpn_labels_customer_fields'),
@@ -48962,7 +48964,7 @@ var EngCalcs = EngCalcs || {};
 	// appended to the host that stands under its own sub-heading in Looped-Network.php, so where a
 	// control lives is readable in one place instead of inferred from the order of a build.
 	function rebuildSettingsFields() {
-		return keepSetboxControl(rebuildSettingsFieldsNow);
+		return keepSetboxControl(function () { return withSetboxView(rebuildSettingsFieldsNow); });
 	}
 	function rebuildSettingsFieldsNow() {
 		var pc = EngCalcs.pageConfig || {};
@@ -49924,9 +49926,9 @@ var EngCalcs = EngCalcs || {};
 			// means "the file did not say" in Base. A second field labelled the same thing, in the
 			// same box, differing only by which scenario you are in, is how a user ends up typing
 			// max-day into the document.
-			var home = function () {
-				return (o.perScenario && !inBaseScenario()) ? calcTargetOf(activeScenario()) : settings.hydraulics;
-			};
+			// ONE HOME NOW: the box's seam (withSetboxView(), setboxEditEnd()) sends a scenario's edit to
+			// the scenario, the demand multiplier included, and shows the value the scenario uses.
+			var home = function () { return settings.hydraulics || (settings.hydraulics = {}); };
 			input.value = home()[key] === undefined ? '' : String(home()[key]);
 			input.addEventListener('change', function () {
 				var t = input.value.trim(), h = home();
@@ -50217,6 +50219,9 @@ var EngCalcs = EngCalcs || {};
 		restoreBtn.type = 'button';
 		restoreBtn.textContent = pc.calc_defaults || 'Restore defaults';
 		helpTip(restoreBtn, pc.lpn_settings_restore_tip);
+		// Restoring resets the project's own settings, which is Base's act: in a scenario it would
+		// reach past the scenario into every other one.
+		if (!inBaseScenario()) { restoreBtn.disabled = true; helpTip(restoreBtn, pc.lpn_settings_restore_base_only || 'Switch to Base to restore the defaults.'); }
 		restoreBtn.addEventListener('click', function () {
 			askDialog({ kind: 'confirm', text: pc.lpn_confirm_restore_defaults || 'Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own.' }, function (yes) {
 				if (!yes) { return; }
@@ -50514,6 +50519,185 @@ var EngCalcs = EngCalcs || {};
 	// happens -- the box stays a view of `settings` -- and afterwards the one control the user is
 	// working is put back where its fresh copy was built, carrying the copy's value and state. Any
 	// other control keeps its focus by moving it to the copy. See keepSetboxControl().
+	// ---- THE SETTINGS BOX IN A SCENARIO: ONE SEAM FOR EVERY EDITOR (dev/scenario-alternatives.md) ----
+	//
+	// Tom, 2026-10-05 (Q4): *"a setting changed while in Peak Hour: Peak Hour only, for every
+	// setting... We can't treat any value overrides differently."* The Settings box has some thirty
+	// editors, each writing `settings`, `labelSettings`, the [TIMES] block or the default pattern in
+	// its own way. Rather than thirty rewrites (each a place to forget), the box is given ONE seam:
+	//
+	//   - **READING**: while a scenario is open, every builder of the box runs with `settings` and
+	//     `labelSettings` pointing at the scenario's resolved view (`setboxView`, its values over
+	//     Base's), so each editor shows what the scenario uses. The view is ONE object, re-synced in
+	//     place, so an editor that captured part of it while building still writes into it.
+	//   - **WRITING**: every change, input or click inside the box is bracketed. Before it, both the
+	//     project's own settings and the view are read; after it, whatever changed in either is a
+	//     setting the person changed. In a scenario each such path goes to setScenarioSetting() (the
+	//     demand multiplier and the two times to their own writers) and the project's own value is
+	//     put back; a path no scenario may hold (a custom property's design) stays the project's.
+	//   - **UNDO**: an edit that took no undo step of its own is given one, holding the paths it
+	//     changed, in Base and in a scenario alike.
+	//
+	// Units and the coordinate frame are not settings a scenario may hold (they are outside these
+	// objects entirely), and the box says so beside Units while a scenario is open.
+	var setboxView = null, setboxViewDepth = 0, setboxSavePending = false;
+	// Deletes what `src` lacks and copies what it has, keeping every nested object's identity.
+	function setboxSyncInPlace(target, src) {
+		Object.keys(target).forEach(function (k) { if (!Object.prototype.hasOwnProperty.call(src, k)) { delete target[k]; } });
+		Object.keys(src).forEach(function (k) {
+			if (plainObject(src[k]) && plainObject(target[k])) { setboxSyncInPlace(target[k], src[k]); }
+			else { target[k] = altCopy(src[k]); }
+		});
+		return target;
+	}
+	function setboxViewSync() {
+		var scn = activeScenario(), t;
+		// Mid-edit the view holds what the person just changed; a rebuild inside the handler must
+		// not resync it away before the edit is routed.
+		if (setboxEdit && setboxView) { return setboxView; }
+		if (!setboxView) { setboxView = { settings: {}, labelSettings: {}, times: {} }; }
+		setboxSyncInPlace(setboxView.settings, plainObject(settingFor(scn, ['settings'])) ? settingFor(scn, ['settings']) : {});
+		setboxSyncInPlace(setboxView.labelSettings, plainObject(settingFor(scn, ['labelSettings'])) ? settingFor(scn, ['labelSettings']) : {});
+		t = timesForScenario(scn) || EngCalcs.lpnTimesDefaults();
+		setboxSyncInPlace(setboxView.times, Object.assign({ text: {} }, t));
+		return setboxView;
+	}
+	// Runs `fn` (a builder of the box) against the open scenario's view; in Base, as it always ran.
+	function withSetboxView(fn) {
+		var real, out;
+		if (inBaseScenario() || setboxViewDepth) { return fn(); }
+		setboxViewSync();
+		real = { settings: settings, labelSettings: labelSettings };
+		settings = setboxView.settings; labelSettings = setboxView.labelSettings;
+		setboxViewDepth++;
+		try { out = fn(); } finally {
+			setboxViewDepth--;
+			settings = real.settings; labelSettings = real.labelSettings;
+			if (setboxSavePending) { setboxSavePending = false; saveToStorage(); }
+		}
+		return out;
+	}
+	// The [TIMES] block the box edits: the project's in Base, the scenario's view otherwise.
+	function setboxEditTimes() {
+		if (inBaseScenario()) {
+			if (!doc.times) { doc.times = EngCalcs.lpnTimesDefaults(); doc.times.text = {}; }
+			return doc.times;
+		}
+		if (!setboxView) { setboxViewSync(); }
+		return setboxView.times;
+	}
+	function setboxState() {
+		return JSON.stringify({ settings: settings, labelSettings: labelSettings, defaultPattern: doc.defaultPattern === undefined ? null : doc.defaultPattern,
+			view: setboxView ? setboxView : null });
+	}
+	// Every leaf that differs between two states, as {root, path, before, after}; an atomic object
+	// (the quality choice) is one leaf.
+	function setboxDiff(a, b) {
+		var out = [], seen = {};
+		function leaves(o, prefix) { var m = {}; settingLeaves(plainObject(o) ? o : {}).forEach(function (l) { m[JSON.stringify(prefix.concat(l.path))] = l.value; }); return m; }
+		function cmp(x, y, prefix, root) {
+			var lx = leaves(x, prefix), ly = leaves(y, prefix);
+			Object.keys(lx).concat(Object.keys(ly)).forEach(function (k) {
+				if (seen[root + k]) { return; }
+				seen[root + k] = true;
+				if (JSON.stringify(lx[k]) !== JSON.stringify(ly[k])) { out.push({ root: root, path: JSON.parse(k), before: lx[k], after: ly[k] }); }
+			});
+		}
+		cmp(a.settings, b.settings, ['settings'], 'project');
+		cmp(a.labelSettings, b.labelSettings, ['labelSettings'], 'project');
+		if (a.defaultPattern !== b.defaultPattern) { out.push({ root: 'project', path: ['defaultPattern'], before: a.defaultPattern, after: b.defaultPattern }); }
+		if (a.view && b.view) {
+			cmp(a.view.settings, b.view.settings, ['settings'], 'view');
+			cmp(a.view.labelSettings, b.view.labelSettings, ['labelSettings'], 'view');
+			cmp(a.view.times, b.view.times, ['times'], 'view');
+		}
+		return out;
+	}
+	var setboxEdit = null;
+	function setboxEditBegin() {
+		if (setboxEdit) { return; }
+		if (!inBaseScenario()) { setboxViewSync(); }
+		setboxEdit = { state: JSON.parse(setboxState()), undoLen: undoStack.length, undoTop: undoStack[undoStack.length - 1] };
+		// A handler that stops the event before it bubbles to the box still ends here.
+		setTimeout(setboxEditEnd, 0);
+	}
+	function setboxEditEnd() {
+		var ed = setboxEdit, changes, scn = activeScenario(), tookStep, scenarioPaths = [], basePaths = [], times = {};
+		if (!ed) { return; }
+		setboxEdit = null;
+		changes = setboxDiff(ed.state, JSON.parse(setboxState()));
+		if (!changes.length) { return; }
+		tookStep = undoStack.length !== ed.undoLen || undoStack[undoStack.length - 1] !== ed.undoTop;
+		changes.forEach(function (c) {
+			var cat = c.path[0] === 'times' ? 'calculation' : categoryOfSetting(c.path);
+			if (inBaseScenario() || cat === null || cat === undefined) {
+				// The project's own: a Base edit, or a path no scenario may hold. A change made in
+				// the view of such a path lands on the project too.
+				if (c.root === 'view' && c.path[0] !== 'times') { settingProjectPut(c.path, c.after); }
+				basePaths.push(c);
+				return;
+			}
+			// A scenario's: the project's own value goes back, and the scenario takes the new one.
+			if (c.root === 'project') { setboxPut(c.path, c.before); }
+			scenarioPaths.push(c);
+		});
+		// The edit's undo step: the one its handler took, else one taken now, holding the state
+		// before the edit; either way it carries the project paths the edit changed, and only those.
+		if (!tookStep) {
+			basePaths.forEach(function (c) { if (c.root === 'project' || c.path[0] !== 'times') { setboxPut(c.path, c.before); } });
+			saveUndoSnapshot();
+			basePaths.forEach(function (c) { if (c.root === 'project' || c.path[0] !== 'times') { setboxPut(c.path, c.after); } });
+		}
+		undoTopHoldsSettingPaths(basePaths.filter(function (c) { return settingProjectRoot(c.path[0]); })
+			.map(function (c) { return { path: c.path, value: c.before }; }), true);
+		scenarioPaths.forEach(function (c) {
+			var s = c.path.join('.'), v = c.after;
+			if (c.path[0] === 'times') {
+				if (c.path[1] === 'text') { times[c.path[2]] = true; } else { times[c.path[1]] = true; }
+				return;
+			}
+			if (s === 'settings.hydraulics.demandMultiplier') {
+				touchTree('demandMultiplier');
+				if (typeof v === 'number' && isFinite(v)) { calcTargetOf(scn).demandMultiplier = v; } else { delete calcTargetOf(scn).demandMultiplier; }
+				return;
+			}
+			// Unstated in the scenario where Base states it: held as an explicit null ("not stated
+			// here"), since clearing the override would put Base's value back.
+			if (v === undefined) { v = settingFor(baseScenario(), c.path) === undefined ? undefined : null; }
+			setScenarioSetting(scn, c.path, v);
+		});
+		Object.keys(times).forEach(function (k) {
+			var t = setboxView.times, text = t.text && typeof t.text[k] === 'string' ? t.text[k] : (EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(t[k]) : String(t[k]));
+			if (LPN_SCENARIO_TIME_KEYS.indexOf(k) >= 0) { setScenarioTime(calcTargetOf(scn), k, text); return; }
+			setScenarioSetting(scn, ['times', k], t[k]);
+			setScenarioSetting(scn, ['times', 'text', k], typeof t[k] === 'number' ? text : undefined);
+		});
+		if (scenarioPaths.length) { settingTableAfterEditNow(); }
+	}
+	function setboxPut(path, v) {
+		if (path[0] === 'defaultPattern') { doc.defaultPattern = v === undefined ? null : v; } else { settingProjectPut(path, v); }
+	}
+	function wireSetboxScenarioSeam(box) {
+		if (!box || box._lpnSeam) { return; }
+		box._lpnSeam = true;
+		['change', 'input', 'click'].forEach(function (type) {
+			box.addEventListener(type, setboxEditBegin, true);
+			box.addEventListener(type, function () { setboxEditEnd(); }, false);
+		});
+	}
+	// Beside Units, while a scenario is open: they are the same in every scenario.
+	function setboxUnitsNote() {
+		var host = document.getElementById('lpn_set_units_fields'), note = document.getElementById('lpn_set_units_scn_note'), pc = EngCalcs.pageConfig || {};
+		if (!host) { return; }
+		if (inBaseScenario()) { if (note && note.parentNode) { note.parentNode.removeChild(note); } return; }
+		if (!note) {
+			note = document.createElement('p');
+			note.id = 'lpn_set_units_scn_note';
+			note.className = 'lpn-set-note';
+			host.insertBefore(note, host.firstChild);
+		}
+		note.textContent = pc.lpn_settings_units_one_project || 'Units are the same in every scenario.';
+	}
 	function rebuildSettingsBox() {
 		keepSetboxControl(rebuildSettingsBoxNow);
 	}
@@ -50524,6 +50708,7 @@ var EngCalcs = EngCalcs || {};
 		// js/lpn-time.js owns every string in its own section, so it renders it (see lpnTimeInit's
 		// host seam). Absent that file, the section is simply empty rather than broken.
 		if (EngCalcs.lpnTimeRenderSettings) { EngCalcs.lpnTimeRenderSettings(); }
+		setboxUnitsNote();
 		buildSettingsIndex();
 		applySetboxFilter();
 		// **THE FIND BOX RIDES THIS SEAM RATHER THAN KEEPING ITS OWN** (Task 580). Everything that
@@ -51138,6 +51323,7 @@ var EngCalcs = EngCalcs || {};
 		var box = setboxEl(), x = document.getElementById('lpn_setbox_close'),
 			filter = document.getElementById('lpn_setbox_filter');
 		if (!box) { return; }
+		wireSetboxScenarioSeam(box);
 		if (x) { x.addEventListener('click', closeSettingsBox); }
 		// Dragged by its chrome, exactly like the property popup and Find: `e.target` is the box
 		// itself only in the padded band, so a drag can never start on a control.
@@ -53168,7 +53354,7 @@ var EngCalcs = EngCalcs || {};
 	// scope marker rather than letting the section's silence imply the wrong one.
 	function settingsDefaultPatternRow(host, rowFn) {
 		var pc = EngCalcs.pageConfig || {}, sel = document.createElement('select');
-		libFillPatternOptions(sel, doc.defaultPattern);
+		libFillPatternOptions(sel, scnDefaultPattern());
 		sel.addEventListener('change', function () {
 			doc.defaultPattern = sel.value || null;
 			libCommit();
@@ -59476,14 +59662,16 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (value === undefined) { delete node[path[path.length - 1]]; } else { node[path[path.length - 1]] = altCopy(value); }
 	}
-	function undoTopHoldsSettingPaths(paths) {
+	// `paths` are paths whose CURRENT value is the one to put back, or, with `given`, entries
+	// {path, value} carrying the value from before the edit. The first entry for a path wins.
+	function undoTopHoldsSettingPaths(paths, given) {
 		var top = undoStack[undoStack.length - 1];
 		if (!top) { return; }
 		top.settingPaths = top.settingPaths || [];
 		paths.forEach(function (p) {
-			var k = JSON.stringify(p);
+			var path = given ? p.path : p, k = JSON.stringify(path);
 			if (top.settingPaths.some(function (e) { return JSON.stringify(e.path) === k; })) { return; }
-			top.settingPaths.push({ path: p.slice(), value: settingProjectGet(p) });
+			top.settingPaths.push({ path: path.slice(), value: given ? altCopy(p.value) : settingProjectGet(path) });
 		});
 	}
 	// Puts the page back to one snapshot, for undo() and redo() alike.
@@ -66492,6 +66680,8 @@ var EngCalcs = EngCalcs || {};
 			// Which scenarios state their own value of each, for the note under Settings > Time.
 			timeOverrides: scenarioTimeOverrides,
 			openScenarioOptions: function (id, key) { openSettingsTableAt(id, ['times', key]); },
+			// The [TIMES] block Settings > Time edits: a scenario's view while one is open.
+			editTimes: setboxEditTimes,
 			apply: applySolveResult, status: setStatus, notice: showSlowAdvice, solve: scheduleSolve,
 			// **AND THE UNDEBOUNCED ONE, which is what asking for a run needs** (Task 248,
 			// 2026-08-19). A period run is provoked by a deliberate act -- the Run button, or a

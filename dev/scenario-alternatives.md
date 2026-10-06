@@ -400,50 +400,65 @@ extension, there will have to be a settings Table."* Built as one more table of 
 widths, copy, paste, Fill down, Print, Show scenarios, the override wash, its tip and Clear override
 are the asset tables' own.
 
-- **A row is a setting path** (`settingTableRows()`): every leaf the project states, by
-  `settingLeaves()`'s rule, plus every leaf any scenario holds, plus the demand multiplier and the
-  seven `[TIMES]` values, always. Only paths `categoryOfSetting()` names a category for: units and
-  the coordinate frame are never rows. A row's id is the path as JSON.
+- **Every setting a scenario may hold is a row, stated or not** (`settingTableRows()`): the leaves
+  of a fresh project's settings, the ones it leaves unstated (`LPN_SETTAB_OPTIONAL`: friction
+  method, the hydraulic options, reactions, energy), the colour and contour settings of the fields
+  being coloured, every leaf the project or any scenario states, and the seven `[TIMES]` values. An
+  unstated row shows the value the page uses, marked "(default)". A legacy setting
+  (`LPN_SETTAB_SUPERSEDED`) is hidden while the one that replaced it is stated. Units and the
+  coordinate frame are never rows. A row's id is the path as JSON.
 - **Columns: Major heading, Minor heading, Category, Setting, Value** (Tom, 2026-10-05). Major and
-  Minor are where the Settings box shows it. **Setting is always visitor words, never a stored
-  name**: the box's own label, else a key of its own (`lpn_settings_row_*`), and a map's member in
-  the Labels box's and toolbar's words ("Node labels: Pressure, Decimals", "ID prefixes, Junction").
-  `settings-table-labels-harness.js` fails a stored-name-shaped cell on every example with every
-  view option on. With Show scenarios on, Scenario sits after Setting.
+  Minor are where the Settings box shows it; the label ranks and drops have their own Minor heading.
+  **Setting is always visitor words, never a stored name**: the box's own label, else a key of its
+  own (`lpn_settings_row_*`), a map's member in the Labels box's and toolbar's words ("Node labels:
+  Pressure, Decimals", "ID prefixes, Junction"), contour rows saying Contour, and new-asset values
+  saying "New assets: Diameter". `settings-table-labels-harness.js` fails a stored-name-shaped cell
+  on every example with every view option on. With Show scenarios on, Scenario sits after Setting.
+- **Value is in visitor words**: a choice or a yes/no is a select of the Settings box's own options;
+  a number carries its unit; an object (Map view, colour band boundaries, Quality parameter) is a
+  short read-only summary, edited in its own box. A wrong entry reverts and says nothing, as the
+  asset tables do. The screen-reader label is the setting's name.
 - **Value is read with `settingFor()` in the row's scenario and written with
   `setScenarioSetting()`**; Base writes the project's own object. The demand multiplier and the run
   time and time step keep their own homes and writers (`calcTargetOf()`, `setScenarioTime()`). A time
-  keeps its typed text beside its seconds. A typed value is read back as the kind of thing the row
-  holds (number, yes/no, a choice, a time, JSON for an object), and refused, costing no undo step,
-  when it is not one. **Every edit is an undo step, Base's included**: a step that edits `settings`
-  or `labelSettings` carries them (`settingsState`, opt-in per step, `undoTopHoldsSettings()`). The
-  Settings box shares the gap and is not closed here: most of its editors take no undo step at all,
-  so each would need one; only its custom property Add and Remove, which already took a step that
-  did not hold the settings, now carry them.
+  keeps its typed text beside its seconds.
+- **The Settings box writes the open scenario** (Tom, Q4), through one seam rather than its thirty
+  editors (`withSetboxView()`, `setboxEditBegin()`/`setboxEditEnd()`, `wireSetboxScenarioSeam()`,
+  `setboxEditTimes()`): in a scenario its builders run against the scenario's resolved view, so the
+  box shows what the scenario uses; every change, input or click in the Settings and Contour boxes
+  is bracketed, and whatever setting it changed goes to the scenario, the project's own value put
+  back. A path no scenario may hold (a custom property's design) stays the project's; an answer to
+  a question the box asked (the friction method's confirm) is bracketed too. Units say "Units are
+  the same in every scenario" while a scenario is open; Restore defaults is Base's act only.
+- **Every edit is an undo step, the box's included, and restores only what it changed**: a step
+  carries the setting paths it edited with their earlier values (`settingPaths`,
+  `undoTopHoldsSettingPaths()`), never the whole settings object, so Ctrl+Z on one edit never reverts
+  another made after it (Perry's repro: a table multiplier, then a box friction method).
+- **A new scenario inherits everything, the demand multiplier included**: nothing is seeded, so
+  nothing is marked that the count ignores, and the scenario follows Base until given its own. Tom's
+  2026-09-02 complaint the seed answered is answered by the box showing the inherited value.
 - **An override is marked by `hasOverride()`'s rule**: local where the scenario writes
-  (`settingRowIsLocal()`). A demand multiplier seeded at a scenario's birth is an override by
-  presence, so it is marked, though the count leaves it out until it differs.
+  (`settingRowIsLocal()`).
 - **Friction method varies by scenario and reinterprets roughness, never converts it**; the value
   warning follows the method in effect, row by row under Show scenarios (`paneValueWarn()` judges a
   row in its own scenario).
-- **Not filtered** by Find or by Selection only, and its menu has no map or Delete element items.
+- **Not filtered** by Find or by Selection only; its menu has no map, Delete or Delete element items.
 - **The Alternatives table's three option columns retired** (Q7); its last two columns are
   Presentation and Calculation. The note under Settings, Time names each scenario holding its own
   run time or step, and its button opens the Settings table on that row.
-- **Visible in Basic mode**, as Show scenarios already is: it is a table, and in Basic mode it is now
-  the only place a scenario's own run time is typed.
+- **Visible in Basic mode: CC's call, for Tom to judge.** Show scenarios already is, it is a table,
+  and in Basic mode it is now the only table where a scenario's own settings are audited. The
+  alternative is to show the tab only with Basic mode off, as the Alternatives preview is.
 
 Harnesses: `dev/lpn-spike/settings-table-browser-harness.js` (real Chromium: Net1 and Net3 lat/lon;
-a Base edit, a child scenario's friction method, demand multiplier and text size, solve before and
-after, Clear override, the Alternatives table's columns and counts); the two option harnesses
-(`scenario-time-option-harness.js`, `scenario-tree-harness.js`) now type through the Settings
-table's Value cell.
+Base edits and their undo, a child scenario's friction method, demand multiplier and text size,
+solve before and after, Clear override, the Settings box writing Peak and not Base, Perry's undo
+repro, the Alternatives table's columns and counts); `settings-table-labels-harness.js`; the two
+option harnesses (`scenario-time-option-harness.js`, `scenario-tree-harness.js`) type through the
+Settings table's Value cell.
 
-**Still to build (the editing half):** the Settings box itself still shows and edits the project's
-values in every scenario. In a scenario it must read `settingFor()` and write
-`setScenarioSetting()`, with a held value marked, so that "a setting changed in Peak Hour changes
-Peak Hour only" is true from the box as it is from the table; and the view's settings editable
-there beside a deliberate "Hold this view in this scenario".
+**Still to build:** a held value marked in the Settings box itself (Ida's amber edge and "Base:
+value", Clear), and the view's settings there beside a deliberate "Hold this view in this scenario".
 
 ### Questions for Tom
 
@@ -570,8 +585,8 @@ The road, each stage shippable alone, each hidden from Basic mode until the Adva
    exclusion; `scenario.settings`; the read and write seams; the table counts settings.
 3. **Done (2026-10-06): every setting reader routed through `effectiveSetting()`**, so a setting
    override changes the map and the solve; a scenario may hold its own view. Byte-identical
-   behaviour with no override is held by `scenario-settings-routing-harness.js`. **3b, the
-   Settings table, built 2026-10-06; the Settings box's editing half is next** (see "Stage 3b").
+   behaviour with no override is held by `scenario-settings-routing-harness.js`. **3b, built
+   2026-10-06: the Settings table, and the Settings box writing the open scenario** (see "Stage 3b").
 4. **Built (2026-10-05): the stored tree (choice B), additively.** Shared and named alternatives,
    alternatives of any depth, calculation sets. See below.
 5. **Built (2026-10-05): the scenario tree.** A scenario whose parent is not Base inherits its
@@ -661,9 +676,8 @@ that holds none shows Base's live view.
 - The edit marker means "local in the alternative this scenario writes to"; an inherited value is
   not marked.
 
-**UI obligation:** a new scenario is seeded with the project's demand multiplier, which is a local
-Calculation value, so assigning it a calculation set is refused until that value is promoted or
-discarded. The screen that assigns a set must offer one or the other.
+**No UI obligation left from seeding:** a new scenario is no longer seeded with the project's
+demand multiplier (stage 3b), so assigning it a calculation set meets no local value to refuse.
 
 **Not yet:** no screen for any of it; the Alternatives table and the override count still show
 each scenario's own values; a unit change converts element values in stored alternatives but, as
