@@ -160,12 +160,27 @@ ec_ft_expect('units: preset clicks by asked tag list the two English rows and ex
     ec_ft_line($out, '/\n\s+1 en-gb\tpreset:us\n/') && ec_ft_line($out, '/\n\s+1 en-us\tpreset:si\n/')
     && !ec_ft_line($out, '/es-mx\tpreset:si/'));
 
+// -- the window starts at the earliest FIRST row, not at a replayed row's older stamp --
+ec_ft_expect('window: the fixture reports its first row as the start',
+    ec_ft_line($out, '/WINDOW\s+2026-09-01T00:00:00Z\s+\.\./'), $out);
+$rows3 = $rows;
+// An offline-queue replay: arrives last, stamped a month before the log began.
+$rows3['engcalcs-human-view.log'][] = "2026-08-01T00:00:00Z{$T}Manning-Trap{$T}en{$T}en-us{$T}fine{$T}visit";
+$dir3 = $dir . '-c';
+@mkdir($dir3, 0700, true);
+foreach ($rows3 as $name => $lines) {
+    file_put_contents("$dir3/$name", $lines ? implode("\n", $lines) . "\n" : '');
+}
+$out3 = (string) shell_exec('bash ' . escapeshellarg($script) . ' --archive=' . escapeshellarg($dir3) . ' 2>&1');
+ec_ft_expect('window: a replayed row stamped 2026-08-01 does not stretch the window back to it',
+    ec_ft_line($out3, '/WINDOW\s+2026-09-01T00:00:00Z\s+\.\./') && !ec_ft_line($out3, '/WINDOW\s+2026-08-01/'), $out3);
+
 // -- the state file the report writes lands in the fixture, not in log/ --
 ec_ft_expect('the run wrote its window state beside the fixture and nowhere else',
     is_file("$dir/.last-report-window"));
 
 // ---- cleanup -------------------------------------------------------------------------------------
-foreach ([$dir, $dir2] as $d) {
+foreach ([$dir, $dir2, $dir3] as $d) {
     foreach (glob("$d/{,.}*", GLOB_BRACE) ?: [] as $f) { if (is_file($f)) @unlink($f); }
     @rmdir($d);
 }

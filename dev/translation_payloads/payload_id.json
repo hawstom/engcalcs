@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 2351,
-        "delta_key_count": 125,
+        "expected_key_count": 2361,
+        "delta_key_count": 135,
         "exempt_key_count": 49,
         "exempt_keys": [
             "u_imgd",
@@ -744,6 +744,9 @@
         "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
         "lpn_pane_sel_only": "Selection only",
         "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
+        "lpn_pane_scn_show": "Show scenarios",
+        "lpn_pane_clear_override": "Clear override",
+        "lpn_pane_scn_alt_tip": "{category} alt.: {alternative}",
         "lpn_find_scope_source": "Source",
         "lpn_find_source_no_chemical": "No chemical is being tracked, so no node has a source.",
         "lpn_profile_open": "Open EPANET profile file…",
@@ -764,6 +767,13 @@
         "lpn_mode_add_chain": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
         "lpn_cp_allow_tip": "Allow only these characters:",
         "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
+        "lpn_valwarn_diameter": "A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.",
+        "lpn_valwarn_hw": "A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.",
+        "lpn_valwarn_manning": "A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.",
+        "lpn_valwarn_dw": "A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.",
+        "lpn_valwarn_positive": "EPANET refuses zero or a negative number here.",
+        "lpn_valwarn_negative": "EPANET refuses a negative number here.",
+        "lpn_valwarn_tank_levels": "EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.",
         "lpn_alt_calc_options": "Calculation options",
         "lpn_scenario_duration_tip": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
         "lpn_scenario_hyd_step_tip": "Leave blank to inherit from parent.",
@@ -871,6 +881,9 @@
         "lpn_pane_filter_sel_none": "None of the selected elements are in this table.",
         "lpn_pane_sel_only": "Selection only",
         "lpn_pane_sel_only_none": "No elements are selected. Select elements on the map first.",
+        "lpn_pane_scn_show": "Show scenarios",
+        "lpn_pane_clear_override": "Clear override",
+        "lpn_pane_scn_alt_tip": "{category} alt.: {alternative}",
         "lpn_find_scope_source": "Source",
         "lpn_find_source_no_chemical": "No chemical is being tracked, so no node has a source.",
         "lpn_profile_open": "Open EPANET profile file…",
@@ -891,6 +904,13 @@
         "lpn_mode_add_chain": "Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.",
         "lpn_cp_allow_tip": "Allow only these characters:",
         "lpn_cp_characters_tip": "\"@\" means any letter; \"#\" means any numeric digit, and you must separately list \"-\", \".\", and \",\" if they are allowed; and any white space characters must be between other characters.",
+        "lpn_valwarn_diameter": "A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.",
+        "lpn_valwarn_hw": "A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.",
+        "lpn_valwarn_manning": "A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.",
+        "lpn_valwarn_dw": "A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.",
+        "lpn_valwarn_positive": "EPANET refuses zero or a negative number here.",
+        "lpn_valwarn_negative": "EPANET refuses a negative number here.",
+        "lpn_valwarn_tank_levels": "EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.",
         "lpn_alt_calc_options": "Calculation options",
         "lpn_scenario_duration_tip": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
         "lpn_scenario_hyd_step_tip": "Leave blank to inherit from parent.",
@@ -1238,6 +1258,54 @@
                 }
             }
         },
+        "lpn_pane_scn_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Tidak ada yang cocok dengan filter di tabel ini.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Perbesar & pilih",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_clear_override": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Tidak ada yang cocok dengan filter di tabel ini.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Perbesar & pilih",
+                    "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_pane_scn_alt_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_pane_filter_none",
+                    "value": "Tidak ada yang cocok dengan filter di tabel ini.",
+                    "english": "Nothing in this table matches the filter."
+                },
+                "next_translated": {
+                    "key": "lpn_pane_goto_tip",
+                    "value": "Perbesar & pilih",
+                    "english": "Zoom & select"
+                }
+            }
+        },
         "lpn_find_scope_source": {
             "reason": "missing",
             "current_value": null,
@@ -1555,6 +1623,118 @@
                     "key": "lpn_cp_restrict_mode",
                     "value": "Izinkan atau batasi",
                     "english": "Allow or restrict"
+                }
+            }
+        },
+        "lpn_valwarn_diameter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_cp_flag",
+                    "value": "{label}: {reason} Nilai tersebut disimpan persis seperti yang Anda ketik.",
+                    "english": "{label}: {reason} The value is kept exactly as you entered it."
+                },
+                "next_translated": {
+                    "key": "lpn_cp_bad_number",
+                    "value": "Nilai ini bukan angka seperti yang disyaratkan untuk properti ini.",
+                    "english": "This value is not a number as required for this property."
+                }
+            }
+        },
+        "lpn_valwarn_hw": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_cp_flag",
+                    "value": "{label}: {reason} Nilai tersebut disimpan persis seperti yang Anda ketik.",
+                    "english": "{label}: {reason} The value is kept exactly as you entered it."
+                },
+                "next_translated": {
+                    "key": "lpn_cp_bad_number",
+                    "value": "Nilai ini bukan angka seperti yang disyaratkan untuk properti ini.",
+                    "english": "This value is not a number as required for this property."
+                }
+            }
+        },
+        "lpn_valwarn_manning": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_cp_flag",
+                    "value": "{label}: {reason} Nilai tersebut disimpan persis seperti yang Anda ketik.",
+                    "english": "{label}: {reason} The value is kept exactly as you entered it."
+                },
+                "next_translated": {
+                    "key": "lpn_cp_bad_number",
+                    "value": "Nilai ini bukan angka seperti yang disyaratkan untuk properti ini.",
+                    "english": "This value is not a number as required for this property."
+                }
+            }
+        },
+        "lpn_valwarn_dw": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_cp_flag",
+                    "value": "{label}: {reason} Nilai tersebut disimpan persis seperti yang Anda ketik.",
+                    "english": "{label}: {reason} The value is kept exactly as you entered it."
+                },
+                "next_translated": {
+                    "key": "lpn_cp_bad_number",
+                    "value": "Nilai ini bukan angka seperti yang disyaratkan untuk properti ini.",
+                    "english": "This value is not a number as required for this property."
+                }
+            }
+        },
+        "lpn_valwarn_positive": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_cp_flag",
+                    "value": "{label}: {reason} Nilai tersebut disimpan persis seperti yang Anda ketik.",
+                    "english": "{label}: {reason} The value is kept exactly as you entered it."
+                },
+                "next_translated": {
+                    "key": "lpn_cp_bad_number",
+                    "value": "Nilai ini bukan angka seperti yang disyaratkan untuk properti ini.",
+                    "english": "This value is not a number as required for this property."
+                }
+            }
+        },
+        "lpn_valwarn_negative": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_cp_flag",
+                    "value": "{label}: {reason} Nilai tersebut disimpan persis seperti yang Anda ketik.",
+                    "english": "{label}: {reason} The value is kept exactly as you entered it."
+                },
+                "next_translated": {
+                    "key": "lpn_cp_bad_number",
+                    "value": "Nilai ini bukan angka seperti yang disyaratkan untuk properti ini.",
+                    "english": "This value is not a number as required for this property."
+                }
+            }
+        },
+        "lpn_valwarn_tank_levels": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_cp_flag",
+                    "value": "{label}: {reason} Nilai tersebut disimpan persis seperti yang Anda ketik.",
+                    "english": "{label}: {reason} The value is kept exactly as you entered it."
+                },
+                "next_translated": {
+                    "key": "lpn_cp_bad_number",
+                    "value": "Nilai ini bukan angka seperti yang disyaratkan untuk properti ini.",
+                    "english": "This value is not a number as required for this property."
                 }
             }
         },

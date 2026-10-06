@@ -3880,3 +3880,8 @@ Lesson: pane toggle button toggles; sort lives on the arrow button; dialogs rout
 - OBSERVED defect (low): String.replace with a name holding `$&` or `{file}` mangles the status line (project named `a$&b {file} x`). Files themselves fine.
 - Other languages have no new keys, so they fall back to English (no stale translation).
 - Not checkable: Windows Explorer, 7-Zip, macOS Archive Utility, EPANET desktop.
+## feat/value-warning at 424b278e (OBSERVED, 2026-10-06; re-verify before citing)
+OBSERVED real Chromium: branch's own harness passes. All 7 shipped examples: 0 warnings in every table. Undo/redo, unit change (in to mm: thresholds 12 and 3810 mm), method change all refresh the glyph. Net3 Pipes tab fill median ~9-10 ms before and after; 117 glyphs painted at no measurable cost.
+OBSERVED DEFECT: touch (hover none): tapping the glyph in the Properties box opens the tip AND focuses the Diameter input (label activation), the exact 2026-08-29 complaint; initTips only cancels this on `.ec-tip`, the glyph here is a bare `.ec-help`. Tables-pane tap also focuses a cell input.
+OBSERVED: Basic-example-SI-units opens with roughness unit ft (pre-existing); under D-W its tip reads ft in an SI project.
+SPECULATION: how the glyph looks (zero-width inset over the input end) not judged.

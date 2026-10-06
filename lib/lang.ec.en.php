@@ -1487,6 +1487,16 @@ $ec_lang['lpn_pane_filter_sel_and']='Filtered by {q} and selection only. Showing
 $ec_lang['lpn_pane_filter_sel_none']='None of the selected elements are in this table.';
 $ec_lang['lpn_pane_sel_only']='Selection only';
 $ec_lang['lpn_pane_sel_only_none']='No elements are selected. Select elements on the map first.';
+// Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
+// scenario, with a Scenario column after ID.
+$ec_lang['lpn_pane_scn_show']='Show scenarios';
+// The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
+// scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+$ec_lang['lpn_pane_clear_override']='Clear override';
+// The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
+// Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
+// in Basic mode is its scenario's.
+$ec_lang['lpn_pane_scn_alt_tip']='{category} alt.: {alternative}';
 // The pin beside the ID in the first column. The ID itself was this control until 2026-09-19,
 // underlined and turning link blue; the ID is an ordinary editable cell now and this is the way
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip
@@ -2923,6 +2933,13 @@ $ec_lang['lpn_cp_val_hyphen']='hyphen-case';
 // is a way of asking a question about the data, so nothing is ever cleared or refused: the value
 // stays exactly as it was typed and says what is wrong with it.
 $ec_lang['lpn_cp_flag']='{label}: {reason} The value is kept exactly as you entered it.';
+$ec_lang['lpn_valwarn_diameter']='A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.';
+$ec_lang['lpn_valwarn_hw']='A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.';
+$ec_lang['lpn_valwarn_manning']='A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.';
+$ec_lang['lpn_valwarn_dw']='A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.';
+$ec_lang['lpn_valwarn_positive']='EPANET refuses zero or a negative number here.';
+$ec_lang['lpn_valwarn_negative']='EPANET refuses a negative number here.';
+$ec_lang['lpn_valwarn_tank_levels']='EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.';
 $ec_lang['lpn_cp_bad_number']='This value is not a number as required for this property.';
 $ec_lang['lpn_cp_bad_integer']='This value is not a whole number as required for this property.';
 $ec_lang['lpn_cp_bad_case']='This value is not ALL CAPS as required for this property.';

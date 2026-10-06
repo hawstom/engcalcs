@@ -5,6 +5,22 @@
 - **Rank honestly, including against myself.** Something I found is not thereby important.
 - **State the case once and do not campaign.**
 
+## 0m. Write to Gusnet's author first, then QGISRed; before either, test one DXF yourself (2026-10-06, Tom's three replies)
+
+Tom said he wants to collaborate with QGISRed and Giswater, and asked whether DXF attribute data works in all DWG software. Evidence is in journal 2026-10-06.
+1. **Open a GitHub Discussion or Issue at github.com/angusmcb/gusnet** asking what layer and field schema it writes, and offering the 27-language glossary. One author, active, translated, built to be adjacent. Cost: one message. Odds: best of the field.
+2. **QGISRed: a GitHub Issue at github.com/qgisred/QGISRed plus a plain email to Prof. Fernando Martinez Alzamora (published on qgisred.upv.es and the UPV IIAMA pages).** Ask for the project-folder schema and whether a translated, no-install viewer helps them. Say plainly that their plugin is Windows-only and English-only. Cost: one message. Odds: moderate, an academic group that wants reach.
+3. **Giswater: info@giswater.org or info@bgeo.es, addressed to Josep Lluis Sala (Association) or Xavier Torret (R+D).** A services business; expect a training or integration angle, and be ready to say what is free. Its forum is nearly silent (about 8 months since the last post), so email beats forum.
+4. **Do not use epanet-js's Founding Partner program for the GPL project;** it is for organisations that rely on modelling (unlimited licences, roadmap access) and may suit Tom's firm. support@epanetjs.com is the plain route.
+5. **For DXF, post one test file on forum.bricsys.com (now Octave BricsCAD)** with XDATA, an extension dictionary and attributed blocks, and ask which survive and show. Free, same day, and answers the question across BricsCAD without a corporate contact. Then open the same file in plain AutoCAD (XDLIST via LISP, LIST), ZWCAD and LibreCAD. I have only documentation and search summaries; nobody has tested it.
+6. **DXF target: ASCII R2000 (AC1015)**, layers per asset type, and attributed blocks for nodes (what utility CAD standards already ask for: New Jersey American Water, Charlotte County), XDATA for the id as the machine key, TEXT for results. Never rely on Map 3D Object Data ("ADE"): it does not survive DXF export (cadforum.cz, Autodesk idea 6257205).
+7. **If an in-AutoCAD piece is ever built, a .lsp reaches AutoCAD LT 2024+ (Windows), AutoCAD, BricsCAD and ZWCAD; a .NET app does not reach LT.** Ask Mary's "friends" first, as Tom said; I found no demand evidence for any in-AutoCAD tool.
+Size: items 1-3 are three emails; 5 is one afternoon; 6 is a design note. Evidence of demand for a "dumb annotated" DXF: EPANET's stock DXF map export plus the EPANET Plus add-on built to improve it and the "tender drawings" request (journal 2026-10-06 C). No demand numbers exist.
+
+## 0n. Name check: Bricsys is Octave BricsCAD since 2026-05-28
+
+Anywhere the repo or landing pages say "Bricsys" (including the old 2026-10-05 notes) should read "Octave BricsCAD (formerly Bricsys)". Source: digitalengineering247.com/article/bricsys-is-now-octave. Cost: a grep.
+
 ## 0a. Before building epanet-plus-plus.org / epanetpp.org: settle the "++" completeness-claim
 tension, and pick ONE canonical domain
 

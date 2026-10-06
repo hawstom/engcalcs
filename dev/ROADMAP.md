@@ -230,6 +230,12 @@ the block.
   selection set from menu choices (his leading candidate: Highlighted / Chosen), and an audit of tip
   pollution in lpn (status strip, click-to-open, delays in master styles, tips that talk down).
   Ida's audit: `dev/tip-and-selection-audit.md` (branch `chore/ida-tip`); decisions go to him as an interview.
+- 100|775| **File, Convert as: what is left of the Fotobi, Ghana session.**
+  Tom, 2026-10-06. FIXED: Convert as on an empty project opened a file picker (it now opens the box).
+  NOT REPRODUCED: the old project losing its node symbols and its view after a conversion
+  (`convert-as-fotobi-harness.js`, four paths, master and production 9c71d54f); ask which surface.
+  HIS CALL: EPSG:3857 and 4326 are the same lat/lon project here (R-218), so choosing 3857 in File,
+  New or Convert as silently becomes 4326. Options: explain, hide the 3857 row, or make 3857 real.
 - 75|578| **Fire flow: the EPS frame and the Run concept, extracted from 530.**
   Everything else in Task 530 shipped and that task is closed. Two phases were never built and are
   kept here so they are not lost in a closed block.
@@ -336,12 +342,6 @@ the block.
   goal. The tabs read the tree Task 721 builds. Export/import as a file first (no account, no
   upload); a Sheets sync is a fifth third-party service, so a `privacy.php` paragraph and his call.
   Mary, Sue and Declan advised against Sheets as the live store (2026-09-30); a sync is not that.
-- 75|766| **Show scenarios in the Tables pane: one row per asset per scenario.**
-  Tom, 2026-10-05/06: right-click "Show scenarios" adds ONE column, Scenario (*"My mistake. Scenario
-  column only"*); an override cell's tip names its alternative ("Demand alt.: Max day"); ties keep
-  their previous order in every sort (Google Sheets). *"Scenarios must be added to tables so we can
-  audit these things. And by extension, there will have to be a settings Table."* Built on
-  `feat/scenario-table`; the settings table is next, after the setting readers (Task 721).
 - 75|756| **Cross-platform: the suite as a desktop application, beyond the web folder.**
   Tom, 2026-09-30: *"Put a cross platform project on our roadmap priority 75. Plan where/how to move
   the project to transcend the web-centric hawsedc.com/engcalcs folder. Windows or Linux? Plan what
@@ -356,22 +356,35 @@ the block.
 - 75|768| **Report a problem: more information and freedom than one anonymous click.**
   Tom, 2026-10-05: *"those links open a small form that allows, but doesn't require, a message, an
   email address, and some selectors or canned phrases."* Ida's ranking (journal 2026-10-05): the
-  error toast carries its own link with the code, and contact.php gains a category and an optional
-  email label (building on `feat/feedback`); the in-page Send feedback dialog is the larger build.
+  Tom, 2026-10-06, rejecting the cheap build (new links, a better contact.php): *"Cheap is no good.
+  Bigger build is needed... Do it right."* "Something wrong here?" opens a little box (canned-message
+  buttons, optional email, comments); Send is the second click. Rebuilt on `feat/feedback`.
 - 75|769| **Change type: a junction becomes a tank, a pipe a valve.**
   Tom, 2026-10-05: *"a tool under Water or Tables to Change node type for any asset, where if it has
   information that can't be ported to the new type, we alert and ask."* Building on
   `feat/asset-type`; the seam with `feat/bentley-interop` is alternatives keyed by element id.
-- 75|770| **A warning glyph on every unreasonable value.** Tom, 2026-10-05, on Sue's
-  friction-method warning: *"Add the glyph to every unreasonable value like a diameter over 150
-  inches or under 12 mm"*, roughness by method, and so on. Building on `feat/value-warning`.
 - 75|771| **Survey points as a script: the Description names the asset or vertex.**
   Tom, 2026-10-05: interpret a point's Description as an asset or a pipe vertex, and the CSV as a
   batch. The open question is joining several pipes at one node without a custom code; Mary is
   asked what Civil 3D, Carlson and Trimble codes already do (`dev/agents/market-researcher/survey-codes.md`).
+  Tom, 2026-10-06: OK to reuse Carlson's JPN<point> (Civil 3D's CPN) for a tee rather than invent one.
 - 75|772| **AutoCAD: import, export, and perhaps sync, on a long-lived branch.**
   Tom, 2026-10-05: *"I am an AutoCAD power user and developer... I would like to know what's already
   been done first."* Mary's survey of prior art: `dev/agents/market-researcher/autocad-interop.md`.
+  Tom, 2026-10-06: **DXF export first** (plain AutoCAD cannot read a shapefile); stable, venerable,
+  widely usable. XDATA is invisible to users, so useful only with an in-AutoCAD app (perhaps a .lsp
+  and README shipped beside the DXF), and that app waits on real demand and someone to spec it with.
+  **DXF import as plain as survey import**: LWPOLYLINEs are links, points or INSERTs are nodes; where
+  layers, attributed blocks, XDATA or Map data exist, propose asset types and properties in an
+  editable translation table (assets, properties, scenarios, alternatives). Mary, same day: Map
+  "ADE" object data does not survive DXF; layers and ATTRIBs are visible everywhere; target ASCII
+  R2000.
+- 75|776| **Copy a table with its headings; export Tables to CSV and ODS.**
+  Tom, 2026-10-06: *"When copying from a Table, it would be nice to be able to copy the headings
+  somehow. It might also be nice to Export to CSV and ODS the Tables."* Branch `feat/table-export`.
+- 75|777| **Station and elevation marks on the mi and wi section sketches.**
+  Tom, 2026-10-06: *"it would be very nice to add either an automatic stations and elevations grid
+  or the stations and elevations about 4 to 8 points."* Branch `feat/section-grid`.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -904,6 +917,9 @@ the block.
   migration on-ramp that needs no WaterCAD file. Unsized; read with Task 723. Tom, 2026-10-05,
   asked first whether QGIS or Esri already have robust water-modelling plug-ins, and where we could
   interoperate or merge: `dev/agents/market-researcher/gis-plugins.md`.
+  Tom, 2026-10-06: yes to shapefile + GeoJSON import behind one mapping step, GeoJSON export first;
+  and on the free GIS-to-EPS gap, *"I'd love to collaborate to provide this."* Who to write to
+  (Gusnet, QGISRed, Giswater): Mary's journal, 2026-10-06.
 - 50|733| **Grow the native solver, in phases, to everything EPANET's solves.** Tom, 2026-09-26
   (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
   to do everything that the EPANET solver does. This way the math is less of a black box for us."*
