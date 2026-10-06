@@ -230,6 +230,11 @@ the block.
   selection set from menu choices (his leading candidate: Highlighted / Chosen), and an audit of tip
   pollution in lpn (status strip, click-to-open, delays in master styles, tips that talk down).
   Ida's audit: `dev/tip-and-selection-audit.md` (branch `chore/ida-tip`); decisions go to him as an interview.
+- 100|775| **File, Convert as: five defects from one session in Fotobi, Ghana.**
+  Tom, 2026-10-06: after converting WGS84 to Pseudo Mercator the OLD project lost its node symbols
+  (back after close and reopen) and was zoomed somewhere wrong; File, New with EPSG:3857 shows 4326
+  on the map; Convert as on an empty project opens a file Open dialog; with map and Current both
+  4326, 3857 cannot be chosen. Branch `fix/convert-as`.
 - 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
@@ -384,6 +389,12 @@ the block.
   editable translation table (assets, properties, scenarios, alternatives). Mary, same day: Map
   "ADE" object data does not survive DXF; layers and ATTRIBs are visible everywhere; target ASCII
   R2000.
+- 75|776| **Copy a table with its headings; export Tables to CSV and ODS.**
+  Tom, 2026-10-06: *"When copying from a Table, it would be nice to be able to copy the headings
+  somehow. It might also be nice to Export to CSV and ODS the Tables."* Branch `feat/table-export`.
+- 75|777| **Station and elevation marks on the mi and wi section sketches.**
+  Tom, 2026-10-06: *"it would be very nice to add either an automatic stations and elevations grid
+  or the stations and elevations about 4 to 8 points."* Branch `feat/section-grid`.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
