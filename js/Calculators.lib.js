@@ -16,7 +16,8 @@ var EngCalcs = EngCalcs || {};
 // mouse away only clears hover -- so the tip stays pinned open until a second click toggles it back
 // off, and it visibly cycles. 'focus' sticks the same way, since a clicked button keeps focus.
 //
-// So pick ONE opening gesture per DEVICE:
+// So pick ONE opening gesture per DEVICE for a NAME tip (an EXPLANATION, behind a "?", has one
+// gesture on every device; see ecTipGlyph() below):
 //   - pointer can hover (mouse/trackpad): 'hover focus'. A <span> is not focusable without
 //     tabindex, so for a plain label this is effectively hover-only -- nothing to get stuck on.
 //   - pointer cannot hover (touch): 'click' for a plain label, which is the only way to reach its
@@ -31,6 +32,157 @@ function ecTipIsControl(el) {
 // device as it is now, and matchMedia is cheap.
 function ecCanHover() {
 	return !window.matchMedia || window.matchMedia('(hover: hover)').matches;
+}
+// **TWO KINDS OF TIP, AND THE "?" IS WHAT TELLS THEM APART** (ROADMAP Task 759, Tom's answer to
+// Ida's interview, 2026-10-03: *"Click the ?, closed by a click elsewhere or Esc; one door on
+// desktop and phone."*). dev/tip-followup-2026-10-03.md draws the line:
+//   - a NAME tip says what a control is (icon-only toolbar buttons, transport, the x, sort arrows,
+//     a table heading). It keeps hover/focus with the 500 ms delay below. No glyph.
+//   - an EXPLANATION tip is the one behind a "?" glyph (ecTipLabel(), ecLinkTipLabel(), their JS
+//     twins). It has ONE door on every device: a click or tap on the "?", or Enter/Space on it from
+//     the keyboard. It stays until a click elsewhere, Esc, or focus leaving for something else; the
+//     pointer can rest on it (css/engcalcs.css, .ec-explain) and it is wider than a name tip.
+// One door is also what keeps THE RULE above: an explanation is `manual`, so Bootstrap holds no
+// trigger of its own on it and there is nothing left active to pin it open.
+function ecTipGlyph(el) {
+	if (!el || !el.classList) { return null; }
+	if (el.classList.contains('ec-tip')) { return el; }
+	return el.querySelector ? el.querySelector('.ec-tip') : null;
+}
+// The one explanation on screen: opening another closes it, as a second question replaces the first.
+EngCalcs._explainOpen = null;
+EngCalcs.closeExplanation = function () {
+	var el = EngCalcs._explainOpen, t, g;
+	EngCalcs._explainOpen = null;
+	if (!el) { return; }
+	t = window.bootstrap && bootstrap.Tooltip.getInstance(el);
+	if (t) { t.hide(); }
+	g = ecTipGlyph(el);
+	if (g && g.setAttribute) { g.setAttribute('aria-expanded', 'false'); }
+};
+// **THE "OPEN" RECORD FOLLOWS THE TIP, NOT THE OTHER WAY ROUND.** A tip can go without a click:
+// its box closed from the keyboard or by script (hidePanel() sweeps its tips), or its box rebuilt,
+// detaching the "?" and orphaning the drawn tip. Believed open after that, the next Esc was spent
+// closing nothing and the box's own Esc needed a second press (Perry's pre-review, 2026-10-05).
+// So every reader of the record asks first whether the tip is really still up.
+function ecExplainLive() {
+	var el = EngCalcs._explainOpen, t, drawn;
+	if (!el) { return false; }
+	if (el.isConnected === false) { return false; }
+	if (el.getClientRects && !el.getClientRects().length) { return false; }
+	t = window.bootstrap && bootstrap.Tooltip.getInstance(el);
+	if (!t) { return false; }
+	drawn = t.tip;
+	// Bootstrap sets `tip` to null once a hide completes; a DOM stub has no `tip` at all.
+	if (drawn === null) { return false; }
+	if (drawn) { return drawn.isConnected !== false && !!(drawn.classList && drawn.classList.contains('show')); }
+	return !!(el.getAttribute && el.getAttribute('aria-describedby'));
+}
+function ecSyncExplanation() {
+	if (EngCalcs._explainOpen && !ecExplainLive()) { EngCalcs.closeExplanation(); }
+}
+EngCalcs.toggleExplanation = function (el) {
+	var was, t, g;
+	ecSyncExplanation();
+	was = EngCalcs._explainOpen;
+	EngCalcs.closeExplanation();
+	if (was === el) { return; }
+	t = window.bootstrap && bootstrap.Tooltip.getInstance(el);
+	if (!t) { return; }
+	t.show();
+	EngCalcs._explainOpen = el;
+	g = ecTipGlyph(el);
+	if (g && g.setAttribute) { g.setAttribute('aria-expanded', 'true'); }
+};
+// Is this node inside the open explanation, its glyph or the tip Bootstrap drew in the body?
+function ecInsideExplanation(node) {
+	var el = EngCalcs._explainOpen, g, t, drawn;
+	if (!el || !node) { return false; }
+	g = ecTipGlyph(el);
+	if (g && (g === node || (g.contains && g.contains(node)))) { return true; }
+	t = window.bootstrap && bootstrap.Tooltip.getInstance(el);
+	drawn = t && t.tip;
+	return !!(drawn && (drawn === node || (drawn.contains && drawn.contains(node))));
+}
+// Wired once per document. CAPTURE phase on both: a box or a map that stops a pointer event from
+// bubbling must still let it count as "a click elsewhere", and an Esc that closes the open
+// explanation must not ALSO close the box the reader is in -- the box's own Esc runs later.
+function ecWireExplanationDocument() {
+	if (EngCalcs._explainDocWired || !document.addEventListener) { return; }
+	EngCalcs._explainDocWired = true;
+	document.addEventListener('pointerdown', function (e) {
+		ecSyncExplanation();
+		if (EngCalcs._explainOpen && !ecInsideExplanation(e.target)) { EngCalcs.closeExplanation(); }
+	}, true);
+	document.addEventListener('keydown', function (e) {
+		if (e.key !== 'Escape') { return; }
+		ecSyncExplanation();
+		if (!EngCalcs._explainOpen) { return; }
+		EngCalcs.closeExplanation();
+		if (e.stopPropagation) { e.stopPropagation(); }
+		if (e.preventDefault) { e.preventDefault(); }
+	}, true);
+}
+// **A TIP MAY HAVE PARAGRAPHS** (Tom, 2026-10-05: "It would be really good for tips to have
+// paragraphs"). The marker is the two-character sequence
+// backslash-n written twice, as a LITERAL in a single-quoted language value (rule D means PHP
+// never turns it into a newline); PHP's ecTipPlain() turns it into real newlines for the native
+// title, so both spellings are the break. A paragraph in capitals is NOT a heading (Tom,
+// 2026-10-06: the detector is removed); every paragraph is a paragraph.
+// Tips stay plain text: every character is escaped here, and the only tag is the one this builds.
+EngCalcs.tipHtml = function (text) {
+	var parts = String(text == null ? '' : text).split(/\\n\\n|\r?\n\r?\n/), out = [], i, t;
+	for (i = 0; i < parts.length; i++) {
+		t = parts[i].replace(/^\s+|\s+$/g, '');
+		if (!t) { continue; }
+		out.push('<p class="ec-tip-p">' + EngCalcs.escapeAttr(t) + '</p>');
+	}
+	return out.join('');
+};
+// The same text as one plain string, for a place that cannot show paragraphs (a native title).
+EngCalcs.tipPlain = function (text) {
+	return String(text == null ? '' : text).replace(/\\n\\n/g, '\n\n');
+};
+function ecWireExplanationGlyph(el, glyph) {
+	// An expando, not a data- attribute: markup copied by innerHTML and put back (the grievance
+	// button restores its label so) must not arrive believing it is already wired.
+	if (glyph.__ecExplainWired) { return; }
+	glyph.__ecExplainWired = true;
+	// **A "?" INSIDE A LINK OR A BUTTON** (Darcy-Weisbach's "Kinematic viscosity, v ?" is all one
+	// link; Looped Network's "Something wrong here? ?" is all one button). The same door: a click on
+	// the "?" opens the explanation and does NOT follow the link or press the button; a click on the
+	// words still does. Inside a link the "?" is its own tab stop. Inside a BUTTON it is not: a
+	// focusable thing inside a button is invalid and browsers disagree about it, so there the
+	// keyboard reaches the button's action and the explanation is a pointer's and a finger's only.
+	var host = glyph.parentNode && glyph.parentNode.closest ? glyph.parentNode.closest('a, button, [role="button"]') : null;
+	var inButton = !!host && !(host.tagName && host.tagName.toUpperCase() === 'A');
+	// The keyboard's door: the glyph is a button in all but tag (a <button> inside a <label> would
+	// become the label's control). tabindex on the glyph alone, so a label is one tab stop.
+	if (glyph.setAttribute && !inButton) {
+		glyph.setAttribute('tabindex', '0');
+		glyph.setAttribute('role', 'button');
+		glyph.setAttribute('aria-expanded', 'false');
+	}
+	// preventDefault(): the glyph sits inside a <label>, whose activation focuses the field it names,
+	// and the tap that asks a question must not open a phone's keyboard over the answer (Tom,
+	// 2026-08-29). Now the same on a mouse, since a click is the one door there too.
+	glyph.addEventListener('click', function (e) {
+		if (e.preventDefault) { e.preventDefault(); }
+		if (host && e.stopPropagation) { e.stopPropagation(); }
+		EngCalcs.toggleExplanation(el);
+	});
+	glyph.addEventListener('keydown', function (e) {
+		if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') { return; }
+		if (e.preventDefault) { e.preventDefault(); }
+		EngCalcs.toggleExplanation(el);
+	});
+	// Focus leaving for some OTHER element (Tab, Shift+Tab) closes it. A click on the tip itself
+	// moves focus to nothing (relatedTarget null) and must leave it open to be read.
+	glyph.addEventListener('focusout', function (e) {
+		if (EngCalcs._explainOpen === el && e.relatedTarget && !ecInsideExplanation(e.relatedTarget)) {
+			EngCalcs.closeExplanation();
+		}
+	});
 }
 /**
  * Change a tip that is ALREADY ON SCREEN, and have the reader see the new one.
@@ -70,10 +222,44 @@ EngCalcs.setTipText = function (el, text) {
 	el.title = want;
 	if (prior && EngCalcs.initTips) { EngCalcs.initTips(el.parentNode || el); }
 };
-EngCalcs.initTips = function (root) {
-	var canHover = ecCanHover();
-	(root || document).querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(function (el) {
+EngCalcs._tapTips = [];
+function ecTrackTapTip(el, tip) {
+	if (el.__ecTapTracked) { return; }
+	el.__ecTapTracked = true;
+	EngCalcs._tapTips.push({ el: el, tip: tip });
+	if (EngCalcs._tapTipsWired || !document.addEventListener) { return; }
+	EngCalcs._tapTipsWired = true;
+	// Capture, so a map or box that stops the event from bubbling still counts as "elsewhere".
+	document.addEventListener('pointerdown', function (e) {
+		var i, r;
+		for (i = 0; i < EngCalcs._tapTips.length; i++) {
+			r = EngCalcs._tapTips[i];
+			if (r.el !== e.target && !(r.el.contains && r.el.contains(e.target))) { r.tip.hide(); }
+		}
+	}, true);
+}
+// Arms ONE element with the styled tooltip (an explanation behind its "?", or a name tip). Shared
+// by initTips() and by the delegated listener below, so there is exactly one place that decides
+// trigger, delay, long-press and click-to-hide.
+function ecWireTipEl(el) {
+		var canHover = ecCanHover();
 		var control = ecTipIsControl(el);
+		var explainGlyph = ecTipGlyph(el);
+		if (explainGlyph) {
+			bootstrap.Tooltip.getOrCreateInstance(el, {
+				trigger: 'manual', customClass: 'ec-explain', html: true,
+				// Read at show time, so EngCalcs.setTipText() still changes what is shown.
+				title: function () {
+					var t = el.getAttribute ? el.getAttribute('data-bs-original-title') : null;
+					if (t == null) { t = el.title || ''; }
+					return EngCalcs.tipHtml(t);
+				}
+			});
+			if (el.classList && el.classList.add) { el.classList.add('ec-explain-host'); }
+			ecWireExplanationGlyph(el, explainGlyph);
+			ecWireExplanationDocument();
+			return;
+		}
 		// **A CONTROL ON A HOVER-LESS DEVICE GETS PRESS-AND-HOLD, and nothing else can work.**
 		// 'hover focus' on a touch screen means a tap focuses the button (showing the tip) and the
 		// same tap's click hides it again, so the tip is unreadable -- invisible while a word was on
@@ -137,35 +323,19 @@ EngCalcs.initTips = function (root) {
 				if (!keyboard) { tip.hide(); }
 			});
 		}
-		// **A TAP ON THE "?" ASKS A QUESTION; IT DOES NOT START TYPING** (Tom, 2026-08-29, from a
-		// phone: *"The only problem is that it puts me in the input field, bringing up my input
-		// keyboard when I am not ready for any input."*). The glyph sits inside a <label>, and a
-		// label's activation behaviour is to focus the control it names -- so the tap that opened
-		// the tip also opened the keyboard, over the tip.
-		//
-		// CANCELLED ON THE GLYPH ALONE, never on `.ec-help`. The two nestings are opposite
-		// (lib/Calculators.lib.php): with a link `.ec-help` wraps the glyph, without one it wraps
-		// the label TEXT and the glyph. Cancelling on `.ec-help` would therefore take the label
-		// text's own tap with it in the second case, and a tap on a field's name is meant to reach
-		// the field. `.ec-tip` is the glyph in both nestings and in the ones js/looped-network.js
-		// builds by hand, so it is the one honest handle.
-		//
-		// preventDefault() only: the click still bubbles, so Bootstrap's own 'click' trigger -- the
-		// only way a tip opens on a device that cannot hover -- still sees it and shows the tip.
-		//
-		// TOUCH ONLY. A mouse reaches the tip by hovering and never taps the glyph to read it, so
-		// the pointer behaviour is left exactly as it was.
-		if (!canHover && !control) {
-			// A bare glyph with no `.ec-tip` look of its own (the ⚠ beside an unreasonable value in
-			// js/looped-network.js) declares itself with data-ec-tip-glyph and is cancelled the same way.
-			var isGlyph = function (n) {
-				return !!(n.classList && n.classList.contains('ec-tip')) || !!(n.hasAttribute && n.hasAttribute('data-ec-tip-glyph'));
-			};
-			var glyph = isGlyph(el) ? el : (el.querySelector ? el.querySelector('.ec-tip, [data-ec-tip-glyph]') : null);
-			if (glyph && !glyph.dataset.ecTipNoFocus) {
-				glyph.dataset.ecTipNoFocus = '1';
-				glyph.addEventListener('click', function (e) { e.preventDefault(); });
-			}
+		// **A NAME TIP OPENED BY A TAP MUST NOT STICK.** On a device that cannot hover, a titled
+		// NON-control (a pane grip, a ramp option, a plain label) opens on 'click' and had no way
+		// out: nothing but a second tap on the same element took it down (Perry's pre-review,
+		// 2026-10-06). A tap anywhere else now closes it, as it does an explanation.
+		if (!control && !canHover) { ecTrackTapTip(el, tip); }
+		// The "?" glyph's own tap handling lives in ecWireExplanationGlyph(): every tip with a glyph
+		// returned above, so what reaches here is a name tip on a control or a glyph-less label.
+		// A bare glyph with no "?" of its own (the ⚠ beside an unreasonable value in
+		// js/looped-network.js) declares itself with data-ec-tip-glyph: on touch its tap asks and
+		// never focuses the field its label names (Tom, 2026-08-29).
+		if (!control && !canHover && el.hasAttribute && el.hasAttribute('data-ec-tip-glyph') && !el.dataset.ecTipNoFocus) {
+			el.dataset.ecTipNoFocus = '1';
+			el.addEventListener('click', function (e) { e.preventDefault(); });
 		}
 		if (longPress && !el.dataset.ecTipHoldWired) {
 			el.dataset.ecTipHoldWired = '1';
@@ -186,9 +356,118 @@ EngCalcs.initTips = function (root) {
 				if (e.target !== el && !el.contains(e.target)) { tip.hide(); }
 			}, { passive: true });
 		}
-	});
+}
+EngCalcs.initTips = function (root) {
+	(root || document).querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(ecWireTipEl);
 };
 document.addEventListener('DOMContentLoaded', function () { EngCalcs.initTips(document); });
+// **ONE STYLE OF TIP, FOR EVERY `title` IN THE SUITE** (Tom, 2026-10-06, testing feat/tip-door:
+// two styles of tips, make them one). initTips() arms only `.ec-help[title]` and cursor:help; any
+// other element with a `title` got the BROWSER'S native tooltip, a visibly different box that
+// never opens on touch (about 60 writes in js/looped-network.js, the tool menu's anchors, the
+// pane resizers and close buttons in the PHP). Rather than hand-mark each, ONE delegated listener
+// arms an element the first time a pointer reaches it or focus lands in it, with exactly the
+// same wiring as an `.ec-help` (ecWireTipEl()).
+//   - LAZY, so it costs nothing up front: the Net3 Tables pane has thousands of cells and
+//     none of them is touched until the pointer is.
+//   - `pointerover` fires BEFORE the mouseenter/touchstart/click that Bootstrap's own listeners
+//     (added by ecWireTipEl()) wait for, and long before the browser's ~1 s native delay; arming
+//     moves the title into data-bs-original-title, so the native box never gets the chance.
+//   - FOCUS: a keyboard arrival has no earlier pointer event, so focusin arms the element and
+//     replays the focusin Bootstrap just missed.
+//   - A `title` WRITTEN AGAIN after arming (the trap setTipText() documents) is caught here too:
+//     if an armed element's title is non-empty again, it is moved into the cache before the
+//     native box can show, so the next write is never stale and never doubled.
+//   - SVG: an element's <title> child (graph dots, the scenario ring) is read at the same moment,
+//     moved into the attribute and removed.
+//   - NOT armed: an <iframe> (its title names the frame for assistive technology and is not a
+//     hover tip), an <svg> root's own <title>, and anything marked data-ec-native-title.
+var EC_SVG_NS = 'http://www.w3.org/2000/svg';
+// An SVG element's <title> child (what the graph dots and the scenario ring carry): the browser
+// draws it as a native tooltip, so it is turned into a `title` attribute when the pointer arrives.
+function ecSvgTitleChild(el) {
+	var i, n;
+	if (!el || el.namespaceURI !== EC_SVG_NS || el.localName === 'svg' || !el.childNodes) { return null; }
+	for (i = 0; i < el.childNodes.length; i++) {
+		n = el.childNodes[i];
+		if (n.nodeType === 1 && n.localName === 'title') { return n; }
+	}
+	return null;
+}
+function ecDelegatedTipTarget(node) {
+	var el = node, tag;
+	while (el && el.nodeType === 1) {
+		tag = (el.localName || '').toLowerCase();
+		if (tag === 'html' || tag === 'body') { return null; }
+		if (el.getAttribute('title') || ecSvgTitleChild(el)) { break; }
+		el = el.parentNode;
+	}
+	if (!el || el.nodeType !== 1) { return null; }
+	if (tag === 'iframe' || (tag === 'svg' && !el.getAttribute('title'))) { return null; }
+	if (el.hasAttribute('data-ec-native-title')) { return null; }
+	if (el.closest('.tooltip')) { return null; }
+	return el;
+}
+function ecArmDelegatedTip(e) {
+	var el = ecDelegatedTipTarget(e.target), t, Tip, inst;
+	if (!el || !window.bootstrap || !bootstrap.Tooltip) { return; }
+	t = ecSvgTitleChild(el);
+	if (t) {
+		// Move the text to the attribute and take the native <title> away, so no native box shows.
+		if (t.textContent) { el.setAttribute('title', t.textContent); }
+		el.removeChild(t);
+	}
+	Tip = bootstrap.Tooltip;
+	inst = Tip.getInstance(el);
+	if (inst) {
+		// Armed before, and the title was written again: cache it, blank the attribute.
+		t = el.getAttribute('title');
+		el.setAttribute('data-bs-original-title', t);
+		el.setAttribute('title', '');
+		return;
+	}
+	ecWireTipEl(el);
+	if (e.type === 'focusin' && el.dispatchEvent && window.FocusEvent) {
+		el.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+	}
+}
+// **A LATER WRITE TO AN ARMED ELEMENT'S `title` MUST REACH THE READER.** Bootstrap caches the text
+// in data-bs-original-title and blanks the attribute, so `el.title = x` or removeAttribute('title')
+// afterwards would leave the OLD text on screen (and, for a write, the native box besides). One
+// observer, filtered to the `title` attribute alone, so it never wakes for anything else: a
+// non-empty write is moved into the cache; a removal empties the cache (an empty tip never opens).
+// Bootstrap's own blanking writes '' and is left alone.
+EngCalcs._tipObserver = null;
+function ecWatchTitleWrites() {
+	if (EngCalcs._tipObserver || !window.MutationObserver || !document.documentElement) { return; }
+	EngCalcs._tipObserver = new MutationObserver(function (records) {
+		var i, el, t;
+		for (i = 0; i < records.length; i++) {
+			el = records[i].target;
+			if (!el.hasAttribute || !el.hasAttribute('data-bs-original-title')) { continue; }
+			// A disposed tooltip puts its title back (Bootstrap's dispose()); only a LIVE one is ours.
+			if (!(window.bootstrap && bootstrap.Tooltip.getInstance(el))) { continue; }
+			// Bootstrap arms an element by REMOVING `title` (after caching it): a removal is its own
+			// doing and is ignored, and an already-absent attribute cannot be removed again, so a
+			// caller who wants an armed element's tip gone writes `el.title = ''`.
+			if (el.hasAttribute('title')) {
+				t = el.getAttribute('title');
+				el.setAttribute('data-bs-original-title', t);
+				el.removeAttribute('title');
+			}
+		}
+	});
+	EngCalcs._tipObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['title'], subtree: true });
+}
+EngCalcs._tipDelegated = false;
+EngCalcs.wireTipDelegation = function () {
+	if (EngCalcs._tipDelegated || !document.addEventListener) { return; }
+	EngCalcs._tipDelegated = true;
+	ecWatchTitleWrites();
+	document.addEventListener('pointerover', ecArmDelegatedTip, true);
+	document.addEventListener('focusin', ecArmDelegatedTip, true);
+};
+EngCalcs.wireTipDelegation();
 
 /**
  * Shortcut words in the reader's platform: a Mac reader is told "Cmd", not "Ctrl". The key

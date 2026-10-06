@@ -3862,6 +3862,11 @@ OBSERVED defects (minor): new scenario while shown appends its rows at the botto
 OBSERVED: stable sort changes ordinary tables vs master (tie rows keep previous order instead of ID) - intended.
 Lesson: pane toggle button toggles; sort lives on the arrow button; dialogs routed to native by seam (answerPromptWith).
 
+## feat/tip-door at 4df634f8 (OBSERVED, 2026-10-06; re-verify before citing)
+OBSERVED real Chrome (Net3 desktop, 900 touch, 390 phone): the delegated listener works for HTML titles: toolbar, menu rows, Water button (title parked while menu open, restored on close), pane close x, tabs, synthetic disabled button (Chrome fires pointerover on it), Tab-key focus tips; tap on a toolbar button / menu button / menu row just acts, no tip left. Harness 12/12 and 5/12 with the wireTipDelegation() call removed (so it is not decoration).
+OBSERVED MISSED: SVG <title> CHILDREN still give the browser's native tip: Time series tab on Net3 has 100, Profile 126 (also Frequency, Calibration, scenario override ring via setOverrideTitle). The harness skips svg on purpose. CLAUDE.md line "the browser's native tooltip never shows" is false for these.
+OBSERVED DEFECT (touch only): a non-control titled element (pane grip) tapped on a touch device opens a click-trigger tip that stays when you tap elsewhere (still up 1.5 s later); was silent on touch before.
+Fire flow strings match Tom's words; only those two keys changed. dev/translation_payloads/lang.en.json still has the OLD accounting text (orchestrator regenerates).
 ## feat/value-warning at 424b278e (OBSERVED, 2026-10-06; re-verify before citing)
 OBSERVED real Chromium: branch's own harness passes. All 7 shipped examples: 0 warnings in every table. Undo/redo, unit change (in to mm: thresholds 12 and 3810 mm), method change all refresh the glyph. Net3 Pipes tab fill median ~9-10 ms before and after; 117 glyphs painted at no measurable cost.
 OBSERVED DEFECT: touch (hover none): tapping the glyph in the Properties box opens the tip AND focuses the Diameter input (label activation), the exact 2026-08-29 complaint; initTips only cancels this on `.ec-tip`, the glyph here is a bare `.ec-help`. Tables-pane tap also focuses a cell input.

@@ -3644,7 +3644,6 @@ $ec_lang['lpn_ff_menu_tip']='逐个测试节点：每个节点在维持您设定
 $ec_lang['lpn_ff_title']='消防流量分析';
 $ec_lang['lpn_ff_intro']='依次让管网中的每个节点在其现有需水量之外再抽取一份消防流量。您的项目不会被更改；整个运行都在一份副本上进行。';
 $ec_lang['lpn_ff_scope']='要测试的节点';
-$ec_lang['lpn_ff_scope_tip']='请在运行前选择测试范围。在大型系统中测试每一个节点可能需要几分钟。';
 $ec_lang['lpn_ff_all']='全部';
 $ec_lang['lpn_ff_selected']='所选';
 $ec_lang['lpn_ff_no_junctions']='此项目目前还没有节点，因此没有可测试的对象。';
@@ -3674,7 +3673,6 @@ $ec_lang['lpn_ff_engine_native']='使用内置求解器。';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='使用 EPANET 求解器。';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='可提供的消防流量是通过搜索得到的，因此每个被测试的节点都要对整个管网求解大约十六次。大型系统可能需要几分钟。您可以随时停止，并保留已经算出的结果。';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3682,7 +3680,6 @@ $ec_lang['lpn_ff_engine_cost']='可提供的消防流量是通过搜索得到的
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='仅测试当前屏幕上显示的这一时刻。消防流量通常应在最大日需水量的基础上测试，请先将管网设为该工况再运行。';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

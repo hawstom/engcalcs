@@ -64,7 +64,22 @@ function ecDefaultValue($default)
 }
 
 /**
- * Builds a label carrying a hover/tap explanation, and (optionally) an external link.
+ * A tip's plain text: markup stripped, and the paragraph marker (a LITERAL backslash-n written
+ * twice in a single-quoted language value) turned into a real blank line, so a native title shows
+ * paragraphs and never the raw marker. js/Calculators.lib.js (EngCalcs.tipHtml) draws the real ones.
+ */
+function ecTipPlain($tip)
+{
+    return str_replace('\\n\\n', "\n\n", strip_tags($tip));
+}
+
+/**
+ * Builds a label carrying an explanation behind a "?", and (optionally) an external link.
+ *
+ * The explanation opens ONLY on a click or tap of the "?" glyph, or Enter/Space on it, and closes
+ * on a click elsewhere, Esc or focus leaving (ROADMAP Task 759; js/Calculators.lib.js,
+ * ecTipGlyph()). The nestings below are still what that code reads: .ec-help holds the text,
+ * .ec-tip is the door.
  *
  * THESE TWO FUNCTIONS EXIST BECAUSE THE CONVENTION THEY IMPLEMENT WAS BEING BROKEN BY HAND.
  * CLAUDE.md spent ~40 lines describing how to nest .ec-help and .ec-tip -- including that the
@@ -78,8 +93,8 @@ function ecDefaultValue($default)
  * The two nestings, and why they differ:
  *
  *   ecTipLabel()      no link, so the label text has no other big click target -- .ec-help
- *                     (carrying the title) wraps the text AND the glyph, making the whole
- *                     label the hover/tap target. Only the glyph gets .ec-tip.
+ *                     (carrying the title) wraps the text AND the glyph, so the tip hangs
+ *                     from the whole label. Only the glyph gets .ec-tip, and only it opens.
  *
  *   ecLinkTipLabel()  the <a> is already a big, real click target, so it takes the label text
  *                     and .ec-help wraps the glyph alone. Exactly one "?" per label: the tip's.
@@ -95,7 +110,7 @@ function ecDefaultValue($default)
  */
 function ecTipLabel($text, $tip)
 {
-    return '<span class="ec-help" title="'.htmlspecialchars(strip_tags($tip)).'">'
+    return '<span class="ec-help" title="'.htmlspecialchars(ecTipPlain($tip)).'">'
          . $text.' <span class="ec-tip">?</span></span>';
 }
 
@@ -128,7 +143,7 @@ function ecPlainLabelText($html)
 function ecLinkTipLabel($href, $text, $tip)
 {
     return '<a target="_blank" rel="noopener" href="'.htmlspecialchars($href, ENT_QUOTES, 'UTF-8').'">'.$text.'</a>'
-         . '<span class="ec-help" title="'.htmlspecialchars(strip_tags($tip)).'">'
+         . '<span class="ec-help" title="'.htmlspecialchars(ecTipPlain($tip)).'">'
          . '<span class="ec-tip">?</span></span>';
 }
 

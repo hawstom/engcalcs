@@ -4532,7 +4532,9 @@ var EngCalcs = EngCalcs || {};
 			target.title = customPropFlagText(def, problem);
 		} else {
 			target.className = cls;
-			target.removeAttribute('title');
+			// '' and not removeAttribute: an armed tooltip caches the old text, and only a write
+			// (here an empty one) reaches it (EngCalcs.wireTipDelegation's title observer).
+			target.title = '';
 		}
 		return problem;
 	}
@@ -25582,7 +25584,7 @@ var EngCalcs = EngCalcs || {};
 		text = c.hint(el) || '';
 		tip = c.hintTip ? (c.hintTip(el) || '') : '';
 		if (text) { input.setAttribute('placeholder', text); } else { input.removeAttribute('placeholder'); }
-		if (tip) { input.title = tip; } else if (input.title) { input.removeAttribute('title'); }
+		if (tip) { input.title = tip; } else if (input.title || input.getAttribute('data-bs-original-title')) { input.title = ''; }
 	}
 	function paneHeadingText(c) {
 		var pc = EngCalcs.pageConfig || {},
@@ -30427,8 +30429,8 @@ var EngCalcs = EngCalcs || {};
 		EngCalcs.lpnProfile.labelStride(series.nodes.map(function (n) { return X(n.station); }), PROFILE_ID_LABEL_PX)
 			.forEach(function (k) { idKeep[k] = true; });
 		series.nodes.forEach(function (n, k) {
-			var x = X(n.station), t, ttl, parts, ptxt;
-			el('line', { x1: x, y1: box.top, x2: x, y2: box.top + box.height, class: 'lpn-profile-station' }, svg);
+			var x = X(n.station), t, ttl, parts, ptxt, stLine;
+			stLine = el('line', { x1: x, y1: box.top, x2: x, y2: box.top + box.height, class: 'lpn-profile-station' }, svg);
 			if (idKeep[k]) {
 				t = profileText(svg, 0, 0, n.id, { class: 'lpn-profile-nodeid', 'text-anchor': 'end' });
 				t.setAttribute('transform', 'translate(' + x + ',' + (box.top + box.height + 20) + ') rotate(-60)');
@@ -30437,8 +30439,12 @@ var EngCalcs = EngCalcs || {};
 				el('circle', { cx: x, cy: Y(n.ground), r: 2, class: 'lpn-profile-dot' }, svg);
 			}
 			// The hover text carries what the drawing cannot: the pressure, whose unit is not the
-			// axis's. A <title>, not a tooltip of our own -- it is the one every browser already has.
-			ttl = el('title', {}, svg);
+			// axis's. A <title> on a transparent hit circle over the dot (it used to hang off the
+			// svg root, so it named nothing in particular); EngCalcs.wireTipDelegation() turns it
+			// into the one styled tip when the pointer arrives.
+			ttl = el('title', {}, typeof n.ground === 'number'
+				? el('circle', { cx: x, cy: Y(n.ground), r: 7, fill: 'transparent', class: 'lpn-profile-hit' }, svg)
+				: stLine);
 			parts = [n.id];
 			if (typeof n.ground === 'number') { parts.push(plainRound(n.ground, 2) + ' ' + unitLabel(resultUnit('elevhead'))); }
 			ptxt = profilePressureText(n.id);
@@ -48922,7 +48928,7 @@ var EngCalcs = EngCalcs || {};
 				parts.push(k.getAttribute(attr));
 			});
 		});
-		var text = parts.join(' ').toLowerCase();
+		var text = parts.join(' ').replace(/\\n\\n/g, ' ').toLowerCase();
 		if (setboxTextCache) { setboxTextCache.set(el, text); }
 		return text;
 	}
@@ -49890,12 +49896,12 @@ var EngCalcs = EngCalcs || {};
 		return b;
 	}
 	// The box's one `?` (Q5): the JS twin of ecTipLabel() with no label text, so the glyph IS the
-	// whole tip target, and focusable so a keyboard reaches the explanation as a pointer does.
+	// whole tip target. EngCalcs.initTips() makes the glyph the tab stop and the one door, as on
+	// every other `?` (Task 759), so the wrapper is not focusable itself: one `?`, one tab stop.
 	function cornerHelp(tip) {
 		var help = document.createElement('span'), glyph = document.createElement('span');
 		help.className = 'ec-help lpn-corner-help';
 		help.title = tip;
-		help.tabIndex = 0;
 		glyph.className = 'ec-tip';
 		glyph.textContent = '?';
 		help.appendChild(glyph);
@@ -50334,7 +50340,7 @@ var EngCalcs = EngCalcs || {};
 		d.tab = tab;
 	}
 	function registerDockBox(id, rec, save, key, tipKey) {
-		var box = document.getElementById(id), pc = EngCalcs.pageConfig || {}, x, row, d;
+		var box = document.getElementById(id), pc = EngCalcs.pageConfig || {}, x, row, d, tip;
 		if (!box || box.__lpnDock) { return; }
 		d = { box: box, rec: rec || {}, save: save || null, help: null, tab: null };
 		readDockRecord(key, d.rec);
@@ -50344,7 +50350,9 @@ var EngCalcs = EngCalcs || {};
 		box.insertBefore(row, x || box.firstChild);
 		box.classList.add('lpn-has-corner');
 		d.corner = row;
-		if (tipKey && pc[tipKey]) { d.help = cornerHelp(pc[tipKey]); }
+		tip = typeof tipKey === 'function' ? tipKey() :
+			[].concat(tipKey || []).map(function (k) { return pc[k]; }).filter(Boolean).join(' ');
+		if (tip) { d.help = cornerHelp(tip); }
 		wireDockTab(d);
 		box.addEventListener('pointerenter', function () { if (dockFlyout === d) { clearTimeout(dockTimer); } });
 		box.addEventListener('pointerleave', function () { if (dockFlyout === d) { dockTuckLater(d); } });
@@ -50363,17 +50371,20 @@ var EngCalcs = EngCalcs || {};
 		initTipsIn(row);
 	}
 	// **EVERY NON-MODAL BOX ON THE PAGE**, by the furniture record it already keeps (null: none, so
-	// it docks for this page load only). The last column is the `?` its corner carries (Q5), the
-	// tool's own menu tip until it has words of its own.
+	// it docks for this page load only). The last column is the `?` its corner carries (Q5): the
+	// tool's whole explanation, its intro and the scope tip that only restated the tool's purpose,
+	// whole strings joined in order (Task 759, Tom 2026-10-03: one `?` by the x of each Analyze box).
+	// Fire flow and Demand scaling build theirs (ffBoxTip(), dsBoxTip()): every paragraph that box
+	// used to show is in it, and some of those carry the engine and the units of the moment.
 	function wireBoxDocking() {
 		[
 			['lpn_popup', {}, null, null],
 			['lpn_find_popup', findDockRec, saveFindLayout, LPN_FINDBOX_KEY],
 			['lpn_settings_box', setboxLayout, saveSetboxLayout, LPN_SETBOX_KEY],
 			['lpn_library_box', libboxLayout, saveLibboxLayout, LPN_LIBBOX_KEY],
-			['lpn_ff_box', ffboxLayout, saveFfboxLayout, LPN_FFBOX_KEY, 'lpn_ff_menu_tip'],
-			['lpn_crit_box', critLayout, null, null, 'lpn_crit_menu_tip'],
-			['lpn_ds_box', dsLayout, null, null, 'lpn_ds_menu_tip'],
+			['lpn_ff_box', ffboxLayout, saveFfboxLayout, LPN_FFBOX_KEY, ffBoxTip],
+			['lpn_crit_box', critLayout, null, null, ['lpn_crit_intro', 'lpn_crit_scope_tip']],
+			['lpn_ds_box', dsLayout, null, null, dsBoxTip],
 			['lpn_energy_box', energyboxLayout, saveEnergyboxLayout, LPN_ENERGYBOX_KEY],
 			['lpn_contour_box', contourboxLayout, saveContourboxLayout, LPN_CONTOURBOX_KEY],
 			['lpn_scncmp_box', cmpboxLayout, saveCmpboxLayout, LPN_CMPBOX_KEY],
@@ -61092,12 +61103,12 @@ var EngCalcs = EngCalcs || {};
 		host.innerHTML = '';
 		ffEl('p', 'lpn-ff-summary', text, host);
 	}
-	// One labelled row. The whole label text is the tip's target and not a one-character glyph --
-	// CLAUDE.md's tip-only nesting rule.
+	// One labelled row. A tip is an explanation, so it carries the `?` that every explanation does
+	// and opens from that glyph (Task 759: a tip with no glyph was the one-?-per-label defect).
 	function ffRow(parent, labelText, tip, control, unitText) {
-		var row = ffEl('div', 'lpn-ff-row', null, parent),
-			name = ffEl('span', null, labelText || '', row);
-		if (tip) { name.title = tip; name.className = 'ec-help'; }
+		var row = ffEl('div', 'lpn-ff-row', null, parent), name;
+		if (tip) { name = findHelpLabel(labelText || '', tip); row.appendChild(name); }
+		else { ffEl('span', null, labelText || '', row); }
 		row.appendChild(control);
 		ffEl('span', 'lpn-ff-unit', unitText || '', row);
 		return row;
@@ -61128,6 +61139,34 @@ var EngCalcs = EngCalcs || {};
 		return unitId ? toSI(+s, unitId) : +s;
 	}
 
+	// **THE BOX SHOWS CONTROLS AND RESULTS; ITS EXPLANATION IS BEHIND ITS `?`** (Tom, 2026-10-05:
+	// *"a lot of head room is spent in Fire flow analysis on paragraph text, both above and
+	// below/after Run (ISO note). Both of these can be folded into the box ? glyph tip ... Do the
+	// same treatment for Demand Scaling."*). One tip, whole strings in reading order. `engine`
+	// is absent when the docking is wired, before a network exists to choose one; the box's own
+	// build supplies it, and refreshBoxTip() rewrites the tip only when the words changed.
+	function ffBoxTip(engine) {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			pc.lpn_ff_intro,
+			EngCalcs.lpnFireFlowLossAccounting === 'raw-node' ? pc.lpn_ff_accounting : '',
+			EngCalcs.lpnFireFlowIsoCap && pc.lpn_ff_iso ?
+				pc.lpn_ff_iso.replace('{flow}', ffQty(EngCalcs.lpnFireFlowIsoCap, 'lpn_u_flow')) : '',
+			engine ? (engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native) : ''
+		].filter(Boolean).join('\\n\\n');
+	}
+	function dsBoxTip(engine) {
+		var pc = EngCalcs.pageConfig || {},
+			D = EngCalcs.lpnDemandScaleDefaults || { max: 20, step: 0.01 };
+		return [
+			pc.lpn_ds_intro ? pc.lpn_ds_intro.replace('{max}', dsMult(D.max)).replace('{step}', String(D.step)) : '',
+			engine ? (engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native) : ''
+		].filter(Boolean).join('\\n\\n');
+	}
+	function refreshBoxTip(id, text) {
+		var box = document.getElementById(id), d = box && box.__lpnDock;
+		if (d && d.help && text) { EngCalcs.setTipText(d.help, text); }
+	}
 	function buildFireFlowControls() {
 		var pc = EngCalcs.pageConfig || {},
 			host = document.getElementById('lpn_ff_controls'),
@@ -61139,20 +61178,20 @@ var EngCalcs = EngCalcs || {};
 			clear;
 		if (!host) { return; }
 		host.innerHTML = '';
-		ffEl('p', 'lpn-ff-note', pc.lpn_ff_intro, host);
 
 		boxes.scope = ffSelect([
 			['all', pc.lpn_ff_all || 'All junctions'],
 			['selected', pc.lpn_ff_selected || 'Selected junctions']
 		], ask.scope);
-		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', pc.lpn_ff_scope_tip, boxes.scope, '');
+		ffRow(host, pc.lpn_ff_scope || 'Junctions to test', null, boxes.scope, '');
 
 		boxes.required = ffInput(ask.required);
 		ffRow(host, pc.lpn_ff_required || 'Required fire flow', pc.lpn_ff_required_tip,
 			boxes.required, unitLabel('lpn_u_flow'));
 		// **A CRITERION THAT DOES NOT APPLY EVERYWHERE SAYS SO WHERE IT IS TYPED.** Only when some
 		// junction actually states its own: a sentence about an exception nobody has made is noise,
-		// and the count is the useful half of it.
+		// and the count is the useful half of it. It stays in the box when the explanations went
+		// behind its `?` (Tom, 2026-10-05): it reports this network, which a fixed tip cannot.
 		if (fireFlowOwnCount() > 0) {
 			ffEl('p', 'lpn-ff-note', (pc.lpn_ff_required_own ||
 				'Junctions carrying a required fire flow of their own are tested against that instead. Number of them: {n}.')
@@ -61188,21 +61227,12 @@ var EngCalcs = EngCalcs || {};
 		ffRow(host, pc.lpn_ff_maxvelocity || 'Highest velocity allowed', pc.lpn_ff_maxvelocity_tip,
 			boxes.maxVelocity, unitLabel('lpn_u_velocity'));
 
-		// **HOW HYDRANT LOSSES ARE ACCOUNTED FOR, ON THE SCREEN** (Tom, 2026-08-25: *"I want to be
-		// very explicit and transparent... about how we account if at all for hydrant losses beyond
-		// the node."*). Read off the engine's own declared accounting rather than restated here, so
-		// the sentence cannot survive a change in the method it describes.
-		if (EngCalcs.lpnFireFlowLossAccounting === 'raw-node') {
-			ffEl('p', 'lpn-ff-note', pc.lpn_ff_accounting, host);
-		}
+		// **HOW HYDRANT LOSSES ARE ACCOUNTED FOR, BEHIND THE BOX'S `?`** (Tom, 2026-08-25: *"I want
+		// to be very explicit and transparent... about how we account if at all for hydrant losses
+		// beyond the node."*). ffBoxTip() reads it off the engine's own declared accounting, as does
+		// the ISO credit limit and the engine sentence, so none can outlive what it describes.
 		engine = engineFor(assembleModel());
-		ffEl('p', 'lpn-ff-note', engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native, host);
-		ffEl('p', 'lpn-ff-note', pc.lpn_ff_engine_cost, host);
-		// Said only where there is a clock to be confused by. A project with no run schedule has
-		// only ever had one condition, and a sentence about which one would be noise.
-		if (effectiveTimesExtended()) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_ff_steady, host);
-		}
+		refreshBoxTip('lpn_ff_box', ffBoxTip(engine));
 
 		var buttons = ffEl('div', 'lpn-ff-buttons', null, host);
 		run = ffEl('button', 'lpn-ff-run', pc.lpn_ff_calculate || 'Run', buttons);
@@ -61603,11 +61633,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_cost || 'This run solved the whole network {solves} times.')
 			.replace('{solves}', String(set.solves)), host);
-		// **THE ISO CREDIT LIMIT TRAVELS WITH THE NUMBERS AND IS NEVER APPLIED TO THEM.** Said once
-		// for the run rather than on every row: it is a fact about how a rating is credited, not
-		// about any one junction's hydraulics.
-		ffEl('p', 'lpn-ff-note', (pc.lpn_ff_iso || 'The Insurance Services Office (ISO) credits a single hydrant with at most {flow}. That credit limit has not been applied here because we do not know how many hydrants a node may represent.')
-			.replace('{flow}', ffQty(set.isoCap, 'lpn_u_flow')), host);
+		// The ISO credit limit is never applied to these numbers; the box's `?` says so (ffBoxTip()).
 		// The two design columns are still drawn when the design half was turned off -- as dashes,
 		// with the reason said above the table. A column that appears and disappears makes two runs
 		// of the same network look like two different reports.
@@ -62043,13 +62069,12 @@ var EngCalcs = EngCalcs || {};
 			scope, minP, skip, buttons, run, stop, engine;
 		if (!host) { return; }
 		host.innerHTML = '';
-		ffEl('p', 'lpn-ff-note', pc.lpn_crit_intro, host);
 		scope = ffSelect([
 			['all', pc.lpn_crit_scope_all || 'All links'],
 			['selected', pc.lpn_crit_scope_selected || 'Selected links']
 		], critAsk.scope);
 		scope.addEventListener('change', function () { critAsk.scope = scope.value; });
-		ffRow(host, pc.lpn_crit_scope || 'Links to break', pc.lpn_crit_scope_tip, scope, '');
+		ffRow(host, pc.lpn_crit_scope || 'Links to break', null, scope, '');
 		skip = document.createElement('input');
 		skip.type = 'checkbox';
 		skip.checked = !!critAsk.skipDeadEnds;
@@ -62352,26 +62377,21 @@ var EngCalcs = EngCalcs || {};
 	function buildDemandScaleControls() {
 		var pc = EngCalcs.pageConfig || {},
 			host = document.getElementById('lpn_ds_controls'),
-			D = EngCalcs.lpnDemandScaleDefaults || { max: 20, step: 0.01 },
 			scope, minP, mult, buttons, run, find, stop, engine, other;
 		if (!host) { return; }
 		host.innerHTML = '';
-		ffEl('p', 'lpn-ff-note', pc.lpn_ds_intro, host);
 		scope = ffSelect([
 			['all', pc.lpn_ds_scope_all || 'All junctions'],
 			['selected', pc.lpn_ds_scope_selected || 'Selected junctions']
 		], dsAsk.scope);
 		scope.addEventListener('change', function () { dsAsk.scope = scope.value; buildDemandScaleControls(); });
-		ffRow(host, pc.lpn_ds_scope || 'Junctions to scale', pc.lpn_ds_scope_tip, scope, '');
+		ffRow(host, pc.lpn_ds_scope || 'Junctions to scale', null, scope, '');
 		minP = ffInput(critFireFlowAsk().minPressure);
 		minP.addEventListener('change', function () { critFireFlowAsk().minPressure = minP.value; });
 		ffRow(host, pc.lpn_ds_minpressure || 'Lowest pressure allowed', pc.lpn_ds_minpressure_tip,
 			minP, unitLabel('lpn_u_pressure'));
 		engine = engineFor(assembleModel());
-		ffEl('p', 'lpn-ff-note', engine.epanet ? pc.lpn_ff_engine_epanet : pc.lpn_ff_engine_native, host);
-		if (effectiveTimesExtended()) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_ds_eps_note, host);
-		}
+		refreshBoxTip('lpn_ds_box', dsBoxTip(engine));
 		other = fireFlowBusy || critBusy;
 		function take() {
 			dsAsk.scope = scope.value;
@@ -62397,9 +62417,6 @@ var EngCalcs = EngCalcs || {};
 		ffEl('div', 'lpn-ff-head', dsAsk.scope === 'selected'
 			? (pc.lpn_ds_head_search_selected || 'What demand scale can these junctions handle?')
 			: (pc.lpn_ds_head_search || 'What demand scale can the system handle?'), host);
-		ffEl('p', 'lpn-ff-note', (pc.lpn_ds_search_note ||
-			'Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.')
-			.replace('{max}', dsMult(D.max)).replace('{step}', String(D.step)), host);
 		buttons = ffEl('div', 'lpn-ff-buttons', null, host);
 		find = ffEl('button', 'lpn-ff-run', pc.lpn_find_btn || 'Find', buttons);
 		find.type = 'button';

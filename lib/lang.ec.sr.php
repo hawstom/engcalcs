@@ -3644,7 +3644,6 @@ $ec_lang['lpn_ff_menu_tip']='Тестира чворове један по је�
 $ec_lang['lpn_ff_title']='Анализа противпожарног протока';
 $ec_lang['lpn_ff_intro']='Од сваког чвора се редом тражи да повуче противпожарни проток поред потрошње коју већ има. Ништа у вашем пројекту се не мења; цео прорачун се обавља на копији.';
 $ec_lang['lpn_ff_scope']='Чворови за тестирање';
-$ec_lang['lpn_ff_scope_tip']='Изаберите скуп пре покретања. Тестирање сваког чвора у великом систему може потрајати минутима.';
 $ec_lang['lpn_ff_all']='Сви';
 $ec_lang['lpn_ff_selected']='Изабрани';
 $ec_lang['lpn_ff_no_junctions']='Овај пројекат још нема чворова, па нема шта да се тестира.';
@@ -3674,7 +3673,6 @@ $ec_lang['lpn_ff_engine_native']='Користи се уграђени реша�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='Користи се EPANET решавач.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='Расположиви противпожарни проток је претрага, па се цела мрежа решава око шеснаест пута за сваки тестирани чвор. Велики систем може потрајати минутима. Можете га зауставити у било ком тренутку и задржати оно што је до тада израчунато.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3682,7 +3680,6 @@ $ec_lang['lpn_ff_engine_cost']='Расположиви противпожарн�
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Тестира се само временски корак тренутно приказан на екрану. Противпожарни проток се обично тестира поред максималне дневне потрошње, па поставите мрежу у то стање пре покретања.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

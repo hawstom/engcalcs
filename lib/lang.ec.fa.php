@@ -3644,7 +3644,6 @@ $ec_lang['lpn_ff_menu_tip']='گره‌ها را یکی‌یکی آزمایش ک�
 $ec_lang['lpn_ff_title']='تحلیل جریان آتش‌نشانی';
 $ec_lang['lpn_ff_intro']='از هر گره به‌نوبت خواسته می‌شود جریان آتش‌نشانی را روی مصرفی که از پیش دارد اضافه بردارد. چیزی در پروژهٔ شما تغییر نمی‌کند؛ کل اجرا روی یک نسخه انجام می‌شود.';
 $ec_lang['lpn_ff_scope']='گره‌های آزمایش‌شونده';
-$ec_lang['lpn_ff_scope_tip']='مجموعه را پیش از اجرا انتخاب کنید. آزمایش هر گره در یک سیستم بزرگ می‌تواند دقیقه‌ها طول بکشد.';
 $ec_lang['lpn_ff_all']='همه';
 $ec_lang['lpn_ff_selected']='انتخاب‌شده‌ها';
 $ec_lang['lpn_ff_no_junctions']='این پروژه هنوز گره‌ای ندارد، پس چیزی برای آزمایش نیست.';
@@ -3674,7 +3673,6 @@ $ec_lang['lpn_ff_engine_native']='حل‌کنندهٔ درون‌ساخت است
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='موتور EPANET استفاده می‌شود.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='جریان آتش‌نشانی موجود یک جستجوست، پس کل شبکه برای هر گرهٔ آزمایش‌شده حدود شانزده بار حل می‌شود. یک سیستم بزرگ چند دقیقه طول می‌کشد. می‌توانید هر زمان آن را متوقف کنید و آنچه را که تاکنون انجام داده نگه دارید.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3682,7 +3680,6 @@ $ec_lang['lpn_ff_engine_cost']='جریان آتش‌نشانی موجود یک �
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='فقط گام زمانیِ اکنون روی صفحه آزمایش می‌شود. جریان آتش‌نشانی معمولاً روی مصرف حداکثر روز آزمایش می‌شود، پس پیش از اجرا شبکه را در آن شرایط تنظیم کنید.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

@@ -3645,7 +3645,6 @@ $ec_lang['lpn_ff_menu_tip']='Проверяет узлы по одному: ск
 $ec_lang['lpn_ff_title']='Анализ противопожарного расхода';
 $ec_lang['lpn_ff_intro']='У каждого узла по очереди запрашивается забор противопожарного расхода сверх уже имеющегося расхода отбора. Ваш проект при этом не меняется: весь расчёт выполняется на копии.';
 $ec_lang['lpn_ff_scope']='Проверяемые узлы';
-$ec_lang['lpn_ff_scope_tip']='Выберите набор узлов перед запуском. Проверка каждого узла в большой системе может занять несколько минут.';
 $ec_lang['lpn_ff_all']='Все';
 $ec_lang['lpn_ff_selected']='Выбранные';
 $ec_lang['lpn_ff_no_junctions']='В этом проекте пока нет узлов, поэтому проверять нечего.';
@@ -3675,7 +3674,6 @@ $ec_lang['lpn_ff_engine_native']='Это вычислено встроенным
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='Это вычислено расчётным ядром EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='Располагаемый противопожарный расход находится поиском, поэтому вся сеть рассчитывается около шестнадцати раз для каждого проверяемого узла. Большая система может занять несколько минут. Вы можете остановить расчёт в любой момент и сохранить то, что уже вычислено.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3683,7 +3681,6 @@ $ec_lang['lpn_ff_engine_cost']='Располагаемый противопож�
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Проверяется только шаг времени, показанный сейчас на экране. Противопожарный расход обычно проверяется сверх расхода в сутки максимального водопотребления, поэтому перед запуском приведите сеть в это состояние.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

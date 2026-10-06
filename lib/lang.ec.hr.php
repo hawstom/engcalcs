@@ -3645,7 +3645,6 @@ $ec_lang['lpn_ff_menu_tip']='Testirajte čvorove jedan po jedan: koliko svaki mo
 $ec_lang['lpn_ff_title']='Analiza protupožarnog protoka';
 $ec_lang['lpn_ff_intro']='Od svakog se čvora redom traži da povuče protupožarni protok povrh potražnje koju već ima. Ništa se u vašem projektu ne mijenja; cijelo pokretanje izvodi se na kopiji.';
 $ec_lang['lpn_ff_scope']='Čvorovi za testiranje';
-$ec_lang['lpn_ff_scope_tip']='Odaberite skup prije pokretanja. Testiranje svakog čvora u velikom sustavu može potrajati minutama.';
 $ec_lang['lpn_ff_all']='Svi';
 $ec_lang['lpn_ff_selected']='Odabrani';
 $ec_lang['lpn_ff_no_junctions']='Ovaj projekt još nema čvorova, pa nema ništa za testirati.';
@@ -3675,7 +3674,6 @@ $ec_lang['lpn_ff_engine_native']='Koristi se ugrađeni rješavač.';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='Koristi se EPANET rješavač.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='Raspoloživi protupožarni protok je pretraga, pa se cijela mreža rješava otprilike šesnaest puta za svaki testirani čvor. Velik sustav traje minutama. Možete ga zaustaviti u bilo kojem trenutku i zadržati ono što je već napravljeno.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3683,7 +3681,6 @@ $ec_lang['lpn_ff_engine_cost']='Raspoloživi protupožarni protok je pretraga, p
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Testira se samo vremenski korak koji je sada na zaslonu. Protupožarni protok obično se testira povrh potražnje maksimalnog dana, pa mrežu postavite na to stanje prije pokretanja.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

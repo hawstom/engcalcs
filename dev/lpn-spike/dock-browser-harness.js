@@ -17,7 +17,8 @@
 //      map, leaving tucks it, a click on the tab flies it out with the keyboard inside, Escape tucks
 //      it and puts the keyboard on the tab, and a reload brings it back tucked.
 //   4. Q5. Fire flow, Criticality and Demand scaling carry one `?` in the row, focusable, whose tip
-//      is the tool's own menu tip; no other box carries one.
+//      is the tool's whole explanation (its intro, then its scope tip); no other box carries one.
+//      Enter on the `?` opens it (Task 759: one door) and a click on the title bar closes it.
 //   5. A PHONE (390 x 844). No dock buttons, and a box stored as docked opens filling the screen with
 //      the map at full width.
 //
@@ -63,7 +64,8 @@ async function shot(page, name) {
 const BOXES = ['lpn_popup', 'lpn_find_popup', 'lpn_settings_box', 'lpn_library_box', 'lpn_ff_box', 'lpn_crit_box',
 	'lpn_ds_box', 'lpn_energy_box', 'lpn_contour_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_alt_box',
 	'lpn_full_box', 'lpn_calib_box', 'lpn_notes_popup', 'lpn_hotkeys_popup'];
-const HELP = { lpn_ff_box: 'lpn_ff_menu_tip', lpn_crit_box: 'lpn_crit_menu_tip', lpn_ds_box: 'lpn_ds_menu_tip' };
+const HELP = { lpn_ff_box: ['lpn_ff_intro'], lpn_crit_box: ['lpn_crit_intro', 'lpn_crit_scope_tip'],
+	lpn_ds_box: ['lpn_ds_intro'] };
 
 async function openNet3(Session, browser, viewport, before) {
 	const a = await Session.open(browser, NAME, { viewport: viewport || { width: 1400, height: 900 } });
@@ -380,17 +382,23 @@ async function sectionHelp(Session, browser) {
 			const b = document.getElementById(id), row = b.querySelector('.lpn-box-corner');
 			const glyphs = row.querySelectorAll('.ec-tip'), help = row.querySelector('.ec-help');
 			return { id, glyphs: glyphs.length, tip: help ? (help.getAttribute('data-bs-original-title') || help.title) : null,
-				focusable: !!help && help.tabIndex === 0, last: !!help && row.lastElementChild === help };
+				focusable: glyphs.length === 1 && glyphs[0].tabIndex === 0, last: !!help && row.lastElementChild === help };
 		}), BOXES);
 		for (const id of Object.keys(HELP)) {
 			const f = facts.find((x) => x.id === id);
 			ok(id + ': exactly one ?, the last thing before the X, focusable', f.glyphs === 1 && f.last && f.focusable, JSON.stringify(f));
-			ok(id + ': ...its tip is the tool\'s own menu tip', f.tip === await a.lang(HELP[id]));
+			const want = [];
+			for (const k of HELP[id]) { want.push(await a.lang(k)); }
+			// Fire flow and Demand scaling fold the box's former paragraphs in after the intro.
+			const whole = want.join(' ');
+			ok(id + ': ...its tip opens with the tool\'s intro', id === 'lpn_crit_box' ? f.tip === whole :
+				String(f.tip).indexOf(whole.split('{')[0]) === 0, String(f.tip).slice(0, 60));
 		}
 		ok('no other box carries a ? in its corner', facts.filter((f) => !HELP[f.id]).every((f) => f.glyphs === 0));
 		await a.menuClickSub(await a.lang('lpn_analyze_menu'), await a.lang('lpn_ff_menu'), 'project');
 		await a.settle(400);
-		await a.page.focus('#lpn_ff_box .lpn-corner-help');
+		await a.page.focus('#lpn_ff_box .lpn-corner-help .ec-tip');
+		await a.page.keyboard.press('Enter');
 		await a.settle(700);
 		const shown = await a.page.evaluate(() => {
 			const h = document.querySelector('#lpn_ff_box .lpn-corner-help'), id = h.getAttribute('aria-describedby');
@@ -403,7 +411,7 @@ async function sectionHelp(Session, browser) {
 		await a.settle(400);
 		const still = await a.page.evaluate(() => { const h = document.querySelector('#lpn_ff_box .lpn-corner-help'); return !!h.getAttribute('aria-describedby') && !!document.getElementById(h.getAttribute('aria-describedby')); });
 		ok('a click on the box title bar closes the ? tip', !still);
-		ok('the keyboard reaching the ? shows the tip', !!shown && shown.indexOf((await a.lang('lpn_ff_menu_tip')).slice(0, 20)) >= 0, String(shown).slice(0, 60));
+		ok('Enter on the ? shows the tip', !!shown && shown.indexOf((await a.lang('lpn_ff_intro')).slice(0, 20)) >= 0, String(shown).slice(0, 60));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 	} finally {
 		await a.close();

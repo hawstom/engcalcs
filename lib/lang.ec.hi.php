@@ -3646,7 +3646,6 @@ $ec_lang['lpn_ff_menu_tip']='जंक्शनों को एक-एक क�
 $ec_lang['lpn_ff_title']='फायर फ्लो विश्लेषण';
 $ec_lang['lpn_ff_intro']='हर जंक्शन से बारी-बारी से पहले से मौजूद माँग के ऊपर एक फायर फ्लो खींचने को कहा जाता है। आपके प्रोजेक्ट में कुछ नहीं बदलता; पूरा रन एक प्रति पर किया जाता है।';
 $ec_lang['lpn_ff_scope']='जाँचने के लिए जंक्शन';
-$ec_lang['lpn_ff_scope_tip']='रन करने से पहले सेट चुनें। एक बड़े सिस्टम में हर जंक्शन जाँचने में कई मिनट लग सकते हैं।';
 $ec_lang['lpn_ff_all']='सभी';
 $ec_lang['lpn_ff_selected']='चयनित';
 $ec_lang['lpn_ff_no_junctions']='इस प्रोजेक्ट में अभी तक कोई जंक्शन नहीं है, इसलिए जाँचने के लिए कुछ नहीं है।';
@@ -3677,7 +3676,6 @@ $ec_lang['lpn_ff_engine_native']='बिल्ट-इन सॉल्वर उ�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='EPANET इंजन उपयोग किया जाता है।';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='उपलब्ध फायर फ्लो एक खोज है, इसलिए जाँचे जा रहे हर जंक्शन के लिए पूरा नेटवर्क लगभग सोलह बार हल किया जाता है। एक बड़े सिस्टम में कई मिनट लगते हैं। आप इसे किसी भी समय रोक सकते हैं और अब तक जो निकाला जा चुका है उसे रख सकते हैं।';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3685,7 +3683,6 @@ $ec_lang['lpn_ff_engine_cost']='उपलब्ध फायर फ्लो ए
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='अभी स्क्रीन पर दिख रहे समय-चरण की ही जाँच की जाती है। फायर फ्लो सामान्यतः अधिकतम दिन माँग के ऊपर जाँचा जाता है, इसलिए रन करने से पहले नेटवर्क को उस स्थिति में सेट करें।';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

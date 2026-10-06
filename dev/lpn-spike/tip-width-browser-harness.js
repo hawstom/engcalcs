@@ -1,6 +1,7 @@
 // A TIP IS WIDE, NOT TALL (Tom, 2026-10-04, on Ida's tip audit). Bootstrap caps a tooltip at
 // 200 px, so a long tip became a column taller than half the window. css/engcalcs.css raises the
-// cap to 17rem, never wider than the viewport less a gutter. Real headless Chrome, because the
+// cap to 17rem for a name tip and 22rem for an explanation behind a "?", never wider than the
+// viewport less a gutter. Real headless Chrome, because the
 // width is what the browser lays out, not what the stylesheet says.
 //
 //   node dev/lpn-spike/tip-width-browser-harness.js
@@ -15,11 +16,14 @@ function ok(name, cond, extra) {
 	fails++;
 	console.log('  FAIL ' + name + (extra === undefined ? '' : '  -- ' + extra));
 }
-// Show the longest tip on the page and measure what the browser drew.
-async function measure(page) {
-	return page.evaluate(() => {
+// Show the longest tip of one kind on the page and measure what the browser drew. A tip behind a
+// "?" is an EXPLANATION (Task 759): opened by a click, capped at 22rem, not 17rem.
+async function measure(page, explain) {
+	return page.evaluate((ex) => {
+		document.querySelectorAll('.tooltip').forEach((t) => t.remove());
 		const els = Array.from(document.querySelectorAll('[data-bs-toggle="tooltip"], [data-bs-original-title], [title]'))
-			.filter((e) => (e.getAttribute('data-bs-original-title') || e.getAttribute('title') || '').length > 0);
+			.filter((e) => (e.getAttribute('data-bs-original-title') || e.getAttribute('title') || '').length > 0)
+			.filter((e) => e.classList.contains('ec-explain-host') === ex);
 		els.sort((a, b) => (b.getAttribute('data-bs-original-title') || b.getAttribute('title')).length -
 			(a.getAttribute('data-bs-original-title') || a.getAttribute('title')).length);
 		const el = els[0];
@@ -29,9 +33,10 @@ async function measure(page) {
 		return new Promise((res) => setTimeout(() => {
 			const inner = document.querySelector('.tooltip .tooltip-inner');
 			const r = inner ? inner.getBoundingClientRect() : null;
+			t.hide();
 			res({ words, w: r ? r.width : -1, h: r ? r.height : -1, vw: window.innerWidth });
 		}, 200));
-	});
+	}, !!explain);
 }
 async function main() {
 	let playwright;
@@ -53,6 +58,14 @@ async function main() {
 				ok('desktop: no taller than half the window (it stood 554 px at the old cap)', m.h < vp.height / 2, m.h);
 			} else {
 				ok('phone: never wider than the screen less a gutter', m.w <= m.vw - 32 + 0.5, m.w + ' of ' + m.vw);
+			}
+			await page.waitForTimeout(300);
+			const x = await measure(page, true);
+			ok(vp.name + ': the longest explanation (' + x.words + ' words) was drawn', x.w > 0, JSON.stringify(x));
+			if (vp.name === 'desktop') {
+				ok('desktop: an explanation is wider than a name tip, up to 22rem', x.w > 272.5 && x.w <= 352.5, x.w);
+			} else {
+				ok('phone: an explanation is never wider than the screen less a gutter', x.w <= x.vw - 32 + 0.5, x.w + ' of ' + x.vw);
 			}
 			await page.close();
 		}

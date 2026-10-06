@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**25 still to read on master**, of 135 untranslated keys, of 2361 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**26 still to read on master**, of 132 untranslated keys, of 2355 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (135, 25 to read @@ NEEDS RULING)
+## lpn_  (132, 26 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -153,9 +153,6 @@ never edits a synonym.
 - **`lpn_ds_col_unscaled_tip`**
   > With the demands as they are in the active scenario at this time step, the same value the map shows.
   _Ruled OK 2026-10-03._
-- **`lpn_ds_eps_note`**
-  > Only the time step now on screen is scaled; levels and statuses are taken from this step. To test the peak, move the clock to the peak demand before you run.
-  _Ruled OK 2026-10-05._
 - **`lpn_ds_found`**
   > ✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.
   _Ruled 2026-10-05: Proposal approved._
@@ -181,8 +178,8 @@ never edits a synonym.
   > ✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.
   _Ruled OK 2026-10-03._
 - **`lpn_ds_intro`**
-  > The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.
-  _Ruled OK 2026-10-03._
+  > Select the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\n\nSelect the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\n\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. Only that time step is scaled, and levels and statuses are taken from it; to test the peak, move the clock to the peak demand before you run.
+  @@ NEEDS RULING
 - **`lpn_ds_lowest_at`**
   > At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.
   _Ruled OK 2026-10-03._
@@ -237,12 +234,6 @@ never edits a synonym.
 - **`lpn_ds_scope_selected`**
   > Selected junctions
   _Ruled OK 2026-10-03._
-- **`lpn_ds_scope_tip`**
-  > All junctions, or only those selected on the map. Pressures are checked at the scaled demand.
-  _Ruled OK 2026-10-03._
-- **`lpn_ds_search_note`**
-  > Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.
-  _Ruled 2026-10-05: Edited proposal._
 - **`lpn_ds_search_stopped`**
   > The search was stopped before it found an answer.
   _Ruled 2026-10-03: OK. Are we sure this isn't already provided by a different key?_
@@ -547,7 +538,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.
   @@ NEEDS RULING
 
-### feat/backdrop-attach (`929d7ec9`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/backdrop-attach (`5ab01ee7`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_inp_backdrop_attach`**
   > Attach {file}…
@@ -732,7 +723,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`728c2993`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/dxf (`f643a2ac`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_dxf_export_no_utm`**
   > The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.
@@ -762,7 +753,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Download this network as a drawing that AutoCAD and other CAD programs open: one layer for each kind of asset, each node a block carrying its ID and main values, and the labels as they appear on the map.
   @@ NEEDS RULING
 
-### feat/feedback (`d96763d3`) — 13 new, 13 to read @@ NEEDS RULING
+### feat/feedback (`1be9dba0`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_fb_bad_email`**
   > That email address does not look right. Correct it, or leave it empty.
@@ -780,7 +771,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > That did not reach us. What you wrote is still here, so you can try again.
   @@ NEEDS RULING
 - **`lpn_fb_intro`**
-  > Canned messages (optional). Nothing is sent until you press Send.
+  > Pick any that fit, or none, and add whatever you like. Nothing is sent until you press Send.
   @@ NEEDS RULING
 - **`lpn_fb_pick_broken`**
   > Something did not work
@@ -804,7 +795,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
   @@ NEEDS RULING
 
-### feat/geojson (`1e01efdb`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/geojson (`ea4af950`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_file_export_geojson`**
   > Export GeoJSON file…
@@ -853,7 +844,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/screenshot (`98f78a17`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/screenshot (`8a583e22`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_screenshot_copied`**
   > Screenshot copied.
@@ -963,4 +954,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Export table as ODS
   @@ NEEDS RULING
 
-### feat/tip-door (`0711a336`) — adds no English strings
+### feat/tip-door (`32bc317e`) — adds no English strings

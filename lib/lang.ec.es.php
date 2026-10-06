@@ -3743,7 +3743,6 @@ $ec_lang['lpn_ff_menu_tip']='Pruebe los nudos uno por uno: cuánto puede entrega
 $ec_lang['lpn_ff_title']='Caudal contra incendios';
 $ec_lang['lpn_ff_intro']='A cada nudo, por turno, se le pide que extraiga un caudal contra incendios además de la demanda que ya tiene. Nada en su proyecto se cambia; todo el cálculo se hace sobre una copia.';
 $ec_lang['lpn_ff_scope']='Nudos a probar';
-$ec_lang['lpn_ff_scope_tip']='Elija el conjunto antes de ejecutar. Probar todos los nudos en un sistema grande puede tardar varios minutos.';
 $ec_lang['lpn_ff_all']='Todos';
 $ec_lang['lpn_ff_selected']='Seleccionados';
 $ec_lang['lpn_ff_no_junctions']='Este proyecto todavía no tiene nudos, así que no hay nada que probar.';
@@ -3776,7 +3775,6 @@ $ec_lang['lpn_ff_engine_native']='Esto se calcula con el solucionador incorporad
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='Esto se calcula con el solucionador de EPANET.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='El caudal contra incendios disponible es una búsqueda, así que toda la red se resuelve unas dieciséis veces por cada nudo probado. Un sistema grande tarda varios minutos. Puede detenerlo en cualquier momento y conservar lo que ya se calculó.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3784,7 +3782,6 @@ $ec_lang['lpn_ff_engine_cost']='El caudal contra incendios disponible es una bú
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='Solo se prueba el paso de tiempo que está en pantalla ahora. El caudal contra incendios normalmente se prueba sumado a la demanda máxima diaria, así que configure la red en esa condición antes de ejecutar.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

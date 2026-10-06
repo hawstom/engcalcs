@@ -3645,7 +3645,6 @@ $ec_lang['lpn_ff_menu_tip']='جنکشنونه یو په یو ازمویئ: هر 
 $ec_lang['lpn_ff_title']='د اور بهاو شننه';
 $ec_lang['lpn_ff_intro']='هر جنکشن یو په یو غوښتل کیږي چې د خپلې دمخه لرلې غوښتنې پر سر یو اور بهاو راباسي. ستاسو پروژه کې هیڅ شی نه بدلیږي؛ ټول محاسبه یوه کاپي باندې کیږي.';
 $ec_lang['lpn_ff_scope']='هغه جنکشنونه چې ازمویل شي';
-$ec_lang['lpn_ff_scope_tip']='مخکې لدې چې محاسبه وکړئ ټاکنه وکړئ. په یوه لویه سیسټم کې د هر جنکشن ازموینه کیدای شي دقیقې ونیسي.';
 $ec_lang['lpn_ff_all']='ټول';
 $ec_lang['lpn_ff_selected']='ټاکل شوي';
 $ec_lang['lpn_ff_no_junctions']='دا پروژه لا هیڅ جنکشن نلري، نو د ازموینې لپاره هیڅ شی نشته.';
@@ -3675,7 +3674,6 @@ $ec_lang['lpn_ff_engine_native']='جوړ شوی حل کوونکی کارول ک�
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='د EPANET انجن کارول کیږي.';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='شتون لرونکې اور بهاو یوه لټون ده، نو ټوله شبکه د هر ازمویل شوي جنکشن لپاره شاوخوا شپاړس ځله حل کیږي. یوه لویه سیسټم دقیقې نیسي. تاسو یې کوم وخت ودرولی شئ او هغه څه وساتلی شئ چې دمخه یې ترسره کړي دي.';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3683,7 +3681,6 @@ $ec_lang['lpn_ff_engine_cost']='شتون لرونکې اور بهاو یوه ل�
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='یوازې هغه وخت پړاو چې اوس پر پردې دی ازمویل کیږي. اور بهاو معمولاً د اعظمي ورځې غوښتنې پر سر ازمویل کیږي، نو مخکې لدې چې محاسبه وکړئ شبکه هغه حالت ته وټاکئ.';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost
