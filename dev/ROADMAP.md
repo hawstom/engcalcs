@@ -361,8 +361,9 @@ the block.
 - 75|768| **Report a problem: more information and freedom than one anonymous click.**
   Tom, 2026-10-05: *"those links open a small form that allows, but doesn't require, a message, an
   email address, and some selectors or canned phrases."* Ida's ranking (journal 2026-10-05): the
-  error toast carries its own link with the code, and contact.php gains a category and an optional
-  email label (building on `feat/feedback`); the in-page Send feedback dialog is the larger build.
+  Tom, 2026-10-06, rejecting the cheap build (new links, a better contact.php): *"Cheap is no good.
+  Bigger build is needed... Do it right."* "Something wrong here?" opens a little box (canned-message
+  buttons, optional email, comments); Send is the second click. Rebuilt on `feat/feedback`.
 - 75|769| **Change type: a junction becomes a tank, a pipe a valve.**
   Tom, 2026-10-05: *"a tool under Water or Tables to Change node type for any asset, where if it has
   information that can't be ported to the new type, we alert and ask."* Building on
@@ -371,9 +372,18 @@ the block.
   Tom, 2026-10-05: interpret a point's Description as an asset or a pipe vertex, and the CSV as a
   batch. The open question is joining several pipes at one node without a custom code; Mary is
   asked what Civil 3D, Carlson and Trimble codes already do (`dev/agents/market-researcher/survey-codes.md`).
+  Tom, 2026-10-06: OK to reuse Carlson's JPN<point> (Civil 3D's CPN) for a tee rather than invent one.
 - 75|772| **AutoCAD: import, export, and perhaps sync, on a long-lived branch.**
   Tom, 2026-10-05: *"I am an AutoCAD power user and developer... I would like to know what's already
   been done first."* Mary's survey of prior art: `dev/agents/market-researcher/autocad-interop.md`.
+  Tom, 2026-10-06: **DXF export first** (plain AutoCAD cannot read a shapefile); stable, venerable,
+  widely usable. XDATA is invisible to users, so useful only with an in-AutoCAD app (perhaps a .lsp
+  and README shipped beside the DXF), and that app waits on real demand and someone to spec it with.
+  **DXF import as plain as survey import**: LWPOLYLINEs are links, points or INSERTs are nodes; where
+  layers, attributed blocks, XDATA or Map data exist, propose asset types and properties in an
+  editable translation table (assets, properties, scenarios, alternatives). Mary, same day: Map
+  "ADE" object data does not survive DXF; layers and ATTRIBs are visible everywhere; target ASCII
+  R2000.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -906,6 +916,9 @@ the block.
   migration on-ramp that needs no WaterCAD file. Unsized; read with Task 723. Tom, 2026-10-05,
   asked first whether QGIS or Esri already have robust water-modelling plug-ins, and where we could
   interoperate or merge: `dev/agents/market-researcher/gis-plugins.md`.
+  Tom, 2026-10-06: yes to shapefile + GeoJSON import behind one mapping step, GeoJSON export first;
+  and on the free GIS-to-EPS gap, *"I'd love to collaborate to provide this."* Who to write to
+  (Gusnet, QGISRed, Giswater): Mary's journal, 2026-10-06.
 - 50|733| **Grow the native solver, in phases, to everything EPANET's solves.** Tom, 2026-09-26
   (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
   to do everything that the EPANET solver does. This way the math is less of a black box for us."*

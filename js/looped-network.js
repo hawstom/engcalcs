@@ -6682,7 +6682,12 @@ var EngCalcs = EngCalcs || {};
 	// default (a node's default elevation, demand, or pipe diameter) is a number in whatever unit
 	// was showing when it was typed; roughness is handled separately (it follows the friction
 	// method, not a length unit) and `k` is a dimensionless minor-loss coefficient.
-	var LPN_DEFAULTS_UNIT_FIELD = { lpn_u_elevhead: 'nodeElev', lpn_u_flow: 'demand', lpn_u_diameter: 'diameter' };
+	// A tank's water depths are in the elevation/head unit and its vessel diameter in the length unit
+	// (seedDefaultInputs()), so they follow the same rule. The lowest depth is a zero, unit-free.
+	var LPN_DEFAULTS_UNIT_FIELD = {
+		lpn_u_elevhead: ['nodeElev', 'tankLevel', 'tankMaxLevel'], lpn_u_flow: ['demand'],
+		lpn_u_diameter: ['diameter'], lpn_u_length: ['tankDiameter']
+	};
 	/**
 	 * **R-342: A NEW PROJECT FOLLOWS THE ONE IT LEFT AS MUCH AS IT CAN** (Tom: *"A new project
 	 * copies the open project where units are the same... Otherwise a new project gets built-in
@@ -6714,8 +6719,16 @@ var EngCalcs = EngCalcs || {};
 		if (!changedSelectors || !changedSelectors.length) { return; }
 		changedSelectors.forEach(function (n) { set[n] = true; });
 		Object.keys(LPN_DEFAULTS_UNIT_FIELD).forEach(function (s) {
-			if (set[s] && settings.defaults) { settings.defaults[LPN_DEFAULTS_UNIT_FIELD[s]] = null; }
+			if (set[s] && settings.defaults) {
+				LPN_DEFAULTS_UNIT_FIELD[s].forEach(function (k) { settings.defaults[k] = null; });
+			}
 		});
+		// **NULL IS NOT A STATE A PROJECT MAY BE LEFT IN.** defaultSettings() holds nulls only until
+		// seedDefaultInputs() fills them (init, Restore defaults); a new project that stopped at the
+		// null gave every pipe, junction and tank it drew or imported a null diameter, demand or
+		// depth, and the first label refresh threw on `toFixed` (SI new project, 2026-10-06). The
+		// units are already the new ones here, so the seed reads the built-in value for them.
+		seedDefaultInputs();
 		if (set.lpn_u_length) { labelSettings.customerMaxWidth = defaultLabelSettings().customerMaxWidth; }
 		for (group in LPN_LABEL_FIELD_UNIT) {
 			if (!Object.prototype.hasOwnProperty.call(LPN_LABEL_FIELD_UNIT, group)) { continue; }
