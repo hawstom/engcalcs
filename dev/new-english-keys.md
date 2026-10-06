@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**25 still to read on master**, of 135 untranslated keys, of 2361 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**35 still to read on master**, of 145 untranslated keys, of 2371 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (135, 25 to read @@ NEEDS RULING)
+## lpn_  (145, 35 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -96,6 +96,36 @@ never edits a synonym.
 - **`lpn_basemap_style_normal`**
   > Normal
   _Ruled OK 2026-10-05._
+- **`lpn_change_type_key`**
+  > ID: Lost entry
+  @@ NEEDS RULING
+- **`lpn_change_type_line`**
+  > {id}: {property} {value}
+  @@ NEEDS RULING
+- **`lpn_change_type_line_scenario`**
+  > {id}: {property} {value}, in scenario {scenario}
+  @@ NEEDS RULING
+- **`lpn_change_type_lost`**
+  > These values will be lost:
+  @@ NEEDS RULING
+- **`lpn_change_type_meaning`**
+  > These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.
+  @@ NEEDS RULING
+- **`lpn_change_type_menu`**
+  > Change type
+  @@ NEEDS RULING
+- **`lpn_change_type_more`**
+  > And {n} more.
+  @@ NEEDS RULING
+- **`lpn_change_type_ok`**
+  > Change
+  @@ NEEDS RULING
+- **`lpn_change_type_surface`**
+  > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
+  @@ NEEDS RULING
+- **`lpn_change_type_tip`**
+  > Change the selected nodes into junctions, reservoirs, or tanks. Each keeps its ID, its place, its pipes, and every value the new type also has. If anything would be lost, you are asked first.
+  @@ NEEDS RULING
 - **`lpn_choice_default`**
   > Default
   _Ruled OK 2026-10-05._
@@ -485,7 +515,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**40 still to read**, of 43 new keys across 13 unmerged branch(es).
+**62 still to read**, of 65 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -496,40 +526,9 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/asset-type (`c49cc214`) — 10 new, 10 to read @@ NEEDS RULING
+### feat/asset-type (`acbbc815`) — adds no English strings
 
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  @@ NEEDS RULING
-- **`lpn_change_type_line`**
-  > {id}: {property} {value}
-  @@ NEEDS RULING
-- **`lpn_change_type_line_scenario`**
-  > {id}: {property} {value}, in scenario {scenario}
-  @@ NEEDS RULING
-- **`lpn_change_type_lost`**
-  > These values will be lost:
-  @@ NEEDS RULING
-- **`lpn_change_type_meaning`**
-  > These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.
-  @@ NEEDS RULING
-- **`lpn_change_type_menu`**
-  > Change type
-  @@ NEEDS RULING
-- **`lpn_change_type_more`**
-  > And {n} more.
-  @@ NEEDS RULING
-- **`lpn_change_type_ok`**
-  > Change
-  @@ NEEDS RULING
-- **`lpn_change_type_surface`**
-  > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
-  @@ NEEDS RULING
-- **`lpn_change_type_tip`**
-  > Change the selected nodes into junctions, reservoirs, or tanks. Each keeps its ID, its place, its pipes, and every value the new type also has. If anything would be lost, you are asked first.
-  @@ NEEDS RULING
-
-### feat/backdrop-attach (`7f582c54`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/backdrop-attach (`55bb434f`) — 6 new, 6 to read @@ NEEDS RULING
 
 - **`lpn_inp_backdrop_attach`**
   > Attach {file}…
@@ -543,11 +542,14 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_inp_backdrop_attached_other`**
   > Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.
   @@ NEEDS RULING
+- **`lpn_status_inp_exported_no_picture`**
+  > Exported {file}. The background picture could not be saved, so {file} names none; in EPANET, add it with View > Backdrop > Load.
+  @@ NEEDS RULING
 - **`lpn_status_inp_exported_picture`**
-  > Exported {file}, the background picture {picture} and its world file {world}. Keep the three in one folder.
+  > Exported {zip}, holding {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open {file} in EPANET; the picture comes with it.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`d6f39266`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/bentley-interop (`29075699`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -558,10 +560,28 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
   @@ NEEDS RULING
+- **`lpn_settings_table_category`**
+  > Category
+  @@ NEEDS RULING
+- **`lpn_settings_table_major`**
+  > Major heading
+  @@ NEEDS RULING
+- **`lpn_settings_table_minor`**
+  > Minor heading
+  @@ NEEDS RULING
+- **`lpn_settings_table_no`**
+  > No
+  @@ NEEDS RULING
+- **`lpn_settings_table_setting`**
+  > Setting
+  @@ NEEDS RULING
+- **`lpn_settings_table_yes`**
+  > Yes
+  @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/feedback (`c4cb8389`) — 13 new, 13 to read @@ NEEDS RULING
+### feat/feedback (`ce8819b0`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_fb_bad_email`**
   > That email address does not look right. Correct it, or leave it empty.
@@ -601,6 +621,30 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_fb_sends`**
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
+  @@ NEEDS RULING
+
+### feat/geojson (`6bd2f64a`) — 7 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_file_export_geojson`**
+  > Export GeoJSON file…
+  @@ NEEDS RULING
+- **`lpn_file_export_geojson_tip`**
+  > Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are longitude and latitude. Results are included only when the network has been solved.
+  @@ NEEDS RULING
+- **`lpn_geojson_refused_empty`**
+  > There is nothing to export yet. Draw or open a network first.
+  @@ NEEDS RULING
+- **`lpn_geojson_refused_local`**
+  > A GeoJSON file holds longitude and latitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.
+  @@ NEEDS RULING
+- **`lpn_geojson_refused_range`**
+  > These positions are not valid longitudes and latitudes: {detail}
+  @@ NEEDS RULING
+- **`lpn_geojson_results_in`**
+  > The results on screen are included.
+  @@ NEEDS RULING
+- **`lpn_geojson_results_out`**
+  > No results are included, because the network is not solved.
   @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
@@ -655,4 +699,61 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
   @@ NEEDS RULING
 
-### feat/tip-door (`19f79bc1`) — adds no English strings
+### feat/survey-code (`26ca3c1c`) — 18 new, 18 to read @@ NEEDS RULING
+
+- **`lpn_survey_codes_add`**
+  > Add code
+  @@ NEEDS RULING
+- **`lpn_survey_codes_col_code`**
+  > Code
+  @@ NEEDS RULING
+- **`lpn_survey_codes_col_type`**
+  > Asset type
+  @@ NEEDS RULING
+- **`lpn_survey_codes_remove`**
+  > Remove code
+  @@ NEEDS RULING
+- **`lpn_survey_codes_tip`**
+  > Read the first word of each description as a code from the table. Points with the same line code join into one pipe in file order, and WL1 and WL2 are separate lines. +0 starts a line, -0 ends one, and CLO closes one. JPN followed by a point name joins to that point (Carlson), and Civil 3D writes it CPN.
+  @@ NEEDS RULING
+- **`lpn_survey_codes_toggle`**
+  > Read the description as field codes
+  @@ NEEDS RULING
+- **`lpn_survey_confirm_coded`**
+  > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) found. Proceed?
+  @@ NEEDS RULING
+- **`lpn_survey_note_code_two_nodes`**
+  > More than one node code, the first was used.
+  @@ NEEDS RULING
+- **`lpn_survey_note_code_unknown`**
+  > Code not in the code table, imported as the asset type chosen above.
+  @@ NEEDS RULING
+- **`lpn_survey_note_code_unread`**
+  > Not every word is a code this page reads, kept in the description.
+  @@ NEEDS RULING
+- **`lpn_survey_note_join_missing`**
+  > JPN or CPN names a point not in this file or project, no pipe drawn for it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_join_no_line`**
+  > JPN or CPN on a point with no line code, no pipe drawn for it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_line_one_point`**
+  > Only point on its line, no pipe drawn from it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_no_desc`**
+  > Field codes are on, but this file has no description column, so no codes were read.
+  @@ NEEDS RULING
+- **`lpn_survey_note_pipe_one_node`**
+  > This line returns to the same node with no other node between, no pipe drawn for it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_vertex_text`**
+  > Not every word is a code this page reads, and a vertex keeps no description.
+  @@ NEEDS RULING
+- **`lpn_survey_note_vertices`**
+  > Points that became pipe vertices: {detail}. A vertex keeps no name, elevation, or description.
+  @@ NEEDS RULING
+- **`lpn_survey_report_coded`**
+  > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.
+  @@ NEEDS RULING
+
+### feat/tip-door (`4df634f8`) — adds no English strings
