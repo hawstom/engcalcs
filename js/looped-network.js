@@ -6870,7 +6870,7 @@ var EngCalcs = EngCalcs || {};
 	// Recalculate OFF means a snapshot; pre-review of Change type, 2026-10-06, which saw a converted
 	// node's label drop from a stale P=114.70 to an invented P=0.00). A junction's head and pressure
 	// come from the last solve, a tank's or reservoir's from its own inputs, so a converted node
-	// would otherwise switch from one road to the other with no solve between. changeSelectedNodeType()
+	// would otherwise switch from one road to the other with no solve between. changeSelectedType()
 	// records what was on screen; it is honoured only while the same solve is showing and the node
 	// is still the type and the water surface it was converted to, so the next Calculate, an undo, or
 	// an edit of its head, depth or elevation each retire it.
@@ -31995,7 +31995,7 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **ONE UNDO.** One snapshot before the first node changes, however many are selected.
 	//
-	// **NODES ONLY.** Links were weighed and left out; dev/asset-type.md says why.
+	// **LINKS TOO**, under the same rule and the same box: see the link half below.
 	//
 	// **THE TYPE IS BASE-OWNED**, like a valve's type (renderValveFields()): it is not in
 	// LPN_OVERRIDABLE, so a change made while a scenario is showing changes the node in every
@@ -32213,7 +32213,7 @@ var EngCalcs = EngCalcs || {};
 		return { lost: lost, meaning: meaning, surface: surface };
 	}
 	// The change itself, on one node, in Base and in every scenario's overrides. No snapshot and no
-	// redraw: changeSelectedNodeType() takes one of each for the whole selection.
+	// redraw: changeSelectedType() takes one of each for the whole selection.
 	function applyNodeTypeChange(n, to) {
 		var from = n.type, key = ovKey(n), birth = nodeBirthFields(to), k,
 			carry = waterSurfaceCarry(n, to), depths = [];
@@ -32261,23 +32261,274 @@ var EngCalcs = EngCalcs || {};
 			n.maxLevel = Math.max.apply(null, [typeof n.maxLevel === 'number' ? n.maxLevel : 0].concat(depths));
 		}
 	}
+	// ---- CHANGE TYPE FOR A LINK: Pipe, Pump, Valve (Tom, 2026-10-06: "Proceed.") ----------------
+	//
+	// **THE SAME RULE AND THE SAME BOX AS A NODE.** The link keeps its ID, its ends, its bends, its
+	// Description, Tag and map label, its status, its active flag, and every value the new type also
+	// has. What only the old type had is listed first, Base and every scenario's override, and goes
+	// on Change. What only the new type has is what a newly drawn link of that type gets.
+	//
+	// **WHAT EACH TYPE HAS**, as `has(d)` on a {type, valveType} pair, because a valve's own type
+	// decides two of them: a throttle valve (TCV) reads no minor loss (EPANET ignores the column; see
+	// renderValveFields()), and only a general purpose valve (GPV) states a head-loss curve. A pump's
+	// head curve and a GPV's head-loss curve share `curveId` with different kinds, so they are two
+	// rows; no pair of types has both, so a change always drops one of them.
+	var LPN_LINK_TYPES = ['pipe', 'pump', 'valve'];
+	// **A VALVE IS BORN A THROTTLE (TCV)**, as addLink() draws one: it is the one valve type both
+	// engines solve, so changing a pipe into a valve never moves the page onto the other engine.
+	var CHANGE_TYPE_NEW_VALVE = 'TCV';
+	function linkTypeDesc(l) { return { type: l.type, valveType: l.type === 'valve' ? String(l.valveType || 'TCV').toUpperCase() : null }; }
+	function linkTargetDesc(to, l) {
+		if (to === l.type) { return linkTypeDesc(l); }
+		return { type: to, valveType: to === 'valve' ? CHANGE_TYPE_NEW_VALVE : null };
+	}
+	function valveTypeName(vt) {
+		var pc = EngCalcs.pageConfig || {};
+		return pc['lpn_valve_type_' + String(vt).toLowerCase()] || vt;
+	}
+	// The label and unit of a valve's setting, which is a different quantity per valve type
+	// (renderValveFields()): a pressure, a pressure drop, a flow, or a bare loss coefficient.
+	function valveSettingSpec(vt) {
+		var pc = EngCalcs.pageConfig || {};
+		if (vt === 'PRV' || vt === 'PSV') { return { label: pc.lpn_field_valve_setting_pressure || 'Pressure setting', unit: 'lpn_u_pressure' }; }
+		if (vt === 'PBV') { return { label: pc.lpn_field_valve_setting_drop || 'Pressure drop', unit: 'lpn_u_pressure' }; }
+		if (vt === 'FCV') { return { label: pc.lpn_field_valve_setting_flow || 'Flow setting', unit: 'lpn_u_flow' }; }
+		return { label: pc.lpn_field_valve_setting_loss || 'Loss coefficient' };
+	}
 	/**
-	 * **THE COMMAND**: every selected node that is not already `to` becomes one. Asks first, in the
+	 * Every link property that belongs to some link types and not to others, as
+	 * typeOwnedNodeSpecs() is for nodes. A key named in no row -- the ends, the bends, status,
+	 * active, Description, Tag, where its map label sits -- is common to every link and is kept.
+	 * Built for one link `l`, so a valve's setting is labelled as the quantity it is on that valve.
+	 */
+	function typeOwnedLinkSpecs(l) {
+		var pc = EngCalcs.pageConfig || {},
+			pipe = function (d) { return d.type === 'pipe'; },
+			pump = function (d) { return d.type === 'pump'; },
+			valve = function (d) { return d.type === 'valve'; },
+			vs = valveSettingSpec(linkTypeDesc(l).valveType);
+		return [
+			{ has: pipe, keys: ['_typeId'], props: ['typeId'], label: pc.lpn_field_pipetype || 'Pipe type' },
+			{ has: function (d) { return d.type !== 'pump'; }, keys: ['_diameter'], props: ['diameter'],
+				unit: 'lpn_u_diameter', label: pc.lpn_field_diameter || 'Diameter' },
+			{ has: pipe, keys: ['_roughness'], props: ['roughness'], label: roughnessLabel(),
+				unit: frictionMethod() === 'dw' ? 'lpn_u_roughness' : null },
+			{ has: pipe, keys: ['_length', 'lenAuto'], props: ['length'], unit: 'lpn_u_length',
+				label: pc.lpn_field_length || 'Length' },
+			{ has: pipe, keys: ['_fittingsId'], props: ['fittingsId'], label: pc.lpn_field_fittings || 'Fittings list' },
+			{ has: function (d) { return d.type === 'pipe' || (d.type === 'valve' && d.valveType !== 'TCV'); },
+				keys: ['_k'], props: ['k'], none: [0], label: pc.lpn_field_km || 'Minor (local) loss coefficient, k' },
+			{ has: pipe, keys: ['_bulkCoeff'], props: ['bulkCoeff'], label: pc.lpn_reaction_bulk || 'Bulk reaction coefficient' },
+			{ has: pipe, keys: ['_wallCoeff'], props: ['wallCoeff'], label: pc.lpn_reaction_wall || 'Wall reaction coefficient' },
+			{ has: pump, keys: ['_curveId'], props: ['curveId'], label: pc.lpn_pump_curve_source || 'Pump head curve' },
+			{ has: function (d) { return d.type === 'valve' && d.valveType === 'GPV'; }, keys: ['_curveId'], props: ['curveId'],
+				label: pc.lpn_gpv_curve_source || 'Valve head loss curve' },
+			{ has: pump, keys: ['_efficCurveId'], props: ['efficCurveId'], label: pc.lpn_pump_effic_curve || 'Pump efficiency curve' },
+			{ has: pump, keys: ['speed'], props: [], none: [1], label: pc.lpn_field_pump_speed || 'Relative speed' },
+			{ has: pump, keys: ['speedPattern'], props: [], label: pc.lpn_field_speed_pattern || 'Speed pattern' },
+			{ has: pump, keys: ['_energyPrice'], props: ['energyPrice'], label: pc.lpn_energy_price || 'Price of power' },
+			{ has: pump, keys: ['_energyPattern'], props: ['energyPattern'], label: pc.lpn_energy_price_pattern || 'Price pattern' },
+			{ has: valve, keys: ['valveType'], props: [], label: pc.lpn_field_valve_type || 'Valve type', show: valveTypeName },
+			{ has: valve, keys: ['_setting'], props: ['setting'], label: vs.label, unit: vs.unit }
+		].concat(customPropDefs().filter(function (d) { return !!d.key; }).map(function (d) {
+			return { custom: true, keys: ['_' + d.key], props: [d.key], label: customPropLabel(d),
+				has: function (x) { return customPropAppliesToType(d, 'link', x.type); } };
+		}));
+	}
+	// What a newly drawn link of this type carries beyond its ID, ends and bends: addLink()'s own
+	// values, read from the same New assets settings, so a converted valve and a drawn one cannot
+	// differ. A pump names no curve, as a drawn one does not (Task 586). A pipe's length is its
+	// drawn length, with Auto on, as when it is drawn. Called after the type is written.
+	function linkBirthFields(type, l) {
+		if (type === 'valve') {
+			return { _diameter: settings.defaults.diameter, _length: 0, lenAuto: false,
+				_k: settings.defaults.k, valveType: CHANGE_TYPE_NEW_VALVE,
+				_setting: defaultValveSetting(CHANGE_TYPE_NEW_VALVE) };
+		}
+		if (type === 'pump') { return {}; }
+		return { _diameter: settings.defaults.diameter, _roughness: settings.defaults.roughness,
+			lenAuto: true, _length: linkGeomLength(l), _k: settings.defaults.k };
+	}
+	// Is this row discarded by changing `l` to `to`? The node rule, on a {type, valveType} pair.
+	function linkChangeDrops(spec, from, to) {
+		return spec.custom ? !spec.has(to) : !(spec.has(to) && spec.has(from));
+	}
+	// The rule lines that name link `id` by a kind word (PIPE, PUMP or VALVE), each with that word
+	// rewritten to `to`'s. EPANET reads all three, and LINK, as "the link with this ID" and never
+	// checks the word against the link's type (rules.c, newpremise() and newaction()), so the rule
+	// parses either way; the word is rewritten so the rule does not say PUMP about a pipe. Case is
+	// kept, and nothing else on the line moves.
+	function ruleKindRewrites(id, to) {
+		var kw = { pipe: 'PIPE', pump: 'PUMP', valve: 'VALVE' }[to], out = [];
+		(doc.rules || []).forEach(function (line, i) {
+			var s = String(line), cut = s.indexOf(';'), code = cut < 0 ? s : s.slice(0, cut),
+				rest = cut < 0 ? '' : s.slice(cut), changed = false, re, now;
+			re = /(^|\s)(PIPE|PUMP|VALVE)(\s+)(\S+)(?=\s|$)/gi;
+			now = code.replace(re, function (m, pre, word, gap, wid) {
+				if (wid !== String(id) || word.toUpperCase() === kw) { return m; }
+				changed = true;
+				var w = word === word.toLowerCase() ? kw.toLowerCase()
+					: (word === word.toUpperCase() ? kw : kw.charAt(0) + kw.slice(1).toLowerCase());
+				return pre + w + gap + wid;
+			});
+			if (changed) { out.push({ index: i, line: now + rest }); }
+		});
+		return out;
+	}
+	// Customers served by this pipe. A customer connects to a pipe and nothing else (Task 247).
+	function customersOnLink(id) {
+		return (doc.customers || []).filter(function (c) { return c && c.link === id; });
+	}
+	/**
+	 * **WHAT CHANGING LINK `l` TO `to` WOULD COST**, before anything is touched, in the node
+	 * report's shape plus four more lists: `born` (what the new type starts with that changes the
+	 * answers), `customers` (moved to the node their demand already reaches), `rules` (rule lines
+	 * whose kind word is rewritten) and `setting` (controls and rules that give or test this link's
+	 * setting, which means something else on each type).
+	 */
+	function linkTypeChangeReport(l, to) {
+		var pc = EngCalcs.pageConfig || {}, from = linkTypeDesc(l), dest = linkTargetDesc(to, l),
+			key = ovKey(l), lost = [], meaning = [], born = [], moved = [], rules = [],
+			LINE = pc.lpn_change_type_line || '{id}: {property} {value}',
+			LINE_S = pc.lpn_change_type_line_scenario || '{id}: {property} {value}, in scenario {scenario}';
+		typeOwnedLinkSpecs(l).forEach(function (spec) {
+			var v;
+			if (!linkChangeDrops(spec, from, dest)) { return; }
+			// A stale built-in value is dropped quietly: it belonged to no type this link is.
+			if (!spec.custom && !spec.has(from)) { return; }
+			v = l[spec.keys[0]];
+			if (changeTypeSays(spec, v)) {
+				lost.push(changeTypeLine(LINE, l.id, spec.label, changeTypeValueText(spec, v)));
+			}
+			scenarios.forEach(function (s) {
+				var ov = s.isBase ? null : s.overrides[key];
+				if (!ov) { return; }
+				spec.props.forEach(function (p) {
+					if (!Object.prototype.hasOwnProperty.call(ov, p) || ov[p] === undefined) { return; }
+					lost.push(changeTypeLine(LINE_S, l.id, spec.label, changeTypeValueText(spec, ov[p]), scenarioDisplayName(s)));
+				});
+			});
+		});
+		// **A NEW PUMP NAMES NO CURVE, AND SO ADDS NO HEAD** (pumpFit(): H = 0 at every flow, in
+		// both engines). It solves as a lossless connection until a curve is chosen, which is
+		// what a drawn pump does too; the box says so rather than leave a pump that does nothing.
+		if (to === 'pump') {
+			born.push(String(pc.lpn_change_type_no_curve || '{id}: No pump head curve, so the pump adds no head until one is selected')
+				.replace('{id}', function () { return String(l.id); }));
+		}
+		if (to === 'valve') {
+			born.push(changeTypeLine(LINE, l.id, pc.lpn_field_valve_type || 'Valve type', valveTypeName(CHANGE_TYPE_NEW_VALVE)));
+			born.push(changeTypeLine(LINE, l.id, valveSettingSpec(CHANGE_TYPE_NEW_VALVE).label,
+				changeTypeValueText({}, defaultValveSetting(CHANGE_TYPE_NEW_VALVE))));
+		}
+		if (to === 'pipe') {
+			born.push(changeTypeLine(LINE, l.id, pc.lpn_field_length || 'Length',
+				changeTypeValueText({ unit: 'lpn_u_length' }, linkGeomLength(l))));
+		}
+		// **A CUSTOMER STAYS WHERE IT IS, AND SO DOES ITS DEMAND.** Its demand already lands on the
+		// pipe end nearer to it along the pipe (EngCalcs.lpnCustomerNode()); it is connected to
+		// that node instead, the state a customer is left in when its pipe is deleted at a node
+		// end (detachCustomersFromLink()), so every answer stays exactly what it was.
+		if (l.type === 'pipe' && to !== 'pipe') {
+			customersOnLink(l.id).forEach(function (c) {
+				var nid = customerNodeId(c);
+				moved.push(changeTypeLine(LINE, l.id, pc.lpn_tool_add_meter || 'Customer',
+					c.id + (nid !== null && nid !== undefined ? ' (' + nid + ')' : '')));
+			});
+		}
+		ruleKindRewrites(l.id, to).forEach(function (r) { rules.push(r.line.trim()); });
+		// **A SETTING IS A DIFFERENT QUANTITY ON EACH TYPE**: a pump's relative speed, a valve's
+		// pressure, flow or loss coefficient, and on a pipe EPANET reads any setting as open or
+		// closed (input3.c, controldata(); rules.c, newaction()). A control or rule that gives or
+		// tests this link's setting is listed, because its number will mean something else.
+		libControlsRead().forEach(function (c) {
+			if (c && String(c.link) === String(l.id) && c.action && c.action.setting !== undefined && !c.action.status) {
+				meaning.push(libControlText(c));
+			}
+		});
+		(doc.rules || []).forEach(function (line) {
+			var t = String(line).replace(/;.*$/, '').trim().split(/\s+/), i, w;
+			for (i = 0; i + 2 < t.length; i++) {
+				w = t[i].toUpperCase();
+				if ((w === 'LINK' || w === 'PIPE' || w === 'PUMP' || w === 'VALVE') && t[i + 1] === String(l.id) &&
+						t[i + 2].toUpperCase() === 'SETTING') {
+					meaning.push(String(line).trim());
+					return;
+				}
+			}
+		});
+		return { lost: lost, meaning: meaning, born: born, moved: moved, rules: rules };
+	}
+	// The change itself, on one link, in Base and in every scenario's overrides. No snapshot and no
+	// redraw: changeSelectedType() takes one of each for the whole selection.
+	function applyLinkTypeChange(l, to) {
+		var from = linkTypeDesc(l), dest = linkTargetDesc(to, l), key = ovKey(l), birth, k, t;
+		// **A LIBRARY PIPE'S DIAMETER IS THE TYPE'S, NOT THE PIPE'S** (Task 465: stating a type clears
+		// the element's own copy). A valve keeps the diameter, so it is written onto the element
+		// before the type reference goes; otherwise the valve would take the New assets default.
+		if (l.type === 'pipe' && to === 'valve' && l._diameter === undefined && l._typeId) {
+			t = pipeTypeById(l._typeId);
+			if (pipeTypeStates(t, 'diameter')) { l._diameter = t.props.diameter; }   // base-write: the type is Base-owned, and Base's inherited diameter is carried onto the element
+		}
+		typeOwnedLinkSpecs(l).forEach(function (spec) {
+			if (!linkChangeDrops(spec, from, dest)) { return; }
+			spec.keys.forEach(function (sk) {
+				delete l[sk];   // base-write: the type is Base-owned, so what only the old type had goes from Base
+				if (l.tok) { delete l.tok[sk]; }
+			});
+			scenarios.forEach(function (s) {
+				var ov = s.isBase ? null : s.overrides[key];
+				if (!ov) { return; }
+				spec.props.forEach(function (p) { delete ov[p]; });
+				if (!Object.keys(ov).length) { delete s.overrides[key]; }
+			});
+		});
+		if (l.tok && !Object.keys(l.tok).length) { delete l.tok; }
+		if (l.type === 'pipe' && to !== 'pipe') {
+			customersOnLink(l.id).forEach(function (c) {
+				var pt = customerPoint(c), nid = customerNodeId(c), an;
+				c.link = null;
+				delete c.t;
+				if (nid !== null && nid !== undefined) { c.node = nid; } else { delete c.node; }
+				// The meter stays exactly where it is drawn: on a node, its offset is read whole.
+				an = customerAttachPoint(c);
+				c.x = an ? pt.x - an.x : pt.x;
+				c.y = an ? pt.y - an.y : pt.y;
+			});
+			delete customersByLink[l.id];
+		}
+		ruleKindRewrites(l.id, to).forEach(function (r) { doc.rules[r.index] = r.line; });
+		l.type = to;
+		birth = linkBirthFields(to, l);
+		for (k in birth) {
+			if (Object.prototype.hasOwnProperty.call(birth, k) && l[k] === undefined) {
+				l[k] = birth[k];   // base-write: the new type's own values are born in Base, as addLink() writes them
+			}
+		}
+	}
+	/**
+	 * **THE COMMAND**: every selected asset of the right kind that is not already `to` becomes one
+	 * -- nodes for Junction, Reservoir or Tank, links for Pipe, Pump or Valve. Asks first, in the
 	 * page's own box, only when something would be lost or would change its meaning; Cancel leaves
 	 * the document exactly as it was, because nothing has been written before the answer.
 	 */
-	function changeSelectedNodeType(to) {
-		var pc = EngCalcs.pageConfig || {}, targets, lost = [], meaning = [], surface = [], text, MAX = 20;
-		if (LPN_NODE_TYPES.indexOf(to) < 0) { return; }
-		targets = selectedRefs().filter(function (s) { return s.kind === 'node'; })
-			.map(function (s) { return nodeById(s.id); })
-			.filter(function (n) { return n && n.type !== to; });
+	function changeSelectedType(to) {
+		var pc = EngCalcs.pageConfig || {}, isNode = LPN_NODE_TYPES.indexOf(to) >= 0,
+			isLink = LPN_LINK_TYPES.indexOf(to) >= 0, targets, lost = [], meaning = [], surface = [],
+			born = [], moved = [], rules = [], setting = [], text, MAX = 20;
+		if (!isNode && !isLink) { return; }
+		targets = selectedRefs().filter(function (s) { return s.kind === (isNode ? 'node' : 'link'); })
+			.map(function (s) { return isNode ? nodeById(s.id) : linkById(s.id); })
+			.filter(function (el) { return el && el.type !== to; });
 		if (!targets.length) { return; }
-		targets.forEach(function (n) {
-			var r = nodeTypeChangeReport(n, to);
+		targets.forEach(function (el) {
+			var r = isNode ? nodeTypeChangeReport(el, to) : linkTypeChangeReport(el, to);
 			lost = lost.concat(r.lost);
-			meaning = meaning.concat(r.meaning);
-			surface = surface.concat(r.surface);
+			if (isNode) { meaning = meaning.concat(r.meaning); surface = surface.concat(r.surface); }
+			else {
+				setting = setting.concat(r.meaning); born = born.concat(r.born);
+				moved = moved.concat(r.moved); rules = rules.concat(r.rules);
+			}
 		});
 		function capped(lines) {
 			if (lines.length <= MAX) { return lines; }
@@ -32288,17 +32539,30 @@ var EngCalcs = EngCalcs || {};
 			saveUndoSnapshot();
 			// What each node's head and pressure read on screen NOW, held until the next solve
 			// (heldTypeChange()). Read before the change, through the same reader the map uses.
-			var was = {};
-			if (lastSolveResult) {
+			var was = {}, ids = {};
+			if (isNode && lastSolveResult) {
 				targets.forEach(function (n) {
 					was[n.id] = { head: colorNodeValue(n, 'head'), pressure: colorNodeValue(n, 'pressure') };
 				});
 			}
-			targets.forEach(function (n) { if (nodeById(n.id) === n) { applyNodeTypeChange(n, to); } });
+			targets.forEach(function (el) {
+				ids[el.id] = true;
+				if (isNode && nodeById(el.id) === el) { applyNodeTypeChange(el, to); }
+				if (isLink && linkById(el.id) === el) { applyLinkTypeChange(el, to); }
+			});
 			targets.forEach(function (n) {
 				if (!was[n.id]) { return; }
 				typeChangeHeld[n.id] = { result: lastSolveResult, type: n.type, sig: typeChangeSig(n),
 					head: was[n.id].head, pressure: was[n.id].pressure };
+			});
+			// **A CONTROL CARRIES WHAT ITS NUMBERS MEASURE**, read from the types when it was read
+			// (libAnnotateControl()): a valve's setting unit, a node's pressure or level. Read again
+			// for every control naming a changed asset, or the engine converts by the old type.
+			libControlsRead().forEach(function (c) {
+				if (!c) { return; }
+				if ((isLink && ids[c.link]) || (isNode && c.condition && c.condition.kind === 'node' && ids[c.condition.node])) {
+					libAnnotateControl(c);
+				}
 			});
 			// The symbol is the type, so the drawing is rebuilt; buildDom() puts the selection back.
 			buildDom();
@@ -32309,7 +32573,7 @@ var EngCalcs = EngCalcs || {};
 			scheduleSolve();
 			scheduleSave();
 		}
-		if (!lost.length && !meaning.length && !surface.length) { proceed(); return; }
+		if (!lost.length && !meaning.length && !surface.length && !moved.length && !rules.length && !setting.length && !born.length) { proceed(); return; }
 		text = [];
 		// The key to the lost lines, first in the box: each is the asset ID, a colon, the entry lost.
 		if (lost.length) { text.push(String(pc.lpn_change_type_key || 'ID: Lost entry')); }
@@ -32318,29 +32582,50 @@ var EngCalcs = EngCalcs || {};
 				.concat(capped(surface)).join('\n'));
 		}
 		if (lost.length) { text.push([pc.lpn_change_type_lost || 'These values will be lost:'].concat(capped(lost)).join('\n')); }
+		if (born.length) {
+			text.push([pc.lpn_change_type_born || 'These are new, as on a newly drawn one:'].concat(capped(born)).join('\n'));
+		}
+		if (moved.length) {
+			text.push([pc.lpn_change_type_customers || 'Only a pipe serves customers. These customers stay where they are, connected to the node in brackets, where their demand already lands:']
+				.concat(capped(moved)).join('\n'));
+		}
 		if (meaning.length) {
 			text.push([pc.lpn_change_type_meaning || 'These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.']
 				.concat(capped(meaning)).join('\n'));
+		}
+		if (setting.length) {
+			text.push([pc.lpn_change_type_setting || 'These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:']
+				.concat(capped(setting)).join('\n'));
+		}
+		if (rules.length) {
+			text.push([pc.lpn_change_type_rules || 'These rule lines name a link by its kind, and will name its new kind:']
+				.concat(capped(rules)).join('\n'));
 		}
 		askDialog({ kind: 'confirm', title: pc.lpn_change_type_menu || 'Change type',
 			ok: pc.lpn_change_type_ok || 'Change', text: text.join('\n\n') }, function (yes) {
 			if (yes) { proceed(); }
 		});
 	}
-	// The fly-out under Water: the three node types in the Insert order, each disabled where every
-	// selected node already is one. Empty-handed it still lists them, disabled, so the command can be
-	// found before it can be used.
+	// The fly-out under Water: the three node types and the three link types, each in the Insert
+	// order, each disabled where every selected asset of its kind already is one. Empty-handed it
+	// still lists them, disabled, so the command can be found before it can be used.
 	function changeTypeRows() {
-		var pc = EngCalcs.pageConfig || {},
-			nodes = selectedRefs().filter(function (s) { return s.kind === 'node'; })
+		var pc = EngCalcs.pageConfig || {}, refs = selectedRefs(),
+			nodes = refs.filter(function (s) { return s.kind === 'node'; })
 				.map(function (s) { return nodeById(s.id); }).filter(Boolean),
+			links = refs.filter(function (s) { return s.kind === 'link'; })
+				.map(function (s) { return linkById(s.id); }).filter(Boolean),
 			names = { junction: pc.lpn_tool_add_junction || 'Junction',
-				reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank' };
-		return LPN_NODE_TYPES.map(function (t) {
+				reservoir: pc.lpn_tool_add_reservoir || 'Reservoir', tank: pc.lpn_tool_add_tank || 'Tank',
+				pipe: pc.lpn_tool_add_pipe || 'Pipe', pump: pc.lpn_tool_add_pump || 'Pump', valve: pc.lpn_tool_add_valve || 'Valve' };
+		function row(t, els) {
 			return { icon: t, label: names[t],
-				disabled: !nodes.some(function (n) { return n.type !== t; }),
-				fn: function () { closeMenu(); changeSelectedNodeType(t); } };
-		});
+				disabled: !els.some(function (el) { return el.type !== t; }),
+				fn: function () { closeMenu(); changeSelectedType(t); } };
+		}
+		return LPN_NODE_TYPES.map(function (t) { return row(t, nodes); })
+			.concat([{ separator: true }])
+			.concat(LPN_LINK_TYPES.map(function (t) { return row(t, links); }));
 	}
 	// ---- The examples gallery (ROADMAP Task 314) ---------------------------------------------
 	//

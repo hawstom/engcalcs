@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**35 still to read on master**, of 145 untranslated keys, of 2371 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**40 still to read on master**, of 150 untranslated keys, of 2376 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (145, 35 to read @@ NEEDS RULING)
+## lpn_  (150, 40 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -96,6 +96,12 @@ never edits a synonym.
 - **`lpn_basemap_style_normal`**
   > Normal
   _Ruled OK 2026-10-05._
+- **`lpn_change_type_born`**
+  > These are new, as on a newly drawn one:
+  @@ NEEDS RULING
+- **`lpn_change_type_customers`**
+  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:
+  @@ NEEDS RULING
 - **`lpn_change_type_key`**
   > ID: Lost entry
   @@ NEEDS RULING
@@ -117,14 +123,23 @@ never edits a synonym.
 - **`lpn_change_type_more`**
   > And {n} more.
   @@ NEEDS RULING
+- **`lpn_change_type_no_curve`**
+  > {id}: No pump head curve, so the pump adds no head until one is selected
+  @@ NEEDS RULING
 - **`lpn_change_type_ok`**
   > Change
+  @@ NEEDS RULING
+- **`lpn_change_type_rules`**
+  > These rule lines name a link by its kind, and will name its new kind instead:
+  @@ NEEDS RULING
+- **`lpn_change_type_setting`**
+  > These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:
   @@ NEEDS RULING
 - **`lpn_change_type_surface`**
   > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
   @@ NEEDS RULING
 - **`lpn_change_type_tip`**
-  > Change the selected nodes into junctions, reservoirs, or tanks. Each keeps its ID, its place, its pipes, and every value the new type also has. If anything would be lost, you are asked first.
+  > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.
   @@ NEEDS RULING
 - **`lpn_choice_default`**
   > Default
@@ -526,7 +541,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/asset-type (`acbbc815`) — adds no English strings
+### feat/asset-type (`c49c4b74`) — adds no English strings
 
 ### feat/backdrop-attach (`55bb434f`) — 6 new, 6 to read @@ NEEDS RULING
 
@@ -549,7 +564,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {zip}, holding {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open {file} in EPANET; the picture comes with it.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`29075699`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/bentley-interop (`fb45a301`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation

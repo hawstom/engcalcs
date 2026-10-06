@@ -3,14 +3,15 @@
 Tom, 2026-10-05: *"It would be nice to provide a tool under Water or Tables to Change node type for
 any asset, where if it has information that can't be ported to the new type, we alert and ask."*
 
-Code: the `CHANGE TYPE` section of `js/looped-network.js` (`changeSelectedNodeType()` and its
+Code: the `CHANGE TYPE` section of `js/looped-network.js` (`changeSelectedType()` and its
 helpers). Harness: `dev/lpn-spike/change-type-harness.js`, mutation-proved in process.
 
-## What it does
+## What it does (nodes)
 
 Every selected node that is not already the chosen type becomes one: Junction, Reservoir or Tank.
+Links follow under "Links" below.
 
-- **Kept:** the ID, the position, the pipes on it, Description, Tag, its map Label placement, and
+- **Kept:** the ID, the position, the links on it, Description, Tag, its map Label placement, and
   every value the new type also has (elevation, initial quality, the source booster, active, and a
   custom property whose "Applies to" includes the new type).
 - **Lost:** what only the old type had, in Base and in every scenario's override: a junction's
@@ -61,35 +62,58 @@ dealt in row order (`menuMnemonics()`). Under Insert it took C and moved Scenari
 the foot it takes H and no learned letter moves. `menu-mnemonic-harness.js` reads the Scenarios
 letter from the row, so a row added above it later cannot break that test.
 
-## Links: not built, and why
+## Links: Pipe, Pump, Valve
 
-Pipe, Pump and Valve were weighed. They do not fit cleanly, for four reasons:
+Tom, 2026-10-06, after testing the node version: *"Proceed."* Same rule, same box, same one undo,
+same Cancel. Code: `typeOwnedLinkSpecs()`, `linkTypeChangeReport()`, `applyLinkTypeChange()`;
+`changeSelectedType()` serves both halves. The fly-out lists the link types under a divider below
+the node types, in Insert's order.
 
-- **Customers** attach to pipes only (Task 247). A pipe turned into a pump or valve would need
-  every customer on it detached or moved.
-- **Controls change meaning.** A control's setting is a pump speed on a pump and a pressure, flow or
-  loss coefficient on a valve. On a pipe it can only open or close.
-- **Rules name links by kind** (`PUMP`, `VALVE`, `PIPE`).
-- **A valve is a zero-length link** and a pump has no diameter. The length, `lenAuto` and curve
-  references (a pump's head curve and a GPV's head-loss curve share `curveId` with different
-  kinds) each need their own rule.
+- **Kept:** the ID, the ends, the bends, Description, Tag, label placement, status, active, and
+  what both types have (a pipe's and a valve's diameter; a non-TCV valve's minor loss).
+- **Lost, Base and every scenario's override:** a pipe's library pipe type, roughness, length (and
+  Auto), fittings list, minor loss, reaction coefficients; a pump's head curve, efficiency curve,
+  speed, speed pattern, price of power and price pattern; a valve's type, setting and a GPV's
+  head-loss curve; a custom property whose "Applies to" excludes the new type. A pump has no
+  diameter. A TCV reads no minor loss (EPANET ignores it), so a pipe's k is listed as lost.
+- **Born, from the New assets settings as `addLink()` draws one, and listed under its own heading:**
+  a valve is a **TCV** with setting 2, zero length, Auto off. TCV because it is the one valve type
+  both engines solve, so a change never moves the page onto EPANET. A pipe takes its drawn length
+  with Auto on. A pump names **no curve**, and the box says so: it then adds no head, in both
+  engines (`pumpFit()`), and the export writes it as the usual smooth stand-in pipe. That is the
+  page's existing curveless-pump behaviour, not a new failure.
+- **A library pipe's diameter** is the type's; changing it to a valve writes Base's inherited
+  diameter onto the valve.
+- **Customers** connect to pipes only. On a pipe that becomes a pump or valve, each is connected to
+  the end node its demand already lands on (`EngCalcs.lpnCustomerNode()`), drawn where it was:
+  the same state a pipe deletion leaves at a node end. No answer changes. Listed with that node.
+- **Rules:** EPANET reads PIPE, PUMP, VALVE and LINK alike as "the link with this ID" and never
+  checks the word (rules.c `newpremise()`, `newaction()`), so a rule parses either way. The kind
+  word before the ID is rewritten to the new kind, case kept, nothing else on the line touched;
+  each rewritten line is listed.
+- **Settings change meaning:** a pump's setting is its speed, a valve's its pressure, flow or loss
+  coefficient, and EPANET reads any number on a pipe as open or closed (input3.c `controldata()`).
+  Every control and rule line that gives or tests the link's SETTING is listed.
+- **Controls are re-read** after any change, node or link (`libAnnotateControl()`), so the stored
+  setting unit or pressure/level reading follows the new type.
 
-The valve subtype (TCV, PRV and so on) already changes in the valve's own Properties box. That
-change re-seeds the setting and drops scenario overrides of it **without asking**. The same "alert
-and ask" rule could apply there; that is a separate decision.
+The valve subtype (TCV, PRV and so on) still changes in the valve's own Properties box, re-seeding
+the setting and dropping scenario overrides of it **without asking**. Whether the same rule applies
+there is a separate decision.
 
 ## Seam: feat/bentley-interop (unmerged)
 
 That branch stores scenario **alternatives** in `doc.alternatives[].values`, keyed by `ovKey()`
-(`n:<id>`), and routes every walk of an override map through `eachOverrideMap()`. Its seam check
-enforces that rule. `nodeTypeChangeReport()` and `applyNodeTypeChange()` walk
-`scenarios[].overrides` directly. **At that merge, both must walk through `eachOverrideMap()` and
-also list and strip a lost property's values held in stored alternatives,** or a stored alternative
-keeps a tank's water depth on what is now a junction. The harness's sections 4 and 9 (scenario
-overrides survive) are the test to extend.
+(`n:<id>`, `l:<id>`), and routes every walk of an override map through `eachOverrideMap()`. Its
+seam check enforces that rule. `nodeTypeChangeReport()`, `applyNodeTypeChange()`,
+`linkTypeChangeReport()` and `applyLinkTypeChange()` walk `scenarios[].overrides` directly. **At
+that merge, all four must walk through `eachOverrideMap()` and also list and strip a lost
+property's values held in stored alternatives,** or an alternative keeps a tank's water depth on a
+junction or a pipe's roughness on a valve. Harness sections 4, 9 and 12 are the tests to extend.
 
 ## Known gaps
 
 - An import note on the element (for example, that a tank's volume curve was carried) is left as
   it is.
 - Rule clauses are matched by the keyword before the ID, not by a full parse of the rule.
+- A link's import note is left as it is, like a node's.

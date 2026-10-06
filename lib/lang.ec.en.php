@@ -1545,7 +1545,7 @@ $ec_lang['lpn_tables_menu']='Tables';
 // popup already uses, {value} the number or name with its unit, {scenario} a scenario's name.
 // dev/asset-type.md.
 $ec_lang['lpn_change_type_menu']='Change type';
-$ec_lang['lpn_change_type_tip']='Change the selected nodes into junctions, reservoirs, or tanks. Each keeps its ID, its place, its pipes, and every value the new type also has. If anything would be lost, you are asked first.';
+$ec_lang['lpn_change_type_tip']='Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.';
 $ec_lang['lpn_change_type_ok']='Change';
 $ec_lang['lpn_change_type_lost']='These values will be lost:';
 // The key to the lines under it (Tom, 2026-10-06: *"Provide a key for the loss report. 'ID: Lost entry'."*).
@@ -1557,6 +1557,12 @@ $ec_lang['lpn_change_type_more']='And {n} more.';
 // water surface is carried, so the new head or water depth is listed with its value.
 $ec_lang['lpn_change_type_surface']='These keep the water surface where it was. A reservoir\'s head is the tank\'s elevation plus its water depth, and a tank\'s water depth is the reservoir\'s head minus its elevation:';
 $ec_lang['lpn_change_type_meaning']='These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.';
+// The link half (Tom, 2026-10-06: "Proceed."). Each heads a list of "ID: entry" lines.
+$ec_lang['lpn_change_type_born']='These are new, as on a newly drawn one:';
+$ec_lang['lpn_change_type_no_curve']='{id}: No pump head curve, so the pump adds no head until one is selected';
+$ec_lang['lpn_change_type_customers']='Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:';
+$ec_lang['lpn_change_type_setting']='These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:';
+$ec_lang['lpn_change_type_rules']='These rule lines name a link by its kind, and will name its new kind instead:';
 $ec_lang['lpn_tables_menu_tip']='View and edit assets in tables in bottom panel.';
 // The Run row's own tip, NOT lpn_time_run_tip: this row exists partly to answer "where is my Run
 // button?" for somebody whose project recalculates by itself, and that sentence is not true of the

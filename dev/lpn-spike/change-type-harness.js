@@ -20,7 +20,7 @@
 // through the stub's question box, exactly as the Water menu row calls it. Nothing writes a type
 // by hand.
 //
-// MUTATION-PROVED IN PROCESS (section 9): eight live mutations of js/looped-network.js -- keep the
+// MUTATION-PROVED IN PROCESS (section 9): live mutations of js/looped-network.js -- keep the
 // lost values, never ask, skip the undo snapshot, skip the New assets defaults, drop the water
 // surface either way, show freshly derived results on a converted node, keep the scenario
 // overrides -- each must turn this harness red, or the harness fails.
@@ -28,12 +28,19 @@
 // Pre-review, 2026-10-06, added sections 10 and 11: with Recalculate off a converted node keeps its
 // stale head and pressure until Calculate, and Net1's tank 2 turned into a reservoir and back
 // leaves every junction pressure where it was.
+//
+// Sections 12-17 hold the LINK half (Tom, 2026-10-06: "Proceed."): on Net1, pipe -> valve,
+// valve -> pipe, pipe -> pump with and without a curve, pump -> pipe; on Net3, pump 335 -> pipe ->
+// pump, which must solve back to Net3's own answer. Each: the box (key first, every lost line
+// "ID: ..."), Cancel byte-identical, one undo byte-identical, and a solve before and after with a
+// physical check on heads and flows. Then a pipe with customers and a link named in a rule.
 
 const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 require(ROOT + 'js/lpn-inp.js');
 require(ROOT + 'js/lpn-patterns.js');
 require(ROOT + 'js/lpn-time.js');
 require(ROOT + 'js/lpn-net.js');
+require(ROOT + 'js/lpn-rules.js');
 const fs = require('fs');
 const path = require('path');
 const solver = require(ROOT + 'js/lpn-solver.js');
@@ -45,6 +52,7 @@ global.FileReader = function () {
 	};
 };
 const NET1 = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net1.inp'), 'utf8');
+const NET3 = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net3.inp'), 'utf8');
 const PC = global.EngCalcs.pageConfig;
 
 const INJECT =
@@ -54,12 +62,13 @@ const INJECT =
 	"\t\teffective: effective, setProp: setProp, setCustomProp: setCustomProp,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario, baseScenario: baseScenario,\n" +
 	"\t\tserializeProject: serializeProject, undo: undo,\n" +
-	"\t\tsetSelectionList: setSelectionList, changeSelectedNodeType: changeSelectedNodeType,\n" +
+	"\t\tsetSelectionList: setSelectionList, changeSelectedNodeType: changeSelectedType, changeSelectedType: changeSelectedType,\n" +
 	"\t\tchangeTypeRows: changeTypeRows, nodeById: nodeById, linkById: linkById,\n" +
 	"\t\tincident: function (id) { return incidentLinks[id]; },\n" +
 	"\t\tlibReadControl: libReadControl, libControls: libControls, addCustomer: addCustomer,\n" +
 	"\t\temitterToStore: emitterToStore, runSolve: runSolve, lastResult: function () { return lastSolveResult; },\n" +
 	"\t\tcolorNodeValue: colorNodeValue, fixedHeadPressure: fixedHeadPressure,\n" +
+	"\t\tcustomerPoint: customerPoint, linkGeomLength: linkGeomLength, customerById: customerById,\n" +
 	"\t\timportInp: importInpFromFile, assembleModel: assembleModel,\n" +
 	"\t\texportInp: function () { return EngCalcs.lpnExportInp(serializeProject(), inpExportOptions()); },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -247,6 +256,9 @@ function run(mutate, quiet) {
 		ok('6.2 reservoir -> junction asks, for the control alone', q.length === 1 &&
 			q[0].indexOf(PC.lpn_change_type_meaning) === 0 && q[0].indexOf('IF NODE ' + J) >= 0, q[0]);
 		ok('6.3 ...and the round trip is complete: a junction again', L.nodeById(J).type === 'junction');
+		// The control's number is read as a pressure now, not a level (libAnnotateControl()).
+		ok('6.4 the control is re-read: its number is a pressure at a junction', read.rec.condition.unit === 'press',
+			String(read.rec.condition.unit));
 	}
 
 	say('\n--- 6b. a selection of many: one question, a capped list, one undo ---');
@@ -269,13 +281,15 @@ function run(mutate, quiet) {
 	say('\n--- 7. the menu rows ---');
 	{
 		select(J);
-		const rows = L.changeTypeRows();
-		ok('7.1 three rows, in the Insert order', rows.map(r => r.label).join('|') ===
-			[PC.lpn_tool_add_junction, PC.lpn_tool_add_reservoir, PC.lpn_tool_add_tank].join('|'));
+		const all = L.changeTypeRows(), rows = all.slice(0, 3);
+		ok('7.1 three node rows, a divider, three link rows, each in the Insert order', all.map(r => r.separator ? '-' : r.label).join('|') ===
+			[PC.lpn_tool_add_junction, PC.lpn_tool_add_reservoir, PC.lpn_tool_add_tank, '-',
+				PC.lpn_tool_add_pipe, PC.lpn_tool_add_pump, PC.lpn_tool_add_valve].join('|'), all.map(r => r.label).join('|'));
+		ok('7.1b a node selection leaves every link row disabled', all.slice(4).every(r => r.disabled));
 		ok('7.2 the type it already is, is disabled; the others are not',
 			rows[0].disabled && !rows[1].disabled && !rows[2].disabled);
 		L.setSelectionList([]);
-		ok('7.3 with nothing selected every row is disabled', L.changeTypeRows().every(r => r.disabled));
+		ok('7.3 with nothing selected every row is disabled', L.changeTypeRows().every(r => r.separator || r.disabled));
 	}
 	say('\n--- 8. a customer whose demand lands on the junction is named ---');
 	{
@@ -354,6 +368,241 @@ function run(mutate, quiet) {
 		ok('11.6 and every junction pressure is still unchanged', worst < 1e-6, 'worst ' + worst);
 	}
 
+
+	// ---- THE LINK HALF ----------------------------------------------------------------------
+	function changeLink(id, to, ans) {
+		asked = [];
+		answer = ans === undefined ? true : ans;
+		L.setSelectionList([{ kind: 'link', id: id }]);
+		L.changeSelectedType(to);
+		return asked;
+	}
+	function linkSection(inp, id) {
+		let sec = null, found = [];
+		inp.split(/\r?\n/).forEach(function (line) {
+			const m = /^\s*\[([A-Z]+)\]/.exec(line);
+			if (m) { sec = m[1]; return; }
+			const t = line.replace(/;.*$/, '').trim().split(/\s+/);
+			if (t[0] === id && ['PIPES', 'PUMPS', 'VALVES'].indexOf(sec) >= 0) { found.push(sec); }
+		});
+		return found.join(',');
+	}
+	// The box's own shape: the key line first, and every line of the lost list is "ID: ...".
+	function boxShape(text, id) {
+		const lines = text.split('\n');
+		if (lines[0] !== PC.lpn_change_type_key) { return 'first line ' + lines[0]; }
+		const part = text.split(PC.lpn_change_type_lost + '\n')[1];
+		if (!part) { return 'no lost list'; }
+		const bad = part.split('\n\n')[0].split('\n').filter(l => l.indexOf(id + ': ') !== 0);
+		return bad.length ? 'not "ID: ...": ' + bad.join(' | ') : '';
+	}
+	const solveNow = () => solver.lpnSolve(L.assembleModel(), { tol: 1e-9 });
+	const allFinite = r => r && r.converged && Object.keys(r.heads).every(k => isFinite(r.heads[k])) &&
+		Object.keys(r.flows).every(k => isFinite(r.flows[k]));
+	const engineWas2 = S.engine;
+	S.engine = 'native';
+
+	say('\n--- 12. Net1: pipe 10 -> valve ---');
+	{
+		L.importInp({ name: 'Net1.inp', _text: NET1 });
+		const p10 = L.linkById('10');
+		p10.desc = 'Plant main'; p10.tag = 'MAIN-1';
+		const scn = L.createScenario('Relined');
+		L.setProp(p10, 'roughness', 140);
+		L.switchScenario(L.baseScenario().id);
+		const r0 = solveNow();
+		const before = snap();
+		let q = changeLink('10', 'valve', false);
+		const text = q[0] || '';
+		ok('12.1 the box was shown, key first, every lost line "10: ..."', q.length === 1 && boxShape(text, '10') === '', boxShape(text, '10') + ' | ' + text);
+		ok('12.2 it lists length, roughness, and the scenario\'s roughness by name',
+			text.indexOf('10: ' + PC.lpn_field_length + ' 10530') >= 0 && /10: [^\n]* 100\n/.test(text) &&
+			text.split('\n').some(l => l.indexOf('10: ') === 0 && l.indexOf('Relined') > 0 && l.indexOf(' 140') > 0), text);
+		ok('12.3 ...and says the valve is born a throttle valve (TCV)', text.indexOf(PC.lpn_change_type_born) > 0 &&
+			text.indexOf('10: ' + PC.lpn_field_valve_type + ' ' + PC.lpn_valve_type_tcv) >= 0, text);
+		ok('12.4 Cancel leaves the document byte-identical', snap() === before);
+		changeLink('10', 'valve', true);
+		const v = L.linkById('10');
+		ok('12.5 the same object is a TCV valve with setting 2, zero length, Auto off',
+			v === p10 && v.type === 'valve' && v.valveType === 'TCV' && L.effective(v, 'setting') === 2 &&
+			v._length === 0 && v.lenAuto === false, JSON.stringify(v));
+		ok('12.6 kept: ID, ends, bends, diameter 18, Description, Tag', v.id === '10' && v.from === '10' && v.to === '11' &&
+			Array.isArray(v.verts) && v._diameter === 18 && v.desc === 'Plant main' && v.tag === 'MAIN-1');
+		ok('12.7 gone: roughness from Base and the scenario',
+			!('_roughness' in v) && !(((L.getScenarios().filter(x => x.id === scn.id)[0].overrides || {})['l:10']) || {}).roughness);
+		ok('12.8 the export writes it under [VALVES]', linkSection(L.exportInp().inp, '10') === 'VALVES', linkSection(L.exportInp().inp, '10'));
+		const r1 = solveNow();
+		// Pipe 10 is the only way out of the pump: its flow is the pump's. Without 10 530 ft of pipe
+		// friction, junction 11 sits higher and the pump delivers a little more, the same way.
+		ok('12.9 SOLVE: still converges, finite everywhere', allFinite(r1), r1 && r1.converged);
+		ok('12.10 ...flow through 10 the same direction and within 25%, head at 11 not lower',
+			Math.sign(r1.flows['10']) === Math.sign(r0.flows['10']) && Math.abs(r1.flows['10'] / r0.flows['10'] - 1) < 0.25 &&
+			r1.heads['11'] >= r0.heads['11'] - 1e-6,
+			r0.flows['10'] + ' -> ' + r1.flows['10'] + ', H11 ' + r0.heads['11'] + ' -> ' + r1.heads['11']);
+		L.undo();
+		ok('12.11 one undo: byte-identical', snap() === before);
+		const r2 = solveNow();
+		ok('12.12 ...and solves back to the pipe\'s answer', Math.abs(r2.heads['11'] - r0.heads['11']) < 1e-9);
+	}
+
+	say('\n--- 13. Net1: valve -> pipe ---');
+	{
+		changeLink('10', 'valve', true);
+		const r0 = solveNow();
+		const before = snap();
+		const q = changeLink('10', 'pipe', false);
+		const text = q[0] || '';
+		ok('13.1 the box: key first, the valve type and its loss coefficient lost', boxShape(text, '10') === '' &&
+			text.indexOf('10: ' + PC.lpn_field_valve_type + ' ' + PC.lpn_valve_type_tcv) >= 0 &&
+			text.indexOf('10: ' + PC.lpn_field_valve_setting_loss + ' 2') >= 0, text);
+		const geom = L.linkGeomLength(L.linkById('10'));
+		ok('13.2 ...and the new pipe\'s drawn length is said', text.indexOf(PC.lpn_change_type_born) > 0 &&
+			text.indexOf('10: ' + PC.lpn_field_length + ' ') >= 0, text);
+		ok('13.3 Cancel: byte-identical', snap() === before);
+		changeLink('10', 'pipe', true);
+		const p = L.linkById('10');
+		ok('13.4 a pipe with Auto length at its drawn length, New assets roughness, diameter kept',
+			p.type === 'pipe' && p.lenAuto === true && p._length === geom && p._roughness === D.roughness && p._diameter === 18 &&
+			!('valveType' in p) && !('_setting' in p), JSON.stringify(p));
+		const r1 = solveNow();
+		ok('13.5 SOLVE: converges, finite, flow through 10 the same direction', allFinite(r1) &&
+			Math.sign(r1.flows['10']) === Math.sign(r0.flows['10']), r0.flows['10'] + ' -> ' + (r1 && r1.flows['10']));
+		L.undo();
+		ok('13.6 one undo: byte-identical', snap() === before);
+		L.undo();   // back to Net1's pipe
+	}
+
+	say('\n--- 14. Net1: pipe 10 -> pump, without and then with a curve ---');
+	{
+		const r0 = solveNow();
+		const before = snap();
+		const q = changeLink('10', 'pump', true);
+		const text = q[0] || '';
+		ok('14.1 the box: key first; diameter, roughness and length lost', boxShape(text, '10') === '' &&
+			text.indexOf('10: ' + PC.lpn_field_diameter + ' 18') >= 0 && text.indexOf('10: ' + PC.lpn_field_length) >= 0, text);
+		ok('14.2 ...and it says the pump has no curve, so it adds no head',
+			text.indexOf(String(PC.lpn_change_type_no_curve).replace('{id}', '10')) >= 0, text);
+		const pm = L.linkById('10');
+		ok('14.3 a pump naming no curve, no diameter, no length', pm.type === 'pump' && L.effective(pm, 'curveId') === undefined &&
+			!('_diameter' in pm) && !('_length' in pm) && !('_roughness' in pm), JSON.stringify(pm));
+		// The page's normal treatment of a curveless pump: the file gets a smooth stand-in pipe.
+		ok('14.4 the export writes the curveless pump as its stand-in pipe', linkSection(L.exportInp().inp, '10') === 'PIPES',
+			linkSection(L.exportInp().inp, '10'));
+		const r1 = solveNow();
+		ok('14.5 SOLVE without a curve: converges; it neither adds nor loses head (|H10 - H11| < 0.01 m)',
+			allFinite(r1) && Math.abs(r1.heads['10'] - r1.heads['11']) < 0.01, r1 && (r1.heads['10'] + ' / ' + r1.heads['11']));
+		L.setProp(pm, 'curveId', '1');
+		const r2 = solveNow();
+		ok('14.6 SOLVE with Net1\'s curve 1: converges, and the pump lifts 11 above 10',
+			allFinite(r2) && r2.heads['11'] > r2.heads['10'] + 1 && r2.flows['10'] > 0,
+			r2 && (r2.heads['10'] + ' -> ' + r2.heads['11'] + ', Q ' + r2.flows['10']));
+		ok('14.6b with a curve, the export writes it under [PUMPS]', linkSection(L.exportInp().inp, '10') === 'PUMPS');
+		L.undo(); L.undo();
+		ok('14.7 two undos (curve, change): byte-identical', snap() === before);
+		ok('14.8 ...and Net1 solves as it did', Math.abs(solveNow().heads['11'] - r0.heads['11']) < 1e-9);
+	}
+
+	say('\n--- 15. Net1: pump 9 -> pipe; Net3: pump 335 -> pipe -> pump ---');
+	{
+		const before = snap();
+		const q = changeLink('9', 'pipe', false);
+		const text = q[0] || '';
+		ok('15.1 the box: key first; the head curve 1 lost', boxShape(text, '9') === '' &&
+			text.indexOf('9: ' + PC.lpn_pump_curve_source + ' 1') >= 0, text);
+		ok('15.2 Cancel: byte-identical', snap() === before);
+		changeLink('9', 'pipe', true);
+		const r1 = solveNow();
+		const p = L.linkById('9');
+		ok('15.3 a pipe, no curve; SOLVE converges, finite', p.type === 'pipe' && !('_curveId' in p) && allFinite(r1),
+			JSON.stringify(p));
+		// Without the pump, water reaches junction 10 only from the tank, so it sits below the tank's 970 ft.
+		ok('15.4 ...and the reservoir no longer lifts junction 10 above the tank surface', r1.heads['10'] < 970 * 0.3048 + 1e-6,
+			String(r1.heads['10']));
+		L.undo();
+		ok('15.5 one undo: byte-identical', snap() === before);
+
+		L.importInp({ name: 'Net3.inp', _text: NET3 });
+		const n3 = solveNow();
+		ok('15.6 Net3 solves as imported', allFinite(n3));
+		const b3 = snap();
+		let t = changeLink('335', 'pipe', true)[0] || '';
+		ok('15.7 pump 335 -> pipe: key first, curve 2 lost', boxShape(t, '335') === '' &&
+			t.indexOf('335: ' + PC.lpn_pump_curve_source + ' 2') >= 0, t);
+		const asPipe = solveNow();
+		ok('15.8 SOLVE as a pipe: converges, finite', allFinite(asPipe));
+		t = changeLink('335', 'pump', true)[0] || '';
+		ok('15.9 pipe -> pump: the no-curve line', t.indexOf(String(PC.lpn_change_type_no_curve).replace('{id}', '335')) >= 0, t);
+		L.setProp(L.linkById('335'), 'curveId', '2');
+		const back = solveNow();
+		let worst = 0;
+		Object.keys(n3.heads).forEach(k => { worst = Math.max(worst, Math.abs(back.heads[k] - n3.heads[k])); });
+		ok('15.10 with its curve back, Net3 solves to its own answer (every head within 1e-6 m)',
+			allFinite(back) && worst < 1e-6, 'worst ' + worst);
+		L.undo(); L.undo(); L.undo();
+		ok('15.11 three undos: byte-identical Net3', snap() === b3);
+	}
+
+	say('\n--- 16. a pipe with customers -> valve ---');
+	{
+		L.importInp({ name: 'Net1.inp', _text: NET1 });
+		const pipe = L.linkById('111');   // 11 -> 21
+		const c1 = L.addCustomer(0, 0, { link: '111', t: 0.1 });
+		const c2 = L.addCustomer(0, 0, { link: '111', t: 0.8 });
+		c1.demand = 3; c2.demand = 4;
+		const rows = () => {
+			const by = global.EngCalcs.lpnCustomerRowsByNode(doc()), out = {};
+			Object.keys(by).forEach(k => { out[k] = by[k].map(r => r.customer.id + '=' + r.base).join(','); });
+			return JSON.stringify(out);
+		};
+		const rowsBefore = rows(), pts = [c1, c2].map(c => L.customerPoint(c));
+		const r0 = solveNow();
+		const before = snap();
+		const q = changeLink('111', 'valve', true);
+		const text = q[0] || '';
+		ok('16.1 the box names both customers and the node each is connected to',
+			text.indexOf(PC.lpn_change_type_customers) > 0 &&
+			text.indexOf('111: ' + PC.lpn_tool_add_meter + ' ' + c1.id + ' (11)') >= 0 &&
+			text.indexOf('111: ' + PC.lpn_tool_add_meter + ' ' + c2.id + ' (21)') >= 0, text);
+		const a = L.customerById(c1.id), b = L.customerById(c2.id);
+		ok('16.2 each now connects to that node, not the valve', !a.link && a.node === '11' && !b.link && b.node === '21',
+			JSON.stringify([a, b]));
+		const pts2 = [a, b].map(c => L.customerPoint(c));
+		ok('16.3 ...drawn exactly where they were', pts.every((p, i) => Math.abs(p.x - pts2[i].x) < 1e-9 && Math.abs(p.y - pts2[i].y) < 1e-9),
+			JSON.stringify(pts) + ' vs ' + JSON.stringify(pts2));
+		ok('16.4 ...and their demand lands on the same nodes', rows() === rowsBefore, rowsBefore + ' vs ' + rows());
+		ok('16.5 SOLVE: converges', allFinite(solveNow()) && allFinite(r0));
+		L.undo();
+		ok('16.6 one undo: byte-identical, customers back on the pipe', snap() === before && L.customerById(c1.id).link === '111');
+	}
+
+	say('\n--- 17. a link named in a rule and a control ---');
+	{
+		const R = ['RULE R1', 'IF PIPE 10 FLOW ABOVE 100   ; plant main', 'THEN Pipe 10 SETTING IS 1', 'AND PUMP 9 STATUS IS OPEN', '',
+			'RULE R2', 'IF LINK 10 STATUS IS OPEN', 'THEN PUMP 9 STATUS IS CLOSED'];
+		doc().rules = R.slice();
+		const read = L.libReadControl('LINK 10 1.5 AT TIME 2');
+		ok('17.0 the control reads', read.ok);
+		L.libControls().push(read.rec);
+		const before = snap();
+		const q = changeLink('10', 'valve', false);
+		const text = q[0] || '';
+		ok('17.1 the box lists the two rule lines whose kind word changes, rewritten',
+			text.indexOf(PC.lpn_change_type_rules + '\nIF VALVE 10 FLOW ABOVE 100   ; plant main\nTHEN Valve 10 SETTING IS 1') > 0, text);
+		ok('17.2 ...and the control and the rule line that give 10 a setting',
+			text.indexOf(PC.lpn_change_type_setting) > 0 && /LINK 10 1\.5/.test(text.split(PC.lpn_change_type_setting)[1] || '') &&
+			(text.split(PC.lpn_change_type_setting)[1] || '').indexOf('THEN Pipe 10 SETTING IS 1') >= 0, text);
+		ok('17.3 Cancel: byte-identical', snap() === before);
+		changeLink('10', 'valve', true);
+		ok('17.4 the rules now say VALVE 10, keep their case and comment, and leave LINK and PUMP 9 alone',
+			JSON.stringify(doc().rules) === JSON.stringify(['RULE R1', 'IF VALVE 10 FLOW ABOVE 100   ; plant main', 'THEN Valve 10 SETTING IS 1',
+				'AND PUMP 9 STATUS IS OPEN', '', 'RULE R2', 'IF LINK 10 STATUS IS OPEN', 'THEN PUMP 9 STATUS IS CLOSED']), JSON.stringify(doc().rules));
+		const parsed = global.EngCalcs.lpnRuleParse(doc().rules);
+		ok('17.5 ...and every rule still parses', parsed.length === 2 && parsed.every(b => b.ok), JSON.stringify(parsed.map(b => b.ok)));
+		L.undo();
+		ok('17.6 one undo: byte-identical', snap() === before);
+	}
+	S.engine = engineWas2;
+
 	return fails;
 }
 
@@ -363,7 +612,7 @@ const MUTATIONS = [
 	['the lost values are kept (no delete)', src => src.replace(
 		"delete n[sk];   // base-write: the type is Base-owned", "void n[sk];   // base-write: the type is Base-owned")],
 	['the box is never shown', src => src.replace(
-		"if (!lost.length && !meaning.length && !surface.length) { proceed(); return; }", "{ proceed(); return; }")],
+		"if (!lost.length && !meaning.length && !surface.length && !moved.length && !rules.length && !setting.length && !born.length) { proceed(); return; }", "{ proceed(); return; }")],
 	['the key line is dropped', src => src.replace(
 		"if (lost.length) { text.push(String(pc.lpn_change_type_key", "if (false) { text.push(String(pc.lpn_change_type_key")],
 	['no undo snapshot', src => src.replace(
@@ -377,7 +626,25 @@ const MUTATIONS = [
 	['a converted node shows freshly derived results', src => src.replace(
 		"\t\tvar held = heldTypeChange(n, 'pressure');\n\t\tif (held !== undefined) { return held; }\n", "")],
 	['scenario overrides survive', src => src.replace(
-		"spec.props.forEach(function (p) { delete ov[p]; });", "spec.props.forEach(function (p) { void ov[p]; });")]
+		"spec.props.forEach(function (p) { delete ov[p]; });", "spec.props.forEach(function (p) { void ov[p]; });")],
+	// The link half (sections 12-17).
+	['a link keeps what only its old type had', src => src.replace(
+		"delete l[sk];   // base-write: the type is Base-owned", "void l[sk];   // base-write: the type is Base-owned")],
+	['a link\'s scenario overrides survive', src => {
+		const k = "spec.props.forEach(function (p) { delete ov[p]; });", i = src.lastIndexOf(k);
+		return src.slice(0, i) + "spec.props.forEach(function (p) { void ov[p]; });" + src.slice(i + k.length);
+	}],
+	['a new link gets no New assets values', src => src.replace(
+		"l[k] = birth[k];   // base-write: the new type's own", "void birth[k];   // base-write: the new type's own")],
+	['the box does not say a new pump has no curve', src => src.replace(
+		"if (to === 'pump') {\n\t\t\tborn.push(", "if (false) {\n\t\t\tborn.push(")],
+	['customers stay on the valve', src => src.replace(
+		"\t\t\t\tc.link = null;\n\t\t\t\tdelete c.t;\n\t\t\t\tif (nid !== null && nid !== undefined) { c.node = nid; } else { delete c.node; }\n\t\t\t\t// The meter stays",
+		"\t\t\t\t// The meter stays")],
+	['rule kind words are not rewritten', src => src.replace(
+		"ruleKindRewrites(l.id, to).forEach(function (r) { doc.rules[r.index] = r.line; });", "")],
+	['controls are not re-read after the change', src => src.replace(
+		"\t\t\t\t\tlibAnnotateControl(c);\n\t\t\t\t}\n\t\t\t});\n\t\t\t// The symbol is the type", "\t\t\t\t}\n\t\t\t});\n\t\t\t// The symbol is the type")]
 ];
 let mutFails = 0;
 MUTATIONS.forEach(function (m) {
