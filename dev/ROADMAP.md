@@ -230,11 +230,12 @@ the block.
   selection set from menu choices (his leading candidate: Highlighted / Chosen), and an audit of tip
   pollution in lpn (status strip, click-to-open, delays in master styles, tips that talk down).
   Ida's audit: `dev/tip-and-selection-audit.md` (branch `chore/ida-tip`); decisions go to him as an interview.
-- 100|775| **File, Convert as: five defects from one session in Fotobi, Ghana.**
-  Tom, 2026-10-06: after converting WGS84 to Pseudo Mercator the OLD project lost its node symbols
-  (back after close and reopen) and was zoomed somewhere wrong; File, New with EPSG:3857 shows 4326
-  on the map; Convert as on an empty project opens a file Open dialog; with map and Current both
-  4326, 3857 cannot be chosen. Branch `fix/convert-as`.
+- 100|775| **File, Convert as: what is left of the Fotobi, Ghana session.**
+  Tom, 2026-10-06. FIXED: Convert as on an empty project opened a file picker (it now opens the box).
+  NOT REPRODUCED: the old project losing its node symbols and its view after a conversion
+  (`convert-as-fotobi-harness.js`, four paths, master and production 9c71d54f); ask which surface.
+  HIS CALL: EPSG:3857 and 4326 are the same lat/lon project here (R-218), so choosing 3857 in File,
+  New or Convert as silently becomes 4326. Options: explain, hide the 3857 row, or make 3857 real.
 - 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
