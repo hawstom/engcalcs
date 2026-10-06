@@ -32586,7 +32586,7 @@ var EngCalcs = EngCalcs || {};
 			text.push([pc.lpn_change_type_born || 'These are new, as on a newly drawn one:'].concat(capped(born)).join('\n'));
 		}
 		if (moved.length) {
-			text.push([pc.lpn_change_type_customers || 'Only a pipe serves customers. These customers stay where they are, connected to the node in brackets, where their demand already lands:']
+			text.push([pc.lpn_change_type_customers || 'Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:']
 				.concat(capped(moved)).join('\n'));
 		}
 		if (meaning.length) {
@@ -32598,7 +32598,7 @@ var EngCalcs = EngCalcs || {};
 				.concat(capped(setting)).join('\n'));
 		}
 		if (rules.length) {
-			text.push([pc.lpn_change_type_rules || 'These rule lines name a link by its kind, and will name its new kind:']
+			text.push([pc.lpn_change_type_rules || 'These rule lines name a link by its kind, and will name its new kind instead:']
 				.concat(capped(rules)).join('\n'));
 		}
 		askDialog({ kind: 'confirm', title: pc.lpn_change_type_menu || 'Change type',
