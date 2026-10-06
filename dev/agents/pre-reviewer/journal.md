@@ -3875,3 +3875,15 @@ OBSERVED real Chromium: branch's own harness passes. All 7 shipped examples: 0 w
 OBSERVED DEFECT: touch (hover none): tapping the glyph in the Properties box opens the tip AND focuses the Diameter input (label activation), the exact 2026-08-29 complaint; initTips only cancels this on `.ec-tip`, the glyph here is a bare `.ec-help`. Tables-pane tap also focuses a cell input.
 OBSERVED: Basic-example-SI-units opens with roughness unit ft (pre-existing); under D-W its tip reads ft in an SI project.
 SPECULATION: how the glyph looks (zero-width inset over the input end) not judged.
+
+## 2026-10-06 Perry: Settings table (Task 721 stage 3b), feat/bentley-interop @ 365def3d
+OBSERVED (real Chromium, this tree; re-verify before citing):
+- Branch harness passes (settings-table-browser-harness.js); removing undoTopHoldsSettings() from the Base write makes 3 checks FAIL, so the undo claim is not decoration.
+- Typed-value refusals (bad number, 0 or negative multiplier, unknown choice, bad time) revert silently, no dialog, no undo step. Same as the ordinary tables. Choice rows have no picker: the exact word must be typed.
+- Undo: Ctrl+Z after [Base table edit B, then Settings-box edit X] undoes B AND reverts X (B's step carries the settings as they were before B). Element edits do not do this. Redo likewise.
+- Settings box vs table: with Peak open and a Peak override, picking another friction method in the box silently writes Base, the box snaps back to Peak's value. With no override, the box edit lands in Base and Peak follows with no mark.
+- A row exists only if the project STATES the setting: Net3 lat/lon has no Friction method row (status bar says Hazen-Williams); a new project has no Accuracy, Maximum trials, Contour interval rows although the Settings box shows them.
+- Value cells show stored ids (rdylgn, pretty, osm, muted, dem, value, top-right) and raw JSON (Map view, colour band boundaries, Quality parameter); Value aria-label is the raw path. Units not shown on Values (65000 for map width).
+- New scenario seeds its own demand multiplier: wears the override wash while "No. of overrides: 0"; then Base edit to 1.4 leaves Peak at 1 and the count becomes 1.
+- Perf Net3, 5 scenarios, Show scenarios 1422 rows: toggle 229 ms, one edit 60 ms sync.
+Not checked: how anything looks beyond screenshots read; phone width of a 12-tab strip.
