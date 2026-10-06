@@ -80,6 +80,27 @@ function parseCsv(text) {
 	return rows;
 }
 
+const PY = `
+import zipfile, sys, json
+import xml.etree.ElementTree as ET
+z = zipfile.ZipFile(sys.argv[1])
+bad = z.testzip()
+infos = z.infolist()
+ns = {'t':'urn:oasis:names:tc:opendocument:xmlns:table:1.0','o':'urn:oasis:names:tc:opendocument:xmlns:office:1.0','x':'urn:oasis:names:tc:opendocument:xmlns:text:1.0'}
+root = ET.fromstring(z.read('content.xml'))
+rows = []
+for r in root.iter('{%(t)s}table-row' % ns):
+    row = []
+    for c in r:
+        vt = c.get('{%(o)s}value-type' % ns)
+        txt = ''.join(''.join(p.itertext()) for p in c.findall('x:p', ns))
+        row.append([vt, c.get('{%(o)s}value' % ns), txt])
+    rows.append(row)
+print(json.dumps({'bad': bad, 'first': infos[0].filename, 'firstType': infos[0].compress_type,
+  'firstExtra': len(infos[0].extra), 'mime': z.read('mimetype').decode(), 'names': [i.filename for i in infos],
+  'manifest': 'content.xml' in z.read('META-INF/manifest.xml').decode(), 'rows': rows}))
+`;
+
 (async function () {
 	setUnitSet('us');
 	L.reset();
@@ -111,6 +132,16 @@ function parseCsv(text) {
 		if (!b) { return false; }
 		fire(b, 'click', {});
 		return true;
+	}
+
+	async function readOds() {
+		const odsBytes = Buffer.from(await downloads[0].arrayBuffer());
+		const f = path.join(os.tmpdir(), 'lpn-table-export-' + process.pid + '.ods');
+		fs.writeFileSync(f, odsBytes);
+		const py = PY;
+		const res = JSON.parse(cp.execFileSync('python3', ['-c', py, f]).toString());
+		fs.unlinkSync(f);
+		return res;
 	}
 
 	console.log('--- copy with headings ---');
@@ -164,31 +195,7 @@ function parseCsv(text) {
 	menu = openMenu(order[0], k1);
 	pick(menu, PC.lpn_pane_export_ods);
 	ok('one download per click', downloads.length === 1, String(downloads.length));
-	const odsBytes = Buffer.from(await downloads[0].arrayBuffer());
-	const f = path.join(os.tmpdir(), 'lpn-table-export-' + process.pid + '.ods');
-	fs.writeFileSync(f, odsBytes);
-	const py = `
-import zipfile, sys, json
-import xml.etree.ElementTree as ET
-z = zipfile.ZipFile(sys.argv[1])
-bad = z.testzip()
-infos = z.infolist()
-ns = {'t':'urn:oasis:names:tc:opendocument:xmlns:table:1.0','o':'urn:oasis:names:tc:opendocument:xmlns:office:1.0','x':'urn:oasis:names:tc:opendocument:xmlns:text:1.0'}
-root = ET.fromstring(z.read('content.xml'))
-rows = []
-for r in root.iter('{%(t)s}table-row' % ns):
-    row = []
-    for c in r:
-        vt = c.get('{%(o)s}value-type' % ns)
-        txt = ''.join(''.join(p.itertext()) for p in c.findall('x:p', ns))
-        row.append([vt, c.get('{%(o)s}value' % ns), txt])
-    rows.append(row)
-print(json.dumps({'bad': bad, 'first': infos[0].filename, 'firstType': infos[0].compress_type,
-  'firstExtra': len(infos[0].extra), 'mime': z.read('mimetype').decode(), 'names': [i.filename for i in infos],
-  'manifest': 'content.xml' in z.read('META-INF/manifest.xml').decode(), 'rows': rows}))
-`;
-	const out = JSON.parse(cp.execFileSync('python3', ['-c', py, f]).toString());
-	fs.unlinkSync(f);
+	const out = await readOds();
 	ok('zip CRCs are valid (zipfile.testzip)', out.bad === null, String(out.bad));
 	ok('mimetype is the first entry, stored, no extra field', out.first === 'mimetype' && out.firstType === 0 && out.firstExtra === 0);
 	ok('mimetype text is the OpenDocument spreadsheet type', out.mime === 'application/vnd.oasis.opendocument.spreadsheet');
@@ -203,6 +210,29 @@ print(json.dumps({'bad': bad, 'first': infos[0].filename, 'firstType': infos[0].
 	ok('numeric cells are floats holding the exact displayed characters', floats > 20 && badFloat === 0, floats + ' floats, ' + badFloat + ' mismatched');
 	const idIdx = cols.map((c) => c.key).indexOf('id');
 	ok('the ID column stays text, even when an ID is all digits', out.rows.slice(1).every((r) => r[idIdx][0] === 'string'));
+
+	console.log('--- ODS of the Pipes table: From and To are text ---');
+	// A node ID that is all digits with a leading zero: read as a float it would become 7.
+	const target = doc.nodes.filter((n) => n.type === 'junction')[2], oldId = target.id;
+	const touched = doc.links.filter((l) => l.from === oldId || l.to === oldId);
+	target.id = '007';
+	doc.links.forEach((l) => { if (l.from === oldId) { l.from = '007'; } if (l.to === oldId) { l.to = '007'; } });
+	ok('a pipe ends at node 007', touched.length > 0);
+	L.openPane('pipes');
+	L.renderTable('pipes');
+	const pTable = byId.lpn_pane_pipes.children.filter((c) => c._tag === 'table')[0];
+	const pCols = L.tableCols('pipes'), pOrder = L.tableOrder('pipes'), pTds = L.tds('pipes');
+	fire(pTable, 'mousedown', { target: pTds[pOrder[0]][pCols[0].key], button: 2, shiftKey: false, preventDefault() {} });
+	fire(pTable, 'focusin', { target: pTds[pOrder[0]][pCols[0].key] });
+	fire(pTable, 'contextmenu', { target: pTds[pOrder[0]][pCols[0].key], clientX: 5, clientY: 5, preventDefault() {} });
+	downloads.length = 0;
+	pick(menuEl(), PC.lpn_pane_export_ods);
+	const pOut = await readOds();
+	const fi = pCols.map((c) => c.key).indexOf('from'), ti = pCols.map((c) => c.key).indexOf('to');
+	ok('Pipes has From and To columns', fi >= 0 && ti >= 0);
+	const body = pOut.rows.slice(1);
+	ok('every From and To cell is a string', body.every((r) => r[fi][0] === 'string' && r[ti][0] === 'string'));
+	ok('the leading-zero ID keeps its zeros', body.some((r) => r[fi][2] === '007' || r[ti][2] === '007'));
 
 	console.log(fails ? '\n' + fails + ' FAILED' : '\nall ok');
 	process.exit(fails ? 1 : 0);

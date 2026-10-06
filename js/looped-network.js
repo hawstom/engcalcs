@@ -29127,7 +29127,7 @@ var EngCalcs = EngCalcs || {};
 			downloadTextFile(name, data, 'text/csv;charset=utf-8');
 		} else {
 			data = EngCalcs.lpnTableOds(heads, cells, table, cols.map(function (c) {
-				return c.key !== 'id' && !c.str && !c.choices && !c.bool && !c.plainWord;
+				return c.key !== 'id' && !c.refTo && !c.str && !c.choices && !c.bool && !c.plainWord;
 			}));
 			downloadTextFile(name, data, 'application/vnd.oasis.opendocument.spreadsheet');
 		}
