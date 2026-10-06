@@ -57,8 +57,8 @@ in the node's description.
 
 ## Reported, never dropped or guessed
 
-Line notes, all warnings (the row made something), printed as `Line N: warning: <sentence>` with
-no internal code: an unknown code, two node codes, words that are not codes, a JPN target not
+Line notes, all warnings (the row made something), printed in the Task 592 shape
+`Line N: warning: code: sentence`: an unknown code, two node codes, words that are not codes, a JPN target not
 found, a JPN with no line code, a pipe that would return to its only node, a one-point line, a
 point that became a junction to close a ring, a zero-length pipe (two nodes at one spot), and a
 node shot exactly on a pipe it is not joined to. **Coincident shots are reported, never merged.**

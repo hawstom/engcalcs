@@ -4421,7 +4421,6 @@ $ec_lang['lpn_survey_note_pipe_one_node']='This line returns to the same node wi
 $ec_lang['lpn_survey_note_line_one_point']='Only point on its line, no pipe drawn from it.';
 $ec_lang['lpn_survey_note_vertices']='Points that became pipe vertices: {detail}. A vertex keeps no name, elevation, or description.';
 $ec_lang['lpn_survey_note_no_desc']='Field codes are on, but this file has no description column, so no codes were read.';
-$ec_lang['lpn_survey_note_line_plain']='Line {line}: {sev}: {text}';
 $ec_lang['lpn_survey_note_ring_junction']='This point became a junction so the ring could close.';
 $ec_lang['lpn_survey_note_pipe_zero_length']='This point is at the same spot as the node before it, so the pipe between them has no length.';
 $ec_lang['lpn_survey_note_node_on_pipe']='This point lies exactly on a pipe it is not joined to. If they connect, add JPN to say so.';

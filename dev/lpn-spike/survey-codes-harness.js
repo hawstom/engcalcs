@@ -169,8 +169,11 @@ const P = (rows) => rows.map((r, i) => r).join('\n') + '\n';
 	['code-unknown', 'code-two-nodes', 'code-unread', 'vertex-text', 'join-missing', 'join-no-line',
 		'pipe-one-node', 'line-one-point', 'ring-junction', 'pipe-zero-length', 'node-on-pipe'].forEach(c => {
 		const t = EC.lpnSurveyNoteText({ code: c, line: 9, raw: 'x' }, AX).text;
-		ok('note ' + c + ' prints as a numbered plain sentence, with no internal code',
-			t.indexOf('9') >= 0 && t !== c && t.indexOf(c) < 0 && t.indexOf(PC.lpn_survey_sev_warning) >= 0, t);
+		// Tom's shape, 2026-09-18: Line N: sev: code: text, the text a plain sentence.
+		const parts = t.split(': ');
+		ok('note ' + c + ' prints in the Line N: sev: code: text shape',
+			parts.length >= 4 && parts[0].indexOf('9') >= 0 && parts[1] === PC.lpn_survey_sev_warning &&
+			/^[a-z]+(-[a-z]+)*$/.test(parts[2]) && /\.$/.test(t), t);
 	});
 	ok('the vertices note fills its count', EC.lpnSurveyNoteText({ code: 'vertices', detail: '4' }, AX).text
 		=== PC.lpn_survey_note_vertices.replace('{detail}', '4'));

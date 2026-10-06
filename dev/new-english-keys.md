@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**43 still to read on master**, of 153 untranslated keys, of 2379 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**46 still to read on master**, of 156 untranslated keys, of 2382 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (153, 43 to read @@ NEEDS RULING)
+## lpn_  (156, 46 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -459,8 +459,17 @@ never edits a synonym.
 - **`lpn_survey_note_no_desc`**
   > Field codes are on, but this file has no description column, so no codes were read.
   @@ NEEDS RULING
+- **`lpn_survey_note_node_on_pipe`**
+  > This point lies exactly on a pipe it is not joined to. If they connect, add JPN to say so.
+  @@ NEEDS RULING
 - **`lpn_survey_note_pipe_one_node`**
   > This line returns to the same node with no other node between, no pipe drawn for it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_pipe_zero_length`**
+  > This point is at the same spot as the node before it, so the pipe between them has no length.
+  @@ NEEDS RULING
+- **`lpn_survey_note_ring_junction`**
+  > This point became a junction so the ring could close.
   @@ NEEDS RULING
 - **`lpn_survey_note_vertex_text`**
   > Not every word is a code this page reads, and a vertex keeps no description.
@@ -539,7 +548,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**59 still to read**, of 62 new keys across 15 unmerged branch(es).
+**83 still to read**, of 86 new keys across 15 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -550,8 +559,11 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/asset-type (`4c26066b`) — 15 new, 15 to read @@ NEEDS RULING
+### feat/asset-type (`1b358f39`) — 16 new, 16 to read @@ NEEDS RULING
 
+- **`lpn_change_type_becomes`**
+  > {id}: {property} {value}, in scenario {scenario}, becomes {new}
+  @@ NEEDS RULING
 - **`lpn_change_type_born`**
   > These are new, as on a newly drawn one:
   @@ NEEDS RULING
@@ -580,7 +592,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > And {n} more.
   @@ NEEDS RULING
 - **`lpn_change_type_no_curve`**
-  > {id}: No pump head curve, so the pump adds no head until one is selected
+  > {id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe
   @@ NEEDS RULING
 - **`lpn_change_type_ok`**
   > Change
@@ -598,7 +610,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.
   @@ NEEDS RULING
 
-### feat/backdrop-attach (`8adc7601`) — 6 new, 6 to read @@ NEEDS RULING
+### feat/backdrop-attach (`5ab01ee7`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_inp_backdrop_attach`**
   > Attach {file}…
@@ -612,6 +624,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_inp_backdrop_attached_other`**
   > Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.
   @@ NEEDS RULING
+- **`lpn_inp_export_difference_one`**
+  > One thing the .inp format cannot hold.
+  @@ NEEDS RULING
 - **`lpn_status_inp_exported_no_picture`**
   > Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.
   @@ NEEDS RULING
@@ -619,7 +634,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`6195c2f8`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/bentley-interop (`7c758f15`) — 31 new, 31 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -629,6 +644,72 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap`**
+  > Basemap
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_last`**
+  > Basemap to return to
+  @@ NEEDS RULING
+- **`lpn_settings_row_check_freq`**
+  > Status check frequency
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_labels`**
+  > Contour labels
+  @@ NEEDS RULING
+- **`lpn_settings_row_customer_max_width`**
+  > Show customer labels when zoomed to this map width or less
+  @@ NEEDS RULING
+- **`lpn_settings_row_elev_source_old`**
+  > Elevation source (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_emitter_exponent_old`**
+  > Emitter exponent (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_after`**
+  > Text after
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_before`**
+  > Text before
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_customer`**
+  > Customer labels
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_field`**
+  > {labels}: {field}
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_part`**
+  > {labels}: {field}, {part}
+  @@ NEEDS RULING
+- **`lpn_settings_row_max_check`**
+  > Maximum status checks
+  @@ NEEDS RULING
+- **`lpn_settings_row_of`**
+  > {setting}, {member}
+  @@ NEEDS RULING
+- **`lpn_settings_row_pda_src`**
+  > Pressure driven options stated in the file
+  @@ NEEDS RULING
+- **`lpn_settings_row_quality_option`**
+  > Quality option as the file states it
+  @@ NEEDS RULING
+- **`lpn_settings_row_quality_step`**
+  > Quality time step
+  @@ NEEDS RULING
+- **`lpn_settings_row_status_report`**
+  > Status report
+  @@ NEEDS RULING
+- **`lpn_settings_row_symbol_cap_multiple`**
+  > Largest symbol, as a multiple of a typical pipe length
+  @@ NEEDS RULING
+- **`lpn_settings_row_symbol_cap_percentile`**
+  > Typical pipe length, as a percentile of all pipe lengths
+  @@ NEEDS RULING
+- **`lpn_settings_row_tolerance`**
+  > Accuracy (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_view`**
+  > Map view (center and scale)
   @@ NEEDS RULING
 - **`lpn_settings_table_category`**
   > Category
@@ -651,7 +732,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/feedback (`eccd64ca`) — 13 new, 13 to read @@ NEEDS RULING
+### feat/feedback (`1be9dba0`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_fb_bad_email`**
   > That email address does not look right. Correct it, or leave it empty.
@@ -693,7 +774,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
   @@ NEEDS RULING
 
-### feat/geojson (`55b18e9d`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/geojson (`46e034bd`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_file_export_geojson`**
   > Export GeoJSON file…
@@ -769,6 +850,6 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
   @@ NEEDS RULING
 
-### feat/survey-code (`ab7795a1`) — adds no English strings
+### feat/survey-code (`ba5d5991`) — adds no English strings
 
 ### feat/tip-door (`2a64dbe5`) — adds no English strings

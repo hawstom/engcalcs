@@ -868,13 +868,20 @@
 		'id-duplicate': 'duplicate-name',
 		'id-taken': 'duplicate-name',
 		'id-invalid': 'invalid-name',
+		// Field codes (Task 771), in the same shape as every note above (Tom, 2026-09-18). Every
+		// one is a warning: the row made something.
+		'code-unknown': 'unknown-code',
+		'code-two-nodes': 'two-node-codes',
+		'code-unread': 'not-a-code',
+		'vertex-text': 'not-a-code',
+		'join-missing': 'join-not-found',
+		'join-no-line': 'join-without-line',
+		'pipe-one-node': 'pipe-one-node',
+		'line-one-point': 'line-one-point',
+		'ring-junction': 'ring-junction',
+		'pipe-zero-length': 'zero-length-pipe',
+		'node-on-pipe': 'node-on-pipe'
 	};
-	// **THE FIELD-CODE NOTES PRINT NO CODE** (Perry's pre-review, 2026-10-06): a handle like
-	// `pipe-one-node` read as our internal name, not a word for the reader. Their line is
-	// `Line 12: warning: <sentence>`, and every one is a warning: the row made something.
-	var FIELD_NOTE = { 'code-unknown': 1, 'code-two-nodes': 1, 'code-unread': 1, 'vertex-text': 1,
-		'join-missing': 1, 'join-no-line': 1, 'pipe-one-node': 1, 'line-one-point': 1,
-		'ring-junction': 1, 'pipe-zero-length': 1, 'node-on-pipe': 1 };
 	// **THE SPLIT IS A FACT ABOUT THE CODE ABOVE, NOT A JUDGEMENT ABOUT SEVERITY.** `error` is every
 	// case where readCsvRow() returns before pushing a point, so the file's row produced nothing;
 	// `warning` is every case where the junction was made and something about it was adjusted or
@@ -896,12 +903,6 @@
 			: (PC.lpn_survey_sev_warning || 'warning');
 	}
 	function lineNote(code, sentence, axis, line) {
-		if (FIELD_NOTE[code]) {
-			return (PC.lpn_survey_note_line_plain || 'Line {line}: {sev}: {text}')
-				.replace('{line}', line === null || line === undefined ? '' : line)
-				.replace('{sev}', PC.lpn_survey_sev_warning || 'warning')
-				.replace('{text}', fill(sentence, null, axis, line));
-		}
 		return (PC.lpn_survey_note_line || 'Line {line}: {sev}: {code}: {text}')
 			.replace('{line}', line === null || line === undefined ? '' : line)
 			.replace('{sev}', sevWord(code))
