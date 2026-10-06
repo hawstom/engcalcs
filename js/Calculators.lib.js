@@ -124,22 +124,18 @@ function ecWireExplanationDocument() {
 	}, true);
 }
 // **A TIP MAY HAVE PARAGRAPHS** (Tom, 2026-10-05: "It would be really good for tips to have
-// paragraphs, possibly with poor-boy headings"). The marker is the two-character sequence
+// paragraphs"). The marker is the two-character sequence
 // backslash-n written twice, as a LITERAL in a single-quoted language value (rule D means PHP
 // never turns it into a newline); PHP's ecTipPlain() turns it into real newlines for the native
-// title, so both spellings are the break. A paragraph that is one short line in capitals and is
-// followed by more text is a heading ("FIRE FLOW"); "Heading. Rest" on one line needs nothing.
-// Tips stay plain text: every character is escaped here, and the only tags are the two this builds.
+// title, so both spellings are the break. A paragraph in capitals is NOT a heading (Tom,
+// 2026-10-06: the detector is removed); every paragraph is a paragraph.
+// Tips stay plain text: every character is escaped here, and the only tag is the one this builds.
 EngCalcs.tipHtml = function (text) {
 	var parts = String(text == null ? '' : text).split(/\\n\\n|\r?\n\r?\n/), out = [], i, t;
 	for (i = 0; i < parts.length; i++) {
 		t = parts[i].replace(/^\s+|\s+$/g, '');
 		if (!t) { continue; }
-		if (i < parts.length - 1 && t.length <= 60 && t.indexOf('\n') < 0 && t === t.toUpperCase() && t !== t.toLowerCase()) {
-			out.push('<p class="ec-tip-head">' + EngCalcs.escapeAttr(t) + '</p>');
-		} else {
-			out.push('<p class="ec-tip-p">' + EngCalcs.escapeAttr(t) + '</p>');
-		}
+		out.push('<p class="ec-tip-p">' + EngCalcs.escapeAttr(t) + '</p>');
 	}
 	return out.join('');
 };
@@ -226,9 +222,11 @@ EngCalcs.setTipText = function (el, text) {
 	el.title = want;
 	if (prior && EngCalcs.initTips) { EngCalcs.initTips(el.parentNode || el); }
 };
-EngCalcs.initTips = function (root) {
-	var canHover = ecCanHover();
-	(root || document).querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(function (el) {
+// Arms ONE element with the styled tooltip (an explanation behind its "?", or a name tip). Shared
+// by initTips() and by the delegated listener below, so there is exactly one place that decides
+// trigger, delay, long-press and click-to-hide.
+function ecWireTipEl(el) {
+		var canHover = ecCanHover();
 		var control = ecTipIsControl(el);
 		var explainGlyph = ecTipGlyph(el);
 		if (explainGlyph) {
@@ -330,9 +328,95 @@ EngCalcs.initTips = function (root) {
 				if (e.target !== el && !el.contains(e.target)) { tip.hide(); }
 			}, { passive: true });
 		}
-	});
+}
+EngCalcs.initTips = function (root) {
+	(root || document).querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(ecWireTipEl);
 };
 document.addEventListener('DOMContentLoaded', function () { EngCalcs.initTips(document); });
+// **ONE STYLE OF TIP, FOR EVERY `title` IN THE SUITE** (Tom, 2026-10-06, testing feat/tip-door:
+// two styles of tips, make them one). initTips() arms only `.ec-help[title]` and cursor:help; any
+// other element with a `title` got the BROWSER'S native tooltip, a visibly different box that
+// never opens on touch (about 60 writes in js/looped-network.js, the tool menu's anchors, the
+// pane resizers and close buttons in the PHP). Rather than hand-mark each, ONE delegated listener
+// arms an element the first time a pointer reaches it or focus lands in it, with exactly the
+// same wiring as an `.ec-help` (ecWireTipEl()).
+//   - LAZY, so it costs nothing up front: the Net3 Tables pane has thousands of cells and
+//     none of them is touched until the pointer is.
+//   - `pointerover` fires BEFORE the mouseenter/touchstart/click that Bootstrap's own listeners
+//     (added by ecWireTipEl()) wait for, and long before the browser's ~1 s native delay; arming
+//     moves the title into data-bs-original-title, so the native box never gets the chance.
+//   - FOCUS: a keyboard arrival has no earlier pointer event, so focusin arms the element and
+//     replays the focusin Bootstrap just missed.
+//   - A `title` WRITTEN AGAIN after arming (the trap setTipText() documents) is caught here too:
+//     if an armed element's title is non-empty again, it is moved into the cache before the
+//     native box can show, so the next write is never stale and never doubled.
+//   - NOT armed: an <iframe> (its title names the frame for assistive technology and is not a
+//     hover tip), and anything marked data-ec-native-title.
+function ecDelegatedTipTarget(node) {
+	var el = node && node.closest ? node.closest('[title]') : null;
+	var tag;
+	if (!el) { return null; }
+	tag = (el.tagName || '').toLowerCase();
+	if (tag === 'iframe' || tag === 'svg' || tag === 'html' || tag === 'body') { return null; }
+	if (el.hasAttribute('data-ec-native-title')) { return null; }
+	if (!el.getAttribute('title')) { return null; }
+	if (el.closest('.tooltip')) { return null; }
+	return el;
+}
+function ecArmDelegatedTip(e) {
+	var el = ecDelegatedTipTarget(e.target), t, Tip, inst;
+	if (!el || !window.bootstrap || !bootstrap.Tooltip) { return; }
+	Tip = bootstrap.Tooltip;
+	inst = Tip.getInstance(el);
+	if (inst) {
+		// Armed before, and the title was written again: cache it, blank the attribute.
+		t = el.getAttribute('title');
+		el.setAttribute('data-bs-original-title', t);
+		el.setAttribute('title', '');
+		return;
+	}
+	ecWireTipEl(el);
+	if (e.type === 'focusin' && el.dispatchEvent && window.FocusEvent) {
+		el.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+	}
+}
+// **A LATER WRITE TO AN ARMED ELEMENT'S `title` MUST REACH THE READER.** Bootstrap caches the text
+// in data-bs-original-title and blanks the attribute, so `el.title = x` or removeAttribute('title')
+// afterwards would leave the OLD text on screen (and, for a write, the native box besides). One
+// observer, filtered to the `title` attribute alone, so it never wakes for anything else: a
+// non-empty write is moved into the cache; a removal empties the cache (an empty tip never opens).
+// Bootstrap's own blanking writes '' and is left alone.
+EngCalcs._tipObserver = null;
+function ecWatchTitleWrites() {
+	if (EngCalcs._tipObserver || !window.MutationObserver || !document.documentElement) { return; }
+	EngCalcs._tipObserver = new MutationObserver(function (records) {
+		var i, el, t;
+		for (i = 0; i < records.length; i++) {
+			el = records[i].target;
+			if (!el.hasAttribute || !el.hasAttribute('data-bs-original-title')) { continue; }
+			// A disposed tooltip puts its title back (Bootstrap's dispose()); only a LIVE one is ours.
+			if (!(window.bootstrap && bootstrap.Tooltip.getInstance(el))) { continue; }
+			// Bootstrap arms an element by REMOVING `title` (after caching it): a removal is its own
+			// doing and is ignored, and an already-absent attribute cannot be removed again, so a
+			// caller who wants an armed element's tip gone writes `el.title = ''`.
+			if (el.hasAttribute('title')) {
+				t = el.getAttribute('title');
+				el.setAttribute('data-bs-original-title', t);
+				el.removeAttribute('title');
+			}
+		}
+	});
+	EngCalcs._tipObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['title'], subtree: true });
+}
+EngCalcs._tipDelegated = false;
+EngCalcs.wireTipDelegation = function () {
+	if (EngCalcs._tipDelegated || !document.addEventListener) { return; }
+	EngCalcs._tipDelegated = true;
+	ecWatchTitleWrites();
+	document.addEventListener('pointerover', ecArmDelegatedTip, true);
+	document.addEventListener('focusin', ecArmDelegatedTip, true);
+};
+EngCalcs.wireTipDelegation();
 
 /**
  * Shortcut words in the reader's platform: a Mac reader is told "Cmd", not "Ctrl". The key

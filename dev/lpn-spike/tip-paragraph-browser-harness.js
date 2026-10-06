@@ -98,8 +98,7 @@ async function main() {
 		ok('...and shows no raw marker, and no sentence-case heading', !!s && s.text.indexOf('\\n') < 0 && s.heads.length === 0);
 		await page.mouse.click(5, 5); await a.settle(200);
 		s = await open('p2');
-		ok('an ALL-CAPS first paragraph is a heading', !!s && s.heads.length === 1 && s.heads[0] === 'THE HEADING' && s.ps === 2, JSON.stringify(s));
-		ok('...and "Heading. rest" on one line is left alone', !!s && s.text.indexOf('Run-in heading. Rest of it.') > 0 && s.heads.length === 1);
+		ok('an ALL-CAPS first paragraph is NOT a heading, just a paragraph', !!s && s.heads.length === 0 && s.ps === 2 && s.text.indexOf('THE HEADING') === 0, JSON.stringify(s));
 		await page.mouse.click(5, 5); await a.settle(200);
 		s = await open('p3');
 		ok('markup in a tip is escaped, never rendered', !!s && s.bold === 0 && s.text.indexOf('<b>bold</b>') >= 0 && s.text.indexOf('Next & last.') >= 0, JSON.stringify(s));

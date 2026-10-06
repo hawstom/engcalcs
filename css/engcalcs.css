@@ -5271,8 +5271,6 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 	.lpn-menu-row[data-hotkey]::after { content: none; }
 }
 
-/* Paragraphs inside an explanation (EngCalcs.tipHtml()); a heading is a paragraph whose first
-   line is all capitals, shown small. */
+/* Paragraphs inside an explanation (EngCalcs.tipHtml()). */
 .tooltip.ec-explain .tooltip-inner p { margin: 0 0 0.6em; }
 .tooltip.ec-explain .tooltip-inner p:last-child { margin-bottom: 0; }
-.tooltip.ec-explain .tooltip-inner p.ec-tip-head { font-size: 0.8em; font-weight: bold; letter-spacing: 0.04em; margin-bottom: 0.2em; }

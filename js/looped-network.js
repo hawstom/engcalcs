@@ -4532,7 +4532,9 @@ var EngCalcs = EngCalcs || {};
 			target.title = customPropFlagText(def, problem);
 		} else {
 			target.className = cls;
-			target.removeAttribute('title');
+			// '' and not removeAttribute: an armed tooltip caches the old text, and only a write
+			// (here an empty one) reaches it (EngCalcs.wireTipDelegation's title observer).
+			target.title = '';
 		}
 		return problem;
 	}
@@ -25340,7 +25342,7 @@ var EngCalcs = EngCalcs || {};
 		text = c.hint(el) || '';
 		tip = c.hintTip ? (c.hintTip(el) || '') : '';
 		if (text) { input.setAttribute('placeholder', text); } else { input.removeAttribute('placeholder'); }
-		if (tip) { input.title = tip; } else if (input.title) { input.removeAttribute('title'); }
+		if (tip) { input.title = tip; } else if (input.title || input.hasAttribute('data-bs-original-title')) { input.title = ''; }
 	}
 	function paneHeadingText(c) {
 		var pc = EngCalcs.pageConfig || {},
