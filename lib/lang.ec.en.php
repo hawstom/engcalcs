@@ -1106,7 +1106,7 @@ $ec_lang['lpn_wrong_thanks']='Thank you. That reached us.';
 // nothing in it posts only the anonymous tally the button always posted. The four picks are canned
 // phrases a visitor may toggle in any combination. lpn_fb_sends must stay true to send-feedback.php
 // and to the "Messages you send us" row of privacy.php.
-$ec_lang['lpn_fb_intro']='Pick any that fit, or none, and add whatever you like. Nothing is sent until you press Send.';
+$ec_lang['lpn_fb_intro']='Canned messages (optional). Nothing is sent until you press Send.';
 $ec_lang['lpn_fb_pick_numbers']='The numbers look wrong';
 $ec_lang['lpn_fb_pick_broken']='Something did not work';
 $ec_lang['lpn_fb_pick_wording']='The wording or translation is wrong';
