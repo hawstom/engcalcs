@@ -1487,6 +1487,16 @@ $ec_lang['lpn_pane_filter_sel_and']='Filtered by {q} and selection only. Showing
 $ec_lang['lpn_pane_filter_sel_none']='None of the selected elements are in this table.';
 $ec_lang['lpn_pane_sel_only']='Selection only';
 $ec_lang['lpn_pane_sel_only_none']='No elements are selected. Select elements on the map first.';
+// Show scenarios (Tom, 2026-10-05): the table's cell menu switch that lists every asset once per
+// scenario, with a Scenario column after ID.
+$ec_lang['lpn_pane_scn_show']='Show scenarios';
+// The cell menu's item that removes the selected cells' scenario overrides, so each reads what its
+// scenario inherits (Tom, 2026-10-06). Greyed when no selected cell holds one.
+$ec_lang['lpn_pane_clear_override']='Clear override';
+// The tip on a table cell holding a value set in its row's scenario (Tom, 2026-10-06: "Demand alt.:
+// Max day"). {category} is an lpn_alt_cat_* name; {alternative} is the alternative's name, which
+// in Basic mode is its scenario's.
+$ec_lang['lpn_pane_scn_alt_tip']='{category} alt.: {alternative}';
 // The pin beside the ID in the first column. The ID itself was this control until 2026-09-19,
 // underlined and turning link blue; the ID is an ordinary editable cell now and this is the way
 // back to the map. It is the button's ONLY name, the button having no text, so it is both the tip

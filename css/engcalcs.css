@@ -2573,6 +2573,10 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
 .lpn-pane-table tbody td input:focus { outline: 0; }
 /* A table waiting for Paste as new rows (Task 610): visibly armed until Ctrl+V or Esc. */
 .lpn-pane-appending .lpn-pane-table { outline: 2px dashed var(--ec-accent); outline-offset: 2px; }
+/* SHOW SCENARIOS (Tom, 2026-10-05): a cell holding a value set in its row's scenario, washed in the
+   amber the map rings an override with. Before the selection wash, so a selected range still reads
+   as one block. */
+.lpn-pane-table tbody td.lpn-pane-ovcell { background: var(--ec-hue-fff3cd); box-shadow: inset 0 -2px 0 var(--ec-hue-e8a33d), inset -1px 0 0 var(--ec-border); }
 /* The selected RANGE. A wash rather than a border, so a rectangle of forty rows reads as one
    block; the current cell keeps its border on top of it. */
 .lpn-pane-table tbody td.lpn-pane-sel { background: var(--ec-select-bg); }
@@ -2904,6 +2908,7 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    about Ctrl+D"). Quieter than the label, so the row still reads as one action first. */
 .lpn-pane-ctxmenu-accel { color: var(--ec-gray-888); font-size: .85em; white-space: nowrap; }
 .lpn-pane-ctxmenu button:hover, .lpn-pane-ctxmenu button:focus-visible { background: var(--ec-hue-eef1f4); outline: 0; }
+.lpn-pane-ctxmenu button:disabled { color: var(--ec-gray-888); cursor: default; background: none; }
 /* THE DIVIDER BETWEEN TWO HEADINGS, which is where a spreadsheet user aims to resize a column
    (Tom's point (d), 2026-09-18). It sits on the trailing edge of its own heading, is as tall as the
    heading row, and is the ONLY thing there that takes a col-resize cursor -- so the gesture
