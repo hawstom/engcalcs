@@ -2045,7 +2045,7 @@ $ec_lang['lpn_dxf_note_geo']='Coordinates: {crs}, in meters, not latitude and lo
 $ec_lang['lpn_dxf_exported_geo']='Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.';
 // {h} and {w} are lengths, each a number (3 significant figures) followed by its unit symbol.
 $ec_lang['lpn_dxf_note_scale']='Text and symbols are sized as the map draws them at Zoom to fit: text {h} high, on a network {w} across.';
-$ec_lang['lpn_dxf_note_blocks']='Block attributes are 1 unit high in each block definition. Every block is inserted at scale {s}, so its attributes are {s} {unit} high; change the insertion scale to change that.';
+$ec_lang['lpn_dxf_note_blocks']='Block attributes are 1 unit high in each block definition. Every block is inserted at scale {scale}, so its attributes are {h} high; change the insertion scale to change that.';
 // {n} is a whole number; {max} is 2049. The ellipsis is the character the shortened value ends in.
 $ec_lang['lpn_dxf_note_shortened']='{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in “…”.';
 $ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network file.';

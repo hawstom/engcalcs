@@ -35211,8 +35211,8 @@ var EngCalcs = EngCalcs || {};
 				.replace('{h}', three(textHeight) + ' ' + (frame.unitLabel || '')).replace('{w}', three(across) + ' ' + (frame.unitLabel || '')),
 			// **ATTRIBUTES ARE 1 HIGH IN THE BLOCK, AND THE INSERT SCALE IS THE TEXT HEIGHT** (Tom,
 			// 2026-10-06), so scaling a block's insertion is how a CAD user sets their height.
-			(pc.lpn_dxf_note_blocks || 'Block attributes are 1 unit high in each block definition. Every block is inserted at scale {s}, so its attributes are {s} {unit} high; change the insertion scale to change that.')
-				.replace(/\{s\}/g, three(textHeight)).replace('{unit}', frame.unitLabel || '')];
+			(pc.lpn_dxf_note_blocks || 'Block attributes are 1 unit high in each block definition. Every block is inserted at scale {scale}, so its attributes are {h} high; change the insertion scale to change that.')
+				.replace('{scale}', three(textHeight)).replace('{h}', three(textHeight) + ' ' + (frame.unitLabel || ''))];
 		// **A VALUE TOO LONG FOR ONE DXF STRING IS SHORTENED, AND THE DRAWING SAYS SO** -- the writer
 		// cuts it and ends it in an ellipsis (js/lpn-dxf.js, LIMIT_CHARS).
 		var longOnes = 0;
