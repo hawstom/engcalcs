@@ -540,3 +540,4 @@ N+5. **A check that flags one English string holding both a select word and an o
 
 - **Show one reader the amber-edge field plus "Base: x / Reset" before the Settings box is built**, against the per-field checkbox, to see whether the border alone is read as "this differs". SPECULATION until then.
 - **Ask Tom whether the Settings table's Category must be sortable** (it decides heading-as-columns vs group rows).
+- (2026-10-05) Feedback usage data: how often does `lpn wrong:*` fire vs contact sends per week (log/lang-log-stats.sh)? Decides whether the in-page dialog is worth ~310 strings.
