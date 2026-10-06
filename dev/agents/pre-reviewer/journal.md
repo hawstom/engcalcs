@@ -3867,3 +3867,9 @@ OBSERVED real Chromium: branch's own harness passes. All 7 shipped examples: 0 w
 OBSERVED DEFECT: touch (hover none): tapping the glyph in the Properties box opens the tip AND focuses the Diameter input (label activation), the exact 2026-08-29 complaint; initTips only cancels this on `.ec-tip`, the glyph here is a bare `.ec-help`. Tables-pane tap also focuses a cell input.
 OBSERVED: Basic-example-SI-units opens with roughness unit ft (pre-existing); under D-W its tip reads ft in an SI project.
 SPECULATION: how the glyph looks (zero-width inset over the input end) not judged.
+
+## feat/survey-code (Task 771) at b530f536 (OBSERVED, 2026-10-06; re-verify before citing)
+CITED (read): Carlson Special Codes 2021 PDF: JPN 3.28, CLO 3.13 (a Carlson code, so the doc's "Civil 3D, unverified" attribution of CLO is wrong), +0/-0 PointCAD, group-number same-code joining. PennDOT WL/WV/FH/WM confirmed. Civil 3D CPN: search summary only (single separate segment, example `EP1 B CPN101`).
+OBSERVED real Chromium (xy-us, geo-us, xy-si, geo-si, phone 390): one undo clears the import; unticked saved file identical to master (xy and geo); georef vertices keep the file's doubles; messy file (blank/mixed case/trailing spaces/WL10 vs WL1/forward JPN/self-cross) read as expected; bad rows carry line numbers.
+OBSERVED defects: (1) a ring coded WL3 ... CLO with no second node draws NO pipe, and its other points are counted as "vertices"; same for a ring fed by a JPN tee. (2) two nodes at the same spot give a 0-length pipe, unreported. (3) PRE-EXISTING on master: New SI project, import throws in label refresh (no default pipe diameter), report dialog never appears; this branch inherits it with pipes.
+Not done: harness mutation test (would need to edit the worktree), appearance of the table.
