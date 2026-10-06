@@ -498,7 +498,7 @@ there beside a deliberate "Hold this view in this scenario".
 
 - **Q7, yes.** The demand multiplier, run time and time step are calculation options, counted in
   the Calculation column; their three Alternatives-table columns retire once the settings table
-  exists. Storage stays where it is.
+  exists (done 2026-10-06, stage 3b). Storage stays where it is.
 - **Q8, yes.** An ID prefix by scenario sits in Physical.
 - **Q9, the view, answered by a different rule:** *"Leaving doesn't do anything. Entering does
   everything."* View is a setting, and Base has a View property: the live view. Entering a
