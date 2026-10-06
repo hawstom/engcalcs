@@ -99,7 +99,7 @@ console.log('== 2. the wizard changes Length and Diameter: a narrow reset ==');
 	var s2 = L.getSettings(), ls2 = L.ls();
 	ok('idPrefixes.J STILL carries over (unit-independent)', s2.idPrefixes.J === 'JJ', q(s2.idPrefixes));
 	ok('show.node.id STILL carries over (unit-independent)', ls2.show.node.id === 5, ls2.show.node.id);
-	ok('defaults.diameter resets to the built-in default (its OWN unit changed)', s2.defaults.diameter === null, s2.defaults.diameter);
+	ok('defaults.diameter resets to the built-in default for mm (100), never null', s2.defaults.diameter === 100, s2.defaults.diameter);
 	ok('useUnits.link.length resets to the built-in default for metres (ticked, R-347)', ls2.useUnits.link.length === true, ls2.useUnits.link.length);
 	ok('customerMaxWidth resets to the built-in default (length unit changed)', ls2.customerMaxWidth === 1000, ls2.customerMaxWidth);
 	// The one deliberately UNCHANGED reading: decimals is a display-format preference, not a typed

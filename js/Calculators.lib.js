@@ -156,8 +156,12 @@ EngCalcs.initTips = function (root) {
 		// TOUCH ONLY. A mouse reaches the tip by hovering and never taps the glyph to read it, so
 		// the pointer behaviour is left exactly as it was.
 		if (!canHover && !control) {
-			var glyph = (el.classList && el.classList.contains('ec-tip')) ? el :
-				(el.querySelector ? el.querySelector('.ec-tip') : null);
+			// A bare glyph with no `.ec-tip` look of its own (the ⚠ beside an unreasonable value in
+			// js/looped-network.js) declares itself with data-ec-tip-glyph and is cancelled the same way.
+			var isGlyph = function (n) {
+				return !!(n.classList && n.classList.contains('ec-tip')) || !!(n.hasAttribute && n.hasAttribute('data-ec-tip-glyph'));
+			};
+			var glyph = isGlyph(el) ? el : (el.querySelector ? el.querySelector('.ec-tip, [data-ec-tip-glyph]') : null);
 			if (glyph && !glyph.dataset.ecTipNoFocus) {
 				glyph.dataset.ecTipNoFocus = '1';
 				glyph.addEventListener('click', function (e) { e.preventDefault(); });

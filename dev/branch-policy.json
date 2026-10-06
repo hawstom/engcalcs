@@ -37,6 +37,8 @@
         "name that comes back meaning something else must not walk through an open door."
     ],
     "protected": [
+        "feat/section-grid",
+        "feat/table-export",
         "feat/keyboard-menu",
         "feat/drawing-keep",
         "feat/property-arrow-key",
@@ -132,7 +134,13 @@
         "feat/tip-door",
         "feat/scenario-table",
         "feat/screenshot",
-        "feat/backdrop-attach"
+        "feat/backdrop-attach",
+        "feat/value-warning",
+        "feat/asset-type",
+        "feat/feedback",
+        "feat/survey-code",
+        "feat/geojson",
+        "feat/dxf"
     ],
     "feature_freeze": {
         "active": false,

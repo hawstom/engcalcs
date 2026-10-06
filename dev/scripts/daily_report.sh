@@ -332,7 +332,7 @@ if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ];
     if [ -n "$out" ]; then
         picked=$(
             [ -n "$day" ] && rank_table "$day" "Top pages, LAST 24 HOURS"
-            rank_table "$out" "Top pages, WHOLE LOG, not one day"
+            rank_table "$out" "Top pages, WHOLE LOG, which restarts on the 1st"
             echo ""
             # R-121/122/123: "people" is the CONSENTED bucket (one row per person per page, by
             # cookie, nothing to do with dwell time); "page loads" is everybody else, one row per
