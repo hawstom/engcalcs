@@ -325,7 +325,7 @@ async function main() {
 		const notice = a.lastNotice || '';
 		ok('Elm Street: the notice names the .zip and all three files, and says how to open them in EPANET', notice.includes(pc.lpn_status_inp_exported_picture
 			.replace('{zip}', 'Elm-Street-Center.zip').replace('{picture}', 'Elm-Street-Center.bmp').replace('{world}', 'Elm-Street-Center.bpw')
-			.replace(/\{file\}/g, 'Elm-Street-Center.inp')) && /EPANET/.test(notice), notice.slice(0, 300));
+			.replace('{file}', 'Elm-Street-Center.inp')) && /EPANET/.test(notice), notice.slice(0, 300));
 		ok('Elm Street: no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 
@@ -381,7 +381,7 @@ async function main() {
 		const bInp = pick(broken, '.inp');
 		ok('an unreadable picture: the .inp alone is downloaded', Object.keys(broken).length === 1 && !!bInp, Object.keys(broken).join(', '));
 		ok('and its [BACKDROP] names no file', !!bInp && !/^\s*FILE/mi.test(String(broken[bInp])));
-		ok('and the notice says the picture could not be saved', !!bInp && a.lastNotice.includes(pcB.lpn_status_inp_exported_no_picture.replace(/\{file\}/g, bInp)), a.lastNotice.slice(0, 300));
+		ok('and the notice says the picture could not be saved', !!bInp && a.lastNotice.includes(pcB.lpn_status_inp_exported_no_picture.replace('{file}', bInp)), a.lastNotice.slice(0, 300));
 		await a.close();
 		await browser.close();
 

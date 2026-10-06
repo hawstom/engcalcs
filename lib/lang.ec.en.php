@@ -2016,8 +2016,8 @@ $ec_lang['lpn_file_export_inp']='Export EPANET file…';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_file_export_inp_tip']='Download this network as an EPANET .inp file. Anything the .inp format cannot hold is listed for you afterwards.';
 $ec_lang['lpn_status_inp_exported']='Exported {file}.';
-$ec_lang['lpn_status_inp_exported_picture']='Exported {zip}, holding {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open {file} in EPANET; the picture comes with it.';
-$ec_lang['lpn_status_inp_exported_no_picture']='Exported {file}. The background picture could not be saved, so {file} names none; in EPANET, add it with View > Backdrop > Load.';
+$ec_lang['lpn_status_inp_exported_picture']='Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.';
+$ec_lang['lpn_status_inp_exported_no_picture']='Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
 $ec_lang['lpn_inp_export_differences']='{n} things the .inp format cannot hold.';

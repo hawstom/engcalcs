@@ -67,8 +67,8 @@ own Background image > Add when the BMP and `.bpw` are picked together.
 ## What the user sees: one .zip, not three downloads
 
 `Name.zip`, holding `Name.inp`, `Name.bmp` and `Name.bpw`, and the status line: "Exported Name.zip,
-holding Name.inp, its background picture Name.bmp, and the world file Name.bpw. Extract all three
-into one folder, then open Name.inp in EPANET; the picture comes with it." A project with no picture
+holding the EPANET file Name.inp, its background picture Name.bmp, and the world file Name.bpw.
+Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it." A project with no picture
 still downloads its bare `.inp`. A picture the page cannot read back (undecodable, or a canvas the
 browser will not let it read) gives the bare `.inp` with no FILE line, and the status line says the
 picture could not be saved and to add it in EPANET with View > Backdrop > Load.

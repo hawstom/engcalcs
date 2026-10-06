@@ -34768,17 +34768,17 @@ var EngCalcs = EngCalcs || {};
 			if (!pic) {
 				downloadBlob(new Blob([out.inp], { type: 'text/plain' }), inpName);
 				setNotice((pic === false
-					? (pcX.lpn_status_inp_exported_no_picture || 'Exported {file}. The background picture could not be saved, so {file} names none; in EPANET, add it with View > Backdrop > Load.')
-					: (pcX.lpn_status_inp_exported || 'Exported {file}.')).replace(/\{file\}/g, inpName) + tail);
+					? (pcX.lpn_status_inp_exported_no_picture || 'Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.')
+					: (pcX.lpn_status_inp_exported || 'Exported {file}.')).replace('{file}', inpName) + tail);
 				showInpExportFlattening(out.differences, inpName);
 				return;
 			}
 			buildZip([{ name: inpName, data: out.inp }, { name: picName, data: pic.bmp }, { name: worldName, data: pic.world }])
 				.then(function (zip) {
 					downloadBlob(zip, zipName);
-					setNotice((pcX.lpn_status_inp_exported_picture || 'Exported {zip}, holding {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open {file} in EPANET; the picture comes with it.')
+					setNotice((pcX.lpn_status_inp_exported_picture || 'Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.')
 						.replace('{zip}', zipName).replace('{picture}', picName).replace('{world}', worldName)
-						.replace(/\{file\}/g, inpName) + tail);
+						.replace('{file}', inpName) + tail);
 					showInpExportFlattening(out.differences, inpName);
 				});
 		});

@@ -96,7 +96,25 @@ async function exportInp(a) {
 		const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0);
 		if (r) { r.click(); }
 	}, label)]);
-	return fs.readFileSync(await dl.path(), 'utf8');
+	const buf = fs.readFileSync(await dl.path());
+	return /\.zip$/i.test(dl.suggestedFilename()) ? inpFromZip(buf) : buf.toString('utf8');
+}
+// A project with a picture exports ONE .zip (.inp, .bmp, .bpw; dev/backdrop-export.md). The .inp in
+// it, read by the central directory and inflated by node's zlib; null when there is none.
+function inpFromZip(buf) {
+	let e = buf.length - 22;
+	while (e >= 0 && buf.readUInt32LE(e) !== 0x06054b50) { e--; }
+	if (e < 0) { return null; }
+	for (let i = 0, p = buf.readUInt32LE(e + 16); i < buf.readUInt16LE(e + 10); i++) {
+		const method = buf.readUInt16LE(p + 10), csize = buf.readUInt32LE(p + 20), nlen = buf.readUInt16LE(p + 28),
+			loc = buf.readUInt32LE(p + 42), name = buf.toString('utf8', p + 46, p + 46 + nlen);
+		if (/\.inp$/i.test(name)) {
+			const start = loc + 30 + buf.readUInt16LE(loc + 26) + buf.readUInt16LE(loc + 28), body = buf.subarray(start, start + csize);
+			return (method === 8 ? zlib.inflateRawSync(body) : body).toString('utf8');
+		}
+		p += 46 + nlen + buf.readUInt16LE(p + 30) + buf.readUInt16LE(p + 32);
+	}
+	return null;
 }
 // The picture's stored placement, from the saved document, plus the document origin.
 function storedBackdrop(a) {
