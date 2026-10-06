@@ -144,13 +144,12 @@ research; his notes on Tasks 728, 768, 771, 772 in the roadmap. `feat/value-warn
 
 ### The long burn: `feat/bentley-interop` (long-lived, never merges without him)
 
-Q6 answered: "Calculation". The Settings table (stage 3b) is built and the Settings box now writes
-the open scenario through one seam (his Q4), every setting is a row, undo restores only edited
-paths, a new scenario seeds nothing. Perry's second pass (journal 0998ab89) found label text fields
-losing keystrokes in a scenario and Graphs > Contour writing Base; that fix round was running at
-the end of the session. `git log` the branch and read its last report; Perry passes it before a
-previews row is added. Tom's calls waiting there: Settings tab in Basic mode; Restore defaults
-disabled in a scenario.
+Q6 answered: "Calculation". The Settings table (stage 3b) is built and the Settings box, Graphs >
+Contour and the Map basemap doors now write the open scenario through one seam (his Q4); every
+setting is a row; undo restores only edited paths; a new scenario seeds nothing. Two Perry passes,
+every finding fixed (head a83b751c); on the previews page. His calls: Settings tab in Basic mode;
+Restore defaults disabled in a scenario. Next stage: mark a held value inside the Settings box, and
+"Hold this view in this scenario".
 
 ### Next job
 
