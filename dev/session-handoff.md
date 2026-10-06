@@ -99,71 +99,84 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-06 (third session; jasmine was on UTC, so earlier "10-06" dates are Phoenix 10-05)
+## STATE — 2026-10-06 (fourth session; jasmine runs on UTC, so log stamps read a day ahead late in the evening)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged this session on green (defect and chore tracks): `fix/phone-bolt` (the Calculate bolt shows on
-a phone when Recalculate is off; a mixed-scope Filter in table now filters), `fix/valve-label` (pump
-and valve symbols are label obstacles; found by the round-6 bench), `chore/adviser-notes` (Tasks
-768-773; Ida's report-a-problem and tip-text advice; Mary's `gis-plugins.md`, `autocad-interop.md`,
-`survey-codes.md` in `dev/agents/market-researcher/`; Mary's proposed journal/wishlist rows sit at
-the foot of those three files, not yet folded into her journal).
+Merged this session: `feat/scenario-table` (Task 766, "Good. Merge.") and `feat/value-warning`
+(Task 770, "Merge."), both closed; `fix/si-default-diameter` (a new project whose units differ from
+the open one got null diameter/elevation/demand defaults and threw on survey import); Mary's GIS/CAD
+research; his notes on Tasks 728, 768, 771, 772 in the roadmap. `feat/value-warning`, `asset-type`,
+`feedback`, `survey-code`, `geojson`, `dxf` were added to `branch-policy.json` (they had been missed).
 
-### Awaiting him (all on the Branch previews page; each passed Perry, his findings fixed)
+### Awaiting him (all on the Branch previews page; every one passed Perry, his findings fixed)
 
-- **`feat/tip-door`** (Task 759): tips take paragraphs (`\n\n` literal in the value). An ALL-CAPS
-  first line renders as a heading, but he did NOT rule on that: Ida and CC advise removing it (14 of
-  27 languages have no case; a tip needing a heading has outgrown a tip). **Ask: remove the heading
-  detector?** `lpn_ds_scope_tip` and its synonym deleted on his word. **Phone check deferred to the
-  merge: remind him when it merges and master is pushed.**
-- **`feat/scenario-table`** (Task 766): Clear override now HIDDEN when it can't act (his call).
-- **`feat/screenshot`**: 50% drag, Screenshot box with Magnification 1-4x, no credit drawn. **New
-  localStorage key `lpn_snipbox`** (box place + magnification; told him). Ask: should the scale bar
-  be in the picture (it is a page element, not drawn)?
-- **`feat/backdrop-attach`** (Task 282): Export EPANET file also saves the picture as **BMP + .bpw,
-  not the PNG + .pgw he asked for** (EPANET 2.2 reads BMP/EMF/WMF only; Perry confirmed from source).
-  His round trip: steps on the previews row. Risk only he can check: in EPANET desktop DIMENSIONS
-  becomes the map extent and 3 of Elm Street's 18 nodes lie outside the picture.
-- **`feat/value-warning`** (Task 770, new): ⚠ on unreasonable values in Tables and Properties; zero
-  false alarms on all 7 examples. **Ask: Darcy-Weisbach limit 10 mm** (he wrote "over 0.001 for e",
-  no unit); the HW C ceiling 200 is CC's number. Seams: scenario-table cells, bentley's resolved
-  method (`valueWarnMethod()`).
-- **`feat/asset-type`** (Task 769, new): Water > Change type (foot of the menu) for nodes; tank <->
-  reservoir keeps the water surface; links not built (reasons in `feat/asset-type:dev/asset-type.md`). Seam with
-  bentley: must walk `eachOverrideMap()` and stored alternatives at that merge.
-- **`feat/feedback`** (Task 768, new): contact.php category select, optional email, refused post
-  keeps input; "Tell us more" beside "Something wrong here?" carries page/lang/error code. **privacy.php
-  sentence changed (public text; told him).** contactYourEmail kept as the fallback until a sprint.
-  Ida's move 3 (in-page dialog) not built.
-- Still from before: `feat/desktop`. `feat/label-placer` round 6 done: four questions for him in
-  `feat/label-placer:dev/label-trials/round-6-2026-10-05.md` (drop order keeps most-wanted value over ID; R1 as
-  pass/fail; spot_prime as a ranked gap list two deep). Round 5's "D breaks on bends" was our
-  generator's bug, withdrawn.
+- **`feat/tip-door`** (Task 759): ALL-CAPS heading detector removed (CC's advice; he had asked what
+  it was). ONE style of tip: every `title` (and SVG `<title>`, chart dots) is now the styled Bootstrap
+  name tip via a lazy delegated listener; a tap elsewhere closes a non-control tip on touch. Fire-flow
+  wording is his. Phone check still deferred to the merge.
+- **`feat/screenshot`**: a Screenshot button in the box repeats the shot. No scale bar (his word).
+  An on-map legend that is showing IS in the picture: his call.
+- **`feat/backdrop-attach`** (Task 282): his "only the .inp" was Chrome dropping a 2nd/3rd download
+  from one click (reproduced). Export now saves ONE Name.zip (.inp + .bmp + .bpw); picture name is
+  ASCII for EPANET. He then said the BMP/BPW did arrive late on the old build; CC recommended keeping
+  the zip and offered to revert. Ask: `lpn_file_export_inp_tip` does not mention the .zip.
+- **`feat/asset-type`** (Task 769): the key line "ID: Lost entry"; then CC read his "Proceed" as
+  "build the links" (the branch had left Pipe/Pump/Valve unbuilt), NOT as an all-clear; links are
+  built (TCV for a new valve; a curveless pump adds no head; customers stay on their node; rule words
+  rewritten). Seam: bentley must walk `eachOverrideMap()` in four functions at its merge
+  (`dev/asset-type.md`). **Ask him whether "Proceed" meant merge.**
+- **`feat/feedback`** (Task 768, REBUILT): his spec, no links, no contact page: "Something wrong
+  here?" opens a little box (four canned toggles, optional comment and email, what-this-sends line);
+  Send is click two; new endpoint `send-feedback.php`. **privacy.php sentence changed (public text).**
+  jasmine has no MTA, so on the preview a Send with content shows the failure path. The old
+  `lpn_wrong_tip` in 26 languages is now false until the sprint that follows the merge.
+- **`feat/survey-code`** (Task 771, new): opt-in field codes in survey import (Carlson same-code
+  joining, +0/-0, CLO, JPN/CPN tee; PennDOT code defaults). His calls: CPN and B/E in Civil 3D; WV
+  as a junction. Sample CSV is `feat/survey-code:dev/lpn-spike/fixtures/survey-coded-carlson.csv`.
+- **`feat/geojson`** (Task 728, new): File > Export GeoJSON (RFC 7946, Gusnet/WNTR field names,
+  patterns as multipliers, project units stated not converted; XY projects refused).
+- **`feat/dxf`** (Task 772, new): File > Export DXF (R2000, C-WATR-* layers, invisible-attribute
+  blocks incl. a mid-run pipe block, labels as laid out at Zoom to fit, UTM for lat/lon). His calls:
+  invisible ID, layer names, arial.ttf, VALV vs INST.
+- Still from before: `feat/desktop`; `feat/label-placer` (his Q1 yes folded in; Q2 and Q4 on the
+  artifact https://claude.ai/artifact/NEDMYBs4exkWvYcTzaqMUA).
 
 ### The long burn: `feat/bentley-interop` (long-lived, never merges without him)
 
-His 2026-10-05 answers are recorded in `dev/scenario-alternatives.md` on the branch: "override" is
-the word (an override equal to its parent is still one); shared-alternative edits, refused deletes and
-the merge rule all YES; Major/Minor stay COLUMNS (no group rows); Sue's ⚠ is suite-wide on
-`feat/value-warning`. **Q6 re-asked with context:** the Alternatives table's two new column headings
-are "Presentation" and "Calculation" (or Bentley's "Calculation options") -- the column that counts
-each scenario's calculation-option overrides; he guessed "Value", which is the settings table's
-column, not this one. **Next: the Settings table, after `feat/scenario-table` merges.**
+Q6 answered: "Calculation". The Settings table (stage 3b) is built and the Settings box now writes
+the open scenario through one seam (his Q4), every setting is a row, undo restores only edited
+paths, a new scenario seeds nothing. Perry's second pass (journal 0998ab89) found label text fields
+losing keystrokes in a scenario and Graphs > Contour writing Base; that fix round was running at
+the end of the session. `git log` the branch and read its last report; Perry passes it before a
+previews row is added. Tom's calls waiting there: Settings tab in Basic mode; Restore defaults
+disabled in a scenario.
 
 ### Next job
 
-- Translation sprint after tip-door, scenario-table and the new branches merge (they all add keys).
-- Task 771 survey codes: Mary recommends Carlson's convention (same-code joining, +0/-0, JPN<point>
-  for a tee; accept Civil 3D's CPN). Task 772 AutoCAD: DXF export with ids in XDATA first, import
-  with a visible snap tolerance; DWG via the user saving DXF. Task 728: shapefile+GeoJSON import
-  behind one mapping step; GeoJSON export first. Mary names QGISRed (UPV) and Gusnet as contacts.
-- jasmine timezone: needs `sudo timedatectl set-timezone America/Phoenix` from him (sudo needs a
-  password).
+- **Translation sprint once his pass merges this batch** (tip-door, feedback, asset-type, survey,
+  geojson, dxf, backdrop all add or change keys; ~150 untranslated). Wave 0 first. Deferred this
+  session to run once rather than twice, and because build agents held most of the 20 slots.
+- jasmine timezone: needs `sudo timedatectl set-timezone America/Phoenix` from him.
 
 ### Decisions waiting on him
 
 - DMARC phase 3: gate met; needs his go and his not-epanet.org choice.
+- Mary's contacts (journal 2026-10-06): Angus McBride (Gusnet), Prof. Fernando Martínez Alzamora
+  (QGISRed), Giswater/BGEO; openers drafted in her journal. Bricsys is now Octave (2026-05-28).
+
+### Traps met 2026-10-06 (fourth session)
+
+- **`>>` onto `ports.conf` glued a new row to the last one** (the file had no trailing newline), so
+  `generate.sh` silently made no vhost and the port refused. Edit it with a script that keeps the
+  newline, then curl the port.
+- **CC's own brief contradicted one of his calls** (told an agent to drop report-line codes; he ruled
+  2026-09-18 that a report line carries `Line N: sev: code: text`). The agent caught it. Grep his
+  calls before dictating wording to a builder.
+- **"Proceed" after a list of fixes is not "Merge."** The other branches got the merge word; read
+  an ambiguous one as the conservative instruction and ask.
+- **jasmine has no MTA** (`sendmail` missing): any preview that mails shows its failure path.
+- **Chrome delivers one download per click by default**; a page must never fire two.
 
 ### Traps met 2026-10-06 (third session)
 
