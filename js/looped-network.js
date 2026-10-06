@@ -57624,7 +57624,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		// Box first, then words, in its own <span> -- setFieldLabel() assigns textContent, which
 		// would wipe a checkbox already appended to the same element. Same order as closedField().
-		setFieldLabel(text, pc.lpn_field_active || 'Part of this network', pc.lpn_field_active_tip);
+		setFieldLabel(text, pc.lpn_field_active || 'Is active?', pc.lpn_field_active_tip);
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);
