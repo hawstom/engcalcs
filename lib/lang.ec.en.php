@@ -3026,7 +3026,6 @@ $ec_lang['lpn_settings_row_basemap_last']='Basemap to return to';
 $ec_lang['lpn_settings_row_customer_max_width']='Show customer labels when zoomed to this map width or less';
 $ec_lang['lpn_settings_row_quality_step']='Quality time step';
 $ec_lang['lpn_settings_row_view']='Map view (center and scale)';
-$ec_lang['lpn_settings_row_minor_label_order']='Label order (rank and drop)';
 $ec_lang['lpn_settings_row_contour_fill']='Contour fill';
 $ec_lang['lpn_settings_row_contour_opacity']='Contour fill opacity';
 $ec_lang['lpn_settings_row_contour_interval']='Contour interval';

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**25 still to read on master**, of 135 untranslated keys, of 2361 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**76 still to read on master**, of 183 untranslated keys, of 2409 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,11 +73,14 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (135, 25 to read @@ NEEDS RULING)
+## lpn_  (183, 76 to read @@ NEEDS RULING)
 
-- **`lpn_alt_calc_options`**
-  > Calculation options
-  _Ruled OK 2026-10-05._
+- **`lpn_alt_cat_calculation`**
+  > Calculation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_presentation`**
+  > Presentation
+  @@ NEEDS RULING
 - **`lpn_analyze_at_time`**
   > Time step: {time}.
   _Ruled OK 2026-10-03._
@@ -369,12 +372,9 @@ never edits a synonym.
 - **`lpn_saved_session`**
   > Not saved
   _Ruled OK 2026-10-05._
-- **`lpn_scenario_duration_tip`**
-  > Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.
-  _Ruled OK 2026-10-05._
-- **`lpn_scenario_hyd_step_tip`**
-  > Leave blank to inherit from parent.
-  _Ruled OK 2026-10-05._
+- **`lpn_scenario_delete_has_children`**
+  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
+  @@ NEEDS RULING
 - **`lpn_scncmp_at_time`**
   > {value} at {id}, {time}
   _Ruled OK 2026-10-05._
@@ -399,6 +399,9 @@ never edits a synonym.
 - **`lpn_settings_demand_model_tip`**
   > Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.
   _Ruled OK 2026-10-05._
+- **`lpn_settings_held_base`**
+  > {base}: {value}
+  @@ NEEDS RULING
 - **`lpn_settings_min_pressure`**
   > Minimum pressure
   _Ruled OK 2026-10-05._
@@ -417,174 +420,6 @@ never edits a synonym.
 - **`lpn_settings_req_pressure_tip`**
   > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.
   _Ruled OK 2026-10-05._
-- **`lpn_sysflow_title`**
-  > Flow balance
-  _Ruled OK 2026-10-03._
-- **`lpn_time_engine_fetch_failed`**
-  > The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.
-  @@ NEEDS RULING
-- **`lpn_time_engine_run_failed`**
-  > The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.
-  @@ NEEDS RULING
-- **`lpn_time_engine_start_failed`**
-  > The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.
-  @@ NEEDS RULING
-- **`lpn_time_no_engine_why`**
-  > The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}
-  @@ NEEDS RULING
-- **`lpn_time_scn_overrides`**
-  > Scenario overrides:
-  _Ruled OK 2026-10-05._
-- **`lpn_time_stat_averaged`**
-  > Avg
-  @@ NEEDS RULING
-- **`lpn_time_stat_maximum`**
-  > Max
-  @@ NEEDS RULING
-- **`lpn_time_stat_minimum`**
-  > Min
-  @@ NEEDS RULING
-- **`lpn_time_stat_none`**
-  > None
-  _Ruled OK 2026-10-05._
-- **`lpn_time_stat_range`**
-  > Range
-  _Ruled OK 2026-10-05._
-- **`lpn_time_statistic`**
-  > Statistic
-  _Ruled OK 2026-10-05._
-- **`lpn_tool_add_chain`**
-  > Junction Pipe Chain
-  _Ruled OK 2026-10-05._
-- **`lpn_tool_add_chain_tip`**
-  > Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
-  _Ruled OK 2026-10-05._
-- **`lpn_valwarn_diameter`**
-  > A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.
-  @@ NEEDS RULING
-- **`lpn_valwarn_dw`**
-  > A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.
-  @@ NEEDS RULING
-- **`lpn_valwarn_hw`**
-  > A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
-  @@ NEEDS RULING
-- **`lpn_valwarn_manning`**
-  > A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
-  @@ NEEDS RULING
-- **`lpn_valwarn_negative`**
-  > EPANET refuses a negative number here.
-  @@ NEEDS RULING
-- **`lpn_valwarn_positive`**
-  > EPANET refuses zero or a negative number here.
-  @@ NEEDS RULING
-- **`lpn_valwarn_tank_levels`**
-  > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
-  @@ NEEDS RULING
-
----
-
-# Strings waiting on a branch
-
-**138 still to read**, of 141 new keys across 18 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### feat/asset-type (`fdaa932d`) — 16 new, 16 to read @@ NEEDS RULING
-
-- **`lpn_change_type_becomes`**
-  > {id}: {property} {value}, in scenario {scenario}, becomes {new}
-  @@ NEEDS RULING
-- **`lpn_change_type_born`**
-  > These are new, as on a newly drawn one:
-  @@ NEEDS RULING
-- **`lpn_change_type_customers`**
-  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  @@ NEEDS RULING
-- **`lpn_change_type_line`**
-  > {id}: {property} {value}
-  @@ NEEDS RULING
-- **`lpn_change_type_line_scenario`**
-  > {id}: {property} {value}, in scenario {scenario}
-  @@ NEEDS RULING
-- **`lpn_change_type_lost`**
-  > These values will be lost:
-  @@ NEEDS RULING
-- **`lpn_change_type_meaning`**
-  > These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.
-  @@ NEEDS RULING
-- **`lpn_change_type_menu`**
-  > Change type
-  @@ NEEDS RULING
-- **`lpn_change_type_more`**
-  > And {n} more.
-  @@ NEEDS RULING
-- **`lpn_change_type_no_curve`**
-  > {id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe
-  @@ NEEDS RULING
-- **`lpn_change_type_ok`**
-  > Change
-  @@ NEEDS RULING
-- **`lpn_change_type_rules`**
-  > These rule lines name a link by its kind, and will name its new kind instead:
-  @@ NEEDS RULING
-- **`lpn_change_type_setting`**
-  > These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:
-  @@ NEEDS RULING
-- **`lpn_change_type_surface`**
-  > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
-  @@ NEEDS RULING
-- **`lpn_change_type_tip`**
-  > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.
-  @@ NEEDS RULING
-
-### feat/backdrop-attach (`929d7ec9`) — 7 new, 7 to read @@ NEEDS RULING
-
-- **`lpn_inp_backdrop_attach`**
-  > Attach {file}…
-  @@ NEEDS RULING
-- **`lpn_inp_backdrop_attach_tip`**
-  > A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.
-  @@ NEEDS RULING
-- **`lpn_inp_backdrop_attached`**
-  > Attached {file}, placed where the file says it belongs.
-  @@ NEEDS RULING
-- **`lpn_inp_backdrop_attached_other`**
-  > Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.
-  @@ NEEDS RULING
-- **`lpn_inp_export_difference_one`**
-  > One thing the .inp format cannot hold.
-  @@ NEEDS RULING
-- **`lpn_status_inp_exported_no_picture`**
-  > Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.
-  @@ NEEDS RULING
-- **`lpn_status_inp_exported_picture`**
-  > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
-  @@ NEEDS RULING
-
-### feat/bentley-interop (`70cdf9a3`) — 52 new, 52 to read @@ NEEDS RULING
-
-- **`lpn_alt_cat_calculation`**
-  > Calculation
-  @@ NEEDS RULING
-- **`lpn_alt_cat_presentation`**
-  > Presentation
-  @@ NEEDS RULING
-- **`lpn_scenario_delete_has_children`**
-  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
-  @@ NEEDS RULING
-- **`lpn_settings_held_base`**
-  > {base}: {value}
-  @@ NEEDS RULING
 - **`lpn_settings_restore_base_only`**
   > Switch to Base to restore the defaults.
   @@ NEEDS RULING
@@ -650,9 +485,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_settings_row_max_check`**
   > Maximum status checks
-  @@ NEEDS RULING
-- **`lpn_settings_row_minor_label_order`**
-  > Label order (rank and drop)
   @@ NEEDS RULING
 - **`lpn_settings_row_new_asset`**
   > New assets: {setting}
@@ -729,22 +561,135 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_view_top_left`**
   > Top left corner
   @@ NEEDS RULING
+- **`lpn_sysflow_title`**
+  > Flow balance
+  _Ruled OK 2026-10-03._
+- **`lpn_time_engine_fetch_failed`**
+  > The download of the EPANET solver failed. Reload the page to try again; a firewall, proxy, or browser extension may be blocking it.
+  @@ NEEDS RULING
+- **`lpn_time_engine_run_failed`**
+  > The EPANET run failed. That is a defect in this page; use the {wrong} link to report it.
+  @@ NEEDS RULING
+- **`lpn_time_engine_start_failed`**
+  > The browser refused to start the EPANET solver. WebAssembly may be turned off by a security setting or an extension.
+  @@ NEEDS RULING
+- **`lpn_time_no_engine_why`**
+  > The built-in solver calculates one moment at a time, so this is the network at {time} only: every pattern is read at that moment, and every tank still sits at its starting level instead of filling and draining. {reason}
+  @@ NEEDS RULING
+- **`lpn_time_scn_overrides`**
+  > Scenario overrides:
+  _Ruled OK 2026-10-05._
+- **`lpn_time_stat_averaged`**
+  > Avg
+  @@ NEEDS RULING
+- **`lpn_time_stat_maximum`**
+  > Max
+  @@ NEEDS RULING
+- **`lpn_time_stat_minimum`**
+  > Min
+  @@ NEEDS RULING
+- **`lpn_time_stat_none`**
+  > None
+  _Ruled OK 2026-10-05._
+- **`lpn_time_stat_range`**
+  > Range
+  _Ruled OK 2026-10-05._
+- **`lpn_time_statistic`**
+  > Statistic
+  _Ruled OK 2026-10-05._
+- **`lpn_tool_add_chain`**
+  > Junction Pipe Chain
+  _Ruled OK 2026-10-05._
+- **`lpn_tool_add_chain_tip`**
+  > Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
+  _Ruled OK 2026-10-05._
+- **`lpn_valwarn_diameter`**
+  > A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.
+  @@ NEEDS RULING
+- **`lpn_valwarn_dw`**
+  > A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.
+  @@ NEEDS RULING
+- **`lpn_valwarn_hw`**
+  > A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
+  @@ NEEDS RULING
+- **`lpn_valwarn_manning`**
+  > A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
+  @@ NEEDS RULING
+- **`lpn_valwarn_negative`**
+  > EPANET refuses a negative number here.
+  @@ NEEDS RULING
+- **`lpn_valwarn_positive`**
+  > EPANET refuses zero or a negative number here.
+  @@ NEEDS RULING
+- **`lpn_valwarn_tank_levels`**
+  > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
+  @@ NEEDS RULING
+
+---
+
+# Strings waiting on a branch
+
+**83 still to read**, of 86 new keys across 17 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/backdrop-attach (`929d7ec9`) — 7 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_inp_backdrop_attach`**
+  > Attach {file}…
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attach_tip`**
+  > A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attached`**
+  > Attached {file}, placed where the file says it belongs.
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attached_other`**
+  > Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.
+  @@ NEEDS RULING
+- **`lpn_inp_export_difference_one`**
+  > One thing the .inp format cannot hold.
+  @@ NEEDS RULING
+- **`lpn_status_inp_exported_no_picture`**
+  > Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.
+  @@ NEEDS RULING
+- **`lpn_status_inp_exported_picture`**
+  > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
+  @@ NEEDS RULING
+
+### feat/bentley-interop (`43658d9f`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`728c2993`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/dxf (`93469e95`) — 12 new, 12 to read @@ NEEDS RULING
 
+- **`lpn_dxf_export_failed`**
+  > The DXF file was not written: an error in this page stopped it ({error}).
+  @@ NEEDS RULING
 - **`lpn_dxf_export_no_utm`**
   > The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.
   @@ NEEDS RULING
 - **`lpn_dxf_export_refused`**
   > The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.
   @@ NEEDS RULING
+- **`lpn_dxf_exported_geo`**
+  > Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_blocks`**
+  > Block attributes are 1 unit high in each block definition. Every block is inserted at scale {s}, so its attributes are {s} {unit} high; change the insertion scale to change that.
+  @@ NEEDS RULING
 - **`lpn_dxf_note_crs`**
   > Coordinates: {crs}, exactly as this project states them.
   @@ NEEDS RULING
 - **`lpn_dxf_note_geo`**
-  > Coordinates: converted from latitude and longitude to {crs}, in meters.
+  > Coordinates: {crs}, in meters, not latitude and longitude. The project’s latitudes and longitudes were converted to that grid.
   @@ NEEDS RULING
 - **`lpn_dxf_note_grid`**
   > Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.
@@ -804,13 +749,22 @@ build for that would be a gate nobody keeps. Refresh it with
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
   @@ NEEDS RULING
 
-### feat/geojson (`1e01efdb`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/geojson (`0495c559`) — 11 new, 11 to read @@ NEEDS RULING
 
 - **`lpn_file_export_geojson`**
   > Export GeoJSON file…
   @@ NEEDS RULING
 - **`lpn_file_export_geojson_tip`**
   > Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.
+  @@ NEEDS RULING
+- **`lpn_file_export_item_geojson`**
+  > GeoJSON file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_inp`**
+  > EPANET file…
+  @@ NEEDS RULING
+- **`lpn_file_export_menu`**
+  > Export…
   @@ NEEDS RULING
 - **`lpn_geojson_refused_crs`**
   > The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.
@@ -853,7 +807,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/screenshot (`98f78a17`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/screenshot (`26d7b515`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_screenshot_copied`**
   > Screenshot copied.
@@ -881,6 +835,21 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_screenshot_tip`**
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
+  @@ NEEDS RULING
+- **`lpn_snip_button`**
+  > Snip
+  @@ NEEDS RULING
+- **`lpn_snip_freehand`**
+  > Freehand
+  @@ NEEDS RULING
+- **`lpn_snip_hint_free`**
+  > Drag around the area to snip, or click for the whole map. Esc cancels.
+  @@ NEEDS RULING
+- **`lpn_snip_pen`**
+  > Pen
+  @@ NEEDS RULING
+- **`lpn_snip_rectangle`**
+  > Rectangle
   @@ NEEDS RULING
 
 ### feat/section-grid (`977b887e`) — adds no English strings
@@ -963,4 +932,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > Export table as ODS
   @@ NEEDS RULING
 
-### feat/tip-door (`0711a336`) — adds no English strings
+### feat/user-guide (`bcb042ef`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_guide_also`**
+  > Also in {menu}
+  @@ NEEDS RULING
+- **`lpn_help_manual`**
+  > User guide
+  @@ NEEDS RULING

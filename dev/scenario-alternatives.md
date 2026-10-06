@@ -505,12 +505,49 @@ Settings table's Value cell.
   with the older `s` (pixels per drawing unit) is still read. No file in the wild holds one: nothing
   wrote a scenario's view before this stage.
 
+**Round two (2026-10-06), after Tom's browser pass and Perry's review.** Tom: *"(1) The Major and
+Minor headings assignments don't match the Settings box. (2) The override shows in the settings
+box, but not in the Settings table. Good start. Keep building."*
+
+- **(1) Major and Minor are read from the box.** A Settings table row stands under the section and
+  sub-heading of the box where its control sits (`settingBoxPlaces()`, `settingTablePlace()`), in
+  the words the box's index shows (`setboxHeadingText()`), and in the box's own order, control by
+  control. A setting with no box control falls back to a sub-heading the box has
+  (`settingTableHeadings()` now names box sub-heading ids). So the separate "Label order" Minor
+  heading is gone (its key `lpn_settings_row_minor_label_order` deleted: nothing renders it), and
+  text size, symbol size and the other appearance rows now stand under Map and page, Appearance,
+  where the box has them.
+- **(2) The Settings table marks the open scenario's overrides with Show scenarios off**, as the
+  box does (`paneMarksOpenScenario()`), and a box edit refreshes the open table at once. Before,
+  the wash existed only in Show scenarios rows, and nothing refreshed the table after a box edit.
+  The asset tables are unchanged: they still mark only with Show scenarios on (question 12).
+- **Clear override on Friction method clears what picking it wrote** (the new-asset roughness and
+  the roughness label's decimals), in the same undo step (`LPN_METHOD_DEPENDENTS` in
+  `settingRowClear()`, so the table's Clear does the same). This settles question 10 below.
+- The Base line names the unit by **Base's** method (a Hazen-Williams C has none); a label's
+  Before, After and Text between values read Base's shown default ("Q="), quoted when blank or
+  space-edged; a Labels row's note names its column ("Decimals: 0"); typed text is marked as it is
+  typed, the caret kept; the box's search keeps a held row's note with it; the box's index marks a
+  sub-heading that holds a value.
+- **The view rows**: each centre box is its own named row ("Map center, Latitude"); a latitude off
+  the map's world or a longitude past 180 is refused; a centre leaving the network off screen
+  shows "Your network is intact" with Zoom to fit; a scale takes "1:2000", "2:4000", "2000" or
+  "1:1,000", and refuses "1,5" rather than guess; corners follow a window resize; undo of a hold or
+  a release moves the map as the act did, and the Base line is always there (Base's live view,
+  which with nothing remembered is where the map is).
+
 Harnesses: `dev/lpn-spike/settings-box-held-browser-harness.js` (real Chromium, Net1: no mark in
 Base or in a fresh scenario; friction method and text size changed in the box in a scenario, each
 marked with Base's value; Clear override returns the box and the solve to Base's; Ctrl+Z restores
 the override and its solve; every box row tagged; the view held as centre plus metres per pixel,
 switching scenarios moving the camera there and back, Clear override returning to Base's view and
-following it afterwards); `scenario-settings-routing-harness.js` holds the stored form.
+following it afterwards; round two: Major and Minor equal the box's section and sub-heading row
+for row, the open table marking a box edit at once and on reopening, Clear on the method clearing
+its companions and undoing as one, the unitless Base line, label text marked while typed with
+Base's default, the search keeping notes, the index mark, the named centre rows, the refused
+scale "1,5", the off-screen notice, the resize, undo of a release, and on Net3 lat/lon the
+Latitude/Longitude names and the refused latitude 89 and longitude 200. Run against the previous
+stage's code it fails 18 checks); `scenario-settings-routing-harness.js` holds the stored form.
 
 ### Questions for Tom
 
@@ -622,13 +659,17 @@ named set and stops pretending to have a parent. Recommendation: keep the column
 
 ### Questions for Tom (third round, stage 3c)
 
-10. **Picking a friction method in a scenario also changes two companions there**: the New assets
-    roughness and the roughness label's decimals (the box has always reset them to suit the
-    method). So three rows are marked, and Clear override on the method clears only the method;
-    the other two stay held until cleared. Recommendation: keep it, since each row says what it
-    holds and Clear does exactly what it says. The alternative is one Clear for the three.
+10. **Decided by CC, because the alternative is an invalid state; Tom may overrule.** Picking a
+    friction method in a scenario also sets two companions there: the New assets roughness and the
+    roughness label's decimals. Clearing the method alone left a Hazen-Williams scenario with a
+    Manning n of 0.011 as its new-pipe roughness (Perry). So Clear override on the method clears
+    the two companions with it, in one undo step. Each companion still has its own mark and its own
+    Clear.
 11. **The link under a held row says "Clear override"**, the Settings table's own words, where Ida
     drew "Reset". Recommendation: keep "Clear override", one name for one act.
+12. **Should the asset tables (Junctions, Pipes...) also mark the open scenario's overrides with
+    Show scenarios off**, as the Settings table now does? Today they mark only in Show scenarios
+    rows. Recommendation: yes, for the same reason; it is a separate change to every table.
 
 ## The long burn: from Basic mode to the full model (2026-10-06)
 

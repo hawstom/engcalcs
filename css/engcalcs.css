@@ -3755,6 +3755,8 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 .lpn-set-heldnote { margin: -2px 0 4px; padding-left: 6px; box-shadow: inset 3px 0 0 var(--ec-held); background: var(--ec-held-bg); }
 .lpn-set-heldclear { background: none; border: 0; padding: 0; font: inherit; color: var(--ec-accent); text-decoration: underline; cursor: pointer; }
 .lpn-set-viewgroup > button { margin: 2px 0 4px; }
+/* The box's left index marks a sub-heading under which the open scenario holds a value. */
+.lpn-setbox-link.lpn-setbox-link-held { box-shadow: inset 3px 0 0 var(--ec-held); }
 /* **A TRANSIENT MARK ON THE ROW A LINK JUST SENT YOU TO** (Tom's 2026-09-08 worklist). Tom asked for the
    Show page titles label "temporarily highlighted" when Hide these titles opens the box at it.
    TRANSIENT is the whole rule: the class is taken off on a timer or on the first press inside the
