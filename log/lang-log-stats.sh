@@ -234,7 +234,12 @@ ALL_TS="$TMP/all-ts"
 : > "$ALL_TS"
 for f in lang view calc title signal send; do cut -f1 "$TMP/$f" >> "$ALL_TS" 2>/dev/null; done
 sort -o "$ALL_TS" "$ALL_TS"
-WIN_START=$(head -1 "$ALL_TS")
+# THE START IS THE EARLIEST FIRST ROW, never the earliest stamp. A beacon replayed from a phone's
+# offline queue carries the stamp of the moment it was taken (Task 119), so three rows stamped
+# 2026-09-21 arriving after the 1 October rotation made a 5-day log report itself as 15 days, and
+# the daily mail printed five days of counts under a fifteen-day heading. Files are in arrival
+# order, so row 1 of each is when that log began.
+WIN_START=$(for f in lang view calc title signal send; do first_of "$TMP/$f"; done | grep . | sort | head -1)
 WIN_END=$(tail -1 "$ALL_TS")
 [ -n "$WIN_START" ] || WIN_START="(no rows)"
 [ -n "$WIN_END" ]   || WIN_END="(no rows)"

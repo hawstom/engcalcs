@@ -12060,6 +12060,10 @@ var EngCalcs = EngCalcs || {};
 			if (!ne) { return; }
 			lines = [];
 			if (ls.node.id) { lines.push(affix('node', 'id', { text: n.id })); }
+			// The two identity words, as the full pass prints them (Task 774): this single-label
+			// path left them out, so a Description just typed did not reach its own label.
+			if (ls.node.desc && n.desc) { lines.push(affix('node', 'desc', { text: String(n.desc) })); }
+			if (ls.node.tag && n.tag) { lines.push(affix('node', 'tag', { text: String(n.tag) })); }
 			// **GUARDED, WHERE THE FULL PASS IS NOT.** A junction with no demand stated at all
 			// resolves to `undefined` (resolvedDemand()/baseDemandTotal() hand back `rows[0].base`
 			// verbatim), and rawLine() has no guard of its own -- plainRound() returns undefined for
@@ -12099,6 +12103,8 @@ var EngCalcs = EngCalcs || {};
 			if (!le) { return; }
 			lines = [];
 			if (ls.link.id) { lines.push(affix('link', 'id', { text: l.id })); }
+			if (ls.link.desc && l.desc) { lines.push(affix('link', 'desc', { text: String(l.desc) })); }
+			if (ls.link.tag && l.tag) { lines.push(affix('link', 'tag', { text: String(l.tag) })); }
 			if (l.type === 'pipe') {
 				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), null, ld.diameter))); }
 				if (ls.link.length) { lines.push(affix('link', 'length', rawLine(effective(l, 'length'), null, ld.length))); }
@@ -36825,12 +36831,19 @@ var EngCalcs = EngCalcs || {};
 		if (from.kind !== to.kind) { return true; }
 		return from.kind === 'epsg' && String(from.crs) !== String(to.crs);
 	}
-	// The menu row. An empty tab has nothing to copy, so there the row means the file picker, and the
-	// file that lands is then offered the same box (see landProjectText()).
+	// The menu row. **AN EMPTY PROJECT GETS THE SAME BOX** (Task 775; Tom, 2026-10-06: *"File,
+	// Convert as on a project that has no objects causes a file Open dialog"*). It used to mean the
+	// file picker there, which is a different command under this one's name; an empty project still
+	// has units and a coordinate system to convert, and with nothing drawn the copy simply states
+	// the new ones (convasNothingToPlace()).
 	function convertAs() {
 		if (mapgeoActive() || georefActive()) { georefBlocksProjectSwitch(); return; }
-		if (!doc.nodes.length) { pickGeoFile(); return; }
 		openConvertAsBox();
+	}
+	// Nothing anywhere whose coordinates a new coordinate system would have to move: no node, no
+	// Text, no background image. Then there is nothing for the placement steps to place.
+	function convasNothingToPlace() {
+		return !doc.nodes.length && !(doc.labels && doc.labels.length) && !(backdrop && backdrop.href);
 	}
 	// A file opened through the row's file route: the same box, unless there is nothing to convert.
 	function convertAsLanded() {
@@ -36932,6 +36945,10 @@ var EngCalcs = EngCalcs || {};
 		convasFor = library.openId;
 		convasPick = { crs: from.kind === 'epsg' ? from.crs : LPN_CRS_WEBMERC, place: null };
 		convasSetKind(from.kind);
+		// Attaching the world map IS a placement, and an empty project has nothing to place, so that
+		// one answer is offered only where it already is the project's own.
+		var unnamedEl = document.getElementById('lpn_convas_kind_unnamed');
+		if (unnamedEl) { unnamedEl.disabled = convasNothingToPlace() && from.kind !== 'unnamed'; }
 		fromEl = document.getElementById('lpn_convas_from');
 		if (fromEl) {
 			fromEl.textContent = String(pc.lpn_convas_from || 'Current: {crs}').replace('{crs}', crsDisplayName());
@@ -37372,6 +37389,15 @@ var EngCalcs = EngCalcs || {};
 		} else if (from.kind === 'unnamed' && to.kind === 'none') {
 			// Detaching changes no coordinate: the grid is the grid it always was.
 			savedSetKind(saved, 'none');
+		} else if (convasNothingToPlace() && to.kind !== 'unnamed') {
+			// **AN EMPTY PROJECT: NO COORDINATE TO MOVE, SO NO PLACEMENT STEPS** (Task 775). The copy
+			// states the system asked for and opens on that system's own default view; the old
+			// origin and view were numbers in the old frame and would mean nothing in the new one.
+			if (to.kind === 'epsg' && to.crs === LPN_CRS_WEBMERC) { savedSetKind(saved, 'geo'); }
+			else if (to.kind === 'epsg') { savedSetKind(saved, 'epsg', to.crs); }
+			else { savedSetKind(saved, 'none'); }
+			delete saved.origin;
+			delete saved.view;
 		} else if (from.kind === 'none') {
 			// Nowhere yet: the steps start from the whole world, as they always have.
 			step = to.kind === 'unnamed' ? 'attach' : 'place';
@@ -56720,24 +56746,48 @@ var EngCalcs = EngCalcs || {};
 	// `after` is the one thing a CUSTOMER needs that a node and a link do not: every write to a
 	// customer goes through customerEdited(), which redraws its symbol and its label and re-solves.
 	// Optional, so the two dozen existing callers are untouched.
+	// **WHAT A DESCRIPTION OR TAG EDIT OWES THE SCREEN, AND NOTHING MORE** (Task 774). Not
+	// afterPropertyEdit(): that schedules a solve, the solve's result re-renders the open Properties
+	// box, and the field being typed in is thrown away under the cursor. These two words change no
+	// answer, so there is nothing to solve -- only the element's own label, the Tables pane and the
+	// pending save.
+	function identityEdited(el) {
+		var g = elGroup(el);
+		if (g === 'node' || g === 'link') { refreshOneLabelInPlace(el); }
+		refreshPaneIfOpen();
+		scheduleSave();
+	}
 	function descField(fields, el, after) {
 		var pc = EngCalcs.pageConfig || {},
 			label = document.createElement('label'),
 			input = document.createElement('input');
 		input.type = 'text';
 		input.value = el.desc || '';
-		function commit() {
+		// **THE BOX IS NEVER REWRITTEN WHILE SOMEBODY IS TYPING** (Task 774; Tom, 2026-10-06: *"it
+		// first wouldn't accept a space"*). This used to put the trimmed text back into the box on
+		// every keystroke, so a space typed after a word was trimmed away at once -- "Corner of Elm"
+		// came out "CornerofElm". Only the stored value is trimmed (the file cannot hold a leading
+		// or trailing space); the box is tidied on `change`, when the field is being left.
+		function commit(tidy) {
 			var t = EngCalcs.lpnDescText ? EngCalcs.lpnDescText(input.value) : String(input.value || '').trim();
-			if (input.value !== t) { input.value = t; }
+			if (tidy && input.value !== t) { input.value = t; }
 			if (t === (el.desc || '')) { return; }
 			saveUndoSnapshot();
 			if (t) { el.desc = t; } else { delete el.desc; }   // base-write: a description is identity, not an overridable property -- see this function's own note
-			if (after) { after(); }
+			// **EVERY WRITE REACHES THE SAME PLACES THE TABLE'S DOES** (Task 774): the element's own
+			// label, the Tables pane, the pending save. A node and a link had no `after`, so the edit
+			// landed in the document and nowhere anybody could see it until the project was reopened.
+			if (after) { after(); } else { identityEdited(el); }
 		}
-		input.addEventListener('input', commit);
+		input.addEventListener('input', function () {
+			// A pasted line break is the one thing the box itself refuses as it lands (collapsed to a
+			// space, nothing trimmed); the rest of the tidy waits for `change`.
+			if (/[\r\n]/.test(input.value)) { input.value = input.value.replace(/[\r\n]+/g, ' '); }
+			commit(false);
+		});
 		// `change` as well, for the reason the tag's does: a field can lose focus without ever firing
 		// `input` -- a value restored by the browser, or an autofill.
-		input.addEventListener('change', function () { commit(); refreshPopupIfOpen(); });
+		input.addEventListener('change', function () { commit(true); refreshPopupIfOpen(); });
 		setFieldLabel(label, pc.lpn_field_desc || 'Description');
 		label.appendChild(input);
 		fields.appendChild(label);
@@ -56781,7 +56831,7 @@ var EngCalcs = EngCalcs || {};
 			if (t === (el.tag || '')) { return; }
 			saveUndoSnapshot();
 			if (t) { el.tag = t; } else { delete el.tag; }   // base-write: a tag is an identity, not an overridable property -- see this function's own note
-			if (after) { after(); }
+			if (after) { after(); } else { identityEdited(el); }
 		}
 		input.addEventListener('input', commit);
 		// `change` as well, because a field can lose focus without ever firing `input` -- a value
