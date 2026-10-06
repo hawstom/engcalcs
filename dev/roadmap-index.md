@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**92 open tasks.** Next (100): 7 · Soon (75): 16 · Someday (50): 35 · Maybe (25): 15 · Parked (5): 19
+**90 open tasks.** Next (100): 7 · Soon (75): 14 · Someday (50): 35 · Maybe (25): 15 · Parked (5): 19
 
 ## 100 — Next (7)
 
@@ -19,7 +19,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 741 — The infinite map: generated networks for the label bench.
 - ! Task 759 — One word for the map selection, another for a menu choice; tips that earn their place.
 
-## 75 — Soon (16)
+## 75 — Soon (14)
 
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
@@ -31,10 +31,8 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 752 — Google Sheets: sync the scenarios and their alternatives out and in.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 763 — A searchable help manual, built from the tips Tom cut.
-- Task 766 — Show scenarios in the Tables pane: one row per asset per scenario.
 - Task 768 — Report a problem: more information and freedom than one anonymous click.
 - Task 769 — Change type: a junction becomes a tank, a pipe a valve.
-- Task 770 — A warning glyph on every unreasonable value.
 - Task 771 — Survey points as a script: the Description names the asset or vertex.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 
@@ -120,5 +118,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-84 of 92 titles are within 4–12 words. `!` marks the rest;
+82 of 90 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.

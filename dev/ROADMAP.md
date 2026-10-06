@@ -347,12 +347,6 @@ the block.
   goal. The tabs read the tree Task 721 builds. Export/import as a file first (no account, no
   upload); a Sheets sync is a fifth third-party service, so a `privacy.php` paragraph and his call.
   Mary, Sue and Declan advised against Sheets as the live store (2026-09-30); a sync is not that.
-- 75|766| **Show scenarios in the Tables pane: one row per asset per scenario.**
-  Tom, 2026-10-05/06: right-click "Show scenarios" adds ONE column, Scenario (*"My mistake. Scenario
-  column only"*); an override cell's tip names its alternative ("Demand alt.: Max day"); ties keep
-  their previous order in every sort (Google Sheets). *"Scenarios must be added to tables so we can
-  audit these things. And by extension, there will have to be a settings Table."* Built on
-  `feat/scenario-table`; the settings table is next, after the setting readers (Task 721).
 - 75|756| **Cross-platform: the suite as a desktop application, beyond the web folder.**
   Tom, 2026-09-30: *"Put a cross platform project on our roadmap priority 75. Plan where/how to move
   the project to transcend the web-centric hawsedc.com/engcalcs folder. Windows or Linux? Plan what
@@ -373,9 +367,6 @@ the block.
   Tom, 2026-10-05: *"a tool under Water or Tables to Change node type for any asset, where if it has
   information that can't be ported to the new type, we alert and ask."* Building on
   `feat/asset-type`; the seam with `feat/bentley-interop` is alternatives keyed by element id.
-- 75|770| **A warning glyph on every unreasonable value.** Tom, 2026-10-05, on Sue's
-  friction-method warning: *"Add the glyph to every unreasonable value like a diameter over 150
-  inches or under 12 mm"*, roughness by method, and so on. Building on `feat/value-warning`.
 - 75|771| **Survey points as a script: the Description names the asset or vertex.**
   Tom, 2026-10-05: interpret a point's Description as an asset or a pipe vertex, and the CSV as a
   batch. The open question is joining several pipes at one node without a custom code; Mary is
