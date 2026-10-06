@@ -430,6 +430,21 @@ are the asset tables' own.
   back. A path no scenario may hold (a custom property's design) stays the project's; an answer to
   a question the box asked (the friction method's confirm) is bracketed too. Units say "Units are
   the same in every scenario" while a scenario is open; Restore defaults is Base's act only.
+- **A keystroke is not a rebuild**: an `input` event in the box routes its value and redraws the
+  map but leaves the box alone (`settingTableAfterEditKeepBox()`), so typing into a label's text box
+  in a scenario keeps every character; the `change` on leaving the field rebuilds it.
+- **Every other door that writes a setting, routed or justified** (from a search of every write to
+  `settings`, `labelSettings`, `project.basemap` and the default pattern):
+  - *Routed through the seam* (`throughSettingSeam()`): Graphs > Contour (`showContour()`), the Map
+    menu's and the corner's basemap (`setBasemapSource()`: World map Attach and Detach, satellite),
+    and the transport's Recalculate hook.
+  - *Never writes from inside a scenario*: the colour breaks a render fills in (`fillBreaks()`); in a
+    scenario they follow the data until someone sets them.
+  - *Follows a renamed pattern*: a library rename repoints a scenario's held default pattern too.
+  - *Base's act, refused in a scenario* with the new-asset push's words: ID prefix Apply to all.
+  - *The project's own, by design*: opening, creating and migrating a project; a unit change and
+    Convert as (units are one per project); the georeferencing wizards (the coordinate frame);
+    undo and redo.
 - **Every edit is an undo step, the box's included, and restores only what it changed**: a step
   carries the setting paths it edited with their earlier values (`settingPaths`,
   `undoTopHoldsSettingPaths()`), never the whole settings object, so Ctrl+Z on one edit never reverts

@@ -9580,6 +9580,10 @@ var EngCalcs = EngCalcs || {};
 		tidy = b.map(tidyBreak);
 		if (!R.validateBreaks(tidy, n).ok) { tidy = b; }
 		if (!R.validateBreaks(tidy, n).ok) { return b; }
+		// A RENDER WRITES NOTHING FROM INSIDE A SCENARIO: the fill would put breaks computed from the
+		// scenario's data into Base's object, or an override into the scenario nobody made. There
+		// the breaks follow the data until someone sets them.
+		if (!inBaseScenario()) { return tidy; }
 		settings.colorBreaks = settings.colorBreaks || {};
 		settings.colorBreaks[colorBreakKey(group, field)] = tidy.slice();
 		return tidy;
@@ -10335,10 +10339,13 @@ var EngCalcs = EngCalcs || {};
 	}
 	// THE MENU ROW: turns the plot on if it is off (a smooth fill with labelled lines, of pressure
 	// if the nodes are not coloured yet), then opens the box where it is tuned or turned off.
+	// Graphs > Contour turns the contour on in the open scenario: through the Settings box's seam.
 	function showContour() {
-		if (!colorFieldOf('node')) { settings.colorNodeField = 'pressure'; }
-		if (!contourIsOn()) { settings.contourFill = 'smooth'; settings.contourLines = true; }
-		refreshValueColors(); saveToStorage(); syncColorControls();
+		throughSettingSeam(function () {
+			if (!colorFieldOf('node')) { settings.colorNodeField = 'pressure'; }
+			if (!contourIsOn()) { settings.contourFill = 'smooth'; settings.contourLines = true; }
+			refreshValueColors(); saveToStorage(); syncColorControls();
+		});
 		openContourBox();
 	}
 	function openContourBox() {
@@ -14571,13 +14578,16 @@ var EngCalcs = EngCalcs || {};
 	// **THE STYLE IN USE IS REMEMBERED WHEN THE MAP GOES OFF**, so Detach then Attach brings back
 	// satellite for somebody who was on satellite, not the street map. `basemapLast` is on the
 	// project for the same reason `basemap` is: it is a statement about this document's picture.
+	// The Map menu's basemap rows and the corner teaser: the open scenario's basemap, through the seam.
 	function setBasemapSource(style) {
-		if (style === 'off' && project.basemap && project.basemap !== 'off') {
-			project.basemapLast = project.basemap;
-		}
-		project.basemap = style;
-		refreshBasemap();
-		saveToStorage();
+		throughSettingSeam(function () {
+			if (style === 'off' && project.basemap && project.basemap !== 'off') {
+				project.basemapLast = project.basemap;
+			}
+			project.basemap = style;
+			refreshBasemap();
+			saveToStorage();
+		});
 	}
 	function setBasemapOn(on) {
 		setBasemapSource(on ? (project.basemapLast || 'osm') : 'off');
@@ -26523,6 +26533,9 @@ var EngCalcs = EngCalcs || {};
 				['faded', pc.lpn_basemap_style_faded || 'Faded'], ['grayscale', pc.lpn_basemap_style_grayscale || 'Grayscale']];
 		}
 		if (s === 'settings.legendPosition' || s === 'settings.colorLegendPosition') { return legendPositionOptions(pc); }
+		if (s === 'settings.colorNodeField' || s === 'settings.colorLinkField') {
+			return [['', pc.lpn_color_none || 'No color']].concat(colorFieldOptions(s === 'settings.colorNodeField' ? 'node' : 'link'));
+		}
 		if (s === 'settings.contourFill') {
 			return [['', pc.lpn_settings_legend_off || 'None'], ['smooth', pc.lpn_contour_fill_smooth || 'Smooth'],
 				['bands', pc.lpn_contour_fill_bands || 'Bands']];
@@ -26657,10 +26670,15 @@ var EngCalcs = EngCalcs || {};
 	function settingRowOptions(row, scn) {
 		var ch = row.kind === 'bool' ? [['true', settingTableYes()], ['false', settingTableNo()]] : settingTableChoices(row.path) || [],
 			v = settingRowValue(row, scn), d, i, word = null;
+		// Unstated: the default's own option says so ("Hazen-Williams (default)") and is the one shown;
+		// with no default among the options, a blank "Not stated" option is.
 		if (v === undefined) {
 			d = row.dflt === undefined ? null : String(row.dflt);
-			for (i = 0; i < ch.length; i++) { if (d !== null && String(ch[i][0]) === d) { word = ch[i][1]; } }
-			ch = [['', word !== null ? settingTableDefaultText(word) : ((EngCalcs.pageConfig || {}).lpn_settings_option_unset || 'Not stated')]].concat(ch);
+			ch = ch.map(function (o) {
+				if (d !== null && String(o[0]) === d) { word = o[1]; return [o[0], settingTableDefaultText(o[1])]; }
+				return o;
+			});
+			if (word === null) { ch = [['', (EngCalcs.pageConfig || {}).lpn_settings_option_unset || 'Not stated']].concat(ch); }
 		}
 		return ch;
 	}
@@ -26801,6 +26819,18 @@ var EngCalcs = EngCalcs || {};
 	// After a write or a clear: everything a scenario switch redraws, since a setting can change
 	// any of it, then the basemap and the contours, which a switch does not touch.
 	function settingTableAfterEdit() { paneAfterScenarioSwap(settingTableAfterEditNow); }
+	// The same, leaving the Settings box itself alone (a keystroke in one of its text fields).
+	function settingTableAfterEditKeepBox() {
+		buildDom();
+		refreshSelection();
+		refreshPopupIfOpen();
+		refreshSymbolSizes();
+		refreshValueColors();
+		refreshScenarioStatus();
+		scheduleSolve();
+		saveToStorage();
+		dropScenarioCompareRun();
+	}
 	function settingTableAfterEditNow() {
 		applyScenarioChange();
 		refreshBasemap();
@@ -26833,6 +26863,7 @@ var EngCalcs = EngCalcs || {};
 					if (!row(r)) { return undefined; }
 					if (!settingRowIsSelect(r)) { return settingRowText(r, activeScenario()); }
 					v = settingRowValue(r, activeScenario());
+					if (v === undefined) { v = r.dflt; }
 					return v === undefined ? '' : String(v);
 				},
 				choicesFor: function (r) { return !!row(r) && settingRowIsSelect(r); },
@@ -49091,6 +49122,13 @@ var EngCalcs = EngCalcs || {};
 			apply.textContent = pc.lpn_settings_apply_to_all || 'Apply to all';
 			helpTip(apply, pc.lpn_settings_apply_to_all_tip);
 			apply.addEventListener('click', function () {
+				// Renaming every asset changes the drawing itself: Base's act, refused in a scenario with
+				// the same words the new-asset push uses.
+				if (!inBaseScenario()) {
+					setWarning((pc.lpn_push_base_only || 'This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.')
+						.replace(/\{base\}/g, pc.lpn_scenario_base || 'Base'));
+					return;
+				}
 				// Committed FIRST, so pressing Apply straight after typing (without leaving the box,
 				// which is what a hurried user does) applies what is on screen rather than the last
 				// committed value.
@@ -50588,7 +50626,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function setboxState() {
 		return JSON.stringify({ settings: settings, labelSettings: labelSettings, defaultPattern: doc.defaultPattern === undefined ? null : doc.defaultPattern,
-			view: setboxView ? setboxView : null });
+			basemap: { basemap: project.basemap, basemapLast: project.basemapLast }, view: setboxView ? setboxView : null });
 	}
 	// Every leaf that differs between two states, as {root, path, before, after}; an atomic object
 	// (the quality choice) is one leaf.
@@ -50606,6 +50644,7 @@ var EngCalcs = EngCalcs || {};
 		cmp(a.settings, b.settings, ['settings'], 'project');
 		cmp(a.labelSettings, b.labelSettings, ['labelSettings'], 'project');
 		if (a.defaultPattern !== b.defaultPattern) { out.push({ root: 'project', path: ['defaultPattern'], before: a.defaultPattern, after: b.defaultPattern }); }
+		cmp(a.basemap, b.basemap, ['project'], 'project');
 		if (a.view && b.view) {
 			cmp(a.view.settings, b.view.settings, ['settings'], 'view');
 			cmp(a.view.labelSettings, b.view.labelSettings, ['labelSettings'], 'view');
@@ -50614,10 +50653,15 @@ var EngCalcs = EngCalcs || {};
 		return out;
 	}
 	var setboxEdit = null;
-	function setboxEditBegin() {
+	function setboxEditBegin(e) {
 		if (setboxEdit) { return; }
 		if (!inBaseScenario()) { setboxViewSync(); }
-		setboxEdit = { state: JSON.parse(setboxState()), undoLen: undoStack.length, undoTop: undoStack[undoStack.length - 1] };
+		// **A KEYSTROKE IS NOT A REBUILD** (Perry's re-review, 2026-10-06: typing "abcdef" into a
+		// label's Before box in a scenario stored "f", because each keystroke's rebuild swapped the box
+		// for a copy with the caret at 0). An `input` event routes its value and redraws the map, but
+		// leaves the box as it is; the `change` that follows when the field is left rebuilds it.
+		setboxEdit = { state: JSON.parse(setboxState()), undoLen: undoStack.length, undoTop: undoStack[undoStack.length - 1],
+			keepBox: !!(e && e.type === 'input') };
 		// A handler that stops the event before it bubbles to the box still ends here.
 		setTimeout(setboxEditEnd, 0);
 	}
@@ -50672,16 +50716,23 @@ var EngCalcs = EngCalcs || {};
 			setScenarioSetting(scn, ['times', k], t[k]);
 			setScenarioSetting(scn, ['times', 'text', k], typeof t[k] === 'number' ? text : undefined);
 		});
-		if (scenarioPaths.length) { settingTableAfterEditNow(); }
+		if (scenarioPaths.length) { if (ed.keepBox) { settingTableAfterEditKeepBox(); } else { settingTableAfterEditNow(); } }
 	}
 	function setboxPut(path, v) {
 		if (path[0] === 'defaultPattern') { doc.defaultPattern = v === undefined ? null : v; } else { settingProjectPut(path, v); }
+	}
+	// A door outside the two boxes that writes a setting (Graphs > Contour, the Map menu's basemap,
+	// the transport's Recalculate) goes through the same bracket.
+	function throughSettingSeam(fn) {
+		var mine = !setboxEdit;
+		if (mine) { setboxEditBegin(); }
+		try { return fn(); } finally { if (mine) { setboxEditEnd(); } }
 	}
 	function wireSetboxScenarioSeam(box) {
 		if (!box || box._lpnSeam) { return; }
 		box._lpnSeam = true;
 		['change', 'input', 'click'].forEach(function (type) {
-			box.addEventListener(type, setboxEditBegin, true);
+			box.addEventListener(type, function (e) { setboxEditBegin(e); }, true);
 			box.addEventListener(type, function () { setboxEditEnd(); }, false);
 		});
 	}
@@ -53182,6 +53233,10 @@ var EngCalcs = EngCalcs || {};
 		// and it lives in doc.customers, which neither loop above walks.
 		(doc.customers || []).forEach(function (c) { if (c.pattern === was) { c.pattern = to; } });
 		if (doc.defaultPattern === was) { doc.defaultPattern = to; }
+		// A scenario that holds its own default pattern refers to the pattern by id as well.
+		scenarios.concat(doc.alternatives || [], doc.calcSets || []).forEach(function (o) {
+			if (o && plainObject(o.settings) && o.settings.defaultPattern === was) { o.settings.defaultPattern = to; touchTree('libRepointPattern'); }
+		});
 	}
 	function libRenamePattern(pat, want) {
 		var name = String(want || '').trim(), clash, was;
@@ -66706,11 +66761,14 @@ var EngCalcs = EngCalcs || {};
 			runBoxHidden: function () { return runBoxHidden; },
 			expireStatus: expireStatus,
 			setRunBoxHidden: function (on) { setRunBoxHidden(on); rebuildSettingsFields(); },
+			// The transport's Recalculate toggle: the open scenario's, through the seam.
 			setAutoRun: function (on) {
-				settings.autoRun = !!on;
-				clearSlowAdvice();
-				saveToStorage();
-				rebuildSettingsFields();
+				throughSettingSeam(function () {
+					settings.autoRun = !!on;
+					clearSlowAdvice();
+					saveToStorage();
+					rebuildSettingsFields();
+				});
 			}
 		});
 	}

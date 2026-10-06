@@ -382,6 +382,62 @@ async function main() {
 		await a.settle(1200);
 		ok('Ctrl+Z takes the basemap style edit back off Peak', !(await H.findRow(BMS, 'Peak')).local);
 
+		// TYPING, character by character, into a label's text box with Peak open (Perry's
+		// re-review: each keystroke's rebuild put the caret back at 0, so "abcdef" stored "f").
+		const typeInto = async (idx, text, leave) => {
+			const h = await page.evaluateHandle((i) => Array.from(document.querySelectorAll('#lpn_labels_node_fields input[type=text]'))[i], idx);
+			await h.asElement().focus();
+			await page.keyboard.press('Control+a');
+			await page.keyboard.press('Backspace');
+			await page.keyboard.type(text, { delay: 40 });
+			await a.settle(300);
+			const v = await h.asElement().evaluate((e) => ({ value: e.value, attached: e.isConnected }));
+			if (leave === 'close') { await page.evaluate(() => document.getElementById('lpn_setbox_close').click()); }
+			else { await page.keyboard.press('Tab'); }
+			await a.settle(1200);
+			return v;
+		};
+		const nText = await page.evaluate(() => document.querySelectorAll('#lpn_labels_node_fields input[type=text]').length);
+		ok('the node labels have text boxes to type in', nText >= 2, nText);
+		const typed = await typeInto(0, 'abcdef');
+		ok('typed "abcdef" one key at a time in Peak: the box still holds abcdef, the same box', typed.value === 'abcdef' && typed.attached, JSON.stringify(typed));
+		let held = (await H.settingRows()).filter((r) => r.cells.scn_name === 'Peak' && r.cells.st_value === 'abcdef');
+		ok('...Peak holds abcdef, marked', held.length === 1 && held[0].local, JSON.stringify(held.map((r) => r.cells.st_setting)));
+		ok('...and Base\'s row of that setting does not', held.length === 1 && (await H.findRow(held[0].cells.st_setting, base)).cells.st_value !== 'abcdef');
+		const typed2 = await typeInto(1, 'xyz', 'close');
+		held = (await H.settingRows()).filter((r) => r.cells.scn_name === 'Peak' && r.cells.st_value === 'xyz');
+		ok('typing "xyz" and closing the box mid-word: Peak holds xyz', typed2.value === 'xyz' && held.length === 1 && held[0].local, JSON.stringify(typed2));
+		await openBox();
+
+		// THE DOORS OUTSIDE THE BOX that write a setting, run in Peak: Base must not change.
+		const baseRowsBefore = JSON.stringify((await H.settingRows()).filter((r) => r.cells.scn_name === base).map((r) => [r.key, r.cells.st_value]));
+		await page.evaluate(() => document.getElementById('lpn_setbox_close').click());
+		await a.menuClickSub(await L('lpn_graphs_menu'), await L('lpn_contour_menu'), 'project');
+		await a.settle(1500);
+		await page.evaluate(() => { const x = document.getElementById('lpn_contour_close'); if (x) { x.click(); } });
+		const NC = await L('lpn_settings_color_node_field');
+		const ncP = await H.findRow(NC, 'Peak');
+		ok('Graphs > Contour in Peak: Peak colours nodes by Pressure (in the box\'s words), marked', ncP && ncP.local &&
+			ncP.cells.st_value === await L('lpn_result_pressure'), JSON.stringify(ncP && ncP.cells));
+		ok('...and turns its contours on, there', (await H.findRow(await L('lpn_settings_row_contour_fill'), 'Peak')).local);
+		ok('...and Base is unchanged, row for row', JSON.stringify((await H.settingRows()).filter((r) => r.cells.scn_name === base)
+			.filter((r) => JSON.parse(baseRowsBefore).some((b) => b[0] === r.key)).map((r) => [r.key, r.cells.st_value])) === baseRowsBefore);
+		// The ID prefix's Apply to all renames the drawing: refused in a scenario, as the new-asset push is.
+		await openBox();
+		const idsBefore = await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_pane_junctions td.lpn-pane-col-id input')).map((i) => i.value).join(','));
+		const applied = await page.evaluate((t) => {
+			const b = Array.from(document.querySelectorAll('#lpn_settings_box button')).filter((x) => x.textContent.trim() === t)[0];
+			if (b) { b.click(); }
+			return !!b;
+		}, await L('lpn_settings_apply_to_all'));
+		await a.settle(800);
+		const refusal = (a.lastDialog() || {}).message;
+		ok('ID prefix Apply to all in Peak is refused with the Base-only message', applied &&
+			String(refusal || '').indexOf((await L('lpn_push_base_only')).split('{base}')[0].trim()) >= 0, String(refusal));
+		await H.tab('junctions');
+		ok('...and no asset was renamed', await page.evaluate(() => Array.from(document.querySelectorAll('#lpn_pane_junctions td.lpn-pane-col-id input')).map((i) => i.value).join(',')) === idsBefore || idsBefore === '');
+		await H.tab('settings');
+
 		console.log('\n--- 8. undo restores only what an edit changed (Perry\'s repro) ---');
 		await H.scenarioMenu(base);
 		await a.settle(800);
@@ -445,8 +501,19 @@ async function main() {
 		await b.settle(1500);
 		const f1 = await fontOf();
 		ok('a scenario\'s own text size changes its map, label by label', f0 === +tsRow.cells.st_value && f1 === f0 + 8, f0 + ' -> ' + f1);
+		// A door outside the box: Map > World map > Detach, in the scenario, hides its basemap only.
+		const BM = await b.lang('lpn_settings_row_basemap');
+		const bmBase0 = (await G.settingRows()).filter((r) => r.cells.st_setting === BM && r.cells.scn_name === undefined)[0];
+		await b.menuClickSub(await b.lang('lpn_map_attach_menu'), await b.lang('lpn_map_attach_remove'), 'map');
+		await b.settle(1500);
+		await G.tab('settings');
+		const bmFig = (await G.settingRows()).filter((r) => r.cells.st_setting === BM)[0];
+		ok('Map > World map > Detach in the scenario: its basemap reads None', bmFig && bmFig.cells.st_value === await b.lang('lpn_settings_legend_off'),
+			JSON.stringify(bmFig && bmFig.cells));
 		await G.scenarioMenu(await b.lang('lpn_scenario_base'));
 		await b.settle(1500);
+		const bmBase = (await G.settingRows()).filter((r) => r.cells.st_setting === BM)[0];
+		ok('...and Base\'s basemap is untouched', bmBase && bmBase0 && bmBase.cells.st_value === bmBase0.cells.st_value, JSON.stringify([bmBase0 && bmBase0.cells.st_value, bmBase && bmBase.cells.st_value]));
 		const f2 = await fontOf();
 		ok('...and Base\'s map is as it was', Math.abs(f2 - f0) < 0.5, f0 + ' vs ' + f2);
 	} finally {
