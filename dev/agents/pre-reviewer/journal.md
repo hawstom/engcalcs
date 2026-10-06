@@ -3867,3 +3867,10 @@ OBSERVED real Chromium: branch's own harness passes. All 7 shipped examples: 0 w
 OBSERVED DEFECT: touch (hover none): tapping the glyph in the Properties box opens the tip AND focuses the Diameter input (label activation), the exact 2026-08-29 complaint; initTips only cancels this on `.ec-tip`, the glyph here is a bare `.ec-help`. Tables-pane tap also focuses a cell input.
 OBSERVED: Basic-example-SI-units opens with roughness unit ft (pre-existing); under D-W its tip reads ft in an SI project.
 SPECULATION: how the glyph looks (zero-width inset over the input end) not judged.
+
+## feat/section-grid at 0b3bad98 (OBSERVED, 2026-10-06; re-verify before citing)
+OBSERVED real Chrome (desktop 1200, phone 390; US and SI via es locale; default and offset/negative sections): mi and wi grids render, 4-8 round marks, unit on largest mark for mi (ft/m follow the selects), negative elevations and stations starting at 1000 fine; no mark collides with the n labels, but gridlines run through them (and 0.04 strikes the section line, as on master).
+OBSERVED: phone mi shrinks to 390 wide so marks render ~7px high (wi ~11px). Master mi overflowed at 600. Plot is ~12-16% smaller than master in mi.
+OBSERVED: wi has no unit selects (Cw only), so bare numbers are honest. No dark mode on these pages (prefers-color-scheme only styles lpn cards).
+Lesson: php -S needs a docroot with an engcalcs/ symlink (pages use /engcalcs/ asset paths); sticky header and consent bar cover element screenshots.
+SPECULATION: print rendering not checked.
