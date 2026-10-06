@@ -52,7 +52,9 @@ const L = loadLoopedNetwork(
 	"\t\taddCustomer: addCustomer, linkPointList: linkPointList,\n" +
 	"\t\tfontSize: function () { return effectiveFontSize(); },\n" +
 	"\t\tdxfFrame: dxfFrame, dxfExportText: dxfExportText, dxfShown: dxfShown,\n" +
-	"\t\tisGeo: isLatLonProject"
+	"\t\tisGeo: isLatLonProject, zoomAbout: zoomAbout, settleZoom: reshedNow,\n" +
+	"\t\tview: function () { return { s: state.s, tx: state.tx, ty: state.ty }; },\n" +
+	"\t\tnodeById: nodeById"
 );
 
 const PC = global.EngCalcs.pageConfig;
@@ -262,17 +264,81 @@ async function main() {
 		String(c['class'] || '').indexOf('lpn-leader') >= 0 && L.dxfShown(c)).length;
 	ok('Net1: one LINE per leader shown on the map (' + shownLeaders + ')',
 		countOn(e1, 'LINE', 'C-WATR-LABL') === shownLeaders);
-	const fsWorld = L.fontSize();
 	const lblHeights = e1.filter(e => e.type === 'TEXT' && e.layer === 'C-WATR-LABL').map(e => parseFloat(g(e.ent, 40)));
-	ok('Net1: label height is the map\'s text size times Arial\'s cap height',
-		lblHeights.length > 0 && lblHeights.every(h => Math.abs(h - fsWorld * 0.716) < 1e-9 * Math.max(1, h)),
-		lblHeights[0] + ' vs ' + fsWorld * 0.716);
+	const textSize = parseFloat(d1.header.$TEXTSIZE[0][1]);
+	ok('Net1: every label row is one height, the drawing\'s $TEXTSIZE (' + textSize + ')',
+		lblHeights.length > 0 && lblHeights.every(h => Math.abs(h - textSize) < 1e-9 * Math.max(1, h)));
 	const rd = e1.filter(e => e.type === 'TEXT' && e.layer === 'C-WATR-RDME').map(e => g(e.ent, 1));
 	ok('Net1: the read-me note states the coordinates claim no system', rd.some(t => t === global.EngCalcs.lpnDxfString(PC.lpn_dxf_note_grid.replace('{unit}', 'ft'))), rd.join(' | '));
+	// The pipe blocks: one per pipe, at mid-run, carrying the pipe's own numbers.
+	const pipeIns = e1.filter(e => e.type === 'INSERT' && e.layer === 'C-WATR-PIPE');
+	ok('Net1: one WATR_PIPE block per pipe', pipeIns.length === linksOf('pipe').length &&
+		pipeIns.every(e => e.block === 'WATR_PIPE'));
+	const pipeBad = [];
+	pipeIns.forEach(ins => {
+		const l = snap1.links.find(x => x.id === ins.attribs.ID);
+		if (!l) { pipeBad.push('no pipe ' + ins.attribs.ID); return; }
+		[['DIAMETER', l._diameter], ['LENGTH', l._length], ['ROUGHNESS', l._roughness]].forEach(([t, v]) => {
+			if (ins.attribs[t] !== numStr(v)) { pipeBad.push(l.id + '.' + t + '=' + ins.attribs[t] + ' want ' + v); }
+		});
+		if (!('FLOW' in ins.attribs) || !('VELOCITY' in ins.attribs)) { pipeBad.push(l.id + ' lacks FLOW/VELOCITY'); }
+		if (!ins.attribEnts.every(a => g(a, 70) === '1')) { pipeBad.push(l.id + ' has a visible attribute'); }
+	});
+	ok('Net1: every pipe block\'s diameter, length and roughness equal the model', pipeBad.length === 0, pipeBad.slice(0, 4).join('; '));
 	ezdxfAudit(path.join(tmp, 'Net1.dxf'), 'Net1');
+
+	console.log('--- the drawing does not depend on the zoom it was exported from ---');
+	{
+		const files = [], views = [];
+		[0.25, 8, 40].forEach((f, i) => {
+			if (i) { L.zoomAbout(700, 350, f); L.settleZoom(); }
+			const before = L.view();
+			files.push(L.dxfExportText(out1.frame).text);
+			views.push([before, L.view()]);
+		});
+		if (process.env.EC_DXF_KEEP) { files.forEach((t, i) => fs.writeFileSync(path.join(tmp, 'zoom' + i + '.dxf'), t, 'latin1')); }
+		ok('Net1 exported at three zooms gives three identical files', files[0] === files[1] && files[1] === files[2],
+			files.map(t => t.length).join(' / '));
+		ok('...from three different views', views[0][0].s !== views[1][0].s && views[1][0].s !== views[2][0].s,
+			views.map(v => v[0].s).join(' / '));
+		ok('...and each export puts the user\'s view back exactly', views.every(v => v[0].s === v[1].s &&
+			v[0].tx === v[1].tx && v[0].ty === v[1].ty));
+		const rdz = readDxf(files[0]).sections.ENTITIES.filter(e => e.type === 'TEXT' && g(e, 8) === 'C-WATR-RDME').map(e => g(e, 1));
+		const lead = PC.lpn_dxf_note_scale.split('{h}')[0];
+		ok('the read-me note states the text height against the network\'s size',
+			rdz.some(t => t.indexOf(global.EngCalcs.lpnDxfString(lead)) === 0 && / 80 /.test(t)), rdz.join(' | '));
+	}
+
+	console.log('--- strings the user typed reach the drawing literally ---');
+	{
+		const n = L.nodeById('10');
+		n._tag = 'a^b 50%%c \\U+0041 \\P 😀';
+		n._desc = 'x'.repeat(3000);
+		const out = L.dxfExportText(out1.frame), ents = entities(readDxf(out.text));
+		const ins = ents.find(e => e.type === 'INSERT' && e.layer === 'C-WATR-NODE' && e.attribs.ID === '10');
+		ok('caret, percent, backslash and a non-BMP character are each escaped in an ATTRIB',
+			ins.attribs.TAG === 'a^ b 50%%%%%%c \\U+005CU+0041 \\U+005CP ?', JSON.stringify(ins.attribs.TAG));
+		ok('a 3000-character description is cut to 2049 characters ending in an ellipsis',
+			ins.attribs.DESC.length === 2049 && ins.attribs.DESC.charCodeAt(2048) === 0x85, ins.attribs.DESC.length);
+		const rds = ents.filter(e => e.type === 'TEXT' && e.layer === 'C-WATR-RDME').map(e => g(e.ent, 1));
+		ok('...and the read-me note says one value was shortened',
+			rds.some(t => t === global.EngCalcs.lpnDxfString(PC.lpn_dxf_note_shortened.replace('{n}', '1').replace('{max}', '2049'))),
+			rds.join(' | '));
+		ok('no string in the file is longer than 2049 characters',
+			readDxf(out.text).pairs.every(p => p[1] === undefined || p[1].length <= 2049));
+		delete n._tag; delete n._desc;
+	}
 
 	console.log('--- Net3-Novato-CA-World: latitude and longitude, to UTM ---');
 	const net3 = openExample('Net3-Novato-CA-World.lwn');
+	// A customer in a latitude-and-longitude project: its place is worked out in the drawing frame
+	// (customerPoint()), so it crosses the boundary through dxfDrawnToFile(), not the nodes' path.
+	{
+		const pl = L.linkPointList(L.getDoc().links.find(l => l.type === 'pipe'));
+		L.addCustomer((pl[0].x + pl[1].x) / 2 + 1e-4, (pl[0].y + pl[1].y) / 2 + 1e-4,
+			{ link: L.getDoc().links.find(l => l.type === 'pipe').id });
+		L.flush();
+	}
 	ok('Net3-World opens as a latitude-and-longitude project', L.isGeo());
 	const out3 = await exportNow();
 	ok('Net3-World exports', out3 && out3.ok);
@@ -326,6 +392,20 @@ async function main() {
 	});
 	ok('Net3-World: junction elevations equal the model', attr3.length === 0, attr3.slice(0, 3).join('; '));
 	const lbl3 = e3.filter(e => e.type === 'TEXT' && e.layer === 'C-WATR-LABL');
+	{
+		const ci = e3.filter(e => e.type === 'INSERT' && e.layer === 'C-WATR-CUST'),
+			cl = e3.filter(e => e.type === 'LINE' && e.layer === 'C-WATR-CUST');
+		const fl = snap3.links.find(l => l.type === 'pipe'),
+			a = e3.find(e => e.type === 'INSERT' && e.attribs.ID === fl.from), b = e3.find(e => e.type === 'INSERT' && e.attribs.ID === fl.to);
+		const cx = ci.length ? parseFloat(g(ci[0].ent, 10)) : NaN, cy = ci.length ? parseFloat(g(ci[0].ent, 20)) : NaN,
+			ax = parseFloat(g(a.ent, 10)), ay = parseFloat(g(a.ent, 20)), bx = parseFloat(g(b.ent, 10)), by = parseFloat(g(b.ent, 20));
+		const off = Math.hypot(cx - (ax + bx) / 2, cy - (ay + by) / 2), pipeLen = Math.hypot(bx - ax, by - ay);
+		ok('Net3-World: the customer is a block and a service line, in UTM metres beside its pipe (' +
+			off.toFixed(1) + ' m from mid-pipe, pipe ' + pipeLen.toFixed(0) + ' m)',
+			ci.length === 1 && cl.length === 1 && off < 30 + pipeLen / 2);
+	}
+	ok('Net3-World: one WATR_PIPE block per pipe',
+		countOn(e3, 'INSERT', 'C-WATR-PIPE') === l3('pipe'));
 	ok('Net3-World: the map\'s labels are in the drawing (' + lbl3.length + ' rows)', lbl3.length > 0);
 	ok('Net3-World: Text labels LAKE and RIVER are on the text layer',
 		['LAKE', 'RIVER'].every(t => e3.some(e => e.type === 'TEXT' && e.layer === 'C-WATR-TEXT' && g(e.ent, 1) === t)));
@@ -341,7 +421,24 @@ async function main() {
 	ok('a character outside Windows-1252 becomes AutoCAD\'s \\U+ escape', S('水') === '\\U+6C34');
 	ok('the whole file is bytes: every character of it is below 256',
 		!/[^\x00-\xff]/.test(out1.text) && !/[^\x00-\xff]/.test(out3.text));
-	ok('a control character cannot reach a DXF value', S('a\nb') === 'a b');
+	ok('a control character is written in the Reference\'s caret form', S('a\nb') === 'a^Jb');
+	ok('a literal caret is written "^ "', S('a^b') === 'a^ b');
+	ok('where "%%" appears, every percent sign is AutoCAD\'s literal %%%', S('5%%u') === '5%%%%%%u' && S('50%') === '50%');
+	ok('a typed "\\U+0041" and "\\P" are not decoded: the backslash is \\U+005C',
+		S('\\U+0041\\P') === '\\U+005CU+0041\\U+005CP');
+	ok('a character outside the BMP is "?", not two escaped surrogates', S('a😀b') === 'a?b');
+	ok('the cap is 2049 characters, cut between whole escapes', S('水'.repeat(1000)).length <= 2049 &&
+		/(\\U\+6C34)+\x85$/.test(S('水'.repeat(1000))));
+	// THE ESCAPE ASSERTION CAN FAIL: the same module with its caret rule taken out answers wrong.
+	{
+		const vm = require('vm');
+		const src = fs.readFileSync(path.join(ROOT, 'js', 'lpn-dxf.js'), 'utf8');
+		const rule = "if (c === 0x5E) { parts.push('^ '); continue; }";
+		ok('mutation: the caret rule is in js/lpn-dxf.js to take out', src.indexOf(rule) >= 0);
+		const ctx = {}; vm.createContext(ctx);
+		vm.runInContext(src.replace(rule, ''), ctx);
+		ok('mutation: without it, the caret assertion goes red', ctx.EngCalcs.lpnDxfString('a^b') !== 'a^ b');
+	}
 
 	if (process.env.EC_DXF_KEEP) { console.log('  (files kept in ' + tmp + ')'); } else {
 		fs.rmSync(tmp, { recursive: true, force: true });

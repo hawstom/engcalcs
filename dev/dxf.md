@@ -8,8 +8,17 @@ Mary's journal, 2026-10-06 section B.
 
 ## Rules
 
-- **ASCII DXF R2000 (AC1015)**: the oldest version with LWPOLYLINE. `$DWGCODEPAGE` ANSI_1252: a
-  character Windows-1252 holds is its byte; any other is AutoCAD's `\U+XXXX`.
+- **ASCII DXF R2000 (AC1015)**: the oldest version with LWPOLYLINE.
+- **One escape for every string** (`escapeParts()`/`str()` in `js/lpn-dxf.js`: TEXT, ATTRIB,
+  ATTDEF, prompts, tags, layer and block names):
+  - `$DWGCODEPAGE` ANSI_1252: a character Windows-1252 holds is its byte; any other in the Basic
+    Multilingual Plane is `\U+XXXX`; one outside it is `?` (`\U+` has four hex digits).
+  - a literal caret is `^ `; a control character is its caret form (`^I`, `^J`), per the Reference.
+  - a literal backslash is `\U+005C`, so a typed `\U+0041` or `\P` is never decoded.
+  - where a string holds `%%`, every `%` is `%%%`, AutoCAD's literal percent.
+  - 2049 characters at most (the Reference's limit): longer is cut between whole escapes and ends
+    in `…`, and the read-me note says how many values were shortened.
+  - layer and block names also have the symbol-table characters `<>/\":;?*|=`` ` `` made `_`.
 - **Every object has a handle and an owner** (330); `$HANDSEED` is above them all. Structure follows
   the Autodesk DXF Reference and ezdxf's minimal R2000 content (below), plus the two LAYOUTs and the
   plot-style placeholder AutoCAD 2000 writes, so nothing is left for AutoCAD to rebuild on open.
@@ -20,10 +29,17 @@ Mary's journal, 2026-10-06 section B.
   shown node, link, repeat and customer label row as a TEXT at the place and angle the placement
   pass gave it; Text labels; leaders as LINEs. Results appear only if the map shows them, so only
   when solved. Underlined and overlined extremes keep their mark (`%%u`, `%%o`).
-- **Text height** = the map's current text size × 0.716 (Arial's cap height per em, OS/2
+- **Laid out at Zoom to fit, whatever the zoom at export.** `dxfAtFitScale()` runs the page's own
+  `zoomExtent()` and label pass, holds the scale to ten significant figures, gathers, and puts the
+  user's view back, all in one synchronous call (nothing is painted in between). Text height,
+  symbol size and every label's place are therefore the ones the map shows at Zoom to fit; they
+  still follow the map window's size and the text and symbol sizes in Settings, as Zoom to fit does.
+- **Text height** = the text size at that scale × 0.716 (Arial's cap height per em, OS/2
   sCapHeight 1467/2048), because a CAD text height is a cap height and an SVG font size is an em.
-  Style Standard uses `arial.ttf`. **Symbol size** = the map's current junction symbol. Both
-  therefore follow the zoom at export, and the read-me note says so.
+  Style Standard uses `arial.ttf`. **Symbol size** = the junction symbol at that scale.
+- **Plot scale, stated in the drawing**: the read-me note gives the text height and the network's
+  extent in drawing units ("text 1.17 ft high, on a network 80 ft across" for Net1 in a 1400 px
+  window). Plot the network at width W and the text is W × h / w high.
 - **Coordinates, and the only claim the file makes about them** (the read-me note):
   - grid project: its own X and Y, exactly (the file's number plus the origin, as the `.inp`
     export writes them); `$INSUNITS` from the length unit (ft 2, m 6). "No coordinate system is stated."
@@ -32,7 +48,8 @@ Mary's journal, 2026-10-06 section B.
   - latitude-and-longitude project: converted with `js/lpn-crs.js` (proj4) to the WGS 84 UTM zone
     holding the network's centre, metres, `$INSUNITS` 6. Not the page's Web Mercator frame, whose
     scale is off by 1/cos(latitude). If the conversion cannot load, nothing is written and the
-    status line says why.
+    status line says so; a network centred beyond 80° S or 84° N, where UTM stops, gets its own
+    message. A network straddling a zone edge or the antimeridian is drawn in the centre's zone.
   - A scenario that moves a node exports that position, as the `.inp` export does.
 - **Attributes are all invisible** (flag 1). The visible annotation is the map's own lettering; a
   visible ID attribute would print every ID twice wherever the map shows IDs. `ATTDISP ON` or
@@ -42,17 +59,29 @@ Mary's journal, 2026-10-06 section B.
 
 ## Layers
 
-US National CAD Standard v5, AIA CAD Layer Guidelines: discipline C, major group WATR (water
-supply). PIPE, EQPM, VALV, TANK, LABL, TEXT, RDME are prescribed codes ("any Minor Group may be used
-to modify any Major Group"); NODE, RSVR and CUST are user-defined, which the Guidelines permit when
-documented, and this table is that document. ACI colours 1-9 only.
+AIA CAD Layer Guidelines, United States National CAD Standard v5: the edition named in the page
+footers of the copy read (hosted by Duke University, facilities.duke.edu); v5 from the NIBS site was
+not fetched. Discipline C, major group WATR (water supply).
+
+- C-WATR-PIPE is in the Guidelines' Civil list as it stands.
+- EQPM, VALV, TANK, LABL, TEXT and RDME are prescribed Minor Group codes, used under the rule
+  "any Minor Group may be used to modify any Major Group".
+- NODE is a prescribed code, but a Major Group ("Node", as in V-NODE-WATR); here it sits in the
+  minor position with the same meaning.
+- RSVR and CUST are user-defined, which the Guidelines permit when documented; this table is that
+  document.
+- Valves: the Guidelines' own layer is C-WATR-INST, "instrumentation (meters, valves, etc.)". VALV
+  is used because a model's valves are control valves with settings (PRV, PSV, FCV, TCV), and INST
+  would file them with meters.
+
+ACI colours 1-9 only.
 
 | Layer | Holds | ACI | NCS |
 |---|---|---|---|
-| C-WATR-PIPE | pipes, LWPOLYLINE through every bend | 5 | listed: "Water supply: piping" |
+| C-WATR-PIPE | pipes: LWPOLYLINE through every bend + WATR_PIPE block at mid-run | 5 | listed: "Water supply: piping" |
 | C-WATR-EQPM | pumps: LWPOLYLINE + WATR_PUMP block at mid-run | 6 | EQPM "Equipment" |
-| C-WATR-VALV | valves: LWPOLYLINE + WATR_VALVE block at mid-run | 1 | VALV "Valves" |
-| C-WATR-NODE | junctions, WATR_JUNCTION | 4 | user-defined |
+| C-WATR-VALV | valves: LWPOLYLINE + WATR_VALVE block at mid-run | 1 | VALV "Valves" (Guidelines: INST) |
+| C-WATR-NODE | junctions, WATR_JUNCTION | 4 | NODE, a prescribed Major Group code |
 | C-WATR-TANK | tanks, WATR_TANK | 3 | TANK "Storage tanks" |
 | C-WATR-RSVR | reservoirs, WATR_RESERVOIR | 3 | user-defined |
 | C-WATR-CUST | customers, WATR_CUSTOMER + service LINE | 8 | user-defined |
@@ -70,12 +99,14 @@ INSERT scale is the symbol size. Shapes follow the map's silhouettes.
 | WATR_JUNCTION | ID, ELEV, DEMAND (base demand, all categories), TAG, DESC |
 | WATR_RESERVOIR | ID, HEAD (the effective water surface), TAG, DESC |
 | WATR_TANK | ID, ELEV, LEVEL, MINLEVEL, MAXLEVEL, DIAMETER, TAG, DESC |
+| WATR_PIPE | ID, DIAMETER, LENGTH, ROUGHNESS, FLOW, VELOCITY, TAG, DESC; FLOW and VELOCITY only when the map has results, else empty. Geometry: one POINT |
 | WATR_PUMP | ID, TAG, DESC |
 | WATR_VALVE | ID, VALVETYPE, DIAMETER, SETTING, TAG, DESC |
 | WATR_CUSTOMER | ID, DEMAND, COUNT, TAG, DESC |
 
-Pipe IDs and values are not attributes (a polyline carries none); they are in the drawing where the
-map labels them.
+A polyline carries no attributes, so a pipe's data rides on its WATR_PIPE block, a POINT at
+mid-run (snap with Node, or pick it with a crossing window). A tank's DIAMETER prompt is the tank
+diameter in the length unit; a pipe's or valve's is in the diameter unit.
 
 ## Not in this cut
 
@@ -85,8 +116,10 @@ option); lineweights; MTEXT; a background mask behind text (the map's white halo
 ## Validation
 
 The harness reads the file back with its own small reader and asserts R2000, handles and owners,
-per-layer counts, vertex counts, attribute values, exact grid coordinates, UTM coordinates and
-ground lengths, and the lettering. With `EC_EZDXF_PYTHON` pointing at a Python that has ezdxf, it
+per-layer counts, vertex counts, attribute values (nodes and pipe blocks), exact grid coordinates,
+UTM coordinates and ground lengths, a customer in each kind of project, the lettering, identical
+files from three zooms with the view put back, every escape rule (with a mutation that removes the
+caret rule and shows the assertion going red), the length cap and its note. With `EC_EZDXF_PYTHON` pointing at a Python that has ezdxf, it
 also runs `ezdxf.recover` and `doc.audit()` (2026-10-06, ezdxf 1.4.4: 0 errors, 0 fixes on Net1 and
 Net3-Novato-CA-World); without it that line prints NOT RUN. `dxf-parser` (npm) read both files with
 the same counts. LibreDWG's web build (`@mlightcad/libredwg-web` 0.7.14) reads DWG only, and no

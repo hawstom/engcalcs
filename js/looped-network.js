@@ -34910,11 +34910,14 @@ var EngCalcs = EngCalcs || {};
 				b.w = Math.min(b.w, X); b.e = Math.max(b.e, X); b.s = Math.min(b.s, Y); b.n = Math.max(b.n, Y);
 			});
 			code = crsUtmCodeFor(b ? { lon: (b.w + b.e) / 2, lat: (b.s + b.n) / 2 } : { lon: 0, lat: 0 });
-			if (!code || !EngCalcs.lpnCrsLoad) { done({ ok: false }); return; }
+			// UTM stops at 80 S and 84 N, and the drawing has no other plane to go to; that is a
+			// fact about where the network is, not a failed download, so it is said differently.
+			if (!code) { done({ ok: false, reason: 'utm' }); return; }
+			if (!EngCalcs.lpnCrsLoad) { done({ ok: false, reason: 'load' }); return; }
 			EngCalcs.lpnCrsLoad(function () {
-				if (!EngCalcs.lpnCrsHas(code)) { done({ ok: false }); return; }
+				if (!EngCalcs.lpnCrsHas(code)) { done({ ok: false, reason: 'load' }); return; }
 				done({
-					ok: true, kind: 'geo', code: code, insunits: 6, measurement: 1,
+					ok: true, kind: 'geo', code: code, insunits: 6, measurement: 1, unitLabel: pc.u_m || 'm',
 					fwd: function (X, Y) { return EngCalcs.lpnCrsForward(code, { lon: X, lat: Y }); },
 					note: (pc.lpn_dxf_note_geo || 'Coordinates: converted from latitude and longitude to {crs}, in meters.')
 						.replace('{crs}', dxfCrsName(code))
@@ -34929,7 +34932,7 @@ var EngCalcs = EngCalcs || {};
 				var cu = EngCalcs.lpnCrsUnit ? EngCalcs.lpnCrsUnit(code) : null,
 					unit = cu && cu.units ? cu.units : (cu && cu.toMeter === 1 ? 'm' : '');
 				done({
-					ok: true, kind: 'projected', code: code, fwd: identity,
+					ok: true, kind: 'projected', code: code, fwd: identity, unitLabel: unit === 'm' ? (pc.u_m || 'm') : unit,
 					insunits: EngCalcs.lpnDxfInsUnits(unit), measurement: unit === 'm' ? 1 : 0,
 					note: (pc.lpn_dxf_note_crs || 'Coordinates: {crs}, exactly as this project states them.')
 						.replace('{crs}', dxfCrsName(code))
@@ -34940,7 +34943,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		u = unitKey('lpn_u_length');
 		done({
-			ok: true, kind: 'grid', fwd: identity,
+			ok: true, kind: 'grid', fwd: identity, unitLabel: unitSymbol('lpn_u_length'),
 			insunits: EngCalcs.lpnDxfInsUnits(u), measurement: u === 'm' ? 1 : 0,
 			note: (pc.lpn_dxf_note_grid || 'Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.')
 				.replace('{unit}', unitSymbol('lpn_u_length'))
@@ -34962,6 +34965,7 @@ var EngCalcs = EngCalcs || {};
 		junction: ['ID', 'ELEV', 'DEMAND', 'TAG', 'DESC'],
 		reservoir: ['ID', 'HEAD', 'TAG', 'DESC'],
 		tank: ['ID', 'ELEV', 'LEVEL', 'MINLEVEL', 'MAXLEVEL', 'DIAMETER', 'TAG', 'DESC'],
+		pipe: ['ID', 'DIAMETER', 'LENGTH', 'ROUGHNESS', 'FLOW', 'VELOCITY', 'TAG', 'DESC'],
 		pump: ['ID', 'TAG', 'DESC'],
 		valve: ['ID', 'VALVETYPE', 'DIAMETER', 'SETTING', 'TAG', 'DESC'],
 		customer: ['ID', 'DEMAND', 'COUNT', 'TAG', 'DESC']
@@ -34977,7 +34981,12 @@ var EngCalcs = EngCalcs || {};
 			LEVEL: withUnit(pc.lpn_field_tank_level || 'Water depth', 'lpn_u_elevhead'),
 			MINLEVEL: withUnit(pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead'),
 			MAXLEVEL: withUnit(pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead'),
-			DIAMETER: pc.lpn_field_diameter || 'Diameter',
+			DIAMETER: withUnit(pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter'),
+			'tank.DIAMETER': withUnit(pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_length'),
+			LENGTH: withUnit(pc.lpn_field_length || 'Length', 'lpn_u_length'),
+			ROUGHNESS: pc.lpn_field_roughness || 'Roughness',
+			FLOW: withUnit(pc.lpn_result_flow || 'Flow', resultUnit('flow')),
+			VELOCITY: withUnit(pc.lpn_result_velocity || 'Velocity', resultUnit('velocity')),
 			VALVETYPE: pc.lpn_field_valve_type || 'Valve type',
 			SETTING: pc.lpn_field_valve_setting || 'Setting',
 			COUNT: pc.lpn_field_meter_count || 'Number of services',
@@ -35002,7 +35011,16 @@ var EngCalcs = EngCalcs || {};
 		return a;
 	}
 	function dxfLinkAttrs(l) {
-		var a = [{ tag: 'ID', value: l.id }];
+		var a = [{ tag: 'ID', value: l.id }], r = lastSolveResult;
+		if (l.type === 'pipe') {
+			a.push({ tag: 'DIAMETER', value: dxfVal(l, 'diameter') }, { tag: 'LENGTH', value: dxfVal(l, 'length') },
+				{ tag: 'ROUGHNESS', value: dxfVal(l, 'roughness') });
+			// RESULTS ONLY WHERE THE MAP HAS THEM: a solve on screen, stale or not, exactly as the
+			// labels show it. Without one the two attributes are present and empty.
+			var q = r && r.flows ? r.flows[l.id] : undefined, v = r && r.velocities ? r.velocities[l.id] : undefined;
+			a.push({ tag: 'FLOW', value: typeof q === 'number' && isFinite(q) ? toDisplay(shownFlow(q), resultUnit('flow')) : '' },
+				{ tag: 'VELOCITY', value: typeof v === 'number' && isFinite(v) ? toDisplay(v, resultUnit('velocity')) : '' });
+		}
 		if (l.type === 'valve') {
 			a.push({ tag: 'VALVETYPE', value: l.valveType || '' }, { tag: 'DIAMETER', value: dxfVal(l, 'diameter') },
 				{ tag: 'SETTING', value: dxfVal(l, 'setting') });
@@ -35077,29 +35095,28 @@ var EngCalcs = EngCalcs || {};
 			for (i = 0; i < kids.length; i++) {
 				c = kids[i];
 				if (c.nodeType !== 1) { continue; }
-				var s = String(c.textContent || '').replace(/%%/g, '%%%%%%'),
-					dec = c.getAttribute('text-decoration');
-				if (dec === 'underline') { s = '%%u' + s + '%%u'; } else if (dec === 'overline') { s = '%%o' + s + '%%o'; }
+				var dec = c.getAttribute('text-decoration');
 				if (dxfHasAttr(c, 'x') || !cur) {
 					yOff += dxfEmLength(c.getAttribute('dy'), fs);
-					cur = { x: dxfHasAttr(c, 'x') ? +c.getAttribute('x') : x0, y: y0 + yOff, text: '' };
+					cur = { x: dxfHasAttr(c, 'x') ? +c.getAttribute('x') : x0, y: y0 + yOff, segs: [] };
 					rows.push(cur);
 				}
-				cur.text += s;
+				cur.segs.push({ text: String(c.textContent || ''),
+					mark: dec === 'underline' ? 'under' : (dec === 'overline' ? 'over' : '') });
 			}
 			if (!rows.length && String(e.textContent || '')) {
-				rows.push({ x: x0, y: y0, text: String(e.textContent).replace(/%%/g, '%%%%%%') });
+				rows.push({ x: x0, y: y0, segs: [{ text: String(e.textContent), mark: '' }] });
 			}
 			var ca = Math.cos(ang * Math.PI / 180), sa = Math.sin(ang * Math.PI / 180);
 			rows.forEach(function (r) {
-				if (!r.text.replace(/%%[uo]/g, '').trim()) { return; }
+				if (!r.segs.map(function (g) { return g.text; }).join('').trim()) { return; }
 				var dx = r.x - rcx, dy = r.y - rcy,
 					px = rot ? rcx + dx * ca - dy * sa : r.x, py = rot ? rcy + dx * sa + dy * ca : r.y,
 					P = toOut(px, py), Q = toOut(px + ca * fs, py + sa * fs);
 				if (!P || !Q || !isFinite(P.x) || !isFinite(Q.x)) { return; }
 				var len = Math.hypot(Q.x - P.x, Q.y - P.y);
 				texts.push({
-					text: r.text, codes: true, x: P.x, y: P.y,
+					segs: r.segs, x: P.x, y: P.y,
 					h: len * LPN_DXF_CAP_HEIGHT,
 					rot: Math.atan2(Q.y - P.y, Q.x - P.x) * 180 / Math.PI,
 					halign: anchor === 'middle' ? 1 : (anchor === 'end' ? 2 : 0),
@@ -35171,11 +35188,32 @@ var EngCalcs = EngCalcs || {};
 			textHeight = fs * LPN_DXF_CAP_HEIGHT * k,
 			letters = dxfLettering(G);
 		// The read-me note, above the top-left of the network on a layer that does not plot.
-		var ex = { x0: Infinity, y1: -Infinity };
-		nodes.forEach(function (n) { ex.x0 = Math.min(ex.x0, n.x); ex.y1 = Math.max(ex.y1, n.y); });
-		if (!isFinite(ex.x0)) { ex = { x0: 0, y1: 0 }; }
+		var ex = { x0: Infinity, x1: -Infinity, y0: Infinity, y1: -Infinity };
+		nodes.forEach(function (n) {
+			ex.x0 = Math.min(ex.x0, n.x); ex.x1 = Math.max(ex.x1, n.x);
+			ex.y0 = Math.min(ex.y0, n.y); ex.y1 = Math.max(ex.y1, n.y);
+		});
+		if (!isFinite(ex.x0)) { ex = { x0: 0, x1: 0, y0: 0, y1: 0 }; }
+		// **THE PLOT-SCALE RELATIONSHIP, STATED IN THE DRAWING**: the text height against the
+		// network's own size, so a reader choosing a plot scale knows what the lettering becomes.
+		var across = Math.max(ex.x1 - ex.x0, ex.y1 - ex.y0);
+		function three(v) { return isFinite(v) ? String(+v.toPrecision(3)) : '?'; }
 		var notes = [projectDisplayName(project), frame.note,
-			pc.lpn_dxf_note_scale || 'Text and symbols are drawn at the size the map showed them when this file was exported.'];
+			(pc.lpn_dxf_note_scale || 'Text and symbols are sized as the map draws them at Zoom to fit: text {h} {unit} high, on a network {w} {unit} across.')
+				.replace('{h}', three(textHeight)).replace('{w}', three(across)).split('{unit}').join(frame.unitLabel || '')];
+		// **A VALUE TOO LONG FOR ONE DXF STRING IS SHORTENED, AND THE DRAWING SAYS SO** -- the writer
+		// cuts it and ends it in an ellipsis (js/lpn-dxf.js, LIMIT_CHARS).
+		var longOnes = 0;
+		nodes.concat(links, customers).forEach(function (el) {
+			(el.attrs || []).forEach(function (a) { if (EngCalcs.lpnDxfTooLong(a.value)) { longOnes++; } });
+		});
+		letters.texts.forEach(function (t) {
+			if (EngCalcs.lpnDxfTooLong((t.segs || []).map(function (g) { return g.text; }).join(''))) { longOnes++; }
+		});
+		if (longOnes) {
+			notes.push((pc.lpn_dxf_note_shortened || '{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in “…”.')
+				.replace('{n}', String(longOnes)).replace('{max}', String(EngCalcs.lpnDxfLimit)));
+		}
 		for (i = 0; i < notes.length; i++) {
 			letters.texts.push({ text: notes[i], x: ex.x0, y: ex.y1 + symbol * 3 + (notes.length - i) * textHeight * 1.6,
 				h: textHeight, layer: 'note' });
@@ -35188,10 +35226,43 @@ var EngCalcs = EngCalcs || {};
 			tags: LPN_DXF_TAGS, prompts: dxfPrompts()
 		};
 	}
+	/**
+	 * **THE DRAWING DOES NOT DEPEND ON THE ZOOM IT WAS EXPORTED FROM** (pre-review 2026-10-06: Net1
+	 * at three zooms gave text 17.2, 1.2 and 0.043 units high). It is laid out as the map lays the
+	 * network out at Zoom to fit: the page's own zoomExtent() and its own label pass, run at that
+	 * scale, read, and the user's view put back -- all inside one synchronous call, so the browser
+	 * never paints the intermediate view. What it still depends on is what Zoom to fit depends on:
+	 * the map window's size and the text and symbol sizes in Settings.
+	 *
+	 * Where the map has not been measured yet there is no fit to run, and the export is laid out at
+	 * the view in force; that is the honest alternative, and it cannot arise from the File menu,
+	 * which is only reachable on a sized map.
+	 */
+	function dxfAtFitScale(fn) {
+		if (!mapSized || !svg) { return fn(); }
+		var keep = { tx: state.tx, ty: state.ty, s: state.s }, keepFit = lastFit;
+		try {
+			zoomExtent();
+			// The fit's own iteration can land a last bit apart depending on the view it started
+			// from; held to ten significant figures, every start gives the same scale and so the
+			// same file, byte for byte (dev/lpn-spike/dxf-export-harness.js).
+			state.s = +state.s.toPrecision(10);
+			setTransform();
+			onZoomChanged();
+			reshedNow();
+			return fn();
+		} finally {
+			state.tx = keep.tx; state.ty = keep.ty; state.s = keep.s;
+			setTransform();
+			onZoomChanged();
+			reshedNow();
+			lastFit = keepFit;
+		}
+	}
 	/** frame -> {ok, text}; the synchronous half, which is what a harness drives. */
 	function dxfExportText(frame) {
-		if (!frame || !frame.ok || !EngCalcs.lpnDxfWrite) { return { ok: false }; }
-		return { ok: true, text: EngCalcs.lpnDxfWrite(dxfModel(frame)), frame: frame };
+		if (!frame || !frame.ok || !EngCalcs.lpnDxfWrite) { return { ok: false, reason: frame && frame.reason }; }
+		return { ok: true, frame: frame, text: dxfAtFitScale(function () { return EngCalcs.lpnDxfWrite(dxfModel(frame)); }) };
 	}
 	function exportDxfFile() {
 		var pcX = EngCalcs.pageConfig || {};
@@ -35200,7 +35271,9 @@ var EngCalcs = EngCalcs || {};
 		dxfFrame(function (frame) {
 			var out = dxfExportText(frame);
 			if (!out.ok) {
-				setNotice(pcX.lpn_dxf_export_refused || 'The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.');
+				setNotice(out.reason === 'utm'
+					? (pcX.lpn_dxf_export_no_utm || 'The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.')
+					: (pcX.lpn_dxf_export_refused || 'The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.'));
 				return;
 			}
 			// A BYTE string in Windows-1252 (js/lpn-dxf.js), so it goes out as bytes: a Blob of the

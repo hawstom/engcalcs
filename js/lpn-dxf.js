@@ -29,11 +29,17 @@
 	var EngCalcs = root.EngCalcs = root.EngCalcs || {};
 
 	// ---- THE LAYER TABLE ---------------------------------------------------------------------------
-	// US National CAD Standard v5, AIA CAD Layer Guidelines: Discipline C (Civil), Major Group WATR
-	// (water supply). PIPE, EQPM, VALV, TANK, LABL, TEXT and RDME are prescribed codes ("any Minor
-	// Group may be used to modify any Major Group"); NODE, RSVR and CUST are user-defined, which the
-	// Guidelines allow when documented -- dev/dxf.md is that document. ACI colours, 1-9 only, so every
-	// program shows the same colour. RDME is the Guidelines' "read-me layer (not plotted)".
+	// AIA CAD Layer Guidelines, United States National CAD Standard v5 (the edition its own page
+	// footers name; the copy read is the one Duke University hosts). Discipline C (Civil), Major
+	// Group WATR (water supply). Its Civil list names C-WATR-PIPE outright. EQPM, VALV, TANK, LABL,
+	// TEXT and RDME are prescribed Minor Group codes, used here under the Guidelines' own rule that
+	// "any Minor Group may be used to modify any Major Group". NODE is a prescribed code too, but a
+	// MAJOR group ("Node", the survey layers' V-NODE); in the minor position it is used with that
+	// same meaning. RSVR and CUST are user-defined, which the Guidelines allow when documented, and
+	// dev/dxf.md is that document. The Guidelines' own layer for valves is C-WATR-INST
+	// ("instrumentation (meters, valves, etc.)"); VALV is used instead because a model's valves are
+	// control valves with settings, not instruments, and INST would put them with meters.
+	// ACI colours 1-9 only, so every program shows the same colour.
 	var LAYERS = [
 		{ key: 'pipe', name: 'C-WATR-PIPE', color: 5 },
 		{ key: 'pump', name: 'C-WATR-EQPM', color: 6 },
@@ -48,7 +54,7 @@
 	];
 	var BLOCK_OF = {
 		junction: 'WATR_JUNCTION', reservoir: 'WATR_RESERVOIR', tank: 'WATR_TANK',
-		pump: 'WATR_PUMP', valve: 'WATR_VALVE', customer: 'WATR_CUSTOMER'
+		pipe: 'WATR_PIPE', pump: 'WATR_PUMP', valve: 'WATR_VALVE', customer: 'WATR_CUSTOMER'
 	};
 	// Each block's geometry, in units of ONE SYMBOL (a junction's diameter on the map), so the
 	// INSERT's scale is the symbol size and nothing else. Outlines only: no HATCH, no SOLID, which
@@ -62,14 +68,23 @@
 		tank: [{ poly: [[-1.5, -1.5], [1.5, -1.5], [1.5, 1.5], [-1.5, 1.5]], closed: true }],
 		pump: [{ circle: 0.75 }, { poly: [[0, 0.75], [1.25, 0.75], [1.25, 0.25], [0.66, 0.25]] }],
 		valve: [{ poly: [[-1, -0.75], [-1, 0.75], [1, -0.75], [1, 0.75]], closed: true }],
-		customer: [{ circle: 0.35 }]
+		customer: [{ circle: 0.35 }],
+		// A pipe's data carrier: a POINT at mid-run, a node a cursor can snap to and a crossing window
+		// can pick, and nothing drawn on the sheet beyond a dot.
+		pipe: [{ point: true }]
 	};
 
 	function layerName(key, prefix) {
 		for (var i = 0; i < LAYERS.length; i++) {
-			if (LAYERS[i].key === key) { return (prefix || '') + LAYERS[i].name; }
+			if (LAYERS[i].key === key) { return tableName((prefix || '') + LAYERS[i].name); }
 		}
 		return '0';
+	}
+	// A layer or block NAME: the same escape as every other string, then the characters the DXF
+	// Reference forbids in a symbol-table name (< > / \ " : ; ? * | = `) made underscores, so a
+	// caller's prefix cannot produce a table AutoCAD rejects.
+	function tableName(v) {
+		return str(v).replace(/\\U\+005C/g, '_').replace(/[<>\/\\":;?*|=`]/g, '_');
 	}
 
 	// ---- VALUES -------------------------------------------------------------------------------------
@@ -84,36 +99,75 @@
 		if (s.indexOf('e') >= 0) { return s.replace('e', 'E'); }
 		return s.indexOf('.') < 0 ? s + '.0' : s;
 	}
-	// A string in an ANSI_1252 file ($DWGCODEPAGE), which is what AutoCAD 2000 itself writes: a
-	// character Windows-1252 holds goes out as its one byte, and anything else as AutoCAD's \U+XXXX
-	// escape, so a label in any of the 27 languages reaches the drawing. The result is a BYTE
-	// string (every char 0-255); lpnDxfBytes() turns it into the file. Control characters cannot be
-	// in a DXF value at all.
+	// **THE ONE ESCAPE, AND EVERY STRING IN THE FILE GOES THROUGH IT** -- TEXT, ATTRIB and ATTDEF
+	// values, prompts, tags, names. The DXF Reference's rules for a group-1 string, plus the
+	// sequences AutoCAD itself interprets inside one:
+	//   - the file is ANSI_1252 ($DWGCODEPAGE), as AutoCAD 2000 writes it: a character Windows-1252
+	//     holds goes out as its one byte, any other as \U+XXXX. The result is a BYTE string (every
+	//     char 0-255); lpnDxfBytes() turns it into the file.
+	//   - a character outside the Basic Multilingual Plane has no \U+ form (four hex digits), so it
+	//     becomes '?' rather than two escaped surrogate halves.
+	//   - a CARET introduces a control character (^J, ^I...), so a literal caret is written "^ ".
+	//     A control character itself is written in that caret form, never raw.
+	//   - a BACKSLASH would let a user's own "\U+0041" or "\P" be decoded, so every literal
+	//     backslash is written as \U+005C, which decodes to a backslash and nothing more.
+	//   - "%%" introduces %%u, %%o, %%d...: where a string holds "%%", every percent sign in it is
+	//     written %%%, AutoCAD's literal percent, so it reads exactly as typed.
+	//   - LIMIT_CHARS: the Reference limits these strings to 2049 characters. A longer value is cut,
+	//     between whole escapes, and ends in an ellipsis; tooLong() lets the caller say so.
+	var LIMIT_CHARS = 2049, ELLIPSIS = String.fromCharCode(0x85);
 	var CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86,
 		0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E,
 		0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97,
 		0x02DC: 0x98, 0x2122: 0x99, 0x0161: 0x9A, 0x203A: 0x9B, 0x0153: 0x9C, 0x017E: 0x9E, 0x0178: 0x9F };
-	function str(v) {
-		var s = String(v === undefined || v === null ? '' : v), out = '', i, c;
+	function escapeParts(v) {
+		var s = String(v === undefined || v === null ? '' : v), parts = [], i, c, d,
+			pct = s.indexOf('%%') >= 0 ? '%%%' : '%';
 		for (i = 0; i < s.length; i++) {
 			c = s.charCodeAt(i);
-			if (c < 32 || c === 127) { out += ' '; continue; }
-			if (c < 127) { out += s.charAt(i); continue; }
-			if (c >= 0xA0 && c <= 0xFF) { out += String.fromCharCode(c); continue; }
-			if (CP1252[c]) { out += String.fromCharCode(CP1252[c]); continue; }
-			out += '\\U+' + ('0000' + c.toString(16).toUpperCase()).slice(-4);
+			if (c >= 0xD800 && c <= 0xDBFF && i + 1 < s.length) {
+				d = s.charCodeAt(i + 1);
+				if (d >= 0xDC00 && d <= 0xDFFF) { i++; parts.push('?'); continue; }
+			}
+			if (c >= 0xD800 && c <= 0xDFFF) { parts.push('?'); continue; }   // a lone surrogate
+			if (c < 32) { parts.push('^' + String.fromCharCode(c + 64)); continue; }
+			if (c === 0x5E) { parts.push('^ '); continue; }
+			if (c === 0x5C) { parts.push('\\U+005C'); continue; }
+			if (c === 0x25) { parts.push(pct); continue; }
+			if (c < 127) { parts.push(s.charAt(i)); continue; }
+			if (c >= 0xA0 && c <= 0xFF) { parts.push(String.fromCharCode(c)); continue; }
+			if (CP1252[c]) { parts.push(String.fromCharCode(CP1252[c])); continue; }
+			parts.push('\\U+' + ('0000' + c.toString(16).toUpperCase()).slice(-4));
 		}
-		return out;
+		return parts;
 	}
+	// `room` (optional) is the characters this value may take, for a caller composing one string
+	// out of several (a label row with an underlined value in it).
+	function str(v, room) {
+		var parts = escapeParts(v), max = room === undefined ? LIMIT_CHARS : room, out = '', i;
+		if (parts.join('').length <= max) { return parts.join(''); }
+		for (i = 0; i < parts.length && out.length + parts[i].length <= max - 1; i++) { out += parts[i]; }
+		return out + ELLIPSIS;
+	}
+	function tooLong(v) { return escapeParts(v).join('').length > LIMIT_CHARS; }
 	function bytes(text) {
 		var b = new Uint8Array(text.length), i;
 		for (i = 0; i < text.length; i++) { b[i] = text.charCodeAt(i) & 0xFF; }
 		return b;
 	}
-	// Text content: str(), plus the one sequence a TEXT entity reads as a control code. "%%"
-	// introduces %%u, %%o, %%d...; AutoCAD's literal percent sign is %%%.
-	function textStr(v) {
-		return str(v).replace(/%%/g, '%%%%%%');
+	// A TEXT's content: plain, or a list of segments of which some carry the map's extrema mark
+	// (%%u underline, %%o overline), each escaped by str() and the whole held to the limit.
+	function textContent(t) {
+		if (!t.segs) { return str(t.text); }
+		var out = '', i, seg, code, room;
+		for (i = 0; i < t.segs.length; i++) {
+			seg = t.segs[i];
+			code = seg.mark === 'under' ? '%%u' : (seg.mark === 'over' ? '%%o' : '');
+			room = LIMIT_CHARS - out.length - 2 * code.length;
+			if (room <= 1) { break; }
+			out += code + str(seg.text, room) + code;
+		}
+		return out;
 	}
 
 	// ---- THE WRITER ---------------------------------------------------------------------------------
@@ -131,11 +185,11 @@
 	 *   insunits, measurement (0 imperial, 1 metric), layerPrefix,
 	 *   symbol: drawing units per map symbol, textHeight: drawing units,
 	 *   nodes:     [{ id, type, x, y, attrs: [{ tag, value }] }],
-	 *   links:     [{ id, type, pts: [{x, y}...], attrs }]    -- pump/valve get a block at mid-run
+	 *   links:     [{ id, type, pts: [{x, y}...], attrs }]    -- each gets its block at mid-run
 	 *   customers: [{ id, x, y, from: {x, y} | null, attrs }]
-	 *   texts:     [{ text, codes, x, y, h, rot, halign 0|1|2, valign 0|1|2|3, layer: 'label'|'text'|'note' }]
+	 *   texts:     [{ text | segs: [{ text, mark: 'under'|'over'|'' }], x, y, h, rot, halign 0|1|2, valign 0|1|2|3, layer: 'label'|'text'|'note' }]
 	 *   lines:     [{ x1, y1, x2, y2, layer }]
-	 *   prompts:   { TAG: 'prompt shown in Edit Attributes' }
+	 *   prompts:   { TAG or 'type.TAG': 'prompt shown in Edit Attributes' }
 	 *   tags:      { junction: [TAG...], ... }  -- the ATTDEFs each block carries, in order
 	 * }
 	 * Returns the DXF text.
@@ -193,7 +247,7 @@
 			var ha = t.halign | 0, va = t.valign | 0;
 			entity('TEXT', layer);
 			body.g(100, 'AcDbText').g(10, num(t.x)).g(20, num(t.y)).g(30, '0.0').g(40, num(t.h || th))
-				.g(1, t.codes ? str(t.text) : textStr(t.text));
+				.g(1, textContent(t));
 			if (t.rot) { body.g(50, num(t.rot)); }
 			if (ha) { body.g(72, ha); }
 			if (ha || va) { body.g(11, num(t.x)).g(21, num(t.y)).g(31, '0.0'); }
@@ -203,7 +257,7 @@
 		// An attribute's place in the block: stacked to the right of the symbol, one text height
 		// apart, so ATTDISP ON shows a readable column rather than every value on one point.
 		function attrOffset(k, type) {
-			var r = type === 'tank' ? 1.5 : (type === 'reservoir' ? 1.4 : (type === 'pump' || type === 'valve' ? 1 : 0.5));
+			var r = type === 'tank' ? 1.5 : (type === 'reservoir' ? 1.4 : (type === 'pump' || type === 'valve' ? 1 : (type === 'pipe' ? 0.25 : 0.5)));
 			return { x: r + 0.25, y: -k * 1.5 * th / S };
 		}
 		function insert(type, x, y, rot, attrs, layer) {
@@ -249,7 +303,10 @@
 				// Geometry on layer 0 and colour ByLayer, so each INSERT takes its own layer's colour.
 				SHAPES[t].forEach(function (sh) {
 					var hh = w.handle();
-					if (sh.circle) {
+					if (sh.point) {
+						w.g(0, 'POINT').g(5, hh).g(330, br.rec).g(100, 'AcDbEntity').g(8, '0')
+							.g(100, 'AcDbPoint').g(10, '0.0').g(20, '0.0').g(30, '0.0');
+					} else if (sh.circle) {
 						w.g(0, 'CIRCLE').g(5, hh).g(330, br.rec).g(100, 'AcDbEntity').g(8, '0')
 							.g(100, 'AcDbCircle').g(10, '0.0').g(20, '0.0').g(30, '0.0').g(40, num(sh.circle));
 					} else {
@@ -264,7 +321,7 @@
 						.g(100, 'AcDbText').g(10, num(o.x)).g(20, num(o.y)).g(30, '0.0')
 						.g(40, num(th / S)).g(1, '')
 						.g(100, 'AcDbAttributeDefinition')
-						.g(3, str((model.prompts && model.prompts[tag]) || tag)).g(2, str(tag)).g(70, 1);
+						.g(3, str((model.prompts && (model.prompts[t + '.' + tag] || model.prompts[tag])) || tag)).g(2, str(tag)).g(70, 1);
 				});
 				blockEnd(br.end, br.rec);
 			});
@@ -275,7 +332,7 @@
 			var lay = layerName(l.type === 'pump' ? 'pump' : (l.type === 'valve' ? 'valve' : 'pipe'), pfx);
 			if (!l.pts || l.pts.length < 2) { return; }
 			lwpoly(l.pts, lay, false);
-			if (l.type === 'pump' || l.type === 'valve') {
+			if (l.type === 'pump' || l.type === 'valve' || l.type === 'pipe') {
 				var m = midAlong(l.pts);
 				insert(l.type, m.x, m.y, m.angle, l.attrs, lay);
 			}
@@ -353,7 +410,7 @@
 		w.g(2, '0').g(70, 0).g(62, 7).g(6, 'Continuous').g(370, -3).g(390, H.psnNormal);
 		LAYERS.forEach(function (L) {
 			rec('LAYER', H['layer:' + L.key], H.layerT, 'AcDbLayerTableRecord');
-			w.g(2, pfx + L.name).g(70, 0).g(62, L.color).g(6, 'Continuous');
+			w.g(2, tableName(pfx + L.name)).g(70, 0).g(62, L.color).g(6, 'Continuous');
 			if (L.noPlot) { w.g(290, 0); }
 			w.g(370, -3).g(390, H.psnNormal);
 		});
@@ -466,5 +523,7 @@
 	EngCalcs.lpnDxfInsUnits = function (u) { return INSUNITS[u] || 0; };
 	EngCalcs.lpnDxfMidAlong = midAlong;
 	EngCalcs.lpnDxfString = str;
+	EngCalcs.lpnDxfTooLong = tooLong;
+	EngCalcs.lpnDxfLimit = LIMIT_CHARS;
 	EngCalcs.lpnDxfBytes = bytes;
 }(typeof window !== 'undefined' ? window : globalThis));

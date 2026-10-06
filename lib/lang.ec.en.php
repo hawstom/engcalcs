@@ -2033,6 +2033,7 @@ $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET 
 // Task 772: File > Export DXF file. A drawing for AutoCAD and other CAD programs, never read back.
 $ec_lang['lpn_file_export_dxf']='Export DXF file…';
 $ec_lang['lpn_file_export_dxf_tip']='Download this network as a drawing that AutoCAD and other CAD programs open: one layer for each kind of asset, each node a block carrying its ID and main values, and the labels as they appear on the map.';
+$ec_lang['lpn_dxf_export_no_utm']='The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.';
 $ec_lang['lpn_dxf_export_refused']='The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.';
 // The read-me note written into the drawing itself, on a layer that does not plot. Each says what
 // the coordinates are and claims no coordinate system the file does not have. {unit} is a length
@@ -2040,7 +2041,10 @@ $ec_lang['lpn_dxf_export_refused']='The DXF file was not written: the coordinate
 $ec_lang['lpn_dxf_note_grid']='Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.';
 $ec_lang['lpn_dxf_note_crs']='Coordinates: {crs}, exactly as this project states them.';
 $ec_lang['lpn_dxf_note_geo']='Coordinates: converted from latitude and longitude to {crs}, in meters.';
-$ec_lang['lpn_dxf_note_scale']='Text and symbols are drawn at the size the map showed them when this file was exported.';
+// {h} and {w} are numbers (3 significant figures); {unit} is a length unit symbol.
+$ec_lang['lpn_dxf_note_scale']='Text and symbols are sized as the map draws them at Zoom to fit: text {h} {unit} high, on a network {w} {unit} across.';
+// {n} is a whole number; {max} is 2049. The ellipsis is the character the shortened value ends in.
+$ec_lang['lpn_dxf_note_shortened']='{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in “…”.';
 $ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network file.';
 // EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
 // the way out named here always works, so keep the instruction in the message rather than leaving
