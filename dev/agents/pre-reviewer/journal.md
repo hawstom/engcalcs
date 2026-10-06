@@ -3875,3 +3875,13 @@ OBSERVED real Chromium: branch's own harness passes. All 7 shipped examples: 0 w
 OBSERVED DEFECT: touch (hover none): tapping the glyph in the Properties box opens the tip AND focuses the Diameter input (label activation), the exact 2026-08-29 complaint; initTips only cancels this on `.ec-tip`, the glyph here is a bare `.ec-help`. Tables-pane tap also focuses a cell input.
 OBSERVED: Basic-example-SI-units opens with roughness unit ft (pre-existing); under D-W its tip reads ft in an SI project.
 SPECULATION: how the glyph looks (zero-width inset over the input end) not judged.
+
+## 2026-10-06 feat/asset-type, link half (tree 4c26066b)
+
+OBSERVED (real Chrome on a scratch copy with a test hook, this tree; re-verify before citing):
+- Change-type harness passes with all its mutations. Net1 and Net3 (geographic): every key that vanished from a pipe, pump or valve (and from every scenario override, incl. custom property, GPV curve, library pipe type, fittings list, valve setting override) appeared in the box; Cancel left the document identical; undo identical (only the id counters X/M differ after the FIRST undo in a session, node version too).
+- EPANET source: rules.c newpremise/newaction never check the PIPE/PUMP/VALVE word (true; but newaction turns a numeric setting on a pipe into open/closed and refuses one on a GPV). A curveless pump and a TCV solve in both engines, heads agree to 1e-4. Export writes a curveless pump as a 0.01 ft, 40 in pipe and it re-imports as a pipe.
+- MISSED (medium): pump -> pipe or valve gives the New assets diameter (4 in on Net1) in place of the pump's stored 18, plus roughness and k from defaults; only Length (pipe) or type and setting (valve) are listed under "new". Node 10 head fell 22 m, 18 m/s in a 4 in pipe.
+- MISSED (low): Recalculate off, pump -> pipe shows velocity 0.00 and head loss 204 ft / gradient 2043% invented from stale numbers.
+- Pipe with scenario type override -> valve: that scenario's diameter silently reverts to Base's.
+Method note: scratch copy served by php -S, injected EngCalcs.__t; playwright from ~/.npm/_npx; lock via flock.
