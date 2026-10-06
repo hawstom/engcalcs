@@ -120,12 +120,12 @@ research; his notes on Tasks 728, 768, 771, 772 in the roadmap. `feat/value-warn
 - **`feat/backdrop-attach`** (Task 282): his "only the .inp" was Chrome dropping a 2nd/3rd download
   from one click (reproduced). Export now saves ONE Name.zip (.inp + .bmp + .bpw); picture name is
   ASCII for EPANET. He then said the BMP/BPW did arrive late on the old build; CC recommended keeping
-  the zip and offered to revert. Ask: `lpn_file_export_inp_tip` does not mention the .zip.
+  the zip; he agreed ("Zip: I agree."). Ask: `lpn_file_export_inp_tip` does not mention the .zip.
 - **`feat/asset-type`** (Task 769): the key line "ID: Lost entry"; then CC read his "Proceed" as
   "build the links" (the branch had left Pipe/Pump/Valve unbuilt), NOT as an all-clear; links are
   built (TCV for a new valve; a curveless pump adds no head; customers stay on their node; rule words
   rewritten). Seam: bentley must walk `eachOverrideMap()` in four functions at its merge
-  (`dev/asset-type.md`). **Ask him whether "Proceed" meant merge.**
+  (`feat/asset-type:dev/asset-type.md`). **Ask him whether "Proceed" meant merge.**
 - **`feat/feedback`** (Task 768, REBUILT): his spec, no links, no contact page: "Something wrong
   here?" opens a little box (four canned toggles, optional comment and email, what-this-sends line);
   Send is click two; new endpoint `send-feedback.php`. **privacy.php sentence changed (public text).**
