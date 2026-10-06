@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**25 still to read on master**, of 135 untranslated keys, of 2361 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**28 still to read on master**, of 138 untranslated keys, of 2364 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (135, 25 to read @@ NEEDS RULING)
+## lpn_  (138, 28 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -282,11 +282,20 @@ never edits a synonym.
 - **`lpn_pane_clear_override`**
   > Clear override
   @@ NEEDS RULING
+- **`lpn_pane_copy_heads`**
+  > Copy with headings
+  @@ NEEDS RULING
 - **`lpn_pane_delete_element`**
   > Delete element
   @@ NEEDS RULING
 - **`lpn_pane_delete_elements`**
   > Delete elements
+  @@ NEEDS RULING
+- **`lpn_pane_export_csv`**
+  > Export table as CSV
+  @@ NEEDS RULING
+- **`lpn_pane_export_ods`**
+  > Export table as ODS
   @@ NEEDS RULING
 - **`lpn_pane_filter_sel_and`**
   > Filtered by {q} and selection only. Showing {n} of {all}.
@@ -485,7 +494,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**40 still to read**, of 43 new keys across 13 unmerged branch(es).
+**135 still to read**, of 138 new keys across 20 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -496,8 +505,17 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/asset-type (`c49cc214`) — 10 new, 10 to read @@ NEEDS RULING
+### feat/asset-type (`1b358f39`) — 16 new, 16 to read @@ NEEDS RULING
 
+- **`lpn_change_type_becomes`**
+  > {id}: {property} {value}, in scenario {scenario}, becomes {new}
+  @@ NEEDS RULING
+- **`lpn_change_type_born`**
+  > These are new, as on a newly drawn one:
+  @@ NEEDS RULING
+- **`lpn_change_type_customers`**
+  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:
+  @@ NEEDS RULING
 - **`lpn_change_type_key`**
   > ID: Lost entry
   @@ NEEDS RULING
@@ -519,17 +537,26 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_change_type_more`**
   > And {n} more.
   @@ NEEDS RULING
+- **`lpn_change_type_no_curve`**
+  > {id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe
+  @@ NEEDS RULING
 - **`lpn_change_type_ok`**
   > Change
+  @@ NEEDS RULING
+- **`lpn_change_type_rules`**
+  > These rule lines name a link by its kind, and will name its new kind instead:
+  @@ NEEDS RULING
+- **`lpn_change_type_setting`**
+  > These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:
   @@ NEEDS RULING
 - **`lpn_change_type_surface`**
   > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
   @@ NEEDS RULING
 - **`lpn_change_type_tip`**
-  > Change the selected nodes into junctions, reservoirs, or tanks. Each keeps its ID, its place, its pipes, and every value the new type also has. If anything would be lost, you are asked first.
+  > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.
   @@ NEEDS RULING
 
-### feat/backdrop-attach (`7f582c54`) — 5 new, 5 to read @@ NEEDS RULING
+### feat/backdrop-attach (`5ab01ee7`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_inp_backdrop_attach`**
   > Attach {file}…
@@ -543,11 +570,17 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_inp_backdrop_attached_other`**
   > Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.
   @@ NEEDS RULING
+- **`lpn_inp_export_difference_one`**
+  > One thing the .inp format cannot hold.
+  @@ NEEDS RULING
+- **`lpn_status_inp_exported_no_picture`**
+  > Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.
+  @@ NEEDS RULING
 - **`lpn_status_inp_exported_picture`**
-  > Exported {file}, the background picture {picture} and its world file {world}. Keep the three in one folder.
+  > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`d6f39266`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/bentley-interop (`f1038674`) — 52 new, 52 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -558,10 +591,187 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
   @@ NEEDS RULING
+- **`lpn_settings_held_base`**
+  > {base}: {value}
+  @@ NEEDS RULING
+- **`lpn_settings_restore_base_only`**
+  > Switch to Base to restore the defaults.
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap`**
+  > Basemap
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_last`**
+  > Basemap to return to
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_osm`**
+  > Street map
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_satellite`**
+  > Satellite images
+  @@ NEEDS RULING
+- **`lpn_settings_row_check_freq`**
+  > Status check frequency
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_buffer`**
+  > Contour buffer
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_fill`**
+  > Contour fill
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_interval`**
+  > Contour interval
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_labels`**
+  > Contour labels
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_opacity`**
+  > Contour fill opacity
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_terrain`**
+  > Contour ground between nodes from Mapbox DEM
+  @@ NEEDS RULING
+- **`lpn_settings_row_customer_max_width`**
+  > Show customer labels when zoomed to this map width or less
+  @@ NEEDS RULING
+- **`lpn_settings_row_default`**
+  > {value} (default)
+  @@ NEEDS RULING
+- **`lpn_settings_row_elev_source_old`**
+  > Elevation source (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_emitter_exponent_old`**
+  > Emitter exponent (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_after`**
+  > Text after
+  @@ NEEDS RULING
+- **`lpn_settings_row_label_before`**
+  > Text before
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_customer`**
+  > Customer labels
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_field`**
+  > {labels}: {field}
+  @@ NEEDS RULING
+- **`lpn_settings_row_labels_part`**
+  > {labels}: {field}, {part}
+  @@ NEEDS RULING
+- **`lpn_settings_row_max_check`**
+  > Maximum status checks
+  @@ NEEDS RULING
+- **`lpn_settings_row_minor_label_order`**
+  > Label order (rank and drop)
+  @@ NEEDS RULING
+- **`lpn_settings_row_new_asset`**
+  > New assets: {setting}
+  @@ NEEDS RULING
+- **`lpn_settings_row_of`**
+  > {setting}, {member}
+  @@ NEEDS RULING
+- **`lpn_settings_row_pda_src`**
+  > Pressure driven options stated in the file
+  @@ NEEDS RULING
+- **`lpn_settings_row_quality_option`**
+  > Quality option as the file states it
+  @@ NEEDS RULING
+- **`lpn_settings_row_quality_step`**
+  > Quality time step
+  @@ NEEDS RULING
+- **`lpn_settings_row_status_report`**
+  > Status report
+  @@ NEEDS RULING
+- **`lpn_settings_row_symbol_cap_multiple`**
+  > Largest symbol, as a multiple of a typical pipe length
+  @@ NEEDS RULING
+- **`lpn_settings_row_symbol_cap_percentile`**
+  > Typical pipe length, as a percentile of all pipe lengths
+  @@ NEEDS RULING
+- **`lpn_settings_row_tolerance`**
+  > Accuracy (older projects)
+  @@ NEEDS RULING
+- **`lpn_settings_row_view`**
+  > Map view (center and scale)
+  @@ NEEDS RULING
+- **`lpn_settings_row_view_value`**
+  > Center {x}, {y}; scale {s}
+  @@ NEEDS RULING
+- **`lpn_settings_table_category`**
+  > Category
+  @@ NEEDS RULING
+- **`lpn_settings_table_major`**
+  > Major heading
+  @@ NEEDS RULING
+- **`lpn_settings_table_minor`**
+  > Minor heading
+  @@ NEEDS RULING
+- **`lpn_settings_table_no`**
+  > No
+  @@ NEEDS RULING
+- **`lpn_settings_table_setting`**
+  > Setting
+  @@ NEEDS RULING
+- **`lpn_settings_table_yes`**
+  > Yes
+  @@ NEEDS RULING
+- **`lpn_settings_units_one_project`**
+  > Units are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_settings_view_bottom_right`**
+  > Bottom right corner
+  @@ NEEDS RULING
+- **`lpn_settings_view_center`**
+  > Map center
+  @@ NEEDS RULING
+- **`lpn_settings_view_hold`**
+  > Hold this view in this scenario
+  @@ NEEDS RULING
+- **`lpn_settings_view_hold_tip`**
+  > Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.
+  @@ NEEDS RULING
+- **`lpn_settings_view_scale`**
+  > Map scale
+  @@ NEEDS RULING
+- **`lpn_settings_view_scale_tip`**
+  > The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.
+  @@ NEEDS RULING
+- **`lpn_settings_view_top_left`**
+  > Top left corner
+  @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/feedback (`c4cb8389`) — 13 new, 13 to read @@ NEEDS RULING
+### feat/dxf (`f643a2ac`) — 9 new, 9 to read @@ NEEDS RULING
+
+- **`lpn_dxf_export_no_utm`**
+  > The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.
+  @@ NEEDS RULING
+- **`lpn_dxf_export_refused`**
+  > The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_crs`**
+  > Coordinates: {crs}, exactly as this project states them.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_geo`**
+  > Coordinates: converted from latitude and longitude to {crs}, in meters.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_grid`**
+  > Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_scale`**
+  > Text and symbols are sized as the map draws them at Zoom to fit: text {h} high, on a network {w} across.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_shortened`**
+  > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in “…”.
+  @@ NEEDS RULING
+- **`lpn_file_export_dxf`**
+  > Export DXF file…
+  @@ NEEDS RULING
+- **`lpn_file_export_dxf_tip`**
+  > Download this network as a drawing that AutoCAD and other CAD programs open: one layer for each kind of asset, each node a block carrying its ID and main values, and the labels as they appear on the map.
+  @@ NEEDS RULING
+
+### feat/feedback (`1be9dba0`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_fb_bad_email`**
   > That email address does not look right. Correct it, or leave it empty.
@@ -601,6 +811,33 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_fb_sends`**
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
+  @@ NEEDS RULING
+
+### feat/geojson (`ea4af950`) — 8 new, 8 to read @@ NEEDS RULING
+
+- **`lpn_file_export_geojson`**
+  > Export GeoJSON file…
+  @@ NEEDS RULING
+- **`lpn_file_export_geojson_tip`**
+  > Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.
+  @@ NEEDS RULING
+- **`lpn_geojson_refused_crs`**
+  > The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.
+  @@ NEEDS RULING
+- **`lpn_geojson_refused_empty`**
+  > There is nothing to export yet. Draw or open a network first.
+  @@ NEEDS RULING
+- **`lpn_geojson_refused_local`**
+  > A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.
+  @@ NEEDS RULING
+- **`lpn_geojson_refused_range`**
+  > These positions are not valid latitudes and longitudes: {detail}
+  @@ NEEDS RULING
+- **`lpn_geojson_results_in`**
+  > The results on screen are included.
+  @@ NEEDS RULING
+- **`lpn_geojson_results_out`**
+  > No results are included, because the network is not solved.
   @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
@@ -655,4 +892,78 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
   @@ NEEDS RULING
 
-### feat/tip-door (`19f79bc1`) — adds no English strings
+### feat/section-grid (`1a04428f`) — adds no English strings
+
+### feat/survey-code (`087e6868`) — 21 new, 21 to read @@ NEEDS RULING
+
+- **`lpn_survey_codes_add`**
+  > Add code
+  @@ NEEDS RULING
+- **`lpn_survey_codes_col_code`**
+  > Code
+  @@ NEEDS RULING
+- **`lpn_survey_codes_col_type`**
+  > Asset type
+  @@ NEEDS RULING
+- **`lpn_survey_codes_remove`**
+  > Remove code
+  @@ NEEDS RULING
+- **`lpn_survey_codes_tip`**
+  > Read the first word of each description as a code from the table. Points with the same line code join into one pipe in file order, and WL1 and WL2 are separate lines. +0 starts a line, -0 ends one, and CLO closes one. JPN followed by a point name joins to that point (Carlson), and Civil 3D writes it CPN.
+  @@ NEEDS RULING
+- **`lpn_survey_codes_toggle`**
+  > Read the description as field codes
+  @@ NEEDS RULING
+- **`lpn_survey_confirm_coded`**
+  > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) found. Proceed?
+  @@ NEEDS RULING
+- **`lpn_survey_note_code_two_nodes`**
+  > More than one node code, the first was used.
+  @@ NEEDS RULING
+- **`lpn_survey_note_code_unknown`**
+  > Code not in the code table, imported as the asset type chosen above.
+  @@ NEEDS RULING
+- **`lpn_survey_note_code_unread`**
+  > Not every word is a code this page reads, kept in the description.
+  @@ NEEDS RULING
+- **`lpn_survey_note_join_missing`**
+  > JPN or CPN names a point not in this file or project, no pipe drawn for it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_join_no_line`**
+  > JPN or CPN on a point with no line code, no pipe drawn for it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_line_one_point`**
+  > Only point on its line, no pipe drawn from it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_no_desc`**
+  > Field codes are on, but this file has no description column, so no codes were read.
+  @@ NEEDS RULING
+- **`lpn_survey_note_node_on_pipe`**
+  > This point lies exactly on a pipe it is not joined to. If they connect, add JPN to say so.
+  @@ NEEDS RULING
+- **`lpn_survey_note_pipe_one_node`**
+  > This line returns to the same node with no other node between, no pipe drawn for it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_pipe_zero_length`**
+  > This point is at the same spot as the node before it, so the pipe between them has no length.
+  @@ NEEDS RULING
+- **`lpn_survey_note_ring_junction`**
+  > This point became a junction so the ring could close.
+  @@ NEEDS RULING
+- **`lpn_survey_note_vertex_text`**
+  > Not every word is a code this page reads, and a vertex keeps no description.
+  @@ NEEDS RULING
+- **`lpn_survey_note_vertices`**
+  > Points that became pipe vertices: {detail}. A vertex keeps no name, elevation, or description.
+  @@ NEEDS RULING
+- **`lpn_survey_report_coded`**
+  > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.
+  @@ NEEDS RULING
+
+### feat/table-export (`37823295`) — adds no English strings
+
+### feat/tip-door (`2a64dbe5`) — adds no English strings
+
+### fix/convert-as (`f9d1fc1c`) — adds no English strings
+
+### fix/lpn-description (`4f7f1a5a`) — adds no English strings

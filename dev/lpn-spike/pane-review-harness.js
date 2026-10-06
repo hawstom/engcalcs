@@ -369,7 +369,7 @@ console.log('\n--- right-click menu: Copy, Paste, Select in map, Delete ---');
 	// Paste as new rows at end of table (Task 610) sits after Paste on a table that can create rows.
 	// Tom, 2026-09-28: Select on map / Unselect on map join it, each offered only when it would do
 	// something. Nothing is selected yet, so this cell's menu has Select on map and not Unselect.
-	// Task 776 adds Copy with headings after Copy, and Export table as CSV and as ODS after Print.
+	// Tom, 2026-10-06: adds Copy with headings after Copy, and Export table as CSV and as ODS after Print.
 	report(labels.length === 11, 'exactly eleven rows', labels.join(' | '));
 	report(labels[0] === (PC.points_data_copy || 'Copy'), 'Copy is the row-table grid’s own word', labels[0]);
 	report(labels[1] === PC.lpn_pane_copy_heads, 'Copy with headings follows Copy', labels[1]);

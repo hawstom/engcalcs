@@ -3825,7 +3825,7 @@ EngCalcs.pageConfig = {
       // looped-network.js for the same reason; absent, the Run button does nothing. ?>
 <script src="/engcalcs/js/lpn-criticality.js?v=<?=filemtime(__DIR__.'/js/lpn-criticality.js')?>"></script>
 <script src="/engcalcs/js/lpn-demandscale.js?v=<?=filemtime(__DIR__.'/js/lpn-demandscale.js')?>"></script>
-<?php // A table as TSV, CSV or ODS (Task 776). Pure, no DOM; BEFORE looped-network.js, whose Tables
+<?php // A table as TSV, CSV or ODS (Tom, 2026-10-06). Pure, no DOM; BEFORE looped-network.js, whose Tables
       // pane menu calls EngCalcs.lpnTableCsv() and lpnTableOds(). ?>
 <script src="/engcalcs/js/lpn-tablefile.js?v=<?=filemtime(__DIR__.'/js/lpn-tablefile.js')?>"></script>
 <?php // Reading a surveyed point list from a text file (ROADMAP Task 592). Pure parsing and column

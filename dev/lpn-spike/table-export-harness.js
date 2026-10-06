@@ -1,4 +1,4 @@
-// Copy with headings, and Export to CSV and ODS, on the Tables pane (ROADMAP Task 776). Run with:
+// Copy with headings, and Export to CSV and ODS, on the Tables pane (Tom, 2026-10-06). Run with:
 //   node dev/lpn-spike/table-export-harness.js
 //
 // Tom, 2026-10-06: *"When copying from a Table, it would be nice to be able to copy the headings
@@ -149,7 +149,7 @@ function parseCsv(text) {
 	// The stub fills an <input>'s value only for typed cells: a computed result, a yes/no and a
 	// pull-down read blank here, where a browser shows 150, a tick and the option's label. Those
 	// four columns are held to what the screen shows by name instead.
-	const SHOWN_BLANK = { 'Part of this network': /^[01]$/, 'Demand (gpm)': /^-?[\d.]+$/, 'Source type': /^None$/, 'Source pattern': /^No pattern$/ };
+	const SHOWN_BLANK = { [PC.lpn_field_active]: /^[01]$/, 'Demand (gpm)': /^-?[\d.]+$/, 'Source type': /^None$/, 'Source pattern': /^No pattern$/ };
 	const diffs = [];
 	parsed.slice(1).forEach((r, i) => r.forEach((t, j) => {
 		if (t === live[i][j]) { return; }

@@ -1507,7 +1507,7 @@ $ec_lang_syn['lpn_goto_on_map']='Bring this into view on the map, Zoom to this o
 $ec_lang['lpn_pane_select_on_map']='Select on map';
 $ec_lang['lpn_pane_unselect_on_map']='Unselect on map';
 $ec_lang['lpn_pane_print']='Print table';
-// Task 776. Copy with headings puts the heading line, unit included, above the selected cells; plain
+// Tom, 2026-10-06. Copy with headings puts the heading line, unit included, above the selected cells; plain
 // Copy never does. The two Export rows download the whole table as shown.
 $ec_lang['lpn_pane_copy_heads']='Copy with headings';
 $ec_lang['lpn_pane_export_csv']='Export table as CSV';

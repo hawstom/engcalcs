@@ -26663,7 +26663,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function paneCopyTsv(spec, rows, cols, box, withHeads) {
 		var out = [], r, c, line;
-		// **HEADINGS ONLY WHEN ASKED FOR, BY NAME** (Task 776, Tom, 2026-10-06: *"it would be nice
+		// **HEADINGS ONLY WHEN ASKED FOR, BY NAME** (Tom, 2026-10-06: *"it would be nice
 		// to be able to copy the headings somehow"*). Ctrl+C and Copy stay as R-310 left them, so a
 		// range copied and pasted back lands on values, never on a heading row; "Copy with
 		// headings" on the right-click menu is the one door, and the heading is the one the table
@@ -28623,7 +28623,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		// **PRINT TABLE, THE ONLY DOOR TO IT** (Tom, 2026-10-04: the button left the pane head).
 		mk(pc.lpn_pane_print || 'Print table', function () { printPaneTable(spec); });
-		// **EXPORT THE TABLE, NEXT TO PRINT IT** (Task 776). The whole table as it is shown: its
+		// **EXPORT THE TABLE, NEXT TO PRINT IT** (Tom, 2026-10-06). The whole table as it is shown: its
 		// visible columns, its sort, its filter. One file per click.
 		mk(pc.lpn_pane_export_csv || 'Export table as CSV', function () { paneExportTable(spec, 'csv'); });
 		mk(pc.lpn_pane_export_ods || 'Export table as ODS', function () { paneExportTable(spec, 'ods'); });
@@ -29104,7 +29104,7 @@ var EngCalcs = EngCalcs || {};
 	function paneSanitizeFileName(s) {
 		return String(s || '').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
 	}
-	// **THE TABLE AS A FILE** (Task 776). Cells read through paneCellDisplayText(), the same reader
+	// **THE TABLE AS A FILE** (Tom, 2026-10-06). Cells read through paneCellDisplayText(), the same reader
 	// the printed sheet uses, so a file says what the screen says -- a choice column its label, a
 	// result its two decimals. A column is numeric to a spreadsheet only when it is a number column
 	// (no text, choice or yes/no flag) and not the ID.
