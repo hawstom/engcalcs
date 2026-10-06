@@ -26372,10 +26372,11 @@ var EngCalcs = EngCalcs || {};
 	var LPN_SETTAB_LABEL_PARTS = { decimals: 'lpn_labels_col_decimals', show: 'lpn_labels_col_rank',
 		priority: 'lpn_labels_col_drop', useUnits: 'lpn_labels_use_units',
 		prefix: 'lpn_settings_row_label_before', suffix: 'lpn_settings_row_label_after' };
+	// Each token by name, so the placeholder check can see what substitutes it.
 	function settingTableFill(tpl, map) {
-		var out = String(tpl);
-		Object.keys(map).forEach(function (k) { out = out.split('{' + k + '}').join(map[k]); });
-		return out;
+		function v(k) { return map[k] === undefined ? '' : String(map[k]); }
+		return String(tpl).split('{setting}').join(v('setting')).split('{member}').join(v('member'))
+			.split('{labels}').join(v('labels')).split('{field}').join(v('field')).split('{part}').join(v('part'));
 	}
 	// A field a label or a colour shows, in the words the Labels box uses; a quality field held per
 	// analysis (`quality:trace`) names its analysis too.
