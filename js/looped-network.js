@@ -34925,7 +34925,7 @@ var EngCalcs = EngCalcs || {};
 				done({
 					ok: true, kind: 'geo', code: code, insunits: 6, measurement: 1, unitLabel: pc.u_m || 'm',
 					fwd: function (X, Y) { return EngCalcs.lpnCrsForward(code, { lon: X, lat: Y }); },
-					note: (pc.lpn_dxf_note_geo || 'Coordinates: converted from latitude and longitude to {crs}, in meters.')
+					note: (pc.lpn_dxf_note_geo || 'Coordinates: {crs}, in meters, not latitude and longitude. The project’s latitudes and longitudes were converted to that grid.')
 						.replace('{crs}', dxfCrsName(code))
 				});
 			});
@@ -35073,7 +35073,9 @@ var EngCalcs = EngCalcs || {};
 	function dxfLettering(G) {
 		var texts = [], lines = [];
 		function toOut(x, y) { return dxfDrawnToFile(G, x, y); }
-		(labelsLayer && labelsLayer.children ? labelsLayer.children : []).forEach(function (e) {
+		// A real SVG element's `children` is an HTMLCollection, which has no forEach (Tom,
+		// 2026-10-06: "No downloads." -- the DOM stub's Array hid it); copied to an Array first.
+		Array.prototype.slice.call(labelsLayer && labelsLayer.children ? labelsLayer.children : []).forEach(function (e) {
 			var tag = String(e._tag || e.tagName || e.nodeName || '').toLowerCase();
 			if (tag === 'line') {
 				var cls = String(e.getAttribute('class') || '');
@@ -35206,7 +35208,11 @@ var EngCalcs = EngCalcs || {};
 		function three(v) { return isFinite(v) ? String(+v.toPrecision(3)) : '?'; }
 		var notes = [projectDisplayName(project), frame.note,
 			(pc.lpn_dxf_note_scale || 'Text and symbols are sized as the map draws them at Zoom to fit: text {h} high, on a network {w} across.')
-				.replace('{h}', three(textHeight) + ' ' + (frame.unitLabel || '')).replace('{w}', three(across) + ' ' + (frame.unitLabel || ''))];
+				.replace('{h}', three(textHeight) + ' ' + (frame.unitLabel || '')).replace('{w}', three(across) + ' ' + (frame.unitLabel || '')),
+			// **ATTRIBUTES ARE 1 HIGH IN THE BLOCK, AND THE INSERT SCALE IS THE TEXT HEIGHT** (Tom,
+			// 2026-10-06), so scaling a block's insertion is how a CAD user sets their height.
+			(pc.lpn_dxf_note_blocks || 'Block attributes are 1 unit high in each block definition. Every block is inserted at scale {s}, so its attributes are {s} {unit} high; change the insertion scale to change that.')
+				.replace(/\{s\}/g, three(textHeight)).replace('{unit}', frame.unitLabel || '')];
 		// **A VALUE TOO LONG FOR ONE DXF STRING IS SHORTENED, AND THE DRAWING SAYS SO** -- the writer
 		// cuts it and ends it in an ellipsis (js/lpn-dxf.js, LIMIT_CHARS).
 		var longOnes = 0;
@@ -35277,6 +35283,18 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();   // export what is on screen, including edits not yet saved
 		flushLabelRefresh();   // the lettering as the map will show it, not a pass still owed
 		dxfFrame(function (frame) {
+			// **A FAILURE SAYS SO.** On a lat/lon project this runs inside the coordinate loader's
+			// promise, which swallows a throw; uncaught, the click did nothing at all (2026-10-06).
+			try { dxfExportFinish(frame); } catch (err) {
+				if (window.console && console.error) { console.error(err); }
+				setNotice((pcX.lpn_dxf_export_failed || 'The DXF file was not written: an error in this page stopped it ({error}).')
+					.replace('{error}', String(err && err.message ? err.message : err)));
+			}
+		});
+	}
+	function dxfExportFinish(frame) {
+		var pcX = EngCalcs.pageConfig || {};
+		(function () {
 			var out = dxfExportText(frame);
 			if (!out.ok) {
 				setNotice(out.reason === 'utm'
@@ -35294,9 +35312,14 @@ var EngCalcs = EngCalcs || {};
 			a.click();
 			document.body.removeChild(a);
 			setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
-			// Exporting is not saving, for the reason exportInpFile() gives.
-			setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download));
-		});
+			// Exporting is not saving, for the reason exportInpFile() gives. A lat/lon project's
+			// drawing is in UTM metres, and the status line says so, since a reader expecting the
+			// project's degrees would otherwise look for them (Tom, 2026-10-06).
+			setNotice(frame.kind === 'geo'
+				? (pcX.lpn_dxf_exported_geo || 'Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.')
+					.replace('{file}', a.download).replace('{crs}', dxfCrsName(frame.code))
+				: (pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download));
+		}());
 	}
 	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being

@@ -52,6 +52,27 @@
 		{ key: 'text', name: 'C-WATR-TEXT', color: 7 },
 		{ key: 'note', name: 'C-WATR-RDME', color: 8, noPlot: true }
 	];
+	// **ONE LAYER PER ATTRIBUTE PROPERTY** (Tom, 2026-10-06: *"we could make a layer for every
+	// property to give the user control of freezing and plotting via No plot"*). An ATTRIB is an
+	// entity in its own right and carries its own layer (group 8, the DXF Reference's common entity
+	// codes, which ATTRIB shares with every graphical entity); AutoCAD and BricsCAD hide an attribute
+	// whose layer is frozen even when its block's layer is thawed, and honour that layer's No plot.
+	// The ATTDEF in the block sits on the same layer, so ATTSYNC, which resets an attribute's
+	// properties to its definition's, keeps it there. C-WATR-ATTR-* freezes them all at once.
+	// NCS form: Discipline-Major-Minor-Minor, four characters a field. ATTR is user-defined (as
+	// RSVR and CUST are); IDEN is the Guidelines' own annotation code, "identification tags".
+	var ATTR_LAYER = {
+		ID: 'IDEN', ELEV: 'ELEV', DEMAND: 'DMND', HEAD: 'HEAD', LEVEL: 'LEVL', MINLEVEL: 'LMIN',
+		MAXLEVEL: 'LMAX', DIAMETER: 'DIAM', LENGTH: 'LENG', ROUGHNESS: 'ROUG', FLOW: 'FLOW',
+		VELOCITY: 'VELO', VALVETYPE: 'VTYP', SETTING: 'SETG', COUNT: 'QNTY', TAG: 'TAGS', DESC: 'DESC'
+	};
+	// The ID is the one VISIBLE attribute (Tom, 2026-10-06, asked whether it should be invisible:
+	// *"No."*); every other one is invisible until ATTDISP ON.
+	var VISIBLE_TAG = 'ID';
+	function attrLayerCode(tag) {
+		return ATTR_LAYER[tag] || (String(tag).toUpperCase().replace(/[^A-Z0-9]/g, '') + 'XXXX').slice(0, 4);
+	}
+	function attrLayerName(tag, prefix) { return tableName((prefix || '') + 'C-WATR-ATTR-' + attrLayerCode(tag)); }
 	var BLOCK_OF = {
 		junction: 'WATR_JUNCTION', reservoir: 'WATR_RESERVOIR', tank: 'WATR_TANK',
 		pipe: 'WATR_PIPE', pump: 'WATR_PUMP', valve: 'WATR_VALVE', customer: 'WATR_CUSTOMER'
@@ -196,7 +217,13 @@
 	 */
 	function writeDxf(model) {
 		var w = new Writer(), pfx = model.layerPrefix || '', S = +model.symbol || 1,
-			th = +model.textHeight || S, ext = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity },
+			th = +model.textHeight || S,
+			// **ONE BLOCK UNIT IS ONE TEXT HEIGHT** (Tom, 2026-10-06: *"the height of every attribute
+			// should be 1 so that the user or we can scale the block insertion to the desired scale and
+			// text height"*). Every ATTDEF is 1.0 high, every INSERT is scaled by the text height `B`,
+			// and the symbol's outline is drawn `Q` block units across so it still lands one map
+			// symbol wide.
+			B = th, Q = S / th, ext = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity },
 			H = {}, blockRec = {}, blockTypes = [], i;
 		function grow(x, y) {
 			if (!isFinite(x) || !isFinite(y)) { return; }
@@ -222,6 +249,16 @@
 			if (t === 'customer' && !(model.customers || []).length) { return; }
 			blockTypes.push(t);
 			blockRec[t] = { rec: w.handle(), begin: w.handle(), end: w.handle() };
+		});
+		// The property layers the blocks in this file use, in the order their tags first appear.
+		var attrLayers = [];
+		blockTypes.forEach(function (t) {
+			((model.tags && model.tags[t]) || []).forEach(function (tag) {
+				var name = attrLayerName(tag, pfx);
+				if (H['alayer:' + name]) { return; }
+				H['alayer:' + name] = w.handle();
+				attrLayers.push({ name: name, color: tag === VISIBLE_TAG ? 7 : 9 });
+			});
 		});
 
 		var body = new Writer();
@@ -254,11 +291,12 @@
 			body.g(100, 'AcDbText');
 			if (va) { body.g(73, va); }
 		}
-		// An attribute's place in the block: stacked to the right of the symbol, one text height
-		// apart, so ATTDISP ON shows a readable column rather than every value on one point.
+		// An attribute's place in the block, in block units (text heights): stacked to the right of
+		// the symbol, 1.5 apart, so ATTDISP ON shows a readable column rather than every value on
+		// one point.
 		function attrOffset(k, type) {
 			var r = type === 'tank' ? 1.5 : (type === 'reservoir' ? 1.4 : (type === 'pump' || type === 'valve' ? 1 : (type === 'pipe' ? 0.25 : 0.5)));
-			return { x: r + 0.25, y: -k * 1.5 * th / S };
+			return { x: (r + 0.25) * Q, y: -k * 1.5 };
 		}
 		function insert(type, x, y, rot, attrs, layer) {
 			var tags = (model.tags && model.tags[type]) || [], ins, values = {}, c, s, k;
@@ -267,20 +305,21 @@
 			body.g(100, 'AcDbBlockReference');
 			if (tags.length) { body.g(66, 1); }
 			body.g(2, BLOCK_OF[type]).g(10, num(x)).g(20, num(y)).g(30, '0.0')
-				.g(41, num(S)).g(42, num(S)).g(43, num(S));
+				.g(41, num(B)).g(42, num(B)).g(43, num(B));
 			if (rot) { body.g(50, num(rot)); }
 			if (!tags.length) { return; }
 			c = Math.cos((rot || 0) * Math.PI / 180); s = Math.sin((rot || 0) * Math.PI / 180);
 			for (k = 0; k < tags.length; k++) {
-				var o = attrOffset(k, type), ax = x + S * (o.x * c - o.y * s), ay = y + S * (o.x * s + o.y * c),
+				var o = attrOffset(k, type), ax = x + B * (o.x * c - o.y * s), ay = y + B * (o.x * s + o.y * c),
 					v = values[tags[k]];
-				entity('ATTRIB', layer, ins);
-				body.g(100, 'AcDbText').g(10, num(ax)).g(20, num(ay)).g(30, '0.0').g(40, num(th))
+				// An ATTRIB is stored in the drawing's own coordinates, already through the INSERT:
+				// 1.0 in the block times the scale B is B high here.
+				entity('ATTRIB', attrLayerName(tags[k], pfx), ins);
+				body.g(100, 'AcDbText').g(10, num(ax)).g(20, num(ay)).g(30, '0.0').g(40, num(B))
 					.g(1, str(v === undefined || v === null ? '' : v));
 				if (rot) { body.g(50, num(rot)); }
-				// Flag 1 = invisible: the map's own lettering is the visible annotation (dev/dxf.md),
-				// so a visible attribute would print every ID twice. ATTDISP ON shows them all.
-				body.g(100, 'AcDbAttribute').g(2, str(tags[k])).g(70, 1);
+				// Flag 1 = invisible, for every attribute but the ID.
+				body.g(100, 'AcDbAttribute').g(2, str(tags[k])).g(70, tags[k] === VISIBLE_TAG ? 0 : 1);
 			}
 			var seq = body.handle();
 			body.g(0, 'SEQEND').g(5, seq).g(330, ins).g(100, 'AcDbEntity').g(8, layer);
@@ -308,20 +347,21 @@
 							.g(100, 'AcDbPoint').g(10, '0.0').g(20, '0.0').g(30, '0.0');
 					} else if (sh.circle) {
 						w.g(0, 'CIRCLE').g(5, hh).g(330, br.rec).g(100, 'AcDbEntity').g(8, '0')
-							.g(100, 'AcDbCircle').g(10, '0.0').g(20, '0.0').g(30, '0.0').g(40, num(sh.circle));
+							.g(100, 'AcDbCircle').g(10, '0.0').g(20, '0.0').g(30, '0.0').g(40, num(sh.circle * Q));
 					} else {
 						w.g(0, 'LWPOLYLINE').g(5, hh).g(330, br.rec).g(100, 'AcDbEntity').g(8, '0')
 							.g(100, 'AcDbPolyline').g(90, sh.poly.length).g(70, sh.closed ? 1 : 0);
-						sh.poly.forEach(function (p) { w.g(10, num(p[0])).g(20, num(p[1])); });
+						sh.poly.forEach(function (p) { w.g(10, num(p[0] * Q)).g(20, num(p[1] * Q)); });
 					}
 				});
 				tags.forEach(function (tag, k) {
 					var o = attrOffset(k, t), hh = w.handle();
-					w.g(0, 'ATTDEF').g(5, hh).g(330, br.rec).g(100, 'AcDbEntity').g(8, '0')
+					w.g(0, 'ATTDEF').g(5, hh).g(330, br.rec).g(100, 'AcDbEntity').g(8, attrLayerName(tag, pfx))
 						.g(100, 'AcDbText').g(10, num(o.x)).g(20, num(o.y)).g(30, '0.0')
-						.g(40, num(th / S)).g(1, '')
+						.g(40, '1.0').g(1, '')
 						.g(100, 'AcDbAttributeDefinition')
-						.g(3, str((model.prompts && (model.prompts[t + '.' + tag] || model.prompts[tag])) || tag)).g(2, str(tag)).g(70, 1);
+						.g(3, str((model.prompts && (model.prompts[t + '.' + tag] || model.prompts[tag])) || tag)).g(2, str(tag))
+						.g(70, tag === VISIBLE_TAG ? 0 : 1);
 				});
 				blockEnd(br.end, br.rec);
 			});
@@ -405,7 +445,7 @@
 				w.g(2, lt[1]).g(70, 0).g(3, lt[2]).g(72, 65).g(73, 0).g(40, '0.0');
 			});
 		w.g(0, 'ENDTAB');
-		table('LAYER', H.layerT, LAYERS.length + 1);
+		table('LAYER', H.layerT, LAYERS.length + attrLayers.length + 1);
 		rec('LAYER', H.layer0, H.layerT, 'AcDbLayerTableRecord');
 		w.g(2, '0').g(70, 0).g(62, 7).g(6, 'Continuous').g(370, -3).g(390, H.psnNormal);
 		LAYERS.forEach(function (L) {
@@ -414,13 +454,21 @@
 			if (L.noPlot) { w.g(290, 0); }
 			w.g(370, -3).g(390, H.psnNormal);
 		});
+		attrLayers.forEach(function (L) {
+			rec('LAYER', H['alayer:' + L.name], H.layerT, 'AcDbLayerTableRecord');
+			w.g(2, L.name).g(70, 0).g(62, L.color).g(6, 'Continuous').g(370, -3).g(390, H.psnNormal);
+		});
 		w.g(0, 'ENDTAB');
-		// Arial, because a TrueType font is what a reader on any system substitutes cleanly, and
-		// the text heights below are worked out from Arial's cap height (dev/dxf.md).
+		// **STYLE Standard, AND NO FONT FILE NAMED** (Tom, 2026-10-06, asked arial.ttf or txt.shx:
+		// *"Neither. Use 'Standard' style."*). Every TEXT, ATTDEF and ATTRIB leaves group 7 out,
+		// which the DXF Reference defaults to STANDARD. The record keeps the fields the Reference
+		// gives a STYLE (2 name, 70 flags, 40 fixed height 0 = not fixed, 41 width factor, 50
+		// oblique angle, 71 generation flags, 42 last height used, 3 primary font file, 4 big-font
+		// file) with 3 and 4 empty, so the opening program shows Standard in its own default font.
 		table('STYLE', H.styleT, 1);
 		rec('STYLE', H.style, H.styleT, 'AcDbTextStyleTableRecord');
 		w.g(2, 'Standard').g(70, 0).g(40, '0.0').g(41, '1.0').g(50, '0.0').g(71, 0)
-			.g(42, num(th)).g(3, 'arial.ttf').g(4, '').g(0, 'ENDTAB');
+			.g(42, num(th)).g(3, '').g(4, '').g(0, 'ENDTAB');
 		table('VIEW', H.viewT, 0); w.g(0, 'ENDTAB');
 		table('UCS', H.ucsT, 0); w.g(0, 'ENDTAB');
 		table('APPID', H.appidT, 1);
@@ -520,6 +568,7 @@
 		return LAYERS.map(function (L) { return { key: L.key, name: (prefix || '') + L.name, color: L.color }; });
 	};
 	EngCalcs.lpnDxfBlocks = BLOCK_OF;
+	EngCalcs.lpnDxfAttrLayer = attrLayerName;
 	EngCalcs.lpnDxfInsUnits = function (u) { return INSUNITS[u] || 0; };
 	EngCalcs.lpnDxfMidAlong = midAlong;
 	EngCalcs.lpnDxfString = str;

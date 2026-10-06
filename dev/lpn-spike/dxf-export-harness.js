@@ -236,7 +236,7 @@ async function main() {
 		Object.keys(want).forEach(t => {
 			if (ins.attribs[t] !== numStr(want[t])) { attrBad.push(n.id + '.' + t + '=' + ins.attribs[t] + ' want ' + want[t]); }
 		});
-		if (!ins.attribEnts.every(a => g(a, 70) === '1')) { attrBad.push(n.id + ' has a visible attribute'); }
+		if (!ins.attribEnts.every(a => g(a, 70) === (g(a, 2) === 'ID' ? '0' : '1'))) { attrBad.push(n.id + ': only the ID attribute may be visible'); }
 	});
 	ok('Net1: every node attribute equals the model', attrBad.length === 0, attrBad.slice(0, 5).join('; '));
 	ok('Net1: every node lands on the file\'s own coordinates, exactly', coordBad.length === 0, coordBad.slice(0, 3).join('; '));
@@ -282,7 +282,7 @@ async function main() {
 			if (ins.attribs[t] !== numStr(v)) { pipeBad.push(l.id + '.' + t + '=' + ins.attribs[t] + ' want ' + v); }
 		});
 		if (!('FLOW' in ins.attribs) || !('VELOCITY' in ins.attribs)) { pipeBad.push(l.id + ' lacks FLOW/VELOCITY'); }
-		if (!ins.attribEnts.every(a => g(a, 70) === '1')) { pipeBad.push(l.id + ' has a visible attribute'); }
+		if (!ins.attribEnts.every(a => g(a, 70) === (g(a, 2) === 'ID' ? '0' : '1'))) { pipeBad.push(l.id + ': only the ID attribute may be visible'); }
 	});
 	ok('Net1: every pipe block\'s diameter, length and roughness equal the model', pipeBad.length === 0, pipeBad.slice(0, 4).join('; '));
 	ezdxfAudit(path.join(tmp, 'Net1.dxf'), 'Net1');

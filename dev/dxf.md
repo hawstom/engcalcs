@@ -36,7 +36,17 @@ Mary's journal, 2026-10-06 section B.
   still follow the map window's size and the text and symbol sizes in Settings, as Zoom to fit does.
 - **Text height** = the text size at that scale × 0.716 (Arial's cap height per em, OS/2
   sCapHeight 1467/2048), because a CAD text height is a cap height and an SVG font size is an em.
-  Style Standard uses `arial.ttf`. **Symbol size** = the junction symbol at that scale.
+  **Symbol size** = the junction symbol at that scale.
+- **Text style Standard, naming no font file** (Tom, 2026-10-06: *"Neither. Use 'Standard'
+  style."*, asked arial.ttf or txt.shx). The STYLE record keeps the Reference's fields with 3
+  (primary font file) and 4 (big font) empty; no entity names a style (group 7 defaults to
+  STANDARD), so the opening program draws Standard in its own default font.
+- **Attribute height 1, INSERT scale = text height** (Tom, 2026-10-06: *"the height of every
+  attribute should be 1 so that the user or we can scale the block insertion to the desired scale
+  and text height"*). One block unit is one text height: every ATTDEF is 1.0 high, every INSERT is
+  scaled by the text height, and the symbol outline is drawn symbol ÷ text-height block units
+  across, so it still lands one map symbol wide. Each ATTRIB, stored in drawing coordinates, is the
+  text height. The read-me note states the scale ("inserted at scale 1.08" for Net1).
 - **Plot scale, stated in the drawing**: the read-me note gives the text height and the network's
   extent in drawing units ("text 1.17 ft high, on a network 80 ft across" for Net1 in a 1400 px
   window). Plot the network at width W and the text is W × h / w high.
@@ -46,15 +56,24 @@ Mary's journal, 2026-10-06 section B.
   - project with a stated coordinate system: its numbers unchanged; `$INSUNITS` from that system's
     unit (US survey feet has no R2000 code and is written as feet; the system's name says which).
   - latitude-and-longitude project: converted with `js/lpn-crs.js` (proj4) to the WGS 84 UTM zone
-    holding the network's centre, metres, `$INSUNITS` 6. Not the page's Web Mercator frame, whose
+    holding the network's centre, metres, `$INSUNITS` 6. **Never degrees.** The read-me note and
+    the status line after export both say the coordinates are that UTM zone, in meters, "not
+    latitude and longitude" (Tom expected degrees on the preview, 2026-10-06). Not the page's Web Mercator frame, whose
     scale is off by 1/cos(latitude). If the conversion cannot load, nothing is written and the
     status line says so; a network centred beyond 80° S or 84° N, where UTM stops, gets its own
     message. A network straddling a zone edge or the antimeridian is drawn in the centre's zone.
   - A scenario that moves a node exports that position, as the `.inp` export does.
-- **Attributes are all invisible** (flag 1). The visible annotation is the map's own lettering; a
-  visible ID attribute would print every ID twice wherever the map shows IDs. `ATTDISP ON` or
-  double-click (Enhanced Attribute Editor) shows and edits them. Values are the model's numbers,
-  unrounded, in the project's display units; prompts carry the unit.
+- **The ID attribute is visible; every other is invisible** (flag 1). Tom, 2026-10-06, asked
+  whether the ID should be invisible: *"No."* `ATTDISP ON` or double-click (Enhanced Attribute
+  Editor) shows and edits the rest. Values are the model's numbers, unrounded, in the project's
+  display units; prompts carry the unit.
+- **One layer per attribute property**, C-WATR-ATTR-xxxx (table below). Tom offered one layer per
+  property or one for all; per property gives freeze and No plot property by property, and
+  `C-WATR-ATTR-*` in the layer filter still takes them all at once. An ATTRIB carries its own
+  group 8 (the Reference's common entity codes, which ATTRIB shares with every graphical entity),
+  and AutoCAD and BricsCAD hide an attribute on a frozen layer even when the block's layer is
+  thawed. The ATTDEF sits on the same layer, so ATTSYNC, which resets attributes to their
+  definitions, keeps them there.
 - **Layer prefix**: `lpnDxfWrite()` takes `layerPrefix`; no control offers it yet.
 
 ## Layers
@@ -76,6 +95,22 @@ not fetched. Discipline C, major group WATR (water supply).
 
 ACI colours 1-9 only.
 
+Attribute property layers (NCS Discipline-Major-Minor-Minor, four characters a field; ATTR is
+user-defined, IDEN is the Guidelines' annotation code "identification tags"). ID's layer is ACI 7,
+the rest ACI 9. Only the layers a file's blocks use are written.
+
+| Tag | Layer | | Tag | Layer |
+|---|---|---|---|---|
+| ID | C-WATR-ATTR-IDEN (visible) | | ROUGHNESS | C-WATR-ATTR-ROUG |
+| ELEV | C-WATR-ATTR-ELEV | | FLOW | C-WATR-ATTR-FLOW |
+| DEMAND | C-WATR-ATTR-DMND | | VELOCITY | C-WATR-ATTR-VELO |
+| HEAD | C-WATR-ATTR-HEAD | | VALVETYPE | C-WATR-ATTR-VTYP |
+| LEVEL | C-WATR-ATTR-LEVL | | SETTING | C-WATR-ATTR-SETG |
+| MINLEVEL | C-WATR-ATTR-LMIN | | COUNT | C-WATR-ATTR-QNTY |
+| MAXLEVEL | C-WATR-ATTR-LMAX | | TAG | C-WATR-ATTR-TAGS |
+| DIAMETER | C-WATR-ATTR-DIAM (tank, pipe, valve) | | DESC | C-WATR-ATTR-DESC |
+| LENGTH | C-WATR-ATTR-LENG | | | |
+
 | Layer | Holds | ACI | NCS |
 |---|---|---|---|
 | C-WATR-PIPE | pipes: LWPOLYLINE through every bend + WATR_PIPE block at mid-run | 5 | listed: "Water supply: piping" |
@@ -91,8 +126,8 @@ ACI colours 1-9 only.
 
 ## Blocks and attributes
 
-Geometry on layer 0, ByLayer, so each insert takes its layer's colour; unit = one map symbol, the
-INSERT scale is the symbol size. Shapes follow the map's silhouettes.
+Geometry on layer 0, ByLayer, so each insert takes its layer's colour; unit = one text height, the
+INSERT scale is the text height. Shapes follow the map's silhouettes.
 
 | Block | Attribute tags |
 |---|---|
@@ -114,6 +149,14 @@ DXF import (Task 772's other half); a layer-prefix control; layers split by diam
 option); lineweights; MTEXT; a background mask behind text (the map's white halo); XDATA.
 
 ## Validation
+
+**`dev/lpn-spike/dxf-export-browser-harness.js` clicks the real File menu row in real Chromium**
+on Net1 and Net3 lat/lon and asserts one download of a valid R2000 file, the attribute rules, the
+style, the scale and the UTM wording; `EC_DXF_BASE_URL=http://localhost:8115/engcalcs/` runs it
+against a preview vhost. It exists because the DOM-stub harness below passed while the real page
+gave no download at all (2026-10-06): the stub's labels layer `children` was an Array, a real SVG
+element's is an HTMLCollection with no forEach, and on a lat/lon project the throw happened inside
+the coordinate loader's promise and was swallowed. Any failure now reaches the status line.
 
 The harness reads the file back with its own small reader and asserts R2000, handles and owners,
 per-layer counts, vertex counts, attribute values (nodes and pipe blocks), exact grid coordinates,
