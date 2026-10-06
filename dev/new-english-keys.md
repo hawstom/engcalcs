@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**69 still to read on master**, of 176 untranslated keys, of 2402 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**77 still to read on master**, of 184 untranslated keys, of 2410 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (176, 69 to read @@ NEEDS RULING)
+## lpn_  (184, 77 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -399,6 +399,9 @@ never edits a synonym.
 - **`lpn_settings_demand_model_tip`**
   > Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.
   _Ruled OK 2026-10-05._
+- **`lpn_settings_held_base`**
+  > {base}: {value}
+  @@ NEEDS RULING
 - **`lpn_settings_min_pressure`**
   > Minimum pressure
   _Ruled OK 2026-10-05._
@@ -540,6 +543,27 @@ never edits a synonym.
 - **`lpn_settings_units_one_project`**
   > Units are the same in every scenario.
   @@ NEEDS RULING
+- **`lpn_settings_view_bottom_right`**
+  > Bottom right corner
+  @@ NEEDS RULING
+- **`lpn_settings_view_center`**
+  > Map center
+  @@ NEEDS RULING
+- **`lpn_settings_view_hold`**
+  > Hold this view in this scenario
+  @@ NEEDS RULING
+- **`lpn_settings_view_hold_tip`**
+  > Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.
+  @@ NEEDS RULING
+- **`lpn_settings_view_scale`**
+  > Map scale
+  @@ NEEDS RULING
+- **`lpn_settings_view_scale_tip`**
+  > The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.
+  @@ NEEDS RULING
+- **`lpn_settings_view_top_left`**
+  > Top left corner
+  @@ NEEDS RULING
 - **`lpn_sysflow_title`**
   > Flow balance
   _Ruled OK 2026-10-03._
@@ -608,7 +632,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**83 still to read**, of 86 new keys across 16 unmerged branch(es).
+**86 still to read**, of 89 new keys across 19 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -694,11 +718,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`31a1eca2`) — adds no English strings
+### feat/bentley-interop (`f1038674`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`56f052a3`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/dxf (`f643a2ac`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_dxf_export_no_utm`**
   > The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.
@@ -716,7 +740,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.
   @@ NEEDS RULING
 - **`lpn_dxf_note_scale`**
-  > Text and symbols are sized as the map draws them at Zoom to fit: text {h} {unit} high, on a network {w} {unit} across.
+  > Text and symbols are sized as the map draws them at Zoom to fit: text {h} high, on a network {w} across.
   @@ NEEDS RULING
 - **`lpn_dxf_note_shortened`**
   > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in “…”.
@@ -849,6 +873,8 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
   @@ NEEDS RULING
 
+### feat/section-grid (`0b3bad98`) — adds no English strings
+
 ### feat/survey-code (`087e6868`) — 21 new, 21 to read @@ NEEDS RULING
 
 - **`lpn_survey_codes_add`**
@@ -915,4 +941,18 @@ build for that would be a gate nobody keeps. Refresh it with
   > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.
   @@ NEEDS RULING
 
+### feat/table-export (`ba3fef1c`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_pane_copy_heads`**
+  > Copy with headings
+  @@ NEEDS RULING
+- **`lpn_pane_export_csv`**
+  > Export table as CSV
+  @@ NEEDS RULING
+- **`lpn_pane_export_ods`**
+  > Export table as ODS
+  @@ NEEDS RULING
+
 ### feat/tip-door (`2a64dbe5`) — adds no English strings
+
+### fix/convert-as (`0d0f6e60`) — adds no English strings

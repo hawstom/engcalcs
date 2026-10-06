@@ -50946,10 +50946,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		group.id = 'lpn_set_view_group';
 		group.setAttribute('data-lpn-noseam', '1');
 		wrap.className = 'lpn-set-ctlgroup';
-		[[c1, 'lpn_set_view_c1', geo ? (pc.lpn_field_lat || 'Latitude') : (pc.lpn_field_x || 'X')],
-			[c2, 'lpn_set_view_c2', geo ? (pc.lpn_field_lon || 'Longitude') : (pc.lpn_field_y || 'Y')]].forEach(function (c) {
-			c[0].type = 'text'; c[0].className = 'lpn-set-num'; c[0].id = c[1]; c[0].size = 11;
-			c[0].setAttribute('aria-label', c[2]); c[0].placeholder = c[2];
+		c1.id = 'lpn_set_view_c1';
+		c2.id = 'lpn_set_view_c2';
+		[[c1, geo ? (pc.lpn_field_lat || 'Latitude') : (pc.lpn_field_x || 'X')],
+			[c2, geo ? (pc.lpn_field_lon || 'Longitude') : (pc.lpn_field_y || 'Y')]].forEach(function (c) {
+			c[0].type = 'number'; c[0].step = 'any'; c[0].className = 'lpn-set-num'; c[0].style.width = '7.5em';
+			c[0].setAttribute('aria-label', c[1]); c[0].placeholder = c[1];
 			c[0].addEventListener('change', commitTyped);
 			wrap.appendChild(c[0]);
 		});
@@ -50967,7 +50969,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			hold.type = 'button';
 			hold.id = 'lpn_set_view_hold';
 			hold.textContent = pc.lpn_settings_view_hold || 'Hold this view in this scenario';
-			helpTip(hold, (pc.lpn_settings_view_hold_tip || 'Stores this map center and scale in the open scenario, so opening it moves the map here. Moving the map afterward changes nothing until you press this again. Clear override to follow the {base} view again.')
+			helpTip(hold, (pc.lpn_settings_view_hold_tip || 'Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.')
 				.split('{base}').join(pc.lpn_scenario_base || 'Base'));
 			hold.addEventListener('click', function () { holdScenarioView(); });
 			group.appendChild(hold);
@@ -50976,8 +50978,10 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		refreshSetboxViewRows();
 		// A typed centre or scale: the map goes there, and a scenario holding a view holds this one.
 		function commitTyped() {
+			// A scale is a ratio, 1:2000 (or 2:4000), or the bare 2000.
 			var o = outwardViewOf(currentView()), a = parseFloat(c1.value), b = parseFloat(c2.value),
-				n = parseFloat(String(sc.value).replace(/^\s*1\s*:\s*/, '').replace(/[\s,]/g, '')), v, here = activeScenario();
+				r = String(sc.value).replace(/[\s,]/g, '').match(/^(?:([\d.]+):)?([\d.]+)$/),
+				n = r ? parseFloat(r[2]) / (r[1] === undefined ? 1 : parseFloat(r[1])) : NaN, v, here = activeScenario();
 			if (!o || !isFinite(a) || !isFinite(b) || !(n > 0)) { refreshSetboxViewRows(true); return; }
 			if (geo) { o.cy = a; o.cx = b; } else { o.cx = a; o.cy = b; }
 			o.mpp = n * LPN_CSS_PX_METRES;
@@ -50988,7 +50992,12 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 				saveUndoSnapshot();
 				setScenarioView(here, currentView());
 				afterHeldViewChange();
-			} else { refreshSetboxViewRows(true); }
+			} else {
+				// The project file carries the map's view (serializeProject()), so a typed one is saved
+				// with it, as the Map display heading says.
+				saveToStorage();
+				refreshSetboxViewRows(true);
+			}
 		}
 	}
 	// The view rows say where the map is now. A box being typed in keeps what is typed.
