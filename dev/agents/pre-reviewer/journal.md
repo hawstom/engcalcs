@@ -3872,3 +3872,11 @@ Lesson: pane toggle button toggles; sort lives on the arrow button; dialogs rout
 - OBSERVED (Chromium, flock): builder harness 61/61. My own run: Elm Street moved/scaled via world file -> DIMENSIONS, C/F, BMP all agree; RGBA PNG exported on white (alpha 0 -> 255,255,255; alpha 128 red -> 255,127,127); 4000x3000 PNG ends as 1600x1200 BMP 5.7 MB (existing 1600 px store cap), ~5 s.
 - OBSERVED: Elm Street 3 of 18 nodes lie outside the picture rectangle that becomes EPANET DIMENSIONS. Unverifiable without EPANET desktop whether they draw. Decays: re-check against tree.
 - Nothing stored on device in the diff.
+
+## 2026-10-06 Perry: feat/backdrop-attach re-review, one .zip (tip 8adc7601)
+- OBSERVED (Chromium via playwright, flock; re-verify before citing): builder harness 77/77. Zips from the page for Elm Street, "Café Ñandú 水" and "a$&b {file} x": Info-ZIP `unzip -t` OK, python zipfile testzip OK, flag 0x800, DOS date = local time, MS-DOS origin, no data descriptors. Stored fallback (CompressionStream deleted) also valid.
+- OBSERVED: my own raw-CDP page that fires three downloads from one click lands only the first in headless=new Chrome with default prefs, so the harness's real-Chrome section does discriminate (not decoration).
+- OBSERVED: inp-export (4497), net3 round trip, passthrough harnesses pass; branch's lpn-inp.js export change is gated on opts.backdropFile only.
+- OBSERVED defect (low): String.replace with a name holding `$&` or `{file}` mangles the status line (project named `a$&b {file} x`). Files themselves fine.
+- Other languages have no new keys, so they fall back to English (no stale translation).
+- Not checkable: Windows Explorer, 7-Zip, macOS Archive Utility, EPANET desktop.
