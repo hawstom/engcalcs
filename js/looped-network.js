@@ -41172,6 +41172,7 @@ var EngCalcs = EngCalcs || {};
 	var snipboxLayout = newBoxLayout();
 	snipboxLayout.userSized = false;
 	snipboxLayout.scale = SNIP_SCALE;
+	delete snipboxLayout.open;   // openness is not recorded (see above); the key is never written
 	function saveSnipboxLayout() {
 		try { localStorage.setItem(LPN_SNIPBOX_KEY, JSON.stringify(snipboxLayout)); } catch (e) {}
 	}
@@ -41213,15 +41214,32 @@ var EngCalcs = EngCalcs || {};
 		// (placePanelForScreen()) and would cover the very map the finger has to drag over; the
 		// magnification last chosen still applies there.
 		if (!smallScreen()) { openSnipBox(); }
-		var pc = EngCalcs.pageConfig || {}, map = snipMapRect();
+		var pc = EngCalcs.pageConfig || {}, map = snipMapRect(), watcher = null;
 		if (map.w < 1 || map.h < 1) { return; }
 		var veil = document.createElement('div'), box = document.createElement('div'), start = null;
 		veil.className = 'lpn-snip-veil';
-		veil.style.left = map.x + 'px'; veil.style.top = map.y + 'px';
-		veil.style.width = map.w + 'px'; veil.style.height = map.h + 'px';
+		function fitVeil() {
+			veil.style.left = map.x + 'px'; veil.style.top = map.y + 'px';
+			veil.style.width = map.w + 'px'; veil.style.height = map.h + 'px';
+		}
+		fitVeil();
 		box.className = 'lpn-snip-rect';   // joins the veil on the first move, so a click never shows it
 		document.body.appendChild(veil);
-		snipVeil = { el: veil, onKey: null };
+		snipVeil = { el: veil, onKey: null, watcher: null };
+		// The map changes size while the snip waits (a box docked, undocked or resized, the window):
+		// the veil and the drag's limits follow it, and a drag begun on the old size is dropped.
+		if (window.ResizeObserver) {
+			watcher = new window.ResizeObserver(function () {
+				var m = snipMapRect();
+				if (m.x === map.x && m.y === map.y && m.w === map.w && m.h === map.h) { return; }
+				map = m;
+				fitVeil();
+				start = null;
+				if (box.parentNode) { veil.removeChild(box); }
+			});
+			watcher.observe(svg);
+			snipVeil.watcher = watcher;
+		}
 		function at(e) {
 			return { x: Math.min(Math.max(e.clientX, map.x), map.x + map.w), y: Math.min(Math.max(e.clientY, map.y), map.y + map.h) };
 		}
@@ -41260,6 +41278,7 @@ var EngCalcs = EngCalcs || {};
 	function cancelScreenshot() {
 		if (!snipVeil) { return; }
 		document.removeEventListener('keydown', snipVeil.onKey, true);
+		if (snipVeil.watcher) { snipVeil.watcher.disconnect(); }
 		if (snipVeil.el.parentNode) { snipVeil.el.parentNode.removeChild(snipVeil.el); }
 		snipVeil = null;
 	}

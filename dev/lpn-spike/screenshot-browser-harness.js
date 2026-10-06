@@ -232,7 +232,7 @@ async function desktop(Session, browser) {
 		ok('at 2x a click gives the whole map at 2x (' + Math.round(map.w * 2) + ' x ' + Math.round(map.h * 2) + ')',
 			!!png && png.w === Math.round(map.w * 2) && png.h === Math.round(map.h * 2), png && (png.w + ' x ' + png.h));
 		const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('lpn_snipbox') || 'null'));
-		ok('...and the choice is remembered in this browser as lpn_snipbox', !!stored && stored.scale === 2 && !('open' in stored && stored.open), JSON.stringify(stored));
+		ok('...and the choice is remembered in this browser as lpn_snipbox', !!stored && stored.scale === 2 && !('open' in stored), JSON.stringify(stored));
 		await startSnip(a, LABEL);
 		await page.selectOption('#lpn_snip_scale', '4');
 		const r4 = { x: Math.round(map.x + map.w * 0.3), y: Math.round(map.y + map.h * 0.3), w: 200, h: 150 };
@@ -247,6 +247,33 @@ async function desktop(Session, browser) {
 		ok('the box stays open after the snip', keptOpen);
 		await page.click('#lpn_snip_close');
 		ok('its x closes it', await page.evaluate(() => getComputedStyle(document.getElementById('lpn_snip_box')).display === 'none'));
+
+		// 4c. Docking the box while a snip waits narrows the map: the veil and the drag follow it.
+		await startSnip(a, LABEL);
+		await page.click('#lpn_snip_box .lpn-corner-btn[data-dock="right"]');
+		await a.settle(600);
+		const VEIL = () => { const v = document.querySelector('.lpn-snip-veil'), r = v.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height }; };
+		const mapD = await page.evaluate(MAP_RECT), veilD = await page.evaluate(VEIL);
+		ok('docking the box narrows the map', mapD.w < map.w - 50, map.w + ' -> ' + mapD.w);
+		ok('...and the veil follows the map\'s new rectangle',
+			Math.abs(veilD.x - mapD.x) < 1.5 && Math.abs(veilD.y - mapD.y) < 1.5 && Math.abs(veilD.w - mapD.w) < 1.5 && Math.abs(veilD.h - mapD.h) < 1.5,
+			JSON.stringify(veilD) + ' vs ' + JSON.stringify(mapD));
+		await page.mouse.move(mapD.x + 100, mapD.y + 100);
+		await page.mouse.down();
+		await page.mouse.move(mapD.x + mapD.w + 150, mapD.y + 200, { steps: 6 });
+		const over = await page.$eval('.lpn-snip-rect', (e) => { const r = e.getBoundingClientRect(); return { right: r.right }; });
+		ok('a drag past the map edge is held to the map', over.right <= mapD.x + mapD.w + 1.5, over.right + ' vs map right ' + (mapD.x + mapD.w));
+		await page.mouse.up();
+		await waitBlobs(page, 6);
+		png = await page.evaluate(LAST_PNG);
+		ok('...and the picture is no wider than the map allows', !!png && png.w <= Math.round((mapD.w - 100) * 4) + 8, png && png.w);
+		await page.click('#lpn_snip_box .lpn-corner-btn[data-dock="float"]');
+		await a.settle(400);
+		await startSnip(a, LABEL);
+		const mapF = await page.evaluate(MAP_RECT), veilF = await page.evaluate(VEIL);
+		ok('floating it again gives the map back, and a new veil matches', Math.abs(veilF.w - mapF.w) < 1.5 && mapF.w > mapD.w + 50, JSON.stringify(veilF));
+		await page.keyboard.press('Escape');
+		await page.click('#lpn_snip_close');
 
 		// 5. No clipboard: a download, and a notice that says so.
 		await page.evaluate(() => { delete navigator.clipboard; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined }); });
