@@ -58898,9 +58898,11 @@ var EngCalcs = EngCalcs || {};
 	// send succeeds or they cancel; a failed send keeps it on screen, never in browser storage.
 	// That is also why the mail goes by fetch and not by logSignal's offline queue.
 	//
-	// THE THANK-YOU REPLACES THE LABEL IN PLACE, as it always did, and promises nothing.
+	// THE THANK-YOU REPLACES THE LABEL IN PLACE for FEEDBACK_THANKS_MS, promises nothing, and then
+	// gives the door back.
 	var FEEDBACK_PICKS = ['numbers', 'broken', 'wording', 'confusing'];
 	var FEEDBACK_ENDPOINT = '/engcalcs/send-feedback.php';
+	var FEEDBACK_THANKS_MS = 4000;
 	function resetWrongButton(id) {
 		var btn = document.getElementById(id);
 		if (!btn || !btn.dataset || !btn.dataset.lpnWrongWired) { return; }
@@ -58917,6 +58919,10 @@ var EngCalcs = EngCalcs || {};
 		// textContent, not the tip markup: the thank-you is a statement and not a control.
 		btn.textContent = pcW.lpn_wrong_thanks || 'Thank you. That reached us.';
 		btn.disabled = true;
+		// **AND THEN IT IS A DOOR AGAIN** (Tom: "give the users the information and the freedom").
+		// A second report in the same visit is a real thing to want, so the thank-you stands for a
+		// few seconds and the label comes back; the next click opens a fresh, empty box.
+		if (btn.id) { setTimeout(function () { if (btn.disabled) { resetWrongButton(btn.id); } }, FEEDBACK_THANKS_MS); }
 	}
 	/**
 	 * Posts what the visitor picked or typed. Resolves {ok, reason}; never rejects. A network

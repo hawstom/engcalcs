@@ -22,7 +22,8 @@
 //       bad address (focus goes to it), the rate limit, a dropped connection, and a Cancel pressed
 //       while the request was on its way;
 //   (7) the keyboard: focus starts on the first pick, Space toggles, Tab stays inside;
-//   (8) on a phone in tall mode the box, its fields and both buttons fit inside the window.
+//   (8) on a phone in tall mode the box, its fields and both buttons fit inside the window;
+//   (9) after the thank-you the door comes back, and a second report in the same visit goes.
 'use strict';
 
 const fs = require('fs');
@@ -211,6 +212,26 @@ async function sectionDesk(browser) {
 	ok('(3) the anonymous row went too, once', seen.wrong.length === 1 && seen.wrong[0].detail === 'wrong:none', JSON.stringify(seen.wrong));
 	d = await door(a, 'lpn_wrong_btn');
 	ok('...and the door is the thank-you', d.text === pc.lpn_wrong_thanks && d.disabled, JSON.stringify(d));
+
+	// (9) A SECOND REPORT IN THE SAME VISIT. The thank-you stands a few seconds, then the door is back.
+	await a.settle(4500);
+	d = await door(a, 'lpn_wrong_btn');
+	ok('(9) a few seconds later the door says "Something wrong here?" again', !d.disabled && d.text.indexOf(pc.lpn_wrong_btn) === 0, JSON.stringify(d));
+	await a.page.click('#lpn_wrong_btn');
+	await a.settle(300);
+	b = await box(a);
+	ok('...and opens a fresh, empty box', b && b.isFeedback && b.email === '' && b.comment === '' && b.picks.every((p) => p.pressed === 'false'));
+	await picks(a, ['broken']);
+	await a.page.fill('#lpn_dialog .lpn-fb-comment', 'A second thing, later.');
+	await clickSend(a);
+	ok('...and a second Send goes through', await waitClosed(a));
+	ok('...as a second post to the endpoint', seen.feedback.length === 2 && seen.feedback[1].params.picks === 'broken' &&
+		seen.feedback[1].params.comment === 'A second thing, later.' && seen.feedback[1].params.email === '', JSON.stringify(seen.feedback[1] && seen.feedback[1].params));
+	ok('...and a second mail, with no Reply-To', mails().length === 2 && mails()[1].body.indexOf('A second thing, later.') >= 0 && mails()[1].headers.indexOf('Reply-To') < 0);
+	// logSignal dedupes event+detail per page load, so the anonymous tally counts a visit's reports
+	// about one message once; that is its own long-standing rule, not this box's.
+	ok('...while the anonymous tally row is not repeated for the same message', seen.wrong.length === 1, seen.wrong.length);
+	ok('...and the door is the thank-you again', (await door(a, 'lpn_wrong_btn')).disabled);
 
 	const storeAfter = await a.page.evaluate((t) => {
 		const all = [];
