@@ -4580,17 +4580,23 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 
 	   THE TWO <select>s STAY. They are not buttons, and the step selector is the only control on
 	   the page that says which moment is showing -- a transport you cannot read is not a transport.
-	   Run is a button and is not a player control (js/lpn-time.js is explicit about that), so it
-	   goes; on a project with auto-run on, which is the default, it is already hidden anyway.
+	   Run (the bolt) is not a player control, but it STAYS (`.lpn-run-btn`): js/lpn-time.js hides
+	   it inline while auto-run is on, and with Recalculate off it is the only way to calculate
+	   on a phone, where the toolbar's other groups are gone.
 
 	   The run group then has to give up the divider and the gap it wears as a MIDDLE group, or the
 	   strip would open with a rule and 12px of air in front of its first control. */
 	html:has(#lpn_canvas) #lpn_toolbar > .lpn-toolbar-group:not(#lpn_toolbar_run) { display: none; }
-	html:has(#lpn_canvas) #lpn_toolbar_run button:not(.lpn-transport-btn) { display: none; }
+	html:has(#lpn_canvas) #lpn_toolbar_run button:not(.lpn-transport-btn):not(.lpn-run-btn) { display: none; }
 	html:has(#lpn_canvas) #lpn_toolbar_run { border-left: 0; padding-left: 0; margin-right: 0; }
 	/* Five buttons and two selectors are 333 px at the default gap; a 320 px window needs 15 back. */
-	html:has(#lpn_canvas) #lpn_toolbar_run { gap: 2px; }
-	html:has(#lpn_canvas) #lpn_toolbar_run .lpn-transport-btn { padding: 2px 3px; }
+	html:has(#lpn_canvas) #lpn_toolbar_run { gap: 0; }
+	html:has(#lpn_canvas) #lpn_toolbar_run .lpn-transport-btn,
+	html:has(#lpn_canvas) #lpn_toolbar_run .lpn-run-btn { padding: 2px 3px; }
+	/* The bolt is a sixth control; at 320 px the strip's 6px neighbour margins push it 30 px past the
+	   edge, so the bolt's neighbour and the two selectors sit flush with no gap. */
+	html:has(#lpn_canvas) #lpn_toolbar_run > .lpn-run-btn + .lpn-transport-btn,
+	html:has(#lpn_canvas) #lpn_toolbar_run > select { margin-inline-start: 0; }
 
 	/* 4. THE MENU BAR DROPS TO ICONS. The word is a <span class="lpn-menubar-word"> that
 	   buildMenuBar() builds for this rule to reach; the accessible name is on the button as an

@@ -973,9 +973,27 @@ var EngCalcs = EngCalcs || {};
 			if (!all || !all.length || !le.lines) { return; }
 			var order = shedOrder(all),
 				gone = all.length - le.lines.length;
+			// **A LONE ALIGNED LABEL IS TESTED WHERE THE SLIDE COULD PUT IT, not only where it sat.**
+			// placeStationedLabels() slides it along LPN_ALIGNED_STATIONS to the first clear one, so
+			// "in the way" here means in the way at EVERY station. Asked at one station only, a
+			// valve's label hid for its own volute at mid-pipe with clear pipe either side of it.
+			var stations = (linkLabelAligned(l) && linkLabelStations(l).length === 1)
+				? LPN_ALIGNED_STATIONS : [le.alignedAlong === undefined ? 0.5 : le.alignedAlong];
+			function clearBox(w, h) {
+				var i, b, first = null;
+				for (i = 0; i < stations.length; i++) {
+					b = stationedLabelBox(l, le, stations[i], w, h, fs);
+					if (boxIsClear(b, obs, pad)) { return b; }
+					if (!first) { first = b; }
+				}
+				return { blocked: first };
+			}
 			function boxNow() {
-				return stationedLabelBox(l, le, le.alignedAlong === undefined ? 0.5 : le.alignedAlong,
-					labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), fs);
+				var r = clearBox(labelBoxWidth(le), dataLabelBoxHeight(le.lineCount));
+				return r.blocked || r;
+			}
+			function fitsNow() {
+				return !clearBox(labelBoxWidth(le), dataLabelBoxHeight(le.lineCount)).blocked;
 			}
 			// **THE CASCADE IS ARITHMETIC NOW, AND IT WRITES ONCE** (Task 436). It used to redraw and
 			// re-measure at every rung, and that loop was 73-79% of a wheel notch on a 736-element
@@ -992,16 +1010,14 @@ var EngCalcs = EngCalcs || {};
 			while (gone < order.length - 1) {
 				var wNext = shedWidthFor(le, shedKeepSet(all, order, gone), all);
 				if (wNext === null) { break; }                       // fall through to the old loop
-				var probe = stationedLabelBox(l, le, le.alignedAlong === undefined ? 0.5 : le.alignedAlong,
-					wNext / (state.s || 1), dataLabelBoxHeight(rowsForKeep(all, order, gone, l)), fs);
-				if (boxIsClear(probe, obs, pad)) { break; }
+				if (!clearBox(wNext / (state.s || 1), dataLabelBoxHeight(rowsForKeep(all, order, gone, l))).blocked) { break; }
 				gone++; priced++;
 			}
 			// One write and one measurement, at the content the arithmetic chose.
 			if (priced) { renderLinkLabel(le, l, keptLines(all, shedKeepSet(all, order, gone)), fsNow); }
 			// Whatever the arithmetic could not price, the original loop still finishes exactly as
 			// it did -- including the case where nothing was priced at all.
-			while (gone < order.length - 1 && !boxIsClear(boxNow(), obs, pad)) {
+			while (gone < order.length - 1 && !fitsNow()) {
 				gone++;
 				renderLinkLabel(le, l, keptLines(all, shedKeepSet(all, order, gone)), fsNow);
 			}
@@ -1009,7 +1025,7 @@ var EngCalcs = EngCalcs || {};
 			// **SHED OUT AND STILL IN THE WAY MEANS HIDE.** The cascade has two entrances -- too long
 			// for its segment, and in conflict with a neighbour -- and needs the same exit for both,
 			// or a label that gave up everything but its best value stays and overlaps.
-			le.hiddenCrowded = !boxIsClear(boxNow(), obs, pad);
+			le.hiddenCrowded = !fitsNow();
 			// **AND A HIDDEN LABEL IS NOT AN OBSTACLE.** It is not drawn, so reserving its ground
 			// would make the next label shed for something nobody can see -- and on a crowded map
 			// that cascades, each hidden label crowding out the next.
@@ -1681,7 +1697,21 @@ var EngCalcs = EngCalcs || {};
 				textOwner: lb.id });
 		});
 		doc.links.forEach(function (l) {
-			var pts = linkPointList(l), i;
+			var pts = linkPointList(l), i, le = linkEls[l.id], a, b, sz, vb;
+			// **A PUMP OR VALVE SYMBOL IS A SYMBOL, exactly as a node's is**, and it is an obstacle
+			// to EVERY label, its own link's included: the link's label belongs beside its volute,
+			// never on it. Left out, labels were written over valves (the label bench, round 6:
+			// 51 at five zooms on one bent-and-valved network). The box is positionPumpSymbol()'s:
+			// the END nodes' midpoint, turned to the from->to line, pumpSymbolSize() square.
+			if (le && le.symbolG) {
+				a = nodeAt(nodeById(l.from)); b = nodeAt(nodeById(l.to)); sz = pumpSymbolSize(l.type);
+				if (a && b) {
+					vb = Collide.box((a.x + b.x) / 2, (a.y + b.y) / 2, sz, sz,
+						Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI);
+					vb.kind = 'symbol';
+					out.boxes.push(vb);
+				}
+			}
 			for (i = 1; i < pts.length; i++) {
 				// OWNED BY ITS OWN LINK, exactly as a leader is owned by its own label. A link's
 				// data label sits ON its pipe by design -- that is how a reader tells whose number
@@ -1756,14 +1786,21 @@ var EngCalcs = EngCalcs || {};
 				best = null, bestBox = null, i, ap, b, clear, forced, natural, other;
 			if (linkLabelAligned(l) && full.length === 1) {
 				// THE SLIDE, which only a lone label gets.
-				for (i = 0; i < LPN_ALIGNED_STATIONS.length; i++) {
-					ap = alignedLabelPlacement(l, le, LPN_ALIGNED_STATIONS[i]);
-					b = Geom.orientedLabelBox(ap.ax, ap.ay, w, h, 'middle', 'top', ap.angle, fs);
-					clear = boxIsClear(b, obs, pad);
-					// The FIRST clear station wins and the search stops -- it is already the most
-					// central one available, because the list is ordered outward from the middle.
-					if (clear) { best = LPN_ALIGNED_STATIONS[i]; bestBox = b; break; }
-					if (!bestBox) { bestBox = b; best = LPN_ALIGNED_STATIONS[i]; } // fall back to the middle
+				// **TWO SWEEPS: WITH AIR, THEN WITHOUT.** The shed above kept this label because some
+				// station is clear with no pad (shedAlignedForConflicts() tests real overlap only); a
+				// slide that knew only the padded test fell back to the middle, which on a valve is
+				// its own volute. Touching a neighbour beats lying on a symbol.
+				var sweepPad = [pad, 0], k;
+				for (k = 0; k < sweepPad.length && !clear; k++) {
+					for (i = 0; i < LPN_ALIGNED_STATIONS.length; i++) {
+						ap = alignedLabelPlacement(l, le, LPN_ALIGNED_STATIONS[i]);
+						b = Geom.orientedLabelBox(ap.ax, ap.ay, w, h, 'middle', 'top', ap.angle, fs);
+						clear = boxIsClear(b, obs, sweepPad[k]);
+						// The FIRST clear station wins and the search stops -- it is already the most
+						// central one available, because the list is ordered outward from the middle.
+						if (clear) { best = LPN_ALIGNED_STATIONS[i]; bestBox = b; break; }
+						if (!bestBox) { bestBox = b; best = LPN_ALIGNED_STATIONS[i]; } // fall back to the middle
+					}
 				}
 				le.alignedAlong = best;
 				le.forceSide = undefined;
@@ -20318,10 +20355,13 @@ var EngCalcs = EngCalcs || {};
 	}
 	function findQueryAppliesToTable(props, spec) {
 		var p;
+		// ANY condition that names one of the table's properties qualifies it. "All of them" made a
+		// mixed-scope query (Junction.X OR Pipe.Y) apply to no table at all; the query is still
+		// evaluated whole, and the table shows its own members of that answer.
 		for (p in props) {
-			if (Object.prototype.hasOwnProperty.call(props, p) && !propAppliesToTable(p, spec)) { return false; }
+			if (Object.prototype.hasOwnProperty.call(props, p) && propAppliesToTable(p, spec)) { return true; }
 		}
-		return true;
+		return false;
 	}
 	// One row of the multi-table receipt: "Junctions: 5 of 12".
 	function findFilterRowText(spec) {
@@ -32443,6 +32483,7 @@ var EngCalcs = EngCalcs || {};
 	// own, so it names the one address the suite asks to be found at (Task 479.01, 2026-09-06).
 	// dev/lpn-spike/file-naming-harness.js holds it against the config.
 	var LPN_FILE_APP = 'https://epanet-plus-plus.org/app/';
+	var LPN_TREE_KEYS = ['alternatives', 'calcSets'];
 	function serializeProject() {
 		var out = {
 			format: LPN_FILE_FORMAT, app: LPN_FILE_APP,
@@ -32491,6 +32532,9 @@ var EngCalcs = EngCalcs || {};
 			// not say what it means, and a 400 mm main would open as a 400 inch main (Tom).
 			units: readUnitSelections()
 		};
+		// **A STORED SCENARIO TREE IS CARRIED, NEVER DROPPED** (dev/scenario-alternatives.md):
+		// written last, and only when the file brought one or an explicit act made one.
+		LPN_TREE_KEYS.forEach(function (k) { if (doc[k] !== undefined) { out[k] = doc[k]; } });
 		// From v4 the file is Cartesian. CLONED FIRST -- flipStoredY() mutates, and the object above
 		// holds live references to doc.nodes/links/labels, so flipping in place would turn the
 		// drawing upside down on screen every time it was saved.
@@ -33614,6 +33658,9 @@ var EngCalcs = EngCalcs || {};
 		doc.controls = saved.controls || [];
 		doc.rules = saved.rules || [];
 		doc.inpSections = saved.inpSections || {};
+		// A scenario tree from a later reader (shared alternatives, calculation sets) rides through
+		// verbatim; a scenario's own tree keys already do, on the scenario object.
+		LPN_TREE_KEYS.forEach(function (k) { if (saved[k] !== undefined) { doc[k] = saved[k]; } else { delete doc[k]; } });
 		// Task 510's saved paths, taken VERBATIM. An id naming a node this document does not have
 		// is the user's data and is reported where it is used, never pruned here -- see
 		// profileMissingStops(). A file written before this existed simply has none.

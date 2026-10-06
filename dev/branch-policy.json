@@ -130,7 +130,9 @@
         "feat/transport-ends",
         "feat/engine-prefetch",
         "feat/tip-door",
-        "feat/scenario-table"
+        "feat/scenario-table",
+        "feat/screenshot",
+        "feat/backdrop-attach"
     ],
     "feature_freeze": {
         "active": false,
