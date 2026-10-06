@@ -5811,14 +5811,57 @@ var EngCalcs = EngCalcs || {};
 	// the origin shift and the geographic projection never touch it, and it means the same place
 	// after any of them. A frame change that the scale cannot survive (a grid project turned
 	// geographic) leaves a view that viewShowsModel() refuses, and a refused view moves nothing.
+	//
+	// **THE SCALE IS GROUND METRES PER CSS PIXEL (`mpp`), NOT PIXELS PER DRAWING UNIT** (Declan's
+	// advice, dev/scenario-alternatives.md): a drawing unit is a degree of longitude in a geographic
+	// project and a foot or a metre in a grid one, so a stored `s` meant a different zoom in each
+	// and nothing after a unit or frame change. Metres per pixel at the centre means the same map in
+	// every frame, and 1:N is derived from it (a CSS pixel is 1/96 inch). Corners depend on the
+	// window, so they are shown, never stored. A view written before this (`s`) is still read.
+	var LPN_CSS_PX_METRES = 0.0254 / 96;
+	// Ground metres in one drawing unit at an OUTWARD point (longitude and latitude, or the grid's
+	// own x and y). A grid's drawing unit is its length unit; a geographic one's is a degree of
+	// longitude, worth less towards the poles, measured along the parallel at that latitude.
+	function viewMetresPerUnitAt(ox, oy) {
+		var d = 1e-3, m;
+		if (!isLatLonProject()) { return 1 / toDisplay(1, 'lpn_u_length'); }
+		if (!Geom || !Geom.geodesicMeters || !isFinite(ox) || !isFinite(oy)) { return NaN; }
+		m = Geom.geodesicMeters(ox, oy, ox + d, oy) / d;
+		return m > 0 ? m : NaN;
+	}
 	function outwardViewOf(v) {
+		var o, m;
 		if (!v || !isFinite(v.cx) || !isFinite(v.cy) || !(v.s > 0)) { return null; }
-		return { cx: outwardX(v.cx), cy: outwardY(v.cy), s: v.s };
+		o = { cx: outwardX(v.cx), cy: outwardY(v.cy) };
+		m = viewMetresPerUnitAt(o.cx, o.cy) / v.s;
+		if (!(m > 0) || !isFinite(m)) { return null; }
+		o.mpp = m;
+		return o;
 	}
 	function inwardViewOf(o) {
-		if (!plainObject(o) || typeof o.cx !== 'number' || typeof o.cy !== 'number' || typeof o.s !== 'number' ||
-			!isFinite(o.cx) || !isFinite(o.cy) || !(o.s > 0) || !isFinite(o.s)) { return null; }
-		return { cx: inwardX(o.cx), cy: inwardY(o.cy), s: o.s };
+		var s;
+		if (!plainObject(o) || typeof o.cx !== 'number' || typeof o.cy !== 'number' ||
+			!isFinite(o.cx) || !isFinite(o.cy)) { return null; }
+		if (typeof o.mpp === 'number' && o.mpp > 0 && isFinite(o.mpp)) { s = viewMetresPerUnitAt(o.cx, o.cy) / o.mpp; }
+		else if (typeof o.s === 'number') { s = o.s; }
+		if (!(s > 0) || !isFinite(s)) { return null; }
+		return { cx: inwardX(o.cx), cy: inwardY(o.cy), s: s };
+	}
+	// 1:N for a stored view, N rounded to a whole number.
+	function viewScaleDenominator(o) {
+		return o && o.mpp > 0 ? Math.round(o.mpp / LPN_CSS_PX_METRES) : NaN;
+	}
+	// An outward point in public order (latitude first in a geographic project; x first in a grid).
+	function viewPointText(ox, oy) {
+		function n(v, dp) { return String(+(+v).toFixed(dp)); }
+		return isLatLonProject() ? n(oy, 6) + ', ' + n(ox, 6) : n(ox, 2) + ', ' + n(oy, 2);
+	}
+	// A stored (outward) view in words: its centre in public order and its scale as 1:N.
+	function viewSummaryText(o) {
+		var pc = EngCalcs.pageConfig || {}, geo = isLatLonProject(), N = viewScaleDenominator(o), s, dp = geo ? 6 : 2;
+		s = isFinite(N) ? '1:' + N : (o && o.s > 0 ? String(+(+o.s).toPrecision(4)) : '');
+		return settingTableFill(pc.lpn_settings_row_view_value || 'Center {x}, {y}; scale {s}',
+			{ x: String(+(+(geo ? o.cy : o.cx)).toFixed(dp)), y: String(+(+(geo ? o.cx : o.cy)).toFixed(dp)), s: s });
 	}
 	// The view this scenario holds, in the drawing frame, or null. Base never holds one: its view is
 	// wherever the reader left it, which is what the file's own `view` records.
@@ -5828,8 +5871,9 @@ var EngCalcs = EngCalcs || {};
 		var block = scenarioSettingsBlock(scn);
 		return block && block.view !== undefined ? inwardViewOf(block.view) : null;
 	}
-	// **WRITTEN ONLY WHEN DELIBERATELY SET.** Nothing in the interface calls this yet (the editing
-	// stage); a scenario holding a view is a deliberate act, never a side effect of looking.
+	// **WRITTEN ONLY WHEN DELIBERATELY SET**: the Settings box's Hold this view in this scenario, or a
+	// centre or scale typed while the scenario holds one. A scenario holding a view is a deliberate
+	// act, never a side effect of looking.
 	function setScenarioView(scn, v) {
 		return setScenarioSetting(scn, ['view'], v === undefined ? undefined : outwardViewOf(v) || undefined);
 	}
@@ -5845,10 +5889,13 @@ var EngCalcs = EngCalcs || {};
 		if (own) {
 			if (!had) { viewBeforeScenarioView = currentView(); }
 			if (viewShowsModel(own)) { applyView(own); }
+			refreshSetboxViewRows(true);
+			markHeldSetboxRows();
 			return;
 		}
 		if (had && viewBeforeScenarioView) { applyView(viewBeforeScenarioView); }
 		viewBeforeScenarioView = null;
+		refreshSetboxViewRows(true);
 	}
 
 	// One scenario's setting leaves that belong to a category, for alternativesOf() and the count.
@@ -13604,6 +13651,8 @@ var EngCalcs = EngCalcs || {};
 		var v = currentView();
 		var show = !!el && !!v && !!modelExtent() && !viewShowsModel(v);
 		if (el) { el.style.display = show ? 'flex' : 'none'; }
+		// The same moment, at rest: the Settings box's view rows say where the map now is.
+		refreshSetboxViewRows();
 	}
 	// One-time fill and wiring, called from the same boot pass as wireMessageLogButton() etc.
 	// The button reuses `lpn_tool_zoom_extent` -- the toolbar's own "Zoom to fit" string -- rather
@@ -23519,7 +23568,7 @@ var EngCalcs = EngCalcs || {};
 		return pc.lpn_color_break_number ||
 			'A boundary must be a number. The map is unchanged.';
 	}
-	function buildColoringSection() { return withSetboxView(buildColoringSectionNow); }
+	function buildColoringSection() { var out = withSetboxView(buildColoringSectionNow); markHeldSetboxRows(); return out; }
 	function buildColoringSectionNow() {
 		var pc = EngCalcs.pageConfig || {},
 			R = ramps(),
@@ -23601,12 +23650,12 @@ var EngCalcs = EngCalcs || {};
 				crit = criterionClassCount(group),
 				n = colorClassCount(group),
 				R2 = ramps(), i;
-			rowIn(target, (group === 'node'
+			setboxTag(rowIn(target, (group === 'node'
 				? (pc.lpn_color_node_field || 'Color nodes by')
-				: (pc.lpn_color_link_field || 'Color links by')), fieldSelect(group));
+				: (pc.lpn_color_link_field || 'Color links by')), fieldSelect(group)), [['settings', 'color' + (group === 'node' ? 'Node' : 'Link') + 'Field']]);
 
 			// THE SCHEME. A button showing a bar of this group's own colours -- see buildRampPicker.
-			rowIn(target, pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, group));
+			setboxTag(rowIn(target, pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, group)), [['settings', 'colorRamp' + (group === 'node' ? 'Node' : 'Link')]]);
 			// **AND A POINTER TO THE ACKNOWLEDGEMENT, UNDER THE PICKER IT IS ABOUT** (Tom,
 			// 2026-08-20: "Were we going to put a Credits link near the color pickers? Maybe under
 			// the Color scheme label?"). It SCROLLS to the footer copy and marks it for a moment; it
@@ -23696,8 +23745,8 @@ var EngCalcs = EngCalcs || {};
 				else { settings.colorClassesNode = Number(classSel.value); }
 				refreshValueColors(); saveToStorage(); syncColorControls();
 			});
-			rowIn(target, pc.lpn_settings_color_classes || 'Number of colors', classSel);
-			rowIn(target, pc.lpn_color_mode || 'Data classification method', modeSel);
+			setboxTag(rowIn(target, pc.lpn_settings_color_classes || 'Number of colors', classSel), [['settings', 'colorClasses' + (group === 'node' ? 'Node' : 'Link')]]);
+			setboxTag(rowIn(target, pc.lpn_color_mode || 'Data classification method', modeSel), field ? [['settings', 'colorModes', group + '.' + field]] : []);
 			if (crit) {
 				noteIn(target, pc.lpn_color_criterion_note ||
 					'This method takes its boundaries from a design standard, so the number of colors is fixed while this method is selected.');
@@ -23709,7 +23758,7 @@ var EngCalcs = EngCalcs || {};
 				else { settings.colorReverseNode = rev.checked; }
 				refreshValueColors(); saveToStorage(); syncColorControls();
 			});
-			rowIn(target, pc.lpn_settings_color_reverse || 'Reverse the color order', rev);
+			setboxTag(rowIn(target, pc.lpn_settings_color_reverse || 'Reverse the color order', rev), [['settings', 'colorReverse' + (group === 'node' ? 'Node' : 'Link')]]);
 
 			// ---- THE RANGES, one set per coloured field -----------------------------------------
 			//
@@ -23794,6 +23843,7 @@ var EngCalcs = EngCalcs || {};
 				wrap.appendChild(box);
 			}
 			target.appendChild(wrap);
+			setboxTag(wrap, [['settings', 'colorBreaks', key]]);
 			target.appendChild(msg);
 			// **THERE IS NO "AUTOMATIC" BUTTON** (Tom, 2026-08-21: *"What is the 'Automatic' button
 			// for. It contradicts the explanation. Automatic happens when you choose a
@@ -23823,13 +23873,13 @@ var EngCalcs = EngCalcs || {};
 		// The colour key is one overlay in one corner however many schemes feed it, and the
 		// acknowledgement is a licence obligation on the catalogue rather than on either picker. So
 		// the two stand under Map appearance, where the sizes and the other legend already are.
-		row(pc.lpn_settings_color_key_position || 'Color legend position',
+setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			positionSelect(settings.colorLegendPosition, function (v) {
 				settings.colorLegendPosition = v;
 				// The RENDER, for the same reason the labels legend's dropdown calls its own: only the
 				// render knows whether there is a key to bring back after Off.
 				renderColorLegend(); saveToStorage();
-			}));
+			})), [['settings', 'colorLegendPosition']]);
 		// **THE ACKNOWLEDGEMENT IS A LICENCE OBLIGATION, NOT A CREDIT WE CHOSE TO GIVE.** Apache-2.0
 		// clause 2 fixes its WORDING, so it is rendered verbatim out of EngCalcs.lpnRamps.CREDITS,
 		// in English, untranslated -- translating it would change the text the licence requires.
@@ -26703,10 +26753,7 @@ var EngCalcs = EngCalcs || {};
 	// An object-valued setting, read as a short summary (it is edited in its own box).
 	function settingRowSummary(row, v) {
 		var pc = EngCalcs.pageConfig || {}, modes;
-		if (row.path[0] === 'view' && v && typeof v === 'object') {
-			return settingTableFill(pc.lpn_settings_row_view_value || 'Center {x}, {y}; scale {s}',
-				{ x: settingTableNum((+v.cx).toPrecision(8)), y: settingTableNum((+v.cy).toPrecision(8)), s: settingTableNum((+v.s).toPrecision(4)) });
-		}
+		if (row.path[0] === 'view' && v && typeof v === 'object') { return viewSummaryText(v); }
 		if (row.path.join('.') === 'settings.quality' && v && typeof v === 'object') {
 			modes = { none: pc.lpn_quality_none || 'Nothing', age: pc.lpn_result_water_age || 'Water age',
 				trace: pc.lpn_quality_trace || 'Source trace', chemical: pc.lpn_quality_chemical || 'A reactive chemical' };
@@ -26827,7 +26874,22 @@ var EngCalcs = EngCalcs || {};
 		if (row.home === 'dm') { touchTree('demandMultiplier'); delete t.demandMultiplier; return true; }
 		if (row.home === 'time2') { return setScenarioTime(t, row.path[1], ''); }
 		if (row.path[0] === 'times') { setScenarioSetting(scn, ['times', 'text', row.path[1]], undefined); }
+		if (row.path[0] === 'view') { return releaseScenarioView(scn); }
 		return setScenarioSetting(scn, row.path, undefined);
+	}
+	// A held view released in the open scenario: the map goes back to Base's view (where it was
+	// before the scenario took the map somewhere), and the scenario follows Base's view again. One
+	// that still inherits a view (a parent's, a shared alternative's) goes there instead.
+	function releaseScenarioView(scn) {
+		var ok = setScenarioSetting(scn, ['view'], undefined), still;
+		if (!ok || scn !== activeScenario()) { return ok; }
+		still = heldView(scn);
+		if (still) { if (viewShowsModel(still)) { applyView(still); } }
+		else {
+			if (viewBeforeScenarioView) { applyView(viewBeforeScenarioView); }
+			viewBeforeScenarioView = null;
+		}
+		return ok;
 	}
 	// After a write or a clear: everything a scenario switch redraws, since a setting can change
 	// any of it, then the basemap and the contours, which a switch does not touch.
@@ -47264,6 +47326,7 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		container.appendChild(row);
+		return row;
 	}
 	// The reserved width of each column, read by the controls, their headings and the spacers that
 	// stand in for a missing control, so none of them can drift apart.
@@ -47548,8 +47611,8 @@ var EngCalcs = EngCalcs || {};
 			text = document.createElement('span'), note = document.createElement('div');
 		customerFieldDefs(pc).forEach(function (f) {
 			var r = labelRowSpecs('customer', f[0]);
-			labelCheckbox(host, f[1], labelSettings.customer[f[0]],
-				function (v) { labelSettings.customer[f[0]] = v; }, r.decimals, r.affix, r.orders);
+			setboxTag(labelCheckbox(host, f[1], labelSettings.customer[f[0]],
+				function (v) { labelSettings.customer[f[0]] = v; }, r.decimals, r.affix, r.orders), labelRowPaths('customer', f[0]));
 		});
 		note.className = 'lpn-set-note';
 		note.textContent = pc.lpn_labels_customer_note ||
@@ -47580,6 +47643,7 @@ var EngCalcs = EngCalcs || {};
 		});
 		line.appendChild(text); line.appendChild(lw.wrap);
 		host.appendChild(line);
+		setboxTag(line, [['labelSettings', 'customerMaxWidth']]);
 	}
 	// The Drop column's tip, which differs by group because the three orders do different jobs: rows
 	// inside one link label, whole node labels against each other, and a customer label's values.
@@ -47664,7 +47728,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Extracted from wireLabelsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the checkbox
 	// list can be rebuilt in place after labelSettings is reset, without re-wiring the close button.
-	function rebuildLabelsFields() { return withSetboxView(rebuildLabelsFieldsNow); }
+	function rebuildLabelsFields() { var out = withSetboxView(rebuildLabelsFieldsNow); markHeldSetboxRows(); return out; }
 	function rebuildLabelsFieldsNow() {
 		var pc = EngCalcs.pageConfig || {}, nodeBox = document.getElementById('lpn_labels_node_fields'),
 			linkBox = document.getElementById('lpn_labels_link_fields'),
@@ -47713,14 +47777,14 @@ var EngCalcs = EngCalcs || {};
 		columnHeadings(nodeBox, 'node');
 		nodeFieldDefs(pc).forEach(function (f) {
 			var r = labelRowSpecs('node', f[0]);
-			labelCheckbox(nodeBox, f[1], labelSettings.node[f[0]],
-				function (v) { labelSettings.node[f[0]] = v; }, r.decimals, r.affix, r.orders);
+			setboxTag(labelCheckbox(nodeBox, f[1], labelSettings.node[f[0]],
+				function (v) { labelSettings.node[f[0]] = v; }, r.decimals, r.affix, r.orders), labelRowPaths('node', f[0]));
 		});
 		columnHeadings(linkBox, 'link');
 		linkFieldDefs(pc).forEach(function (f) {
 			var r = labelRowSpecs('link', f[0]);
-			labelCheckbox(linkBox, f[1], labelSettings.link[f[0]],
-				function (v) { labelSettings.link[f[0]] = v; }, r.decimals, r.affix, r.orders);
+			setboxTag(labelCheckbox(linkBox, f[1], labelSettings.link[f[0]],
+				function (v) { labelSettings.link[f[0]] = v; }, r.decimals, r.affix, r.orders), labelRowPaths('link', f[0]));
 		});
 		if (custBox) {
 			custBox.innerHTML = '';
@@ -47739,9 +47803,9 @@ var EngCalcs = EngCalcs || {};
 			// is the move he asked to stop making everywhere else in this box -- and it would still
 			// not have told a reader which mark they were looking at. The tip does both: the search
 			// matches it, and somebody who sees an overlined number on the map can look it up.
-			labelCheckbox(optBox, pc.lpn_labels_mark_extrema || 'Mark highest and lowest values',
+			setboxTag(labelCheckbox(optBox, pc.lpn_labels_mark_extrema || 'Mark highest and lowest values',
 				labelSettings.markExtrema, function (v) { labelSettings.markExtrema = v; },
-				null, null, null, pc.lpn_labels_mark_extrema_tip);
+				null, null, null, pc.lpn_labels_mark_extrema_tip), [['labelSettings', 'markExtrema']]);
 			var sepRow = document.createElement('div'), sepLabel = document.createElement('span');
 			sepRow.style.display = 'flex'; sepRow.style.alignItems = 'baseline'; sepRow.style.gap = '6px';
 			sepLabel.textContent = pc.lpn_labels_separator || 'Text between values';
@@ -47757,6 +47821,7 @@ var EngCalcs = EngCalcs || {};
 				onChange: function (v) { labelSettings.separator = v; }
 			}));
 			optBox.appendChild(sepRow);
+			setboxTag(sepRow, [['labelSettings', 'separator']]);
 		}
 	}
 	// The key that survives printing: the Settings box is chrome (d-print-none), so a
@@ -49008,7 +49073,9 @@ var EngCalcs = EngCalcs || {};
 	// appended to the host that stands under its own sub-heading in Looped-Network.php, so where a
 	// control lives is readable in one place instead of inferred from the order of a build.
 	function rebuildSettingsFields() {
-		return keepSetboxControl(function () { return withSetboxView(rebuildSettingsFieldsNow); });
+		var out = keepSetboxControl(function () { return withSetboxView(rebuildSettingsFieldsNow); });
+		markHeldSetboxRows();
+		return out;
 	}
 	function rebuildSettingsFieldsNow() {
 		var pc = EngCalcs.pageConfig || {};
@@ -49086,7 +49153,7 @@ var EngCalcs = EngCalcs || {};
 				if (input.value !== '' && isFinite(v) && isValid(v)) { settings.defaults[key] = v; saveToStorage(); }
 				else { input.value = trimNum(settings.defaults[key]); }
 			});
-			row(target, unitId ? labelText + ' (' + unitLabel(unitId) + ')' : labelText, input, tip, href);
+			setboxTag(row(target, unitId ? labelText + ' (' + unitLabel(unitId) + ')' : labelText, input, tip, href), [['settings', 'defaults', key]]);
 			return input;
 		}
 		function any() { return true; }
@@ -49151,7 +49218,7 @@ var EngCalcs = EngCalcs || {};
 				rebuildSettingsFields();
 			});
 			wrap.appendChild(input); wrap.appendChild(apply);
-			row(idBody, f[1], wrap);
+			setboxTag(row(idBody, f[1], wrap), [['settings', 'idPrefixes', key]]);
 		});
 		// ---- Custom properties (ROADMAP Task 636; dev/custom-property-scope.md) ----
 		//
@@ -49458,8 +49525,8 @@ var EngCalcs = EngCalcs || {};
 				saveToStorage();
 				syncElevSource();
 			});
-			row(defBody, pc.lpn_settings_elev_source || 'Elevation source', elevSrc,
-				pc.lpn_settings_elev_source_tip);
+			setboxTag(row(defBody, pc.lpn_settings_elev_source || 'Elevation source', elevSrc,
+				pc.lpn_settings_elev_source_tip), [['settings', 'defaults', 'nodeElevSource'], ['settings', 'nodeElevSource']]);
 			syncElevSource();   // the box opens in the state the setting already says
 		}
 		// The BASE demand, because a starting value is a typed number: a resolved demand is worked
@@ -49589,7 +49656,7 @@ var EngCalcs = EngCalcs || {};
 			if (+sizeInput.value > 0) { settings.textSize = +sizeInput.value; refreshFontSizes(); saveToStorage(); }
 			else { sizeInput.value = settings.textSize; }
 		});
-		row(mapBody, pc.lpn_settings_text_size || 'Text size (pixels)', sizeInput);
+		setboxTag(row(mapBody, pc.lpn_settings_text_size || 'Text size (pixels)', sizeInput), [['settings', 'textSize']]);
 		// THREE INDEPENDENT PIXEL SIZES, and no units selector anywhere (Task 331). The "Text size
 		// units" map/screen dropdown is gone with map-unit sizing itself, and the old "Symbol size
 		// (relative to text)" multiplier is gone with the coupling that forced it -- a symbol size
@@ -49602,7 +49669,7 @@ var EngCalcs = EngCalcs || {};
 			if (+symInput.value > 0) { settings.symbolSize = +symInput.value; refreshSymbolSizes(); relayoutLabels(); saveToStorage(); }
 			else { symInput.value = settings.symbolSize; }
 		});
-		row(mapBody, pc.lpn_settings_symbol_size || 'Symbol size (pixels)', symInput);
+		setboxTag(row(mapBody, pc.lpn_settings_symbol_size || 'Symbol size (pixels)', symInput), [['settings', 'symbolSize']]);
 		var lwInput = document.createElement('input');
 		lwInput.type = 'number'; lwInput.className = 'ec-spin';
 		lwInput.step = '1'; lwInput.min = '1'; lwInput.value = settings.linkWidth;
@@ -49616,7 +49683,7 @@ var EngCalcs = EngCalcs || {};
 			if (+lwInput.value >= 1) { settings.linkWidth = +lwInput.value; refreshSymbolSizes(); saveToStorage(); }
 			else { lwInput.value = settings.linkWidth; }
 		});
-		row(mapBody, pc.lpn_settings_link_width || 'Link line width (pixels)', lwInput);
+		setboxTag(row(mapBody, pc.lpn_settings_link_width || 'Link line width (pixels)', lwInput), [['settings', 'linkWidth']]);
 		// **FLOW-DIRECTION ARROWS** (Tom, 2026-09-01). Built exactly like maskLabels and
 		// alignPipeLabels two rows below -- a bare checkbox through row(), reading `settings`,
 		// writing `settings`, then one apply function and saveToStorage(). It sits with the link
@@ -49627,8 +49694,8 @@ var EngCalcs = EngCalcs || {};
 			settings.showArrows = arrowInput.checked;
 			applyShowArrows(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_show_arrows || 'Flow direction arrows', arrowInput,
-			pc.lpn_settings_show_arrows_tip);
+		setboxTag(row(mapBody, pc.lpn_settings_show_arrows || 'Flow direction arrows', arrowInput,
+			pc.lpn_settings_show_arrows_tip), [['settings', 'showArrows']]);
 		// Task 329, and it ships OFF: aligned-vs-horizontal is a visual judgement, and turning it on
 		// by default would be making that judgement for the user rather than offering it to them.
 		var alignInput = document.createElement('input');
@@ -49637,7 +49704,7 @@ var EngCalcs = EngCalcs || {};
 			settings.alignPipeLabels = alignInput.checked;
 			relayoutLabels(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_align_labels || 'Draw link labels along the link line', alignInput);
+		setboxTag(row(mapBody, pc.lpn_settings_align_labels || 'Draw link labels along the link line', alignInput), [['settings', 'alignPipeLabels']]);
 		// Task 351, and it belongs directly under the checkbox it only means anything for. A number
 		// rather than a checkbox because the right value depends on the drawing: a subdivision of
 		// north-south mains wants the doorway well clear of vertical, and a diagonal transmission
@@ -49653,8 +49720,8 @@ var EngCalcs = EngCalcs || {};
 			biasInput.value = settings.labelFlipLeftOfVertical;
 			relayoutLabels(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_readability_bias || 'Label flip angle adjustment (degrees)', biasInput,
-			pc.lpn_settings_readability_bias_tip);
+		setboxTag(row(mapBody, pc.lpn_settings_readability_bias || 'Label flip angle adjustment (degrees)', biasInput,
+			pc.lpn_settings_readability_bias_tip), [['settings', 'labelFlipLeftOfVertical']]);
 		// Task 330, and it ships ON because that is what the page has always drawn -- a label over a
 		// backdrop image is unreadable without it, and an upgrade must not restyle anyone's drawing.
 		var maskInput = document.createElement('input');
@@ -49663,7 +49730,7 @@ var EngCalcs = EngCalcs || {};
 			settings.maskLabels = maskInput.checked;
 			applyMaskLabels(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_mask_labels || 'Solid background behind labels', maskInput);
+		setboxTag(row(mapBody, pc.lpn_settings_mask_labels || 'Solid background behind labels', maskInput), [['settings', 'maskLabels']]);
 		// **ONE CONTROL, NOT A CHECKBOX AND A PICKER** (ROADMAP Task 408). Tom asked for "a toggle
 		// or picker for the increment"; Off is one of the increments, exactly as it is one of the
 		// legend placements, so there is one decision and no question of which control wins.
@@ -49687,8 +49754,8 @@ var EngCalcs = EngCalcs || {};
 			settings.leaderSnapDeg = +snapSelect.value;
 			saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_leader_snap || 'Snap leader lines to set angles', snapSelect,
-			null);
+		setboxTag(row(mapBody, pc.lpn_settings_leader_snap || 'Snap leader lines to set angles', snapSelect,
+			null), [['settings', 'leaderSnapDeg']]);
 		// ---- THE LABELING THRESHOLD (Tasks 669 and 705, restored 2026-09-22) ----
 		// It sat at this point until 2026-08-19 and is back on Tom's asking, in his words for the
 		// row. **A NUMBER AND A CAPTURE BUTTON**: no default is meaningful across networks 400 ft
@@ -49718,8 +49785,8 @@ var EngCalcs = EngCalcs || {};
 			get: function () { return settings.labelMaxWidth; },
 			set: function (v) { settings.labelMaxWidth = v; labelThresholdChanged(); saveToStorage(); }
 		});
-		row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when zoomed to this map width or less',
-			lmw.wrap, pc.lpn_settings_label_max_width_tip);
+		setboxTag(row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when zoomed to this map width or less',
+			lmw.wrap, pc.lpn_settings_label_max_width_tip), [['settings', 'labelMaxWidth']]);
 		// ---- THE MAXIMUM-SYMBOL-SIZE RULE (Task 705, his own wording, 2026-09-22) ----
 		// "Prevent nodes from scaling larger than [0.5] times the length of the [20] percentile
 		// pipe." ONE rule now, replacing the old fallback onto the labeling threshold above --
@@ -49770,7 +49837,7 @@ var EngCalcs = EngCalcs || {};
 				capWrap.appendChild(capNote);
 			}
 		}
-		row(mapBody, capLabel || '\u00a0', capWrap, pc.lpn_settings_symbol_cap_tip);
+		setboxTag(row(mapBody, capLabel || '\u00a0', capWrap, pc.lpn_settings_symbol_cap_tip), [['settings', 'symbolCapMultiple'], ['settings', 'symbolCapPercentile']]);
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;
@@ -49779,7 +49846,7 @@ var EngCalcs = EngCalcs || {};
 			if (v > 0 && v <= 1) { settings.symbolOpacity = v; refreshSymbolSizes(); saveToStorage(); }
 			else { opacityInput.value = settings.symbolOpacity; }
 		});
-		row(mapBody, pc.lpn_settings_symbol_opacity || 'Symbol opacity (0 to 1)', opacityInput);
+		setboxTag(row(mapBody, pc.lpn_settings_symbol_opacity || 'Symbol opacity (0 to 1)', opacityInput), [['settings', 'symbolOpacity']]);
 		var backdropOpacityInput = document.createElement('input');
 		backdropOpacityInput.type = 'number'; backdropOpacityInput.step = '0.05';
 		backdropOpacityInput.min = '0.05'; backdropOpacityInput.max = '1';
@@ -49789,7 +49856,7 @@ var EngCalcs = EngCalcs || {};
 			if (v > 0 && v <= 1) { settings.backdropOpacity = v; refreshSymbolSizes(); saveToStorage(); }
 			else { backdropOpacityInput.value = settings.backdropOpacity; }
 		});
-		row(mapBody, pc.lpn_settings_backdrop_opacity || 'Background image opacity (0 to 1)', backdropOpacityInput);
+		setboxTag(row(mapBody, pc.lpn_settings_backdrop_opacity || 'Background image opacity (0 to 1)', backdropOpacityInput), [['settings', 'backdropOpacity']]);
 		// Task 617: tone the street or satellite tiles down. Same save path as the opacity row above.
 		var basemapStyleSelect = document.createElement('select');
 		basemapStyleSelect.id = 'lpn_set_basemap_style';
@@ -49804,7 +49871,7 @@ var EngCalcs = EngCalcs || {};
 		basemapStyleSelect.addEventListener('change', function () {
 			settings.basemapStyle = basemapStyleSelect.value; delete settings.basemapFilter; refreshBackdropOpacity(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_basemap_style || 'Basemap style', basemapStyleSelect);
+		setboxTag(row(mapBody, pc.lpn_settings_basemap_style || 'Basemap style', basemapStyleSelect), [['settings', 'basemapStyle']]);
 		var legendSelect = document.createElement('select');
 		legendPositionOptions(pc).forEach(function (o) {
 			var opt = document.createElement('option');
@@ -49823,7 +49890,8 @@ var EngCalcs = EngCalcs || {};
 		// weakest case there is for promoting a row out of its section. The earlier "fiddled with
 		// often" justification for keeping it loose did not survive contact with the section it
 		// obviously belongs to.
-		row(mapBody, pc.lpn_settings_legend_position || 'Labels legend position', legendSelect);
+		setboxTag(row(mapBody, pc.lpn_settings_legend_position || 'Labels legend position', legendSelect), [['settings', 'legendPosition']]);
+		settingsViewRows(mapBody, row);
 		// There is no "Saving to a file" section (Task 211): nothing is written to a file on a timer.
 		// Its 60-180 s range protected a coupling rather than the user -- one number doing three jobs
 		// (write interval, lock heartbeat, takeover threshold).
@@ -50024,7 +50092,7 @@ var EngCalcs = EngCalcs || {};
 				tipText = (tipText ? tipText + ' ' : '')
 					+ (pc.lpn_settings_default_is || 'The default is {n}.').replace('{n}', String(dflt));
 			}
-			row(compBody, labelText, input, tipText);
+			setboxTag(row(compBody, labelText, input, tipText), [['settings', 'hydraulics', key]].concat(key === 'emitterExponent' ? [['settings', 'emitterExponent']] : []));
 		}
 		if (!settings.hydraulics) { settings.hydraulics = {}; }
 		// **THE TWO SWITCHES COME FIRST UNDER Hydraulics, and Tom put them there** (2026-09-05:
@@ -50056,7 +50124,7 @@ var EngCalcs = EngCalcs || {};
 			clearSlowAdvice();
 			saveToStorage();
 		});
-		row(compBody, pc.lpn_settings_auto_run || 'Recalculate automatically', autoInput, pc.lpn_settings_auto_run_tip);
+		setboxTag(row(compBody, pc.lpn_settings_auto_run || 'Recalculate automatically', autoInput, pc.lpn_settings_auto_run_tip), [['settings', 'autoRun']]);
 		// **THE ONE FURNITURE ROW IN THIS BOX, and it says so in its own tip** (Tom, 2026-09-12).
 		// Every other row here writes `settings`, which is PROJECT data and rides in
 		// serializeProject(). This one writes a browser key and must never touch `settings`: see
@@ -50119,7 +50187,7 @@ var EngCalcs = EngCalcs || {};
 			if (settings.engine === 'epanet') { warmEpanetEngine('engine'); }
 			scheduleSolve();
 		});
-		row(compBody, pc.lpn_settings_engine_native || 'Use the built-in solver when possible', engInput, pc.lpn_settings_engine_native_tip);
+		setboxTag(row(compBody, pc.lpn_settings_engine_native || 'Use the built-in solver when possible', engInput, pc.lpn_settings_engine_native_tip), [['settings', 'engine']]);
 		// ---- friction method (ROADMAP Task 271) ----
 		// THIRD row here, and the order of the first five is TOM'S, given twice (2026-09-05:
 		// *"Settings.Hydraulics: First item needs to be recalculate. Second needs to be EPANET
@@ -50184,7 +50252,7 @@ var EngCalcs = EngCalcs || {};
 				scheduleSolve();
 			}
 		});
-		row(compBody, pc.bpn_method || 'Friction method', methodSelect, pc.bpn_roughness_tip);
+		setboxTag(row(compBody, pc.bpn_method || 'Friction method', methodSelect, pc.bpn_roughness_tip), [['settings', 'method']]);
 		hydNumberRow('accuracy', 'lpn_settings_accuracy', 'Accuracy',
 			'lpn_settings_accuracy_tip', solveAccuracy());
 		// FIFTH, and last of the five Tom ordered: it is a statement about the SYSTEM rather than
@@ -50227,7 +50295,7 @@ var EngCalcs = EngCalcs || {};
 			if (demandModelSel.value === 'PDA') { warmEpanetIfNeeded(); }
 			scheduleSolve();
 		});
-		row(compBody, pc.lpn_settings_demand_model || 'Demand model', demandModelSel, pc.lpn_settings_demand_model_tip);
+		setboxTag(row(compBody, pc.lpn_settings_demand_model || 'Demand model', demandModelSel, pc.lpn_settings_demand_model_tip), [['settings', 'hydraulics', 'demandModel'], ['settings', 'hydraulics', 'pdaSrc']]);
 		isPda = demandModelSel.value === 'PDA';
 		if (isPda) {
 			hydNumberRow('minPressure', 'lpn_settings_min_pressure', 'Minimum pressure',
@@ -50744,13 +50812,220 @@ var EngCalcs = EngCalcs || {};
 		if (mine) { setboxEditBegin(); setboxEdit.outside = true; }
 		try { return fn(); } finally { if (mine) { setboxEditEnd(); } }
 	}
+	// A control marked `data-lpn-noseam` keeps its own undo step and its own write (a held value's
+	// Clear override, the view's rows): the bracket would otherwise hold the box's view still while
+	// the control rebuilds it, and show the value just cleared.
+	function setboxNoSeam(e) { return !!(e && e.target && e.target.closest && e.target.closest('[data-lpn-noseam]')); }
 	function wireSetboxScenarioSeam(box) {
 		if (!box || box._lpnSeam) { return; }
 		box._lpnSeam = true;
 		['change', 'input', 'click'].forEach(function (type) {
-			box.addEventListener(type, function (e) { setboxEditBegin(e); }, true);
+			box.addEventListener(type, function (e) { if (!setboxNoSeam(e)) { setboxEditBegin(e); } }, true);
 			box.addEventListener(type, function () { setboxEditEnd(); }, false);
 		});
+	}
+	// ---- A HELD VALUE, MARKED IN THE SETTINGS BOX ITSELF (Ida's design, dev/scenario-alternatives.md) ----
+	//
+	// In a scenario, a row whose value the scenario holds (an override, by settingRowIsLocal()'s rule:
+	// local where the scenario writes, so an inherited value is not marked) wears an amber edge, and
+	// under it a line says what Base has and offers Clear override, which removes the override
+	// through the Settings table's own settingRowClear(), as one undo step. No per-field checkbox:
+	// typing a value is what holds it. In Base nothing is marked, because Base holds nothing.
+	//
+	// **A ROW SAYS WHICH SETTINGS IT EDITS** (`data-lpn-setting`, a JSON list of paths, written by
+	// setboxTag() where the row is built). A path names a leaf or a whole map; every Settings table
+	// row at or under it counts, so one Labels row (show, decimals, before, after, units, ranks)
+	// is one mark.
+	function setboxTag(el, paths) {
+		if (el && el.setAttribute) { el.setAttribute('data-lpn-setting', JSON.stringify(paths || [])); }
+		return el;
+	}
+	// Every setting one Labels row edits.
+	function labelRowPaths(group, key) {
+		var out = [['labelSettings', group, key]], rk = labelRankKey(key);
+		['decimals', 'prefix', 'suffix', 'useUnits'].forEach(function (m) { out.push(['labelSettings', m, group, key]); });
+		if (key === 'quality') { out.push(['labelSettings', 'decimals', group, qualityDecimalsKey()]); }
+		['show', 'priority'].forEach(function (m) { out.push(['labelSettings', m, group, rk]); });
+		return out;
+	}
+	function setboxPathUnder(p, prefix) {
+		var i;
+		if (p.length < prefix.length) { return false; }
+		for (i = 0; i < prefix.length; i++) { if (String(p[i]) !== String(prefix[i])) { return false; } }
+		return true;
+	}
+	// The Settings table rows a tagged row edits that scenario `scn` holds.
+	function setboxHeldRowsOf(paths, scn, rows) {
+		if (!scn || scn.isBase) { return []; }
+		return rows.filter(function (r) {
+			return paths.some(function (p) { return setboxPathUnder(r.path, p); }) && settingRowIsLocal(r, scn);
+		});
+	}
+	// What Base has for one row, in the words the Settings table shows it in. The view's Base value
+	// is Base's live view, known while a scenario holds one (followScenarioView() remembers it).
+	function setboxBaseText(row) {
+		var base = baseScenario(), v, opts, i;
+		if (row.path[0] === 'view') { return viewBeforeScenarioView ? viewSummaryText(outwardViewOf(viewBeforeScenarioView)) : null; }
+		if (settingRowIsSelect(row)) {
+			v = settingRowValue(row, base);
+			if (v === undefined) { v = row.dflt; }
+			opts = settingRowOptions(row, base);
+			for (i = 0; i < opts.length; i++) { if (String(opts[i][0]) === String(v)) { return opts[i][1]; } }
+		}
+		return settingRowText(row, base);
+	}
+	function markHeldSetboxRows() {
+		var box = setboxEl(), scn = activeScenario(), rows = null, pc = EngCalcs.pageConfig || {};
+		// Base's text is read from the project's own objects, so never from inside a builder's view.
+		if (!box || setboxViewDepth) { return; }
+		Array.prototype.forEach.call(box.querySelectorAll('.lpn-set-heldnote'), function (n) { n.parentNode.removeChild(n); });
+		Array.prototype.forEach.call(box.querySelectorAll('.lpn-set-held'), function (el) { el.classList.remove('lpn-set-held'); });
+		if (!scn || scn.isBase) { return; }
+		Array.prototype.forEach.call(box.querySelectorAll('[data-lpn-setting]'), function (el) {
+			var paths, held, note, text, btn, many;
+			try { paths = JSON.parse(el.getAttribute('data-lpn-setting')) || []; } catch (e) { paths = []; }
+			if (!paths.length) { return; }
+			if (!rows) { rows = settingTableRows(); }
+			held = setboxHeldRowsOf(paths, scn, rows);
+			if (!held.length) { return; }
+			el.classList.add('lpn-set-held');
+			many = held.length > 1;
+			text = held.map(function (r) {
+				var t = setboxBaseText(r);
+				if (t === null || t === undefined) { return null; }
+				return many ? settingTableFill(pc.lpn_settings_row_of || '{setting}, {member}', { setting: settingTableLabel(r.path), member: t }) : t;
+			}).filter(function (t) { return t !== null; });
+			note = document.createElement('div');
+			note.className = 'lpn-set-note lpn-set-heldnote';
+			note.setAttribute('data-lpn-noseam', '1');
+			if (text.length) {
+				note.appendChild(document.createTextNode((pc.lpn_settings_held_base || '{base}: {value}')
+					.split('{base}').join(pc.lpn_scenario_base || 'Base').split('{value}').join(text.join('; ')) + ' '));
+			}
+			btn = document.createElement('button');
+			btn.type = 'button';
+			btn.className = 'lpn-set-heldclear';
+			btn.textContent = pc.lpn_pane_clear_override || 'Clear override';
+			btn.addEventListener('click', function (e) {
+				if (e && e.preventDefault) { e.preventDefault(); }
+				clearHeldSetboxRows(held, scn);
+			});
+			note.appendChild(btn);
+			el.parentNode.insertBefore(note, el.nextSibling);
+		});
+	}
+	// Clear override, from the Settings box: the Settings table's own clear, one undo step, then
+	// everything a setting edit redraws (the box with it).
+	function clearHeldSetboxRows(held, scn) {
+		if (!held.length || scn !== activeScenario()) { return false; }
+		saveUndoSnapshot();
+		held.forEach(function (r) { settingRowClear(r, scn); });
+		settingTableAfterEdit();
+		refreshPaneIfOpen();
+		return true;
+	}
+	// ---- THE VIEW IN THE SETTINGS BOX, AND "HOLD THIS VIEW IN THIS SCENARIO" (Tom, 2026-10-06, Q2 and Q9) ----
+	//
+	// The rows show the map as it is now: its centre (latitude and longitude, or x and y, in public
+	// order), its scale as 1:N, and its two corners, which depend on the window and so are shown and
+	// never stored. Typing a centre or a scale moves the map. **HOLDING IS A CLICK, NEVER A SIDE
+	// EFFECT OF LOOKING**: panning and zooming write nothing; the Hold button stores the view as it
+	// is now in the open scenario (setScenarioView(), centre plus metres per pixel), and while the
+	// scenario holds one, a typed centre or scale is written to it too. Entering the scenario then
+	// moves the map there (followScenarioView()). Clear override releases it, and the map goes back
+	// to Base's view, which the scenario then follows again.
+	function viewHeldHere(scn) {
+		return !!scn && !scn.isBase && settingRowIsLocal({ path: ['view'], cat: 'presentation', home: '' }, scn);
+	}
+	function settingsViewRows(target, rowFn) {
+		var pc = EngCalcs.pageConfig || {}, group = document.createElement('div'), geo = isLatLonProject(),
+			c1 = document.createElement('input'), c2 = document.createElement('input'), sc = document.createElement('input'),
+			wrap = document.createElement('span'), tl = document.createElement('span'), br = document.createElement('span'),
+			scn = activeScenario(), hold;
+		group.className = 'lpn-set-viewgroup';
+		group.id = 'lpn_set_view_group';
+		group.setAttribute('data-lpn-noseam', '1');
+		wrap.className = 'lpn-set-ctlgroup';
+		[[c1, 'lpn_set_view_c1', geo ? (pc.lpn_field_lat || 'Latitude') : (pc.lpn_field_x || 'X')],
+			[c2, 'lpn_set_view_c2', geo ? (pc.lpn_field_lon || 'Longitude') : (pc.lpn_field_y || 'Y')]].forEach(function (c) {
+			c[0].type = 'text'; c[0].className = 'lpn-set-num'; c[0].id = c[1]; c[0].size = 11;
+			c[0].setAttribute('aria-label', c[2]); c[0].placeholder = c[2];
+			c[0].addEventListener('change', commitTyped);
+			wrap.appendChild(c[0]);
+		});
+		sc.type = 'text'; sc.className = 'lpn-set-num'; sc.id = 'lpn_set_view_scale'; sc.size = 11;
+		sc.addEventListener('change', commitTyped);
+		tl.id = 'lpn_set_view_tl'; br.id = 'lpn_set_view_br';
+		tl.className = br.className = 'lpn-set-note';
+		target.appendChild(group);
+		rowFn(group, pc.lpn_settings_view_center || 'Map center', wrap);
+		rowFn(group, pc.lpn_settings_view_scale || 'Map scale', sc, pc.lpn_settings_view_scale_tip);
+		rowFn(group, pc.lpn_settings_view_top_left || 'Top left corner', tl);
+		rowFn(group, pc.lpn_settings_view_bottom_right || 'Bottom right corner', br);
+		if (scn && !scn.isBase) {
+			hold = document.createElement('button');
+			hold.type = 'button';
+			hold.id = 'lpn_set_view_hold';
+			hold.textContent = pc.lpn_settings_view_hold || 'Hold this view in this scenario';
+			helpTip(hold, (pc.lpn_settings_view_hold_tip || 'Stores this map center and scale in the open scenario, so opening it moves the map here. Moving the map afterward changes nothing until you press this again. Clear override to follow the {base} view again.')
+				.split('{base}').join(pc.lpn_scenario_base || 'Base'));
+			hold.addEventListener('click', function () { holdScenarioView(); });
+			group.appendChild(hold);
+		}
+		setboxTag(group, [['view']]);
+		refreshSetboxViewRows();
+		// A typed centre or scale: the map goes there, and a scenario holding a view holds this one.
+		function commitTyped() {
+			var o = outwardViewOf(currentView()), a = parseFloat(c1.value), b = parseFloat(c2.value),
+				n = parseFloat(String(sc.value).replace(/^\s*1\s*:\s*/, '').replace(/[\s,]/g, '')), v, here = activeScenario();
+			if (!o || !isFinite(a) || !isFinite(b) || !(n > 0)) { refreshSetboxViewRows(true); return; }
+			if (geo) { o.cy = a; o.cx = b; } else { o.cx = a; o.cy = b; }
+			o.mpp = n * LPN_CSS_PX_METRES;
+			delete o.s;
+			v = inwardViewOf(o);
+			if (!v || !applyView(v)) { refreshSetboxViewRows(true); return; }
+			if (viewHeldHere(here)) {
+				saveUndoSnapshot();
+				setScenarioView(here, currentView());
+				afterHeldViewChange();
+			} else { refreshSetboxViewRows(true); }
+		}
+	}
+	// The view rows say where the map is now. A box being typed in keeps what is typed.
+	function refreshSetboxViewRows(force) {
+		var c1 = document.getElementById('lpn_set_view_c1'), c2 = document.getElementById('lpn_set_view_c2'),
+			sc = document.getElementById('lpn_set_view_scale'), tl = document.getElementById('lpn_set_view_tl'),
+			br = document.getElementById('lpn_set_view_br'), v = currentView(), o, box = mapBox(), a, b, geo = isLatLonProject(), N;
+		if (!c1 || !c2 || !sc || !v) { return; }
+		o = outwardViewOf(v);
+		if (!o) { return; }
+		N = viewScaleDenominator(o);
+		[[c1, geo ? o.cy : o.cx], [c2, geo ? o.cx : o.cy]].forEach(function (p) {
+			if (force || document.activeElement !== p[0]) { p[0].value = String(+(+p[1]).toFixed(geo ? 6 : 2)); }
+		});
+		if (force || document.activeElement !== sc) { sc.value = isFinite(N) ? '1:' + N : ''; }
+		a = outwardViewOf({ cx: v.cx - (box.w || 0) / 2 / v.s, cy: v.cy - (box.h || 0) / 2 / v.s, s: v.s });
+		b = outwardViewOf({ cx: v.cx + (box.w || 0) / 2 / v.s, cy: v.cy + (box.h || 0) / 2 / v.s, s: v.s });
+		if (tl && a) { tl.textContent = viewPointText(a.cx, a.cy); }
+		if (br && b) { br.textContent = viewPointText(b.cx, b.cy); }
+	}
+	// "Hold this view in this scenario": one undo step. Base's live view is remembered first, so
+	// Clear override can go back to it, as leaving the scenario does.
+	function holdScenarioView() {
+		var scn = activeScenario(), v = currentView();
+		if (!scn || scn.isBase || !v) { return false; }
+		saveUndoSnapshot();
+		if (!heldView(scn) && !viewBeforeScenarioView) { viewBeforeScenarioView = v; }
+		if (!setScenarioView(scn, v)) { return false; }
+		afterHeldViewChange();
+		return true;
+	}
+	function afterHeldViewChange() {
+		saveToStorage();
+		refreshScenarioStatus();
+		refreshPaneIfOpen();
+		dropScenarioCompareRun();
+		rebuildSettingsBox();
 	}
 	// Beside Units, while a scenario is open: they are the same in every scenario.
 	function setboxUnitsNote() {
@@ -50776,6 +51051,7 @@ var EngCalcs = EngCalcs || {};
 		// host seam). Absent that file, the section is simply empty rather than broken.
 		if (EngCalcs.lpnTimeRenderSettings) { EngCalcs.lpnTimeRenderSettings(); }
 		setboxUnitsNote();
+		markHeldSetboxRows();
 		buildSettingsIndex();
 		applySetboxFilter();
 		// **THE FIND BOX RIDES THIS SEAM RATHER THAN KEEPING ITS OWN** (Task 580). Everything that
@@ -53431,8 +53707,8 @@ var EngCalcs = EngCalcs || {};
 			libCommit();
 			refreshPopupIfOpen();
 		});
-		rowFn(host, pc.lpn_settings_default_pattern || 'Default demand pattern', sel,
-			pc.lpn_settings_default_pattern_tip);
+		setboxTag(rowFn(host, pc.lpn_settings_default_pattern || 'Default demand pattern', sel,
+			pc.lpn_settings_default_pattern_tip), [['defaultPattern']]);
 	}
 	// ---- WATER QUALITY, THE TWO CONTROLS (Tom, 2026-09-01: quality is the priority) --------------
 	//
@@ -53515,7 +53791,7 @@ var EngCalcs = EngCalcs || {};
 			refreshPopupIfOpen();
 			scheduleSolve();
 		});
-		rowFn(host, pc.lpn_settings_quality_track || 'Quality parameter', sel, pc.lpn_settings_quality_track_tip);
+		setboxTag(rowFn(host, pc.lpn_settings_quality_track || 'Quality parameter', sel, pc.lpn_settings_quality_track_tip), [['settings', 'quality']]);
 		if (q.mode === 'trace') {
 			var src = document.createElement('select');
 			qualitySourceCandidates().forEach(function (id) {
@@ -53541,8 +53817,8 @@ var EngCalcs = EngCalcs || {};
 				refreshPopupIfOpen();
 				scheduleSolve();
 			});
-			rowFn(host, pc.lpn_settings_quality_source || 'Trace node', src,
-				pc.lpn_settings_quality_source_tip);
+			setboxTag(rowFn(host, pc.lpn_settings_quality_source || 'Trace node', src,
+				pc.lpn_settings_quality_source_tip), [['settings', 'quality']]);
 		}
 		if (q.mode === 'chemical') { settingsChemicalRows(host, rowFn, noteFn); }
 		// **SAID PLAINLY, IN THE BOX, RATHER THAN LEFT TO BE DISCOVERED.** Water quality is carried
@@ -53599,10 +53875,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		nameInput.addEventListener('change', commitChemical);
 		massSel.addEventListener('change', commitChemical);
-		rowFn(host, pc.lpn_quality_chemical_name || 'Chemical', nameInput,
-			pc.lpn_quality_chemical_name_tip);
-		rowFn(host, pc.lpn_quality_mass_units || 'Mass units', massSel,
-			pc.lpn_quality_mass_units_tip);
+		setboxTag(rowFn(host, pc.lpn_quality_chemical_name || 'Chemical', nameInput,
+			pc.lpn_quality_chemical_name_tip), [['settings', 'quality']]);
+		setboxTag(rowFn(host, pc.lpn_quality_mass_units || 'Mass units', massSel,
+			pc.lpn_quality_mass_units_tip), [['settings', 'quality']]);
 		// **QUALITY TOLERANCE AND RELATIVE DIFFUSIVITY, EPANET'S OWN NAMES** (R-322, Tom: "I don't
 		// see this in our interface. Is it missing?" -- twice). They were carried in the file and
 		// handed to the engine all along (`qualitySetting()`, js/lpn-epanet.js) with no box to read
@@ -53631,7 +53907,7 @@ var EngCalcs = EngCalcs || {};
 				saveToStorage();
 				scheduleSolve();
 			});
-			rowFn(host, labelText, input, tip);
+			setboxTag(rowFn(host, labelText, input, tip), [['settings', 'qualityOptions', key]]);
 		}
 		qualityOptionRow('tolerance', pc.lpn_quality_tolerance || 'Quality tolerance',
 			pc.lpn_quality_tolerance_tip, '0.01');
@@ -53654,7 +53930,7 @@ var EngCalcs = EngCalcs || {};
 				saveToStorage();
 				scheduleSolve();
 			});
-			rowFn(host, labelText, input, tip);
+			setboxTag(rowFn(host, labelText, input, tip), [['settings', 'reactions', key]]);
 		}
 		coeffRow('globalBulk', (pc.lpn_reaction_bulk || 'Bulk reaction coefficient')
 			+ ' (' + (pc.lpn_reaction_per_day || '1/day') + ')', pc.lpn_reaction_bulk_tip);
@@ -53713,8 +53989,8 @@ var EngCalcs = EngCalcs || {};
 			rebuildSettingsBox();
 			scheduleSolve();
 		});
-		rowFn(host, pc.lpn_reaction_order_wall || 'Wall reaction order', wallOrder,
-			pc.lpn_reaction_order_wall_tip);
+		setboxTag(rowFn(host, pc.lpn_reaction_order_wall || 'Wall reaction order', wallOrder,
+			pc.lpn_reaction_order_wall_tip), [['settings', 'reactions', 'orderWall']]);
 		coeffRow('limitingPotential', pc.lpn_reaction_limiting || 'Limiting concentration',
 			pc.lpn_reaction_limiting_tip);
 		coeffRow('roughnessCorrelation', pc.lpn_reaction_rough_corr || 'Roughness correlation',
@@ -53765,7 +54041,7 @@ var EngCalcs = EngCalcs || {};
 				saveToStorage();
 				scheduleSolve();
 			});
-			rowFn(host, labelText, input, tip);
+			setboxTag(rowFn(host, labelText, input, tip), [['settings', 'energy', key]]);
 		}
 		numberRow('globalEfficiency', pc.lpn_energy_efficiency || 'Pump efficiency (percent)',
 			pc.lpn_energy_efficiency_tip);
@@ -53784,8 +54060,8 @@ var EngCalcs = EngCalcs || {};
 			saveToStorage();
 			scheduleSolve();
 		});
-		rowFn(host, pc.lpn_energy_price_pattern || 'Price pattern', pat,
-			pc.lpn_energy_price_pattern_tip);
+		setboxTag(rowFn(host, pc.lpn_energy_price_pattern || 'Price pattern', pat,
+			pc.lpn_energy_price_pattern_tip), [['settings', 'energy', 'globalPattern']]);
 		numberRow('demandCharge', (pc.lpn_energy_demand_charge || 'Peak demand charge')
 			+ ' (' + (money ? money + '/' : '') + (pc.lpn_energy_kw || 'kW') + ')',
 		pc.lpn_energy_demand_charge_tip);
@@ -53804,7 +54080,7 @@ var EngCalcs = EngCalcs || {};
 			rebuildSettingsBox();
 			refreshPopupIfOpen();
 		});
-		rowFn(host, pc.lpn_energy_currency || 'Currency', cur, pc.lpn_energy_currency_tip);
+		setboxTag(rowFn(host, pc.lpn_energy_currency || 'Currency', cur, pc.lpn_energy_currency_tip), [['settings', 'energy', 'currency']]);
 		if (noteFn) {
 			noteFn(host, pc.lpn_energy_price_note || 'This application offers no price suggestions. What power costs depends on the utility, the country, the hour and the year.');
 			noteFn(host, pc.lpn_energy_needs_run || 'Pump energy is power integrated over the run, so it needs an extended period simulation. Set a Total run time in Settings, Calculation, Time, press the Calculate button, then open Water, Reports, Pump energy.');
@@ -53866,8 +54142,8 @@ var EngCalcs = EngCalcs || {};
 			rebuildSettingsBox();
 			scheduleSolve();
 		});
-		rowFn(host, pc.lpn_settings_unbalanced || 'If it does not converge', sel,
-			pc.lpn_settings_unbalanced_tip);
+		setboxTag(rowFn(host, pc.lpn_settings_unbalanced || 'If it does not converge', sel,
+			pc.lpn_settings_unbalanced_tip), [['settings', 'hydraulics', 'unbalanced']]);
 		if (hyd.unbalanced === 'continue') {
 			numberRow('unbalancedTrials', 'lpn_settings_unbalanced_trials', 'Extra trials first',
 				'lpn_settings_unbalanced_trials_tip', 10, { allowZero: true });
@@ -59753,10 +60029,13 @@ var EngCalcs = EngCalcs || {};
 		// elements, because a class put on an element now would be thrown away with that element.
 		// Only ids present on both sides: a node the undo brought back or took away has not MOVED,
 		// and marking a resurrection would say the wrong thing about it.
-		var wasAt = {};
+		var wasAt = {}, scnSettingsWere = scenarioSettingsSignature(), scnSettingsChanged;
 		doc.nodes.forEach(function (n) { wasAt[n.id] = nodeDrawX(n) + ',' + nodeDrawY(n); });
 		doc = snap.state.doc;
 		scenarios = snap.state.scenarios;
+		// A step that put back a scenario's own setting (a Clear override in the Settings box or
+		// table, a held view) redraws what a setting edit redraws, as a project setting's step does.
+		scnSettingsChanged = scenarioSettingsSignature() !== scnSettingsWere;
 		if (snap.settingPaths) { snap.settingPaths.forEach(function (e) { settingProjectPut(e.path, e.value); }); }
 		touchTree('restoreUndoSnapshot');
 		// The fields only Delete network's snapshot carries (see deleteNetwork()). Assigned before
@@ -59819,7 +60098,7 @@ var EngCalcs = EngCalcs || {};
 		chainResyncAfterUndo();
 		refreshScenarioStatus();
 		// A step that put settings back redraws what a setting edit redraws.
-		if (snap.settingPaths) {
+		if (snap.settingPaths || scnSettingsChanged) {
 			refreshSymbolSizes(); refreshValueColors(); refreshBasemap(); refreshContour();
 			rebuildSettingsBox();
 			if (EngCalcs.lpnTimeTimesChanged) { EngCalcs.lpnTimeTimesChanged(); }
@@ -59856,6 +60135,11 @@ var EngCalcs = EngCalcs || {};
 		// An undone run time, the project's or a scenario's own (Task 755), moves the transport.
 		if (EngCalcs.lpnTimeTimesChanged) { EngCalcs.lpnTimeTimesChanged(); }
 		scheduleSolve();
+	}
+	// Every setting any scenario, stored alternative or calculation set holds, as one string.
+	function scenarioSettingsSignature() {
+		return JSON.stringify({ s: scenarios.map(function (x) { return [x.settings || null, x.demandMultiplier, x.times || null, x.calc || null, x.alternatives || null]; }),
+			a: (doc && doc.alternatives || []).map(function (x) { return x.settings || null; }), c: (doc && doc.calcSets) || null });
 	}
 	function undoPopupSubjectSurvives() {
 		var p = currentPopup;

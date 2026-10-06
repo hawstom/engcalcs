@@ -28,6 +28,9 @@
 	--ec-warn-bg: #fffbe6;
 	--ec-warn-border: #a80;
 	--ec-warn-ink: #c60;
+	/* A value the open scenario holds (an override): the amber the tables' override wash uses. */
+	--ec-held: #e8a33d;
+	--ec-held-bg: #fff3cd;
 	--ec-ok-ink: #267326;
 	--ec-bad-ink: #c00;
 	--ec-error-ink: #a00;
@@ -3745,6 +3748,13 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
    text in the box that named a control and did NOT wear it, which is what he was reading as "not
    uniform". The labels lists' own names are set to match in labelCheckbox(). */
 .lpn-set-row > :first-child, .lpn-set-name { overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
+/* A VALUE THE OPEN SCENARIO HOLDS (Ida's design, dev/scenario-alternatives.md): an amber edge on
+   the row, and under it what Base has with Clear override. The edge is drawn inside the row's own
+   box, so nothing beside it moves. */
+.lpn-set-held { box-shadow: inset 3px 0 0 var(--ec-held); padding-left: 6px; }
+.lpn-set-heldnote { margin: -2px 0 4px; padding-left: 6px; box-shadow: inset 3px 0 0 var(--ec-held); background: var(--ec-held-bg); }
+.lpn-set-heldclear { background: none; border: 0; padding: 0; font: inherit; color: var(--ec-accent); text-decoration: underline; cursor: pointer; }
+.lpn-set-viewgroup > button { margin: 2px 0 4px; }
 /* **A TRANSIENT MARK ON THE ROW A LINK JUST SENT YOU TO** (Tom's 2026-09-08 worklist). Tom asked for the
    Show page titles label "temporarily highlighted" when Hide these titles opens the box at it.
    TRANSIENT is the whole rule: the class is taken off on a timer or on the first press inside the

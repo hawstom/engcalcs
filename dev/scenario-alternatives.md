@@ -202,7 +202,7 @@ map is looking.
 | `settings`, map appearance | `basemapStyle`, `backdropOpacity` | `basemapStyleName()`, `backdropImageOpacity()` |
 | `settings`, colour by value | `colorNodeField`, `colorLinkField`, `colorRampNode`, `colorRampLink`, `colorClassesNode`, `colorClassesLink`, `colorReverseNode`, `colorReverseLink`, `colorBreaks`, `colorModes`, `colorLegendPosition` | `colorFieldOf()`, `colorRampKey()`, `colorClassCount()`, `colorReverseOf()`, `storedBreaks()`, `effectiveBreaks()`, `colorModeOf()`, `renderColorLegend()` |
 | `settings`, contours | `contourFill`, `contourLines`, `contourLabels`, `contourOpacity`, `contourInterval`, `contourBuffer`, `contourTerrain` | `contourFillMode()`, `contourIsOn()`, `drawContourLabels()`, `contourOpacityOf()`, `contourIntervalOf()`, `contourBufferOf()`, `contourTerrainWanted()` |
-| `view` (Tom, 2026-10-06, Q2) | the window: centre and scale, one atomic value | `followScenarioView()` on a switch. **Stored outward**, as a node's position override is (longitude and latitude, or the grid's absolute x and y), so the Y flip, the origin shift and the projection never touch it. Written only when a scenario deliberately holds one (`setScenarioView()`; no button calls it yet). |
+| `view` (Tom, 2026-10-06, Q2) | the window: centre and scale, one atomic value | `followScenarioView()` on a switch. **Stored outward**, as a node's position override is (longitude and latitude, or the grid's absolute x and y), so the Y flip, the origin shift and the projection never touch it. Written only when a scenario deliberately holds one (`setScenarioView()`, called by the Settings box's Hold this view in this scenario), as centre plus ground metres per CSS pixel. |
 
 **Calculation (`calculation`), 9 paths, two of them whole groups.** What the solver is told, other
 than the network itself.
@@ -283,9 +283,9 @@ project keeps the value:
 - **No coordinate is stored in the drawing frame.** The one coordinate in the store, a scenario's
   `view`, is stored outward, as a node's position override already is, so nothing in the store needs
   the Y flip, the origin shift or the geographic projection that `serializeProject()` applies to
-  the document's own coordinates. Its scale is pixels per drawing unit; a project turned from a
-  grid to geographic leaves a view that `viewShowsModel()` refuses, and a refused view moves
-  nothing. Two Presentation values are lengths (`labelMaxWidth`,
+  the document's own coordinates. Its scale is ground metres per CSS pixel (stage 3c), so it
+  means the same zoom in either frame; a view that shows none of the model is refused by
+  `viewShowsModel()`, and a refused view moves nothing. Two Presentation values are lengths (`labelMaxWidth`,
   `labelSettings.customerMaxWidth`), typed in the project's display unit; units are one per
   project, so they mean the same thing in every scenario.
 - **A file is read, never trusted** (`sanitizeScenarioSettings()`, beside
@@ -472,8 +472,45 @@ repro, the Alternatives table's columns and counts); `settings-table-labels-harn
 option harnesses (`scenario-time-option-harness.js`, `scenario-tree-harness.js`) type through the
 Settings table's Value cell.
 
-**Still to build:** a held value marked in the Settings box itself (Ida's amber edge and "Base:
-value", Clear), and the view's settings there beside a deliberate "Hold this view in this scenario".
+### Stage 3c: a held value marked in the Settings box, and holding the view (built 2026-10-06)
+
+- **Ida's mark, in the box itself.** In a scenario, a row whose value the scenario holds wears an
+  amber edge (`--ec-held`, beside `--ec-held-bg`, in the token block), and under it a line reads
+  "Base: {value}" in the Settings table's own words, then **Clear override**. No per-field checkbox:
+  typing a value is what holds it. Held means `settingRowIsLocal()`'s rule (local where the
+  scenario writes), so an inherited value is not marked; in Base nothing is.
+- **A row says which settings it edits** (`setboxTag()`, a `data-lpn-setting` list of paths, written
+  where each row is built: Map display, labels, colours, new assets, ID prefixes, Hydraulics, Time,
+  Quality, Energy). A path covers every Settings table row under it, so one Labels row (show,
+  decimals, before, after, units, ranks) is one mark, and its note names each held part. The
+  harness fails a Settings table row the box has a control for and does not tag.
+- **Clear override is the Settings table's own** (`settingRowClear()` through `setScenarioSetting()`),
+  one undo step, then what any setting edit redraws (`clearHeldSetboxRows()`). Undo of it, or of any
+  step that changed a scenario's own setting, now redraws the map and the box as a project
+  setting's undo does (`scenarioSettingsSignature()` in `restoreUndoSnapshot()`).
+- **Not marked yet:** the Contour box's rows (a box of its own), and the few settings the box has no
+  control for (the basemap, the tank new-asset values, check frequency and its pair, the quality
+  step): the Settings table is where those are seen held.
+- **The view in the box** (Map display): the map's centre (latitude and longitude, or x and y, in
+  public order), its scale as 1:N, and its top left and bottom right corners, shown and never
+  stored. They show the map as it is and follow it when it comes to rest. Typing a centre or a scale
+  moves the map. **Hold this view in this scenario** (a button, shown only in a scenario) stores the
+  view through `setScenarioView()`; panning and zooming never write it. While the scenario holds a
+  view, a typed centre or scale is written to it as well. The view rows are then marked like any
+  held value, "Base: {view}" being Base's live view, and Clear override releases it
+  (`releaseScenarioView()`, also what the Settings table's Clear override does on that row): the map
+  goes back to Base's view, and the scenario follows Base's view after that.
+- **Stored as centre plus ground metres per CSS pixel** (Declan): `{cx, cy, mpp}`, outward as before
+  (`outwardViewOf()`/`inwardViewOf()`); 1:N is derived (a CSS pixel is 1/96 inch). A view stored
+  with the older `s` (pixels per drawing unit) is still read. No file in the wild holds one: nothing
+  wrote a scenario's view before this stage.
+
+Harnesses: `dev/lpn-spike/settings-box-held-browser-harness.js` (real Chromium, Net1: no mark in
+Base or in a fresh scenario; friction method and text size changed in the box in a scenario, each
+marked with Base's value; Clear override returns the box and the solve to Base's; Ctrl+Z restores
+the override and its solve; every box row tagged; the view held as centre plus metres per pixel,
+switching scenarios moving the camera there and back, Clear override returning to Base's view and
+following it afterwards); `scenario-settings-routing-harness.js` holds the stored form.
 
 ### Questions for Tom
 
@@ -582,6 +619,16 @@ named set and stops pretending to have a parent. Recommendation: keep the column
    category). Agree, or would you rather it stood in its own place?
 9. **A scenario's own view: where does the map go when you leave it?** Answered above.
 
+
+### Questions for Tom (third round, stage 3c)
+
+10. **Picking a friction method in a scenario also changes two companions there**: the New assets
+    roughness and the roughness label's decimals (the box has always reset them to suit the
+    method). So three rows are marked, and Clear override on the method clears only the method;
+    the other two stay held until cleared. Recommendation: keep it, since each row says what it
+    holds and Clear does exactly what it says. The alternative is one Clear for the three.
+11. **The link under a held row says "Clear override"**, the Settings table's own words, where Ida
+    drew "Reset". Recommendation: keep "Clear override", one name for one act.
 
 ## The long burn: from Basic mode to the full model (2026-10-06)
 
@@ -740,6 +787,9 @@ Harness: `dev/lpn-spike/scenario-settings-routing-harness.js`.
 The Settings table: same file, section "THE SETTINGS TABLE" (`settingTableRows()`,
 `settingTableCols()`, `settingRowValue()`, `settingRowWrite()`, `settingRowIsLocal()`,
 `settingRowClear()`, `openSettingsTableAt()`); the spec is the last of `buildPaneTables()`.
+The held mark in the Settings box: `setboxTag()`, `labelRowPaths()`, `markHeldSetboxRows()`,
+`clearHeldSetboxRows()`, beside `wireSetboxScenarioSeam()`; the view's rows, `settingsViewRows()`,
+`refreshSetboxViewRows()`, `holdScenarioView()`, `releaseScenarioView()`.
 
 Basic mode and the table: same file, section "SCENARIOS > BASIC MODE" (`setScenarioBasicMode()`,
 `rebuildAlternativesTable()`); the box is `#lpn_alt_box` in `Looped-Network.php`. The box's

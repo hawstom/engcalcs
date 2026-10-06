@@ -1426,6 +1426,8 @@
 					value: EC.lpnTimeText(times, pair[0], times[pair[0]] || 0)
 				});
 			input.addEventListener('change', function () { commitField(pair[0], input.value); });
+			// Which setting this row edits, for the held-value mark (setboxTag() in looped-network.js).
+			row.setAttribute('data-lpn-setting', JSON.stringify([['times', pair[0]]]));
 			row.appendChild(label);
 			row.appendChild(input);
 			panel.appendChild(row);
@@ -1446,6 +1448,7 @@
 		});
 		ssel.value = times.statistic || 'NONE';
 		ssel.addEventListener('change', function () { commitStatistic(ssel.value); });
+		srow.setAttribute('data-lpn-setting', JSON.stringify([['times', 'statistic']]));
 		srow.appendChild(el('span', {}, S.statistic));
 		srow.appendChild(ssel);
 		panel.appendChild(srow);

@@ -254,11 +254,14 @@ if (BLIND && process.env.LPN_SEAM_OVERRIDE === '1') {
 		L.applyView({ cx: 20, cy: 60, s: 5 });
 		const figView = L.currentView();
 		L.setScenarioView(scn, figView);
-		ok('the view is held outward, as a position override is', scn.settings.view && scn.settings.view.s === 5 && typeof scn.settings.view.cx === 'number');
+		// The scale is held as ground metres per CSS pixel (Declan's advice), never as the drawing's
+		// own pixels per unit, which means a different zoom in every frame.
+		ok('the view is held outward, as a position override is, its scale in metres per pixel',
+			scn.settings.view && scn.settings.view.mpp > 0 && scn.settings.view.s === undefined && typeof scn.settings.view.cx === 'number', JSON.stringify(scn.settings.view));
 		L.switchScenario(L.baseScenario().id);
 		L.applyView(home);
 		L.switchScenario(scn.id);
-		ok('switching into a scenario that holds a view goes there', Math.abs(L.currentView().cx - figView.cx) < 1e-9 && Math.abs(L.currentView().cy - figView.cy) < 1e-9 && L.currentView().s === 5);
+		ok('switching into a scenario that holds a view goes there', Math.abs(L.currentView().cx - figView.cx) < 1e-9 && Math.abs(L.currentView().cy - figView.cy) < 1e-9 && Math.abs(L.currentView().s - 5) < 1e-9);
 		L.switchScenario(L.baseScenario().id);
 		ok('...and switching out returns to where you were looking', Math.abs(L.currentView().cx - home.cx) < 1e-9 && Math.abs(L.currentView().cy - home.cy) < 1e-9 && L.currentView().s === home.s);
 		const text = JSON.stringify(L.serializeProject());
