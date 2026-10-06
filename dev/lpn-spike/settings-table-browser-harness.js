@@ -226,6 +226,26 @@ async function main() {
 			return spec.map((t) => !!t.querySelector('.lpn-valwarn'));
 		});
 		ok('Pipes table (ordinary view, in Peak): pipe 11\'s C = 130 wears ⚠ under Darcy-Weisbach', warn.length === 1 && warn[0], JSON.stringify(warn));
+		// ...and with Show scenarios on, each row is judged by ITS scenario's method: Base's row
+		// (Hazen-Williams) carries none, Peak's (Darcy-Weisbach) does.
+		await page.evaluate(() => {
+			const td = Array.from(document.querySelectorAll('#lpn_pane_pipes td.lpn-pane-col-roughness')).filter((t) => t._lpnPaneId === '11')[0];
+			td.querySelector('input').focus();
+		});
+		await a.settle(200);
+		await page.keyboard.press('Shift+F10');
+		await a.settle(300);
+		await H.menuPick(await L('lpn_pane_scn_show'));
+		await a.settle(800);
+		const warn2 = await page.evaluate(() => {
+			const out = {};
+			Array.from(document.querySelectorAll('#lpn_pane_pipes td.lpn-pane-col-roughness')).forEach((t) => {
+				const k = String(t._lpnPaneId).split(String.fromCharCode(1));
+				if (k[0] === '11') { out[k[1]] = !!t.querySelector('.lpn-valwarn'); }
+			});
+			return out;
+		});
+		ok('Pipes table, Show scenarios: pipe 11\'s Base row has no ⚠, its Peak row has one', warn2.base === false && warn2.s1 === true, JSON.stringify(warn2));
 		await H.tab('settings');
 
 		console.log('\n--- 5. Clear override ---');
