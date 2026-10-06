@@ -336,8 +336,10 @@ console.log('\n--- six tabs, one renderer ---');
 	// that is a deliberate departure from "the toolbar's Add order": a customer is not a water
 	// asset, so it belongs with the other tab that is not one rather than between the valves and
 	// the notes. Order within the six water assets is unchanged and is still asserted.
-	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers',
-		'eight asset tables, the six water assets in the toolbar’s Add order, nodes before links',
+	// **NINE SINCE 2026-10-06: Settings** (Tom: *"there will have to be a settings Table"*), last of
+	// the tables: one row per setting, not an asset, so after Customers.
+	report(ids.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers,settings',
+		'eight asset tables, the six water assets in the toolbar’s Add order, nodes before links, then Settings',
 		ids.join(','));
 	// **PROFILE FOLLOWS TIME SERIES** (Tom, 2026-10-04: the graph tabs match the Graphs menu):
 	// after the eight tables, Time series, Profile, Frequency, Flow balance. It was last until
@@ -357,10 +359,11 @@ console.log('\n--- six tabs, one renderer ---');
 	// **TEN SINCE TASK 247**: Customers joined, with the tables, before the two drawings.
 	// **ELEVEN SINCE TASK 600**: Frequency joined the drawings, between Time series and Profile.
 	// **TWELVE SINCE TASK 600's flow balance**: System flow joined them, after Frequency.
-	report(L.paneTabIds().length === 12, 'twelve tabs in all', String(L.paneTabIds().length));
+	// **THIRTEEN SINCE 2026-10-06**: the Settings table joined the tables.
+	report(L.paneTabIds().length === 13, 'thirteen tabs in all', String(L.paneTabIds().length));
 	report(L.paneTabIds().indexOf('text') === 6 && ids.indexOf('text') === 6,
 		'Text IS a tab since 2026-09-08 (Tom), after the six that solve and before the drawings');
-	report(L.paneTabIds().indexOf('timeseries') === 8,
+	report(L.paneTabIds().indexOf('timeseries') === 9,
 		'Time series is the drawing BEFORE Profile (Task 599)', L.paneTabIds().join(','));
 	// Every table has a panel div of its own in the page, which is also what gives each its own
 	// scroll offset for nothing.

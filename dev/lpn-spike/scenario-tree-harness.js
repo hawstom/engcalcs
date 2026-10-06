@@ -51,7 +51,7 @@ const L = loadLoopedNetwork(
 	"\t\tlibRepointPattern: libRepointPattern, setScenarioParent: setScenarioParent, treeLayers: treeLayers,\n" +
 	"\t\tsetScenarioView: setScenarioView, currentView: currentView, applyView: applyView,\n" +
 	"\t\tclearOverride: clearOverride, scenarioMenuRows: scenarioMenuRows,\n" +
-	"\t\tsettingType: function (scn, path, text) { var c = settingTableCols().filter(function (k) { return k.key === 'value'; })[0],\n" +
+	"\t\tsettingType: function (scn, path, text) { var c = settingTableCols().filter(function (k) { return k.key === 'st_value'; })[0],\n" +
 	"\t\t\trow = settingTableRows().filter(function (r) { return r.id === JSON.stringify(path); })[0];\n" +
 	"\t\t\treturn paneInScenario(scn, function () { var p = paneParseCellText(c, text, row), was;\n" +
 	"\t\t\t\tif (!p.ok) { return false; } was = paneParseCellText(c, paneCellText(c, row), row);\n" +

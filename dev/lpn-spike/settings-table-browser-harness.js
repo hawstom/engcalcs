@@ -64,7 +64,7 @@ function helpers(a) {
 				const inp = td.querySelector('input, select');
 				cells[td._lpnPaneKey] = inp ? inp.value : td.textContent.trim();
 				key = td._lpnPaneId;
-				if (td._lpnPaneKey === 'value' && td.classList.contains('lpn-pane-ovcell')) { local = true; }
+				if (td._lpnPaneKey === 'st_value' && td.classList.contains('lpn-pane-ovcell')) { local = true; }
 			});
 			out.push({ key: key, cells: cells, local: local });
 		});
@@ -73,15 +73,15 @@ function helpers(a) {
 	const headings = () => page.evaluate(() => Array.from(document.querySelectorAll('#lpn_pane_settings thead th'))
 		.map((th) => (th.querySelector('.lpn-pane-sort') || th).textContent.replace(/­/g, '').trim()));
 	// The row whose Setting cell reads `label`, in scenario `scn` (Show scenarios) or the only one.
-	const findRow = async (label, scn) => (await settingRows()).filter((r) => r.cells.setting === label &&
+	const findRow = async (label, scn) => (await settingRows()).filter((r) => r.cells.st_setting === label &&
 		(scn === undefined || r.cells.scn_name === scn))[0];
 	const valueInput = (rowKey) => page.evaluateHandle((k) => {
-		const td = Array.from(document.querySelectorAll('#lpn_pane_settings td.lpn-pane-col-value')).filter((t) => t._lpnPaneId === k)[0];
+		const td = Array.from(document.querySelectorAll('#lpn_pane_settings td.lpn-pane-col-st_value')).filter((t) => t._lpnPaneId === k)[0];
 		return td ? td.querySelector('input') : null;
 	}, rowKey);
 	const typeValue = async (rowKey, text) => {
 		await page.evaluate(([k, v]) => {
-			const td = Array.from(document.querySelectorAll('#lpn_pane_settings td.lpn-pane-col-value')).filter((t) => t._lpnPaneId === k)[0];
+			const td = Array.from(document.querySelectorAll('#lpn_pane_settings td.lpn-pane-col-st_value')).filter((t) => t._lpnPaneId === k)[0];
 			const inp = td.querySelector('input');
 			inp.value = v;
 			inp.dispatchEvent(new Event('change', { bubbles: true }));
@@ -169,17 +169,17 @@ async function main() {
 		let rows = await H.settingRows();
 		const FM = await L('bpn_method'), DM = await L('bpn_demand_mult'), DUR = await L('lpn_time_duration'),
 			TS = await L('lpn_settings_text_size'), CALC = await L('lpn_alt_cat_calculation'), PRES = await L('lpn_alt_cat_presentation');
-		const fm = rows.filter((r) => r.cells.setting === FM)[0];
+		const fm = rows.filter((r) => r.cells.st_setting === FM)[0];
 		ok('Friction method is a row, in Calculation, reading Hazen-Williams',
-			fm && fm.cells.category === CALC && fm.cells.value === await L('bpn_method_hw'), JSON.stringify(fm));
-		ok('Demand multiplier and Total run time are rows (Q7)', rows.some((r) => r.cells.setting === DM) && rows.some((r) => r.cells.setting === DUR));
-		const ts = rows.filter((r) => r.cells.setting === TS)[0];
-		ok('Text size is a row, in Presentation', ts && ts.cells.category === PRES, JSON.stringify(ts));
+			fm && fm.cells.st_category === CALC && fm.cells.st_value === await L('bpn_method_hw'), JSON.stringify(fm));
+		ok('Demand multiplier and Total run time are rows (Q7)', rows.some((r) => r.cells.st_setting === DM) && rows.some((r) => r.cells.st_setting === DUR));
+		const ts = rows.filter((r) => r.cells.st_setting === TS)[0];
+		ok('Text size is a row, in Presentation', ts && ts.cells.st_category === PRES, JSON.stringify(ts));
 		const DIA = await L('lpn_field_diameter'), BD = await L('lpn_field_base_demand'),
 			PHYS = await L('lpn_alt_cat_physical'), DEMC = await L('lpn_alt_cat_demand');
 		ok('new-asset defaults sit in Physical (diameter) and Demand (base demand)',
-			rows.some((r) => r.cells.setting === DIA && r.cells.category === PHYS) &&
-			rows.some((r) => r.cells.setting === BD && r.cells.category === DEMC));
+			rows.some((r) => r.cells.st_setting === DIA && r.cells.st_category === PHYS) &&
+			rows.some((r) => r.cells.st_setting === BD && r.cells.st_category === DEMC));
 		const keys = rows.map((r) => JSON.parse(r.key)[0] + (JSON.parse(r.key)[1] ? '.' + JSON.parse(r.key)[1] : ''));
 		ok('units and the coordinate frame are not rows', !keys.some((k) => /^(units|origin|project\.(coords|crs|georef))/.test(k)), JSON.stringify(keys.filter((k) => /^(units|origin|project)/.test(k))));
 		ok('no Value cell wears the override wash with no scenario', rows.every((r) => !r.local));
@@ -208,15 +208,15 @@ async function main() {
 		ok('a Scenario column is inserted after Setting', heads2[4] === await L('lpn_scenario_label') && heads2[3] === await L('lpn_settings_table_setting'), JSON.stringify(heads2));
 		rows = await H.settingRows();
 		const base = await L('lpn_scenario_base');
-		ok('every setting is shown once per scenario, Base first', rows.filter((r) => r.cells.setting === FM).map((r) => r.cells.scn_name).join() === base + ',Peak',
-			rows.filter((r) => r.cells.setting === FM).map((r) => r.cells.scn_name).join());
+		ok('every setting is shown once per scenario, Base first', rows.filter((r) => r.cells.st_setting === FM).map((r) => r.cells.scn_name).join() === base + ',Peak',
+			rows.filter((r) => r.cells.st_setting === FM).map((r) => r.cells.scn_name).join());
 
 		console.log('\n--- 4. a friction method override in Peak ---');
 		const pBase = await H.pressure('22');
 		await H.typeValue((await H.findRow(FM, 'Peak')).key, await L('bpn_method_dw'));
 		let fmPeak = await H.findRow(FM, 'Peak'), fmBase = await H.findRow(FM, base);
-		ok('Peak\'s row reads Darcy-Weisbach and wears the override wash', fmPeak.cells.value === await L('bpn_method_dw') && fmPeak.local, JSON.stringify(fmPeak));
-		ok('...Base\'s row still reads Hazen-Williams, unmarked', fmBase.cells.value === await L('bpn_method_hw') && !fmBase.local, JSON.stringify(fmBase));
+		ok('Peak\'s row reads Darcy-Weisbach and wears the override wash', fmPeak.cells.st_value === await L('bpn_method_dw') && fmPeak.local, JSON.stringify(fmPeak));
+		ok('...Base\'s row still reads Hazen-Williams, unmarked', fmBase.cells.st_value === await L('bpn_method_hw') && !fmBase.local, JSON.stringify(fmBase));
 		const pDw = await H.pressure('22');
 		ok('Peak solves differently from Base (C = 130 read as a roughness, never converted)', isFinite(pDw) ? Math.abs(pDw - pBase) > 0.01 : true, pBase + ' vs ' + pDw);
 		// The value-warning seam: the Pipes table under Show scenarios judges each row by its own method.
@@ -257,20 +257,29 @@ async function main() {
 		await H.menuPick(await L('lpn_pane_clear_override'));
 		await a.settle(1500);
 		fmPeak = await H.findRow(FM, 'Peak');
-		ok('Peak inherits Hazen-Williams again, unmarked', fmPeak.cells.value === await L('bpn_method_hw') && !fmPeak.local, JSON.stringify(fmPeak));
+		ok('Peak inherits Hazen-Williams again, unmarked', fmPeak.cells.st_value === await L('bpn_method_hw') && !fmPeak.local, JSON.stringify(fmPeak));
 		const pBack = await H.pressure('22');
 		ok('...and solves as Base does', Math.abs(pBack - pBase) < 1e-6, pBase + ' vs ' + pBack);
 
 		console.log('\n--- 6. a demand multiplier and a text size in Peak; the Alternatives table ---');
 		await H.typeValue((await H.findRow(DM, 'Peak')).key, '2');
 		const dmPeak = await H.findRow(DM, 'Peak'), dmBase = await H.findRow(DM, base);
-		ok('Peak\'s demand multiplier reads 2, marked; Base\'s reads 1', dmPeak.cells.value === '2' && dmPeak.local && dmBase.cells.value === '1' && !dmBase.local,
+		ok('Peak\'s demand multiplier reads 2, marked; Base\'s reads 1', dmPeak.cells.st_value === '2' && dmPeak.local && dmBase.cells.st_value === '1' && !dmBase.local,
 			JSON.stringify([dmPeak, dmBase]));
 		const pDm = await H.pressure('22');
 		ok('Peak\'s pressure at 22 drops below Base\'s', pDm < pBase - 0.01, pBase + ' -> ' + pDm);
 		const tsBase = await H.findRow(TS, base);
-		await H.typeValue((await H.findRow(TS, 'Peak')).key, String(+tsBase.cells.value + 4));
-		ok('Peak\'s text size is its own; Base\'s is unchanged', (await H.findRow(TS, 'Peak')).local && (await H.findRow(TS, base)).cells.value === tsBase.cells.value);
+		await H.typeValue((await H.findRow(TS, 'Peak')).key, String(+tsBase.cells.st_value + 4));
+		ok('Peak\'s text size is its own; Base\'s is unchanged', (await H.findRow(TS, 'Peak')).local && (await H.findRow(TS, base)).cells.st_value === tsBase.cells.st_value);
+		// Ctrl+Z, pressed outside the table, takes a Settings table edit back, and Ctrl+Y redoes it.
+		await page.evaluate(() => { if (document.activeElement) { document.activeElement.blur(); } });
+		await page.keyboard.press('Control+z');
+		await a.settle(1000);
+		const undone = await H.findRow(TS, 'Peak');
+		ok('Ctrl+Z takes Peak\'s text size back to inheriting Base\'s', !undone.local && undone.cells.st_value === tsBase.cells.st_value, JSON.stringify(undone.cells));
+		await page.keyboard.press('Control+y');
+		await a.settle(1000);
+		ok('...and Ctrl+Y puts it back', (await H.findRow(TS, 'Peak')).local);
 		// Basic mode off reveals the Alternatives preview.
 		await H.scenarioMenu(await L('lpn_scenario_basic'));
 		await H.scenarioMenu(await L('lpn_alt_title'));
@@ -303,7 +312,7 @@ async function main() {
 		const gkeys = grows.map((r) => JSON.parse(r.key).join('.'));
 		ok('Net3 lat/lon: the coordinate frame and units are not rows', gkeys.length > 50 &&
 			!gkeys.some((k) => /^(units|origin|project\.(coords|crs|georef))/.test(k)), gkeys.length);
-		ok('...and the view is a Presentation row', grows.some((r) => r.key === '["view"]' && r.cells.category === PRES));
+		ok('...and the view is a Presentation row', grows.some((r) => r.key === '["view"]' && r.cells.st_category === PRES));
 		// The labels' drawn height on screen, as a reader sees it: the median over every map label.
 		const fontOf = () => b.page.evaluate(() => {
 			// Font size times the drawing's scale is the size on screen, in pixels, whatever the zoom.
@@ -317,11 +326,11 @@ async function main() {
 		// Measured in the new scenario before it holds anything, where the map is Base's.
 		const f0 = await fontOf();
 		await G.tab('settings');
-		const tsRow = (await G.settingRows()).filter((r) => r.cells.setting === TS)[0];
-		await G.typeValue(tsRow.key, String(+tsRow.cells.value + 8));
+		const tsRow = (await G.settingRows()).filter((r) => r.cells.st_setting === TS)[0];
+		await G.typeValue(tsRow.key, String(+tsRow.cells.st_value + 8));
 		await b.settle(1500);
 		const f1 = await fontOf();
-		ok('a scenario\'s own text size changes its map, label by label', f0 === +tsRow.cells.value && f1 === f0 + 8, f0 + ' -> ' + f1);
+		ok('a scenario\'s own text size changes its map, label by label', f0 === +tsRow.cells.st_value && f1 === f0 + 8, f0 + ' -> ' + f1);
 		await G.scenarioMenu(await b.lang('lpn_scenario_base'));
 		await b.settle(1500);
 		const f2 = await fontOf();

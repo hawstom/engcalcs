@@ -25059,7 +25059,7 @@ var EngCalcs = EngCalcs || {};
 			// of the tables: one row per setting a scenario may hold. See settingTableRows().
 			{
 				id: 'settings', panel: 'lpn_pane_settings', label: 'lpn_tool_settings',
-				group: 'setting', type: 'setting', scnAfter: 'setting',
+				group: 'setting', type: 'setting', scnAfter: 'st_setting',
 				cols: settingTableCols()
 			}
 		].map(function (spec) {
@@ -26294,55 +26294,63 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The Settings box's own words for a path, where it has them: the longest named prefix, then
 	// the members under it as they are stored (a field key, a unit), which no label could name.
+	// Members of `settings` are keyed by member name, not 'settings.x', for the reason
+	// LPN_SETTING_CATEGORY_OF gives: a harness counting one setting's readers in this file's source.
 	var LPN_SETTAB_LABEL = {
-		'settings.textSize': 'lpn_settings_text_size', 'settings.symbolSize': 'lpn_settings_symbol_size',
-		'settings.linkWidth': 'lpn_settings_link_width', 'settings.symbolOpacity': 'lpn_settings_symbol_opacity',
-		'settings.labelMaxWidth': 'lpn_settings_label_max_width', 'settings.alignPipeLabels': 'lpn_settings_align_labels',
-		'settings.labelFlipLeftOfVertical': 'lpn_settings_readability_bias', 'settings.maskLabels': 'lpn_settings_mask_labels',
-		'settings.showArrows': 'lpn_settings_show_arrows', 'settings.leaderSnapDeg': 'lpn_settings_leader_snap',
-		'settings.legendPosition': 'lpn_settings_legend_position', 'settings.basemapStyle': 'lpn_settings_basemap_style',
-		'settings.backdropOpacity': 'lpn_settings_backdrop_opacity',
-		'settings.colorNodeField': 'lpn_settings_color_node_field', 'settings.colorLinkField': 'lpn_settings_color_link_field',
-		'settings.colorRampNode': 'lpn_settings_color_ramp', 'settings.colorRampLink': 'lpn_settings_color_ramp',
-		'settings.colorClassesNode': 'lpn_settings_color_classes', 'settings.colorClassesLink': 'lpn_settings_color_classes',
-		'settings.colorReverseNode': 'lpn_settings_color_reverse', 'settings.colorReverseLink': 'lpn_settings_color_reverse',
-		'settings.colorBreaks': 'lpn_settings_color_breaks', 'settings.colorModes': 'lpn_color_mode',
-		'settings.colorLegendPosition': 'lpn_settings_color_key_position',
-		'settings.contourFill': 'lpn_contour_fill', 'settings.contourLines': 'lpn_contour_lines',
-		'settings.contourOpacity': 'lpn_contour_opacity', 'settings.contourInterval': 'lpn_contour_interval',
-		'settings.contourBuffer': 'lpn_contour_buffer', 'settings.contourTerrain': 'lpn_contour_dem',
-		'settings.method': 'bpn_method', 'settings.engine': 'lpn_settings_engine_native', 'settings.autoRun': 'lpn_settings_auto_run',
-		'settings.hydraulics.accuracy': 'lpn_settings_accuracy', 'settings.hydraulics.trials': 'lpn_settings_trials',
-		'settings.hydraulics.unbalanced': 'lpn_settings_unbalanced', 'settings.hydraulics.unbalancedTrials': 'lpn_settings_unbalanced_trials',
-		'settings.hydraulics.headError': 'lpn_settings_head_error', 'settings.hydraulics.flowChange': 'lpn_settings_flow_change',
-		'settings.hydraulics.dampLimit': 'lpn_settings_damp_limit', 'settings.hydraulics.specificGravity': 'lpn_settings_specific_gravity',
-		'settings.hydraulics.viscosity': 'lpn_settings_viscosity', 'settings.hydraulics.emitterExponent': 'lpn_settings_emitter_exponent',
-		'settings.hydraulics.demandModel': 'lpn_settings_demand_model', 'settings.hydraulics.minPressure': 'lpn_settings_min_pressure',
-		'settings.hydraulics.reqPressure': 'lpn_settings_req_pressure', 'settings.hydraulics.pressureExponent': 'lpn_settings_pressure_exponent',
-		'settings.hydraulics.demandMultiplier': 'bpn_demand_mult', 'settings.emitterExponent': 'lpn_settings_emitter_exponent',
-		'settings.quality': 'lpn_settings_quality_track', 'settings.qualityOptions.tolerance': 'lpn_quality_tolerance',
-		'settings.qualityOptions.diffusivity': 'lpn_quality_diffusivity',
-		'settings.reactions.globalBulk': 'lpn_reaction_bulk', 'settings.reactions.globalWall': 'lpn_reaction_wall',
-		'settings.reactions.orderBulk': 'lpn_reaction_order_bulk', 'settings.reactions.orderWall': 'lpn_reaction_order_wall',
-		'settings.reactions.orderTank': 'lpn_reaction_order_tank', 'settings.reactions.limitingPotential': 'lpn_reaction_limiting',
-		'settings.reactions.roughnessCorrelation': 'lpn_reaction_rough_corr',
-		'settings.energy.globalEfficiency': 'lpn_energy_efficiency', 'settings.energy.globalPrice': 'lpn_energy_price',
-		'settings.energy.globalPattern': 'lpn_energy_price_pattern', 'settings.energy.demandCharge': 'lpn_energy_demand_charge',
-		'settings.energy.currency': 'lpn_energy_currency',
-		'settings.nodeElevSource': 'lpn_settings_elev_source', 'settings.defaults.nodeElevSource': 'lpn_settings_elev_source',
-		'settings.defaults.nodeElev': 'lpn_field_elev', 'settings.defaults.diameter': 'lpn_field_diameter',
-		'settings.defaults.roughness': 'lpn_field_roughness', 'settings.defaults.k': 'lpn_field_km',
-		'settings.defaults.demand': 'lpn_field_base_demand', 'settings.defaults.tankDiameter': 'lpn_field_tank_diameter',
-		'settings.defaults.tankLevel': 'lpn_field_tank_level', 'settings.defaults.tankMinLevel': 'lpn_field_tank_minlevel',
-		'settings.defaults.tankMaxLevel': 'lpn_field_tank_maxlevel',
 		'labelSettings.markExtrema': 'lpn_labels_mark_extrema', 'labelSettings.separator': 'lpn_labels_separator',
 		'labelSettings.priority': 'lpn_labels_priority', 'labelSettings.useUnits': 'lpn_labels_use_units',
 		'labelSettings.decimals': 'lpn_labels_col_decimals', 'labelSettings.prefix': 'lpn_labels_col_before',
 		'labelSettings.suffix': 'lpn_labels_col_after', 'labelSettings.show': 'lpn_labels_col_show',
 		'labelSettings.node': 'lpn_labels_col_show', 'labelSettings.link': 'lpn_labels_col_show',
-		'labelSettings.customer': 'lpn_labels_col_show',
-		'defaultPattern': 'lpn_settings_default_pattern', 'times.statistic': 'lpn_time_statistic'
+		'labelSettings.customer': 'lpn_labels_col_show', 'defaultPattern': 'lpn_settings_default_pattern',
+		'times.statistic': 'lpn_time_statistic'
 	};
+	(function (members) {
+		Object.keys(members).forEach(function (k) { LPN_SETTAB_LABEL['settings.' + k] = members[k]; });
+	}({
+		textSize: 'lpn_settings_text_size', symbolSize: 'lpn_settings_symbol_size',
+		linkWidth: 'lpn_settings_link_width', symbolOpacity: 'lpn_settings_symbol_opacity',
+		labelMaxWidth: 'lpn_settings_label_max_width', alignPipeLabels: 'lpn_settings_align_labels',
+		labelFlipLeftOfVertical: 'lpn_settings_readability_bias', maskLabels: 'lpn_settings_mask_labels',
+		showArrows: 'lpn_settings_show_arrows', leaderSnapDeg: 'lpn_settings_leader_snap',
+		legendPosition: 'lpn_settings_legend_position', basemapStyle: 'lpn_settings_basemap_style',
+		backdropOpacity: 'lpn_settings_backdrop_opacity', colorNodeField: 'lpn_settings_color_node_field',
+		colorLinkField: 'lpn_settings_color_link_field', colorRampNode: 'lpn_settings_color_ramp',
+		colorRampLink: 'lpn_settings_color_ramp', colorClassesNode: 'lpn_settings_color_classes',
+		colorClassesLink: 'lpn_settings_color_classes', colorReverseNode: 'lpn_settings_color_reverse',
+		colorReverseLink: 'lpn_settings_color_reverse', colorBreaks: 'lpn_settings_color_breaks',
+		colorModes: 'lpn_color_mode', colorLegendPosition: 'lpn_settings_color_key_position',
+		contourFill: 'lpn_contour_fill', contourLines: 'lpn_contour_lines', contourOpacity: 'lpn_contour_opacity',
+		contourInterval: 'lpn_contour_interval', contourBuffer: 'lpn_contour_buffer',
+		contourTerrain: 'lpn_contour_dem', method: 'bpn_method', engine: 'lpn_settings_engine_native',
+		autoRun: 'lpn_settings_auto_run', 'hydraulics.accuracy': 'lpn_settings_accuracy',
+		'hydraulics.trials': 'lpn_settings_trials', 'hydraulics.unbalanced': 'lpn_settings_unbalanced',
+		'hydraulics.unbalancedTrials': 'lpn_settings_unbalanced_trials',
+		'hydraulics.headError': 'lpn_settings_head_error', 'hydraulics.flowChange': 'lpn_settings_flow_change',
+		'hydraulics.dampLimit': 'lpn_settings_damp_limit',
+		'hydraulics.specificGravity': 'lpn_settings_specific_gravity',
+		'hydraulics.viscosity': 'lpn_settings_viscosity',
+		'hydraulics.emitterExponent': 'lpn_settings_emitter_exponent',
+		'hydraulics.demandModel': 'lpn_settings_demand_model',
+		'hydraulics.minPressure': 'lpn_settings_min_pressure',
+		'hydraulics.reqPressure': 'lpn_settings_req_pressure',
+		'hydraulics.pressureExponent': 'lpn_settings_pressure_exponent',
+		'hydraulics.demandMultiplier': 'bpn_demand_mult', emitterExponent: 'lpn_settings_emitter_exponent',
+		quality: 'lpn_settings_quality_track', 'qualityOptions.tolerance': 'lpn_quality_tolerance',
+		'qualityOptions.diffusivity': 'lpn_quality_diffusivity', 'reactions.globalBulk': 'lpn_reaction_bulk',
+		'reactions.globalWall': 'lpn_reaction_wall', 'reactions.orderBulk': 'lpn_reaction_order_bulk',
+		'reactions.orderWall': 'lpn_reaction_order_wall', 'reactions.orderTank': 'lpn_reaction_order_tank',
+		'reactions.limitingPotential': 'lpn_reaction_limiting',
+		'reactions.roughnessCorrelation': 'lpn_reaction_rough_corr',
+		'energy.globalEfficiency': 'lpn_energy_efficiency', 'energy.globalPrice': 'lpn_energy_price',
+		'energy.globalPattern': 'lpn_energy_price_pattern', 'energy.demandCharge': 'lpn_energy_demand_charge',
+		'energy.currency': 'lpn_energy_currency', nodeElevSource: 'lpn_settings_elev_source',
+		'defaults.nodeElevSource': 'lpn_settings_elev_source', 'defaults.nodeElev': 'lpn_field_elev',
+		'defaults.diameter': 'lpn_field_diameter', 'defaults.roughness': 'lpn_field_roughness',
+		'defaults.k': 'lpn_field_km', 'defaults.demand': 'lpn_field_base_demand',
+		'defaults.tankDiameter': 'lpn_field_tank_diameter', 'defaults.tankLevel': 'lpn_field_tank_level',
+		'defaults.tankMinLevel': 'lpn_field_tank_minlevel', 'defaults.tankMaxLevel': 'lpn_field_tank_maxlevel'
+	}));
 	function settingTableLabel(p) {
 		var pc = EngCalcs.pageConfig || {}, i, key, k, times = EngCalcs.LPN_TIME_FIELDS || [];
 		if (p[0] === 'times') {
@@ -26554,21 +26562,21 @@ var EngCalcs = EngCalcs || {};
 	function settingTableCols() {
 		function row(r) { return r && r._lpnSetting ? r : null; }
 		return [
-			{ key: 'major', label: 'lpn_settings_table_major', str: true, em: 8,
+			{ key: 'st_major', label: 'lpn_settings_table_major', str: true, em: 8,
 				get: function (r) { var pc = EngCalcs.pageConfig || {}, i;
 					for (i = 0; i < LPN_SETTAB_SECTIONS.length; i++) { if (LPN_SETTAB_SECTIONS[i][0] === r.major) { return pc[LPN_SETTAB_SECTIONS[i][1]] || r.major; } }
 					return r.major; },
 				sortKey: function (r) { return r.order; } },
-			{ key: 'minor', label: 'lpn_settings_table_minor', str: true, em: 8,
+			{ key: 'st_minor', label: 'lpn_settings_table_minor', str: true, em: 8,
 				get: function (r) { return (EngCalcs.pageConfig || {})[LPN_SETTAB_SUBS[r.minor]] || r.minor; },
 				sortKey: function (r) { return r.order; } },
-			{ key: 'category', label: 'lpn_settings_table_category', str: true, em: 7,
+			{ key: 'st_category', label: 'lpn_settings_table_category', str: true, em: 7,
 				get: function (r) { return altCategoryLabel(r.cat); } },
-			{ key: 'setting', label: 'lpn_settings_table_setting', str: true, em: 16,
+			{ key: 'st_setting', label: 'lpn_settings_table_setting', str: true, em: 16,
 				get: function (r) { return settingTableLabel(r.path); } },
 			// **THE VALUE, IN THE SCENARIO THE ROW SHOWS**: the open one with Show scenarios off, the
 			// row's own with it on (paneScnWrapCol() makes it the open one for the call).
-			{ key: 'value', label: 'lpn_find_value', str: true, em: 10, reread: true,
+			{ key: 'st_value', label: 'lpn_find_value', str: true, em: 10, reread: true,
 				get: function (r) { return row(r) ? settingRowText(r, activeScenario()) : undefined; },
 				// Checked here, so a refused entry costs no undo step; handed on as the TEXT, which
 				// set() reads by the same rule (a time's typed text is kept beside its seconds).
@@ -26597,11 +26605,11 @@ var EngCalcs = EngCalcs || {};
 		openPane('settings');
 		rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
 		r = paneIndexOfId(rows, spec.scnRows ? paneScnRowKey(JSON.stringify(path), scnId) : JSON.stringify(path));
-		c = paneIndexOfKey(cols, 'value');
+		c = paneIndexOfKey(cols, 'st_value');
 		if (r < 0 || c < 0) { return; }
 		paneSelSet(spec, rows, cols, r, c, false);
 		paneSelPaint(spec, rows, cols);
-		paneFocusCell(spec, rows[r].id, 'value');
+		paneFocusCell(spec, rows[r].id, 'st_value');
 	}
 	function paneNumText(v) {
 		return (typeof v === 'number' && isFinite(v)) ? String(+v.toFixed(6)) : '';

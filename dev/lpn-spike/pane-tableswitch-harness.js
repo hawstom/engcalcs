@@ -139,11 +139,11 @@ L.addLink('pipe', jIds[2], jIds[3]);
 // tables" and "the no-wrap boundary is now a genuinely EMPTY last table", not a stand-in for one.
 
 L.openPane('junctions');
-['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'text', 'customers']
+['junctions', 'reservoirs', 'tanks', 'pipes', 'pumps', 'valves', 'text', 'customers', 'settings']
 	.forEach((id) => L.renderTable(id));
 
 const order = L.tableIds();
-report(order.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers',
+report(order.join(',') === 'junctions,reservoirs,tanks,pipes,pumps,valves,text,customers,settings',
 	'the table order this harness assumes is the real one', JSON.stringify(order));
 
 console.log('\n--- 1. Ctrl+Shift+PageDown moves to the NEXT table; plain Ctrl+PageDown does not ---');
@@ -296,11 +296,11 @@ console.log('\n--- 8. an EMPTY table still answers the shortcut, in both directi
 
 console.log('\n--- 9. (Task 743) stepping onward from the last TABLE onto the graph tabs, and back ---');
 {
-	// Customers is the last of the eight tables; the next three presses now reach Time series,
-	// Frequency and Profile in turn, each one landing on ITS OWN first control.
-	L.setPaneTab('customers');
-	const claimed1 = pressPageKey('customers', 'PageDown', { shift: true });
-	report(claimed1, 'Ctrl+Shift+PageDown out of Customers (the last table) is claimed');
+	// Settings is the last of the tables (2026-10-06); the next presses reach Time series,
+	// Profile and Frequency in turn, each one landing on ITS OWN first control.
+	L.setPaneTab('settings');
+	const claimed1 = pressPageKey('settings', 'PageDown', { shift: true });
+	report(claimed1, 'Ctrl+Shift+PageDown out of Settings (the last table) is claimed');
 	report(L.activeTab() === 'timeseries', 'the tab moved onto Time series', L.activeTab());
 	report(L.focusedId() === 'lpn_ts_group',
 		'and the caret landed on Time series\' own first control, its group picker', L.focusedId());
@@ -350,13 +350,12 @@ console.log('\n--- 9. (Task 743) stepping onward from the last TABLE onto the gr
 
 	const back3 = pressPageKey('timeseries', 'PageUp', { shift: true });
 	report(back3, 'Ctrl+Shift+PageUp FROM Time series is claimed');
-	report(L.activeTab() === 'customers', 'Time series -> Customers, back among the tables', L.activeTab());
+	report(L.activeTab() === 'settings', 'Time series -> Settings, back among the tables', L.activeTab());
 	// **A GRAPH TAB CARRIES NO COLUMN OR ROW ACROSS** -- landing back in a table finds `colKey`
 	// null exactly as an empty-table SOURCE already does (section 8), so it takes the same "home
 	// column" path proven there and in section 4; Customers being empty in this harness means the
 	// visible proof here is the same empty-state note section 8 already checked.
-	report(focusedIsEmptyNoteOf('customers'),
-		'landed on Customers\' own empty-state note, the same door an empty table always answers on');
+	report(!!L.focused('settings'), 'landed on a cell of the Settings table, its home column', JSON.stringify(L.focused('settings')));
 	L.setPaneTab('junctions');
 }
 

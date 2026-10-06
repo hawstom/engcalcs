@@ -361,6 +361,8 @@ $typeGroup = [
     'pipe' => 'link', 'pump' => 'link', 'valve' => 'link',
     'text' => 'label', 'customer' => 'customer',
 ];
+// The Settings table (type `setting`) is not an element type and Find has no group for it, so it
+// is neither checked nor counted.
 
 $gaps = [];       // "<type>/<id>" => true
 $matched = 0;
@@ -424,7 +426,7 @@ if ($gaps) {
     echo "correct-by-design; declare those in EC_VENUE_EXEMPT in this script with the reason.\n\n";
 }
 printf("%d editable table column(s) checked across %d element types; %d matched a Find property of "
-    . "their group; %d gap(s).\n", $total, count($editable), $matched, count($gaps));
+    . "their group; %d gap(s).\n", $total, count(array_intersect_key($editable, $typeGroup)), $matched, count($gaps));
 
 if ($gaps && !EC_VENUE_ADVISORY) { exit(1); }
 if ($gaps) { echo "\nADVISORY -- see dev/property-venue-matrix.md for the ranked list.\n"; }
