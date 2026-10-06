@@ -240,7 +240,7 @@ console.log('\n6. The refusal tells the visitor what to do');
 		ok(k + ' reaches the page', php.indexOf("lpn_" + k.slice(4) + ": <?=json_encode($ec_lang['" + k + "'])?>") >= 0);
 	});
 	const js = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
-	ok('File menu row sits directly under Export EPANET file', /fn: exportInpFile \},(\s*\/\/[^\n]*)*\s*\{ icon: 'save', label: pc\.lpn_file_export_geojson/.test(js));
+	ok('the Export submenu lists GeoJSON directly under the EPANET file', /fn: exportInpFile \},(\s*\/\/[^\n]*)*\s*\{ icon: 'save', label: pc\.lpn_file_export_item_geojson/.test(js));
 }
 
 

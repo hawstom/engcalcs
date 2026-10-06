@@ -40853,6 +40853,20 @@ var EngCalcs = EngCalcs || {};
 			  tip: pc.lpn_library_import_tip, fn: libImportPick }
 		];
 	}
+	// The Export fly-out, a function of its own for the reason importMenuRows() is: a harness can ask
+	// what it offers without driving a popup. **ADDING AN EXPORT IS ONE LINE HERE**, nothing in
+	// openFileMenu() changes. Each is a DOWNLOAD and never a live handle (Task 281): a file we hand
+	// over, not one this page keeps writing to, which is why Export is not a second Save as.
+	function exportMenuRows() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ icon: 'save', label: pc.lpn_file_export_item_inp || 'EPANET file…',
+			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
+			// GeoJSON (Task 728): same verb, same kind of file.
+			{ icon: 'save', label: pc.lpn_file_export_item_geojson || 'GeoJSON file…',
+			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile }
+		];
+	}
 	function openFileMenu(anchor) {
 		// **THE FILE MENU AND THE OPEN BUTTON TAKE THE SAME REFUSAL AS THE TAB STRIP** (Tom,
 		// 2026-09-08: *"I think the File menu and Open toolbar also must be disabled just for
@@ -40916,14 +40930,10 @@ var EngCalcs = EngCalcs || {};
 			// EPANET found each other by standing side by side -- even though the three import rows
 			// no longer stand in the flat list themselves.
 			{ icon: 'open', label: pc.lpn_file_import_menu || 'Import…', submenu: importMenuRows },
-			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
-			// file we hand over, not one this page keeps writing to -- the same reason Import is a
-			// separate row from Open rather than a second file type on it.
-			{ icon: 'save', label: pc.lpn_file_export_inp || 'Export EPANET file…',
-			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
-			// GeoJSON, directly under the other export (Task 728): same verbs, same kind of file.
-			{ icon: 'save', label: pc.lpn_file_export_geojson || 'Export GeoJSON file…',
-			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile },
+			// **AN EXPORT SUBMENU (Tom, 2026-10-06: "it's time to put all the exports into a
+			// submenu")**, the twin of Import above it and built the same way. Each row keeps its
+			// handler and tip; see exportMenuRows(), where a new export is one line.
+			{ icon: 'save', label: pc.lpn_file_export_menu || 'Export…', submenu: exportMenuRows },
 		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the

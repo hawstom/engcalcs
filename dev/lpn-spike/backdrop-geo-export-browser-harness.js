@@ -89,11 +89,17 @@ async function addPicture(a) {
 }
 // File > Export EPANET file, by its own words; returns the downloaded text.
 async function exportInp(a) {
-	const label = await a.lang('lpn_file_export_inp');
+	const label = await a.lang('lpn_file_export_item_inp');
 	await a.page.click('#lpn_menu_file');
 	await a.page.waitForSelector('#lpn_menu_popup', { state: 'visible' });
-	const [dl] = await Promise.all([a.page.waitForEvent('download'), a.page.evaluate((l) => {
+	// Export is a fly-out of File: open it by its row, then press the row inside it.
+	await a.page.evaluate((l) => {
 		const r = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0);
+		if (r) { r.click(); }
+	}, await a.lang('lpn_file_export_menu'));
+	await a.page.waitForSelector('#lpn_menu_list2 button.lpn-menu-row', { state: 'attached' });
+	const [dl] = await Promise.all([a.page.waitForEvent('download'), a.page.evaluate((l) => {
+		const r = Array.from(document.querySelectorAll('#lpn_menu_list2 button.lpn-menu-row')).find((b) => b.textContent.trim().indexOf(l) === 0);
 		if (r) { r.click(); }
 	}, label)]);
 	return fs.readFileSync(await dl.path(), 'utf8');

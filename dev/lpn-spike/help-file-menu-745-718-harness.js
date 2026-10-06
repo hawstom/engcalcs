@@ -179,8 +179,8 @@ console.log('\n-- Task 718: the three import rows are one Import submenu --');
 		'none of the three import handlers is called directly from the flat File menu list any more');
 	// Export EPANET file stays where Import EPANET file used to be adjacent to it (2026-09-17 EWB
 	// finding): the submenu row now sits directly above it instead.
-	report(/submenu: importMenuRows[\s\S]{0,400}lpn_file_export_inp/.test(fileBody),
-		'the Import submenu row sits directly above Export EPANET file');
+	report(/submenu: importMenuRows[\s\S]{0,900}lpn_file_export_menu/.test(fileBody),
+		'the Import submenu row sits directly above the Export row');
 }
 
 console.log(`\n${checks - failures}/${checks} checks passed`);
