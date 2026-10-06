@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fa",
-        "expected_key_count": 2361,
-        "delta_key_count": 135,
+        "expected_key_count": 2371,
+        "delta_key_count": 148,
         "exempt_key_count": 28,
         "exempt_keys": [
             "u_imgd",
@@ -726,6 +726,22 @@
         "lpn_pane_scn_show": "Show scenarios",
         "lpn_pane_clear_override": "Clear override",
         "lpn_pane_scn_alt_tip": "{category} alt.: {alternative}",
+        "lpn_change_type_menu": "Change type",
+        "lpn_change_type_tip": "Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.",
+        "lpn_change_type_ok": "Change",
+        "lpn_change_type_lost": "These values will be lost:",
+        "lpn_change_type_key": "ID: Lost entry",
+        "lpn_change_type_line": "{id}: {property} {value}",
+        "lpn_change_type_line_scenario": "{id}: {property} {value}, in scenario {scenario}",
+        "lpn_change_type_more": "And {n} more.",
+        "lpn_change_type_surface": "These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:",
+        "lpn_change_type_meaning": "These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.",
+        "lpn_change_type_born": "These are new, as on a newly drawn one:",
+        "lpn_change_type_no_curve": "{id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe",
+        "lpn_change_type_becomes": "{id}: {property} {value}, in scenario {scenario}, becomes {new}",
+        "lpn_change_type_customers": "Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:",
+        "lpn_change_type_setting": "These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:",
+        "lpn_change_type_rules": "These rule lines name a link by its kind, and will name its new kind instead:",
         "lpn_find_scope_source": "Source",
         "lpn_find_source_no_chemical": "No chemical is being tracked, so no node has a source.",
         "lpn_profile_open": "Open EPANET profile file…",
@@ -783,14 +799,12 @@
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
         "lpn_ds_title": "Demand scaling",
-        "lpn_ds_intro": "The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.",
+        "lpn_ds_intro": "Select the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\\n\\nSelect the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\\n\\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. Only that time step is scaled, and levels and statuses are taken from it; to test the peak, move the clock to the peak demand before you run.",
         "lpn_ds_scope": "Junctions to scale",
-        "lpn_ds_scope_tip": "All junctions, or only those selected on the map. Pressures are checked at the scaled demand.",
         "lpn_ds_scope_all": "All junctions",
         "lpn_ds_scope_selected": "Selected junctions",
         "lpn_ds_minpressure": "Lowest pressure allowed",
         "lpn_ds_minpressure_tip": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
-        "lpn_ds_eps_note": "Only the time step now on screen is scaled; levels and statuses are taken from this step. To test the peak, move the clock to the peak demand before you run.",
         "lpn_ds_head_scale": "Scale the demands",
         "lpn_ds_multiplier": "Demand scale",
         "lpn_ds_multiplier_tip": "The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.",
@@ -798,7 +812,6 @@
         "lpn_ds_head_search": "What demand scale can the system handle?",
         "lpn_ds_head_search_selected": "What demand scale can these junctions handle?",
         "lpn_ds_outside_below": "At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.",
-        "lpn_ds_search_note": "Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.",
         "lpn_ds_holds_max": "✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.",
         "lpn_ds_below_zero": "⚠ At least one junction is below {pressure} even with the scaled demands at zero.",
         "lpn_ds_found": "✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.",
@@ -863,6 +876,22 @@
         "lpn_pane_scn_show": "Show scenarios",
         "lpn_pane_clear_override": "Clear override",
         "lpn_pane_scn_alt_tip": "{category} alt.: {alternative}",
+        "lpn_change_type_menu": "Change type",
+        "lpn_change_type_tip": "Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.",
+        "lpn_change_type_ok": "Change",
+        "lpn_change_type_lost": "These values will be lost:",
+        "lpn_change_type_key": "ID: Lost entry",
+        "lpn_change_type_line": "{id}: {property} {value}",
+        "lpn_change_type_line_scenario": "{id}: {property} {value}, in scenario {scenario}",
+        "lpn_change_type_more": "And {n} more.",
+        "lpn_change_type_surface": "These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:",
+        "lpn_change_type_meaning": "These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.",
+        "lpn_change_type_born": "These are new, as on a newly drawn one:",
+        "lpn_change_type_no_curve": "{id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe",
+        "lpn_change_type_becomes": "{id}: {property} {value}, in scenario {scenario}, becomes {new}",
+        "lpn_change_type_customers": "Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:",
+        "lpn_change_type_setting": "These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:",
+        "lpn_change_type_rules": "These rule lines name a link by its kind, and will name its new kind instead:",
         "lpn_find_scope_source": "Source",
         "lpn_find_source_no_chemical": "No chemical is being tracked, so no node has a source.",
         "lpn_profile_open": "Open EPANET profile file…",
@@ -920,14 +949,12 @@
         "lpn_ds_menu": "Demand scaling…",
         "lpn_ds_menu_tip": "Multiply the demands on a copy of the network and see the pressures and velocities, or find the largest demand scale the system can carry.",
         "lpn_ds_title": "Demand scaling",
-        "lpn_ds_intro": "The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.",
+        "lpn_ds_intro": "Select the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\\n\\nSelect the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\\n\\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. Only that time step is scaled, and levels and statuses are taken from it; to test the peak, move the clock to the peak demand before you run.",
         "lpn_ds_scope": "Junctions to scale",
-        "lpn_ds_scope_tip": "All junctions, or only those selected on the map. Pressures are checked at the scaled demand.",
         "lpn_ds_scope_all": "All junctions",
         "lpn_ds_scope_selected": "Selected junctions",
         "lpn_ds_minpressure": "Lowest pressure allowed",
         "lpn_ds_minpressure_tip": "This is the same number as Lowest pressure allowed elsewhere in Fire flow analysis. Changing it here changes it there.",
-        "lpn_ds_eps_note": "Only the time step now on screen is scaled; levels and statuses are taken from this step. To test the peak, move the clock to the peak demand before you run.",
         "lpn_ds_head_scale": "Scale the demands",
         "lpn_ds_multiplier": "Demand scale",
         "lpn_ds_multiplier_tip": "The number each demand is multiplied by: 1.5 is half again as much water. It applies on top of the active scenario's own demand multiplier, which is already in the demands, and it is never saved in your project.",
@@ -935,7 +962,6 @@
         "lpn_ds_head_search": "What demand scale can the system handle?",
         "lpn_ds_head_search_selected": "What demand scale can these junctions handle?",
         "lpn_ds_outside_below": "At a demand scale of {m}, junctions not selected that are below {pressure}: {n} ({ids}). They do not limit this answer.",
-        "lpn_ds_search_note": "Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.",
         "lpn_ds_holds_max": "✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.",
         "lpn_ds_below_zero": "⚠ At least one junction is below {pressure} even with the scaled demands at zero.",
         "lpn_ds_found": "✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.",
@@ -1282,6 +1308,262 @@
                     "key": "lpn_pane_goto_tip",
                     "value": "بزرگ‌نمایی و انتخاب",
                     "english": "Zoom & select"
+                }
+            }
+        },
+        "lpn_change_type_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_ok": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_lost": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_key": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_line": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_line_scenario": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_more": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_surface": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_meaning": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_born": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_no_curve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_becomes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_customers": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_setting": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
+                }
+            }
+        },
+        "lpn_change_type_rules": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tables_menu",
+                    "value": "جدول‌ها",
+                    "english": "Tables"
+                },
+                "next_translated": {
+                    "key": "lpn_tables_menu_tip",
+                    "value": "پنل زیر نقشه را روی جدولی از قطعات این شبکه باز کنید. برای هر نوع قطعه یک جدول وجود دارد، و می‌توانید آن را همان‌جا مرتب و ویرایش کنید.",
+                    "english": "View and edit assets in tables in bottom panel."
                 }
             }
         },
@@ -2229,22 +2511,6 @@
                 }
             }
         },
-        "lpn_ds_scope_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_crit_skipped_dead",
-                    "value": "اتصال‌های بن‌بست ردشده: {n}. هرکدام هر چیزی را که آن سوتر است قطع می‌کند.",
-                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "وارد کردن نقاط نقشه‌برداری‌شده…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
         "lpn_ds_scope_all": {
             "reason": "missing",
             "current_value": null,
@@ -2294,22 +2560,6 @@
             }
         },
         "lpn_ds_minpressure_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_crit_skipped_dead",
-                    "value": "اتصال‌های بن‌بست ردشده: {n}. هرکدام هر چیزی را که آن سوتر است قطع می‌کند.",
-                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "وارد کردن نقاط نقشه‌برداری‌شده…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_ds_eps_note": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -2422,22 +2672,6 @@
             }
         },
         "lpn_ds_outside_below": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_crit_skipped_dead",
-                    "value": "اتصال‌های بن‌بست ردشده: {n}. هرکدام هر چیزی را که آن سوتر است قطع می‌کند.",
-                    "english": "Dead-end links skipped: {n}. Each one cuts off everything beyond it."
-                },
-                "next_translated": {
-                    "key": "lpn_file_import_survey",
-                    "value": "وارد کردن نقاط نقشه‌برداری‌شده…",
-                    "english": "Import surveyed points…"
-                }
-            }
-        },
-        "lpn_ds_search_note": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -3067,7 +3301,6 @@
         }
     },
     "key_syn": {
-        "lpn_ds_scope_tip": "Scale the demand at the junctions that you choose. Pressures are checked at the scaled demand.",
         "lpn_ds_head_search_selected": "What demand can the junctions you choose handle"
     },
     "key_concepts": []
