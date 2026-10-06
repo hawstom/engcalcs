@@ -3896,3 +3896,15 @@ OBSERVED (real Chromium, this tree; re-verify before citing):
 - ID prefix "Apply to all" in a scenario renames Base's assets after a confirm; "Apply these new-asset values" is refused with "only in Base". Inconsistent, structural either way.
 - Fuzz of all ~300 Settings controls in Peak (real edits): Base changed only through Units (by design: "Units are the same in every scenario"). Buttons, ramp popup, custom property add, time settings, energy, new-asset defaults, colour breaks all land in the scenario.
 Not checked: how the box looks; Show scenarios toggle time re-measure; toolbar/legend controls outside the two boxes.
+
+## 2026-10-06 Perry: Stage 3c (held mark in Settings box, hold the view), feat/bentley-interop @ 70cdf9a3
+OBSERVED (real Chromium, Net1 XY and Net3 lat/lon, this tree; re-verify before citing):
+- Branch harness passes; three mutations (untag symbol size, drop the undo redraw, drop remembering Base's view at Hold) each make it FAIL. routing, setting-scope, settings-table harnesses pass.
+- 1:N honest at centre in Web Mercator: Net3 lat/lon 1:61919 vs my own WGS84 parallel-radius figure 61918.7. Resize keeps centre and scale. Save/reopen keeps held view and overrides; an `s`-form view still read; master and the pre-stage branch both open the new file without error.
+- Base fuzz of 65 box controls: no marks in Base or in Peak. Rapid switching (32 switches) lands on the right view.
+- DEFECT: Clear override on friction method leaves default roughness (0.00492, a D-W number) and roughness label decimals held in the scenario under Hazen-Williams. Base text for that default reads "Base: 100 ft".
+- DEFECT: label text fields (Bef., Aft., Text between values) typed in a scenario do not mark until the box rebuilds; then the note says "Base: Not stated" while Base shows "Q=".
+- DEFECT: latitude outside +-90 accepted (clamped to 85.05, scale recomputed wrong); longitude outside +-180 refused. A typed centre that only pans leaves a blank map with no "network is intact" notice. Centre boxes have no visible lat/lon or X/Y label.
+- Minor: corners do not update on window resize until next pan/zoom; after undo of a view Clear override, or reopening, the note is a bare "Clear override" with no Base line, and undo does not move the camera; search "friction" shows the amber edge but hides the Base line and Clear override; label-row notes give a bare value ("Base: 0", "Base: No") without saying which part.
+- Typing a scale in Base marks the file changed; panning does not (by design per code comment).
+SPECULATION: "Base:" equal to the held view right after Hold may read as pointless to Tom.
