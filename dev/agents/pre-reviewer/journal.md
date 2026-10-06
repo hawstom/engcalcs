@@ -3869,3 +3869,11 @@ Lesson: pane toggle button toggles; sort lives on the arrow button; dialogs rout
 - OBSERVED: uppercase email (A@B.com) rejected by old lowercase-only regex; empty-message refusal is a bare die() text.
 - OBSERVED: with empty email, mail headers end in a trailing CRLF (unverified effect).
 - SPECULATION: render in php -S needs a parent dir with an /engcalcs symlink (base path).
+
+## 2026-10-06 feat/feedback rebuild (eccd64ca) (OBSERVED; re-verify before citing)
+- OBSERVED: no <a>/href/contact.php added vs merge-base; contact.php, formmail.php byte-identical to master; privacy.php differs only by the intended two edits.
+- OBSERVED: harnesses 42/42, 74/74, grievance ALL PASS. Mutations: honeypot removed -> caught; rate limit removed -> caught; explicit CR/LF email check removed -> NOT caught (regex alone also refuses; redundant, harmless).
+- OBSERVED DEFECT: 26 non-English lang files keep the old lpn_wrong_tip ("nothing you typed... Nadie puede responderle... Use Ayuda, Corregir algo") - now false. New lpn_fb_* keys fall back to English.
+- OBSERVED: desk box 506x579 px (not small); phone 358x611, "What this sends" line clipped at the bottom of the box on 390x844 (scroll, unmeasured). Enter in email sends; Enter in comment is a newline.
+- OBSERVED: outside click does not close box; Esc/Cancel reopen fresh.
+- SPECULATION: global rate limit lets any curl script lock out real reporters for 10 min.
