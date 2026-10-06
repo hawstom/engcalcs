@@ -499,8 +499,8 @@ console.log('\n--- properties for many ---');
 		kinds.filter((k) => k === 'br').length === kinds.filter((k) => k === 'label').length,
 		'every row in a section is followed by a line break', kinds.join(','));
 	// **THE ACTIVE CHECKBOX IS ON EVERY TYPE** (Tom, 2026-09-08): a row whose control is a checkbox
-	// and whose words are the popup's own "Part of this network".
-	const activeRow = sec2.children.filter((c) => c._tag === 'label' && /Part of this network/.test(c.textContent || ''))[0];
+	// and whose words are the popup's own "Is active?".
+	const activeRow = sec2.children.filter((c) => c._tag === 'label' && /Is active\?/.test(c.textContent || ''))[0];
 	report(!!activeRow, 'the junction section carries the Active row');
 	const activeBox = activeRow && activeRow.children.filter((c) => c._tag === 'input')[0];
 	report(!!activeBox && activeBox.type === 'checkbox', '...as a checkbox', activeBox && activeBox.type);

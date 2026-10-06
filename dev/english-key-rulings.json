@@ -5581,6 +5581,11 @@
         "u_hr": {
             "on": "hr",
             "ruled": "2026-09-01"
+        },
+        "lpn_field_active": {
+            "on": "Is active?",
+            "ruled": "2026-10-06",
+            "answer": "His own wording: \"Part of network: Change to \\\"Is active?\\\" like Bentley.\""
         }
     }
 }

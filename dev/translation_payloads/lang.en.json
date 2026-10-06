@@ -1627,7 +1627,7 @@
         "lpn_scenario_preset_fire_max_day_tip": "Max day demand (multiplier 2.0). Run Fire flow analysis in this scenario: it adds the fire flow at each junction on top of this demand.",
         "lpn_delete_drops_overrides": "Deleting this asset also throws away {n} scenario overrides for it. Continue?",
         "lpn_push_base_only": "This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.",
-        "lpn_field_active": "Part of this network",
+        "lpn_field_active": "Is active?",
         "lpn_field_active_tip": "Clear this box to leave the asset on the drawing but out of the network: it is drawn grey and the solver ignores it. In a scenario this is how a pipe is switched on and off.",
         "lpn_settings_emitter_exponent": "Emitter exponent",
         "lpn_settings_emitter_exponent_tip": "The exponent in EPANET’s emitter equation for sprinklers and leaks: flow = coefficient x pressure raised to this exponent. It only changes the answer where a node has an emitter, which for now means a network read from an EPANET file.",
