@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**33 still to read on master**, of 143 untranslated keys, of 2369 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**36 still to read on master**, of 146 untranslated keys, of 2372 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (143, 33 to read @@ NEEDS RULING)
+## lpn_  (146, 36 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -272,6 +272,15 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_file_export_geojson_tip`**
   > Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.
+  @@ NEEDS RULING
+- **`lpn_file_export_item_geojson`**
+  > GeoJSON file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_inp`**
+  > EPANET file…
+  @@ NEEDS RULING
+- **`lpn_file_export_menu`**
+  > Export…
   @@ NEEDS RULING
 - **`lpn_find_scope_source`**
   > Source
@@ -509,7 +518,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**97 still to read**, of 100 new keys across 15 unmerged branch(es).
+**138 still to read**, of 141 new keys across 19 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -520,7 +529,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/asset-type (`1b358f39`) — 16 new, 16 to read @@ NEEDS RULING
+### feat/asset-type (`fdaa932d`) — 16 new, 16 to read @@ NEEDS RULING
 
 - **`lpn_change_type_becomes`**
   > {id}: {property} {value}, in scenario {scenario}, becomes {new}
@@ -571,7 +580,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.
   @@ NEEDS RULING
 
-### feat/backdrop-attach (`5ab01ee7`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/backdrop-attach (`929d7ec9`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_inp_backdrop_attach`**
   > Attach {file}…
@@ -595,7 +604,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`7c758f15`) — 31 new, 31 to read @@ NEEDS RULING
+### feat/bentley-interop (`43658d9f`) — 52 new, 52 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -606,20 +615,50 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
   @@ NEEDS RULING
+- **`lpn_settings_held_base`**
+  > {base}: {value}
+  @@ NEEDS RULING
+- **`lpn_settings_restore_base_only`**
+  > Switch to Base to restore the defaults.
+  @@ NEEDS RULING
 - **`lpn_settings_row_basemap`**
   > Basemap
   @@ NEEDS RULING
 - **`lpn_settings_row_basemap_last`**
   > Basemap to return to
   @@ NEEDS RULING
+- **`lpn_settings_row_basemap_osm`**
+  > Street map
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_satellite`**
+  > Satellite images
+  @@ NEEDS RULING
 - **`lpn_settings_row_check_freq`**
   > Status check frequency
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_buffer`**
+  > Contour buffer
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_fill`**
+  > Contour fill
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_interval`**
+  > Contour interval
   @@ NEEDS RULING
 - **`lpn_settings_row_contour_labels`**
   > Contour labels
   @@ NEEDS RULING
+- **`lpn_settings_row_contour_opacity`**
+  > Contour fill opacity
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_terrain`**
+  > Contour ground between nodes from Mapbox DEM
+  @@ NEEDS RULING
 - **`lpn_settings_row_customer_max_width`**
   > Show customer labels when zoomed to this map width or less
+  @@ NEEDS RULING
+- **`lpn_settings_row_default`**
+  > {value} (default)
   @@ NEEDS RULING
 - **`lpn_settings_row_elev_source_old`**
   > Elevation source (older projects)
@@ -644,6 +683,12 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_settings_row_max_check`**
   > Maximum status checks
+  @@ NEEDS RULING
+- **`lpn_settings_row_minor_label_order`**
+  > Label order (rank and drop)
+  @@ NEEDS RULING
+- **`lpn_settings_row_new_asset`**
+  > New assets: {setting}
   @@ NEEDS RULING
 - **`lpn_settings_row_of`**
   > {setting}, {member}
@@ -672,6 +717,9 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_row_view`**
   > Map view (center and scale)
   @@ NEEDS RULING
+- **`lpn_settings_row_view_value`**
+  > Center {x}, {y}; scale {s}
+  @@ NEEDS RULING
 - **`lpn_settings_table_category`**
   > Category
   @@ NEEDS RULING
@@ -690,10 +738,73 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_table_yes`**
   > Yes
   @@ NEEDS RULING
+- **`lpn_settings_units_one_project`**
+  > Units are the same in every scenario.
+  @@ NEEDS RULING
+- **`lpn_settings_view_bottom_right`**
+  > Bottom right corner
+  @@ NEEDS RULING
+- **`lpn_settings_view_center`**
+  > Map center
+  @@ NEEDS RULING
+- **`lpn_settings_view_hold`**
+  > Hold this view in this scenario
+  @@ NEEDS RULING
+- **`lpn_settings_view_hold_tip`**
+  > Stores this map center and scale in the open scenario, so opening that scenario moves the map here. Moving the map afterward changes nothing until you press this again. Clear the override to follow the {base} view again.
+  @@ NEEDS RULING
+- **`lpn_settings_view_scale`**
+  > Map scale
+  @@ NEEDS RULING
+- **`lpn_settings_view_scale_tip`**
+  > The scale at the center of the map, as 1:N. Type 1:2000, or just 2000, to zoom to that scale.
+  @@ NEEDS RULING
+- **`lpn_settings_view_top_left`**
+  > Top left corner
+  @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/feedback (`1be9dba0`) — 13 new, 13 to read @@ NEEDS RULING
+### feat/dxf (`93469e95`) — 12 new, 12 to read @@ NEEDS RULING
+
+- **`lpn_dxf_export_failed`**
+  > The DXF file was not written: an error in this page stopped it ({error}).
+  @@ NEEDS RULING
+- **`lpn_dxf_export_no_utm`**
+  > The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.
+  @@ NEEDS RULING
+- **`lpn_dxf_export_refused`**
+  > The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.
+  @@ NEEDS RULING
+- **`lpn_dxf_exported_geo`**
+  > Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_blocks`**
+  > Block attributes are 1 unit high in each block definition. Every block is inserted at scale {s}, so its attributes are {s} {unit} high; change the insertion scale to change that.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_crs`**
+  > Coordinates: {crs}, exactly as this project states them.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_geo`**
+  > Coordinates: {crs}, in meters, not latitude and longitude. The project’s latitudes and longitudes were converted to that grid.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_grid`**
+  > Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_scale`**
+  > Text and symbols are sized as the map draws them at Zoom to fit: text {h} high, on a network {w} across.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_shortened`**
+  > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in “…”.
+  @@ NEEDS RULING
+- **`lpn_file_export_dxf`**
+  > Export DXF file…
+  @@ NEEDS RULING
+- **`lpn_file_export_dxf_tip`**
+  > Download this network as a drawing that AutoCAD and other CAD programs open: one layer for each kind of asset, each node a block carrying its ID and main values, and the labels as they appear on the map.
+  @@ NEEDS RULING
+
+### feat/feedback (`d96763d3`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_fb_bad_email`**
   > That email address does not look right. Correct it, or leave it empty.
@@ -711,7 +822,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > That did not reach us. What you wrote is still here, so you can try again.
   @@ NEEDS RULING
 - **`lpn_fb_intro`**
-  > Pick any that fit, or none, and add whatever you like. Nothing is sent until you press Send.
+  > Canned messages (optional). Nothing is sent until you press Send.
   @@ NEEDS RULING
 - **`lpn_fb_pick_broken`**
   > Something did not work
@@ -735,7 +846,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
   @@ NEEDS RULING
 
-### feat/geojson (`84ec6eb5`) — adds no English strings
+### feat/geojson (`1352ed11`) — adds no English strings
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -759,7 +870,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/screenshot (`8a583e22`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/screenshot (`26d7b515`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_screenshot_copied`**
   > Screenshot copied.
@@ -788,6 +899,23 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_screenshot_tip`**
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
   @@ NEEDS RULING
+- **`lpn_snip_button`**
+  > Snip
+  @@ NEEDS RULING
+- **`lpn_snip_freehand`**
+  > Freehand
+  @@ NEEDS RULING
+- **`lpn_snip_hint_free`**
+  > Drag around the area to snip, or click for the whole map. Esc cancels.
+  @@ NEEDS RULING
+- **`lpn_snip_pen`**
+  > Pen
+  @@ NEEDS RULING
+- **`lpn_snip_rectangle`**
+  > Rectangle
+  @@ NEEDS RULING
+
+### feat/section-grid (`977b887e`) — adds no English strings
 
 ### feat/survey-code (`087e6868`) — 21 new, 21 to read @@ NEEDS RULING
 
@@ -855,4 +983,18 @@ build for that would be a gate nobody keeps. Refresh it with
   > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.
   @@ NEEDS RULING
 
-### feat/tip-door (`2a64dbe5`) — adds no English strings
+### feat/table-export (`39697062`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_pane_copy_heads`**
+  > Copy with headings
+  @@ NEEDS RULING
+- **`lpn_pane_export_csv`**
+  > Export table as CSV
+  @@ NEEDS RULING
+- **`lpn_pane_export_ods`**
+  > Export table as ODS
+  @@ NEEDS RULING
+
+### feat/tip-door (`0711a336`) — adds no English strings
+
+### feat/user-guide (`a06b9bec`) — adds no English strings
