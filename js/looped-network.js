@@ -56348,7 +56348,12 @@ var EngCalcs = EngCalcs || {};
 			// landed in the document and nowhere anybody could see it until the project was reopened.
 			if (after) { after(); } else { identityEdited(el); }
 		}
-		input.addEventListener('input', function () { commit(false); });
+		input.addEventListener('input', function () {
+			// A pasted line break is the one thing the box itself refuses as it lands (collapsed to a
+			// space, nothing trimmed); the rest of the tidy waits for `change`.
+			if (/[\r\n]/.test(input.value)) { input.value = input.value.replace(/[\r\n]+/g, ' '); }
+			commit(false);
+		});
 		// `change` as well, for the reason the tag's does: a field can lose focus without ever firing
 		// `input` -- a value restored by the browser, or an autofill.
 		input.addEventListener('change', function () { commit(true); refreshPopupIfOpen(); });
