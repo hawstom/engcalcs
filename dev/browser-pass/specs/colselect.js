@@ -292,7 +292,7 @@ exports.run = async function ({ browser, report }) {
 		const a = await Session.open(browser, 'E');
 		await a.goto('Looped-Network.php');
 		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
-		await a.menuClick(await a.lang('lpn_help_hotkeys'), 'help');
+		await a.menuClick(await a.lang('lpn_help_manual'), 'help');   // the User guide since 2026-10-06
 		await a.settle(200);
 		// Not bridged into pageConfig (the notes are page HTML), so read from the language file.
 		// Note 6 is "Table columns help" and the shortcuts are note 7 (the keys are numbered, not named).
@@ -310,7 +310,7 @@ exports.run = async function ({ browser, report }) {
 				actionLeft: rows.map((r) => Math.round(r.children[1].getBoundingClientRect().left))
 			};
 		}, term);
-		report.ok(got.shown, 'Help > Tables and Hotkeys opens the box');
+		report.ok(got.shown, 'Help > User guide opens the box');
 		report.ok(got.n >= 10, 'the shortcuts note is a table with a row each', got.n + ' rows');
 		report.ok(got.twoCells, '...each row is a key or gesture, then what it does');
 		report.ok(new Set(got.tops).size === got.tops.length && got.tops.every((t, i) => i === 0 || t > got.tops[i - 1]),

@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**25 still to read on master**, of 135 untranslated keys, of 2361 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**27 still to read on master**, of 137 untranslated keys, of 2363 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (135, 25 to read @@ NEEDS RULING)
+## lpn_  (137, 27 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -272,6 +272,12 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_find_source_no_chemical`**
   > No chemical is being tracked, so no node has a source.
+  @@ NEEDS RULING
+- **`lpn_guide_also`**
+  > Also in {menu}
+  @@ NEEDS RULING
+- **`lpn_help_manual`**
+  > User guide
   @@ NEEDS RULING
 - **`lpn_inp_drop_pressure_unit`**
   > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
@@ -485,7 +491,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**138 still to read**, of 141 new keys across 18 unmerged branch(es).
+**149 still to read**, of 152 new keys across 19 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -571,7 +577,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`70cdf9a3`) — 52 new, 52 to read @@ NEEDS RULING
+### feat/bentley-interop (`43658d9f`) — 52 new, 52 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -732,19 +738,28 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`728c2993`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/dxf (`93469e95`) — 12 new, 12 to read @@ NEEDS RULING
 
+- **`lpn_dxf_export_failed`**
+  > The DXF file was not written: an error in this page stopped it ({error}).
+  @@ NEEDS RULING
 - **`lpn_dxf_export_no_utm`**
   > The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.
   @@ NEEDS RULING
 - **`lpn_dxf_export_refused`**
   > The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.
   @@ NEEDS RULING
+- **`lpn_dxf_exported_geo`**
+  > Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_blocks`**
+  > Block attributes are 1 unit high in each block definition. Every block is inserted at scale {s}, so its attributes are {s} {unit} high; change the insertion scale to change that.
+  @@ NEEDS RULING
 - **`lpn_dxf_note_crs`**
   > Coordinates: {crs}, exactly as this project states them.
   @@ NEEDS RULING
 - **`lpn_dxf_note_geo`**
-  > Coordinates: converted from latitude and longitude to {crs}, in meters.
+  > Coordinates: {crs}, in meters, not latitude and longitude. The project’s latitudes and longitudes were converted to that grid.
   @@ NEEDS RULING
 - **`lpn_dxf_note_grid`**
   > Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.
@@ -804,13 +819,22 @@ build for that would be a gate nobody keeps. Refresh it with
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
   @@ NEEDS RULING
 
-### feat/geojson (`1e01efdb`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/geojson (`1352ed11`) — 11 new, 11 to read @@ NEEDS RULING
 
 - **`lpn_file_export_geojson`**
   > Export GeoJSON file…
   @@ NEEDS RULING
 - **`lpn_file_export_geojson_tip`**
   > Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.
+  @@ NEEDS RULING
+- **`lpn_file_export_item_geojson`**
+  > GeoJSON file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_inp`**
+  > EPANET file…
+  @@ NEEDS RULING
+- **`lpn_file_export_menu`**
+  > Export…
   @@ NEEDS RULING
 - **`lpn_geojson_refused_crs`**
   > The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.
@@ -853,7 +877,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/screenshot (`98f78a17`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/screenshot (`26d7b515`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_screenshot_copied`**
   > Screenshot copied.
@@ -881,6 +905,21 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_screenshot_tip`**
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
+  @@ NEEDS RULING
+- **`lpn_snip_button`**
+  > Snip
+  @@ NEEDS RULING
+- **`lpn_snip_freehand`**
+  > Freehand
+  @@ NEEDS RULING
+- **`lpn_snip_hint_free`**
+  > Drag around the area to snip, or click for the whole map. Esc cancels.
+  @@ NEEDS RULING
+- **`lpn_snip_pen`**
+  > Pen
+  @@ NEEDS RULING
+- **`lpn_snip_rectangle`**
+  > Rectangle
   @@ NEEDS RULING
 
 ### feat/section-grid (`977b887e`) — adds no English strings
@@ -964,3 +1003,5 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### feat/tip-door (`0711a336`) — adds no English strings
+
+### feat/user-guide (`a06b9bec`) — adds no English strings

@@ -143,7 +143,7 @@ console.log('\n-- the invitation landed somewhere real before the page dropped i
 
 console.log('\n-- the Help menu rows --');
 {
-	const fn = src.slice(src.indexOf('function openHelpMenu'));
+	const fn = src.slice(src.indexOf('function helpMenuRows'));
 	const body = fn.slice(0, fn.indexOf('\n\tfunction ', 10));
 	report(/pc\.lpn_help_walkthroughs/.test(body), 'Walkthroughs');
 	// Two OUTWARD rows added 2026-09-06 (Tasks 596 and 178 phase 1). Both are the same shape as
@@ -193,7 +193,9 @@ console.log('\n-- the Help menu rows --');
 	//
 	// This replaces the single-group order of 2026-09-11 and every older comment. Do not restore
 	// any of them.
-	const order = ['lpn_help_walkthroughs', 'lpn_help_hotkeys', 'lpn_help_icons',
+	// **"Tables and Hotkeys" and "Toolbars" are ONE row now, the User guide** (Tom, 2026-10-06:
+	// *"Maybe items 2 and 3 combined into a simple User Manual"*), still in group 1.
+	const order = ['lpn_help_walkthroughs', 'lpn_help_manual',
 		'lpn_help_fix', 'install_main_menu', 'consent_settings_link',
 		'lpn_help_notes', 'lpn_help_welcome', 'lpn_help_screenshots', 'privacy_link', 'terms_link',
 		'about_main_menu'];
@@ -203,18 +205,18 @@ console.log('\n-- the Help menu rows --');
 	// **THE THREE GROUPS ARE SEPARATED, NOT JUST ORDERED** (the menu's own idiom -- `{ separator:
 	// true }`). Exactly two separators inside the Help rows array: after Toolbars (end of group 1)
 	// and after Cookie settings (end of group 2).
-	const rowsListMatch = body.match(/openMenu\(anchor, \[([\s\S]*)\]\);/);
+	const rowsListMatch = body.match(/return \[([\s\S]*)\];/);
 	const rowsList = rowsListMatch ? rowsListMatch[1] : '';
 	report((rowsList.match(/\{ separator: true \}/g) || []).length === 2,
 		'exactly two separators divide the three groups');
 	{
-		const iconsAt = rowsList.indexOf('pc.lpn_help_icons'),
+		const iconsAt = rowsList.indexOf('pc.lpn_help_manual'),
 			fixAt = rowsList.indexOf('pc.lpn_help_fix'),
 			cookiesAt = rowsList.indexOf('pc.consent_settings_link'),
 			notesAt = rowsList.indexOf('pc.lpn_help_notes'),
 			sep1 = rowsList.indexOf('{ separator: true }'),
 			sep2 = rowsList.indexOf('{ separator: true }', sep1 + 1);
-		report(sep1 > iconsAt && sep1 < fixAt, 'the first separator falls between Toolbars and Fix something');
+		report(sep1 > iconsAt && sep1 < fixAt, 'the first separator falls between User guide and Fix something');
 		report(sep2 > cookiesAt && sep2 < notesAt, 'the second separator falls between Cookie settings and Notes');
 	}
 	// Everything the mark's menu had borrowed is back where it started.
@@ -310,7 +312,7 @@ console.log('\n-- and the notice it dropped is reachable twice over --');
 	// wants the notice FINDABLE and withdrawal as easy as consent; it never named a menu, and Help
 	// is where this page has no footer to put them. Asserted here again, which is where they
 	// started and where they now are.
-	const help2 = src.slice(src.indexOf('function openHelpMenu'));
+	const help2 = src.slice(src.indexOf('function helpMenuRows'));
 	const menu = help2.slice(0, help2.indexOf('\n\tfunction ', 10));
 	report(/pc\.privacy_link/.test(menu) && /pc\.terms_link/.test(menu) && /pc\.consent_settings_link/.test(menu),
 		'the Help menu carries privacy, terms and cookie settings');

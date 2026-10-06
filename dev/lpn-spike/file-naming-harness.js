@@ -196,7 +196,7 @@ console.log('\n-- open then save on the toolbar; SAVE AS came off it 2026-09-06 
 	// Asserted here as well as in toolbar-harness.js, for the reason the New-project note below
 	// gives: two files have to change together to put it back.
 	report(bar.indexOf(", 'saveas',") < 0, '...and Save as is NOT on the strip any more');
-	report(extract('openFileMenu').indexOf('lpn_file_saveas') >= 0,
+	report(extract('fileMenuRows').indexOf('lpn_file_saveas') >= 0,
 		'...while Save as is still on the File menu, because a command that leaves the toolbar must not leave the app');
 	// **NEW PROJECT IS THE ONE OF THE FOUR THAT IS NOT HERE**, and it is not an oversight. Task 246
 	// asks for all four; Tom removed New from the strip by name afterwards, on 2026-08-15, and

@@ -1888,40 +1888,48 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	</div>
 </div>
 
-<?php // ---- THE TABLES AND HOTKEYS BOX (ROADMAP Task 745) -------------------------------------------
+<?php // ---- THE USER GUIDE (Tom, 2026-10-06; Ida's design; was the Tables and Hotkeys box, Task 745) ----
       //
-      // **MOVED HERE RATHER THAN DUPLICATED.** lpn_notes_6 (table columns help) and lpn_notes_7
-      // (table keyboard shortcuts) used to sit in the Notes list above; Tom, 2026-09-29, asked for
-      // one box gathering ALL table help and ALL keyboard shortcuts, divided by context, so they
-      // moved out of Notes rather than being shown twice. Neither key was deleted -- both still
-      // render here, and both are still real PHP-rendered markup, for the same reason the Notes
-      // list itself is: a search engine, print, and Find-in-page must still be able to see them.
+      // ONE BOX where Help > "Tables and Hotkeys" and the Help > "Toolbar" fly-out stood. Four
+      // sections under one search: Toolbar and Menus are DERIVED at runtime by renderGuide() in
+      // js/looped-network.js from the strip and the menu rows themselves, so they cannot drift;
+      // Map and Tables stay real PHP-rendered markup, as the Notes list is, so a search engine,
+      // print and Find-in-page still see them. lpn_notes_6/7 moved here from Notes (Task 745) and
+      // were not duplicated.
       //
-      // **Map is new content.** The digit tool keys, Undo and the zoom keys had tips of their own
-      // (toolTipWithKey(), lpn_zoom_in_tip, lpn_zoom_out_tip) but had never been gathered into one
-      // place a reader could scan. lpn_hotkeys_map_def states them once, in the same
-      // key-then-action table shape as lpn_notes_7_def.
-      //
-      // **SAME SHELL AS NOTES** (.lpn-setbox / .lpn-notesbox), wired by wireHotkeysBox() in
-      // js/looped-network.js: draggable, resizable, remembered per browser as `lpn_hotkeysbox`,
-      // dismissed only by its own X or an Escape pressed while focus is inside it. ?>
-<div id="lpn_hotkeys_popup" class="d-print-none lpn-popover lpn-setbox lpn-notesbox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_hotkeys_title">
-	<div id="lpn_hotkeys_title" class="lpn-setbox-title"><?=$ec_lang['lpn_help_hotkeys']?></div>
+      // **SAME SHELL AS NOTES** (.lpn-setbox / .lpn-notesbox), wired by wireHotkeysBox(): draggable,
+      // resizable, remembered per browser as `lpn_hotkeysbox` (the key it always had; nothing new is
+      // stored), dismissed only by its own X or an Escape pressed while focus is inside it. ?>
+<div id="lpn_hotkeys_popup" class="d-print-none lpn-popover lpn-setbox lpn-notesbox lpn-guidebox" style="display:none;position:fixed;background:var(--ec-bg);border:1px solid var(--ec-ink);padding:40px 8px 8px;box-shadow:2px 2px 6px var(--ec-a-0-0-0-3)" role="dialog" aria-labelledby="lpn_hotkeys_title">
+	<div id="lpn_hotkeys_title" class="lpn-setbox-title"><?=$ec_lang['lpn_help_manual']?></div>
 	<button type="button" id="lpn_hotkeys_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
-	<div class="lpn-popover-body lpn-setbox-body">
+	<div class="lpn-popover-body lpn-setbox-body lpn-guide-body">
+<div class="lpn-guide-search"><input type="search" id="lpn_guide_search" autocomplete="off" placeholder="<?=htmlspecialchars($ec_lang['lpn_crs_search'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_crs_search'])?>"></div>
+<p id="lpn_guide_none" class="lpn-guide-none" hidden><?=$ec_lang['lpn_find_none']?></p>
+<section class="lpn-guide-section" data-guide-section="toolbar">
+<h2><?=$ec_lang['lpn_help_icons']?></h2>
+<div id="lpn_guide_toolbar" class="lpn-guide-list"></div>
+</section>
+<section class="lpn-guide-section" data-guide-section="menus">
+<h2><?=$ec_lang['lpn_hotkeys_menu_heading']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_hotkeys_menu_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_menu_def']?></dd>
+</dl>
+<div id="lpn_guide_menus" class="lpn-guide-list"></div>
+</section>
+<section class="lpn-guide-section" data-guide-section="map">
+<h2><?=$ec_lang['lpn_hotkeys_map_heading']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_map_def']?></dd>
+</dl>
+</section>
+<section class="lpn-guide-section" data-guide-section="tables">
 <h2><?=$ec_lang['lpn_hotkeys_tables_heading']?></h2>
 <dl>
 	<dt><?=$ec_lang['lpn_notes_6_term']?></dt><dd><?=$ec_lang['lpn_notes_6_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_7_term']?></dt><dd><?=$ec_lang['lpn_notes_7_def']?></dd>
 </dl>
-<h2><?=$ec_lang['lpn_hotkeys_map_heading']?></h2>
-<dl>
-	<dt><?=$ec_lang['lpn_hotkeys_map_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_map_def']?></dd>
-</dl>
-<h2><?=$ec_lang['lpn_hotkeys_menu_heading']?></h2>
-<dl>
-	<dt><?=$ec_lang['lpn_hotkeys_menu_term']?></dt><dd><?=$ec_lang['lpn_hotkeys_menu_def']?></dd>
-</dl>
+</section>
 	</div>
 </div>
 
@@ -2490,7 +2498,8 @@ EngCalcs.pageConfig = {
 	lpn_field_speed_pattern_tip: <?=json_encode($ec_lang['lpn_field_speed_pattern_tip'])?>,
 	lpn_help_fix: <?=json_encode($ec_lang['lpn_help_fix'])?>,
 	lpn_help_notes: <?=json_encode($ec_lang['lpn_help_notes'])?>,
-	lpn_help_hotkeys: <?=json_encode($ec_lang['lpn_help_hotkeys'])?>,
+	lpn_help_manual: <?=json_encode($ec_lang['lpn_help_manual'])?>,
+	lpn_guide_also: <?=json_encode($ec_lang['lpn_guide_also'])?>,
 <?php   // The suite's existing legal-link strings, needed here because this page's Help menu and
         // examples gallery carry them instead of a footer. Reused, never re-keyed: the wording must
         // match the identical links on every other page. ?>
@@ -2940,7 +2949,6 @@ EngCalcs.pageConfig = {
 	lpn_zoom_in_tip: <?=json_encode($ec_lang['lpn_zoom_in_tip'])?>,
 	lpn_zoom_out_tip: <?=json_encode($ec_lang['lpn_zoom_out_tip'])?>,
 	lpn_find_menu_tip: <?=json_encode($ec_lang['lpn_find_menu_tip'])?>,
-	lpn_help_icons: <?=json_encode($ec_lang['lpn_help_icons'])?>,
 	lpn_pane_right_toggle: <?=json_encode($ec_lang['lpn_pane_right_toggle'])?>,
 	lpn_color_legend_open_tip: <?=json_encode($ec_lang['lpn_color_legend_open_tip'])?>,
 	lpn_color_node_field: <?=json_encode($ec_lang['lpn_color_node_field'])?>,

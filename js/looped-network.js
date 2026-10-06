@@ -39177,7 +39177,7 @@ var EngCalcs = EngCalcs || {};
 	// accessible name and the head of the tip. Everything else on this page -- the menu bar, the
 	// menu rows, the tab strip, the map symbols -- keeps its words and keeps setLabel().
 	//
-	// Every button that goes through here is also recorded, so Help > "What the toolbar icons mean"
+	// Every button that goes through here is also recorded, so the User guide's Toolbar section
 	// is DERIVED from the strip rather than being a second list to keep in step with it. A new
 	// toolbar button appears in that list without anybody remembering to add it.
 	var toolbarTipsWired = false;
@@ -39188,8 +39188,8 @@ var EngCalcs = EngCalcs || {};
 	// or a touch user learns what an icon-only button does. The two jobs used to be bolted together
 	// so tightly that taking one meant losing the other, which nobody had asked for.). This is only
 	// the bookkeeping: keyed on the button so a repaint replaces its row rather than adding one, and
-	// callable with an empty `tip` for a control that genuinely carries none -- `iconGuideRows()`
-	// already treats a falsy tip as "no tip on this row" the same way `openMenu()` does everywhere
+	// callable with an empty `tip` for a control that genuinely carries none -- the User guide
+	// (guideToolbarRows()) treats a falsy tip as "no tip on this row" the same way `openMenu()` does everywhere
 	// else. setIconLabel() below calls this too, so every ordinary toolbar button keeps getting both
 	// jobs from the one call it always made; a button built by hand because it must carry no tip
 	// calls this alone.
@@ -39353,6 +39353,9 @@ var EngCalcs = EngCalcs || {};
 			b.className = 'lpn-menu-row';
 			b.setAttribute('role', 'menuitem');
 			b.tabIndex = -1;   // arrows move through the rows; Tab leaves the menu (Task 748)
+			// The row it was drawn from, so the User guide can find this row again (a guide row
+			// SHOWS it) and `?` on this row can find its guide entry. Read, never run.
+			b.__lpnRow = r;
 			// A reserved icon column, not an inline prefix: a row with no natural glyph leaves the
 			// cell EMPTY and its text still lines up with its neighbours. Prefixing inline instead
 			// would ragged-edge the whole menu the moment one row went without.
@@ -40749,7 +40752,7 @@ var EngCalcs = EngCalcs || {};
 		if (field && field.focus) { field.focus(); }
 	}
 	// **THE THREE IMPORT ROWS, APART FROM THE MENU THAT SHOWS THEM** (Task 718), the same split
-	// iconGuideRows() takes from openHelpMenu(): a harness can ask what the submenu offers without
+	// mapMenuRows() takes from openMapMenu(): a harness can ask what the submenu offers without
 	// driving a popup. Each row is unchanged from the flat list it moved out of -- same icon, same
 	// label key, same tip, same handler.
 	function importMenuRows() {
@@ -40784,6 +40787,11 @@ var EngCalcs = EngCalcs || {};
 		// own for the toolbar button and the keyboard, so this one is about the door rather than
 		// the deed: a menu that opens and then refuses every row is a menu that teaches nothing.
 		if (georefBlocksProjectSwitch()) { return; }
+		openMenu(anchor, fileMenuRows());
+	}
+	// **THE ROWS, APART FROM THE OPENING OF THEM** (the split Task 542 gave mapMenuRows()), so the
+	// User guide lists what this menu offers from the menu itself. A pure extraction.
+	function fileMenuRows() {
 		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
 		var linked = isLinked(id), api = fileApiAvailable();
 		// **RECENT FILES SIT JUST ABOVE CLOSE** (Tom, 2026-09-25, correcting "Exit" to "Close" on
@@ -40810,7 +40818,7 @@ var EngCalcs = EngCalcs || {};
 				});
 			});
 		}
-		openMenu(anchor, [
+		return [
 			// New project OPENS A SUBMENU now (Task 264, Tom 2026-08-10) rather than making a blank
 			// one on the spot -- "Blank project" is still the first row of it, so the old act is one
 			// extra click and every other way to start is finally reachable from the same place.
@@ -40903,16 +40911,17 @@ var EngCalcs = EngCalcs || {};
 		], recentRows, [
 			{ separator: true },
 			{ icon: 'close', label: pc.lpn_close || 'Close', fn: function () { closeTab(id); } }
-		]));
+		]);
 	}
 	// ---- The menu bar (ROADMAP Task 211) ----
 	// Every command on this page is reachable from here; the toolbar is the high-use subset, so a
 	// command appearing in both is correct, not duplication to be cleaned up. The names are the ones
 	// desktop applications have used for thirty years: adopting a paradigm only pays if it is adopted
 	// whole. Rows are data, not markup, so moving a command between menus is a one-line change.
-	function openEditMenu(anchor) {
+	function openEditMenu(anchor) { openMenu(anchor, editMenuRows(anchor)); }
+	function editMenuRows(anchor) {
 		var pc = EngCalcs.pageConfig || {};
-		openMenu(anchor, [
+		return [
 			// **SELECT IS A MENU ROW BECAUSE THE TOOLBAR IS NOT ALWAYS THERE** (Task 486). Below the
 			// small-screen breakpoint every toolbar control except the transport is hidden, and
 			// Select was the one of them with no other door: Insert can put you into add-junction
@@ -40959,7 +40968,7 @@ var EngCalcs = EngCalcs || {};
 				setMode(mode === 'delete' ? 'select' : 'delete');
 			} },
 			{ icon: 'delnetwork', label: pc.lpn_edit_delete_network || 'Delete network', fn: deleteNetwork }
-		]);
+		];
 	}
 	// **THERE IS NO INSERT MENU ANY MORE** (Tom, 2026-08-27, deciding Task 543's larger half):
 	// *"(1) Change the View menu to Map. (2) Move the Insert asset group to Water as the first item,
@@ -41094,44 +41103,28 @@ var EngCalcs = EngCalcs || {};
 	// EVERY row here opens a NEW TAB, including the two internal pages, and that is not stylistic:
 	// the beforeunload guard in init() prompts whenever a file project is dirty, so navigating this
 	// tab to About.php would meet a browser "Leave site?" dialog mid-edit.
-	// One row per toolbar button, in strip order: the icon as drawn, the name as announced, and the
-	// explanation as a tip. A MENU rather than a new popover, because a menu is exactly this shape
-	// already -- icon, label, tip -- and it is keyboard- and touch-operable without a second panel
-	// to build, position, dismiss and translate.
-	// **A FLY-OUT, NOT A SECOND TOP-LEVEL MENU, AND THAT IS THE BUG FIX** (Tom, 2026-08-18: 'Help >
-	// "What the toolbar icons mean" does nothing'). It did nothing for a precise reason worth
-	// keeping written down: it re-opened level 0 anchored on #lpn_menu_help, which is the anchor
-	// the Help menu showing at that moment was already open on -- so openMenu()'s
-	// same-anchor-means-toggle branch fired and CLOSED the menu instead of replacing it. Any menu
-	// row that opens a list is a submenu; declaring it as one gets the fly-out placement, the ▸
-	// marker, the hover-open and the click that does not dismiss its own parent, all for free.
-	function iconGuideRows() {
-		return toolbarIconIndex.map(function (b) {
-			return { icon: b.icon, label: b.name, tip: b.tip, fn: function () {} };
-		});
-	}
 	// **THREE GROUPS, TOM'S OWN ORDER** (Task 745, 2026-09-29: *"(1) True help: Walkthroughs,
 	// Tables and Hotkeys ..., Toolbars. (2) Helpers: Fix something, Install, and Cookies.
 	// (3) True about: Notes on this page, Welcome page, Screenshot, Privacy, Terms, About."*).
 	// This replaces every earlier grouping in this file's history -- do not restore one from an
 	// older comment. Each row still carries the key and the reasoning it always had; what moved is
 	// only which group it stands in.
-	function openHelpMenu(anchor) {
+	function openHelpMenu(anchor) { openMenu(anchor, helpMenuRows()); }
+	function helpMenuRows() {
 		var pc = EngCalcs.pageConfig || {};
 		function ext(url) { return function () { window.open(url, '_blank', 'noopener'); }; }
-		openMenu(anchor, [
+		return [
 			// ---- Group 1: true help ----
 			{ icon: 'help', label: pc.lpn_help_walkthroughs || 'Walkthroughs', fn: ext(LPN_WALKTHROUGHS_URL) },
-			// **THE NEW BOX** (Task 745). Gathers the table-help entries that used to live only in
-			// the Notes list (lpn_notes_6/7 -- see #lpn_hotkeys_popup in Looped-Network.php) and the
-			// keyboard shortcuts that had never been gathered anywhere, divided by context.
-			{ icon: 'help', label: pc.lpn_help_hotkeys || 'Tables and Hotkeys', fn: toggleHotkeysBox },
-			// **THE DISCOVERY ROUTE THAT IS NOT A TOOLTIP** (dev/toolbar-icons.md). Once the toolbar
-			// is icons only, a first-time user who does not think to hover -- and a touch user, for
-			// whom a tip needs a deliberate press-and-hold -- has no way to read the strip. This is
-			// that way: the same icon, its name, and its explanation, in one list. DERIVED from the
-			// strip itself (toolbarIconIndex), so a button added later is in it already.
-			{ icon: 'help', label: pc.lpn_help_icons || 'Toolbar', submenu: iconGuideRows },
+			// **THE USER GUIDE** (Tom, 2026-10-06: *"The Help, Toolbar menu is unconventional. It should
+			// be a list or table in a help manual or on a help page ... Maybe items 2 and 3 combined
+			// into a simple User Manual"*; Ida's design, journal 2026-10-06). ONE row where "Tables and
+			// Hotkeys" and the "Toolbar" fly-out stood: the fly-out was 26 rows that looked like
+			// commands and did nothing, with the explanation hidden in a hover tip that touch cannot
+			// reach. The box shows every toolbar button with its tip written out, every menu row, and
+			// the map and table keys, with a search over all of it. `?` opens it from anywhere but a
+			// field, at the control under the pointer or holding focus -- see openGuideAt().
+			{ icon: 'help', label: pc.lpn_help_manual || 'User guide', hotkey: '?', fn: toggleHotkeysBox },
 			{ separator: true },
 			// ---- Group 2: helpers ----
 			// **A VERB, not a noun.** "Contribute" reads as money or code to most visitors; the
@@ -41175,7 +41168,7 @@ var EngCalcs = EngCalcs || {};
 			// About last, where every Help menu in the world puts it, and an IN-PAGE box rather
 			// than a link to the suite's About.php -- Tom's fourth embarrassment.
 			{ icon: 'info', label: pc.about_main_menu || 'About', fn: toggleAboutPopup }
-		]);
+		];
 	}
 
 	// **ONE ROW PER LANGUAGE, AND EACH DECLARES ITS OWN** (Task 625). The rows come from
@@ -41295,7 +41288,8 @@ var EngCalcs = EngCalcs || {};
 		wireBoxMemory(box, LPN_NOTESBOX_KEY, notesboxLayout, saveNotesboxLayout, notesBoxIsOpen);
 	}
 
-	// **THE TABLES AND HOTKEYS BOX** (Task 745). The same non-hog shell and memory as Notes --
+	// **THE USER GUIDE BOX** (Tables and Hotkeys until 2026-10-06, Task 745; see renderGuide()
+	// below). The same non-hog shell and memory as Notes --
 	// draggable, resizable, remembered per browser as window furniture (`lpn_hotkeysbox`), and
 	// dismissed only by its own X or an Escape pressed while focus is inside it.
 	function hotkeysBoxEl() { return document.getElementById('lpn_hotkeys_popup'); }
@@ -41315,6 +41309,7 @@ var EngCalcs = EngCalcs || {};
 		closeViewPopovers();
 		hideOpenTips();
 		box.style.display = 'flex';
+		renderGuide();
 		placePanelForScreen(box, function () {
 			applyBoxSize(box, hotkeysboxLayout);
 			floor = chromeFloor();
@@ -41349,6 +41344,365 @@ var EngCalcs = EngCalcs || {};
 			if (e.key === 'Escape') { e.preventDefault(); closeHotkeysBox(); }
 		});
 		wireBoxMemory(box, LPN_HOTKEYSBOX_KEY, hotkeysboxLayout, saveHotkeysboxLayout, hotkeysBoxIsOpen);
+	}
+	// ---- THE USER GUIDE (Tom, 2026-10-06; Ida's design, dev/agents/interface-designer/journal.md) ----
+	// One box, four sections: Toolbar, Menus, Map, Tables. **THE FIRST TWO ARE DERIVED, NEVER
+	// WRITTEN**: the toolbar rows come from toolbarIconIndex (the strip records itself through
+	// registerToolbarIcon()), and the menu rows from the same row functions the menu bar opens
+	// (fileMenuRows() and its siblings), so a button or a row added later is in the guide without
+	// anybody remembering to add it. Map and Tables are the PHP-rendered tables that were already in
+	// this box, so a search engine, print and Find-in-page still see them.
+	//
+	// **A ROW SHOWS, IT NEVER RUNS** (Ida: a menu is a list of verbs, a guide a list of nouns with
+	// definitions). Clicking a toolbar row pulses the real button; on a phone, where the strip is
+	// folded away, or for a menu row, it opens that menu (and fly-out) with the row focused. Nothing
+	// here calls a row's `fn`. A guide that ran commands would let a reader never meet the menu bar;
+	// one that points at it teaches it.
+	var GUIDE_PULSE_MS = 1500;
+	var GUIDE_MENUS = [
+		{ id: 'lpn_menu_file', rows: function () { return fileMenuRows(); } },
+		{ id: 'lpn_menu_edit', rows: function () { return editMenuRows(null); } },
+		{ id: 'lpn_menu_map', rows: function () { return mapMenuRows(); } },
+		{ id: 'lpn_menu_project', rows: function () { return waterMenuRows(); } },
+		{ id: 'lpn_menu_help', rows: function () { return helpMenuRows(); } }
+	];
+	// The word on the menu-bar button itself, so the guide can never name a menu differently --
+	// without the keyboard-mode letter badge that rides inside the button (.lpn-kbdbadge).
+	function guideMenuLabel(id) {
+		var b = document.getElementById(id), c;
+		if (!b) { return ''; }
+		c = b.cloneNode(true);
+		Array.prototype.forEach.call(c.querySelectorAll('.lpn-kbdbadge, svg'), function (x) { x.parentNode.removeChild(x); });
+		return String(c.textContent || '').replace(/\s+/g, ' ').trim();
+	}
+	// Every menu row, one fly-out deep (openMenu() has exactly one fly-out level). Hidden rows,
+	// headings and `variable` rows (recent file names, scenario names: content, not commands) are
+	// left out; separators are kept and tidied at render time.
+	function guideMenuEntries() {
+		var out = [];
+		GUIDE_MENUS.forEach(function (m) {
+			var rows, menuLabel = guideMenuLabel(m.id);
+			try { rows = m.rows() || []; } catch (err) { rows = []; }
+			(function walk(list, depth, parent) {
+				list.forEach(function (r) {
+					var e, sub;
+					if (!r || r.hidden || r.variable || r.heading) { return; }
+					if (r.separator) { out.push({ menuId: m.id, menuLabel: menuLabel, separator: true, depth: depth, parent: parent }); return; }
+					if (!r.label) { return; }
+					e = { menuId: m.id, menuLabel: menuLabel, row: r, depth: depth, parent: parent };
+					out.push(e);
+					if (r.submenu && depth === 0) {
+						try { sub = r.submenu() || []; } catch (err2) { sub = []; }
+						walk(sub, 1, e);
+					}
+				});
+			})(rows, 0, null);
+		});
+		return out;
+	}
+	// A toolbar button's menu twin: the first menu row with the same icon AND the same words. Both,
+	// because either alone mismatches (two rows share 'del'; Graphs rows share no icon at all).
+	function guideTwinFor(b, entries) {
+		var i, e;
+		for (i = 0; i < entries.length; i++) {
+			e = entries[i];
+			if (!e.separator && e.row.icon === b.icon && e.row.label === b.name) { return e; }
+		}
+		return null;
+	}
+	// The tip without the "Shortcut: N" toolTipWithKey() appended: the key has a <kbd> of its own.
+	function guideTipText(b) {
+		var tip = String(b.tip || ''), t = b.el && b.el.dataset ? b.el.dataset.tool : null, suffix;
+		if (t) {
+			suffix = toolTipWithKey(t, '');
+			if (suffix && tip.slice(-suffix.length) === suffix) { tip = tip.slice(0, -suffix.length).trim(); }
+		}
+		return tip;
+	}
+	function guideKeysFor(b, twin) {
+		var t = b.el && b.el.dataset ? b.el.dataset.tool : null, keys = [], k, alt;
+		if (t) {
+			k = toolKeyFor(t); alt = LPN_TOOL_ALT_KEYS[t];
+			if (k) { keys.push(k); }
+			if (alt) { keys.push(alt); }
+		}
+		if (!keys.length && twin && twin.row.hotkey) { keys.push(menuHotkeyText(twin.row.hotkey)); }
+		return keys;
+	}
+	// One record per toolbar button, in strip order. Exported for the harness.
+	function guideToolbarRows() {
+		var entries = guideMenuEntries();
+		return toolbarIconIndex.map(function (b) {
+			var twin = guideTwinFor(b, entries);
+			return {
+				b: b, twin: twin, tip: guideTipText(b), keys: guideKeysFor(b, twin),
+				group: b.el && b.el.closest ? b.el.closest('.lpn-toolbar-group') : null,
+				shown: !!(b.el && b.el.isConnected && b.el.getClientRects().length > 0)
+			};
+		});
+	}
+	function guideSpan(cls, text) {
+		var s = document.createElement('span');
+		s.className = cls;
+		if (text) { s.textContent = text; }
+		return s;
+	}
+	// A drawn chevron, not a '›' character, so RTL mirrors it in CSS like the transport arrows.
+	function guideChevron() {
+		var ns = 'http://www.w3.org/2000/svg', svgEl = document.createElementNS(ns, 'svg'), path = document.createElementNS(ns, 'path');
+		svgEl.setAttribute('viewBox', '0 0 10 10');
+		svgEl.setAttribute('class', 'lpn-guide-chev');
+		svgEl.setAttribute('aria-hidden', 'true');
+		path.setAttribute('d', 'M3.5 1.5 L7 5 L3.5 8.5');
+		svgEl.appendChild(path);
+		return svgEl;
+	}
+	function guidePathEl(e) {
+		var p = guideSpan('lpn-guide-path'), parts = [e.menuLabel];
+		if (e.parent) { parts.push(e.parent.row.label); }
+		parts.push(e.row.label);
+		parts.forEach(function (w, i) {
+			if (i) { p.appendChild(guideChevron()); }
+			p.appendChild(guideSpan('lpn-guide-seg', w));
+		});
+		return p;
+	}
+	function guideRow(icon, name, tip, keys) {
+		var row = document.createElement('button'), ic = guideSpan('lpn-guide-icon'), desc, keyEl, ie;
+		row.type = 'button';
+		row.className = 'lpn-guide-row';
+		ie = icon ? iconEl(icon) : null;
+		if (ie) { ic.appendChild(ie); }
+		row.appendChild(ic);
+		row.appendChild(guideSpan('lpn-guide-name', name));
+		desc = guideSpan('lpn-guide-desc');
+		if (tip) { desc.appendChild(guideSpan('lpn-guide-tip', tip)); }
+		row.appendChild(desc);
+		keyEl = guideSpan('lpn-guide-keys');
+		(keys || []).forEach(function (k) {
+			var kb = document.createElement('kbd');
+			kb.textContent = k;
+			keyEl.appendChild(kb);
+		});
+		row.appendChild(keyEl);
+		return row;
+	}
+	function guideRule(list) {
+		var last = list.lastElementChild;
+		if (!last || last.className === 'lpn-guide-rule' || last.tagName === 'H3') { return; }
+		var hr = document.createElement('hr');
+		hr.className = 'lpn-guide-rule';
+		list.appendChild(hr);
+	}
+	function guideTrimRule(list) {
+		var last = list.lastElementChild;
+		if (last && last.className === 'lpn-guide-rule') { list.removeChild(last); }
+	}
+	function renderGuide() {
+		var pc = EngCalcs.pageConfig || {}, tb = document.getElementById('lpn_guide_toolbar'),
+			mn = document.getElementById('lpn_guide_menus'), entries, lastGroup = null, curMenu = null, block = null;
+		if (!tb || !mn) { return; }
+		entries = guideMenuEntries();
+		tb.innerHTML = '';
+		guideToolbarRows().forEach(function (g, i) {
+			var row, twin, also, at;
+			if (lastGroup && g.group !== lastGroup) { guideRule(tb); }
+			lastGroup = g.group;
+			row = guideRow(g.b.icon, g.b.name, g.tip, g.keys);
+			row.setAttribute('data-guide-toolbar', String(i));
+			if (!g.shown) { row.classList.add('lpn-guide-off'); }
+			if (g.twin) {
+				// "Also in Edit › Delete": the sentence is one key with a {menu} slot, so a translator
+				// can put the path wherever the language wants it.
+				also = guideSpan('lpn-guide-twin');
+				twin = (pc.lpn_guide_also || 'Also in {menu}').split('{menu}');
+				if (twin[0]) { also.appendChild(document.createTextNode(twin[0])); }
+				also.appendChild(guidePathEl(g.twin));
+				if (twin[1]) { also.appendChild(document.createTextNode(twin[1])); }
+				row.querySelector('.lpn-guide-desc').appendChild(also);
+			}
+			row.__lpnGuide = { kind: 'toolbar', g: g };
+			tb.appendChild(row);
+		});
+		mn.innerHTML = '';
+		entries.forEach(function (e) {
+			var row;
+			if (e.menuId !== curMenu) {
+				if (block) { guideTrimRule(block); }
+				curMenu = e.menuId;
+				block = document.createElement('div');
+				block.className = 'lpn-guide-menu';
+				block.setAttribute('data-guide-menu', e.menuId);
+				var h = document.createElement('h3');
+				h.textContent = e.menuLabel;
+				block.appendChild(h);
+				mn.appendChild(block);
+			}
+			if (e.separator) { if (e.depth === 0) { guideRule(block); } return; }
+			row = guideRow(e.row.icon, e.row.label, e.row.tip, e.row.hotkey ? [menuHotkeyText(e.row.hotkey)] : []);
+			if (e.depth) { row.classList.add('lpn-guide-sub'); }
+			row.__lpnGuide = { kind: 'menu', e: e };
+			block.appendChild(row);
+		});
+		if (block) { guideTrimRule(block); }
+		guideFilter();
+	}
+	// ---- Search: one box over all four sections ----
+	function guideMatch(el, q) { return String(el.textContent || '').toLowerCase().indexOf(q) >= 0; }
+	function guideFilter() {
+		var box = hotkeysBoxEl(), input = document.getElementById('lpn_guide_search'), none = document.getElementById('lpn_guide_none'),
+			q = input ? String(input.value || '').trim().toLowerCase() : '', any = false;
+		if (!box) { return; }
+		function show(el, on) { el.style.display = on ? '' : 'none'; return on; }
+		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
+			var hit = false;
+			sec.querySelectorAll('.lpn-guide-rule').forEach(function (r) { show(r, !q); });
+			sec.querySelectorAll('#lpn_guide_toolbar > .lpn-guide-row').forEach(function (r) {
+				if (show(r, !q || guideMatch(r, q))) { hit = true; }
+			});
+			sec.querySelectorAll('.lpn-guide-menu').forEach(function (m) {
+				var h = m.querySelector('h3'), all = !q || guideMatch(h, q), mhit = false;
+				m.querySelectorAll('.lpn-guide-row').forEach(function (r) {
+					if (show(r, all || guideMatch(r, q))) { mhit = true; }
+				});
+				if (show(m, mhit)) { hit = true; }
+			});
+			// The PHP tables: a matching term shows its whole entry, otherwise only matching rows.
+			sec.querySelectorAll('dl > dt').forEach(function (dt) {
+				var dd = dt.nextElementSibling, all = !q || guideMatch(dt, q), dhit = false, trs;
+				if (!dd || dd.tagName !== 'DD') { return; }
+				trs = dd.querySelectorAll('tr');
+				if (trs.length) {
+					trs.forEach(function (tr) { if (show(tr, all || guideMatch(tr, q))) { dhit = true; } });
+				} else { dhit = all || guideMatch(dd, q); }
+				show(dt, dhit); show(dd, dhit);
+				if (dhit) { hit = true; }
+			});
+			if (show(sec, hit)) { any = true; }
+		});
+		if (none) { none.hidden = any; }
+	}
+	// ---- Show, never run ----
+	function guidePulse(el) {
+		if (!el || !el.classList) { return; }
+		el.classList.remove('lpn-guide-pulse');
+		void el.offsetWidth;   // restart the animation on a second click
+		el.classList.add('lpn-guide-pulse');
+		clearTimeout(el.__lpnPulseT);
+		el.__lpnPulseT = setTimeout(function () { el.classList.remove('lpn-guide-pulse'); }, GUIDE_PULSE_MS);
+	}
+	function guideMenuRowIn(listId, row) {
+		return Array.prototype.filter.call(document.querySelectorAll('#' + listId + ' button.lpn-menu-row'), function (x) {
+			return x.__lpnRow && x.__lpnRow.label === row.label && x.__lpnRow.icon === row.icon;
+		})[0] || null;
+	}
+	// Opens the menu the entry lives in, and its fly-out, through the menu bar's own button, with
+	// the row focused (a disabled row cannot take focus, so it only pulses). The command is not run.
+	function guideShowMenuEntry(e) {
+		var btn = document.getElementById(e.menuId), pop = document.getElementById('lpn_menu_popup'), opener, target;
+		if (!btn || !btn.getClientRects().length || !pop) { return false; }
+		closeMenu();
+		btn.click();
+		if (pop.style.display !== 'block') { return false; }
+		if (e.depth) {
+			opener = guideMenuRowIn('lpn_menu_list', e.parent.row);
+			if (!opener) { return false; }
+			if (opener.disabled || !opener.__lpnRow.submenu) { opener.focus(); guidePulse(opener); return true; }
+			openMenu(opener, opener.__lpnRow.submenu(), 1);
+			target = guideMenuRowIn('lpn_menu_list2', e.row);
+		} else {
+			target = guideMenuRowIn('lpn_menu_list', e.row);
+		}
+		if (target) {
+			if (!target.disabled) { target.focus(); }
+			guidePulse(target);
+		}
+		return true;
+	}
+	function guideShow(row) {
+		var d = row && row.__lpnGuide, el;
+		if (!d) { return; }
+		if (d.kind === 'toolbar') {
+			el = d.g.b.el;
+			if (!smallScreen() && el && el.isConnected && el.getClientRects().length > 0) { guidePulse(el); return; }
+			if (d.g.twin) { guideShowMenuEntry(d.g.twin); }
+			return;
+		}
+		guideShowMenuEntry(d.e);
+	}
+	// ---- `?` opens the guide at the control under the pointer or holding focus ----
+	var guideHoverEl = null;
+	var GUIDE_SUBJECTS = '#lpn_toolbar button, #lpn_menu_popup button.lpn-menu-row, #lpn_menu_popup2 button.lpn-menu-row';
+	document.addEventListener('mouseover', function (e) {
+		guideHoverEl = e.target && e.target.closest ? e.target.closest(GUIDE_SUBJECTS) : null;
+	}, true);
+	function guideTyping(el) {
+		var tag = el && el.tagName, type;
+		if (!tag) { return false; }
+		if (el.isContentEditable || tag === 'TEXTAREA' || tag === 'SELECT') { return true; }
+		if (tag !== 'INPUT') { return false; }
+		type = String(el.type || 'text').toLowerCase();
+		return ['button', 'checkbox', 'radio', 'range', 'color', 'submit', 'reset', 'file', 'image'].indexOf(type) < 0;
+	}
+	function guideSubjectOf(el) {
+		var t = el && el.closest ? el.closest(GUIDE_SUBJECTS) : null, inSub;
+		if (!t) { return null; }
+		if (t.closest('#lpn_toolbar')) { return { kind: 'toolbar', el: t }; }
+		if (!t.__lpnRow) { return null; }
+		inSub = !!t.closest('#lpn_menu_popup2');
+		return {
+			kind: 'menu', row: t.__lpnRow, menuId: openMenuAnchor ? openMenuAnchor.id : '',
+			parentRow: inSub && subOpener ? subOpener.__lpnRow || null : null
+		};
+	}
+	function guideRowFor(subject) {
+		var rows = Array.prototype.slice.call(document.querySelectorAll('#lpn_hotkeys_popup .lpn-guide-row'));
+		return rows.filter(function (r) {
+			var d = r.__lpnGuide;
+			if (!d || !subject || d.kind !== subject.kind) { return false; }
+			if (d.kind === 'toolbar') { return d.g.b.el === subject.el; }
+			return d.e.menuId === subject.menuId && d.e.row.label === subject.row.label && d.e.row.icon === subject.row.icon
+				&& (!subject.parentRow || (d.e.parent && d.e.parent.row.label === subject.parentRow.label));
+		})[0] || null;
+	}
+	function openGuideAt(subject) {
+		var input = document.getElementById('lpn_guide_search'), row;
+		if (input) { input.value = ''; }
+		openHotkeysBox();
+		row = subject ? guideRowFor(subject) : null;
+		if (row) {
+			if (row.scrollIntoView) { row.scrollIntoView({ block: 'center' }); }
+			row.focus({ preventScroll: true });
+			guidePulse(row);
+		} else if (input && !smallScreen()) {
+			input.focus();
+		}
+	}
+	window.addEventListener('keydown', function (e) {
+		var ae = document.activeElement, subject;
+		if (e.defaultPrevented || e.key !== '?' || e.ctrlKey || e.altKey || e.metaKey) { return; }
+		if (guideTyping(e.target) || guideTyping(ae)) { return; }
+		subject = guideSubjectOf(ae) || guideSubjectOf(guideHoverEl);
+		e.preventDefault();
+		e.stopPropagation();
+		openGuideAt(subject);
+	}, true);
+	function wireGuide() {
+		var box = hotkeysBoxEl(), input = document.getElementById('lpn_guide_search');
+		if (!box) { return; }
+		if (input) { input.addEventListener('input', guideFilter); }
+		if (hotkeysBoxIsOpen()) { renderGuide(); }   // reopened from memory before the menu bar existed
+		box.addEventListener('click', function (e) {
+			var row = e.target && e.target.closest ? e.target.closest('.lpn-guide-row') : null;
+			if (!row) { return; }
+			// Stopped, so the page's click-away dismissal does not close the menu this opens.
+			e.stopPropagation();
+			guideShow(row);
+		});
+		// **Looped-Network.php#guide OPENS IT**, so a link, a blog post or an email can point at it.
+		function fromHash() { if (String(location.hash || '').toLowerCase() === '#guide') { openGuideAt(null); } }
+		window.addEventListener('hashchange', fromHash);
+		fromHash();
 	}
 	// **THE MAP MENU** -- View until 2026-08-27, renamed on Tom's word. It holds the drawing's frame,
 	// the pictures behind it, where on Earth it is, and the elevations read off that ground. Only
@@ -41474,9 +41828,10 @@ var EngCalcs = EngCalcs || {};
 	//
 	// Named openProjectBarMenu(), NOT openProjectMenu(): that name is taken by the TAB's own menu
 	// (rename, duplicate, close), which is about one project rather than about the open one.
-	function openProjectBarMenu(anchor) {
+	function openProjectBarMenu(anchor) { openMenu(anchor, waterMenuRows()); }
+	function waterMenuRows() {
 		var pc = EngCalcs.pageConfig || {};
-		openMenu(anchor, [
+		return [
 			// **FIRST, because it is the one thing here that adds water to the model** (Tom,
 			// 2026-08-27). Everything under it reads, configures or reports on what these rows put
 			// on the map. It keeps `lpn_menu_insert` -- the word is right and it is already
@@ -41630,7 +41985,7 @@ var EngCalcs = EngCalcs || {};
 				icon: 'info', label: pc.lpn_reports_menu || 'Reports',
 				submenu: reportMenuRows
 			}
-		]);
+		];
 	}
 	// openSettingsMenu() is GONE (Tom, 2026-08-08). Its three rows now live where they belong: Settings
 	// and Units are sections of the panel, and Clear calculator is the button at its foot --
@@ -42573,6 +42928,7 @@ var EngCalcs = EngCalcs || {};
 		wireFullReportBox();
 		wireCalibBox();
 		buildMenuBar();
+		wireGuide();   // after the menu bar: the guide names each menu by its button
 		wireScenarioButton();
 		wireWrongButtons();
 		wireMessageLogButton();
@@ -43119,6 +43475,8 @@ var EngCalcs = EngCalcs || {};
 		paneBtn.setAttribute('aria-pressed', paneIsOpen() ? 'true' : 'false');
 		paneBtn.addEventListener('click', togglePane);
 		endGroup.appendChild(paneBtn);
+		// A repainted strip repaints the guide's Toolbar section if the guide is open.
+		if (hotkeysBoxIsOpen()) { renderGuide(); }
 		// **NO RIGHT-PANE TOGGLE.** Tom, 2026-08-19: "We can hide the right pane button for now."
 		// This button was its only door, so hiding it retires the right pane from the interface
 		// without deleting a line of it -- which is the point, because the pane is already
@@ -64981,6 +65339,14 @@ var EngCalcs = EngCalcs || {};
 	// file draws it, so the dependency runs one way: lpn-time.js owns the text, looped-network.js
 	// owns the boxes, and neither reaches into the other's state.
 	EngCalcs.lpnOpenRunReportBox = function () { return openRunReportBox(); };
+	// For dev/lpn-spike/user-guide-harness.js: the strip's own record, the undo depth and the
+	// document's signature, so the harness can prove a guide row SHOWS and runs nothing.
+	EngCalcs.lpnGuideProbe = function () {
+		return {
+			toolbar: toolbarIconIndex.map(function (b) { return { el: b.el, icon: b.icon, name: b.name }; }),
+			undo: undoStack.length, sig: docSignature(), mode: mode
+		};
+	};
 	// The Full report's Type column harness opens the box through this, not through the menu.
 	EngCalcs.lpnOpenFullReportBox = function () { return openFullReportBox(); };
 

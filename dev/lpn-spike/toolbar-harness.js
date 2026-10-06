@@ -78,12 +78,12 @@ console.log('--- the toolbar holds the commands you use every few minutes ---');
 	ok('New project has left the toolbar', !/lpn_file_new/.test(bar));
 	ok('...and so has Background image', !/lpn_backdrop_menu/.test(bar));
 	// Both are still reachable. A command that leaves the toolbar must not leave the app.
-	ok('New project is still in the File menu', /lpn_file_new/.test(fn('openFileMenu')));
-	ok('...and Save as is still in the File menu', /lpn_file_saveas/.test(fn('openFileMenu')));
+	ok('New project is still in the File menu', /lpn_file_new/.test(fn('fileMenuRows')));
+	ok('...and Save as is still in the File menu', /lpn_file_saveas/.test(fn('fileMenuRows')));
 	// Libraries, Profile and Tables are rows of the Water menu (`lpn_menu_project` is its key -- see
 	// dev/session-handoff.md: the menu READS 'Water' and the key kept its old name deliberately).
 	{
-		const water = fn('openProjectBarMenu');
+		const water = fn('waterMenuRows');
 		ok('...and Libraries, Profile and Tables are all still on the Water menu',
 			/lpn_library_menu/.test(water) && /lpn_profile_menu/.test(water) && /lpn_tables_menu/.test(water),
 			'a command that leaves the toolbar must not leave the app');

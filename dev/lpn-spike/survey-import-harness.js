@@ -86,9 +86,9 @@ section('0. the File menu is where it is reached from');
 // carries the DOOR to it (the "Import…" row whose submenu is importMenuRows), asserted below.
 ok('the File menu carries the row', /pickSurveyFile/.test(bodyOf('importMenuRows')));
 ok('...and the File menu opens the submenu that holds it',
-	/submenu: importMenuRows/.test(bodyOf('openFileMenu')));
+	/submenu: importMenuRows/.test(bodyOf('fileMenuRows')));
 ok('...and no other menu does, the Settings panel that used to hold it included',
-	['openEditMenu', 'mapMenuRows', 'openHelpMenu', 'rebuildSettingsFields']
+	['editMenuRows', 'mapMenuRows', 'helpMenuRows', 'rebuildSettingsFields']
 		.every(n => !/pickSurveyFile/.test(bodyOf(n))));
 ok('the whole page names the picker in exactly two places: the menu row and the definition',
 	(PAGE_SRC.match(/pickSurveyFile/g) || []).length === 2,

@@ -2676,6 +2676,13 @@
                 "lpn_ts_none"
             ],
             "reason": "resynced in sprint 1004-lpn, all 26 languages"
+        },
+        {
+            "date": "2026-10-06",
+            "keys": [
+                "lpn_notes_6_def"
+            ],
+            "reason": "cells swapped to gesture-then-action in all 27 files by script; prose unchanged"
         }
     ],
     "hashes": {
@@ -3915,7 +3922,7 @@
         "lpn_notes_3_term": "c6bf37fe1cd4249e4de2da6de2a9ba4ee14b45e3",
         "lpn_notes_5_def": "0cf16cb1b992df37397f4beead63ef471a22806d",
         "lpn_notes_5_term": "04433f7fe8fbf41ae2e5d2354f718f4330e9c5ac",
-        "lpn_notes_6_def": "7a690fe4507dd6a8016cbb6d1ee1ca3f620f396c",
+        "lpn_notes_6_def": "a19382aeec50a6d5b1cf8dc005d9f68207587416",
         "lpn_notes_6_term": "81d3fc18f58b1f062d929392cf56424cce60fa14",
         "lpn_notes_7_def": "2df684887cb0fdd7cda7206963d15c312460575a",
         "lpn_notes_7_term": "f85f833914da7710e7a7fe82a00dc7b784dea9b5",

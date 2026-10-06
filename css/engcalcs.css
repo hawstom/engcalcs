@@ -4377,6 +4377,56 @@ html:has(#lpn_canvas) { overflow: hidden; }
    Only the width is its own, kept at the 44rem the old centred popover opened with -- a column of
    defined terms reads better at Library's width than at Settings' narrower one. */
 .lpn-notesbox { width: min(44rem, 94vw); }
+/* ---- THE USER GUIDE (Tom, 2026-10-06; Ida's design) ---------------------------------------------
+   The Notes shell, with a search pinned at the top and rows that are a legend, not a menu: icon,
+   name, the whole tip written out, and the key. The body is a size container so a row folds by
+   the BOX's width (a narrow box on a desktop folds the same as a phone): name above tip, key
+   still at the end. A toolbar button that is not on screen now is dimmed, not dropped. */
+.lpn-guide-body { container-type: inline-size; }
+.lpn-guide-search { position: sticky; top: 0; z-index: 1; background: var(--ec-bg); padding: 0 0 6px; }
+.lpn-guide-search input { width: 100%; box-sizing: border-box; padding: 3px 6px; font: inherit; }
+.lpn-guide-none { margin: .5em 0; color: var(--ec-ink-muted); }
+.lpn-guidebox .lpn-guide-section > h2 { font-size: 1.25rem; margin: .6em 0 .25em; }
+.lpn-guide-section h3 { font-size: 1rem; font-weight: bold; margin: .8em 0 .2em; }
+.lpn-guide-row {
+	display: grid; grid-template-columns: 1.6em minmax(7em, 11em) 1fr auto; column-gap: .6em;
+	align-items: start; width: 100%; box-sizing: border-box; text-align: start;
+	background: none; border: 1px solid transparent; border-radius: 3px; padding: 3px 4px;
+	color: inherit; font: inherit; cursor: pointer;
+}
+.lpn-guide-row:hover { background: var(--ec-hover-bg); border-color: var(--ec-hover-border); }
+.lpn-guide-row:focus-visible { outline: 2px solid var(--ec-accent); outline-offset: 1px; }
+.lpn-guide-icon { display: inline-flex; justify-content: center; padding-top: 1px; }
+.lpn-guide-icon svg { width: 18px; height: 18px; }
+.lpn-guide-name { font-weight: bold; }
+.lpn-guide-desc { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lpn-guide-tip { white-space: pre-line; }
+.lpn-guide-twin { color: var(--ec-ink-muted); font-size: .9em; }
+.lpn-guide-path { white-space: nowrap; }
+.lpn-guide-chev { width: .7em; height: .7em; margin: 0 .2em; vertical-align: middle; fill: none; stroke: currentColor; stroke-width: 1.6; }
+html[dir="rtl"] .lpn-guide-chev { transform: scaleX(-1); }
+.lpn-guide-keys { display: flex; gap: 3px; flex-wrap: wrap; justify-content: flex-end; }
+.lpn-guide-keys kbd {
+	font: inherit; font-size: .85em; padding: 0 .4em; border: 1px solid var(--ec-border-strong);
+	border-radius: 3px; background: var(--ec-gray-f6f6f6); color: var(--ec-ink); white-space: nowrap;
+}
+.lpn-guide-off .lpn-guide-icon, .lpn-guide-off .lpn-guide-name { opacity: .55; }
+.lpn-guide-sub { padding-inline-start: 1.6em; }
+.lpn-guide-rule { margin: 3px 0; border: 0; border-top: 1px solid var(--ec-border); }
+@container (max-width: 520px) {
+	.lpn-guide-row { grid-template-columns: 1.6em 1fr auto; }
+	.lpn-guide-name { grid-column: 2; grid-row: 1; }
+	.lpn-guide-keys { grid-column: 3; grid-row: 1; }
+	.lpn-guide-desc { grid-column: 2 / 4; grid-row: 2; }
+}
+/* The SHOW pulse: a guide row points at the real control (a toolbar button or a menu row) and
+   never runs it. ~1.5 s, matching GUIDE_PULSE_MS in js/looped-network.js. */
+@keyframes lpn-guide-pulse {
+	0%, 50%, 100% { box-shadow: 0 0 0 0 transparent; }
+	25%, 75% { box-shadow: 0 0 0 3px var(--ec-accent); }
+}
+.lpn-guide-pulse { animation: lpn-guide-pulse 1.5s ease-in-out 1; outline: 2px solid var(--ec-accent); outline-offset: 1px; }
+@media (prefers-reduced-motion: reduce) { .lpn-guide-pulse { animation: none; } }
 /* ---- THE FIRE FLOW BOX (ROADMAP Task 530) -----------------------------------------------------
    It borrows .lpn-setbox's whole shell -- moveable by its chrome, resizeable by `resize: both` and
    by the touch grabber, capped to the viewport, body scrolling inside itself. Only the width is its
