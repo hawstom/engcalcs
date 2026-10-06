@@ -71,7 +71,7 @@ USA.</p>
 		<td>Necessary to provide what you asked for</td>
 	</tr>
 	<tr>
-		<td><strong>Messages you send us.</strong> Your name, your message, and your email address if you choose to give one (it is optional). Also the page you came from, your language, the topic you picked and, for a map error, its error code</td>
+		<td><strong>Messages you send us.</strong> Your name, email address and message</td>
 		<td>To answer you and refer back to the conversation</td>
 		<td>Necessary to answer you</td>
 	</tr>

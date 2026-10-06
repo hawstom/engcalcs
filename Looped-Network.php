@@ -441,9 +441,7 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // only site, and why the standing cell in the bottom strip is the primary one.
 			      // d-print-none although the box around it is not: a printed sheet should carry
 			      // the diagnostic and cannot carry a button. pointer-events:auto because the
-			      // overlay stack it sits in is inert. ?><button type="button" id="lpn_wrong_status_btn" class="lpn-wrong-btn d-print-none"><?=ecTipLabel($ec_lang['lpn_wrong_btn'], $ec_lang['lpn_wrong_tip'])?></button><?php // "TELL US MORE" (feat/feedback, Ida 2026-10-05, moves 1-2). The same message, with a way to write: opens contact.php
-			      // with the page, the language and this message's code in the URL. setStatus() rewrites the code. The
-			      // anonymous button beside it is unchanged. ?><a id="lpn_tell_status" class="lpn-tell-link d-print-none" href="<?=htmlspecialchars(EC_SW_BASE)?>contact.php?from=Looped-Network&amp;cat=wrong" target="_blank" rel="noopener"><?=htmlspecialchars($ec_lang['lpn_tell_more'])?></a></p>
+			      // overlay stack it sits in is inert. ?><button type="button" id="lpn_wrong_status_btn" class="lpn-wrong-btn d-print-none"><?=ecTipLabel($ec_lang['lpn_wrong_btn'], $ec_lang['lpn_wrong_tip'])?></button></p>
 			<?php // THE ENGINE WAIT (ROADMAP Task 608). Its own row in this column rather than a
 			      // second writer of the diagnostic or of the one-shot notice, because it outlives
 			      // both: it stands for as long as the download does, and every solve in between
@@ -768,7 +766,6 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 			      // #lpn_map_overlay_tl, beside the mode hint and the notice it recalls -- see the
 			      // comment there. It is not a cell of this strip any more. ?>
 			<button type="button" id="lpn_wrong_btn" class="lpn-wrong-btn"><?=ecTipLabel($ec_lang['lpn_wrong_btn'], $ec_lang['lpn_wrong_tip'])?></button>
-			<a id="lpn_tell_btn" class="lpn-tell-link" href="<?=htmlspecialchars(EC_SW_BASE)?>contact.php?from=Looped-Network&amp;cat=wrong" target="_blank" rel="noopener"><?=htmlspecialchars($ec_lang['lpn_tell_more'])?></a>
 		</div>
 		<?php // THE OPENSTREETMAP ATTRIBUTION (ROADMAP Task 145). Required by the OSM tile usage
 		      // policy whenever a tile is on screen, and therefore NOT dismissible: the only thing

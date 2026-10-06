@@ -545,13 +545,6 @@ $ec_lang['about_body_html']='<h3>Mission</h3><p>HawsEDC Engineering Calculators 
 $ec_lang['contactSendMessage']='Send Tom Haws a message';
 $ec_lang['contactYourName']='Your name:';
 $ec_lang['contactYourEmail']='Your e-mail address:';
-$ec_lang['contactYourEmailOptional']='Email (only if you want a reply)';
-$ec_lang['contactCategory']='What is this about?';
-$ec_lang['contactCategoryWrong']='Something is wrong';
-$ec_lang['contactCategoryWording']='Wrong wording or translation';
-$ec_lang['contactCategoryIdea']='An idea';
-$ec_lang['contactCategoryOther']='Other';
-$ec_lang['contactContextNote']='This message will also say which page you came from, your language, and the error code if there was one. It never includes anything from your drawing.';
 $ec_lang['contactSubject']='Subject:';
 $ec_lang['contact_message']='Message:';
 $ec_lang['contactSpamPrefix']='Five plus one equals';
@@ -1112,7 +1105,6 @@ $ec_lang['lpn_wrong_btn']='Something wrong here?';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_wrong_tip']='Use this link to tell us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends nothing you have entered, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.';
 $ec_lang['lpn_wrong_thanks']='Thank you. That reached us.';
-$ec_lang['lpn_tell_more']='Tell us more';
 $ec_lang['lpn_status_example_opened']='Opened {name}. It is your copy: save it with File, Save as.';
 // Stands while the fault stands, rather than expiring like every other notice on the map: it
 // reports a page that cannot lay itself out, which is true until a measurement recovers.

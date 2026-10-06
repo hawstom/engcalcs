@@ -150,31 +150,52 @@ $postSubject     = isset($_POST['subject'])      && is_string($_POST['subject'])
 $postMessage     = isset($_POST['message'])      && is_string($_POST['message'])      ? $_POST['message']      : '';
 $postMoreMessage = isset($_POST['more_message']) && is_string($_POST['more_message']) ? $_POST['more_message'] : '';
 
-// Validation and composition live in lib/ContactMail.lib.php so a harness can run the real rules.
-// The e-mail address is optional there; a category, a page language and an error code ride along.
-require_once __DIR__ . '/lib/ContactMail.lib.php';
-$composed = ecContactCompose(array(
-  'name' => $postName, 'email' => $postEmail, 'subject' => $postSubject, 'message' => $postMessage,
-  'more_message' => $postMoreMessage,
-  'category' => isset($_POST['category']) ? $_POST['category'] : '',
-  'code' => isset($_POST['code']) ? $_POST['code'] : '',
-  'lang' => isset($_POST['ctxlang']) ? $_POST['ctxlang'] : '',
-), ecContactOriginPage());
-if (isset($composed['error'])) {
-  // Show the form again, filled in, with the refusal above it. contact.php reads these two.
-  $ecContactError = $composed['error'];
-  $ecContactPrefill = array('name' => $postName, 'email' => $postEmail, 'subject' => $postSubject, 'message' => $postMessage,
-    'category' => isset($_POST['category']) ? $_POST['category'] : '', 'code' => isset($_POST['code']) ? $_POST['code'] : '',
-    'ctxlang' => isset($_POST['ctxlang']) ? $_POST['ctxlang'] : '', 'origin' => ecContactOriginPage());
-  require __DIR__ . '/contact.php';
-  exit;
+// 2026-07-15 Trying the form without this.
+// Get the spam test or abort.
+// $test = $_POST['test'];
+// if (strtoupper($test) !== strtoupper($testanswer)) die($errspam);
+
+// Get the commentor's name
+if (preg_match("/(\r|\n)/", $postName) or preg_match("/@/",$postName)) {
+  die("Are you trying to spam this form?  Please don't do that.");
+} else {
+  $name = $postName;
 }
-$subject = $composed['subject'];
-$message = $composed['message'];
-$replyto = $composed['replyto'];
+
+// Get the commentor's e-mail address
+if (preg_match("/(\r|\n)/", $postEmail) or !preg_match("/^[a-z0-9]+([_\\.-][a-z0-9]+)*" ."@"."([a-z0-9]+([\.-][a-z0-9]+)*)+"."\\.[a-z]{2,}"."$/",$postEmail)) {
+  die("Invalid e-mail address.");
+} else {
+  $email = $postEmail;
+}
+
+// Get the Subject: header.
+if (preg_match("/(\r|\n)/", $postSubject) or preg_match("/@/",$postSubject)) {
+  die("Get out, spammer.");
+} else {
+  $subject = $postSubject;
+}
+
+
+// Get the message
+$message = $postMessage.$postMoreMessage;
+
+// WHERE DID THEY COME FROM. Appended by us, below the visitor's own words and behind a rule so it
+// cannot be mistaken for part of the message. Labelled honestly in both directions: a page name
+// only when one was actually carried through, and the words "not recorded" -- never a guess --
+// when it was not. See ecContactOriginPage().
+$originPage = ecContactOriginPage();
+$message .= "\n\n-- \nCame from: " . ($originPage !== '' ? $originPage : 'not recorded') . "\n";
 
 // Use a fixed internal success page (do not trust user input for redirects).
 $successfile = 'formmailsuccess.php';
+
+// Put commentor's e-mail address in Reply-to: or else omit the Reply-to:
+if  ($email !== "") {
+ $replyto = 'Reply-to: '.$name.' <'.$email.'>';
+} else {
+$replyto = '';
+}
 
 // Make the From: header
 // Use the commentor's e-mail.
@@ -182,7 +203,7 @@ $from = 'From: HawsEDC Support <support@hawsedc.com>';
 
 // Assemble the From and Reply-to into additional headers for the
 // PHP mail() function.
-$moreheaders = ecContactHeaders($from, $replyto);
+$moreheaders = $from."\r\n".$replyto;
 
 // Send the message. If send was successful, show the success page.
 if (mail($to, $subject, $message, $moreheaders)) {
@@ -202,4 +223,4 @@ if (mail($to, $subject, $message, $moreheaders)) {
 } else {
   echo $errsendfailed;
 }
-?>
+?>

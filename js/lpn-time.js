@@ -1182,8 +1182,7 @@
 		state.failed = 'engine';
 		state.failedWhy = why || 'offline';
 		host.apply(host.native(model));
-		// The code rides to the "Tell us more" link beside the message (js/looped-network.js contactUrl).
-		host.status(noEngineText(state.t), 'engine-' + state.failedWhy);
+		host.status(noEngineText(state.t));
 		renderPanel();
 		return true;
 	}
