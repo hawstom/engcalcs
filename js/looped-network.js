@@ -36063,10 +36063,21 @@ var EngCalcs = EngCalcs || {};
 			// that file: a reader who imported three tanks last week and drops in a point list this
 			// week must not find 200 tanks on the map because a control remembered something.
 			// Junction is the hard-coded default, which is what a surveyed point usually is.
-			assetType = 'junction';
+			assetType = 'junction',
+			// **FIELD CODES ARE OPT-IN AND START OFF EVERY TIME** (Task 771). Off, this box and
+			// the import are exactly what they were; the table is per import and stored nowhere.
+			useCodes = false,
+			codeTable = (EngCalcs.LPN_SURVEY_CODE_DEFAULTS || []).map(function (r) { return { code: r.code, as: r.as }; });
 		function read() {
 			return EngCalcs.lpnSurveyParse
 				? EngCalcs.lpnSurveyParse(text, { limits: limits, format: format }) : { ok: false };
+		}
+		// The network the codes describe, or null with codes off. Re-planned on every change, for
+		// the reason read() is: what the box says is what the button will do.
+		function plan() {
+			if (!useCodes || !parsed.ok || !EngCalcs.lpnSurveyCodePlan) { return null; }
+			return EngCalcs.lpnSurveyCodePlan(parsed, { table: codeTable, fallback: assetType,
+				hasNode: function (id) { return !!nodeById(id); } });
 		}
 		parsed = read();
 		// A file nothing can be read out of at all gets the sentence and no box: there is no
@@ -36096,6 +36107,79 @@ var EngCalcs = EngCalcs || {};
 				typeSel.appendChild(o);
 			});
 			wrap.appendChild(typeSel);
+			// **THE FIELD-CODE TICK AND ITS TABLE** (Task 771; Tom, 2026-10-05: interpret a point's
+			// Description as an asset or a pipe vertex). A choice in this box, not a new door. The
+			// asset type above stays the answer for a point whose code the table does not hold.
+			var codesRow = document.createElement('div'), codesBox = document.createElement('input'),
+				codesLabel = document.createElement('label'), codesTable = document.createElement('div');
+			codesRow.style.margin = '8px 0 6px';
+			codesBox.type = 'checkbox';
+			codesBox.id = 'lpn_survey_codes';
+			codesLabel.htmlFor = 'lpn_survey_codes';
+			setFieldLabel(codesLabel, pc.lpn_survey_codes_toggle || 'Read the description as field codes',
+				pc.lpn_survey_codes_tip || 'Read the first word of each description as a code from the table. Points with the same line code join into one pipe in file order, and WL1 and WL2 are separate lines. +0 starts a line, -0 ends one, and CLO closes one. JPN followed by a point name joins to that point (Carlson), and Civil 3D writes it CPN.');
+			codesRow.appendChild(codesBox);
+			codesRow.appendChild(document.createTextNode(' '));
+			codesRow.appendChild(codesLabel);
+			wrap.appendChild(codesRow);
+			codesTable.id = 'lpn_survey_code_table';
+			codesTable.style.display = 'none';
+			codesTable.style.margin = '0 0 6px 1.5em';
+			wrap.appendChild(codesTable);
+			function fillCodeTable() {
+				var tbl = document.createElement('table'), head = document.createElement('tr'), add;
+				codesTable.innerHTML = '';
+				[pc.lpn_survey_codes_col_code || 'Code', pc.lpn_survey_codes_col_type || 'Asset type'].forEach(function (t) {
+					var th = document.createElement('th');
+					th.textContent = t;
+					th.style.textAlign = 'left';
+					head.appendChild(th);
+				});
+				tbl.appendChild(head);
+				codeTable.forEach(function (row, i) {
+					var tr = document.createElement('tr'), td1 = document.createElement('td'),
+						td2 = document.createElement('td'), td3 = document.createElement('td'),
+						inp = document.createElement('input'), as = document.createElement('select'),
+						rm = document.createElement('button');
+					inp.type = 'text';
+					inp.size = 6;
+					inp.value = row.code;
+					inp.className = 'lpn-survey-code';
+					inp.addEventListener('input', function () { row.code = inp.value; draw(); });
+					td1.appendChild(inp);
+					LPN_SURVEY_TYPES.concat(['pipe']).forEach(function (t) {
+						var o = document.createElement('option');
+						o.value = t;
+						o.textContent = t === 'pipe' ? (pc.lpn_tool_add_pipe || 'Pipe') : surveyTypeLabel(t);
+						if (t === row.as) { o.selected = true; }
+						as.appendChild(o);
+					});
+					as.className = 'lpn-survey-code-as';
+					as.addEventListener('change', function () { row.as = as.value; draw(); });
+					td2.appendChild(as);
+					rm.type = 'button';
+					rm.textContent = '\u00d7';
+					rm.title = pc.lpn_survey_codes_remove || 'Remove code';
+					rm.setAttribute('aria-label', rm.title);
+					rm.addEventListener('click', function () { codeTable.splice(i, 1); fillCodeTable(); draw(); });
+					td3.appendChild(rm);
+					tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3);
+					tbl.appendChild(tr);
+				});
+				codesTable.appendChild(tbl);
+				add = document.createElement('button');
+				add.type = 'button';
+				add.id = 'lpn_survey_code_add';
+				add.textContent = pc.lpn_survey_codes_add || 'Add code';
+				add.addEventListener('click', function () { codeTable.push({ code: '', as: 'junction' }); fillCodeTable(); draw(); });
+				codesTable.appendChild(add);
+			}
+			codesBox.addEventListener('change', function () {
+				useCodes = !!codesBox.checked;
+				codesTable.style.display = useCodes ? '' : 'none';
+				if (useCodes) { fillCodeTable(); }
+				draw();
+			});
 			// **THE CHOOSER IS SHOWN EVEN WHEN THE HEADER ANSWERED, AND IT SHOWS WHAT THE HEADER
 			// SAID** (Tom, 2026-09-18, writing the box: *"File format: / PNEZD specified
 			// internally"*). It used to grey out beside a sentence of ours explaining that a header
@@ -36160,7 +36244,7 @@ var EngCalcs = EngCalcs || {};
 				preview.innerHTML = '';
 				fillChooser();
 				var text2 = parsed.ok
-					? EngCalcs.lpnSurveyConfirmText(parsed, assetType)
+					? EngCalcs.lpnSurveyConfirmText(parsed, assetType, plan())
 					: EngCalcs.lpnSurveyErrorText(parsed, axes);
 				text2.split('\n\n').forEach(function (para) {
 					var p = document.createElement('p');
@@ -36184,11 +36268,12 @@ var EngCalcs = EngCalcs || {};
 				draw();
 			});
 			draw();
+			tipsIn(wrap);
 		}, [
 			{ label: pc.lpn_survey_create || 'Create nodes', fn: function () {
 				if (!parsed.ok) { setWarning(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 				rememberSurveyFormat(format);
-				showSurveyReport(parsed, createSurveyNodes(parsed, assetType));
+				showSurveyReport(parsed, createSurveyNodes(parsed, assetType, plan()));
 			} },
 			{ label: pc.lpn_cancel || 'Cancel', fn: function () {
 				setNotice(pc.lpn_survey_cancelled || 'Nothing was created and nothing was changed.');
@@ -36206,12 +36291,20 @@ var EngCalcs = EngCalcs || {};
 	 * already reads. Neither is a new mechanism and neither needs a call site to remember anything:
 	 * both are believed only while the drawn number is still the one derived from them.
 	 */
-	function createSurveyNodes(parsed, assetType) {
+	function createSurveyNodes(parsed, assetType, codePlan) {
 		var notes = [], created = 0, elevFromFile = 0;
 		var geo = isLatLonProject();
 		var type = LPN_SURVEY_TYPES.indexOf(assetType) >= 0 ? assetType : 'junction';
 		saveUndoSnapshot();
-		parsed.points.forEach(function (p) {
+		// **WITH FIELD CODES ON, THE PLAN DECIDES WHICH POINTS ARE NODES AND OF WHAT KIND** (Task
+		// 771), and every node is still made by the one function below, so a coded junction and an
+		// uncoded one cannot come to differ. Off, the plan is null and this is the loop it always was.
+		var made = {}, coded = null;
+		var nodePoints = codePlan
+			? codePlan.nodes.map(function (w) { return { p: parsed.points[w.pt], as: w.as, pt: w.pt }; })
+			: parsed.points.map(function (p) { return { p: p, as: type }; });
+		nodePoints.forEach(function (w) {
+			var p = w.p, type = w.as;
 			// **THE EAST COLUMN IS THE DOCUMENT'S x AND THE NORTH COLUMN IS ITS y, in every kind of
 			// project** -- a longitude on a georeferenced one, an easting on a projected one, a
 			// plain X on a grid. inwardX/inwardY is the one door either number comes through, and it
@@ -36261,8 +36354,33 @@ var EngCalcs = EngCalcs || {};
 				else if (allIds('node').indexOf(want) !== -1) { notes.push({ code: 'id-taken', line: p.line, raw: p.raw, detail: want }); }
 				else { applyNodeRename(n.id, want); }
 			}
+			if (w.pt !== undefined) { made[w.pt] = n; }
 			created++;
 		});
+		// **THE PIPES, EACH BETWEEN TWO NODES, THROUGH THE VERTICES BETWEEN THEM.** addLink() is the
+		// toolbar's door, so each pipe takes the New assets defaults (diameter, roughness, minor
+		// loss) and an automatic length from its drawn geometry. A vertex keeps the file's own double
+		// through the same `_xsrc`/`_ysrc` channel a node does.
+		if (codePlan) {
+			coded = { junction: 0, reservoir: 0, tank: 0, pipe: 0 };
+			codePlan.nodes.forEach(function (w) { coded[w.as]++; });
+			codePlan.pipes.forEach(function (pp) {
+				var ends = [pp.from, pp.to].map(function (r) {
+					return typeof r === 'number' ? (made[r] && made[r].id) : r.existing;
+				}), verts, l;
+				if (!ends[0] || !ends[1] || !nodeById(ends[0]) || !nodeById(ends[1])) { return; }
+				verts = pp.verts.map(function (i) {
+					var v = parsed.points[i];
+					return { x: inwardX(v.east), y: inwardY(v.north), e: v.east, n: v.north };
+				});
+				l = addLink('pipe', ends[0], ends[1], verts);
+				if (geo) {
+					verts.forEach(function (v, k) { l.verts[k][LPN_GEO_XSRC] = v.e; l.verts[k][LPN_GEO_YSRC] = v.n; });
+				}
+				coded.pipe++;
+			});
+			codePlan.notes.forEach(function (n) { notes.push(n); });
+		}
 		// **THE ORIGIN IS RE-DERIVED, for the reason Task 439 gives**: a geographic document's
 		// coordinates are shifted onto a 1/128-degree grid near the network so float32 rasterising
 		// cannot lose a pipe, and a batch of points dropped into an empty project is exactly the
@@ -36286,7 +36404,7 @@ var EngCalcs = EngCalcs || {};
 		// holds three whole sentences for it rather than a noun it drops into one -- see
 		// assetSentence() in js/lpn-survey.js, and CLAUDE.md on why a label is never composed from
 		// fragments at render time.
-		return { created: created, elevFromFile: elevFromFile, notes: notes, type: type };
+		return { created: created, elevFromFile: elevFromFile, notes: notes, type: type, coded: coded };
 	}
 	// **THE REPORT OPENS ON THE COUNT, AND ON NOTHING ELSE** (Tom, 2026-09-18, writing it out:
 	// *"6 junction(s) imported, 5 with elevation. / Import errors and notes: / Line 11: ..."*). It

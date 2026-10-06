@@ -538,6 +538,198 @@
 			elev: ele.ok ? ele.value : null, elevTok: ele.ok ? ele.tok : null });
 	}
 
+	// ---- FIELD CODES: THE DESCRIPTION AS A SCRIPT (ROADMAP Task 771) ---------------------------
+	//
+	// **OPT-IN, AND READ ONLY WHEN ASKED.** Without the tick in the import box nothing below runs and
+	// the import is exactly the junctions-only reading above. Every convention here is somebody
+	// else's, and dev/survey-codes.md says whose (Tom, 2026-10-06: *"I'm a little shy to invent
+	// conventions."*):
+	//
+	//   * The first word of the Description is the feature code; a code with digits after it is
+	//     the same code, numbered line (`WL1`, `WL2`): Carlson "Special Codes", same-code joining.
+	//   * Several codes on one shot are joined by dots (`FH.WL1`): Carlson Field to Finish.
+	//   * `+0` starts and `-0` ends a line (Carlson's PointCAD format); `CLO` closes it.
+	//   * `JPN<point>` joins to a named point (Carlson); `CPN<point>` is Civil 3D's spelling.
+	//
+	// **WHAT A CODE BECOMES IS THE READER'S TABLE, never ours to guess.** The defaults come from
+	// PennDOT's published survey feature codes (WL water line, WV valve, FH hydrant, WM meter, WELL,
+	// CIST), are shown in the box, and are edited there.
+	EngCalcs.LPN_SURVEY_CODE_DEFAULTS = [
+		{ code: 'WL', as: 'pipe' },
+		{ code: 'FH', as: 'junction' },
+		{ code: 'WV', as: 'junction' },
+		{ code: 'WM', as: 'junction' },
+		{ code: 'WELL', as: 'reservoir' },
+		{ code: 'CIST', as: 'tank' }
+	];
+	var CODE_AS = { junction: 1, reservoir: 1, tank: 1, pipe: 1 };
+
+	// The table as a lookup, upper-cased. A blank or unknown row is skipped: an empty row is one the
+	// reader has just added and not filled in yet.
+	function codeLookup(table) {
+		var out = {};
+		(table || []).forEach(function (r) {
+			var c = String((r && r.code) || '').trim().toUpperCase();
+			if (c && CODE_AS[r.as] && !out[c]) { out[c] = r.as; }
+		});
+		return out;
+	}
+	// One code against the table: the code itself first (`WELL`), then the code with a line number
+	// stripped (`WL12` -> `WL`). The line's identity keeps its number, so WL1 and WL2 stay apart.
+	function matchCode(word, lookup) {
+		var up = word.toUpperCase(), m;
+		if (lookup[up]) { return { as: lookup[up], key: up }; }
+		m = /^(.*\D)(\d+)$/.exec(up);
+		if (m && lookup[m[1]]) { return { as: lookup[m[1]], key: up }; }
+		return null;
+	}
+	// What one point's Description says. Never throws and never drops a word: what is not read is
+	// flagged, and the caller reports it.
+	function readCodes(desc, lookup) {
+		var words = String(desc || '').trim().split(/\s+/).filter(Boolean),
+			r = { nodeAs: null, lines: [], start: false, end: false, close: false, joins: [],
+				unread: false, unknown: false, twoNodes: false, coded: words.length > 0 }, i, m;
+		if (!words.length) { return r; }
+		words[0].split('.').filter(Boolean).forEach(function (c) {
+			var hit = matchCode(c, lookup);
+			if (!hit) { r.unknown = true; return; }
+			if (hit.as === 'pipe') { if (r.lines.indexOf(hit.key) < 0) { r.lines.push(hit.key); } }
+			else if (r.nodeAs) { r.twoNodes = true; }
+			else { r.nodeAs = hit.as; }
+		});
+		for (i = 1; i < words.length; i++) {
+			if (words[i] === '+0') { r.start = true; }
+			else if (words[i] === '-0') { r.end = true; }
+			else if (words[i].toUpperCase() === 'CLO') { r.close = true; }
+			else if ((m = /^(?:JPN|CPN)(\S+)$/i.exec(words[i]))) { r.joins.push(m[1]); }
+			else { r.unread = true; }
+		}
+		// A start, end or close marker on a point with no line has nothing to act on, so it is a
+		// word that was not read -- and said so, rather than quietly meaning nothing. So is an
+		// unknown code dotted onto a known one (`FH.XX`): the shot is still read by the known one.
+		if (!r.lines.length && (r.start || r.end || r.close)) { r.unread = true; }
+		if (r.unknown && (r.nodeAs || r.lines.length)) { r.unread = true; r.unknown = false; }
+		return r;
+	}
+
+	/**
+	 * The network a coded point list describes: which points are nodes, of what kind, and which
+	 * pipes run between them through which vertices. DOM-free; js/looped-network.js makes it.
+	 *
+	 * `opts.table` is the reader's code table, `opts.fallback` the asset type chosen in the box (for
+	 * an uncoded or unknown-coded point), and `opts.hasNode(name)` answers whether the open project
+	 * already holds a node of that name, so a JPN can reach the existing network.
+	 *
+	 * Returns `{nodes: [{pt, as}], pipes: [{from, to, verts, key}], vertices, notes, counts}`. A
+	 * pipe end is a point index, or `{existing: id}` for a project node.
+	 *
+	 * **EPANET-HONEST: A PIPE HAS TWO END NODES.** Every line end, every point on two lines, every
+	 * JPN target and every node-coded point is a node; a line ending on a vertex-only point makes it
+	 * a junction. Only the points strictly inside a line between two nodes become vertices.
+	 */
+	EngCalcs.lpnSurveyCodePlan = function (parsed, opts) {
+		opts = opts || {};
+		var pts = (parsed && parsed.points) || [], lookup = codeLookup(opts.table),
+			fallback = opts.fallback && opts.fallback !== 'pipe' && CODE_AS[opts.fallback] ? opts.fallback : 'junction',
+			hasNode = opts.hasNode || function () { return false; },
+			notes = [], codes = [], byName = {}, open = {}, seqs = [], useCount = [], isNode = [],
+			nodes = [], pipes = [], counts = { junction: 0, reservoir: 0, tank: 0, pipe: 0 }, vertices = 0;
+		function note(code, i) {
+			notes.push({ code: code, line: pts[i].line, raw: pts[i].raw });
+		}
+		if (parsed && parsed.mapping && parsed.mapping.desc === null) {
+			notes.push({ code: 'no-desc-column', ids: [] });
+		}
+		pts.forEach(function (p, i) {
+			codes[i] = readCodes(p.desc, lookup);
+			if (p.id && byName[p.id] === undefined) { byName[p.id] = i; }
+			useCount[i] = 0;
+		});
+		function finish(key) { if (open[key]) { seqs.push(open[key]); delete open[key]; } }
+		// **FILE ORDER, CARLSON'S RULE**: points with the same line code join in the order they were
+		// shot, and a `+0` or `-0` is the only thing that breaks a line in two.
+		pts.forEach(function (p, i) {
+			var c = codes[i];
+			c.lines.forEach(function (key) {
+				if (c.start) { finish(key); }
+				if (!open[key]) { open[key] = { key: key, refs: [], closed: false }; }
+				open[key].refs.push(i);
+				if (c.close) { open[key].closed = true; }
+				if (c.end || c.close) { finish(key); }
+			});
+		});
+		Object.keys(open).forEach(finish);
+		// **A JOIN EXTENDS THE LINE AT AN END AND BRANCHES FROM IT ANYWHERE ELSE.** Carlson: "JPN73
+		// causes a line to be drawn from the current point to the point '73'". On the first or last
+		// point of its line that segment continues the line; on an inside point it is a pipe of its
+		// own, and the inside point becomes the node it leaves from.
+		pts.forEach(function (p, i) {
+			var c = codes[i];
+			c.joins.forEach(function (name) {
+				var target, seq, at, k;
+				if (!c.lines.length) { note('join-no-line', i); return; }
+				if (byName[name] !== undefined) { target = byName[name]; }
+				else if (hasNode(name)) { target = { existing: name }; }
+				else { note('join-missing', i); return; }
+				for (k = 0; k < seqs.length && !seq; k++) {
+					if (seqs[k].key === c.lines[0] && seqs[k].refs.indexOf(i) >= 0) { seq = seqs[k]; }
+				}
+				at = seq.refs.indexOf(i);
+				if (at === 0 && !seq.closed) { seq.refs.unshift(target); }
+				else if (at === seq.refs.length - 1 && !seq.closed) { seq.refs.push(target); }
+				else { seqs.push({ key: seq.key, refs: [i, target], closed: false }); }
+			});
+		});
+		function same(a, b) {
+			return typeof a === 'number' ? a === b
+				: (typeof b !== 'number' && a.existing === b.existing);
+		}
+		seqs.forEach(function (s) {
+			if (s.closed && s.refs.length > 1) { s.refs.push(s.refs[0]); }
+			s.refs.forEach(function (r) { if (typeof r === 'number') { useCount[r]++; } });
+		});
+		// Which points are nodes. A point on no line at all is a node of its coded kind or of the
+		// kind chosen in the box; so is a point the lines need as a node.
+		pts.forEach(function (p, i) {
+			isNode[i] = !!codes[i].nodeAs || !codes[i].lines.length || useCount[i] > 1;
+		});
+		seqs.forEach(function (s) {
+			var a = s.refs[0], b = s.refs[s.refs.length - 1];
+			if (typeof a === 'number') { isNode[a] = true; }
+			if (typeof b === 'number') { isNode[b] = true; }
+		});
+		pts.forEach(function (p, i) {
+			var c = codes[i], as;
+			if (!isNode[i]) { vertices++; if (c.unread) { note('vertex-text', i); } return; }
+			as = c.nodeAs || (c.lines.length ? 'junction' : fallback);
+			nodes.push({ pt: i, as: as });
+			counts[as]++;
+			if (c.coded && c.unknown && !c.nodeAs && !c.lines.length) { note('code-unknown', i); }
+			if (c.twoNodes) { note('code-two-nodes', i); }
+			if (c.unread) { note('code-unread', i); }
+		});
+		// Each line cut at its nodes: one pipe per stretch between two nodes, the points inside it its
+		// vertices, in order.
+		seqs.forEach(function (s) {
+			var from = s.refs[0], verts = [], j, r,
+				first = s.refs.filter(function (x) { return typeof x === 'number'; })[0];
+			if (s.refs.length < 2) { note('line-one-point', first); return; }
+			for (j = 1; j < s.refs.length; j++) {
+				r = s.refs[j];
+				if (typeof r === 'number' && !isNode[r]) { verts.push(r); continue; }
+				if (same(from, r)) {
+					note('pipe-one-node', typeof r === 'number' ? r : first);
+				} else {
+					pipes.push({ from: from, to: r, verts: verts, key: s.key });
+					counts.pipe++;
+				}
+				from = r; verts = [];
+			}
+		});
+		if (vertices) { notes.push({ code: 'vertices', ids: [], detail: String(vertices) }); }
+		return { nodes: nodes, pipes: pipes, vertices: vertices, notes: notes, counts: counts };
+	};
+
 	// ---- the sentences --------------------------------------------------------------------------
 	//
 	// Composed here rather than in js/looped-network.js for one reason: that file is 40,000 lines and
@@ -621,7 +813,16 @@
 		'bad-elev': 'bad-elevation',
 		'id-duplicate': 'duplicate-name',
 		'id-taken': 'duplicate-name',
-		'id-invalid': 'invalid-name'
+		'id-invalid': 'invalid-name',
+		// Field codes (Task 771). Every one is a warning: the row made something.
+		'code-unknown': 'unknown-code',
+		'code-two-nodes': 'two-node-codes',
+		'code-unread': 'not-a-code',
+		'vertex-text': 'not-a-code',
+		'join-missing': 'join-not-found',
+		'join-no-line': 'join-without-line',
+		'pipe-one-node': 'pipe-one-node',
+		'line-one-point': 'line-one-point'
 	};
 	// **THE SPLIT IS A FACT ABOUT THE CODE ABOVE, NOT A JUDGEMENT ABOUT SEVERITY.** `error` is every
 	// case where readCsvRow() returns before pushing a point, so the file's row produced nothing;
@@ -636,7 +837,15 @@
 		'bad-elev': 'warning',
 		'id-duplicate': 'warning',
 		'id-taken': 'warning',
-		'id-invalid': 'warning'
+		'id-invalid': 'warning',
+		'code-unknown': 'warning',
+		'code-two-nodes': 'warning',
+		'code-unread': 'warning',
+		'vertex-text': 'warning',
+		'join-missing': 'warning',
+		'join-no-line': 'warning',
+		'pipe-one-node': 'warning',
+		'line-one-point': 'warning'
 	};
 	function sevWord(code) {
 		return NOTE_SEV[code] === 'error'
@@ -675,10 +884,20 @@
 		else if (code === 'id-duplicate') { text = lineNote(code, PC.lpn_survey_note_id_duplicate || 'Name already used earlier in this file, new name assigned.', ax, line); }
 		else if (code === 'id-taken') { text = lineNote(code, PC.lpn_survey_note_id_taken || 'Name already in project, new name assigned.', ax, line); }
 		else if (code === 'id-invalid') { text = lineNote(code, PC.lpn_survey_note_id_invalid || 'Name cannot be used here, new name assigned.', ax, line); }
+		else if (code === 'code-unknown') { text = lineNote(code, PC.lpn_survey_note_code_unknown || 'Code not in the code table, imported as the asset type chosen above.', ax, line); }
+		else if (code === 'code-two-nodes') { text = lineNote(code, PC.lpn_survey_note_code_two_nodes || 'More than one node code, the first was used.', ax, line); }
+		else if (code === 'code-unread') { text = lineNote(code, PC.lpn_survey_note_code_unread || 'Not every word is a code this page reads, kept in the description.', ax, line); }
+		else if (code === 'vertex-text') { text = lineNote(code, PC.lpn_survey_note_vertex_text || 'Not every word is a code this page reads, and a vertex keeps no description.', ax, line); }
+		else if (code === 'join-missing') { text = lineNote(code, PC.lpn_survey_note_join_missing || 'JPN or CPN names a point not in this file or project, no pipe drawn for it.', ax, line); }
+		else if (code === 'join-no-line') { text = lineNote(code, PC.lpn_survey_note_join_no_line || 'JPN or CPN on a point with no line code, no pipe drawn for it.', ax, line); }
+		else if (code === 'pipe-one-node') { text = lineNote(code, PC.lpn_survey_note_pipe_one_node || 'This line returns to the same node with no other node between, no pipe drawn for it.', ax, line); }
+		else if (code === 'line-one-point') { text = lineNote(code, PC.lpn_survey_note_line_one_point || 'Only point on its line, no pipe drawn from it.', ax, line); }
 		// The rest are about the FILE and not about a line, so they carry no number, no code and
 		// nothing printed underneath them: there is no line to point at.
 		else if (code === 'ambiguous-elev') { text = fill(PC.lpn_survey_note_ambiguous_elev || 'More than one column could be the elevation, so none of them was read.', d, ax, line); }
 		else if (code === 'header-unread') { text = fill(PC.lpn_survey_note_header_unread || 'The first line was skipped: it names no columns this page knows.', d, ax, line); }
+		else if (code === 'vertices') { text = fill(PC.lpn_survey_note_vertices || 'Points that became pipe vertices: {detail}. A vertex keeps no name, elevation, or description.', d, ax, line); }
+		else if (code === 'no-desc-column') { text = fill(PC.lpn_survey_note_no_desc || 'Field codes are on, but this file has no description column, so no codes were read.', d, ax, line); }
 		else if (code === 'blank-rows') { text = fill(PC.lpn_survey_note_blank_rows || 'Blank lines skipped: {detail}.', d, ax, line); }
 		return { text: text, raw: raw };
 	};
@@ -716,6 +935,12 @@
 		return junction;
 	}
 
+	function codedSentence(text, counts, m) {
+		counts = counts || {};
+		return String(text).replace('{j}', counts.junction || 0).replace('{r}', counts.reservoir || 0)
+			.replace('{t}', counts.tank || 0).replace('{p}', counts.pipe || 0).replace('{m}', m || 0);
+	}
+
 	/**
 	 * What the import is about to do, for the box that stands in front of it.
 	 *
@@ -737,7 +962,10 @@
 	 * mechanism: a file naming its own columns is still read by those names, and the chooser is still
 	 * disabled while that is so, which says the same thing without a sentence.
 	 */
-	EngCalcs.lpnSurveyConfirmText = function (parsed, type) {
+	EngCalcs.lpnSurveyConfirmText = function (parsed, type, plan) {
+		// **WITH FIELD CODES ON, ONE SENTENCE COUNTS EVERY KIND** (Task 771): the file now makes
+		// several kinds at once, and the numbers are filled into one whole sentence, never a noun.
+		if (plan) { return codedSentence(PC.lpn_survey_confirm_coded || '{j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) found. Proceed?', plan.counts, 0); }
 		return assetSentence(type,
 			PC.lpn_survey_confirm_junction || '{n} junction(s) found. Proceed?',
 			PC.lpn_survey_confirm_reservoir || '{n} reservoir(s) found. Proceed?',
@@ -767,12 +995,17 @@
 		// name, how many junctions, and how many of them took an elevation -- where the reader's
 		// question is one question. The elevation count is stated even when it is zero, because a
 		// number that appears only when it is interesting makes its absence mean two things.
-		out.push({ text: assetSentence(outcome && outcome.type,
+		if (outcome && outcome.coded) {
+			out.push({ text: codedSentence(PC.lpn_survey_report_coded || '{j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.',
+				outcome.coded, outcome.elevFromFile), raw: null });
+		} else {
+			out.push({ text: assetSentence(outcome && outcome.type,
 			PC.lpn_survey_report_junction || '{n} junction(s) imported, {m} with elevation.',
 			PC.lpn_survey_report_reservoir || '{n} reservoir(s) imported, {m} with elevation.',
 			PC.lpn_survey_report_tank || '{n} tank(s) imported, {m} with elevation.')
 			.replace('{n}', (outcome && outcome.created) || 0)
 			.replace('{m}', (outcome && outcome.elevFromFile) || 0), raw: null });
+		}
 		((parsed && parsed.notes) || []).concat((outcome && outcome.notes) || []).forEach(function (d) {
 			var said = EngCalcs.lpnSurveyNoteText(d, axes);
 			if (d && d.line) { perLine.push({ line: d.line, text: said.text, raw: said.raw }); return; }
