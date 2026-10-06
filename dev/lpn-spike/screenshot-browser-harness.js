@@ -98,8 +98,12 @@ const LAST_PNG = async () => {
 	}
 	return { type: b.type, w: bm.width, h: bm.height, ink: ink, total: bm.width * bm.height, cornerDark: cornerDark };
 };
+// A capture now opens the markup view; the picture reaches the clipboard when Copy is pressed.
 async function waitBlobs(page, n) {
+	await page.waitForSelector('#lpn_snip_copy', { state: 'visible', timeout: 15000 });
+	await page.click('#lpn_snip_copy');
 	await page.waitForFunction((k) => (window.__snipBlobs || []).length >= k, n, { timeout: 15000 });
+	await page.keyboard.press('Escape');   // close the markup view
 }
 async function startSnip(a, label) {
 	await a.menuClick(label, 'map');
@@ -293,9 +297,11 @@ async function desktop(Session, browser) {
 		// 5. No clipboard: a download, and a notice that says so.
 		await page.evaluate(() => { delete navigator.clipboard; Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined }); });
 		await startSnip(a, LABEL);
+		await page.mouse.click(map.x + map.w / 2, map.y + map.h / 2);
+		await page.waitForSelector('#lpn_snip_copy', { state: 'visible', timeout: 15000 });
 		const [dl] = await Promise.all([
 			page.waitForEvent('download', { timeout: 15000 }),
-			page.mouse.click(map.x + map.w / 2, map.y + map.h / 2)
+			page.click('#lpn_snip_copy')
 		]);
 		ok('with no clipboard the PNG is downloaded', /\.png$/.test(dl.suggestedFilename()), dl.suggestedFilename());
 		await a.settle(200);

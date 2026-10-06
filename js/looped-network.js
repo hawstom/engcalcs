@@ -41365,7 +41365,7 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'zoom', label: pc.lpn_tool_zoom_extent || 'Zoom to fit', tip: pc.lpn_tool_zoom_extent_tip, fn: zoomExtent },
 			// **A SNIPPING TOOL, IN THE MAP MENU BECAUSE IT IS NOT ABOUT WATER** (Tom, 2026-10-05). Beside
 			// Zoom to fit: both are about the view of the drawing, and the one frames what the other takes.
-			{ icon: 'image', pointerOnly: true, label: pc.lpn_screenshot_menu || 'Screenshot', tip: pc.lpn_screenshot_tip, fn: startScreenshot },
+			{ icon: 'image', pointerOnly: true, label: pc.lpn_screenshot_menu || 'Screenshot', tip: pc.lpn_screenshot_tip, fn: function () { startScreenshot(); } },
 			// **THE BACKGROUND IMAGE CAME HERE FROM INSERT** (Tom, 2026-08-27). A picture behind the
 			// drawing is not a water asset; it is the same kind of thing as the street map two rows
 			// down, and EPANET files its own Backdrop under this menu for the same reason. A
@@ -41486,6 +41486,8 @@ var EngCalcs = EngCalcs || {};
 		'text-anchor', 'dominant-baseline', 'alignment-baseline', 'baseline-shift', 'direction', 'unicode-bidi',
 		'marker-start', 'marker-mid', 'marker-end', 'shape-rendering', 'text-rendering', 'image-rendering', 'color'];
 	var snipVeil = null;
+	// 'rect' or 'free' (lasso): the shape the next snip is dragged in. Session only, never stored.
+	var snipMode = 'rect';
 	// The magnification the Screenshot box shows, 3 until the visitor chooses another.
 	function snipScaleChosen() {
 		return SNIP_SCALES.indexOf(snipboxLayout.scale) >= 0 ? snipboxLayout.scale : SNIP_SCALE;
@@ -41578,6 +41580,25 @@ var EngCalcs = EngCalcs || {};
 		});
 		r.appendChild(lab); r.appendChild(sel);
 		body.appendChild(r);
+		// **SNIP, WITH ITS SHAPE BESIDE IT** (Tom, 2026-10-06, on the Windows snipping tool: a mode
+		// dropdown beside the New button). Rectangle or Freehand (a lasso); the choice lasts the
+		// session and is stored nowhere.
+		var snipRow = document.createElement('div'), snipBtn = document.createElement('button'), modeSel = document.createElement('select');
+		snipRow.className = 'lpn-set-row';
+		snipBtn.type = 'button'; snipBtn.id = 'lpn_snip_go'; snipBtn.className = 'lpn-btn';
+		snipBtn.textContent = pc.lpn_snip_button || 'Snip';
+		modeSel.id = 'lpn_snip_mode';
+		modeSel.setAttribute('aria-label', pc.lpn_snip_button || 'Snip');
+		[['rect', pc.lpn_snip_rectangle || 'Rectangle'], ['free', pc.lpn_snip_freehand || 'Freehand']].forEach(function (m) {
+			var o = document.createElement('option');
+			o.value = m[0]; o.textContent = m[1];
+			if (m[0] === snipMode) { o.selected = true; }
+			modeSel.appendChild(o);
+		});
+		modeSel.addEventListener('change', function () { snipMode = modeSel.value === 'free' ? 'free' : 'rect'; });
+		snipBtn.addEventListener('click', function () { startScreenshot(modeSel.value); });
+		snipRow.appendChild(snipBtn); snipRow.appendChild(modeSel);
+		body.appendChild(snipRow);
 		// **THE REPEAT BUTTON** (Tom, 2026-10-06: *"The panel is missing a Screenshot button for
 		// repeats."*). Pan or zoom the map, press it, and the whole visible map is shot again at
 		// the chosen magnification, with no veil to drag. Same word as the menu row.
@@ -41589,13 +41610,17 @@ var EngCalcs = EngCalcs || {};
 			cancelScreenshot();
 			var m = snipMapRect();
 			if (m.w < 1 || m.h < 1) { return; }
-			takeScreenshot(m);
+			takeScreenshot(m, null);
 		});
 		row.appendChild(again);
 		body.appendChild(row);
 	}
-	function startScreenshot() {
+	function startScreenshot(mode) {
 		cancelScreenshot();
+		var free = (mode === 'rect' || mode === 'free' ? mode : snipMode) === 'free';
+		snipMode = free ? 'free' : 'rect';
+		var modeEl = document.getElementById('lpn_snip_mode');
+		if (modeEl) { modeEl.value = snipMode; }
 		// The box first: docked, it takes its column from the map, and the veil is laid over the
 		// map as it is after that. **NOT ON A PHONE**, where every standing box fills the window
 		// (placePanelForScreen()) and would cover the very map the finger has to drag over; the
@@ -41621,8 +41646,7 @@ var EngCalcs = EngCalcs || {};
 				if (m.x === map.x && m.y === map.y && m.w === map.w && m.h === map.h) { return; }
 				map = m;
 				fitVeil();
-				start = null;
-				if (box.parentNode) { veil.removeChild(box); }
+				if (typeof dropShape === 'function') { dropShape(); }
 			});
 			watcher.observe(svg);
 			snipVeil.watcher = watcher;
@@ -41633,14 +41657,40 @@ var EngCalcs = EngCalcs || {};
 		function rectOf(a, b) {
 			return { x: Math.min(a.x, b.x), y: Math.min(a.y, b.y), w: Math.abs(a.x - b.x), h: Math.abs(a.y - b.y) };
 		}
+		// Freehand: the path is drawn on a small SVG inside the veil, as dashes in the accent colour.
+		var pts = [], outline = null;
+		if (free) {
+			outline = document.createElementNS(NS, 'svg');
+			outline.setAttribute('class', 'lpn-snip-lasso');
+			outline.setAttribute('width', map.w); outline.setAttribute('height', map.h);
+			outline.appendChild(document.createElementNS(NS, 'polygon'));
+		}
+		function boundsOf(list) {
+			var xs = list.map(function (p) { return p.x; }), ys = list.map(function (p) { return p.y; });
+			var x0 = Math.min.apply(null, xs), y0 = Math.min.apply(null, ys);
+			return { x: x0, y: y0, w: Math.max.apply(null, xs) - x0, h: Math.max.apply(null, ys) - y0 };
+		}
+		function dropShape() {
+			start = null; pts = [];
+			if (box.parentNode) { veil.removeChild(box); }
+			if (outline && outline.parentNode) { veil.removeChild(outline); }
+		}
 		veil.addEventListener('pointerdown', function (e) {
 			if (e.button !== undefined && e.button !== 0) { return; }
 			e.preventDefault(); e.stopPropagation();
 			start = at(e);
+			pts = [start];
 			try { veil.setPointerCapture(e.pointerId); } catch (err) { /* capture is a nicety */ }
 		});
 		veil.addEventListener('pointermove', function (e) {
 			if (!start) { return; }
+			if (free) {
+				var q = at(e);
+				pts.push(q);
+				if (!outline.parentNode) { veil.appendChild(outline); }
+				outline.firstChild.setAttribute('points', pts.map(function (p) { return (p.x - map.x) + ',' + (p.y - map.y); }).join(' '));
+				return;
+			}
 			var r = rectOf(start, at(e));
 			if (!box.parentNode) { veil.appendChild(box); }
 			box.style.left = (r.x - map.x) + 'px'; box.style.top = (r.y - map.y) + 'px';
@@ -41649,20 +41699,25 @@ var EngCalcs = EngCalcs || {};
 		veil.addEventListener('pointerup', function (e) {
 			if (!start) { return; }
 			e.preventDefault(); e.stopPropagation();
-			var r = rectOf(start, at(e));
+			var r, poly = null;
+			if (free) { pts.push(at(e)); r = boundsOf(pts); poly = pts; }
+			else { r = rectOf(start, at(e)); }
 			start = null;
 			cancelScreenshot();
 			// A plain click (or a tap) takes the whole visible map, as a snipping tool's does.
-			takeScreenshot(r.w < SNIP_DRAG_PX || r.h < SNIP_DRAG_PX ? map : r);
+			if (r.w < SNIP_DRAG_PX || r.h < SNIP_DRAG_PX) { r = map; poly = null; }
+			takeScreenshot(r, poly);
 		});
-		veil.addEventListener('pointercancel', function () { start = null; if (box.parentNode) { veil.removeChild(box); } });
+		veil.addEventListener('pointercancel', dropShape);
 		snipVeil.onKey = function (e) {
 			if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); cancelScreenshot(); setNotice(''); }
 		};
 		document.addEventListener('keydown', snipVeil.onKey, true);
-		setNotice(pc.lpn_screenshot_hint || 'Drag a rectangle over the map, or click for the whole map. Esc cancels.');
+		setNotice(free ? (pc.lpn_snip_hint_free || 'Drag around the area to snip, or click for the whole map. Esc cancels.')
+			: (pc.lpn_screenshot_hint || 'Drag a rectangle over the map, or click for the whole map. Esc cancels.'));
 	}
 	function cancelScreenshot() {
+		closeSnipEditor();
 		if (!snipVeil) { return; }
 		document.removeEventListener('keydown', snipVeil.onKey, true);
 		if (snipVeil.watcher) { snipVeil.watcher.disconnect(); }
@@ -41768,7 +41823,7 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	// Render the client-pixel rectangle `r` of the map. Resolves to { blob, droppedBasemap, scale }.
-	function renderScreenshot(r) {
+	function renderScreenshot(r, poly) {
 		var out = { droppedBasemap: false, scale: snipScaleFor(r.w, r.h) };
 		var s = out.scale, W = Math.max(1, Math.round(r.w * s)), H = Math.max(1, Math.round(r.h * s));
 		var sr = svg.getBoundingClientRect(), ox = sr.left + svg.clientLeft, oy = sr.top + svg.clientTop;
@@ -41797,6 +41852,19 @@ var EngCalcs = EngCalcs || {};
 					if (lr.right > r.x && lr.left < r.x + r.w && lr.bottom > r.y && lr.top < r.y + r.h) { snipPaintHtml(ctx, lg); }
 				});
 				ctx.restore();
+				if (poly) {
+					// Freehand: everything outside the outline becomes transparent.
+					ctx.save();
+					ctx.globalCompositeOperation = 'destination-in';
+					ctx.beginPath();
+					poly.forEach(function (p, i) {
+						var x = (p.x - r.x) * W / r.w, y = (p.y - r.y) * H / r.h;
+						if (i) { ctx.lineTo(x, y); } else { ctx.moveTo(x, y); }
+					});
+					ctx.closePath();
+					ctx.fill();
+					ctx.restore();
+				}
 				return new Promise(function (resolve, reject) {
 					c.toBlob(function (b) { if (b) { out.blob = b; resolve(out); } else { reject(new Error('toBlob')); } }, 'image/png');
 				});
@@ -41812,34 +41880,137 @@ var EngCalcs = EngCalcs || {};
 		document.body.removeChild(a);
 		setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
 	}
-	// Called from the pointerup, so the clipboard write starts INSIDE the gesture -- Safari refuses
-	// one that starts later -- with the picture still being drawn as the ClipboardItem's promise.
-	function takeScreenshot(r) {
-		var pc = EngCalcs.pageConfig || {}, job = renderScreenshot(r), wrote;
-		function say(key, fallback, out) {
-			var t = pc[key] || fallback;
-			if (out && out.droppedBasemap) { t += ' ' + (pc.lpn_screenshot_no_basemap || 'The street map or satellite image could not be included.'); }
-			setNotice(t);
-		}
+	// A snip or screenshot is drawn, then SHOWN in the markup view, where it can be scribbled on in
+	// red before Copy or Save (Tom, 2026-10-06: the Windows snipping tool's pen is what he uses
+	// "profusely"). Nothing is copied or saved until the visitor presses one of them.
+	function takeScreenshot(r, poly) {
+		var pc = EngCalcs.pageConfig || {};
+		return renderScreenshot(r, poly).then(function (out) {
+			openSnipEditor(out);
+			if (out.droppedBasemap) { setNotice(pc.lpn_screenshot_no_basemap || 'The street map or satellite image could not be included.'); }
+		}).catch(function () {
+			setNotice(pc.lpn_screenshot_failed || 'The screenshot could not be made.');
+		});
+	}
+	// ---- THE MARKUP VIEW -------------------------------------------------------------------
+	// A modal over the page: the picture on a canvas, a red pen, Undo, Copy, Save, Close. The pen is
+	// red only (Tom: "a red scribbler pen like the Windows tool"); its ink is image content, never
+	// chrome. Strokes are kept as point lists and redrawn over the untouched snip, so Undo is exact.
+	// Pointer events, so a mouse, a pen and a finger all draw. Nothing here is stored on the device.
+	var SNIP_PEN_INK = '#ff0000', SNIP_PEN_CSS_PX = 3;
+	var snipEditor = null;
+	function closeSnipEditor() {
+		if (!snipEditor) { return; }
+		document.removeEventListener('keydown', snipEditor.onKey, true);
+		if (snipEditor.el.parentNode) { snipEditor.el.parentNode.removeChild(snipEditor.el); }
+		snipEditor = null;
+	}
+	function openSnipEditor(out) {
+		closeSnipEditor();
+		var pc = EngCalcs.pageConfig || {};
+		return createImageBitmap(out.blob).then(function (bm) {
+			var strokes = [], drawing = null, pen = true;
+			var el = document.createElement('div'), panel = document.createElement('div'), bar = document.createElement('div'),
+				cv = document.createElement('canvas'), ctx, held = document.createElement('div');
+			el.id = 'lpn_snip_edit'; el.className = 'lpn-snip-edit';
+			el.setAttribute('role', 'dialog');
+			panel.className = 'lpn-snip-edit-panel';
+			bar.className = 'lpn-snip-edit-bar';
+			cv.id = 'lpn_snip_canvas'; cv.className = 'lpn-snip-edit-canvas';
+			cv.width = bm.width; cv.height = bm.height;
+			ctx = cv.getContext('2d');
+			function button(id, text, fn) {
+				var b = document.createElement('button');
+				b.type = 'button'; b.id = id; b.className = 'lpn-btn'; b.textContent = text;
+				b.addEventListener('click', fn);
+				bar.appendChild(b);
+				return b;
+			}
+			function paint() {
+				ctx.clearRect(0, 0, cv.width, cv.height);
+				ctx.drawImage(bm, 0, 0);
+				ctx.strokeStyle = SNIP_PEN_INK; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+				ctx.lineWidth = SNIP_PEN_CSS_PX * out.scale;
+				strokes.forEach(function (st) {
+					ctx.beginPath();
+					st.forEach(function (p, i) { if (i) { ctx.lineTo(p.x, p.y); } else { ctx.moveTo(p.x, p.y); } });
+					ctx.stroke();
+				});
+				undoBtn.disabled = strokes.length === 0;
+			}
+			function at(e) {
+				var r = cv.getBoundingClientRect();
+				return { x: (e.clientX - r.left) * cv.width / r.width, y: (e.clientY - r.top) * cv.height / r.height };
+			}
+			var penBtn = button('lpn_snip_pen', pc.lpn_snip_pen || 'Pen', function () {
+				pen = !pen;
+				penBtn.setAttribute('aria-pressed', pen ? 'true' : 'false');
+				penBtn.classList.toggle('lpn-btn-on', pen);
+				cv.style.cursor = pen ? 'crosshair' : 'default';
+			});
+			penBtn.setAttribute('aria-pressed', 'true'); penBtn.classList.add('lpn-btn-on');
+			var undoBtn = button('lpn_snip_undo', pc.lpn_tool_undo || 'Undo', function () { strokes.pop(); paint(); });
+			var blobNow = function () { return new Promise(function (res, rej) { cv.toBlob(function (b) { b ? res(b) : rej(new Error('toBlob')); }, 'image/png'); }); };
+			button('lpn_snip_copy', pc.points_data_copy || 'Copy', function () { copyBlob(blobNow()); });
+			button('lpn_snip_save', pc.lpn_file_save || 'Save', function () {
+				blobNow().then(snipDownload);   // one click, one download
+			});
+			var x = button('lpn_snip_edit_close', '×', closeSnipEditor);
+			x.className = 'lpn-popover-x'; x.title = pc.lpn_close || 'Close'; x.setAttribute('aria-label', pc.lpn_close || 'Close');
+			cv.addEventListener('pointerdown', function (e) {
+				if (!pen || (e.button !== undefined && e.button !== 0)) { return; }
+				e.preventDefault();
+				var p = at(e);
+				drawing = [p, { x: p.x + 0.01, y: p.y }];
+				strokes.push(drawing);
+				try { cv.setPointerCapture(e.pointerId); } catch (err) { /* a nicety */ }
+				paint();
+			});
+			cv.addEventListener('pointermove', function (e) {
+				if (!drawing) { return; }
+				drawing.push(at(e));
+				paint();
+			});
+			function endStroke() { drawing = null; }
+			cv.addEventListener('pointerup', endStroke);
+			cv.addEventListener('pointercancel', endStroke);
+			held.className = 'lpn-snip-edit-scroll';
+			held.appendChild(cv);
+			panel.appendChild(bar); panel.appendChild(held);
+			el.appendChild(panel);
+			// While the markup view is open it owns the keyboard: Esc closes it, Ctrl+Z undoes a
+			// stroke, and nothing else reaches the map (its Delete, its own Ctrl+Z).
+			snipEditor = { el: el, onKey: function (e) {
+				e.stopPropagation();
+				if (e.key === 'Escape') { e.preventDefault(); closeSnipEditor(); }
+				else if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'z' || e.key === 'Z')) { e.preventDefault(); strokes.pop(); paint(); }
+			} };
+			document.addEventListener('keydown', snipEditor.onKey, true);
+			document.body.appendChild(el);
+			cv.style.cursor = 'crosshair';
+			paint();
+			document.getElementById('lpn_snip_copy').focus();
+		});
+	}
+	// The clipboard write starts inside the Copy click, with the picture as the ClipboardItem's
+	// promise; where the clipboard refuses, the picture is downloaded instead.
+	function copyBlob(blobPromise) {
+		var pc = EngCalcs.pageConfig || {}, wrote;
 		function fallback() {
-			return job.then(function (out) {
-				snipDownload(out.blob);
-				say('lpn_screenshot_saved', 'The clipboard is not available here, so the screenshot was downloaded as a PNG file.', out);
+			return blobPromise.then(function (b) {
+				snipDownload(b);
+				setNotice(pc.lpn_screenshot_saved || 'The clipboard is not available here, so the screenshot was downloaded as a PNG file.');
 			});
 		}
 		try {
 			if (!navigator.clipboard || !navigator.clipboard.write || typeof window.ClipboardItem !== 'function') { throw new Error('no clipboard'); }
-			wrote = navigator.clipboard.write([new window.ClipboardItem({
-				'image/png': job.then(function (out) { return out.blob; })
-			})]).then(function () {
-				return job.then(function (out) { say('lpn_screenshot_copied', 'Screenshot copied.', out); });
+			wrote = navigator.clipboard.write([new window.ClipboardItem({ 'image/png': blobPromise })]).then(function () {
+				setNotice(pc.lpn_screenshot_copied || 'Screenshot copied.');
 			}, fallback);
 		} catch (err) {
 			wrote = fallback();
 		}
-		return wrote.catch(function () {
-			setNotice(pc.lpn_screenshot_failed || 'The screenshot could not be made.');
-		});
+		return wrote.catch(function () { setNotice(pc.lpn_screenshot_failed || 'The screenshot could not be made.'); });
 	}
 	// **THE PROJECT MENU** (ROADMAP Task 467). Tom, 2026-08-20: *"Maybe we can have a Project menu
 	// with Settings, Library, and Report under it?"*, and his own row order of 2026-08-21:

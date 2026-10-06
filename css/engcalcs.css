@@ -1797,6 +1797,15 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
    so what is being snipped shows through it. */
 .lpn-snip-veil { position: fixed; z-index: 1190; cursor: crosshair; touch-action: none; }
 .lpn-snip-rect { position: absolute; box-sizing: border-box; border: 1px dashed var(--ec-accent); background: var(--ec-select-bg); opacity: 0.5; pointer-events: none; }
+.lpn-snip-lasso { position: absolute; left: 0; top: 0; pointer-events: none; }
+.lpn-snip-lasso polygon { fill: var(--ec-select-bg); fill-opacity: 0.5; stroke: var(--ec-accent); stroke-width: 1; stroke-dasharray: 4 3; }
+.lpn-snip-edit { position: fixed; inset: 0; z-index: 1200; background: var(--ec-a-0-0-0-4); display: flex; align-items: center; justify-content: center; padding: 8px; }
+.lpn-snip-edit-panel { position: relative; background: var(--ec-bg); color: var(--ec-ink); border: 1px solid var(--ec-ink); box-shadow: 2px 2px 6px var(--ec-a-0-0-0-3); padding: 8px; max-width: 100%; max-height: 100%; display: flex; flex-direction: column; gap: 8px; }
+.lpn-snip-edit-bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding-right: 28px; }
+.lpn-snip-edit-bar .lpn-popover-x { position: absolute; top: 4px; right: 6px; }
+.lpn-snip-edit-bar .lpn-btn-on { background: var(--ec-select-bg); border-color: var(--ec-accent); }
+.lpn-snip-edit-scroll { overflow: auto; min-height: 0; background: var(--ec-border); }
+.lpn-snip-edit-canvas { display: block; max-width: 100%; max-height: calc(100vh - 6rem); touch-action: none; }
 @media print { .lpn-snip-veil { display: none; } }
 /* Node-mode target step: nodes ARE the valid click target here, so forcing crosshair over them
    removes the one affordance that actually matters. More specific than the rule above (extra

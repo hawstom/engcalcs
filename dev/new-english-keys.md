@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**34 still to read on master**, of 144 untranslated keys, of 2370 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**39 still to read on master**, of 149 untranslated keys, of 2375 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (144, 34 to read @@ NEEDS RULING)
+## lpn_  (149, 39 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -444,6 +444,21 @@ never edits a synonym.
 - **`lpn_settings_req_pressure_tip`**
   > Enter the pressure at or above which a junction receives its full demand. It must be greater than the minimum pressure. Use this project's pressure unit. Leave it blank to use EPANET's default, which is in psi for US flow units and meters otherwise.
   _Ruled OK 2026-10-05._
+- **`lpn_snip_button`**
+  > Snip
+  @@ NEEDS RULING
+- **`lpn_snip_freehand`**
+  > Freehand
+  @@ NEEDS RULING
+- **`lpn_snip_hint_free`**
+  > Drag around the area to snip, or click for the whole map. Esc cancels.
+  @@ NEEDS RULING
+- **`lpn_snip_pen`**
+  > Pen
+  @@ NEEDS RULING
+- **`lpn_snip_rectangle`**
+  > Rectangle
+  @@ NEEDS RULING
 - **`lpn_sysflow_title`**
   > Flow balance
   _Ruled OK 2026-10-03._
@@ -512,7 +527,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**129 still to read**, of 132 new keys across 18 unmerged branch(es).
+**132 still to read**, of 135 new keys across 18 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -831,13 +846,22 @@ build for that would be a gate nobody keeps. Refresh it with
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
   @@ NEEDS RULING
 
-### feat/geojson (`1e01efdb`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/geojson (`1352ed11`) — 11 new, 11 to read @@ NEEDS RULING
 
 - **`lpn_file_export_geojson`**
   > Export GeoJSON file…
   @@ NEEDS RULING
 - **`lpn_file_export_geojson_tip`**
   > Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.
+  @@ NEEDS RULING
+- **`lpn_file_export_item_geojson`**
+  > GeoJSON file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_inp`**
+  > EPANET file…
+  @@ NEEDS RULING
+- **`lpn_file_export_menu`**
+  > Export…
   @@ NEEDS RULING
 - **`lpn_geojson_refused_crs`**
   > The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.
@@ -880,7 +904,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/screenshot (`98f78a17`) — adds no English strings
+### feat/screenshot (`6c10e21e`) — adds no English strings
 
 ### feat/section-grid (`977b887e`) — adds no English strings
 
