@@ -432,5 +432,28 @@ console.log('\n--- Everything filters every table the query can be asked of ---'
 	ok('clearing brings every row back', same(L.filteredIds('junctions'), L.allIds('junctions')));
 }
 
+// ---- 8. A MIXED-SCOPE TYPED QUERY FILTERS THE TABLES IT REACHES -------------------------------
+//
+// "Junction.Elevation above 0 OR Pipe.Diameter above 8" names a property of nodes and one of links.
+// The old test asked every property to apply to a table, so no table qualified and the button
+// answered "This query doesn't apply to any table." A table now takes the filter when ANY condition
+// names one of its properties; a table no condition reaches is still left alone.
+console.log('\n--- a mixed-scope query filters the tables it reaches ---');
+{
+	build();
+	const q = 'Junction.Elevation above -1000 OR Pipe.Diameter above 8';
+	ok('the query parses', L.parse(q).ok);
+	L.buildPanel();
+	L.type(q);
+	L.pressFilter();
+	ok('it does not answer "applies to any table"', L.resultsText().indexOf(EngCalcs.pageConfig.lpn_find_filter_none) < 0, L.resultsText());
+	ok('the Pipes table is filtered', L.filterQuery('pipes') === q, L.filterQuery('pipes'));
+	ok('the Junctions table is filtered', L.filterQuery('junctions') === q, L.filterQuery('junctions'));
+	ok('the Text table is left alone (no condition names a text property)',
+		L.filterQuery('text') === '', L.filterQuery('text'));
+	ok('Pipes shows exactly the pipes over 8 in', L.filteredIds('pipes').length === 2, JSON.stringify(L.filteredIds('pipes')));
+	L.setFilter('pipes', ''); L.setFilter('junctions', '');
+}
+
 console.log('\n' + checks + ' checks, ' + fails + ' failed');
 process.exit(fails === 0 ? 0 : 1);
