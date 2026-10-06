@@ -83,7 +83,7 @@ files.forEach(function (f) {
 });
 // The pattern itself is live: a stored name it must refuse.
 ok('the check refuses a stored name (symbolCapMultiple, colorBreaks \u203a node.pressure)',
-	CODE.test('symbolCapMultiple') && CODE.test('colorBreaks \u203a node.pressure') && !CODE.test('Text size (pixels)'));
+	CODE.test('symbolCapMultiple') && CODE.test('colorBreaks \u203a node.pressure') && !CODE.test('Plain words, with a unit (in parentheses)'));
 
 console.log(fails ? '\n' + fails + ' of ' + checks + ' settings table label check(s) FAILED' : '\nSettings table labels: all ' + checks + ' checks passed.');
 process.exit(fails ? 1 : 0);
