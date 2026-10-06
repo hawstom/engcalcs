@@ -2106,6 +2106,13 @@ EngCalcs.pageConfig = {
 	lpn_status_inp_exported: <?=json_encode($ec_lang['lpn_status_inp_exported'])?>,
 	lpn_inp_export_differences: <?=json_encode($ec_lang['lpn_inp_export_differences'])?>,
 	lpn_inp_export_refused: <?=json_encode($ec_lang['lpn_inp_export_refused'])?>,
+	lpn_file_export_dxf: <?=json_encode($ec_lang['lpn_file_export_dxf'])?>,
+	lpn_file_export_dxf_tip: <?=json_encode($ec_lang['lpn_file_export_dxf_tip'])?>,
+	lpn_dxf_export_refused: <?=json_encode($ec_lang['lpn_dxf_export_refused'])?>,
+	lpn_dxf_note_grid: <?=json_encode($ec_lang['lpn_dxf_note_grid'])?>,
+	lpn_dxf_note_crs: <?=json_encode($ec_lang['lpn_dxf_note_crs'])?>,
+	lpn_dxf_note_geo: <?=json_encode($ec_lang['lpn_dxf_note_geo'])?>,
+	lpn_dxf_note_scale: <?=json_encode($ec_lang['lpn_dxf_note_scale'])?>,
 	lpn_find_menu: <?=json_encode($ec_lang['lpn_find_menu'])?>,
 	lpn_find_scope: <?=json_encode($ec_lang['lpn_find_scope'])?>,
 	lpn_find_scope_all: <?=json_encode($ec_lang['lpn_find_scope_all'])?>,
@@ -3831,6 +3838,9 @@ EngCalcs.pageConfig = {
       // DOM. BEFORE looped-network.js, which reads EngCalcs.lpnCalib when the Calibration report
       // opens; absent, the report draws nothing. ?>
 <script src="/engcalcs/js/lpn-calib.js?v=<?=filemtime(__DIR__.'/js/lpn-calib.js')?>"></script>
+<?php // Writing a DXF drawing (ROADMAP Task 772). Pure text, no DOM, no request. BEFORE
+      // looped-network.js, which calls EngCalcs.lpnDxfWrite() when File > Export DXF file is chosen. ?>
+<script src="/engcalcs/js/lpn-dxf.js?v=<?=filemtime(__DIR__.'/js/lpn-dxf.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

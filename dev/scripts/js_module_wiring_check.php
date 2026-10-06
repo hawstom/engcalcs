@@ -89,6 +89,9 @@ const EC_HARNESS_LAZY_MODULES = [
     'lpn-calib.js' => 'calibration files and their statistics. Pure text parsing and arithmetic, '
                     . 'no DOM; the editor calls it when the Calibration report opens or a file is '
                     . 'picked, not during boot, and dev/lpn-spike/calibration-harness.js loads it.',
+    'lpn-dxf.js' => 'writing a DXF drawing. Pure text, no DOM and no request; the editor calls it '
+                  . 'when File > Export DXF file is chosen, not during boot, and '
+                  . 'dev/lpn-spike/dxf-export-harness.js loads it.',
     'lpn-crs.js' => 'the projected-coordinate transform. It fetches js/vendor/proj4.js and 62 KB '
                   . 'of definitions on first use, so booting it in the shared stub would make '
                   . 'every harness pay for a library almost none of them touch; the projection '

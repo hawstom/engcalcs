@@ -2030,6 +2030,17 @@ $ec_lang['lpn_status_inp_exported']='Exported {file}.';
 // the failure this whole feature exists to prevent.
 $ec_lang['lpn_inp_export_differences']='{n} things the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
+// Task 772: File > Export DXF file. A drawing for AutoCAD and other CAD programs, never read back.
+$ec_lang['lpn_file_export_dxf']='Export DXF file…';
+$ec_lang['lpn_file_export_dxf_tip']='Download this network as a drawing that AutoCAD and other CAD programs open: one layer for each kind of asset, each node a block carrying its ID and main values, and the labels as they appear on the map.';
+$ec_lang['lpn_dxf_export_refused']='The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.';
+// The read-me note written into the drawing itself, on a layer that does not plot. Each says what
+// the coordinates are and claims no coordinate system the file does not have. {unit} is a length
+// unit symbol; {crs} is a coordinate system name with its EPSG code.
+$ec_lang['lpn_dxf_note_grid']='Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.';
+$ec_lang['lpn_dxf_note_crs']='Coordinates: {crs}, exactly as this project states them.';
+$ec_lang['lpn_dxf_note_geo']='Coordinates: converted from latitude and longitude to {crs}, in meters.';
+$ec_lang['lpn_dxf_note_scale']='Text and symbols are drawn at the size the map showed them when this file was exported.';
 $ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network file.';
 // EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
 // the way out named here always works, so keep the instruction in the message rather than leaving

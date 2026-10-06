@@ -34885,6 +34885,334 @@ var EngCalcs = EngCalcs || {};
 				: ''));
 		showInpExportFlattening(out.differences, a.download);
 	}
+	// ---- EXPORT DXF FILE (ROADMAP Task 772) ---------------------------------------------------------
+	//
+	// **A DUMB ANNOTATED NETWORK** (Tom, 2026-10-06): what the map shows, as a drawing any DWG
+	// program opens. js/lpn-dxf.js writes the file; this half GATHERS -- the project's own
+	// coordinates, each element's main values, and the lettering exactly as the map has placed it.
+	// Rules and the layer table: dev/dxf.md.
+	//
+	// **THE FRAME, AND WHAT THE FILE MAY CLAIM ABOUT IT.** A grid project goes out in its own X and
+	// Y, number for number. A project with a stated coordinate system goes out in it, unchanged. A
+	// latitude-and-longitude project is converted to the UTM zone that holds its centre (WGS 84,
+	// metres), because a CAD drawing is a plane and degrees are not a length; the page's own Web
+	// Mercator frame is not used, since its scale is wrong by 1 / cos(latitude). The note on the
+	// read-me layer says which of the three it is, and nothing else claims a coordinate system.
+	var LPN_DXF_CAP_HEIGHT = 0.716;   // Arial's cap height per em (OS/2 sCapHeight 1467 / 2048)
+	function dxfFrame(done) {
+		var pc = EngCalcs.pageConfig || {}, code, u;
+		if (isLatLonProject()) {
+			var b = null;
+			doc.nodes.forEach(function (n) {
+				var X = effective(n, 'x'), Y = effective(n, 'y');
+				if (!isFinite(X) || !isFinite(Y)) { return; }
+				if (!b) { b = { w: X, e: X, s: Y, n: Y }; return; }
+				b.w = Math.min(b.w, X); b.e = Math.max(b.e, X); b.s = Math.min(b.s, Y); b.n = Math.max(b.n, Y);
+			});
+			code = crsUtmCodeFor(b ? { lon: (b.w + b.e) / 2, lat: (b.s + b.n) / 2 } : { lon: 0, lat: 0 });
+			if (!code || !EngCalcs.lpnCrsLoad) { done({ ok: false }); return; }
+			EngCalcs.lpnCrsLoad(function () {
+				if (!EngCalcs.lpnCrsHas(code)) { done({ ok: false }); return; }
+				done({
+					ok: true, kind: 'geo', code: code, insunits: 6, measurement: 1,
+					fwd: function (X, Y) { return EngCalcs.lpnCrsForward(code, { lon: X, lat: Y }); },
+					note: (pc.lpn_dxf_note_geo || 'Coordinates: converted from latitude and longitude to {crs}, in meters.')
+						.replace('{crs}', dxfCrsName(code))
+				});
+			});
+			return;
+		}
+		function identity(X, Y) { return { x: X, y: Y }; }
+		if (isProjectedProject()) {
+			code = projectCrsCode();
+			var finish = function () {
+				var cu = EngCalcs.lpnCrsUnit ? EngCalcs.lpnCrsUnit(code) : null,
+					unit = cu && cu.units ? cu.units : (cu && cu.toMeter === 1 ? 'm' : '');
+				done({
+					ok: true, kind: 'projected', code: code, fwd: identity,
+					insunits: EngCalcs.lpnDxfInsUnits(unit), measurement: unit === 'm' ? 1 : 0,
+					note: (pc.lpn_dxf_note_crs || 'Coordinates: {crs}, exactly as this project states them.')
+						.replace('{crs}', dxfCrsName(code))
+				});
+			};
+			if (EngCalcs.lpnCrsLoad) { EngCalcs.lpnCrsLoad(finish); } else { finish(); }
+			return;
+		}
+		u = unitKey('lpn_u_length');
+		done({
+			ok: true, kind: 'grid', fwd: identity,
+			insunits: EngCalcs.lpnDxfInsUnits(u), measurement: u === 'm' ? 1 : 0,
+			note: (pc.lpn_dxf_note_grid || 'Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.')
+				.replace('{unit}', unitSymbol('lpn_u_length'))
+		});
+	}
+	function dxfCrsName(code) {
+		var name = crsLabel(code);
+		return (name && name !== String(code)) ? name + ' (' + code + ')' : String(code);
+	}
+	// A value for an attribute: the effective (scenario) value where the property is overridable,
+	// the stored one otherwise, and '' for nothing at all. Numbers go out as the number, unrounded,
+	// so an attribute says what the model says.
+	function dxfVal(el, prop) {
+		var v = effective(el, prop);
+		if (v === undefined || v === null) { v = el[prop]; }
+		return (v === undefined || v === null || (typeof v === 'number' && !isFinite(v))) ? '' : v;
+	}
+	var LPN_DXF_TAGS = {
+		junction: ['ID', 'ELEV', 'DEMAND', 'TAG', 'DESC'],
+		reservoir: ['ID', 'HEAD', 'TAG', 'DESC'],
+		tank: ['ID', 'ELEV', 'LEVEL', 'MINLEVEL', 'MAXLEVEL', 'DIAMETER', 'TAG', 'DESC'],
+		pump: ['ID', 'TAG', 'DESC'],
+		valve: ['ID', 'VALVETYPE', 'DIAMETER', 'SETTING', 'TAG', 'DESC'],
+		customer: ['ID', 'DEMAND', 'COUNT', 'TAG', 'DESC']
+	};
+	function dxfPrompts() {
+		var pc = EngCalcs.pageConfig || {};
+		function withUnit(label, unitName) { return label + ' (' + unitSymbol(unitName) + ')'; }
+		return {
+			ID: pc.lpn_field_id || 'ID',
+			ELEV: withUnit(pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead'),
+			DEMAND: withUnit(pc.lpn_field_base_demand || 'Base demand', 'lpn_u_flow'),
+			HEAD: withUnit(pc.lpn_field_head || 'Head', 'lpn_u_elevhead'),
+			LEVEL: withUnit(pc.lpn_field_tank_level || 'Water depth', 'lpn_u_elevhead'),
+			MINLEVEL: withUnit(pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead'),
+			MAXLEVEL: withUnit(pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead'),
+			DIAMETER: pc.lpn_field_diameter || 'Diameter',
+			VALVETYPE: pc.lpn_field_valve_type || 'Valve type',
+			SETTING: pc.lpn_field_valve_setting || 'Setting',
+			COUNT: pc.lpn_field_meter_count || 'Number of services',
+			TAG: pc.lpn_field_tag || 'Tag',
+			DESC: pc.lpn_field_desc || 'Description'
+		};
+	}
+	function dxfNodeAttrs(n) {
+		var a = [{ tag: 'ID', value: n.id }];
+		if (n.type === 'junction') {
+			a.push({ tag: 'ELEV', value: dxfVal(n, 'elev') });
+			var d = baseDemandTotal(n);
+			a.push({ tag: 'DEMAND', value: (typeof d === 'number' && isFinite(d)) ? d : '' });
+		} else if (n.type === 'reservoir') {
+			a.push({ tag: 'HEAD', value: nodeFixedHead(n) });
+		} else if (n.type === 'tank') {
+			a.push({ tag: 'ELEV', value: dxfVal(n, 'elev') }, { tag: 'LEVEL', value: dxfVal(n, 'level') },
+				{ tag: 'MINLEVEL', value: dxfVal(n, 'minLevel') }, { tag: 'MAXLEVEL', value: dxfVal(n, 'maxLevel') },
+				{ tag: 'DIAMETER', value: dxfVal(n, 'tankDiameter') });
+		}
+		a.push({ tag: 'TAG', value: dxfVal(n, 'tag') }, { tag: 'DESC', value: dxfVal(n, 'desc') });
+		return a;
+	}
+	function dxfLinkAttrs(l) {
+		var a = [{ tag: 'ID', value: l.id }];
+		if (l.type === 'valve') {
+			a.push({ tag: 'VALVETYPE', value: l.valveType || '' }, { tag: 'DIAMETER', value: dxfVal(l, 'diameter') },
+				{ tag: 'SETTING', value: dxfVal(l, 'setting') });
+		}
+		a.push({ tag: 'TAG', value: dxfVal(l, 'tag') }, { tag: 'DESC', value: dxfVal(l, 'desc') });
+		return a;
+	}
+	// Is this piece of lettering on the map right now? Every way the page hides one: an inline
+	// visibility or display on it or an ancestor (a dropped, crossed, crowded or too-short label;
+	// a hidden layer), `.lpn-lbl-hidden` (a Text not in this scenario), and generated annotation
+	// while the map's data labels are switched off (`.lpn-labels-hidden`).
+	function dxfShown(e) {
+		var p = e;
+		if (dataLabelsHidden && e.classList && e.classList.contains('lpn-annotation')) { return false; }
+		while (p && p !== svg) {
+			if (p.style && (p.style.display === 'none' || p.style.visibility === 'hidden')) { return false; }
+			if (p.classList && p.classList.contains('lpn-lbl-hidden')) { return false; }
+			p = p.parentNode;
+		}
+		return true;
+	}
+	function dxfEmLength(v, fs) {
+		var s = String(v === undefined || v === null ? '' : v).trim();
+		if (!s) { return 0; }
+		var n = parseFloat(s);
+		if (!isFinite(n)) { return 0; }
+		return /em$/.test(s) ? n * fs : n;
+	}
+	function dxfHasAttr(e, name) {
+		var v = e.getAttribute(name);
+		return v !== undefined && v !== null;
+	}
+	/**
+	 * **THE LETTERING, READ OFF THE MAP ITSELF**, so what the user sees labelled is what lands in the
+	 * drawing: every shown <text> and leader in the labels layer -- node and link data labels and
+	 * their repeats, customer labels, and Text -- at the place, angle and size the placement pass
+	 * gave it. One TEXT per row, on the row's own baseline. `G` takes an OUTWARD coordinate pair to
+	 * the drawing.
+	 */
+	function dxfLettering(G) {
+		var texts = [], lines = [];
+		function toOut(x, y) { return G(outwardX(x), outwardY(y)); }
+		(labelsLayer && labelsLayer.children ? labelsLayer.children : []).forEach(function (e) {
+			var tag = String(e._tag || e.tagName || e.nodeName || '').toLowerCase();
+			if (tag === 'line') {
+				var cls = String(e.getAttribute('class') || '');
+				if (cls.indexOf('lpn-leader') < 0 || !dxfShown(e)) { return; }
+				var a = toOut(+e.getAttribute('x1'), +e.getAttribute('y1')),
+					b = toOut(+e.getAttribute('x2'), +e.getAttribute('y2'));
+				if (a && b && isFinite(a.x) && isFinite(b.x)) {
+					lines.push({ x1: a.x, y1: a.y, x2: b.x, y2: b.y, layer: 'label' });
+				}
+				return;
+			}
+			if (tag !== 'text' || !dxfShown(e)) { return; }
+			var styleAttr = String(e.getAttribute('style') || ''),
+				m = /font-size:\s*([-\d.eE+]+)px/.exec(styleAttr),
+				fs = textElFontSize(e) || (m ? parseFloat(m[1]) : 0) || effectiveFontSize(),
+				x0 = +e.getAttribute('x') || 0, y0 = +e.getAttribute('y') || 0,
+				anchor = e.getAttribute('text-anchor'),
+				db = e.getAttribute('dominant-baseline'),
+				rot = /rotate\(\s*([-\d.eE+]+)(?:[\s,]+([-\d.eE+]+)[\s,]+([-\d.eE+]+))?\s*\)/.exec(String(e.getAttribute('transform') || '')),
+				ang = rot ? parseFloat(rot[1]) : 0,
+				rcx = rot && rot[2] !== undefined ? parseFloat(rot[2]) : 0,
+				rcy = rot && rot[3] !== undefined ? parseFloat(rot[3]) : 0,
+				layer = dxfHasAttr(e, 'data-lbl') ? 'text' : 'label',
+				kids = (e.childNodes || e.children || []), rows = [], cur = null, yOff = 0, i, c;
+			for (i = 0; i < kids.length; i++) {
+				c = kids[i];
+				if (c.nodeType !== 1) { continue; }
+				var s = String(c.textContent || '').replace(/%%/g, '%%%%%%'),
+					dec = c.getAttribute('text-decoration');
+				if (dec === 'underline') { s = '%%u' + s + '%%u'; } else if (dec === 'overline') { s = '%%o' + s + '%%o'; }
+				if (dxfHasAttr(c, 'x') || !cur) {
+					yOff += dxfEmLength(c.getAttribute('dy'), fs);
+					cur = { x: dxfHasAttr(c, 'x') ? +c.getAttribute('x') : x0, y: y0 + yOff, text: '' };
+					rows.push(cur);
+				}
+				cur.text += s;
+			}
+			if (!rows.length && String(e.textContent || '')) {
+				rows.push({ x: x0, y: y0, text: String(e.textContent).replace(/%%/g, '%%%%%%') });
+			}
+			var ca = Math.cos(ang * Math.PI / 180), sa = Math.sin(ang * Math.PI / 180);
+			rows.forEach(function (r) {
+				if (!r.text.replace(/%%[uo]/g, '').trim()) { return; }
+				var dx = r.x - rcx, dy = r.y - rcy,
+					px = rot ? rcx + dx * ca - dy * sa : r.x, py = rot ? rcy + dx * sa + dy * ca : r.y,
+					P = toOut(px, py), Q = toOut(px + ca * fs, py + sa * fs);
+				if (!P || !Q || !isFinite(P.x) || !isFinite(Q.x)) { return; }
+				var len = Math.hypot(Q.x - P.x, Q.y - P.y);
+				texts.push({
+					text: r.text, codes: true, x: P.x, y: P.y,
+					h: len * LPN_DXF_CAP_HEIGHT,
+					rot: Math.atan2(Q.y - P.y, Q.x - P.x) * 180 / Math.PI,
+					halign: anchor === 'middle' ? 1 : (anchor === 'end' ? 2 : 0),
+					valign: db === 'central' ? 2 : (db === 'hanging' ? 3 : 0),
+					layer: layer
+				});
+			});
+		});
+		return { texts: texts, lines: lines };
+	}
+	/** The whole drawing as js/lpn-dxf.js's plain model, in `frame`'s coordinates. */
+	function dxfModel(frame) {
+		var pc = EngCalcs.pageConfig || {}, G = frame.fwd, snap = serializeProject(),
+			geo = isLatLonProject(),
+			org = (!geo && snap.origin && isFinite(snap.origin.x)) ? snap.origin : { x: 0, y: 0 },
+			fileNode = {}, nodes = [], links = [], customers = [], i;
+		snap.nodes.forEach(function (n) { fileNode[n.id] = n; });
+		// A node's OUTWARD position: this scenario's own if it moved the node, else the file's
+		// number plus the origin -- the same arithmetic the .inp export uses, so the two agree.
+		function nodeOut(id) {
+			var fn = fileNode[id], live = nodeById(id), ov = live ? coordOverridesOf(live) : null;
+			if (!fn) { return null; }
+			return G(ov && typeof ov.x === 'number' ? ov.x : fn.x + org.x,
+				ov && typeof ov.y === 'number' ? ov.y : fn.y + org.y);
+		}
+		doc.nodes.forEach(function (n) {
+			var p = nodeOut(n.id);
+			if (!p) { return; }
+			nodes.push({ id: n.id, type: n.type, x: p.x, y: p.y, attrs: dxfNodeAttrs(n) });
+		});
+		snap.links.forEach(function (fl) {
+			var l = linkById(fl.id), pts = [], a = nodeOut(fl.from), b = nodeOut(fl.to);
+			if (!l || !a || !b) { return; }
+			pts.push(a);
+			(fl.verts || []).forEach(function (v) {
+				var q = G(v.x + org.x, v.y + org.y);
+				if (q) { pts.push(q); }
+			});
+			pts.push(b);
+			links.push({ id: l.id, type: l.type, pts: pts, attrs: dxfLinkAttrs(l) });
+		});
+		(doc.customers || []).forEach(function (c) {
+			var pt = customerPoint(c), an = customerAttachPoint(c),
+				P = pt ? G(outwardX(pt.x), outwardY(pt.y)) : null,
+				A = an ? G(outwardX(an.x), outwardY(an.y)) : null;
+			if (!P) { return; }
+			customers.push({ id: c.id, x: P.x, y: P.y, from: A, attrs: [
+				{ tag: 'ID', value: c.id }, { tag: 'DEMAND', value: dxfVal(c, 'demand') },
+				{ tag: 'COUNT', value: dxfVal(c, 'count') },
+				{ tag: 'TAG', value: c.tag || '' }, { tag: 'DESC', value: c.desc || '' }] });
+		});
+		// **ONE SCALE FOR THE WHOLE SHEET**, measured at the middle of the network: how many drawing
+		// units one unit of the map's own frame is there. 1 for a grid or a stated system; for a
+		// latitude-and-longitude project it is the Mercator-to-UTM factor, which varies by well
+		// under a percent across the 300 km mission scope.
+		var bx = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
+		doc.nodes.forEach(function (n) {
+			var x = nodeDrawX(n), y = nodeDrawY(n);
+			if (!isFinite(x) || !isFinite(y)) { return; }
+			bx.x0 = Math.min(bx.x0, x); bx.x1 = Math.max(bx.x1, x); bx.y0 = Math.min(bx.y0, y); bx.y1 = Math.max(bx.y1, y);
+		});
+		var fs = effectiveFontSize(), k = 1;
+		if (isFinite(bx.x0)) {
+			var mx = (bx.x0 + bx.x1) / 2, my = (bx.y0 + bx.y1) / 2,
+				P = G(outwardX(mx), outwardY(my)), Q = G(outwardX(mx + fs), outwardY(my));
+			if (P && Q && fs > 0) { k = Math.hypot(Q.x - P.x, Q.y - P.y) / fs || 1; }
+		}
+		var symbol = (settings.symbolSize / symbolScaleAt()) * k,
+			textHeight = fs * LPN_DXF_CAP_HEIGHT * k,
+			letters = dxfLettering(G);
+		// The read-me note, above the top-left of the network on a layer that does not plot.
+		var ex = { x0: Infinity, y1: -Infinity };
+		nodes.forEach(function (n) { ex.x0 = Math.min(ex.x0, n.x); ex.y1 = Math.max(ex.y1, n.y); });
+		if (!isFinite(ex.x0)) { ex = { x0: 0, y1: 0 }; }
+		var notes = [projectDisplayName(project), frame.note,
+			pc.lpn_dxf_note_scale || 'Text and symbols are drawn at the size the map showed them when this file was exported.'];
+		for (i = 0; i < notes.length; i++) {
+			letters.texts.push({ text: notes[i], x: ex.x0, y: ex.y1 + symbol * 3 + (notes.length - i) * textHeight * 1.6,
+				h: textHeight, layer: 'note' });
+		}
+		return {
+			insunits: frame.insunits, measurement: frame.measurement, layerPrefix: '',
+			symbol: symbol, textHeight: textHeight,
+			nodes: nodes, links: links, customers: customers,
+			texts: letters.texts, lines: letters.lines,
+			tags: LPN_DXF_TAGS, prompts: dxfPrompts()
+		};
+	}
+	/** frame -> {ok, text}; the synchronous half, which is what a harness drives. */
+	function dxfExportText(frame) {
+		if (!frame || !frame.ok || !EngCalcs.lpnDxfWrite) { return { ok: false }; }
+		return { ok: true, text: EngCalcs.lpnDxfWrite(dxfModel(frame)), frame: frame };
+	}
+	function exportDxfFile() {
+		var pcX = EngCalcs.pageConfig || {};
+		saveToStorage();   // export what is on screen, including edits not yet saved
+		flushLabelRefresh();   // the lettering as the map will show it, not a pass still owed
+		dxfFrame(function (frame) {
+			var out = dxfExportText(frame);
+			if (!out.ok) {
+				setNotice(pcX.lpn_dxf_export_refused || 'The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.');
+				return;
+			}
+			// A BYTE string in Windows-1252 (js/lpn-dxf.js), so it goes out as bytes: a Blob of the
+			// string itself would be UTF-8 and turn every accented letter into two wrong ones.
+			var blob = new Blob([EngCalcs.lpnDxfBytes(out.text)], { type: 'application/dxf' }),
+				url = URL.createObjectURL(blob), a = document.createElement('a');
+			a.href = url;
+			a.download = safeFileName(projectDisplayName(project)) + '.dxf';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+			// Exporting is not saving, for the reason exportInpFile() gives.
+			setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download));
+		});
+	}
 	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being
 	 * something a round trip loses: *"Yes. And we have to start showing an export alert."*). It is
@@ -40818,6 +41146,10 @@ var EngCalcs = EngCalcs || {};
 			// separate row from Open rather than a second file type on it.
 			{ icon: 'save', label: pc.lpn_file_export_inp || 'Export EPANET file…',
 			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
+			// A DRAWING for AutoCAD and every other DWG program (Task 772): a download, like the row
+			// above, and never something read back -- DXF import is a separate task.
+			{ icon: 'save', label: pc.lpn_file_export_dxf || 'Export DXF file…',
+			  tip: pc.lpn_file_export_dxf_tip, fn: exportDxfFile },
 		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the
