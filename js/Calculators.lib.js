@@ -1481,7 +1481,7 @@ EngCalcs.wireSelectAllOnFocus = function () {
 document.addEventListener('DOMContentLoaded', function () { EngCalcs.wireSelectAllOnFocus(); });
 
 /**
-	* niceTicks() -- round values to mark an axis, ROADMAP Task 777.
+	* niceTicks() -- round values to mark an axis, 
 	*
 	* Steps are 1, 2, 2.5 or 5 times a power of ten. Of every step that puts 4 to 8 marks inside
 	* [lo, hi], the one whose count is nearest `target` (default 5) wins; when no step manages 4 to 8
@@ -1526,7 +1526,7 @@ EngCalcs.tickLabel = function (v, step) {
 };
 
 /**
-	* sketchAxesSvg() -- a faint grid with labelled marks for a cross-section sketch (Task 777).
+	* sketchAxesSvg() -- a faint grid with labelled marks for a cross-section sketch.
 	*
 	* o.x and o.y are {min, max, unit, target, to}: the DISPLAYED range, the unit symbol (may be
 	* empty), and `to(displayedValue)` -> pixel along that axis. The unit rides on the largest mark's

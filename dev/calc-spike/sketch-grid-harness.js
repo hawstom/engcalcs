@@ -1,4 +1,4 @@
-// Cross-section sketch scale for mi_ and wi_ (ROADMAP Task 777).
+// Cross-section sketch scale for mi_ and wi_ (ROADMAP).
 //
 //   node dev/calc-spike/sketch-grid-harness.js
 //

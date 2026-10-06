@@ -173,7 +173,7 @@ EngCalcs.pageCalculator = function (objForm) {
 	var
 	i,
 	htmlSketchSegments = '';
-	// The 600 x 100 box stays; the plot is inset to leave room for the scale marks (Task 777).
+	// The 600 x 100 box stays; the plot is inset to leave room for the scale marks.
 	var skW = 600, skH = 100, skL = 52, skR = 24, skT = 8, skB = 16,
 		fx = EngCalcs.unitFactor(objForm['stationu']), fy = EngCalcs.unitFactor(objForm['elevationu']),
 		sketchTop = Math.max(...arrElev, ws), sketchBottom = Math.min(...arrElev),
@@ -222,11 +222,13 @@ EngCalcs.pageCalculator = function (objForm) {
 		);
 	}
 
+	// a unit's NAME is its symbol (ft, m); it is a label here, not a factor
+	function unitSymbol(sel) { return sel ? String(sel.value) : ''; }
 	if (sketchRight > sketchLeft && sketchTop > sketchBottom) {
 		htmlAxes = EngCalcs.sketchAxesSvg({
-			x: { min: sketchLeft * fx, max: sketchRight * fx, unit: objForm['stationu'].value, target: 6,
+			x: { min: sketchLeft * fx, max: sketchRight * fx, unit: unitSymbol(objForm['stationu']), target: 6,
 				to: function (v) { return EngCalcs.Sketch.convertPoint({x: v / fx, y: sketchTop}).x; } },
-			y: { min: sketchBottom * fy, max: sketchTop * fy, unit: objForm['elevationu'].value, target: 4,
+			y: { min: sketchBottom * fy, max: sketchTop * fy, unit: unitSymbol(objForm['elevationu']), target: 4,
 				to: function (v) { return EngCalcs.Sketch.convertPoint({x: sketchLeft, y: v / fy}).y; } }
 		});
 	}

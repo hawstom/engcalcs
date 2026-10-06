@@ -129,7 +129,7 @@ EngCalcs.wiDrawSketch = function(hw) {
 
     var s = '<svg width="' + svgW + '" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '" style="max-width:100%;height:auto;font-family:sans-serif;font-size:11px;">';
 
-    // Scale marks: a faint grid, drawn first so the crest and the water stay on top (Task 777).
+    // Scale marks: a faint grid, drawn first so the crest and the water stay on top.
     // No unit label: this page has no unit selects (Cw carries the unit system).
     s += EngCalcs.sketchAxesSvg({
         x: { min: minX, max: maxX, unit: '', target: 6, to: toX },
