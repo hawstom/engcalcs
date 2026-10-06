@@ -114,7 +114,7 @@ ec_dr_expect('the mail gives the true, checked answer on robots (excluded by the
 ec_dr_expect('a LAST 24 HOURS table is headed as such',
     strpos($usage, 'LAST 24 HOURS') !== false, $usage);
 ec_dr_expect('the whole-log table says it is not one day, with its duration and dates',
-    (bool) preg_match('/WHOLE LOG, not one day \(1\.0 days, 2026-01-01 to 2026-01-02\)/', $usage), $usage);
+    (bool) preg_match('/WHOLE LOG, which restarts on the 1st \(1\.0 days, 2026-01-01 to 2026-01-02\)/', $usage), $usage);
 ec_dr_expect('a zero old-format count prints no reach-rows line',
     strpos($usage, 'reach rows') === false, $usage);
 
