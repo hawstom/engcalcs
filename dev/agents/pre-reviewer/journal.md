@@ -3861,3 +3861,11 @@ OBSERVED real Chrome (Net1, Net3): Show scenarios works on Junctions/Pipes/Pumps
 OBSERVED defects (minor): new scenario while shown appends its rows at the bottom, not beside each asset; rename leaves old name in Scenario column until switch; fill down makes overrides equal to parent.
 OBSERVED: stable sort changes ordinary tables vs master (tie rows keep previous order instead of ID) - intended.
 Lesson: pane toggle button toggles; sort lives on the arrow button; dialogs routed to native by seam (answerPromptWith).
+
+## 2026-10-06 feat/asset-type (Water > Change type)
+
+- OBSERVED (headless Chrome, Net1, tree 0f448176): tank 2 -> reservoir leaves head blank, so head = elevation 850 not 970; every junction pressure fell about 119 -> 60 psi after one convert. Dialog lists the lost water depth but never says the head changes.
+- OBSERVED: with Recalculate off, the converted node's label shows P=0.00 (invented) while neighbours keep stale values.
+- OBSERVED: undo and redo restore the doc byte-identically; Tables row counts move between tabs; symbol class becomes lpn-node-tank; lost-values list correct for junction (demand+extra, pattern, emitter) and tank (depths, diameter, volume curve, mixing, coeff); VOLUME curve stays in doc.curves; only `nodes` changed at top level.
+- NOT CHECKED: Properties box refresh (box was closed), Net3 solve, scenario overrides in browser (harness covers).
+- Method note: scratch copy of the tree with an injected EngCalcs.__t hook, served by php -S; real worktree untouched.
