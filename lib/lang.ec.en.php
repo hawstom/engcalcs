@@ -3034,7 +3034,7 @@ $ec_lang['lpn_scenario_preset_fire_max_day']='7. Fire plus max day';
 $ec_lang['lpn_scenario_preset_fire_max_day_tip']='Max day demand (multiplier 2.0). Run Fire flow analysis in this scenario: it adds the fire flow at each junction on top of this demand.';
 $ec_lang['lpn_delete_drops_overrides']='Deleting this asset also throws away {n} scenario overrides for it. Continue?';
 $ec_lang['lpn_push_base_only']='This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.';
-$ec_lang['lpn_field_active']='Part of this network';
+$ec_lang['lpn_field_active']='Is active?';
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_field_active_tip']='Clear this box to leave the asset on the drawing but out of the network: it is drawn grey and the solver ignores it. In a scenario this is how a pipe is switched on and off.';
 // ---- Task 412: a Base-wide property SAYS it is Base-wide ----
