@@ -31860,7 +31860,7 @@ var EngCalcs = EngCalcs || {};
 		text = [];
 		if (lost.length) { text.push([pc.lpn_change_type_lost || 'These values will be lost:'].concat(capped(lost)).join('\n')); }
 		if (meaning.length) {
-			text.push([pc.lpn_change_type_meaning || 'These controls and rules test this node, and will now read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.']
+			text.push([pc.lpn_change_type_meaning || 'These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.']
 				.concat(capped(meaning)).join('\n'));
 		}
 		askDialog({ kind: 'confirm', title: pc.lpn_change_type_menu || 'Change type',
