@@ -27,7 +27,7 @@ arrives already measured. The full typedefs are the doc comment at the top of `c
 **In** (`place(scene, {prev})`): the viewport; `view` (model to view: `px = model * s + t`, for a
 placer that caches in model space); the lettering (row height, the separator a one-line label
 joins rows with and its width, the longest allowed hook); the user's per-kind value **drop order**
-(first to go first; the ID row is never in it); **every** node (centre and symbol box) and link
+(first to go first; **the ID is in it like any other value**, and a label keeps the last value in the order longest, Tom 2026-10-06; a scene recorded before then lacks `id`, and `dropOrderOf()` puts it first to go); **every** node (centre and symbol box) and link
 (polyline in view px, pump/valve symbol, flow arrows), on screen or not, since the model runs off
 the screen on every side; the user's label `settings` (whether pipe labels are drawn along their
 pipes, and the reading window a turned label keeps to); Text objects and customer symbols as fixed boxes; and the **labels

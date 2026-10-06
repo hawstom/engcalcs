@@ -32,8 +32,11 @@
  *          separator a one-line label joins its rows with (and its measured width), the longest
  *          allowed hook, and the spacing a pipe longer than it repeats its label along (R9)
  * @property {{node:string[], link:string[], customer:string[]}} dropOrder   the user's per-kind
- *          value drop order, FIRST TO GO first. A row whose `field` is not listed ('id') is the
- *          label itself and is never dropped.
+ *          value drop order, FIRST TO GO first. The ID is in it like any other value (Tom,
+ *          2026-10-06: "Keep the last dropped property."): a label keeps the LAST value in this order
+ *          longest, and that may be a value rather than the ID. A scene recorded before then lacks
+ *          'id'; dropOrderOf() puts it first to go, as Tom's table does. A row whose `field` is not
+ *          listed goes before every listed one.
  * @property {{alignPipeLabels:boolean, readableAngleDeg:{min:number, max:number}}} [settings]   the
  *          user's "Draw link labels along the link line" setting (Settings > Symbology > Labels), and
  *          the reading window a turned label keeps to: its `angle` lies in (min, max], so no label
@@ -291,5 +294,35 @@ function sceneProblem(scene) {
 	return null;
 }
 
-module.exports = { sceneProblem, EPS, blockSize, placementBoxes, invalidReason, corners, rectToOBox, boxesOverlap,
+// The drop order of one kind, FIRST TO GO first, with the ID in it (Tom, 2026-10-06: the ID is dropped
+// like any other value, and a label keeps the last value in the user's order longest). A scene
+// recorded before then names no 'id'; it is put first to go, where Tom's table (R-326) ranks it
+// among Novato's fields.
+function dropOrderOf(scene, kind) {
+	const o = ((scene.dropOrder && scene.dropOrder[kind]) || []).slice();
+	if (o.indexOf('id') < 0) { o.unshift('id'); }
+	return o;
+}
+// A shown label gives up values in the user's order, so what it shows is what is LEFT when the first
+// k have gone. It breaks that when it shows a row that comes earlier in the order than a row it
+// hides: a bare ID beside a hidden last-in-order value is the case that matters. A row whose field
+// is not in the order ranks before all that are. `shownIdx` is the placement's `rows`. Returns the
+// hidden row's field that outranks a shown one, or null.
+function dropOrderBreak(scene, req, shownIdx) {
+	const order = dropOrderOf(scene, req.kind);
+	const rank = function (i) { return order.indexOf(req.rows[i].field); };
+	const shown = {};
+	shownIdx.forEach(function (i) { shown[i] = true; });
+	let minShown = Infinity;
+	shownIdx.forEach(function (i) { minShown = Math.min(minShown, rank(i)); });
+	let worst = null, worstRank = -Infinity;
+	req.rows.forEach(function (r, i) {
+		if (shown[i]) { return; }
+		const k = rank(i);
+		if (k > minShown && k > worstRank) { worst = r.field; worstRank = k; }
+	});
+	return worst;
+}
+
+module.exports = { dropOrderOf, dropOrderBreak, sceneProblem, EPS, blockSize, placementBoxes, invalidReason, corners, rectToOBox, boxesOverlap,
 	segsCross, segHitsBox, distToSeg, distToPolyline, distToOBox, polylineLength, pointInOBox };

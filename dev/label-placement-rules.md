@@ -43,7 +43,8 @@ pipe is medium-low cost; leader on pipe is very low cost. A label on a customer 
 - **R1. Hide a label only because there is no room for it on screen. Never hide it because of how
   many labels are already showing.** When space runs out, give up in this order: (1) nearness to
   home if there is convenient available space; (2) wholeness; (3) properties that won't fit, by drop
-  order; (4) the label itself.
+  order, **the ID being one of them like any other value: a label keeps the last value in the user's
+  drop order longest, whether that is a value or the ID** (Tom, 2026-10-06); (4) the label itself.
 - **R2. If there is convenient available space, use it if that saves a neighbour's properties.**
 - **R5. Basic leader conventions:** label text is justified to the leader side, never to centre or
   to the far side.
@@ -325,4 +326,13 @@ is not only human, it is biological; it is real."*
   default settings, ID is the first thing to drop. Since the user decides drop order (meaning they
   really want to see what they asked for), it might be best to prioritize more labels with a single
   value left than less labels with more values left."* Not yet a rule; round 6 should test it.
+
+### Round 6 proposals, his answers, 2026-10-06
+
+- **Proposal 1, at a crowded view a label keeps its most-wanted value (the last in the user's drop
+  order, P or Q by default) rather than its ID:** *"Yes! Of course. 'Give the user the freedom.'
+  Keep the last dropped property."* Settled, and now R1 (3): the ID is in the drop order like any
+  other value, and a label keeps the last value in the order longest. The bench stopped saying "the
+  ID is never dropped"; the scene's `dropOrder` carries `id`, and the judges score a label that
+  keeps a value earlier in the order than one it hides.
 

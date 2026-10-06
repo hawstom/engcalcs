@@ -20,10 +20,11 @@
 	function r2(v) { return Math.round(v * 100) / 100; }
 
 	// The user's drop order per kind: lowest Drop number first; a field with none goes first of all
-	// (linkFieldRank()'s rule). ID is never in it -- it is the label.
+	// (linkFieldRank()'s rule). The ID is in it like any other value (Tom, 2026-10-06: "Keep the last
+	// dropped property."), at the rank the user's Drop column gives it.
 	function dropOrder(ls, group) {
 		var pr = (ls.priority && ls.priority[group]) || {};
-		return Object.keys(ls[group] || {}).filter(function (f) { return ls[group][f] && f !== 'id'; })
+		return Object.keys(ls[group] || {}).filter(function (f) { return ls[group][f]; })
 			.sort(function (a, b) {
 				var ra = typeof pr[a] === 'number' ? pr[a] : -Infinity;
 				var rb = typeof pr[b] === 'number' ? pr[b] : -Infinity;

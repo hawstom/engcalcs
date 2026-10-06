@@ -181,6 +181,16 @@ function scoreView(scene, layout, opts) {
 	let rowsReq = 0, rowsShown = 0;
 	scene.labels.forEach(function (req) { rowsReq += req.rows.length; });
 	items.forEach(function (it) { rowsShown += it.pl.rows.length; });
+	// REPORTED: a label that gives up values out of the user's order (Tom, 2026-10-06: "Keep the last
+	// dropped property."). It shows a value that is earlier in the drop order than one it hides; the
+	// bare ID beside a hidden last-in-order value is the case that matters.
+	let dropChecked = 0, dropOut = 0;
+	const dropOutIds = [];
+	items.forEach(function (it) {
+		if (it.pl.rows.length >= it.req.rows.length) { return; }
+		dropChecked++;
+		if (C.dropOrderBreak(scene, it.req, it.pl.rows)) { dropOut++; dropOutIds.push(it.id); }
+	});
 	const leaderLH = items.filter(function (it) { return it.leader; }).map(function (it) {
 		return C.polylineLength(it.leader) / (it.blockH || scene.text.rowHeightPx);
 	});
@@ -244,6 +254,7 @@ function scoreView(scene, layout, opts) {
 		labelsShown: items.length, rowsReq: rowsReq, rowsShown: rowsShown, leaderLH: leaderLH,
 		r5: { checked: r5Checked, mismatch: r5Mismatch }, r7: { checked: r7Checked, onOwnPipe: r7OnOwnPipe },
 		r9: { should: r9Should, has: r9Has },
+		dropOrder: { checked: dropChecked, outOfOrder: dropOut, ids: dropOutIds },
 		r14: { asked: r14Asked, along: r14Along, missedWithRoom: r14MissedWithRoom, missedIds: r14Missed, zoom: scene.zoom || null },
 		underFurniture: underFurniture };
 }

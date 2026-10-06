@@ -124,7 +124,7 @@ function greedy(cap) {
 		let n = 0;
 		scene.labels.slice().sort(function (a, b) { return a.id < b.id ? -1 : a.id > b.id ? 1 : 0; }).forEach(function (req) {
 			if (cap && n >= cap) { out[req.id] = { shown: false }; return; }
-			const pl = roomWithinReach(scene, { labels: Object.assign({}, out) }, req, R1.smallestRows(req), { reachRows: 3 });
+			const pl = roomWithinReach(scene, { labels: Object.assign({}, out) }, req, R1.smallestRows(req, scene), { reachRows: 3 });
 			if (pl) { pl.shown = true; out[req.id] = pl; n++; } else { out[req.id] = { shown: false }; }
 		});
 		return { labels: out };

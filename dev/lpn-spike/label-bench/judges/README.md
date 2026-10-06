@@ -45,7 +45,7 @@ node dev/lpn-spike/label-bench/judges/judge.js --placer dev/lpn-spike/label-benc
 - **R1, Tom's sentence of 2026-10-05** (*"Hide a label only because there is no room for it on
   screen. Never hide it because of how many labels are already showing."*), `r1.js`, over every view
   of the Novato sets. **No room:** labels hidden although free ground within 3 rows (`room.js`) could
-  hold their ID row; reported. **Not by count:** the same view laid out again with the labels of
+  hold their last-kept value (the last in the user's drop order, the ID being a value like any other); reported. **Not by count:** the same view laid out again with the labels of
   one half of the screen not asked for (nodes and pipes all still there), each half in turn; a label
   more than a quarter of the screen beyond the cut has exactly the room it had, so one hidden in the
   full layout and shown in the half one was hidden by count. Asserted: at most 5% come back, beyond

@@ -4,7 +4,7 @@
 // Never hide it because of how many labels are already showing." Two halves, two measures.
 //
 //   1. NO ROOM. A label hidden although free ground within reach could hold its smallest form (its
-//      ID row; its first row when it has no ID row) in that same finished layout: room.js's search,
+//      last-in-order value; the ID is in the drop order like any other value) in that same finished layout: room.js's search,
 //      the one R-075 and round 5's G use. That label was not hidden for lack of room.
 //
 //   2. NOT BY COUNT. The counterfactual: the same view laid out again with the labels on the far
@@ -25,6 +25,7 @@
 'use strict';
 
 const { roomWithinReach } = require('./room.js');
+const C = require('../contract.js');
 
 // A label more than this share of the viewport width beyond the cut is "far": at the bench's 1400 px
 // canvas, 350 px, about 24 text rows. No placer's leader runs that far (round 5's longest p90 was a
@@ -32,9 +33,15 @@ const { roomWithinReach } = require('./room.js');
 const FAR_FRACTION = 0.25;
 const REACH_ROWS = 3;
 
-function smallestRows(req) {
-	const id = req.rows.map(function (r, i) { return r.field === 'id' ? i : -1; }).filter(function (i) { return i >= 0; });
-	return id.length ? id : [0];
+// The smallest form a label can take is the one value the user's drop order keeps longest (Tom,
+// 2026-10-06: "Keep the last dropped property."), the ID included in that order like any other.
+function smallestRows(req, scene) {
+	const order = scene ? C.dropOrderOf(scene, req.kind) : [];
+	for (let k = order.length - 1; k >= 0; k--) {
+		const i = req.rows.findIndex(function (r) { return r.field === order[k]; });
+		if (i >= 0) { return [i]; }
+	}
+	return [0];
 }
 
 // Half 1: hidden labels that had room. Hand-placed labels are N4's business, not this.
@@ -45,7 +52,7 @@ function hiddenWithRoom(scene, layout, reach) {
 		const p = L[req.id];
 		if (p && p.shown) { return; }
 		out.hidden++;
-		if (roomWithinReach(scene, { labels: L }, req, smallestRows(req), { reachRows: reach === undefined ? REACH_ROWS : reach })) {
+		if (roomWithinReach(scene, { labels: L }, req, smallestRows(req, scene), { reachRows: reach === undefined ? REACH_ROWS : reach })) {
 			out.withRoom++;
 			out.ids.push(req.id);
 		}

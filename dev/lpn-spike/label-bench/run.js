@@ -156,7 +156,7 @@ function printTable(results, log) {
 	log(cols.map(function (c) { return pad(c[0], c[1], c[2]); }).join(' '));
 	const T = { N1: 0, N3: 0, N4: 0, N5: 0, invalid: 0, cost: 0, rowsR: 0, rowsS: 0, labR: 0, labS: 0,
 		ldr: [], moved: 0, churn: 0, compared: 0, ms: [],
-		r5c: 0, r5m: 0, r7c: 0, r7o: 0, r9s: 0, r9h: 0, r14a: 0, r14y: 0, r14m: 0, r14ca: 0, r14cy: 0, r14cm: 0, zoomRegained: 0, zoomLost: 0 };
+		r5c: 0, r5m: 0, r7c: 0, r7o: 0, r9s: 0, r9h: 0, dc: 0, dx: 0, r14a: 0, r14y: 0, r14m: 0, r14ca: 0, r14cy: 0, r14cm: 0, zoomRegained: 0, zoomLost: 0 };
 	results.forEach(function (set) {
 		set.steps.forEach(function (st) {
 			const s = st.score, b = s.breaks;
@@ -165,6 +165,7 @@ function printTable(results, log) {
 			T.ldr = T.ldr.concat(s.leaderLH); T.ms.push(st.ms);
 			T.r5c += s.r5.checked; T.r5m += s.r5.mismatch; T.r7c += s.r7.checked; T.r7o += s.r7.onOwnPipe;
 			T.r9s += s.r9.should; T.r9h += s.r9.has;
+			T.dc += s.dropOrder.checked; T.dx += s.dropOrder.outOfOrder;
 			T.r14a += s.r14.asked; T.r14y += s.r14.along; T.r14m += s.r14.missedWithRoom;
 			if (s.r14.zoom >= CLOSE_ZOOM) { T.r14ca += s.r14.asked; T.r14cy += s.r14.along; T.r14cm += s.r14.missedWithRoom; }
 			const stab = st.stability;
@@ -191,6 +192,8 @@ function printTable(results, log) {
 	log('REPORTED, never failing -- R5 leader-side align: ' + T.r5m + '/' + T.r5c + ' stacked+leadered labels not'
 		+ ' justified to their leader\'s side; R7 label-on-own-pipe: ' + T.r7o + '/' + T.r7c + ' shown pipe labels sit on'
 		+ ' their own pipe; R9 repeats: ' + T.r9h + '/' + T.r9s + ' pipes longer than the repeat spacing carry repeats;'
+		+ ' drop order (the ID is a value like any other; a label keeps the last in the user\'s order longest): '
+		+ T.dx + '/' + T.dc + ' labels that gave up rows kept one that comes earlier in the order than one they hid;'
 		+ ' R11 zoom-in row change: ' + T.zoomRegained + ' regained, ' + T.zoomLost + ' lost, across zoom-in steps;'
 		+ ' R14 along the pipe: ' + T.r14y + '/' + T.r14a + ' shown pipe labels the setting asks to lie along their pipe do,'
 		+ ' and ' + T.r14m + ' of the rest had room beside their pipe to; R14 at close zoom (' + CLOSE_ZOOM + 'x and closer): of '

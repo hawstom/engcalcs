@@ -28,7 +28,7 @@
 //      numbers. Reported.
 //   5. R1, TOM'S SENTENCE OF 2026-10-05 (r1.js): "Hide a label only because there is no room for
 //      it on screen. Never hide it because of how many labels are already showing." Over every view
-//      of the Novato sets: labels hidden although free ground within reach could hold their ID row
+//      of the Novato sets: labels hidden although free ground within reach could hold their last-kept value
 //      (reported), and labels a long way from the cut that were hidden with every label asked for
 //      and shown when the far half of the screen asked for none (asserted: at most R1_MAX_REVIVED
 //      of the far hidden labels, beyond the flips of a control run that changes nothing).
@@ -227,7 +227,7 @@ function r1(placer) {
 			c.ids.forEach(function (id) { ids.push(scene.id + ' ' + id); });
 		});
 	});
-	console.log('  hidden although free ground within ' + R1.REACH_ROWS + ' rows could hold the ID row: ' + T.withRoom + '/' + T.hidden
+	console.log('  hidden although free ground within ' + R1.REACH_ROWS + ' rows could hold the last-kept value: ' + T.withRoom + '/' + T.hidden
 		+ (T.hidden ? ' (' + (100 * T.withRoom / T.hidden).toFixed(1) + '%)' : '') + ' (reported)');
 	if (!probed) { console.log('  ..   R1 not by count: not measurable (this placer cannot place a scene it has not seen)'); return T; }
 	const beyond = Math.max(0, T.revived - T.controlFlips);
