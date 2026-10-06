@@ -36122,8 +36122,8 @@ var EngCalcs = EngCalcs || {};
 			codesRow.appendChild(document.createTextNode(' '));
 			codesRow.appendChild(codesLabel);
 			wrap.appendChild(codesRow);
+			// Empty while unticked rather than hidden: it is part of this box, not a panel.
 			codesTable.id = 'lpn_survey_code_table';
-			codesTable.style.display = 'none';
 			codesTable.style.margin = '0 0 6px 1.5em';
 			wrap.appendChild(codesTable);
 			function fillCodeTable() {
@@ -36176,8 +36176,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			codesBox.addEventListener('change', function () {
 				useCodes = !!codesBox.checked;
-				codesTable.style.display = useCodes ? '' : 'none';
-				if (useCodes) { fillCodeTable(); }
+				if (useCodes) { fillCodeTable(); } else { codesTable.innerHTML = ''; }
 				draw();
 			});
 			// **THE CHOOSER IS SHOWN EVEN WHEN THE HEADER ANSWERED, AND IT SHOWS WHAT THE HEADER
@@ -36303,8 +36302,10 @@ var EngCalcs = EngCalcs || {};
 		var nodePoints = codePlan
 			? codePlan.nodes.map(function (w) { return { p: parsed.points[w.pt], as: w.as, pt: w.pt }; })
 			: parsed.points.map(function (p) { return { p: p, as: type }; });
+		// One crossing into the drawing frame for a surveyed position, node or vertex alike.
+		function surveyAt(p) { return { x: inwardX(p.east), y: inwardY(p.north) }; }
 		nodePoints.forEach(function (w) {
-			var p = w.p, type = w.as;
+			var p = w.p, type = w.as, at = surveyAt(p);
 			// **THE EAST COLUMN IS THE DOCUMENT'S x AND THE NORTH COLUMN IS ITS y, in every kind of
 			// project** -- a longitude on a georeferenced one, an easting on a projected one, a
 			// plain X on a grid. inwardX/inwardY is the one door either number comes through, and it
@@ -36315,7 +36316,7 @@ var EngCalcs = EngCalcs || {};
 			// set -- none of which a point list states, and all of which the reader can edit. An
 			// ELEVATION is the one field all three share, which is why the file's own number needs
 			// no case below.
-			var n = addNode(type, inwardX(p.east), inwardY(p.north)), want = p.id;
+			var n = addNode(type, at.x, at.y), want = p.id;
 			// **THE SOURCE RECORD IS GEOGRAPHIC ONLY, for the reason setNodeCoordAxis() states**:
 			// these two keys are stripped from the snapshot by unprojectStoredGeo(), which no other
 			// kind of project runs -- so writing one here would put it in the saved file. A grid
@@ -36370,8 +36371,8 @@ var EngCalcs = EngCalcs || {};
 				}), verts, l;
 				if (!ends[0] || !ends[1] || !nodeById(ends[0]) || !nodeById(ends[1])) { return; }
 				verts = pp.verts.map(function (i) {
-					var v = parsed.points[i];
-					return { x: inwardX(v.east), y: inwardY(v.north), e: v.east, n: v.north };
+					var v = parsed.points[i], at = surveyAt(v);
+					return { x: at.x, y: at.y, e: v.east, n: v.north };
 				});
 				l = addLink('pipe', ends[0], ends[1], verts);
 				if (geo) {
