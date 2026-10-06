@@ -3977,6 +3977,8 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 .lpn-fb-sends { margin: 10px 0 0; font-size: 0.9em; color: var(--ec-ink-muted); }
 .lpn-fb-status { margin: 8px 0 0; min-height: 1.2em; }
 .lpn-fb-status.lpn-fb-error { color: var(--ec-error-ink); }
+/* The honeypot field: never shown, never reached by Tab, filled only by a bot. */
+.lpn-fb-trap { display: none; }
 /* ---- The message log button and list (ROADMAP Task 704) ----
    Moved 2026-09-21 into #lpn_map_overlay_tl, beside the mode hint it recalls (Tom: "the
    button/glyph must be where the messages appear"). **OPAQUE, not the translucent pill paint the

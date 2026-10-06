@@ -59021,7 +59021,7 @@ var EngCalcs = EngCalcs || {};
 			var intro = document.createElement('p');
 			intro.className = 'lpn-dialog-msg';
 			intro.id = 'lpn_fb_intro';
-			intro.textContent = pc.lpn_fb_intro || '';
+			intro.textContent = pc.lpn_fb_intro;
 			wrap.appendChild(intro);
 			var group = document.createElement('div');
 			group.className = 'lpn-fb-picks';
@@ -59041,17 +59041,17 @@ var EngCalcs = EngCalcs || {};
 				els.picks.push(b);
 			});
 			wrap.appendChild(group);
-			els.comment = field(wrap, pc.lpn_fb_comment || '', 'textarea', 'lpn-fb-comment');
+			els.comment = field(wrap, pc.lpn_fb_comment, 'textarea', 'lpn-fb-comment');
 			els.comment.rows = 4;
 			els.comment.value = st.comment;
-			els.email = field(wrap, pc.lpn_fb_email || '', 'input', 'lpn-fb-email');
+			els.email = field(wrap, pc.lpn_fb_email, 'input', 'lpn-fb-email');
 			els.email.type = 'email';
 			els.email.autocomplete = 'email';
 			els.email.value = st.email;
-			// THE HONEYPOT. display:none, so no visitor sees it, Tab never reaches it (the box's Tab
+			// THE HONEYPOT. display:none (.lpn-fb-trap), so no visitor sees it, Tab never reaches it (the box's Tab
 			// ring skips what has no layout), and the endpoint drops any post that fills it.
 			var trapBox = document.createElement('div');
-			trapBox.style.display = 'none';
+			trapBox.className = 'lpn-fb-trap';
 			trapBox.setAttribute('aria-hidden', 'true');
 			els.trap = document.createElement('input');
 			els.trap.type = 'text';
@@ -59062,7 +59062,7 @@ var EngCalcs = EngCalcs || {};
 			wrap.appendChild(trapBox);
 			var sends = document.createElement('p');
 			sends.className = 'lpn-fb-sends';
-			sends.textContent = pc.lpn_fb_sends || '';
+			sends.textContent = pc.lpn_fb_sends;
 			wrap.appendChild(sends);
 			els.status = document.createElement('p');
 			els.status.setAttribute('role', 'status');
@@ -59072,7 +59072,7 @@ var EngCalcs = EngCalcs || {};
 		}, [
 			{ label: pc.lpn_fb_send || 'Send', keepOpen: true, fn: send },
 			{ label: pc.lpn_cancel || 'Cancel', cancel: true, fn: function () { } }
-		], { title: pc.lpn_wrong_btn || '', focus: function () { return els.picks[0]; } });
+		], { title: pc.lpn_wrong_btn, focus: function () { return els.picks[0]; } });
 		var bar = document.getElementById('lpn_dialog_buttons');
 		if (bar && bar.firstChild) { bar.firstChild.dataset.fbSend = '1'; }
 	}
