@@ -230,10 +230,6 @@ the block.
   selection set from menu choices (his leading candidate: Highlighted / Chosen), and an audit of tip
   pollution in lpn (status strip, click-to-open, delays in master styles, tips that talk down).
   Ida's audit: `dev/tip-and-selection-audit.md` (branch `chore/ida-tip`); decisions go to him as an interview.
-- 100|774| **Description edits in Properties are refused or vanish.**
-  Tom, 2026-10-06: a new Description first "wouldn't accept a space. Then it wouldn't appear" until
-  close and reopen; past an unstated length limit an edit, and then deleting it, "wouldn't appear";
-  the Tables pane took the same edit. "This kept happening repeatedly." Branch `fix/lpn-description`.
 - 100|775| **File, Convert as: five defects from one session in Fotobi, Ghana.**
   Tom, 2026-10-06: after converting WGS84 to Pseudo Mercator the OLD project lost its node symbols
   (back after close and reopen) and was zoomed somewhere wrong; File, New with EPSG:3857 shows 4326
