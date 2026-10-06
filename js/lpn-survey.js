@@ -8,8 +8,10 @@
 // honoured out. It creates nothing and draws nothing -- js/looped-network.js owns the document, the
 // undo stack and the map.
 //
-// **JUNCTIONS ONLY, AND NO PIPES.** A surveyed point list is points. Which of them are connected,
-// and in what order, is a decision the surveyor did not write down and we must not invent.
+// **POINTS ONLY, AND NO PIPES, UNLESS THE SURVEYOR CODED THEM.** A surveyed point list is points.
+// Which of them are connected is a decision we must not invent -- so pipes are drawn only when the
+// reader ticks "field codes" and the Description states the connection in a published convention
+// (Carlson / Civil 3D linework codes; Task 771, dev/survey-codes.md).
 //
 // THE ONE RULE THAT DECIDES EVERY CASE BELOW, taken from js/lpn-inp.js because this is the same
 // question in a smaller file: **a row that cannot be honoured is REPORTED, never dropped in silence
