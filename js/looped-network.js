@@ -26766,9 +26766,9 @@ var EngCalcs = EngCalcs || {};
 			}
 			return setScenarioSetting(scn, row.path, p.v);
 		}
-		// The undo step the cell took (paneCommitCell(), a paste) is made to carry the settings, so
+		// The undo step the cell took (paneCommitCell(), a paste) is made to carry this setting, so
 		// Ctrl+Z puts a Base value back as it does a scenario's.
-		undoTopHoldsSettings();
+		if (settingProjectRoot(row.path[0])) { undoTopHoldsSettingPaths([row.path]); }
 		if (row.path[0] === 'times') {
 			times = doc.times || (doc.times = EngCalcs.lpnTimesDefaults());
 			times[k] = p.v;
@@ -49176,7 +49176,7 @@ var EngCalcs = EngCalcs || {};
 					if (e && e.preventDefault) { e.preventDefault(); }
 					if (e && e.stopPropagation) { e.stopPropagation(); }
 					saveUndoSnapshot();
-					undoTopHoldsSettings();
+					undoTopHoldsSettingPaths([['settings', 'customProps']]);
 					settings.customProps.splice(i, 1);
 					saveToStorage();
 					rebuildSettingsFields();
@@ -49341,7 +49341,7 @@ var EngCalcs = EngCalcs || {};
 			helpTip(add, pc.lpn_cp_add_tip);
 			add.addEventListener('click', function () {
 				saveUndoSnapshot();
-				undoTopHoldsSettings();
+				undoTopHoldsSettingPaths([['settings', 'customProps']]);
 				if (!settings.customProps) { settings.customProps = []; }
 				// BLANK, not a copy of the row above. A new row is a question to the user, exactly
 				// as a new demand category is, and seeding it with somebody else's design would put
@@ -59452,27 +59452,38 @@ var EngCalcs = EngCalcs || {};
 	function counterSnapshot(snap) {
 		var back = makeUndoSnapshot();
 		if (snap.project) { back.project = JSON.parse(JSON.stringify(project)); }
-		if (snap.settingsState) { back.settingsState = settingsStateCopy(); }
+		if (snap.settingPaths) {
+			back.settingPaths = snap.settingPaths.map(function (e) { return { path: e.path, value: settingProjectGet(e.path) }; });
+		}
 		return back;
 	}
-	// **AN UNDO STEP THAT EDITS THE PROJECT'S SETTINGS CARRIES THEM** (`settingsState`), the way one
-	// that edits `project` carries it: `settings` and `labelSettings` live outside `doc`, so the
-	// plain snapshot never held them. Opt-in per step, NOT in every snapshot: most Settings box
-	// editors take no undo step at all, and a snapshot that always carried the settings would let
-	// Ctrl+Z on an earlier element edit silently revert a setting changed since. The Settings
-	// table's Base edits and the custom property Add and Remove buttons take it.
-	function settingsStateCopy() {
-		return JSON.parse(JSON.stringify({ settings: settings, labelSettings: labelSettings }));
+	// **AN UNDO STEP THAT EDITS A PROJECT SETTING CARRIES THAT SETTING, AND ONLY THAT ONE**
+	// (`settingPaths`: each path with the value it had before), the way one that edits `project`
+	// carries it: `settings` and `labelSettings` live outside `doc`, so the plain snapshot never held
+	// them. Path by path, never the whole object (Perry's review, 2026-10-06): a step carrying all
+	// the settings made Ctrl+Z on a table edit also revert a Settings box edit made after it.
+	function settingProjectRoot(root) { return root === 'settings' ? settings : root === 'labelSettings' ? labelSettings : root === 'project' ? project : null; }
+	function settingProjectGet(path) {
+		var r = settingProjectRoot(path[0]);
+		return r ? altCopy(settingGet({ r: r }, ['r'].concat(path.slice(1)))) : undefined;
 	}
-	function undoTopHoldsSettings() {
+	function settingProjectPut(path, value) {
+		var node = settingProjectRoot(path[0]), i;
+		if (!node) { return; }
+		for (i = 1; i < path.length - 1; i++) {
+			if (!plainObject(node[path[i]])) { if (value === undefined) { return; } node[path[i]] = {}; }
+			node = node[path[i]];
+		}
+		if (value === undefined) { delete node[path[path.length - 1]]; } else { node[path[path.length - 1]] = altCopy(value); }
+	}
+	function undoTopHoldsSettingPaths(paths) {
 		var top = undoStack[undoStack.length - 1];
-		if (top && !top.settingsState) { top.settingsState = settingsStateCopy(); }
-	}
-	// In place, because readers hold the project's own objects (settingFor() hands them out).
-	function restoreSettingsState(st) {
-		[[settings, st.settings], [labelSettings, st.labelSettings]].forEach(function (pair) {
-			Object.keys(pair[0]).forEach(function (k) { delete pair[0][k]; });
-			Object.keys(pair[1] || {}).forEach(function (k) { pair[0][k] = pair[1][k]; });
+		if (!top) { return; }
+		top.settingPaths = top.settingPaths || [];
+		paths.forEach(function (p) {
+			var k = JSON.stringify(p);
+			if (top.settingPaths.some(function (e) { return JSON.stringify(e.path) === k; })) { return; }
+			top.settingPaths.push({ path: p.slice(), value: settingProjectGet(p) });
 		});
 	}
 	// Puts the page back to one snapshot, for undo() and redo() alike.
@@ -59487,7 +59498,7 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) { wasAt[n.id] = nodeDrawX(n) + ',' + nodeDrawY(n); });
 		doc = snap.state.doc;
 		scenarios = snap.state.scenarios;
-		if (snap.settingsState) { restoreSettingsState(JSON.parse(JSON.stringify(snap.settingsState))); }
+		if (snap.settingPaths) { snap.settingPaths.forEach(function (e) { settingProjectPut(e.path, e.value); }); }
 		touchTree('restoreUndoSnapshot');
 		// The fields only Delete network's snapshot carries (see deleteNetwork()). Assigned before
 		// the comparisons below, which then read the snapshot's own coords and basemap anyway.
@@ -59549,7 +59560,7 @@ var EngCalcs = EngCalcs || {};
 		chainResyncAfterUndo();
 		refreshScenarioStatus();
 		// A step that put settings back redraws what a setting edit redraws.
-		if (snap.settingsState) {
+		if (snap.settingPaths) {
 			refreshSymbolSizes(); refreshValueColors(); refreshBasemap(); refreshContour();
 			rebuildSettingsBox();
 			if (EngCalcs.lpnTimeTimesChanged) { EngCalcs.lpnTimeTimesChanged(); }
