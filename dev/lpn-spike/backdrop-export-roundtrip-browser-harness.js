@@ -381,7 +381,59 @@ async function main() {
 		const bInp = pick(broken, '.inp');
 		ok('an unreadable picture: the .inp alone is downloaded', Object.keys(broken).length === 1 && !!bInp, Object.keys(broken).join(', '));
 		ok('and its [BACKDROP] names no file', !!bInp && !/^\s*FILE/mi.test(String(broken[bInp])));
-		ok('and the notice says the picture could not be saved', !!bInp && a.lastNotice.includes(pcB.lpn_status_inp_exported_no_picture.replace('{file}', bInp)), a.lastNotice.slice(0, 300));
+		ok('and the notice says the picture could not be saved', !!bInp && a.lastNotice.includes(pcB.lpn_status_inp_exported_no_picture.split('{file}').join(bInp)), a.lastNotice.slice(0, 300));
+		ok('and one difference reads in the singular, never "1 things"', !/\b1 things\b/.test(a.lastNotice) &&
+			(a.lastNotice.includes(pcB.lpn_inp_export_difference_one) || !a.lastNotice.includes(pcB.lpn_inp_export_differences.split('{n}')[1])), a.lastNotice.slice(-120));
+		await a.close();
+
+		// Elm Street under another project name, picture intact.
+		const elmAs = async (name) => {
+			const b = await open(browser), d = JSON.parse(fs.readFileSync(path.join(REPO, 'examples', 'Elm-Street-Center.lwn'), 'utf8'));
+			d.project.name = name;
+			await b.page.setInputFiles('#lpn_project_file', { name: 'renamed.lwn', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(d)) });
+			await b.settle(1500);
+			return b;
+		};
+
+		console.log('\n--- a project name carrying $& and a placeholder: every name lands once, literally ---');
+		a = await elmAs('a$&b {file} x');
+		const pcN = await a.page.evaluate(() => EngCalcs.pageConfig);
+		const zN = (await exportZip(a)) || {};
+		const nInp = pick(zN, '.inp'), nBmp = pick(zN, '.bmp'), nBpw = pick(zN, '.bpw');
+		ok('the .zip and the .inp keep the project name', a.zipName === 'a$&b-{file}-x.zip' && nInp === 'a$&b-{file}-x.inp', a.zipName + ' / ' + nInp);
+		// The expected line, filled by a function replacer in one pass, independent of the page's method.
+		const want = pcN.lpn_status_inp_exported_picture.replace(/\{(zip|file|picture|world)\}/g, (m, k) =>
+			({ zip: a.zipName, file: nInp, picture: nBmp, world: nBpw })[k]);
+		ok('the notice is the template with each name put in once, $& and {file} left as typed', !!nBmp && a.lastNotice.indexOf(want) === 0, a.lastNotice.slice(0, 300));
+		await a.close();
+
+		console.log('\n--- a non-ASCII project name: the picture EPANET must find gets a plain ASCII name ---');
+		for (const [name, wantBase] of [['Café-Ñandú-水', 'Cafe-Nandu'], ['水道網', 'backdrop']]) {
+			a = await elmAs(name);
+			const z = (await exportZip(a)) || {};
+			const zi = pick(z, '.inp'), zb = pick(z, '.bmp'), zw = pick(z, '.bpw');
+			ok(name + ': the .zip and the .inp keep the project name', a.zipName === name + '.zip' && zi === name + '.inp', a.zipName + ' / ' + zi);
+			ok(name + ': the picture and world file are ' + wantBase + '.bmp/.bpw, plain ASCII', zb === wantBase + '.bmp' && zw === wantBase + '.bpw', zb + ' / ' + zw);
+			ok(name + ': the FILE line names that ASCII picture', !!zi && (bdRow(String(z[zi]), 'FILE') || []).join(' ') === wantBase + '.bmp', zi && (bdRow(String(z[zi]), 'FILE') || []).join(' '));
+			await a.close();
+		}
+
+		console.log('\n--- the .zip cannot be built: the bare .inp, naming no picture, and said ---');
+		a = await open(browser);
+		await a.page.evaluate(() => {
+			const RealBlob = window.Blob;
+			window.Blob = function (parts, opts) {
+				if (opts && opts.type === 'application/zip') { throw new Error('harness: no memory for the archive'); }
+				return new RealBlob(parts, opts);
+			};
+			window.Blob.prototype = RealBlob.prototype;
+		});
+		await a.openExampleCard(await a.lang('lpn_ex_elm_street_title'));
+		await a.settle(1500);
+		const failed = await exportAll(a), fInp = pick(failed, '.inp'), pcF = await a.page.evaluate(() => EngCalcs.pageConfig);
+		ok('zip failure: the .inp alone is downloaded', Object.keys(failed).length === 1 && !!fInp, Object.keys(failed).join(', '));
+		ok('zip failure: its [BACKDROP] names no file', !!fInp && !/^\s*FILE/mi.test(String(failed[fInp])));
+		ok('zip failure: the notice says the picture could not be saved', !!fInp && a.lastNotice.includes(pcF.lpn_status_inp_exported_no_picture.split('{file}').join(fInp)), a.lastNotice.slice(0, 300));
 		await a.close();
 		await browser.close();
 

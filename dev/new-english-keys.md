@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**21 still to read on master**, of 131 untranslated keys, of 2357 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**22 still to read on master**, of 132 untranslated keys, of 2358 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (131, 21 to read @@ NEEDS RULING)
+## lpn_  (132, 22 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -288,6 +288,9 @@ never edits a synonym.
 - **`lpn_inp_drop_pressure_unit`**
   > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
   _Ruled OK 2026-10-05._
+- **`lpn_inp_export_difference_one`**
+  > One thing the .inp format cannot hold.
+  @@ NEEDS RULING
 - **`lpn_mode_add_chain`**
   > Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
   _Ruled OK 2026-10-05._
@@ -473,7 +476,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**111 still to read**, of 114 new keys across 15 unmerged branch(es).
+**125 still to read**, of 128 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -484,7 +487,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/asset-type (`78aa447b`) — 25 new, 25 to read @@ NEEDS RULING
+### feat/asset-type (`4c26066b`) — 25 new, 25 to read @@ NEEDS RULING
 
 - **`lpn_change_type_born`**
   > These are new, as on a newly drawn one:
@@ -562,9 +565,9 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
   @@ NEEDS RULING
 
-### feat/backdrop-attach (`55bb434f`) — adds no English strings
+### feat/backdrop-attach (`eb541779`) — adds no English strings
 
-### feat/bentley-interop (`fb45a301`) — 19 new, 19 to read @@ NEEDS RULING
+### feat/bentley-interop (`6195c2f8`) — 19 new, 19 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -626,7 +629,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/feedback (`ce8819b0`) — 13 new, 13 to read @@ NEEDS RULING
+### feat/feedback (`1be9dba0`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_fb_bad_email`**
   > That email address does not look right. Correct it, or leave it empty.
@@ -774,7 +777,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
   @@ NEEDS RULING
 
-### feat/survey-code (`ab7795a1`) — 28 new, 28 to read @@ NEEDS RULING
+### feat/survey-code (`ba5d5991`) — 32 new, 32 to read @@ NEEDS RULING
 
 - **`lpn_pane_clear_override`**
   > Clear override
@@ -824,11 +827,23 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_survey_note_line_one_point`**
   > Only point on its line, no pipe drawn from it.
   @@ NEEDS RULING
+- **`lpn_survey_note_line_plain`**
+  > Line {line}: {sev}: {text}
+  @@ NEEDS RULING
 - **`lpn_survey_note_no_desc`**
   > Field codes are on, but this file has no description column, so no codes were read.
   @@ NEEDS RULING
+- **`lpn_survey_note_node_on_pipe`**
+  > This point lies exactly on a pipe it is not joined to. If they connect, add JPN to say so.
+  @@ NEEDS RULING
 - **`lpn_survey_note_pipe_one_node`**
   > This line returns to the same node with no other node between, no pipe drawn for it.
+  @@ NEEDS RULING
+- **`lpn_survey_note_pipe_zero_length`**
+  > This point is at the same spot as the node before it, so the pipe between them has no length.
+  @@ NEEDS RULING
+- **`lpn_survey_note_ring_junction`**
+  > This point became a junction so the ring could close.
   @@ NEEDS RULING
 - **`lpn_survey_note_vertex_text`**
   > Not every word is a code this page reads, and a vertex keeps no description.
@@ -861,4 +876,37 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
   @@ NEEDS RULING
 
-### feat/tip-door (`4df634f8`) — adds no English strings
+### feat/tip-door (`2a64dbe5`) — adds no English strings
+
+### fix/si-default-diameter (`15e8b412`) — 10 new, 10 to read @@ NEEDS RULING
+
+- **`lpn_pane_clear_override`**
+  > Clear override
+  @@ NEEDS RULING
+- **`lpn_pane_scn_alt_tip`**
+  > {category} alt.: {alternative}
+  @@ NEEDS RULING
+- **`lpn_pane_scn_show`**
+  > Show scenarios
+  @@ NEEDS RULING
+- **`lpn_valwarn_diameter`**
+  > A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.
+  @@ NEEDS RULING
+- **`lpn_valwarn_dw`**
+  > A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.
+  @@ NEEDS RULING
+- **`lpn_valwarn_hw`**
+  > A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
+  @@ NEEDS RULING
+- **`lpn_valwarn_manning`**
+  > A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
+  @@ NEEDS RULING
+- **`lpn_valwarn_negative`**
+  > EPANET refuses a negative number here.
+  @@ NEEDS RULING
+- **`lpn_valwarn_positive`**
+  > EPANET refuses zero or a negative number here.
+  @@ NEEDS RULING
+- **`lpn_valwarn_tank_levels`**
+  > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
+  @@ NEEDS RULING

@@ -90,6 +90,13 @@ with one gesture. Windows opens a `.zip` like a folder, but EPANET started from 
 the `.inp`, which is why the status line says to extract all three first. If the `.inp` is opened
 without the picture beside it, EPANET asks for it (`Fmain.pas FindBackdropFile`).
 
+**The picture's name is plain ASCII.** EPANET 2.2 desktop is a Delphi ANSI program and reads the
+FILE line in the system code page, so a name outside it may not be found. The `.bmp` and `.bpw` take
+the project name with accents removed and anything else outside A-Z, 0-9, `.`, `_` and `-` turned to a
+dash (`Café-Ñandú-水` gives `Cafe-Nandu.bmp`), or `backdrop` when nothing is left. The `.inp` and the
+`.zip` keep the project's own name. If the archive cannot be built, the export falls back to the
+bare `.inp` with no FILE line and says the picture could not be saved.
+
 The archive is written in the page (PKWARE APPNOTE: local headers, central directory, end record;
 deflate through `CompressionStream('deflate-raw')`, stored when the browser lacks it; names flagged
 UTF-8). The harness reads it back with node's zlib and checks every CRC; Info-ZIP `unzip -t` and

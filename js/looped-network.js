@@ -34743,25 +34743,40 @@ var EngCalcs = EngCalcs || {};
 		document.body.removeChild(a);
 		setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
 	}
+	// **THE PICTURE'S NAME IS PLAIN ASCII.** EPANET 2.2 desktop is a Delphi ANSI program: it reads
+	// the .inp's FILE line in the system code page, so a name outside it (Café-Ñandú-水) can leave
+	// EPANET looking for a file that is not there. Accents come off (NFD, combining marks dropped),
+	// anything else becomes a dash, and a name with no letter or digit left is "backdrop". The .inp
+	// and the .zip keep the project's own name; only what the FILE line names has to survive ANSI.
+	function asciiPictureBase(name) {
+		var s = String(name || '');
+		if (s.normalize) { s = s.normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+		s = s.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/-{2,}/g, '-').replace(/^[-.]+|[-.]+$/g, '');
+		return /[A-Za-z0-9]/.test(s) ? s : 'backdrop';
+	}
 	function exportInpFile() {
-		var pcX = EngCalcs.pageConfig || {}, base = safeFileName(projectDisplayName(project));
+		var pcX = EngCalcs.pageConfig || {}, base = safeFileName(projectDisplayName(project)),
+			picBase = asciiPictureBase(base);
 		saveToStorage();   // export what is on screen, including edits not yet saved
+		// Every name goes in by split/join, never String.replace(): a project named `a$&b {file}`
+		// would otherwise have its `$&` expanded, or its own `{file}` filled by the next replace.
 		// pic: an object (the picture, saved), null (no picture to save), false (a picture this
-		// page could not read back, so it is said, and the .inp names none).
-		backdropExportPicture(function (pic) {
+		// page could not read back, or a .zip that could not be built, so it is said, and the .inp
+		// names none).
+		function finish(pic) {
 			var opts = inpExportOptions(), out, inpName = base + '.inp',
-				picName = base + '.bmp', worldName = base + '.bpw', zipName = base + '.zip';
+				picName = picBase + '.bmp', worldName = picBase + '.bpw', zipName = base + '.zip';
 			if (pic) { opts.backdropFile = picName; }
 			out = EngCalcs.lpnExportInp(serializeProject(), opts);
 			if (!out || !out.ok) {
 				setNotice((pcX.lpn_inp_export_refused || 'This project cannot be written as an EPANET file: {detail}')
-					.replace('{detail}', (out && out.detail) || '?'));
+					.split('{detail}').join((out && out.detail) || '?'));
 				return;
 			}
-			var tail = out.differences && out.differences.length
-				? ' ' + (pcX.lpn_inp_export_differences || '{n} things the .inp format cannot hold.')
-					.replace('{n}', String(out.differences.length))
-				: '';
+			var nDiff = out.differences ? out.differences.length : 0,
+				tail = nDiff === 1 ? ' ' + (pcX.lpn_inp_export_difference_one || 'One thing the .inp format cannot hold.')
+					: nDiff ? ' ' + (pcX.lpn_inp_export_differences || '{n} things the .inp format cannot hold.').split('{n}').join(String(nDiff))
+					: '';
 			// EXPORTING IS NOT SAVING. No stampProjectSaved() here, deliberately: an `.inp` cannot hold
 			// this document (scenarios, text sizes, a backdrop image), so a project that has only been
 			// exported still has unsaved changes and must keep saying so.
@@ -34769,19 +34784,31 @@ var EngCalcs = EngCalcs || {};
 				downloadBlob(new Blob([out.inp], { type: 'text/plain' }), inpName);
 				setNotice((pic === false
 					? (pcX.lpn_status_inp_exported_no_picture || 'Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.')
-					: (pcX.lpn_status_inp_exported || 'Exported {file}.')).replace('{file}', inpName) + tail);
+					: (pcX.lpn_status_inp_exported || 'Exported {file}.')).split('{file}').join(inpName) + tail);
 				showInpExportFlattening(out.differences, inpName);
 				return;
 			}
-			buildZip([{ name: inpName, data: out.inp }, { name: picName, data: pic.bmp }, { name: worldName, data: pic.world }])
-				.then(function (zip) {
-					downloadBlob(zip, zipName);
-					setNotice((pcX.lpn_status_inp_exported_picture || 'Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.')
-						.replace('{zip}', zipName).replace('{picture}', picName).replace('{world}', worldName)
-						.replace('{file}', inpName) + tail);
-					showInpExportFlattening(out.differences, inpName);
-				});
-		});
+			var built;
+			try {
+				built = buildZip([{ name: inpName, data: out.inp }, { name: picName, data: pic.bmp }, { name: worldName, data: pic.world }]);
+			} catch (e) { built = Promise.reject(e); }
+			built.then(function (zip) {
+				downloadBlob(zip, zipName);
+				// Each placeholder filled once: first marked by a control character (safeFileName()
+				// strips those from every name), then the marks filled. A name carrying another
+				// placeholder's token is therefore never filled a second time.
+				var tpl = pcX.lpn_status_inp_exported_picture || 'Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.';
+				setNotice(tpl.split('{zip}').join('\u0001').split('{file}').join('\u0002')
+					.split('{picture}').join('\u0003').split('{world}').join('\u0004')
+					.split('\u0001').join(zipName).split('\u0002').join(inpName)
+					.split('\u0003').join(picName).split('\u0004').join(worldName) + tail);
+				showInpExportFlattening(out.differences, inpName);
+			}, function () {
+				// No archive, so no picture: the bare .inp, written again without a FILE line, and said.
+				finish(false);
+			});
+		}
+		backdropExportPicture(finish);
 	}
 	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being
