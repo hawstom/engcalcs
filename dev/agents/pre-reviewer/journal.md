@@ -3867,3 +3867,8 @@ OBSERVED real Chromium: branch's own harness passes. All 7 shipped examples: 0 w
 OBSERVED DEFECT: touch (hover none): tapping the glyph in the Properties box opens the tip AND focuses the Diameter input (label activation), the exact 2026-08-29 complaint; initTips only cancels this on `.ec-tip`, the glyph here is a bare `.ec-help`. Tables-pane tap also focuses a cell input.
 OBSERVED: Basic-example-SI-units opens with roughness unit ft (pre-existing); under D-W its tip reads ft in an SI project.
 SPECULATION: how the glyph looks (zero-width inset over the input end) not judged.
+
+## feat/table-export (Task 776) at 9dd3bc32 (OBSERVED, 2026-10-06; re-verify before citing)
+OBSERVED real Chromium, Net1 solved: CSV and ODS download once per click from Junctions, Pipes, Pumps, and from a Show-scenarios Junctions table; results columns carry the displayed numbers; sorted order and Selection-only filter honoured; headings clean (no soft hyphens), units present. ODS passes zipfile/unzip -t and XML parse; office:value always dot-decimal, also under ?lang=fr and de (cell text is never localized). Copy with headings and plain Copy read back from the real clipboard correctly. Menu fits at 390x900 and 390x640. Harness 3 mutations all caught. No LibreOffice/soffice on this box: a real office suite NOT run.
+OBSERVED limits: an empty table (Valves, 0 rows) has no cell to right-click, so it cannot be exported; yes/no columns export 1/0; a From/To value like 007 would be a float cell with office:value="007" (office suite behaviour unverified); fr/de menus show the three new rows in English until translated.
+Lesson: pressing a menu row by text prefix hit a different "Copy" button elsewhere; match inside the menu only.
