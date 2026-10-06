@@ -537,3 +537,5 @@ N+5. **A check that flags one English string holding both a select word and an o
 
 - Instrument nothing, but ask Tom/testers: do you ever press Restart or End instead of the step selector? (decides whether they stay)
 - Consider the menu bar's bordered pills in the same hierarchy review (same "boxed" problem as the transport; Task 616 lineage).
+
+- (2026-10-05) Feedback usage data: how often does `lpn wrong:*` fire vs contact sends per week (log/lang-log-stats.sh)? Decides whether the in-page dialog is worth ~310 strings.

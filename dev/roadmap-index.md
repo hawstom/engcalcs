@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**85 open tasks.** Next (100): 7 · Soon (75): 10 · Someday (50): 34 · Maybe (25): 15 · Parked (5): 19
+**91 open tasks.** Next (100): 7 · Soon (75): 15 · Someday (50): 35 · Maybe (25): 15 · Parked (5): 19
 
 ## 100 — Next (7)
 
@@ -19,7 +19,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 741 — The infinite map: generated networks for the label bench.
 - ! Task 759 — One word for the map selection, another for a menu choice; tips that earn their place.
 
-## 75 — Soon (10)
+## 75 — Soon (15)
 
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
 - Task 617 — More map view options, the opacity one having shipped.
@@ -31,8 +31,13 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 763 — A searchable help manual, built from the tips Tom cut.
 - Task 766 — Show scenarios in the Tables pane: one row per asset per scenario.
+- Task 768 — Report a problem: more information and freedom than one anonymous click.
+- Task 769 — Change type: a junction becomes a tank, a pipe a valve.
+- Task 770 — A warning glyph on every unreasonable value.
+- Task 771 — Survey points as a script: the Description names the asset or vertex.
+- Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 
-## 50 — Someday (34)
+## 50 — Someday (35)
 
 - ! Task 146.09 — An inset overview map: the whole project, with a box round where you are.
 - Task 217 — A suite-owned, multilingual Manning's n table, built from primary sources.
@@ -68,6 +73,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 733 — Grow the native solver, in phases, to everything EPANET's solves.
 - Task 734 — Where space is open east or west, one label on one line.
 - Task 736 — [H] · Count installs and app launches, if the consent text allows it.
+- Task 773 — Hover shows an asset's full label, as if every field were ticked.
 
 ## 25 — Maybe (15)
 
@@ -113,5 +119,5 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
 ---
 
-77 of 85 titles are within 4–12 words. `!` marks the rest;
+83 of 91 titles are within 4–12 words. `!` marks the rest;
 `php dev/scripts/roadmap_id_check.php` lists them with their word counts.
