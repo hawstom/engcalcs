@@ -539,6 +539,20 @@
    "words": "feat/engine-prefetch: Merge.",
    "context": "Pasted message answering the 2026-10-06 handoff report.",
    "pin_note": "Pinned to the head the preview served when he tested it."
+  },
+  "feat/scenario-table": {
+   "head": "896b12590ed2aa162ef1b6c991817d635ecee833",
+   "date": "2026-10-06",
+   "words": "Good. Merge.",
+   "context": "Said after his browser pass, in his pasted message of 2026-10-06 listing each branch's verdict (\"2. feat/scenario-table: Good. Merge.\").",
+   "pin_note": "Pinned to the merge of master into the branch made right after his word, so the suite could run on it; it adds only master's commits."
+  },
+  "feat/value-warning": {
+   "head": "0a6d4c196742c412aecf735d72c7dd5045845a28",
+   "date": "2026-10-06",
+   "words": "Merge.",
+   "context": "Said after his browser pass, in his pasted message of 2026-10-06 (\"5. feat/value-warning (new): Merge.\"). The two numbers put to him (Darcy-Weisbach roughness limit 10 mm, Hazen-Williams C ceiling 200) were not answered and ship as built.",
+   "pin_note": "Pinned to the merge of master into the branch made right after his word; it adds only master's commits."
   }
  }
 }

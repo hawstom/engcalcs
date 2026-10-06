@@ -306,7 +306,9 @@ console.log('\n--- nothing on the sheet is a control ---');
 	report(src.split('function paneCellText(').length === 2, 'one function decides a cell’s text');
 	// (R-111: the refill now writes a cell only when its text changed, so the value arrives through
 	// a local -- still paneCellText()'s, and still the only thing either write is handed.)
-	report(/text = paneCellText\(c, el\);\s*if \(target\.textContent !== text\) \{ target\.textContent = text; \}/.test(src) &&
+	// A plain cell is written through paneCellDisplayText(), which is paneCellText() for every column
+	// but a choice, whose label it reads from the same list the pull-down shows (Show scenarios).
+	report(/text = paneCellDisplayText\(c, el, true\);\s*if \(target\.textContent !== text\) \{ target\.textContent = text; \}/.test(src) &&
 		/text = paneCellText\(c, el\);\s*if \(target\.value !== text\) \{ target\.value = text; \}/.test(src),
 		'...and the live table fills its cells through it too');
 }

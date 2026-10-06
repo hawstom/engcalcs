@@ -132,7 +132,13 @@
         "feat/tip-door",
         "feat/scenario-table",
         "feat/screenshot",
-        "feat/backdrop-attach"
+        "feat/backdrop-attach",
+        "feat/value-warning",
+        "feat/asset-type",
+        "feat/feedback",
+        "feat/survey-code",
+        "feat/geojson",
+        "feat/dxf"
     ],
     "feature_freeze": {
         "active": false,

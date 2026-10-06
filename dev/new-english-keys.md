@@ -96,36 +96,6 @@ never edits a synonym.
 - **`lpn_basemap_style_normal`**
   > Normal
   _Ruled OK 2026-10-05._
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  @@ NEEDS RULING
-- **`lpn_change_type_line`**
-  > {id}: {property} {value}
-  @@ NEEDS RULING
-- **`lpn_change_type_line_scenario`**
-  > {id}: {property} {value}, in scenario {scenario}
-  @@ NEEDS RULING
-- **`lpn_change_type_lost`**
-  > These values will be lost:
-  @@ NEEDS RULING
-- **`lpn_change_type_meaning`**
-  > These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.
-  @@ NEEDS RULING
-- **`lpn_change_type_menu`**
-  > Change type
-  @@ NEEDS RULING
-- **`lpn_change_type_more`**
-  > And {n} more.
-  @@ NEEDS RULING
-- **`lpn_change_type_ok`**
-  > Change
-  @@ NEEDS RULING
-- **`lpn_change_type_surface`**
-  > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
-  @@ NEEDS RULING
-- **`lpn_change_type_tip`**
-  > Change the selected nodes into junctions, reservoirs, or tanks. Each keeps its ID, its place, its pipes, and every value the new type also has. If anything would be lost, you are asked first.
-  @@ NEEDS RULING
 - **`lpn_choice_default`**
   > Default
   _Ruled OK 2026-10-05._
@@ -309,6 +279,9 @@ never edits a synonym.
 - **`lpn_mode_add_chain`**
   > Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
   _Ruled OK 2026-10-05._
+- **`lpn_pane_clear_override`**
+  > Clear override
+  @@ NEEDS RULING
 - **`lpn_pane_delete_element`**
   > Delete element
   @@ NEEDS RULING
@@ -327,6 +300,12 @@ never edits a synonym.
 - **`lpn_pane_manage_cols_width`**
   > Width (em)
   _Ruled OK 2026-10-05._
+- **`lpn_pane_scn_alt_tip`**
+  > {category} alt.: {alternative}
+  @@ NEEDS RULING
+- **`lpn_pane_scn_show`**
+  > Show scenarios
+  @@ NEEDS RULING
 - **`lpn_pane_sel_only`**
   > Selection only
   _Ruled OK 2026-10-05._
@@ -480,12 +459,33 @@ never edits a synonym.
 - **`lpn_tool_add_chain_tip`**
   > Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
   _Ruled OK 2026-10-05._
+- **`lpn_valwarn_diameter`**
+  > A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.
+  @@ NEEDS RULING
+- **`lpn_valwarn_dw`**
+  > A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.
+  @@ NEEDS RULING
+- **`lpn_valwarn_hw`**
+  > A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
+  @@ NEEDS RULING
+- **`lpn_valwarn_manning`**
+  > A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
+  @@ NEEDS RULING
+- **`lpn_valwarn_negative`**
+  > EPANET refuses a negative number here.
+  @@ NEEDS RULING
+- **`lpn_valwarn_positive`**
+  > EPANET refuses zero or a negative number here.
+  @@ NEEDS RULING
+- **`lpn_valwarn_tank_levels`**
+  > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**27 still to read**, of 30 new keys across 15 unmerged branch(es).
+**40 still to read**, of 43 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -496,7 +496,38 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/asset-type (`e06cebac`) — adds no English strings
+### feat/asset-type (`c49cc214`) — 10 new, 10 to read @@ NEEDS RULING
+
+- **`lpn_change_type_key`**
+  > ID: Lost entry
+  @@ NEEDS RULING
+- **`lpn_change_type_line`**
+  > {id}: {property} {value}
+  @@ NEEDS RULING
+- **`lpn_change_type_line_scenario`**
+  > {id}: {property} {value}, in scenario {scenario}
+  @@ NEEDS RULING
+- **`lpn_change_type_lost`**
+  > These values will be lost:
+  @@ NEEDS RULING
+- **`lpn_change_type_meaning`**
+  > These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.
+  @@ NEEDS RULING
+- **`lpn_change_type_menu`**
+  > Change type
+  @@ NEEDS RULING
+- **`lpn_change_type_more`**
+  > And {n} more.
+  @@ NEEDS RULING
+- **`lpn_change_type_ok`**
+  > Change
+  @@ NEEDS RULING
+- **`lpn_change_type_surface`**
+  > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
+  @@ NEEDS RULING
+- **`lpn_change_type_tip`**
+  > Change the selected nodes into junctions, reservoirs, or tanks. Each keeps its ID, its place, its pipes, and every value the new type also has. If anything would be lost, you are asked first.
+  @@ NEEDS RULING
 
 ### feat/backdrop-attach (`7f582c54`) — 5 new, 5 to read @@ NEEDS RULING
 
@@ -516,7 +547,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {file}, the background picture {picture} and its world file {world}. Keep the three in one folder.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`0eb355c8`) — 3 new, 3 to read @@ NEEDS RULING
+### feat/bentley-interop (`d6f39266`) — 3 new, 3 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -530,7 +561,47 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/feedback (`d5b7aece`) — adds no English strings
+### feat/feedback (`c4cb8389`) — 13 new, 13 to read @@ NEEDS RULING
+
+- **`lpn_fb_bad_email`**
+  > That email address does not look right. Correct it, or leave it empty.
+  @@ NEEDS RULING
+- **`lpn_fb_busy`**
+  > Too many messages have arrived in the last few minutes. What you wrote is still here, so you can try again later.
+  @@ NEEDS RULING
+- **`lpn_fb_comment`**
+  > Comments (optional)
+  @@ NEEDS RULING
+- **`lpn_fb_email`**
+  > Email (optional, only if you want a reply)
+  @@ NEEDS RULING
+- **`lpn_fb_failed`**
+  > That did not reach us. What you wrote is still here, so you can try again.
+  @@ NEEDS RULING
+- **`lpn_fb_intro`**
+  > Pick any that fit, or none, and add whatever you like. Nothing is sent until you press Send.
+  @@ NEEDS RULING
+- **`lpn_fb_pick_broken`**
+  > Something did not work
+  @@ NEEDS RULING
+- **`lpn_fb_pick_confusing`**
+  > This is confusing
+  @@ NEEDS RULING
+- **`lpn_fb_pick_numbers`**
+  > The numbers look wrong
+  @@ NEEDS RULING
+- **`lpn_fb_pick_wording`**
+  > The wording or translation is wrong
+  @@ NEEDS RULING
+- **`lpn_fb_send`**
+  > Send
+  @@ NEEDS RULING
+- **`lpn_fb_sending`**
+  > Sending…
+  @@ NEEDS RULING
+- **`lpn_fb_sends`**
+  > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -544,7 +615,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
   _Ruled OK 2026-09-23._
 
-### feat/label-placer (`8dd849ba`) — adds no English strings
+### feat/label-placer (`0885e755`) — adds no English strings
 
 ### feat/label-placer-a (`3483bfd6`) — adds no English strings
 
@@ -553,18 +624,6 @@ build for that would be a gate nobody keeps. Refresh it with
 ### feat/label-placer-c (`9a790a3e`) — adds no English strings
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
-
-### feat/scenario-table (`896b1259`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_pane_clear_override`**
-  > Clear override
-  @@ NEEDS RULING
-- **`lpn_pane_scn_alt_tip`**
-  > {category} alt.: {alternative}
-  @@ NEEDS RULING
-- **`lpn_pane_scn_show`**
-  > Show scenarios
-  @@ NEEDS RULING
 
 ### feat/screenshot (`8a583e22`) — 9 new, 9 to read @@ NEEDS RULING
 
@@ -596,28 +655,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
   @@ NEEDS RULING
 
-### feat/tip-door (`fbf7a6c4`) — adds no English strings
-
-### feat/value-warning (`0a6d4c19`) — 7 new, 7 to read @@ NEEDS RULING
-
-- **`lpn_valwarn_diameter`**
-  > A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.
-  @@ NEEDS RULING
-- **`lpn_valwarn_dw`**
-  > A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.
-  @@ NEEDS RULING
-- **`lpn_valwarn_hw`**
-  > A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
-  @@ NEEDS RULING
-- **`lpn_valwarn_manning`**
-  > A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
-  @@ NEEDS RULING
-- **`lpn_valwarn_negative`**
-  > EPANET refuses a negative number here.
-  @@ NEEDS RULING
-- **`lpn_valwarn_positive`**
-  > EPANET refuses zero or a negative number here.
-  @@ NEEDS RULING
-- **`lpn_valwarn_tank_levels`**
-  > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
-  @@ NEEDS RULING
+### feat/tip-door (`19f79bc1`) — adds no English strings
