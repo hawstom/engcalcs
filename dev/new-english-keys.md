@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**24 still to read on master**, of 134 untranslated keys, of 2360 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**25 still to read on master**, of 135 untranslated keys, of 2361 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (134, 24 to read @@ NEEDS RULING)
+## lpn_  (135, 25 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -279,6 +279,9 @@ never edits a synonym.
 - **`lpn_mode_add_chain`**
   > Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
   _Ruled OK 2026-10-05._
+- **`lpn_pane_clear_override`**
+  > Clear override
+  @@ NEEDS RULING
 - **`lpn_pane_delete_element`**
   > Delete element
   @@ NEEDS RULING
@@ -297,6 +300,12 @@ never edits a synonym.
 - **`lpn_pane_manage_cols_width`**
   > Width (em)
   _Ruled OK 2026-10-05._
+- **`lpn_pane_scn_alt_tip`**
+  > {category} alt.: {alternative}
+  @@ NEEDS RULING
+- **`lpn_pane_scn_show`**
+  > Show scenarios
+  @@ NEEDS RULING
 - **`lpn_pane_sel_only`**
   > Selection only
   _Ruled OK 2026-10-05._
@@ -375,33 +384,6 @@ never edits a synonym.
 - **`lpn_scncmp_same`**
   > The same in every scenario
   _Ruled OK 2026-10-05._
-- **`lpn_screenshot_copied`**
-  > Screenshot copied.
-  @@ NEEDS RULING
-- **`lpn_screenshot_failed`**
-  > The screenshot could not be made.
-  @@ NEEDS RULING
-- **`lpn_screenshot_hint`**
-  > Drag a rectangle over the map, or click for the whole map. Esc cancels.
-  @@ NEEDS RULING
-- **`lpn_screenshot_menu`**
-  > Screenshot
-  @@ NEEDS RULING
-- **`lpn_screenshot_no_basemap`**
-  > The street map or satellite image could not be included.
-  @@ NEEDS RULING
-- **`lpn_screenshot_saved`**
-  > The clipboard is not available here, so the screenshot was downloaded as a PNG file.
-  @@ NEEDS RULING
-- **`lpn_screenshot_scale`**
-  > Magnification
-  @@ NEEDS RULING
-- **`lpn_screenshot_scale_tip`**
-  > The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.
-  @@ NEEDS RULING
-- **`lpn_screenshot_tip`**
-  > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
-  @@ NEEDS RULING
 - **`lpn_settings_basemap_style`**
   > Basemap style
   _Ruled OK 2026-10-05._
@@ -477,150 +459,6 @@ never edits a synonym.
 - **`lpn_tool_add_chain_tip`**
   > Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
   _Ruled OK 2026-10-05._
-
----
-
-# Strings waiting on a branch
-
-**34 still to read**, of 37 new keys across 17 unmerged branch(es).
-
-A feature waits on its branch until you have used it and said so, so this is where new
-wording lives before it reaches master. **These strings are real and are not on master**,
-which is why the list above can honestly say none while there is reading to do here.
-
-Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
-fresh by the build — a branch moves whenever anybody commits on it, and failing master's
-build for that would be a gate nobody keeps. Refresh it with
-`php dev/scripts/new_english_keys.php --write`.
-
-### chore/adviser-notes (`dab4198d`) — adds no English strings
-
-### feat/asset-type (`1bb93e5c`) — 8 new, 8 to read @@ NEEDS RULING
-
-- **`lpn_change_type_line`**
-  > {id}: {property} {value}
-  @@ NEEDS RULING
-- **`lpn_change_type_line_scenario`**
-  > {id}, in scenario {scenario}: {property} {value}
-  @@ NEEDS RULING
-- **`lpn_change_type_lost`**
-  > These values will be lost:
-  @@ NEEDS RULING
-- **`lpn_change_type_meaning`**
-  > These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.
-  @@ NEEDS RULING
-- **`lpn_change_type_menu`**
-  > Change type
-  @@ NEEDS RULING
-- **`lpn_change_type_more`**
-  > And {n} more.
-  @@ NEEDS RULING
-- **`lpn_change_type_ok`**
-  > Change
-  @@ NEEDS RULING
-- **`lpn_change_type_tip`**
-  > Change the selected nodes into junctions, reservoirs, or tanks. Each keeps its ID, its place, its pipes, and every value the new type also has. If anything would be lost, you are asked first.
-  @@ NEEDS RULING
-
-### feat/backdrop-attach (`50ebd9a7`) — 5 new, 5 to read @@ NEEDS RULING
-
-- **`lpn_inp_backdrop_attach`**
-  > Attach {file}…
-  @@ NEEDS RULING
-- **`lpn_inp_backdrop_attach_tip`**
-  > A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.
-  @@ NEEDS RULING
-- **`lpn_inp_backdrop_attached`**
-  > Attached {file}, placed where the file says it belongs.
-  @@ NEEDS RULING
-- **`lpn_inp_backdrop_attached_other`**
-  > Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.
-  @@ NEEDS RULING
-- **`lpn_status_inp_exported_picture`**
-  > Exported {file}, the background picture {picture} and its world file {world}. Keep the three in one folder.
-  @@ NEEDS RULING
-
-### feat/bentley-interop (`0eb355c8`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_alt_cat_calculation`**
-  > Calculation
-  @@ NEEDS RULING
-- **`lpn_alt_cat_presentation`**
-  > Presentation
-  @@ NEEDS RULING
-- **`lpn_scenario_delete_has_children`**
-  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
-  @@ NEEDS RULING
-
-### feat/desktop (`baba0f04`) — adds no English strings
-
-### feat/feedback (`dd5b2b0f`) — 8 new, 8 to read @@ NEEDS RULING
-
-- **`contactCategory`**
-  > What is this about?
-  @@ NEEDS RULING
-- **`contactCategoryIdea`**
-  > An idea
-  @@ NEEDS RULING
-- **`contactCategoryOther`**
-  > Other
-  @@ NEEDS RULING
-- **`contactCategoryWording`**
-  > Wrong wording or translation
-  @@ NEEDS RULING
-- **`contactCategoryWrong`**
-  > Something is wrong
-  @@ NEEDS RULING
-- **`contactContextNote`**
-  > This message will also say which page you came from, your language, and the error code if there was one. It never includes anything from your drawing.
-  @@ NEEDS RULING
-- **`contactYourEmailOptional`**
-  > Email (only if you want a reply)
-  @@ NEEDS RULING
-- **`lpn_tell_more`**
-  > Tell us more
-  @@ NEEDS RULING
-
-### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
-
-- **`lpn_confirm_labels_restore`**
-  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  _Ruled OK 2026-09-23._
-- **`lpn_labels_restore`**
-  > Restore label defaults
-  _Ruled OK 2026-09-23._
-- **`lpn_labels_restore_tip`**
-  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
-  _Ruled OK 2026-09-23._
-
-### feat/label-placer (`e1ea6e54`) — adds no English strings
-
-### feat/label-placer-a (`3483bfd6`) — adds no English strings
-
-### feat/label-placer-b (`c5905432`) — adds no English strings
-
-### feat/label-placer-c (`9a790a3e`) — adds no English strings
-
-### feat/label-placer-d (`129b63c4`) — adds no English strings
-
-### feat/scenario-table (`8113d32d`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_pane_clear_override`**
-  > Clear override
-  @@ NEEDS RULING
-- **`lpn_pane_scn_alt_tip`**
-  > {category} alt.: {alternative}
-  @@ NEEDS RULING
-- **`lpn_pane_scn_show`**
-  > Show scenarios
-  @@ NEEDS RULING
-
-### feat/screenshot (`3489e5ac`) — adds no English strings
-
-### feat/tip-door (`9a9cd3a1`) — adds no English strings
-
-### feat/value-warning (`36cdb584`) — 7 new, 7 to read @@ NEEDS RULING
-
 - **`lpn_valwarn_diameter`**
   > A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.
   @@ NEEDS RULING
@@ -643,4 +481,178 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
   @@ NEEDS RULING
 
-### fix/phone-bolt (`1ab79ee4`) — adds no English strings
+---
+
+# Strings waiting on a branch
+
+**40 still to read**, of 43 new keys across 13 unmerged branch(es).
+
+A feature waits on its branch until you have used it and said so, so this is where new
+wording lives before it reaches master. **These strings are real and are not on master**,
+which is why the list above can honestly say none while there is reading to do here.
+
+Each branch carries the commit it was read at. This part is a SNAPSHOT and is not held
+fresh by the build — a branch moves whenever anybody commits on it, and failing master's
+build for that would be a gate nobody keeps. Refresh it with
+`php dev/scripts/new_english_keys.php --write`.
+
+### feat/asset-type (`c49cc214`) — 10 new, 10 to read @@ NEEDS RULING
+
+- **`lpn_change_type_key`**
+  > ID: Lost entry
+  @@ NEEDS RULING
+- **`lpn_change_type_line`**
+  > {id}: {property} {value}
+  @@ NEEDS RULING
+- **`lpn_change_type_line_scenario`**
+  > {id}: {property} {value}, in scenario {scenario}
+  @@ NEEDS RULING
+- **`lpn_change_type_lost`**
+  > These values will be lost:
+  @@ NEEDS RULING
+- **`lpn_change_type_meaning`**
+  > These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.
+  @@ NEEDS RULING
+- **`lpn_change_type_menu`**
+  > Change type
+  @@ NEEDS RULING
+- **`lpn_change_type_more`**
+  > And {n} more.
+  @@ NEEDS RULING
+- **`lpn_change_type_ok`**
+  > Change
+  @@ NEEDS RULING
+- **`lpn_change_type_surface`**
+  > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
+  @@ NEEDS RULING
+- **`lpn_change_type_tip`**
+  > Change the selected nodes into junctions, reservoirs, or tanks. Each keeps its ID, its place, its pipes, and every value the new type also has. If anything would be lost, you are asked first.
+  @@ NEEDS RULING
+
+### feat/backdrop-attach (`7f582c54`) — 5 new, 5 to read @@ NEEDS RULING
+
+- **`lpn_inp_backdrop_attach`**
+  > Attach {file}…
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attach_tip`**
+  > A web page cannot open the picture by its name. Choose it on your device and it is placed where the file says it belongs.
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attached`**
+  > Attached {file}, placed where the file says it belongs.
+  @@ NEEDS RULING
+- **`lpn_inp_backdrop_attached_other`**
+  > Attached {picked}, placed where the file says it belongs. The file names {file}, which is a different name.
+  @@ NEEDS RULING
+- **`lpn_status_inp_exported_picture`**
+  > Exported {file}, the background picture {picture} and its world file {world}. Keep the three in one folder.
+  @@ NEEDS RULING
+
+### feat/bentley-interop (`d6f39266`) — 3 new, 3 to read @@ NEEDS RULING
+
+- **`lpn_alt_cat_calculation`**
+  > Calculation
+  @@ NEEDS RULING
+- **`lpn_alt_cat_presentation`**
+  > Presentation
+  @@ NEEDS RULING
+- **`lpn_scenario_delete_has_children`**
+  > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
+  @@ NEEDS RULING
+
+### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/feedback (`c4cb8389`) — 13 new, 13 to read @@ NEEDS RULING
+
+- **`lpn_fb_bad_email`**
+  > That email address does not look right. Correct it, or leave it empty.
+  @@ NEEDS RULING
+- **`lpn_fb_busy`**
+  > Too many messages have arrived in the last few minutes. What you wrote is still here, so you can try again later.
+  @@ NEEDS RULING
+- **`lpn_fb_comment`**
+  > Comments (optional)
+  @@ NEEDS RULING
+- **`lpn_fb_email`**
+  > Email (optional, only if you want a reply)
+  @@ NEEDS RULING
+- **`lpn_fb_failed`**
+  > That did not reach us. What you wrote is still here, so you can try again.
+  @@ NEEDS RULING
+- **`lpn_fb_intro`**
+  > Pick any that fit, or none, and add whatever you like. Nothing is sent until you press Send.
+  @@ NEEDS RULING
+- **`lpn_fb_pick_broken`**
+  > Something did not work
+  @@ NEEDS RULING
+- **`lpn_fb_pick_confusing`**
+  > This is confusing
+  @@ NEEDS RULING
+- **`lpn_fb_pick_numbers`**
+  > The numbers look wrong
+  @@ NEEDS RULING
+- **`lpn_fb_pick_wording`**
+  > The wording or translation is wrong
+  @@ NEEDS RULING
+- **`lpn_fb_send`**
+  > Send
+  @@ NEEDS RULING
+- **`lpn_fb_sending`**
+  > Sending…
+  @@ NEEDS RULING
+- **`lpn_fb_sends`**
+  > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
+  @@ NEEDS RULING
+
+### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
+
+- **`lpn_confirm_labels_restore`**
+  > Set the label columns back to their original values? This resets which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  _Ruled OK 2026-09-23._
+- **`lpn_labels_restore`**
+  > Restore label defaults
+  _Ruled OK 2026-09-23._
+- **`lpn_labels_restore_tip`**
+  > Sets the label columns back to their original values: which properties are shown, the text before and after each one, the decimals, and the drop order. Your drawing and your other settings are not changed.
+  _Ruled OK 2026-09-23._
+
+### feat/label-placer (`0885e755`) — adds no English strings
+
+### feat/label-placer-a (`3483bfd6`) — adds no English strings
+
+### feat/label-placer-b (`c5905432`) — adds no English strings
+
+### feat/label-placer-c (`9a790a3e`) — adds no English strings
+
+### feat/label-placer-d (`129b63c4`) — adds no English strings
+
+### feat/screenshot (`8a583e22`) — 9 new, 9 to read @@ NEEDS RULING
+
+- **`lpn_screenshot_copied`**
+  > Screenshot copied.
+  @@ NEEDS RULING
+- **`lpn_screenshot_failed`**
+  > The screenshot could not be made.
+  @@ NEEDS RULING
+- **`lpn_screenshot_hint`**
+  > Drag a rectangle over the map, or click for the whole map. Esc cancels.
+  @@ NEEDS RULING
+- **`lpn_screenshot_menu`**
+  > Screenshot
+  @@ NEEDS RULING
+- **`lpn_screenshot_no_basemap`**
+  > The street map or satellite image could not be included.
+  @@ NEEDS RULING
+- **`lpn_screenshot_saved`**
+  > The clipboard is not available here, so the screenshot was downloaded as a PNG file.
+  @@ NEEDS RULING
+- **`lpn_screenshot_scale`**
+  > Magnification
+  @@ NEEDS RULING
+- **`lpn_screenshot_scale_tip`**
+  > The picture's size as a multiple of the area on the screen. A larger one is sharper and makes a bigger file.
+  @@ NEEDS RULING
+- **`lpn_screenshot_tip`**
+  > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
+  @@ NEEDS RULING
+
+### feat/tip-door (`19f79bc1`) — adds no English strings
