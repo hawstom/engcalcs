@@ -1057,6 +1057,7 @@ Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-fireflow.js'));
 // Criticality analysis, for the same reason.
 Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-criticality.js'));
 Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-demandscale.js'));
+Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-tablefile.js'));
 // The [RULES] grammar (ROADMAP Task 248.03). In the SHARED stub rather than per-harness, because
 // looped-network.js's modelRules() reaches it on EVERY model assembly -- so a harness that merely
 // solves a document holding rules would otherwise send the engine nothing and pass on a page the

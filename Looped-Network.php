@@ -2297,6 +2297,9 @@ EngCalcs.pageConfig = {
 	points_data_copy: <?=json_encode($ec_lang['points_data_copy'])?>,
 	points_data_paste: <?=json_encode($ec_lang['points_data_paste'])?>,
 	lpn_pane_print: <?=json_encode($ec_lang['lpn_pane_print'])?>,
+	lpn_pane_copy_heads: <?=json_encode($ec_lang['lpn_pane_copy_heads'])?>,
+	lpn_pane_export_csv: <?=json_encode($ec_lang['lpn_pane_export_csv'])?>,
+	lpn_pane_export_ods: <?=json_encode($ec_lang['lpn_pane_export_ods'])?>,
 	lpn_time_menu: <?=json_encode($ec_lang['lpn_time_menu'])?>,
 	lpn_time_duration: <?=json_encode($ec_lang['lpn_time_duration'])?>,
 	lpn_time_hyd_step: <?=json_encode($ec_lang['lpn_time_hyd_step'])?>,
@@ -3822,6 +3825,9 @@ EngCalcs.pageConfig = {
       // looped-network.js for the same reason; absent, the Run button does nothing. ?>
 <script src="/engcalcs/js/lpn-criticality.js?v=<?=filemtime(__DIR__.'/js/lpn-criticality.js')?>"></script>
 <script src="/engcalcs/js/lpn-demandscale.js?v=<?=filemtime(__DIR__.'/js/lpn-demandscale.js')?>"></script>
+<?php // A table as TSV, CSV or ODS (Task 776). Pure, no DOM; BEFORE looped-network.js, whose Tables
+      // pane menu calls EngCalcs.lpnTableCsv() and lpnTableOds(). ?>
+<script src="/engcalcs/js/lpn-tablefile.js?v=<?=filemtime(__DIR__.'/js/lpn-tablefile.js')?>"></script>
 <?php // Reading a surveyed point list from a text file (ROADMAP Task 592). Pure parsing and column
       // mapping, no DOM, and no request of any kind. BEFORE looped-network.js, which calls
       // EngCalcs.lpnSurveyParse() when somebody picks a file; absent, the button reports that the

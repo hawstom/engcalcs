@@ -26661,8 +26661,18 @@ var EngCalcs = EngCalcs || {};
 	 * on screen. Excel makes you ask for that with Alt+semicolon and silently includes hidden rows
 	 * if you forget; here it is true by construction.
 	 */
-	function paneCopyTsv(spec, rows, cols, box) {
+	function paneCopyTsv(spec, rows, cols, box, withHeads) {
 		var out = [], r, c, line;
+		// **HEADINGS ONLY WHEN ASKED FOR, BY NAME** (Task 776, Tom, 2026-10-06: *"it would be nice
+		// to be able to copy the headings somehow"*). Ctrl+C and Copy stay as R-310 left them, so a
+		// range copied and pasted back lands on values, never on a heading row; "Copy with
+		// headings" on the right-click menu is the one door, and the heading is the one the table
+		// shows, unit included.
+		if (withHeads) {
+			line = [];
+			for (c = box.c0; c <= box.c1; c++) { line.push(paneHeadingText(cols[c])); }
+			out.push(line.join('\t'));
+		}
 		for (r = box.r0; r <= box.r1; r++) {
 			line = [];
 			for (c = box.c0; c <= box.c1; c++) { line.push(paneCellText(cols[c], rows[r])); }
@@ -28546,6 +28556,9 @@ var EngCalcs = EngCalcs || {};
 		mk(pc.points_data_copy || 'Copy', function () {
 			libCopyOut(paneCopyTsv(spec, rows, cols, box));
 		}, 'Ctrl+C');
+		mk(pc.lpn_pane_copy_heads || 'Copy with headings', function () {
+			libCopyOut(paneCopyTsv(spec, rows, cols, box, true));
+		});
 		mk(pc.points_data_paste || 'Paste', function () {
 			// A synthetic 'paste' event cannot be raised, so this is the one place the page reads
 			// the clipboard directly -- and the one place it can be denied permission to. Silence
@@ -28610,6 +28623,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		// **PRINT TABLE, THE ONLY DOOR TO IT** (Tom, 2026-10-04: the button left the pane head).
 		mk(pc.lpn_pane_print || 'Print table', function () { printPaneTable(spec); });
+		// **EXPORT THE TABLE, NEXT TO PRINT IT** (Task 776). The whole table as it is shown: its
+		// visible columns, its sort, its filter. One file per click.
+		mk(pc.lpn_pane_export_csv || 'Export table as CSV', function () { paneExportTable(spec, 'csv'); });
+		mk(pc.lpn_pane_export_ods || 'Export table as ODS', function () { paneExportTable(spec, 'ods'); });
 		// **FILL DOWN, ON THE SAME MENU, FOR THE SAME RANGE.** Offered only when the selection
 		// spans more than one row -- a single row has nothing below it to fill, and an item that
 		// does nothing when clicked is worse than an absent one.
@@ -29086,6 +29103,29 @@ var EngCalcs = EngCalcs || {};
 	// name reaches `document.title`.
 	function paneSanitizeFileName(s) {
 		return String(s || '').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+	}
+	// **THE TABLE AS A FILE** (Task 776). Cells read through paneCellDisplayText(), the same reader
+	// the printed sheet uses, so a file says what the screen says -- a choice column its label, a
+	// result its two decimals. A column is numeric to a spreadsheet only when it is a number column
+	// (no text, choice or yes/no flag) and not the ID.
+	function paneExportTable(spec, kind) {
+		var pc = EngCalcs.pageConfig || {}, cols = paneCols(spec), rows = paneTableRowsInOrder(spec),
+			heads = cols.map(paneHeadingText),
+			cells = rows.map(function (el) { return cols.map(function (c) { return paneCellDisplayText(c, el, true); }); }),
+			proj = paneSanitizeFileName((typeof project === 'object' && project && project.name) || ''),
+			table = paneSanitizeFileName(pc[spec.label] || spec.id),
+			name = (proj ? proj + '-' : '') + table + '.' + kind, data;
+		if (!EngCalcs.lpnTableCsv) { return; }
+		if (kind === 'csv') {
+			data = EngCalcs.lpnTableCsv(heads, cells);
+			downloadTextFile(name, data, 'text/csv;charset=utf-8');
+		} else {
+			data = EngCalcs.lpnTableOds(heads, cells, table, cols.map(function (c) {
+				return c.key !== 'id' && !c.str && !c.choices && !c.bool && !c.plainWord;
+			}));
+			downloadTextFile(name, data, 'application/vnd.oasis.opendocument.spreadsheet');
+		}
+		setNotice((pc.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', name));
 	}
 	function paneEndPrint() {
 		if (document.body) { document.body.classList.remove('lpn-printing-table'); }
