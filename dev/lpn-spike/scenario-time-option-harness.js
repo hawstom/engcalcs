@@ -4,7 +4,7 @@
 // Tom, 2026-09-30: *"A Demand Multiplier column with the alternatives? What about other settings?"*
 // Sue ranked a steady against a 24-hour run, and the duration, next. On Net1 (a 24-hour project):
 //   1. A project with no scenario options opens, saves and exports exactly as before.
-//   2. Typed in the Alternatives preview, a scenario's own run time and step reach the model, the
+//   2. Typed in the Settings table, a scenario's own run time and step reach the model, the
 //      badge and the transport, and never the project's own [TIMES] block. Bad text writes nothing.
 //   3. Each accepted edit is one undo step, and undo and redo walk it.
 //   4. A duration of 0 is a steady-state run, in a project that runs 24 hours.
@@ -14,7 +14,7 @@
 //      and lists per row what does.
 //
 // Mutations this must catch: docTimes() reading doc.times (2, 7); setScenarioTime() writing
-// doc.times (2); no saveUndoSnapshot() in commitAltOption() (3); the export ignoring opts.times (5);
+// doc.times (2); no undo snapshot for a typed Settings table cell (3); the export ignoring opts.times (5);
 // sanitizeScenarioTimes() not called (6); the compare solving every scenario steady (7).
 //
 // Copyright 2009 Thomas Gail Haws
@@ -36,7 +36,16 @@ const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getScenarios: function () { return scenarios; },\n" +
 	"\t\tbyIdScn: scenarioById, createScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\tactiveId: function () { return project.activeScenario; },\n" +
-	"\t\tcommit: commitAltOption, effectiveTimes: effectiveTimes, extended: effectiveTimesExtended,\n" +
+	"\t\teffectiveTimes: effectiveTimes, extended: effectiveTimesExtended,\n" +
+	"\t\tsettingText: function (scn, path) { return settingRowText(settingTableRows().filter(function (r) { return r.id === JSON.stringify(path); })[0], scn); },\n" +
+	"\t\tsettingLocal: function (scn, path) { return settingRowIsLocal(settingTableRows().filter(function (r) { return r.id === JSON.stringify(path); })[0], scn); },\n" +
+	"\t\tsettingType: function (scn, path, text) { var c = settingTableCols().filter(function (k) { return k.key === 'value'; })[0],\n" +
+	"\t\t\trow = settingTableRows().filter(function (r) { return r.id === JSON.stringify(path); })[0];\n" +
+	"\t\t\treturn paneInScenario(scn, function () { var p = paneParseCellText(c, text, row), was;\n" +
+	"\t\t\t\tif (!p.ok) { return false; } was = paneParseCellText(c, paneCellText(c, row), row);\n" +
+	"\t\t\t\tif (!(was.ok && was.v === p.v)) { saveUndoSnapshot(); } c.set(row, p.v); return true; }); },\n" +
+	"\t\tsettingClear: function (scn, path) { var row = settingTableRows().filter(function (r) { return r.id === JSON.stringify(path); })[0];\n" +
+	"\t\t\tif (!settingRowIsLocal(row, scn)) { return false; } saveUndoSnapshot(); settingRowClear(row, scn); settingTableAfterEdit(); return true; },\n" +
 	"\t\tassembleModel: assembleModel, overrideCount: overrideCount,\n" +
 	"\t\tundo: undo, redo: redo, undoDepth: function () { return undoStack.length; },\n" +
 	"\t\tserializeProject: serializeProject,\n" +
@@ -72,8 +81,12 @@ function cellText(c) {
 	const inp = kids(c).filter(function (k) { return k.tagName === 'INPUT' || k._tag === 'input'; })[0];
 	return inp ? String(inp.value) : String(c.textContent || '');
 }
-// The Alternatives preview's own edit path: a change event on the input, here its handler.
-function type(id, key, value) { L.commit(L.byIdScn(id), key, { value: value }); }
+// The Settings table's own edit path for a scenario's row (a typed Value cell); a blank is that
+// row's Clear override, the table's way back to inheriting.
+function type(id, key, value) {
+	if (value === '') { L.settingClear(L.byIdScn(id), ['times', key]); return; }
+	L.settingType(L.byIdScn(id), ['times', key], value);
+}
 function timesLines(inp) {
 	const m = /\[TIMES\]\n([\s\S]*?)\n\n/.exec(inp);
 	return m ? m[1] : '';
@@ -100,7 +113,7 @@ function timesLines(inp) {
 	ok('saved and reopened, the file is byte-identical', JSON.stringify(L.serializeProject()) === fileBefore);
 	ok('...and no scenario carries a `times` block', L.getScenarios().every(function (s) { return !s.times; }));
 
-	console.log('\n--- 2. a scenario\'s own run time and step, typed in the Alternatives preview ---');
+	console.log('\n--- 2. a scenario\'s own run time and step, typed in the Settings table ---');
 	const two = L.createScenario('Two days');
 	const undo0 = L.undoDepth();
 	type(two.id, 'duration', 'abc');
@@ -227,50 +240,28 @@ function timesLines(inp) {
 		JSON.stringify(byName.Steady));
 	ok('the period note is there', all.indexOf(PC.lpn_scncmp_period_note) >= 0);
 
-	console.log('\n--- the Alternatives preview shows them ---');
-	const altHost = ensure('lpn_alt_report');
-	L.rebuildAlt();
-	// The first row names the calculation options as a group; the column headings are the second.
-	const at0 = rowsOf(altHost), groupRow = at0[0], at = at0.slice(1), ah = kids(at[0]).map(cellText);
-	const col = function (label) { return ah.findIndex(function (h) { return h.indexOf(label) === 0; }); };
-	const aD = col(PC.lpn_time_duration), aH = col(PC.lpn_time_hyd_step), an = {};
-	at.slice(1).forEach(function (tr) { const k = kids(tr); an[cellText(k[0])] = k; });
-	ok('Base shows the project\'s values as text', cellText(an[PC.lpn_scenario_base][aD]) === '24:00' &&
-		kids(an[PC.lpn_scenario_base][aD]).every(function (k) { return k.tagName !== 'INPUT' && k._tag !== 'input'; }));
-	ok('a scenario shows its own in a box', cellText(an['Two days'][aD]) === '48:00' && cellText(an['Two days'][aH]) === '0:30');
-	ok('...and one that inherits shows a blank box', cellText(an.Steady[aH]) === '');
-
-	// TOM, 2026-10-04, on a preview: *"I can't find Scenario options or the tip in question."* The
-	// column tips were a bare `title` (nothing on the heading said a tip existed, and touch never
-	// shows one), the blank box did not say what blank means, and Settings, Calculation, Time sits
-	// thousands of pixels down a box that opens on Symbology.
-	const optTh = [PC.lpn_time_duration, PC.lpn_time_hyd_step].map(function (lab) { return kids(at[0])[col(lab)]; });
-	ok('each calculation-option heading shows a ? for its tip', optTh.every(function (th) {
-		let q = false; walk(th, function (x) { if (/(^|\s)ec-tip(\s|$)/.test(x.className || '')) { q = true; } }); return q; }));
-	// TOM, 2026-10-04 again, in the preview with Basic mode off: still could not find them, and saw
-	// "two versions of glyph tips". Nothing named the three columns as a group, and the heading kept
-	// its own `title` beside the ?'s tip, so the browser showed a second tooltip.
-	ok('a row above the headings names the calculation options as a group',
-		kids(groupRow).length === 2 && cellText(kids(groupRow)[1]) === PC.lpn_alt_calc_options, kids(groupRow).map(cellText).join('|'));
-	ok('...spanning exactly the option columns', kids(groupRow)[1].colSpan === ah.length - col(PC.bpn_demand_mult),
-		kids(groupRow)[1].colSpan + ' of ' + ah.length);
-	ok('an option heading with a ? carries no browser tooltip of its own', optTh.every(function (th) { return !th.title; }));
-	const blank = kids(an.Steady[aH]).filter(function (k) { return k._tag === 'input'; })[0];
-	ok('a blank box shows the Base value it falls back to', blank && blank.placeholder === '1:00', blank && blank.placeholder);
-	const door = kids(an[PC.lpn_scenario_base][aD]).filter(function (k) { return k._tag === 'button'; })[0];
-	ok('Base\'s own value is a button into Settings, Time', !!door && door.textContent === '24:00');
-	if (door) {
-		const sb = ensure('lpn_settings_box'); sb.style.display = 'none';
-		(door._listeners.click || []).forEach(function (f) { f(); });
-		ok('...and pressing it opens the Settings box', sb.style.display === 'flex', sb.style.display);
-		sb.style.display = 'none';
-	}
+	console.log('\n--- the Settings table shows them (Q7: their Alternatives columns retired) ---');
+	const baseS = L.byIdScn('base') || L.getScenarios().filter(function (s) { return s.isBase; })[0];
+	const D = ['times', 'duration'], H = ['times', 'hydraulicStep'];
+	ok('Base reads the project\'s own run time, not marked', L.settingText(baseS, D) === '24:00' && !L.settingLocal(baseS, D),
+		L.settingText(baseS, D));
+	ok('a scenario reads its own, each marked as an override', L.settingText(L.byIdScn(twoId), D) === '48:00' &&
+		L.settingText(L.byIdScn(twoId), H) === '0:30' && L.settingLocal(L.byIdScn(twoId), D) && L.settingLocal(L.byIdScn(twoId), H));
+	ok('...and one that inherits reads Base\'s step, not marked', L.settingText(L.byIdScn(steadyId), H) === '1:00' &&
+		!L.settingLocal(L.byIdScn(steadyId), H), L.settingText(L.byIdScn(steadyId), H));
 
 	console.log('\n--- 8. Settings > Time states which scenarios override it ---');
 	// Two days: 48:00 and 0:30; Steady: duration 0 and no step. Rebuilt from the document each time.
 	EC.lpnTimeRenderSettings();
-	const tf = ensure('lpn_set_time_fields'), notes = [];
-	walk(tf, function (x) { if (/(^|\s)lpn-time-ovr(\s|$)/.test(x.className || (x.getAttribute && x.getAttribute('class')) || '')) { notes.push(x); } });
+	const tf = ensure('lpn_set_time_fields');
+	let notes = [];
+	// A Settings table edit redraws the Settings box as a scenario switch does, so the notes are
+	// found afresh after each one.
+	function findNotes() {
+		notes = [];
+		walk(tf, function (x) { if (/(^|\s)lpn-time-ovr(\s|$)/.test(x.className || (x.getAttribute && x.getAttribute('class')) || '')) { notes.push(x); } });
+	}
+	findNotes();
 	ok('a note sits under each of the two options', notes.length === 2, notes.length);
 	const shown = function (n) { return n.style.display !== 'none' ? String(n.textContent) : ''; };
 	ok('the run time note names both scenarios with their own values',
@@ -282,11 +273,13 @@ function timesLines(inp) {
 	ok('each name is a button', btns.map(function (b) { return b.textContent; }).sort().join() === 'Steady,Two days', btns.length);
 	type(steadyId, 'duration', '');
 	L.refreshStatus();
-	ok('clearing an override takes the scenario out of the note, without a rebuild of the fields',
+	findNotes();
+	ok('clearing an override takes the scenario out of the note',
 		shown(notes[0]).indexOf('Steady') < 0 && shown(notes[0]).indexOf('Two days (48:00)') > 0, shown(notes[0]));
 	type(two.id, 'duration', '');
 	type(two.id, 'hydraulicStep', '');
 	L.refreshStatus();
+	findNotes();
 	ok('with no overrides left both notes are hidden', shown(notes[0]) === '' && shown(notes[1]) === '',
 		shown(notes[0]) + ' / ' + shown(notes[1]));
 

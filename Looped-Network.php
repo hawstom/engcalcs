@@ -958,6 +958,9 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 		      // table! Yes!"). The pane generates one tab per row of paneTables(), so a Customer
 		      // table is a row in that list plus this host div, and nothing else. ?>
 		<div id="lpn_pane_customers" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_customers"></div>
+		<?php // The Settings table (Tom, 2026-10-05: "there will have to be a settings Table"): one row
+		      // per setting a scenario may hold, a row of paneTables() like the others. ?>
+		<div id="lpn_pane_settings" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_settings"></div>
 	</div>
 </div>
 <?php // position:fixed, not absolute: the popup is positioned from pointer-event clientX/clientY
@@ -3479,10 +3482,24 @@ EngCalcs.pageConfig = {
 	lpn_scenario_basic: <?=json_encode($ec_lang['lpn_scenario_basic'])?>,
 	lpn_scenario_basic_tip: <?=json_encode($ec_lang['lpn_scenario_basic_tip'])?>,
 	lpn_alt_title: <?=json_encode($ec_lang['lpn_alt_title'])?>,
-	lpn_alt_calc_options: <?=json_encode($ec_lang['lpn_alt_calc_options'])?>,
 	lpn_alt_note: <?=json_encode($ec_lang['lpn_alt_note'])?>,
-	lpn_scenario_duration_tip: <?=json_encode($ec_lang['lpn_scenario_duration_tip'])?>,
-	lpn_scenario_hyd_step_tip: <?=json_encode($ec_lang['lpn_scenario_hyd_step_tip'])?>,
+	lpn_settings_table_major: <?=json_encode($ec_lang['lpn_settings_table_major'])?>,
+	lpn_settings_table_minor: <?=json_encode($ec_lang['lpn_settings_table_minor'])?>,
+	lpn_settings_table_category: <?=json_encode($ec_lang['lpn_settings_table_category'])?>,
+	lpn_settings_table_setting: <?=json_encode($ec_lang['lpn_settings_table_setting'])?>,
+	lpn_settings_table_yes: <?=json_encode($ec_lang['lpn_settings_table_yes'])?>,
+	lpn_settings_table_no: <?=json_encode($ec_lang['lpn_settings_table_no'])?>,
+	lpn_settings_sec_symbology: <?=json_encode($ec_lang['lpn_settings_sec_symbology'])?>,
+	lpn_settings_sec_map: <?=json_encode($ec_lang['lpn_settings_sec_map'])?>,
+	lpn_settings_sec_assets: <?=json_encode($ec_lang['lpn_settings_sec_assets'])?>,
+	lpn_settings_sec_calculation: <?=json_encode($ec_lang['lpn_settings_sec_calculation'])?>,
+	lpn_settings_sym_all: <?=json_encode($ec_lang['lpn_settings_sym_all'])?>,
+	lpn_settings_sym_customer: <?=json_encode($ec_lang['lpn_settings_sym_customer'])?>,
+	lpn_settings_sym_node_colors: <?=json_encode($ec_lang['lpn_settings_sym_node_colors'])?>,
+	lpn_settings_sym_link_colors: <?=json_encode($ec_lang['lpn_settings_sym_link_colors'])?>,
+	lpn_settings_hydraulics: <?=json_encode($ec_lang['lpn_settings_hydraulics'])?>,
+	lpn_settings_quality: <?=json_encode($ec_lang['lpn_settings_quality'])?>,
+	lpn_settings_energy: <?=json_encode($ec_lang['lpn_settings_energy'])?>,
 	lpn_time_scn_overrides: <?=json_encode($ec_lang['lpn_time_scn_overrides'])?>,
 	lpn_alt_cat_physical: <?=json_encode($ec_lang['lpn_alt_cat_physical'])?>,
 	lpn_alt_cat_demand: <?=json_encode($ec_lang['lpn_alt_cat_demand'])?>,

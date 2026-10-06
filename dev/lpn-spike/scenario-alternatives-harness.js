@@ -273,37 +273,27 @@ console.log('\n--- Basic mode ---');
 	const text = (function walk(el) { return (el.textContent || '') + (el.children || []).map(walk).join('|'); })(ensure('lpn_alt_report'));
 	ok('the table names every category', L.CATS.every(function (c) { return text.indexOf(PC['lpn_alt_cat_' + c]) >= 0; }));
 	ok('...and shows Peak Hour with its own Demand alternative of one value', text.indexOf(pk.name + ' (1)') >= 0);
-	// The Demand multiplier column: a calculation option beside the alternatives, after the categories.
+	// Q7 (Tom, 2026-10-05): the demand multiplier, run time and time step are calculation options,
+	// counted in the Calculation column; their own three columns retired with the Settings table.
 	{
-		// The row above the headings that names the calculation options as a group is not a data row.
-		const notGroupRow = (tr) => !(tr.children || []).some((c) => /lpn-alt-group/.test(c.className || ''));
-		const rowsOf = (function walkRows(el, out) { if (el.tagName === 'TR') { out.push(el); } (el.children || []).forEach(function (c) { walkRows(c, out); }); return out; })(ensure('lpn_alt_report'), []).filter(notGroupRow);
-		// A scenario's option is a box it can be typed into (Task 755), so a cell reads as its input.
-		const cellText = (c) => { const inp = (c.children || []).filter((k) => k.tagName === 'INPUT')[0];
-			return inp ? String(inp.value) : (c.textContent || ''); };
-		const cells = (tr) => tr.children.map((c) => cellText(c).replace(/[^\x20-\x7e]/g, '').trim());
-		const head = cells(rowsOf[0]);
-		// Demand multiplier, then the two clock options (Task 755), after every category.
-		const DM = L.CATS.length + 1;
-		ok('the calculation options follow every category: Demand multiplier, Total run time, Hydraulic time step',
-			head[DM].indexOf(PC.bpn_demand_mult) === 0 && head[DM + 1].indexOf(PC.lpn_time_duration) === 0 &&
-			head[DM + 2].indexOf(PC.lpn_time_hyd_step) === 0 && head.length === L.CATS.length + 4, JSON.stringify(head));
-		const byName = {}; rowsOf.slice(1).forEach(function (tr) { byName[cells(tr)[0]] = cells(tr); });
-		ok('Base shows the project value (1 when it states none)', byName[PC.lpn_scenario_base][DM] === '1', JSON.stringify(byName[PC.lpn_scenario_base]));
-		// createScenario() seeds a new scenario with the project's value, so one that inherits is one
-		// holding none (the ready-made Flow test scenarios).
-		const inheriting = L.createScenario('Inheriting'); delete inheriting.demandMultiplier; L.openAlternativesBox();
-		const rows1 = (function walkRows(el, out) { if (el.tagName === 'TR') { out.push(el); } (el.children || []).forEach(function (c) { walkRows(c, out); }); return out; })(ensure('lpn_alt_report'), []).filter(notGroupRow);
-		rows1.slice(1).forEach(function (tr) { byName[cells(tr)[0]] = cells(tr); });
-		ok('a scenario holding no multiplier of its own the project shows blank', byName['Inheriting'][DM] === '', JSON.stringify(byName['Inheriting']));
+		const rowsOf = () => (function walkRows(el, out) { if (el.tagName === 'TR') { out.push(el); } (el.children || []).forEach(function (c) { walkRows(c, out); }); return out; })(ensure('lpn_alt_report'), []);
+		const cells = (tr) => tr.children.map((c) => String(c.textContent || '').replace(/[^\x20-\x7e]/g, '').trim());
+		const head = cells(rowsOf()[0]);
+		ok('one column per category and nothing after them', head.length === L.CATS.length + 1, JSON.stringify(head));
+		ok('...the last two headed Presentation and Calculation', head[head.length - 2] === PC.lpn_alt_cat_presentation &&
+			head[head.length - 1] === PC.lpn_alt_cat_calculation, JSON.stringify(head.slice(-2)));
+		ok('no input is left in the table', !(function walk(el) { return el.tagName === 'INPUT' || (el.children || []).some(walk); })(ensure('lpn_alt_report')));
+		const CALC = head.length - 1;
+		const seeded = L.createScenario('Seeded');
 		const ownMult = L.createScenario('Max Day'); ownMult.demandMultiplier = 2;
 		L.openAlternativesBox();
-		const rows2 = (function walkRows(el, out) { if (el.tagName === 'TR') { out.push(el); } (el.children || []).forEach(function (c) { walkRows(c, out); }); return out; })(ensure('lpn_alt_report'), []).filter(notGroupRow);
-		const md = rows2.map(cells).filter((r) => r[0] === 'Max Day')[0];
-		ok('a scenario with its own multiplier shows it', md && md[DM] === '2', JSON.stringify(md));
-		ok('the column is marked as a calculation option, apart from the categories',
-			rowsOf[0].children[DM].className.indexOf('lpn-alt-calcopt') >= 0);
-		L.deleteScenario(ownMult.id); L.deleteScenario(inheriting.id);
+		const byName = {}; rowsOf().slice(1).forEach(function (tr) { byName[cells(tr)[0]] = cells(tr); });
+		ok('a multiplier seeded equal to the project\'s counts nothing: Calculation is Base\'s',
+			byName.Seeded && byName.Seeded[CALC] === PC.lpn_scenario_base, JSON.stringify(byName.Seeded));
+		ok('a scenario with its own multiplier counts it in Calculation', byName['Max Day'] && byName['Max Day'][CALC] === 'Max Day (1)',
+			JSON.stringify(byName['Max Day']));
+		ok('...and that count is the number beside its name', L.overrideCount(ownMult) === 1, L.overrideCount(ownMult));
+		L.deleteScenario(ownMult.id); L.deleteScenario(seeded.id);
 	}
 	basicRow().fn();
 	ok('ticking it again removes the stored key and closes the box',
@@ -429,8 +419,10 @@ console.log('\n--- settings: an override resolves in its scenario and not in Bas
 	const pres = L.alternativeFor(pk, 'presentation'), calc = L.alternativeFor(pk, 'calculation');
 	ok('Peak Hour now uses its own Presentation alternative, a child of Base Presentation, of two values',
 		!pres.isBase && pres.parent === L.alternativeFor(L.baseScenario(), 'presentation').id && pres.count === 2 && pres.settings.length === 2);
-	ok('...and its own Calculation alternative, of two values (the multiplier keeps its own column)',
-		!calc.isBase && calc.count === 2, JSON.stringify(calc.settings));
+	// Q7 (Tom, 2026-10-05): the demand multiplier is a calculation option like accuracy, counted here.
+	ok('...and its own Calculation alternative, of three values, the demand multiplier among them',
+		!calc.isBase && calc.count === 3 && calc.settings.some(function (l) { return l.path.join('.') === 'settings.hydraulics.demandMultiplier'; }),
+		JSON.stringify(calc.settings));
 	ok('...and every element category is still Base\'s',
 		L.CATS.filter(function (c) { return c !== 'presentation' && c !== 'calculation'; }).every(function (c) { return L.alternativeFor(pk, c).isBase; }));
 	ok('the scenario\'s count includes its four setting values', L.overrideCount(pk) === 5, String(L.overrideCount(pk)));
@@ -445,6 +437,7 @@ console.log('\n--- settings: an override resolves in its scenario and not in Bas
 	['settings.textSize', ['settings', 'colorBreaks', 'node.pressure'], 'settings.hydraulics.accuracy', 'settings.quality'].forEach(function (p) {
 		L.setScenarioSetting(pk2, p, undefined);
 	});
+	delete pk2.demandMultiplier;
 	ok('clearing every value removes the block, and Peak Hour uses the Base alternatives again',
 		!has(pk2, 'settings') && L.alternativeFor(pk2, 'presentation').isBase && L.alternativeFor(pk2, 'calculation').isBase);
 	L.deleteScenario(pk2.id);

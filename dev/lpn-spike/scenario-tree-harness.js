@@ -50,7 +50,14 @@ const L = loadLoopedNetwork(
 	"\t\tapplyNodeRename: applyNodeRename, deleteNode: deleteNode, convertUnitValues: convertUnitValues,\n" +
 	"\t\tlibRepointPattern: libRepointPattern, setScenarioParent: setScenarioParent, treeLayers: treeLayers,\n" +
 	"\t\tsetScenarioView: setScenarioView, currentView: currentView, applyView: applyView,\n" +
-	"\t\tclearOverride: clearOverride, commitAltOption: commitAltOption, scenarioMenuRows: scenarioMenuRows,\n" +
+	"\t\tclearOverride: clearOverride, scenarioMenuRows: scenarioMenuRows,\n" +
+	"\t\tsettingType: function (scn, path, text) { var c = settingTableCols().filter(function (k) { return k.key === 'value'; })[0],\n" +
+	"\t\t\trow = settingTableRows().filter(function (r) { return r.id === JSON.stringify(path); })[0];\n" +
+	"\t\t\treturn paneInScenario(scn, function () { var p = paneParseCellText(c, text, row), was;\n" +
+	"\t\t\t\tif (!p.ok) { return false; } was = paneParseCellText(c, paneCellText(c, row), row);\n" +
+	"\t\t\t\tif (!(was.ok && was.v === p.v)) { saveUndoSnapshot(); } c.set(row, p.v); return true; }); },\n" +
+	"\t\tsettingClear: function (scn, path) { var row = settingTableRows().filter(function (r) { return r.id === JSON.stringify(path); })[0];\n" +
+	"\t\t\tif (!settingRowIsLocal(row, scn)) { return false; } saveUndoSnapshot(); settingRowClear(row, scn); settingTableAfterEdit(); return true; },\n" +
 	"\t\tlastNotice: function () { return noticeLog[0]; },\n" +
 	"\t\tgeorefBegin: function () { var was = georef; georef = { ovs: georefCaptureCoordOverrides() }; return was; },\n" +
 	"\t\tgeorefMove: function (t) { georefWriteCoordOverrides(t); }, georefEnd: function (was) { georef = was; },\n" +
@@ -584,9 +591,9 @@ siteCase('eachOverrideMap', 'a unit change reaching a stored alternative', () =>
 siteCase('eachOverrideMap', 'a node rename moving its key', () => { const f = fixture(true); return () => { L.applyNodeRename(f.j.id, 'RENAMED'); }; });
 siteCase('createScenario', 'a child scenario makes the tree stored', () => { const f = fixture(false); return () => { L.createScenario('Kid', f.peak.id); }; });
 siteCase('deleteScenario', 'the only stored parent goes with its scenario', () => { const f = fixture(true); return () => { L.deleteScenario(f.kid.id); }; });
-siteCase('demandMultiplier', 'a parent\'s multiplier typed in the Alternatives table', () => {
+siteCase('demandMultiplier', 'a parent\'s multiplier typed in the Settings table', () => {
 	const f = fixture(true);
-	return () => { L.commitAltOption(f.peak, 'demandMultiplier', { value: '4' }); };
+	return () => { L.settingType(f.peak, ['settings', 'hydraulics', 'demandMultiplier'], '4'); };
 });
 siteCase('georef', 'a scenario\'s own position moved by the georeferencing wizard', () => {
 	const f = fixture(true);

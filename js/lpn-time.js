@@ -1454,8 +1454,8 @@
 	/**
 	 * **WHICH SCENARIOS OVERRIDE THIS PROJECT SETTING, under the setting.** Redrawn on its own, never
 	 * by rebuilding the seven inputs, because it follows every scenario edit and a rebuild would take
-	 * the focus from a box being typed in. Each scenario name is a button that opens the Alternatives
-	 * preview, where its own value is edited. The names are the visitor's own text and are set as
+	 * the focus from a box being typed in. Each scenario name is a button that opens the Settings
+	 * table on that scenario's row of this setting, where its own value is edited. The names are the visitor's own text and are set as
 	 * text, never as markup.
 	 */
 	EC.lpnTimeRenderOverrides = function () {
@@ -1470,7 +1470,7 @@
 			note.appendChild(document.createTextNode(S.scnOverrides + ' '));
 			mine.forEach(function (o, i) {
 				var b = el('button', { type: 'button', class: 'lpn-time-ovr-btn' }, o.name);
-				b.addEventListener('click', function () { if (host.openScenarioOptions) { host.openScenarioOptions(o.id); } });
+				b.addEventListener('click', function () { if (host.openScenarioOptions) { host.openScenarioOptions(o.id, key); } });
 				if (i) { note.appendChild(document.createTextNode(', ')); }
 				note.appendChild(b);
 				note.appendChild(document.createTextNode(' (' + o.text + ')'));

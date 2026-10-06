@@ -4693,20 +4693,29 @@ var EngCalcs = EngCalcs || {};
 		// **A DOCUMENT THAT STATES NONE MEANS 1** (Task 721), which is what docDemandMultiplier()
 		// solves with. So a scenario stating 1 on such a document changes nothing and counts nothing:
 		// the ready-made 4. Average Day would otherwise read (1) beside a value equal to Base's.
-		var docDm = (settings.hydraulics || {}).demandMultiplier;
-		if (!(typeof docDm === 'number' && isFinite(docDm))) { docDm = 1; }
-		if (typeof scn.demandMultiplier === 'number' && isFinite(scn.demandMultiplier)
-			&& scn.demandMultiplier !== docDm) { total += 1; }
 		// **A SCENARIO'S OWN RUN TIME OR TIME STEP COUNTS THE SAME WAY** (Task 755): one each, and
 		// only where it differs from the project's own, for the same reason as the multiplier.
-		LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
-			var v = scenarioTimeValue(scn, key);
-			if (v !== undefined && v !== projectTimes()[key]) { total += 1; }
-		});
+		total += calcOptionLeaves(scn).length;
 		// **AND EACH SETTING IT HOLDS OF ITS OWN** (Tom, 2026-10-05), one per value, by presence
 		// as an element override counts: nothing seeds a scenario's settings block.
 		total += scenarioSettingLeaves(scn).length;
 		return total;
+	}
+	// The three calculation options with homes of their own that this scenario COUNTS: each only
+	// where it differs from the project's own (see overrideCount()). Read by the count and by the
+	// Calculation alternative (Q7), so the counts across a row add up to the number by the name.
+	function calcOptionLeaves(scn) {
+		var out = [], docDm = (settings.hydraulics || {}).demandMultiplier;
+		if (!scn || scn.isBase) { return out; }
+		if (!(typeof docDm === 'number' && isFinite(docDm))) { docDm = 1; }
+		if (typeof scn.demandMultiplier === 'number' && isFinite(scn.demandMultiplier) && scn.demandMultiplier !== docDm) {
+			out.push({ path: ['settings', 'hydraulics', 'demandMultiplier'], value: scn.demandMultiplier });
+		}
+		LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
+			var v = scenarioTimeValue(scn, key);
+			if (v !== undefined && v !== projectTimes()[key]) { out.push({ path: ['times', key], value: v }); }
+		});
+		return out;
 	}
 	// Every scenario's overrides on one element -- what a Base-side deletion is about to destroy,
 	// counted before the confirm rather than after it.
@@ -4812,7 +4821,7 @@ var EngCalcs = EngCalcs || {};
 				a.count++;
 			});
 		});
-		scenarioSettingLeaves(scn).forEach(function (leaf) {
+		scenarioSettingLeaves(scn).concat(calcOptionLeaves(scn)).forEach(function (leaf) {
 			var a = child(categoryOfSetting(leaf.path));
 			a.settings.push({ path: leaf.path, value: altCopy(leaf.value) });
 			a.count++;
@@ -25045,6 +25054,13 @@ var EngCalcs = EngCalcs || {};
 				id: 'customers', panel: 'lpn_pane_customers', label: 'lpn_pane_tab_customers',
 				group: 'customer', type: 'customer',
 				cols: paneCustomerCols()
+			},
+			// **THE SETTINGS TABLE** (Tom, 2026-10-05: *"there will have to be a settings Table"*), last
+			// of the tables: one row per setting a scenario may hold. See settingTableRows().
+			{
+				id: 'settings', panel: 'lpn_pane_settings', label: 'lpn_tool_settings',
+				group: 'setting', type: 'setting', scnAfter: 'setting',
+				cols: settingTableCols()
 			}
 		].map(function (spec) {
 			// The per-type view state. On the SPEC, so six tables genuinely have six of everything
@@ -25257,6 +25273,7 @@ var EngCalcs = EngCalcs || {};
 	// Every element of this type, filter or no filter -- the denominator the banner prints.
 	function paneTableAllElements(spec) {
 		var pool = spec.group === 'link' ? doc.links : doc.nodes;
+		if (spec.group === 'setting') { return settingTableRows(); }
 		// A Text object has no `type` of its own: every label is a Text, so the Text table is all
 		// of them (Tom, 2026-09-08). A customer is the same shape (Task 247).
 		if (spec.group === 'label') { return (doc.labels || []).slice(); }
@@ -25267,7 +25284,9 @@ var EngCalcs = EngCalcs || {};
 	// `spec.filterStale` is the rows kept only for having been edited -- what the table dims and
 	// marks and the banner counts.
 	function paneTableElements(spec) {
-		var rows = paneTableAllElements(spec), keys = paneFilterKeys(spec), seen, kept, stale = {}, n = 0;
+		var rows = paneTableAllElements(spec), keys = spec.group === 'setting' ? null : paneFilterKeys(spec),
+			seen, kept, stale = {}, n = 0;
+		// The Settings table is never filtered: Find's queries and the map's selection are about assets.
 		if (!keys) { spec.filterStale = null; spec.filterStaleCount = 0; return rows; }
 		seen = paneFilterSeen[spec.id] || (paneFilterSeen[spec.id] = {});
 		kept = paneFilterKept[spec.id] || (paneFilterKept[spec.id] = {});
@@ -26046,11 +26065,25 @@ var EngCalcs = EngCalcs || {};
 	}
 	// A customer carries nothing a scenario can change (Task 247), so its table has no such view.
 	function paneScnAvailable(spec) { return spec.group !== 'customer'; }
+	// **A REDRAW ASKED FOR DURING THE SWAP WAITS FOR ITS END** (paneAfterScenarioSwap()), so it
+	// draws the scenario actually showing, not the row's.
+	var paneScnSwapDepth = 0, paneScnSwapPending = [];
 	function paneInScenario(scn, fn) {
-		var was = project.activeScenario;
+		var was = project.activeScenario, todo;
 		if (!scn || scn.id === was) { return fn(); }
 		project.activeScenario = scn.id;
-		try { return fn(); } finally { project.activeScenario = was; }
+		paneScnSwapDepth++;
+		try { return fn(); } finally {
+			project.activeScenario = was;
+			if (--paneScnSwapDepth === 0 && paneScnSwapPending.length) {
+				todo = paneScnSwapPending; paneScnSwapPending = [];
+				todo.forEach(function (f) { f(); });
+			}
+		}
+	}
+	function paneAfterScenarioSwap(fn) {
+		if (!paneScnSwapDepth) { fn(); return; }
+		if (paneScnSwapPending.indexOf(fn) < 0) { paneScnSwapPending.push(fn); }
 	}
 	// What every row of one render shares: the scenarios in display order, Base first.
 	function paneScnInfo() {
@@ -26123,6 +26156,7 @@ var EngCalcs = EngCalcs || {};
 			if (!x) { return !!(c.roFor && c.roFor(r)); }
 			if (c.key === 'id') { return true; }
 			if (x.scn.isBase) { return false; }
+			if (c.scnEditable) { return !c.scnEditable(x.el, x.scn); }
 			p = paneColProp(c);
 			return !(p && isOverridable(x.el, p));
 		};
@@ -26136,7 +26170,8 @@ var EngCalcs = EngCalcs || {};
 		if (pref && extra.some(function (c) { return pref.indexOf(c.key) !== -1; })) {
 			return paneApplyColOrder(spec, wrapped.concat(extra));
 		}
-		wrapped.forEach(function (c, i) { if (c.key === 'id') { at = i + 1; } });
+		// After ID, or after the column a table names instead (the Settings table has no ID).
+		wrapped.forEach(function (c, i) { if (c.key === (spec.scnAfter || 'id')) { at = i + 1; } });
 		return wrapped.slice(0, at).concat(extra, wrapped.slice(at));
 	}
 	// **A VALUE SET IN THIS ROW'S SCENARIO WEARS THE OVERRIDE'S AMBER**, the map's own colour for
@@ -26145,6 +26180,7 @@ var EngCalcs = EngCalcs || {};
 	function paneScnCellIsLocal(c, row) {
 		var x = row && row._lpnScn, ov, p, has = Object.prototype.hasOwnProperty;
 		if (!x || x.scn.isBase) { return false; }
+		if (c.scnLocal) { return !!c.scnLocal(x.el, x.scn); }
 		p = paneColProp(c);
 		// Local where this scenario WRITES (hasOverride()'s rule), so a stored alternative it names
 		// marks the cell and a value it only inherits does not.
@@ -26157,7 +26193,8 @@ var EngCalcs = EngCalcs || {};
 	// day'"*). Asked of the scenario's alternative in the property's category, so the words follow
 	// the alternatives layer (dev/scenario-alternatives.md) rather than restating it here.
 	function paneScnCellTip(c, row) {
-		var x = row._lpnScn, pc = EngCalcs.pageConfig || {}, cat = categoryOf(paneColProp(c), elGroup(x.el)),
+		var x = row._lpnScn, pc = EngCalcs.pageConfig || {},
+			cat = c.scnCat ? c.scnCat(x.el) : categoryOf(paneColProp(c), elGroup(x.el)),
 			alt = alternativeFor(x.scn, cat), owner = alt && !alt.isBase ? (scenarioById(alt.scenario) || x.scn) : baseScenario();
 		return String(pc.lpn_pane_scn_alt_tip || '{category} alt.: {alternative}')
 			.split('{category}').join(altCategoryLabel(cat)).split('{alternative}').join(scenarioDisplayName(owner));
@@ -26184,7 +26221,9 @@ var EngCalcs = EngCalcs || {};
 	function paneScnSignature(spec, rows) {
 		if (!spec.scnRows) { return ''; }
 		return rows.map(function (r) {
-			var x = r._lpnScn, ov = x && !x.scn.isBase ? resolvedOverrides(x.scn)[ovKey(x.el)] : null;
+			var x = r._lpnScn, ov;
+			if (x && x.el._lpnSetting) { return settingRowIsLocal(x.el, x.scn) ? '1' : ''; }
+			ov = x && !x.scn.isBase ? resolvedOverrides(x.scn)[ovKey(x.el)] : null;
 			return ov ? Object.keys(ov).join(',') : '';
 		}).join('|') + '||' + scenariosForDisplay().map(scenarioDisplayName).join('|');
 	}
@@ -26201,6 +26240,362 @@ var EngCalcs = EngCalcs || {};
 		if (spec.sel) { spec.sel.aId = map(spec.sel.aId); spec.sel.fId = map(spec.sel.fId); }
 		paneTableReset(spec);
 		renderPaneTable(spec);
+	}
+	// ---- THE SETTINGS TABLE: ONE ROW PER SETTING A SCENARIO MAY HOLD (dev/scenario-alternatives.md) ----
+	//
+	// Tom, 2026-10-05: *"Scenarios must be added to tables so we can audit these things. And by
+	// extension, there will have to be a settings Table... We can't treat any value overrides
+	// differently."* So this is a table of the Tables pane like the asset tables, built from the same
+	// spec, and Show scenarios, the override wash, its tip and Clear override behave here exactly as
+	// they do there. A ROW IS A SETTING PATH, `{id: JSON of the path, _lpnSetting: true, path, cat}`;
+	// its Value is read through settingFor() in the scenario the row shows and written through
+	// setScenarioSetting() (Base writes the project's own object), so the table holds no fact of its
+	// own. The demand multiplier and the run time and time step keep their own homes and writers
+	// (Q7: they are three rows here like any other calculation option).
+	//
+	// **WHICH ROWS**: every leaf the project states, by the rule settingLeaves() walks with (a map
+	// member by member, `settings.quality` and `view` whole), plus every leaf any scenario holds, plus
+	// the three calculation options with their own homes and the seven [TIMES] values, always. Units
+	// and the coordinate frame are not rows: categoryOfSetting() answers null for them.
+	var LPN_SETTAB_SECTIONS = [
+		['symbology', 'lpn_settings_sec_symbology'], ['map', 'lpn_settings_sec_map'],
+		['assets', 'lpn_settings_sec_assets'], ['calc', 'lpn_settings_sec_calculation']];
+	var LPN_SETTAB_SUBS = {
+		nodeLbl: 'lpn_labels_heading_node', linkLbl: 'lpn_labels_heading_link', custLbl: 'lpn_settings_sym_customer',
+		nodeCol: 'lpn_settings_sym_node_colors', linkCol: 'lpn_settings_sym_link_colors', all: 'lpn_settings_sym_all',
+		display: 'lpn_settings_map_display', ids: 'lpn_settings_id_prefixes', defaults: 'lpn_settings_defaults',
+		hyd: 'lpn_settings_hydraulics', time: 'lpn_time_menu', quality: 'lpn_settings_quality', energy: 'lpn_settings_energy' };
+	var LPN_SETTAB_SUB_ORDER = ['all', 'nodeLbl', 'nodeCol', 'linkLbl', 'linkCol', 'custLbl', 'display', 'ids', 'defaults',
+		'time', 'hyd', 'quality', 'energy'];
+	// Where the Settings box shows a path: [section, sub-heading]. Read by the Major and Minor
+	// heading columns, so a row can be found again in the box it is also edited in.
+	function settingTableHeadings(p) {
+		var m = p[1], own;
+		function side(k) { return k === 'node' ? 'nodeLbl' : k === 'link' ? 'linkLbl' : k === 'customer' ? 'custLbl' : null; }
+		if (p[0] === 'labelSettings') {
+			own = side(m) || (m === 'customerMaxWidth' ? 'custLbl' : side(p[2]));
+			return ['symbology', own || 'all'];
+		}
+		if (p[0] === 'project' || p[0] === 'view') { return ['map', 'display']; }
+		if (p[0] === 'times') { return ['calc', 'time']; }
+		if (p[0] === 'defaultPattern') { return ['calc', 'hyd']; }
+		if (/^(basemapStyle|backdropOpacity|contour)/.test(m)) { return ['map', 'display']; }
+		if (m === 'idPrefixes') { return ['assets', 'ids']; }
+		if (m === 'defaults' || m === 'nodeElevSource') { return ['assets', 'defaults']; }
+		if (/^(quality|qualityOptions|reactions)$/.test(m)) { return ['calc', 'quality']; }
+		if (m === 'energy') { return ['calc', 'energy']; }
+		if (/^(method|engine|autoRun|hydraulics|emitterExponent|tolerance)$/.test(m)) { return ['calc', 'hyd']; }
+		if (m === 'colorBreaks' || m === 'colorModes') {
+			return ['symbology', /^link/.test(String(p[2])) ? 'linkCol' : 'nodeCol'];
+		}
+		if (/^color.*Node$/.test(m)) { return ['symbology', 'nodeCol']; }
+		if (/^color.*Link$/.test(m)) { return ['symbology', 'linkCol']; }
+		return ['symbology', 'all'];
+	}
+	// The Settings box's own words for a path, where it has them: the longest named prefix, then
+	// the members under it as they are stored (a field key, a unit), which no label could name.
+	var LPN_SETTAB_LABEL = {
+		'settings.textSize': 'lpn_settings_text_size', 'settings.symbolSize': 'lpn_settings_symbol_size',
+		'settings.linkWidth': 'lpn_settings_link_width', 'settings.symbolOpacity': 'lpn_settings_symbol_opacity',
+		'settings.labelMaxWidth': 'lpn_settings_label_max_width', 'settings.alignPipeLabels': 'lpn_settings_align_labels',
+		'settings.labelFlipLeftOfVertical': 'lpn_settings_readability_bias', 'settings.maskLabels': 'lpn_settings_mask_labels',
+		'settings.showArrows': 'lpn_settings_show_arrows', 'settings.leaderSnapDeg': 'lpn_settings_leader_snap',
+		'settings.legendPosition': 'lpn_settings_legend_position', 'settings.basemapStyle': 'lpn_settings_basemap_style',
+		'settings.backdropOpacity': 'lpn_settings_backdrop_opacity',
+		'settings.colorNodeField': 'lpn_settings_color_node_field', 'settings.colorLinkField': 'lpn_settings_color_link_field',
+		'settings.colorRampNode': 'lpn_settings_color_ramp', 'settings.colorRampLink': 'lpn_settings_color_ramp',
+		'settings.colorClassesNode': 'lpn_settings_color_classes', 'settings.colorClassesLink': 'lpn_settings_color_classes',
+		'settings.colorReverseNode': 'lpn_settings_color_reverse', 'settings.colorReverseLink': 'lpn_settings_color_reverse',
+		'settings.colorBreaks': 'lpn_settings_color_breaks', 'settings.colorModes': 'lpn_color_mode',
+		'settings.colorLegendPosition': 'lpn_settings_color_key_position',
+		'settings.contourFill': 'lpn_contour_fill', 'settings.contourLines': 'lpn_contour_lines',
+		'settings.contourOpacity': 'lpn_contour_opacity', 'settings.contourInterval': 'lpn_contour_interval',
+		'settings.contourBuffer': 'lpn_contour_buffer', 'settings.contourTerrain': 'lpn_contour_dem',
+		'settings.method': 'bpn_method', 'settings.engine': 'lpn_settings_engine_native', 'settings.autoRun': 'lpn_settings_auto_run',
+		'settings.hydraulics.accuracy': 'lpn_settings_accuracy', 'settings.hydraulics.trials': 'lpn_settings_trials',
+		'settings.hydraulics.unbalanced': 'lpn_settings_unbalanced', 'settings.hydraulics.unbalancedTrials': 'lpn_settings_unbalanced_trials',
+		'settings.hydraulics.headError': 'lpn_settings_head_error', 'settings.hydraulics.flowChange': 'lpn_settings_flow_change',
+		'settings.hydraulics.dampLimit': 'lpn_settings_damp_limit', 'settings.hydraulics.specificGravity': 'lpn_settings_specific_gravity',
+		'settings.hydraulics.viscosity': 'lpn_settings_viscosity', 'settings.hydraulics.emitterExponent': 'lpn_settings_emitter_exponent',
+		'settings.hydraulics.demandModel': 'lpn_settings_demand_model', 'settings.hydraulics.minPressure': 'lpn_settings_min_pressure',
+		'settings.hydraulics.reqPressure': 'lpn_settings_req_pressure', 'settings.hydraulics.pressureExponent': 'lpn_settings_pressure_exponent',
+		'settings.hydraulics.demandMultiplier': 'bpn_demand_mult', 'settings.emitterExponent': 'lpn_settings_emitter_exponent',
+		'settings.quality': 'lpn_settings_quality_track', 'settings.qualityOptions.tolerance': 'lpn_quality_tolerance',
+		'settings.qualityOptions.diffusivity': 'lpn_quality_diffusivity',
+		'settings.reactions.globalBulk': 'lpn_reaction_bulk', 'settings.reactions.globalWall': 'lpn_reaction_wall',
+		'settings.reactions.orderBulk': 'lpn_reaction_order_bulk', 'settings.reactions.orderWall': 'lpn_reaction_order_wall',
+		'settings.reactions.orderTank': 'lpn_reaction_order_tank', 'settings.reactions.limitingPotential': 'lpn_reaction_limiting',
+		'settings.reactions.roughnessCorrelation': 'lpn_reaction_rough_corr',
+		'settings.energy.globalEfficiency': 'lpn_energy_efficiency', 'settings.energy.globalPrice': 'lpn_energy_price',
+		'settings.energy.globalPattern': 'lpn_energy_price_pattern', 'settings.energy.demandCharge': 'lpn_energy_demand_charge',
+		'settings.energy.currency': 'lpn_energy_currency',
+		'settings.nodeElevSource': 'lpn_settings_elev_source', 'settings.defaults.nodeElevSource': 'lpn_settings_elev_source',
+		'settings.defaults.nodeElev': 'lpn_field_elev', 'settings.defaults.diameter': 'lpn_field_diameter',
+		'settings.defaults.roughness': 'lpn_field_roughness', 'settings.defaults.km': 'lpn_field_km',
+		'settings.defaults.demand': 'lpn_field_base_demand', 'settings.defaults.tankDiameter': 'lpn_field_tank_diameter',
+		'settings.defaults.tankLevel': 'lpn_field_tank_level', 'settings.defaults.tankMinLevel': 'lpn_field_tank_minlevel',
+		'settings.defaults.tankMaxLevel': 'lpn_field_tank_maxlevel',
+		'labelSettings.markExtrema': 'lpn_labels_mark_extrema', 'labelSettings.separator': 'lpn_labels_separator',
+		'labelSettings.priority': 'lpn_labels_priority', 'labelSettings.useUnits': 'lpn_labels_use_units',
+		'labelSettings.decimals': 'lpn_labels_col_decimals', 'labelSettings.prefix': 'lpn_labels_col_before',
+		'labelSettings.suffix': 'lpn_labels_col_after', 'labelSettings.show': 'lpn_labels_col_show',
+		'labelSettings.node': 'lpn_labels_col_show', 'labelSettings.link': 'lpn_labels_col_show',
+		'labelSettings.customer': 'lpn_labels_col_show',
+		'defaultPattern': 'lpn_settings_default_pattern', 'times.statistic': 'lpn_time_statistic'
+	};
+	function settingTableLabel(p) {
+		var pc = EngCalcs.pageConfig || {}, i, key, k, times = EngCalcs.LPN_TIME_FIELDS || [];
+		if (p[0] === 'times') {
+			for (i = 0; i < times.length; i++) { if (times[i][0] === p[1] && pc[times[i][1]]) { return pc[times[i][1]]; } }
+		}
+		for (i = p.length; i > 0; i--) {
+			key = p.slice(0, i).join('.');
+			k = LPN_SETTAB_LABEL[key];
+			if (k && pc[k]) { return [pc[k]].concat(p.slice(i)).join(' › '); }
+		}
+		// No label of its own: the stored name, under the object that holds it.
+		return p.slice(p[0] === 'settings' ? 1 : 0).join(' › ');
+	}
+	// The three calculation options with homes of their own (LPN_SETTING_ELSEWHERE).
+	function settingRowHome(p) {
+		var s = p.join('.');
+		if (s === 'settings.hydraulics.demandMultiplier') { return 'dm'; }
+		if (p[0] === 'times' && LPN_SCENARIO_TIME_KEYS.indexOf(p[1]) >= 0) { return 'time2'; }
+		return '';
+	}
+	function settingTableChoices(p) {
+		var pc = EngCalcs.pageConfig || {}, s = p.join('.');
+		if (s === 'settings.method') {
+			return [['hw', pc.bpn_method_hw || 'Hazen-Williams'], ['dw', pc.bpn_method_dw || 'Darcy-Weisbach'],
+				['manning', pc.bpn_method_manning || 'Manning']];
+		}
+		// Stored as the solver's name; the Settings box asks it as a yes/no about the built-in one.
+		if (s === 'settings.engine') { return [['native', settingTableYes()], ['epanet', settingTableNo()]]; }
+		return null;
+	}
+	function settingTableYes() { return (EngCalcs.pageConfig || {}).lpn_settings_table_yes || 'Yes'; }
+	function settingTableNo() { return (EngCalcs.pageConfig || {}).lpn_settings_table_no || 'No'; }
+	// What a row's value IS, read off the value the project states (else the first a scenario
+	// holds), so a typed cell is read back as the same kind of thing.
+	function settingRowKind(p, sample) {
+		if (p[0] === 'times') { return p[1] === 'statistic' ? 'statistic' : 'time'; }
+		if (settingTableChoices(p)) { return 'choice'; }
+		if (typeof sample === 'number') { return 'num'; }
+		if (typeof sample === 'boolean') { return 'bool'; }
+		if (sample && typeof sample === 'object') { return 'json'; }
+		return 'str';
+	}
+	function settingTableRows() {
+		var seen = {}, out = [], held = [], secIdx = {}, subIdx = {};
+		LPN_SETTAB_SECTIONS.forEach(function (s, i) { secIdx[s[0]] = i; });
+		LPN_SETTAB_SUB_ORDER.forEach(function (s, i) { subIdx[s] = i; });
+		function add(path) {
+			var p = path.slice(), id, cat, h;
+			if (p[0] === 'times') { if (p[1] === 'text' || p.length < 2) { return; } p = p.slice(0, 2); }
+			cat = categoryOfSetting(p);
+			if (!cat) { return; }
+			id = JSON.stringify(p);
+			if (seen[id]) { return; }
+			seen[id] = true;
+			h = settingTableHeadings(p);
+			out.push({ id: id, _lpnSetting: true, path: p, cat: cat, home: settingRowHome(p),
+				major: h[0], minor: h[1], order: secIdx[h[0]] * 100 + subIdx[h[1]], n: out.length });
+		}
+		settingLeaves({ settings: settings, labelSettings: labelSettings,
+			project: { basemap: project.basemap, basemapLast: project.basemapLast },
+			defaultPattern: doc.defaultPattern === undefined ? null : doc.defaultPattern }).forEach(function (l) { add(l.path); });
+		(EngCalcs.LPN_TIME_FIELDS || LPN_SCENARIO_TIME_KEYS.map(function (k) { return [k]; })).forEach(function (f) { add(['times', f[0]]); });
+		Object.keys(projectTimes()).forEach(function (k) { add(['times', k]); });
+		add(['settings', 'hydraulics', 'demandMultiplier']);
+		add(['view']);
+		scenarios.forEach(function (s) {
+			if (s.isBase) { return; }
+			settingLeaves(scenarioSettingsBlock(s) || {}).forEach(function (l) { add(l.path); held.push(l); });
+		});
+		out.forEach(function (r) {
+			var sample = settingFor(baseScenario(), r.path), i;
+			for (i = 0; (sample === null || sample === undefined) && i < held.length; i++) {
+				if (JSON.stringify(held[i].path) === r.id) { sample = held[i].value; }
+			}
+			r.kind = r.home === 'dm' ? 'num' : settingRowKind(r.path, sample);
+		});
+		return out.sort(function (a, b) { return (a.order - b.order) || (a.n - b.n); });
+	}
+	// The value this row has in scenario `scn` (Base: the project's own).
+	function settingRowValue(row, scn) {
+		var v;
+		if (row.home === 'dm') {
+			v = scn.isBase ? undefined : heldCalcOption(scn, 'demandMultiplier');
+			if (v === undefined) { v = (settings.hydraulics || {}).demandMultiplier; }
+			return (typeof v === 'number' && isFinite(v)) ? v : 1;
+		}
+		return settingFor(scn, row.path);
+	}
+	function settingRowText(row, scn) {
+		var v = settingRowValue(row, scn), key = row.path[1], t, ch, i;
+		if (row.kind === 'time') {
+			if (typeof v !== 'number') { return ''; }
+			t = settingFor(scn, ['times', 'text', key]);
+			return EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText({ text: typeof t === 'string' ? (function () { var o = {}; o[key] = t; return o; }()) : {} }, key, v) : String(v);
+		}
+		if (v === undefined || v === null) { return ''; }
+		if (row.kind === 'choice') {
+			ch = settingTableChoices(row.path);
+			for (i = 0; i < ch.length; i++) { if (ch[i][0] === v) { return String(ch[i][1]); } }
+			return String(v);
+		}
+		if (typeof v === 'boolean') { return v ? settingTableYes() : settingTableNo(); }
+		if (typeof v === 'number') { return String(+v.toFixed(10)); }
+		if (typeof v === 'object') { return JSON.stringify(v); }
+		return String(v);
+	}
+	// Typed text to the value it stores, or {ok: false}. The same rule in every scenario.
+	function settingRowParse(row, text) {
+		var t = String(text === null || text === undefined ? '' : text).trim(), sec, ch, i, v, base;
+		switch (row.kind) {
+			case 'time':
+				if (!EngCalcs.lpnParseTime || t === '') { return { ok: false }; }
+				sec = EngCalcs.lpnParseTime(t.split(/\s+/), { typed: true });
+				if (sec === null || !isFinite(sec) || sec < 0 || (row.path[1] === 'hydraulicStep' && !(sec > 0))) { return { ok: false }; }
+				return { ok: true, v: sec, text: t };
+			case 'statistic':
+				v = EngCalcs.lpnParseStatistic ? EngCalcs.lpnParseStatistic(t) : null;
+				return v ? { ok: true, v: v, text: t } : { ok: false };
+			case 'num':
+				if (t === '' || !isFinite(+t)) { return { ok: false }; }
+				if (row.home === 'dm' && !(+t > 0)) { return { ok: false }; }
+				return { ok: true, v: +t };
+			case 'bool':
+				if (/^(1|true|yes|on|y)$/i.test(t) || t.toLowerCase() === settingTableYes().toLowerCase()) { return { ok: true, v: true }; }
+				if (/^(0|false|no|off|n)$/i.test(t) || t.toLowerCase() === settingTableNo().toLowerCase()) { return { ok: true, v: false }; }
+				return { ok: false };
+			case 'choice':
+				ch = settingTableChoices(row.path);
+				for (i = 0; i < ch.length; i++) {
+					if (t.toLowerCase() === String(ch[i][0]).toLowerCase() || t.toLowerCase() === String(ch[i][1]).toLowerCase()) { return { ok: true, v: ch[i][0] }; }
+				}
+				return { ok: false };
+			case 'json':
+				try { v = JSON.parse(t); } catch (e) { return { ok: false }; }
+				if (!v || typeof v !== 'object') { return { ok: false }; }
+				if (row.path[0] === 'view' && !inwardViewOf(v)) { return { ok: false }; }
+				return { ok: true, v: v };
+		}
+		// A blank where the project states nothing (a default pattern) is "none", not an empty name.
+		base = settingFor(baseScenario(), row.path);
+		return { ok: true, v: (t === '' && (base === null || base === undefined)) ? null : t };
+	}
+	// **WHERE AN EDIT OF THIS ROW LANDS IN THIS SCENARIO**: the scenario (or the stored alternative or
+	// calculation set it names), through setScenarioSetting(); Base writes the project's own object.
+	function settingRowWrite(row, scn, p) {
+		var root, node, i, k = row.path[1], times;
+		if (!scn.isBase) {
+			if (row.home === 'dm') { touchTree('demandMultiplier'); calcTargetOf(scn).demandMultiplier = p.v; return true; }
+			if (row.home === 'time2') { return setScenarioTime(calcTargetOf(scn), k, p.text); }
+			if (row.path[0] === 'times') {
+				setScenarioSetting(scn, row.path, p.v);
+				return setScenarioSetting(scn, ['times', 'text', k], p.text);
+			}
+			return setScenarioSetting(scn, row.path, p.v);
+		}
+		if (row.path[0] === 'times') {
+			times = doc.times || (doc.times = EngCalcs.lpnTimesDefaults());
+			times[k] = p.v;
+			times.text = times.text || {};
+			times.text[k] = p.text;
+			return true;
+		}
+		if (row.path[0] === 'view') { if (viewShowsModel(inwardViewOf(p.v))) { applyView(inwardViewOf(p.v)); } return true; }
+		if (row.path[0] === 'defaultPattern') { doc.defaultPattern = p.v; return true; }
+		root = row.path[0] === 'settings' ? settings : row.path[0] === 'labelSettings' ? labelSettings : project;
+		node = root;
+		for (i = 1; i < row.path.length - 1; i++) {
+			if (!plainObject(node[row.path[i]])) { node[row.path[i]] = {}; }
+			node = node[row.path[i]];
+		}
+		node[row.path[row.path.length - 1]] = altCopy(p.v);
+		return true;
+	}
+	// **IS THIS ROW'S VALUE AN OVERRIDE IN THIS SCENARIO?** hasOverride()'s rule: local where the
+	// scenario WRITES, so a value it only inherits is not marked. Base holds none.
+	function settingRowIsLocal(row, scn) {
+		var t;
+		if (!scn || scn.isBase) { return false; }
+		t = writeTargetFor(scn, row.cat).obj;
+		if (row.home === 'dm') { return typeof t.demandMultiplier === 'number' && isFinite(t.demandMultiplier); }
+		if (row.home === 'time2') { return scenarioTimeValue(t, row.path[1]) !== undefined; }
+		return settingGet({ r: t.settings }, ['r'].concat(row.path)) !== undefined;
+	}
+	function settingRowClear(row, scn) {
+		var t;
+		if (!settingRowIsLocal(row, scn)) { return false; }
+		t = writeTargetFor(scn, row.cat).obj;
+		if (row.home === 'dm') { touchTree('demandMultiplier'); delete t.demandMultiplier; return true; }
+		if (row.home === 'time2') { return setScenarioTime(t, row.path[1], ''); }
+		if (row.path[0] === 'times') { setScenarioSetting(scn, ['times', 'text', row.path[1]], undefined); }
+		return setScenarioSetting(scn, row.path, undefined);
+	}
+	// After a write or a clear: everything a scenario switch redraws, since a setting can change
+	// any of it, then the basemap and the contours, which a switch does not touch.
+	function settingTableAfterEdit() { paneAfterScenarioSwap(settingTableAfterEditNow); }
+	function settingTableAfterEditNow() {
+		applyScenarioChange();
+		refreshBasemap();
+		refreshContour();
+		if (EngCalcs.lpnTimeRenderOverrides) { EngCalcs.lpnTimeRenderOverrides(); }
+		dropScenarioCompareRun();
+	}
+	function settingTableCols() {
+		function row(r) { return r && r._lpnSetting ? r : null; }
+		return [
+			{ key: 'major', label: 'lpn_settings_table_major', str: true, em: 8,
+				get: function (r) { var pc = EngCalcs.pageConfig || {}, i;
+					for (i = 0; i < LPN_SETTAB_SECTIONS.length; i++) { if (LPN_SETTAB_SECTIONS[i][0] === r.major) { return pc[LPN_SETTAB_SECTIONS[i][1]] || r.major; } }
+					return r.major; },
+				sortKey: function (r) { return r.order; } },
+			{ key: 'minor', label: 'lpn_settings_table_minor', str: true, em: 8,
+				get: function (r) { return (EngCalcs.pageConfig || {})[LPN_SETTAB_SUBS[r.minor]] || r.minor; },
+				sortKey: function (r) { return r.order; } },
+			{ key: 'category', label: 'lpn_settings_table_category', str: true, em: 7,
+				get: function (r) { return altCategoryLabel(r.cat); } },
+			{ key: 'setting', label: 'lpn_settings_table_setting', str: true, em: 16,
+				get: function (r) { return settingTableLabel(r.path); } },
+			// **THE VALUE, IN THE SCENARIO THE ROW SHOWS**: the open one with Show scenarios off, the
+			// row's own with it on (paneScnWrapCol() makes it the open one for the call).
+			{ key: 'value', label: 'lpn_find_value', str: true, em: 10, reread: true,
+				get: function (r) { return row(r) ? settingRowText(r, activeScenario()) : undefined; },
+				// Checked here, so a refused entry costs no undo step; handed on as the TEXT, which
+				// set() reads by the same rule (a time's typed text is kept beside its seconds).
+				parse: function (t, r) { return row(r) && settingRowParse(r, t).ok ? { ok: true, v: t } : { ok: false }; },
+				set: function (r, v) {
+					var p;
+					if (!row(r)) { return; }
+					p = settingRowParse(r, v);
+					if (!p.ok || !settingRowWrite(r, activeScenario(), p)) { return; }
+					settingTableAfterEdit();
+				},
+				// The Show scenarios hooks (paneScnWrapCol(), paneScnCellIsLocal(), paneOverrideCells()):
+				// every scenario may hold every row, so a scenario's Value is always typeable.
+				scnEditable: function () { return true; },
+				scnLocal: function (r, scn) { return settingRowIsLocal(r, scn); },
+				scnClear: function (r, scn) { return settingRowClear(r, scn); },
+				scnCat: function (r) { return r.cat; } }
+		];
+	}
+	// The time-override note under Settings > Time names each scenario holding its own run time or
+	// time step; its button opens this table on that scenario's row of that setting.
+	function openSettingsTableAt(scnId, path) {
+		var spec = paneTableById('settings'), rows, cols, r, c;
+		if (!spec) { return; }
+		if (!spec.scnRows && scenarios.length > 1) { paneScnToggle(spec); }
+		openPane('settings');
+		rows = paneTableRowsInOrder(spec); cols = paneCols(spec);
+		r = paneIndexOfId(rows, spec.scnRows ? paneScnRowKey(JSON.stringify(path), scnId) : JSON.stringify(path));
+		c = paneIndexOfKey(cols, 'value');
+		if (r < 0 || c < 0) { return; }
+		paneSelSet(spec, rows, cols, r, c, false);
+		paneSelPaint(spec, rows, cols);
+		paneFocusCell(spec, rows[r].id, 'value');
 	}
 	function paneNumText(v) {
 		return (typeof v === 'number' && isFinite(v)) ? String(+v.toFixed(6)) : '';
@@ -26277,11 +26672,13 @@ var EngCalcs = EngCalcs || {};
 	// the rule it always had (blank means `undefined` where the column says so, otherwise a finite
 	// number); a yes/no accepts the spellings a sheet or a hand would produce; a choice must be one
 	// of the column's own; a text column takes anything.
-	function paneParseCellText(c, text) {
+	function paneParseCellText(c, text, row) {
 		var t = String(text === null || text === undefined ? '' : text).trim();
 		// A column whose cell is a small language of its own (the Vertices list, Task 610) brings
 		// its own reader, so a typed cell, a pasted one and a created row all refuse it alike.
-		if (c.parse) { return c.parse(t); }
+		// `row` is the row being written, for a column whose rows are different kinds of thing (the
+		// Settings table's Value); a Show scenarios row is handed over as its own row.
+		if (c.parse) { return c.parse(t, paneRowEl(row)); }
 		// **A CELL'S OWN PLAIN WORD ROUND-TRIPS** (Tom, 2026-09-28: pasting Net3's Tanks into a new
 		// project refused on "Not used is not a valid Mixing fraction"). paneCellText() prints the
 		// plain word -- "Not used", "Attached" -- wherever plainFor(el) is true, and a copy writes
@@ -26755,7 +27152,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function paneFilterBanner(spec, rows, withClear) {
 		var pc = EngCalcs.pageConfig || {}, q = paneFilterQuery(spec), wrap, text, btn;
-		if (!q && !paneSelFilter) { return null; }
+		if ((!q && !paneSelFilter) || spec.group === 'setting') { return null; }
 		wrap = document.createElement('div');
 		wrap.className = 'lpn-pane-filter';
 		text = document.createElement('span');
@@ -27828,7 +28225,7 @@ var EngCalcs = EngCalcs || {};
 		if (!ctx) { return false; }
 		c = ctx.c; el = ctx.el;
 		// A checkbox cell carries its answer in `checked`; every other cell in its text.
-		p = paneParseCellText(c, (c.bool && input.type === 'checkbox') ? (input.checked ? '1' : '0') : input.value);
+		p = paneParseCellText(c, (c.bool && input.type === 'checkbox') ? (input.checked ? '1' : '0') : input.value, el);
 		if (!p.ok) {
 			input.value = paneCellText(c, el);
 			paneLeaveEdit(input);
@@ -27851,7 +28248,7 @@ var EngCalcs = EngCalcs || {};
 		 * PARSED values rather than as text, so "42.0" typed over a stored 42 is the no-change it
 		 * looks like.
 		 */
-		was = paneParseCellText(c, paneCellText(c, el));
+		was = paneParseCellText(c, paneCellText(c, el), el);
 		// **ONE CANVAS MEASUREMENT FOR THE WHOLE COMMIT, SNAPSHOT INCLUDED** (Task 690). The
 		// snapshot records the camera, which means it reads the canvas -- and it is taken between
 		// the previous keystroke's drawing writes and this one's, which is the worst possible
@@ -27894,7 +28291,7 @@ var EngCalcs = EngCalcs || {};
 		if (c.plainWord && c.plainFor && c.plainFor(el) &&
 			String(text === null || text === undefined ? '' : text).trim() === String(c.plainWord()).trim()) { return true; }
 		if (paneCellIsPlain(c, el) || !c.set) { return false; }
-		p = paneParseCellText(c, text);
+		p = paneParseCellText(c, text, el);
 		if (!p.ok) { return false; }
 		c.set(el, p.v);
 		return true;
@@ -29406,6 +29803,11 @@ var EngCalcs = EngCalcs || {};
 			if (!el || scn.isBase) { continue; }
 			for (c = box.c0; c <= box.c1; c++) {
 				col = cols[c];
+				// A Settings table row: the column says whether it holds an override, and clears it.
+				if (col && col.scnLocal) {
+					if (col.scnLocal(el, scn)) { out.push({ el: el, scn: scn, props: [], col: col }); }
+					continue;
+				}
 				p = col && paneColProp(col);
 				if (!p) { continue; }
 				// Where clearOverride() would act: the map this scenario writes this category to.
@@ -29422,16 +29824,18 @@ var EngCalcs = EngCalcs || {};
 	// in this scenario" box calls, run in the row's own scenario.
 	function paneClearOverrides(spec) {
 		var rows = paneTableRowsInOrder(spec), cols = paneCols(spec),
-			box = paneSelBox(spec, rows, cols), hits, touched = {};
+			box = paneSelBox(spec, rows, cols), hits, touched = {}, settingsCleared = false;
 		if (!box) { return false; }
 		hits = paneOverrideCells(spec, rows, cols, box);
 		if (!hits.length) { return false; }
 		saveUndoSnapshot();
 		hits.forEach(function (h) {
+			if (h.col) { h.col.scnClear(h.el, h.scn); settingsCleared = true; return; }
 			paneInScenario(h.scn, function () { h.props.forEach(function (k) { clearOverride(h.el, k); }); });
 			touched[elGroup(h.el) + '\u0000' + h.el.id] = h.el;
 		});
 		Object.keys(touched).forEach(function (k) { afterPropertyEdit(touched[k]); });
+		if (settingsCleared) { settingTableAfterEdit(); }
 		refreshPopupIfOpen();
 		renderPaneTable(spec);
 		return true;
@@ -64755,147 +65159,24 @@ var EngCalcs = EngCalcs || {};
 	// for a Base alternative, the scenario's name and its count of local values for its own.
 	function rebuildAlternativesTable() {
 		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_alt_report'), body,
-			baseWord = pc.lpn_scenario_base || 'Base', focusAt = null, act, nCat;
+			baseWord = pc.lpn_scenario_base || 'Base';
 		if (!host) { return; }
-		// **AN EDIT HERE REBUILDS THIS TABLE** (the badge count changes, and refreshScenarioStatus()
-		// redraws every box that shows one), so the cell being typed in is found again afterwards --
-		// or Tab out of one option would land nowhere.
-		act = document.activeElement;
-		if (act && act.getAttribute && act.getAttribute('data-alt-scn')) {
-			focusAt = { scn: act.getAttribute('data-alt-scn'), key: act.getAttribute('data-alt-key') };
-		}
 		host.innerHTML = '';
-		// **THE CALCULATION OPTIONS ARE NOT ALTERNATIVES** (Tom, 2026-09-30: *"Demand multiplier:
-		// OK. A Demand Multiplier column with the alternatives? What about other settings?"*; Mary
-		// and Sue advised they stay per-scenario options, as Bentley keeps them in Calculation
-		// Options). So they are the last columns, after a divider, each heading carrying its tip --
-		// and they are plain columns, blank meaning inherits, not named sets (Sue, until scenarios
-		// number in the dozens). Task 755 made them editable here.
-		nCat = LPN_ALT_CATEGORIES.length;
-		body = ffTable(host, [pc.lpn_scenario_label || 'Scenario'].concat(LPN_ALT_CATEGORIES.map(altCategoryLabel),
-			[[pc.bpn_demand_mult || 'Demand multiplier', pc.lpn_settings_demand_multiplier_tip, true],
-				[pc.lpn_time_duration || 'Total run time', pc.lpn_scenario_duration_tip, true],
-				[pc.lpn_time_hyd_step || 'Hydraulic time step', pc.lpn_scenario_hyd_step_tip, true]]));
-		markHeadingsFrom(body, nCat + 1);
+		// **ONE COLUMN PER CATEGORY, AND NOTHING ELSE** (Tom, Q7, 2026-10-05: the demand multiplier,
+		// the run time and the time step are calculation options like any other, counted in the
+		// Calculation column; their own three columns retired once the Settings table existed,
+		// which is where every option, these three included, is typed and audited).
+		body = ffTable(host, [pc.lpn_scenario_label || 'Scenario'].concat(LPN_ALT_CATEGORIES.map(altCategoryLabel)));
 		body.parentNode.className += ' lpn-alt-table';
 		scenariosForDisplay().forEach(function (s) {
-			var tr = ffEl('tr', null, null, body), alts = alternativesOf(s), dm;
+			var tr = ffEl('tr', null, null, body), alts = alternativesOf(s);
 			ffCell(tr, scenarioDisplayName(s));
 			LPN_ALT_CATEGORIES.forEach(function (cat) {
 				var a = alts[cat];
 				ffCell(tr, a.isBase ? baseWord : scenarioDisplayName(s) + ' (' + a.count + ')');
 			});
-			// Base shows the project's values (a multiplier of 1 when it states none) and is not
-			// edited here: Settings is its door. A scenario shows its own, BLANK meaning it inherits
-			// the project's (Sue), in a box it can be typed into.
-			if (s.isBase) {
-				dm = (settings.hydraulics || {}).demandMultiplier;
-				if (!(typeof dm === 'number' && isFinite(dm))) { dm = 1; }
-				ffCell(tr, String(dm), 'lpn-alt-calcopt lpn-alt-opt');
-				// Base's run time and step are the project's own, which Settings edits: the value
-				// is the door to it, so nobody has to know where Settings keeps them.
-				LPN_SCENARIO_TIME_KEYS.forEach(function (key) {
-					var td = ffCell(tr, null, 'lpn-alt-opt'), b = document.createElement('button');
-					b.type = 'button'; b.className = 'lpn-time-ovr-btn';
-					b.textContent = scenarioTimeText(s, key);
-					b.addEventListener('click', function () { openSettingsBox('time'); });
-					td.appendChild(b);
-				});
-				return;
-			}
-			altOptionCell(tr, s, 'demandMultiplier', 'lpn-alt-calcopt lpn-alt-opt');
-			LPN_SCENARIO_TIME_KEYS.forEach(function (key) { altOptionCell(tr, s, key, 'lpn-alt-opt'); });
 		});
 		ffEl('p', 'lpn-ff-note', pc.lpn_alt_note, host);
-		if (focusAt) {
-			Array.prototype.forEach.call(host.querySelectorAll ? host.querySelectorAll('input[data-alt-scn]') : [], function (inp) {
-				if (inp.getAttribute('data-alt-scn') === focusAt.scn && inp.getAttribute('data-alt-key') === focusAt.key) {
-					try { inp.focus(); } catch (e) {}
-				}
-			});
-		}
-	}
-	// tbody -> its table -> thead -> the heading row; every heading from `from` on is an option.
-	// **THE OPTION COLUMNS ARE NAMED AS A GROUP** (Tom, 2026-10-04, in the preview with Basic mode off:
-	// he could not find them). A row above the headings spans them with "Calculation options", the
-	// word Settings and the note under the table already use; the alternatives side stays blank.
-	function markHeadingsFrom(tbody, from) {
-		var thead = tbody.parentNode.children[0], hr = thead.children[0], i, gr, blank, group;
-		for (i = from; i < hr.children.length; i++) {
-			hr.children[i].className += ' lpn-alt-opt' + (i === from ? ' lpn-alt-calcopt' : '');
-		}
-		gr = document.createElement('tr');
-		blank = document.createElement('th'); blank.colSpan = from;
-		group = document.createElement('th'); group.colSpan = hr.children.length - from;
-		group.className = 'lpn-alt-opt lpn-alt-calcopt lpn-alt-group';
-		group.textContent = (EngCalcs.pageConfig || {}).lpn_alt_calc_options || 'Calculation options';
-		gr.appendChild(blank); gr.appendChild(group);
-		thead.insertBefore(gr, hr);
-	}
-	function altOptionText(s, key) {
-		var t = calcTargetOf(s);
-		if (key === 'demandMultiplier') {
-			return (typeof t.demandMultiplier === 'number' && isFinite(t.demandMultiplier)) ? String(t.demandMultiplier) : '';
-		}
-		return scenarioTimeText(s, key);
-	}
-	function altOptionLabel(key) {
-		var pc = EngCalcs.pageConfig || {};
-		if (key === 'demandMultiplier') { return pc.bpn_demand_mult || 'Demand multiplier'; }
-		return key === 'duration' ? (pc.lpn_time_duration || 'Total run time') : (pc.lpn_time_hyd_step || 'Hydraulic time step');
-	}
-	// One editable option cell. A change that the page cannot use puts the old text back and
-	// writes nothing; one that changes nothing writes nothing either, so no empty undo step is
-	// pushed. Otherwise: one undo step, the write, and the same follow-through a Settings edit has.
-	function altOptionCell(tr, s, key, cls) {
-		var td = ffCell(tr, null, cls), input = document.createElement('input');
-		input.type = 'text';
-		input.inputMode = key === 'demandMultiplier' ? 'decimal' : 'text';
-		input.className = 'lpn-alt-input';
-		input.value = altOptionText(s, key);
-		// A blank box shows what it falls back to, so "blank" reads as "same as Base".
-		if (key !== 'demandMultiplier') { input.placeholder = scenarioTimeText(baseScenario(), key); }
-		input.setAttribute('data-alt-scn', s.id);
-		input.setAttribute('data-alt-key', key);
-		input.setAttribute('aria-label', scenarioDisplayName(s) + ': ' + altOptionLabel(key));
-		input.addEventListener('change', function () { commitAltOption(s, key, input); });
-		td.appendChild(input);
-		return td;
-	}
-	function commitAltOption(s, key, input) {
-		var raw = String(input.value).trim(), was = altOptionText(s, key), num;
-		if (raw === was) { return; }
-		if (key === 'demandMultiplier') {
-			num = +raw;
-			if (raw !== '' && !(isFinite(num) && num > 0)) { input.value = was; return; }
-			saveUndoSnapshot();
-			if (raw === '') { delete calcTargetOf(s).demandMultiplier; } else { calcTargetOf(s).demandMultiplier = num; }
-			touchTree('demandMultiplier');
-		} else {
-			if (!scenarioTimeTextOk(key, raw)) { input.value = was; return; }
-			saveUndoSnapshot();
-			setScenarioTime(calcTargetOf(s), key, raw);
-		}
-		afterScenarioOptionEdit(s);
-	}
-	// **THE TABLE IS NOT REBUILT UNDER THE PERSON TYPING IN IT.** An option edit changes no
-	// category cell and no other row, and the box already shows what was typed; rebuilding it here
-	// (refreshScenarioStatus() redraws this box) would throw away the box Tab is moving focus to.
-	var altOptionEditing = false;
-	function afterScenarioOptionEdit(s) {
-		var active = s.id === project.activeScenario;
-		altOptionEditing = true;
-		try { refreshScenarioStatus(); } finally { altOptionEditing = false; }
-		saveToStorage();
-		if (active) {
-			// The Settings box reads the open scenario's multiplier, and the transport its clock.
-			rebuildSettingsBox();
-			if (EngCalcs.lpnTimeTimesChanged) { EngCalcs.lpnTimeTimesChanged(); }
-			scheduleSolve();
-		} else {
-			// Nothing on the map changed, but a comparison on screen no longer describes the project.
-			dropScenarioCompareRun();
-		}
 	}
 	// Position and size for the life of the page only: remembering them would be a new key in the
 	// browser for a view Tom has not yet decided to keep.
@@ -64919,7 +65200,7 @@ var EngCalcs = EngCalcs || {};
 		addPanelResizeGrip(box);
 	}
 	function refreshAlternativesBoxIfOpen() {
-		if (altBoxIsOpen() && !altOptionEditing) { rebuildAlternativesTable(); }
+		if (altBoxIsOpen()) { rebuildAlternativesTable(); }
 	}
 
 	// ---- THE FULL REPORT: every node and every link, at every reporting time step -----------------
@@ -65877,7 +66158,7 @@ var EngCalcs = EngCalcs || {};
 			times: effectiveTimes,
 			// Which scenarios state their own value of each, for the note under Settings > Time.
 			timeOverrides: scenarioTimeOverrides,
-			openScenarioOptions: function () { openAlternativesBox(); },
+			openScenarioOptions: function (id, key) { openSettingsTableAt(id, ['times', key]); },
 			apply: applySolveResult, status: setStatus, notice: showSlowAdvice, solve: scheduleSolve,
 			// **AND THE UNDEBOUNCED ONE, which is what asking for a run needs** (Task 248,
 			// 2026-08-19). A period run is provoked by a deliberate act -- the Run button, or a

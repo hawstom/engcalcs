@@ -4422,9 +4422,6 @@ html:has(#lpn_canvas) { overflow: hidden; }
 /* The calculation options shown beside the alternatives (the Alternatives preview's Demand
    multiplier, Total run time and Hydraulic time step, Task 755): a divider before the first, every
    one centred, and a scenario's own value in a box narrow enough for `24:00` or `1.8`. */
-.lpn-ff-table .lpn-alt-calcopt { border-inline-start: 2px solid var(--ec-gray-999); }
-.lpn-ff-table .lpn-alt-opt { text-align: center; }
-.lpn-alt-input { width: 4.5em; text-align: center; font: inherit; }
 /* An id in the fire-flow table goes to its element (Tom, 2026-09-28: "can every node have a
    hyperlink to go to it?"): a button dressed as the link he asked for. */
 .lpn-ff-goto { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: var(--ec-accent); text-decoration: underline; cursor: pointer; text-align: inherit; }
