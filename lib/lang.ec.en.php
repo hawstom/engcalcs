@@ -4351,7 +4351,7 @@ $ec_lang['lpn_analyze_time_moved']='⚠ This was computed at {time}, and the clo
 // cannot tell a mistake from a place; a file of eastings and northings is refused by name, because
 // a plane coordinate read as a degree is silent and puts a network in the Gulf of Guinea.
 $ec_lang['lpn_file_import_survey']='Import surveyed points…';
-$ec_lang['lpn_file_import_survey_tip']='Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.';
+$ec_lang['lpn_file_import_survey_tip']='Read a list of surveyed points from a text file and make one junction at each point, taking the new-asset settings for everything the file does not state. No pipes are drawn unless you tick Read the description as field codes, and no row is ever dropped without being named. It reads the coordinate system this project already uses, georeferenced or not.';
 $ec_lang['lpn_survey_read_error']='That file could not be read from your disk.';
 $ec_lang['lpn_survey_cancelled']='Nothing was created and nothing was changed.';
 // What the project calls its two axes, for a sentence js/lpn-survey.js writes about a column. The
@@ -4421,6 +4421,10 @@ $ec_lang['lpn_survey_note_pipe_one_node']='This line returns to the same node wi
 $ec_lang['lpn_survey_note_line_one_point']='Only point on its line, no pipe drawn from it.';
 $ec_lang['lpn_survey_note_vertices']='Points that became pipe vertices: {detail}. A vertex keeps no name, elevation, or description.';
 $ec_lang['lpn_survey_note_no_desc']='Field codes are on, but this file has no description column, so no codes were read.';
+$ec_lang['lpn_survey_note_line_plain']='Line {line}: {sev}: {text}';
+$ec_lang['lpn_survey_note_ring_junction']='This point became a junction so the ring could close.';
+$ec_lang['lpn_survey_note_pipe_zero_length']='This point is at the same spot as the node before it, so the pipe between them has no length.';
+$ec_lang['lpn_survey_note_node_on_pipe']='This point lies exactly on a pipe it is not joined to. If they connect, add JPN to say so.';
 $ec_lang['lpn_settings_demand_model']='Demand model';
 $ec_lang['lpn_settings_demand_model_tip']='Choose how junctions receive flow. Demand driven (DDA) delivers every demand in full, whatever the pressure. Pressure driven (PDA) delivers less than the demand where the pressure is below the required pressure, and only the EPANET solver computes it.';
 $ec_lang['lpn_settings_demand_model_dda']='Demand driven';

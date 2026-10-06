@@ -550,8 +550,11 @@
 	//   * The first word of the Description is the feature code; a code with digits after it is
 	//     the same code, numbered line (`WL1`, `WL2`): Carlson "Special Codes", same-code joining.
 	//   * Several codes on one shot are joined by dots (`FH.WL1`): Carlson Field to Finish.
-	//   * `+0` starts and `-0` ends a line (Carlson's PointCAD format); `CLO` closes it.
-	//   * `JPN<point>` joins to a named point (Carlson); `CPN<point>` is Civil 3D's spelling.
+	//   * `+0` starts and `-0` ends a line (Carlson's PointCAD format); `CLO` closes it (Carlson
+	//     Special Codes 3.13).
+	//   * `JPN<point>` joins to a named point (Carlson 3.28); `CPN<point>` is Civil 3D's spelling.
+	//     Carlson documents JPN for the segment from the coded point; using it on a line's last or
+	//     inside point (below) is OUR extension.
 	//
 	// **WHAT A CODE BECOMES IS THE READER'S TABLE, never ours to guess.** The defaults come from
 	// PennDOT's published survey feature codes (WL water line, WV valve, FH hydrant, WM meter, WELL,
@@ -662,9 +665,9 @@
 		});
 		Object.keys(open).forEach(finish);
 		// **A JOIN EXTENDS THE LINE AT AN END AND BRANCHES FROM IT ANYWHERE ELSE.** Carlson: "JPN73
-		// causes a line to be drawn from the current point to the point '73'". On the first or last
-		// point of its line that segment continues the line; on an inside point it is a pipe of its
-		// own, and the inside point becomes the node it leaves from.
+		// causes a line to be drawn from the current point to the point '73'". On the first point of
+		// its line that segment begins the line (Carlson's documented case); on the last point it
+		// continues the line and on an inside point it is a pipe of its own, which is OUR extension.
 		pts.forEach(function (p, i) {
 			var c = codes[i];
 			c.joins.forEach(function (name) {
@@ -700,9 +703,43 @@
 			if (typeof a === 'number') { isNode[a] = true; }
 			if (typeof b === 'number') { isNode[b] = true; }
 		});
+		// Each line cut at its nodes: one pipe per stretch between two nodes, the points inside it its
+		// vertices, in order.
+		//
+		// **A RING IS NEVER LOST** (Perry's pre-review, 2026-10-06). A stretch that leaves a node and
+		// comes back to the same node -- a CLO line with no other node on it, or a JPN back to the
+		// line's own start -- cannot be one pipe, because EPANET needs two different end nodes. The
+		// last vertex before the return becomes a junction, so the ring is two pipes, and the report
+		// says which point it was. A looped calculator must not drop the loop.
+		seqs.forEach(function (s) {
+			var from = s.refs[0], verts = [], j, r, v,
+				first = s.refs.filter(function (x) { return typeof x === 'number'; })[0];
+			if (s.refs.length < 2) { note('line-one-point', first); return; }
+			for (j = 1; j < s.refs.length; j++) {
+				r = s.refs[j];
+				if (typeof r === 'number' && !isNode[r]) { verts.push(r); continue; }
+				if (same(from, r) && verts.length) {
+					v = verts.pop();
+					isNode[v] = true;
+					note('ring-junction', v);
+					pipes.push({ from: from, to: v, verts: verts, key: s.key });
+					from = v; verts = [];
+				}
+				if (same(from, r)) {
+					note('pipe-one-node', typeof r === 'number' ? r : first);
+				} else {
+					pipes.push({ from: from, to: r, verts: verts, key: s.key });
+				}
+				from = r; verts = [];
+			}
+		});
+		counts.pipe = pipes.length;
+		// The vertices are counted from the pipes actually drawn, so the note never counts a point
+		// that went nowhere.
+		pipes.forEach(function (pp) { vertices += pp.verts.length; });
 		pts.forEach(function (p, i) {
 			var c = codes[i], as;
-			if (!isNode[i]) { vertices++; if (c.unread) { note('vertex-text', i); } return; }
+			if (!isNode[i]) { if (c.unread) { note('vertex-text', i); } return; }
 			as = c.nodeAs || (c.lines.length ? 'junction' : fallback);
 			nodes.push({ pt: i, as: as });
 			counts[as]++;
@@ -710,23 +747,38 @@
 			if (c.twoNodes) { note('code-two-nodes', i); }
 			if (c.unread) { note('code-unread', i); }
 		});
-		// Each line cut at its nodes: one pipe per stretch between two nodes, the points inside it its
-		// vertices, in order.
-		seqs.forEach(function (s) {
-			var from = s.refs[0], verts = [], j, r,
-				first = s.refs.filter(function (x) { return typeof x === 'number'; })[0];
-			if (s.refs.length < 2) { note('line-one-point', first); return; }
-			for (j = 1; j < s.refs.length; j++) {
-				r = s.refs[j];
-				if (typeof r === 'number' && !isNode[r]) { verts.push(r); continue; }
-				if (same(from, r)) {
-					note('pipe-one-node', typeof r === 'number' ? r : first);
-				} else {
-					pipes.push({ from: from, to: r, verts: verts, key: s.key });
-					counts.pipe++;
+		// **COINCIDENT SHOTS ARE REPORTED, NEVER MERGED.** Two nodes at one spot joined by a pipe give
+		// it no length; a node shot exactly on another pipe, with no JPN, is a crossing or a missed
+		// join, and only the surveyor knows which.
+		var XY = function (r) { return typeof r === 'number' ? { x: pts[r].east, y: pts[r].north } : null; };
+		pipes.forEach(function (pp) {
+			var chain = [pp.from].concat(pp.verts, [pp.to]).map(XY), len = 0, k;
+			if (chain.some(function (q) { return !q; })) { return; }
+			for (k = 1; k < chain.length; k++) { len += Math.abs(chain[k].x - chain[k - 1].x) + Math.abs(chain[k].y - chain[k - 1].y); }
+			if (len === 0) { note('pipe-zero-length', pp.to); }
+		});
+		nodes.forEach(function (w) {
+			var P = XY(w.pt), hit = pipes.some(function (pp) {
+				var chain, k, A, B, dx, dy, t, ex, ey, tol;
+				if (pp.from === w.pt || pp.to === w.pt) { return false; }
+				chain = [pp.from].concat(pp.verts, [pp.to]).map(XY);
+				tol = 1e-9 * (1 + Math.abs(P.x) + Math.abs(P.y));
+				for (k = 0; k < chain.length; k++) {
+					A = chain[k];
+					if (!A) { continue; }
+					if (Math.abs(A.x - P.x) <= tol && Math.abs(A.y - P.y) <= tol) { return true; }
+					B = chain[k + 1];
+					if (!B) { continue; }
+					dx = B.x - A.x; dy = B.y - A.y;
+					if (dx === 0 && dy === 0) { continue; }
+					t = ((P.x - A.x) * dx + (P.y - A.y) * dy) / (dx * dx + dy * dy);
+					if (t < 0 || t > 1) { continue; }
+					ex = A.x + t * dx - P.x; ey = A.y + t * dy - P.y;
+					if (Math.abs(ex) <= tol && Math.abs(ey) <= tol) { return true; }
 				}
-				from = r; verts = [];
-			}
+				return false;
+			});
+			if (hit) { note('node-on-pipe', w.pt); }
 		});
 		if (vertices) { notes.push({ code: 'vertices', ids: [], detail: String(vertices) }); }
 		return { nodes: nodes, pipes: pipes, vertices: vertices, notes: notes, counts: counts };
@@ -816,16 +868,13 @@
 		'id-duplicate': 'duplicate-name',
 		'id-taken': 'duplicate-name',
 		'id-invalid': 'invalid-name',
-		// Field codes (Task 771). Every one is a warning: the row made something.
-		'code-unknown': 'unknown-code',
-		'code-two-nodes': 'two-node-codes',
-		'code-unread': 'not-a-code',
-		'vertex-text': 'not-a-code',
-		'join-missing': 'join-not-found',
-		'join-no-line': 'join-without-line',
-		'pipe-one-node': 'pipe-one-node',
-		'line-one-point': 'line-one-point'
 	};
+	// **THE FIELD-CODE NOTES PRINT NO CODE** (Perry's pre-review, 2026-10-06): a handle like
+	// `pipe-one-node` read as our internal name, not a word for the reader. Their line is
+	// `Line 12: warning: <sentence>`, and every one is a warning: the row made something.
+	var FIELD_NOTE = { 'code-unknown': 1, 'code-two-nodes': 1, 'code-unread': 1, 'vertex-text': 1,
+		'join-missing': 1, 'join-no-line': 1, 'pipe-one-node': 1, 'line-one-point': 1,
+		'ring-junction': 1, 'pipe-zero-length': 1, 'node-on-pipe': 1 };
 	// **THE SPLIT IS A FACT ABOUT THE CODE ABOVE, NOT A JUDGEMENT ABOUT SEVERITY.** `error` is every
 	// case where readCsvRow() returns before pushing a point, so the file's row produced nothing;
 	// `warning` is every case where the junction was made and something about it was adjusted or
@@ -839,15 +888,7 @@
 		'bad-elev': 'warning',
 		'id-duplicate': 'warning',
 		'id-taken': 'warning',
-		'id-invalid': 'warning',
-		'code-unknown': 'warning',
-		'code-two-nodes': 'warning',
-		'code-unread': 'warning',
-		'vertex-text': 'warning',
-		'join-missing': 'warning',
-		'join-no-line': 'warning',
-		'pipe-one-node': 'warning',
-		'line-one-point': 'warning'
+		'id-invalid': 'warning'
 	};
 	function sevWord(code) {
 		return NOTE_SEV[code] === 'error'
@@ -855,6 +896,12 @@
 			: (PC.lpn_survey_sev_warning || 'warning');
 	}
 	function lineNote(code, sentence, axis, line) {
+		if (FIELD_NOTE[code]) {
+			return (PC.lpn_survey_note_line_plain || 'Line {line}: {sev}: {text}')
+				.replace('{line}', line === null || line === undefined ? '' : line)
+				.replace('{sev}', PC.lpn_survey_sev_warning || 'warning')
+				.replace('{text}', fill(sentence, null, axis, line));
+		}
 		return (PC.lpn_survey_note_line || 'Line {line}: {sev}: {code}: {text}')
 			.replace('{line}', line === null || line === undefined ? '' : line)
 			.replace('{sev}', sevWord(code))
@@ -893,6 +940,9 @@
 		else if (code === 'join-missing') { text = lineNote(code, PC.lpn_survey_note_join_missing || 'JPN or CPN names a point not in this file or project, no pipe drawn for it.', ax, line); }
 		else if (code === 'join-no-line') { text = lineNote(code, PC.lpn_survey_note_join_no_line || 'JPN or CPN on a point with no line code, no pipe drawn for it.', ax, line); }
 		else if (code === 'pipe-one-node') { text = lineNote(code, PC.lpn_survey_note_pipe_one_node || 'This line returns to the same node with no other node between, no pipe drawn for it.', ax, line); }
+		else if (code === 'ring-junction') { text = lineNote(code, PC.lpn_survey_note_ring_junction || 'This point became a junction so the ring could close.', ax, line); }
+		else if (code === 'pipe-zero-length') { text = lineNote(code, PC.lpn_survey_note_pipe_zero_length || 'This point is at the same spot as the node before it, so the pipe between them has no length.', ax, line); }
+		else if (code === 'node-on-pipe') { text = lineNote(code, PC.lpn_survey_note_node_on_pipe || 'This point lies exactly on a pipe it is not joined to. If they connect, add JPN to say so.', ax, line); }
 		else if (code === 'line-one-point') { text = lineNote(code, PC.lpn_survey_note_line_one_point || 'Only point on its line, no pipe drawn from it.', ax, line); }
 		// The rest are about the FILE and not about a line, so they carry no number, no code and
 		// nothing printed underneath them: there is no line to point at.

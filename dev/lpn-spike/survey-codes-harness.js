@@ -110,8 +110,19 @@ const P = (rows) => rows.map((r, i) => r).join('\n') + '\n';
 {
 	const t = P(['1,0,0,10,WL1', '2,0,100,10,WL1', '3,100,100,10,WL1 CLO']);
 	const pl = planOf(t);
-	ok('CLO closes a line on its first point, which is the only node on it: refused, not drawn',
-		pl.pipes.length === 0 && codes(pl).indexOf('pipe-one-node') >= 0, pipeNames(t, pl).join());
+	ok('a CLO ring with only one node is NOT lost: its last point becomes a junction, two pipes',
+		pipeNames(t, pl).join(' ') === '1>3[2] 3>1' && codes(pl).indexOf('ring-junction') >= 0 &&
+		pl.nodes.some(n => n.pt === 2 && n.as === 'junction'), pipeNames(t, pl).join(' '));
+	ok('...and the vertex count is the vertices actually drawn', pl.vertices === 1, String(pl.vertices));
+	const w = P(['30,0,0,10,WL3', '31,0,100,10,WL3', '32,100,100,10,WL3', '33,100,0,10,WL3 CLO']);
+	const pw = planOf(w);
+	ok('Perry\'s ring, 30..33 WL3 with CLO on 33: point 33 is the junction, the ring is two pipes',
+		pipeNames(w, pw).join(' ') === '30>33[31,32] 33>30', pipeNames(w, pw).join(' '));
+	const f = P(['1,0,-100,10,WL1', '2,0,0,10,WL1 -0', '30,0,0,10,WL3 JPN2', '31,0,100,10,WL3',
+		'32,100,100,10,WL3', '33,100,0,10,WL3 CLO']);
+	const pf = planOf(f);
+	ok('a ring fed by a JPN tee closes too', pf.pipes.length >= 3 &&
+		pipeNames(f, pf).join(' ').indexOf('33>') >= 0, pipeNames(f, pf).join(' '));
 	const v = P(['1,0,0,10,WL1', '2,0,100,10,FH.WL1', '3,100,100,10,WL1 CLO']);
 	ok('...and a ring with a second node on it closes into two pipes',
 		pipeNames(v, planOf(v)).join(' ') === '1>2 2>1[3]', pipeNames(v, planOf(v)).join(' '));
@@ -138,12 +149,28 @@ const P = (rows) => rows.map((r, i) => r).join('\n') + '\n';
 		planOf(P(['1,0,0,10,WL', '2,0,100,10,WL']), { table: [{ code: 'WL', as: 'junction' }] }).pipes.length === 0);
 }
 {
+	const t = P(['1,0,0,10,FH.WL1', '2,0,0,10,FH.WL1', '3,0,100,10,WL1']);
+	const pl = planOf(t);
+	ok('two nodes at one spot: the pipe is still drawn, and its zero length is reported on the line',
+		pipeNames(t, pl).join(' ') === '1>2 2>3' && pl.notes.some(n => n.code === 'pipe-zero-length' && n.line === 2),
+		pipeNames(t, pl).join(' ') + ' ' + JSON.stringify(pl.notes.map(n => n.line + ':' + n.code)));
+	const u = P(['1,0,0,10,WL1', '2,0,100,10,WL1', '3,0,200,10,WL1', '9,0,100,10,FH', '8,0,150,10,WV']);
+	const pu = planOf(u);
+	ok('a node shot exactly on another line\'s VERTEX, with no join, is reported, not merged',
+		pu.notes.some(n => n.code === 'node-on-pipe' && n.line === 4) && pu.nodes.length === 4,
+		JSON.stringify(pu.notes.map(n => n.line + ':' + n.code)));
+	ok('...and one shot exactly on a SEGMENT', pu.notes.some(n => n.code === 'node-on-pipe' && n.line === 5));
+	ok('a node near, but not on, a pipe says nothing',
+		!planOf(P(['1,0,0,10,WL1', '2,0,200,10,WL1', '9,0.5,100,10,FH'])).notes.some(n => n.code === 'node-on-pipe'));
+}
+{
 	// Every note this feature can raise has a sentence, in the standard line shape.
 	const AX = { north: 'Northing', east: 'Easting' };
 	['code-unknown', 'code-two-nodes', 'code-unread', 'vertex-text', 'join-missing', 'join-no-line',
-		'pipe-one-node', 'line-one-point'].forEach(c => {
+		'pipe-one-node', 'line-one-point', 'ring-junction', 'pipe-zero-length', 'node-on-pipe'].forEach(c => {
 		const t = EC.lpnSurveyNoteText({ code: c, line: 9, raw: 'x' }, AX).text;
-		ok('note ' + c + ' prints as a numbered line with a code', /^.*9.*:.*:/.test(t) && t !== c, t);
+		ok('note ' + c + ' prints as a numbered plain sentence, with no internal code',
+			t.indexOf('9') >= 0 && t !== c && t.indexOf(c) < 0 && t.indexOf(PC.lpn_survey_sev_warning) >= 0, t);
 	});
 	ok('the vertices note fills its count', EC.lpnSurveyNoteText({ code: 'vertices', detail: '4' }, AX).text
 		=== PC.lpn_survey_note_vertices.replace('{detail}', '4'));
@@ -206,8 +233,9 @@ function importFile(text, tick) {
 	const box = boxFind(e => e.id === 'lpn_survey_codes');
 	if (tick) { box.checked = true; fire(box, 'change'); }
 	const question = boxText();
-	press(PC.lpn_survey_create);
-	return { box: box, question: question, report: boxText() };
+	const label = (byId.lpn_dialog_buttons.children || [])[0].textContent;
+	press(tick ? PC.lpn_new_create : PC.lpn_survey_create);
+	return { box: box, question: question, report: boxText(), label: label };
 }
 
 L.reset();
@@ -218,6 +246,9 @@ const r = importFile(CODED, true);
 		!!r.box && r.box.type === 'checkbox');
 	ok('the box states every kind it is about to make, in one sentence',
 		r.question.indexOf(PC.lpn_survey_confirm_coded.replace('{j}', 3).replace('{r}', 1).replace('{t}', 1).replace('{p}', 4)) >= 0);
+	ok('ticked, the button says Create, not Create nodes', r.label === PC.lpn_new_create, r.label);
+	ok('the File menu tip no longer says flatly that no pipes are drawn',
+		PC.lpn_file_import_survey_tip.indexOf(PC.lpn_survey_codes_toggle) >= 0);
 	ok('five nodes and four pipes arrived', d.nodes.length === 5 && d.links.length === 4,
 		d.nodes.length + ' nodes, ' + d.links.length + ' links');
 	ok('the kinds are the table\'s', L.node('1').type === 'reservoir' && L.node('20').type === 'tank' &&
@@ -275,6 +306,26 @@ section('5. it SOLVES');
 	ok('every pipe has a finite flow', d.links.every(l => isFinite(res.flows[l.id])));
 }
 
+section('5a. a ring main, coded with CLO and fed by a JPN tee, imports and SOLVES as a loop');
+{
+	L.reset();
+	importFile('1,5000,5000,150,WELL.WL1\n2,5000,5100,100,WL1 -0\n30,5000,5200,100,WL3 JPN2\n' +
+		'31,5000,5300,100,WL3\n32,4900,5300,100,WL3\n33,4900,5200,100,WL3 CLO\n', true);
+	const d = L.getDoc();
+	ok('three nodes on the ring side: the tee 30 and the promoted 33, plus 2', !!L.node('30') && !!L.node('33') && !!L.node('2'),
+		d.nodes.map(n => n.id).join());
+	ok('the ring is two pipes between 30 and 33', d.links.filter(l => (l.from === '30' && l.to === '33') || (l.from === '33' && l.to === '30')).length === 2,
+		d.links.map(l => l.from + '>' + l.to).join(' '));
+	L.runSolve();
+	const model = L.assembleModel();
+	const res = EC.lpnSolve(model, { tol: 1e-9 });
+	ok('the looped network converges', res && res.ok && res.converged === true, res && res.message);
+	const ring = d.links.filter(l => l.from === '30' || l.to === '30').filter(l => l.from === '33' || l.to === '33');
+	const dem33 = (model.nodes.find(n => n.id === '33') || {}).demand || 0;
+	ok('the promoted junction balances: what the two ring pipes bring it is its demand',
+		Math.abs(ring.reduce((a, l) => a + (l.to === '33' ? 1 : -1) * res.flows[l.id], 0) - dem33) < 1e-8);
+}
+
 section('5b. on a georeferenced project, a vertex saves as the file\'s own latitude and longitude');
 {
 	L.reset(L.GEO);
@@ -294,6 +345,7 @@ section('6. unticked, the same file imports exactly as the junctions-only import
 	const plain = importFile(CODED, false);
 	const d = L.getDoc();
 	const parsed = EC.lpnSurveyParse(CODED);
+	ok('unticked, the button still says Create nodes', plain.label === PC.lpn_survey_create, plain.label);
 	ok('one junction per readable point, and no pipe', d.nodes.length === parsed.points.length &&
 		d.links.length === 0 && d.nodes.every(n => n.type === 'junction'), d.nodes.length + '/' + d.links.length);
 	ok('each Description lands verbatim, codes unread', parsed.points.every(p => L.node(p.id).desc === p.desc));

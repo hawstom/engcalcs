@@ -3775,6 +3775,11 @@ EngCalcs.pageConfig = {
 	lpn_survey_note_line_one_point: <?=json_encode($ec_lang['lpn_survey_note_line_one_point'])?>,
 	lpn_survey_note_vertices: <?=json_encode($ec_lang['lpn_survey_note_vertices'])?>,
 	lpn_survey_note_no_desc: <?=json_encode($ec_lang['lpn_survey_note_no_desc'])?>,
+	lpn_survey_note_line_plain: <?=json_encode($ec_lang['lpn_survey_note_line_plain'])?>,
+	lpn_survey_note_ring_junction: <?=json_encode($ec_lang['lpn_survey_note_ring_junction'])?>,
+	lpn_survey_note_pipe_zero_length: <?=json_encode($ec_lang['lpn_survey_note_pipe_zero_length'])?>,
+	lpn_survey_note_node_on_pipe: <?=json_encode($ec_lang['lpn_survey_note_node_on_pipe'])?>,
+	lpn_new_create: <?=json_encode($ec_lang['lpn_new_create'])?>,
 };
 </script>
 <script src="/engcalcs/js/PipeHydraulics.lib.js?v=<?=filemtime(__DIR__.'/js/PipeHydraulics.lib.js')?>"></script>

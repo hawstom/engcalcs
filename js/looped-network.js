@@ -36067,6 +36067,7 @@ var EngCalcs = EngCalcs || {};
 			// **FIELD CODES ARE OPT-IN AND START OFF EVERY TIME** (Task 771). Off, this box and
 			// the import are exactly what they were; the table is per import and stored nowhere.
 			useCodes = false,
+			createPlain = pc.lpn_survey_create || 'Create nodes', createCoded = pc.lpn_new_create || 'Create',
 			codeTable = (EngCalcs.LPN_SURVEY_CODE_DEFAULTS || []).map(function (r) { return { code: r.code, as: r.as }; });
 		function read() {
 			return EngCalcs.lpnSurveyParse
@@ -36175,8 +36176,14 @@ var EngCalcs = EngCalcs || {};
 				codesTable.appendChild(add);
 			}
 			codesBox.addEventListener('change', function () {
+				var was = useCodes ? createCoded : createPlain, bar = document.getElementById('lpn_dialog_buttons');
 				useCodes = !!codesBox.checked;
 				if (useCodes) { fillCodeTable(); } else { codesTable.innerHTML = ''; }
+				// **THE BUTTON SAYS WHAT IT WILL DO**: with codes on it makes pipes too, so "Create
+				// nodes" would understate it. The New project box's own "Create" is reused whole.
+				Array.prototype.forEach.call((bar && bar.children) || [], function (b) {
+					if (b.textContent === was) { b.textContent = useCodes ? createCoded : createPlain; }
+				});
 				draw();
 			});
 			// **THE CHOOSER IS SHOWN EVEN WHEN THE HEADER ANSWERED, AND IT SHOWS WHAT THE HEADER
@@ -36269,7 +36276,7 @@ var EngCalcs = EngCalcs || {};
 			draw();
 			tipsIn(wrap);
 		}, [
-			{ label: pc.lpn_survey_create || 'Create nodes', fn: function () {
+			{ label: createPlain, fn: function () {
 				if (!parsed.ok) { setWarning(EngCalcs.lpnSurveyErrorText(parsed, axes)); return; }
 				rememberSurveyFormat(format);
 				showSurveyReport(parsed, createSurveyNodes(parsed, assetType, plan()));
