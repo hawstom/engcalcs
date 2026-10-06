@@ -34920,32 +34920,47 @@ var EngCalcs = EngCalcs || {};
 			scenarioName: scenarioDisplayName(activeScenario())
 		};
 	}
-	function exportGeoJsonFile() {
-		var pcX = EngCalcs.pageConfig || {}, out, fallback = {
-			local: 'A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.',
-			range: 'These positions are not valid latitudes and longitudes: {detail}',
-			empty: 'There is nothing to export yet. Draw or open a network first.',
-			crs: 'This project’s coordinate system cannot be converted to longitude and latitude here.'
-		};
+	/**
+	 * **THE WRITER'S ANSWER, WITH THE COORDINATE TABLE LOADED FIRST WHEN A PROJECTED PROJECT NEEDS
+	 * IT.** The transform is fetched on demand (js/lpn-crs.js), so asking before it arrives would
+	 * refuse a project the page can in fact place. Same wait the basemap makes. `done(out)` is
+	 * called once, with the writer's result; a harness drives this half.
+	 */
+	function exportGeoJsonResult(done) {
+		function go() { done(EngCalcs.lpnExportGeoJson(serializeProject(), geoJsonExportOptions())); }
 		saveToStorage();   // export what is on screen, including edits not yet saved
-		out = EngCalcs.lpnExportGeoJson(serializeProject(), geoJsonExportOptions());
-		if (!out || !out.ok) {
-			setNotice((pcX['lpn_geojson_refused_' + (out && out.error)] || fallback[out && out.error] || fallback.empty)
-				.replace('{detail}', (out && out.detail) || '?'));
+		if (isProjectedProject() && EngCalcs.lpnCrsLoad && EngCalcs.lpnCrsReady && !EngCalcs.lpnCrsReady()) {
+			EngCalcs.lpnCrsLoad(go);
 			return;
 		}
-		var blob = new Blob([out.text], { type: 'application/geo+json' }),
-			url = URL.createObjectURL(blob), a = document.createElement('a');
-		a.href = url;
-		a.download = safeFileName(projectDisplayName(project)) + '.geojson';
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
-		// EXPORTING IS NOT SAVING, for the reason exportInpFile() gives: no stampProjectSaved().
-		setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + ' ' +
-			(out.hasResults ? (pcX.lpn_geojson_results_in || 'The results on screen are included.')
-				: (pcX.lpn_geojson_results_out || 'No results are included, because the network is not solved.')));
+		go();
+	}
+	function exportGeoJsonFile() {
+		exportGeoJsonResult(function (out) {
+			var pcX = EngCalcs.pageConfig || {}, fallback = {
+				local: 'A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.',
+				range: 'These positions are not valid latitudes and longitudes: {detail}',
+				empty: 'There is nothing to export yet. Draw or open a network first.',
+				crs: 'The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.'
+			};
+			if (!out || !out.ok) {
+				setNotice((pcX['lpn_geojson_refused_' + (out && out.error)] || fallback[out && out.error] || fallback.empty)
+					.replace('{detail}', (out && out.detail) || '?'));
+				return;
+			}
+			var blob = new Blob([out.text], { type: 'application/geo+json' }),
+				url = URL.createObjectURL(blob), a = document.createElement('a');
+			a.href = url;
+			a.download = safeFileName(projectDisplayName(project)) + '.geojson';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+			// EXPORTING IS NOT SAVING, for the reason exportInpFile() gives: no stampProjectSaved().
+			setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + ' ' +
+				(out.hasResults ? (pcX.lpn_geojson_results_in || 'The results on screen are included.')
+					: (pcX.lpn_geojson_results_out || 'No results are included, because the network is not solved.')));
+		});
 	}
 	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being

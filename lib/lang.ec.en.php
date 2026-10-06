@@ -2037,6 +2037,7 @@ $ec_lang['lpn_file_export_geojson']='Export GeoJSON file…';
 $ec_lang['lpn_file_export_geojson_tip']='Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.';
 $ec_lang['lpn_geojson_refused_local']='A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.';
 $ec_lang['lpn_geojson_refused_range']='These positions are not valid latitudes and longitudes: {detail}';
+$ec_lang['lpn_geojson_refused_crs']='The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.';
 $ec_lang['lpn_geojson_refused_empty']='There is nothing to export yet. Draw or open a network first.';
 $ec_lang['lpn_geojson_results_in']='The results on screen are included.';
 $ec_lang['lpn_geojson_results_out']='No results are included, because the network is not solved.';

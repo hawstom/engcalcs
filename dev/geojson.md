@@ -17,17 +17,44 @@ under Export EPANET file…, in `js/looped-network.js` (`exportGeoJsonFile`). Ha
   `5.`, `+3`) is written as the plain rendering of the same value. The rule is the suite's raw-token
   rule, through `EngCalcs.lpnNumText`.
 - **A projected project with a known CRS** (state plane etc.) is converted by the page's own
-  transform (`EngCalcs.lpnCrsInverse`) and `lwn.coordinates` says "Converted from EPSG:n". These
-  are numbers of ours, not the user's. One that the transform cannot place is refused (`range`).
+  transform (`EngCalcs.lpnCrsInverse`; proj4 with no datum shift) and `lwn.coordinates` says so.
+  These are numbers of ours, not the user's. **A NAD83 system such as State Plane is treated as WGS
+  84**, which agrees to under a metre in North America. The page loads the definition table before
+  asking (`exportGeoJsonResult`); a code with no definition is refused as `crs` ("not known to this
+  page", with Convert as…), and a position the transform cannot place as `range`.
 - **A local (XY) project is refused**, never written with a non-standard `crs` member. Reasons: a
   file claiming a coordinate system it does not have puts the network somewhere false, in the
   one program (a GIS) whose whole job is to say where things are; a `crs` member is not GeoJSON
   any more, so QGIS or ArcGIS would read it as WGS 84 anyway; and the fix costs the user one
   command. The message says why and what to do: georeference first (Map, World map, Attach).
-- **Values are in the project's units**, each feature naming them in `units` (field to unit NAME:
-  `ft`, `in`, `gpm`, `fth2o`, `psi`; the stored name, never a factor or a translated symbol), and
-  `lwn.units` carries the whole set. Nothing is converted. Roughness has no unit under
-  Hazen-Williams; `lwn.headloss_formula` is `H-W`, `D-W` or `C-M` (Gusnet's `HeadlossFormula`).
+- **Values are in the project's own units, exactly as typed. Not SI, not converted to WNTR's.**
+  Each feature names them in `units` (field to unit NAME: `ft`, `in`, `gpm`, `fth2o`, `psi`; the
+  stored name, never a factor or a translated symbol), and `lwn.units` carries the whole set. Roughness
+  has no unit under Hazen-Williams; `lwn.headloss_formula` is `H-W`, `D-W` or `C-M` (Gusnet's
+  `HeadlossFormula`). Gusnet reads a layer in the units of its flow unit (EPANET's convention:
+  traditional for gpm, cfs, mgd; SI for L/s and the metric flows). Mapping to that choice:
+  a US project (ft, in, gpm, psi, ft/s, ft of head) matches Gusnet traditional except
+  **Darcy-Weisbach roughness** (ours ft, Gusnet 0.001 ft) and **unit_headloss** (ours percent or the
+  gradient unit named in `units`, Gusnet ft per 1000 ft). An SI project matches Gusnet SI (m, mm, L/s,
+  m/s) except **pressure** where the project uses kPa or bar rather than m of water, **roughness**
+  under Darcy-Weisbach (ours m or mm as named) and **unit_headloss** (Gusnet m per km). Always read
+  `units`; this file never silently converts.
+- **Patterns and curves are written in Gusnet's meaning** (`gusnet/pattern_curve.py`, read
+  2026-10-06). Gusnet parses `demand_pattern`, `head_pattern`, `speed_pattern` as the multipliers,
+  space separated (`"1 1.2 0.8"`), and `pump_curve`, `vol_curve`, `headloss_curve` as points
+  (`"(0, 104), (2000, 92)"`, `ast.literal_eval`, x strictly increasing). So those fields carry the
+  numbers, from the project's own patterns and curves, each multiplier as the exact characters typed
+  (a curve point as the plain rendering of its number: the project keeps no text for one), and the
+  name goes in the WNTR-style `demand_pattern_name`, `head_pattern_name`, `speed_pattern_name`,
+  `pump_curve_name`, `vol_curve_name`, `headloss_curve_name`. A junction with no pattern of its own
+  gets the project's default pattern, resolved, because that is what EPANET applies. Writing the
+  name in the Gusnet field would be read as a one-multiplier pattern (name `3` triples the demand).
+- **Tank `min_vol` is 0**, the `.inp` writer's own value; this page does not hold it. With a volume
+  curve EPANET takes the minimum volume from the curve. Gusnet requires the field.
+- **Results are rounded to 6 significant figures** (they are ours, with float noise in the tail;
+  typed inputs are never rounded). A pump's `headloss` is as the map shows it; **EPANET and WNTR
+  report a pump's headloss as negative** (a gain). `lwn.unit_note`, `headloss_sign` and
+  `result_precision` say all this inside the file.
 - **Results are the ones on the screen**, read through `colorNodeValue` / `colorLinkValue` (the map
   colouring's own values, in the Results strip's units). Absent when nothing is solved. Every
   feature carries `has_results`, and `lwn.results` says included or not, and for a time-stepped
