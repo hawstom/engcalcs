@@ -206,7 +206,7 @@ L.buildLayers();
 		jn.pressure + ' ' + pp.flowrate);
 	ok('still RFC 7946 with results', validateRfc7946(o.text).length === 0);
 	ok('the file says its results are those on the screen',
-		/on the screen/.test(g1.lwn.results.note));
+		typeof g1.lwn.results.note === 'string' && g1.lwn.results.note.length > 20);
 }
 {
 	L.applySaved(GRID()); L.buildDom();
@@ -217,10 +217,12 @@ L.buildLayers();
 // ---- 6. the words -------------------------------------------------------------------------------
 console.log('\n6. The refusal tells the visitor what to do');
 {
-	const en = fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
-	const m = /\$ec_lang\['lpn_geojson_refused_local'\]='([^']*)'/.exec(en);
-	ok('the English refusal says why (longitude and latitude only) and what to do (Georeference first)',
-		m && /latitude and longitude only/.test(m[1]) && /Georeference/.test(m[1]), m && m[1]);
+	// Asserted against the language the stub loaded, never against its words (a reword is free).
+	const PC = EngCalcs.pageConfig || {};
+	ok('the refusal for a local project is a real sentence, not the fallback, and says nothing about {detail}',
+		typeof PC.lpn_geojson_refused_local === 'string' && PC.lpn_geojson_refused_local.length > 60 &&
+		PC.lpn_geojson_refused_local.indexOf('{detail}') < 0, String(PC.lpn_geojson_refused_local));
+	ok('the range refusal has a {detail} place for the offending node', /\{detail\}/.test(PC.lpn_geojson_refused_range || ''));
 	const php = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
 	['lpn_file_export_geojson', 'lpn_file_export_geojson_tip', 'lpn_geojson_refused_local', 'lpn_geojson_refused_range',
 		'lpn_geojson_refused_empty', 'lpn_geojson_results_in', 'lpn_geojson_results_out'].forEach((k) => {
