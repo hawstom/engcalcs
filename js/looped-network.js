@@ -34873,6 +34873,68 @@ var EngCalcs = EngCalcs || {};
 		showInpExportFlattening(out.differences, a.download);
 	}
 	/**
+	 * **EXPORT GeoJSON (ROADMAP Task 728, Tom 2026-10-06, approving Mary's order: GeoJSON out
+	 * first).** The writer is js/lpn-geojson.js and its rules are dev/geojson.md; this is the way in
+	 * (the document, the scenario on screen, the results on screen) and the way out (a download).
+	 *
+	 * **RESULTS ARE WHAT IS ON SCREEN, READ THROUGH THE MAP COLOURING'S OWN VALUE FUNCTIONS**
+	 * (colorNodeValue / colorLinkValue), so the file and the map cannot disagree about a pressure and
+	 * the result units are the ones the Results strip shows. Absent when nothing has been solved --
+	 * a stale snapshot (Recalculate off) is still what the screen shows, and the file says only
+	 * "the results on the screen".
+	 */
+	function geoJsonResults() {
+		var out = { nodes: {}, links: {}, time: (lastSolveResult && typeof lastSolveResult.t === 'number') ? lastSolveResult.t : undefined };
+		if (!lastSolveResult) { return null; }
+		doc.nodes.forEach(function (n) {
+			out.nodes[n.id] = { head: colorNodeValue(n, 'head'), pressure: colorNodeValue(n, 'pressure'),
+				demand: colorNodeValue(n, 'demandActual') };
+		});
+		doc.links.forEach(function (l) {
+			out.links[l.id] = { flowrate: colorLinkValue(l, 'flow'), headloss: colorLinkValue(l, 'headloss'),
+				unit_headloss: colorLinkValue(l, 'gradient'), velocity: colorLinkValue(l, 'velocity') };
+		});
+		return out;
+	}
+	function geoJsonExportOptions() {
+		return {
+			effective: effective,
+			coordOverride: inpExportOptions().coordOverride,
+			customProps: function (el) {
+				return customPropsFor(el).map(function (def) { return { key: def.key, value: customPropValue(el, def) }; });
+			},
+			results: geoJsonResults(),
+			scenarioName: scenarioDisplayName(activeScenario())
+		};
+	}
+	function exportGeoJsonFile() {
+		var pcX = EngCalcs.pageConfig || {}, out, fallback = {
+			local: 'A GeoJSON file holds longitude and latitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.',
+			range: 'These positions are not valid longitudes and latitudes: {detail}',
+			empty: 'There is nothing to export yet. Draw or open a network first.',
+			crs: 'This project’s coordinate system cannot be converted to longitude and latitude here.'
+		};
+		saveToStorage();   // export what is on screen, including edits not yet saved
+		out = EngCalcs.lpnExportGeoJson(serializeProject(), geoJsonExportOptions());
+		if (!out || !out.ok) {
+			setNotice((pcX['lpn_geojson_refused_' + (out && out.error)] || fallback[out && out.error] || fallback.empty)
+				.replace('{detail}', (out && out.detail) || '?'));
+			return;
+		}
+		var blob = new Blob([out.text], { type: 'application/geo+json' }),
+			url = URL.createObjectURL(blob), a = document.createElement('a');
+		a.href = url;
+		a.download = safeFileName(projectDisplayName(project)) + '.geojson';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+		// EXPORTING IS NOT SAVING, for the reason exportInpFile() gives: no stampProjectSaved().
+		setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) + ' ' +
+			(out.hasResults ? (pcX.lpn_geojson_results_in || 'The results on screen are included.')
+				: (pcX.lpn_geojson_results_out || 'No results are included, because the network is not solved.')));
+	}
+	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being
 	 * something a round trip loses: *"Yes. And we have to start showing an export alert."*). It is
 	 * the discipline js/lpn-inp.js already applies on IMPORT, pointed the other way: report the
@@ -40805,6 +40867,9 @@ var EngCalcs = EngCalcs || {};
 			// separate row from Open rather than a second file type on it.
 			{ icon: 'save', label: pc.lpn_file_export_inp || 'Export EPANET file…',
 			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
+			// GeoJSON, directly under the other export (Task 728): same verbs, same kind of file.
+			{ icon: 'save', label: pc.lpn_file_export_geojson || 'Export GeoJSON file…',
+			  tip: pc.lpn_file_export_geojson_tip, fn: exportGeoJsonFile },
 		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the

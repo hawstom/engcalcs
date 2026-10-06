@@ -2106,6 +2106,13 @@ EngCalcs.pageConfig = {
 	lpn_status_inp_exported: <?=json_encode($ec_lang['lpn_status_inp_exported'])?>,
 	lpn_inp_export_differences: <?=json_encode($ec_lang['lpn_inp_export_differences'])?>,
 	lpn_inp_export_refused: <?=json_encode($ec_lang['lpn_inp_export_refused'])?>,
+	lpn_file_export_geojson: <?=json_encode($ec_lang['lpn_file_export_geojson'])?>,
+	lpn_file_export_geojson_tip: <?=json_encode($ec_lang['lpn_file_export_geojson_tip'])?>,
+	lpn_geojson_refused_local: <?=json_encode($ec_lang['lpn_geojson_refused_local'])?>,
+	lpn_geojson_refused_range: <?=json_encode($ec_lang['lpn_geojson_refused_range'])?>,
+	lpn_geojson_refused_empty: <?=json_encode($ec_lang['lpn_geojson_refused_empty'])?>,
+	lpn_geojson_results_in: <?=json_encode($ec_lang['lpn_geojson_results_in'])?>,
+	lpn_geojson_results_out: <?=json_encode($ec_lang['lpn_geojson_results_out'])?>,
 	lpn_find_menu: <?=json_encode($ec_lang['lpn_find_menu'])?>,
 	lpn_find_scope: <?=json_encode($ec_lang['lpn_find_scope'])?>,
 	lpn_find_scope_all: <?=json_encode($ec_lang['lpn_find_scope_all'])?>,
@@ -3768,6 +3775,8 @@ EngCalcs.pageConfig = {
       // the difference between importing a pattern and reporting that one was dropped. ?>
 <script src="/engcalcs/js/lpn-patterns.js?v=<?=filemtime(__DIR__.'/js/lpn-patterns.js')?>"></script>
 <script src="/engcalcs/js/lpn-inp.js?v=<?=filemtime(__DIR__.'/js/lpn-inp.js')?>"></script>
+<?php // The GeoJSON writer (ROADMAP Task 728). Pure; reads EngCalcs.lpnNumText from lpn-inp.js, so AFTER it. ?>
+<script src="/engcalcs/js/lpn-geojson.js?v=<?=filemtime(__DIR__.'/js/lpn-geojson.js')?>"></script>
 <?php // The clock's RUN half (ROADMAP Task 248). AFTER lpn-patterns.js, which it reads for
       // lpnParseTime, lpnTimeText and lpnTimesDefaults; BEFORE looped-network.js, which calls
       // EngCalcs.lpnTimeInit() at script scope to register its own bottom-pane tab. Get this
