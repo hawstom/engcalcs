@@ -130,14 +130,14 @@ the foot of those three files, not yet folded into her journal).
   no unit); the HW C ceiling 200 is CC's number. Seams: scenario-table cells, bentley's resolved
   method (`valueWarnMethod()`).
 - **`feat/asset-type`** (Task 769, new): Water > Change type (foot of the menu) for nodes; tank <->
-  reservoir keeps the water surface; links not built (reasons in `dev/asset-type.md`). Seam with
+  reservoir keeps the water surface; links not built (reasons in `feat/asset-type:dev/asset-type.md`). Seam with
   bentley: must walk `eachOverrideMap()` and stored alternatives at that merge.
 - **`feat/feedback`** (Task 768, new): contact.php category select, optional email, refused post
   keeps input; "Tell us more" beside "Something wrong here?" carries page/lang/error code. **privacy.php
   sentence changed (public text; told him).** contactYourEmail kept as the fallback until a sprint.
   Ida's move 3 (in-page dialog) not built.
 - Still from before: `feat/desktop`. `feat/label-placer` round 6 done: four questions for him in
-  `dev/label-trials/round-6-2026-10-05.md` (drop order keeps most-wanted value over ID; R1 as
+  `feat/label-placer:dev/label-trials/round-6-2026-10-05.md` (drop order keeps most-wanted value over ID; R1 as
   pass/fail; spot_prime as a ranked gap list two deep). Round 5's "D breaks on bends" was our
   generator's bug, withdrawn.
 
