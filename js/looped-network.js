@@ -30117,8 +30117,8 @@ var EngCalcs = EngCalcs || {};
 		EngCalcs.lpnProfile.labelStride(series.nodes.map(function (n) { return X(n.station); }), PROFILE_ID_LABEL_PX)
 			.forEach(function (k) { idKeep[k] = true; });
 		series.nodes.forEach(function (n, k) {
-			var x = X(n.station), t, ttl, parts, ptxt;
-			el('line', { x1: x, y1: box.top, x2: x, y2: box.top + box.height, class: 'lpn-profile-station' }, svg);
+			var x = X(n.station), t, ttl, parts, ptxt, stLine;
+			stLine = el('line', { x1: x, y1: box.top, x2: x, y2: box.top + box.height, class: 'lpn-profile-station' }, svg);
 			if (idKeep[k]) {
 				t = profileText(svg, 0, 0, n.id, { class: 'lpn-profile-nodeid', 'text-anchor': 'end' });
 				t.setAttribute('transform', 'translate(' + x + ',' + (box.top + box.height + 20) + ') rotate(-60)');
@@ -30127,8 +30127,12 @@ var EngCalcs = EngCalcs || {};
 				el('circle', { cx: x, cy: Y(n.ground), r: 2, class: 'lpn-profile-dot' }, svg);
 			}
 			// The hover text carries what the drawing cannot: the pressure, whose unit is not the
-			// axis's. A <title>, not a tooltip of our own -- it is the one every browser already has.
-			ttl = el('title', {}, svg);
+			// axis's. A <title> on a transparent hit circle over the dot (it used to hang off the
+			// svg root, so it named nothing in particular); EngCalcs.wireTipDelegation() turns it
+			// into the one styled tip when the pointer arrives.
+			ttl = el('title', {}, typeof n.ground === 'number'
+				? el('circle', { cx: x, cy: Y(n.ground), r: 7, fill: 'transparent', class: 'lpn-profile-hit' }, svg)
+				: stLine);
 			parts = [n.id];
 			if (typeof n.ground === 'number') { parts.push(plainRound(n.ground, 2) + ' ' + unitLabel(resultUnit('elevhead'))); }
 			ptxt = profilePressureText(n.id);

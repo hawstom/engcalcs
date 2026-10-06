@@ -52,6 +52,81 @@ function ok(label, cond, detail) {
 	console.log((cond ? '  ok   ' : '  FAIL ') + label + (detail === undefined ? '' : '   ' + detail));
 }
 
+// The three graph tabs: SVG <title> children (dots) must become the one styled tip, with no native
+// <title> left in the chart. Hundreds of dots exist, so only the hovered one is armed (lazy).
+async function graphTabs(a) {
+	const page = a.page;
+	for (const [tab, chart] of [['timeseries', 'lpn_ts_chart'], ['profile', 'lpn_profile_chart'], ['frequency', 'lpn_freq_chart']]) {
+		console.log('\n--- SVG titles: ' + tab + ' ---');
+		await page.evaluate((t) => { const e = document.getElementById('lpn_pane_tab_' + t); if (e) { e.click(); } }, tab);
+		await a.settle(2000);
+		const pos = await page.evaluate((id) => {
+			const svg = document.querySelector('#' + id + ' svg');
+			if (!svg) { return null; }
+			const withTitle = Array.from(svg.querySelectorAll('*')).filter((e) => Array.from(e.children).some((k) => k.localName === 'title'));
+			for (let i = 0; i < withTitle.length; i++) {
+				const el = withTitle[i];
+				const r = el.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+				const top = document.elementFromPoint(x, y);
+				if (top === el) {
+					const k = Array.from(el.children).filter((c) => c.localName === 'title')[0];
+					return { x: x, y: y, text: k.textContent, count: withTitle.length };
+				}
+			}
+			return { none: true, count: withTitle.length };
+		}, chart);
+		ok(tab + ': the chart has dots carrying a <title> (found ' + (pos && pos.count) + ')', !!pos && pos.count > 3);
+		if (!pos || pos.none) { ok(tab + ': a titled dot can be reached by the pointer', false); continue; }
+		await page.mouse.move(2, 2);
+		await a.settle(150);
+		await page.mouse.move(pos.x, pos.y);
+		await a.settle(800);
+		const got = await page.evaluate(() => { const t = document.querySelector('.tooltip.show .tooltip-inner'); return t ? t.textContent : null; });
+		ok(tab + ': hovering a dot shows the styled tooltip with its text', got !== null && got.trim() === pos.text.trim(), JSON.stringify([got, pos.text]));
+		await page.mouse.move(2, 2);
+		await a.settle(250);
+		// Every other dot arms on arrival too, and then no <title> child is left to show natively.
+		const left = await page.evaluate((id) => {
+			const svg = document.querySelector('#' + id + ' svg');
+			Array.from(svg.querySelectorAll('*')).forEach((e) => {
+				if (Array.from(e.children).some((k) => k.localName === 'title')) { e.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' })); }
+			});
+			return svg.querySelectorAll('title').length;
+		}, chart);
+		ok(tab + ': after arrival no native <title> is left in the chart', left === 0, String(left));
+	}
+}
+
+// A tap on a titled non-control opens a name tip on a touch screen, and a tap elsewhere closes it.
+async function touchCheck(browser, Session) {
+	const t = await Session.open(browser, NAME + ':touch', { viewport: { width: 900, height: 900 }, hasTouch: true, isMobile: true });
+	const page = t.page;
+	await page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+	await t.goto('Looped-Network.php?ec_nolog=1');
+	await t.answerTrainingPanel().catch(() => {});
+	await page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } });
+	await t.openExampleCard(await t.lang('lpn_ex_net3_title'));
+	await t.settle(1500);
+	await t.toolbarClick(await t.lang('lpn_pane_toggle'));
+	await t.settle(800);
+	console.log('\n--- touch: a name tip on a non-control does not stick ---');
+	ok('the emulation cannot hover', await page.evaluate(() => !window.matchMedia('(hover: hover)').matches));
+	const grip = await page.evaluate(() => { const g = document.querySelector('.lpn-pane-grip'); if (!g) { return null; } const r = g.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+	ok('the pane grip is there', !!grip);
+	if (grip) {
+		await page.touchscreen.tap(grip.x, grip.y);
+		await t.settle(900);
+		const open = await page.evaluate(() => !!document.querySelector('.tooltip.show'));
+		ok('a tap on the grip opens its tip', open);
+		const map = await page.evaluate(() => { const r = document.getElementById('lpn_canvas').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + 60 }; });
+		await page.touchscreen.tap(map.x, map.y);
+		await t.settle(1500);
+		const stuck = await page.evaluate(() => !!document.querySelector('.tooltip.show'));
+		ok('a tap on the map closes it (1.5 s later nothing is showing)', !stuck);
+	}
+	await t.close();
+}
+
 // Runs in the page. Visible elements with a non-empty title that the delegation would arm.
 function collectTitled() {
 	const out = [];
@@ -187,6 +262,20 @@ async function main() {
 		await hoverKinds(a, 'Looped Network', null);
 		await armCheck(a, 'Looped Network, Net3, Tables pane');
 
+		await graphTabs(a);
+		// The scenario-override ring writes its <title> child later, on an element that may be armed.
+		const ring = await page.evaluate(() => {
+			const ns = 'http://www.w3.org/2000/svg', svg = document.createElementNS(ns, 'svg'), c = document.createElementNS(ns, 'circle');
+			svg.appendChild(c); document.body.appendChild(svg);
+			const put = (txt) => { const t = document.createElementNS(ns, 'title'); t.textContent = txt; c.insertBefore(t, c.firstChild); };
+			put('first'); c.dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
+			const one = c.getAttribute('data-bs-original-title');
+			put('second'); c.dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
+			const two = c.getAttribute('data-bs-original-title'), left = svg.querySelectorAll('title').length;
+			svg.remove();
+			return { one: one, two: two, left: left };
+		});
+		ok('an SVG <title> written again on an armed element reaches the tip (override ring)', ring.one === 'first' && ring.two === 'second' && ring.left === 0, JSON.stringify(ring));
 		// 3. A title written again after arming reaches the reader; a cleared one takes its tip away.
 		const rewrite = await page.evaluate(async () => {
 			const el = document.querySelector('#lpn_pane_close') || document.querySelector('button[title], button[data-bs-original-title]');
@@ -216,6 +305,7 @@ async function main() {
 		await armCheck(b, 'a calculator page, calculators menu open');
 		ok('no uncaught page errors (calculator)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 		await b.close();
+		await touchCheck(browser, Session);
 	} finally {
 		await browser.close();
 		env.stopServer();

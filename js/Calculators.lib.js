@@ -222,6 +222,22 @@ EngCalcs.setTipText = function (el, text) {
 	el.title = want;
 	if (prior && EngCalcs.initTips) { EngCalcs.initTips(el.parentNode || el); }
 };
+EngCalcs._tapTips = [];
+function ecTrackTapTip(el, tip) {
+	if (el.__ecTapTracked) { return; }
+	el.__ecTapTracked = true;
+	EngCalcs._tapTips.push({ el: el, tip: tip });
+	if (EngCalcs._tapTipsWired || !document.addEventListener) { return; }
+	EngCalcs._tapTipsWired = true;
+	// Capture, so a map or box that stops the event from bubbling still counts as "elsewhere".
+	document.addEventListener('pointerdown', function (e) {
+		var i, r;
+		for (i = 0; i < EngCalcs._tapTips.length; i++) {
+			r = EngCalcs._tapTips[i];
+			if (r.el !== e.target && !(r.el.contains && r.el.contains(e.target))) { r.tip.hide(); }
+		}
+	}, true);
+}
 // Arms ONE element with the styled tooltip (an explanation behind its "?", or a name tip). Shared
 // by initTips() and by the delegated listener below, so there is exactly one place that decides
 // trigger, delay, long-press and click-to-hide.
@@ -307,6 +323,11 @@ function ecWireTipEl(el) {
 				if (!keyboard) { tip.hide(); }
 			});
 		}
+		// **A NAME TIP OPENED BY A TAP MUST NOT STICK.** On a device that cannot hover, a titled
+		// NON-control (a pane grip, a ramp option, a plain label) opens on 'click' and had no way
+		// out: nothing but a second tap on the same element took it down (Perry's pre-review,
+		// 2026-10-06). A tap anywhere else now closes it, as it does an explanation.
+		if (!control && !canHover) { ecTrackTapTip(el, tip); }
 		// The "?" glyph's own tap handling lives in ecWireExplanationGlyph(): every tip with a glyph
 		// returned above, so what reaches here is a name tip on a control or a glyph-less label.
 		if (longPress && !el.dataset.ecTipHoldWired) {
@@ -350,22 +371,45 @@ document.addEventListener('DOMContentLoaded', function () { EngCalcs.initTips(do
 //   - A `title` WRITTEN AGAIN after arming (the trap setTipText() documents) is caught here too:
 //     if an armed element's title is non-empty again, it is moved into the cache before the
 //     native box can show, so the next write is never stale and never doubled.
+//   - SVG: an element's <title> child (graph dots, the scenario ring) is read at the same moment,
+//     moved into the attribute and removed.
 //   - NOT armed: an <iframe> (its title names the frame for assistive technology and is not a
-//     hover tip), and anything marked data-ec-native-title.
+//     hover tip), an <svg> root's own <title>, and anything marked data-ec-native-title.
+var EC_SVG_NS = 'http://www.w3.org/2000/svg';
+// An SVG element's <title> child (what the graph dots and the scenario ring carry): the browser
+// draws it as a native tooltip, so it is turned into a `title` attribute when the pointer arrives.
+function ecSvgTitleChild(el) {
+	var i, n;
+	if (!el || el.namespaceURI !== EC_SVG_NS || el.localName === 'svg' || !el.childNodes) { return null; }
+	for (i = 0; i < el.childNodes.length; i++) {
+		n = el.childNodes[i];
+		if (n.nodeType === 1 && n.localName === 'title') { return n; }
+	}
+	return null;
+}
 function ecDelegatedTipTarget(node) {
-	var el = node && node.closest ? node.closest('[title]') : null;
-	var tag;
-	if (!el) { return null; }
-	tag = (el.tagName || '').toLowerCase();
-	if (tag === 'iframe' || tag === 'svg' || tag === 'html' || tag === 'body') { return null; }
+	var el = node, tag;
+	while (el && el.nodeType === 1) {
+		tag = (el.localName || '').toLowerCase();
+		if (tag === 'html' || tag === 'body') { return null; }
+		if (el.getAttribute('title') || ecSvgTitleChild(el)) { break; }
+		el = el.parentNode;
+	}
+	if (!el || el.nodeType !== 1) { return null; }
+	if (tag === 'iframe' || (tag === 'svg' && !el.getAttribute('title'))) { return null; }
 	if (el.hasAttribute('data-ec-native-title')) { return null; }
-	if (!el.getAttribute('title')) { return null; }
 	if (el.closest('.tooltip')) { return null; }
 	return el;
 }
 function ecArmDelegatedTip(e) {
 	var el = ecDelegatedTipTarget(e.target), t, Tip, inst;
 	if (!el || !window.bootstrap || !bootstrap.Tooltip) { return; }
+	t = ecSvgTitleChild(el);
+	if (t) {
+		// Move the text to the attribute and take the native <title> away, so no native box shows.
+		if (t.textContent) { el.setAttribute('title', t.textContent); }
+		el.removeChild(t);
+	}
 	Tip = bootstrap.Tooltip;
 	inst = Tip.getInstance(el);
 	if (inst) {
