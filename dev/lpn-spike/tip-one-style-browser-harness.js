@@ -211,9 +211,9 @@ async function main() {
 		await b.settle(300);
 		await b.page.click('#dropdown-calc').catch(() => {});
 		await b.settle(400);
-		await collect(b, 'Manning Pipe Flow, calculators menu open');
-		await hoverKinds(b, 'Manning Pipe Flow', (k) => /dropdown-item|ec-fg-x|^a\./.test(k));
-		await armCheck(b, 'Manning Pipe Flow, calculators menu open');
+		await collect(b, 'a calculator page, calculators menu open');
+		await hoverKinds(b, 'calculator page', (k) => /dropdown-item|ec-fg-x|^a\./.test(k));
+		await armCheck(b, 'a calculator page, calculators menu open');
 		ok('no uncaught page errors (calculator)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
 		await b.close();
 	} finally {

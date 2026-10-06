@@ -25342,7 +25342,7 @@ var EngCalcs = EngCalcs || {};
 		text = c.hint(el) || '';
 		tip = c.hintTip ? (c.hintTip(el) || '') : '';
 		if (text) { input.setAttribute('placeholder', text); } else { input.removeAttribute('placeholder'); }
-		if (tip) { input.title = tip; } else if (input.title || input.hasAttribute('data-bs-original-title')) { input.title = ''; }
+		if (tip) { input.title = tip; } else if (input.title || input.getAttribute('data-bs-original-title')) { input.title = ''; }
 	}
 	function paneHeadingText(c) {
 		var pc = EngCalcs.pageConfig || {},
