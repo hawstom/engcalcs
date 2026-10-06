@@ -1954,6 +1954,8 @@
 		// make the one feature it announces undiscoverable in the state most people open the page
 		// in. It is never the ONLY way to a period result -- see EC.LPN_TIME_AUTO.
 		ui.run = btn('run', S.run, function () { requestRun(true); }, S.runTip);
+		// Marks the one non-player button the phone toolbar keeps: with Recalculate off it is the only way to calculate.
+		ui.run.className += ' lpn-run-btn';
 		// **HIDDEN WHILE THIS PROJECT WORKS ITSELF OUT** (Task 467). Tom, 2026-08-20: *"If it's on,
 		// we do our debounce and calculate, and we hide the Calculate button."* A button that
 		// recomputes what is already being recomputed is a button whose press changes nothing

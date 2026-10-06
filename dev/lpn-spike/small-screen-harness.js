@@ -436,7 +436,12 @@ console.log('\n--- 3. the toolbar keeps the transport and nothing else ---');
 		ok('the transport keeps ' + nm, !hiddenAt(RULES, b, SMALL, DOC_IDS));
 		ok('...and ' + nm + ' is enabled on Net3, so it is a live control and not a stub', !b.el.disabled);
 	});
-	const gone = buttons.filter((b) => b.cls.indexOf('lpn-transport-btn') < 0);
+	// THE BOLT STAYS (it is hidden inline by lpn-time.js while auto-run is on): with Recalculate off
+	// it is a phone's only way to calculate. phone-bolt-browser-harness.js measures it for real.
+	const bolt = buttons.filter((b) => b.cls.indexOf('lpn-run-btn') >= 0);
+	ok('the Calculate bolt is marked .lpn-run-btn', bolt.length === 1, String(bolt.length));
+	bolt.forEach((b) => ok('the toolbar keeps Calculate on a small screen', !hiddenAt(RULES, b, SMALL, DOC_IDS)));
+	const gone = buttons.filter((b) => b.cls.indexOf('lpn-transport-btn') < 0 && b.cls.indexOf('lpn-run-btn') < 0);
 	gone.forEach((b) => {
 		const nm = b.el.getAttribute('aria-label') || b.id || '(unnamed)';
 		ok('the toolbar drops ' + nm, !!hiddenAt(RULES, b, SMALL, DOC_IDS));
