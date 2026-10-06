@@ -2014,7 +2014,7 @@ $ec_lang['lpn_file_import_inp_tip']='Create a new project from an EPANET file, e
 // keeps no handle on an `.inp` and never writes back to one.
 $ec_lang['lpn_file_export_inp']='Export EPANET file…';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_file_export_inp_tip']='Download this network as an EPANET .inp file. Anything the .inp format cannot hold is listed for you afterwards.';
+$ec_lang['lpn_file_export_inp_tip']='Download this network as an EPANET .inp file (in a zip file with its image if applicable). Anything the .inp format cannot hold is listed for you afterwards.';
 $ec_lang['lpn_status_inp_exported']='Exported {file}.';
 $ec_lang['lpn_status_inp_exported_picture']='Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.';
 $ec_lang['lpn_status_inp_exported_no_picture']='Exported {file}. The background picture could not be saved, so the .inp names none; in EPANET, add it with View > Backdrop > Load.';
