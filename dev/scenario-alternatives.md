@@ -77,9 +77,8 @@ here. Each property is in exactly one category. The category id is what the code
 
 **The demand multiplier is a calculation option.** `scenario.demandMultiplier` is a per-scenario
 number, not an element property. Its Bentley counterpart is a **Calculation Option** (a scenario
-names one set of calculation options beside its alternatives), so it stays stored on the scenario.
-It belongs to the Calculation category of "Settings in scenarios" below; whether the table counts
-it there or keeps it in its own column is question 1 at the end of that section.
+names one set of calculation options beside its alternatives), so it stays stored on the scenario,
+and counts in the Calculation category (Q7).
 
 **Bentley categories we have nothing for:** Operational (controls; our `[RULES]` are the
 document's, not a scenario's), Age, Trace (the trace node is a document setting), Capital Cost,
@@ -153,12 +152,11 @@ category, naming the alternative each scenario uses in each category and how man
 holds. It is the minimum honest view of a model that otherwise has no screen, **and Tom may strike
 it.**
 
-**The Demand multiplier is a calculation option, shown beside the alternatives** (Tom, 2026-09-30:
-*"Demand multiplier: OK. A Demand Multiplier column with the alternatives?"*; Mary and Sue: Bentley
-keeps demand adjustments in Calculation Options, not alternatives). It is the last column, after a
-divider, so it reads as set apart from the categories. Base shows the Base Calculation
-alternative's value; a scenario shows its own, and blank means it inherits. Task 755 covers more per-scenario options
-later. No editing, no Bentley import or export, no Google Sheets: the Advanced UX is not designed.
+**The demand multiplier, run time and time step are counted in the Calculation column** (Q7), by
+`overrideCount()`'s rule (only where they differ from the project's own), so a row's counts add up
+to the number beside the scenario's name. Their own three columns retired with the Settings table,
+which is where they are typed. No editing, no Bentley import or export, no Google Sheets: the
+Advanced UX is not designed.
 
 ## Settings in scenarios: Presentation and Calculation (2026-10-05)
 
@@ -394,31 +392,52 @@ of output, identical. The same harness holds a Presentation value (text size, a 
 Calculation value (accuracy, viscosity, friction method) and values that ride into the `.inp`
 (viscosity, global bulk rate, pattern step) changing their scenario and not Base.
 
-### Next stage: the editing half and the settings table
+### Stage 3b: the Settings table (built 2026-10-06)
 
 Tom, 2026-10-06: *"Scenarios must be added to tables so we can audit these things. And by
-extension, there will have to be a settings Table."* Not built yet. What it must be:
+extension, there will have to be a settings Table."* Built as one more table of the Tables pane
+(tab **Settings**, after Customers), from the same spec as the asset tables, so sorting, column
+widths, copy, paste, Fill down, Print, Show scenarios, the override wash, its tip and Clear override
+are the asset tables' own.
 
-- **One row per setting path a scenario may hold** (every path whose `categoryOf(path, 'setting')`
-  is a category): the leaves of `settings`, `labelSettings`, `project.basemap`/`basemapLast`,
-  `times`, `defaultPattern` and `view`, by the rule `settingLeaves()` already walks with (a map
-  member by member; `settings.quality` and `view` whole). Map-valued settings expand to one row
-  per member the project or any scenario states (`colorBreaks['node.pressure']`,
-  `labelSettings.node.pressure`, `contourInterval['pressure|psi']`), so a scenario's single label
-  toggle is one row, not a copy of the label map.
-- **Columns (Tom, 2026-10-05): Major Heading, Minor Heading, Category, Setting, Value**, with the
-  scenarios shown as Task 766 shows them; blank where a scenario inherits, its own value where it
-  holds one, marked the way an element override is. The demand multiplier, the run time and the
-  time step are three more rows here, read from their own homes (Q7).
-- **A row maps to a path by the same array `settingFor()` takes**; an edit in a scenario's column is
-  `setScenarioSetting(scn, path, value)`, a clear is the same with `undefined`, and an edit in
-  Base's column writes the project. The demand multiplier and the two times keep their own writers.
-- **The Settings box writes through the same door**: in a scenario, an edit goes to
-  `setScenarioSetting()`, every editor reads `settingFor()`, and a scenario-held value is marked as
-  an element override is. That is the step that makes "a setting changed in Peak Hour changes Peak
-  Hour only" true from the keyboard.
-- **The view's settings are editable in the Settings box** (Tom, 2026-10-05: not read-only), beside
-  a deliberate "Hold this view in this scenario" / "Forget it"; looking around never writes one.
+- **A row is a setting path** (`settingTableRows()`): every leaf the project states, by
+  `settingLeaves()`'s rule, plus every leaf any scenario holds, plus the demand multiplier and the
+  seven `[TIMES]` values, always. Only paths `categoryOfSetting()` names a category for: units and
+  the coordinate frame are never rows. A row's id is the path as JSON.
+- **Columns: Major heading, Minor heading, Category, Setting, Value** (Tom, 2026-10-05). Major and
+  Minor are where the Settings box shows it; Setting is the box's own words where it has them, else
+  the stored name under its object (`colorBreaks › node.pressure`). With Show scenarios on, Scenario
+  sits after Setting.
+- **Value is read with `settingFor()` in the row's scenario and written with
+  `setScenarioSetting()`**; Base writes the project's own object. The demand multiplier and the run
+  time and time step keep their own homes and writers (`calcTargetOf()`, `setScenarioTime()`). A time
+  keeps its typed text beside its seconds. A typed value is read back as the kind of thing the row
+  holds (number, yes/no, a choice, a time, JSON for an object), and refused, costing no undo step,
+  when it is not one.
+- **An override is marked by `hasOverride()`'s rule**: local where the scenario writes
+  (`settingRowIsLocal()`). A demand multiplier seeded at a scenario's birth is an override by
+  presence, so it is marked, though the count leaves it out until it differs.
+- **Friction method varies by scenario and reinterprets roughness, never converts it**; the value
+  warning follows the method in effect, row by row under Show scenarios (`paneValueWarn()` judges a
+  row in its own scenario).
+- **Not filtered** by Find or by Selection only, and its menu has no map or Delete element items.
+- **The Alternatives table's three option columns retired** (Q7); its last two columns are
+  Presentation and Calculation. The note under Settings, Time names each scenario holding its own
+  run time or step, and its button opens the Settings table on that row.
+- **Visible in Basic mode**, as Show scenarios already is: it is a table, and in Basic mode it is now
+  the only place a scenario's own run time is typed.
+
+Harnesses: `dev/lpn-spike/settings-table-browser-harness.js` (real Chromium: Net1 and Net3 lat/lon;
+a Base edit, a child scenario's friction method, demand multiplier and text size, solve before and
+after, Clear override, the Alternatives table's columns and counts); the two option harnesses
+(`scenario-time-option-harness.js`, `scenario-tree-harness.js`) now type through the Settings
+table's Value cell.
+
+**Still to build (the editing half):** the Settings box itself still shows and edits the project's
+values in every scenario. In a scenario it must read `settingFor()` and write
+`setScenarioSetting()`, with a held value marked, so that "a setting changed in Peak Hour changes
+Peak Hour only" is true from the box as it is from the table; and the view's settings editable
+there beside a deliberate "Hold this view in this scenario".
 
 ### Questions for Tom
 
@@ -545,8 +564,8 @@ The road, each stage shippable alone, each hidden from Basic mode until the Adva
    exclusion; `scenario.settings`; the read and write seams; the table counts settings.
 3. **Done (2026-10-06): every setting reader routed through `effectiveSetting()`**, so a setting
    override changes the map and the solve; a scenario may hold its own view. Byte-identical
-   behaviour with no override is held by `scenario-settings-routing-harness.js`. **Next, 3b: the
-   editing half and the settings table** (see "Next stage" above).
+   behaviour with no override is held by `scenario-settings-routing-harness.js`. **3b, the
+   Settings table, built 2026-10-06; the Settings box's editing half is next** (see "Stage 3b").
 4. **Built (2026-10-05): the stored tree (choice B), additively.** Shared and named alternatives,
    alternatives of any depth, calculation sets. See below.
 5. **Built (2026-10-05): the scenario tree.** A scenario whose parent is not Base inherits its
@@ -682,6 +701,10 @@ The stored tree: same file, section "SCENARIO TREE": `touchTree()`, `isExplicitT
 `setScenarioParent()`; `heldCalcOption()` is the calculation-option seam. Harness:
 `dev/lpn-spike/scenario-tree-harness.js` (seeded; `node ... <seed>` reproduces one).
 Harness: `dev/lpn-spike/scenario-settings-routing-harness.js`.
+
+The Settings table: same file, section "THE SETTINGS TABLE" (`settingTableRows()`,
+`settingTableCols()`, `settingRowValue()`, `settingRowWrite()`, `settingRowIsLocal()`,
+`settingRowClear()`, `openSettingsTableAt()`); the spec is the last of `buildPaneTables()`.
 
 Basic mode and the table: same file, section "SCENARIOS > BASIC MODE" (`setScenarioBasicMode()`,
 `rebuildAlternativesTable()`); the box is `#lpn_alt_box` in `Looped-Network.php`. The box's
