@@ -22665,9 +22665,9 @@ var EngCalcs = EngCalcs || {};
 	// a project file would make a colleague inherit your screen. serializeProject() must never
 	// learn about it.
 	//
-	// What is NOT here, and is not coming: Settings and the Labels box (Tom, explicitly). Both hang
-	// off their own toolbar button as pull-downs, and a setting is not something you read beside
-	// the drawing. A LEFT pane is not planned at all; the RIGHT pane is empty on purpose (see its
+	// The Settings and Labels BOXES are not here (Tom, explicitly): both hang off their own toolbar
+	// button as pull-downs. The Settings TABLE is (Tom, 2026-10-05: *"there will have to be a
+	// settings Table"*): one row per setting, audited by scenario as the asset tables are. A LEFT pane is not planned at all; the RIGHT pane is empty on purpose (see its
 	// own note below).
 	var LPN_PANE_KEY = 'lpn_pane';
 	// The pane's own floor, and the map's. Between them they decide how far the grip can travel:
@@ -26331,7 +26331,7 @@ var EngCalcs = EngCalcs || {};
 		'settings.energy.currency': 'lpn_energy_currency',
 		'settings.nodeElevSource': 'lpn_settings_elev_source', 'settings.defaults.nodeElevSource': 'lpn_settings_elev_source',
 		'settings.defaults.nodeElev': 'lpn_field_elev', 'settings.defaults.diameter': 'lpn_field_diameter',
-		'settings.defaults.roughness': 'lpn_field_roughness', 'settings.defaults.km': 'lpn_field_km',
+		'settings.defaults.roughness': 'lpn_field_roughness', 'settings.defaults.k': 'lpn_field_km',
 		'settings.defaults.demand': 'lpn_field_base_demand', 'settings.defaults.tankDiameter': 'lpn_field_tank_diameter',
 		'settings.defaults.tankLevel': 'lpn_field_tank_level', 'settings.defaults.tankMinLevel': 'lpn_field_tank_minlevel',
 		'settings.defaults.tankMaxLevel': 'lpn_field_tank_maxlevel',
@@ -26383,6 +26383,11 @@ var EngCalcs = EngCalcs || {};
 		if (typeof sample === 'number') { return 'num'; }
 		if (typeof sample === 'boolean') { return 'bool'; }
 		if (sample && typeof sample === 'object') { return 'json'; }
+		// Nothing stated anywhere yet (a new-asset default before it is seeded): a typed number is
+		// a number, except where the setting names something (a pattern, a node, a word).
+		if ((sample === null || sample === undefined) && !/(pattern|node|currency|prefix|suffix|separator|basemap)/i.test(p[p.length - 1] + p[0])) {
+			return 'auto';
+		}
 		return 'str';
 	}
 	function settingTableRows() {
@@ -26481,6 +26486,7 @@ var EngCalcs = EngCalcs || {};
 				if (row.path[0] === 'view' && !inwardViewOf(v)) { return { ok: false }; }
 				return { ok: true, v: v };
 		}
+		if (row.kind === 'auto') { return { ok: true, v: t === '' ? null : (isFinite(+t) ? +t : t) }; }
 		// A blank where the project states nothing (a default pattern) is "none", not an empty name.
 		base = settingFor(baseScenario(), row.path);
 		return { ok: true, v: (t === '' && (base === null || base === undefined)) ? null : t };
@@ -29995,7 +30001,8 @@ var EngCalcs = EngCalcs || {};
 		// Each ADDS TO or TAKES FROM the map's selection and never replaces it, which is the whole
 		// of his selection-set complaint. Select and Unselect are offered only when they would do
 		// something, the same rule Fill down follows.
-		targets = box.r1 > box.r0
+		targets = spec.group === 'setting' ? []   // a setting is not on the map
+			: box.r1 > box.r0
 			? rows.slice(box.r0, box.r1 + 1).map(function (el) { return { group: spec.group, id: paneRowEl(el).id }; })
 				.filter(function (t, i, all) { return !all.slice(0, i).some(function (u) { return u.id === t.id; }); })
 			: [aim];
@@ -30012,7 +30019,7 @@ var EngCalcs = EngCalcs || {};
 				}));
 			});
 		}
-		mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () { selectAndZoomTo(targets); openMultiProperties(); });
+		if (targets.length) { mk(pc.lpn_pane_goto_tip || 'Zoom & select', function () { selectAndZoomTo(targets); openMultiProperties(); }); }
 		// **SELECTION ONLY, offered only when the map has a selection** (or the filter is on, so it
 		// can be turned off from here). It acts on the MAP's selection, not on the rows clicked.
 		if (selections.length || paneSelFilter) {
@@ -30046,7 +30053,7 @@ var EngCalcs = EngCalcs || {};
 		// Delete element menu item."*). Delete clears values, as a spreadsheet's does; this removes
 		// the rows' own elements through the map's path.
 		// Not while scenarios are shown: the map's delete acts in the scenario SHOWING, not the row's.
-		if (!spec.scnRows) {
+		if (!spec.scnRows && spec.group !== 'setting') {
 			mk(box.r1 > box.r0 ? (pc.lpn_pane_delete_elements || 'Delete elements') : (pc.lpn_pane_delete_element || 'Delete element'),
 				function () { paneDeleteElements(spec); });
 		}
