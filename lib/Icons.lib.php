@@ -790,6 +790,9 @@ $ec_icons = array(
 		. '<path d="M10.5 12h6"/>'
 		. '<path d="M13.5 5.5v13"/>'
 		. '<path d="M13.5 5.5h3M13.5 18.5h3"/>',
+	// Water > Change type (Tom, 2026-10-05; dev/asset-type.md): one thing becoming another, drawn as
+	// the swap two opposed arrows make, the mark every editor uses for "exchange".
+	'retype'     => '<path d="M4 8h15"/><path d="M15 4l4 4-4 4"/><path d="M20 16H5"/><path d="M9 12l-4 4 4 4"/>',
 
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal

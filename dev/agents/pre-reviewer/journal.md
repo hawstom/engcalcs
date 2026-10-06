@@ -3867,8 +3867,26 @@ OBSERVED real Chrome (Net3 desktop, 900 touch, 390 phone): the delegated listene
 OBSERVED MISSED: SVG <title> CHILDREN still give the browser's native tip: Time series tab on Net3 has 100, Profile 126 (also Frequency, Calibration, scenario override ring via setOverrideTitle). The harness skips svg on purpose. CLAUDE.md line "the browser's native tooltip never shows" is false for these.
 OBSERVED DEFECT (touch only): a non-control titled element (pane grip) tapped on a touch device opens a click-trigger tip that stays when you tap elsewhere (still up 1.5 s later); was silent on touch before.
 Fire flow strings match Tom's words; only those two keys changed. dev/translation_payloads/lang.en.json still has the OLD accounting text (orchestrator regenerates).
+## 2026-10-06 feat/asset-type (Water > Change type)
+
+- OBSERVED (headless Chrome, Net1, tree 0f448176): tank 2 -> reservoir leaves head blank, so head = elevation 850 not 970; every junction pressure fell about 119 -> 60 psi after one convert. Dialog lists the lost water depth but never says the head changes.
+- OBSERVED: with Recalculate off, the converted node's label shows P=0.00 (invented) while neighbours keep stale values.
+- OBSERVED: undo and redo restore the doc byte-identically; Tables row counts move between tabs; symbol class becomes lpn-node-tank; lost-values list correct for junction (demand+extra, pattern, emitter) and tank (depths, diameter, volume curve, mixing, coeff); VOLUME curve stays in doc.curves; only `nodes` changed at top level.
+- NOT CHECKED: Properties box refresh (box was closed), Net3 solve, scenario overrides in browser (harness covers).
+- Method note: scratch copy of the tree with an injected EngCalcs.__t hook, served by php -S; real worktree untouched.
+
 ## feat/value-warning at 424b278e (OBSERVED, 2026-10-06; re-verify before citing)
 OBSERVED real Chromium: branch's own harness passes. All 7 shipped examples: 0 warnings in every table. Undo/redo, unit change (in to mm: thresholds 12 and 3810 mm), method change all refresh the glyph. Net3 Pipes tab fill median ~9-10 ms before and after; 117 glyphs painted at no measurable cost.
 OBSERVED DEFECT: touch (hover none): tapping the glyph in the Properties box opens the tip AND focuses the Diameter input (label activation), the exact 2026-08-29 complaint; initTips only cancels this on `.ec-tip`, the glyph here is a bare `.ec-help`. Tables-pane tap also focuses a cell input.
 OBSERVED: Basic-example-SI-units opens with roughness unit ft (pre-existing); under D-W its tip reads ft in an SI project.
 SPECULATION: how the glyph looks (zero-width inset over the input end) not judged.
+
+## 2026-10-06 feat/asset-type, link half (tree 4c26066b)
+
+OBSERVED (real Chrome on a scratch copy with a test hook, this tree; re-verify before citing):
+- Change-type harness passes with all its mutations. Net1 and Net3 (geographic): every key that vanished from a pipe, pump or valve (and from every scenario override, incl. custom property, GPV curve, library pipe type, fittings list, valve setting override) appeared in the box; Cancel left the document identical; undo identical (only the id counters X/M differ after the FIRST undo in a session, node version too).
+- EPANET source: rules.c newpremise/newaction never check the PIPE/PUMP/VALVE word (true; but newaction turns a numeric setting on a pipe into open/closed and refuses one on a GPV). A curveless pump and a TCV solve in both engines, heads agree to 1e-4. Export writes a curveless pump as a 0.01 ft, 40 in pipe and it re-imports as a pipe.
+- MISSED (medium): pump -> pipe or valve gives the New assets diameter (4 in on Net1) in place of the pump's stored 18, plus roughness and k from defaults; only Length (pipe) or type and setting (valve) are listed under "new". Node 10 head fell 22 m, 18 m/s in a 4 in pipe.
+- MISSED (low): Recalculate off, pump -> pipe shows velocity 0.00 and head loss 204 ft / gradient 2043% invented from stale numbers.
+- Pipe with scenario type override -> valve: that scenario's diameter silently reverts to Base's.
+Method note: scratch copy served by php -S, injected EngCalcs.__t; playwright from ~/.npm/_npx; lock via flock.
