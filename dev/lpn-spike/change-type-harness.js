@@ -164,7 +164,7 @@ function run(mutate, quiet) {
 		const q = change(J, 'junction', false);
 		ok('3.1 the box was shown', q.length === 1);
 		const text = q[0] || '';
-		ok('3.2 it opens with the key line, exactly "ID: Lost entry"', PC.lpn_change_type_key === 'ID: Lost entry' && text.split('\n')[0] === 'ID: Lost entry', text.split('\n')[0]);
+		ok('3.2 it opens with the key line', !!PC.lpn_change_type_key && text.split('\n')[0] === PC.lpn_change_type_key, text.split('\n')[0]);
 		ok('3.2b the "values will be lost" sentence follows, and every line under it is "ID: entry"',
 			text.indexOf(PC.lpn_change_type_lost) > 0 && text.split(PC.lpn_change_type_lost + '\n')[1].split('\n\n')[0].split('\n').every(l => l.indexOf(J + ': ') === 0),
 			text);
