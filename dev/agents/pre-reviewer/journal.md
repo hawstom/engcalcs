@@ -3867,3 +3867,8 @@ OBSERVED real Chrome (Net3 desktop, 900 touch, 390 phone): the delegated listene
 OBSERVED MISSED: SVG <title> CHILDREN still give the browser's native tip: Time series tab on Net3 has 100, Profile 126 (also Frequency, Calibration, scenario override ring via setOverrideTitle). The harness skips svg on purpose. CLAUDE.md line "the browser's native tooltip never shows" is false for these.
 OBSERVED DEFECT (touch only): a non-control titled element (pane grip) tapped on a touch device opens a click-trigger tip that stays when you tap elsewhere (still up 1.5 s later); was silent on touch before.
 Fire flow strings match Tom's words; only those two keys changed. dev/translation_payloads/lang.en.json still has the OLD accounting text (orchestrator regenerates).
+## feat/value-warning at 424b278e (OBSERVED, 2026-10-06; re-verify before citing)
+OBSERVED real Chromium: branch's own harness passes. All 7 shipped examples: 0 warnings in every table. Undo/redo, unit change (in to mm: thresholds 12 and 3810 mm), method change all refresh the glyph. Net3 Pipes tab fill median ~9-10 ms before and after; 117 glyphs painted at no measurable cost.
+OBSERVED DEFECT: touch (hover none): tapping the glyph in the Properties box opens the tip AND focuses the Diameter input (label activation), the exact 2026-08-29 complaint; initTips only cancels this on `.ec-tip`, the glyph here is a bare `.ec-help`. Tables-pane tap also focuses a cell input.
+OBSERVED: Basic-example-SI-units opens with roughness unit ft (pre-existing); under D-W its tip reads ft in an SI project.
+SPECULATION: how the glyph looks (zero-width inset over the input end) not judged.

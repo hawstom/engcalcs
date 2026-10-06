@@ -330,6 +330,13 @@ function ecWireTipEl(el) {
 		if (!control && !canHover) { ecTrackTapTip(el, tip); }
 		// The "?" glyph's own tap handling lives in ecWireExplanationGlyph(): every tip with a glyph
 		// returned above, so what reaches here is a name tip on a control or a glyph-less label.
+		// A bare glyph with no "?" of its own (the ⚠ beside an unreasonable value in
+		// js/looped-network.js) declares itself with data-ec-tip-glyph: on touch its tap asks and
+		// never focuses the field its label names (Tom, 2026-08-29).
+		if (!control && !canHover && el.hasAttribute && el.hasAttribute('data-ec-tip-glyph') && !el.dataset.ecTipNoFocus) {
+			el.dataset.ecTipNoFocus = '1';
+			el.addEventListener('click', function (e) { e.preventDefault(); });
+		}
 		if (longPress && !el.dataset.ecTipHoldWired) {
 			el.dataset.ecTipHoldWired = '1';
 			var timer = null;

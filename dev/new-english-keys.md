@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**16 still to read on master**, of 122 untranslated keys, of 2345 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**25 still to read on master**, of 135 untranslated keys, of 2361 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (122, 16 to read @@ NEEDS RULING)
+## lpn_  (135, 25 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -153,6 +153,9 @@ never edits a synonym.
 - **`lpn_ds_col_unscaled_tip`**
   > With the demands as they are in the active scenario at this time step, the same value the map shows.
   _Ruled OK 2026-10-03._
+- **`lpn_ds_eps_note`**
+  > Only the time step now on screen is scaled; levels and statuses are taken from this step. To test the peak, move the clock to the peak demand before you run.
+  _Ruled OK 2026-10-05._
 - **`lpn_ds_found`**
   > ✓ Every junction checked keeps at least {pressure} up to a demand scale of {m}.
   _Ruled 2026-10-05: Proposal approved._
@@ -178,8 +181,8 @@ never edits a synonym.
   > ✓ Every junction keeps {pressure} up to a demand scale of {max}, the top of the search.
   _Ruled OK 2026-10-03._
 - **`lpn_ds_intro`**
-  > Select the Run button to multiply the demands at the chosen junctions by the demand scale and see the pressures and velocities.\n\nSelect the Find button to find the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed; it searches from 0 to {max}.\n\nBoth work on a copy of the network, solved at the time step on screen in the active scenario, so nothing in your project is changed. Only that time step is scaled, and levels and statuses are taken from it; to test the peak, move the clock to the peak demand before you run.
-  @@ NEEDS RULING
+  > The demands are multiplied on a copy of the network, which is solved at the time step on screen in the active scenario. Nothing in your project is changed.
+  _Ruled OK 2026-10-03._
 - **`lpn_ds_lowest_at`**
   > At a demand scale of {m}, the lowest pressure is {pressure}, at junction {id}.
   _Ruled OK 2026-10-03._
@@ -234,6 +237,12 @@ never edits a synonym.
 - **`lpn_ds_scope_selected`**
   > Selected junctions
   _Ruled OK 2026-10-03._
+- **`lpn_ds_scope_tip`**
+  > All junctions, or only those selected on the map. Pressures are checked at the scaled demand.
+  _Ruled OK 2026-10-03._
+- **`lpn_ds_search_note`**
+  > Finds the largest demand scale, to the nearest {step}, at which all these junctions keep at least the lowest pressure allowed. It searches from 0 to {max}.
+  _Ruled 2026-10-05: Edited proposal._
 - **`lpn_ds_search_stopped`**
   > The search was stopped before it found an answer.
   _Ruled 2026-10-03: OK. Are we sure this isn't already provided by a different key?_
@@ -270,6 +279,9 @@ never edits a synonym.
 - **`lpn_mode_add_chain`**
   > Mode: Junction Pipe Chain. Specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain. Switch to Select mode to change or move assets and labels.
   _Ruled OK 2026-10-05._
+- **`lpn_pane_clear_override`**
+  > Clear override
+  @@ NEEDS RULING
 - **`lpn_pane_delete_element`**
   > Delete element
   @@ NEEDS RULING
@@ -288,6 +300,12 @@ never edits a synonym.
 - **`lpn_pane_manage_cols_width`**
   > Width (em)
   _Ruled OK 2026-10-05._
+- **`lpn_pane_scn_alt_tip`**
+  > {category} alt.: {alternative}
+  @@ NEEDS RULING
+- **`lpn_pane_scn_show`**
+  > Show scenarios
+  @@ NEEDS RULING
 - **`lpn_pane_sel_only`**
   > Selection only
   _Ruled OK 2026-10-05._
@@ -441,12 +459,33 @@ never edits a synonym.
 - **`lpn_tool_add_chain_tip`**
   > Chain junctions and pipes: specify a point on the map to add a junction, then specify each next point to add a pipe and a junction. Specify an existing node to continue from it. Press Escape to end the chain.
   _Ruled OK 2026-10-05._
+- **`lpn_valwarn_diameter`**
+  > A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.
+  @@ NEEDS RULING
+- **`lpn_valwarn_dw`**
+  > A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.
+  @@ NEEDS RULING
+- **`lpn_valwarn_hw`**
+  > A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
+  @@ NEEDS RULING
+- **`lpn_valwarn_manning`**
+  > A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
+  @@ NEEDS RULING
+- **`lpn_valwarn_negative`**
+  > EPANET refuses a negative number here.
+  @@ NEEDS RULING
+- **`lpn_valwarn_positive`**
+  > EPANET refuses zero or a negative number here.
+  @@ NEEDS RULING
+- **`lpn_valwarn_tank_levels`**
+  > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
+  @@ NEEDS RULING
 
 ---
 
 # Strings waiting on a branch
 
-**37 still to read**, of 40 new keys across 15 unmerged branch(es).
+**40 still to read**, of 43 new keys across 13 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -522,7 +561,47 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/feedback (`d5b7aece`) — adds no English strings
+### feat/feedback (`c4cb8389`) — 13 new, 13 to read @@ NEEDS RULING
+
+- **`lpn_fb_bad_email`**
+  > That email address does not look right. Correct it, or leave it empty.
+  @@ NEEDS RULING
+- **`lpn_fb_busy`**
+  > Too many messages have arrived in the last few minutes. What you wrote is still here, so you can try again later.
+  @@ NEEDS RULING
+- **`lpn_fb_comment`**
+  > Comments (optional)
+  @@ NEEDS RULING
+- **`lpn_fb_email`**
+  > Email (optional, only if you want a reply)
+  @@ NEEDS RULING
+- **`lpn_fb_failed`**
+  > That did not reach us. What you wrote is still here, so you can try again.
+  @@ NEEDS RULING
+- **`lpn_fb_intro`**
+  > Pick any that fit, or none, and add whatever you like. Nothing is sent until you press Send.
+  @@ NEEDS RULING
+- **`lpn_fb_pick_broken`**
+  > Something did not work
+  @@ NEEDS RULING
+- **`lpn_fb_pick_confusing`**
+  > This is confusing
+  @@ NEEDS RULING
+- **`lpn_fb_pick_numbers`**
+  > The numbers look wrong
+  @@ NEEDS RULING
+- **`lpn_fb_pick_wording`**
+  > The wording or translation is wrong
+  @@ NEEDS RULING
+- **`lpn_fb_send`**
+  > Send
+  @@ NEEDS RULING
+- **`lpn_fb_sending`**
+  > Sending…
+  @@ NEEDS RULING
+- **`lpn_fb_sends`**
+  > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
+  @@ NEEDS RULING
 
 ### feat/label-gang-search (`8b31a907`) — 3 new, all ruled
 
@@ -545,18 +624,6 @@ build for that would be a gate nobody keeps. Refresh it with
 ### feat/label-placer-c (`9a790a3e`) — adds no English strings
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
-
-### feat/scenario-table (`896b1259`) — 3 new, 3 to read @@ NEEDS RULING
-
-- **`lpn_pane_clear_override`**
-  > Clear override
-  @@ NEEDS RULING
-- **`lpn_pane_scn_alt_tip`**
-  > {category} alt.: {alternative}
-  @@ NEEDS RULING
-- **`lpn_pane_scn_show`**
-  > Show scenarios
-  @@ NEEDS RULING
 
 ### feat/screenshot (`8a583e22`) — 9 new, 9 to read @@ NEEDS RULING
 
@@ -588,28 +655,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
   @@ NEEDS RULING
 
-### feat/tip-door (`fbf7a6c4`) — adds no English strings
-
-### feat/value-warning (`0a6d4c19`) — 7 new, 7 to read @@ NEEDS RULING
-
-- **`lpn_valwarn_diameter`**
-  > A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.
-  @@ NEEDS RULING
-- **`lpn_valwarn_dw`**
-  > A Darcy-Weisbach roughness is normally more than 0 and at most {max} {unit}. A larger number is often a Hazen-Williams C or a Manning n.
-  @@ NEEDS RULING
-- **`lpn_valwarn_hw`**
-  > A Hazen-Williams C is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
-  @@ NEEDS RULING
-- **`lpn_valwarn_manning`**
-  > A Manning n is normally between {min} and {max}. A number outside that range is often a roughness meant for another friction method.
-  @@ NEEDS RULING
-- **`lpn_valwarn_negative`**
-  > EPANET refuses a negative number here.
-  @@ NEEDS RULING
-- **`lpn_valwarn_positive`**
-  > EPANET refuses zero or a negative number here.
-  @@ NEEDS RULING
-- **`lpn_valwarn_tank_levels`**
-  > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
-  @@ NEEDS RULING
+### feat/tip-door (`19f79bc1`) — adds no English strings

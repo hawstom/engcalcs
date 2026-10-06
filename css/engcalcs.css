@@ -2593,6 +2593,10 @@ html[dir="rtl"] .lpn-pane-table tbody td.lpn-pane-first { box-shadow: inset 1px 
 .lpn-pane-table tbody td input:focus { outline: 0; }
 /* A table waiting for Paste as new rows (Task 610): visibly armed until Ctrl+V or Esc. */
 .lpn-pane-appending .lpn-pane-table { outline: 2px dashed var(--ec-accent); outline-offset: 2px; }
+/* SHOW SCENARIOS (Tom, 2026-10-05): a cell holding a value set in its row's scenario, washed in the
+   amber the map rings an override with. Before the selection wash, so a selected range still reads
+   as one block. */
+.lpn-pane-table tbody td.lpn-pane-ovcell { background: var(--ec-hue-fff3cd); box-shadow: inset 0 -2px 0 var(--ec-hue-e8a33d), inset -1px 0 0 var(--ec-border); }
 /* The selected RANGE. A wash rather than a border, so a rectangle of forty rows reads as one
    block; the current cell keeps its border on top of it. */
 .lpn-pane-table tbody td.lpn-pane-sel { background: var(--ec-select-bg); }
@@ -2924,6 +2928,7 @@ html[dir="rtl"] .lpn-pane-table thead th:first-child {
    about Ctrl+D"). Quieter than the label, so the row still reads as one action first. */
 .lpn-pane-ctxmenu-accel { color: var(--ec-gray-888); font-size: .85em; white-space: nowrap; }
 .lpn-pane-ctxmenu button:hover, .lpn-pane-ctxmenu button:focus-visible { background: var(--ec-hue-eef1f4); outline: 0; }
+.lpn-pane-ctxmenu button:disabled { color: var(--ec-gray-888); cursor: default; background: none; }
 /* THE DIVIDER BETWEEN TWO HEADINGS, which is where a spreadsheet user aims to resize a column
    (Tom's point (d), 2026-09-18). It sits on the trailing edge of its own heading, is as tall as the
    heading row, and is the ONLY thing there that takes a col-resize cursor -- so the gesture
@@ -3649,6 +3654,16 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    tightening a limit is a way of ASKING a question about the data). The outline says which cells
    answer the question; the value underneath it is untouched. */
 .lpn-cp-bad { outline: 2px solid var(--ec-hue-c0392b); background: var(--ec-error-bg); }
+/* **THE ⚠ BESIDE AN UNREASONABLE VALUE** (dev/value-warning.md). In a Tables cell it takes no width
+   and is drawn back over the inline end of the box, so the first one to appear does not widen the
+   column and shift the table, and no class goes on the cell; in the Properties box it follows the
+   input on the same line. The glyph is the whole tip target. */
+.lpn-valwarn { color: var(--ec-warn-ink); cursor: help; line-height: 1; position: relative; }
+/* A finger-sized target around the glyph that adds no width to the cell: the glyph's own box is
+   zero wide in a Tables cell, and a ? beside a label is about a character square. */
+.lpn-valwarn::after { content: ''; position: absolute; inset-block: -.6em; inset-inline-start: -.35em; width: 1.8em; }
+.lpn-valwarn-inset { display: inline-block; width: 0; white-space: nowrap; inset-inline-start: -1.1em; }
+label > .lpn-valwarn { margin-inline-start: .3em; }
 /* A heading INSIDE a sub-heading's body -- the colour band limits, which name the field they belong
    to. Same weight as a sub-heading, not full bold, so it reads as one level further in. */
 .lpn-set-minihead { margin-top: 6px; font-weight: 600; opacity: .8; }
