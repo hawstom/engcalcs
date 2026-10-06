@@ -34909,8 +34909,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	function exportGeoJsonFile() {
 		var pcX = EngCalcs.pageConfig || {}, out, fallback = {
-			local: 'A GeoJSON file holds longitude and latitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.',
-			range: 'These positions are not valid longitudes and latitudes: {detail}',
+			local: 'A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.',
+			range: 'These positions are not valid latitudes and longitudes: {detail}',
 			empty: 'There is nothing to export yet. Draw or open a network first.',
 			crs: 'This project’s coordinate system cannot be converted to longitude and latitude here.'
 		};

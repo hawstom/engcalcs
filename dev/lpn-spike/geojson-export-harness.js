@@ -220,7 +220,7 @@ console.log('\n6. The refusal tells the visitor what to do');
 	const en = fs.readFileSync(ROOT + 'lib/lang.ec.en.php', 'utf8');
 	const m = /\$ec_lang\['lpn_geojson_refused_local'\]='([^']*)'/.exec(en);
 	ok('the English refusal says why (longitude and latitude only) and what to do (Georeference first)',
-		m && /longitude and latitude only/.test(m[1]) && /Georeference/.test(m[1]), m && m[1]);
+		m && /latitude and longitude only/.test(m[1]) && /Georeference/.test(m[1]), m && m[1]);
 	const php = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
 	['lpn_file_export_geojson', 'lpn_file_export_geojson_tip', 'lpn_geojson_refused_local', 'lpn_geojson_refused_range',
 		'lpn_geojson_refused_empty', 'lpn_geojson_results_in', 'lpn_geojson_results_out'].forEach((k) => {

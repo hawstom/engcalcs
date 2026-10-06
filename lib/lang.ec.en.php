@@ -2034,9 +2034,9 @@ $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET 
 // file are always longitude and latitude (RFC 7946), so a project with no place on the Earth is
 // refused and told how to get one, never written with an invented coordinate system.
 $ec_lang['lpn_file_export_geojson']='Export GeoJSON file…';
-$ec_lang['lpn_file_export_geojson_tip']='Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are longitude and latitude. Results are included only when the network has been solved.';
-$ec_lang['lpn_geojson_refused_local']='A GeoJSON file holds longitude and latitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.';
-$ec_lang['lpn_geojson_refused_range']='These positions are not valid longitudes and latitudes: {detail}';
+$ec_lang['lpn_file_export_geojson_tip']='Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.';
+$ec_lang['lpn_geojson_refused_local']='A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.';
+$ec_lang['lpn_geojson_refused_range']='These positions are not valid latitudes and longitudes: {detail}';
 $ec_lang['lpn_geojson_refused_empty']='There is nothing to export yet. Draw or open a network first.';
 $ec_lang['lpn_geojson_results_in']='The results on screen are included.';
 $ec_lang['lpn_geojson_results_out']='No results are included, because the network is not solved.';
