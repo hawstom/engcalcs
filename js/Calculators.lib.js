@@ -1479,3 +1479,78 @@ EngCalcs.wireSelectAllOnFocus = function () {
 	});
 };
 document.addEventListener('DOMContentLoaded', function () { EngCalcs.wireSelectAllOnFocus(); });
+
+/**
+	* niceTicks() -- round values to mark an axis, ROADMAP Task 777.
+	*
+	* Steps are 1, 2, 2.5 or 5 times a power of ten. Of every step that puts 4 to 8 marks inside
+	* [lo, hi], the one whose count is nearest `target` (default 5) wins; when no step manages 4 to 8
+	* (a span that straddles the marks unluckily) the nearest count to that range wins. Marks are
+	* inside the range, never outside it, so a mark never sits beyond the drawing.
+	* Returns { ticks: [..], step: n }; an empty range or a non-finite end returns no ticks.
+	*/
+EngCalcs.niceTicks = function (lo, hi, target) {
+	'use strict';
+	var span = hi - lo, base, e, m, step, k, first, ticks, t, n, score, best = null, mults = [1, 2, 2.5, 5], i;
+	if (!isFinite(lo) || !isFinite(hi) || !(span > 0)) { return { ticks: [], step: 0 }; }
+	target = target || 5;
+	base = Math.floor(Math.log(span) / Math.LN10);
+	for (e = base - 2; e <= base + 1; e += 1) {
+		for (i = 0; i < mults.length; i += 1) {
+			m = mults[i];
+			step = m * Math.pow(10, e);
+			first = Math.ceil(lo / step - 1e-9);
+			ticks = [];
+			for (k = first; k * step <= hi + step * 1e-9; k += 1) {
+				// k * step, then trimmed, so 0.1 * 3 is 0.3 and not 0.30000000000000004
+				t = parseFloat((k * step).toPrecision(12));
+				ticks.push(t);
+				if (ticks.length > 50) { break; }
+			}
+			n = ticks.length;
+			score = (n >= 4 && n <= 8) ? Math.abs(n - target) : 100 + (n < 4 ? 4 - n : n - 8);
+			if (best === null || score < best.score) { best = { score: score, ticks: ticks, step: step }; }
+		}
+	}
+	return { ticks: best.ticks, step: best.step };
+};
+
+/** The mark's text: as many decimals as the step needs, never "-0". */
+EngCalcs.tickLabel = function (v, step) {
+	'use strict';
+	var dec = 0, s;
+	// the fewest decimals that show the step exactly: 0.25 needs two, 2.5 one, 5 none
+	while (dec < 8 && Math.abs(Math.round(step * Math.pow(10, dec)) - step * Math.pow(10, dec)) > 1e-7 * Math.max(1, step * Math.pow(10, dec))) { dec += 1; }
+	s = v.toFixed(dec);
+	return (parseFloat(s) === 0) ? (0).toFixed(dec) : s;
+};
+
+/**
+	* sketchAxesSvg() -- a faint grid with labelled marks for a cross-section sketch (Task 777).
+	*
+	* o.x and o.y are {min, max, unit, target, to}: the DISPLAYED range, the unit symbol (may be
+	* empty), and `to(displayedValue)` -> pixel along that axis. The unit rides on the largest mark's
+	* label so no extra row or column is spent on it. Ink is the .ec-sk-* classes in engcalcs.css.
+	* Draw this BEFORE the section so the line stays on top. Returns SVG markup.
+	*/
+EngCalcs.sketchAxesSvg = function (o) {
+	'use strict';
+	var tx = EngCalcs.niceTicks(o.x.min, o.x.max, o.x.target),
+		ty = EngCalcs.niceTicks(o.y.min, o.y.max, o.y.target),
+		left = o.x.to(o.x.min), right = o.x.to(o.x.max),
+		top = o.y.to(o.y.max), bottom = o.y.to(o.y.min),
+		s = '', i, p, txt;
+	for (i = 0; i < tx.ticks.length; i += 1) {
+		p = o.x.to(tx.ticks[i]);
+		txt = EngCalcs.tickLabel(tx.ticks[i], tx.step) + ((o.x.unit && i === tx.ticks.length - 1) ? ' ' + o.x.unit : '');
+		s += '<line class="ec-sk-grid" x1="' + p + '" y1="' + top + '" x2="' + p + '" y2="' + bottom + '" />'
+			+ '<text class="ec-sk-tick" x="' + p + '" y="' + (bottom + 12) + '" text-anchor="middle">' + txt + '</text>';
+	}
+	for (i = 0; i < ty.ticks.length; i += 1) {
+		p = o.y.to(ty.ticks[i]);
+		txt = EngCalcs.tickLabel(ty.ticks[i], ty.step) + ((o.y.unit && i === ty.ticks.length - 1) ? ' ' + o.y.unit : '');
+		s += '<line class="ec-sk-grid" x1="' + left + '" y1="' + p + '" x2="' + right + '" y2="' + p + '" />'
+			+ '<text class="ec-sk-tick" x="' + (left - 4) + '" y="' + (p + 3.5) + '" text-anchor="end">' + txt + '</text>';
+	}
+	return s;
+};

@@ -5265,3 +5265,7 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 @media (hover: none) and (pointer: coarse) {
 	.lpn-menu-row[data-hotkey]::after { content: none; }
 }
+
+/* Cross-section sketch scale (mi_, wi_): faint grid and round-number marks, Task 777 */
+.ec-sk-grid { stroke: var(--ec-border); stroke-width: 1; }
+.ec-sk-tick { fill: var(--ec-ink-subtle); font-size: 10px; font-family: sans-serif; }

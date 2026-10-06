@@ -120,14 +120,21 @@ EngCalcs.wiDrawSketch = function(hw) {
     if (spanX <= 0 || spanY <= 0) { el.innerHTML = ''; return; }
 
     var svgW = 400, svgH = 200;
-    var padL = 10, padR = 10, padT = 20, padB = 10;
+    var padL = 40, padR = 14, padT = 20, padB = 22;
     var drawW = svgW - padL - padR;
     var drawH = svgH - padT - padB;
 
     function toX(x) { return padL + (x - minX) / spanX * drawW; }
     function toY(y) { return svgH - padB - (y - minY) / spanY * drawH; }
 
-    var s = '<svg width="' + svgW + '" height="' + svgH + '" style="font-family:sans-serif;font-size:11px;">';
+    var s = '<svg width="' + svgW + '" height="' + svgH + '" viewBox="0 0 ' + svgW + ' ' + svgH + '" style="max-width:100%;height:auto;font-family:sans-serif;font-size:11px;">';
+
+    // Scale marks: a faint grid, drawn first so the crest and the water stay on top (Task 777).
+    // No unit label: this page has no unit selects (Cw carries the unit system).
+    s += EngCalcs.sketchAxesSvg({
+        x: { min: minX, max: maxX, unit: '', target: 6, to: toX },
+        y: { min: minY, max: maxY, unit: '', target: 5, to: toY }
+    });
 
     // Weir crest profile
     var poly = '';
