@@ -526,9 +526,10 @@ console.log('\n--- a box that fills the screen has to be scrollable by finger --
 	// still never a zero.
 	ok('...and blank still means "the file did not say"',
 		/input\.value = home\(\)\[key\] === undefined \? '' :/.test(body('hydNumberRow')));
-	ok('...in whichever of the row\'s two homes the value lives',
-		// The scenario's home is where an edit in it lands: itself, or the calculation set it names.
-		/\(o\.perScenario && !inBaseScenario\(\)\) \? calcTargetOf\(activeScenario\(\)\) : settings\.hydraulics/
+	ok('...and the row has one home, the hydraulics object the Settings box seam points it at',
+		// In a scenario the box's seam (withSetboxView(), setboxEditEnd()) shows the scenario's value
+		// and sends an edit to the scenario, the demand multiplier included (stage 3b).
+		/var home = function \(\) \{ return settings\.hydraulics \|\| \(settings\.hydraulics = \{\}\); \};/
 			.test(body('hydNumberRow')));
 	ok('an unset hydraulics row shows NO number: no placeholder is set',
 		!/input\.placeholder\s*=/.test(body('hydNumberRow')));

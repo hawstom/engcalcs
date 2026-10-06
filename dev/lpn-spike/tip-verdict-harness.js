@@ -121,7 +121,7 @@ console.log('\n--- 4. a blank that follows a default says Default ---');
 	// And the blanks that really are "none" stay so: the project's own Default demand pattern, a
 	// reservoir's head pattern, a pump's speed pattern, a source pattern, the network price pattern.
 	ok('the Settings default-pattern row still offers No pattern',
-		/libFillPatternOptions\(sel, doc\.defaultPattern\);/.test(js));
+		/libFillPatternOptions\(sel, scnDefaultPattern\(\)\);/.test(js));
 	ok('...as does the network price pattern', /libFillPatternOptions\(pat, e\.globalPattern \|\| ''\);/.test(js));
 	// Nothing may still hand the two deleted pattern tips to a label.
 	ok('neither deleted pattern tip is read', !/pc\.lpn_field_(demand|meter)_pattern_tip/.test(js));

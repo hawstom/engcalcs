@@ -26567,7 +26567,7 @@ var EngCalcs = EngCalcs || {};
 	function settingRowUnitText(row) {
 		var u = settingRowUnit(row.path), pc = EngCalcs.pageConfig || {};
 		if (u) { return unitLabel(u); }
-		if (row.path.join('.') === 'settings.contourBuffer') { return pc.lpn_contour_buffer_unit || ''; }
+		if (row.path.join('.') === 'settings.contourBuffer') { return pc.lpn_contour_buffer_unit || '× median pipe length'; }
 		return '';
 	}
 	// What a row's value IS, read off the value the project states (else the first a scenario
