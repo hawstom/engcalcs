@@ -62,7 +62,9 @@ function helpers(a) {
 			const cells = {}; let key = null, local = false;
 			tr.querySelectorAll('td').forEach((td) => {
 				const inp = td.querySelector('input, select');
-				cells[td._lpnPaneKey] = inp ? inp.value : td.textContent.trim();
+				// A select shows the words of its chosen option, which is what the reader sees.
+				cells[td._lpnPaneKey] = inp ? (inp.tagName === 'SELECT' ? (inp.options[inp.selectedIndex] || { text: '' }).text : inp.value) : td.textContent.trim();
+				if (td._lpnPaneKey === 'st_value') { cells.select = !!(inp && inp.tagName === 'SELECT'); cells.aria = inp ? inp.getAttribute('aria-label') : ''; }
 				key = td._lpnPaneId;
 				if (td._lpnPaneKey === 'st_value' && td.classList.contains('lpn-pane-ovcell')) { local = true; }
 			});
@@ -77,12 +79,12 @@ function helpers(a) {
 		(scn === undefined || r.cells.scn_name === scn))[0];
 	const valueInput = (rowKey) => page.evaluateHandle((k) => {
 		const td = Array.from(document.querySelectorAll('#lpn_pane_settings td.lpn-pane-col-st_value')).filter((t) => t._lpnPaneId === k)[0];
-		return td ? td.querySelector('input') : null;
+		return td ? td.querySelector('input, select') : null;
 	}, rowKey);
 	const typeValue = async (rowKey, text) => {
 		await page.evaluate(([k, v]) => {
 			const td = Array.from(document.querySelectorAll('#lpn_pane_settings td.lpn-pane-col-st_value')).filter((t) => t._lpnPaneId === k)[0];
-			const inp = td.querySelector('input');
+			const inp = td.querySelector('input, select');
 			inp.value = v;
 			inp.dispatchEvent(new Event('change', { bubbles: true }));
 		}, [rowKey, text]);
@@ -91,7 +93,8 @@ function helpers(a) {
 	// The cell menu of one Value cell, by the keyboard's own door (Shift+F10); returns its rows.
 	const cellMenu = async (rowKey) => {
 		const h = await valueInput(rowKey);
-		await h.asElement().click();
+		// Focus, not a click: a click on a select opens its own list.
+		await h.asElement().focus();
 		await a.settle(200);
 		await page.keyboard.press('Shift+F10');
 		await a.settle(300);
@@ -176,10 +179,10 @@ async function main() {
 		const ts = rows.filter((r) => r.cells.st_setting === TS)[0];
 		ok('Text size is a row, in Presentation', ts && ts.cells.st_category === PRES, JSON.stringify(ts));
 		const DIA = await L('lpn_field_diameter'), BD = await L('lpn_field_base_demand'),
-			PHYS = await L('lpn_alt_cat_physical'), DEMC = await L('lpn_alt_cat_demand');
+			PHYS = await L('lpn_alt_cat_physical'), DEMC = await L('lpn_alt_cat_demand'), NEWA = await L('lpn_settings_row_new_asset');
 		ok('new-asset defaults sit in Physical (diameter) and Demand (base demand)',
-			rows.some((r) => r.cells.st_setting === DIA && r.cells.st_category === PHYS) &&
-			rows.some((r) => r.cells.st_setting === BD && r.cells.st_category === DEMC));
+			rows.some((r) => r.cells.st_setting === NEWA.replace('{setting}', DIA) && r.cells.st_category === PHYS) &&
+			rows.some((r) => r.cells.st_setting === NEWA.replace('{setting}', BD) && r.cells.st_category === DEMC));
 		const keys = rows.map((r) => JSON.parse(r.key)[0] + (JSON.parse(r.key)[1] ? '.' + JSON.parse(r.key)[1] : ''));
 		ok('units and the coordinate frame are not rows', !keys.some((k) => /^(units|origin|project\.(coords|crs|georef))/.test(k)), JSON.stringify(keys.filter((k) => /^(units|origin|project)/.test(k))));
 		ok('no Value cell wears the override wash with no scenario', rows.every((r) => !r.local));
@@ -236,7 +239,8 @@ async function main() {
 
 		console.log('\n--- 4. a friction method override in Peak ---');
 		const pBase = await H.pressure('22');
-		await H.typeValue((await H.findRow(FM, 'Peak')).key, await L('bpn_method_dw'));
+		// A choice is a select of the Settings box's own options; picking Darcy-Weisbach.
+		await H.typeValue((await H.findRow(FM, 'Peak')).key, 'dw');
 		let fmPeak = await H.findRow(FM, 'Peak'), fmBase = await H.findRow(FM, base);
 		ok('Peak\'s row reads Darcy-Weisbach and wears the override wash', fmPeak.cells.st_value === await L('bpn_method_dw') && fmPeak.local, JSON.stringify(fmPeak));
 		ok('...Base\'s row still reads Hazen-Williams, unmarked', fmBase.cells.st_value === await L('bpn_method_hw') && !fmBase.local, JSON.stringify(fmBase));

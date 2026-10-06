@@ -26060,8 +26060,10 @@ var EngCalcs = EngCalcs || {};
 		return i < 0 ? k : k.slice(0, i);
 	}
 	function paneRowLabel(row) {
-		var x = row && row._lpnScn;
-		return x ? x.el.id + ' ' + scenarioDisplayName(x.scn) : (row ? row.id : '');
+		var x = row && row._lpnScn, el = x ? x.el : row;
+		// A Settings table row is named by its setting, never by its stored path.
+		var name = el && el._lpnSetting ? settingTableLabel(el.path) : (el ? el.id : '');
+		return x ? name + ' ' + scenarioDisplayName(x.scn) : name;
 	}
 	// A customer carries nothing a scenario can change (Task 247), so its table has no such view.
 	function paneScnAvailable(spec) { return spec.group !== 'customer'; }
@@ -26134,7 +26136,7 @@ var EngCalcs = EngCalcs || {};
 				sortKey: function (r) { return x(r) ? x(r).info.idx[x(r).scn.id] : undefined; } }
 		];
 	}
-	var PANE_SCN_EL_FNS = ['plainFor', 'choices', 'disabledFor', 'hint', 'hintTip', 'refTo'];
+	var PANE_SCN_EL_FNS = ['plainFor', 'choices', 'choicesFor', 'disabledFor', 'hint', 'hintTip', 'refTo'];
 	function paneScnWrapCol(c) {
 		var w = Object.create(c);
 		function run(r, fn) {
@@ -26264,14 +26266,18 @@ var EngCalcs = EngCalcs || {};
 		nodeLbl: 'lpn_labels_heading_node', linkLbl: 'lpn_labels_heading_link', custLbl: 'lpn_settings_sym_customer',
 		nodeCol: 'lpn_settings_sym_node_colors', linkCol: 'lpn_settings_sym_link_colors', all: 'lpn_settings_sym_all',
 		display: 'lpn_settings_map_display', ids: 'lpn_settings_id_prefixes', defaults: 'lpn_settings_defaults',
-		hyd: 'lpn_settings_hydraulics', time: 'lpn_time_menu', quality: 'lpn_settings_quality', energy: 'lpn_settings_energy' };
-	var LPN_SETTAB_SUB_ORDER = ['all', 'nodeLbl', 'nodeCol', 'linkLbl', 'linkCol', 'custLbl', 'display', 'ids', 'defaults',
+		hyd: 'lpn_settings_hydraulics', time: 'lpn_time_menu', quality: 'lpn_settings_quality', energy: 'lpn_settings_energy',
+		labelOrder: 'lpn_settings_row_minor_label_order' };
+	var LPN_SETTAB_SUB_ORDER = ['all', 'nodeLbl', 'nodeCol', 'linkLbl', 'linkCol', 'custLbl', 'labelOrder', 'display', 'ids', 'defaults',
 		'time', 'hyd', 'quality', 'energy'];
 	// Where the Settings box shows a path: [section, sub-heading]. Read by the Major and Minor
 	// heading columns, so a row can be found again in the box it is also edited in.
 	function settingTableHeadings(p) {
 		var m = p[1], own;
 		function side(k) { return k === 'node' ? 'nodeLbl' : k === 'link' ? 'linkLbl' : k === 'customer' ? 'custLbl' : null; }
+		// The order a label's values appear in and drop out by: their own Minor heading, so 80 rows
+		// of ranks do not bury the rest of the labels.
+		if (p[0] === 'labelSettings' && (m === 'show' || m === 'priority')) { return ['symbology', 'labelOrder']; }
 		if (p[0] === 'labelSettings') {
 			own = side(m) || (m === 'customerMaxWidth' ? 'custLbl' : side(p[2]));
 			return ['symbology', own || 'all'];
@@ -26356,6 +26362,10 @@ var EngCalcs = EngCalcs || {};
 		'settings.symbolCapMultiple': 'lpn_settings_row_symbol_cap_multiple',
 		'settings.symbolCapPercentile': 'lpn_settings_row_symbol_cap_percentile',
 		'settings.contourLabels': 'lpn_settings_row_contour_labels',
+		// Contour rows say so: in the Settings box they sit under a Contour heading the table lacks.
+		'settings.contourFill': 'lpn_settings_row_contour_fill', 'settings.contourOpacity': 'lpn_settings_row_contour_opacity',
+		'settings.contourInterval': 'lpn_settings_row_contour_interval', 'settings.contourBuffer': 'lpn_settings_row_contour_buffer',
+		'settings.contourTerrain': 'lpn_settings_row_contour_terrain',
 		'settings.hydraulics.checkFreq': 'lpn_settings_row_check_freq',
 		'settings.hydraulics.maxCheck': 'lpn_settings_row_max_check',
 		'settings.hydraulics.statusReport': 'lpn_settings_row_status_report',
@@ -26376,7 +26386,8 @@ var EngCalcs = EngCalcs || {};
 	function settingTableFill(tpl, map) {
 		function v(k) { return map[k] === undefined ? '' : String(map[k]); }
 		return String(tpl).split('{setting}').join(v('setting')).split('{member}').join(v('member'))
-			.split('{labels}').join(v('labels')).split('{field}').join(v('field')).split('{part}').join(v('part'));
+			.split('{labels}').join(v('labels')).split('{field}').join(v('field')).split('{part}').join(v('part'))
+			.split('{value}').join(v('value')).split('{x}').join(v('x')).split('{y}').join(v('y')).split('{s}').join(v('s'));
 	}
 	// A field a label or a colour shows, in the words the Labels box uses; a quality field held per
 	// analysis (`quality:trace`) names its analysis too.
@@ -26403,7 +26414,16 @@ var EngCalcs = EngCalcs || {};
 	 * dev/lpn-spike/settings-table-labels-harness.js fails on that, on every example with every view
 	 * option on.
 	 */
+	// New-asset values say so ("New assets: Diameter"), so they do not read as a setting of the
+	// pipes already drawn.
 	function settingTableLabel(p) {
+		var bare = settingTableLabelBare(p);
+		if (p[0] === 'settings' && p[1] === 'defaults') {
+			return settingTableFill((EngCalcs.pageConfig || {}).lpn_settings_row_new_asset || 'New assets: {setting}', { setting: bare });
+		}
+		return bare;
+	}
+	function settingTableLabelBare(p) {
 		var pc = EngCalcs.pageConfig || {}, i, key, k, base, times = EngCalcs.LPN_TIME_FIELDS || [],
 			groups = { node: 1, link: 1, customer: 1 }, fld, partKey, sideKey;
 		function own(path) {
@@ -26461,26 +26481,112 @@ var EngCalcs = EngCalcs || {};
 		if (p[0] === 'times' && LPN_SCENARIO_TIME_KEYS.indexOf(p[1]) >= 0) { return 'time2'; }
 		return '';
 	}
+	// **EVERY SETTING A SCENARIO MAY HOLD IS A ROW, STATED OR NOT** (Perry's review, 2026-10-06: Net3
+	// lat/lon had no Friction method row; a new project had no Accuracy). The leaves of a fresh
+	// project's settings name most of them; these are the ones a fresh project leaves unstated, each
+	// with the value the page uses while it is unstated (the Settings box's own stated default), or
+	// `undefined` where none is fixed.
+	var LPN_SETTAB_OPTIONAL = [
+		[['settings', 'method'], 'hw'],
+		[['settings', 'hydraulics', 'accuracy'], 0.001], [['settings', 'hydraulics', 'trials'], 40],
+		[['settings', 'hydraulics', 'unbalanced'], undefined], [['settings', 'hydraulics', 'headError'], 0],
+		[['settings', 'hydraulics', 'flowChange'], 0], [['settings', 'hydraulics', 'dampLimit'], 0],
+		[['settings', 'hydraulics', 'demandModel'], 'DDA'], [['settings', 'hydraulics', 'specificGravity'], 1],
+		[['settings', 'hydraulics', 'viscosity'], 1], [['settings', 'hydraulics', 'emitterExponent'], 0.5],
+		[['settings', 'hydraulics', 'demandMultiplier'], 1],
+		[['settings', 'reactions', 'globalBulk'], 0], [['settings', 'reactions', 'globalWall'], 0],
+		[['settings', 'reactions', 'orderBulk'], 1], [['settings', 'reactions', 'orderWall'], 1],
+		[['settings', 'reactions', 'orderTank'], 1], [['settings', 'reactions', 'limitingPotential'], undefined],
+		[['settings', 'reactions', 'roughnessCorrelation'], undefined],
+		[['settings', 'energy', 'globalEfficiency'], 75], [['settings', 'energy', 'globalPrice'], 0],
+		[['settings', 'energy', 'globalPattern'], undefined], [['settings', 'energy', 'demandCharge'], 0],
+		[['defaultPattern'], undefined], [['view'], undefined],
+		[['project', 'basemap'], 'osm']
+	];
+	// A legacy setting a project may still carry, hidden while the setting that replaced it is
+	// stated and no scenario holds the legacy one.
+	var LPN_SETTAB_SUPERSEDED = {
+		'settings.nodeElevSource': ['settings', 'defaults', 'nodeElevSource'],
+		'settings.emitterExponent': ['settings', 'hydraulics', 'emitterExponent'],
+		'settings.tolerance': ['settings', 'hydraulics', 'accuracy']
+	};
+	// Values a setting may take, in the Settings box's own words: these rows are a select.
 	function settingTableChoices(p) {
-		var pc = EngCalcs.pageConfig || {}, s = p.join('.');
+		var pc = EngCalcs.pageConfig || {}, s = p.join('.'), R, list;
 		if (s === 'settings.method') {
 			return [['hw', pc.bpn_method_hw || 'Hazen-Williams'], ['dw', pc.bpn_method_dw || 'Darcy-Weisbach'],
 				['manning', pc.bpn_method_manning || 'Manning']];
 		}
 		// Stored as the solver's name; the Settings box asks it as a yes/no about the built-in one.
 		if (s === 'settings.engine') { return [['native', settingTableYes()], ['epanet', settingTableNo()]]; }
+		if (s === 'settings.hydraulics.demandModel') {
+			return [['DDA', pc.lpn_settings_demand_model_dda || 'Demand driven'], ['PDA', pc.lpn_settings_demand_model_pda || 'Pressure driven']];
+		}
+		if (s === 'settings.hydraulics.unbalanced') {
+			return [['continue', pc.lpn_settings_unbalanced_continue || 'Allow extra trials'],
+				['stop', pc.lpn_settings_unbalanced_stop || 'Stop and report the last trial']];
+		}
+		if (s === 'settings.basemapStyle') {
+			return [['normal', pc.lpn_basemap_style_normal || 'Normal'], ['muted', pc.lpn_basemap_style_muted || 'Muted'],
+				['faded', pc.lpn_basemap_style_faded || 'Faded'], ['grayscale', pc.lpn_basemap_style_grayscale || 'Grayscale']];
+		}
+		if (s === 'settings.legendPosition' || s === 'settings.colorLegendPosition') { return legendPositionOptions(pc); }
+		if (s === 'settings.contourFill') {
+			return [['', pc.lpn_settings_legend_off || 'None'], ['smooth', pc.lpn_contour_fill_smooth || 'Smooth'],
+				['bands', pc.lpn_contour_fill_bands || 'Bands']];
+		}
+		if (s === 'settings.nodeElevSource' || s === 'settings.defaults.nodeElevSource') {
+			return [['value', pc.lpn_settings_elev_source_typed || 'Above'], ['dem', pc.lpn_settings_elev_source_dem || 'Mapbox DEM']];
+		}
+		if (s === 'project.basemap' || s === 'project.basemapLast') {
+			return [['osm', pc.lpn_settings_row_basemap_osm || 'Street map'],
+				['satellite', pc.lpn_settings_row_basemap_satellite || 'Satellite images'], ['off', pc.lpn_settings_legend_off || 'None']];
+		}
+		if (s === 'times.statistic') {
+			return (EngCalcs.LPN_STATISTICS || []).map(function (n) {
+				return [n, { NONE: pc.lpn_time_stat_none, AVERAGED: pc.lpn_time_stat_averaged, MINIMUM: pc.lpn_time_stat_minimum,
+					MAXIMUM: pc.lpn_time_stat_maximum, RANGE: pc.lpn_time_stat_range }[n] || n];
+			});
+		}
+		if (p[0] === 'settings' && (p[1] === 'colorRampNode' || p[1] === 'colorRampLink') && (R = ramps())) {
+			return Object.keys(R.RAMPS).map(function (k) { return [k, R.RAMPS[k].name]; });
+		}
+		if (p[0] === 'settings' && p[1] === 'colorModes' && p.length === 3 && (R = ramps())) {
+			list = R.modesFor(String(p[2]).split('.').slice(1).join('.')).map(function (m) { return [m.key, colorModeName(pc, m)]; });
+			list.push([R.MANUAL_MODE, pc.lpn_color_mode_manual || 'Manual']);
+			return list;
+		}
 		return null;
 	}
 	function settingTableYes() { return (EngCalcs.pageConfig || {}).lpn_settings_table_yes || 'Yes'; }
 	function settingTableNo() { return (EngCalcs.pageConfig || {}).lpn_settings_table_no || 'No'; }
+	// The unit a number is typed in, where the Settings box shows one beside it.
+	function settingRowUnit(p) {
+		var s = p.join('.');
+		if (s === 'settings.labelMaxWidth' || s === 'labelSettings.customerMaxWidth') { return 'lpn_u_length'; }
+		if (s === 'settings.defaults.diameter') { return 'lpn_u_diameter'; }
+		if (s === 'settings.defaults.roughness') { return frictionMethod() === 'dw' ? 'lpn_u_roughness' : null; }
+		if (/^settings\.defaults\.(nodeElev|tankLevel|tankMinLevel|tankMaxLevel)$/.test(s) || s === 'settings.hydraulics.headError') { return 'lpn_u_elevhead'; }
+		if (s === 'settings.defaults.tankDiameter') { return 'lpn_u_length'; }
+		if (s === 'settings.defaults.demand' || s === 'settings.hydraulics.flowChange') { return 'lpn_u_flow'; }
+		if (s === 'settings.hydraulics.minPressure' || s === 'settings.hydraulics.reqPressure') { return 'lpn_u_pressure'; }
+		return null;
+	}
+	function settingRowUnitText(row) {
+		var u = settingRowUnit(row.path), pc = EngCalcs.pageConfig || {};
+		if (u) { return unitLabel(u); }
+		if (row.path.join('.') === 'settings.contourBuffer') { return pc.lpn_contour_buffer_unit || ''; }
+		return '';
+	}
 	// What a row's value IS, read off the value the project states (else the first a scenario
-	// holds), so a typed cell is read back as the same kind of thing.
+	// holds, else its default), so a typed cell is read back as the same kind of thing.
 	function settingRowKind(p, sample) {
-		if (p[0] === 'times') { return p[1] === 'statistic' ? 'statistic' : 'time'; }
+		if (p[0] === 'times') { return p[1] === 'statistic' ? 'choice' : 'time'; }
 		if (settingTableChoices(p)) { return 'choice'; }
 		if (typeof sample === 'number') { return 'num'; }
 		if (typeof sample === 'boolean') { return 'bool'; }
 		if (sample && typeof sample === 'object') { return 'json'; }
+		if (p[0] === 'view') { return 'json'; }
 		// Nothing stated anywhere yet (a new-asset default before it is seeded): a typed number is
 		// a number, except where the setting names something (a pattern, a node, a word).
 		if ((sample === null || sample === undefined) && !/(pattern|node|currency|prefix|suffix|separator|basemap)/i.test(p[p.length - 1] + p[0])) {
@@ -26489,7 +26595,7 @@ var EngCalcs = EngCalcs || {};
 		return 'str';
 	}
 	function settingTableRows() {
-		var seen = {}, out = [], held = [], secIdx = {}, subIdx = {};
+		var seen = {}, out = [], held = [], secIdx = {}, subIdx = {}, dflt = {}, base = baseScenario(), f;
 		LPN_SETTAB_SECTIONS.forEach(function (s, i) { secIdx[s[0]] = i; });
 		LPN_SETTAB_SUB_ORDER.forEach(function (s, i) { subIdx[s] = i; });
 		function add(path) {
@@ -26504,66 +26610,125 @@ var EngCalcs = EngCalcs || {};
 			out.push({ id: id, _lpnSetting: true, path: p, cat: cat, home: settingRowHome(p),
 				major: h[0], minor: h[1], order: secIdx[h[0]] * 100 + subIdx[h[1]], n: out.length });
 		}
+		// A fresh project's own values are the defaults of what it states.
+		settingLeaves({ settings: defaultSettings(), labelSettings: defaultLabelSettings() }).forEach(function (l) {
+			if (l.value !== null && l.value !== undefined) { dflt[JSON.stringify(l.path)] = l.value; }
+			add(l.path);
+		});
+		LPN_SETTAB_OPTIONAL.forEach(function (o) { if (o[1] !== undefined) { dflt[JSON.stringify(o[0])] = o[1]; } add(o[0]); });
 		settingLeaves({ settings: settings, labelSettings: labelSettings,
 			project: { basemap: project.basemap, basemapLast: project.basemapLast },
 			defaultPattern: doc.defaultPattern === undefined ? null : doc.defaultPattern }).forEach(function (l) { add(l.path); });
-		(EngCalcs.LPN_TIME_FIELDS || LPN_SCENARIO_TIME_KEYS.map(function (k) { return [k]; })).forEach(function (f) { add(['times', f[0]]); });
+		(EngCalcs.LPN_TIME_FIELDS || LPN_SCENARIO_TIME_KEYS.map(function (k) { return [k]; })).forEach(function (t) { add(['times', t[0]]); });
 		Object.keys(projectTimes()).forEach(function (k) { add(['times', k]); });
-		add(['settings', 'hydraulics', 'demandMultiplier']);
-		add(['view']);
+		add(['times', 'statistic']);
+		// The colour and contour settings of the fields being coloured now, stated or not.
+		['node', 'link'].forEach(function (g) {
+			f = settingFor(base, ['settings', g === 'node' ? 'colorNodeField' : 'colorLinkField']);
+			if (f) { add(['settings', 'colorModes', g + '.' + f]); }
+			if (f && g === 'node') { add(['settings', 'contourInterval', contourIntervalKey(f)]); }
+		});
 		scenarios.forEach(function (s) {
 			if (s.isBase) { return; }
 			settingLeaves(scenarioSettingsBlock(s) || {}).forEach(function (l) { add(l.path); held.push(l); });
 		});
+		out = out.filter(function (r) {
+			var by = LPN_SETTAB_SUPERSEDED[r.path.join('.')], v;
+			if (!by) { return true; }
+			v = settingFor(base, by);
+			return (v === undefined || v === null) || held.some(function (h) { return JSON.stringify(h.path) === r.id; });
+		});
 		out.forEach(function (r) {
-			var sample = settingFor(baseScenario(), r.path), i;
+			var sample = settingFor(base, r.path), i;
 			for (i = 0; (sample === null || sample === undefined) && i < held.length; i++) {
 				if (JSON.stringify(held[i].path) === r.id) { sample = held[i].value; }
 			}
-			r.kind = r.home === 'dm' ? 'num' : settingRowKind(r.path, sample);
+			if (sample === null || sample === undefined) { sample = dflt[r.id]; }
+			r.dflt = dflt[r.id];
+			r.kind = r.home === 'dm' ? 'num' : (typeof sample === 'boolean' ? 'bool' : settingRowKind(r.path, sample));
 		});
 		return out.sort(function (a, b) { return (a.order - b.order) || (a.n - b.n); });
 	}
-	// The value this row has in scenario `scn` (Base: the project's own).
+	// The value this row has in scenario `scn` (Base: the project's own), `undefined` when unstated.
 	function settingRowValue(row, scn) {
 		var v;
 		if (row.home === 'dm') {
 			v = scn.isBase ? undefined : heldCalcOption(scn, 'demandMultiplier');
 			if (v === undefined) { v = (settings.hydraulics || {}).demandMultiplier; }
-			return (typeof v === 'number' && isFinite(v)) ? v : 1;
+			return (typeof v === 'number' && isFinite(v)) ? v : undefined;
 		}
-		return settingFor(scn, row.path);
+		v = settingFor(scn, row.path);
+		return v === null ? undefined : v;
 	}
+	// A select row (a choice, or a yes/no) shows the Settings box's own options.
+	function settingRowIsSelect(row) { return row.kind === 'choice' || row.kind === 'bool'; }
+	function settingRowOptions(row, scn) {
+		var ch = row.kind === 'bool' ? [['true', settingTableYes()], ['false', settingTableNo()]] : settingTableChoices(row.path) || [],
+			v = settingRowValue(row, scn), d, i, word = null;
+		if (v === undefined) {
+			d = row.dflt === undefined ? null : String(row.dflt);
+			for (i = 0; i < ch.length; i++) { if (d !== null && String(ch[i][0]) === d) { word = ch[i][1]; } }
+			ch = [['', word !== null ? settingTableDefaultText(word) : ((EngCalcs.pageConfig || {}).lpn_settings_option_unset || 'Not stated')]].concat(ch);
+		}
+		return ch;
+	}
+	function settingTableDefaultText(text) {
+		return settingTableFill((EngCalcs.pageConfig || {}).lpn_settings_row_default || '{value} (default)', { value: text });
+	}
+	// A number as the page prints one.
+	function settingTableNum(v) { return String(+(+v).toFixed(10)); }
+	// An object-valued setting, read as a short summary (it is edited in its own box).
+	function settingRowSummary(row, v) {
+		var pc = EngCalcs.pageConfig || {}, modes;
+		if (row.path[0] === 'view' && v && typeof v === 'object') {
+			return settingTableFill(pc.lpn_settings_row_view_value || 'Center {x}, {y}; scale {s}',
+				{ x: settingTableNum((+v.cx).toPrecision(8)), y: settingTableNum((+v.cy).toPrecision(8)), s: settingTableNum((+v.s).toPrecision(4)) });
+		}
+		if (row.path.join('.') === 'settings.quality' && v && typeof v === 'object') {
+			modes = { none: pc.lpn_quality_none || 'Nothing', age: pc.lpn_result_water_age || 'Water age',
+				trace: pc.lpn_quality_trace || 'Source trace', chemical: pc.lpn_quality_chemical || 'A reactive chemical' };
+			return (modes[v.mode] || String(v.mode || '')) + (v.mode === 'trace' && v.traceNode ? ', ' + v.traceNode : '');
+		}
+		if (Array.isArray(v)) { return v.map(function (x) { return typeof x === 'number' ? settingTableNum(x) : String(x); }).join(', '); }
+		if (v && typeof v === 'object') {
+			return Object.keys(v).map(function (k) { return typeof v[k] === 'number' ? settingTableNum(v[k]) : String(v[k]); }).join(', ');
+		}
+		return v === undefined ? '' : String(v);
+	}
+	// What a text row's cell says in scenario `scn`: its value with its unit, or, unstated, the
+	// default the page uses, marked as one.
 	function settingRowText(row, scn) {
-		var v = settingRowValue(row, scn), key = row.path[1], t, ch, i;
+		var v = settingRowValue(row, scn), key = row.path[1], t, u = settingRowUnitText(row), pc = EngCalcs.pageConfig || {}, s;
 		if (row.kind === 'time') {
 			if (typeof v !== 'number') { return ''; }
 			t = settingFor(scn, ['times', 'text', key]);
 			return EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText({ text: typeof t === 'string' ? (function () { var o = {}; o[key] = t; return o; }()) : {} }, key, v) : String(v);
 		}
-		if (v === undefined || v === null) { return ''; }
-		if (row.kind === 'choice') {
-			ch = settingTableChoices(row.path);
-			for (i = 0; i < ch.length; i++) { if (ch[i][0] === v) { return String(ch[i][1]); } }
-			return String(v);
+		if (row.kind === 'json') { return settingRowSummary(row, v); }
+		if (v === undefined) {
+			if (row.path.join('.') === 'settings.labelMaxWidth' || row.path.join('.') === 'labelSettings.customerMaxWidth') {
+				return pc.lpn_settings_label_always || 'Always show';
+			}
+			if (row.dflt === undefined) { return pc.lpn_settings_option_unset || 'Not stated'; }
+			s = typeof row.dflt === 'number' ? settingTableNum(row.dflt) : String(row.dflt);
+			return settingTableDefaultText(u ? s + ' ' + u : s);
 		}
 		if (typeof v === 'boolean') { return v ? settingTableYes() : settingTableNo(); }
-		if (typeof v === 'number') { return String(+v.toFixed(10)); }
-		if (typeof v === 'object') { return JSON.stringify(v); }
+		if (typeof v === 'number') { return u ? settingTableNum(v) + ' ' + u : settingTableNum(v); }
+		if (typeof v === 'object') { return settingRowSummary(row, v); }
 		return String(v);
 	}
-	// Typed text to the value it stores, or {ok: false}. The same rule in every scenario.
+	// Typed text (or a picked option) to the value it stores, or {ok: false}. The same rule in every
+	// scenario. A number may carry its unit, as the cell shows it.
 	function settingRowParse(row, text) {
-		var t = String(text === null || text === undefined ? '' : text).trim(), sec, ch, i, v, base;
+		var t = String(text === null || text === undefined ? '' : text).trim(), sec, ch, i, v, base, u = settingRowUnitText(row);
+		if (u && t.length > u.length && t.slice(-u.length) === u) { t = t.slice(0, -u.length).trim(); }
 		switch (row.kind) {
 			case 'time':
 				if (!EngCalcs.lpnParseTime || t === '') { return { ok: false }; }
 				sec = EngCalcs.lpnParseTime(t.split(/\s+/), { typed: true });
 				if (sec === null || !isFinite(sec) || sec < 0 || (row.path[1] === 'hydraulicStep' && !(sec > 0))) { return { ok: false }; }
 				return { ok: true, v: sec, text: t };
-			case 'statistic':
-				v = EngCalcs.lpnParseStatistic ? EngCalcs.lpnParseStatistic(t) : null;
-				return v ? { ok: true, v: v, text: t } : { ok: false };
 			case 'num':
 				if (t === '' || !isFinite(+t)) { return { ok: false }; }
 				if (row.home === 'dm' && !(+t > 0)) { return { ok: false }; }
@@ -26573,16 +26738,15 @@ var EngCalcs = EngCalcs || {};
 				if (/^(0|false|no|off|n)$/i.test(t) || t.toLowerCase() === settingTableNo().toLowerCase()) { return { ok: true, v: false }; }
 				return { ok: false };
 			case 'choice':
-				ch = settingTableChoices(row.path);
+				ch = settingTableChoices(row.path) || [];
 				for (i = 0; i < ch.length; i++) {
-					if (t.toLowerCase() === String(ch[i][0]).toLowerCase() || t.toLowerCase() === String(ch[i][1]).toLowerCase()) { return { ok: true, v: ch[i][0] }; }
+					if (t.toLowerCase() === String(ch[i][0]).toLowerCase() || t.toLowerCase() === String(ch[i][1]).toLowerCase()) {
+						return { ok: true, v: ch[i][0], text: t };
+					}
 				}
 				return { ok: false };
 			case 'json':
-				try { v = JSON.parse(t); } catch (e) { return { ok: false }; }
-				if (!v || typeof v !== 'object') { return { ok: false }; }
-				if (row.path[0] === 'view' && !inwardViewOf(v)) { return { ok: false }; }
-				return { ok: true, v: v };
+				return { ok: false };   // read-only here: edited in its own box
 		}
 		if (row.kind === 'auto') { return { ok: true, v: t === '' ? null : (isFinite(+t) ? +t : t) }; }
 		// A blank where the project states nothing (a default pattern) is "none", not an empty name.
@@ -26669,21 +26833,37 @@ var EngCalcs = EngCalcs || {};
 				get: function (r) { return settingTableLabel(r.path); } },
 			// **THE VALUE, IN THE SCENARIO THE ROW SHOWS**: the open one with Show scenarios off, the
 			// row's own with it on (paneScnWrapCol() makes it the open one for the call).
+			// A choice or a yes/no is a select of the Settings box's own options (choicesFor()); an
+			// object-valued row is a read-only summary (plainFor()), edited in its own box.
 			{ key: 'st_value', label: 'lpn_find_value', str: true, em: 10, reread: true,
-				get: function (r) { return row(r) ? settingRowText(r, activeScenario()) : undefined; },
+				get: function (r) {
+					var v;
+					if (!row(r)) { return undefined; }
+					if (!settingRowIsSelect(r)) { return settingRowText(r, activeScenario()); }
+					v = settingRowValue(r, activeScenario());
+					return v === undefined ? '' : String(v);
+				},
+				choicesFor: function (r) { return !!row(r) && settingRowIsSelect(r); },
+				choices: function (r) { return row(r) && settingRowIsSelect(r) ? settingRowOptions(r, activeScenario()) : []; },
+				plainFor: function (r) { return !!row(r) && r.kind === 'json'; },
 				// Checked here, so a refused entry costs no undo step; handed on as the TEXT, which
-				// set() reads by the same rule (a time's typed text is kept beside its seconds).
-				parse: function (t, r) { return row(r) && settingRowParse(r, t).ok ? { ok: true, v: t } : { ok: false }; },
+				// set() reads by the same rule (a time's typed text is kept beside its seconds). The
+				// blank option of an unstated select is "leave it unstated": no write.
+				parse: function (t, r) {
+					if (!row(r)) { return { ok: false }; }
+					if (settingRowIsSelect(r) && t === '') { return { ok: true, v: '' }; }
+					return settingRowParse(r, t).ok ? { ok: true, v: t } : { ok: false };
+				},
 				set: function (r, v) {
 					var p;
-					if (!row(r)) { return; }
+					if (!row(r) || (settingRowIsSelect(r) && v === '')) { return; }
 					p = settingRowParse(r, v);
 					if (!p.ok || !settingRowWrite(r, activeScenario(), p)) { return; }
 					settingTableAfterEdit();
 				},
 				// The Show scenarios hooks (paneScnWrapCol(), paneScnCellIsLocal(), paneOverrideCells()):
 				// every scenario may hold every row, so a scenario's Value is always typeable.
-				scnEditable: function () { return true; },
+				scnEditable: function (r) { return r.kind !== 'json'; },
 				scnLocal: function (r, scn) { return settingRowIsLocal(r, scn); },
 				scnClear: function (r, scn) { return settingRowClear(r, scn); },
 				scnCat: function (r) { return r.cat; } }
@@ -27201,7 +27381,10 @@ var EngCalcs = EngCalcs || {};
 			cols.map(function (c) {
 				if (c.result || !c.set) { return ''; }
 				return (c.choices && !c.bool ? c.choices().map(function (o) { return o[0]; }).join(',') : '') +
-					(c.plainFor ? ':' + rows.map(function (el) { return c.plainFor(el) ? 1 : 0; }).join('') : '');
+					(c.plainFor ? ':' + rows.map(function (el) { return c.plainFor(el) ? 1 : 0; }).join('') : '') +
+					// A column whose rows are selects or boxes by row (the Settings table's Value), and
+					// whose options change with the row's state, rebuilds when they do.
+					(c.choicesFor ? ':' + rows.map(function (el) { return c.choicesFor(el) ? c.choices(el).length : '-'; }).join(',') : '');
 			}).join('|') + '||' + paneScnSignature(spec, rows);
 	}
 	// The line above a filtered table: what it is filtered by, how much of the table is showing,
@@ -27600,7 +27783,7 @@ var EngCalcs = EngCalcs || {};
 				// while Tab still walks the boxes a person can actually type in.
 				td.tabIndex = -1;
 				cells[c.key] = td;
-			} else if (c.bool || c.choices) {
+			} else if (c.bool || (c.choices && (!c.choicesFor || c.choicesFor(el)))) {
 				// **A YES/NO IS A CHECKBOX AND A CHOICE IS A SELECT** (Tom, 2026-09-08: the Active
 				// column on every table, and the Text table's alignments and Bold). Both commit
 				// through paneCommitCell() like a typed cell, so the write, the completeEdit() and
@@ -30148,7 +30331,8 @@ var EngCalcs = EngCalcs || {};
 		if (box.r1 > box.r0) {
 			mk(pc.lpn_pane_filldown || 'Fill down', function () { paneFillDown(spec); }, 'Ctrl+D');
 		}
-		mk(pc.lpn_tool_delete || 'Delete', function () { paneDeleteSelection(spec); });
+		// Not on the Settings table: a setting is never blank, and "unstate" is not this menu's to offer.
+		if (spec.group !== 'setting') { mk(pc.lpn_tool_delete || 'Delete', function () { paneDeleteSelection(spec); }); }
 		// **DELETE ELEMENT IS SEPARATE FROM DELETE, ON PURPOSE** (Tom, 2026-10-05: *"Table delete
 		// needs to delete the element if you are on the ID cell or there needs to be a separate
 		// Delete element menu item."*). Delete clears values, as a spreadsheet's does; this removes

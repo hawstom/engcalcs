@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**56 still to read on master**, of 163 untranslated keys, of 2389 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**67 still to read on master**, of 174 untranslated keys, of 2400 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (163, 56 to read @@ NEEDS RULING)
+## lpn_  (174, 67 to read @@ NEEDS RULING)
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -423,14 +423,38 @@ never edits a synonym.
 - **`lpn_settings_row_basemap_last`**
   > Basemap to return to
   @@ NEEDS RULING
+- **`lpn_settings_row_basemap_osm`**
+  > Street map
+  @@ NEEDS RULING
+- **`lpn_settings_row_basemap_satellite`**
+  > Satellite images
+  @@ NEEDS RULING
 - **`lpn_settings_row_check_freq`**
   > Status check frequency
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_buffer`**
+  > Contour buffer
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_fill`**
+  > Contour fill
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_interval`**
+  > Contour interval
   @@ NEEDS RULING
 - **`lpn_settings_row_contour_labels`**
   > Contour labels
   @@ NEEDS RULING
+- **`lpn_settings_row_contour_opacity`**
+  > Contour fill opacity
+  @@ NEEDS RULING
+- **`lpn_settings_row_contour_terrain`**
+  > Contour ground between nodes from Mapbox DEM
+  @@ NEEDS RULING
 - **`lpn_settings_row_customer_max_width`**
   > Show customer labels when zoomed to this map width or less
+  @@ NEEDS RULING
+- **`lpn_settings_row_default`**
+  > {value} (default)
   @@ NEEDS RULING
 - **`lpn_settings_row_elev_source_old`**
   > Elevation source (older projects)
@@ -455,6 +479,12 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_settings_row_max_check`**
   > Maximum status checks
+  @@ NEEDS RULING
+- **`lpn_settings_row_minor_label_order`**
+  > Label order (rank and drop)
+  @@ NEEDS RULING
+- **`lpn_settings_row_new_asset`**
+  > New assets: {setting}
   @@ NEEDS RULING
 - **`lpn_settings_row_of`**
   > {setting}, {member}
@@ -482,6 +512,9 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_settings_row_view`**
   > Map view (center and scale)
+  @@ NEEDS RULING
+- **`lpn_settings_row_view_value`**
+  > Center {x}, {y}; scale {s}
   @@ NEEDS RULING
 - **`lpn_settings_table_category`**
   > Category
@@ -569,7 +602,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**74 still to read**, of 77 new keys across 15 unmerged branch(es).
+**81 still to read**, of 84 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -655,9 +688,33 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`6195c2f8`) — adds no English strings
+### feat/bentley-interop (`dda7730c`) — adds no English strings
 
 ### feat/desktop (`baba0f04`) — adds no English strings
+
+### feat/dxf (`b8dbd129`) — 7 new, 7 to read @@ NEEDS RULING
+
+- **`lpn_dxf_export_refused`**
+  > The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_crs`**
+  > Coordinates: {crs}, exactly as this project states them.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_geo`**
+  > Coordinates: converted from latitude and longitude to {crs}, in meters.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_grid`**
+  > Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_scale`**
+  > Text and symbols are drawn at the size the map showed them when this file was exported.
+  @@ NEEDS RULING
+- **`lpn_file_export_dxf`**
+  > Export DXF file…
+  @@ NEEDS RULING
+- **`lpn_file_export_dxf_tip`**
+  > Download this network as a drawing that AutoCAD and other CAD programs open: one layer for each kind of asset, each node a block carrying its ID and main values, and the labels as they appear on the map.
+  @@ NEEDS RULING
 
 ### feat/feedback (`1be9dba0`) — 13 new, 13 to read @@ NEEDS RULING
 
@@ -701,13 +758,16 @@ build for that would be a gate nobody keeps. Refresh it with
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
   @@ NEEDS RULING
 
-### feat/geojson (`46e034bd`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/geojson (`ea4af950`) — 8 new, 8 to read @@ NEEDS RULING
 
 - **`lpn_file_export_geojson`**
   > Export GeoJSON file…
   @@ NEEDS RULING
 - **`lpn_file_export_geojson_tip`**
   > Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.
+  @@ NEEDS RULING
+- **`lpn_geojson_refused_crs`**
+  > The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.
   @@ NEEDS RULING
 - **`lpn_geojson_refused_empty`**
   > There is nothing to export yet. Draw or open a network first.
@@ -777,7 +837,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
   @@ NEEDS RULING
 
-### feat/survey-code (`ba5d5991`) — 22 new, 22 to read @@ NEEDS RULING
+### feat/survey-code (`087e6868`) — 21 new, 21 to read @@ NEEDS RULING
 
 - **`lpn_survey_codes_add`**
   > Add code
@@ -817,9 +877,6 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_survey_note_line_one_point`**
   > Only point on its line, no pipe drawn from it.
-  @@ NEEDS RULING
-- **`lpn_survey_note_line_plain`**
-  > Line {line}: {sev}: {text}
   @@ NEEDS RULING
 - **`lpn_survey_note_no_desc`**
   > Field codes are on, but this file has no description column, so no codes were read.
