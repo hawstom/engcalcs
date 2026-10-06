@@ -27786,6 +27786,8 @@ var EngCalcs = EngCalcs || {};
 		table.addEventListener('mousedown', function (e) {
 			var td = paneTdOfEvent(spec, e.target), rows, cols, r, c, box;
 			if (!td) { return; }
+			// A press on a tip glyph (the ⚠) asks a question; it does not select or enter the cell.
+			if (e.target && e.target.closest && e.target.closest('[data-ec-tip-glyph]')) { return; }
 			/**
 			 * **A RIGHT-CLICK INSIDE THE SELECTION LEAVES IT ALONE** (Tom, 2026-09-19:
 			 * *"Right-clicking anywhere in a selection should not perturb the selection. But I see
@@ -44844,6 +44846,7 @@ var EngCalcs = EngCalcs || {};
 			// to appear neither widens its column nor shifts the table. No class goes on the cell.
 			mark.className = 'lpn-valwarn ec-help' + (inset ? ' lpn-valwarn-inset' : '');
 			mark.textContent = '⚠';
+			mark.setAttribute('data-ec-tip-glyph', '1');   // a tap here asks, never types (initTips)
 			mark.title = text;
 			mark.setAttribute('aria-label', text);
 			host.appendChild(mark);

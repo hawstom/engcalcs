@@ -240,6 +240,95 @@ async function main() {
 			mn && mn.mark && mx && mx.mark && lv && lv.mark, JSON.stringify([mn, mx, lv]));
 		await setCell('tanks', '2', 'minLevel', '100');
 		ok('lowest depth back to 100: the ⚠ go', (await marksIn('tanks')) === 0);
+
+		// ---- a TAP on a touch device (no hover): the tip opens, the keyboard does not (Tom, 2026-08-29) ----
+		const t = await Session.open(browser, 'T', { hasTouch: true, isMobile: true });
+		const tp = t.page;
+		await t.goto('Looped-Network.php');
+		await t.openExampleCard(await t.lang('lpn_ex_net1_title'));
+		await t.settle(1500);
+		await tp.evaluate(() => {
+			let e = document.querySelector('.ec-consent-actions');
+			while (e && getComputedStyle(e).position !== 'fixed') { e = e.parentElement; }
+			if (e) { e.style.display = 'none'; }
+		});
+		ok('the touch session cannot hover', await tp.evaluate(() => !matchMedia('(hover: hover)').matches));
+		await t.toolbarClick(await t.lang('lpn_pane_toggle'));
+		await t.settle(500);
+		await tp.click('#lpn_pane_tab_pipes');
+		await t.settle(1000);
+		await tp.evaluate(() => {
+			const td = Array.from(document.querySelectorAll('#lpn_pane_pipes td.lpn-pane-col-diameter')).filter((x) => x._lpnPaneId === '12')[0];
+			const inp = td.querySelector('input');
+			inp.value = '200'; inp.dispatchEvent(new Event('change', { bubbles: true }));
+		});
+		await t.settle(900);
+		const tapState = async (sel) => {
+			const box = await tp.evaluate((sel) => {
+				if (document.activeElement && document.activeElement.blur) { document.activeElement.blur(); }
+				// a row under the sticky header cannot be tapped, so take the first mark that is on top
+				const ms = Array.from(document.querySelectorAll(sel));
+				let g = null, m = null;
+				for (let i = 0; i < ms.length && !m; i++) {
+					const rg = document.createRange(); rg.selectNodeContents(ms[i]);
+					const b = rg.getBoundingClientRect(), e = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2);
+					if (e === ms[i]) { m = ms[i]; g = b; }
+				}
+				if (!m) { return ms.map((x) => { const rg = document.createRange(); rg.selectNodeContents(x); const b = rg.getBoundingClientRect(); const e = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2); return [Math.round(b.left), Math.round(b.top), Math.round(b.width), e && e.tagName + '.' + e.className]; }); }
+				m.setAttribute('data-tapped', '1');
+				return { x: g.left + g.width / 2, y: g.top + g.height / 2 };
+			}, sel);
+			await tp.touchscreen.tap(box.x, box.y);
+			await t.settle(700);
+			return tp.evaluate(() => {
+				const ae = document.activeElement;
+				return { active: ae ? (ae.tagName + (ae.type ? ':' + ae.type : '')) : null,
+					typing: !!(ae && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)),
+					tip: Array.from(document.querySelectorAll('.tooltip.show')).map((e) => e.textContent.trim()) };
+			});
+		};
+		let ts = await tapState('#lpn_pane_pipes td.lpn-pane-col-diameter .lpn-valwarn');
+		ok('touch: a tap on the ⚠ in a Tables cell opens its tip', ts.tip.length === 1 && /\S/.test(ts.tip[0]), JSON.stringify(ts));
+		ok('...and focuses no input', !ts.typing, JSON.stringify(ts));
+		await tp.evaluate(() => { document.querySelectorAll('.lpn-valwarn').forEach((m) => { const i = bootstrap.Tooltip.getInstance(m); if (i) { i.hide(); } }); });
+		await t.settle(500);
+		// the tap target is at least the size of a ? glyph, with the glyph's own box still zero wide in a cell
+		const sizes = await tp.evaluate(() => {
+			const m = document.querySelector('[data-tapped]');
+			const q = document.createElement('span'); q.className = 'ec-tip'; q.textContent = '?';
+			document.body.appendChild(q);
+			const qr = q.getBoundingClientRect();
+			document.body.removeChild(q);
+			// hit-test a point a half-glyph either side of the mark and a little above and below
+			const r = document.createRange(); r.selectNodeContents(m);
+			const g = r.getBoundingClientRect();
+			const probe = (x, y) => { const e = document.elementFromPoint(x, y); return !!(e && (e === m || m.contains(e))); };
+			const cx = g.left + g.width / 2, cy = g.top + g.height / 2;
+			return { qw: qr.width, qh: qr.height, boxW: m.getBoundingClientRect().width,
+				hitW: [-2, -1, 0, 1, 2].filter((k) => probe(cx + k * qr.width * 0.5, cy)).length * qr.width * 0.5,
+				hitH: [-1.5, -1, 0, 1, 1.5].filter((k) => probe(cx, cy + k * qr.height * 0.5)).length * qr.height * 0.5 };
+		});
+		ok('Tables glyph: the box is still zero wide', Math.round(sizes.boxW) === 0, JSON.stringify(sizes));
+		ok('Tables glyph: the hit area is at least twice a ? glyph wide and 1.75 times as tall', sizes.hitW >= 2 * sizes.qw && sizes.hitH >= 1.75 * sizes.qh, JSON.stringify(sizes));
+
+		await tp.evaluate(() => {
+			const td = Array.from(document.querySelectorAll('#lpn_pane_pipes td.lpn-pane-col-id')).filter((x) => x._lpnPaneId === '12')[0];
+			td.querySelector('input').focus();
+		});
+		await t.settle(200);
+		await tp.keyboard.press('Shift+F10');
+		await t.settle(300);
+		const goto = await t.lang('lpn_pane_goto_tip');
+		await tp.evaluate((want) => {
+			const b = Array.from(document.querySelectorAll('[role=menuitem]')).filter((e) => (e.textContent || '').trim().indexOf(want) === 0);
+			if (b.length) { b[0].click(); }
+		}, goto);
+		await t.settle(900);
+		await tp.evaluate(() => { document.querySelectorAll('.lpn-valwarn').forEach((m) => { const i = bootstrap.Tooltip.getInstance(m); if (i) { i.hide(); } }); });
+		await t.settle(500);
+		ts = await tapState('#lpn_popup_fields label .lpn-valwarn');
+		ok('touch: a tap on the ⚠ in the Properties box opens its tip', ts.tip.length === 1 && /\S/.test(ts.tip[0]), JSON.stringify(ts));
+		ok('...and focuses no input (the keyboard stays shut)', !ts.typing, JSON.stringify(ts));
 	} finally {
 		await browser.close();
 		env.stopServer();

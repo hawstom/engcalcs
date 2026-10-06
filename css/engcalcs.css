@@ -3633,8 +3633,11 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
    and is drawn back over the inline end of the box, so the first one to appear does not widen the
    column and shift the table, and no class goes on the cell; in the Properties box it follows the
    input on the same line. The glyph is the whole tip target. */
-.lpn-valwarn { color: var(--ec-warn-ink); cursor: help; line-height: 1; }
-.lpn-valwarn-inset { display: inline-block; width: 0; white-space: nowrap; position: relative; inset-inline-start: -1.1em; }
+.lpn-valwarn { color: var(--ec-warn-ink); cursor: help; line-height: 1; position: relative; }
+/* A finger-sized target around the glyph that adds no width to the cell: the glyph's own box is
+   zero wide in a Tables cell, and a ? beside a label is about a character square. */
+.lpn-valwarn::after { content: ''; position: absolute; inset-block: -.6em; inset-inline-start: -.35em; width: 1.8em; }
+.lpn-valwarn-inset { display: inline-block; width: 0; white-space: nowrap; inset-inline-start: -1.1em; }
 label > .lpn-valwarn { margin-inline-start: .3em; }
 /* A heading INSIDE a sub-heading's body -- the colour band limits, which name the field they belong
    to. Same weight as a sub-heading, not full bold, so it reads as one level further in. */
