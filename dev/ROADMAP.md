@@ -364,6 +364,25 @@ the block.
 - 75|763| **A searchable help manual, built from the tips Tom cut.** Tom, 2026-10-04: *"Almost all
   the deletes could be turned into a searchable help manual."* The cut tips' English is kept in
   `dev/help-manual-source.md` (feat/tip-verdict) as its first material.
+- 75|768| **Report a problem: more information and freedom than one anonymous click.**
+  Tom, 2026-10-05: *"those links open a small form that allows, but doesn't require, a message, an
+  email address, and some selectors or canned phrases."* Ida's ranking (journal 2026-10-05): the
+  error toast carries its own link with the code, and contact.php gains a category and an optional
+  email label (building on `feat/feedback`); the in-page Send feedback dialog is the larger build.
+- 75|769| **Change type: a junction becomes a tank, a pipe a valve.**
+  Tom, 2026-10-05: *"a tool under Water or Tables to Change node type for any asset, where if it has
+  information that can't be ported to the new type, we alert and ask."* Building on
+  `feat/asset-type`; the seam with `feat/bentley-interop` is alternatives keyed by element id.
+- 75|770| **A warning glyph on every unreasonable value.** Tom, 2026-10-05, on Sue's
+  friction-method warning: *"Add the glyph to every unreasonable value like a diameter over 150
+  inches or under 12 mm"*, roughness by method, and so on. Building on `feat/value-warning`.
+- 75|771| **Survey points as a script: the Description names the asset or vertex.**
+  Tom, 2026-10-05: interpret a point's Description as an asset or a pipe vertex, and the CSV as a
+  batch. The open question is joining several pipes at one node without a custom code; Mary is
+  asked what Civil 3D, Carlson and Trimble codes already do (`dev/agents/market-researcher/survey-codes.md`).
+- 75|772| **AutoCAD: import, export, and perhaps sync, on a long-lived branch.**
+  Tom, 2026-10-05: *"I am an AutoCAD power user and developer... I would like to know what's already
+  been done first."* Mary's survey of prior art: `dev/agents/market-researcher/autocad-interop.md`.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
@@ -893,7 +912,9 @@ the block.
   Report" shape. Presentation only; one run already computes both.
 - 50|728| **Import a GIS shapefile or geodatabase as a network.**
   Mary's wishlist §0b2: most WaterCAD models are built from a GIS asset layer, so this is a
-  migration on-ramp that needs no WaterCAD file. Unsized; read with Task 723.
+  migration on-ramp that needs no WaterCAD file. Unsized; read with Task 723. Tom, 2026-10-05,
+  asked first whether QGIS or Esri already have robust water-modelling plug-ins, and where we could
+  interoperate or merge: `dev/agents/market-researcher/gis-plugins.md`.
 - 50|733| **Grow the native solver, in phases, to everything EPANET's solves.** Tom, 2026-09-26
   (R-325): *"it would be fun and maybe wise ... to gradually, in phases, build out our native solver
   to do everything that the EPANET solver does. This way the math is less of a black box for us."*
@@ -906,6 +927,10 @@ the block.
   *"Do we have a way of knowing whether people are installing?"* No: `appinstalled` only hides the
   button (`js/Calculators.lib.js:195`). One install event plus an app/tab field on view rows would
   answer it; it is a new logged fact about visitors, so it goes past `consent_body` and him first.
+- 50|773| **Hover shows an asset's full label, as if every field were ticked.**
+  Tom, 2026-10-05: informative where labels are missing, and a clue to what a click will select. On
+  a phone it would need tap for Properties and long-press for the label, which he called
+  counter-natural but possibly phone-intuitive.
 - 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
   **The 11% outlier does not reproduce and the fix it was waiting for already shipped** (2026-07-28,
   `9c47608f`, one day after the snapshot). The 2026-08-21 report gives HW 58% use-of-shopping, ordinary
