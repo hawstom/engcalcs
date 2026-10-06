@@ -50687,6 +50687,9 @@ var EngCalcs = EngCalcs || {};
 		});
 		// The edit's undo step: the one its handler took, else one taken now, holding the state
 		// before the edit; either way it carries the project paths the edit changed, and only those.
+		// A door outside the box keeps its own undo arrangement (the corner basemap toggle takes its
+		// step before it runs): the seam adds no step and no paths to someone else's.
+		if (ed.outside) { tookStep = true; basePaths = []; }
 		if (!tookStep) {
 			basePaths.forEach(function (c) { if (c.root === 'project' || c.path[0] !== 'times') { setboxPut(c.path, c.before); } });
 			saveUndoSnapshot();
@@ -50725,7 +50728,7 @@ var EngCalcs = EngCalcs || {};
 	// the transport's Recalculate) goes through the same bracket.
 	function throughSettingSeam(fn) {
 		var mine = !setboxEdit;
-		if (mine) { setboxEditBegin(); }
+		if (mine) { setboxEditBegin(); setboxEdit.outside = true; }
 		try { return fn(); } finally { if (mine) { setboxEditEnd(); } }
 	}
 	function wireSetboxScenarioSeam(box) {
