@@ -68,6 +68,7 @@ const INJECT =
 	"\t\tlibReadControl: libReadControl, libControls: libControls, addCustomer: addCustomer,\n" +
 	"\t\temitterToStore: emitterToStore, runSolve: runSolve, lastResult: function () { return lastSolveResult; },\n" +
 	"\t\tcolorNodeValue: colorNodeValue, fixedHeadPressure: fixedHeadPressure,\n" +
+	"\t\tcolorLinkValue: colorLinkValue, linkStatusText: linkStatusText,\n" +
 	"\t\tcustomerPoint: customerPoint, linkGeomLength: linkGeomLength, customerById: customerById,\n" +
 	"\t\timportInp: importInpFromFile, assembleModel: assembleModel,\n" +
 	"\t\texportInp: function () { return EngCalcs.lpnExportInp(serializeProject(), inpExportOptions()); },\n" +
@@ -448,6 +449,9 @@ function run(mutate, quiet) {
 	say('\n--- 13. Net1: valve -> pipe ---');
 	{
 		changeLink('10', 'valve', true);
+		// A bend gives the drawn length an irrational tail, which the box must show as the length
+		// field does, to 2 places.
+		L.linkById('10').verts = [{ x: 25, y: 73 }];
 		const r0 = solveNow();
 		const before = snap();
 		const q = changeLink('10', 'pipe', false);
@@ -456,8 +460,9 @@ function run(mutate, quiet) {
 			text.indexOf('10: ' + PC.lpn_field_valve_type + ' ' + PC.lpn_valve_type_tcv) >= 0 &&
 			text.indexOf('10: ' + PC.lpn_field_valve_setting_loss + ' 2') >= 0, text);
 		const geom = L.linkGeomLength(L.linkById('10'));
-		ok('13.2 ...and the new pipe\'s drawn length is said', text.indexOf(PC.lpn_change_type_born) > 0 &&
-			text.indexOf('10: ' + PC.lpn_field_length + ' ') >= 0, text);
+		const shown = String(+geom.toFixed(2));
+		ok('13.2 ...and the new pipe\'s drawn length is said, to the field\'s 2 places', text.indexOf(PC.lpn_change_type_born) > 0 &&
+			String(geom).length > shown.length && text.indexOf('10: ' + PC.lpn_field_length + ' ' + shown + ' ft\n') >= 0, shown + ' | ' + text);
 		ok('13.3 Cancel: byte-identical', snap() === before);
 		changeLink('10', 'pipe', true);
 		const p = L.linkById('10');
@@ -470,6 +475,7 @@ function run(mutate, quiet) {
 		L.undo();
 		ok('13.6 one undo: byte-identical', snap() === before);
 		L.undo();   // back to Net1's pipe
+		L.linkById('10').verts = [];
 	}
 
 	say('\n--- 14. Net1: pipe 10 -> pump, without and then with a curve ---');
@@ -483,8 +489,13 @@ function run(mutate, quiet) {
 		ok('14.2 ...and it says the pump has no curve, so it adds no head',
 			text.indexOf(String(PC.lpn_change_type_no_curve).replace('{id}', '10')) >= 0, text);
 		const pm = L.linkById('10');
-		ok('14.3 a pump naming no curve, no diameter, no length', pm.type === 'pump' && L.effective(pm, 'curveId') === undefined &&
-			!('_diameter' in pm) && !('_length' in pm) && !('_roughness' in pm), JSON.stringify(pm));
+		// A pump's diameter is hidden and only seeds the solver's first flow: a drawn pump's is the
+		// New assets diameter (addLink()), so a converted pump's is too.
+		ok('14.3 a pump naming no curve, no length or roughness, the hidden New assets diameter', pm.type === 'pump' &&
+			L.effective(pm, 'curveId') === undefined && pm._diameter === D.diameter &&
+			!('_length' in pm) && !('_roughness' in pm), JSON.stringify(pm));
+		ok('14.3b the no-curve line says an .inp export writes it as a pipe', /\.inp/.test(PC.lpn_change_type_no_curve) &&
+			/pipe/.test(PC.lpn_change_type_no_curve), PC.lpn_change_type_no_curve);
 		// The page's normal treatment of a curveless pump: the file gets a smooth stand-in pipe.
 		ok('14.4 the export writes the curveless pump as its stand-in pipe', linkSection(L.exportInp().inp, '10') === 'PIPES',
 			linkSection(L.exportInp().inp, '10'));
@@ -510,10 +521,24 @@ function run(mutate, quiet) {
 		ok('15.1 the box: key first; the head curve 1 lost', boxShape(text, '9') === '' &&
 			text.indexOf('9: ' + PC.lpn_pump_curve_source + ' 1') >= 0, text);
 		ok('15.2 Cancel: byte-identical', snap() === before);
+		// Every value the pipe is born with is said, with its unit (pre-review: only the length was).
+		const bornPart = text.split(PC.lpn_change_type_born + '\n')[1] || '';
+		ok('15.2b "These are new" lists the pipe\'s diameter, roughness, minor loss and length, with units',
+			bornPart.indexOf('9: ' + PC.lpn_field_diameter + ' ' + D.diameter + ' in') >= 0 &&
+			bornPart.indexOf(' ' + D.roughness + '\n') > 0 &&
+			bornPart.indexOf('9: ' + PC.lpn_field_km + ' ' + D.k) >= 0 &&
+			bornPart.indexOf('9: ' + PC.lpn_field_length + ' ') >= 0, bornPart);
+		const tv = changeLink('9', 'valve', false)[0] || '';
+		const bornV = tv.split(PC.lpn_change_type_born + '\n')[1] || '';
+		ok('15.2c pump -> valve: diameter, valve type and setting are listed as new; the pump\'s hidden diameter is not carried',
+			bornV.indexOf('9: ' + PC.lpn_field_diameter + ' ' + D.diameter + ' in') >= 0 &&
+			bornV.indexOf('9: ' + PC.lpn_field_valve_type + ' ' + PC.lpn_valve_type_tcv) >= 0 &&
+			bornV.indexOf('9: ' + PC.lpn_field_valve_setting_loss + ' 2') >= 0 && snap() === before, bornV);
 		changeLink('9', 'pipe', true);
 		const r1 = solveNow();
 		const p = L.linkById('9');
-		ok('15.3 a pipe, no curve; SOLVE converges, finite', p.type === 'pipe' && !('_curveId' in p) && allFinite(r1),
+		ok('15.3 a pipe, no curve, the New assets diameter (not the pump\'s hidden 18); SOLVE converges, finite',
+			p.type === 'pipe' && !('_curveId' in p) && p._diameter === D.diameter && allFinite(r1),
 			JSON.stringify(p));
 		// Without the pump, water reaches junction 10 only from the tank, so it sits below the tank's 970 ft.
 		ok('15.4 ...and the reservoir no longer lifts junction 10 above the tank surface', r1.heads['10'] < 970 * 0.3048 + 1e-6,
@@ -601,6 +626,52 @@ function run(mutate, quiet) {
 		L.undo();
 		ok('17.6 one undo: byte-identical', snap() === before);
 	}
+	say('\n--- 18. Recalculate off: a changed link shows no results until Calculate ---');
+	{
+		L.importInp({ name: 'Net1.inp', _text: NET1 });
+		const S2 = L.getSettings();
+		S2.engine = 'native';
+		S2.autoRun = false;
+		// Net1 states a 24-hour duration, which makes Calculate an EPANET run (asynchronous). The
+		// single instant through the built-in solver is the same snapshot question, answered now.
+		const timeRunWas = global.EngCalcs.lpnTimeRun;
+		global.EngCalcs.lpnTimeRun = null;
+		L.runSolve();
+		const r = L.lastResult(), l10 = L.linkById('10');
+		const f9 = L.colorLinkValue(L.linkById('9'), 'flow'), f10 = L.colorLinkValue(l10, 'flow');
+		ok('18.0 the solve gave pump 9 a flow', typeof f9 === 'number' && f9 > 0, String(f9));
+		changeLink('9', 'pipe', true);
+		const p9 = L.linkById('9');
+		ok('18.1 the same stale solve is on show', L.lastResult() === r);
+		ok('18.2 the new pipe shows no flow, velocity, head loss or gradient (none was calculated)',
+			['flow', 'velocity', 'headloss', 'gradient'].every(f => L.colorLinkValue(p9, f) === undefined),
+			['flow', 'velocity', 'headloss', 'gradient'].map(f => L.colorLinkValue(p9, f)).join(','));
+		ok('18.3 ...while every other link keeps its stale result', L.colorLinkValue(l10, 'flow') === f10);
+		L.undo();
+		ok('18.4 undo puts the pump back with its own results', typeof f9 === 'number' && L.colorLinkValue(L.linkById('9'), 'flow') === f9);
+		changeLink('9', 'pipe', true);
+		L.runSolve();
+		const q9 = L.colorLinkValue(L.linkById('9'), 'flow');
+		ok('18.5 Calculate gives the pipe its own flow', L.lastResult() !== r && typeof q9 === 'number' && isFinite(q9), String(q9));
+		L.undo();
+		S2.autoRun = true;
+		global.EngCalcs.lpnTimeRun = timeRunWas;
+	}
+
+	say('\n--- 19. a pipe whose library pipe type is chosen only in a scenario -> valve ---');
+	{
+		L.importInp({ name: 'Net1.inp', _text: NET1 });
+		doc().pipeTypes = [{ id: 'DI30', props: { diameter: 30 } }];
+		const s1 = L.createScenario('S1');
+		L.setProp(L.linkById('10'), 'typeId', 'DI30');
+		L.switchScenario(L.baseScenario().id);
+		const q = changeLink('10', 'valve', true);
+		ok('19.1 the box says that scenario\'s diameter 30 in becomes Base\'s 18 in',
+			(q[0] || '').indexOf('10: ' + PC.lpn_field_diameter + ' 30 in, in scenario S1, becomes 18 in') >= 0, q[0]);
+		L.switchScenario(s1.id);
+		ok('19.2 ...and so it is', L.effective(L.linkById('10'), 'diameter') === 18, String(L.effective(L.linkById('10'), 'diameter')));
+		L.switchScenario(L.baseScenario().id);
+	}
 	S.engine = engineWas2;
 
 	return fails;
@@ -643,6 +714,13 @@ const MUTATIONS = [
 		"\t\t\t\t// The meter stays")],
 	['rule kind words are not rewritten', src => src.replace(
 		"ruleKindRewrites(l.id, to).forEach(function (r) { doc.rules[r.index] = r.line; });", "")],
+	['a changed link shows its stale results', src => src.replace(
+		"if (h.result !== lastSolveResult || h.type !== l.type) { delete typeChangeHeldLink[l.id]; return false; }\n\t\treturn true;",
+		"return false;")],
+	['the born values are not listed', src => src.replace(
+		"born.push(changeTypeLine(LINE, l.id, spec.label, changeTypeValueText(spec, birth[k0])));", "")],
+	['the scenario diameter consequence is not listed', src => src.replace(
+		"if (was === newDia) { return; }", "return;")],
 	['controls are not re-read after the change', src => src.replace(
 		"\t\t\t\t\tlibAnnotateControl(c);\n\t\t\t\t}\n\t\t\t});\n\t\t\t// The symbol is the type", "\t\t\t\t}\n\t\t\t});\n\t\t\t// The symbol is the type")]
 ];

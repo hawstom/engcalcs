@@ -6885,6 +6885,19 @@ var EngCalcs = EngCalcs || {};
 		return h[field];
 	}
 	function typeChangeSig(n) { return nodeFixedHead(n) + '|' + n.elev; }
+	// **A LINK WHOSE TYPE CHANGED HAS NO RESULTS UNTIL THE NEXT CALCULATE** (pre-review,
+	// 2026-10-06: Net1's pump 9 turned into a pipe showed a velocity of 0.00 and a head loss of
+	// 204 ft, numbers no solve produced). Unlike a node, nothing about a link's result can be read
+	// off its inputs, so its flow, velocity, head loss, status, quality and every label, colour and
+	// arrow built from them show as not yet calculated, while the rest of the snapshot stays. The
+	// next Calculate, or an undo that puts the old type back, retires it.
+	var typeChangeHeldLink = {};
+	function linkResultHeld(l) {
+		var h = l && typeChangeHeldLink[l.id];
+		if (!h) { return false; }
+		if (h.result !== lastSolveResult || h.type !== l.type) { delete typeChangeHeldLink[l.id]; return false; }
+		return true;
+	}
 	function linkById(id) { return byId('link', id); }
 	// ---- THE CURVE LIBRARY (Task 586) ------------------------------------------------------------
 	//
@@ -8113,7 +8126,7 @@ var EngCalcs = EngCalcs || {};
 	function linkQualityValue(l) {
 		var mode = qualityMode(), v;
 		if (mode !== 'age' && mode !== 'trace' && mode !== 'chemical') { return undefined; }
-		if (!lastSolveResult || !lastSolveResult.linkQualities) { return undefined; }
+		if (!lastSolveResult || !lastSolveResult.linkQualities || linkResultHeld(l)) { return undefined; }
 		if (lastSolveResult.qualityMode !== mode) { return undefined; }
 		v = lastSolveResult.linkQualities[l.id];
 		if (typeof v !== 'number' || !isFinite(v)) { return undefined; }
@@ -8145,7 +8158,7 @@ var EngCalcs = EngCalcs || {};
 	function linkReactionRate(l) {
 		var v;
 		if (qualityMode() !== 'chemical') { return undefined; }
-		if (!lastSolveResult || !lastSolveResult.linkRates) { return undefined; }
+		if (!lastSolveResult || !lastSolveResult.linkRates || linkResultHeld(l)) { return undefined; }
 		if (lastSolveResult.qualityMode !== 'chemical') { return undefined; }
 		v = lastSolveResult.linkRates[l.id];
 		if (typeof v !== 'number' || !isFinite(v)) { return undefined; }
@@ -8183,7 +8196,7 @@ var EngCalcs = EngCalcs || {};
 	 * test that rule actually applies.
 	 */
 	function linkStatusOf(l) {
-		var st = lastSolveResult && lastSolveResult.statuses && lastSolveResult.statuses[l.id];
+		var st = lastSolveResult && !linkResultHeld(l) && lastSolveResult.statuses && lastSolveResult.statuses[l.id];
 		if (st === 'open' || st === 'closed') { return st; }
 		return effective(l, 'status') === 'closed' ? 'closed' : 'open';
 	}
@@ -8251,7 +8264,7 @@ var EngCalcs = EngCalcs || {};
 	function linkFrictionFactor(l) {
 		var len, dia, hf, v;
 		if (l.type === 'pump') { return undefined; }
-		if (!lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
+		if (!lastSolveResult || linkResultHeld(l) || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
 		len = linkLengthSI(l);
 		dia = effective(l, 'diameter') / unitFactor('lpn_u_diameter');
 		hf = shownHeadloss(l, lastSolveResult.headlosses[l.id]);
@@ -8350,7 +8363,7 @@ var EngCalcs = EngCalcs || {};
 		// answer. Everything below here is a hydraulic result and needs one.
 		if (field === 'status') { return linkStatusNumber(l); }
 		if (field === 'quality') { return linkQualityValue(l); }
-		if (!lastSolveResult || lastSolveResult.flows[l.id] === undefined) { return undefined; }
+		if (!lastSolveResult || linkResultHeld(l) || lastSolveResult.flows[l.id] === undefined) { return undefined; }
 		if (field === 'flow') { return toDisplay(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow')); }
 		if (field === 'velocity') { return l.type === 'pump' ? undefined : toDisplay(lastSolveResult.velocities[l.id], 'lpn_u_velocity'); }
 		if (field === 'headloss') { return toDisplay(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead')); }
@@ -9849,7 +9862,7 @@ var EngCalcs = EngCalcs || {};
 	// ARROW_ALONG from the upstream end), expressed as one distance per arrow so linkLabelMid() can
 	// keep the label clear of them. Returns [] before the first solve, when no arrow is shown.
 	function arrowAlongDistances(l) {
-		var mids = segmentMidpoints(l), flow = lastSolveResult ? lastSolveResult.flows[l.id] : undefined,
+		var mids = segmentMidpoints(l), flow = (lastSolveResult && !linkResultHeld(l)) ? lastSolveResult.flows[l.id] : undefined,
 			k = arrowFactor(), minLen = ARROW_NOMINAL_LEN * k * 2, out = [], run = 0, i, t;
 		// An arrow that is not drawn reserves no space: without this the labels would go on dodging
 		// a chevron nobody can see, which is the "label dodges a phantom" failure the comment inside
@@ -9878,7 +9891,7 @@ var EngCalcs = EngCalcs || {};
 	function showArrows() { return settings.showArrows !== false; }
 	function updateArrow(id) {
 		var le = linkEls[id]; if (!le || !le.arrows) { return; }
-		var mids = segmentMidpoints(linkById(id)), flow = lastSolveResult ? lastSolveResult.flows[id] : undefined,
+		var mids = segmentMidpoints(linkById(id)), flow = (lastSolveResult && !linkResultHeld(linkById(id))) ? lastSolveResult.flows[id] : undefined,
 			k = arrowFactor(), minLen = ARROW_NOMINAL_LEN * k * 2, i,
 			// The switch is read HERE, in the one place an arrow is shown or hidden, so turning it
 			// off needs no re-solve and no rebuild: every path that already re-runs this function --
@@ -12121,7 +12134,7 @@ var EngCalcs = EngCalcs || {};
 			} else if (l.type === 'valve') {
 				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), null, ld.diameter))); }
 			}
-			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
+			if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[l.id] !== undefined) {
 				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), null, ld.flow))); }
 				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], resultUnit('velocity'), null, ld.velocity))); }
 				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), null, ld.headloss), l)); }
@@ -32064,6 +32077,9 @@ var EngCalcs = EngCalcs || {};
 			t = v.map(function (x) { return (x && typeof x === 'object') ? x.base : x; }).join(' + ');
 		} else {
 			t = spec.show ? spec.show(v) : v;
+			// A number the page derived (a drawn length) is shown as its own field shows it, to
+			// `decimals` places, never with the arithmetic's tail.
+			if (spec.decimals !== undefined && typeof t === 'number' && isFinite(t)) { t = String(+t.toFixed(spec.decimals)); }
 			// A typed number reads back as stored, at most 6 decimals, the way the Tables pane shows
 			// it (paneNumText). A CONVERTED one (the emitter, crossed back from the solver's SI terms)
 			// carries the conversion's noise in its tail, so it is held to 6 significant figures.
@@ -32313,8 +32329,9 @@ var EngCalcs = EngCalcs || {};
 				unit: 'lpn_u_diameter', label: pc.lpn_field_diameter || 'Diameter' },
 			{ has: pipe, keys: ['_roughness'], props: ['roughness'], label: roughnessLabel(),
 				unit: frictionMethod() === 'dw' ? 'lpn_u_roughness' : null },
+			// An Auto length is the drawing's, shown to the 2 places lengthField() shows it.
 			{ has: pipe, keys: ['_length', 'lenAuto'], props: ['length'], unit: 'lpn_u_length',
-				label: pc.lpn_field_length || 'Length' },
+				label: pc.lpn_field_length || 'Length', decimals: l.lenAuto ? 2 : undefined },
 			{ has: pipe, keys: ['_fittingsId'], props: ['fittingsId'], label: pc.lpn_field_fittings || 'Fittings list' },
 			{ has: function (d) { return d.type === 'pipe' || (d.type === 'valve' && d.valveType !== 'TCV'); },
 				keys: ['_k'], props: ['k'], none: [0], label: pc.lpn_field_km || 'Minor (local) loss coefficient, k' },
@@ -32345,7 +32362,10 @@ var EngCalcs = EngCalcs || {};
 				_k: settings.defaults.k, valveType: CHANGE_TYPE_NEW_VALVE,
 				_setting: defaultValveSetting(CHANGE_TYPE_NEW_VALVE) };
 		}
-		if (type === 'pump') { return {}; }
+		// A pump's diameter is never shown or solved with; the solver seeds its first flow from it
+		// (js/lpn-inp.js gives an imported pump one for that reason), and addLink() gives a drawn
+		// pump the New assets diameter, so a converted pump gets the same.
+		if (type === 'pump') { return { _diameter: settings.defaults.diameter }; }
 		return { _diameter: settings.defaults.diameter, _roughness: settings.defaults.roughness,
 			lenAuto: true, _length: linkGeomLength(l), _k: settings.defaults.k };
 	}
@@ -32409,21 +32429,50 @@ var EngCalcs = EngCalcs || {};
 				});
 			});
 		});
+		// **EVERY VALUE THE NEW TYPE IS BORN WITH IS SAID** (pre-review, 2026-10-06: Net1's pump 9
+		// turned into a pipe took the New assets 4 in, C 100 and k 2 with only its length in the
+		// box). Each row the new type has and the link will not keep is listed with the value
+		// linkBirthFields() gives it. A pump's own diameter is not a row of the pump's (nothing
+		// shows it), so it is never carried and the new pipe's or valve's diameter is listed here.
+		var birth = linkBirthFields(to, l),
+			bornSpecs = typeOwnedLinkSpecs({ type: to, valveType: dest.valveType, lenAuto: to === 'pipe' });
+		bornSpecs.forEach(function (spec) {
+			var k0 = spec.keys[0];
+			if (spec.custom || !spec.has(dest) || birth[k0] === undefined) { return; }
+			if (l[k0] !== undefined && !linkChangeDrops(spec, from, dest)) { return; }
+			born.push(changeTypeLine(LINE, l.id, spec.label, changeTypeValueText(spec, birth[k0])));
+		});
 		// **A NEW PUMP NAMES NO CURVE, AND SO ADDS NO HEAD** (pumpFit(): H = 0 at every flow, in
 		// both engines). It solves as a lossless connection until a curve is chosen, which is
-		// what a drawn pump does too; the box says so rather than leave a pump that does nothing.
+		// what a drawn pump does too, and an .inp export writes it as a smooth stand-in pipe
+		// (js/lpn-inp.js), which comes back as a pipe. The box says both.
 		if (to === 'pump') {
-			born.push(String(pc.lpn_change_type_no_curve || '{id}: No pump head curve, so the pump adds no head until one is selected')
+			born.push(String(pc.lpn_change_type_no_curve || '{id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe')
 				.replace('{id}', function () { return String(l.id); }));
 		}
-		if (to === 'valve') {
-			born.push(changeTypeLine(LINE, l.id, pc.lpn_field_valve_type || 'Valve type', valveTypeName(CHANGE_TYPE_NEW_VALVE)));
-			born.push(changeTypeLine(LINE, l.id, valveSettingSpec(CHANGE_TYPE_NEW_VALVE).label,
-				changeTypeValueText({}, defaultValveSetting(CHANGE_TYPE_NEW_VALVE))));
-		}
-		if (to === 'pipe') {
-			born.push(changeTypeLine(LINE, l.id, pc.lpn_field_length || 'Length',
-				changeTypeValueText({ unit: 'lpn_u_length' }, linkGeomLength(l))));
+		// **A SCENARIO'S OWN LIBRARY PIPE TYPE GOES, AND ITS DIAMETER WITH IT** (pre-review): a
+		// pipe whose type is chosen only in a scenario takes that type's diameter there. A valve
+		// has no type, so in that scenario it takes Base's diameter, and the box says what it was
+		// and what it becomes.
+		if (l.type === 'pipe' && to === 'valve') {
+			var baseT = l._typeId ? pipeTypeById(l._typeId) : null,
+				newDia = l._diameter !== undefined ? l._diameter
+					: (pipeTypeStates(baseT, 'diameter') ? baseT.props.diameter : settings.defaults.diameter),
+				diaSpec = { unit: 'lpn_u_diameter' };
+			scenarios.forEach(function (s) {
+				var ov = s.isBase ? null : s.overrides[key], t, was;
+				if (!ov || !Object.prototype.hasOwnProperty.call(ov, 'typeId') || Object.prototype.hasOwnProperty.call(ov, 'diameter')) { return; }
+				t = pipeTypeById(ov.typeId);
+				if (!pipeTypeStates(t, 'diameter')) { return; }
+				was = t.props.diameter;
+				if (was === newDia) { return; }
+				lost.push(String(pc.lpn_change_type_becomes || '{id}: {property} {value}, in scenario {scenario}, becomes {new}')
+					.replace('{id}', function () { return String(l.id); })
+					.replace('{scenario}', function () { return scenarioDisplayName(s); })
+					.replace('{property}', function () { return pc.lpn_field_diameter || 'Diameter'; })
+					.replace('{value}', function () { return changeTypeValueText(diaSpec, was); })
+					.replace('{new}', function () { return changeTypeValueText(diaSpec, newDia); }));
+			});
 		}
 		// **A CUSTOMER STAYS WHERE IT IS, AND SO DOES ITS DEMAND.** Its demand already lands on the
 		// pipe end nearer to it along the pipe (EngCalcs.lpnCustomerNode()); it is connected to
@@ -32550,6 +32599,9 @@ var EngCalcs = EngCalcs || {};
 				if (isNode && nodeById(el.id) === el) { applyNodeTypeChange(el, to); }
 				if (isLink && linkById(el.id) === el) { applyLinkTypeChange(el, to); }
 			});
+			if (isLink && lastSolveResult) {
+				targets.forEach(function (l) { typeChangeHeldLink[l.id] = { result: lastSolveResult, type: l.type }; });
+			}
 			targets.forEach(function (n) {
 				if (!was[n.id]) { return; }
 				typeChangeHeld[n.id] = { result: lastSolveResult, type: n.type, sig: typeChangeSig(n),
@@ -57273,7 +57325,7 @@ var EngCalcs = EngCalcs || {};
 		customPropFields(fields, l);
 		activeField(fields, l);
 		pushHereButton(fields, l);
-		if (lastSolveResult && lastSolveResult.flows[linkId] !== undefined) {
+		if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[linkId] !== undefined) {
 			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', resultUnit('flow'), shownFlow(lastSolveResult.flows[linkId]));
 			// A pump has no diameter (Tom, 2026-07-30: "how can a pump have a velocity if it has no
 			// diameter?") -- js/lpn-solver.js can only compute velocity = Q/area from a real
@@ -60531,13 +60583,13 @@ var EngCalcs = EngCalcs || {};
 			// Both dimensionless, so they use rawLine()/plainRound() like Length, not displayRound().
 			roughness: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'roughness'), ld.roughness) : undefined; })),
 			km: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(pipeK(l), ld.km) : undefined; })),
-			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), ld.flow) : undefined; })),
-			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], resultUnit('velocity'), ld.velocity) : undefined; })),
+			flow: fieldExtrema(doc.links.map(function (l) { return (lastSolveResult && !linkResultHeld(l)) ? displayRound(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), ld.flow) : undefined; })),
+			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult && !linkResultHeld(l)) ? displayRound(lastSolveResult.velocities[l.id], resultUnit('velocity'), ld.velocity) : undefined; })),
 			// Pipes and valves only: a pump's number is the head it adds, a different quantity, and
 			// would otherwise win the "highest head loss" badge (Tom, 2026-10-02: "Yes, pumps left
 			// out of highest head loss").
 			headloss: fieldExtrema(doc.links.map(function (l) {
-				if (l.type === 'pump' || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
+				if (l.type === 'pump' || !lastSolveResult || linkResultHeld(l) || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
 				return displayRound(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), ld.headloss);
 			})),
 			// Head loss GRADIENT (Task 177): headloss/length as a dimensionless ratio, reusing
@@ -60553,7 +60605,7 @@ var EngCalcs = EngCalcs || {};
 
 			gradient: fieldExtrema(doc.links.map(function (l) {
 				var len = linkLengthSI(l);
-				if (l.type === 'pump' || !len || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
+				if (l.type === 'pump' || !len || !lastSolveResult || linkResultHeld(l) || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
 				return displayRound(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / len, resultUnit('gradient'), ld.gradient);
 			})),
 			// **BOTH DIMENSIONLESS, SO plainRound() AND NOT displayRound()** (Task 638), the same
@@ -60693,7 +60745,7 @@ var EngCalcs = EngCalcs || {};
 				// where it is labelled, until a label toggle of its own is worth 26 translations.
 				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), extrema.diameter, ld.diameter))); }
 			}
-			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
+			if (lastSolveResult && !linkResultHeld(l) && lastSolveResult.flows[l.id] !== undefined) {
 				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), extrema.flow, ld.flow))); }
 				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
 				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], resultUnit('velocity'), extrema.velocity, ld.velocity))); }

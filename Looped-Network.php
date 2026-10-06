@@ -3010,6 +3010,7 @@ EngCalcs.pageConfig = {
 	lpn_change_type_surface: <?=json_encode($ec_lang['lpn_change_type_surface'])?>,
 	lpn_change_type_born: <?=json_encode($ec_lang['lpn_change_type_born'])?>,
 	lpn_change_type_no_curve: <?=json_encode($ec_lang['lpn_change_type_no_curve'])?>,
+	lpn_change_type_becomes: <?=json_encode($ec_lang['lpn_change_type_becomes'])?>,
 	lpn_change_type_customers: <?=json_encode($ec_lang['lpn_change_type_customers'])?>,
 	lpn_change_type_setting: <?=json_encode($ec_lang['lpn_change_type_setting'])?>,
 	lpn_change_type_rules: <?=json_encode($ec_lang['lpn_change_type_rules'])?>,

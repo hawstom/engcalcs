@@ -76,14 +76,25 @@ the node types, in Insert's order.
   speed, speed pattern, price of power and price pattern; a valve's type, setting and a GPV's
   head-loss curve; a custom property whose "Applies to" excludes the new type. A pump has no
   diameter. A TCV reads no minor loss (EPANET ignores it), so a pipe's k is listed as lost.
-- **Born, from the New assets settings as `addLink()` draws one, and listed under its own heading:**
-  a valve is a **TCV** with setting 2, zero length, Auto off. TCV because it is the one valve type
-  both engines solve, so a change never moves the page onto EPANET. A pipe takes its drawn length
-  with Auto on. A pump names **no curve**, and the box says so: it then adds no head, in both
-  engines (`pumpFit()`), and the export writes it as the usual smooth stand-in pipe. That is the
-  page's existing curveless-pump behaviour, not a new failure.
+- **Born, from the New assets settings as `addLink()` draws one. Every born value is listed
+  under "These are new", with its unit, at the precision its field shows:** a pipe's diameter,
+  roughness, minor loss and drawn length (Auto on, 2 places); a valve's diameter, type and
+  setting. A valve is a **TCV** with setting 2, zero length, Auto off: TCV because it is the one
+  valve type both engines solve, so a change never moves the page onto EPANET. A pump names **no
+  curve**, and the box says so: it adds no head in both engines (`pumpFit()`), and an `.inp`
+  export writes it as a smooth stand-in pipe, which comes back as a pipe.
+- **A pump's diameter is not the user's.** No field shows it; it only seeds the solver's first
+  flow. The importer derives it from the largest pipe the pump touches (no file token: `[PUMPS]`
+  has no diameter column), and a drawn pump gets the New assets diameter. So it is never carried:
+  a pump becoming a pipe or valve gets the New assets diameter, listed as new, and a pipe becoming
+  a pump gets the New assets diameter as its hidden seed.
 - **A library pipe's diameter** is the type's; changing it to a valve writes Base's inherited
-  diameter onto the valve.
+  diameter onto the valve. A scenario that chose its own library pipe type loses that type's
+  diameter: the box lists "ID: Diameter 30 in, in scenario S1, becomes 18 in".
+- **Stale results (Recalculate off):** a changed link shows no flow, velocity, head loss,
+  gradient, status, quality, label value or arrow until the next Calculate (`linkResultHeld()`),
+  because nothing about a link's result can be read off its inputs. The rest of the snapshot
+  stays; an undo that puts the old type back shows its results again.
 - **Customers** connect to pipes only. On a pipe that becomes a pump or valve, each is connected to
   the end node its demand already lands on (`EngCalcs.lpnCustomerNode()`), drawn where it was:
   the same state a pipe deletion leaves at a node end. No answer changes. Listed with that node.

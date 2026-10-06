@@ -1559,7 +1559,8 @@ $ec_lang['lpn_change_type_surface']='These keep the water surface where it was. 
 $ec_lang['lpn_change_type_meaning']='These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.';
 // The link half (Tom, 2026-10-06: "Proceed."). Each heads a list of "ID: entry" lines.
 $ec_lang['lpn_change_type_born']='These are new, as on a newly drawn one:';
-$ec_lang['lpn_change_type_no_curve']='{id}: No pump head curve, so the pump adds no head until one is selected';
+$ec_lang['lpn_change_type_no_curve']='{id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe';
+$ec_lang['lpn_change_type_becomes']='{id}: {property} {value}, in scenario {scenario}, becomes {new}';
 $ec_lang['lpn_change_type_customers']='Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:';
 $ec_lang['lpn_change_type_setting']='These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:';
 $ec_lang['lpn_change_type_rules']='These rule lines name a link by its kind, and will name its new kind instead:';
