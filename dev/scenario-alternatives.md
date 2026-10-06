@@ -470,8 +470,10 @@ extension, there will have to be a settings Table."* Not built yet. What it must
 - **Q1, does the Calculation column count the demand multiplier, run time and time step:** *"Rethink
   this, make it consistent, and bring it again. I think I know what you are saying. But the answer
   may be obvious once you look at what we are doing."* Brought again as question 7 below.
-- Q6 (the two headings): not yet answered. 2026-10-05 he asked for context (*"Where? If I am
-  guessing right, I think my answer is 'Value'"*): re-asked with the place named, see the handoff.
+- **Q6, the two headings (answered 2026-10-06, after context):** "Calculation", not Bentley's
+  "Calculation options": *"Calculation; its not privileged or odd; it's just another category."*
+  He confirmed the two new count columns, and that "Value" belongs to the future settings table.
+  He asked whether the Alternatives table already had one column per category: it did, read-only.
 
 ### His answers, 2026-10-05 (second round)
 
