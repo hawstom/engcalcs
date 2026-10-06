@@ -1805,7 +1805,8 @@ nav.navbar:has(.dropdown-menu.show) { position: relative; z-index: 1852; }
 .lpn-snip-edit-bar .lpn-popover-x { position: absolute; top: 4px; right: 6px; }
 .lpn-snip-edit-bar .lpn-btn-on { background: var(--ec-select-bg); border-color: var(--ec-accent); }
 .lpn-snip-edit-scroll { overflow: auto; min-height: 0; background: var(--ec-border); }
-.lpn-snip-edit-canvas { display: block; max-width: 100%; max-height: calc(100vh - 6rem); touch-action: none; }
+.lpn-snip-edit-canvas { display: block; max-width: 100%; max-height: calc(100vh - 6rem); touch-action: none; cursor: crosshair; }
+.lpn-snip-edit-canvas.lpn-snip-pen-off { cursor: default; }
 @media print { .lpn-snip-veil { display: none; } }
 /* Node-mode target step: nodes ARE the valid click target here, so forcing crosshair over them
    removes the one affordance that actually matters. More specific than the rule above (extra

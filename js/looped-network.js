@@ -41946,12 +41946,12 @@ var EngCalcs = EngCalcs || {};
 				pen = !pen;
 				penBtn.setAttribute('aria-pressed', pen ? 'true' : 'false');
 				penBtn.classList.toggle('lpn-btn-on', pen);
-				cv.style.cursor = pen ? 'crosshair' : 'default';
+				cv.classList.toggle('lpn-snip-pen-off', !pen);
 			});
 			penBtn.setAttribute('aria-pressed', 'true'); penBtn.classList.add('lpn-btn-on');
 			var undoBtn = button('lpn_snip_undo', pc.lpn_tool_undo || 'Undo', function () { strokes.pop(); paint(); });
 			var blobNow = function () { return new Promise(function (res, rej) { cv.toBlob(function (b) { b ? res(b) : rej(new Error('toBlob')); }, 'image/png'); }); };
-			button('lpn_snip_copy', pc.points_data_copy || 'Copy', function () { copyBlob(blobNow()); });
+			var copyBtn = button('lpn_snip_copy', pc.points_data_copy || 'Copy', function () { copyBlob(blobNow()); });
 			button('lpn_snip_save', pc.lpn_file_save || 'Save', function () {
 				blobNow().then(snipDownload);   // one click, one download
 			});
@@ -41987,9 +41987,8 @@ var EngCalcs = EngCalcs || {};
 			} };
 			document.addEventListener('keydown', snipEditor.onKey, true);
 			document.body.appendChild(el);
-			cv.style.cursor = 'crosshair';
 			paint();
-			document.getElementById('lpn_snip_copy').focus();
+			copyBtn.focus();
 		});
 	}
 	// The clipboard write starts inside the Copy click, with the picture as the ClipboardItem's
