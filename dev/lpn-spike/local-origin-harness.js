@@ -398,8 +398,10 @@ console.log('\n--- one home for the concept ---');
 	// **AND ONE FEWER EACH FOR viewLonLat()** (2026-09-26): its two branches, lat/lon and projected,
 	// each crossed outward on their own; they now cross once and hand the point to placeLonLatAt(),
 	// which also answers for a grid with the world map attached (the Convert as chooser's filter).
-	ok('outwardX has one definition and 36 call sites', count(/outwardX\(/g) === 37, count(/outwardX\(/g));
-	ok('outwardY has one definition and 36 call sites', count(/outwardY\(/g) === 37, count(/outwardY\(/g));
+	// **TASK 772 ADDED ONE SITE TO EACH PAIR: THE DXF EXPORT.** dxfDrawnToFile() carries the map's
+	// lettering, customers and scale point outward into the drawing, once for all of them.
+	ok('outwardX has one definition and 37 call sites', count(/outwardX\(/g) === 38, count(/outwardX\(/g));
+	ok('outwardY has one definition and 37 call sites', count(/outwardY\(/g) === 38, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.

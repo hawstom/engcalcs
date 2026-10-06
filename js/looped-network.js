@@ -35024,6 +35024,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		return true;
 	}
+	// A point of the DRAWING FRAME (where the lettering, a customer and the view live) through the
+	// outward boundary and on into the drawing by `G`. The DXF export's one crossing of that
+	// boundary, so dev/lpn-spike/local-origin-harness.js counts it once.
+	function dxfDrawnToFile(G, x, y) { return G(outwardX(x), outwardY(y)); }
 	function dxfEmLength(v, fs) {
 		var s = String(v === undefined || v === null ? '' : v).trim();
 		if (!s) { return 0; }
@@ -35044,7 +35048,7 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function dxfLettering(G) {
 		var texts = [], lines = [];
-		function toOut(x, y) { return G(outwardX(x), outwardY(y)); }
+		function toOut(x, y) { return dxfDrawnToFile(G, x, y); }
 		(labelsLayer && labelsLayer.children ? labelsLayer.children : []).forEach(function (e) {
 			var tag = String(e._tag || e.tagName || e.nodeName || '').toLowerCase();
 			if (tag === 'line') {
@@ -35139,8 +35143,8 @@ var EngCalcs = EngCalcs || {};
 		});
 		(doc.customers || []).forEach(function (c) {
 			var pt = customerPoint(c), an = customerAttachPoint(c),
-				P = pt ? G(outwardX(pt.x), outwardY(pt.y)) : null,
-				A = an ? G(outwardX(an.x), outwardY(an.y)) : null;
+				P = pt ? dxfDrawnToFile(G, pt.x, pt.y) : null,
+				A = an ? dxfDrawnToFile(G, an.x, an.y) : null;
 			if (!P) { return; }
 			customers.push({ id: c.id, x: P.x, y: P.y, from: A, attrs: [
 				{ tag: 'ID', value: c.id }, { tag: 'DEMAND', value: dxfVal(c, 'demand') },
@@ -35160,7 +35164,7 @@ var EngCalcs = EngCalcs || {};
 		var fs = effectiveFontSize(), k = 1;
 		if (isFinite(bx.x0)) {
 			var mx = (bx.x0 + bx.x1) / 2, my = (bx.y0 + bx.y1) / 2,
-				P = G(outwardX(mx), outwardY(my)), Q = G(outwardX(mx + fs), outwardY(my));
+				P = dxfDrawnToFile(G, mx, my), Q = dxfDrawnToFile(G, mx + fs, my);
 			if (P && Q && fs > 0) { k = Math.hypot(Q.x - P.x, Q.y - P.y) / fs || 1; }
 		}
 		var symbol = (settings.symbolSize / symbolScaleAt()) * k,
