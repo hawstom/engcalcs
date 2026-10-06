@@ -3887,3 +3887,12 @@ OBSERVED (real Chromium, this tree; re-verify before citing):
 - New scenario seeds its own demand multiplier: wears the override wash while "No. of overrides: 0"; then Base edit to 1.4 leaves Peak at 1 and the count becomes 1.
 - Perf Net3, 5 scenarios, Show scenarios 1422 rows: toggle 229 ms, one edit 60 ms sync.
 Not checked: how anything looks beyond screenshots read; phone width of a 12-tab strip.
+
+## 2026-10-06 Perry: Settings box seam re-review, feat/bentley-interop @ 60729ab4
+OBSERVED (real Chromium, this tree; re-verify before citing):
+- Branch harness settings-table-browser-harness.js passes. My seven repros: undo-only-what-an-edit-changed FIXED; box edit in Peak lands in Peak, Base untouched (also through the real in-page friction confirm: Cancel changes nothing, OK writes Peak); unstated settings are rows "X (default)" on Net3 lat/lon and a new project; new scenario seeds nothing (row unmarked, count 0, follows Base edit to 1.4); undo/redo across Base, Peak, Off box edits steps one edit at a time, redo-all restores identical stored JSON; reload leaves stored JSON identical; Net3 typing in a box number field with 2 scenarios + Settings tab open: no long task, 15-64 ms. Still raw ids: Node color "pressure", Pipe color "velocity" (read-only).
+- DEFECT: with a scenario open, typing more than one character in any LABEL text field of the Settings box (Bef., Aft., text between values; 66 of them on Net3) keeps only the last character ("abcdef" -> "f"; paste of one string is fine). Each keystroke's rebuild swaps the input for a copy with the caret at 0. Base is fine. Number fields and the ID-prefix/other change-driven text fields are fine.
+- DEFECT: Graphs > Contour menu row, run in Peak, writes Base (colour field pressure, contour fill smooth, lines on); Peak holds nothing. showContour() is outside the seam. The box's own controls then write Peak correctly.
+- ID prefix "Apply to all" in a scenario renames Base's assets after a confirm; "Apply these new-asset values" is refused with "only in Base". Inconsistent, structural either way.
+- Fuzz of all ~300 Settings controls in Peak (real edits): Base changed only through Units (by design: "Units are the same in every scenario"). Buttons, ramp popup, custom property add, time settings, energy, new-asset defaults, colour breaks all land in the scenario.
+Not checked: how the box looks; Show scenarios toggle time re-measure; toolbar/legend controls outside the two boxes.
