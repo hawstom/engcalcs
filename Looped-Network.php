@@ -3003,6 +3003,7 @@ EngCalcs.pageConfig = {
 	lpn_change_type_line_scenario: <?=json_encode($ec_lang['lpn_change_type_line_scenario'])?>,
 	lpn_change_type_more: <?=json_encode($ec_lang['lpn_change_type_more'])?>,
 	lpn_change_type_meaning: <?=json_encode($ec_lang['lpn_change_type_meaning'])?>,
+	lpn_change_type_surface: <?=json_encode($ec_lang['lpn_change_type_surface'])?>,
 	lpn_menu_project_tip: <?=json_encode($ec_lang['lpn_menu_project_tip'])?>,
 	lpn_tables_menu: <?=json_encode($ec_lang['lpn_tables_menu'])?>,
 	lpn_tables_menu_tip: <?=json_encode($ec_lang['lpn_tables_menu_tip'])?>,

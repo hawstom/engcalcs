@@ -6816,10 +6816,37 @@ var EngCalcs = EngCalcs || {};
 	//
 	// A TANK always has one: EPANET states a tank's elevation, and its level is measured from it.
 	function fixedHeadPressure(n) {
+		var held = heldTypeChange(n, 'pressure');
+		if (held !== undefined) { return held; }
 		if (n.type !== 'tank' && typeof n.elev !== 'number') { return undefined; }
 		return toDisplay(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), resultUnit('pressure'));
 	}
 	function isFixedHeadNode(n) { return !!n && (n.type === 'reservoir' || n.type === 'tank'); }
+	// A tank's or reservoir's head as a result reads it, in the result unit: held across a type
+	// change until the next Calculate (see heldTypeChange()), else derived from its inputs.
+	function fixedHeadDisplay(n) {
+		var held = heldTypeChange(n, 'head');
+		return held !== undefined ? held : toDisplay(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead'));
+	}
+	// **A NODE WHOSE TYPE CHANGED KEEPS ITS STALE RESULTS UNTIL THE NEXT CALCULATE** (CLAUDE.md:
+	// Recalculate OFF means a snapshot; pre-review of Change type, 2026-10-06, which saw a converted
+	// node's label drop from a stale P=114.70 to an invented P=0.00). A junction's head and pressure
+	// come from the last solve, a tank's or reservoir's from its own inputs, so a converted node
+	// would otherwise switch from one road to the other with no solve between. changeSelectedNodeType()
+	// records what was on screen; it is honoured only while the same solve is showing and the node
+	// is still the type and the water surface it was converted to, so the next Calculate, an undo, or
+	// an edit of its head, depth or elevation each retire it.
+	var typeChangeHeld = {};
+	function heldTypeChange(n, field) {
+		var h = n && typeChangeHeld[n.id];
+		if (!h) { return undefined; }
+		if (h.result !== lastSolveResult || h.type !== n.type || h.sig !== typeChangeSig(n)) {
+			delete typeChangeHeld[n.id];
+			return undefined;
+		}
+		return h[field];
+	}
+	function typeChangeSig(n) { return nodeFixedHead(n) + '|' + n.elev; }
 	function linkById(id) { return byId('link', id); }
 	// ---- THE CURVE LIBRARY (Task 586) ------------------------------------------------------------
 	//
@@ -8260,7 +8287,7 @@ var EngCalcs = EngCalcs || {};
 					lastSolveResult.heads && typeof lastSolveResult.heads[n.id] === 'number') {
 					return toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead'));
 				}
-				return toDisplay(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead'));
+				return fixedHeadDisplay(n);
 			}
 			return lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined;
 		}
@@ -12020,7 +12047,7 @@ var EngCalcs = EngCalcs || {};
 			if (!isFixedHeadNode(n) && ls.node.demandActual && typeof demandActualVal === 'number') { lines.push(affix('node', 'demandActual', rawLine(demandActualVal, null, nd.demandActual))); }
 			if (!isFixedHeadNode(n) && ls.node.demand && typeof demandVal === 'number') { lines.push(affix('node', 'demand', rawLine(demandVal, null, nd.demand))); }
 			var headVal = isFixedHeadNode(n)
-				? toDisplay(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead'))
+				? fixedHeadDisplay(n)
 				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined);
 			var pressVal = isFixedHeadNode(n)
 				? fixedHeadPressure(n)
@@ -31668,7 +31695,8 @@ var EngCalcs = EngCalcs || {};
 			{ types: ['junction'], keys: ['demandPattern'], props: [], label: pc.lpn_field_demand_pattern || 'Demand pattern' },
 			// Stored in the solver's SI terms; shown as the popup shows it.
 			{ types: ['junction'], keys: ['_emitter'], props: ['emitter'], none: [0],
-				label: pc.lpn_field_emitter || 'Emitter coefficient', show: emitterToDisplay },
+				label: pc.lpn_field_emitter || 'Emitter coefficient', show: emitterToDisplay,
+				unitText: function () { return unitLabel('lpn_u_flow') + '/' + unitLabel('lpn_u_pressure'); } },
 			{ types: ['junction'], keys: ['_fireFlow'], props: ['fireFlow'], unit: 'lpn_u_flow',
 				label: pc.lpn_ff_required || 'Required fire flow' },
 			{ types: ['reservoir'], keys: ['_head'], props: ['head'], unit: 'lpn_u_elevhead',
@@ -31706,9 +31734,15 @@ var EngCalcs = EngCalcs || {};
 			t = v.map(function (x) { return (x && typeof x === 'object') ? x.base : x; }).join(' + ');
 		} else {
 			t = spec.show ? spec.show(v) : v;
-			if (typeof t === 'number' && isFinite(t)) { t = plainRound(t, 6); }
+			// A typed number reads back as stored, at most 6 decimals, the way the Tables pane shows
+			// it (paneNumText). A CONVERTED one (the emitter, crossed back from the solver's SI terms)
+			// carries the conversion's noise in its tail, so it is held to 6 significant figures.
+			if (typeof t === 'number' && isFinite(t)) {
+				t = spec.show ? Number(t.toPrecision(6)) : paneNumText(t);
+			}
 		}
 		t = String(t === undefined ? v : t);
+		if (spec.unitText) { return t + ' ' + spec.unitText(); }
 		return spec.unit ? t + ' ' + unitSymbol(spec.unit) : t;
 	}
 	// One line of the list. Each value is handed over by a function so that a `$` in a description
@@ -31734,15 +31768,69 @@ var EngCalcs = EngCalcs || {};
 	 * override of it; `meaning` is every control and rule that tests this node and would read its
 	 * number differently afterwards.
 	 */
+	/**
+	 * **A TANK AND A RESERVOIR ARE BOTH A WATER SURFACE, AND THE SURFACE STAYS WHERE IT WAS**
+	 * (pre-review, 2026-10-06: Net1's tank 2 turned into a reservoir with a blank head dropped from
+	 * 970 ft to its elevation of 850, and every junction lost about 59 psi). A reservoir's head is
+	 * the tank's elevation plus its water depth; a tank's water depth is the reservoir's head minus
+	 * its elevation. Both in the Elevation/Head unit, which is the one the two are typed in, so
+	 * nothing converts -- nodeFixedHead() adds them the same way.
+	 *
+	 * Returns {base, ovs, prop, newProp}: `base` the new Base value (null when there is none to
+	 * carry), `ovs` one {s, value} per scenario whose override is carried. A reservoir whose head
+	 * is BLANK follows its ground, so its tank starts empty (depth 0) and the surface still stays.
+	 * A head BELOW the ground (or a ground not known until the land surface answers) cannot be a
+	 * depth, so nothing is carried and the head is listed as lost, as before.
+	 */
+	function waterSurfaceCarry(n, to) {
+		var from = n.type, key = ovKey(n), out = { base: null, ovs: [], prop: null, newProp: null }, e;
+		if (from === 'tank' && to === 'reservoir') {
+			e = typeof n.elev === 'number' ? n.elev : 0;
+			out.prop = 'level'; out.newProp = 'head';
+			if (typeof n._level === 'number') { out.base = { value: e + n._level }; }
+			scenarios.forEach(function (s) {
+				var ov = s.isBase ? null : s.overrides[key];
+				if (ov && typeof ov.level === 'number') { out.ovs.push({ s: s, value: e + ov.level }); }
+			});
+		} else if (from === 'reservoir' && to === 'tank') {
+			e = typeof n.elev === 'number' ? n.elev
+				: (!elevSourceIsDem() && typeof settings.defaults.nodeElev === 'number' ? settings.defaults.nodeElev : undefined);
+			if (e === undefined) { return out; }
+			out.prop = 'head'; out.newProp = 'level';
+			if (typeof n._head === 'number') {
+				if (n._head >= e) { out.base = { value: n._head - e }; }
+			} else {
+				out.base = { value: 0, silent: true };
+			}
+			scenarios.forEach(function (s) {
+				var ov = s.isBase ? null : s.overrides[key];
+				if (ov && typeof ov.head === 'number' && ov.head >= e) { out.ovs.push({ s: s, value: ov.head - e }); }
+			});
+		}
+		return out;
+	}
 	function nodeTypeChangeReport(n, to) {
-		var pc = EngCalcs.pageConfig || {}, from = n.type, key = ovKey(n), lost = [], meaning = [];
+		var pc = EngCalcs.pageConfig || {}, from = n.type, key = ovKey(n), lost = [], meaning = [], surface = [],
+			carry = waterSurfaceCarry(n, to), carriedIn = {}, newSpec = null;
+		carry.ovs.forEach(function (c) { carriedIn[c.s.id] = true; });
 		typeOwnedNodeSpecs().forEach(function (spec) {
-			var v;
+			if (!spec.custom && carry.newProp && spec.props.indexOf(carry.newProp) >= 0) { newSpec = spec; }
+		});
+		if (carry.base && !carry.base.silent) {
+			surface.push(changeTypeLine(pc.lpn_change_type_line || '{id}: {property} {value}',
+				n.id, newSpec.label, changeTypeValueText(newSpec, carry.base.value)));
+		}
+		carry.ovs.forEach(function (c) {
+			surface.push(changeTypeLine(pc.lpn_change_type_line_scenario || '{id}, in scenario {scenario}: {property} {value}',
+				n.id, newSpec.label, changeTypeValueText(newSpec, c.value), scenarioDisplayName(c.s)));
+		});
+		typeOwnedNodeSpecs().forEach(function (spec) {
+			var v, carried = !spec.custom && carry.prop && spec.props.indexOf(carry.prop) >= 0;
 			if (!changeTypeDrops(spec, from, to)) { return; }
 			// A stale built-in value is dropped quietly: it belonged to no type this node is.
 			if (!spec.custom && spec.types.indexOf(from) < 0) { return; }
 			v = spec.value ? spec.value(n) : n[spec.keys[0]];
-			if (changeTypeSays(spec, v)) {
+			if (changeTypeSays(spec, v) && !(carried && carry.base)) {
 				lost.push(changeTypeLine(pc.lpn_change_type_line || '{id}: {property} {value}',
 					n.id, spec.label, changeTypeValueText(spec, v)));
 			}
@@ -31751,6 +31839,7 @@ var EngCalcs = EngCalcs || {};
 				if (!ov) { return; }
 				spec.props.forEach(function (p) {
 					if (!Object.prototype.hasOwnProperty.call(ov, p) || ov[p] === undefined) { return; }
+					if (carried && carriedIn[s.id]) { return; }
 					lost.push(changeTypeLine(pc.lpn_change_type_line_scenario || '{id}, in scenario {scenario}: {property} {value}',
 						n.id, spec.label, changeTypeValueText(spec, ov[p]), scenarioDisplayName(s)));
 				});
@@ -31791,12 +31880,13 @@ var EngCalcs = EngCalcs || {};
 				}
 			}
 		});
-		return { lost: lost, meaning: meaning };
+		return { lost: lost, meaning: meaning, surface: surface };
 	}
 	// The change itself, on one node, in Base and in every scenario's overrides. No snapshot and no
 	// redraw: changeSelectedNodeType() takes one of each for the whole selection.
 	function applyNodeTypeChange(n, to) {
-		var from = n.type, key = ovKey(n), birth = nodeBirthFields(to), k;
+		var from = n.type, key = ovKey(n), birth = nodeBirthFields(to), k,
+			carry = waterSurfaceCarry(n, to), depths = [];
 		typeOwnedNodeSpecs().forEach(function (spec) {
 			if (!changeTypeDrops(spec, from, to)) { return; }
 			spec.keys.forEach(function (sk) {
@@ -31824,6 +31914,22 @@ var EngCalcs = EngCalcs || {};
 			if (elevSourceIsDem()) { queueTerrainForNewNode(n.id); }
 			else { n.elev = settings.defaults.nodeElev; }
 		}
+		// The water surface, carried (waterSurfaceCarry()). Written after the strip, which has
+		// already taken the old property and any override map it left empty.
+		if (carry.base) {
+			n['_' + carry.newProp] = carry.base.value;   // base-write: the type is Base-owned, and the surface it carries is born in Base
+			depths.push(carry.base.value);
+		}
+		carry.ovs.forEach(function (c) {
+			if (!c.s.overrides[key]) { c.s.overrides[key] = {}; }
+			c.s.overrides[key][carry.newProp] = c.value;
+			depths.push(c.value);
+		});
+		// A tank may not start above its own highest water depth (EPANET refuses it), so a depth
+		// carried from a reservoir raises the tank's top to meet it.
+		if (to === 'tank' && depths.length) {
+			n.maxLevel = Math.max.apply(null, [typeof n.maxLevel === 'number' ? n.maxLevel : 0].concat(depths));
+		}
 	}
 	/**
 	 * **THE COMMAND**: every selected node that is not already `to` becomes one. Asks first, in the
@@ -31831,7 +31937,7 @@ var EngCalcs = EngCalcs || {};
 	 * the document exactly as it was, because nothing has been written before the answer.
 	 */
 	function changeSelectedNodeType(to) {
-		var pc = EngCalcs.pageConfig || {}, targets, lost = [], meaning = [], text, MAX = 20;
+		var pc = EngCalcs.pageConfig || {}, targets, lost = [], meaning = [], surface = [], text, MAX = 20;
 		if (LPN_NODE_TYPES.indexOf(to) < 0) { return; }
 		targets = selectedRefs().filter(function (s) { return s.kind === 'node'; })
 			.map(function (s) { return nodeById(s.id); })
@@ -31841,6 +31947,7 @@ var EngCalcs = EngCalcs || {};
 			var r = nodeTypeChangeReport(n, to);
 			lost = lost.concat(r.lost);
 			meaning = meaning.concat(r.meaning);
+			surface = surface.concat(r.surface);
 		});
 		function capped(lines) {
 			if (lines.length <= MAX) { return lines; }
@@ -31849,7 +31956,20 @@ var EngCalcs = EngCalcs || {};
 		}
 		function proceed() {
 			saveUndoSnapshot();
+			// What each node's head and pressure read on screen NOW, held until the next solve
+			// (heldTypeChange()). Read before the change, through the same reader the map uses.
+			var was = {};
+			if (lastSolveResult) {
+				targets.forEach(function (n) {
+					was[n.id] = { head: colorNodeValue(n, 'head'), pressure: colorNodeValue(n, 'pressure') };
+				});
+			}
 			targets.forEach(function (n) { if (nodeById(n.id) === n) { applyNodeTypeChange(n, to); } });
+			targets.forEach(function (n) {
+				if (!was[n.id]) { return; }
+				typeChangeHeld[n.id] = { result: lastSolveResult, type: n.type, sig: typeChangeSig(n),
+					head: was[n.id].head, pressure: was[n.id].pressure };
+			});
 			// The symbol is the type, so the drawing is rebuilt; buildDom() puts the selection back.
 			buildDom();
 			refreshScenarioMarks();
@@ -31859,8 +31979,12 @@ var EngCalcs = EngCalcs || {};
 			scheduleSolve();
 			scheduleSave();
 		}
-		if (!lost.length && !meaning.length) { proceed(); return; }
+		if (!lost.length && !meaning.length && !surface.length) { proceed(); return; }
 		text = [];
+		if (surface.length) {
+			text.push([pc.lpn_change_type_surface || 'These keep the water surface where it was. A reservoir\'s head is the tank\'s elevation plus its water depth, and a tank\'s water depth is the reservoir\'s head minus its elevation:']
+				.concat(capped(surface)).join('\n'));
+		}
 		if (lost.length) { text.push([pc.lpn_change_type_lost || 'These values will be lost:'].concat(capped(lost)).join('\n')); }
 		if (meaning.length) {
 			text.push([pc.lpn_change_type_meaning || 'These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.']
@@ -41382,16 +41506,6 @@ var EngCalcs = EngCalcs || {};
 				icon: 'insert', label: pc.lpn_menu_insert || 'Insert',
 				submenu: insertAssetRows
 			},
-			// **CHANGE TYPE SITS UNDER INSERT** (Tom, 2026-10-05: *"a tool under Water or Tables to
-			// Change node type for any asset"*). Water, because the fly-out is the same list of asset
-			// types Insert offers, in the same order, and Water is where those types live. Not the
-			// Tables right-click: that menu is a spreadsheet's four (Tom, 2026-09-21), and a type
-			// change is not a cell operation. Not Edit either, which he did not name.
-			{
-				icon: 'retype', label: pc.lpn_change_type_menu || 'Change type',
-				tip: pc.lpn_change_type_tip,
-				submenu: changeTypeRows
-			},
 			{ separator: true },
 			{
 				icon: 'settings', label: pc.lpn_tool_settings || 'Settings',
@@ -41536,6 +41650,19 @@ var EngCalcs = EngCalcs || {};
 			{
 				icon: 'info', label: pc.lpn_reports_menu || 'Reports',
 				submenu: reportMenuRows
+			},
+			// **CHANGE TYPE, AT THE FOOT** (Tom, 2026-10-05: *"a tool under Water or Tables to Change
+			// node type for any asset"*). Water, because the fly-out is the list of asset types Water's
+			// Insert offers, in the same order. Not the Tables right-click: that menu is a
+			// spreadsheet's four (Tom, 2026-09-21), and a type change is not a cell operation.
+			// AT THE FOOT rather than under Insert, because menu letters are dealt in row order
+			// (menuMnemonics()): placed higher it took C and moved Scenarios off it. Here it takes H
+			// and no letter anybody has learned moves.
+			{ separator: true },
+			{
+				icon: 'retype', label: pc.lpn_change_type_menu || 'Change type',
+				tip: pc.lpn_change_type_tip,
+				submenu: changeTypeRows
 			}
 		]);
 	}
@@ -59571,11 +59698,17 @@ var EngCalcs = EngCalcs || {};
 				// of this one field reach the RESULT unit by different roads -- one across the input
 				// boundary, one straight from SI. Both must end there, or the extrema tick would be
 				// comparing two quantities (Task 422).
-				if (isFixedHeadNode(n)) { return displayRound(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead'), nd.head); }
+				if (isFixedHeadNode(n)) {
+					return heldTypeChange(n, 'head') !== undefined ? plainRound(heldTypeChange(n, 'head'), nd.head)
+						: displayRound(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead'), nd.head);
+				}
 				return lastSolveResult ? displayRound(lastSolveResult.heads[n.id], resultUnit('elevhead'), nd.head) : undefined;
 			}),
 			pressure: nodeValueMap(function (n) {
-				if (isFixedHeadNode(n)) { return displayRound(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), resultUnit('pressure'), nd.pressure); }
+				if (isFixedHeadNode(n)) {
+					return heldTypeChange(n, 'pressure') !== undefined ? plainRound(heldTypeChange(n, 'pressure'), nd.pressure)
+						: displayRound(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), resultUnit('pressure'), nd.pressure);
+				}
 				return lastSolveResult ? displayRound(lastSolveResult.pressures[n.id], resultUnit('pressure'), nd.pressure) : undefined;
 			}),
 			// plainRound(), not displayRound(): nodeQualityValue() has already crossed into the
@@ -59685,7 +59818,7 @@ var EngCalcs = EngCalcs || {};
 			// one column, and if they did not both end in the result unit the same map label would
 			// print two different quantities under one heading.
 			var headVal = isFixedHeadNode(n)
-				? toDisplay(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead'))
+				? fixedHeadDisplay(n)
 				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined);
 			var pressVal = isFixedHeadNode(n)
 				? fixedHeadPressure(n)

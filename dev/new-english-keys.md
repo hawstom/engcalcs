@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**23 still to read on master**, of 133 untranslated keys, of 2359 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**24 still to read on master**, of 134 untranslated keys, of 2360 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (133, 23 to read @@ NEEDS RULING)
+## lpn_  (134, 24 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -116,6 +116,9 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_change_type_ok`**
   > Change
+  @@ NEEDS RULING
+- **`lpn_change_type_surface`**
+  > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
   @@ NEEDS RULING
 - **`lpn_change_type_tip`**
   > Change the selected nodes into junctions, reservoirs, or tanks. Each keeps its ID, its place, its pipes, and every value the new type also has. If anything would be lost, you are asked first.
@@ -479,7 +482,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**35 still to read**, of 38 new keys across 17 unmerged branch(es).
+**35 still to read**, of 38 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -490,9 +493,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/adviser-notes (`85a5ab98`) — adds no English strings
-
-### feat/asset-type (`1bb93e5c`) — adds no English strings
+### feat/asset-type (`4ca39acf`) — adds no English strings
 
 ### feat/backdrop-attach (`aa8853ca`) — 5 new, 5 to read @@ NEEDS RULING
 
@@ -587,7 +588,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Show scenarios
   @@ NEEDS RULING
 
-### feat/screenshot (`aec41fe1`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/screenshot (`b09c68a8`) — 9 new, 9 to read @@ NEEDS RULING
 
 - **`lpn_screenshot_copied`**
   > Screenshot copied.
@@ -619,7 +620,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/tip-door (`9a9cd3a1`) — adds no English strings
 
-### feat/value-warning (`424b278e`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/value-warning (`f5395ed4`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_valwarn_diameter`**
   > A pipe or valve diameter is normally between {min} and {max} {unit}. Check the number and the diameter unit.
@@ -643,4 +644,4 @@ build for that would be a gate nobody keeps. Refresh it with
   > EPANET refuses this tank. The lowest water depth must not exceed the water depth, and the water depth must not exceed the highest water depth.
   @@ NEEDS RULING
 
-### fix/phone-bolt (`22f2d88a`) — adds no English strings
+### fix/valve-label (`9ce21702`) — adds no English strings

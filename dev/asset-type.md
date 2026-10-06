@@ -18,6 +18,19 @@ Every selected node that is not already the chosen type becomes one: Junction, R
   and head pattern; a tank's water depths, diameter, volume curve, mixing model and fraction, and
   reaction coefficient; a custom property whose design does not apply to the new type. Their file
   tokens go too.
+- **The water surface is kept between a tank and a reservoir.** Tank to reservoir: the head becomes
+  the tank's elevation plus its water depth. Reservoir to tank: the elevation stays and the water
+  depth becomes the head minus the elevation (0 for a blank head, which follows the ground). Both
+  are in the Elevation/Head unit, so nothing converts. Each scenario's own depth or head goes the
+  same way. The box states the new value under its own heading rather than calling it lost. A head
+  below the ground cannot be a depth, so it is listed as lost instead. A carried depth raises the
+  tank's highest water depth if it has to, since EPANET refuses a tank that starts above its top.
+  Net1's tank 2 to a reservoir and back leaves every junction pressure exactly where it was
+  (harness section 11).
+- **Stale results stay (Recalculate off).** A junction's head and pressure come from the last solve,
+  while a tank's or reservoir's are derived from its inputs. So a converted node would switch roads
+  with no solve between, and show an invented value. `heldTypeChange()` keeps what was on screen
+  until the next Calculate, an undo, or an edit of that node's head, depth or elevation.
 - **Born:** what only the new type has comes from `nodeBirthFields()`, the same New assets
   defaults `addNode()` uses, so a converted tank and a drawn tank cannot differ. A node with no
   elevation (an imported reservoir) gets one the way a drawn node does.
@@ -35,18 +48,17 @@ Every selected node that is not already the chosen type becomes one: Junction, R
 - **Base-owned.** The type is not in `LPN_OVERRIDABLE`, like a valve's type, so a change made
   while a scenario is showing applies in every scenario.
 
-## Why Water, under Insert
+## Why Water, at the foot
 
-The fly-out is the list Insert already offers (Junction, Reservoir, Tank, in Insert's order), and
-Water is where those types live. Tom also suggested Tables. The Tables right-click is a
+The fly-out is the list Water's Insert already offers (Junction, Reservoir, Tank, in Insert's
+order), and Water is where those types live. Tom also suggested Tables. The Tables right-click is a
 spreadsheet's four commands (Tom, 2026-09-21), and changing an asset's type is not a cell
-operation. Edit was not one of his two suggestions.
+operation.
 
-**A side effect for Tom to judge:** menu letters are assigned in row order, so the new row takes
-C, and Water > Scenarios moves from Alt+Shift+W, C to Alt+Shift+W, E. Nothing else moves. If he
-would rather keep C, the row can go at the foot of the Water menu, where it takes H and no letter
-moves. `menu-mnemonic-harness.js` now reads the Scenarios letter from the row instead of
-hard-coding it.
+It sits at the foot of the menu, under its own divider, rather than under Insert. Menu letters are
+dealt in row order (`menuMnemonics()`). Under Insert it took C and moved Scenarios from C to E; at
+the foot it takes H and no learned letter moves. `menu-mnemonic-harness.js` reads the Scenarios
+letter from the row, so a row added above it later cannot break that test.
 
 ## Links: not built, and why
 
@@ -77,9 +89,6 @@ overrides survive) are the test to extend.
 
 ## Known gaps
 
-- A tank turned into a reservoir gets a blank head, which follows the elevation, as a drawn
-  reservoir does. It does not get the tank's water surface. The dialog lists the water depth that
-  is lost.
 - An import note on the element (for example, that a tank's volume curve was carried) is left as
   it is.
 - Rule clauses are matched by the keyword before the ID, not by a full parse of the rule.

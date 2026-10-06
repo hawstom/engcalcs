@@ -20,13 +20,31 @@
 // through the stub's question box, exactly as the Water menu row calls it. Nothing writes a type
 // by hand.
 //
-// MUTATION-PROVED IN PROCESS (section 9): five live mutations of js/looped-network.js -- keep the
-// lost values, never ask, skip the undo snapshot, skip the New assets defaults, keep the scenario
+// MUTATION-PROVED IN PROCESS (section 9): eight live mutations of js/looped-network.js -- keep the
+// lost values, never ask, skip the undo snapshot, skip the New assets defaults, drop the water
+// surface either way, show freshly derived results on a converted node, keep the scenario
 // overrides -- each must turn this harness red, or the harness fails.
+//
+// Pre-review, 2026-10-06, added sections 10 and 11: with Recalculate off a converted node keeps its
+// stale head and pressure until Calculate, and Net1's tank 2 turned into a reservoir and back
+// leaves every junction pressure where it was.
 
 const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 require(ROOT + 'js/lpn-inp.js');
 require(ROOT + 'js/lpn-patterns.js');
+require(ROOT + 'js/lpn-time.js');
+require(ROOT + 'js/lpn-net.js');
+const fs = require('fs');
+const path = require('path');
+const solver = require(ROOT + 'js/lpn-solver.js');
+global.FileReader = function () {
+	this.readAsArrayBuffer = function (file) {
+		const bytes = new TextEncoder().encode(file._text);
+		this.result = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+		if (this.onload) { this.onload({ target: { result: this.result } }); }
+	};
+};
+const NET1 = fs.readFileSync(path.join(ROOT, 'dev', 'lpn-spike', 'reference', 'Net1.inp'), 'utf8');
 const PC = global.EngCalcs.pageConfig;
 
 const INJECT =
@@ -40,6 +58,9 @@ const INJECT =
 	"\t\tchangeTypeRows: changeTypeRows, nodeById: nodeById, linkById: linkById,\n" +
 	"\t\tincident: function (id) { return incidentLinks[id]; },\n" +
 	"\t\tlibReadControl: libReadControl, libControls: libControls, addCustomer: addCustomer,\n" +
+	"\t\temitterToStore: emitterToStore, runSolve: runSolve, lastResult: function () { return lastSolveResult; },\n" +
+	"\t\tcolorNodeValue: colorNodeValue, fixedHeadPressure: fixedHeadPressure,\n" +
+	"\t\timportInp: importInpFromFile, assembleModel: assembleModel,\n" +
 	"\t\texportInp: function () { return EngCalcs.lpnExportInp(serializeProject(), inpExportOptions()); },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -118,17 +139,18 @@ function run(mutate, quiet) {
 			sectionOf(L.exportInp().inp, J));
 	}
 
-	say('\n--- 2. reservoir -> tank: the tank a click would have drawn ---');
+	say('\n--- 2. reservoir -> tank: the tank a click would have drawn, at the same water surface ---');
 	{
 		const q = change(J, 'tank');
 		const n = L.nodeById(J);
 		ok('2.1 no box (a reservoir with a blank head has nothing to lose)', q.length === 0, JSON.stringify(q));
 		ok('2.2 it is a tank', n.type === 'tank');
-		ok('2.3 water depth, lowest, highest and diameter are the New assets defaults',
-			L.effective(n, 'level') === D.tankLevel && n.minLevel === D.tankMinLevel &&
+		// A blank head follows the ground, so the surface is AT the elevation: depth 0 keeps it.
+		ok('2.3 water depth 0 keeps the surface; lowest, highest and diameter are the New assets defaults',
+			L.effective(n, 'level') === 0 && n.minLevel === D.tankMinLevel &&
 			n.maxLevel === D.tankMaxLevel && n.tankDiameter === D.tankDiameter,
-			[L.effective(n, 'level'), n.minLevel, n.maxLevel, n.tankDiameter].join(',') + ' vs ' +
-			[D.tankLevel, D.tankMinLevel, D.tankMaxLevel, D.tankDiameter].join(','));
+			[L.effective(n, 'level'), n.minLevel, n.maxLevel, n.tankDiameter].join(',') + ' vs 0,' +
+			[D.tankMinLevel, D.tankMaxLevel, D.tankDiameter].join(','));
 		ok('2.4 elevation is kept, not re-defaulted', n.elev === 812);
 		ok('2.5 the export writes it under [TANKS]', sectionOf(L.exportInp().inp, J) === 'TANKS');
 	}
@@ -208,9 +230,15 @@ function run(mutate, quiet) {
 		ok('6.0 the control reads', read.ok);
 		L.libControls().push(read.rec);
 		// tank -> reservoir: a level either way, so the control is not raised; the tank's values are.
+		const tk = L.nodeById(J), surfaceWas = tk.elev + L.effective(tk, 'level');
 		let q = change(J, 'reservoir', true);
 		ok('6.1 tank -> reservoir does not name the control (a level both sides)',
 			q.length === 1 && q[0].indexOf(PC.lpn_change_type_meaning) < 0, q[0]);
+		ok('6.1b ...and its head is the tank\'s water surface, said in the box',
+			L.effective(L.nodeById(J), 'head') === surfaceWas && q[0].indexOf(PC.lpn_change_type_surface) === 0 &&
+			q[0].indexOf(J + ': ' + PC.lpn_field_head + ' ' + surfaceWas) >= 0, surfaceWas + ' | ' + q[0]);
+		// Back to a junction below needs the head gone first, so the box is about the control only.
+		delete L.nodeById(J)._head;
 		// reservoir (blank head) -> junction: nothing lost, but the control crosses pressure/level.
 		q = change(J, 'junction', true);
 		ok('6.2 reservoir -> junction asks, for the control alone', q.length === 1 &&
@@ -252,8 +280,75 @@ function run(mutate, quiet) {
 		// moves the M counter, which an undo then recounts. A customer a tenth of the way along L2 from J1
 		// lumps its demand there (EngCalcs.lpnCustomerNode: the nearer end along the pipe).
 		const c = L.addCustomer(110, 20, { link: l2.id, t: 0.1 });
+		L.setProp(L.nodeById(J), 'emitter', L.emitterToStore(1.5));
 		const q = change(J, 'reservoir', false);
 		ok('8.1 the box names the customer', q.length === 1 && q[0].indexOf(J + ': ' + PC.lpn_tool_add_meter + ' ' + c.id) >= 0, q[0]);
+		// The emitter crosses back from the solver's SI terms, and must not bring the conversion's
+		// noise with it (pre-review: "6646.932397").
+		ok('8.2 the emitter reads as typed, with its two-unit unit', /Emitter coefficient 1\.5 gpm\/psi/.test(q[0]) ||
+			q[0].indexOf(PC.lpn_field_emitter + ' 1.5 ') >= 0, q[0]);
+		L.setProp(L.nodeById(J), 'emitter', undefined);
+	}
+
+	say('\n--- 10. Recalculate off: a converted node keeps its stale results until Calculate ---');
+	{
+		// The built-in solver, which answers at once; the EPANET engine (the default) answers later.
+		const engineWas = S.engine;
+		S.engine = 'native';
+		S.autoRun = false;
+		L.runSolve();
+		const r = L.lastResult(), n = L.nodeById(J);
+		const p0 = L.colorNodeValue(n, 'pressure'), h0 = L.colorNodeValue(n, 'head');
+		ok('10.0 the solve gave the junction a pressure', !!r && typeof p0 === 'number' && Math.abs(p0) > 1, String(p0));
+		change(J, 'reservoir', true);
+		ok('10.1 still the same stale solve on show', L.lastResult() === r);
+		ok('10.2 the converted node shows the pressure it had, not an invented one',
+			L.fixedHeadPressure(L.nodeById(J)) === p0 && L.colorNodeValue(L.nodeById(J), 'pressure') === p0,
+			L.fixedHeadPressure(L.nodeById(J)) + ' vs ' + p0);
+		ok('10.3 ...and the head it had', L.colorNodeValue(L.nodeById(J), 'head') === h0);
+		L.setProp(L.nodeById(J), 'head', 900);
+		ok('10.4 an edit of its head shows at once, as any edit does with Recalculate off',
+			L.colorNodeValue(L.nodeById(J), 'head') !== h0);
+		L.undo();   // the head edit: a reservoir with a blank head again, the stale solve still on show
+		L.runSolve();
+		ok('10.5 Calculate retires the hold: the reading is now the reservoir\'s own (its head is its ground)',
+			L.lastResult() !== r && L.fixedHeadPressure(L.nodeById(J)) === 0, String(L.fixedHeadPressure(L.nodeById(J))));
+		L.undo();   // the type change
+		S.autoRun = true;
+		S.engine = engineWas;
+	}
+
+	say('\n--- 11. Net1: tank 2 -> reservoir -> tank, and every junction pressure is unchanged ---');
+	{
+		L.importInp({ name: 'Net1.inp', _text: NET1 });
+		const solve = () => solver.lpnSolve(L.assembleModel(), { tol: 1e-9 });
+		const juncs = doc().nodes.filter(nd => nd.type === 'junction').map(nd => nd.id);
+		const before = solve();
+		const t2 = L.nodeById('2');
+		ok('11.0 Net1 tank 2 is a tank at 850 with 120 of water', t2 && t2.type === 'tank' && t2.elev === 850 &&
+			L.effective(t2, 'level') === 120);
+		// A scenario's own water depth is a surface too, and goes the same way.
+		const low = L.createScenario('Low tank');
+		L.setProp(t2, 'level', 100);
+		L.switchScenario(L.baseScenario().id);
+		const ovOf = () => (L.getScenarios().filter(x => x.id === low.id)[0].overrides || {})['n:2'] || {};
+		let q = change('2', 'reservoir', true);
+		ok('11.1b the scenario\'s depth 100 became its head 950, and the box names it',
+			ovOf().head === 950 && !('level' in ovOf()) && (q[0] || '').indexOf('Low tank') >= 0, JSON.stringify(ovOf()));
+		ok('11.1 the reservoir\'s head is 970', L.effective(L.nodeById('2'), 'head') === 970,
+			String(L.effective(L.nodeById('2'), 'head')));
+		ok('11.2 the box says so', (q[0] || '').indexOf('2: ' + PC.lpn_field_head + ' 970') >= 0, q[0]);
+		let after = solve(), worst = 0;
+		juncs.forEach(id => { worst = Math.max(worst, Math.abs(after.pressures[id] - before.pressures[id])); });
+		ok('11.3 every junction pressure unchanged (within 1e-6)', worst < 1e-6, 'worst ' + worst);
+		q = change('2', 'tank', true);
+		ok('11.4 back to a tank: elevation 850, water depth 120', L.nodeById('2').elev === 850 &&
+			L.effective(L.nodeById('2'), 'level') === 120, String(L.effective(L.nodeById('2'), 'level')));
+		ok('11.4b ...and the scenario\'s depth is 100 again', ovOf().level === 100 && !('head' in ovOf()), JSON.stringify(ovOf()));
+		ok('11.5 the box says the depth', (q[0] || '').indexOf('2: ' + PC.lpn_field_tank_level + ' 120') >= 0, q[0]);
+		after = solve(); worst = 0;
+		juncs.forEach(id => { worst = Math.max(worst, Math.abs(after.pressures[id] - before.pressures[id])); });
+		ok('11.6 and every junction pressure is still unchanged', worst < 1e-6, 'worst ' + worst);
 	}
 
 	return fails;
@@ -265,11 +360,17 @@ const MUTATIONS = [
 	['the lost values are kept (no delete)', src => src.replace(
 		"delete n[sk];   // base-write: the type is Base-owned", "void n[sk];   // base-write: the type is Base-owned")],
 	['the box is never shown', src => src.replace(
-		"if (!lost.length && !meaning.length) { proceed(); return; }", "{ proceed(); return; }")],
+		"if (!lost.length && !meaning.length && !surface.length) { proceed(); return; }", "{ proceed(); return; }")],
 	['no undo snapshot', src => src.replace(
-		"\t\tfunction proceed() {\n\t\t\tsaveUndoSnapshot();\n\t\t\ttargets.forEach(", "\t\tfunction proceed() {\n\t\t\ttargets.forEach(")],
+		"\t\tfunction proceed() {\n\t\t\tsaveUndoSnapshot();\n", "\t\tfunction proceed() {\n")],
 	['the new type gets no New assets defaults', src => src.replace(
 		"n[k] = birth[k];   // base-write: the new type's own", "void birth[k];   // base-write: the new type's own")],
+	['the tank\'s water surface is not carried', src => src.replace(
+		"if (typeof n._level === 'number') { out.base = { value: e + n._level }; }", "")],
+	['the reservoir\'s head is not carried into a tank', src => src.replace(
+		"if (n._head >= e) { out.base = { value: n._head - e }; }", "")],
+	['a converted node shows freshly derived results', src => src.replace(
+		"\t\tvar held = heldTypeChange(n, 'pressure');\n\t\tif (held !== undefined) { return held; }\n", "")],
 	['scenario overrides survive', src => src.replace(
 		"spec.props.forEach(function (p) { delete ov[p]; });", "spec.props.forEach(function (p) { void ov[p]; });")]
 ];

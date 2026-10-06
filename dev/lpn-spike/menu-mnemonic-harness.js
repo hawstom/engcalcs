@@ -289,9 +289,9 @@ async function preReviewSuite(browser, open) {
 	// (1) A fixed row's letter does not depend on the project's scenario names.
 	const fixedLetters = async () => {
 		await page.keyboard.press('Alt+Shift+W');
-		// Scenarios, by ITS OWN letter as the menu now assigns it, read off the row rather than
-		// typed in here: a row added above it (Water > Change type, 2026-10-05) moves the letter,
-		// and what this section tests is the fly-out's rows, not which letter opens it.
+		// Scenarios, by ITS OWN letter as the menu assigns it, read off the row rather than typed in
+		// here: a row added above it would move the letter, and what this section tests is the
+		// fly-out's rows, not which letter opens it.
 		const scnKey = await page.evaluate((label) => {
 			const b = Array.from(document.querySelectorAll('#lpn_menu_list button.lpn-menu-row'))
 				.find((x) => x.textContent.replace(/[▸\s]+$/, '').trim().endsWith(label));
