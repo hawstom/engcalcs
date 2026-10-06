@@ -405,15 +405,21 @@ are the asset tables' own.
   seven `[TIMES]` values, always. Only paths `categoryOfSetting()` names a category for: units and
   the coordinate frame are never rows. A row's id is the path as JSON.
 - **Columns: Major heading, Minor heading, Category, Setting, Value** (Tom, 2026-10-05). Major and
-  Minor are where the Settings box shows it; Setting is the box's own words where it has them, else
-  the stored name under its object (`colorBreaks › node.pressure`). With Show scenarios on, Scenario
-  sits after Setting.
+  Minor are where the Settings box shows it. **Setting is always visitor words, never a stored
+  name**: the box's own label, else a key of its own (`lpn_settings_row_*`), and a map's member in
+  the Labels box's and toolbar's words ("Node labels: Pressure, Decimals", "ID prefixes, Junction").
+  `settings-table-labels-harness.js` fails a stored-name-shaped cell on every example with every
+  view option on. With Show scenarios on, Scenario sits after Setting.
 - **Value is read with `settingFor()` in the row's scenario and written with
   `setScenarioSetting()`**; Base writes the project's own object. The demand multiplier and the run
   time and time step keep their own homes and writers (`calcTargetOf()`, `setScenarioTime()`). A time
   keeps its typed text beside its seconds. A typed value is read back as the kind of thing the row
   holds (number, yes/no, a choice, a time, JSON for an object), and refused, costing no undo step,
-  when it is not one.
+  when it is not one. **Every edit is an undo step, Base's included**: a step that edits `settings`
+  or `labelSettings` carries them (`settingsState`, opt-in per step, `undoTopHoldsSettings()`). The
+  Settings box shares the gap and is not closed here: most of its editors take no undo step at all,
+  so each would need one; only its custom property Add and Remove, which already took a step that
+  did not hold the settings, now carry them.
 - **An override is marked by `hasOverride()`'s rule**: local where the scenario writes
   (`settingRowIsLocal()`). A demand multiplier seeded at a scenario's birth is an override by
   presence, so it is marked, though the count leaves it out until it differs.

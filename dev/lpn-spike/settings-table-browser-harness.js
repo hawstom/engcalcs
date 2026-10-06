@@ -183,6 +183,9 @@ async function main() {
 		const keys = rows.map((r) => JSON.parse(r.key)[0] + (JSON.parse(r.key)[1] ? '.' + JSON.parse(r.key)[1] : ''));
 		ok('units and the coordinate frame are not rows', !keys.some((k) => /^(units|origin|project\.(coords|crs|georef))/.test(k)), JSON.stringify(keys.filter((k) => /^(units|origin|project)/.test(k))));
 		ok('no Value cell wears the override wash with no scenario', rows.every((r) => !r.local));
+		const CODE = /[a-z][A-Z]|\w\.\w|\u203a|_|\w:\w|\w\|\w/;
+		ok('Net1: every Setting cell is words, none a stored name', rows.every((r) => !CODE.test(r.cells.st_setting)),
+			JSON.stringify(rows.filter((r) => CODE.test(r.cells.st_setting)).map((r) => r.cells.st_setting).slice(0, 10)));
 
 		console.log('\n--- 2. a Base edit writes the project ---');
 		const p0 = await H.pressure('22');
@@ -194,6 +197,26 @@ async function main() {
 		await H.typeValue(dmRow, '1');
 		const p2 = await H.pressure('22');
 		ok('...and back to 1 it is what it was', Math.abs(p2 - p0) < 1e-6, p2);
+		// A Base edit is an undo step like a scenario's (its step carries the project's settings).
+		const blurAll = () => page.evaluate(() => { if (document.activeElement) { document.activeElement.blur(); } });
+		await H.typeValue(dmRow, '1.5');
+		await blurAll();
+		await page.keyboard.press('Control+z');
+		await a.settle(1500);
+		ok('Ctrl+Z after a Base edit puts the Base value back', (await H.findRow(DM)).cells.st_value === '1', (await H.findRow(DM)).cells.st_value);
+		const pUndo = await H.pressure('22');
+		ok('...and the solve with it', Math.abs(pUndo - p0) < 1e-6, pUndo);
+		await blurAll();
+		await page.keyboard.press('Control+y');
+		await a.settle(1500);
+		ok('Ctrl+Y redoes it', (await H.findRow(DM)).cells.st_value === '1.5', (await H.findRow(DM)).cells.st_value);
+		await H.typeValue(dmRow, '1');
+		const tsBase0 = (await H.findRow(TS)).cells.st_value;
+		await H.typeValue((await H.findRow(TS)).key, String(+tsBase0 + 3));
+		await blurAll();
+		await page.keyboard.press('Control+z');
+		await a.settle(1000);
+		ok('...a Base Presentation value too (text size)', (await H.findRow(TS)).cells.st_value === tsBase0, (await H.findRow(TS)).cells.st_value);
 
 		console.log('\n--- 3. Show scenarios ---');
 		await H.newScenario('Peak');
@@ -313,6 +336,9 @@ async function main() {
 		ok('Net3 lat/lon: the coordinate frame and units are not rows', gkeys.length > 50 &&
 			!gkeys.some((k) => /^(units|origin|project\.(coords|crs|georef))/.test(k)), gkeys.length);
 		ok('...and the view is a Presentation row', grows.some((r) => r.key === '["view"]' && r.cells.st_category === PRES));
+		ok('Net3 lat/lon: every Setting cell is words, none a stored name',
+			grows.every((r) => !/[a-z][A-Z]|\w\.\w|\u203a|_|\w:\w|\w\|\w/.test(r.cells.st_setting)),
+			JSON.stringify(grows.filter((r) => /[a-z][A-Z]|\w\.\w|\u203a|_|\w:\w|\w\|\w/.test(r.cells.st_setting)).map((r) => r.cells.st_setting).slice(0, 10)));
 		// The labels' drawn height on screen, as a reader sees it: the median over every map label.
 		const fontOf = () => b.page.evaluate(() => {
 			// Font size times the drawing's scale is the size on screen, in pixels, whatever the zoom.

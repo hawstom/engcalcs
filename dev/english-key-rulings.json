@@ -29,11 +29,6 @@
             "ruled": "2026-09-14",
             "answer": "OK"
         },
-        "lpn_alt_calc_options": {
-            "on": "Calculation options",
-            "ruled": "2026-10-05",
-            "answer": "OK."
-        },
         "lpn_alt_cat_constituent": {
             "on": "Constituent",
             "ruled": "2026-10-01",
@@ -4360,16 +4355,6 @@
             "on": "Checked, a scenario is simply the values you set in it. Unchecked, this menu also offers the Alternatives preview table, which shows how those values are grouped by category and invites your feedback.",
             "ruled": "2026-10-01",
             "answer": "Edited."
-        },
-        "lpn_scenario_duration_tip": {
-            "on": "Leave blank to inherit from parent. A total run time of 0:00 is a steady-state run.",
-            "ruled": "2026-10-05",
-            "answer": "Edited"
-        },
-        "lpn_scenario_hyd_step_tip": {
-            "on": "Leave blank to inherit from parent.",
-            "ruled": "2026-10-05",
-            "answer": "Edited"
         },
         "lpn_scenario_mark_tip": {
             "on": "Ringed: this element holds a value that belongs to the scenario {name} alone.",

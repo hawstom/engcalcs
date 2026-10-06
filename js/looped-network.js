@@ -26308,7 +26308,7 @@ var EngCalcs = EngCalcs || {};
 	(function (members) {
 		Object.keys(members).forEach(function (k) { LPN_SETTAB_LABEL['settings.' + k] = members[k]; });
 	}({
-		textSize: 'lpn_settings_text_size', symbolSize: 'lpn_settings_symbol_size',
+		idPrefixes: 'lpn_settings_id_prefixes', textSize: 'lpn_settings_text_size', symbolSize: 'lpn_settings_symbol_size',
 		linkWidth: 'lpn_settings_link_width', symbolOpacity: 'lpn_settings_symbol_opacity',
 		labelMaxWidth: 'lpn_settings_label_max_width', alignPipeLabels: 'lpn_settings_align_labels',
 		labelFlipLeftOfVertical: 'lpn_settings_readability_bias', maskLabels: 'lpn_settings_mask_labels',
@@ -26335,7 +26335,7 @@ var EngCalcs = EngCalcs || {};
 		'hydraulics.minPressure': 'lpn_settings_min_pressure',
 		'hydraulics.reqPressure': 'lpn_settings_req_pressure',
 		'hydraulics.pressureExponent': 'lpn_settings_pressure_exponent',
-		'hydraulics.demandMultiplier': 'bpn_demand_mult', emitterExponent: 'lpn_settings_emitter_exponent',
+		'hydraulics.demandMultiplier': 'bpn_demand_mult',
 		quality: 'lpn_settings_quality_track', 'qualityOptions.tolerance': 'lpn_quality_tolerance',
 		'qualityOptions.diffusivity': 'lpn_quality_diffusivity', 'reactions.globalBulk': 'lpn_reaction_bulk',
 		'reactions.globalWall': 'lpn_reaction_wall', 'reactions.orderBulk': 'lpn_reaction_order_bulk',
@@ -26344,24 +26344,113 @@ var EngCalcs = EngCalcs || {};
 		'reactions.roughnessCorrelation': 'lpn_reaction_rough_corr',
 		'energy.globalEfficiency': 'lpn_energy_efficiency', 'energy.globalPrice': 'lpn_energy_price',
 		'energy.globalPattern': 'lpn_energy_price_pattern', 'energy.demandCharge': 'lpn_energy_demand_charge',
-		'energy.currency': 'lpn_energy_currency', nodeElevSource: 'lpn_settings_elev_source',
+		'energy.currency': 'lpn_energy_currency',
 		'defaults.nodeElevSource': 'lpn_settings_elev_source', 'defaults.nodeElev': 'lpn_field_elev',
 		'defaults.diameter': 'lpn_field_diameter', 'defaults.roughness': 'lpn_field_roughness',
 		'defaults.k': 'lpn_field_km', 'defaults.demand': 'lpn_field_base_demand',
 		'defaults.tankDiameter': 'lpn_field_tank_diameter', 'defaults.tankLevel': 'lpn_field_tank_level',
 		'defaults.tankMinLevel': 'lpn_field_tank_minlevel', 'defaults.tankMaxLevel': 'lpn_field_tank_maxlevel'
 	}));
+	// Rows the Settings box has no single label for: whole words of their own (lpn_settings_row_*).
+	var LPN_SETTAB_ROW_KEY = {
+		'settings.symbolCapMultiple': 'lpn_settings_row_symbol_cap_multiple',
+		'settings.symbolCapPercentile': 'lpn_settings_row_symbol_cap_percentile',
+		'settings.contourLabels': 'lpn_settings_row_contour_labels',
+		'settings.hydraulics.checkFreq': 'lpn_settings_row_check_freq',
+		'settings.hydraulics.maxCheck': 'lpn_settings_row_max_check',
+		'settings.hydraulics.statusReport': 'lpn_settings_row_status_report',
+		'settings.hydraulics.pdaSrc': 'lpn_settings_row_pda_src',
+		'settings.qualityOptions.quality': 'lpn_settings_row_quality_option',
+		'settings.tolerance': 'lpn_settings_row_tolerance',
+		// The older mirrors a project still carries, beside the values that replaced them.
+		'settings.emitterExponent': 'lpn_settings_row_emitter_exponent_old',
+		'settings.nodeElevSource': 'lpn_settings_row_elev_source_old',
+		'project.basemap': 'lpn_settings_row_basemap', 'project.basemapLast': 'lpn_settings_row_basemap_last',
+		'labelSettings.customerMaxWidth': 'lpn_settings_row_customer_max_width',
+		'times.qualityStep': 'lpn_settings_row_quality_step', view: 'lpn_settings_row_view'
+	};
+	var LPN_SETTAB_LABEL_PARTS = { decimals: 'lpn_labels_col_decimals', show: 'lpn_labels_col_rank',
+		priority: 'lpn_labels_col_drop', useUnits: 'lpn_labels_use_units',
+		prefix: 'lpn_settings_row_label_before', suffix: 'lpn_settings_row_label_after' };
+	function settingTableFill(tpl, map) {
+		var out = String(tpl);
+		Object.keys(map).forEach(function (k) { out = out.split('{' + k + '}').join(map[k]); });
+		return out;
+	}
+	// A field a label or a colour shows, in the words the Labels box uses; a quality field held per
+	// analysis (`quality:trace`) names its analysis too.
+	function settingTableField(group, key) {
+		var pc = EngCalcs.pageConfig || {}, parts = String(key).split(':'), defs, i, word = null,
+			modes = { age: pc.lpn_result_water_age || 'Water age', trace: pc.lpn_quality_trace || 'Source trace',
+				chemical: pc.lpn_quality_chemical_name || 'Chemical' };
+		defs = group === 'link' ? linkFieldDefs(pc) : group === 'customer' ? customerFieldDefs(pc) : nodeFieldDefs(pc);
+		for (i = 0; i < defs.length; i++) { if (defs[i][0] === parts[0]) { word = defs[i][1]; } }
+		if (word === null) { return null; }
+		return parts[1] ? word + ' (' + (modes[parts[1]] || parts[1]) + ')' : word;
+	}
+	function settingTableLabelsOf(group) {
+		var pc = EngCalcs.pageConfig || {};
+		return group === 'node' ? (pc.lpn_labels_heading_node || 'Node labels')
+			: group === 'link' ? (pc.lpn_labels_heading_link || 'Link labels')
+			: group === 'customer' ? (pc.lpn_settings_row_labels_customer || 'Customer labels') : null;
+	}
+	/**
+	 * **THE SETTING COLUMN IS VISITOR WORDS, NEVER A STORED NAME** (coordinator, 2026-10-06, for
+	 * Perry and Tom): the Settings box's own label where it has one, else a key of its own, and a
+	 * member of a map (a label field, a colour field, an ID prefix's asset) named in the Labels box's
+	 * and the toolbar's words. A path nothing here can name falls back to its stored name, and
+	 * dev/lpn-spike/settings-table-labels-harness.js fails on that, on every example with every view
+	 * option on.
+	 */
 	function settingTableLabel(p) {
-		var pc = EngCalcs.pageConfig || {}, i, key, k, times = EngCalcs.LPN_TIME_FIELDS || [];
+		var pc = EngCalcs.pageConfig || {}, i, key, k, base, times = EngCalcs.LPN_TIME_FIELDS || [],
+			groups = { node: 1, link: 1, customer: 1 }, fld, partKey, sideKey;
+		function own(path) {
+			var s2 = path.join('.'), kk = LPN_SETTAB_ROW_KEY[s2] || LPN_SETTAB_LABEL[s2];
+			return kk && pc[kk] ? pc[kk] : null;
+		}
+		function member(setting, m) {
+			return settingTableFill(pc.lpn_settings_row_of || '{setting}, {member}', { setting: setting, member: m });
+		}
 		if (p[0] === 'times') {
 			for (i = 0; i < times.length; i++) { if (times[i][0] === p[1] && pc[times[i][1]]) { return pc[times[i][1]]; } }
 		}
-		for (i = p.length; i > 0; i--) {
-			key = p.slice(0, i).join('.');
-			k = LPN_SETTAB_LABEL[key];
-			if (k && pc[k]) { return [pc[k]].concat(p.slice(i)).join(' › '); }
+		if (p[0] === 'labelSettings' && p.length >= 3) {
+			if (groups[p[1]] && (fld = settingTableField(p[1], p[2]))) {
+				return settingTableFill(pc.lpn_settings_row_labels_field || '{labels}: {field}',
+					{ labels: settingTableLabelsOf(p[1]), field: fld });
+			}
+			partKey = LPN_SETTAB_LABEL_PARTS[p[1]];
+			if (partKey && groups[p[2]] && p.length === 4 && (fld = settingTableField(p[2], p[3]))) {
+				return settingTableFill(pc.lpn_settings_row_labels_part || '{labels}: {field}, {part}',
+					{ labels: settingTableLabelsOf(p[2]), field: fld, part: pc[partKey] || p[1] });
+			}
+			sideKey = groups[p[2]] && p.length === 3 ? own(p.slice(0, 2)) : null;
+			if (sideKey) {
+				return settingTableFill(pc.lpn_settings_row_labels_field || '{labels}: {field}',
+					{ labels: settingTableLabelsOf(p[2]), field: sideKey });
+			}
 		}
-		// No label of its own: the stored name, under the object that holds it.
+		if (p[0] === 'settings' && (p[1] === 'colorBreaks' || p[1] === 'colorModes') && p.length === 3 && own(p.slice(0, 2))) {
+			k = String(p[2]).split('.');
+			fld = settingTableField(k[0], k.slice(1).join('.'));
+			if (fld) { return member(own(p.slice(0, 2)), fld); }
+		}
+		if (p[0] === 'settings' && p[1] === 'contourInterval' && p.length === 3 && own(p.slice(0, 2))) {
+			k = String(p[2]).split('|');
+			fld = settingTableField('node', k[0]);
+			if (fld) { return member(own(p.slice(0, 2)), fld + (k[1] ? ' (' + k[1] + ')' : '')); }
+		}
+		if (p[0] === 'settings' && p[1] === 'idPrefixes' && p.length === 3 && own(p.slice(0, 2))) {
+			base = { J: 'lpn_tool_add_junction', R: 'lpn_tool_add_reservoir', T: 'lpn_tool_add_tank', L: 'lpn_tool_add_pipe',
+				P: 'lpn_tool_add_pump', V: 'lpn_tool_add_valve', X: 'lpn_tool_add_text', M: 'lpn_tool_add_meter' }[p[2]];
+			if (base && pc[base]) { return member(own(p.slice(0, 2)), pc[base]); }
+		}
+		for (i = p.length; i > 0; i--) {
+			key = own(p.slice(0, i));
+			if (key) { return i === p.length ? key : member(key, p.slice(i).join(' ')); }
+		}
+		// No words for it: the stored name, which the labels harness refuses.
 		return p.slice(p[0] === 'settings' ? 1 : 0).join(' › ');
 	}
 	// The three calculation options with homes of their own (LPN_SETTING_ELSEWHERE).
@@ -26512,6 +26601,9 @@ var EngCalcs = EngCalcs || {};
 			}
 			return setScenarioSetting(scn, row.path, p.v);
 		}
+		// The undo step the cell took (paneCommitCell(), a paste) is made to carry the settings, so
+		// Ctrl+Z puts a Base value back as it does a scenario's.
+		undoTopHoldsSettings();
 		if (row.path[0] === 'times') {
 			times = doc.times || (doc.times = EngCalcs.lpnTimesDefaults());
 			times[k] = p.v;
@@ -48899,6 +48991,7 @@ var EngCalcs = EngCalcs || {};
 					if (e && e.preventDefault) { e.preventDefault(); }
 					if (e && e.stopPropagation) { e.stopPropagation(); }
 					saveUndoSnapshot();
+					undoTopHoldsSettings();
 					settings.customProps.splice(i, 1);
 					saveToStorage();
 					rebuildSettingsFields();
@@ -49063,6 +49156,7 @@ var EngCalcs = EngCalcs || {};
 			helpTip(add, pc.lpn_cp_add_tip);
 			add.addEventListener('click', function () {
 				saveUndoSnapshot();
+				undoTopHoldsSettings();
 				if (!settings.customProps) { settings.customProps = []; }
 				// BLANK, not a copy of the row above. A new row is a question to the user, exactly
 				// as a new demand category is, and seeding it with somebody else's design would put
@@ -59173,7 +59267,28 @@ var EngCalcs = EngCalcs || {};
 	function counterSnapshot(snap) {
 		var back = makeUndoSnapshot();
 		if (snap.project) { back.project = JSON.parse(JSON.stringify(project)); }
+		if (snap.settingsState) { back.settingsState = settingsStateCopy(); }
 		return back;
+	}
+	// **AN UNDO STEP THAT EDITS THE PROJECT'S SETTINGS CARRIES THEM** (`settingsState`), the way one
+	// that edits `project` carries it: `settings` and `labelSettings` live outside `doc`, so the
+	// plain snapshot never held them. Opt-in per step, NOT in every snapshot: most Settings box
+	// editors take no undo step at all, and a snapshot that always carried the settings would let
+	// Ctrl+Z on an earlier element edit silently revert a setting changed since. The Settings
+	// table's Base edits and the custom property Add and Remove buttons take it.
+	function settingsStateCopy() {
+		return JSON.parse(JSON.stringify({ settings: settings, labelSettings: labelSettings }));
+	}
+	function undoTopHoldsSettings() {
+		var top = undoStack[undoStack.length - 1];
+		if (top && !top.settingsState) { top.settingsState = settingsStateCopy(); }
+	}
+	// In place, because readers hold the project's own objects (settingFor() hands them out).
+	function restoreSettingsState(st) {
+		[[settings, st.settings], [labelSettings, st.labelSettings]].forEach(function (pair) {
+			Object.keys(pair[0]).forEach(function (k) { delete pair[0][k]; });
+			Object.keys(pair[1] || {}).forEach(function (k) { pair[0][k] = pair[1][k]; });
+		});
 	}
 	// Puts the page back to one snapshot, for undo() and redo() alike.
 	function restoreUndoSnapshot(snap) {
@@ -59187,6 +59302,7 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) { wasAt[n.id] = nodeDrawX(n) + ',' + nodeDrawY(n); });
 		doc = snap.state.doc;
 		scenarios = snap.state.scenarios;
+		if (snap.settingsState) { restoreSettingsState(JSON.parse(JSON.stringify(snap.settingsState))); }
 		touchTree('restoreUndoSnapshot');
 		// The fields only Delete network's snapshot carries (see deleteNetwork()). Assigned before
 		// the comparisons below, which then read the snapshot's own coords and basemap anyway.
@@ -59247,6 +59363,12 @@ var EngCalcs = EngCalcs || {};
 		updateEmptyHint();
 		chainResyncAfterUndo();
 		refreshScenarioStatus();
+		// A step that put settings back redraws what a setting edit redraws.
+		if (snap.settingsState) {
+			refreshSymbolSizes(); refreshValueColors(); refreshBasemap(); refreshContour();
+			rebuildSettingsBox();
+			if (EngCalcs.lpnTimeTimesChanged) { EngCalcs.lpnTimeTimesChanged(); }
+		}
 		// **THE LIBRARIES BOX IS PART OF THE DOCUMENT ON SCREEN, AND UNTIL TASK 611 NOTHING PUT IT
 		// BACK.** Tom, 2026-09-17, on the library import: *"Undo doesn't work."* It did -- the
 		// snapshot deep-clones `doc`, and `doc.curves`, `doc.pipeTypes` and `doc.fittingSets` ride
