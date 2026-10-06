@@ -3867,3 +3867,11 @@ OBSERVED real Chromium: branch's own harness passes. All 7 shipped examples: 0 w
 OBSERVED DEFECT: touch (hover none): tapping the glyph in the Properties box opens the tip AND focuses the Diameter input (label activation), the exact 2026-08-29 complaint; initTips only cancels this on `.ec-tip`, the glyph here is a bare `.ec-help`. Tables-pane tap also focuses a cell input.
 OBSERVED: Basic-example-SI-units opens with roughness unit ft (pre-existing); under D-W its tip reads ft in an SI project.
 SPECULATION: how the glyph looks (zero-width inset over the input end) not judged.
+
+## 2026-10-06 feat/dxf (Task 772), pre-review
+
+- OBSERVED: ezdxf 1.4.4 recover+audit+strict read: 0 errors on Net1, Net3-World, a nasty project (spaces, accents, CJK, 5000-char DESC, caret and percent sequences, 1.2e9 coordinate, customer) and Net3-World with a customer. dxf and dxf-parser (npm) also read them. LibreCAD 2.2.1.5 AppImage extracted but needs an X display (only xcb plugin; no Xvfb), so it did not read them. No gcc to build LibreDWG. AutoCAD/BricsCAD/ODA: not run.
+- OBSERVED: a literal "^" is written as "^" (DXF Reference: caret must be written "^ "); strings over 2049 characters are written whole (limit 2049 for group codes 0-9, 1); "%%" is escaped in TEXT but not in ATTRIB/ATTDEF values; a user's own "\U+XXXX" is not escaped.
+- OBSERVED: text height and symbol size follow the map zoom at export: Net1 at zoom 0.5 text 17.2 units, at saved zoom 1.2, at zoom 200 0.043 on a 70-unit-wide drawing.
+- OBSERVED: the layer table matches the Duke-hosted AIA CAD Layer Guidelines text for EQPM, VALV, TANK, LABL, TEXT, RDME; NODE is a prescribed minor group there, not user-defined. That PDF is an older edition than v5; v5 itself was not fetchable.
+- OBSERVED: dxf-export-harness.js passes and has no assertion on %% escaping, zoom, zone boundary or long strings.
