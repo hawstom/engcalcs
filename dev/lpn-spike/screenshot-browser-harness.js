@@ -243,6 +243,21 @@ async function desktop(Session, browser) {
 		await waitBlobs(page, 5);
 		png = await page.evaluate(LAST_PNG);
 		ok('at 4x a drag gives 4x the rectangle (800 x 600)', !!png && png.w === 800 && png.h === 600, png && (png.w + ' x ' + png.h));
+		// 8c. The box's own Screenshot button repeats the shot at the chosen magnification.
+		await page.selectOption('#lpn_snip_scale', '2');
+		const before = await page.evaluate(() => window.__snipBlobs.length);
+		const againLabel = await page.evaluate(() => document.getElementById('lpn_snip_again') && document.getElementById('lpn_snip_again').textContent.trim());
+		ok('the box has a button labelled Screenshot', againLabel === LABEL, againLabel);
+		await page.focus('#lpn_snip_again');
+		await page.keyboard.press('Enter');
+		await waitBlobs(page, before + 1);
+		await page.click('#lpn_snip_again');
+		await waitBlobs(page, before + 2);
+		const two = await page.evaluate(() => window.__snipBlobs.length);
+		png = await page.evaluate(LAST_PNG);
+		ok('pressing it twice (keyboard, then mouse) makes two pictures', two === before + 2, before + ' -> ' + two);
+		ok('...each the whole map at the chosen 2x', !!png && png.w === Math.round(map.w * 2) && png.h === Math.round(map.h * 2), png && (png.w + ' x ' + png.h));
+		ok('...with no veil left over', await page.evaluate(() => !document.querySelector('.lpn-snip-veil')));
 		const keptOpen = await page.evaluate(() => getComputedStyle(document.getElementById('lpn_snip_box')).display !== 'none');
 		ok('the box stays open after the snip', keptOpen);
 		await page.click('#lpn_snip_close');

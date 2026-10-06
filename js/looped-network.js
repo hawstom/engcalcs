@@ -41246,6 +41246,21 @@ var EngCalcs = EngCalcs || {};
 		});
 		r.appendChild(lab); r.appendChild(sel);
 		body.appendChild(r);
+		// **THE REPEAT BUTTON** (Tom, 2026-10-06: *"The panel is missing a Screenshot button for
+		// repeats."*). Pan or zoom the map, press it, and the whole visible map is shot again at
+		// the chosen magnification, with no veil to drag. Same word as the menu row.
+		var again = document.createElement('button'), row = document.createElement('div');
+		row.className = 'lpn-set-row';
+		again.type = 'button'; again.id = 'lpn_snip_again'; again.className = 'lpn-btn';
+		again.textContent = pc.lpn_screenshot_menu || 'Screenshot';
+		again.addEventListener('click', function () {
+			cancelScreenshot();
+			var m = snipMapRect();
+			if (m.w < 1 || m.h < 1) { return; }
+			takeScreenshot(m);
+		});
+		row.appendChild(again);
+		body.appendChild(row);
 	}
 	function startScreenshot() {
 		cancelScreenshot();
