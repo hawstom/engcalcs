@@ -2041,8 +2041,8 @@ $ec_lang['lpn_dxf_export_refused']='The DXF file was not written: the coordinate
 $ec_lang['lpn_dxf_note_grid']='Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.';
 $ec_lang['lpn_dxf_note_crs']='Coordinates: {crs}, exactly as this project states them.';
 $ec_lang['lpn_dxf_note_geo']='Coordinates: converted from latitude and longitude to {crs}, in meters.';
-// {h} and {w} are numbers (3 significant figures); {unit} is a length unit symbol.
-$ec_lang['lpn_dxf_note_scale']='Text and symbols are sized as the map draws them at Zoom to fit: text {h} {unit} high, on a network {w} {unit} across.';
+// {h} and {w} are lengths, each a number (3 significant figures) followed by its unit symbol.
+$ec_lang['lpn_dxf_note_scale']='Text and symbols are sized as the map draws them at Zoom to fit: text {h} high, on a network {w} across.';
 // {n} is a whole number; {max} is 2049. The ellipsis is the character the shortened value ends in.
 $ec_lang['lpn_dxf_note_shortened']='{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in “…”.';
 $ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network file.';

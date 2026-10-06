@@ -271,7 +271,7 @@ never edits a synonym.
   > Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.
   @@ NEEDS RULING
 - **`lpn_dxf_note_scale`**
-  > Text and symbols are sized as the map draws them at Zoom to fit: text {h} {unit} high, on a network {w} {unit} across.
+  > Text and symbols are sized as the map draws them at Zoom to fit: text {h} high, on a network {w} across.
   @@ NEEDS RULING
 - **`lpn_dxf_note_shortened`**
   > {n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in “…”.
@@ -512,7 +512,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**116 still to read**, of 119 new keys across 16 unmerged branch(es).
+**118 still to read**, of 121 new keys across 16 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -598,7 +598,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`31a1eca2`) — 42 new, 42 to read @@ NEEDS RULING
+### feat/bentley-interop (`53cd3a4a`) — 44 new, 44 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -608,6 +608,9 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_scenario_delete_has_children`**
   > The scenario {name} cannot be deleted while other scenarios inherit from it: {list}. Delete those first, or give them another parent.
+  @@ NEEDS RULING
+- **`lpn_settings_restore_base_only`**
+  > Switch to Base to restore the defaults.
   @@ NEEDS RULING
 - **`lpn_settings_row_basemap`**
   > Basemap
@@ -726,10 +729,13 @@ build for that would be a gate nobody keeps. Refresh it with
 - **`lpn_settings_table_yes`**
   > Yes
   @@ NEEDS RULING
+- **`lpn_settings_units_one_project`**
+  > Units are the same in every scenario.
+  @@ NEEDS RULING
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`b24fbb02`) — adds no English strings
+### feat/dxf (`56f052a3`) — adds no English strings
 
 ### feat/feedback (`1be9dba0`) — 13 new, 13 to read @@ NEEDS RULING
 

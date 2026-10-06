@@ -35199,8 +35199,8 @@ var EngCalcs = EngCalcs || {};
 		var across = Math.max(ex.x1 - ex.x0, ex.y1 - ex.y0);
 		function three(v) { return isFinite(v) ? String(+v.toPrecision(3)) : '?'; }
 		var notes = [projectDisplayName(project), frame.note,
-			(pc.lpn_dxf_note_scale || 'Text and symbols are sized as the map draws them at Zoom to fit: text {h} {unit} high, on a network {w} {unit} across.')
-				.replace('{h}', three(textHeight)).replace('{w}', three(across)).split('{unit}').join(frame.unitLabel || '')];
+			(pc.lpn_dxf_note_scale || 'Text and symbols are sized as the map draws them at Zoom to fit: text {h} high, on a network {w} across.')
+				.replace('{h}', three(textHeight) + ' ' + (frame.unitLabel || '')).replace('{w}', three(across) + ' ' + (frame.unitLabel || ''))];
 		// **A VALUE TOO LONG FOR ONE DXF STRING IS SHORTENED, AND THE DRAWING SAYS SO** -- the writer
 		// cuts it and ends it in an ellipsis (js/lpn-dxf.js, LIMIT_CHARS).
 		var longOnes = 0;
@@ -35229,7 +35229,7 @@ var EngCalcs = EngCalcs || {};
 	/**
 	 * **THE DRAWING DOES NOT DEPEND ON THE ZOOM IT WAS EXPORTED FROM** (pre-review 2026-10-06: Net1
 	 * at three zooms gave text 17.2, 1.2 and 0.043 units high). It is laid out as the map lays the
-	 * network out at Zoom to fit: the page's own zoomExtent() and its own label pass, run at that
+	 * network out at Zoom to fit: the page's own zoomExtent and its own label pass, run at that
 	 * scale, read, and the user's view put back -- all inside one synchronous call, so the browser
 	 * never paints the intermediate view. What it still depends on is what Zoom to fit depends on:
 	 * the map window's size and the text and symbol sizes in Settings.
@@ -35242,7 +35242,9 @@ var EngCalcs = EngCalcs || {};
 		if (!mapSized || !svg) { return fn(); }
 		var keep = { tx: state.tx, ty: state.ty, s: state.s }, keepFit = lastFit;
 		try {
-			zoomExtent();
+			// `false`, not `true`: this is not an automatic fit to re-baseline the project on. The view
+			// is put back below, so the project's signature never sees it (view-memory-harness.js).
+			zoomExtent(false);
 			// The fit's own iteration can land a last bit apart depending on the view it started
 			// from; held to ten significant figures, every start gives the same scale and so the
 			// same file, byte for byte (dev/lpn-spike/dxf-export-harness.js).
