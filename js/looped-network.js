@@ -20318,10 +20318,13 @@ var EngCalcs = EngCalcs || {};
 	}
 	function findQueryAppliesToTable(props, spec) {
 		var p;
+		// ANY condition that names one of the table's properties qualifies it. "All of them" made a
+		// mixed-scope query (Junction.X OR Pipe.Y) apply to no table at all; the query is still
+		// evaluated whole, and the table shows its own members of that answer.
 		for (p in props) {
-			if (Object.prototype.hasOwnProperty.call(props, p) && !propAppliesToTable(p, spec)) { return false; }
+			if (Object.prototype.hasOwnProperty.call(props, p) && propAppliesToTable(p, spec)) { return true; }
 		}
-		return true;
+		return false;
 	}
 	// One row of the multi-table receipt: "Junctions: 5 of 12".
 	function findFilterRowText(spec) {
