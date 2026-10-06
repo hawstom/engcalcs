@@ -99,60 +99,84 @@ lines rather than appending corrections.
   tile counts at a 900 ms settle (basemap.js now waits for a pointable tile). Pre-existing and unrelated: `scale-publish-harness.js` (2 checks). The full `node dev/browser-pass/run.js` is green (1853/1853, 2026-10-04, Task 761); browser-pass specs are not in
   check_all.
 
-## STATE — 2026-10-06 (second session)
+## STATE — 2026-10-06 (third session; jasmine was on UTC, so earlier "10-06" dates are Phoenix 10-05)
 
 ### Master = see `git log -1 master`, pushed. Production = 9c71d54f (Tom pulled 2026-09-28)
 
-Merged this session on his word: `feat/transport-ends`, `feat/notes-trim`, `feat/engine-prefetch`
-(privacy row's last sentence now says the engine is fetched in advance). Also on master: the
-scenario-tree reader guard (a page carries `alternatives`/`calcSets` through save, so a deployed
-page never drops a stored tree), and the geographic backdrop export fix (DIMENSIONS was written in
-Mercator y, not latitude; `backdrop-geo-export-browser-harness.js`). Roadmap: Task 721 is the
-umbrella at 100 (the model); 749 is the `.sqlite` file only; 752 is Sheets sync; 765 folded into 721.
+Merged this session on green (defect and chore tracks): `fix/phone-bolt` (the Calculate bolt shows on
+a phone when Recalculate is off; a mixed-scope Filter in table now filters), `fix/valve-label` (pump
+and valve symbols are label obstacles; found by the round-6 bench), `chore/adviser-notes` (Tasks
+768-773; Ida's report-a-problem and tip-text advice; Mary's `gis-plugins.md`, `autocad-interop.md`,
+`survey-codes.md` in `dev/agents/market-researcher/`; Mary's proposed journal/wishlist rows sit at
+the foot of those three files, not yet folded into her journal).
 
-### Awaiting him (all on the Branch previews page; each passed Perry)
+### Awaiting him (all on the Branch previews page; each passed Perry, his findings fixed)
 
-- **`feat/tip-door`** (Task 759): plus the Fire flow and Demand scaling paragraphs folded into each
-  box's corner ? (his "edit masterfully"); `lpn_ds_intro` and the three `lpn_ff_` English need his
-  word. `lpn_ds_scope_tip` now renders nowhere but has a synonym entry: his call to delete. **He
-  deferred the phone check to the merge: remind him then.**
-- **`feat/scenario-table`** (Task 766): plus Clear override on the Tables right-click menu. Greyed
-  (not hidden) when nothing selected holds an override: the menu's other items hide instead. Ask.
-- **`feat/screenshot`** (new, port 8108): Map > Screenshot, snip at 3x to the clipboard, tile
-  credit drawn when tiles are in the picture.
-- **`feat/backdrop-attach`** (Task 282, port 8109): attach the picture an `.inp` names, placed by
-  DIMENSIONS with EPANET's own OFFSET sign and fit rule (Umap.pas).
-- Still from before: `feat/desktop`; `feat/label-placer` waits on ONE answer from him, the R1
-  rule reworded: *"Hide a label only because there is no room for it on screen. Never hide it
-  because of how many labels are already showing."* Yes or no.
+- **`feat/tip-door`** (Task 759): tips take paragraphs (`\n\n` literal in the value). An ALL-CAPS
+  first line renders as a heading, but he did NOT rule on that: Ida and CC advise removing it (14 of
+  27 languages have no case; a tip needing a heading has outgrown a tip). **Ask: remove the heading
+  detector?** `lpn_ds_scope_tip` and its synonym deleted on his word. **Phone check deferred to the
+  merge: remind him when it merges and master is pushed.**
+- **`feat/scenario-table`** (Task 766): Clear override now HIDDEN when it can't act (his call).
+- **`feat/screenshot`**: 50% drag, Screenshot box with Magnification 1-4x, no credit drawn. **New
+  localStorage key `lpn_snipbox`** (box place + magnification; told him). Ask: should the scale bar
+  be in the picture (it is a page element, not drawn)?
+- **`feat/backdrop-attach`** (Task 282): Export EPANET file also saves the picture as **BMP + .bpw,
+  not the PNG + .pgw he asked for** (EPANET 2.2 reads BMP/EMF/WMF only; Perry confirmed from source).
+  His round trip: steps on the previews row. Risk only he can check: in EPANET desktop DIMENSIONS
+  becomes the map extent and 3 of Elm Street's 18 nodes lie outside the picture.
+- **`feat/value-warning`** (Task 770, new): ⚠ on unreasonable values in Tables and Properties; zero
+  false alarms on all 7 examples. **Ask: Darcy-Weisbach limit 10 mm** (he wrote "over 0.001 for e",
+  no unit); the HW C ceiling 200 is CC's number. Seams: scenario-table cells, bentley's resolved
+  method (`valueWarnMethod()`).
+- **`feat/asset-type`** (Task 769, new): Water > Change type (foot of the menu) for nodes; tank <->
+  reservoir keeps the water surface; links not built (reasons in `feat/asset-type:dev/asset-type.md`). Seam with
+  bentley: must walk `eachOverrideMap()` and stored alternatives at that merge.
+- **`feat/feedback`** (Task 768, new): contact.php category select, optional email, refused post
+  keeps input; "Tell us more" beside "Something wrong here?" carries page/lang/error code. **privacy.php
+  sentence changed (public text; told him).** contactYourEmail kept as the fallback until a sprint.
+  Ida's move 3 (in-page dialog) not built.
+- Still from before: `feat/desktop`. `feat/label-placer` round 6 done: four questions for him in
+  `feat/label-placer:dev/label-trials/round-6-2026-10-05.md` (drop order keeps most-wanted value over ID; R1 as
+  pass/fail; spot_prime as a ranked gap list two deep). Round 5's "D breaks on bends" was our
+  generator's bug, withdrawn.
 
 ### The long burn: `feat/bentley-interop` (long-lived, never merges without him)
 
-Stages 4 and 5 are built: stored alternatives (shared, deep, named, unused), calculation sets,
-scenario parents, the inherited view, merge and promote; a property harness against a naive walk
-(525 passes, 16 of 18 touch sites mutation-proven), byte-identical with no tree, and Perry's review
-fixed (merge rules, per-holder cache mending: 8,000 writes 2 s to 11 ms). His 2026-10-06 answers
-(a-d, and "View settings in the Settings box are NOT read-only") and the "decided by CC, his to
-overturn" list are in `dev/scenario-alternatives.md`. **Next: the Settings table, after
-`feat/scenario-table` merges** (it needs Show scenarios; they share the Tables pane). Advisers:
-scenarios as rows (Declan), Major/Minor as group rows and Category a column (Ida: ask him whether
-Category must sort), view stored as centre plus scale in ground metres per CSS pixel, held field
-marked by an amber edge plus "Base: x" and Reset, no per-field checkbox. Sue: warn when a scenario
-switches friction method with no roughness override; Sheets sync-in must mark local only where a
-cell differs from the resolved value.
+His 2026-10-05 answers are recorded in `dev/scenario-alternatives.md` on the branch: "override" is
+the word (an override equal to its parent is still one); shared-alternative edits, refused deletes and
+the merge rule all YES; Major/Minor stay COLUMNS (no group rows); Sue's ⚠ is suite-wide on
+`feat/value-warning`. **Q6 re-asked with context:** the Alternatives table's two new column headings
+are "Presentation" and "Calculation" (or Bentley's "Calculation options") -- the column that counts
+each scenario's calculation-option overrides; he guessed "Value", which is the settings table's
+column, not this one. **Next: the Settings table, after `feat/scenario-table` merges.**
 
 ### Next job
 
-- The translation sprint: master has ~127 untranslated keys, but tip-door and scenario-table
-  change keys in the same area; run the wave after those merge.
-- Q6 of the stage-3 questions (headings "Presentation" / "Calculation options") is still unanswered.
+- Translation sprint after tip-door, scenario-table and the new branches merge (they all add keys).
+- Task 771 survey codes: Mary recommends Carlson's convention (same-code joining, +0/-0, JPN<point>
+  for a tee; accept Civil 3D's CPN). Task 772 AutoCAD: DXF export with ids in XDATA first, import
+  with a visible snap tolerance; DWG via the user saving DXF. Task 728: shapefile+GeoJSON import
+  behind one mapping step; GeoJSON export first. Mary names QGISRed (UPV) and Gusnet as contacts.
+- jasmine timezone: needs `sudo timedatectl set-timezone America/Phoenix` from him (sudo needs a
+  password).
 
 ### Decisions waiting on him
 
 - DMARC phase 3: gate met; needs his go and his not-epanet.org choice.
-- On a phone (<=640 px) the Calculate bolt is hidden by an older CSS rule even with auto-recalculate
-  off (Perry); not filed yet.
-- A mixed-scope typed Filter in table answers "applies to no table" (Perry; pre-existing, generic).
+
+### Traps met 2026-10-06 (third session)
+
+- **"Possibly" in his request is not a ruling.** He asked for tip paragraphs "possibly with poor-boy
+  headings"; the build shipped ALL-CAPS headings and he said *"I am not ruling on ALL CAPS tips
+  headings. I am asking for advice."* Build the certain part; bring the "possibly" back as advice.
+- **`delete_lang_key.php` also deletes the key's entry in `english-key-rulings.json`**, and deleting a
+  key that a new English key replaced strips the TRANSLATED text from 26 languages until a sprint.
+  Perry caught it on feat/feedback; keep the old key as the fallback.
+- **A GitHub push failed once with "Permission denied (publickey)"** and the same push worked a
+  minute later. Retry before diagnosing.
+- **A builder's harness tested the conversion, not the hydraulics**: tank -> reservoir passed every
+  kept/lost check while dropping the head 120 ft. Brief builders of model edits to solve before/after.
 
 ### Traps met 2026-10-06 (second session)
 
