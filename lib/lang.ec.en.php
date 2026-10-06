@@ -1094,17 +1094,31 @@ $ec_lang['lpn_hotkeys_map_def']='<table class="lpn-notes-table"><tbody><tr><td>1
 $ec_lang['lpn_hotkeys_menu_heading']='Menus';
 $ec_lang['lpn_hotkeys_menu_term']='Menu keyboard shortcuts';
 $ec_lang['lpn_hotkeys_menu_def']='<table class="lpn-notes-table"><tbody><tr><td>Alt+Shift+letter</td><td>Open the menu with that letter, then press a row\'s letter to choose it. The letters show while you use the keyboard. On a Mac, use Ctrl+Option.</td></tr><tr><td>F10</td><td>Go to the menu bar.</td></tr></tbody></table>';
-// ---- The one-tap grievance link (ROADMAP Task 207, Rung 0) ----
-// The floor of the cost ladder in dev/dilettante-path.md: a visitor says something is wrong here
-// with one tap and nothing typed. Two sites, one behaviour -- a standing cell in the map's bottom
-// strip, and the same control inside the solver's diagnostic box when one is on screen.
-// THE TIP SAYS EXACTLY WHAT THE TAP SENDS, because a control that posts on one press and does not
-// say what it posts is asking for trust it has not earned. It also says no reply is coming, which
-// is the honesty boundary that document draws: a thank-you must never imply an answer.
+// ---- "Something wrong here?" (ROADMAP Tasks 207 and 768) ----
+// Two sites, one behaviour -- a standing cell in the map's bottom strip, and the same control inside
+// the solver's diagnostic box when one is on screen. The first click opens a box; Send is the second.
+// The thank-you must never imply an answer: a reply comes only to somebody who left an address.
 $ec_lang['lpn_wrong_btn']='Something wrong here?';
-// Edited by TGH 2026-09-07
-$ec_lang['lpn_wrong_tip']='Use this link to tell us that something on this page is wrong. It sends the name of this page, the language you are reading it in, and the message on the map if there is one. It sends nothing you have entered, no address, and nothing at all out of your drawing. Nobody can write back, because this tells us nothing about who you are. Use Help, Fix something when you want to say more.';
+// Rewritten for the two-click box (Task 768); TGH's 2026-09-07 wording described one press.
+$ec_lang['lpn_wrong_tip']='Tell us that something on this page is wrong. This opens a small box where you can pick what is wrong, add a comment, and leave an email address if you want a reply. All of it is optional, and nothing is sent until you press Send.';
 $ec_lang['lpn_wrong_thanks']='Thank you. That reached us.';
+// The box "Something wrong here?" opens (ROADMAP Task 768). Every field is optional; Send with
+// nothing in it posts only the anonymous tally the button always posted. The four picks are canned
+// phrases a visitor may toggle in any combination. lpn_fb_sends must stay true to send-feedback.php
+// and to the "Messages you send us" row of privacy.php.
+$ec_lang['lpn_fb_intro']='Pick any that fit, or none, and add whatever you like. Nothing is sent until you press Send.';
+$ec_lang['lpn_fb_pick_numbers']='The numbers look wrong';
+$ec_lang['lpn_fb_pick_broken']='Something did not work';
+$ec_lang['lpn_fb_pick_wording']='The wording or translation is wrong';
+$ec_lang['lpn_fb_pick_confusing']='This is confusing';
+$ec_lang['lpn_fb_comment']='Comments (optional)';
+$ec_lang['lpn_fb_email']='Email (optional, only if you want a reply)';
+$ec_lang['lpn_fb_sends']='What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.';
+$ec_lang['lpn_fb_send']='Send';
+$ec_lang['lpn_fb_sending']='Sending…';
+$ec_lang['lpn_fb_failed']='That did not reach us. What you wrote is still here, so you can try again.';
+$ec_lang['lpn_fb_bad_email']='That email address does not look right. Correct it, or leave it empty.';
+$ec_lang['lpn_fb_busy']='Too many messages have arrived in the last few minutes. What you wrote is still here, so you can try again later.';
 $ec_lang['lpn_status_example_opened']='Opened {name}. It is your copy: save it with File, Save as.';
 // Stands while the fault stands, rather than expiring like every other notice on the map: it
 // reports a page that cannot lay itself out, which is true until a measurement recovers.

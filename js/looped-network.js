@@ -41577,6 +41577,9 @@ var EngCalcs = EngCalcs || {};
 			.filter(function (el) { return !el.disabled && el.offsetParent !== null; });
 	}
 	function pressDialogButton(b) {
+		// A `keepOpen` button (the feedback box's Send) does its own closing, because its answer
+		// arrives later and may be a refusal the visitor must read in the box, beside what they typed.
+		if (b.keepOpen) { return b.fn(); }
 		closeDialog();
 		var r = b.fn();
 		// The answer may ask the next question; only when it did not does the queue or the opener
@@ -58878,38 +58881,200 @@ var EngCalcs = EngCalcs || {};
 		placeLegends();
 	}
 
-	// ---- The one-tap grievance link (ROADMAP Task 207, Rung 0; dev/dilettante-path.md) ----
+	// ---- "Something wrong here?": two clicks (ROADMAP Task 768; Task 207 before it) ----
 	//
-	// ONE PRESS, NOTHING TYPED, AND NO NEW CHANNEL. EngCalcs.logSignal already posts, already
-	// dedupes per page load, and already queues to IndexedDB and retries when the visitor is
-	// offline -- which is the requirement that matters most here, because the field users in
-	// low-resource regions this most needs to hear from are the likeliest to be offline. So this
-	// adds a detail slug to the lpn rows that already carry 'first:' and 'diag:', and nothing else.
+	// Tom, 2026-10-05: "those links open a small form that allows, but doesn't require, a message,
+	// an email address, and some selectors or canned phrases." And of the one-press version it
+	// replaces: "Give the users the information and the freedom." So the FIRST click opens a box and
+	// sends nothing; the SECOND is Send.
 	//
-	// WHAT IT SENDS IS FIXED AND SMALL: page, served language, and 'wrong:none' from the standing
-	// cell or 'wrong:<code>' from the diagnostic box. NEVER anything out of the user's document --
-	// not an element id, not a coordinate, not a count of what they drew. A node coordinate says
-	// where their network is.
+	// SEND WITH NOTHING IN THE BOX SENDS EXACTLY WHAT ONE PRESS USED TO: the anonymous tally
+	// 'wrong:<code>' through EngCalcs.logSignal (page, served language, and the code of the message
+	// on screen, or 'none'). That row is posted on EVERY Send, so the count of reports stays the
+	// same instrument it was. Only when something was picked or typed does a second request go,
+	// to send-feedback.php, which e-mails it to Tom. Never anything out of the user's document.
 	//
-	// NOTHING NEW IS STORED ON THE DEVICE, which is the entire reason the shape is this one: new
-	// storage would make a sentence in the consent banner false and re-ask every visitor. The
-	// dedupe is EngCalcs.logSignal's in-memory map and the button's own disabled flag, both of
-	// which end with the page load.
+	// NOTHING NEW IS STORED ON THE DEVICE. What the visitor typed lives in this closure until a
+	// send succeeds or they cancel; a failed send keeps it on screen, never in browser storage.
+	// That is also why the mail goes by fetch and not by logSignal's offline queue.
 	//
-	// THE THANK-YOU REPLACES THE LABEL IN PLACE and promises nothing. There is no reply coming and
-	// the tip says so; a thank-you that implies one is the honesty boundary this task is not
-	// allowed to cross.
+	// THE THANK-YOU REPLACES THE LABEL IN PLACE, as it always did, and promises nothing.
+	var FEEDBACK_PICKS = ['numbers', 'broken', 'wording', 'confusing'];
+	var FEEDBACK_ENDPOINT = '/engcalcs/send-feedback.php';
 	function resetWrongButton(id) {
 		var btn = document.getElementById(id);
 		if (!btn || !btn.dataset || !btn.dataset.lpnWrongWired) { return; }
 		// Restored as HTML because the label is the tip markup ecTipLabel() built, and the tip has
-		// to come back with the control: a button offering to send something with no way left to
-		// read what it sends is the one shape this feature must not take.
+		// to come back with the control.
 		if (btn.dataset.lpnWrongLabel) { btn.innerHTML = btn.dataset.lpnWrongLabel; }
 		btn.disabled = false;
 		// initTipsIn(), never EngCalcs.initTips() (Task 562): the direct call skips the orphan
 		// sweep, and a tip left standing over the map has no trigger to dismiss it on touch.
 		initTipsIn(btn);
+	}
+	function thankWrongButton(btn) {
+		var pcW = EngCalcs.pageConfig || {};
+		// textContent, not the tip markup: the thank-you is a statement and not a control.
+		btn.textContent = pcW.lpn_wrong_thanks || 'Thank you. That reached us.';
+		btn.disabled = true;
+	}
+	/**
+	 * Posts what the visitor picked or typed. Resolves {ok, reason}; never rejects. A network
+	 * failure, a timeout and an unreadable answer all come back as reason 'failed'.
+	 */
+	function postFeedback(fields) {
+		var body = Object.keys(fields).map(function (k) {
+			return encodeURIComponent(k) + '=' + encodeURIComponent(fields[k]);
+		}).join('&');
+		if (typeof fetch !== 'function') { return Promise.resolve({ ok: false, reason: 'failed' }); }
+		var ctl = typeof AbortController === 'function' ? new AbortController() : null;
+		var timer = ctl ? setTimeout(function () { ctl.abort(); }, 20000) : 0;
+		return fetch(FEEDBACK_ENDPOINT, {
+			method: 'POST', credentials: 'same-origin', signal: ctl ? ctl.signal : undefined,
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'X-EngCalcs-Feedback': '1' },
+			body: body
+		}).then(function (r) {
+			return r.json().then(function (j) {
+				return { ok: !!(r.ok && j && j.ok), reason: (j && j.reason) || (r.ok ? '' : 'failed') };
+			}, function () { return { ok: false, reason: 'failed' }; });
+		}, function () { return { ok: false, reason: 'failed' }; }).then(function (res) {
+			if (timer) { clearTimeout(timer); }
+			return res;
+		});
+	}
+	/**
+	 * The box. `code` is the message that was on screen when the button was pressed ('none' from
+	 * the standing cell). `keep` and `note` reopen it after a send that failed with the box closed.
+	 */
+	function openFeedbackBox(btn, code, keep, note) {
+		var pc = EngCalcs.pageConfig || {};
+		if (dialogIsOpen()) { dialogQueue.push(function () { openFeedbackBox(btn, code, keep, note); }); return; }
+		var st = keep || { picks: [], email: '', comment: '' };
+		var els = { picks: [] }, sending = false;
+		// Is the open dialog still THIS box? Another question replaces the body, which detaches our wrap.
+		function mine() { return dialogIsOpen() && !!els.wrap && els.wrap.parentNode === document.getElementById('lpn_dialog_body'); }
+		function read() {
+			if (!mine()) { return; }
+			st.picks = els.picks.filter(function (b) { return b.getAttribute('aria-pressed') === 'true'; })
+				.map(function (b) { return b.dataset.pick; });
+			st.email = els.email.value;
+			st.comment = els.comment.value;
+		}
+		function say(text, isError) {
+			if (!els.status) { return; }
+			els.status.textContent = text || '';
+			els.status.className = 'lpn-fb-status' + (isError ? ' lpn-fb-error' : '');
+		}
+		function lockButtons(on) {
+			var bar = document.getElementById('lpn_dialog_buttons');
+			if (bar) { Array.prototype.forEach.call(bar.querySelectorAll('button'), function (b) { b.disabled = on && b.dataset.fbSend === '1'; }); }
+		}
+		function done() {
+			if (mine()) { closeDialog(); afterDialogAnswer(); }
+			thankWrongButton(btn);
+		}
+		function send() {
+			if (sending) { return; }
+			read();
+			var comment = st.comment.trim(), email = st.email.trim();
+			// The tally goes on every Send, empty or not: it is the same row one press used to post.
+			if (EngCalcs.logSignal) { EngCalcs.logSignal('lpn', 'wrong:' + code); }
+			if (!st.picks.length && !comment && !email) { done(); return; }
+			sending = true;
+			lockButtons(true);
+			say(pc.lpn_fb_sending || 'Sending…', false);
+			postFeedback({
+				page: EngCalcs.cookieName || 'Looped-Network',
+				lang: (document.documentElement && document.documentElement.lang) || '',
+				code: code, picks: st.picks.join(','), email: email, comment: st.comment,
+				website: els.trap ? els.trap.value : ''
+			}).then(function (res) {
+				sending = false;
+				if (res.ok) { done(); return; }
+				var msg = res.reason === 'email' ? pc.lpn_fb_bad_email
+					: res.reason === 'busy' ? pc.lpn_fb_busy : pc.lpn_fb_failed;
+				msg = msg || 'That did not reach us.';
+				if (mine()) {
+					lockButtons(false);
+					say(msg, true);
+					if (res.reason === 'email') { els.email.focus(); }
+				} else {
+					// Cancelled while it was on its way: what they wrote is not thrown away.
+					openFeedbackBox(btn, code, st, msg);
+				}
+			});
+		}
+		function field(body, labelText, tag, cls) {
+			var lab = document.createElement('label');
+			lab.className = 'lpn-fb-label';
+			lab.appendChild(document.createTextNode(labelText));
+			var f = document.createElement(tag);
+			f.className = 'lpn-dialog-input ' + cls;
+			lab.appendChild(f);
+			body.appendChild(lab);
+			return f;
+		}
+		openDialog(function (body) {
+			var wrap = els.wrap = document.createElement('div');
+			wrap.className = 'lpn-fb';
+			body.appendChild(wrap);
+			var intro = document.createElement('p');
+			intro.className = 'lpn-dialog-msg';
+			intro.id = 'lpn_fb_intro';
+			intro.textContent = pc.lpn_fb_intro || '';
+			wrap.appendChild(intro);
+			var group = document.createElement('div');
+			group.className = 'lpn-fb-picks';
+			group.setAttribute('role', 'group');
+			group.setAttribute('aria-labelledby', 'lpn_fb_intro');
+			FEEDBACK_PICKS.forEach(function (id) {
+				var b = document.createElement('button');
+				b.type = 'button';
+				b.className = 'lpn-fb-pick';
+				b.dataset.pick = id;
+				b.textContent = pc['lpn_fb_pick_' + id] || id;
+				b.setAttribute('aria-pressed', st.picks.indexOf(id) >= 0 ? 'true' : 'false');
+				b.addEventListener('click', function () {
+					b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+				});
+				group.appendChild(b);
+				els.picks.push(b);
+			});
+			wrap.appendChild(group);
+			els.comment = field(wrap, pc.lpn_fb_comment || '', 'textarea', 'lpn-fb-comment');
+			els.comment.rows = 4;
+			els.comment.value = st.comment;
+			els.email = field(wrap, pc.lpn_fb_email || '', 'input', 'lpn-fb-email');
+			els.email.type = 'email';
+			els.email.autocomplete = 'email';
+			els.email.value = st.email;
+			// THE HONEYPOT. display:none, so no visitor sees it, Tab never reaches it (the box's Tab
+			// ring skips what has no layout), and the endpoint drops any post that fills it.
+			var trapBox = document.createElement('div');
+			trapBox.style.display = 'none';
+			trapBox.setAttribute('aria-hidden', 'true');
+			els.trap = document.createElement('input');
+			els.trap.type = 'text';
+			els.trap.name = 'website';
+			els.trap.tabIndex = -1;
+			els.trap.autocomplete = 'off';
+			trapBox.appendChild(els.trap);
+			wrap.appendChild(trapBox);
+			var sends = document.createElement('p');
+			sends.className = 'lpn-fb-sends';
+			sends.textContent = pc.lpn_fb_sends || '';
+			wrap.appendChild(sends);
+			els.status = document.createElement('p');
+			els.status.setAttribute('role', 'status');
+			els.status.setAttribute('aria-live', 'polite');
+			wrap.appendChild(els.status);
+			say(note || '', !!note);
+		}, [
+			{ label: pc.lpn_fb_send || 'Send', keepOpen: true, fn: send },
+			{ label: pc.lpn_cancel || 'Cancel', cancel: true, fn: function () { } }
+		], { title: pc.lpn_wrong_btn || '', focus: function () { return els.picks[0]; } });
+		var bar = document.getElementById('lpn_dialog_buttons');
+		if (bar && bar.firstChild) { bar.firstChild.dataset.fbSend = '1'; }
 	}
 	function wireWrongButton(id, detail) {
 		var btn = document.getElementById(id);
@@ -58920,14 +59085,9 @@ var EngCalcs = EngCalcs || {};
 		btn.dataset.lpnWrongLabel = btn.innerHTML;
 		btn.addEventListener('click', function () {
 			if (btn.disabled) { return; }
-			var pcW = EngCalcs.pageConfig || {};
-			if (EngCalcs.logSignal) {
-				EngCalcs.logSignal('lpn', 'wrong:' + (typeof detail === 'function' ? detail() : detail));
-			}
-			// textContent, not the tip markup: the thank-you is a statement and not a control, so
-			// it carries no "?" and no title of its own.
-			btn.textContent = pcW.lpn_wrong_thanks || 'Thank you. That reached us.';
-			btn.disabled = true;
+			// The code is read NOW, at the first click: the report is about the message the
+			// visitor was looking at, even if a solve replaces it while they type.
+			openFeedbackBox(btn, typeof detail === 'function' ? detail() : detail);
 		});
 	}
 	function wireWrongButtons() {

@@ -3962,6 +3962,21 @@ table.lpn-notes-table td:first-child { font-weight: bold; width: 40%; }
 /* Once tapped it is no longer a control, and it must not keep looking like one: the label is the
    thank-you, so a hover border on it would invite a second press that posts nothing. */
 .lpn-wrong-btn[disabled] { color: var(--ec-ink-muted); cursor: default; border-color: transparent; opacity: 1; }
+/* ---- The box "Something wrong here?" opens (ROADMAP Task 768), drawn in #lpn_dialog ----
+   The picks are toggles (aria-pressed), wrapping onto as many rows as the width needs, so a phone in
+   tall mode gets a column of them and a desk gets two rows. A pressed pick wears the toolbar's own
+   pressed paint. The fields fill the box; the "What this sends" line is quieter than the controls. */
+.lpn-fb { width: 30em; max-width: 100%; }
+.lpn-fb-picks { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 10px; }
+.lpn-fb-pick { font: inherit; padding: 4px 8px; border: 1px solid var(--ec-gray-bbb); border-radius: 3px; background: var(--ec-bg); color: inherit; cursor: pointer; text-align: left; }
+.lpn-fb-pick[aria-pressed="true"] { background: var(--ec-pressed-bg); border-color: var(--ec-pressed-border); }
+/* The tick is drawn, not a glyph: U+2713 is missing from some system fonts and showed as a box. */
+.lpn-fb-pick[aria-pressed="true"]::before { content: ""; display: inline-block; width: 0.3em; height: 0.6em; margin: 0 0.5em 0.15em 0.1em; border: solid currentColor; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.lpn-fb-label { display: block; margin-top: 8px; }
+.lpn-fb textarea.lpn-fb-comment { min-height: 5em; font-family: inherit; resize: vertical; }
+.lpn-fb-sends { margin: 10px 0 0; font-size: 0.9em; color: var(--ec-ink-muted); }
+.lpn-fb-status { margin: 8px 0 0; min-height: 1.2em; }
+.lpn-fb-status.lpn-fb-error { color: var(--ec-error-ink); }
 /* ---- The message log button and list (ROADMAP Task 704) ----
    Moved 2026-09-21 into #lpn_map_overlay_tl, beside the mode hint it recalls (Tom: "the
    button/glyph must be where the messages appear"). **OPAQUE, not the translucent pill paint the

@@ -66,6 +66,7 @@ $excluded = [
     'log-title-event.php'  => 'beacon endpoint, emits no HTML',
     'consent.php'          => 'redirect endpoint for the no-JS consent path, emits no HTML',
     'log-signal-event.php' => 'beacon endpoint, emits no HTML',
+    'send-feedback.php'    => 'POST endpoint behind Something wrong here?, answers JSON',
     'lpn-lock.php'         => 'POST-only lock broker, answers a GET with 405',
     'sw.php'               => 'generates the service worker, serves JavaScript',
     'manifest.php'         => 'generates the web app manifest per mount, serves JSON',
