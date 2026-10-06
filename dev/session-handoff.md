@@ -119,7 +119,8 @@ research; his notes on Tasks 728, 768, 771, 772 in the roadmap. `feat/value-warn
   An on-map legend that is showing IS in the picture: his call.
 - **`feat/backdrop-attach`** (Task 282): his "only the .inp" was Chrome dropping a 2nd/3rd download
   from one click (reproduced). Export now saves ONE Name.zip (.inp + .bmp + .bpw); picture name is
-  ASCII for EPANET. Ask: `lpn_file_export_inp_tip` does not mention the .zip.
+  ASCII for EPANET. He then said the BMP/BPW did arrive late on the old build; CC recommended keeping
+  the zip and offered to revert. Ask: `lpn_file_export_inp_tip` does not mention the .zip.
 - **`feat/asset-type`** (Task 769): the key line "ID: Lost entry"; then CC read his "Proceed" as
   "build the links" (the branch had left Pipe/Pump/Valve unbuilt), NOT as an all-clear; links are
   built (TCV for a new valve; a curveless pump adds no head; customers stay on their node; rule words
@@ -143,11 +144,13 @@ research; his notes on Tasks 728, 768, 771, 772 in the roadmap. `feat/value-warn
 
 ### The long burn: `feat/bentley-interop` (long-lived, never merges without him)
 
-Q6 answered: "Calculation". The Settings table (stage 3b) is built; Perry found the Settings box
-still wrote Base while a scenario was open (against his Q4), missing rows for unstated settings, an
-undo that restored the whole settings object, and code-ish values; the rework was running at the end
-of the session — `git log` the branch and read its last report before briefing. NOT on the previews
-page yet: add a row once Perry has passed the rework.
+Q6 answered: "Calculation". The Settings table (stage 3b) is built and the Settings box now writes
+the open scenario through one seam (his Q4), every setting is a row, undo restores only edited
+paths, a new scenario seeds nothing. Perry's second pass (journal 0998ab89) found label text fields
+losing keystrokes in a scenario and Graphs > Contour writing Base; that fix round was running at
+the end of the session. `git log` the branch and read its last report; Perry passes it before a
+previews row is added. Tom's calls waiting there: Settings tab in Basic mode; Restore defaults
+disabled in a scenario.
 
 ### Next job
 
