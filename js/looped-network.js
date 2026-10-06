@@ -36418,12 +36418,19 @@ var EngCalcs = EngCalcs || {};
 		if (from.kind !== to.kind) { return true; }
 		return from.kind === 'epsg' && String(from.crs) !== String(to.crs);
 	}
-	// The menu row. An empty tab has nothing to copy, so there the row means the file picker, and the
-	// file that lands is then offered the same box (see landProjectText()).
+	// The menu row. **AN EMPTY PROJECT GETS THE SAME BOX** (Task 775; Tom, 2026-10-06: *"File,
+	// Convert as on a project that has no objects causes a file Open dialog"*). It used to mean the
+	// file picker there, which is a different command under this one's name; an empty project still
+	// has units and a coordinate system to convert, and with nothing drawn the copy simply states
+	// the new ones (convasNothingToPlace()).
 	function convertAs() {
 		if (mapgeoActive() || georefActive()) { georefBlocksProjectSwitch(); return; }
-		if (!doc.nodes.length) { pickGeoFile(); return; }
 		openConvertAsBox();
+	}
+	// Nothing anywhere whose coordinates a new coordinate system would have to move: no node, no
+	// Text, no background image. Then there is nothing for the placement steps to place.
+	function convasNothingToPlace() {
+		return !doc.nodes.length && !(doc.labels && doc.labels.length) && !(backdrop && backdrop.href);
 	}
 	// A file opened through the row's file route: the same box, unless there is nothing to convert.
 	function convertAsLanded() {
@@ -36525,6 +36532,10 @@ var EngCalcs = EngCalcs || {};
 		convasFor = library.openId;
 		convasPick = { crs: from.kind === 'epsg' ? from.crs : LPN_CRS_WEBMERC, place: null };
 		convasSetKind(from.kind);
+		// Attaching the world map IS a placement, and an empty project has nothing to place, so that
+		// one answer is offered only where it already is the project's own.
+		var unnamedEl = document.getElementById('lpn_convas_kind_unnamed');
+		if (unnamedEl) { unnamedEl.disabled = convasNothingToPlace() && from.kind !== 'unnamed'; }
 		fromEl = document.getElementById('lpn_convas_from');
 		if (fromEl) {
 			fromEl.textContent = String(pc.lpn_convas_from || 'Current: {crs}').replace('{crs}', crsDisplayName());
@@ -36965,6 +36976,15 @@ var EngCalcs = EngCalcs || {};
 		} else if (from.kind === 'unnamed' && to.kind === 'none') {
 			// Detaching changes no coordinate: the grid is the grid it always was.
 			savedSetKind(saved, 'none');
+		} else if (convasNothingToPlace() && to.kind !== 'unnamed') {
+			// **AN EMPTY PROJECT: NO COORDINATE TO MOVE, SO NO PLACEMENT STEPS** (Task 775). The copy
+			// states the system asked for and opens on that system's own default view; the old
+			// origin and view were numbers in the old frame and would mean nothing in the new one.
+			if (to.kind === 'epsg' && to.crs === LPN_CRS_WEBMERC) { savedSetKind(saved, 'geo'); }
+			else if (to.kind === 'epsg') { savedSetKind(saved, 'epsg', to.crs); }
+			else { savedSetKind(saved, 'none'); }
+			delete saved.origin;
+			delete saved.view;
 		} else if (from.kind === 'none') {
 			// Nowhere yet: the steps start from the whole world, as they always have.
 			step = to.kind === 'unnamed' ? 'attach' : 'place';
