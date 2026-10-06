@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**26 still to read on master**, of 132 untranslated keys, of 2355 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**42 still to read on master**, of 148 untranslated keys, of 2371 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (132, 26 to read @@ NEEDS RULING)
+## lpn_  (148, 42 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -96,6 +96,54 @@ never edits a synonym.
 - **`lpn_basemap_style_normal`**
   > Normal
   _Ruled OK 2026-10-05._
+- **`lpn_change_type_becomes`**
+  > {id}: {property} {value}, in scenario {scenario}, becomes {new}
+  @@ NEEDS RULING
+- **`lpn_change_type_born`**
+  > These are new, as on a newly drawn one:
+  @@ NEEDS RULING
+- **`lpn_change_type_customers`**
+  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:
+  @@ NEEDS RULING
+- **`lpn_change_type_key`**
+  > ID: Lost entry
+  @@ NEEDS RULING
+- **`lpn_change_type_line`**
+  > {id}: {property} {value}
+  @@ NEEDS RULING
+- **`lpn_change_type_line_scenario`**
+  > {id}: {property} {value}, in scenario {scenario}
+  @@ NEEDS RULING
+- **`lpn_change_type_lost`**
+  > These values will be lost:
+  @@ NEEDS RULING
+- **`lpn_change_type_meaning`**
+  > These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.
+  @@ NEEDS RULING
+- **`lpn_change_type_menu`**
+  > Change type
+  @@ NEEDS RULING
+- **`lpn_change_type_more`**
+  > And {n} more.
+  @@ NEEDS RULING
+- **`lpn_change_type_no_curve`**
+  > {id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe
+  @@ NEEDS RULING
+- **`lpn_change_type_ok`**
+  > Change
+  @@ NEEDS RULING
+- **`lpn_change_type_rules`**
+  > These rule lines name a link by its kind, and will name its new kind instead:
+  @@ NEEDS RULING
+- **`lpn_change_type_setting`**
+  > These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:
+  @@ NEEDS RULING
+- **`lpn_change_type_surface`**
+  > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
+  @@ NEEDS RULING
+- **`lpn_change_type_tip`**
+  > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.
+  @@ NEEDS RULING
 - **`lpn_choice_default`**
   > Default
   _Ruled OK 2026-10-05._
@@ -476,7 +524,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**138 still to read**, of 141 new keys across 18 unmerged branch(es).
+**135 still to read**, of 138 new keys across 17 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -487,58 +535,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### feat/asset-type (`fdaa932d`) — 16 new, 16 to read @@ NEEDS RULING
-
-- **`lpn_change_type_becomes`**
-  > {id}: {property} {value}, in scenario {scenario}, becomes {new}
-  @@ NEEDS RULING
-- **`lpn_change_type_born`**
-  > These are new, as on a newly drawn one:
-  @@ NEEDS RULING
-- **`lpn_change_type_customers`**
-  > Only a pipe serves customers, so these customers are connected instead to the node shown in parentheses, where their demand already lands. They stay where they are drawn, and their demand is unchanged:
-  @@ NEEDS RULING
-- **`lpn_change_type_key`**
-  > ID: Lost entry
-  @@ NEEDS RULING
-- **`lpn_change_type_line`**
-  > {id}: {property} {value}
-  @@ NEEDS RULING
-- **`lpn_change_type_line_scenario`**
-  > {id}: {property} {value}, in scenario {scenario}
-  @@ NEEDS RULING
-- **`lpn_change_type_lost`**
-  > These values will be lost:
-  @@ NEEDS RULING
-- **`lpn_change_type_meaning`**
-  > These controls and rules test a node being changed, and will read it differently: a junction is tested by its pressure, and a tank or reservoir by its water level.
-  @@ NEEDS RULING
-- **`lpn_change_type_menu`**
-  > Change type
-  @@ NEEDS RULING
-- **`lpn_change_type_more`**
-  > And {n} more.
-  @@ NEEDS RULING
-- **`lpn_change_type_no_curve`**
-  > {id}: No pump head curve, so the pump adds no head until one is selected, and an .inp export writes it as a pipe
-  @@ NEEDS RULING
-- **`lpn_change_type_ok`**
-  > Change
-  @@ NEEDS RULING
-- **`lpn_change_type_rules`**
-  > These rule lines name a link by its kind, and will name its new kind instead:
-  @@ NEEDS RULING
-- **`lpn_change_type_setting`**
-  > These controls and rules give or test the setting of a link being changed. A setting is a different quantity on a pipe, a pump, and a valve, so these will read it differently:
-  @@ NEEDS RULING
-- **`lpn_change_type_surface`**
-  > These keep the water surface where it was. A reservoir's head is the tank's elevation plus its water depth, and a tank's water depth is the reservoir's head minus its elevation:
-  @@ NEEDS RULING
-- **`lpn_change_type_tip`**
-  > Change the selected nodes into junctions, reservoirs, or tanks, or the selected links into pipes, pumps, or valves. Each keeps its ID, its place, its connections, and every value the new type also has. If anything would be lost, you are asked first.
-  @@ NEEDS RULING
-
-### feat/backdrop-attach (`5ab01ee7`) — 7 new, 7 to read @@ NEEDS RULING
+### feat/backdrop-attach (`929d7ec9`) — 7 new, 7 to read @@ NEEDS RULING
 
 - **`lpn_inp_backdrop_attach`**
   > Attach {file}…
@@ -562,7 +559,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Exported {zip}, holding the EPANET file {file}, its background picture {picture}, and the world file {world}. Extract all three into one folder, then open the .inp there in EPANET; the picture comes with it.
   @@ NEEDS RULING
 
-### feat/bentley-interop (`70cdf9a3`) — 52 new, 52 to read @@ NEEDS RULING
+### feat/bentley-interop (`43658d9f`) — 52 new, 52 to read @@ NEEDS RULING
 
 - **`lpn_alt_cat_calculation`**
   > Calculation
@@ -723,19 +720,28 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/desktop (`baba0f04`) — adds no English strings
 
-### feat/dxf (`f643a2ac`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/dxf (`93469e95`) — 12 new, 12 to read @@ NEEDS RULING
 
+- **`lpn_dxf_export_failed`**
+  > The DXF file was not written: an error in this page stopped it ({error}).
+  @@ NEEDS RULING
 - **`lpn_dxf_export_no_utm`**
   > The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.
   @@ NEEDS RULING
 - **`lpn_dxf_export_refused`**
   > The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.
   @@ NEEDS RULING
+- **`lpn_dxf_exported_geo`**
+  > Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.
+  @@ NEEDS RULING
+- **`lpn_dxf_note_blocks`**
+  > Block attributes are 1 unit high in each block definition. Every block is inserted at scale {s}, so its attributes are {s} {unit} high; change the insertion scale to change that.
+  @@ NEEDS RULING
 - **`lpn_dxf_note_crs`**
   > Coordinates: {crs}, exactly as this project states them.
   @@ NEEDS RULING
 - **`lpn_dxf_note_geo`**
-  > Coordinates: converted from latitude and longitude to {crs}, in meters.
+  > Coordinates: {crs}, in meters, not latitude and longitude. The project’s latitudes and longitudes were converted to that grid.
   @@ NEEDS RULING
 - **`lpn_dxf_note_grid`**
   > Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.
@@ -753,7 +759,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Download this network as a drawing that AutoCAD and other CAD programs open: one layer for each kind of asset, each node a block carrying its ID and main values, and the labels as they appear on the map.
   @@ NEEDS RULING
 
-### feat/feedback (`1be9dba0`) — 13 new, 13 to read @@ NEEDS RULING
+### feat/feedback (`d96763d3`) — 13 new, 13 to read @@ NEEDS RULING
 
 - **`lpn_fb_bad_email`**
   > That email address does not look right. Correct it, or leave it empty.
@@ -771,7 +777,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > That did not reach us. What you wrote is still here, so you can try again.
   @@ NEEDS RULING
 - **`lpn_fb_intro`**
-  > Pick any that fit, or none, and add whatever you like. Nothing is sent until you press Send.
+  > Canned messages (optional). Nothing is sent until you press Send.
   @@ NEEDS RULING
 - **`lpn_fb_pick_broken`**
   > Something did not work
@@ -795,13 +801,22 @@ build for that would be a gate nobody keeps. Refresh it with
   > What this sends: the name of this page, your language, the version of the site, the code of the message on the map if there is one, and what you picked or typed. Never your drawing or your network. Your email address is used only to reply to you.
   @@ NEEDS RULING
 
-### feat/geojson (`ea4af950`) — 8 new, 8 to read @@ NEEDS RULING
+### feat/geojson (`0495c559`) — 11 new, 11 to read @@ NEEDS RULING
 
 - **`lpn_file_export_geojson`**
   > Export GeoJSON file…
   @@ NEEDS RULING
 - **`lpn_file_export_geojson_tip`**
   > Download this network as a GeoJSON file for QGIS, ArcGIS Pro and other GIS programs. Junctions, tanks and reservoirs are points, and pipes, pumps and valves are lines that follow their vertices. Positions are latitude and longitude. Results are included only when the network has been solved.
+  @@ NEEDS RULING
+- **`lpn_file_export_item_geojson`**
+  > GeoJSON file…
+  @@ NEEDS RULING
+- **`lpn_file_export_item_inp`**
+  > EPANET file…
+  @@ NEEDS RULING
+- **`lpn_file_export_menu`**
+  > Export…
   @@ NEEDS RULING
 - **`lpn_geojson_refused_crs`**
   > The coordinate system of this project ({detail}) is not known to this page, so its positions cannot be converted to latitude and longitude. Use Convert as… to copy the project into one this page knows, then export again.
@@ -844,7 +859,7 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`129b63c4`) — adds no English strings
 
-### feat/screenshot (`8a583e22`) — 9 new, 9 to read @@ NEEDS RULING
+### feat/screenshot (`26d7b515`) — 14 new, 14 to read @@ NEEDS RULING
 
 - **`lpn_screenshot_copied`**
   > Screenshot copied.
@@ -872,6 +887,21 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 - **`lpn_screenshot_tip`**
   > Copy a sharper-than-screen picture of the map area you drag, ready to paste into a report. Click without dragging to take the whole map.
+  @@ NEEDS RULING
+- **`lpn_snip_button`**
+  > Snip
+  @@ NEEDS RULING
+- **`lpn_snip_freehand`**
+  > Freehand
+  @@ NEEDS RULING
+- **`lpn_snip_hint_free`**
+  > Drag around the area to snip, or click for the whole map. Esc cancels.
+  @@ NEEDS RULING
+- **`lpn_snip_pen`**
+  > Pen
+  @@ NEEDS RULING
+- **`lpn_snip_rectangle`**
+  > Rectangle
   @@ NEEDS RULING
 
 ### feat/section-grid (`977b887e`) — adds no English strings
@@ -954,4 +984,11 @@ build for that would be a gate nobody keeps. Refresh it with
   > Export table as ODS
   @@ NEEDS RULING
 
-### feat/tip-door (`32bc317e`) — adds no English strings
+### feat/user-guide (`bcb042ef`) — 2 new, 2 to read @@ NEEDS RULING
+
+- **`lpn_guide_also`**
+  > Also in {menu}
+  @@ NEEDS RULING
+- **`lpn_help_manual`**
+  > User guide
+  @@ NEEDS RULING
