@@ -693,3 +693,4 @@ red builds on 2026-09-15 before anybody wrote it down.
 - 0|765| Closed 2026-10-06 by folding into Task 721, as Tom asked (*"really this should be part of the Advanced (Bentley) scenarios task, not its own task"*). Presentation alternatives are built on `feat/bentley-interop`.
 - 0|766| CLOSED 2026-10-06: Show scenarios in the Tables pane, one row per asset per scenario, Clear override hidden when it cannot act. Tom: "Good. Merge." `pane-show-scenarios-harness.js`, `pane-clear-override-harness.js`.
 - 0|770| CLOSED 2026-10-06: a ⚠ on unreasonable values in Tables and Properties, zero false alarms on the seven examples (`dev/value-warning.md`). Tom: "Merge." The D-W 10 mm and H-W C 200 limits are CC's numbers, unruled. `value-warning-browser-harness.js`.
+- 0|774| CLOSED 2026-10-06: Description in Properties trimmed every keystroke (ate spaces) and its commit refreshed nothing; no length limit existed. Defect track. `description-field-browser-harness.js`.
