@@ -141,6 +141,22 @@ async function main() {
 		s = await st();
 		ok('back on the first network the message shows again', s.text.indexOf(unreach) === 0 && s.x && !s.chip, JSON.stringify(s));
 
+		console.log('\n--- a hidden text is forgotten once it stops showing ---');
+		await place('Junction', 0.1, 0.2);   // J3: the list is J1, J2, J3
+		await wait();
+		s = await st();
+		ok('three unreachable nodes are named', /J1, J2, J3/.test(s.text), s.text);
+		await page.evaluate(() => document.getElementById('lpn_status_dismiss').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 })));
+		await a.settle(300);
+		ok('hidden', (await st()).chip);
+		await page.evaluate(() => { if (document.activeElement) { document.activeElement.blur(); } });
+		await page.keyboard.press('Control+z'); await a.settle(1200);
+		s = await st();
+		ok('undo (the problem changes) shows the shorter list', /J1, J2$/.test(s.text) && s.x && !s.chip, JSON.stringify(s));
+		await page.keyboard.press('Control+y'); await a.settle(1200);
+		s = await st();
+		ok('redo brings the broken state back SHOWING, not hidden', /J1, J2, J3/.test(s.text) && s.x && !s.chip, JSON.stringify(s));
+
 		console.log('\n--- nothing is stored ---');
 		const stored = await page.evaluate(() => {
 			const all = [];
@@ -197,6 +213,10 @@ async function main() {
 		await dragBox();
 		const a2 = await sym();
 		ok('...and a drag zooms', Math.abs(a2.w - b2.w) > 0.01 || Math.abs(a2.x - b2.x) > 5, JSON.stringify([b2, a2]));
+		await page.evaluate(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: '\u0446', code: 'KeyW', bubbles: true })));
+		await a.settle(300);
+		ok('a Russian layout (key ц, code KeyW) enters it', (await mode()).pressed === 'true');
+		await page.keyboard.press('Escape'); await a.settle(300);
 		await page.keyboard.press('W');
 		await a.settle(300);
 		ok('capital W enters it too', (await mode()).pressed === 'true');

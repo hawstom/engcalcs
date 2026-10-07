@@ -4042,7 +4042,9 @@ label > .lpn-valwarn { margin-inline-start: .3em; }
 	color: var(--ec-ink-muted);
 	cursor: pointer;
 }
-.lpn-status-x { font-size: 13px; line-height: 1; }
+.lpn-status-x { font-size: 13px; line-height: 1; position: relative; }
+/* A finger needs about 32 px: widen the hit area without moving the text or the neighbouring button. */
+@media (pointer: coarse) { .lpn-status-x::after { content: ""; position: absolute; top: -9px; bottom: -9px; left: -8px; right: -8px; } }
 .lpn-status-chip { border-color: var(--ec-gray-bbb); }
 .lpn-status-x:hover, .lpn-status-x:focus, .lpn-status-chip:hover, .lpn-status-chip:focus { border-color: var(--ec-gray-bbb); color: var(--ec-ink-strong); }
 .lpn-wrong-btn:hover, .lpn-wrong-btn:focus { border-color: var(--ec-gray-bbb); color: var(--ec-ink-strong); }

@@ -60052,7 +60052,9 @@ var EngCalcs = EngCalcs || {};
 	document.addEventListener('keydown', function (e) {
 		if (e.ctrlKey || e.metaKey || e.altKey) { return; }
 		if (isTextEntry(e.target)) { return; }
-		if (e.key !== 'w' && e.key !== 'W') { return; }
+		// By character, and by physical key so a layout that types something else there (Russian: key
+		// 'ц', code KeyW) still answers, as the menu chords' own e.code rule does.
+		if (e.key !== 'w' && e.key !== 'W' && e.code !== 'KeyW') { return; }
 		// An open menu owns the letters (its rows answer to mnemonics), and it checks defaultPrevented.
 		if (openMenuAnchor) { return; }
 		if (e.preventDefault) { e.preventDefault(); }
@@ -61384,6 +61386,9 @@ var EngCalcs = EngCalcs || {};
 		var el = document.getElementById('lpn_status');
 		if (!el) { return; }
 		statusLast = { text: text || '', code: code || '', hideable: !!(text && hideable) };
+		// A hidden text is FORGOTTEN the moment it is no longer the one showing: fix the problem,
+		// break it again (undo, redo, an edit) and the message must be seen again.
+		Object.keys(statusHidden).forEach(function (k) { if (k !== statusLast.text) { delete statusHidden[k]; } });
 		paintStatus();
 		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
 		// overlay now, so this changes what is COVERED, never what is laid out.
