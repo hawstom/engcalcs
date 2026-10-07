@@ -3419,25 +3419,29 @@ var EngCalcs = EngCalcs || {};
 	//
 	// **PHASE 2 COLLAPSED THE QUESTION FROM THREE ANSWERS TO TWO** (Tom's interface specification,
 	// 2026-09-13). lat/lon is not a third kind beside "projected"; it IS a projection, and the
-	// register names it -- EPSG:3857, WGS 84 / Pseudo-Mercator, which is the frame this page has
-	// drawn in since the projection seam landed. So the catalogue carries it, the New-project box
-	// offers one "geographic projection" radio over the whole list, and EPSG:3857 is the answer
+	// register names it -- EPSG:4326, WGS 84. So the catalogue carries it, the New-project box
+	// offers one "geographic projection" radio over the whole list, and EPSG:4326 is the answer
 	// that produces exactly the lat/lon project this page has always made -- basemap, place-name
-	// search, terrain elevations and all. Everything else in the catalogue is a plane we hold the
-	// user's own eastings and northings in without converting them.
+	// search, terrain elevations and all. Everything else in the catalogue, EPSG:3857 included
+	// since Task 775, is a plane we hold the user's own eastings and northings in without
+	// converting them.
 
-	// **EPSG:3857 IS THE GEOGRAPHIC ANSWER AND IS NEVER STORED AS `project.crs`.** It names the
-	// drawing frame of a lon/lat document, and a document that stated it as a projected plane would
-	// be claiming its numbers are metres. isLatLonProject() is the one thing that answers "is this
-	// document lon/lat", and this constant is only ever the code the CHOOSER hands back.
-	var LPN_CRS_WEBMERC = 'EPSG:3857';
-	// **WGS 84 ITSELF, THE OTHER GEOGRAPHIC ANSWER** (Tom, 2026-09-25: EPSG:4326 was missing from
-	// the chooser and must be an ordinary, unmodified-name option). Its own stored numbers are the
-	// same longitude and latitude degrees LPN_CRS_WEBMERC already means here, so picking either one
-	// makes the identical lat/lon project -- crsIsLatLonCode() is where that equivalence is stated,
-	// and crsBoxOk() is where a 4326 pick is folded onto LPN_CRS_WEBMERC before anything reads it.
+	// **EPSG:4326 IS THE lat/lon PROJECT, AND IT IS NEVER STORED AS `project.crs`.** A lat/lon
+	// document states `project.coords`, and isLatLonProject() is the one thing that answers "is this
+	// document lon/lat"; this constant is only ever the code the CHOOSER hands back for it.
 	var LPN_CRS_GEOWGS84 = 'EPSG:4326';
-	function crsIsLatLonCode(code) { return code === LPN_CRS_WEBMERC || code === LPN_CRS_GEOWGS84; }
+	var LPN_CRS_LATLON = LPN_CRS_GEOWGS84;
+	// **EPSG:3857 IS A PROJECTED SYSTEM LIKE ANY OTHER** (Task 775; Tom, 2026-10-07: *"Make 3857
+	// real. They aren't the same thing, and some pedantic people will notice if 3857 is missing or
+	// doesn't work."*). Until then a 3857 pick was folded onto the lat/lon project (R-218), so the
+	// row named metres and made degrees. Now it is stored as `project.crs` and its numbers are Web
+	// Mercator x and y in metres, exactly as a UTM project's are eastings and northings. Its
+	// transform is closed-form in js/lpn-crs.js (no proj4, no download), and because its map
+	// distances exceed ground distances by 1/cos(latitude), every length read off its coordinates
+	// is a geodesic one -- see isWebMercProject().
+	var LPN_CRS_WEBMERC = 'EPSG:3857';
+	function crsIsLatLonCode(code) { return code === LPN_CRS_LATLON; }
+	function isWebMercProject() { return isProjectedProject() && projectCrsCode() === LPN_CRS_WEBMERC; }
 	// **A PROJECTION'S NAME IS NOT A LANGUAGE KEY**, for the reason the OpenStreetMap credit is not
 	// one: "WGS 84 / UTM zone 12N" is the EPSG register's own name for a registered thing, it names
 	// rather than describes, and a GIS reader in any language looks for exactly those characters.
@@ -3606,14 +3610,14 @@ var EngCalcs = EngCalcs || {};
 	function crsFamilyName(f, z) { return f.name.replace('{z}', String(z)); }
 	function crsCatalogue() {
 		var out = [], i, f, z;
-		// FIRST, because it is the commonest answer and the one Tom's own tip points at.
-		out.push({ code: LPN_CRS_WEBMERC, name: 'WGS 84 / Pseudo-Mercator' });
-		// **AND EPSG:4326 RIGHT BESIDE IT** (Tom, 2026-09-25), the register's own name for the plain
-		// longitude/latitude CRS this page's own lat/lon project actually stores. Both entries lead
-		// to the identical project -- crsIsLatLonCode() -- so neither is a projected CRS the register
-		// list below could duplicate.
+		// FIRST, because it is the commonest answer and the suggested one (Task 775): the plain
+		// longitude/latitude CRS this page's lat/lon project stores, marked as suggested in the list
+		// by crsOptionText().
 		out.push({ code: LPN_CRS_GEOWGS84, name: 'WGS 84' });
-		// The register, once it is here. Pseudo-Mercator is already first and is a live projected
+		// **AND EPSG:3857 RIGHT BESIDE IT**, Web Mercator, which since Task 775 makes a projected
+		// project in metres rather than a second door to the lat/lon one.
+		out.push({ code: LPN_CRS_WEBMERC, name: 'WGS 84 / Pseudo-Mercator' });
+		// The register, once it is here. Pseudo-Mercator is already listed and is a live projected
 		// CRS like any other, so it is skipped rather than offered twice. EPSG:4326 is geographic,
 		// not projected, so the register (projected CRS only) never carries it and needs no skip.
 		if (crsRegisterReady()) {
@@ -3748,9 +3752,10 @@ var EngCalcs = EngCalcs || {};
 	function assignProjectCrs(code) {
 		if (!project || !code) { return false; }
 		if (isLatLonProject()) { return false; }
-		// **EPSG:3857 AND EPSG:4326 ARE BOTH THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing
-		// either in the box makes a lon/lat project, and newProject() takes that branch; if either
-		// ever reached here it would write a document claiming its longitudes were metres.
+		// **EPSG:4326 IS THE GEOGRAPHIC ANSWER, NOT A PROJECTED ONE.** Choosing it in the box makes a
+		// lon/lat project, and newProject() takes that branch; if it ever reached here it would write
+		// a document claiming its longitudes were metres. EPSG:3857 is a projected answer like UTM
+		// (Task 775) and is accepted here.
 		if (crsIsLatLonCode(String(code))) { return false; }
 		if (project.crs) { return false; }
 		if (doc && ((doc.nodes && doc.nodes.length) || (doc.links && doc.links.length) ||
@@ -3758,7 +3763,7 @@ var EngCalcs = EngCalcs || {};
 		project.crs = String(code);
 		return true;
 	}
-	// What the status strip says this project is drawn in. EPSG:3857 names itself for a geographic
+	// What the status strip says this project is drawn in. WGS 84 (EPSG:4326) names a geographic
 	// project, and an unprojected grid is a plane the user declared the meaning of that sits nowhere
 	// on the Earth -- which is a fact worth printing rather than leaving blank.
 	/**
@@ -3773,11 +3778,11 @@ var EngCalcs = EngCalcs || {};
 	 */
 	function crsDisplayName() {
 		var pc = EngCalcs.pageConfig || {}, code;
-		// **R-218: NEVER "WGS 84 / Pseudo-Mercator (EPSG:3857)" HERE.** That is the catalogue's own
-		// name for the code this page uses internally to mark a lat/lon project (comment at
-		// LPN_CRS_WEBMERC's declaration), and showing it verbatim told Tom the stored numbers were
-		// projected metres when they are longitude and latitude degrees (R-188). This is the one
-		// place that names a lat/lon project's coordinate system, and it says what the numbers are.
+		// **R-218: A lat/lon PROJECT IS NEVER NAMED "WGS 84 / Pseudo-Mercator (EPSG:3857)".** That
+		// told Tom the stored numbers were projected metres when they are longitude and latitude
+		// degrees (R-188). Since Task 775 EPSG:3857 is a real projected project of its own, named
+		// by the projected branch below. This is the one place that names a lat/lon project's
+		// coordinate system, and it says what the numbers are.
 		//
 		// **THROUGH THE CATALOGUE'S OWN EPSG:4326 ENTRY, NOT A SEPARATE STRING** (Tom, 2026-09-25,
 		// closing R-218's own key: "probably no longer needed since we are not changing any of the
@@ -6461,11 +6466,14 @@ var EngCalcs = EngCalcs || {};
 	function scaleBarUnitsPerPx() {
 		var probe = 100, a, b, metres;
 		if (!svg || !state.s || !isFinite(state.s) || state.s <= 0) { return null; }
-		if (!isLatLonProject()) {
+		if (!isLatLonProject() && !isWebMercProject()) {
 			// A grid project's world unit IS the display length unit, so there is nothing to ask.
 			return 1 / state.s;
 		}
 		if (!Geom || !Geom.geodesicMeters) { return null; }
+		// A Web Mercator project (Task 775): measured on the ground like a lat/lon one, because a
+		// Mercator metre is a ground metre only at the equator.
+		if (isWebMercProject()) { return scaleBarWebMercUnitsPerPx(probe); }
 		// The bar sits at the bottom left, so it is measured there: same latitude, two points the
 		// probe width apart. y is whatever the bottom of the canvas is; x starts at the left.
 		var r = svg.getBoundingClientRect();
@@ -6480,6 +6488,20 @@ var EngCalcs = EngCalcs || {};
 		// of the screen, and Mercator has pinned the poles besides. Measured in degrees of
 		// longitude because that is what the frame's x axis IS.
 		if (r.width / state.s > SCALEBAR_MAX_DEGREES) { return null; }
+		metres = Geom.geodesicMeters(a.lon, a.lat, b.lon, b.lat);
+		if (!isFinite(metres) || metres <= 0) { return null; }
+		return toDisplay(metres / probe, 'lpn_u_length');
+	}
+
+	// The scale bar of a Web Mercator project: the same probe at the bottom left, its two ends taken
+	// to longitude and latitude through drawLonLat(), and the same whole-window test in degrees.
+	function scaleBarWebMercUnitsPerPx(probe) {
+		var r = svg.getBoundingClientRect(), w0, w1, a, b, metres;
+		if (!r || !r.width) { return null; }
+		w0 = screenToWorld(r.left, r.bottom); w1 = screenToWorld(r.left + probe, r.bottom);
+		a = drawLonLat(w0.x, w0.y); b = drawLonLat(w1.x, w1.y);
+		if (!a || !b || !isFinite(a.lat) || !isFinite(b.lon)) { return null; }
+		if (Math.abs(b.lon - a.lon) * r.width / probe > SCALEBAR_MAX_DEGREES) { return null; }
 		metres = Geom.geodesicMeters(a.lon, a.lat, b.lon, b.lat);
 		if (!isFinite(metres) || metres <= 0) { return null; }
 		return toDisplay(metres / probe, 'lpn_u_length');
@@ -7235,8 +7257,21 @@ var EngCalcs = EngCalcs || {};
 	// of a number anybody typed. Getting that wrong is silent: a 1200 ft pipe comes back as 366 and
 	// looks like a units bug in the solver.
 
+	// **A WEB MERCATOR PROJECT IS MEASURED ON THE GROUND TOO** (Task 775). Its x and y are metres,
+	// but Mercator metres: a map distance exceeds the ground distance by 1/cos(latitude), 31% at
+	// 40 degrees. So each vertex is taken back to longitude and latitude (drawLonLat(), the closed
+	// form in js/lpn-crs.js) and the polyline is measured with the same geodesicPolylineMeters()
+	// as a lat/lon project, never hypot() on the plane.
 	function linkGeomLength(l) {
-		var pts = linkPointList(l);
+		var pts = linkPointList(l), ll, bad = false;
+		if (isWebMercProject()) {
+			ll = pts.map(function (p) {
+				var q = drawLonLat(p.x, p.y);
+				if (!q) { bad = true; return { x: 0, y: 0 }; }
+				return { x: q.lon, y: q.lat };
+			});
+			if (!bad) { return Geom.geodesicPolylineMeters(ll) * unitFactor('lpn_u_length'); }
+		}
 		if (!isLatLonProject()) { return Geom.polylineLength(pts); }
 		return Geom.geodesicPolylineMeters(pts.map(function (p) {
 			return { x: outwardX(p.x), y: outwardY(p.y) };
@@ -10402,7 +10437,14 @@ var EngCalcs = EngCalcs || {};
 	// ground distance at a given latitude -- which is what lets a meter be drawn as a SQUARE in
 	// world units and still be square on the screen.
 	function metresPerWorldUnit(x, y) {
-		var f, d = 0.001, m, lon, lat;
+		var f, d = 0.001, m, lon, lat, a, b;
+		// A Web Mercator project (Task 775): a world unit is a Mercator metre, which is cos(latitude)
+		// of a ground metre. Measured, as below, rather than a cosine typed out a second time.
+		if (isWebMercProject() && Geom && Geom.geodesicMeters) {
+			a = drawLonLat(x, y); b = drawLonLat(x + 1, y);
+			m = (a && b) ? Geom.geodesicMeters(a.lon, a.lat, b.lon, b.lat) : NaN;
+			if (isFinite(m) && m > 0) { return m; }
+		}
 		if (!isLatLonProject()) {
 			f = unitFactor('lpn_u_length');
 			return (f && isFinite(f)) ? 1 / f : 1;
@@ -11645,6 +11687,12 @@ var EngCalcs = EngCalcs || {};
 	// with the same geodesic a pipe's Auto length is measured with.
 	function customerOffsetUnitsPerDrawn(c) {
 		var l = customerLink(c), an, n;
+		// Web Mercator (Task 775): one scale at a point serves every direction, to well within the
+		// accuracy of an offset (the sphere-on-ellipsoid departure is a fraction of a percent).
+		if (l && isWebMercProject()) {
+			an = Geom.pointAlongPolyline(linkPointList(l), customerT(c));
+			return metresPerWorldUnit(an.x, an.y) * unitFactor('lpn_u_length');
+		}
 		if (!l || !isLatLonProject()) { return 1; }
 		an = Geom.pointAlongPolyline(linkPointList(l), customerT(c));
 		n = linkNormalAt(l, customerT(c));
@@ -16247,7 +16295,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (georef) { return; }
 		// **A lat/lon PROJECT IS NOT A REASON TO REFUSE** (Task 696; Tom, 2026-09-23: the wizard
-		// *"exits with the message 'This project is already on lat/lon'"*). lat/lon is EPSG:3857 on
+		// *"exits with the message 'This project is already on lat/lon'"*). lat/lon is EPSG:4326 on
 		// this page, one coordinate system among hundreds, so being on it says nothing about whether
 		// somebody may convert to another. It says where the network already is, so the wizard opens
 		// with that answer in place rather than asking the question again from the whole world.
@@ -37155,7 +37203,7 @@ var EngCalcs = EngCalcs || {};
 	// exact factors still fail in doubles (150 * 0.3048 / 0.3048 is 149.99999999999997).
 	//
 	// **THE THREE COORDINATE CASES ARE HIS** (R-155): an EPSG coordinate system (lat/lon is
-	// EPSG:3857 here, one of them), an unnamed (local) georeference, and not georeferenced.
+	// EPSG:4326 here, one of them), an unnamed (local) georeference, and not georeferenced.
 	//
 	// **WHERE THE COORDINATES ARE CONVERTED: ON THE SAVED DOCUMENT, NOT THE LIVE ONE.** A saved
 	// document states its frame plainly -- Cartesian, absolute through `origin`, and longitude and
@@ -37165,11 +37213,11 @@ var EngCalcs = EngCalcs || {};
 	// existing wizard, unchanged, which is where every conversion to a new place already went.
 	var convas = null;          // a conversion in flight, from the box to the end of the placement
 	var convasUnits = [];       // [{ name, sel, item }], cloned from the strip as the New project box does
-	var convasPick = { crs: LPN_CRS_WEBMERC, place: null };
+	var convasPick = { crs: LPN_CRS_LATLON, place: null };
 	var convasWired = false;
 	// Which of the three cases this project is, plus the EPSG code when it states one.
 	function projectCoordKind() {
-		if (isLatLonProject()) { return { kind: 'epsg', crs: LPN_CRS_WEBMERC }; }
+		if (isLatLonProject()) { return { kind: 'epsg', crs: LPN_CRS_LATLON }; }
 		if (projectCrsCode()) { return { kind: 'epsg', crs: projectCrsCode() }; }
 		return { kind: xyGeorefOk() ? 'unnamed' : 'none', crs: '' };
 	}
@@ -37222,13 +37270,8 @@ var EngCalcs = EngCalcs || {};
 			off = convasKind() !== 'epsg';
 		if (b) { b.disabled = off; }
 		if (n) {
-			// R-218: the same lat/lon name crsDisplayName() reads off the catalogue's own EPSG:4326
-			// entry, not the catalogue's Pseudo-Mercator name -- crsBoxOk() has already folded any
-			// 4326 pick onto LPN_CRS_WEBMERC by the time convasPick.crs is read here, so this is the
-			// one comparison that still needs to ask which code it is.
-			n.textContent = convasPick.crs === LPN_CRS_WEBMERC
-				? crsOptionText({ code: LPN_CRS_GEOWGS84, name: crsLabel(LPN_CRS_GEOWGS84) })
-				: crsOptionText({ code: convasPick.crs, name: crsLabel(convasPick.crs) });
+			// The same name crsDisplayName() prints: lat/lon is the catalogue's own EPSG:4326 entry.
+			n.textContent = crsOptionText({ code: convasPick.crs, name: crsLabel(convasPick.crs) });
 			n.className = off ? 'lpn-new-crs-name lpn-dim' : 'lpn-new-crs-name';
 		}
 	}
@@ -37267,7 +37310,7 @@ var EngCalcs = EngCalcs || {};
 				// row selected is the UTM zone the network sits in. The pick itself does not change
 				// until Select, so Cancel still leaves a plain copy.
 				var place = convasPick.place || networkPlace(),
-					start = convasPick.crs === LPN_CRS_WEBMERC ? (crsUtmCodeFor(place) || convasPick.crs) : convasPick.crs;
+					start = convasPick.crs === LPN_CRS_LATLON ? (crsUtmCodeFor(place) || convasPick.crs) : convasPick.crs;
 				openCrsBox(start, place, function (code, ll) {
 					convasPick.crs = code;
 					convasPick.place = ll || convasPick.place;
@@ -37289,7 +37332,7 @@ var EngCalcs = EngCalcs || {};
 		closeViewPopovers();
 		wireConvasBox();
 		convasFor = library.openId;
-		convasPick = { crs: from.kind === 'epsg' ? from.crs : LPN_CRS_WEBMERC, place: null };
+		convasPick = { crs: from.kind === 'epsg' ? from.crs : LPN_CRS_LATLON, place: null };
 		convasSetKind(from.kind);
 		// Attaching the world map IS a placement, and an empty project has nothing to place, so that
 		// one answer is offered only where it already is the project's own.
@@ -37369,7 +37412,7 @@ var EngCalcs = EngCalcs || {};
 			rounding[k] = s ? String(s.value || '') : '';
 			suffix[k] = sf ? String(sf.value || '') : '';
 		});
-		return { kind: kind, crs: kind === 'epsg' ? String(convasPick.crs || LPN_CRS_WEBMERC) : '',
+		return { kind: kind, crs: kind === 'epsg' ? String(convasPick.crs || LPN_CRS_LATLON) : '',
 			units: units, rounding: rounding, suffix: suffix };
 	}
 	// The box is not modal, so a tab switch can happen under it; its answers were read off the
@@ -37386,8 +37429,8 @@ var EngCalcs = EngCalcs || {};
 	// FROM side is named: its caller, convasProceed(), fails only while reading the project's own
 	// coordinates. runConvertAs() names the missing side itself, before anything is copied.
 	function convasForeignCrs(from, to) {
-		if (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC) { return from.crs; }
-		if (to.kind === 'epsg' && to.crs !== LPN_CRS_WEBMERC) { return to.crs; }
+		if (from.kind === 'epsg' && from.crs !== LPN_CRS_LATLON) { return from.crs; }
+		if (to.kind === 'epsg' && to.crs !== LPN_CRS_LATLON) { return to.crs; }
 		return '';
 	}
 	function convasNoTransformMessage(pc, code) {
@@ -37400,11 +37443,11 @@ var EngCalcs = EngCalcs || {};
 	// this page cannot transform refuses up front rather than half way through.
 	function runConvertAs(a) {
 		var pc = EngCalcs.pageConfig || {}, from = projectCoordKind(),
-			to = { kind: a.kind, crs: a.kind === 'epsg' ? String(a.crs || LPN_CRS_WEBMERC) : '' },
+			to = { kind: a.kind, crs: a.kind === 'epsg' ? String(a.crs || LPN_CRS_LATLON) : '' },
 			changed = convasCrsChanged(from, to), need = [], bornAs = library.openId;
 		if (changed) {
-			if (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC) { need.push(from.crs); }
-			if (to.kind === 'epsg' && to.crs !== LPN_CRS_WEBMERC) { need.push(to.crs); }
+			if (from.kind === 'epsg' && from.crs !== LPN_CRS_LATLON) { need.push(from.crs); }
+			if (to.kind === 'epsg' && to.crs !== LPN_CRS_LATLON) { need.push(to.crs); }
 		}
 		if (!need.length) { convasProceed(a, from, to, changed); return; }
 		var refuse = function (code) {
@@ -37427,7 +37470,7 @@ var EngCalcs = EngCalcs || {};
 	// where it is. Null for the case that does not.
 	function savedLonLatReader(saved, from) {
 		var t = saved.project && saved.project.georef;
-		if (from.kind === 'epsg' && from.crs === LPN_CRS_WEBMERC) { return function (p) { return { x: p.x, y: p.y }; }; }
+		if (from.kind === 'epsg' && from.crs === LPN_CRS_LATLON) { return function (p) { return { x: p.x, y: p.y }; }; }
 		if (from.kind === 'epsg') {
 			return function (p) {
 				var ll = EngCalcs.lpnCrsInverse(from.crs, p);
@@ -37715,7 +37758,11 @@ var EngCalcs = EngCalcs || {};
 		// Null for lat/lon, whose unit is a degree and has no one ground length.
 		var bdTurn = saved.project.georef && isFinite(saved.project.georef.rotDeg) ? saved.project.georef.rotDeg : 0;
 		var srcUnitM = from.kind === 'unnamed' && saved.project.georef ? saved.project.georef.metersPerUnit
-			: (from.kind === 'epsg' && from.crs !== LPN_CRS_WEBMERC ? planeUnitMetres(from.crs) : null);
+			: (from.kind === 'epsg' && from.crs !== LPN_CRS_LATLON ? planeUnitMetres(from.crs) : null);
+		// A Web Mercator metre is cos(latitude) of a ground metre (Task 775), read at the first node.
+		if (from.kind === 'epsg' && from.crs === LPN_CRS_WEBMERC && doc.nodes.length && isWebMercProject()) {
+			srcUnitM = metresPerWorldUnit(doc.nodes[0].x, doc.nodes[0].y);
+		}
 		name = (pc.lpn_copy_of || 'Copy of {name}').replace('{name}', projectDisplayName(project));
 		// **A COPY IS A DIFFERENT DOCUMENT AND MUST NOT CARRY THE ORIGINAL'S IDENTITY.** The docId is
 		// what the lock broker and every live file handle key on.
@@ -37739,7 +37786,7 @@ var EngCalcs = EngCalcs || {};
 			// **AN EMPTY PROJECT: NO COORDINATE TO MOVE, SO NO PLACEMENT STEPS** (Task 775). The copy
 			// states the system asked for and opens on that system's own default view; the old
 			// origin and view were numbers in the old frame and would mean nothing in the new one.
-			if (to.kind === 'epsg' && to.crs === LPN_CRS_WEBMERC) { savedSetKind(saved, 'geo'); }
+			if (to.kind === 'epsg' && to.crs === LPN_CRS_LATLON) { savedSetKind(saved, 'geo'); }
 			else if (to.kind === 'epsg') { savedSetKind(saved, 'epsg', to.crs); }
 			else { savedSetKind(saved, 'none'); }
 			delete saved.origin;
@@ -37757,7 +37804,7 @@ var EngCalcs = EngCalcs || {};
 				}, false);
 				if (ok) { savedSetKind(saved, 'none'); }
 			} else {
-				if (!(from.kind === 'epsg' && from.crs === LPN_CRS_WEBMERC)) {
+				if (!(from.kind === 'epsg' && from.crs === LPN_CRS_LATLON)) {
 					ok = !!toLL && convertSavedGeometry(saved, toLL, true);
 					if (ok) { savedSetKind(saved, 'geo'); }
 				}
@@ -37794,7 +37841,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, c = convas, saved, t2, ok = true, prepared;
 		convas = null;
 		if (!c || c.copyId !== library.openId) { return; }
-		if (c.step === 'attach' || (c.to.kind === 'epsg' && c.to.crs === LPN_CRS_WEBMERC)) { return; }
+		if (c.step === 'attach' || (c.to.kind === 'epsg' && c.to.crs === LPN_CRS_LATLON)) { return; }
 		try { saved = JSON.parse(JSON.stringify(serializeProject())); } catch (err) { saved = null; }
 		if (!saved || !saved.project) { return; }
 		if (c.to.kind === 'epsg') {
@@ -40844,11 +40891,11 @@ var EngCalcs = EngCalcs || {};
 		return (r && r.value) ? String(r.value) : 'local';
 	}
 	// **THE BOX'S OWN ANSWER TO THE PROJECTION QUESTION, AND THE PLACE THAT CAME WITH IT.**
-	// EPSG:3857 to begin with, which is Tom's own recommendation in the radio's tip and which makes
-	// exactly the lat/lon project this page has always made. `place` is whatever the projection
+	// EPSG:4326 to begin with, the suggested row (Task 775), which makes exactly the lat/lon
+	// project this page has always made. `place` is whatever the projection
 	// box's place-name search last found: it filters the catalogue there, and it is where the new
 	// project opens here, so one search answers two questions.
-	var newBoxGeo = { crs: LPN_CRS_WEBMERC, place: null };
+	var newBoxGeo = { crs: LPN_CRS_LATLON, place: null };
 	// The chooser states the answer and changes it, so its LABEL is the projection now in force.
 	function syncNewBoxCrsPick() {
 		var b = document.getElementById('lpn_new_crs_pick'),
@@ -40955,16 +41002,17 @@ var EngCalcs = EngCalcs || {};
 			code = onEarth ? String(newBoxGeo.crs || '') : '', units = {};
 		newBoxUnits.forEach(function (u) { units[u.name] = u.sel.value; });
 		return {
-			// **EPSG:3857 IS THE lat/lon PROJECT AND EVERY OTHER CODE IS A PROJECTED ONE.** That is
+			// **EPSG:4326 IS THE lat/lon PROJECT AND EVERY OTHER CODE IS A PROJECTED ONE** (EPSG:3857
+			// included since Task 775). That is
 			// the whole of what collapsing three radios into two costs: one comparison, here, at the
 			// one place the box's answer becomes a project. The two kinds are genuinely different
 			// documents -- one stores degrees and draws Web Mercator behind them, the other stores
 			// the plane's own eastings and northings -- and this is where they part.
-			geo: onEarth && code === LPN_CRS_WEBMERC,
+			geo: onEarth && code === LPN_CRS_LATLON,
 			// Only when the geographic radio is the one checked: a code left over from a chooser
 			// nobody opened is a declaration nobody made, and this is the one declaration that can
 			// never be withdrawn.
-			crs: (onEarth && code !== LPN_CRS_WEBMERC) ? code : '',
+			crs: (onEarth && code !== LPN_CRS_LATLON) ? code : '',
 			// The point the place-name search found, not the words that found it: the search has
 			// already run, in the projection box, so this costs no second request.
 			place: onEarth ? newBoxGeo.place : null,
@@ -41024,6 +41072,10 @@ var EngCalcs = EngCalcs || {};
 		// multiplies, exactly as a display conversion does.
 		perUnit = unitFactor('lpn_u_length');
 		if (!isFinite(perUnit) || perUnit <= 0) { perUnit = 1; }
+		// **A WEB MERCATOR PLANE IS ALWAYS METRES, AND MERCATOR METRES** (Task 775): a ground metre
+		// spans 1/cos(latitude) of them, the same scale the length code corrects for, so the search
+		// does not land that much too close.
+		if (isWebMercProject()) { perUnit = 1 / Math.max(1e-6, Math.cos(lat * Math.PI / 180)); }
 		sw = w / (wideM * perUnit);
 		sh = h / (highM * perUnit);
 		s = Math.min(sw, sh) * SEARCH_FIT_PAD;
@@ -41201,7 +41253,7 @@ var EngCalcs = EngCalcs || {};
 		// The projection answer resets with the box, for the reason the note above gives: a box that
 		// remembered the last answers would be a fifth kind of stored preference, and a remembered
 		// PLACE is a record of where somebody's network is, which this page stores nowhere.
-		newBoxGeo = { crs: LPN_CRS_WEBMERC, place: null };
+		newBoxGeo = { crs: LPN_CRS_LATLON, place: null };
 		buildNewBoxUnits();
 		method = document.getElementById('lpn_new_method');
 		if (method) { method.value = frictionMethod(); }
@@ -41275,13 +41327,10 @@ var EngCalcs = EngCalcs || {};
 	 * everything, so a mark drawn from it would brand all 5,346. This returns false while the
 	 * answer is not yet knowable, and openCrsBox() asks for the load and re-renders when it lands.
 	 *
-	 * **NEITHER LAT/LON CODE EVER ASKS lpnCrsHas() AT ALL** (Tom, 2026-09-25, on finding "(no map)"
-	 * beside "WGS 84 / Pseudo-Mercator (EPSG:3857)" -- the very projection the map is drawn in).
-	 * js/lpn-crs.js's proj4 definitions cover PROJECTED systems; EPSG:3857 and EPSG:4326 both mean
-	 * this page's own native lat/lon project, placed with the hand-written Mercator math
-	 * (Geom.mercLat/mercY) this page has always drawn its basemap with, never through proj4 --
-	 * lpnCrsHas('3857') and lpnCrsHas('4326') both correctly answer false, and asking either was the
-	 * defect, not the answer.
+	 * **THE lat/lon CODE NEVER ASKS lpnCrsHas() AT ALL** (Tom, 2026-09-25, on finding "(no map)"
+	 * beside a lat/lon row). EPSG:4326 is this page's own native lat/lon project, placed with the
+	 * hand-written Mercator math (Geom.mercLat/mercY), never through proj4. EPSG:3857 is asked like
+	 * any projected code, and js/lpn-crs.js answers true for it at all times (closed form, Task 775).
 	 */
 	function crsCannotBePlaced(code) {
 		if (!code || crsIsLatLonCode(code)) { return false; }
@@ -41302,7 +41351,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		return text;
 	}
-	var crsBox = { code: LPN_CRS_WEBMERC, place: null, onPick: null };
+	var crsBox = { code: LPN_CRS_LATLON, place: null, onPick: null };
 	function crsBoxEl() { return document.getElementById('lpn_crsbox'); }
 	function crsBoxViewOn() {
 		var c = document.getElementById('lpn_crsbox_view');
@@ -41330,6 +41379,12 @@ var EngCalcs = EngCalcs || {};
 			opt = document.createElement('option');
 			opt.value = list[i].code;
 			opt.textContent = crsOptionText(list[i]);
+			// **THE SUGGESTED ROW** (Task 775): latitude and longitude, marked in the list only.
+			// Not in crsOptionText(), which also names the project on the status strip, where a
+			// recommendation would read as a property of the project.
+			if (list[i].code === LPN_CRS_LATLON) {
+				opt.textContent += ' ' + (pc.lpn_crs_suggested_mark || '(suggested)');
+			}
 			sel.appendChild(opt);
 		}
 		// Membership is decided from the LIST rather than by writing to the select and reading it
@@ -41379,12 +41434,9 @@ var EngCalcs = EngCalcs || {};
 			code = (sel && sel.value) ? String(sel.value) : crsBox.code,
 			pick = crsBox.onPick;
 		closeCrsBox();
-		// **BOTH LAT/LON ENTRIES ANSWER AS LPN_CRS_WEBMERC**, the one code every caller downstream
-		// (New project, Convert as) already knows means "make the lat/lon project". EPSG:3857 and
-		// EPSG:4326 are offered as two unmodified, honestly-named rows so nothing in the register is
-		// hidden (Tom, 2026-09-25); which one somebody clicked never needs to be told apart again
-		// after this point, because both name the identical project.
-		if (pick) { pick(crsIsLatLonCode(code) ? LPN_CRS_WEBMERC : code, crsBox.place); }
+		// **NO FOLD** (Task 775). EPSG:4326 is the lat/lon project and EPSG:3857 is a projected one
+		// in metres; until Task 775 a 3857 pick was answered as 4326 here (R-218).
+		if (pick) { pick(code, crsBox.place); }
 	}
 	var crsBoxWired = false;
 	function wireCrsBox() {
@@ -41444,7 +41496,7 @@ var EngCalcs = EngCalcs || {};
 		var box = crsBoxEl(), h, r, v;
 		if (!box) { return; }
 		wireCrsBox();
-		crsBox.code = code || LPN_CRS_WEBMERC;
+		crsBox.code = code || LPN_CRS_LATLON;
 		crsBox.onPick = onPick || null;
 		// **THE MAP VIEW, WHEN THERE IS ONE TO READ.** The point comes from the open project when
 		// it can, from the caller when it was found earlier in this box, and from the place-name

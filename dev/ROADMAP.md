@@ -236,8 +236,8 @@ the block.
   Tom, 2026-10-06. FIXED: Convert as on an empty project opened a file picker (it now opens the box).
   NOT REPRODUCED: the old project losing its node symbols and its view after a conversion
   (`convert-as-fotobi-harness.js`, four paths, master and production 9c71d54f); ask which surface.
-  HIS CALL: EPSG:3857 and 4326 are the same lat/lon project here (R-218), so choosing 3857 in File,
-  New or Convert as silently becomes 4326. Options: explain, hide the 3857 row, or make 3857 real.
+  BUILT on `feat/web-mercator`, awaiting his pass: EPSG:3857 is a real projected project in metres
+  (his call, 2026-10-07: "Make 3857 real."), lengths on the ground, 4326 marked suggested.
 - 75|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
