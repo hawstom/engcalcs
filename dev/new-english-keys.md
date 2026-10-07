@@ -12,7 +12,7 @@ What to do with it: read the English, and say where it is wrong. A ruling is a s
 conversation, not an edit — the wording is Tom's and the editing is AI's. Once the wording is
 settled these go into the next translation sprint as a batch.
 
-**59 still to read on master**, of 165 untranslated keys, of 2388 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
+**62 still to read on master**, of 168 untranslated keys, of 2391 English keys. **A branch section follows if anything is waiting there.** A key already marked _Ruled OK_ below needs nothing from you;
 the ruling lapses by itself if the wording changes.
 
 **Search for `@@ NEEDS RULING` to jump to every key that still needs you.** It sits
@@ -73,7 +73,7 @@ never edits a synonym.
   **What this asks for:** WRITTEN PERMISSION to keep, change or remove this `$ec_lang_syn` entry (say which, and the new text if changing).
   _Ruled 2026-10-05: Is this _syn needed?_
 
-## lpn_  (165, 59 to read @@ NEEDS RULING)
+## lpn_  (168, 62 to read @@ NEEDS RULING)
 
 - **`lpn_alt_calc_options`**
   > Calculation options
@@ -311,6 +311,15 @@ never edits a synonym.
   @@ NEEDS RULING
 - **`lpn_find_source_no_chemical`**
   > No chemical is being tracked, so no node has a source.
+  @@ NEEDS RULING
+- **`lpn_hotkeys_snip_def`**
+  > <table class="lpn-notes-table"><tbody><tr><td>S</td><td>Snip, with the Screenshot box open.</td></tr><tr><td>E</td><td>Eraser, in the markup view.</td></tr><tr><td>Ctrl+Z, Ctrl+Y</td><td>Undo and redo, in the markup view.</td></tr><tr><td>Esc</td><td>Cancel a snip, or leave the eraser. In the markup view, close it when nothing is drawn.</td></tr></tbody></table>
+  @@ NEEDS RULING
+- **`lpn_hotkeys_snip_heading`**
+  > Screenshot
+  @@ NEEDS RULING
+- **`lpn_hotkeys_snip_term`**
+  > Screenshot keyboard shortcuts
   @@ NEEDS RULING
 - **`lpn_inp_drop_pressure_unit`**
   > This file states a pressure unit other than the one this page reads for its flow unit, which is psi for US units and meters otherwise. Every pressure in the file is read that way, so check the valve settings, emitters, and pressure driven limits it holds. The line is kept and is written back.
@@ -575,7 +584,7 @@ never edits a synonym.
 
 # Strings waiting on a branch
 
-**164 still to read**, of 167 new keys across 22 unmerged branch(es).
+**164 still to read**, of 167 new keys across 21 unmerged branch(es).
 
 A feature waits on its branch until you have used it and said so, so this is where new
 wording lives before it reaches master. **These strings are real and are not on master**,
@@ -586,7 +595,7 @@ fresh by the build — a branch moves whenever anybody commits on it, and failin
 build for that would be a gate nobody keeps. Refresh it with
 `php dev/scripts/new_english_keys.php --write`.
 
-### chore/technical-english (`8e4d66b8`) — adds no English strings
+### chore/technical-english (`4be0b5b5`) — adds no English strings
 
 ### feat/backdrop-attach (`929d7ec9`) — 7 new, 7 to read @@ NEEDS RULING
 
@@ -936,10 +945,16 @@ build for that would be a gate nobody keeps. Refresh it with
 
 ### feat/label-placer-d (`2e5e81c4`) — adds no English strings
 
-### feat/screenshot (`8a48a1d7`) — adds no English strings
+### feat/screenshot (`9c96822f`) — adds no English strings
 
-### feat/section-grid (`89905957`) — 1 new, 1 to read @@ NEEDS RULING
+### feat/section-grid (`0345725c`) — 3 new, 3 to read @@ NEEDS RULING
 
+- **`points_data_msg_line`**
+  > Nothing was pasted. Line {n} could not be read as a station and an elevation.
+  @@ NEEDS RULING
+- **`points_data_msg_none`**
+  > Nothing was pasted. No station and elevation pairs were found.
+  @@ NEEDS RULING
 - **`points_data_points_heading`**
   > Points data<br />(use Copy to see format)
   @@ NEEDS RULING
@@ -1010,7 +1025,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > {j} junction(s), {r} reservoir(s), {t} tank(s), and {p} pipe(s) imported, {m} of the nodes with elevation.
   @@ NEEDS RULING
 
-### feat/table-export (`3442c883`) — 10 new, 10 to read @@ NEEDS RULING
+### feat/table-export (`0de5ecbd`) — 10 new, 10 to read @@ NEEDS RULING
 
 - **`lpn_export_table_all`**
   > All
@@ -1124,7 +1139,7 @@ build for that would be a gate nobody keeps. Refresh it with
   > Guide
   @@ NEEDS RULING
 
-### feat/visit-dedupe (`82261d32`) — adds no English strings
+### feat/visit-dedupe (`2de0a88e`) — adds no English strings
 
 ### feat/web-mercator (`850558e1`) — 1 new, 1 to read @@ NEEDS RULING
 
@@ -1133,12 +1148,3 @@ build for that would be a gate nobody keeps. Refresh it with
   @@ NEEDS RULING
 
 ### fix/label-node-overlap (`fe5c3d57`) — adds no English strings
-
-### fix/points-paste-2 (`c84a876e`) — 2 new, 2 to read @@ NEEDS RULING
-
-- **`points_data_msg_line`**
-  > Nothing was pasted. Line {n} could not be read as a station and an elevation.
-  @@ NEEDS RULING
-- **`points_data_msg_none`**
-  > Nothing was pasted. No station and elevation pairs were found.
-  @@ NEEDS RULING
