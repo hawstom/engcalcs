@@ -12,8 +12,12 @@
 //   3. A bad file (not JSON, wrong format, a newer version) is refused with a message, changes no
 //      stored key and does not reload. A good file with entries it does not know applies what it
 //      knows, ignores the rest, reports the count, and never writes a project or index key.
-//   4. The page's own allow-list is what the check reads (workspace_keys_check.php), and that
-//      check fails on a key written that is in neither list.
+//   4. The check (workspace_keys_check.php) fails on a non-`lpn_` key that is neither carried nor
+//      excluded, and lets a new `lpn_` furniture key ride along.
+//   6. Tom's sequence (2026-10-07): fifteen boxes docked as auto-hide tabs, exported, Alternatives
+//      (top left) and Properties (top right) closed, imported: a confirm first, whose Cancel changes
+//      nothing; Replace brings both back, all fifteen docked in the same order, still fifteen after
+//      a further reload.
 'use strict';
 
 const fs = require('fs');
@@ -50,8 +54,10 @@ function ok(label, cond, detail) {
 	console.log((cond ? '  ok   ' : '  FAIL ') + label + (detail === undefined ? '' : '   ' + detail));
 }
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'lpn-workspace-'));
-const KEYS = fs.readFileSync(path.join(REPO, 'js/looped-network.js'), 'utf8')
-	.match(/var LPN_WORKSPACE_KEYS = \[([\s\S]*?)\];/)[1].match(/'([^']+)'/g).map((s) => s.slice(1, -1));
+const { strips, dockHidden } = require('./dock-boxes.js');
+// What the page itself carries: every lpn_ key it does not exclude, plus its named extras.
+const carried = (a, k) => a.page.evaluate((x) => EngCalcs.lpnWorkspaceCarries(x), k);
+const heldKeys = (a) => a.page.evaluate(() => Object.keys(localStorage).filter((k) => EngCalcs.lpnWorkspaceCarries(k)).sort());
 
 async function openNet3(browser) {
 	const a = await Session.open(browser, NAME, { viewport: { width: 1400, height: 900 } });
@@ -103,8 +109,10 @@ async function exportWorkspace(a) {
 	await dl.saveAs(file);
 	return { name: dl.suggestedFilename(), text: fs.readFileSync(file, 'utf8') };
 }
-// Offer a file to File > Import > Workspace.
-async function importWorkspace(a, text, fname) {
+// Offer a file to File > Import > Workspace. A file the page can use is first met by the confirm
+// (Tom: "Add a confirm"); `answer` is the button pressed there, and the dialog after it is returned.
+// A file the page refuses never reaches the confirm, so its refusal is what comes back.
+async function importWorkspace(a, text, fname, answer) {
 	const file = path.join(TMP, fname || 'in.json');
 	fs.writeFileSync(file, text);
 	const [chooser] = await Promise.all([
@@ -112,6 +120,11 @@ async function importWorkspace(a, text, fname) {
 		a.menuClickSub(await a.lang('lpn_file_import_menu'), await a.lang('lpn_file_import_workspace'))
 	]);
 	await chooser.setFiles(file);
+	const first = await a.waitDialog(6000);
+	if (!first || first.text !== await a.lang('lpn_workspace_confirm')) { return first; }
+	await a.dialogClick(answer || await a.lang('lpn_replace_btn'));
+	await a.settle(300);
+	if (answer === await a.lang('lpn_cancel')) { return null; }
 	return a.waitDialog(6000);
 }
 
@@ -144,12 +157,13 @@ async function main() {
 		const doc = JSON.parse(out.text);
 		ok('it declares its format and version', doc.format === 'engcalcs-lpn-workspace' && doc.version === 1, doc.format + ' v' + doc.version);
 		ok('it carries both boxes', !!doc.settings.lpn_setbox && !!doc.settings.lpn_findbox, Object.keys(doc.settings).join(', '));
-		ok('every key in it is on the allow-list', Object.keys(doc.settings).every((k) => KEYS.indexOf(k) >= 0));
+		const carriedAll = await Promise.all(Object.keys(doc.settings).map((k) => carried(a, k)));
+		ok('every key in it is one the workspace carries', carriedAll.every(Boolean));
 		ok('no project, index, identity or consent record in it', !/lpn_project_|lpn_index|lpn_identity|lpn_document|ec_consent|ec_geosearch|ec_terrain/.test(out.text));
 		ok('exporting wrote nothing to the device', JSON.stringify(await allKeys(a)) === JSON.stringify(keysBefore));
 
 		console.log('\n--- 2. cleared, reloaded, imported ---');
-		await a.page.evaluate((ks) => ks.forEach((k) => localStorage.removeItem(k)), KEYS);
+		await a.page.evaluate((ks) => ks.forEach((k) => localStorage.removeItem(k)), await heldKeys(a));
 		await a.reload();
 		await a.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
 		await a.settle(1500);
@@ -164,7 +178,7 @@ async function main() {
 		ok('Settings returns in place and size', near(setBefore, setAfter, 2), JSON.stringify([setBefore, setAfter]));
 		ok('Find returns in place and size', near(findBefore, findAfter, 2), JSON.stringify([findBefore, findAfter]));
 		const keysAfter = await allKeys(a);
-		ok('importing created no key that did not already exist on this page', keysAfter.every((k) => keysCleared.indexOf(k) >= 0 || KEYS.indexOf(k) >= 0), keysAfter.filter((k) => keysCleared.indexOf(k) < 0).join(', '));
+		ok('importing created no key but the ones in the file', keysAfter.every((k) => keysCleared.indexOf(k) >= 0 || k in doc.settings), keysAfter.filter((k) => keysCleared.indexOf(k) < 0).join(', '));
 
 		console.log('\n--- 3. bad files are refused; unknown entries are ignored ---');
 		await a.page.evaluate(() => { window.__noReload = true; delete window.lpnDialogAnswerer; });
@@ -216,15 +230,79 @@ async function main() {
 		ok('no uncaught page errors (after import 5)', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();
 
+		console.log('\n--- 6. Tom\'s sequence: fifteen docks, export, close two, import ---');
+		const b = await Session.open(browser, NAME + '-tom', { viewport: { width: 1600, height: 1000 } });
+		await b.page.route(/tile\.openstreetmap\.org|api\.mapbox\.com/, (route) => route.abort());
+		await b.goto('Looped-Network.php');
+		// Basic mode off, the browser's own setting, so the Alternatives box can be opened.
+		await b.page.evaluate(() => { try { localStorage.setItem('lpn_scnbasic', 'off'); } catch (e) {} });
+		await b.reload();
+		await b.answerTrainingPanel().catch(() => {});
+		const quiet = () => b.page.evaluate(() => { const c = document.getElementById('ec-consent'); if (c) { c.remove(); } delete window.lpnDialogAnswerer; });
+		await quiet();
+		await b.openExampleCard(await b.lang('lpn_ex_net3_title'));
+		await b.settle(800);
+		const L = ['lpn_alt_box', 'lpn_energy_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_calib_box', 'lpn_full_box'];
+		const R = ['lpn_popup', 'lpn_settings_box', 'lpn_find_popup', 'lpn_library_box', 'lpn_contour_box', 'lpn_ff_box', 'lpn_crit_box', 'lpn_ds_box'];
+		for (const id of L) { await dockHidden(b, id, 'left'); }
+		for (const id of R) { await dockHidden(b, id, 'right'); }
+		const fifteen = JSON.stringify([L, R]);
+		let st = await strips(b.page);
+		ok('fifteen boxes docked as auto-hide tabs, Alternatives top left and Properties top right', JSON.stringify(st) === fifteen, JSON.stringify(st));
+		const tomFile = (await exportWorkspace(b)).text;
+		ok('the exported file carries the docks of the boxes with no record of their own', /lpn_dockbox/.test(tomFile) && /lpn_alt_box/.test(tomFile) && /lpn_popup/.test(tomFile));
+		// Close the top one on each edge with its own X, from its flown-out tab.
+		for (const [side, id, x] of [['left', 'lpn_alt_box', 'lpn_alt_close'], ['right', 'lpn_popup', 'lpn_popup_close']]) {
+			await b.page.click('#lpn_dock_strip_' + side + ' .lpn-dock-tab[aria-controls="' + id + '"]');
+			await b.settle(400);
+			await b.page.click('#' + x);
+			await b.settle(400);
+		}
+		st = await strips(b.page);
+		ok('Alternatives and Properties closed: thirteen tabs', st[0].length + st[1].length === 13 && !st[0].includes('lpn_alt_box') && !st[1].includes('lpn_popup'), JSON.stringify(st));
+		const before = await snapshot(b);
+		await b.page.evaluate(() => { window.__noReload = true; });
+		const cancelled = await importWorkspace(b, tomFile, 'tom.json', await b.lang('lpn_cancel'));
+		await b.settle(500);
+		ok('the confirm\'s Cancel changes nothing: no further dialog, no reload, storage as it was',
+			cancelled === null && (await b.dialog()) === null && await b.page.evaluate(() => window.__noReload === true) &&
+			JSON.stringify(await snapshot(b)) === JSON.stringify(before));
+		ok('...and the layout on screen is unchanged', JSON.stringify(await strips(b.page)) === JSON.stringify(st));
+		// The confirm itself: its words and its two buttons.
+		const file2 = path.join(TMP, 'tom2.json');
+		fs.writeFileSync(file2, tomFile);
+		const [ch2] = await Promise.all([b.page.waitForEvent('filechooser', { timeout: 8000 }),
+			b.menuClickSub(await b.lang('lpn_file_import_menu'), await b.lang('lpn_file_import_workspace'))]);
+		await ch2.setFiles(file2);
+		const conf = await b.waitDialog(6000);
+		ok('Import asks first, in the page\'s own dialog, with Replace and Cancel',
+			!!conf && conf.text === await b.lang('lpn_workspace_confirm') && JSON.stringify(conf.buttons) === JSON.stringify([await b.lang('lpn_replace_btn'), await b.lang('lpn_cancel')]),
+			JSON.stringify(conf));
+		await b.dialogClick(await b.lang('lpn_replace_btn'));
+		const rep = await b.waitDialog(6000);
+		ok('Replace applies it and says the page reloads', !!rep && /reload/.test(rep.text), rep && rep.text);
+		await Promise.all([b.page.waitForNavigation({ timeout: 10000 }), b.dialogClick('OK')]);
+		await quiet();
+		await b.settle(2000);
+		st = await strips(b.page);
+		ok('(a) the two closed boxes are back, (b) all fifteen docked in the same order', JSON.stringify(st) === fifteen, JSON.stringify(st));
+		await b.reload();
+		await quiet();
+		await b.settle(1500);
+		st = await strips(b.page);
+		ok('...and still fifteen, in order, after a further reload', JSON.stringify(st) === fifteen, JSON.stringify(st));
+		ok('no uncaught page errors (Tom\'s sequence)', b.errors.length === 0, b.errors.slice(0, 2).join(' | '));
+		await b.close();
+
 		console.log('\n--- 4. the allow-list check fails on a key that is in neither list ---');
 		const php = `define('WORKSPACE_KEYS_LIB_ONLY', true);
 require ${JSON.stringify(path.join(REPO, 'dev/scripts/workspace_keys_check.php'))};
-$f = ecWorkspaceFindings(['js/x.js' => "localStorage.setItem('lpn_newbox', '1');\\nlocalStorage.setItem('lpn_pane', '1');"], ['lpn_pane'], ['lpn_index'], []);
+$f = ecWorkspaceFindings(['js/x.js' => "localStorage.setItem('lpn_newbox', '1');\\nlocalStorage.setItem('ec_newpref', '1');\\nlocalStorage.setItem('bpn_sketch_toggles', '1');"], ['bpn_sketch_toggles'], ['lpn_index'], []);
 echo json_encode($f);`;
 		const res = spawnSync('php', ['-r', php], { encoding: 'utf8' });
 		let f = [];
 		try { f = JSON.parse(res.stdout); } catch (e) { /* reported below */ }
-		ok('a new unclassified key is a finding that names it', f.length === 1 && /lpn_newbox/.test(f[0]), res.stdout + res.stderr);
+		ok('a new lpn_ furniture key rides along; a new key outside lpn_ is a finding that names it', f.length === 1 && /ec_newpref/.test(f[0]), res.stdout + res.stderr);
 		const real = spawnSync('php', [path.join(REPO, 'dev/scripts/workspace_keys_check.php')], { encoding: 'utf8' });
 		ok('the real tree passes the check', real.status === 0, real.stdout.trim());
 	} finally {

@@ -9461,6 +9461,7 @@ var EngCalcs = EngCalcs || {};
 	var contourboxLayout = newBoxLayout();
 	contourboxLayout.userSized = false;
 	function saveContourboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_CONTOURBOX_KEY, JSON.stringify(contourboxLayout)); } catch (e) {}
 	}
 	function wireContourBox() {
@@ -21647,6 +21648,7 @@ var EngCalcs = EngCalcs || {};
 		if (findDockRec.autohide) { v.autohide = true; }
 		if (findDockRec.dockW) { v.dockW = findDockRec.dockW; }
 		if (findDockRec.dockOrd !== undefined) { v.dockOrd = findDockRec.dockOrd; }
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_FINDBOX_KEY, JSON.stringify(v)); } catch (e) {}
 	}
 	function loadFindLayout() {
@@ -22013,6 +22015,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function activePaneTab() { return paneTabById(paneState.tab) || paneTabs[0]; }
 	function savePaneState() {
+		if (furnitureFrozen) { return; }
 		try { localStorage.setItem(LPN_PANE_KEY, JSON.stringify(paneState)); } catch (e) {}
 	}
 	function loadPaneState() {
@@ -22296,6 +22299,7 @@ var EngCalcs = EngCalcs || {};
 	function rpaneEl() { return document.getElementById('lpn_rpane'); }
 	function rpaneIsOpen() { return !!rpaneState.open; }
 	function saveRPaneState() {
+		if (furnitureFrozen) { return; }
 		try { localStorage.setItem(LPN_RPANE_KEY, JSON.stringify(rpaneState)); } catch (e) {}
 	}
 	function loadRPaneState() {
@@ -24495,6 +24499,7 @@ var EngCalcs = EngCalcs || {};
 		return paneColPrefs[specId];
 	}
 	function savePaneColPrefs() {
+		if (furnitureFrozen) { return; }
 		try { localStorage.setItem(LPN_PANECOLS_KEY, JSON.stringify(paneColPrefs)); } catch (e) {}
 	}
 	// The width a column is drawn at: what the reader dragged it to, else the rule-based initial
@@ -42057,22 +42062,17 @@ var EngCalcs = EngCalcs || {};
 	// can be given the same layout. **It adds no storage**: it reads and writes only keys this page
 	// already keeps, and a person has to choose the command to make either happen.
 	//
-	// **ONE DECLARED LIST, AND A CHECK THAT KEEPS IT HONEST.** LPN_WORKSPACE_KEYS is the allow-list;
-	// LPN_WORKSPACE_EXCLUDED names every other thing this suite writes to localStorage and why it is
-	// not a preference. dev/scripts/workspace_keys_check.php fails when a key is written anywhere in
-	// js/ that is in neither, so a new box can never be silently left out of the workspace. Keep
-	// both as plain arrays of string literals: the check reads them from the source text.
+	// **EVERY `lpn_` KEY RIDES, EXCEPT THE ONES DECLARED NOT TO.** A workspace carries every
+	// localStorage key that begins `lpn_`, plus the few named in LPN_WORKSPACE_EXTRA, and leaves out
+	// what LPN_WORKSPACE_EXCLUDED names (an entry ending in `_` names a prefix). So a box that gains
+	// its own furniture key tomorrow rides in the workspace with no edit here; only a key that is NOT
+	// window furniture or a preference -- a document, an identity -- has to be declared, in
+	// LPN_WORKSPACE_EXCLUDED. dev/scripts/workspace_keys_check.php fails on a key written anywhere in
+	// js/ that neither rule reaches. Keep both as plain arrays of string literals: the check reads
+	// them from the source text.
 	var LPN_WORKSPACE_FORMAT = 'engcalcs-lpn-workspace';
 	var LPN_WORKSPACE_VERSION = 1;
-	var LPN_WORKSPACE_KEYS = [
-		// Panes and the table columns.
-		'lpn_pane', 'lpn_rpane', 'lpn_panecols',
-		// The standing boxes: position, size, openness, docking.
-		'lpn_setbox', 'lpn_findbox', 'lpn_libbox', 'lpn_ffbox', 'lpn_energybox', 'lpn_cmpbox',
-		'lpn_reportbox', 'lpn_statusbox', 'lpn_fullbox', 'lpn_contourbox', 'lpn_notesbox',
-		'lpn_hotkeysbox', 'lpn_snipbox',
-		// Reading preferences set deliberately on this screen.
-		'lpn_runbox', 'lpn_scnbasic', 'lpn_areahint', 'lpn_survey_format',
+	var LPN_WORKSPACE_EXTRA = [
 		// The Branched-Network sketch's five checkboxes: a browser preference on a sibling page.
 		'bpn_sketch_toggles'
 	];
@@ -42084,11 +42084,30 @@ var EngCalcs = EngCalcs || {};
 		// Legacy keys nothing writes any more; a workspace must not resurrect them.
 		'lpn_show_titles', 'lpn_menucue'
 	];
+	function workspaceCarries(k) {
+		if (typeof k !== 'string') { return false; }
+		if (LPN_WORKSPACE_EXTRA.indexOf(k) >= 0) { return true; }
+		if (k.indexOf('lpn_') !== 0) { return false; }
+		return !LPN_WORKSPACE_EXCLUDED.some(function (x) {
+			return x === k || (x.charAt(x.length - 1) === '_' && k.indexOf(x) === 0);
+		});
+	}
+	// Every carried key this browser holds now.
+	function workspaceKeysHeld() {
+		var out = [], i, k;
+		try {
+			for (i = 0; i < localStorage.length; i++) {
+				k = localStorage.key(i);
+				if (workspaceCarries(k)) { out.push(k); }
+			}
+		} catch (e) { /* private mode: nothing held */ }
+		return out.sort();
+	}
 	// What is read off the device for a workspace file, as {key: raw string}. A key that is absent
 	// stays absent: several of these exist only while they differ from the default.
 	function workspaceCollect() {
 		var out = {}, raw;
-		LPN_WORKSPACE_KEYS.forEach(function (k) {
+		workspaceKeysHeld().forEach(function (k) {
 			try { raw = localStorage.getItem(k); } catch (e) { raw = null; }
 			if (typeof raw === 'string') { out[k] = raw; }
 		});
@@ -42112,15 +42131,12 @@ var EngCalcs = EngCalcs || {};
 		var input = document.getElementById('lpn_workspace_file');
 		if (input) { input.click(); }
 	}
-	// The four records that are a short plain word and not a JSON object: every other carried key
-	// holds JSON.
-	var LPN_WORKSPACE_PLAIN = ['lpn_runbox', 'lpn_scnbasic', 'lpn_areahint', 'lpn_survey_format'];
-	// A value is usable when it is a string a loader here could have written: a short plain word for
-	// the four plain keys, a JSON object or array that parses for the rest.
+	// A value is usable when it is a string a loader here could have written: a JSON object or array
+	// that parses, or a short plain word (`off`, `0`, a column-order name such as `PNEZD`).
 	function workspaceValueOk(key, v) {
 		var j;
 		if (typeof v !== 'string' || v.length > 20000) { return false; }
-		if (LPN_WORKSPACE_PLAIN.indexOf(key) >= 0) { return v.length <= 40 && !/^[\[{]/.test(v); }
+		if (!/^\s*[\[{]/.test(v)) { return v.length <= 40 && /^[A-Za-z0-9_.-]*$/.test(v); }
 		try { j = JSON.parse(v); } catch (e) { return false; }
 		return !!j && typeof j === 'object';
 	}
@@ -42129,7 +42145,7 @@ var EngCalcs = EngCalcs || {};
 	// value is moved, into this window: the bar fully inside, below the menu and toolbar.
 	function workspaceClampBox(key, raw) {
 		var v, w, floor, maxLeft, maxTop;
-		if (LPN_WORKSPACE_PLAIN.indexOf(key) >= 0) { return raw; }
+		if (!/^\s*\{/.test(raw)) { return raw; }
 		try { v = JSON.parse(raw); } catch (e) { return raw; }
 		if (!v || typeof v.left !== 'number' || typeof v.top !== 'number') { return raw; }
 		w = typeof v.w === 'number' && isFinite(v.w) ? v.w : 0;
@@ -42142,8 +42158,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	/** Pure: what a workspace file's text would do, with nothing applied. `ok:false` carries the
 	 * language key of the refusal. Exported for the harness. */
-	function workspacePlan(text) {
-		var doc, set = {}, drop = [], ignored = 0, k, allowed = {};
+	function workspacePlan(text, held) {
+		var doc, set = {}, drop = [], ignored = 0, k;
 		try { doc = JSON.parse(text); } catch (e) { return { ok: false, why: 'lpn_workspace_refused_unreadable' }; }
 		if (!doc || typeof doc !== 'object' || doc.format !== LPN_WORKSPACE_FORMAT
 			|| !doc.settings || typeof doc.settings !== 'object' || Array.isArray(doc.settings)) {
@@ -42155,48 +42171,61 @@ var EngCalcs = EngCalcs || {};
 		if (doc.version > LPN_WORKSPACE_VERSION) {
 			return { ok: false, why: 'lpn_workspace_refused_newer', version: doc.version };
 		}
-		LPN_WORKSPACE_KEYS.forEach(function (key) { allowed[key] = true; });
 		for (k in doc.settings) {
 			if (!Object.prototype.hasOwnProperty.call(doc.settings, k)) { continue; }
-			if (!allowed[k] || !workspaceValueOk(k, doc.settings[k])) { ignored++; continue; }
+			if (!workspaceCarries(k) || !workspaceValueOk(k, doc.settings[k])) { ignored++; continue; }
 			set[k] = workspaceClampBox(k, doc.settings[k]);
 		}
-		// A key the file does not carry is a key at its default, so it is cleared: otherwise a
-		// layout flag that exists only while it is OFF could never be switched back by an import.
-		LPN_WORKSPACE_KEYS.forEach(function (key) { if (!Object.prototype.hasOwnProperty.call(set, key)) { drop.push(key); } });
+		// **THE FILE REPLACES THE LAYOUT; IT IS NOT MERGED OVER IT** (Tom, 2026-10-07: boxes he closed
+		// after exporting did not come back on import). A carried key this browser holds that the
+		// file does not is a key at its default, so it is cleared: a box closed or docked since the
+		// export, or a flag that exists only while it is OFF, goes back to what the file says.
+		(held || workspaceKeysHeld()).forEach(function (key) { if (!Object.prototype.hasOwnProperty.call(set, key)) { drop.push(key); } });
 		return { ok: true, set: set, drop: drop, ignored: ignored };
 	}
 	function importWorkspaceFromFile(file) {
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
 		reader.onerror = function () { tellNotice(pc.lpn_workspace_refused_unreadable || 'This file could not be read as a workspace, so nothing was changed.'); };
 		reader.onload = function () {
-			var plan = workspacePlan(String(reader.result || '')), nSet = 0, nDrop = 0, msg;
+			var plan = workspacePlan(String(reader.result || ''));
 			if (!plan.ok) {
 				tellNotice((pc[plan.why] || 'This is not a workspace file saved by this page.').split('{version}').join(String(plan.version || '')));
 				return;
 			}
-			// The open project is autosaved before the page reloads, so the reload loses nothing.
-			saveToStorage();
-			try {
-				Object.keys(plan.set).forEach(function (k) { localStorage.setItem(k, plan.set[k]); nSet++; });
-				plan.drop.forEach(function (k) {
-					if (localStorage.getItem(k) !== null) { localStorage.removeItem(k); nDrop++; }
-				});
-			} catch (e) {
-				tellNotice(pc.lpn_workspace_refused_storage || 'Browser storage is full or unavailable, so the workspace was not applied.');
-				return;
-			}
-			msg = (pc.lpn_workspace_imported || 'Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.')
-				.split('{file}').join(file.name || '').split('{n}').join(String(nSet)).split('{r}').join(String(nDrop));
-			if (plan.ignored) {
-				msg += ' ' + (pc.lpn_workspace_ignored || 'Entries ignored because they were not recognized: {u}.').split('{u}').join(String(plan.ignored));
-			}
-			logMessage(msg, 'notice');
-			askDialog({ kind: 'alert', text: msg }, function () { window.location.reload(); });
+			// **ASK FIRST** (Tom, 2026-10-07: *"Add a confirm"*). Cancel changes nothing.
+			askDialog({ kind: 'confirm', text: pc.lpn_workspace_confirm || "Replace this browser's layout with the one in the file?",
+				ok: pc.lpn_replace_btn || 'Replace' }, function (yes) { if (yes) { applyWorkspacePlan(plan, file); } });
 		};
 		reader.readAsText(file);
 	}
+	function applyWorkspacePlan(plan, file) {
+		var pc = EngCalcs.pageConfig || {}, nSet = 0, nDrop = 0, msg;
+		// The open project is autosaved before the page reloads, so the reload loses nothing.
+		saveToStorage();
+		// **AND NOTHING ON THIS PAGE MAY WRITE ITS LAYOUT AGAIN BEFORE THE RELOAD**: a box closed by
+		// the dialog, a resize observer, a pane settling would each put this page's own record back
+		// over the one just imported.
+		furnitureFrozen = true;
+		try {
+			Object.keys(plan.set).forEach(function (k) { localStorage.setItem(k, plan.set[k]); nSet++; });
+			plan.drop.forEach(function (k) {
+				if (localStorage.getItem(k) !== null) { localStorage.removeItem(k); nDrop++; }
+			});
+		} catch (e) {
+			furnitureFrozen = false;
+			tellNotice(pc.lpn_workspace_refused_storage || 'Browser storage is full or unavailable, so the workspace was not applied.');
+			return;
+		}
+		msg = (pc.lpn_workspace_imported || 'Workspace applied from {file}. Settings applied: {n}. Returned to their defaults: {r}. The page reloads now, once, to lay out your boxes.')
+			.split('{file}').join(file.name || '').split('{n}').join(String(nSet)).split('{r}').join(String(nDrop));
+		if (plan.ignored) {
+			msg += ' ' + (pc.lpn_workspace_ignored || 'Entries ignored because they were not recognized: {u}.').split('{u}').join(String(plan.ignored));
+		}
+		logMessage(msg, 'notice');
+		askDialog({ kind: 'alert', text: msg }, function () { window.location.reload(); });
+	}
 	EngCalcs.lpnWorkspacePlan = workspacePlan;
+	EngCalcs.lpnWorkspaceCarries = workspaceCarries;
 	// **THE THREE IMPORT ROWS, APART FROM THE MENU THAT SHOWS THEM** (Task 718), the same split
 	// iconGuideRows() takes from openHelpMenu(): a harness can ask what the submenu offers without
 	// driving a popup. Each row is unchanged from the flat list it moved out of -- same icon, same
@@ -42687,6 +42716,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_NOTESBOX_KEY = 'lpn_notesbox';
 	var notesboxLayout = newBoxLayout();
 	function saveNotesboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_NOTESBOX_KEY, JSON.stringify(notesboxLayout)); } catch (e) {}
 	}
 	// **OPENS AT THE MAP'S TOP-RIGHT, NOT CENTRED, THE FIRST TIME** (setboxHomeCorner() -- the same
@@ -42772,6 +42802,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_HOTKEYSBOX_KEY = 'lpn_hotkeysbox';
 	var hotkeysboxLayout = newBoxLayout();
 	function saveHotkeysboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_HOTKEYSBOX_KEY, JSON.stringify(hotkeysboxLayout)); } catch (e) {}
 	}
 	function openHotkeysBox() {
@@ -43012,6 +43043,7 @@ var EngCalcs = EngCalcs || {};
 	snipboxLayout.scale = SNIP_SCALE;
 	delete snipboxLayout.open;   // openness is not recorded (see above); the key is never written
 	function saveSnipboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_SNIPBOX_KEY, JSON.stringify(snipboxLayout)); } catch (e) {}
 	}
 	function wireSnipBox() {
@@ -44808,6 +44840,7 @@ var EngCalcs = EngCalcs || {};
 		dockBooting = true;
 		restoreOpenBoxes();
 		restoreDockedShared();
+		restoreDefaultDocks();
 		dockBooting = false;
 		// **The banner has to be painted on the BOOT path too.** refreshAllFromDocument() ends with
 		// this call but is shared by openProject() and newProject() only, so the one situation the
@@ -50829,6 +50862,7 @@ var EngCalcs = EngCalcs || {};
 	// to stop treating every field as a number; that is the one thing this addition costs.
 	var setboxLayout = { left: null, top: null, w: null, h: null, ix: null, open: false };
 	function saveSetboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_SETBOX_KEY, JSON.stringify(setboxLayout)); } catch (e) {}
 	}
 	function loadSetboxLayout() {
@@ -51791,6 +51825,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_LIBBOX_KEY = 'lpn_libbox';
 	var libboxLayout = { left: null, top: null, w: null, h: null, open: false };
 	function saveLibboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_LIBBOX_KEY, JSON.stringify(libboxLayout)); } catch (e) {}
 	}
 	function loadLibboxLayout() {
@@ -52069,6 +52104,76 @@ var EngCalcs = EngCalcs || {};
 	// that fact alone.
 	var LPN_DOCKBOX_KEY = 'lpn_dockbox';
 	var dockShared = null;
+	// **EVERY BOX'S SAVER ASKS THIS FIRST.** Two things hold a write back. A workspace import sets
+	// `furnitureFrozen` between writing the imported layout and the reload, so nothing this page
+	// still has open can put its own record back over the one just imported. And the first-visit
+	// docks below (`dockDefaultHold`) are shown without being stored: the boot restore's own saves
+	// are swallowed, and the first save after it -- the visitor changing something -- writes every
+	// dock at once, so a reload after that keeps the whole layout and not just the one box touched.
+	var furnitureFrozen = false, dockDefaultHold = false;
+	function boxSaveHeld() {
+		if (furnitureFrozen) { return true; }
+		if (!dockDefaultHold) { return false; }
+		if (dockBooting) { return true; }
+		dockDefaultHold = false;
+		dockBoxes.forEach(function (d) { if (d.save && d.rec.dock) { d.save(); } });
+		return false;
+	}
+	// **A FIRST VISIT STARTS WITH TOM'S DOCKS** (Tom, 2026-10-07, card E02: *"I want to give the
+	// initial user default my auto-hidden docks ... It's cheap discoverability"*). Auto-hide tabs,
+	// top to bottom, named by box and not by label so a renamed report row changes nothing here.
+	// Only a browser that holds NO box record and no `lpn_dockbox` gets them; any saved layout is
+	// the visitor's own and is left alone. Not on a phone, where nothing docks: a phone opens as it
+	// always did. Nothing is stored until the visitor changes something (boxSaveHeld()).
+	var LPN_DEFAULT_DOCKS = {
+		left: ['lpn_energy_box', 'lpn_scncmp_box', 'lpn_rptbox', 'lpn_status_box', 'lpn_calib_box', 'lpn_full_box'],
+		right: ['lpn_settings_box', 'lpn_popup', 'lpn_find_popup', 'lpn_library_box', 'lpn_contour_box',
+			'lpn_ff_box', 'lpn_crit_box', 'lpn_ds_box']
+	};
+	// **A BROWSER DRIVEN BY A TEST HARNESS STARTS WITHOUT THEM** (navigator.webdriver), because two
+	// hundred harnesses were written against a first visit with no docks; a harness that wants them
+	// says so with `window.EC_DEFAULT_DOCKS = true` in an init script (dock-default-harness.js).
+	function defaultDocksWanted() {
+		if (window.EC_DEFAULT_DOCKS === true) { return true; }
+		if (window.EC_DEFAULT_DOCKS === false) { return false; }
+		return !(navigator && navigator.webdriver);
+	}
+	function applyDefaultDocks() {
+		var byId = {};
+		if (!defaultDocksWanted() || smallScreen()) { return; }
+		try {
+			if (localStorage.getItem(LPN_DOCKBOX_KEY) !== null) { return; }
+			if (dockBoxes.some(function (d) { return d.key && localStorage.getItem(d.key) !== null; })) { return; }
+		} catch (e) { return; }
+		dockBoxes.forEach(function (d) { byId[d.box.id] = d; });
+		['left', 'right'].forEach(function (side) {
+			LPN_DEFAULT_DOCKS[side].forEach(function (id, i) {
+				var d = byId[id];
+				if (!d) { return; }
+				d.rec.dock = side;
+				d.rec.autohide = true;
+				d.rec.dockOrd = i;
+				d.open = true;
+				d.byDefault = true;
+			});
+		});
+		dockDefaultHold = true;
+	}
+	function restoreDefaultDocks() {
+		var openers = {
+			lpn_energy_box: openEnergyBox, lpn_scncmp_box: openScenarioCompareBox,
+			lpn_rptbox: function () { openRunReportBox(true); }, lpn_status_box: openStatusReportBox,
+			lpn_calib_box: openCalibBox, lpn_full_box: openFullReportBox,
+			lpn_settings_box: function () { openSettingsBox(); }, lpn_popup: openPopupEmpty,
+			lpn_find_popup: function () { toggleFindPopup(null, true); }, lpn_library_box: openLibraryBox,
+			lpn_contour_box: openContourBox, lpn_ff_box: openFireFlowBox,
+			lpn_crit_box: openCriticalityBox, lpn_ds_box: openDemandScaleBox
+		};
+		if (!dockDefaultHold) { return; }
+		dockBoxes.slice().sort(dockByOrd).forEach(function (d) {
+			if (d.byDefault && !dockBoxShown(d) && openers[d.box.id]) { openers[d.box.id](); }
+		});
+	}
 	function dockSharedLoad() {
 		var raw = null, v = null;
 		if (dockShared) { return dockShared; }
@@ -52081,6 +52186,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function saveDockShared() {
 		var v = {}, n = 0;
+		if (boxSaveHeld()) { return; }
 		dockBoxes.forEach(function (d) {
 			var r;
 			if (!d.shared || !d.rec.dock) { return; }
@@ -52630,7 +52736,7 @@ var EngCalcs = EngCalcs || {};
 	function registerDockBox(id, rec, save, key, tipKey) {
 		var box = document.getElementById(id), pc = EngCalcs.pageConfig || {}, x, row, d, tip;
 		if (!box || box.__lpnDock) { return; }
-		d = { box: box, rec: rec || {}, save: save || null, help: null, tab: null, shared: !key, open: false };
+		d = { box: box, rec: rec || {}, save: save || null, help: null, tab: null, shared: !key, open: false, key: key || null };
 		if (d.shared) {
 			readDockFields(dockSharedLoad()[id], d.rec);
 			d.open = !!d.rec.dock && !!(dockSharedLoad()[id] || {}).open;
@@ -52707,6 +52813,7 @@ var EngCalcs = EngCalcs || {};
 			['lpn_notes_popup', notesboxLayout, saveNotesboxLayout, LPN_NOTESBOX_KEY],
 			['lpn_hotkeys_popup', hotkeysboxLayout, saveHotkeysboxLayout, LPN_HOTKEYSBOX_KEY]
 		].forEach(function (r) { registerDockBox(r[0], r[1], r[2], r[3], r[4]); });
+		applyDefaultDocks();
 		dockRankUnranked();
 		document.addEventListener('pointerdown', dockCloseHelpTips, true);
 		dockWasSmall = smallScreen();
@@ -64542,6 +64649,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_FFBOX_KEY = 'lpn_ffbox';
 	var ffboxLayout = newBoxLayout();
 	function saveFfboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_FFBOX_KEY, JSON.stringify(ffboxLayout)); } catch (e) {}
 	}
 	function wireFireFlowBox() {
@@ -65813,6 +65921,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_CMPBOX_KEY = 'lpn_cmpbox';
 	var cmpboxLayout = newBoxLayout();
 	function saveCmpboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_CMPBOX_KEY, JSON.stringify(cmpboxLayout)); } catch (e) {}
 	}
 	function wireScenarioCompareBox() {
@@ -65851,6 +65960,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_ENERGYBOX_KEY = 'lpn_energybox';
 	var energyboxLayout = newBoxLayout();
 	function saveEnergyboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_ENERGYBOX_KEY, JSON.stringify(energyboxLayout)); } catch (e) {}
 	}
 	// ---- THE EPANET RUN REPORT, THE SIXTH BOX (ROADMAP Task 570) --------------------------------
@@ -65941,6 +66051,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_RPTBOX_KEY = 'lpn_reportbox';
 	var rptboxLayout = newBoxLayout();
 	function saveRptboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_RPTBOX_KEY, JSON.stringify(rptboxLayout)); } catch (e) {}
 	}
 	function wireRunReportBox() {
@@ -66156,6 +66267,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_STATUSBOX_KEY = 'lpn_statusbox';
 	var statusboxLayout = newBoxLayout();
 	function saveStatusboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_STATUSBOX_KEY, JSON.stringify(statusboxLayout)); } catch (e) {}
 	}
 	function wireStatusReportBox() {
@@ -66646,6 +66758,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_FULLBOX_KEY = 'lpn_fullbox';
 	var fullboxLayout = newBoxLayout();
 	function saveFullboxLayout() {
+		if (boxSaveHeld()) { return; }
 		try { localStorage.setItem(LPN_FULLBOX_KEY, JSON.stringify(fullboxLayout)); } catch (e) {}
 	}
 	function wireFullReportBox() {

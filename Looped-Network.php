@@ -2143,6 +2143,7 @@ EngCalcs.pageConfig = {
 	lpn_workspace_refused_unreadable: <?=json_encode($ec_lang['lpn_workspace_refused_unreadable'])?>,
 	lpn_workspace_refused_format: <?=json_encode($ec_lang['lpn_workspace_refused_format'])?>,
 	lpn_workspace_refused_newer: <?=json_encode($ec_lang['lpn_workspace_refused_newer'])?>,
+	lpn_workspace_confirm: <?=json_encode($ec_lang['lpn_workspace_confirm'])?>,
 	lpn_workspace_refused_storage: <?=json_encode($ec_lang['lpn_workspace_refused_storage'])?>,
 	lpn_file_export_inp_tip: <?=json_encode($ec_lang['lpn_file_export_inp_tip'])?>,
 	lpn_status_inp_exported: <?=json_encode($ec_lang['lpn_status_inp_exported'])?>,

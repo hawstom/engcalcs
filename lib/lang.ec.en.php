@@ -2103,6 +2103,7 @@ $ec_lang['lpn_workspace_ignored']='Entries ignored because they were not recogni
 $ec_lang['lpn_workspace_refused_unreadable']='This file could not be read as a workspace, so nothing was changed.';
 $ec_lang['lpn_workspace_refused_format']='This is not a workspace file saved by this page, so nothing was changed.';
 $ec_lang['lpn_workspace_refused_newer']='This workspace file was saved by a newer version of this page (format {version}), so nothing was changed.';
+$ec_lang['lpn_workspace_confirm']='Replace this browser\'s layout with the one in the file?';
 $ec_lang['lpn_workspace_refused_storage']='Browser storage is full or unavailable, so the workspace was not applied.';
 $ec_lang['lpn_geojson_refused_local']='A GeoJSON file holds latitude and longitude only, and this project is drawn on a local grid with no place on the Earth. Georeference it first with Map, World map, Attach, then export again.';
 $ec_lang['lpn_geojson_refused_range']='These positions are not valid latitudes and longitudes: {detail}';

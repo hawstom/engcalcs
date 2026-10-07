@@ -105,12 +105,13 @@ const EC_DYNAMIC_STORAGE_SITES = [
         'names'   => ['lpn_pane', 'lpn_rpane', 'lpn_panecols', 'lpn_setbox', 'lpn_findbox', 'lpn_libbox',
             'lpn_ffbox', 'lpn_energybox', 'lpn_cmpbox', 'lpn_reportbox', 'lpn_statusbox', 'lpn_fullbox',
             'lpn_contourbox', 'lpn_notesbox', 'lpn_hotkeysbox', 'lpn_snipbox', 'lpn_runbox',
-            'lpn_scnbasic', 'lpn_areahint', 'lpn_survey_format', 'bpn_sketch_toggles'],
+            'lpn_scnbasic', 'lpn_areahint', 'lpn_survey_format', 'bpn_sketch_toggles', 'lpn_dockbox'],
         'literal' => true,
         'workspace' => true,
         'why'     => 'File > Import > Workspace writes back, only on the visitor\'s command and only '
                    . 'from a file they chose, the browser-scoped keys the page already keeps '
-                   . '(LPN_WORKSPACE_KEYS). It adds no key of its own. workspace_keys_check.php '
+                   . '(every lpn_ key not in LPN_WORKSPACE_EXCLUDED, plus LPN_WORKSPACE_EXTRA). It adds '
+                   . 'no key of its own; a new furniture key joins this list when it is written. workspace_keys_check.php '
                    . 'does not count this site as a writer of those keys.',
     ],
 ];
