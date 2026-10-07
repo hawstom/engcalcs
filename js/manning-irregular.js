@@ -373,6 +373,7 @@ EngCalcs.pageAddCalcRow = function () {
 	this.addManningIrregularStation(station, elevation, d50in, n, isBank);
 };
 
+EngCalcs.pointsFields = ['station', 'elevation'];
 EngCalcs.dataSingletonsCount = 4;
 EngCalcs.dataColumnsFirstRowCount = 2;
 EngCalcs.dataColumnsOtherRowsCount = 4;
