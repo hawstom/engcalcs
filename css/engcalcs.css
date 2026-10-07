@@ -4513,38 +4513,67 @@ html[dir="rtl"] .lpn-guide-rail-collapsed .lpn-guide-railtoggle svg { transform:
 }
 .lpn-corner-guide { font-weight: bold; font-size: 15px; }
 .lpn-guide-none { margin: .5em 0; color: var(--ec-ink-muted); }
-.lpn-guidebox .lpn-guide-section > h2 { font-size: 1.25rem; margin: .6em 0 .25em; }
-.lpn-guide-section h3 { font-size: 1rem; font-weight: bold; margin: .8em 0 .2em; }
+/* **ONE READING COLUMN, TOP TO BOTTOM** (Tom, 2026-10-07: *"Ditch the two-column approach for the
+   right pane and put it all in line. Audit style too."*). Every entry in every section has the same
+   shape: a name line, then its text at the full width of the pane, starting at the pane's own
+   edge -- a toolbar or menu row (icon, name, key), a box entry (its title), a term (dt). Three
+   levels and no more: h2 a section; h3 a group inside it (a menu, or a term such as "Map keyboard
+   shortcuts"), ruled underneath; then the entry names, bold at body size. Rows are buttons and
+   need padding for their hover box, so every other block takes the same inline padding (5 px =
+   4 px padding + 1 px border) and all text lines up on one edge. */
+.lpn-guide-section > h2, .lpn-guide-section > dl, .lpn-guide-section > .lpn-guide-prose,
+.lpn-guide-menu > h3, .lpn-guide-boxentry { padding-inline: 5px; }
+.lpn-guidebox .lpn-guide-section > h2 { font-size: 1.3rem; font-weight: bold; margin: .9em 0 .3em; }
+.lpn-guidebox .lpn-guide-section:first-of-type > h2 { margin-top: .2em; }
+.lpn-guide-menu > h3, .lpn-guide-section dt {
+	font-size: 1.05rem; font-weight: bold; margin: .9em 0 .3em; padding-bottom: .15em;
+	border-bottom: 1px solid var(--ec-border);
+}
+.lpn-guide-section dd { margin: 0 0 .6em; }
+.lpn-guide-boxentry > h3 { font-size: 1rem; font-weight: bold; }
 .lpn-guide-row {
-	display: grid; grid-template-columns: 1.6em minmax(7em, 11em) 1fr auto; column-gap: .6em;
+	display: grid; grid-template-columns: 1.6em 1fr auto; column-gap: .4em; row-gap: 2px;
 	align-items: start; width: 100%; box-sizing: border-box; text-align: start;
 	background: none; border: 1px solid transparent; border-radius: 3px; padding: 3px 4px;
 	color: inherit; font: inherit; cursor: pointer;
 }
 .lpn-guide-row:hover { background: var(--ec-hover-bg); border-color: var(--ec-hover-border); }
 .lpn-guide-row:focus-visible { outline: 2px solid var(--ec-accent); outline-offset: 1px; }
-.lpn-guide-icon { display: inline-flex; justify-content: center; padding-top: 1px; }
+.lpn-guide-icon { grid-column: 1; grid-row: 1; display: inline-flex; justify-content: center; padding-top: 1px; }
 .lpn-guide-icon svg { width: 18px; height: 18px; }
-.lpn-guide-name { font-weight: bold; }
-.lpn-guide-desc { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lpn-guide-name { grid-column: 2; grid-row: 1; font-weight: bold; }
+.lpn-guide-keys { grid-column: 3; grid-row: 1; display: flex; gap: 3px; flex-wrap: wrap; justify-content: flex-end; }
+.lpn-guide-desc { grid-column: 1 / -1; grid-row: 2; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lpn-guide-desc:empty { display: none; }
 .lpn-guide-tip { white-space: pre-line; }
 .lpn-guide-twin { color: var(--ec-ink-muted); font-size: .9em; }
 .lpn-guide-path { white-space: nowrap; }
 .lpn-guide-chev { width: .7em; height: .7em; margin: 0 .2em; vertical-align: middle; fill: none; stroke: currentColor; stroke-width: 1.6; }
 html[dir="rtl"] .lpn-guide-chev { transform: scaleX(-1); }
-.lpn-guide-keys { display: flex; gap: 3px; flex-wrap: wrap; justify-content: flex-end; }
 .lpn-guide-keys kbd {
 	font: inherit; font-size: .85em; padding: 0 .4em; border: 1px solid var(--ec-border-strong);
 	border-radius: 3px; background: var(--ec-gray-f6f6f6); color: var(--ec-ink); white-space: nowrap;
 }
 .lpn-guide-off .lpn-guide-icon, .lpn-guide-off .lpn-guide-name { opacity: .55; }
-.lpn-guide-sub { padding-inline-start: 1.6em; }
+/* A submenu's rows sit under their parent row: the one indent in the pane, and it means nesting. */
+.lpn-guide-sub { margin-inline-start: 1.6em; width: calc(100% - 1.6em); }
 .lpn-guide-rule { margin: 3px 0; border: 0; border-top: 1px solid var(--ec-border); }
+/* The key tables (Map, Screenshot, Tables, Using the guide) are real tables, a key and its action.
+   Inside the Guide they lose the suite's blue cell borders for one quiet rule per row, the key
+   column takes only the width its keys need, and below 520 px of box they stack, key above action,
+   by the same container width that folds nothing else now because nothing else has columns. */
+.lpn-guidebox table.lpn-notes-table, .lpn-guidebox table.lpn-notes-table td { border: 0; }
+.lpn-guidebox table.lpn-notes-table tr { border: 0; border-bottom: 1px solid var(--ec-border); }
+.lpn-guidebox table.lpn-notes-table td { padding: .25em 1em .25em 0; }
+.lpn-guidebox table.lpn-notes-table td:first-child { width: 1%; white-space: nowrap; }
+/* The Tables section's first column is a gesture written out, not a key, so it wraps. */
+.lpn-guidebox [data-guide-section="tables"] table.lpn-notes-table td:first-child { width: 40%; white-space: normal; }
 @container (max-width: 520px) {
-	.lpn-guide-row { grid-template-columns: 1.6em 1fr auto; }
-	.lpn-guide-name { grid-column: 2; grid-row: 1; }
-	.lpn-guide-keys { grid-column: 3; grid-row: 1; }
-	.lpn-guide-desc { grid-column: 2 / 4; grid-row: 2; }
+	.lpn-guidebox table.lpn-notes-table, .lpn-guidebox table.lpn-notes-table tbody,
+	.lpn-guidebox table.lpn-notes-table tr { display: block; width: auto; }
+	.lpn-guidebox .lpn-guide-section[data-guide-section] table.lpn-notes-table td { display: block; width: auto; white-space: normal; }
+	.lpn-guidebox table.lpn-notes-table tr { padding: .25em 0; }
+	.lpn-guidebox table.lpn-notes-table td { padding: 0; }
 }
 /* The SHOW pulse: a guide row points at the real control (a toolbar button or a menu row) and
    never runs it. ~1.5 s, matching GUIDE_PULSE_MS in js/looped-network.js. */
