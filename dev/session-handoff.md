@@ -139,16 +139,17 @@ replayed offline beacon stamped 09-21 made a 5-day log report 15 days), "Is acti
   stored alternatives. Q10 decided by CC (one Clear for all three; may overrule), Q11, Q12 open.
 - Still from before: `feat/desktop`.
 
-### Running at /clear time
+### Label bench
 
-- **Label round 7** (builder branches feat/label-placer-a to -d, four Opus builders, DONE): each got
-  only the public bench files plus the self-test and the strategies doc
-  (`feat/label-placer:dev/label-placement-strategies.md`; judges removed from their trees; never merge
-  `feat/label-placer` into them). Builders finished 2026-10-07; the judge agent is freezing A7-D7 and
-  scoring (`feat/label-placer:dev/label-trials/round-7-plan.md` §5; one worker, on disk,
-  /home/haws/label-trials-work/r7). Builder B read Part B of the rules by accident (disclosed; the
-  round record says how it is treated). His Q1/Q2 answers are recorded on `feat/label-placer`;
-  sharing the self-test, the catalogue and spot_prime rest on his quotes (plan top); he may object.
+- **Label round 7 is SCORED** (`feat/label-placer` e71dfe82, pushed with the four builder branches):
+  `feat/label-placer:dev/label-trials/round-7-2026-10-07.md`, and the phase-1 close drafted in
+  `feat/label-placer:dev/label-trials/phase-1-summary.md`. A7-D7 within a point of each other
+  (78-79% labels vs round 6's best 71.8%); all six hypotheses held; builder B's accidental read of
+  Part B is disclosed and B's blind tests excluded. Round 8 fixes are listed (room-check counts
+  leader ground and own-pipe ground; Part B out of the builders' file). spot_prime still untried.
+  **Question for him:** the drop order. Scenes that do not list the ID drop it first, so labels show
+  bare values ("P=56.67"); moving the ID last shows 40 of 42 labels instead of 32
+  (`feat/label-placer:dev/label-trials/round-7/drop-order-novato.png`).
 
 ### Decisions waiting on him
 
