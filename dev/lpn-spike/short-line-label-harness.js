@@ -79,6 +79,13 @@ const other = L.addLink('pipe', a.id, d.id);
 long._diameter = 6; stub._diameter = 2; other._diameter = 4;
 L.labelSettings().link.id = true;
 L.labelSettings().link.diameter = true;
+// **NODE LABELS OFF: THIS HARNESS IS ABOUT THE PIPE LABEL ON A SHORT PIPE.** With them on, clean
+// ground first (fix/label-clean-ground) moves J2's label off the long pipe, from (193.6, 6.4) to
+// clean ground below the stub at (204.3, 15.9); the content pass then counts the stub's label,
+// at its full measured width, as crowded by it, and the relayout-only zooms below never run the
+// shed that would clear that. Before: no node label moved, stub shown at TW/5 (all passed). After,
+// with node labels on: J2 moved, stub crowded at TW/5 (2 failed). The short-pipe rule is the same.
+Object.keys(L.labelSettings().node).forEach(function (k) { L.labelSettings().node[k] = false; });
 L.refreshLabelText();
 
 // The label is 10 world units wide at this zoom -- wider than the stub, far narrower than the main.

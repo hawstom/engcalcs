@@ -235,7 +235,7 @@ console.log('\n6. The refusal tells the visitor what to do');
 		PC.lpn_geojson_refused_local.indexOf('{detail}') < 0, String(PC.lpn_geojson_refused_local));
 	ok('the range refusal has a {detail} place for the offending node', /\{detail\}/.test(PC.lpn_geojson_refused_range || ''));
 	const php = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
-	['lpn_file_export_geojson', 'lpn_file_export_geojson_tip', 'lpn_geojson_refused_local', 'lpn_geojson_refused_range',
+	['lpn_file_export_item_geojson', 'lpn_file_export_geojson_tip', 'lpn_geojson_refused_local', 'lpn_geojson_refused_range',
 		'lpn_geojson_refused_empty', 'lpn_geojson_results_in', 'lpn_geojson_results_out'].forEach((k) => {
 		ok(k + ' reaches the page', php.indexOf("lpn_" + k.slice(4) + ": <?=json_encode($ec_lang['" + k + "'])?>") >= 0);
 	});

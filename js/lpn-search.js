@@ -433,9 +433,9 @@
 		}).catch(function (err) {
 			if (err && err.kind === 'rate') {
 				notice(t('lpn_search_rate',
-					'The place-name service is asking us to slow down. Wait a minute and try again.'));
+					'The place-name service has limited the request rate. Wait a minute and try again.'));
 			} else if (err && err.kind === 'http') {
-				notice(t('lpn_search_http', 'The place-name service answered with an error.') +
+				notice(t('lpn_search_http', 'The place-name service returned an error.') +
 					' (HTTP ' + err.status + ')');
 			} else if (err && err.name === 'AbortError') {
 				notice(t('lpn_search_timeout',
@@ -443,7 +443,7 @@
 					'works without it.'));
 			} else if (err instanceof SyntaxError) {
 				notice(t('lpn_search_unreadable',
-					'The place-name service answered with something this page could not read.'));
+					'The place-name service returned a response this page could not read.'));
 			} else {
 				notice(t('lpn_search_offline',
 					'We could not reach the place-name service. You may be offline. Everything ' +
@@ -464,7 +464,7 @@
 	EC.lpnSearchOpen = function () {
 		if (!seam || (seam.locatable && !seam.locatable())) { return; }
 		if (inFlight) {
-			notice(t('lpn_search_busy', 'A search is already running. Wait for it to answer.'));
+			notice(t('lpn_search_busy', 'A search is already running. Wait for it to finish.'));
 			return;
 		}
 		mayWeSend(function () {
@@ -497,7 +497,7 @@
 		if (!seam) { return; }
 		if (!to && seam.locatable && !seam.locatable()) { return; }
 		if (inFlight) {
-			notice(t('lpn_search_busy', 'A search is already running. Wait for it to answer.'));
+			notice(t('lpn_search_busy', 'A search is already running. Wait for it to finish.'));
 			return;
 		}
 		var query = String(text == null ? '' : text).trim();
