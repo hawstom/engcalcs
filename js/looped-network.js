@@ -19126,6 +19126,19 @@ var EngCalcs = EngCalcs || {};
 	// The translated word for a stored code, or null where `prop` is not a choice property, or the
 	// code is not one of its choices (a document written by an older version, or hand-edited) --
 	// the caller's own signal to fall back to printing the raw code rather than nothing at all.
+	// **A TYPED CHOICE IS READ AS ITS CODE** (Tom's guide audit, 2026-10-07): the query line takes
+	// the stored code (`'closed'`) or the word the pull-down shows (`'Closed'`, `'Cerrado'`), in
+	// any case, and both mean the same choice. Null for a word that is neither, which the caller
+	// must not quietly turn into the first choice: `Pipe.Closed equal to 'Closed'` once listed
+	// every OPEN pipe that way, because the pull-down reset an unknown word to its first entry.
+	function findChoiceCodeOf(prop, word) {
+		var defs = findChoiceDefs(prop), w = String(word === undefined || word === null ? '' : word).trim().toLowerCase(), i;
+		if (!defs) { return null; }
+		for (i = 0; i < defs.length; i++) {
+			if (String(defs[i][0]).toLowerCase() === w || String(defs[i][1]).toLowerCase() === w) { return defs[i][0]; }
+		}
+		return null;
+	}
 	function findChoiceLabelOf(prop, code) {
 		var defs = findChoiceDefs(prop), i;
 		if (!defs) { return null; }
@@ -20092,6 +20105,8 @@ var EngCalcs = EngCalcs || {};
 				return fail('lpn_find_q_err_value', 'This condition needs a value after it: {op}',
 					{ op: findLabelOf(opDefs, op) }, at);
 			}
+			// A choice is matched by its code: the word on the pull-down is read as the code it names.
+			if (findPropIsChoice(prop) && findChoiceCodeOf(prop, v.v) !== null) { v.v = findChoiceCodeOf(prop, v.v); }
 			return { t: 'cond', scope: scope, prop: prop, op: op, value: v.v };
 		}
 		function primary() {
@@ -20251,7 +20266,7 @@ var EngCalcs = EngCalcs || {};
 			if (!r.ok) {
 				findQueryError = { msg: r.msg + ' ' + findMsg('lpn_find_q_err_pos', '(at character {n})',
 					{ n: String(r.pos + 1) }) };
-			} else if (findAstIsCond(r.ast)) {
+			} else if (findAstIsCond(r.ast) && !findChoiceUnknown(r.ast)) {
 				findState.scope = r.ast.scope; findState.prop = r.ast.prop;
 				findState.op = r.ast.op; findState.value = r.ast.value;
 				findNormalize();
@@ -20261,6 +20276,13 @@ var EngCalcs = EngCalcs || {};
 		}
 		renderFindControls();
 		renderFindMessage();
+	}
+	// A single condition on a choice property whose value names no choice: the pull-down cannot show
+	// it, so it runs as typed (and matches nothing) with the controls put away, rather than being
+	// reset to the first choice and searching for something nobody typed.
+	function findChoiceUnknown(ast) {
+		return findPropIsChoice(ast.prop) && !findOpIsExtreme(ast.op) && !findOpIsValueless(ast.op)
+			&& findChoiceCodeOf(ast.prop, ast.value) === null;
 	}
 	function findControlsShown() { return !findQueryAst && !findQueryError; }
 	function renderFindControls() {
@@ -20639,6 +20661,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	function runFind() {
 		var pc = EngCalcs.pageConfig || {}, run;
+		// A typed query can change the kind of asset found, so Change what was found is rebuilt for
+		// it here: before this, a query typed into the line left that part offering nothing.
+		rebuildReplaceForm();
 		findConnNote = '';
 		findHasRun = true;
 		// The typed query is the one that runs, and an unreadable one runs nothing at all.
@@ -42908,10 +42933,18 @@ var EngCalcs = EngCalcs || {};
 		return out;
 	}
 	// Text as read: table cells and list rows with a space between them, not run together.
+	// All of it: an entry that holds a table also has a heading and paragraphs to match (the Find
+	// and replace chapter), so the cells are spaced apart rather than read alone.
 	function guideTextOf(el) {
-		var cells = el.querySelectorAll ? el.querySelectorAll('td, th') : [];
-		if (cells.length) { return Array.prototype.map.call(cells, function (c) { return c.textContent; }).join(' '); }
-		return String(el.textContent || '');
+		var out = [];
+		if (!el.querySelector || !el.querySelector('td, th')) { return String(el.textContent || ''); }
+		(function walk(n) {
+			var c;
+			if (n.nodeType === 3) { out.push(n.nodeValue); return; }
+			for (c = n.firstChild; c; c = c.nextSibling) { walk(c); }
+			if (n.nodeType === 1 && /^(TD|TH|TR|P|LI|DT|DD|H[1-6])$/.test(n.tagName)) { out.push(' '); }
+		})(el);
+		return out.join('');
 	}
 	function guideMatch(el, q) { return guideFold(guideTextOf(el)).indexOf(q) >= 0; }
 	function guideFilter() {
@@ -42936,6 +42969,8 @@ var EngCalcs = EngCalcs || {};
 			sec.querySelectorAll('dl > dt').forEach(function (dt) {
 				var dd = dt.nextElementSibling, all = !q || guideMatch(dt, q), dhit = false, trs;
 				if (!dd || dd.tagName !== 'DD') { return; }
+				// Inside a box's entry the entry is matched whole, below; its terms are not filtered.
+				if (dt.closest && dt.closest('.lpn-guide-boxentry')) { return; }
 				trs = dd.querySelectorAll('tr');
 				if (trs.length) {
 					trs.forEach(function (tr) { if (guideShowEl(tr, all || guideMatch(tr, q))) { dhit = true; } });
@@ -42990,6 +43025,10 @@ var EngCalcs = EngCalcs || {};
 				p.textContent = String(para).trim();
 				en.appendChild(p);
 			});
+			// A chapter longer than a paragraph or two (Find and replace, Tom 2026-10-07) is written in
+			// the page as <template id="lpn_guide_more_<box id>"> and copied in under its paragraphs.
+			var more = document.getElementById('lpn_guide_more_' + e.id);
+			if (more && more.content) { en.appendChild(document.importNode(more.content, true)); }
 			host.appendChild(en);
 		});
 	}
@@ -43115,6 +43154,26 @@ var EngCalcs = EngCalcs || {};
 		if (smallScreen()) { guideRailPhoneClosed = collapsed; }
 		else { hotkeysboxLayout.rail = collapsed ? 'closed' : 'open'; saveHotkeysboxLayout(); }
 		guideApplyRail();
+	}
+	// **Ctrl+K SEARCHES FOR WHAT IS SELECTED** (Tom, 2026-10-07: *"Open the guide with the current
+	// selection in the search field."*). The selection is SELECTED TEXT: on the page, or inside a
+	// text box that has focus (the page selection does not include a text box's own). A selected map
+	// asset is not used: the guide describes controls, and an asset ID matches nothing in it.
+	// Whitespace is collapsed and the text is cut at 80 characters, a search rather than a passage.
+	function guideSelectedText() {
+		var ae = document.activeElement, t = '';
+		try {
+			if (ae && ae.id !== 'lpn_guide_search' && (ae.tagName === 'TEXTAREA' || (ae.tagName === 'INPUT' && guideTyping(ae)))
+					&& typeof ae.selectionStart === 'number' && ae.selectionEnd > ae.selectionStart) {
+				t = String(ae.value).substring(ae.selectionStart, ae.selectionEnd);
+			} else if (window.getSelection) {
+				var sel = window.getSelection(), node = sel && sel.anchorNode;
+				if (node && node.nodeType !== 1) { node = node.parentNode; }
+				if (!(node && node.closest && node.closest('#lpn_guide_rail'))) { t = String(sel || ''); }
+			}
+		} catch (e) { t = ''; }
+		t = t.replace(/\s+/g, ' ').trim();
+		return t.length > 80 ? t.substring(0, 80).trim() : t;
 	}
 	function guideFocusSearch() {
 		var input = document.getElementById('lpn_guide_search');
@@ -43265,7 +43324,13 @@ var EngCalcs = EngCalcs || {};
 			if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && String(e.key).toLowerCase() === 'k') {
 				if (dialogIsOpen()) { return; }
 				e.preventDefault(); e.stopPropagation();
+				// Read before the guide opens: opening it moves the focus and clears the selection.
+				var picked = guideSelectedText(), si;
 				if (!hotkeysBoxIsOpen()) { openGuideAt(null); }
+				if (picked) {
+					si = document.getElementById('lpn_guide_search');
+					if (si) { si.value = picked; guideFilter(); }
+				}
 				guideFocusSearch();
 			}
 		}, true);

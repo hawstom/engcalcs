@@ -1927,6 +1927,13 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 </aside>
 <div id="lpn_guide_content" class="lpn-guide-content">
 <p id="lpn_guide_none" class="lpn-guide-none" hidden><?=$ec_lang['lpn_find_none']?></p>
+<?php // **USING THE GUIDE COMES FIRST** (Tom, 2026-10-07: *"Shouldn't 'Using the guide' be first?"*). ?>
+<section class="lpn-guide-section" data-guide-section="using">
+<h2><?=$ec_lang['lpn_guide_using_heading']?></h2>
+<dl>
+	<dt><?=$ec_lang['lpn_guide_keys_term']?></dt><dd><?=$ec_lang['lpn_guide_keys_def']?></dd>
+</dl>
+</section>
 <section class="lpn-guide-section" data-guide-section="toolbar">
 <h2><?=$ec_lang['lpn_help_icons']?></h2>
 <p id="lpn_guide_dimnote" class="lpn-guide-prose" hidden><?=$ec_lang['lpn_guide_dimmed']?></p>
@@ -1958,17 +1965,22 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_notes_7_term']?></dt><dd><?=$ec_lang['lpn_notes_7_def']?></dd>
 </dl>
 </section>
-<section class="lpn-guide-section" data-guide-section="using">
-<h2><?=$ec_lang['lpn_guide_using_heading']?></h2>
-<dl>
-	<dt><?=$ec_lang['lpn_guide_keys_term']?></dt><dd><?=$ec_lang['lpn_guide_keys_def']?></dd>
-</dl>
-</section>
 <section class="lpn-guide-section" data-guide-section="boxes">
 <h2><?=$ec_lang['lpn_guide_boxes_heading']?></h2>
 <p class="lpn-guide-prose"><?=$ec_lang['lpn_guide_boxes_intro']?></p>
+<p class="lpn-guide-prose"><?=$ec_lang['lpn_guide_boxes_autohide']?></p>
 <div id="lpn_guide_boxes" class="lpn-guide-list"></div>
 </section>
+<?php // The Find and replace chapter beyond its opening paragraphs (lpn_guide_text_find_popup):
+      // renderGuideBoxes() copies this template into the box's entry. Tom, 2026-10-07: *"The Find
+      // and Replace chapter says nothing about our query language (!!!)"*. ?>
+<template id="lpn_guide_more_lpn_find_popup"><dl>
+	<dt><?=$ec_lang['lpn_guide_find_query_term']?></dt><dd><?=$ec_lang['lpn_guide_find_query_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_find_examples_term']?></dt><dd><?=$ec_lang['lpn_guide_find_examples_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_find_results_term']?></dt><dd><?=$ec_lang['lpn_guide_find_results_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_find_replace_term']?></dt><dd><?=$ec_lang['lpn_guide_find_replace_def']?></dd>
+	<dt><?=$ec_lang['lpn_guide_find_notes_term']?></dt><dd><?=$ec_lang['lpn_guide_find_notes_def']?></dd>
+</dl></template>
 </div>
 </div>
 	</div>
