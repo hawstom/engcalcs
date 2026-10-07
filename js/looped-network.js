@@ -51826,13 +51826,13 @@ var EngCalcs = EngCalcs || {};
 	// untouched, so every isOpen() and every rebuild on this page goes on treating it as open -- it
 	// is only invisible and untouchable.
 	//
-	// **STORAGE: NO NEW KEY.** `dock` ('left' or 'right'), `autohide` (true) and `dockW` (the docked
+	// **STORAGE.** `dock` ('left' or 'right'), `autohide` (true) and `dockW` (the docked
 	// width, px) ride on the furniture record each box ALREADY keeps, the way `open` and `ix` joined
 	// theirs: same purpose, same category, the same row of dev/cookie-storage-inventory.md. Each is
 	// absent while it is the default, so a visitor who never docks anything stores nothing new. The
 	// five boxes that keep no record across a reload (Properties, Criticality, Demand scaling,
-	// Alternatives, Calibration) dock for this page load only -- the ruling they already carry for
-	// their corner.
+	// Alternatives, Calibration) keep their docks in one key of their own, `lpn_dockbox` (see
+	// saveDockShared()); where they float still lasts one page load.
 	//
 	// **NOT ON A PHONE.** Below the one breakpoint every box fills the window (placePanelForScreen()),
 	// so there is no column to dock into: the dock buttons are not offered there, and a box that is

@@ -111,16 +111,16 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_survey_format` | same | Which column order was last chosen when importing a surveyed point list, so the next file opens on the same answer (Task 592). One of eight names such as `PNEZD`, and nothing from the file itself: the coordinates it described have already become junctions by the time it is written. A preference the visitor set deliberately, on this screen, and a fact about the instrument their files come out of rather than about any network |
 | `bpn_sketch_toggles` | `js/branched-network.js` | Which of the five data fields (length, diameter, flow, elevation, pressure) the Branched-Network topology sketch shows. The checkboxes live outside the form, so the page's own input cookie never captures them |
 
-**Docking rides on the box records above, with no new key (Task 441, 2026-10-03).** `lpn_findbox`,
+**Docking rides on the box records above (Task 441, 2026-10-03); the five boxes with no record of their own keep theirs in `lpn_dockbox`.** `lpn_findbox`,
 `lpn_setbox`, `lpn_libbox`, `lpn_ffbox`, `lpn_energybox`, `lpn_cmpbox`, `lpn_reportbox`,
 `lpn_statusbox`, `lpn_fullbox`, `lpn_contourbox`, `lpn_notesbox`, `lpn_hotkeysbox` and `lpn_snipbox` may each also
 hold `dock` (`left` or `right`: the box is docked beside the map on that side), `autohide` (`true`:
 it tucks into a tab at the map's edge), `dockW` (its docked width in pixels) and `dockOrd` (its
-tab's rank along the bar, set when the visitor drags the tab or presses Alt+Arrow on it). Each field is
+rank along its edge, set when the box is docked and when the visitor drags its tab or presses Alt+Arrow on it). Each field is
 absent while it is the default, so a visitor who never docks a box stores nothing new. Same purpose
 and category as the position and size beside them: a panel layout the visitor set deliberately.
-The Properties, Criticality, Demand scaling, Alternatives and Calibration boxes keep no record, so
-their docking lasts for the page load only.
+The Properties, Criticality, Demand scaling, Alternatives and Calibration boxes keep no record of
+their own, so the same fields for them, plus whether each docked one is open, sit in `lpn_dockbox`.
 
 The first three are **exempt** — they hold the document the user made in order to give it back to
 them. So are the rest, on the second limb of the same test: `lpn_identity` is strictly necessary for
