@@ -123,7 +123,7 @@ console.log('\n-- wiring: an aligned label no longer goes through the ordinary r
 	// either, and a movable box for it would be the same phantom this whole branch exists to stop.
 	report(/linkLabelStations\(l\)\.length > 1/.test(body),
 		'and so is a link whose label repeats along it');
-	report(/placeStationedLabels\(stationed, obs, fs\)/.test(body),
+	report(/placeStationedLabels\(stationed, obs, fs(, true)?\)/.test(body),
 		'and both are handed to the station placer, which commits them as obstacles');
 	// The phantom is the thing that must never come back: a movable box for a label the renderer
 	// will not move. What guarantees that is the `return` — the diverted branch must leave before
