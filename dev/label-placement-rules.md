@@ -40,9 +40,11 @@ A layout that breaks one of these is wrong, however good its other numbers.
 **Costs, worst first:** leader on leader is very high cost; label on leader is high cost; label on
 pipe is medium-low cost; leader on pipe is very low cost. A label on a customer is free.
 
-- **R1. When space runs out, give up in this order:** (1) nearness to home if there is convenient
-  available space; (2) wholeness; (3) properties that won't fit, by drop order; (4) the label
-  itself.
+- **R1. Hide a label only because there is no room for it on screen. Never hide it because of how
+  many labels are already showing.** When space runs out, give up in this order: (1) nearness to
+  home if there is convenient available space; (2) wholeness; (3) properties that won't fit, by drop
+  order, **the ID being one of them like any other value: a label keeps the last value in the user's
+  drop order longest, whether that is a value or the ID** (Tom, 2026-10-06); (4) the label itself.
 - **R2. If there is convenient available space, use it if that saves a neighbour's properties.**
 - **R5. Basic leader conventions:** label text is justified to the leader side, never to centre or
   to the far side.
@@ -59,13 +61,17 @@ pipe is medium-low cost; leader on pipe is very low cost. A label on a customer 
 
 #### Time and change
 
-- **R10. Placement never slows a pan or zoom while it's under way.**
+- **R10. Placement never slows a pan or zoom while it's under way. A layout's cost depends on what is
+  on the screen, not on how big the network is. After a zoom settles, labels are back within about
+  one second on a network of any size; if the layout is not finished by then, show what is placed
+  and keep improving it.** (Second sentence from round 5, confirmed by Tom 2026-10-06; the bound is
+  his number, chosen 2026-10-06.)
 - **R11. When zooming in frees room, dropped properties and hidden labels come back.**
 - **R13. The layout always reflects the current network, text and settings.**
 - **R15. Avoid showing the user drastic shifts.** For example, when jumping into an untested
   (unfamiliar) view, hide the labels immediately while you calculate positions instead of showing
   them in unconfirmed positions while you calculate placements. This is to avoid showing the user
-  a drastic shift once you finish calculation.
+  a drastic shift once you finish calculation. The hiding lasts no longer than R10's one second.
 
 ### 4. Hints (may use or ignore)
 
@@ -87,7 +93,9 @@ shown rows and leader come out. The bench (`dev/lpn-spike/label-bench/`) runs ev
 the same scenes (EPA Net1, Net2, Net3, and Net3 on the world map near Novato at several zooms) and
 prints the same scores: breaks of N1, N3, N4 and N5 (must be zero), crossing cost, values and
 labels shown, leader length, churn (a label that moves between two views and shows nothing more
-for it), and time per layout.
+for it), and time per layout. R1's first half (a label hidden only for lack of room) is scored,
+never passed or failed: how often a label is hidden where there was room counts against a layout,
+and no layout fails on it.
 
 The setting R14 names is the user's "Draw link labels along the link line" (Settings, Symbology,
 Labels). A scene carries it as `scene.settings.alignPipeLabels`, with the reading window a turned
@@ -299,3 +307,49 @@ you to write the rules for the new builds starting with (a) Hang the same column
 shared east edge and every ID grows west, into the empty ground you pointed at. No row is held and
 no gap is needed. Both rules then pass. (b) Treat free space as fundamental; Use space well. That
 is not only human, it is biological; it is real."*
+
+### Round 5 proposals, his answers, 2026-10-06
+
+- **R10 scale sentence:** yes, as written. **The bound after a zoom settles:** one second.
+- **R11 tightened to "zooming in never hides a row that was showing":** no.
+- **A definition of "convenient available space":** no. *"No. This is micromanagement. This is what
+  we are running this experiment for. If they all converge on a rule like this, let's stand amazed.
+  If not, let's hold our peace."*
+- **R1 "dropped for lack of room, never by a count or a rank":** to be reworked and brought back.
+  *"Rethink this, reword this, refine this, and bring it back to me. I can see that it is
+  fundamental (discretionary environmental constraint, not a control knob), not to be discovered.
+  But I don't know what it's saying."*
+  **Reworded and brought back; Tom, 2026-10-05: yes.** The rule: *"Hide a label only because there
+  is no room for it on screen. Never hide it because of how many labels are already showing."*
+  Tom: *"Yes. This seems so obvious as to be trivial."* It now heads R1 in Part A, word for word;
+  the judges test it (`judges/README.md`, "R1").
+- **Bench: bent pipes, valves, large networks, fresh secret scenes every round:** yes.
+- **At dense zooms, bare IDs or no labels:** *"We can't hard-code a rule like this. In the current
+  default settings, ID is the first thing to drop. Since the user decides drop order (meaning they
+  really want to see what they asked for), it might be best to prioritize more labels with a single
+  value left than less labels with more values left."* Not yet a rule; round 6 should test it.
+
+### Round 6 proposals, his answers, 2026-10-06
+
+- **Proposal 1, at a crowded view a label keeps its most-wanted value (the last in the user's drop
+  order, P or Q by default) rather than its ID:** *"Yes! Of course. 'Give the user the freedom.'
+  Keep the last dropped property."* Settled, and now R1 (3): the ID is in the drop order like any
+  other value, and a label keeps the last value in the order longest. The bench stopped saying "the
+  ID is never dropped"; the scene's `dropOrder` carries `id`, and the judges score a label that
+  keeps a value earlier in the order than one it hides.
+
+- **Proposal 2, R1's "only for lack of room" scored as pass or fail:** *"This (use conveniently
+  available space) is the golden prize, the end of the rainbow. You can't fail builders who fail it,
+  because they all fail it. You must score them. But the fact that you have a bench that measures it
+  is like a hidden-in-plain-sight or 'The Answer in the Back of the Book' trope. If we can measure
+  it, does that mean we can build it? And how did we learn how to measure it? And how well are we
+  measuring it? And can we share our measuring tool with the builders so that they can self-test
+  their strategies in real-time?"* **Settled: R1's first half is SCORED, never pass or fail.** The
+  judges report the share of hidden labels that had room; no layout fails on it (Part A §5 says so).
+  R1's second half (never by count) stays a judges' assertion. His four questions are answered in
+  `dev/label-trials/round-7-plan.md` §1.
+- **Proposal 4, search a node's two widest gaps (Task 539, `spot_prime` step 1):** *"This a strategy.
+  We might list known and propounded strategies as suggestions including this one. I would hope that
+  each round of testing would result in a successively better handful of tested and compared
+  creative strategies and recipes for combining them."* **Not a rule.** It goes into round 7's
+  strategy catalogue, handed to the builders as a suggestion (`dev/label-trials/round-7-plan.md` §3).

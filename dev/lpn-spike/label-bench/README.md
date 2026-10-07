@@ -4,15 +4,18 @@ The neutral bench every label placer is run on (dev/label-placement-rules.md §5
 builds no placer.
 
 **If you are building a placer: read `dev/label-placement-rules.md` Part A only — §1 through §5
-(the goal, Never, what the result looks like, the hints, and the job). Do not read Part B (§5-§6
+(the goal, Never, what the result looks like, the hints, and the job), and the strategy catalogue
+`dev/label-placement-strategies.md` (suggestions, never mandates). Do not read Part B (§5-§6
 held back, and §6) of that file, this repo's `judges/` directory, this branch's or this bench's git
-history, or the app's existing label placement code (`js/lpn-collide.js` and friends) — those hold
-secret tests and prior answers you are meant to solve independently.**
+history, the trial records in `dev/label-trials/`, or the app's existing label placement code
+(`js/lpn-collide.js` and friends) — those hold secret tests and prior answers you are meant to solve
+independently.**
 
 ```sh
 node dev/lpn-spike/label-bench/run.js --placer <your-placer.js>            # one table, exit 1 on any N1, N3, N4 or N5 break
 node dev/lpn-spike/label-bench/run.js --placer <path> --only novato-seq --verbose
 node dev/lpn-spike/label-bench/run.js --placer dev/lpn-spike/label-bench/placers/master-replay.js   # the baseline
+node dev/lpn-spike/label-bench/run.js --placer <path> --room              # adds R1's room score per view (scored, never failing)
 node dev/lpn-spike/label-bench/selftest-harness.js                          # the bench checks itself (in check_all)
 node dev/lpn-spike/label-bench/extract.js                                   # regenerate scenes/ and master/ from the app
 ```
@@ -26,7 +29,7 @@ arrives already measured. The full typedefs are the doc comment at the top of `c
 **In** (`place(scene, {prev})`): the viewport; `view` (model to view: `px = model * s + t`, for a
 placer that caches in model space); the lettering (row height, the separator a one-line label
 joins rows with and its width, the longest allowed hook); the user's per-kind value **drop order**
-(first to go first; the ID row is never in it); **every** node (centre and symbol box) and link
+(first to go first; **the ID is in it like any other value**, and a label keeps the last value in the order longest, Tom 2026-10-06; a scene recorded before then lacks `id`, and `dropOrderOf()` puts it first to go); **every** node (centre and symbol box) and link
 (polyline in view px, pump/valve symbol, flow arrows), on screen or not, since the model runs off
 the screen on every side; the user's label `settings` (whether pipe labels are drawn along their
 pipes, and the reading window a turned label keeps to); Text objects and customer symbols as fixed boxes; and the **labels
@@ -119,6 +122,18 @@ stillness rule and no numeric target for the rest, only the order Tom gave the c
   now that were not, or more of them) versus rows lost, summed over labels present in both views.
 - **Time per layout**, median and max, with the machine it ran on.
 
+## The R1 self-test (`room-check.js`)
+
+R1's first half, *"Hide a label only because there is no room for it on screen"*, is **scored, never
+passed or failed**. `room-check.js` is the score, and you may call it on your own output inside your
+own loop: `roomReport(scene, layout)` returns, of the labels hidden, those with free ground for their
+smallest form (the last value in the drop order) within 3 rows; of those cut, those with room for the
+whole label; and one free spot for each (`spots`). `run.js --room` prints it per view. The header of
+`room-check.js` says exactly what it checks and what it does not: above all, it asks about **one label
+at a time**, so two hidden labels may be told "room" for the same ground, and it lets a label sit over
+another label's leader. The judges score R1 with a stricter, finer version of the question that you do
+not see. Strategies that use it, and many others, are in `dev/label-placement-strategies.md`.
+
 ## Scenes (`scenes/`)
 
 Extracted from the real app by `extract.js`: `js/looped-network.js` evaluated against
@@ -133,6 +148,7 @@ hides every label at these views).
 | `net3` | 1 | EPA Net3, likewise; one hand-placed label |
 | `novato-zoom` | 4 | Net3 on the world map at Novato: fit, 2x, 4x, 8x about the node centroid; node labels ID, P, Qb, Z |
 | `novato-seq` | 8 | The same, zoomed about node 179 in steps 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4x: the stability sequence |
+| `bent-valves` | 5 | A generated suburban network (`generator.js`, 600 nodes, seed 7, `bends: 'many'`, `valves: 'many'`): most pipes curve through 1 to 3 vertices and one link in 12 is a valve. The views put nodes 44 px apart, then 1.5x, 2x, 3x, 4x. The other sets have no bent pipe and no valve. Master breaks N1 on its valve symbols here |
 
 **Text widths** are the app's own headless measure, the DOM stub's nominal advance: 6 px per
 character at 11 px text, scaled with the text size (12 px here, so 6.55 px per character). It is
@@ -144,6 +160,20 @@ the scene's own viewport (`0.75 * min(viewport width, viewport height)`, master'
 `labelRepeatSpacing()` in `js/looped-network.js`) rather than by re-running `extract.js`'s headless
 browser pass for a field that is entirely derived from a viewport already in every committed scene.
 Every scene here shares one fixed 1400x900 canvas, so this is one number (675) for all of them.
+
+## Generated and published networks (round 5 on)
+
+- `generator.js` makes a network of any size and shape on demand (families grid, tree, suburban,
+  downtown; 50 to 20,000 nodes; ID styles short, epanet, long, mixed; field sets id, novato, full;
+  bent pipes and valves as factors, `bends` and `valves`),
+  exactly reproducible from (family, parameters, seed). `node generator.js --family grid --n 500
+  --seed 1 --stats` describes one.
+- `networks/` holds published utility-scale networks with open licences (L-Town, C-Town; licences
+  and what was not added, and why, in its README).
+- `extract.js --gen '<spec>' <scene dir> <master dir>` turns either into a scene set, zoomed so
+  the median nearest-neighbour distance is `spacingPx` screen px at the first view, then 1.5x, 2x,
+  3x and 4x about the same node. `noMaster: true` skips master's recording (its collision pass
+  grows with the whole network) and accepts a list of spacings from one load.
 
 ## The two reference placers (`placers/`)
 

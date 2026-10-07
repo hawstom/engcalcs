@@ -4,6 +4,8 @@
 //   node dev/lpn-spike/label-bench/extract.js            (every public scene set)
 //   node dev/lpn-spike/label-bench/extract.js --judges   (the judges' prefixed sets as well)
 //   node dev/lpn-spike/label-bench/extract.js --only novato-zoom
+//   node dev/lpn-spike/label-bench/extract.js --gen '{"family":"grid","n":500,"seed":1}' <scene dir> <master dir>
+//                                                        (one generated set, generator.js)
 //
 // The page is js/looped-network.js evaluated against dev/lpn-spike/lpn-dom-stub.js, exactly as
 // label-crossing-measure.js loads it: the example is opened, solved through the vendored EPANET
@@ -28,6 +30,8 @@ const NOVATO = 'Net3-Novato-CA-World.lwn';
 const NOVATO_NODE_FIELDS = ['id', 'pressure', 'demand', 'elev'];   // P, Qb, Z (and the ID)
 const SEQ_CENTER = '179';
 const SEQ_MULTS = [1, 1.25, 1.5, 1.75, 2, 2.5, 3, 4];
+const GEN_MULTS = [1, 1.5, 2, 3, 4];
+const Gen = require('./generator.js');
 
 // Every scene set the bench ships. `views` is 'saved' (the view the file opens on), 'zooms'
 // (fit then 2x, 4x, 8x about the node centroid) or 'seq' (a zoom sequence about one node).
@@ -85,11 +89,30 @@ async function extractSet(set) {
 		"\t\tpumpSymbolSize: pumpSymbolSize, effectiveFontSize: function () { return effectiveFontSize(); },\n" +
 		"\t\tlabelSeparator: labelSeparator, linkLabelAligned: linkLabelAligned,\n" +
 		"\t\tlabelRank: labelRank, linkLabelStations: linkLabelStations,\n" +
-		"\t\tlabelFlipLeftOfVertical: labelFlipLeftOfVertical"
+		"\t\tlabelFlipLeftOfVertical: labelFlipLeftOfVertical,\n" +
+		"\t\tdocFromInp: docFromInp, inpUnitSelections: inpUnitSelections, applyUnitSelections: applyUnitSelections,\n" +
+		"\t\tcontentOnly: function () { runLabelCollisionAvoidance = function () {}; }"
 	);
 	L.buildLayers();
 	L.setCanvas(CANVAS.w, CANVAS.h);
-	const saved = JSON.parse(fs.readFileSync(path.join(EXAMPLES, set.file), 'utf8'));
+	// **SCENES WITHOUT MASTER** (set.noMaster): master's collision pass grows with the WHOLE network,
+	// not the view (round 5 measured 11 minutes at 2,500 nodes with 515 labels on screen), so on a
+	// large generated network the page composes the label text and the pass is switched off. The
+	// scene is the same; master's layout is not recorded.
+	if (set.noMaster) { L.contentOnly(); }
+	// A generated set (generator.js, round 5 on: "the infinite map") carries its document; the rest
+	// are the example files.
+	// A published benchmark network (networks/, its .inp) is read by the app's own importer.
+	let saved;
+	if (set.inp) {
+		require(ROOT + 'js/lpn-inp.js');
+		const parsed = global.EngCalcs.lpnInpParse(fs.readFileSync(set.inp, 'utf8'));
+		L.applyUnitSelections(L.inpUnitSelections(parsed));
+		saved = L.docFromInp(parsed, path.basename(set.inp));
+		saved.settings = Object.assign({}, saved.settings || {}, { alignPipeLabels: true, textSize: 12, symbolSize: 12 });
+	} else {
+		saved = set.doc ? JSON.parse(JSON.stringify(set.doc)) : JSON.parse(fs.readFileSync(path.join(EXAMPLES, set.file), 'utf8'));
+	}
 	// **THE FILE'S LABELING THRESHOLD IS CLEARED.** Net3 (30) and Novato (65000) carry one that
 	// hides every label at the views measured here; a bench of empty views measures nothing.
 	if (saved.settings) { saved.settings.labelMaxWidth = null; }
@@ -98,7 +121,12 @@ async function extractSet(set) {
 	L.buildDom();
 	L.noteMapSized();
 	const ls = L.labelSettings();
+	if (set.linkFields) {
+		Object.keys(ls.link).forEach(function (k) { ls.link[k] = set.linkFields.indexOf(k) >= 0; });
+		set.linkFields.forEach(function (k) { ls.link[k] = true; });
+	}
 	if (set.nodeFields) {
+		if (set.linkFields) { set.nodeFields.forEach(function (k) { ls.node[k] = true; }); }
 		Object.keys(ls.node).forEach(function (k) { ls.node[k] = set.nodeFields.indexOf(k) >= 0; });
 	}
 	ls.prefix = ls.prefix || {}; ls.prefix.node = ls.prefix.node || {};
@@ -132,6 +160,32 @@ async function extractSet(set) {
 				return { tag: m === 1 ? 'fit' : m + 'x', mult: m, v: { cx: cx, cy: cy, s: sFit * m } };
 			});
 		}
+		if (set.views === 'gen') {
+			// **A GENERATED SET IS ZOOMED BY ITS DENSITY, NOT ITS EXTENT.** The first view puts the
+			// median nearest-neighbour distance at `spacingPx` screen px, centred on the node nearest
+			// the centroid, so a large network runs off the screen on every side ("the infinite map");
+			// then GEN_MULTS about the same node.
+			const pts = doc.nodes.filter(function (n) { return n.type !== 'reservoir'; }).map(function (n) { return L.nodeAt(n); });
+			let gx = 0, gy = 0;
+			pts.forEach(function (p) { gx += p.x; gy += p.y; });
+			gx /= pts.length; gy /= pts.length;
+			let cen = pts[0];
+			pts.forEach(function (p) { if (Math.hypot(p.x - gx, p.y - gy) < Math.hypot(cen.x - gx, cen.y - gy)) { cen = p; } });
+			// A benchmark network is one network, so its seeds vary the VIEW instead: seed 1 is the node
+			// nearest the centroid, any other seed a node drawn from the seed.
+			if (set.inp && set.seed > 1) { cen = pts[Gen.pickIndex(pts.length, 'view|' + set.id)]; }
+			const nnDraw = Gen.medianNN({ nodes: pts.map(function (p) { return { x: p.x, y: p.y, type: 'junction' }; }) });
+			// Several densities of ONE loaded network (set.spacings, a large network without master):
+			// each is its own scene set, `<id>` with its spacing, from one load and one solve.
+			const out = [];
+			(set.spacings || [set.spacingPx]).forEach(function (sp) {
+				const s1 = sp / nnDraw, sid = set.spacings ? set.idFor(sp) : set.id;
+				GEN_MULTS.forEach(function (m, k) {
+					out.push({ tag: m + 'x', mult: m, setId: sid, step: k, v: { cx: cen.x, cy: cen.y, s: s1 * m } });
+				});
+			});
+			return out;
+		}
 		const c = L.nodeAt(L.nodeById(SEQ_CENTER));
 		return SEQ_MULTS.map(function (m) {
 			return { tag: m + 'x', mult: m, v: { cx: c.x, cy: c.y, s: sFit * m } };
@@ -141,19 +195,30 @@ async function extractSet(set) {
 	const steps = [], masters = [];
 	views().forEach(function (vw) {
 		if (!L.setView(vw.v)) { throw new Error(set.id + ': view refused ' + JSON.stringify(vw.v)); }
-		L.refreshLabelText();
+		// A generated set is laid out ONCE per view: master's pass costs minutes at a few thousand
+		// labels, and there the first pass's JIT share is noise. Its time is that one pass.
+		if (set.views === 'gen') {
+			const tg = process.hrtime.bigint();
+			L.refreshLabelText();
+			vw.ms = Number(process.hrtime.bigint() - tg) / 1e6;
+		} else {
+			L.refreshLabelText();
+		}
 		// Timed on a SECOND pass over the same view: the first in a process carries the JIT. The
 		// layout is a pure function of the view (label-stability-harness.js holds that), so the
 		// second pass draws what the first did.
-		const t0 = process.hrtime.bigint();
-		L.refreshLabelText();
-		const masterMs = Number(process.hrtime.bigint() - t0) / 1e6;
+		let masterMs = vw.ms;
+		if (masterMs === undefined) {
+			const t0 = process.hrtime.bigint();
+			L.refreshLabelText();
+			masterMs = Number(process.hrtime.bigint() - t0) / 1e6;
+		}
 		// **THE SCENE IS BUILT BY THE ONE FUNCTION THE PAGE ALSO USES** (js/lpn-label-scene.js):
 		// the live ?placer= switch in js/looped-network.js builds its scenes with it too, so the
 		// bench and the browser cannot come to different ideas of what a scene is. Only the text
 		// measurement and the obstacle set are this file's own.
 		const built = Scene.buildScene(L, {
-			id: set.id + '@' + vw.tag, set: set.id, step: steps.length, source: set.file,
+			id: (vw.setId || set.id) + '@' + vw.tag, set: vw.setId || set.id, step: vw.step === undefined ? steps.length : vw.step, source: set.file,
 			canvas: CANVAS, measure: textW, obs: lastObs, zoom: vw.mult
 		});
 		const scene = built.scene, V = built.V;
@@ -237,11 +302,66 @@ async function extractSet(set) {
 }
 
 function writeJson(file, obj) {
+	// A scene set is refused before it is written if any coordinate is missing or not a number.
+	(obj.steps || []).forEach(function (st) {
+		if (!st.nodes) { return; }
+		const bad = require('./contract.js').sceneProblem(st);
+		if (bad) { throw new Error('scene refused (missing or non-numeric coordinate): ' + bad); }
+	});
 	fs.writeFileSync(file, JSON.stringify(obj, null, 0).replace(/\},\{"id"/g, '},\n{"id"') + '\n');
 }
 
 async function main() {
 	const args = process.argv.slice(2);
+	if (args[0] === '--gen') {
+		// A GENERATED SET: node extract.js --gen '<spec json>' <scene dir> <master dir>. The document is
+		// made here from the spec (generator.js), so the same spec always extracts the same scene.
+		// Or a published network: '{"bench":"L-TOWN","spacingPx":44,"fields":"novato","seed":1}' reads
+		// networks/L-TOWN.inp and is zoomed by the same density rule.
+		const spec = JSON.parse(args[1]);
+		let set, doc;
+		if (spec.bench) {
+			const fset = Gen.FIELD_SETS[spec.fields || 'novato'], seed = spec.seed || 1;
+			const id = ['bench', spec.bench, 's' + (spec.spacingPx || 40), spec.fields || 'novato', 'seed' + seed].join('-');
+			set = { id: id, file: spec.bench + '.inp', inp: path.join(HERE, 'networks', spec.bench + '.inp'), views: 'gen',
+				spacingPx: spec.spacingPx || 40, seed: seed, nodeFields: fset.node, linkFields: fset.link };
+			doc = { generator: { spec: spec, key: id } };
+		} else {
+			doc = Gen.generate(spec);
+			set = { id: Gen.specKey(spec), file: Gen.specKey(spec) + '.lwn', doc: doc, views: 'gen', spacingPx: Gen.normSpec(spec).spacingPx };
+		}
+		if (spec.noMaster) {
+			set.noMaster = true;
+		}
+		const t0 = Date.now();
+		if (Array.isArray(spec.spacingPx)) {
+			// One network, several densities: requires noMaster (master's layouts would carry state
+			// from one density to the next; its sets are extracted one per process).
+			if (!set.noMaster) { throw new Error('a list of spacings needs noMaster'); }
+			const base = Object.assign({}, spec);
+			set.spacings = spec.spacingPx;
+			set.idFor = function (sp) { return spec.bench ? set.id.replace(/-s[^-]+-/, '-s' + sp + '-') : Gen.specKey(Object.assign({}, base, { spacingPx: sp })); };
+		}
+		const res = await extractSet(set);
+		fs.mkdirSync(args[2], { recursive: true });
+		if (set.spacings) {
+			const bySet = {};
+			res.set.steps.forEach(function (st) { (bySet[st.set] = bySet[st.set] || []).push(st); });
+			Object.keys(bySet).forEach(function (sid) {
+				const gsp = Object.assign({}, doc.generator, { key: sid });
+				writeJson(path.join(args[2], sid + '.json'), { id: sid, source: res.set.source, canvas: res.set.canvas, steps: bySet[sid], generator: gsp });
+			});
+			process.stdout.write(Object.keys(bySet).join(', ') + ': ' + res.set.steps.length + ' views, ' + (Date.now() - t0) + ' ms\n', function () { process.exit(0); });
+			return;
+		}
+		res.set.generator = doc.generator;
+		fs.mkdirSync(args[3], { recursive: true });
+		writeJson(path.join(args[2], set.id + '.json'), res.set);
+		if (!set.noMaster) { writeJson(path.join(args[3], set.id + '.json'), res.master); }
+		const n = res.set.steps.map(function (s) { return s.labels.length; }).join('/');
+		process.stdout.write(set.id + ': ' + res.set.steps.length + ' step(s), labels ' + n + ', ' + (Date.now() - t0) + ' ms\n', function () { process.exit(0); });
+		return;
+	}
 	if (args[0] === '--child') {
 		const set = SETS.concat(JUDGE_SETS).find(function (x) { return x.id === args[1]; });
 		const res = await extractSet(set);
