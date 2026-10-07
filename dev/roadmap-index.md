@@ -7,7 +7,7 @@ One line per open task: priority band, ID, marker, actor tag, and the executive-
 title — the first bolded run of the description, 4–12 words. The rule and its rationale
 live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 
-**93 open tasks.** Next (100): 8 · Soon (75): 16 · Someday (50): 35 · Maybe (25): 15 · Parked (5): 19
+**93 open tasks.** Next (100): 8 · Soon (75): 15 · Someday (50): 35 · Maybe (25): 16 · Parked (5): 19
 
 ## 100 — Next (8)
 
@@ -18,9 +18,9 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 737 — Coined names for interface elements, so every language names each one once.
 - Task 741 — The infinite map: generated networks for the label bench.
 - ! Task 759 — One word for the map selection, another for a menu choice; tips that earn their place.
-- Task 775 — File, Convert as: five defects from one session in Fotobi, Ghana.
+- Task 775 — File, Convert as: what is left of the Fotobi, Ghana session.
 
-## 75 — Soon (16)
+## 75 — Soon (15)
 
 - Task 282 — Offer to attach the backdrop an imported `.inp` names.
 - Task 578 — Fire flow: the EPS frame and the Run concept, extracted from 530.
@@ -33,7 +33,6 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 756 — Cross-platform: the suite as a desktop application, beyond the web folder.
 - Task 763 — A searchable help manual, built from the tips Tom cut.
 - Task 768 — Report a problem: more information and freedom than one anonymous click.
-- Task 769 — Change type: a junction becomes a tank, a pipe a valve.
 - Task 771 — Survey points as a script: the Description names the asset or vertex.
 - Task 772 — AutoCAD: import, export, and perhaps sync, on a long-lived branch.
 - Task 776 — Copy a table with its headings; export Tables to CSV and ODS.
@@ -77,7 +76,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 736 — [H] · Count installs and app launches, if the consent text allows it.
 - Task 773 — Hover shows an asset's full label, as if every field were ticked.
 
-## 25 — Maybe (15)
+## 25 — Maybe (16)
 
 - Task 144 — Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.
 - Task 185 — Match/Copy properties tool (originated during Task 146).
@@ -94,6 +93,7 @@ live in `dev/scripts/roadmap_lib.php`. A title marked `!` is outside that range.
 - Task 723 — WaterCAD's element list, against ours.
 - Task 729 — Type a node's location in State Plane or UTM.
 - ! Task 731 — At whole-world zoom the map drags past the 180th meridian and a continent-sized model tears across it.
+- Task 778 — Read pipe size and material from survey field codes.
 
 ## 5 — Parked (19)
 

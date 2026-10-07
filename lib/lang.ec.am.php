@@ -3643,7 +3643,6 @@ $ec_lang['lpn_ff_menu_tip']='መገናኛዎችን አንድ በአንድ ይፈ
 $ec_lang['lpn_ff_title']='የእሳት ፍሰት ትንተና';
 $ec_lang['lpn_ff_intro']='እያንዳንዱ መገናኛ በተራው ከያዘው ፍላጎት በተጨማሪ የእሳት ፍሰት እንዲወስድ ይጠየቃል። በፕሮጀክትዎ ውስጥ ምንም ነገር አይለወጥም፤ ጠቅላላው ስራ በቅጂ ላይ ይደረጋል።';
 $ec_lang['lpn_ff_scope']='የሚፈተኑ መገናኛዎች';
-$ec_lang['lpn_ff_scope_tip']='ከማሳት በፊት ስብስቡን ይምረጡ። በትልቅ ስርዓት ውስጥ እያንዳንዱን መገናኛ መፈተን ደቂቃዎችን ሊወስድ ይችላል።';
 $ec_lang['lpn_ff_all']='ሁሉም';
 $ec_lang['lpn_ff_selected']='የተመረጡት';
 $ec_lang['lpn_ff_no_junctions']='ይህ ፕሮጀክት እስካሁን ምንም መገናኛ የለውም፣ ስለዚህ የሚፈተን ነገር የለም።';
@@ -3676,7 +3675,6 @@ $ec_lang['lpn_ff_engine_native']='አብሮ የተሰራው ፈታች ጥቅም 
 // Edited by TGH 2026-09-07
 $ec_lang['lpn_ff_engine_epanet']='የEPANET ፈታች ጥቅም ላይ ውሏል።';
 // Edited by TGH 2026-09-07
-$ec_lang['lpn_ff_engine_cost']='የሚገኝ የእሳት ፍሰት ፍለጋ ስለሆነ፣ ለሚፈተነው እያንዳንዱ መገናኛ ጠቅላላው መረብ በግምት አስራ ስድስት ጊዜ ይፈታል። ትልቅ ስርዓት ደቂቃዎችን ይወስዳል። በማንኛውም ጊዜ ማቆምና እስከዚያ የተሰራውን ማቆየት ይችላሉ።';
 // The one-condition sentence. Shown only where this project has a run clock, because that is the
 // only place a reader could reasonably expect a fire flow to follow it.
 //
@@ -3684,7 +3682,6 @@ $ec_lang['lpn_ff_engine_cost']='የሚገኝ የእሳት ፍሰት ፍለጋ �
 // first sentence over again in other words -- Tom: "I don't know what this means. Are we just
 // repeating what we said above?" It was. What the practice half carries that the first sentence
 // does not is the DEMAND the fire flow is added to, and that survives.
-$ec_lang['lpn_ff_steady']='አሁን በስክሪኑ ላይ ያለው የጊዜ ደረጃ ብቻ ይፈተናል። የእሳት ፍሰት አብዛኛውን ጊዜ ከከፍተኛ ቀን ፍላጎት በላይ ተጨምሮ ይፈተናል፣ ስለዚህ ከማሳት በፊት መረቡን ወደዚያ ሁኔታ ያዘጋጁ።';
 // THE RUN HAS A DIALOG OF ITS OWN (Tom, 2026-08-30: "The run progress bar is so important that all
 // applications put it in a new dialog with nothing but the progress, a stop button, and maybe some
 // other progress stats."). It says how far along it is and never how long is left: per-solve cost

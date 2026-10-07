@@ -422,8 +422,8 @@ button > .ec-icon, a > .ec-icon, label > .ec-icon { margin-inline-end: 0.4em; }
 	font-weight: normal;
 }
 
-/* Whole-label wrapper: makes the entire label (not just the ? icon) the hover/tap
-   target for the tip carried in .ec-tip's title attribute. */
+/* Label wrapper carrying a tip's text in its title. Behind a "?" it is an explanation that only
+   the glyph opens (.ec-explain-host, below); without one it is a name tip opened by hover. */
 .ec-help {
 	cursor: help;
 }
@@ -446,6 +446,26 @@ button > .ec-icon, a > .ec-icon, label > .ec-icon { margin-inline-end: 0.4em; }
 .tooltip {
 	--bs-tooltip-max-width: min(17rem, calc(100vw - 2rem));
 }
+
+/* **AN EXPLANATION IS OPENED ON PURPOSE, SO IT MAY BE READ, NOT GLIMPSED** (ROADMAP Task 759, Tom
+   2026-10-03: "Click the ?, closed by a click elsewhere or Esc"). The tip behind a "?" opens only
+   on a click of the glyph (js/Calculators.lib.js, ecTipGlyph()), so it is wider than a name tip
+   (22rem, Ida's measured width: the 92-word tip at 352 x 302 px), left-aligned like prose, and it
+   takes the pointer: a reader may rest on it. The 'no click' rule above is for a name tip still up
+   from hover over the next thing clicked; an explanation is never up by hover. Nothing in it is a
+   control. */
+.tooltip.ec-explain {
+	--bs-tooltip-max-width: min(22rem, calc(100vw - 2rem));
+	pointer-events: auto;
+}
+.tooltip.ec-explain .tooltip-inner { text-align: start; }
+/* A box's whole explanation can run to 150 words (the Fire flow box's `?`, Tom 2026-10-05), taller
+   than what lies below its glyph on a short phone. Capped at 60% of the screen's height, the rest
+   scrolls inside the tip, which takes the pointer and the finger for exactly that. */
+.tooltip.ec-explain .tooltip-inner { max-height: 60vh; overflow-y: auto; }
+/* The label words no longer open anything; only the glyph does, so only the glyph says so. */
+.ec-help.ec-explain-host { cursor: inherit; }
+.ec-explain-host .ec-tip, .ec-tip.ec-explain-host { cursor: pointer; }
 
 /* The welcome line under the page title (template_welcome). Set apart with italics
    rather than the >> ... << that used to be typed into all 27 language strings: those
@@ -5265,3 +5285,7 @@ tr.lpn-ff-error { background: var(--ec-gray-f2f2f2); }
 @media (hover: none) and (pointer: coarse) {
 	.lpn-menu-row[data-hotkey]::after { content: none; }
 }
+
+/* Paragraphs inside an explanation (EngCalcs.tipHtml()). */
+.tooltip.ec-explain .tooltip-inner p { margin: 0 0 0.6em; }
+.tooltip.ec-explain .tooltip-inner p:last-child { margin-bottom: 0; }

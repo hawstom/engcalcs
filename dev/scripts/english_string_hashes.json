@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-09-30",
-    "count": 2231,
+    "count": 2228,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -3330,7 +3330,6 @@
         "lpn_ff_design_off_note": "77e938d422b07aca04c053b13772f9ff93f901e8",
         "lpn_ff_design_selected": "9a976fc228b6b33656174ebd6decca02c9068378",
         "lpn_ff_design_tip": "ec2706244f138c3dce9b27c5f5afd772684ed4f6",
-        "lpn_ff_engine_cost": "157e56eee7e4204199f890642c52bf96832b7b7b",
         "lpn_ff_engine_epanet": "aa9ed6dea9711eaf20d4afebec64ee81815b8f70",
         "lpn_ff_engine_native": "08c92b1b3c9c6f164680d3a0f2deae0c069d729c",
         "lpn_ff_err_at_rest": "f233ec47d43d5d5f1b293feacf99e0f126ae933f",
@@ -3367,12 +3366,10 @@
         "lpn_ff_scope": "3e6ac1066ba7438ea2fb7ecb0c95eca0f78595bf",
         "lpn_ff_scope_all": "216decebf8ba73304b9008436c31bfa072209ca7",
         "lpn_ff_scope_selected": "efc69bdb8dcd991ed479c5b1897a3f94b56d16a2",
-        "lpn_ff_scope_tip": "c220976c861bb448cce3c74fd5526aef506ad60f",
         "lpn_ff_selected": "9a976fc228b6b33656174ebd6decca02c9068378",
         "lpn_ff_skipped": "e3a9f59cd7e3aabe984950f5a7602c11e674dc0c",
         "lpn_ff_stale": "2a8f7a09662248de84a2ad1f5cabc19f4e127b81",
         "lpn_ff_static_failed": "8d3961b9e38b39ee986bbefc068180d1124a4998",
-        "lpn_ff_steady": "0b592537f3f4603f48924635156cdb69f1abf7d0",
         "lpn_ff_stop": "9e253470c876ee6d5c720eb777aeb82d4c26e28f",
         "lpn_ff_stopped": "858cb38ae5fa706ce0018e8d764d59bd038becc0",
         "lpn_ff_summary": "fb27646e7d2b991c19a439a1c3a877ace756aade",
@@ -7516,10 +7513,6 @@
             "words": 37,
             "ends_sentence": true
         },
-        "lpn_ff_engine_cost": {
-            "words": 38,
-            "ends_sentence": true
-        },
         "lpn_ff_engine_epanet": {
             "words": 4,
             "ends_sentence": true
@@ -7664,10 +7657,6 @@
             "words": 3,
             "ends_sentence": false
         },
-        "lpn_ff_scope_tip": {
-            "words": 16,
-            "ends_sentence": true
-        },
         "lpn_ff_selected": {
             "words": 1,
             "ends_sentence": false
@@ -7683,10 +7672,6 @@
         "lpn_ff_static_failed": {
             "words": 5,
             "ends_sentence": false
-        },
-        "lpn_ff_steady": {
-            "words": 30,
-            "ends_sentence": true
         },
         "lpn_ff_stop": {
             "words": 1,
