@@ -395,6 +395,11 @@ the block.
 - 75|777| **Station and elevation marks on the mi and wi section sketches.**
   Tom, 2026-10-06: *"it would be very nice to add either an automatic stations and elevations grid
   or the stations and elevations about 4 to 8 points."* Branch `feat/section-grid`.
+- 75|779| **Shape: a simple drawn element, point, polyline or polygon, with snapping.**
+  Tom, 2026-10-06: *"a very simple shape element type (if one point, it's a point, and if more,
+  it's a polyline, and it can close into a polygon if you let it. Either way, we call it a
+  'Shape', and we can export or import to and from points, polylines, and polygons.) and the
+  ability to snap or magnet to shape points."* Seams: DXF (Task 772), GeoJSON, survey points.
 - 50|146.09| **An inset overview map: the whole project, with a box round where you are.**
   Reworked by Tom 2026-08-25, and it is a different feature from the one this ID used to hold:
   *"146.09 reworked as a key/overview map inset like many games where the entire project is depicted
