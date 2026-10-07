@@ -1904,7 +1904,18 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<div id="lpn_hotkeys_title" class="lpn-setbox-title"><?=$ec_lang['lpn_help_manual']?></div>
 	<button type="button" id="lpn_hotkeys_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body lpn-setbox-body lpn-guide-body">
-<div class="lpn-guide-search"><input type="search" id="lpn_guide_search" autocomplete="off" placeholder="<?=htmlspecialchars($ec_lang['lpn_crs_search'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_crs_search'])?>"></div>
+<div id="lpn_guide_panes" class="lpn-guide-panes">
+<aside id="lpn_guide_rail" class="lpn-guide-rail" aria-label="<?=htmlspecialchars($ec_lang['lpn_guide_contents'])?>">
+	<div class="lpn-guide-railhead">
+		<button type="button" id="lpn_guide_railtoggle" class="lpn-guide-railtoggle" aria-expanded="true" aria-controls="lpn_guide_railbody" title="<?=htmlspecialchars($ec_lang['lpn_guide_rail_hide'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_guide_rail_hide'])?>"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+		<span class="lpn-guide-railtitle"><?=$ec_lang['lpn_guide_contents']?></span>
+	</div>
+	<div id="lpn_guide_railbody" class="lpn-guide-railbody">
+		<input type="search" id="lpn_guide_search" autocomplete="off" placeholder="<?=htmlspecialchars($ec_lang['lpn_guide_search'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_guide_search'])?>">
+		<nav id="lpn_guide_nav" class="lpn-guide-nav" aria-label="<?=htmlspecialchars($ec_lang['lpn_guide_contents'])?>"></nav>
+	</div>
+</aside>
+<div id="lpn_guide_content" class="lpn-guide-content">
 <p id="lpn_guide_none" class="lpn-guide-none" hidden><?=$ec_lang['lpn_find_none']?></p>
 <section class="lpn-guide-section" data-guide-section="toolbar">
 <h2><?=$ec_lang['lpn_help_icons']?></h2>
@@ -1930,6 +1941,13 @@ echoHeader("EngCalcsApp", $html_title, "", false);
 	<dt><?=$ec_lang['lpn_notes_7_term']?></dt><dd><?=$ec_lang['lpn_notes_7_def']?></dd>
 </dl>
 </section>
+<section class="lpn-guide-section" data-guide-section="boxes">
+<h2><?=$ec_lang['lpn_guide_boxes_heading']?></h2>
+<p class="lpn-guide-prose"><?=$ec_lang['lpn_guide_boxes_intro']?></p>
+<div id="lpn_guide_boxes" class="lpn-guide-list"></div>
+</section>
+</div>
+</div>
 	</div>
 </div>
 
@@ -2500,6 +2518,9 @@ EngCalcs.pageConfig = {
 	lpn_help_notes: <?=json_encode($ec_lang['lpn_help_notes'])?>,
 	lpn_help_manual: <?=json_encode($ec_lang['lpn_help_manual'])?>,
 	lpn_guide_also: <?=json_encode($ec_lang['lpn_guide_also'])?>,
+	lpn_guide_box_help: <?=json_encode($ec_lang['lpn_guide_box_help'])?>,
+	lpn_guide_rail_hide: <?=json_encode($ec_lang['lpn_guide_rail_hide'])?>,
+	lpn_guide_rail_show: <?=json_encode($ec_lang['lpn_guide_rail_show'])?>,
 <?php   // The suite's existing legal-link strings, needed here because this page's Help menu and
         // examples gallery carry them instead of a footer. Reused, never re-keyed: the wording must
         // match the identical links on every other page. ?>

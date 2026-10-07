@@ -42065,6 +42065,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function closeHotkeysBox() {
 		hidePanel(hotkeysBoxEl());
+		try { if (/^#guide/i.test(location.hash)) { history.replaceState(null, '', location.pathname + location.search); } } catch (e) {}
 		if (hotkeysboxLayout.open) { hotkeysboxLayout.open = false; saveHotkeysboxLayout(); }
 	}
 	function toggleHotkeysBox() {
@@ -42280,7 +42281,9 @@ var EngCalcs = EngCalcs || {};
 			block.appendChild(row);
 		});
 		if (block) { guideTrimRule(block); }
+		renderGuideBoxes();
 		guideFilter();
+		guideObserve();
 	}
 	// **DIMMING FOLLOWS THE STRIP WHILE THE GUIDE IS OPEN** (Perry, pre-review 2026-10-06). The
 	// strip shows and hides buttons under an open guide -- the transport when another project opens,
@@ -42336,9 +42339,166 @@ var EngCalcs = EngCalcs || {};
 				guideShowEl(dt, dhit); guideShowEl(dd, dhit);
 				if (dhit) { hit = true; }
 			});
+			// The Boxes section: a box's entry is a heading and its description, matched whole.
+			sec.querySelectorAll('.lpn-guide-boxentry').forEach(function (en) {
+				if (guideShowEl(en, !q || guideMatch(en, q))) { hit = true; }
+			});
+			sec.querySelectorAll('.lpn-guide-prose').forEach(function (pr) {
+				guideShowEl(pr, !q || guideMatch(pr, q));
+				if (!q || guideMatch(pr, q)) { hit = true; }
+			});
 			if (guideShowEl(sec, hit)) { any = true; }
 		});
 		if (none) { none.hidden = any; }
+		guideRebuildNav(q);
+	}
+	// ---- THE BOXES SECTION, THE CONTENTS RAIL AND THE "?" IN A TITLE BAR (Tom, 2026-10-07) ----
+	// One entry per dockable box, derived from the boxes themselves (their title bar and the tip
+	// their corner `?` already carries), never written here. Prose for a box goes where its tip
+	// stands now, so a box with no description yet still has an entry for its "?" to open.
+	function guideBoxList() {
+		return dockBoxes.map(function (d) {
+			var t = d.box.querySelector('.lpn-setbox-title');
+			return { d: d, id: d.box.id, title: t ? String(t.textContent || '').replace(/\s+/g, ' ').trim() : '' };
+		}).filter(function (e) { return !!e.title; });
+	}
+	function renderGuideBoxes() {
+		var host = document.getElementById('lpn_guide_boxes');
+		if (!host) { return; }
+		while (host.firstChild) { host.removeChild(host.firstChild); }
+		guideBoxList().forEach(function (e) {
+			var en = document.createElement('div'), h = document.createElement('h3'), p;
+			en.className = 'lpn-guide-boxentry';
+			en.id = 'lpn_guide_b_' + e.id;
+			en.setAttribute('data-guide-key', 'box-' + e.id);
+			h.textContent = e.title;
+			en.appendChild(h);
+			if (e.d.tipText) { p = document.createElement('p'); p.textContent = e.d.tipText; en.appendChild(p); }
+			host.appendChild(en);
+		});
+	}
+	function guideContentEl() { return document.getElementById('lpn_guide_content'); }
+	function guideVisible(el) { return !!el && el.style.display !== 'none' && (!el.closest || !el.closest('[style*="display: none"]')); }
+	function guideSnippet(sec, q) {
+		var cands = sec.querySelectorAll('.lpn-guide-row, tr, dt, dd, .lpn-guide-boxentry, .lpn-guide-prose'), i, el, t, at;
+		for (i = 0; i < cands.length; i++) {
+			el = cands[i];
+			if (!guideVisible(el) || el.querySelector('.lpn-guide-row, tr')) { continue; }
+			t = String(el.textContent || '').replace(/\s+/g, ' ').trim();
+			at = t.toLowerCase().indexOf(q);
+			if (at >= 0) {
+				return (at > 20 ? '…' : '') + t.slice(Math.max(0, at - 20), at + 50) + (t.length > at + 50 ? '…' : '');
+			}
+		}
+		return '';
+	}
+	function guideRebuildNav(q) {
+		var nav = document.getElementById('lpn_guide_nav'), cur = nav ? nav.getAttribute('data-current') : '', box = hotkeysBoxEl();
+		if (!nav || !box) { return; }
+		while (nav.firstChild) { nav.removeChild(nav.firstChild); }
+		function add(key, text, sub, snip) {
+			var a = document.createElement('a'), sn;
+			a.href = '#guide/' + key;
+			a.setAttribute('data-guide-link', key);
+			if (sub) { a.className = 'lpn-guide-nav-sub'; }
+			a.appendChild(document.createTextNode(text));
+			if (snip) { sn = document.createElement('span'); sn.className = 'lpn-guide-nav-snip'; sn.textContent = snip; a.appendChild(sn); }
+			if (key === cur) { a.setAttribute('aria-current', 'true'); }
+			nav.appendChild(a);
+		}
+		box.querySelectorAll('.lpn-guide-section').forEach(function (sec) {
+			var h = sec.querySelector('h2'), key = sec.getAttribute('data-guide-section');
+			if (!h || sec.style.display === 'none') { return; }
+			sec.setAttribute('data-guide-key', key);
+			add(key, String(h.textContent || '').trim(), false, q ? guideSnippet(sec, q) : '');
+			sec.querySelectorAll('.lpn-guide-boxentry').forEach(function (en) {
+				if (en.style.display === 'none') { return; }
+				add(en.getAttribute('data-guide-key'), String(en.querySelector('h3').textContent || '').trim(), true, '');
+			});
+		});
+	}
+	var guideIO = null;
+	function guideSetCurrent(key) {
+		var nav = document.getElementById('lpn_guide_nav'), cur = null;
+		if (!nav) { return; }
+		nav.setAttribute('data-current', key || '');
+		nav.querySelectorAll('a').forEach(function (a) {
+			var on = a.getAttribute('data-guide-link') === key;
+			if (on) { a.setAttribute('aria-current', 'true'); cur = a; } else { a.removeAttribute('aria-current'); }
+		});
+		if (cur && cur.scrollIntoView && nav.scrollHeight > nav.clientHeight) {
+			// Keep the current row in the rail's own view, without moving the page or the box.
+			if (cur.offsetTop < nav.scrollTop || cur.offsetTop + cur.offsetHeight > nav.scrollTop + nav.clientHeight) {
+				nav.scrollTop = Math.max(0, cur.offsetTop - 20);
+			}
+		}
+	}
+	// The current section is the last one, in reading order, whose top has reached the top edge of
+	// the pane. The observer is only the trigger: a band of the pane is watched, and what is
+	// current is decided from positions, so short neighbouring entries cannot outvote the one
+	// that was scrolled to.
+	function guideObserve() {
+		var content = guideContentEl();
+		if (!content || !window.IntersectionObserver) { return; }
+		if (guideIO) { guideIO.disconnect(); }
+		guideIO = new window.IntersectionObserver(function () {
+			var top = content.getBoundingClientRect().top + 8, key = null, first = null;
+			content.querySelectorAll('[data-guide-key]').forEach(function (el) {
+				if (el.style.display === 'none' || !el.getClientRects().length) { return; }
+				if (first === null) { first = el.getAttribute('data-guide-key'); }
+				if (el.getBoundingClientRect().top <= top) { key = el.getAttribute('data-guide-key'); }
+			});
+			if (key || first) { guideSetCurrent(key || first); }
+		}, { root: content, rootMargin: '0px 0px -70% 0px', threshold: [0, 1] });
+		content.querySelectorAll('[data-guide-key]').forEach(function (el) { guideIO.observe(el); });
+	}
+	function guideGoto(key) {
+		var content = guideContentEl(), el, pulseEl;
+		if (!content) { return false; }
+		el = content.querySelector('[data-guide-key="' + String(key).replace(/"/g, '') + '"]');
+		if (!el || el.style.display === 'none') { return false; }
+		content.scrollTop = Math.max(0, el.getBoundingClientRect().top - content.getBoundingClientRect().top + content.scrollTop);
+		guideSetCurrent(key);
+		pulseEl = el.classList.contains('lpn-guide-boxentry') ? el : null;
+		if (pulseEl) { guidePulse(pulseEl); }
+		try { history.replaceState(null, '', '#guide/' + key); } catch (e) {}
+		return true;
+	}
+	// Opens the Guide at the entry for one box: the "?" in its title bar, and F1 inside it.
+	function openGuideForBox(boxId) {
+		var input = document.getElementById('lpn_guide_search');
+		if (dialogIsOpen()) { return; }
+		if (input) { input.value = ''; }
+		openHotkeysBox();
+		guideFilter();
+		if (!guideGoto('box-' + boxId)) { guideGoto('boxes'); }
+		(window.requestAnimationFrame || setTimeout)(function () {
+			if (!guideGoto('box-' + boxId)) { guideGoto('boxes'); }
+		});
+	}
+	// ---- the rail: collapsed state is window furniture inside the record the box already keeps ----
+	var guideRailPhoneClosed = true;
+	function guideRailCollapsed() { return smallScreen() ? guideRailPhoneClosed : hotkeysboxLayout.rail === 'closed'; }
+	function guideApplyRail() {
+		var box = hotkeysBoxEl(), t = document.getElementById('lpn_guide_railtoggle'), pc = EngCalcs.pageConfig || {}, c = guideRailCollapsed(), text;
+		if (!box || !t) { return; }
+		box.classList.toggle('lpn-guide-rail-collapsed', c);
+		t.setAttribute('aria-expanded', c ? 'false' : 'true');
+		text = c ? (pc.lpn_guide_rail_show || 'Show contents') : (pc.lpn_guide_rail_hide || 'Hide contents');
+		t.title = text;
+		t.setAttribute('aria-label', text);
+	}
+	function guideSetRail(collapsed) {
+		if (smallScreen()) { guideRailPhoneClosed = collapsed; }
+		else { hotkeysboxLayout.rail = collapsed ? 'closed' : 'open'; saveHotkeysboxLayout(); }
+		guideApplyRail();
+	}
+	function guideFocusSearch() {
+		var input = document.getElementById('lpn_guide_search');
+		if (!input) { return; }
+		if (guideRailCollapsed()) { guideSetRail(false); }
+		input.focus();
+		if (input.select) { input.select(); }
 	}
 	// ---- Show, never run ----
 	function guidePulse(el) {
@@ -42454,6 +42614,38 @@ var EngCalcs = EngCalcs || {};
 		var box = hotkeysBoxEl(), input = document.getElementById('lpn_guide_search');
 		if (!box) { return; }
 		if (input) { input.addEventListener('input', guideFilter); }
+		var toggle = document.getElementById('lpn_guide_railtoggle'), head = box.querySelector('.lpn-guide-railhead'),
+			nav = document.getElementById('lpn_guide_nav');
+		try { hotkeysboxLayout.rail = (JSON.parse(localStorage.getItem(LPN_HOTKEYSBOX_KEY) || '{}') || {}).rail === 'closed' ? 'closed' : 'open'; }
+		catch (e) { hotkeysboxLayout.rail = 'open'; }
+		guideApplyRail();
+		if (toggle) { toggle.addEventListener('click', function (e) { e.stopPropagation(); guideSetRail(!guideRailCollapsed()); }); }
+		// On a phone the whole heading row is the disclosure.
+		if (head) { head.addEventListener('click', function (e) { if (smallScreen() && e.target !== toggle && !toggle.contains(e.target)) { guideSetRail(!guideRailCollapsed()); } }); }
+		window.addEventListener('resize', guideApplyRail);
+		if (nav) {
+			nav.addEventListener('click', function (e) {
+				var a = e.target && e.target.closest ? e.target.closest('a[data-guide-link]') : null;
+				if (!a) { return; }
+				e.preventDefault();
+				e.stopPropagation();
+				guideGoto(a.getAttribute('data-guide-link'));
+			});
+		}
+		// "/" inside the guide goes to its search; Ctrl+K opens the guide there from anywhere.
+		window.addEventListener('keydown', function (e) {
+			var ae = document.activeElement;
+			if (e.defaultPrevented) { return; }
+			if (e.key === '/' && !e.ctrlKey && !e.altKey && !e.metaKey && ae && ae.closest && ae.closest('#lpn_hotkeys_popup') && !guideTyping(ae)) {
+				e.preventDefault(); e.stopPropagation(); guideFocusSearch(); return;
+			}
+			if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && String(e.key).toLowerCase() === 'k') {
+				if (dialogIsOpen()) { return; }
+				e.preventDefault(); e.stopPropagation();
+				if (!hotkeysBoxIsOpen()) { openGuideAt(null); }
+				guideFocusSearch();
+			}
+		}, true);
 		var strip = document.getElementById('lpn_toolbar');
 		if (strip && window.MutationObserver) {
 			new window.MutationObserver(guideQueueDimming).observe(strip,
@@ -42470,7 +42662,12 @@ var EngCalcs = EngCalcs || {};
 			guideShow(row);
 		});
 		// **Looped-Network.php#guide OPENS IT**, so a link, a blog post or an email can point at it.
-		function fromHash() { if (String(location.hash || '').toLowerCase() === '#guide') { openGuideAt(null); } }
+		function fromHash() {
+			var m = /^#guide(?:\/(.+))?$/i.exec(String(location.hash || ''));
+			if (!m) { return; }
+			openGuideAt(null);
+			if (m[1]) { guideGoto(decodeURIComponent(m[1])); }
+		}
 		window.addEventListener('hashchange', fromHash);
 		fromHash();
 	}
@@ -51042,6 +51239,20 @@ var EngCalcs = EngCalcs || {};
 		help.appendChild(glyph);
 		return help;
 	}
+	// **THE ONE "?" OF EVERY STANDING BOX** (Tom, 2026-10-07; Ida): the last glyph before the X, with
+	// the tip "Help for this box", opening that box's entry in the Guide. F1 inside the box does the
+	// same. Feedback is not a second glyph; it is one Help-menu entry.
+	function guideCornerButton(d) {
+		var b = document.createElement('button'), pc = EngCalcs.pageConfig || {}, tip = pc.lpn_guide_box_help || 'Help for this box';
+		b.type = 'button';
+		b.className = 'lpn-corner-btn lpn-corner-guide';
+		b.setAttribute('data-guide-for', d.box.id);
+		b.title = tip;
+		b.setAttribute('aria-label', tip);
+		b.textContent = '?';
+		b.addEventListener('click', function (e) { e.stopPropagation(); openGuideForBox(d.box.id); });
+		return b;
+	}
 	// Rebuilt whole on every change of state, because which buttons exist IS the state. A button the
 	// keyboard was on is replaced by its successor, so focus does not fall out of the box.
 	function renderDockCorner(d) {
@@ -51057,6 +51268,7 @@ var EngCalcs = EngCalcs || {};
 			if (side) { row.appendChild(dockButton(d, 'float', pc.lpn_dock_float || 'Float')); n++; }
 		}
 		if (d.help) { row.appendChild(d.help); n++; }
+		if (d.guideBtn) { row.appendChild(d.guideBtn); n++; }
 		d.box.style.setProperty('--lpn-corner-w', (n * LPN_CORNER_BTN_W) + 'px');
 		if (had) {
 			next = row.querySelector('[data-dock="' + had + '"]') || row.querySelector('[data-dock="float"]') ||
@@ -51487,7 +51699,15 @@ var EngCalcs = EngCalcs || {};
 		d.corner = row;
 		tip = typeof tipKey === 'function' ? tipKey() :
 			[].concat(tipKey || []).map(function (k) { return pc[k]; }).filter(Boolean).join(' ');
-		if (tip) { d.help = cornerHelp(tip); }
+		if (tip) { d.help = cornerHelp(tip); d.tipText = tip; }
+		d.guideBtn = guideCornerButton(d);
+		box.addEventListener('keydown', function (e) {
+			if (e.key === 'F1' && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) {
+				e.preventDefault();
+				e.stopPropagation();
+				openGuideForBox(box.id);
+			}
+		});
 		wireDockTab(d);
 		box.addEventListener('pointerenter', function () { if (dockFlyout === d) { clearTimeout(dockTimer); } });
 		box.addEventListener('pointerleave', function () { if (dockFlyout === d) { dockTuckLater(d); } });

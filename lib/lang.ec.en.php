@@ -1080,7 +1080,15 @@ $ec_lang['lpn_help_hotkeys']='Tables and Hotkeys';
 // whatever the 2026 thing is?"; Ida's design). Names both the Help row and the box's title bar. It
 // replaces lpn_help_hotkeys and the Help > Toolbar fly-out (lpn_help_icons, which still heads the
 // box's Toolbar section).
-$ec_lang['lpn_help_manual']='User guide';
+$ec_lang['lpn_help_manual']='Guide';
+// The Guide's contents rail, its search, its Boxes section and the "?" in every box's title bar.
+$ec_lang['lpn_guide_contents']='Contents';
+$ec_lang['lpn_guide_rail_hide']='Hide contents';
+$ec_lang['lpn_guide_rail_show']='Show contents';
+$ec_lang['lpn_guide_search']='Search the guide';
+$ec_lang['lpn_guide_boxes_heading']='Boxes';
+$ec_lang['lpn_guide_boxes_intro']='Each box can be moved, resized, docked at the left or right of the map, or closed. The ? at the right end of a box\'s title bar opens that box\'s entry in this guide.';
+$ec_lang['lpn_guide_box_help']='Help for this box';
 // Under a toolbar button in the User guide, naming the menu row that does the same thing.
 // {menu} becomes a path such as "Edit > Delete", drawn with chevrons; keep {menu} as it is.
 $ec_lang['lpn_guide_also']='Also in {menu}';
