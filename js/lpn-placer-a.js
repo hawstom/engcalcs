@@ -51,12 +51,10 @@ const RINGS = [0.8, 1.6, 2.6, 4.0];   // leader lengths tried, in row heights
 const RINGS_ALT = [0.8, 1.8];         // and for the other shape, which is lazier
 const RS_ALT = [0, 4], NRS = 5;       // ring slots: RINGS are 0-3, RINGS_ALT reuse 0 and add 4
 const NSLOT = (4 + 16) * NRS;         // leader slots per label: up to 4 gap directions and the compass
-const SIDES = [[1, 0], [-1, 0.15], [0, 1.5]];   // a pipe label above, below, or on its pipe: [side, cost]
 let tol = TOL;
 const DIRS8 = [];
 for (let k = 0; k < 8; k++) { DIRS8.push(k * Math.PI / 4); }
 const ALT_SHAPE = 0.6;     // H1: the other shape costs a little (lazy), used when it wins
-const LINK_OFF_PIPE = 2; // a pipe label that leaves its pipe for the horizontal
 const CS = 24;            // grid cell size, px
 const MARGIN = 320;       // grid reaches this far beyond the viewport
 const W = {
@@ -69,6 +67,15 @@ const W = {
 	ldrLdr: 24,           // a leader across a leader
 	lblTextLdr: 20
 };
+// ---- ingredients, each switchable so its worth can be measured (STRATEGY.md) -----------------
+// In node: PLACER_A_OFF=s4,s15 node run.js ... switches those off. On the page they are all on.
+const ING = { s1: true, s4: true, s5: true, s11: true, s12: true, s13: true, s15: true, grow: true, r5: true };
+(function () {
+	const env = typeof process !== 'undefined' && process.env ? process.env.PLACER_A_OFF : '';
+	(env || '').split(',').forEach(function (k) { k = k.trim(); if (k && Object.prototype.hasOwnProperty.call(ING, k)) { ING[k] = false; } });
+}());
+const ON_OWN = 3.5;       // a pipe label over its own pipe (R7): just under a row, so a value still wins
+const LEVEL = 2;          // a pipe label the setting asks to turn, left level (R14): under a row
 function distCost(L) { return L > 0 ? 0.6 + 0.6 * L + 0.12 * L * L : 0; }   // L in row heights
 
 // ---- geometry --------------------------------------------------------------------------------
@@ -381,6 +388,8 @@ function createPlacer() {
 
 function run(scene, prev, gaps, pool) {
 	const vp = scene.viewport, T = scene.text, RH = T.rowHeightPx;
+	const rw = scene.settings && scene.settings.readableAngleDeg;
+	const WIN = rw && isFinite(rw.min) && isFinite(rw.max) ? rw : { min: -110, max: 70 };
 	const G = gridFor(pool, 'G', vp);   // static real estate: symbols, Text, pipes, Text callouts
 	const D = gridFor(pool, 'D', vp);   // what this pass has placed: label ink and label leaders
 	const nodes = {}, links = {};
@@ -429,16 +438,25 @@ function run(scene, prev, gaps, pool) {
 			f.pt = [req.anchor.x, req.anchor.y];
 		}
 		if (!f.sym) { f.sym = { x: f.pt[0], y: f.pt[1], w: 0, h: 0 }; }
-		f.subsets = rowSubsets(req, scene.dropOrder[req.kind] || []);
+		f.subsets = rowSubsets(req, dropOrderOf(scene, req.kind));
 		f.R = req.rows.length;
 		return f;
 	});
 
+	// The drop order, FIRST TO GO first, with the ID in it like any other value; a scene that does
+	// not name the ID puts it first to go (the contract's dropOrderOf()).
+	function dropOrderOf(sc, kind) {
+		const o = ((sc.dropOrder && sc.dropOrder[kind]) || []).slice();
+		if (o.indexOf('id') < 0) { o.unshift('id'); }
+		return o;
+	}
 	function rowSubsets(req, order) {
 		const n = req.rows.length, keep = [];
 		for (let i = 0; i < n; i++) { keep.push(true); }
 		const out = [allIdx(keep)];
 		const droppable = [];
+		// A row whose field the order does not name goes before every named one.
+		for (let i = 0; i < n; i++) { if (order.indexOf(req.rows[i].field) < 0) { droppable.push(i); } }
 		order.forEach(function (fld) { for (let i = 0; i < n; i++) { if (req.rows[i].field === fld) { droppable.push(i); } } });
 		for (let k = 0; k < droppable.length; k++) {
 			keep[droppable[k]] = false;
@@ -518,8 +536,8 @@ function run(scene, prev, gaps, pool) {
 			const n = G.collect(1, bb[0], bb[1], bb[2], bb[3]);
 			for (let i = 0; i < n; i++) {
 				const it = buf[i];
-				if (it.link === ownLink || linkSeen[it.link] === es) { continue; }
-				if (anyBoxHitsSeg(boxes, it)) { linkSeen[it.link] = es; cost += W.lblPipe; }
+				if (linkSeen[it.link] === es) { continue; }
+				if (anyBoxHitsSeg(boxes, it)) { linkSeen[it.link] = es; if (it.link === ownLink) { cost += ON_OWN; cand.onOwn = true; } else { cost += W.lblPipe; } }
 			}
 		}
 		if (!fast || Rs.sum(Rs.tldr, bb[0], bb[1], bb[2], bb[3]) > 0) {
@@ -663,9 +681,21 @@ function run(scene, prev, gaps, pool) {
 		let x, y, align;
 		if (side === 'E') { x = px; y = py - sh.h0 / 2; align = 'left'; }
 		else if (side === 'W') { x = px - sh.w; y = py - sh.h0 / 2; align = 'right'; }
-		else if (side === 'N') { x = px - sh.w / 2; y = py - sh.h; align = 'center'; }
-		else { x = px - sh.w / 2; y = py; align = 'center'; }
+		else if (!ING.r5 || !leader) { x = px - sh.w / 2; y = side === 'N' ? py - sh.h : py; align = 'center'; }
+		else {
+			// R5: a leader arriving at the top or bottom edge lands near one corner, and the rows
+			// are justified to that side, the side the leader leans toward.
+			const lean = leader[leader.length - 1][0] - leader[0][0], inset = Math.min(5, minRowW(sh) / 2);
+			y = side === 'N' ? py - sh.h : py;
+			if (lean >= 0) { x = px - inset; align = 'left'; } else { x = px - sh.w + inset; align = 'right'; }
+		}
 		return { x: x, y: y, align: align, angle: 0, sh: sh, leader: leader, base: base };
+	}
+	function minRowW(sh) {
+		if (!sh.rw) { return sh.w; }
+		let m = Infinity;
+		for (let i = 0; i < sh.rw.length; i++) { if (sh.rw[i] < m) { m = sh.rw[i]; } }
+		return m;
 	}
 	function sideFor(ux, uy) {
 		if (ux > 0.38) { return 'E'; }
@@ -755,45 +785,105 @@ function run(scene, prev, gaps, pool) {
 			}
 		}
 	}
+	// A pipe label. When the setting asks (req.along, R14): turned to the pipe and beside it, on
+	// either side, at stations sliding out from the middle of the pipe's on-screen stretch (S4);
+	// level only as the fallback, a little dearer. When it does not ask: level, never turned (R13).
 	function linkCandidates(f, rows, rowPen, out, t) {
 		const sh = shape(f, rows, 'line');
+		const along = !!f.req.along, lvl = along ? LEVEL : 0;
 		const pt0 = { x: f.pt[0], y: f.pt[1], w: 0, h: 0 };
 		if (t > 0) {
-			around(f, sh, pt0, rowPen + LINK_OFF_PIPE, out, DIRS8, RINGS, t);
-			if (rows.length > 1) { around(f, shape(f, rows, 'stack'), pt0, rowPen + LINK_OFF_PIPE + ALT_SHAPE, out, DIRS8, RINGS_ALT, t); }
+			around(f, sh, pt0, rowPen + lvl, out, DIRS8, RINGS, t);
+			if (rows.length > 1 && ING.s5) { around(f, shape(f, rows, 'stack'), pt0, rowPen + lvl + ALT_SHAPE, out, DIRS8, RINGS_ALT, t); }
 			return out;
 		}
-		const P = f.link.points, ax = f.pt[0], ay = f.pt[1];
-		let best = Infinity, si = 1;
-		for (let i = 1; i < P.length; i++) {
-			const d = distSeg(ax, ay, P[i - 1], P[i]);
-			if (d < best) { best = d; si = i; }
-		}
-		const A = P[si - 1], B = P[si];
-		let ang = Math.atan2(B[1] - A[1], B[0] - A[0]) * 180 / Math.PI;
-		if (ang > 90) { ang -= 180; } else if (ang <= -90) { ang += 180; }
-		const r = ang * Math.PI / 180, tx = Math.cos(r), ty = Math.sin(r), nx = Math.sin(r), ny = -Math.cos(r);
-		const segLen = Math.hypot(B[0] - A[0], B[1] - A[1]);
-		const ta = ((ax - A[0]) * (B[0] - A[0]) + (ay - A[1]) * (B[1] - A[1])) / (segLen * segLen || 1);
-		const lo = -ta * segLen, hi = (1 - ta) * segLen;
-		const dirSign = ((B[0] - A[0]) * tx + (B[1] - A[1]) * ty) >= 0 ? 1 : -1;
-		const step = Math.max(10, sh.w * 0.4);
-		const slides = [0, step, -step, 2 * step, -2 * step];
-		const off = sh.h / 2 + GAP;
-		for (let k = 0; k < slides.length; k++) {
-			const sl = slides[k], along = sl * dirSign;
-			if (along < lo || along > hi) { continue; }
-			const qx = ax + tx * sl, qy = ay + ty * sl, pk = Math.abs(sl) / RH * 0.35;
-			for (let sd = 0; sd < SIDES.length; sd++) {
-				const ccx = qx + nx * off * SIDES[sd][0], ccy = qy + ny * off * SIDES[sd][0];
-				out.push({ x: ccx - sh.w / 2, y: ccy - sh.h / 2, align: 'left', angle: ang, sh: sh, leader: null, base: rowPen + SIDES[sd][1] + pk });
+		const st = stationsOf(f);
+		if (along) {
+			const off = sh.h / 2 + GAP + 0.5;
+			for (let k = 0; k < st.length; k++) {
+				const q = st[k], r = q.ang * Math.PI / 180, nx = Math.sin(r), ny = -Math.cos(r);
+				for (let side = 1; side >= -1; side -= 2) {
+					const ccx = q.x + nx * off * side, ccy = q.y + ny * off * side;
+					out.push({ x: ccx - sh.w / 2, y: ccy - sh.h / 2, align: 'left', angle: q.ang, sh: sh, leader: null,
+						base: rowPen + q.pen + (side < 0 ? 0.1 : 0) });
+				}
+				if (k === 0) {
+					// On its own pipe, the last resort before giving up a value (R7).
+					out.push({ x: q.x - sh.w / 2, y: q.y - sh.h / 2, align: 'left', angle: q.ang, sh: sh, leader: null, base: rowPen + 0.2 });
+				}
 			}
 		}
-		// Horizontal, beside the anchor or out on a leader from it; as one line or as a stack.
-		const pt = { x: ax, y: ay, w: 0, h: 0 };
-		around(f, sh, pt, rowPen + LINK_OFF_PIPE, out, DIRS8, RINGS, 0);
-		if (rows.length > 1) { around(f, shape(f, rows, 'stack'), pt, rowPen + LINK_OFF_PIPE + ALT_SHAPE, out, DIRS8, RINGS_ALT, 0); }
+		// Level, touching the pipe at the anchor and at the nearer stations; as one line or a stack.
+		const lim = Math.min(st.length, 3);
+		for (let k = 0; k < lim; k++) {
+			const pt = { x: st[k].x, y: st[k].y, w: 0, h: 0 };
+			around(f, sh, pt, rowPen + lvl + st[k].pen, out, DIRS8, RINGS, 0);
+			if (rows.length > 1 && ING.s5) { around(f, shape(f, rows, 'stack'), pt, rowPen + lvl + st[k].pen + ALT_SHAPE, out, DIRS8, RINGS_ALT, 0); }
+		}
 		return out;
+	}
+	// Stations along a pipe's on-screen stretch: the anchor first, then the middle of what is on
+	// screen and out from it by tenths of that stretch (S4), each with its local direction, turned
+	// into the reading window, and a small cost for sliding away from the anchor.
+	function stationsOf(f) {
+		if (f.stations) { return f.stations; }
+		const P = f.link.points, segs = [];
+		let total = 0;
+		for (let i = 1; i < P.length; i++) {
+			const L = Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]);
+			if (L > 0) { segs.push({ a: P[i - 1], b: P[i], s0: total, L: L }); total += L; }
+		}
+		const out = [];
+		function at(s) {
+			for (let i = 0; i < segs.length; i++) {
+				const g = segs[i];
+				if (s <= g.s0 + g.L || i === segs.length - 1) {
+					const u = Math.max(0, Math.min(1, (s - g.s0) / g.L));
+					return { x: g.a[0] + u * (g.b[0] - g.a[0]), y: g.a[1] + u * (g.b[1] - g.a[1]), ang: readable(Math.atan2(g.b[1] - g.a[1], g.b[0] - g.a[0]) * 180 / Math.PI), g: g };
+				}
+			}
+			return null;
+		}
+		if (!segs.length) { f.stations = [{ x: f.pt[0], y: f.pt[1], ang: 0, pen: 0 }]; return f.stations; }
+		// The anchor, on its nearest segment.
+		let sA = 0, best = Infinity;
+		segs.forEach(function (g) {
+			const vx = g.b[0] - g.a[0], vy = g.b[1] - g.a[1];
+			let u = ((f.pt[0] - g.a[0]) * vx + (f.pt[1] - g.a[1]) * vy) / (g.L * g.L);
+			u = Math.max(0, Math.min(1, u));
+			const d = Math.hypot(g.a[0] + u * vx - f.pt[0], g.a[1] + u * vy - f.pt[1]);
+			if (d < best) { best = d; sA = g.s0 + u * g.L; }
+		});
+		const q0 = at(sA);
+		q0.pen = 0; out.push(q0);
+		if (ING.s4) {
+			// The on-screen stretch, as arc length.
+			let on0 = Infinity, on1 = -Infinity;
+			const m = 40;
+			for (let k = 0; k <= m; k++) {
+				const q = at(total * k / m);
+				if (q.x >= vp.x && q.y >= vp.y && q.x <= vp.x + vp.w && q.y <= vp.y + vp.h) { on0 = Math.min(on0, k / m); on1 = Math.max(on1, k / m); }
+			}
+			if (on0 <= on1) {
+				const mid = (on0 + on1) / 2, span = on1 - on0;
+				[0, -0.1, 0.1, -0.2, 0.2, -0.3, 0.3, -0.4, 0.4].forEach(function (o, i) {
+					const fr = mid + o * span;
+					if (fr < on0 || fr > on1) { return; }
+					const s = total * fr;
+					if (Math.abs(s - sA) < 4) { return; }
+					const q = at(s);
+					q.pen = 0.05 + 0.04 * i;
+					out.push(q);
+				});
+			}
+		}
+		f.stations = out;
+		return out;
+	}
+	function readable(a) {
+		a = ((a % 360) + 360) % 360; if (a > 180) { a -= 360; }
+		if (!(a > WIN.min && a <= WIN.max)) { a += 180; a = ((a % 360) + 360) % 360; if (a > 180) { a -= 360; } }
+		return a;
 	}
 
 	// Best candidate for label f among row sets k0..k1, given everything placed.
@@ -891,11 +981,17 @@ function run(scene, prev, gaps, pool) {
 		Object.keys(PL).forEach(function (id) { prevPl[id] = PL[id]; });
 	}
 	info.forEach(function (f) {
-		if (kept[f.li]) { return; }
+		if (kept[f.li] || !ING.s13) { return; }
 		const pl = prevPl[f.req.id];
 		if (!pl || !pl.shown || !prevReq[f.req.id]) { return; }
 		const c = carried(f, pl, prevReq[f.req.id]);
 		if (!c) { return; }
+		// R14: a level pipe label the setting asks to turn takes a clean turned spot with the same
+		// rows when one has opened up, rather than holding still level.
+		if (f.link && f.req.along && !c.angle) {
+			const k = subsetIndex(f, c.sh.rows), a = k < 0 ? null : bestAligned(f, k);
+			if (a) { commit(f, a.cand, a.cost); kept[f.li] = 'held'; return; }
+		}
 		// The bench's own tolerance, a hair inside it: a symbol that grew by a pixel on zooming in
 		// does not force a label to jump.
 		tol = HELD_TOL;
@@ -903,7 +999,30 @@ function run(scene, prev, gaps, pool) {
 		tol = TOL;
 		if (cost < Infinity) { commit(f, c, cost); kept[f.li] = 'held'; }
 	});
+	function subsetIndex(f, rows) {
+		for (let k = 0; k < f.subsets.length; k++) {
+			const s = f.subsets[k];
+			if (s.length === rows.length && s.every(function (v, i) { return v === rows[i]; })) { return k; }
+		}
+		return -1;
+	}
+	// The cheapest clean turned spot beside its pipe for row set k, or null.
+	function bestAligned(f, k) {
+		const list = cands(f, k, 0), rowPen = W.row * (f.R - f.subsets[k].length);
+		let best = null, bestCost = rowPen + 1.5;
+		for (let i = 0; i < list.length; i++) {
+			const c = list[i];
+			if (!c.angle || c.base >= bestCost) { continue; }
+			if (c.st === undefined) { c.st = evalStatic(f, c, true); }
+			if (c.st >= bestCost || c.onOwn) { continue; }
+			const v = evalDyn(f, c, c.st, bestCost);
+			if (v < bestCost) { best = c; bestCost = v; }
+		}
+		return best ? { cand: best, cost: bestCost } : null;
+	}
 	function carried(f, pl, r0) {
+		// R13: when the setting no longer asks, a turned label does not stay turned.
+		if (f.link && !f.req.along && Math.abs((+pl.angle || 0) % 180) > 0.5) { return null; }
 		const fields = pl.rows.map(function (i) { return r0.rows[i] && r0.rows[i].field; });
 		const rows = [];
 		f.req.rows.forEach(function (r, i) { if (fields.indexOf(r.field) >= 0) { rows.push(i); } });
@@ -927,7 +1046,7 @@ function run(scene, prev, gaps, pool) {
 		const p = placed[f.li];
 		if (!p) { return; }
 		const c0 = p.cand, n0 = c0.sh.rows.length;
-		if (c0.align === 'center' || c0.angle) { return; }
+		if (c0.align === 'center' && !c0.angle) { return; }
 		for (let k = 0; k < f.subsets.length; k++) {
 			const rows = f.subsets[k];
 			if (rows.length <= n0) { break; }
@@ -947,7 +1066,7 @@ function run(scene, prev, gaps, pool) {
 			const cur = placed[f.li];
 			uncommit(f);
 			const cost = evalFull(f, c, true);
-			if (cost < cur.cost) { commit(f, c, cost); return; }
+			if (cost < cur.cost && !(c.onOwn && !c0.onOwn)) { c.k = k; commit(f, c, cost); return; }
 			commit(f, cur.cand, cur.cost);
 		}
 	}
