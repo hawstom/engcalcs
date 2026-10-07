@@ -79,7 +79,7 @@ EngCalcs.lpnPlacerC = (function () {
 	//   deepgrow  GROW looks further down a label's list for room for one more property (S11)
 	//   evict     MEND's blocker may be a leader as well as a label, and up to two neighbours (S16)
 	//   fine      a REPAIR pass: hidden and cut labels try rays every 15 degrees, every half row (S3, S15)
-	var ING_ALL = ['deepgrow', 'evict', 'fine'];
+	var ING_ALL = ['deepgrow', 'evict', 'fine', 'finest'];
 	function ingredients() {
 		var off = [];
 		if (typeof process !== 'undefined' && process.env && process.env.PLACER_C_OFF) { off = String(process.env.PLACER_C_OFF).split(','); }
@@ -525,7 +525,12 @@ EngCalcs.lpnPlacerC = (function () {
 			out = layout(last.scene, { scene: last.scene, layout: last.layout, again: true }, deep(deadline));
 			if (out) { ready = { fp: last.fp, layout: out }; }
 		}
-		function deep(deadline) { return { show: 400, grow: 90, mend: 8000, nudge: 8000, deadline: deadline }; }
+		// A pause is anytime too: past `soft` it stops improving and keeps what it has; only a pause
+		// that cannot even place every label (`deadline` during SHOW) is thrown away.
+		function deep(deadline) {
+			var left = deadline - now();
+			return { show: 400, grow: 90, mend: 8000, nudge: 8000, deadline: deadline, soft: deadline - left * 0.3, stop: deadline };
+		}
 
 		// A cheap signature of everything a layout depends on: the view, the lettering, the
 		// labels and their rows, where every node is, and which layout the last view had (R13).
@@ -620,7 +625,15 @@ EngCalcs.lpnPlacerC = (function () {
 				st.fineGrow = true;
 				grow(st, order);
 				st.fineGrow = false;
-			}
+				}
+				// 4e. FINEST: a label still hidden tries 72 directions at every quarter row.
+				if (ING.finest) {
+					order.forEach(function (L) {
+						if (L.cur || (st.pan && L.prevHidden && !L.nearEdge) || st.late || over(st)) { return; }
+						var c = withFine(L, function () { return bestFor(st, L, L.rowsets.length - 1, SHOW_MAX, 0); }, 'finest');
+						if (c) { commit(st, L, c); }
+					});
+				}
 			// 4c. ALIGN (R14): alignment is required wherever the same rows fit aligned. Once
 			// everything has settled, a pipe label still level where the user asked for it along
 			// its pipe takes any aligned spot now free for the same rows.
@@ -831,26 +844,29 @@ EngCalcs.lpnPlacerC = (function () {
 
 		// ---- FINE specs (the `fine` ingredient): rays every 15 degrees, every half row out to
 		// four rows, from the node or from the pipe's middle; tried only by the REPAIR pass. ----
-		function withFine(L, fn) {
-			var s0 = L.specs, c0 = L.sc;
-			if (!L.fine) {
-				L.fine = cachedSpecs(L, 'F' + (L.specs.key || ''), function () { return fineSpecs(L, st0.text.rowHeightPx || 14.4); }, 'fine');
-				L.fsc = [];
+		// tier 'fine': 24 directions, half rows; 'finest' (the `finest` ingredient, for a label
+		// still hidden after everything else): 72 directions, quarter rows.
+		function withFine(L, fn, tier) {
+			var s0 = L.specs, c0 = L.sc, t = tier || 'fine';
+			if (!L[t]) {
+				var row = st0.text.rowHeightPx || 14.4;
+				L[t] = cachedSpecs(L, t + (L.specs.key || ''), function () { return t === 'finest' ? fineSpecs(L, row, 72, 4) : fineSpecs(L, row, 24, 2); }, t);
+				L[t + 'Sc'] = [];
 			}
-			L.specs = L.fine; L.sc = L.fsc;
+			L.specs = L[t]; L.sc = L[t + 'Sc'];
 			try { return fn(); } finally { L.specs = s0; L.sc = c0; }
 		}
-		function fineSpecs(L, row) {
+		function fineSpecs(L, row, nd, sub) {
 			var specs = [], link = L.owner.t === 'link', nx = 0, ny = 0;
 			if (link) { nx = -L.owner.P.dy; ny = L.owner.P.dx; }
-			for (var i = 0; i < 24; i++) {
-				var deg = i * 15 - 180, ux = Math.cos(deg * D2R), uy = Math.sin(deg * D2R), pref = prefOf(deg);
+			for (var i = 0; i < nd; i++) {
+				var deg = i * 360 / nd - 180, ux = Math.cos(deg * D2R), uy = Math.sin(deg * D2R), pref = prefOf(deg);
 				if (link && Math.abs(ux * nx + uy * ny) < 0.26) { continue; }
 				['stack', 'line'].forEach(function (layout) {
 					var sh = layout === L.usual ? 0 : SHAPE;
 					if (!link) { specs.push({ t: 'adj', ux: ux, uy: uy, layout: layout, base: pref + sh }); }
-					for (var k = 1; k <= 8; k++) {
-						var len = k * row / 2 - (link ? 4 : 0);
+					for (var k = 1; k <= 4 * sub; k++) {
+						var len = k * row / sub - (link ? 4 : 0);
 						var b0 = (link ? 0.3 : 0) + LDR_BASE + len * LDR_PER_PX + pref * 0.5 + (link && L.along ? LEVEL / 2 : 0) + sh;
 						specs.push({ t: 'ldr', ux: ux, uy: uy, len: len, layout: layout, base: b0 });
 						// The same ray with the block hung by its near corner, not its end row's middle:
@@ -1237,8 +1253,9 @@ EngCalcs.lpnPlacerC = (function () {
 				if (specs[i].base >= bestCost) { break; }
 				if ((i & 31) === 31 && (st.effort.deadline || st.effort.stop)) {
 					var tn = now();
-					if (st.effort.deadline && tn > st.effort.deadline) { st.late = true; break; }
-					if (st.effort.stop && tn > st.effort.stop && st.phase !== 'show') { break; }
+					if (st.phase === 'show') {
+						if (st.effort.deadline && tn > st.effort.deadline) { st.late = true; break; }
+					} else if (st.effort.stop && tn > st.effort.stop) { break; }
 				}
 				sv = sc[i];
 				// A level spot for a label asked along its pipe carries the LEVEL penalty in its
