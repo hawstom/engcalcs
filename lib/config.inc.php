@@ -497,7 +497,7 @@ define('SIGNAL_LOG', EC_LOG_DIR . '/engcalcs-signal.log');
 //
 // THE SIDE COUNT (Tom, 2026-10-07: *"I would be very interested to see a side count of 'tester
 // browsers'"*). The cookie value is "1.<YYYYMMDD>", the UTC day this browser was last tallied. The
-// first request of each UTC day from a tester browser writes one 'day' row and restamps the cookie,
+// first PAGE VIEW of each UTC day from a tester browser writes one 'day' row and restamps the cookie,
 // so the number of 'day' rows on a date is exactly the number of distinct tester browsers active
 // that day -- with no identifier, because a date is the same for everybody. The restamp also
 // renews the one-year lifetime, so a browser in use is never forgotten; one left unused for a year
@@ -536,10 +536,10 @@ function ecLogTester($event, $page = '') {
     @file_put_contents(TESTER_LOG, $line, FILE_APPEND | LOCK_EX);
 }
 
-/** Sets the tester cookie, stamped with today's UTC date, for EC_NOLOG_DAYS from now. */
-function ecTesterStamp() {
+/** Sets the tester cookie, "1." plus $day (YYYYMMDD, or '' for not yet tallied), for a year. */
+function ecTesterStamp($day) {
     if (headers_sent()) return;
-    $value = '1.' . gmdate('Ymd');
+    $value = $day === '' ? '1' : '1.' . $day;
     // THE ATTRIBUTES ARE NAMED, like every other cookie this suite sets (Task 322 half B).
     // httponly is true because ecLoggingOptedOut() is the only reader and it is PHP; secure follows
     // the scheme, because this host answers on http as well and a Secure cookie set over http is
@@ -555,9 +555,9 @@ function ecTesterStamp() {
 }
 
 /**
- * Applies ?ec_nolog=1 / ?ec_nolog=0 and keeps the daily tally. Runs once per request, from the
- * bottom of the consent section below, because ecLogTester() appends ecLogBucketSuffix() and that
- * reads the consent constants, which are defined further down this file than this function.
+ * Applies ?ec_nolog=1 / ?ec_nolog=0, on any request. Runs once per request, from the bottom of the
+ * consent section below, because ecLogTester() appends ecLogBucketSuffix() and that reads the
+ * consent constants, which are defined further down this file than this function.
  */
 function ecTesterRequest() {
     $was = ecLoggingOptedOut();
@@ -579,15 +579,25 @@ function ecTesterRequest() {
             }
             return;
         }
-        if (!$was) ecLogTester('on', $page);
-    } elseif (!$was) {
-        return;
+        if (!$was) {
+            ecLogTester('on', $page);
+            // Stamped with no day yet, so the page view that carried ?ec_nolog=1 is tallied by
+            // ecTesterDayTally() like any other first page view of the day.
+            ecTesterStamp('');
+        }
     }
-    $stamp = $was ? substr((string) $_COOKIE[EC_NOLOG_COOKIE], 2) : '';
-    if ($stamp !== gmdate('Ymd')) {
-        ecTesterStamp();
-        ecLogTester('day', $page);
-    }
+}
+
+/**
+ * The first PAGE VIEW of each UTC day from a tester browser writes one 'day' row and restamps the
+ * cookie, which also renews its year. Called from lib/base.inc.php, which only pages load, so the
+ * beacons, the lock heartbeat and other background requests never count as a day's use.
+ */
+function ecTesterDayTally() {
+    if (!ecLoggingOptedOut()) return;
+    if (substr((string) $_COOKIE[EC_NOLOG_COOKIE], 2) === gmdate('Ymd')) return;
+    ecTesterStamp(gmdate('Ymd'));
+    ecLogTester('day', isset($_SERVER['SCRIPT_NAME']) ? basename($_SERVER['SCRIPT_NAME'], '.php') : '');
 }
 
 // ---- Consent for the storage that is NOT strictly necessary (ROADMAP Task 286) ----
@@ -953,7 +963,7 @@ if (!ecAnalyticsConsented() && (isset($_COOKIE['ec_blang']) || isset($_COOKIE[EC
     ecForgetAnalyticsStorage();
 }
 
-// The tester mark and its daily tally (see ecTesterRequest() above). Not for a command-line render,
+// The tester mark (see ecTesterRequest() above; the daily tally is in lib/base.inc.php). Not for a command-line render,
 // which is never a visitor and has no cookies to set.
 if (PHP_SAPI !== 'cli') {
     ecTesterRequest();

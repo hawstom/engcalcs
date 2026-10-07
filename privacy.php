@@ -104,8 +104,8 @@ to do something different; <em>Allow all</em> covers that too.</p>
 limited way than a typical web server records that a page was served: the page name, the language
 your browser asked for, the time, and whether the page was used with a finger or with a mouse.
 Those rows carry no identifier, so we cannot tell your second
-visit from somebody else&rsquo;s first, and we count them separately from the visits of people who
-did agree, because they are a different kind of number.</p>
+visit from somebody else&rsquo;s first, and we count them separately from the counts from browsers
+that did agree, because they are a different kind of number.</p>
 
 <h2>What is stored on your device</h2>
 

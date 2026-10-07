@@ -345,7 +345,9 @@ if [ -x "$PROD/log/lang-log-stats.sh" ] || [ -r "$PROD/log/lang-log-stats.sh" ];
             echo "                               page, and not again for a year"
             echo "   page loads (everyone else)  one row per page view"
             echo "   Both count only after 10+ seconds on the page, so robots are"
-            echo "   nearly all excluded."
+            echo "   nearly all excluded. One exception: a said-yes browser that has"
+            echo "   already passed the 10 seconds on any page is counted on a new"
+            echo "   page at once."
             printf '%s\n' "$out" | awk '
                 /reach rows:/ && $NF+0 > 0 {
                     print "   Log check: " $NF " rows of the reach log are in the old format and"
@@ -370,10 +372,13 @@ fi
 # TESTER BROWSERS, the side count (Tom, 2026-10-07). A browser that opened any page with
 # ?ec_nolog=1 writes nothing to the logs above; its activity goes to engcalcs-tester.log instead,
 # and its first request of each UTC day writes one 'day' row there. So the 'day' rows on a date are
-# the number of distinct tester browsers used that day. lib/config.inc.php, ecTesterRequest().
+# the number of distinct tester browsers used that day. Only a page view writes it (lib/base.inc.php,
+# ecTesterDayTally() in lib/config.inc.php), never a beacon or the lock heartbeat.
 TESTER="$PROD/log/engcalcs-tester.log"
 echo ""
-echo "    Tester browsers (marked by ?ec_nolog=1), kept out of every count above:"
+echo "    Tester browsers (marked by ?ec_nolog=1), kept out of every count above."
+echo "    The mark is per host: one browser marked on two hosts counts twice. All hosts"
+echo "    serve one checkout through a symlink, so they share this one log folder."
 if [ -r "$TESTER" ]; then
     echo "     UTC day      tester browsers"
     for i in 6 5 4 3 2 1 0; do
@@ -384,8 +389,13 @@ if [ -r "$TESTER" ]; then
     done
     since=$(date -u -d '24 hours ago' '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null)
     if [ -n "$since" ]; then
-        held=$(awk -F'\t' -v s="$since" '$1 >= s && $2 != "day" && $2 != "on" && $2 != "off"' "$TESTER" | wc -l | tr -d ' ')
-        echo "     tester rows held out of the counts, last 24 hours: $held"
+        # PER BUCKET, NEVER SUMMED: a said-yes tester row and an everyone-else one are the same
+        # two units as the main counts.
+        heldp=$(awk -F'\t' -v s="$since" '$1 >= s && $2 != "day" && $2 != "on" && $2 != "off" && $NF != "visit"' "$TESTER" | wc -l | tr -d ' ')
+        heldl=$(awk -F'\t' -v s="$since" '$1 >= s && $2 != "day" && $2 != "on" && $2 != "off" && $NF == "visit"' "$TESTER" | wc -l | tr -d ' ')
+        echo "     tester rows held out, last 24 hours (two units; never add them):"
+        echo "       from browsers that said yes  $heldp"
+        echo "       from everyone else           $heldl"
     fi
     on=$(awk -F'\t' '$2 == "on"' "$TESTER" | wc -l | tr -d ' ')
     off=$(awk -F'\t' '$2 == "off"' "$TESTER" | wc -l | tr -d ' ')

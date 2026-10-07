@@ -47,11 +47,11 @@ Full inventory: `dev/cookie-storage-inventory.md`.
   spent the banner's interruption on a per-visit count; a year makes the said-yes bucket count
   browsers, per page. `consent_body` names no lifetime, so it stays true and the version does not
   move.
-- **The tester mark (`ec_nolog`) is exempt, day stamp included.** Nobody reaches it by accident:
-  the only door is typing `?ec_nolog=1`, which is a request to be kept out of the counts, and the
-  cookie does nothing but carry that request out. The stamp is what renews the year once a day
-  while the mark is in use, and it is a date shared by everyone, so it identifies no one; that it
-  also yields the tester-browser count is a by-product, not a second purpose stored for it.
+- **The tester mark (`ec_nolog`) is exempt, day stamp included.** The visitor asks to be held
+  out of the counts by typing `?ec_nolog=1`; there is no other door, and the mark does nothing but
+  carry out that request. The date in it exists to give the side count of tester browsers per day:
+  it is the same for everyone that day and is never stored beside an identifier, so it singles out
+  nobody. Whether it gets a `privacy.php` row is Tom's call (it has none: not in the UI).
 
 ---
 

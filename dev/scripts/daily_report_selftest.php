@@ -68,7 +68,7 @@ echo "    PAGE LOADS - reach rows: 8   classified: 8   unclassified (older forma
 SH;
 file_put_contents($tmp . '/log/lang-log-stats.sh', $fixtureScript);
 
-// The tester log (2026-10-07): two tester browsers used today, one yesterday, one held-out row in
+// The tester log (2026-10-07): two tester browsers used today, one yesterday, one held-out row per bucket in
 // the last 24 hours, two marks set and none cleared. Rows in the exact shape ecLogTester() writes.
 $today = gmdate('Y-m-d');
 $yday  = gmdate('Y-m-d', time() - 86400);
@@ -80,6 +80,7 @@ file_put_contents($tmp . '/log/engcalcs-tester.log', implode('', array(
     $today . "T00:00:02Z\ton\tDarcy-Weisbach\tvisitor\n",
     $today . "T00:00:02Z\tday\tDarcy-Weisbach\tvisitor\n",
     $nowTs . "\tshopping\tDarcy-Weisbach\tvisitor\n",
+    $nowTs . "\treach\tDarcy-Weisbach\tvisit\n",
 )));
 chmod($tmp . '/log/lang-log-stats.sh', 0755);
 
@@ -130,8 +131,13 @@ ec_dr_expect('today shows 2 tester browsers (two day rows today)',
     (bool) preg_match('/' . preg_quote($today, '/') . '\s+2\b/', $usage), $usage);
 ec_dr_expect('yesterday shows 1 tester browser',
     (bool) preg_match('/' . preg_quote($yday, '/') . '\s+1\b/', $usage), $usage);
-ec_dr_expect('one tester row was held out of the counts in the last 24 hours',
-    strpos($usage, 'tester rows held out of the counts, last 24 hours: 1') !== false, $usage);
+ec_dr_expect('held-out tester rows are printed per bucket and never summed (1 said yes, 1 everyone else)',
+    (bool) preg_match('/from browsers that said yes\s+1\n\s+from everyone else\s+1\n/', $usage)
+    && strpos($usage, 'never add them') !== false, $usage);
+ec_dr_expect('the tester count says the mark is per host and that the hosts share one log folder',
+    strpos($usage, 'The mark is per host') !== false && strpos($usage, 'share this one log folder') !== false, $usage);
+ec_dr_expect('the mail names the exception to the 10-second gate for returning said-yes browsers',
+    strpos($usage, 'counted on a new') !== false, $usage);
 ec_dr_expect('marks set and cleared are counted from the whole file',
     strpos($usage, 'browsers marked since ' . $yday . ': 2; marks cleared: 0') !== false, $usage);
 ec_dr_expect('the mail gives the true, checked answer on robots (excluded by the dwell gate, '

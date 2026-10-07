@@ -35,13 +35,22 @@ require_once('config.inc.php');
 // called session_start() at the top of every page load, above the config require, so PHPSESSID --
 // a 32-hex unique identifier -- was written before anybody had been asked anything. Task 286 made
 // it conditional on consent; Task 288 removed it outright. Everything the session held was some
-// form of "have we already counted this", which now lives in one session cookie holding a single
+// form of "have we already counted this", which now lives in one one-year cookie holding a single
 // base-32 digit per page. No identifier, no server-side state. See EC_SEEN_COOKIE in config.
 //
 // How long this browser has been around, for the confirmed-human beacon's 10s gate. Derived from
 // the de-duplication digits rather than a stored timestamp: if any page carries the human-view
 // bit, this browser already dwelt somewhere long enough to count.
 $ec_sessionAgeMs = ecSessionAgeMs();
+
+// The tester browsers' daily tally (ecTesterDayTally() in config). Here rather than in config so
+// only a PAGE VIEW writes it: the beacons, the Looped-Network lock heartbeat and consent.php load
+// config alone. sw.php and manifest.php load this file but are fetched by the browser in the
+// background, so they are excluded by name.
+if (PHP_SAPI !== 'cli'
+    && !in_array(basename(isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '', '.php'), ['sw', 'manifest'], true)) {
+    ecTesterDayTally();
+}
 
 // Load the language settings.
 // They are needed for determining the session language in Session.lib.php below.

@@ -119,12 +119,17 @@ function aboutAYear(c) { return c && c.maxAge !== null && Math.abs(c.maxAge - YE
 		r.section('2. ?ec_nolog=1 marks a tester browser for a year');
 		clearLogs();
 		a = await req(base, 'log-human-view.php?ec_nolog=1');
-		r.ok(a.set.ec_nolog && a.set.ec_nolog.value === '1.' + today, 'the cookie is set, stamped with the UTC day', JSON.stringify(a.set.ec_nolog));
+		r.ok(a.set.ec_nolog && a.set.ec_nolog.value === '1' && aboutAYear(a.set.ec_nolog),
+			'?ec_nolog=1 on a non-page request sets the mark for a year, not yet tallied', JSON.stringify(a.set.ec_nolog));
+		r.ok(/^tester:/.test(a.body), 'the hand-opened endpoint says "tester"', a.body.trim());
+		r.eq(rows('engcalcs-tester.log').map((x) => x[1]).join(','), 'on', 'a non-page request writes the mark but no day row');
+		clearLogs();
+		a = await req(base, 'Manning-Pipe-Flow.php?ec_nolog=1');
+		r.ok(a.set.ec_nolog && a.set.ec_nolog.value === '1.' + today, 'on a page the cookie is stamped with the UTC day', JSON.stringify(a.set.ec_nolog));
 		r.ok(aboutAYear(a.set.ec_nolog), 'it lasts one year', JSON.stringify(a.set.ec_nolog));
 		r.ok(a.set.ec_nolog && a.set.ec_nolog.httponly, 'it is HttpOnly');
-		r.ok(/^tester:/.test(a.body), 'the hand-opened endpoint says "tester"', a.body.trim());
 		let t = rows('engcalcs-tester.log').map((x) => x[1]);
-		r.eq(t.join(','), 'on,day', 'the tester log records the mark and the day');
+		r.eq(t.join(','), 'on,day,reach', 'the tester log records the mark, the day, and the page load held out');
 
 		const tester = { ec_nolog: '1.' + today };
 		a = await req(base, 'log-human-view.php', { cookies: tester, post: { page: 'Manning-Pipe-Flow', lang: 'en' } });
@@ -139,7 +144,7 @@ function aboutAYear(c) { return c && c.maxAge !== null && Math.abs(c.maxAge - YE
 		r.eq(a.status, 200, 'a real calculator page renders for a tester');
 		r.eq(rows('engcalcs-lang.log').length, 0, 'a tester page load writes nothing to the reach log');
 		t = rows('engcalcs-tester.log');
-		r.eq(t.map((x) => x[1]).join(','), 'on,day,shopping,using,behaviour,naming,reach',
+		r.eq(t.map((x) => x[1]).join(','), 'on,day,reach,shopping,using,behaviour,naming,reach',
 			'every one of them went to the tester log instead, and no second day row');
 		r.ok(t.every((x) => x[2] === 'Manning-Pipe-Flow' || x[1] === 'on' || x[1] === 'day'), 'each tester row names its page');
 		r.ok(t.every((x) => x[x.length - 1] === 'visit'), 'each tester row carries the bucket token last');
@@ -150,12 +155,20 @@ function aboutAYear(c) { return c && c.maxAge !== null && Math.abs(c.maxAge - YE
 
 		r.section('3. one day row per browser per day; old marks are honoured and upgraded');
 		clearLogs();
-		a = await req(base, 'log-human-view.php', { cookies: { ec_nolog: '1.20200101' } });
-		r.ok(a.set.ec_nolog && a.set.ec_nolog.value === '1.' + today && aboutAYear(a.set.ec_nolog), 'a stamp from an earlier day is renewed for a year', JSON.stringify(a.set.ec_nolog));
-		a = await req(base, 'log-human-view.php', { cookies: { ec_nolog: '1' } });
+		a = await req(base, 'log-human-view.php', { cookies: { ec_nolog: '1.20200101' }, post: { page: 'Manning-Pipe-Flow', lang: 'en' } });
+		a = await req(base, 'lpn-lock.php', { cookies: { ec_nolog: '1.20200101' } });
+		r.ok(!a.set.ec_nolog, 'a beacon or the lock endpoint does not restamp the cookie');
+		r.eq(rows('engcalcs-tester.log').map((x) => x[1]).join(','), 'shopping', 'and writes no day row: only a page view counts as a day of use');
+		clearLogs();
+		a = await req(base, 'Manning-Pipe-Flow.php', { cookies: { ec_nolog: '1.20200101' } });
+		r.ok(a.set.ec_nolog && a.set.ec_nolog.value === '1.' + today && aboutAYear(a.set.ec_nolog), 'a page view renews a stamp from an earlier day for a year', JSON.stringify(a.set.ec_nolog));
+		a = await req(base, 'Manning-Pipe-Flow.php', { cookies: { ec_nolog: '1' } });
 		r.ok(a.set.ec_nolog && a.set.ec_nolog.value === '1.' + today, 'a legacy plain "1" mark is honoured and upgraded', JSON.stringify(a.set.ec_nolog));
-		r.ok(/^tester:/.test(a.body), 'and that browser reads as a tester');
-		r.eq(rows('engcalcs-tester.log').map((x) => x[1]).join(','), 'day,day', 'two browsers, two day rows, no "on" rows (both were already marked)');
+		r.eq(rows('engcalcs-tester.log').map((x) => x[1]).join(','), 'day,reach,day,reach', 'two browsers, two day rows, no "on" rows (both were already marked)');
+		a = await req(base, 'sw.php', { cookies: { ec_nolog: '1.20200101' } });
+		r.ok(!a.set.ec_nolog, 'the service worker script, fetched in the background, is not a day of use');
+		a = await req(base, 'log-human-view.php', { cookies: { ec_nolog: '1' } });
+		r.ok(/^tester:/.test(a.body), 'a legacy mark reads as a tester');
 		a = await req(base, 'log-human-view.php', { cookies: { ec_nolog: 'junk' } });
 		r.ok(/^counted:/.test(a.body), 'a malformed value is not a tester mark');
 

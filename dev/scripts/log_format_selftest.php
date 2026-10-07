@@ -94,6 +94,12 @@ $rows = [
         "2026-09-08T00:00:01Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}units{$T}preset:si{$T}visit",
         // a Spanish page: excluded from the English-only asked-tag table
         "2026-09-08T00:00:02Z{$T}Manning-Pipe-Flow{$T}es{$T}es-mx{$T}units{$T}preset:si{$T}visit",
+        // five returns with saved work from said-yes browsers, against two said-yes views
+        "2026-09-09T00:00:01Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}repeat{$T}return{$T}visitor",
+        "2026-09-09T00:00:02Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}repeat{$T}return{$T}visitor",
+        "2026-09-09T00:00:03Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}repeat{$T}return{$T}visitor",
+        "2026-09-09T00:00:04Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}repeat{$T}return{$T}visitor",
+        "2026-09-09T00:00:05Z{$T}Manning-Pipe-Flow{$T}en{$T}en-us{$T}repeat{$T}return{$T}visitor",
     ],
     'engcalcs-contact-send.log' => [],
 ];
@@ -109,6 +115,14 @@ $out = (string) $out;
 // pattern here separates its tokens with \s+.
 function ec_ft_line($out, $re) { return preg_match($re, $out) === 1; }
 
+// -- repeat use (2026-10-07): a ratio of returns per new said-yes browser, never a percentage ----
+ec_ft_expect('repeat: Manning-Pipe-Flow prints 2 new browsers, 5 returns, 2.50 returns per browser',
+    ec_ft_line($out, '/\n\s+Manning-Pipe-Flow\s+2\s+5\s+2\.50\n/'), $out);
+ec_ft_expect('repeat: no %repeat column survives (it read over 100% once ec_seen lasted a year)',
+    strpos($out, '%repeat') === false && strpos($out, 'returns per browser') !== false);
+ec_ft_expect('no consent share of reach rows is printed (it fell by construction)',
+    strpos($out, 'Consent share of reach rows') === false);
+
 // -- pointer tier --
 ec_ft_expect('device: the section prints',
     ec_ft_line($out, '/DEVICE — coarse pointer/'));
@@ -117,8 +131,8 @@ ec_ft_expect('device: PAGE LOADS counts coarse 1, fine 1, unknown 2 (a blank poi
     && ec_ft_line($out, '/\n\s+coarse\s+1\s+\S+\s+\[/')
     && ec_ft_line($out, '/\n\s+fine\s+1\s+\S+\s+\[/'),
     $out);
-ec_ft_expect('device: PEOPLE counts the legacy four-field row as unknown, never as fine',
-    ec_ft_line($out, '/PEOPLE — confirmed-human page views: 2\n\s+(unknown\s+1[^\n]*\n\s+coarse\s+1|coarse\s+1[^\n]*\n\s+unknown\s+1)/'));
+ec_ft_expect('device: the said-yes bucket counts the legacy four-field row as unknown, never as fine',
+    ec_ft_line($out, '/BROWSERS \(SAID YES\) — confirmed-human page views: 2\n\s+(unknown\s+1[^\n]*\n\s+coarse\s+1|coarse\s+1[^\n]*\n\s+unknown\s+1)/'));
 // Denominators this small print '-' for the ratio and still print the interval, so the
 // patterns below accept any ratio token and anchor on the counts and the bracket.
 ec_ft_expect('device: coarse by page reads known rows only -- Looped-Network 2 known, 1 coarse',
@@ -127,8 +141,8 @@ ec_ft_expect('device: calculated by pointer -- coarse 1 shopping, 1 using in the
     ec_ft_line($out, '/\n\s+coarse\s+1\s+1\s+\S+\s+\[/'), $out);
 
 // -- naming --
-ec_ft_expect('naming: PEOPLE line carries titles 1, subtitles 0, saves 1, renames 1',
-    ec_ft_line($out, '/PEOPLE\s+titles\s+1\s+subtitles\s+0\s+saves\s+1\s+renames\s+1/'));
+ec_ft_expect('naming: the said-yes line carries titles 1, subtitles 0, saves 1, renames 1',
+    ec_ft_line($out, '/BROWSERS \(SAID YES\)\s+titles\s+1\s+subtitles\s+0\s+saves\s+1\s+renames\s+1/'));
 ec_ft_expect('naming: PAGE LOADS line carries the subtitle row',
     ec_ft_line($out, '/PAGE LOADS\s+titles\s+0\s+subtitles\s+1\s+saves\s+0\s+renames\s+0/'));
 ec_ft_expect('naming: Looped-Network is NAMED by its save and its rename is printed beside it, not n/a',
@@ -153,7 +167,7 @@ ec_ft_expect('naming: with no save or rename in the window the map page reads n/
 // -- language: served/asked pair and the region table --
 ec_ft_expect('language: reach rows classify by field count -- 3 page loads, 2 classified, 1 older format',
     ec_ft_line($out, '/PAGE LOADS — reach rows: 3\s+classified: 2\s+unclassified \(older format\): 1/'));
-ec_ft_expect('language: English by region lists en-gb and bare en in page loads and en-us in people',
+ec_ft_expect('language: English by region lists en-gb and bare en in page loads and en-us in said yes',
     ec_ft_line($out, '/\n\s+en-gb\s+0\s+1\n/') && ec_ft_line($out, '/\n\s+en\s+0\s+1\n/')
     && ec_ft_line($out, '/\n\s+en-us\s+1\s+0\n/'), $out);
 ec_ft_expect('units: preset clicks by asked tag list the two English rows and exclude the Spanish page',

@@ -10,8 +10,9 @@
  * THE ONE RULE THIS FILE EXISTS TO HOLD. Every log row ends with a BUCKET, written by
  * ecLogBucketSuffix() in lib/config.inc.php:
  *
- *   'visitor'  a visitor who agreed to being counted once rather than every time. Those rows are
- *              DEDUPLICATED per (visit, page) against the ec_seen cookie, so they count PEOPLE.
+ *   'visitor'  a browser that said yes to the counting question. Those rows are DEDUPLICATED per
+ *              page against the ec_seen cookie (per visit until 2026-10-07, per year since), so
+ *              they count BROWSERS, each the first time it does that thing on that page.
  *   'visit'    everybody else. Nothing may be stored to deduplicate against, so every page load
  *              writes a row. Those rows count PAGE LOADS.
  *

@@ -41,7 +41,7 @@
  * re-derivable by running it.
  *
  * THE TWO BUCKETS ARE NEVER SUMMED. See lib/UsageReport.lib.php for what each one counts. Every
- * table below has a PEOPLE column and a PAGE LOADS column and no total column, and every chart
+ * table below has a BROWSERS (SAID YES) column and a PAGE LOADS column and no total column, and every chart
  * draws one bucket with its own scale.
  */
 
@@ -119,8 +119,13 @@ function ur_charts($series, $range, $caption, $source)
     echo '<h3>' . ur_h($caption) . '</h3>';
     echo '<p class="src">' . ur_h($source) . '</p>';
     echo '<div class="pair">';
-    echo '<figure><figcaption>PEOPLE: ' . $tot['visitor'] . ' row(s), deduplicated per person per page</figcaption>'
-       . ecUsageBarsSvg($daily['visitor'], 'people', 'var(--people)') . '</figure>';
+    // Since 2026-10-07 ec_seen lasts a year, so this series counts each said-yes browser the first
+    // time it does the thing on a page. Said so on the chart, so a falling line is not read as a
+    // falling audience.
+    echo '<figure><figcaption>BROWSERS (SAID YES): ' . $tot['visitor'] . ' row(s), each a browser'
+       . '&rsquo;s first time on that page (once a year since 2026-10-07, once a visit before), so a'
+       . ' falling line is fewer new browsers, not fewer users</figcaption>'
+       . ecUsageBarsSvg($daily['visitor'], 'new browsers', 'var(--people)') . '</figure>';
     echo '<figure><figcaption>PAGE LOADS: ' . $tot['visit'] . ' row(s), one per page load</figcaption>'
        . ecUsageBarsSvg($daily['visit'], 'page loads', 'var(--loads)') . '</figure>';
     echo '</div>';
@@ -131,7 +136,7 @@ function ur_table($series, $field, $caption, $source, $limit = 40)
 {
     $c = $series['countBy'][$field];
     $keys = array_keys($c['visitor'] + $c['visit']);
-    // Ordered by the people column, then by page loads, so the strongest signal leads.
+    // Ordered by the said-yes column, then by page loads, so the strongest signal leads.
     usort($keys, function ($a, $b) use ($c) {
         $pa = isset($c['visitor'][$a]) ? $c['visitor'][$a] : 0;
         $pb = isset($c['visitor'][$b]) ? $c['visitor'][$b] : 0;
@@ -143,7 +148,7 @@ function ur_table($series, $field, $caption, $source, $limit = 40)
     echo '<h3>' . ur_h($caption) . '</h3>';
     echo '<p class="src">' . ur_h($source) . '</p>';
     if (!$keys) { echo '<p class="none">No rows in this window.</p>'; return; }
-    echo '<table><thead><tr><th>' . ur_h($field) . '</th><th>people</th><th>page loads</th></tr></thead><tbody>';
+    echo '<table><thead><tr><th>' . ur_h($field) . '</th><th>browsers (said yes)</th><th>page loads</th></tr></thead><tbody>';
     $n = 0;
     foreach ($keys as $k) {
         if ($limit && $n++ >= $limit) { echo '<tr><td colspan="3" class="none">'
@@ -214,8 +219,9 @@ code { background: #f2f2f2; padding: 0 .2rem; }
 
 <div class="banner">
 <strong>The two columns are two different things and are never added together.</strong>
-<br><strong>PEOPLE</strong> counts rows marked <code>visitor</code>: a visitor who agreed to being
-counted once rather than every time, so those rows are deduplicated per person per page.
+<br><strong>BROWSERS (SAID YES)</strong> counts rows marked <code>visitor</code>: a browser that
+agreed to the counting question. Since 2026-10-07 each is counted the first time it does each
+thing on each page and not again for a year, so in any window these are new browsers on that page.
 <br><strong>PAGE LOADS</strong> counts rows marked <code>visit</code>: everybody else. Nothing may
 be stored to deduplicate against, so every page load writes a row.
 <br>A sum of the two would have a denominator in two units and a numerator in neither. There is no
@@ -306,7 +312,7 @@ ur_charts($contactViews, $range, 'Contact page viewed per day',
 ur_charts($send, $range, 'Messages sent per day',
     'log/engcalcs-contact-send.log, field 1 (timestamp)');
 ?>
-<table><thead><tr><th>step</th><th>people</th><th>page loads</th></tr></thead><tbody>
+<table><thead><tr><th>step</th><th>browsers (said yes)</th><th>page loads</th></tr></thead><tbody>
 <tr><td>contact page viewed</td><td><?= $contactTot['visitor'] ?></td><td><?= $contactTot['visit'] ?></td></tr>
 <tr><td>message sent</td><td><?= $sends['visitor'] ?></td><td><?= $sends['visit'] ?></td></tr>
 </tbody></table>
