@@ -715,6 +715,8 @@
 								[-1, 1].forEach(function (side, si) {
 									const o = side * off;
 									const angR = Math.round(ang * 100) / 100;
+									// On a bent pipe, the block must be turned to the leg it is nearest.
+									if (wide && g.segs.length > 1 && !alongAgrees(req, angR, st.x + nx * o, st.y + ny * o)) { return; }
 									out.push({ rows: rows, layout: 'line', align: 'left', x: st.x + nx * o - W / 2, y: st.y + ny * o - H / 2, w: W, h: H,
 										angle: angR, leader: null, pref: 0.01 * Math.ceil(j / 2) + 0.005 * si + 0.003 * oi });
 								});
