@@ -8,8 +8,8 @@
 // polylines, points (nodes), and attributed block inserts only."* And on the first cut's browser
 // pass: *"There should not be annotation other than the attributed blocks."* So every link is an
 // LWPOLYLINE, every element is an attributed block insert (a link's block at mid-run), and the one
-// thing that is not the model -- the read-me -- is itself an attributed block. No TEXT, no MTEXT,
-// no LINE. The labels a CAD user sees are the blocks' own attributes (Tom, 2026-10-07: *"I would
+// thing that is not the model -- the read-me -- is one MTEXT entity (Tom, 2026-10-07: *"The RDME
+// should be MTEXT, not an attributed block."*). No TEXT, no LINE. The labels a CAD user sees are the blocks' own attributes (Tom, 2026-10-07: *"I would
 // like labeling to be a mere consequence of the decision to transfer data by attributed blocks."*).
 //
 // **NO MLEADER.** Tom allowed annotation only as MULTILEADER (*"make them all MLEADER"*) and
@@ -96,8 +96,7 @@
 	}
 	var BLOCK_OF = {
 		junction: 'WATR_JUNCTION', reservoir: 'WATR_RESERVOIR', tank: 'WATR_TANK',
-		pipe: 'WATR_PIPE', pump: 'WATR_PUMP', valve: 'WATR_VALVE', customer: 'WATR_CUSTOMER',
-		readme: 'WATR_README'
+		pipe: 'WATR_PIPE', pump: 'WATR_PUMP', valve: 'WATR_VALVE', customer: 'WATR_CUSTOMER'
 	};
 	// Each block's geometry, in block units, where ONE BLOCK UNIT IS ONE ATTRIBUTE HEIGHT (Tom,
 	// 2026-10-07: *"My specification for attribute height is 1 so that user can scale the blocks to
@@ -113,11 +112,10 @@
 		valve: [{ poly: [[-1, -0.75], [-1, 0.75], [1, -0.75], [1, 0.75]], closed: true }],
 		customer: [{ circle: 0.35 }],
 		// A pipe's data carrier: a POINT at mid-run, which a cursor can snap to.
-		pipe: [{ point: true }],
-		readme: []
+		pipe: [{ point: true }]
 	};
 	// The ID is the one VISIBLE attribute of an element (Tom, 2026-10-06); every other one is
-	// invisible until ATTDISP ON. Every line of the read-me is visible.
+	// invisible until ATTDISP ON.
 	var VISIBLE_TAG = 'ID';
 	// Capitals in the page's locale, so Turkish "derinliği" is DERİNLİĞİ, not DERINLIĞI.
 	var LOCALE = '';
@@ -233,7 +231,7 @@
 	 *   nodes:     [{ id, type, x, y, attrs: [{ tag, value }] }],
 	 *   links:     [{ id, type, pts: [{x, y}...], attrs }]    -- each gets its block at mid-run
 	 *   customers: [{ id, x, y, from: {x, y} | null, attrs }]
-	 *   readme:    [ 'line', ... ]  -- one visible attribute each, in a block on README_LAYER
+	 *   readme:    [ 'line', ... ]  -- the lines of the one MTEXT on README_LAYER
 	 *   prompts:   { TAG or 'type.TAG': 'prompt shown in Edit Attributes' }
 	 *   tags:      { junction: [TAG...], ... }  -- the ATTDEFs each block carries, in order
 	 * }
@@ -251,7 +249,6 @@
 		Object.keys(BLOCK_OF).forEach(function (t) {
 			tags[t] = ((model.tags && model.tags[t]) || []).map(function (x) { return tagName(x); });
 		});
-		tags.readme = readme.map(function (s, k) { return 'NOTE_' + (k + 1); });
 		function grow(x, y) {
 			if (!isFinite(x) || !isFinite(y)) { return; }
 			if (x < ext.x0) { ext.x0 = x; } if (x > ext.x1) { ext.x1 = x; }
@@ -261,9 +258,11 @@
 		(model.links || []).forEach(function (l) { (l.pts || []).forEach(function (p) { grow(p.x, p.y); }); });
 		(model.customers || []).forEach(function (c) { grow(c.x, c.y); });
 		if (!isFinite(ext.x0)) { ext = { x0: 0, y0: 0, x1: 1, y1: 1 }; }
-		// The read-me sits above the top-left of the network, its first line 3 units up.
-		var readmeAt = { x: ext.x0, y: ext.y1 + 3 + 1.5 * readme.length };
-		if (readme.length) { grow(readmeAt.x, readmeAt.y + 1); }
+		// The read-me's top-left corner sits above the top-left of the network, 3 units up and clear
+		// of its own height: a line of MTEXT is 5/3 of the text height from the next (the Reference's
+		// default line spacing factor of 1).
+		var readmeAt = { x: ext.x0, y: ext.y1 + 3 + (5 / 3) * readme.length };
+		if (readme.length) { grow(readmeAt.x, readmeAt.y); }
 		ext.x0 -= 2; ext.y0 -= 2; ext.x1 += 2; ext.y1 += 2;
 
 		// Handles are fixed for the structural objects, then counted up for everything else.
@@ -278,7 +277,6 @@
 		layerTypes.forEach(function (T) { H['layer:' + T.type] = w.handle(); });
 		Object.keys(BLOCK_OF).forEach(function (t) {
 			if (t === 'customer' && !hasCustomers) { return; }
-			if (t === 'readme' && !readme.length) { return; }
 			blockTypes.push(t);
 			blockRec[t] = { rec: w.handle(), begin: w.handle(), end: w.handle() };
 		});
@@ -296,14 +294,12 @@
 			pts.forEach(function (p) { body.g(10, num(p.x)).g(20, num(p.y)); });
 		}
 		// An attribute's place in the block, in block units: stacked to the right of the symbol,
-		// 1.5 apart, so ATTDISP ON shows a readable column. The read-me's lines stack under its
-		// insertion point.
+		// 1.5 apart, so ATTDISP ON shows a readable column.
 		function attrOffset(k, type) {
-			if (type === 'readme') { return { x: 0, y: -k * 1.5 }; }
 			var r = type === 'tank' ? 1.5 : (type === 'reservoir' ? 1.4 : (type === 'pump' || type === 'valve' ? 1 : (type === 'pipe' ? 0.25 : 0.5)));
 			return { x: r + 0.25, y: -k * 1.5 };
 		}
-		function visible(type, tag) { return type === 'readme' || tag === tagName(idTags[type] || VISIBLE_TAG); }
+		function visible(type, tag) { return tag === tagName(idTags[type] || VISIBLE_TAG); }
 		// INSERT scale 1: an attribute is 1 high in the block and so 1 high in the drawing, and
 		// scaling the insertion is how a CAD user brings it to the height they plot at.
 		function insert(type, x, y, rot, values, layer) {
@@ -339,6 +335,36 @@
 			}
 			var seq = body.handle();
 			body.g(0, 'SEQEND').g(5, seq).g(330, ins).g(100, 'AcDbEntity').g(8, layer);
+		}
+		// **THE READ-ME IS ONE MTEXT** (Autodesk DXF Reference, AutoCAD 2000, MTEXT; the group codes
+		// below are the ones that entity has in R2000): 100 AcDbMText (subclass marker); 10/20/30
+		// insertion point; 40 nominal text height, 1 as an attribute is; 71 attachment point, 1 = top
+		// left; 72 drawing direction, 5 = by style; 7 text style name, Standard; 1 the text, or its
+		// LAST chunk; 3 each earlier chunk, in order, of at most 250 characters (the Reference's
+		// limit for group 1 and 3 in an MTEXT). Layer, colour and plotting are the layer's (group 8):
+		// C-WATR-RDME, white, non-plotting. Group 41 (reference width) is left out, so a line is not
+		// wrapped. Within the text, "\P" ends a paragraph; a backslash, "{" and "}" are MTEXT
+		// formatting codes, so a literal one in a line (a project name) is written as "/", "(" and ")".
+		// A chunk never splits an escape, so a "\U+XXXX" stays whole.
+		function mtext(lines, x, y, layer) {
+			var parts = [], chunks = [], cur = '', size = 0, k, j, ps, total = 0, capped = false;
+			lines.forEach(function (ln, n) {
+				if (n) { parts.push('\\P'); }
+				ps = escapeParts(String(ln).replace(/\\/g, '/').replace(/\{/g, '(').replace(/\}/g, ')'));
+				for (j = 0; j < ps.length; j++) { parts.push(ps[j]); }
+			});
+			for (k = 0; k < parts.length; k++) {
+				total += parts[k].length;
+				if (total > LIMIT_CHARS - ELLIPSIS.length) { capped = true; break; }
+				if (size + parts[k].length > 250) { chunks.push(cur); cur = ''; size = 0; }
+				cur += parts[k]; size += parts[k].length;
+			}
+			if (capped) { if (size + ELLIPSIS.length > 250) { chunks.push(cur); cur = ''; } cur += ELLIPSIS; }
+			entity('MTEXT', layer);
+			body.g(100, 'AcDbMText').g(10, num(x)).g(20, num(y)).g(30, '0.0').g(40, '1.0')
+				.g(71, 1).g(72, 5);
+			chunks.forEach(function (c) { body.g(3, c); });
+			body.g(1, cur).g(7, 'Standard');
 		}
 		function valuesOf(type, attrs) {
 			var out = {};
@@ -376,8 +402,7 @@
 				});
 				tg.forEach(function (tag, k) {
 					var o = attrOffset(k, t), hh = w.handle(), raw = ((model.tags && model.tags[t]) || [])[k],
-						prompt = t === 'readme' ? tag.replace('_', ' ')
-							: ((model.prompts && (model.prompts[t + '.' + raw] || model.prompts[raw])) || tag);
+						prompt = (model.prompts && (model.prompts[t + '.' + raw] || model.prompts[raw])) || tag;
 					w.g(0, 'ATTDEF').g(5, hh).g(330, br.rec).g(100, 'AcDbEntity').g(8, '0')
 						.g(100, 'AcDbText').g(10, num(o.x)).g(20, num(o.y)).g(30, '0.0')
 						.g(40, '1.0').g(1, '')
@@ -407,11 +432,7 @@
 			if (!BLOCK_OF[n.type]) { return; }
 			insert(n.type, n.x, n.y, 0, valuesOf(n.type, n.attrs), layerOf(n.type));
 		});
-		if (readme.length) {
-			var rv = {};
-			readme.forEach(function (s, k) { rv[tags.readme[k]] = s; });
-			insert('readme', readmeAt.x, readmeAt.y, 0, rv, README_LAYER);
-		}
+		if (readme.length) { mtext(readme, readmeAt.x, readmeAt.y, README_LAYER); }
 		// ---- BLOCKS, built next for the same reason ----
 		var blk = new Writer();
 		blk.next = body.next;

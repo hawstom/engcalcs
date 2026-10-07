@@ -9,9 +9,9 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
 
 ## Rules
 
-- **Data only.** Entities are LWPOLYLINE, INSERT, ATTRIB and SEQEND, nothing else: every link a
+- **Data only.** Entities are LWPOLYLINE, INSERT, ATTRIB, SEQEND and the one MTEXT read-me, nothing else: every link a
   polyline through every bend, every element an attributed block (a link's at mid-run), a
-  customer's service line a two-point polyline. No TEXT, MTEXT, LINE or MULTILEADER. Tom allowed
+  customer's service line a two-point polyline. No TEXT, LINE or MULTILEADER. Tom allowed
   annotation only as MLEADER; MULTILEADER is an AutoCAD 2008 entity (in the AutoCAD 2008 DXF
   Reference, not the 2000 one this file follows) and needs an MLEADERSTYLE object besides, so free
   annotation was dropped, which his note allows (*"people will mostly use this for geometry
@@ -46,20 +46,24 @@ and the reasons for R2000 and attributed blocks: `dev/agents/market-researcher/a
   the label with its unit. No solve results (an import has no property for them).
 - **Values verbatim** in the project's display units, as typed: `EngCalcs.lpnNumText()` hands back
   a number's kept token (Net3's `4530.`), as the `.inp` export does (CLAUDE.md: only the user
-  touches a file's numbers). BASE_DEMAND is the first demand category's, as EPANET's [JUNCTIONS]
-  column is, never a sum; the read-me counts junctions with more categories.
+  touches a file's numbers). BASE_DEMAND is the sum of every demand category's base, the same
+  `baseDemandTotal()` the table and label show (Tom: *"If we aren't exporting the full list of demand
+  categories, we must export the aggregate base demand."*); a single category is written as typed.
+  The read-me counts junctions with more than one category and says the attribute is their sum.
 - **Attribute height 1, INSERT scale 1** (Tom: *"attribute height is 1 so that user can scale the
   blocks to their standards"*). Block geometry is in the same unit: a junction is 1 across, a tank
   3. The file therefore no longer depends on the map's zoom or text size.
 - **The ID attribute is visible; every other is invisible** (flag 1; Tom, 2026-10-06). Every
-  read-me line is visible. A pump or valve inserted at 90-270 degrees turns its attributes a half
+  A pump or valve inserted at 90-270 degrees turns its attributes a half
   circle, right- and top-justified on the same point, so they read upright.
-- **Read-me**: one WATR_README block, one attribute per line (NOTE_1...): project name; the
+- **Read-me**: one MTEXT on `C-WATR-RDME` (Tom: *"The RDME should be MTEXT, not an attributed
+  block."*; R2000 groups 100 AcDbMText, 10/20/30, 40 height 1, 71 top left, 72, 3 and 1 text in
+  chunks of 250, 7 Standard), one paragraph per line: project name; the
   coordinate statement (a grid project's unit as its English name, ft or m); the layer pattern, scale-1 and ATTDISP note; and, if any, how many values
   were shortened, and how many junctions have more than one demand category. Plain ASCII quotes (Tom: *"Don't use fancy quotes in the README."*).
 - **Text style Standard on `txt`** (group 3, the STYLE record's primary font file). It was blank,
   and AutoCAD showed the text in Arial while editing (Tom, 2026-10-07, TEDIT); `txt` is what
-  AutoCAD writes for Standard. No entity names a style (group 7 defaults to STANDARD).
+  AutoCAD writes for Standard. Only the read-me MTEXT names a style (group 7, Standard).
 - **ASCII DXF R2000 (AC1015)**, every object with a handle and an owner (330), `$HANDSEED` above
   them all; structure per the Autodesk DXF Reference and ezdxf's minimal R2000 content, plus the two
   LAYOUTs and the plot-style placeholder AutoCAD 2000 writes. **No XDATA** (Tom: invisible to users).

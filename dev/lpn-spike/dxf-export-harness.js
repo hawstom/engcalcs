@@ -8,7 +8,8 @@
 //   (a) it is R2000 (AC1015) with the units stated in $INSUNITS, every handle unique and below
 //       $HANDSEED, and every owner (330) an object that exists;
 //   (b) Tom's DXF Interface Manager specification (dev/dxf-interface.md): data only -- links as
-//       LWPOLYLINEs, every element an attributed INSERT, no TEXT, MTEXT, LINE or MULTILEADER --
+//       LWPOLYLINEs, every element an attributed INSERT, the read-me the one MTEXT, no TEXT, LINE
+//       or MULTILEADER --
 //       on layers C-WATR-MODL- + asset code + "-" + alternative, all in capitals;
 //   (c) every attribute's tag is its property label and its value the model's, verbatim;
 //   (d) a grid project's coordinates are the file's own, EXACTLY; a geographic project's are UTM
@@ -51,7 +52,7 @@ const L = loadLoopedNetwork(
 	"\t\tlabelSettings: function () { return labelSettings; },\n" +
 	"\t\taddCustomer: addCustomer, linkPointList: linkPointList,\n" +
 	"\t\tfontSize: function () { return effectiveFontSize(); },\n" +
-	"\t\tdxfFrame: dxfFrame, dxfExportText: dxfExportText, isGeo: isLatLonProject,\n" +
+	"\t\tdxfFrame: dxfFrame, dxfExportText: dxfExportText, baseDemandTotal: baseDemandTotal, isGeo: isLatLonProject,\n" +
 	"\t\tsettings: function () { return settings; }, createScenario: createScenario,\n" +
 	"\t\tswitchScenario: switchScenario, baseScenario: baseScenario,\n" +
 	"\t\tnodeById: nodeById"
@@ -99,6 +100,8 @@ function entities(d) {
 		if (e.type === 'ATTRIB' && ins) { ins.attribs[g(e, 2)] = g(e, 1); ins.attribEnts.push(e); continue; }
 		if (e.type === 'SEQEND') { ins = null; continue; }
 		const r = { type: e.type, layer: g(e, 8), ent: e, attribs: {}, attribEnts: [] };
+		// An MTEXT's lines: groups 3 (earlier chunks) then 1 (the last), split on the paragraph code.
+		if (e.type === 'MTEXT') { r.lines = gAll(e, 3).concat(gAll(e, 1)).join('').split('\\P'); }
 		if (e.type === 'INSERT') { ins = r; r.block = g(e, 2); }
 		out.push(r);
 	}
@@ -178,16 +181,16 @@ function ezdxfAudit(file, label) {
 //   (3) ALL CAPS: every layer name, block name, attribute tag and prompt, and the read-me.
 //   (1) plain ASCII quotes in the read-me; (2) the read-me layer white (ACI 7).
 //   (5) attribute height 1, INSERT scale 1.
-//   (6) no annotation but the attributed blocks: no TEXT, MTEXT, LINE or MULTILEADER.
+//   (6) no annotation but the attributed blocks and the one MTEXT read-me: no TEXT, LINE or MULTILEADER.
 //   (11) layers C-WATR-MODL- + asset code + "-" + alternative, the prefix one constant.
 //   (12) the STYLE table names no Arial and gives Standard its txt font.
 function specChecks(d, label) {
 	const ents = d.sections.ENTITIES, tables = d.sections.TABLES, blocks = d.sections.BLOCKS;
 	const types = new Set(ents.map(e => e.type));
-	ok(label + ': no TEXT, MTEXT, LINE or MULTILEADER entity (data only)',
-		!['TEXT', 'MTEXT', 'LINE', 'MULTILEADER', 'MLEADER', 'LEADER'].some(t => types.has(t)), [...types].join(','));
-	ok(label + ': entities are only LWPOLYLINE, INSERT, ATTRIB and SEQEND',
-		[...types].every(t => ['LWPOLYLINE', 'INSERT', 'ATTRIB', 'SEQEND'].indexOf(t) >= 0), [...types].join(','));
+	ok(label + ': no TEXT, LINE or MULTILEADER entity (data only)',
+		!['TEXT', 'LINE', 'MULTILEADER', 'MLEADER', 'LEADER'].some(t => types.has(t)), [...types].join(','));
+	ok(label + ': entities are only LWPOLYLINE, INSERT, ATTRIB, SEQEND and the one MTEXT',
+		[...types].every(t => ['LWPOLYLINE', 'INSERT', 'ATTRIB', 'SEQEND', 'MTEXT'].indexOf(t) >= 0), [...types].join(','));
 	const layers = tables.filter(e => e.type === 'LAYER');
 	const names = layers.map(e => g(e, 2));
 	ok(label + ': every layer but 0 is C-WATR-MODL-XXXX-ALT or the read-me layer',
@@ -215,10 +218,16 @@ function specChecks(d, label) {
 	ok(label + ': one STYLE, Standard, on font txt; no Arial anywhere in the file',
 		styles.length === 1 && g(styles[0], 2) === 'Standard' && g(styles[0], 3) === 'txt' &&
 		!d.pairs.some(p => /arial/i.test(p[1] || '')), styles.map(s => g(s, 2) + '/' + g(s, 3)).join(','));
-	const readme = ents.filter(e => e.type === 'ATTRIB' && g(e, 8) === 'C-WATR-RDME').map(e => g(e, 1));
-	ok(label + ': the read-me is a block of visible attributes, upper case, in plain ASCII',
-		readme.length >= 3 && readme.every(t => t === t.toUpperCase() && !/[\x80-\xff]/.test(t)) &&
-		ents.filter(e => e.type === 'ATTRIB' && g(e, 8) === 'C-WATR-RDME').every(e => g(e, 70) === '0'), readme.join(' | '));
+	const mts = ents.filter(e => e.type === 'MTEXT'), mt = mts[0];
+	const readme = mt ? gAll(mt, 3).concat(gAll(mt, 1)).join('').split('\\P') : [];
+	ok(label + ': the read-me is ONE MTEXT on C-WATR-RDME (AcDbMText, top-left, Standard, height 1), no README block',
+		mts.length === 1 && g(mt, 8) === 'C-WATR-RDME' && gAll(mt, 100).indexOf('AcDbMText') >= 0 && g(mt, 71) === '1' &&
+		g(mt, 7) === 'Standard' && +g(mt, 40) === 1 && !ents.some(e => e.type === 'INSERT' && g(e, 2) === 'WATR_README') &&
+		!blocks.some(e => e.type === 'BLOCK' && g(e, 2) === 'WATR_README') &&
+		!ents.some(e => e.type === 'TEXT' || e.type === 'LINE' || e.type === 'MULTILEADER'), mts.length);
+	ok(label + ': ...its chunks are at most 250 characters, and its lines upper case, in plain ASCII',
+		readme.length >= 3 && mt.codes.filter(c => c[0] === 1 || c[0] === 3).every(c => c[1].length <= 250) &&
+		readme.every(t => t === t.toUpperCase() && !/[\x80-\xff]/.test(t)), readme.join(' | '));
 	return readme;
 }
 
@@ -339,7 +348,7 @@ async function main() {
 	console.log('--- D2: scenario names in any script, told apart, never BASE ---');
 	{
 		const layersOf = () => new Set(entities(readDxf(L.dxfExportText(out1.frame).text)).map(e => e.layer));
-		const rdOf = () => Object.values(entities(readDxf(L.dxfExportText(out1.frame).text)).find(e => e.layer === 'C-WATR-RDME').attribs);
+		const rdOf = () => entities(readDxf(L.dxfExportText(out1.frame).text)).find(e => e.type === 'MTEXT').lines;
 		L.createScenario('Пожар');
 		const cyr = 'C-WATR-MODL-J___-' + global.EngCalcs.lpnDxfString('ПОЖАР');
 		ok('D2: "Пожар" is written on ' + cyr + ', not -BASE', layersOf().has(cyr) && ![...layersOf()].some(n => /-BASE$/.test(n)), [...layersOf()].join(' '));
@@ -355,18 +364,38 @@ async function main() {
 		L.switchScenario(L.baseScenario().id);
 	}
 
-	console.log('--- D3: values as typed, and Base demand the first category ---');
+	console.log('--- D3: Base demand is the aggregate of every category ---');
 	{
 		const n = L.nodeById('10');
 		const keep = { d: n._demand, tok: n.tok, extra: n.extraDemands };
 		n._demand = 150; n.tok = Object.assign({}, n.tok || {}, { _demand: '150.0' }); n.extraDemands = [{ base: 25 }];
 		const ents = entities(readDxf(L.dxfExportText(out1.frame).text));
 		const ins = ents.find(e => e.type === 'INSERT' && e.layer === LAY.junction && e.attribs.ID === '10');
-		ok('D3: BASE_DEMAND is the first category as typed ("150.0"), not the sum 175', ins.attribs[T.DEMAND] === '150.0', ins.attribs[T.DEMAND]);
-		const rd = Object.values(ents.find(e => e.layer === 'C-WATR-RDME').attribs);
-		ok('D3: the read-me says one junction has more than one category, in capitals',
-			rd.indexOf(global.EngCalcs.lpnDxfString(PC.lpn_dxf_note_categories.replace('{n}', '1').replace('{tag}', 'BASE_DEMAND').toUpperCase())) >= 0, rd.join(' | '));
+		ok('D3: a two-category junction (150 + 25) writes BASE_DEMAND 175, the sum baseDemandTotal() reports',
+			ins.attribs[T.DEMAND] === '175' && +ins.attribs[T.DEMAND] === L.baseDemandTotal(n), ins.attribs[T.DEMAND]);
+		const rd = ents.find(e => e.type === 'MTEXT').lines;
+		ok('D3: the read-me says one junction has more than one category and that BASE_DEMAND is their sum',
+			rd.indexOf(global.EngCalcs.lpnDxfString(PC.lpn_dxf_note_categories.replace('{n}', '1').replace('{tag}', 'BASE_DEMAND').toUpperCase())) >= 0 &&
+			/SUM/.test(PC.lpn_dxf_note_categories.toUpperCase()) && !/FIRST/.test(rd.join(' ')), rd.join(' | '));
+		n.extraDemands = [{ base: 0.2 }]; n._demand = 0.1; n.tok = Object.assign({}, n.tok, { _demand: '0.1' });
+		const ins2 = entities(readDxf(L.dxfExportText(out1.frame).text)).find(e => e.type === 'INSERT' && e.layer === LAY.junction && e.attribs.ID === '10');
+		ok('D3: the sum carries no float noise (0.1 + 0.2 is 0.3)', ins2.attribs[T.DEMAND] === '0.3', ins2.attribs[T.DEMAND]);
 		n._demand = keep.d; n.tok = keep.tok; if (keep.extra) { n.extraDemands = keep.extra; } else { delete n.extraDemands; }
+		const rd0 = entities(readDxf(L.dxfExportText(out1.frame).text)).find(e => e.type === 'MTEXT').lines;
+		ok('D3: one category per junction again: no categories line in the read-me', !rd0.some(t => /CATEGOR/.test(t)), rd0.join(' | '));
+	}
+
+	console.log('--- the MTEXT read-me: long lines chunk at 250, MTEXT codes in a name are neutralized ---');
+	{
+		const long = 'a'.repeat(600) + ' {b} \\P c';
+		const txt = global.EngCalcs.lpnDxfWrite({ insunits: 0, measurement: 0, nodes: [], links: [], readme: ['Project', long] });
+		const dd = readDxf(txt), mt = dd.sections.ENTITIES.find(e => e.type === 'MTEXT');
+		const ch = gAll(mt, 3).concat(gAll(mt, 1));
+		ok('a 600-character line is split over group 3 chunks of at most 250, ending in group 1', ch.length >= 3 && ch.every(c => c.length <= 250) && g(mt, 1) === gAll(mt, 1)[0] && mt.codes[mt.codes.length - 2][0] === 1, ch.map(c => c.length).join(','));
+		const lines = ch.join('').split('\\P');
+		ok('a backslash, { and } typed in a line cannot act as MTEXT codes (still two paragraphs)', lines.length === 2 && !/[{}]/.test(lines[1]) && lines[1].indexOf('\\U+005C') < 0, lines[1].slice(595));
+		fs.writeFileSync(path.join(tmp, 'long.dxf'), txt);
+		ezdxfAudit(path.join(tmp, 'long.dxf'), 'long read-me');
 	}
 
 	console.log('--- minor: Turkish capitals, an upright pump ID ---');
@@ -397,7 +426,7 @@ async function main() {
 			ins.attribs.TAG === 'a^ b 50%%%%%%c \\U+005CU+0041 \\U+005CP ?', JSON.stringify(ins.attribs.TAG));
 		ok('a 3000-character description is cut to 2049 characters ending in three periods',
 			ins.attribs[T.DESC].length === 2049 && /x\.\.\.$/.test(ins.attribs[T.DESC]), ins.attribs[T.DESC].length);
-		const rds = Object.values((ents.find(e => e.type === 'INSERT' && e.layer === 'C-WATR-RDME') || { attribs: {} }).attribs);
+		const rds = (ents.find(e => e.type === 'MTEXT') || { lines: [] }).lines;
 		ok('...and the read-me says one value was shortened',
 			rds.indexOf(global.EngCalcs.lpnDxfString(PC.lpn_dxf_note_shortened.replace('{n}', '1').replace('{max}', '2049').toUpperCase())) >= 0,
 			rds.join(' | '));

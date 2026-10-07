@@ -35,5 +35,8 @@ Tell people to use a points import/export LSP routine and EPANET++ Import survey
   are the blocks' own attributes, shown or hidden by layer, and no further effort goes into
   laying out separate label text in the DXF. Alternatives in a layer name meet
   Task 721 (`feat/bentley-interop`), which owns the alternatives model.
+- **Two of his calls on the export (2026-10-07):** the read-me is one MTEXT, the only entity that is
+  not a polyline or an attributed block insert; and BASE_DEMAND is the aggregate (sum) of a junction's
+  demand categories, since the file does not carry the full list.
 - "Values verbatim in the project units" is CLAUDE.md's rule that only the user touches a file's
   numbers.

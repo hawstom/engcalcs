@@ -101,8 +101,9 @@ async function exportOnce(a, card) {
 	const onDl = (d) => downloads.push(d);
 	a.page.on('download', onDl);
 	const label = await a.lang('lpn_file_export_item_dxf');
-	// The REAL row, clicked with the real mouse: Session.menuClick opens #lpn_menu_file and clicks.
-	await a.menuClick(label, 'file');
+	// The REAL row, clicked with the real mouse, in File > Export...: Session.menuClickSub opens
+	// #lpn_menu_file, clicks the parent row, then the row in the fly-out.
+	await a.menuClickSub(await a.lang('lpn_file_export_menu'), label, 'file');
 	const t0 = Date.now();
 	while (!downloads.length && Date.now() - t0 < 15000) { await a.page.waitForTimeout(200); }
 	await a.page.waitForTimeout(1500);   // a second download, if one were coming
@@ -138,7 +139,7 @@ function checkDrawing(label, out, geo) {
 	ok(label + ': nothing in the file names Arial', !/arial/i.test(T));
 	// --- data only ---
 	const kinds = new Set(ents.map((e) => e.type));
-	ok(label + ': no TEXT, MTEXT, LINE or MULTILEADER', !['TEXT', 'MTEXT', 'LINE', 'MULTILEADER'].some((k) => kinds.has(k)), [...kinds].join(','));
+	ok(label + ': no TEXT, LINE or MULTILEADER', !['TEXT', 'LINE', 'MULTILEADER'].some((k) => kinds.has(k)), [...kinds].join(','));
 	ok(label + ': every layer is 0, C-WATR-MODL-XXXX-ALT or C-WATR-RDME', [...layerNames].every((n) => n === '0' || n === 'C-WATR-RDME' || /^C-WATR-MODL-[A-Z0-9_]{4}-BASE$/.test(n)),
 		[...layerNames].join(' '));
 	const rd = tables.find((e) => e.type === 'LAYER' && get(e, 2) === 'C-WATR-RDME');
@@ -153,8 +154,8 @@ function checkDrawing(label, out, geo) {
 	const ids = [], rest = [];
 	let first = false;
 	ents.forEach((e) => {
-		if (e.type === 'INSERT') { first = get(e, 8) !== 'C-WATR-RDME'; return; }
-		if (e.type !== 'ATTRIB' || get(e, 8) === 'C-WATR-RDME') { return; }
+		if (e.type === 'INSERT') { first = true; return; }
+		if (e.type !== 'ATTRIB') { return; }
 		(first ? ids : rest).push(e); first = false;
 	});
 	ok(label + ': every ID attribute is visible (70 = 0)', ids.length > 0 && ids.every((e) => (+get(e, 70) & 1) === 0), ids.length + ' IDs');
@@ -171,7 +172,9 @@ function checkDrawing(label, out, geo) {
 	// --- coordinates ---
 	const nodeIns = inserts.filter((e) => get(e, 8) !== 'C-WATR-RDME');
 	const xs = nodeIns.map((e) => +get(e, 10)), ys = nodeIns.map((e) => +get(e, 20));
-	const notes = attribs.filter((e) => get(e, 8) === 'C-WATR-RDME').map((e) => get(e, 1)).join(' | ');
+	const mtexts = ents.filter((e) => e.type === 'MTEXT' && get(e, 8) === 'C-WATR-RDME');
+	ok(label + ': the read-me is one MTEXT', mtexts.length === 1, mtexts.length);
+	const notes = mtexts.map((e) => e.g.filter((c) => c[0] === 3 || c[0] === 1).map((c) => c[1]).join('').split('\\P').join(' | ')).join(' | ');
 	ok(label + ': the read-me is in capitals and plain ASCII', notes.length > 0 && notes === notes.toUpperCase() && !/[\x80-\xff]/.test(notes), notes.slice(0, 200));
 	if (geo) {
 		ok(label + ': coordinates are UTM metres, not degrees (easting 100 000..900 000, northing > 1 000 000)',

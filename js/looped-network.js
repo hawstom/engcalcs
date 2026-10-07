@@ -36090,12 +36090,16 @@ var EngCalcs = EngCalcs || {};
 		if (v === undefined || v === null) { v = el[prop]; }
 		return dxfNum(el, ('_' + prop) in el ? '_' + prop : prop, v);
 	}
-	// **BASE DEMAND IS THE FIRST CATEGORY'S, AS TYPED**, as EPANET's [JUNCTIONS] demand column is,
-	// never a computed sum of categories. dxfModel() counts the junctions that have more.
+	// **BASE DEMAND IS THE AGGREGATE OF EVERY CATEGORY'S BASE** (Tom, 2026-10-07: *"If we aren't
+	// exporting the full list of demand categories, we must export the aggregate base demand."*),
+	// the same sum baseDemandTotal() puts in the table, the label and the popup. One category is
+	// written as typed; several are added and written as a plain number (rounded to 12 significant
+	// digits so 0.1 + 0.2 reads 0.3). dxfModel() counts the junctions that have more than one.
 	function dxfBaseDemand(n) {
-		var rows = EngCalcs.lpnDemandRows ? EngCalcs.lpnDemandRows(n, effective(n, 'demand')) : null;
-		if (!rows || !rows.length) { return { text: dxfVal(n, 'demand'), more: false }; }
-		return { text: dxfNum(rows[0].rec, rows[0].key, rows[0].base), more: rows.length > 1 };
+		var rows = EngCalcs.lpnDemandRows ? EngCalcs.lpnDemandRows(n, effective(n, 'demand')) : null, t;
+		if (!rows || rows.length < 2) { return { text: dxfVal(n, 'demand'), more: false }; }
+		t = baseDemandTotal(n);
+		return { text: String(parseFloat(t.toPrecision(12))), more: true };
 	}
 	// The properties each block carries, by internal key. Data only: no solve results, which an
 	// import would have no property to put back into.
@@ -36258,10 +36262,10 @@ var EngCalcs = EngCalcs || {};
 		nodes.concat(links, customers).forEach(function (el) {
 			(el.attrs || []).forEach(function (a) { if (EngCalcs.lpnDxfTooLong(a.value)) { longOnes++; } });
 		});
-		// More than one demand category: BASE_DEMAND holds the first only, and the read-me says so.
+		// More than one demand category: BASE_DEMAND holds their sum, and the read-me says so.
 		var multi = doc.nodes.filter(function (n) { return n.type === 'junction' && dxfBaseDemand(n).more; }).length;
 		if (multi) {
-			readme.push((pc.lpn_dxf_note_categories || '{n} junctions have more than one demand category. Their {tag} attribute holds the first category only.')
+			readme.push((pc.lpn_dxf_note_categories || '{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.')
 				.replace('{n}', String(multi)).replace('{tag}', tt.tagOf('junction', 'DEMAND')));
 		}
 		if (longOnes) {

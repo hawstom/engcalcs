@@ -2107,7 +2107,7 @@ $ec_lang['lpn_dxf_note_blocks']='Layers are named {prefix}, the asset code, a hy
 // {n} is a whole number; {max} is 2049. Each shortened value ends in three periods (...).
 $ec_lang['lpn_dxf_note_shortened']='{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.';
 // {n} is a whole number; {tag} is an attribute tag in capitals, BASE_DEMAND in English.
-$ec_lang['lpn_dxf_note_categories']='{n} junctions have more than one demand category. Their {tag} attribute holds the first category only.';
+$ec_lang['lpn_dxf_note_categories']='{n} junctions have more than one demand category. Their {tag} attribute holds the sum of the base demands of all categories.';
 // GeoJSON export (Task 728). The command is worded like Export EPANET file. Positions in a GeoJSON
 // file are always longitude and latitude (RFC 7946), so a project with no place on the Earth is
 // refused and told how to get one, never written with an invented coordinate system.
