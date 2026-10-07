@@ -22,7 +22,7 @@
 //      Current scenario only: only the open scenario's rows; both together: the open scenario's
 //      overrides. A line above the table names them, with Show all, which is the way back when no
 //      row is left to right-click; the heading menu carries them too. The same filters on Pipes.
-//   5. Net3 lat/lon: the custom property's design is rows under Custom properties, owned by its key;
+//   5. Net3 lat/lon: the coloured field's band boundaries are a row though never typed; the custom property's design is rows under Custom properties, owned by its key;
 //      typing a Label writes the design (the Properties box and the Settings box read it); in a
 //      scenario's row under Show scenarios the design is read-only.
 //
@@ -259,6 +259,13 @@ async function main() {
 		await HB.tab('settings');
 		rows = await HB.rowsOf('settings');
 		const CPM = await pageB.evaluate(() => { const e = document.getElementById('lpn_set_sub_customProps'); return e ? e.textContent.replace(/\?/g, '').replace(/\s+/g, ' ').trim() : ''; });
+		// Perry, 2026-10-07: the colour band boundaries of the field colouring the map are a row even
+		// when the project has not typed them, as the Settings box lists them under Node colors.
+		const BRK = await L('lpn_settings_color_breaks'), NCOL = await L('lpn_settings_sym_node_colors');
+		const colored = await pageB.evaluate(() => { const s = document.querySelector('#lpn_set_sub_nodeColors + .lpn-set-subbody select'); return s ? s.options[s.selectedIndex].text : null; });
+		const brk = rows.filter((r) => r.cells.st_minor === NCOL && r.cells.st_setting === BRK)[0];
+		ok('Node colors / ' + colored + ' / Color band boundaries is a row, with the boundaries the map uses', !!brk &&
+			brk.cells.st_owner === colored && /\d/.test(brk.cells.st_value) && !brk.editable, brk && JSON.stringify(brk.cells));
 		const CPL = await L('lpn_cp_label');
 		const cpLabel = rows.filter((r) => r.cells.st_owner === 'date_installed' && r.cells.st_setting === CPL)[0];
 		const ASSETS = await pageB.evaluate(() => { const e = document.querySelector('#lpn_set_sec_elements .lpn-set-head'); return e ? e.textContent.trim() : null; });

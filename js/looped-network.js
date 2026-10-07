@@ -13265,15 +13265,23 @@ var EngCalcs = EngCalcs || {};
 	var oneLabelBatch = null;
 	function withOneLabelBatch(fn) {
 		var mine = !oneLabelBatch, list;
-		if (mine) { oneLabelBatch = []; }
-		try { fn(); } finally {
-			if (mine) {
+		if (!mine) { fn(); return; }
+		oneLabelBatch = [];
+		// **ONE SEGMENT INDEX FOR THE WHOLE BATCH** (Perry, 2026-10-07: a 1,201-pipe grid with link
+		// labels froze 2.7 s, buildLinkEls() and layoutLinkLabel() rebuilding the whole network's
+		// index once per link). Held across the writes, where a link's first, provisional placement
+		// reads it; then DROPPED, since a write may have moved a link, and built once more, fresh,
+		// for the placing that counts, which runs after every write of the batch.
+		beginLinkGeomHold();
+		try {
+			try { fn(); } finally {
 				list = oneLabelBatch;
 				oneLabelBatch = null;
+				linkSegIndexHeld = null;
 				list.forEach(function (b) { measureLabelWidths(b.holder); });
 				list.forEach(function (b) { if (b.link !== undefined) { layoutLinkLabel(b.link); } else { layoutNodeLabel(b.node); } });
 			}
-		}
+		} finally { endLinkGeomHold(); }
 	}
 	// **BOTH OF THESE SNAPSHOT FOR THEMSELVES, AND THAT IS THE POINT OF PUTTING IT HERE.**
 	// (ROADMAP Task 567's first strand, found 2026-09-01 by the utility-field-operator agent.)
@@ -26874,9 +26882,9 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		}
 		return 'str';
 	}
-	// Within one label field the box's own column order: the tick, Decimals, Before, After, Use
-	// units, Show order, Drop order. Added to the box position, which is the field's row.
-	var LPN_SETTAB_PART_ORDER = { decimals: 1, prefix: 2, suffix: 3, useUnits: 4, show: 5, priority: 6 };
+	// Within one label field the Labels box's own column order: the tick, Bef., Aft., Use units,
+	// Decimals, Show, Drop. Added to the box position, which is the field's row.
+	var LPN_SETTAB_PART_ORDER = { prefix: 1, suffix: 2, useUnits: 3, decimals: 4, show: 5, priority: 6 };
 	function settingTablePartOrder(p) {
 		if (p[0] === 'customProps') { return LPN_CP_TABLE_FIELDS.indexOf(p[2]) / 100; }
 		return p[0] === 'labelSettings' && p.length === 4 ? (LPN_SETTAB_PART_ORDER[p[1]] || 0) / 10 : 0;
@@ -26933,7 +26941,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		// The colour and contour settings of the fields being coloured now, stated or not.
 		['node', 'link'].forEach(function (g) {
 			f = settingFor(base, ['settings', g === 'node' ? 'colorNodeField' : 'colorLinkField']);
-			if (f) { add(['settings', 'colorModes', g + '.' + f]); }
+			if (f) { add(['settings', 'colorModes', g + '.' + f]); add(['settings', 'colorBreaks', g + '.' + f]); }
 			if (f && g === 'node') { add(['settings', 'contourInterval', contourIntervalKey(f)]); }
 		});
 		scenarios.forEach(function (s) {
@@ -26948,6 +26956,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		out.forEach(function (r) {
 			var sample, i;
+			// Colour band boundaries are a list, edited in the Settings box, stated or not (Perry).
+			if (r.path[0] === 'settings' && r.path[1] === 'colorBreaks') { r.kind = 'json'; return; }
 			if (r.home === 'cp') {
 				r.kind = customPropRowChoices(r) ? 'choice' : 'str';
 				r.dflt = { validate: 'none', restrictMode: 'allow' }[r.path[2]];
@@ -27025,6 +27035,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			t = settingFor(scn, ['times', 'text', key]);
 			return EngCalcs.lpnTimeText ? EngCalcs.lpnTimeText({ text: typeof t === 'string' ? (function () { var o = {}; o[key] = t; return o; }()) : {} }, key, v) : String(v);
 		}
+		// Unstated colour band boundaries follow the data: the ones the map is drawn with, as the
+		// Settings box lists them.
+		if (row.kind === 'json' && v === undefined && row.path[1] === 'colorBreaks') {
+			return settingRowBreaksDefault(row, scn);
+		}
 		if (row.kind === 'json') { return settingRowSummary(row, v); }
 		if (v === undefined && row.path[0] === 'labelSettings' && (row.path[1] === 'prefix' || row.path[1] === 'suffix') && row.path.length === 4) {
 			return settingTableDefaultText(settingRowAffixDefault(row, scn));
@@ -27042,6 +27057,11 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (typeof v === 'number') { return u ? settingTableNum(v) + ' ' + u : settingTableNum(v); }
 		if (typeof v === 'object') { return settingRowSummary(row, v); }
 		return String(v);
+	}
+	function settingRowBreaksDefault(row, scn) {
+		var k = String(row.path[2]).split('.'), b;
+		b = paneInScenario(scn, function () { return computedBreaks(k[0], k.slice(1).join('.')); }) || [];
+		return b.length ? settingTableDefaultText(settingRowSummary(row, b.map(tidyBreak))) : ((EngCalcs.pageConfig || {}).lpn_settings_option_unset || 'Not stated');
 	}
 	// What an unstated Before or After prints in scenario `scn`: the default the page works out
 	// (labelPrefixFor()/labelSuffixFor(), which follow the friction method and the unit), quoted

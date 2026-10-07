@@ -677,8 +677,8 @@ named set and stops pretending to have a parent. Recommendation: keep the column
 - **(1) Owner** (Tom: *"We need a third organizational hierarchy column to help organize the labels
   and custom properties settings... We could call it 'Owner'."*). Between Minor heading and
   Setting, so the four read as his dotted path: Symbology, Node labels, ID, Is active / Show order /
-  Drop order. Owned rows: a label field's settings (Is active, Decimals, Text before, Text after,
-  Use units, Show order, Drop order), a coloured field's classification and band boundaries, a
+  Drop order. Owned rows: a label field's settings (Is active, Text before, Text after, Use units, Decimals,
+  Show order, Drop order), a coloured field's classification and band boundaries, a
   contour field's interval, an ID prefix's asset, a custom property's design fields. Any other row
   leaves Owner blank. Category moved after Setting: it is useful but outside the hierarchy.
   (`settingTableOwnerSetting()`.)
@@ -694,12 +694,14 @@ named set and stops pretending to have a parent. Recommendation: keep the column
 - **(3) Clear override was one table render per cell**: `afterPropertyEdit()` per element
   re-rendered the open table, and each pipe's label forced a layout of the drawing. Now
   `afterPropertyEdits()` redraws each element and runs the shared tail once, and
-  `withOneLabelBatch()` measures every label together. Net3, 117 pipes, Show scenarios on: 3,135 ms
+  `withOneLabelBatch()` measures every label together and holds one link segment index for the
+  batch (Perry: a 1,201-pipe labelled grid rebuilt it 2,400 times, about 2.7 s; now twice). Net3, 117 pipes, Show scenarios on: 3,135 ms
   before, about 170 ms after (jasmine). Find and replace and the Multiple properties row share it.
 - **(4) Save this view**, not Hold (keys renamed `lpn_settings_view_save`, `_tip`).
 - **(5) The audit.** Rows the table omitted, against every control the Settings box tags: every
   label field's Before and After (the maps ship empty, so the stated-leaf walk found none), Use
-  units where a field has a unit and the project leaves it unstated, Energy currency, and every
+  units where a field has a unit and the project leaves it unstated, Energy currency, the colour
+  band boundaries of the field colouring the map while they follow the data (Perry), and every
   custom property design field. Now all rows; an unstated Before or After shows the default the
   page prints ("Q= (default)"). Left out on purpose: Decimals of a field with no number (the box has
   no spinner for it), the PDA "stated in the file" marker, and the superseded emitter exponent.
