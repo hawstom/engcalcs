@@ -1,88 +1,102 @@
-// Looped Pipe Network -- WRITING A DXF DRAWING (ROADMAP Task 772).
+// Looped Pipe Network -- WRITING A DXF FILE OF THE MODEL (ROADMAP Task 772).
 //
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
 //
-// WHAT THIS IS FOR. Tom, 2026-10-06: *"Since simplest AutoCAD can't import a shapefile, I suppose it
-// would be nice to Export to DXF... We want to do what's stable, venerable, and widely usable."* and
-// *"They may be most interested in a dumb annotated network."* So this writes a drawing, not a model:
-// layers a CAD user can freeze, pipes as polylines, nodes as attributed blocks, and the map's own
-// lettering as text. The rules and the layer table are in dev/dxf.md.
+// WHAT THIS IS FOR: DATA, NOT A DRAWING. Tom's DXF Interface Manager specification
+// (dev/dxf-interface.md, 2026-10-07): *"Scope: data only, no annotation"*; *"AutoCAD objects:
+// polylines, points (nodes), and attributed block inserts only."* And on the first cut's browser
+// pass: *"There should not be annotation other than the attributed blocks."* So every link is an
+// LWPOLYLINE, every element is an attributed block insert (a link's block at mid-run), and the one
+// thing that is not the model -- the read-me -- is itself an attributed block. No TEXT, no MTEXT,
+// no LINE. The labels a CAD user sees are the blocks' own attributes (Tom, 2026-10-07: *"I would
+// like labeling to be a mere consequence of the decision to transfer data by attributed blocks."*).
+//
+// **NO MLEADER.** Tom allowed annotation only as MULTILEADER (*"make them all MLEADER"*) and
+// expected most people to use the file for geometry transfer. MULTILEADER is an AutoCAD 2008
+// entity: it is in the AutoCAD 2008 DXF Reference and not in the AutoCAD 2000 one this R2000 file
+// follows, and it needs an MLEADERSTYLE object and a context-data block besides. Free annotation is
+// dropped instead, which his note allows.
 //
 // **ASCII DXF R2000 (AC1015)**, the oldest version with LWPOLYLINE (Mary, 2026-10-06), structured
 // per the Autodesk DXF Reference for AutoCAD 2000 and ezdxf's "minimal DXF content" for R2000 and
 // later: HEADER with $ACADVER and $HANDSEED; CLASSES; TABLES with VPORT, LTYPE (ByBlock, ByLayer,
-// Continuous), LAYER ("0"), STYLE (Standard), VIEW, UCS, APPID (ACAD), DIMSTYLE (Standard) and
-// BLOCK_RECORD (*Model_Space, *Paper_Space); BLOCKS; ENTITIES; OBJECTS with the root dictionary.
-// Every object carries a handle (group 5, or 105 on DIMSTYLE) and an owner (group 330).
+// Continuous), LAYER, STYLE (Standard), VIEW, UCS, APPID (ACAD), DIMSTYLE (Standard) and
+// BLOCK_RECORD; BLOCKS; ENTITIES; OBJECTS with the root dictionary. Every object carries a handle
+// (group 5, or 105 on DIMSTYLE) and an owner (group 330).
 //
-// **NO XDATA** (Tom: invisible to users). Identity rides in a visible-in-CAD place instead: the ID
-// attribute of each node's block.
+// **NO XDATA** (Tom: invisible to users). Identity rides in the visible ID attribute.
 //
-// **THIS FILE KNOWS NOTHING ABOUT THE PAGE.** The caller hands it plain numbers already in drawing
-// units -- coordinates, text heights, a symbol size -- and strings already formatted. No DOM, no
-// EngCalcs.pageConfig, so dev/lpn-spike/dxf-export-harness.js can drive it directly.
+// **ALL CAPS** (Tom, 2026-10-07: *"ALL CAPS in AutoCAD."*): every layer name, block name, attribute
+// tag, prompt and read-me line this file composes is upper case. An attribute VALUE is the user's
+// own data and goes out verbatim (dev/dxf-interface.md: *"values ... are imported verbatim"*).
+//
+// **THIS FILE KNOWS NOTHING ABOUT THE PAGE.** The caller hands it coordinates already in drawing
+// units and strings already formatted. No DOM, no EngCalcs.pageConfig, so
+// dev/lpn-spike/dxf-export-harness.js can drive it directly.
 
 (function (root) {
 	'use strict';
 
 	var EngCalcs = root.EngCalcs = root.EngCalcs || {};
 
-	// ---- THE LAYER TABLE ---------------------------------------------------------------------------
-	// AIA CAD Layer Guidelines, United States National CAD Standard v5 (the edition its own page
-	// footers name; the copy read is the one Duke University hosts). Discipline C (Civil), Major
-	// Group WATR (water supply). Its Civil list names C-WATR-PIPE outright. EQPM, VALV, TANK, LABL,
-	// TEXT and RDME are prescribed Minor Group codes, used here under the Guidelines' own rule that
-	// "any Minor Group may be used to modify any Major Group". NODE is a prescribed code too, but a
-	// MAJOR group ("Node", the survey layers' V-NODE); in the minor position it is used with that
-	// same meaning. RSVR and CUST are user-defined, which the Guidelines allow when documented, and
-	// dev/dxf.md is that document. The Guidelines' own layer for valves is C-WATR-INST
-	// ("instrumentation (meters, valves, etc.)"); VALV is used instead because a model's valves are
-	// control valves with settings, not instruments, and INST would put them with meters.
-	// ACI colours 1-9 only, so every program shows the same colour.
-	var LAYERS = [
-		{ key: 'pipe', name: 'C-WATR-PIPE', color: 5 },
-		{ key: 'pump', name: 'C-WATR-EQPM', color: 6 },
-		{ key: 'valve', name: 'C-WATR-VALV', color: 1 },
-		{ key: 'junction', name: 'C-WATR-NODE', color: 4 },
-		{ key: 'tank', name: 'C-WATR-TANK', color: 3 },
-		{ key: 'reservoir', name: 'C-WATR-RSVR', color: 3 },
-		{ key: 'customer', name: 'C-WATR-CUST', color: 8 },
-		{ key: 'label', name: 'C-WATR-LABL', color: 7 },
-		{ key: 'text', name: 'C-WATR-TEXT', color: 7 },
-		{ key: 'note', name: 'C-WATR-RDME', color: 8, noPlot: true }
+	// ---- THE LAYERS --------------------------------------------------------------------------------
+	// dev/dxf-interface.md: *"EPANET++ imports all legal objects on layers with a specified prefix
+	// like C-WATR-MODL-. Everything after this prefix is used to specify asset and alternative
+	// according to the asset prefixes in the destination project like J___-BASE for a junction on
+	// (geometry) alternative Base"*. So a layer is PREFIX + ASSET CODE + "-" + ALTERNATIVE:
+	// C-WATR-MODL-J___-BASE. Tom, on the browser pass: *"let's attempt to make the layers prefix
+	// somewhat unique in the DWG with C-WATR-MODL-"*; the DXF Interface Manager will let a user
+	// change it, so it is this ONE constant, and a caller's `layerPrefix` replaces it.
+	var MODEL_PREFIX = 'C-WATR-MODL-';
+	// The ASSET CODE is the project's own ID prefix for that type, upper case, letters and digits
+	// only (a hyphen would split the code from the alternative), padded with underscores to four
+	// characters as Tom's "J___" is. These are the built-in prefixes (settings.idPrefixes in
+	// js/looped-network.js), used where the project's are empty or two types would share a code.
+	var TYPE_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V', customer: 'M' };
+	var DEFAULT_PREFIX = { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', M: 'C' };
+	// Layer order and ACI colours (1-9 only, so every program shows the same colour).
+	var TYPES = [
+		{ type: 'pipe', color: 5 }, { type: 'pump', color: 6 }, { type: 'valve', color: 1 },
+		{ type: 'junction', color: 4 }, { type: 'tank', color: 3 }, { type: 'reservoir', color: 3 },
+		{ type: 'customer', color: 8 }
 	];
-	// **ONE LAYER PER ATTRIBUTE PROPERTY** (Tom, 2026-10-06: *"we could make a layer for every
-	// property to give the user control of freezing and plotting via No plot"*). An ATTRIB is an
-	// entity in its own right and carries its own layer (group 8, the DXF Reference's common entity
-	// codes, which ATTRIB shares with every graphical entity); AutoCAD and BricsCAD hide an attribute
-	// whose layer is frozen even when its block's layer is thawed, and honour that layer's No plot.
-	// The ATTDEF in the block sits on the same layer, so ATTSYNC, which resets an attribute's
-	// properties to its definition's, keeps it there. C-WATR-ATTR-* freezes them all at once.
-	// NCS form: Discipline-Major-Minor-Minor, four characters a field. ATTR is user-defined (as
-	// RSVR and CUST are); IDEN is the Guidelines' own annotation code, "identification tags".
-	var ATTR_LAYER = {
-		ID: 'IDEN', ELEV: 'ELEV', DEMAND: 'DMND', HEAD: 'HEAD', LEVEL: 'LEVL', MINLEVEL: 'LMIN',
-		MAXLEVEL: 'LMAX', DIAMETER: 'DIAM', LENGTH: 'LENG', ROUGHNESS: 'ROUG', FLOW: 'FLOW',
-		VELOCITY: 'VELO', VALVETYPE: 'VTYP', SETTING: 'SETG', COUNT: 'QNTY', TAG: 'TAGS', DESC: 'DESC'
-	};
-	// The ID is the one VISIBLE attribute (Tom, 2026-10-06, asked whether it should be invisible:
-	// *"No."*); every other one is invisible until ATTDISP ON.
-	var VISIBLE_TAG = 'ID';
-	function attrLayerCode(tag) {
-		return ATTR_LAYER[tag] || (String(tag).toUpperCase().replace(/[^A-Z0-9]/g, '') + 'XXXX').slice(0, 4);
+	// **THE READ-ME IS OUTSIDE THE MODEL PREFIX**, so an import of C-WATR-MODL-* never reads it as an
+	// asset. White (ACI 7; Tom: *"Make the README layer white."*) and not plotted.
+	var README_LAYER = 'C-WATR-RDME';
+	function codeOf(prefix) {
+		var c = String(prefix || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+		return c ? (c + '____').slice(0, 4) : '';
 	}
-	function attrLayerName(tag, prefix) { return tableName((prefix || '') + 'C-WATR-ATTR-' + attrLayerCode(tag)); }
+	/** settings.idPrefixes -> { junction: 'J___', ... }, the built-in set if any is empty or shared. */
+	function assetCodes(idPrefixes) {
+		var out = {}, seen = {}, clash = false;
+		Object.keys(TYPE_KEY).forEach(function (t) {
+			var c = codeOf((idPrefixes || {})[TYPE_KEY[t]]);
+			if (!c || seen[c]) { clash = true; }
+			seen[c] = true; out[t] = c;
+		});
+		if (clash) {
+			Object.keys(TYPE_KEY).forEach(function (t) { out[t] = codeOf(DEFAULT_PREFIX[TYPE_KEY[t]]); });
+		}
+		return out;
+	}
+	/** An alternative's name as the part of a layer name after the asset code. */
+	function alternativeCode(name) {
+		var c = String(name || '').toUpperCase().replace(/[^A-Z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
+		return c || 'BASE';
+	}
 	var BLOCK_OF = {
 		junction: 'WATR_JUNCTION', reservoir: 'WATR_RESERVOIR', tank: 'WATR_TANK',
-		pipe: 'WATR_PIPE', pump: 'WATR_PUMP', valve: 'WATR_VALVE', customer: 'WATR_CUSTOMER'
+		pipe: 'WATR_PIPE', pump: 'WATR_PUMP', valve: 'WATR_VALVE', customer: 'WATR_CUSTOMER',
+		readme: 'WATR_README'
 	};
-	// Each block's geometry, in units of ONE SYMBOL (a junction's diameter on the map), so the
-	// INSERT's scale is the symbol size and nothing else. Outlines only: no HATCH, no SOLID, which
-	// every reader draws the same way. Shapes follow the map's own (SYMBOL_SILHOUETTE in
-	// js/looped-network.js): an inverted triangle for a reservoir, a square for a tank, a bow tie
-	// for a valve, a circle with a discharge for a pump. Sizes are the map's: a tank is 3 junction
-	// diameters across (TANK_HALF_W / JUNCTION_R).
+	// Each block's geometry, in block units, where ONE BLOCK UNIT IS ONE ATTRIBUTE HEIGHT (Tom,
+	// 2026-10-07: *"My specification for attribute height is 1 so that user can scale the blocks to
+	// their standards."*). A junction is 1 across; the other shapes keep the map's proportions
+	// (SYMBOL_SILHOUETTE in js/looped-network.js): an inverted triangle for a reservoir, a square 3
+	// junctions across for a tank, a bow tie for a valve, a circle with a discharge for a pump.
+	// Outlines only, on layer 0, colour ByLayer, so each INSERT takes its own layer's colour.
 	var SHAPES = {
 		junction: [{ circle: 0.5 }],
 		reservoir: [{ poly: [[-1.4, 0.9], [1.4, 0.9], [0, -1.5]], closed: true }],
@@ -90,22 +104,23 @@
 		pump: [{ circle: 0.75 }, { poly: [[0, 0.75], [1.25, 0.75], [1.25, 0.25], [0.66, 0.25]] }],
 		valve: [{ poly: [[-1, -0.75], [-1, 0.75], [1, -0.75], [1, 0.75]], closed: true }],
 		customer: [{ circle: 0.35 }],
-		// A pipe's data carrier: a POINT at mid-run, a node a cursor can snap to and a crossing window
-		// can pick, and nothing drawn on the sheet beyond a dot.
-		pipe: [{ point: true }]
+		// A pipe's data carrier: a POINT at mid-run, which a cursor can snap to.
+		pipe: [{ point: true }],
+		readme: []
 	};
-
-	function layerName(key, prefix) {
-		for (var i = 0; i < LAYERS.length; i++) {
-			if (LAYERS[i].key === key) { return tableName((prefix || '') + LAYERS[i].name); }
-		}
-		return '0';
-	}
-	// A layer or block NAME: the same escape as every other string, then the characters the DXF
-	// Reference forbids in a symbol-table name (< > / \ " : ; ? * | = `) made underscores, so a
-	// caller's prefix cannot produce a table AutoCAD rejects.
+	// The ID is the one VISIBLE attribute of an element (Tom, 2026-10-06); every other one is
+	// invisible until ATTDISP ON. Every line of the read-me is visible.
+	var VISIBLE_TAG = 'ID';
+	function caps(v) { return String(v === undefined || v === null ? '' : v).toUpperCase(); }
+	// A layer or block NAME: upper case, the one escape, then the characters the DXF Reference
+	// forbids in a symbol-table name (< > / \ " : ; ? * | = `) made underscores.
 	function tableName(v) {
-		return str(v).replace(/\\U\+005C/g, '_').replace(/[<>\/\\":;?*|=`]/g, '_');
+		return str(caps(v)).replace(/\\U\+005C/g, '_').replace(/[<>\/\\":;?*|=`]/g, '_');
+	}
+	// **PLAIN ASCII QUOTES** in what this file composes (Tom: *"Don't use fancy quotes in the
+	// README."*): a translation's typographic quotes become ' and ".
+	function plainQuotes(v) {
+		return String(v).replace(/[‘’‚′]/g, "'").replace(/[“”„«»″]/g, '"');
 	}
 
 	// ---- VALUES -------------------------------------------------------------------------------------
@@ -135,8 +150,10 @@
 	//   - "%%" introduces %%u, %%o, %%d...: where a string holds "%%", every percent sign in it is
 	//     written %%%, AutoCAD's literal percent, so it reads exactly as typed.
 	//   - LIMIT_CHARS: the Reference limits these strings to 2049 characters. A longer value is cut,
-	//     between whole escapes, and ends in an ellipsis; tooLong() lets the caller say so.
-	var LIMIT_CHARS = 2049, ELLIPSIS = String.fromCharCode(0x85);
+	//     between whole escapes, and ends in "..." (three ASCII periods, not the one-character
+	//     ellipsis: plain ASCII in a file written for another program); tooLong() lets the caller
+	//     say so.
+	var LIMIT_CHARS = 2049, ELLIPSIS = '...';
 	var CP1252 = { 0x20AC: 0x80, 0x201A: 0x82, 0x0192: 0x83, 0x201E: 0x84, 0x2026: 0x85, 0x2020: 0x86,
 		0x2021: 0x87, 0x02C6: 0x88, 0x2030: 0x89, 0x0160: 0x8A, 0x2039: 0x8B, 0x0152: 0x8C, 0x017D: 0x8E,
 		0x2018: 0x91, 0x2019: 0x92, 0x201C: 0x93, 0x201D: 0x94, 0x2022: 0x95, 0x2013: 0x96, 0x2014: 0x97,
@@ -162,12 +179,10 @@
 		}
 		return parts;
 	}
-	// `room` (optional) is the characters this value may take, for a caller composing one string
-	// out of several (a label row with an underlined value in it).
-	function str(v, room) {
-		var parts = escapeParts(v), max = room === undefined ? LIMIT_CHARS : room, out = '', i;
-		if (parts.join('').length <= max) { return parts.join(''); }
-		for (i = 0; i < parts.length && out.length + parts[i].length <= max - 1; i++) { out += parts[i]; }
+	function str(v) {
+		var parts = escapeParts(v), out = '', i;
+		if (parts.join('').length <= LIMIT_CHARS) { return parts.join(''); }
+		for (i = 0; i < parts.length && out.length + parts[i].length <= LIMIT_CHARS - ELLIPSIS.length; i++) { out += parts[i]; }
 		return out + ELLIPSIS;
 	}
 	function tooLong(v) { return escapeParts(v).join('').length > LIMIT_CHARS; }
@@ -176,20 +191,10 @@
 		for (i = 0; i < text.length; i++) { b[i] = text.charCodeAt(i) & 0xFF; }
 		return b;
 	}
-	// A TEXT's content: plain, or a list of segments of which some carry the map's extrema mark
-	// (%%u underline, %%o overline), each escaped by str() and the whole held to the limit.
-	function textContent(t) {
-		if (!t.segs) { return str(t.text); }
-		var out = '', i, seg, code, room;
-		for (i = 0; i < t.segs.length; i++) {
-			seg = t.segs[i];
-			code = seg.mark === 'under' ? '%%u' : (seg.mark === 'over' ? '%%o' : '');
-			room = LIMIT_CHARS - out.length - 2 * code.length;
-			if (room <= 1) { break; }
-			out += code + str(seg.text, room) + code;
-		}
-		return out;
-	}
+	// An attribute TAG: upper case, and no spaces or exclamation points, which AutoCAD's ATTDEF
+	// refuses in a tag (dev/dxf-interface.md: *"spaces can be replaced with underscores or
+	// hyphens"*; underscores are used).
+	function tagName(v) { return caps(v).trim().replace(/\s+/g, '_').replace(/!/g, ''); }
 
 	// ---- THE WRITER ---------------------------------------------------------------------------------
 	function Writer() { this.lines = []; this.next = 0x20; }
@@ -203,28 +208,29 @@
 
 	/**
 	 * model = {
-	 *   insunits, measurement (0 imperial, 1 metric), layerPrefix,
-	 *   symbol: drawing units per map symbol, textHeight: drawing units,
+	 *   insunits, measurement (0 imperial, 1 metric),
+	 *   layerPrefix: replaces MODEL_PREFIX ('C-WATR-MODL-'),
+	 *   codes: { junction: 'J___', ... } (assetCodes()), alternative: 'BASE',
 	 *   nodes:     [{ id, type, x, y, attrs: [{ tag, value }] }],
 	 *   links:     [{ id, type, pts: [{x, y}...], attrs }]    -- each gets its block at mid-run
 	 *   customers: [{ id, x, y, from: {x, y} | null, attrs }]
-	 *   texts:     [{ text | segs: [{ text, mark: 'under'|'over'|'' }], x, y, h, rot, halign 0|1|2, valign 0|1|2|3, layer: 'label'|'text'|'note' }]
-	 *   lines:     [{ x1, y1, x2, y2, layer }]
+	 *   readme:    [ 'line', ... ]  -- one visible attribute each, in a block on README_LAYER
 	 *   prompts:   { TAG or 'type.TAG': 'prompt shown in Edit Attributes' }
 	 *   tags:      { junction: [TAG...], ... }  -- the ATTDEFs each block carries, in order
 	 * }
 	 * Returns the DXF text.
 	 */
 	function writeDxf(model) {
-		var w = new Writer(), pfx = model.layerPrefix || '', S = +model.symbol || 1,
-			th = +model.textHeight || S,
-			// **ONE BLOCK UNIT IS ONE TEXT HEIGHT** (Tom, 2026-10-06: *"the height of every attribute
-			// should be 1 so that the user or we can scale the block insertion to the desired scale and
-			// text height"*). Every ATTDEF is 1.0 high, every INSERT is scaled by the text height `B`,
-			// and the symbol's outline is drawn `Q` block units across so it still lands one map
-			// symbol wide.
-			B = th, Q = S / th, ext = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity },
-			H = {}, blockRec = {}, blockTypes = [], i;
+		var w = new Writer(), pfx = model.layerPrefix === undefined ? MODEL_PREFIX : model.layerPrefix,
+			codes = model.codes || assetCodes(null), alt = alternativeCode(model.alternative),
+			ext = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity },
+			H = {}, blockRec = {}, blockTypes = [], tags = {}, i,
+			readme = (model.readme || []).map(function (s) { return caps(plainQuotes(s)); });
+		function layerOf(type) { return tableName(pfx + (codes[type] || codeOf(DEFAULT_PREFIX[TYPE_KEY[type]])) + '-' + alt); }
+		Object.keys(BLOCK_OF).forEach(function (t) {
+			tags[t] = ((model.tags && model.tags[t]) || []).map(tagName);
+		});
+		tags.readme = readme.map(function (s, k) { return 'NOTE_' + (k + 1); });
 		function grow(x, y) {
 			if (!isFinite(x) || !isFinite(y)) { return; }
 			if (x < ext.x0) { ext.x0 = x; } if (x > ext.x1) { ext.x1 = x; }
@@ -233,32 +239,27 @@
 		(model.nodes || []).forEach(function (n) { grow(n.x, n.y); });
 		(model.links || []).forEach(function (l) { (l.pts || []).forEach(function (p) { grow(p.x, p.y); }); });
 		(model.customers || []).forEach(function (c) { grow(c.x, c.y); });
-		(model.texts || []).forEach(function (t) { grow(t.x, t.y); });
 		if (!isFinite(ext.x0)) { ext = { x0: 0, y0: 0, x1: 1, y1: 1 }; }
-		// Grown by a symbol so the extents hold the blocks drawn at the outermost nodes.
-		ext.x0 -= 2 * S; ext.y0 -= 2 * S; ext.x1 += 2 * S; ext.y1 += 2 * S;
+		// The read-me sits above the top-left of the network, its first line 3 units up.
+		var readmeAt = { x: ext.x0, y: ext.y1 + 3 + 1.5 * readme.length };
+		if (readme.length) { grow(readmeAt.x, readmeAt.y + 1); }
+		ext.x0 -= 2; ext.y0 -= 2; ext.x1 += 2; ext.y1 += 2;
 
 		// Handles are fixed for the structural objects, then counted up for everything else.
 		['vportT', 'ltypeT', 'layerT', 'styleT', 'viewT', 'ucsT', 'appidT', 'dimT', 'brT',
 			'ltByBlock', 'ltByLayer', 'ltCont', 'layer0', 'style', 'appAcad', 'dimStd', 'vpActive',
 			'brModel', 'brPaper', 'blkModel', 'endModel', 'blkPaper', 'endPaper',
-			'dictRoot', 'dictGroup', 'dictLayout', 'dictPsn', 'psnNormal', 'layoutModel', 'layoutPaper'
+			'dictRoot', 'dictGroup', 'dictLayout', 'dictPsn', 'psnNormal', 'layoutModel', 'layoutPaper',
+			'layerReadme'
 		].forEach(function (k) { H[k] = w.handle(); });
-		LAYERS.forEach(function (L) { H['layer:' + L.key] = w.handle(); });
+		var hasCustomers = !!(model.customers || []).length;
+		var layerTypes = TYPES.filter(function (T) { return T.type !== 'customer' || hasCustomers; });
+		layerTypes.forEach(function (T) { H['layer:' + T.type] = w.handle(); });
 		Object.keys(BLOCK_OF).forEach(function (t) {
-			if (t === 'customer' && !(model.customers || []).length) { return; }
+			if (t === 'customer' && !hasCustomers) { return; }
+			if (t === 'readme' && !readme.length) { return; }
 			blockTypes.push(t);
 			blockRec[t] = { rec: w.handle(), begin: w.handle(), end: w.handle() };
-		});
-		// The property layers the blocks in this file use, in the order their tags first appear.
-		var attrLayers = [];
-		blockTypes.forEach(function (t) {
-			((model.tags && model.tags[t]) || []).forEach(function (tag) {
-				var name = attrLayerName(tag, pfx);
-				if (H['alayer:' + name]) { return; }
-				H['alayer:' + name] = w.handle();
-				attrLayers.push({ name: name, color: tag === VISIBLE_TAG ? 7 : 9 });
-			});
 		});
 
 		var body = new Writer();
@@ -268,61 +269,51 @@
 			body.g(0, type).g(5, h).g(330, owner || H.brModel).g(100, 'AcDbEntity').g(8, layer);
 			return h;
 		}
-		function lwpoly(pts, layer, closed, owner) {
-			entity('LWPOLYLINE', layer, owner);
-			body.g(100, 'AcDbPolyline').g(90, pts.length).g(70, closed ? 1 : 0);
-			pts.forEach(function (p) { body.g(10, num(p[0] !== undefined ? p[0] : p.x)).g(20, num(p[1] !== undefined ? p[1] : p.y)); });
+		function lwpoly(pts, layer) {
+			entity('LWPOLYLINE', layer);
+			body.g(100, 'AcDbPolyline').g(90, pts.length).g(70, 0);
+			pts.forEach(function (p) { body.g(10, num(p.x)).g(20, num(p.y)); });
 		}
-		function line(x1, y1, x2, y2, layer) {
-			entity('LINE', layer);
-			body.g(100, 'AcDbLine').g(10, num(x1)).g(20, num(y1)).g(30, '0.0')
-				.g(11, num(x2)).g(21, num(y2)).g(31, '0.0');
-		}
-		// TEXT: the alignment point (11) is written whenever the justification is not plain
-		// left-baseline, and 10 carries the same point; AutoCAD recomputes 10 from 11 on open.
-		function text(t, layer) {
-			var ha = t.halign | 0, va = t.valign | 0;
-			entity('TEXT', layer);
-			body.g(100, 'AcDbText').g(10, num(t.x)).g(20, num(t.y)).g(30, '0.0').g(40, num(t.h || th))
-				.g(1, textContent(t));
-			if (t.rot) { body.g(50, num(t.rot)); }
-			if (ha) { body.g(72, ha); }
-			if (ha || va) { body.g(11, num(t.x)).g(21, num(t.y)).g(31, '0.0'); }
-			body.g(100, 'AcDbText');
-			if (va) { body.g(73, va); }
-		}
-		// An attribute's place in the block, in block units (text heights): stacked to the right of
-		// the symbol, 1.5 apart, so ATTDISP ON shows a readable column rather than every value on
-		// one point.
+		// An attribute's place in the block, in block units: stacked to the right of the symbol,
+		// 1.5 apart, so ATTDISP ON shows a readable column. The read-me's lines stack under its
+		// insertion point.
 		function attrOffset(k, type) {
+			if (type === 'readme') { return { x: 0, y: -k * 1.5 }; }
 			var r = type === 'tank' ? 1.5 : (type === 'reservoir' ? 1.4 : (type === 'pump' || type === 'valve' ? 1 : (type === 'pipe' ? 0.25 : 0.5)));
-			return { x: (r + 0.25) * Q, y: -k * 1.5 };
+			return { x: r + 0.25, y: -k * 1.5 };
 		}
-		function insert(type, x, y, rot, attrs, layer) {
-			var tags = (model.tags && model.tags[type]) || [], ins, values = {}, c, s, k;
-			(attrs || []).forEach(function (a) { values[a.tag] = a.value; });
+		function visible(type, tag) { return type === 'readme' || tag === VISIBLE_TAG; }
+		// INSERT scale 1: an attribute is 1 high in the block and so 1 high in the drawing, and
+		// scaling the insertion is how a CAD user brings it to the height they plot at.
+		function insert(type, x, y, rot, values, layer) {
+			var tg = tags[type] || [], ins, c, s, k;
 			ins = entity('INSERT', layer);
 			body.g(100, 'AcDbBlockReference');
-			if (tags.length) { body.g(66, 1); }
+			if (tg.length) { body.g(66, 1); }
 			body.g(2, BLOCK_OF[type]).g(10, num(x)).g(20, num(y)).g(30, '0.0')
-				.g(41, num(B)).g(42, num(B)).g(43, num(B));
+				.g(41, '1.0').g(42, '1.0').g(43, '1.0');
 			if (rot) { body.g(50, num(rot)); }
-			if (!tags.length) { return; }
+			if (!tg.length) { return; }
 			c = Math.cos((rot || 0) * Math.PI / 180); s = Math.sin((rot || 0) * Math.PI / 180);
-			for (k = 0; k < tags.length; k++) {
-				var o = attrOffset(k, type), ax = x + B * (o.x * c - o.y * s), ay = y + B * (o.x * s + o.y * c),
-					v = values[tags[k]];
-				// An ATTRIB is stored in the drawing's own coordinates, already through the INSERT:
-				// 1.0 in the block times the scale B is B high here.
-				entity('ATTRIB', attrLayerName(tags[k], pfx), ins);
-				body.g(100, 'AcDbText').g(10, num(ax)).g(20, num(ay)).g(30, '0.0').g(40, num(B))
-					.g(1, str(v === undefined || v === null ? '' : v));
+			for (k = 0; k < tg.length; k++) {
+				var o = attrOffset(k, type), v = values[tg[k]];
+				// An ATTRIB is stored in the drawing's own coordinates, already through the INSERT,
+				// and on the INSERT's layer: its ATTDEF is on layer 0, which AutoCAD resolves to the
+				// insert's layer, so freezing an element's layer hides its attributes with it.
+				entity('ATTRIB', layer, ins);
+				body.g(100, 'AcDbText').g(10, num(x + o.x * c - o.y * s)).g(20, num(y + o.x * s + o.y * c)).g(30, '0.0')
+					.g(40, '1.0').g(1, str(v === undefined || v === null ? '' : v));
 				if (rot) { body.g(50, num(rot)); }
-				// Flag 1 = invisible, for every attribute but the ID.
-				body.g(100, 'AcDbAttribute').g(2, str(tags[k])).g(70, tags[k] === VISIBLE_TAG ? 0 : 1);
+				// Flag 1 = invisible.
+				body.g(100, 'AcDbAttribute').g(2, str(tg[k])).g(70, visible(type, tg[k]) ? 0 : 1);
 			}
 			var seq = body.handle();
 			body.g(0, 'SEQEND').g(5, seq).g(330, ins).g(100, 'AcDbEntity').g(8, layer);
+		}
+		function valuesOf(type, attrs) {
+			var out = {};
+			(attrs || []).forEach(function (a) { out[tagName(a.tag)] = a.value; });
+			return out;
 		}
 
 		function writeBlocks(w) {
@@ -337,9 +328,8 @@
 			blockBegin('*Model_Space', H.blkModel, H.brModel, 0); blockEnd(H.endModel, H.brModel);
 			blockBegin('*Paper_Space', H.blkPaper, H.brPaper, 0); blockEnd(H.endPaper, H.brPaper);
 			blockTypes.forEach(function (t) {
-				var br = blockRec[t], tags = (model.tags && model.tags[t]) || [];
-				blockBegin(BLOCK_OF[t], br.begin, br.rec, tags.length ? 2 : 0);
-				// Geometry on layer 0 and colour ByLayer, so each INSERT takes its own layer's colour.
+				var br = blockRec[t], tg = tags[t] || [];
+				blockBegin(BLOCK_OF[t], br.begin, br.rec, tg.length ? 2 : 0);
 				SHAPES[t].forEach(function (sh) {
 					var hh = w.handle();
 					if (sh.point) {
@@ -347,21 +337,23 @@
 							.g(100, 'AcDbPoint').g(10, '0.0').g(20, '0.0').g(30, '0.0');
 					} else if (sh.circle) {
 						w.g(0, 'CIRCLE').g(5, hh).g(330, br.rec).g(100, 'AcDbEntity').g(8, '0')
-							.g(100, 'AcDbCircle').g(10, '0.0').g(20, '0.0').g(30, '0.0').g(40, num(sh.circle * Q));
+							.g(100, 'AcDbCircle').g(10, '0.0').g(20, '0.0').g(30, '0.0').g(40, num(sh.circle));
 					} else {
 						w.g(0, 'LWPOLYLINE').g(5, hh).g(330, br.rec).g(100, 'AcDbEntity').g(8, '0')
 							.g(100, 'AcDbPolyline').g(90, sh.poly.length).g(70, sh.closed ? 1 : 0);
-						sh.poly.forEach(function (p) { w.g(10, num(p[0] * Q)).g(20, num(p[1] * Q)); });
+						sh.poly.forEach(function (p) { w.g(10, num(p[0])).g(20, num(p[1])); });
 					}
 				});
-				tags.forEach(function (tag, k) {
-					var o = attrOffset(k, t), hh = w.handle();
-					w.g(0, 'ATTDEF').g(5, hh).g(330, br.rec).g(100, 'AcDbEntity').g(8, attrLayerName(tag, pfx))
+				tg.forEach(function (tag, k) {
+					var o = attrOffset(k, t), hh = w.handle(), raw = ((model.tags && model.tags[t]) || [])[k],
+						prompt = t === 'readme' ? tag.replace('_', ' ')
+							: ((model.prompts && (model.prompts[t + '.' + raw] || model.prompts[raw])) || tag);
+					w.g(0, 'ATTDEF').g(5, hh).g(330, br.rec).g(100, 'AcDbEntity').g(8, '0')
 						.g(100, 'AcDbText').g(10, num(o.x)).g(20, num(o.y)).g(30, '0.0')
 						.g(40, '1.0').g(1, '')
 						.g(100, 'AcDbAttributeDefinition')
-						.g(3, str((model.prompts && (model.prompts[t + '.' + tag] || model.prompts[tag])) || tag)).g(2, str(tag))
-						.g(70, tag === VISIBLE_TAG ? 0 : 1);
+						.g(3, str(caps(plainQuotes(prompt)))).g(2, str(tag))
+						.g(70, visible(t, tag) ? 0 : 1);
 				});
 				blockEnd(br.end, br.rec);
 			});
@@ -369,26 +361,27 @@
 
 		// ---- ENTITIES, built first so the handle seed is known for the header ----
 		(model.links || []).forEach(function (l) {
-			var lay = layerName(l.type === 'pump' ? 'pump' : (l.type === 'valve' ? 'valve' : 'pipe'), pfx);
-			if (!l.pts || l.pts.length < 2) { return; }
-			lwpoly(l.pts, lay, false);
-			if (l.type === 'pump' || l.type === 'valve' || l.type === 'pipe') {
-				var m = midAlong(l.pts);
-				insert(l.type, m.x, m.y, m.angle, l.attrs, lay);
-			}
+			var lay = layerOf(l.type);
+			if (!l.pts || l.pts.length < 2 || !BLOCK_OF[l.type]) { return; }
+			lwpoly(l.pts, lay);
+			var m = midAlong(l.pts);
+			insert(l.type, m.x, m.y, l.type === 'pipe' ? 0 : m.angle, valuesOf(l.type, l.attrs), lay);
 		});
 		(model.customers || []).forEach(function (c) {
-			var lay = layerName('customer', pfx);
-			if (c.from) { line(c.from.x, c.from.y, c.x, c.y, lay); }
-			insert('customer', c.x, c.y, 0, c.attrs, lay);
+			var lay = layerOf('customer');
+			// The service line is geometry, so it is a polyline like any other link.
+			if (c.from) { lwpoly([c.from, { x: c.x, y: c.y }], lay); }
+			insert('customer', c.x, c.y, 0, valuesOf('customer', c.attrs), lay);
 		});
 		(model.nodes || []).forEach(function (n) {
-			insert(n.type, n.x, n.y, 0, n.attrs, layerName(n.type, pfx));
+			if (!BLOCK_OF[n.type]) { return; }
+			insert(n.type, n.x, n.y, 0, valuesOf(n.type, n.attrs), layerOf(n.type));
 		});
-		(model.lines || []).forEach(function (ln) {
-			line(ln.x1, ln.y1, ln.x2, ln.y2, layerName(ln.layer || 'label', pfx));
-		});
-		(model.texts || []).forEach(function (t) { text(t, layerName(t.layer || 'label', pfx)); });
+		if (readme.length) {
+			var rv = {};
+			readme.forEach(function (s, k) { rv[tags.readme[k]] = s; });
+			insert('readme', readmeAt.x, readmeAt.y, 0, rv, README_LAYER);
+		}
 		// ---- BLOCKS, built next for the same reason ----
 		var blk = new Writer();
 		blk.next = body.next;
@@ -406,7 +399,7 @@
 			.g(9, '$LIMMIN').g(10, num(ext.x0)).g(20, num(ext.y0))
 			.g(9, '$LIMMAX').g(10, num(ext.x1)).g(20, num(ext.y1))
 			.g(9, '$ATTMODE').g(70, 1)
-			.g(9, '$TEXTSIZE').g(40, num(th))
+			.g(9, '$TEXTSIZE').g(40, '1.0')
 			.g(9, '$TEXTSTYLE').g(7, 'Standard')
 			.g(9, '$CLAYER').g(8, '0')
 			.g(9, '$LUNITS').g(70, 2)
@@ -445,30 +438,28 @@
 				w.g(2, lt[1]).g(70, 0).g(3, lt[2]).g(72, 65).g(73, 0).g(40, '0.0');
 			});
 		w.g(0, 'ENDTAB');
-		table('LAYER', H.layerT, LAYERS.length + attrLayers.length + 1);
+		table('LAYER', H.layerT, layerTypes.length + 2);
 		rec('LAYER', H.layer0, H.layerT, 'AcDbLayerTableRecord');
 		w.g(2, '0').g(70, 0).g(62, 7).g(6, 'Continuous').g(370, -3).g(390, H.psnNormal);
-		LAYERS.forEach(function (L) {
-			rec('LAYER', H['layer:' + L.key], H.layerT, 'AcDbLayerTableRecord');
-			w.g(2, tableName(pfx + L.name)).g(70, 0).g(62, L.color).g(6, 'Continuous');
-			if (L.noPlot) { w.g(290, 0); }
-			w.g(370, -3).g(390, H.psnNormal);
+		layerTypes.forEach(function (T) {
+			rec('LAYER', H['layer:' + T.type], H.layerT, 'AcDbLayerTableRecord');
+			w.g(2, layerOf(T.type)).g(70, 0).g(62, T.color).g(6, 'Continuous').g(370, -3).g(390, H.psnNormal);
 		});
-		attrLayers.forEach(function (L) {
-			rec('LAYER', H['alayer:' + L.name], H.layerT, 'AcDbLayerTableRecord');
-			w.g(2, L.name).g(70, 0).g(62, L.color).g(6, 'Continuous').g(370, -3).g(390, H.psnNormal);
-		});
+		// Group 290 = 0: not plotted (the DXF Reference's LAYER plotting flag).
+		rec('LAYER', H.layerReadme, H.layerT, 'AcDbLayerTableRecord');
+		w.g(2, README_LAYER).g(70, 0).g(62, 7).g(6, 'Continuous').g(290, 0).g(370, -3).g(390, H.psnNormal);
 		w.g(0, 'ENDTAB');
-		// **STYLE Standard, AND NO FONT FILE NAMED** (Tom, 2026-10-06, asked arial.ttf or txt.shx:
-		// *"Neither. Use 'Standard' style."*). Every TEXT, ATTDEF and ATTRIB leaves group 7 out,
-		// which the DXF Reference defaults to STANDARD. The record keeps the fields the Reference
-		// gives a STYLE (2 name, 70 flags, 40 fixed height 0 = not fixed, 41 width factor, 50
-		// oblique angle, 71 generation flags, 42 last height used, 3 primary font file, 4 big-font
-		// file) with 3 and 4 empty, so the opening program shows Standard in its own default font.
+		// **STYLE Standard ON txt, THE FONT AUTOCAD ITSELF GIVES IT** (Tom, 2026-10-06: *"Use
+		// 'Standard' style."*). Group 3 is the STYLE record's primary font file name (DXF Reference,
+		// STYLE). It used to be written empty; AutoCAD drew the text in a substitute and its text
+		// editor showed it in Arial (Tom, 2026-10-07: *"When I TEDIT the TEXT objects they
+		// temporarily appear as ARIAL, and there is not any ARIAL style in the DWG"*). "txt" is what
+		// AutoCAD writes for Standard (ezdxf's R2000 STYLE example shows the same record), so the
+		// style resolves to txt.shx in every AutoCAD. 4 (big font) stays empty.
 		table('STYLE', H.styleT, 1);
 		rec('STYLE', H.style, H.styleT, 'AcDbTextStyleTableRecord');
 		w.g(2, 'Standard').g(70, 0).g(40, '0.0').g(41, '1.0').g(50, '0.0').g(71, 0)
-			.g(42, num(th)).g(3, '').g(4, '').g(0, 'ENDTAB');
+			.g(42, '1.0').g(3, 'txt').g(4, '').g(0, 'ENDTAB');
 		table('VIEW', H.viewT, 0); w.g(0, 'ENDTAB');
 		table('UCS', H.ucsT, 0); w.g(0, 'ENDTAB');
 		table('APPID', H.appidT, 1);
@@ -560,15 +551,16 @@
 	}
 
 	// $INSUNITS codes from the DXF Reference's HEADER table (R2000 defines 0-20). US survey feet
-	// has no code before AutoCAD 2018, so it is written as feet and the note says which foot.
+	// has no code before AutoCAD 2018, so it is written as feet and the read-me says which foot.
 	var INSUNITS = { 'in': 1, 'ft': 2, 'us-ft': 2, 'mi': 3, 'mm': 4, 'cm': 5, 'm': 6, 'km': 7, 'yd': 10 };
 
 	EngCalcs.lpnDxfWrite = writeDxf;
-	EngCalcs.lpnDxfLayers = function (prefix) {
-		return LAYERS.map(function (L) { return { key: L.key, name: (prefix || '') + L.name, color: L.color }; });
-	};
+	EngCalcs.lpnDxfModelPrefix = MODEL_PREFIX;
+	EngCalcs.lpnDxfReadmeLayer = README_LAYER;
+	EngCalcs.lpnDxfAssetCodes = assetCodes;
+	EngCalcs.lpnDxfAlternative = alternativeCode;
+	EngCalcs.lpnDxfTag = tagName;
 	EngCalcs.lpnDxfBlocks = BLOCK_OF;
-	EngCalcs.lpnDxfAttrLayer = attrLayerName;
 	EngCalcs.lpnDxfInsUnits = function (u) { return INSUNITS[u] || 0; };
 	EngCalcs.lpnDxfMidAlong = midAlong;
 	EngCalcs.lpnDxfString = str;

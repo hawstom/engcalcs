@@ -35628,18 +35628,17 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- EXPORT DXF FILE (ROADMAP Task 772) ---------------------------------------------------------
 	//
-	// **A DUMB ANNOTATED NETWORK** (Tom, 2026-10-06): what the map shows, as a drawing any DWG
-	// program opens. js/lpn-dxf.js writes the file; this half GATHERS -- the project's own
-	// coordinates, each element's main values, and the lettering exactly as the map has placed it.
-	// Rules and the layer table: dev/dxf.md.
+	// **THE MODEL'S DATA, AS ATTRIBUTED BLOCKS** (Tom's DXF Interface Manager specification,
+	// dev/dxf-interface.md): links as polylines, every element a block whose attributes carry its
+	// ID and properties, tagged with the property labels and valued verbatim in the project units.
+	// No annotation. js/lpn-dxf.js writes the file; this half GATHERS. Rules: dev/dxf.md.
 	//
 	// **THE FRAME, AND WHAT THE FILE MAY CLAIM ABOUT IT.** A grid project goes out in its own X and
 	// Y, number for number. A project with a stated coordinate system goes out in it, unchanged. A
 	// latitude-and-longitude project is converted to the UTM zone that holds its centre (WGS 84,
 	// metres), because a CAD drawing is a plane and degrees are not a length; the page's own Web
-	// Mercator frame is not used, since its scale is wrong by 1 / cos(latitude). The note on the
-	// read-me layer says which of the three it is, and nothing else claims a coordinate system.
-	var LPN_DXF_CAP_HEIGHT = 0.716;   // Arial's cap height per em (OS/2 sCapHeight 1467 / 2048)
+	// Mercator frame is not used, since its scale is wrong by 1 / cos(latitude). The read-me says
+	// which of the three it is, and nothing else claims a coordinate system.
 	function dxfFrame(done) {
 		var pc = EngCalcs.pageConfig || {}, code, u;
 		if (isLatLonProject()) {
@@ -35660,7 +35659,7 @@ var EngCalcs = EngCalcs || {};
 				done({
 					ok: true, kind: 'geo', code: code, insunits: 6, measurement: 1, unitLabel: pc.u_m || 'm',
 					fwd: function (X, Y) { return EngCalcs.lpnCrsForward(code, { lon: X, lat: Y }); },
-					note: (pc.lpn_dxf_note_geo || 'Coordinates: {crs}, in meters, not latitude and longitude. The project’s latitudes and longitudes were converted to that grid.')
+					note: (pc.lpn_dxf_note_geo || 'Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.')
 						.replace('{crs}', dxfCrsName(code))
 				});
 			});
@@ -35686,7 +35685,7 @@ var EngCalcs = EngCalcs || {};
 		done({
 			ok: true, kind: 'grid', fwd: identity, unitLabel: unitSymbol('lpn_u_length'),
 			insunits: EngCalcs.lpnDxfInsUnits(u), measurement: u === 'm' ? 1 : 0,
-			note: (pc.lpn_dxf_note_grid || 'Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.')
+			note: (pc.lpn_dxf_note_grid || 'Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.')
 				.replace('{unit}', unitSymbol('lpn_u_length'))
 		});
 	}
@@ -35695,187 +35694,104 @@ var EngCalcs = EngCalcs || {};
 		return (name && name !== String(code)) ? name + ' (' + code + ')' : String(code);
 	}
 	// A value for an attribute: the effective (scenario) value where the property is overridable,
-	// the stored one otherwise, and '' for nothing at all. Numbers go out as the number, unrounded,
-	// so an attribute says what the model says.
+	// the stored one otherwise, and '' for nothing at all. **VERBATIM** (dev/dxf-interface.md:
+	// *"values match the current project units and are imported verbatim"*): a number is stored in
+	// the displayed unit, so it goes out as stored, unrounded and unconverted.
 	function dxfVal(el, prop) {
 		var v = effective(el, prop);
 		if (v === undefined || v === null) { v = el[prop]; }
 		return (v === undefined || v === null || (typeof v === 'number' && !isFinite(v))) ? '' : v;
 	}
-	var LPN_DXF_TAGS = {
+	// The properties each block carries, by internal key. Data only: no solve results, which an
+	// import would have no property to put back into.
+	var LPN_DXF_KEYS = {
 		junction: ['ID', 'ELEV', 'DEMAND', 'TAG', 'DESC'],
 		reservoir: ['ID', 'HEAD', 'TAG', 'DESC'],
 		tank: ['ID', 'ELEV', 'LEVEL', 'MINLEVEL', 'MAXLEVEL', 'DIAMETER', 'TAG', 'DESC'],
-		pipe: ['ID', 'DIAMETER', 'LENGTH', 'ROUGHNESS', 'FLOW', 'VELOCITY', 'TAG', 'DESC'],
+		pipe: ['ID', 'DIAMETER', 'LENGTH', 'ROUGHNESS', 'TAG', 'DESC'],
 		pump: ['ID', 'TAG', 'DESC'],
 		valve: ['ID', 'VALVETYPE', 'DIAMETER', 'SETTING', 'TAG', 'DESC'],
 		customer: ['ID', 'DEMAND', 'COUNT', 'TAG', 'DESC']
 	};
-	function dxfPrompts() {
+	// **A TAG IS THE PROPERTY'S LABEL** in the page's language (dev/dxf-interface.md: *"attributes
+	// have tags that match EPANET++ property labels ... spaces can be replaced with underscores"*),
+	// upper case: "Base demand" is BASE_DEMAND. The prompt AutoCAD shows in Edit Attributes is the
+	// label with its unit.
+	function dxfLabels() {
 		var pc = EngCalcs.pageConfig || {};
-		function withUnit(label, unitName) { return label + ' (' + unitSymbol(unitName) + ')'; }
 		return {
-			ID: pc.lpn_field_id || 'ID',
-			ELEV: withUnit(pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead'),
-			DEMAND: withUnit(pc.lpn_field_base_demand || 'Base demand', 'lpn_u_flow'),
-			HEAD: withUnit(pc.lpn_field_head || 'Head', 'lpn_u_elevhead'),
-			LEVEL: withUnit(pc.lpn_field_tank_level || 'Water depth', 'lpn_u_elevhead'),
-			MINLEVEL: withUnit(pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead'),
-			MAXLEVEL: withUnit(pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead'),
-			DIAMETER: withUnit(pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter'),
-			'tank.DIAMETER': withUnit(pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_length'),
-			LENGTH: withUnit(pc.lpn_field_length || 'Length', 'lpn_u_length'),
-			ROUGHNESS: pc.lpn_field_roughness || 'Roughness',
-			FLOW: withUnit(pc.lpn_result_flow || 'Flow', resultUnit('flow')),
-			VELOCITY: withUnit(pc.lpn_result_velocity || 'Velocity', resultUnit('velocity')),
-			VALVETYPE: pc.lpn_field_valve_type || 'Valve type',
-			SETTING: pc.lpn_field_valve_setting || 'Setting',
-			COUNT: pc.lpn_field_meter_count || 'Number of services',
-			TAG: pc.lpn_field_tag || 'Tag',
-			DESC: pc.lpn_field_desc || 'Description'
+			ID: [pc.lpn_field_id || 'ID'],
+			ELEV: [pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead'],
+			DEMAND: [pc.lpn_field_base_demand || 'Base demand', 'lpn_u_flow'],
+			HEAD: [pc.lpn_field_head || 'Head', 'lpn_u_elevhead'],
+			LEVEL: [pc.lpn_field_tank_level || 'Water depth', 'lpn_u_elevhead'],
+			MINLEVEL: [pc.lpn_field_tank_minlevel || 'Lowest water depth', 'lpn_u_elevhead'],
+			MAXLEVEL: [pc.lpn_field_tank_maxlevel || 'Highest water depth', 'lpn_u_elevhead'],
+			DIAMETER: [pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter'],
+			'tank.DIAMETER': [pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_length'],
+			LENGTH: [pc.lpn_field_length || 'Length', 'lpn_u_length'],
+			ROUGHNESS: [pc.lpn_field_roughness || 'Roughness'],
+			VALVETYPE: [pc.lpn_field_valve_type || 'Valve type'],
+			SETTING: [pc.lpn_field_valve_setting || 'Setting'],
+			COUNT: [pc.lpn_field_meter_count || 'Number of services'],
+			TAG: [pc.lpn_field_tag || 'Tag'],
+			DESC: [pc.lpn_field_desc || 'Description']
 		};
 	}
+	/** { tags: { type: [TAG...] }, prompts: { 'type.TAG': prompt }, tagOf(type, key) }. */
+	function dxfTagTable() {
+		var labels = dxfLabels(), tags = {}, prompts = {}, byKey = {};
+		Object.keys(LPN_DXF_KEYS).forEach(function (t) {
+			var used = {};
+			byKey[t] = {};
+			tags[t] = LPN_DXF_KEYS[t].map(function (key) {
+				var L = labels[t + '.' + key] || labels[key], tag = EngCalcs.lpnDxfTag(L[0]) || key, n = 2, base = tag;
+				// Two labels can read alike in a translation; a tag must be unique in its block.
+				while (used[tag]) { tag = base + '_' + (n++); }
+				used[tag] = true;
+				byKey[t][key] = tag;
+				prompts[t + '.' + tag] = L[1] ? L[0] + ' (' + unitSymbol(L[1]) + ')' : L[0];
+				return tag;
+			});
+		});
+		return { tags: tags, prompts: prompts, tagOf: function (t, key) { return byKey[t][key]; } };
+	}
 	function dxfNodeAttrs(n) {
-		var a = [{ tag: 'ID', value: n.id }];
+		var a = [['ID', n.id]];
 		if (n.type === 'junction') {
-			a.push({ tag: 'ELEV', value: dxfVal(n, 'elev') });
 			var d = baseDemandTotal(n);
-			a.push({ tag: 'DEMAND', value: (typeof d === 'number' && isFinite(d)) ? d : '' });
+			a.push(['ELEV', dxfVal(n, 'elev')], ['DEMAND', (typeof d === 'number' && isFinite(d)) ? d : '']);
 		} else if (n.type === 'reservoir') {
-			a.push({ tag: 'HEAD', value: nodeFixedHead(n) });
+			a.push(['HEAD', nodeFixedHead(n)]);
 		} else if (n.type === 'tank') {
-			a.push({ tag: 'ELEV', value: dxfVal(n, 'elev') }, { tag: 'LEVEL', value: dxfVal(n, 'level') },
-				{ tag: 'MINLEVEL', value: dxfVal(n, 'minLevel') }, { tag: 'MAXLEVEL', value: dxfVal(n, 'maxLevel') },
-				{ tag: 'DIAMETER', value: dxfVal(n, 'tankDiameter') });
+			a.push(['ELEV', dxfVal(n, 'elev')], ['LEVEL', dxfVal(n, 'level')], ['MINLEVEL', dxfVal(n, 'minLevel')],
+				['MAXLEVEL', dxfVal(n, 'maxLevel')], ['DIAMETER', dxfVal(n, 'tankDiameter')]);
 		}
-		a.push({ tag: 'TAG', value: dxfVal(n, 'tag') }, { tag: 'DESC', value: dxfVal(n, 'desc') });
+		a.push(['TAG', dxfVal(n, 'tag')], ['DESC', dxfVal(n, 'desc')]);
 		return a;
 	}
 	function dxfLinkAttrs(l) {
-		var a = [{ tag: 'ID', value: l.id }], r = lastSolveResult;
+		var a = [['ID', l.id]];
 		if (l.type === 'pipe') {
-			a.push({ tag: 'DIAMETER', value: dxfVal(l, 'diameter') }, { tag: 'LENGTH', value: dxfVal(l, 'length') },
-				{ tag: 'ROUGHNESS', value: dxfVal(l, 'roughness') });
-			// RESULTS ONLY WHERE THE MAP HAS THEM: a solve on screen, stale or not, exactly as the
-			// labels show it. Without one the two attributes are present and empty.
-			var q = r && r.flows ? r.flows[l.id] : undefined, v = r && r.velocities ? r.velocities[l.id] : undefined;
-			a.push({ tag: 'FLOW', value: typeof q === 'number' && isFinite(q) ? toDisplay(shownFlow(q), resultUnit('flow')) : '' },
-				{ tag: 'VELOCITY', value: typeof v === 'number' && isFinite(v) ? toDisplay(v, resultUnit('velocity')) : '' });
+			a.push(['DIAMETER', dxfVal(l, 'diameter')], ['LENGTH', dxfVal(l, 'length')], ['ROUGHNESS', dxfVal(l, 'roughness')]);
 		}
 		if (l.type === 'valve') {
-			a.push({ tag: 'VALVETYPE', value: l.valveType || '' }, { tag: 'DIAMETER', value: dxfVal(l, 'diameter') },
-				{ tag: 'SETTING', value: dxfVal(l, 'setting') });
+			a.push(['VALVETYPE', l.valveType || ''], ['DIAMETER', dxfVal(l, 'diameter')], ['SETTING', dxfVal(l, 'setting')]);
 		}
-		a.push({ tag: 'TAG', value: dxfVal(l, 'tag') }, { tag: 'DESC', value: dxfVal(l, 'desc') });
+		a.push(['TAG', dxfVal(l, 'tag')], ['DESC', dxfVal(l, 'desc')]);
 		return a;
 	}
-	// Is this piece of lettering on the map right now? Every way the page hides one: an inline
-	// visibility or display on it or an ancestor (a dropped, crossed, crowded or too-short label;
-	// a hidden layer), `.lpn-lbl-hidden` (a Text not in this scenario), and generated annotation
-	// while the map's data labels are switched off (`.lpn-labels-hidden`).
-	function dxfShown(e) {
-		var p = e;
-		if (dataLabelsHidden && e.classList && e.classList.contains('lpn-annotation')) { return false; }
-		while (p && p !== svg) {
-			if (p.style && (p.style.display === 'none' || p.style.visibility === 'hidden')) { return false; }
-			if (p.classList && p.classList.contains('lpn-lbl-hidden')) { return false; }
-			p = p.parentNode;
-		}
-		return true;
-	}
-	// A point of the DRAWING FRAME (where the lettering, a customer and the view live) through the
-	// outward boundary and on into the drawing by `G`. The DXF export's one crossing of that
-	// boundary, so dev/lpn-spike/local-origin-harness.js counts it once.
+	// A point of the DRAWING FRAME (where a customer lives) through the outward boundary and on
+	// into the drawing by `G`. The DXF export's one crossing of that boundary, so
+	// dev/lpn-spike/local-origin-harness.js counts it once.
 	function dxfDrawnToFile(G, x, y) { return G(outwardX(x), outwardY(y)); }
-	function dxfEmLength(v, fs) {
-		var s = String(v === undefined || v === null ? '' : v).trim();
-		if (!s) { return 0; }
-		var n = parseFloat(s);
-		if (!isFinite(n)) { return 0; }
-		return /em$/.test(s) ? n * fs : n;
-	}
-	function dxfHasAttr(e, name) {
-		var v = e.getAttribute(name);
-		return v !== undefined && v !== null;
-	}
-	/**
-	 * **THE LETTERING, READ OFF THE MAP ITSELF**, so what the user sees labelled is what lands in the
-	 * drawing: every shown <text> and leader in the labels layer -- node and link data labels and
-	 * their repeats, customer labels, and Text -- at the place, angle and size the placement pass
-	 * gave it. One TEXT per row, on the row's own baseline. `G` takes an OUTWARD coordinate pair to
-	 * the drawing.
-	 */
-	function dxfLettering(G) {
-		var texts = [], lines = [];
-		function toOut(x, y) { return dxfDrawnToFile(G, x, y); }
-		// A real SVG element's `children` is an HTMLCollection, which has no forEach (Tom,
-		// 2026-10-06: "No downloads." -- the DOM stub's Array hid it); copied to an Array first.
-		Array.prototype.slice.call(labelsLayer && labelsLayer.children ? labelsLayer.children : []).forEach(function (e) {
-			var tag = String(e._tag || e.tagName || e.nodeName || '').toLowerCase();
-			if (tag === 'line') {
-				var cls = String(e.getAttribute('class') || '');
-				if (cls.indexOf('lpn-leader') < 0 || !dxfShown(e)) { return; }
-				var a = toOut(+e.getAttribute('x1'), +e.getAttribute('y1')),
-					b = toOut(+e.getAttribute('x2'), +e.getAttribute('y2'));
-				if (a && b && isFinite(a.x) && isFinite(b.x)) {
-					lines.push({ x1: a.x, y1: a.y, x2: b.x, y2: b.y, layer: 'label' });
-				}
-				return;
-			}
-			if (tag !== 'text' || !dxfShown(e)) { return; }
-			var styleAttr = String(e.getAttribute('style') || ''),
-				m = /font-size:\s*([-\d.eE+]+)px/.exec(styleAttr),
-				fs = textElFontSize(e) || (m ? parseFloat(m[1]) : 0) || effectiveFontSize(),
-				x0 = +e.getAttribute('x') || 0, y0 = +e.getAttribute('y') || 0,
-				anchor = e.getAttribute('text-anchor'),
-				db = e.getAttribute('dominant-baseline'),
-				rot = /rotate\(\s*([-\d.eE+]+)(?:[\s,]+([-\d.eE+]+)[\s,]+([-\d.eE+]+))?\s*\)/.exec(String(e.getAttribute('transform') || '')),
-				ang = rot ? parseFloat(rot[1]) : 0,
-				rcx = rot && rot[2] !== undefined ? parseFloat(rot[2]) : 0,
-				rcy = rot && rot[3] !== undefined ? parseFloat(rot[3]) : 0,
-				layer = dxfHasAttr(e, 'data-lbl') ? 'text' : 'label',
-				kids = (e.childNodes || e.children || []), rows = [], cur = null, yOff = 0, i, c;
-			for (i = 0; i < kids.length; i++) {
-				c = kids[i];
-				if (c.nodeType !== 1) { continue; }
-				var dec = c.getAttribute('text-decoration');
-				if (dxfHasAttr(c, 'x') || !cur) {
-					yOff += dxfEmLength(c.getAttribute('dy'), fs);
-					cur = { x: dxfHasAttr(c, 'x') ? +c.getAttribute('x') : x0, y: y0 + yOff, segs: [] };
-					rows.push(cur);
-				}
-				cur.segs.push({ text: String(c.textContent || ''),
-					mark: dec === 'underline' ? 'under' : (dec === 'overline' ? 'over' : '') });
-			}
-			if (!rows.length && String(e.textContent || '')) {
-				rows.push({ x: x0, y: y0, segs: [{ text: String(e.textContent), mark: '' }] });
-			}
-			var ca = Math.cos(ang * Math.PI / 180), sa = Math.sin(ang * Math.PI / 180);
-			rows.forEach(function (r) {
-				if (!r.segs.map(function (g) { return g.text; }).join('').trim()) { return; }
-				var dx = r.x - rcx, dy = r.y - rcy,
-					px = rot ? rcx + dx * ca - dy * sa : r.x, py = rot ? rcy + dx * sa + dy * ca : r.y,
-					P = toOut(px, py), Q = toOut(px + ca * fs, py + sa * fs);
-				if (!P || !Q || !isFinite(P.x) || !isFinite(Q.x)) { return; }
-				var len = Math.hypot(Q.x - P.x, Q.y - P.y);
-				texts.push({
-					segs: r.segs, x: P.x, y: P.y,
-					h: len * LPN_DXF_CAP_HEIGHT,
-					rot: Math.atan2(Q.y - P.y, Q.x - P.x) * 180 / Math.PI,
-					halign: anchor === 'middle' ? 1 : (anchor === 'end' ? 2 : 0),
-					valign: db === 'central' ? 2 : (db === 'hanging' ? 3 : 0),
-					layer: layer
-				});
-			});
-		});
-		return { texts: texts, lines: lines };
-	}
-	/** The whole drawing as js/lpn-dxf.js's plain model, in `frame`'s coordinates. */
+	/** The whole model as js/lpn-dxf.js's plain model, in `frame`'s coordinates. */
 	function dxfModel(frame) {
 		var pc = EngCalcs.pageConfig || {}, G = frame.fwd, snap = serializeProject(),
-			geo = isLatLonProject(),
+			geo = isLatLonProject(), tt = dxfTagTable(),
 			org = (!geo && snap.origin && isFinite(snap.origin.x)) ? snap.origin : { x: 0, y: 0 },
-			fileNode = {}, nodes = [], links = [], customers = [], i;
+			fileNode = {}, nodes = [], links = [], customers = [];
+		function attrs(type, pairs) { return pairs.map(function (p) { return { tag: tt.tagOf(type, p[0]), value: p[1] }; }); }
 		snap.nodes.forEach(function (n) { fileNode[n.id] = n; });
 		// A node's OUTWARD position: this scenario's own if it moved the node, else the file's
 		// number plus the origin -- the same arithmetic the .inp export uses, so the two agree.
@@ -35888,7 +35804,7 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) {
 			var p = nodeOut(n.id);
 			if (!p) { return; }
-			nodes.push({ id: n.id, type: n.type, x: p.x, y: p.y, attrs: dxfNodeAttrs(n) });
+			nodes.push({ id: n.id, type: n.type, x: p.x, y: p.y, attrs: attrs(n.type, dxfNodeAttrs(n)) });
 		});
 		snap.links.forEach(function (fl) {
 			var l = linkById(fl.id), pts = [], a = nodeOut(fl.from), b = nodeOut(fl.to);
@@ -35899,124 +35815,52 @@ var EngCalcs = EngCalcs || {};
 				if (q) { pts.push(q); }
 			});
 			pts.push(b);
-			links.push({ id: l.id, type: l.type, pts: pts, attrs: dxfLinkAttrs(l) });
+			links.push({ id: l.id, type: l.type, pts: pts, attrs: attrs(l.type, dxfLinkAttrs(l)) });
 		});
 		(doc.customers || []).forEach(function (c) {
 			var pt = customerPoint(c), an = customerAttachPoint(c),
 				P = pt ? dxfDrawnToFile(G, pt.x, pt.y) : null,
 				A = an ? dxfDrawnToFile(G, an.x, an.y) : null;
 			if (!P) { return; }
-			customers.push({ id: c.id, x: P.x, y: P.y, from: A, attrs: [
-				{ tag: 'ID', value: c.id }, { tag: 'DEMAND', value: dxfVal(c, 'demand') },
-				{ tag: 'COUNT', value: dxfVal(c, 'count') },
-				{ tag: 'TAG', value: c.tag || '' }, { tag: 'DESC', value: c.desc || '' }] });
+			customers.push({ id: c.id, x: P.x, y: P.y, from: A, attrs: attrs('customer', [
+				['ID', c.id], ['DEMAND', dxfVal(c, 'demand')], ['COUNT', dxfVal(c, 'count')],
+				['TAG', c.tag || ''], ['DESC', c.desc || '']]) });
 		});
-		// **ONE SCALE FOR THE WHOLE SHEET**, measured at the middle of the network: how many drawing
-		// units one unit of the map's own frame is there. 1 for a grid or a stated system; for a
-		// latitude-and-longitude project it is the Mercator-to-UTM factor, which varies by well
-		// under a percent across the 300 km mission scope.
-		var bx = { x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity };
-		doc.nodes.forEach(function (n) {
-			var x = nodeDrawX(n), y = nodeDrawY(n);
-			if (!isFinite(x) || !isFinite(y)) { return; }
-			bx.x0 = Math.min(bx.x0, x); bx.x1 = Math.max(bx.x1, x); bx.y0 = Math.min(bx.y0, y); bx.y1 = Math.max(bx.y1, y);
-		});
-		var fs = effectiveFontSize(), k = 1;
-		if (isFinite(bx.x0)) {
-			var mx = (bx.x0 + bx.x1) / 2, my = (bx.y0 + bx.y1) / 2,
-				P = dxfDrawnToFile(G, mx, my), Q = dxfDrawnToFile(G, mx + fs, my);
-			if (P && Q && fs > 0) { k = Math.hypot(Q.x - P.x, Q.y - P.y) / fs || 1; }
-		}
-		var symbol = (settings.symbolSize / symbolScaleAt()) * k,
-			textHeight = fs * LPN_DXF_CAP_HEIGHT * k,
-			letters = dxfLettering(G);
-		// The read-me note, above the top-left of the network on a layer that does not plot.
-		var ex = { x0: Infinity, x1: -Infinity, y0: Infinity, y1: -Infinity };
-		nodes.forEach(function (n) {
-			ex.x0 = Math.min(ex.x0, n.x); ex.x1 = Math.max(ex.x1, n.x);
-			ex.y0 = Math.min(ex.y0, n.y); ex.y1 = Math.max(ex.y1, n.y);
-		});
-		if (!isFinite(ex.x0)) { ex = { x0: 0, x1: 0, y0: 0, y1: 0 }; }
-		// **THE PLOT-SCALE RELATIONSHIP, STATED IN THE DRAWING**: the text height against the
-		// network's own size, so a reader choosing a plot scale knows what the lettering becomes.
-		var across = Math.max(ex.x1 - ex.x0, ex.y1 - ex.y0);
-		function three(v) { return isFinite(v) ? String(+v.toPrecision(3)) : '?'; }
-		var notes = [projectDisplayName(project), frame.note,
-			(pc.lpn_dxf_note_scale || 'Text and symbols are sized as the map draws them at Zoom to fit: text {h} high, on a network {w} across.')
-				.replace('{h}', three(textHeight) + ' ' + (frame.unitLabel || '')).replace('{w}', three(across) + ' ' + (frame.unitLabel || '')),
-			// **ATTRIBUTES ARE 1 HIGH IN THE BLOCK, AND THE INSERT SCALE IS THE TEXT HEIGHT** (Tom,
-			// 2026-10-06), so scaling a block's insertion is how a CAD user sets their height.
-			(pc.lpn_dxf_note_blocks || 'Block attributes are 1 unit high in each block definition. Every block is inserted at scale {scale}, so its attributes are {h} high; change the insertion scale to change that.')
-				.replace('{scale}', three(textHeight)).replace('{h}', three(textHeight) + ' ' + (frame.unitLabel || ''))];
-		// **A VALUE TOO LONG FOR ONE DXF STRING IS SHORTENED, AND THE DRAWING SAYS SO** -- the writer
-		// cuts it and ends it in an ellipsis (js/lpn-dxf.js, LIMIT_CHARS).
+		// **THE LAYER NAMES**: js/lpn-dxf.js's one prefix, the project's own ID prefixes as asset
+		// codes, and the scenario on screen as the alternative (BASE for Base). The whole network
+		// as that scenario has it is written; an overrides-only layer per alternative waits on
+		// Task 721, which owns the alternatives model.
+		var sc = activeScenario(), alternative = sc && !sc.isBase ? EngCalcs.lpnDxfAlternative(sc.name || sc.id) : 'BASE',
+			codes = EngCalcs.lpnDxfAssetCodes(settings.idPrefixes),
+			readme = [projectDisplayName(project), frame.note,
+				(pc.lpn_dxf_note_blocks || 'Layers are named {prefix}, the asset code, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Only the ID attribute is visible; the ATTDISP command shows the others.')
+					.replace('{prefix}', EngCalcs.lpnDxfModelPrefix)
+					.replace('{example}', EngCalcs.lpnDxfModelPrefix + codes.junction + '-' + alternative)];
+		// **A VALUE TOO LONG FOR ONE DXF STRING IS SHORTENED, AND THE READ-ME SAYS SO** -- the writer
+		// cuts it and ends it in three periods (js/lpn-dxf.js, LIMIT_CHARS).
 		var longOnes = 0;
 		nodes.concat(links, customers).forEach(function (el) {
 			(el.attrs || []).forEach(function (a) { if (EngCalcs.lpnDxfTooLong(a.value)) { longOnes++; } });
 		});
-		letters.texts.forEach(function (t) {
-			if (EngCalcs.lpnDxfTooLong((t.segs || []).map(function (g) { return g.text; }).join(''))) { longOnes++; }
-		});
 		if (longOnes) {
-			notes.push((pc.lpn_dxf_note_shortened || '{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in “…”.')
+			readme.push((pc.lpn_dxf_note_shortened || '{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.')
 				.replace('{n}', String(longOnes)).replace('{max}', String(EngCalcs.lpnDxfLimit)));
 		}
-		for (i = 0; i < notes.length; i++) {
-			letters.texts.push({ text: notes[i], x: ex.x0, y: ex.y1 + symbol * 3 + (notes.length - i) * textHeight * 1.6,
-				h: textHeight, layer: 'note' });
-		}
 		return {
-			insunits: frame.insunits, measurement: frame.measurement, layerPrefix: '',
-			symbol: symbol, textHeight: textHeight,
-			nodes: nodes, links: links, customers: customers,
-			texts: letters.texts, lines: letters.lines,
-			tags: LPN_DXF_TAGS, prompts: dxfPrompts()
+			insunits: frame.insunits, measurement: frame.measurement,
+			codes: codes, alternative: alternative,
+			nodes: nodes, links: links, customers: customers, readme: readme,
+			tags: tt.tags, prompts: tt.prompts
 		};
-	}
-	/**
-	 * **THE DRAWING DOES NOT DEPEND ON THE ZOOM IT WAS EXPORTED FROM** (pre-review 2026-10-06: Net1
-	 * at three zooms gave text 17.2, 1.2 and 0.043 units high). It is laid out as the map lays the
-	 * network out at Zoom to fit: the page's own zoomExtent and its own label pass, run at that
-	 * scale, read, and the user's view put back -- all inside one synchronous call, so the browser
-	 * never paints the intermediate view. What it still depends on is what Zoom to fit depends on:
-	 * the map window's size and the text and symbol sizes in Settings.
-	 *
-	 * Where the map has not been measured yet there is no fit to run, and the export is laid out at
-	 * the view in force; that is the honest alternative, and it cannot arise from the File menu,
-	 * which is only reachable on a sized map.
-	 */
-	function dxfAtFitScale(fn) {
-		if (!mapSized || !svg) { return fn(); }
-		var keep = { tx: state.tx, ty: state.ty, s: state.s }, keepFit = lastFit;
-		try {
-			// `false`, not `true`: this is not an automatic fit to re-baseline the project on. The view
-			// is put back below, so the project's signature never sees it (view-memory-harness.js).
-			zoomExtent(false);
-			// The fit's own iteration can land a last bit apart depending on the view it started
-			// from; held to ten significant figures, every start gives the same scale and so the
-			// same file, byte for byte (dev/lpn-spike/dxf-export-harness.js).
-			state.s = +state.s.toPrecision(10);
-			setTransform();
-			onZoomChanged();
-			reshedNow();
-			return fn();
-		} finally {
-			state.tx = keep.tx; state.ty = keep.ty; state.s = keep.s;
-			setTransform();
-			onZoomChanged();
-			reshedNow();
-			lastFit = keepFit;
-		}
 	}
 	/** frame -> {ok, text}; the synchronous half, which is what a harness drives. */
 	function dxfExportText(frame) {
 		if (!frame || !frame.ok || !EngCalcs.lpnDxfWrite) { return { ok: false, reason: frame && frame.reason }; }
-		return { ok: true, frame: frame, text: dxfAtFitScale(function () { return EngCalcs.lpnDxfWrite(dxfModel(frame)); }) };
+		return { ok: true, frame: frame, text: EngCalcs.lpnDxfWrite(dxfModel(frame)) };
 	}
 	function exportDxfFile() {
 		var pcX = EngCalcs.pageConfig || {};
 		saveToStorage();   // export what is on screen, including edits not yet saved
-		flushLabelRefresh();   // the lettering as the map will show it, not a pass still owed
 		dxfFrame(function (frame) {
 			// **A FAILURE SAYS SO.** On a lat/lon project this runs inside the coordinate loader's
 			// promise, which swallows a throw; uncaught, the click did nothing at all (2026-10-06).
@@ -36029,32 +35873,30 @@ var EngCalcs = EngCalcs || {};
 	}
 	function dxfExportFinish(frame) {
 		var pcX = EngCalcs.pageConfig || {};
-		(function () {
-			var out = dxfExportText(frame);
-			if (!out.ok) {
-				setNotice(out.reason === 'utm'
-					? (pcX.lpn_dxf_export_no_utm || 'The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.')
-					: (pcX.lpn_dxf_export_refused || 'The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.'));
-				return;
-			}
-			// A BYTE string in Windows-1252 (js/lpn-dxf.js), so it goes out as bytes: a Blob of the
-			// string itself would be UTF-8 and turn every accented letter into two wrong ones.
-			var blob = new Blob([EngCalcs.lpnDxfBytes(out.text)], { type: 'application/dxf' }),
-				url = URL.createObjectURL(blob), a = document.createElement('a');
-			a.href = url;
-			a.download = safeFileName(projectDisplayName(project)) + '.dxf';
-			document.body.appendChild(a);
-			a.click();
-			document.body.removeChild(a);
-			setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
-			// Exporting is not saving, for the reason exportInpFile() gives. A lat/lon project's
-			// drawing is in UTM metres, and the status line says so, since a reader expecting the
-			// project's degrees would otherwise look for them (Tom, 2026-10-06).
-			setNotice(frame.kind === 'geo'
-				? (pcX.lpn_dxf_exported_geo || 'Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.')
-					.replace('{file}', a.download).replace('{crs}', dxfCrsName(frame.code))
-				: (pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download));
-		}());
+		var out = dxfExportText(frame);
+		if (!out.ok) {
+			setNotice(out.reason === 'utm'
+				? (pcX.lpn_dxf_export_no_utm || 'The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.')
+				: (pcX.lpn_dxf_export_refused || 'The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.'));
+			return;
+		}
+		// A BYTE string in Windows-1252 (js/lpn-dxf.js), so it goes out as bytes: a Blob of the
+		// string itself would be UTF-8 and turn every accented letter into two wrong ones.
+		var blob = new Blob([EngCalcs.lpnDxfBytes(out.text)], { type: 'application/dxf' }),
+			url = URL.createObjectURL(blob), a = document.createElement('a');
+		a.href = url;
+		a.download = safeFileName(projectDisplayName(project)) + '.dxf';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+		// Exporting is not saving, for the reason exportInpFile() gives. A lat/lon project's
+		// drawing is in UTM metres, and the status line says so, since a reader expecting the
+		// project's degrees would otherwise look for them (Tom, 2026-10-06).
+		setNotice(frame.kind === 'geo'
+			? (pcX.lpn_dxf_exported_geo || 'Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.')
+				.replace('{file}', a.download).replace('{crs}', dxfCrsName(frame.code))
+			: (pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download));
 	}
 	/**
 	 * **THE EXPORT ALERT** (ROADMAP Task 465 slice 5; Tom, 2026-09-06, on a library pipe being
@@ -42009,8 +41851,8 @@ var EngCalcs = EngCalcs || {};
 			// separate row from Open rather than a second file type on it.
 			{ icon: 'save', label: pc.lpn_file_export_inp || 'Export EPANET file…',
 			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
-			// A DRAWING for AutoCAD and every other DWG program (Task 772): a download, like the row
-			// above, and never something read back -- DXF import is a separate task.
+			// THE MODEL'S DATA for AutoCAD and every other DWG program (Task 772): a download, like
+			// the row above. Reading a DXF back is the DXF Interface Manager's import half, not built.
 			{ icon: 'save', label: pc.lpn_file_export_dxf || 'Export DXF file…',
 			  tip: pc.lpn_file_export_dxf_tip, fn: exportDxfFile },
 		].concat([

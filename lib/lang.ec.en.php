@@ -2056,24 +2056,25 @@ $ec_lang['lpn_status_inp_exported']='Exported {file}.';
 // the failure this whole feature exists to prevent.
 $ec_lang['lpn_inp_export_differences']='{n} things the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
-// Task 772: File > Export DXF file. A drawing for AutoCAD and other CAD programs, never read back.
+// Task 772: File > Export DXF file. The model's data for AutoCAD and other CAD programs.
 $ec_lang['lpn_file_export_dxf']='Export DXF file…';
-$ec_lang['lpn_file_export_dxf_tip']='Download this network as a drawing that AutoCAD and other CAD programs open: one layer for each kind of asset, each node a block carrying its ID and main values, and the labels as they appear on the map.';
+$ec_lang['lpn_file_export_dxf_tip']='Download this network for AutoCAD and other CAD programs: pipes, pumps, and valves as polylines, and every element as a block whose attributes carry its ID and property values in the project units.';
 $ec_lang['lpn_dxf_export_no_utm']='The DXF file was not written: this network lies outside the latitudes UTM covers (80° S to 84° N), and a drawing needs a flat grid to be drawn on.';
 $ec_lang['lpn_dxf_export_refused']='The DXF file was not written: the coordinate conversion it needs did not load. Check the connection and try again.';
 $ec_lang['lpn_dxf_export_failed']='The DXF file was not written: an error in this page stopped it ({error}).';
-// The read-me note written into the drawing itself, on a layer that does not plot. Each says what
+// The read-me written into the file as a block of attributes, on a layer that does not plot; the
+// file writes it in capital letters. Each says what
 // the coordinates are and claims no coordinate system the file does not have. {unit} is a length
 // unit symbol; {crs} is a coordinate system name with its EPSG code.
-$ec_lang['lpn_dxf_note_grid']='Coordinates: this project’s own X and Y, in {unit}. No coordinate system is stated.';
+$ec_lang['lpn_dxf_note_grid']='Coordinates: the X and Y of this project, in {unit}. No coordinate system is stated.';
 $ec_lang['lpn_dxf_note_crs']='Coordinates: {crs}, exactly as this project states them.';
-$ec_lang['lpn_dxf_note_geo']='Coordinates: {crs}, in meters, not latitude and longitude. The project’s latitudes and longitudes were converted to that grid.';
+$ec_lang['lpn_dxf_note_geo']='Coordinates: {crs}, in meters, not latitude and longitude. The latitudes and longitudes of the project were converted to that grid.';
 $ec_lang['lpn_dxf_exported_geo']='Exported {file}. Its coordinates are {crs}, in meters, not latitude and longitude.';
-// {h} and {w} are lengths, each a number (3 significant figures) followed by its unit symbol.
-$ec_lang['lpn_dxf_note_scale']='Text and symbols are sized as the map draws them at Zoom to fit: text {h} high, on a network {w} across.';
-$ec_lang['lpn_dxf_note_blocks']='Block attributes are 1 unit high in each block definition. Every block is inserted at scale {scale}, so its attributes are {h} high; change the insertion scale to change that.';
+// {prefix} is the layer-name prefix, C-WATR-MODL-; {example} is a whole layer name such as
+// C-WATR-MODL-J___-BASE. ATTDISP is an AutoCAD command name: keep it in Latin capitals.
+$ec_lang['lpn_dxf_note_blocks']='Layers are named {prefix}, the asset code, and the alternative, as in {example}. Each element is a block inserted at scale 1 with attributes 1 unit high; scale the blocks to set the text height. Only the ID attribute is visible; the ATTDISP command shows the others.';
 // {n} is a whole number; {max} is 2049. The ellipsis is the character the shortened value ends in.
-$ec_lang['lpn_dxf_note_shortened']='{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in “…”.';
+$ec_lang['lpn_dxf_note_shortened']='{n} values were longer than a DXF file allows ({max} characters), so each was shortened and ends in three periods.';
 $ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network file.';
 // EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
 // the way out named here always works, so keep the instruction in the message rather than leaving

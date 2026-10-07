@@ -13,13 +13,14 @@
 // browser clicking the real menu row sees either. Asserted, on Net1 and on Net3 lat/lon:
 //   (a) the File menu row gives exactly one download, a .dxf, and no uncaught page error;
 //   (b) the file is ASCII DXF R2000 (AC1015) from SECTION to EOF;
-//   (c) every block's ID attribute is visible and every other attribute invisible, each on its
-//       own C-WATR-ATTR-* property layer (ID on C-WATR-ATTR-IDEN), every layer in the LAYER table;
-//   (d) every ATTDEF is 1.0 high, and every INSERT's scale is the text height, so each ATTRIB is
-//       that height in the drawing;
-//   (e) the one text style is Standard, naming no font file (no arial.ttf, no txt.shx);
+//   (c) data only (Tom's DXF Interface Manager specification, dev/dxf-interface.md): no TEXT,
+//       MTEXT, LINE or MULTILEADER; every layer C-WATR-MODL-XXXX-ALT (or the white read-me layer),
+//       every name and tag in capitals; every ID attribute visible and every other invisible,
+//       each ATTRIB on its INSERT's layer;
+//   (d) every ATTDEF and ATTRIB is 1 high and every INSERT at scale 1 (Tom: "attribute height is 1");
+//   (e) the one text style is Standard on txt, and nothing in the file names Arial;
 //   (f) a lat/lon project's coordinates are UTM metres, and both the status line and the read-me
-//       note say they are not latitude and longitude.
+//       say they are not latitude and longitude.
 'use strict';
 
 const fs = require('fs');
@@ -127,56 +128,55 @@ function checkDrawing(label, out, geo) {
 	const T = out.text;
 	if (!T) { ok(label + ': a drawing to read', false); return; }
 	ok(label + ': SECTION ... EOF, R2000 (AC1015)', /^  0\r?\nSECTION\r?\n/.test(T) && /\r?\nEOF\r?\n$/.test(T) && /\$ACADVER\r?\n  1\r?\nAC1015\r?\n/.test(T));
-	const P = pairs(T), hdr = section(P, 'HEADER'), tables = section(P, 'TABLES'),
+	const P = pairs(T), tables = section(P, 'TABLES'),
 		blocks = section(P, 'BLOCKS'), ents = section(P, 'ENTITIES');
 	const layerNames = new Set(tables.filter((e) => e.type === 'LAYER').map((e) => get(e, 2)));
 	// --- text style ---
 	const styles = tables.filter((e) => e.type === 'STYLE');
-	ok(label + ': one text style, Standard', styles.length === 1 && /^standard$/i.test(get(styles[0], 2)), styles.map((s) => get(s, 2)).join(','));
-	ok(label + ': Standard names no font file (no arial.ttf, no txt.shx)', styles.length === 1 && !get(styles[0], 3) && !/arial|txt\.shx/i.test(T));
+	ok(label + ': one text style, Standard, on font txt', styles.length === 1 && get(styles[0], 2) === 'Standard' && get(styles[0], 3) === 'txt',
+		styles.map((s) => get(s, 2) + '/' + get(s, 3)).join(','));
+	ok(label + ': nothing in the file names Arial', !/arial/i.test(T));
+	// --- data only ---
+	const kinds = new Set(ents.map((e) => e.type));
+	ok(label + ': no TEXT, MTEXT, LINE or MULTILEADER', !['TEXT', 'MTEXT', 'LINE', 'MULTILEADER'].some((k) => kinds.has(k)), [...kinds].join(','));
+	ok(label + ': every layer is 0, C-WATR-MODL-XXXX-ALT or C-WATR-RDME', [...layerNames].every((n) => n === '0' || n === 'C-WATR-RDME' || /^C-WATR-MODL-[A-Z0-9_]{4}-BASE$/.test(n)),
+		[...layerNames].join(' '));
+	const rd = tables.find((e) => e.type === 'LAYER' && get(e, 2) === 'C-WATR-RDME');
+	ok(label + ': the read-me layer is white (ACI 7)', rd && +get(rd, 62) === 7);
 	// --- attributes ---
 	const inserts = ents.filter((e) => e.type === 'INSERT');
 	const attribs = ents.filter((e) => e.type === 'ATTRIB');
 	const attdefs = blocks.filter((e) => e.type === 'ATTDEF');
 	ok(label + ': blocks inserted, attributes attached', inserts.length > 0 && attribs.length > 0, inserts.length + ' inserts, ' + attribs.length + ' attributes');
-	const ids = attribs.filter((e) => get(e, 2) === 'ID'), rest = attribs.filter((e) => get(e, 2) !== 'ID');
+	const model = attribs.filter((e) => get(e, 8) !== 'C-WATR-RDME');
+	const ids = model.filter((e) => get(e, 2) === 'ID'), rest = model.filter((e) => get(e, 2) !== 'ID');
 	ok(label + ': every ID attribute is visible (70 = 0)', ids.length > 0 && ids.every((e) => (+get(e, 70) & 1) === 0), ids.length + ' IDs');
 	ok(label + ': every other attribute is invisible (70 = 1)', rest.length > 0 && rest.every((e) => (+get(e, 70) & 1) === 1), rest.length + ' others');
-	const badLayer = attribs.filter((e) => {
-		const lay = get(e, 8), tag = get(e, 2);
-		return !/^C-WATR-ATTR-[A-Z]{4}$/.test(lay) || (tag === 'ID') !== (lay === 'C-WATR-ATTR-IDEN') || !layerNames.has(lay);
-	});
-	ok(label + ': each attribute on its own C-WATR-ATTR-* property layer, in the LAYER table', badLayer.length === 0,
-		badLayer.slice(0, 3).map((e) => get(e, 2) + '@' + get(e, 8)).join(' '));
-	const byTag = {};
-	attribs.forEach((e) => { (byTag[get(e, 2)] = byTag[get(e, 2)] || new Set()).add(get(e, 8)); });
-	ok(label + ': one layer per property (no tag split over two layers, no two tags sharing one)',
-		Object.keys(byTag).every((t) => byTag[t].size === 1) &&
-		new Set(Object.keys(byTag).map((t) => [...byTag[t]][0])).size === Object.keys(byTag).length,
-		Object.keys(byTag).map((t) => t + '=' + [...byTag[t]].join('/')).join(' '));
-	ok(label + ': every ATTDEF is 1.0 high and sits on its property layer', attdefs.length > 0 &&
-		attdefs.every((e) => +get(e, 40) === 1 && /^C-WATR-ATTR-/.test(get(e, 8))), attdefs.length + ' attdefs');
-	const th = +get(hdr.find((e) => e.g.some((q) => q[1] === '$TEXTSIZE')) || { g: [] }, 40) ||
-		+((/\$TEXTSIZE\r?\n 40\r?\n([^\r\n]+)/.exec(T) || [])[1]);
-	const attInserts = inserts.filter((e) => get(e, 66) === '1' || +get(e, 66) === 1);
-	ok(label + ': every attributed INSERT is scaled to the text height ($TEXTSIZE ' + th + ')',
-		th > 0 && attInserts.length > 0 && attInserts.every((e) => near(+get(e, 41), th) && near(+get(e, 42), th)));
-	ok(label + ': so every ATTRIB is the text height in the drawing', attribs.every((e) => near(+get(e, 40), th)));
+	ok(label + ': every tag and block name is in capitals', attribs.concat(attdefs).every((e) => get(e, 2) === get(e, 2).toUpperCase()) &&
+		inserts.every((e) => get(e, 2) === get(e, 2).toUpperCase()));
+	ok(label + ': ELEVATION is a tag (the property label, in capitals)', attribs.some((e) => get(e, 2) === 'ELEVATION'));
+	let curLayer = null, badLayer = 0;
+	ents.forEach((e) => { if (e.type === 'INSERT') { curLayer = get(e, 8); } else if (e.type === 'ATTRIB' && get(e, 8) !== curLayer) { badLayer++; } });
+	ok(label + ': each attribute is on its block\'s own layer', badLayer === 0, badLayer + ' not');
+	ok(label + ': every ATTDEF is 1.0 high on layer 0', attdefs.length > 0 && attdefs.every((e) => +get(e, 40) === 1 && get(e, 8) === '0'), attdefs.length + ' attdefs');
+	ok(label + ': every INSERT is at scale 1', inserts.every((e) => +get(e, 41) === 1 && +get(e, 42) === 1));
+	ok(label + ': so every ATTRIB is 1 high in the drawing', attribs.every((e) => +get(e, 40) === 1));
 	// --- coordinates ---
-	const xs = inserts.map((e) => +get(e, 10)), ys = inserts.map((e) => +get(e, 20));
-	const notes = ents.filter((e) => e.type === 'TEXT' && get(e, 8) === 'C-WATR-RDME').map((e) => get(e, 1)).join(' | ');
+	const nodeIns = inserts.filter((e) => get(e, 8) !== 'C-WATR-RDME');
+	const xs = nodeIns.map((e) => +get(e, 10)), ys = nodeIns.map((e) => +get(e, 20));
+	const notes = attribs.filter((e) => get(e, 8) === 'C-WATR-RDME').map((e) => get(e, 1)).join(' | ');
+	ok(label + ': the read-me is in capitals and plain ASCII', notes.length > 0 && notes === notes.toUpperCase() && !/[\x80-\xff]/.test(notes), notes.slice(0, 200));
 	if (geo) {
 		ok(label + ': coordinates are UTM metres, not degrees (easting 100 000..900 000, northing > 1 000 000)',
 			xs.every((x) => x > 1e5 && x < 9e5) && ys.every((y) => y > 1e6), 'x ' + Math.min(...xs).toFixed(0) + '..' + Math.max(...xs).toFixed(0));
 		// Every literal piece of the page's own template is there, around the UTM zone's name.
 		const has = (hay, tpl) => !!tpl && tpl.split(/\{\w+\}/).every((piece) => hay.indexOf(piece.trim()) >= 0);
-		const notes1252 = new TextDecoder('windows-1252').decode(Buffer.from(notes, 'latin1'));
-		ok(label + ': the read-me note says UTM metres, not latitude and longitude (lpn_dxf_note_geo)', /UTM zone/.test(notes) && has(notes1252, out.words.note), notes1252.slice(0, 240));
+		ok(label + ': the read-me says UTM metres, not latitude and longitude (lpn_dxf_note_geo)', /UTM ZONE/.test(notes) && has(notes, out.words.note.toUpperCase()), notes.slice(0, 240));
 		ok(label + ': and so does the status line (lpn_dxf_exported_geo)', /UTM zone/.test(out.notice) && has(out.notice, out.words.status), out.notice);
 	} else {
 		ok(label + ': the status line names the file', out.notice.indexOf(out.name) >= 0, out.notice);
 	}
-	ok(label + ': the read-me note states the block scale', /\b1\b/.test(notes) && notes.indexOf(String(+th.toPrecision(3))) >= 0, notes.slice(0, 400));
+	ok(label + ': the read-me names the layer pattern', /C-WATR-MODL-J___-BASE/.test(notes), notes.slice(0, 400));
 	const tmp = path.join(require('os').tmpdir(), NAME + '-' + process.pid + '-' + label.replace(/\W+/g, '_') + '.dxf');
 	fs.writeFileSync(tmp, Buffer.from(T, 'latin1'));
 	const audit = ezdxfAudit(tmp);

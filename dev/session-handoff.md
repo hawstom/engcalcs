@@ -124,7 +124,9 @@ replayed offline beacon stamped 09-21 made a 5-day log report 15 days), "Is acti
   (list in the geojson agent's report, repeated in `feat/geojson:dev/` docs if any).
 - **`feat/dxf`**: no-download fixed (an SVG HTMLCollection `.forEach`; the stub harness used an
   Array). Lat/lon writes UTM metres, not degrees (his assumption corrected; status line says so).
-  ID visible, one layer per property C-WATR-ATTR-*, attributes height 1, Standard style.
+  Reshaped 2026-10-07 to his DXF spec: data only (no TEXT), layers C-WATR-MODL-J___-BASE, tags are
+  property labels in capitals, attributes 1 high at scale 1, read-me a white attributed block,
+  Standard on txt (the blank font was his TEDIT Arial).
 - **`feat/screenshot`**: Snip (rectangle, freehand) + red pen markup view (Undo, Copy, Save). His
   calls: plain Screenshot now opens the view (one more click); view stays open after Copy.
 - **`feat/table-export`** (Task 776): Copy with headings; Export table as CSV / ODS (pane menu).
