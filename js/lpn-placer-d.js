@@ -45,7 +45,7 @@ EngCalcs.lpnPlacerD = (function () {
 	// Off by name: in node, PLACER_D_OFF=a,b (environment); in a page or a harness,
 	// EngCalcs.lpnPlacerD.off = ['a', 'b'] before create(). Names and what each does: STRATEGY.md.
 	var INGREDIENTS = ['order', 'sticky', 'crowd', 'smallfirst', 'evict', 'polish', 'along', 'altlayout',
-		'rescue', 'tight', 'wedge', 'timebound', 'warm'];
+		'rescue', 'rescueevict', 'tight', 'wedge', 'timebound', 'warm'];
 	var OFF = {}, API = null;
 	function readOff(api) {
 		OFF = {};
@@ -87,6 +87,7 @@ EngCalcs.lpnPlacerD = (function () {
 	var DISTS = [1, 2.2, 3.8];          // leader lengths beyond the symbol, in row heights
 	var MAX_DYN = 18000;                    // repair work cap per place(); deterministic, not wall-clock
 	var TRIES = 2;                          // blocked places a short-changed label tries per level
+	var TRIES_DENSE = 4;                    // the same in the rescue's eviction ('rescue-evict')
 	var PASSES = 1;
 	var DIRSET = [];
 	(function () {
@@ -104,7 +105,7 @@ EngCalcs.lpnPlacerD = (function () {
 		this.bl = null; this.items = null; this.st = 0; this.along = false;
 		this.lazy = false; this.dead = false; this.nx = 0; this.ny = 0; this.base = 0;
 		this.x0 = 0; this.y0 = 0; this.x1 = 0; this.y1 = 0; this.bx0 = 0; this.by0 = 0; this.bx1 = 0; this.by1 = 0;
-		this.lb2 = null; this.lb3 = null; this.bbuf = null; this.far = false;
+		this.lb2 = null; this.lb3 = null; this.bbuf = null; this.far = false; this.blT = null;
 	}
 
 	// ---- boxes and segments --------------------------------------------------------------------
@@ -337,9 +338,12 @@ EngCalcs.lpnPlacerD = (function () {
 			},
 			idle: function (budgetMs, info) {
 				if (!info || !info.scene) { return; }
+				readOff(API);
+				if (!on('warm')) { return; }
 				var t0 = now();
 				if (info.opening && budgetMs >= 500 && !cache) {
-					cache = { key: inputKey(info.scene, null), out: place(info.scene, null, mem) };
+					// A pause's layout may take most of the pause, not R10's bound.
+					cache = { key: inputKey(info.scene, null), out: place(info.scene, null, mem, budgetMs * 0.8) };
 				}
 				while (warmRuns < WARM_SIZES.length && now() - t0 < budgetMs) {
 					var ws = warmScene(info.scene, WARM_SIZES[warmRuns++]);
@@ -382,20 +386,20 @@ EngCalcs.lpnPlacerD = (function () {
 		return out;
 	}
 
-	function place(scene, opts, mem) {
+	function place(scene, opts, mem, budgetMs) {
 		readOff(API);
 		PADX = PADX0; PADY = PADY0; tightMode = false;
 		var text = scene.text, vp = scene.viewport, rowH = text.rowHeightPx || 14.4;
 		var hookLen = Math.min(text.hookMaxPx || 0, 9);
 		var spacing = text.repeatSpacingPx || 0;
 		var nDyn = 0;       // label-against-label tests made, for the round-6 work cap ('timebound' off)
-		var tStart = now(), late = false;
+		var tStart = now(), late = false, budget = budgetMs || BUDGET_MS;
 		// R10 and S21: bounded by the clock, never by how many labels there are. With 'timebound'
 		// off, the round-6 count cap.
 		function overBudget() {
 			if (!on('timebound')) { return nDyn > MAX_DYN; }
 			if (late) { return true; }
-			if ((nDyn & 63) === 0 && now() - tStart > BUDGET_MS) { late = true; }
+			if ((nDyn & 63) === 0 && now() - tStart > budget) { late = true; }
 			return late;
 		}
 
@@ -521,7 +525,7 @@ EngCalcs.lpnPlacerD = (function () {
 			c.li = li; c.lv = lv; c.layout = layout; c.align = align;
 			c.x = x; c.y = y; c.w = w; c.h = h; c.angle = angle || 0; c.leader = null;
 			c.reps = null; c.boxes = null; c.fx = NaN; c.ok = false;
-			c.bl = null; c.items = null; c.st = 0; c.along = !!angle;
+			c.bl = null; c.blT = null; c.items = null; c.st = 0; c.along = !!angle;
 			c.lazy = false; c.dead = false; c.nx = 0; c.ny = 0; c.far = false;
 			c.base = lv.value - pref + keepBonus(li, lv);
 			if (leader) { setLeader(c, leader); }
@@ -797,7 +801,7 @@ EngCalcs.lpnPlacerD = (function () {
 				genDense(li, req, lv, raw);
 			} else {
 				if (req.kind === 'link' && linksById[req.owner]) { genPipe(li, req, lv, raw, t); } else { genPoint(li, req, lv, raw, t); }
-				if (!t) { genSticky(li, req, lv, raw); }
+				if (!t && on('sticky')) { genSticky(li, req, lv, raw); }
 			}
 			for (var i = 0; i < raw.length; i++) {
 				var c = raw[i];
@@ -823,11 +827,18 @@ EngCalcs.lpnPlacerD = (function () {
 		// TOUCH is clear of every seated label; one holding a CORE cell is blocked. Only a row on
 		// the fringe needs the grid.
 		var LC = 4, LW = Math.ceil(vp.w / LC) + 1, LH = Math.ceil(vp.h / LC) + 1;
-		if (!mem.lt || mem.lt.length !== LW * LH) { mem.lt = new Int16Array(LW * LH); mem.lc = new Int16Array(LW * LH); } else { mem.lt.fill(0); mem.lc.fill(0); }
-		var lt = mem.lt, lc = mem.lc;
+		if (!mem.lt || mem.lt.length !== LW * LH) {
+			mem.lt = new Int16Array(LW * LH); mem.lc = new Int16Array(LW * LH);
+			mem.lt2 = new Int16Array(LW * LH); mem.lc2 = new Int16Array(LW * LH);
+		} else { mem.lt.fill(0); mem.lc.fill(0); mem.lt2.fill(0); mem.lc2.fill(0); }
+		// The same pair again at the tight clearance ('tight'), for the passes that use it.
+		var lt1 = mem.lt, lc1 = mem.lc, lt2 = mem.lt2, lc2 = mem.lc2, lt = lt1, lc = lc1;
 		function stamp(b, sgn) {
-			var py = b.rot ? PADX0 : PADY0;   // a turned row's clearance, measured on its own axes, is wider
-			var fx0 = (b.x0 - PADX0 - vp.x) / LC, fx1 = (b.x1 + PADX0 - vp.x) / LC, fy0 = (b.y0 - py - vp.y) / LC, fy1 = (b.y1 + py - vp.y) / LC, i, j, r;
+			stampP(b, sgn, PADX0, b.rot ? PADX0 : PADY0, lt1, lc1);   // a turned row's clearance, on its own axes, is wider
+			if (on('tight')) { stampP(b, sgn, PADX_T, b.rot ? PADX_T : PADY_T, lt2, lc2); }
+		}
+		function stampP(b, sgn, px, py, lt, lc) {
+			var fx0 = (b.x0 - px - vp.x) / LC, fx1 = (b.x1 + px - vp.x) / LC, fy0 = (b.y0 - py - vp.y) / LC, fy1 = (b.y1 + py - vp.y) / LC, i, j, r;
 			var i0 = Math.max(0, Math.floor(fx0)), i1 = Math.min(LW, Math.ceil(fx1)), j0 = Math.max(0, Math.floor(fy0)), j1 = Math.min(LH, Math.ceil(fy1));
 			for (j = j0; j < j1; j++) { r = j * LW; for (i = i0; i < i1; i++) { lt[r + i] += sgn; } }
 			if (b.rot) { return; }
@@ -835,6 +846,10 @@ EngCalcs.lpnPlacerD = (function () {
 			for (j = j0; j < j1; j++) { r = j * LW; for (i = i0; i < i1; i++) { lc[r + i] += sgn; } }
 		}
 		// 1 blocked, 0 clear, -1 undecided, for an unturned row box on screen.
+		function setTight(t) {
+			tightMode = t; PADX = t ? PADX_T : PADX0; PADY = t ? PADY_T : PADY0;
+			lt = t ? lt2 : lt1; lc = t ? lc2 : lc1;
+		}
 		function rowRaster(x0, y0, x1, y1) {
 			var fx0 = (x0 - vp.x) / LC, fx1 = (x1 - vp.x) / LC, fy0 = (y0 - vp.y) / LC, fy1 = (y1 - vp.y) / LC, i, j, r;
 			var i0 = Math.max(0, Math.ceil(fx0)), i1 = Math.min(LW, Math.floor(fx1)), j0 = Math.max(0, Math.ceil(fy0)), j1 = Math.min(LH, Math.floor(fy1));
@@ -900,7 +915,8 @@ EngCalcs.lpnPlacerD = (function () {
 		function dynCost(c, blockers) {
 			var cost = 0, n, i, it, o, top;
 			nDyn++;
-			if (!blockers && !tightMode && c.bl && cur[c.bl.li] === c.bl) { return NaN; }
+			// A label that blocks it at the tight clearance blocks it at the usual one too.
+			if (!blockers && ((!tightMode && c.bl && cur[c.bl.li] === c.bl) || (c.blT && cur[c.blT.li] === c.blT))) { return NaN; }
 			var hit = false, q, b;
 			if (!c.boxes && !c.angle && !c.reps) {
 				// Unturned rows as plain rectangles: no ink is built for a candidate that is blocked.
@@ -914,8 +930,8 @@ EngCalcs.lpnPlacerD = (function () {
 						var lf0 = line || c.align === 'left' ? c.x : (c.align === 'right' ? c.x + c.w - rw0 : c.x + (c.w - rw0) / 2);
 						var v = rowRaster(lf0, top, lf0 + rw0, top + rh0);
 						top += rh0;
-						if (v === 1 && !tightMode) { return NaN; }
-						if (v !== 0) { undecided = true; }
+						if (v === 1) { return NaN; }
+						if (v === -1) { undecided = true; }
 					}
 					if (!undecided) { q = qd; q.n = 0; } else { q = null; }
 				} else { q = null; }
@@ -933,7 +949,7 @@ EngCalcs.lpnPlacerD = (function () {
 						top += rh;
 						if (b.x1 - left <= -PADX || left + rw - b.x0 <= -PADX || b.y1 - top0 <= -PADY || top - b.y0 <= -PADY) { continue; }
 						if (b.rot && !boxesOverlap(setBox(SCRATCH, left + rw / 2, top0 + rh / 2, rw, rh, 0), b, -PADY)) { continue; }
-						c.bl = it.c; hit = h1 = true;
+						if (tightMode) { c.blT = it.c; } else { c.bl = it.c; } hit = h1 = true;
 						break;
 					}
 					if (h1 && !blockers) { return NaN; }
@@ -948,8 +964,8 @@ EngCalcs.lpnPlacerD = (function () {
 					und = false;
 					for (i = 0; i < c.boxes.length; i++) {
 						var bv = boxRaster(c.boxes[i]);
-						if (bv === 1 && !tightMode) { return NaN; }
-						if (bv !== 0) { und = true; }
+						if (bv === 1) { return NaN; }
+						if (bv === -1) { und = true; }
 					}
 				}
 				if (und) { q = dynB.query(c.bx0 - PADX, c.by0 - PADY, c.bx1 + PADX, c.by1 + PADY, qd); } else { q = qd; q.n = 0; }
@@ -959,7 +975,7 @@ EngCalcs.lpnPlacerD = (function () {
 					b = it.b;
 					for (i = 0; i < c.boxes.length; i++) {
 						if (padOverlap(c.boxes[i], b)) {
-							c.bl = it.c; hit = true;
+							if (tightMode) { c.blT = it.c; } else { c.bl = it.c; } hit = true;
 							if (!blockers) { return NaN; }
 							blockers.push(it.li);
 							break;
@@ -1027,7 +1043,7 @@ EngCalcs.lpnPlacerD = (function () {
 			}
 			return lev;
 		}
-		function wantsAlong(req) { return req.kind === 'link' && alignOn && !!req.along; }
+		function wantsAlong(req) { return req.kind === 'link' && alignOn && !!req.along && on('along'); }
 		// The readable angle of text along direction (ux, uy), in degrees.
 		function readAngle(ux, uy) {
 			var a = Math.atan2(uy, ux) * 180 / Math.PI;
@@ -1102,7 +1118,7 @@ EngCalcs.lpnPlacerD = (function () {
 				o = { x: P.x, y: P.y, r: 0, hw: 0, hh: 0 };
 				if (!(spacing > 0 && Lt > spacing)) {
 					// Beside the pipe further out along it than the first passes look.
-					var layoutsB = lv.rows.length > 1 ? ['line', 'stack'] : ['line'];
+					var layoutsB = lv.rows.length > 1 && on('altlayout') ? ['line', 'stack'] : ['line'];
 					layoutsB.forEach(function (layout, i2) {
 						var d0 = dims(req, lv.rows, layout, text);
 						[-0.45, 0.45, -0.4, 0.4, -0.35, 0.35].forEach(function (f) {
@@ -1123,9 +1139,10 @@ EngCalcs.lpnPlacerD = (function () {
 				o = ownerPoint(req);
 			}
 			var own = req.kind === 'node' ? req.owner : null;
-			var dirs = denseDirs(req, o);
+			var dirs = lab[li].dirs || (lab[li].dirs = denseDirs(req, o));
 			var layouts = lv.rows.length > 1 ? ['stack', 'line'] : ['stack'];
 			if (req.layout === 'line') { layouts.reverse(); }
+			if (!on('altlayout')) { layouts.length = 1; }
 			var extra = isPipe ? 0.3 + (along ? C_NOT_ALONG : 0) : 0;
 			for (var lo = 0; lo < layouts.length; lo++) {
 				var layout = layouts[lo], d = dims(req, lv.rows, layout, text), alt = lo ? C_ALT_LAYOUT : 0;
@@ -1155,7 +1172,8 @@ EngCalcs.lpnPlacerD = (function () {
 							if (!segOk) { break; }
 							var c = newCand(li, lv, layout, al, x, y, d.w, d.h, 0, null, pref + 0.05 * vnt);
 							setLeader(c, lead2(c, sx, sy, px, py));
-							c.ok = true; list.push(c);
+							c.ok = true;
+							list.push(c);
 						}
 					}
 				}
@@ -1192,6 +1210,7 @@ EngCalcs.lpnPlacerD = (function () {
 			var o = ownerPoint(req), L = o.x - o.hw - GAP, R = o.x + o.hw + GAP, T = o.y - o.hh - GAP, B = o.y + o.hh + GAP;
 			var layouts = lv.rows.length > 1 ? ['stack', 'line'] : ['stack'];
 			if (req.layout === 'line') { layouts.reverse(); }
+			if (!on('altlayout')) { layouts.length = 1; }
 			layouts.forEach(function (layout, li2) {
 				var d = dims(req, lv.rows, layout, text), alt = li2 ? C_ALT_LAYOUT : 0, n = d.mids.length, k;
 				if (tier) { genLeadered(li, o, lv, layout, d, alt, list, DIRSET, tier - 1); return; }
@@ -1248,6 +1267,7 @@ EngCalcs.lpnPlacerD = (function () {
 			}
 			var layouts = lv.rows.length > 1 ? ['line', 'stack'] : ['line'];
 			if (req.layout === 'stack' && !along) { layouts.reverse(); }
+			if (!on('altlayout')) { layouts.length = 1; }
 			layouts.forEach(function (layout, li2) {
 				var d = dims(req, lv.rows, layout, text), alt = li2 ? C_ALT_LAYOUT : 0;
 				if (tier) {
@@ -1415,9 +1435,11 @@ EngCalcs.lpnPlacerD = (function () {
 		});
 		// R11: on a zoom-in, the labels shown last view are seated first, so none is lost to room.
 		function wasShown(li) { var pl = prevPl[reqs[li].id]; return zoomIn && pl && pl.shown ? 0 : 1; }
-		order.sort(function (a, b) { return (wasShown(a) - wasShown(b)) || (crowd[b] - crowd[a]) || (a - b); });
+		var useCrowd = on('crowd');
+		order.sort(function (a, b) { return (wasShown(a) - wasShown(b)) || (useCrowd ? crowd[b] - crowd[a] : 0) || (a - b); });
 		// Every label first, as small as it comes (G: properties go before labels) ...
-		order.forEach(function (li) { var n = lab[li].levels.length - 1; seat(li, bestFor(li, n, n).c); });
+		// (With 'smallfirst' off, each label takes as many rows as fit, in turn.)
+		order.forEach(function (li) { var n = lab[li].levels.length - 1; seat(li, bestFor(li, on('smallfirst') ? n : 0, n).c); });
 		// ... then each grows into the room around it, a row at a time: a label with no room for
 		// one more row has none for two.
 		function grow(li) {
@@ -1448,11 +1470,12 @@ EngCalcs.lpnPlacerD = (function () {
 		function upgrade(li) {
 			var cl = levelOf(li), here = worthNow(li);
 			// One more row than it shows (or, for a pipe label drawn level, the same rows along it).
-			for (var kt = Math.max(0, NT * (cl - 1)); kt < NT * cl + (notAlong(li) ? 1 : 0); kt++) {
-				var k = Math.floor(kt / NT), t = kt % NT;
+			var NTT = NT + (denseOn ? 1 : 0);
+			for (var kt = Math.max(0, NTT * (cl - 1)); kt < NTT * cl + (notAlong(li) ? 1 : 0); kt++) {
+				var k = Math.floor(kt / NTT), t = kt % NTT;
 				if (tierMax(li, k, t) <= here) { continue; }
-				var list = ensure(li, k, t), tried = 0;
-				for (var m = 0; m < list.length && tried < TRIES; m++) {
+				var list = ensure(li, k, t), tried = 0, tries = denseOn ? TRIES_DENSE : TRIES;
+				for (var m = 0; m < list.length && tried < tries; m++) {
 					var c = list[m];
 					if (c.base <= here) { break; }
 					if (c.fx === c.fx && c.base - c.fx <= here) { continue; }
@@ -1495,10 +1518,10 @@ EngCalcs.lpnPlacerD = (function () {
 			todo.sort(function (a, b) { return (cur[a] ? 1 : 0) - (cur[b] ? 1 : 0) || levelOf(b) - levelOf(a) || a - b; });
 			var changed = false;
 			for (i = 0; i < todo.length; i++) {
-				while (tryUpgrade(todo[i])) { changed = true; if (!levelOf(todo[i]) || overBudget()) { break; } }
+				while (on('evict') && tryUpgrade(todo[i])) { changed = true; if (!levelOf(todo[i]) || overBudget()) { break; } }
 			}
 			// ---- 4. polish: every label re-seats itself if that is worth more ----
-			for (i = 0; i < order.length; i++) {
+			for (i = 0; i < order.length && on('polish'); i++) {
 				var lj = order[i], here = worthNow(lj), cl = levelOf(lj), b = bestFor(lj, cl - 1, cl, here + 1e-6);
 				if (b.c && b.c !== cur[lj] && b.w > here + 1e-6) { seat(lj, b.c); changed = true; }
 			}
@@ -1510,20 +1533,25 @@ EngCalcs.lpnPlacerD = (function () {
 		// stand closer to its neighbours) ----
 		if (on('rescue') && !overBudget()) {
 			denseOn = true;
-			if (on('tight')) { PADX = PADX_T; PADY = PADY_T; tightMode = true; }
+			if (on('tight')) { setTight(true); }
 			for (i = 0; i < order.length && !overBudget(); i++) {
 				var lh = order[i];
 				if (cur[lh]) { continue; }
 				var nl = lab[lh].levels.length - 1, bh = bestFor(lh, nl, nl);
 				if (bh.c) { seat(lh, bh.c); }
 			}
-			PADX = PADX0; PADY = PADY0; tightMode = false;
+			// Eviction again (S16), now with the dense places for the hidden label and for the
+			// neighbours it moves ('rescue-evict').
+			if (on('evict') && on('rescueevict')) {
+				for (i = 0; i < order.length && !overBudget(); i++) { if (!cur[order[i]]) { tryUpgrade(order[i]); } }
+			}
+			setTight(false);
 			for (i = 0; i < order.length && !overBudget(); i++) { if (levelOf(order[i]) > 0) { grow(order[i]); } }
 			// And with the tighter clearance, a row more where only that fits.
 			if (on('tight')) {
-				PADX = PADX_T; PADY = PADY_T; tightMode = true;
+				setTight(true);
 				for (i = 0; i < order.length && !overBudget(); i++) { if (levelOf(order[i]) > 0) { grow(order[i]); } }
-				PADX = PADX0; PADY = PADY0; tightMode = false;
+				setTight(false);
 			}
 			denseOn = false;
 		}
