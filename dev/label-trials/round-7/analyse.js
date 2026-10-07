@@ -59,7 +59,7 @@ function aggregate(views) {
 	const pr = views.filter(function (v) { return v.probe; }).map(function (v) { return v.probe; });
 	const c = {
 		placer: views[0].placer, set: views[0].set, exp: views[0].exp, variant: views[0].variant, n: views.length,
-		labelsReq: s('labelsReq'), labelsShown: s('labelsShown'), valuesReq: s('valuesReq'), valuesShown: s('valuesShown'),
+		labelsReq: s('labelsReq'), labelsShown: s('labelsShown'), topReq: s('topReq'), topShown: s('topShown'), valuesReq: s('valuesReq'), valuesShown: s('valuesShown'),
 		breaks: s('N1') + s('N3') + s('N4') + s('N5') + s('invalid'), labelOnLeader: s('labelOnLeader'), leaderOnLeader: s('leaderOnLeader'),
 		costTom: s('costTom'), hidden: s('hidden'), pubRoom: s('pubRoom'), heldRoom: s('heldRoom'), realBrought: s('realBrought'), realRequested: s('realRequested'),
 		r14asked: s('r14asked'), r14along: s('r14along'), churn: s('churn'), compared: s('compared'),
@@ -68,6 +68,7 @@ function aggregate(views) {
 		controlFlips: pr.reduce(function (t, p) { return t + p.controlFlips; }, 0)
 	};
 	c.labelsPct = c.labelsReq ? 100 * c.labelsShown / c.labelsReq : null;
+	c.topPct = c.topReq ? 100 * c.topShown / c.topReq : null;
 	c.valuesPct = c.valuesReq ? 100 * c.valuesShown / c.valuesReq : null;
 	c.realPer100 = c.realRequested ? 100 * c.realBrought / c.realRequested : null;
 	c.lolPer100 = c.labelsShown ? 100 * c.labelOnLeader / c.labelsShown : null;
@@ -91,7 +92,7 @@ function pooled(cells) {
 	const s = function (k) { return cells.reduce(function (t, c) { return t + (c[k] || 0); }, 0); };
 	const ms = [].concat.apply([], cells.map(function (c) { return c.ms; }));
 	return {
-		sets: cells.length, labels: 100 * s('labelsShown') / s('labelsReq'), values: 100 * s('valuesShown') / s('valuesReq'),
+		sets: cells.length, labels: 100 * s('labelsShown') / s('labelsReq'), top: 100 * s('topShown') / s('topReq'), values: 100 * s('valuesShown') / s('valuesReq'),
 		pub: s('hidden') ? 100 * s('pubRoom') / s('hidden') : null, held: s('hidden') ? 100 * s('heldRoom') / s('hidden') : null,
 		real: s('realRequested') ? 100 * s('realBrought') / s('realRequested') : null,
 		lol: 100 * s('labelOnLeader') / s('labelsShown'), ldl: 100 * s('leaderOnLeader') / s('labelsShown'), tom: s('costTom') / s('labelsShown'),
@@ -120,12 +121,12 @@ function main() {
 			const cs = cells.filter(function (c) { return c.placer === p && c.exp === exp; });
 			if (!cs.length) { return; }
 			const P = pooled(cs);
-			rows.push([p, P.sets, f(P.labels), f(P.values), f(P.pub), f(P.held), f(P.real, 2), f(P.lol, 2), f(P.ldl, 2), f(P.tom, 3), f(P.along, 0), P.breaks,
+			rows.push([p, P.sets, f(P.labels), f(P.top), f(P.values), f(P.pub), f(P.held), f(P.real, 2), f(P.lol, 2), f(P.ldl, 2), f(P.tom, 3), f(P.along, 0), P.breaks,
 				f(P.msMed, 0) + ' / ' + f(P.msMax, 0), P.over1s + '/' + P.views]);
 		});
 		if (!rows.length) { return; }
 		out.push('\n## ' + exp + ', pooled\n');
-		out.push(table(['entrant', 'sets', 'labels %', 'values %', 'hidden with room, public %', 'hidden with room, held-back %', 'realizable per 100 requested',
+		out.push(table(['entrant', 'sets', 'labels %', 'most-wanted value %', 'values %', 'hidden with room, public %', 'hidden with room, held-back %', 'realizable per 100 requested',
 			'label on leader /100', 'leader on leader /100', 'Tom cost /label', 'along %', 'breaks', 'ms median / max', 'views > 1 s'], rows));
 	});
 
@@ -151,6 +152,10 @@ function main() {
 	out.push('\n**H2 (beyond the plain recipe).** Labels shown % minus R\'s, paired on E1; R shows ' + f(R.labels) + '% at ' + f(R.lol, 2) + ' label on leader per 100:\n\n');
 	out.push(table(['builder', 'sets', 'mean points over R', 'sign p', 'label on leader /100', 'beats R'], h2.map(function (r) { return [r.p, r.n, f(r.mean, 2), fp(r.pv), f(r.lol, 2), r.ok ? 'yes' : 'no']; })));
 	out.push('\nH2 ' + (h2.some(function (r) { return r.ok; }) ? 'SUPPORTED' : 'NOT supported') + '.\n');
+	// Read beside H2 (not pre-registered): R's inner placer is round 6's C, which keeps the ID against the
+	// drop order, so "labels shown" flatters it. Labels showing their most-wanted value do not.
+	const h2b = M.BUILDERS7.map(function (p) { const d = paired(cells, p, 'R', 'topPct', 'E1'), st = signTest(d); return [p, d.length, f(mean(d), 2), fp(st.p)]; });
+	out.push('\nBeside H2, not pre-registered: most-wanted value % minus R\'s, paired on E1 (R shows ' + f(R.top) + '%):\n\n' + table(['builder', 'sets', 'mean points over R', 'sign p'], h2b));
 	out.push('\n**H3 (the strategies are real)** is checked card by card (each builder\'s STRATEGY.md ablations, re-run on the secret E1 sets) and written up by hand in the round record.\n');
 	// H4: no builder over one second on any E1 or E2 view.
 	const h4 = M.BUILDERS7.map(function (p) { const P = pooled(cells.filter(function (c) { return c.placer === p && (c.exp === 'E1' || c.exp === 'E2'); })); return [p, P.over1s + '/' + P.views, f(P.msMax, 0)]; });

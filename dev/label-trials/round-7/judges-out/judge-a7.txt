@@ -1,0 +1,59 @@
+JUDGES ONLY -- placer dev/label-trials/round-7/frozen/placer-a-r7.js, on AMD Ryzen 9 5900X 12-Core Processor, 24 threads, 61 GB, linux 7.0.0-38-generic, node v24.21.0
+--- R-075: 12345678 prefixed to every node ID (reported, not asserted) ---
+  novato-seq@1x        shown  120   lost with room: hid   0, cut   0   (all: hid   0, cut   5; moved   2)
+  novato-seq@1.25x     shown  149   lost with room: hid   0, cut   1   (all: hid   0, cut   8; moved  11)   n:601
+  novato-seq@1.5x      shown  165   lost with room: hid   1, cut   2   (all: hid   1, cut  17; moved  25)   l:297 n:159 n:239
+  novato-seq@1.75x     shown  173   lost with room: hid   0, cut   0   (all: hid   1, cut  15; moved  32)
+  novato-seq@2x        shown  178   lost with room: hid   0, cut   3   (all: hid   3, cut  18; moved  51)   n:209 l:257 l:263
+  novato-seq@2.5x      shown  168   lost with room: hid   0, cut   0   (all: hid   0, cut   8; moved  53)
+  novato-seq@3x        shown  147   lost with room: hid   0, cut   3   (all: hid   2, cut  17; moved  61)   n:239 l:273 l:311
+  novato-seq@4x        shown  116   lost with room: hid   0, cut   3   (all: hid   1, cut  12; moved  59)   n:161 l:271 l:311
+  novato-zoom@fit      shown  122   lost with room: hid   0, cut   0   (all: hid   0, cut   4; moved   0)
+  novato-zoom@2x       shown  193   lost with room: hid   0, cut   1   (all: hid   0, cut  12; moved   6)   n:239
+  novato-zoom@4x       shown  131   lost with room: hid   0, cut   2   (all: hid   0, cut   8; moved  19)   l:149 l:303
+  novato-zoom@8x       shown   51   lost with room: hid   0, cut   1   (all: hid   0, cut   1; moved   4)   n:269
+  TOTAL: of 1713 labels shown, the long IDs hid 1 and cut values from 16 WHERE FREE GROUND WITHIN 3 ROWS COULD HAVE HELD THEM (1.0%).
+         Reported only: they hid 8 and cut 125 in all, and moved 323 of those still shown (a move is not a failure: Tom, 2026-09-28).
+--- Tom's two screenshots of 2026-09-27, at novato-seq 2x and 2.5x ---
+  ok   novato-seq@2x [overwrite-185-183] 185's label is not written over 183's   185 shown, 183 hidden
+  ok   novato-seq@2x [gang-runs-south] none of the eight has a leader longer than 6 rows (S1, S3)
+  ok   novato-seq@2x [gang-runs-south] no leader of the eight runs off the screen
+  ok   novato-seq@2x [gang-runs-south] at most 2 of the eight hung more than 3 rows south of their nodes   1: 179
+  ok   novato-seq@2x [gang-runs-south] a stacked label west of its node hangs on its east edge (S2)
+        (7 of the eight shown at novato-seq@2x)
+  ok   novato-seq@2.5x [overwrite-185-183] 185's label is not written over 183's   185 shown, 183 hidden
+  ok   novato-seq@2.5x [gang-runs-south] none of the eight has a leader longer than 6 rows (S1, S3)
+  ok   novato-seq@2.5x [gang-runs-south] no leader of the eight runs off the screen
+  ok   novato-seq@2.5x [gang-runs-south] at most 2 of the eight hung more than 3 rows south of their nodes   1: 179
+  ok   novato-seq@2.5x [gang-runs-south] a stacked label west of its node hangs on its east edge (S2)
+        (6 of the eight shown at novato-seq@2.5x)
+--- R14: pipe labels along their pipe where there is room, every public scene ---
+  bent-valves@1x       along  279/459   not along with room   16
+  bent-valves@1.5x     along   71/219   not along with room    7
+  bent-valves@2x       along   54/120   not along with room    6
+  bent-valves@3x       along   38/47    not along with room    2
+  bent-valves@4x       along   24/25    not along with room    1
+  net1@open            along   12/12    not along with room    0
+  net2@open            along   19/39    not along with room    0
+  net3@open            along   29/82    not along with room    1
+  novato-seq@1x        along   15/51    not along with room    2
+  novato-seq@1.25x     along   21/73    not along with room    0
+  novato-seq@1.5x      along   24/83    not along with room    1
+  novato-seq@1.75x     along   34/91    not along with room    5
+  novato-seq@2x        along   36/98    not along with room    1
+  novato-seq@2.5x      along   35/90    not along with room    2
+  novato-seq@3x        along   37/77    not along with room    2
+  novato-seq@4x        along   27/65    not along with room    0
+  novato-zoom@fit      along   15/52    not along with room    3
+  novato-zoom@2x       along   34/102   not along with room    4
+  novato-zoom@4x       along   41/73    not along with room    1
+  novato-zoom@8x       along   15/30    not along with room    1
+  ok   R14: at most 5% of the pipe labels asked to lie along their pipe are drawn otherwise where there was room   55/1888 (2.9%); along 860/1888
+  ok   R14 at close zoom (4x and closer): of the pipe labels still level, at most 5% had room to lie along their pipe with the same rows   3/86 (3.5%)
+  ok   R13: with "Draw link labels along the link line" switched off at the same view, no pipe label stays turned   0/708
+--- Tom's crossing weights (weights.js), every public scene: weighted cost 117.5 (the bench's ranked cost 653) ---
+--- R1: hide a label only for lack of room, never by how many are showing (Novato sets) ---
+  hidden although free ground within 3 rows could hold the last-kept value: 63/408 (15.4%) (reported)
+  ok   R1: a label far from the cut, hidden with every label asked for, stays hidden when the far half asks for none (at most 5% come back)   0/1 came back; control run flipped 0/2127; far shown 159, of which 0 hid
+
+14/14 named assertions passed.
