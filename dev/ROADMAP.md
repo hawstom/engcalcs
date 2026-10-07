@@ -70,7 +70,7 @@ the block.
   **PORTING THE BENCH TO MASTER, 2026-10-07** (Tom agreed D09: rules 1-3 as three defect branches;
   stability is a criterion of low weight). Rule 1, clean ground first, MERGED (`fix/label-clean-ground`):
   node labels over pipes -26%, leaders through node symbols -42%, labels shown flat, pass ~8% slower.
-  Next: rule 2 (rescue search for dropped node labels), then rule 3 (eviction).
+  Rule 2, rescue search, MERGED: labels shown 38.3 -> 39.3 per 100 asked, ~7% slower. Next: rule 3.
   **REBUILD FROM RULES, 2026-09-28:** rules reviewed (`dev/label-placement-rules.md`), bench and
   seam built, two clean-room placers done and both fail R-075; state in the handoff.
   **DROPPED TO 75 BY TOM, 2026-09-17** (*"Task 539: Demote to 75"*). Built on
