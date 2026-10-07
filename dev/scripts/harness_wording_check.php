@@ -115,11 +115,6 @@ const EC_HARNESS_WORDING_EXCEPT = [
             '(b) the project NAME the harness types in, to watch it become a filename and come '
             . 'back. It is input, not a string the page renders.',
     ],
-    'dev/lpn-spike/grievance-link-harness.js' => [
-        'nobody can write back' =>
-            '(a) read off the shipped lpn_wrong_tip. The tip promising no reply is the whole point '
-            . 'of the feedback link\'s honesty, so this is meant to go red if it stops saying it.',
-    ],
     'dev/lpn-spike/label-limit-parity-harness.js' => [
         'This has no effect if it is larger than the similar setting for all labels' =>
             '(a) asserted against PC.lpn_labels_customer_width_tip: the assertion IS that Tom\'s own '

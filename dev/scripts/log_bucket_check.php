@@ -49,6 +49,9 @@ function ecLogBucketExclusions(): array
         // A lock file, not a log: one JSON object, rewritten in place under an exclusive handle,
         // holding who currently has a project open. It has no rows, no columns and no report.
         'lpn-lock.php::fwrite' => 'writes the lock JSON, not a log row',
+        // Send times only, one per line, pruned to a day: the global rate limit behind
+        // send-feedback.php. Never reported, never counted, so it has no bucket to mark.
+        'lib/FeedbackMail.lib.php::fwrite' => 'writes the feedback rate-limit times, not a log row',
     ];
 }
 
