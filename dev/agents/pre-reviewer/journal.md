@@ -3879,3 +3879,8 @@ OBSERVED real Chromium: branch's own harness passes. All 7 shipped examples: 0 w
 OBSERVED DEFECT: touch (hover none): tapping the glyph in the Properties box opens the tip AND focuses the Diameter input (label activation), the exact 2026-08-29 complaint; initTips only cancels this on `.ec-tip`, the glyph here is a bare `.ec-help`. Tables-pane tap also focuses a cell input.
 OBSERVED: Basic-example-SI-units opens with roughness unit ft (pre-existing); under D-W its tip reads ft in an SI project.
 SPECULATION: how the glyph looks (zero-width inset over the input end) not judged.
+
+## 2026-10-07 feat/screenshot 1e28e16e (snip + markup view)
+- OBSERVED (real Chromium, Net1/Net3 at 1400x900 and 390 touch): rectangle snip incl. right-to-left/bottom-to-top = exact rect x scale; 2px drag (also 2x200px) = whole map; pen 3 css px x scale lands correctly at 2x and 4x (view scaled to fit, strokes map correctly, saved at full res); Copy keeps view open; Save one download "Net1-screenshot.png"; freehand 720x480 for 360x240 ellipse; Esc both paths; backdrop click does not close. Phone: menu row works, no box/Freehand on phone, touch scribble works.
+- OBSERVED: harness artefact only: CDP tap within ms of a touch scribble produced no click; with a 2 s gap it did. Not an app defect.
+- CITED: immediate-copy change is the builder's reading of Tom's Snip ask; no recorded Tom ruling found in repo docs.
