@@ -6,7 +6,7 @@
 // shortcut digit), then several real clicks on the map: junction, reservoir, tank, pipe, pump,
 // valve and customer each place one thing per click and stay armed; Text places one and the tool
 // puts itself away. Also: Edit has no Libraries row (Water still does), and the Reports rows read
-// Run (EPANET), Status (EPANET), Calibration, Full.
+// Run, Status changes, Calibration, Full.
 'use strict';
 
 const path = require('path');
@@ -144,7 +144,7 @@ async function main() {
 		}, await a.lang('lpn_reports_menu'));
 		await P.waitForSelector('#lpn_menu_popup2', { state: 'visible' });
 		const reps = await rowTexts(a, '#lpn_menu_list2');
-		const want = ['Pump energy', 'Scenario comparison', 'Run (EPANET)', 'Status (EPANET)', 'Calibration', 'Full'];
+		const want = ['Pump energy', 'Scenario comparison', 'Run', 'Status changes', 'Calibration', 'Full'];
 		ok('Reports rows read as specified', JSON.stringify(reps) === JSON.stringify(want), reps.join(' | '));
 		ok('no uncaught page errors', a.errors.length === 0, a.errors.slice(0, 2).join(' | '));
 		await a.close();

@@ -5079,7 +5079,7 @@ var EngCalcs = EngCalcs || {};
 				fn: function () { closeMenu(); openScenarioCompareBox(); }
 			},
 			{
-				icon: 'info', label: pc.lpn_reports_epanet || 'Run (EPANET)',
+				icon: 'info', label: pc.lpn_reports_epanet || 'Run',
 				tip: pc.lpn_time_run_report_tip,
 				// **SHOWN, OR EXPLAINED -- never an empty box.** The row is always here rather than
 				// hidden when there is nothing to show: a row that disappears teaches nobody that
@@ -5101,7 +5101,7 @@ var EngCalcs = EngCalcs || {};
 			// carries the word so no row has to, the same rule "EPANET run" (not "EPANET run
 			// report") already follows two rows up. The BOX TITLES keep the full names.
 			{
-				icon: 'info', label: pc.lpn_reports_status || 'Status (EPANET)',
+				icon: 'info', label: pc.lpn_reports_status || 'Status changes',
 				tip: pc.lpn_reports_status_tip,
 				fn: function () { closeMenu(); openStatusReportBox(); }
 			},
@@ -65793,7 +65793,7 @@ var EngCalcs = EngCalcs || {};
 		if (!host) { return; }
 		host.innerHTML = '';
 		if (!frames.length) {
-			ffEl('p', 'lpn-ff-note', pc.lpn_status_needs_run || 'The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status report.', host);
+			ffEl('p', 'lpn-ff-note', pc.lpn_status_needs_run || 'The status report lists what changed during an extended period simulation. Set a Total run time in Settings, Calculation, Time, press Calculate, then open Water, Reports, Status changes.', host);
 			return;
 		}
 		events = statusReportEvents();
