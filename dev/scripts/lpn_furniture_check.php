@@ -133,6 +133,8 @@ const EC_LPN_FURNITURE = [
     'lpn_contourbox'  => 'position, size and openness of the Contour plot box (Task 600)',
     // The Screenshot box (Tom, 2026-10-05). Its magnification rides here too: how sharp a picture
     // somebody pastes into their own report is not a fact about the network.
+    // The Alternatives box (Tom, 2026-10-07, card E02: "Add the key, no first-dock limit").
+    'lpn_altbox'      => 'position, size and dock of the Alternatives box',
     'lpn_snipbox'     => 'position and size of the Screenshot box, and its magnification',
     // NOT a box POSITION like its neighbours, and it is furniture for the same reason they are:
     // whether somebody wants a progress dialog in front of them while a run goes is a fact about

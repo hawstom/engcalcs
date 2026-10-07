@@ -26502,10 +26502,33 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		if (row && row._lpnScn) { return row._lpnScn; }
 		return row ? { el: row, scn: activeScenario() } : null;
 	}
+	// **A FIELD ONLY THE SCENARIO'S TYPE HAS IS THE SCENARIO'S, STORED OR NOT** (Tom, 2026-10-07:
+	// *"I changed a Junction to a Tank, and in the Tanks table, only the Water depth appears as an
+	// override."*). Where this scenario states its own type for the asset, every column the new type
+	// has and Base's type lacks -- a tank's depths, diameter, mixing, reaction -- has no Base value
+	// behind it, so it wears the mark. What both types share (ID, coordinates, elevation, tag)
+	// still comes from Base and is marked only where the scenario holds its own value.
+	function paneTypeOwnedCellIsLocal(c, el, scn) {
+		var group = elGroup(el), name = paneColProp(c) || c.key, ov, e, baseDesc, scnDesc, hit = false;
+		if (!name || c.result || !typeOvAny) { return false; }
+		ov = localOverrideMap(scn, categoryOf('type', group))[ovKey(el)];
+		if (!plainObject(ov) || typeof ov.type !== 'string' || !typeIsValidFor(el, ov.type)) { return false; }
+		e = typeView.byEl.get(el);
+		baseDesc = group === 'link' ? linkTypeDesc(e ? e.stash : el) : { type: baseTypeOf(el) };
+		if (ov.type === baseDesc.type) { return false; }
+		scnDesc = typeDescFor(el, ov.type, ov.valveType !== undefined ? ov.valveType : (baseDesc.type === 'valve' ? baseDesc.valveType : undefined));
+		typeSpecsOf(el).forEach(function (spec) {
+			if (hit || spec.custom) { return; }
+			if (spec.props.indexOf(name) < 0 && spec.keys.indexOf(name) < 0 && spec.keys.indexOf('_' + name) < 0) { return; }
+			if (typeSpecHas(spec, scnDesc) && !typeSpecHas(spec, baseDesc)) { hit = true; }
+		});
+		return hit;
+	}
 	function paneScnCellIsLocal(c, row) {
 		var x = paneScnRowOf(row), ov, p, has = Object.prototype.hasOwnProperty;
 		if (!x || x.scn.isBase) { return false; }
 		if (c.scnLocal) { return !!c.scnLocal(x.el, x.scn); }
+		if (paneTypeOwnedCellIsLocal(c, x.el, x.scn)) { return true; }
 		p = paneColProp(c);
 		// Local where this scenario WRITES (hasOverride()'s rule), so a stored alternative it names
 		// marks the cell and a value it only inherits does not.
@@ -26519,7 +26542,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// the alternatives layer (dev/scenario-alternatives.md) rather than restating it here.
 	function paneScnCellTip(c, row) {
 		var x = paneScnRowOf(row), pc = EngCalcs.pageConfig || {},
-			cat = c.scnCat ? c.scnCat(x.el) : categoryOf(paneColProp(c), elGroup(x.el)),
+			cat = c.scnCat ? c.scnCat(x.el) : categoryOf(paneColProp(c) || c.key, elGroup(x.el)),
 			alt = alternativeFor(x.scn, cat), owner = alt && !alt.isBase ? (scenarioById(alt.scenario) || x.scn) : baseScenario();
 		return String(pc.lpn_pane_scn_alt_tip || '{category} alt.: {alternative}')
 			.split('{category}').join(altCategoryLabel(cat)).split('{alternative}').join(scenarioDisplayName(owner));
@@ -36147,6 +36170,8 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			'lpn_notesbox', 'lpn_hotkeysbox',
 			// 'lpn_snipbox' (the Screenshot box and its magnification) joined the day it was written.
 			'lpn_snipbox',
+			// 'lpn_altbox' (the Alternatives box, Tom 2026-10-07) joined the day it was written.
+			'lpn_altbox',
 			// AREA_HINT_KEY joined 2026-09-09, having been missed on the day it was written.
 			// dev/cookie-storage-inventory.md already filed it beside PAGE_TITLES_KEY as a reading
 			// preference set deliberately on this screen, so the document and the code disagreed
@@ -54991,7 +55016,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	// control and freedom?"*). There was not. A column used to stop at 45% of the window, which on a
 	// 1920 screen held a docked table to 864 px while the map beside it had a thousand to spare. The
 	// map keeps LPN_DOCK_MAP_MIN, and that was always the reason the cap existed.
-	var LPN_DOCK_MIN_W = 240, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, LPN_DOCK_FIRST_FRAC = 0.45,
+	var LPN_DOCK_MIN_W = 240, LPN_DOCK_MAP_MIN = 320, LPN_DOCK_DEFAULT_W = 360, dockGripLastSide = null,
 		LPN_DOCK_STRIP_W = 24, LPN_DOCK_TUCK_MS = 400, LPN_DOCK_HOVER_MS = 150, LPN_CORNER_BTN_W = 28,
 		LPN_UNDOCK_SLOP = 6;
 	var dockBoxes = [], dockFlyout = null, dockTimer = null, dockBooting = false, dockQueued = false,
@@ -55105,14 +55130,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 	function dockAct(d, act) {
 		var r, wasSide = dockSideOf(d);
 		if (act === 'left' || act === 'right') {
-			// The width it floats at is the width it docks at, the first time, up to 45% of the
-			// window, so a box that floats wide (Alternatives, 1500 px) does not dock over most of
-			// the map. That is the first width only: the grip takes it anywhere the map allows.
+			// The width it floats at is the width it docks at, the first time, with no share of the
+			// window capping it (Tom, 2026-10-07, card E02: "no first-dock limit"); only the map's
+			// LPN_DOCK_MAP_MIN does, in layoutDocks().
 			if (!wasSide && !d.rec.dockW) {
 				r = d.box.getBoundingClientRect();
-				if (r.width > 0) { d.rec.dockW = Math.round(Math.min(r.width, Math.max(LPN_DOCK_MIN_W, (window.innerWidth || 1000) * LPN_DOCK_FIRST_FRAC))); }
+				if (r.width > 0) { d.rec.dockW = Math.round(r.width); }
 			}
 			d.rec.dock = act;
+			// The column just docked into is the last one the reader acted on (layoutDocks()).
+			dockGripLastSide = act;
 		} else if (act === 'float') {
 			delete d.rec.dock;
 			delete d.rec.autohide;
@@ -55230,6 +55257,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			var list = el.lpnDockList || [];
 			if (!list.length) { return; }
 			from = { x: e.clientX, w: list[0].box.getBoundingClientRect().width, list: list };
+			dockGripLastSide = side;
 			el.lpnDragging = true;
 			try { if (el.setPointerCapture) { el.setPointerCapture(e.pointerId); } } catch (err) { /* resize without capture */ }
 			e.preventDefault();
@@ -55318,12 +55346,22 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			sides[s].pinned.forEach(function (d) { w = Math.max(w, d.rec.dockW || 0); });
 			col[s] = { strip: sides[s].auto.length ? LPN_DOCK_STRIP_W : 0, w: sides[s].pinned.length ? (w || LPN_DOCK_DEFAULT_W) : 0 };
 		});
-		// The map keeps LPN_DOCK_MAP_MIN of width; the columns give way to it, evenly.
+		// The map keeps LPN_DOCK_MAP_MIN of width. **TWO COLUMNS SHARE WHAT IS LEFT, NOT HALF EACH**
+		// (Tom, 2026-10-07: the Alternatives box "gets wider, but it's still limited to about 80% of
+		// the screen width"). Halving the room capped a column at half the window whenever the other
+		// side held a box. Each column keeps its width while both fit; when they do not, the column
+		// last dragged or docked into keeps what the reader asked for and the other gives way, to
+		// its floor.
 		room = (outerR - outerL) - LPN_DOCK_MAP_MIN - col.left.strip - col.right.strip;
 		n = (col.left.w ? 1 : 0) + (col.right.w ? 1 : 0);
+		if (n === 2 && col.left.w + col.right.w > room) {
+			var pri = dockGripLastSide === 'left' ? 'left' : 'right', oth = pri === 'left' ? 'right' : 'left';
+			col[pri].w = clampDockW(col[pri].w, Math.floor(room - LPN_DOCK_MIN_W));
+			col[oth].w = clampDockW(col[oth].w, Math.floor(room - col[pri].w));
+		}
 		['left', 'right'].forEach(function (s) {
 			var S = sides[s], c = col[s], x, each, w;
-			if (c.w) { c.w = clampDockW(c.w, Math.floor(room / n)); }
+			if (c.w) { c.w = clampDockW(c.w, Math.floor(room - (s === 'left' ? col.right.w : col.left.w))); }
 			want[s] = c.strip + c.w;
 			x = s === 'left' ? outerL + c.strip : outerR - c.strip - c.w;
 			each = S.pinned.length ? h / S.pinned.length : 0;
@@ -55569,7 +55607,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			['lpn_scncmp_box', cmpboxLayout, saveCmpboxLayout, LPN_CMPBOX_KEY],
 			['lpn_rptbox', rptboxLayout, saveRptboxLayout, LPN_RPTBOX_KEY],
 			['lpn_status_box', statusboxLayout, saveStatusboxLayout, LPN_STATUSBOX_KEY],
-			['lpn_alt_box', altboxLayout, null, null],
+			['lpn_alt_box', altboxLayout, saveAltboxLayout, LPN_ALTBOX_KEY],
 			['lpn_full_box', fullboxLayout, saveFullboxLayout, LPN_FULLBOX_KEY],
 			['lpn_calib_box', calibboxLayout, null, null],
 			['lpn_notes_popup', notesboxLayout, saveNotesboxLayout, LPN_NOTESBOX_KEY],
@@ -69271,9 +69309,16 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		});
 		ffEl('p', 'lpn-ff-note', pc.lpn_alt_note, host);
 	}
-	// Position and size for the life of the page only: remembering them would be a new key in the
-	// browser for a view Tom has not yet decided to keep.
-	var altboxLayout = newBoxLayout();
+	// **POSITION, SIZE AND DOCK SURVIVE A RELOAD, ON ONE KEY** (Tom, 2026-10-07, card E02: *"Add the
+	// key, no first-dock limit"*): the record every standing box keeps (wireBoxMemory(),
+	// readDockRecord()). Window furniture: never in the project file.
+	// `userSized`: only a drag of its corner makes a size the reader's, so merely opening the box
+	// writes nothing (applyBoxSize()).
+	var LPN_ALTBOX_KEY = 'lpn_altbox';
+	var altboxLayout = Object.assign(newBoxLayout(), { userSized: false });
+	function saveAltboxLayout() {
+		try { localStorage.setItem(LPN_ALTBOX_KEY, JSON.stringify(altboxLayout)); } catch (e) {}
+	}
 	function openAlternativesBox() {
 		var box = altBoxEl();
 		if (!box) { return; }
@@ -69289,8 +69334,7 @@ setboxTag(		row(pc.lpn_settings_color_key_position || 'Color legend position',
 		var box = altBoxEl(), x = document.getElementById('lpn_alt_close');
 		if (!box) { return; }
 		if (x) { x.addEventListener('click', closeAlternativesBox); }
-		makePanelDraggable(box);
-		addPanelResizeGrip(box);
+		wireBoxMemory(box, LPN_ALTBOX_KEY, altboxLayout, saveAltboxLayout, altBoxIsOpen);
 	}
 	function refreshAlternativesBoxIfOpen() {
 		if (altBoxIsOpen()) { rebuildAlternativesTable(); }

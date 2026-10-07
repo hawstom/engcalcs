@@ -171,7 +171,8 @@ async function main() {
 				gx: gr && gr.left + gr.width / 2, gy: gr && gr.top + gr.height / 2 };
 		});
 		let dg = await dockGeom();
-		ok("docked right, it first takes the 45% of the window it always docked at (864 px)", Math.abs(dg.w - 864) <= 2 && dg.gx !== null, JSON.stringify(dg));
+		// Card E02 (Tom, 2026-10-07): "no first-dock limit". It docks at the width it floated at.
+		ok('docked right, it first takes the width it floated at (about 1500 px), no share of the window capping it', Math.abs(dg.w - pcW) <= 2 && dg.gx !== null, JSON.stringify(dg));
 		const hit = await a.page.evaluate((p) => { const e = document.elementFromPoint(p.gx, p.gy); return e && (e.id || e.className); }, dg);
 		ok('...its inner edge is the width grip', hit === 'lpn_dock_grip_right', String(hit));
 		const dragGrip = async (toX) => {
@@ -183,7 +184,7 @@ async function main() {
 			dg = await dockGeom();
 		};
 		await dragGrip(1920 - 1300);
-		ok('...its grip widens it to about 1300 px, far past the old 864 px cap', Math.abs(dg.w - 1300) <= 6, dg.w.toFixed(0));
+		ok('...its grip sizes it to about 1300 px', Math.abs(dg.w - 1300) <= 6, dg.w.toFixed(0));
 		ok('...and the map beside it keeps its width', dg.svgW >= 320, String(dg.svgW));
 		await dragGrip(5);
 		ok('...dragged to the window\'s far edge, it stops where the map keeps its 320 px', dg.svgW >= 319 && dg.svgW <= 330 && dg.w > 1500,
