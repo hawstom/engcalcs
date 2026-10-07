@@ -16,6 +16,10 @@
 //   4. MEND.  A label still hidden may evict one blocking neighbour, if that neighbour can go
 //      somewhere else, even with fewer rows (labels before properties).
 //
+// Round 7 added switchable ingredients (see INGREDIENTS below and js/STRATEGY.md): the fewest-
+// open-spots label first, deeper growth, eviction by leaders and of two neighbours, and REPAIR
+// passes on finer rays; and a time bound (R10) past which a layout stops improving.
+//
 // FREE SPACE is modelled three ways, cheapest first: a raster of cells that some obstacle covers
 // completely (a candidate lying over one is certainly illegal), grids of the exact obstacles
 // (symbols and Text objects, which are never covered; pipes, arrows and callouts, which are
@@ -73,12 +77,14 @@ EngCalcs.lpnPlacerC = (function () {
 	var SOFT_MS = 450, STOP_MS = 750;
 	var NAME = 'C (keep, show, grow, mend)';
 
-	// INGREDIENTS, each switchable so its worth can be measured with it off (STRATEGY.md beside the
-	// bench's c-notes). In node: PLACER_C_OFF=evict,fine,... ; on the page: EngCalcs.lpnPlacerCOff
+	// INGREDIENTS, each switchable so its worth can be measured with it off (js/STRATEGY.md).
+	// In node: PLACER_C_OFF=evict,fine,... ; on the page: EngCalcs.lpnPlacerCOff
 	// = ['evict', ...] before create().
 	//   deepgrow  GROW looks further down a label's list for room for one more property (S11)
 	//   evict     MEND's blocker may be a leader as well as a label, and up to two neighbours (S16)
 	//   fine      a REPAIR pass: hidden and cut labels try rays every 15 degrees, every half row (S3, S15)
+	//   finest    then 72 directions at every quarter row, for what is still hidden or cut
+	//   fewest    the label with the fewest open spots on the fixed map is placed first
 	var ING_ALL = ['deepgrow', 'evict', 'fine', 'finest', 'fewest'];
 	function ingredients() {
 		var off = [];
