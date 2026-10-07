@@ -601,7 +601,9 @@ EngCalcs.lpnPlacerC = (function () {
 				if (ING.evict) {
 					order.forEach(function (L) {
 						if (L.cur || (st.pan && L.prevHidden && !L.nearEdge)) { return; }
-						withFine(L, function () { mend(st, [L], t2); });
+						st.fineMend = true;
+					withFine(L, function () { mend(st, [L], t2); });
+					st.fineMend = false;
 					});
 				}
 				st.fineGrow = true;
@@ -838,8 +840,11 @@ EngCalcs.lpnPlacerC = (function () {
 					if (!link) { specs.push({ t: 'adj', ux: ux, uy: uy, layout: layout, base: pref + sh }); }
 					for (var k = 1; k <= 8; k++) {
 						var len = k * row / 2 - (link ? 4 : 0);
-						specs.push({ t: 'ldr', ux: ux, uy: uy, len: len, layout: layout,
-							base: (link ? 0.3 : 0) + LDR_BASE + len * LDR_PER_PX + pref * 0.5 + (link && L.along ? LEVEL / 2 : 0) + sh });
+						var b0 = (link ? 0.3 : 0) + LDR_BASE + len * LDR_PER_PX + pref * 0.5 + (link && L.along ? LEVEL / 2 : 0) + sh;
+						specs.push({ t: 'ldr', ux: ux, uy: uy, len: len, layout: layout, base: b0 });
+						// The same ray with the block hung by its near corner, not its end row's middle:
+						// other ground for the same leader.
+						if (Math.abs(ux) > 0.26 && Math.abs(uy) > 0.26) { specs.push({ t: 'ldr', corner: true, ux: ux, uy: uy, len: len, layout: layout, base: b0 + 0.05 }); }
 					}
 				});
 			}
@@ -914,8 +919,13 @@ EngCalcs.lpnPlacerC = (function () {
 		// A block hung from the leader's end (ex, ey), on the side away from the leader (R5: the
 		// text is justified to the side the leader arrives from). Straight, or with the one
 		// standard short hook when the leader climbs steeply (R6).
-		function hang(st, L, c, rsI, layout, sx, sy, hx, hy, ux, uy) {
+		function hang(st, L, c, rsI, layout, sx, sy, hx, hy, ux, uy, corner) {
 			var side = ux >= -1e-9 ? 1 : -1, d = dims(st, L, rsI, layout), ex = hx, ey = hy, hooked = Math.abs(uy) > 0.72;
+			if (corner) {
+				fillBlock(st, L, c, rsI, layout, side > 0 ? 'left' : 'right', side > 0 ? ex : ex - d.w, uy < 0 ? ey - d.h : ey, 0);
+				setLeader(c, 2, sx, sy, ex, ey);
+				return true;
+			}
 			if (hooked) { ex = hx + side * hookLen(st); }
 			var rows = L.rowsets[rsI], first = L.rows[rows[0]].h, last = L.rows[rows[rows.length - 1]].h, y;
 			if (layout === 'line') { y = ey - d.h / 2; } else if (uy < -0.35) { y = ey - d.h + last / 2; } else if (uy > 0.35) { y = ey - first / 2; } else { y = ey - d.h / 2; }
@@ -937,7 +947,7 @@ EngCalcs.lpnPlacerC = (function () {
 			}
 			var rb = Math.min(Math.abs(ux) > 1e-9 ? o.sw / Math.abs(ux) : Infinity, Math.abs(uy) > 1e-9 ? o.sh / Math.abs(uy) : Infinity);
 			var r0 = Math.min(o.sw, o.sh);
-			return hang(st, L, c, rsI, spec.layout, o.x + ux * r0, o.y + uy * r0, o.x + ux * (rb + spec.len), o.y + uy * (rb + spec.len), ux, uy);
+			return hang(st, L, c, rsI, spec.layout, o.x + ux * r0, o.y + uy * r0, o.x + ux * (rb + spec.len), o.y + uy * (rb + spec.len), ux, uy, spec.corner);
 		}
 		function fillLink(st, L, spec, rsI, c, d) {
 			var o = L.owner, poly = o.poly, P = o.P;
@@ -987,7 +997,7 @@ EngCalcs.lpnPlacerC = (function () {
 				fillBlock(st, L, c, rsI, spec.layout, ux > 0.3 ? 'left' : (ux < -0.3 ? 'right' : 'center'), bx - d.w / 2, by - d.h / 2, 0);
 				return true;
 			}
-			return hang(st, L, c, rsI, spec.layout, P.x, P.y, P.x + ux * (spec.len + 4), P.y + uy * (spec.len + 4), ux, uy);
+			return hang(st, L, c, rsI, spec.layout, P.x, P.y, P.x + ux * (spec.len + 4), P.y + uy * (spec.len + 4), ux, uy, spec.corner);
 		}
 		// Last view's spot, carried by its offset from the anchor.
 		function fillPrev(st, L, rsI, c) {
@@ -1294,7 +1304,7 @@ EngCalcs.lpnPlacerC = (function () {
 				if (st.effort.deadline && now() > st.effort.deadline) { break; }
 				var rsI = L.rowsets.length - 1, tried = {};
 				var sc = L.sc[rsI] || (L.sc[rsI] = new Float64Array(L.specs.length).fill(NaN));
-				for (var k = 0; k < L.specs.length && k < (ING.evict ? 120 : 60) && st.work < limit; k++) {
+				for (var k = 0; k < L.specs.length && k < (st.fineMend ? 400 : (ING.evict ? 120 : 60)) && st.work < limit; k++) {
 					if (sc[k] === Infinity || !fillSpec(st, L, L.specs[k], rsI, c)) { continue; }
 					if (sc[k] !== sc[k]) { sc[k] = staticCost(st, L, c); }
 					if (sc[k] === Infinity || sc[k] >= SHOW_MAX + pen(L, L.specs[k])) { continue; }
@@ -1314,8 +1324,7 @@ EngCalcs.lpnPlacerC = (function () {
 					var ok = true;
 					for (var n = 0; n < bls.length && ok; n++) {
 						var bl1 = bls[n], old = olds[n];
-						var moved = bestFor(st, bl1, old.rs, SHOW_MAX, 50);
-						if (!moved && old.rs < bl1.rowsets.length - 1) { moved = bestFor(st, bl1, bl1.rowsets.length - 1, SHOW_MAX, 50); }
+						var moved = rehome(st, bl1, old);
 						if (moved) { commit(st, bl1, moved); } else { ok = false; }
 					}
 					if (ok) { touched.push(L); bls.forEach(function (b) { touched.push(b); }); any = true; break; }
@@ -1325,6 +1334,16 @@ EngCalcs.lpnPlacerC = (function () {
 				}
 			}
 			return any;
+		}
+		// Somewhere else for an evicted neighbour: its own rows, else its smallest form; in the
+		// REPAIR pass also on the fine rays.
+		function rehome(st, B, old) {
+			var last = B.rowsets.length - 1, moved = bestFor(st, B, old.rs, SHOW_MAX, 50);
+			if (!moved && old.rs < last) { moved = bestFor(st, B, last, SHOW_MAX, 50); }
+			if (!moved && st.fineMend) {
+				moved = withFine(B, function () { return bestFor(st, B, old.rs, SHOW_MAX, 0) || (old.rs < last ? bestFor(st, B, last, SHOW_MAX, 0) : null); });
+			}
+			return moved;
 		}
 		function nudge(st, order, touched) {
 			var any = false, limit = st.work + st.effort.nudge, c = st.probe;
