@@ -1286,6 +1286,9 @@ EngCalcs.lpnCollide = (function () {
 			if (r) { seat[lbl.id] = r; } else { waiting.push(lbl); }
 		});
 		waiting.forEach(function (lbl) { seat[lbl.id] = placeAny(lbl, startAt[lbl.id]); });
+		// RULE 2: a label both sweeps dropped gets the denser rescue search. `rescue: false` is the
+		// pass without it, kept for the harness that measures it.
+		if (opts.rescue !== false) { rescueDropped(order, seat, obs, pad, opts.leaderMin > 0 ? opts.leaderMin : 0); }
 		// The result keeps the drop order, so a reader of `out` sees the same sequence either way.
 		order.forEach(function (lbl) { out.push(seat[lbl.id]); });
 		// **THE INPUTS COME BACK EXACTLY AS THEY WENT IN.** placeLabels() makes the same promise, and
@@ -1294,6 +1297,135 @@ EngCalcs.lpnCollide = (function () {
 		// is -- and it is asserted.
 		labels.forEach(function (l) { delete l._reach; });
 		return out;
+	}
+	// ---- the rescue search (the label bench's rule 2) ---------------------------------------------
+	//
+	// **A NODE LABEL THE TWO SWEEPS DROPPED GETS ONE MORE, DENSER LOOK BEFORE IT HIDES** (the second of
+	// the three ports agreed on 2026-10-07; dev/label-trials on feat/label-placer, strategy 3 of the
+	// phase-1 summary). Its own `sides` are the four corners and a raster in the widest open arc, out
+	// to about three symbol offsets; ground further out, or in a narrower gap between its pipes, was
+	// never asked about. So every label still dropped tries leader ends on rays every 15 degrees (none
+	// orthogonal, as everywhere else on this map), at every half row out to RESCUE_ROWS rows, nearest
+	// first.
+	//
+	// **IT ONLY ADDS.** It runs after both sweeps, in drop order, and takes only ground that is clear:
+	// nothing yields to it, so no label that was drawn is moved or hidden for a rescued one. Its
+	// leader is longer than a corner's, so it must also be clean of what a long leader can hit: it
+	// passes through no node symbol (N3) and no label's text, crosses no other node label's leader,
+	// and its rows lie on no leader. Those are refusals, not costs.
+	//
+	// **CLEAN GROUND FIRST HOLDS HERE TOO** (rule 1): among the rescue spots a label takes the nearest
+	// one with no pipe under its rows, and a spot with a pipe under it only when no clean one exists,
+	// because a rescued label is one that would otherwise hide.
+	var RESCUE_ROWS = 4;
+	var RESCUE_ANGLES = (function () {
+		// 315 is top-right in y-down bearings, the corner the four fixed sides try first; the rest
+		// fan out from it, so a tie in distance goes to the conventional side.
+		var out = anglesAt(15);
+		function off(a) { var d = Math.abs(a - 315) % 360; return d > 180 ? 360 - d : d; }
+		out.sort(function (a, b) { return (off(a) - off(b)) || (a - b); });
+		return out.map(function (a) { return [Math.cos(a * Math.PI / 180), Math.sin(a * Math.PI / 180)]; });
+	}());
+	function rescueRow(lbl) { return lbl.h / Math.max(1, lbl.lines && lbl.lines.length ? lbl.lines.length : 1); }
+	function rescueCandidates(lbl) {
+		var row = rescueRow(lbl), out = [], k, m;
+		for (k = 1; k <= RESCUE_ROWS * 2; k++) {
+			for (m = 0; m < RESCUE_ANGLES.length; m++) {
+				out.push({ x: lbl.anchor.x + RESCUE_ANGLES[m][0] * k * row / 2,
+					y: lbl.anchor.y + RESCUE_ANGLES[m][1] * k * row / 2 });
+			}
+		}
+		return out;
+	}
+	// The rescue itself. `seat` is the two sweeps' answer by id and is completed in place; `obs` is the
+	// pass's own working copy (the committed rows are already in it). `leaderMin` is the length under
+	// which the page draws no leader, so such a leader cannot cross anything a reader sees.
+	function rescueDropped(order, seat, obs, pad, leaderMin) {
+		var dropped = order.filter(function (l) { return !l.dragged && seat[l.id] && seat[l.id].dropped; }),
+			reach = 0, index, local = { boxes: [], segments: [] }, byId = {};
+		if (!dropped.length) { return; }
+		order.forEach(function (l) { byId[l.id] = l; });
+		// The node leaders already seated become obstacles a rescued label's rows may not lie on.
+		// Only for this sweep: the two before it never drew a leader into the obstacle list, and
+		// the gang repair afterwards still judges crossings against the whole drawing.
+		order.forEach(function (l) {
+			var r = seat[l.id];
+			if (!r || r.dropped) { return; }
+			if (Math.hypot(r.x - l.anchor.x, r.y - l.anchor.y) <= leaderMin) { return; }
+			obs.segments.push(segment(l.anchor.x, l.anchor.y, r.x, r.y, 'leader', l.id));
+		});
+		dropped.forEach(function (l) {
+			reach = Math.max(reach, RESCUE_ROWS * rescueRow(l) + Math.hypot(l.w, l.h) + pad);
+		});
+		// Its own grid: the reach is longer than the sweeps', and a grid answers only queries no
+		// wider than its cell.
+		index = grid(reach, obs);
+		obs.boxes.forEach(function (b, i) { index.addBox(i); });
+		obs.segments.forEach(function (g, i) { index.addSegment(i); });
+		function leaderOk(lbl, c) {
+			var g, i, o;
+			if (Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y) <= leaderMin) { return true; }
+			g = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id);
+			for (i = 0; i < local.boxes.length; i++) {
+				o = local.boxes[i];
+				if (o.owner !== undefined && o.owner === lbl.id) { continue; }
+				if (o.kind === 'symbol') {
+					// Its own symbol holds the anchor, and every leader starts inside it.
+					if (Math.abs(o.cx - lbl.anchor.x) <= o.w / 2 && Math.abs(o.cy - lbl.anchor.y) <= o.h / 2) { continue; }
+				} else if (o.kind !== 'label') { continue; }
+				if (segmentInBoxFraction(g, o) > 0) { return false; }
+			}
+			for (i = 0; i < local.segments.length; i++) {
+				o = local.segments[i];
+				if (o.kind !== 'leader' || o.owner === lbl.id) { continue; }
+				if (segmentsCross(g, o)) { return false; }
+			}
+			return true;
+		}
+		// **THE SAME 'clear' boxesClearOf() GIVES, ASKED THROUGH A FINE INDEX.** Only 'clear' is
+		// taken here (nothing yields to a rescue), and a dropped label owns nothing on the drawing,
+		// so the question is simply whether any box overlaps a padded row or any leader runs through
+		// one. A rescue asks it at 160 spots a label, and boxIndex() answers it from the few boxes
+		// near the row rather than from everything within the long reach; that is the difference
+		// between a rescue costing a few percent of the pass and a third of it.
+		var boxIdx = boxIndex(obs.boxes), leaders = [];
+		function rowsClear(b) {
+			var k, j, q;
+			for (k = 0; k < b.length; k++) {
+				q = pad > 0 ? box(b[k].cx, b[k].cy, b[k].w + 2 * pad, b[k].h + 2 * pad, b[k].a) : b[k];
+				if (boxIdx.anyOverlap(q)) { return false; }
+				for (j = 0; j < leaders.length; j++) {
+					if (segmentInBoxFraction(leaders[j], q) > 0) { return false; }
+				}
+			}
+			return true;
+		}
+		dropped.forEach(function (lbl) {
+			var cands = rescueCandidates(lbl), i, c, b, fallback = null, fallbackBox = null, chosen = null,
+				chosenBox = null, sides = lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home];
+			index.near(lbl.anchor.x, lbl.anchor.y, RESCUE_ROWS * rescueRow(lbl) + Math.hypot(lbl.w, lbl.h) + pad, local);
+			leaders = local.segments.filter(function (g) { return g.kind === 'leader' && g.owner !== lbl.id; });
+			for (i = 0; i < cands.length; i++) {
+				c = cands[i];
+				b = labelLineBoxes(lbl, c);
+				if (!rowsClear(b)) { continue; }
+				if (!leaderOk(lbl, c)) { continue; }
+				if (!boxesOnLink(b, local, lbl.id)) { chosen = c; chosenBox = b; break; }
+				if (!fallback) { fallback = c; fallbackBox = b; }
+			}
+			if (!chosen) { chosen = fallback; chosenBox = fallbackBox; }
+			if (!chosen) { return; }
+			chosenBox.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
+			if (Math.hypot(chosen.x - lbl.anchor.x, chosen.y - lbl.anchor.y) > leaderMin) {
+				index.addSegment(obs.segments.push(segment(lbl.anchor.x, lbl.anchor.y, chosen.x, chosen.y,
+					'leader', lbl.id)) - 1);
+			}
+			// `side` one past the end of `sides` says "a rescue spot" and stays a number for the
+			// readers that compare it; `rescued` says so by name.
+			seat[lbl.id] = { id: lbl.id, x: chosen.x, y: chosen.y, dx: chosen.x - lbl.home.x,
+				dy: chosen.y - lbl.home.y, dropped: false, side: sides.length, rescued: true,
+				box: labelBoxAtEnd(lbl, chosen), boxes: chosenBox, leader: null };
+		});
 	}
 	// **CLEAR MEANS CLEAR OF THE HARD OBSTACLES, AND THE RANKS SAY WHICH THOSE ARE.** A first-fit has
 	// no score, so the goal ladder cannot be read as magnitudes here -- but it still says everything
